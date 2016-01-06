@@ -1,0 +1,9 @@
+{
+  "name": "dv",
+  "version": "0.0.1",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "author": "Santiago Perez De Rosso"
+}
