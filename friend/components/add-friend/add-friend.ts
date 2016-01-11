@@ -18,6 +18,8 @@ export class AddFriendComponent implements OnInit {
 
   addFriend(user: User) {
     console.log(`adding ${user.username} as friend`);
+    this._friendService.addFriend(this.username, user.username).subscribe(
+        res => {});
   }
 
   ngOnInit() {

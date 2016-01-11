@@ -13,12 +13,14 @@ export class FriendService {
       .map(res => res.json());
   }
 
-  addFriend(u1: User, u2: User) {
-    return {};
+  addFriend(u1: Username, u2: Username) {
+    return this._http.put(this._api + `/users/${u1}/friends/${u2}`, "")
+      .map(res => res.json());
   }
 
-  unfriend(u1: User, u2: User) {
-    return {};
+  unfriend(u1: Username, u2: Username) {
+    return this._http.delete(this._api + `/users/${u1}/friends/${u2}`)
+      .map(res => res.json());
   }
 
   getPotentialFriends(username: Username) {

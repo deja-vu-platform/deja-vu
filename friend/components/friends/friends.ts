@@ -16,8 +16,9 @@ export class FriendsComponent implements OnInit {
   
   constructor(private _friendService: FriendService) {}
 
-  unfriend(friend: User) {
-    console.log(`unfriending ${friend.username}`);
+  unfriend(user: User) {
+    console.log(`unfriending ${user.username}`);
+    this._friendService.unfriend(this.username, user.username).subscribe(res => {});
   }
 
   ngOnInit() {
