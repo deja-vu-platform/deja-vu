@@ -1,5 +1,5 @@
-type Username = string;
-type Message = string;
+export type Username = string;
+export type Message = string;
 
 export interface User {
   username: Username;

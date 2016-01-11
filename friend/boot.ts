@@ -1,6 +1,7 @@
 import {bootstrap} from 'angular2/platform/browser';
-import {FriendsComponent} from './components/friends/friends';
-import {AddFriendComponent} from './components/add-friend/add-friend';
+import {HTTP_PROVIDERS} from 'angular2/http';
+import {FriendPatternComponent} from './friend-pattern.component';
 
-bootstrap(FriendsComponent);
-bootstrap(AddFriendComponent);
+import 'rxjs/add/operator/map';
+
+bootstrap(FriendPatternComponent, [HTTP_PROVIDERS]);

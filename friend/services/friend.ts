@@ -1,14 +1,16 @@
 import {Injectable} from 'angular2/core';
-import {User} from '../user';
+import {Http} from 'angular2/http';
+import {User, Username} from '../user';
 
 @Injectable()
 export class FriendService {
 
-  getFriends() {
-    return Promise.resolve([
-        {'username': 'foo', 'can_read': [], 'authors': [], 'friends': []},
-        {'username': 'bar', 'can_read': [], 'authors': [], 'friends': []}
-        ]);
+  constructor(private _http: Http) {}
+
+  getFriends(username: Username) {
+    return this._http.get(
+      `http://localhost:3000/api/users/${username}/friends`)
+        .map(res => res.json());
   }
 
   addFriend(u1: User, u2: User) {
@@ -19,10 +21,9 @@ export class FriendService {
     return {};
   }
 
-  getUsers() {
-    return Promise.resolve([
-        {'username': 'foo', 'can_read': [], 'authors': [], 'friends': []},
-        {'username': 'bar', 'can_read': [], 'authors': [], 'friends': []}
-        ]);
+  getPotentialFriends(username: Username) {
+    return this._http.get(
+      `http://localhost:3000/api/users?not-friends-of=${username}`)
+        .map(res => res.json());
   }
 }

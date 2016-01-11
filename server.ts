@@ -13,24 +13,26 @@ db.open((err, db) => {
 var friend = express();
 
 friend.use(express.static(__dirname));
-friend.get('/users', (req, res) => {
+// api supports fields param
+// supports ?not-friends-of=:userid
+friend.get('/api/users', (req, res) => {
   console.log("getting all users");
-  res.json({});
+  res.json([{"username": "Bob"}, {"username": "Bar"}]);
 });
-friend.get('/users/:userid/friends', (req, res) => {
+friend.get('/api/users/:userid/friends', (req, res) => {
   console.log(`getting friends of ${req.params.userid}`);
-  res.json({});
+  res.json([{"username": "Bob"}, {"username": "Bar"}]);
 });
 
-friend.put('/users/:userid/friends/:friendid', (req, res) => {
+friend.put('/api/users/:userid/friends/:friendid', (req, res) => {
   console.log(
       `adding ${req.params.friendid} as a friend of ${req.params.userid}`);
-  res.json({});
+  res.json({"0": {}});
 });
 
-friend.delete('/users/:userid/friends/:friendid', (req, res) => {
+friend.delete('/api/users/:userid/friends/:friendid', (req, res) => {
   console.log(`unfriending ${req.params.friendid} and ${req.params.userid}`);
-  res.json({});
+  res.json({"0": {}});
 });
 
 friend.listen(3000, () => {

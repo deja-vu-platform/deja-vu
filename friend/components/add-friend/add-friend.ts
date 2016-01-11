@@ -1,7 +1,7 @@
-import {Component} from 'angular2/core';
+import {Component, Input} from 'angular2/core';
 import {OnInit} from 'angular2/core';
 
-import {User} from '../../user';
+import {User, Username} from '../../user';
 import {FriendService} from '../../services/friend';
 
 
@@ -11,14 +11,17 @@ import {FriendService} from '../../services/friend';
   providers: [FriendService]
 })
 export class AddFriendComponent implements OnInit {
-  users: User[];
+  @Input() username: Username;
+  potentialFriends: User[];
   
   constructor(private _friendService: FriendService) {}
 
   addFriend(user: User) {
-    console.log('added ' + user + ' as a friend');
+    console.log(`adding ${user.username} as friend`);
   }
+
   ngOnInit() {
-    this._friendService.getUsers().then(users => this.users = users);
+    this._friendService.getPotentialFriends(this.username).subscribe(
+        potentialFriends => this.potentialFriends = potentialFriends);
   }
 }
