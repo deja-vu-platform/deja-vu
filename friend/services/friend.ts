@@ -4,13 +4,13 @@ import {User, Username} from '../user';
 
 @Injectable()
 export class FriendService {
+  private _api = "http://localhost:3000/api";
 
   constructor(private _http: Http) {}
 
   getFriends(username: Username) {
-    return this._http.get(
-      `http://localhost:3000/api/users/${username}/friends`)
-        .map(res => res.json());
+    return this._http.get(this._api + `/users/${username}/friends`)
+      .map(res => res.json());
   }
 
   addFriend(u1: User, u2: User) {
@@ -23,8 +23,7 @@ export class FriendService {
 
   getPotentialFriends(username: Username) {
     return this._http.get(
-      "http://localhost:3000/api/users?" +
-      `not-friends-of=${username}&fields=username,friends`)
+        this._api + `/users?not-friends-of=${username}&fields=username,friends`)
         .map(res => res.json());
   }
 }
