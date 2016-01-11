@@ -23,7 +23,8 @@ export class FriendService {
 
   getPotentialFriends(username: Username) {
     return this._http.get(
-      `http://localhost:3000/api/users?not-friends-of=${username}`)
+      "http://localhost:3000/api/users?" +
+      `not-friends-of=${username}&fields=username,friends`)
         .map(res => res.json());
   }
 }
