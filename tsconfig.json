@@ -11,7 +11,7 @@
   },
   "exclude": [
     "node_modules",
-    "server.ts",
+    "app.ts",
     "db.ts"
   ]
 }
