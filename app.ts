@@ -5,82 +5,104 @@ import morgan = require('morgan');
 
 import {db} from "./db";
 
+
+module Validation {
+  function _exists(username, res, next) {
+    db.collection('users', {strict: true}, (err, users) => {
+      if (err) { console.log(err); return; }
+      users.findOne({username: username}, (err, user) => {
+        if (err) { console.log(err); return; }
+        if (!user) {
+          res.status(400);
+          next(`user ${username} not found`);
+        } else {
+          next();
+        }
+      });
+    });
+  }
+  
+  export function userExists(req, res, next) {
+    _exists(req.params.userid, res, next);
+  }
+  
+  export function friendExists(req, res, next) {
+    _exists(req.params.friendid, res, next);
+  }
+
+  export function friendNotSameAsUser(req, res, next) {
+    if (req.params.userid == req.params.friendid) {
+      res.status(400);
+      next.send("userid match friendid");
+    } else {
+      next();
+    }
+  }
+}
+
+module Processor {
+  export function fields(req, unused_res, next) {
+    var fields = req.query.fields;
+    if (fields) {
+     var ret = {}
+     fields.split(',').forEach(e => ret[e] = 1);
+     req.query.fields = ret;
+    }
+    next();
+  }
+}
+
 var app = express();
 
 app.use(morgan('dev'));
 app.use(express.static(__dirname));
-// api supports fields param
-var getFields = (req, prefix = "", default_fields = {}) => {
-  var fields = default_fields;
-  if (req.query.fields) {
-    fields = {};
-    req.query.fields.split(',').forEach(e => fields[prefix + e] = 1);
-  }
-  console.log('return is ' + JSON.stringify(fields));
-  return fields;
-};
-// supports ?not-friends-of=:userid
-app.get('/api/users', (req, res) => {
-  var fields = getFields(req);
-  var query = {};
-  var not_friends_of = req.query['not-friends-of'];
-  if (not_friends_of) {
-    query = {friends: {$nin: [not_friends_of]}};
-  }
-  console.log(JSON.stringify(query));
-  db.collection('users', {strict: true}, (err, users) => {
-    if (err) { console.log(err); return; }
-    users.find(query, fields, (err, friends) => {
-      if (err) { console.log(err); return; }
-      friends.toArray((err, arr) => {
-        if (err) { console.log(err); return; }
-        res.json(arr);
-      });
-    });
-  });
-});
 
-app.get('/api/users/:userid/friends', (req, res) => {
-  var fields = getFields(req, 'friends', {friends: 1});
-  db.collection('users', {strict: true}, (err, users) => {
-    if (err) { console.log(err); return; }
-    users.findOne({username: req.params.userid}, fields, (err, user) => {
+//
+// API
+//
+app.get(
+  '/api/users/:userid/potential_friends',
+  Validation.userExists,
+  Processor.fields,
+  (req, res) => {
+    db.collection('users', {strict: true}, (err, users) => {
       if (err) { console.log(err); return; }
-      if (!user) {
-        res.status(400).send("user not found");
-        return;
-      }
-      users.find({username: {$in: user.friends}}, (err, users) => {
+      var query = {friends: {$nin: [req.params.userid]}};
+      users.find(query, req.query.fields, (err, friends) => {
         if (err) { console.log(err); return; }
-        users.toArray((err, arr) => {
+        friends.toArray((err, arr) => {
           if (err) { console.log(err); return; }
           res.json(arr);
-        })
+        });
       });
     });
   });
-});
 
-app.put('/api/users/:userid/friends/:friendid', (req, res) => {
-  var userid = req.params.userid;
-  var friendid = req.params.friendid;
-
-  if (userid == friendid) {
-    res.status(400).send("userid match friendid");
-  }
-  db.collection('users', {strict: true}, (err, users) => {
-    if (err) { console.log(err); return; }
-
-    users.findOne({username: friendid}, (err, user) => {
-      if (user == null) {
-        res.status(400).send("no friend");
-        return;
-      }
-      updateOne(users, userid, friendid, {$addToSet: {friends: friendid}});
-      updateOne(users, friendid, userid, {$addToSet: {friends: userid}});
+app.get(
+  '/api/users/:userid/friends',
+  Validation.userExists,
+  Processor.fields,
+  (req, res) => {
+    db.collection('users', {strict: true}, (err, users) => {
+      if (err) { console.log(err); return; }
+      users.findOne({username: req.params.userid}, (err, user) => {
+        if (err) { console.log(err); return; }
+        if (!user.friends) {
+          res.json([]);
+          return;
+        }
+        users.find(
+          {username: {$in: user.friends}}, req.query.fields,
+          (err, users) => {
+            if (err) { console.log(err); return; }
+            users.toArray((err, arr) => {
+              if (err) { console.log(err); return; }
+              res.json(arr);
+            })
+          });
+      });
     });
   });
-});
 
 var updateOne = (users, userid, friendid, update) => {
   users.updateOne(
@@ -88,15 +110,35 @@ var updateOne = (users, userid, friendid, update) => {
       if (err) { console.log(err); return; }
   });
 };
-app.delete('/api/users/:userid/friends/:friendid', (req, res) => {
-  db.collection('users', {strict: true}, (err, users) => {
-    if (err) { console.log(err); return; }
-    var userid = req.params.userid;
-    var friendid = req.params.friendid;
-    updateOne(users, userid, friendid, {$pull: {friends: friendid}});
-    updateOne(users, friendid, userid, {$pull: {friends: userid}});
+
+app.put(
+  '/api/users/:userid/friends/:friendid',
+  Validation.userExists, Validation.friendExists,
+  Validation.friendNotSameAsUser,
+  (req, res) => {
+    db.collection('users', {strict: true}, (err, users) => {
+      if (err) { console.log(err); return; }
+      var userid = req.params.userid;
+      var friendid = req.params.friendid;
+      updateOne(users, userid, friendid, {$addToSet: {friends: friendid}});
+      updateOne(users, friendid, userid, {$addToSet: {friends: userid}});
+    });
   });
-});
+
+app.delete(
+  '/api/users/:userid/friends/:friendid',
+  Validation.userExists, Validation.friendExists,
+  Validation.friendNotSameAsUser,
+  (req, res) => {
+    db.collection('users', {strict: true}, (err, users) => {
+      if (err) { console.log(err); return; }
+      var userid = req.params.userid;
+      var friendid = req.params.friendid;
+      updateOne(users, userid, friendid, {$pull: {friends: friendid}});
+      updateOne(users, friendid, userid, {$pull: {friends: userid}});
+    });
+  });
+
 
 app.listen(3000, () => {
   console.log(`Listening on port 3000 in mode ${app.settings.env}`);

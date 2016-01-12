@@ -9,7 +9,8 @@ export class FriendService {
   constructor(private _http: Http) {}
 
   getFriends(username: Username) {
-    return this._http.get(this._api + `/users/${username}/friends`)
+    return this._http.get(
+      this._api + `/users/${username}/friends` + '?fields=username,friends')
       .map(res => res.json());
   }
 
@@ -25,7 +26,8 @@ export class FriendService {
 
   getPotentialFriends(username: Username) {
     return this._http.get(
-        this._api + `/users?not-friends-of=${username}&fields=username,friends`)
-        .map(res => res.json());
+      this._api + `/users/${username}/potential_friends` +
+      '?fields=username,friends')
+      .map(res => res.json());
   }
 }
