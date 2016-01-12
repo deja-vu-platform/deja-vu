@@ -6,9 +6,9 @@ import {AddFriendComponent} from './components/add-friend/add-friend';
   selector: 'friend-pattern',
   template: `
     <h1>Friends(User)</h1>
-    <friends username="foo">Loading...</friends>
+    <friends username="benbitdiddle">Loading...</friends>
     <h1>AddFriend(User)</h1>
-    <add-friend username="foo">Loading...</add-friend>
+    <add-friend username="benbitdiddle">Loading...</add-friend>
   `,
   directives: [FriendsComponent, AddFriendComponent]
 })

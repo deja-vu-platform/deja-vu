@@ -13,8 +13,12 @@ db.open((err, db) => {
         console.log(`Removed ${remove_count} elems`);
       });
     users.insert([
-      {username: "foo", friends: []},
-      {username: "bar", friends: []}
+      {username: "benbitdiddle", friends: []},
+      {username: "alyssaphacker", friends: []},
+      {username: "eva", friends: []},
+      {username: "louis", friends: []},
+      {username: "cydfect", friends: []},
+      {username: "lem", friends: []}
     ], (err, res) => {
       if (err) { console.log(err); return; }
     });
