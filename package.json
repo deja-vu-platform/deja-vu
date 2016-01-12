@@ -4,10 +4,10 @@
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "tsc:server": "tsc server.ts db.ts --module commonjs",
-    "server:start": "node server.js",
-    "server": "npm run tsc:server && npm run server:start",
-    "start": "concurrent \"npm run tsc:w\" \"npm run server\""
+    "tsc:app": "tsc app.ts db.ts --module commonjs",
+    "app:start": "node app.js",
+    "app": "npm run tsc:app && npm run app:start",
+    "start": "concurrent \"npm run tsc:w\" \"npm run app\""
   },
   "license": "MIT",
   "dependencies": {
