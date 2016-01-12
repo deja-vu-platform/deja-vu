@@ -1,33 +1,38 @@
 /// <reference path="typings/express/express.d.ts" />
 /// <reference path="typings/morgan/morgan.d.ts" />
+/// <reference path="typings/mongodb/mongodb.d.ts" />
 import * as express from "express";
 import morgan = require('morgan');
+import {Collection} from "mongodb";
 
 import {db} from "./db";
 
 
+interface Request extends express.Request {
+  users: Collection;
+  fields;
+}
+
 module Validation {
-  function _exists(username, res, next) {
-    db.collection('users', {strict: true}, (err, users) => {
-      if (err) { console.log(err); return; }
-      users.findOne({username: username}, (err, user) => {
-        if (err) { console.log(err); return; }
-        if (!user) {
-          res.status(400);
-          next(`user ${username} not found`);
-        } else {
-          next();
-        }
-      });
+  function _exists(username, req, res, next) {
+    if (!req.users) req.users = db.collection('users');
+    req.users.findOne({username: username}, {_id: 1}, (err, user) => {
+      if (err) return next(err);
+      if (!user) {
+        res.status(400);
+        next(`user ${username} not found`);
+      } else {
+        next();
+      }
     });
   }
-  
+
   export function userExists(req, res, next) {
-    _exists(req.params.userid, res, next);
+    _exists(req.params.userid, req, res, next);
   }
   
   export function friendExists(req, res, next) {
-    _exists(req.params.friendid, res, next);
+    _exists(req.params.friendid, req, res, next);
   }
 
   export function friendNotSameAsUser(req, res, next) {
@@ -44,9 +49,9 @@ module Processor {
   export function fields(req, unused_res, next) {
     var fields = req.query.fields;
     if (fields) {
-     var ret = {}
-     fields.split(',').forEach(e => ret[e] = 1);
-     req.query.fields = ret;
+      var ret = {}
+      fields.split(',').forEach(e => ret[e] = 1);
+      req.fields = ret;
     }
     next();
   }
@@ -64,16 +69,17 @@ app.get(
   '/api/users/:userid/potential_friends',
   Validation.userExists,
   Processor.fields,
-  (req, res) => {
-    db.collection('users', {strict: true}, (err, users) => {
-      if (err) { console.log(err); return; }
-      var query = {friends: {$nin: [req.params.userid]}};
-      users.find(query, req.query.fields, (err, friends) => {
-        if (err) { console.log(err); return; }
-        friends.toArray((err, arr) => {
-          if (err) { console.log(err); return; }
-          res.json(arr);
-        });
+  (req: Request, res, next) => {
+    var query = {
+    $and: [
+      {friends: {$nin: [req.params.userid]}},
+      {username: {$ne: req.params.userid}}
+    ]};
+    req.users.find(query, req.fields, (err, friends) => {
+      if (err) return next(err);
+      friends.toArray((err, arr) => {
+        if (err) return next(err);
+        res.json(arr);
       });
     });
   });
@@ -82,32 +88,28 @@ app.get(
   '/api/users/:userid/friends',
   Validation.userExists,
   Processor.fields,
-  (req, res) => {
-    db.collection('users', {strict: true}, (err, users) => {
-      if (err) { console.log(err); return; }
-      users.findOne({username: req.params.userid}, (err, user) => {
-        if (err) { console.log(err); return; }
-        if (!user.friends) {
-          res.json([]);
-          return;
-        }
-        users.find(
-          {username: {$in: user.friends}}, req.query.fields,
-          (err, users) => {
-            if (err) { console.log(err); return; }
-            users.toArray((err, arr) => {
-              if (err) { console.log(err); return; }
-              res.json(arr);
-            })
-          });
-      });
+  (req: Request, res, next) => {
+    req.users.findOne({username: req.params.userid}, (err, user) => {
+      if (err) return next(err);
+      if (!user.friends) {
+        res.json([]);
+        return;
+      }
+      req.users.find(
+        {username: {$in: user.friends}}, req.fields,
+        (err, users) => {
+          if (err) return next(err);
+          users.toArray((err, arr) => {
+            if (err) return next(err);
+            res.json(arr);
+          })
+        });
     });
   });
 
-var updateOne = (users, userid, friendid, update) => {
-  users.updateOne(
-    {username: userid}, update, (err, user) => {
-      if (err) { console.log(err); return; }
+var updateOne = (users, userid, update, next) => {
+  users.updateOne({username: userid}, update, (err, user) => {
+    if (err) return next(err);
   });
 };
 
@@ -115,28 +117,24 @@ app.put(
   '/api/users/:userid/friends/:friendid',
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
-  (req, res) => {
-    db.collection('users', {strict: true}, (err, users) => {
-      if (err) { console.log(err); return; }
-      var userid = req.params.userid;
-      var friendid = req.params.friendid;
-      updateOne(users, userid, friendid, {$addToSet: {friends: friendid}});
-      updateOne(users, friendid, userid, {$addToSet: {friends: userid}});
-    });
+  (req: Request, res, next) => {
+    var userid = req.params.userid;
+    var friendid = req.params.friendid;
+    updateOne(req.users, userid, {$addToSet: {friends: friendid}}, next);
+    updateOne(req.users, friendid, {$addToSet: {friends: userid}}, next);
+    res.json({});
   });
 
 app.delete(
   '/api/users/:userid/friends/:friendid',
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
-  (req, res) => {
-    db.collection('users', {strict: true}, (err, users) => {
-      if (err) { console.log(err); return; }
-      var userid = req.params.userid;
-      var friendid = req.params.friendid;
-      updateOne(users, userid, friendid, {$pull: {friends: friendid}});
-      updateOne(users, friendid, userid, {$pull: {friends: userid}});
-    });
+  (req: Request, res, next) => {
+    var userid = req.params.userid;
+    var friendid = req.params.friendid;
+    updateOne(req.users, userid, {$pull: {friends: friendid}}, next);
+    updateOne(req.users, friendid, {$pull: {friends: userid}}, next);
+    res.json({});
   });
 
 
