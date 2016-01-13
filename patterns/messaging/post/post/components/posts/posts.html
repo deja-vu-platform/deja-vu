@@ -1,0 +1,12 @@
+<!-- Posts(User) -->
+<div>
+  <ul *ngIf="posts && posts.length > 0">
+    <li *ngFor="#post of posts">
+      {{post.content}}
+      by {{post.author}}
+    </li>
+  </ul>
+  <div *ngIf="!posts || posts.length == 0">
+    No posts to show
+  </div>
+</div>
