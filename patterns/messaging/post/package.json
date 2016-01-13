@@ -8,7 +8,7 @@
     "tslint": "tslint *.ts post/**/**/*.ts post/**/*.ts",
     "app:start": "node app.js",
     "app": "npm run tsc:app && npm run app:start",
-    "start": "concurrent \"npm run tsc:w\" \"npm run app\""
+    "start": "npm run tslint && concurrent \"npm run tsc:w\" \"npm run app\""
   },
   "license": "MIT",
   "dependencies": {
