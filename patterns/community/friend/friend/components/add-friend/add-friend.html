@@ -1,0 +1,9 @@
+<!-- AddFriends(User) -->
+<div>
+  <ul>
+    <li *ngFor="#potentialFriend of potentialFriends">
+      {{potentialFriend.username}}
+      <button (click)="addFriend(potentialFriend)">Add Friend</button>
+    </li>
+  </ul>
+</div>
