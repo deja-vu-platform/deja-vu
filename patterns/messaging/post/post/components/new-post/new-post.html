@@ -1,4 +1,8 @@
 <!-- NewPost(User) -->
 <div>
-  new post...
+  <form (ngSubmit)="onSubmit()" #postForm="ngForm">
+    <textarea required
+      [(ngModel)]="post.content" ngControl="content"></textarea>
+    <button type="submit" [disabled]="!postForm.form.valid">Create Post</button>
+  </form>
 </div>

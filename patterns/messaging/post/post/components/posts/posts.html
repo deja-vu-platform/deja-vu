@@ -3,7 +3,7 @@
   <ul *ngIf="posts && posts.length > 0">
     <li *ngFor="#post of posts">
       {{post.content}}
-      by {{post.author}}
+      by {{username}}
     </li>
   </ul>
   <div *ngIf="!posts || posts.length == 0">

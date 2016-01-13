@@ -1,6 +1,6 @@
 import {Injectable} from "angular2/core";
-import {Http} from "angular2/http";
-import {User, Username, Content} from "../data";
+import {Http, Headers} from "angular2/http";
+import {User, Username, Post} from "../data";
 
 @Injectable()
 export class PostService {
@@ -10,13 +10,17 @@ export class PostService {
 
   getPosts(username: Username) {
     return this._http.get(
-      this._api + `/users/${username}/posts` + "?fields=content")
+      this._api + `/users/${username}/posts`)
       .map(res => res.json());
   }
 
-  newPost(username: Username, content: Content) {
+  newPost(username: Username, post: Post) {
+    const headers = new Headers();
+    headers.append("Content-type", "application/json");
     return this._http.post(
-      this._api + `/users/${username}/posts`, content)
+      this._api + `/users/${username}/posts`, JSON.stringify(post), {
+        headers: headers
+      })
       .map(res => res.json());
   }
 }

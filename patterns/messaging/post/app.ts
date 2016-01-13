@@ -1,7 +1,9 @@
 /// <reference path="typings/express/express.d.ts" />
+/// <reference path="typings/body-parser/body-parser.d.ts" />
 /// <reference path="typings/morgan/morgan.d.ts" />
 /// <reference path="typings/mongodb/mongodb.d.ts" />
 import * as express from "express";
+import * as bodyParser from "body-parser";
 import morgan = require("morgan");
 import {Collection} from "mongodb";
 
@@ -51,13 +53,17 @@ app.get(
     });
   });
 
+var jsonParser = bodyParser.json();
+
 app.post(
   "/api/users/:userid/posts",
-  Validation.userExists,
+  Validation.userExists, jsonParser,
   (req: Request, res, next) => {
+    console.log(req.body);
+    console.log(JSON.stringify(req.body));
     req.users.updateOne(
       {username: req.params.userid},
-      {$addToSet: {posts: { content: req.body }}},
+      {$addToSet: {posts: req.body }},
       (err, user) => {
         if (err) return next(err);
         res.json({});
