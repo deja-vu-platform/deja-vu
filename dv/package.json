@@ -5,5 +5,8 @@
   "scripts": {
     "start": "electron main.js"
   },
-  "author": "Santiago Perez De Rosso"
+  "author": "Santiago Perez De Rosso",
+  "devDependencies": {
+    "electron-prebuilt": "^0.36.3"
+  }
 }
