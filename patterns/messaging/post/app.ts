@@ -53,7 +53,7 @@ app.get(
     });
   });
 
-var jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json();
 
 app.post(
   "/api/users/:userid/posts",
@@ -63,7 +63,7 @@ app.post(
     console.log(JSON.stringify(req.body));
     req.users.updateOne(
       {username: req.params.userid},
-      {$addToSet: {posts: req.body }},
+      {$push: {posts: req.body }},
       (err, user) => {
         if (err) return next(err);
         res.json({});
