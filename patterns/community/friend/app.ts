@@ -2,7 +2,7 @@
 /// <reference path="typings/morgan/morgan.d.ts" />
 /// <reference path="typings/mongodb/mongodb.d.ts" />
 import * as express from "express";
-import morgan = require('morgan');
+import morgan = require("morgan");
 import {Collection} from "mongodb";
 
 import {db} from "./db";
@@ -13,9 +13,9 @@ interface Request extends express.Request {
   fields;
 }
 
-module Validation {
+namespace Validation {
   function _exists(username, req, res, next) {
-    if (!req.users) req.users = db.collection('users');
+    if (!req.users) req.users = db.collection("users");
     req.users.findOne({username: username}, {_id: 1}, (err, user) => {
       if (err) return next(err);
       if (!user) {
@@ -30,13 +30,13 @@ module Validation {
   export function userExists(req, res, next) {
     _exists(req.params.userid, req, res, next);
   }
-  
+
   export function friendExists(req, res, next) {
     _exists(req.params.friendid, req, res, next);
   }
 
   export function friendNotSameAsUser(req, res, next) {
-    if (req.params.userid == req.params.friendid) {
+    if (req.params.userid === req.params.friendid) {
       res.status(400);
       next.send("userid match friendid");
     } else {
@@ -45,32 +45,32 @@ module Validation {
   }
 }
 
-module Processor {
+namespace Processor {
   export function fields(req, unused_res, next) {
-    var fields = req.query.fields;
+    const fields = req.query.fields;
     if (fields) {
-      var ret = {}
-      fields.split(',').forEach(e => ret[e] = 1);
+      const ret = {};
+      fields.split(",").forEach(e => ret[e] = 1);
       req.fields = ret;
     }
     next();
   }
 }
 
-var app = express();
+const app = express();
 
-app.use(morgan('dev'));
+app.use(morgan("dev"));
 app.use(express.static(__dirname));
 
 //
 // API
 //
 app.get(
-  '/api/users/:userid/potential_friends',
+  "/api/users/:userid/potential_friends",
   Validation.userExists,
   Processor.fields,
   (req: Request, res, next) => {
-    var query = {
+    const query = {
     $and: [
       {friends: {$nin: [req.params.userid]}},
       {username: {$ne: req.params.userid}}
@@ -85,7 +85,7 @@ app.get(
   });
 
 app.get(
-  '/api/users/:userid/friends',
+  "/api/users/:userid/friends",
   Validation.userExists,
   Processor.fields,
   (req: Request, res, next) => {
@@ -102,36 +102,36 @@ app.get(
           users.toArray((err, arr) => {
             if (err) return next(err);
             res.json(arr);
-          })
+          });
         });
     });
   });
 
-var updateOne = (users, userid, update, next) => {
+const updateOne = (users, userid, update, next) => {
   users.updateOne({username: userid}, update, (err, user) => {
     if (err) return next(err);
   });
 };
 
 app.put(
-  '/api/users/:userid/friends/:friendid',
+  "/api/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
   (req: Request, res, next) => {
-    var userid = req.params.userid;
-    var friendid = req.params.friendid;
+    const userid = req.params.userid;
+    const friendid = req.params.friendid;
     updateOne(req.users, userid, {$addToSet: {friends: friendid}}, next);
     updateOne(req.users, friendid, {$addToSet: {friends: userid}}, next);
     res.json({});
   });
 
 app.delete(
-  '/api/users/:userid/friends/:friendid',
+  "/api/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
   (req: Request, res, next) => {
-    var userid = req.params.userid;
-    var friendid = req.params.friendid;
+    const userid = req.params.userid;
+    const friendid = req.params.friendid;
     updateOne(req.users, userid, {$pull: {friends: friendid}}, next);
     updateOne(req.users, friendid, {$pull: {friends: userid}}, next);
     res.json({});
