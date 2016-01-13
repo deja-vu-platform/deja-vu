@@ -1,6 +1,6 @@
-import {Injectable} from 'angular2/core';
-import {Http} from 'angular2/http';
-import {User, Username} from '../user';
+import {Injectable} from "angular2/core";
+import {Http} from "angular2/http";
+import {User, Username} from "../user";
 
 @Injectable()
 export class FriendService {
@@ -10,7 +10,7 @@ export class FriendService {
 
   getFriends(username: Username) {
     return this._http.get(
-      this._api + `/users/${username}/friends` + '?fields=username,friends')
+      this._api + `/users/${username}/friends` + "?fields=username,friends")
       .map(res => res.json());
   }
 
@@ -27,7 +27,7 @@ export class FriendService {
   getPotentialFriends(username: Username) {
     return this._http.get(
       this._api + `/users/${username}/potential_friends` +
-      '?fields=username,friends')
+      "?fields=username,friends")
       .map(res => res.json());
   }
 }
