@@ -1,0 +1,12 @@
+<!-- Feed(Name) -->
+<div>
+  <ul *ngIf="feed && feed.length > 0">
+    <li *ngFor="#feedItem of feed">
+      {{feedItem.content}}
+      by {{feedItem.publisher}}
+    </li>
+  </ul>
+  <div *ngIf="!feed || feed.length == 0">
+    No content to show
+  </div>
+</div>
