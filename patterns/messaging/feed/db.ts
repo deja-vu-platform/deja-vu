@@ -8,13 +8,14 @@ db.open((err, db) => {
   console.log("Mongodb started");
 
   db.createCollection("subscribers", (err, subs) => {
-    console.log("Reseting existing subscribers collection");
+    console.log("Resetting subscribers collection");
     subs.remove((err, remove_count) => {
         if (err) { console.log(err); return; }
         console.log(`Removed ${remove_count} elems`);
       });
     subs.insert([
-      {name: "Ben", subscriptions: ["Software Engineering News", "Things Ben Bitdiddle Says"]},
+      {name: "Ben", subscriptions: [
+        "Software Engineering News", "Things Ben Bitdiddle Says"]},
       {name: "Alyssa", subscriptions: []}
     ], (err, res) => {
       if (err) { console.log(err); return; }
@@ -22,7 +23,7 @@ db.open((err, db) => {
   });
 
   db.createCollection("publisher", (err, pubs) => {
-    console.log("Reseting existing publishers collection");
+    console.log("Resetting publishers collection");
     pubs.remove((err, remove_count) => {
         if (err) { console.log(err); return; }
         console.log(`Removed ${remove_count} elems`);

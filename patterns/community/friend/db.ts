@@ -7,7 +7,7 @@ db.open((err, db) => {
   if (err) { console.log(err); return; }
   console.log("Mongodb started");
   db.createCollection("users", (err, users) => {
-    console.log("Reseting existing users collection");
+    console.log("Resetting users collection");
     users.remove((err, remove_count) => {
         if (err) { console.log(err); return; }
         console.log(`Removed ${remove_count} elems`);
