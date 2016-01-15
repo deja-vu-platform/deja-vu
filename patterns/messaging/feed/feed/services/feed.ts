@@ -14,7 +14,7 @@ export class FeedService {
   constructor(private _http: Http) {}
 
   getFeed(sub: Name) {
-    return this._http.get(this._api + `/subs/${name}/feed`)
+    return this._http.get(this._api + `/subs/${sub}/feed`)
       .map(res => res.json());
       // stuff here
   }

@@ -9,18 +9,19 @@ db.open((err, db) => {
   db.createCollection("users", (err, users) => {
     console.log("Resetting users collection");
     users.remove((err, remove_count) => {
-        if (err) { console.log(err); return; }
-        console.log(`Removed ${remove_count} elems`);
-      });
-    users.insert([
-      {username: "benbitdiddle", posts: []},
-      {username: "alyssaphacker", posts: []},
-      {username: "eva", posts: []},
-      {username: "louis", posts: []},
-      {username: "cydfect", posts: []},
-      {username: "lem", posts: []}
-    ], (err, res) => {
       if (err) { console.log(err); return; }
+      console.log(`Removed ${remove_count} elems`);
+
+      users.insertMany([
+        {username: "benbitdiddle", posts: []},
+        {username: "alyssaphacker", posts: []},
+        {username: "eva", posts: []},
+        {username: "louis", posts: []},
+        {username: "cydfect", posts: []},
+        {username: "lem", posts: []}
+      ], (err, res) => {
+        if (err) { console.log(err); return; }
+      });
     });
   });
 });

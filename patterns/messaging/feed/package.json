@@ -5,7 +5,7 @@
     "tsc": "tsc",
     "tsc:w": "tsc -w",
     "tsc:app": "tsc app.ts db.ts --module commonjs",
-    "tslint": "tslint *.ts feed/**/**/*.ts feed/**/*.ts",
+    "tslint": "tslint *.ts feed/**/**/*.ts feed/**/*.ts feed/*.ts",
     "app:start": "node app.js",
     "app": "npm run tsc:app && npm run app:start",
     "start": "npm run tslint && concurrent \"npm run tsc:w\" \"npm run app\""

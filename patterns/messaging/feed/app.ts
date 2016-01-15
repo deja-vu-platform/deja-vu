@@ -48,8 +48,11 @@ app.get(
         res.json([]);
         return;
       }
-      db.collection("publishers").find({name: {$in: sub.subscriptions}}, (err, pubs) => {
-        res.json(pubs);
+      db.collection("pubs", {strict: true}, (err, pubs) => {
+        if (err) return next(err);
+        pubs.find({name: {$in: sub.subscriptions}}).toArray((err, pubs) => {
+          res.json(pubs);
+        });
       });
     });
   });

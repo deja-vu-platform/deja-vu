@@ -11,13 +11,12 @@ import {FeedService, FeedItem} from "../../services/feed";
   providers: [FeedService]
 })
 export class FeedComponent implements OnInit {
-  @Input() name: Name;
+  @Input() sub: Name;
   feed: FeedItem[];
 
   constructor(private _feedService: FeedService) {}
 
   ngOnInit() {
-    console.log("got as input " + this.name);
-    this._feedService.getFeed(this.name).subscribe(feed => this.feed = feed);
+    this._feedService.getFeed(this.sub).subscribe(feed => this.feed = feed);
   }
 }
