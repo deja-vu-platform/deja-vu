@@ -17,10 +17,8 @@ export class FeedComponent implements OnInit {
   constructor(private _feedService: FeedService) {}
 
   ngOnInit() {
+    this.feed = [];
     this._feedService.getFeed(this.sub).subscribe(
-        feedItem => {
-          console.log("hi!");
-          console.log(feedItem);
-        });
+        feedItem => this.feed.push(feedItem));
   }
 }
