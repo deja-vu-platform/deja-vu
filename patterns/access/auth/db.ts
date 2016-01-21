@@ -3,6 +3,7 @@ import * as mongodb from "mongodb";
 
 const server = new mongodb.Server("localhost", 27017, {auto_reconnect: true});
 export const db = new mongodb.Db("usersdb", server, { w: 1 });
+
 db.open((err, db) => {
   if (err) { console.log(err); return; }
   console.log("Mongodb started");

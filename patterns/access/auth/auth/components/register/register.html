@@ -2,9 +2,9 @@
 <div>
   <form (ngSubmit)="onSubmit()" #signInForm="ngForm">
     <input type="text" required
-     [(ngModel)]="user.username" ngControl="username"/>
+     [(ngModel)]="user.username" ngControl="username" placeholder="Username"/>
     <input type="password" required
-     [(ngModel)]="user.password" ngControl="password"/>
+     [(ngModel)]="user.password" ngControl="password" placeholder="Password"/>
     <button type="submit"
      [disabled]="!signInForm.form.valid">Register</button>
   </form>
