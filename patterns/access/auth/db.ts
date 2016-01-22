@@ -13,15 +13,6 @@ db.open((err, db) => {
     subs.remove((err, remove_count) => {
       if (err) { console.log(err); return; }
       console.log(`Removed ${remove_count} elems`);
-
-      subs.insertMany([
-        {username: "benbitdiddle", password: "benbitdiddle",
-         read: [], write: []},
-        {username: "alyssaphacker", password: "alyssaphacker",
-         read: [], write: []}
-      ], (err, res) => {
-        if (err) { console.log(err); return; }
-      });
     });
   });
 });
