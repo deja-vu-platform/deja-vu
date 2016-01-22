@@ -2,7 +2,8 @@
 <div>
   <form (ngSubmit)="onSubmit()" #postForm="ngForm">
     <textarea required
-      [(ngModel)]="post.content" ngControl="content"></textarea>
+      [(ngModel)]="post.content" ngControl="content"
+      placeholder="Write something..."></textarea>
     <button type="submit" [disabled]="!postForm.form.valid">Create Post</button>
   </form>
 </div>
