@@ -28,4 +28,31 @@
     "concurrently": "^1.0.0",
     "typescript": "^1.7.3"
   }
+  // Element definition
+  "dv": {
+    "name": "Post",
+    "data": {
+      "Post": {
+        "content": "Content",
+      },
+      "User": {
+        "username": "Username",
+        "posts": "Post"
+      },
+      "Username": {},
+      "Content": {}
+    },
+    "components": {
+      "new-post": {
+        "actions": [
+        {"post": "/api/users/*/posts"}
+        ]
+      },
+      "posts": {
+        "actions": [
+        {"get": "/api/users/*/posts"}
+        ]
+      }
+    }
+  }
 }

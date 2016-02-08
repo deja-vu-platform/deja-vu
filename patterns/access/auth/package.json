@@ -29,4 +29,35 @@
     "concurrently": "^1.0.0",
     "typescript": "^1.7.3"
   }
+  // Element definition
+  "dv": {
+    "name": "Auth",
+    "data": {
+      "User": {
+        "username": "Username",
+        "password": "Password",
+        "read": "Resource",
+        "write": "Resource"
+      },
+      "LoggedInUser": {
+        "_extends": "User"
+      }
+      "Username": {},
+      "Password": {},
+      "Resource": {}
+    },
+    "components": {
+      "sign-in": {
+        "actions": [
+        {"post": "/signin"}
+        ]
+      },
+      "register": {
+        "actions": [
+        {"post": "/register"}
+        ]
+      }
+    }
+  }
+
 }
