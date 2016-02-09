@@ -1,15 +1,62 @@
-/// <reference path="typings/express/express.d.ts" />
-/// <reference path="typings/morgan/morgan.d.ts" />
-/// <reference path="typings/mongodb/mongodb.d.ts" />
+/// <reference path="typings/tsd.d.ts" />
 import * as express from "express";
 import morgan = require("morgan");
-import {Collection} from "mongodb";
-
-import {db} from "./db";
+import * as mongodb from "mongodb";
 
 
+const env = process.env.NODE_ENV || "dev";
+const dbport = process.env.DB_PORT || 27017;
+const wsport = process.env.WS_PORT || 3000;
+
+
+//
+// DB
+//
+const server = new mongodb.Server("localhost", dbport, {auto_reconnect: true});
+export const db = new mongodb.Db("frienddb", server, { w: 1 });
+db.open((err, db) => {
+  if (err) throw err;
+  db.createCollection("users", (err, users) => {
+    if (err) throw err;
+    if (env === "dev") {
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        users.insertMany([
+          {username: "benbitdiddle", friends: []},
+          {username: "alyssaphacker", friends: []},
+          {username: "eva", friends: []},
+          {username: "louis", friends: []},
+          {username: "cydfect", friends: []},
+          {username: "lem", friends: []}
+        ], (err, res) => { if (err) throw err; });
+      });
+    }
+  });
+});
+
+
+//
+// WS
+//
+const app = express();
+
+app.use(morgan("dev"));
+if (env === "dev") {
+  app.use(express.static(__dirname));
+}
+
+app.listen(wsport, () => {
+  console.log(`Listening on port ${wsport} in mode ${env}`);
+});
+
+
+//
+// API
+//
 interface Request extends express.Request {
-  users: Collection;
+  users: mongodb.Collection;
   fields;
 }
 
@@ -57,14 +104,6 @@ namespace Processor {
   }
 }
 
-const app = express();
-
-app.use(morgan("dev"));
-app.use(express.static(__dirname));
-
-//
-// API
-//
 app.get(
   "/api/users/:userid/potential_friends",
   Validation.userExists,
@@ -136,8 +175,3 @@ app.delete(
     updateOne(req.users, friendid, {$pull: {friends: userid}}, next);
     res.json({});
   });
-
-
-app.listen(3000, () => {
-  console.log(`Listening on port 3000 in mode ${app.settings.env}`);
-});

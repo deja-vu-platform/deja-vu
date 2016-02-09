@@ -1,0 +1,34 @@
+{
+  "name": "SocialNetwork",
+  "elements": [
+  {
+    "name": "Friend",
+    "decl": "../../patterns/community/friend/element.json",
+    "location": "http://localhost:3000"
+  },
+  {
+    "name": "Auth",
+    "decl": "../../patterns/access/auth/element.json",
+    "location": "http://localhost:3000"
+  },
+  {
+    "name": "Feed",
+    "decl": "../../patterns/messaging/feed/element.json",
+    "location": "http://localhost:3000"
+  },
+  {
+    "name": "Post",
+    "decl": "../../patterns/messaging/post/element.json",
+    "location": "http://localhost:3000"
+  }
+  ],
+  "merge": {
+    "mappings": [
+    {"Friend/User": "Auth/User"}
+    ],
+    "components": [
+    "Friend/AddFriend",
+    "Friend/Friends"
+    ]
+  }
+}

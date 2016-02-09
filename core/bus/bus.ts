@@ -12,3 +12,10 @@ fs.readFile(fp, "utf8", (err, data) => {
   config = JSON.parse(data);
   console.log(`Done reading config`);
 });
+
+
+namespace Validation {
+  export function check(config) {
+    // something
+  }
+}

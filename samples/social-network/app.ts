@@ -2,7 +2,6 @@
 import * as express from "express";
 import morgan = require("morgan");
 
-import {db} from "./db";
 
 const app = express();
 
