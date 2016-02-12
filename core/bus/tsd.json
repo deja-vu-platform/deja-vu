@@ -9,7 +9,19 @@
       "commit": "3030a4be536b6530c06b80081f1333dc0de4d703"
     },
     "node/node.d.ts": {
-      "commit": "3030a4be536b6530c06b80081f1333dc0de4d703"
+      "commit": "bcd5761826eb567876c197ccc6a87c4d05731054"
+    },
+    "express/express.d.ts": {
+      "commit": "bcd5761826eb567876c197ccc6a87c4d05731054"
+    },
+    "serve-static/serve-static.d.ts": {
+      "commit": "bcd5761826eb567876c197ccc6a87c4d05731054"
+    },
+    "mime/mime.d.ts": {
+      "commit": "bcd5761826eb567876c197ccc6a87c4d05731054"
+    },
+    "morgan/morgan.d.ts": {
+      "commit": "bcd5761826eb567876c197ccc6a87c4d05731054"
     }
   }
 }
