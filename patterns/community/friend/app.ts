@@ -2,17 +2,22 @@
 import * as express from "express";
 import morgan = require("morgan");
 import * as mongodb from "mongodb";
+import {RestBus} from "../../../core/modules/rest_bus/rest.bus";
 
 
 const env = process.env.NODE_ENV || "dev";
+const dbhost = process.env.DB_HOST || "localhost";
 const dbport = process.env.DB_PORT || 27017;
 const wsport = process.env.WS_PORT || 3000;
+const bus = new RestBus(
+  process.env.BUS_HOST || "localhost",
+  process.env.BUS_PORT || 3001);
 
 
 //
 // DB
 //
-const server = new mongodb.Server("localhost", dbport, {auto_reconnect: true});
+const server = new mongodb.Server(dbhost, dbport, {auto_reconnect: true});
 export const db = new mongodb.Db("frienddb", server, { w: 1 });
 db.open((err, db) => {
   if (err) throw err;
@@ -104,9 +109,11 @@ namespace Processor {
   }
 }
 
+
 app.get(
   "/api/users/:userid/potential_friends",
   Validation.userExists,
+  bus.crud("friends"),
   Processor.fields,
   (req: Request, res, next) => {
     const query = {
@@ -126,6 +133,7 @@ app.get(
 app.get(
   "/api/users/:userid/friends",
   Validation.userExists,
+  bus.crud("friends"),
   Processor.fields,
   (req: Request, res, next) => {
     req.users.findOne({username: req.params.userid}, (err, user) => {
@@ -156,6 +164,7 @@ app.put(
   "/api/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
+  bus.crud("friends"),
   (req: Request, res, next) => {
     const userid = req.params.userid;
     const friendid = req.params.friendid;
@@ -168,6 +177,7 @@ app.delete(
   "/api/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
+  bus.crud("friends"),
   (req: Request, res, next) => {
     const userid = req.params.userid;
     const friendid = req.params.friendid;

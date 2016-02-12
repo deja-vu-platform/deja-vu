@@ -4,7 +4,7 @@
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "tsc:app": "tsc app.ts db.ts --module commonjs",
+    "tsc:app": "tsc app.ts --module commonjs",
     "tslint": "tslint *.ts friend/**/**/*.ts friend/**/*.ts friend/*.ts",
     "app:start": "node app.js",
     "app": "npm run tsc:app && npm run app:start",
