@@ -4,7 +4,7 @@
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "tsc:app": "tsc app.ts db.ts --module commonjs",
+    "tsc:app": "tsc app.ts --module commonjs",
     "tslint": "tslint *.ts post/**/**/*.ts post/**/*.ts post/*.ts",
     "app:start": "node app.js",
     "app": "npm run tsc:app && npm run app:start",
@@ -27,32 +27,5 @@
   "devDependencies": {
     "concurrently": "^1.0.0",
     "typescript": "^1.7.3"
-  }
-  // Element definition
-  "dv": {
-    "name": "Post",
-    "data": {
-      "Post": {
-        "content": "Content",
-      },
-      "User": {
-        "username": "Username",
-        "posts": "Post"
-      },
-      "Username": {},
-      "Content": {}
-    },
-    "components": {
-      "new-post": {
-        "actions": [
-        {"post": "/api/users/*/posts"}
-        ]
-      },
-      "posts": {
-        "actions": [
-        {"get": "/api/users/*/posts"}
-        ]
-      }
-    }
   }
 }

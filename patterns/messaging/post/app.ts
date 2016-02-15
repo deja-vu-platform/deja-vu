@@ -1,17 +1,68 @@
-/// <reference path="typings/express/express.d.ts" />
-/// <reference path="typings/body-parser/body-parser.d.ts" />
-/// <reference path="typings/morgan/morgan.d.ts" />
-/// <reference path="typings/mongodb/mongodb.d.ts" />
+/// <reference path="typings/tsd.d.ts" />
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import morgan = require("morgan");
-import {Collection} from "mongodb";
+import * as mongodb from "mongodb";
+import {RestBus} from "../../../core/modules/rest_bus/rest.bus";
 
-import {db} from "./db";
+
+const env = process.env.NODE_ENV || "dev";
+const dbhost = process.env.DB_HOST || "localhost";
+const dbport = process.env.DB_PORT || 27017;
+const wsport = process.env.WS_PORT || 3000;
+const bus = new RestBus(
+  process.env.BUS_HOST || "localhost",
+  process.env.BUS_PORT || 3001);
 
 
+//
+// DB
+//
+const server = new mongodb.Server(dbhost, dbport, {auto_reconnect: true});
+export const db = new mongodb.Db("postdb", server, { w: 1 });
+db.open((err, db) => {
+  if (err) throw err;
+  db.createCollection("users", (err, users) => {
+    if (err) throw err;
+    if (env === "dev") {
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        users.insertMany([
+          {username: "benbitdiddle", friends: []},
+          {username: "alyssaphacker", friends: []},
+          {username: "eva", friends: []},
+          {username: "louis", friends: []},
+          {username: "cydfect", friends: []},
+          {username: "lem", friends: []}
+        ], (err, res) => { if (err) throw err; });
+      });
+    }
+  });
+});
+
+
+//
+// WS
+//
+const app = express();
+
+app.use(morgan("dev"));
+if (env === "dev") {
+  app.use(express.static(__dirname));
+}
+
+app.listen(wsport, () => {
+  console.log(`Listening on port ${wsport} in mode ${env}`);
+});
+
+
+//
+// API
+//
 interface Request extends express.Request {
-  users: Collection;
+  users: mongodb.Collection;
   fields;
 }
 
@@ -31,17 +82,10 @@ namespace Validation {
   }
 }
 
-const app = express();
-
-app.use(morgan("dev"));
-app.use(express.static(__dirname));
-
-//
-// API
-//
 app.get(
   "/api/users/:userid/posts",
   Validation.userExists,
+  bus.crud("posts"),
   (req: Request, res, next) => {
     req.users.findOne({username: req.params.userid}, (err, user) => {
       if (err) return next(err);
@@ -58,6 +102,7 @@ const jsonParser = bodyParser.json();
 app.post(
   "/api/users/:userid/posts",
   Validation.userExists, jsonParser,
+  bus.crud("posts"),
   (req: Request, res, next) => {
     console.log(req.body);
     console.log(JSON.stringify(req.body));
@@ -69,8 +114,3 @@ app.post(
         res.json({});
       });
   });
-
-
-app.listen(3000, () => {
-  console.log(`Listening on port 3000 in mode ${app.settings.env}`);
-});
