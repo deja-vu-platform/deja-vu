@@ -1,0 +1,22 @@
+{
+  "name": "Feed",
+  "data": {
+    "Subscriber": {
+      "name": "Name",
+      "subscriptions": "Name"
+    },
+    "Publisher": {
+      "name": "Name",
+      "published": "Content"
+    },
+    "Name": {},
+    "Content": {}
+  },
+  "components": {
+    "feed": {
+      "actions": [
+      {"get": "/api/subs/*/feed"}
+      ]
+    }
+  }
+}

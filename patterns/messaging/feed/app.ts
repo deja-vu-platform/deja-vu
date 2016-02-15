@@ -1,17 +1,82 @@
-/// <reference path="typings/express/express.d.ts" />
-/// <reference path="typings/body-parser/body-parser.d.ts" />
-/// <reference path="typings/morgan/morgan.d.ts" />
-/// <reference path="typings/mongodb/mongodb.d.ts" />
+/// <reference path="typings/tsd.d.ts" />
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import morgan = require("morgan");
-import {Collection} from "mongodb";
+import * as mongodb from "mongodb";
+import {RestBus} from "../../../core/modules/rest_bus/rest.bus";
 
-import {db} from "./db";
+
+const env = process.env.NODE_ENV || "dev";
+const dbhost = process.env.DB_HOST || "localhost";
+const dbport = process.env.DB_PORT || 27017;
+const wsport = process.env.WS_PORT || 3000;
+const bus = new RestBus(
+  process.env.BUS_HOST || "localhost",
+  process.env.BUS_PORT || 3001);
 
 
+//
+// DB
+//
+const server = new mongodb.Server(dbhost, dbport, {auto_reconnect: true});
+export const db = new mongodb.Db("feeddb", server, { w: 1 });
+db.open((err, db) => {
+  if (err) throw err;
+  db.createCollection("subs", (err, subs) => {
+    if (err) throw err;
+    if (env === "dev") {
+      subs.remove((err, remove_count) => {
+        if (err) { console.log(err); return; }
+        console.log(`Removed ${remove_count} elems`);
+
+        subs.insertMany([
+          {name: "Ben", subscriptions: [
+            "Software Engineering News", "Things Ben Bitdiddle Says"]},
+          {name: "Alyssa", subscriptions: []}
+        ], (err, res) => { if (err) throw err; });
+      });
+    }
+  });
+
+  db.createCollection("pubs", (err, pubs) => {
+    if (err) throw err;
+    pubs.remove((err, remove_count) => {
+      if (err) throw err;
+      if (env === "dev") {
+       pubs.insertMany([
+         {name: "Software Engineering News", published: [
+           "Node v0.0.1 released!"]},
+         {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
+         {name: "U.S News", published: []},
+         {name: "World News", published: []},
+         {name: "New Books about Zombies", published: []}
+       ], (err, res) => { if (err) throw err; });
+      }
+    });
+  });
+});
+
+
+//
+// WS
+//
+const app = express();
+
+app.use(morgan("dev"));
+if (env === "dev") {
+  app.use(express.static(__dirname));
+}
+
+app.listen(wsport, () => {
+  console.log(`Listening on port ${wsport} in mode ${env}`);
+});
+
+
+//
+// API
+//
 interface Request extends express.Request {
-  subs: Collection;
+  subs: mongodb.Collection;
 }
 
 namespace Validation {
@@ -30,17 +95,10 @@ namespace Validation {
   }
 }
 
-const app = express();
-
-app.use(morgan("dev"));
-app.use(express.static(__dirname));
-
-//
-// API
-//
 app.get(
   "/api/subs/:name/feed",
   Validation.SubExists,
+  bus.crud("subs"),
   (req: Request, res, next) => {
     req.subs.findOne({name: req.params.name}, (err, sub) => {
       if (err) return next(err);
@@ -56,8 +114,3 @@ app.get(
       });
     });
   });
-
-
-app.listen(3000, () => {
-  console.log(`Listening on port 3000 in mode ${app.settings.env}`);
-});

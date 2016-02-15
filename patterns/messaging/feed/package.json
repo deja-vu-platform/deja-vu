@@ -4,7 +4,7 @@
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "tsc:app": "tsc app.ts db.ts --module commonjs",
+    "tsc:app": "tsc app.ts --module commonjs",
     "tslint": "tslint *.ts feed/**/**/*.ts feed/**/*.ts feed/*.ts",
     "app:start": "node app.js",
     "app": "npm run tsc:app && npm run app:start",
@@ -28,28 +28,4 @@
     "concurrently": "^1.0.0",
     "typescript": "^1.7.3"
   }
-  // Element definition
-  "dv": {
-    "name": "Feed",
-    "data": {
-      "Subscriber": {
-        "name": "Name",
-        "subscriptions": "Name"
-      },
-      "Publisher": {
-        "name": "Name",
-        "published": "Content"
-      },
-      "Name": {},
-      "Content": {}
-    },
-    "components": {
-      "feed": {
-        "actions": [
-        {"get": "/api/subs/*/feed"}
-        ]
-      }
-    }
-  }
-
 }
