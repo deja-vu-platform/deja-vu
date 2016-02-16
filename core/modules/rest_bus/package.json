@@ -1,0 +1,13 @@
+{
+  "name": "rest-bus",
+  "version": "0.0.1",
+  "scripts": {
+    "tsc": "tsc",
+    "tslint": "tslint *.ts"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^1.7.3"
+  },
+  "files": ["rest.bus.js", "rest.bus.d.ts"]
+}
