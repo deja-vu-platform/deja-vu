@@ -13,13 +13,26 @@
     <script>
       System.config({
         packages: {        
-          friend: {
+          dev: {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          client: {
             format: 'register',
             defaultExtension: 'js'
           }
+          /*
+          "client/components/friends": {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          "client/components/add-friend": {
+            format: 'register',
+            defaultExtension: 'js'
+          }*/
         }
       });
-      System.import('friend/boot')
+      System.import('./dev/boot')
             .then(null, console.error.bind(console));
     </script>
 

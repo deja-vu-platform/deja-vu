@@ -29,5 +29,5 @@ typings
 # Users Environment Variables
 .lock-wscript
 
-*.js
-*.map
+.tscache
+dist

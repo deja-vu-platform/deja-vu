@@ -1,13 +1,13 @@
 import {Component, Input} from "angular2/core";
 import {OnInit} from "angular2/core";
 
-import {User, Username} from "../../user";
+import {User, Username} from "../../../user";
 import {FriendService} from "../../services/friend";
 
 
 @Component({
   selector: "friends",
-  templateUrl: "./friend/components/friends/friends.html",
+  templateUrl: "./client/components/friends/friends.html",
   providers: [FriendService]
 })
 export class FriendsComponent implements OnInit {
@@ -18,7 +18,8 @@ export class FriendsComponent implements OnInit {
 
   unfriend(user: User) {
     console.log(`unfriending ${user.username}`);
-    this._friendService.unfriend(this.username, user.username).subscribe(res => {});
+    this._friendService.unfriend(this.username, user.username).subscribe(
+      res => undefined);
   }
 
   ngOnInit() {
