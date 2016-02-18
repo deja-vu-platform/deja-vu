@@ -2,14 +2,12 @@
   <head>
     <title>Friends Pattern</title>
 
-    <!-- 1. Load libraries -->
     <script src="node_modules/angular2/bundles/angular2-polyfills.js"></script>
     <script src="node_modules/systemjs/dist/system.src.js"></script>
     <script src="node_modules/rxjs/bundles/Rx.js"></script>
     <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
     <script src="node_modules/angular2/bundles/http.js"></script>
 
-    <!-- 2. Configure SystemJS -->
     <script>
       System.config({
         packages: {        
@@ -17,30 +15,20 @@
             format: 'register',
             defaultExtension: 'js'
           },
-          client: {
+          components: {
             format: 'register',
             defaultExtension: 'js'
           }
-          /*
-          "client/components/friends": {
-            format: 'register',
-            defaultExtension: 'js'
-          },
-          "client/components/add-friend": {
-            format: 'register',
-            defaultExtension: 'js'
-          }*/
         }
       });
+
       System.import('./dev/boot')
             .then(null, console.error.bind(console));
     </script>
 
   </head>
 
-  <!-- 3. Display the application -->
   <body>
     <friend-pattern></friend-pattern>
   </body>
-
 </html>

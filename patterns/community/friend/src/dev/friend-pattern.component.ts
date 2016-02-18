@@ -1,6 +1,6 @@
 import {Component} from "angular2/core";
-import {FriendsComponent} from "../client/components/friends/friends";
-import {AddFriendComponent} from "../client/components/add-friend/add-friend";
+import {FriendsComponent} from "../components/friends/friends";
+import {AddFriendComponent} from "../components/add-friend/add-friend";
 
 @Component({
   selector: "friend-pattern",

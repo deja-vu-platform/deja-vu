@@ -1,7 +1,7 @@
 import {Injectable} from "angular2/core";
 import {Http} from "angular2/http";
 import {Observable} from "rxjs/observable";
-import {User, Username} from "../../user";
+import {User, Username} from "../../shared/user";
 
 @Injectable()
 export class FriendService {

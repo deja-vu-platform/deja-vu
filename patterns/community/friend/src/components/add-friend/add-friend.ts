@@ -1,13 +1,13 @@
 import {Component, Input} from "angular2/core";
 import {OnInit} from "angular2/core";
 
-import {User, Username} from "../../../user";
-import {FriendService} from "../../services/friend";
+import {User, Username} from "../../shared/user";
+import {FriendService} from "../shared/friend";
 
 
 @Component({
   selector: "add-friend",
-  templateUrl: "./client/components/add-friend/add-friend.html",
+  templateUrl: "./components/add-friend/add-friend.html",
   providers: [FriendService]
 })
 export class AddFriendComponent implements OnInit {

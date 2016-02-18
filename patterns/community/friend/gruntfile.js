@@ -1,10 +1,15 @@
 module.exports = function(grunt) {
 
+  const components = "src/components/**/*.ts";
+  const shared = "src/shared/**/*.ts";
+  const server = "src/*.ts";
+  const dev = "src/dev/**/*.ts";
+
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     ts: {
       dev_client: {
-        src: ["src/user.ts", "src/client/**/*.ts", "src/dev/**/*.ts"],
+        src: [shared, components, dev],
         outDir: ["dist/public"],
         options: {
           verbose: true,
@@ -19,7 +24,7 @@ module.exports = function(grunt) {
         }
       },
       dev_server: {
-        src: ["src/*.ts"],
+        src: [shared, server],
         outDir: ["dist"],
         options: {
           verbose: true,
@@ -34,7 +39,7 @@ module.exports = function(grunt) {
         }
       },
       pack: {
-        src: ["src/user.ts", "src/client/**/*.ts"],
+        src: [shared, components],
         outDir: ["pack"],
         options: {
           verbose: true,
@@ -57,7 +62,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: "src",
-            src: ["client/**/*.html"],
+            src: ["components/**/*.html"],
             dest: "dist/public"
           },
           {
@@ -84,7 +89,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             cwd: "src",
-            src: ["client/**/*.html"],
+            src: ["components/**/*.html"],
             dest: "pack"
           }
         ]
