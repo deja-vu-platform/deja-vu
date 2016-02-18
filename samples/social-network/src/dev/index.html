@@ -2,32 +2,40 @@
   <head>
     <title>Social Network</title>
 
-    <!-- 1. Load libraries -->
     <script src="node_modules/angular2/bundles/angular2-polyfills.js"></script>
     <script src="node_modules/systemjs/dist/system.src.js"></script>
     <script src="node_modules/rxjs/bundles/Rx.js"></script>
     <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
     <script src="node_modules/angular2/bundles/http.js"></script>
 
-    <!-- 2. Configure SystemJS -->
+
     <script>
       System.config({
-        packages: {        
-          "social-network": {
+        map: {
+          "dv-community-friend": "node_modules/dv-community-friend"
+        },
+        packages: {
+          dev: {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          components: {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          "dv-community-friend": {
             format: 'register',
             defaultExtension: 'js'
           }
         }
       });
-      System.import('social-network/boot')
+      System.import('./dev/boot')
             .then(null, console.error.bind(console));
     </script>
 
   </head>
 
-  <!-- 3. Display the application -->
   <body>
     <social-network></social-network>
   </body>
-
 </html>
