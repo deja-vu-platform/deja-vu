@@ -32,7 +32,23 @@ module.exports = function(grunt) {
           removeComments: false,
           noImplicitAny: false
         }
-      }
+      },
+      pack: {
+        src: ["src/user.ts", "src/client/**/*.ts"],
+        outDir: ["pack"],
+        options: {
+          verbose: true,
+          target: "es5",
+          module: "system",
+          moduleResolution: "node",
+          sourceMap: true,
+          emitDecoratorMetadata: true,
+          experimentalDecorators: true,
+          removeComments: false,
+          noImplicitAny: false,
+          declaration: true
+        }
+      },
     },
 
     copy: {
@@ -62,7 +78,17 @@ module.exports = function(grunt) {
             dest: "dist/public"
           }
         ]
-        }
+        },
+      pack: {
+        files: [
+          {
+            expand: true,
+            cwd: "src",
+            src: ["client/**/*.html"],
+            dest: "pack"
+          }
+        ]
+      } 
     },
 
     tslint: {
@@ -82,6 +108,9 @@ module.exports = function(grunt) {
       },
       dev: {
         src: ["dist"]
+      },
+      pack: {
+        src: ["pack"]
       }
     },
 
@@ -106,4 +135,7 @@ module.exports = function(grunt) {
   grunt.registerTask(
       "serve.dev",
       ["build.dev", "express:dev"]);
+
+  grunt.registerTask(
+      "pack", ["clean:pack", "tslint", "ts:pack", "copy:pack"]);
 }
