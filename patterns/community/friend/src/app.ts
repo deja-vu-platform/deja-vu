@@ -107,6 +107,18 @@ namespace Processor {
     }
     next();
   }
+
+  // temp hack
+  export function cors(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+        "Access-Control-Allow-Methods",
+        "POST, GET, OPTIONS, PUT, DELETE");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  }
 }
 
 
@@ -115,6 +127,7 @@ app.get(
   Validation.userExists,
   bus.crud("friends"),
   Processor.fields,
+  Processor.cors,
   (req: Request, res, next) => {
     const query = {
     $and: [
@@ -135,6 +148,7 @@ app.get(
   Validation.userExists,
   bus.crud("friends"),
   Processor.fields,
+  Processor.cors,
   (req: Request, res, next) => {
     req.users.findOne({username: req.params.userid}, (err, user) => {
       if (err) return next(err);
@@ -160,11 +174,15 @@ const updateOne = (users, userid, update, next) => {
   });
 };
 
+// tmp hack
+app.options("/api/users/:userid/friends/:friendid", Processor.cors);
+
 app.put(
   "/api/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
   bus.crud("friends"),
+  Processor.cors,
   (req: Request, res, next) => {
     const userid = req.params.userid;
     const friendid = req.params.friendid;
@@ -178,6 +196,7 @@ app.delete(
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
   bus.crud("friends"),
+  Processor.cors,
   (req: Request, res, next) => {
     const userid = req.params.userid;
     const friendid = req.params.friendid;
