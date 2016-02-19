@@ -1,12 +1,12 @@
-import {Component, Input} from "angular2/core";
+import {Component} from "angular2/core";
 
 import {User} from "../../data";
-import {AuthService} from "../../services/auth";
+import {AuthService} from "../shared/auth";
 
 
 @Component({
   selector: "register",
-  templateUrl: "./auth/components/register/register.html",
+  templateUrl: "./components/register/register.html",
   providers: [AuthService]
 })
 export class RegisterComponent {

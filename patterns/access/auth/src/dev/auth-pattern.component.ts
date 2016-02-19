@@ -1,6 +1,6 @@
 import {Component} from "angular2/core";
-import {SignInComponent} from "./components/sign-in/sign-in";
-import {RegisterComponent} from "./components/register/register";
+import {SignInComponent} from "../components/sign-in/sign-in";
+import {RegisterComponent} from "../components/register/register";
 
 @Component({
   selector: "auth-pattern",

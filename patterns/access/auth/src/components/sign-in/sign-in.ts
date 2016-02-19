@@ -1,12 +1,12 @@
-import {Component, Input} from "angular2/core";
+import {Component} from "angular2/core";
 
 import {User} from "../../data";
-import {AuthService} from "../../services/auth";
+import {AuthService} from "../shared/auth";
 
 
 @Component({
   selector: "sign-in",
-  templateUrl: "./auth/components/sign-in/sign-in.html",
+  templateUrl: "./components/sign-in/sign-in.html",
   providers: [AuthService]
 })
 export class SignInComponent {

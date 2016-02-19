@@ -1,12 +1,12 @@
-/// <reference path="typings/tsd.d.ts" />
+/// <reference path="../typings/tsd.d.ts" />
 import * as express from "express";
 import * as bodyParser from "body-parser";
 import morgan = require("morgan");
 import * as mongodb from "mongodb";
 import bcrypt = require("bcryptjs");
 
-import {RestBus} from "../../../core/modules/rest_bus/rest.bus";
-import {User} from "./auth/data";
+import {RestBus} from "rest-bus/rest.bus";
+import {User} from "./data";
 
 const env = process.env.NODE_ENV || "dev";
 const dbhost = process.env.DB_HOST || "localhost";
@@ -44,7 +44,7 @@ const app = express();
 
 app.use(morgan("dev"));
 if (env === "dev") {
-  app.use(express.static(__dirname));
+  app.use(express.static(__dirname + "/public"));
 }
 
 app.listen(wsport, () => {

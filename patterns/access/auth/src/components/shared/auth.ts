@@ -1,7 +1,6 @@
 import {Injectable} from "angular2/core";
 import {Http, Headers} from "angular2/http";
-import {User} from "../data";
-import {Observable} from "rxjs/Observable";
+import {User} from "../../data";
 
 
 @Injectable()
