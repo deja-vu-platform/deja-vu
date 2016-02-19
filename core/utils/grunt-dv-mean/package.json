@@ -1,0 +1,14 @@
+{
+  "name": "grunt-dv-mean",
+  "version": "0.0.1",
+  "license": "MIT",
+  "dependencies": {
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^0.8.2",
+    "grunt-express-server": "^0.5.2",
+    "grunt-ts": "^5.3.2",
+    "grunt-tslint": "^3.0.2"
+  },
+  "main": "tasks/dv-mean",
+  "files": ["tasks/**/*.js"]
+}
