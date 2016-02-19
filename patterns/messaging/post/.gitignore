@@ -31,3 +31,7 @@ typings
 
 *.js
 *.map
+*.baseDir.ts
+.tscache
+dist
+pack
