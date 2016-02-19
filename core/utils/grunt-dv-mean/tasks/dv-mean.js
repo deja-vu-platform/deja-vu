@@ -98,7 +98,7 @@ module.exports = function(grunt) {
 
     tslint: {
       options: {
-        configuration: "tslint.json"
+        configuration: "node_modules/grunt-dv-mean/tasks/tslint.json"
       },
       default: {
         files: {
@@ -128,6 +128,7 @@ module.exports = function(grunt) {
       }
     }
   });
+
   const base = "grunt-dv-mean/node_modules/";
   grunt.loadNpmTasks(base + "grunt-ts");
   grunt.loadNpmTasks(base + "grunt-tslint");

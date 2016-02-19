@@ -10,5 +10,5 @@
     "grunt-tslint": "^3.0.2"
   },
   "main": "tasks/dv-mean",
-  "files": ["tasks/**/*.js"]
+  "files": ["tasks/**/*.js", "tasks/**/*.json"]
 }
