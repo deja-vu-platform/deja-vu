@@ -1,6 +1,6 @@
 import {Injectable} from "angular2/core";
 import {Http, Headers} from "angular2/http";
-import {User, Username, Post} from "../data";
+import {Username, Post} from "../../data";
 
 @Injectable()
 export class PostService {

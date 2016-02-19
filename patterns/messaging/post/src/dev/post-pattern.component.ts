@@ -1,6 +1,6 @@
 import {Component} from "angular2/core";
-import {PostsComponent} from "./components/posts/posts";
-import {NewPostComponent} from "./components/new-post/new-post";
+import {PostsComponent} from "../components/posts/posts";
+import {NewPostComponent} from "../components/new-post/new-post";
 
 @Component({
   selector: "post-pattern",
