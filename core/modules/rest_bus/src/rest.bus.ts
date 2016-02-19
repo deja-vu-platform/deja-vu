@@ -1,12 +1,8 @@
+/// <reference path="../typings/tsd.d.ts" />
 import * as http from "http";
 
 export class RestBus {
   constructor(private _host: string, private _port: number) {}
-
-  private paramExtractor(req): Object {
-    console.log(JSON.stringify(req.params));
-    return {};
-  }
 
   // If no info fn is provided we resort to taking all params from the req
   // If no action is given we use the action of the req
@@ -34,4 +30,11 @@ export class RestBus {
       bus_req.end();
     };
   }
+
+  /*
+  private paramExtractor(req): Object {
+    console.log(JSON.stringify(req.params));
+    return {};
+  }
+  */
 }
