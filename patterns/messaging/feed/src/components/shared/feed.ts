@@ -1,7 +1,7 @@
 import {Injectable} from "angular2/core";
-import {Http, Headers} from "angular2/http";
-import {Content, Publisher, Name} from "../data";
+import {Http} from "angular2/http";
 import {Observable} from "rxjs/Observable";
+import {Content, Publisher, Name} from "../../data";
 
 
 export interface FeedItem {

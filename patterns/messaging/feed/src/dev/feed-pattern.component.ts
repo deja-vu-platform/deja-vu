@@ -1,5 +1,5 @@
 import {Component} from "angular2/core";
-import {FeedComponent} from "./components/feed/feed";
+import {FeedComponent} from "../components/feed/feed";
 
 @Component({
   selector: "feed-pattern",
