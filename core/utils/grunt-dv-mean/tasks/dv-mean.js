@@ -1,4 +1,16 @@
-module.exports = function(grunt) {
+module.exports = function(grunt, optPatterns) {
+  optPatterns = (typeof optPatterns === "undefined") ? [] : optPatterns;
+  const patternsSrc = optPatterns.map(function(p) {
+        return "node_modules/" + p + "/pack/components/**/*.{js,html}";
+  });
+  var deps = [
+    "node_modules/angular2/bundles/angular2-polyfills.js",
+    "node_modules/systemjs/dist/system.src.js",
+    "node_modules/rxjs/bundles/Rx.js",
+    "node_modules/angular2/bundles/angular2.dev.js",
+    "node_modules/angular2/bundles/http.js"
+  ];
+  deps = deps.concat(patternsSrc);
 
   const components = "src/components/**/*.ts";
   const shared = "src/shared/**/*.ts";
@@ -73,14 +85,19 @@ module.exports = function(grunt) {
           },
           {
             expand: true,
-            src: [
-              "node_modules/angular2/bundles/angular2-polyfills.js",
-              "node_modules/systemjs/dist/system.src.js",
-              "node_modules/rxjs/bundles/Rx.js",
-              "node_modules/angular2/bundles/angular2.dev.js",
-              "node_modules/angular2/bundles/http.js"
-            ],
+            src: deps,
             dest: "dist/public"
+          },
+          // https://github.com/angular/angular/issues/6053
+          {
+            expand: true,
+            src: optPatterns.map(function(p) {
+              return "node_modules/" + p + "/pack/components/**/*.html";
+            }),
+            dest: "dist/public/components/",
+            rename: function(dst, src) {
+              return dst + src.match("node_modules/.*/pack/components/(.*)")[1];
+            }
           }
         ]
         },
