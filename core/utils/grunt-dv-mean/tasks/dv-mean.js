@@ -50,13 +50,29 @@ module.exports = function(grunt, optPatterns) {
           noImplicitAny: false
         }
       },
-      pack: {
+      pack_client: {
         src: [shared, components],
         outDir: ["pack"],
         options: {
           verbose: true,
           target: "es5",
           module: "system",
+          moduleResolution: "node",
+          sourceMap: true,
+          emitDecoratorMetadata: true,
+          experimentalDecorators: true,
+          removeComments: false,
+          noImplicitAny: false,
+          declaration: true
+        }
+      },
+      pack_server: {
+        src: [shared, server],
+        outDir: ["pack"],
+        options: {
+          verbose: true,
+          target: "es5",
+          module: "commonjs",
           moduleResolution: "node",
           sourceMap: true,
           emitDecoratorMetadata: true,
@@ -139,8 +155,9 @@ module.exports = function(grunt, optPatterns) {
     express: {
       dev: {
         options: {
-         script: "dist/app.js",
-         background: false
+          script: "dist/app.js",
+          background: true,
+          args: ["--wsport=3000"]
         }
       }
     }
@@ -161,12 +178,27 @@ module.exports = function(grunt, optPatterns) {
     } else if (action === "serve") {
       grunt.log.writeln(this.name + " serve");
       grunt.task.run(
-        ["clean:dev", "tslint", "ts:dev_client", "copy:dev", "ts:dev_server",
-         "express:dev"]);
+        ["clean:dev", "tslint", "ts:dev_client", "copy:dev", "ts:dev_server"]);
+      var express_config = {};
+      var port = 3001;
+      optPatterns.forEach(function(p) {
+        express_config[p] = {
+          options: {
+            script: "node_modules/" + p + "/pack/app.js",
+            background: true,
+            args: ["--wsport=" + port, "--servepublic=false"]
+          }
+        };
+        ++port;
+      });
+      grunt.config.merge({express: express_config});
+      grunt.task.run(["express"]);
+      // we need to add a watch, if ow the servers die
     } else if (action === "pack") {
       grunt.log.writeln(this.name + " pack");
       grunt.task.run(
-        ["clean:pack", "tslint", "ts:pack", "copy:pack"]);
+        ["clean:pack", "tslint", "ts:pack_client", "ts:pack_server",
+         "copy:pack"]);
     } else { // clean
       grunt.task.run("clean");
     }
