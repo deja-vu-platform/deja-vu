@@ -8,7 +8,7 @@ module.exports = function(grunt) {
         options: {
           verbose: true,
           target: "es5",
-          module: "system",
+          module: "commonjs",
           moduleResolution: "node",
           sourceMap: true,
           emitDecoratorMetadata: true,
