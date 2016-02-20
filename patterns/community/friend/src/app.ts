@@ -2,28 +2,39 @@
 import * as express from "express";
 import morgan = require("morgan");
 import * as mongodb from "mongodb";
-import {RestBus} from "rest-bus/rest.bus";
+let command_line_args = require("command-line-args");
+
+import {RestBus} from "rest-bus/pack/rest.bus";
 
 
-const env = process.env.NODE_ENV || "dev";
-const dbhost = process.env.DB_HOST || "localhost";
-const dbport = process.env.DB_PORT || 27017;
-const wsport = process.env.WS_PORT || 3000;
-const bus = new RestBus(
-  process.env.BUS_HOST || "localhost",
-  process.env.BUS_PORT || 3001);
+const cli = command_line_args([
+  {name: "dbhost", type: String, defaultValue: "localhost"},
+  {name: "dbport", type: Number, defaultValue: 27017},
+
+  {name: "wshost", type: String, defaultValue: "localhost"},
+  {name: "wsport", type: Number, defaultValue: 3000},
+
+  {name: "bushost", type: String, defaultValue: "localhost"},
+  {name: "busport", type: Number, defaultValue: 3001},
+
+  {name: "servepublic", type: Boolean, defaultValue: true},
+  {name: "debugdata", type: Boolean, defaultValue: true}
+]);
+const opts = cli.parse();
+const bus = new RestBus(opts.bus_host, opts.bus_port);
 
 
 //
 // DB
 //
-const server = new mongodb.Server(dbhost, dbport, {auto_reconnect: true});
+const server = new mongodb.Server(
+  opts.dbhost, opts.dbport, {auto_reconnect: true});
 export const db = new mongodb.Db("frienddb", server, { w: 1 });
 db.open((err, db) => {
   if (err) throw err;
   db.createCollection("users", (err, users) => {
     if (err) throw err;
-    if (env === "dev") {
+    if (opts.debugdata) {
       console.log("Resetting users collection");
       users.remove((err, remove_count) => {
         if (err) throw err;
@@ -48,12 +59,12 @@ db.open((err, db) => {
 const app = express();
 
 app.use(morgan("dev"));
-if (env === "dev") {
+if (opts.servepublic) {
   app.use(express.static(__dirname + "/public"));
 }
 
-app.listen(wsport, () => {
-  console.log(`Listening on port ${wsport} in mode ${env}`);
+app.listen(opts.wsport, () => {
+  console.log(`Listening with opts ${JSON.stringify(opts)}`);
 });
 
 

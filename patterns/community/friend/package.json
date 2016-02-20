@@ -8,21 +8,24 @@
   },
   "license": "MIT",
   "dependencies": {
+    "angular2": "2.0.0-beta.0",
+    "command-line-args": "^2.1.6",
+    "es6-promise": "^3.0.2",
+    "es6-shim": "^0.33.3",
     "express": "^4.13.3",
     "mongodb": "^2.1.3",
     "morgan": "^1.6.1",
-    "angular2": "2.0.0-beta.0",
-    "es6-promise": "^3.0.2",
-    "es6-shim": "^0.33.3",
     "reflect-metadata": "0.1.2",
+    "rest-bus": "file:../../../core/modules/rest_bus",
     "rxjs": "5.0.0-beta.0",
     "systemjs": "0.19.6",
-    "zone.js": "0.5.10",
-    "rest-bus": "file:../../../core/modules/rest_bus"
+    "zone.js": "0.5.10"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-dv-mean": "file:../../../core/utils/grunt-dv-mean"
   },
-  "files": ["pack"]
+  "files": [
+    "pack"
+  ]
 }
