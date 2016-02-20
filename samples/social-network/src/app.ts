@@ -4,7 +4,7 @@ import morgan = require("morgan");
 
 
 const env = process.env.NODE_ENV || "dev";
-const wsport = process.env.WS_PORT || 3003;
+const wsport = process.env.WS_PORT || 3000;
 
 const app = express();
 
