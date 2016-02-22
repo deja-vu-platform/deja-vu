@@ -1,0 +1,149 @@
+/*
+ Colors:
+ - body light gray: #F0F1F2
+ - light header:    #EBEBEB
+ - body selected:   #E0E0E0
+ - dark gray:       #D5D5D5
+ - td selected:     #4F9FCF
+ */
+
+/*===================================================
+                   MENUBAR
+===================================================*/
+.menubar {
+    width: 100%;
+    display: block;
+    height: 70px;
+    background-color: #F0F1F2;
+    /*overflow-x: visible;*/
+    /*overflow-y: visible;*/
+    z-index: 600;
+}
+
+.menu-item {
+    float: left;
+    margin: 15px 5px 15px 5px;
+}
+
+.menu-item.logo {
+    width: 200px;
+    color: #555555;
+    font-weight: bold;
+    font-size: 23px;
+    font-family: "Adobe Garamond";
+}
+
+/*===================================================
+                  COMPONENTS
+===================================================*/
+.components {
+    float: left;
+    border: #d5d5d5 1px solid;
+    height: 100vh;
+    width: 200px;
+
+}
+
+.header {
+    border-top: solid 5px #D5D5D5;
+    text-align: center;
+    line-height: 250%;
+    background-color: #EBEBEB;
+}
+
+.content {
+    overflow: scroll;
+    text-align: left;
+    resize: vertical;
+}
+
+.basic_components .content {
+    height: 300px;
+}
+
+.cliche_components .content {
+    height: 200px;
+}
+
+.content li {
+    margin: 10px 10px 0px 0px;
+    padding: 5px;
+}
+.content ul {
+    padding-left: 15px;
+    padding-right: 5px;
+}
+.content li:hover {
+    background-color: #E0E0E0;
+}
+
+.content img {
+    width: 15px;
+    height: 15px;
+    margin: 0px 15px 0px 5px;
+}
+
+
+
+
+/*===================================================
+                  GRID
+===================================================*/
+.table_outter {
+    border: 10px solid white;
+    table-layout: fixed !important;
+    border-collapse: inherit;
+}
+
+td {
+    background-color: #F0F1F2;
+    width: 170px;
+    min-width: 170px !important;
+    height: 170px;
+    border: 15px solid white;
+    resize: both;
+    position: relative;
+}
+
+.droppable:hover {
+    background-color: rgba(55, 131, 198, 0.2);
+}
+
+#grid-container {
+    height: 550px;
+    width: 850px;
+    overflow: scroll !important;
+}
+
+.widget:hover {
+    cursor: -webkit-grab;
+    cursor: grab;
+    background-color: #E0E0E0;
+
+}
+
+.highlight {
+    background-color: rgba(55, 131, 198, 0.2);
+}
+.dropped {
+    background-color: #E0E0E0;
+}
+
+.edit-btn {
+    display: none;
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+
+.dropped:hover button{
+    display: inline-block;
+}
+
+.form-lbl {
+    text-align: right;
+}
+
+@media (max-width: 1050px) {
+    #grid-container { width: 650px; }
+}

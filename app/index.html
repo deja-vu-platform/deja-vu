@@ -1,0 +1,207 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>Deja Vu UI builder</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/main.css">
+
+</head>
+<body>
+
+<div class="menubar">
+
+    <div class="menu-item logo">Déjà Vu UI builder</div>
+
+    <div class="menu-item">
+        <button type="button" class="btn btn-default">
+            <span class="glyphicon glyphicon-file"></span> Open...
+        </button>
+    </div>
+
+    <div class="menu-item">
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new_component">
+            <span class="glyphicon glyphicon-plus"></span> New component
+        </button>
+    </div>
+
+    <div class="menu-item">
+        <button type="button" class="btn btn-default" id="save_component">
+            <span class="glyphicon glyphicon-save"></span> Save component
+        </button>
+    </div>
+
+    <div class="menu-item">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-file"></span> View
+            </button>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="#" id="zoomIn">Zoom in + </a></li>
+                <li><a href="#" id="zoomOut">Zoom out - </a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#" id="zoomReset">Reset </a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="menu-item">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default">
+                <span class="glyphicon glyphicon-file"></span> Help
+            </button>
+            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a href="#">About</a></li>
+                <li><a href="#">Tutorials</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Report an issue</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div class="components">
+    <div class="basic_components">
+        <div class="header">Basic components</div>
+        <div class="content">
+            <ul id="basic_components">
+                <li id="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Label</li>
+                <li id="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
+                <li id="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Image</li>
+
+                <li>Table</li> <li>Video</li> <li>Horizontal line</li> <li>Button link</li> <li>Image link</li> <li>Code block</li>
+
+            </ul>
+        </div>
+    </div>
+
+    <div class="cliche_components">
+        <div class="header">Cliché components</div>
+        <div class="content">
+            <ul>
+
+                <li>USER</li>
+                <li>ACCOUNT</li>
+                <li>FRIEND</li>
+
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<div id="grid-container">
+
+    <!--<table class="table_outter">-->
+        <!--<tr>-->
+            <!--<td></td>-->
+            <!--<td></td>-->
+            <!--<td></td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td></td>-->
+            <!--<td></td>-->
+            <!--<td></td>-->
+        <!--</tr>-->
+        <!--<tr>-->
+            <!--<td></td>-->
+            <!--<td></td>-->
+            <!--<td></td>-->
+        <!--</tr>-->
+    <!--</table>-->
+
+</div>
+
+<!--MODALS-->
+<div class="modal fade" id="new_component">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">New Component</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Component name: </div>
+                    <div class="col-sm-7"><input type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Version: </div>
+                    <div class="col-sm-7"><input type="text" class="form-control" required placeholder="0.1.0"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Rows: </div>
+                    <div class="col-sm-7">
+                        <select id="select-rows">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3" selected="selected">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Columns: </div>
+                    <div class="col-sm-7">
+                        <select id="select-cols">
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3" selected="selected">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <p><button id="create_component" data-dismiss="modal" class="btn btn-primary">Create</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<!--<script>window.$ = window.jQuery = require('./js/jquery.min.js');</script>-->
+
+<script src="js/jquery.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/index.js"></script>
+<script src="js/create_component.js"></script>
+<script src="js/save_component.js"></script>
+<!--<script src="main.js"></script>-->
+</body>
+</html>
