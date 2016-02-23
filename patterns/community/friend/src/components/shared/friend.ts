@@ -5,30 +5,27 @@ import {User, Username} from "../../shared/user";
 
 @Injectable()
 export class FriendService {
-  private _api = "http://localhost:3000/api";
-
   constructor(private _http: Http) {}
 
   getFriends(username: Username): Observable<User[]> {
     return this._http.get(
-      this._api + `/users/${username}/friends` + "?fields=username,friends")
+      `/users/${username}/friends` + "?fields=username,friends")
       .map(res => res.json());
   }
 
   addFriend(u1: Username, u2: Username): any {
-    return this._http.put(this._api + `/users/${u1}/friends/${u2}`, "")
+    return this._http.put(`/users/${u1}/friends/${u2}`, "")
       .map(res => res.json());
   }
 
   unfriend(u1: Username, u2: Username): any {
-    return this._http.delete(this._api + `/users/${u1}/friends/${u2}`)
+    return this._http.delete(`/users/${u1}/friends/${u2}`)
       .map(res => res.json());
   }
 
   getPotentialFriends(username: Username): Observable<User[]> {
     return this._http.get(
-      this._api + `/users/${username}/potential_friends` +
-      "?fields=username,friends")
+      `/users/${username}/potential_friends` + "?fields=username,friends")
       .map(res => res.json());
   }
 }

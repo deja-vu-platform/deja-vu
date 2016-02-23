@@ -1,40 +1,14 @@
 /// <reference path="../typings/tsd.d.ts" />
 import * as express from "express";
-import morgan = require("morgan");
 import * as mongodb from "mongodb";
-let command_line_args = require("command-line-args");
 
-import {RestBus} from "rest-bus/pack/rest.bus";
-
-
-const cli = command_line_args([
-  {name: "dbhost", type: String, defaultValue: "localhost"},
-  {name: "dbport", type: Number, defaultValue: 27017},
-
-  {name: "wshost", type: String, defaultValue: "localhost"},
-  {name: "wsport", type: Number, defaultValue: 3000},
-
-  {name: "bushost", type: String, defaultValue: "localhost"},
-  {name: "busport", type: Number, defaultValue: 3001},
-
-  {name: "servepublic", type: Boolean, defaultValue: true},
-  {name: "debugdata", type: Boolean, defaultValue: true}
-]);
-const opts = cli.parse();
-const bus = new RestBus(opts.bus_host, opts.bus_port);
+import {Mean} from "mean";
 
 
-//
-// DB
-//
-const server = new mongodb.Server(
-  opts.dbhost, opts.dbport, {auto_reconnect: true});
-export const db = new mongodb.Db("frienddb", server, { w: 1 });
-db.open((err, db) => {
-  if (err) throw err;
+const mean = new Mean("friend", (db, debug) => {
   db.createCollection("users", (err, users) => {
     if (err) throw err;
-    if (opts.debugdata) {
+    if (debug) {
       console.log("Resetting users collection");
       users.remove((err, remove_count) => {
         if (err) throw err;
@@ -54,21 +28,6 @@ db.open((err, db) => {
 
 
 //
-// WS
-//
-const app = express();
-
-app.use(morgan("dev"));
-if (opts.servepublic) {
-  app.use(express.static(__dirname + "/public"));
-}
-
-app.listen(opts.wsport, () => {
-  console.log(`Listening with opts ${JSON.stringify(opts)}`);
-});
-
-
-//
 // API
 //
 interface Request extends express.Request {
@@ -78,7 +37,7 @@ interface Request extends express.Request {
 
 namespace Validation {
   function _exists(username, req, res, next) {
-    if (!req.users) req.users = db.collection("users");
+    if (!req.users) req.users = mean.db.collection("users");
     req.users.findOne({username: username}, {_id: 1}, (err, user) => {
       if (err) return next(err);
       if (!user) {
@@ -133,10 +92,10 @@ namespace Processor {
 }
 
 
-app.get(
+mean.app.get(
   "/api/users/:userid/potential_friends",
   Validation.userExists,
-  bus.crud("friends"),
+  mean.bus.crud("friends"),
   Processor.fields,
   Processor.cors,
   (req: Request, res, next) => {
@@ -154,10 +113,10 @@ app.get(
     });
   });
 
-app.get(
+mean.app.get(
   "/api/users/:userid/friends",
   Validation.userExists,
-  bus.crud("friends"),
+  mean.bus.crud("friends"),
   Processor.fields,
   Processor.cors,
   (req: Request, res, next) => {
@@ -186,13 +145,13 @@ const updateOne = (users, userid, update, next) => {
 };
 
 // tmp hack
-app.options("/api/users/:userid/friends/:friendid", Processor.cors);
+mean.app.options("/api/users/:userid/friends/:friendid", Processor.cors);
 
-app.put(
+mean.app.put(
   "/api/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
-  bus.crud("friends"),
+  mean.bus.crud("friends"),
   Processor.cors,
   (req: Request, res, next) => {
     const userid = req.params.userid;
@@ -202,11 +161,11 @@ app.put(
     res.json({});
   });
 
-app.delete(
+mean.app.delete(
   "/api/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
-  bus.crud("friends"),
+  mean.bus.crud("friends"),
   Processor.cors,
   (req: Request, res, next) => {
     const userid = req.params.userid;
