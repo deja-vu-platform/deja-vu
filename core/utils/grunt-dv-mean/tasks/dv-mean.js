@@ -1,7 +1,7 @@
 module.exports = function(grunt, optPatterns) {
   optPatterns = (typeof optPatterns === "undefined") ? [] : optPatterns;
   const patternsSrc = optPatterns.map(function(p) {
-        return "node_modules/" + p + "/pack/components/**/*.{js,html}";
+        return "node_modules/" + p + "/lib/components/**/*.{js,html}";
   });
   var deps = [
     "node_modules/angular2/bundles/angular2-polyfills.js",
@@ -50,9 +50,9 @@ module.exports = function(grunt, optPatterns) {
           noImplicitAny: false
         }
       },
-      pack_client: {
+      lib_client: {
         src: [shared, components],
-        outDir: ["pack"],
+        outDir: ["lib"],
         options: {
           verbose: true,
           target: "es5",
@@ -66,9 +66,9 @@ module.exports = function(grunt, optPatterns) {
           declaration: true
         }
       },
-      pack_server: {
+      lib_server: {
         src: [shared, server],
-        outDir: ["pack"],
+        outDir: ["lib"],
         options: {
           verbose: true,
           target: "es5",
@@ -108,22 +108,22 @@ module.exports = function(grunt, optPatterns) {
           {
             expand: true,
             src: optPatterns.map(function(p) {
-              return "node_modules/" + p + "/pack/components/**/*.html";
+              return "node_modules/" + p + "/lib/components/**/*.html";
             }),
             dest: "dist/public/components/",
             rename: function(dst, src) {
-              return dst + src.match("node_modules/.*/pack/components/(.*)")[1];
+              return dst + src.match("node_modules/.*/lib/components/(.*)")[1];
             }
           }
         ]
         },
-      pack: {
+      lib: {
         files: [
           {
             expand: true,
             cwd: "src",
             src: ["components/**/*.html"],
-            dest: "pack"
+            dest: "lib"
           }
         ]
       } 
@@ -142,13 +142,13 @@ module.exports = function(grunt, optPatterns) {
 
     clean: {
       default: {
-        src: ["dist", "pack", "src/**/*.js", "src/**/*.js.map", "src/**/*.d.ts"]
+        src: ["dist", "lib", "src/**/*.js", "src/**/*.js.map", "src/**/*.d.ts"]
       },
       dev: {
         src: ["dist"]
       },
-      pack: {
-        src: ["pack"]
+      lib: {
+        src: ["lib"]
       }
     },
 
@@ -160,6 +160,16 @@ module.exports = function(grunt, optPatterns) {
           args: ["--wsport=3000"]
         }
       }
+    },
+
+    watch: {
+      express: {
+        files: ["src/**/*.ts"],
+        tasks: ["dv-mean:serve"],
+        options: {
+          spawn: false
+        }
+      }
     }
   });
 
@@ -169,6 +179,7 @@ module.exports = function(grunt, optPatterns) {
   grunt.loadNpmTasks(base + "grunt-contrib-clean");
   grunt.loadNpmTasks(base + "grunt-contrib-copy");
   grunt.loadNpmTasks(base + "grunt-express-server");
+  grunt.loadNpmTasks(base + "grunt-contrib-watch");
 
   grunt.registerTask("dv-mean", "Dv a mean element", function(action) {
     if (action === "build") {
@@ -184,7 +195,7 @@ module.exports = function(grunt, optPatterns) {
       optPatterns.forEach(function(p) {
         express_config[p] = {
           options: {
-            script: "node_modules/" + p + "/pack/app.js",
+            script: "node_modules/" + p + "/lib/app.js",
             background: true,
             args: ["--wsport=" + port, "--servepublic=false"]
           }
@@ -192,13 +203,12 @@ module.exports = function(grunt, optPatterns) {
         ++port;
       });
       grunt.config.merge({express: express_config});
-      grunt.task.run(["express"]);
-      // we need to add a watch, if ow the servers die
-    } else if (action === "pack") {
-      grunt.log.writeln(this.name + " pack");
+      grunt.task.run(["express", "watch"]);
+    } else if (action === "lib") {
+      grunt.log.writeln(this.name + " lib");
       grunt.task.run(
-        ["clean:pack", "tslint", "ts:pack_client", "ts:pack_server",
-         "copy:pack"]);
+        ["clean:lib", "tslint", "ts:lib_client", "ts:lib_server",
+         "copy:lib"]);
     } else { // clean
       grunt.task.run("clean");
     }
