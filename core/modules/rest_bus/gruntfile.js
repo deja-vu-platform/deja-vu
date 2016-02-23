@@ -2,9 +2,9 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     ts: {
-      pack: {
+      lib: {
         src: ["src/**/*.ts"],
-        outDir: ["pack"],
+        outDir: ["lib"],
         options: {
           verbose: true,
           target: "es5",
@@ -33,10 +33,10 @@ module.exports = function(grunt) {
 
     clean: {
       default: {
-        src: ["pack", "src/**/*.js", "src/**/*.js.map", "src/**/*.d.ts"]
+        src: ["lib", "src/**/*.js", "src/**/*.js.map", "src/**/*.d.ts"]
       },
-      pack: {
-        src: ["pack"]
+      lib: {
+        src: ["lib"]
       }
     },
   });
@@ -46,5 +46,5 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-contrib-clean");
 
   grunt.registerTask(
-      "pack", ["clean:pack", "tslint", "ts:pack"]);
+      "lib", ["clean:lib", "tslint", "ts:lib"]);
 }

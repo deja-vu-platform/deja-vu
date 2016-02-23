@@ -2,7 +2,7 @@
   "name": "rest-bus",
   "version": "0.0.1",
   "scripts": {
-    "pack": "grunt pack"
+    "lib": "grunt lib"
   },
   "license": "MIT",
   "devDependencies": {
@@ -13,5 +13,7 @@
     "tslint": "^3.3.0",
     "typescript": "^1.7.5"
   },
-  "files": ["pack"]
+  "typings": "./lib/rest.bus",
+  "main": "./lib/rest.bus",
+  "files": ["lib"]
 }
