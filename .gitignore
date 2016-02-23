@@ -28,3 +28,9 @@ typings
 
 # Users Environment Variables
 .lock-wscript
+
+*.map
+*.baseDir.ts
+.tscache
+dist
+lib
