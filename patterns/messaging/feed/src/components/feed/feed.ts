@@ -1,14 +1,15 @@
-import {Component, Input} from "angular2/core";
-import {OnInit} from "angular2/core";
+import {Component, Input, OnInit} from "angular2/core";
+import {HTTP_PROVIDERS} from "angular2/http";
 
-import {Name} from "../../data";
+
+import {Name} from "../../shared/data";
 import {FeedService, FeedItem} from "../shared/feed";
 
 
 @Component({
   selector: "feed",
   templateUrl: "./components/feed/feed.html",
-  providers: [FeedService]
+  providers: [FeedService, HTTP_PROVIDERS]
 })
 export class FeedComponent implements OnInit {
   @Input() sub: Name;

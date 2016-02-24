@@ -1,13 +1,14 @@
 import {Component} from "angular2/core";
+import {HTTP_PROVIDERS} from "angular2/http";
 
-import {User} from "../../data";
+import {User} from "../../shared/data";
 import {AuthService} from "../shared/auth";
 
 
 @Component({
   selector: "register",
   templateUrl: "./components/register/register.html",
-  providers: [AuthService]
+  providers: [AuthService, HTTP_PROVIDERS]
 })
 export class RegisterComponent {
   user: User = {username: "", password: "", read: [], write: []};

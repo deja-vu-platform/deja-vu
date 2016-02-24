@@ -1,14 +1,14 @@
-import {Component, Input} from "angular2/core";
-import {OnInit} from "angular2/core";
+import {Component, Input, OnInit} from "angular2/core";
+import {HTTP_PROVIDERS} from "angular2/http";
 
-import {Post, Username} from "../../data";
+import {Post, Username} from "../../shared/data";
 import {PostService} from "../shared/post";
 
 
 @Component({
   selector: "posts",
   templateUrl: "./components/posts/posts.html",
-  providers: [PostService]
+  providers: [PostService, HTTP_PROVIDERS]
 })
 export class PostsComponent implements OnInit {
   @Input() username: Username;

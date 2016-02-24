@@ -1,7 +1,7 @@
-import {Injectable} from "angular2/core";
+import {Injectable, Inject} from "angular2/core";
 import {Http} from "angular2/http";
 import {Observable} from "rxjs/Observable";
-import {Content, Publisher, Name} from "../../data";
+import {Content, Publisher, Name} from "../../shared/data";
 
 
 export interface FeedItem {
@@ -11,9 +11,7 @@ export interface FeedItem {
 
 @Injectable()
 export class FeedService {
-  private _api = "http://localhost:3000/api";
-
-  constructor(private _http: Http) {}
+  constructor(private _http: Http, @Inject("feed.api") private _api: String) {}
 
   getFeed(sub: Name): Observable<FeedItem> {
     return this._http.get(this._api + `/subs/${sub}/feed`)

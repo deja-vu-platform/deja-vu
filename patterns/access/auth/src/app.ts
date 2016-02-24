@@ -1,32 +1,17 @@
 /// <reference path="../typings/tsd.d.ts" />
 import * as express from "express";
-import * as bodyParser from "body-parser";
-import morgan = require("morgan");
 import * as mongodb from "mongodb";
+import * as bodyParser from "body-parser";
 import bcrypt = require("bcryptjs");
 
-import {RestBus} from "rest-bus/rest.bus";
-import {User} from "./data";
-
-const env = process.env.NODE_ENV || "dev";
-const dbhost = process.env.DB_HOST || "localhost";
-const dbport = process.env.DB_PORT || 27017;
-const wsport = process.env.WS_PORT || 3000;
-const bus = new RestBus(
-  process.env.BUS_HOST || "localhost",
-  process.env.BUS_PORT || 3001);
+import {Mean} from "mean";
+import {User} from "./shared/data";
 
 
-//
-// DB
-//
-const server = new mongodb.Server(dbhost, dbport, {auto_reconnect: true});
-export const db = new mongodb.Db("authdb", server, { w: 1 });
-db.open((err, db) => {
-  if (err) throw err;
+const mean = new Mean("auth", (db, debug) => {
   db.createCollection("users", (err, users) => {
     if (err) throw err;
-    if (env === "dev") {
+    if (debug) {
       console.log("Resetting users collection");
       users.remove((err, remove_count) => {
         if (err) throw err;
@@ -34,21 +19,6 @@ db.open((err, db) => {
       });
     }
   });
-});
-
-
-//
-// WS
-//
-const app = express();
-
-app.use(morgan("dev"));
-if (env === "dev") {
-  app.use(express.static(__dirname + "/public"));
-}
-
-app.listen(wsport, () => {
-  console.log(`Listening on port ${wsport} in mode ${env}`);
 });
 
 
@@ -71,7 +41,7 @@ namespace Parsers {
 
 namespace Validation {
   export function userIsNew(req, res, next) {
-    if (!req.users) req.users = db.collection("users");
+    if (!req.users) req.users = mean.db.collection("users");
     req.users.findOne({username: req.user.username}, {_id: 1}, (err, user) => {
       if (err) return next(err);
       if (user) {
@@ -83,12 +53,12 @@ namespace Validation {
   }
 }
 
-app.post(
+mean.app.post(
   "/signin",
   Parsers.json, Parsers.user,
-  bus.crud("users"),
+  mean.bus.crud("users"),
   (req, res, next) => {
-    db.collection("users").findOne(
+    mean.db.collection("users").findOne(
       {username: req.user.username},
       (err, user) => {
         if (err) return next(err);
@@ -111,11 +81,11 @@ app.post(
       });
   });
 
-app.post(
+mean.app.post(
   "/register",
   Parsers.json, Parsers.user,
   Validation.userIsNew,
-  bus.crud("users"),
+  mean.bus.crud("users"),
   (req: Request, res, next) => {
     console.log(JSON.stringify(req.user));
     bcrypt.hash(req.user.password, 10, (err, hash) => {

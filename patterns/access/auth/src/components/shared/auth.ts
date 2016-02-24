@@ -1,27 +1,26 @@
-import {Injectable} from "angular2/core";
+import {Injectable, Inject} from "angular2/core";
 import {Http, Headers} from "angular2/http";
-import {User} from "../../data";
+import {User} from "../../shared/data";
 
 
 @Injectable()
 export class AuthService {
-  private _www = "http://localhost:3000";
   private _headers;
 
-  constructor(private _http: Http) {
+  constructor(private _http: Http, @Inject("auth.api") private _api: String) {
     this._headers = new Headers();
     this._headers.append("Content-type", "application/json");
   }
 
   signIn(user: User) {
     return this._http.post(
-      this._www + "/signin", JSON.stringify(user), {headers: this._headers})
+      this._api + "/signin", JSON.stringify(user), {headers: this._headers})
       .map(res => res.json());
   }
 
   register(user: User) {
     return this._http.post(
-      this._www + "/register", JSON.stringify(user), {headers: this._headers})
+      this._api + "/register", JSON.stringify(user), {headers: this._headers})
       .map(res => res.json());
   }
 }

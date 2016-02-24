@@ -1,9 +1,16 @@
+import {provide} from "angular2/core";
 import {bootstrap} from "angular2/platform/browser";
-import {HTTP_PROVIDERS} from "angular2/http";
 import {FeedPatternComponent} from "./feed-pattern.component";
 
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 import "rxjs/add/observable/fromArray";
 
-bootstrap(FeedPatternComponent, [HTTP_PROVIDERS]);
+
+const APIS = {feed: "http://localhost:3000"};
+
+
+bootstrap(
+  FeedPatternComponent, [
+    provide("feed.api", {useValue: APIS.feed})
+  ]);

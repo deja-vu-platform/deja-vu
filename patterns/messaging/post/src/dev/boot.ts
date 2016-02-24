@@ -1,7 +1,13 @@
+import {provide} from "angular2/core";
 import {bootstrap} from "angular2/platform/browser";
-import {HTTP_PROVIDERS} from "angular2/http";
 import {PostPatternComponent} from "./post-pattern.component";
 
 import "rxjs/add/operator/map";
 
-bootstrap(PostPatternComponent, [HTTP_PROVIDERS]);
+
+const APIS = {post: "http://localhost:3000"};
+
+bootstrap(
+  PostPatternComponent, [
+    provide("post.api", {useValue: APIS.post})
+  ]);

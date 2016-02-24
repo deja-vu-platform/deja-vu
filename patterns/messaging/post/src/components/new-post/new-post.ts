@@ -1,13 +1,14 @@
 import {Component, Input} from "angular2/core";
+import {HTTP_PROVIDERS} from "angular2/http";
 
-import {Post, Username} from "../../data";
+import {Post, Username} from "../../shared/data";
 import {PostService} from "../shared/post";
 
 
 @Component({
   selector: "new-post",
   templateUrl: "./components/new-post/new-post.html",
-  providers: [PostService]
+  providers: [PostService, HTTP_PROVIDERS]
 })
 export class NewPostComponent {
   @Input() username: Username;
