@@ -38,7 +38,7 @@ export class Mean {
         console.log("Error opening mongodb");
         throw err;
       }
-      init(db, opts.debug);
+      init(db, opts.debugdata);
     });
 
     this.app = express();

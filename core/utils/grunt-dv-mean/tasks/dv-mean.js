@@ -157,7 +157,7 @@ module.exports = function(grunt, optPatterns) {
         options: {
           script: "dist/app.js",
           background: true,
-          args: ["--wsport=3000"]
+          args: ["--wsport=3000", "--busport=3001"]
         }
       }
     },
@@ -206,13 +206,13 @@ module.exports = function(grunt, optPatterns) {
         ["clean:dev", "tslint", "ts:dev_client", "copy:dev", "ts:dev_server"]);
       var express_config = {};
       var replace_patterns = [];
-      var port = 3001;
+      var port = 3002;
       optPatterns.forEach(function(p) {
         express_config[p] = {
           options: {
             script: "node_modules/" + p + "/lib/app.js",
             background: true,
-            args: ["--wsport=" + port, "--servepublic=false"]
+            args: ["--wsport=" + port, "--servepublic=false", "--busport=3001"]
           }
         };
         replace_patterns.push(
