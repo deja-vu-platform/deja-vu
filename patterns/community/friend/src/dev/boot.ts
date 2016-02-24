@@ -1,7 +1,14 @@
+import {provide} from "angular2/core";
 import {bootstrap} from "angular2/platform/browser";
-import {HTTP_PROVIDERS} from "angular2/http";
 import {FriendPatternComponent} from "./friend-pattern.component";
 
 import "rxjs/add/operator/map";
 
-bootstrap(FriendPatternComponent, [HTTP_PROVIDERS]);
+
+const APIS = {friend: "http://localhost:3000"};
+
+
+bootstrap(
+  FriendPatternComponent, [
+    provide("friend.api", {useValue: APIS.friend})
+  ]);

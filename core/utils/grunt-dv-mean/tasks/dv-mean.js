@@ -170,6 +170,19 @@ module.exports = function(grunt, optPatterns) {
           spawn: false
         }
       }
+    },
+
+    replace: {
+      dev: {
+        files: [
+          {
+            expand: true,
+            flatten: true,
+            src: "dist/public/dev/boot.js",
+            dest: "dist/public/dev"
+          }
+        ]
+      }
     }
   });
 
@@ -180,6 +193,7 @@ module.exports = function(grunt, optPatterns) {
   grunt.loadNpmTasks(base + "grunt-contrib-copy");
   grunt.loadNpmTasks(base + "grunt-express-server");
   grunt.loadNpmTasks(base + "grunt-contrib-watch");
+  grunt.loadNpmTasks(base + "grunt-replace");
 
   grunt.registerTask("dv-mean", "Dv a mean element", function(action) {
     if (action === "build") {
@@ -191,6 +205,7 @@ module.exports = function(grunt, optPatterns) {
       grunt.task.run(
         ["clean:dev", "tslint", "ts:dev_client", "copy:dev", "ts:dev_server"]);
       var express_config = {};
+      var replace_patterns = [];
       var port = 3001;
       optPatterns.forEach(function(p) {
         express_config[p] = {
@@ -200,10 +215,14 @@ module.exports = function(grunt, optPatterns) {
             args: ["--wsport=" + port, "--servepublic=false"]
           }
         };
+        replace_patterns.push(
+          {match: p, replacement: "http://localhost:" + port});
         ++port;
       });
       grunt.config.merge({express: express_config});
-      grunt.task.run(["express", "watch"]);
+      grunt.config.merge(
+        {replace: {dev: {options: {patterns: replace_patterns}}}});
+      grunt.task.run(["replace:dev", "express", "watch"]);
     } else if (action === "lib") {
       grunt.log.writeln(this.name + " lib");
       grunt.task.run(

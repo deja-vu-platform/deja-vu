@@ -21,7 +21,7 @@
     "grunt": "^0.4.5",
     "grunt-dv-mean": "file:../../../core/utils/grunt-dv-mean"
   },
-  "files": [
-    "pack"
-  ]
+  "main": "./lib",
+  "typings": "./lib",
+  "files": ["lib"]
 }

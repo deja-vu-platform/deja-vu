@@ -4,9 +4,9 @@ import {Component} from "angular2/core";
 // import {RegisterComponent} from
 // "dv-access-auth/auth/components/register/register";
 import {FriendsComponent} from
-"dv-community-friend/pack/components/friends/friends";
+"dv-community-friend/lib/components/friends/friends";
 import {AddFriendComponent} from
-"dv-community-friend/pack/components/add-friend/add-friend";
+"dv-community-friend/lib/components/add-friend/add-friend";
 
 @Component({
   selector: "social-network",

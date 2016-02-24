@@ -1,5 +1,6 @@
 import {Component, Input} from "angular2/core";
 import {OnInit} from "angular2/core";
+import {HTTP_PROVIDERS} from "angular2/http";
 
 import {User, Username} from "../../shared/user";
 import {FriendService} from "../shared/friend";
@@ -8,7 +9,7 @@ import {FriendService} from "../shared/friend";
 @Component({
   selector: "add-friend",
   templateUrl: "./components/add-friend/add-friend.html",
-  providers: [FriendService]
+  providers: [FriendService, HTTP_PROVIDERS]
 })
 export class AddFriendComponent implements OnInit {
   @Input() username: Username;

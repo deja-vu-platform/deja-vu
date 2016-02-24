@@ -93,7 +93,7 @@ namespace Processor {
 
 
 mean.app.get(
-  "/api/users/:userid/potential_friends",
+  "/users/:userid/potential_friends",
   Validation.userExists,
   mean.bus.crud("friends"),
   Processor.fields,
@@ -114,7 +114,7 @@ mean.app.get(
   });
 
 mean.app.get(
-  "/api/users/:userid/friends",
+  "/users/:userid/friends",
   Validation.userExists,
   mean.bus.crud("friends"),
   Processor.fields,
@@ -145,10 +145,10 @@ const updateOne = (users, userid, update, next) => {
 };
 
 // tmp hack
-mean.app.options("/api/users/:userid/friends/:friendid", Processor.cors);
+mean.app.options("/users/:userid/friends/:friendid", Processor.cors);
 
 mean.app.put(
-  "/api/users/:userid/friends/:friendid",
+  "/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
   mean.bus.crud("friends"),
@@ -162,7 +162,7 @@ mean.app.put(
   });
 
 mean.app.delete(
-  "/api/users/:userid/friends/:friendid",
+  "/users/:userid/friends/:friendid",
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
   mean.bus.crud("friends"),
