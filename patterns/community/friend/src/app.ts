@@ -77,27 +77,26 @@ namespace Processor {
     }
     next();
   }
-
-  // temp hack
-  export function cors(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Methods",
-        "POST, GET, OPTIONS, PUT, DELETE");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  }
 }
 
+// temp hack
+function cors(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+      "Access-Control-Allow-Methods",
+      "POST, GET, OPTIONS, PUT, DELETE");
+  res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+}
 
 mean.app.get(
   "/users/:userid/potential_friends",
   Validation.userExists,
   mean.bus.crud("friends"),
   Processor.fields,
-  Processor.cors,
+  cors,
   (req: Request, res, next) => {
     const query = {
     $and: [
@@ -118,7 +117,7 @@ mean.app.get(
   Validation.userExists,
   mean.bus.crud("friends"),
   Processor.fields,
-  Processor.cors,
+  cors,
   (req: Request, res, next) => {
     req.users.findOne({username: req.params.userid}, (err, user) => {
       if (err) return next(err);
@@ -145,14 +144,14 @@ const updateOne = (users, userid, update, next) => {
 };
 
 // tmp hack
-mean.app.options("/users/:userid/friends/:friendid", Processor.cors);
+mean.app.options("/users/:userid/friends/:friendid", cors);
 
 mean.app.put(
   "/users/:userid/friends/:friendid",
+  cors,
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
   mean.bus.crud("friends"),
-  Processor.cors,
   (req: Request, res, next) => {
     const userid = req.params.userid;
     const friendid = req.params.friendid;
@@ -163,10 +162,10 @@ mean.app.put(
 
 mean.app.delete(
   "/users/:userid/friends/:friendid",
+  cors,
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
   mean.bus.crud("friends"),
-  Processor.cors,
   (req: Request, res, next) => {
     const userid = req.params.userid;
     const friendid = req.params.friendid;

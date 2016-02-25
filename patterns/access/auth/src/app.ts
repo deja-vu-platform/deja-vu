@@ -21,6 +21,17 @@ const mean = new Mean("auth", (db, debug) => {
   });
 });
 
+// temp hack
+function cors(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+      "Access-Control-Allow-Methods",
+      "POST, GET, OPTIONS, PUT, DELETE");
+  res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+}
 
 //
 // API
@@ -53,8 +64,12 @@ namespace Validation {
   }
 }
 
+mean.app.options("/signin", cors);
+mean.app.options("/register", cors);
+
 mean.app.post(
   "/signin",
+  cors,
   Parsers.json, Parsers.user,
   mean.bus.crud("users"),
   (req, res, next) => {
@@ -83,6 +98,7 @@ mean.app.post(
 
 mean.app.post(
   "/register",
+  cors,
   Parsers.json, Parsers.user,
   Validation.userIsNew,
   mean.bus.crud("users"),

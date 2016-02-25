@@ -53,8 +53,23 @@ namespace Validation {
   }
 }
 
+
+// temp hack
+function cors(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+      "Access-Control-Allow-Methods",
+      "POST, GET, OPTIONS, PUT, DELETE");
+  res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+}
+
+
 mean.app.get(
   "/users/:userid/posts",
+  cors,
   Validation.userExists,
   mean.bus.crud("posts"),
   (req: Request, res, next) => {
@@ -70,8 +85,11 @@ mean.app.get(
 
 const jsonParser = bodyParser.json();
 
+mean.app.options("/users/:userid/posts", cors);
+
 mean.app.post(
   "/users/:userid/posts",
+  cors,
   Validation.userExists, jsonParser,
   mean.bus.crud("posts"),
   (req: Request, res, next) => {
