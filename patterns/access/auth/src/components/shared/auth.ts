@@ -1,5 +1,6 @@
 import {Injectable, Inject} from "angular2/core";
 import {Http, Headers} from "angular2/http";
+
 import {User} from "../../shared/data";
 
 
@@ -12,13 +13,13 @@ export class AuthService {
     this._headers.append("Content-type", "application/json");
   }
 
-  signIn(user: User) {
+  signIn(user: User): any {
     return this._http.post(
       this._api + "/signin", JSON.stringify(user), {headers: this._headers})
       .map(res => res.json());
   }
 
-  register(user: User) {
+  register(user: User): any {
     return this._http.post(
       this._api + "/register", JSON.stringify(user), {headers: this._headers})
       .map(res => res.json());

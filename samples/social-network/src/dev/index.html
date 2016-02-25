@@ -12,7 +12,10 @@
     <script>
       System.config({
         map: {
-          "dv-community-friend": "node_modules/dv-community-friend"
+          "dv-access-auth": "node_modules/dv-access-auth",
+          "dv-community-friend": "node_modules/dv-community-friend",
+          "dv-messaging-post": "node_modules/dv-messaging-post",
+          "dv-messaging-feed": "node_modules/dv-messaging-feed"
         },
         packages: {
           dev: {
@@ -23,7 +26,19 @@
             format: 'register',
             defaultExtension: 'js'
           },
+          "dv-access-auth": {
+            format: 'register',
+            defaultExtension: 'js'
+          },
           "dv-community-friend": {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          "dv-messaging-post": {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          "dv-messaging-feed": {
             format: 'register',
             defaultExtension: 'js'
           }

@@ -18,7 +18,10 @@
     "rxjs": "5.0.0-beta.0",
     "systemjs": "0.19.6",
     "zone.js": "0.5.10",
-    "friend": "file:../../patterns/community/friend"
+    "auth": "file:../../patterns/access/auth",
+    "friend": "file:../../patterns/community/friend",
+    "post": "file:../../patterns/messaging/post",
+    "feed": "file:../../patterns/messaging/feed"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
