@@ -11,4 +11,9 @@ import {RegisterComponent} from
   directives: [SignInComponent, RegisterComponent]
 })
 export class HomeComponent {
+
+  onEnter(user) {
+    console.log("on enter");
+    console.log(JSON.stringify(user));
+  }
 }

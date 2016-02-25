@@ -1,4 +1,4 @@
-import {Component} from "angular2/core";
+import {Component, Output, EventEmitter} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {User} from "../../shared/data";
@@ -12,10 +12,16 @@ import {AuthService} from "../shared/auth";
 })
 export class RegisterComponent {
   user: User = {username: "", password: "", read: [], write: []};
+  @Output() onRegister = new EventEmitter();
 
   constructor(private _authService: AuthService) {}
 
   onSubmit() {
-    this._authService.register(this.user).subscribe();
+    this._authService.register(this.user).subscribe(
+      res => {
+        console.log("about to emit from register");
+        this.onRegister.emit(this.user);
+      }
+    );
   }
 }
