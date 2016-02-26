@@ -51,6 +51,6 @@ export class Mean {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
     });
 
-    this.bus = new RestBus(opts.bushost, opts.busport);
+    this.bus = new RestBus(name, opts.bushost, opts.busport);
   }
 }

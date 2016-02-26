@@ -2,18 +2,22 @@
 import * as http from "http";
 
 export class RestBus {
-  constructor(private _host: string, private _port: number) {}
+  private _name: string;
+
+  constructor(name: string, private _hostname: string, private _port: number) {
+    this._name = name.charAt(0).toUpperCase() + name.slice(1);
+  }
 
   // If no info fn is provided we resort to taking all params from the req
   // If no action is given we use the action of the req
   crud(rel: String, info?) {
     return (req, res, next) => {
-      console.log(`attempting to reach bus at ${this._host}:${this._port}`);
+      console.log(`attempting to reach bus at ${this._hostname}:${this._port}`);
       const options = {
-        hostname: this._host,
+        hostname: this._hostname,
         port: this._port,
         method: req.method,
-        path: `/${rel}`
+        path: `/${this._name}/${rel}`
       };
       console.log(JSON.stringify(options));
 

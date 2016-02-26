@@ -2,11 +2,11 @@
   "name": "Feed",
   "data": {
     "Subscriber": {
-      "name": "Name",
-      "subscriptions": "Name"
+      "name": "one Name",
+      "subscriptions": "Publisher"
     },
     "Publisher": {
-      "name": "Name",
+      "name": "one Name",
       "published": "Content"
     },
     "Name": {},

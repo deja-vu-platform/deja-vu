@@ -13,7 +13,7 @@ fs.readFile(fp, "utf8", (err, data) => {
   if (err) throw err;
   console.log(`Reading config from ${fp}`);
   config = JSON.parse(data);
-  console.log(`Done reading config`);
+  console.log("Done reading config");
 });
 
 
@@ -29,12 +29,25 @@ app.listen(wsport, () => {
   console.log(`Listening on port ${wsport} in mode ${env}`);
 });
 
-app.get(
-  "/:rel",
-  (req, res, next) => {
-    console.log(`${req.params.attr}`);
-    res.json({});
-  });
+const fw = (req, res, next) => {
+  console.log("something?");
+  console.log(`${req.params.attr}`);
+  console.log(config.merge.mappings);
+  const mappings = config.merge.mappings[
+    `${req.params.elem}/${req.params.rel}`];
+  let count = 0;
+  if (mappings) {
+    mappings.forEach(m => {
+      console.log("send to " + m);
+      ++count;
+    });
+  }
+  res.json({updated: count});
+  next();
+};
+
+app.get("/:elem/:rel", fw);
+app.post("/:elem/:rel", fw);
 // create/element/relation
 // read/element/relation
 // update/element/relation
