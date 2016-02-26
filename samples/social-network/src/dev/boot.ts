@@ -17,7 +17,7 @@ bootstrap(
   SocialNetworkComponent, [
     provide("auth.api", {useValue: APIS.auth}),
     provide("friend.api", {useValue: APIS.friend}),
-    provide("friend.post", {useValue: APIS.post}),
-    provide("friend.feed", {useValue: APIS.feed}),
+    provide("post.api", {useValue: APIS.post}),
+    provide("feed.api", {useValue: APIS.feed}),
     ROUTER_PROVIDERS
   ]);

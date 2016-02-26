@@ -1,8 +1,8 @@
 import {Component} from "angular2/core";
 import {RouteConfig, ROUTER_DIRECTIVES} from "angular2/router";
 
-import {HomeComponent} from "../components/home/home";
-import {NewsFeedComponent} from "../components/news-feed/news-feed";
+import {LandingComponent} from "../components/landing/landing";
+import {AppComponent} from "../components/app/app";
 
 
 @Component({
@@ -11,8 +11,9 @@ import {NewsFeedComponent} from "../components/news-feed/news-feed";
   directives: [ROUTER_DIRECTIVES]
 })
 @RouteConfig([
-  {path: "/", name: "Home", component: HomeComponent, useAsDefault: true},
-  {path: "/news-feed", name: "NewsFeed", component: NewsFeedComponent}
+  {path: "/landing", name: "Landing", component: LandingComponent,
+   useAsDefault: true},
+  {path: "/app/...", name: "App", component: AppComponent}
 ])
 export class SocialNetworkComponent {
   public title = "Social Network";
