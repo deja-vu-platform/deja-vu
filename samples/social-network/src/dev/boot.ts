@@ -1,5 +1,7 @@
 import {provide} from "angular2/core";
 import {bootstrap} from "angular2/platform/browser";
+import {ROUTER_PROVIDERS} from "angular2/router";
+
 import {SocialNetworkComponent} from "./social-network.component";
 
 import "rxjs/add/operator/map";
@@ -16,5 +18,6 @@ bootstrap(
     provide("auth.api", {useValue: APIS.auth}),
     provide("friend.api", {useValue: APIS.friend}),
     provide("friend.post", {useValue: APIS.post}),
-    provide("friend.feed", {useValue: APIS.feed})
+    provide("friend.feed", {useValue: APIS.feed}),
+    ROUTER_PROVIDERS
   ]);
