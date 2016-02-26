@@ -1,3 +1,4 @@
-<new-post></new-post>
+<logged-in (loggedInUser)="loggedInUser($event)"></logged-in>
+<new-post [username]="username"></new-post>
 <h1>News Feed</h1>
-<feed></feed>
+<feed [sub]="username"></feed>
