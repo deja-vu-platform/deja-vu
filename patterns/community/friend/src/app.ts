@@ -93,10 +93,10 @@ function cors(req, res, next) {
 
 mean.app.get(
   "/users/:userid/potential_friends",
+  cors,
   Validation.userExists,
   mean.bus.crud("friends"),
   Processor.fields,
-  cors,
   (req: Request, res, next) => {
     const query = {
     $and: [
@@ -114,10 +114,10 @@ mean.app.get(
 
 mean.app.get(
   "/users/:userid/friends",
+  cors,
   Validation.userExists,
   mean.bus.crud("friends"),
   Processor.fields,
-  cors,
   (req: Request, res, next) => {
     req.users.findOne({username: req.params.userid}, (err, user) => {
       if (err) return next(err);
