@@ -80,7 +80,8 @@ mean.app.get(
   "/subs/:name/feed",
   cors,
   Validation.SubExists,
-  mean.bus.crud("subs"),
+  mean.bus.crud("subscriptions"),
+  mean.bus.crud("published"),
   (req: Request, res, next) => {
     req.subs.findOne({name: req.params.name}, (err, sub) => {
       if (err) return next(err);

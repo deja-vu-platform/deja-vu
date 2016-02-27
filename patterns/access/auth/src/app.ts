@@ -71,7 +71,7 @@ mean.app.post(
   "/signin",
   cors,
   Parsers.json, Parsers.user,
-  mean.bus.crud("users"),
+  mean.bus.crud("User"),
   (req, res, next) => {
     mean.db.collection("users").findOne(
       {username: req.user.username},
@@ -101,7 +101,7 @@ mean.app.post(
   cors,
   Parsers.json, Parsers.user,
   Validation.userIsNew,
-  mean.bus.crud("users"),
+  mean.bus.crud("User"),
   (req: Request, res, next) => {
     console.log(JSON.stringify(req.user));
     bcrypt.hash(req.user.password, 10, (err, hash) => {

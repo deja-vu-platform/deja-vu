@@ -71,6 +71,7 @@ mean.app.get(
   "/users/:userid/posts",
   cors,
   Validation.userExists,
+  mean.bus.crud("users"),
   mean.bus.crud("posts"),
   (req: Request, res, next) => {
     req.users.findOne({username: req.params.userid}, (err, user) => {
@@ -91,6 +92,7 @@ mean.app.post(
   "/users/:userid/posts",
   cors,
   Validation.userExists, jsonParser,
+  mean.bus.crud("users"),
   mean.bus.crud("posts"),
   (req: Request, res, next) => {
     console.log(req.body);

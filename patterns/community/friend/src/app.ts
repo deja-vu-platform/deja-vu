@@ -95,6 +95,7 @@ mean.app.get(
   "/users/:userid/potential_friends",
   cors,
   Validation.userExists,
+  mean.bus.crud("User"),
   mean.bus.crud("friends"),
   Processor.fields,
   (req: Request, res, next) => {
@@ -116,6 +117,7 @@ mean.app.get(
   "/users/:userid/friends",
   cors,
   Validation.userExists,
+  mean.bus.crud("User"),
   mean.bus.crud("friends"),
   Processor.fields,
   (req: Request, res, next) => {
@@ -151,6 +153,7 @@ mean.app.put(
   cors,
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
+  mean.bus.crud("User"),
   mean.bus.crud("friends"),
   (req: Request, res, next) => {
     const userid = req.params.userid;
@@ -165,6 +168,7 @@ mean.app.delete(
   cors,
   Validation.userExists, Validation.friendExists,
   Validation.friendNotSameAsUser,
+  mean.bus.crud("User"),
   mean.bus.crud("friends"),
   (req: Request, res, next) => {
     const userid = req.params.userid;
