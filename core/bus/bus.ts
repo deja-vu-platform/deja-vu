@@ -14,6 +14,7 @@ fs.readFile(fp, "utf8", (err, data) => {
   console.log(`Reading config from ${fp}`);
   config = JSON.parse(data);
   console.log("Done reading config");
+  console.log(JSON.stringify(config));
 });
 
 
@@ -30,7 +31,6 @@ app.listen(wsport, () => {
 });
 
 const fw = (req, res, next) => {
-  console.log("something?");
   console.log(`${req.params.attr}`);
   console.log(config.merge.mappings);
   const mappings = config.merge.mappings[

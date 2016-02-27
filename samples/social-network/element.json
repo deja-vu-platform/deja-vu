@@ -24,6 +24,12 @@
   ],
   "merge": {
     "mappings": {
+      "Auth/User": [
+        "Friend/User",
+        "Post/User",
+        "Feed/Subscriber",
+        "Feed/Publisher"
+      ],
       "Friend/User": [
         "Auth/User",
         "Post/User",
