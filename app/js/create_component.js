@@ -3,6 +3,7 @@
  */
 num_rows = 3;
 num_cols = 3;
+files = [];
 
 $(function() {
 
@@ -24,6 +25,8 @@ $(function() {
         createTable(grid_width, grid_height, num_rows, num_cols);
     });
 
+
+
 });
 
 /**
@@ -44,19 +47,19 @@ function createTable(grid_width, grid_height, num_rows, num_cols) {
             for (var col=0; col<num_cols; col++) {
                 (function(col){
                     var td = document.createElement('td');
+                    td.className = 'droppable';
+                    td.id = 'cell'+row+col;
+                    resizeCell(td, grid_width, grid_height, num_rows, num_cols);
 
                     var sp = document.createElement('span');
                     sp.innerHTML = '<button type="button" class="edit-btn btn btn-default"><span class="glyphicon glyphicon-edit"></span></button>';
                     var button = sp.firstChild;
 
-                    td.className = 'droppable';
-                    td.id = 'cell'+row+col;
-
-                    resizeCell(td, grid_width, grid_height, num_rows, num_cols);
-
                     td.appendChild(button);
-
                     tr.appendChild(td);
+
+                    $(button).on("click", function() { triggerEdit(td.id)});
+
                 })(col+1);
             }
             grid.appendChild(tr);
@@ -64,9 +67,11 @@ function createTable(grid_width, grid_height, num_rows, num_cols) {
     }
 
     document.getElementById('grid-container').appendChild(grid);
+
     registerDroppable();
 
 }
+
 /**
  * Resize cell such that all cells fill width and height of grid
  * @param cell
@@ -82,4 +87,65 @@ function resizeCell(cell, grid_width, grid_height, num_rows, num_cols) {
 
     cell.setAttribute('style', 'width: '+cell_width+'px; height: '+cell_height+'px;');
 
+    // Resize tooltip
+    var tooltip_width = Number($('.tooltip').css('width').substring(0,3));
+    $('.tooltip').css('left', -1*Math.floor((tooltip_width-(cell_width-40))/2)+'px');
 }
+/**
+ * Register listener for click on edit button
+ * @param cell_id
+ */
+function triggerEdit(cell_id) {
+    var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
+    //console.log("dropped_component:"+dropped_component);
+
+    var edit_dialog_template = $('#'+dropped_component+'_popup_holder').html();
+    //console.log(edit_dialog_template);
+
+    var sp = document.createElement('span');
+    sp.innerHTML = edit_dialog_template;
+    //console.log(sp.firstElementChild);
+    var edit_dialog = sp.firstElementChild;
+    //console.log(edit_dialog.firstChild);
+
+    var cell = document.getElementById(cell_id);
+    cell.insertBefore(edit_dialog, cell.firstChild);
+
+    $(Array.prototype.slice.call(
+        $('#'+cell_id).get(0).getElementsByClassName('form-control'), 0)[0]).trigger("focus");
+    setTimeout(function(){
+        $($('#'+cell_id).children().first()).addClass('open');
+    }, 1);
+    registerCloseBtnHandler();
+
+}
+
+
+function registerCloseBtnHandler() {
+    $('.close').on("click", function() {
+        setTimeout(function(){
+            $('.tooltip').removeClass('open');
+        }, 1);
+        Array.prototype.slice.call(
+            $(this).parent().get(0).getElementsByClassName('form-control'), 0)
+            .forEach(function(item) {
+                item.value = "";
+            })
+    })
+}
+
+
+$(document).click(function(event) {
+    if(!$(event.target).closest('.tooltip').length &&
+        !$(event.target).is('.tooltip')) {
+        if($('.tooltip').hasClass('open')) {
+            $('.tooltip').removeClass('open');
+        }
+    }
+
+});
+
+$(document).on('change', '#fileselect', function(evt) {
+    files = $(this).get(0).files;
+    $(this).parent().parent().parent().children().first().val(files[0].name);
+});

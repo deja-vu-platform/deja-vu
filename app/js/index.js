@@ -10,23 +10,35 @@ $(function() {
 
     registerZoom();
 
-
 });
 
+
 function registerDroppable() {
-    $('.droppable').each(function() {
-        $(this).droppable({
-            accept: ".widget",
-            hoverClass: "highlight",
-            tolerance: "intersect",
-            drop: function(event, ui) {
+    enableDrop = {
+        accept: ".widget",
+        hoverClass: "highlight",
+        tolerance: "intersect",
+        drop: function(event, ui) {
+            if ($(this).attr('id') != "trash") {
                 $(this).addClass("dropped");
                 $(this).removeClass("droppable");
                 $(ui.draggable).appendTo(this);
-                $('#basic_components').html(components);
-                registerDraggable();
+                $(this).droppable('disable');
+                triggerEdit($(this).attr('id'));
+            } else {
+                var trashCopy = $(this).children().first();
+                $(ui.draggable).appendTo(this);
+                $(this).empty();
+                trashCopy.appendTo($(this));
             }
-        });
+
+
+            $('#basic_components').html(components);
+            registerDraggable();
+        }
+    };
+    $('.droppable').each(function() {
+        $(this).droppable(enableDrop);
     });
 }
 
@@ -70,10 +82,11 @@ function registerZoom() {
 }
 
 function resetDraggability() {
-    $('.ui-droppable').each(function() {
-        if ($(this).children().length < 2) {
+    $('td').each(function() {
+        if ($(this).children().length < 3) { // if .dropped
             $(this).removeClass('dropped');
             $(this).addClass('droppable');
+            $(this).droppable('enable');
         }
     })
 }

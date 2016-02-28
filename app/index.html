@@ -79,11 +79,13 @@
         <div class="header">Basic components</div>
         <div class="content">
             <ul id="basic_components">
-                <li id="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Label</li>
-                <li id="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
-                <li id="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Image</li>
+                <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Label</li>
+                <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
+                <li name="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Image</li>
+                <li name="tab_viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Tab Viewer</li>
+                <li name="menu" class="draggable widget"><img src="images/menu_icon.png" width="15px" height="15px"> Menu</li>
 
-                <li>Table</li> <li>Video</li> <li>Horizontal line</li> <li>Button link</li> <li>Image link</li> <li>Code block</li>
+                <li>Video</li> <li>Button link</li> <li>Image link</li> <li>Code block</li>
 
             </ul>
         </div>
@@ -94,8 +96,8 @@
         <div class="content">
             <ul>
 
-                <li>USER</li>
                 <li>ACCOUNT</li>
+                <li>USER</li>
                 <li>FRIEND</li>
 
             </ul>
@@ -104,31 +106,171 @@
 </div>
 
 
-<div id="grid-container">
-
-    <!--<table class="table_outter">-->
-        <!--<tr>-->
-            <!--<td></td>-->
-            <!--<td></td>-->
-            <!--<td></td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td></td>-->
-            <!--<td></td>-->
-            <!--<td></td>-->
-        <!--</tr>-->
-        <!--<tr>-->
-            <!--<td></td>-->
-            <!--<td></td>-->
-            <!--<td></td>-->
-        <!--</tr>-->
-    <!--</table>-->
-
-</div>
+<div id="grid-container"></div>
 
 <!--TRASH CAN-->
-<div id="trash">
+<div id="trash" class="droppable">
+    <span class="glyphicon glyphicon-trash"></span>
 </div>
+
+<!--EDIT PROPERTIES POPUPS-->
+<div class="not_displayed">
+    <div id="link_popup_holder">
+        <div class="tooltip">
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>Link</strong>
+                    <button type="button" class="close close_btn""><small>x</small></button>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Text: </div>
+                        <div class="col-sm-7"><input type="text" class="form-control" required autofocus/></div>
+                        <div class="col-sm-4"></div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Link: </div>
+                        <div class="col-sm-7"><input type="text" class="form-control" required /></div>
+                        <div class="col-sm-2 apply"><button class="btn btn-primary">Apply</button></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="label_popup_holder">
+        <div id="label_popup" class="tooltip">
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>Label text</strong>
+                    <button type="button" class="close close_btn"><small>x</small></button>
+                </div>
+                <div class="panel-body">
+
+                    <div class="row">
+                        <div class="col-sm-12"><textarea class="form-control" rows="4"></textarea> </div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col-sm-5 form-lbl"></div>
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-2 apply"><button class="btn btn-primary">Apply</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="image_popup_holder">
+        <div id="img_popup" class="tooltip">
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>Upload image</strong>
+                    <button type="button" class="close close_btn"><small>x</small></button>
+                </div>
+                <div class="panel-body">
+                    <div class="input-group image-preview">
+                        <input placeholder="" type="text" class="form-control image-preview-filename" disabled="disabled" id="image-name">
+						<span class="input-group-btn">
+						    <!-- image-preview-clear button -->
+						    <button type="button" class="btn btn-default image-preview-clear" style="display:none;"> <span class="glyphicon glyphicon-remove"></span> Clear </button>
+                            <!-- image-preview-input -->
+						    <div class="btn btn-default image-preview-input"> <span class="glyphicon glyphicon-folder-open"></span> <span class="image-preview-input-title">Browse</span>
+                                <input type="file" accept="image/png, image/jpeg, image/gif" name="input-file-preview" id="fileselect"/>
+                                <!-- rename it -->
+                            </div>
+						    <button type="button" class="btn btn-labeled btn-default"> <span class="btn-label"><i class="glyphicon glyphicon-upload"></i> </span>Upload</button>
+						</span>
+                    </div>
+                    <!-- /input-group image-preview [TO HERE]-->
+                    <br />
+                    <!-- Drop Zone -->
+                    <div class="upload-drop-zone" id="drop-zone"> Or drag and drop files here </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab_viewer_popup_holder">
+        <div id="tab_popup" class="tooltip">
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>Tab Viewer</strong>
+                    <button type="button" class="close close_btn"><small>x</small></button>
+                </div>
+                <div class="panel-body tabs">
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl-header"> </div>
+                        <div class="col-sm-4 form-lbl-header">Title </div>
+                        <div class="col-sm-5 form-lbl-header">Target </div>
+
+                    </div><br/>
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Tab 1 </div>
+                        <div class="col-sm-4"><input type="text" class="form-control" required autofocus/></div>
+                        <div class="col-sm-5"><input type="text" class="form-control" required/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Tab 2 </div>
+                        <div class="col-sm-4"><input type="text" class="form-control" /></div>
+                        <div class="col-sm-5"><input type="text" class="form-control" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Tab 3 </div>
+                        <div class="col-sm-4"><input type="text" class="form-control" /></div>
+                        <div class="col-sm-5"><input type="text" class="form-control" /></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-5 form-lbl"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-2 apply"><button class="btn btn-primary">Apply</button></div>
+                </div>
+                <br/>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="menu_popup_holder">
+        <div id="menu_popup" class="tooltip">
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>Menu</strong>
+                    <button type="button" class="close close_btn"><small>x</small></button>
+                </div>
+                <div class="panel-body tabs">
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl-header"> </div>
+                        <div class="col-sm-4 form-lbl-header">Title </div>
+                        <div class="col-sm-5 form-lbl-header">Target </div>
+
+                    </div><br/>
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Item 1 </div>
+                        <div class="col-sm-4"><input type="text" class="form-control" required autofocus/></div>
+                        <div class="col-sm-5"><input type="text" class="form-control" required/></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Item 2 </div>
+                        <div class="col-sm-4"><input type="text" class="form-control" /></div>
+                        <div class="col-sm-5"><input type="text" class="form-control" /></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Item 3 </div>
+                        <div class="col-sm-4"><input type="text" class="form-control" /></div>
+                        <div class="col-sm-5"><input type="text" class="form-control" /></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-5 form-lbl"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-2 apply"><button class="btn btn-primary">Apply</button></div>
+                </div>
+                <br/>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
 
 <!--MODALS-->
 <div class="modal fade" id="new_component">
@@ -196,6 +338,7 @@
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
 
 
 <!--<script>window.$ = window.jQuery = require('./js/jquery.min.js');</script>-->

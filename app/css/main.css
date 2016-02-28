@@ -39,7 +39,7 @@
 .components {
     float: left;
     border: #d5d5d5 1px solid;
-    height: 100vh;
+    height: 100%;
     width: 200px;
 
 }
@@ -78,8 +78,8 @@
 }
 
 .content img {
-    width: 15px;
-    height: 15px;
+    width: 20px;
+    height: 20px;
     margin: 0px 15px 0px 5px;
 }
 
@@ -112,7 +112,7 @@ td {
 #grid-container {
     height: 600px;
     width: 850px;
-    overflow: scroll !important;
+    margin-left: 200px;
 }
 
 .widget:hover {
@@ -127,6 +127,7 @@ td {
 }
 .dropped {
     background-color: #E0E0E0;
+    text-align: center;
 }
 
 .edit-btn {
@@ -136,12 +137,33 @@ td {
     right: 2px;
 }
 
-.dropped:hover button{
+.dropped:hover .edit-btn{
     display: inline-block;
 }
 
 .form-lbl {
     text-align: right;
+    height: 35px;
+    line-height: 35px;
+    vertical-align: middle;
+    padding-right: 0px;
+}
+
+.form-lbl-header {
+    text-align: center;
+    font-weight: bold;
+}
+
+.dropped li {
+    position: absolute;
+    bottom: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    border: 1px solid #d5d5d5;
+    line-height: 20px;
+
 }
 
 @media (max-width: 1050px) {
@@ -155,7 +177,122 @@ td {
 ===================================================*/
 #trash {
     position: fixed;
-    bottom: 10px;
-    right: 10px;
-    background-image:
+    bottom: 20px;
+    right: 20px;
+    font-size: 60px;
 }
+
+/*===================================================
+                  POPUPS
+===================================================*/
+.not_displayed {
+    display: none;
+}
+
+.close_btn {
+    position: absolute; !important
+    opacity: 1;
+    top: 5px;
+    right: 9px;
+}
+
+.tooltip {
+    display: none;
+    left: -60px;
+    width: 350px;
+
+}
+
+.dropped .tooltip {
+    background: #fff;
+    border: #d5d5d5 solid 1px;
+    border-radius: 4px;
+    bottom: 0%;
+    display: inline-block;
+    margin-bottom: 30px;
+    opacity: 0;
+    padding: 0px;
+    position: absolute;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: -1;
+}
+
+.dropped .tooltip.open {
+    opacity: 1;
+    z-index: 2;
+}
+
+/* Triangle */
+.dropped .tooltip:after {
+    border-left: solid transparent 10px;
+    border-right: solid transparent 10px;
+    border-top: solid #fff 10px;
+    bottom: -10px;
+    content: " ";
+    height: 0;
+    left: 50%;
+    margin-left: -13px;
+    position: absolute;
+    width: 0;
+}
+
+.apply {
+    padding-left: 0px;
+}
+
+.panel {
+    margin-bottom: 0px;
+    border-width: 0px;
+}
+
+.tabs .col-sm-4 {
+    padding-right: 0px;
+}
+.tabs .col-sm-5 {
+    padding-right: 0px;
+}
+
+/* Image popup */
+/* layout.css Style */
+.upload-drop-zone {
+    height: 100px;
+    border-width: 2px;
+    margin-bottom: 0px;
+}
+
+/* skin.css Style*/
+.upload-drop-zone {
+    color: #ccc;
+    border-style: dashed;
+    border-color: #ccc;
+    line-height: 100px;
+    text-align: center
+}
+.upload-drop-zone.drop {
+    color: #222;
+    border-color: #222;
+}
+
+.image-preview-input {
+    position: relative;
+    overflow: hidden;
+    margin: 0px;
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+.image-preview-input input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+.image-preview-input-title {
+    margin-left:2px;
+}
+

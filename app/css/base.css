@@ -12,12 +12,18 @@ html {
 
 body {
     margin: 0px;
-    overflow: hidden; /* disable scrolling */
+    /*overflow: hidden; !* disable scrolling *!*/
     min-width:600px;
+
 }
 
 ul {
     list-style-type: none;
+}
+
+li {
+    list-style-type: none;
+
 }
 
 /*
