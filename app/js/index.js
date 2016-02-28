@@ -31,6 +31,7 @@ function registerDroppable() {
 }
 
 function registerDraggable() {
+
     $('.widget').each(function() {
         $(this).draggable({
             opacity: 1,
@@ -49,6 +50,7 @@ function registerDraggable() {
             scroll: true
         });
     });
+    resetDraggability();
 }
 
 function registerZoom() {
@@ -65,4 +67,13 @@ function registerZoom() {
             currentZoom = 1.0;
             $('#grid-container').animate({ 'zoom': 1 }, 'slow');
         });
+}
+
+function resetDraggability() {
+    $('.ui-droppable').each(function() {
+        if ($(this).children().length < 2) {
+            $(this).removeClass('dropped');
+            $(this).addClass('droppable');
+        }
+    })
 }

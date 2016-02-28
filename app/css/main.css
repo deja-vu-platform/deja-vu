@@ -98,7 +98,7 @@
 td {
     background-color: #F0F1F2;
     width: 170px;
-    min-width: 170px !important;
+    min-width: 100px;
     height: 170px;
     border: 15px solid white;
     resize: both;
@@ -110,7 +110,7 @@ td {
 }
 
 #grid-container {
-    height: 550px;
+    height: 600px;
     width: 850px;
     overflow: scroll !important;
 }
@@ -146,4 +146,16 @@ td {
 
 @media (max-width: 1050px) {
     #grid-container { width: 650px; }
+}
+
+
+
+/*===================================================
+                  TRASH CAN
+===================================================*/
+#trash {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    background-image:
 }

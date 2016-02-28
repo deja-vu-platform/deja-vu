@@ -1,12 +1,16 @@
 /**
  * Created by ericmanzi on 2/21/16.
  */
-
-var num_rows = 4;
-var num_cols = 4;
+num_rows = 3;
+num_cols = 3;
 
 $(function() {
-    createTable();
+
+    var grid = document.getElementById('grid-container');
+    var grid_width = grid.offsetWidth;
+    var grid_height = grid.offsetHeight;
+
+    createTable(grid_width, grid_height, num_rows, num_cols);
 
     $('#select-rows').on('change', function(e) {
         num_rows = $(this).val();
@@ -17,12 +21,19 @@ $(function() {
     });
 
     $('#create_component').on('click', function() {
-        createTable();
+        createTable(grid_width, grid_height, num_rows, num_cols);
     });
 
 });
 
-function createTable() {
+/**
+ * Generate the grid
+ * @param grid_width
+ * @param grid_height
+ * @param num_rows
+ * @param num_cols
+ */
+function createTable(grid_width, grid_height, num_rows, num_cols) {
     $('#grid-container').html('');
 
     var grid = document.createElement('table');
@@ -41,6 +52,8 @@ function createTable() {
                     td.className = 'droppable';
                     td.id = 'cell'+row+col;
 
+                    resizeCell(td, grid_width, grid_height, num_rows, num_cols);
+
                     td.appendChild(button);
 
                     tr.appendChild(td);
@@ -52,5 +65,21 @@ function createTable() {
 
     document.getElementById('grid-container').appendChild(grid);
     registerDroppable();
+
+}
+/**
+ * Resize cell such that all cells fill width and height of grid
+ * @param cell
+ * @param grid_width
+ * @param grid_height
+ * @param num_rows
+ * @param num_cols
+ */
+function resizeCell(cell, grid_width, grid_height, num_rows, num_cols) {
+
+    var cell_width = Math.floor((grid_width/num_cols)) - 10;
+    var cell_height = Math.floor((grid_height/num_rows)) - 10;
+
+    cell.setAttribute('style', 'width: '+cell_width+'px; height: '+cell_height+'px;');
 
 }
