@@ -18,8 +18,15 @@ export class FeedService {
   constructor(private _http: Http, @Inject("feed.api") private _api: String) {}
 
   getFeed(sub: Name): Observable<FeedItem> {
-    return this._http.get(this._api + `/subs/${sub}/feed`)
-      .map(res => res.json())
+    return this._get(`{
+      sub(name: "${sub}") {
+        subscriptions {
+          name,
+          published
+        }
+      }
+    }`)
+      .map(data => data.sub.subscriptions)
       .flatMap((pubs: Publisher[], unused_ix) => Observable.fromArray(pubs))
       .flatMap(
           (pub: Publisher, unused_ix: number) => {
@@ -29,5 +36,13 @@ export class FeedService {
            unused_ci: number) => {
             return {content: content, publisher: pub};
           });
+  }
+
+  private _get(query) {
+    const query_str = query.replace(/ /g, "");
+    return this._http
+      .get(this._api + `/graphql?query=query+${query_str}`)
+      .map(res => res.json())
+      .map(json_res => json_res.data);
   }
 }

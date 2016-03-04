@@ -1,11 +1,13 @@
 /// <reference path="../typings/tsd.d.ts" />
-import * as express from "express";
-import * as mongodb from "mongodb";
+// import {Promise} from "es6-promise";
+let graphql = require("graphql");
+let express_graphql = require("express-graphql");
 
-import {Mean} from "mean";
+// the mongodb tsd typings are wrong and we can't use them with promises
+let mean_mod = require("mean");
 
 
-const mean = new Mean("feed", (db, debug) => {
+const mean = new mean_mod.Mean("feed", (db, debug) => {
   db.createCollection("subs", (err, subs) => {
     if (err) throw err;
     if (debug) {
@@ -41,26 +43,67 @@ const mean = new Mean("feed", (db, debug) => {
 });
 
 
-//
-// API
-//
-interface Request extends express.Request {
-  subs: mongodb.Collection;
-}
+const pub_type = new graphql.GraphQLObjectType({
+  name: "Publisher",
+  fields: {
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    published: {
+      "type": new graphql.GraphQLList(graphql.GraphQLString),
+      resolve: pub => pub.published
+    }
+  }
+});
 
-namespace Validation {
-  export function SubExists(req, res, next) {
-    const name = req.params.name;
-    if (!req.subs) req.subs = mean.db.collection("subs");
-    req.subs.findOne({name: name}, {_id: 1}, (err, sub) => {
-      if (err) return next(err);
-      if (!sub) {
-        res.status(400);
-        next(`subscriber ${name} not found`);
-      } else {
-        next();
+const sub_type = new graphql.GraphQLObjectType({
+  name: "Subscriber",
+  fields: {
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    subscriptions: {
+      "type": new graphql.GraphQLList(pub_type),
+      resolve: sub => mean.db.collection("pubs")
+        .find({name: {$in: sub.subscriptions}})
+        .toArray()
+    }
+  }
+});
+
+
+/*
+const fields = ast => ast.fields.selections.reduce((fields, s) => {
+  fields[s.name.value] = 1;
+  return fields;
+}, {});*/
+
+const schema = new graphql.GraphQLSchema({
+  query: new graphql.GraphQLObjectType({
+    name: "Query",
+    fields: {
+      sub: {
+        "type": sub_type,
+        args: {
+          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, {name}) => {
+          console.log(`getting ${name}`);
+          // const fields = {username: 1, friends: {username: 1}}; TODO: project
+          return mean.db.collection("subs").findOne({name: name});
+        }
       }
-    });
+    }
+  })
+});
+
+
+mean.app.use("/graphql", express_graphql({schema: schema, pretty: true}));
+
+/*
+namespace Validation {
+  export function sub_exists(name) {
+    return mean.db.collection("usbs")
+      .findOne({name: name}, {_id: 1})
+      .then(user => {
+        if (!user) throw new Error(`${name} doesn't exist`);
+      });
   }
 }
 
@@ -75,25 +118,4 @@ function cors(req, res, next) {
       "Origin, X-Requested-With, Content-Type, Accept");
   next();
 }
-
-mean.app.get(
-  "/subs/:name/feed",
-  cors,
-  Validation.SubExists,
-  mean.bus.crud("subscriptions"),
-  mean.bus.crud("published"),
-  (req: Request, res, next) => {
-    req.subs.findOne({name: req.params.name}, (err, sub) => {
-      if (err) return next(err);
-      if (!sub.subscriptions) {
-        res.json([]);
-        return;
-      }
-      mean.db.collection("pubs", {strict: true}, (err, pubs) => {
-        if (err) return next(err);
-        pubs.find({name: {$in: sub.subscriptions}}).toArray((err, pubs) => {
-          res.json(pubs);
-        });
-      });
-    });
-  });
+*/
