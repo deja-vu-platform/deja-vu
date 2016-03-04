@@ -1,14 +1,14 @@
 /// <reference path="../typings/tsd.d.ts" />
-import * as express from "express";
-import * as mongodb from "mongodb";
-import * as bodyParser from "body-parser";
-import bcrypt = require("bcryptjs");
+let graphql = require("graphql");
+let express_graphql = require("express-graphql");
+// typings don't have the call with no callback
+let bcrypt = require("bcryptjs");
 
-import {Mean} from "mean";
-import {User} from "./shared/data";
+// the mongodb tsd typings are wrong and we can't use them with promises
+let mean_mod = require("mean");
 
 
-const mean = new Mean("auth", (db, debug) => {
+const mean = new mean_mod.Mean("auth", (db, debug) => {
   db.createCollection("users", (err, users) => {
     if (err) throw err;
     if (debug) {
@@ -22,6 +22,7 @@ const mean = new Mean("auth", (db, debug) => {
 });
 
 // temp hack
+/*
 function cors(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -32,87 +33,97 @@ function cors(req, res, next) {
       "Origin, X-Requested-With, Content-Type, Accept");
   next();
 }
+*/
 
-//
-// API
-//
-interface Request extends express.Request {
-  user: User;
-  users: mongodb.Collection;
-}
-
-namespace Parsers {
-  export const json = bodyParser.json();
-
-  export function user(req, res, next) {
-    req.user = req.body;
-    next();
+let user_type = new graphql.GraphQLObjectType({
+  name: "User",
+  fields:  {
+    username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
   }
-}
+});
+
+
+let schema = new graphql.GraphQLSchema({
+  query: new graphql.GraphQLObjectType({
+    name: "Query",
+    fields: {
+      user: {
+        "type": user_type,
+        args: {
+          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, {username}) => {
+          console.log(`getting ${username}`);
+          // const fields = {username: 1, friends: {username: 1}}; TODO: project
+          return mean.db.collection("users").findOne({username: username});
+        }
+      }
+    }
+  }),
+
+  mutation: new graphql.GraphQLObjectType({
+    name: "Mutation",
+    fields: {
+      register: {
+        "type": user_type,
+        args: {
+          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (_, {username, password}) => {
+          return Validation.userIsNew(username).then(_ => {
+            // TODO: promisify
+            const hash = bcrypt.hashSync(password, 10);
+            return mean.db.collection("users")
+              .insertOne({username: username, password: hash})
+              .then(write_res => {
+                if (write_res.insertedCount !== 1) {
+                  throw new Error("Couldn't save new user");
+                }
+                return {username: username};
+              });
+          });
+        }
+      },
+      signIn: {
+        "type": user_type,
+        args: {
+          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (_, {username, password}) => {
+          return Validation.userExists(username).then(user => {
+            // TODO: promisify
+            if (!bcrypt.compareSync(password, user.password)) {
+              throw new Error("Incorrect password");
+            }
+            return {username: username};
+          });
+        }
+      }
+    }
+  })
+});
+
 
 namespace Validation {
-  export function userIsNew(req, res, next) {
-    if (!req.users) req.users = mean.db.collection("users");
-    req.users.findOne({username: req.user.username}, {_id: 1}, (err, user) => {
-      if (err) return next(err);
-      if (user) {
-        res.status(400);
-        return next(`user ${req.user.username} already exists`);
-      }
-      next();
-    });
+  export function userExists(username) {
+    return mean.db.collection("users")
+      .findOne({username: username})
+      .then(user => {
+        if (!user) throw new Error(`${username} doesn't exist`);
+        return user;
+      });
+  }
+
+  export function userIsNew(username) {
+    return mean.db.collection("users")
+      .findOne({username: username}, {_id: 1})
+      .then(user => {
+        if (user) throw new Error(`${username} exists`);
+        return user;
+      });
   }
 }
 
-mean.app.options("/signin", cors);
-mean.app.options("/register", cors);
-
-mean.app.post(
-  "/signin",
-  cors,
-  Parsers.json, Parsers.user,
-  mean.bus.crud("User"),
-  (req, res, next) => {
-    mean.db.collection("users").findOne(
-      {username: req.user.username},
-      (err, user) => {
-        if (err) return next(err);
-        if (!user) {
-          res.status(401);
-          return next("Incorrect username");
-        }
-        console.log(user.password);
-        console.log(req.user.password);
-        bcrypt.compare(req.user.password, user.password, (err, bcrypt_res) => {
-          if (err) return next(err);
-          if (!bcrypt_res) {
-            res.status(401);
-            return next("Incorrect password");
-          }
-          console.log("sign in successful");
-          res.json([]);
-          next();
-        });
-      });
-  });
-
-mean.app.post(
-  "/register",
-  cors,
-  Parsers.json, Parsers.user,
-  Validation.userIsNew,
-  mean.bus.crud("User"),
-  (req: Request, res, next) => {
-    console.log(JSON.stringify(req.user));
-    bcrypt.hash(req.user.password, 10, (err, hash) => {
-      req.user.password = hash;
-      console.log(req.user.password);
-      req.users.insertOne(req.user, (err, write_res) => {
-        if (err) return next(err);
-        if (write_res.insertedCount !== 1) return next(err);
-        console.log("all good");
-        res.json([]);
-        next();
-      });
-    });
-  });
+mean.app.use("/graphql", express_graphql({schema: schema, pretty: true}));
