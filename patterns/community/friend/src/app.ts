@@ -1,6 +1,8 @@
 /// <reference path="../typings/tsd.d.ts" />
-import * as express from "express";
-import * as mongodb from "mongodb";
+// import * as express from "express";
+// import * as mongodb from "mongodb";
+let graphql = require("graphql");
+let express_graphql = require("express-graphql");
 
 import {Mean} from "mean";
 
@@ -27,46 +29,92 @@ const mean = new Mean("friend", (db, debug) => {
 });
 
 
-//
-// API
-//
-interface Request extends express.Request {
-  users: mongodb.Collection;
-  fields;
-}
+let user_type = new graphql.GraphQLObjectType({
+  name: "User",
+  fields: () => ({
+    username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    friends: {
+      "type": new graphql.GraphQLList(user_type),
+      resolve: user => {
+        console.log(`getting friends of ${user.username}`);
+        return user.friends;
+      }
+    },
+    potentialFriends: {
+      "type": new graphql.GraphQLList(user_type),
+      resolve: ({username}) => {
+        console.log(`getting potential friends of ${username}`);
+        const query = {
+          $and: [
+            {friends: {$nin: [username]}},
+            {username: {$ne: username}}
+          ]};
+        return mean.db.collection("users").find(query).toArray();
+      }
+    }
+  })
+});
+
+/*
+const fields = ast => ast.fields.selections.reduce((fields, s) => {
+  fields[s.name.value] = 1;
+  return fields;
+}, {});*/
+
+let schema = new graphql.GraphQLSchema({
+  query: new graphql.GraphQLObjectType({
+    name: "Query",
+    fields: {
+      user: {
+        "type": user_type,
+        args: {
+          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, {username}) => {
+          console.log(`getting ${username}`);
+          // const fields = {username: 1, friends: {username: 1}}; TODO: project
+          return mean.db.collection("users").findOne({username: username});
+        }
+      }
+    }
+  }),
+
+  mutation: new graphql.GraphQLObjectType({
+    name: "Mutation",
+    fields: {
+      addFriend: {
+        "type": user_type,
+        args: {
+          u1: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          u2: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, {u1, u2}) => {
+          return Promise.all(Validation.userExists(u1)) // stuff...
+          console.log(`HEllooo ${u1} ${u2}`);
+          if (!Validation.userExists(u1)) throw `${u1} doesn't exist`;
+          if (!Validation.userExists(u2)) throw `${u1} doesn't exist`;
+          if (!Validation.userExists("adas")) throw `${u1} doesn't exist`;
+          if (u1 === u2) return;
+
+          console.log("all good");
+          return u1;
+        }
+      }
+    }
+  })
+});
+
+
+
+mean.app.use("/graphql", express_graphql({schema: schema, pretty: true}));
 
 namespace Validation {
-  function _exists(username, req, res, next) {
-    if (!req.users) req.users = mean.db.collection("users");
-    req.users.findOne({username: username}, {_id: 1}, (err, user) => {
-      if (err) return next(err);
-      if (!user) {
-        res.status(400);
-        next(`user ${username} not found`);
-      } else {
-        next();
-      }
-    });
-  }
-
-  export function userExists(req, res, next) {
-    _exists(req.params.userid, req, res, next);
-  }
-
-  export function friendExists(req, res, next) {
-    _exists(req.params.friendid, req, res, next);
-  }
-
-  export function friendNotSameAsUser(req, res, next) {
-    if (req.params.userid === req.params.friendid) {
-      res.status(400);
-      next.send("userid match friendid");
-    } else {
-      next();
-    }
+  export function userExists(username) {
+    return mean.db.collection("users").findOne({username: username}, {_id: 1});
   }
 }
 
+/*
 namespace Processor {
   export function fields(req, unused_res, next) {
     const fields = req.query.fields;
@@ -177,3 +225,4 @@ mean.app.delete(
     updateOne(req.users, friendid, {$pull: {friends: userid}}, next);
     res.json({});
   });
+*/

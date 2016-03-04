@@ -11,11 +11,13 @@
     "angular2": "2.0.0-beta.0",
     "es6-promise": "^3.0.2",
     "es6-shim": "^0.33.3",
+    "express-graphql": "^0.4.9",
+    "graphql": "^0.4.18",
+    "mean": "file:../../../core/modules/mean",
     "reflect-metadata": "0.1.2",
     "rxjs": "5.0.0-beta.0",
     "systemjs": "0.19.6",
-    "zone.js": "0.5.10",
-    "mean": "file:../../../core/modules/mean"
+    "zone.js": "0.5.10"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -23,5 +25,7 @@
   },
   "main": "./lib",
   "typings": "./lib",
-  "files": ["lib"]
+  "files": [
+    "lib"
+  ]
 }

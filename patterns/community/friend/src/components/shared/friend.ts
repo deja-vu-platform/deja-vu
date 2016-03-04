@@ -1,5 +1,5 @@
 import {Injectable, Inject} from "angular2/core";
-import {Http} from "angular2/http";
+import {Http, Headers} from "angular2/http";
 import {Observable} from "rxjs/observable";
 
 import {User, Username} from "../../shared/user";
@@ -11,25 +11,61 @@ export class FriendService {
     private _http: Http, @Inject("friend.api") private _api: String) {}
 
   getFriends(username: Username): Observable<User[]> {
-    return this._http.get(
-      this._api + `/users/${username}/friends` + "?fields=username,friends")
-      .map(res => res.json());
+    return this._get(`{
+      user(username: "${username}") {
+        username,
+        friends {
+          username
+        } 
+      }
+    }`).map(user => user.friends);
   }
 
   addFriend(u1: Username, u2: Username): any {
-    return this._http.put(this._api + `/users/${u1}/friends/${u2}`, "")
-      .map(res => res.json());
+    return this._post(`{
+      addFriend(u1: "${u1}", u2: "${u2}") {
+        username
+      }
+    }`);
   }
 
   unfriend(u1: Username, u2: Username): any {
-    return this._http.delete(this._api + `/users/${u1}/friends/${u2}`)
-      .map(res => res.json());
+    return this._post(`{
+      unfriend(u1: "${u1}", u2: "${u2}") {
+        username
+      }
+    }`);
   }
 
   getPotentialFriends(username: Username): Observable<User[]> {
-    return this._http.get(
-      this._api + `/users/${username}/potential_friends` +
-      "?fields=username,friends")
+    return this._get(`{
+      user(username: "${username}") {
+        username,
+        potentialFriends {
+          username
+        } 
+      }
+    }`).map(user => user.potentialFriends);
+  }
+
+  private _post(query) {
+    const headers = new Headers();
+    headers.append("Content-type", "application/json");
+    const query_str = query.replace(/ /g, "");
+
+    return this._http
+      .post(
+          this._api + "/graphql",
+          JSON.stringify({query: "mutation " + query_str}),
+          {headers: headers})
       .map(res => res.json());
+  }
+
+  private _get(query) {
+    const query_str = query.replace(/ /g, "");
+    return this._http
+      .get(this._api + `/graphql?query=query+${query_str}`)
+      .map(res => res.json())
+      .map(json_res => json_res.data.user);
   }
 }

@@ -32,7 +32,9 @@ app.listen(wsport, () => {
 
 const fw = (req, res, next) => {
   console.log(`${req.params.attr}`);
-  console.log(config.merge.mappings);
+  if (!config) return next();
+  if (!config.merge) return next();
+  if (!config.merge.mappings) return next();
   const mappings = config.merge.mappings[
     `${req.params.elem}/${req.params.rel}`];
   let count = 0;
