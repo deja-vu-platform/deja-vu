@@ -125,7 +125,6 @@ namespace Validation {
     return mean.db.collection("users")
       .findOne({username: username}, {_id: 1})
       .then(user => {
-        console.log(`for ${username} got ${user}`);
         if (!user) throw new Error(`${username} doesn't exist`);
       });
   }
