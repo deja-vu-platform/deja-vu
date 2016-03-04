@@ -1,5 +1,4 @@
-import {Component, Input} from "angular2/core";
-import {OnInit} from "angular2/core";
+import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {User, Username} from "../../shared/user";
@@ -9,11 +8,12 @@ import {FriendService} from "../shared/friend";
 @Component({
   selector: "friends",
   templateUrl: "./components/friends/friends.html",
-  providers: [FriendService, HTTP_PROVIDERS]
+  providers: [FriendService, HTTP_PROVIDERS],
+  inputs: ["username"]
 })
-export class FriendsComponent implements OnInit {
-  @Input() username: Username;
+export class FriendsComponent {
   friends: User[];
+  private _username: Username;
 
   constructor(private _friendService: FriendService) {}
 
@@ -23,9 +23,15 @@ export class FriendsComponent implements OnInit {
       res => undefined);
   }
 
-  ngOnInit() {
-    console.log("got as input " + this.username);
-    this._friendService.getFriends(this.username).subscribe(
+  get username() {
+    return this._username;
+  }
+
+  set username(username: Username) {
+    if (!username) return;
+    console.log("got as input " + username);
+    this._username = username;
+    this._friendService.getFriends(this._username).subscribe(
       friends => this.friends = friends);
   }
 }
