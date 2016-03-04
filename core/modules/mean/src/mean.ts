@@ -43,14 +43,30 @@ export class Mean {
 
     this.app = express();
     this.app.use(morgan("dev"));
+
     if (opts.servepublic) {
       this.app.use(express.static("./dist/public"));
     };
+
+    this.app.options("/graphql", this._cors);
+    this.app.use("/graphql", this._cors);
 
     this.app.listen(opts.wsport, () => {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
     });
 
     this.bus = new RestBus(name, opts.bushost, opts.busport);
+  }
+
+  private _cors(req, res, next) {
+    console.log("HEL:LLOO??");
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header(
+        "Access-Control-Allow-Methods",
+        "POST, GET, OPTIONS, PUT, DELETE");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept");
+    next();
   }
 }
