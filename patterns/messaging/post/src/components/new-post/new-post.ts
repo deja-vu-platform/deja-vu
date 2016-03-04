@@ -18,7 +18,7 @@ export class NewPostComponent {
   constructor(private _postService: PostService) {}
 
   onSubmit() {
-    this._postService.newPost(this.username, this.post).subscribe(
+    this._postService.newPost(this.username, this.post.content).subscribe(
       submitted => this.submitted = submitted);
   }
 }
