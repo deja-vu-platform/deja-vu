@@ -1,35 +1,13 @@
 /// <reference path="../typings/tsd.d.ts" />
 import {Promise} from "es6-promise";
-let graphql = require("graphql");
-let express_graphql = require("express-graphql");
+const graphql = require("graphql");
 
 // the mongodb tsd typings are wrong and we can't use them with promises
-let mean_mod = require("mean");
+const mean_mod = require("mean");
 
+let mean;
 
-const mean = new mean_mod.Mean("friend", (db, debug) => {
-  db.createCollection("users", (err, users) => {
-    if (err) throw err;
-    if (debug) {
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        users.insertMany([
-          {username: "benbitdiddle", friends: []},
-          {username: "alyssaphacker", friends: []},
-          {username: "eva", friends: []},
-          {username: "louis", friends: []},
-          {username: "cydfect", friends: []},
-          {username: "lem", friends: []}
-        ], (err, res) => { if (err) throw err; });
-      });
-    }
-  });
-});
-
-
-let user_type = new graphql.GraphQLObjectType({
+const user_type = new graphql.GraphQLObjectType({
   name: "User",
   fields: () => ({
     username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
@@ -59,7 +37,7 @@ const fields = ast => ast.fields.selections.reduce((fields, s) => {
   return fields;
 }, {});*/
 
-let schema = new graphql.GraphQLSchema({
+const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
     fields: {
@@ -130,4 +108,24 @@ namespace Validation {
   }
 }
 
-mean.app.use("/graphql", express_graphql({schema: schema, pretty: true}));
+
+mean = new mean_mod.Mean("friend", schema, (db, debug) => {
+  db.createCollection("users", (err, users) => {
+    if (err) throw err;
+    if (debug) {
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        users.insertMany([
+          {username: "benbitdiddle", friends: []},
+          {username: "alyssaphacker", friends: []},
+          {username: "eva", friends: []},
+          {username: "louis", friends: []},
+          {username: "cydfect", friends: []},
+          {username: "lem", friends: []}
+        ], (err, res) => { if (err) throw err; });
+      });
+    }
+  });
+});

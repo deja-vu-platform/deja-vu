@@ -1,41 +1,21 @@
 /// <reference path="../typings/tsd.d.ts" />
 //import {Promise} from "es6-promise";
-let graphql = require("graphql");
-let express_graphql = require("express-graphql");
-
+const graphql = require("graphql");
 // the mongodb tsd typings are wrong and we can't use them with promises
-let mean_mod = require("mean");
+const mean_mod = require("mean");
 
 
-const mean = new mean_mod.Mean("post", (db, debug) => {
-  db.createCollection("users", (err, users) => {
-    if (err) throw err;
-    if (debug) {
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        users.insertMany([
-          {username: "benbitdiddle", posts: []},
-          {username: "alyssaphacker", posts: []},
-          {username: "eva", posts: []},
-          {username: "louis", posts: []},
-          {username: "cydfect", posts: []},
-          {username: "lem", posts: []}
-        ], (err, res) => { if (err) throw err; });
-      });
-    }
-  });
-});
+let mean;
 
-let post_type = new graphql.GraphQLObjectType({
+
+const post_type = new graphql.GraphQLObjectType({
   name: "Post",
   fields: {
     content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
   }
 });
 
-let user_type = new graphql.GraphQLObjectType({
+const user_type = new graphql.GraphQLObjectType({
   name: "User",
   fields: {
     username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
@@ -46,7 +26,7 @@ let user_type = new graphql.GraphQLObjectType({
   }
 });
 
-let schema = new graphql.GraphQLSchema({
+const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
     fields: {
@@ -95,4 +75,24 @@ namespace Validation {
   }
 }
 
-mean.app.use("/graphql", express_graphql({schema: schema, pretty: true}));
+
+mean = new mean_mod.Mean("post", schema, (db, debug) => {
+  db.createCollection("users", (err, users) => {
+    if (err) throw err;
+    if (debug) {
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        users.insertMany([
+          {username: "benbitdiddle", posts: []},
+          {username: "alyssaphacker", posts: []},
+          {username: "eva", posts: []},
+          {username: "louis", posts: []},
+          {username: "cydfect", posts: []},
+          {username: "lem", posts: []}
+        ], (err, res) => { if (err) throw err; });
+      });
+    }
+  });
+});

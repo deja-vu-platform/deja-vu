@@ -1,46 +1,11 @@
 /// <reference path="../typings/tsd.d.ts" />
 // import {Promise} from "es6-promise";
-let graphql = require("graphql");
-let express_graphql = require("express-graphql");
-
+const graphql = require("graphql");
 // the mongodb tsd typings are wrong and we can't use them with promises
-let mean_mod = require("mean");
+const mean_mod = require("mean");
 
 
-const mean = new mean_mod.Mean("feed", (db, debug) => {
-  db.createCollection("subs", (err, subs) => {
-    if (err) throw err;
-    if (debug) {
-      subs.remove((err, remove_count) => {
-        if (err) { console.log(err); return; }
-        console.log(`Removed ${remove_count} elems`);
-
-        subs.insertMany([
-          {name: "Ben", subscriptions: [
-            "Software Engineering News", "Things Ben Bitdiddle Says"]},
-          {name: "Alyssa", subscriptions: []}
-        ], (err, res) => { if (err) throw err; });
-      });
-    }
-  });
-
-  db.createCollection("pubs", (err, pubs) => {
-    if (err) throw err;
-    pubs.remove((err, remove_count) => {
-      if (err) throw err;
-      if (debug) {
-       pubs.insertMany([
-         {name: "Software Engineering News", published: [
-           "Node v0.0.1 released!"]},
-         {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
-         {name: "U.S News", published: []},
-         {name: "World News", published: []},
-         {name: "New Books about Zombies", published: []}
-       ], (err, res) => { if (err) throw err; });
-      }
-    });
-  });
-});
+let mean;
 
 
 const pub_type = new graphql.GraphQLObjectType({
@@ -94,8 +59,6 @@ const schema = new graphql.GraphQLSchema({
 });
 
 
-mean.app.use("/graphql", express_graphql({schema: schema, pretty: true}));
-
 /*
 namespace Validation {
   export function sub_exists(name) {
@@ -107,3 +70,39 @@ namespace Validation {
   }
 }
 */
+
+mean = new mean_mod.Mean("feed", schema, (db, debug) => {
+  db.createCollection("subs", (err, subs) => {
+    if (err) throw err;
+    if (debug) {
+      subs.remove((err, remove_count) => {
+        if (err) { console.log(err); return; }
+        console.log(`Removed ${remove_count} elems`);
+
+        subs.insertMany([
+          {name: "Ben", subscriptions: [
+            "Software Engineering News", "Things Ben Bitdiddle Says"]},
+          {name: "Alyssa", subscriptions: []}
+        ], (err, res) => { if (err) throw err; });
+      });
+    }
+  });
+
+  db.createCollection("pubs", (err, pubs) => {
+    if (err) throw err;
+    pubs.remove((err, remove_count) => {
+      if (err) throw err;
+      if (debug) {
+       pubs.insertMany([
+         {name: "Software Engineering News", published: [
+           "Node v0.0.1 released!"]},
+         {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
+         {name: "U.S News", published: []},
+         {name: "World News", published: []},
+         {name: "New Books about Zombies", published: []}
+       ], (err, res) => { if (err) throw err; });
+      }
+    });
+  });
+});
+

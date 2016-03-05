@@ -3,6 +3,7 @@ import * as express from "express";
 import morgan = require("morgan");
 import * as mongodb from "mongodb";
 let command_line_args = require("command-line-args");
+let express_graphql = require("express-graphql");
 
 import {RestBus} from "rest-bus";
 
@@ -27,7 +28,7 @@ export class Mean {
   app: express.Express;
   bus: RestBus;
 
-  constructor(public name: string, init: (db, debug)=>void ) {
+  constructor(public name: string, schema, init: (db, debug) => void) {
     const opts = cli.parse();
 
     const server = new mongodb.Server(
@@ -47,9 +48,10 @@ export class Mean {
     if (opts.servepublic) {
       this.app.use(express.static("./dist/public"));
     };
-
+    const gql = express_graphql({schema: schema, pretty: true});
     this.app.options("/graphql", this._cors);
-    this.app.use("/graphql", this._cors);
+    this.app.get("/graphql", this._cors, gql);
+    this.app.post("/graphql", this._cors, gql);
 
     this.app.listen(opts.wsport, () => {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
@@ -59,11 +61,8 @@ export class Mean {
   }
 
   private _cors(req, res, next) {
-    console.log("HEL:LLOO??");
     res.header("Access-Control-Allow-Origin", "*");
-    res.header(
-        "Access-Control-Allow-Methods",
-        "POST, GET, OPTIONS, PUT, DELETE");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
     res.header(
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept");
