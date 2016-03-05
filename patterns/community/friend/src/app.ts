@@ -31,6 +31,14 @@ const user_type = new graphql.GraphQLObjectType({
   })
 });
 
+const user_input_type = new graphql.GraphQLInputObjectType({
+  name: "UserInput",
+  fields: () => ({
+    username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    friends: {"type": new graphql.GraphQLList(user_input_type)}
+  })
+});
+
 /*
 const fields = ast => ast.fields.selections.reduce((fields, s) => {
   fields[s.name.value] = 1;
@@ -73,6 +81,36 @@ const schema = new graphql.GraphQLSchema({
           u2: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mutate_friends("$pull")
+      },
+
+      _dv_new_user: {
+        "type": user_type,
+        args: {
+          atom: {"type": new graphql.GraphQLNonNull(user_input_type)},
+        },
+        resolve: (root, user) => {
+          console.log("got new user from bus " + JSON.stringify(user));
+        }
+      },
+      _dv_update_user: {
+        "type": user_type,
+        args: {
+          _dv_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          new_atom: {"type": new graphql.GraphQLNonNull(user_input_type)}
+        },
+        resolve: (root, {_dv_id, user}) => {
+          console.log("id " + _dv_id);
+          console.log("got up user from bus " + JSON.stringify(user));
+        }
+      },
+      _dv_rm_user: {
+        "type": user_type,
+        args: {
+          _dv_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, _dv_id) => {
+          console.log("got rm from bus " + JSON.stringify(_dv_id));
+        }
       }
     }
   })
@@ -92,9 +130,18 @@ function mutate_friends(op) {
     };
     const users = mean.db.collection("users");
     return Promise.all([
-      users.updateOne({username: u1}, update(u2)),
-      users.updateOne({username: u2}, update(u1))
+      users.updateOne({username: u1}, update(u2)).then(_ => report_update(u1)),
+      users.updateOne({username: u2}, update(u1)).then(_ => report_update(u2))
     ]);
+  });
+}
+
+function report_update(username) {
+  console.log("reporting update of " + username);
+  const users = mean.db.collection("users");
+  return users.findOne({username: username}).then(user => {
+    return mean.composer.update_atom(
+      {element: "friend", name: "user"}, user.username, user);
   });
 }
 

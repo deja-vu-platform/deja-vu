@@ -2,10 +2,9 @@
 import * as express from "express";
 import morgan = require("morgan");
 import * as mongodb from "mongodb";
+import * as http from "http";
 let command_line_args = require("command-line-args");
 let express_graphql = require("express-graphql");
-
-import {RestBus} from "rest-bus";
 
 
 const cli = command_line_args([
@@ -26,7 +25,7 @@ const cli = command_line_args([
 export class Mean {
   db: mongodb.Db;
   app: express.Express;
-  bus: RestBus;
+  composer: Composer;
 
   constructor(public name: string, schema, init: (db, debug) => void) {
     const opts = cli.parse();
@@ -57,7 +56,7 @@ export class Mean {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
     });
 
-    this.bus = new RestBus(name, opts.bushost, opts.busport);
+    this.composer = new Composer(opts.bushost, opts.busport);
   }
 
   private _cors(req, res, next) {
@@ -67,5 +66,58 @@ export class Mean {
         "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept");
     next();
+  }
+}
+
+export interface Type {
+  element: string;
+  name: string;
+}
+
+export class Composer {
+  constructor(private _hostname: string, private _port: number) {}
+
+  new_atom(t: Type, atom: any) {
+    console.log("sending new atom to composer");
+    this._post(`new`);
+  }
+
+  update_atom(t: Type, id: string, new_atom: any) {
+    console.log("sending up atom to composer");
+    this._post(`update`);
+  }
+
+  rm_atom(t: Type, id: string) {
+    console.log("sending rm atom to composer");
+    this._post(`rm`);
+  }
+
+  private _post(query) {
+    const query_str = query.replace(/ /g, "");
+    const post_data = JSON.stringify({query: "mutation " + query_str});
+
+    const options = {
+      hostname: this._hostname,
+      port: this._port,
+      method: "post",
+      path: "/graphql",
+      headers: {
+        "Content-type": "application/json",
+        "Content-length": post_data.length
+      }
+    };
+
+    const req = http.request(options);
+    req.on("response", res => {
+      let body = "";
+      res.on("data", d => { body += d; });
+      res.on("end", () => {
+        console.log(`got ${body} back from the bus`);
+      });
+    });
+    req.on("error", err => console.log(err));
+
+    req.write(post_data);
+    req.end();
   }
 }

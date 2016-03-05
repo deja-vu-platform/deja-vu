@@ -19,7 +19,7 @@ const element_type = new graphql.GraphQLObjectType({
 const type_type = new graphql.GraphQLObjectType({
   name: "Type",
   fields: () => ({
-    element: {"type": new graphql.GraphQLNonNull(element_type)},
+    element: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
   })
 });
@@ -46,37 +46,18 @@ const field_bond_type = new graphql.GraphQLObjectType({
   })
 });
 
-const compound_type = new graphql.GraphQLObjectType({
-  name: "Compound",
-  fields: () => ({
-    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    elements: {
-      "type": new graphql.GraphQLList(element_type),
-      resolve: compound => compound.elements
-    },
-    type_bonds: {
-      "type": new graphql.GraphQLList(type_bond_type),
-      resolve: compound => compound.type_bonds
-    },
-    field_bonds: {
-      "type": new graphql.GraphQLList(field_bond_type),
-      resolve: compound => compound.field_bonds
-    },
-  })
-});
-
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
     fields: {
-      compound: {
-        "type": compound_type,
+      element: {
+        "type": element_type,
         args: {
           name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, {name}) => {
-          return mean.db.collection("compounds").findOne({name: name});
+          return mean.db.collection("elements").findOne({name: name});
         }
       }
     }
@@ -84,20 +65,45 @@ const schema = new graphql.GraphQLSchema({
   mutation: new graphql.GraphQLObjectType({
     name: "Mutation",
     fields: {
-      newCompound: {
-        "type": compound_type,
+      // mutations used to build a compound
+      newElement: {
+        "type": element_type,
         args: {
           name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          elements: {"type": new graphql.GraphQLList(element_type)},
-          type_bonds: {"type": new graphql.GraphQLList(type_bond_type)},
-          field_bonds: {"type": new graphql.GraphQLList(field_bond_type)}
+          loc: {
+            "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+          }
         },
-        resolve: (root, compound) => {
-          return mean.db.collection("compounds").insertOne(compound);
+        resolve: (root, elem) => {
+          console.log("new element!");
+          return mean.db.collection("elements").insertOne(elem);
         }
       },
+      newTypeBond: {
+        "type": type_bond_type,
+        args: {
+          types: {"type": new graphql.GraphQLList(type_type)},
+        },
+        resolve: (root, type_bond) => {
+          console.log("new type bond!");
+          return mean.db.collection("tbonds").insertOne(type_bond);
+        }
+      },
+
+      newFieldBond: {
+        "type": field_bond_type,
+        args: {
+          fields: {"type": new graphql.GraphQLList(field_type)},
+        },
+        resolve: (root, field_bond) => {
+          console.log("new field bond!");
+          return mean.db.collection("fbonds").insertOne(field_bond);
+        }
+      },
+
+      // mutations used by elements to report mutations to their state
       newAtom: {
-        "type": compound_type,
+        "type": element_type,
         args: {
           "type": {"type": new graphql.GraphQLNonNull(type_type)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLObject)}
@@ -113,7 +119,7 @@ const schema = new graphql.GraphQLSchema({
 });
 
 mean = new mean_mod.Mean("composer", schema, (db, debug) => {
-  db.createCollection("compounds", (err, _) => {
-    if (err) throw err;
-  });
+  db.createCollection("elements", (err, _) => {if (err) throw err;});
+  db.createCollection("tbonds", (err, _) => {if (err) throw err;});
+  db.createCollection("fbonds", (err, _) => {if (err) throw err;});
 });
