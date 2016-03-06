@@ -33,6 +33,22 @@ const sub_type = new graphql.GraphQLObjectType({
 });
 
 
+const pub_input_type = new graphql.GraphQLInputObjectType({
+  name: "PublisherInput",
+  fields: {
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    published: {"type": new graphql.GraphQLList(graphql.GraphQLString)}
+  }
+});
+
+const sub_input_type = new graphql.GraphQLInputObjectType({
+  name: "SubscriberInput",
+  fields: {
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    subscriptions: {"type": new graphql.GraphQLList(pub_input_type)}
+  }
+});
+
 /*
 const fields = ast => ast.fields.selections.reduce((fields, s) => {
   fields[s.name.value] = 1;
@@ -55,6 +71,30 @@ const schema = new graphql.GraphQLSchema({
         }
       }
     }
+  }),
+
+  mutation: new graphql.GraphQLObjectType({
+    name: "Mutation",
+    fields: {
+      _dv_new_subscriber: {
+        "type": sub_type,
+        args: {
+          atom: {"type": new graphql.GraphQLNonNull(sub_input_type)}
+        },
+        resolve: (root, sub) => {
+          console.log("got new sub from bus " + JSON.stringify(sub));
+        }
+      },
+      _dv_new_publisher: {
+        "type": pub_type,
+        args: {
+          atom: {"type": new graphql.GraphQLNonNull(pub_input_type)}
+        },
+        resolve: (root, pub) => {
+          console.log("got new pub from bus " + JSON.stringify(pub));
+        }
+      }
+    }
   })
 });
 
@@ -71,38 +111,40 @@ namespace Validation {
 }
 */
 
-mean = new mean_mod.Mean("feed", schema, (db, debug) => {
-  db.createCollection("subs", (err, subs) => {
-    if (err) throw err;
-    if (debug) {
-      subs.remove((err, remove_count) => {
-        if (err) { console.log(err); return; }
-        console.log(`Removed ${remove_count} elems`);
-
-        subs.insertMany([
-          {name: "Ben", subscriptions: [
-            "Software Engineering News", "Things Ben Bitdiddle Says"]},
-          {name: "Alyssa", subscriptions: []}
-        ], (err, res) => { if (err) throw err; });
-      });
-    }
-  });
-
-  db.createCollection("pubs", (err, pubs) => {
-    if (err) throw err;
-    pubs.remove((err, remove_count) => {
+mean = new mean_mod.Mean("feed", {
+  graphql_schema: schema,
+  init_db: (db, debug) => {
+    db.createCollection("subs", (err, subs) => {
       if (err) throw err;
       if (debug) {
-       pubs.insertMany([
-         {name: "Software Engineering News", published: [
-           "Node v0.0.1 released!"]},
-         {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
-         {name: "U.S News", published: []},
-         {name: "World News", published: []},
-         {name: "New Books about Zombies", published: []}
-       ], (err, res) => { if (err) throw err; });
+        subs.remove((err, remove_count) => {
+          if (err) { console.log(err); return; }
+          console.log(`Removed ${remove_count} elems`);
+
+          subs.insertMany([
+            {name: "Ben", subscriptions: [
+              "Software Engineering News", "Things Ben Bitdiddle Says"]},
+            {name: "Alyssa", subscriptions: []}
+          ], (err, res) => { if (err) throw err; });
+        });
       }
     });
-  });
-});
 
+    db.createCollection("pubs", (err, pubs) => {
+      if (err) throw err;
+      pubs.remove((err, remove_count) => {
+        if (err) throw err;
+        if (debug) {
+         pubs.insertMany([
+           {name: "Software Engineering News", published: [
+             "Node v0.0.1 released!"]},
+           {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
+           {name: "U.S News", published: []},
+           {name: "World News", published: []},
+           {name: "New Books about Zombies", published: []}
+         ], (err, res) => { if (err) throw err; });
+        }
+      });
+    });
+  }
+});

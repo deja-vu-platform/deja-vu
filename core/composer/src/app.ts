@@ -1,9 +1,7 @@
 /// <reference path="../typings/tsd.d.ts" />
-// import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mean_mod = require("mean");
+import {Mean} from "mean";
 
 let mean;
 
@@ -46,6 +44,21 @@ const field_bond_type = new graphql.GraphQLObjectType({
   })
 });
 
+const type_input_type = new graphql.GraphQLInputObjectType({
+  name: "TypeInput",
+  fields: () => ({
+    element: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+  })
+});
+
+const field_input_type = new graphql.GraphQLInputObjectType({
+  name: "FieldInput",
+  fields: () => ({
+    "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+  })
+});
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
@@ -82,7 +95,7 @@ const schema = new graphql.GraphQLSchema({
       newTypeBond: {
         "type": type_bond_type,
         args: {
-          types: {"type": new graphql.GraphQLList(type_type)},
+          types: {"type": new graphql.GraphQLList(type_input_type)},
         },
         resolve: (root, type_bond) => {
           console.log("new type bond!");
@@ -93,7 +106,7 @@ const schema = new graphql.GraphQLSchema({
       newFieldBond: {
         "type": field_bond_type,
         args: {
-          fields: {"type": new graphql.GraphQLList(field_type)},
+          fields: {"type": new graphql.GraphQLList(field_input_type)},
         },
         resolve: (root, field_bond) => {
           console.log("new field bond!");
@@ -101,25 +114,29 @@ const schema = new graphql.GraphQLSchema({
         }
       },
 
+      // atom is an arbitraty json
       // mutations used by elements to report mutations to their state
       newAtom: {
         "type": element_type,
         args: {
-          "type": {"type": new graphql.GraphQLNonNull(type_type)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLObject)}
+          "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, {t, atom}) => {
           console.log("got");
           console.log(JSON.stringify(t));
-          console.log(JSON.stringify(atom));
+          console.log(atom);
         }
       }
     }
   })
 });
 
-mean = new mean_mod.Mean("composer", schema, (db, debug) => {
-  db.createCollection("elements", (err, _) => {if (err) throw err;});
-  db.createCollection("tbonds", (err, _) => {if (err) throw err;});
-  db.createCollection("fbonds", (err, _) => {if (err) throw err;});
+mean = new Mean("composer", {
+  graphql_schema: schema,
+  init_db: (db, debug) => {
+    db.createCollection("elements", (err, _) => {if (err) throw err;});
+    db.createCollection("tbonds", (err, _) => {if (err) throw err;});
+    db.createCollection("fbonds", (err, _) => {if (err) throw err;});
+  }
 });

@@ -1,20 +1,75 @@
 /// <reference path="../typings/tsd.d.ts" />
-import * as express from "express";
-import morgan = require("morgan");
+//import {Promise} from "es6-promise";
+// const graphql = require("graphql");
+// the mongodb tsd typings are wrong and we can't use them with promises
+const mean_mod = require("mean");
 
 
-const env = process.env.NODE_ENV || "dev";
-const wsport = process.env.WS_PORT || 3000;
+const elements = [
+  {name: "Friend", loc: "@@dv-community-friend"},
+  {name: "Auth", loc: "@@dv-access-auth"},
+  {name: "Post", loc: "@@dv-messaging-post"},
+  {name: "Feed", loc: "@@dv-messaging-feed"}
+];
 
-const app = express();
+const mean = new mean_mod.Mean("social-network", {});
 
-app.use(morgan("dev"));
-app.use(express.static(__dirname + "/public"));
-app.use("/*", (req, res) => {
+mean.app.use("/*", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
 });
 
+setTimeout(init_composer, 10 * 1000);  // hack..
 
-app.listen(wsport, () => {
-  console.log(`Listening on port ${wsport} in mode ${env}`);
-});
+function init_composer() {
+  console.log("Adding all elements");
+  for (let elem of elements) {
+    mean.composer.config(`{
+      newElement(name: "${elem.name}", loc: "${elem.loc}") {
+        name
+      }
+    }`);
+  }
+
+
+  console.log("Creating type bonds");
+  mean.composer.config(`{
+    newTypeBond(types: [
+      {element: "Friend", name: "User"},
+      {element: "Auth", name: "User"},
+      {element: "Post", name: "User"},
+      {element: "Feed", name: "Subscriber"},
+      {element: "Feed", name: "Publisher"}
+    ]) {
+      name
+    }
+  }`);
+
+  mean.composer.config(`{
+    newTypeBond(types: [
+      {element: "Post", name: "Post"},
+      {element: "Feed", name: "Content"}
+    ]) {
+      name
+    }
+  }`);
+
+  mean.composer.config(`{
+    newTypeBond(types: [
+      {element: "Feed", name: "Name"},
+      {element: "Friend", name: "Username"}
+    ]) {
+      name
+    }
+  }`);
+
+
+  console.log("Creating field bonds");
+  mean.composer.config(`{
+    newFieldBond(fields: [
+      {type: {element: "Friend", name: "User"}, name: "friends"},
+      {type: {element: "Feed", name: "Subscriber"}, name: "subscriptions"}
+    ]) {
+      name
+    }
+  }`);
+}

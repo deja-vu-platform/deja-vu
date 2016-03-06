@@ -22,13 +22,21 @@ const cli = command_line_args([
 ]);
 
 
+export interface MeanConfig {
+  graphql_schema?: any;
+  init_db?: (db, debug) => void;
+}
+
+
 export class Mean {
   db: mongodb.Db;
   app: express.Express;
   composer: Composer;
 
-  constructor(public name: string, schema, init: (db, debug) => void) {
+  constructor(public name: string, config: MeanConfig) {
     const opts = cli.parse();
+
+    console.log(`Starting MEAN ${name}`);
 
     const server = new mongodb.Server(
       opts.dbhost, opts.dbport, {socketOptions: {autoReconnect: true}});
@@ -38,19 +46,26 @@ export class Mean {
         console.log("Error opening mongodb");
         throw err;
       }
-      init(db, opts.debugdata);
+      if (config.init_db) {
+        console.log(`Initializing db for MEAN ${name}`);
+        config.init_db(db, opts.debugdata);
+      }
     });
 
     this.app = express();
     this.app.use(morgan("dev"));
 
     if (opts.servepublic) {
+      console.log(`Serving public folder for MEAN ${name}`);
       this.app.use(express.static("./dist/public"));
     };
-    const gql = express_graphql({schema: schema, pretty: true});
-    this.app.options("/graphql", this._cors);
-    this.app.get("/graphql", this._cors, gql);
-    this.app.post("/graphql", this._cors, gql);
+    if (config.graphql_schema) {
+     console.log(`Serving graphql schema for MEAN ${name}`);
+     const gql = express_graphql({schema: config.graphql_schema, pretty: true});
+     this.app.options("/graphql", this._cors);
+     this.app.get("/graphql", this._cors, gql);
+     this.app.post("/graphql", this._cors, gql);
+    }
 
     this.app.listen(opts.wsport, () => {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
@@ -92,6 +107,10 @@ export class Composer {
     this._post(`rm`);
   }
 
+  config(query) {
+    this._post(query);
+  }
+
   private _post(query) {
     const query_str = query.replace(/ /g, "");
     const post_data = JSON.stringify({query: "mutation " + query_str});
@@ -107,6 +126,7 @@ export class Composer {
       }
     };
 
+    console.log("using options " + JSON.stringify(options));
     const req = http.request(options);
     req.on("response", res => {
       let body = "";

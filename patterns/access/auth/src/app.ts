@@ -47,12 +47,16 @@ const schema = new graphql.GraphQLSchema({
           return Validation.userIsNew(username).then(_ => {
             // TODO: promisify
             const hash = bcrypt.hashSync(password, 10);
+            const user = {username: username, password: hash};
             return mean.db.collection("users")
-              .insertOne({username: username, password: hash})
+              .insertOne(user)
               .then(write_res => {
                 if (write_res.insertedCount !== 1) {
                   throw new Error("Couldn't save new user");
                 }
+
+                // report
+                mean.composer.new_atom({element: "auth", name: "User"}, user);
                 return {username: username};
               });
           });
@@ -100,15 +104,18 @@ namespace Validation {
 }
 
 
-mean = new mean_mod.Mean("auth", schema, (db, debug) => {
-  db.createCollection("users", (err, users) => {
-    if (err) throw err;
-    if (debug) {
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-      });
-    }
-  });
+mean = new mean_mod.Mean("auth", {
+  graphql_schema: schema,
+  init_db: (db, debug) => {
+    db.createCollection("users", (err, users) => {
+      if (err) throw err;
+      if (debug) {
+        console.log("Resetting users collection");
+        users.remove((err, remove_count) => {
+          if (err) throw err;
+          console.log(`Removed ${remove_count} elems`);
+        });
+      }
+    });
+  }
 });

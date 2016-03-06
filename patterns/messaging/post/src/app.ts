@@ -26,6 +26,23 @@ const user_type = new graphql.GraphQLObjectType({
   }
 });
 
+
+const post_input_type = new graphql.GraphQLInputObjectType({
+  name: "PostInput",
+  fields: {
+    content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+  }
+});
+
+const user_input_type = new graphql.GraphQLInputObjectType({
+  name: "UserInput",
+  fields: {
+    username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    posts: {"type": new graphql.GraphQLList(post_input_type)}
+  }
+});
+
+
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
@@ -57,7 +74,22 @@ const schema = new graphql.GraphQLSchema({
               return mean.db.collection("users")
                 .updateOne(
                   {username: author}, {$push: {posts: {content: content}}});
+            })
+            .then(_ => {
+              // report
+              mean.composer.new_atom(
+                {element: "Post", name: "Post"}, {content: content});
             });
+        }
+      },
+
+      _dv_new_user: {
+        "type": user_type,
+        args: {
+          atom: {"type": new graphql.GraphQLNonNull(user_input_type)}
+        },
+        resolve: (root, post) => {
+          console.log("got new user from bus " + JSON.stringify(post));
         }
       }
     }
@@ -76,23 +108,26 @@ namespace Validation {
 }
 
 
-mean = new mean_mod.Mean("post", schema, (db, debug) => {
-  db.createCollection("users", (err, users) => {
-    if (err) throw err;
-    if (debug) {
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        users.insertMany([
-          {username: "benbitdiddle", posts: []},
-          {username: "alyssaphacker", posts: []},
-          {username: "eva", posts: []},
-          {username: "louis", posts: []},
-          {username: "cydfect", posts: []},
-          {username: "lem", posts: []}
-        ], (err, res) => { if (err) throw err; });
-      });
-    }
-  });
+mean = new mean_mod.Mean("post", {
+  graphql_schema: schema,
+  init_db: (db, debug) => {
+    db.createCollection("users", (err, users) => {
+      if (err) throw err;
+      if (debug) {
+        console.log("Resetting users collection");
+        users.remove((err, remove_count) => {
+          if (err) throw err;
+          console.log(`Removed ${remove_count} elems`);
+          users.insertMany([
+            {username: "benbitdiddle", posts: []},
+            {username: "alyssaphacker", posts: []},
+            {username: "eva", posts: []},
+            {username: "louis", posts: []},
+            {username: "cydfect", posts: []},
+            {username: "lem", posts: []}
+          ], (err, res) => { if (err) throw err; });
+        });
+      }
+    });
+  }
 });

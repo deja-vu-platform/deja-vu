@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-
 import os
 import shutil
 from sh import grunt, npm
+
 
 def main():
   print("Setting up local dev environment")
@@ -19,10 +19,11 @@ def main():
     f.writelines(data[1:])
   os.chdir(cwd)
 
-  build_pattern("community/friend", mean_dir)
-  build_pattern("access/auth", mean_dir)
-  build_pattern("messaging/feed", mean_dir)
-  build_pattern("messaging/post", mean_dir)
+  build("core/composer", mean_dir)
+  build("patterns/community/friend", mean_dir)
+  build("patterns/access/auth", mean_dir)
+  build("patterns/messaging/feed", mean_dir)
+  build("patterns/messaging/post", mean_dir)
   build_sample("social-network", [
     "community/friend",
     "access/auth",
@@ -31,12 +32,12 @@ def main():
     ])
 
 
-def build_pattern(pattern, mean_dir):
-  print("Building pattern {0}".format(pattern))
+def build(path, mean_dir):
+  print("Building {0}".format(path))
 
   cwd = os.getcwd()
 
-  os.chdir("patterns/{0}".format(pattern))
+  os.chdir(path)
   shutil.rmtree("node_modules/mean")
   print(npm.install())
   shutil.rmtree("node_modules/mean/lib")

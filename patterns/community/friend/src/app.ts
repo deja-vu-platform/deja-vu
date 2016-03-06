@@ -156,23 +156,26 @@ namespace Validation {
 }
 
 
-mean = new mean_mod.Mean("friend", schema, (db, debug) => {
-  db.createCollection("users", (err, users) => {
-    if (err) throw err;
-    if (debug) {
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        users.insertMany([
-          {username: "benbitdiddle", friends: []},
-          {username: "alyssaphacker", friends: []},
-          {username: "eva", friends: []},
-          {username: "louis", friends: []},
-          {username: "cydfect", friends: []},
-          {username: "lem", friends: []}
-        ], (err, res) => { if (err) throw err; });
-      });
-    }
-  });
+mean = new mean_mod.Mean("friend", {
+  graphql_schema: schema,
+  init_db: (db, debug) => {
+    db.createCollection("users", (err, users) => {
+      if (err) throw err;
+      if (debug) {
+        console.log("Resetting users collection");
+        users.remove((err, remove_count) => {
+          if (err) throw err;
+          console.log(`Removed ${remove_count} elems`);
+          users.insertMany([
+            {username: "benbitdiddle", friends: []},
+            {username: "alyssaphacker", friends: []},
+            {username: "eva", friends: []},
+            {username: "louis", friends: []},
+            {username: "cydfect", friends: []},
+            {username: "lem", friends: []}
+          ], (err, res) => { if (err) throw err; });
+        });
+      }
+    });
+  }
 });

@@ -181,6 +181,12 @@ module.exports = function(grunt, optPatterns) {
             flatten: true,
             src: "dist/public/dev/boot.js",
             dest: "dist/public/dev"
+          },
+          { // get this info via flags
+            expand: true,
+            flatten: true,
+            src: "dist/public/app.js",
+            dest: "dist/public"
           }
         ]
       }
@@ -208,6 +214,17 @@ module.exports = function(grunt, optPatterns) {
       var express_config = {};
       var replace_patterns = [];
       var port = 3002;
+
+      if (optPatterns.length > 0) {
+        grunt.log.writeln("This element is a compound, will start a composer");
+        express_config["composer"] = {
+          options: {
+            script: "node_modules/dv-composer/lib/app.js",
+            background: true,
+            args: ["--wsport=3001", "--servepublic=false"]
+          }
+        };
+      }
       optPatterns.forEach(function(p) {
         express_config[p] = {
           options: {
