@@ -24,52 +24,50 @@ function init_composer() {
   console.log("Adding all elements");
   for (let elem of elements) {
     mean.composer.config(`{
-      newElement(name: "${elem.name}", loc: "${elem.loc}") {
-        name
-      }
+      newElement(name: "${elem.name}", loc: "${elem.loc}")
     }`);
   }
 
 
   console.log("Creating type bonds");
   mean.composer.config(`{
-    newTypeBond(types: [
-      {element: "Friend", name: "User"},
-      {element: "Auth", name: "User"},
-      {element: "Post", name: "User"},
-      {element: "Feed", name: "Subscriber"},
-      {element: "Feed", name: "Publisher"}
-    ]) {
-      name
-    }
+    newTypeBond(type_bond: {
+      types: [
+        {element: "Friend", name: "User"},
+        {element: "Auth", name: "User"},
+        {element: "Post", name: "User"},
+        {element: "Feed", name: "Subscriber"},
+        {element: "Feed", name: "Publisher"}
+      ]
+    })
   }`);
 
   mean.composer.config(`{
-    newTypeBond(types: [
-      {element: "Post", name: "Post"},
-      {element: "Feed", name: "Content"}
-    ]) {
-      name
-    }
+    newTypeBond(type_bond: {
+      types: [
+        {element: "Post", name: "Post"},
+        {element: "Feed", name: "Content"}
+      ]
+    }) 
   }`);
 
   mean.composer.config(`{
-    newTypeBond(types: [
-      {element: "Feed", name: "Name"},
-      {element: "Friend", name: "Username"}
-    ]) {
-      name
-    }
+    newTypeBond(type_bond: {
+      types: [
+        {element: "Feed", name: "Name"},
+        {element: "Friend", name: "Username"}
+      ]
+    })
   }`);
 
 
   console.log("Creating field bonds");
   mean.composer.config(`{
-    newFieldBond(fields: [
-      {type: {element: "Friend", name: "User"}, name: "friends"},
-      {type: {element: "Feed", name: "Subscriber"}, name: "subscriptions"}
-    ]) {
-      name
-    }
+    newFieldBond(field_bond: {
+      fields: [
+        {type: {element: "Friend", name: "User"}, name: "friends"},
+        {type: {element: "Feed", name: "Subscriber"}, name: "subscriptions"}
+      ]
+    })
   }`);
 }

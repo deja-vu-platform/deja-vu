@@ -14,6 +14,7 @@ const element_type = new graphql.GraphQLObjectType({
   })
 });
 
+/*
 const type_type = new graphql.GraphQLObjectType({
   name: "Type",
   fields: () => ({
@@ -43,6 +44,7 @@ const field_bond_type = new graphql.GraphQLObjectType({
     fields: {"type": new graphql.GraphQLList(field_type)}
   })
 });
+*/
 
 const type_input_type = new graphql.GraphQLInputObjectType({
   name: "TypeInput",
@@ -59,6 +61,21 @@ const field_input_type = new graphql.GraphQLInputObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
   })
 });
+
+const type_bond_input_type = new graphql.GraphQLInputObjectType({
+  name: "TypeBondInput",
+  fields: () => ({
+    types: {"type": new graphql.GraphQLList(type_input_type)}
+  })
+});
+
+const field_bond_input_type = new graphql.GraphQLInputObjectType({
+  name: "FieldBondInput",
+  fields: () => ({
+    fields: {"type": new graphql.GraphQLList(field_input_type)}
+  })
+});
+
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
@@ -80,7 +97,7 @@ const schema = new graphql.GraphQLSchema({
     fields: {
       // mutations used to build a compound
       newElement: {
-        "type": element_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           loc: {
@@ -89,35 +106,40 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, elem) => {
           console.log("new element!");
-          return mean.db.collection("elements").insertOne(elem);
+          return mean.db.collection("elements").insertOne(elem)
+            .then(res => res.insertedCount === 1);
         }
       },
       newTypeBond: {
-        "type": type_bond_type,
+        "type": graphql.GraphQLBoolean,
         args: {
-          types: {"type": new graphql.GraphQLList(type_input_type)},
+          type_bond: {"type": new graphql.GraphQLNonNull(type_bond_input_type)},
         },
         resolve: (root, type_bond) => {
           console.log("new type bond!");
-          return mean.db.collection("tbonds").insertOne(type_bond);
+          return mean.db.collection("tbonds").insertOne(type_bond)
+            .then(res => res.insertedCount === 1);
         }
       },
 
       newFieldBond: {
-        "type": field_bond_type,
+        "type": graphql.GraphQLBoolean,
         args: {
-          fields: {"type": new graphql.GraphQLList(field_input_type)},
+          field_bond: {
+            "type": new graphql.GraphQLNonNull(field_bond_input_type)
+          },
         },
         resolve: (root, field_bond) => {
           console.log("new field bond!");
-          return mean.db.collection("fbonds").insertOne(field_bond);
+          return mean.db.collection("fbonds").insertOne(field_bond)
+            .then(res => res.insertedCount === 1);
         }
       },
 
       // atom is an arbitraty json
       // mutations used by elements to report mutations to their state
       newAtom: {
-        "type": element_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -126,6 +148,7 @@ const schema = new graphql.GraphQLSchema({
           console.log("got");
           console.log(JSON.stringify(t));
           console.log(atom);
+          return true;
         }
       }
     }
