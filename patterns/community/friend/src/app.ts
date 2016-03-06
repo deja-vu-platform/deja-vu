@@ -67,7 +67,7 @@ const schema = new graphql.GraphQLSchema({
     name: "Mutation",
     fields: {
       addFriend: {
-        "type": user_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           u1: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           u2: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -75,7 +75,7 @@ const schema = new graphql.GraphQLSchema({
         resolve: mutate_friends("$addToSet")
       },
       unfriend: {
-        "type": user_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           u1: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           u2: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -84,16 +84,17 @@ const schema = new graphql.GraphQLSchema({
       },
 
       _dv_new_user: {
-        "type": user_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           atom: {"type": new graphql.GraphQLNonNull(user_input_type)},
         },
         resolve: (root, user) => {
           console.log("got new user from bus " + JSON.stringify(user));
+          return true;
         }
       },
       _dv_update_user: {
-        "type": user_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           _dv_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           new_atom: {"type": new graphql.GraphQLNonNull(user_input_type)}
@@ -104,7 +105,7 @@ const schema = new graphql.GraphQLSchema({
         }
       },
       _dv_rm_user: {
-        "type": user_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           _dv_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },

@@ -23,17 +23,13 @@ export class FriendService {
 
   addFriend(u1: Username, u2: Username): any {
     return this._post(`{
-      addFriend(u1: "${u1}", u2: "${u2}") {
-        username
-      }
+      addFriend(u1: "${u1}", u2: "${u2}")
     }`);
   }
 
   unfriend(u1: Username, u2: Username): any {
     return this._post(`{
-      unfriend(u1: "${u1}", u2: "${u2}") {
-        username
-      }
+      unfriend(u1: "${u1}", u2: "${u2}")
     }`);
   }
 
