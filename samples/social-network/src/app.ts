@@ -6,10 +6,10 @@ const mean_mod = require("mean");
 
 
 const elements = [
-  {name: "Friend", loc: "@@dv-community-friend"},
-  {name: "Auth", loc: "@@dv-access-auth"},
-  {name: "Post", loc: "@@dv-messaging-post"},
-  {name: "Feed", loc: "@@dv-messaging-feed"}
+  {name: "friend", loc: "@@dv-community-friend"},
+  {name: "auth", loc: "@@dv-access-auth"},
+  {name: "post", loc: "@@dv-messaging-post"},
+  {name: "feed", loc: "@@dv-messaging-feed"}
 ];
 
 const mean = new mean_mod.Mean("social-network", {});
@@ -33,11 +33,11 @@ function init_composer() {
   mean.composer.config(`{
     newTypeBond(type_bond: {
       types: [
-        {element: "Friend", name: "User"},
-        {element: "Auth", name: "User"},
-        {element: "Post", name: "User"},
-        {element: "Feed", name: "Subscriber"},
-        {element: "Feed", name: "Publisher"}
+        {element: "friend", name: "user"},
+        {element: "auth", name: "user"},
+        {element: "post", name: "user"},
+        {element: "feed", name: "subscriber"},
+        {element: "feed", name: "publisher"}
       ]
     })
   }`);
@@ -45,8 +45,8 @@ function init_composer() {
   mean.composer.config(`{
     newTypeBond(type_bond: {
       types: [
-        {element: "Post", name: "Post"},
-        {element: "Feed", name: "Content"}
+        {element: "post", name: "post"},
+        {element: "feed", name: "content"}
       ]
     }) 
   }`);
@@ -54,8 +54,8 @@ function init_composer() {
   mean.composer.config(`{
     newTypeBond(type_bond: {
       types: [
-        {element: "Feed", name: "Name"},
-        {element: "Friend", name: "Username"}
+        {element: "feed", name: "name"},
+        {element: "friend", name: "username"}
       ]
     })
   }`);
@@ -65,8 +65,8 @@ function init_composer() {
   mean.composer.config(`{
     newFieldBond(field_bond: {
       fields: [
-        {type: {element: "Friend", name: "User"}, name: "friends"},
-        {type: {element: "Feed", name: "Subscriber"}, name: "subscriptions"}
+        {type: {element: "friend", name: "user"}, name: "friends"},
+        {type: {element: "feed", name: "subscriber"}, name: "subscriptions"}
       ]
     })
   }`);

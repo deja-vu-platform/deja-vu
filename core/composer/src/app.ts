@@ -1,5 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 const graphql = require("graphql");
+import * as http from "http";
 
 import {Mean} from "mean";
 
@@ -105,7 +106,7 @@ const schema = new graphql.GraphQLSchema({
           }
         },
         resolve: (root, elem) => {
-          console.log("new element!");
+          console.log("new element! " + JSON.stringify(elem));
           return mean.db.collection("elements").insertOne(elem)
             .then(res => res.insertedCount === 1);
         }
@@ -115,8 +116,8 @@ const schema = new graphql.GraphQLSchema({
         args: {
           type_bond: {"type": new graphql.GraphQLNonNull(type_bond_input_type)},
         },
-        resolve: (root, type_bond) => {
-          console.log("new type bond!");
+        resolve: (root, {type_bond}) => {
+          console.log("new type bond! " + JSON.stringify(type_bond));
           return mean.db.collection("tbonds").insertOne(type_bond)
             .then(res => res.insertedCount === 1);
         }
@@ -129,8 +130,8 @@ const schema = new graphql.GraphQLSchema({
             "type": new graphql.GraphQLNonNull(field_bond_input_type)
           },
         },
-        resolve: (root, field_bond) => {
-          console.log("new field bond!");
+        resolve: (root, {field_bond}) => {
+          console.log("new field bond! " + JSON.stringify(field_bond));
           return mean.db.collection("fbonds").insertOne(field_bond)
             .then(res => res.insertedCount === 1);
         }
@@ -144,22 +145,135 @@ const schema = new graphql.GraphQLSchema({
           "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, {t, atom}) => {
-          console.log("got");
-          console.log(JSON.stringify(t));
-          console.log(atom);
-          return true;
+        resolve: (root, args) => {
+          const t = args.type;
+          const atom = args.atom;
+          console.log("new atom! " + JSON.stringify(t) + atom);
+          // hack
+          // should make this efficient..also compute the intersection of fields
+          // taking into account fbonds
+          mean.db.collection("tbonds").find().toArray()
+            .then(a => {
+              console.log("debug col");
+              for (let b of a) {
+                console.log(JSON.stringify(b));
+              }
+              console.log("end debug col");
+            });
+          return mean.db.collection("tbonds").find({types: {$in: [t]}})
+              .toArray()
+              .then(type_bonds => {
+                console.log("got " + type_bonds.length + " tbonds");
+                let promises = [];
+                for (let type_bond of type_bonds) {
+                  console.log("processing " + JSON.stringify(type_bond));
+                  /*
+                  mean.db.collection("fbonds").find({fields: {"type": bt}})
+                    .toArray()
+                    .then(bonded_fields => {
+                      for (let fbond of bonded_fields) {
+
+                      }
+                    });
+                    */
+                   for (let bonded_type of type_bond.types) {
+                     if (bonded_type.element === t.element) continue;
+                     promises.push(
+                       mean.db.collection("elements")
+                         .findOne({name: bonded_type.element})
+                         .then(element => {
+                           console.log(
+                             "Sending update to element " +
+                              JSON.stringify(element));
+                           const match = element.loc.match(
+                             /http:\/\/(.*):(.*)/);
+                           const hostname = match[1];
+                           const port = match[2];
+                           console.log("have <" + atom + ">");
+                           const atom_str = atom.replace(/"/g, "\\\"");
+                           console.log("now have <" + atom_str + ">");
+                           post(
+                             hostname, port, `{
+                               _dv_new_${bonded_type.name}(atom: "${atom_str}")
+                             }`);
+                         })
+                     );
+                   }
+                }
+
+                return Promise.all(promises);
+              });
         }
       }
     }
   })
 });
 
+
+function post(hostname, port, query) {
+  const query_str = query.replace(/ /g, "");
+  const post_data = JSON.stringify({query: "mutation " + query_str});
+
+  const options = {
+    hostname: hostname,
+    port: port,
+    method: "post",
+    path: "/graphql",
+    headers: {
+      "Content-type": "application/json",
+      "Content-length": post_data.length
+    }
+  };
+
+  console.log("using options " + JSON.stringify(options));
+  console.log("query is <" + query_str + ">");
+  const req = http.request(options);
+  req.on("response", res => {
+    let body = "";
+    res.on("data", d => { body += d; });
+    res.on("end", () => {
+      console.log(`got ${body} back from ${hostname}:${port}`);
+    });
+  });
+  req.on("error", err => console.log(err));
+
+  req.write(post_data);
+  req.end();
+}
+
+
 mean = new Mean("composer", {
   graphql_schema: schema,
   init_db: (db, debug) => {
-    db.createCollection("elements", (err, _) => {if (err) throw err;});
-    db.createCollection("tbonds", (err, _) => {if (err) throw err;});
-    db.createCollection("fbonds", (err, _) => {if (err) throw err;});
+    db.createCollection("elements", (err, elements) => {
+      if (err) throw err;
+      if (debug) {
+        console.log("Resetting elements collection");
+        elements.remove((err, remove_count) => {
+          if (err) throw err;
+          console.log(`Removed ${remove_count} elems`);
+        });
+      }
+    });
+    db.createCollection("tbonds", (err, tbonds) => {
+      if (err) throw err;
+      if (debug) {
+        console.log("Resetting tbonds collection");
+        tbonds.remove((err, remove_count) => {
+          if (err) throw err;
+          console.log(`Removed ${remove_count} elems`);
+        });
+      }
+    });
+    db.createCollection("fbonds", (err, fbonds) => {
+      if (err) throw err;
+      if (debug) {
+        console.log("Resetting fbonds collection");
+        fbonds.remove((err, remove_count) => {
+          if (err) throw err;
+          console.log(`Removed ${remove_count} elems`);
+        });
+      }
+    });
   }
 });

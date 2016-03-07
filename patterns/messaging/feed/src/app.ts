@@ -33,6 +33,7 @@ const sub_type = new graphql.GraphQLObjectType({
 });
 
 
+/*
 const pub_input_type = new graphql.GraphQLInputObjectType({
   name: "PublisherInput",
   fields: {
@@ -49,7 +50,6 @@ const sub_input_type = new graphql.GraphQLInputObjectType({
   }
 });
 
-/*
 const fields = ast => ast.fields.selections.reduce((fields, s) => {
   fields[s.name.value] = 1;
   return fields;
@@ -77,21 +77,23 @@ const schema = new graphql.GraphQLSchema({
     name: "Mutation",
     fields: {
       _dv_new_subscriber: {
-        "type": sub_type,
+        "type": graphql.GraphQLBoolean,
         args: {
-          atom: {"type": new graphql.GraphQLNonNull(sub_input_type)}
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, sub) => {
           console.log("got new sub from bus " + JSON.stringify(sub));
+          return true;
         }
       },
       _dv_new_publisher: {
-        "type": pub_type,
+        "type": graphql.GraphQLBoolean,
         args: {
-          atom: {"type": new graphql.GraphQLNonNull(pub_input_type)}
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, pub) => {
           console.log("got new pub from bus " + JSON.stringify(pub));
+          return true;
         }
       }
     }

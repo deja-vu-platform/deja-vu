@@ -94,7 +94,12 @@ export class Composer {
 
   new_atom(t: Type, atom: any) {
     console.log("sending new atom to composer");
-    this._post(`new`);
+    const atom_str = JSON.stringify(atom).replace(/"/g, "\\\"");
+    this._post(`{
+      newAtom(
+        type: {element: "${t.element}", name: "${t.name}"},
+        atom: "${atom_str}")
+    }`);
   }
 
   update_atom(t: Type, id: string, new_atom: any) {
@@ -127,6 +132,7 @@ export class Composer {
     };
 
     console.log("using options " + JSON.stringify(options));
+    console.log("query is <" + query_str + ">");
     const req = http.request(options);
     req.on("response", res => {
       let body = "";

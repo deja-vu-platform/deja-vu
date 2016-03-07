@@ -27,6 +27,7 @@ const user_type = new graphql.GraphQLObjectType({
 });
 
 
+/*
 const post_input_type = new graphql.GraphQLInputObjectType({
   name: "PostInput",
   fields: {
@@ -41,7 +42,7 @@ const user_input_type = new graphql.GraphQLInputObjectType({
     posts: {"type": new graphql.GraphQLList(post_input_type)}
   }
 });
-
+*/
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
@@ -84,12 +85,13 @@ const schema = new graphql.GraphQLSchema({
       },
 
       _dv_new_user: {
-        "type": user_type,
+        "type": graphql.GraphQLBoolean,
         args: {
-          atom: {"type": new graphql.GraphQLNonNull(user_input_type)}
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, post) => {
           console.log("got new user from bus " + JSON.stringify(post));
+          return true;
         }
       }
     }

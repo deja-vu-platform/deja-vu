@@ -86,7 +86,7 @@ const schema = new graphql.GraphQLSchema({
       _dv_new_user: {
         "type": graphql.GraphQLBoolean,
         args: {
-          atom: {"type": new graphql.GraphQLNonNull(user_input_type)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
         resolve: (root, user) => {
           console.log("got new user from bus " + JSON.stringify(user));
@@ -97,7 +97,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           _dv_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          new_atom: {"type": new graphql.GraphQLNonNull(user_input_type)}
+          new_atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, {_dv_id, user}) => {
           console.log("id " + _dv_id);

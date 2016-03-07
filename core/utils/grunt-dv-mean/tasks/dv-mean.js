@@ -185,8 +185,8 @@ module.exports = function(grunt, optPatterns) {
           { // get this info via flags
             expand: true,
             flatten: true,
-            src: "dist/public/app.js",
-            dest: "dist/public"
+            src: "dist/app.js",
+            dest: "dist"
           }
         ]
       }
