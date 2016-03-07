@@ -89,7 +89,8 @@ const schema = new graphql.GraphQLSchema({
         args: {
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, post) => {
+        resolve: (root, args) => {
+          const post = JSON.parse(args.atom);
           console.log("got new user from bus " + JSON.stringify(post));
           return true;
         }

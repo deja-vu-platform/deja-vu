@@ -88,7 +88,8 @@ const schema = new graphql.GraphQLSchema({
         args: {
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, user) => {
+        resolve: (root, args) => {
+          const user = JSON.parse(args.atom);
           console.log("got new user from bus " + JSON.stringify(user));
           return true;
         }
@@ -99,8 +100,9 @@ const schema = new graphql.GraphQLSchema({
           _dv_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           new_atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, {_dv_id, user}) => {
+        resolve: (root, {_dv_id, new_atom}) => {
           console.log("id " + _dv_id);
+          const user = JSON.parse(new_atom);
           console.log("got up user from bus " + JSON.stringify(user));
         }
       },

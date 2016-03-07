@@ -81,7 +81,8 @@ const schema = new graphql.GraphQLSchema({
         args: {
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, sub) => {
+        resolve: (root, args) => {
+          const sub = JSON.parse(args.atom);
           console.log("got new sub from bus " + JSON.stringify(sub));
           return true;
         }
@@ -91,7 +92,8 @@ const schema = new graphql.GraphQLSchema({
         args: {
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, pub) => {
+        resolve: (root, args) => {
+          const pub = JSON.parse(args.atom);
           console.log("got new pub from bus " + JSON.stringify(pub));
           return true;
         }
