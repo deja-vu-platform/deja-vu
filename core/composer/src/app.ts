@@ -161,18 +161,13 @@ const schema = new graphql.GraphQLSchema({
                       }
                     });
                     */
-                   for (let {name, element, loc} of type_bond.types) {
-                     if (name === t.name && element === t.element &&
-                         loc === t.loc) {
+                   for (let bonded_type of type_bond.types) {
+                     if (bonded_type.name === t.name &&
+                         bonded_type.element === t.element &&
+                         bonded_type.loc === t.loc) {
                        continue;
                      }
-                     console.log("Sending update to element " + element);
-                      console.log("have <" + atom + ">");
-                      const atom_str = atom.replace(/"/g, "\\\"");
-                      console.log("now have <" + atom_str + ">");
-                      post(loc, `{
-                          _dv_new_${name}(atom: "${atom_str}")
-                      }`);
+                     send_update(bonded_type, t, atom);
                    }
                 }
               });
@@ -181,6 +176,42 @@ const schema = new graphql.GraphQLSchema({
     }
   })
 });
+
+function send_update(dst, src, atom) {
+  console.log("Sending update to element " + dst.element);
+  console.log("have <" + atom + ">");
+  transform_atom(dst, atom, transformed_atom => {
+    const atom_str = transformed_atom.replace(/"/g, "\\\"");
+    console.log("now have <" + atom_str + ">");
+    post(dst.loc, `{
+        _dv_new_${dst.name}(atom: "${atom_str}")
+    }`);
+
+  });
+}
+
+function transform_atom({name, element, loc}, atom, callback) {
+  console.log(`Getting schema info for ${element}/${name}`);
+  const query = `{
+    __type(name: "${name}") {
+      fields {
+        name,
+        kind,
+        ofType {
+          name,
+          kind
+        }
+      }
+    }
+  }`;
+  get(loc, query, res => {
+    console.log("got back " + JSON.stringify(res));
+    const parsed_atom = JSON.parse(atom);
+    // todo
+    let transformed_atom = JSON.stringify(parsed_atom);
+    callback(transformed_atom);
+  });
+}
 
 
 function post(loc, query) {
@@ -218,20 +249,39 @@ function post(loc, query) {
   req.end();
 }
 
+function get(loc, query, callback) {
+  const match = loc.match(/http:\/\/(.*):(.*)/);
+  const hostname = match[1];
+  const port = match[2];
+
+  const query_str = query.replace(/ /g, "");
+
+  const options = {
+    hostname: hostname,
+    port: port,
+    method: "post",
+    path: `/graphql?query=query+${query_str}`
+  };
+
+  console.log("using options " + JSON.stringify(options));
+  console.log("query is <" + query_str + ">");
+  const req = http.request(options);
+  req.on("response", res => {
+    let body = "";
+    res.on("data", d => { body += d; });
+    res.on("end", () => {
+      console.log(`got ${body} back from ${hostname}:${port}`);
+      callback(body);
+    });
+  });
+  req.on("error", err => console.log(err));
+  req.write({});
+  req.end();
+}
 
 mean = new Mean("composer", {
   graphql_schema: schema,
   init_db: (db, debug) => {
-    db.createCollection("elements", (err, elements) => {
-      if (err) throw err;
-      if (debug) {
-        console.log("Resetting elements collection");
-        elements.remove((err, remove_count) => {
-          if (err) throw err;
-          console.log(`Removed ${remove_count} elems`);
-        });
-      }
-    });
     db.createCollection("tbonds", (err, tbonds) => {
       if (err) throw err;
       if (debug) {
