@@ -5,13 +5,6 @@
 const mean_mod = require("mean");
 
 
-const elements = [
-  {name: "friend", loc: "@@dv-community-friend"},
-  {name: "auth", loc: "@@dv-access-auth"},
-  {name: "post", loc: "@@dv-messaging-post"},
-  {name: "feed", loc: "@@dv-messaging-feed"}
-];
-
 const mean = new mean_mod.Mean("social-network", {});
 
 mean.app.use("/*", (req, res) => {
@@ -21,53 +14,43 @@ mean.app.use("/*", (req, res) => {
 setTimeout(init_composer, 10 * 1000);  // hack..
 
 function init_composer() {
-  console.log("Adding all elements");
-  for (let elem of elements) {
-    mean.composer.config(`{
-      newElement(name: "${elem.name}", loc: "${elem.loc}")
-    }`);
-  }
-
-
   console.log("Creating type bonds");
   mean.composer.config(`{
-    newTypeBond(type_bond: {
-      types: [
-        {element: "friend", name: "user"},
-        {element: "auth", name: "user"},
-        {element: "post", name: "user"},
-        {element: "feed", name: "subscriber"},
-        {element: "feed", name: "publisher"}
-      ]
-    })
+    newTypeBond(types: [
+      {name: "user", element: "friend", loc: "@@dv-community-friend"},
+      {name: "user", element: "auth", loc: "@@dv-access-auth"},
+      {name: "user", element: "post", loc: "@@dv-messaging-post"},
+      {name: "subscriber", element: "feed", loc: "@@dv-messaging-feed"},
+      {name: "publisher", element: "feed", loc: "@@dv-messaging-feed"}
+    ])
   }`);
 
   mean.composer.config(`{
-    newTypeBond(type_bond: {
-      types: [
-        {element: "post", name: "post"},
-        {element: "feed", name: "content"}
-      ]
-    }) 
+    newTypeBond(types: [
+      {name: "post", element: "post", loc: "@@dv-messaging-post"},
+      {name: "content", element: "feed", loc: "@@dv-messaging-feed"}
+    ])
   }`);
 
   mean.composer.config(`{
-    newTypeBond(type_bond: {
-      types: [
-        {element: "feed", name: "name"},
-        {element: "friend", name: "username"}
-      ]
-    })
+    newTypeBond(types: [
+      {name: "name", element: "feed", loc: "@@dv-messaging-feed"},
+      {name: "username", element: "friend", loc: "@@dv-community-friend"}
+    ])
   }`);
 
 
   console.log("Creating field bonds");
   mean.composer.config(`{
-    newFieldBond(field_bond: {
-      fields: [
-        {type: {element: "friend", name: "user"}, name: "friends"},
-        {type: {element: "feed", name: "subscriber"}, name: "subscriptions"}
-      ]
-    })
+    newFieldBond(fields: [
+      {
+        name: "friends",
+        type: {name: "user", element: "friend", loc: "@@dv-community-friend"}
+      },
+      {
+        name: "subscriptions",
+        type: {name: "subscriber", element: "feed", loc: "@@dv-messaging-feed"}
+      }
+    ])
   }`);
 }

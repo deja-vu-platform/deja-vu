@@ -71,7 +71,8 @@ export class Mean {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
     });
 
-    this.composer = new Composer(opts.bushost, opts.busport);
+    this.composer = new Composer(
+        opts.bushost, opts.busport, opts.wshost, opts.wsport);
   }
 
   private _cors(req, res, next) {
@@ -90,14 +91,20 @@ export interface Type {
 }
 
 export class Composer {
-  constructor(private _hostname: string, private _port: number) {}
+  _loc: string;
+
+  constructor(
+      private _hostname: string, private _port: number,
+      wshost: string, wsport: number) {
+    this._loc = `http://${wshost}:${wsport}`;
+  }
 
   new_atom(t: Type, atom: any) {
     console.log("sending new atom to composer");
     const atom_str = JSON.stringify(atom).replace(/"/g, "\\\"");
     this._post(`{
       newAtom(
-        type: {element: "${t.element}", name: "${t.name}"},
+        type: {element: "${t.element}", name: "${t.name}", loc: "${this._loc}"},
         atom: "${atom_str}")
     }`);
   }

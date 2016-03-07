@@ -7,6 +7,7 @@ import {Mean} from "mean";
 let mean;
 
 
+/*
 const element_type = new graphql.GraphQLObjectType({
   name: "Element",
   fields: () => ({
@@ -15,7 +16,6 @@ const element_type = new graphql.GraphQLObjectType({
   })
 });
 
-/*
 const type_type = new graphql.GraphQLObjectType({
   name: "Type",
   fields: () => ({
@@ -50,19 +50,20 @@ const field_bond_type = new graphql.GraphQLObjectType({
 const type_input_type = new graphql.GraphQLInputObjectType({
   name: "TypeInput",
   fields: () => ({
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     element: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    loc: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
   })
 });
 
 const field_input_type = new graphql.GraphQLInputObjectType({
   name: "FieldInput",
   fields: () => ({
-    "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
-    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    "type": {"type": new graphql.GraphQLNonNull(type_input_type)}
   })
 });
-
+/*
 const type_bond_input_type = new graphql.GraphQLInputObjectType({
   name: "TypeBondInput",
   fields: () => ({
@@ -76,19 +77,20 @@ const field_bond_input_type = new graphql.GraphQLInputObjectType({
     fields: {"type": new graphql.GraphQLList(field_input_type)}
   })
 });
-
+*/
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
     fields: {
-      element: {
-        "type": element_type,
+      t: {
+        "type": graphql.GraphQLBoolean,
         args: {
           name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, {name}) => {
-          return mean.db.collection("elements").findOne({name: name});
+          // todo?
+          console.log(name);
         }
       }
     }
@@ -97,28 +99,14 @@ const schema = new graphql.GraphQLSchema({
     name: "Mutation",
     fields: {
       // mutations used to build a compound
-      newElement: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          loc: {
-            "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
-          }
-        },
-        resolve: (root, elem) => {
-          console.log("new element! " + JSON.stringify(elem));
-          return mean.db.collection("elements").insertOne(elem)
-            .then(res => res.insertedCount === 1);
-        }
-      },
       newTypeBond: {
         "type": graphql.GraphQLBoolean,
         args: {
-          type_bond: {"type": new graphql.GraphQLNonNull(type_bond_input_type)},
+          types: {"type": new graphql.GraphQLList(type_input_type)},
         },
-        resolve: (root, {type_bond}) => {
-          console.log("new type bond! " + JSON.stringify(type_bond));
-          return mean.db.collection("tbonds").insertOne(type_bond)
+        resolve: (root, {types}) => {
+          console.log("new type bond! " + JSON.stringify(types));
+          return mean.db.collection("tbonds").insertOne({types: types})
             .then(res => res.insertedCount === 1);
         }
       },
@@ -126,13 +114,11 @@ const schema = new graphql.GraphQLSchema({
       newFieldBond: {
         "type": graphql.GraphQLBoolean,
         args: {
-          field_bond: {
-            "type": new graphql.GraphQLNonNull(field_bond_input_type)
-          },
+          fields: {"type": new graphql.GraphQLList(field_input_type)}
         },
-        resolve: (root, {field_bond}) => {
-          console.log("new field bond! " + JSON.stringify(field_bond));
-          return mean.db.collection("fbonds").insertOne(field_bond)
+        resolve: (root, {fields}) => {
+          console.log("new field bond! " + JSON.stringify(fields));
+          return mean.db.collection("fbonds").insertOne({fields: fields})
             .then(res => res.insertedCount === 1);
         }
       },
@@ -164,7 +150,6 @@ const schema = new graphql.GraphQLSchema({
               .toArray()
               .then(type_bonds => {
                 console.log("got " + type_bonds.length + " tbonds");
-                let promises = [];
                 for (let type_bond of type_bonds) {
                   console.log("processing " + JSON.stringify(type_bond));
                   /*
@@ -176,32 +161,20 @@ const schema = new graphql.GraphQLSchema({
                       }
                     });
                     */
-                   for (let bonded_type of type_bond.types) {
-                     if (bonded_type.element === t.element) continue;
-                     promises.push(
-                       mean.db.collection("elements")
-                         .findOne({name: bonded_type.element})
-                         .then(element => {
-                           console.log(
-                             "Sending update to element " +
-                              JSON.stringify(element));
-                           const match = element.loc.match(
-                             /http:\/\/(.*):(.*)/);
-                           const hostname = match[1];
-                           const port = match[2];
-                           console.log("have <" + atom + ">");
-                           const atom_str = atom.replace(/"/g, "\\\"");
-                           console.log("now have <" + atom_str + ">");
-                           post(
-                             hostname, port, `{
-                               _dv_new_${bonded_type.name}(atom: "${atom_str}")
-                             }`);
-                         })
-                     );
+                   for (let {name, element, loc} of type_bond.types) {
+                     if (name === t.name && element === t.element &&
+                         loc === t.loc) {
+                       continue;
+                     }
+                     console.log("Sending update to element " + element);
+                      console.log("have <" + atom + ">");
+                      const atom_str = atom.replace(/"/g, "\\\"");
+                      console.log("now have <" + atom_str + ">");
+                      post(loc, `{
+                          _dv_new_${name}(atom: "${atom_str}")
+                      }`);
                    }
                 }
-
-                return Promise.all(promises);
               });
         }
       }
@@ -210,7 +183,11 @@ const schema = new graphql.GraphQLSchema({
 });
 
 
-function post(hostname, port, query) {
+function post(loc, query) {
+  const match = loc.match(/http:\/\/(.*):(.*)/);
+  const hostname = match[1];
+  const port = match[2];
+
   const query_str = query.replace(/ /g, "");
   const post_data = JSON.stringify({query: "mutation " + query_str});
 
