@@ -17,25 +17,25 @@ function init_composer() {
   console.log("Creating type bonds");
   mean.composer.config(`{
     newTypeBond(types: [
-      {name: "user", element: "friend", loc: "@@dv-community-friend"},
-      {name: "user", element: "auth", loc: "@@dv-access-auth"},
-      {name: "user", element: "post", loc: "@@dv-messaging-post"},
-      {name: "subscriber", element: "feed", loc: "@@dv-messaging-feed"},
-      {name: "publisher", element: "feed", loc: "@@dv-messaging-feed"}
+      {name: "User", element: "friend", loc: "@@dv-community-friend"},
+      {name: "User", element: "auth", loc: "@@dv-access-auth"},
+      {name: "User", element: "post", loc: "@@dv-messaging-post"},
+      {name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed"},
+      {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed"}
     ])
   }`);
 
   mean.composer.config(`{
     newTypeBond(types: [
-      {name: "post", element: "post", loc: "@@dv-messaging-post"},
-      {name: "content", element: "feed", loc: "@@dv-messaging-feed"}
+      {name: "Post", element: "post", loc: "@@dv-messaging-post"},
+      {name: "Content", element: "feed", loc: "@@dv-messaging-feed"}
     ])
   }`);
 
   mean.composer.config(`{
     newTypeBond(types: [
-      {name: "name", element: "feed", loc: "@@dv-messaging-feed"},
-      {name: "username", element: "friend", loc: "@@dv-community-friend"}
+      {name: "Name", element: "feed", loc: "@@dv-messaging-feed"},
+      {name: "Username", element: "friend", loc: "@@dv-community-friend"}
     ])
   }`);
 
@@ -45,11 +45,11 @@ function init_composer() {
     newFieldBond(fields: [
       {
         name: "friends",
-        type: {name: "user", element: "friend", loc: "@@dv-community-friend"}
+        type: {name: "User", element: "friend", loc: "@@dv-community-friend"}
       },
       {
         name: "subscriptions",
-        type: {name: "subscriber", element: "feed", loc: "@@dv-messaging-feed"}
+        type: {name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed"}
       }
     ])
   }`);

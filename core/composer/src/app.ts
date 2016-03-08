@@ -146,31 +146,32 @@ const schema = new graphql.GraphQLSchema({
               }
               console.log("end debug col");
             });
-          return mean.db.collection("tbonds").find({types: {$in: [t]}})
-              .toArray()
-              .then(type_bonds => {
-                console.log("got " + type_bonds.length + " tbonds");
-                for (let type_bond of type_bonds) {
-                  console.log("processing " + JSON.stringify(type_bond));
-                  /*
-                  mean.db.collection("fbonds").find({fields: {"type": bt}})
-                    .toArray()
-                    .then(bonded_fields => {
-                      for (let fbond of bonded_fields) {
+          mean.db.collection("tbonds").find({types: {$in: [t]}})
+            .toArray()
+            .then(type_bonds => {
+              console.log("got " + type_bonds.length + " tbonds");
+              for (let type_bond of type_bonds) {
+                console.log("processing " + JSON.stringify(type_bond));
+                /*
+                mean.db.collection("fbonds").find({fields: {"type": bt}})
+                  .toArray()
+                  .then(bonded_fields => {
+                    for (let fbond of bonded_fields) {
 
-                      }
-                    });
-                    */
-                   for (let bonded_type of type_bond.types) {
-                     if (bonded_type.name === t.name &&
-                         bonded_type.element === t.element &&
-                         bonded_type.loc === t.loc) {
-                       continue;
-                     }
-                     send_update(bonded_type, t, atom);
+                    }
+                  });
+                  */
+                 for (let bonded_type of type_bond.types) {
+                   if (bonded_type.name === t.name &&
+                       bonded_type.element === t.element &&
+                       bonded_type.loc === t.loc) {
+                     continue;
                    }
-                }
-              });
+                   send_update(bonded_type, t, atom);
+                 }
+              }
+            });
+            return true;
         }
       }
     }
@@ -184,7 +185,7 @@ function send_update(dst, src, atom) {
     const atom_str = transformed_atom.replace(/"/g, "\\\"");
     console.log("now have <" + atom_str + ">");
     post(dst.loc, `{
-        _dv_new_${dst.name}(atom: "${atom_str}")
+        _dv_new_${dst.name.toLowerCase()}(atom: "${atom_str}")
     }`);
 
   });
@@ -194,12 +195,16 @@ function transform_atom({name, element, loc}, atom, callback) {
   console.log(`Getting schema info for ${element}/${name}`);
   const query = `{
     __type(name: "${name}") {
+      name,
       fields {
         name,
-        kind,
-        ofType {
+        type {
           name,
-          kind
+          kind,
+          ofType {
+            name,
+            kind
+          }
         }
       }
     }
@@ -233,8 +238,9 @@ function post(loc, query) {
     }
   };
 
-  console.log("using options " + JSON.stringify(options));
-  console.log("query is <" + query_str + ">");
+  console.log(
+    "using options " + JSON.stringify(options) +
+    " for query <" + query_str + ">");
   const req = http.request(options);
   req.on("response", res => {
     let body = "";
@@ -254,19 +260,22 @@ function get(loc, query, callback) {
   const hostname = match[1];
   const port = match[2];
 
-  const query_str = query.replace(/ /g, "");
+  const query_str = encodeURIComponent(
+    query.replace(/ /g, "").replace(/\n/g, ""));
 
   const options = {
     hostname: hostname,
     port: port,
-    method: "post",
+    method: "get",
     path: `/graphql?query=query+${query_str}`
   };
 
-  console.log("using options " + JSON.stringify(options));
-  console.log("query is <" + query_str + ">");
+  console.log(
+    "using options " + JSON.stringify(options) +
+    " for query <" + query_str + ">");
   const req = http.request(options);
   req.on("response", res => {
+    res.setEncoding("utf8");
     let body = "";
     res.on("data", d => { body += d; });
     res.on("end", () => {
@@ -275,7 +284,6 @@ function get(loc, query, callback) {
     });
   });
   req.on("error", err => console.log(err));
-  req.write({});
   req.end();
 }
 
