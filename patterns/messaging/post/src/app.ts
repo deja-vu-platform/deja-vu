@@ -90,9 +90,10 @@ const schema = new graphql.GraphQLSchema({
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, args) => {
-          const post = JSON.parse(args.atom);
-          console.log("got new user from bus " + JSON.stringify(post));
-          return true;
+          const user = JSON.parse(args.atom);
+          console.log("got new user from bus " + JSON.stringify(user));
+          return mean.db.collection("users").insertOne(user)
+            .then(res => res.insertedCount === 1);
         }
       }
     }

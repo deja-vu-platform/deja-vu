@@ -91,7 +91,8 @@ const schema = new graphql.GraphQLSchema({
         resolve: (root, args) => {
           const user = JSON.parse(args.atom);
           console.log("got new user from bus " + JSON.stringify(user));
-          return true;
+          return mean.db.collection("users").insertOne(user)
+            .then(res => res.insertedCount === 1);
         }
       },
       _dv_update_user: {

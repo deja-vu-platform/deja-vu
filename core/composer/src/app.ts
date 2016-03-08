@@ -270,6 +270,9 @@ function transform_atom(dst: Type, src: Type, atom, callback) {
             transformed_atom[dst_f.name] = parsed_atom[dst_f.name];
           } else if (name_map[dst_f.name] !== undefined) {
             transformed_atom[dst_f.name] = parsed_atom[name_map[dst_f.name]];
+          } else {
+            // Send well-formed atoms to elements
+            transformed_atom[dst_f.name] = null;
           }
         }
 

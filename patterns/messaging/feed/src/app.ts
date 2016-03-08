@@ -84,7 +84,8 @@ const schema = new graphql.GraphQLSchema({
         resolve: (root, args) => {
           const sub = JSON.parse(args.atom);
           console.log("got new sub from bus " + JSON.stringify(sub));
-          return true;
+          return mean.db.collection("subs").insertOne(sub)
+            .then(res => res.insertedCount === 1);
         }
       },
       _dv_new_publisher: {
@@ -95,7 +96,8 @@ const schema = new graphql.GraphQLSchema({
         resolve: (root, args) => {
           const pub = JSON.parse(args.atom);
           console.log("got new pub from bus " + JSON.stringify(pub));
-          return true;
+          return mean.db.collection("pubs").insertOne(pub)
+            .then(res => res.insertedCount === 1);
         }
       }
     }
