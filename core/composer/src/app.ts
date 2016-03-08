@@ -132,7 +132,8 @@ const schema = new graphql.GraphQLSchema({
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, args) => {
-          const t = args.type;
+          const t: Type = new Type(
+            args.type.name, args.type.element, args.type.loc);
           const atom = args.atom;
           console.log("new atom! " + JSON.stringify(t) + atom);
           // hack
@@ -162,6 +163,8 @@ const schema = new graphql.GraphQLSchema({
                   });
                   */
                  for (let bonded_type of type_bond.types) {
+                   bonded_type = new Type(
+                     bonded_type.name, bonded_type.element, bonded_type.loc);
                    if (bonded_type.name === t.name &&
                        bonded_type.element === t.element &&
                        bonded_type.loc === t.loc) {
@@ -178,10 +181,10 @@ const schema = new graphql.GraphQLSchema({
   })
 });
 
-function send_update(dst, src, atom) {
+function send_update(dst: Type, src: Type, atom) {
   console.log("Sending update to element " + dst.element);
   console.log("have <" + atom + ">");
-  transform_atom(dst, atom, transformed_atom => {
+  transform_atom(dst, src, atom, transformed_atom => {
     const atom_str = transformed_atom.replace(/"/g, "\\\"");
     console.log("now have <" + atom_str + ">");
     post(dst.loc, `{
@@ -191,10 +194,21 @@ function send_update(dst, src, atom) {
   });
 }
 
-function transform_atom({name, element, loc}, atom, callback) {
-  console.log(`Getting schema info for ${element}/${name}`);
+class Type {
+  constructor(
+      public name: string, public element: string, public loc: string) {}
+
+  equals(other: Type) {
+    return (
+      this.name === other.name && this.element === other.element &&
+      this.loc === other.loc);
+  }
+}
+
+function transform_atom(dst: Type, src: Type, atom, callback) {
+  console.log(`Getting schema info for ${dst.element}/${dst.name}`);
   const query = `{
-    __type(name: "${name}") {
+    __type(name: "${dst.name}") {
       name,
       fields {
         name,
@@ -209,15 +223,74 @@ function transform_atom({name, element, loc}, atom, callback) {
       }
     }
   }`;
-  get(loc, query, res => {
-    console.log("got back " + JSON.stringify(res));
-    const parsed_atom = JSON.parse(atom);
-    // todo
-    let transformed_atom = JSON.stringify(parsed_atom);
-    callback(transformed_atom);
+  /*
+  mean.db.collection("fbonds").find().toArray()
+    .then(a => {
+      console.log("DEEBUUUGG");
+      for (let b of a) {
+        console.log(JSON.stringify(b));
+      }
+      console.log("FBOND end debug col");
+    });
+    */
+  get(dst.loc, query, res => {
+    const dst_type_info = JSON.parse(res).data.__type;
+    mean.db.collection("fbonds")
+      .aggregate([
+        {$match: {fields: {$elemMatch: {"type": dst}}}},
+        {$match: {fields: {$elemMatch: {"type": src}}}}
+      ])
+      .toArray()
+      .then(fbonds => {
+        let name_map = {};
+        for (let fbond of fbonds) {
+          console.log("processing fbond " + JSON.stringify(fbond));
+          // a given type can only appear once in a field bond
+          let src_fbond_info, dst_fbond_info;
+          for (let finfo of fbond.fields) {
+            if (src.equals(finfo.type)) {
+              src_fbond_info = finfo;
+            } else if (dst.equals(finfo.type)) {
+              dst_fbond_info = finfo;
+            }
+          }
+          name_map[dst_fbond_info.name] = src_fbond_info.name;
+        }
+        console.log(
+          "got " + fbonds.length + " back, used " + JSON.stringify(dst) +
+          " and " + JSON.stringify(src) + " name map " +
+          JSON.stringify(name_map));
+        console.log(JSON.stringify(fbonds));
+
+        const parsed_atom = JSON.parse(atom);
+        let transformed_atom = {};
+        console.log("res fields is " + JSON.stringify(dst_type_info.fields));
+        for (let dst_f of dst_type_info.fields) {
+          if (parsed_atom[dst_f.name] !== undefined) {
+            transformed_atom[dst_f.name] = parsed_atom[dst_f.name];
+          } else if (name_map[dst_f.name] !== undefined) {
+            transformed_atom[dst_f.name] = parsed_atom[name_map[dst_f.name]];
+          }
+        }
+
+        const transformed_atom_str = JSON.stringify(transformed_atom);
+        console.log("trasnformed atom str " + transformed_atom_str);
+        callback(transformed_atom_str);
+      });
   });
 }
 
+/*
+function get_null(t) {
+  let ret;
+  if (t.kind === "LIST") {
+    ret = [];
+  } else if (t.ofType.name === "String") {
+    ret = "";
+  }
+  return ret;
+}
+*/
 
 function post(loc, query) {
   const match = loc.match(/http:\/\/(.*):(.*)/);

@@ -53,4 +53,29 @@ function init_composer() {
       }
     ])
   }`);
+
+  mean.composer.config(`{
+    newFieldBond(fields: [
+      {
+        name: "username",
+        type: {name: "User", element: "friend", loc: "@@dv-community-friend"}
+      },
+      {
+        name: "username",
+        type: {name: "User", element: "auth", loc: "@@dv-access-auth"}
+      },
+      {
+        name: "username",
+        type: {name: "User", element: "post", loc: "@@dv-messaging-post"}
+      },
+      {
+        name: "name",
+        type: {name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed"}
+      },
+      {
+        name: "name",
+        type: {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed"}
+      }
+    ])
+  }`);
 }
