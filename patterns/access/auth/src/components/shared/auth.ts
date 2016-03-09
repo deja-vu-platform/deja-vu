@@ -20,9 +20,7 @@ export class AuthService {
     const headers = new Headers();
     headers.append("Content-type", "application/json");
     const query = `{
-      ${mutation}(username: "${username}", password: "${password}") {
-        username
-      }
+      ${mutation}(username: "${username}", password: "${password}")
     }`;
     const query_str = query.replace(/ /g, "");
 

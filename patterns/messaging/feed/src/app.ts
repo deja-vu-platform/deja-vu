@@ -79,11 +79,15 @@ const schema = new graphql.GraphQLSchema({
       _dv_new_subscriber: {
         "type": graphql.GraphQLBoolean,
         args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, args) => {
           const sub = JSON.parse(args.atom);
-          console.log("got new sub from bus " + JSON.stringify(sub));
+          console.log(
+            "got new sub (id " + args.atom_id + ") from bus " +
+            JSON.stringify(sub));
+          sub["atom_id"] = args.atom_id;
           return mean.db.collection("subs").insertOne(sub)
             .then(res => res.insertedCount === 1);
         }
@@ -91,11 +95,15 @@ const schema = new graphql.GraphQLSchema({
       _dv_new_publisher: {
         "type": graphql.GraphQLBoolean,
         args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, args) => {
           const pub = JSON.parse(args.atom);
-          console.log("got new pub from bus " + JSON.stringify(pub));
+          console.log(
+            "got new pub (id " + args.atom_id + ") from bus " +
+            JSON.stringify(pub));
+          pub["atom_id"] = args.atom_id;
           return mean.db.collection("pubs").insertOne(pub)
             .then(res => res.insertedCount === 1);
         }

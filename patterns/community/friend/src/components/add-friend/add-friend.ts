@@ -29,7 +29,7 @@ export class AddFriendComponent {
 
   set username(username: Username) {
     if (!username) return;
-    console.log("got username" + username);
+    console.log("got username " + username);
     this._username = username;
     this._friendService.getPotentialFriends(this._username).subscribe(
         potentialFriends => this.potentialFriends = potentialFriends);

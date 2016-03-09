@@ -87,11 +87,13 @@ const schema = new graphql.GraphQLSchema({
       _dv_new_user: {
         "type": graphql.GraphQLBoolean,
         args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, args) => {
           const user = JSON.parse(args.atom);
           console.log("got new user from bus " + JSON.stringify(user));
+          user["atom_id"] = args.atom_id;
           return mean.db.collection("users").insertOne(user)
             .then(res => res.insertedCount === 1);
         }

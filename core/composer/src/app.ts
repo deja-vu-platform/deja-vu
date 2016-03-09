@@ -129,12 +129,14 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, args) => {
           const t: Type = new Type(
             args.type.name, args.type.element, args.type.loc);
           const atom = args.atom;
+          const atom_id = args.atom_id;
           console.log("new atom! " + JSON.stringify(t) + atom);
           // hack
           // should make this efficient..also compute the intersection of fields
@@ -170,7 +172,7 @@ const schema = new graphql.GraphQLSchema({
                        bonded_type.loc === t.loc) {
                      continue;
                    }
-                   send_update(bonded_type, t, atom);
+                   send_update(bonded_type, t, atom_id, atom);
                  }
               }
             });
@@ -181,14 +183,15 @@ const schema = new graphql.GraphQLSchema({
   })
 });
 
-function send_update(dst: Type, src: Type, atom) {
+function send_update(dst: Type, src: Type, atom_id: string, atom: string) {
   console.log("Sending update to element " + dst.element);
   console.log("have <" + atom + ">");
   transform_atom(dst, src, atom, transformed_atom => {
     const atom_str = transformed_atom.replace(/"/g, "\\\"");
     console.log("now have <" + atom_str + ">");
     post(dst.loc, `{
-        _dv_new_${dst.name.toLowerCase()}(atom: "${atom_str}")
+        _dv_new_${dst.name.toLowerCase()}(
+          atom_id: "${atom_id}", atom: "${atom_str}")
     }`);
 
   });

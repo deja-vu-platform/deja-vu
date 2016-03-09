@@ -25,6 +25,7 @@ const user_type = new graphql.GraphQLObjectType({
             {friends: {$nin: [username]}},
             {username: {$ne: username}}
           ]};
+        console.log("query <" +  JSON.stringify(query) + ">");
         return mean.db.collection("users").find(query).toArray();
       }
     }
@@ -86,11 +87,13 @@ const schema = new graphql.GraphQLSchema({
       _dv_new_user: {
         "type": graphql.GraphQLBoolean,
         args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
         resolve: (root, args) => {
           const user = JSON.parse(args.atom);
           console.log("got new user from bus " + JSON.stringify(user));
+          user["atom_id"] = args.atom_id;
           return mean.db.collection("users").insertOne(user)
             .then(res => res.insertedCount === 1);
         }
@@ -98,12 +101,11 @@ const schema = new graphql.GraphQLSchema({
       _dv_update_user: {
         "type": graphql.GraphQLBoolean,
         args: {
-          _dv_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           new_atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, {_dv_id, new_atom}) => {
-          console.log("id " + _dv_id);
-          const user = JSON.parse(new_atom);
+        resolve: (root, args) => {
+          const user = JSON.parse(args.new_atom);
           console.log("got up user from bus " + JSON.stringify(user));
         }
       },
@@ -144,8 +146,7 @@ function report_update(username) {
   console.log("reporting update of " + username);
   const users = mean.db.collection("users");
   return users.findOne({username: username}).then(user => {
-    return mean.composer.update_atom(
-      {element: "friend", name: "user"}, user.username, user);
+    return mean.composer.update_atom("user", user.username, user);
   });
 }
 

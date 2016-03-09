@@ -2,9 +2,9 @@
 const graphql = require("graphql");
 // typings don't have the call with no callback
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mean_mod = require("mean");
+import {Mean} from "mean";
 
 let mean;
 
@@ -38,7 +38,7 @@ const schema = new graphql.GraphQLSchema({
     name: "Mutation",
     fields: {
       register: {
-        "type": user_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -56,14 +56,14 @@ const schema = new graphql.GraphQLSchema({
                 }
 
                 // report
-                mean.composer.new_atom({element: "auth", name: "User"}, user);
-                return {username: username};
+                mean.composer.new_atom("User", username, user);
+                return true;
               });
           });
         }
       },
       signIn: {
-        "type": user_type,
+        "type": graphql.GraphQLString,
         args: {
           username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -74,7 +74,8 @@ const schema = new graphql.GraphQLSchema({
             if (!bcrypt.compareSync(password, user.password)) {
               throw new Error("Incorrect password");
             }
-            return {username: username};
+            const token = jwt.sign(username, "ultra-secret-key");
+            return token;
           });
         }
       }
@@ -104,7 +105,7 @@ namespace Validation {
 }
 
 
-mean = new mean_mod.Mean("auth", {
+mean = new Mean("auth", {
   graphql_schema: schema,
   init_db: (db, debug) => {
     db.createCollection("users", (err, users) => {

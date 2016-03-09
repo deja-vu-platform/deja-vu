@@ -14,9 +14,12 @@ import {RegisterComponent} from
 export class LandingComponent {
   constructor(private _router: Router) {}
 
-  onEnter(user) {
-    console.log("on enter");
-    console.log(JSON.stringify(user));
+  onRegister(user) {
+    console.log("user registered");
+  }
+
+  onSignIn(user) {
+    console.log("sign in of " + JSON.stringify(user) + " succ");
     this._router.navigate(["App"]);
   }
 }

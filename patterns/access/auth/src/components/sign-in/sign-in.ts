@@ -18,7 +18,12 @@ export class SignInComponent {
 
   onSubmit() {
     this._authService.signIn(this.user).subscribe(
-      res => this.onSignIn.emit(this.user)
+      token => {
+        console.log("setting username " + this.user.username);
+        localStorage.setItem("id_token", token);
+        localStorage.setItem("username", this.user.username);
+        this.onSignIn.emit(this.user);
+      }
     );
   }
 }

@@ -15,7 +15,7 @@ export class FindFriendsComponent {
   username: string;
 
   loggedInUser(username: string) {
-    console.log("got a username");
+    console.log("got username <" + username + ">");
     this.username = username;
   }
 }

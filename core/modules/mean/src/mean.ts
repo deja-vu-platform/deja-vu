@@ -1,7 +1,8 @@
 /// <reference path="../typings/tsd.d.ts" />
 import * as express from "express";
 import morgan = require("morgan");
-import * as mongodb from "mongodb";
+// the mongodb tsd typings are wrong and we can't use them with promises
+let mongodb = require("mongodb");
 import * as http from "http";
 let command_line_args = require("command-line-args");
 let express_graphql = require("express-graphql");
@@ -29,7 +30,7 @@ export interface MeanConfig {
 
 
 export class Mean {
-  db: mongodb.Db;
+  db; //: mongodb.Db;
   app: express.Express;
   composer: Composer;
 
@@ -72,7 +73,7 @@ export class Mean {
     });
 
     this.composer = new Composer(
-        opts.bushost, opts.busport, opts.wshost, opts.wsport);
+        name, opts.bushost, opts.busport, opts.wshost, opts.wsport);
   }
 
   private _cors(req, res, next) {
@@ -94,24 +95,34 @@ export class Composer {
   _loc: string;
 
   constructor(
+      private _element: string,
       private _hostname: string, private _port: number,
       wshost: string, wsport: number) {
     this._loc = `http://${wshost}:${wsport}`;
   }
 
-  new_atom(t: Type, atom: any) {
+  new_atom(t: string, atom_id: string, atom: any) {
     console.log("sending new atom to composer");
     const atom_str = JSON.stringify(atom).replace(/"/g, "\\\"");
+    console.log("t is " + t);
+    console.log("atom id is " + atom_id);
     this._post(`{
       newAtom(
-        type: {element: "${t.element}", name: "${t.name}", loc: "${this._loc}"},
+        type: {name: "${t}", element: "${this._element}", loc: "${this._loc}"},
+        atom_id: "${atom_id}",
         atom: "${atom_str}")
     }`);
   }
 
-  update_atom(t: Type, id: string, new_atom: any) {
+  update_atom(t: string, atom_id: string, new_atom: any) {
     console.log("sending up atom to composer");
-    this._post(`update`);
+    const atom_str = JSON.stringify(new_atom).replace(/"/g, "\\\"");
+    this._post(`{
+      updateAtom(
+        type: {name: "${t}", element: "${this._element}", loc: "${this._loc}"},
+        atom_id: "${atom_id}",
+        new_atom: "${atom_str}")
+    }`);
   }
 
   rm_atom(t: Type, id: string) {

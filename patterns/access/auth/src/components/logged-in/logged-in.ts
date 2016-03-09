@@ -11,7 +11,7 @@ export class LoggedInComponent implements OnInit {
   @Output() loggedInUser = new EventEmitter();
 
   ngOnInit() {
-    // get the loggedin
-    this.loggedInUser.emit("foo");
+    console.log(localStorage.getItem("username"));
+    this.loggedInUser.emit(localStorage.getItem("username"));
   }
 }
