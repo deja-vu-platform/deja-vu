@@ -92,6 +92,24 @@ const schema = new graphql.GraphQLSchema({
             .then(res => res.insertedCount === 1);
         }
       },
+      _dv_update_subscriber: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => {
+          const sub = JSON.parse(args.atom);
+          console.log(
+            "got update sub (id " + args.atom_id + ") from bus " +
+            JSON.stringify(sub));
+          sub["atom_id"] = args.atom_id;
+          return mean.db.collection("subs")
+            .updateOne({atom_id: args.atom_id}, sub)
+            .then(res => res.nMatched === 1 && res.nModified === 1);
+        }
+      },
+
       _dv_new_publisher: {
         "type": graphql.GraphQLBoolean,
         args: {
@@ -106,6 +124,24 @@ const schema = new graphql.GraphQLSchema({
           pub["atom_id"] = args.atom_id;
           return mean.db.collection("pubs").insertOne(pub)
             .then(res => res.insertedCount === 1);
+        }
+      },
+
+      _dv_update_publisher: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => {
+          const pub = JSON.parse(args.atom);
+          console.log(
+            "got update pub (id " + args.atom_id + ") from bus " +
+            JSON.stringify(pub));
+          pub["atom_id"] = args.atom_id;
+          return mean.db.collection("pubs")
+            .updateOne({atom_id: args.atom_id}, pub)
+            .then(res => res.nMatched === 1 && res.nModified === 1);
         }
       }
     }

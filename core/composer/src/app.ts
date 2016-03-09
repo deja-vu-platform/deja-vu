@@ -132,68 +132,77 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const t: Type = new Type(
-            args.type.name, args.type.element, args.type.loc);
-          const atom = args.atom;
-          const atom_id = args.atom_id;
-          console.log("new atom! " + JSON.stringify(t) + atom);
-          // hack
-          // should make this efficient..also compute the intersection of fields
-          // taking into account fbonds
-          mean.db.collection("tbonds").find().toArray()
-            .then(a => {
-              console.log("debug col");
-              for (let b of a) {
-                console.log(JSON.stringify(b));
-              }
-              console.log("end debug col");
-            });
-          mean.db.collection("tbonds").find({types: {$in: [t]}})
-            .toArray()
-            .then(type_bonds => {
-              console.log("got " + type_bonds.length + " tbonds");
-              for (let type_bond of type_bonds) {
-                console.log("processing " + JSON.stringify(type_bond));
-                /*
-                mean.db.collection("fbonds").find({fields: {"type": bt}})
-                  .toArray()
-                  .then(bonded_fields => {
-                    for (let fbond of bonded_fields) {
-
-                    }
-                  });
-                  */
-                 for (let bonded_type of type_bond.types) {
-                   bonded_type = new Type(
-                     bonded_type.name, bonded_type.element, bonded_type.loc);
-                   if (bonded_type.name === t.name &&
-                       bonded_type.element === t.element &&
-                       bonded_type.loc === t.loc) {
-                     continue;
-                   }
-                   send_update(bonded_type, t, atom_id, atom);
-                 }
-              }
-            });
-            return true;
-        }
+        resolve: (root, args) => process("new", args)
+      },
+      updateAtom: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => process("update", args)
       }
     }
   })
 });
 
-function send_update(dst: Type, src: Type, atom_id: string, atom: string) {
+function process(op: string, args: any) {
+  const t: Type = new Type(
+    args.type.name, args.type.element, args.type.loc);
+  const atom = args.atom;
+  const atom_id = args.atom_id;
+  console.log(`${op} atom! ${JSON.stringify(t)} ${atom}`);
+  // hack
+  // should make this efficient..also compute the intersection of fields
+  // taking into account fbonds
+  mean.db.collection("tbonds").find().toArray()
+    .then(a => {
+      console.log("debug col");
+      for (let b of a) {
+        console.log(JSON.stringify(b));
+      }
+      console.log("end debug col");
+    });
+  mean.db.collection("tbonds").find({types: {$in: [t]}})
+    .toArray()
+    .then(type_bonds => {
+      console.log("got " + type_bonds.length + " tbonds");
+      for (let type_bond of type_bonds) {
+        console.log("processing " + JSON.stringify(type_bond));
+        /*
+        mean.db.collection("fbonds").find({fields: {"type": bt}})
+          .toArray()
+          .then(bonded_fields => {
+            for (let fbond of bonded_fields) {
+
+            }
+          });
+          */
+         for (let bonded_type of type_bond.types) {
+           bonded_type = new Type(
+             bonded_type.name, bonded_type.element, bonded_type.loc);
+           if (bonded_type.equals(t)) {
+             continue;
+           }
+           send_update(op, bonded_type, t, atom_id, atom);
+         }
+      }
+    });
+    return true;
+}
+
+function send_update(
+  op: string, dst: Type, src: Type, atom_id: string, atom: string) {
   console.log("Sending update to element " + dst.element);
   console.log("have <" + atom + ">");
   transform_atom(dst, src, atom, transformed_atom => {
     const atom_str = transformed_atom.replace(/"/g, "\\\"");
     console.log("now have <" + atom_str + ">");
     post(dst.loc, `{
-        _dv_new_${dst.name.toLowerCase()}(
+        _dv_${op}_${dst.name.toLowerCase()}(
           atom_id: "${atom_id}", atom: "${atom_str}")
     }`);
-
   });
 }
 
@@ -247,7 +256,7 @@ function transform_atom(dst: Type, src: Type, atom, callback) {
       .then(fbonds => {
         let name_map = {};
         for (let fbond of fbonds) {
-          console.log("processing fbond " + JSON.stringify(fbond));
+          // console.log("processing fbond " + JSON.stringify(fbond));
           // a given type can only appear once in a field bond
           let src_fbond_info, dst_fbond_info;
           for (let finfo of fbond.fields) {
@@ -259,15 +268,16 @@ function transform_atom(dst: Type, src: Type, atom, callback) {
           }
           name_map[dst_fbond_info.name] = src_fbond_info.name;
         }
+        /*
         console.log(
           "got " + fbonds.length + " back, used " + JSON.stringify(dst) +
           " and " + JSON.stringify(src) + " name map " +
           JSON.stringify(name_map));
         console.log(JSON.stringify(fbonds));
+        */
 
         const parsed_atom = JSON.parse(atom);
         let transformed_atom = {};
-        console.log("res fields is " + JSON.stringify(dst_type_info.fields));
         for (let dst_f of dst_type_info.fields) {
           if (parsed_atom[dst_f.name] !== undefined) {
             transformed_atom[dst_f.name] = parsed_atom[dst_f.name];
@@ -275,7 +285,7 @@ function transform_atom(dst: Type, src: Type, atom, callback) {
             transformed_atom[dst_f.name] = parsed_atom[name_map[dst_f.name]];
           } else {
             // Send well-formed atoms to elements
-            transformed_atom[dst_f.name] = null;
+            transformed_atom[dst_f.name] = get_null(dst_f.type);
           }
         }
 
@@ -286,7 +296,6 @@ function transform_atom(dst: Type, src: Type, atom, callback) {
   });
 }
 
-/*
 function get_null(t) {
   let ret;
   if (t.kind === "LIST") {
@@ -296,7 +305,6 @@ function get_null(t) {
   }
   return ret;
 }
-*/
 
 function post(loc, query) {
   const match = loc.match(/http:\/\/(.*):(.*)/);

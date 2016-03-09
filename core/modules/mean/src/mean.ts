@@ -121,7 +121,7 @@ export class Composer {
       updateAtom(
         type: {name: "${t}", element: "${this._element}", loc: "${this._loc}"},
         atom_id: "${atom_id}",
-        new_atom: "${atom_str}")
+        atom: "${atom_str}")
     }`);
   }
 
