@@ -102,20 +102,12 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          new_atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, args) => {
-          const user = JSON.parse(args.new_atom);
+          const user = JSON.parse(args.atom);
           console.log("got up user from bus " + JSON.stringify(user));
-        }
-      },
-      _dv_rm_user: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          _dv_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: (root, _dv_id) => {
-          console.log("got rm from bus " + JSON.stringify(_dv_id));
+          return true;
         }
       }
     }

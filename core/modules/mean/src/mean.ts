@@ -86,10 +86,6 @@ export class Mean {
   }
 }
 
-export interface Type {
-  element: string;
-  name: string;
-}
 
 export class Composer {
   _loc: string;
@@ -125,7 +121,7 @@ export class Composer {
     }`);
   }
 
-  rm_atom(t: Type, id: string) {
+  rm_atom(t: string, id: string) {
     console.log("sending rm atom to composer");
     this._post(`rm`);
   }

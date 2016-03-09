@@ -105,8 +105,8 @@ const schema = new graphql.GraphQLSchema({
             JSON.stringify(sub));
           sub["atom_id"] = args.atom_id;
           return mean.db.collection("subs")
-            .updateOne({atom_id: args.atom_id}, sub)
-            .then(res => res.nMatched === 1 && res.nModified === 1);
+            .update({atom_id: args.atom_id}, sub)
+            .then(res => res.result.ok === 1 && res.result.nModified === 1);
         }
       },
 
@@ -141,7 +141,7 @@ const schema = new graphql.GraphQLSchema({
           pub["atom_id"] = args.atom_id;
           return mean.db.collection("pubs")
             .updateOne({atom_id: args.atom_id}, pub)
-            .then(res => res.nMatched === 1 && res.nModified === 1);
+            .then(res => res.result.ok === 1 && res.result.nModified === 1);
         }
       }
     }

@@ -1,9 +1,8 @@
 /// <reference path="../typings/tsd.d.ts" />
 //import {Promise} from "es6-promise";
 const graphql = require("graphql");
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mean_mod = require("mean");
 
+import {Mean} from "mean";
 
 let mean;
 
@@ -78,8 +77,12 @@ const schema = new graphql.GraphQLSchema({
             })
             .then(_ => {
               // report
-              mean.composer.new_atom(
-                {element: "Post", name: "Post"}, {content: content});
+              return mean.db.collection("users")
+                .findOne({username: author})
+                .then(updated_user => {
+                  return mean.composer.update_atom(
+                    "User", updated_user.atom_id, updated_user);
+                });
             });
         }
       },
@@ -114,7 +117,7 @@ namespace Validation {
 }
 
 
-mean = new mean_mod.Mean("post", {
+mean = new Mean("post", {
   graphql_schema: schema,
   init_db: (db, debug) => {
     db.createCollection("users", (err, users) => {

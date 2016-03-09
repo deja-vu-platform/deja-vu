@@ -78,6 +78,19 @@ const schema = new graphql.GraphQLSchema({
             return token;
           });
         }
+      },
+
+      _dv_update_user: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => {
+          const user = JSON.parse(args.atom);
+          console.log("got up user from bus " + JSON.stringify(user));
+          return true;
+        }
       }
     }
   })

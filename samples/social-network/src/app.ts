@@ -25,22 +25,31 @@ function init_composer() {
     ])
   }`);
 
+  /*
+  // this doesn't work...type bonds must always be between root types
   mean.composer.config(`{
     newTypeBond(types: [
       {name: "Post", element: "post", loc: "@@dv-messaging-post"},
       {name: "Content", element: "feed", loc: "@@dv-messaging-feed"}
     ])
   }`);
+  */
 
+  // can only have field bonds if the types (domain) are already bonded
+  // the codomain must have the same type (maybe not?)
+  console.log("Creating field bonds");
   mean.composer.config(`{
-    newTypeBond(types: [
-      {name: "Name", element: "feed", loc: "@@dv-messaging-feed"},
-      {name: "Username", element: "friend", loc: "@@dv-community-friend"}
+    newFieldBond(fields: [
+      {
+        name: "published",
+        type: {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed"}
+      },
+      {
+        name: "posts",
+        type: {name: "User", element: "post", loc: "@@dv-messaging-post"}
+      }
     ])
   }`);
-
-
-  console.log("Creating field bonds");
   mean.composer.config(`{
     newFieldBond(fields: [
       {
