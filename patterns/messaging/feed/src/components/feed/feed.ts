@@ -7,9 +7,36 @@ import {FeedService, FeedItem} from "../shared/feed";
 
 
 @Component({
+  selector: "publisher-content",
+  template: "{{item}}",
+  inputs: ["item"]
+})
+class PublisherContentComponent {}
+
+@Component({
+  selector: "publisher-name",
+  template: "{{item}}",
+  inputs: ["item"]
+})
+class PublisherNameComponent {}
+
+
+let publisherComponentProvider = field => {
+  if (field === "name") {
+    return PublisherNameComponent;
+  } else if (field === "content") {
+    return PublisherContentComponent;
+  }
+};
+
+
+@Component({
   selector: "feed",
   templateUrl: "./components/feed/feed.html",
   providers: [FeedService, HTTP_PROVIDERS],
+  directives: [
+    publisherComponentProvider("name"), publisherComponentProvider("content")
+  ],
   inputs: ["sub"]
 })
 export class FeedComponent {

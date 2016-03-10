@@ -2,8 +2,8 @@
 <div>
   <ul *ngIf="feed && feed.length > 0">
     <li *ngFor="#feedItem of feed">
-      {{feedItem.content}}
-      by {{feedItem.publisher.name}}
+      <publisher-content item="{{feedItem.content}}"></publisher-content>
+      by <publisher-name item="{{feedItem.publisher.name}}"></publisher-name>
     </li>
   </ul>
   <div *ngIf="!feed || feed.length == 0">
