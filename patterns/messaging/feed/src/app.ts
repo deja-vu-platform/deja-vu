@@ -14,7 +14,7 @@ const pub_type = new graphql.GraphQLObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     published: {
       "type": new graphql.GraphQLList(graphql.GraphQLString),
-      resolve: pub => pub.published
+      resolve: pub => pub.published.map(p => JSON.stringify(p))
     }
   }
 });

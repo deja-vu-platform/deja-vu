@@ -34,7 +34,7 @@ export class FeedService {
           },
           (pub: Publisher, content: Content, unused_pubi: number,
            unused_ci: number) => {
-            return {content: content, publisher: pub};
+            return {content: JSON.parse(content), publisher: pub};
           });
   }
 
