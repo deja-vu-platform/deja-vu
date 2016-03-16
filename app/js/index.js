@@ -1,3 +1,5 @@
+'use strict'
+
 var currentZoom = 1.0;
 var components = $('#basic_components').html();
 
@@ -14,7 +16,7 @@ $(function() {
 
 
 function registerDroppable() {
-    enableDrop = {
+    var enableDrop = {
         accept: ".widget",
         hoverClass: "highlight",
         tolerance: "intersect",

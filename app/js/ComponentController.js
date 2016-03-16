@@ -1,9 +1,10 @@
-/**
- * Created by ericmanzi on 2/21/16.
- */
-num_rows = 3;
-num_cols = 3;
-files = [];
+'use strict'
+
+var num_rows = 3;
+var num_cols = 3;
+var files = [];
+var component_data = {};
+var clicheComponent;
 
 $(function() {
 
@@ -11,9 +12,7 @@ $(function() {
     var grid_width = grid.offsetWidth;
     var grid_height = grid.offsetHeight;
 
-    clicheComponent = Component('cliche', {}, {rows: num_rows, cols: num_cols}, 'New Component', 1, "0.0.1", "Unknown");
-
-    createTable(grid_width, grid_height, num_rows, num_cols);
+    createTable(grid_width, grid_height, true);
 
     $('#select-rows').on('change', function(e) {
         num_rows = $(this).val();
@@ -24,7 +23,7 @@ $(function() {
     });
 
     $('#create_component').on('click', function() {
-        createTable(grid_width, grid_height, num_rows, num_cols);
+        createTable(grid_width, grid_height, false);
     });
 
 
@@ -38,7 +37,7 @@ $(function() {
  * @param num_rows
  * @param num_cols
  */
-function createTable(grid_width, grid_height, num_rows, num_cols) {
+function createTable(grid_width, grid_height, isDefault) {
     $('#grid-container').html('');
 
     var grid = document.createElement('table');
@@ -147,8 +146,28 @@ $(document).click(function(event) {
 
 });
 
+/**
+ * Display name of uploaded image
+ */
 $(document).on('change', '#fileselect', function(evt) {
     files = $(this).get(0).files;
     $(this).parent().parent().parent().children().first().val(files[0].name);
 });
 
+
+/**
+ * SAVE COMPONENT
+ */
+$('#save_component').on('click', function() {
+
+    component_data.num_rows = num_rows;
+    component_data.num_cols = num_cols;
+
+    $('[id^="cell"]').each(function() {
+        var cell = $(this);
+
+        component_data[cell.attr('id')]=cell.children().first().attr('id');
+    });
+
+    alert(JSON.stringify(component_data));
+});
