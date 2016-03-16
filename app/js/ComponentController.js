@@ -157,6 +157,11 @@ function updateComponentAt(cell_id) {
             "menu_item2": { text: inputs[2].value, target: inputs[3].value},
             "menu_item3": { text: inputs[4].value, target: inputs[5].value}
         }
+    } else if (type==='image') {
+        component = "link";
+        value = {
+            img_src: inputs[0].value
+        }
     }
 
     clicheComponent.components[row][col].components[component] = value;
@@ -183,6 +188,9 @@ function findDeletedCoord() {
             if ((bitmap_new[row][col] - bitmap_old[row][col]) < 0) {
                 result[0] = row+1;
                 result[1] = col+1;
+            } else if ((bitmap_new[row][col] - bitmap_old[row][col]) > 0) {
+                result[2] = row+1;
+                result[3] = col+1;
             }
         }
     }

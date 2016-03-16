@@ -264,7 +264,7 @@ td {
 /* Image popup */
 /* layout.css Style */
 .upload-drop-zone {
-    height: 100px;
+    height: 50px;
     border-width: 2px;
     margin-bottom: 0px;
 }
@@ -274,7 +274,7 @@ td {
     color: #ccc;
     border-style: dashed;
     border-color: #ccc;
-    line-height: 100px;
+    line-height: 50px;
     text-align: center
 }
 .upload-drop-zone.drop {

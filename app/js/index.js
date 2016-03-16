@@ -103,10 +103,16 @@ function resetDroppability() {
 
     });
 
-    var del_coord = findDeletedCoord();
-    if (del_coord.length > 0) {
-        var del_row = del_coord[0];
-        var del_col = del_coord[1];
+    var coord = findDeletedCoord();
+    if (coord.length > 0 && typeof coord[0]!=="undefined") {
+        var del_row = coord[0];
+        var del_col = coord[1];
+        if (typeof coord[2]!=="undefined") { // if move, copy any saved data
+            var component_copy = clicheComponent.components[del_row][del_col];
+            var new_row = coord[2];
+            var new_col = coord[3];
+            clicheComponent.components[new_row][new_col].components = component_copy.components;
+        }
         delete clicheComponent.components[del_row][del_col];
     }
 }
