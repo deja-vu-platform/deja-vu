@@ -33,8 +33,9 @@ function registerDroppable() {
 
             $('#basic_components').html(basic_components);
 
-            //console.log(clicheComponent);
             registerDraggable();
+            resetDroppability();
+
         }
     };
     $('.droppable').each(function() {
@@ -62,7 +63,6 @@ function registerDraggable() {
             scroll: true
         });
     });
-    resetDroppability();
 
 }
 
@@ -83,14 +83,32 @@ function registerZoom() {
 }
 
 function resetDroppability() {
+    bitmap_old = JSON.parse(JSON.stringify(bitmap_new));
+
     $('td').each(function() {
+
+        // ALSO UPDATE BITMAP
+        var row = Number($(this).attr('id').substring(4,5))-1;
+        var col = Number($(this).attr('id').substring(5,6))-1;
 
         if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
             $(this).removeClass('dropped');
             $(this).addClass('droppable');
             $(this).droppable('enable');
+            bitmap_new[row][col] = 0;
+        } else {
+            bitmap_new[row][col] = 1;
         }
-    })
+
+
+    });
+
+    var del_coord = findDeletedCoord();
+    if (del_coord.length > 0) {
+        var del_row = del_coord[0];
+        var del_col = del_coord[1];
+        delete clicheComponent.components[del_row][del_col];
+    }
 }
 
 /**
@@ -132,7 +150,7 @@ function registerTooltipBtnHandlers() {
     });
 
 
-    $('.apply').click(function(event) {
+    $('.apply').on("click", function(event) {
         var parent = $(this).parent();
         var tag_name = parent.get(0).tagName;
         while (tag_name !== 'TD') {
@@ -157,9 +175,6 @@ $(document).click(function(event) {
         }
     }
 });
-
-
-
 
 /**
  * Display name of uploaded image

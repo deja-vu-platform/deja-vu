@@ -3,6 +3,8 @@ var num_rows = 3;
 var num_cols = 3;
 var files = [];
 clicheComponent = null;
+bitmap_old = null;
+bitmap_new = null;
 
 $(function() {
     clicheComponent = "in jq";
@@ -74,6 +76,10 @@ function createTable(grid_width, grid_height, isDefault) {
 
     InitClicheComponent(isDefault);
 
+    bitmap_old = make2dArray(num_rows, num_cols);
+    bitmap_new = make2dArray(num_rows, num_cols);
+
+
 }
 
 /**
@@ -118,6 +124,8 @@ function addComponent(widget, cell_id) {
     clicheComponent.addComponent(component, row, col);
 }
 
+
+
 function updateComponentAt(cell_id) {
     var row = cell_id.substring(4,5);
     var col = cell_id.substring(5,6);
@@ -152,4 +160,31 @@ function updateComponentAt(cell_id) {
     }
 
     clicheComponent.components[row][col].components[component] = value;
+}
+
+
+
+
+/*
+  BITMAP TO HELP IN UPDATE
+ */
+function quicklyMakeArray(size, func) {
+    return Array.apply(null, Array(size)).map(func);
+};
+function make2dArray(rows, cols) {
+    return quicklyMakeArray(cols, function () {
+        return quicklyMakeArray(rows, function (i) {return 0;});
+    });
+};
+function findDeletedCoord() {
+    var result = [];
+    for (var row=0; row < num_rows; row++) {
+        for (var col = 0; col < num_cols; col++) {
+            if ((bitmap_new[row][col] - bitmap_old[row][col]) < 0) {
+                result[0] = row+1;
+                result[1] = col+1;
+            }
+        }
+    }
+    return result;
 }
