@@ -1,9 +1,7 @@
-'use strict'
 
 var num_rows = 3;
 var num_cols = 3;
 var files = [];
-var component_data = {};
 var clicheComponent;
 
 $(function() {
@@ -71,6 +69,8 @@ function createTable(grid_width, grid_height, isDefault) {
 
     registerDroppable();
 
+    InitClicheComponent(isDefault);
+
 }
 
 /**
@@ -82,92 +82,40 @@ function createTable(grid_width, grid_height, isDefault) {
  * @param num_cols
  */
 function resizeCell(cell, grid_width, grid_height, num_rows, num_cols) {
-
     var cell_width = Math.floor((grid_width/num_cols)) - 10;
     var cell_height = Math.floor((grid_height/num_rows)) - 10;
-
     cell.setAttribute('style', 'width: '+cell_width+'px; height: '+cell_height+'px;');
-
     // Resize tooltip
     var tooltip_width = Number($('.tooltip').css('width').substring(0,3));
     $('.tooltip').css('left', -1*Math.floor((tooltip_width-(cell_width-40))/2)+'px');
 }
-/**
- * Register listener for click on edit button
- * @param cell_id
- */
-function triggerEdit(cell_id) {
-    var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
-    //console.log("dropped_component:"+dropped_component);
 
-    var edit_dialog_template = $('#'+dropped_component+'_popup_holder').html();
-    //console.log(edit_dialog_template);
-
-    var sp = document.createElement('span');
-    sp.innerHTML = edit_dialog_template;
-    //console.log(sp.firstElementChild);
-    var edit_dialog = sp.firstElementChild;
-    //console.log(edit_dialog.firstChild);
-
-    var cell = document.getElementById(cell_id);
-    cell.insertBefore(edit_dialog, cell.firstChild);
-
-    $(Array.prototype.slice.call(
-        $('#'+cell_id).get(0).getElementsByClassName('form-control'), 0)[0]).trigger("focus");
-    setTimeout(function(){
-        $($('#'+cell_id).children().first()).addClass('open');
-    }, 1);
-    registerCloseBtnHandler();
-
-}
-
-
-function registerCloseBtnHandler() {
-    $('.close').on("click", function() {
-        setTimeout(function(){
-            $('.tooltip').removeClass('open');
-        }, 1);
-        Array.prototype.slice.call(
-            $(this).parent().get(0).getElementsByClassName('form-control'), 0)
-            .forEach(function(item) {
-                item.value = "";
-            })
-    })
-}
-
-
-$(document).click(function(event) {
-    if(!$(event.target).closest('.tooltip').length &&
-        !$(event.target).is('.tooltip')) {
-        if($('.tooltip').hasClass('open')) {
-            $('.tooltip').removeClass('open');
-        }
+function InitClicheComponent(isDefault) {
+    if (isDefault) {
+        var name = "New Component";
+        var version = "0.0.1";
+        var author = "Unknown";
+    } else {
+        var name = $('#component_name').val();
+        var version = $('#component_version').val();
+        var author = $('#component_author').val();
     }
+    clicheComponent = ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
+}
 
-});
-
-/**
- * Display name of uploaded image
- */
-$(document).on('change', '#fileselect', function(evt) {
-    files = $(this).get(0).files;
-    $(this).parent().parent().parent().children().first().val(files[0].name);
-});
-
+function addComponent(widget, cell_id) {
+    var row = cell_id.substring(4,5);
+    var col = cell_id.substring(5,6);
+    var span = document.createElement('span');
+    span.innerHTML=widget[0].outerHTML;
+    var type = span.firstElementChild.getAttribute('name');
+    var component = BaseComponent(type, {text: '', link:'', tab_items: {}, menu_items: {} });
+    clicheComponent.addComponent(component, row, col);
+}
 
 /**
  * SAVE COMPONENT
  */
 $('#save_component').on('click', function() {
-
-    component_data.num_rows = num_rows;
-    component_data.num_cols = num_cols;
-
-    $('[id^="cell"]').each(function() {
-        var cell = $(this);
-
-        component_data[cell.attr('id')]=cell.children().first().attr('id');
-    });
-
-    alert(JSON.stringify(component_data));
+    alert(JSON.stringify(clicheComponent));
 });

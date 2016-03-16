@@ -284,13 +284,7 @@
                 <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Component name: </div>
-                    <div class="col-sm-7"><input type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
-                    <div class="col-sm-1"></div>
-                </div><br/>
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3 form-lbl">Version: </div>
-                    <div class="col-sm-7"><input type="text" class="form-control" required placeholder="0.1.0"/></div>
+                    <div class="col-sm-7"><input id="component_name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
                     <div class="col-sm-1"></div>
                 </div><br/>
                 <div class="row">
@@ -307,7 +301,6 @@
                             <option value="7">7</option>
                             <option value="8">8</option>
                             <option value="9">9</option>
-                            <option value="10">10</option>
                         </select>
                     </div>
                     <div class="col-sm-1"></div>
@@ -326,11 +319,22 @@
                             <option value="7">7</option>
                             <option value="8">8</option>
                             <option value="9">9</option>
-                            <option value="10">10</option>
                         </select>
                     </div>
                     <div class="col-sm-1"></div>
-                </div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Version: </div>
+                    <div class="col-sm-7"><input id="component_version" type="text" class="form-control" required placeholder="e.g.: 0.1.0"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Author: </div>
+                    <div class="col-sm-7"><input id="component_author" type="text" class="form-control" required placeholder="e.g.: Dijkstra..."/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
             </div>
             <div class="modal-footer">
                 <p><button id="create_component" data-dismiss="modal" class="btn btn-primary">Create</button>
