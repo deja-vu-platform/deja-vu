@@ -1,14 +1,13 @@
 var currentZoom = 1.0;
-var basic_components = $('#basic_components').html();
 
 $(function() {
+    basic_components = $('#basic_components').html();
 
     registerDroppable();
 
     registerDraggable();
 
     registerZoom();
-
 });
 
 
@@ -34,6 +33,7 @@ function registerDroppable() {
 
             $('#basic_components').html(basic_components);
 
+            //console.log(clicheComponent);
             registerDraggable();
         }
     };

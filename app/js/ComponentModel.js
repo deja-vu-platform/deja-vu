@@ -4,7 +4,7 @@
  * @returns {Component}
  * @constructor
  */
-Component = function() {
+function Component() {
     this.type = '';
     this.meta = {};
     this.dimensions = {};
@@ -23,7 +23,9 @@ Component = function() {
  * @param col
  * @constructor
  */
-BaseComponent = function(type, components) {
+BaseComponent.prototype = new Component();
+BaseComponent.prototype.constructor = BaseComponent;
+function BaseComponent(type, components) {
     this.type = type;
     this.components = components;
     this.properties = {};
@@ -31,13 +33,13 @@ BaseComponent = function(type, components) {
 
 BaseComponent.prototype.setProperty = function(property, value) {
     this.properties[property] = value;
+    return;
 };
 BaseComponent.prototype.updateComponent = function(component, value) {
     this.properties[component] = value;
+    return;
 };
 
-BaseComponent.prototype = new Component();
-BaseComponent.prototype.constructor = BaseComponent;
 
 
 
@@ -52,6 +54,8 @@ BaseComponent.prototype.constructor = BaseComponent;
  * @param author
  * @constructor
  */
+ClicheComponent.prototype = new Component();
+ClicheComponent.prototype.constructor = ClicheComponent;
 function ClicheComponent(dimensions, name, id, version, author) {
     this.type = "cliche";
     this.meta = {
@@ -70,9 +74,10 @@ ClicheComponent.prototype.addComponent = function(component, row, col) {
         this.components[row]={};
     }
     this.components[row][col]=component;
+    return true;
 };
 
-ClicheComponent.prototype = new Component();
-ClicheComponent.prototype.constructor = ClicheComponent;
 
 
+clicheComponent = new ClicheComponent({rows: 3, cols: 3}, "name", 1, "version", "author");
+clicheComponent.addComponent({}, 2, 3);

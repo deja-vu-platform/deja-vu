@@ -2,31 +2,35 @@
 var num_rows = 3;
 var num_cols = 3;
 var files = [];
-var clicheComponent;
+clicheComponent = ";ljk";
 
 $(function() {
-
-    var grid = document.getElementById('grid-container');
-    var grid_width = grid.offsetWidth;
-    var grid_height = grid.offsetHeight;
-
+    clicheComponent = "in jq";
+    var grid = $('#grid-container').get(0);
+    grid_width = grid.offsetWidth;
+    grid_height = grid.offsetHeight;
     createTable(grid_width, grid_height, true);
 
-    $('#select-rows').on('change', function(e) {
-        num_rows = $(this).val();
-    });
-
-    $('#select-cols').on('change', function(e) {
-        num_cols = $(this).val();
-    });
-
-    $('#create_component').on('click', function() {
-        createTable(grid_width, grid_height, false);
-    });
-
-
-
 });
+
+$('#select-rows').on('change', function(e) {
+    num_rows = $(this).val();
+});
+
+$('#select-cols').on('change', function(e) {
+    num_cols = $(this).val();
+});
+
+$('#create_component').on('click', function() {
+    createTable(grid_width, grid_height, false);
+});
+
+$('#save_component').on('click', function() {
+    w = window.open();
+    w.document.body.innerHTML='<p><textarea style="width:95%; height:95%">'+JSON.stringify(clicheComponent, null, '\t')+'</textarea></p>';
+    //alert(JSON.stringify(clicheComponent, null, 4));
+});
+
 
 /**
  * Generate the grid
@@ -91,16 +95,17 @@ function resizeCell(cell, grid_width, grid_height, num_rows, num_cols) {
 }
 
 function InitClicheComponent(isDefault) {
+    var name, version, author;
     if (isDefault) {
-        var name = "New Component";
-        var version = "0.0.1";
-        var author = "Unknown";
+        name = "New Component";
+        version = "0.0.1";
+        author = "Unknown";
     } else {
-        var name = $('#component_name').val();
-        var version = $('#component_version').val();
-        var author = $('#component_author').val();
+        name = $('#component_name').val();
+        version = $('#component_version').val();
+        author = $('#component_author').val();
     }
-    clicheComponent = ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
+    clicheComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
 }
 
 function addComponent(widget, cell_id) {
@@ -109,13 +114,9 @@ function addComponent(widget, cell_id) {
     var span = document.createElement('span');
     span.innerHTML=widget[0].outerHTML;
     var type = span.firstElementChild.getAttribute('name');
-    var component = BaseComponent(type, {text: '', link:'', tab_items: {}, menu_items: {} });
+    var component = new BaseComponent(type, {text: '', link:'', tab_items: {}, menu_items: {} });
+    console.log(clicheComponent);
     clicheComponent.addComponent(component, row, col);
 }
 
-/**
- * SAVE COMPONENT
- */
-$('#save_component').on('click', function() {
-    alert(JSON.stringify(clicheComponent));
-});
+
