@@ -11,6 +11,8 @@ $(function() {
     var grid_width = grid.offsetWidth;
     var grid_height = grid.offsetHeight;
 
+    clicheComponent = Component('cliche', {}, {rows: num_rows, cols: num_cols}, 'New Component', 1, "0.0.1", "Unknown");
+
     createTable(grid_width, grid_height, num_rows, num_cols);
 
     $('#select-rows').on('change', function(e) {
@@ -149,3 +151,4 @@ $(document).on('change', '#fileselect', function(evt) {
     files = $(this).get(0).files;
     $(this).parent().parent().parent().children().first().val(files[0].name);
 });
+
