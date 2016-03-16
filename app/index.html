@@ -17,58 +17,60 @@
 <body>
 
 <div class="menubar">
+    <div class="menubar-inner">
 
-    <div class="menu-item logo">Déjà Vu UI builder</div>
+        <div class="menu-item logo">Déjà Vu UI builder</div>
 
-    <div class="menu-item">
-        <button type="button" class="btn btn-default">
-            <span class="glyphicon glyphicon-file"></span> Open...
-        </button>
-    </div>
-
-    <div class="menu-item">
-        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new_component">
-            <span class="glyphicon glyphicon-plus"></span> New component
-        </button>
-    </div>
-
-    <div class="menu-item">
-        <button type="button" class="btn btn-default" id="save_component">
-            <span class="glyphicon glyphicon-save"></span> Save component
-        </button>
-    </div>
-
-    <div class="menu-item">
-        <div class="btn-group">
+        <div class="menu-item">
             <button type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-file"></span> View
+                <span class="glyphicon glyphicon-file"></span> Open...
             </button>
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-                <li><a href="#" id="zoomIn">Zoom in + </a></li>
-                <li><a href="#" id="zoomOut">Zoom out - </a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#" id="zoomReset">Reset </a></li>
-            </ul>
         </div>
-    </div>
 
-    <div class="menu-item">
-        <div class="btn-group">
-            <button type="button" class="btn btn-default">
-                <span class="glyphicon glyphicon-file"></span> Help
+        <div class="menu-item">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new_component">
+                <span class="glyphicon glyphicon-plus"></span> New component
             </button>
-            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="caret"></span>
+        </div>
+
+        <div class="menu-item">
+            <button type="button" class="btn btn-default" id="save_component">
+                <span class="glyphicon glyphicon-save"></span> Save component
             </button>
-            <ul class="dropdown-menu">
-                <li><a href="#">About</a></li>
-                <li><a href="#">Tutorials</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Report an issue</a></li>
-            </ul>
+        </div>
+
+        <div class="menu-item">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default">
+                    <span class="glyphicon glyphicon-file"></span> View
+                </button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" id="zoomIn">Zoom in + </a></li>
+                    <li><a href="#" id="zoomOut">Zoom out - </a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" id="zoomReset">Reset </a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="menu-item">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default">
+                    <span class="glyphicon glyphicon-file"></span> Help
+                </button>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Report an issue</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
@@ -108,7 +110,6 @@
 
 <div id="grid-container"></div>
 
-<!--TRASH CAN-->
 <div id="trash" class="droppable">
     <span class="glyphicon glyphicon-trash"></span>
 </div>
@@ -149,11 +150,7 @@
                     <div class="row">
                         <div class="col-sm-12"><textarea class="form-control" rows="4"></textarea> </div>
                     </div><br/>
-                    <div class="row">
-                        <div class="col-sm-5 form-lbl"></div>
-                        <div class="col-sm-4"></div>
-                        <div class="col-sm-2 apply"><button class="btn btn-primary">Apply</button></div>
-                    </div>
+                    <button class="apply btn btn-primary pull-right">Apply</button>
                 </div>
             </div>
         </div>
@@ -344,6 +341,7 @@
 </div><!-- /.modal -->
 
 
+<!--<script src="../main.js"></script>-->
 <!--<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>-->
 <script src="js/external/jquery.min.js"></script>
 
@@ -352,6 +350,5 @@
 <script src="js/ComponentModel.js"></script>
 <script src="js/ComponentController.js"></script>
 <script src="js/index.js"></script>
-<!--<script src="../main.js"></script>-->
 </body>
 </html>

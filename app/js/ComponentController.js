@@ -2,7 +2,7 @@
 var num_rows = 3;
 var num_cols = 3;
 var files = [];
-clicheComponent = ";ljk";
+clicheComponent = null;
 
 $(function() {
     clicheComponent = "in jq";
@@ -28,7 +28,6 @@ $('#create_component').on('click', function() {
 $('#save_component').on('click', function() {
     w = window.open();
     w.document.body.innerHTML='<p><textarea style="width:95%; height:95%">'+JSON.stringify(clicheComponent, null, '\t')+'</textarea></p>';
-    //alert(JSON.stringify(clicheComponent, null, 4));
 });
 
 
@@ -108,15 +107,49 @@ function InitClicheComponent(isDefault) {
     clicheComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
 }
 
+
 function addComponent(widget, cell_id) {
     var row = cell_id.substring(4,5);
     var col = cell_id.substring(5,6);
     var span = document.createElement('span');
     span.innerHTML=widget[0].outerHTML;
     var type = span.firstElementChild.getAttribute('name');
-    var component = new BaseComponent(type, {text: '', link:'', tab_items: {}, menu_items: {} });
-    console.log(clicheComponent);
+    var component = new BaseComponent(type, {text: null, link: null, tab_items: null, menu_items: null });
     clicheComponent.addComponent(component, row, col);
 }
 
+function updateComponentAt(cell_id) {
+    var row = cell_id.substring(4,5);
+    var col = cell_id.substring(5,6);
+    var type = $('#'+cell_id).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    var component, value;
+    var inputs = Array.prototype.slice.call(
+        $('#'+cell_id).get(0).getElementsByTagName('input'), 0);
 
+    if (type==='label') {
+        component = "text";
+        value = $('#'+cell_id).get(0).getElementsByTagName('textarea')[0].value;
+    } else if (type==='link') {
+        component = "link";
+        value = {
+            link_text: inputs[0].value,
+            target: inputs[1].value
+        }
+    } else if (type==='tab_viewer') {
+        component = "tab_items";
+        value = {
+            "tab1": { text: inputs[0].value, target: inputs[1].value},
+            "tab2": { text: inputs[2].value, target: inputs[3].value},
+            "tab3": { text: inputs[4].value, target: inputs[5].value}
+        }
+    } else if (type==='menu') {
+        component = "menu_items";
+        value = {
+            "menu_item1": { text: inputs[0].value, target: inputs[1].value},
+            "menu_item2": { text: inputs[2].value, target: inputs[3].value},
+            "menu_item3": { text: inputs[4].value, target: inputs[5].value}
+        }
+    }
+
+    clicheComponent.components[row][col].components[component] = value;
+}

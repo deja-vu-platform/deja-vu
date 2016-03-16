@@ -99,16 +99,12 @@ function resetDroppability() {
  */
 function triggerEdit(cell_id) {
     var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
-    //console.log("dropped_component:"+dropped_component);
 
     var edit_dialog_template = $('#'+dropped_component+'_popup_holder').html();
-    //console.log(edit_dialog_template);
 
     var sp = document.createElement('span');
     sp.innerHTML = edit_dialog_template;
-    //console.log(sp.firstElementChild);
     var edit_dialog = sp.firstElementChild;
-    //console.log(edit_dialog.firstChild);
 
     var cell = document.getElementById(cell_id);
     cell.insertBefore(edit_dialog, cell.firstChild);
@@ -118,12 +114,12 @@ function triggerEdit(cell_id) {
     setTimeout(function(){
         $($('#'+cell_id).children().first()).addClass('open');
     }, 1);
-    registerCloseBtnHandler();
+    registerTooltipBtnHandlers();
 
 }
 
 
-function registerCloseBtnHandler() {
+function registerTooltipBtnHandlers() {
     $('.close').on("click", function() {
         setTimeout(function(){
             $('.tooltip').removeClass('open');
@@ -133,7 +129,20 @@ function registerCloseBtnHandler() {
             .forEach(function(item) {
                 item.value = "";
             })
-    })
+    });
+
+
+    $('.apply').click(function(event) {
+        var parent = $(this).parent();
+        var tag_name = parent.get(0).tagName;
+        while (tag_name !== 'TD') {
+            parent = $(parent).parent();
+            tag_name = parent.get(0).tagName;
+        }
+        var cell_id = $(parent).attr('id');
+        updateComponentAt(cell_id);
+        $('.tooltip').removeClass('open');
+    });
 }
 
 
@@ -148,6 +157,9 @@ $(document).click(function(event) {
         }
     }
 });
+
+
+
 
 /**
  * Display name of uploaded image

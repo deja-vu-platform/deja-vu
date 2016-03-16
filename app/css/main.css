@@ -15,9 +15,18 @@
     display: block;
     height: 70px;
     background-color: #F0F1F2;
-    /*overflow-x: visible;*/
-    /*overflow-y: visible;*/
+    overflow-x: scroll;
     z-index: 600;
+}
+
+.menubar-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1000px;
+    height: 70px;
+    background-color: #F0F1F2;
+
 }
 
 .menu-item {
@@ -237,7 +246,7 @@ td {
 }
 
 .apply {
-    padding-left: 0px;
+    padding-left: 10px;
 }
 
 .panel {
