@@ -82,7 +82,10 @@ function createTable(grid_width, grid_height, isDefault) {
                     td.appendChild(button);
                     tr.appendChild(td);
 
-                    $(button).on("click", function() { triggerEdit(td.id)});
+                    $(button).on("click", function() {
+                        $('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
+                        triggerEdit(td.id);
+                    });
 
                 })(col+1);
             }
