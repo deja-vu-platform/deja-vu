@@ -1,6 +1,7 @@
 var currentZoom = 1.0;
 
 $(function() {
+
     basic_components = $('#basic_components').html();
 
     registerDroppable();
@@ -107,13 +108,18 @@ function resetDroppability() {
     if (coord.length > 0 && typeof coord[0]!=="undefined") {
         var del_row = coord[0];
         var del_col = coord[1];
-        if (typeof coord[2]!=="undefined") { // if move, copy any saved data
-            var component_copy = clicheComponent.components[del_row][del_col];
+        var cell = $('#cell'+del_row+del_col).get(0);
+        if (typeof coord[2]!=="undefined") { // if move, copy any save data
             var new_row = coord[2];
             var new_col = coord[3];
+
+            var component_copy = clicheComponent.components[del_row][del_col];
             clicheComponent.components[new_row][new_col].components = component_copy.components;
+
+            Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
         }
         delete clicheComponent.components[del_row][del_col];
+        cell.removeChild(cell.firstChild);
     }
 }
 
@@ -167,6 +173,13 @@ function registerTooltipBtnHandlers() {
         updateComponentAt(cell_id);
         $('.tooltip').removeClass('open');
     });
+
+    var dropzones = document.getElementsByClassName("upload-drop-zone");
+    for (var i=0; i<dropzones.length; i++) {
+        dropzones[i].addEventListener("dragover", FileDragHover, false);
+        dropzones[i].addEventListener("dragleave", FileDragHover, false);
+        dropzones[i].addEventListener("drop", FileSelectHandler, false);
+    }
 }
 
 
@@ -189,3 +202,4 @@ $(document).on('change', '#fileselect', function(evt) {
     files = $(this).get(0).files;
     $(this).parent().parent().parent().children().first().val(files[0].name);
 });
+

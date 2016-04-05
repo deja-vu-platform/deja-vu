@@ -1,3 +1,4 @@
+
 /*
  Colors:
  - body light gray: #F0F1F2
@@ -101,6 +102,11 @@ fieldset { border: 0; margin: 0; padding: 0; }
     height: 200px;
 }
 
+
+#rename_component {
+    cursor: pointer;
+}
+
 .content li {
     margin: 10px 10px 0px 0px;
     padding: 5px;
@@ -110,6 +116,10 @@ fieldset { border: 0; margin: 0; padding: 0; }
     padding-right: 5px;
 }
 .content li:hover {
+    background-color: #E0E0E0;
+}
+
+li.selected {
     background-color: #E0E0E0;
 }
 
@@ -162,7 +172,7 @@ td {
     background-color: rgba(55, 131, 198, 0.2);
 }
 .dropped {
-    background-color: #E0E0E0;
+    background-color: #F9F9F9;
     text-align: center;
 }
 
@@ -190,16 +200,20 @@ td {
     font-weight: bold;
 }
 
-.dropped li {
+td.dropped li.widget {
     position: absolute;
     bottom: 0px;
     margin-left: auto;
     margin-right: auto;
     left: 0;
     right: 0;
-    border: 1px solid #d5d5d5;
+    border: 1px solid #e1e1e1;
     line-height: 20px;
+    color: #6f6f6f;
 
+}
+.nav {
+    margin-bottom: 10px;
 }
 
 @media (max-width: 1050px) {
@@ -298,12 +312,17 @@ td {
 
 /* skin.css Style*/
 .upload-drop-zone {
-    color: #ccc;
+    color: #2d2d2d;
     border-style: dashed;
     border-color: #ccc;
     line-height: 50px;
     text-align: center
 }
+.upload-drop-zone.hover {
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed;
+}
+
 .upload-drop-zone.drop {
     color: #222;
     border-color: #222;

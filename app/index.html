@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/css/dropzone.css">
     <link rel="stylesheet" href="css/main.css">
 
 </head>
@@ -97,6 +98,12 @@
                 <li>ACCOUNT</li>
                 <li>USER</li>
                 <li>FRIEND</li>
+                <li class="selected">
+                    <span id="rename_component">NEW COMPONENT</span>
+                    <span id="submit_rename" class="not_displayed">
+                        <input type="text" id="new_name_input" class="form-control" autofocus>
+                    </span>
+                </li>
 
             </ul>
         </div>
@@ -109,7 +116,6 @@
 <div id="trash" class="droppable">
     <span class="glyphicon glyphicon-trash"></span>
 </div>
-
 <!--EDIT PROPERTIES POPUPS-->
 <div class="not_displayed">
     <div id="link_popup_holder">
@@ -144,7 +150,7 @@
                 <div class="panel-body">
 
                     <div class="row">
-                        <div class="col-sm-12"><textarea class="form-control" rows="4"></textarea> </div>
+                        <div class="col-sm-12"><textarea class="form-control" rows="2"></textarea> </div>
                     </div><br/>
                     <button class="apply btn btn-primary pull-right">Apply</button>
                 </div>
@@ -162,24 +168,23 @@
                     <div class="row"><div class="col-sm-3 form-lbl"><h6>Paste link:</h6></div>
                         <div class="col-sm-9"><input type="text" class="form-control"></div>
                     </div><br/>
+
                     <!-- Drop Zone -->
-                    <div class="upload-drop-zone" id="drop-zone"> Or drag here </div><br/>
+                    <div class="upload-drop-zone"> Or drop file here </div><br/>
+
                     <div class="input-group image-preview">
-                        <input placeholder="" type="text" class="form-control image-preview-filename" disabled="disabled" id="image-name">
+                        <input placeholder="Or browse" type="text" class="form-control image-preview-filename" disabled="disabled" id="image-name">
 						<span class="input-group-btn">
 						    <!-- image-preview-clear button -->
 						    <button type="button" class="btn btn-default image-preview-clear" style="display:none;"> <span class="glyphicon glyphicon-remove"></span> Clear </button>
                             <!-- image-preview-input -->
 						    <div class="btn btn-default image-preview-input"> <span class="glyphicon glyphicon-folder-open"></span> <span class="image-preview-input-title">Browse</span>
-                                <input type="file" accept="image/png, image/jpeg, image/gif" name="input-file-preview" id="fileselect"/>
+                                <input type="file" accept="image/*" name="input-file-preview" id="fileselect"/>
                                 <!-- rename it -->
                             </div>
 						    <button type="button" class="apply btn btn-labeled btn-default"> <span class="btn-label"><i class="glyphicon glyphicon-upload"></i> </span>Upload</button>
 						</span>
                     </div>
-                    <!-- /input-group image-preview [TO HERE]-->
-
-
                 </div>
             </div>
         </div>
@@ -265,6 +270,11 @@
         </div>
     </div>
 
+    <div class="tab-content">
+        <div class="tab-pane active" id="1a"></div>
+        <div class="tab-pane" id="2a"></div>
+        <div class="tab-pane" id="3a"></div>
+    </div>
 </div>
 
 
@@ -346,6 +356,7 @@
 
 <script src="js/external/jquery-ui.min.js"></script>
 <script src="js/external/bootstrap.min.js"></script>
+<script src="js/external/parse.min.js"></script>
 <script src="js/ComponentModel.js"></script>
 <script src="js/DisplayElement.js"></script>
 <script src="js/ComponentController.js"></script>

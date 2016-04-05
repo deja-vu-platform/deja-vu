@@ -8,15 +8,15 @@ var getHTML = {
     'link': function(value) {
         return '<a class="link display_component" href="'+value.target+'">'+value.link_text+'</a>';
     },
-    'tab_items': function(value) {
+    'tab_viewer': function(value) {
         var html = '<ul class="nav nav-pills nav-stacked">' +
-            '<li role="presentation" class="active"><a href="#">'+value.tab1.text+'</a></li>' +
-            '<li role="presentation"><a href="#">'+value.tab2.text+'</a></li>' +
-            '<li role="presentation"><a href="#">'+value.tab3.text+'</a></li>' +
+            '<li role="presentation" class="active"><a href="#1a" data-toggle="tab">'+value.tab1.text+'</a></li>' +
+            '<li role="presentation"><a href="#2a" data-toggle="tab">'+value.tab2.text+'</a></li>' +
+            '<li role="presentation"><a href="#3a" data-toggle="tab">'+value.tab3.text+'</a></li>' +
             '</ul>'; //TODO: tab target
         return html;
     },
-    'menu_items': function(value) {
+    'menu': function(value) {
         var html = '<div class="dropdown"> ' +
             '<button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" ' +
             'data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">Menu' +
@@ -29,8 +29,8 @@ var getHTML = {
             '</div>';
         return html;
     },
-    'image_link': function(value) {
-        return html = '';
+    'image': function(value) {
+        return '<img src="'+value.img_src+'">';
     }
 };
 

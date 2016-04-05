@@ -7,6 +7,8 @@ bitmap_old = null;
 bitmap_new = null;
 
 $(function() {
+    Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
+
     clicheComponent = "in jq";
     var grid = $('#grid-container').get(0);
     grid_width = grid.offsetWidth;
@@ -30,6 +32,24 @@ $('#create_component').on('click', function() {
 $('#save_component').on('click', function() {
     w = window.open();
     w.document.body.innerHTML='<p><textarea style="width:95%; height:95%">'+JSON.stringify(clicheComponent, null, '\t')+'</textarea></p>';
+});
+
+$('#rename_component').on('click', function() {
+    $('#submit_rename').removeClass('not_displayed');
+    $(this).addClass('not_displayed');
+    $('#new_name_input').focus();
+});
+
+$('#new_name_input').on('keypress', function(event) {
+    if ( event.which == 13 ) {
+        event.preventDefault();
+        $('#rename_component').removeClass('not_displayed');
+        $('#submit_rename').addClass('not_displayed');
+
+        $('#rename_component').text($(this).val());
+        clicheComponent.meta.name = $(this).val();
+    }
+
 });
 
 
@@ -102,13 +122,14 @@ function resizeCell(cell, grid_width, grid_height, num_rows, num_cols) {
 function InitClicheComponent(isDefault) {
     var name, version, author;
     if (isDefault) {
-        name = "New Component";
+        name = "NEW COMPONENT";
         version = "0.0.1";
         author = "Unknown";
     } else {
         name = $('#component_name').val();
         version = $('#component_version').val();
         author = $('#component_author').val();
+        $('#rename_component').text($('#component_name').val());
     }
     clicheComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
 }
@@ -130,43 +151,52 @@ function updateComponentAt(cell_id) {
     var row = cell_id.substring(4,5);
     var col = cell_id.substring(5,6);
     var type = $('#'+cell_id).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    var component, value;
+    var value;
+    var isUpload = false;
     var inputs = Array.prototype.slice.call(
         $('#'+cell_id).get(0).getElementsByTagName('input'), 0);
 
     if (type==='label') {
-        component = "label";
         value = $('#'+cell_id).get(0).getElementsByTagName('textarea')[0].value;
     } else if (type==='link') {
-        component = "link";
         value = {
             link_text: inputs[0].value,
             target: inputs[1].value
         }
     } else if (type==='tab_viewer') {
-        component = "tab_items";
         value = {
             "tab1": { text: inputs[0].value, target: inputs[1].value},
             "tab2": { text: inputs[2].value, target: inputs[3].value},
             "tab3": { text: inputs[4].value, target: inputs[5].value}
         }
     } else if (type==='menu') {
-        component = "menu_items";
         value = {
             "menu_item1": { text: inputs[0].value, target: inputs[1].value},
             "menu_item2": { text: inputs[2].value, target: inputs[3].value},
             "menu_item3": { text: inputs[4].value, target: inputs[5].value}
         }
     } else if (type==='image') {
-        component = "image_link";
-        value = {
-            img_src: inputs[0].value
+        value = {};
+
+        if (files.length > 0) { // if there's a file to upload
+            var file = files[0];
+            var parseFile = new Parse.File(file.name, file);
+            isUpload = true;
+            parseFile.save()
+                .then(function (savedFile) { // save was successful
+                    value.img_src = savedFile.url();
+                    Display(cell_id, getHTML[type](value));
+                    clicheComponent.components[row][col].components[type] = value;
+                });
+        } else { // pasted link to image
+            value.img_src = inputs[0].value;
         }
     }
 
-    Display(cell_id, getHTML[component](value));
-
-    clicheComponent.components[row][col].components[component] = value;
+    if (!isUpload) {
+        Display(cell_id, getHTML[type](value));
+        clicheComponent.components[row][col].components[type] = value;
+    }
 }
 
 
@@ -197,4 +227,32 @@ function findDeletedCoord() {
         }
     }
     return result;
+}
+
+
+/*
+ IMAGE UPLOAD HELPERS
+ */
+// file drag hover
+function FileDragHover(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    if (e.type=="dragover") {
+        $(e.target).addClass("hover");
+    } else if (e.type == "dragleave") {
+        $(e.target).removeClass("hover");
+    }
+}
+// file selection
+function FileSelectHandler(e) {
+
+    FileDragHover(e); // cancel event and hover styling
+
+    files = e.target.files || e.dataTransfer.files;
+
+    $(e.target).text("Got file: "+truncate(files[0].name,30));
+}
+
+function truncate(str,len) {
+    return str.substring(0,len)+(str.length>len ? "... "+str.substring(str.length-4) : "");
 }
