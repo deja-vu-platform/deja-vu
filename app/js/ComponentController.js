@@ -135,7 +135,7 @@ function updateComponentAt(cell_id) {
         $('#'+cell_id).get(0).getElementsByTagName('input'), 0);
 
     if (type==='label') {
-        component = "text";
+        component = "label";
         value = $('#'+cell_id).get(0).getElementsByTagName('textarea')[0].value;
     } else if (type==='link') {
         component = "link";
@@ -158,11 +158,13 @@ function updateComponentAt(cell_id) {
             "menu_item3": { text: inputs[4].value, target: inputs[5].value}
         }
     } else if (type==='image') {
-        component = "link";
+        component = "image_link";
         value = {
             img_src: inputs[0].value
         }
     }
+
+    Display(cell_id, getHTML[component](value));
 
     clicheComponent.components[row][col].components[component] = value;
 }

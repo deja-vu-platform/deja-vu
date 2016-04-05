@@ -8,6 +8,33 @@
  */
 
 /*===================================================
+                   BASE STYLES
+===================================================*/
+html {
+    color: #222;
+    font-size: 1em;
+    font-weight: 200;
+    margin: 0px;
+    line-height: 1.4;
+}
+body { margin: 0px; min-width:600px; }
+ul { list-style-type: none; }
+li { list-style-type: none; }
+/*
+ * Remove the gap between audio, canvas, iframes,
+ * images, videos and the bottom of their containers:
+ */
+audio, canvas, iframe, img, svg, video { vertical-align: middle; }
+/* Remove default fieldset styles. */
+fieldset { border: 0; margin: 0; padding: 0; }
+.clearfix:before, .clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+.clearfix:after { clear: both; }
+
+
+/*===================================================
                    MENUBAR
 ===================================================*/
 .menubar {
@@ -305,3 +332,23 @@ td {
     margin-left:2px;
 }
 
+
+
+
+/*===================================================
+                   COMPONENTS
+===================================================*/
+.display_component {
+    font-weight: 300;
+    line-height: 1.4;
+}
+
+.label {
+    font-size: 20px;
+    color: black;
+}
+
+.link {
+    font-size: 20px;
+
+}
