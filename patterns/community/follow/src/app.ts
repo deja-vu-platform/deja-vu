@@ -26,6 +26,21 @@ const user_type = new graphql.GraphQLObjectType({
         return mean.db.collection("users")
           .find({username: {$nin: nin}}).toArray();
       }
+    },
+    followed_by: {
+      "type": graphql.GraphQLBoolean,
+      args: {
+        username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      },
+      resolve: (user, {username}) => {
+        return Validation.userExists(username)
+          .then(_ => {
+            return mean.db.collection("users")
+              .findOne({
+                $and: [{username: username}, {follows: user.username}]
+              });
+          });
+      }
     }
   })
 });
@@ -44,7 +59,14 @@ const schema = new graphql.GraphQLSchema({
           console.log(`getting ${username}`);
           return mean.db.collection("users").findOne({username: username});
         }
-      }
+      },
+      users: {
+        "type": new graphql.GraphQLList(user_type),
+        resolve: (root, _) => {
+          console.log(`getting users`);
+          return mean.db.collection("users").find().toArray();
+        }
+      },
     }
   }),
 
@@ -67,6 +89,26 @@ const schema = new graphql.GraphQLSchema({
           console.log(`${username} ${target}`);
           return users.updateOne(
             {username: username}, {$addToSet: {follows: target}}).then(
+              _ => report_update(username));
+        })
+      },
+
+      unfollow: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (_, {username, target}) => Promise.all([
+          Validation.userExists(username),
+          Validation.userExists(target)
+        ]).then(_ => {
+          if (username === target) return;
+          console.log("all good");
+          const users = mean.db.collection("users");
+          console.log(`${username} ${target}`);
+          return users.updateOne(
+            {username: username}, {$pull: {follows: target}}).then(
               _ => report_update(username));
         })
       },

@@ -1,0 +1,10 @@
+<!-- EditFollow(User) -->
+<div>
+  <ul>
+    <li *ngFor="#user of users">
+      {{user.username}}
+      <button *ngIf="!user.followed_by" (click)="follow(user)">Follow</button>
+      <button *ngIf="user.followed_by" (click)="unfollow(user)">Unfollow</button>
+    </li>
+  </ul>
+</div>
