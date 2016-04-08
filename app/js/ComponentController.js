@@ -144,7 +144,7 @@ function addComponent(widget, cell_id) {
     var span = document.createElement('span');
     span.innerHTML=widget[0].outerHTML;
     var type = span.firstElementChild.getAttribute('name');
-    var component = new BaseComponent(type, {text: null, link: null, tab_items: null, menu_items: null });
+    var component = new BaseComponent(type, null);
     clicheComponent.addComponent(component, row, col);
 }
 
@@ -198,6 +198,7 @@ function updateComponentAt(cell_id) {
 
     if (!isUpload) {
         Display(cell_id, getHTML[type](value));
+        clicheComponent.components[row][col].components={};
         clicheComponent.components[row][col].components[type] = value;
     }
 }
