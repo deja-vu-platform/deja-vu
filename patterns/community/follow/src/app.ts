@@ -164,7 +164,7 @@ namespace Validation {
 }
 
 
-mean = new mean_mod.Mean("friend", {
+mean = new mean_mod.Mean("follow", {
   graphql_schema: schema,
   init_db: (db, debug) => {
     db.createCollection("users", (err, users) => {
