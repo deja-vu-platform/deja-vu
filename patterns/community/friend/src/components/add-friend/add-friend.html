@@ -1,9 +1,10 @@
 <!-- AddFriends(User) -->
 <div class="container">
-  <ul>
-    <li *ngFor="#potentialFriend of potentialFriends">
+  <ul class="row">
+    <li *ngFor="#potentialFriend of potentialFriends" class="col-md-4">
       {{potentialFriend.username}}
-      <button (click)="addFriend(potentialFriend)" class="btn btn-default btn-sm">Add Friend</button>
+      <button (click)="addFriend(potentialFriend)"
+       class="btn btn-default btn-sm pull-right">Add Friend</button>
     </li>
   </ul>
 </div>
