@@ -1,7 +1,7 @@
 module.exports = function(grunt, optPatterns) {
   optPatterns = (typeof optPatterns === "undefined") ? [] : optPatterns;
   const patternsSrc = optPatterns.map(function(p) {
-        return "node_modules/" + p + "/lib/components/**/*.{js,html}";
+        return "node_modules/" + p + "/lib/components/**/*.{js,html,css}";
   });
   var deps = [
     "node_modules/angular2/bundles/angular2-polyfills.js",
@@ -91,7 +91,7 @@ module.exports = function(grunt, optPatterns) {
           {
             expand: true,
             cwd: "src",
-            src: ["components/**/*.html", "dev/**/*.html"],
+            src: ["components/**/*.{html,css}", "dev/**/*.{html,css}"],
             dest: "dist/public"
           },
           {
@@ -109,7 +109,7 @@ module.exports = function(grunt, optPatterns) {
           {
             expand: true,
             src: optPatterns.map(function(p) {
-              return "node_modules/" + p + "/lib/components/**/*.html";
+              return "node_modules/" + p + "/lib/components/**/*.{html,css}";
             }),
             dest: "dist/public/components/",
             rename: function(dst, src) {
@@ -123,7 +123,7 @@ module.exports = function(grunt, optPatterns) {
           {
             expand: true,
             cwd: "src",
-            src: ["components/**/*.html"],
+            src: ["components/**/*.{html,css}"],
             dest: "lib"
           }
         ]

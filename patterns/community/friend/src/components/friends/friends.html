@@ -1,9 +1,9 @@
 <!-- Friends(User) -->
-<div>
+<div class="container">
   <ul>
     <li *ngFor="#friend of friends">
       {{friend.username}}
-      <button (click)="unfriend(friend)">Unfriend</button>
+      <button (click)="unfriend(friend)" class="btn btn-default btn-sm">Unfriend</button>
     </li>
   </ul>
 </div>

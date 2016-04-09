@@ -8,6 +8,7 @@ import {FriendService} from "../shared/friend";
 @Component({
   selector: "add-friend",
   templateUrl: "./components/add-friend/add-friend.html",
+  styleUrls: ["./components/add-friend/add-friend.css"],
   providers: [FriendService, HTTP_PROVIDERS],
   inputs: ["username"]
 })
