@@ -25,7 +25,9 @@ export class SearchComponent {
 
   private _search(query: string) {
     return this._graphQlService.get(`{
-      items(query: "${query}")
+      items(query: "${query}") {
+        name
+      }
     }`).map(data => data.items);
   }
 }
