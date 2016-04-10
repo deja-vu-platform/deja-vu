@@ -1,11 +1,19 @@
 <!-- Register --> 
-<div>
-  <form (ngSubmit)="onSubmit()" #signInForm="ngForm">
-    <input type="text" required
-     [(ngModel)]="user.username" ngControl="username" placeholder="Username"/>
-    <input type="password" required
-     [(ngModel)]="user.password" ngControl="password" placeholder="Password"/>
-    <button type="submit"
-     [disabled]="!signInForm.form.valid">Register</button>
+<div class="container">
+  <form (ngSubmit)="onSubmit()" #signInForm="ngForm" class="form-horizontal">
+    <div class="form-group">
+      <label class="sr-only" for="username">Username</label>
+      <input type="text" required
+      [(ngModel)]="user.username" ngControl="username" placeholder="Username"/>
+    </div>
+    <div class="form-group">
+      <label class="sr-only" for="password">Password</label>
+      <input type="password" required
+       [(ngModel)]="user.password" ngControl="password" placeholder="Password"/>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-default bt-sm"
+       [disabled]="!signInForm.form.valid">Register</button>
+    </div>
   </form>
 </div>
