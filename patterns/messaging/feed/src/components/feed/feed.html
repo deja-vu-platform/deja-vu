@@ -1,9 +1,13 @@
 <!-- Feed(Name) -->
-<div>
-  <ul *ngIf="feed && feed.length > 0">
-    <li *ngFor="#feedItem of feed">
-      <publisher-content [item]="feedItem.content"></publisher-content>
-      by <publisher-name [item]="feedItem.publisher.name"></publisher-name>
+<div class="container">
+  <ul *ngIf="feed && feed.length > 0" class="row">
+    <li *ngFor="#feedItem of feed" class="col-md-12">
+      <div class="row">
+        <publisher-content [item]="feedItem.content"></publisher-content>
+      </div>
+      <div class="row">
+        by <publisher-name [item]="feedItem.publisher.name"></publisher-name>
+      </div>
     </li>
   </ul>
   <div *ngIf="!feed || feed.length == 0">

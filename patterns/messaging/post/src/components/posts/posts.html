@@ -1,9 +1,13 @@
 <!-- Posts(User) -->
-<div>
-  <ul *ngIf="posts && posts.length > 0">
+<div class="container">
+  <ul *ngIf="posts && posts.length > 0" class="row">
     <li *ngFor="#post of posts">
-      {{post.content}}
-      by {{username}}
+      <div class="row">
+        {{post.content}}
+      </div>
+      <div class="row">
+        by {{username}}
+      </div>
     </li>
   </ul>
   <div *ngIf="!posts || posts.length == 0">

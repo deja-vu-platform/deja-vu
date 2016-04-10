@@ -9,6 +9,7 @@ import {FeedService, FeedItem} from "../shared/feed";
 @Component({
   selector: "feed",
   templateUrl: "./components/feed/feed.html",
+  styleUrls: ["./components/feed/feed.css"],
   providers: [FeedService, HTTP_PROVIDERS],
   inputs: ["sub"]
 })
