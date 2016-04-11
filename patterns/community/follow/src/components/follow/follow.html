@@ -2,7 +2,7 @@
 <div class="container">
   <ul class="row">
     <li *ngFor="#potentialFollow of potentialFollows" class="col-md-4">
-      {{potentialFollow.username}}
+      {{potentialFollow.name}}
       <button (click)="follow(potentialFollow)"
        class="btn btn-default btn-sm pull-right">Follow</button>
     </li>

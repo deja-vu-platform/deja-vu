@@ -6,9 +6,9 @@ import {EditFollowComponent} from "../components/edit-follow/edit-follow";
   selector: "follow-pattern",
   template: `
     <h1>Follow(User)</h1>
-    <follow username="benbitdiddle">Loading...</follow>
+    <follow name="benbitdiddle">Loading...</follow>
     <h1>EditFollow(User)</h1>
-    <edit-follow username="benbitdiddle">Loading...</edit-follow>
+    <edit-follow name="benbitdiddle">Loading...</edit-follow>
   `,
   directives: [FollowComponent, EditFollowComponent]
 })

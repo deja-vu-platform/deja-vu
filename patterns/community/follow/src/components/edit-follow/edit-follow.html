@@ -1,11 +1,11 @@
 <!-- EditFollow(User) -->
 <div class="container">
   <ul class="row">
-    <li *ngFor="#user of users" class="col-md-4">
-      {{user.username}}
-      <button *ngIf="!user.followed_by" (click)="follow(user)"
+    <li *ngFor="#target of targets" class="col-md-4">
+      {{target.name}}
+      <button *ngIf="!target.followed_by" (click)="follow(target)"
        class="btn btn-default btn-sm pull-right">Follow</button>
-     <button *ngIf="user.followed_by" (click)="unfollow(user)"
+     <button *ngIf="target.followed_by" (click)="unfollow(target)"
        class="btn btn-default btn-sm pull-right">Unfollow</button>
     </li>
   </ul>

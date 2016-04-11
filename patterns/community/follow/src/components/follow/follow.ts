@@ -2,7 +2,7 @@ import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 import {Observable} from "rxjs/observable";
 
-import {User, Username} from "../../shared/user";
+import {Target, Name} from "../../shared/data";
 import {GraphQlService} from "../shared/graphql";
 
 
@@ -10,45 +10,45 @@ import {GraphQlService} from "../shared/graphql";
   selector: "follow",
   templateUrl: "./components/follow/follow.html",
   providers: [GraphQlService, HTTP_PROVIDERS],
-  inputs: ["username"]
+  inputs: ["name"]
 })
 export class FollowComponent {
-  potentialFollows: User[];
-  private _username: Username;
+  potentialFollows: Target[];
+  private _name: Name;
 
   constructor(private _graphQlService: GraphQlService) {}
 
-  follow(user: User) {
-    console.log(`following ${user.username}`);
-    this._follow(this._username, user.username).subscribe(res => undefined);
+  follow(target: Target) {
+    console.log(`following ${target.name}`);
+    this._follow(this._name, target.name).subscribe(res => undefined);
   }
 
-  get username() {
-    return this._username;
+  get name() {
+    return this._name;
   }
 
-  set username(username: Username) {
-    if (!username) return;
-    console.log("got username " + username);
-    this._username = username;
-    this._getPotentialFollows(this._username).subscribe(
+  set name(name: Name) {
+    if (!name) return;
+    console.log("got name " + name);
+    this._name = name;
+    this._getPotentialFollows(this._name).subscribe(
         potentialFollows => this.potentialFollows = potentialFollows);
   }
 
-  private _getPotentialFollows(username: Username): Observable<User[]> {
+  private _getPotentialFollows(source: Name): Observable<Target[]> {
     return this._graphQlService.get(`{
-      user(username: "${username}") {
-        username,
+      source(name: "${source}") {
+        name,
         potentialFollows {
-          username
+          name
         } 
       }
-    }`).map(data => data.user.potentialFollows);
+    }`).map(data => data.source.potentialFollows);
   }
 
-  private _follow(username: Username, target: Username): any {
+  private _follow(source: Name, target: Name): any {
     return this._graphQlService.post(`{
-      follow(username: "${username}", target: "${target}")
+      follow(source: "${source}", target: "${target}")
     }`);
   }
 }

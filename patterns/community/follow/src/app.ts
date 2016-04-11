@@ -7,39 +7,48 @@ const mean_mod = require("mean");
 
 let mean;
 
-const user_type = new graphql.GraphQLObjectType({
-  name: "User",
+
+const target_type = new graphql.GraphQLObjectType({
+  name: "Target",
   fields: () => ({
-    username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    follows: {
-      "type": new graphql.GraphQLList(user_type),
-      resolve: user => mean.db.collection("users").find(
-          {username: {$in: user.follows}}).toArray()
-    },
-    potentialFollows: {
-      "type": new graphql.GraphQLList(user_type),
-      resolve: user => {
-        let nin = [user.username];
-        if (user.follows !== undefined) {
-          nin = nin.concat(user.follows);
-        }
-        return mean.db.collection("users")
-          .find({username: {$nin: nin}}).toArray();
-      }
-    },
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     followed_by: {
       "type": graphql.GraphQLBoolean,
       args: {
-        username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
       },
-      resolve: (user, {username}) => {
-        return Validation.userExists(username)
+      resolve: (target, {name}) => {
+        return Validation.sourceExists(name)
           .then(_ => {
-            return mean.db.collection("users")
+            return mean.db.collection("sources")
               .findOne({
-                $and: [{username: username}, {follows: user.username}]
+                $and: [{name: name}, {follows: target.name}]
               });
           });
+      }
+    }
+  })
+});
+
+
+const source_type = new graphql.GraphQLObjectType({
+  name: "Source",
+  fields: () => ({
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    follows: {
+      "type": new graphql.GraphQLList(target_type),
+      resolve: source => mean.db.collection("sources").find(
+          {name: {$in: source.follows}}).toArray()
+    },
+    potentialFollows: {
+      "type": new graphql.GraphQLList(target_type),
+      resolve: source => {
+        let nin = [source.name];
+        if (source.follows !== undefined) {
+          nin = nin.concat(source.follows);
+        }
+        return mean.db.collection("sources")
+          .find({name: {$nin: nin}}).toArray();
       }
     }
   })
@@ -50,23 +59,30 @@ const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
     fields: {
-      user: {
-        "type": user_type,
+      source: {
+        "type": source_type,
         args: {
-          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, {username}) => {
-          console.log(`getting ${username}`);
-          return mean.db.collection("users").findOne({username: username});
+        resolve: (root, {name}) => {
+          console.log(`getting ${name}`);
+          return mean.db.collection("sources").findOne({name: name});
         }
       },
-      users: {
-        "type": new graphql.GraphQLList(user_type),
+      sources: {
+        "type": new graphql.GraphQLList(source_type),
         resolve: (root, _) => {
-          console.log(`getting users`);
-          return mean.db.collection("users").find().toArray();
+          console.log(`getting sources`);
+          return mean.db.collection("sources").find().toArray();
         }
       },
+      targets: {
+        "type": new graphql.GraphQLList(target_type),
+        resolve: (root, _) => {
+          console.log(`getting targets`);
+          return mean.db.collection("targets").find().toArray();
+        }
+      }
     }
   }),
 
@@ -76,67 +92,82 @@ const schema = new graphql.GraphQLSchema({
       follow: {
         "type": graphql.GraphQLBoolean,
         args: {
-          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          source: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (_, {username, target}) => Promise.all([
-          Validation.userExists(username),
-          Validation.userExists(target)
+        resolve: (_, {source, target}) => Promise.all([
+          Validation.sourceExists(source),
+          Validation.targetExists(target)
         ]).then(_ => {
-          if (username === target) return;
+          if (source === target) return;
           console.log("all good");
-          const users = mean.db.collection("users");
-          console.log(`${username} ${target}`);
-          return users.updateOne(
-            {username: username}, {$addToSet: {follows: target}}).then(
-              _ => report_update(username));
+          const sources = mean.db.collection("sources");
+          console.log(`${source} ${target}`);
+          return sources.updateOne(
+            {name: source}, {$addToSet: {follows: target}}).then(
+              _ => report_update(source));
         })
       },
 
       unfollow: {
         "type": graphql.GraphQLBoolean,
         args: {
-          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          source: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (_, {username, target}) => Promise.all([
-          Validation.userExists(username),
-          Validation.userExists(target)
+        resolve: (_, {source, target}) => Promise.all([
+          Validation.sourceExists(source),
+          Validation.targetExists(target)
         ]).then(_ => {
-          if (username === target) return;
+          if (source === target) return;
           console.log("all good");
-          const users = mean.db.collection("users");
-          console.log(`${username} ${target}`);
-          return users.updateOne(
-            {username: username}, {$pull: {follows: target}}).then(
-              _ => report_update(username));
+          const sources = mean.db.collection("sources");
+          console.log(`${source} ${target}`);
+          return sources.updateOne(
+            {name: source}, {$pull: {follows: target}}).then(
+              _ => report_update(source));
         })
       },
 
-      _dv_new_user: {
+      _dv_new_source: {
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
         resolve: (root, args) => {
-          const user = JSON.parse(args.atom);
-          console.log("got new user from bus " + JSON.stringify(user));
-          user["atom_id"] = args.atom_id;
-          return mean.db.collection("users").insertOne(user)
+          const source = JSON.parse(args.atom);
+          console.log("got new source from bus " + JSON.stringify(source));
+          source["atom_id"] = args.atom_id;
+          return mean.db.collection("sources").insertOne(source)
             .then(res => res.insertedCount === 1);
         }
       },
-      _dv_update_user: {
+      _dv_update_source: {
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (root, args) => {
-          const user = JSON.parse(args.atom);
-          console.log("got up user from bus " + JSON.stringify(user));
+          const source = JSON.parse(args.atom);
+          console.log("got up source from bus " + JSON.stringify(source));
           return true;
+        }
+      },
+
+      _dv_new_target: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, args) => {
+          const target = JSON.parse(args.atom);
+          console.log("got new target from bus " + JSON.stringify(target));
+          target["atom_id"] = args.atom_id;
+          return mean.db.collection("targets").insertOne(target)
+            .then(res => res.insertedCount === 1);
         }
       }
     }
@@ -144,21 +175,29 @@ const schema = new graphql.GraphQLSchema({
 });
 
 
-function report_update(username) {
-  console.log("reporting update of " + username);
-  const users = mean.db.collection("users");
-  return users.findOne({username: username}).then(user => {
-    console.log(JSON.stringify(user));
-    return mean.composer.update_atom("User", user.username, user);
+function report_update(name) {
+  console.log("reporting update of " + name);
+  const sources = mean.db.collection("sources");
+  return sources.findOne({name: name}).then(source => {
+    console.log(JSON.stringify(source));
+    return mean.composer.update_atom("Source", source.name, source);
   });
 }
 
 namespace Validation {
-  export function userExists(username) {
-    return mean.db.collection("users")
-      .findOne({username: username}, {_id: 1})
-      .then(user => {
-        if (!user) throw new Error(`${username} doesn't exist`);
+  export function sourceExists(name) {
+    return _exists(name, "sources");
+  }
+
+  export function targetExists(name) {
+    return _exists(name, "targets");
+  }
+
+  function _exists(name, col) {
+    return mean.db.collection(col)
+      .findOne({name: name}, {_id: 1})
+      .then(source => {
+        if (!source) throw new Error(`${name} doesn't exist`);
       });
   }
 }
@@ -167,20 +206,39 @@ namespace Validation {
 mean = new mean_mod.Mean("follow", {
   graphql_schema: schema,
   init_db: (db, debug) => {
-    db.createCollection("users", (err, users) => {
+    db.createCollection("sources", (err, sources) => {
       if (err) throw err;
       if (debug) {
-        console.log("Resetting users collection");
-        users.remove((err, remove_count) => {
+        console.log("Resetting sources collection");
+        sources.remove((err, remove_count) => {
           if (err) throw err;
           console.log(`Removed ${remove_count} elems`);
-          users.insertMany([
-            {username: "benbitdiddle", follows: []},
-            {username: "alyssaphacker", follows: []},
-            {username: "eva", follows: []},
-            {username: "louis", follows: []},
-            {username: "cydfect", follows: []},
-            {username: "lem", follows: []}
+          sources.insertMany([
+            {name: "benbitdiddle", follows: []},
+            {name: "alyssaphacker", follows: []},
+            {name: "eva", follows: []},
+            {name: "louis", follows: []},
+            {name: "cydfect", follows: []},
+            {name: "lem", follows: []}
+          ], (err, res) => { if (err) throw err; });
+        });
+      }
+    });
+
+    db.createCollection("targets", (err, sources) => {
+      if (err) throw err;
+      if (debug) {
+        console.log("Resetting targets collection");
+        sources.remove((err, remove_count) => {
+          if (err) throw err;
+          console.log(`Removed ${remove_count} elems`);
+          sources.insertMany([
+            {name: "benbitdiddle"},
+            {name: "alyssaphacker"},
+            {name: "eva"},
+            {name: "louis"},
+            {name: "cydfect"},
+            {name: "lem"}
           ], (err, res) => { if (err) throw err; });
         });
       }
