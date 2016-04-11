@@ -8,10 +8,11 @@ import "rxjs/add/operator/map";
 
 
 const APIS = {
-  auth: "@@dv-access-auth",
-  follow: "@@dv-community-follow",
-  post: "@@dv-messaging-post",
-  feed: "@@dv-messaging-feed"
+  auth: "@@dv-access-auth-1",
+  follow_1: "@@dv-community-follow-1",
+  follow_2: "@@dv-community-follow-2",
+  post: "@@dv-messaging-post-1",
+  feed: "@@dv-messaging-feed-1"
 };
 
 @Component({
@@ -32,7 +33,8 @@ class PublisherNameComponent {}
 bootstrap(
   BookmarkComponent, [
     provide("auth.api", {useValue: APIS.auth}),
-    provide("follow.api", {useValue: APIS.follow}),
+    provide("follow_1.api", {useValue: APIS.follow_1}),
+    provide("follow_2.api", {useValue: APIS.follow_2}),
     provide("post.api", {useValue: APIS.post}),
     provide("feed.api", {useValue: APIS.feed}),
     ROUTER_PROVIDERS,

@@ -13,77 +13,127 @@ mean.app.use("/*", (req, res) => {
 
 setTimeout(init_composer, 10 * 1000);  // hack..
 
+/*
+ * - Users create posts and attach topics to them
+ * - Users can follow other users or topics
+ * - Users get a feed with all the posts of the users or topics they follow
+ */
 function init_composer() {
   console.log("Creating type bonds");
   mean.composer.config(`{
     newTypeBond(types: [
-      {name: "User", element: "friend", loc: "@@dv-community-friend"},
-      {name: "User", element: "auth", loc: "@@dv-access-auth"},
-      {name: "User", element: "post", loc: "@@dv-messaging-post"},
-      {name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed"},
-      {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed"}
+      {name: "Source", element: "follow", loc: "@@dv-community-follow-1"},
+      {name: "Target", element: "follow", loc: "@@dv-community-follow-1"},
+      {name: "Source", element: "follow", loc: "@@dv-community-follow-2"},
+      {name: "User", element: "auth", loc: "@@dv-access-auth-1"},
+      {name: "User", element: "post", loc: "@@dv-messaging-post-1"},
+      {name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed-1"},
+      {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed-1"}
     ])
   }`);
 
-  /*
-  // this doesn't work...type bonds must always be between root types
   mean.composer.config(`{
     newTypeBond(types: [
-      {name: "Post", element: "post", loc: "@@dv-messaging-post"},
-      {name: "Content", element: "feed", loc: "@@dv-messaging-feed"}
+      {name: "Item", element: "label", loc: "@@dv-organization-label-1"},
+      {name: "Post", element: "post", loc: "@@dv-messaging-post-1"}
     ])
   }`);
-  */
 
-  // can only have field bonds if the types (domain) are already bonded
-  // the codomain must have the same type (maybe not?)
+  mean.composer.config(`{
+    newTypeBond(types: [
+      {name: "Label", element: "label", loc: "@@dv-organization-label-1"},
+      {name: "Target", element: "follow", loc: "@@dv-community-follow-2"}
+    ])
+  }`);
+
+  mean.composer.config(`{
+    newTypeBond(types: [
+      {name: "Target", element: "follow", loc: "@@dv-community-follow-2"},
+      {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed-1"}
+    ])
+  }`);
+
+
   console.log("Creating field bonds");
   mean.composer.config(`{
     newFieldBond(fields: [
       {
         name: "published",
-        type: {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed"}
+        type: {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed-1"}
       },
       {
         name: "posts",
-        type: {name: "User", element: "post", loc: "@@dv-messaging-post"}
+        type: {name: "User", element: "post", loc: "@@dv-messaging-post-1"}
       }
     ])
   }`);
   mean.composer.config(`{
     newFieldBond(fields: [
       {
-        name: "friends",
-        type: {name: "User", element: "friend", loc: "@@dv-community-friend"}
+        name: "follows",
+        type: {
+          name: "Source", element: "follow", loc: "@@dv-community-follow-1"
+        }
+      },
+      {
+        name: "follows",
+        type: {
+          name: "Source", element: "follow", loc: "@@dv-community-follow-2"
+        }
       },
       {
         name: "subscriptions",
-        type: {name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed"}
+        type: {
+          name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed-1"
+        }
       }
     ])
   }`);
 
+
   mean.composer.config(`{
     newFieldBond(fields: [
       {
-        name: "username",
-        type: {name: "User", element: "friend", loc: "@@dv-community-friend"}
-      },
-      {
-        name: "username",
-        type: {name: "User", element: "auth", loc: "@@dv-access-auth"}
-      },
-      {
-        name: "username",
-        type: {name: "User", element: "post", loc: "@@dv-messaging-post"}
+        name: "name",
+        type: {
+          name: "Source", element: "follow", loc: "@@dv-community-follow-1"
+        }
       },
       {
         name: "name",
-        type: {name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed"}
+        type: {
+          name: "Target", element: "follow", loc: "@@dv-community-follow-1"
+        }
       },
       {
         name: "name",
-        type: {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed"}
+        type: {
+          name: "Source", element: "follow", loc: "@@dv-community-follow-2"
+        }
+      },
+      {
+        name: "name",
+        type: {
+          name: "Target", element: "follow", loc: "@@dv-community-follow-2"
+        }
+      },
+      {
+        name: "username",
+        type: {name: "User", element: "auth", loc: "@@dv-access-auth-1"}
+      },
+      {
+        name: "username",
+        type: {name: "User", element: "post", loc: "@@dv-messaging-post-1"}
+      },
+      {
+        name: "name",
+        type: {
+          name: "Subscriber", element: "feed", loc: "@@dv-messaging-feed-1"
+        }
+      },
+      {
+        name: "name",
+        type: {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed-1"}
       }
     ])
   }`);
