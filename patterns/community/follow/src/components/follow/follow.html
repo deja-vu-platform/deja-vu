@@ -1,9 +1,10 @@
 <!-- Follow(User) -->
-<div>
-  <ul>
-    <li *ngFor="#potentialFollow of potentialFollows">
+<div class="container">
+  <ul class="row">
+    <li *ngFor="#potentialFollow of potentialFollows" class="col-md-4">
       {{potentialFollow.username}}
-      <button (click)="follow(potentialFollow)">Follow</button>
+      <button (click)="follow(potentialFollow)"
+       class="btn btn-default btn-sm pull-right">Follow</button>
     </li>
   </ul>
 </div>
