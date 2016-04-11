@@ -110,8 +110,23 @@
     </div>
 </div>
 
+<!--<div id="outer-container">-->
+    <!--<div id="grid-container" class="zoomTarget"></div>-->
+    <!--<div class="grid-container2 zoomTarget"></div>-->
+    <!--<div class="grid-container2 zoomTarget"></div>-->
+    <!--<div class="grid-container2 zoomTarget"></div>-->
+<!--</div>-->
 
-<div id="grid-container"></div>
+<div id="outer-container">
+    <div id="viewport">
+        <div class="zoomContainer">
+            <div id="grid-container" class="zoomTarget"></div>
+            <div class="grid-container2 zoomTarget"></div>
+            <div class="grid-container2 zoomTarget"></div>
+            <div class="grid-container2 zoomTarget"></div>
+        </div>
+    </div>
+</div>
 
 <div id="trash" class="droppable">
     <span class="glyphicon glyphicon-trash"></span>
@@ -350,9 +365,9 @@
 </div><!-- /.modal -->
 
 
-<!--<script src="../main.js"></script>-->
-<!--<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>-->
-<script src="js/external/jquery.min.js"></script>
+<script src="../main.js"></script>
+<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
+<!--<script src="js/external/jquery.min.js"></script>-->
 
 <script src="js/external/jquery-ui.min.js"></script>
 <script src="js/external/bootstrap.min.js"></script>
@@ -361,5 +376,6 @@
 <script src="js/ComponentView.js"></script>
 <script src="js/ComponentController.js"></script>
 <script src="js/index.js"></script>
+<script src="js/external/zoomooz.min.js"></script>
 </body>
 </html>

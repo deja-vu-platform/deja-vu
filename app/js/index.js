@@ -116,7 +116,9 @@ function resetDroppability() {
             var component_copy = clicheComponent.components[del_row][del_col];
             clicheComponent.components[new_row][new_col].components = component_copy.components;
 
-            Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
+            if (component_copy.components != null) {
+                Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
+            }
         }
         delete clicheComponent.components[del_row][del_col];
         cell.removeChild(cell.firstChild);

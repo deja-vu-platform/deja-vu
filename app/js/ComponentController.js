@@ -34,6 +34,7 @@ $('#save_component').on('click', function() {
     w.document.body.innerHTML='<p><textarea style="width:95%; height:95%">'+JSON.stringify(clicheComponent, null, '\t')+'</textarea></p>';
 });
 
+/*
 $('#rename_component').on('click', function() {
     $('#submit_rename').removeClass('not_displayed');
     $(this).addClass('not_displayed');
@@ -45,12 +46,11 @@ $('#new_name_input').on('keypress', function(event) {
         event.preventDefault();
         $('#rename_component').removeClass('not_displayed');
         $('#submit_rename').addClass('not_displayed');
-
         $('#rename_component').text($(this).val());
         clicheComponent.meta.name = $(this).val();
     }
-
 });
+*/
 
 
 /**
@@ -114,9 +114,10 @@ function createTable(grid_width, grid_height, isDefault) {
  * @param num_cols
  */
 function resizeCell(cell, grid_width, grid_height, num_rows, num_cols) {
-    var cell_width = Math.floor((grid_width/num_cols)) - 10;
-    var cell_height = Math.floor((grid_height/num_rows)) - 10;
-    cell.setAttribute('style', 'width: '+cell_width+'px; height: '+cell_height+'px;');
+    var cell_width = Math.floor((grid_width/num_cols)) - 15;
+    var cell_height = Math.floor((grid_height/num_rows)) - 15;
+    $(cell).css('width', cell_width).css('height', cell_height);
+    //cell.setAttribute('style', 'width: '+cell_width+'px; height: '+cell_height+'px;');
     // Resize tooltip
     var tooltip_width = Number($('.tooltip').css('width').substring(0,3));
     $('.tooltip').css('left', -1*Math.floor((tooltip_width-(cell_width-40))/2)+'px');
@@ -132,8 +133,9 @@ function InitClicheComponent(isDefault) {
         name = $('#component_name').val();
         version = $('#component_version').val();
         author = $('#component_author').val();
-        $('#rename_component').text($('#component_name').val());
+        //$('#rename_component').text($('#component_name').val());
     }
+    $('<style>.table_outter::after{content:"'+name+'"}</style>').appendTo('head');
     clicheComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
 }
 
