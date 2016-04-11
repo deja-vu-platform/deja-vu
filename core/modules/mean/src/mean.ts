@@ -36,12 +36,14 @@ export class Mean {
 
   constructor(public name: string, config: MeanConfig) {
     const opts = cli.parse();
+    const loc = `http://${opts.wshost}:${opts.wsport}`;
 
-    console.log(`Starting MEAN ${name}`);
+    console.log(`Starting MEAN ${name} at ${loc}`);
 
     const server = new mongodb.Server(
       opts.dbhost, opts.dbport, {socketOptions: {autoReconnect: true}});
-    this.db = new mongodb.Db(`${name}db`, server, {w: 1});
+    this.db = new mongodb.Db(
+        `${name}-${opts.wshost}-${opts.wsport}-db`, server, {w: 1});
     this.db.open((err, db) => {
       if (err) {
         console.log("Error opening mongodb");
@@ -57,11 +59,11 @@ export class Mean {
     this.app.use(morgan("dev"));
 
     if (opts.servepublic) {
-      console.log(`Serving public folder for MEAN ${name}`);
+      console.log(`Serving public folder for MEAN ${name} at ${loc}`);
       this.app.use(express.static("./dist/public"));
     };
     if (config.graphql_schema) {
-     console.log(`Serving graphql schema for MEAN ${name}`);
+     console.log(`Serving graphql schema for MEAN ${name} at ${loc}`);
      const gql = express_graphql({schema: config.graphql_schema, pretty: true});
      this.app.options("/graphql", this._cors);
      this.app.get("/graphql", this._cors, gql);
@@ -73,7 +75,7 @@ export class Mean {
     });
 
     this.composer = new Composer(
-        name, opts.bushost, opts.busport, opts.wshost, opts.wsport);
+        name, opts.bushost, opts.busport, loc);
   }
 
   private _cors(req, res, next) {
@@ -88,14 +90,10 @@ export class Mean {
 
 
 export class Composer {
-  _loc: string;
-
   constructor(
       private _element: string,
       private _hostname: string, private _port: number,
-      wshost: string, wsport: number) {
-    this._loc = `http://${wshost}:${wsport}`;
-  }
+      private _loc: string) {}
 
   new_atom(t: string, atom_id: string, atom: any) {
     console.log("sending new atom to composer");

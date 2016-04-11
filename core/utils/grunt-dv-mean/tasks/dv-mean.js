@@ -1,7 +1,7 @@
 module.exports = function(grunt, optPatterns) {
-  optPatterns = (typeof optPatterns === "undefined") ? [] : optPatterns;
-  const patternsSrc = optPatterns.map(function(p) {
-        return "node_modules/" + p + "/lib/components/**/*.{js,html,css}";
+  optPatterns = (typeof optPatterns === "undefined") ? {} : optPatterns;
+  const patternsSrc = Object.keys(optPatterns).map(function(p) {
+    return "node_modules/" + p + "/lib/components/**/*.{js,html,css}";
   });
   var deps = [
     "node_modules/angular2/bundles/angular2-polyfills.js",
@@ -108,7 +108,7 @@ module.exports = function(grunt, optPatterns) {
           // https://github.com/angular/angular/issues/6053
           {
             expand: true,
-            src: optPatterns.map(function(p) {
+            src: Object.keys(optPatterns).map(function(p) {
               return "node_modules/" + p + "/lib/components/**/*.{html,css}";
             }),
             dest: "dist/public/components/",
@@ -215,7 +215,7 @@ module.exports = function(grunt, optPatterns) {
       var replace_patterns = [];
       var port = 3002;
 
-      if (optPatterns.length > 0) {
+      if (Object.keys(optPatterns).length > 0) {
         grunt.log.writeln("This element is a compound, will start a composer");
         express_config["composer"] = {
           options: {
@@ -225,18 +225,28 @@ module.exports = function(grunt, optPatterns) {
           }
         };
       }
-      optPatterns.forEach(function(p) {
-        express_config[p] = {
-          options: {
-            script: "node_modules/" + p + "/lib/app.js",
-            background: true,
-            args: ["--wsport=" + port, "--servepublic=false", "--busport=3001"]
-          }
-        };
-        replace_patterns.push(
-          {match: p, replacement: "http://localhost:" + port});
-        ++port;
+
+      Object.keys(optPatterns).forEach(function(p) {
+        var process_instance = function(p, instance_number) {
+          express_config[p] = {
+            options: {
+              script: "node_modules/" + p + "/lib/app.js",
+              background: true,
+              args: ["--wsport=" + port, "--servepublic=false", "--busport=3001"]
+            }
+          };
+          replace_patterns.push({
+            match: p + "-" + instance_number,
+            replacement: "http://localhost:" + port
+          });
+          ++port;
+        }
+        var instances_number = optPatterns[p];
+        for (var i = 1; i <= instances_number; ++i) {
+          process_instance(p, i);
+        }
       });
+
       grunt.config.merge({express: express_config});
       grunt.config.merge(
         {replace: {dev: {options: {patterns: replace_patterns}}}});
