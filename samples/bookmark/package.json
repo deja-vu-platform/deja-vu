@@ -1,0 +1,32 @@
+{
+  "name": "dv-samples-bookmark",
+  "version": "0.0.1",
+  "scripts": {
+    "build.dev": "grunt dv-mean:build",
+    "serve.dev": "grunt dv-mean:serve",
+    "start": "grunt dv-mean:serve"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "angular2": "2.0.0-beta.0",
+    "auth": "file:../../patterns/access/auth",
+    "es6-promise": "^3.0.2",
+    "es6-shim": "^0.33.3",
+    "express": "^4.13.3",
+    "feed": "file:../../patterns/messaging/feed",
+    "follow": "file:../../patterns/community/follow",
+    "graphql": "^0.4.18",
+    "morgan": "^1.6.1",
+    "post": "file:../../patterns/messaging/post",
+    "mean": "file:../../core/modules/mean",
+    "composer": "file:../../core/composer",
+    "reflect-metadata": "0.1.2",
+    "rxjs": "5.0.0-beta.0",
+    "systemjs": "0.19.6",
+    "zone.js": "0.5.10"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-dv-mean": "file:../../core/utils/grunt-dv-mean"
+  }
+}

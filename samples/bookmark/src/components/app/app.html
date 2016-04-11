@@ -1,0 +1,17 @@
+<nav class="navbar navbar-default navbar-static-top">
+  <div class="container navbar-header">
+    <span class="navbar-brand">Bookmark</span>
+    <ul class="nav navbar-nav">
+      <li [class.active]="isRouteActive('Home')">
+        <a [routerLink]="['Home']">Home</a>
+      </li>
+      <li [class.active]="isRouteActive('Topics')">
+        <a [routerLink]="['Topics']">Topics</a>
+      </li>
+      <li [class.active]="isRouteActive('Users')">
+        <a [routerLink]="['Users']">Users</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<router-outlet></router-outlet>
