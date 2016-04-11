@@ -1,4 +1,4 @@
-import {Component} from "angular2/core";
+import {Component, provide} from "angular2/core";
 
 import {LoggedInComponent} from
 "dv-access-auth/lib/components/logged-in/logged-in";
@@ -8,7 +8,8 @@ import {EditFollowComponent} from
 
 @Component({
   selector: "users",
-  templateUrl: "./components/topics/topics.html",
+  templateUrl: "./components/users/users.html",
+  providers: [provide("follow.api", {useValue: "@@dv-community-follow-2"})],
   directives: [LoggedInComponent, EditFollowComponent]
 })
 export class UsersComponent {

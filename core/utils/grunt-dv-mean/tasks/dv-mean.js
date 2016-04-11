@@ -187,6 +187,12 @@ module.exports = function(grunt, optPatterns) {
             flatten: true,
             src: "dist/app.js",
             dest: "dist"
+          },
+          { // tmp hack: shouldn't have to do the replaces everywhere
+            expand: true,
+            cwd: "dist/public/components/",
+            src: "**/*.js",
+            dest: "dist/public/components/"
           }
         ]
       }
@@ -228,7 +234,7 @@ module.exports = function(grunt, optPatterns) {
 
       Object.keys(optPatterns).forEach(function(p) {
         var process_instance = function(p, instance_number) {
-          express_config[p] = {
+          express_config[p + "-" + instance_number] = {
             options: {
               script: "node_modules/" + p + "/lib/app.js",
               background: true,
