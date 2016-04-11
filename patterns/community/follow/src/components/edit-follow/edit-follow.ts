@@ -6,7 +6,7 @@ import {User, Username} from "../../shared/user";
 import {GraphQlService} from "../shared/graphql";
 
 
-interface UserFollowInfo {
+export interface UserFollowInfo {
   username: Username;
   followed_by: boolean;
 }
