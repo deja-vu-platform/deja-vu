@@ -150,7 +150,9 @@ export class Composer {
       let body = "";
       res.on("data", d => { body += d; });
       res.on("end", () => {
-        console.log(`got ${body} back from the bus`);
+        console.log(
+          `got ${body} back from the bus for query ${query_str},
+           options ${JSON.stringify(options)}`);
       });
     });
     req.on("error", err => console.log(err));

@@ -103,10 +103,12 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           types: {"type": new graphql.GraphQLList(type_input_type)},
+          subtype: {"type": type_input_type}
         },
-        resolve: (root, {types}) => {
+        resolve: (root, {types, subtype}) => {
           console.log("new type bond! " + JSON.stringify(types));
-          return mean.db.collection("tbonds").insertOne({types: types})
+          return mean.db.collection("tbonds")
+            .insertOne({types: types, subtype: subtype})
             .then(res => res.insertedCount === 1);
         }
       },
@@ -114,11 +116,13 @@ const schema = new graphql.GraphQLSchema({
       newFieldBond: {
         "type": graphql.GraphQLBoolean,
         args: {
-          fields: {"type": new graphql.GraphQLList(field_input_type)}
+          fields: {"type": new graphql.GraphQLList(field_input_type)},
+          subfield: {"type": field_input_type}
         },
-        resolve: (root, {fields}) => {
+        resolve: (root, {fields, subfield}) => {
           console.log("new field bond! " + JSON.stringify(fields));
-          return mean.db.collection("fbonds").insertOne({fields: fields})
+          return mean.db.collection("fbonds")
+            .insertOne({fields: fields, subfield: subfield})
             .then(res => res.insertedCount === 1);
         }
       },
@@ -153,50 +157,52 @@ function process(op: string, args: any) {
   const atom = args.atom;
   const atom_id = args.atom_id;
   console.log(`${op} atom! ${JSON.stringify(t)} ${atom}`);
-  // hack
-  // should make this efficient..also compute the intersection of fields
-  // taking into account fbonds
-  mean.db.collection("tbonds").find().toArray()
-    .then(a => {
-      console.log("debug col");
-      for (let b of a) {
-        console.log(JSON.stringify(b));
-      }
-      console.log("end debug col");
-    });
+
+
+  // Downwards propagation
   mean.db.collection("tbonds").find({types: {$in: [t]}})
     .toArray()
     .then(type_bonds => {
-      console.log("got " + type_bonds.length + " tbonds");
+      console.log("got " + type_bonds.length + " tbonds for downwards prop");
       for (let type_bond of type_bonds) {
         console.log("processing " + JSON.stringify(type_bond));
-        /*
-        mean.db.collection("fbonds").find({fields: {"type": bt}})
-          .toArray()
-          .then(bonded_fields => {
-            for (let fbond of bonded_fields) {
 
-            }
-          });
-          */
          for (let bonded_type of type_bond.types) {
            bonded_type = new Type(
              bonded_type.name, bonded_type.element, bonded_type.loc);
            if (bonded_type.equals(t)) {
              continue;
            }
-           send_update(op, bonded_type, t, atom_id, atom);
+           send_update(true, op, bonded_type, t, atom_id, atom);
          }
       }
     });
-    return true;
+
+  // Upwards propagation
+  mean.db.collection("tbonds").find({subtype: t})
+    .toArray()
+    .then(type_bonds => {
+      console.log("got " + type_bonds.length + " tbonds for upwards prop");
+      for (let type_bond of type_bonds) {
+        console.log("processing " + JSON.stringify(type_bond));
+
+         for (let bonded_type of type_bond.types) {
+           bonded_type = new Type(
+             bonded_type.name, bonded_type.element, bonded_type.loc);
+           send_update(false, op, bonded_type, t, atom_id, atom);
+         }
+      }
+    });
+
+  return true;
 }
 
 function send_update(
-  op: string, dst: Type, src: Type, atom_id: string, atom: string) {
+  downwards: boolean, op: string, dst: Type, src: Type, atom_id: string,
+  atom: string) {
   console.log("Sending update to element " + dst.element);
   console.log("have <" + atom + ">");
-  transform_atom(dst, src, atom, transformed_atom => {
+  transform_atom(downwards, dst, src, atom, transformed_atom => {
     const atom_str = transformed_atom.replace(/"/g, "\\\"");
     console.log("now have <" + atom_str + ">");
     post(dst.loc, `{
@@ -217,7 +223,8 @@ class Type {
   }
 }
 
-function transform_atom(dst: Type, src: Type, atom, callback) {
+function transform_atom(
+  downwards: boolean, dst: Type, src: Type, atom, callback) {
   console.log(`Getting schema info for ${dst.element}/${dst.name}`);
   const query = `{
     __type(name: "${dst.name}") {
@@ -235,7 +242,70 @@ function transform_atom(dst: Type, src: Type, atom, callback) {
       }
     }
   }`;
-  /*
+  const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
+
+
+  get(dst.loc, query, res => {
+    const dst_type_info = JSON.parse(res).data.__type;
+    get_name_map(src, dst, name_map => {
+      const parsed_atom = JSON.parse(atom);
+      let transformed_atom = {};
+      for (let dst_f of dst_type_info.fields) {
+        if (parsed_atom[dst_f.name] !== undefined) {
+          transformed_atom[dst_f.name] = parsed_atom[dst_f.name];
+        } else if (name_map[dst_f.name] !== undefined) {
+          transformed_atom[dst_f.name] = parsed_atom[name_map[dst_f.name]];
+        } else {
+          // Send well-formed atoms to elements
+          transformed_atom[dst_f.name] = get_null(dst_f.type);
+        }
+      }
+
+      const transformed_atom_str = JSON.stringify(transformed_atom);
+      console.log(
+        "trasnformed atom str " + transformed_atom_str + " used name map " +
+        JSON.stringify(name_map));
+      callback(transformed_atom_str);
+    });
+  });
+}
+
+function get_name_map_downwards(src, dst, callback) {
+  mean.db.collection("fbonds")
+    .aggregate([  // get fbonds where both src and dst appear
+      {$match: {fields: {$elemMatch: {"type": dst}}}},
+      {$match: {fields: {$elemMatch: {"type": src}}}}
+    ])
+    .toArray()
+    .then(fbonds => {
+      let name_map = {};
+      for (let fbond of fbonds) {
+        // console.log("processing fbond " + JSON.stringify(fbond));
+        // a given type can only appear once in a field bond
+        let src_fbond_info, dst_fbond_info;
+        for (let finfo of fbond.fields) {
+          if (src.equals(finfo.type)) {
+            src_fbond_info = finfo;
+          } else if (dst.equals(finfo.type)) {
+            dst_fbond_info = finfo;
+          }
+        }
+        name_map[dst_fbond_info.name] = src_fbond_info.name;
+      }
+      callback(name_map);
+    });
+}
+
+function get_name_map_upwards(src, dst, callback) {
+/*
+  mean.db.collection("fbonds").find({"subfield.type": src}).toArray()
+    .then(a => {
+      console.log("22DEEBUUUGG " + JSON.stringify(src));
+      for (let b of a) {
+        console.log(JSON.stringify(b));
+      }
+      console.log("22FBOND end debug col");
+    });
   mean.db.collection("fbonds").find().toArray()
     .then(a => {
       console.log("DEEBUUUGG");
@@ -244,56 +314,33 @@ function transform_atom(dst: Type, src: Type, atom, callback) {
       }
       console.log("FBOND end debug col");
     });
-    */
-  get(dst.loc, query, res => {
-    const dst_type_info = JSON.parse(res).data.__type;
-    mean.db.collection("fbonds")
-      .aggregate([
-        {$match: {fields: {$elemMatch: {"type": dst}}}},
-        {$match: {fields: {$elemMatch: {"type": src}}}}
-      ])
-      .toArray()
-      .then(fbonds => {
-        let name_map = {};
-        for (let fbond of fbonds) {
-          // console.log("processing fbond " + JSON.stringify(fbond));
-          // a given type can only appear once in a field bond
-          let src_fbond_info, dst_fbond_info;
-          for (let finfo of fbond.fields) {
-            if (src.equals(finfo.type)) {
-              src_fbond_info = finfo;
-            } else if (dst.equals(finfo.type)) {
-              dst_fbond_info = finfo;
-            }
-          }
-          name_map[dst_fbond_info.name] = src_fbond_info.name;
-        }
-        /*
-        console.log(
-          "got " + fbonds.length + " back, used " + JSON.stringify(dst) +
-          " and " + JSON.stringify(src) + " name map " +
-          JSON.stringify(name_map));
-        console.log(JSON.stringify(fbonds));
-        */
-
-        const parsed_atom = JSON.parse(atom);
-        let transformed_atom = {};
-        for (let dst_f of dst_type_info.fields) {
-          if (parsed_atom[dst_f.name] !== undefined) {
-            transformed_atom[dst_f.name] = parsed_atom[dst_f.name];
-          } else if (name_map[dst_f.name] !== undefined) {
-            transformed_atom[dst_f.name] = parsed_atom[name_map[dst_f.name]];
-          } else {
-            // Send well-formed atoms to elements
-            transformed_atom[dst_f.name] = get_null(dst_f.type);
+*/
+  mean.db.collection("fbonds")
+    .aggregate([
+      {$match: {fields: {$elemMatch: {"type": dst}}}},
+      {$match: {"subfield.type": src}},
+    ])
+    .toArray()
+    .then(fbonds => {
+      let name_map = {};
+      for (let fbond of fbonds) {
+        console.log("processing fbond " + JSON.stringify(fbond));
+        // a given type can only appear once in a field bond
+        let src_fbond_info;
+        for (let finfo of fbond.fields) {
+          if (src.equals(finfo.type)) {
+            src_fbond_info = finfo;
           }
         }
+        name_map[fbond.subfield.name] = src_fbond_info.name;
+      }
 
-        const transformed_atom_str = JSON.stringify(transformed_atom);
-        console.log("trasnformed atom str " + transformed_atom_str);
-        callback(transformed_atom_str);
-      });
-  });
+      console.log(
+        "got " + fbonds.length + " back, used " + JSON.stringify(dst) +
+        " and " + JSON.stringify(src) + " name map " +
+        JSON.stringify(name_map));
+      callback(name_map);
+    });
 }
 
 function get_null(t) {

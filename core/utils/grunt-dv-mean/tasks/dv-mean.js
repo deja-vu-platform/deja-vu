@@ -1,4 +1,4 @@
-module.exports = function(grunt, optPatterns) {
+module.exports = function(grunt, optPatterns, element) {
   optPatterns = (typeof optPatterns === "undefined") ? {} : optPatterns;
   const patternsSrc = Object.keys(optPatterns).map(function(p) {
     return "node_modules/" + p + "/lib/components/**/*.{js,html,css}";
@@ -221,6 +221,11 @@ module.exports = function(grunt, optPatterns) {
       var replace_patterns = [];
       var port = 3002;
 
+      replace_patterns.push({
+        match: element + "-1",
+        replacement: "http://localhost:3000"
+      });
+
       if (Object.keys(optPatterns).length > 0) {
         grunt.log.writeln("This element is a compound, will start a composer");
         express_config["composer"] = {
@@ -238,7 +243,9 @@ module.exports = function(grunt, optPatterns) {
             options: {
               script: "node_modules/" + p + "/lib/app.js",
               background: true,
-              args: ["--wsport=" + port, "--servepublic=false", "--busport=3001"]
+              args: [
+                "--wsport=" + port, "--servepublic=false", "--busport=3001",
+                "--debugdata=false"]
             }
           };
           replace_patterns.push({
