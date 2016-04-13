@@ -352,7 +352,9 @@ function get_null(t) {
   let ret;
   if (t.kind === "LIST") {
     ret = [];
-  } else if (t.ofType.name === "String") {
+  } else if (
+      (t.kind === "NON_NULL" && t.ofType.name === "String") ||
+      (t.name === "String")) {
     ret = "";
   }
   return ret;
