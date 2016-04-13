@@ -183,14 +183,20 @@ function process(op: string, args: any) {
     .toArray()
     .then(type_bonds => {
       console.log("got " + type_bonds.length + " tbonds for upwards prop");
+      // The same bonded type can appear multiple times and we only want to send
+      // one update to that one
+      let bonded_types = {};
       for (let type_bond of type_bonds) {
         console.log("processing " + JSON.stringify(type_bond));
-
-         for (let bonded_type of type_bond.types) {
-           bonded_type = new Type(
-             bonded_type.name, bonded_type.element, bonded_type.loc);
-           send_update(false, op, bonded_type, t, atom_id, atom);
-         }
+        for (let bonded_type of type_bond.types) {
+          bonded_types[JSON.stringify(bonded_type)] = true;
+        }
+      }
+      for (let bonded_type_str of Object.keys(bonded_types)) {
+        const bonded_type_obj = JSON.parse(bonded_type_str);
+        const bonded_type = new Type(
+          bonded_type_obj.name, bonded_type_obj.element, bonded_type_obj.loc);
+        send_update(false, op, bonded_type, t, atom_id, atom);
       }
     });
 
