@@ -122,11 +122,11 @@ mean = new Mean("post", {
   init_db: (db, debug) => {
     db.createCollection("users", (err, users) => {
       if (err) throw err;
-      if (debug) {
-        console.log("Resetting users collection");
-        users.remove((err, remove_count) => {
-          if (err) throw err;
-          console.log(`Removed ${remove_count} elems`);
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
           users.insertMany([
             {username: "benbitdiddle", posts: []},
             {username: "alyssaphacker", posts: []},
@@ -135,8 +135,8 @@ mean = new Mean("post", {
             {username: "cydfect", posts: []},
             {username: "lem", posts: []}
           ], (err, res) => { if (err) throw err; });
-        });
-      }
+        }
+      });
     });
   }
 });

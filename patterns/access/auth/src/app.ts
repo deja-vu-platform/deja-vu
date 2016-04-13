@@ -80,6 +80,27 @@ const schema = new graphql.GraphQLSchema({
         }
       },
 
+      _dv_new_user: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => {
+          const arg_user = JSON.parse(args.atom);
+          console.log("got new user from bus " + JSON.stringify(arg_user));
+          const hash = bcrypt.hashSync(arg_user.username, 10);
+          const user = {username: arg_user.username, password: hash};
+          return mean.db.collection("users")
+            .insertOne(user)
+            .then(write_res => {
+              if (write_res.insertedCount !== 1) {
+                throw new Error("Couldn't save new user");
+              }
+              return true;
+            });
+        }
+      },
       _dv_update_user: {
         "type": graphql.GraphQLBoolean,
         args: {
@@ -123,13 +144,11 @@ mean = new Mean("auth", {
   init_db: (db, debug) => {
     db.createCollection("users", (err, users) => {
       if (err) throw err;
-      if (debug) {
-        console.log("Resetting users collection");
-        users.remove((err, remove_count) => {
-          if (err) throw err;
-          console.log(`Removed ${remove_count} elems`);
-        });
-      }
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+      });
     });
   }
 });

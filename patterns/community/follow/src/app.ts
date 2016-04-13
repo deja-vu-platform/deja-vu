@@ -208,30 +208,30 @@ mean = new mean_mod.Mean("follow", {
   init_db: (db, debug) => {
     db.createCollection("sources", (err, sources) => {
       if (err) throw err;
-      if (debug) {
         console.log("Resetting sources collection");
         sources.remove((err, remove_count) => {
           if (err) throw err;
           console.log(`Removed ${remove_count} elems`);
-          sources.insertMany([
-            {name: "benbitdiddle", follows: []},
-            {name: "alyssaphacker", follows: []},
-            {name: "eva", follows: []},
-            {name: "louis", follows: []},
-            {name: "cydfect", follows: []},
-            {name: "lem", follows: []}
-          ], (err, res) => { if (err) throw err; });
+          if (debug) {
+            sources.insertMany([
+              {name: "benbitdiddle", follows: []},
+              {name: "alyssaphacker", follows: []},
+              {name: "eva", follows: []},
+              {name: "louis", follows: []},
+              {name: "cydfect", follows: []},
+              {name: "lem", follows: []}
+            ], (err, res) => { if (err) throw err; });
+          }
         });
-      }
     });
 
     db.createCollection("targets", (err, sources) => {
       if (err) throw err;
-      if (debug) {
-        console.log("Resetting targets collection");
-        sources.remove((err, remove_count) => {
-          if (err) throw err;
-          console.log(`Removed ${remove_count} elems`);
+      console.log("Resetting targets collection");
+      sources.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
           sources.insertMany([
             {name: "benbitdiddle"},
             {name: "alyssaphacker"},
@@ -240,8 +240,8 @@ mean = new mean_mod.Mean("follow", {
             {name: "cydfect"},
             {name: "lem"}
           ], (err, res) => { if (err) throw err; });
-        });
-      }
+        }
+      });
     });
   }
 });

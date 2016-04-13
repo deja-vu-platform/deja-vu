@@ -326,15 +326,14 @@ function get_name_map_upwards(src, dst, callback) {
       for (let fbond of fbonds) {
         console.log("processing fbond " + JSON.stringify(fbond));
         // a given type can only appear once in a field bond
-        let src_fbond_info;
+        let dst_fbond_info;
         for (let finfo of fbond.fields) {
-          if (src.equals(finfo.type)) {
-            src_fbond_info = finfo;
+          if (dst.equals(finfo.type)) {
+            dst_fbond_info = finfo;
           }
         }
-        name_map[fbond.subfield.name] = src_fbond_info.name;
+        name_map[dst_fbond_info.name] = fbond.subfield.name;
       }
-
       console.log(
         "got " + fbonds.length + " back, used " + JSON.stringify(dst) +
         " and " + JSON.stringify(src) + " name map " +
@@ -426,23 +425,19 @@ mean = new Mean("composer", {
   init_db: (db, debug) => {
     db.createCollection("tbonds", (err, tbonds) => {
       if (err) throw err;
-      if (debug) {
-        console.log("Resetting tbonds collection");
-        tbonds.remove((err, remove_count) => {
-          if (err) throw err;
-          console.log(`Removed ${remove_count} elems`);
-        });
-      }
+      console.log("Resetting tbonds collection");
+      tbonds.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+      });
     });
     db.createCollection("fbonds", (err, fbonds) => {
       if (err) throw err;
-      if (debug) {
-        console.log("Resetting fbonds collection");
-        fbonds.remove((err, remove_count) => {
-          if (err) throw err;
-          console.log(`Removed ${remove_count} elems`);
-        });
-      }
+      console.log("Resetting fbonds collection");
+      fbonds.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+      });
     });
   }
 });

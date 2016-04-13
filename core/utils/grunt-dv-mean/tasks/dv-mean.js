@@ -158,7 +158,8 @@ module.exports = function(grunt, optPatterns, element) {
         options: {
           script: "dist/app.js",
           background: true,
-          args: ["--wsport=3000", "--busport=3001"]
+          args: [
+            "--wsport=3000", "--busport=3001", "--servepublic", "--debugdata"]
         }
       }
     },
@@ -232,7 +233,7 @@ module.exports = function(grunt, optPatterns, element) {
           options: {
             script: "node_modules/dv-composer/lib/app.js",
             background: true,
-            args: ["--wsport=3001", "--servepublic=false"]
+            args: ["--wsport=3001"]
           }
         };
       }
@@ -243,9 +244,7 @@ module.exports = function(grunt, optPatterns, element) {
             options: {
               script: "node_modules/" + p + "/lib/app.js",
               background: true,
-              args: [
-                "--wsport=" + port, "--servepublic=false", "--busport=3001",
-                "--debugdata=false"]
+              args: ["--wsport=" + port, "--busport=3001"]
             }
           };
           replace_patterns.push({

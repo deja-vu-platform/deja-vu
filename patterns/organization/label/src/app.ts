@@ -106,17 +106,17 @@ mean = new mean_mod.Mean("label", {
   init_db: (db, debug) => {
     db.createCollection("items", (err, items) => {
       if (err) throw err;
-      if (debug) {
-        console.log("Resetting items collection");
-        items.remove((err, remove_count) => {
-          if (err) throw err;
-          console.log(`Removed ${remove_count} elems`);
+      console.log("Resetting items collection");
+      items.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
           items.insertMany([
             {name: "item", labels: ["label1", "label2"]},
             {name: "another-item", labels: ["label1"]}
           ], (err, res) => { if (err) throw err; });
+        }
         });
-      }
     });
   }
 });

@@ -18,8 +18,8 @@ const cli = command_line_args([
   {name: "bushost", type: String, defaultValue: "localhost"},
   {name: "busport", type: Number, defaultValue: 3001},
 
-  {name: "servepublic", type: Boolean, defaultValue: true},
-  {name: "debugdata", type: Boolean, defaultValue: true}
+  {name: "servepublic", type: Boolean},
+  {name: "debugdata", type: Boolean}
 ]);
 
 

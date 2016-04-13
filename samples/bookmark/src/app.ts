@@ -112,7 +112,7 @@ function init_composer() {
       {name: "Post", element: "post", loc: "@@dv-messaging-post-1"}
     ], subtype: {
       name: "Post", element: "bookmark", loc: "@@dv-samples-bookmark-1"
-    }
+    })
   }`);
 
   mean.composer.config(`{
