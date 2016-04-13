@@ -206,8 +206,9 @@ function process(op: string, args: any) {
 function send_update(
   downwards: boolean, op: string, dst: Type, src: Type, atom_id: string,
   atom: string) {
-  console.log("Sending update to element " + dst.element);
-  console.log("have <" + atom + ">");
+  console.log(
+       "Sending update to element " + dst.element + " dst type " +
+       JSON.stringify(dst) + " have atom <" + atom + ">");
   transform_atom(downwards, dst, src, atom, transformed_atom => {
     const atom_str = transformed_atom.replace(/"/g, "\\\"");
     console.log("now have <" + atom_str + ">");
@@ -257,6 +258,10 @@ function transform_atom(
       const parsed_atom = JSON.parse(atom);
       let transformed_atom = {};
       for (let dst_f of dst_type_info.fields) {
+        console.log(
+          "Looking at " + JSON.stringify(dst_f) + " for dst " +
+          JSON.stringify(dst) + " parsed atom " + atom + " name_map " +
+          JSON.stringify(name_map));
         if (parsed_atom[dst_f.name] !== undefined) {
           transformed_atom[dst_f.name] = parsed_atom[dst_f.name];
         } else if (name_map[dst_f.name] !== undefined) {
@@ -270,7 +275,7 @@ function transform_atom(
       const transformed_atom_str = JSON.stringify(transformed_atom);
       console.log(
         "trasnformed atom str " + transformed_atom_str + " used name map " +
-        JSON.stringify(name_map));
+        JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
       callback(transformed_atom_str);
     });
   });
@@ -330,7 +335,9 @@ function get_name_map_upwards(src, dst, callback) {
     .then(fbonds => {
       let name_map = {};
       for (let fbond of fbonds) {
-        console.log("processing fbond " + JSON.stringify(fbond));
+        console.log(
+          "processing fbond " + JSON.stringify(fbond) + " for dst " +
+          JSON.stringify(dst));
         // a given type can only appear once in a field bond
         let dst_fbond_info;
         for (let finfo of fbond.fields) {
@@ -350,6 +357,7 @@ function get_name_map_upwards(src, dst, callback) {
 
 function get_null(t) {
   let ret;
+  // console.log("getting null of " + JSON.stringify(t));
   if (t.kind === "LIST") {
     ret = [];
   } else if (
@@ -357,6 +365,7 @@ function get_null(t) {
       (t.name === "String")) {
     ret = "";
   }
+  // console.log("got " + ret);
   return ret;
 }
 
