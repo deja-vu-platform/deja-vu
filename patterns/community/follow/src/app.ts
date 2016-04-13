@@ -104,7 +104,7 @@ const schema = new graphql.GraphQLSchema({
           const sources = mean.db.collection("sources");
           console.log(`${source} ${target}`);
           return sources.updateOne(
-            {name: source}, {$addToSet: {follows: target}}).then(
+            {name: source}, {$addToSet: {follows: {name: target}}}).then(
               _ => report_update(source));
         })
       },
@@ -124,7 +124,7 @@ const schema = new graphql.GraphQLSchema({
           const sources = mean.db.collection("sources");
           console.log(`${source} ${target}`);
           return sources.updateOne(
-            {name: source}, {$pull: {follows: target}}).then(
+            {name: source}, {$pull: {follows: {name: target}}}).then(
               _ => report_update(source));
         })
       },
@@ -137,7 +137,9 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const source = JSON.parse(args.atom);
-          console.log("got new source from bus " + JSON.stringify(source));
+          console.log(
+            "got new source (id " + args.atom_id + ") from bus " +
+            JSON.stringify(source));
           source["atom_id"] = args.atom_id;
           return mean.db.collection("sources").insertOne(source)
             .then(res => res.insertedCount === 1);
@@ -151,7 +153,9 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const source = JSON.parse(args.atom);
-          console.log("got up source from bus " + JSON.stringify(source));
+          console.log(
+            "got update source id(" + args.atom_id + ") from bus " +
+            JSON.stringify(source));
           return true;
         }
       },
@@ -164,12 +168,29 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const target = JSON.parse(args.atom);
-          console.log("got new target from bus " + JSON.stringify(target));
+          console.log(
+            "got new target (id " + args.atom_id + ") from bus " +
+            JSON.stringify(target));
           target["atom_id"] = args.atom_id;
           return mean.db.collection("targets").insertOne(target)
             .then(res => res.insertedCount === 1);
         }
-      }
+      },
+
+      _dv_update_target: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => {
+          const target = JSON.parse(args.atom);
+          console.log(
+            "got update target id(" + args.atom_id + ") from bus " +
+            JSON.stringify(target));
+          return true;
+        }
+      },
     }
   })
 });
@@ -180,7 +201,7 @@ function report_update(name) {
   const sources = mean.db.collection("sources");
   return sources.findOne({name: name}).then(source => {
     console.log(JSON.stringify(source));
-    return mean.composer.update_atom("Source", source.name, source);
+    return mean.composer.update_atom("Source", source.atom_id, source);
   });
 }
 

@@ -47,7 +47,8 @@ const schema = new graphql.GraphQLSchema({
           return Validation.userIsNew(username).then(_ => {
             // TODO: promisify
             const hash = bcrypt.hashSync(password, 10);
-            const user = {username: username, password: hash};
+            const user = {
+              username: username, password: hash, atom_id: username};
             return mean.db.collection("users")
               .insertOne(user)
               .then(write_res => {
@@ -90,7 +91,9 @@ const schema = new graphql.GraphQLSchema({
           const arg_user = JSON.parse(args.atom);
           console.log("got new user from bus " + JSON.stringify(arg_user));
           const hash = bcrypt.hashSync(arg_user.username, 10);
-          const user = {username: arg_user.username, password: hash};
+          const user = {
+            username: arg_user.username, password: hash,
+            atom_id: arg_user.username};
           return mean.db.collection("users")
             .insertOne(user)
             .then(write_res => {

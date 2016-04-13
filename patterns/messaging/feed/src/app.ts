@@ -166,33 +166,33 @@ mean = new mean_mod.Mean("feed", {
   init_db: (db, debug) => {
     db.createCollection("subs", (err, subs) => {
       if (err) throw err;
-      if (debug) {
-        subs.remove((err, remove_count) => {
-          if (err) { console.log(err); return; }
-          console.log(`Removed ${remove_count} elems`);
-
+      subs.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
           subs.insertMany([
             {name: "Ben", subscriptions: [
               "Software Engineering News", "Things Ben Bitdiddle Says"]},
             {name: "Alyssa", subscriptions: []}
           ], (err, res) => { if (err) throw err; });
-        });
-      }
+        }
+      });
     });
 
     db.createCollection("pubs", (err, pubs) => {
       if (err) throw err;
       pubs.remove((err, remove_count) => {
         if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
         if (debug) {
-         pubs.insertMany([
-           {name: "Software Engineering News", published: [
-             "Node v0.0.1 released!"]},
-           {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
-           {name: "U.S News", published: []},
-           {name: "World News", published: []},
-           {name: "New Books about Zombies", published: []}
-         ], (err, res) => { if (err) throw err; });
+          pubs.insertMany([
+            {name: "Software Engineering News", published: [
+              "Node v0.0.1 released!"]},
+            {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
+            {name: "U.S News", published: []},
+            {name: "World News", published: []},
+            {name: "New Books about Zombies", published: []}
+          ], (err, res) => { if (err) throw err; });
         }
       });
     });

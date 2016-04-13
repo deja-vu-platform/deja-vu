@@ -9,7 +9,7 @@ import {EditFollowComponent} from
 @Component({
   selector: "topics",
   templateUrl: "./components/topics/topics.html",
-  providers: [provide("follow.api", {useValue: "@@dv-community-follow-1"})],
+  providers: [provide("follow.api", {useValue: "@@dv-community-follow-2"})],
   directives: [LoggedInComponent, EditFollowComponent]
 })
 export class TopicsComponent {

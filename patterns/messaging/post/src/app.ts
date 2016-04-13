@@ -1,5 +1,5 @@
 /// <reference path="../typings/tsd.d.ts" />
-//import {Promise} from "es6-promise";
+import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
 import {Mean} from "mean";
@@ -25,23 +25,6 @@ const user_type = new graphql.GraphQLObjectType({
   }
 });
 
-
-/*
-const post_input_type = new graphql.GraphQLInputObjectType({
-  name: "PostInput",
-  fields: {
-    content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-  }
-});
-
-const user_input_type = new graphql.GraphQLInputObjectType({
-  name: "UserInput",
-  fields: {
-    username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    posts: {"type": new graphql.GraphQLList(post_input_type)}
-  }
-});
-*/
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
@@ -69,19 +52,25 @@ const schema = new graphql.GraphQLSchema({
           content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (_, {author, content}) => {
+          const post = {atom_id: content, content: content};
           return Validation.user_exists(author)
             .then(_ => {
-              return mean.db.collection("users")
-                .updateOne(
-                  {username: author}, {$push: {posts: {content: content}}});
+              return Promise.all([
+                mean.db.collection("users")
+                  .updateOne(
+                    {username: author}, {$push: {posts: post}}),
+                mean.db.collection("posts")
+                  .insertOne(post)
+                  ]);
             })
             .then(_ => {
               // report
               return mean.db.collection("users")
                 .findOne({username: author})
                 .then(updated_user => {
-                  return mean.composer.update_atom(
+                  mean.composer.update_atom(
                     "User", updated_user.atom_id, updated_user);
+                  mean.composer.new_atom("Post", post.atom_id, post);
                 });
             });
         }
@@ -100,7 +89,46 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("users").insertOne(user)
             .then(res => res.insertedCount === 1);
         }
-      }
+      },
+
+      _dv_update_user: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => {
+          const user = JSON.parse(args.atom);
+          console.log("got up user from bus " + JSON.stringify(user));
+        }
+      },
+
+      _dv_new_post: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => {
+          const post = JSON.parse(args.atom);
+          console.log("got new post from bus " + JSON.stringify(post));
+          post["atom_id"] = args.atom_id;
+          return mean.db.collection("posts").insertOne(post)
+            .then(res => res.insertedCount === 1);
+        }
+      },
+
+      _dv_update_post: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (root, args) => {
+          const post = JSON.parse(args.atom);
+          console.log("got up post from bus " + JSON.stringify(post));
+        }
+      },
     }
   })
 });
@@ -136,6 +164,15 @@ mean = new Mean("post", {
             {username: "lem", posts: []}
           ], (err, res) => { if (err) throw err; });
         }
+      });
+    });
+
+    db.createCollection("posts", (err, posts) => {
+      if (err) throw err;
+      console.log("Resetting posts collection");
+      posts.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
       });
     });
   }

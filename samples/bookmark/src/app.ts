@@ -5,15 +5,23 @@ const graphql = require("graphql");
 const mean_mod = require("mean");
 
 
+const topic_type = new graphql.GraphQLObjectType({
+  name: "Topic",
+  fields: () => ({
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    posts: {"type": new graphql.GraphQLList(topic_type)}
+  })
+});
+
 const post_type = new graphql.GraphQLObjectType({
   name: "Post",
-  fields: {
+  fields: () => ({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     topics: {
-      "type": new graphql.GraphQLList(graphql.GraphQLString)
+      "type": new graphql.GraphQLList(topic_type)
     }
-  }
+  })
 });
 
 const user_type = new graphql.GraphQLObjectType({
@@ -21,7 +29,11 @@ const user_type = new graphql.GraphQLObjectType({
   fields: () => ({
     username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     follows: {
-      "type": new graphql.GraphQLList(user_type) // or topic
+      "type": new graphql.GraphQLList(new graphql.GraphQLUnionType({
+        name: "Follow",
+        types: [user_type, topic_type],
+        resolveType: value => ("username" in value) ? user_type : topic_type
+      }))
     },
     posts: {
       "type": new graphql.GraphQLList(post_type)
@@ -68,21 +80,31 @@ setTimeout(init_db, 30 * 1000);  // hack..
 
 function init_db() {
   mean.composer.new_atom(
+      "Topic", 1, {
+        name: "hello",
+        posts: [{atom_id: 1}, {atom_id: 2}]);
+  mean.composer.new_atom(
+      "Post", 1, {
+        name: "1",
+        content: "hello, I'm Ben",
+        topics: [{atom_id: 1}]
+      });
+  mean.composer.new_atom(
+      "Post", 2, {
+        name: "2",
+        content: "hello, I'm Alyssa",
+        topics: [{atom_id: 1}]
+      });
+  mean.composer.new_atom(
       "User", 1, {
         username: "benbitdiddle", follows: [],
-        posts: [
-          {content: "hello, I'm Ben", topics: ["hello"]}
-        ]
+        posts: [{atom_id: 1}]
       });
-  /*
   mean.composer.new_atom(
       "User", 2, {
         username: "alyssaphacker", follows: [],
-        posts: [
-          {content: "hello, I'm Alyssa", topics: ["hello"]}
-        ]
+        posts: [{atom_id: 2}]
       });
-      */
 }
 
 /*
@@ -118,18 +140,10 @@ function init_composer() {
   mean.composer.config(`{
     newTypeBond(types: [
       {name: "Label", element: "label", loc: "@@dv-organization-label-1"},
-      {name: "Target", element: "follow", loc: "@@dv-community-follow-2"}
-    ], subtype: {
-      name: "Topic", element: "bookmark", loc: "@@dv-samples-bookmark-1"
-    })
-  }`);
-
-  mean.composer.config(`{
-    newTypeBond(types: [
       {name: "Target", element: "follow", loc: "@@dv-community-follow-2"},
       {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed-1"}
     ], subtype: {
-      name: "User", element: "bookmark", loc: "@@dv-samples-bookmark-1"
+      name: "Topic", element: "bookmark", loc: "@@dv-samples-bookmark-1"
     })
   }`);
 
@@ -151,6 +165,19 @@ function init_composer() {
       }
     })
   }`);
+  mean.composer.config(`{
+    newFieldBond(fields: [
+      {
+        name: "published",
+        type: {name: "Publisher", element: "feed", loc: "@@dv-messaging-feed-1"}
+      }
+    ], subfield: {
+      name: "posts", type: {
+        name: "Topic", element: "bookmark", loc: "@@dv-samples-bookmark-1"
+      }
+    })
+  }`);
+
   mean.composer.config(`{
     newFieldBond(fields: [
       {
@@ -193,6 +220,20 @@ function init_composer() {
     })
   }`);
 
+  mean.composer.config(`{
+    newFieldBond(fields: [
+      {
+        name: "labels",
+        type: {
+          name: "Item", element: "label", loc: "@@dv-organization-label-1"
+        }
+      }
+    ], subfield: {
+      name: "topics", type: {
+        name: "Post", element: "bookmark", loc: "@@dv-samples-bookmark-1"
+      }
+    })
+  }`);
 
   mean.composer.config(`{
     newFieldBond(fields: [
