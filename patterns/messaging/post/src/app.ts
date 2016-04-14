@@ -20,7 +20,12 @@ const user_type = new graphql.GraphQLObjectType({
     username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     posts: {
       "type": new graphql.GraphQLList(post_type),
-      resolve: user => user.posts
+      resolve: user => {
+        let promises = user.posts.map(p => {
+          return mean.db.collections("posts").find({atom_id: p.atom_id});
+        });
+        return Promise.all(promises);
+      }
     }
   }
 });
@@ -84,7 +89,9 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const user = JSON.parse(args.atom);
-          console.log("got new user from bus " + JSON.stringify(user));
+          console.log(
+            "got new user (id" + args.atom_id + ") from bus " +
+             JSON.stringify(user));
           user["atom_id"] = args.atom_id;
           return mean.db.collection("users").insertOne(user)
             .then(res => res.insertedCount === 1);
@@ -99,7 +106,12 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const user = JSON.parse(args.atom);
-          console.log("got up user from bus " + JSON.stringify(user));
+          console.log(
+            "got update user (id " + args.atom_id + ") from bus " +
+            JSON.stringify(user));
+          return mean.db.collection("users").replaceOne(
+            {atom_id: args.atom_id}, user)
+            .then(res => res.modifiedCount === 1);
         }
       },
 
@@ -111,6 +123,7 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const post = JSON.parse(args.atom);
+
           console.log("got new post from bus " + JSON.stringify(post));
           post["atom_id"] = args.atom_id;
           return mean.db.collection("posts").insertOne(post)
@@ -126,7 +139,12 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const post = JSON.parse(args.atom);
-          console.log("got up post from bus " + JSON.stringify(post));
+          console.log(
+            "got update post (id " + args.atom_id + ") from bus " +
+            JSON.stringify(post));
+          return mean.db.collection("posts").replaceOne(
+            {atom_id: args.atom_id}, post)
+            .then(res => res.modifiedCount === 1);
         }
       },
     }

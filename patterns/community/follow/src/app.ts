@@ -22,7 +22,7 @@ const target_type = new graphql.GraphQLObjectType({
           .then(_ => {
             return mean.db.collection("sources")
               .findOne({
-                $and: [{name: name}, {follows: target.name}]
+                $and: [{name: name}, {"follows.name": target.name}]
               });
           });
       }
@@ -100,12 +100,12 @@ const schema = new graphql.GraphQLSchema({
           Validation.targetExists(target)
         ]).then(_ => {
           if (source === target) return;
-          console.log("all good");
-          const sources = mean.db.collection("sources");
           console.log(`${source} ${target}`);
-          return sources.updateOne(
-            {name: source}, {$addToSet: {follows: {name: target}}}).then(
-              _ => report_update(source));
+          return mean.db.collection("targets")
+            .findOne({name: target})
+            .then(target => mean.db.collection("sources")
+              .updateOne({name: source}, {$addToSet: {follows: target}})
+              .then(_ => report_update(source)));
         })
       },
 
@@ -120,12 +120,12 @@ const schema = new graphql.GraphQLSchema({
           Validation.targetExists(target)
         ]).then(_ => {
           if (source === target) return;
-          console.log("all good");
-          const sources = mean.db.collection("sources");
           console.log(`${source} ${target}`);
-          return sources.updateOne(
-            {name: source}, {$pull: {follows: {name: target}}}).then(
-              _ => report_update(source));
+          return mean.db.collection("targets")
+            .findOne({name: target})
+            .then(target => mean.db.collection("sources")
+              .updateOne({name: source}, {$addToSet: {follows: target}})
+              .then(_ => report_update(source)));
         })
       },
 
@@ -154,9 +154,11 @@ const schema = new graphql.GraphQLSchema({
         resolve: (root, args) => {
           const source = JSON.parse(args.atom);
           console.log(
-            "got update source id(" + args.atom_id + ") from bus " +
+            "got update source (id" + args.atom_id + ") from bus " +
             JSON.stringify(source));
-          return true;
+          return mean.db.collection("sources").replaceOne(
+            {atom_id: args.atom_id}, source)
+            .then(res => res.modifiedCount === 1);
         }
       },
 
@@ -186,9 +188,11 @@ const schema = new graphql.GraphQLSchema({
         resolve: (root, args) => {
           const target = JSON.parse(args.atom);
           console.log(
-            "got update target id(" + args.atom_id + ") from bus " +
+            "got update target (id " + args.atom_id + ") from bus " +
             JSON.stringify(target));
-          return true;
+          return mean.db.collection("targets").replaceOne(
+            {atom_id: args.atom_id}, target)
+            .then(res => res.modifiedCount === 1);
         }
       },
     }

@@ -80,20 +80,21 @@ setTimeout(init_db, 30 * 1000);  // hack..
 
 function init_db() {
   mean.composer.new_atom(
-      "Topic", 1, {
+      "Topic", 3, {
         name: "hello",
-        posts: [{atom_id: 1}, {atom_id: 2}]);
+        posts: [{atom_id: 1}, {atom_id: 2}]
+      });
   mean.composer.new_atom(
       "Post", 1, {
         name: "1",
         content: "hello, I'm Ben",
-        topics: [{atom_id: 1}]
+        topics: [{atom_id: 3}]
       });
   mean.composer.new_atom(
       "Post", 2, {
         name: "2",
         content: "hello, I'm Alyssa",
-        topics: [{atom_id: 1}]
+        topics: [{atom_id: 3}]
       });
   mean.composer.new_atom(
       "User", 1, {

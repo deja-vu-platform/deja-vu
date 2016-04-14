@@ -27,7 +27,9 @@ const item_type = new graphql.GraphQLObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     labels: {
       "type": new graphql.GraphQLList(label_type),
-      resolve: item => item.labels
+      resolve: item => Promise.all(
+        item.labels.map(l => mean.db.collections("labels").find({
+          atom_id: l.atom_id})))
     },
     attach_labels: {
       "type": graphql.GraphQLBoolean,
@@ -36,6 +38,10 @@ const item_type = new graphql.GraphQLObjectType({
       },
       resolve: (item, {labels}) => {
         const items = mean.db.collection("items");
+        labels = labels.map(l => {
+          l["atom_id"] = l.name;
+          return l;
+        });
         return items.updateOne(
         {name: item.name}, {$addToSet: {labels: labels}}).then(
             _ => report_update(item.name));
@@ -83,7 +89,9 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const item = JSON.parse(args.atom);
-          console.log("got new item from bus " + JSON.stringify(item));
+          console.log(
+            "got new item (id " + args.atom_id + ") from bus " +
+            JSON.stringify(item));
           item["atom_id"] = args.atom_id;
           return mean.db.collection("items").insertOne(item)
             .then(res => res.insertedCount === 1);
@@ -97,8 +105,12 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const item = JSON.parse(args.atom);
-          console.log("got up item from bus " + JSON.stringify(item));
-          return true;
+          console.log(
+            "got update item (id " + args.atom_id + ") from bus " +
+            JSON.stringify(item));
+          return mean.db.collection("items").replaceOne(
+            {atom_id: args.atom_id}, item)
+            .then(res => res.modifiedCount === 1);
         }
       },
       _dv_new_label: {
@@ -109,7 +121,9 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const label = JSON.parse(args.atom);
-          console.log("got new label from bus " + JSON.stringify(label));
+          console.log(
+            "got new label (id " + args.atom_id + ") from bus " +
+            JSON.stringify(label));
           label["atom_id"] = args.atom_id;
           return mean.db.collection("labels").insertOne(label)
             .then(res => res.insertedCount === 1);
@@ -123,8 +137,12 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, args) => {
           const label = JSON.parse(args.atom);
-          console.log("got up label from bus " + JSON.stringify(label));
-          return true;
+          console.log(
+            "got update label (id " + args.atom_id + ") from bus " +
+            JSON.stringify(label));
+          return mean.db.collection("labels").replaceOne(
+            {atom_id: args.atom_id}, label)
+            .then(res => res.modifiedCount === 1);
         }
       }
     }

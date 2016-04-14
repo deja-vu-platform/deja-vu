@@ -26,7 +26,7 @@ const sub_type = new graphql.GraphQLObjectType({
     subscriptions: {
       "type": new graphql.GraphQLList(pub_type),
       resolve: sub => mean.db.collection("pubs")
-        .find({name: {$in: sub.subscriptions}})
+        .find({name: {$in: sub.subscriptions.map(s => s.name)}})
         .toArray()
     }
   }
@@ -105,8 +105,8 @@ const schema = new graphql.GraphQLSchema({
             JSON.stringify(sub));
           sub["atom_id"] = args.atom_id;
           return mean.db.collection("subs")
-            .update({atom_id: args.atom_id}, sub)
-            .then(res => res.result.ok === 1 && res.result.nModified === 1);
+            .replaceOne({atom_id: args.atom_id}, sub)
+            .then(res => res.modifiedCount === 1);
         }
       },
 
@@ -140,8 +140,8 @@ const schema = new graphql.GraphQLSchema({
             JSON.stringify(pub));
           pub["atom_id"] = args.atom_id;
           return mean.db.collection("pubs")
-            .updateOne({atom_id: args.atom_id}, pub)
-            .then(res => res.result.ok === 1 && res.result.nModified === 1);
+            .replaceOne({atom_id: args.atom_id}, pub)
+            .then(res => res.modifiedCount === 1);
         }
       }
     }
