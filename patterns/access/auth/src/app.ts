@@ -115,7 +115,7 @@ const schema = new graphql.GraphQLSchema({
           console.log(
             "got update user (id " + args.atom_id + ") from bus " +
             JSON.stringify(user));
-          pub["atom_id"] = args.atom_id;
+          user["atom_id"] = args.atom_id;
           return mean.db.collection("users")
             .replaceOne({atom_id: args.atom_id}, user)
             .then(res => res.modifiedCount === 1);
