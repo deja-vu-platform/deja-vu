@@ -5,11 +5,11 @@ import "rxjs/add/operator/map";
 import "rxjs/add/observable/fromArray";
 import "rxjs/add/operator/mergeMap";
 
-import {Content, Publisher, Name} from "../../shared/data";
+import {Message, Publisher, Name} from "../../shared/data";
 
 
 export interface FeedItem {
-  content: Content;
+  message: Message;
   publisher: Publisher;
 }
 
@@ -22,7 +22,9 @@ export class FeedService {
       sub(name: "${sub}") {
         subscriptions {
           name,
-          published
+          published {
+            content
+          }
         }
       }
     }`)
@@ -32,9 +34,9 @@ export class FeedService {
           (pub: Publisher, unused_ix: number) => {
             return Observable.fromArray(pub.published);
           },
-          (pub: Publisher, content: Content, unused_pubi: number,
+          (pub: Publisher, message: Message, unused_pubi: number,
            unused_ci: number) => {
-            return {content: JSON.parse(content), publisher: pub};
+            return {message: message, publisher: pub};
           });
   }
 

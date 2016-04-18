@@ -7,18 +7,18 @@ const APIS = {feed: "http://localhost:3000"};
 
 
 @Component({
-  selector: "publisher-content",
-  template: "{{item}}",
-  inputs: ["item"]
+  selector: "publisher-message",
+  template: "{{msg}}",
+  inputs: ["msg"]
 })
-class PublisherContentComponent {}
+class PublisherMessageComponent {}
 
 @Component({
-  selector: "publisher-name",
-  template: "{{item}}",
-  inputs: ["item"]
+  selector: "publisher",
+  template: "{{pub}}",
+  inputs: ["pub"]
 })
-class PublisherNameComponent {}
+class PublisherComponent {}
 
 
 
@@ -26,7 +26,7 @@ bootstrap(
   FeedPatternComponent, [
     provide("feed.api", {useValue: APIS.feed}),
     provide(
-      PLATFORM_DIRECTIVES, {useValue: PublisherContentComponent, multi: true}),
+      PLATFORM_DIRECTIVES, {useValue: PublisherMessageComponent, multi: true}),
     provide(
-      PLATFORM_DIRECTIVES, {useValue: PublisherNameComponent, multi: true})
+      PLATFORM_DIRECTIVES, {useValue: PublisherComponent, multi: true})
   ]);

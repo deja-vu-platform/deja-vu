@@ -1,5 +1,5 @@
 /// <reference path="../typings/tsd.d.ts" />
-// import {Promise} from "es6-promise";
+import {Promise} from "es6-promise";
 const graphql = require("graphql");
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mean_mod = require("mean");
@@ -7,14 +7,29 @@ const mean_mod = require("mean");
 
 let mean;
 
+const msg_type = new graphql.GraphQLObjectType({
+  name: "Message",
+  fields: {
+    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    content: {"type": new graphql.GraphQLList(graphql.GraphQLString)}
+  }
+});
 
 const pub_type = new graphql.GraphQLObjectType({
   name: "Publisher",
   fields: {
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     published: {
-      "type": new graphql.GraphQLList(graphql.GraphQLString),
-      resolve: pub => pub.published.map(p => JSON.stringify(p))
+      "type": new graphql.GraphQLList(msg_type),
+      resolve: pub => {
+        console.log(JSON.stringify(pub));
+        console.log(JSON.stringify(pub));
+        let promises = pub.published.map(msg => {
+          console.log("hellooo");
+          return mean.db.collections("msgs").find({atom_id: msg.atom_id});
+        });
+        return Promise.all(promises);
+      }
     }
   }
 });
@@ -32,28 +47,31 @@ const sub_type = new graphql.GraphQLObjectType({
   }
 });
 
+enum MutationType {
+  New,
+  Update
+}
 
-/*
-const pub_input_type = new graphql.GraphQLInputObjectType({
-  name: "PublisherInput",
-  fields: {
-    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    published: {"type": new graphql.GraphQLList(graphql.GraphQLString)}
-  }
-});
+function resolve_dv_mut(mutation_type, item) {
+  const insert = (col, atom_id, atom) => col
+    .insertOne(atom).then(res => res.insertedCount === 1);
+  const replace = (col, atom_id, atom) => col
+    .replaceOne({atom_id: atom_id}, atom).then(res => res.modifiedCount === 1);
 
-const sub_input_type = new graphql.GraphQLInputObjectType({
-  name: "SubscriberInput",
-  fields: {
-    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    subscriptions: {"type": new graphql.GraphQLList(pub_input_type)}
-  }
-});
-
-const fields = ast => ast.fields.selections.reduce((fields, s) => {
-  fields[s.name.value] = 1;
-  return fields;
-}, {});*/
+  return (_, args) => {
+    const atom = JSON.parse(args.atom);
+    console.log(
+      "got new " + item + "(id " + args.atom_id + ") from bus " +
+      JSON.stringify(atom));
+    atom["atom_id"] = args.atom_id;
+    const col = mean.db.collection(item + "s");
+    if (mutation_type === MutationType.New) {
+      return insert(col, args.atom_id, atom);
+    } else {
+      return replace(col, args.atom_id, atom);
+    }
+  };
+}
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
@@ -82,15 +100,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const sub = JSON.parse(args.atom);
-          console.log(
-            "got new sub (id " + args.atom_id + ") from bus " +
-            JSON.stringify(sub));
-          sub["atom_id"] = args.atom_id;
-          return mean.db.collection("subs").insertOne(sub)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: resolve_dv_mut(MutationType.New, "sub")
       },
       _dv_update_subscriber: {
         "type": graphql.GraphQLBoolean,
@@ -98,16 +108,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const sub = JSON.parse(args.atom);
-          console.log(
-            "got update sub (id " + args.atom_id + ") from bus " +
-            JSON.stringify(sub));
-          sub["atom_id"] = args.atom_id;
-          return mean.db.collection("subs")
-            .replaceOne({atom_id: args.atom_id}, sub)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: resolve_dv_mut(MutationType.Update, "sub")
       },
 
       _dv_new_publisher: {
@@ -116,15 +117,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const pub = JSON.parse(args.atom);
-          console.log(
-            "got new pub (id " + args.atom_id + ") from bus " +
-            JSON.stringify(pub));
-          pub["atom_id"] = args.atom_id;
-          return mean.db.collection("pubs").insertOne(pub)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: resolve_dv_mut(MutationType.New, "pub")
       },
 
       _dv_update_publisher: {
@@ -133,16 +126,25 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const pub = JSON.parse(args.atom);
-          console.log(
-            "got update pub (id " + args.atom_id + ") from bus " +
-            JSON.stringify(pub));
-          pub["atom_id"] = args.atom_id;
-          return mean.db.collection("pubs")
-            .replaceOne({atom_id: args.atom_id}, pub)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: resolve_dv_mut(MutationType.Update, "pub")
+      },
+
+      _dv_new_message: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: resolve_dv_mut(MutationType.New, "msg")
+      },
+
+      _dv_update_message: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: resolve_dv_mut(MutationType.Update, "msg")
       }
     }
   })
@@ -164,6 +166,7 @@ namespace Validation {
 mean = new mean_mod.Mean("feed", {
   graphql_schema: schema,
   init_db: (db, debug) => {
+    // Subs
     db.createCollection("subs", (err, subs) => {
       if (err) throw err;
       subs.remove((err, remove_count) => {
@@ -178,7 +181,7 @@ mean = new mean_mod.Mean("feed", {
         }
       });
     });
-
+    // Pubs
     db.createCollection("pubs", (err, pubs) => {
       if (err) throw err;
       pubs.remove((err, remove_count) => {
@@ -193,6 +196,17 @@ mean = new mean_mod.Mean("feed", {
             {name: "World News", published: []},
             {name: "New Books about Zombies", published: []}
           ], (err, res) => { if (err) throw err; });
+        }
+      });
+    });
+    // Messages
+    db.createCollection("msgs", (err, pubs) => {
+      if (err) throw err;
+      pubs.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          //
         }
       });
     });

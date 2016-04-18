@@ -132,7 +132,8 @@ function init_composer() {
   mean.composer.config(`{
     newTypeBond(types: [
       {name: "Item", element: "label", loc: "@@dv-organization-label-1"},
-      {name: "Post", element: "post", loc: "@@dv-messaging-post-1"}
+      {name: "Post", element: "post", loc: "@@dv-messaging-post-1"},
+      {name: "Message", element: "Feed", loc: "@@dv-messaging-feed-1"}
     ], subtype: {
       name: "Post", element: "bookmark", loc: "@@dv-samples-bookmark-1"
     })
@@ -166,6 +167,24 @@ function init_composer() {
       }
     })
   }`);
+
+  mean.composer.config(`{
+    newFieldBond(fields: [
+      {
+        name: "content",
+        type: {name: "Post", element: "post", loc: "@@dv-messaging-post-1"}
+      },
+      {
+        name: "content",
+        type: {name: "Message", element: "feed", loc: "@@dv-messaging-feed-1"}
+      }
+    ], subfield: {
+      name: "content", type: {
+        name: "Post", element: "bookmark", loc: "@@dv-samples-bookmark-1"
+      }
+    })
+  }`);
+
   mean.composer.config(`{
     newFieldBond(fields: [
       {

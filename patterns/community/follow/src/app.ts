@@ -124,7 +124,7 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("targets")
             .findOne({name: target})
             .then(target => mean.db.collection("sources")
-              .updateOne({name: source}, {$addToSet: {follows: target}})
+              .updateOne({name: source}, {$pull: {follows: target}})
               .then(_ => report_update(source)));
         })
       },
