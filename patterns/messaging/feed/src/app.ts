@@ -11,7 +11,7 @@ const msg_type = new graphql.GraphQLObjectType({
   name: "Message",
   fields: {
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    content: {"type": new graphql.GraphQLList(graphql.GraphQLString)}
+    content: {"type": graphql.GraphQLString}
   }
 });
 
@@ -22,11 +22,9 @@ const pub_type = new graphql.GraphQLObjectType({
     published: {
       "type": new graphql.GraphQLList(msg_type),
       resolve: pub => {
-        console.log(JSON.stringify(pub));
-        console.log(JSON.stringify(pub));
         let promises = pub.published.map(msg => {
-          console.log("hellooo");
-          return mean.db.collections("msgs").find({atom_id: msg.atom_id});
+          return mean.db.collection("msgs")
+             .find({atom_id: msg.atom_id}).limit(1).next();
         });
         return Promise.all(promises);
       }
@@ -84,8 +82,7 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (root, {name}) => {
           console.log(`getting ${name}`);
-          // const fields = {username: 1, friends: {username: 1}}; TODO: project
-          return mean.db.collection("subs").findOne({name: name});
+          return mean.db.collection("subs").find({name: name}).limit(1).next();
         }
       }
     }
@@ -150,18 +147,6 @@ const schema = new graphql.GraphQLSchema({
   })
 });
 
-
-/*
-namespace Validation {
-  export function sub_exists(name) {
-    return mean.db.collection("usbs")
-      .findOne({name: name}, {_id: 1})
-      .then(user => {
-        if (!user) throw new Error(`${name} doesn't exist`);
-      });
-  }
-}
-*/
 
 mean = new mean_mod.Mean("feed", {
   graphql_schema: schema,
