@@ -155,7 +155,7 @@ function report_update(name) {
   const items = mean.db.collection("items");
   return items.findOne({name: name}).then(item => {
     console.log(JSON.stringify(item));
-    return mean.composer.update_atom("Item", item.atom_id, item);
+    return mean.composer.update_atom(item_type, item.atom_id, item);
   });
 }
 

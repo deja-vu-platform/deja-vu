@@ -138,7 +138,7 @@ function report_update(username) {
   console.log("reporting update of " + username);
   const users = mean.db.collection("users");
   return users.findOne({username: username}).then(user => {
-    return mean.composer.update_atom("User", user.atom_id, user);
+    return mean.composer.update_atom(user_type, user.atom_id, user);
   });
 }
 

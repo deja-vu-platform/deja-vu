@@ -57,7 +57,7 @@ const schema = new graphql.GraphQLSchema({
                 }
 
                 // report
-                mean.composer.new_atom("User", username, user);
+                mean.composer.new_atom(user_type, username, user);
                 return true;
               });
           });

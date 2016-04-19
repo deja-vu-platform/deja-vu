@@ -74,8 +74,8 @@ const schema = new graphql.GraphQLSchema({
                 .findOne({username: author})
                 .then(updated_user => {
                   mean.composer.update_atom(
-                    "User", updated_user.atom_id, updated_user);
-                  mean.composer.new_atom("Post", post.atom_id, post);
+                    user_type, updated_user.atom_id, updated_user);
+                  mean.composer.new_atom(post_type, post.atom_id, post);
                 });
             });
         }

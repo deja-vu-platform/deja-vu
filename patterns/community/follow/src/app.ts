@@ -205,7 +205,7 @@ function report_update(name) {
   const sources = mean.db.collection("sources");
   return sources.findOne({name: name}).then(source => {
     console.log(JSON.stringify(source));
-    return mean.composer.update_atom("Source", source.atom_id, source);
+    return mean.composer.update_atom(source_type, source.atom_id, source);
   });
 }
 

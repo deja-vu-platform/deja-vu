@@ -95,37 +95,51 @@ export class Composer {
       private _hostname: string, private _port: number,
       private _loc: string) {}
 
-  new_atom(t: string, atom_id: string, atom: any) {
+  new_atom(t: any /* GraphQLObjectType */, atom_id: string, atom: any) {
     console.log("sending new atom to composer");
-    const atom_str = JSON.stringify(atom).replace(/"/g, "\\\"");
-    console.log("t is " + t);
+    const atom_str = JSON.stringify(
+        this._filter_atom(t, atom)).replace(/"/g, "\\\"");
+    console.log("t is " + t.name);
     console.log("atom id is " + atom_id);
     this._post(`{
       newAtom(
-        type: {name: "${t}", element: "${this._element}", loc: "${this._loc}"},
+        type: {
+          name: "${t.name}", element: "${this._element}", loc: "${this._loc}"
+        },
         atom_id: "${atom_id}",
         atom: "${atom_str}")
     }`);
   }
 
-  update_atom(t: string, atom_id: string, new_atom: any) {
+  update_atom(t: any /* GraphQLObjectType */, atom_id: string, new_atom: any) {
     console.log("sending up atom to composer");
-    const atom_str = JSON.stringify(new_atom).replace(/"/g, "\\\"");
+    const atom_str = JSON.stringify(
+        this._filter_atom(t, new_atom)).replace(/"/g, "\\\"");
     this._post(`{
       updateAtom(
-        type: {name: "${t}", element: "${this._element}", loc: "${this._loc}"},
+        type: {
+          name: "${t.name}", element: "${this._element}", loc: "${this._loc}"
+        },
         atom_id: "${atom_id}",
         atom: "${atom_str}")
     }`);
   }
 
-  rm_atom(t: string, id: string) {
+  rm_atom(t: any /* GraphQLObjectType */, id: string) {
     console.log("sending rm atom to composer");
     this._post(`rm`);
   }
 
   config(query) {
     this._post(query);
+  }
+
+  private _filter_atom(t: any, atom: any) {
+    let filtered_atom = {};
+    for (const f of Object.keys(t._fields)) {
+      filtered_atom[f] = atom[f];
+    }
+    return filtered_atom;
   }
 
   private _post(query) {
