@@ -39,7 +39,7 @@ const sub_type = new graphql.GraphQLObjectType({
     subscriptions: {
       "type": new graphql.GraphQLList(pub_type),
       resolve: sub => mean.db.collection("pubs")
-        .find({name: {$in: sub.subscriptions.map(s => s.name)}})
+        .find({name: {$in: sub.subscriptions.map(s => s.name)}}) // fatten this one
         .toArray()
     }
   }
@@ -59,7 +59,8 @@ function resolve_dv_mut(mutation_type, item) {
   return (_, args) => {
     const atom = JSON.parse(args.atom);
     console.log(
-      "got new " + item + "(id " + args.atom_id + ") from bus " +
+      "got " + mutation_type + " " + item +
+      "(id " + args.atom_id + ") from bus " +
       JSON.stringify(atom));
     atom["atom_id"] = args.atom_id;
     const col = mean.db.collection(item + "s");

@@ -137,9 +137,37 @@ export class Composer {
   private _filter_atom(t: any, atom: any) {
     let filtered_atom = {};
     for (const f of Object.keys(t._fields)) {
-      filtered_atom[f] = atom[f];
+      const atom_f = atom[f];
+
+      let filtered_atom_f = {};
+      if (Array.isArray(atom_f)) {   // list type
+        filtered_atom_f = this._filter_list(atom_f);
+      } else if (typeof atom_f === "object") {  // object type
+        filtered_atom_f["atom_id"] = atom_f["atom_id"];
+      } else {  // scalar type
+        filtered_atom_f = atom_f;
+      }
+
+      filtered_atom[f] = filtered_atom_f;
     }
+    console.log(
+        "BEFORE FILTER <" + JSON.stringify(atom) + "> AFTER FILTER <" +
+        JSON.stringify(filtered_atom) + ">");
     return filtered_atom;
+  }
+
+  private _filter_list(l: Array<any>) {
+    return l.map(atom => {
+      let filtered_atom = {};
+      if (typeof atom === "object") {
+        filtered_atom["atom_id"] = atom["atom_id"];
+      } else if (atom["Symbol.iterator"] === "function") {
+        filtered_atom = this._filter_list(atom);
+      } else {
+        filtered_atom = atom;
+      }
+      return filtered_atom;
+    });
   }
 
   private _post(query) {
