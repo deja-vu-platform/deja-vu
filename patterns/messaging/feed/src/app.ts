@@ -1,5 +1,5 @@
 /// <reference path="../typings/tsd.d.ts" />
-import {Promise} from "es6-promise";
+// import {Promise} from "es6-promise";
 const graphql = require("graphql");
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mean_mod = require("mean");
@@ -21,13 +21,9 @@ const pub_type = new graphql.GraphQLObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     published: {
       "type": new graphql.GraphQLList(msg_type),
-      resolve: pub => {
-        let promises = pub.published.map(msg => {
-          return mean.db.collection("msgs")
-             .find({atom_id: msg.atom_id}).limit(1).next();
-        });
-        return Promise.all(promises);
-      }
+      resolve: pub => mean.db.collection("msgs")
+        .find({atom_id: {$in: pub.published.map(p => p.atom_id)}})
+        .toArray()
     }
   }
 });
@@ -39,38 +35,12 @@ const sub_type = new graphql.GraphQLObjectType({
     subscriptions: {
       "type": new graphql.GraphQLList(pub_type),
       resolve: sub => mean.db.collection("pubs")
-        .find({name: {$in: sub.subscriptions.map(s => s.name)}}) // fatten this one
+        .find({atom_id: {$in: sub.subscriptions.map(s => s.atom_id)}})
         .toArray()
     }
   }
 });
 
-enum MutationType {
-  New,
-  Update
-}
-
-function resolve_dv_mut(mutation_type, item) {
-  const insert = (col, atom_id, atom) => col
-    .insertOne(atom).then(res => res.insertedCount === 1);
-  const replace = (col, atom_id, atom) => col
-    .replaceOne({atom_id: atom_id}, atom).then(res => res.modifiedCount === 1);
-
-  return (_, args) => {
-    const atom = JSON.parse(args.atom);
-    console.log(
-      "got " + mutation_type + " " + item +
-      "(id " + args.atom_id + ") from bus " +
-      JSON.stringify(atom));
-    atom["atom_id"] = args.atom_id;
-    const col = mean.db.collection(item + "s");
-    if (mutation_type === MutationType.New) {
-      return insert(col, args.atom_id, atom);
-    } else {
-      return replace(col, args.atom_id, atom);
-    }
-  };
-}
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
@@ -98,7 +68,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: resolve_dv_mut(MutationType.New, "sub")
+        resolve: mean.resolve_dv_new("sub")
       },
       _dv_update_subscriber: {
         "type": graphql.GraphQLBoolean,
@@ -106,7 +76,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: resolve_dv_mut(MutationType.Update, "sub")
+        resolve: mean.resolve_dv_up("sub")
       },
 
       _dv_new_publisher: {
@@ -115,7 +85,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: resolve_dv_mut(MutationType.New, "pub")
+        resolve: mean.resolve_dv_new("pub")
       },
 
       _dv_update_publisher: {
@@ -124,7 +94,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: resolve_dv_mut(MutationType.Update, "pub")
+        resolve: mean.resolve_dv_up("pub")
       },
 
       _dv_new_message: {
@@ -133,7 +103,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: resolve_dv_mut(MutationType.New, "msg")
+        resolve: mean.resolve_dv_new("msg")
       },
 
       _dv_update_message: {
@@ -142,7 +112,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: resolve_dv_mut(MutationType.Update, "msg")
+        resolve: mean.resolve_dv_up("msg")
       }
     }
   })

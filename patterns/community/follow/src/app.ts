@@ -233,21 +233,21 @@ mean = new mean_mod.Mean("follow", {
   init_db: (db, debug) => {
     db.createCollection("sources", (err, sources) => {
       if (err) throw err;
-        console.log("Resetting sources collection");
-        sources.remove((err, remove_count) => {
-          if (err) throw err;
-          console.log(`Removed ${remove_count} elems`);
-          if (debug) {
-            sources.insertMany([
-              {name: "benbitdiddle", follows: []},
-              {name: "alyssaphacker", follows: []},
-              {name: "eva", follows: []},
-              {name: "louis", follows: []},
-              {name: "cydfect", follows: []},
-              {name: "lem", follows: []}
-            ], (err, res) => { if (err) throw err; });
-          }
-        });
+      console.log("Resetting sources collection");
+      sources.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          sources.insertMany([
+            {name: "benbitdiddle", follows: []},
+            {name: "alyssaphacker", follows: []},
+            {name: "eva", follows: []},
+            {name: "louis", follows: []},
+            {name: "cydfect", follows: []},
+            {name: "lem", follows: []}
+          ], (err, res) => { if (err) throw err; });
+        }
+      });
     });
 
     db.createCollection("targets", (err, sources) => {

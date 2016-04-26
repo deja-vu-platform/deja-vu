@@ -28,6 +28,10 @@ export interface MeanConfig {
   init_db?: (db, debug) => void;
 }
 
+enum MutationType {
+  New,
+  Update
+}
 
 export class Mean {
   db; //: mongodb.Db;
@@ -76,6 +80,48 @@ export class Mean {
 
     this.composer = new Composer(
         name, opts.bushost, opts.busport, loc);
+  }
+
+  resolve_dv_new(
+      item_name: string, col_name?: string, transform_fn?: (atom: any) => any) {
+    return this._resolve_dv_mut(
+        MutationType.New, item_name, col_name, transform_fn);
+  }
+
+  resolve_dv_up(
+      item_name: string, col_name?: string, transform_fn?: (atom: any) => any) {
+    return this._resolve_dv_mut(
+        MutationType.Update, item_name, col_name, transform_fn);
+  }
+
+  private _resolve_dv_mut(
+      mutation_type: MutationType, item_name: string, col_name?: string,
+      transform_fn?: (atom: any) => any) {
+    if (col_name === undefined) col_name = item_name + "s";
+
+    const insert = (col, atom_id, atom) => col
+      .insertOne(atom)
+      .then(res => res.insertedCount === 1);
+    const replace = (col, atom_id, atom) => col
+      .replaceOne({atom_id: atom_id}, atom)
+      .then(res => res.modifiedCount === 1);
+
+    return (_, args) => {
+      let atom = JSON.parse(args.atom);
+      console.log(
+        "got " + mutation_type + " " + item_name +
+        "(id " + args.atom_id + ") from bus " +
+        JSON.stringify(atom));
+      atom["atom_id"] = args.atom_id;
+      if (transform_fn !== undefined) atom = transform_fn(atom);
+
+      const col = this.db.collection(col_name);
+      if (mutation_type === MutationType.New) {
+        return insert(col, args.atom_id, atom);
+      } else {
+        return replace(col, args.atom_id, atom);
+      }
+    };
   }
 
   private _cors(req, res, next) {
