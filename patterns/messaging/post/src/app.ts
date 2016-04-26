@@ -4,19 +4,51 @@ const graphql = require("graphql");
 
 import {Mean} from "mean";
 
-let mean;
+
+const mean = new Mean(
+  "post",
+  (db, debug) => {
+    db.createCollection("users", (err, users) => {
+      if (err) throw err;
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          users.insertMany([
+            {username: "benbitdiddle", posts: []},
+            {username: "alyssaphacker", posts: []},
+            {username: "eva", posts: []},
+            {username: "louis", posts: []},
+            {username: "cydfect", posts: []},
+            {username: "lem", posts: []}
+          ], (err, res) => { if (err) throw err; });
+        }
+      });
+    });
+
+    db.createCollection("posts", (err, posts) => {
+      if (err) throw err;
+      console.log("Resetting posts collection");
+      posts.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+      });
+    });
+  }
+);
 
 
 const post_type = new graphql.GraphQLObjectType({
   name: "Post",
-  fields: {
+  fields: () => ({
     content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-  }
+  })
 });
 
 const user_type = new graphql.GraphQLObjectType({
   name: "User",
-  fields: {
+  fields: () => ({
     username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     posts: {
       "type": new graphql.GraphQLList(post_type),
@@ -27,14 +59,14 @@ const user_type = new graphql.GraphQLObjectType({
         return Promise.all(promises);
       }
     }
-  }
+  })
 });
 
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
-    fields: {
+    fields: () => ({
       user: {
         "type": user_type,
         args: {
@@ -44,12 +76,12 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("users").findOne({username: username});
         }
       }
-    }
+    })
   }),
 
   mutation: new graphql.GraphQLObjectType({
     name: "Mutation",
-    fields: {
+    fields: () => ({
       newPost: {
         "type": post_type,
         args: {
@@ -87,15 +119,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const user = JSON.parse(args.atom);
-          console.log(
-            "got new user (id" + args.atom_id + ") from bus " +
-             JSON.stringify(user));
-          user["atom_id"] = args.atom_id;
-          return mean.db.collection("users").insertOne(user)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: mean.resolve_dv_new("user")
       },
 
       _dv_update_user: {
@@ -104,15 +128,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const user = JSON.parse(args.atom);
-          console.log(
-            "got update user (id " + args.atom_id + ") from bus " +
-            JSON.stringify(user));
-          return mean.db.collection("users").replaceOne(
-            {atom_id: args.atom_id}, user)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: mean.resolve_dv_up("user")
       },
 
       _dv_new_post: {
@@ -121,14 +137,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const post = JSON.parse(args.atom);
-
-          console.log("got new post from bus " + JSON.stringify(post));
-          post["atom_id"] = args.atom_id;
-          return mean.db.collection("posts").insertOne(post)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: mean.resolve_dv_new("post")
       },
 
       _dv_update_post: {
@@ -137,17 +146,9 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const post = JSON.parse(args.atom);
-          console.log(
-            "got update post (id " + args.atom_id + ") from bus " +
-            JSON.stringify(post));
-          return mean.db.collection("posts").replaceOne(
-            {atom_id: args.atom_id}, post)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: mean.resolve_dv_up("post")
       },
-    }
+    })
   })
 });
 
@@ -162,36 +163,4 @@ namespace Validation {
   }
 }
 
-
-mean = new Mean("post", {
-  graphql_schema: schema,
-  init_db: (db, debug) => {
-    db.createCollection("users", (err, users) => {
-      if (err) throw err;
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          users.insertMany([
-            {username: "benbitdiddle", posts: []},
-            {username: "alyssaphacker", posts: []},
-            {username: "eva", posts: []},
-            {username: "louis", posts: []},
-            {username: "cydfect", posts: []},
-            {username: "lem", posts: []}
-          ], (err, res) => { if (err) throw err; });
-        }
-      });
-    });
-
-    db.createCollection("posts", (err, posts) => {
-      if (err) throw err;
-      console.log("Resetting posts collection");
-      posts.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-      });
-    });
-  }
-});
+mean.serve_schema(schema);

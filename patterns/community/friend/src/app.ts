@@ -5,7 +5,31 @@ const graphql = require("graphql");
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mean_mod = require("mean");
 
-let mean;
+
+const mean = new mean_mod.Mean(
+  "friend",
+  (db, debug) => {
+    db.createCollection("users", (err, users) => {
+      if (err) throw err;
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          users.insertMany([
+            {username: "benbitdiddle", friends: []},
+            {username: "alyssaphacker", friends: []},
+            {username: "eva", friends: []},
+            {username: "louis", friends: []},
+            {username: "cydfect", friends: []},
+            {username: "lem", friends: []}
+          ], (err, res) => { if (err) throw err; });
+        }
+      });
+    });
+  }
+);
+
 
 const user_type = new graphql.GraphQLObjectType({
   name: "User",
@@ -49,7 +73,7 @@ const fields = ast => ast.fields.selections.reduce((fields, s) => {
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
-    fields: {
+    fields: () => ({
       user: {
         "type": user_type,
         args: {
@@ -61,12 +85,12 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("users").findOne({username: username});
         }
       }
-    }
+    })
   }),
 
   mutation: new graphql.GraphQLObjectType({
     name: "Mutation",
-    fields: {
+    fields: () => ({
       addFriend: {
         "type": graphql.GraphQLBoolean,
         args: {
@@ -90,13 +114,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, args) => {
-          const user = JSON.parse(args.atom);
-          console.log("got new user from bus " + JSON.stringify(user));
-          user["atom_id"] = args.atom_id;
-          return mean.db.collection("users").insertOne(user)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: mean.resolve_dv_new("user")
       },
       _dv_update_user: {
         "type": graphql.GraphQLBoolean,
@@ -104,13 +122,9 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const user = JSON.parse(args.atom);
-          console.log("got up user from bus " + JSON.stringify(user));
-          return true;
-        }
+        resolve: mean.resolve_dv_up("user")
       }
-    }
+    })
   })
 });
 
@@ -152,27 +166,4 @@ namespace Validation {
   }
 }
 
-
-mean = new mean_mod.Mean("friend", {
-  graphql_schema: schema,
-  init_db: (db, debug) => {
-    db.createCollection("users", (err, users) => {
-      if (err) throw err;
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          users.insertMany([
-            {username: "benbitdiddle", friends: []},
-            {username: "alyssaphacker", friends: []},
-            {username: "eva", friends: []},
-            {username: "louis", friends: []},
-            {username: "cydfect", friends: []},
-            {username: "lem", friends: []}
-          ], (err, res) => { if (err) throw err; });
-        }
-      });
-    });
-  }
-});
+mean.serve_schema(schema);

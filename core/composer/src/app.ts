@@ -4,48 +4,29 @@ import * as http from "http";
 
 import {Mean} from "mean";
 
-let mean;
 
+const mean = new Mean(
+  "composer",
+  (db, debug) => {
+    db.createCollection("tbonds", (err, tbonds) => {
+      if (err) throw err;
+      console.log("Resetting tbonds collection");
+      tbonds.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+      });
+    });
+    db.createCollection("fbonds", (err, fbonds) => {
+      if (err) throw err;
+      console.log("Resetting fbonds collection");
+      fbonds.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+      });
+    });
+  }
+);
 
-/*
-const element_type = new graphql.GraphQLObjectType({
-  name: "Element",
-  fields: () => ({
-    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    "location": {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-  })
-});
-
-const type_type = new graphql.GraphQLObjectType({
-  name: "Type",
-  fields: () => ({
-    element: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-  })
-});
-
-const field_type = new graphql.GraphQLObjectType({
-  name: "Field",
-  fields: () => ({
-    "type": {"type": new graphql.GraphQLNonNull(type_type)},
-    name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-  })
-});
-
-const type_bond_type = new graphql.GraphQLObjectType({
-  name: "TypeBond",
-  fields: () => ({
-    types: {"type": new graphql.GraphQLList(type_type)}
-  })
-});
-
-const field_bond_type = new graphql.GraphQLObjectType({
-  name: "FieldBond",
-  fields: () => ({
-    fields: {"type": new graphql.GraphQLList(field_type)}
-  })
-});
-*/
 
 const type_input_type = new graphql.GraphQLInputObjectType({
   name: "TypeInput",
@@ -63,21 +44,6 @@ const field_input_type = new graphql.GraphQLInputObjectType({
     "type": {"type": new graphql.GraphQLNonNull(type_input_type)}
   })
 });
-/*
-const type_bond_input_type = new graphql.GraphQLInputObjectType({
-  name: "TypeBondInput",
-  fields: () => ({
-    types: {"type": new graphql.GraphQLList(type_input_type)}
-  })
-});
-
-const field_bond_input_type = new graphql.GraphQLInputObjectType({
-  name: "FieldBondInput",
-  fields: () => ({
-    fields: {"type": new graphql.GraphQLList(field_input_type)}
-  })
-});
-*/
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
@@ -150,6 +116,8 @@ const schema = new graphql.GraphQLSchema({
     }
   })
 });
+
+mean.serve_schema(schema);
 
 function process(op: string, args: any) {
   const t: Type = new Type(
@@ -437,24 +405,4 @@ function get(loc, query, callback) {
   req.end();
 }
 
-mean = new Mean("composer", {
-  graphql_schema: schema,
-  init_db: (db, debug) => {
-    db.createCollection("tbonds", (err, tbonds) => {
-      if (err) throw err;
-      console.log("Resetting tbonds collection");
-      tbonds.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-      });
-    });
-    db.createCollection("fbonds", (err, fbonds) => {
-      if (err) throw err;
-      console.log("Resetting fbonds collection");
-      fbonds.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-      });
-    });
-  }
-});
+

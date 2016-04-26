@@ -5,19 +5,67 @@ const graphql = require("graphql");
 const mean_mod = require("mean");
 
 
-let mean;
+const mean = new mean_mod.Mean(
+  "feed",
+  (db, debug) => {
+    // Subs
+    db.createCollection("subs", (err, subs) => {
+      if (err) throw err;
+      subs.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          subs.insertMany([
+            {name: "Ben", subscriptions: [
+              "Software Engineering News", "Things Ben Bitdiddle Says"]},
+            {name: "Alyssa", subscriptions: []}
+          ], (err, res) => { if (err) throw err; });
+        }
+      });
+    });
+    // Pubs
+    db.createCollection("pubs", (err, pubs) => {
+      if (err) throw err;
+      pubs.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          pubs.insertMany([
+            {name: "Software Engineering News", published: [
+              "Node v0.0.1 released!"]},
+            {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
+            {name: "U.S News", published: []},
+            {name: "World News", published: []},
+            {name: "New Books about Zombies", published: []}
+          ], (err, res) => { if (err) throw err; });
+        }
+      });
+    });
+    // Messages
+    db.createCollection("msgs", (err, pubs) => {
+      if (err) throw err;
+      pubs.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          //
+        }
+      });
+    });
+  }
+);
 
 const msg_type = new graphql.GraphQLObjectType({
   name: "Message",
-  fields: {
+  fields: () => ({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     content: {"type": graphql.GraphQLString}
-  }
+  })
 });
 
 const pub_type = new graphql.GraphQLObjectType({
   name: "Publisher",
-  fields: {
+  fields: () => ({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     published: {
       "type": new graphql.GraphQLList(msg_type),
@@ -25,12 +73,12 @@ const pub_type = new graphql.GraphQLObjectType({
         .find({atom_id: {$in: pub.published.map(p => p.atom_id)}})
         .toArray()
     }
-  }
+  })
 });
 
 const sub_type = new graphql.GraphQLObjectType({
   name: "Subscriber",
-  fields: {
+  fields: () => ({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     subscriptions: {
       "type": new graphql.GraphQLList(pub_type),
@@ -38,14 +86,14 @@ const sub_type = new graphql.GraphQLObjectType({
         .find({atom_id: {$in: sub.subscriptions.map(s => s.atom_id)}})
         .toArray()
     }
-  }
+  })
 });
 
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
-    fields: {
+    fields: () => ({
       sub: {
         "type": sub_type,
         args: {
@@ -56,12 +104,12 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("subs").find({name: name}).limit(1).next();
         }
       }
-    }
+    })
   }),
 
   mutation: new graphql.GraphQLObjectType({
     name: "Mutation",
-    fields: {
+    fields: () => ({
       _dv_new_subscriber: {
         "type": graphql.GraphQLBoolean,
         args: {
@@ -114,57 +162,9 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: mean.resolve_dv_up("msg")
       }
-    }
+    })
   })
 });
 
 
-mean = new mean_mod.Mean("feed", {
-  graphql_schema: schema,
-  init_db: (db, debug) => {
-    // Subs
-    db.createCollection("subs", (err, subs) => {
-      if (err) throw err;
-      subs.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          subs.insertMany([
-            {name: "Ben", subscriptions: [
-              "Software Engineering News", "Things Ben Bitdiddle Says"]},
-            {name: "Alyssa", subscriptions: []}
-          ], (err, res) => { if (err) throw err; });
-        }
-      });
-    });
-    // Pubs
-    db.createCollection("pubs", (err, pubs) => {
-      if (err) throw err;
-      pubs.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          pubs.insertMany([
-            {name: "Software Engineering News", published: [
-              "Node v0.0.1 released!"]},
-            {name: "Things Ben Bitdiddle Says", published: ["Hi"]},
-            {name: "U.S News", published: []},
-            {name: "World News", published: []},
-            {name: "New Books about Zombies", published: []}
-          ], (err, res) => { if (err) throw err; });
-        }
-      });
-    });
-    // Messages
-    db.createCollection("msgs", (err, pubs) => {
-      if (err) throw err;
-      pubs.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          //
-        }
-      });
-    });
-  }
-});
+mean.serve_schema(schema);

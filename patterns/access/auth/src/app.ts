@@ -6,20 +6,34 @@ const jwt = require("jsonwebtoken");
 
 import {Mean} from "mean";
 
-let mean;
+
+const mean = new Mean(
+  "auth",
+  (db, debug) => {
+    db.createCollection("users", (err, users) => {
+      if (err) throw err;
+      console.log("Resetting users collection");
+      users.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+      });
+    });
+  }
+);
+
 
 const user_type = new graphql.GraphQLObjectType({
   name: "User",
-  fields:  {
+  fields: () => ({
     username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-  }
+  })
 });
 
 
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
-    fields: {
+    fields: () => ({
       user: {
         "type": user_type,
         args: {
@@ -31,12 +45,12 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("users").findOne({username: username});
         }
       }
-    }
+    })
   }),
 
   mutation: new graphql.GraphQLObjectType({
     name: "Mutation",
-    fields: {
+    fields: () => ({
       register: {
         "type": graphql.GraphQLBoolean,
         args: {
@@ -87,22 +101,10 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const arg_user = JSON.parse(args.atom);
-          console.log("got new user from bus " + JSON.stringify(arg_user));
-          const hash = bcrypt.hashSync(arg_user.username, 10);
-          const user = {
-            username: arg_user.username, password: hash,
-            atom_id: arg_user.username};
-          return mean.db.collection("users")
-            .insertOne(user)
-            .then(write_res => {
-              if (write_res.insertedCount !== 1) {
-                throw new Error("Couldn't save new user");
-              }
-              return true;
-            });
-        }
+        resolve: mean.resolve_dv_new("user", "users", user => {
+          user["password"] = bcrypt.hashSync(user.username, 10);
+          return user;
+        })
       },
       _dv_update_user: {
         "type": graphql.GraphQLBoolean,
@@ -110,18 +112,9 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const user = JSON.parse(args.atom);
-          console.log(
-            "got update user (id " + args.atom_id + ") from bus " +
-            JSON.stringify(user));
-          user["atom_id"] = args.atom_id;
-          return mean.db.collection("users")
-            .replaceOne({atom_id: args.atom_id}, user)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: mean.resolve_dv_up("user")
       }
-    }
+    })
   })
 });
 
@@ -146,17 +139,4 @@ namespace Validation {
   }
 }
 
-
-mean = new Mean("auth", {
-  graphql_schema: schema,
-  init_db: (db, debug) => {
-    db.createCollection("users", (err, users) => {
-      if (err) throw err;
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-      });
-    });
-  }
-});
+mean.serve_schema(schema);

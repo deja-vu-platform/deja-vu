@@ -23,11 +23,6 @@ const cli = command_line_args([
 ]);
 
 
-export interface MeanConfig {
-  graphql_schema?: any;
-  init_db?: (db, debug) => void;
-}
-
 enum MutationType {
   New,
   Update
@@ -37,12 +32,13 @@ export class Mean {
   db; //: mongodb.Db;
   app: express.Express;
   composer: Composer;
+  loc: string;
 
-  constructor(public name: string, config: MeanConfig) {
+  constructor(public name: string, init_db?: (db, debug) => void) {
     const opts = cli.parse();
-    const loc = `http://${opts.wshost}:${opts.wsport}`;
+    this.loc = `http://${opts.wshost}:${opts.wsport}`;
 
-    console.log(`Starting MEAN ${name} at ${loc}`);
+    console.log(`Starting MEAN ${name} at ${this.loc}`);
 
     const server = new mongodb.Server(
       opts.dbhost, opts.dbport, {socketOptions: {autoReconnect: true}});
@@ -53,9 +49,9 @@ export class Mean {
         console.log("Error opening mongodb");
         throw err;
       }
-      if (config.init_db) {
+      if (init_db !== undefined) {
         console.log(`Initializing db for MEAN ${name}`);
-        config.init_db(db, opts.debugdata);
+        init_db(db, opts.debugdata);
       }
     });
 
@@ -63,23 +59,24 @@ export class Mean {
     this.app.use(morgan("dev"));
 
     if (opts.servepublic) {
-      console.log(`Serving public folder for MEAN ${name} at ${loc}`);
+      console.log(`Serving public folder for MEAN ${name} at ${this.loc}`);
       this.app.use(express.static("./dist/public"));
     };
-    if (config.graphql_schema) {
-     console.log(`Serving graphql schema for MEAN ${name} at ${loc}`);
-     const gql = express_graphql({schema: config.graphql_schema, pretty: true});
-     this.app.options("/graphql", this._cors);
-     this.app.get("/graphql", this._cors, gql);
-     this.app.post("/graphql", this._cors, gql);
-    }
 
     this.app.listen(opts.wsport, () => {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
     });
 
     this.composer = new Composer(
-        name, opts.bushost, opts.busport, loc);
+        name, opts.bushost, opts.busport, this.loc);
+  }
+
+  serve_schema(graphql_schema) {
+    console.log(`Serving graphql schema for MEAN ${this.name} at ${this.loc}`);
+    const gql = express_graphql({schema: graphql_schema, pretty: true});
+    this.app.options("/graphql", this._cors);
+    this.app.get("/graphql", this._cors, gql);
+    this.app.post("/graphql", this._cors, gql);
   }
 
   resolve_dv_new(

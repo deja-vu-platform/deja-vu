@@ -5,7 +5,49 @@ const graphql = require("graphql");
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mean_mod = require("mean");
 
-let mean;
+
+const mean = new mean_mod.Mean(
+  "follow",
+  (db, debug) => {
+    db.createCollection("sources", (err, sources) => {
+      if (err) throw err;
+      console.log("Resetting sources collection");
+      sources.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          sources.insertMany([
+            {name: "benbitdiddle", follows: []},
+            {name: "alyssaphacker", follows: []},
+            {name: "eva", follows: []},
+            {name: "louis", follows: []},
+            {name: "cydfect", follows: []},
+            {name: "lem", follows: []}
+          ], (err, res) => { if (err) throw err; });
+        }
+      });
+    });
+
+    db.createCollection("targets", (err, sources) => {
+      if (err) throw err;
+      console.log("Resetting targets collection");
+      sources.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          sources.insertMany([
+            {name: "benbitdiddle"},
+            {name: "alyssaphacker"},
+            {name: "eva"},
+            {name: "louis"},
+            {name: "cydfect"},
+            {name: "lem"}
+          ], (err, res) => { if (err) throw err; });
+        }
+      });
+    });
+  }
+);
 
 
 const target_type = new graphql.GraphQLObjectType({
@@ -58,7 +100,7 @@ const source_type = new graphql.GraphQLObjectType({
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
-    fields: {
+    fields: () => ({
       source: {
         "type": source_type,
         args: {
@@ -83,12 +125,12 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("targets").find().toArray();
         }
       }
-    }
+    })
   }),
 
   mutation: new graphql.GraphQLObjectType({
     name: "Mutation",
-    fields: {
+    fields: () => ({
       follow: {
         "type": graphql.GraphQLBoolean,
         args: {
@@ -135,15 +177,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, args) => {
-          const source = JSON.parse(args.atom);
-          console.log(
-            "got new source (id " + args.atom_id + ") from bus " +
-            JSON.stringify(source));
-          source["atom_id"] = args.atom_id;
-          return mean.db.collection("sources").insertOne(source)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: mean.resolve_dv_new("source")
       },
       _dv_update_source: {
         "type": graphql.GraphQLBoolean,
@@ -151,15 +185,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const source = JSON.parse(args.atom);
-          console.log(
-            "got update source (id" + args.atom_id + ") from bus " +
-            JSON.stringify(source));
-          return mean.db.collection("sources").replaceOne(
-            {atom_id: args.atom_id}, source)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: mean.resolve_dv_up("source")
       },
 
       _dv_new_target: {
@@ -168,15 +194,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, args) => {
-          const target = JSON.parse(args.atom);
-          console.log(
-            "got new target (id " + args.atom_id + ") from bus " +
-            JSON.stringify(target));
-          target["atom_id"] = args.atom_id;
-          return mean.db.collection("targets").insertOne(target)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: mean.resolve_dv_new("target")
       },
 
       _dv_update_target: {
@@ -185,17 +203,9 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const target = JSON.parse(args.atom);
-          console.log(
-            "got update target (id " + args.atom_id + ") from bus " +
-            JSON.stringify(target));
-          return mean.db.collection("targets").replaceOne(
-            {atom_id: args.atom_id}, target)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: mean.resolve_dv_up("target")
       },
-    }
+    })
   })
 });
 
@@ -227,46 +237,4 @@ namespace Validation {
   }
 }
 
-
-mean = new mean_mod.Mean("follow", {
-  graphql_schema: schema,
-  init_db: (db, debug) => {
-    db.createCollection("sources", (err, sources) => {
-      if (err) throw err;
-      console.log("Resetting sources collection");
-      sources.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          sources.insertMany([
-            {name: "benbitdiddle", follows: []},
-            {name: "alyssaphacker", follows: []},
-            {name: "eva", follows: []},
-            {name: "louis", follows: []},
-            {name: "cydfect", follows: []},
-            {name: "lem", follows: []}
-          ], (err, res) => { if (err) throw err; });
-        }
-      });
-    });
-
-    db.createCollection("targets", (err, sources) => {
-      if (err) throw err;
-      console.log("Resetting targets collection");
-      sources.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          sources.insertMany([
-            {name: "benbitdiddle"},
-            {name: "alyssaphacker"},
-            {name: "eva"},
-            {name: "louis"},
-            {name: "cydfect"},
-            {name: "lem"}
-          ], (err, res) => { if (err) throw err; });
-        }
-      });
-    });
-  }
-});
+mean.serve_schema(schema);

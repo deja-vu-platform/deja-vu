@@ -66,9 +66,8 @@ const schema = new graphql.GraphQLSchema({
 });
 
 
-const mean = new mean_mod.Mean("bookmark", {
-  graphql_schema: schema
-});
+const mean = new mean_mod.Mean("bookmark");
+mean.serve_schema(schema);
 
 mean.app.use("/*", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
@@ -77,36 +76,6 @@ mean.app.use("/*", (req, res) => {
 setTimeout(init_composer, 10 * 1000);  // hack..
 setTimeout(init_db, 30 * 1000);  // hack..
 
-
-function init_db() {
-  mean.composer.new_atom(
-      topic_type, "3", {
-        name: "hello",
-        posts: [{atom_id: "1"}, {atom_id: "2"}]
-      });
-  mean.composer.new_atom(
-      post_type, "1", {
-        name: "1",
-        content: "hello, I'm Ben",
-        topics: [{atom_id: "3"}]
-      });
-  mean.composer.new_atom(
-      post_type, "2", {
-        name: "2",
-        content: "hello, I'm Alyssa",
-        topics: [{atom_id: "3"}]
-      });
-  mean.composer.new_atom(
-      user_type, "1", {
-        username: "benbitdiddle", follows: [],
-        posts: [{atom_id: "1"}]
-      });
-  mean.composer.new_atom(
-      user_type, "2", {
-        username: "alyssaphacker", follows: [],
-        posts: [{atom_id: "2"}]
-      });
-}
 
 /*
  * - Users create posts and attach topics to them
@@ -305,4 +274,35 @@ function init_composer() {
       }
     })
   }`);
+}
+
+
+function init_db() {
+  mean.composer.new_atom(
+      topic_type, "3", {
+        name: "hello",
+        posts: [{atom_id: "1"}, {atom_id: "2"}]
+      });
+  mean.composer.new_atom(
+      post_type, "1", {
+        name: "1",
+        content: "hello, I'm Ben",
+        topics: [{atom_id: "3"}]
+      });
+  mean.composer.new_atom(
+      post_type, "2", {
+        name: "2",
+        content: "hello, I'm Alyssa",
+        topics: [{atom_id: "3"}]
+      });
+  mean.composer.new_atom(
+      user_type, "1", {
+        username: "benbitdiddle", follows: [],
+        posts: [{atom_id: "1"}]
+      });
+  mean.composer.new_atom(
+      user_type, "2", {
+        username: "alyssaphacker", follows: [],
+        posts: [{atom_id: "2"}]
+      });
 }

@@ -4,7 +4,40 @@ const graphql = require("graphql");
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mean_mod = require("mean");
 
-let mean;
+const mean = new mean_mod.Mean(
+  "label",
+  (db, debug) => {
+    db.createCollection("items", (err, items) => {
+      if (err) throw err;
+      console.log("Resetting items collection");
+      items.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          items.insertMany([
+            {name: "item", labels: [{name: "label1"}, {name: "label2"}]},
+            {name: "another-item", labels: [{name: "label1"}]}
+          ], (err, res) => { if (err) throw err; });
+        }
+        });
+    });
+
+    db.createCollection("labels", (err, items) => {
+      if (err) throw err;
+      console.log("Resetting labels collection");
+      items.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+        if (debug) {
+          items.insertMany([
+            {name: "label1"},
+            {name: "label2"}
+          ], (err, res) => { if (err) throw err; });
+        }
+        });
+    });
+  }
+);
 
 
 const label_type = new graphql.GraphQLObjectType({
@@ -54,7 +87,7 @@ const item_type = new graphql.GraphQLObjectType({
 const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
-    fields: {
+    fields: () => ({
       item: {
         "type": item_type,
         args: {
@@ -75,27 +108,19 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("items").find().toArray();
         }
       },
-    }
+    })
   }),
 
   mutation: new graphql.GraphQLObjectType({
     name: "Mutation",
-    fields: {
+    fields: () => ({
       _dv_new_item: {
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, args) => {
-          const item = JSON.parse(args.atom);
-          console.log(
-            "got new item (id " + args.atom_id + ") from bus " +
-            JSON.stringify(item));
-          item["atom_id"] = args.atom_id;
-          return mean.db.collection("items").insertOne(item)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: mean.resolve_dv_new("item")
       },
       _dv_update_item: {
         "type": graphql.GraphQLBoolean,
@@ -103,15 +128,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const item = JSON.parse(args.atom);
-          console.log(
-            "got update item (id " + args.atom_id + ") from bus " +
-            JSON.stringify(item));
-          return mean.db.collection("items").replaceOne(
-            {atom_id: args.atom_id}, item)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: mean.resolve_dv_up("item")
       },
       _dv_new_label: {
         "type": graphql.GraphQLBoolean,
@@ -119,15 +136,7 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, args) => {
-          const label = JSON.parse(args.atom);
-          console.log(
-            "got new label (id " + args.atom_id + ") from bus " +
-            JSON.stringify(label));
-          label["atom_id"] = args.atom_id;
-          return mean.db.collection("labels").insertOne(label)
-            .then(res => res.insertedCount === 1);
-        }
+        resolve: mean.resolve_dv_new("label")
       },
       _dv_update_label: {
         "type": graphql.GraphQLBoolean,
@@ -135,17 +144,9 @@ const schema = new graphql.GraphQLSchema({
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (root, args) => {
-          const label = JSON.parse(args.atom);
-          console.log(
-            "got update label (id " + args.atom_id + ") from bus " +
-            JSON.stringify(label));
-          return mean.db.collection("labels").replaceOne(
-            {atom_id: args.atom_id}, label)
-            .then(res => res.modifiedCount === 1);
-        }
+        resolve: mean.resolve_dv_up("label")
       }
-    }
+    })
   })
 });
 
@@ -159,39 +160,4 @@ function report_update(name) {
   });
 }
 
-
-mean = new mean_mod.Mean("label", {
-  graphql_schema: schema,
-  init_db: (db, debug) => {
-    db.createCollection("items", (err, items) => {
-      if (err) throw err;
-      console.log("Resetting items collection");
-      items.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          items.insertMany([
-            {name: "item", labels: [{name: "label1"}, {name: "label2"}]},
-            {name: "another-item", labels: [{name: "label1"}]}
-          ], (err, res) => { if (err) throw err; });
-        }
-        });
-    });
-
-    db.createCollection("labels", (err, items) => {
-      if (err) throw err;
-      console.log("Resetting labels collection");
-      items.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
-        if (debug) {
-          items.insertMany([
-            {name: "label1"},
-            {name: "label2"}
-          ], (err, res) => { if (err) throw err; });
-        }
-        });
-    });
-
-  }
-});
+mean.serve_schema(schema);
