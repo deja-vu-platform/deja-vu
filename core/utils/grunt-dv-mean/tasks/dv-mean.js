@@ -218,16 +218,17 @@ module.exports = function(grunt, optPatterns, element) {
       grunt.log.writeln(this.name + " serve");
       grunt.task.run(
         ["clean:dev", "tslint", "ts:dev_client", "copy:dev", "ts:dev_server"]);
-      var express_config = {};
-      var replace_patterns = [];
-      var port = 3002;
-
-      replace_patterns.push({
-        match: element + "-1",
-        replacement: "http://localhost:3000"
-      });
 
       if (Object.keys(optPatterns).length > 0) {
+        var express_config = {};
+        var replace_patterns = [];
+        var port = 3002;
+
+        replace_patterns.push({
+          match: element + "-1",
+          replacement: "http://localhost:3000"
+        });
+
         grunt.log.writeln("This element is a compound, will start a composer");
         express_config["composer"] = {
           options: {
@@ -236,32 +237,33 @@ module.exports = function(grunt, optPatterns, element) {
             args: ["--wsport=3001"]
           }
         };
+
+        Object.keys(optPatterns).forEach(function(p) {
+          var process_instance = function(p, instance_number) {
+            express_config[p + "-" + instance_number] = {
+              options: {
+                script: "node_modules/" + p + "/lib/app.js",
+                background: true,
+                args: ["--wsport=" + port, "--busport=3001"]
+              }
+            };
+            replace_patterns.push({
+              match: p + "-" + instance_number,
+              replacement: "http://localhost:" + port
+            });
+            ++port;
+          }
+          var instances_number = optPatterns[p];
+          for (var i = 1; i <= instances_number; ++i) {
+            process_instance(p, i);
+          }
+        });
+
+        grunt.config.merge({express: express_config});
+        grunt.config.merge(
+          {replace: {dev: {options: {patterns: replace_patterns}}}});
       }
 
-      Object.keys(optPatterns).forEach(function(p) {
-        var process_instance = function(p, instance_number) {
-          express_config[p + "-" + instance_number] = {
-            options: {
-              script: "node_modules/" + p + "/lib/app.js",
-              background: true,
-              args: ["--wsport=" + port, "--busport=3001"]
-            }
-          };
-          replace_patterns.push({
-            match: p + "-" + instance_number,
-            replacement: "http://localhost:" + port
-          });
-          ++port;
-        }
-        var instances_number = optPatterns[p];
-        for (var i = 1; i <= instances_number; ++i) {
-          process_instance(p, i);
-        }
-      });
-
-      grunt.config.merge({express: express_config});
-      grunt.config.merge(
-        {replace: {dev: {options: {patterns: replace_patterns}}}});
       grunt.task.run(["replace:dev", "express", "watch"]);
     } else if (action === "lib") {
       grunt.log.writeln(this.name + " lib");

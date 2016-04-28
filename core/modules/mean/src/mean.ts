@@ -23,11 +23,6 @@ const cli = command_line_args([
 ]);
 
 
-enum MutationType {
-  New,
-  Update
-}
-
 export class Mean {
   db; //: mongodb.Db;
   app: express.Express;
@@ -81,43 +76,32 @@ export class Mean {
 
   resolve_dv_new(
       item_name: string, col_name?: string, transform_fn?: (atom: any) => any) {
-    return this._resolve_dv_mut(
-        MutationType.New, item_name, col_name, transform_fn);
-  }
-
-  resolve_dv_up(
-      item_name: string, col_name?: string, transform_fn?: (atom: any) => any) {
-    return this._resolve_dv_mut(
-        MutationType.Update, item_name, col_name, transform_fn);
-  }
-
-  private _resolve_dv_mut(
-      mutation_type: MutationType, item_name: string, col_name?: string,
-      transform_fn?: (atom: any) => any) {
     if (col_name === undefined) col_name = item_name + "s";
 
-    const insert = (col, atom_id, atom) => col
-      .insertOne(atom)
-      .then(res => res.insertedCount === 1);
-    const replace = (col, atom_id, atom) => col
-      .replaceOne({atom_id: atom_id}, atom)
-      .then(res => res.modifiedCount === 1);
-
-    return (_, args) => {
-      let atom = JSON.parse(args.atom);
+    return (_, {atom_id, atom}) => {
+      let atom_obj = JSON.parse(atom);
       console.log(
-        "got " + mutation_type + " " + item_name +
-        "(id " + args.atom_id + ") from bus " +
-        JSON.stringify(atom));
-      atom["atom_id"] = args.atom_id;
-      if (transform_fn !== undefined) atom = transform_fn(atom);
+        "got new " + item_name + "(id " + atom_id + ") from bus " + atom);
+      atom_obj["atom_id"] = atom_id;
+      if (transform_fn !== undefined) atom_obj = transform_fn(atom_obj);
 
-      const col = this.db.collection(col_name);
-      if (mutation_type === MutationType.New) {
-        return insert(col, args.atom_id, atom);
-      } else {
-        return replace(col, args.atom_id, atom);
-      }
+      return this.db.collection(col_name)
+        .insertOne(atom_obj)
+        .then(res => res.insertedCount === 1);
+    };
+  }
+
+  resolve_dv_up(item_name: string, col_name?: string) {
+    if (col_name === undefined) col_name = item_name + "s";
+
+    return (_, {atom_id, update}) => {
+      let update_obj = JSON.parse(update);
+      console.log(
+        "got update " + item_name + "(id " + atom_id + ") from bus " + update);
+
+      return this.db.collection(col_name)
+        .updateOne({atom_id: atom_id}, update_obj)
+        .then(res => res.matchedCount === 1 && res.modifiedCount === 1);
     };
   }
 
@@ -154,17 +138,17 @@ export class Composer {
     }`);
   }
 
-  update_atom(t: any /* GraphQLObjectType */, atom_id: string, new_atom: any) {
+  // no filtering update
+  update_atom(t: any /* GraphQLObjectType */, atom_id: string, update: any) {
     console.log("sending up atom to composer");
-    const atom_str = JSON.stringify(
-        this._filter_atom(t, new_atom)).replace(/"/g, "\\\"");
+    const update_str = JSON.stringify(update).replace(/"/g, "\\\"");
     this._post(`{
       updateAtom(
         type: {
           name: "${t.name}", element: "${this._element}", loc: "${this._loc}"
         },
         atom_id: "${atom_id}",
-        atom: "${atom_str}")
+        update: "${update_str}")
     }`);
   }
 

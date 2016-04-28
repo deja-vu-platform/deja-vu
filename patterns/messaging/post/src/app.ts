@@ -52,12 +52,9 @@ const user_type = new graphql.GraphQLObjectType({
     username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     posts: {
       "type": new graphql.GraphQLList(post_type),
-      resolve: user => {
-        let promises = user.posts.map(p => {
-          return mean.db.collections("posts").find({atom_id: p.atom_id});
-        });
-        return Promise.all(promises);
-      }
+      resolve: user => mean.db.collection("posts")
+          .find({atom_id: {$in: user.posts.map(p => p.atom_id)}})
+          .toArray()
     }
   })
 });
@@ -83,7 +80,7 @@ const schema = new graphql.GraphQLSchema({
     name: "Mutation",
     fields: () => ({
       newPost: {
-        "type": post_type,
+        "type": graphql.GraphQLBoolean,
         args: {
           author: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -91,25 +88,17 @@ const schema = new graphql.GraphQLSchema({
         resolve: (_, {author, content}) => {
           const post = {atom_id: content, content: content};
           return Validation.user_exists(author)
-            .then(_ => {
-              return Promise.all([
+            .then(user => Promise.all([
+                mean.db.collection("posts").insertOne(post),
                 mean.db.collection("users")
                   .updateOne(
-                    {username: author}, {$push: {posts: post}}),
-                mean.db.collection("posts")
-                  .insertOne(post)
-                  ]);
-            })
-            .then(_ => {
-              // report
-              return mean.db.collection("users")
-                .findOne({username: author})
-                .then(updated_user => {
-                  mean.composer.update_atom(
-                    user_type, updated_user.atom_id, updated_user);
-                  mean.composer.new_atom(post_type, post.atom_id, post);
-                });
-            });
+                    {atom_id: user.atom_id},
+                    {$addToSet: {posts: {atom_id: post.atom_id}}}),
+                mean.composer.update_atom(
+                  user_type, user.atom_id,
+                  {$addToSet: {posts: {atom_id: post.atom_id}}}),
+                mean.composer.new_atom(post_type, post.atom_id, post)
+                ]));
         }
       },
 
@@ -126,7 +115,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mean.resolve_dv_up("user")
       },
@@ -144,7 +133,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mean.resolve_dv_up("post")
       },
@@ -155,7 +144,7 @@ const schema = new graphql.GraphQLSchema({
 namespace Validation {
   export function user_exists(username) {
     return mean.db.collection("users")
-      .findOne({username: username}, {_id: 1})
+      .findOne({username: username}, {atom_id: 1})
       .then(user => {
         if (!user) throw new Error(`user ${username} not found`);
         return user;

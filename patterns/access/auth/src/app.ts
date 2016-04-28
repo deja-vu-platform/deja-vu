@@ -110,7 +110,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mean.resolve_dv_up("user")
       }

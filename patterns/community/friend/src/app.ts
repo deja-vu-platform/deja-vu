@@ -94,16 +94,24 @@ const schema = new graphql.GraphQLSchema({
       addFriend: {
         "type": graphql.GraphQLBoolean,
         args: {
-          u1: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          u2: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          username1: {
+            "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+          },
+          username2: {
+            "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+          }
         },
         resolve: mutate_friends("$addToSet")
       },
       unfriend: {
         "type": graphql.GraphQLBoolean,
         args: {
-          u1: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          u2: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          username1: {
+            "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+          },
+          username2: {
+            "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+          }
         },
         resolve: mutate_friends("$pull")
       },
@@ -120,7 +128,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mean.resolve_dv_up("user")
       }
@@ -129,39 +137,37 @@ const schema = new graphql.GraphQLSchema({
 });
 
 function mutate_friends(op) {
-  return (_, {u1, u2}) => Promise.all([
-    Validation.userExists(u1),
-    Validation.userExists(u2)
-  ]).then(_ => {
-    if (u1 === u2) return;
-    console.log("all good");
+  return (_, {username1, username2}) => Promise.all([
+    Validation.userExists(username1), Validation.userExists(username2)
+  ]).then(users => {
+    if (username1 === username2) return;
     const update = u => {
       let ret = {};
       ret[op] = {friends: u};
       return ret;
     };
-    const users = mean.db.collection("users");
+    const u1 = users[0];
+    const u2 = users[1];
+    const users_col = mean.db.collection("users");
     return Promise.all([
-      users.updateOne({username: u1}, update(u2)).then(_ => report_update(u1)),
-      users.updateOne({username: u2}, update(u1)).then(_ => report_update(u2))
+      users_col.updateOne({username: username1}, update(u2))
+          .then(_ => mean.composer
+            .update_atom(user_type, u1.atom_id, update(u2))),
+      users_col.updateOne({username: username2}, update(u1))
+          .then(_ => mean.composer
+            .update_atom(user_type, u2.atom_id, update(u1)))
     ]);
   });
 }
 
-function report_update(username) {
-  console.log("reporting update of " + username);
-  const users = mean.db.collection("users");
-  return users.findOne({username: username}).then(user => {
-    return mean.composer.update_atom(user_type, user.atom_id, user);
-  });
-}
 
 namespace Validation {
   export function userExists(username) {
     return mean.db.collection("users")
-      .findOne({username: username}, {_id: 1})
+      .findOne({username: username}, {atom_id: 1})
       .then(user => {
         if (!user) throw new Error(`${username} doesn't exist`);
+        return user;
       });
   }
 }

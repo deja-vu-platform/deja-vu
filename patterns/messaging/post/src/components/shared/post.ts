@@ -22,9 +22,7 @@ export class PostService {
 
   newPost(author: Username, content): any {
     return this._post(`{
-      newPost(author: "${author}", content: "${content}") {
-        content
-      }
+      newPost(author: "${author}", content: "${content}")
     }`);
   }
 

@@ -17,12 +17,12 @@ const mean = new mean_mod.Mean(
         console.log(`Removed ${remove_count} elems`);
         if (debug) {
           sources.insertMany([
-            {name: "benbitdiddle", follows: []},
-            {name: "alyssaphacker", follows: []},
-            {name: "eva", follows: []},
-            {name: "louis", follows: []},
-            {name: "cydfect", follows: []},
-            {name: "lem", follows: []}
+            {atom_id: "benbitdiddle", name: "benbitdiddle", follows: []},
+            {atom_id: "alyssaphacker", name: "alyssaphacker", follows: []},
+            {atom_id: "eva", name: "eva", follows: []},
+            {atom_id: "louis", name: "louis", follows: []},
+            {atom_id: "cydfect", name: "cydfect", follows: []},
+            {atom_id: "lem", name: "lem", follows: []}
           ], (err, res) => { if (err) throw err; });
         }
       });
@@ -36,12 +36,12 @@ const mean = new mean_mod.Mean(
         console.log(`Removed ${remove_count} elems`);
         if (debug) {
           sources.insertMany([
-            {name: "benbitdiddle"},
-            {name: "alyssaphacker"},
-            {name: "eva"},
-            {name: "louis"},
-            {name: "cydfect"},
-            {name: "lem"}
+            {atom_id: "benbitdiddle", name: "benbitdiddle"},
+            {atom_id: "alyssaphacker", name: "alyssaphacker"},
+            {atom_id: "eva", name: "eva"},
+            {atom_id: "louis", name: "louis"},
+            {atom_id: "cydfect", name: "cydfect"},
+            {atom_id: "lem", name: "lem"}
           ], (err, res) => { if (err) throw err; });
         }
       });
@@ -59,15 +59,11 @@ const target_type = new graphql.GraphQLObjectType({
       args: {
         name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
       },
-      resolve: (target, {name}) => {
-        return Validation.sourceExists(name)
-          .then(_ => {
-            return mean.db.collection("sources")
-              .findOne({
-                $and: [{name: name}, {"follows.name": target.name}]
-              });
-          });
-      }
+      resolve: (target, {name}) => Validation.sourceExists(name)
+          .then(_ => mean.db.collection("sources")
+            .count({
+              $and: [{name: name}, {follows: {atom_id: target.atom_id}}
+              ]}))
     }
   })
 });
@@ -79,18 +75,18 @@ const source_type = new graphql.GraphQLObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     follows: {
       "type": new graphql.GraphQLList(target_type),
-      resolve: source => mean.db.collection("sources").find(
-          {name: {$in: source.follows}}).toArray()
+      resolve: source => mean.db.collection("targets")
+        .find({atom_id: {$in: source.follows.map(f => f.atom_id)}}).toArray()
     },
     potentialFollows: {
       "type": new graphql.GraphQLList(target_type),
       resolve: source => {
-        let nin = [source.name];
+        let nin = [source.atom_id];
         if (source.follows !== undefined) {
-          nin = nin.concat(source.follows);
+          nin = nin.concat(source.follows.map(f => f.atom_id));
         }
-        return mean.db.collection("sources")
-          .find({name: {$nin: nin}}).toArray();
+        return mean.db.collection("targets")
+          .find({atom_id: {$nin: nin}}).toArray();
       }
     }
   })
@@ -106,10 +102,7 @@ const schema = new graphql.GraphQLSchema({
         args: {
           name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, {name}) => {
-          console.log(`getting ${name}`);
-          return mean.db.collection("sources").findOne({name: name});
-        }
+        resolve: (root, {name}) => Validation.sourceExists(name)
       },
       sources: {
         "type": new graphql.GraphQLList(source_type),
@@ -137,18 +130,7 @@ const schema = new graphql.GraphQLSchema({
           source: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (_, {source, target}) => Promise.all([
-          Validation.sourceExists(source),
-          Validation.targetExists(target)
-        ]).then(_ => {
-          if (source === target) return;
-          console.log(`${source} ${target}`);
-          return mean.db.collection("targets")
-            .findOne({name: target})
-            .then(target => mean.db.collection("sources")
-              .updateOne({name: source}, {$addToSet: {follows: target}})
-              .then(_ => report_update(source)));
-        })
+        resolve: update("$addToSet")
       },
 
       unfollow: {
@@ -157,18 +139,7 @@ const schema = new graphql.GraphQLSchema({
           source: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (_, {source, target}) => Promise.all([
-          Validation.sourceExists(source),
-          Validation.targetExists(target)
-        ]).then(_ => {
-          if (source === target) return;
-          console.log(`${source} ${target}`);
-          return mean.db.collection("targets")
-            .findOne({name: target})
-            .then(target => mean.db.collection("sources")
-              .updateOne({name: source}, {$pull: {follows: target}})
-              .then(_ => report_update(source)));
-        })
+        resolve: update("$pull")
       },
 
       _dv_new_source: {
@@ -183,7 +154,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mean.resolve_dv_up("source")
       },
@@ -201,7 +172,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mean.resolve_dv_up("target")
       },
@@ -210,13 +181,26 @@ const schema = new graphql.GraphQLSchema({
 });
 
 
-function report_update(name) {
-  console.log("reporting update of " + name);
-  const sources = mean.db.collection("sources");
-  return sources.findOne({name: name}).then(source => {
-    console.log(JSON.stringify(source));
-    return mean.composer.update_atom(source_type, source.atom_id, source);
-  });
+function update(op) {
+  return (_, {source, target}) => Promise.all([
+      Validation.sourceExists(source), Validation.targetExists(target)
+      ]).then(val_info => {
+        console.log(`doing update of ${source} ${target}`);
+        if (source === target) return;
+        const s = val_info[0];
+        const t = val_info[1];
+        console.log(`got ${JSON.stringify(s)} ${JSON.stringify(t)}`);
+
+        const update_op = t => {
+          const ret = {};
+          ret[op] = {follows: {atom_id: t.atom_id}};
+          return ret;
+        };
+        return mean.db.collection("sources")
+          .updateOne({atom_id: s.atom_id}, update_op(t))
+          .then(_ => mean.composer
+              .update_atom(source_type, s.atom_id, update_op(t)));
+      });
 }
 
 namespace Validation {
@@ -230,9 +214,10 @@ namespace Validation {
 
   function _exists(name, col) {
     return mean.db.collection(col)
-      .findOne({name: name}, {_id: 1})
+      .findOne({name: name}, {atom_id: 1})
       .then(source => {
         if (!source) throw new Error(`${name} doesn't exist`);
+        return source;
       });
   }
 }

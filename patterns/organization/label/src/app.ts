@@ -15,8 +15,14 @@ const mean = new mean_mod.Mean(
         console.log(`Removed ${remove_count} elems`);
         if (debug) {
           items.insertMany([
-            {name: "item", labels: [{name: "label1"}, {name: "label2"}]},
-            {name: "another-item", labels: [{name: "label1"}]}
+            {
+              atom_id: "item", name: "item",
+              labels: [{atom_id: "label1"}, {atom_id: "label2"}]
+            },
+            {
+              atom_id: "another-item", name: "another-item",
+              labels: [{atom_id: "label1"}]
+            }
           ], (err, res) => { if (err) throw err; });
         }
         });
@@ -30,8 +36,8 @@ const mean = new mean_mod.Mean(
         console.log(`Removed ${remove_count} elems`);
         if (debug) {
           items.insertMany([
-            {name: "label1"},
-            {name: "label2"}
+            {atom_id: "label1", name: "label1"},
+            {atom_id: "label2", name: "label2"}
           ], (err, res) => { if (err) throw err; });
         }
         });
@@ -60,9 +66,8 @@ const item_type = new graphql.GraphQLObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     labels: {
       "type": new graphql.GraphQLList(label_type),
-      resolve: item => Promise.all(
-        item.labels.map(l => mean.db.collections("labels").find({
-          atom_id: l.atom_id})))
+      resolve: item => mean.db.collection("labels")
+          .find({atom_id: {$in: item.labels.map(l => l.atom_id)}})
     },
     attach_labels: {
       "type": graphql.GraphQLBoolean,
@@ -70,14 +75,12 @@ const item_type = new graphql.GraphQLObjectType({
         labels: {"type": new graphql.GraphQLList(label_input_type)}
       },
       resolve: (item, {labels}) => {
-        const items = mean.db.collection("items");
-        labels = labels.map(l => {
-          l["atom_id"] = l.name;
-          return l;
-        });
-        return items.updateOne(
-        {name: item.name}, {$addToSet: {labels: labels}}).then(
-            _ => report_update(item.name));
+        const label_objs = mean.db.collection("labels")
+            .find({name: {$in: labels}}, {atom_id: 1}).toArray();
+        const up_op = {$addToSet: {labels: {$each: label_objs}}};
+        return mean.db.collection("items")
+          .updateOne({name: item.name}, up_op)
+          .then(_ => mean.composer.update_atom(item_type, item.atom_id, up_op));
       }
     }
   })
@@ -126,7 +129,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mean.resolve_dv_up("item")
       },
@@ -142,7 +145,7 @@ const schema = new graphql.GraphQLSchema({
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: mean.resolve_dv_up("label")
       }
@@ -150,14 +153,5 @@ const schema = new graphql.GraphQLSchema({
   })
 });
 
-
-function report_update(name) {
-  console.log("reporting update of " + name);
-  const items = mean.db.collection("items");
-  return items.findOne({name: name}).then(item => {
-    console.log(JSON.stringify(item));
-    return mean.composer.update_atom(item_type, item.atom_id, item);
-  });
-}
 
 mean.serve_schema(schema);

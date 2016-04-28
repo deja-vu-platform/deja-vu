@@ -21,15 +21,15 @@ export class FriendService {
     }`).map(user => user.friends);
   }
 
-  addFriend(u1: Username, u2: Username): any {
+  addFriend(username1: Username, username2: Username): any {
     return this._post(`{
-      addFriend(u1: "${u1}", u2: "${u2}")
+      addFriend(username1: "${username1}", username2: "${username2}")
     }`);
   }
 
-  unfriend(u1: Username, u2: Username): any {
+  unfriend(username1: Username, username2: Username): any {
     return this._post(`{
-      unfriend(u1: "${u1}", u2: "${u2}")
+      unfriend(username1: "${username1}", username2: "${username2}")
     }`);
   }
 
