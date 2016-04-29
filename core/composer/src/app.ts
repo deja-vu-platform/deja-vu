@@ -1,6 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 const graphql = require("graphql");
-import * as http from "http";
+const rp = require("request-promise");
 
 import {Mean} from "mean";
 
@@ -182,7 +182,7 @@ function send_update(
     transform_atom(downwards, dst, src, atom, transformed_atom => {
       const atom_str = transformed_atom.replace(/"/g, "\\\"");
       console.log("now have <" + atom_str + ">");
-      post(dst.loc, `{
+      return post(dst.loc, `{
           _dv_${op}_${dst.name.toLowerCase()}(
             atom_id: "${atom_id}", atom: "${atom_str}")
       }`);
@@ -195,7 +195,7 @@ function send_update(
     transform_update(downwards, dst, src, update, transformed_update => {
       const update_str = transformed_update.replace(/"/g, "\\\"");
       console.log("now have <" + update_str + ">");
-      post(dst.loc, `{
+      return post(dst.loc, `{
           _dv_${op}_${dst.name.toLowerCase()}(
             atom_id: "${atom_id}", update: "${update_str}")
       }`);
@@ -235,7 +235,7 @@ function transform_atom(
   }`;
   const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
 
-  get(dst.loc, query, res => {
+  get(dst.loc, query).then(res => {
     const dst_type_info = JSON.parse(res).data.__type;
     get_name_map(src, dst, name_map => {
       const parsed_atom = JSON.parse(atom);
@@ -287,7 +287,7 @@ function transform_update(
   const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
 
 
-  get(dst.loc, query, res => {
+  get(dst.loc, query).then(res => {
     const dst_type_info = JSON.parse(res).data.__type;
     const dst_type_fields = dst_type_info.fields.map(f => f.name);
     get_name_map(src, dst, name_map => {
@@ -413,69 +413,33 @@ function get_null(t) {
 }
 
 function post(loc, query) {
-  const match = loc.match(/http:\/\/(.*):(.*)/);
-  const hostname = match[1];
-  const port = match[2];
-
   const query_str = query.replace(/ /g, "");
-  const post_data = JSON.stringify({query: "mutation " + query_str});
 
   const options = {
-    hostname: hostname,
-    port: port,
+    uri: loc + "/graphql",
     method: "post",
-    path: "/graphql",
-    headers: {
-      "Content-type": "application/json",
-      "Content-length": post_data.length
-    }
+    body: {
+      query: "mutation " + query_str
+    },
+    json: true
   };
 
   console.log(
     "using options " + JSON.stringify(options) +
     " for query <" + query_str + ">");
-  const req = http.request(options);
-  req.on("response", res => {
-    let body = "";
-    res.on("data", d => { body += d; });
-    res.on("end", () => {
-      console.log(`got ${body} back from ${hostname}:${port}`);
-    });
-  });
-  req.on("error", err => console.log(err));
-
-  req.write(post_data);
-  req.end();
+  return rp(options);
 }
 
-function get(loc, query, callback) {
-  const match = loc.match(/http:\/\/(.*):(.*)/);
-  const hostname = match[1];
-  const port = match[2];
-
+function get(loc, query) {
   const query_str = encodeURIComponent(
     query.replace(/ /g, "").replace(/\n/g, ""));
 
   const options = {
-    hostname: hostname,
-    port: port,
-    method: "get",
-    path: `/graphql?query=query+${query_str}`
+    uri: loc + `/graphql?query=query+${query_str}`
   };
 
   console.log(
     "using options " + JSON.stringify(options) +
     " for query <" + query_str + ">");
-  const req = http.request(options);
-  req.on("response", res => {
-    res.setEncoding("utf8");
-    let body = "";
-    res.on("data", d => { body += d; });
-    res.on("end", () => {
-      console.log(`got ${body} back from ${hostname}:${port}`);
-      callback(body);
-    });
-  });
-  req.on("error", err => console.log(err));
-  req.end();
+  return rp(options);
 }
