@@ -24,6 +24,14 @@ const mean = new Mean(
         console.log(`Removed ${remove_count} elems`);
       });
     });
+    db.createCollection("tinfo", (err, tinfo) => {
+      if (err) throw err;
+      console.log("Resetting tinfo collection");
+      tinfo.remove((err, remove_count) => {
+        if (err) throw err;
+        console.log(`Removed ${remove_count} elems`);
+      });
+    });
   }
 );
 
@@ -218,6 +226,44 @@ class Type {
   constructor(
       public name: string, public element: string, public loc: string) {}
 
+  info() {
+    console.log(`Getting schema info for ${this.element}/${this.name}`);
+    const query = `{
+      __type(name: "${this.name}") {
+        name,
+        fields {
+          name,
+          type {
+            name,
+            kind,
+            ofType {
+              name,
+              kind
+            }
+          }
+        }
+      }
+    }`;
+    return mean.db.collection("tinfo")
+      .find({element: this.element, loc: this.loc, name: this.name})
+      .limit(1)
+      .next()
+      .then(tinfo => {
+        if (tinfo !== null) return tinfo.info;
+        console.log(
+          "Need to retrieve info for " + this.element + this.loc + this.name);
+        return get(this.loc, query)
+          .then(res => {
+            const info = JSON.parse(res).data.__type;
+            const doc = {
+                element: this.element, loc: this.loc, name: this.name,
+                info: info
+            };
+            return mean.db.collection("tinfo").insertOne(doc).then(_ => info);
+          });
+      });
+  }
+
   equals(other: Type) {
     return (
       this.name === other.name && this.element === other.element &&
@@ -226,27 +272,9 @@ class Type {
 }
 
 function transform_atom(downwards: boolean, dst: Type, src: Type, atom) {
-  console.log(`Getting schema info for ${dst.element}/${dst.name}`);
-  const query = `{
-    __type(name: "${dst.name}") {
-      name,
-      fields {
-        name,
-        type {
-          name,
-          kind,
-          ofType {
-            name,
-            kind
-          }
-        }
-      }
-    }
-  }`;
   const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
 
-  return get(dst.loc, query).then(res => {
-    const dst_type_info = JSON.parse(res).data.__type;
+  return dst.info().then(dst_type_info => {
     return get_name_map(src, dst)
         .then(name_map => {
           const parsed_atom = JSON.parse(atom);
@@ -277,54 +305,34 @@ function transform_atom(downwards: boolean, dst: Type, src: Type, atom) {
 
 
 function transform_update(downwards: boolean, dst: Type, src: Type, update) {
-  console.log(`Getting schema info for ${dst.element}/${dst.name}`);
-  const query = `{
-    __type(name: "${dst.name}") {
-      name,
-      fields {
-        name,
-        type {
-          name,
-          kind,
-          ofType {
-            name,
-            kind
-          }
-        }
-      }
-    }
-  }`;
   const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
 
-
-  return get(dst.loc, query)
-    .then(res => {
-      const dst_type_info = JSON.parse(res).data.__type;
-      const dst_type_fields = dst_type_info.fields.map(f => f.name);
-      return get_name_map(src, dst, true)
-        .then(name_map => {
-          const parsed_update = JSON.parse(update);
-          let transform_up = {};
-          // { operator1: {field: value, ...}, operator2: {field: value, ...}
-          for (const update_f of Object.keys(parsed_update)) {
-            transform_up[update_f] = {};
-            for (const field_f of Object.keys(parsed_update[update_f])) {
-              if (dst_type_fields.indexOf(field_f) > -1) {
-                transform_up[update_f][field_f] = (
-                  parsed_update[update_f][field_f]);
-              } else if (name_map[field_f] !== undefined) {
-                const map_f = name_map[field_f];
-                transform_up[update_f][map_f] = (
-                  parsed_update[update_f][field_f]);
-              }
+  return dst.info().then(dst_type_info => {
+    const dst_type_fields = dst_type_info.fields.map(f => f.name);
+    return get_name_map(src, dst, true)
+      .then(name_map => {
+        const parsed_update = JSON.parse(update);
+        let transform_up = {};
+        // { operator1: {field: value, ...}, operator2: {field: value, ...}
+        for (const update_f of Object.keys(parsed_update)) {
+          transform_up[update_f] = {};
+          for (const field_f of Object.keys(parsed_update[update_f])) {
+            if (dst_type_fields.indexOf(field_f) > -1) {
+              transform_up[update_f][field_f] = (
+                parsed_update[update_f][field_f]);
+            } else if (name_map[field_f] !== undefined) {
+              const map_f = name_map[field_f];
+              transform_up[update_f][map_f] = (
+                parsed_update[update_f][field_f]);
             }
           }
-          const transform_up_str = JSON.stringify(transform_up);
-          console.log(
-            "trasnformed update str " + transform_up_str + " used name map " +
-            JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
-          return transform_up_str;
-        });
+        }
+        const transform_up_str = JSON.stringify(transform_up);
+        console.log(
+          "trasnformed update str " + transform_up_str + " used name map " +
+          JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
+        return transform_up_str;
+      });
   });
 }
 
