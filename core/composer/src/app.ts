@@ -127,29 +127,36 @@ function process(op: string, args: any) {
 
 
   // Downwards propagation
-  mean.db.collection("tbonds").find({types: {$in: [t]}})
+  const downwards_p = mean.db.collection("tbonds")
+    .find({types: {$in: [t]}})
     .toArray()
     .then(type_bonds => {
       console.log("got " + type_bonds.length + " tbonds for downwards prop");
+      const updates_p = [];
+
       for (let type_bond of type_bonds) {
         console.log("processing " + JSON.stringify(type_bond));
-
-         for (let bonded_type of type_bond.types) {
-           bonded_type = new Type(
-             bonded_type.name, bonded_type.element, bonded_type.loc);
-           if (bonded_type.equals(t)) {
-             continue;
-           }
-           send_update(true, op, bonded_type, t, args);
-         }
+        for (let bonded_type of type_bond.types) {
+          bonded_type = new Type(
+            bonded_type.name, bonded_type.element, bonded_type.loc);
+          if (bonded_type.equals(t)) {
+            continue;
+          }
+          updates_p.push(send_update(true, op, bonded_type, t, args));
+        }
       }
+
+      return Promise.all(updates_p);
     });
 
   // Upwards propagation
-  mean.db.collection("tbonds").find({subtype: t})
+  const upwards_p = mean.db.collection("tbonds")
+    .find({subtype: t})
     .toArray()
     .then(type_bonds => {
       console.log("got " + type_bonds.length + " tbonds for upwards prop");
+      const updates_p = [];
+
       // The same bonded type can appear multiple times and we only want to send
       // one update to that one
       let bonded_types = {};
@@ -163,11 +170,13 @@ function process(op: string, args: any) {
         const bonded_type_obj = JSON.parse(bonded_type_str);
         const bonded_type = new Type(
           bonded_type_obj.name, bonded_type_obj.element, bonded_type_obj.loc);
-        send_update(false, op, bonded_type, t, args);
+        updates_p.push(send_update(false, op, bonded_type, t, args));
       }
+
+      return Promise.all(updates_p);
     });
 
-  return true;
+  return Promise.all([downwards_p, upwards_p]);
 }
 
 function send_update(
@@ -179,27 +188,29 @@ function send_update(
     console.log(
          "Sending update to element " + dst.element + " dst type " +
          JSON.stringify(dst) + " have atom <" + atom + ">");
-    transform_atom(downwards, dst, src, atom, transformed_atom => {
-      const atom_str = transformed_atom.replace(/"/g, "\\\"");
-      console.log("now have <" + atom_str + ">");
-      return post(dst.loc, `{
-          _dv_${op}_${dst.name.toLowerCase()}(
-            atom_id: "${atom_id}", atom: "${atom_str}")
-      }`);
-    });
+    return transform_atom(downwards, dst, src, atom)
+      .then(transformed_atom => {
+        const atom_str = transformed_atom.replace(/"/g, "\\\"");
+        console.log("now have <" + atom_str + ">");
+        return post(dst.loc, `{
+            _dv_${op}_${dst.name.toLowerCase()}(
+              atom_id: "${atom_id}", atom: "${atom_str}")
+        }`);
+      });
   } else { // update
     const update = args.update;
     console.log(
          "Sending update to element " + dst.element + " dst type " +
          JSON.stringify(dst) + " have update <" + update + ">");
-    transform_update(downwards, dst, src, update, transformed_update => {
-      const update_str = transformed_update.replace(/"/g, "\\\"");
-      console.log("now have <" + update_str + ">");
-      return post(dst.loc, `{
-          _dv_${op}_${dst.name.toLowerCase()}(
-            atom_id: "${atom_id}", update: "${update_str}")
-      }`);
-    });
+    return transform_update(downwards, dst, src, update)
+      .then(transformed_update => {
+        const update_str = transformed_update.replace(/"/g, "\\\"");
+        console.log("now have <" + update_str + ">");
+        return post(dst.loc, `{
+            _dv_${op}_${dst.name.toLowerCase()}(
+              atom_id: "${atom_id}", update: "${update_str}")
+        }`);
+      });
   }
 }
 
@@ -214,8 +225,7 @@ class Type {
   }
 }
 
-function transform_atom(
-  downwards: boolean, dst: Type, src: Type, atom, callback) {
+function transform_atom(downwards: boolean, dst: Type, src: Type, atom) {
   console.log(`Getting schema info for ${dst.element}/${dst.name}`);
   const query = `{
     __type(name: "${dst.name}") {
@@ -235,38 +245,38 @@ function transform_atom(
   }`;
   const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
 
-  get(dst.loc, query).then(res => {
+  return get(dst.loc, query).then(res => {
     const dst_type_info = JSON.parse(res).data.__type;
-    get_name_map(src, dst, name_map => {
-      const parsed_atom = JSON.parse(atom);
-      let transformed_atom = {};
-      for (let dst_f of dst_type_info.fields) {
-        console.log(
-          "Looking at " + JSON.stringify(dst_f) + " for dst " +
-          JSON.stringify(dst) + " parsed atom " + atom + " name_map " +
-          JSON.stringify(name_map));
-        if (parsed_atom[dst_f.name] !== undefined) {
-          transformed_atom[dst_f.name] = parsed_atom[dst_f.name];
-        } else if (name_map[dst_f.name] !== undefined) {
-          transformed_atom[dst_f.name] = parsed_atom[name_map[dst_f.name]];
-        } else {
-          // Send well-formed atoms to elements
-          transformed_atom[dst_f.name] = get_null(dst_f.type);
-        }
-      }
+    return get_name_map(src, dst)
+        .then(name_map => {
+          const parsed_atom = JSON.parse(atom);
+          let transformed_atom = {};
+          for (let dst_f of dst_type_info.fields) {
+            console.log(
+              "Looking at " + JSON.stringify(dst_f) + " for dst " +
+              JSON.stringify(dst) + " parsed atom " + atom + " name_map " +
+              JSON.stringify(name_map));
+            if (parsed_atom[dst_f.name] !== undefined) {
+              transformed_atom[dst_f.name] = parsed_atom[dst_f.name];
+            } else if (name_map[dst_f.name] !== undefined) {
+              transformed_atom[dst_f.name] = parsed_atom[name_map[dst_f.name]];
+            } else {
+              // Send well-formed atoms to elements
+              transformed_atom[dst_f.name] = get_null(dst_f.type);
+            }
+          }
 
-      const transformed_atom_str = JSON.stringify(transformed_atom);
-      console.log(
-        "trasnformed atom str " + transformed_atom_str + " used name map " +
-        JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
-      callback(transformed_atom_str);
-    });
+          const transformed_atom_str = JSON.stringify(transformed_atom);
+          console.log(
+            "trasnformed atom str " + transformed_atom_str + " used name map " +
+            JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
+          return transformed_atom_str;
+        });
   });
 }
 
 
-function transform_update(
-  downwards: boolean, dst: Type, src: Type, update, callback) {
+function transform_update(downwards: boolean, dst: Type, src: Type, update) {
   console.log(`Getting schema info for ${dst.element}/${dst.name}`);
   const query = `{
     __type(name: "${dst.name}") {
@@ -287,37 +297,41 @@ function transform_update(
   const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
 
 
-  get(dst.loc, query).then(res => {
-    const dst_type_info = JSON.parse(res).data.__type;
-    const dst_type_fields = dst_type_info.fields.map(f => f.name);
-    get_name_map(src, dst, name_map => {
-      const parsed_update = JSON.parse(update);
-      let transform_up = {};
-      // { operator1: {field: value, ...}, operator2: {field: value, ...}
-      for (const update_f of Object.keys(parsed_update)) {
-        transform_up[update_f] = {};
-        for (const field_f of Object.keys(parsed_update[update_f])) {
-          if (dst_type_fields.indexOf(field_f) > -1) {
-            transform_up[update_f][field_f] = parsed_update[update_f][field_f];
-          } else if (name_map[field_f] !== undefined) {
-            const map_f = name_map[field_f];
-            transform_up[update_f][map_f] = parsed_update[update_f][field_f];
+  return get(dst.loc, query)
+    .then(res => {
+      const dst_type_info = JSON.parse(res).data.__type;
+      const dst_type_fields = dst_type_info.fields.map(f => f.name);
+      return get_name_map(src, dst, true)
+        .then(name_map => {
+          const parsed_update = JSON.parse(update);
+          let transform_up = {};
+          // { operator1: {field: value, ...}, operator2: {field: value, ...}
+          for (const update_f of Object.keys(parsed_update)) {
+            transform_up[update_f] = {};
+            for (const field_f of Object.keys(parsed_update[update_f])) {
+              if (dst_type_fields.indexOf(field_f) > -1) {
+                transform_up[update_f][field_f] = (
+                  parsed_update[update_f][field_f]);
+              } else if (name_map[field_f] !== undefined) {
+                const map_f = name_map[field_f];
+                transform_up[update_f][map_f] = (
+                  parsed_update[update_f][field_f]);
+              }
+            }
           }
-        }
-      }
-      const transform_up_str = JSON.stringify(transform_up);
-      console.log(
-        "trasnformed update str " + transform_up_str + " used name map " +
-        JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
-      callback(transform_up_str);
-    }, true);
+          const transform_up_str = JSON.stringify(transform_up);
+          console.log(
+            "trasnformed update str " + transform_up_str + " used name map " +
+            JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
+          return transform_up_str;
+        });
   });
 }
 
 
 // name_map: dst -> src
-function get_name_map_downwards(src, dst, callback, reverse = false) {
-  mean.db.collection("fbonds")
+function get_name_map_downwards(src, dst, reverse = false) {
+  return mean.db.collection("fbonds")
     .aggregate([  // get fbonds where both src and dst appear
       {$match: {fields: {$elemMatch: {"type": dst}}}},
       {$match: {fields: {$elemMatch: {"type": src}}}}
@@ -342,11 +356,11 @@ function get_name_map_downwards(src, dst, callback, reverse = false) {
           name_map[dst_fbond_info.name] = src_fbond_info.name;
         }
       }
-      callback(name_map);
+      return name_map;
     });
 }
 
-function get_name_map_upwards(src, dst, callback, reverse = false) {
+function get_name_map_upwards(src, dst, reverse = false) {
 /*
   mean.db.collection("fbonds").find({"subfield.type": src}).toArray()
     .then(a => {
@@ -365,7 +379,7 @@ function get_name_map_upwards(src, dst, callback, reverse = false) {
       console.log("FBOND end debug col");
     });
 */
-  mean.db.collection("fbonds")
+  return mean.db.collection("fbonds")
     .aggregate([
       {$match: {fields: {$elemMatch: {"type": dst}}}},
       {$match: {"subfield.type": src}},
@@ -394,7 +408,7 @@ function get_name_map_upwards(src, dst, callback, reverse = false) {
         "got " + fbonds.length + " back, used " + JSON.stringify(dst) +
         " and " + JSON.stringify(src) + " name map " +
         JSON.stringify(name_map));
-      callback(name_map);
+      return name_map;
     });
 }
 
