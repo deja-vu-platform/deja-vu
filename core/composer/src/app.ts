@@ -136,7 +136,7 @@ function process(op: string, args: any) {
 
   // Downwards propagation
   const downwards_p = mean.db.collection("tbonds")
-    .find({types: {$in: [t]}})
+    .find({types: {$in: [t.doc]}})
     .toArray()
     .then(type_bonds => {
       console.log("got " + type_bonds.length + " tbonds for downwards prop");
@@ -159,7 +159,7 @@ function process(op: string, args: any) {
 
   // Upwards propagation
   const upwards_p = mean.db.collection("tbonds")
-    .find({subtype: t})
+    .find({subtype: t.doc})
     .toArray()
     .then(type_bonds => {
       console.log("got " + type_bonds.length + " tbonds for upwards prop");
@@ -223,8 +223,12 @@ function send_update(
 }
 
 class Type {
+  doc;
+
   constructor(
-      public name: string, public element: string, public loc: string) {}
+      public name: string, public element: string, public loc: string) {
+    this.doc =  {name: this.name, element: this.element, loc: this.loc};
+  }
 
   info() {
     console.log(`Getting schema info for ${this.element}/${this.name}`);
@@ -245,7 +249,7 @@ class Type {
       }
     }`;
     return mean.db.collection("tinfo")
-      .find({element: this.element, loc: this.loc, name: this.name})
+      .find(this.doc)
       .limit(1)
       .next()
       .then(tinfo => {
@@ -264,6 +268,70 @@ class Type {
       });
   }
 
+  transform_map(other: Type, downwards: boolean, reverse = false) {
+    if (downwards) {
+      return mean.db.collection("fbonds")
+        .aggregate([  // get fbonds where both this and other appear
+          {$match: {fields: {$elemMatch: {"type": other.doc}}}},
+          {$match: {fields: {$elemMatch: {"type": this.doc}}}}
+        ])
+        .toArray()
+        .then(fbonds => {
+          let name_map = {};
+          for (let fbond of fbonds) {
+            // console.log("processing fbond " + JSON.stringify(fbond));
+            // a given type can only appear once in a field bond
+            let this_fbond_info, other_fbond_info;
+            for (let finfo of fbond.fields) {
+              if (this.equals(finfo.type)) {
+                this_fbond_info = finfo;
+              } else if (other.equals(finfo.type)) {
+                other_fbond_info = finfo;
+              }
+            }
+            if (reverse) {
+              name_map[this_fbond_info.name] = other_fbond_info.name;
+            } else {
+              name_map[other_fbond_info.name] = this_fbond_info.name;
+            }
+          }
+          return name_map;
+        });
+    } else {
+      return mean.db.collection("fbonds")
+        .aggregate([
+          {$match: {fields: {$elemMatch: {"type": other.doc}}}},
+          {$match: {"subfield.type": this.doc}},
+        ])
+        .toArray()
+        .then(fbonds => {
+          let name_map = {};
+          for (let fbond of fbonds) {
+            console.log(
+              "processing fbond " + JSON.stringify(fbond) + " for other " +
+              JSON.stringify(other));
+            // a given type can only appear once in a field bond
+            let other_fbond_info;
+            for (let finfo of fbond.fields) {
+              if (other.equals(finfo.type)) {
+                other_fbond_info = finfo;
+              }
+            }
+            if (reverse) {
+              name_map[fbond.subfield.name] = other_fbond_info.name;
+            } else {
+              name_map[other_fbond_info.name] = fbond.subfield.name;
+            }
+          }
+          console.log(
+            "got " + fbonds.length + " back, used " + JSON.stringify(other) +
+            " and " + JSON.stringify(this.doc) + " name map " +
+            JSON.stringify(name_map));
+          return name_map;
+        });
+    }
+  }
+
   equals(other: Type) {
     return (
       this.name === other.name && this.element === other.element &&
@@ -272,10 +340,8 @@ class Type {
 }
 
 function transform_atom(downwards: boolean, dst: Type, src: Type, atom) {
-  const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
-
   return dst.info().then(dst_type_info => {
-    return get_name_map(src, dst)
+    return src.transform_map(dst, downwards)
         .then(name_map => {
           const parsed_atom = JSON.parse(atom);
           let transformed_atom = {};
@@ -305,11 +371,9 @@ function transform_atom(downwards: boolean, dst: Type, src: Type, atom) {
 
 
 function transform_update(downwards: boolean, dst: Type, src: Type, update) {
-  const get_name_map = downwards ? get_name_map_downwards:get_name_map_upwards;
-
   return dst.info().then(dst_type_info => {
     const dst_type_fields = dst_type_info.fields.map(f => f.name);
-    return get_name_map(src, dst, true)
+    return src.transform_map(dst, downwards, true)
       .then(name_map => {
         const parsed_update = JSON.parse(update);
         let transform_up = {};
@@ -334,90 +398,6 @@ function transform_update(downwards: boolean, dst: Type, src: Type, update) {
         return transform_up_str;
       });
   });
-}
-
-
-// name_map: dst -> src
-function get_name_map_downwards(src, dst, reverse = false) {
-  return mean.db.collection("fbonds")
-    .aggregate([  // get fbonds where both src and dst appear
-      {$match: {fields: {$elemMatch: {"type": dst}}}},
-      {$match: {fields: {$elemMatch: {"type": src}}}}
-    ])
-    .toArray()
-    .then(fbonds => {
-      let name_map = {};
-      for (let fbond of fbonds) {
-        // console.log("processing fbond " + JSON.stringify(fbond));
-        // a given type can only appear once in a field bond
-        let src_fbond_info, dst_fbond_info;
-        for (let finfo of fbond.fields) {
-          if (src.equals(finfo.type)) {
-            src_fbond_info = finfo;
-          } else if (dst.equals(finfo.type)) {
-            dst_fbond_info = finfo;
-          }
-        }
-        if (reverse) {
-          name_map[src_fbond_info.name] = dst_fbond_info.name;
-        } else {
-          name_map[dst_fbond_info.name] = src_fbond_info.name;
-        }
-      }
-      return name_map;
-    });
-}
-
-function get_name_map_upwards(src, dst, reverse = false) {
-/*
-  mean.db.collection("fbonds").find({"subfield.type": src}).toArray()
-    .then(a => {
-      console.log("22DEEBUUUGG " + JSON.stringify(src));
-      for (let b of a) {
-        console.log(JSON.stringify(b));
-      }
-      console.log("22FBOND end debug col");
-    });
-  mean.db.collection("fbonds").find().toArray()
-    .then(a => {
-      console.log("DEEBUUUGG");
-      for (let b of a) {
-        console.log(JSON.stringify(b));
-      }
-      console.log("FBOND end debug col");
-    });
-*/
-  return mean.db.collection("fbonds")
-    .aggregate([
-      {$match: {fields: {$elemMatch: {"type": dst}}}},
-      {$match: {"subfield.type": src}},
-    ])
-    .toArray()
-    .then(fbonds => {
-      let name_map = {};
-      for (let fbond of fbonds) {
-        console.log(
-          "processing fbond " + JSON.stringify(fbond) + " for dst " +
-          JSON.stringify(dst));
-        // a given type can only appear once in a field bond
-        let dst_fbond_info;
-        for (let finfo of fbond.fields) {
-          if (dst.equals(finfo.type)) {
-            dst_fbond_info = finfo;
-          }
-        }
-        if (reverse) {
-          name_map[fbond.subfield.name] = dst_fbond_info.name;
-        } else {
-          name_map[dst_fbond_info.name] = fbond.subfield.name;
-        }
-      }
-      console.log(
-        "got " + fbonds.length + " back, used " + JSON.stringify(dst) +
-        " and " + JSON.stringify(src) + " name map " +
-        JSON.stringify(name_map));
-      return name_map;
-    });
 }
 
 function get_null(t) {
