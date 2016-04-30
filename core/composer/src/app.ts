@@ -290,9 +290,9 @@ class Type {
               }
             }
             if (reverse) {
-              name_map[this_fbond_info.name] = other_fbond_info.name;
-            } else {
               name_map[other_fbond_info.name] = this_fbond_info.name;
+            } else {
+              name_map[this_fbond_info.name] = other_fbond_info.name;
             }
           }
           return name_map;
@@ -318,9 +318,9 @@ class Type {
               }
             }
             if (reverse) {
-              name_map[fbond.subfield.name] = other_fbond_info.name;
-            } else {
               name_map[other_fbond_info.name] = fbond.subfield.name;
+            } else {
+              name_map[fbond.subfield.name] = other_fbond_info.name;
             }
           }
           console.log(
@@ -341,7 +341,7 @@ class Type {
 
 function transform_atom(downwards: boolean, dst: Type, src: Type, atom) {
   return dst.info().then(dst_type_info => {
-    return src.transform_map(dst, downwards)
+    return src.transform_map(dst, downwards, true)
         .then(name_map => {
           const parsed_atom = JSON.parse(atom);
           let transformed_atom = {};
@@ -373,7 +373,7 @@ function transform_atom(downwards: boolean, dst: Type, src: Type, atom) {
 function transform_update(downwards: boolean, dst: Type, src: Type, update) {
   return dst.info().then(dst_type_info => {
     const dst_type_fields = dst_type_info.fields.map(f => f.name);
-    return src.transform_map(dst, downwards, true)
+    return src.transform_map(dst, downwards)
       .then(name_map => {
         const parsed_update = JSON.parse(update);
         let transform_up = {};
