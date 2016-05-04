@@ -12,6 +12,7 @@ const APIS = {
   follow_1: "@@dv-community-follow-1",
   follow_2: "@@dv-community-follow-2",
   post: "@@dv-messaging-post-1",
+  label: "@@dv-organization-label-1",
   feed: "@@dv-messaging-feed-1"
 };
 
@@ -37,6 +38,7 @@ bootstrap(
     provide("follow_2.api", {useValue: APIS.follow_2}),
     provide("post.api", {useValue: APIS.post}),
     provide("feed.api", {useValue: APIS.feed}),
+    provide("label.api", {useValue: APIS.label}),
     ROUTER_PROVIDERS,
     provide(
       PLATFORM_DIRECTIVES, {useValue: PublisherMessageComponent, multi: true}),

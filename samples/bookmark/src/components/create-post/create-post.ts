@@ -2,6 +2,8 @@ import {Component} from "angular2/core";
 
 import {Post, User} from "../../shared/data";
 
+import {LabelsTextComponent} from
+"dv-organization-label/lib/components/labels-text/labels-text";
 import {NewPostContentComponent} from
 "dv-messaging-post/lib/components/new-post-content/new-post-content";
 import {NewPostButtonComponent} from
@@ -11,7 +13,8 @@ import {NewPostButtonComponent} from
 @Component({
   selector: "create-post",
   templateUrl: "./components/create-post/create-post.html",
-  directives: [NewPostContentComponent, NewPostButtonComponent],
+  directives: [
+    NewPostContentComponent, LabelsTextComponent, NewPostButtonComponent],
   inputs: ["user"]
 })
 export class CreatePostComponent {
