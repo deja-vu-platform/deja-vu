@@ -1,5 +1,6 @@
 import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
+import {Composer} from "composer";
 
 import {Post, User} from "../../shared/data";
 import {PostService} from "../shared/post";
@@ -16,7 +17,7 @@ export class NewPostButtonComponent {
   private _post: Post = {content: ""};
   private _user: User = {username: "", posts: []};
 
-  constructor(private _postService: PostService) {}
+  constructor(private _postService: PostService, private _composer: Composer) {}
 
   get post(): Post {
     return this._post;
@@ -43,7 +44,14 @@ export class NewPostButtonComponent {
   }
 
   create() {
+    console.log(
+        "at new-post-button on save, got post " + JSON.stringify(this._post));
     this._postService.newPost(this._user.username, this._post.content)
-      .subscribe(submitted => this.submitted = submitted);
+      .subscribe(data => {
+        this.submitted = true;
+        this._composer.report_save("post", data.atom_id, this._post);
+        const user_up = {$addToSet: {posts: {atom_id: data.atom_id}}};
+        this._composer.report_update(this._user, user_up);
+      });
   }
 }

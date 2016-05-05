@@ -12,14 +12,22 @@
     <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
     <script src="node_modules/angular2/bundles/http.js"></script>
 
+
     <script>
       System.config({
+        map: {
+          "composer": "node_modules/composer/lib/composer.js"
+        },
         packages: {
           dev: {
             format: 'register',
             defaultExtension: 'js'
           },
           components: {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          "composer": {
             format: 'register',
             defaultExtension: 'js'
           }

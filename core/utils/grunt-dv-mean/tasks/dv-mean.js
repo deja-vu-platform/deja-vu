@@ -9,7 +9,8 @@ module.exports = function(grunt, optPatterns, element) {
     "node_modules/rxjs/bundles/Rx.js",
     "node_modules/angular2/bundles/angular2.dev.js",
     "node_modules/angular2/bundles/http.js",
-    "node_modules/angular2/bundles/router.dev.js"
+    "node_modules/angular2/bundles/router.dev.js",
+    "node_modules/composer/lib/composer.js"
   ];
   deps = deps.concat(patternsSrc);
 
