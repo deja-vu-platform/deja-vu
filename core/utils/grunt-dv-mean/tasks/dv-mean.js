@@ -200,14 +200,13 @@ module.exports = function(grunt, optPatterns, element) {
     }
   });
 
-  const base = "grunt-dv-mean/node_modules/";
-  grunt.loadNpmTasks(base + "grunt-ts");
-  grunt.loadNpmTasks(base + "grunt-tslint");
-  grunt.loadNpmTasks(base + "grunt-contrib-clean");
-  grunt.loadNpmTasks(base + "grunt-contrib-copy");
-  grunt.loadNpmTasks(base + "grunt-express-server");
-  grunt.loadNpmTasks(base + "grunt-contrib-watch");
-  grunt.loadNpmTasks(base + "grunt-replace");
+  grunt.loadNpmTasks("grunt-ts");
+  grunt.loadNpmTasks("grunt-tslint");
+  grunt.loadNpmTasks("grunt-contrib-clean");
+  grunt.loadNpmTasks("grunt-contrib-copy");
+  grunt.loadNpmTasks("grunt-express-server");
+  grunt.loadNpmTasks("grunt-contrib-watch");
+  grunt.loadNpmTasks("grunt-replace");
 
   grunt.registerTask("dv-mean", "Dv a mean element", function(action) {
     if (action === "build") {
