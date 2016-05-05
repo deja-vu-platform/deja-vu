@@ -36,7 +36,8 @@ export class PostService {
           this._api + "/graphql",
           JSON.stringify({query: "mutation " + query_str}),
           {headers: headers})
-      .map(res => res.json());
+      .map(res => res.json())
+      .map(json_res => json_res.data);
   }
 
   private _get(query) {
