@@ -22,7 +22,9 @@
   },
   "devDependencies": {
     "grunt": "^0.4.5",
-    "grunt-dv-mean": "file:../../../core/utils/grunt-dv-mean"
+    "grunt-dv-mean": "file:../../../core/utils/grunt-dv-mean",
+    "tslint": "^3.9.0",
+    "typescript": "^1.8.10"
   },
   "peerDependencies": {
     "tslint": "^3.9.0",
