@@ -29,6 +29,6 @@ export class LabelsTextComponent {
     if (labels_text === undefined) return;
     console.log("got labels_text " + labels_text);
     this._labels_text = labels_text;
-    this.item.labels = this._labels_text.split(",").map(l => {name: l});
+    this.item.labels = this._labels_text.split(",").map(l => ({name: l}));
   }
 }
