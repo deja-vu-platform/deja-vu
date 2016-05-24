@@ -23,7 +23,8 @@
           "dv-community-follow": "node_modules/dv-community-follow",
           "dv-messaging-post": "node_modules/dv-messaging-post",
           "dv-organization-label": "node_modules/dv-organization-label",
-          "dv-messaging-feed": "node_modules/dv-messaging-feed"
+          "dv-messaging-feed": "node_modules/dv-messaging-feed",
+          "composer": "node_modules/composer/lib/composer.js"
         },
         packages: {
           dev: {
@@ -31,6 +32,10 @@
             defaultExtension: 'js'
           },
           components: {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          shared: {
             format: 'register',
             defaultExtension: 'js'
           },
@@ -51,6 +56,10 @@
             defaultExtension: 'js'
           },
           "dv-messaging-feed": {
+            format: 'register',
+            defaultExtension: 'js'
+          },
+          "composer": {
             format: 'register',
             defaultExtension: 'js'
           }

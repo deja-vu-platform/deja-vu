@@ -5,7 +5,7 @@ export interface Type {
   name: string;
   element: string;
   loc: string;
-  fields: Field[];
+//  fields: Field[];
 }
 
 export interface Field {
@@ -15,12 +15,12 @@ export interface Field {
 
 export interface TypeBond {
   types: Type[];
-  subtype: Type[];
+  subtype: Type;
 }
 
 export interface FieldBond {
   fields: Field[];
-  subfield: Field[];
+  subfield: Field;
 }
 
 export interface CompInfo {
@@ -37,20 +37,31 @@ export class Composer {
   adapt_atom(to: Type, atom: any, t: Type | string) {
     let type_info;
     if (typeof t === "string") {
-      type_info = {name: t, element: this._element, loc: this._loc, fields: []};
+      type_info = {name: t, element: this._element, loc: this._loc};
     } else {
       type_info = t;
     }
-    const name_map = this._get_name_map(to, type_info);
+    // const name_map = this._get_name_map(to, type_info);
     return new Proxy(atom, {
-      get: (target, name) => target[name_map[name]],
-      set: (target, name, value) => target[name_map[name]] = value
+      get: (target, name) => {
+             console.log("getting " + JSON.stringify(name));
+             // return target[name_map[name]];
+             return target[name];
+           },
+      set: (target, name, value) => {
+             console.log(
+               "setting " + JSON.stringify(name) + " w " +
+               JSON.stringify(value));
+             // target[name_map[name]] = value;
+             target[name] = value;
+             return true;
+           }
     });
   }
 
   report_save(t_name: string, atom_id: string, atom: any) {
     console.log(
-        "Reporting save (id " + atom_id + ", t" + t_name + ") " +
+        "Reporting save (id " + atom_id + ", t " + t_name + ") " +
         JSON.stringify(atom));
   }
 
@@ -60,9 +71,9 @@ export class Composer {
         JSON.stringify(update));
   }
 
-  private _get_name_map(src: Type, dst: Type) {
-    return {};
-  }
+//  private _get_name_map(src: Type, dst: Type) {
+//    return {};
+//  }
 /*
   private _new_atom(t: any, atom_id: string, atom: any) {
     console.log("sending new atom to composer");

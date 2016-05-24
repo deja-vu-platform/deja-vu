@@ -9,6 +9,8 @@ import {NewPostContentComponent} from
 import {NewPostButtonComponent} from
 "dv-messaging-post/lib/components/new-post-button/new-post-button";
 
+import {Composer} from "composer";
+
 
 @Component({
   selector: "create-post",
@@ -21,6 +23,21 @@ export class CreatePostComponent {
   private _post = {content: ""};
   private _user = {username: "", posts: []};
 
+  private post_post;
+  private label_item;
+
+  constructor(private _composer: Composer) {
+    this.post_post = this._composer.adapt_atom(
+        {name: "Post", element: "post", loc: "@@dv-messaging-post-1"},
+        this._post,
+        "Post");
+
+    this.label_item = this._composer.adapt_atom(
+        {name: "Item", element: "label", loc: "@@dv-organization-label-1"},
+        this._post,
+        "Post");
+  }
+
   get post() {
     return this._post;
   }
@@ -30,6 +47,7 @@ export class CreatePostComponent {
     this._post = post;
     console.log("at create-post, got post " + post.content);
   }
+
   get user() {
     return this._user;
   }

@@ -6,6 +6,16 @@ import {BookmarkComponent} from "../components/bookmark/bookmark";
 
 import "rxjs/add/operator/map";
 
+import {Composer} from "composer";
+import {TBONDS, FBONDS} from "../shared/data";
+
+
+const loc = "http://localhost:3000";
+
+const COMP_INFO = {
+  tbonds: TBONDS,
+  fbonds: FBONDS
+};
 
 const APIS = {
   auth: "@@dv-access-auth-1",
@@ -43,5 +53,6 @@ bootstrap(
     provide(
       PLATFORM_DIRECTIVES, {useValue: PublisherMessageComponent, multi: true}),
     provide(
-      PLATFORM_DIRECTIVES, {useValue: PublisherComponent, multi: true})
+      PLATFORM_DIRECTIVES, {useValue: PublisherComponent, multi: true}),
+    provide(Composer, {useValue: new Composer("bookmark", loc, COMP_INFO)})
   ]);

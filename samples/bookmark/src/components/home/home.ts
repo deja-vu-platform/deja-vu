@@ -19,6 +19,7 @@ export class HomeComponent {
   loggedInUser(username: string) {
     console.log("got a username");
     this.username = username;
-    this.user = {username: username};
+    // tmp hack: set atom_id
+    this.user = {atom_id: username, username: username};
   }
 }
