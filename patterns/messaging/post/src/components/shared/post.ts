@@ -22,7 +22,9 @@ export class PostService {
 
   newPost(author: Username, content): any {
     return this._post(`{
-      newPost(author: "${author}", content: "${content}")
+      newPost(author: "${author}", content: "${content}") {
+        atom_id
+      }
     }`);
   }
 
@@ -37,7 +39,7 @@ export class PostService {
           JSON.stringify({query: "mutation " + query_str}),
           {headers: headers})
       .map(res => res.json())
-      .map(json_res => json_res.data);
+      .map(json_res => json_res.data.newPost);
   }
 
   private _get(query) {

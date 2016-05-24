@@ -42,6 +42,7 @@ const mean = new Mean(
 const post_type = new graphql.GraphQLObjectType({
   name: "Post",
   fields: () => ({
+    atom_id: {"type": graphql.GraphQLString},
     content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
   })
 });
@@ -80,7 +81,7 @@ const schema = new graphql.GraphQLSchema({
     name: "Mutation",
     fields: () => ({
       newPost: {
-        "type": graphql.GraphQLBoolean,
+        "type": post_type,
         args: {
           author: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -98,7 +99,7 @@ const schema = new graphql.GraphQLSchema({
                   user_type, user.atom_id,
                   {$addToSet: {posts: {atom_id: post.atom_id}}}),
                 mean.composer.new_atom(post_type, post.atom_id, post)
-                ]));
+                ]).then(_ => post));
         }
       },
 
