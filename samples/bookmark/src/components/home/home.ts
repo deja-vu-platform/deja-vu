@@ -6,6 +6,8 @@ import {CreatePostComponent} from "../create-post/create-post";
 import {FeedComponent} from
 "dv-messaging-feed/lib/components/feed/feed";
 
+import {Composer} from "composer";
+
 
 @Component({
   selector: "home",
@@ -15,11 +17,23 @@ import {FeedComponent} from
 export class HomeComponent {
   username: string;
   user;
+  post_user;
+  feed_sub;
+
+  constructor(private _composer: Composer) {}
 
   loggedInUser(username: string) {
     console.log("got a username");
     this.username = username;
-    // tmp hack: set atom_id
-    this.user = {atom_id: username, username: username};
+    // tmp hack: auth should be returning an atom obj
+    this.user = this._composer.new_atom().adapt("User");
+    this.user.atom_id = username;
+    this.user.username = username;
+    //
+
+    this.post_user = this.user.adapt(
+        {name: "User", element: "Post", loc: "@@dv-messaging-post-1"});
+    this.feed_sub = this.user.adapt(
+        {name: "Subscriber", element: "Feed", loc: "@@dv-messaging-feed-1"});
   }
 }

@@ -20,22 +20,21 @@ import {Composer} from "composer";
   inputs: ["user"]
 })
 export class CreatePostComponent {
-  private _post = {content: ""};
+  private _post;
   private _user = {username: "", posts: []};
 
   private post_post;
   private label_item;
 
   constructor(private _composer: Composer) {
-    this.post_post = this._composer.adapt_atom(
-        {name: "Post", element: "post", loc: "@@dv-messaging-post-1"},
-        this._post,
-        "Post");
+    this._post = this._composer.new_atom().adapt("Post");
+    this._post.content = "";
+    this.post_post = this._post
+      .adapt({name: "Post", element: "post", loc: "@@dv-messaging-post-1"});
 
-    this.label_item = this._composer.adapt_atom(
-        {name: "Item", element: "label", loc: "@@dv-organization-label-1"},
-        this._post,
-        "Post");
+    this.label_item = this._post
+      .adapt({
+        name: "Item", element: "label", loc: "@@dv-organization-label-1"});
   }
 
   get post() {

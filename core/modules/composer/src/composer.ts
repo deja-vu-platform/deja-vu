@@ -29,23 +29,36 @@ export interface CompInfo {
 }
 
 
-export class Composer {
+export class Atom {
+  atom_id: string;
+  private _core: Atom;
+
   constructor(
       private _element: string, private _loc: string,
-      private _comp_info?: CompInfo) {}
+      private _comp_info?: CompInfo) {
+    this._core = this;
+    this.atom_id = "unsaved";
+  }
 
-  adapt_atom(to: Type, atom: any, t: Type | string) {
+  adapt(to: Type | string) {
     let type_info;
-    if (typeof t === "string") {
-      type_info = {name: t, element: this._element, loc: this._loc};
+    if (typeof to === "string") {
+      type_info = {name: to, element: this._element, loc: this._loc};
     } else {
-      type_info = t;
+      type_info = to;
     }
     // const name_map = this._get_name_map(to, type_info);
-    return new Proxy(atom, {
+    return new Proxy(this._core, {
       get: (target, name) => {
              console.log("getting " + JSON.stringify(name));
              // return target[name_map[name]];
+             if (name === "report_save") {
+               console.log("it's a report save!");
+               return target._report_save(type_info);
+             } else if (name === "report_update") {
+               console.log("it's a report update!");
+               return target._report_update(type_info);
+             }
              return target[name];
            },
       set: (target, name, value) => {
@@ -59,16 +72,39 @@ export class Composer {
     });
   }
 
-  report_save(t_name: string, atom_id: string, atom: any) {
-    console.log(
-        "Reporting save (id " + atom_id + ", t " + t_name + ") " +
-        JSON.stringify(atom));
+  _report_save(t: Type) {
+    return (atom_id: string) => {
+      console.log(
+          "Reporting save (id " + atom_id + ", t " + t.name + ") ");
+      console.dir(this);
+    };
   }
 
-  report_update(atom: any, update: any) {
-    console.log(
-        "Reporting up (id " + atom.atom_id + ") " +
-        JSON.stringify(update));
+  _report_update(t: Type) {
+    return (update: any) => {
+      console.log(
+          "Reporting up (id " + this.atom_id + ") " +
+          JSON.stringify(update));
+    };
+  }
+
+}
+
+export class Composer {
+  constructor(
+      private _element: string, private _loc: string,
+      private _comp_info?: CompInfo) {}
+
+  new_atom() {
+    return new Atom(this._element, this._loc, this._comp_info);
+  }
+
+  report_save(atom_id: string, atom: any) {
+    atom.report_save(atom_id);
+  }
+
+  report_update(update: any, atom: any) {
+    atom.report_update(update);
   }
 
 //  private _get_name_map(src: Type, dst: Type) {

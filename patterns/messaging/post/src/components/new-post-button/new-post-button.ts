@@ -45,13 +45,13 @@ export class NewPostButtonComponent {
 
   create() {
     console.log(
-        "at new-post-button on save, got post " + JSON.stringify(this._post));
+        "at new-post-button on save, got post " + this._post.content);
     this._postService.newPost(this._user.username, this._post.content)
       .subscribe(data => {
         this.submitted = true;
-        this._composer.report_save("post", data.atom_id, this._post);
+        this._composer.report_save(data.atom_id, this._post);
         const user_up = {$addToSet: {posts: {atom_id: data.atom_id}}};
-        this._composer.report_update(this._user, user_up);
+        this._composer.report_update(user_up, this._user);
       });
   }
 }
