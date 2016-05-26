@@ -29,15 +29,13 @@ function BaseComponent(type, components) {
     this.type = type;
     this.components = components;
     this.properties = {};
-};
+}
 
 BaseComponent.prototype.setProperty = function(property, value) {
     this.properties[property] = value;
-    return;
 };
-BaseComponent.prototype.updateComponent = function(component, value) {
-    this.properties[component] = value;
-    return;
+BaseComponent.prototype.updateComponent = function(type, value) {
+    this.components[type] = value;
 };
 
 
@@ -80,4 +78,4 @@ ClicheComponent.prototype.addComponent = function(component, row, col) {
 
 
 clicheComponent = new ClicheComponent({rows: 3, cols: 3}, "name", 1, "version", "author");
-clicheComponent.addComponent({}, 2, 3);
+//clicheComponent.addComponent({}, 2, 3);

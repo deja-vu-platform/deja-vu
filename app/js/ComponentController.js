@@ -1,6 +1,8 @@
 
 var num_rows = 3;
 var num_cols = 3;
+var cell_width = 250;
+var cell_height = 250;
 var files = [];
 clicheComponent = null;
 bitmap_old = null;
@@ -14,6 +16,8 @@ $(function() {
     grid_width = grid.offsetWidth;
     grid_height = grid.offsetHeight;
     createTable(grid_width, grid_height, true);
+    InitClicheComponent(true);
+
 
 });
 
@@ -27,14 +31,26 @@ $('#select-cols').on('change', function(e) {
 
 $('#create_component').on('click', function() {
     createTable(grid_width, grid_height, false);
+    InitClicheComponent(false);
+
+});
+
+$('#load_component_btn').on('click', function() {
+    loadTable(grid_width, grid_height);
 });
 
 $('#save_component').on('click', function() {
-    w = window.open();
-    w.document.body.innerHTML='<p><textarea style="width:95%; height:95%">'+JSON.stringify(clicheComponent, null, '\t')+'</textarea></p>';
+
+    window.open( "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(clicheComponent, null, '\t')));
+
+    //w = window.open();
+    //w.document.body.innerHTML='<a href="data:' + data + '" download="data.json">' +
+    //    'Download JSON</a>'+'<p><textarea style="width:95%; height:95%">'+
+    //    JSON.stringify(clicheComponent, null, '\t')+'</textarea></p>';
 });
 
-/*
+
 $('#rename_component').on('click', function() {
     $('#submit_rename').removeClass('not_displayed');
     $(this).addClass('not_displayed');
@@ -47,10 +63,12 @@ $('#new_name_input').on('keypress', function(event) {
         $('#rename_component').removeClass('not_displayed');
         $('#submit_rename').addClass('not_displayed');
         $('#rename_component').text($(this).val());
+        $('<style>.table_outter::after{content:"'+$(this).val()+'"}</style>').appendTo('head');
+
         clicheComponent.meta.name = $(this).val();
     }
 });
-*/
+
 
 
 /**
@@ -73,18 +91,19 @@ function createTable(grid_width, grid_height, isDefault) {
                     var td = document.createElement('td');
                     td.className = 'droppable';
                     td.id = 'cell'+row+col;
-                    resizeCell(td, grid_width, grid_height, num_rows, num_cols);
 
                     var sp = document.createElement('span');
-                    sp.innerHTML = '<button type="button" class="edit-btn btn btn-default"><span class="glyphicon glyphicon-edit"></span></button>';
+                    sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
+
                     var button = sp.firstChild;
 
                     td.appendChild(button);
                     tr.appendChild(td);
 
-                    $(button).on("click", function() {
-                        $('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
-                        triggerEdit(td.id);
+                    $(button).on("click", function(e) {
+                        //$('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
+                        //triggerEdit(td.id);
+                        $('#'+td.id).find('.tooltip').addClass('open');
                     });
 
                 })(col+1);
@@ -95,9 +114,11 @@ function createTable(grid_width, grid_height, isDefault) {
 
     document.getElementById('grid-container').appendChild(grid);
 
-    registerDroppable();
+    //initSVG(grid);
 
-    InitClicheComponent(isDefault);
+    resizeCell(grid_width, grid_height, num_rows, num_cols);
+
+    registerDroppable();
 
     bitmap_old = make2dArray(num_rows, num_cols);
     bitmap_new = make2dArray(num_rows, num_cols);
@@ -113,14 +134,17 @@ function createTable(grid_width, grid_height, isDefault) {
  * @param num_rows
  * @param num_cols
  */
-function resizeCell(cell, grid_width, grid_height, num_rows, num_cols) {
-    var cell_width = Math.floor((grid_width/num_cols)) - 15;
-    var cell_height = Math.floor((grid_height/num_rows)) - 15;
-    $(cell).css('width', cell_width).css('height', cell_height);
-    //cell.setAttribute('style', 'width: '+cell_width+'px; height: '+cell_height+'px;');
-    // Resize tooltip
+function resizeCell(grid_width, grid_height, num_rows, num_cols) {
+    cell_width = Math.floor((grid_width/num_cols)) - 15;
+    cell_height = Math.floor((grid_height/num_rows)) - 15;
     var tooltip_width = Number($('.tooltip').css('width').substring(0,3));
-    $('.tooltip').css('left', -1*Math.floor((tooltip_width-(cell_width-40))/2)+'px');
+
+    getCSSRule('td').style.setProperty('width',cell_width+'px',null);
+    getCSSRule('td').style.setProperty('height',cell_height+'px',null);
+    getCSSRule('.tooltip').style.setProperty('left',-1*Math.floor((tooltip_width-(cell_width-40))/2)+'px',null);
+
+    resizeLabelDivs(cell_width, cell_height);
+
 }
 
 function InitClicheComponent(isDefault) {
@@ -133,7 +157,8 @@ function InitClicheComponent(isDefault) {
         name = $('#component_name').val();
         version = $('#component_version').val();
         author = $('#component_author').val();
-        //$('#rename_component').text($('#component_name').val());
+        $('#rename_component').text($('#component_name').val());
+        $('#modal-title-1').text($('#component_name').val());
     }
     $('<style>.table_outter::after{content:"'+name+'"}</style>').appendTo('head');
     clicheComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
@@ -146,8 +171,21 @@ function addComponent(widget, cell_id) {
     var span = document.createElement('span');
     span.innerHTML=widget[0].outerHTML;
     var type = span.firstElementChild.getAttribute('name');
-    var component = new BaseComponent(type, null);
-    clicheComponent.addComponent(component, row, col);
+    var component = new BaseComponent(type, {});
+    if (!clicheComponent.components.hasOwnProperty(row)) {
+        clicheComponent.components[row] = {};
+        }
+    clicheComponent.components[row][col] = component;
+
+    //clicheComponent.addComponent(component, row, col);
+
+    if (type==='label') {
+        Display(cell_id, getHTML[type]("Type text here..."));
+    } else if (type==='panel') {
+        Display(cell_id, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
+    } else {
+        triggerEdit(cell_id);
+    }
 }
 
 
@@ -162,7 +200,7 @@ function updateComponentAt(cell_id) {
         $('#'+cell_id).get(0).getElementsByTagName('input'), 0);
 
     if (type==='label') {
-        value = $('#'+cell_id).get(0).getElementsByTagName('textarea')[0].value;
+        value = $('#'+cell_id).find('p')[0].textContent;
     } else if (type==='link') {
         value = {
             link_text: inputs[0].value,
@@ -196,10 +234,22 @@ function updateComponentAt(cell_id) {
         } else { // pasted link to image
             value.img_src = inputs[0].value;
         }
+    } else if (type==='panel') {
+        value = {
+            heading: $('#'+cell_id).find('.panel-title')[0].textContent,
+            content: $('#'+cell_id).find('.panel-body')[0].textContent
+        }
     }
 
     if (!isUpload) {
-        Display(cell_id, getHTML[type](value));
+        $('#'+cell_id).find('.label_container').remove();
+        $('#'+cell_id).find('.display_component').remove();
+        Display(cell_id, getHTML[type](value), function() {
+            //for (var prop in clicheComponent.components[row][col].properties) {
+            //    var bootstrap_class = clicheComponent.components[row][col].properties[prop];
+            //    $('#'+cell_id).find('.display_component').addClass(bootstrap_class);
+            //}
+        });
         clicheComponent.components[row][col].components={};
         clicheComponent.components[row][col].components[type] = value;
     }
@@ -213,12 +263,14 @@ function updateComponentAt(cell_id) {
  */
 function quicklyMakeArray(size, func) {
     return Array.apply(null, Array(size)).map(func);
-};
+}
 function make2dArray(rows, cols) {
-    return quicklyMakeArray(cols, function () {
-        return quicklyMakeArray(rows, function (i) {return 0;});
+    rows=Number(rows);
+    cols=Number(cols);
+    return quicklyMakeArray(rows, function () {
+        return quicklyMakeArray(cols, function (i) {return 0;});
     });
-};
+}
 function findDeletedCoord() {
     var result = [];
     for (var row=0; row < num_rows; row++) {
@@ -234,6 +286,20 @@ function findDeletedCoord() {
     }
     return result;
 }
+
+function updateBitmap() {
+    bitmap_old = JSON.parse(JSON.stringify(bitmap_new));
+    $('td').each(function() {
+        var row = Number($(this).attr('id').substring(4, 5)) - 1;
+        var col = Number($(this).attr('id').substring(5, 6)) - 1;
+        if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
+            bitmap_new[row][col] = 0;
+        } else {
+            bitmap_new[row][col] = 1;
+        }
+    });
+}
+
 
 
 /*
@@ -261,4 +327,45 @@ function FileSelectHandler(e) {
 
 function truncate(str,len) {
     return str.substring(0,len)+(str.length>len ? "... "+str.substring(str.length-4) : "");
+}
+
+function getCSSRule(search) {
+    var x =[].slice.call(document.styleSheets[2].cssRules);
+    return x.filter(function(rule) {
+        return rule.selectorText === search;
+    })[0];
+}
+
+function resizeLabelDivs(cell_width, cell_height) {
+    getCSSRule('.label_container').style.setProperty('width',(cell_width-10)+'px',null);
+    getCSSRule('.label_container').style.setProperty('height',(cell_height-30)+'px',null);
+    getCSSRule('.label_container').style.setProperty('padding-top',(cell_height/4)+'px',null);
+}
+
+function loadTable(grid_width, grid_height) {
+    clicheComponent=JSON.parse($('#component_json').val());
+    $('#rename_component').text(clicheComponent.meta.name);
+    $('<style>.table_outter::after{content:"'+clicheComponent.meta.name+'"}</style>').appendTo('head');
+    num_rows=clicheComponent.dimensions.rows;
+    num_cols=clicheComponent.dimensions.cols;
+    createTable(grid_width, grid_height, false);
+
+    $('td').each(function() {
+        var cell_id=$(this).get(0).id;
+        var row = cell_id.substring(4,5);
+        var col = cell_id.substring(5,6);
+        if (clicheComponent.components[row]) {
+            if (clicheComponent.components[row][col]) {
+                var component = clicheComponent.components[row][col];
+                var type = component.type;
+                showConfigOptions(type, document.getElementById(cell_id));
+                Display(cell_id, getHTML[type](component.components[type]));
+                $('#'+cell_id).addClass("dropped");
+                $('#'+cell_id).removeClass("droppable");
+            }
+        }
+    });
+
+    registerDraggable();
+    registerTooltipBtnHandlers();
 }

@@ -1,0 +1,99 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>openlayers test</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+
+
+    </style>
+</head>
+
+
+<body>
+<div id="map" style="width: 400px; height: 300px;"></div>
+
+<span onclick="handleClick();">Click me</span>
+
+
+<script src="http://openlayers.org/api/OpenLayers.js"></script>
+<script>
+
+    // Define global variables
+    var map, graphic, sampleUrl;
+
+    // Create map and layer objects on page load
+    window.onload = function() {
+
+        map = new OpenLayers.Map('map');
+
+        var options = {
+            numZoomLevels: 3,
+            isBaseLayer: true
+        };
+
+        // Don't use var here - use global variable instead,
+        // so you can access this layer in updateImage function
+        graphic = new OpenLayers.Layer.Image(
+                'City Lights',
+                '', // We don't know image URL yet
+                new OpenLayers.Bounds(-180, -88.759, 180, 88.759),
+                new OpenLayers.Size(580, 288),
+                options
+        );
+
+        // Create Landsat7 WMS layer
+        // Remove, if you don't need it actually...
+//        var jpl_wms = new OpenLayers.Layer.WMS(
+//                "NASA Global Mosaic",
+//                "http://t1.hypercube.telascience.org/cgi-bin/landsat7",
+//                {layers: "landsat7"},
+//                options
+//        );
+
+//         ...and remember to remove jpl_wms also from here, also
+//        map.addLayers([graphic, jpl_wms]);
+        map.addLayers([graphic]);
+
+//        map.addControl(new OpenLayers.Control.LayerSwitcher());
+        map.zoomToMaxExtent();
+//        popup = new OpenLayers.Popup("chicken",
+//                new OpenLayers.LonLat(5,40),
+//                new OpenLayers.Size(200,200),
+//                "example popup",
+//                true);
+//
+//        map.addPopup(popup);
+
+        label = '<div class="panel panel-default"><div class="panel-heading"><strong>Label text</strong>' +
+                '<button type="button" class="close close_btn"><small>x</small></button></div><div class="panel-body">'+
+                '<div class="row"><div class="col-sm-12"><textarea class="form-control" rows="2"></textarea> </div>'+
+                '</div><br><button class="apply btn btn-primary pull-right">Apply</button></div></div>';
+
+//        OpenLayers.Util.getElement("graphic").innerHTML = label;
+
+    };
+
+    // Function to change
+    var updateImage = function(strURL) {
+        // Call image layer's setUrl method
+        graphic.setUrl(strURL);
+    };
+    // Handle click event
+    var handleClick = function() {
+        sampleUrl = 'http://i.imgur.com/mlstXzS.jpg';
+        updateImage(sampleUrl);
+    }
+
+
+</script>
+
+
+</body>
+
+</html>

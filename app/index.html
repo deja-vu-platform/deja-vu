@@ -22,7 +22,7 @@
         <div class="menu-item logo">Déjà Vu UI builder</div>
 
         <div class="menu-item">
-            <button type="button" class="btn btn-default">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load_component">
                 <span class="glyphicon glyphicon-file"></span> Open...
             </button>
         </div>
@@ -39,21 +39,6 @@
             </button>
         </div>
 
-        <div class="menu-item">
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="glyphicon glyphicon-file"></span> View
-                    <span class="caret"></span>
-                </button>
-
-                <ul class="dropdown-menu">
-                    <li><a href="#" id="zoomIn">Zoom in + </a></li>
-                    <li><a href="#" id="zoomOut">Zoom out - </a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="#" id="zoomReset">Reset </a></li>
-                </ul>
-            </div>
-        </div>
 
         <div class="menu-item">
             <div class="btn-group">
@@ -78,13 +63,12 @@
         <div class="header">Basic components</div>
         <div class="content">
             <ul id="basic_components">
-                <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Label</li>
+                <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
                 <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
-                <li name="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Image</li>
-                <li name="tab_viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Tab Viewer</li>
+                <li name="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Media</li>
+                <li name="tab_viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs</li>
                 <li name="menu" class="draggable widget"><img src="images/menu_icon.png" width="15px" height="15px"> Menu</li>
-
-                <li>Video</li> <li>Button link</li> <li>Image link</li> <li>Code block</li>
+                <li name="panel" class="draggable widget"><img src="images/panel_icon.png" width="15px" height="15px"> Panel</li>
 
             </ul>
         </div>
@@ -110,27 +94,30 @@
     </div>
 </div>
 
-<!--<div id="outer-container">-->
-    <!--<div id="grid-container" class="zoomTarget"></div>-->
-    <!--<div class="grid-container2 zoomTarget"></div>-->
-    <!--<div class="grid-container2 zoomTarget"></div>-->
-    <!--<div class="grid-container2 zoomTarget"></div>-->
-<!--</div>-->
 
 <div id="outer-container">
-    <div id="viewport">
-        <div class="zoomContainer">
-            <div id="grid-container" class="zoomTarget"></div>
-            <div class="grid-container2 zoomTarget"></div>
-            <div class="grid-container2 zoomTarget"></div>
-            <div class="grid-container2 zoomTarget"></div>
-        </div>
+    <div id="middle-container">
+    <div class="inner-container">
+        <div id="grid-container"></div>
+        <div id="grid-container2"><h1>Component 2</h1></div>
     </div>
+    <div class="inner-container">
+        <div id="grid-container3"><h1>Component 3</h1></div>
+        <div id="grid-container4"><h1>Component 4</h1></div>
+    </div>
+    </div>
+
+</div>
+
+<div id="zoom_control">
+    <button id="zoomIn" class="zoom_control_button">+</button><br/>
+    <button id="zoomOut" class="zoom_control_button">-</button>
 </div>
 
 <div id="trash" class="droppable">
     <span class="glyphicon glyphicon-trash"></span>
 </div>
+
 <!--EDIT PROPERTIES POPUPS-->
 <div class="not_displayed">
     <div id="link_popup_holder">
@@ -152,9 +139,43 @@
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
+
+
+    <div id="link_properties">
+        <div class="config-btns">
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-tint"></span> Style
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="btn-style-link">Link</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li class="dropdown-header">Button</li>
+                    <li><a href="#" class="btn-style-default">Default</a></li>
+                    <li><a href="#" class="btn-style-primary">Primary</a></li>
+                    <li><a href="#" class="btn-style-success">Success</a></li>
+                    <li><a href="#" class="btn-style-info">Info</a></li>
+                    <li><a href="#" class="btn-style-warning">Warning</a></li>
+                    <li><a href="#" class="btn-style-danger">Danger</a></li>
+                </ul>
+            </span>
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-text-size"></span> Size
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="btn-size-xs">Small</a></li>
+                    <li><a href="#" class="btn-size-df">Default</a></li>
+                    <li><a href="#" class="btn-size-lg">Large</a></li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
 
     <div id="label_popup_holder">
         <div id="label_popup" class="tooltip">
@@ -163,7 +184,6 @@
                     <button type="button" class="close close_btn"><small>x</small></button>
                 </div>
                 <div class="panel-body">
-
                     <div class="row">
                         <div class="col-sm-12"><textarea class="form-control" rows="2"></textarea> </div>
                     </div><br/>
@@ -173,10 +193,57 @@
         </div>
     </div>
 
+
+
+    <div id="label_properties">
+        <div class="config-btns">
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-indent-left"></span> Align
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="align-center">Center</a></li>
+                    <li><a href="#" class="align-right">Right</a></li>
+                    <li><a href="#" class="align-left">Left</a></li>
+                    <li><a href="#" class="align-justify">Justify</a></li>
+                </ul>
+            </span>
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-text-size"></span> Size
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="lbl-small">Small</a></li>
+                    <li><a href="#" class="lbl-default">Default</a></li>
+                    <li><a href="#" class="lbl-large">Large</a></li>
+                    <li><a href="#" class="lbl-heading">H1</a></li>
+                </ul>
+            </span>
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-text-color"></span> Color
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="lbl-text-default">Default</a></li>
+                    <li><a href="#" class="lbl-text-muted">Muted</a></li>
+                    <li><a href="#" class="lbl-text-primary">Primary</a></li>
+                    <li><a href="#" class="lbl-text-success">Success</a></li>
+                    <li><a href="#" class="lbl-text-info">Info</a></li>
+                    <li><a href="#" class="lbl-text-warning">Warning</a></li>
+                    <li><a href="#" class="lbl-text-danger">Danger</a></li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+
     <div id="image_popup_holder">
         <div id="img_popup" class="tooltip">
             <div class="panel panel-default">
-                <div class="panel-heading"><strong>Upload image</strong>
+                <div class="panel-heading"><strong>Upload image or video</strong>
                     <button type="button" class="close close_btn"><small>x</small></button>
                 </div>
                 <div class="panel-body">
@@ -245,6 +312,31 @@
         </div>
     </div>
 
+    <div id="tab_viewer_properties">
+        <div class="config-btns">
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-th-list"></span> Alignment
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="tab-align-stacked">Stacked</a></li>
+                    <li><a href="#" class="tab-align-horizontal">Horizontal</a></li>
+                </ul>
+            </span>
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-tint"></span> Style
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="tab-style-pills">Pills</a></li>
+                    <li><a href="#" class="tab-style-tabs">Tabs</a></li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
     <div id="menu_popup_holder">
         <div id="menu_popup" class="tooltip">
             <div class="panel panel-default">
@@ -282,6 +374,86 @@
                 <br/>
             </div>
 
+        </div>
+    </div>
+
+    <div id="menu_properties">
+        <div class="config-btns">
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-th-list"></span> Alignment
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="menu-horizontal">Horizontal</a></li>
+                    <li><a href="#" class="menu-vertical">Stacked</a></li>
+                </ul>
+            </span>
+        </div>
+    </div>
+
+    <div id="panel_popup_holder">
+        <div class="tooltip">
+            <div class="panel panel-default">
+                <div class="panel-heading"><strong>Panel</strong>
+                    <button type="button" class="close close_btn"><small>x</small></button>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Heading: </div>
+                        <div class="col-sm-7"><input type="text" class="form-control" required autofocus/></div>
+                        <div class="col-sm-4"></div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col-sm-2 form-lbl">Content: </div>
+                        <div class="col-sm-7"><input type="text" class="form-control" required /></div>
+                        <div class="col-sm-2 apply"><button class="btn btn-primary">Apply</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="panel_properties">
+        <div class="config-btns">
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-indent-left"></span> Align
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="align-center">Center</a></li>
+                    <li><a href="#" class="align-right">Right</a></li>
+                    <li><a href="#" class="align-left">Left</a></li>
+                    <li><a href="#" class="align-justify">Justify</a></li>
+                </ul>
+            </span>
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-text-size"></span> Size
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="lbl-small">Small</a></li>
+                    <li><a href="#" class="lbl-default">Default</a></li>
+                    <li><a href="#" class="lbl-large">Large</a></li>
+                    <li><a href="#" class="lbl-heading">H1</a></li>
+                </ul>
+            </span>
+            <span class="btn-group btn-group-xs">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-tint"></span> Style
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" class="panel-text-default">Default</a></li>
+                    <li><a href="#" class="panel-text-primary">Primary</a></li>
+                    <li><a href="#" class="panel-text-success">Success</a></li>
+                    <li><a href="#" class="panel-text-info">Info</a></li>
+                    <li><a href="#" class="panel-text-warning">Warning</a></li>
+                    <li><a href="#" class="panel-text-danger">Danger</a></li>
+                </ul>
+            </span>
         </div>
     </div>
 
@@ -364,10 +536,28 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div class="modal fade" id="load_component">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">Load component</h4>
+            </div>
+            <div class="modal-body">
+                <div>Paste JSON here:</div>
+                <div><textarea id="component_json" rows="10" class="form-control" required></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button id="load_component_btn" data-dismiss="modal" class="btn btn-primary">Load</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
-<script src="../main.js"></script>
-<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
-<!--<script src="js/external/jquery.min.js"></script>-->
+
+<!--<script src="../main.js"></script>-->
+<!--<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>-->
+<script src="js/external/jquery.min.js"></script>
 
 <script src="js/external/jquery-ui.min.js"></script>
 <script src="js/external/bootstrap.min.js"></script>
@@ -377,5 +567,6 @@
 <script src="js/ComponentController.js"></script>
 <script src="js/index.js"></script>
 <script src="js/external/zoomooz.min.js"></script>
+
 </body>
 </html>
