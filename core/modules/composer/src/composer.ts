@@ -31,13 +31,13 @@ export interface CompInfo {
 
 export class Atom {
   atom_id: string;
-  private _core: Atom;
+  private _forwards;
 
   constructor(
       private _element: string, private _loc: string,
       private _comp_info?: CompInfo) {
-    this._core = this;
     this.atom_id = "unsaved";
+    this._forwards = {};
   }
 
   adapt(to: Type | string) {
@@ -48,7 +48,10 @@ export class Atom {
       type_info = to;
     }
     // const name_map = this._get_name_map(to, type_info);
-    return new Proxy(this._core, {
+    const tinfo_str = JSON.stringify(type_info);
+    this._forwards[tinfo_str] = this._forward_map(type_info);
+    console.dir(this._forwards);
+    return new Proxy(this, {
       get: (target, name) => {
              console.log("getting " + JSON.stringify(name));
              // return target[name_map[name]];
@@ -59,13 +62,22 @@ export class Atom {
                console.log("it's a report update!");
                return target._report_update(type_info);
              }
+             const core_name = target._forwards[tinfo_str][name];
+             if (core_name !== undefined) {
+               console.log("using core name " + core_name);
+               name = core_name;
+             }
              return target[name];
            },
       set: (target, name, value) => {
              console.log(
                "setting " + JSON.stringify(name) + " w " +
                JSON.stringify(value));
-             // target[name_map[name]] = value;
+
+             const core_name = target._forwards[tinfo_str][name];
+             if (core_name !== undefined) {
+               name = core_name;
+             }
              target[name] = value;
              return true;
            }
@@ -77,6 +89,23 @@ export class Atom {
       console.log(
           "Reporting save (id " + atom_id + ", t " + t.name + ") ");
       console.dir(this);
+
+      for (const field_name of Object.keys(this)) {
+        if (field_name.startsWith("_")) continue;
+        const field = this[field_name];
+        if (typeof field === "function") continue;
+
+        if (field instanceof Array) {
+          console.log("it's an array ");
+          console.dir(field);
+        } else if (field instanceof Object) {
+          console.log("it's an object ");
+          console.dir(field);
+        } else {
+          console.log("it's a basic " + field);
+        }
+      }
+
     };
   }
 
@@ -88,6 +117,26 @@ export class Atom {
     };
   }
 
+  // from a type to the core
+  _forward_map(t: Type) {
+    if (this._comp_info === undefined) return {};
+    const forward_map = {};
+    // find the field bonds where t is part of, map field to core
+    for (const fbond of this._comp_info.fbonds) {
+      for (const field of fbond.fields) {
+        if (this._t_equals(field.type, t)) {
+          forward_map[field.name] = fbond.subfield.name;
+        }
+      }
+    }
+    console.log("ret forward map is " + JSON.stringify(forward_map));
+    return forward_map;
+  }
+
+  _t_equals(t1: Type, t2: Type) {
+    return (
+      t1.name === t2.name && t1.element === t2.element && t1.loc === t2.loc);
+  }
 }
 
 export class Composer {
