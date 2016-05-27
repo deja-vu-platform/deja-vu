@@ -18,7 +18,7 @@ export class HomeComponent {
   username: string;
   user;
   post_user;
-  feed_sub;
+  feed_sub = {name: ""};
 
   constructor(private _composer: Composer) {}
 
