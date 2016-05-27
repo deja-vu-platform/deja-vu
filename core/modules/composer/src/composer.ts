@@ -32,12 +32,14 @@ export interface CompInfo {
 export class Atom {
   atom_id: string;
   private _forwards;
+  private _reverse;
 
   constructor(
       private _element: string, private _loc: string,
       private _comp_info?: CompInfo) {
     this.atom_id = "unsaved";
     this._forwards = {};
+    this._reverse = {};
   }
 
   adapt(to: Type | string) {
@@ -77,6 +79,11 @@ export class Atom {
              const core_name = target._forwards[tinfo_str][name];
              if (core_name !== undefined) {
                name = core_name;
+             } else { // the field we are putting is not bonded
+               if (typeof name === "string" && !name.startsWith("_") &&
+                   typeof value !== "function") {
+                 this._reverse[name] = tinfo_str;
+               }
              }
              target[name] = value;
              return true;
@@ -90,22 +97,23 @@ export class Atom {
           "Reporting save (id " + atom_id + ", t " + t.name + ") ");
       console.dir(this);
 
-      for (const field_name of Object.keys(this)) {
-        if (field_name.startsWith("_")) continue;
+      for (const field_name of Object.keys(this._reverse)) {
+        console.log("Looking at " + field_name);
         const field = this[field_name];
-        if (typeof field === "function") continue;
-
+        const owner = this._reverse[field_name];
         if (field instanceof Array) {
-          console.log("it's an array ");
+          console.log("it's an array that corresponds to " + owner);
           console.dir(field);
         } else if (field instanceof Object) {
-          console.log("it's an object ");
+          console.log("it's an object that corresponds to " + owner);
           console.dir(field);
+          // save and then report_save on this atom
+          // when that returns do up of current
         } else {
-          console.log("it's a basic " + field);
+          console.log(
+              "it's a basic " + field + " that corresponds to " + owner);
         }
       }
-
     };
   }
 
