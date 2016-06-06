@@ -68,7 +68,15 @@ export class Mean {
 
   serve_schema(graphql_schema) {
     console.log(`Serving graphql schema for MEAN ${this.name} at ${this.loc}`);
-    const gql = express_graphql({schema: graphql_schema, pretty: true});
+    const gql = express_graphql({
+      schema: graphql_schema,
+      pretty: true,
+      formatError: e => ({
+        message: e.message,
+        locations: e.locations,
+        stack: e.stack
+      })
+    });
     this.app.options("/graphql", this._cors);
     this.app.get("/graphql", this._cors, gql);
     this.app.post("/graphql", this._cors, gql);
