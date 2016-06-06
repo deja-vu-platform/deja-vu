@@ -273,7 +273,8 @@ class Type {
 
   equals(other: Type) {
     return (
-      this.name === other.name && this.element === other.element &&
+      this.name.toLowerCase() === other.name.toLowerCase() &&
+      this.element.toLowerCase() === other.element.toLowerCase() &&
       this.loc === other.loc);
   }
 }
