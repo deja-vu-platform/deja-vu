@@ -110,7 +110,8 @@ const schema = new graphql.GraphQLSchema({
         args: {
           "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          self_forward: {"type": graphql.GraphQLBoolean}
         },
         resolve: (root, args) => process("new", args)
       },
@@ -119,7 +120,8 @@ const schema = new graphql.GraphQLSchema({
         args: {
           "type": {"type": new graphql.GraphQLNonNull(type_input_type)},
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          self_forward: {"type": graphql.GraphQLBoolean}
         },
         resolve: (root, args) => process("update", args)
       }
@@ -147,7 +149,7 @@ function process(op: string, args: any) {
         for (let bonded_type of type_bond.types) {
           bonded_type = new Type(
             bonded_type.name, bonded_type.element, bonded_type.loc);
-          if (bonded_type.equals(t)) {
+          if (!args.self_forward && bonded_type.equals(t)) {
             continue;
           }
           updates_p.push(send_update(op, bonded_type, t, args));
@@ -254,7 +256,8 @@ class Type {
           for (let finfo of fbond.fields) {
             if (this.equals(finfo.type)) {
               this_fbond_info = finfo;
-            } else if (other.equals(finfo.type)) {
+            } // not "else if" because could be a self-report
+            if (other.equals(finfo.type)) {
               other_fbond_info = finfo;
             }
           }
