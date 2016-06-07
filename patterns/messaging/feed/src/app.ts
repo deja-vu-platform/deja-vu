@@ -69,9 +69,12 @@ const pub_type = new graphql.GraphQLObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     published: {
       "type": new graphql.GraphQLList(msg_type),
-      resolve: pub => mean.db.collection("msgs")
-        .find({atom_id: {$in: pub.published.map(p => p.atom_id)}})
-        .toArray()
+      resolve: pub => {
+        if (!pub.published) return [];
+        return mean.db.collection("msgs")
+          .find({atom_id: {$in: pub.published.map(p => p.atom_id)}})
+          .toArray();
+      }
     }
   })
 });
