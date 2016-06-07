@@ -4,6 +4,8 @@ const rp = require("request-promise");
 
 import {Mean} from "mean";
 
+import * as _ from "underscore";
+
 
 const mean = new Mean(
   "composer",
@@ -166,11 +168,11 @@ function send_update(op: string, dst: Type, src: Type, args: any) {
   if (op === "new") {
     const atom = args.atom;
     console.log(
-         "Sending update to element " + dst.element + " dst type " +
+         "Computing update to element " + dst.element + " dst type " +
          JSON.stringify(dst) + " have atom <" + atom + ">");
     return transform_atom(dst, src, atom)
       .then(transformed_atom => {
-        const atom_str = transformed_atom.replace(/"/g, "\\\"");
+        const atom_str = JSON.stringify(transformed_atom).replace(/"/g, "\\\"");
         console.log("now have <" + atom_str + ">");
         return post(dst.loc, `{
             _dv_${op}_${dst.name.toLowerCase()}(
@@ -180,11 +182,16 @@ function send_update(op: string, dst: Type, src: Type, args: any) {
   } else { // update
     const update = args.update;
     console.log(
-         "Sending update to element " + dst.element + " dst type " +
+         "Computing update to element " + dst.element + " dst type " +
          JSON.stringify(dst) + " have update <" + update + ">");
     return transform_update(dst, src, update)
       .then(transformed_update => {
-        const update_str = transformed_update.replace(/"/g, "\\\"");
+        if (_.isEmpty(transformed_update)) {
+          console.log("No need to send any updates to " + dst.element);
+          return true;
+        }
+        const update_str = JSON.stringify(transformed_update)
+            .replace(/"/g, "\\\"");
         console.log("now have <" + update_str + ">");
         return post(dst.loc, `{
             _dv_${op}_${dst.name.toLowerCase()}(
@@ -300,11 +307,11 @@ function transform_atom(dst: Type, src: Type, atom) {
           }
         }
 
-        const transformed_atom_str = JSON.stringify(transformed_atom);
         console.log(
-          "trasnformed atom str " + transformed_atom_str + " used name map " +
-          JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
-        return transformed_atom_str;
+          "trasnformed atom str " + JSON.stringify(transformed_atom) +
+          " used name map " + JSON.stringify(name_map) + " for dst " +
+          JSON.stringify(dst));
+        return transformed_atom;
       });
   });
 }
@@ -319,23 +326,23 @@ function transform_update(dst: Type, src: Type, update) {
         let transform_up = {};
         // { operator1: {field: value, ...}, operator2: {field: value, ...}
         for (const update_f of Object.keys(parsed_update)) {
-          transform_up[update_f] = {};
+          let transform_up_f = transform_up[update_f];
           for (const field_f of Object.keys(parsed_update[update_f])) {
             if (dst_type_fields.indexOf(field_f) > -1) {
-              transform_up[update_f][field_f] = (
-                parsed_update[update_f][field_f]);
+              if (transform_up_f === undefined) transform_up_f = {};
+              transform_up_f[field_f] = parsed_update[update_f][field_f];
             } else if (name_map[field_f] !== undefined) {
+              if (transform_up_f === undefined) transform_up_f = {};
               const map_f = name_map[field_f];
-              transform_up[update_f][map_f] = (
-                parsed_update[update_f][field_f]);
+              transform_up_f[map_f] = parsed_update[update_f][field_f];
             }
           }
         }
-        const transform_up_str = JSON.stringify(transform_up);
         console.log(
-          "trasnformed update str " + transform_up_str + " used name map " +
-          JSON.stringify(name_map) + " for dst " + JSON.stringify(dst));
-        return transform_up_str;
+          "trasnformed update str " + JSON.stringify(transform_up) +
+          " used name map " + JSON.stringify(name_map) + " for dst " +
+          JSON.stringify(dst));
+        return transform_up;
       });
   });
 }
