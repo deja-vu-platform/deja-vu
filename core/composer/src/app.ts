@@ -323,25 +323,36 @@ function transform_update(dst: Type, src: Type, update) {
     return src.transform_map(dst)
       .then(name_map => {
         const parsed_update = JSON.parse(update);
-        let transform_up = {};
+        const transform_up = {};
         // { operator1: {field: value, ...}, operator2: {field: value, ...}
         for (const update_f of Object.keys(parsed_update)) {
-          let transform_up_f = transform_up[update_f];
+
           for (const field_f of Object.keys(parsed_update[update_f])) {
-            if (dst_type_fields.indexOf(field_f) > -1) {
-              if (transform_up_f === undefined) transform_up_f = {};
-              transform_up_f[field_f] = parsed_update[update_f][field_f];
-            } else if (name_map[field_f] !== undefined) {
-              if (transform_up_f === undefined) transform_up_f = {};
-              const map_f = name_map[field_f];
-              transform_up_f[map_f] = parsed_update[update_f][field_f];
+            // field could have dots (the update could be modifying nested objs)
+            const transformed_f = [];
+            for (const subfield of field_f.split(".")) {
+              if (_.contains(dst_type_fields, subfield)) {
+                transformed_f.push(subfield);
+              } else if (name_map[subfield] !== undefined) {
+                transformed_f.push(name_map[subfield]);
+              } else if (!isNaN(Number(subfield)) &&
+                         !_.isEmpty(transformed_f)) {
+                transformed_f.push(subfield);
+              }
+            }
+            if (!_.isEmpty(transformed_f)) {
+              if (transform_up[update_f] === undefined) {
+                transform_up[update_f] = {};
+              }
+              transform_up[update_f][transformed_f.join(".")] = (
+                  parsed_update[update_f][field_f]);
             }
           }
         }
         console.log(
           "trasnformed update str " + JSON.stringify(transform_up) +
           " used name map " + JSON.stringify(name_map) + " for dst " +
-          JSON.stringify(dst));
+          JSON.stringify(dst) + " update " + JSON.stringify(update));
         return transform_up;
       });
   });
