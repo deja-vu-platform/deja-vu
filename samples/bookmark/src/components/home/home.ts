@@ -1,4 +1,5 @@
 import {Component} from "angular2/core";
+import {HTTP_PROVIDERS} from "angular2/http";
 
 import {LoggedInComponent} from
 "dv-access-auth/lib/components/logged-in/logged-in";
@@ -12,7 +13,8 @@ import {Composer} from "composer";
 @Component({
   selector: "home",
   templateUrl: "./components/home/home.html",
-  directives: [LoggedInComponent, CreatePostComponent, FeedComponent]
+  directives: [LoggedInComponent, CreatePostComponent, FeedComponent],
+  providers: [Composer, HTTP_PROVIDERS]
 })
 export class HomeComponent {
   username: string;
@@ -26,7 +28,7 @@ export class HomeComponent {
     console.log("got a username");
     this.username = username;
     // tmp hack: auth should be returning an atom obj
-    this.user = this._composer.new_atom().adapt("User");
+    this.user = this._composer.new_atom("User");
     this.user.atom_id = username;
     this.user.username = username;
     //

@@ -27,7 +27,7 @@ export class CreatePostComponent {
   private label_item;
 
   constructor(private _composer: Composer) {
-    this._post = this._composer.new_atom().adapt("Post");
+    this._post = this._composer.new_atom("Post");
     this._post.content = "";
     this.post_post = this._post
       .adapt({name: "Post", element: "post", loc: "@@dv-messaging-post-1"});

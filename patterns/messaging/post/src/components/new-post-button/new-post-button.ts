@@ -9,7 +9,7 @@ import {PostService} from "../shared/post";
 @Component({
   selector: "new-post-button",
   templateUrl: "./components/new-post-button/new-post-button.html",
-  providers: [PostService, HTTP_PROVIDERS],
+  providers: [PostService, Composer, HTTP_PROVIDERS],
   inputs: ["post", "user"]
 })
 export class NewPostButtonComponent {
@@ -49,9 +49,12 @@ export class NewPostButtonComponent {
     this._postService.newPost(this._user.username, this._post.content)
       .subscribe(data => {
         this.submitted = true;
-        this._composer.report_save(data.atom_id, this._post);
-        const user_up = {$addToSet: {posts: {atom_id: data.atom_id}}};
-        this._composer.report_update(user_up, this._user);
+        this.post["atom_id"] = data.atom_id;
+        this._composer.report_save(data.atom_id, this.post).then(_ => {
+          console.log("looks like the save finished");
+        });
+        // const user_up = {$addToSet: {posts: {atom_id: data.atom_id}}};
+        // this._composer.report_update(user_up, this._user);
       });
   }
 }
