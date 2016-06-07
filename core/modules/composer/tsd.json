@@ -5,8 +5,11 @@
   "path": "typings",
   "bundle": "typings/tsd.d.ts",
   "installed": {
-    "node/node.d.ts": {
-      "commit": "bd269cad4cb2b495f940c7b6afc5825d568029be"
+    "underscore/underscore.d.ts": {
+      "commit": "473232e5dbd179e9ee682fab12f796720f37b118"
+    },
+    "uuid/UUID.d.ts": {
+      "commit": "26a1f8c44f5fe76168df717020bfb93839b63db3"
     }
   }
 }

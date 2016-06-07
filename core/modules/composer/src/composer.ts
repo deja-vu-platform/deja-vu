@@ -1,11 +1,23 @@
 /// <reference path="../typings/tsd.d.ts" />
-// const rp = require("request-promise");
+import {Injectable, Inject} from "angular2/core";
+import {Http, Headers} from "angular2/http";
+// import * as _ from "underscore";
+import {Observable} from "rxjs/rx";
+import "rxjs/add/operator/toPromise";
+
+
+function uuid() {  // from SO
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+    .replace(/[xy]/g, c => {
+      var r = Math.random()*16|0, v = c === "x" ? r : (r&0x3|0x8);
+      return v.toString(16);
+    });
+}
 
 export interface Type {
   name: string;
   element: string;
   loc: string;
-//  fields: Field[];
 }
 
 export interface Field {
@@ -33,58 +45,47 @@ export class Atom {
   atom_id: string;
   private _forwards;
   private _reverse;
+  private _core: Atom;
 
-  constructor(
-      private _element: string, private _loc: string,
-      private _comp_info?: CompInfo) {
+  constructor(private _helper, private _comp_info?: CompInfo) {
     this.atom_id = "unsaved";
     this._forwards = {};
     this._reverse = {};
+    this._core = this;
   }
 
-  adapt(to: Type | string) {
-    let type_info;
-    if (typeof to === "string") {
-      type_info = {name: to, element: this._element, loc: this._loc};
-    } else {
-      type_info = to;
-    }
-    // const name_map = this._get_name_map(to, type_info);
-    const tinfo_str = JSON.stringify(type_info);
-    this._forwards[tinfo_str] = this._forward_map(type_info);
+  adapt(t: Type) {
+    const tinfo_str = JSON.stringify(t);
+    console.log("Adapting to " + tinfo_str);
+    this._forwards[tinfo_str] = this._forward_map(t);
     console.dir(this._forwards);
-    return new Proxy(this, {
+    return new Proxy(this._core, {
       get: (target, name) => {
-             console.log("getting " + JSON.stringify(name));
-             // return target[name_map[name]];
+             // console.log("getting " + JSON.stringify(name));
              if (name === "report_save") {
-               console.log("it's a report save!");
-               return target._report_save(type_info);
+               return target._report_save(t);
              } else if (name === "report_update") {
-               console.log("it's a report update!");
-               return target._report_update(type_info);
+               return target._report_update(t);
              }
              const core_name = target._forwards[tinfo_str][name];
              if (core_name !== undefined) {
-               console.log("using core name " + core_name);
                name = core_name;
              }
              return target[name];
            },
       set: (target, name, value) => {
-             console.log(
-               "setting " + JSON.stringify(name) + " w " +
-               JSON.stringify(value));
-
              const core_name = target._forwards[tinfo_str][name];
+             console.log(
+               "setting " + JSON.stringify(name) + " core name " + core_name);
+             console.log("beging val");
+             console.dir(value);
+             console.log("end val");
+
              if (core_name !== undefined) {
                name = core_name;
-             } else { // the field we are putting is not bonded
-               if (typeof name === "string" && !name.startsWith("_") &&
-                   typeof value !== "function") {
-                 this._reverse[name] = tinfo_str;
-               }
              }
+
+             target._reverse[name] = tinfo_str;
              target[name] = value;
              return true;
            }
@@ -95,26 +96,112 @@ export class Atom {
     return (atom_id: string) => {
       console.log(
           "Reporting save (id " + atom_id + ", t " + t.name + ") ");
-      console.dir(this);
 
-      for (const field_name of Object.keys(this._reverse)) {
-        console.log("Looking at " + field_name);
-        const field = this[field_name];
-        const owner = this._reverse[field_name];
-        if (field instanceof Array) {
-          console.log("it's an array that corresponds to " + owner);
-          console.dir(field);
-        } else if (field instanceof Object) {
-          console.log("it's an object that corresponds to " + owner);
-          console.dir(field);
-          // save and then report_save on this atom
-          // when that returns do up of current
-        } else {
-          console.log(
-              "it's a basic " + field + " that corresponds to " + owner);
+      const ps = [];
+      for (let field of Object.keys(this._reverse)) {
+        // For each field that was not saved by the reporting type
+        // we compute the update op to include unsaved fields
+
+        const value = this[field];
+        const owner = this._reverse[field];
+        if (this._t_equals(JSON.parse(owner), t)) {
+          continue;
         }
+
+        console.log("Looking at " + field + " owned by " + owner);
+
+        // Remap up so that it makes sense to owner
+        for (const src_field of Object.keys(this._forwards[owner])) {
+          const dst_field = this._forwards[owner][src_field];
+          if (dst_field === field) {
+            field = src_field;
+          }
+        }
+        ps.push(this._get_up(field, value).then(up => {
+          console.log("got up");
+          console.dir(up);
+          console.log("got up end");
+          const ret = {};
+          ret[owner] = up;
+          return ret;
+        }));
       }
+
+      return Promise.all(ps)
+          .then(values => {
+             const ups = {};
+             console.log("begin values");
+             console.dir(values);
+             console.log("end values");
+             for (const value of values) {
+               const owner = Object.keys(value)[0];
+               const up = value[owner];
+               if (ups[owner] === undefined) ups[owner] = {};
+               ups[owner] = Object.assign(ups[owner], up);
+             }
+             return ups;
+          })
+          .then(ups => {
+            console.log("got ups");
+            console.dir(ups);
+
+            const ps = [];
+            for (const owner of Object.keys(ups)) {
+              ps.push(
+                  this._helper
+                      .update_atom(
+                        JSON.parse(owner), atom_id, {$set: ups[owner]}));
+            }
+            return Promise.all(ps);
+          });
     };
+  }
+
+  _save(atom_id: string) {
+    // pick some t to make the save
+    const t = JSON.parse(Object.keys(this._forwards)[0]);
+    console.log("picked t " + JSON.stringify(t) + " to do the save");
+    return this._helper.new_atom(t, atom_id, this);
+  }
+
+  _get_up(field: string, value: any): Promise<any> {
+    let ret;
+    if (value instanceof Array) {
+      console.log("it's an array");
+      return Promise
+        .all(value.map((arr_val, i) => this._get_up(field + "." + i, arr_val)))
+        .then(pvalues => {
+          console.log("pval begin");
+          console.dir(pvalues);
+          console.log("pval end");
+          return pvalues
+            .reduce((acc, pval) => Object.assign(acc, pval), {});
+        });
+    } else if (value instanceof Atom) {
+      console.log("it's an atom");
+      if (value.atom_id === "unsaved") {
+        const atom_id = uuid();
+        ret = value._save(atom_id).then(_ => {
+          console.log("returned from saving " + atom_id);
+          const up = {};
+          up[field] = atom_id;
+          return up;
+        });
+      } else {
+        const up = {};
+        up[field] = value.atom_id;
+        ret = Promise.resolve(up);
+      }
+    } else if (value instanceof Object) {
+      // can't have objects that are not atoms
+      console.log("ERROR: it's an object");
+    } else {
+      console.log("it's a basic value: " + value);
+      const up = {};
+      up[field] = value;
+      ret = Promise.resolve(up);
+    }
+    return ret;
   }
 
   _report_update(t: Type) {
@@ -133,6 +220,7 @@ export class Atom {
     for (const fbond of this._comp_info.fbonds) {
       for (const field of fbond.fields) {
         if (this._t_equals(field.type, t)) {
+          // use the subfield name
           forward_map[field.name] = fbond.subfield.name;
         }
       }
@@ -149,13 +237,17 @@ export class Atom {
   }
 }
 
+
+@Injectable()
 export class Composer {
   constructor(
-      private _element: string, private _loc: string,
-      private _comp_info?: CompInfo) {}
+      @Inject("element") private _element: string,
+      @Inject("loc") private _loc: string, private _http: Http,
+      @Inject("CompInfo") private _comp_info: CompInfo) {}
 
-  new_atom() {
-    return new Atom(this._element, this._loc, this._comp_info);
+  new_atom(t: string): any {
+    return new Atom(new Helper(this._http), this._comp_info)
+      .adapt({name: t, element: this._element, loc: this._loc});
   }
 
   report_save(atom_id: string, atom: any) {
@@ -177,66 +269,97 @@ export class Composer {
     }
     return atom.report_update(update);
   }
+}
 
-//  private _get_name_map(src: Type, dst: Type) {
-//    return {};
-//  }
-/*
-  private _new_atom(t: any, atom_id: string, atom: any) {
-    console.log("sending new atom to composer");
-    const atom_str = JSON.stringify(
-        this._filter_atom(t, atom)).replace(/"/g, "\\\"");
-    console.log("t is " + t.name);
-    console.log("atom id is " + atom_id);
-    this._post(`{
-      newAtom(
-        type: {
-          name: "${t.name}", element: "${this._element}", loc: "${this._loc}"
-        },
-        atom_id: "${atom_id}",
-        atom: "${atom_str}")
-    }`);
+
+class Helper {
+  constructor(private _http) {}
+
+  new_atom(t: Type, atom_id: string, atom: Atom): Promise<any> {
+    return this._filter_atom(t, atom)
+      .map(filtered_atom => {
+        console.log("sending new atom to element");
+        const atom_str = JSON.stringify(filtered_atom).replace(/"/g, "\\\"");
+        console.log("t is " + t.name);
+        console.log("atom id is " + atom_id);
+        return this._post("http://localhost:3001", `{
+           newAtom(
+             type: {
+               name: "${t.name}", element: "${t.element}", loc: "${t.loc}"
+             },
+             atom_id: "${atom_id}",
+             atom: "${atom_str}",
+             self_forward: true)
+         }`).toPromise();
+      })
+      .toPromise();
   }
 
   // no filtering update
-  private _update_atom(t: any, atom_id: string, update: any) {
+  update_atom(t: Type, atom_id: string, update: any) {
     console.log("sending up atom to composer");
     const update_str = JSON.stringify(update).replace(/"/g, "\\\"");
-    this._post(`{
+    return this._post("http://localhost:3001", `{
       updateAtom(
         type: {
-          name: "${t.name}", element: "${this._element}", loc: "${this._loc}"
+          name: "${t.name}", element: "${t.element}", loc: "${t.loc}"
         },
         atom_id: "${atom_id}",
-        update: "${update_str}")
-    }`);
+        update: "${update_str}",
+        self_forward: true)
+    }`)
+    .toPromise();
   }
 
-  private _rm_atom(t: any, id: string) {
-    console.log("sending rm atom to composer");
-    this._post(`rm`);
+  private _schema_query(t: Type) {
+    return `{
+       __type(name: "${t.name}") {
+         name,
+         fields {
+           name,
+           type {
+             name,
+             kind,
+             ofType {
+               name,
+               kind
+             }
+           }
+         }
+       }
+     }`;
   }
 
-  private _filter_atom(t: any, atom: any) {
+  private _info(t: Type) {
+    return this._get(t.loc, this._schema_query(t))
+      .map(data => data.__type)
+      .map(tinfo => tinfo.fields);
+  }
+
+  private _filter_atom(t: Type, atom: Atom) {
     let filtered_atom = {};
-    for (const f of Object.keys(t._fields)) {
-      const atom_f = atom[f];
+    return this._info(t)
+      .map(fields => fields.map(f => f.name))
+      .map(fields => {
+        for (const f of fields) {
+          const atom_f = atom[f];
 
-      let filtered_atom_f = {};
-      if (Array.isArray(atom_f)) {   // list type
-        filtered_atom_f = this._filter_list(atom_f);
-      } else if (typeof atom_f === "object") {  // object type
-        filtered_atom_f["atom_id"] = atom_f["atom_id"];
-      } else {  // scalar type
-        filtered_atom_f = atom_f;
-      }
+          let filtered_atom_f = {};
+          if (Array.isArray(atom_f)) {   // list type
+            filtered_atom_f = this._filter_list(atom_f);
+          } else if (typeof atom_f === "object") {  // object type
+            filtered_atom_f["atom_id"] = atom_f["atom_id"];
+          } else {  // scalar type
+            filtered_atom_f = atom_f;
+          }
 
-      filtered_atom[f] = filtered_atom_f;
-    }
-    console.log(
-        "BEFORE FILTER <" + JSON.stringify(atom) + "> AFTER FILTER <" +
-        JSON.stringify(filtered_atom) + ">");
-    return filtered_atom;
+          filtered_atom[f] = filtered_atom_f;
+        }
+        console.log("BEFORE FILTER ");
+        console.dir(atom);
+        console.log("AFTER FILTER <" + JSON.stringify(filtered_atom) + ">");
+        return filtered_atom;
+      });
   }
 
   private _filter_list(l: Array<any>) {
@@ -253,7 +376,23 @@ export class Composer {
     });
   }
 
-  private _post(query) {
+  private _get(loc, query): Observable<any> {
+    const query_str = encodeURIComponent(
+      query.replace(/ /g, "").replace(/\n/g, ""));
+
+    const options = {
+      uri: loc + `/graphql?query=query+${query_str}`
+    };
+
+    console.log(
+      "using options " + JSON.stringify(options) +
+      " for query <" + query_str + ">");
+    return this._http.get(options.uri)
+      .map(res => res.json())
+      .map(json => json.data);
+  }
+
+  private _post(loc, query): Observable<any> {
     const query_str = query.replace(/ /g, "");
 
     const options = {
@@ -268,11 +407,14 @@ export class Composer {
     console.log(
       "using options " + JSON.stringify(options) +
       " for query <" + query_str + ">");
-    return rp(options)
-      .then(body => {
-        console.log(body);
-        return body;
-      });
+    const headers = new Headers();
+    headers.append("Content-Type", "application/json");
+
+    return this._http
+      .post(
+          options.uri,
+          JSON.stringify({query: "mutation " + query_str}),
+          {headers: headers})
+      .map(res => res.json());
   }
-  */
 }
