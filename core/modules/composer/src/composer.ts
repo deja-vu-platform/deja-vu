@@ -159,11 +159,23 @@ export class Composer {
   }
 
   report_save(atom_id: string, atom: any) {
-    atom.report_save(atom_id);
+    if (!(atom instanceof Atom)) {
+      console.log("ERROR: reporting save on something that's not an atom");
+      console.dir(atom);
+      return Promise.reject(
+          new Error("reporting save on something that's not an atom"));
+    }
+    return atom.report_save(atom_id);
   }
 
   report_update(update: any, atom: any) {
-    atom.report_update(update);
+    if (!(atom instanceof Atom)) {
+      console.log("ERROR: reporting update on something that's not an atom");
+      console.dir(atom);
+      return Promise.reject(
+          new Error("reporting update on something that's not an atom"));
+    }
+    return atom.report_update(update);
   }
 
 //  private _get_name_map(src: Type, dst: Type) {
