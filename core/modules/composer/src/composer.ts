@@ -143,7 +143,9 @@ export class Atom {
 
   _t_equals(t1: Type, t2: Type) {
     return (
-      t1.name === t2.name && t1.element === t2.element && t1.loc === t2.loc);
+      t1.name.toLowerCase() === t2.name.toLowerCase() &&
+      t1.element.toLowerCase() === t2.element.toLowerCase() &&
+      t1.loc === t2.loc);
   }
 }
 
