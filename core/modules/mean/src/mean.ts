@@ -165,8 +165,28 @@ export class Composer {
     this._post(`rm`);
   }
 
-  config(query) {
-    this._post(query);
+  config(comp_info) {
+    // JSON.stringify quotes properties and graphql doesn't like that
+    const str_t = t => (
+        `{name: "${t.name}", element: "${t.element}", loc: "${t.loc}"}`);
+    const str_f = f => (`{
+      name: "${f.name}",
+      type: ${str_t(f.type)}
+    }`);
+    for (const tbond of comp_info.tbonds) {
+      this._post(`{
+        newTypeBond(
+          types: ${"[" + tbond.types.map(str_t).join(",") + "]"},
+          subtype: ${str_t(tbond.subtype)})
+      }`);
+    }
+    for (const fbond of comp_info.fbonds) {
+      this._post(`{
+        newFieldBond(
+          fields: ${"[" + fbond.fields.map(str_f).join(",") + "]"},
+          subfield: ${str_f(fbond.subfield)})
+      }`);
+    }
   }
 
   private _filter_atom(t: any, atom: any) {

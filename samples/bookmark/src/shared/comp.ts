@@ -83,6 +83,11 @@ const FBONDS = [
         "type": {
           name: "Publisher", element: "feed", loc: "@@dv-messaging-feed-1"
         }
+      },
+      {
+        name: "items",
+        "type": {
+          name: "Label", element: "label", loc: "@@dv-organization-label-1"}
       }
     ],
     subfield: {
