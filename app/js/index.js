@@ -1,5 +1,6 @@
 var currentZoom = 1.0;
 
+
 $(function() {
 
     basic_components = $('#basic_components').html();
@@ -9,6 +10,7 @@ $(function() {
     registerDraggable();
 
     registerZoom();
+
 });
 
 
@@ -116,14 +118,14 @@ function movedComponent() {
             var new_row = coord[2];
             var new_col = coord[3];
 
-            var component_copy = clicheComponent.components[del_row][del_col];
-            clicheComponent.addComponent(component_copy, new_row, new_col);
+            var component_copy = selectedUserComponent.components[del_row][del_col];
+            selectedUserComponent.addComponent(component_copy, new_row, new_col);
 
             if (Object.keys(component_copy.components).length !== 0) {
                 Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
             }
         }
-        delete clicheComponent.components[del_row][del_col];
+        delete selectedUserComponent.components[del_row][del_col];
         $(cell).find('.config-btns').remove();
         $(cell).find('.tooltip').remove();
         $(cell).find('.label_container').remove();
@@ -236,7 +238,7 @@ function registerTooltipBtnHandlers() {
 
             var row = cell_id.substring(4,5);
             var col = cell_id.substring(5,6);
-            clicheComponent.components[row][col].properties[propertyName] = bootstrap_class;
+            selectedUserComponent.components[row][col].properties[propertyName] = bootstrap_class;
 
         }
     }

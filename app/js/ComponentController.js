@@ -4,21 +4,25 @@ var num_cols = 3;
 var cell_width = 250;
 var cell_height = 250;
 var files = [];
-clicheComponent = null;
-bitmap_old = null;
-bitmap_new = null;
+
+// currently save components in this array
+var userComponents = [];
+var numComponents = userComponents.length - 1; // -1 to enable 0-indexing
+var selectedUserComponent = null;
+var bitmap_old = null;
+var bitmap_new = null;
 
 $(function() {
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
 
-    clicheComponent = "in jq";
+    selectedUserComponent = "in jq";
     var grid = $('#grid-container').get(0);
     grid_width = grid.offsetWidth;
     grid_height = grid.offsetHeight;
     createTable(grid_width, grid_height, true);
-    InitClicheComponent(true);
 
-
+    // start a default component
+    InitClicheComponent(true, userComponents);
 });
 
 $('#select-rows').on('change', function(e) {
@@ -31,7 +35,7 @@ $('#select-cols').on('change', function(e) {
 
 $('#create_component').on('click', function() {
     createTable(grid_width, grid_height, false);
-    InitClicheComponent(false);
+    InitClicheComponent(false, userComponents);
 
 });
 
@@ -42,36 +46,54 @@ $('#load_component_btn').on('click', function() {
 $('#save_component').on('click', function() {
 
     window.open( "data:text/json;charset=utf-8," +
-        encodeURIComponent(JSON.stringify(clicheComponent, null, '\t')));
+        encodeURIComponent(JSON.stringify(selectedUserComponent, null, '\t')));
 
     //w = window.open();
     //w.document.body.innerHTML='<a href="data:' + data + '" download="data.json">' +
     //    'Download JSON</a>'+'<p><textarea style="width:95%; height:95%">'+
-    //    JSON.stringify(clicheComponent, null, '\t')+'</textarea></p>';
+    //    JSON.stringify(selectedUserComponent, null, '\t')+'</textarea></p>';
 });
 
+$('#user_components_list').on('click', 'li', function() {
+    var componentNumber = $(this).data('componentnumber');
+    $('#selected').removeAttr('id');
+    $($('#user_components_list li')[componentNumber]).attr('id', 'selected');
+    selectedUserComponent = userComponents[componentNumber];
 
-$('#rename_component').on('click', function() {
-    $('#new_name_input').val($(this).text());
-    $('#submit_rename').removeClass('not_displayed');
+});
+
+$('#user_components_list').on('dblclick', '.component_name', function() {
+    var componentNumber = $(this).parent().data('componentnumber');
+    var componentToRename = $($('#user_components_list li')[componentNumber]);
+    var new_name_input_elt = $(componentToRename.find('.new_name_input'));
+    var submit_rename_elt = $(componentToRename.find('.submit_rename'));
+    new_name_input_elt.val($(this).text());
+    submit_rename_elt.removeClass('not_displayed');
     $(this).addClass('not_displayed');
-    $('#new_name_input').focus();
-    $('#new_name_input').select();
+    new_name_input_elt.focus();
+    new_name_input_elt.select();
 });
 
-$('#new_name_input').on('keypress', function(event) {
+$('#user_components_list').on('keypress', '.new_name_input', function(event) {
     if ( event.which == 13 ) {
         event.preventDefault();
-        $('#rename_component').removeClass('not_displayed');
-        $('#submit_rename').addClass('not_displayed');
+        var componentNumber = $(this).parent().parent().data('componentnumber');
+        var componentToRename = $($('#user_components_list li')[componentNumber]);
+        var component_name_elt = $(componentToRename.find('.component_name'));
+        var submit_rename_elt = $(componentToRename.find('.submit_rename'));
+
+
+        component_name_elt.removeClass('not_displayed');
+        submit_rename_elt.addClass('not_displayed');
         var newName = $(this).val();
         if (newName.length===0){ // empty string entered, don't change the name!
             return;
         }
-        $('#rename_component').text($(this).val());
+        component_name_elt.text($(this).val());
+        // update the display of the component box
         $('<style>.table_outter::after{content:"'+$(this).val()+'"}</style>').appendTo('head');
 
-        clicheComponent.meta.name = $(this).val();
+        selectedUserComponent.meta.name = $(this).val();
     }
 });
 
@@ -153,21 +175,34 @@ function resizeCell(grid_width, grid_height, num_rows, num_cols) {
 
 }
 
-function InitClicheComponent(isDefault) {
+function InitClicheComponent(isDefault, componentList) {
     var name, version, author;
     if (isDefault) {
         name = "NEW COMPONENT";
         version = "0.0.1";
         author = "Unknown";
     } else {
-        name = $('#component_name').val();
+        name = $('#new_component_name').val();
         version = $('#component_version').val();
         author = $('#component_author').val();
-        $('#rename_component').text($('#component_name').val());
-        $('#modal-title-1').text($('#component_name').val());
     }
     $('<style>.table_outter::after{content:"'+name+'"}</style>').appendTo('head');
-    clicheComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
+    var newComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
+    componentList.push(newComponent);
+    numComponents += 1;
+    selectedUserComponent = newComponent;
+
+    // display the newly added component to the user components list
+    $('#selected').removeAttr("id");
+
+    var newComponentElt = '<li id="selected" data-componentnumber='+numComponents+'>'
+                        +   '<span class="component_name">'+name+'</span>'
+                        +   '<span class="submit_rename not_displayed">'
+                        +      '<input type="text" class="new_name_input form-control" autofocus>'
+                        +   '</span>'
+                        + '</li>';
+    $('#user_components_list').append(newComponentElt);
+    $('#selected #modal-title-1').text(name); // TODO: what is this?
 }
 
 
@@ -178,12 +213,12 @@ function addComponent(widget, cell_id) {
     span.innerHTML=widget[0].outerHTML;
     var type = span.firstElementChild.getAttribute('name');
     var component = new BaseComponent(type, {});
-    if (!clicheComponent.components.hasOwnProperty(row)) {
-        clicheComponent.components[row] = {};
+    if (!selectedUserComponent.components.hasOwnProperty(row)) {
+        selectedUserComponent.components[row] = {};
         }
-    clicheComponent.components[row][col] = component;
+    selectedUserComponent.components[row][col] = component;
 
-    //clicheComponent.addComponent(component, row, col);
+    //selectedUserComponent.addComponent(component, row, col);
 
     if (type==='label') {
         Display(cell_id, getHTML[type]("Type text here..."));
@@ -235,7 +270,7 @@ function updateComponentAt(cell_id) {
                 .then(function (savedFile) { // save was successful
                     value.img_src = savedFile.url();
                     Display(cell_id, getHTML[type](value));
-                    clicheComponent.components[row][col].components[type] = value;
+                    selectedUserComponent.components[row][col].components[type] = value;
                 });
         } else { // pasted link to image
             value.img_src = inputs[0].value;
@@ -251,13 +286,13 @@ function updateComponentAt(cell_id) {
         $('#'+cell_id).find('.label_container').remove();
         $('#'+cell_id).find('.display_component').remove();
         Display(cell_id, getHTML[type](value), function() {
-            //for (var prop in clicheComponent.components[row][col].properties) {
-            //    var bootstrap_class = clicheComponent.components[row][col].properties[prop];
+            //for (var prop in selectedUserComponent.components[row][col].properties) {
+            //    var bootstrap_class = selectedUserComponent.components[row][col].properties[prop];
             //    $('#'+cell_id).find('.display_component').addClass(bootstrap_class);
             //}
         });
-        clicheComponent.components[row][col].components={};
-        clicheComponent.components[row][col].components[type] = value;
+        selectedUserComponent.components[row][col].components={};
+        selectedUserComponent.components[row][col].components[type] = value;
     }
 }
 
@@ -349,20 +384,20 @@ function resizeLabelDivs(cell_width, cell_height) {
 }
 
 function loadTable(grid_width, grid_height) {
-    clicheComponent=JSON.parse($('#component_json').val());
-    $('#rename_component').text(clicheComponent.meta.name);
-    $('<style>.table_outter::after{content:"'+clicheComponent.meta.name+'"}</style>').appendTo('head');
-    num_rows=clicheComponent.dimensions.rows;
-    num_cols=clicheComponent.dimensions.cols;
+    selectedUserComponent=JSON.parse($('#component_json').val());
+    $('.component_name').text(selectedUserComponent.meta.name);
+    $('<style>.table_outter::after{content:"'+selectedUserComponent.meta.name+'"}</style>').appendTo('head');
+    num_rows=selectedUserComponent.dimensions.rows;
+    num_cols=selectedUserComponent.dimensions.cols;
     createTable(grid_width, grid_height, false);
 
     $('td').each(function() {
         var cell_id=$(this).get(0).id;
         var row = cell_id.substring(4,5);
         var col = cell_id.substring(5,6);
-        if (clicheComponent.components[row]) {
-            if (clicheComponent.components[row][col]) {
-                var component = clicheComponent.components[row][col];
+        if (selectedUserComponent.components[row]) {
+            if (selectedUserComponent.components[row][col]) {
+                var component = selectedUserComponent.components[row][col];
                 var type = component.type;
                 showConfigOptions(type, document.getElementById(cell_id));
                 Display(cell_id, getHTML[type](component.components[type]));

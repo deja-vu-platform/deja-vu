@@ -89,13 +89,7 @@
     <div class="user_components">
         <div class="header">User components</div>
         <div class="content">
-            <ul>
-                <li class="selected">
-                    <span id="rename_component">NEW COMPONENT</span>
-                    <span id="submit_rename" class="not_displayed">
-                        <input type="text" id="new_name_input" class="form-control" autofocus>
-                    </span>
-                </li>
+            <ul id="user_components_list">
             </ul>
         </div>
     </div>
@@ -484,7 +478,7 @@
                 <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Component name: </div>
-                    <div class="col-sm-7"><input id="component_name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                    <div class="col-sm-7"><input id="new_component_name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
                     <div class="col-sm-1"></div>
                 </div><br/>
                 <div class="row">
