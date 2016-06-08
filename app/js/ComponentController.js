@@ -22,7 +22,7 @@ $(function() {
     createTable(grid_width, grid_height, true);
 
     // start a default component
-    InitClicheComponent(true, userComponents);
+    InitClicheComponent(true);
 });
 
 $('#select-rows').on('change', function(e) {
@@ -35,12 +35,14 @@ $('#select-cols').on('change', function(e) {
 
 $('#create_component').on('click', function() {
     createTable(grid_width, grid_height, false);
-    InitClicheComponent(false, userComponents);
+    InitClicheComponent(false);
 
 });
 
 $('#load_component_btn').on('click', function() {
-    loadTable(grid_width, grid_height);
+    selectedUserComponent=JSON.parse($('#component_json').val());
+    loadTable(grid_width, grid_height, selectedUserComponent);
+    addComponentToUserComponentsList(selectedUserComponent);
 });
 
 $('#save_component').on('click', function() {
@@ -59,7 +61,7 @@ $('#user_components_list').on('click', 'li', function() {
     $('#selected').removeAttr('id');
     $($('#user_components_list li')[componentNumber]).attr('id', 'selected');
     selectedUserComponent = userComponents[componentNumber];
-
+    loadTable(grid_width, grid_height, selectedUserComponent);
 });
 
 $('#user_components_list').on('dblclick', '.component_name', function() {
@@ -175,7 +177,27 @@ function resizeCell(grid_width, grid_height, num_rows, num_cols) {
 
 }
 
-function InitClicheComponent(isDefault, componentList) {
+function addComponentToUserComponentsList(newComponent){
+    userComponents.push(newComponent);
+    numComponents += 1;
+    selectedUserComponent = newComponent;
+
+    // display the newly added component to the user components list
+    $('#selected').removeAttr("id");
+
+    var newComponentElt = '<li id="selected" data-componentnumber='+numComponents+'>'
+        +   '<span class="component_name">'+newComponent.meta.name+'</span>'
+        +   '<span class="submit_rename not_displayed">'
+        +      '<input type="text" class="new_name_input form-control" autofocus>'
+        +   '</span>'
+        + '</li>';
+    $('#user_components_list').append(newComponentElt);
+    $('#selected #modal-title-1').text(name); // TODO: what is this?
+
+};
+
+
+function InitClicheComponent(isDefault){
     var name, version, author;
     if (isDefault) {
         name = "NEW COMPONENT";
@@ -188,21 +210,8 @@ function InitClicheComponent(isDefault, componentList) {
     }
     $('<style>.table_outter::after{content:"'+name+'"}</style>').appendTo('head');
     var newComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
-    componentList.push(newComponent);
-    numComponents += 1;
-    selectedUserComponent = newComponent;
 
-    // display the newly added component to the user components list
-    $('#selected').removeAttr("id");
-
-    var newComponentElt = '<li id="selected" data-componentnumber='+numComponents+'>'
-                        +   '<span class="component_name">'+name+'</span>'
-                        +   '<span class="submit_rename not_displayed">'
-                        +      '<input type="text" class="new_name_input form-control" autofocus>'
-                        +   '</span>'
-                        + '</li>';
-    $('#user_components_list').append(newComponentElt);
-    $('#selected #modal-title-1').text(name); // TODO: what is this?
+    addComponentToUserComponentsList(newComponent);
 }
 
 
@@ -383,21 +392,19 @@ function resizeLabelDivs(cell_width, cell_height) {
     getCSSRule('.label_container').style.setProperty('padding-top',(cell_height/4)+'px',null);
 }
 
-function loadTable(grid_width, grid_height) {
-    selectedUserComponent=JSON.parse($('#component_json').val());
-    $('.component_name').text(selectedUserComponent.meta.name);
-    $('<style>.table_outter::after{content:"'+selectedUserComponent.meta.name+'"}</style>').appendTo('head');
-    num_rows=selectedUserComponent.dimensions.rows;
-    num_cols=selectedUserComponent.dimensions.cols;
+function loadTable(grid_width, grid_height, componentToShow) {
+    $('<style>.table_outter::after{content:"'+componentToShow.meta.name+'"}</style>').appendTo('head');
+    num_rows=componentToShow.dimensions.rows;
+    num_cols=componentToShow.dimensions.cols;
     createTable(grid_width, grid_height, false);
 
     $('td').each(function() {
         var cell_id=$(this).get(0).id;
         var row = cell_id.substring(4,5);
         var col = cell_id.substring(5,6);
-        if (selectedUserComponent.components[row]) {
-            if (selectedUserComponent.components[row][col]) {
-                var component = selectedUserComponent.components[row][col];
+        if (componentToShow.components[row]) {
+            if (componentToShow.components[row][col]) {
+                var component = componentToShow.components[row][col];
                 var type = component.type;
                 showConfigOptions(type, document.getElementById(cell_id));
                 Display(cell_id, getHTML[type](component.components[type]));
