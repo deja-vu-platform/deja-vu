@@ -52,9 +52,11 @@ $('#save_component').on('click', function() {
 
 
 $('#rename_component').on('click', function() {
+    $('#new_name_input').val($(this).text());
     $('#submit_rename').removeClass('not_displayed');
     $(this).addClass('not_displayed');
     $('#new_name_input').focus();
+    $('#new_name_input').select();
 });
 
 $('#new_name_input').on('keypress', function(event) {
@@ -62,6 +64,10 @@ $('#new_name_input').on('keypress', function(event) {
         event.preventDefault();
         $('#rename_component').removeClass('not_displayed');
         $('#submit_rename').addClass('not_displayed');
+        var newName = $(this).val();
+        if (newName.length===0){ // empty string entered, don't change the name!
+            return;
+        }
         $('#rename_component').text($(this).val());
         $('<style>.table_outter::after{content:"'+$(this).val()+'"}</style>').appendTo('head');
 
