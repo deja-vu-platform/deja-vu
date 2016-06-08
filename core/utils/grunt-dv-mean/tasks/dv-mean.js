@@ -11,8 +11,7 @@ module.exports = function(grunt, optPatterns, element) {
     "node_modules/angular2/bundles/http.js",
     "node_modules/angular2/bundles/router.dev.js",
     "node_modules/composer/lib/composer.js",
-    "node_modules/underscore/underscore.js",
-    "node_modules/uuid/uuid.js"
+    "node_modules/underscore/underscore.js"
   ];
   deps = deps.concat(patternsSrc);
 
@@ -194,15 +193,9 @@ module.exports = function(grunt, optPatterns, element) {
           },
           { // tmp hack: shouldn't have to do the replaces everywhere
             expand: true,
-            cwd: "dist/public/components/",
-            src: "**/*.js",
-            dest: "dist/public/components/"
-          },
-          { // tmp hack: shouldn't have to do the replaces everywhere
-            expand: true,
-            cwd: "dist/public/node_modules/",
-            src: "**/*.js",
-            dest: "dist/public/node_modules/"
+            cwd: "dist/",
+            src: "**/**/**/*.js",
+            dest: "dist/",
           }
         ]
       }
