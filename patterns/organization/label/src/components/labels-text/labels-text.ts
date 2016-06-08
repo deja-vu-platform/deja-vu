@@ -39,14 +39,14 @@ export class LabelsTextComponent {
     if (labels_text === undefined) return;
     console.log("got labels_text " + labels_text);
     this._labels_text = labels_text;
-    this.item.labels = this._labels_text
-      .split(",")
-      .map(l => {
-        const ret = this._composer.new_atom("Label");
-        ret.name = l;
-        if (ret.items === undefined) ret.items = [];
-        ret.items.push(this.item);
-        return ret;
-      });
+    this.item.labels = [];
+    new Set(this._labels_text.split(",").map(l => l.trim()))
+      .forEach(
+          l => {
+            const ret = this._composer.new_atom("Label");
+            ret.name = l;
+            ret.items = [this.item];
+            this.item.labels.push(ret);
+          });
   }
 }
