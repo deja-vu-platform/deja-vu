@@ -1,12 +1,27 @@
-<h1>Bookmark</h1>
-<div>
-  <ul>
-    <li>Save bookmarks</li>
-    <li>Attach topics to bookmarks</li>
-    <li>Stay up to date with content by following topics or users</li>
-  </ul>
+<nav class="navbar navbar-default navbar-static-top">
+  <div class="container navbar-header">
+    <span class="navbar-brand">Bookmark</span>
+    <span class="navbar-right">
+      <sign-in (onSignIn)="onSignIn($event)"></sign-in>
+    </span>
+  </div>
+</nav>
+<div class="container">
+  <div class="row">
+    <div class="col-md-8">
+    <h1>Join the discussion</h1>
+      <div>
+        <ul>
+          <li>Save bookmarks</li>
+          <li>Attach topics to bookmarks</li>
+          <li>Stay up to date with content by following topics or users</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <h2>Register</h2>
+      <p>It's free!</p>
+      <register (onRegister)="onRegister($event)"></register>
+    </div>
+  </div>
 </div>
-<h2>Register</h2>
-<register (onRegister)="onRegister($event)"></register>
-
-<sign-in (onSignIn)="onSignIn($event)"></sign-in>

@@ -1,6 +1,6 @@
 <!-- Follow(User) -->
 <div class="container">
-  <ul class="row">
+  <ul class="row" style="list-style-type: none">
     <li *ngFor="#potentialFollow of potentialFollows" class="col-md-4">
       {{potentialFollow.name}}
       <button (click)="follow(potentialFollow)"

@@ -1,6 +1,6 @@
 <!-- EditFollow(User) -->
 <div class="container">
-  <ul class="row">
+  <ul class="row" style="list-style-type: none">
     <li *ngFor="#target of targets" class="col-md-4">
       {{target.name}}
       <button *ngIf="!target.followed_by" (click)="follow(target)"

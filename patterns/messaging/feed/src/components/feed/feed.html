@@ -1,6 +1,6 @@
 <!-- Feed(Name) -->
 <div class="container">
-  <ul *ngIf="feed && feed.length > 0" class="row">
+  <ul *ngIf="feed && feed.length > 0" class="row" style="list-style-type: none">
     <li *ngFor="#feedItem of feed" class="col-md-12">
       <div class="row">
         <publisher-message [msg]="feedItem.message"></publisher-message>
