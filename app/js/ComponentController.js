@@ -215,13 +215,15 @@ function InitClicheComponent(isDefault){
 }
 
 
-function addComponent(widget, cell_id) {
+function addComponent(widget, cell_id, component) {
     var row = cell_id.substring(4,5);
     var col = cell_id.substring(5,6);
     var span = document.createElement('span');
     span.innerHTML=widget[0].outerHTML;
     var type = span.firstElementChild.getAttribute('name');
-    var component = new BaseComponent(type, {});
+    if (!component){
+        component = new BaseComponent(type, {});
+    }
     if (!selectedUserComponent.components.hasOwnProperty(row)) {
         selectedUserComponent.components[row] = {};
         }
