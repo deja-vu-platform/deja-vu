@@ -77,5 +77,5 @@ ClicheComponent.prototype.addComponent = function(component, row, col) {
 
 
 
-clicheComponent = new ClicheComponent({rows: 3, cols: 3}, "name", 1, "version", "author");
-//clicheComponent.addComponent({}, 2, 3);
+selectedUserComponent = new ClicheComponent({rows: 3, cols: 3}, "name", 1, "version", "author");
+//selectedUserComponent.addComponent({}, 2, 3);

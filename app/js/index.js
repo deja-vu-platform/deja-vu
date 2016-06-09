@@ -1,5 +1,6 @@
 var currentZoom = 1.0;
 
+
 $(function() {
 
     basic_components = $('#basic_components').html();
@@ -9,6 +10,7 @@ $(function() {
     registerDraggable();
 
     registerZoom();
+
 });
 
 
@@ -28,7 +30,7 @@ function registerDroppable() {
                 var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
                 showConfigOptions(dropped_component, document.getElementById(cell_id));
                 if (!movedComponent()) {
-                    addComponent($(ui.draggable), cell_id);
+                    addComponent(cell_id, $(ui.draggable));
                 }
             } else { // if dropped in trash
                 var trashCopy = $(this).children().first();
@@ -90,15 +92,22 @@ function registerZoom() {
 }
 
 
-function resetDroppability() {
-    $('td').each(function() {
-        if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
-            $(this).removeClass('dropped');
-            $(this).addClass('droppable');
-            $(this).droppable('enable');
+function resetDroppability(cell_id) {
+    if (cell_id){
+        if ($('#'+cell_id).get(0).getElementsByClassName('draggable').length == 0) {
+            $('#'+cell_id).removeClass('dropped');
+            $('#'+cell_id).addClass('droppable');
+            $('#'+cell_id).droppable('enable');
         }
-    });
-
+    } else {
+        $('td').each(function() {
+            if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
+                $(this).removeClass('dropped');
+                $(this).addClass('droppable');
+                $(this).droppable('enable');
+            }
+        });
+    }
 }
 
 function movedComponent() {
@@ -111,23 +120,25 @@ function movedComponent() {
 
         var del_row = coord[0];
         var del_col = coord[1];
-        var cell = $('#cell'+del_row+del_col).get(0);
+        var old_cell = $('#cell'+del_row+del_col).get(0);
         if (typeof coord[2]!=="undefined") { // if move, copy any save data
             var new_row = coord[2];
             var new_col = coord[3];
 
-            var component_copy = clicheComponent.components[del_row][del_col];
-            clicheComponent.addComponent(component_copy, new_row, new_col);
+            var component_copy = selectedUserComponent.components[del_row][del_col];
+            selectedUserComponent.addComponent(component_copy, new_row, new_col);
 
-            if (Object.keys(component_copy.components).length !== 0) {
-                Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
-            }
+            //if (Object.keys(component_copy.components).length !== 0) {
+            Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
+            //}
+            triggerEdit('cell'+new_row+new_col, false);
+
         }
-        delete clicheComponent.components[del_row][del_col];
-        $(cell).find('.config-btns').remove();
-        $(cell).find('.tooltip').remove();
-        $(cell).find('.label_container').remove();
-        $(cell).find('.display_component').remove();
+        delete selectedUserComponent.components[del_row][del_col];
+        $(old_cell).find('.config-btns').remove();
+        $(old_cell).find('.tooltip').remove();
+        $(old_cell).find('.label_container').remove();
+        $(old_cell).find('.display_component').remove();
         //cell.removeChild(cell.firstChild);
         return true;
     }
@@ -138,7 +149,7 @@ function movedComponent() {
  * Register listener for click on edit button
  * @param cell_id
  */
-function triggerEdit(cell_id) {
+function triggerEdit(cell_id, popup) {
     var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
 
     var edit_dialog_template = $('#'+dropped_component+'_popup_holder').html();
@@ -152,10 +163,11 @@ function triggerEdit(cell_id) {
 
     $(Array.prototype.slice.call(
         $('#'+cell_id).get(0).getElementsByClassName('form-control'), 0)[0]).trigger("focus");
-    setTimeout(function(){
-        $($('#'+cell_id).children().first()).addClass('open');
-    }, 1);
-
+    if (popup){
+        setTimeout(function(){
+            $($('#'+cell_id).children().first()).addClass('open');
+        }, 1);
+    }
 
 }
 
@@ -236,7 +248,7 @@ function registerTooltipBtnHandlers() {
 
             var row = cell_id.substring(4,5);
             var col = cell_id.substring(5,6);
-            clicheComponent.components[row][col].properties[propertyName] = bootstrap_class;
+            selectedUserComponent.components[row][col].properties[propertyName] = bootstrap_class;
 
         }
     }
