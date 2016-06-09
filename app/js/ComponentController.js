@@ -177,6 +177,10 @@ function resizeCell(grid_width, grid_height, num_rows, num_cols) {
 
 }
 
+/**
+ * Adds a component to the list of user components
+ * @param newComponent
+ */
 function addComponentToUserComponentsList(newComponent){
     userComponents.push(newComponent);
     numComponents += 1;
@@ -196,7 +200,11 @@ function addComponentToUserComponentsList(newComponent){
 
 };
 
-
+/**
+ * Creates a new Cliche (but actually User?) component based on user inputs
+ * @param isDefault
+ * @constructor
+ */
 function InitClicheComponent(isDefault){
     var name, version, author;
     if (isDefault) {
@@ -214,15 +222,25 @@ function InitClicheComponent(isDefault){
     addComponentToUserComponentsList(newComponent);
 }
 
-
-function addComponent(widget, cell_id, component) {
+/**
+ * Adds a component to the table and displays it. If no component is given, it creates a
+ * base component based on the widget
+ * @param widget
+ * @param cell_id
+ * @param component (optional)
+ */
+function addComponent(cell_id, widget, component) {
+    var type;
     var row = cell_id.substring(4,5);
     var col = cell_id.substring(5,6);
-    var span = document.createElement('span');
-    span.innerHTML=widget[0].outerHTML;
-    var type = span.firstElementChild.getAttribute('name');
+
     if (!component){
+        var span = document.createElement('span');
+        span.innerHTML=widget[0].outerHTML;
+        type = span.firstElementChild.getAttribute('name');
         component = new BaseComponent(type, {});
+    } else {
+        type = component.type;
     }
     if (!selectedUserComponent.components.hasOwnProperty(row)) {
         selectedUserComponent.components[row] = {};

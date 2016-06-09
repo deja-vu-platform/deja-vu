@@ -30,7 +30,7 @@ function registerDroppable() {
                 var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
                 showConfigOptions(dropped_component, document.getElementById(cell_id));
                 if (!movedComponent()) {
-                    addComponent($(ui.draggable), cell_id);
+                    addComponent(cell_id, $(ui.draggable));
                 }
             } else { // if dropped in trash
                 var trashCopy = $(this).children().first();
