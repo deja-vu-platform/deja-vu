@@ -92,15 +92,22 @@ function registerZoom() {
 }
 
 
-function resetDroppability() {
-    $('td').each(function() {
-        if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
-            $(this).removeClass('dropped');
-            $(this).addClass('droppable');
-            $(this).droppable('enable');
+function resetDroppability(cell_id) {
+    if (cell_id){
+        if ($('#'+cell_id).get(0).getElementsByClassName('draggable').length == 0) {
+            $('#'+cell_id).removeClass('dropped');
+            $('#'+cell_id).addClass('droppable');
+            $('#'+cell_id).droppable('enable');
         }
-    });
-
+    } else {
+        $('td').each(function() {
+            if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
+                $(this).removeClass('dropped');
+                $(this).addClass('droppable');
+                $(this).droppable('enable');
+            }
+        });
+    }
 }
 
 function movedComponent() {
@@ -122,7 +129,7 @@ function movedComponent() {
             selectedUserComponent.addComponent(component_copy, new_row, new_col);
 
             //if (Object.keys(component_copy.components).length !== 0) {
-                Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
+            Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
             //}
             triggerEdit('cell'+new_row+new_col, false);
 
