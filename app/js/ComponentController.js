@@ -406,16 +406,24 @@ function loadTable(grid_width, grid_height, componentToShow) {
         var col = cell_id.substring(5,6);
         if (componentToShow.components[row]) {
             if (componentToShow.components[row][col]) {
-                var component = componentToShow.components[row][col];
-                var type = component.type;
+                var innerComponent = componentToShow.components[row][col];
+                var type = innerComponent.type;
                 showConfigOptions(type, document.getElementById(cell_id));
-                Display(cell_id, getHTML[type](component.components[type]));
+
+                Display(cell_id, getHTML[type](innerComponent.components[type]));
+                $($('.draggable[name='+type+']').get(0)).clone().appendTo($('#'+cell_id).get(0));
+                triggerEdit(cell_id, false);
+
                 $('#'+cell_id).addClass("dropped");
                 $('#'+cell_id).removeClass("droppable");
+                $('#'+cell_id).droppable('disable');
+
             }
         }
     });
 
+
+    updateBitmap();
     registerDraggable();
     registerTooltipBtnHandlers();
 }
