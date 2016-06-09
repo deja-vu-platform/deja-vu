@@ -435,6 +435,20 @@ function resizeLabelDivs(cell_width, cell_height) {
     getCSSRule('.label_container').style.setProperty('padding-top',(cell_height/4)+'px',null);
 }
 
+function mergeCells(cell1_id, cell2_id, component){
+    // first check for top left cell and bottom right cell
+
+    // then check legality: are there any other components in the way
+        // this might be done before calling the method
+
+    // then col span and row span the first cell
+    // then remove the older cells
+    // then put the component in there
+
+    // problem: will doing this dynamically work?
+}
+
+
 function loadTable(grid_width, grid_height, componentToShow) {
     $('<style>.table_outter::after{content:"'+componentToShow.meta.name+'"}</style>').appendTo('head');
     num_rows=componentToShow.dimensions.rows;
