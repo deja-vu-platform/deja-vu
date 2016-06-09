@@ -236,7 +236,7 @@ function addComponent(widget, cell_id, component) {
     } else if (type==='panel') {
         Display(cell_id, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
     } else {
-        triggerEdit(cell_id);
+        triggerEdit(cell_id, true);
     }
 }
 

@@ -140,7 +140,7 @@ function movedComponent() {
  * Register listener for click on edit button
  * @param cell_id
  */
-function triggerEdit(cell_id) {
+function triggerEdit(cell_id, popup) {
     var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
 
     var edit_dialog_template = $('#'+dropped_component+'_popup_holder').html();
@@ -154,10 +154,11 @@ function triggerEdit(cell_id) {
 
     $(Array.prototype.slice.call(
         $('#'+cell_id).get(0).getElementsByClassName('form-control'), 0)[0]).trigger("focus");
-    setTimeout(function(){
-        $($('#'+cell_id).children().first()).addClass('open');
-    }, 1);
-
+    if (popup){
+        setTimeout(function(){
+            $($('#'+cell_id).children().first()).addClass('open');
+        }, 1);
+    }
 
 }
 
