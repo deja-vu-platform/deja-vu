@@ -10,17 +10,17 @@ var getHTML = {
     },
     'link': function(value) {
         if (!value){
-            return '<a class="btn btn-link display_component" href="#"></a>';
+            return '<a class="btn btn-link display_component" href="#">Link</a>';
         }
         return '<a class="btn btn-link display_component" href="'+value.target+'">'+value.link_text+'</a>';
     },
     'tab_viewer': function(value) {
         if (!value){
             var html = '<ul class="nav nav-pills nav-stacked display_component">' +
-                '<li role="presentation" class="active"><a href="#1a" data-toggle="tab"></a></li>' +
-                '<li role="presentation"><a href="#2a" data-toggle="tab"></a></li>' +
-                '<li role="presentation"><a href="#3a" data-toggle="tab"></a></li>' +
-                '</ul>'; //TODO: tab target
+                '<li role="presentation" class="active"><a href="#" data-toggle="tab">Tab 1</a></li>' +
+                '<li role="presentation"><a href="#" data-toggle="tab">Tab 2</a></li>' +
+                '<li role="presentation"><a href="#" data-toggle="tab">Tab 3</a></li>' +
+                '</ul>';
 
             return html;
         }
@@ -34,9 +34,9 @@ var getHTML = {
     'menu': function(value) {
         if (!value){
             var html = '<div class="btn-group display_component" role="group">' +
-                '<a type="button" class="btn btn-default" role="button" href="#"></a>' +
-                '<a type="button" class="btn btn-default" role="button" href="#"></a>' +
-                '<a type="button" class="btn btn-default" role="button" href="#"></a>' +
+                '<a type="button" class="btn btn-default" role="button" href="#">Item 1</a>' +
+                '<a type="button" class="btn btn-default" role="button" href="#">Item 2</a>' +
+                '<a type="button" class="btn btn-default" role="button" href="#">Item 3</a>' +
                 '</div>';
             return html;
         }
@@ -49,7 +49,7 @@ var getHTML = {
     },
     'image': function(value) {
         if (!value){
-            return '<img>';
+            return '<img src="images/image_icon.png" width="15px" height="15px">';
         }
         return '<img src="'+value.img_src+'" width="'+cell_width+"px"+'" class="display_component">';
     },
