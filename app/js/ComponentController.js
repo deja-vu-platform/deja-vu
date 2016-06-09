@@ -275,18 +275,21 @@ function updateComponentAt(cell_id) {
         value = {};
 
         if (files.length > 0) { // if there's a file to upload
+
             var file = files[0];
             var parseFile = new Parse.File(file.name, file);
             isUpload = true;
+            files.length = 0; // clear the old file
             parseFile.save()
                 .then(function (savedFile) { // save was successful
+                    RemoveDisplay(cell_id);
                     value.img_src = savedFile.url();
                     Display(cell_id, getHTML[type](value));
                     selectedUserComponent.components[row][col].components[type] = value;
                 });
         } else { // pasted link to image
             value.img_src = inputs[0].value;
-        }
+        } // TODO what if empty link given?
     } else if (type==='panel') {
         value = {
             heading: $('#'+cell_id).find('.panel-title')[0].textContent,

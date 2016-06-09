@@ -49,7 +49,7 @@ var getHTML = {
     },
     'image': function(value) {
         if (!value){
-            return '<img src="images/image_icon.png" width="15px" height="15px">';
+            return '<img class="display_component" src="images/image_icon.png" width="15px" height="15px">';
         }
         return '<img src="'+value.img_src+'" width="'+cell_width+"px"+'" class="display_component">';
     },
@@ -72,3 +72,16 @@ function Display(cell_id, html, callback) {
     cell.insertBefore(html_, cell.firstChild);
     if (callback) callback();
 }
+
+/**
+ * Removes just the display part of the component. Useful for removing the old image
+ * on upload
+ * @param cell_id
+ * @param callback
+ * @constructor
+ */
+function RemoveDisplay(cell_id, callback) {
+    $('#'+cell_id).find('.display_component').remove();
+    if (callback) callback();
+}
+
