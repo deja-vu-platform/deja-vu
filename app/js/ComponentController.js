@@ -1,8 +1,18 @@
+/******* Constants ******/
+var DEFAULT_ROWS = 3;
+var DEFAULT_COLS = 3;
+var DEFAULT_CELL_WIDTH = 250;
+var DEFAULT_CELL_HEIGHT = 250;
 
-var num_rows = 3;
-var num_cols = 3;
-var cell_width = 250;
-var cell_height = 250;
+var DEFAULT_COMPONENT_NAME = "New Component";
+var DEFAULT_AUTHOR = "Unknown";
+var DEFAULT_VERSION = '0.0.1';
+//////////////////////////
+
+var num_rows = DEFAULT_ROWS;
+var num_cols = DEFAULT_COLS;
+var cell_width = DEFAULT_CELL_WIDTH;
+var cell_height = DEFAULT_CELL_HEIGHT;
 var files = [];
 
 // currently save components in this array
@@ -36,13 +46,14 @@ $('#select-cols').on('change', function(e) {
 $('#create_component').on('click', function() {
     createTable(grid_width, grid_height, false);
     InitClicheComponent(false);
-
+    resetMenuItems();
 });
 
 $('#load_component_btn').on('click', function() {
     selectedUserComponent=JSON.parse($('#component_json').val());
     loadTable(grid_width, grid_height, selectedUserComponent);
     addComponentToUserComponentsList(selectedUserComponent);
+    resetMenuItems();
 });
 
 $('#save_component').on('click', function() {
@@ -99,7 +110,15 @@ $('#user_components_list').on('keypress', '.new_name_input', function(event) {
     }
 });
 
+function resetMenuItems(){
+    $('#select-rows').val(DEFAULT_ROWS);
+    $('#select-cols').val(DEFAULT_COLS);
+    $('#new_component_name').val('');
+    $('#component_version').val('');
+    $('#component_author').val('');
 
+    $('#component_json').val('');
+}
 
 /**
  * Generate the grid
@@ -208,9 +227,9 @@ function addComponentToUserComponentsList(newComponent){
 function InitClicheComponent(isDefault){
     var name, version, author;
     if (isDefault) {
-        name = "NEW COMPONENT";
-        version = "0.0.1";
-        author = "Unknown";
+        name = DEFAULT_COMPONENT_NAME;
+        version = DEFAULT_VERSION;
+        author = DEFAULT_AUTHOR;
     } else {
         name = $('#new_component_name').val();
         version = $('#component_version').val();
