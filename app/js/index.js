@@ -113,7 +113,7 @@ function movedComponent() {
 
         var del_row = coord[0];
         var del_col = coord[1];
-        var cell = $('#cell'+del_row+del_col).get(0);
+        var old_cell = $('#cell'+del_row+del_col).get(0);
         if (typeof coord[2]!=="undefined") { // if move, copy any save data
             var new_row = coord[2];
             var new_col = coord[3];
@@ -124,12 +124,14 @@ function movedComponent() {
             if (Object.keys(component_copy.components).length !== 0) {
                 Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
             }
+            triggerEdit('cell'+new_row+new_col, false);
+
         }
         delete selectedUserComponent.components[del_row][del_col];
-        $(cell).find('.config-btns').remove();
-        $(cell).find('.tooltip').remove();
-        $(cell).find('.label_container').remove();
-        $(cell).find('.display_component').remove();
+        $(old_cell).find('.config-btns').remove();
+        $(old_cell).find('.tooltip').remove();
+        $(old_cell).find('.label_container').remove();
+        $(old_cell).find('.display_component').remove();
         //cell.removeChild(cell.firstChild);
         return true;
     }
