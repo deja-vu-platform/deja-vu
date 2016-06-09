@@ -121,9 +121,9 @@ function movedComponent() {
             var component_copy = selectedUserComponent.components[del_row][del_col];
             selectedUserComponent.addComponent(component_copy, new_row, new_col);
 
-            if (Object.keys(component_copy.components).length !== 0) {
+            //if (Object.keys(component_copy.components).length !== 0) {
                 Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
-            }
+            //}
             triggerEdit('cell'+new_row+new_col, false);
 
         }
