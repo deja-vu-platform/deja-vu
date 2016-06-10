@@ -445,7 +445,77 @@ function mergeCells(cell1_id, cell2_id, component){
     // then remove the older cells
     // then put the component in there
 
-    // problem: will doing this dynamically work?
+    // TODO problem: should also figure out how to revert the merge, maybe have some data on which cells were merged
+    // TODO problem: what about when views are changed and this is brought back
+
+    var row1 = cell1_id.substring(4,5);
+    var col1 = cell1_id.substring(5,6);
+
+    var row2 = cell2_id.substring(4,5);
+    var col2 = cell2_id.substring(5,6);
+
+
+    var top_row_num = Math.min(parseInt(row1), parseInt(row2));
+    var bottom_row_num = Math.max(parseInt(row1), parseInt(row2));
+
+    var left_col_num = Math.min(parseInt(col1), parseInt(col2));
+    var right_col_num = Math.max(parseInt(col1), parseInt(col2));
+
+    // hide all the other cells in that block
+    for (var row = top_row_num; row<= bottom_row_num; row++){
+        for (var col = left_col_num; col<=right_col_num; col++){
+            if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
+                continue;
+            }
+            var cell_to_hide = $("#cell"+row.toString()+col.toString());
+            cell_to_hide.css("display", "none");
+
+        }
+    }
+
+
+    // Make the first cell take the correct size
+    var cell_top_right = $("#cell"+top_row_num.toString()+left_col_num.toString());
+    cell_top_right.attr("rowSpan", bottom_row_num-top_row_num+1);
+    cell_top_right.attr("colSpan", right_col_num-left_col_num+1);
+
+    // TODO add info to the datatype
+}
+
+
+function unmergeCells(cell1_id, cell2_id, component){
+    var row1 = cell1_id.substring(4,5);
+    var col1 = cell1_id.substring(5,6);
+
+    var row2 = cell2_id.substring(4,5);
+    var col2 = cell2_id.substring(5,6);
+
+
+    var top_row_num = Math.min(parseInt(row1), parseInt(row2));
+    var bottom_row_num = Math.max(parseInt(row1), parseInt(row2));
+
+    var left_col_num = Math.min(parseInt(col1), parseInt(col2));
+    var right_col_num = Math.max(parseInt(col1), parseInt(col2));
+
+
+    // Make the first cell take the correct size
+    var cell_top_right = $("#cell"+top_row_num.toString()+left_col_num.toString());
+    cell_top_right.attr("rowSpan", 1);
+    cell_top_right.attr("colSpan", 1);
+    // display all the other cells in that block
+    for (var row = top_row_num; row<= bottom_row_num; row++){
+        for (var col = left_col_num; col<=right_col_num; col++){
+            if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
+                continue;
+            }
+            var cell_to_show = $("#cell"+row.toString()+col.toString());
+            cell_to_show.css("display", "table-cell");
+        }
+    }
+
+
+
+
 }
 
 
