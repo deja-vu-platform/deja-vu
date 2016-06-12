@@ -65,6 +65,7 @@ function ClicheComponent(dimensions, name, id, version, author) {
     this.dimensions = dimensions;
     this.components = {};
     this.properties = {};
+    this.layout = {}; // this is to remember this sizes of different cells
 };
 
 ClicheComponent.prototype.addComponent = function(component, row, col) {
