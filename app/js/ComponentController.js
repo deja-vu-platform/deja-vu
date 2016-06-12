@@ -534,22 +534,64 @@ function unmergeCells(cell1_id, cell2_id, component){
 
 
     // Make the first cell take the correct size
-    var cell_top_right = $("#cell"+top_row_num.toString()+left_col_num.toString());
+    var top_left_cell_id = "cell"+top_row_num.toString()+left_col_num.toString();
+
+    var cell_top_right = $("#"+top_left_cell_id);
     cell_top_right.attr("rowSpan", 1);
     cell_top_right.attr("colSpan", 1);
     // display all the other cells in that block
     for (var row = top_row_num; row<= bottom_row_num; row++){
         for (var col = left_col_num; col<=right_col_num; col++){
+            var cell_id = "cell"+row.toString()+col.toString();
             if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
+                // delete any component that was there
+                deleteComponent(cell_id);
                 continue;
             }
-            var cell_to_show = $("#cell"+row.toString()+col.toString());
+            var cell_to_show = $("#"+cell_id);
             cell_to_show.css("display", "table-cell");
+
+            // return rowspan/colspan to 1
+            cell_to_show.attr("rowSpan", 1);
+            cell_to_show.attr("colSpan", 1);
+
+            // delete any component that was there
+            deleteComponent(cell_id);
+
         }
     }
 
+    if (component){
+        // add the component to the cell
+        addComponent(top_left_cell_id, false, component);
+    }
 
+}
 
+/**
+ * Deletes a component from the datatype and also from the view
+ */
+function deleteComponent(cell_id){
+
+    var row = cell_id.substring(4,5);
+    var col = cell_id.substring(5,6);
+
+    if (selectedUserComponent.components[row]){
+        if (selectedUserComponent.components[row][col]){
+
+            delete selectedUserComponent.components[row][col];
+            var cell = $('#cell'+row+col).get(0);
+
+            $(cell).find('.config-btns').remove();
+            $(cell).find('.tooltip').remove();
+            $(cell).find('.label_container').remove();
+            $(cell).find('.display_component').remove();
+            $(cell).find('.widget').remove();
+
+            resetDroppability(cell_id);
+
+        }
+    }
 
 }
 
