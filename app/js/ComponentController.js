@@ -155,6 +155,16 @@ function createTable(grid_width, grid_height, isDefault) {
                         $('#'+td.id).find('.tooltip').addClass('open');
                     });
 
+                    // change size of cell based on the layout
+                    var rowspan = selectedUserComponent.layout[row][col][0];
+                    var colspan = selectedUserComponent.layout[row][col][1];
+
+                    if (rowspan === 0){ // and thus also colspan
+                        $(td).css("display", "none");
+                    } else{
+                        $(td).attr("rowSpan", rowspan);
+                        $(td).attr("colSpan", colspan);
+                    }
                 })(col+1);
             }
             grid.appendChild(tr);
