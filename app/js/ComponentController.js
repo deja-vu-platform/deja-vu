@@ -1,4 +1,4 @@
-/******* Constants ******/
+/** ** ** ** Constants ** ** ** **/
 var DEFAULT_ROWS = 3;
 var DEFAULT_COLS = 3;
 var DEFAULT_CELL_WIDTH = 250;
@@ -7,7 +7,7 @@ var DEFAULT_CELL_HEIGHT = 250;
 var DEFAULT_COMPONENT_NAME = "New Component";
 var DEFAULT_AUTHOR = "Unknown";
 var DEFAULT_VERSION = '0.0.1';
-//////////////////////////
+/** ** ** ** ** ** ** ** ** ** **/
 
 var num_rows = DEFAULT_ROWS;
 var num_cols = DEFAULT_COLS;
@@ -22,6 +22,7 @@ var selectedUserComponent = null;
 var bitmap_old = null;
 var bitmap_new = null;
 
+// Initialization
 $(function() {
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
     selectedUserComponent = "in jq";
@@ -46,14 +47,14 @@ $('#select-cols').on('change', function(e) {
 $('#create_component').on('click', function() {
     InitClicheComponent(false);
     createTable(grid_width, grid_height, false);
-    resetMenuItems();
+    resetMenuOptions();
 });
 
 $('#load_component_btn').on('click', function() {
     selectedUserComponent=JSON.parse($('#component_json').val());
     loadTable(grid_width, grid_height, selectedUserComponent);
     addComponentToUserComponentsList(selectedUserComponent);
-    resetMenuItems();
+    resetMenuOptions();
 });
 
 $('#save_component').on('click', function() {
@@ -110,7 +111,10 @@ $('#user_components_list').on('keypress', '.new_name_input', function(event) {
     }
 });
 
-function resetMenuItems(){
+/**
+ * Resets the menu options to their default values
+ */
+function resetMenuOptions(){
     $('#select-rows').val(DEFAULT_ROWS);
     $('#select-cols').val(DEFAULT_COLS);
     $('#new_component_name').val('');
@@ -186,8 +190,47 @@ function createTable(grid_width, grid_height, isDefault) {
 }
 
 /**
+ * Creates and displays a table based on the component given
+ * @param grid_width
+ * @param grid_height
+ * @param componentToShow
+ */
+function loadTable(grid_width, grid_height, componentToShow) {
+    $('<style>.table_outter::after{content:"'+componentToShow.meta.name+'"}</style>').appendTo('head');
+    num_rows=componentToShow.dimensions.rows;
+    num_cols=componentToShow.dimensions.cols;
+    createTable(grid_width, grid_height, false);
+
+    $('td').each(function() {
+        var cell_id=$(this).get(0).id;
+        var row = cell_id.substring(4,5);
+        var col = cell_id.substring(5,6);
+        if (componentToShow.components[row]) {
+            if (componentToShow.components[row][col]) {
+                var innerComponent = componentToShow.components[row][col];
+                var type = innerComponent.type;
+                showConfigOptions(type, document.getElementById(cell_id));
+
+                Display(cell_id, getHTML[type](innerComponent.components[type]));
+                $($('.draggable[name='+type+']').get(0)).clone().appendTo($('#'+cell_id).get(0));
+                triggerEdit(cell_id, false);
+
+                $('#'+cell_id).addClass("dropped");
+                $('#'+cell_id).removeClass("droppable");
+                $('#'+cell_id).droppable('disable');
+
+            }
+        }
+    });
+
+
+    updateBitmap();
+    registerDraggable();
+    registerTooltipBtnHandlers();
+}
+
+/**
  * Resize cell such that all cells fill width and height of grid
- * @param cell
  * @param grid_width
  * @param grid_height
  * @param num_rows
@@ -308,6 +351,33 @@ function addComponent(cell_id, widget, component) {
     //selectedUserComponent.addComponent(component, row, col);
 }
 
+
+/**
+ * Deletes a component from the datatype and also from the view
+ */
+function deleteComponent(cell_id){
+
+    var row = cell_id.substring(4,5);
+    var col = cell_id.substring(5,6);
+
+    if (selectedUserComponent.components[row]){
+        if (selectedUserComponent.components[row][col]){
+
+            delete selectedUserComponent.components[row][col];
+            var cell = $('#cell'+row+col).get(0);
+
+            $(cell).find('.config-btns').remove();
+            $(cell).find('.tooltip').remove();
+            $(cell).find('.label_container').remove();
+            $(cell).find('.display_component').remove();
+            $(cell).find('.widget').remove();
+
+            resetDroppability(cell_id);
+
+        }
+    }
+
+}
 
 
 function updateComponentAt(cell_id) {
@@ -465,6 +535,11 @@ function resizeLabelDivs(cell_width, cell_height) {
     getCSSRule('.label_container').style.setProperty('padding-top',(cell_height/4)+'px',null);
 }
 
+
+
+/*
+ * Merging and unmerging cells
+ */
 function mergeCells(cell1_id, cell2_id, component){
     // first check for top left cell and bottom right cell
 
@@ -532,7 +607,6 @@ function mergeCells(cell1_id, cell2_id, component){
     }
 }
 
-
 function unmergeCells(cell1_id, cell2_id, component){
     var row1 = cell1_id.substring(4,5);
     var col1 = cell1_id.substring(5,6);
@@ -589,64 +663,3 @@ function unmergeCells(cell1_id, cell2_id, component){
 
 }
 
-/**
- * Deletes a component from the datatype and also from the view
- */
-function deleteComponent(cell_id){
-
-    var row = cell_id.substring(4,5);
-    var col = cell_id.substring(5,6);
-
-    if (selectedUserComponent.components[row]){
-        if (selectedUserComponent.components[row][col]){
-
-            delete selectedUserComponent.components[row][col];
-            var cell = $('#cell'+row+col).get(0);
-
-            $(cell).find('.config-btns').remove();
-            $(cell).find('.tooltip').remove();
-            $(cell).find('.label_container').remove();
-            $(cell).find('.display_component').remove();
-            $(cell).find('.widget').remove();
-
-            resetDroppability(cell_id);
-
-        }
-    }
-
-}
-
-
-function loadTable(grid_width, grid_height, componentToShow) {
-    $('<style>.table_outter::after{content:"'+componentToShow.meta.name+'"}</style>').appendTo('head');
-    num_rows=componentToShow.dimensions.rows;
-    num_cols=componentToShow.dimensions.cols;
-    createTable(grid_width, grid_height, false);
-
-    $('td').each(function() {
-        var cell_id=$(this).get(0).id;
-        var row = cell_id.substring(4,5);
-        var col = cell_id.substring(5,6);
-        if (componentToShow.components[row]) {
-            if (componentToShow.components[row][col]) {
-                var innerComponent = componentToShow.components[row][col];
-                var type = innerComponent.type;
-                showConfigOptions(type, document.getElementById(cell_id));
-
-                Display(cell_id, getHTML[type](innerComponent.components[type]));
-                $($('.draggable[name='+type+']').get(0)).clone().appendTo($('#'+cell_id).get(0));
-                triggerEdit(cell_id, false);
-
-                $('#'+cell_id).addClass("dropped");
-                $('#'+cell_id).removeClass("droppable");
-                $('#'+cell_id).droppable('disable');
-
-            }
-        }
-    });
-
-
-    updateBitmap();
-    registerDraggable();
-    registerTooltipBtnHandlers();
-}
