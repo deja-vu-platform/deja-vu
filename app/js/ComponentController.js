@@ -512,14 +512,19 @@ function mergeCells(cell1_id, cell2_id, component){
 
             // delete any component that was there
             deleteComponent(cell_id);
+            selectedUserComponent.layout[row][col] = [0,0];
         }
     }
 
 
     // Make the first cell take the correct size
     var cell_top_right = $("#" + top_left_cell_id);
-    cell_top_right.attr("rowSpan", bottom_row_num-top_row_num+1);
-    cell_top_right.attr("colSpan", right_col_num-left_col_num+1);
+    var rowspan = bottom_row_num-top_row_num+1;
+    var colspan = right_col_num-left_col_num+1;
+    cell_top_right.attr("rowSpan", rowspan);
+    cell_top_right.attr("colSpan", colspan);
+
+    selectedUserComponent.layout[top_row_num][left_col_num] = [rowspan, colspan];
 
     if (component){
         // add the component to the cell

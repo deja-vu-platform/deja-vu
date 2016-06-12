@@ -10,7 +10,7 @@ function Component() {
     this.dimensions = {};
     this.properties = {};
     this.components = {};
-    this.layout = {};
+    this.layout = {}; // {row:{col:[rowspan, colspan]}}; [0,0] means hide this cell
 };
 
 
@@ -37,7 +37,7 @@ function BaseComponent(type, components) {
         author: ''
     };
     this.dimensions = {rows: 1, cols: 1};
-    this.layout = {1:{1:[1,1]}}; // {row:{col:[rowspan, colspan]}}
+    this.layout = {1:{1:[1,1]}};
 }
 
 BaseComponent.prototype.setProperty = function(property, value) {
