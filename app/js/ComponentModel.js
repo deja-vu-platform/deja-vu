@@ -10,6 +10,7 @@ function Component() {
     this.dimensions = {};
     this.properties = {};
     this.components = {};
+    this.layout = {};
 };
 
 
@@ -29,6 +30,14 @@ function BaseComponent(type, components) {
     this.type = type;
     this.components = components;
     this.properties = {};
+    this.meta = {
+        name: '',
+        id: '',
+        version: '',
+        author: ''
+    };
+    this.dimensions = {rows: 1, cols: 1};
+    this.layout = {1:{1:[1,1]}}; // {row:{col:[rowspan, colspan]}}
 }
 
 BaseComponent.prototype.setProperty = function(property, value) {
@@ -37,8 +46,6 @@ BaseComponent.prototype.setProperty = function(property, value) {
 BaseComponent.prototype.updateComponent = function(type, value) {
     this.components[type] = value;
 };
-
-
 
 
 
@@ -66,6 +73,13 @@ function ClicheComponent(dimensions, name, id, version, author) {
     this.components = {};
     this.properties = {};
     this.layout = {}; // this is to remember this sizes of different cells
+
+    for (var row = 1; row<=dimensions.rows; row++){
+        this.layout[row] = {};
+        for (var col = 1; col<= dimensions.cols; col++){
+            this.layout[row][col] = [1,1];
+        }
+    }
 };
 
 ClicheComponent.prototype.addComponent = function(component, row, col) {
