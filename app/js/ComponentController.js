@@ -24,15 +24,15 @@ var bitmap_new = null;
 
 $(function() {
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
-
     selectedUserComponent = "in jq";
+
+    // start a default component
+    InitClicheComponent(true);
     var grid = $('#grid-container').get(0);
     grid_width = grid.offsetWidth;
     grid_height = grid.offsetHeight;
     createTable(grid_width, grid_height, true);
 
-    // start a default component
-    InitClicheComponent(true);
 });
 
 $('#select-rows').on('change', function(e) {
@@ -44,8 +44,8 @@ $('#select-cols').on('change', function(e) {
 });
 
 $('#create_component').on('click', function() {
-    createTable(grid_width, grid_height, false);
     InitClicheComponent(false);
+    createTable(grid_width, grid_height, false);
     resetMenuItems();
 });
 
