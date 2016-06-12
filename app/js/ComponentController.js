@@ -244,38 +244,58 @@ function InitClicheComponent(isDefault){
 /**
  * Adds a component to the table and displays it. If no component is given, it creates a
  * base component based on the widget
+ *
+ * Either a widget or a component has to be present
+ *
  * @param widget
  * @param cell_id
- * @param component (optional)
+ * @param component
  */
 function addComponent(cell_id, widget, component) {
     var type;
     var row = cell_id.substring(4,5);
     var col = cell_id.substring(5,6);
 
+
     if (!component){
         var span = document.createElement('span');
         span.innerHTML=widget[0].outerHTML;
         type = span.firstElementChild.getAttribute('name');
         component = new BaseComponent(type, {});
-    } else {
+
+        if (type==='label') {
+            Display(cell_id, getHTML[type]("Type text here..."));
+        } else if (type==='panel') {
+            Display(cell_id, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
+        } else {
+            Display(cell_id, getHTML[type]());
+            triggerEdit(cell_id, true); // since this is a new component, show edit options
+        }
+
+    } else {// a component is there
         type = component.type;
+
+        Display(cell_id, getHTML[type](component.components[type]));
+        if (!widget){
+            $($('.draggable[name='+type+']').get(0)).clone().appendTo($('#'+cell_id).get(0))
+        }
+        triggerEdit(cell_id, false); // no need to show edit options
+
     }
+
+    $('#'+cell_id).addClass("dropped");
+    $('#'+cell_id).removeClass("droppable");
+    $('#'+cell_id).droppable('disable');
+    registerDraggable();
+    //showConfigOptions(type, document.getElementById(cell_id));
+
     if (!selectedUserComponent.components.hasOwnProperty(row)) {
         selectedUserComponent.components[row] = {};
         }
     selectedUserComponent.components[row][col] = component;
 
+    updateBitmap();
     //selectedUserComponent.addComponent(component, row, col);
-
-    if (type==='label') {
-        Display(cell_id, getHTML[type]("Type text here..."));
-    } else if (type==='panel') {
-        Display(cell_id, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
-    } else {
-        Display(cell_id, getHTML[type]());
-        triggerEdit(cell_id, true);
-    }
 }
 
 
