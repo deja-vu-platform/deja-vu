@@ -558,6 +558,9 @@ function unmergeCells(cell1_id, cell2_id, component){
     for (var row = top_row_num; row<= bottom_row_num; row++){
         for (var col = left_col_num; col<=right_col_num; col++){
             var cell_id = "cell"+row.toString()+col.toString();
+            // update the datatype
+            selectedUserComponent.layout[row][col] = [1,1];
+
             if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
                 // delete any component that was there
                 deleteComponent(cell_id);
@@ -572,6 +575,9 @@ function unmergeCells(cell1_id, cell2_id, component){
 
             // delete any component that was there
             deleteComponent(cell_id);
+
+            // update the datatype
+            selectedUserComponent.layout[row][col] = [1,1];
 
         }
     }
