@@ -460,6 +460,7 @@ function mergeCells(cell1_id, cell2_id, component){
 
     // then check legality: are there any other components in the way
         // this might be done before calling the method
+        // in fact, I will delete any in this function!
 
     // then col span and row span the first cell
     // then remove the older cells
@@ -481,25 +482,39 @@ function mergeCells(cell1_id, cell2_id, component){
     var left_col_num = Math.min(parseInt(col1), parseInt(col2));
     var right_col_num = Math.max(parseInt(col1), parseInt(col2));
 
+    var top_left_cell_id = "cell"+top_row_num.toString()+left_col_num.toString();
+
     // hide all the other cells in that block
     for (var row = top_row_num; row<= bottom_row_num; row++){
         for (var col = left_col_num; col<=right_col_num; col++){
+            var cell_id = "cell"+row.toString()+col.toString();
+
             if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
+                deleteComponent(cell_id);
                 continue;
             }
-            var cell_to_hide = $("#cell"+row.toString()+col.toString());
+            var cell_to_hide = $("#"+cell_id);
             cell_to_hide.css("display", "none");
 
+            // return rowspan/colspan to 1
+            cell_to_hide.attr("rowSpan", 1);
+            cell_to_hide.attr("colSpan", 1);
+
+            // delete any component that was there
+            deleteComponent(cell_id);
         }
     }
 
 
     // Make the first cell take the correct size
-    var cell_top_right = $("#cell"+top_row_num.toString()+left_col_num.toString());
+    var cell_top_right = $("#" + top_left_cell_id);
     cell_top_right.attr("rowSpan", bottom_row_num-top_row_num+1);
     cell_top_right.attr("colSpan", right_col_num-left_col_num+1);
 
-    // TODO add info to the datatype
+    if (component){
+        // add the component to the cell
+        addComponent(top_left_cell_id, false, component);
+    }
 }
 
 
