@@ -261,6 +261,13 @@ function attachMergeHandlers(){
                     var container_width = drag_handle_container.css('width');
                     var container_height = drag_handle_container.css('height');
 
+                    var component;
+                    if (selectedUserComponent.components[row]){
+                        if (selectedUserComponent.components[row][col]){
+                            component = selectedUserComponent.components[row][col];
+                        }
+                    }
+
                     //console.log(container_offset);
                     //console.log(container_height);
                     //console.log(container_width);
@@ -290,9 +297,9 @@ function attachMergeHandlers(){
                         }
                     }
                     if (!(new_row>num_rows || new_col>num_cols)){
-                        mergeCells('cell' + row + col, 'cell' + new_row + new_col);
+                        mergeCells('cell' + row + col, 'cell' + new_row + new_col, component);
                     } else {
-                        mergeCells('cell' + row + col, 'cell' + row + col);
+                        mergeCells('cell' + row + col, 'cell' + row + col, component);
                     }
 
                 }
