@@ -62,7 +62,7 @@ function registerDraggable() {
             revert: "invalid",
             cursorAt: { top: 0, left: 0 },
             helper: function(){
-                $('#grid-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
+                $('#table-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
                 //Hack to append the widget to the body (visible above others divs), but still belonging to the scrollable container
                 $("#clone").hide();
                 setTimeout(function(){$('#clone').appendTo('body'); $("#clone").show();},1);
@@ -100,7 +100,7 @@ function resetDroppability(cell_id) {
             $('#'+cell_id).droppable('enable');
         }
     } else {
-        $('td').each(function() {
+        $('#table-container td').each(function() {
             if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
                 $(this).removeClass('dropped');
                 $(this).addClass('droppable');

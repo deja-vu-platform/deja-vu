@@ -29,10 +29,10 @@ $(function() {
 
     // start a default component
     InitClicheComponent(true);
-    var grid = $('#grid-container').get(0);
+    var grid = $('#table-container').get(0);
     grid_width = grid.offsetWidth;
     grid_height = grid.offsetHeight;
-    createTable(grid_width, grid_height, true);
+    createTable(grid_width, grid_height);
 
 });
 
@@ -125,57 +125,51 @@ function resetMenuOptions(){
 }
 
 /**
- * Generate the grid
+ * Generate the table
  * @param grid_width
  * @param grid_height
- * @param num_rows
- * @param num_cols
  */
-function createTable(grid_width, grid_height, isDefault) {
-    $('#grid-container').html('');
+function createTable(grid_width, grid_height) {
+    $('#table-container').html('');
 
     var grid = document.createElement('table');
     grid.className = 'table_outter';
-    for (var row=0; row<num_rows; row++) {
-        (function(row){
-            var tr = document.createElement('tr');
-            for (var col=0; col<num_cols; col++) {
-                (function(col){
-                    var td = document.createElement('td');
-                    td.className = 'droppable';
-                    td.id = 'cell'+row+col;
+    for (var row=1; row<=num_rows; row++) {
+        var tr = document.createElement('tr');
+        for (var col=1; col<=num_cols; col++) {
+            var td = document.createElement('td');
+            td.className = 'droppable';
+            td.id = 'cell'+row+col;
 
-                    var sp = document.createElement('span');
-                    sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
+            var sp = document.createElement('span');
+            sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
 
-                    var button = sp.firstChild;
+            var button = sp.firstChild;
 
-                    td.appendChild(button);
-                    tr.appendChild(td);
+            td.appendChild(button);
+            tr.appendChild(td);
 
-                    $(button).on("click", function(e) {
-                        //$('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
-                        //triggerEdit(td.id);
-                        $('#'+td.id).find('.tooltip').addClass('open');
-                    });
+            $(button).on("click", function(e) {
+                //$('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
+                //triggerEdit(td.id);
+                $('#'+td.id).find('.tooltip').addClass('open');
+            });
 
-                    // change size of cell based on the layout
-                    var rowspan = selectedUserComponent.layout[row][col][0];
-                    var colspan = selectedUserComponent.layout[row][col][1];
+            // change size of cell based on the layout
+            var rowspan = selectedUserComponent.layout[row][col][0];
+            var colspan = selectedUserComponent.layout[row][col][1];
 
-                    if (rowspan === 0){ // and thus also colspan
-                        $(td).css("display", "none");
-                    } else{
-                        $(td).attr("rowSpan", rowspan);
-                        $(td).attr("colSpan", colspan);
-                    }
-                })(col+1);
+            if (rowspan === 0){ // and thus also colspan
+                $(td).css("display", "none");
+            } else{
+                $(td).attr("rowSpan", rowspan);
+                $(td).attr("colSpan", colspan);
             }
-            grid.appendChild(tr);
-        })(row+1);
+        }
+        grid.appendChild(tr);
     }
 
-    document.getElementById('grid-container').appendChild(grid);
+    document.getElementById('table-container').appendChild(grid);
 
     //initSVG(grid);
 
@@ -186,8 +180,30 @@ function createTable(grid_width, grid_height, isDefault) {
     bitmap_old = make2dArray(num_rows, num_cols);
     bitmap_new = make2dArray(num_rows, num_cols);
 
+    createTopGrid();
+}
+
+function createTopGrid() {
+    $('#guide-grid-container').html('');
+
+    var grid = document.createElement('table');
+    grid.className = 'table_outter';
+    for (var row=1; row<=num_rows; row++) {
+        var tr = document.createElement('tr');
+        for (var col=1; col<=num_cols; col++) {
+            var td = document.createElement('td');
+            td.id = 'grid'+row+col;
+
+            tr.appendChild(td);
+        }
+        grid.appendChild(tr);
+    }
+
+    document.getElementById('guide-grid-container').appendChild(grid);
 
 }
+
+
 
 /**
  * Creates and displays a table based on the component given
@@ -199,9 +215,9 @@ function loadTable(grid_width, grid_height, componentToShow) {
     $('<style>.table_outter::after{content:"'+componentToShow.meta.name+'"}</style>').appendTo('head');
     num_rows=componentToShow.dimensions.rows;
     num_cols=componentToShow.dimensions.cols;
-    createTable(grid_width, grid_height, false);
+    createTable(grid_width, grid_height);
 
-    $('td').each(function() {
+    $('#table-container td').each(function() {
         var cell_id=$(this).get(0).id;
         var row = cell_id.substring(4,5);
         var col = cell_id.substring(5,6);
@@ -482,7 +498,7 @@ function findDeletedCoord() {
 
 function updateBitmap() {
     bitmap_old = JSON.parse(JSON.stringify(bitmap_new));
-    $('td').each(function() {
+    $('#table-container td').each(function() {
         var row = Number($(this).attr('id').substring(4, 5)) - 1;
         var col = Number($(this).attr('id').substring(5, 6)) - 1;
         if ($(this).get(0).getElementsByClassName('draggable').length == 0) {

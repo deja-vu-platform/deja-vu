@@ -191,7 +191,19 @@ td {
     height: 650px;
     display: block;
 }
-#grid-container {
+
+
+#guide-grid-container {
+    height: 550px;
+    width: 800px;
+    margin: 50px 100px 10px 50px;
+    float: left;
+    position: absolute;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+#table-container {
     height: 550px;
     width: 800px;
     margin: 50px 100px 10px 50px;
