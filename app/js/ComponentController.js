@@ -155,122 +155,8 @@ function createTable(grid_width, grid_height) {
                 $('#'+td.id).find('.tooltip').addClass('open');
             });
 
-            var drag_handle = document.createElement('span');
-            drag_handle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
-            drag_handle.className = 'ui-resizable-handle ui-resizable-se';
-            drag_handle.id = 'drag_handle'+row+col;
-
-            td.appendChild(drag_handle);
-
-            $(drag_handle).css({
-                position: 'absolute',
-                bottom: 0,
-                right: 0,
-                'z-index':100
-            });
-
-            $(td).resizable({
-                handles: {
-                    'se': '#drag_handle' + row + col
-                }
-            });
             td.appendChild(button);
             tr.appendChild(td);
-
-
-            //
-
-            //
-            //$( drag_handle ).draggable({
-            //    drag: function( event, ui ) {
-            //        //event.preventDefault();
-            //        console.log('dragging');
-            //        var ghost = $(this).parent().parent().parent().find(".merge-ghost");
-            //        if (ghost.length==0){
-            //            ghost = $(this).parent().clone().addClass("merge-ghost");
-            //            $(ghost).css({
-            //                position: 'absolute',
-            //                'z-index': '10'
-            //            });
-            //            $(this).parent().parent().parent().append(ghost);
-            //
-            //        }
-            //
-            //        ghost.css({
-            //           background: 'red'
-            //        });
-            //        var offset = $(this).parent().offset();
-            //        //$(this).parent().css({
-            //        //    position: 'absolute',
-            //        //    width: ($(this).offset().right - offset.left + 10) +'px',
-            //        //    height: ($(this).offset().bottom - offset.top + 10) +'px'
-            //        //});
-            //        //console.log();
-            //        //console.log();
-            //        ////console.log($(this).parent().css('width'));
-            //        //console.log(offset.left);
-            //        //console.log(event.pageX);
-            //        ////console.log($(this).parent().css('height'));
-            //    }
-            //});
-            //
-            //$(drag_handle).css({
-            //    position: 'absolute',
-            //    bottom: '0',
-            //    right: '0',
-            //    'z-index': '50'
-            //});
-            //
-            //$(drag_handle).hover(function() {
-            //    $(this).css({
-            //        cursor: 'move',
-            //    });
-            //});
-
-            //
-            //
-            //$(document).on('mousedown', '.drag_handle', function(){
-            //    $('.resizing').removeClass("resizing");
-            //    $(this).parent().addClass('resizing');
-            //
-            //});
-            //
-            //$(document).mouseup(function(){
-            //    $('.resizing').removeClass("resizing");
-            //});
-            //
-            //$(document).on('mousemove', '.resizing', function(){
-            //    console.log("hi!");
-            //});
-
-
-            //// hovering on border
-            //$(td).mousemove(function(e){
-            //    var border_width = parseInt($(this).css('border-width'));
-            //    if(e.offsetX < border_width || e.offsetX > $(this).innerWidth()) {
-            //        $(this).css('cursor', 'col-resize');
-            //        $(this).addClass('resizable');
-            //        $(this).find(".resizing").css("width", "50px");
-            //    }
-            //    else if (e.offsetY < border_width || e.offsetY > $(this).innerHeight()){
-            //        $(this).css('cursor', 'row-resize');
-            //        $(this).addClass('resizable');
-            //        $(this).find(".resizing").css("width", "50px");
-            //    } else{
-            //        $(this).css('cursor', 'default');
-            //        $(this).removeClass('resizable');
-            //    }
-            //});
-            //
-            //$(td).on('mousedown', '.resizable', function(e){
-            //    $(this).addClass("resizing");
-            //});
-            //
-            //
-            //$(td).on('mouseup', '.resizable', function(e){
-            //    $(this).removeClass("resizing");
-            //});
-
 
             // change size of cell based on the layout
             var rowspan = selectedUserComponent.layout[row][col][0];
@@ -295,12 +181,125 @@ function createTable(grid_width, grid_height) {
 
     resizeCell(grid_width, grid_height, num_rows, num_cols);
 
+    attachMergeHandlers();
     registerDroppable();
 
     bitmap_old = make2dArray(num_rows, num_cols);
     bitmap_new = make2dArray(num_rows, num_cols);
 
     createTopGrid();
+}
+
+function attachMergeHandlers(){
+    for (var row=1; row<=num_rows; row++) {
+        for (var col = 1; col <= num_cols; col++) {
+            var td = $("#cell" + row + col);
+
+            var offset = td.offset();
+            var width = td.css("width");
+            var height = td.css("height");
+
+            var drag_handle_container = document.createElement('div');
+            drag_handle_container.id = 'drag_handle_container'+row+col;
+            var drag_handle = document.createElement('span');
+
+            drag_handle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
+            drag_handle.className = 'ui-resizable-handle ui-resizable-se';
+            drag_handle.id = 'drag_handle' + row + col;
+
+            drag_handle_container.appendChild(drag_handle);
+            $('#table-container').append(drag_handle_container);
+            $(drag_handle_container).css({
+                position: 'absolute',
+                top: offset.top,
+                left: offset.left,
+                width: width,
+                height: height,
+                'pointer-events' : 'none',
+            });
+
+            $(drag_handle).mouseenter(function(event, ui){
+                $(this).parent().css({
+                   //background: 'red',
+                   // opacity: '0.5',
+                   border: 'black 1px dotted'
+               })
+            });
+
+            $(drag_handle).mouseleave(function(event, ui){
+                $(this).parent().css({
+                    //background: 'none',
+                    //opacity: '0.5',
+                    border: 'none'
+                })
+            });
+
+            $(drag_handle).css({
+                'pointer-events': 'auto',
+                position: 'absolute',
+                bottom: '5px',
+                right: '5px',
+                cursor: 'nwse-resize',
+            });
+
+            $(drag_handle_container).resizable({
+                handles: {
+                    'se': '#drag_handle' + row + col
+                },
+                //autoHide: true,
+                stop: function () {
+                    var drag_handle_container = $(this);
+                    var container_id = drag_handle_container.get(0).id;
+                    var row = container_id.substring(21, 22);
+                    var col = container_id.substring(22, 23);
+
+                    var grid = $('#grid' + row + col);
+                    var grid_offset = grid.offset();
+                    var grid_width = grid.css('width');
+                    var grid_height = grid.css('height');
+                    var container_offset = drag_handle_container.offset();
+                    var container_width = drag_handle_container.css('width');
+                    var container_height = drag_handle_container.css('height');
+
+                    //console.log(container_offset);
+                    //console.log(container_height);
+                    //console.log(container_width);
+                    //console.log(grid_offset);
+                    //console.log(grid_height);
+                    //console.log(grid_width);
+
+                    var new_row;
+                    var new_col;
+                    // TODO take care of edge case
+                    if (parseFloat(container_offset.left) + parseFloat(container_width) > parseFloat(grid_offset.left) + parseFloat(grid_width)) {
+                        if (parseFloat(container_offset.top) + parseFloat(container_height) > parseFloat(grid_offset.top) + parseFloat(grid_height)) { // right & down
+                            new_row = parseInt(row)+1;
+                            new_col = parseInt(col)+1;
+
+                        } else { // right
+                            new_row = row;
+                            new_col = parseInt(col)+1;
+                        }
+                    } else {
+                        if (parseFloat(container_offset.top) + parseFloat(container_height) > parseFloat(grid_offset.top) + parseFloat(grid_height)) { // right & down
+                            new_row = parseInt(row)+1;
+                            new_col = col;
+                        } else { // none
+                            new_row = row;
+                            new_col = col;
+                        }
+                    }
+                    if (!(new_row>num_rows || new_col>num_cols)){
+                        mergeCells('cell' + row + col, 'cell' + new_row + new_col);
+                    } else {
+                        mergeCells('cell' + row + col, 'cell' + row + col);
+                    }
+
+                }
+            });
+        }
+    }
+
 }
 
 function createTopGrid() {
@@ -725,6 +724,9 @@ function mergeCells(cell1_id, cell2_id, component){
             cell_to_hide.attr("rowSpan", 1);
             cell_to_hide.attr("colSpan", 1);
 
+            var drag_container_to_hide = $('#drag_handle_container'+row+col);
+            drag_container_to_hide.css('display', 'none');
+
             // delete any component that was there
             deleteComponent(cell_id);
             selectedUserComponent.layout[row][col] = [0,0];
@@ -738,6 +740,10 @@ function mergeCells(cell1_id, cell2_id, component){
     var colspan = right_col_num-left_col_num+1;
     cell_top_right.attr("rowSpan", rowspan);
     cell_top_right.attr("colSpan", colspan);
+    $('#drag_handle_container'+top_row_num+left_col_num).css({
+        width: cell_top_right.css('width'),
+        height: cell_top_right.css('height'),
+    });
 
     selectedUserComponent.layout[top_row_num][left_col_num] = [rowspan, colspan];
 
