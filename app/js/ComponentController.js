@@ -155,20 +155,94 @@ function createTable(grid_width, grid_height) {
                 $('#'+td.id).find('.tooltip').addClass('open');
             });
 
-
             var drag_handle = document.createElement('span');
             drag_handle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
-            drag_handle.className = 'drag_handle';
+            drag_handle.className = 'ui-resizable-handle ui-resizable-se';
+            drag_handle.id = 'drag_handle'+row+col;
 
-            $(drag_handle).hover(function(){
-                $(this).css({
-                    cursor: "move"
-                })
+            td.appendChild(drag_handle);
+
+            $(drag_handle).css({
+                position: 'absolute',
+                bottom: 0,
+                right: 0,
+                'z-index':100
             });
 
+            $(td).resizable({
+                handles: {
+                    'se': '#drag_handle' + row + col
+                }
+            });
             td.appendChild(button);
-            td.appendChild(drag_handle);
             tr.appendChild(td);
+
+
+            //
+
+            //
+            //$( drag_handle ).draggable({
+            //    drag: function( event, ui ) {
+            //        //event.preventDefault();
+            //        console.log('dragging');
+            //        var ghost = $(this).parent().parent().parent().find(".merge-ghost");
+            //        if (ghost.length==0){
+            //            ghost = $(this).parent().clone().addClass("merge-ghost");
+            //            $(ghost).css({
+            //                position: 'absolute',
+            //                'z-index': '10'
+            //            });
+            //            $(this).parent().parent().parent().append(ghost);
+            //
+            //        }
+            //
+            //        ghost.css({
+            //           background: 'red'
+            //        });
+            //        var offset = $(this).parent().offset();
+            //        //$(this).parent().css({
+            //        //    position: 'absolute',
+            //        //    width: ($(this).offset().right - offset.left + 10) +'px',
+            //        //    height: ($(this).offset().bottom - offset.top + 10) +'px'
+            //        //});
+            //        //console.log();
+            //        //console.log();
+            //        ////console.log($(this).parent().css('width'));
+            //        //console.log(offset.left);
+            //        //console.log(event.pageX);
+            //        ////console.log($(this).parent().css('height'));
+            //    }
+            //});
+            //
+            //$(drag_handle).css({
+            //    position: 'absolute',
+            //    bottom: '0',
+            //    right: '0',
+            //    'z-index': '50'
+            //});
+            //
+            //$(drag_handle).hover(function() {
+            //    $(this).css({
+            //        cursor: 'move',
+            //    });
+            //});
+
+            //
+            //
+            //$(document).on('mousedown', '.drag_handle', function(){
+            //    $('.resizing').removeClass("resizing");
+            //    $(this).parent().addClass('resizing');
+            //
+            //});
+            //
+            //$(document).mouseup(function(){
+            //    $('.resizing').removeClass("resizing");
+            //});
+            //
+            //$(document).on('mousemove', '.resizing', function(){
+            //    console.log("hi!");
+            //});
+
 
             //// hovering on border
             //$(td).mousemove(function(e){
