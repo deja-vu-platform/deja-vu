@@ -136,9 +136,11 @@ function createTable(grid_width, grid_height) {
     grid.className = 'table_outter';
     for (var row=1; row<=num_rows; row++) {
         var tr = document.createElement('tr');
+        tr.className = 'row'+row;
         for (var col=1; col<=num_cols; col++) {
             var td = document.createElement('td');
-            td.className = 'droppable';
+            td.className = 'droppable col'+col;
+
             td.id = 'cell'+row+col;
 
             var sp = document.createElement('span');
@@ -188,11 +190,15 @@ function createTopGrid() {
 
     var grid = document.createElement('table');
     grid.className = 'table_outter';
+
     for (var row=1; row<=num_rows; row++) {
         var tr = document.createElement('tr');
+        tr.className = 'row'+row;
+
         for (var col=1; col<=num_cols; col++) {
             var td = document.createElement('td');
             td.id = 'grid'+row+col;
+            td.className = 'col'+col;
 
             tr.appendChild(td);
         }
