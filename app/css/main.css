@@ -178,7 +178,7 @@ td {
     height: 600px;
     border: 1px solid #dddddd;
     margin-left: 200px;
-    overflow: scroll;
+    /*overflow: scroll;*/
     /*-webkit-transform: scale(0.45,0.45);*/
     /*-webkit-transform: scale(0.45,0.45);*/
 }
@@ -201,6 +201,13 @@ td {
     position: absolute;
     pointer-events: none;
     visibility: hidden;
+}
+
+.drag_handle{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 50;
 }
 
 #table-container {

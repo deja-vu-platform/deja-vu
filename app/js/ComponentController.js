@@ -148,14 +148,55 @@ function createTable(grid_width, grid_height) {
 
             var button = sp.firstChild;
 
-            td.appendChild(button);
-            tr.appendChild(td);
 
             $(button).on("click", function(e) {
                 //$('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
                 //triggerEdit(td.id);
                 $('#'+td.id).find('.tooltip').addClass('open');
             });
+
+
+            var drag_handle = document.createElement('span');
+            drag_handle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
+            drag_handle.className = 'drag_handle';
+
+            $(drag_handle).hover(function(){
+                $(this).css({
+                    cursor: "move"
+                })
+            });
+
+            td.appendChild(button);
+            td.appendChild(drag_handle);
+            tr.appendChild(td);
+
+            //// hovering on border
+            //$(td).mousemove(function(e){
+            //    var border_width = parseInt($(this).css('border-width'));
+            //    if(e.offsetX < border_width || e.offsetX > $(this).innerWidth()) {
+            //        $(this).css('cursor', 'col-resize');
+            //        $(this).addClass('resizable');
+            //        $(this).find(".resizing").css("width", "50px");
+            //    }
+            //    else if (e.offsetY < border_width || e.offsetY > $(this).innerHeight()){
+            //        $(this).css('cursor', 'row-resize');
+            //        $(this).addClass('resizable');
+            //        $(this).find(".resizing").css("width", "50px");
+            //    } else{
+            //        $(this).css('cursor', 'default');
+            //        $(this).removeClass('resizable');
+            //    }
+            //});
+            //
+            //$(td).on('mousedown', '.resizable', function(e){
+            //    $(this).addClass("resizing");
+            //});
+            //
+            //
+            //$(td).on('mouseup', '.resizable', function(e){
+            //    $(this).removeClass("resizing");
+            //});
+
 
             // change size of cell based on the layout
             var rowspan = selectedUserComponent.layout[row][col][0];
@@ -167,8 +208,11 @@ function createTable(grid_width, grid_height) {
                 $(td).attr("rowSpan", rowspan);
                 $(td).attr("colSpan", colspan);
             }
+
         }
+
         grid.appendChild(tr);
+
     }
 
     document.getElementById('table-container').appendChild(grid);
