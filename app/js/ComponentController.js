@@ -528,6 +528,7 @@ function addComponent(cell_id, widget, component) {
     selectedUserComponent.components[row][col] = component;
 
     updateBitmap();
+    registerTooltipBtnHandlers()
     //selectedUserComponent.addComponent(component, row, col);
 }
 
