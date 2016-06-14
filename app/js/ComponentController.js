@@ -119,24 +119,32 @@ function resetMenuOptions() {
  * @param grid_height
  */
 function createTable(grid_width, grid_height) {
+    /*
+        Note about naming conventions:
+        for naming id, try to follow this rule
+
+        name-with-several-parts_idrownumber_idcolnumber
+     
+     */
+
     $('#table-container').html('');
 
     var grid = document.createElement('table');
     grid.className = 'table_outter';
     for (var row = 1; row <= num_rows; row++) {
         var tr = document.createElement('tr');
-        tr.className = 'row' + row;
+        tr.className = 'row' + '_' + row;
         for (var col = 1; col <= num_cols; col++) {
             var td = document.createElement('td');
-            td.className = 'droppable cell col' + col;
+            td.className = 'droppable cell col' + '_' + col;
 
-            td.id = 'cell' + row + col;
+            td.id = 'cell' + '_' + row + '_' + col;
 
             var sp = document.createElement('span');
             sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
 
             var button = sp.firstChild;
-            button.id = 'edit-btn'+row+col;
+            button.id = 'edit-btn' + '_' + row + '_' + col;
 
             td.appendChild(button);
             tr.appendChild(td);
@@ -144,8 +152,8 @@ function createTable(grid_width, grid_height) {
             $(button).on("click", function (e) {
                 //$('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
                 //triggerEdit(td.id);
-                var rowcol = this.id.substring(8,10);
-                $('#cell' + rowcol).find('.tooltip').addClass('open');
+                var rowcol = this.id.split('_');
+                $('#cell' + '_' + rowcol[rowcol.length-2] + '_' + rowcol[rowcol.length-1]).find('.tooltip').addClass('open');
             });
 
             // change size of cell based on the layout
@@ -190,19 +198,19 @@ function attachMergeHandlers() {
     $('#drag-handle-containers-container').html('');
     for (var row = 1; row <= num_rows; row++) {
         for (var col = 1; col <= num_cols; col++) {
-            var td = $("#cell" + row + col);
+            var td = $("#cell" + '_' + row + '_' + col);
 
             var offset = td.offset();
             var width = td.css("width");
             var height = td.css("height");
 
             var drag_handle_container = document.createElement('div');
-            drag_handle_container.id = 'drag_handle_container' + row + col;
+            drag_handle_container.id = 'drag-handle-container' + '_' + row + '_' + col;
             var drag_handle = document.createElement('span');
 
             drag_handle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
             drag_handle.className = 'ui-resizable-handle ui-resizable-se drag-handle';
-            drag_handle.id = 'drag_handle' + row + col;
+            drag_handle.id = 'drag-handle' + '_' + row + '_' + col;
 
             drag_handle_container.appendChild(drag_handle);
             $('#drag-handle-containers-container').append(drag_handle_container);
@@ -237,7 +245,7 @@ function attachMergeHandlers() {
 
             $(drag_handle_container).resizable({
                 handles: {
-                    'se': '#drag_handle' + row + col
+                    'se': '#drag-handle' + '_' + row + '_' + col
                 },
                 start: function (event, ui) {
                     $('#guide-grid-container td').css({
@@ -252,8 +260,9 @@ function attachMergeHandlers() {
                 stop: function (event, ui) {
                     var drag_handle_container = $(this);
                     var container_id = drag_handle_container.get(0).id;
-                    var row = container_id.substring(21, 22);
-                    var col = container_id.substring(22, 23);
+                    var rowcol = container_id.split('_');
+                    var row = rowcol[rowcol.length-2];
+                    var col = rowcol[rowcol.length-1];
 
                     var component;
                     if (selectedUserComponent.components[row]) {
@@ -290,11 +299,11 @@ function attachMergeHandlers() {
 
                     var new_cell_grid = $(all_elts_list).filter('.grid');
                     if (!new_cell_grid[0]) { // it's outside the table
-                        mergeCells('cell' + row + col, 'cell' + row + col, component);
+                        mergeCells('cell' + '_' + row + '_' + col, 'cell' + '_' + row + '_' + col, component);
                     } else {
-                        var new_cell_rowcol = new_cell_grid[0].id.substring(4, 6);
-                        var new_cell_id = 'cell' + new_cell_rowcol;
-                        mergeCells('cell' + row + col, new_cell_id, component);
+                        var new_cell_rowcol = new_cell_grid[0].id.split('_');
+                        var new_cell_id = 'cell' + '_' + new_cell_rowcol[new_cell_rowcol.length-2] + '_' + new_cell_rowcol[new_cell_rowcol.length-1];
+                        mergeCells('cell' + '_' + row + '_' + col, new_cell_id, component);
                     }
 
                     // rest event handlers
@@ -357,12 +366,12 @@ function createTopGrid() {
 
     for (var row = 1; row <= num_rows; row++) {
         var tr = document.createElement('tr');
-        tr.className = 'row' + row;
+        tr.className = 'row' + '_' + row;
 
         for (var col = 1; col <= num_cols; col++) {
             var td = document.createElement('td');
-            td.id = 'grid' + row + col;
-            td.className = 'grid col' + col;
+            td.id = 'grid' + '_' + row + '_' + col;
+            td.className = 'grid col' + '_' + col;
 
             tr.appendChild(td);
         }
@@ -388,8 +397,9 @@ function loadTable(grid_width, grid_height, componentToShow) {
 
     $('#table-container td').each(function () {
         var cell_id = $(this).get(0).id;
-        var row = cell_id.substring(4, 5);
-        var col = cell_id.substring(5, 6);
+        var rowcol = cell_id.split('_');
+        var row = rowcol[rowcol.length-2];
+        var col = rowcol[rowcol.length-1];
         if (componentToShow.components[row]) {
             if (componentToShow.components[row][col]) {
                 var innerComponent = componentToShow.components[row][col];
@@ -491,8 +501,9 @@ function InitClicheComponent(isDefault) {
  */
 function addComponent(cell_id, widget, component) {
     var type;
-    var row = cell_id.substring(4, 5);
-    var col = cell_id.substring(5, 6);
+    var rowcol = cell_id.split('_');
+    var row = rowcol[rowcol.length-2];
+    var col = rowcol[rowcol.length-1];
 
     if (!component) {
         var span = document.createElement('span');
@@ -540,15 +551,15 @@ function addComponent(cell_id, widget, component) {
  * Deletes a component from the datatype and also from the view
  */
 function deleteComponent(cell_id) {
-
-    var row = cell_id.substring(4, 5);
-    var col = cell_id.substring(5, 6);
+    var rowcol = cell_id.split('_');
+    var row = rowcol[rowcol.length-2];
+    var col = rowcol[rowcol.length-1];
 
     if (selectedUserComponent.components[row]) {
         if (selectedUserComponent.components[row][col]) {
 
             delete selectedUserComponent.components[row][col];
-            var cell = $('#cell' + row + col).get(0);
+            var cell = $('#cell' + '_' + row + '_' + col).get(0);
 
             $(cell).find('.config-btns').remove();
             $(cell).find('.tooltip').remove();
@@ -565,8 +576,9 @@ function deleteComponent(cell_id) {
 
 
 function updateComponentAt(cell_id) {
-    var row = cell_id.substring(4, 5);
-    var col = cell_id.substring(5, 6);
+    var rowcol = cell_id.split('_');
+    var row = rowcol[rowcol.length-2];
+    var col = rowcol[rowcol.length-1];
     var type = $('#' + cell_id).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     var value;
     var isUpload = false;
@@ -667,8 +679,10 @@ function findDeletedCoord() {
 function updateBitmap() {
     bitmap_old = JSON.parse(JSON.stringify(bitmap_new));
     $('#table-container td').each(function () {
-        var row = Number($(this).attr('id').substring(4, 5)) - 1;
-        var col = Number($(this).attr('id').substring(5, 6)) - 1;
+        var cell_id = $(this).attr('id');
+        var rowcol = cell_id.split('_');
+        var row = Number(rowcol[rowcol.length-2]) - 1;
+        var col = Number(rowcol[rowcol.length-1]) - 1;
         if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
             bitmap_new[row][col] = 0;
         } else {
@@ -724,11 +738,13 @@ function resizeLabelDivs(cell_width, cell_height) {
  */
 function mergeCells(cell1_id, cell2_id, component) {
     // first check for top left cell and bottom right cell
-    var row1 = cell1_id.substring(4, 5);
-    var col1 = cell1_id.substring(5, 6);
+    var rowcol1 = cell1_id.split('_');
+    var row1 = rowcol1[rowcol1.length - 2];
+    var col1 = rowcol1[rowcol1.length - 1];
 
-    var row2 = cell2_id.substring(4, 5);
-    var col2 = cell2_id.substring(5, 6);
+    var rowcol2 = cell2_id.split('_');
+    var row2 = rowcol2[rowcol2.length - 2];
+    var col2 = rowcol2[rowcol2.length - 1];
 
 
     var top_row_num = Math.min(parseInt(row1), parseInt(row2));
@@ -737,8 +753,8 @@ function mergeCells(cell1_id, cell2_id, component) {
     var left_col_num = Math.min(parseInt(col1), parseInt(col2));
     var right_col_num = Math.max(parseInt(col1), parseInt(col2));
 
-    var top_left_cell_id = "cell" + top_row_num.toString() + left_col_num.toString();
-    var bottom_right_cell_id = "cell" + bottom_row_num.toString() + right_col_num.toString();
+    var top_left_cell_id = "cell" + '_' + top_row_num.toString() + '_' + left_col_num.toString();
+    var bottom_right_cell_id = "cell" + '_' + bottom_row_num.toString() + '_' + right_col_num.toString();
 
     // figure out if this is already a merged cell
     var merged = $('#' + top_left_cell_id).data('merged');
@@ -757,7 +773,7 @@ function mergeCells(cell1_id, cell2_id, component) {
         // hide all the other cells in that block
         for (var row = top_row_num; row <= bottom_row_num; row++) {
             for (var col = left_col_num; col <= right_col_num; col++) {
-                var cell_id = "cell" + row.toString() + col.toString();
+                var cell_id = "cell" + '_' + row.toString() + '_' + col.toString();
 
                 // delete any component that was there
                 // TODO: note: checks should be made before calling this function!
@@ -785,7 +801,7 @@ function mergeCells(cell1_id, cell2_id, component) {
                 cell_to_hide.attr("rowSpan", 1);
                 cell_to_hide.attr("colSpan", 1);
 
-                var drag_container_to_hide = $('#drag_handle_container' + row + col);
+                var drag_container_to_hide = $('#drag-handle-container' + '_' + row + '_' + col);
                 drag_container_to_hide.css('display', 'none');
 
                 selectedUserComponent.layout[row][col] = [0, 0, false, ''];
@@ -800,7 +816,7 @@ function mergeCells(cell1_id, cell2_id, component) {
     var colspan = right_col_num - left_col_num + 1;
     cell_top_right.attr("rowSpan", rowspan);
     cell_top_right.attr("colSpan", colspan);
-    $('#drag_handle_container' + top_row_num + left_col_num).css({
+    $('#drag-handle-container' + '_' + top_row_num + '_' + left_col_num).css({
         width: cell_top_right.css('width'),
         height: cell_top_right.css('height'),
     });
@@ -816,11 +832,14 @@ function mergeCells(cell1_id, cell2_id, component) {
 }
 
 function unmergeCells(cell1_id, cell2_id, component) {
-    var row1 = cell1_id.substring(4, 5);
-    var col1 = cell1_id.substring(5, 6);
+    var rowcol1 = cell1_id.split('_');
+    var row1 = rowcol1[rowcol1.length - 2];
+    var col1 = rowcol1[rowcol1.length - 1];
 
-    var row2 = cell2_id.substring(4, 5);
-    var col2 = cell2_id.substring(5, 6);
+    var rowcol2 = cell2_id.split('_');
+    var row2 = rowcol2[rowcol2.length - 2];
+    var col2 = rowcol2[rowcol2.length - 1];
+
 
 
     var top_row_num = Math.min(parseInt(row1), parseInt(row2));
@@ -831,7 +850,7 @@ function unmergeCells(cell1_id, cell2_id, component) {
 
 
     // Make the first cell take the correct size
-    var top_left_cell_id = "cell" + top_row_num.toString() + left_col_num.toString();
+    var top_left_cell_id = "cell" + '_' + top_row_num.toString() + '_' + left_col_num.toString();
 
     var cell_top_right = $("#" + top_left_cell_id);
     cell_top_right.attr("rowSpan", 1);
@@ -839,7 +858,7 @@ function unmergeCells(cell1_id, cell2_id, component) {
     // display all the other cells in that block
     for (var row = top_row_num; row <= bottom_row_num; row++) {
         for (var col = left_col_num; col <= right_col_num; col++) {
-            var cell_id = "cell" + row.toString() + col.toString();
+            var cell_id = "cell" + '_' + row.toString() + '_' + col.toString();
             // update the datatype
             selectedUserComponent.layout[row][col] = [1, 1, false, ''];
 
@@ -857,7 +876,7 @@ function unmergeCells(cell1_id, cell2_id, component) {
             // delete any component that was there
             deleteComponent(cell_id);
 
-            var drag_container_to_show = $('#drag_handle_container' + row + col);
+            var drag_container_to_show = $('#drag-handle-container' + '_' + row + '_' + col);
             var cell_offset = cell_to_show.offset();
             drag_container_to_show.css({
                 display: 'block',
