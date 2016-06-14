@@ -127,12 +127,12 @@ function movedComponent() {
             var component_copy = selectedUserComponent.components[del_row][del_col];
             selectedUserComponent.addComponent(component_copy, new_row, new_col);
 
-            Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
-            triggerEdit('cell'+new_row+new_col, false);
+            Display('cell'+ '_' + new_row + '_' + new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
+            triggerEdit('cell'+ '_' + new_row + '_' + new_col, false);
 
         }
 
-        deleteComponent("cell"+del_row+del_col);
+        deleteComponent("cell"+ '_' + del_row + '_' + del_col);
         return true;
     }
     return false;
@@ -239,8 +239,9 @@ function registerTooltipBtnHandlers() {
                 }
             }
 
-            var row = cell_id.substring(4,5);
-            var col = cell_id.substring(5,6);
+            var rowcol = cell_id.split('_');
+            var row = rowcol[rowcol.length-2];
+            var col = cell_id[rowcol.length-1];
             selectedUserComponent.components[row][col].properties[propertyName] = bootstrap_class;
 
         }
