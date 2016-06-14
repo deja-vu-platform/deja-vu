@@ -201,6 +201,12 @@ td {
     position: absolute;
     pointer-events: none;
     visibility: hidden;
+    opacity: .2;
+}
+
+#guide-grid-container td {
+    background-color: transparent;
+    pointer-events: none;
 }
 
 .drag_handle{

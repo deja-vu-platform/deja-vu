@@ -201,7 +201,7 @@ function attachMergeHandlers(){
             var drag_handle = document.createElement('span');
 
             drag_handle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
-            drag_handle.className = 'ui-resizable-handle ui-resizable-se';
+            drag_handle.className = 'ui-resizable-handle ui-resizable-se drag-handle';
             drag_handle.id = 'drag_handle' + row + col;
 
             drag_handle_container.appendChild(drag_handle);
@@ -218,13 +218,13 @@ function attachMergeHandlers(){
             $(drag_handle).mouseenter(function(event, ui){
                 $(this).parent().css({
                     border: 'black 1px dotted'
-               })
+               });
             });
 
             $(drag_handle).mouseleave(function(event, ui){
                 $(this).parent().css({
                     border: 'none'
-                })
+                });
             });
 
             $(drag_handle).css({
@@ -239,8 +239,33 @@ function attachMergeHandlers(){
                 handles: {
                     'se': '#drag_handle' + row + col
                 },
-                //autoHide: true,
+                start: function(event, ui){
+                    $('#guide-grid-container td').css({
+                        border: 'black 1px dotted',
+                        visibility: 'visible'
+                    });
+                    $('.drag-handle').off('mouseenter mouseleave');
+                    $(event.target).css({
+                        border: 'black 1px dotted'
+                    });
+                },
                 stop: function (event, ui) {
+                    $('#guide-grid-container td').css({
+                        border: 'none',
+                        visibility: 'hidden'
+                    });
+                    $('.drag-handle').mouseenter(function(event, ui){
+                        $(this).parent().css({
+                            border: 'black 1px dotted'
+                        });
+                    });
+
+                    $('.drag-handle').mouseleave(function(event, ui){
+                        $(this).parent().css({
+                            border: 'none'
+                        });
+                    });
+
                     var drag_handle_container = $(this);
                     var container_id = drag_handle_container.get(0).id;
                     var row = container_id.substring(21, 22);
@@ -844,8 +869,6 @@ function unmergeCells(cell1_id, cell2_id, component){
                 top: cell_offset.top,
                 left: cell_offset.left,
             });
-
-
 
         }
     }
