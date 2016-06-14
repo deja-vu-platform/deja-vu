@@ -162,6 +162,12 @@ function createTable(grid_width, grid_height) {
             var rowspan = selectedUserComponent.layout[row][col][0];
             var colspan = selectedUserComponent.layout[row][col][1];
 
+            // TODO save initial state
+            //
+            //cell_to_show.data('merged', false);
+            //cell_to_show.data('merged_cell_bottom_right', '');
+
+
             if (rowspan === 0){ // and thus also colspan
                 $(td).css("display", "none");
             } else{
@@ -275,8 +281,6 @@ function attachMergeHandlers(){
 
                     var new_cell = $(all_elts_list).filter('td');
                     var new_cell_id = new_cell.get(0).id;
-                    console.log(new_cell_id);
-
 
                     var new_row;
                     var new_col;
@@ -745,32 +749,48 @@ function mergeCells(cell1_id, cell2_id, component){
     var right_col_num = Math.max(parseInt(col1), parseInt(col2));
 
     var top_left_cell_id = "cell"+top_row_num.toString()+left_col_num.toString();
+    var bottom_right_cell_id = "cell"+bottom_row_num.toString()+right_col_num.toString();
 
-    // hide all the other cells in that block
-    for (var row = top_row_num; row<= bottom_row_num; row++){
-        for (var col = left_col_num; col<=right_col_num; col++){
-            var cell_id = "cell"+row.toString()+col.toString();
-
-            if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
-                deleteComponent(cell_id);
-                continue;
-            }
-            var cell_to_hide = $("#"+cell_id);
-            cell_to_hide.css("display", "none");
-
-            // return rowspan/colspan to 1
-            cell_to_hide.attr("rowSpan", 1);
-            cell_to_hide.attr("colSpan", 1);
-
-            var drag_container_to_hide = $('#drag_handle_container'+row+col);
-            drag_container_to_hide.css('display', 'none');
-
-            // delete any component that was there
-            deleteComponent(cell_id);
-            selectedUserComponent.layout[row][col] = [0,0];
-        }
+    // figure out if this is already a merged cell
+    var merged = $('#' + top_left_cell_id).data('merged');
+    if (merged){
+        var last_merged_cell_bottom_right_id = $('#' + top_left_cell_id).data('merged_cell_bottom_right');
+        // if merged, unmerge the two cells
+        // this also resets the cells to unmerged status
+        unmergeCells(top_left_cell_id, last_merged_cell_bottom_right_id);
     }
 
+    if (top_left_cell_id != bottom_right_cell_id) { // not merging/unmerging to the same cell,
+                                                    // that is, the cell is actually merging to something else
+        // mark cell as merged
+        $('#' + top_left_cell_id).data('merged', true);
+        $('#' + top_left_cell_id).data('merged_cell_bottom_right', bottom_right_cell_id);
+        // hide all the other cells in that block
+        for (var row = top_row_num; row<= bottom_row_num; row++){
+            for (var col = left_col_num; col<=right_col_num; col++){
+                var cell_id = "cell"+row.toString()+col.toString();
+
+                if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
+                    deleteComponent(cell_id);
+                    continue;
+                }
+                var cell_to_hide = $("#"+cell_id);
+                cell_to_hide.css("display", "none");
+
+                // return rowspan/colspan to 1
+                cell_to_hide.attr("rowSpan", 1);
+                cell_to_hide.attr("colSpan", 1);
+
+                var drag_container_to_hide = $('#drag_handle_container'+row+col);
+                drag_container_to_hide.css('display', 'none');
+
+                // delete any component that was there
+                deleteComponent(cell_id);
+                selectedUserComponent.layout[row][col] = [0,0];
+            }
+        }
+
+    }
 
     // Make the first cell take the correct size
     var cell_top_right = $("#" + top_left_cell_id);
@@ -827,6 +847,10 @@ function unmergeCells(cell1_id, cell2_id, component){
             var cell_to_show = $("#"+cell_id);
             cell_to_show.css("display", "table-cell");
 
+            // reset some meta data
+            cell_to_show.data('merged', false);
+            cell_to_show.data('merged_cell_bottom_right', '');
+
             // return rowspan/colspan to 1
             cell_to_show.attr("rowSpan", 1);
             cell_to_show.attr("colSpan", 1);
@@ -837,8 +861,17 @@ function unmergeCells(cell1_id, cell2_id, component){
             // update the datatype
             selectedUserComponent.layout[row][col] = [1,1];
 
+            var drag_container_to_show = $('#drag_handle_container'+row+col);
+            drag_container_to_show.css('display', 'block');
+
+
         }
     }
+
+    // reset to umerged status
+    $('#' + top_left_cell_id).data('merged', false);
+    $('#' + top_left_cell_id).data('merged_cell_bottom_right', '');
+
 
     if (component){
         // add the component to the cell
