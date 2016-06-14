@@ -1,3 +1,15 @@
+/** ** ** ** Constants ** ** ** **/
+var DEFAULT_ROWS = 3;
+var DEFAULT_COLS = 3;
+var DEFAULT_CELL_WIDTH = 250;
+var DEFAULT_CELL_HEIGHT = 250;
+
+var DEFAULT_COMPONENT_NAME = "New Component";
+var DEFAULT_AUTHOR = "Unknown";
+var DEFAULT_VERSION = '0.0.1';
+/** ** ** ** ** ** ** ** ** ** **/
+
+
 
 /**
  * Component
@@ -10,6 +22,7 @@ function Component() {
     this.dimensions = {};
     this.properties = {};
     this.components = {};
+    this.layout = {}; // {row:{col:[rowspan, colspan, isMerged, last_merged_bottom_right_cell_id]}}; [0,0, ...] means hide this cell
 };
 
 
@@ -29,6 +42,14 @@ function BaseComponent(type, components) {
     this.type = type;
     this.components = components;
     this.properties = {};
+    this.meta = {
+        name: '',
+        id: '',
+        version: '',
+        author: ''
+    };
+    this.dimensions = {rows: 1, cols: 1};
+    this.layout = {1:{1:[1,1, false, '']}};
 }
 
 BaseComponent.prototype.setProperty = function(property, value) {
@@ -37,8 +58,6 @@ BaseComponent.prototype.setProperty = function(property, value) {
 BaseComponent.prototype.updateComponent = function(type, value) {
     this.components[type] = value;
 };
-
-
 
 
 
@@ -65,6 +84,14 @@ function ClicheComponent(dimensions, name, id, version, author) {
     this.dimensions = dimensions;
     this.components = {};
     this.properties = {};
+    this.layout = {}; // this is to remember this sizes of different cells
+
+    for (var row = 1; row<=dimensions.rows; row++){
+        this.layout[row] = {};
+        for (var col = 1; col<= dimensions.cols; col++){
+            this.layout[row][col] = [1,1, false, ''];
+        }
+    }
 };
 
 ClicheComponent.prototype.addComponent = function(component, row, col) {
@@ -77,5 +104,5 @@ ClicheComponent.prototype.addComponent = function(component, row, col) {
 
 
 
-selectedUserComponent = new ClicheComponent({rows: 3, cols: 3}, "name", 1, "version", "author");
+selectedUserComponent = new ClicheComponent({rows: DEFAULT_ROWS, cols: DEFAULT_COLS}, DEFAULT_COMPONENT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
 //selectedUserComponent.addComponent({}, 2, 3);

@@ -178,7 +178,7 @@ td {
     height: 600px;
     border: 1px solid #dddddd;
     margin-left: 200px;
-    overflow: scroll;
+    /*overflow: scroll;*/
     /*-webkit-transform: scale(0.45,0.45);*/
     /*-webkit-transform: scale(0.45,0.45);*/
 }
@@ -191,7 +191,32 @@ td {
     height: 650px;
     display: block;
 }
-#grid-container {
+
+
+#guide-grid-container {
+    height: 550px;
+    width: 800px;
+    margin: 50px 100px 10px 50px;
+    float: left;
+    position: absolute;
+    pointer-events: none;
+    visibility: hidden;
+    opacity: .2;
+}
+
+#guide-grid-container td {
+    background-color: transparent;
+    pointer-events: none;
+}
+
+.drag_handle{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 50;
+}
+
+#table-container {
     height: 550px;
     width: 800px;
     margin: 50px 100px 10px 50px;
