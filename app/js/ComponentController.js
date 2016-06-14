@@ -174,7 +174,7 @@ function createTable(grid_width, grid_height) {
 
     //initSVG(grid);
 
-    resizeCell(grid_width, grid_height, num_rows, num_cols);
+    initialResizeCells(grid_width, grid_height, num_rows, num_cols);
 
     attachMergeHandlers();
     registerDroppable();
@@ -417,7 +417,7 @@ function loadTable(grid_width, grid_height, componentToShow) {
  * @param num_rows
  * @param num_cols
  */
-function resizeCell(grid_width, grid_height, num_rows, num_cols) {
+function initialResizeCells(grid_width, grid_height, num_rows, num_cols) {
     cell_width = Math.floor((grid_width / num_cols)) - 15;
     cell_height = Math.floor((grid_height / num_rows)) - 15;
     var tooltip_width = Number($('.tooltip').css('width').substring(0, 3));
@@ -764,7 +764,17 @@ function mergeCells(cell1_id, cell2_id, component) {
                     continue;
                 }
 
-                // then hide the older cells
+                // figure out if this is already a merged cell
+                var merged = $('#' + cell_id).data('merged');
+                if (merged) {
+                    var last_merged_cell_bottom_right_id = $('#' + cell_id).data('merged_cell_bottom_right');
+                    // if merged, unmerge the two cells
+                    // this also resets the cells to unmerged status
+                    unmergeCells(cell_id, last_merged_cell_bottom_right_id);
+                }
+
+
+                // then hide the other cells
                 var cell_to_hide = $("#" + cell_id);
                 cell_to_hide.css("display", "none");
 
@@ -850,6 +860,8 @@ function unmergeCells(cell1_id, cell2_id, component) {
                 display: 'block',
                 top: cell_offset.top,
                 left: cell_offset.left,
+                width: cell_to_show.css('width'),
+                height: cell_to_show.css('height'),
             });
 
         }
