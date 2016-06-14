@@ -62,7 +62,7 @@ function registerDraggable() {
             revert: "invalid",
             cursorAt: { top: 0, left: 0 },
             helper: function(){
-                $('#grid-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
+                $('#table-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
                 //Hack to append the widget to the body (visible above others divs), but still belonging to the scrollable container
                 $("#clone").hide();
                 setTimeout(function(){$('#clone').appendTo('body'); $("#clone").show();},1);
@@ -100,7 +100,7 @@ function resetDroppability(cell_id) {
             $('#'+cell_id).droppable('enable');
         }
     } else {
-        $('td').each(function() {
+        $('#table-container td').each(function() {
             if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
                 $(this).removeClass('dropped');
                 $(this).addClass('droppable');
@@ -120,7 +120,6 @@ function movedComponent() {
 
         var del_row = coord[0];
         var del_col = coord[1];
-        var old_cell = $('#cell'+del_row+del_col).get(0);
         if (typeof coord[2]!=="undefined") { // if move, copy any save data
             var new_row = coord[2];
             var new_col = coord[3];
@@ -128,18 +127,12 @@ function movedComponent() {
             var component_copy = selectedUserComponent.components[del_row][del_col];
             selectedUserComponent.addComponent(component_copy, new_row, new_col);
 
-            //if (Object.keys(component_copy.components).length !== 0) {
             Display('cell'+new_row+new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
-            //}
             triggerEdit('cell'+new_row+new_col, false);
 
         }
-        delete selectedUserComponent.components[del_row][del_col];
-        $(old_cell).find('.config-btns').remove();
-        $(old_cell).find('.tooltip').remove();
-        $(old_cell).find('.label_container').remove();
-        $(old_cell).find('.display_component').remove();
-        //cell.removeChild(cell.firstChild);
+
+        deleteComponent("cell"+del_row+del_col);
         return true;
     }
     return false;
@@ -171,15 +164,15 @@ function triggerEdit(cell_id, popup) {
 
 }
 
-function showConfigOptions(dropped_component, cell) {
+function showConfigOptions(dropped_component_type, cell) {
     // Hide edit button if label or panel
-    if (dropped_component==='label' || dropped_component==='panel') {
+    if (dropped_component_type==='label' || dropped_component_type==='panel') {
         $('#'+cell.id).find('.edit-btn').css('visibility', 'hidden');
     } else {
         $('#'+cell.id).find('.edit-btn').css('visibility', 'visible');
     }
 
-    var configOptions = document.getElementById(dropped_component+'_properties');
+    var configOptions = document.getElementById(dropped_component_type+'_properties');
     if (configOptions==null || configOptions==undefined) {
         return;
     }
