@@ -164,15 +164,15 @@ function triggerEdit(cell_id, popup) {
 
 }
 
-function showConfigOptions(dropped_component, cell) {
+function showConfigOptions(dropped_component_type, cell) {
     // Hide edit button if label or panel
-    if (dropped_component==='label' || dropped_component==='panel') {
+    if (dropped_component_type==='label' || dropped_component_type==='panel') {
         $('#'+cell.id).find('.edit-btn').css('visibility', 'hidden');
     } else {
         $('#'+cell.id).find('.edit-btn').css('visibility', 'visible');
     }
 
-    var configOptions = document.getElementById(dropped_component+'_properties');
+    var configOptions = document.getElementById(dropped_component_type+'_properties');
     if (configOptions==null || configOptions==undefined) {
         return;
     }

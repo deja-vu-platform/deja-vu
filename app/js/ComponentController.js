@@ -136,16 +136,17 @@ function createTable(grid_width, grid_height) {
             sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
 
             var button = sp.firstChild;
+            button.id = 'edit-btn'+row+col;
 
+            td.appendChild(button);
+            tr.appendChild(td);
 
             $(button).on("click", function (e) {
                 //$('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
                 //triggerEdit(td.id);
-                $('#' + td.id).find('.tooltip').addClass('open');
+                var rowcol = this.id.substring(8,10);
+                $('#cell' + rowcol).find('.tooltip').addClass('open');
             });
-
-            td.appendChild(button);
-            tr.appendChild(td);
 
             // change size of cell based on the layout
             var rowspan = selectedUserComponent.layout[row][col][0];
@@ -490,7 +491,6 @@ function addComponent(cell_id, widget, component) {
     var row = cell_id.substring(4, 5);
     var col = cell_id.substring(5, 6);
 
-
     if (!component) {
         var span = document.createElement('span');
         span.innerHTML = widget[0].outerHTML;
@@ -521,7 +521,6 @@ function addComponent(cell_id, widget, component) {
     $('#' + cell_id).removeClass("droppable");
     $('#' + cell_id).droppable('disable');
     registerDraggable();
-    //showConfigOptions(type, document.getElementById(cell_id));
 
     if (!selectedUserComponent.components.hasOwnProperty(row)) {
         selectedUserComponent.components[row] = {};
