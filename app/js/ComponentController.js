@@ -220,16 +220,12 @@ function attachMergeHandlers(){
 
             $(drag_handle).mouseenter(function(event, ui){
                 $(this).parent().css({
-                   //background: 'red',
-                   // opacity: '0.5',
-                   border: 'black 1px dotted'
+                    border: 'black 1px dotted'
                })
             });
 
             $(drag_handle).mouseleave(function(event, ui){
                 $(this).parent().css({
-                    //background: 'none',
-                    //opacity: '0.5',
                     border: 'none'
                 })
             });
@@ -247,7 +243,7 @@ function attachMergeHandlers(){
                     'se': '#drag_handle' + row + col
                 },
                 //autoHide: true,
-                stop: function () {
+                stop: function (event, ui) {
                     var drag_handle_container = $(this);
                     var container_id = drag_handle_container.get(0).id;
                     var row = container_id.substring(21, 22);
@@ -268,12 +264,19 @@ function attachMergeHandlers(){
                         }
                     }
 
-                    //console.log(container_offset);
-                    //console.log(container_height);
-                    //console.log(container_width);
-                    //console.log(grid_offset);
-                    //console.log(grid_height);
-                    //console.log(grid_width);
+
+                    // useful page http://stackoverflow.com/questions/6073505/what-is-the-difference-between-screenx-y-clientx-y-and-pagex-y
+                    // frame of reference fro clientX/Y does not change even if you scroll
+                    var all_elts_list = allElementsFromPoint(event.clientX, event.clientY);
+                    // other interesting functions
+                    // document.elementFromPoint(event.pageX, event.pageY)
+                    // document.querySelectorAll(':hover');
+
+
+                    var new_cell = $(all_elts_list).filter('td');
+                    var new_cell_id = new_cell.get(0).id;
+                    console.log(new_cell_id);
+
 
                     var new_row;
                     var new_col;
@@ -302,11 +305,39 @@ function attachMergeHandlers(){
                         mergeCells('cell' + row + col, 'cell' + row + col, component);
                     }
 
-                }
+                    //console.log(event.pageX);
+                    }
             });
+
+            var rowspan = selectedUserComponent.layout[row][col][0];
+            var colspan = selectedUserComponent.layout[row][col][1];
+
+            if (rowspan === 0){ // and thus also colspan
+                $(drag_handle_container).css("display", "none");
+            }
         }
     }
 
+}
+
+// from http://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
+function allElementsFromPoint(x, y) {
+    var element, elements = [];
+    var old_visibility = [];
+    while (true) {
+        element = document.elementFromPoint(x, y);
+        if (!element || element === document.documentElement) {
+            break;
+        }
+        elements.push(element);
+        old_visibility.push(element.style.visibility);
+        element.style.visibility = 'hidden'; // Temporarily hide the element (without changing the layout)
+    }
+    for (var k = 0; k < elements.length; k++) {
+        elements[k].style.visibility = old_visibility[k];
+    }
+    elements.reverse();
+    return elements;
 }
 
 function createTopGrid() {
@@ -414,7 +445,7 @@ function addComponentToUserComponentsList(newComponent){
         +   '</span>'
         + '</li>';
     $('#user_components_list').append(newComponentElt);
-    $('#selected #modal-title-1').text(name); // TODO: what is this?
+    $('#selected #modal-title-1').text(name);
 
 };
 
