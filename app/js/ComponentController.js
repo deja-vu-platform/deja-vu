@@ -254,14 +254,6 @@ function attachMergeHandlers() {
                     var row = container_id.substring(21, 22);
                     var col = container_id.substring(22, 23);
 
-                    var grid = $('#grid' + row + col);
-                    var grid_offset = grid.offset();
-                    var grid_width = grid.css('width');
-                    var grid_height = grid.css('height');
-                    var container_offset = drag_handle_container.offset();
-                    var container_width = drag_handle_container.css('width');
-                    var container_height = drag_handle_container.css('height');
-
                     var component;
                     if (selectedUserComponent.components[row]) {
                         if (selectedUserComponent.components[row][col]) {
@@ -269,14 +261,18 @@ function attachMergeHandlers() {
                         }
                     }
 
-
+                    // Now we look for the cell to merge into
+                    // In case the cell we are resizing was already merged (ie, we are making it smaller,
+                    // then the cell we want to merge will not be visible. So we need to use the grid.
+                    // For that, we first make the grid visible and able to take mouse events
                     $('#guide-grid-container td').css({
                         'z-index': 100,
                         visibility: 'visible',
                         'pointer-events': 'visiblePainted',
                     });
 
-
+                    // Then we look for the grid element underneath the mouse (this requires the element to be visible
+                    // and able to accept mouse events).
                     // useful page http://stackoverflow.com/questions/6073505/what-is-the-difference-between-screenx-y-clientx-y-and-pagex-y
                     // frame of reference fro clientX/Y does not change even if you scroll
                     var all_elts_list = allElementsFromPoint(event.clientX, event.clientY);
@@ -284,53 +280,21 @@ function attachMergeHandlers() {
                     // document.elementFromPoint(event.pageX, event.pageY)
                     // document.querySelectorAll(':hover');
 
-
+                    // then we reset these values
                     $('#guide-grid-container td').css({
                         'z-index': 0,
                         visibility: 'hidden',
                         'pointer-events': 'none',
-
                     });
 
                     var new_cell_grid = $(all_elts_list).filter('.grid');
-                    var new_cell_rowcol = new_cell_grid[0].id.substring(4, 6);
-                    var new_cell_id = 'cell' + new_cell_rowcol;
-
-                    if (new_cell_id) {
-                        mergeCells('cell' + row + col, new_cell_id, component);
-                    } else {
+                    if (!new_cell_grid[0]) { // it's outside the table
                         mergeCells('cell' + row + col, 'cell' + row + col, component);
+                    } else {
+                        var new_cell_rowcol = new_cell_grid[0].id.substring(4, 6);
+                        var new_cell_id = 'cell' + new_cell_rowcol;
+                        mergeCells('cell' + row + col, new_cell_id, component);
                     }
-
-
-                    //var new_row;
-                    //var new_col;
-                    //// TODO take care of edge case
-                    //if (parseFloat(container_offset.left) + parseFloat(container_width) > parseFloat(grid_offset.left) + parseFloat(grid_width)) {
-                    //    if (parseFloat(container_offset.top) + parseFloat(container_height) > parseFloat(grid_offset.top) + parseFloat(grid_height)) { // right & down
-                    //        new_row = parseInt(row)+1;
-                    //        new_col = parseInt(col)+1;
-                    //
-                    //    } else { // right
-                    //        new_row = row;
-                    //        new_col = parseInt(col)+1;
-                    //    }
-                    //} else {
-                    //    if (parseFloat(container_offset.top) + parseFloat(container_height) > parseFloat(grid_offset.top) + parseFloat(grid_height)) { // right & down
-                    //        new_row = parseInt(row)+1;
-                    //        new_col = col;
-                    //    } else { // none
-                    //        new_row = row;
-                    //        new_col = col;
-                    //    }
-                    //}
-                    //if (!(new_row>num_rows || new_col>num_cols)){
-                    //    mergeCells('cell' + row + col, 'cell' + new_row + new_col, component);
-                    //} else {
-                    //    mergeCells('cell' + row + col, 'cell' + row + col, component);
-                    //}
-
-                    //console.log(event.pageX);
 
                     // rest event handlers
                     $('#guide-grid-container td').css({
@@ -347,8 +311,6 @@ function attachMergeHandlers() {
                             border: 'none'
                         });
                     });
-
-
                 }
             });
 
