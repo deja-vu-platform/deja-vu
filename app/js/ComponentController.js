@@ -312,6 +312,9 @@ function attachMergeHandlers() {
                             border: 'none'
                         });
                     });
+                    $('.drag-handle').parent().css({
+                        border: 'none'
+                    });
                 }
             });
 
