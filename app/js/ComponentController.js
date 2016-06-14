@@ -123,14 +123,14 @@ function createTable(grid_width, grid_height) {
 
     var grid = document.createElement('table');
     grid.className = 'table_outter';
-    for (var row=1; row<=num_rows; row++) {
+    for (var row = 1; row <= num_rows; row++) {
         var tr = document.createElement('tr');
-        tr.className = 'row'+row;
-        for (var col=1; col<=num_cols; col++) {
+        tr.className = 'row' + row;
+        for (var col = 1; col <= num_cols; col++) {
             var td = document.createElement('td');
-            td.className = 'droppable col'+col;
+            td.className = 'droppable cell col' + col;
 
-            td.id = 'cell'+row+col;
+            td.id = 'cell' + row + col;
 
             var sp = document.createElement('span');
             sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
@@ -185,8 +185,9 @@ function createTable(grid_width, grid_height) {
     createTopGrid();
 }
 
-function attachMergeHandlers(){
-    for (var row=1; row<=num_rows; row++) {
+function attachMergeHandlers() {
+    $('#drag-handle-containers-container').html('');
+    for (var row = 1; row <= num_rows; row++) {
         for (var col = 1; col <= num_cols; col++) {
             var td = $("#cell" + row + col);
 
@@ -248,22 +249,6 @@ function attachMergeHandlers(){
                     });
                 },
                 stop: function (event, ui) {
-                    $('#guide-grid-container td').css({
-                        border: 'none',
-                        visibility: 'hidden'
-                    });
-                    $('.drag-handle').mouseenter(function(event, ui){
-                        $(this).parent().css({
-                            border: 'black 1px dotted'
-                        });
-                    });
-
-                    $('.drag-handle').mouseleave(function(event, ui){
-                        $(this).parent().css({
-                            border: 'none'
-                        });
-                    });
-
                     var drag_handle_container = $(this);
                     var container_id = drag_handle_container.get(0).id;
                     var row = container_id.substring(21, 22);
@@ -278,11 +263,18 @@ function attachMergeHandlers(){
                     var container_height = drag_handle_container.css('height');
 
                     var component;
-                    if (selectedUserComponent.components[row]){
-                        if (selectedUserComponent.components[row][col]){
+                    if (selectedUserComponent.components[row]) {
+                        if (selectedUserComponent.components[row][col]) {
                             component = selectedUserComponent.components[row][col];
                         }
                     }
+
+
+                    $('#guide-grid-container td').css({
+                        'z-index': 100,
+                        visibility: 'visible',
+                        'pointer-events': 'visiblePainted',
+                    });
 
 
                     // useful page http://stackoverflow.com/questions/6073505/what-is-the-difference-between-screenx-y-clientx-y-and-pagex-y
@@ -397,14 +389,14 @@ function createTopGrid() {
     var grid = document.createElement('table');
     grid.className = 'table_outter';
 
-    for (var row=1; row<=num_rows; row++) {
+    for (var row = 1; row <= num_rows; row++) {
         var tr = document.createElement('tr');
-        tr.className = 'row'+row;
+        tr.className = 'row' + row;
 
-        for (var col=1; col<=num_cols; col++) {
+        for (var col = 1; col <= num_cols; col++) {
             var td = document.createElement('td');
-            td.id = 'grid'+row+col;
-            td.className = 'col'+col;
+            td.id = 'grid' + row + col;
+            td.className = 'grid col' + col;
 
             tr.appendChild(td);
         }
