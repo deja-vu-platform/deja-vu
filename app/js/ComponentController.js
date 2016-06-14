@@ -714,18 +714,6 @@ function resizeLabelDivs(cell_width, cell_height) {
  */
 function mergeCells(cell1_id, cell2_id, component){
     // first check for top left cell and bottom right cell
-
-    // then check legality: are there any other components in the way
-        // this might be done before calling the method
-        // in fact, I will delete any in this function!
-
-    // then col span and row span the first cell
-    // then remove the older cells
-    // then put the component in there
-
-    // TODO problem: should also figure out how to revert the merge, maybe have some data on which cells were merged
-    // TODO problem: what about when views are changed and this is brought back
-
     var row1 = cell1_id.substring(4,5);
     var col1 = cell1_id.substring(5,6);
 
@@ -761,10 +749,15 @@ function mergeCells(cell1_id, cell2_id, component){
             for (var col = left_col_num; col<=right_col_num; col++){
                 var cell_id = "cell"+row.toString()+col.toString();
 
+                // delete any component that was there
+                // TODO: note: checks should be made before calling this function!
+                deleteComponent(cell_id);
+
                 if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
-                    deleteComponent(cell_id);
                     continue;
                 }
+
+                // then hide the older cells
                 var cell_to_hide = $("#"+cell_id);
                 cell_to_hide.css("display", "none");
 
@@ -775,8 +768,6 @@ function mergeCells(cell1_id, cell2_id, component){
                 var drag_container_to_hide = $('#drag_handle_container'+row+col);
                 drag_container_to_hide.css('display', 'none');
 
-                // delete any component that was there
-                deleteComponent(cell_id);
                 selectedUserComponent.layout[row][col] = [0,0, false, ''];
             }
         }
@@ -794,8 +785,10 @@ function mergeCells(cell1_id, cell2_id, component){
         height: cell_top_right.css('height'),
     });
 
+    // update the datatype
     selectedUserComponent.layout[top_row_num][left_col_num] = [rowspan, colspan, true, bottom_right_cell_id];
 
+    // then put the component in there
     if (component){
         // add the component to the cell
         addComponent(top_left_cell_id, false, component);
