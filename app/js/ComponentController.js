@@ -1,13 +1,4 @@
-/** ** ** ** Constants ** ** ** **/
-var DEFAULT_ROWS = 3;
-var DEFAULT_COLS = 3;
-var DEFAULT_CELL_WIDTH = 250;
-var DEFAULT_CELL_HEIGHT = 250;
 
-var DEFAULT_COMPONENT_NAME = "New Component";
-var DEFAULT_AUTHOR = "Unknown";
-var DEFAULT_VERSION = '0.0.1';
-/** ** ** ** ** ** ** ** ** ** **/
 
 var num_rows = DEFAULT_ROWS;
 var num_cols = DEFAULT_COLS;
@@ -162,11 +153,11 @@ function createTable(grid_width, grid_height) {
             var rowspan = selectedUserComponent.layout[row][col][0];
             var colspan = selectedUserComponent.layout[row][col][1];
 
-            // TODO save initial state
-            //
-            //cell_to_show.data('merged', false);
-            //cell_to_show.data('merged_cell_bottom_right', '');
+            var isMerged = selectedUserComponent.layout[row][col][2];
+            var last_merged_bottom_right_cell_id = selectedUserComponent.layout[row][col][3];
 
+            $(td).data('merged', isMerged);
+            $(td).data('merged_cell_bottom_right', last_merged_bottom_right_cell_id);
 
             if (rowspan === 0){ // and thus also colspan
                 $(td).css("display", "none");
@@ -786,7 +777,7 @@ function mergeCells(cell1_id, cell2_id, component){
 
                 // delete any component that was there
                 deleteComponent(cell_id);
-                selectedUserComponent.layout[row][col] = [0,0];
+                selectedUserComponent.layout[row][col] = [0,0, false, ''];
             }
         }
 
@@ -803,7 +794,7 @@ function mergeCells(cell1_id, cell2_id, component){
         height: cell_top_right.css('height'),
     });
 
-    selectedUserComponent.layout[top_row_num][left_col_num] = [rowspan, colspan];
+    selectedUserComponent.layout[top_row_num][left_col_num] = [rowspan, colspan, true, bottom_right_cell_id];
 
     if (component){
         // add the component to the cell
@@ -837,13 +828,8 @@ function unmergeCells(cell1_id, cell2_id, component){
         for (var col = left_col_num; col<=right_col_num; col++){
             var cell_id = "cell"+row.toString()+col.toString();
             // update the datatype
-            selectedUserComponent.layout[row][col] = [1,1];
+            selectedUserComponent.layout[row][col] = [1,1, false, ''];
 
-            if ((row == top_row_num) && (col == left_col_num)){ // the cell we just made bigger
-                // delete any component that was there
-                deleteComponent(cell_id);
-                continue;
-            }
             var cell_to_show = $("#"+cell_id);
             cell_to_show.css("display", "table-cell");
 
@@ -858,20 +844,18 @@ function unmergeCells(cell1_id, cell2_id, component){
             // delete any component that was there
             deleteComponent(cell_id);
 
-            // update the datatype
-            selectedUserComponent.layout[row][col] = [1,1];
-
             var drag_container_to_show = $('#drag_handle_container'+row+col);
-            drag_container_to_show.css('display', 'block');
+            var cell_offset = cell_to_show.offset();
+            drag_container_to_show.css({
+                display: 'block',
+                top: cell_offset.top,
+                left: cell_offset.left,
+            });
+
 
 
         }
     }
-
-    // reset to umerged status
-    $('#' + top_left_cell_id).data('merged', false);
-    $('#' + top_left_cell_id).data('merged_cell_bottom_right', '');
-
 
     if (component){
         // add the component to the cell
