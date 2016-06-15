@@ -17,7 +17,7 @@ $(function () {
     selectedUserComponent = "in jq";
 
     // start a default component
-    InitClicheComponent(true);
+    initClicheComponent(true);
     var grid = $('#table-container').get(0);
     grid_width = grid.offsetWidth;
     grid_height = grid.offsetHeight;
@@ -34,7 +34,7 @@ $('#select-cols').on('change', function (e) {
 });
 
 $('#create_component').on('click', function () {
-    InitClicheComponent(false);
+    initClicheComponent(false);
     createTable(grid_width, grid_height, false);
     resetMenuOptions();
 });
@@ -191,7 +191,7 @@ function createTable(grid_width, grid_height) {
     bitmap_old = make2dArray(num_rows, num_cols);
     bitmap_new = make2dArray(num_rows, num_cols);
 
-    createTopGrid();
+    createGuideGrid();
 }
 
 function attachMergeHandlers() {
@@ -301,8 +301,8 @@ function attachMergeHandlers() {
                     if (!new_cell_grid[0]) { // it's outside the table
                         mergeCells('cell' + '_' + row + '_' + col, 'cell' + '_' + row + '_' + col, component);
                     } else {
-                        var new_cell_rowcol = new_cell_grid[0].id.split('_');
-                        var new_cell_id = 'cell' + '_' + new_cell_rowcol[new_cell_rowcol.length-2] + '_' + new_cell_rowcol[new_cell_rowcol.length-1];
+                        var new_cell_grid_rowcol = new_cell_grid[0].id.split('_');
+                        var new_cell_id = 'cell' + '_' + new_cell_grid_rowcol[new_cell_grid_rowcol.length-2] + '_' + new_cell_grid_rowcol[new_cell_grid_rowcol.length-1];
                         mergeCells('cell' + '_' + row + '_' + col, new_cell_id, component);
                     }
 
@@ -358,7 +358,7 @@ function allElementsFromPoint(x, y) {
     return elements;
 }
 
-function createTopGrid() {
+function createGuideGrid() {
     $('#guide-grid-container').html('');
 
     var grid = document.createElement('table');
@@ -472,7 +472,7 @@ function addComponentToUserComponentsList(newComponent) {
  * @param isDefault
  * @constructor
  */
-function InitClicheComponent(isDefault) {
+function initClicheComponent(isDefault) {
     var name, version, author;
     if (isDefault) {
         name = DEFAULT_COMPONENT_NAME;
