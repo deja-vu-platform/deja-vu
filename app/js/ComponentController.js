@@ -97,7 +97,7 @@ $('#user-components-list').on('keypress', '.new-name-input', function (event) {
         }
         componentNameElt.text($(this).val());
         // update the display of the component box
-        $('<style>.maintable::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
+        $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
         selectedUserComponent.meta.name = $(this).val();
     }
@@ -192,7 +192,7 @@ function createTable(gridWidth, gridHeight) {
     $('#table-container').html('');
 
     var tableGrid = document.createElement('table');
-    tableGrid.className = 'maintable';
+    tableGrid.className = 'main-table';
     for (var row = 1; row <= numRows; row++) {
         var tr = createEmptyRow(row);
         for (var col = 1; col <= numCols; col++) {
@@ -384,7 +384,7 @@ function createGuideGrid() {
     $('#guide-grid-container').html('');
 
     var grid = document.createElement('table');
-    grid.className = 'maintable';
+    grid.className = 'main-table';
 
     for (var row = 1; row <= numRows; row++) {
         var tr = createEmptyRow(row);
@@ -406,7 +406,7 @@ function createGuideGrid() {
  * @param componentToShow
  */
 function loadTable(gridWidth, gridHeight, componentToShow) {
-    $('<style>.maintable::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
+    $('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
     numRows = componentToShow.dimensions.rows;
     numCols = componentToShow.dimensions.cols;
     createTable(gridWidth, gridHeight);
@@ -497,7 +497,7 @@ function initClicheComponent(isDefault) {
         version = $('#component-version').val();
         author = $('#component-author').val();
     }
-    $('<style>.maintable::after{content:"' + name + '"}</style>').appendTo('head');
+    $('<style>.main-table::after{content:"' + name + '"}</style>').appendTo('head');
     var newComponent = new ClicheComponent({rows: numRows, cols: numCols}, name, 1, version, author);
 
     addComponentToUserComponentsList(newComponent);
