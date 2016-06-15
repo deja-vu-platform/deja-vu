@@ -114,6 +114,67 @@ function resetMenuOptions() {
 }
 
 /**
+ * Requires that the row, col in the datatype is already created
+ * @param row
+ * @param col
+ * @returns {Element}
+ */
+function createTableCell(row, col){
+    var td = document.createElement('td');
+    td.className = 'droppable cell col' + '_' + col;
+
+    td.id = 'cell' + '_' + row + '_' + col;
+
+    var sp = document.createElement('span');
+    sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
+
+    var button = sp.firstChild;
+    button.id = 'edit-btn' + '_' + row + '_' + col;
+
+    td.appendChild(button);
+
+
+    $(button).on("click", function (e) {
+        var rowcol = this.id.split('_');
+        $('#cell' + '_' + rowcol[rowcol.length-2] + '_' + rowcol[rowcol.length-1]).find('.tooltip').addClass('open');
+    });
+
+    // change size of cell based on the layout
+    var rowspan = selectedUserComponent.layout[row][col][0];
+    var colspan = selectedUserComponent.layout[row][col][1];
+
+    var isMerged = selectedUserComponent.layout[row][col][2];
+    var last_merged_bottom_right_cell_id = selectedUserComponent.layout[row][col][3];
+
+    $(td).data('merged', isMerged);
+    $(td).data('merged_cell_bottom_right', last_merged_bottom_right_cell_id);
+
+    if (rowspan === 0) { // and thus also colspan
+        $(td).css("display", "none");
+    } else {
+        $(td).attr("rowSpan", rowspan);
+        $(td).attr("colSpan", colspan);
+    }
+
+    return td;
+}
+
+
+function createGridCell(row, col){
+    var td = document.createElement('td');
+    td.id = 'grid' + '_' + row + '_' + col;
+    td.className = 'grid col' + '_' + col;
+    return td;
+}
+
+function createEmptyRow(rowNumber){
+    var tr = document.createElement('tr');
+    tr.className = 'row' + '_' + rowNumber;
+    return tr;
+}
+
+
+/**
  * Generate the table
  * @param grid_width
  * @param grid_height
@@ -129,59 +190,19 @@ function createTable(grid_width, grid_height) {
 
     $('#table-container').html('');
 
-    var grid = document.createElement('table');
-    grid.className = 'table_outter';
+    var tableGrid = document.createElement('table');
+    tableGrid.className = 'table_outter';
     for (var row = 1; row <= num_rows; row++) {
-        var tr = document.createElement('tr');
-        tr.className = 'row' + '_' + row;
+        var tr = createEmptyRow(row);
         for (var col = 1; col <= num_cols; col++) {
-            var td = document.createElement('td');
-            td.className = 'droppable cell col' + '_' + col;
-
-            td.id = 'cell' + '_' + row + '_' + col;
-
-            var sp = document.createElement('span');
-            sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
-
-            var button = sp.firstChild;
-            button.id = 'edit-btn' + '_' + row + '_' + col;
-
-            td.appendChild(button);
+            var td = createTableCell(row, col);
             tr.appendChild(td);
-
-            $(button).on("click", function (e) {
-                //$('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
-                //triggerEdit(td.id);
-                var rowcol = this.id.split('_');
-                $('#cell' + '_' + rowcol[rowcol.length-2] + '_' + rowcol[rowcol.length-1]).find('.tooltip').addClass('open');
-            });
-
-            // change size of cell based on the layout
-            var rowspan = selectedUserComponent.layout[row][col][0];
-            var colspan = selectedUserComponent.layout[row][col][1];
-
-            var isMerged = selectedUserComponent.layout[row][col][2];
-            var last_merged_bottom_right_cell_id = selectedUserComponent.layout[row][col][3];
-
-            $(td).data('merged', isMerged);
-            $(td).data('merged_cell_bottom_right', last_merged_bottom_right_cell_id);
-
-            if (rowspan === 0) { // and thus also colspan
-                $(td).css("display", "none");
-            } else {
-                $(td).attr("rowSpan", rowspan);
-                $(td).attr("colSpan", colspan);
-            }
-
         }
-
-        grid.appendChild(tr);
+        tableGrid.appendChild(tr);
 
     }
 
-    document.getElementById('table-container').appendChild(grid);
-
-    //initSVG(grid);
+    document.getElementById('table-container').appendChild(tableGrid);
 
     initialResizeCells(grid_width, grid_height, num_rows, num_cols);
 
@@ -365,14 +386,10 @@ function createGuideGrid() {
     grid.className = 'table_outter';
 
     for (var row = 1; row <= num_rows; row++) {
-        var tr = document.createElement('tr');
-        tr.className = 'row' + '_' + row;
+        var tr = createEmptyRow(row);
 
         for (var col = 1; col <= num_cols; col++) {
-            var td = document.createElement('td');
-            td.id = 'grid' + '_' + row + '_' + col;
-            td.className = 'grid col' + '_' + col;
-
+            var td = createGridCell(row, col);
             tr.appendChild(td);
         }
         grid.appendChild(tr);
@@ -896,3 +913,69 @@ function unmergeCells(cell1_id, cell2_id, component) {
 
 }
 
+
+/*
+    Adding and deleting rows and columns
+ */
+
+/**
+ * Adds a row to the end
+ * Mutates selectedUserComponent
+ */
+function addRowToEnd(){
+    var lastRowNum = selectedUserComponent.dimensions.rows;
+
+    // datatype update
+    selectedUserComponent.dimensions.rows += 1;
+    num_rows += 1;
+    selectedUserComponent.layout[lastRowNum+1] = {}
+
+    // visual update
+    //var tableRow = $('#table-container table').get(0).insertRow(lastRowNum);
+    var tableRow = createEmptyRow(lastRowNum + 1);
+    //var gridRow = $('#guide-grid-container table').get(0).insertRow(lastRowNum);
+    var gridRow = createEmptyRow(lastRowNum + 1);
+
+    for (var i = 1; i<= selectedUserComponent.dimensions.cols; i++){
+        selectedUserComponent.layout[lastRowNum+1][i] = [1,1, false, ''];
+        var tableCell = createTableCell(lastRowNum+1, i);
+        tableRow.appendChild(tableCell);
+        var gridCell = createGridCell(lastRowNum+1, i);
+        gridRow.appendChild(gridCell);
+    }
+    $('#table-container table').append(tableRow);
+    $('#guide-grid-container table').append(gridRow);
+
+    attachMergeHandlers();
+    bitmap_new = make2dArray(num_rows, num_cols);
+    updateBitmap();
+    // from http://stackoverflow.com/questions/597588/how-do-you-clone-an-array-of-objects-in-javascript
+    bitmap_old = JSON.parse(JSON.stringify(bitmap_new)); // as not to have issues with the old and the new having
+                                                         // different numbers of rows
+}
+
+/**
+ * Removes the end row
+ * Does nothing if there is only one row left
+ * Mutates selectedUserComponent
+ */
+function removeEndRow(){
+
+}
+
+/**
+ * Adds a column to the end
+ * Mutates selectedUserComponent
+ */
+function addColToEnd(){
+
+}
+
+/**
+ * Remove end columns
+ * Does nothing if there is only one column left
+ * Mutates selectedUserComponent
+ */
+function removeEndCol(){
+
+}
