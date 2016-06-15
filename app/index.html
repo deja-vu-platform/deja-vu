@@ -22,19 +22,19 @@
         <div class="menu-item logo">Déjà Vu UI builder</div>
 
         <div class="menu-item">
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load_component">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
                 <span class="glyphicon glyphicon-file"></span> Open...
             </button>
         </div>
 
         <div class="menu-item">
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new_component">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component">
                 <span class="glyphicon glyphicon-plus"></span> New component
             </button>
         </div>
 
         <div class="menu-item">
-            <button type="button" class="btn btn-default" id="save_component">
+            <button type="button" class="btn btn-default" id="save-component">
                 <span class="glyphicon glyphicon-save"></span> Save component
             </button>
         </div>
@@ -59,22 +59,22 @@
 
 
 <div class="components">
-    <div class="user_components">
+    <div class="user-components">
         <div class="header">User components</div>
         <div class="content">
-            <ul id="user_components_list">
+            <ul id="user-components-list">
             </ul>
         </div>
     </div>
 
-    <div class="basic_components">
+    <div class="basic-components">
         <div class="header">Basic components</div>
         <div class="content">
-            <ul id="basic_components">
+            <ul id="basic-components">
                 <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
                 <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
                 <li name="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Media</li>
-                <li name="tab_viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs</li>
+                <li name="tab-viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs</li>
                 <li name="menu" class="draggable widget"><img src="images/menu_icon.png" width="15px" height="15px"> Menu</li>
                 <li name="panel" class="draggable widget"><img src="images/panel_icon.png" width="15px" height="15px"> Panel</li>
 
@@ -82,7 +82,7 @@
         </div>
     </div>
 
-    <div class="cliche_components">
+    <div class="cliche-components">
         <div class="header">Cliché components</div>
         <div class="content">
             <ul>
@@ -115,9 +115,9 @@
 
 </div>
 
-<div id="zoom_control">
-    <button id="zoomIn" class="zoom_control_button">+</button><br/>
-    <button id="zoomOut" class="zoom_control_button">-</button>
+<div id="zoom-control">
+    <button id="zoomIn" class="zoom-control-button">+</button><br/>
+    <button id="zoomOut" class="zoom-control-button">-</button>
 </div>
 
 <div id="trash" class="droppable">
@@ -125,12 +125,12 @@
 </div>
 
 <!--EDIT PROPERTIES POPUPS-->
-<div class="not_displayed">
-    <div id="link_popup_holder">
+<div class="not-displayed">
+    <div id="link-popup-holder">
         <div class="tooltip">
             <div class="panel panel-default">
                 <div class="panel-heading"><strong>Link</strong>
-                    <button type="button" class="close close_btn"><small>x</small></button>
+                    <button type="button" class="close close-btn"><small>x</small></button>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -149,7 +149,7 @@
     </div>
 
 
-    <div id="link_properties">
+    <div id="link-properties">
         <div class="config-btns">
             <span class="btn-group btn-group-xs">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -183,11 +183,11 @@
     </div>
 
 
-    <div id="label_popup_holder">
-        <div id="label_popup" class="tooltip">
+    <div id="label-popup-holder">
+        <div id="label-popup" class="tooltip">
             <div class="panel panel-default">
                 <div class="panel-heading"><strong>Label text</strong>
-                    <button type="button" class="close close_btn"><small>x</small></button>
+                    <button type="button" class="close close-btn"><small>x</small></button>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -201,7 +201,7 @@
 
 
 
-    <div id="label_properties">
+    <div id="label-properties">
         <div class="config-btns">
             <span class="btn-group btn-group-xs">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -246,11 +246,11 @@
     </div>
 
 
-    <div id="image_popup_holder">
-        <div id="img_popup" class="tooltip">
+    <div id="image-popup-holder">
+        <div id="img-popup" class="tooltip">
             <div class="panel panel-default">
                 <div class="panel-heading"><strong>Upload image or video</strong>
-                    <button type="button" class="close close_btn"><small>x</small></button>
+                    <button type="button" class="close close-btn"><small>x</small></button>
                 </div>
                 <div class="panel-body">
                     <div class="row"><div class="col-sm-3 form-lbl"><h6>Paste link:</h6></div>
@@ -278,11 +278,11 @@
         </div>
     </div>
 
-    <div id="tab_viewer_popup_holder">
-        <div id="tab_popup" class="tooltip">
+    <div id="tab-viewer-popup-holder">
+        <div id="tab-popup" class="tooltip">
             <div class="panel panel-default">
                 <div class="panel-heading"><strong>Tab Viewer</strong>
-                    <button type="button" class="close close_btn"><small>x</small></button>
+                    <button type="button" class="close close-btn"><small>x</small></button>
                 </div>
                 <div class="panel-body tabs">
                     <div class="row">
@@ -318,7 +318,7 @@
         </div>
     </div>
 
-    <div id="tab_viewer_properties">
+    <div id="tab-viewer-properties">
         <div class="config-btns">
             <span class="btn-group btn-group-xs">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -343,11 +343,11 @@
         </div>
     </div>
 
-    <div id="menu_popup_holder">
-        <div id="menu_popup" class="tooltip">
+    <div id="menu-popup-holder">
+        <div id="menu-popup" class="tooltip">
             <div class="panel panel-default">
                 <div class="panel-heading"><strong>Menu</strong>
-                    <button type="button" class="close close_btn"><small>x</small></button>
+                    <button type="button" class="close close-btn"><small>x</small></button>
                 </div>
                 <div class="panel-body tabs">
                     <div class="row">
@@ -383,7 +383,7 @@
         </div>
     </div>
 
-    <div id="menu_properties">
+    <div id="menu-properties">
         <div class="config-btns">
             <span class="btn-group btn-group-xs">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -398,11 +398,11 @@
         </div>
     </div>
 
-    <div id="panel_popup_holder">
+    <div id="panel-popup-holder">
         <div class="tooltip">
             <div class="panel panel-default">
                 <div class="panel-heading"><strong>Panel</strong>
-                    <button type="button" class="close close_btn"><small>x</small></button>
+                    <button type="button" class="close close-btn"><small>x</small></button>
                 </div>
                 <div class="panel-body">
                     <div class="row">
@@ -420,7 +420,7 @@
         </div>
     </div>
 
-    <div id="panel_properties">
+    <div id="panel-properties">
         <div class="config-btns">
             <span class="btn-group btn-group-xs">
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -472,7 +472,7 @@
 
 
 <!--MODALS-->
-<div class="modal fade" id="new_component">
+<div class="modal fade" id="new-component">
     <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header">
@@ -483,7 +483,7 @@
                 <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Component name: </div>
-                    <div class="col-sm-7"><input id="new_component_name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                    <div class="col-sm-7"><input id="new-component-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
                     <div class="col-sm-1"></div>
                 </div><br/>
                 <div class="row">
@@ -525,24 +525,24 @@
                 <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Version: </div>
-                    <div class="col-sm-7"><input id="component_version" type="text" class="form-control" required placeholder="e.g.: 0.1.0"/></div>
+                    <div class="col-sm-7"><input id="component-version" type="text" class="form-control" required placeholder="e.g.: 0.1.0"/></div>
                     <div class="col-sm-1"></div>
                 </div><br/>
                 <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Author: </div>
-                    <div class="col-sm-7"><input id="component_author" type="text" class="form-control" required placeholder="e.g.: Dijkstra..."/></div>
+                    <div class="col-sm-7"><input id="component-author" type="text" class="form-control" required placeholder="e.g.: Dijkstra..."/></div>
                     <div class="col-sm-1"></div>
                 </div><br/>
             </div>
             <div class="modal-footer">
-                <p><button id="create_component" data-dismiss="modal" class="btn btn-primary">Create</button>
+                <p><button id="create-component" data-dismiss="modal" class="btn btn-primary">Create</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<div class="modal fade" id="load_component">
+<div class="modal fade" id="load-component">
     <div class="modal-dialog modal-md">
         <div class="modal-content">
             <div class="modal-header">
@@ -551,10 +551,10 @@
             </div>
             <div class="modal-body">
                 <div>Paste JSON here:</div>
-                <div><textarea id="component_json" rows="10" class="form-control" required></textarea></div>
+                <div><textarea id="component-json" rows="10" class="form-control" required></textarea></div>
             </div>
             <div class="modal-footer">
-                <button id="load_component_btn" data-dismiss="modal" class="btn btn-primary">Load</button>
+                <button id="load-component-btn" data-dismiss="modal" class="btn btn-primary">Load</button>
             </div>
         </div><!-- /.modal-content -->
     </div><!-- /.modal-dialog -->

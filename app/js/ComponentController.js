@@ -1,15 +1,18 @@
-var num_rows = DEFAULT_ROWS;
-var num_cols = DEFAULT_COLS;
-var cell_width = DEFAULT_CELL_WIDTH;
-var cell_height = DEFAULT_CELL_HEIGHT;
+var numRows = DEFAULT_ROWS;
+var numCols = DEFAULT_COLS;
+var cellWidth = DEFAULT_CELL_WIDTH;
+var cellHeight = DEFAULT_CELL_HEIGHT;
 var files = [];
 
 // currently save components in this array
 var userComponents = [];
 var numComponents = userComponents.length - 1; // -1 to enable 0-indexing
 var selectedUserComponent = null;
-var bitmap_old = null;
-var bitmap_new = null;
+var bitmapOld = null;
+var bitmapNew = null;
+
+var gridWidth;
+var gridHeight;
 
 // Initialization
 $(function () {
@@ -19,34 +22,34 @@ $(function () {
     // start a default component
     initClicheComponent(true);
     var grid = $('#table-container').get(0);
-    grid_width = grid.offsetWidth;
-    grid_height = grid.offsetHeight;
-    createTable(grid_width, grid_height);
+    gridWidth = grid.offsetWidth;
+    gridHeight = grid.offsetHeight;
+    createTable(gridWidth, gridHeight);
 
 });
 
 $('#select-rows').on('change', function (e) {
-    num_rows = $(this).val();
+    numRows = $(this).val();
 });
 
 $('#select-cols').on('change', function (e) {
-    num_cols = $(this).val();
+    numCols = $(this).val();
 });
 
-$('#create_component').on('click', function () {
+$('#create-component').on('click', function () {
     initClicheComponent(false);
-    createTable(grid_width, grid_height, false);
+    createTable(gridWidth, gridHeight, false);
     resetMenuOptions();
 });
 
-$('#load_component_btn').on('click', function () {
-    selectedUserComponent = JSON.parse($('#component_json').val());
-    loadTable(grid_width, grid_height, selectedUserComponent);
+$('#load-component-btn').on('click', function () {
+    selectedUserComponent = JSON.parse($('#component-json').val());
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
     addComponentToUserComponentsList(selectedUserComponent);
     resetMenuOptions();
 });
 
-$('#save_component').on('click', function () {
+$('#save-component').on('click', function () {
 
     window.open("data:text/json;charset=utf-8," +
         encodeURIComponent(JSON.stringify(selectedUserComponent, null, '\t')));
@@ -57,44 +60,44 @@ $('#save_component').on('click', function () {
     //    JSON.stringify(selectedUserComponent, null, '\t')+'</textarea></p>';
 });
 
-$('#user_components_list').on('click', 'li', function () {
+$('#user-components-list').on('click', 'li', function () {
     var componentNumber = $(this).data('componentnumber');
     $('#selected').removeAttr('id');
-    $($('#user_components_list li')[componentNumber]).attr('id', 'selected');
+    $($('#user-components-list li')[componentNumber]).attr('id', 'selected');
     selectedUserComponent = userComponents[componentNumber];
-    loadTable(grid_width, grid_height, selectedUserComponent);
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
 });
 
-$('#user_components_list').on('dblclick', '.component_name', function () {
+$('#user-components-list').on('dblclick', '.component-name', function () {
     var componentNumber = $(this).parent().data('componentnumber');
-    var componentToRename = $($('#user_components_list li')[componentNumber]);
-    var new_name_input_elt = $(componentToRename.find('.new_name_input'));
-    var submit_rename_elt = $(componentToRename.find('.submit_rename'));
-    new_name_input_elt.val($(this).text());
-    submit_rename_elt.removeClass('not_displayed');
-    $(this).addClass('not_displayed');
-    new_name_input_elt.focus();
-    new_name_input_elt.select();
+    var componentToRename = $($('#user-components-list li')[componentNumber]);
+    var newNameInputElt = $(componentToRename.find('.new-name-input'));
+    var submitRenameElt = $(componentToRename.find('.submit-rename'));
+    newNameInputElt.val($(this).text());
+    submitRenameElt.removeClass('not-displayed');
+    $(this).addClass('not-displayed');
+    newNameInputElt.focus();
+    newNameInputElt.select();
 });
 
-$('#user_components_list').on('keypress', '.new_name_input', function (event) {
+$('#user-components-list').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
         var componentNumber = $(this).parent().parent().data('componentnumber');
-        var componentToRename = $($('#user_components_list li')[componentNumber]);
-        var component_name_elt = $(componentToRename.find('.component_name'));
-        var submit_rename_elt = $(componentToRename.find('.submit_rename'));
+        var componentToRename = $($('#user-components-list li')[componentNumber]);
+        var componentNameElt = $(componentToRename.find('.component-name'));
+        var submitRenameElt = $(componentToRename.find('.submit-rename'));
 
 
-        component_name_elt.removeClass('not_displayed');
-        submit_rename_elt.addClass('not_displayed');
+        componentNameElt.removeClass('not-displayed');
+        submitRenameElt.addClass('not-displayed');
         var newName = $(this).val();
         if (newName.length === 0) { // empty string entered, don't change the name!
             return;
         }
-        component_name_elt.text($(this).val());
+        componentNameElt.text($(this).val());
         // update the display of the component box
-        $('<style>.table_outter::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
+        $('<style>.maintable::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
         selectedUserComponent.meta.name = $(this).val();
     }
@@ -106,11 +109,11 @@ $('#user_components_list').on('keypress', '.new_name_input', function (event) {
 function resetMenuOptions() {
     $('#select-rows').val(DEFAULT_ROWS);
     $('#select-cols').val(DEFAULT_COLS);
-    $('#new_component_name').val('');
-    $('#component_version').val('');
-    $('#component_author').val('');
+    $('#new-component-name').val('');
+    $('#component-version').val('');
+    $('#component-author').val('');
 
-    $('#component_json').val('');
+    $('#component-json').val('');
 }
 
 /**
@@ -119,7 +122,7 @@ function resetMenuOptions() {
  * @param col
  * @returns {Element}
  */
-function createTableCell(row, col){
+function createTableCell(row, col) {
     var td = document.createElement('td');
     td.className = 'droppable cell col' + '_' + col;
 
@@ -136,7 +139,7 @@ function createTableCell(row, col){
 
     $(button).on("click", function (e) {
         var rowcol = this.id.split('_');
-        $('#cell' + '_' + rowcol[rowcol.length-2] + '_' + rowcol[rowcol.length-1]).find('.tooltip').addClass('open');
+        $('#cell' + '_' + rowcol[rowcol.length - 2] + '_' + rowcol[rowcol.length - 1]).find('.tooltip').addClass('open');
     });
 
     // change size of cell based on the layout
@@ -144,10 +147,10 @@ function createTableCell(row, col){
     var colspan = selectedUserComponent.layout[row][col][1];
 
     var isMerged = selectedUserComponent.layout[row][col][2];
-    var last_merged_bottom_right_cell_id = selectedUserComponent.layout[row][col][3];
+    var lastMergedBottomRightCellId = selectedUserComponent.layout[row][col][3];
 
     $(td).data('merged', isMerged);
-    $(td).data('merged_cell_bottom_right', last_merged_bottom_right_cell_id);
+    $(td).data('merged-cell-bottom-right', lastMergedBottomRightCellId);
 
     if (rowspan === 0) { // and thus also colspan
         $(td).css("display", "none");
@@ -160,14 +163,14 @@ function createTableCell(row, col){
 }
 
 
-function createGridCell(row, col){
+function createGridCell(row, col) {
     var td = document.createElement('td');
     td.id = 'grid' + '_' + row + '_' + col;
     td.className = 'grid col' + '_' + col;
     return td;
 }
 
-function createEmptyRow(rowNumber){
+function createEmptyRow(rowNumber) {
     var tr = document.createElement('tr');
     tr.className = 'row' + '_' + rowNumber;
     return tr;
@@ -176,25 +179,23 @@ function createEmptyRow(rowNumber){
 
 /**
  * Generate the table
- * @param grid_width
- * @param grid_height
  */
-function createTable(grid_width, grid_height) {
+function createTable(gridWidth, gridHeight) {
     /*
-        Note about naming conventions:
-        for naming id, try to follow this rule
+     Note about naming conventions:
+     for naming id, try to follow this rule
 
-        name-with-several-parts_idrownumber_idcolnumber
-     
+     name-with-several-parts_idrownumber_idcolnumber
+
      */
 
     $('#table-container').html('');
 
     var tableGrid = document.createElement('table');
-    tableGrid.className = 'table_outter';
-    for (var row = 1; row <= num_rows; row++) {
+    tableGrid.className = 'maintable';
+    for (var row = 1; row <= numRows; row++) {
         var tr = createEmptyRow(row);
-        for (var col = 1; col <= num_cols; col++) {
+        for (var col = 1; col <= numCols; col++) {
             var td = createTableCell(row, col);
             tr.appendChild(td);
         }
@@ -204,38 +205,38 @@ function createTable(grid_width, grid_height) {
 
     document.getElementById('table-container').appendChild(tableGrid);
 
-    initialResizeCells(grid_width, grid_height, num_rows, num_cols);
+    initialResizeCells(gridWidth, gridHeight, numRows, numCols);
 
     attachMergeHandlers();
     registerDroppable();
 
-    bitmap_old = make2dArray(num_rows, num_cols);
-    bitmap_new = make2dArray(num_rows, num_cols);
+    bitmapOld = make2dArray(numRows, numCols);
+    bitmapNew = make2dArray(numRows, numCols);
 
     createGuideGrid();
 }
 
 function attachMergeHandlers() {
     $('#drag-handle-containers-container').html('');
-    for (var row = 1; row <= num_rows; row++) {
-        for (var col = 1; col <= num_cols; col++) {
+    for (var row = 1; row <= numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
             var td = $("#cell" + '_' + row + '_' + col);
 
             var offset = td.offset();
             var width = td.css("width");
             var height = td.css("height");
 
-            var drag_handle_container = document.createElement('div');
-            drag_handle_container.id = 'drag-handle-container' + '_' + row + '_' + col;
-            var drag_handle = document.createElement('span');
+            var dragHandleContainer = document.createElement('div');
+            dragHandleContainer.id = 'drag-handle-container' + '_' + row + '_' + col;
+            var dragHandle = document.createElement('span');
 
-            drag_handle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
-            drag_handle.className = 'ui-resizable-handle ui-resizable-se drag-handle';
-            drag_handle.id = 'drag-handle' + '_' + row + '_' + col;
+            dragHandle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
+            dragHandle.className = 'ui-resizable-handle ui-resizable-se drag-handle';
+            dragHandle.id = 'drag-handle' + '_' + row + '_' + col;
 
-            drag_handle_container.appendChild(drag_handle);
-            $('#drag-handle-containers-container').append(drag_handle_container);
-            $(drag_handle_container).css({
+            dragHandleContainer.appendChild(dragHandle);
+            $('#drag-handle-containers-container').append(dragHandleContainer);
+            $(dragHandleContainer).css({
                 position: 'absolute',
                 top: offset.top,
                 left: offset.left,
@@ -244,19 +245,19 @@ function attachMergeHandlers() {
                 'pointer-events': 'none',
             });
 
-            $(drag_handle).mouseenter(function (event, ui) {
+            $(dragHandle).mouseenter(function (event, ui) {
                 $(this).parent().css({
                     border: 'black 1px dotted'
                 });
             });
 
-            $(drag_handle).mouseleave(function (event, ui) {
+            $(dragHandle).mouseleave(function (event, ui) {
                 $(this).parent().css({
                     border: 'none'
                 });
             });
 
-            $(drag_handle).css({
+            $(dragHandle).css({
                 'pointer-events': 'auto',
                 position: 'absolute',
                 bottom: '5px',
@@ -264,7 +265,7 @@ function attachMergeHandlers() {
                 cursor: 'nwse-resize',
             });
 
-            $(drag_handle_container).resizable({
+            $(dragHandleContainer).resizable({
                 handles: {
                     'se': '#drag-handle' + '_' + row + '_' + col
                 },
@@ -279,11 +280,11 @@ function attachMergeHandlers() {
                     });
                 },
                 stop: function (event, ui) {
-                    var drag_handle_container = $(this);
-                    var container_id = drag_handle_container.get(0).id;
-                    var rowcol = container_id.split('_');
-                    var row = rowcol[rowcol.length-2];
-                    var col = rowcol[rowcol.length-1];
+                    var dragHandleContainer = $(this);
+                    var containerId = dragHandleContainer.get(0).id;
+                    var rowcol = containerId.split('_');
+                    var row = rowcol[rowcol.length - 2];
+                    var col = rowcol[rowcol.length - 1];
 
                     var component;
                     if (selectedUserComponent.components[row]) {
@@ -306,7 +307,7 @@ function attachMergeHandlers() {
                     // and able to accept mouse events).
                     // useful page http://stackoverflow.com/questions/6073505/what-is-the-difference-between-screenx-y-clientx-y-and-pagex-y
                     // frame of reference fro clientX/Y does not change even if you scroll
-                    var all_elts_list = allElementsFromPoint(event.clientX, event.clientY);
+                    var allEltsList = allElementsFromPoint(event.clientX, event.clientY);
                     // other interesting functions
                     // document.elementFromPoint(event.pageX, event.pageY)
                     // document.querySelectorAll(':hover');
@@ -318,13 +319,13 @@ function attachMergeHandlers() {
                         'pointer-events': 'none',
                     });
 
-                    var new_cell_grid = $(all_elts_list).filter('.grid');
-                    if (!new_cell_grid[0]) { // it's outside the table
+                    var newCellGrid = $(allEltsList).filter('.grid');
+                    if (!newCellGrid[0]) { // it's outside the table
                         mergeCells('cell' + '_' + row + '_' + col, 'cell' + '_' + row + '_' + col, component);
                     } else {
-                        var new_cell_grid_rowcol = new_cell_grid[0].id.split('_');
-                        var new_cell_id = 'cell' + '_' + new_cell_grid_rowcol[new_cell_grid_rowcol.length-2] + '_' + new_cell_grid_rowcol[new_cell_grid_rowcol.length-1];
-                        mergeCells('cell' + '_' + row + '_' + col, new_cell_id, component);
+                        var newCellGridRowcol = newCellGrid[0].id.split('_');
+                        var newCellId = 'cell' + '_' + newCellGridRowcol[newCellGridRowcol.length - 2] + '_' + newCellGridRowcol[newCellGridRowcol.length - 1];
+                        mergeCells('cell' + '_' + row + '_' + col, newCellId, component);
                     }
 
                     // rest event handlers
@@ -352,7 +353,7 @@ function attachMergeHandlers() {
             var colspan = selectedUserComponent.layout[row][col][1];
 
             if (rowspan === 0) { // and thus also colspan
-                $(drag_handle_container).css("display", "none");
+                $(dragHandleContainer).css("display", "none");
             }
         }
     }
@@ -362,18 +363,18 @@ function attachMergeHandlers() {
 // from http://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
 function allElementsFromPoint(x, y) {
     var element, elements = [];
-    var old_visibility = [];
+    var oldVisibility = [];
     while (true) {
         element = document.elementFromPoint(x, y);
         if (!element || element === document.documentElement) {
             break;
         }
         elements.push(element);
-        old_visibility.push(element.style.visibility);
+        oldVisibility.push(element.style.visibility);
         element.style.visibility = 'hidden'; // Temporarily hide the element (without changing the layout)
     }
     for (var k = 0; k < elements.length; k++) {
-        elements[k].style.visibility = old_visibility[k];
+        elements[k].style.visibility = oldVisibility[k];
     }
     elements.reverse();
     return elements;
@@ -383,12 +384,12 @@ function createGuideGrid() {
     $('#guide-grid-container').html('');
 
     var grid = document.createElement('table');
-    grid.className = 'table_outter';
+    grid.className = 'maintable';
 
-    for (var row = 1; row <= num_rows; row++) {
+    for (var row = 1; row <= numRows; row++) {
         var tr = createEmptyRow(row);
 
-        for (var col = 1; col <= num_cols; col++) {
+        for (var col = 1; col <= numCols; col++) {
             var td = createGridCell(row, col);
             tr.appendChild(td);
         }
@@ -402,34 +403,32 @@ function createGuideGrid() {
 
 /**
  * Creates and displays a table based on the component given
- * @param grid_width
- * @param grid_height
  * @param componentToShow
  */
-function loadTable(grid_width, grid_height, componentToShow) {
-    $('<style>.table_outter::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
-    num_rows = componentToShow.dimensions.rows;
-    num_cols = componentToShow.dimensions.cols;
-    createTable(grid_width, grid_height);
+function loadTable(gridWidth, gridHeight, componentToShow) {
+    $('<style>.maintable::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
+    numRows = componentToShow.dimensions.rows;
+    numCols = componentToShow.dimensions.cols;
+    createTable(gridWidth, gridHeight);
 
     $('#table-container td').each(function () {
-        var cell_id = $(this).get(0).id;
-        var rowcol = cell_id.split('_');
-        var row = rowcol[rowcol.length-2];
-        var col = rowcol[rowcol.length-1];
+        var cellId = $(this).get(0).id;
+        var rowcol = cellId.split('_');
+        var row = rowcol[rowcol.length - 2];
+        var col = rowcol[rowcol.length - 1];
         if (componentToShow.components[row]) {
             if (componentToShow.components[row][col]) {
                 var innerComponent = componentToShow.components[row][col];
                 var type = innerComponent.type;
-                showConfigOptions(type, document.getElementById(cell_id));
+                showConfigOptions(type, document.getElementById(cellId));
 
-                Display(cell_id, getHTML[type](innerComponent.components[type]));
-                $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cell_id).get(0));
-                triggerEdit(cell_id, false);
+                Display(cellId, getHTML[type](innerComponent.components[type]));
+                $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
+                triggerEdit(cellId, false);
 
-                $('#' + cell_id).addClass("dropped");
-                $('#' + cell_id).removeClass("droppable");
-                $('#' + cell_id).droppable('disable');
+                $('#' + cellId).addClass("dropped");
+                $('#' + cellId).removeClass("droppable");
+                $('#' + cellId).droppable('disable');
 
             }
         }
@@ -443,21 +442,19 @@ function loadTable(grid_width, grid_height, componentToShow) {
 
 /**
  * Resize cell such that all cells fill width and height of grid
- * @param grid_width
- * @param grid_height
- * @param num_rows
- * @param num_cols
+ * @param numRows
+ * @param numCols
  */
-function initialResizeCells(grid_width, grid_height, num_rows, num_cols) {
-    cell_width = Math.floor((grid_width / num_cols)) - 15;
-    cell_height = Math.floor((grid_height / num_rows)) - 15;
-    var tooltip_width = Number($('.tooltip').css('width').substring(0, 3));
+function initialResizeCells(gridWidth, gridHeight, numRows, numCols) {
+    cellWidth = Math.floor((gridWidth / numCols)) - 15;
+    cellHeight = Math.floor((gridHeight / numRows)) - 15;
+    var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
 
-    getCSSRule('td').style.setProperty('width', cell_width + 'px', null);
-    getCSSRule('td').style.setProperty('height', cell_height + 'px', null);
-    getCSSRule('.tooltip').style.setProperty('left', -1 * Math.floor((tooltip_width - (cell_width - 40)) / 2) + 'px', null);
+    getCSSRule('td').style.setProperty('width', cellWidth + 'px', null);
+    getCSSRule('td').style.setProperty('height', cellHeight + 'px', null);
+    getCSSRule('.tooltip').style.setProperty('left', -1 * Math.floor((tooltipWidth - (cellWidth - 40)) / 2) + 'px', null);
 
-    resizeLabelDivs(cell_width, cell_height);
+    resizeLabelDivs(cellWidth, cellHeight);
 
 }
 
@@ -474,12 +471,12 @@ function addComponentToUserComponentsList(newComponent) {
     $('#selected').removeAttr("id");
 
     var newComponentElt = '<li id="selected" data-componentnumber=' + numComponents + '>'
-        + '<span class="component_name">' + newComponent.meta.name + '</span>'
-        + '<span class="submit_rename not_displayed">'
-        + '<input type="text" class="new_name_input form-control" autofocus>'
+        + '<span class="component-name">' + newComponent.meta.name + '</span>'
+        + '<span class="submit-rename not-displayed">'
+        + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</span>'
         + '</li>';
-    $('#user_components_list').append(newComponentElt);
+    $('#user-components-list').append(newComponentElt);
     $('#selected #modal-title-1').text(name);
 
 };
@@ -496,12 +493,12 @@ function initClicheComponent(isDefault) {
         version = DEFAULT_VERSION;
         author = DEFAULT_AUTHOR;
     } else {
-        name = $('#new_component_name').val();
-        version = $('#component_version').val();
-        author = $('#component_author').val();
+        name = $('#new-component-name').val();
+        version = $('#component-version').val();
+        author = $('#component-author').val();
     }
-    $('<style>.table_outter::after{content:"' + name + '"}</style>').appendTo('head');
-    var newComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
+    $('<style>.maintable::after{content:"' + name + '"}</style>').appendTo('head');
+    var newComponent = new ClicheComponent({rows: numRows, cols: numCols}, name, 1, version, author);
 
     addComponentToUserComponentsList(newComponent);
 }
@@ -513,14 +510,14 @@ function initClicheComponent(isDefault) {
  * Either a widget or a component has to be present
  *
  * @param widget
- * @param cell_id
+ * @param cellId
  * @param component
  */
-function addComponent(cell_id, widget, component) {
+function addComponent(cellId, widget, component) {
     var type;
-    var rowcol = cell_id.split('_');
-    var row = rowcol[rowcol.length-2];
-    var col = rowcol[rowcol.length-1];
+    var rowcol = cellId.split('_');
+    var row = rowcol[rowcol.length - 2];
+    var col = rowcol[rowcol.length - 1];
 
     if (!component) {
         var span = document.createElement('span');
@@ -529,28 +526,28 @@ function addComponent(cell_id, widget, component) {
         component = new BaseComponent(type, {});
 
         if (type === 'label') {
-            Display(cell_id, getHTML[type]("Type text here..."));
+            Display(cellId, getHTML[type]("Type text here..."));
         } else if (type === 'panel') {
-            Display(cell_id, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
+            Display(cellId, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
         } else {
-            Display(cell_id, getHTML[type]());
-            triggerEdit(cell_id, true); // since this is a new component, show edit options
+            Display(cellId, getHTML[type]());
+            triggerEdit(cellId, true); // since this is a new component, show edit options
         }
 
     } else {// a component is there
         type = component.type;
 
-        Display(cell_id, getHTML[type](component.components[type]));
+        Display(cellId, getHTML[type](component.components[type]));
         if (!widget) {
-            $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cell_id).get(0))
+            $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0))
         }
-        triggerEdit(cell_id, false); // no need to show edit options
+        triggerEdit(cellId, false); // no need to show edit options
 
     }
 
-    $('#' + cell_id).addClass("dropped");
-    $('#' + cell_id).removeClass("droppable");
-    $('#' + cell_id).droppable('disable');
+    $('#' + cellId).addClass("dropped");
+    $('#' + cellId).removeClass("droppable");
+    $('#' + cellId).droppable('disable');
     registerDraggable();
 
     if (!selectedUserComponent.components.hasOwnProperty(row)) {
@@ -567,10 +564,10 @@ function addComponent(cell_id, widget, component) {
 /**
  * Deletes a component from the datatype and also from the view
  */
-function deleteComponent(cell_id) {
-    var rowcol = cell_id.split('_');
-    var row = rowcol[rowcol.length-2];
-    var col = rowcol[rowcol.length-1];
+function deleteComponent(cellId) {
+    var rowcol = cellId.split('_');
+    var row = rowcol[rowcol.length - 2];
+    var col = rowcol[rowcol.length - 1];
 
     if (selectedUserComponent.components[row]) {
         if (selectedUserComponent.components[row][col]) {
@@ -580,11 +577,11 @@ function deleteComponent(cell_id) {
 
             $(cell).find('.config-btns').remove();
             $(cell).find('.tooltip').remove();
-            $(cell).find('.label_container').remove();
-            $(cell).find('.display_component').remove();
+            $(cell).find('.label-container').remove();
+            $(cell).find('.display-component').remove();
             $(cell).find('.widget').remove();
 
-            resetDroppability(cell_id);
+            resetDroppability(cellId);
 
         }
     }
@@ -592,18 +589,18 @@ function deleteComponent(cell_id) {
 }
 
 
-function updateComponentAt(cell_id) {
-    var rowcol = cell_id.split('_');
-    var row = rowcol[rowcol.length-2];
-    var col = rowcol[rowcol.length-1];
-    var type = $('#' + cell_id).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+function updateComponentAt(cellId) {
+    var rowcol = cellId.split('_');
+    var row = rowcol[rowcol.length - 2];
+    var col = rowcol[rowcol.length - 1];
+    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     var value;
     var isUpload = false;
     var inputs = Array.prototype.slice.call(
-        $('#' + cell_id).get(0).getElementsByTagName('input'), 0);
+        $('#' + cellId).get(0).getElementsByTagName('input'), 0);
 
     if (type === 'label') {
-        value = $('#' + cell_id).find('p')[0].textContent;
+        value = $('#' + cellId).find('p')[0].textContent;
     } else if (type === 'link') {
         value = {
             link_text: inputs[0].value,
@@ -632,9 +629,9 @@ function updateComponentAt(cell_id) {
             files.length = 0; // clear the old file
             parseFile.save()
                 .then(function (savedFile) { // save was successful
-                    RemoveDisplay(cell_id);
+                    RemoveDisplay(cellId);
                     value.img_src = savedFile.url();
-                    Display(cell_id, getHTML[type](value));
+                    Display(cellId, getHTML[type](value));
                     selectedUserComponent.components[row][col].components[type] = value;
                 });
         } else { // pasted link to image
@@ -642,19 +639,15 @@ function updateComponentAt(cell_id) {
         } // TODO what if empty link given?
     } else if (type === 'panel') {
         value = {
-            heading: $('#' + cell_id).find('.panel-title')[0].textContent,
-            content: $('#' + cell_id).find('.panel-body')[0].textContent
+            heading: $('#' + cellId).find('.panel-title')[0].textContent,
+            content: $('#' + cellId).find('.panel-body')[0].textContent
         }
     }
 
     if (!isUpload) {
-        $('#' + cell_id).find('.label_container').remove();
-        $('#' + cell_id).find('.display_component').remove();
-        Display(cell_id, getHTML[type](value), function () {
-            //for (var prop in selectedUserComponent.components[row][col].properties) {
-            //    var bootstrap_class = selectedUserComponent.components[row][col].properties[prop];
-            //    $('#'+cell_id).find('.display_component').addClass(bootstrap_class);
-            //}
+        $('#' + cellId).find('.label-container').remove();
+        $('#' + cellId).find('.display-component').remove();
+        Display(cellId, getHTML[type](value), function () {
         });
         selectedUserComponent.components[row][col].components = {};
         selectedUserComponent.components[row][col].components[type] = value;
@@ -679,12 +672,12 @@ function make2dArray(rows, cols) {
 }
 function findDeletedCoord() {
     var result = [];
-    for (var row = 0; row < num_rows; row++) {
-        for (var col = 0; col < num_cols; col++) {
-            if ((bitmap_new[row][col] - bitmap_old[row][col]) < 0) {
+    for (var row = 0; row < numRows; row++) {
+        for (var col = 0; col < numCols; col++) {
+            if ((bitmapNew[row][col] - bitmapOld[row][col]) < 0) {
                 result[0] = row + 1;
                 result[1] = col + 1;
-            } else if ((bitmap_new[row][col] - bitmap_old[row][col]) > 0) {
+            } else if ((bitmapNew[row][col] - bitmapOld[row][col]) > 0) {
                 result[2] = row + 1;
                 result[3] = col + 1;
             }
@@ -694,16 +687,16 @@ function findDeletedCoord() {
 }
 
 function updateBitmap() {
-    bitmap_old = JSON.parse(JSON.stringify(bitmap_new));
+    bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
     $('#table-container td').each(function () {
-        var cell_id = $(this).attr('id');
-        var rowcol = cell_id.split('_');
-        var row = Number(rowcol[rowcol.length-2]) - 1;
-        var col = Number(rowcol[rowcol.length-1]) - 1;
+        var cellId = $(this).attr('id');
+        var rowcol = cellId.split('_');
+        var row = Number(rowcol[rowcol.length - 2]) - 1;
+        var col = Number(rowcol[rowcol.length - 1]) - 1;
         if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
-            bitmap_new[row][col] = 0;
+            bitmapNew[row][col] = 0;
         } else {
-            bitmap_new[row][col] = 1;
+            bitmapNew[row][col] = 1;
         }
     });
 }
@@ -743,83 +736,83 @@ function getCSSRule(search) {
     })[0];
 }
 
-function resizeLabelDivs(cell_width, cell_height) {
-    getCSSRule('.label_container').style.setProperty('width', (cell_width - 10) + 'px', null);
-    getCSSRule('.label_container').style.setProperty('height', (cell_height - 30) + 'px', null);
-    getCSSRule('.label_container').style.setProperty('padding-top', (cell_height / 4) + 'px', null);
+function resizeLabelDivs(cellWidth, cellHeight) {
+    getCSSRule('.label-container').style.setProperty('width', (cellWidth - 10) + 'px', null);
+    getCSSRule('.label-container').style.setProperty('height', (cellHeight - 30) + 'px', null);
+    getCSSRule('.label-container').style.setProperty('padding-top', (cellHeight / 4) + 'px', null);
 }
 
 
 /*
  * Merging and unmerging cells
  */
-function mergeCells(cell1_id, cell2_id, component) {
+function mergeCells(cell1Id, cell2Id, component) {
     // first check for top left cell and bottom right cell
-    var rowcol1 = cell1_id.split('_');
+    var rowcol1 = cell1Id.split('_');
     var row1 = rowcol1[rowcol1.length - 2];
     var col1 = rowcol1[rowcol1.length - 1];
 
-    var rowcol2 = cell2_id.split('_');
+    var rowcol2 = cell2Id.split('_');
     var row2 = rowcol2[rowcol2.length - 2];
     var col2 = rowcol2[rowcol2.length - 1];
 
 
-    var top_row_num = Math.min(parseInt(row1), parseInt(row2));
-    var bottom_row_num = Math.max(parseInt(row1), parseInt(row2));
+    var topRowNum = Math.min(parseInt(row1), parseInt(row2));
+    var bottomRowNum = Math.max(parseInt(row1), parseInt(row2));
 
-    var left_col_num = Math.min(parseInt(col1), parseInt(col2));
-    var right_col_num = Math.max(parseInt(col1), parseInt(col2));
+    var leftColNum = Math.min(parseInt(col1), parseInt(col2));
+    var rightColNum = Math.max(parseInt(col1), parseInt(col2));
 
-    var top_left_cell_id = "cell" + '_' + top_row_num.toString() + '_' + left_col_num.toString();
-    var bottom_right_cell_id = "cell" + '_' + bottom_row_num.toString() + '_' + right_col_num.toString();
+    var topLeftCellId = "cell" + '_' + topRowNum.toString() + '_' + leftColNum.toString();
+    var bottomRightCellId = "cell" + '_' + bottomRowNum.toString() + '_' + rightColNum.toString();
 
     // figure out if this is already a merged cell
-    var merged = $('#' + top_left_cell_id).data('merged');
+    var merged = $('#' + topLeftCellId).data('merged');
     if (merged) {
-        var last_merged_cell_bottom_right_id = $('#' + top_left_cell_id).data('merged_cell_bottom_right');
+        var lastMergedCellBottomRightId = $('#' + topLeftCellId).data('merged-cell-bottom-right');
         // if merged, unmerge the two cells
         // this also resets the cells to unmerged status
-        unmergeCells(top_left_cell_id, last_merged_cell_bottom_right_id);
+        unmergeCells(topLeftCellId, lastMergedCellBottomRightId);
     }
 
-    if (top_left_cell_id != bottom_right_cell_id) { // not merging/unmerging to the same cell,
+    if (topLeftCellId != bottomRightCellId) { // not merging/unmerging to the same cell,
         // that is, the cell is actually merging to something else
         // mark cell as merged
-        $('#' + top_left_cell_id).data('merged', true);
-        $('#' + top_left_cell_id).data('merged_cell_bottom_right', bottom_right_cell_id);
+        $('#' + topLeftCellId).data('merged', true);
+        $('#' + topLeftCellId).data('merged-cell-bottom-right', bottomRightCellId);
         // hide all the other cells in that block
-        for (var row = top_row_num; row <= bottom_row_num; row++) {
-            for (var col = left_col_num; col <= right_col_num; col++) {
-                var cell_id = "cell" + '_' + row.toString() + '_' + col.toString();
+        for (var row = topRowNum; row <= bottomRowNum; row++) {
+            for (var col = leftColNum; col <= rightColNum; col++) {
+                var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
 
                 // delete any component that was there
                 // TODO: note: checks should be made before calling this function!
-                deleteComponent(cell_id);
+                deleteComponent(cellId);
 
-                if ((row == top_row_num) && (col == left_col_num)) { // the cell we just made bigger
+                if ((row == topRowNum) && (col == leftColNum)) { // the cell we just made bigger
                     continue;
                 }
 
                 // figure out if this is already a merged cell
-                var merged = $('#' + cell_id).data('merged');
+                var merged = $('#' + cellId).data('merged');
                 if (merged) {
-                    var last_merged_cell_bottom_right_id = $('#' + cell_id).data('merged_cell_bottom_right');
+                    var lastMergedCellBottomRightId = $('#' + cellId).data('merged-cell-bottom-right');
                     // if merged, unmerge the two cells
                     // this also resets the cells to unmerged status
-                    unmergeCells(cell_id, last_merged_cell_bottom_right_id);
+                    unmergeCells(cellId, lastMergedCellBottomRightId);
                 }
 
 
                 // then hide the other cells
-                var cell_to_hide = $("#" + cell_id);
-                cell_to_hide.css("display", "none");
+                var cellToHide = $("#" + cellId);
+                cellToHide.css("display", "none");
 
                 // return rowspan/colspan to 1
-                cell_to_hide.attr("rowSpan", 1);
-                cell_to_hide.attr("colSpan", 1);
+                cellToHide.attr("rowSpan", 1);
+                cellToHide.attr("colSpan", 1);
 
-                var drag_container_to_hide = $('#drag-handle-container' + '_' + row + '_' + col);
-                drag_container_to_hide.css('display', 'none');
+                var dragContainerToHide = $('#drag-handle-container' + '_' + row + '_' + col);
+                dragContainerToHide.css('display', 'none');
 
                 selectedUserComponent.layout[row][col] = [0, 0, false, ''];
             }
@@ -828,79 +821,78 @@ function mergeCells(cell1_id, cell2_id, component) {
     }
 
     // Make the first cell take the correct size
-    var cell_top_right = $("#" + top_left_cell_id);
-    var rowspan = bottom_row_num - top_row_num + 1;
-    var colspan = right_col_num - left_col_num + 1;
-    cell_top_right.attr("rowSpan", rowspan);
-    cell_top_right.attr("colSpan", colspan);
-    $('#drag-handle-container' + '_' + top_row_num + '_' + left_col_num).css({
-        width: cell_top_right.css('width'),
-        height: cell_top_right.css('height'),
+    var cellTopRight = $("#" + topLeftCellId);
+    var rowspan = bottomRowNum - topRowNum + 1;
+    var colspan = rightColNum - leftColNum + 1;
+    cellTopRight.attr("rowSpan", rowspan);
+    cellTopRight.attr("colSpan", colspan);
+    $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum).css({
+        width: cellTopRight.css('width'),
+        height: cellTopRight.css('height'),
     });
 
     // update the datatype
-    selectedUserComponent.layout[top_row_num][left_col_num] = [rowspan, colspan, true, bottom_right_cell_id];
+    selectedUserComponent.layout[topRowNum][leftColNum] = [rowspan, colspan, true, bottomRightCellId];
 
     // then put the component in there
     if (component) {
         // add the component to the cell
-        addComponent(top_left_cell_id, false, component);
+        addComponent(topLeftCellId, false, component);
     }
 }
 
-function unmergeCells(cell1_id, cell2_id, component) {
-    var rowcol1 = cell1_id.split('_');
+function unmergeCells(cell1Id, cell2Id, component) {
+    var rowcol1 = cell1Id.split('_');
     var row1 = rowcol1[rowcol1.length - 2];
     var col1 = rowcol1[rowcol1.length - 1];
 
-    var rowcol2 = cell2_id.split('_');
+    var rowcol2 = cell2Id.split('_');
     var row2 = rowcol2[rowcol2.length - 2];
     var col2 = rowcol2[rowcol2.length - 1];
 
 
+    var topRowNum = Math.min(parseInt(row1), parseInt(row2));
+    var bottomRowNum = Math.max(parseInt(row1), parseInt(row2));
 
-    var top_row_num = Math.min(parseInt(row1), parseInt(row2));
-    var bottom_row_num = Math.max(parseInt(row1), parseInt(row2));
-
-    var left_col_num = Math.min(parseInt(col1), parseInt(col2));
-    var right_col_num = Math.max(parseInt(col1), parseInt(col2));
+    var leftColNum = Math.min(parseInt(col1), parseInt(col2));
+    var rightColNum = Math.max(parseInt(col1), parseInt(col2));
 
 
     // Make the first cell take the correct size
-    var top_left_cell_id = "cell" + '_' + top_row_num.toString() + '_' + left_col_num.toString();
+    var topLeftCellId = "cell" + '_' + topRowNum.toString() + '_' + leftColNum.toString();
 
-    var cell_top_right = $("#" + top_left_cell_id);
-    cell_top_right.attr("rowSpan", 1);
-    cell_top_right.attr("colSpan", 1);
+    var cellTopRight = $("#" + topLeftCellId);
+    cellTopRight.attr("rowSpan", 1);
+    cellTopRight.attr("colSpan", 1);
     // display all the other cells in that block
-    for (var row = top_row_num; row <= bottom_row_num; row++) {
-        for (var col = left_col_num; col <= right_col_num; col++) {
-            var cell_id = "cell" + '_' + row.toString() + '_' + col.toString();
+    for (var row = topRowNum; row <= bottomRowNum; row++) {
+        for (var col = leftColNum; col <= rightColNum; col++) {
+            var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
             // update the datatype
             selectedUserComponent.layout[row][col] = [1, 1, false, ''];
 
-            var cell_to_show = $("#" + cell_id);
-            cell_to_show.css("display", "table-cell");
+            var cellToShow = $("#" + cellId);
+            cellToShow.css("display", "table-cell");
 
             // reset some meta data
-            cell_to_show.data('merged', false);
-            cell_to_show.data('merged_cell_bottom_right', '');
+            cellToShow.data('merged', false);
+            cellToShow.data('merged-cell-bottom-right', '');
 
             // return rowspan/colspan to 1
-            cell_to_show.attr("rowSpan", 1);
-            cell_to_show.attr("colSpan", 1);
+            cellToShow.attr("rowSpan", 1);
+            cellToShow.attr("colSpan", 1);
 
             // delete any component that was there
-            deleteComponent(cell_id);
+            deleteComponent(cellId);
 
-            var drag_container_to_show = $('#drag-handle-container' + '_' + row + '_' + col);
-            var cell_offset = cell_to_show.offset();
-            drag_container_to_show.css({
+            var dragContainerToShow = $('#drag-handle-container' + '_' + row + '_' + col);
+            var cellOffset = cellToShow.offset();
+            dragContainerToShow.css({
                 display: 'block',
-                top: cell_offset.top,
-                left: cell_offset.left,
-                width: cell_to_show.css('width'),
-                height: cell_to_show.css('height'),
+                top: cellOffset.top,
+                left: cellOffset.left,
+                width: cellToShow.css('width'),
+                height: cellToShow.css('height'),
             });
 
         }
@@ -908,50 +900,48 @@ function unmergeCells(cell1_id, cell2_id, component) {
 
     if (component) {
         // add the component to the cell
-        addComponent(top_left_cell_id, false, component);
+        addComponent(topLeftCellId, false, component);
     }
 
 }
 
 
 /*
-    Adding and deleting rows and columns
+ Adding and deleting rows and columns
  */
 
 /**
  * Adds a row to the end
  * Mutates selectedUserComponent
  */
-function addRowToEnd(){
+function addRowToEnd() {
     var lastRowNum = selectedUserComponent.dimensions.rows;
 
     // datatype update
     selectedUserComponent.dimensions.rows += 1;
-    num_rows += 1;
-    selectedUserComponent.layout[lastRowNum+1] = {}
+    numRows += 1;
+    selectedUserComponent.layout[lastRowNum + 1] = {}
 
     // visual update
-    //var tableRow = $('#table-container table').get(0).insertRow(lastRowNum);
     var tableRow = createEmptyRow(lastRowNum + 1);
-    //var gridRow = $('#guide-grid-container table').get(0).insertRow(lastRowNum);
     var gridRow = createEmptyRow(lastRowNum + 1);
 
-    for (var i = 1; i<= selectedUserComponent.dimensions.cols; i++){
-        selectedUserComponent.layout[lastRowNum+1][i] = [1,1, false, ''];
-        var tableCell = createTableCell(lastRowNum+1, i);
+    for (var i = 1; i <= selectedUserComponent.dimensions.cols; i++) {
+        selectedUserComponent.layout[lastRowNum + 1][i] = [1, 1, false, ''];
+        var tableCell = createTableCell(lastRowNum + 1, i);
         tableRow.appendChild(tableCell);
-        var gridCell = createGridCell(lastRowNum+1, i);
+        var gridCell = createGridCell(lastRowNum + 1, i);
         gridRow.appendChild(gridCell);
     }
     $('#table-container table').append(tableRow);
     $('#guide-grid-container table').append(gridRow);
 
     attachMergeHandlers();
-    bitmap_new = make2dArray(num_rows, num_cols);
+    bitmapNew = make2dArray(numRows, numCols);
     updateBitmap();
     // from http://stackoverflow.com/questions/597588/how-do-you-clone-an-array-of-objects-in-javascript
-    bitmap_old = JSON.parse(JSON.stringify(bitmap_new)); // as not to have issues with the old and the new having
-                                                         // different numbers of rows
+    bitmapOld = JSON.parse(JSON.stringify(bitmapNew)); // as not to have issues with the old and the new having
+    // different numbers of rows
 }
 
 /**
@@ -959,7 +949,7 @@ function addRowToEnd(){
  * Does nothing if there is only one row left
  * Mutates selectedUserComponent
  */
-function removeEndRow(){
+function removeEndRow() {
 
 }
 
@@ -967,7 +957,7 @@ function removeEndRow(){
  * Adds a column to the end
  * Mutates selectedUserComponent
  */
-function addColToEnd(){
+function addColToEnd() {
 
 }
 
@@ -976,6 +966,6 @@ function addColToEnd(){
  * Does nothing if there is only one column left
  * Mutates selectedUserComponent
  */
-function removeEndCol(){
+function removeEndCol() {
 
 }

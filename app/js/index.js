@@ -1,9 +1,9 @@
 var currentZoom = 1.0;
-
+var basicComponents;
 
 $(function() {
 
-    basic_components = $('#basic_components').html();
+    basicComponents = $('#basic-components').html();
 
     registerDroppable();
 
@@ -26,11 +26,11 @@ function registerDroppable() {
                 $(this).removeClass("droppable");
                 $(ui.draggable).appendTo(this);
                 $(this).droppable('disable');
-                var cell_id = $(this).attr('id');
-                var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
-                showConfigOptions(dropped_component, document.getElementById(cell_id));
+                var cellId = $(this).attr('id');
+                var droppedComponent =$('#'+cellId).children().last().attr('name').toLowerCase();
+                showConfigOptions(droppedComponent, document.getElementById(cellId));
                 if (!movedComponent()) {
-                    addComponent(cell_id, $(ui.draggable));
+                    addComponent(cellId, $(ui.draggable));
                 }
             } else { // if dropped in trash
                 var trashCopy = $(this).children().first();
@@ -40,7 +40,7 @@ function registerDroppable() {
                 movedComponent();
             }
 
-            $('#basic_components').html(basic_components);
+            $('#basic-components').html(basicComponents);
 
             registerDraggable();
             resetDroppability();
@@ -81,23 +81,23 @@ function registerZoom() {
     $('#zoomIn').click( function (e) {
         e.preventDefault();
         $('#middle-container').animate({ 'zoom': currentZoom = 1 }, 'slow');
-        $('.table_outter').after().css('font-size', '14px');
+        $('.maintable').after().css('font-size', '14px');
     });
     $('#zoomOut').click( function (e) {
         e.preventDefault();
         $('#middle-container').animate({ 'zoom': currentZoom = 0.4 }, 'slow');
-        $('.table_outter').after().css('font-size', '50px');
+        $('.maintable').after().css('font-size', '50px');
     });
 
 }
 
 
-function resetDroppability(cell_id) {
-    if (cell_id){
-        if ($('#'+cell_id).get(0).getElementsByClassName('draggable').length == 0) {
-            $('#'+cell_id).removeClass('dropped');
-            $('#'+cell_id).addClass('droppable');
-            $('#'+cell_id).droppable('enable');
+function resetDroppability(cellId) {
+    if (cellId){
+        if ($('#'+cellId).get(0).getElementsByClassName('draggable').length == 0) {
+            $('#'+cellId).removeClass('dropped');
+            $('#'+cellId).addClass('droppable');
+            $('#'+cellId).droppable('enable');
         }
     } else {
         $('#table-container td').each(function() {
@@ -118,21 +118,21 @@ function movedComponent() {
 
     if (coord.length > 0 && typeof coord[0]!=="undefined") { // if not first drop
 
-        var del_row = coord[0];
-        var del_col = coord[1];
+        var delRow = coord[0];
+        var delCol = coord[1];
         if (typeof coord[2]!=="undefined") { // if move, copy any save data
-            var new_row = coord[2];
-            var new_col = coord[3];
+            var newRow = coord[2];
+            var newCol = coord[3];
 
-            var component_copy = selectedUserComponent.components[del_row][del_col];
-            selectedUserComponent.addComponent(component_copy, new_row, new_col);
+            var componentCopy = selectedUserComponent.components[delRow][delCol];
+            selectedUserComponent.addComponent(componentCopy, newRow, newCol);
 
-            Display('cell'+ '_' + new_row + '_' + new_col, getHTML[component_copy.type](component_copy.components[component_copy.type]));
-            triggerEdit('cell'+ '_' + new_row + '_' + new_col, false);
+            Display('cell'+ '_' + newRow + '_' + newCol, getHTML[componentCopy.type](componentCopy.components[componentCopy.type]));
+            triggerEdit('cell'+ '_' + newRow + '_' + newCol, false);
 
         }
 
-        deleteComponent("cell"+ '_' + del_row + '_' + del_col);
+        deleteComponent("cell"+ '_' + delRow + '_' + delCol);
         return true;
     }
     return false;
@@ -140,39 +140,39 @@ function movedComponent() {
 
 /**
  * Register listener for click on edit button
- * @param cell_id
+ * @param cellId
  */
-function triggerEdit(cell_id, popup) {
-    var dropped_component =$('#'+cell_id).children().last().attr('name').toLowerCase();
+function triggerEdit(cellId, popup) {
+    var droppedComponent =$('#'+cellId).children().last().attr('name').toLowerCase();
 
-    var edit_dialog_template = $('#'+dropped_component+'_popup_holder').html();
+    var editDialogTemplate = $('#'+droppedComponent+'-popup-holder').html();
 
     var sp = document.createElement('span');
-    sp.innerHTML = edit_dialog_template;
-    var edit_dialog = sp.firstElementChild;
+    sp.innerHTML = editDialogTemplate;
+    var editDialog = sp.firstElementChild;
 
-    var cell = document.getElementById(cell_id);
-    cell.insertBefore(edit_dialog, cell.firstChild);
+    var cell = document.getElementById(cellId);
+    cell.insertBefore(editDialog, cell.firstChild);
 
     $(Array.prototype.slice.call(
-        $('#'+cell_id).get(0).getElementsByClassName('form-control'), 0)[0]).trigger("focus");
+        $('#'+cellId).get(0).getElementsByClassName('form-control'), 0)[0]).trigger("focus");
     if (popup){
         setTimeout(function(){
-            $($('#'+cell_id).children().first()).addClass('open');
+            $($('#'+cellId).children().first()).addClass('open');
         }, 1);
     }
 
 }
 
-function showConfigOptions(dropped_component_type, cell) {
+function showConfigOptions(droppedComponentType, cell) {
     // Hide edit button if label or panel
-    if (dropped_component_type==='label' || dropped_component_type==='panel') {
+    if (droppedComponentType==='label' || droppedComponentType==='panel') {
         $('#'+cell.id).find('.edit-btn').css('visibility', 'hidden');
     } else {
         $('#'+cell.id).find('.edit-btn').css('visibility', 'visible');
     }
 
-    var configOptions = document.getElementById(dropped_component_type+'_properties');
+    var configOptions = document.getElementById(droppedComponentType+'-properties');
     if (configOptions==null || configOptions==undefined) {
         return;
     }
@@ -198,8 +198,8 @@ function registerTooltipBtnHandlers() {
     });
 
     $('.apply').on("click", function(event) {
-        var cell_id = findContainingCell(this);
-        updateComponentAt(cell_id);
+        var cellId = findContainingCell(this);
+        updateComponentAt(cellId);
         $('.tooltip').removeClass('open');
     });
 
@@ -213,36 +213,36 @@ function registerTooltipBtnHandlers() {
     var menu_alignments = ['alignment', 'vertical', 'horizontal'];
     var panel_styles = ['style', 'default', 'primary', 'info', 'success', 'warning', 'danger'];
 
-    function registerPropHandlers(options_list_, class_prefix, bootstrap_prefix) {
-        var propertyName = options_list_[0];
-        var options_list = options_list_.slice(1);
+    function registerPropHandlers(optionsList_, classPrefix, bootstrapPrefix) {
+        var propertyName = optionsList_[0];
+        var optionsList = optionsList_.slice(1);
 
-        for (var i=0; i<options_list.length; i++) {
-            var options = document.getElementsByClassName(class_prefix+'-'+options_list[i]);
+        for (var i=0; i<optionsList.length; i++) {
+            var options = document.getElementsByClassName(classPrefix+'-'+optionsList[i]);
             for (var j=0; j<options.length; j++) {
-                options[j].onclick = generateHandler(i, options_list, bootstrap_prefix, propertyName);
+                options[j].onclick = generateHandler(i, optionsList, bootstrapPrefix, propertyName);
             }
         }
     }
 
-    function generateHandler(index, options_list, bootstrap_prefix, propertyName) {
+    function generateHandler(index, optionsList, bootstrapPrefix, propertyName) {
         return function(e) {
             e.preventDefault();
-            var cell_id = findContainingCell(this);
-            var element = $('#'+cell_id).find('.display_component');
-            var bootstrap_class = bootstrap_prefix+"-"+options_list[index];
-            element.addClass(bootstrap_class);
+            var cellId = findContainingCell(this);
+            var element = $('#'+cellId).find('.display-component');
+            var bootstrapClass = bootstrapPrefix+"-"+optionsList[index];
+            element.addClass(bootstrapClass);
 
-            for (var j=0; j<options_list.length; j++) {
+            for (var j=0; j<optionsList.length; j++) {
                 if (j!==index) {
-                    element.removeClass(bootstrap_prefix+'-'+options_list[j]);
+                    element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
                 }
             }
 
-            var rowcol = cell_id.split('_');
+            var rowcol = cellId.split('_');
             var row = rowcol[rowcol.length-2];
-            var col = cell_id[rowcol.length-1];
-            selectedUserComponent.components[row][col].properties[propertyName] = bootstrap_class;
+            var col = cellId[rowcol.length-1];
+            selectedUserComponent.components[row][col].properties[propertyName] = bootstrapClass;
 
         }
     }
@@ -274,19 +274,19 @@ function registerTooltipBtnHandlers() {
 
 function findContainingCell(context) {
     var parent = $(context).parent();
-    var tag_name = parent.get(0).tagName;
-    while (tag_name !== 'TD') {
+    var tagName = parent.get(0).tagName;
+    while (tagName !== 'TD') {
         parent = $(parent).parent();
-        tag_name = parent.get(0).tagName;
+        tagName = parent.get(0).tagName;
     }
-    var cell_id = $(parent).attr('id');
-    return cell_id;
+    var cellId = $(parent).attr('id');
+    return cellId;
 }
 
 function getEdits() {
     $('[contenteditable=true]').blur(function() {
-        var cell_id = findContainingCell(this);
-        updateComponentAt(cell_id);
+        var cellId = findContainingCell(this);
+        updateComponentAt(cellId);
         getEdits();
     });
 }
