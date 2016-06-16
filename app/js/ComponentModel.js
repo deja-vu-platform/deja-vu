@@ -22,8 +22,15 @@ function Component() {
     this.dimensions = {};
     this.properties = {};
     this.components = {};
-    this.layout = {}; // {row:{col:[rowspan, colspan, isMerged, lastMergedBottomRightCellId]}}; [0,0, ...] means hide this cell
-};
+    this.layout = {}; // {row:
+                        // {col:
+                            // {spans: {row: Number ,col: Number},
+                            // merged:{isMerged: Boolean, lastMergedBottomRightCellId: String},
+                            // hidden:{isHidden: Boolean, hidingCellId: String}
+                             // }
+                        // }
+                      // }
+}
 
 
 
@@ -49,7 +56,13 @@ function BaseComponent(type, components) {
         author: ''
     };
     this.dimensions = {rows: 1, cols: 1};
-    this.layout = {1:{1:[1,1, false, '']}};
+    this.layout = {1:{
+                    1:{
+                        spans:{row:1,col:1},
+                        merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                        hidden:{isHidden: false, hidingCellId: ''}
+                    }
+                   }};
 }
 
 BaseComponent.prototype.setProperty = function(property, value) {
@@ -89,10 +102,14 @@ function ClicheComponent(dimensions, name, id, version, author) {
     for (var row = 1; row<=dimensions.rows; row++){
         this.layout[row] = {};
         for (var col = 1; col<= dimensions.cols; col++){
-            this.layout[row][col] = [1,1, false, ''];
+            this.layout[row][col] = {
+                                        spans:{row:1,col:1},
+                                        merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                                        hidden:{isHidden: false, hidingCellId: ''}
+                                    };
         }
     }
-};
+}
 
 ClicheComponent.prototype.addComponent = function(component, row, col) {
     if (!this.components.hasOwnProperty(row)) {

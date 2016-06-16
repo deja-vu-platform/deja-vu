@@ -143,16 +143,20 @@ function createTableCell(row, col) {
     });
 
     // change size of cell based on the layout
-    var rowspan = selectedUserComponent.layout[row][col][0];
-    var colspan = selectedUserComponent.layout[row][col][1];
+    var rowspan = selectedUserComponent.layout[row][col].spans.row;
+    var colspan = selectedUserComponent.layout[row][col].spans.col;
 
-    var isMerged = selectedUserComponent.layout[row][col][2];
-    var lastMergedBottomRightCellId = selectedUserComponent.layout[row][col][3];
+    var isMerged = selectedUserComponent.layout[row][col].merged.isMerged;
+    var lastMergedBottomRightCellId = selectedUserComponent.layout[row][col].merged.lastMergedBottomRightCellId;
 
-    $(td).data('merged', isMerged);
-    $(td).data('merged-cell-bottom-right', lastMergedBottomRightCellId);
+    var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
+    var hidingCellIdId = selectedUserComponent.layout[row][col].hidden.hidingCellId;
 
-    if (rowspan === 0) { // and thus also colspan
+    $(td).data('merged', {isMerged:isMerged, lastMergedBottomRightCellId: lastMergedBottomRightCellId});
+    $(td).data('hidden', {isHidden:isHidden, lastMergedBottomRightCellId: hidingCellIdId});
+
+
+    if (isHidden) {
         $(td).css("display", "none");
     } else {
         $(td).attr("rowSpan", rowspan);
@@ -349,8 +353,8 @@ function attachMergeHandlers() {
                 }
             });
 
-            var rowspan = selectedUserComponent.layout[row][col][0];
-            var colspan = selectedUserComponent.layout[row][col][1];
+            var rowspan = selectedUserComponent.layout[row][col].spans.row;
+            var colspan = selectedUserComponent.layout[row][col].spans.col;
 
             if (rowspan === 0) { // and thus also colspan
                 $(dragHandleContainer).css("display", "none");
@@ -769,19 +773,16 @@ function mergeCells(cell1Id, cell2Id, component) {
 
     // figure out if this is already a merged cell
     var merged = $('#' + topLeftCellId).data('merged');
-    if (merged) {
-        var lastMergedCellBottomRightId = $('#' + topLeftCellId).data('merged-cell-bottom-right');
+    if (merged.isMerged) {
         // if merged, unmerge the two cells
         // this also resets the cells to unmerged status
-        unmergeCells(topLeftCellId, lastMergedCellBottomRightId);
+        unmergeCells(topLeftCellId);
     }
 
     if (topLeftCellId != bottomRightCellId) { // not merging/unmerging to the same cell,
         // that is, the cell is actually merging to something else
         // mark cell as merged
-        $('#' + topLeftCellId).data('merged', true);
-        $('#' + topLeftCellId).data('merged-cell-bottom-right', bottomRightCellId);
-        // hide all the other cells in that block
+        $('#' + topLeftCellId).data('merged', {isMerged: true, lastMergedBottomRightCellId: bottomRightCellId});
         for (var row = topRowNum; row <= bottomRowNum; row++) {
             for (var col = leftColNum; col <= rightColNum; col++) {
                 var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
@@ -794,46 +795,60 @@ function mergeCells(cell1Id, cell2Id, component) {
                     continue;
                 }
 
-                // figure out if this is already a merged cell
+
+                // if it is a hidden cell, unmerge the hiding cell
+                var hidden = $('#' + cellId).data('hidden');
                 var merged = $('#' + cellId).data('merged');
-                if (merged) {
-                    var lastMergedCellBottomRightId = $('#' + cellId).data('merged-cell-bottom-right');
+                //if (hidden.isHidden){
+                //    console.log(cellId+' hidden: true, merged: ' + merged.isMerged);
+                //    unmergeCells(hidden.hidingCellId);
+                //}
+
+                // figure out if this is already a merged cell
+                if (merged.isMerged) {
                     // if merged, unmerge the two cells
                     // this also resets the cells to unmerged status
-                    unmergeCells(cellId, lastMergedCellBottomRightId);
+                    console.log(cellId + ' hidden: '+ hidden.isHidden +' merged: true');
+
+                    unmergeCells(cellId);
                 }
 
 
                 // then hide the other cells
                 var cellToHide = $("#" + cellId);
                 cellToHide.css("display", "none");
-
-                // return rowspan/colspan to 1
-                cellToHide.attr("rowSpan", 1);
-                cellToHide.attr("colSpan", 1);
+                cellToHide.data('hidden', {isHidden: true, hidingCellId: topLeftCellId});
 
                 var dragContainerToHide = $('#drag-handle-container' + '_' + row + '_' + col);
                 dragContainerToHide.css('display', 'none');
 
-                selectedUserComponent.layout[row][col] = [0, 0, false, ''];
+                selectedUserComponent.layout[row][col] =
+                {spans:{row:0,col:0},
+                    merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                    hidden:{isHidden: true, hidingCellId: topLeftCellId}
+                };
             }
         }
 
     }
 
     // Make the first cell take the correct size
-    var cellTopRight = $("#" + topLeftCellId);
+    var cellTopLeft = $("#" + topLeftCellId);
     var rowspan = bottomRowNum - topRowNum + 1;
     var colspan = rightColNum - leftColNum + 1;
-    cellTopRight.attr("rowSpan", rowspan);
-    cellTopRight.attr("colSpan", colspan);
+    cellTopLeft.attr("rowSpan", rowspan);
+    cellTopLeft.attr("colSpan", colspan);
     $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum).css({
-        width: cellTopRight.css('width'),
-        height: cellTopRight.css('height'),
+        width: cellTopLeft.css('width'),
+        height: cellTopLeft.css('height'),
     });
 
     // update the datatype
-    selectedUserComponent.layout[topRowNum][leftColNum] = [rowspan, colspan, true, bottomRightCellId];
+    selectedUserComponent.layout[topRowNum][leftColNum] =
+            {spans:{row:rowspan,col:colspan},
+            merged:{isMerged: true, lastMergedBottomRightCellId: bottomRightCellId},
+            hidden:{isHidden: false, hidingCellId: ''}
+            };
 
     // then put the component in there
     if (component) {
@@ -842,42 +857,52 @@ function mergeCells(cell1Id, cell2Id, component) {
     }
 }
 
-function unmergeCells(cell1Id, cell2Id, component) {
-    var rowcol1 = cell1Id.split('_');
-    var row1 = rowcol1[rowcol1.length - 2];
-    var col1 = rowcol1[rowcol1.length - 1];
-
-    var rowcol2 = cell2Id.split('_');
-    var row2 = rowcol2[rowcol2.length - 2];
-    var col2 = rowcol2[rowcol2.length - 1];
+function unmergeCells(cellToUnmergeId, component) {
+    var cellToUnmergeRowcol = cellToUnmergeId.split('_');
+    var cellToUnmergeRow = cellToUnmergeRowcol[cellToUnmergeRowcol.length - 2];
+    var cellToUnmergeCol = cellToUnmergeRowcol[cellToUnmergeRowcol.length - 1];
 
 
-    var topRowNum = Math.min(parseInt(row1), parseInt(row2));
-    var bottomRowNum = Math.max(parseInt(row1), parseInt(row2));
+    var lastMergedCellBottomRightId = $('#' + cellToUnmergeId).data('merged').lastMergedBottomRightCellId;
 
-    var leftColNum = Math.min(parseInt(col1), parseInt(col2));
-    var rightColNum = Math.max(parseInt(col1), parseInt(col2));
+
+    var lastMergedCellBottomRightRowcol = lastMergedCellBottomRightId.split('_');
+    var lastMergedCellBottomRightRow = lastMergedCellBottomRightRowcol[lastMergedCellBottomRightRowcol.length - 2];
+    var lastMergedCellBottomRightCol = lastMergedCellBottomRightRowcol[lastMergedCellBottomRightRowcol.length - 1];
+
+
+    var topRowNum = Math.min(parseInt(cellToUnmergeRow), parseInt(lastMergedCellBottomRightRow));
+    var bottomRowNum = Math.max(parseInt(cellToUnmergeRow), parseInt(lastMergedCellBottomRightRow));
+
+    var leftColNum = Math.min(parseInt(cellToUnmergeCol), parseInt(lastMergedCellBottomRightCol));
+    var rightColNum = Math.max(parseInt(cellToUnmergeCol), parseInt(lastMergedCellBottomRightCol));
 
 
     // Make the first cell take the correct size
     var topLeftCellId = "cell" + '_' + topRowNum.toString() + '_' + leftColNum.toString();
 
-    var cellTopRight = $("#" + topLeftCellId);
-    cellTopRight.attr("rowSpan", 1);
-    cellTopRight.attr("colSpan", 1);
+    var cellTopLeft = $("#" + topLeftCellId);
+    cellTopLeft.attr("rowSpan", 1);
+    cellTopLeft.attr("colSpan", 1);
     // display all the other cells in that block
     for (var row = topRowNum; row <= bottomRowNum; row++) {
         for (var col = leftColNum; col <= rightColNum; col++) {
             var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
+            var gridId = 'grid' + '_' + row.toString() + '_' + col.toString();
             // update the datatype
-            selectedUserComponent.layout[row][col] = [1, 1, false, ''];
+            selectedUserComponent.layout[row][col] = {
+                spans:{row:1,col:1},
+                merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                hidden:{isHidden: false, hidingCellId: ''}
+            };
 
             var cellToShow = $("#" + cellId);
             cellToShow.css("display", "table-cell");
 
             // reset some meta data
-            cellToShow.data('merged', false);
-            cellToShow.data('merged-cell-bottom-right', '');
+            cellToShow.data('merged', {isMerged: false, lastMergedBottomRightCellId: ''});
+            cellToShow.data('hidden', {isHidden: false, hidingCellId: ''});
+
 
             // return rowspan/colspan to 1
             cellToShow.attr("rowSpan", 1);
@@ -887,7 +912,7 @@ function unmergeCells(cell1Id, cell2Id, component) {
             deleteComponent(cellId);
 
             var dragContainerToShow = $('#drag-handle-container' + '_' + row + '_' + col);
-            var cellOffset = cellToShow.offset();
+            var cellOffset = $('#' + gridId).offset();
             dragContainerToShow.css({
                 display: 'block',
                 top: cellOffset.top,
@@ -955,7 +980,11 @@ function addRowToEnd() {
     selectedUserComponent.layout[lastRowNum + 1] = {}
 
     for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
-        selectedUserComponent.layout[lastRowNum + 1][col] = [1, 1, false, ''];
+        selectedUserComponent.layout[lastRowNum + 1][col] = {
+                                                                spans:{row:1,col:1},
+                                                                merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                                                                hidden:{isHidden: false, hidingCellId: ''}
+                                                            }
     }
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
@@ -993,7 +1022,11 @@ function addColToEnd() {
     numCols += 1;
 
     for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
-        selectedUserComponent.layout[row][lastColNum + 1] = [1, 1, false, ''];
+        selectedUserComponent.layout[row][lastColNum + 1] ={
+                                                                spans:{row:1,col:1},
+                                                                merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                                                                hidden:{isHidden: false, hidingCellId: ''}
+                                                            }
     }
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
