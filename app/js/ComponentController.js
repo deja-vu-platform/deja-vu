@@ -915,33 +915,50 @@ function unmergeCells(cell1Id, cell2Id, component) {
  * Mutates selectedUserComponent
  */
 function addRowToEnd() {
-    var lastRowNum = selectedUserComponent.dimensions.rows;
 
-    // datatype update
-    selectedUserComponent.dimensions.rows += 1;
+    // old solution trying to addrow without loading the entire table,
+    // needed more work...
+    //var lastRowNum = selectedUserComponent.dimensions.rows;
+    //
+    //// datatype update
+    //selectedUserComponent.dimensions.rows += 1;
+    //numRows += 1;
+    //selectedUserComponent.layout[lastRowNum + 1] = {}
+    //
+    //// visual update
+    //var tableRow = createEmptyRow(lastRowNum + 1);
+    //var gridRow = createEmptyRow(lastRowNum + 1);
+    //
+    //for (var i = 1; i <= selectedUserComponent.dimensions.cols; i++) {
+    //    selectedUserComponent.layout[lastRowNum + 1][i] = [1, 1, false, ''];
+    //    var tableCell = createTableCell(lastRowNum + 1, i);
+    //    tableRow.appendChild(tableCell);
+    //    var gridCell = createGridCell(lastRowNum + 1, i);
+    //    gridRow.appendChild(gridCell);
+    //}
+    //
+    //$('#table-container table').append(tableRow);
+    //$('#guide-grid-container table').append(gridRow);
+    //
+    //attachMergeHandlers();
+    //bitmapNew = make2dArray(numRows, numCols);
+    //updateBitmap();
+    //// from http://stackoverflow.com/questions/597588/how-do-you-clone-an-array-of-objects-in-javascript
+    //bitmapOld = JSON.parse(JSON.stringify(bitmapNew)); // as not to have issues with the old and the new having
+    //// different numbers of rows
+
+    var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
+
+    selectedUserComponent.dimensions.rows = lastRowNum + 1;
     numRows += 1;
     selectedUserComponent.layout[lastRowNum + 1] = {}
 
-    // visual update
-    var tableRow = createEmptyRow(lastRowNum + 1);
-    var gridRow = createEmptyRow(lastRowNum + 1);
-
     for (var i = 1; i <= selectedUserComponent.dimensions.cols; i++) {
         selectedUserComponent.layout[lastRowNum + 1][i] = [1, 1, false, ''];
-        var tableCell = createTableCell(lastRowNum + 1, i);
-        tableRow.appendChild(tableCell);
-        var gridCell = createGridCell(lastRowNum + 1, i);
-        gridRow.appendChild(gridCell);
     }
-    $('#table-container table').append(tableRow);
-    $('#guide-grid-container table').append(gridRow);
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
 
-    attachMergeHandlers();
-    bitmapNew = make2dArray(numRows, numCols);
-    updateBitmap();
-    // from http://stackoverflow.com/questions/597588/how-do-you-clone-an-array-of-objects-in-javascript
-    bitmapOld = JSON.parse(JSON.stringify(bitmapNew)); // as not to have issues with the old and the new having
-    // different numbers of rows
+
 }
 
 /**
@@ -950,6 +967,13 @@ function addRowToEnd() {
  * Mutates selectedUserComponent
  */
 function removeEndRow() {
+    var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
+
+    selectedUserComponent.dimensions.rows = lastRowNum - 1;
+    numRows -= 1;
+    delete selectedUserComponent.layout[lastRowNum];
+
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
 
 }
 
@@ -958,6 +982,15 @@ function removeEndRow() {
  * Mutates selectedUserComponent
  */
 function addColToEnd() {
+    var lastColNum = parseInt(selectedUserComponent.dimensions.cols);
+
+    selectedUserComponent.dimensions.cols = lastColNum + 1;
+    numCols += 1;
+
+    for (var i = 1; i <= selectedUserComponent.dimensions.rows; i++) {
+        selectedUserComponent.layout[i][lastColNum + 1] = [1, 1, false, ''];
+    }
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
 
 }
 
@@ -967,5 +1000,14 @@ function addColToEnd() {
  * Mutates selectedUserComponent
  */
 function removeEndCol() {
+    var lastColNum = parseInt(selectedUserComponent.dimensions.cols);
+
+    selectedUserComponent.dimensions.cols = lastColNum - 1;
+    numCols -= 1;
+    for (var i = 1; i <= selectedUserComponent.dimensions.rows; i++) {
+        delete selectedUserComponent.layout[i][lastColNum];
+    }
+
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
 
 }
