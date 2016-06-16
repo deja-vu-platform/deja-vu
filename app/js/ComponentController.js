@@ -197,6 +197,7 @@ function createTable(gridWidth, gridHeight) {
 
     var tableGrid = document.createElement('table');
     tableGrid.className = 'main-table';
+    tableGrid.id = 'main-cell-table';
     for (var row = 1; row <= numRows; row++) {
         var tr = createEmptyRow(row);
         for (var col = 1; col <= numCols; col++) {
@@ -213,11 +214,12 @@ function createTable(gridWidth, gridHeight) {
 
     attachMergeHandlers();
     registerDroppable();
+    createGuideGrid();
+    addRowColAddRemoveButtons()
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
 
-    createGuideGrid();
 }
 
 function attachMergeHandlers() {
@@ -389,7 +391,7 @@ function createGuideGrid() {
 
     var grid = document.createElement('table');
     grid.className = 'main-table';
-
+    grid.id = 'main-grid-table';
     for (var row = 1; row <= numRows; row++) {
         var tr = createEmptyRow(row);
 
@@ -402,6 +404,59 @@ function createGuideGrid() {
 
     document.getElementById('guide-grid-container').appendChild(grid);
 
+}
+
+function addRowColAddRemoveButtons(){
+    var spAddRow = document.createElement('span');
+    spAddRow.innerHTML = '<button type="button" class="btn btn-default ">' +
+                    '<span class="glyphicon glyphicon-plus"></span>' +
+                    '</button>';
+
+    var buttonAddRow = spAddRow.firstChild;
+    buttonAddRow.id = 'btn-add-row';
+
+    $(buttonAddRow).on("click", function (e) {
+        addRowToEnd();
+    });
+
+    var spRemoveRow = document.createElement('span');
+    spRemoveRow.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span class="glyphicon glyphicon-minus"></span>' +
+        '</button>';
+
+    var buttonRemoveRow = spRemoveRow.firstChild;
+    buttonRemoveRow.id = 'btn-remove-row';
+
+    $(buttonRemoveRow).on("click", function (e) {
+        removeEndRow();
+    });
+
+
+    var spAddCol = document.createElement('span');
+    spAddCol.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span class="glyphicon glyphicon-plus"></span>' +
+        '</button>';
+
+    var buttonAddCol = spAddCol.firstChild;
+    buttonAddCol.id = 'btn-add-col';
+
+    $(buttonAddCol).on("click", function (e) {
+        addColToEnd();
+    });
+
+    var spRemoveCol = document.createElement('span');
+    spRemoveCol.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span class="glyphicon glyphicon-minus"></span>' +
+        '</button>';
+
+    var buttonRemoveCol = spRemoveCol.firstChild;
+    buttonRemoveCol.id = 'btn-remove-col';
+
+    $(buttonRemoveCol).on("click", function (e) {
+        removeEndCol();
+    });
+
+    $('#main-cell-table').append(buttonAddRow).append(buttonRemoveRow).append(buttonAddCol).append(buttonRemoveCol);
 }
 
 

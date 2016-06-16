@@ -294,6 +294,26 @@ td {
     display: inline-block;
 }
 
+#btn-add-row, #btn-remove-row{
+    position: absolute;
+    bottom: -33px;
+    left: 0;
+}
+
+#btn-remove-row{
+    left: 40px;
+}
+
+#btn-add-col, #btn-remove-col{
+    position: absolute;
+    top: 0;
+    right: -40px;
+}
+
+#btn-remove-col{
+    top: 33px;
+}
+
 .form-lbl {
     text-align: right;
     height: 35px;
