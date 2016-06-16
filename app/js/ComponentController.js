@@ -234,13 +234,33 @@ function attachMergeHandlers() {
 
             var dragHandleContainer = document.createElement('div');
             dragHandleContainer.id = 'drag-handle-container' + '_' + row + '_' + col;
-            var dragHandle = document.createElement('span');
+            
+            var dragHandle_se = document.createElement('span');
+            dragHandle_se.innerHTML = '<img src="images/drag_handle_se_icon.png" width="15px" height="15px">';
+            dragHandle_se.className = 'ui-resizable-handle ui-resizable-se drag-handle';
+            dragHandle_se.id = 'drag-handle-se' + '_' + row + '_' + col;
 
-            dragHandle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
-            dragHandle.className = 'ui-resizable-handle ui-resizable-se drag-handle';
-            dragHandle.id = 'drag-handle' + '_' + row + '_' + col;
+            var dragHandle_sw = document.createElement('span');
+            dragHandle_sw.innerHTML = '<img src="images/drag_handle_sw_icon.png" width="15px" height="15px">';
+            dragHandle_sw.className = 'ui-resizable-handle ui-resizable-sw drag-handle';
+            dragHandle_sw.id = 'drag-handle-sw' + '_' + row + '_' + col;
 
-            dragHandleContainer.appendChild(dragHandle);
+            var dragHandle_ne = document.createElement('span');
+            dragHandle_ne.innerHTML = '<img src="images/drag_handle_ne_icon.png" width="15px" height="15px">';
+            dragHandle_ne.className = 'ui-resizable-handle ui-resizable-ne drag-handle';
+            dragHandle_ne.id = 'drag-handle-ne' + '_' + row + '_' + col;
+
+            var dragHandle_nw = document.createElement('span');
+            dragHandle_nw.innerHTML = '<img src="images/drag_handle_nw_icon.png" width="15px" height="15px">';
+            dragHandle_nw.className = 'ui-resizable-handle ui-resizable-nw drag-handle';
+            dragHandle_nw.id = 'drag-handle-nw' + '_' + row + '_' + col;
+
+
+            dragHandleContainer.appendChild(dragHandle_se);
+            dragHandleContainer.appendChild(dragHandle_sw);
+            dragHandleContainer.appendChild(dragHandle_ne);
+            dragHandleContainer.appendChild(dragHandle_nw);
+
             $('#drag-handle-containers-container').append(dragHandleContainer);
             $(dragHandleContainer).css({
                 position: 'absolute',
@@ -251,19 +271,19 @@ function attachMergeHandlers() {
                 'pointer-events': 'none',
             });
 
-            $(dragHandle).mouseenter(function (event, ui) {
+            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseenter(function (event, ui) {
                 $(this).parent().css({
                     border: 'black 1px dotted'
                 });
             });
 
-            $(dragHandle).mouseleave(function (event, ui) {
+            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseleave(function (event, ui) {
                 $(this).parent().css({
                     border: 'none'
                 });
             });
 
-            $(dragHandle).css({
+            $(dragHandle_se).css({
                 'pointer-events': 'auto',
                 position: 'absolute',
                 bottom: '5px',
@@ -271,9 +291,36 @@ function attachMergeHandlers() {
                 cursor: 'nwse-resize',
             });
 
+            $(dragHandle_sw).css({
+                'pointer-events': 'auto',
+                position: 'absolute',
+                bottom: '5px',
+                left: '5px',
+                cursor: 'nesw-resize',
+            });
+
+            $(dragHandle_ne).css({
+                'pointer-events': 'auto',
+                position: 'absolute',
+                top: '5px',
+                right: '5px',
+                cursor: 'nesw-resize',
+            });
+
+            $(dragHandle_nw).css({
+                'pointer-events': 'auto',
+                position: 'absolute',
+                top: '5px',
+                left: '5px',
+                cursor: 'nwse-resize',
+            });
+
             $(dragHandleContainer).resizable({
                 handles: {
-                    'se': '#drag-handle' + '_' + row + '_' + col
+                    'se': '#drag-handle-se' + '_' + row + '_' + col,
+                    'sw': '#drag-handle-sw' + '_' + row + '_' + col,
+                    'ne': '#drag-handle-ne' + '_' + row + '_' + col,
+                    'nw': '#drag-handle-nw' + '_' + row + '_' + col
                 },
                 start: function (event, ui) {
                     $('#guide-grid-container td').css({
