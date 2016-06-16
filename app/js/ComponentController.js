@@ -799,17 +799,14 @@ function mergeCells(cell1Id, cell2Id, component) {
                 // if it is a hidden cell, unmerge the hiding cell
                 var hidden = $('#' + cellId).data('hidden');
                 var merged = $('#' + cellId).data('merged');
-                //if (hidden.isHidden){
-                //    console.log(cellId+' hidden: true, merged: ' + merged.isMerged);
-                //    unmergeCells(hidden.hidingCellId);
-                //}
+                if (hidden.isHidden){
+                    unmergeCells(hidden.hidingCellId);
+                }
 
                 // figure out if this is already a merged cell
                 if (merged.isMerged) {
                     // if merged, unmerge the two cells
                     // this also resets the cells to unmerged status
-                    console.log(cellId + ' hidden: '+ hidden.isHidden +' merged: true');
-
                     unmergeCells(cellId);
                 }
 
