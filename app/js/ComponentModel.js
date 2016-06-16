@@ -22,7 +22,7 @@ function Component() {
     this.dimensions = {};
     this.properties = {};
     this.components = {};
-    this.layout = {}; // {row:{col:[rowspan, colspan, isMerged, last_merged_bottom_right_cell_id]}}; [0,0, ...] means hide this cell
+    this.layout = {}; // {row:{col:[rowspan, colspan, isMerged, lastMergedBottomRightCellId]}}; [0,0, ...] means hide this cell
 };
 
 

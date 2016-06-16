@@ -582,6 +582,7 @@ function deleteComponent(cellId) {
             $(cell).find('.widget').remove();
 
             resetDroppability(cellId);
+            updateBitmap();
 
         }
     }
@@ -953,8 +954,8 @@ function addRowToEnd() {
     numRows += 1;
     selectedUserComponent.layout[lastRowNum + 1] = {}
 
-    for (var i = 1; i <= selectedUserComponent.dimensions.cols; i++) {
-        selectedUserComponent.layout[lastRowNum + 1][i] = [1, 1, false, ''];
+    for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+        selectedUserComponent.layout[lastRowNum + 1][col] = [1, 1, false, ''];
     }
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
@@ -968,6 +969,10 @@ function addRowToEnd() {
  */
 function removeEndRow() {
     var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
+
+    if (lastRowNum == 1){
+        return
+    }
 
     selectedUserComponent.dimensions.rows = lastRowNum - 1;
     numRows -= 1;
@@ -987,8 +992,8 @@ function addColToEnd() {
     selectedUserComponent.dimensions.cols = lastColNum + 1;
     numCols += 1;
 
-    for (var i = 1; i <= selectedUserComponent.dimensions.rows; i++) {
-        selectedUserComponent.layout[i][lastColNum + 1] = [1, 1, false, ''];
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+        selectedUserComponent.layout[row][lastColNum + 1] = [1, 1, false, ''];
     }
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
@@ -1001,13 +1006,36 @@ function addColToEnd() {
  */
 function removeEndCol() {
     var lastColNum = parseInt(selectedUserComponent.dimensions.cols);
-
+    if (lastColNum == 1){
+        return
+    }
     selectedUserComponent.dimensions.cols = lastColNum - 1;
     numCols -= 1;
-    for (var i = 1; i <= selectedUserComponent.dimensions.rows; i++) {
-        delete selectedUserComponent.layout[i][lastColNum];
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+        delete selectedUserComponent.layout[row][lastColNum];
     }
 
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
+}
+
+function clearAll(){
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++){
+        clearRow(row);
+    }
+}
+
+function clearRow(row){
+    for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++){
+        var cellId = 'cell' + '_' + row + '_' + col;
+        deleteComponent(cellId);
+    }
+
+}
+
+function clearCol(col){
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++){
+        var cellId = 'cell' + '_' + row + '_' + col;
+        deleteComponent(cellId);
+    }
 }
