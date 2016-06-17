@@ -27,7 +27,8 @@ function Component() {
                             // {spans: {row: Number ,col: Number},
                             // merged:{isMerged: Boolean, lastMergedBottomRightCellId: String},
                             // hidden:{isHidden: Boolean, hidingCellId: String}
-                             // }
+                            // pxDimensions: {width: Number (ratio), height: Number (ratio)}
+                            // }
                         // }
                       // }
 }
@@ -60,7 +61,8 @@ function BaseComponent(type, components) {
                     1:{
                         spans:{row:1,col:1},
                         merged:{isMerged: false, lastMergedBottomRightCellId: ''},
-                        hidden:{isHidden: false, hidingCellId: ''}
+                        hidden:{isHidden: false, hidingCellId: ''},
+                        pxDimensions: {width: 1, height: 1}
                     }
                    }};
 }
@@ -105,8 +107,10 @@ function ClicheComponent(dimensions, name, id, version, author) {
             this.layout[row][col] = {
                                         spans:{row:1,col:1},
                                         merged:{isMerged: false, lastMergedBottomRightCellId: ''},
-                                        hidden:{isHidden: false, hidingCellId: ''}
-                                    };
+                                        hidden:{isHidden: false, hidingCellId: ''},
+                                        // pxDimensions will be measured in %
+                                        pxDimensions: {width: 1/dimensions.cols, height: 1/dimensions.rows},
+            };
         }
     }
 }

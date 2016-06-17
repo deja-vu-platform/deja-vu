@@ -222,6 +222,28 @@ function createTable(gridWidth, gridHeight) {
 
 }
 
+function resizeMergeHandleContainersToCellSize(){
+    for (var row = 1; row <= numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var cell = $("#cell" + '_' + row + '_' + col);
+
+            var offset = cell.offset();
+            var width = cell.css("width");
+            var height = cell.css("height");
+
+            var dragHandleContainer = $('#drag-handle-container' + '_' + row + '_' + col);
+
+            dragHandleContainer.css({
+                position: 'absolute',
+                top: offset.top,
+                left: offset.left,
+                width: width,
+                height: height,
+            });
+        }
+    }
+}
+
 function attachMergeHandlers() {
     $('#drag-handle-containers-container').html('');
     for (var row = 1; row <= numRows; row++) {
@@ -234,6 +256,7 @@ function attachMergeHandlers() {
 
             var dragHandleContainer = document.createElement('div');
             dragHandleContainer.id = 'drag-handle-container' + '_' + row + '_' + col;
+            dragHandleContainer.className = 'row_'+ row + ' col_' + col;
             var dragHandle = document.createElement('span');
 
             dragHandle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
@@ -406,6 +429,72 @@ function createGuideGrid() {
 
 }
 
+function addRowColResizeHandlers(){
+    // Have a resizable on the rows
+    // once resize is stopped, loop through all the rows/cols, and store the
+    // col-width/table-width or col-height/table-height or something similar
+    //
+    //  Then also set the cell size in load table (or resize function) based on these values
+
+    // glyphicon-resize-horizontal
+    // glyphicon-resize-vertical
+
+    for (var row = 1; row <= numRows; row++) {
+        $('#table-container .row_' + row).resizable({
+            //handles: {
+            //    'se': resizeHandleRow,
+            //},
+            handles: 's',
+            alsoResize: '#guide-grid-container .row_' + row + ', #drag-handle-containers-container .row_' + row,
+            start: function () {
+                $(this).children().css({
+                    height: 0,
+                })
+            },
+            resize: function () {
+                resizeMergeHandleContainersToCellSize();
+            },
+            stop: function () {
+                // TODO, save resized ratios
+            }
+        });
+
+        $('#table-container .row_' + row + ' .ui-resizable-handle').addClass('glyphicon glyphicon-resize-vertical').css({
+            cursor: 'ns-resize',
+            'padding-top': $('#table-container .row_' + row).css('height'),
+        });
+
+
+    }
+
+    for (var col = 1; col <= numCols; col++) {
+        $('#table-container #cell_1_' + col).resizable({ //there is always at least 1 cell!
+            handles: 'ew',
+            alsoResize: '#table-container .col_' + col + ',#guide-grid-container .col_' + col + ', #drag-handle-containers-container .col_' + col,
+            start: function () {
+                $(this).parent().children().css({
+                    width: 0,
+                })
+            },
+            resize: function () {
+                // TODO: move to stop() once the cell resize handles are made invisible
+                resizeMergeHandleContainersToCellSize();
+            },
+            stop: function () {
+            }
+        });
+
+        $('#table-container .col_' + col + ' .ui-resizable-handle').addClass('glyphicon glyphicon-resize-horizontal').css({
+            cursor: 'ew-resize',
+            position: 'absolute',
+            top: 'auto',
+            bottom: '0',
+        });
+
+
+    }
+}
+
 function addRowColAddRemoveButtons(){
     var spAddRow = document.createElement('span');
     spAddRow.innerHTML = '<button type="button" class="btn btn-default ">' +
@@ -505,8 +594,9 @@ function loadTable(gridWidth, gridHeight, componentToShow) {
  * @param numCols
  */
 function initialResizeCells(gridWidth, gridHeight, numRows, numCols) {
-    cellWidth = Math.floor((gridWidth / numCols)) - 15;
-    cellHeight = Math.floor((gridHeight / numRows)) - 15;
+    // TODO use saved ratios from the datatype
+    cellWidth = (gridWidth / numCols)  - 10;
+    cellHeight = (gridHeight / numRows)  - 10;
     var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
 
     getCSSRule('td').style.setProperty('width', cellWidth + 'px', null);
@@ -616,7 +706,6 @@ function addComponent(cellId, widget, component) {
 
     updateBitmap();
     registerTooltipBtnHandlers()
-    //selectedUserComponent.addComponent(component, row, col);
 }
 
 
@@ -874,11 +963,9 @@ function mergeCells(cell1Id, cell2Id, component) {
                 var dragContainerToHide = $('#drag-handle-container' + '_' + row + '_' + col);
                 dragContainerToHide.css('display', 'none');
 
-                selectedUserComponent.layout[row][col] =
-                {spans:{row:0,col:0},
-                    merged:{isMerged: false, lastMergedBottomRightCellId: ''},
-                    hidden:{isHidden: true, hidingCellId: topLeftCellId}
-                };
+                selectedUserComponent.layout[row][col].spans = {row:0,col:0};
+                selectedUserComponent.layout[row][col].merged = {isMerged: false, lastMergedBottomRightCellId: ''};
+                selectedUserComponent.layout[row][col].hidden = {isHidden: true, hidingCellId: topLeftCellId};
             }
         }
 
@@ -896,11 +983,10 @@ function mergeCells(cell1Id, cell2Id, component) {
     });
 
     // update the datatype
-    selectedUserComponent.layout[topRowNum][leftColNum] =
-            {spans:{row:rowspan,col:colspan},
-            merged:{isMerged: true, lastMergedBottomRightCellId: bottomRightCellId},
-            hidden:{isHidden: false, hidingCellId: ''}
-            };
+    selectedUserComponent.layout[topRowNum][leftColNum].spans = {row:rowspan,col:colspan};
+    selectedUserComponent.layout[topRowNum][leftColNum].merged = {isMerged: true, lastMergedBottomRightCellId: bottomRightCellId};
+    selectedUserComponent.layout[topRowNum][leftColNum].hidden = {isHidden: false, hidingCellId: ''};
+
 
     // then put the component in there
     if (component) {
@@ -942,11 +1028,10 @@ function unmergeCells(cellToUnmergeId, component) {
             var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
             var gridId = 'grid' + '_' + row.toString() + '_' + col.toString();
             // update the datatype
-            selectedUserComponent.layout[row][col] = {
-                spans:{row:1,col:1},
-                merged:{isMerged: false, lastMergedBottomRightCellId: ''},
-                hidden:{isHidden: false, hidingCellId: ''}
-            };
+            selectedUserComponent.layout[row][col].spans = {row:1,col:1};
+            selectedUserComponent.layout[row][col].merged = {isMerged: false, lastMergedBottomRightCellId: ''};
+            selectedUserComponent.layout[row][col].hidden = {isHidden: false, hidingCellId: ''};
+
 
             var cellToShow = $("#" + cellId);
             cellToShow.css("display", "table-cell");
