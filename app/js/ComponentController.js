@@ -674,6 +674,8 @@ function addComponent(cellId, widget, component) {
         type = span.firstElementChild.getAttribute('name');
         component = new BaseComponent(type, {});
 
+        showConfigOptions(type, document.getElementById(cellId));
+
         if (type === 'label') {
             Display(cellId, getHTML[type]("Type text here..."));
         } else if (type === 'panel') {
@@ -685,6 +687,8 @@ function addComponent(cellId, widget, component) {
 
     } else {// a component is there
         type = component.type;
+
+        showConfigOptions(type, document.getElementById(cellId));
 
         Display(cellId, getHTML[type](component.components[type]));
         if (!widget) {
