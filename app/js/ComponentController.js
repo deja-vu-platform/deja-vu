@@ -458,6 +458,8 @@ function addRowColResizeHandlers(){
             },
             stop: function () {
                 // TODO, save resized ratios
+                resizeMergeHandleContainersToCellSize();
+                saveRowColRatios();
             }
         });
 
@@ -483,6 +485,8 @@ function addRowColResizeHandlers(){
                 resizeMergeHandleContainersToCellSize();
             },
             stop: function () {
+                resizeMergeHandleContainersToCellSize();
+                saveRowColRatios();
             }
         });
 
@@ -549,6 +553,11 @@ function addRowColAddRemoveButtons(){
 
     $('#main-cell-table').append(buttonAddRow).append(buttonRemoveRow).append(buttonAddCol).append(buttonRemoveCol);
 }
+
+function saveRowColRatios(){
+    //TODO
+}
+
 
 
 /**
