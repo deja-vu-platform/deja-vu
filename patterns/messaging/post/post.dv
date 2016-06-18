@@ -1,0 +1,29 @@
+cliche Post
+
+type Post {
+  content: Text,
+  author: User
+}
+
+type User {
+  username: Text
+}
+
+widget Post {
+  post: Post
+}
+
+widget EditContent {
+  post: Post
+}
+
+widget NewPostButton {
+  post: Post
+}
+
+widget User {
+  user: User
+}
+
+attach Post to Post
+attach User to User

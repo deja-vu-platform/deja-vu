@@ -1,0 +1,20 @@
+cliche Label
+
+type Item {
+  name: Text,
+  labels: *Label
+}
+
+type Label {
+  name: Text
+}
+
+widget AttachLabels {
+  item: Item
+}
+
+widget Label {
+  label: Label
+}
+
+attach Label to Label
