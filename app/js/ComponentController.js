@@ -555,7 +555,19 @@ function addRowColAddRemoveButtons(){
 }
 
 function saveRowColRatios(){
-    //TODO
+    for (var row = 1; row<=numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var cell = $('#grid' + '_' + row + '_' + col); //grid is better to use?, since cells can merge with other cells
+            var cellWidth = parseFloat(cell.css('width'));
+            var cellHeight = parseFloat(cell.css('height'));
+            var widthRatio = cellWidth/(gridWidth-20);
+            var heightRatio = cellHeight/(gridHeight-20);
+
+            selectedUserComponent.layout[row][col].pxDimensions.width = widthRatio;
+            selectedUserComponent.layout[row][col].pxDimensions.height = heightRatio;
+        }
+    }
+
 }
 
 
