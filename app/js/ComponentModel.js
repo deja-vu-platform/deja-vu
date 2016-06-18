@@ -99,7 +99,7 @@ function ClicheComponent(dimensions, name, id, version, author) {
     this.dimensions = dimensions;
     this.components = {};
     this.properties = {};
-    this.layout = {}; // this is to remember this sizes of different cells
+    this.layout = {tablePxDimensions:{isSet: false, width:-1, height:-1}}; // -1 means absolute width and height have not been set
 
     for (var row = 1; row<=dimensions.rows; row++){
         this.layout[row] = {};

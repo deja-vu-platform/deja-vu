@@ -24,6 +24,8 @@ $(function () {
     var grid = $('#table-container').get(0);
     gridWidth = grid.offsetWidth;
     gridHeight = grid.offsetHeight;
+    //console.log(gridWidth);
+    //console.log(gridHeight);
     createTable(gridWidth, gridHeight);
 
 });
@@ -210,7 +212,7 @@ function createTable(gridWidth, gridHeight) {
 
     document.getElementById('table-container').appendChild(tableGrid);
 
-    initialResizeCells(gridWidth, gridHeight, numRows, numCols);
+    initialResizeCells(numRows, numCols);
 
     attachMergeHandlers();
     registerDroppable();
@@ -593,10 +595,25 @@ function loadTable(gridWidth, gridHeight, componentToShow) {
  * @param numRows
  * @param numCols
  */
-function initialResizeCells(gridWidth, gridHeight, numRows, numCols) {
+function initialResizeCells(numRows, numCols) {
     // TODO use saved ratios from the datatype
-    cellWidth = (gridWidth / numCols)  - 10;
-    cellHeight = (gridHeight / numRows)  - 10;
+    if (!selectedUserComponent.layout.tablePxDimensions.isSet){
+        selectedUserComponent.layout.tablePxDimensions.width = gridWidth;
+        selectedUserComponent.layout.tablePxDimensions.height = gridHeight;
+        selectedUserComponent.layout.tablePxDimensions.isSet = true;
+    } else {
+        gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
+        gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
+        $('#table-container').css({
+            width: gridWidth,
+            height: gridHeight
+        })
+    }
+
+    cellWidth = ((gridWidth-20) / numCols);
+    cellHeight = ((gridHeight-20) / numRows);
+    console.log(cellWidth);
+    console.log(cellHeight);
     var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
 
     getCSSRule('td').style.setProperty('width', cellWidth + 'px', null);

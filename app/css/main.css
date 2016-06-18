@@ -161,7 +161,7 @@ li#selected {
 td {
     background-color: #F0F1F2;
     width: 170px;
-    min-width: 100px;
+    /*min-width: 100px;*/
     height: 170px;
     border: 5px solid white;
     resize: both;
