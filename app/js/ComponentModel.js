@@ -115,6 +115,22 @@ function ClicheComponent(dimensions, name, id, version, author) {
     }
 }
 
+ClicheComponent.prototype.recalculateRatios = function(deltaRows, deltaCols){
+    var dimensions = this.dimensions;
+    for (var row = 1; row<=dimensions.rows; row++){
+        for (var col = 1; col<= dimensions.cols; col++){
+            if (this.layout[row][col].pxDimensions){
+                this.layout[row][col].pxDimensions.width = this.layout[row][col].pxDimensions.width*(dimensions.cols-deltaCols)/dimensions.cols;
+                this.layout[row][col].pxDimensions.height = this.layout[row][col].pxDimensions.height*(dimensions.rows-deltaRows)/dimensions.rows;
+            } else {
+                this.layout[row][col].pxDimensions = {};
+                this.layout[row][col].pxDimensions.width = 1/dimensions.cols;
+                this.layout[row][col].pxDimensions.height = 1/dimensions.rows;
+            }
+        }
+    }
+}
+
 ClicheComponent.prototype.addComponent = function(component, row, col) {
     if (!this.components.hasOwnProperty(row)) {
         this.components[row]={};

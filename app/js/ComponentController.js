@@ -212,11 +212,11 @@ function createTable(gridWidth, gridHeight) {
 
     document.getElementById('table-container').appendChild(tableGrid);
 
+    createGuideGrid();
     initialResizeCells(numRows, numCols);
 
     attachMergeHandlers();
     registerDroppable();
-    createGuideGrid();
     addRowColAddRemoveButtons()
 
     bitmapOld = make2dArray(numRows, numCols);
@@ -621,12 +621,30 @@ function initialResizeCells(numRows, numCols) {
 
     cellWidth = ((gridWidth-20) / numCols);
     cellHeight = ((gridHeight-20) / numRows);
-    console.log(cellWidth);
-    console.log(cellHeight);
-    var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
 
-    getCSSRule('td').style.setProperty('width', cellWidth + 'px', null);
-    getCSSRule('td').style.setProperty('height', cellHeight + 'px', null);
+    //console.log(cellWidth);
+    //console.log(cellHeight);
+
+    for (var row = 1; row<=numRows; row++){
+        for (var col = 1; col<=numCols; col++){
+            var widthRatio = selectedUserComponent.layout[row][col].pxDimensions.width;
+            var heightRatio = selectedUserComponent.layout[row][col].pxDimensions.height;
+            var thisCellWidth = widthRatio*(gridWidth-20);
+            var thisCellHeight = heightRatio*(gridHeight-20);
+            var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
+            $('#cell' + '_' + row + '_' + col).css({
+                width: thisCellWidth + 'px',
+                height: thisCellHeight + 'px',
+            })
+            $('#grid' + '_' + row + '_' + col).css({
+                width: thisCellWidth + 'px',
+                height: thisCellHeight + 'px',
+            })
+        }
+    }
+
+    //getCSSRule('td').style.setProperty('width', cellWidth + 'px', null);
+    //getCSSRule('td').style.setProperty('height', cellHeight + 'px', null);
     getCSSRule('.tooltip').style.setProperty('left', -1 * Math.floor((tooltipWidth - (cellWidth - 40)) / 2) + 'px', null);
 
     resizeLabelDivs(cellWidth, cellHeight);
@@ -1153,6 +1171,7 @@ function addRowToEnd() {
                                                                 hidden:{isHidden: false, hidingCellId: ''}
                                                             }
     }
+    selectedUserComponent.recalculateRatios(1,0);
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
 
@@ -1174,6 +1193,7 @@ function removeEndRow() {
     numRows -= 1;
     delete selectedUserComponent.layout[lastRowNum];
 
+    selectedUserComponent.recalculateRatios(-1,0);
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
 }
@@ -1195,6 +1215,7 @@ function addColToEnd() {
                                                                 hidden:{isHidden: false, hidingCellId: ''}
                                                             }
     }
+    selectedUserComponent.recalculateRatios(0,1);
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
 }
@@ -1215,6 +1236,7 @@ function removeEndCol() {
         delete selectedUserComponent.layout[row][lastColNum];
     }
 
+    selectedUserComponent.recalculateRatios(0,-1);
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 
 }
