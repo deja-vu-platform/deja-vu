@@ -224,7 +224,7 @@ function createTable(gridWidth, gridHeight) {
 
 }
 
-function resizeMergeHandleContainersToCellSize(){
+function resetMergeHandleContainersSizeAndPostition(){
     for (var row = 1; row <= numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             var cell = $("#cell" + '_' + row + '_' + col);
@@ -454,11 +454,11 @@ function addRowColResizeHandlers(){
                 })
             },
             resize: function () {
-                resizeMergeHandleContainersToCellSize();
+                // TODO get rid of this later!
+                resetMergeHandleContainersSizeAndPostition();
             },
             stop: function () {
-                // TODO, save resized ratios
-                resizeMergeHandleContainersToCellSize();
+                resetMergeHandleContainersSizeAndPostition();
                 saveRowColRatios();
             }
         });
@@ -482,10 +482,10 @@ function addRowColResizeHandlers(){
             },
             resize: function () {
                 // TODO: move to stop() once the cell resize handles are made invisible
-                resizeMergeHandleContainersToCellSize();
+                resetMergeHandleContainersSizeAndPostition();
             },
             stop: function () {
-                resizeMergeHandleContainersToCellSize();
+                resetMergeHandleContainersSizeAndPostition();
                 saveRowColRatios();
             }
         });
@@ -1053,6 +1053,10 @@ function mergeCells(cell1Id, cell2Id, component) {
         // add the component to the cell
         addComponent(topLeftCellId, false, component);
     }
+
+    // TODO this is doing some redundant stuff, maybe reduce some stuff above?
+    resetMergeHandleContainersSizeAndPostition();
+
 }
 
 function unmergeCells(cellToUnmergeId, component) {
@@ -1126,6 +1130,8 @@ function unmergeCells(cellToUnmergeId, component) {
         addComponent(topLeftCellId, false, component);
     }
 
+    // TODO this is doing some redundant stuff, maybe reduce some stuff above?
+    resetMergeHandleContainersSizeAndPostition();
 }
 
 
