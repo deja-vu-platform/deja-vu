@@ -552,9 +552,6 @@ function addTableResizeHandler(){
         stop: function () {
             resetMergeHandleContainersSizeAndPostition();
             saveRowColRatios();
-            selectedUserComponent.layout.pxDimensions.width = $('#main-cell-table').css('width');
-            selectedUserComponent.layout.pxDimensions.height = $('#main-cell-table').css('height');
-
         }
     });
 
@@ -626,6 +623,10 @@ function addRowColAddRemoveButtons(){
 }
 
 function saveRowColRatios(){
+    // save the new table dimensions
+    //selectedUserComponent.layout.tablePxDimensions.width = $('#main-cell-table').css('width');
+    //selectedUserComponent.layout.tablePxDimensions.height = $('#main-cell-table').css('height');
+
     for (var row = 1; row<=numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             var cell = $('#grid' + '_' + row + '_' + col); //grid is better to use?, since cells can merge with other cells

@@ -124,8 +124,16 @@ ClicheComponent.prototype.recalculateRatios = function(deltaRows, deltaCols){
                 this.layout[row][col].pxDimensions.height = this.layout[row][col].pxDimensions.height*(dimensions.rows-deltaRows)/dimensions.rows;
             } else {
                 this.layout[row][col].pxDimensions = {};
-                this.layout[row][col].pxDimensions.width = 1/dimensions.cols;
-                this.layout[row][col].pxDimensions.height = 1/dimensions.rows;
+                if (this.layout[row-1]){ // if there is a row before this, take the width of the cell to the top
+                    this.layout[row][col].pxDimensions.width = this.layout[row-1][col].pxDimensions.width;
+                } else { // otherwise have a standard width
+                    this.layout[row][col].pxDimensions.width = 1/dimensions.cols;
+                }
+                if (this.layout[row][col-1]){ // if there is a col before this, take the height of the cell to the left
+                    this.layout[row][col].pxDimensions.height = this.layout[row][col-1].pxDimensions.height;
+                } else { // otherwise have a standard height
+                    this.layout[row][col].pxDimensions.height = 1/dimensions.rows;
+                }
             }
         }
     }
