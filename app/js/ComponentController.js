@@ -386,10 +386,9 @@ function attachMergeHandlers() {
                 }
             });
 
-            var rowspan = selectedUserComponent.layout[row][col].spans.row;
-            var colspan = selectedUserComponent.layout[row][col].spans.col;
+            var isMerged = selectedUserComponent.layout[row][col].merged.isMerged;
 
-            if (rowspan === 0) { // and thus also colspan
+            if (isMerged) { // and thus also colspan
                 $(dragHandleContainer).css("display", "none");
             }
         }
@@ -444,14 +443,8 @@ function addRowColResizeHandlers(){
     //
     //  Then also set the cell size in load table (or resize function) based on these values
 
-    // glyphicon-resize-horizontal
-    // glyphicon-resize-vertical
-
     for (var row = 1; row <= numRows; row++) {
         $('#table-container .row_' + row).resizable({
-            //handles: {
-            //    'se': resizeHandleRow,
-            //},
             handles: 's',
             alsoResize: '#table-container .row_' + row + ' .cell, ' +  // also resize the td's
                             '#guide-grid-container .row_' + row + ' .grid,' + // also resize the td's
@@ -462,13 +455,6 @@ function addRowColResizeHandlers(){
             resize: function () {
                 // TODO get rid of this later!
                 resetMergeHandleContainersSizeAndPostition();
-                //var resizablesList = $('.ui-resizable-s');
-                //for (var i = 0; i<resizablesList.length; i++){
-                //    $(resizablesList.get(i)).css({
-                //        'padding-top': (parseFloat($(resizablesList.get(i)).parent().css('height')) - 25).toString() + 'px',
-                //    });
-                //}
-
             },
             stop: function () {
                 resetMergeHandleContainersSizeAndPostition();
@@ -536,6 +522,7 @@ function addRowColResizeHandlers(){
 }
 
 function addTableResizeHandler(){
+    // TODO THIS DOES NOT WORK!
     var dragHandle = document.createElement('span');
 
     dragHandle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';

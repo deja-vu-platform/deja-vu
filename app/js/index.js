@@ -315,6 +315,7 @@ $(document).click(function(event) {
     if ($(event.target).is('[contenteditable=true]')) {
         selectText($(event.target).get(0));
     }
+
 });
 
 /**
