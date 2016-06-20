@@ -222,6 +222,7 @@ function createTable(gridWidth, gridHeight) {
     addRowColAddRemoveButtons();
 
     addRowColResizeHandlers();
+    addClearButtons();
     //addTableResizeHandler();
 
     bitmapOld = make2dArray(numRows, numCols);
@@ -622,6 +623,37 @@ function addRowColAddRemoveButtons(){
     });
 
     $('#main-cell-table').append(buttonAddRow).append(buttonRemoveRow).append(buttonAddCol).append(buttonRemoveCol);
+}
+
+/**
+ * Add buttons to clear a row, a column or the entire table of its components
+ */
+function addClearButtons(){
+    addClearAllButton();
+}
+
+function addClearAllButton(){
+    var spClearAll = document.createElement('span');
+    spClearAll.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span>Clear All </span>' +
+        '<span class="glyphicon glyphicon-remove"></span>' +
+        '</button>';
+
+    var buttonClearAll = spClearAll.firstChild;
+    buttonClearAll.id = 'btn-clear-all';
+
+    $(buttonClearAll).on("click", function (e) {
+        clearAll();
+    });
+
+    $('#table-container').append(buttonClearAll).css({
+        position: 'relative'
+    });
+    $(buttonClearAll).css({
+        position: 'absolute',
+        top:'-45px',
+        right:'-140px'
+    })
 }
 
 function saveRowColRatios(){
