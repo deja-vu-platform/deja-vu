@@ -217,7 +217,9 @@ function createTable(gridWidth, gridHeight) {
 
     attachMergeHandlers();
     registerDroppable();
-    addRowColAddRemoveButtons()
+    addRowColAddRemoveButtons();
+
+    addRowColResizeHandlers();
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
@@ -447,15 +449,22 @@ function addRowColResizeHandlers(){
             //    'se': resizeHandleRow,
             //},
             handles: 's',
-            alsoResize: '#guide-grid-container .row_' + row + ', #drag-handle-containers-container .row_' + row,
-            start: function () {
-                $(this).children().css({
-                    height: 0,
-                })
-            },
+            alsoResize: '#table-container .row_' + row + ' .cell, ' +  // also resize the td's
+                            '#guide-grid-container .row_' + row + ' .grid,' + // also resize the td's
+                            ' #guide-grid-container .row_' + row + ', ' +
+                            '#drag-handle-containers-container .row_' + row + ', ' +
+                            //'#table-container .row_' + row + ' .ui-resizable-s' +
+                            ' .ui-resizable-s-row_'+row,
             resize: function () {
                 // TODO get rid of this later!
                 resetMergeHandleContainersSizeAndPostition();
+                //var resizablesList = $('.ui-resizable-s');
+                //for (var i = 0; i<resizablesList.length; i++){
+                //    $(resizablesList.get(i)).css({
+                //        'padding-top': (parseFloat($(resizablesList.get(i)).parent().css('height')) - 25).toString() + 'px',
+                //    });
+                //}
+
             },
             stop: function () {
                 resetMergeHandleContainersSizeAndPostition();
@@ -463,10 +472,30 @@ function addRowColResizeHandlers(){
             }
         });
 
-        $('#table-container .row_' + row + ' .ui-resizable-handle').addClass('glyphicon glyphicon-resize-vertical').css({
+        $('#table-container .row_' + row).css({
+            position: 'relative',
+            width: $('#table-container .row_' + row).css('width'),
+            height: $('#table-container .row_' + row).css('height')
+        })
+
+        var handle = document.createElement('div');
+        $(handle).addClass('glyphicon glyphicon-resize-vertical ');
+
+        $('#table-container .row_' + row + ' .ui-resizable-s').addClass('ui-resizable-s-row_'+row).append(handle).css({
             cursor: 'ns-resize',
-            'padding-top': $('#table-container .row_' + row).css('height'),
+            width: 0,
+            height: $('#table-container .row_' + row).css('height'),
+            position: 'relative',
+
         });
+
+        $(handle).css({
+            position: 'absolute',
+            top: 'auto',
+            bottom: '10px',
+            width: 0,
+            height: 0
+        })
 
 
     }
@@ -474,12 +503,9 @@ function addRowColResizeHandlers(){
     for (var col = 1; col <= numCols; col++) {
         $('#table-container #cell_1_' + col).resizable({ //there is always at least 1 cell!
             handles: 'ew',
-            alsoResize: '#table-container .col_' + col + ',#guide-grid-container .col_' + col + ', #drag-handle-containers-container .col_' + col,
-            start: function () {
-                $(this).parent().children().css({
-                    width: 0,
-                })
-            },
+            alsoResize: '#table-container .col_' + col + ',' + // the td's are already resized!
+                        '#guide-grid-container .col_' + col + ', ' +
+                        '#drag-handle-containers-container .col_' + col,
             resize: function () {
                 // TODO: move to stop() once the cell resize handles are made invisible
                 resetMergeHandleContainersSizeAndPostition();
@@ -490,11 +516,15 @@ function addRowColResizeHandlers(){
             }
         });
 
-        $('#table-container .col_' + col + ' .ui-resizable-handle').addClass('glyphicon glyphicon-resize-horizontal').css({
+        $('#table-container .col_' + col + ' .ui-resizable-ew').addClass('glyphicon glyphicon-resize-horizontal').css({
             cursor: 'ew-resize',
             position: 'absolute',
-            top: 'auto',
-            bottom: '0',
+            top: '-15px',
+            left: 'auto',
+            right: '5px',
+            width: 0,
+            height: 0
+
         });
 
 

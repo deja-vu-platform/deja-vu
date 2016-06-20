@@ -137,7 +137,7 @@ li#selected {
                   GRID
 ===================================================*/
 .main-table {
-    table-layout: fixed !important;
+    /*table-layout: fixed !important;*/
     border-collapse: inherit;
     -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.2);
     padding: 10px;
