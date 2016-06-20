@@ -1,15 +1,18 @@
-var num_rows = DEFAULT_ROWS;
-var num_cols = DEFAULT_COLS;
-var cell_width = DEFAULT_CELL_WIDTH;
-var cell_height = DEFAULT_CELL_HEIGHT;
+var numRows = DEFAULT_ROWS;
+var numCols = DEFAULT_COLS;
+var cellWidth = DEFAULT_CELL_WIDTH;
+var cellHeight = DEFAULT_CELL_HEIGHT;
 var files = [];
 
 // currently save components in this array
 var userComponents = [];
 var numComponents = userComponents.length - 1; // -1 to enable 0-indexing
 var selectedUserComponent = null;
-var bitmap_old = null;
-var bitmap_new = null;
+var bitmapOld = null;
+var bitmapNew = null;
+
+var gridWidth;
+var gridHeight;
 
 // Initialization
 $(function () {
@@ -17,36 +20,40 @@ $(function () {
     selectedUserComponent = "in jq";
 
     // start a default component
-    InitClicheComponent(true);
+    initClicheComponent(true);
     var grid = $('#table-container').get(0);
-    grid_width = grid.offsetWidth;
-    grid_height = grid.offsetHeight;
-    createTable(grid_width, grid_height);
+    gridWidth = grid.offsetWidth;
+    gridHeight = grid.offsetHeight;
+    //console.log(gridWidth);
+    //console.log(gridHeight);
+    createTable(gridWidth, gridHeight);
 
 });
 
-$('#select-rows').on('change', function (e) {
-    num_rows = $(this).val();
-});
+//$('#select-rows').on('change', function (e) {
+//    numRows = $(this).val();
+//});
+//
+//$('#select-cols').on('change', function (e) {
+//    numCols = $(this).val();
+//});
 
-$('#select-cols').on('change', function (e) {
-    num_cols = $(this).val();
-});
-
-$('#create_component').on('click', function () {
-    InitClicheComponent(false);
-    createTable(grid_width, grid_height, false);
+$('#create-component').on('click', function () {
+    numRows = $('#select-rows').val();
+    numCols = $('#select-cols').val();
+    initClicheComponent(false);
+    createTable(gridWidth, gridHeight, false);
     resetMenuOptions();
 });
 
-$('#load_component_btn').on('click', function () {
-    selectedUserComponent = JSON.parse($('#component_json').val());
-    loadTable(grid_width, grid_height, selectedUserComponent);
+$('#load-component-btn').on('click', function () {
+    selectedUserComponent = JSON.parse($('#component-json').val());
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
     addComponentToUserComponentsList(selectedUserComponent);
     resetMenuOptions();
 });
 
-$('#save_component').on('click', function () {
+$('#save-component').on('click', function () {
 
     window.open("data:text/json;charset=utf-8," +
         encodeURIComponent(JSON.stringify(selectedUserComponent, null, '\t')));
@@ -57,44 +64,44 @@ $('#save_component').on('click', function () {
     //    JSON.stringify(selectedUserComponent, null, '\t')+'</textarea></p>';
 });
 
-$('#user_components_list').on('click', 'li', function () {
+$('#user-components-list').on('click', 'li', function () {
     var componentNumber = $(this).data('componentnumber');
     $('#selected').removeAttr('id');
-    $($('#user_components_list li')[componentNumber]).attr('id', 'selected');
+    $($('#user-components-list li')[componentNumber]).attr('id', 'selected');
     selectedUserComponent = userComponents[componentNumber];
-    loadTable(grid_width, grid_height, selectedUserComponent);
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
 });
 
-$('#user_components_list').on('dblclick', '.component_name', function () {
+$('#user-components-list').on('dblclick', '.component-name', function () {
     var componentNumber = $(this).parent().data('componentnumber');
-    var componentToRename = $($('#user_components_list li')[componentNumber]);
-    var new_name_input_elt = $(componentToRename.find('.new_name_input'));
-    var submit_rename_elt = $(componentToRename.find('.submit_rename'));
-    new_name_input_elt.val($(this).text());
-    submit_rename_elt.removeClass('not_displayed');
-    $(this).addClass('not_displayed');
-    new_name_input_elt.focus();
-    new_name_input_elt.select();
+    var componentToRename = $($('#user-components-list li')[componentNumber]);
+    var newNameInputElt = $(componentToRename.find('.new-name-input'));
+    var submitRenameElt = $(componentToRename.find('.submit-rename'));
+    newNameInputElt.val($(this).text());
+    submitRenameElt.removeClass('not-displayed');
+    $(this).addClass('not-displayed');
+    newNameInputElt.focus();
+    newNameInputElt.select();
 });
 
-$('#user_components_list').on('keypress', '.new_name_input', function (event) {
+$('#user-components-list').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
         var componentNumber = $(this).parent().parent().data('componentnumber');
-        var componentToRename = $($('#user_components_list li')[componentNumber]);
-        var component_name_elt = $(componentToRename.find('.component_name'));
-        var submit_rename_elt = $(componentToRename.find('.submit_rename'));
+        var componentToRename = $($('#user-components-list li')[componentNumber]);
+        var componentNameElt = $(componentToRename.find('.component-name'));
+        var submitRenameElt = $(componentToRename.find('.submit-rename'));
 
 
-        component_name_elt.removeClass('not_displayed');
-        submit_rename_elt.addClass('not_displayed');
+        componentNameElt.removeClass('not-displayed');
+        submitRenameElt.addClass('not-displayed');
         var newName = $(this).val();
         if (newName.length === 0) { // empty string entered, don't change the name!
             return;
         }
-        component_name_elt.text($(this).val());
+        componentNameElt.text($(this).val());
         // update the display of the component box
-        $('<style>.table_outter::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
+        $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
         selectedUserComponent.meta.name = $(this).val();
     }
@@ -106,115 +113,167 @@ $('#user_components_list').on('keypress', '.new_name_input', function (event) {
 function resetMenuOptions() {
     $('#select-rows').val(DEFAULT_ROWS);
     $('#select-cols').val(DEFAULT_COLS);
-    $('#new_component_name').val('');
-    $('#component_version').val('');
-    $('#component_author').val('');
+    $('#new-component-name').val('');
+    $('#component-version').val('');
+    $('#component-author').val('');
 
-    $('#component_json').val('');
+    $('#component-json').val('');
 }
 
 /**
- * Generate the table
- * @param grid_width
- * @param grid_height
+ * Requires that the row, col in the datatype is already created
+ * @param row
+ * @param col
+ * @returns {Element}
  */
-function createTable(grid_width, grid_height) {
-    /*
-        Note about naming conventions:
-        for naming id, try to follow this rule
+function createTableCell(row, col) {
+    var td = document.createElement('td');
+    td.className = 'droppable cell col' + '_' + col;
 
-        name-with-several-parts_idrownumber_idcolnumber
-     
+    td.id = 'cell' + '_' + row + '_' + col;
+
+    var sp = document.createElement('span');
+    sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
+
+    var button = sp.firstChild;
+    button.id = 'edit-btn' + '_' + row + '_' + col;
+
+    td.appendChild(button);
+
+
+    $(button).on("click", function (e) {
+        var rowcol = this.id.split('_');
+        $('#cell' + '_' + rowcol[rowcol.length - 2] + '_' + rowcol[rowcol.length - 1]).find('.tooltip').addClass('open');
+    });
+
+    // change size of cell based on the layout
+    var rowspan = selectedUserComponent.layout[row][col].spans.row;
+    var colspan = selectedUserComponent.layout[row][col].spans.col;
+
+    var isMerged = selectedUserComponent.layout[row][col].merged.isMerged;
+    var lastMergedBottomRightCellId = selectedUserComponent.layout[row][col].merged.lastMergedBottomRightCellId;
+
+    var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
+    var hidingCellIdId = selectedUserComponent.layout[row][col].hidden.hidingCellId;
+
+    $(td).data('merged', {isMerged:isMerged, lastMergedBottomRightCellId: lastMergedBottomRightCellId});
+    $(td).data('hidden', {isHidden:isHidden, lastMergedBottomRightCellId: hidingCellIdId});
+
+
+    if (isHidden) {
+        $(td).css("display", "none");
+    } else {
+        $(td).attr("rowSpan", rowspan);
+        $(td).attr("colSpan", colspan);
+    }
+
+    return td;
+}
+
+
+function createGridCell(row, col) {
+    var td = document.createElement('td');
+    td.id = 'grid' + '_' + row + '_' + col;
+    td.className = 'grid col' + '_' + col;
+    return td;
+}
+
+function createEmptyRow(rowNumber) {
+    var tr = document.createElement('tr');
+    tr.className = 'row' + '_' + rowNumber;
+    return tr;
+}
+
+
+/**
+ * Generate the table
+ */
+function createTable(gridWidth, gridHeight) {
+    /*
+     Note about naming conventions:
+     for naming id, try to follow this rule
+
+     name-with-several-parts_idrownumber_idcolnumber
+
      */
 
     $('#table-container').html('');
 
-    var grid = document.createElement('table');
-    grid.className = 'table_outter';
-    for (var row = 1; row <= num_rows; row++) {
-        var tr = document.createElement('tr');
-        tr.className = 'row' + '_' + row;
-        for (var col = 1; col <= num_cols; col++) {
-            var td = document.createElement('td');
-            td.className = 'droppable cell col' + '_' + col;
-
-            td.id = 'cell' + '_' + row + '_' + col;
-
-            var sp = document.createElement('span');
-            sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
-
-            var button = sp.firstChild;
-            button.id = 'edit-btn' + '_' + row + '_' + col;
-
-            td.appendChild(button);
+    var tableGrid = document.createElement('table');
+    tableGrid.className = 'main-table';
+    tableGrid.id = 'main-cell-table';
+    for (var row = 1; row <= numRows; row++) {
+        var tr = createEmptyRow(row);
+        for (var col = 1; col <= numCols; col++) {
+            var td = createTableCell(row, col);
             tr.appendChild(td);
-
-            $(button).on("click", function (e) {
-                //$('#'+td.id).get(0).removeChild($('#'+td.id).get(0).firstChild);
-                //triggerEdit(td.id);
-                var rowcol = this.id.split('_');
-                $('#cell' + '_' + rowcol[rowcol.length-2] + '_' + rowcol[rowcol.length-1]).find('.tooltip').addClass('open');
-            });
-
-            // change size of cell based on the layout
-            var rowspan = selectedUserComponent.layout[row][col][0];
-            var colspan = selectedUserComponent.layout[row][col][1];
-
-            var isMerged = selectedUserComponent.layout[row][col][2];
-            var last_merged_bottom_right_cell_id = selectedUserComponent.layout[row][col][3];
-
-            $(td).data('merged', isMerged);
-            $(td).data('merged_cell_bottom_right', last_merged_bottom_right_cell_id);
-
-            if (rowspan === 0) { // and thus also colspan
-                $(td).css("display", "none");
-            } else {
-                $(td).attr("rowSpan", rowspan);
-                $(td).attr("colSpan", colspan);
-            }
-
         }
-
-        grid.appendChild(tr);
+        tableGrid.appendChild(tr);
 
     }
 
-    document.getElementById('table-container').appendChild(grid);
+    document.getElementById('table-container').appendChild(tableGrid);
 
-    //initSVG(grid);
-
-    initialResizeCells(grid_width, grid_height, num_rows, num_cols);
+    createGuideGrid();
+    initialResizeCells(numRows, numCols);
 
     attachMergeHandlers();
     registerDroppable();
+    addRowColAddRemoveButtons();
 
-    bitmap_old = make2dArray(num_rows, num_cols);
-    bitmap_new = make2dArray(num_rows, num_cols);
+    addRowColResizeHandlers();
+    addClearButtons();
+    //addTableResizeHandler();
 
-    createTopGrid();
+    bitmapOld = make2dArray(numRows, numCols);
+    bitmapNew = make2dArray(numRows, numCols);
+
+}
+
+function resetMergeHandleContainersSizeAndPostition(){
+    for (var row = 1; row <= numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var cell = $("#cell" + '_' + row + '_' + col);
+
+            var offset = cell.offset();
+            var width = cell.css("width");
+            var height = cell.css("height");
+
+            var dragHandleContainer = $('#drag-handle-container' + '_' + row + '_' + col);
+
+            dragHandleContainer.css({
+                position: 'absolute',
+                top: offset.top,
+                left: offset.left,
+                width: width,
+                height: height,
+            });
+        }
+    }
 }
 
 function attachMergeHandlers() {
     $('#drag-handle-containers-container').html('');
-    for (var row = 1; row <= num_rows; row++) {
-        for (var col = 1; col <= num_cols; col++) {
+    for (var row = 1; row <= numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
             var td = $("#cell" + '_' + row + '_' + col);
 
             var offset = td.offset();
             var width = td.css("width");
             var height = td.css("height");
 
-            var drag_handle_container = document.createElement('div');
-            drag_handle_container.id = 'drag-handle-container' + '_' + row + '_' + col;
-            var drag_handle = document.createElement('span');
+            var dragHandleContainer = document.createElement('div');
+            dragHandleContainer.id = 'drag-handle-container' + '_' + row + '_' + col;
+            dragHandleContainer.className = 'row_'+ row + ' col_' + col;
+            var dragHandle = document.createElement('span');
 
-            drag_handle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
-            drag_handle.className = 'ui-resizable-handle ui-resizable-se drag-handle';
-            drag_handle.id = 'drag-handle' + '_' + row + '_' + col;
+            dragHandle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
+            dragHandle.className = 'ui-resizable-handle ui-resizable-se drag-handle';
+            dragHandle.id = 'drag-handle' + '_' + row + '_' + col;
 
-            drag_handle_container.appendChild(drag_handle);
-            $('#drag-handle-containers-container').append(drag_handle_container);
-            $(drag_handle_container).css({
+            dragHandleContainer.appendChild(dragHandle);
+            $('#drag-handle-containers-container').append(dragHandleContainer);
+            $(dragHandleContainer).css({
                 position: 'absolute',
                 top: offset.top,
                 left: offset.left,
@@ -223,19 +282,19 @@ function attachMergeHandlers() {
                 'pointer-events': 'none',
             });
 
-            $(drag_handle).mouseenter(function (event, ui) {
+            $(dragHandle).mouseenter(function (event, ui) {
                 $(this).parent().css({
                     border: 'black 1px dotted'
                 });
             });
 
-            $(drag_handle).mouseleave(function (event, ui) {
+            $(dragHandle).mouseleave(function (event, ui) {
                 $(this).parent().css({
                     border: 'none'
                 });
             });
 
-            $(drag_handle).css({
+            $(dragHandle).css({
                 'pointer-events': 'auto',
                 position: 'absolute',
                 bottom: '5px',
@@ -243,7 +302,7 @@ function attachMergeHandlers() {
                 cursor: 'nwse-resize',
             });
 
-            $(drag_handle_container).resizable({
+            $(dragHandleContainer).resizable({
                 handles: {
                     'se': '#drag-handle' + '_' + row + '_' + col
                 },
@@ -258,11 +317,11 @@ function attachMergeHandlers() {
                     });
                 },
                 stop: function (event, ui) {
-                    var drag_handle_container = $(this);
-                    var container_id = drag_handle_container.get(0).id;
-                    var rowcol = container_id.split('_');
-                    var row = rowcol[rowcol.length-2];
-                    var col = rowcol[rowcol.length-1];
+                    var dragHandleContainer = $(this);
+                    var containerId = dragHandleContainer.get(0).id;
+                    var rowcol = containerId.split('_');
+                    var row = rowcol[rowcol.length - 2];
+                    var col = rowcol[rowcol.length - 1];
 
                     var component;
                     if (selectedUserComponent.components[row]) {
@@ -285,7 +344,7 @@ function attachMergeHandlers() {
                     // and able to accept mouse events).
                     // useful page http://stackoverflow.com/questions/6073505/what-is-the-difference-between-screenx-y-clientx-y-and-pagex-y
                     // frame of reference fro clientX/Y does not change even if you scroll
-                    var all_elts_list = allElementsFromPoint(event.clientX, event.clientY);
+                    var allEltsList = allElementsFromPoint(event.clientX, event.clientY);
                     // other interesting functions
                     // document.elementFromPoint(event.pageX, event.pageY)
                     // document.querySelectorAll(':hover');
@@ -297,13 +356,13 @@ function attachMergeHandlers() {
                         'pointer-events': 'none',
                     });
 
-                    var new_cell_grid = $(all_elts_list).filter('.grid');
-                    if (!new_cell_grid[0]) { // it's outside the table
+                    var newCellGrid = $(allEltsList).filter('.grid');
+                    if (!newCellGrid[0]) { // it's outside the table
                         mergeCells('cell' + '_' + row + '_' + col, 'cell' + '_' + row + '_' + col, component);
                     } else {
-                        var new_cell_rowcol = new_cell_grid[0].id.split('_');
-                        var new_cell_id = 'cell' + '_' + new_cell_rowcol[new_cell_rowcol.length-2] + '_' + new_cell_rowcol[new_cell_rowcol.length-1];
-                        mergeCells('cell' + '_' + row + '_' + col, new_cell_id, component);
+                        var newCellGridRowcol = newCellGrid[0].id.split('_');
+                        var newCellId = 'cell' + '_' + newCellGridRowcol[newCellGridRowcol.length - 2] + '_' + newCellGridRowcol[newCellGridRowcol.length - 1];
+                        mergeCells('cell' + '_' + row + '_' + col, newCellId, component);
                     }
 
                     // rest event handlers
@@ -327,11 +386,10 @@ function attachMergeHandlers() {
                 }
             });
 
-            var rowspan = selectedUserComponent.layout[row][col][0];
-            var colspan = selectedUserComponent.layout[row][col][1];
+            var isMerged = selectedUserComponent.layout[row][col].merged.isMerged;
 
-            if (rowspan === 0) { // and thus also colspan
-                $(drag_handle_container).css("display", "none");
+            if (isMerged) { // and thus also colspan
+                $(dragHandleContainer).css("display", "none");
             }
         }
     }
@@ -341,38 +399,34 @@ function attachMergeHandlers() {
 // from http://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
 function allElementsFromPoint(x, y) {
     var element, elements = [];
-    var old_visibility = [];
+    var oldVisibility = [];
     while (true) {
         element = document.elementFromPoint(x, y);
         if (!element || element === document.documentElement) {
             break;
         }
         elements.push(element);
-        old_visibility.push(element.style.visibility);
+        oldVisibility.push(element.style.visibility);
         element.style.visibility = 'hidden'; // Temporarily hide the element (without changing the layout)
     }
     for (var k = 0; k < elements.length; k++) {
-        elements[k].style.visibility = old_visibility[k];
+        elements[k].style.visibility = oldVisibility[k];
     }
     elements.reverse();
     return elements;
 }
 
-function createTopGrid() {
+function createGuideGrid() {
     $('#guide-grid-container').html('');
 
     var grid = document.createElement('table');
-    grid.className = 'table_outter';
+    grid.className = 'main-table';
+    grid.id = 'main-grid-table';
+    for (var row = 1; row <= numRows; row++) {
+        var tr = createEmptyRow(row);
 
-    for (var row = 1; row <= num_rows; row++) {
-        var tr = document.createElement('tr');
-        tr.className = 'row' + '_' + row;
-
-        for (var col = 1; col <= num_cols; col++) {
-            var td = document.createElement('td');
-            td.id = 'grid' + '_' + row + '_' + col;
-            td.className = 'grid col' + '_' + col;
-
+        for (var col = 1; col <= numCols; col++) {
+            var td = createGridCell(row, col);
             tr.appendChild(td);
         }
         grid.appendChild(tr);
@@ -382,37 +436,263 @@ function createTopGrid() {
 
 }
 
+function addRowColResizeHandlers(){
+    // Have a resizable on the rows
+    // once resize is stopped, loop through all the rows/cols, and store the
+    // col-width/table-width or col-height/table-height or something similar
+    //
+    //  Then also set the cell size in load table (or resize function) based on these values
+
+    for (var row = 1; row <= numRows; row++) {
+        $('#table-container .row_' + row).resizable({
+            handles: 's',
+            alsoResize: '#table-container .row_' + row + ' .cell, ' +  // also resize the td's
+                            '#guide-grid-container .row_' + row + ' .grid,' + // also resize the td's
+                            ' #guide-grid-container .row_' + row + ', ' +
+                            '#drag-handle-containers-container .row_' + row + ', ' +
+                            //'#table-container .row_' + row + ' .ui-resizable-s' +
+                            ' .ui-resizable-s-row_'+row,
+            resize: function () {
+                // TODO get rid of this later!
+                resetMergeHandleContainersSizeAndPostition();
+            },
+            stop: function () {
+                resetMergeHandleContainersSizeAndPostition();
+                saveRowColRatios();
+            }
+        });
+
+        $('#table-container .row_' + row).css({
+            position: 'relative',
+            width: $('#table-container .row_' + row).css('width'),
+            height: $('#table-container .row_' + row).css('height')
+        })
+
+        var handle = document.createElement('div');
+        $(handle).addClass('glyphicon glyphicon-resize-vertical ');
+
+        $('#table-container .row_' + row + ' .ui-resizable-s').addClass('ui-resizable-s-row_'+row).append(handle).css({
+            cursor: 'ns-resize',
+            width: 0,
+            height: $('#table-container .row_' + row).css('height'),
+            position: 'relative',
+
+        });
+
+        $(handle).css({
+            position: 'absolute',
+            top: 'auto',
+            bottom: '10px',
+            width: 0,
+            height: 0
+        })
+
+
+    }
+
+    for (var col = 1; col <= numCols; col++) {
+        $('#table-container #cell_1_' + col).resizable({ //there is always at least 1 cell!
+            handles: 'ew',
+            alsoResize: '#table-container .col_' + col + ',' + // the td's are already resized!
+                        '#guide-grid-container .col_' + col + ', ' +
+                        '#drag-handle-containers-container .col_' + col,
+            resize: function () {
+                // TODO: move to stop() once the cell resize handles are made invisible
+                resetMergeHandleContainersSizeAndPostition();
+            },
+            stop: function () {
+                resetMergeHandleContainersSizeAndPostition();
+                saveRowColRatios();
+            }
+        });
+
+        $('#table-container .col_' + col + ' .ui-resizable-ew').addClass('glyphicon glyphicon-resize-horizontal').css({
+            cursor: 'ew-resize',
+            position: 'absolute',
+            top: '-15px',
+            left: 'auto',
+            right: '5px',
+            width: 0,
+            height: 0
+
+        });
+
+
+    }
+}
+
+function addTableResizeHandler(){
+    // TODO THIS DOES NOT WORK!
+    var dragHandle = document.createElement('span');
+
+    dragHandle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
+    dragHandle.className = 'ui-resizable-handle ui-resizable-se';
+    dragHandle.id = 'table-drag-handle';
+
+
+    $('#main-cell-table').append(dragHandle).resizable({
+        handles: {
+            'se': '#table-drag-handle'
+        },
+        alsoResize: '#main-grid-table',
+        resize: function () {
+            // TODO get rid of this later!
+            resetMergeHandleContainersSizeAndPostition();
+        },
+        stop: function () {
+            resetMergeHandleContainersSizeAndPostition();
+            saveRowColRatios();
+        }
+    });
+
+    $('#table-drag-handle').css({
+        cursor: 'nwse-resize',
+        width: 0,
+        height: 0,
+        position: 'absolute',
+        top: 'auto',
+        bottom: 0,
+        left: 'auto',
+        right: 0
+    });
+
+}
+
+
+function addRowColAddRemoveButtons(){
+    var spAddRow = document.createElement('span');
+    spAddRow.innerHTML = '<button type="button" class="btn btn-default ">' +
+                    '<span class="glyphicon glyphicon-plus"></span>' +
+                    '</button>';
+
+    var buttonAddRow = spAddRow.firstChild;
+    buttonAddRow.id = 'btn-add-row';
+
+    $(buttonAddRow).on("click", function (e) {
+        addRowToEnd();
+    });
+
+    var spRemoveRow = document.createElement('span');
+    spRemoveRow.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span class="glyphicon glyphicon-minus"></span>' +
+        '</button>';
+
+    var buttonRemoveRow = spRemoveRow.firstChild;
+    buttonRemoveRow.id = 'btn-remove-row';
+
+    $(buttonRemoveRow).on("click", function (e) {
+        removeEndRow();
+    });
+
+
+    var spAddCol = document.createElement('span');
+    spAddCol.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span class="glyphicon glyphicon-plus"></span>' +
+        '</button>';
+
+    var buttonAddCol = spAddCol.firstChild;
+    buttonAddCol.id = 'btn-add-col';
+
+    $(buttonAddCol).on("click", function (e) {
+        addColToEnd();
+    });
+
+    var spRemoveCol = document.createElement('span');
+    spRemoveCol.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span class="glyphicon glyphicon-minus"></span>' +
+        '</button>';
+
+    var buttonRemoveCol = spRemoveCol.firstChild;
+    buttonRemoveCol.id = 'btn-remove-col';
+
+    $(buttonRemoveCol).on("click", function (e) {
+        removeEndCol();
+    });
+
+    $('#main-cell-table').append(buttonAddRow).append(buttonRemoveRow).append(buttonAddCol).append(buttonRemoveCol);
+}
+
+/**
+ * Add buttons to clear a row, a column or the entire table of its components
+ */
+function addClearButtons(){
+    addClearAllButton();
+}
+
+function addClearAllButton(){
+    var spClearAll = document.createElement('span');
+    spClearAll.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span>Clear All </span>' +
+        '<span class="glyphicon glyphicon-remove"></span>' +
+        '</button>';
+
+    var buttonClearAll = spClearAll.firstChild;
+    buttonClearAll.id = 'btn-clear-all';
+
+    $(buttonClearAll).on("click", function (e) {
+        clearAll();
+    });
+
+    $('#table-container').append(buttonClearAll).css({
+        position: 'relative'
+    });
+    $(buttonClearAll).css({
+        position: 'absolute',
+        top:'-45px',
+        right:'-140px'
+    })
+}
+
+function saveRowColRatios(){
+    // save the new table dimensions
+    //selectedUserComponent.layout.tablePxDimensions.width = $('#main-cell-table').css('width');
+    //selectedUserComponent.layout.tablePxDimensions.height = $('#main-cell-table').css('height');
+
+    for (var row = 1; row<=numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var cell = $('#grid' + '_' + row + '_' + col); //grid is better to use?, since cells can merge with other cells
+            var cellWidth = parseFloat(cell.css('width'));
+            var cellHeight = parseFloat(cell.css('height'));
+            var widthRatio = cellWidth/(gridWidth-20);
+            var heightRatio = cellHeight/(gridHeight-20);
+
+            selectedUserComponent.layout[row][col].pxDimensions.width = widthRatio;
+            selectedUserComponent.layout[row][col].pxDimensions.height = heightRatio;
+        }
+    }
+
+}
+
+
 
 /**
  * Creates and displays a table based on the component given
- * @param grid_width
- * @param grid_height
  * @param componentToShow
  */
-function loadTable(grid_width, grid_height, componentToShow) {
-    $('<style>.table_outter::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
-    num_rows = componentToShow.dimensions.rows;
-    num_cols = componentToShow.dimensions.cols;
-    createTable(grid_width, grid_height);
+function loadTable(gridWidth, gridHeight, componentToShow) {
+    $('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
+    numRows = componentToShow.dimensions.rows;
+    numCols = componentToShow.dimensions.cols;
+    createTable(gridWidth, gridHeight);
 
     $('#table-container td').each(function () {
-        var cell_id = $(this).get(0).id;
-        var rowcol = cell_id.split('_');
-        var row = rowcol[rowcol.length-2];
-        var col = rowcol[rowcol.length-1];
+        var cellId = $(this).get(0).id;
+        var rowcol = cellId.split('_');
+        var row = rowcol[rowcol.length - 2];
+        var col = rowcol[rowcol.length - 1];
         if (componentToShow.components[row]) {
             if (componentToShow.components[row][col]) {
                 var innerComponent = componentToShow.components[row][col];
                 var type = innerComponent.type;
-                showConfigOptions(type, document.getElementById(cell_id));
+                showConfigOptions(type, document.getElementById(cellId));
 
-                Display(cell_id, getHTML[type](innerComponent.components[type]));
-                $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cell_id).get(0));
-                triggerEdit(cell_id, false);
+                Display(cellId, getHTML[type](innerComponent.components[type]));
+                $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
+                triggerEdit(cellId, false);
 
-                $('#' + cell_id).addClass("dropped");
-                $('#' + cell_id).removeClass("droppable");
-                $('#' + cell_id).droppable('disable');
+                $('#' + cellId).addClass("dropped");
+                $('#' + cellId).removeClass("droppable");
+                $('#' + cellId).droppable('disable');
 
             }
         }
@@ -426,21 +706,53 @@ function loadTable(grid_width, grid_height, componentToShow) {
 
 /**
  * Resize cell such that all cells fill width and height of grid
- * @param grid_width
- * @param grid_height
- * @param num_rows
- * @param num_cols
+ * @param numRows
+ * @param numCols
  */
-function initialResizeCells(grid_width, grid_height, num_rows, num_cols) {
-    cell_width = Math.floor((grid_width / num_cols)) - 15;
-    cell_height = Math.floor((grid_height / num_rows)) - 15;
-    var tooltip_width = Number($('.tooltip').css('width').substring(0, 3));
+function initialResizeCells(numRows, numCols) {
+    // TODO use saved ratios from the datatype
+    if (!selectedUserComponent.layout.tablePxDimensions.isSet){
+        selectedUserComponent.layout.tablePxDimensions.width = gridWidth;
+        selectedUserComponent.layout.tablePxDimensions.height = gridHeight;
+        selectedUserComponent.layout.tablePxDimensions.isSet = true;
+    } else {
+        gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
+        gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
+        $('#table-container').css({
+            width: gridWidth,
+            height: gridHeight
+        })
+    }
 
-    getCSSRule('td').style.setProperty('width', cell_width + 'px', null);
-    getCSSRule('td').style.setProperty('height', cell_height + 'px', null);
-    getCSSRule('.tooltip').style.setProperty('left', -1 * Math.floor((tooltip_width - (cell_width - 40)) / 2) + 'px', null);
+    cellWidth = ((gridWidth-20) / numCols);
+    cellHeight = ((gridHeight-20) / numRows);
 
-    resizeLabelDivs(cell_width, cell_height);
+    //console.log(cellWidth);
+    //console.log(cellHeight);
+
+    for (var row = 1; row<=numRows; row++){
+        for (var col = 1; col<=numCols; col++){
+            var widthRatio = selectedUserComponent.layout[row][col].pxDimensions.width;
+            var heightRatio = selectedUserComponent.layout[row][col].pxDimensions.height;
+            var thisCellWidth = widthRatio*(gridWidth-20);
+            var thisCellHeight = heightRatio*(gridHeight-20);
+            var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
+            $('#cell' + '_' + row + '_' + col).css({
+                width: thisCellWidth + 'px',
+                height: thisCellHeight + 'px',
+            })
+            $('#grid' + '_' + row + '_' + col).css({
+                width: thisCellWidth + 'px',
+                height: thisCellHeight + 'px',
+            })
+        }
+    }
+
+    //getCSSRule('td').style.setProperty('width', cellWidth + 'px', null);
+    //getCSSRule('td').style.setProperty('height', cellHeight + 'px', null);
+    getCSSRule('.tooltip').style.setProperty('left', -1 * Math.floor((tooltipWidth - (cellWidth - 40)) / 2) + 'px', null);
+
+    resizeLabelDivs(cellWidth, cellHeight);
 
 }
 
@@ -457,12 +769,12 @@ function addComponentToUserComponentsList(newComponent) {
     $('#selected').removeAttr("id");
 
     var newComponentElt = '<li id="selected" data-componentnumber=' + numComponents + '>'
-        + '<span class="component_name">' + newComponent.meta.name + '</span>'
-        + '<span class="submit_rename not_displayed">'
-        + '<input type="text" class="new_name_input form-control" autofocus>'
+        + '<span class="component-name">' + newComponent.meta.name + '</span>'
+        + '<span class="submit-rename not-displayed">'
+        + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</span>'
         + '</li>';
-    $('#user_components_list').append(newComponentElt);
+    $('#user-components-list').append(newComponentElt);
     $('#selected #modal-title-1').text(name);
 
 };
@@ -472,19 +784,19 @@ function addComponentToUserComponentsList(newComponent) {
  * @param isDefault
  * @constructor
  */
-function InitClicheComponent(isDefault) {
+function initClicheComponent(isDefault) {
     var name, version, author;
     if (isDefault) {
         name = DEFAULT_COMPONENT_NAME;
         version = DEFAULT_VERSION;
         author = DEFAULT_AUTHOR;
     } else {
-        name = $('#new_component_name').val();
-        version = $('#component_version').val();
-        author = $('#component_author').val();
+        name = $('#new-component-name').val();
+        version = $('#component-version').val();
+        author = $('#component-author').val();
     }
-    $('<style>.table_outter::after{content:"' + name + '"}</style>').appendTo('head');
-    var newComponent = new ClicheComponent({rows: num_rows, cols: num_cols}, name, 1, version, author);
+    $('<style>.main-table::after{content:"' + name + '"}</style>').appendTo('head');
+    var newComponent = new ClicheComponent({rows: numRows, cols: numCols}, name, 1, version, author);
 
     addComponentToUserComponentsList(newComponent);
 }
@@ -496,14 +808,14 @@ function InitClicheComponent(isDefault) {
  * Either a widget or a component has to be present
  *
  * @param widget
- * @param cell_id
+ * @param cellId
  * @param component
  */
-function addComponent(cell_id, widget, component) {
+function addComponent(cellId, widget, component) {
     var type;
-    var rowcol = cell_id.split('_');
-    var row = rowcol[rowcol.length-2];
-    var col = rowcol[rowcol.length-1];
+    var rowcol = cellId.split('_');
+    var row = rowcol[rowcol.length - 2];
+    var col = rowcol[rowcol.length - 1];
 
     if (!component) {
         var span = document.createElement('span');
@@ -511,29 +823,33 @@ function addComponent(cell_id, widget, component) {
         type = span.firstElementChild.getAttribute('name');
         component = new BaseComponent(type, {});
 
+        showConfigOptions(type, document.getElementById(cellId));
+
         if (type === 'label') {
-            Display(cell_id, getHTML[type]("Type text here..."));
+            Display(cellId, getHTML[type]("Type text here..."));
         } else if (type === 'panel') {
-            Display(cell_id, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
+            Display(cellId, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
         } else {
-            Display(cell_id, getHTML[type]());
-            triggerEdit(cell_id, true); // since this is a new component, show edit options
+            Display(cellId, getHTML[type]());
+            triggerEdit(cellId, true); // since this is a new component, show edit options
         }
 
     } else {// a component is there
         type = component.type;
 
-        Display(cell_id, getHTML[type](component.components[type]));
+        showConfigOptions(type, document.getElementById(cellId));
+
+        Display(cellId, getHTML[type](component.components[type]));
         if (!widget) {
-            $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cell_id).get(0))
+            $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0))
         }
-        triggerEdit(cell_id, false); // no need to show edit options
+        triggerEdit(cellId, false); // no need to show edit options
 
     }
 
-    $('#' + cell_id).addClass("dropped");
-    $('#' + cell_id).removeClass("droppable");
-    $('#' + cell_id).droppable('disable');
+    $('#' + cellId).addClass("dropped");
+    $('#' + cellId).removeClass("droppable");
+    $('#' + cellId).droppable('disable');
     registerDraggable();
 
     if (!selectedUserComponent.components.hasOwnProperty(row)) {
@@ -543,17 +859,16 @@ function addComponent(cell_id, widget, component) {
 
     updateBitmap();
     registerTooltipBtnHandlers()
-    //selectedUserComponent.addComponent(component, row, col);
 }
 
 
 /**
  * Deletes a component from the datatype and also from the view
  */
-function deleteComponent(cell_id) {
-    var rowcol = cell_id.split('_');
-    var row = rowcol[rowcol.length-2];
-    var col = rowcol[rowcol.length-1];
+function deleteComponent(cellId) {
+    var rowcol = cellId.split('_');
+    var row = rowcol[rowcol.length - 2];
+    var col = rowcol[rowcol.length - 1];
 
     if (selectedUserComponent.components[row]) {
         if (selectedUserComponent.components[row][col]) {
@@ -563,11 +878,12 @@ function deleteComponent(cell_id) {
 
             $(cell).find('.config-btns').remove();
             $(cell).find('.tooltip').remove();
-            $(cell).find('.label_container').remove();
-            $(cell).find('.display_component').remove();
+            $(cell).find('.label-container').remove();
+            $(cell).find('.display-component').remove();
             $(cell).find('.widget').remove();
 
-            resetDroppability(cell_id);
+            resetDroppability(cellId);
+            updateBitmap();
 
         }
     }
@@ -575,18 +891,18 @@ function deleteComponent(cell_id) {
 }
 
 
-function updateComponentAt(cell_id) {
-    var rowcol = cell_id.split('_');
-    var row = rowcol[rowcol.length-2];
-    var col = rowcol[rowcol.length-1];
-    var type = $('#' + cell_id).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+function updateComponentAt(cellId) {
+    var rowcol = cellId.split('_');
+    var row = rowcol[rowcol.length - 2];
+    var col = rowcol[rowcol.length - 1];
+    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     var value;
     var isUpload = false;
     var inputs = Array.prototype.slice.call(
-        $('#' + cell_id).get(0).getElementsByTagName('input'), 0);
+        $('#' + cellId).get(0).getElementsByTagName('input'), 0);
 
     if (type === 'label') {
-        value = $('#' + cell_id).find('p')[0].textContent;
+        value = $('#' + cellId).find('p')[0].textContent;
     } else if (type === 'link') {
         value = {
             link_text: inputs[0].value,
@@ -615,9 +931,9 @@ function updateComponentAt(cell_id) {
             files.length = 0; // clear the old file
             parseFile.save()
                 .then(function (savedFile) { // save was successful
-                    RemoveDisplay(cell_id);
+                    RemoveDisplay(cellId);
                     value.img_src = savedFile.url();
-                    Display(cell_id, getHTML[type](value));
+                    Display(cellId, getHTML[type](value));
                     selectedUserComponent.components[row][col].components[type] = value;
                 });
         } else { // pasted link to image
@@ -625,19 +941,15 @@ function updateComponentAt(cell_id) {
         } // TODO what if empty link given?
     } else if (type === 'panel') {
         value = {
-            heading: $('#' + cell_id).find('.panel-title')[0].textContent,
-            content: $('#' + cell_id).find('.panel-body')[0].textContent
+            heading: $('#' + cellId).find('.panel-title')[0].textContent,
+            content: $('#' + cellId).find('.panel-body')[0].textContent
         }
     }
 
     if (!isUpload) {
-        $('#' + cell_id).find('.label_container').remove();
-        $('#' + cell_id).find('.display_component').remove();
-        Display(cell_id, getHTML[type](value), function () {
-            //for (var prop in selectedUserComponent.components[row][col].properties) {
-            //    var bootstrap_class = selectedUserComponent.components[row][col].properties[prop];
-            //    $('#'+cell_id).find('.display_component').addClass(bootstrap_class);
-            //}
+        $('#' + cellId).find('.label-container').remove();
+        $('#' + cellId).find('.display-component').remove();
+        Display(cellId, getHTML[type](value), function () {
         });
         selectedUserComponent.components[row][col].components = {};
         selectedUserComponent.components[row][col].components[type] = value;
@@ -662,12 +974,12 @@ function make2dArray(rows, cols) {
 }
 function findDeletedCoord() {
     var result = [];
-    for (var row = 0; row < num_rows; row++) {
-        for (var col = 0; col < num_cols; col++) {
-            if ((bitmap_new[row][col] - bitmap_old[row][col]) < 0) {
+    for (var row = 0; row < numRows; row++) {
+        for (var col = 0; col < numCols; col++) {
+            if ((bitmapNew[row][col] - bitmapOld[row][col]) < 0) {
                 result[0] = row + 1;
                 result[1] = col + 1;
-            } else if ((bitmap_new[row][col] - bitmap_old[row][col]) > 0) {
+            } else if ((bitmapNew[row][col] - bitmapOld[row][col]) > 0) {
                 result[2] = row + 1;
                 result[3] = col + 1;
             }
@@ -677,16 +989,16 @@ function findDeletedCoord() {
 }
 
 function updateBitmap() {
-    bitmap_old = JSON.parse(JSON.stringify(bitmap_new));
+    bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
     $('#table-container td').each(function () {
-        var cell_id = $(this).attr('id');
-        var rowcol = cell_id.split('_');
-        var row = Number(rowcol[rowcol.length-2]) - 1;
-        var col = Number(rowcol[rowcol.length-1]) - 1;
+        var cellId = $(this).attr('id');
+        var rowcol = cellId.split('_');
+        var row = Number(rowcol[rowcol.length - 2]) - 1;
+        var col = Number(rowcol[rowcol.length - 1]) - 1;
         if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
-            bitmap_new[row][col] = 0;
+            bitmapNew[row][col] = 0;
         } else {
-            bitmap_new[row][col] = 1;
+            bitmapNew[row][col] = 1;
         }
     });
 }
@@ -726,164 +1038,181 @@ function getCSSRule(search) {
     })[0];
 }
 
-function resizeLabelDivs(cell_width, cell_height) {
-    getCSSRule('.label_container').style.setProperty('width', (cell_width - 10) + 'px', null);
-    getCSSRule('.label_container').style.setProperty('height', (cell_height - 30) + 'px', null);
-    getCSSRule('.label_container').style.setProperty('padding-top', (cell_height / 4) + 'px', null);
+function resizeLabelDivs(cellWidth, cellHeight) {
+    getCSSRule('.label-container').style.setProperty('width', (cellWidth - 10) + 'px', null);
+    getCSSRule('.label-container').style.setProperty('height', (cellHeight - 30) + 'px', null);
+    getCSSRule('.label-container').style.setProperty('padding-top', (cellHeight / 4) + 'px', null);
 }
 
 
 /*
  * Merging and unmerging cells
  */
-function mergeCells(cell1_id, cell2_id, component) {
+function mergeCells(cell1Id, cell2Id, component) {
     // first check for top left cell and bottom right cell
-    var rowcol1 = cell1_id.split('_');
+    var rowcol1 = cell1Id.split('_');
     var row1 = rowcol1[rowcol1.length - 2];
     var col1 = rowcol1[rowcol1.length - 1];
 
-    var rowcol2 = cell2_id.split('_');
+    var rowcol2 = cell2Id.split('_');
     var row2 = rowcol2[rowcol2.length - 2];
     var col2 = rowcol2[rowcol2.length - 1];
 
 
-    var top_row_num = Math.min(parseInt(row1), parseInt(row2));
-    var bottom_row_num = Math.max(parseInt(row1), parseInt(row2));
+    var topRowNum = Math.min(parseInt(row1), parseInt(row2));
+    var bottomRowNum = Math.max(parseInt(row1), parseInt(row2));
 
-    var left_col_num = Math.min(parseInt(col1), parseInt(col2));
-    var right_col_num = Math.max(parseInt(col1), parseInt(col2));
+    var leftColNum = Math.min(parseInt(col1), parseInt(col2));
+    var rightColNum = Math.max(parseInt(col1), parseInt(col2));
 
-    var top_left_cell_id = "cell" + '_' + top_row_num.toString() + '_' + left_col_num.toString();
-    var bottom_right_cell_id = "cell" + '_' + bottom_row_num.toString() + '_' + right_col_num.toString();
+    var topLeftCellId = "cell" + '_' + topRowNum.toString() + '_' + leftColNum.toString();
+    var bottomRightCellId = "cell" + '_' + bottomRowNum.toString() + '_' + rightColNum.toString();
 
     // figure out if this is already a merged cell
-    var merged = $('#' + top_left_cell_id).data('merged');
-    if (merged) {
-        var last_merged_cell_bottom_right_id = $('#' + top_left_cell_id).data('merged_cell_bottom_right');
+    var merged = $('#' + topLeftCellId).data('merged');
+    if (merged.isMerged) {
         // if merged, unmerge the two cells
         // this also resets the cells to unmerged status
-        unmergeCells(top_left_cell_id, last_merged_cell_bottom_right_id);
+        unmergeCells(topLeftCellId);
     }
 
-    if (top_left_cell_id != bottom_right_cell_id) { // not merging/unmerging to the same cell,
+    if (topLeftCellId != bottomRightCellId) { // not merging/unmerging to the same cell,
         // that is, the cell is actually merging to something else
         // mark cell as merged
-        $('#' + top_left_cell_id).data('merged', true);
-        $('#' + top_left_cell_id).data('merged_cell_bottom_right', bottom_right_cell_id);
-        // hide all the other cells in that block
-        for (var row = top_row_num; row <= bottom_row_num; row++) {
-            for (var col = left_col_num; col <= right_col_num; col++) {
-                var cell_id = "cell" + '_' + row.toString() + '_' + col.toString();
+        $('#' + topLeftCellId).data('merged', {isMerged: true, lastMergedBottomRightCellId: bottomRightCellId});
+        for (var row = topRowNum; row <= bottomRowNum; row++) {
+            for (var col = leftColNum; col <= rightColNum; col++) {
+                var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
 
                 // delete any component that was there
                 // TODO: note: checks should be made before calling this function!
-                deleteComponent(cell_id);
+                deleteComponent(cellId);
 
-                if ((row == top_row_num) && (col == left_col_num)) { // the cell we just made bigger
+                if ((row == topRowNum) && (col == leftColNum)) { // the cell we just made bigger
                     continue;
                 }
 
+
+                // if it is a hidden cell, unmerge the hiding cell
+                var hidden = $('#' + cellId).data('hidden');
+                var merged = $('#' + cellId).data('merged');
+                if (hidden.isHidden){
+                    unmergeCells(hidden.hidingCellId);
+                }
+
                 // figure out if this is already a merged cell
-                var merged = $('#' + cell_id).data('merged');
-                if (merged) {
-                    var last_merged_cell_bottom_right_id = $('#' + cell_id).data('merged_cell_bottom_right');
+                if (merged.isMerged) {
                     // if merged, unmerge the two cells
                     // this also resets the cells to unmerged status
-                    unmergeCells(cell_id, last_merged_cell_bottom_right_id);
+                    unmergeCells(cellId);
                 }
 
 
                 // then hide the other cells
-                var cell_to_hide = $("#" + cell_id);
-                cell_to_hide.css("display", "none");
+                var cellToHide = $("#" + cellId);
+                cellToHide.css("display", "none");
+                cellToHide.data('hidden', {isHidden: true, hidingCellId: topLeftCellId});
 
-                // return rowspan/colspan to 1
-                cell_to_hide.attr("rowSpan", 1);
-                cell_to_hide.attr("colSpan", 1);
+                var dragContainerToHide = $('#drag-handle-container' + '_' + row + '_' + col);
+                dragContainerToHide.css('display', 'none');
 
-                var drag_container_to_hide = $('#drag-handle-container' + '_' + row + '_' + col);
-                drag_container_to_hide.css('display', 'none');
-
-                selectedUserComponent.layout[row][col] = [0, 0, false, ''];
+                selectedUserComponent.layout[row][col].spans = {row:0,col:0};
+                selectedUserComponent.layout[row][col].merged = {isMerged: false, lastMergedBottomRightCellId: ''};
+                selectedUserComponent.layout[row][col].hidden = {isHidden: true, hidingCellId: topLeftCellId};
             }
         }
 
     }
 
     // Make the first cell take the correct size
-    var cell_top_right = $("#" + top_left_cell_id);
-    var rowspan = bottom_row_num - top_row_num + 1;
-    var colspan = right_col_num - left_col_num + 1;
-    cell_top_right.attr("rowSpan", rowspan);
-    cell_top_right.attr("colSpan", colspan);
-    $('#drag-handle-container' + '_' + top_row_num + '_' + left_col_num).css({
-        width: cell_top_right.css('width'),
-        height: cell_top_right.css('height'),
+    var cellTopLeft = $("#" + topLeftCellId);
+    var rowspan = bottomRowNum - topRowNum + 1;
+    var colspan = rightColNum - leftColNum + 1;
+    cellTopLeft.attr("rowSpan", rowspan);
+    cellTopLeft.attr("colSpan", colspan);
+    $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum).css({
+        width: cellTopLeft.css('width'),
+        height: cellTopLeft.css('height'),
     });
 
     // update the datatype
-    selectedUserComponent.layout[top_row_num][left_col_num] = [rowspan, colspan, true, bottom_right_cell_id];
+    selectedUserComponent.layout[topRowNum][leftColNum].spans = {row:rowspan,col:colspan};
+    selectedUserComponent.layout[topRowNum][leftColNum].merged = {isMerged: true, lastMergedBottomRightCellId: bottomRightCellId};
+    selectedUserComponent.layout[topRowNum][leftColNum].hidden = {isHidden: false, hidingCellId: ''};
+
 
     // then put the component in there
     if (component) {
         // add the component to the cell
-        addComponent(top_left_cell_id, false, component);
+        addComponent(topLeftCellId, false, component);
     }
+
+    // TODO this is doing some redundant stuff, maybe reduce some stuff above?
+    resetMergeHandleContainersSizeAndPostition();
+
 }
 
-function unmergeCells(cell1_id, cell2_id, component) {
-    var rowcol1 = cell1_id.split('_');
-    var row1 = rowcol1[rowcol1.length - 2];
-    var col1 = rowcol1[rowcol1.length - 1];
-
-    var rowcol2 = cell2_id.split('_');
-    var row2 = rowcol2[rowcol2.length - 2];
-    var col2 = rowcol2[rowcol2.length - 1];
+function unmergeCells(cellToUnmergeId, component) {
+    var cellToUnmergeRowcol = cellToUnmergeId.split('_');
+    var cellToUnmergeRow = cellToUnmergeRowcol[cellToUnmergeRowcol.length - 2];
+    var cellToUnmergeCol = cellToUnmergeRowcol[cellToUnmergeRowcol.length - 1];
 
 
+    var lastMergedCellBottomRightId = $('#' + cellToUnmergeId).data('merged').lastMergedBottomRightCellId;
 
-    var top_row_num = Math.min(parseInt(row1), parseInt(row2));
-    var bottom_row_num = Math.max(parseInt(row1), parseInt(row2));
 
-    var left_col_num = Math.min(parseInt(col1), parseInt(col2));
-    var right_col_num = Math.max(parseInt(col1), parseInt(col2));
+    var lastMergedCellBottomRightRowcol = lastMergedCellBottomRightId.split('_');
+    var lastMergedCellBottomRightRow = lastMergedCellBottomRightRowcol[lastMergedCellBottomRightRowcol.length - 2];
+    var lastMergedCellBottomRightCol = lastMergedCellBottomRightRowcol[lastMergedCellBottomRightRowcol.length - 1];
+
+
+    var topRowNum = Math.min(parseInt(cellToUnmergeRow), parseInt(lastMergedCellBottomRightRow));
+    var bottomRowNum = Math.max(parseInt(cellToUnmergeRow), parseInt(lastMergedCellBottomRightRow));
+
+    var leftColNum = Math.min(parseInt(cellToUnmergeCol), parseInt(lastMergedCellBottomRightCol));
+    var rightColNum = Math.max(parseInt(cellToUnmergeCol), parseInt(lastMergedCellBottomRightCol));
 
 
     // Make the first cell take the correct size
-    var top_left_cell_id = "cell" + '_' + top_row_num.toString() + '_' + left_col_num.toString();
+    var topLeftCellId = "cell" + '_' + topRowNum.toString() + '_' + leftColNum.toString();
 
-    var cell_top_right = $("#" + top_left_cell_id);
-    cell_top_right.attr("rowSpan", 1);
-    cell_top_right.attr("colSpan", 1);
+    var cellTopLeft = $("#" + topLeftCellId);
+    cellTopLeft.attr("rowSpan", 1);
+    cellTopLeft.attr("colSpan", 1);
     // display all the other cells in that block
-    for (var row = top_row_num; row <= bottom_row_num; row++) {
-        for (var col = left_col_num; col <= right_col_num; col++) {
-            var cell_id = "cell" + '_' + row.toString() + '_' + col.toString();
+    for (var row = topRowNum; row <= bottomRowNum; row++) {
+        for (var col = leftColNum; col <= rightColNum; col++) {
+            var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
+            var gridId = 'grid' + '_' + row.toString() + '_' + col.toString();
             // update the datatype
-            selectedUserComponent.layout[row][col] = [1, 1, false, ''];
+            selectedUserComponent.layout[row][col].spans = {row:1,col:1};
+            selectedUserComponent.layout[row][col].merged = {isMerged: false, lastMergedBottomRightCellId: ''};
+            selectedUserComponent.layout[row][col].hidden = {isHidden: false, hidingCellId: ''};
 
-            var cell_to_show = $("#" + cell_id);
-            cell_to_show.css("display", "table-cell");
+
+            var cellToShow = $("#" + cellId);
+            cellToShow.css("display", "table-cell");
 
             // reset some meta data
-            cell_to_show.data('merged', false);
-            cell_to_show.data('merged_cell_bottom_right', '');
+            cellToShow.data('merged', {isMerged: false, lastMergedBottomRightCellId: ''});
+            cellToShow.data('hidden', {isHidden: false, hidingCellId: ''});
+
 
             // return rowspan/colspan to 1
-            cell_to_show.attr("rowSpan", 1);
-            cell_to_show.attr("colSpan", 1);
+            cellToShow.attr("rowSpan", 1);
+            cellToShow.attr("colSpan", 1);
 
             // delete any component that was there
-            deleteComponent(cell_id);
+            deleteComponent(cellId);
 
-            var drag_container_to_show = $('#drag-handle-container' + '_' + row + '_' + col);
-            var cell_offset = cell_to_show.offset();
-            drag_container_to_show.css({
+            var dragContainerToShow = $('#drag-handle-container' + '_' + row + '_' + col);
+            var cellOffset = $('#' + gridId).offset();
+            dragContainerToShow.css({
                 display: 'block',
-                top: cell_offset.top,
-                left: cell_offset.left,
-                width: cell_to_show.css('width'),
-                height: cell_to_show.css('height'),
+                top: cellOffset.top,
+                left: cellOffset.left,
+                width: cellToShow.css('width'),
+                height: cellToShow.css('height'),
             });
 
         }
@@ -891,8 +1220,155 @@ function unmergeCells(cell1_id, cell2_id, component) {
 
     if (component) {
         // add the component to the cell
-        addComponent(top_left_cell_id, false, component);
+        addComponent(topLeftCellId, false, component);
+    }
+
+    // TODO this is doing some redundant stuff, maybe reduce some stuff above?
+    resetMergeHandleContainersSizeAndPostition();
+}
+
+
+/*
+ Adding and deleting rows and columns
+ */
+
+/**
+ * Adds a row to the end
+ * Mutates selectedUserComponent
+ */
+function addRowToEnd() {
+
+    // old solution trying to addrow without loading the entire table,
+    // needed more work...
+    //var lastRowNum = selectedUserComponent.dimensions.rows;
+    //
+    //// datatype update
+    //selectedUserComponent.dimensions.rows += 1;
+    //numRows += 1;
+    //selectedUserComponent.layout[lastRowNum + 1] = {}
+    //
+    //// visual update
+    //var tableRow = createEmptyRow(lastRowNum + 1);
+    //var gridRow = createEmptyRow(lastRowNum + 1);
+    //
+    //for (var i = 1; i <= selectedUserComponent.dimensions.cols; i++) {
+    //    selectedUserComponent.layout[lastRowNum + 1][i] = [1, 1, false, ''];
+    //    var tableCell = createTableCell(lastRowNum + 1, i);
+    //    tableRow.appendChild(tableCell);
+    //    var gridCell = createGridCell(lastRowNum + 1, i);
+    //    gridRow.appendChild(gridCell);
+    //}
+    //
+    //$('#table-container table').append(tableRow);
+    //$('#guide-grid-container table').append(gridRow);
+    //
+    //attachMergeHandlers();
+    //bitmapNew = make2dArray(numRows, numCols);
+    //updateBitmap();
+    //// from http://stackoverflow.com/questions/597588/how-do-you-clone-an-array-of-objects-in-javascript
+    //bitmapOld = JSON.parse(JSON.stringify(bitmapNew)); // as not to have issues with the old and the new having
+    //// different numbers of rows
+
+    var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
+
+    selectedUserComponent.dimensions.rows = lastRowNum + 1;
+    numRows += 1;
+    selectedUserComponent.layout[lastRowNum + 1] = {}
+
+    for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+        selectedUserComponent.layout[lastRowNum + 1][col] = {
+                                                                spans:{row:1,col:1},
+                                                                merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                                                                hidden:{isHidden: false, hidingCellId: ''}
+                                                            }
+    }
+    selectedUserComponent.recalculateRatios(1,0);
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
+
+
+}
+
+/**
+ * Removes the end row
+ * Does nothing if there is only one row left
+ * Mutates selectedUserComponent
+ */
+function removeEndRow() {
+    var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
+
+    if (lastRowNum == 1){
+        return
+    }
+
+    selectedUserComponent.dimensions.rows = lastRowNum - 1;
+    numRows -= 1;
+    delete selectedUserComponent.layout[lastRowNum];
+
+    selectedUserComponent.recalculateRatios(-1,0);
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
+
+}
+
+/**
+ * Adds a column to the end
+ * Mutates selectedUserComponent
+ */
+function addColToEnd() {
+    var lastColNum = parseInt(selectedUserComponent.dimensions.cols);
+
+    selectedUserComponent.dimensions.cols = lastColNum + 1;
+    numCols += 1;
+
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+        selectedUserComponent.layout[row][lastColNum + 1] ={
+                                                                spans:{row:1,col:1},
+                                                                merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                                                                hidden:{isHidden: false, hidingCellId: ''}
+                                                            }
+    }
+    selectedUserComponent.recalculateRatios(0,1);
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
+
+}
+
+/**
+ * Remove end columns
+ * Does nothing if there is only one column left
+ * Mutates selectedUserComponent
+ */
+function removeEndCol() {
+    var lastColNum = parseInt(selectedUserComponent.dimensions.cols);
+    if (lastColNum == 1){
+        return
+    }
+    selectedUserComponent.dimensions.cols = lastColNum - 1;
+    numCols -= 1;
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+        delete selectedUserComponent.layout[row][lastColNum];
+    }
+
+    selectedUserComponent.recalculateRatios(0,-1);
+    loadTable(gridWidth, gridHeight, selectedUserComponent);
+
+}
+
+function clearAll(){
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++){
+        clearRow(row);
+    }
+}
+
+function clearRow(row){
+    for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++){
+        var cellId = 'cell' + '_' + row + '_' + col;
+        deleteComponent(cellId);
     }
 
 }
 
+function clearCol(col){
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++){
+        var cellId = 'cell' + '_' + row + '_' + col;
+        deleteComponent(cellId);
+    }
+}

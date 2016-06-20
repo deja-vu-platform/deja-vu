@@ -22,8 +22,16 @@ function Component() {
     this.dimensions = {};
     this.properties = {};
     this.components = {};
-    this.layout = {}; // {row:{col:[rowspan, colspan, isMerged, last_merged_bottom_right_cell_id]}}; [0,0, ...] means hide this cell
-};
+    this.layout = {}; // {row:
+                        // {col:
+                            // {spans: {row: Number ,col: Number},
+                            // merged:{isMerged: Boolean, lastMergedBottomRightCellId: String},
+                            // hidden:{isHidden: Boolean, hidingCellId: String}
+                            // pxDimensions: {width: Number (ratio), height: Number (ratio)}
+                            // }
+                        // }
+                      // }
+}
 
 
 
@@ -49,7 +57,14 @@ function BaseComponent(type, components) {
         author: ''
     };
     this.dimensions = {rows: 1, cols: 1};
-    this.layout = {1:{1:[1,1, false, '']}};
+    this.layout = {1:{
+                    1:{
+                        spans:{row:1,col:1},
+                        merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                        hidden:{isHidden: false, hidingCellId: ''},
+                        pxDimensions: {width: 1, height: 1}
+                    }
+                   }};
 }
 
 BaseComponent.prototype.setProperty = function(property, value) {
@@ -84,15 +99,45 @@ function ClicheComponent(dimensions, name, id, version, author) {
     this.dimensions = dimensions;
     this.components = {};
     this.properties = {};
-    this.layout = {}; // this is to remember this sizes of different cells
+    this.layout = {tablePxDimensions:{isSet: false, width:-1, height:-1}}; // -1 means absolute width and height have not been set
 
     for (var row = 1; row<=dimensions.rows; row++){
         this.layout[row] = {};
         for (var col = 1; col<= dimensions.cols; col++){
-            this.layout[row][col] = [1,1, false, ''];
+            this.layout[row][col] = {
+                                        spans:{row:1,col:1},
+                                        merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                                        hidden:{isHidden: false, hidingCellId: ''},
+                                        // pxDimensions will be measured in %
+                                        pxDimensions: {width: 1/dimensions.cols, height: 1/dimensions.rows},
+            };
         }
     }
-};
+}
+
+ClicheComponent.prototype.recalculateRatios = function(deltaRows, deltaCols){
+    var dimensions = this.dimensions;
+    for (var row = 1; row<=dimensions.rows; row++){
+        for (var col = 1; col<= dimensions.cols; col++){
+            if (this.layout[row][col].pxDimensions){
+                this.layout[row][col].pxDimensions.width = this.layout[row][col].pxDimensions.width*(dimensions.cols-deltaCols)/dimensions.cols;
+                this.layout[row][col].pxDimensions.height = this.layout[row][col].pxDimensions.height*(dimensions.rows-deltaRows)/dimensions.rows;
+            } else {
+                this.layout[row][col].pxDimensions = {};
+                if (this.layout[row-1]){ // if there is a row before this, take the width of the cell to the top
+                    this.layout[row][col].pxDimensions.width = this.layout[row-1][col].pxDimensions.width;
+                } else { // otherwise have a standard width
+                    this.layout[row][col].pxDimensions.width = 1/dimensions.cols;
+                }
+                if (this.layout[row][col-1]){ // if there is a col before this, take the height of the cell to the left
+                    this.layout[row][col].pxDimensions.height = this.layout[row][col-1].pxDimensions.height;
+                } else { // otherwise have a standard height
+                    this.layout[row][col].pxDimensions.height = 1/dimensions.rows;
+                }
+            }
+        }
+    }
+}
 
 ClicheComponent.prototype.addComponent = function(component, row, col) {
     if (!this.components.hasOwnProperty(row)) {

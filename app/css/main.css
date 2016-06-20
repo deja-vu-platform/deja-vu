@@ -95,16 +95,16 @@ fieldset { border: 0; margin: 0; padding: 0; }
     resize: vertical;
 }
 
-.basic_components .content {
+.basic-components .content {
     height: 250px;
 }
 
-.cliche_components .content {
+.cliche-components .content {
     height: 200px;
 }
 
 
-.component_name {
+.component-name {
     cursor: pointer;
 }
 
@@ -136,15 +136,15 @@ li#selected {
 /*===================================================
                   GRID
 ===================================================*/
-.table_outter {
-    table-layout: fixed !important;
+.main-table {
+    /*table-layout: fixed !important;*/
     border-collapse: inherit;
     -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.2);
     padding: 10px;
     position: relative;
 }
 
-.table_outter::after {
+.main-table::after {
     content: 'Component name: ';
     display: block;
     position: absolute;
@@ -161,7 +161,7 @@ li#selected {
 td {
     background-color: #F0F1F2;
     width: 170px;
-    min-width: 100px;
+    /*min-width: 100px;*/
     height: 170px;
     border: 5px solid white;
     resize: both;
@@ -209,7 +209,7 @@ td {
     pointer-events: none;
 }
 
-.drag_handle{
+.drag-handle{
     position: absolute;
     bottom: 0;
     right: 0;
@@ -294,6 +294,26 @@ td {
     display: inline-block;
 }
 
+#btn-add-row, #btn-remove-row{
+    position: absolute;
+    bottom: -33px;
+    left: 0;
+}
+
+#btn-remove-row{
+    left: 40px;
+}
+
+#btn-add-col, #btn-remove-col{
+    position: absolute;
+    top: 0;
+    right: -40px;
+}
+
+#btn-remove-col{
+    top: 33px;
+}
+
 .form-lbl {
     text-align: right;
     height: 35px;
@@ -324,7 +344,7 @@ td.dropped li.widget {
 }
 
 
-.label_container {
+.label-container {
     position: absolute;
     top: 0;
     /*width: 200px;*/
@@ -355,14 +375,14 @@ p.label {
     font-size: 60px;
 }
 
-#zoom_control {
+#zoom-control {
     position: fixed;
     top: 80px;
     right: 15px;
     border-radius: 4px;
 }
 
-.zoom_control_button {
+.zoom-control-button {
     font-size: 25px;
     background-color: rgba(0, 60, 136, 0.5);
     width: 35px;
@@ -373,7 +393,7 @@ p.label {
     vertical-align: middle;
 }
 
-.zoom_control_button:hover {
+.zoom-control-button:hover {
     background-color: rgba(0, 60, 136, 0.8);
 }
 
@@ -385,11 +405,11 @@ p.label {
 /*===================================================
                   POPUPS
 ===================================================*/
-.not_displayed {
+.not-displayed {
     display: none;
 }
 
-.close_btn {
+.close-btn {
     position: absolute; !important
     opacity: 1;
     top: 5px;
@@ -419,7 +439,7 @@ p.label {
 
 .dropped .tooltip.open {
     opacity: 1;
-    z-index: 2;
+    z-index: 100;
 }
 
 /* Triangle */
@@ -508,7 +528,7 @@ p.label {
 /*===================================================
                    COMPONENTS
 ===================================================*/
-.display_component {
+.display-component {
     white-space: initial;
     font-weight: 400;
 }
