@@ -220,6 +220,7 @@ function createTable(gridWidth, gridHeight) {
     addRowColAddRemoveButtons();
 
     addRowColResizeHandlers();
+    //addTableResizeHandler();
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
@@ -530,6 +531,46 @@ function addRowColResizeHandlers(){
 
     }
 }
+
+function addTableResizeHandler(){
+    var dragHandle = document.createElement('span');
+
+    dragHandle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
+    dragHandle.className = 'ui-resizable-handle ui-resizable-se';
+    dragHandle.id = 'table-drag-handle';
+
+
+    $('#main-cell-table').append(dragHandle).resizable({
+        handles: {
+            'se': '#table-drag-handle'
+        },
+        alsoResize: '#main-grid-table',
+        resize: function () {
+            // TODO get rid of this later!
+            resetMergeHandleContainersSizeAndPostition();
+        },
+        stop: function () {
+            resetMergeHandleContainersSizeAndPostition();
+            saveRowColRatios();
+            selectedUserComponent.layout.pxDimensions.width = $('#main-cell-table').css('width');
+            selectedUserComponent.layout.pxDimensions.height = $('#main-cell-table').css('height');
+
+        }
+    });
+
+    $('#table-drag-handle').css({
+        cursor: 'nwse-resize',
+        width: 0,
+        height: 0,
+        position: 'absolute',
+        top: 'auto',
+        bottom: 0,
+        left: 'auto',
+        right: 0
+    });
+
+}
+
 
 function addRowColAddRemoveButtons(){
     var spAddRow = document.createElement('span');
