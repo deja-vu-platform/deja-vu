@@ -30,15 +30,17 @@ $(function () {
 
 });
 
-$('#select-rows').on('change', function (e) {
-    numRows = $(this).val();
-});
-
-$('#select-cols').on('change', function (e) {
-    numCols = $(this).val();
-});
+//$('#select-rows').on('change', function (e) {
+//    numRows = $(this).val();
+//});
+//
+//$('#select-cols').on('change', function (e) {
+//    numCols = $(this).val();
+//});
 
 $('#create-component').on('click', function () {
+    numRows = $('#select-rows').val();
+    numCols = $('#select-cols').val();
     initClicheComponent(false);
     createTable(gridWidth, gridHeight, false);
     resetMenuOptions();
