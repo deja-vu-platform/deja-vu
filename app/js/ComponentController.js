@@ -20,28 +20,18 @@ $(function () {
     selectedUserComponent = "in jq";
 
     // start a default component
-    initClicheComponent(true);
+    initUserComponent(true);
     var grid = $('#table-container').get(0);
     gridWidth = grid.offsetWidth;
     gridHeight = grid.offsetHeight;
-    //console.log(gridWidth);
-    //console.log(gridHeight);
     createTable(gridWidth, gridHeight);
 
 });
 
-//$('#select-rows').on('change', function (e) {
-//    numRows = $(this).val();
-//});
-//
-//$('#select-cols').on('change', function (e) {
-//    numCols = $(this).val();
-//});
-
 $('#create-component').on('click', function () {
     numRows = $('#select-rows').val();
     numCols = $('#select-cols').val();
-    initClicheComponent(false);
+    initUserComponent(false);
     createTable(gridWidth, gridHeight, false);
     resetMenuOptions();
 });
@@ -62,6 +52,10 @@ $('#save-component').on('click', function () {
     //w.document.body.innerHTML='<a href="data:' + data + '" download="data.json">' +
     //    'Download JSON</a>'+'<p><textarea style="width:95%; height:95%">'+
     //    JSON.stringify(selectedUserComponent, null, '\t')+'</textarea></p>';
+});
+
+$('#back-to-projects').click(function(){
+   window.location = 'projectView.html';
 });
 
 $('#user-components-list').on('click', 'li', function () {
@@ -744,7 +738,6 @@ function initialResizeCells(numRows, numCols) {
 function addComponentToUserComponentsList(newComponent) {
     userComponents.push(newComponent);
     numComponents += 1;
-    selectedUserComponent = newComponent;
 
     // display the newly added component to the user components list
     $('#selected').removeAttr("id");
@@ -756,16 +749,14 @@ function addComponentToUserComponentsList(newComponent) {
         + '</span>'
         + '</li>';
     $('#user-components-list').append(newComponentElt);
-    $('#selected #modal-title-1').text(name);
-
 };
 
 /**
- * Creates a new Cliche (but actually User?) component based on user inputs
+ * Creates a new User component based on user inputs
  * @param isDefault
  * @constructor
  */
-function initClicheComponent(isDefault) {
+function initUserComponent(isDefault) {
     var name, version, author;
     if (isDefault) {
         name = DEFAULT_COMPONENT_NAME;
@@ -777,9 +768,9 @@ function initClicheComponent(isDefault) {
         author = $('#component-author').val();
     }
     $('<style>.main-table::after{content:"' + name + '"}</style>').appendTo('head');
-    var newComponent = new ClicheComponent({rows: numRows, cols: numCols}, name, 1, version, author);
-
+    var newComponent = new UserComponent({rows: numRows, cols: numCols}, name, 1, version, author);
     addComponentToUserComponentsList(newComponent);
+    selectedUserComponent = newComponent;
 }
 
 /**
