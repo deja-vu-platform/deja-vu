@@ -9,15 +9,8 @@ type User {
   username: Text
 }
 
-widget Post {
-  post: Post
-}
-
-widget EditContent {
-  post: Post
-}
-
-widget NewPostButton {
+widget Post, EditContent,
+       NewPostButton {
   post: Post
 }
 
