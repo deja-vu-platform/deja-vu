@@ -14,7 +14,6 @@ function Project() {
     this.objectType = "Project";
     //this.type = '';
     this.meta = {};
-    this.numComponents = 0;
     this.components = {};
     this.componentIdSet = {};
 }
@@ -39,19 +38,16 @@ function UserProject(name, id, version, author) {
         version: version,
         author: author
     };
-    this.numComponents = 0;
     this.components = {};
     this.componentIdSet = {id:''};
 }
 
 UserProject.prototype.addComponent = function(componentId, component){
-    this.numComponents++;
     this.components[componentId] = component;
 };
 
 
 UserProject.prototype.removeComponent = function(componentId){
-    this.numComponents--;
     delete this.components[componentId];
 };
 

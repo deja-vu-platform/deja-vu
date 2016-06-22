@@ -18,10 +18,6 @@ var gridHeight;
 $(function () {
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
 
-    // TODO get project information from local storage
-    // TODO load first component (or maybe the last edited one?)
-    // TODO if no components, then load the default one
-
     selectedProject = window.sessionStorage.getItem('selectedProject');
     if (selectedProject){ // if it exists
         selectedProject = $.extend(new UserProject(), JSON.parse(selectedProject));
@@ -35,7 +31,7 @@ $(function () {
 
     $('.project-name .header').text(selectedProject.meta.name);
 
-    if (selectedProject.numComponents === 0){
+    if (selectedProject.components.length === 0){
         // start a default component
         selectedUserComponent = initUserComponent(true);
         var grid = $('#table-container').get(0);
@@ -143,7 +139,7 @@ $('#user-components-list').on('keypress', '.new-name-input', function (event) {
 
         selectedUserComponent.meta.name = $(this).val();
 
-        // was attempting to change the ids, but it doesn't seem to be a good idea
+        // changing the ids todo: is this a good idea?
         //var oldId = selectedUserComponent.meta.id;
         //var newId = generateId(selectedUserComponent.meta.name);
         //selectedUserComponent.meta.id = newId;
@@ -789,7 +785,6 @@ function loadTable(gridWidth, gridHeight, componentToShow) {
  * @param numCols
  */
 function initialResizeCells(numRows, numCols) {
-    // TODO use saved ratios from the datatype
     if (!selectedUserComponent.layout.tablePxDimensions.isSet){
         selectedUserComponent.layout.tablePxDimensions.width = gridWidth;
         selectedUserComponent.layout.tablePxDimensions.height = gridHeight;

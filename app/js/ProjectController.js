@@ -61,7 +61,6 @@ $(function () {
         if (content.objectType && (content.objectType === 'UserProject')){
 
             availableProjects[filename] = content;
-            // TODO display projects
             var li = document.createElement('li');
             var projectLink = document.createElement('span');
             projectLink.className = "project-filename";
