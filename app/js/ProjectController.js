@@ -2,16 +2,103 @@
  * Created by Shinjini on 6/20/2016.
  */
 var selectedProject;
+var fs = require('fs');
+const path = require('path');
+
+// TODO get path emitted by main
+var projectsSavePath = path.join(__dirname, 'projects');
+
+var availableProjects = {};
 
 // Initialization
 $(function () {
+    /*
+        1. In main.js, create a new directory for the files on load of the app (if there isn't one)
+        2. Look at all the available files in that directory, and display it for opening
+        3. On click, save which project is selected (local storage or query strin) and shift to the
+            main view of that project
+
+        window.localStorage - stores data with no expiration date
+        window.sessionStorage - stores data for one session (data is lost when the browser tab is closed)
+
+     */
+    var currentProject = window.sessionStorage.getItem('selectedProject');
+
+    if (currentProject){
+        $('.current-project .content').html('<a href="projectView">Go back to Current Project:<br>'+JSON.parse(currentProject).meta.name + '</a>');
+    } else {
+        $('.current-project').css({
+            display: 'none'
+        })
+    }
+
+
+    // from http://stackoverflow.com/questions/10049557/reading-all-files-in-a-directory-store-them-in-objects-and-send-the-object
+    // TODO should these calls be synch?
+    function readFiles(dirname, onFileContent, onError) {
+        fs.readdir(dirname, function(err, filenames) {
+            if (err) {
+                onError(err);
+                return;
+            }
+            filenames.forEach(function(filename) {
+                fs.readFile(path.join(dirname, filename), 'utf-8', function(err, content) {
+                    if (err) {
+                        onError(err);
+                        return;
+                    }
+                    onFileContent(filename, content);
+                });
+            });
+        });
+    }
+
+
+    readFiles(projectsSavePath, function(filename, content) {
+        // TODO add a loading projects sign
+        // Check the types to only add projects
+        var content = JSON.parse(content);
+        if (content.objectType && (content.objectType === 'UserProject')){
+
+            availableProjects[filename] = content;
+            // TODO display projects
+            var li = document.createElement('li');
+            var projectLink = document.createElement('span');
+            projectLink.className = "project-filename";
+            projectLink.innerHTML = filename;
+            var projectLink = '<li><div class="project-filename" data-filename="'+filename+'">'+filename+'</div></li>';
+            $('#recent-projects-list').append(projectLink);
+        }
+    }, function(err) {
+        throw err;
+        // handle errors
+    });
+
+
+
 });
 
 
 $('#create-project').on('click', function () {
-    initNewProject();
+    selectedProject = initNewProject();
     resetMenuOptions();
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+    window.location = 'index.html';
 });
+
+$('.current-project').on('click', function(){
+    window.location = 'index.html';
+});
+
+
+$('.recent-projects').on('click', '.project-filename', function(){
+    var filename = $(this).data('filename');
+    selectedProject = availableProjects[filename];
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+    //console.log( window.sessionStorage.getItem('selectedProject'));
+    window.location = 'index.html';
+});
+
 
 /**
  * Creates a new Project based on user inputs
