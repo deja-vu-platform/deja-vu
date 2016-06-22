@@ -638,6 +638,23 @@ function resetMergeHandleContainersSizeAndPosition(){
     }
 }
 
+function alignCellsWithGrid(){
+    for (var row = 1; row <= numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var grid = $("#grid" + '_' + row + '_' + col);
+            var cell = $("#cell" + '_' + row + '_' + col);
+
+            var width = grid.css("width");
+            var height = grid.css("height");
+
+            cell.css({
+                width: width,
+                height: height,
+            });
+        }
+    }
+
+}
 
 /**
  * Resize cell such that all cells fill width and height of grid
@@ -702,7 +719,7 @@ function addRowColResizeHandlers(){
     //  Then also set the cell size in load table (or resize function) based on these values
 
     for (var row = 1; row <= numRows; row++) {
-        $('#table-container .row_' + row).resizable({
+        $('#guide-grid-container .row_' + row).resizable({
             handles: 's',
             alsoResize: '#table-container .row_' + row + ' .cell, ' +  // also resize the td's
                             '#guide-grid-container .row_' + row + ' .grid,' + // also resize the td's
@@ -712,15 +729,16 @@ function addRowColResizeHandlers(){
                             ' .ui-resizable-s-row_'+row,
             resize: function () {
                 // TODO get rid of this later!
-                resetMergeHandleContainersSizeAndPosition();
+                //resetMergeHandleContainersSizeAndPosition();
             },
             stop: function () {
+                alignCellsWithGrid();
                 resetMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
             }
         });
 
-        $('#table-container .row_' + row).css({
+        $('#guide-grid-container .row_' + row).css({
             position: 'relative',
             width: $('#table-container .row_' + row).css('width'),
             height: $('#table-container .row_' + row).css('height')
@@ -729,7 +747,7 @@ function addRowColResizeHandlers(){
         var handle = document.createElement('div');
         $(handle).addClass('glyphicon glyphicon-resize-vertical ');
 
-        $('#table-container .row_' + row + ' .ui-resizable-s').addClass('ui-resizable-s-row_'+row).append(handle).css({
+        $('#guide-grid-container .row_' + row + ' .ui-resizable-s').addClass('ui-resizable-s-row_'+row).append(handle).css({
             cursor: 'ns-resize',
             width: 0,
             height: $('#table-container .row_' + row).css('height'),
@@ -742,37 +760,43 @@ function addRowColResizeHandlers(){
             top: 'auto',
             bottom: '10px',
             width: 0,
-            height: 0
+            height: 0,
+            visibility: 'visible',
+            'pointer-events': 'auto',
+            opacity: 3
         })
 
 
     }
 
     for (var col = 1; col <= numCols; col++) {
-        $('#table-container #cell_1_' + col).resizable({ //there is always at least 1 cell!
+        $('#grid_1_' + col).resizable({ //there is always at least 1 cell, and grids can't merge
             handles: 'ew',
             alsoResize: '#table-container .col_' + col + ',' + // the td's are already resized!
                         '#guide-grid-container .col_' + col + ', ' +
                         '#drag-handle-containers-container .col_' + col,
             resize: function () {
                 // TODO: move to stop() once the cell resize handles are made invisible
-                resetMergeHandleContainersSizeAndPosition();
+                //resetMergeHandleContainersSizeAndPosition();
             },
             stop: function () {
+                alignCellsWithGrid();
                 resetMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
             }
         });
 
-        $('#table-container .col_' + col + ' .ui-resizable-ew').addClass('glyphicon glyphicon-resize-horizontal').css({
+        $('#grid_1_' + col + ' .ui-resizable-ew').addClass('glyphicon glyphicon-resize-horizontal').css({
             cursor: 'ew-resize',
             position: 'absolute',
             top: '-15px',
             left: 'auto',
             right: '5px',
             width: 0,
-            height: 0
-
+            height: 0,
+            visibility: 'visible',
+            'pointer-events': 'auto',
+            opacity: 3
         });
 
 
@@ -823,9 +847,9 @@ function saveRowColRatios(){
 
     for (var row = 1; row<=numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
-            var cell = $('#grid' + '_' + row + '_' + col); //grid is better to use?, since cells can merge with other cells
-            var cellWidth = parseFloat(cell.css('width'));
-            var cellHeight = parseFloat(cell.css('height'));
+            var grid = $('#grid' + '_' + row + '_' + col); //grid is better to use?, since cells can merge with other cells
+            var cellWidth = parseFloat(grid.css('width'));
+            var cellHeight = parseFloat(grid.css('height'));
             var widthRatio = cellWidth/(gridWidth-20);
             var heightRatio = cellHeight/(gridHeight-20);
 
