@@ -23,6 +23,7 @@ function Project() {
     //this.type = '';
     this.meta = {};
     this.components = {};
+    this.numComponents = 0;
     this.componentIdSet = {};
 }
 
@@ -47,16 +48,19 @@ function UserProject(name, id, version, author) {
         author: author
     };
     this.components = {};
+    this.numComponents = 0;
     this.componentIdSet = {id:''};
 }
 
 UserProject.prototype.addComponent = function(componentId, component){
     this.components[componentId] = component;
+    this.numComponents++;
 };
 
 
 UserProject.prototype.removeComponent = function(componentId){
     delete this.components[componentId];
+    this.numComponents--;
 };
 
 UserProject.fromString = function(string){

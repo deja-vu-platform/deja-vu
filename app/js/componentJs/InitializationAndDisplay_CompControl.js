@@ -16,7 +16,7 @@ $(function () {
 
     $('.project-name .header').text(selectedProject.meta.name);
 
-    if (selectedProject.components.length === 0){
+    if (selectedProject.numComponents === 0){
         // start a default component
         selectedUserComponent = initUserComponent(true);
         var grid = $('#table-container').get(0);
