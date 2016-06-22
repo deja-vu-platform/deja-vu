@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Projects</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/css/dropzone.css">
+    <link rel="stylesheet" href="css/projectView.css">
+
+</head>
+<body>
+<a href="index.html">Go to index</a>
+
+<div class="menubar">
+    <div class="menubar-inner">
+
+        <div class="menu-item logo">Déjà Vu UI builder</div>
+
+        <div class="menu-item">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-project">
+                <span class="glyphicon glyphicon-file"></span> Open...
+            </button>
+        </div>
+
+        <div class="menu-item">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-project">
+                <span class="glyphicon glyphicon-plus"></span> New project
+            </button>
+        </div>
+
+        <div class="menu-item">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-file"></span> Help
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Report an issue</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="projects">
+    <div class="current-project">
+        <div class="header">Current project</div>
+        <div class="content">
+
+        </div>
+    </div>
+
+    <div class="recent-projects">
+        <div class="header">Recent projects</div>
+        <div class="content">
+            <ul id="recent-projects-list">
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<!--<div id="trash" class="droppable">-->
+    <!--<span class="glyphicon glyphicon-trash"></span>-->
+<!--</div>-->
+
+<!--MODALS-->
+<div class="modal fade" id="new-project">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">New project</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Project name: </div>
+                    <div class="col-sm-7"><input id="new-project-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Version: </div>
+                    <div class="col-sm-7"><input id="project-version" type="text" class="form-control" required placeholder="e.g.: 0.1.0"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Author: </div>
+                    <div class="col-sm-7"><input id="project-author" type="text" class="form-control" required placeholder="e.g.: Dijkstra..."/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+            </div>
+            <div class="modal-footer">
+                <p><button id="create-project" data-dismiss="modal" class="btn btn-primary">Create</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="load-project">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">Load project</h4>
+            </div>
+            <div class="modal-body">
+                <div>Paste JSON here:</div>
+                <div><textarea id="project-json" rows="10" class="form-control" required></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button id="load-project-btn" data-dismiss="modal" class="btn btn-primary">Load</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
+<script src="js/external/jquery.min.js"></script>
+<script src="js/external/jquery-ui.min.js"></script>
+<script src="js/external/bootstrap.min.js"></script>
+<script src="js/ProjectModel.js"></script>
+<script src="js/ProjectController.js"></script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 .DS_Store
 .idea/*
 *.iml
-app/node_modules
+node_modules
+app/projects

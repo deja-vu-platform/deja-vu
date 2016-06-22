@@ -17,6 +17,7 @@ var DEFAULT_VERSION = '0.0.1';
  * @constructor
  */
 function Component() {
+    this.objectType = "Component";
     this.type = '';
     this.meta = {};
     this.dimensions = {};
@@ -47,6 +48,7 @@ function Component() {
 BaseComponent.prototype = new Component();
 BaseComponent.prototype.constructor = BaseComponent;
 function BaseComponent(type, components) {
+    this.objectType = "BaseComponent";
     this.type = type;
     this.components = components;
     this.properties = {};
@@ -86,10 +88,11 @@ BaseComponent.prototype.updateComponent = function(type, value) {
  * @param author
  * @constructor
  */
-ClicheComponent.prototype = new Component();
-ClicheComponent.prototype.constructor = ClicheComponent;
-function ClicheComponent(dimensions, name, id, version, author) {
-    this.type = "cliche";
+UserComponent.prototype = new Component();
+UserComponent.prototype.constructor = UserComponent;
+function UserComponent(dimensions, name, id, version, author) {
+    this.objectType = "UserComponent";
+    this.type = "user";
     this.meta = {
         name: name,
         id: id,
@@ -115,7 +118,7 @@ function ClicheComponent(dimensions, name, id, version, author) {
     }
 }
 
-ClicheComponent.prototype.recalculateRatios = function(deltaRows, deltaCols){
+UserComponent.prototype.recalculateRatios = function(deltaRows, deltaCols){
     var dimensions = this.dimensions;
     for (var row = 1; row<=dimensions.rows; row++){
         for (var col = 1; col<= dimensions.cols; col++){
@@ -139,7 +142,7 @@ ClicheComponent.prototype.recalculateRatios = function(deltaRows, deltaCols){
     }
 }
 
-ClicheComponent.prototype.addComponent = function(component, row, col) {
+UserComponent.prototype.addComponent = function(component, row, col) {
     if (!this.components.hasOwnProperty(row)) {
         this.components[row]={};
     }
@@ -149,5 +152,5 @@ ClicheComponent.prototype.addComponent = function(component, row, col) {
 
 
 
-selectedUserComponent = new ClicheComponent({rows: DEFAULT_ROWS, cols: DEFAULT_COLS}, DEFAULT_COMPONENT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
+//selectedUserComponent = new UserComponent({rows: DEFAULT_ROWS, cols: DEFAULT_COLS}, DEFAULT_COMPONENT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
 //selectedUserComponent.addComponent({}, 2, 3);

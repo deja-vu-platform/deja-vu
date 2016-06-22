@@ -5,9 +5,9 @@ var cellHeight = DEFAULT_CELL_HEIGHT;
 var files = [];
 
 // currently save components in this array
-var userComponents = [];
-var numComponents = userComponents.length - 1; // -1 to enable 0-indexing
 var selectedUserComponent = null;
+var selectedProject = null;
+
 var bitmapOld = null;
 var bitmapNew = null;
 
@@ -17,31 +17,49 @@ var gridHeight;
 // Initialization
 $(function () {
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
-    selectedUserComponent = "in jq";
 
-    // start a default component
-    initClicheComponent(true);
-    var grid = $('#table-container').get(0);
-    gridWidth = grid.offsetWidth;
-    gridHeight = grid.offsetHeight;
-    //console.log(gridWidth);
-    //console.log(gridHeight);
-    createTable(gridWidth, gridHeight);
+    selectedProject = window.sessionStorage.getItem('selectedProject');
+    if (selectedProject){ // if it exists
+        selectedProject = $.extend(new UserProject(), JSON.parse(selectedProject));
+        for (var componentId in selectedProject.components){
+            var component = selectedProject.components[componentId];
+            selectedProject.components[componentId] = $.extend(new UserComponent(component.dimensions), component);
+        }
+    } else { // make a new one
+        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
+    }
+
+    $('.project-name .header').text(selectedProject.meta.name);
+
+    if (selectedProject.components.length === 0){
+        // start a default component
+        selectedUserComponent = initUserComponent(true);
+        var grid = $('#table-container').get(0);
+        gridWidth = grid.offsetWidth;
+        gridHeight = grid.offsetHeight;
+        createTable(gridWidth, gridHeight);
+        addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
+    } else {
+        var componentToLoadId = Object.keys(selectedProject.components)[0];
+        selectedUserComponent = selectedProject.components[componentToLoadId];
+        displayNewComponentInUserComponentListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
+        for (var componentId in selectedProject.components){
+            if (componentId != componentToLoadId){
+                var componentName = selectedProject.components[componentId].meta.name
+                displayNewComponentInUserComponentList(componentName, componentId);
+            }
+        }
+        loadTable(gridWidth, gridHeight, selectedUserComponent);
+
+    }
 
 });
-
-//$('#select-rows').on('change', function (e) {
-//    numRows = $(this).val();
-//});
-//
-//$('#select-cols').on('change', function (e) {
-//    numCols = $(this).val();
-//});
 
 $('#create-component').on('click', function () {
     numRows = $('#select-rows').val();
     numCols = $('#select-cols').val();
-    initClicheComponent(false);
+    selectedUserComponent = initUserComponent(false);
+    addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
     createTable(gridWidth, gridHeight, false);
     resetMenuOptions();
 });
@@ -49,34 +67,53 @@ $('#create-component').on('click', function () {
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = JSON.parse($('#component-json').val());
     loadTable(gridWidth, gridHeight, selectedUserComponent);
-    addComponentToUserComponentsList(selectedUserComponent);
+    addComponentToUserProjectAndDisplayInList(selectedUserComponent);
     resetMenuOptions();
 });
+
+function downloadObject(filename, obj) {
+    var element = document.createElement('a');
+    var data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+
+    element.setAttribute('href', data);
+    element.setAttribute('download', filename);
+
+    element.click();
+}
+
 
 $('#save-component').on('click', function () {
 
     window.open("data:text/json;charset=utf-8," +
         encodeURIComponent(JSON.stringify(selectedUserComponent, null, '\t')));
+});
 
-    //w = window.open();
-    //w.document.body.innerHTML='<a href="data:' + data + '" download="data.json">' +
-    //    'Download JSON</a>'+'<p><textarea style="width:95%; height:95%">'+
-    //    JSON.stringify(selectedUserComponent, null, '\t')+'</textarea></p>';
+
+$('#save-project').on('click', function () {
+
+    //window.open("data:text/json;charset=utf-8," +
+    //    encodeURIComponent(JSON.stringify(selectedProject, null, '\t')));
+
+    downloadObject(selectedProject.meta.name+'.json', selectedProject);
+});
+
+$('#back-to-projects').click(function(event){
+    event.preventDefault();
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
+    window.location = 'projectView.html';
 });
 
 $('#user-components-list').on('click', 'li', function () {
-    var componentNumber = $(this).data('componentnumber');
+    var componentId = $(this).data('componentid');
     $('#selected').removeAttr('id');
-    $($('#user-components-list li')[componentNumber]).attr('id', 'selected');
-    selectedUserComponent = userComponents[componentNumber];
+    $(this).attr('id', 'selected');
+    selectedUserComponent = selectedProject.components[componentId];
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 });
 
 $('#user-components-list').on('dblclick', '.component-name', function () {
-    var componentNumber = $(this).parent().data('componentnumber');
-    var componentToRename = $($('#user-components-list li')[componentNumber]);
-    var newNameInputElt = $(componentToRename.find('.new-name-input'));
-    var submitRenameElt = $(componentToRename.find('.submit-rename'));
+    var newNameInputElt = $($(this).parent().find('.new-name-input'));
+    var submitRenameElt = $($(this).parent().find('.submit-rename'));
     newNameInputElt.val($(this).text());
     submitRenameElt.removeClass('not-displayed');
     $(this).addClass('not-displayed');
@@ -87,11 +124,8 @@ $('#user-components-list').on('dblclick', '.component-name', function () {
 $('#user-components-list').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
-        var componentNumber = $(this).parent().parent().data('componentnumber');
-        var componentToRename = $($('#user-components-list li')[componentNumber]);
-        var componentNameElt = $(componentToRename.find('.component-name'));
-        var submitRenameElt = $(componentToRename.find('.submit-rename'));
-
+        var componentNameElt = $($(this).parent().parent().find('.component-name'));
+        var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
         componentNameElt.removeClass('not-displayed');
         submitRenameElt.addClass('not-displayed');
@@ -104,6 +138,16 @@ $('#user-components-list').on('keypress', '.new-name-input', function (event) {
         $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
         selectedUserComponent.meta.name = $(this).val();
+
+        // changing the ids todo: is this a good idea?
+        //var oldId = selectedUserComponent.meta.id;
+        //var newId = generateId(selectedUserComponent.meta.name);
+        //selectedUserComponent.meta.id = newId;
+        //selectedProject.componentIdSet[newId] = "";
+        //delete selectedProject.componentIdSet[oldId];
+        //selectedProject.components[newId] = selectedUserComponent;
+        //delete selectedProject.components[oldId];
+        //$(this).parent().parent().data('componentid', newId);
     }
 });
 
@@ -223,6 +267,7 @@ function createTable(gridWidth, gridHeight) {
 
     addRowColResizeHandlers();
     addClearButtons();
+    addDeleteUserComponentButton();
     //addTableResizeHandler();
 
     bitmapOld = make2dArray(numRows, numCols);
@@ -644,6 +689,35 @@ function addClearAllButton(){
     })
 }
 
+
+
+function addDeleteUserComponentButton(){
+    // TODO add a waring tag!
+    var spDelete = document.createElement('span');
+    spDelete.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span>Delete User Component </span>' +
+        '<span class="glyphicon glyphicon-remove"></span>' +
+        '</button>';
+
+    var buttonClearAll = spDelete.firstChild;
+    buttonClearAll.id = 'btn-clear-all';
+
+    $(buttonClearAll).on("click", function (e) {
+        deleteUserComponent(selectedUserComponent.meta.id);
+    });
+
+    $('#table-container').append(buttonClearAll).css({
+        position: 'relative'
+    });
+    $(buttonClearAll).css({
+        position: 'absolute',
+        top:'-100px',
+        right:'-150px',
+        background: 'red',
+        color: 'white'
+    })
+}
+
 function saveRowColRatios(){
     // save the new table dimensions
     //selectedUserComponent.layout.tablePxDimensions.width = $('#main-cell-table').css('width');
@@ -711,7 +785,6 @@ function loadTable(gridWidth, gridHeight, componentToShow) {
  * @param numCols
  */
 function initialResizeCells(numRows, numCols) {
-    // TODO use saved ratios from the datatype
     if (!selectedUserComponent.layout.tablePxDimensions.isSet){
         selectedUserComponent.layout.tablePxDimensions.width = gridWidth;
         selectedUserComponent.layout.tablePxDimensions.height = gridHeight;
@@ -757,35 +830,46 @@ function initialResizeCells(numRows, numCols) {
 
 }
 
+function addComponentToUserProjectAndDisplayInListAndSelect(newComponent){
+    $('#selected').removeAttr("id");
+    addComponentToUserProjectAndDisplayInList(newComponent);
+    $("#user-components-list").find("[data-componentid='" + newComponent.meta.id + "']").attr('id', 'selected');
+}
+
+
+
 /**
  * Adds a component to the list of user components
  * @param newComponent
  */
-function addComponentToUserComponentsList(newComponent) {
-    userComponents.push(newComponent);
-    numComponents += 1;
-    selectedUserComponent = newComponent;
+function addComponentToUserProjectAndDisplayInList(newComponent) {
+    selectedProject.addComponent(newComponent.meta.id, newComponent);
+    displayNewComponentInUserComponentList(newComponent.meta.name, newComponent.meta.id);
+};
 
-    // display the newly added component to the user components list
+
+function displayNewComponentInUserComponentListAndSelect(name, id){
     $('#selected').removeAttr("id");
+    displayNewComponentInUserComponentList(name, id);
+    $("#user-components-list").find("[data-componentid='" + id + "']").attr('id', 'selected');
+}
 
-    var newComponentElt = '<li id="selected" data-componentnumber=' + numComponents + '>'
-        + '<span class="component-name">' + newComponent.meta.name + '</span>'
+function displayNewComponentInUserComponentList(name, id){
+    var newComponentElt = '<li data-componentid=' + id + '>'
+        + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
         + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</span>'
         + '</li>';
-    $('#user-components-list').append(newComponentElt);
-    $('#selected #modal-title-1').text(name);
-
-};
+    $('#user-components-list').append(newComponentElt)
+}
 
 /**
- * Creates a new Cliche (but actually User?) component based on user inputs
+ * Creates a new User component based on user inputs
  * @param isDefault
  * @constructor
  */
-function initClicheComponent(isDefault) {
+function initUserComponent(isDefault) {
     var name, version, author;
     if (isDefault) {
         name = DEFAULT_COMPONENT_NAME;
@@ -797,9 +881,14 @@ function initClicheComponent(isDefault) {
         author = $('#component-author').val();
     }
     $('<style>.main-table::after{content:"' + name + '"}</style>').appendTo('head');
-    var newComponent = new ClicheComponent({rows: numRows, cols: numCols}, name, 1, version, author);
+    var id = generateId(name);
+    while (id in selectedProject.componentIdSet){ // very unlikely to have a collision unless the user has 1 Million components!
+        id = generateId(name);
+    }
+    selectedProject.componentIdSet[id] = '';
 
-    addComponentToUserComponentsList(newComponent);
+    var newComponent = new UserComponent({rows: numRows, cols: numCols}, name, id, version, author);
+    return newComponent;
 }
 
 /**
@@ -1372,4 +1461,20 @@ function clearCol(col){
         var cellId = 'cell' + '_' + row + '_' + col;
         deleteComponent(cellId);
     }
+}
+
+
+function deleteUserComponent(componentId){
+    if (selectedProject.components.length === 1){
+        return; //don't delete the last one TODO is the the right way to go?
+    }
+    delete selectedProject.components[componentId];
+    if (componentId === selectedUserComponent.meta.id){
+        var otherIds = Object.keys(selectedProject.components);
+        selectedUserComponent = selectedProject.components[otherIds[0]];
+        $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").attr('id', 'selected');
+        loadTable(gridWidth, gridHeight, selectedUserComponent);
+    }
+    $("#user-components-list").find("[data-componentid='" + componentId + "']").remove();
+
 }
