@@ -30,6 +30,13 @@ function createWindow() {
         // when you should delete the corresponding element.
         mainWindow = null;
     });
+}
+
+
+// This method will be called when Electron has finished
+// initialization and is ready to create browser windows.
+app.on('ready', function() {
+    createWindow();
 });
 
 // Quit when all windows are closed.
@@ -40,3 +47,27 @@ app.on('window-all-closed', function() {
         app.quit();
     }
 });
+
+app.on('activate', function(){
+    // On OS X it's common to re-create a window in the app when the
+    // dock icon is clicked and there are no other windows open.
+    if (mainWindow === null) {
+        createWindow();
+    }
+});
+
+
+
+var fs = require('fs');
+const path = require('path');
+
+// TODO have a settings file to store preferred pathname
+
+var projectsSavePath = path.join(__dirname, 'app', 'projects');
+
+try {
+    fs.accessSync(projectsSavePath, fs.F_OK);
+} catch (e) {
+    // It isn't accessible
+    fs.mkdir(projectsSavePath);
+}
