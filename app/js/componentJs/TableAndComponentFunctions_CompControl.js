@@ -669,10 +669,10 @@ function initialResizeCells(numRows, numCols) {
     } else {
         gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
         gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
-        $('#table-container').css({
-            width: gridWidth,
-            height: gridHeight
-        })
+        //$('.main-table').css({
+        //    width: gridWidth,
+        //    height: gridHeight
+        //})
     }
 
     cellWidth = ((gridWidth-20) / numCols);
@@ -683,8 +683,8 @@ function initialResizeCells(numRows, numCols) {
 
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){
-            var widthRatio = selectedUserComponent.layout[row][col].pxDimensions.width;
-            var heightRatio = selectedUserComponent.layout[row][col].pxDimensions.height;
+            var widthRatio = selectedUserComponent.layout[row][col].ratio.width;
+            var heightRatio = selectedUserComponent.layout[row][col].ratio.height;
             var thisCellWidth = widthRatio*(gridWidth-20);
             var thisCellHeight = heightRatio*(gridHeight-20);
             var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
@@ -698,6 +698,12 @@ function initialResizeCells(numRows, numCols) {
             })
         }
     }
+
+    saveRowColRatios(); // adding rows/cols changes the ratios, so...
+                        // although, it doesn't actually matter since if no row/col is resized, then the table size isn't
+                        // updated, so the old ratios still work
+                        // but if they are resized, the table size is updated but so are the ratios!
+                        // But I would like the ratios to always be 1.
 
     //getCSSRule('td').style.setProperty('width', cellWidth + 'px', null);
     //getCSSRule('td').style.setProperty('height', cellHeight + 'px', null);
@@ -842,8 +848,10 @@ function addTableResizeHandler(){
 
 function saveRowColRatios(){
     // save the new table dimensions
-    //selectedUserComponent.layout.tablePxDimensions.width = $('#main-cell-table').css('width');
-    //selectedUserComponent.layout.tablePxDimensions.height = $('#main-cell-table').css('height');
+    selectedUserComponent.layout.tablePxDimensions.width = parseFloat($('#main-cell-table').css('width'));
+    selectedUserComponent.layout.tablePxDimensions.height = parseFloat($('#main-cell-table').css('height'));
+    gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
+    gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
 
     for (var row = 1; row<=numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
@@ -853,8 +861,8 @@ function saveRowColRatios(){
             var widthRatio = cellWidth/(gridWidth-20);
             var heightRatio = cellHeight/(gridHeight-20);
 
-            selectedUserComponent.layout[row][col].pxDimensions.width = widthRatio;
-            selectedUserComponent.layout[row][col].pxDimensions.height = heightRatio;
+            selectedUserComponent.layout[row][col].ratio.width = widthRatio;
+            selectedUserComponent.layout[row][col].ratio.height = heightRatio;
         }
     }
 
@@ -964,10 +972,11 @@ function addRowToEnd() {
         selectedUserComponent.layout[lastRowNum + 1][col] = {
             spans:{row:1,col:1},
             merged:{isMerged: false, lastMergedBottomRightCellId: ''},
-            hidden:{isHidden: false, hidingCellId: ''}
+            hidden:{isHidden: false, hidingCellId: ''},
+            ratio:{width: standardCellWidth/gridWidth, height: standardCellHeight/gridHeight}
         }
     }
-    selectedUserComponent.recalculateRatios(1,0);
+    //selectedUserComponent.recalculateRatios(1,0);
     loadTable(selectedUserComponent);
 
 
@@ -989,7 +998,7 @@ function removeEndRow() {
     numRows -= 1;
     delete selectedUserComponent.layout[lastRowNum];
 
-    selectedUserComponent.recalculateRatios(-1,0);
+    //selectedUserComponent.recalculateRatios(-1,0);
     loadTable(selectedUserComponent);
 
 }
@@ -1008,10 +1017,11 @@ function addColToEnd() {
         selectedUserComponent.layout[row][lastColNum + 1] ={
             spans:{row:1,col:1},
             merged:{isMerged: false, lastMergedBottomRightCellId: ''},
-            hidden:{isHidden: false, hidingCellId: ''}
+            hidden:{isHidden: false, hidingCellId: ''},
+            ratio:{width: standardCellWidth/gridWidth, height: standardCellHeight/gridHeight}
         }
     }
-    selectedUserComponent.recalculateRatios(0,1);
+    //selectedUserComponent.recalculateRatios(0,1);
     loadTable(selectedUserComponent);
 
 }
@@ -1032,7 +1042,7 @@ function removeEndCol() {
         delete selectedUserComponent.layout[row][lastColNum];
     }
 
-    selectedUserComponent.recalculateRatios(0,-1);
+    //selectedUserComponent.recalculateRatios(0,-1);
     loadTable(selectedUserComponent);
 
 }

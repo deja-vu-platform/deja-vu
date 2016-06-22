@@ -19,9 +19,9 @@ $(function () {
     if (selectedProject.numComponents === 0){
         // start a default component
         selectedUserComponent = initUserComponent(true);
-        var grid = $('#table-container').get(0);
-        gridWidth = grid.offsetWidth;
-        gridHeight = grid.offsetHeight;
+        //var grid = $('#table-container').get(0);
+        //gridWidth = grid.offsetWidth;
+        //gridHeight = grid.offsetHeight;
         createTable();
         addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
     } else {

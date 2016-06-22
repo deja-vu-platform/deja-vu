@@ -28,7 +28,7 @@ function Component() {
                             // {spans: {row: Number ,col: Number},
                             // merged:{isMerged: Boolean, lastMergedBottomRightCellId: String},
                             // hidden:{isHidden: Boolean, hidingCellId: String}
-                            // pxDimensions: {width: Number (ratio), height: Number (ratio)}
+                            // ratio: {width: Number (ratio), height: Number (ratio)}
                             // }
                         // }
                       // }
@@ -111,36 +111,45 @@ function UserComponent(dimensions, name, id, version, author) {
                                         spans:{row:1,col:1},
                                         merged:{isMerged: false, lastMergedBottomRightCellId: ''},
                                         hidden:{isHidden: false, hidingCellId: ''},
-                                        // pxDimensions will be measured in %
-                                        pxDimensions: {width: 1/dimensions.cols, height: 1/dimensions.rows},
+                                        // ratio will be measured in %
+                                        ratio: {width: 1/dimensions.cols, height: 1/dimensions.rows},
             };
         }
     }
 }
-
-UserComponent.prototype.recalculateRatios = function(deltaRows, deltaCols){
-    var dimensions = this.dimensions;
-    for (var row = 1; row<=dimensions.rows; row++){
-        for (var col = 1; col<= dimensions.cols; col++){
-            if (this.layout[row][col].pxDimensions){
-                this.layout[row][col].pxDimensions.width = this.layout[row][col].pxDimensions.width*(dimensions.cols-deltaCols)/dimensions.cols;
-                this.layout[row][col].pxDimensions.height = this.layout[row][col].pxDimensions.height*(dimensions.rows-deltaRows)/dimensions.rows;
-            } else {
-                this.layout[row][col].pxDimensions = {};
-                if (this.layout[row-1]){ // if there is a row before this, take the width of the cell to the top
-                    this.layout[row][col].pxDimensions.width = this.layout[row-1][col].pxDimensions.width;
-                } else { // otherwise have a standard width
-                    this.layout[row][col].pxDimensions.width = 1/dimensions.cols;
-                }
-                if (this.layout[row][col-1]){ // if there is a col before this, take the height of the cell to the left
-                    this.layout[row][col].pxDimensions.height = this.layout[row][col-1].pxDimensions.height;
-                } else { // otherwise have a standard height
-                    this.layout[row][col].pxDimensions.height = 1/dimensions.rows;
-                }
-            }
-        }
-    }
-}
+//
+// UserComponent.prototype.recalculateRatios = function(deltaRows, deltaCols){
+//    var dimensions = this.dimensions;
+//    var totalWidth = 0;
+//    var totalHeight = 0;
+//    for (var row = 1; row<=dimensions.rows; row++){
+//        for (var col = 1; col<= dimensions.cols; col++){
+//            if (deltaRows>0 || deltaCols>0){ // only one changed at a time
+//                if (this.layout[row][col].ratio){
+//                    this.layout[row][col].ratio.width = this.layout[row][col].ratio.width*(dimensions.cols-deltaCols)/dimensions.cols;
+//                    this.layout[row][col].ratio.height = this.layout[row][col].ratio.height*(dimensions.rows-deltaRows)/dimensions.rows;
+//                } else {
+//                    this.layout[row][col].ratio = {};
+//                    if (this.layout[row-1]){ // if there is a row before this, take the width of the cell to the top
+//                        this.layout[row][col].ratio.width = this.layout[row-1][col].ratio.width;
+//                    } else { // otherwise have a standard width
+//                        this.layout[row][col].ratio.width = 1/dimensions.cols;
+//                    }
+//                    if (this.layout[row][col-1]){ // if there is a col before this, take the height of the cell to the left
+//                        this.layout[row][col].ratio.height = this.layout[row][col-1].ratio.height;
+//                    } else { // otherwise have a standard height
+//                        this.layout[row][col].ratio.height = 1/dimensions.rows;
+//                    }
+//                }
+//            }
+//            totalWidth += this.layout[row][col].ratio.width;
+//            totalHeight += this.layout[row][col].ratio.height;
+//        }
+//    }
+//    console.log(totalWidth);
+//    console.log(totalHeight);
+//
+//}
 
 UserComponent.prototype.addComponent = function(component, row, col) {
     if (!this.components.hasOwnProperty(row)) {

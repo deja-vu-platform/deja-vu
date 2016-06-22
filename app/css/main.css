@@ -204,12 +204,14 @@ td {
     display: block;
 }
 
-
-#guide-grid-container {
-    height: 550px;
-    width: 800px;
+#table-container, #guide-grid-container{
+    height: 5000px;
+    width: 5000px;
     margin: 50px 100px 10px 50px;
     float: left;
+}
+
+#guide-grid-container {
     position: absolute;
     pointer-events: none;
     visibility: hidden;
@@ -227,12 +229,6 @@ td {
     z-index: 50;
 }
 
-#table-container {
-    height: 550px;
-    width: 800px;
-    margin: 50px 100px 10px 50px;
-    float: left;
-}
 #grid-container2 {
     height: 500px;
     width: 800px;
