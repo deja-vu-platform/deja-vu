@@ -37,7 +37,7 @@ $(function () {
         var grid = $('#table-container').get(0);
         gridWidth = grid.offsetWidth;
         gridHeight = grid.offsetHeight;
-        createTable(gridWidth, gridHeight);
+        createTable();
         addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
     } else {
         var componentToLoadId = Object.keys(selectedProject.components)[0];
@@ -49,7 +49,7 @@ $(function () {
                 displayNewComponentInUserComponentList(componentName, componentId);
             }
         }
-        loadTable(gridWidth, gridHeight, selectedUserComponent);
+        loadTable(selectedUserComponent);
 
     }
 
@@ -60,13 +60,13 @@ $('#create-component').on('click', function () {
     numCols = $('#select-cols').val();
     selectedUserComponent = initUserComponent(false);
     addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
-    createTable(gridWidth, gridHeight, false);
+    createTable();
     resetMenuOptions();
 });
 
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
-    loadTable(gridWidth, gridHeight, selectedUserComponent);
+    loadTable(selectedUserComponent);
     addComponentToUserProjectAndDisplayInList(selectedUserComponent);
     resetMenuOptions();
 });
@@ -108,7 +108,7 @@ $('#user-components-list').on('click', 'li', function () {
     $('#selected').removeAttr('id');
     $(this).attr('id', 'selected');
     selectedUserComponent = selectedProject.components[componentId];
-    loadTable(gridWidth, gridHeight, selectedUserComponent);
+    loadTable(selectedUserComponent);
 });
 
 $('#user-components-list').on('dblclick', '.component-name', function () {
@@ -232,7 +232,7 @@ function createEmptyRow(rowNumber) {
 /**
  * Generate the table
  */
-function createTable(gridWidth, gridHeight) {
+function createTable() {
     /*
      Note about naming conventions:
      for naming id, try to follow this rule
@@ -268,7 +268,6 @@ function createTable(gridWidth, gridHeight) {
     addRowColResizeHandlers();
     addClearButtons();
     addDeleteUserComponentButton();
-    //addTableResizeHandler();
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
@@ -744,11 +743,11 @@ function saveRowColRatios(){
  * Creates and displays a table based on the component given
  * @param componentToShow
  */
-function loadTable(gridWidth, gridHeight, componentToShow) {
+function loadTable(componentToShow) {
     $('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
     numRows = componentToShow.dimensions.rows;
     numCols = componentToShow.dimensions.cols;
-    createTable(gridWidth, gridHeight);
+    createTable();
 
     $('#table-container td').each(function () {
         var cellId = $(this).get(0).id;
@@ -1361,7 +1360,7 @@ function addRowToEnd() {
                                                             }
     }
     selectedUserComponent.recalculateRatios(1,0);
-    loadTable(gridWidth, gridHeight, selectedUserComponent);
+    loadTable(selectedUserComponent);
 
 
 }
@@ -1383,7 +1382,7 @@ function removeEndRow() {
     delete selectedUserComponent.layout[lastRowNum];
 
     selectedUserComponent.recalculateRatios(-1,0);
-    loadTable(gridWidth, gridHeight, selectedUserComponent);
+    loadTable(selectedUserComponent);
 
 }
 
@@ -1405,7 +1404,7 @@ function addColToEnd() {
                                                             }
     }
     selectedUserComponent.recalculateRatios(0,1);
-    loadTable(gridWidth, gridHeight, selectedUserComponent);
+    loadTable(selectedUserComponent);
 
 }
 
@@ -1426,7 +1425,7 @@ function removeEndCol() {
     }
 
     selectedUserComponent.recalculateRatios(0,-1);
-    loadTable(gridWidth, gridHeight, selectedUserComponent);
+    loadTable(selectedUserComponent);
 
 }
 
@@ -1461,7 +1460,7 @@ function deleteUserComponent(componentId){
         var otherIds = Object.keys(selectedProject.components);
         selectedUserComponent = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").attr('id', 'selected');
-        loadTable(gridWidth, gridHeight, selectedUserComponent);
+        loadTable(selectedUserComponent);
     }
     $("#user-components-list").find("[data-componentid='" + componentId + "']").remove();
 
