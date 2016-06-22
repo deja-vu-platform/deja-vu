@@ -5,9 +5,9 @@ var cellHeight = DEFAULT_CELL_HEIGHT;
 var files = [];
 
 // currently save components in this array
-var userComponents = [];
-var numComponents = userComponents.length - 1; // -1 to enable 0-indexing
 var selectedUserComponent = null;
+var selectedProject = null;
+
 var bitmapOld = null;
 var bitmapNew = null;
 
@@ -17,21 +17,53 @@ var gridHeight;
 // Initialization
 $(function () {
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
-    selectedUserComponent = "in jq";
 
-    // start a default component
-    initUserComponent(true);
-    var grid = $('#table-container').get(0);
-    gridWidth = grid.offsetWidth;
-    gridHeight = grid.offsetHeight;
-    createTable(gridWidth, gridHeight);
+    // TODO get project information from local storage
+    // TODO load first component (or maybe the last edited one?)
+    // TODO if no components, then load the default one
+
+    selectedProject = window.sessionStorage.getItem('selectedProject');
+    if (selectedProject){ // if it exists
+        selectedProject = $.extend(new UserProject(), JSON.parse(selectedProject));
+        for (var componentId in selectedProject.components){
+            var component = selectedProject.components[componentId];
+            selectedProject.components[componentId] = $.extend(new UserComponent(component.dimensions), component);
+        }
+    } else { // make a new one
+        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
+    }
+
+    $('.project-name .header').text(selectedProject.meta.name);
+
+    if (selectedProject.numComponents === 0){
+        // start a default component
+        selectedUserComponent = initUserComponent(true);
+        var grid = $('#table-container').get(0);
+        gridWidth = grid.offsetWidth;
+        gridHeight = grid.offsetHeight;
+        createTable(gridWidth, gridHeight);
+        addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
+    } else {
+        var componentToLoadId = Object.keys(selectedProject.components)[0];
+        selectedUserComponent = selectedProject.components[componentToLoadId];
+        addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
+        for (var componentId in selectedProject.components){
+            if (componentId != componentToLoadId){
+                var comeponentName = selectedProject.components[componentId].meta.name
+                displayNewComponentInUserComponentList(comeponentName, componentId);
+            }
+        }
+        loadTable(gridWidth, gridHeight, selectedUserComponent);
+
+    }
 
 });
 
 $('#create-component').on('click', function () {
     numRows = $('#select-rows').val();
     numCols = $('#select-cols').val();
-    initUserComponent(false);
+    selectedUserComponent = initUserComponent(false);
+    addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
     createTable(gridWidth, gridHeight, false);
     resetMenuOptions();
 });
