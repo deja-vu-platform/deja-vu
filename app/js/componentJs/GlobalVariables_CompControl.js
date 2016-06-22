@@ -17,4 +17,8 @@ var gridHeight;
 
 var currentZoom = 1.0;
 var basicComponents;
+
+// settings
+var confirmOnDangerousMerge = true;
+var confirmOnUserComponentDelete = true;
 /** ** ** ** ** ** ** ** ** ** ** ** ** **/

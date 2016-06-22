@@ -292,10 +292,14 @@ function attachMergeHandlers() {
                         var newCellGridRowcol = newCellGrid[0].id.split('_');
                         var newCellId = 'cell' + '_' + newCellGridRowcol[newCellGridRowcol.length - 2] + '_' + newCellGridRowcol[newCellGridRowcol.length - 1];
                         // TODO: have a setting to turn this off?
-                        if (safeToMerge(thisCellId, newCellId)){
-                            mergeCells(thisCellId, newCellId, component);
+                        if (confirmOnDangerousMerge){
+                            if (safeToMerge(thisCellId, newCellId)){
+                                mergeCells(thisCellId, newCellId, component);
+                            } else {
+                                openMergeConfirmDialogue(thisCellId, newCellId);
+                            }
                         } else {
-                            openMergeConfirmDialogue(thisCellId, newCellId);
+                            mergeCells(thisCellId, newCellId, component);
                         }
                     }
 
@@ -1080,7 +1084,14 @@ function addDeleteUserComponentButton(){
     buttonClearAll.id = 'btn-clear-all';
 
     $(buttonClearAll).on("click", function (e) {
-        deleteUserComponent(selectedUserComponent.meta.id);
+        if (selectedProject.numComponents === 1){
+            return; //don't delete the last one TODO is the the right way to go?
+        }
+        if (confirmOnUserComponentDelete){
+            openDeleteUserComponentConfirmDialogue(selectedUserComponent.meta.id);
+        } else {
+            deleteUserComponent(selectedUserComponent.meta.id);
+        }
     });
 
     $('#table-container').append(buttonClearAll).css({
@@ -1095,20 +1106,49 @@ function addDeleteUserComponentButton(){
     })
 }
 
-function deleteUserComponent(componentId){
-    if (selectedProject.components.length === 1){
+function deleteUserComponent(userComponentId){
+    if (selectedProject.numComponents === 1){
         return; //don't delete the last one TODO is the the right way to go?
     }
-    delete selectedProject.components[componentId];
-    if (componentId === selectedUserComponent.meta.id){
+    delete selectedProject.components[userComponentId];
+    if (userComponentId === selectedUserComponent.meta.id){
         var otherIds = Object.keys(selectedProject.components);
         selectedUserComponent = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").attr('id', 'selected');
         loadTable(selectedUserComponent);
     }
-    $("#user-components-list").find("[data-componentid='" + componentId + "']").remove();
+    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
 
 }
+
+function openDeleteUserComponentConfirmDialogue(userComponentId){
+    $('#confirm-delete-userComponent').modal('show');
+    $('#delete-userComponent-name').text(selectedProject.components[userComponentId].meta.name);
+    $('#delete-userComponent-btn').data('deleteUserComponentId', userComponentId);
+};
+
+$('#delete-userComponent-btn').click(function(){
+    var userComponentId =  $('#delete-userComponent-btn').data('deleteUserComponentId');
+    deleteUserComponent(userComponentId);
+
+    $('#delete-userComponent-btn').data('deleteUserComponentId', '');
+
+    $('#delete-userComponent-name').text('');
+});
+
+$('#delete-userComponent-cancel-btn').click(function(){
+    $('#delete-userComponent-btn').data('deleteUserComponentId', '');
+
+    $('#delete-userComponent-name').text('');
+});
+
+$('#confirm-delete-userComponent .close').click(function(event){
+    event.preventDefault();
+    $('#delete-userComponent-btn').data('deleteUserComponentId', '');
+    $('#confirm-delete-userComponent').modal('hide');
+
+    $('#delete-userComponent-name').text('');
+});
 
 
 /**
