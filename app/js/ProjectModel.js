@@ -90,4 +90,3 @@ UserProject.fromObject = function(object){
 };
 
 //selectedUserProject = new UserProject(DEFAULT_PROJECT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
-//selectedUserComponent.addComponent({}, 2, 3);

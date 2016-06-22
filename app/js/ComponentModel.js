@@ -184,4 +184,3 @@ UserComponent.fromObject = function(object){
 };
 
 //selectedUserComponent = new UserComponent({rows: DEFAULT_ROWS, cols: DEFAULT_COLS}, DEFAULT_COMPONENT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
-//selectedUserComponent.addComponent({}, 2, 3);

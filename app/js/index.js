@@ -30,7 +30,7 @@ function registerDroppable() {
                 var droppedComponent =$('#'+cellId).children().last().attr('name').toLowerCase();
                 showConfigOptions(droppedComponent, document.getElementById(cellId));
                 if (!movedComponent()) {
-                    addComponent(cellId, $(ui.draggable));
+                    displayComponentInTable(cellId, $(ui.draggable));
                 }
             } else { // if dropped in trash
                 var trashCopy = $(this).children().first();
@@ -132,7 +132,7 @@ function movedComponent() {
 
         }
 
-        deleteComponent("cell"+ '_' + delRow + '_' + delCol);
+        deleteComponentFromUserComponentAndFromView("cell"+ '_' + delRow + '_' + delCol);
         return true;
     }
     return false;
@@ -199,7 +199,7 @@ function registerTooltipBtnHandlers() {
 
     $('.apply').on("click", function(event) {
         var cellId = findContainingCell(this);
-        updateComponentAt(cellId);
+        updateComponentContentsAt(cellId);
         $('.tooltip').removeClass('open');
     });
 
@@ -286,7 +286,7 @@ function findContainingCell(context) {
 function getEdits() {
     $('[contenteditable=true]').blur(function() {
         var cellId = findContainingCell(this);
-        updateComponentAt(cellId);
+        updateComponentContentsAt(cellId);
         getEdits();
     });
 }
