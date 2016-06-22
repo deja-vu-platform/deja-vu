@@ -1,12 +1,12 @@
 /** ** ** ** Constants ** ** ** **/
-var DEFAULT_ROWS = 3;
-var DEFAULT_COLS = 3;
-var DEFAULT_CELL_WIDTH = 250;
-var DEFAULT_CELL_HEIGHT = 250;
+const DEFAULT_ROWS = 3;
+const DEFAULT_COLS = 3;
+const DEFAULT_CELL_WIDTH = 250;
+const DEFAULT_CELL_HEIGHT = 250;
 
-var DEFAULT_COMPONENT_NAME = "New Component";
-var DEFAULT_AUTHOR = "Unknown";
-var DEFAULT_VERSION = '0.0.1';
+const DEFAULT_COMPONENT_NAME = "New Component";
+//const DEFAULT_AUTHOR = "Unknown"; Already defined
+//const DEFAULT_VERSION = '0.0.1';
 /** ** ** ** ** ** ** ** ** ** **/
 
 
@@ -150,7 +150,38 @@ UserComponent.prototype.addComponent = function(component, row, col) {
     return true;
 };
 
+UserComponent.fromString = function(string){
+    var object = JSON.parse(string);
+    return UserComponent.fromObject(object)
+};
 
+UserComponent.fromObject = function(object){
+    // Check that the object has all the required fields
+    var notCorrectObjectError = "notCorrectObjectError: object object is not an instance of a UserComponent";
+    if (!object.objectType){
+        throw notCorrectObjectError;
+    }
+    if (!object.type){
+        throw notCorrectObjectError;
+    }
+    if (!object.meta){
+        throw notCorrectObjectError;
+    }
+    if (!object.dimensions){
+        throw notCorrectObjectError;
+    }
+    if (!object.components){
+        throw notCorrectObjectError;
+    }
+    if (!object.properties){
+        throw notCorrectObjectError;
+    }
+    if (!object.layout){
+        throw notCorrectObjectError;
+    }
+
+    return $.extend(new UserComponent(object.dimensions), object)
+};
 
 //selectedUserComponent = new UserComponent({rows: DEFAULT_ROWS, cols: DEFAULT_COLS}, DEFAULT_COMPONENT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
 //selectedUserComponent.addComponent({}, 2, 3);

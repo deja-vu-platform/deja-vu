@@ -1,10 +1,11 @@
+/** ** ** ** Global Variables ** ** ** **/
+
 var numRows = DEFAULT_ROWS;
 var numCols = DEFAULT_COLS;
 var cellWidth = DEFAULT_CELL_WIDTH;
 var cellHeight = DEFAULT_CELL_HEIGHT;
 var files = [];
 
-// currently save components in this array
 var selectedUserComponent = null;
 var selectedProject = null;
 
@@ -14,19 +15,18 @@ var bitmapNew = null;
 var gridWidth;
 var gridHeight;
 
+/** ** ** ** ** ** ** ** ** ** ** ** ** **/
+
 // Initialization
 $(function () {
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
 
+    // get selected project
     selectedProject = window.sessionStorage.getItem('selectedProject');
-    if (selectedProject){ // if it exists
-        selectedProject = $.extend(new UserProject(), JSON.parse(selectedProject));
-        for (var componentId in selectedProject.components){
-            var component = selectedProject.components[componentId];
-            selectedProject.components[componentId] = $.extend(new UserComponent(component.dimensions), component);
-        }
-    } else { // make a new one
-        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
+    if (selectedProject){ // if it exists, load it
+        selectedProject = UserProject.fromString(selectedProject);
+    } else { // if not, make a new one
+        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, generateId(DEFAULT_PROJECT_NAME), DEFAULT_VERSION, DEFAULT_AUTHOR);
     }
 
     $('.project-name .header').text(selectedProject.meta.name);
@@ -65,7 +65,7 @@ $('#create-component').on('click', function () {
 });
 
 $('#load-component-btn').on('click', function () {
-    selectedUserComponent = JSON.parse($('#component-json').val());
+    selectedUserComponent = UserComponent.fromString($('#component-json').val());
     loadTable(gridWidth, gridHeight, selectedUserComponent);
     addComponentToUserProjectAndDisplayInList(selectedUserComponent);
     resetMenuOptions();
@@ -696,7 +696,7 @@ function addDeleteUserComponentButton(){
     var spDelete = document.createElement('span');
     spDelete.innerHTML = '<button type="button" class="btn btn-default ">' +
         '<span>Delete User Component </span>' +
-        '<span class="glyphicon glyphicon-remove"></span>' +
+        '<span class="glyphicon glyphicon-trash"></span>' +
         '</button>';
 
     var buttonClearAll = spDelete.firstChild;
