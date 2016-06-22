@@ -973,9 +973,12 @@ function addRowToEnd() {
             spans:{row:1,col:1},
             merged:{isMerged: false, lastMergedBottomRightCellId: ''},
             hidden:{isHidden: false, hidingCellId: ''},
-            ratio:{width: standardCellWidth/gridWidth, height: standardCellHeight/gridHeight}
+            // take the width of the cell to the top
+            ratio:{width: selectedUserComponent.layout[lastRowNum][col].ratio.width, height: standardCellHeight/gridHeight}
         }
+
     }
+
     //selectedUserComponent.recalculateRatios(1,0);
     loadTable(selectedUserComponent);
 
@@ -1018,7 +1021,8 @@ function addColToEnd() {
             spans:{row:1,col:1},
             merged:{isMerged: false, lastMergedBottomRightCellId: ''},
             hidden:{isHidden: false, hidingCellId: ''},
-            ratio:{width: standardCellWidth/gridWidth, height: standardCellHeight/gridHeight}
+            // take the height of the cell to the left
+            ratio:{width: standardCellWidth/gridWidth, height: selectedUserComponent.layout[row][lastColNum].ratio.height}
         }
     }
     //selectedUserComponent.recalculateRatios(0,1);
