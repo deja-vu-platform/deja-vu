@@ -73,12 +73,30 @@ fieldset { border: 0; margin: 0; padding: 0; }
 /*===================================================
                   COMPONENTS
 ===================================================*/
+.projects {
+
+}
 .recent-projects {
     border: #d5d5d5 1px solid;
     height: 100%;
     width: 100%;
     display: inline-block;
+
 }
+
+#recent-projects-list{
+    text-align: center;
+}
+
+#recent-projects-list li{
+    cursor: pointer;
+}
+
+.current-project .content{
+    text-align: center;
+    cursor: pointer;
+}
+
 
 .header {
     border-top: solid 5px #D5D5D5;

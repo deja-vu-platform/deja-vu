@@ -88,10 +88,23 @@ fieldset { border: 0; margin: 0; padding: 0; }
     background-color: #EBEBEB;
 }
 
+.project-name .header{
+    border: none;
+    background-color: white;
+    font-weight: bold;
+}
+
+#back-to-projects{
+    width: 100%;
+    text-align: center;
+}
+
 .content {
     overflow: scroll;
     text-align: left;
     resize: vertical;
+    cursor: pointer;
+
 }
 
 .basic-components .content {

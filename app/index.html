@@ -34,11 +34,17 @@
         </div>
 
         <div class="menu-item">
-            <button type="button" class="btn btn-default" id="save-component">
-                <span class="glyphicon glyphicon-save"></span> Save component
-            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-save"></span> Save
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#" id="save-component">Save Component</a></li>
+                    <li><a href="#" id="save-project">Save Project</a></li>
+                </ul>
+            </div>
         </div>
-
 
         <div class="menu-item">
             <div class="btn-group">
@@ -55,17 +61,19 @@
             </div>
         </div>
 
-        <div class="menu-item">
-            <button type="button" class="btn btn-default" id="back-to-projects">
-                <span class="glyphicon glyphicon-arrow-left"></span> Back to Projects
-            </button>
-        </div>
-
     </div>
 </div>
 
 
 <div class="components">
+    <div class="project-name">
+        <div class="header"></div>
+        <div  id="back-to-projects">
+            <a href="projectView.html">
+                <span class="glyphicon glyphicon-arrow-left"></span> Back to Projects
+            </a>
+        </div>
+    </div>
     <div class="user-components">
         <div class="header">User components</div>
         <div class="content">
@@ -573,6 +581,8 @@
 <script src="js/external/jquery-ui.min.js"></script>
 <script src="js/external/bootstrap.min.js"></script>
 <script src="js/external/parse.min.js"></script>
+<script src="js/ProjectModel.js"></script>
+<script src="js/ProjectController.js"></script>
 <script src="js/ComponentModel.js"></script>
 <script src="js/ComponentView.js"></script>
 <script src="js/ComponentController.js"></script>
