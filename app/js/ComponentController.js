@@ -271,6 +271,7 @@ function createTable(gridWidth, gridHeight) {
 
     addRowColResizeHandlers();
     addClearButtons();
+    addDeleteUserComponentButton();
     //addTableResizeHandler();
 
     bitmapOld = make2dArray(numRows, numCols);
@@ -689,6 +690,35 @@ function addClearAllButton(){
         position: 'absolute',
         top:'-45px',
         right:'-140px'
+    })
+}
+
+
+
+function addDeleteUserComponentButton(){
+    // TODO add a waring tag!
+    var spDelete = document.createElement('span');
+    spDelete.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<span>Delete User Component </span>' +
+        '<span class="glyphicon glyphicon-remove"></span>' +
+        '</button>';
+
+    var buttonClearAll = spDelete.firstChild;
+    buttonClearAll.id = 'btn-clear-all';
+
+    $(buttonClearAll).on("click", function (e) {
+        deleteUserComponent(selectedUserComponent.meta.id);
+    });
+
+    $('#table-container').append(buttonClearAll).css({
+        position: 'relative'
+    });
+    $(buttonClearAll).css({
+        position: 'absolute',
+        top:'-100px',
+        right:'-150px',
+        background: 'red',
+        color: 'white'
     })
 }
 
@@ -1436,4 +1466,20 @@ function clearCol(col){
         var cellId = 'cell' + '_' + row + '_' + col;
         deleteComponent(cellId);
     }
+}
+
+
+function deleteUserComponent(componentId){
+    if (selectedProject.components.length === 1){
+        return; //don't delete the last one TODO is the the right way to go?
+    }
+    delete selectedProject.components[componentId];
+    if (componentId === selectedUserComponent.meta.id){
+        var otherIds = Object.keys(selectedProject.components);
+        selectedUserComponent = selectedProject.components[otherIds[0]];
+        $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").attr('id', 'selected');
+        loadTable(gridWidth, gridHeight, selectedUserComponent);
+    }
+    $("#user-components-list").find("[data-componentid='" + componentId + "']").remove();
+
 }
