@@ -17,6 +17,7 @@ var DEFAULT_VERSION = '0.0.1';
  * @constructor
  */
 function Component() {
+    this.objectType = "Component";
     this.type = '';
     this.meta = {};
     this.dimensions = {};
@@ -47,6 +48,7 @@ function Component() {
 BaseComponent.prototype = new Component();
 BaseComponent.prototype.constructor = BaseComponent;
 function BaseComponent(type, components) {
+    this.objectType = "BaseComponent";
     this.type = type;
     this.components = components;
     this.properties = {};
@@ -89,6 +91,7 @@ BaseComponent.prototype.updateComponent = function(type, value) {
 UserComponent.prototype = new Component();
 UserComponent.prototype.constructor = UserComponent;
 function UserComponent(dimensions, name, id, version, author) {
+    this.objectType = "UserComponent";
     this.type = "user";
     this.meta = {
         name: name,
