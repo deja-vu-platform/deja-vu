@@ -575,6 +575,28 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<div class="modal fade" id="confirm-merge">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">Confirm Merge?</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    You are about to merge over cell(s) containing a component. The merge will
+                    cause the component(s) to be deleted. Continue?
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="merge-btn" data-dismiss="modal" class="btn btn-primary" data-cell1Id="" data-cell2Id="">Yes</button>
+                <button id="merge-cancel-btn" data-dismiss="modal" class="btn btn-primary">No</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 <script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
 <script src="js/external/jquery.min.js"></script>
 
@@ -586,7 +608,7 @@
 <script src="js/componentJs/ComponentModel.js"></script>
 <script src="js/componentJs/ComponentView.js"></script>
 <script src="js/componentJs/GlobalVariables_CompControl.js"></script>
-<script src="js/componentJs/TableComponentFunctions_CompControl.js"></script>
+<script src="js/componentJs/TableAndComponentFunctions_CompControl.js"></script>
 <script src="js/componentJs/InitializationAndDisplay_CompControl.js"></script>
 <script src="js/external/zoomooz.min.js"></script>
 

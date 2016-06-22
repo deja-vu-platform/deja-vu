@@ -250,6 +250,7 @@ function attachMergeHandlers() {
                     var rowcol = containerId.split('_');
                     var row = rowcol[rowcol.length - 2];
                     var col = rowcol[rowcol.length - 1];
+                    var thisCellId = 'cell' + '_' + row + '_' + col;
 
                     var component;
                     if (selectedUserComponent.components[row]) {
@@ -286,11 +287,16 @@ function attachMergeHandlers() {
 
                     var newCellGrid = $(allEltsList).filter('.grid');
                     if (!newCellGrid[0]) { // it's outside the table
-                        mergeCells('cell' + '_' + row + '_' + col, 'cell' + '_' + row + '_' + col, component);
+                        mergeCells(thisCellId, thisCellId, component);
                     } else {
                         var newCellGridRowcol = newCellGrid[0].id.split('_');
                         var newCellId = 'cell' + '_' + newCellGridRowcol[newCellGridRowcol.length - 2] + '_' + newCellGridRowcol[newCellGridRowcol.length - 1];
-                        mergeCells('cell' + '_' + row + '_' + col, newCellId, component);
+                        // TODO: have a setting to turn this off?
+                        if (safeToMerge(thisCellId, newCellId)){
+                            mergeCells(thisCellId, newCellId, component);
+                        } else {
+                            openMergeConfirmDialogue(thisCellId, newCellId);
+                        }
                     }
 
                     // rest event handlers
@@ -344,12 +350,8 @@ function allElementsFromPoint(x, y) {
     return elements;
 }
 
-
-/*
- * Merging and unmerging cells
- */
-function mergeCells(cell1Id, cell2Id, component) {
-    // first check for top left cell and bottom right cell
+/** ** ** ** ** ** ** ** ** Merging and unmerging cells ** ** ** ** ** ** ** ** ** ** **/
+function getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id){
     var rowcol1 = cell1Id.split('_');
     var row1 = rowcol1[rowcol1.length - 2];
     var col1 = rowcol1[rowcol1.length - 1];
@@ -364,6 +366,101 @@ function mergeCells(cell1Id, cell2Id, component) {
 
     var leftColNum = Math.min(parseInt(col1), parseInt(col2));
     var rightColNum = Math.max(parseInt(col1), parseInt(col2));
+
+    return [topRowNum, bottomRowNum, leftColNum, rightColNum]
+}
+
+function safeToMerge(cell1Id, cell2Id){
+    // first check for top left cell and bottom right cell
+    var topBottomLeftRight = getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id);
+    var topRowNum = topBottomLeftRight[0];
+    var bottomRowNum = topBottomLeftRight[1];
+
+    var leftColNum = topBottomLeftRight[2];
+    var rightColNum = topBottomLeftRight[3];
+
+    for (var row = topRowNum; row <= bottomRowNum; row++) {
+        for (var col = leftColNum; col <= rightColNum; col++) {
+            var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
+            if (cellId === cell1Id){
+                continue;
+            }
+            if (selectedUserComponent.components[row]) {
+                if (selectedUserComponent.components[row][col]) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+
+function openMergeConfirmDialogue(cell1Id, cell2Id){
+    $('#confirm-merge').modal('show');
+    $('#merge-btn').data('cell1Id', cell1Id).data('cell2Id',cell2Id);
+};
+
+$('#merge-btn').click(function(){
+    var cell1Id =  $('#merge-btn').data('cell1Id');
+    var cell2Id =  $('#merge-btn').data('cell2Id');
+
+    var rowcol1 = cell1Id.split('_');
+    var row1 = rowcol1[rowcol1.length - 2];
+    var col1 = rowcol1[rowcol1.length - 1];
+
+    if (selectedUserComponent.components[row1]){
+        mergeCells(cell1Id, cell2Id, selectedUserComponent.components[row1][col1]);
+    } else {
+        mergeCells(cell1Id, cell2Id);
+    }
+
+    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
+});
+
+$('#merge-cancel-btn').click(function(){
+    var cell1Id =  $('#merge-btn').data('cell1Id');
+
+    var rowcol1 = cell1Id.split('_');
+    var row1 = rowcol1[rowcol1.length - 2];
+    var col1 = rowcol1[rowcol1.length - 1];
+
+    if (selectedUserComponent.components[row1]){
+        mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
+    } else {
+        mergeCells(cell1Id, cell1Id);
+    }
+
+    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
+    $('#confirm-merge').modal('hide');
+});
+
+$('#confirm-merge .close').click(function(event){
+    event.preventDefault();
+    var cell1Id =  $('#merge-btn').data('cell1Id');
+
+    var rowcol1 = cell1Id.split('_');
+    var row1 = rowcol1[rowcol1.length - 2];
+    var col1 = rowcol1[rowcol1.length - 1];
+
+    if (selectedUserComponent.components[row1]){
+        mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
+    } else {
+        mergeCells(cell1Id, cell1Id);
+    }
+
+    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
+    $('#confirm-merge').modal('hide');
+});
+
+function mergeCells(cell1Id, cell2Id, component) {
+    // first check for top left cell and bottom right cell
+    var topBottomLeftRight = getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id);
+    var topRowNum = topBottomLeftRight[0];
+    var bottomRowNum = topBottomLeftRight[1];
+
+    var leftColNum = topBottomLeftRight[2];
+    var rightColNum = topBottomLeftRight[3];
 
     var topLeftCellId = "cell" + '_' + topRowNum.toString() + '_' + leftColNum.toString();
     var bottomRightCellId = "cell" + '_' + bottomRowNum.toString() + '_' + rightColNum.toString();
