@@ -11,10 +11,12 @@ var DEFAULT_VERSION = '0.0.1';
  * @constructor
  */
 function Project() {
+    this.objectType = "Project";
     //this.type = '';
     this.meta = {};
     this.numComponents = 0;
     this.components = {};
+    this.componentIdSet = {};
 }
 
 /**
@@ -29,6 +31,7 @@ function Project() {
 UserProject.prototype = new Project();
 UserProject.prototype.constructor = UserProject;
 function UserProject(name, id, version, author) {
+    this.objectType = "UserProject";
     //this.type = type;
     this.meta = {
         name: name,
@@ -38,6 +41,7 @@ function UserProject(name, id, version, author) {
     };
     this.numComponents = 0;
     this.components = {};
+    this.componentIdSet = {id:''};
 }
 
 UserProject.prototype.addComponent = function(componentId, component){
