@@ -1,214 +1,9 @@
-/** ** ** ** Global Variables ** ** ** **/
-
-var numRows = DEFAULT_ROWS;
-var numCols = DEFAULT_COLS;
-var cellWidth = DEFAULT_CELL_WIDTH;
-var cellHeight = DEFAULT_CELL_HEIGHT;
-var files = [];
-
-var selectedUserComponent = null;
-var selectedProject = null;
-
-var bitmapOld = null;
-var bitmapNew = null;
-
-var gridWidth;
-var gridHeight;
-
-/** ** ** ** ** ** ** ** ** ** ** ** ** **/
-
-/** ** ** ** ** ** Initialization ** ** ** ** ** **/
-$(function () {
-    Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
-
-    // get selected project
-    selectedProject = window.sessionStorage.getItem('selectedProject');
-    if (selectedProject){ // if it exists, load it
-        selectedProject = UserProject.fromString(selectedProject);
-    } else { // if not, make a new one
-        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, generateId(DEFAULT_PROJECT_NAME), DEFAULT_VERSION, DEFAULT_AUTHOR);
-    }
-
-    $('.project-name .header').text(selectedProject.meta.name);
-
-    if (selectedProject.components.length === 0){
-        // start a default component
-        selectedUserComponent = initUserComponent(true);
-        var grid = $('#table-container').get(0);
-        gridWidth = grid.offsetWidth;
-        gridHeight = grid.offsetHeight;
-        createTable();
-        addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
-    } else {
-        var componentToLoadId = Object.keys(selectedProject.components)[0];
-        selectedUserComponent = selectedProject.components[componentToLoadId];
-        displayNewComponentInUserComponentListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
-        for (var componentId in selectedProject.components){
-            if (componentId != componentToLoadId){
-                var componentName = selectedProject.components[componentId].meta.name;
-                displayNewComponentInUserComponentList(componentName, componentId);
-            }
-        }
-        loadTable(selectedUserComponent);
-    }
-});
-
-/** ** ** ** ** ** Menu Event Handlers ** ** ** ** ** **/
-
-$('#create-component').on('click', function () {
-    numRows = $('#select-rows').val();
-    numCols = $('#select-cols').val();
-    selectedUserComponent = initUserComponent(false);
-    addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
-    createTable();
-    resetMenuOptions();
-});
-
-$('#load-component-btn').on('click', function () {
-    selectedUserComponent = UserComponent.fromString($('#component-json').val());
-    loadTable(selectedUserComponent);
-    addComponentToUserProjectAndDisplayInList(selectedUserComponent);
-    resetMenuOptions();
-});
-
-$('#save-component').on('click', function () {
-
-    window.open("data:text/json;charset=utf-8," +
-        encodeURIComponent(JSON.stringify(selectedUserComponent, null, '\t')));
-});
-
-$('#save-project').on('click', function () {
-
-    downloadObject(selectedProject.meta.name+'.json', selectedProject);
-});
-
-
-/** ** ** ** ** ** Menu Related Functions ** ** ** ** ** **/
-
-/**
- * Resets the menu options to their default values
- */
-function resetMenuOptions() {
-    $('#select-rows').val(DEFAULT_ROWS);
-    $('#select-cols').val(DEFAULT_COLS);
-    $('#new-component-name').val('');
-    $('#component-version').val('');
-    $('#component-author').val('');
-
-    $('#component-json').val('');
-}
-
-
-function downloadObject(filename, obj) {
-    var element = document.createElement('a');
-    var data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
-
-    element.setAttribute('href', data);
-    element.setAttribute('download', filename);
-
-    element.click();
-}
-
-
-
-/** ** ** ** ** ** Components Event Handlers ** ** ** ** ** **/
-
-$('#back-to-projects').click(function(event){
-    event.preventDefault();
-    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
-    window.location = 'projectView.html';
-});
-
-$('#user-components-list').on('click', 'li', function () {
-    var componentId = $(this).data('componentid');
-    $('#selected').removeAttr('id');
-    $(this).attr('id', 'selected');
-    selectedUserComponent = selectedProject.components[componentId];
-    loadTable(selectedUserComponent);
-});
-
-$('#user-components-list').on('dblclick', '.component-name', function () {
-    var newNameInputElt = $($(this).parent().find('.new-name-input'));
-    var submitRenameElt = $($(this).parent().find('.submit-rename'));
-    newNameInputElt.val($(this).text());
-    submitRenameElt.removeClass('not-displayed');
-    $(this).addClass('not-displayed');
-    newNameInputElt.focus();
-    newNameInputElt.select();
-});
-
-$('#user-components-list').on('keypress', '.new-name-input', function (event) {
-    if (event.which == 13) {
-        event.preventDefault();
-        var componentNameElt = $($(this).parent().parent().find('.component-name'));
-        var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
-
-        componentNameElt.removeClass('not-displayed');
-        submitRenameElt.addClass('not-displayed');
-        var newName = $(this).val();
-        if (newName.length === 0) { // empty string entered, don't change the name!
-            return;
-        }
-        componentNameElt.text($(this).val());
-        // update the display of the component box
-        $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
-
-        selectedUserComponent.meta.name = $(this).val();
-
-        // changing the ids todo: is this a good idea?
-        //var oldId = selectedUserComponent.meta.id;
-        //var newId = generateId(selectedUserComponent.meta.name);
-        //selectedUserComponent.meta.id = newId;
-        //selectedProject.componentIdSet[newId] = "";
-        //delete selectedProject.componentIdSet[oldId];
-        //selectedProject.components[newId] = selectedUserComponent;
-        //delete selectedProject.components[oldId];
-        //$(this).parent().parent().data('componentid', newId);
-    }
-});
-
-/** ** ** ** ** ** Component Adding to Project and Display helpers ** ** ** ** ** ** ** ** ** **/
-
-
-function addComponentToUserProjectAndDisplayInListAndSelect(newComponent){
-    $('#selected').removeAttr("id");
-    addComponentToUserProjectAndDisplayInList(newComponent);
-    $("#user-components-list").find("[data-componentid='" + newComponent.meta.id + "']").attr('id', 'selected');
-}
-
-
-
-/**
- * Adds a component to the list of user components
- * @param newComponent
- */
-function addComponentToUserProjectAndDisplayInList(newComponent) {
-    selectedProject.addComponent(newComponent.meta.id, newComponent);
-    displayNewComponentInUserComponentList(newComponent.meta.name, newComponent.meta.id);
-};
-
-
-function displayNewComponentInUserComponentListAndSelect(name, id){
-    $('#selected').removeAttr("id");
-    displayNewComponentInUserComponentList(name, id);
-    $("#user-components-list").find("[data-componentid='" + id + "']").attr('id', 'selected');
-}
-
-function displayNewComponentInUserComponentList(name, id){
-    var newComponentElt = '<li data-componentid=' + id + '>'
-        + '<span class="component-name">' + name + '</span>'
-        + '<span class="submit-rename not-displayed">'
-        + '<input type="text" class="new-name-input form-control" autofocus>'
-        + '</span>'
-        + '</li>';
-    $('#user-components-list').append(newComponentElt)
-}
-
+// This file mostly has functions that work to make and display
+// the table, and functions that work with editing the datatype
+// (which is mostly connected to the table)
 
 
 /** ** ** ** ** ** ** Table Related Functions ** ** ** ** ** ** **/
-
-
 
 /**
  * Creates and displays a table based on the component given
@@ -648,7 +443,7 @@ function mergeCells(cell1Id, cell2Id, component) {
         displayComponentInTable(topLeftCellId, false, component);
     }
 
-    resetMergeHandleContainersSizeAndPostition();
+    resetMergeHandleContainersSizeAndPosition();
 
 }
 
@@ -717,10 +512,10 @@ function unmergeCells(cellToUnmergeId, component) {
         displayComponentInTable(topLeftCellId, false, component);
     }
 
-    resetMergeHandleContainersSizeAndPostition();
+    resetMergeHandleContainersSizeAndPosition();
 }
 
-function resetMergeHandleContainersSizeAndPostition(){
+function resetMergeHandleContainersSizeAndPosition(){
     for (var row = 1; row <= numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             var cell = $("#cell" + '_' + row + '_' + col);
@@ -816,10 +611,10 @@ function addRowColResizeHandlers(){
                             ' .ui-resizable-s-row_'+row,
             resize: function () {
                 // TODO get rid of this later!
-                resetMergeHandleContainersSizeAndPostition();
+                resetMergeHandleContainersSizeAndPosition();
             },
             stop: function () {
-                resetMergeHandleContainersSizeAndPostition();
+                resetMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
             }
         });
@@ -860,10 +655,10 @@ function addRowColResizeHandlers(){
                         '#drag-handle-containers-container .col_' + col,
             resize: function () {
                 // TODO: move to stop() once the cell resize handles are made invisible
-                resetMergeHandleContainersSizeAndPostition();
+                resetMergeHandleContainersSizeAndPosition();
             },
             stop: function () {
-                resetMergeHandleContainersSizeAndPostition();
+                resetMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
             }
         });
@@ -899,10 +694,10 @@ function addTableResizeHandler(){
         alsoResize: '#main-grid-table',
         resize: function () {
             // TODO get rid of this later!
-            resetMergeHandleContainersSizeAndPostition();
+            resetMergeHandleContainersSizeAndPosition();
         },
         stop: function () {
-            resetMergeHandleContainersSizeAndPostition();
+            resetMergeHandleContainersSizeAndPosition();
             saveRowColRatios();
         }
     });
@@ -1246,164 +1041,6 @@ function initUserComponent(isDefault) {
     return newComponent;
 }
 
-/**
- * Adds a component to the table and displays it. If no component is given, it creates a
- * base component based on the widget
- *
- * Either a widget or a component has to be present
- *
- * @param widget
- * @param cellId
- * @param component
- */
-function displayComponentInTable(cellId, widget, component) {
-    var type;
-    var rowcol = cellId.split('_');
-    var row = rowcol[rowcol.length - 2];
-    var col = rowcol[rowcol.length - 1];
-
-    if (!component) {
-        var span = document.createElement('span');
-        span.innerHTML = widget[0].outerHTML;
-        type = span.firstElementChild.getAttribute('name');
-        component = new BaseComponent(type, {});
-
-        showConfigOptions(type, document.getElementById(cellId));
-
-        if (type === 'label') {
-            Display(cellId, getHTML[type]("Type text here..."));
-        } else if (type === 'panel') {
-            Display(cellId, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
-        } else {
-            Display(cellId, getHTML[type]());
-            triggerEdit(cellId, true); // since this is a new component, show edit options
-        }
-
-    } else {// a component is there
-        type = component.type;
-
-        showConfigOptions(type, document.getElementById(cellId));
-
-        Display(cellId, getHTML[type](component.components[type]));
-        if (!widget) {
-            $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0))
-        }
-        triggerEdit(cellId, false); // no need to show edit options
-
-    }
-
-    $('#' + cellId).addClass("dropped");
-    $('#' + cellId).removeClass("droppable");
-    $('#' + cellId).droppable('disable');
-    registerDraggable();
-
-    if (!selectedUserComponent.components.hasOwnProperty(row)) {
-        selectedUserComponent.components[row] = {};
-    }
-    selectedUserComponent.components[row][col] = component;
-
-    updateBitmap();
-    registerTooltipBtnHandlers()
-}
-
-
-/**
- * Deletes a component from the datatype and also from the view
- */
-function deleteComponentFromUserComponentAndFromView(cellId) {
-    var rowcol = cellId.split('_');
-    var row = rowcol[rowcol.length - 2];
-    var col = rowcol[rowcol.length - 1];
-
-    if (selectedUserComponent.components[row]) {
-        if (selectedUserComponent.components[row][col]) {
-
-            delete selectedUserComponent.components[row][col];
-            var cell = $('#cell' + '_' + row + '_' + col).get(0);
-
-            $(cell).find('.config-btns').remove();
-            $(cell).find('.tooltip').remove();
-            $(cell).find('.label-container').remove();
-            $(cell).find('.display-component').remove();
-            $(cell).find('.widget').remove();
-
-            resetDroppability(cellId);
-            updateBitmap();
-
-        }
-    }
-
-}
-
-
-/**
- * Updates the contents of a base component at a particular cell
- * @param cellId
- */
-function updateComponentContentsAt(cellId) {
-    var rowcol = cellId.split('_');
-    var row = rowcol[rowcol.length - 2];
-    var col = rowcol[rowcol.length - 1];
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    var value;
-    var isUpload = false;
-    var inputs = Array.prototype.slice.call(
-        $('#' + cellId).get(0).getElementsByTagName('input'), 0);
-
-    if (type === 'label') {
-        value = $('#' + cellId).find('p')[0].textContent;
-    } else if (type === 'link') {
-        value = {
-            link_text: inputs[0].value,
-            target: inputs[1].value
-        }
-    } else if (type === 'tab_viewer') {
-        value = {
-            "tab1": {text: inputs[0].value, target: inputs[1].value},
-            "tab2": {text: inputs[2].value, target: inputs[3].value},
-            "tab3": {text: inputs[4].value, target: inputs[5].value}
-        }
-    } else if (type === 'menu') {
-        value = {
-            "menu_item1": {text: inputs[0].value, target: inputs[1].value},
-            "menu_item2": {text: inputs[2].value, target: inputs[3].value},
-            "menu_item3": {text: inputs[4].value, target: inputs[5].value}
-        }
-    } else if (type === 'image') {
-        value = {};
-
-        if (files.length > 0) { // if there's a file to upload
-
-            var file = files[0];
-            var parseFile = new Parse.File(file.name, file);
-            isUpload = true;
-            files.length = 0; // clear the old file
-            parseFile.save()
-                .then(function (savedFile) { // save was successful
-                    RemoveDisplay(cellId);
-                    value.img_src = savedFile.url();
-                    Display(cellId, getHTML[type](value));
-                    selectedUserComponent.components[row][col].components[type] = value;
-                });
-        } else { // pasted link to image
-            value.img_src = inputs[0].value;
-        } // TODO what if empty link given?
-    } else if (type === 'panel') {
-        value = {
-            heading: $('#' + cellId).find('.panel-title')[0].textContent,
-            content: $('#' + cellId).find('.panel-body')[0].textContent
-        }
-    }
-
-    if (!isUpload) {
-        $('#' + cellId).find('.label-container').remove();
-        $('#' + cellId).find('.display-component').remove();
-        Display(cellId, getHTML[type](value), function () {
-        });
-        selectedUserComponent.components[row][col].components = {};
-        selectedUserComponent.components[row][col].components[type] = value;
-    }
-}
 
 
 /** ** ** ** ** ** BITMAP TO HELP IN UPDATE  ** ** ** ** ** ** **/
@@ -1451,42 +1088,4 @@ function updateBitmap() {
     });
 }
 
-
-/** ** ** ** ** ** ** ** IMAGE UPLOAD HELPERS ** ** ** ** ** ** ** **/
-// file drag hover
-function FileDragHover(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    if (e.type == "dragover") {
-        $(e.target).addClass("hover");
-    } else if (e.type == "dragleave") {
-        $(e.target).removeClass("hover");
-    }
-}
-// file selection
-function FileSelectHandler(e) {
-
-    FileDragHover(e); // cancel event and hover styling
-
-    files = e.target.files || e.dataTransfer.files;
-
-    $(e.target).text("Got file: " + truncate(files[0].name, 30));
-}
-
-function truncate(str, len) {
-    return str.substring(0, len) + (str.length > len ? "... " + str.substring(str.length - 4) : "");
-}
-
-function getCSSRule(search) {
-    var x = [].slice.call(document.styleSheets[2].cssRules);
-    return x.filter(function (rule) {
-        return rule.selectorText === search;
-    })[0];
-}
-
-function resizeLabelDivs(cellWidth, cellHeight) {
-    getCSSRule('.label-container').style.setProperty('width', (cellWidth - 10) + 'px', null);
-    getCSSRule('.label-container').style.setProperty('height', (cellHeight - 30) + 'px', null);
-    getCSSRule('.label-container').style.setProperty('padding-top', (cellHeight / 4) + 'px', null);
-}
 
