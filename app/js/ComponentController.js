@@ -1220,10 +1220,6 @@ function mergeCells(cell1Id, cell2Id, component) {
     var colspan = rightColNum - leftColNum + 1;
     cellTopLeft.attr("rowSpan", rowspan);
     cellTopLeft.attr("colSpan", colspan);
-    $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum).css({
-        width: cellTopLeft.css('width'),
-        height: cellTopLeft.css('height'),
-    });
 
     // update the datatype
     selectedUserComponent.layout[topRowNum][leftColNum].spans = {row:rowspan,col:colspan};
@@ -1237,7 +1233,6 @@ function mergeCells(cell1Id, cell2Id, component) {
         addComponent(topLeftCellId, false, component);
     }
 
-    // TODO this is doing some redundant stuff, maybe reduce some stuff above?
     resetMergeHandleContainersSizeAndPostition();
 
 }
@@ -1273,7 +1268,6 @@ function unmergeCells(cellToUnmergeId, component) {
     for (var row = topRowNum; row <= bottomRowNum; row++) {
         for (var col = leftColNum; col <= rightColNum; col++) {
             var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
-            var gridId = 'grid' + '_' + row.toString() + '_' + col.toString();
             // update the datatype
             selectedUserComponent.layout[row][col].spans = {row:1,col:1};
             selectedUserComponent.layout[row][col].merged = {isMerged: false, lastMergedBottomRightCellId: ''};
@@ -1296,13 +1290,8 @@ function unmergeCells(cellToUnmergeId, component) {
             deleteComponent(cellId);
 
             var dragContainerToShow = $('#drag-handle-container' + '_' + row + '_' + col);
-            var cellOffset = $('#' + gridId).offset();
             dragContainerToShow.css({
                 display: 'block',
-                top: cellOffset.top,
-                left: cellOffset.left,
-                width: cellToShow.css('width'),
-                height: cellToShow.css('height'),
             });
 
         }
@@ -1313,7 +1302,6 @@ function unmergeCells(cellToUnmergeId, component) {
         addComponent(topLeftCellId, false, component);
     }
 
-    // TODO this is doing some redundant stuff, maybe reduce some stuff above?
     resetMergeHandleContainersSizeAndPostition();
 }
 
