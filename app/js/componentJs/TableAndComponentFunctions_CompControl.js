@@ -236,7 +236,7 @@ function attachMergeHandlers() {
                 },
                 start: function (event, ui) {
                     $('#guide-grid-container td').css({
-                        border: 'black 1px dotted',
+                        border: '#cdcdcd 1px dotted',
                         visibility: 'visible'
                     });
                     $('.drag-handle').off('mouseenter mouseleave');
