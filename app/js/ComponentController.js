@@ -836,9 +836,14 @@ function initUserComponent(isDefault) {
         author = $('#component-author').val();
     }
     $('<style>.main-table::after{content:"' + name + '"}</style>').appendTo('head');
-    var newComponent = new UserComponent({rows: numRows, cols: numCols}, name, 1, version, author);
-    addComponentToUserComponentsList(newComponent);
-    selectedUserComponent = newComponent;
+    var id = generateId(name);
+    while (id in selectedProject.componentIdSet){ // very unlikely to have a collision unless the user has 1 Million components!
+        id = generateId(name);
+    }
+    selectedProject.componentIdSet[id] = '';
+
+    var newComponent = new UserComponent({rows: numRows, cols: numCols}, name, id, version, author);
+    return newComponent;
 }
 
 /**
