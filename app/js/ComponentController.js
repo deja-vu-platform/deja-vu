@@ -71,38 +71,53 @@ $('#create-component').on('click', function () {
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = JSON.parse($('#component-json').val());
     loadTable(gridWidth, gridHeight, selectedUserComponent);
-    addComponentToUserComponentsList(selectedUserComponent);
+    addComponentToUserProjectAndDisplayInList(selectedUserComponent);
     resetMenuOptions();
 });
+
+function downloadObject(filename, obj) {
+    var element = document.createElement('a');
+    var data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+
+    element.setAttribute('href', data);
+    element.setAttribute('download', filename);
+
+    element.click();
+}
+
 
 $('#save-component').on('click', function () {
 
     window.open("data:text/json;charset=utf-8," +
         encodeURIComponent(JSON.stringify(selectedUserComponent, null, '\t')));
-
-    //w = window.open();
-    //w.document.body.innerHTML='<a href="data:' + data + '" download="data.json">' +
-    //    'Download JSON</a>'+'<p><textarea style="width:95%; height:95%">'+
-    //    JSON.stringify(selectedUserComponent, null, '\t')+'</textarea></p>';
 });
 
-$('#back-to-projects').click(function(){
-   window.location = 'projectView.html';
+
+$('#save-project').on('click', function () {
+
+    //window.open("data:text/json;charset=utf-8," +
+    //    encodeURIComponent(JSON.stringify(selectedProject, null, '\t')));
+
+    downloadObject(selectedProject.meta.name+'.json', selectedProject);
+});
+
+$('#back-to-projects').click(function(event){
+    event.preventDefault();
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
+    window.location = 'projectView.html';
 });
 
 $('#user-components-list').on('click', 'li', function () {
-    var componentNumber = $(this).data('componentnumber');
+    var componentId = $(this).data('componentid');
     $('#selected').removeAttr('id');
-    $($('#user-components-list li')[componentNumber]).attr('id', 'selected');
-    selectedUserComponent = userComponents[componentNumber];
+    $(this).attr('id', 'selected');
+    selectedUserComponent = selectedProject.components[componentId];
     loadTable(gridWidth, gridHeight, selectedUserComponent);
 });
 
 $('#user-components-list').on('dblclick', '.component-name', function () {
-    var componentNumber = $(this).parent().data('componentnumber');
-    var componentToRename = $($('#user-components-list li')[componentNumber]);
-    var newNameInputElt = $(componentToRename.find('.new-name-input'));
-    var submitRenameElt = $(componentToRename.find('.submit-rename'));
+    var newNameInputElt = $($(this).parent().find('.new-name-input'));
+    var submitRenameElt = $($(this).parent().find('.submit-rename'));
     newNameInputElt.val($(this).text());
     submitRenameElt.removeClass('not-displayed');
     $(this).addClass('not-displayed');
@@ -113,11 +128,8 @@ $('#user-components-list').on('dblclick', '.component-name', function () {
 $('#user-components-list').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
-        var componentNumber = $(this).parent().parent().data('componentnumber');
-        var componentToRename = $($('#user-components-list li')[componentNumber]);
-        var componentNameElt = $(componentToRename.find('.component-name'));
-        var submitRenameElt = $(componentToRename.find('.submit-rename'));
-
+        var componentNameElt = $($(this).parent().parent().find('.component-name'));
+        var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
         componentNameElt.removeClass('not-displayed');
         submitRenameElt.addClass('not-displayed');
@@ -130,6 +142,11 @@ $('#user-components-list').on('keypress', '.new-name-input', function (event) {
         $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
         selectedUserComponent.meta.name = $(this).val();
+        var oldId = selectedUserComponent.meta.id;
+        delete selectedProject.componentIdSet[oldId];
+        var newId = generateId(name);
+        selectedUserComponent.meta.id = newId;
+        $(this).parent().data('componentid', newId);
     }
 });
 
