@@ -7,18 +7,18 @@ var app = electron.app;  // Module to control application life.
 //console.log(app);
 var BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 
+// from http://electron.atom.io/docs/tutorial/quick-start/
+
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function() {
+function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({width: 1200, height: 700, 'min-height': 500, 'min-width': 850});
 
     // and load the index.html of the app.
-    mainWindow.loadURL('file://' + __dirname + '/app/index.html');
+    mainWindow.loadURL('file://' + __dirname + '/app/projectView.html');
 
     // Open the DevTools.
     mainWindow.webContents.openDevTools();

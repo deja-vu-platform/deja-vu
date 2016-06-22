@@ -46,11 +46,11 @@ $(function () {
     } else {
         var componentToLoadId = Object.keys(selectedProject.components)[0];
         selectedUserComponent = selectedProject.components[componentToLoadId];
-        addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
+        displayNewComponentInUserComponentListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
         for (var componentId in selectedProject.components){
             if (componentId != componentToLoadId){
-                var comeponentName = selectedProject.components[componentId].meta.name
-                displayNewComponentInUserComponentList(comeponentName, componentId);
+                var componentName = selectedProject.components[componentId].meta.name
+                displayNewComponentInUserComponentList(componentName, componentId);
             }
         }
         loadTable(gridWidth, gridHeight, selectedUserComponent);
@@ -142,11 +142,16 @@ $('#user-components-list').on('keypress', '.new-name-input', function (event) {
         $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
         selectedUserComponent.meta.name = $(this).val();
-        var oldId = selectedUserComponent.meta.id;
-        delete selectedProject.componentIdSet[oldId];
-        var newId = generateId(name);
-        selectedUserComponent.meta.id = newId;
-        $(this).parent().data('componentid', newId);
+
+        // was attempting to change the ids, but it doesn't seem to be a good idea
+        //var oldId = selectedUserComponent.meta.id;
+        //var newId = generateId(selectedUserComponent.meta.name);
+        //selectedUserComponent.meta.id = newId;
+        //selectedProject.componentIdSet[newId] = "";
+        //delete selectedProject.componentIdSet[oldId];
+        //selectedProject.components[newId] = selectedUserComponent;
+        //delete selectedProject.components[oldId];
+        //$(this).parent().parent().data('componentid', newId);
     }
 });
 
@@ -780,25 +785,39 @@ function initialResizeCells(numRows, numCols) {
 
 }
 
+function addComponentToUserProjectAndDisplayInListAndSelect(newComponent){
+    $('#selected').removeAttr("id");
+    addComponentToUserProjectAndDisplayInList(newComponent);
+    $("#user-components-list").find("[data-componentid='" + newComponent.meta.id + "']").attr('id', 'selected');
+}
+
+
+
 /**
  * Adds a component to the list of user components
  * @param newComponent
  */
-function addComponentToUserComponentsList(newComponent) {
-    userComponents.push(newComponent);
-    numComponents += 1;
+function addComponentToUserProjectAndDisplayInList(newComponent) {
+    selectedProject.addComponent(newComponent.meta.id, newComponent);
+    displayNewComponentInUserComponentList(newComponent.meta.name, newComponent.meta.id);
+};
 
-    // display the newly added component to the user components list
+
+function displayNewComponentInUserComponentListAndSelect(name, id){
     $('#selected').removeAttr("id");
+    displayNewComponentInUserComponentList(name, id);
+    $("#user-components-list").find("[data-componentid='" + id + "']").attr('id', 'selected');
+}
 
-    var newComponentElt = '<li id="selected" data-componentnumber=' + numComponents + '>'
-        + '<span class="component-name">' + newComponent.meta.name + '</span>'
+function displayNewComponentInUserComponentList(name, id){
+    var newComponentElt = '<li data-componentid=' + id + '>'
+        + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
         + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</span>'
         + '</li>';
-    $('#user-components-list').append(newComponentElt);
-};
+    $('#user-components-list').append(newComponentElt)
+}
 
 /**
  * Creates a new User component based on user inputs
