@@ -258,6 +258,7 @@ function attachMergeHandlers() {
         for (var col = 1; col <= numCols; col++) {
             var td = $("#cell" + '_' + row + '_' + col);
 
+
             var offset = td.offset();
             var width = td.css("width");
             var height = td.css("height");
@@ -386,9 +387,9 @@ function attachMergeHandlers() {
                 }
             });
 
-            var isMerged = selectedUserComponent.layout[row][col].merged.isMerged;
+            var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
 
-            if (isMerged) { // and thus also colspan
+            if (isHidden) { // and thus also colspan
                 $(dragHandleContainer).css("display", "none");
             }
         }
