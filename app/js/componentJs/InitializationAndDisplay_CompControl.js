@@ -473,7 +473,7 @@ function registerZoom() {
     $('#zoomOut').click( function (e) {
         e.preventDefault();
         $('#middle-container').animate({ 'zoom': currentZoom = 0.4 }, 'slow');
-        $('.main-table').after().css('font-size', '50px');
+        //$('.main-table').after().css('font-size', '50px');
     });
 
 }

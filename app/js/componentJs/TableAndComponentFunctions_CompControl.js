@@ -183,13 +183,6 @@ function attachMergeHandlers() {
     $('#drag-handle-containers-container').html('');
     for (var row = 1; row <= numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
-            var td = $("#cell" + '_' + row + '_' + col);
-
-
-            var offset = td.offset();
-            var width = td.css("width");
-            var height = td.css("height");
-
             var dragHandleContainer = document.createElement('div');
             dragHandleContainer.id = 'drag-handle-container' + '_' + row + '_' + col;
             dragHandleContainer.className = 'row_'+ row + ' col_' + col;
@@ -201,14 +194,7 @@ function attachMergeHandlers() {
 
             dragHandleContainer.appendChild(dragHandle);
             $('#drag-handle-containers-container').append(dragHandleContainer);
-            $(dragHandleContainer).css({
-                position: 'absolute',
-                top: offset.top,
-                left: offset.left,
-                width: width,
-                height: height,
-                'pointer-events': 'none',
-            });
+            resetMergeHandleContainerSizeAndPosition(row, col);
 
             $(dragHandle).mouseenter(function (event, ui) {
                 $(this).parent().css({
@@ -544,7 +530,7 @@ function mergeCells(cell1Id, cell2Id, component) {
         displayComponentInTable(topLeftCellId, false, component);
     }
 
-    resetMergeHandleContainersSizeAndPosition();
+    resetAllMergeHandleContainersSizeAndPosition();
 
 }
 
@@ -613,30 +599,39 @@ function unmergeCells(cellToUnmergeId, component) {
         displayComponentInTable(topLeftCellId, false, component);
     }
 
-    resetMergeHandleContainersSizeAndPosition();
+    resetAllMergeHandleContainersSizeAndPosition();
 }
 
-function resetMergeHandleContainersSizeAndPosition(){
+function resetAllMergeHandleContainersSizeAndPosition(){
     for (var row = 1; row <= numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
-            var cell = $("#cell" + '_' + row + '_' + col);
-
-            var offset = cell.offset();
-            var width = cell.css("width");
-            var height = cell.css("height");
-
-            var dragHandleContainer = $('#drag-handle-container' + '_' + row + '_' + col);
-
-            dragHandleContainer.css({
-                position: 'absolute',
-                top: offset.top,
-                left: offset.left,
-                width: width,
-                height: height,
-            });
+            resetMergeHandleContainerSizeAndPosition(row,col);
         }
     }
 }
+
+function resetMergeHandleContainerSizeAndPosition(row, col){
+    var cell = $("#cell" + '_' + row + '_' + col);
+    var containersContainer = $('#drag-handle-containers-container');
+
+    var containersContainerOffset = containersContainer.offset();
+    var cellOffset = cell.offset();
+    var width = cell.css("width");
+    var height = cell.css("height");
+
+    var dragHandleContainer = $('#drag-handle-container' + '_' + row + '_' + col);
+
+    dragHandleContainer.css({
+        position: 'absolute',
+        top: cellOffset.top - containersContainerOffset.top,
+        left: cellOffset.left - containersContainerOffset.left,
+        width: width,
+        height: height,
+        'pointer-events': 'none',
+    });
+}
+
+
 
 function alignCellsWithGrid(){
     for (var row = 1; row <= numRows; row++) {
@@ -735,11 +730,11 @@ function addRowColResizeHandlers(){
                             ' .ui-resizable-s-row_'+row,
             resize: function () {
                 // TODO get rid of this later!
-                //resetMergeHandleContainersSizeAndPosition();
+                //resetAllMergeHandleContainersSizeAndPosition();
             },
             stop: function () {
                 alignCellsWithGrid();
-                resetMergeHandleContainersSizeAndPosition();
+                resetAllMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
             }
         });
@@ -783,11 +778,11 @@ function addRowColResizeHandlers(){
                         '#drag-handle-containers-container .col_' + col,
             resize: function () {
                 // TODO: move to stop() once the cell resize handles are made invisible
-                //resetMergeHandleContainersSizeAndPosition();
+                //resetAllMergeHandleContainersSizeAndPosition();
             },
             stop: function () {
                 alignCellsWithGrid();
-                resetMergeHandleContainersSizeAndPosition();
+                resetAllMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
             }
         });
@@ -825,10 +820,10 @@ function addTableResizeHandler(){
         alsoResize: '#main-grid-table',
         resize: function () {
             // TODO get rid of this later!
-            resetMergeHandleContainersSizeAndPosition();
+            resetAllMergeHandleContainersSizeAndPosition();
         },
         stop: function () {
-            resetMergeHandleContainersSizeAndPosition();
+            resetAllMergeHandleContainersSizeAndPosition();
             saveRowColRatios();
         }
     });

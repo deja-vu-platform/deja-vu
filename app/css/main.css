@@ -229,6 +229,10 @@ td {
     z-index: 50;
 }
 
+#drag-handle-containers-container{
+    position: absolute;
+}
+
 #grid-container2 {
     height: 500px;
     width: 800px;
