@@ -986,6 +986,8 @@ function addRowToEnd() {
  * Mutates selectedUserComponent
  */
 function removeEndRow() {
+    var cellsNeedingRowspanCut = {};
+
     var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
 
     if (lastRowNum == 1){
@@ -994,6 +996,23 @@ function removeEndRow() {
 
     selectedUserComponent.dimensions.rows = lastRowNum - 1;
     numRows -= 1;
+    for (var col = 1; col <= selectedUserComponent.dimensions.rows; col++) {
+        var isHidden = selectedUserComponent.layout[lastRowNum][col].hidden.isHidden;
+        var hidingCellId = selectedUserComponent.layout[lastRowNum][col].hidden.hidingCellId;
+        if (isHidden){
+            if (!(hidingCellId in cellsNeedingRowspanCut)){
+                cellsNeedingRowspanCut[hidingCellId] = '';
+                var hcRowcol = hidingCellId.split('_');
+                var hcRow = Number(hcRowcol[hcRowcol.length - 2]);
+                var hcCol = Number(hcRowcol[hcRowcol.length - 1]);
+
+                var rowspan = selectedUserComponent.layout[hcRow][hcCol].spans.row;
+                $('#'+hidingCellId).attr('rowspan', rowspan - 1);
+                selectedUserComponent.layout[hcRow][hcCol].spans.row = rowspan - 1;
+            }
+        }
+    }
+
     delete selectedUserComponent.layout[lastRowNum];
 
     //selectedUserComponent.recalculateRatios(-1,0);
@@ -1031,6 +1050,8 @@ function addColToEnd() {
  * Mutates selectedUserComponent
  */
 function removeEndCol() {
+    var cellsNeedingColspanCut = {};
+
     var lastColNum = parseInt(selectedUserComponent.dimensions.cols);
     if (lastColNum == 1){
         return
@@ -1038,6 +1059,22 @@ function removeEndCol() {
     selectedUserComponent.dimensions.cols = lastColNum - 1;
     numCols -= 1;
     for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+        var isHidden = selectedUserComponent.layout[row][lastColNum].hidden.isHidden;
+        var hidingCellId = selectedUserComponent.layout[row][lastColNum].hidden.hidingCellId;
+        if (isHidden){
+            if (!(hidingCellId in cellsNeedingColspanCut)){
+                cellsNeedingColspanCut[hidingCellId] = '';
+                var hcRowcol = hidingCellId.split('_');
+                var hcRow = Number(hcRowcol[hcRowcol.length - 2]);
+                var hcCol = Number(hcRowcol[hcRowcol.length - 1]);
+
+                var colspan = selectedUserComponent.layout[hcRow][hcCol].spans.col;
+                $('#'+hidingCellId).attr('colspan', colspan - 1);
+                selectedUserComponent.layout[hcRow][hcCol].spans.col = colspan - 1;
+            }
+        }
+
+
         delete selectedUserComponent.layout[row][lastColNum];
     }
 
