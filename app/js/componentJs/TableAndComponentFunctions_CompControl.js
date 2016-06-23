@@ -1076,9 +1076,7 @@ function addClearAllButton(){
         clearAll();
     });
 
-    $('#table-container').append(buttonClearAll).css({
-        position: 'relative'
-    });
+    $('#main-cell-table').append(buttonClearAll);
     $(buttonClearAll).css({
         position: 'absolute',
         top:'-45px',
@@ -1132,9 +1130,7 @@ function addDeleteUserComponentButton(){
         }
     });
 
-    $('#table-container').append(buttonClearAll).css({
-        position: 'relative'
-    });
+    $('#main-cell-table').append(buttonClearAll);
     $(buttonClearAll).css({
         position: 'absolute',
         top:'-100px',

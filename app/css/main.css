@@ -209,10 +209,10 @@ td {
     width: 5000px;
     margin: 50px 100px 10px 50px;
     float: left;
+    position: absolute;
 }
 
 #guide-grid-container {
-    position: absolute;
     pointer-events: none;
     visibility: hidden;
 }
