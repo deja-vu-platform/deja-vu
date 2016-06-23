@@ -1,1 +1,17 @@
 cliche Feed
+
+data Publisher {
+  name: Text,
+  published: *Message
+}
+
+data Subscriber {
+  name: Text,
+  subscriptions: *Publisher
+}
+
+data Content {}
+
+data Message {
+  content: Content
+}

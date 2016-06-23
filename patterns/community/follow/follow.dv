@@ -1,1 +1,6 @@
 cliche Follow
+
+data User {
+  username: Text,
+  follows: *User
+}

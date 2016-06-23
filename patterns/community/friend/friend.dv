@@ -1,1 +1,6 @@
 cliche Friend
+
+data User {
+  username: Text,
+  friends: *User
+}

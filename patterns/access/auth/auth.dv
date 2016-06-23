@@ -1,1 +1,7 @@
 cliche Auth
+
+data User {
+  username: Text
+}
+
+data LoggedInUser extends User {}

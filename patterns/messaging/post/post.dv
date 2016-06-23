@@ -1,11 +1,11 @@
 cliche Post
 
-type Post {
+data Post {
   content: Text,
   author: User
 }
 
-type User {
+data User {
   username: Text
 }
 

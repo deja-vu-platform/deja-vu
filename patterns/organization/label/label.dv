@@ -1,11 +1,11 @@
 cliche Label
 
-type Item {
+data Item {
   name: Text,
   labels: *Label
 }
 
-type Label {
+data Label {
   name: Text
 }
 
