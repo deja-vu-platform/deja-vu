@@ -73,13 +73,30 @@ fieldset { border: 0; margin: 0; padding: 0; }
 /*===================================================
                   COMPONENTS
 ===================================================*/
-.components {
-    float: left;
+.projects {
+
+}
+.recent-projects {
     border: #d5d5d5 1px solid;
     height: 100%;
-    width: 200px;
-    position: absolute;
+    width: 100%;
+    display: inline-block;
+
 }
+
+#recent-projects-list{
+    text-align: center;
+}
+
+#recent-projects-list li{
+    cursor: pointer;
+}
+
+.current-project .content{
+    text-align: center;
+    cursor: pointer;
+}
+
 
 .header {
     border-top: solid 5px #D5D5D5;
@@ -88,35 +105,14 @@ fieldset { border: 0; margin: 0; padding: 0; }
     background-color: #EBEBEB;
 }
 
-.project-name .header{
-    border: none;
-    background-color: white;
-    font-weight: bold;
-}
-
-#back-to-projects{
-    width: 100%;
-    text-align: center;
-}
-
 .content {
     overflow: scroll;
     text-align: left;
     resize: vertical;
-    cursor: pointer;
-
-}
-
-.basic-components .content {
-    height: 250px;
-}
-
-.cliche-components .content {
-    height: 200px;
 }
 
 
-.component-name {
+.project-name {
     cursor: pointer;
 }
 
@@ -157,7 +153,7 @@ li#selected {
 }
 
 .main-table::after {
-    content: 'Component name: ';
+    content: 'project name: ';
     display: block;
     position: absolute;
     left: 20px;
@@ -204,17 +200,16 @@ td {
     display: block;
 }
 
-#table-container, #guide-grid-container{
-    height: 5000px;
-    width: 5000px;
+
+#guide-grid-container {
+    height: 550px;
+    width: 800px;
     margin: 50px 100px 10px 50px;
     float: left;
     position: absolute;
-}
-
-#guide-grid-container {
     pointer-events: none;
     visibility: hidden;
+    opacity: .2;
 }
 
 #guide-grid-container td {
@@ -223,13 +218,18 @@ td {
 }
 
 .drag-handle{
+    position: absolute;
+    bottom: 0;
+    right: 0;
     z-index: 50;
 }
 
-#drag-handle-containers-container{
-    position: absolute;
+#table-container {
+    height: 550px;
+    width: 800px;
+    margin: 50px 100px 10px 50px;
+    float: left;
 }
-
 #grid-container2 {
     height: 500px;
     width: 800px;
@@ -534,9 +534,9 @@ p.label {
 
 
 /*===================================================
-                   COMPONENTS
+                   PROJECTS
 ===================================================*/
-.display-component {
+.display-project {
     white-space: initial;
     font-weight: 400;
 }
