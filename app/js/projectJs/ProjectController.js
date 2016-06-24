@@ -61,12 +61,10 @@ $(function () {
         if (content.objectType && (content.objectType === 'UserProject')){
 
             availableProjects[filename] = content;
-            var li = document.createElement('li');
-            var projectLink = document.createElement('span');
-            projectLink.className = "project-filename";
-            projectLink.innerHTML = filename;
-            var projectLink = '<li><div class="project-filename" data-filename="'+filename+'">'+filename+'</div></li>';
+            // TODO sanitise filename!
+            var projectLink = '<li><div class="project-filename" data-filename="'+filename+'">'+filename.split('.').slice(0, -1).join('.')+'</div></li>';
             $('#recent-projects-list').append(projectLink);
+            addDeleteProjectButton(filename);
         }
     }, function(err) {
         throw err;
@@ -122,3 +120,32 @@ function resetMenuOptions() {
     $('#project-json').val('');
 }
 
+function deleteFile(filename){
+    var pathName = path.join(dirname, filename);
+    fs.stat(pathName, function (err, stats) {
+        if (err) {
+            return console.error(err);
+        }
+        fs.unlink(pathName,function(err){
+            if(err) return console.log(err);
+        });
+    });
+}
+
+function addDeleteProjectButton(filename){
+    var spDelete = document.createElement('span');
+    spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-project">' +
+            //'<span>Delete User Component </span>' +
+        '<span class="glyphicon glyphicon-trash"></span>' +
+        '</button>';
+
+    var buttonDeletProject = spDelete.firstChild;
+    buttonDeletProject.id = 'btn-delete-project_'+filename;
+
+    $(buttonDeletProject).on("click", function (e) {
+         deleteFile(filename)
+    });
+
+    $(".project-filename").find("[data-filename='" + filename + "']").append(buttonDeletProject);
+
+}

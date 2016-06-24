@@ -25,6 +25,7 @@ function Project() {
     this.components = {};
     this.numComponents = 0;
     this.componentIdSet = {};
+    this.lastAccessed = 0;
 }
 
 /**
@@ -50,6 +51,7 @@ function UserProject(name, id, version, author) {
     this.components = {};
     this.numComponents = 0;
     this.componentIdSet = {id:''};
+    this.lastAccessed = 0;
 }
 
 UserProject.prototype.addComponent = function(componentId, component){

@@ -1335,10 +1335,10 @@ function addDeleteUserComponentButton(userComponentId){
         '<span class="glyphicon glyphicon-trash"></span>' +
         '</button>';
 
-    var buttonClearAll = spDelete.firstChild;
-    buttonClearAll.id = 'btn-delete-component_'+userComponentId;
+    var buttonDeleteUserComponent = spDelete.firstChild;
+    buttonDeleteUserComponent.id = 'btn-delete-component_'+userComponentId;
 
-    $(buttonClearAll).on("click", function (e) {
+    $(buttonDeleteUserComponent).on("click", function (e) {
         if (selectedProject.numComponents === 1){
             return; //don't delete the last one TODO is the the right way to go?
         }
@@ -1349,8 +1349,8 @@ function addDeleteUserComponentButton(userComponentId){
         }
     });
 
-    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").append(buttonClearAll);
-    $(buttonClearAll).css({
+    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").append(buttonDeleteUserComponent);
+    $(buttonDeleteUserComponent).css({
         //position: 'absolute',
         //top:'-100px',
         //right:'-150px',
