@@ -204,16 +204,17 @@ td {
     display: block;
 }
 
-
-#guide-grid-container {
-    height: 550px;
-    width: 800px;
+#table-container, #guide-grid-container{
+    height: 5000px;
+    width: 5000px;
     margin: 50px 100px 10px 50px;
     float: left;
     position: absolute;
+}
+
+#guide-grid-container {
     pointer-events: none;
     visibility: hidden;
-    opacity: .2;
 }
 
 #guide-grid-container td {
@@ -222,18 +223,13 @@ td {
 }
 
 .drag-handle{
-    position: absolute;
-    bottom: 0;
-    right: 0;
     z-index: 50;
 }
 
-#table-container {
-    height: 550px;
-    width: 800px;
-    margin: 50px 100px 10px 50px;
-    float: left;
+#drag-handle-containers-container{
+    position: absolute;
 }
+
 #grid-container2 {
     height: 500px;
     width: 800px;
