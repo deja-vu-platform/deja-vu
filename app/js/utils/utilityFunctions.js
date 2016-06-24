@@ -13,3 +13,10 @@ function generateId(name){
     var nameHash = stringHash(name);
     return (nameHash%997) + Math.floor(Math.random()*1000)*1000;
 }
+
+function getRowColFromId(id){
+    var rowcol = id.split('_');
+    var row = rowcol[rowcol.length - 2];
+    var col = rowcol[rowcol.length - 1];
+    return {row:row,col:col}
+}

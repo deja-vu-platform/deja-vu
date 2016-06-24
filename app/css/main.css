@@ -224,6 +224,7 @@ td {
 
 .drag-handle{
     z-index: 50;
+    display: none;
 }
 
 #drag-handle-containers-container{

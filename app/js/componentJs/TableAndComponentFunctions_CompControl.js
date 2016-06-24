@@ -19,9 +19,9 @@ function loadTable(componentToShow) {
 
     $('#table-container td').each(function () {
         var cellId = $(this).get(0).id;
-        var rowcol = cellId.split('_');
-        var row = rowcol[rowcol.length - 2];
-        var col = rowcol[rowcol.length - 1];
+        var rowcol = getRowColFromId(cellId);
+        var row = rowcol.row;
+        var col = rowcol.col;
         if (componentToShow.components[row]) {
             if (componentToShow.components[row][col]) {
                 var innerComponent = componentToShow.components[row][col];
@@ -71,8 +71,8 @@ function createTableCell(row, col) {
 
 
     $(button).on("click", function (e) {
-        var rowcol = this.id.split('_');
-        $('#cell' + '_' + rowcol[rowcol.length - 2] + '_' + rowcol[rowcol.length - 1]).find('.tooltip').addClass('open');
+        var rowcol = getRowColFromId(this.id);
+        $('#cell' + '_' + rowcol.row + '_' + rowcol.col).find('.tooltip').addClass('open');
     });
 
     // change size of cell based on the layout
@@ -224,49 +224,6 @@ function attachMergeHandlers() {
             $('#drag-handle-containers-container').append(dragHandleContainer);
             resetMergeHandleContainerSizeAndPosition(row, col);
 
-            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseenter(function (event, ui) {
-                $(this).parent().css({
-                    border: 'black 1px dotted'
-                });
-            });
-
-            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseleave(function (event, ui) {
-                $(this).parent().css({
-                    border: 'none'
-                });
-            });
-
-            $(dragHandle_se).css({
-                'pointer-events': 'auto',
-                position: 'absolute',
-                bottom: '5px',
-                right: '5px',
-                cursor: 'nwse-resize',
-            });
-
-            $(dragHandle_sw).css({
-                'pointer-events': 'auto',
-                position: 'absolute',
-                bottom: '5px',
-                left: '5px',
-                cursor: 'nesw-resize',
-            });
-
-            $(dragHandle_ne).css({
-                'pointer-events': 'auto',
-                position: 'absolute',
-                top: '5px',
-                right: '5px',
-                cursor: 'nesw-resize',
-            });
-
-            $(dragHandle_nw).css({
-                'pointer-events': 'auto',
-                position: 'absolute',
-                top: '5px',
-                left: '5px',
-                cursor: 'nwse-resize',
-            });
 
             $(dragHandleContainer).resizable({
                 handles: {
@@ -289,9 +246,9 @@ function attachMergeHandlers() {
                 stop: function (event, ui) {
                     var dragHandleContainer = $(this);
                     var containerId = dragHandleContainer.get(0).id;
-                    var rowcol = containerId.split('_');
-                    var row = rowcol[rowcol.length - 2];
-                    var col = rowcol[rowcol.length - 1];
+                    var rowcol = getRowColFromId(containerId);
+                    var row = rowcol.row;
+                    var col = rowcol.col;
                     var thisCellId = 'cell' + '_' + row + '_' + col;
 
                     var handleType = $(ui.element).data("ui-resizable").axis;
@@ -366,8 +323,8 @@ function attachMergeHandlers() {
                     if (!newCellGrid[0]) { // it's outside the table
                         mergeCells(cell1Id, cell1Id, component);
                     } else {
-                        var newCellGridRowcol = newCellGrid[0].id.split('_');
-                        var newCellId = 'cell' + '_' + newCellGridRowcol[newCellGridRowcol.length - 2] + '_' + newCellGridRowcol[newCellGridRowcol.length - 1];
+                        var newCellGridRowcol = getRowColFromId(newCellGrid[0].id);
+                        var newCellId = 'cell' + '_' + newCellGridRowcol.row + '_' + newCellGridRowcol.col;
                         // TODO: have a setting to turn this off?
                         if (confirmOnDangerousMerge){
                             if (safeToMerge(cell1Id, newCellId)){
@@ -401,6 +358,51 @@ function attachMergeHandlers() {
                 }
             });
 
+
+            // putting these css modifiers later to override any native drag handle css
+            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseenter(function (event, ui) {
+                $(this).parent().css({
+                    border: 'black 1px dotted'
+                });
+            });
+
+            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseleave(function (event, ui) {
+                $(this).parent().css({
+                    border: 'none'
+                });
+            });
+
+            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).css({
+                display: 'none',
+                'pointer-events': 'auto',
+                position: 'absolute',
+            });
+
+            $(dragHandle_se).css({
+                bottom: '5px',
+                right: '5px',
+                cursor: 'nwse-resize',
+            });
+
+            $(dragHandle_sw).css({
+                bottom: '5px',
+                left: '5px',
+                cursor: 'nesw-resize',
+            });
+
+            $(dragHandle_ne).css({
+                top: '5px',
+                right: '5px',
+                cursor: 'nesw-resize',
+            });
+
+            $(dragHandle_nw).css({
+                top: '5px',
+                left: '5px',
+                cursor: 'nwse-resize',
+            });
+
+
             var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
 
             if (isHidden) { // and thus also colspan
@@ -431,15 +433,52 @@ function allElementsFromPoint(x, y) {
     return elements;
 }
 
+
+//$('#table-container').on('mouseenter', '.cell', function(){
+//    var rowcol = getRowColFromId(this.id);
+//    var row = rowcol.row;
+//    var col = rowcol.col;
+//    $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+//        display: 'inline',
+//    });
+//}).on('mouseleave', '.cell', function(){
+//    var rowcol = getRowColFromId(this.id);
+//    var row = rowcol.row;
+//    var col = rowcol.col;
+//    $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+//        display: 'none',
+//    });
+//});
+
+$('#table-container').on('click', '.cell', function(){
+    var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
+    var rowcol = getRowColFromId(this.id);
+    var row = rowcol.row;
+    var col = rowcol.col;
+    // the opposite of what it is before the click!
+    if (showMergeHandles){
+        $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+            display: 'inline',
+        });
+    } else {
+        $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+            display: 'none',
+        });
+    }
+    // now store the current state
+    $(this).data('show-merge-handles', showMergeHandles)
+});
+
+
 /** ** ** ** ** ** ** ** ** Merging and unmerging cells ** ** ** ** ** ** ** ** ** ** **/
 function getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id){
-    var rowcol1 = cell1Id.split('_');
-    var row1 = rowcol1[rowcol1.length - 2];
-    var col1 = rowcol1[rowcol1.length - 1];
+    var rowcol1 =getRowColFromId(cell1Id);
+    var row1 = rowcol1.row;
+    var col1 = rowcol1.col;
 
-    var rowcol2 = cell2Id.split('_');
-    var row2 = rowcol2[rowcol2.length - 2];
-    var col2 = rowcol2[rowcol2.length - 1];
+    var rowcol2 = getRowColFromId(cell2Id);
+    var row2 = rowcol2.row;
+    var col2 = rowcol2.col;
 
 
     var topRowNum = Math.min(parseInt(row1), parseInt(row2));
@@ -490,9 +529,9 @@ $('#merge-btn').click(function(){
     var cell1Id =  $('#merge-btn').data('cell1Id');
     var cell2Id =  $('#merge-btn').data('cell2Id');
 
-    var rowcol1 = cell1Id.split('_');
-    var row1 = rowcol1[rowcol1.length - 2];
-    var col1 = rowcol1[rowcol1.length - 1];
+    var rowcol1 = getRowColFromId(cell1Id);
+    var row1 = rowcol1.row;
+    var col1 = rowcol1.col;
 
     if (selectedUserComponent.components[row1]){
         mergeCells(cell1Id, cell2Id, selectedUserComponent.components[row1][col1]);
@@ -506,9 +545,9 @@ $('#merge-btn').click(function(){
 $('#merge-cancel-btn').click(function(){
     var cell1Id =  $('#merge-btn').data('cell1Id');
 
-    var rowcol1 = cell1Id.split('_');
-    var row1 = rowcol1[rowcol1.length - 2];
-    var col1 = rowcol1[rowcol1.length - 1];
+    var rowcol1 = getRowColFromId(cell1Id);
+    var row1 = rowcol1.row;
+    var col1 = rowcol1.col;
 
     if (selectedUserComponent.components[row1]){
         mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
@@ -524,9 +563,9 @@ $('#confirm-merge .close').click(function(event){
     event.preventDefault();
     var cell1Id =  $('#merge-btn').data('cell1Id');
 
-    var rowcol1 = cell1Id.split('_');
-    var row1 = rowcol1[rowcol1.length - 2];
-    var col1 = rowcol1[rowcol1.length - 1];
+    var rowcol1 = getRowColFromId(cell1Id);
+    var row1 = rowcol1.row;
+    var col1 = rowcol1.col;
 
     if (selectedUserComponent.components[row1]){
         mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
@@ -650,17 +689,17 @@ function mergeCells(cell1Id, cell2Id, component) {
 }
 
 function unmergeCells(cellToUnmergeId, component) {
-    var cellToUnmergeRowcol = cellToUnmergeId.split('_');
-    var cellToUnmergeRow = cellToUnmergeRowcol[cellToUnmergeRowcol.length - 2];
-    var cellToUnmergeCol = cellToUnmergeRowcol[cellToUnmergeRowcol.length - 1];
+    var cellToUnmergeRowcol = getRowColFromId(cellToUnmergeId);
+    var cellToUnmergeRow = cellToUnmergeRowcol.row;
+    var cellToUnmergeCol = cellToUnmergeRowcol.col;
 
 
     var lastMergedCellBottomRightId = $('#' + cellToUnmergeId).data('merged').bottomRightCellId;
 
 
-    var lastMergedCellBottomRightRowcol = lastMergedCellBottomRightId.split('_');
-    var lastMergedCellBottomRightRow = lastMergedCellBottomRightRowcol[lastMergedCellBottomRightRowcol.length - 2];
-    var lastMergedCellBottomRightCol = lastMergedCellBottomRightRowcol[lastMergedCellBottomRightRowcol.length - 1];
+    var lastMergedCellBottomRightRowcol = getRowColFromId(lastMergedCellBottomRightId);
+    var lastMergedCellBottomRightRow = lastMergedCellBottomRightRowcol.row;
+    var lastMergedCellBottomRightCol = lastMergedCellBottomRightRowcol.col;
 
 
     var topRowNum = Math.min(parseInt(cellToUnmergeRow), parseInt(lastMergedCellBottomRightRow));
@@ -1129,9 +1168,9 @@ function removeEndRow() {
         if (isHidden){
             if (!(hidingCellId in cellsNeedingRowspanCut)){
                 cellsNeedingRowspanCut[hidingCellId] = '';
-                var hcRowcol = hidingCellId.split('_');
-                var hcRow = Number(hcRowcol[hcRowcol.length - 2]);
-                var hcCol = Number(hcRowcol[hcRowcol.length - 1]);
+                var hcRowcol = getRowColFromId(hidingCellId.split);
+                var hcRow = Number(hcRowcol.row);
+                var hcCol = Number(hcRowcol.col);
 
                 var rowspan = selectedUserComponent.layout[hcRow][hcCol].spans.row;
                 $('#'+hidingCellId).attr('rowspan', rowspan - 1);
@@ -1411,9 +1450,9 @@ function updateBitmap() {
     bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
     $('#table-container td').each(function () {
         var cellId = $(this).attr('id');
-        var rowcol = cellId.split('_');
-        var row = Number(rowcol[rowcol.length - 2]) - 1;
-        var col = Number(rowcol[rowcol.length - 1]) - 1;
+        var rowcol = getRowColFromId(cellId);
+        var row = Number(rowcol.row) - 1;
+        var col = Number(rowcol.col) - 1;
         if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
             bitmapNew[row][col] = 0;
         } else {
