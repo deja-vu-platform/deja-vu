@@ -19,19 +19,22 @@ $(function () {
     if (selectedProject.numComponents === 0){
         // start a default component
         selectedUserComponent = initUserComponent(true);
+        selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
         //var grid = $('#table-container').get(0);
         //gridWidth = grid.offsetWidth;
         //gridHeight = grid.offsetHeight;
         createTable();
-        addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
+        displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         var componentToLoadId = Object.keys(selectedProject.components)[0];
         selectedUserComponent = selectedProject.components[componentToLoadId];
-        displayNewComponentInUserComponentListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
+        displayNewUserComponentInListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
         for (var componentId in selectedProject.components){
             if (componentId != componentToLoadId){
                 var componentName = selectedProject.components[componentId].meta.name;
                 displayNewComponentInUserComponentList(componentName, componentId);
+
+
             }
         }
         loadTable(selectedUserComponent);
@@ -56,15 +59,17 @@ $('#create-component').on('click', function () {
     numRows = $('#select-rows').val();
     numCols = $('#select-cols').val();
     selectedUserComponent = initUserComponent(false);
-    addComponentToUserProjectAndDisplayInListAndSelect(selectedUserComponent);
+    selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+    displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     createTable();
     resetMenuOptions();
 });
 
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
+    selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
     loadTable(selectedUserComponent);
-    addComponentToUserProjectAndDisplayInList(selectedUserComponent);
+    displayNewComponentInUserComponentList(selectedUserComponent.meta.name,selectedUserComponent.meta.id);
     resetMenuOptions();
 });
 
@@ -116,10 +121,10 @@ $('#back-to-projects').click(function(event){
     window.location = 'projectView.html';
 });
 
-$('#user-components-list').on('click', 'li', function () {
-    var componentId = $(this).data('componentid');
+$('#user-components-list').on('click', '.component-name-container', function () {
+    var componentId = $(this).parent().data('componentid');
     $('#selected').removeAttr('id');
-    $(this).attr('id', 'selected');
+    $(this).parent().attr('id', 'selected');
     selectedUserComponent = selectedProject.components[componentId];
     loadTable(selectedUserComponent);
 });
@@ -167,36 +172,36 @@ $('#user-components-list').on('keypress', '.new-name-input', function (event) {
 /** ** ** ** ** ** Component Adding to Project and Display helpers ** ** ** ** ** ** ** ** ** **/
 
 
-function addComponentToUserProjectAndDisplayInListAndSelect(newComponent){
+function displayUserComponentInListAndSelect(name, id){
     $('#selected').removeAttr("id");
-    addComponentToUserProjectAndDisplayInList(newComponent);
-    $("#user-components-list").find("[data-componentid='" + newComponent.meta.id + "']").attr('id', 'selected');
+    displayNewComponentInUserComponentList(name,id);
+    $("#user-components-list").find("[data-componentid='" + id + "']").attr('id', 'selected');
+}
+
+
+
+function displayNewUserComponentInListAndSelect(name, id){
+    $('#selected').removeAttr("id");
+    displayNewComponentInUserComponentList(name, id);
+    $("#user-components-list").find("[data-componentid='" + id + "']").attr('id', 'selected');
 }
 
 /**
  * Adds a component to the list of user components
  * @param newComponent
  */
-function addComponentToUserProjectAndDisplayInList(newComponent) {
-    selectedProject.addComponent(newComponent.meta.id, newComponent);
-    displayNewComponentInUserComponentList(newComponent.meta.name, newComponent.meta.id);
-};
-
-
-function displayNewComponentInUserComponentListAndSelect(name, id){
-    $('#selected').removeAttr("id");
-    displayNewComponentInUserComponentList(name, id);
-    $("#user-components-list").find("[data-componentid='" + id + "']").attr('id', 'selected');
-}
-
 function displayNewComponentInUserComponentList(name, id){
-    var newComponentElt = '<li data-componentid=' + id + '>'
-        + '<span class="component-name">' + name + '</span>'
-        + '<span class="submit-rename not-displayed">'
-        + '<input type="text" class="new-name-input form-control" autofocus>'
-        + '</span>'
+    var newComponentElt =
+          '<li data-componentid=' + id + '>'
+            + '<div class="component-name-container">'
+                + '<span class="component-name">' + name + '</span>'
+                + '<span class="submit-rename not-displayed">'
+                    + '<input type="text" class="new-name-input form-control" autofocus>'
+                + '</span>'
+            + '</div>'
         + '</li>';
-    $('#user-components-list').append(newComponentElt)
+    $('#user-components-list').append(newComponentElt);
+    addDeleteUserComponentButton(id);
 }
 
 

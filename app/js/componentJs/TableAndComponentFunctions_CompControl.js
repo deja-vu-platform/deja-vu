@@ -160,7 +160,6 @@ function createTable() {
 
     addRowColResizeHandlers();
     addClearButtons();
-    addDeleteUserComponentButton();
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
@@ -793,6 +792,26 @@ function resetMergeHandleContainerSizeAndPosition(row, col){
     });
 }
 
+function resetMergeHandleVisibility(row,col){
+    var cell = $("#cell" + '_' + row + '_' + col);
+    var dragHandleContainer = $('#drag-handle-container' + '_' + row + '_' + col);
+
+    dragHandleContainer.find('.drag-handle').css({
+        display: 'none',
+    });
+
+    cell.data('show-merge-handles', false)
+}
+
+function resetAllMergeHandleVisibilityExcept(spRow,spCol) {
+    for (var row = 1; row <= numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            if ((row!=spRow) && (col != spCol)){
+                resetMergeHandleVisibility(row,col);
+            }
+        }
+    }
+}
 
 
 function alignCellsWithGrid(){
@@ -1309,36 +1328,32 @@ function clearCol(col){
 
 /** ** ** ** ** ** ** Delete UserComponent Functions ** ** ** ** ** ** ** ** ** **/
 
-
-function addDeleteUserComponentButton(){
-    // TODO add a waring tag!
+function addDeleteUserComponentButton(userComponentId){
     var spDelete = document.createElement('span');
-    spDelete.innerHTML = '<button type="button" class="btn btn-default ">' +
-        '<span>Delete User Component </span>' +
+    spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-component">' +
+        //'<span>Delete User Component </span>' +
         '<span class="glyphicon glyphicon-trash"></span>' +
         '</button>';
 
     var buttonClearAll = spDelete.firstChild;
-    buttonClearAll.id = 'btn-clear-all';
+    buttonClearAll.id = 'btn-delete-component_'+userComponentId;
 
     $(buttonClearAll).on("click", function (e) {
         if (selectedProject.numComponents === 1){
             return; //don't delete the last one TODO is the the right way to go?
         }
         if (confirmOnUserComponentDelete){
-            openDeleteUserComponentConfirmDialogue(selectedUserComponent.meta.id);
+            openDeleteUserComponentConfirmDialogue(userComponentId);
         } else {
-            deleteUserComponent(selectedUserComponent.meta.id);
+            deleteUserComponent(userComponentId);
         }
     });
 
-    $('#main-cell-table').append(buttonClearAll);
+    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").append(buttonClearAll);
     $(buttonClearAll).css({
-        position: 'absolute',
-        top:'-100px',
-        right:'-150px',
-        background: 'red',
-        color: 'white'
+        //position: 'absolute',
+        //top:'-100px',
+        //right:'-150px',
     })
 }
 
