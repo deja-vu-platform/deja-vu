@@ -26,7 +26,11 @@ function Component() {
     this.layout = {}; // {row:
                         // {col:
                             // {spans: {row: Number ,col: Number},
-                            // merged:{isMerged: Boolean, lastMergedBottomRightCellId: String},
+                            // merged:{isMerged: Boolean,
+                            // topLeftCellId: String,
+                            // topRightCellId: String,
+                            // BottomLeftCellId: String,
+                            // BottomRightCellId: String},
                             // hidden:{isHidden: Boolean, hidingCellId: String}
                             // ratio: {width: Number (ratio), height: Number (ratio)}
                             // }
@@ -62,7 +66,11 @@ function BaseComponent(type, components) {
     this.layout = {1:{
                     1:{
                         spans:{row:1,col:1},
-                        merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                        merged:{isMerged: false,
+                             topLeftCellId: '',
+                             topRightCellId: '',
+                             bottomLeftCellId: '',
+                             bottomRightCellId: ''},
                         hidden:{isHidden: false, hidingCellId: ''},
                         pxDimensions: {width: 1, height: 1}
                     }
@@ -109,7 +117,11 @@ function UserComponent(dimensions, name, id, version, author) {
         for (var col = 1; col<= dimensions.cols; col++){
             this.layout[row][col] = {
                                         spans:{row:1,col:1},
-                                        merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+                                        merged:{isMerged: false,
+                                            topLeftCellId: '',
+                                            topRightCellId: '',
+                                            bottomLeftCellId: '',
+                                            bottomRightCellId: ''},
                                         hidden:{isHidden: false, hidingCellId: ''},
                                         // ratio will be measured in %
                                         ratio: {width: 1/dimensions.cols, height: 1/dimensions.rows},

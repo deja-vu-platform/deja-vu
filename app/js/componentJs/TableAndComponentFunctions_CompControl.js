@@ -2,6 +2,8 @@
 // the table, and functions that work with editing the datatype
 // (which is mostly connected to the table)
 
+/** ** ** ** ** Global variables for this file ** ** ** ** ** **/
+
 
 /** ** ** ** ** ** ** Table Related Functions ** ** ** ** ** ** **/
 
@@ -78,13 +80,20 @@ function createTableCell(row, col) {
     var colspan = selectedUserComponent.layout[row][col].spans.col;
 
     var isMerged = selectedUserComponent.layout[row][col].merged.isMerged;
-    var lastMergedBottomRightCellId = selectedUserComponent.layout[row][col].merged.lastMergedBottomRightCellId;
+    var topLeftCellId = selectedUserComponent.layout[row][col].merged.topLeftCellId;
+    var topRightCellId = selectedUserComponent.layout[row][col].merged.topRightCellId;
+    var bottomLeftCellId = selectedUserComponent.layout[row][col].merged.bottomLeftCellId;
+    var bottomRightCellId = selectedUserComponent.layout[row][col].merged.bottomRightCellId;
 
     var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
     var hidingCellIdId = selectedUserComponent.layout[row][col].hidden.hidingCellId;
 
-    $(td).data('merged', {isMerged:isMerged, lastMergedBottomRightCellId: lastMergedBottomRightCellId});
-    $(td).data('hidden', {isHidden:isHidden, lastMergedBottomRightCellId: hidingCellIdId});
+    $(td).data('merged', {isMerged:isMerged,
+        topLeftCellId: topLeftCellId,
+        topRightCellId: topRightCellId,
+        bottomLeftCellId: bottomLeftCellId,
+        bottomRightCellId: bottomRightCellId});
+    $(td).data('hidden', {isHidden:isHidden, bottomRightCellId: hidingCellIdId});
 
 
     if (isHidden) {
@@ -275,6 +284,7 @@ function attachMergeHandlers() {
                     $(event.target).css({
                         border: 'black 1px dotted'
                     });
+
                 },
                 stop: function (event, ui) {
                     var dragHandleContainer = $(this);
@@ -284,12 +294,47 @@ function attachMergeHandlers() {
                     var col = rowcol[rowcol.length - 1];
                     var thisCellId = 'cell' + '_' + row + '_' + col;
 
+                    var handleType = $(ui.element).data("ui-resizable").axis;
+
+                    // this will be one of the cell id's input into the merge function
+                    var cell1Id = thisCellId;
+                    if ($('#'+thisCellId).data('merged').isMerged){
+                        switch(handleType){
+                            case 'ne':
+                                cell1Id = $('#'+thisCellId).data('merged').bottomLeftCellId;
+                                break;
+                            case 'nw':
+                                cell1Id = $('#'+thisCellId).data('merged').bottomRightCellId;
+                                break;
+                            case 'se':
+                                cell1Id = $('#'+thisCellId).data('merged').topLeftCellId;
+                                break;
+                            case 'sw':
+                                cell1Id = $('#'+thisCellId).data('merged').topRightCellId;
+                                break;
+                            default:
+                                throw 'Something went wrong'; // TODO
+                        }
+                    }
+
+                    // extract the component from this cell
                     var component;
                     if (selectedUserComponent.components[row]) {
                         if (selectedUserComponent.components[row][col]) {
                             component = selectedUserComponent.components[row][col];
                         }
                     }
+
+
+                    // if this is already a merged cell we should unmerge it now
+                    // since this cell (a top left cell), may not be in the final merge
+                    // so should be brought back to the original form
+                    if ($('#' + thisCellId).data('merged').isMerged) {
+                        // if merged, unmerge the two cells
+                        // this also resets the cells to unmerged status
+                        unmergeCells(thisCellId); // without the component; it will get it back if it was its
+                    }
+
 
                     // Now we look for the cell to merge into
                     // In case the cell we are resizing was already merged (ie, we are making it smaller,
@@ -319,19 +364,19 @@ function attachMergeHandlers() {
 
                     var newCellGrid = $(allEltsList).filter('.grid');
                     if (!newCellGrid[0]) { // it's outside the table
-                        mergeCells(thisCellId, thisCellId, component);
+                        mergeCells(cell1Id, cell1Id, component);
                     } else {
                         var newCellGridRowcol = newCellGrid[0].id.split('_');
                         var newCellId = 'cell' + '_' + newCellGridRowcol[newCellGridRowcol.length - 2] + '_' + newCellGridRowcol[newCellGridRowcol.length - 1];
                         // TODO: have a setting to turn this off?
                         if (confirmOnDangerousMerge){
-                            if (safeToMerge(thisCellId, newCellId)){
-                                mergeCells(thisCellId, newCellId, component);
+                            if (safeToMerge(cell1Id, newCellId)){
+                                mergeCells(cell1Id, newCellId, component);
                             } else {
-                                openMergeConfirmDialogue(thisCellId, newCellId);
+                                openMergeConfirmDialogue(cell1Id, newCellId);
                             }
                         } else {
-                            mergeCells(thisCellId, newCellId, component);
+                            mergeCells(cell1Id, newCellId, component);
                         }
                     }
 
@@ -431,7 +476,11 @@ function safeToMerge(cell1Id, cell2Id){
     return true;
 }
 
-
+/**
+ * here cell1 is the one whose component (if any) will be saved in case of a merge
+ * @param cell1Id
+ * @param cell2Id
+ */
 function openMergeConfirmDialogue(cell1Id, cell2Id){
     $('#confirm-merge').modal('show');
     $('#merge-btn').data('cell1Id', cell1Id).data('cell2Id',cell2Id);
@@ -489,7 +538,17 @@ $('#confirm-merge .close').click(function(event){
     $('#confirm-merge').modal('hide');
 });
 
+/**
+ * @param cell1Id
+ * @param cell2Id
+ * @param component
+ */
 function mergeCells(cell1Id, cell2Id, component) {
+    // NOTE: despite which cell is actually expanding, only the topLeftCell, determined above
+    // is the cell that will actually be expanded. Figuring out which cell1 and cell2 should be done
+    // before calling this function
+
+
     // first check for top left cell and bottom right cell
     var topBottomLeftRight = getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id);
     var topRowNum = topBottomLeftRight[0];
@@ -499,32 +558,20 @@ function mergeCells(cell1Id, cell2Id, component) {
     var rightColNum = topBottomLeftRight[3];
 
     var topLeftCellId = "cell" + '_' + topRowNum.toString() + '_' + leftColNum.toString();
+    var topRightCellId = "cell" + '_' + topRowNum.toString() + '_' + rightColNum.toString();
+    var bottomLeftCellId = "cell" + '_' + bottomRowNum.toString() + '_' + leftColNum.toString();
     var bottomRightCellId = "cell" + '_' + bottomRowNum.toString() + '_' + rightColNum.toString();
 
-    // figure out if this is already a merged cell
-    var merged = $('#' + topLeftCellId).data('merged');
-    if (merged.isMerged) {
-        // if merged, unmerge the two cells
-        // this also resets the cells to unmerged status
-        unmergeCells(topLeftCellId);
-    }
 
     if (topLeftCellId != bottomRightCellId) { // not merging/unmerging to the same cell,
         // that is, the cell is actually merging to something else
-        // mark cell as merged
-        $('#' + topLeftCellId).data('merged', {isMerged: true, lastMergedBottomRightCellId: bottomRightCellId});
+
         for (var row = topRowNum; row <= bottomRowNum; row++) {
             for (var col = leftColNum; col <= rightColNum; col++) {
                 var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
 
                 // delete any component that was there
-                // TODO: note: checks should be made before calling this function!
                 deleteComponentFromUserComponentAndFromView(cellId);
-
-                if ((row == topRowNum) && (col == leftColNum)) { // the cell we just made bigger
-                    continue;
-                }
-
 
                 // if it is a hidden cell, unmerge the hiding cell
                 var hidden = $('#' + cellId).data('hidden');
@@ -540,7 +587,6 @@ function mergeCells(cell1Id, cell2Id, component) {
                     unmergeCells(cellId);
                 }
 
-
                 // then hide the other cells
                 var cellToHide = $("#" + cellId);
                 cellToHide.css("display", "none");
@@ -550,12 +596,31 @@ function mergeCells(cell1Id, cell2Id, component) {
                 dragContainerToHide.css('display', 'none');
 
                 selectedUserComponent.layout[row][col].spans = {row:0,col:0};
-                selectedUserComponent.layout[row][col].merged = {isMerged: false, lastMergedBottomRightCellId: ''};
+                selectedUserComponent.layout[row][col].merged = {isMerged: false,
+                                                                    topLeftCellId: '',
+                                                                    topRightCellId: '',
+                                                                    bottomLeftCellId: '',
+                                                                    bottomRightCellId: ''};
                 selectedUserComponent.layout[row][col].hidden = {isHidden: true, hidingCellId: topLeftCellId};
             }
         }
 
+        // mark cell as merged and reset hiding status incase it was hidden before
+        $('#' + topLeftCellId).data('merged', {isMerged: true,
+            topLeftCellId: topLeftCellId,
+            topRightCellId: topRightCellId,
+            bottomLeftCellId: bottomLeftCellId,
+            bottomRightCellId: bottomRightCellId});
+        $('#' + topLeftCellId).css("display", "table-cell");
+        $('#' + topLeftCellId).data('hidden', {isHidden: false, hidingCellId: ''});
+
+        var dragContainer = $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum);
+        dragContainer.css('display', 'block');
+
+
     }
+
+    // Do these even if the cell is just merging to itself
 
     // Make the first cell take the correct size
     var cellTopLeft = $("#" + topLeftCellId);
@@ -566,7 +631,11 @@ function mergeCells(cell1Id, cell2Id, component) {
 
     // update the datatype
     selectedUserComponent.layout[topRowNum][leftColNum].spans = {row:rowspan,col:colspan};
-    selectedUserComponent.layout[topRowNum][leftColNum].merged = {isMerged: true, lastMergedBottomRightCellId: bottomRightCellId};
+    selectedUserComponent.layout[topRowNum][leftColNum].merged = {isMerged: true,
+                                                                    topLeftCellId: topLeftCellId,
+                                                                    topRightCellId: topRightCellId,
+                                                                    bottomLeftCellId: bottomLeftCellId,
+                                                                    bottomRightCellId: bottomRightCellId};
     selectedUserComponent.layout[topRowNum][leftColNum].hidden = {isHidden: false, hidingCellId: ''};
 
 
@@ -586,7 +655,7 @@ function unmergeCells(cellToUnmergeId, component) {
     var cellToUnmergeCol = cellToUnmergeRowcol[cellToUnmergeRowcol.length - 1];
 
 
-    var lastMergedCellBottomRightId = $('#' + cellToUnmergeId).data('merged').lastMergedBottomRightCellId;
+    var lastMergedCellBottomRightId = $('#' + cellToUnmergeId).data('merged').bottomRightCellId;
 
 
     var lastMergedCellBottomRightRowcol = lastMergedCellBottomRightId.split('_');
@@ -613,7 +682,11 @@ function unmergeCells(cellToUnmergeId, component) {
             var cellId = "cell" + '_' + row.toString() + '_' + col.toString();
             // update the datatype
             selectedUserComponent.layout[row][col].spans = {row:1,col:1};
-            selectedUserComponent.layout[row][col].merged = {isMerged: false, lastMergedBottomRightCellId: ''};
+            selectedUserComponent.layout[row][col].merged = {isMerged: false,
+                                                                topLeftCellId: '',
+                                                                topRightCellId: '',
+                                                                bottomLeftCellId: '',
+                                                                bottomRightCellId: ''};
             selectedUserComponent.layout[row][col].hidden = {isHidden: false, hidingCellId: ''};
 
 
@@ -621,7 +694,11 @@ function unmergeCells(cellToUnmergeId, component) {
             cellToShow.css("display", "table-cell");
 
             // reset some meta data
-            cellToShow.data('merged', {isMerged: false, lastMergedBottomRightCellId: ''});
+            cellToShow.data('merged', {isMerged: false,
+                                        topLeftCellId: '',
+                                        topRightCellId: '',
+                                        bottomLeftCellId: '',
+                                        bottomRightCellId: ''});
             cellToShow.data('hidden', {isHidden: false, hidingCellId: ''});
 
 
@@ -1012,7 +1089,11 @@ function addRowToEnd() {
     for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
         selectedUserComponent.layout[lastRowNum + 1][col] = {
             spans:{row:1,col:1},
-            merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+            merged:{isMerged: false,
+                topLeftCellId: '',
+                topRightCellId: '',
+                bottomLeftCellId: '',
+                bottomRightCellId: ''},
             hidden:{isHidden: false, hidingCellId: ''},
             // take the width of the cell to the top
             ratio:{width: selectedUserComponent.layout[lastRowNum][col].ratio.width, height: standardCellHeight/gridHeight}
@@ -1079,7 +1160,11 @@ function addColToEnd() {
     for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
         selectedUserComponent.layout[row][lastColNum + 1] ={
             spans:{row:1,col:1},
-            merged:{isMerged: false, lastMergedBottomRightCellId: ''},
+            merged:{isMerged: false,
+                topLeftCellId: '',
+                topRightCellId: '',
+                bottomLeftCellId: '',
+                bottomRightCellId: ''},
             hidden:{isHidden: false, hidingCellId: ''},
             // take the height of the cell to the left
             ratio:{width: standardCellWidth/gridWidth, height: selectedUserComponent.layout[row][lastColNum].ratio.height}
