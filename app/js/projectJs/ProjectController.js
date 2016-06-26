@@ -1,6 +1,8 @@
 /**
  * Created by Shinjini on 6/20/2016.
  */
+
+// TODO difference between project name and filename? .json vs sans .json?
 var selectedProject;
 var fs = require('fs');
 const path = require('path');
@@ -28,31 +30,9 @@ $(function () {
         $('.current-project .content').html('<a href="projectView">Go back to Current Project:<br>'+JSON.parse(currentProject).meta.name + '</a>');
     } else {
         $('.current-project').css({
-            display: 'none'
+            //display: 'none'
         })
     }
-
-
-    // from http://stackoverflow.com/questions/10049557/reading-all-files-in-a-directory-store-them-in-objects-and-send-the-object
-    // TODO should these calls be synch?
-    function readFiles(dirname, onFileContent, onError) {
-        fs.readdir(dirname, function(err, filenames) {
-            if (err) {
-                onError(err);
-                return;
-            }
-            filenames.forEach(function(filename) {
-                fs.readFile(path.join(dirname, filename), 'utf-8', function(err, content) {
-                    if (err) {
-                        onError(err);
-                        return;
-                    }
-                    onFileContent(filename, content);
-                });
-            });
-        });
-    }
-
 
     readFiles(projectsSavePath, function(filename, content) {
         // TODO add a loading projects sign
@@ -62,9 +42,11 @@ $(function () {
 
             availableProjects[filename] = content;
             // TODO sanitise filename!
-            var projectLink = '<li><div class="project-filename" data-filename="'+filename+'">'+filename.split('.').slice(0, -1).join('.')+'</div></li>';
+            var projectLink = '<li><div class="project-filename" data-filename="'+filename+'">' +
+                '<div class="project-name">'+filenameToProjectName(filename)+'</div>' +
+                '</div></li>';
             $('#recent-projects-list').append(projectLink);
-            addDeleteProjectButton(filename);
+            addDeleteProjectButton(projectsSavePath, filename);
         }
     }, function(err) {
         throw err;
@@ -83,12 +65,12 @@ $('#create-project').on('click', function () {
     window.location = 'index.html';
 });
 
-$('.current-project').on('click', function(){
+$('.current-project').on('click', 'a', function(){
     window.location = 'index.html';
 });
 
 
-$('.recent-projects').on('click', '.project-filename', function(){
+$('.recent-projects').on('click', '.project-name', function(){
     var filename = $(this).data('filename');
     selectedProject = availableProjects[filename];
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
@@ -120,7 +102,28 @@ function resetMenuOptions() {
     $('#project-json').val('');
 }
 
-function deleteFile(filename){
+// from http://stackoverflow.com/questions/10049557/reading-all-files-in-a-directory-store-them-in-objects-and-send-the-object
+// TODO should these calls be synch?
+function readFiles(dirname, onFileContent, onError) {
+    fs.readdir(dirname, function(err, filenames) {
+        if (err) {
+            onError(err);
+            return;
+        }
+        filenames.forEach(function(filename) {
+            fs.readFile(path.join(dirname, filename), 'utf-8', function(err, content) {
+                if (err) {
+                    onError(err);
+                    return;
+                }
+                onFileContent(filename, content);
+            });
+        });
+    });
+}
+
+
+function deleteFile(dirname, filename){
     var pathName = path.join(dirname, filename);
     fs.stat(pathName, function (err, stats) {
         if (err) {
@@ -132,7 +135,13 @@ function deleteFile(filename){
     });
 }
 
-function addDeleteProjectButton(filename){
+function deleteFileAndDisplay(dirname, filename){
+    deleteFile(dirname, filename);
+    $(".recent-projects").find("[data-filename='" + filename + "']").parent().remove();
+}
+
+
+function addDeleteProjectButton(dirname, filename){
     var spDelete = document.createElement('span');
     spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-project">' +
             //'<span>Delete User Component </span>' +
@@ -143,9 +152,53 @@ function addDeleteProjectButton(filename){
     buttonDeletProject.id = 'btn-delete-project_'+filename;
 
     $(buttonDeletProject).on("click", function (e) {
-         deleteFile(filename)
+        // todo add safety
+        openDeleteProjectConfirmDialogue(dirname, filename);
     });
 
-    $(".project-filename").find("[data-filename='" + filename + "']").append(buttonDeletProject);
+    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonDeletProject);
 
+}
+
+function openDeleteProjectConfirmDialogue(dirname, filename){
+    var projectName = filenameToProjectName(filename);
+    $('#confirm-delete-project').modal('show');
+    $('#delete-project-name').text(projectName);
+    $('#delete-project-btn').data('deleteProjectDirname', dirname).data('deleteFilename', filename);
+};
+
+$('#delete-project-btn').click(function(){
+    var filename =  $('#delete-project-btn').data('deleteFilename');
+    var projectDirname =  $('#delete-project-btn').data('deleteProjectDirname');
+    deleteFileAndDisplay(projectDirname, filename);
+
+    $('#delete-project-btn').data('deleteFilename', '');
+    $('#delete-project-btn').data('deleteProjectDirname', '');
+
+    $('#delete-project-name').text('');
+});
+
+$('#delete-project-cancel-btn').click(function(){
+    $('#delete-project-btn').data('deleteFilename', '');
+    $('#delete-project-btn').data('deleteProjectDirname', '');
+
+    $('#delete-project-name').text('');
+});
+
+$('#confirm-delete-project .close').click(function(event){
+    event.preventDefault();
+    $('#delete-project-btn').data('deleteFilename', '');
+    $('#delete-project-btn').data('deleteProjectDirname', '');
+    $('#confirm-delete-project').modal('hide');
+
+    $('#delete-project-name').text('');
+});
+
+
+function projectNameToFilename(projectName){
+    return projectName+'.json';
+}
+
+function filenameToProjectName(filename){
+    return filename.split('.').slice(0, -1).join('.')
 }

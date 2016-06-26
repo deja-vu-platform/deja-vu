@@ -101,7 +101,6 @@ fieldset { border: 0; margin: 0; padding: 0; }
 }
 .current-project .content{
     text-align: center;
-    cursor: pointer;
     height: 60px;
 
 }
@@ -128,8 +127,11 @@ fieldset { border: 0; margin: 0; padding: 0; }
 
 
 .project-name {
+    width: 70%;
     cursor: pointer;
+    display: inline-block;
 }
+
 
 .content li {
     margin: 10px 10px 0px 0px;

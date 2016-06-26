@@ -1350,11 +1350,6 @@ function addDeleteUserComponentButton(userComponentId){
     });
 
     $("#user-components-list").find("[data-componentid='" + userComponentId + "']").append(buttonDeleteUserComponent);
-    $(buttonDeleteUserComponent).css({
-        //position: 'absolute',
-        //top:'-100px',
-        //right:'-150px',
-    })
 }
 
 function deleteUserComponent(userComponentId){
