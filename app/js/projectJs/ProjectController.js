@@ -27,7 +27,7 @@ $(function () {
     var currentProject = window.sessionStorage.getItem('selectedProject');
 
     if (currentProject){
-        $('.current-project .content').html('<a href="projectView">Go back to Current Project:<br>'+JSON.parse(currentProject).meta.name + '</a>');
+        $('.current-project .content').html('<a href="projectView">'+JSON.parse(currentProject).meta.name + '</a>');
     } else {
         $('.current-project').css({
             //display: 'none'
