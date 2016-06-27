@@ -186,6 +186,7 @@ function addDeleteProjectButton(dirname, filename){
             });
             $(this).find('.btn-delete-project').css({
                 display: 'inline-block',
+                'vertical-align': 'top',
             });
         }, function(){
             $(this).find('.project-name').css({
@@ -234,11 +235,3 @@ $('#confirm-delete-project .close').click(function(event){
     $('#delete-project-name').text('');
 });
 
-
-function projectNameToFilename(projectName){
-    return projectName+'.json';
-}
-
-function filenameToProjectName(filename){
-    return filename.split('.').slice(0, -1).join('.')
-}

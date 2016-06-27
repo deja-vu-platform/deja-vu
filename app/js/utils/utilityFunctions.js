@@ -75,3 +75,12 @@ function isCopyOfFile(dirname, filename){
         return false;
     }
 }
+
+
+function projectNameToFilename(projectName){
+    return projectName+'.json';
+}
+
+function filenameToProjectName(filename){
+    return filename.split('.').slice(0, -1).join('.')
+}
