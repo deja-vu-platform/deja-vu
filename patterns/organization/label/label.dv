@@ -2,7 +2,7 @@ cliche Label
 
 data Item {
   name: Text,
-  labels: *Label
+  labels: set Label
 }
 
 data Label {

@@ -18,5 +18,11 @@ widget User {
   user: User
 }
 
+widget Posts {
+  author: User
+}
+
+widget AllPosts {}
+
 attach Post to Post
 attach User to User
