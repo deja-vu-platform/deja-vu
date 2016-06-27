@@ -233,10 +233,12 @@ function displayComponentInTable(cellId, widget, component) {
 
         showConfigOptions(type, document.getElementById(cellId));
 
-        Display(cellId, getHTML[type](component.components[type]));
         if (!widget) {
             $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0))
         }
+        // display requires widget to be placed before display happens
+        Display(cellId, getHTML[type](component.components[type]));
+
         triggerEdit(cellId, false); // no need to show edit options
 
     }
@@ -354,26 +356,48 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     }
 }
 
-function updateBaseComponentDisplayAt(cellId) {
-    // only labels and images need this
-    var rowcol = getRowColFromId(cellId);
-    var row = rowcol.row;
-    var col = rowcol.col;
-
-
-    var grid = $('#grid'+'_'+row+'_'+col);
-    var height = (parseFloat(grid.css('height'))-30) + 'px';
-    var width = (parseFloat(grid.css('width'))-10) + 'px';
-
+function hideBaseComponentDisplayAt(cellId){
     var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     if (type === 'label'){
         $('#' + cellId).find('.display-component').parent().css({
+            display: 'none'
+        });
+    }
+    if (type === 'image'){
+        $('#' + cellId).find('.display-component').css({
+            display: 'none'
+        });
+    }
+}
+
+function showBaseComponentDisplayAt(cellId){
+    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    if (type === 'label'){
+        $('#' + cellId).find('.display-component').parent().css({
+            display: 'block'
+        });
+    }
+    if (type === 'image'){
+        $('#' + cellId).find('.display-component').css({
+            display: 'block'
+        });
+    }
+}
+
+function updateBaseComponentDisplayAt(cellId) {
+    var cell = $('#'+cellId);
+    var height = (parseFloat(cell.css('height'))-30) + 'px';
+    var width = (parseFloat(cell.css('width'))-10) + 'px';
+
+    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    if (type === 'label'){
+        cell.find('.display-component').parent().css({
             height: height,
             width: width,
         });
     }
     if (type === 'image'){
-        $('#' + cellId).find('.display-component').css({
+        cell.find('.display-component').css({
             'max-height': height,
             'max-width': width,
             height: 'auto',
@@ -381,6 +405,8 @@ function updateBaseComponentDisplayAt(cellId) {
             'vertical-align':'top',
         });
     }
+
+    // TODO other types?
 
 }
 

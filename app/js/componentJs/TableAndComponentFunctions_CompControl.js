@@ -915,8 +915,10 @@ function addRowColResizeHandlers(){
             },
             stop: function () {
                 var row = getRowColFromId($(this).children().get(0).id).row;
-                updateBaseComponentDisplayRow(row);
+                hideBaseComponentDisplayRow(row);
                 alignCellsWithGrid();
+                updateBaseComponentDisplayRow(row);
+                showBaseComponentDisplayRow(row);
                 resetAllMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
             }
@@ -965,8 +967,10 @@ function addRowColResizeHandlers(){
             },
             stop: function () {
                 var col = getRowColFromId(this.id).col;
-                updateBaseComponentDisplayCol(col);
+                hideBaseComponentDisplayCol(col);
                 alignCellsWithGrid();
+                updateBaseComponentDisplayCol(col);
+                showBaseComponentDisplayCol(col);
                 resetAllMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
             }
@@ -1016,6 +1020,54 @@ function updateBaseComponentDisplayCol(col){
         }
     }
 }
+
+
+function hideBaseComponentDisplayCol(col){
+    for (var row = 1; row<=numRows; row++){
+        if (selectedUserComponent.components[row]){
+            if (selectedUserComponent.components[row][col]){
+                var cellId = 'cell'+'_'+row+'_'+col;
+                hideBaseComponentDisplayAt(cellId)
+            }
+        }
+    }
+}
+
+function hideBaseComponentDisplayRow(row){
+    for (var col = 1; col<=numCols; col++){
+        if (selectedUserComponent.components[row]){
+            if (selectedUserComponent.components[row][col]){
+                var cellId = 'cell'+'_'+row+'_'+col;
+                hideBaseComponentDisplayAt(cellId)
+            }
+        }
+    }
+}
+
+
+function showBaseComponentDisplayCol(col){
+    for (var row = 1; row<=numRows; row++){
+        if (selectedUserComponent.components[row]){
+            if (selectedUserComponent.components[row][col]){
+                var cellId = 'cell'+'_'+row+'_'+col;
+                showBaseComponentDisplayAt(cellId)
+            }
+        }
+    }
+}
+
+function showBaseComponentDisplayRow(row){
+    for (var col = 1; col<=numCols; col++){
+        if (selectedUserComponent.components[row]){
+            if (selectedUserComponent.components[row][col]){
+                var cellId = 'cell'+'_'+row+'_'+col;
+                showBaseComponentDisplayAt(cellId)
+            }
+        }
+    }
+}
+
+
 
 function addTableResizeHandler(){
     // TODO THIS DOES NOT WORK!
