@@ -2,6 +2,10 @@
 // the display and interaction handling
 
 
+var projectsSavePath = path.join(__dirname, 'projects');
+
+
+
 /** ** ** ** ** ** Initialization ** ** ** ** ** **/
 $(function () {
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
@@ -108,6 +112,7 @@ function resetMenuOptions() {
 $('#back-to-projects').click(function(event){
     event.preventDefault();
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
+    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
     window.location = 'projectView.html';
 });
 
@@ -379,17 +384,20 @@ function showBaseComponentDisplayAt(cellId){
     }
     if (type === 'image'){
         $('#' + cellId).find('.display-component').css({
-            display: 'block'
+            display: 'inline-block'
         });
     }
 }
 
+/**
+ *
+ * @param cellId
+ */
 function updateBaseComponentDisplayAt(cellId) {
     var cell = $('#'+cellId);
     var height = (parseFloat(cell.css('height'))-30) + 'px';
     var width = (parseFloat(cell.css('width'))-10) + 'px';
-
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    var type = cell.get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     if (type === 'label'){
         cell.find('.display-component').parent().css({
             height: height,
@@ -403,12 +411,14 @@ function updateBaseComponentDisplayAt(cellId) {
             height: 'auto',
             width: 'auto',
             'vertical-align':'top',
+
         });
     }
 
     // TODO other types?
 
 }
+
 
 
 /** ** ** ** ** ** ** ** IMAGE UPLOAD HELPERS ** ** ** ** ** ** ** **/

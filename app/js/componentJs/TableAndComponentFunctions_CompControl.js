@@ -285,11 +285,7 @@ function attachMergeHandlers() {
                     // if this is already a merged cell we should unmerge it now
                     // since this cell (a top left cell), may not be in the final merge
                     // so should be brought back to the original form
-                    if ($('#' + thisCellId).data('merged').isMerged) {
-                        // if merged, unmerge the two cells
-                        // this also resets the cells to unmerged status
-                        unmergeCells(thisCellId); // without the component; it will get it back if it was its
-                    }
+                    unmergeCells(thisCellId); // without the component; it will get it back if it was its
 
 
                     // Now we look for the cell to merge into
@@ -694,7 +690,9 @@ function unmergeCells(cellToUnmergeId, component) {
 
 
     var lastMergedCellBottomRightId = $('#' + cellToUnmergeId).data('merged').bottomRightCellId;
-
+    if (lastMergedCellBottomRightId.length === 0){ // this is actually an unmerged cell
+        lastMergedCellBottomRightId = cellToUnmergeId;
+    }
 
     var lastMergedCellBottomRightRowcol = getRowColFromId(lastMergedCellBottomRightId);
     var lastMergedCellBottomRightRow = lastMergedCellBottomRightRowcol.row;
