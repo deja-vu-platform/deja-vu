@@ -55,6 +55,9 @@ $(function () {
 
 /** ** ** ** ** ** Menu Event Handlers ** ** ** ** ** **/
 
+
+// TODO on user component name input check for special chars
+
 $('#create-component').on('click', function () {
     numRows = $('#select-rows').val();
     numCols = $('#select-cols').val();

@@ -11,6 +11,7 @@ const path = require('path');
 var projectsSavePath = path.join(__dirname, 'projects');
 
 var availableProjects = {};
+//TODO implement recent vs all
 
 // Initialization
 $(function () {
@@ -39,11 +40,11 @@ $(function () {
         // Check the types to only add projects
         var content = JSON.parse(content);
         if (content.objectType && (content.objectType === 'UserProject')){
-
             availableProjects[filename] = content;
             // TODO sanitise filename!
             var projectLink = '<li><div class="project-filename" data-filename="'+filename+'">' +
-                '<div class="project-name">'+filenameToProjectName(filename)+'</div>' +
+                    // sanitizing display because that's where the injections can play
+                '<div class="project-name">'+sanitizeStringOfSpecialChars(filenameToProjectName(filename))+'</div>' +
                 '</div></li>';
             $('#recent-projects-list').append(projectLink);
             addDeleteProjectButton(projectsSavePath, filename);
@@ -53,10 +54,10 @@ $(function () {
         // handle errors
     });
 
-
-
 });
 
+
+// TODO on project name input check for special chars
 
 $('#create-project').on('click', function () {
     selectedProject = initNewProject();
@@ -71,7 +72,7 @@ $('.current-project').on('click', 'a', function(){
 
 
 $('.recent-projects').on('click', '.project-name', function(){
-    var filename = $(this).data('filename');
+    var filename = $(this).parent().data('filename');
     selectedProject = availableProjects[filename];
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
     //console.log( window.sessionStorage.getItem('selectedProject'));
@@ -85,7 +86,7 @@ $('.recent-projects').on('click', '.project-name', function(){
  * @constructor
  */
 function initNewProject() {
-    var name = $('#new-project-name').val();
+    var name = sanitizeStringOfSpecialChars($('#new-project-name').val());
     var version = $('#project-version').val();
     var author = $('#project-author').val();
     return new UserProject(name, generateId(name), version, author);

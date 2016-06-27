@@ -1409,7 +1409,7 @@ function initUserComponent(isDefault) {
         version = DEFAULT_VERSION;
         author = DEFAULT_AUTHOR;
     } else {
-        name = $('#new-component-name').val();
+        name = sanitizeStringOfSpecialChars($('#new-component-name').val());
         version = $('#component-version').val();
         author = $('#component-author').val();
     }
