@@ -103,19 +103,6 @@ function resetMenuOptions() {
     $('#component-json').val('');
 }
 
-
-function downloadObject(filename, obj) {
-    var element = document.createElement('a');
-    var data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
-
-    element.setAttribute('href', data);
-    element.setAttribute('download', filename);
-
-    element.click();
-}
-
-
-
 /** ** ** ** ** ** Components Event Handlers ** ** ** ** ** **/
 
 $('#back-to-projects').click(function(event){

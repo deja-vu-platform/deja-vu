@@ -1,6 +1,9 @@
+var fs = require('fs');
+var path = require('path');
+
 // special characters not allowed in inputs
 //var regex = /[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi;
-var regex = /[^\w\s\-.]/gi;
+var regex = /[^\w\s\-]/gi;
 
 function stringHash(string){
     var hash = 0;
@@ -40,4 +43,35 @@ function checkStringForSpecialChars(string){
     // some javascript bs http://stackoverflow.com/questions/2630418/javascript-regex-returning-true-then-false-then-true-etc
     regex.lastIndex= 0;
     return matches;
+}
+
+
+function downloadObject(filename, obj) {
+    var element = document.createElement('a');
+    var data = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(obj));
+
+    element.setAttribute('href', data);
+    element.setAttribute('download', filename);
+
+    element.click();
+}
+
+function saveObjectToFile(dirname, filename, object){
+    // Asynch
+    var pathName = path.join(dirname, filename);
+    fs.writeFile(pathName, JSON.stringify(object),function(err){
+        if(err) return console.log(err);
+        return true;
+    });
+}
+
+function isCopyOfFile(dirname, filename){
+    var pathName = path.join(dirname, filename);
+    try {
+        var stats = fs.statSync(pathName);
+        return true;
+    }
+    catch (err) {
+        return false;
+    }
 }

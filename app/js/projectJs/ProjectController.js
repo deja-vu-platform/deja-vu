@@ -4,8 +4,8 @@
 
 // TODO difference between project name and filename? .json vs sans .json?
 var selectedProject;
-var fs = require('fs');
-const path = require('path');
+//var fs = require('fs');
+//var path = require('path');
 
 // TODO get path emitted by main
 var projectsSavePath = path.join(__dirname, 'projects');
@@ -57,12 +57,15 @@ $(function () {
 });
 
 
-// TODO on project name input check for special chars
+// TODO on project name input *check* for special chars
+// TODO something about rewriting existing files?
+// TODO on project name input *check* for name being reused
 
 $('#create-project').on('click', function () {
     selectedProject = initNewProject();
     resetMenuOptions();
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+
     window.location = 'index.html';
 });
 
@@ -86,10 +89,26 @@ $('.recent-projects').on('click', '.project-name', function(){
  * @constructor
  */
 function initNewProject() {
-    var name = sanitizeStringOfSpecialChars($('#new-project-name').val());
+    var projectName = sanitizeStringOfSpecialChars($('#new-project-name').val());
     var version = $('#project-version').val();
     var author = $('#project-author').val();
-    return new UserProject(name, generateId(name), version, author);
+
+    // create a copy instead
+    var copyName = projectName;
+    var copyNum = 0;
+    // TODO should give user warning or options
+    while(isCopyOfFile(projectsSavePath, copyName+'.json')){
+        if (copyNum == 0){
+            copyName = projectName + ' - Copy';
+        } else {
+            copyName = projectName + ' - Copy ' + copyNum;
+        }
+        copyNum++;
+    }
+    var newProject = new UserProject(copyName, generateId(copyName), version, author);
+    saveObjectToFile(projectsSavePath, projectNameToFilename(copyName), newProject);
+    return newProject;
+
 }
 
 /**
@@ -135,6 +154,7 @@ function deleteFile(dirname, filename){
         });
     });
 }
+
 
 function deleteFileAndDisplay(dirname, filename){
     deleteFile(dirname, filename);
