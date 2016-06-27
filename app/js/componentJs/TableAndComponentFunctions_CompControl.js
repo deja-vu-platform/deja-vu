@@ -1349,7 +1349,24 @@ function addDeleteUserComponentButton(userComponentId){
         }
     });
 
-    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").append(buttonDeleteUserComponent);
+    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").append(buttonDeleteUserComponent).hover(
+        function(){
+            $(this).find('.component-name-container').css({
+                width: '70%'
+            });
+            $(this).find('.btn-delete-component').css({
+                display: 'inline-block',
+            });
+        }, function(){
+            $(this).find('.component-name-container').css({
+                width: '100%'
+            });
+            $(this).find('.btn-delete-component').css({
+                display: 'none',
+
+            });
+        }
+    );
 }
 
 function deleteUserComponent(userComponentId){

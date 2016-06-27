@@ -114,14 +114,20 @@ fieldset { border: 0; margin: 0; padding: 0; }
 }
 
 .component-name-container{
-    width: 70%;
+    width: 100%;
     display: inline-block;
     cursor: pointer;
 }
 
+#user-components-list li{
+    height: 40px;
+}
+
 .btn-delete-component{
-    width: 29%;
+    display: none;
     cursor: pointer;
+    vertical-align: top;
+
 }
 
 .content li {

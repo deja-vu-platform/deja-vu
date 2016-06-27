@@ -128,11 +128,19 @@ fieldset { border: 0; margin: 0; padding: 0; }
     resize: vertical;
 }
 
+.project-filename{
+    height: 40px;
+}
 
 .project-name {
-    width: 70%;
+    width: 100%;
     cursor: pointer;
     display: inline-block;
+}
+
+.btn-delete-project{
+    display: none;
+    vertical-align: top;
 }
 
 

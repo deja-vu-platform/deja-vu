@@ -177,7 +177,26 @@ function addDeleteProjectButton(dirname, filename){
         openDeleteProjectConfirmDialogue(dirname, filename);
     });
 
-    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonDeletProject);
+
+
+    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonDeletProject).hover(
+        function(){
+            $(this).find('.project-name').css({
+                width: '70%'
+            });
+            $(this).find('.btn-delete-project').css({
+                display: 'inline-block',
+            });
+        }, function(){
+            $(this).find('.project-name').css({
+                width: '100%'
+            });
+            $(this).find('.btn-delete-project').css({
+                display: 'none',
+
+            });
+        }
+    );
 
 }
 
