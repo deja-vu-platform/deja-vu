@@ -70,6 +70,7 @@ function Display(cellId, html, callback) {
     sp.innerHTML = html;
     var html_ = sp.firstElementChild;
     cell.insertBefore(html_, cell.firstChild);
+    updateBaseComponentDisplayAt(cellId);
     if (callback) callback();
 }
 

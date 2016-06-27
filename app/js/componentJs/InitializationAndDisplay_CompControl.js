@@ -207,9 +207,9 @@ function displayNewComponentInUserComponentList(name, id){
  */
 function displayComponentInTable(cellId, widget, component) {
     var type;
-    var rowcol = cellId.split('_');
-    var row = rowcol[rowcol.length - 2];
-    var col = rowcol[rowcol.length - 1];
+    var rowcol = getRowColFromId(cellId);
+    var row = rowcol.row;
+    var col = rowcol.col;
 
     if (!component) {
         var span = document.createElement('span');
@@ -252,7 +252,7 @@ function displayComponentInTable(cellId, widget, component) {
     selectedUserComponent.components[row][col] = component;
 
     updateBitmap();
-    registerTooltipBtnHandlers()
+    registerTooltipBtnHandlers();
 }
 
 
@@ -260,9 +260,9 @@ function displayComponentInTable(cellId, widget, component) {
  * Deletes a component from the datatype and also from the view
  */
 function deleteComponentFromUserComponentAndFromView(cellId) {
-    var rowcol = cellId.split('_');
-    var row = rowcol[rowcol.length - 2];
-    var col = rowcol[rowcol.length - 1];
+    var rowcol = getRowColFromId(cellId);
+    var row = rowcol.row;
+    var col = rowcol.col;
 
     if (selectedUserComponent.components[row]) {
         if (selectedUserComponent.components[row][col]) {
@@ -284,15 +284,15 @@ function deleteComponentFromUserComponentAndFromView(cellId) {
 
 }
 
-
 /**
- * Updates the contents of a base component at a particular cell
+ * Updates the contents of a base component info at a particular cell based on inputs
  * @param cellId
  */
-function updateComponentContentsAt(cellId) {
-    var rowcol = cellId.split('_');
-    var row = rowcol[rowcol.length - 2];
-    var col = rowcol[rowcol.length - 1];
+function updateBaseComponentContentsAndDisplayAt(cellId) {
+    var rowcol = getRowColFromId(cellId);
+    var row = rowcol.row;
+    var col = rowcol.col;
+
     var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     var value;
     var isUpload = false;
@@ -353,6 +353,37 @@ function updateComponentContentsAt(cellId) {
         selectedUserComponent.components[row][col].components[type] = value;
     }
 }
+
+function updateBaseComponentDisplayAt(cellId) {
+    // only labels and images need this
+    var rowcol = getRowColFromId(cellId);
+    var row = rowcol.row;
+    var col = rowcol.col;
+
+
+    var grid = $('#grid'+'_'+row+'_'+col);
+    var height = (parseFloat(grid.css('height'))-30) + 'px';
+    var width = (parseFloat(grid.css('width'))-10) + 'px';
+
+    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    if (type === 'label'){
+        $('#' + cellId).find('.display-component').parent().css({
+            height: height,
+            width: width,
+        });
+    }
+    if (type === 'image'){
+        $('#' + cellId).find('.display-component').css({
+            'max-height': height,
+            'max-width': width,
+            height: 'auto',
+            width: 'auto',
+            'vertical-align':'top',
+        });
+    }
+
+}
+
 
 /** ** ** ** ** ** ** ** IMAGE UPLOAD HELPERS ** ** ** ** ** ** ** **/
 // file drag hover
@@ -581,7 +612,7 @@ function registerTooltipBtnHandlers() {
 
     $('.apply').on("click", function(event) {
         var cellId = findContainingCell(this);
-        updateComponentContentsAt(cellId);
+        updateBaseComponentContentsAndDisplayAt(cellId);
         $('.tooltip').removeClass('open');
     });
 
@@ -621,9 +652,9 @@ function registerTooltipBtnHandlers() {
                 }
             }
 
-            var rowcol = cellId.split('_');
-            var row = rowcol[rowcol.length-2];
-            var col = cellId[rowcol.length-1];
+            var rowcol = getRowColFromId(cellId);
+            var row = rowcol.row;
+            var col = rowcol.col;
             selectedUserComponent.components[row][col].properties[propertyName] = bootstrapClass;
 
         }
@@ -668,7 +699,7 @@ function findContainingCell(context) {
 function getEdits() {
     $('[contenteditable=true]').blur(function() {
         var cellId = findContainingCell(this);
-        updateComponentContentsAt(cellId);
+        updateBaseComponentContentsAndDisplayAt(cellId);
         getEdits();
     });
 }

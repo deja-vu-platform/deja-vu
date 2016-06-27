@@ -28,8 +28,8 @@ function loadTable(componentToShow) {
                 var type = innerComponent.type;
                 showConfigOptions(type, document.getElementById(cellId));
 
-                Display(cellId, getHTML[type](innerComponent.components[type]));
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
+                Display(cellId, getHTML[type](innerComponent.components[type]));
                 triggerEdit(cellId, false);
 
                 $('#' + cellId).addClass("dropped");
@@ -914,6 +914,8 @@ function addRowColResizeHandlers(){
                 //resetAllMergeHandleContainersSizeAndPosition();
             },
             stop: function () {
+                var row = getRowColFromId($(this).children().get(0).id).row;
+                updateBaseComponentDisplayRow(row);
                 alignCellsWithGrid();
                 resetAllMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
@@ -962,6 +964,8 @@ function addRowColResizeHandlers(){
                 //resetAllMergeHandleContainersSizeAndPosition();
             },
             stop: function () {
+                var col = getRowColFromId(this.id).col;
+                updateBaseComponentDisplayCol(col);
                 alignCellsWithGrid();
                 resetAllMergeHandleContainersSizeAndPosition();
                 saveRowColRatios();
@@ -982,6 +986,34 @@ function addRowColResizeHandlers(){
         });
 
 
+    }
+}
+
+function updateBaseComponentDisplayAll(){
+    for (var row = 1; row<=numRows; row++){
+        updateBaseComponentDisplayRow(row);
+    }
+}
+
+function updateBaseComponentDisplayRow(row){
+    for (var col = 1; col<=numCols; col++){
+        if (selectedUserComponent.components[row]){
+            if (selectedUserComponent.components[row][col]){
+                var cellId = 'cell'+'_'+row+'_'+col;
+                updateBaseComponentDisplayAt(cellId);
+            }
+        }
+    }
+}
+
+function updateBaseComponentDisplayCol(col){
+    for (var row = 1; row<=numRows; row++){
+        if (selectedUserComponent.components[row]){
+            if (selectedUserComponent.components[row][col]){
+                var cellId = 'cell'+'_'+row+'_'+col;
+                updateBaseComponentDisplayAt(cellId);
+            }
+        }
     }
 }
 
