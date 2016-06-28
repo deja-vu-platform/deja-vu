@@ -32,7 +32,8 @@ function Component() {
                             // BottomLeftCellId: String,
                             // BottomRightCellId: String},
                             // hidden:{isHidden: Boolean, hidingCellId: String}
-                            // ratio: {width: Number (ratio), height: Number (ratio)}
+                            // ratio: {cell:{width: Number (ratio), height: Number (ratio)},
+                            //          grid:{width: Number (ratio), height: Number (ratio)}}
                             // }
                         // }
                       // }
@@ -72,7 +73,7 @@ function BaseComponent(type, components) {
                              bottomLeftCellId: '',
                              bottomRightCellId: ''},
                         hidden:{isHidden: false, hidingCellId: ''},
-                        pxDimensions: {width: 1, height: 1}
+                        ratio: {cell:{width: 1, height: 1}, grid:{width: 1, height: 1}}
                     }
                    }};
 }
@@ -124,7 +125,8 @@ function UserComponent(dimensions, name, id, version, author) {
                                             bottomRightCellId: ''},
                                         hidden:{isHidden: false, hidingCellId: ''},
                                         // ratio will be measured in %
-                                        ratio: {width: 1/dimensions.cols, height: 1/dimensions.rows},
+                                        ratio: {cell:{width: 1/dimensions.cols, height: 1/dimensions.rows},
+                                                grid:{width: 1/dimensions.cols, height: 1/dimensions.rows}}
             };
         }
     }
