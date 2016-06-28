@@ -93,7 +93,7 @@ function createTableCell(row, col) {
         topRightCellId: topRightCellId,
         bottomLeftCellId: bottomLeftCellId,
         bottomRightCellId: bottomRightCellId});
-    $(td).data('hidden', {isHidden:isHidden, bottomRightCellId: hidingCellIdId});
+    $(td).data('hidden', {isHidden:isHidden, hidingCellId: hidingCellIdId});
 
 
     if (isHidden) {
