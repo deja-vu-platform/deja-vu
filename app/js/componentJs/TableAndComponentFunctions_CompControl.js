@@ -971,18 +971,38 @@ function addRowColResizeHandlers(){
     for (var row = 1; row <= numRows; row++) {
         $('#guide-grid-container .row_' + row).resizable({
             handles: 's',
-            alsoResize: '#table-container .row_' + row + ' .cell, ' +  // also resize the td's
+            alsoResize: //'#table-container .row_' + row + ' .cell, ' +  // also resize the td's
                             '#guide-grid-container .row_' + row + ' .grid,' + // also resize the td's
                             ' #guide-grid-container .row_' + row + ', ' +
-                            '#drag-handle-containers-container .row_' + row + ', ' +
+                          //  '#drag-handle-containers-container .row_' + row + ', ' +
                             //'#table-container .row_' + row + ' .ui-resizable-s' +
                             ' .ui-resizable-s-row_'+row,
-            resize: function () {
-                // TODO get rid of this later!
-                //resetAllMergeHandleContainersSizeAndPosition();
+            start: function(){
+                $('#guide-grid-container td').css({
+                    visibility: 'visible',
+                    border: 'black 1px dotted',
+                });
+                $('#drag-handle-containers-container').css({
+                    visibility: 'hidden',
+                });
+                $('#table-container td').css({
+                    opacity: '.5',
+                });
+
             },
             stop: function () {
-                //var row = getRowColFromId($(this).children().get(0).id).row;
+                $('#guide-grid-container td').css({
+                    visibility: 'hidden',
+                    'background-color': 'transparent'
+                });
+                $('#drag-handle-containers-container').css({
+                    visibility: 'visible',
+                });
+
+                $('#table-container td').css({
+                    opacity: '1',
+                });
+
                 hideBaseComponentDisplayAll();
                 alignCellsWithGrid();
                 updateBaseComponentDisplayAll();
@@ -1011,7 +1031,6 @@ function addRowColResizeHandlers(){
             height: 0,
             visibility: 'visible',
             'pointer-events': 'auto',
-            opacity: 3
         })
 
 
@@ -1020,14 +1039,36 @@ function addRowColResizeHandlers(){
     for (var col = 1; col <= numCols; col++) {
         $('#grid_1_' + col).resizable({ //there is always at least 1 cell, and grids can't merge
             handles: 'ew',
-            alsoResize: '#table-container .col_' + col + ',' + // the td's are already resized!
-                        '#guide-grid-container .col_' + col + ', ' +
-                        '#drag-handle-containers-container .col_' + col,
-            resize: function () {
-                // TODO: move to stop() once the cell resize handles are made invisible
-                //resetAllMergeHandleContainersSizeAndPosition();
+            alsoResize: //'#table-container .col_' + col + ',' + // the td's are already resized!
+                        '#guide-grid-container .col_' + col // + ', ' +
+                        //'#drag-handle-containers-container .col_' + col
+            ,
+            start: function(){
+                $('#guide-grid-container td').css({
+                    visibility: 'visible',
+                    border: 'black 1px dotted',
+                });
+                $('#drag-handle-containers-container').css({
+                    visibility: 'hidden',
+                });
+                $('#table-container td').css({
+                    opacity: '.5',
+                });
+
             },
             stop: function () {
+                $('#guide-grid-container td').css({
+                    visibility: 'hidden',
+                    'background-color': 'transparent'
+                });
+                $('#drag-handle-containers-container').css({
+                    visibility: 'visible',
+                });
+
+                $('#table-container td').css({
+                    opacity: '1',
+                });
+
                 hideBaseComponentDisplayAll();
                 alignCellsWithGrid();
                 updateBaseComponentDisplayAll();
@@ -1047,7 +1088,6 @@ function addRowColResizeHandlers(){
             height: 0,
             visibility: 'visible',
             'pointer-events': 'auto',
-            opacity: 3
         });
 
 
