@@ -302,12 +302,6 @@ function attachMergeHandlers() {
                     }
 
 
-                    // if this is already a merged cell we should unmerge it now
-                    // since this cell (a top left cell), may not be in the final merge
-                    // so should be brought back to the original form
-                    unmergeCells(thisCellId); // without the component; it will get it back if it was its
-
-
                     // Now we look for the cell to merge into
                     // In case the cell we are resizing was already merged (ie, we are making it smaller,
                     // then the cell we want to merge will not be visible. So we need to use the grid.
@@ -336,18 +330,23 @@ function attachMergeHandlers() {
 
                     var newCellGrid = $(allEltsList).filter('.grid');
                     if (!newCellGrid[0]) { // it's outside the table
-                        mergeCells(cell1Id, cell1Id, component);
+                        resetMergeHandleContainerSizeAndPositionCellId(thisCellId);
                     } else {
                         var newCellGridRowcol = getRowColFromId(newCellGrid[0].id);
                         var newCellId = 'cell' + '_' + newCellGridRowcol.row + '_' + newCellGridRowcol.col;
                         // TODO: have a setting to turn this off?
                         if (confirmOnDangerousMerge){
                             if (safeToMerge(cell1Id, newCellId)){
+                                // if this is already a merged cell we should unmerge it now
+                                // since this cell (a top left cell), may not be in the final merge
+                                // so should be brought back to the original form
+                                unmergeCells(thisCellId); // without the component; it will get it back if it was its
                                 mergeCells(cell1Id, newCellId, component);
                             } else {
-                                openMergeConfirmDialogue(cell1Id, newCellId);
+                                openMergeConfirmDialogue(thisCellId, cell1Id, newCellId, component);
                             }
                         } else {
+                            unmergeCells(thisCellId);
                             mergeCells(cell1Id, newCellId, component);
                         }
                     }
@@ -535,62 +534,79 @@ function safeToMerge(cell1Id, cell2Id){
  * @param cell1Id
  * @param cell2Id
  */
-function openMergeConfirmDialogue(cell1Id, cell2Id){
+function openMergeConfirmDialogue(oldTopLeftCellId, cell1Id, cell2Id, component){
     $('#confirm-merge').modal('show');
-    $('#merge-btn').data('cell1Id', cell1Id).data('cell2Id',cell2Id);
+
+    $('#merge-btn').click(function(){
+        mergeCells(cell1Id, cell2Id, component);
+        $('#confirm-merge').modal('hide');
+    });
+
+    $('#merge-cancel-btn').click(function(){
+        resetMergeHandleContainerSizeAndPositionCellId(oldTopLeftCellId);
+        $('#confirm-merge').modal('hide');
+    });
+
+    $('#confirm-merge .close').click(function(event){
+        event.preventDefault();
+        resetMergeHandleContainerSizeAndPositionCellId(oldTopLeftCellId);
+        $('#confirm-merge').modal('hide');
+    });
+
+
 };
 
-$('#merge-btn').click(function(){
-    var cell1Id =  $('#merge-btn').data('cell1Id');
-    var cell2Id =  $('#merge-btn').data('cell2Id');
-
-    var rowcol1 = getRowColFromId(cell1Id);
-    var row1 = rowcol1.row;
-    var col1 = rowcol1.col;
-
-    if (selectedUserComponent.components[row1]){
-        mergeCells(cell1Id, cell2Id, selectedUserComponent.components[row1][col1]);
-    } else {
-        mergeCells(cell1Id, cell2Id);
-    }
-
-    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
-});
-
-$('#merge-cancel-btn').click(function(){
-    var cell1Id =  $('#merge-btn').data('cell1Id');
-
-    var rowcol1 = getRowColFromId(cell1Id);
-    var row1 = rowcol1.row;
-    var col1 = rowcol1.col;
-
-    if (selectedUserComponent.components[row1]){
-        mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
-    } else {
-        mergeCells(cell1Id, cell1Id);
-    }
-
-    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
-    $('#confirm-merge').modal('hide');
-});
-
-$('#confirm-merge .close').click(function(event){
-    event.preventDefault();
-    var cell1Id =  $('#merge-btn').data('cell1Id');
-
-    var rowcol1 = getRowColFromId(cell1Id);
-    var row1 = rowcol1.row;
-    var col1 = rowcol1.col;
-
-    if (selectedUserComponent.components[row1]){
-        mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
-    } else {
-        mergeCells(cell1Id, cell1Id);
-    }
-
-    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
-    $('#confirm-merge').modal('hide');
-});
+//$('#merge-btn').click(function(){
+//    var cell1Id =  $('#merge-btn').data('cell1Id');
+//    var cell2Id =  $('#merge-btn').data('cell2Id');
+//
+//    var rowcol1 = getRowColFromId(cell1Id);
+//    var row1 = rowcol1.row;
+//    var col1 = rowcol1.col;
+//
+//    if (selectedUserComponent.components[row1]){
+//        mergeCells(cell1Id, cell2Id, selectedUserComponent.components[row1][col1]);
+//    } else {
+//        mergeCells(cell1Id, cell2Id);
+//    }
+//
+//    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
+//});
+//
+//$('#merge-cancel-btn').click(function(){
+//    var cell1Id =  $('#merge-btn').data('cell1Id');
+//
+//    var rowcol1 = getRowColFromId(cell1Id);
+//    var row1 = rowcol1.row;
+//    var col1 = rowcol1.col;
+//
+//    if (selectedUserComponent.components[row1]){
+//        mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
+//    } else {
+//        mergeCells(cell1Id, cell1Id);
+//    }
+//
+//    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
+//    $('#confirm-merge').modal('hide');
+//});
+//
+//$('#confirm-merge .close').click(function(event){
+//    event.preventDefault();
+//    var cell1Id =  $('#merge-btn').data('cell1Id');
+//
+//    var rowcol1 = getRowColFromId(cell1Id);
+//    var row1 = rowcol1.row;
+//    var col1 = rowcol1.col;
+//
+//    if (selectedUserComponent.components[row1]){
+//        mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
+//    } else {
+//        mergeCells(cell1Id, cell1Id);
+//    }
+//
+//    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
+//    $('#confirm-merge').modal('hide');
+//});
 
 /**
  * @param cell1Id
@@ -813,6 +829,11 @@ function resetAllMergeHandleContainersSizeAndPosition(){
             resetMergeHandleContainerSizeAndPosition(row,col);
         }
     }
+}
+
+function resetMergeHandleContainerSizeAndPositionCellId(cellId){
+    var rowcol = getRowColFromId(cellId);
+    resetMergeHandleContainerSizeAndPosition(rowcol.row, rowcol.col);
 }
 
 function resetMergeHandleContainerSizeAndPosition(row, col){
