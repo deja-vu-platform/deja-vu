@@ -103,8 +103,6 @@ fieldset { border: 0; margin: 0; padding: 0; }
     overflow: scroll;
     text-align: left;
     resize: vertical;
-    cursor: pointer;
-
 }
 
 .basic-components .content {
@@ -115,9 +113,21 @@ fieldset { border: 0; margin: 0; padding: 0; }
     height: 200px;
 }
 
-
-.component-name {
+.component-name-container{
+    width: 100%;
+    display: inline-block;
     cursor: pointer;
+}
+
+#user-components-list li{
+    height: 50px;
+}
+
+.btn-delete-component{
+    display: none;
+    cursor: pointer;
+    vertical-align: top;
+
 }
 
 .content li {
@@ -146,10 +156,10 @@ li#selected {
 
 
 /*===================================================
-                  GRID
+                  MAIN TABLE
 ===================================================*/
 .main-table {
-    /*table-layout: fixed !important;*/
+    table-layout: fixed !important;
     border-collapse: inherit;
     -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.2);
     padding: 10px;
@@ -222,8 +232,21 @@ td {
     pointer-events: none;
 }
 
+.zero-height{
+    height: 1px;
+    border: 0;
+    visibility: hidden;
+}
+
+.zero-width{
+    width: 1px;
+    border: 0;
+    visibility: hidden;
+}
+
 .drag-handle{
     z-index: 50;
+    display: none;
 }
 
 #drag-handle-containers-container{
