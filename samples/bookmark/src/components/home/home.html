@@ -1,6 +1,12 @@
 <div class="container">
-  <logged-in (loggedInUser)="loggedInUser($event)"></logged-in>
-  <create-post [(user)]="post_user"></create-post>
-  <h1>Feed</h1>
-  <feed [(sub)]="feed_sub.name"></feed>
+  <div class="col-md-12">
+    <logged-in (loggedInUser)="loggedInUser($event)"></logged-in>
+    <div class="row">
+      <create-post [(user)]="post_user"></create-post>
+    </div>
+    <div class="row">
+      <h1>Feed</h1>
+      <feed [(sub)]="feed_sub.name"></feed>
+    </div>
+  </div>
 </div>
