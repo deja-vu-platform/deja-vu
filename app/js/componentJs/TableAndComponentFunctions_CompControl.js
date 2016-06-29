@@ -17,7 +17,7 @@ function loadTable(componentToShow) {
     numCols = componentToShow.dimensions.cols;
     createTable();
 
-    $('#table-container td').each(function () {
+    $('.cell').each(function () {
         var cellId = $(this).get(0).id;
         var rowcol = getRowColFromId(cellId);
         var row = rowcol.row;
@@ -251,7 +251,7 @@ function attachMergeHandlers() {
                     'nw': '#drag-handle-nw' + '_' + row + '_' + col
                 },
                 start: function (event, ui) {
-                    $('#guide-grid-container td').css({
+                    $('.grid').css({
                         border: '#cdcdcd 1px dotted',
                         visibility: 'visible'
                     });
@@ -311,7 +311,7 @@ function attachMergeHandlers() {
                     // In case the cell we are resizing was already merged (ie, we are making it smaller,
                     // then the cell we want to merge will not be visible. So we need to use the grid.
                     // For that, we first make the grid visible and able to take mouse events
-                    $('#guide-grid-container td').css({
+                    $('.grid').css({
                         'z-index': 100,
                         visibility: 'visible',
                         'pointer-events': 'visiblePainted',
@@ -327,7 +327,7 @@ function attachMergeHandlers() {
                     // document.querySelectorAll(':hover');
 
                     // then we reset these values
-                    $('#guide-grid-container td').css({
+                    $('.grid').css({
                         'z-index': 0,
                         visibility: 'hidden',
                         'pointer-events': 'none',
@@ -352,7 +352,7 @@ function attachMergeHandlers() {
                     }
 
                     // rest event handlers
-                    $('#guide-grid-container td').css({
+                    $('.grid').css({
                         border: 'none',
                     });
                     $('.drag-handle').mouseenter(function (event, ui) {
@@ -698,7 +698,7 @@ function mergeCells(cell1Id, cell2Id, component) {
         var dragContainer = $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum);
         dragContainer.css('display', 'block');
 
-
+        showMergeHandle(topRowNum,leftColNum);
 
 
     }
@@ -796,7 +796,7 @@ function unmergeCells(cellToUnmergeId, component) {
             dragContainerToShow.css({
                 display: 'block',
             });
-
+            resetMergeHandleVisibility(row,col);
         }
     }
 
@@ -804,7 +804,6 @@ function unmergeCells(cellToUnmergeId, component) {
         // add the component to the cell
         displayComponentInTable(topLeftCellId, false, component);
     }
-
     resetAllMergeHandleContainersSizeAndPosition();
 }
 
@@ -847,6 +846,18 @@ function resetMergeHandleVisibility(row,col){
 
     cell.data('show-merge-handles', false)
 }
+
+function showMergeHandle(row,col){
+    var cell = $("#cell" + '_' + row + '_' + col);
+    var dragHandleContainer = $('#drag-handle-container' + '_' + row + '_' + col);
+
+    dragHandleContainer.find('.drag-handle').css({
+        display: 'block',
+    });
+
+    cell.data('show-merge-handles', true);
+}
+
 
 function resetAllMergeHandleVisibilityExcept(spRow,spCol) {
     for (var row = 1; row <= numRows; row++) {
@@ -1033,20 +1044,20 @@ function addRowColResizeHandlers(){
                             //'#table-container .row_' + row + ' .ui-resizable-s' +
                             ' .ui-resizable-s-row_'+row,
             start: function(){
-                $('#guide-grid-container td').css({
+                $('.grid').css({
                     visibility: 'visible',
                     border: 'black 1px dotted',
                 });
                 $('#drag-handle-containers-container').css({
                     visibility: 'hidden',
                 });
-                $('#table-container td').css({
+                $('.cell').css({
                     opacity: '.5',
                 });
 
             },
             stop: function () {
-                $('#guide-grid-container td').css({
+                $('.grid').css({
                     visibility: 'hidden',
                     'background-color': 'transparent'
                 });
@@ -1054,7 +1065,7 @@ function addRowColResizeHandlers(){
                     visibility: 'visible',
                 });
 
-                $('#table-container td').css({
+                $('.cell').css({
                     opacity: '1',
                 });
                 saveRowColRatiosGrid();
@@ -1099,20 +1110,20 @@ function addRowColResizeHandlers(){
                         //'#drag-handle-containers-container .col_' + col
             ,
             start: function(){
-                $('#guide-grid-container td').css({
+                $('.grid').css({
                     visibility: 'visible',
                     border: 'black 1px dotted',
                 });
                 $('#drag-handle-containers-container').css({
                     visibility: 'hidden',
                 });
-                $('#table-container td').css({
+                $('.cell').css({
                     opacity: '.5',
                 });
 
             },
             stop: function () {
-                $('#guide-grid-container td').css({
+                $('.grid').css({
                     visibility: 'hidden',
                     'background-color': 'transparent'
                 });
@@ -1120,7 +1131,7 @@ function addRowColResizeHandlers(){
                     visibility: 'visible',
                 });
 
-                $('#table-container td').css({
+                $('.cell').css({
                     opacity: '1',
                 });
                 saveRowColRatiosGrid();

@@ -283,7 +283,7 @@ function deleteComponentFromUserComponentAndFromView(cellId) {
             $(cell).find('.display-component').remove();
             $(cell).find('.widget').remove();
 
-            resetDroppability(cellId);
+            resetDroppabilityAt(cellId);
             updateBitmap();
 
         }
@@ -540,23 +540,18 @@ function registerZoom() {
 
 }
 
-
-function resetDroppability(cellId) {
-    if (cellId){
-        if ($('#'+cellId).get(0).getElementsByClassName('draggable').length == 0) {
-            $('#'+cellId).removeClass('dropped');
-            $('#'+cellId).addClass('droppable');
-            $('#'+cellId).droppable('enable');
-        }
-    } else {
-        $('#table-container td').each(function() {
-            if ($(this).get(0).getElementsByClassName('draggable').length == 0) {
-                $(this).removeClass('dropped');
-                $(this).addClass('droppable');
-                $(this).droppable('enable');
-            }
-        });
+function resetDroppabilityAt(cellId){
+    if ($('#'+cellId).get(0).getElementsByClassName('draggable').length == 0) {
+        $('#'+cellId).removeClass('dropped');
+        $('#'+cellId).addClass('droppable');
+        $('#'+cellId).droppable('enable');
     }
+}
+
+function resetDroppability() {
+    $('.cell').each(function() {
+        resetDroppabilityAt(this.id);
+    });
 }
 
 function movedComponent() {
