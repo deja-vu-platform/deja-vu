@@ -139,11 +139,30 @@ function createTable() {
     var tableGrid = document.createElement('table');
     tableGrid.className = 'main-table';
     tableGrid.id = 'main-cell-table';
-    for (var row = 1; row <= numRows; row++) {
+    for (var row = 0; row <= numRows; row++) {
         var tr = createEmptyRow(row);
-        for (var col = 1; col <= numCols; col++) {
-            var td = createTableCell(row, col);
+        for (var col = 0; col <= numCols; col++) {
+            if ((row === 0)||(col === 0)){
+                if (row === 0){
+                    if (col===0){
+                        var td = document.createElement('td');
+                        td.className = 'zero-height zero-width col' + '_' + col;
+                        td.id = 'cell' + '_' + row + '_' + col;
+                    } else {
+                        var td = document.createElement('td');
+                        td.className = 'zero-height col' + '_' + col;
+                        td.id = 'cell' + '_' + row + '_' + col;
+                    }
+                } else {
+                    var td = document.createElement('td');
+                    td.className = 'zero-width col' + '_' + col;
+                    td.id = 'cell' + '_' + row + '_' + col;
+                }
+            } else {
+                var td = createTableCell(row, col);
+            }
             tr.appendChild(td);
+
         }
         tableGrid.appendChild(tr);
 
@@ -637,6 +656,15 @@ function mergeCells(cell1Id, cell2Id, component) {
             }
         }
 
+        // Make the first cell take the correct size
+        var cellTopLeft = $("#" + topLeftCellId);
+        var rowspan = bottomRowNum - topRowNum + 1;
+        var colspan = rightColNum - leftColNum + 1;
+        cellTopLeft.attr("rowSpan", rowspan);
+        cellTopLeft.attr("colSpan", colspan);
+
+        selectedUserComponent.layout[topRowNum][leftColNum].spans = {row:rowspan,col:colspan};
+
         // mark cell as merged and reset hiding status incase it was hidden before
         $('#' + topLeftCellId).data('merged', {isMerged: true,
             topLeftCellId: topLeftCellId,
@@ -645,7 +673,15 @@ function mergeCells(cell1Id, cell2Id, component) {
             bottomRightCellId: bottomRightCellId
         });
 
-        // find the new width and height
+        selectedUserComponent.layout[topRowNum][leftColNum].merged = {isMerged: true,
+            topLeftCellId: topLeftCellId,
+            topRightCellId: topRightCellId,
+            bottomLeftCellId: bottomLeftCellId,
+            bottomRightCellId: bottomRightCellId};
+        selectedUserComponent.layout[topRowNum][leftColNum].hidden = {isHidden: false, hidingCellId: ''};
+
+
+        // find the new width and height (after the cell merge data is updated)
         var widthheight = calculateMergedCellWidthHeight(topLeftCellId);
 
 
@@ -657,32 +693,18 @@ function mergeCells(cell1Id, cell2Id, component) {
 
         selectedUserComponent.layout[topRowNum][leftColNum].ratio.cell = {width: widthheight.width/(gridWidth-20), height: widthheight.height/(gridHeight-20)};
 
-
         $('#' + topLeftCellId).data('hidden', {isHidden: false, hidingCellId: ''});
 
         var dragContainer = $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum);
         dragContainer.css('display', 'block');
 
 
+
+
     }
 
     // Do these even if the cell is just merging to itself
 
-    // Make the first cell take the correct size
-    var cellTopLeft = $("#" + topLeftCellId);
-    var rowspan = bottomRowNum - topRowNum + 1;
-    var colspan = rightColNum - leftColNum + 1;
-    cellTopLeft.attr("rowSpan", rowspan);
-    cellTopLeft.attr("colSpan", colspan);
-
-    // update the datatype
-    selectedUserComponent.layout[topRowNum][leftColNum].spans = {row:rowspan,col:colspan};
-    selectedUserComponent.layout[topRowNum][leftColNum].merged = {isMerged: true,
-                                                                    topLeftCellId: topLeftCellId,
-                                                                    topRightCellId: topRightCellId,
-                                                                    bottomLeftCellId: bottomLeftCellId,
-                                                                    bottomRightCellId: bottomRightCellId};
-    selectedUserComponent.layout[topRowNum][leftColNum].hidden = {isHidden: false, hidingCellId: ''};
 
 
     // then put the component in there
@@ -865,6 +887,7 @@ function calculateMergedCellWidthHeight(cellId){
 
 
 function alignCellsWithGrid(){
+    resetAligners();
     for (var row = 1; row <= numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             var grid = $("#grid" + '_' + row + '_' + col);
@@ -918,32 +941,34 @@ function initialResizeCells(numRows, numCols) {
     //console.log(cellWidth);
     //console.log(cellHeight);
 
+    resetAligners();
+
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){
             var widthRatioCell = selectedUserComponent.layout[row][col].ratio.cell.width;
             var heightRatioCell = selectedUserComponent.layout[row][col].ratio.cell.height;
-            var thisCellWidth = widthRatioCell*(gridWidth-20);
-            var thisCellHeight = heightRatioCell*(gridHeight-20);
+            var thisCellWidth = widthRatioCell * (gridWidth - 20);
+            var thisCellHeight = heightRatioCell * (gridHeight - 20);
 
 
             var widthRatioGrid = selectedUserComponent.layout[row][col].ratio.grid.width;
             var heightRatioGrid = selectedUserComponent.layout[row][col].ratio.grid.height;
-            var thisGridCellWidth = widthRatioGrid*(gridWidth-20);
-            var thisGridCellHeight = heightRatioGrid*(gridHeight-20);
+            var thisGridCellWidth = widthRatioGrid * (gridWidth - 20);
+            var thisGridCellHeight = heightRatioGrid * (gridHeight - 20);
 
             var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
             $('#cell' + '_' + row + '_' + col).css({
                 width: thisCellWidth + 'px',
                 height: thisCellHeight + 'px',
-            })
+            });
             $('#grid' + '_' + row + '_' + col).css({
                 width: thisGridCellWidth + 'px',
                 height: thisGridCellHeight + 'px',
-            })
+            });
         }
     }
 
-    //saveRowColRatios(); // adding rows/cols changes the ratios, so...
+    //saveRowColRatiosCells(); // adding rows/cols changes the ratios, so...
                         // although, it doesn't actually matter since if no row/col is resized, then the table size isn't
                         // updated, so the old ratios still work
                         // but if they are resized, the table size is updated but so are the ratios!
@@ -954,6 +979,36 @@ function initialResizeCells(numRows, numCols) {
     getCSSRule('.tooltip').style.setProperty('left', -1 * Math.floor((tooltipWidth - (cellWidth - 40)) / 2) + 'px', null);
 
     resizeLabelDivs(cellWidth, cellHeight);
+
+}
+
+function resetAligners() {
+    $('#cell_0_0').css({
+        width: '1px',
+        height: '1px',
+    });
+
+    // 0th col
+    for (var row = 1; row<=numRows; row++){
+        var heightRatioGrid = selectedUserComponent.layout[row][1].ratio.grid.height;
+        var thisGridCellHeight = heightRatioGrid * (gridHeight - 20);
+        $('#cell' + '_' + row + '_' + 0).css({
+            width: '1px',
+            height: thisGridCellHeight + 'px',
+        })
+    }
+
+    // 0th row
+    for (var col = 1; col<=numCols; col++) {
+        var widthRatioGrid = selectedUserComponent.layout[1][col].ratio.grid.width;
+        var thisGridCellWidth = widthRatioGrid * (gridWidth - 20);
+
+        $('#cell' + '_' + 0 + '_' + col).css({
+            width: thisGridCellWidth + 'px',
+            height: '1px',
+        })
+
+    }
 
 }
 
@@ -1002,13 +1057,13 @@ function addRowColResizeHandlers(){
                 $('#table-container td').css({
                     opacity: '1',
                 });
-
+                saveRowColRatiosGrid();
                 hideBaseComponentDisplayAll();
                 alignCellsWithGrid();
                 updateBaseComponentDisplayAll();
                 showBaseComponentDisplayAll();
                 resetAllMergeHandleContainersSizeAndPosition();
-                saveRowColRatios();
+                saveRowColRatiosCells();
             }
         });
 
@@ -1068,13 +1123,13 @@ function addRowColResizeHandlers(){
                 $('#table-container td').css({
                     opacity: '1',
                 });
-
+                saveRowColRatiosGrid();
                 hideBaseComponentDisplayAll();
                 alignCellsWithGrid();
                 updateBaseComponentDisplayAll();
                 showBaseComponentDisplayAll();
                 resetAllMergeHandleContainersSizeAndPosition();
-                saveRowColRatios();
+                saveRowColRatiosCells();
             }
         });
 
@@ -1203,7 +1258,8 @@ function addTableResizeHandler(){
         },
         stop: function () {
             resetAllMergeHandleContainersSizeAndPosition();
-            saveRowColRatios();
+            saveRowColRatiosCells();
+            saveRowColRatiosGrid();
         }
     });
 
@@ -1220,7 +1276,7 @@ function addTableResizeHandler(){
 
 }
 
-function saveRowColRatios(){
+function saveRowColRatiosCells(){
     // save the new table dimensions
     selectedUserComponent.layout.tablePxDimensions.width = parseFloat($('#main-grid-table').css('width'));
     selectedUserComponent.layout.tablePxDimensions.height = parseFloat($('#main-grid-table').css('height'));
@@ -1237,7 +1293,20 @@ function saveRowColRatios(){
 
             selectedUserComponent.layout[row][col].ratio.cell.width = widthRatioCell;
             selectedUserComponent.layout[row][col].ratio.cell.height = heightRatioCell;
+        }
+    }
 
+}
+
+function saveRowColRatiosGrid(){
+    // save the new table dimensions
+    selectedUserComponent.layout.tablePxDimensions.width = parseFloat($('#main-grid-table').css('width'));
+    selectedUserComponent.layout.tablePxDimensions.height = parseFloat($('#main-grid-table').css('height'));
+    gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
+    gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
+
+    for (var row = 1; row<=numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
             var grid = $('#grid' + '_' + row + '_' + col);
             var gridCellWidth = parseFloat(grid.css('width'));
             var gridCellHeight = parseFloat(grid.css('height'));
@@ -1250,6 +1319,7 @@ function saveRowColRatios(){
     }
 
 }
+
 
 
 function addRowColAddRemoveButtons(){
@@ -1716,7 +1786,7 @@ function findDeletedCoord() {
 
 function updateBitmap() {
     bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
-    $('#table-container td').each(function () {
+    $('.cell').each(function () {
         var cellId = $(this).attr('id');
         var rowcol = getRowColFromId(cellId);
         var row = Number(rowcol.row) - 1;

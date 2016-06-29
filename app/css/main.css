@@ -156,10 +156,10 @@ li#selected {
 
 
 /*===================================================
-                  GRID
+                  MAIN TABLE
 ===================================================*/
 .main-table {
-    /*table-layout: fixed !important;*/
+    table-layout: fixed !important;
     border-collapse: inherit;
     -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.2);
     padding: 10px;
@@ -230,6 +230,18 @@ td {
 #guide-grid-container td {
     background-color: transparent;
     pointer-events: none;
+}
+
+.zero-height{
+    height: 1px;
+    border: 0;
+    visibility: hidden;
+}
+
+.zero-width{
+    width: 1px;
+    border: 0;
+    visibility: hidden;
 }
 
 .drag-handle{
