@@ -3,7 +3,8 @@
 // (which is mostly connected to the table)
 
 /** ** ** ** ** Global variables for this file ** ** ** ** ** **/
-
+const DEFAULT_CONTAINER_WIDTH = '3000px';
+const DEFAULT_CONTAINER_HEIGHT = '3000px';
 
 /** ** ** ** ** ** ** Table Related Functions ** ** ** ** ** ** **/
 
@@ -1001,6 +1002,7 @@ function addRowColResizeHandlers(){
                           //  '#drag-handle-containers-container .row_' + row + ', ' +
                             //'#table-container .row_' + row + ' .ui-resizable-s' +
                             ' .ui-resizable-s-row_'+row,
+            containment: "#guide-grid-container",
             start: function(){
                 $('.grid').css({
                     visibility: 'visible',
@@ -1267,6 +1269,60 @@ function addTableResizeHandler(){
         right: 0,
         'pointer-events': 'auto',
     });
+
+}
+
+function addTableSizeLockUnlockButton(){
+    //glyphicon icon-lock
+    var span = document.createElement('span');
+    span.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<img src="images/unlock_icon.png" width="20px" height="20px">' +
+        '</button>';
+
+    var tableSizeLockUnlockButton = span.firstChild;
+    tableSizeLockUnlockButton.id = 'btn-table-lock-unlock';
+    $(tableSizeLockUnlockButton).data('locked', false).css({
+        position: 'absolute',
+        top:'-45px',
+        right:'-20px'
+
+    });
+
+    $(tableSizeLockUnlockButton).on("click", function (e) {
+        var locked = $(this).data('locked');
+        if (locked){
+            // unlock it
+            $(this).find('img').get(0).src = 'images/unlock_icon.png';
+            $('#table-container').css({
+                height: DEFAULT_CONTAINER_HEIGHT,
+                width: DEFAULT_CONTAINER_WIDTH
+            });
+            $('#guide-grid-container').css({
+                height: DEFAULT_CONTAINER_HEIGHT,
+                width: DEFAULT_CONTAINER_WIDTH
+            });
+
+
+        } else {
+            // lock it
+            $(this).find('img').get(0).src = 'images/lock_icon.png';
+            var width = $('#main-grid-table').css('width');
+            var height = $('#main-grid-table').css('height');
+
+            $('#table-container').css({
+                height: height,
+                width: width
+            });
+            $('#guide-grid-container').css({
+                height: height,
+                width: width
+            });
+        }
+        $(this).data('locked', !locked);
+
+    });
+
+    $('#main-cell-table').append(tableSizeLockUnlockButton);
 
 }
 

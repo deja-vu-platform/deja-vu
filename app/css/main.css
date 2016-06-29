@@ -201,8 +201,8 @@ td {
 }
 
 #outer-container {
-    width: 1000px;
-    height: 600px;
+    width: 3500px;
+    height: 3500px;
     border: 1px solid #dddddd;
     margin-left: 200px;
     /*overflow: scroll;*/
@@ -210,18 +210,18 @@ td {
     /*-webkit-transform: scale(0.45,0.45);*/
 }
 #middle-container {
-    width: 2050px;
-    height: 1400px;
+    /*width: 2050px;*/
+    /*height: 1400px;*/
 }
 .inner-container {
-    width: 2000px;
-    height: 650px;
-    display: block;
+    /*width: 2000px;*/
+    /*height: 650px;*/
+    /*display: block;*/
 }
 
 #table-container, #guide-grid-container{
-    height: 5000px;
-    width: 5000px;
+    height: 3000px;
+    width: 3000px;
     margin: 50px 100px 10px 50px;
     float: left;
     position: absolute;
