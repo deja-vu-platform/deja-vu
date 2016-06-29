@@ -682,6 +682,7 @@ function mergeCells(cell1Id, cell2Id, component) {
 
 
         // find the new width and height (after the cell merge data is updated)
+        // this actually isn't necessary, but let's keep it until it proves to cause trouble
         var widthheight = calculateMergedCellWidthHeight(topLeftCellId);
 
 
@@ -698,9 +699,6 @@ function mergeCells(cell1Id, cell2Id, component) {
         var dragContainer = $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum);
         dragContainer.css('display', 'block');
 
-        showMergeHandle(topRowNum,leftColNum);
-
-
     }
 
     // Do these even if the cell is just merging to itself
@@ -713,6 +711,7 @@ function mergeCells(cell1Id, cell2Id, component) {
         displayComponentInTable(topLeftCellId, false, component);
     }
 
+    showMergeHandle(topRowNum,leftColNum);
     resetAllMergeHandleContainersSizeAndPosition();
 
 }
@@ -934,17 +933,13 @@ function alignCellsWithGrid(){
  */
 function initialResizeCells(numRows, numCols) {
     if (!selectedUserComponent.layout.tablePxDimensions.isSet){
-        selectedUserComponent.layout.tablePxDimensions.width = gridWidth;
-        selectedUserComponent.layout.tablePxDimensions.height = gridHeight;
+        selectedUserComponent.layout.tablePxDimensions.width = DEFAULT_GRID_WIDTH;
+        selectedUserComponent.layout.tablePxDimensions.height = DEFAULT_GRID_HEIGHT;
         selectedUserComponent.layout.tablePxDimensions.isSet = true;
-    } else {
-        gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
-        gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
-        //$('.main-table').css({
-        //    width: gridWidth,
-        //    height: gridHeight
-        //})
     }
+
+    gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
+    gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
 
     cellWidth = ((gridWidth-20) / numCols);
     cellHeight = ((gridHeight-20) / numRows);
@@ -979,14 +974,6 @@ function initialResizeCells(numRows, numCols) {
         }
     }
 
-    //saveRowColRatiosCells(); // adding rows/cols changes the ratios, so...
-                        // although, it doesn't actually matter since if no row/col is resized, then the table size isn't
-                        // updated, so the old ratios still work
-                        // but if they are resized, the table size is updated but so are the ratios!
-                        // But I would like the ratios to always be 1.
-
-    //getCSSRule('td').style.setProperty('width', cellWidth + 'px', null);
-    //getCSSRule('td').style.setProperty('height', cellHeight + 'px', null);
     getCSSRule('.tooltip').style.setProperty('left', -1 * Math.floor((tooltipWidth - (cellWidth - 40)) / 2) + 'px', null);
 
     resizeLabelDivs(cellWidth, cellHeight);
@@ -1451,7 +1438,7 @@ function addRowToEnd() {
 
     //selectedUserComponent.recalculateRatios(1,0);
     loadTable(selectedUserComponent);
-
+    saveRowColRatiosCells();
 
 }
 
@@ -1507,6 +1494,7 @@ function removeEndRow() {
 
     //selectedUserComponent.recalculateRatios(-1,0);
     loadTable(selectedUserComponent);
+    saveRowColRatiosCells();
 
 }
 
@@ -1536,7 +1524,7 @@ function addColToEnd() {
     }
     //selectedUserComponent.recalculateRatios(0,1);
     loadTable(selectedUserComponent);
-
+    saveRowColRatiosCells();
 }
 
 /**
@@ -1591,7 +1579,7 @@ function removeEndCol() {
     // and save rowcol ratios
 
     loadTable(selectedUserComponent);
-
+    saveRowColRatiosCells();
 }
 
 

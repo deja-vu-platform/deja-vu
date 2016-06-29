@@ -166,6 +166,11 @@ li#selected {
     position: relative;
 }
 
+#main-cell-table{
+    padding: 9px 10px 10px 9px;
+}
+
+
 .main-table::after {
     content: 'Component name: ';
     display: block;
