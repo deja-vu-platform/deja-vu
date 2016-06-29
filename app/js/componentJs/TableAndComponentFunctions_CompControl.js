@@ -1683,7 +1683,7 @@ function deleteUserComponent(userComponentId){
     if (selectedProject.numComponents === 1){
         return; //don't delete the last one TODO is the the right way to go?
     }
-    delete selectedProject.components[userComponentId];
+    selectedProject.removeComponent(userComponentId);
     if (userComponentId === selectedUserComponent.meta.id){
         var otherIds = Object.keys(selectedProject.components);
         selectedUserComponent = selectedProject.components[otherIds[0]];
