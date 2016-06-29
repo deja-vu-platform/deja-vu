@@ -1,1 +1,8 @@
 cliche Comment
+
+data Comment {
+  content: Text,
+  target: Target
+}
+
+data Target {}

@@ -1,11 +1,11 @@
 cliche Bookmark
 
-use Follow as Follow_1, Follow as Follow_2, Auth, Feed, Label, Post
+use Follow, Follow, Auth, Feed, Label, Post
 
 data User {
-  posts: *Post,
+  posts: set Post,
   username: Text,
-  follows: *User
+  follows: set User
 }
 
 data Post {
@@ -17,21 +17,23 @@ data Topic {
   name: Text
 }
 
-/*
-Feed/Publisher
-Feed/published
-posts
-*/
-
-bond Follow_1/Source, Follow_1/Target, Follow_2/Source, Auth/User, Post/User,
-     Feed/Subscriber, Feed/Publisher, User
-bond Label/Item, Post/Post, Feed/Message, Post
-bond Label/Label, Follow_2/Target, Feed/Publisher, Topic
-bond Feed/published, Post/posts, posts
-bond Post/content, Feed/content, content
-bond Feed/published, Label/labels, posts
-bond Follow_1/follows, Feed/subscriptions, follows
-bond Label/labels, topics
-bond Follow_1/Source.name, Follow_1/Target.name, Follow_2/Source.name,
-     Follow_2/Target.name, Auth/username, Post/username, Feed/Subscriber.name,
-     Feed/Publisher.name, username
+bond {
+  Follow_1/Source, Follow_1/Target, Follow_2/Source,
+  Auth/User, Post/User, Feed/Subscriber, Feed/Publisher,
+  User
+}
+bond { Label/Item, Post/Post, Feed/Message, Post }
+bond {
+  Label/Label, Follow_2/Target, Feed/Publisher, Topic
+}
+bond { Feed/published, Post/posts, posts }
+bond { Post/content, Feed/content, content }
+bond { Feed/published, Label/labels, posts }
+bond { Follow_1/follows, Feed/subscriptions, follows }
+bond { Label/labels, topics }
+bond {
+  Follow_1/Source.name, Follow_1/Target.name,
+  Follow_2/Source.name, Follow_2/Target.name,
+  Auth/username, Post/username, Feed/Subscriber.name,
+  Feed/Publisher.name, username
+}
