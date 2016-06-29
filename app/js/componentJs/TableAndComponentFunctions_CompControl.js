@@ -178,6 +178,7 @@ function createTable() {
     addRowColAddRemoveButtons();
 
     addRowColResizeHandlers();
+    addTableResizeHandler();
     addClearButtons();
 
     bitmapOld = make2dArray(numRows, numCols);
@@ -1062,6 +1063,7 @@ function addRowColResizeHandlers(){
                 showBaseComponentDisplayAll();
                 resetAllMergeHandleContainersSizeAndPosition();
                 saveRowColRatiosCells();
+                updateTableResizeHandler();
             }
         });
 
@@ -1128,6 +1130,7 @@ function addRowColResizeHandlers(){
                 showBaseComponentDisplayAll();
                 resetAllMergeHandleContainersSizeAndPosition();
                 saveRowColRatiosCells();
+                updateTableResizeHandler();
             }
         });
 
@@ -1234,31 +1237,53 @@ function showBaseComponentDisplayRow(row){
     }
 }
 
-
+function updateTableResizeHandler() {
+    $('#table-resize-div').css({
+        width: $('#main-grid-table').css('width'),
+        height: $('#main-grid-table').css('height'),
+    });
+}
 
 function addTableResizeHandler(){
-    // TODO THIS DOES NOT WORK!
+    var tableResizeDiv = document.createElement('div');
+    tableResizeDiv.id = 'table-resize-div';
+
     var dragHandle = document.createElement('span');
 
-    dragHandle.innerHTML = '<img src="images/drag_handle_icon.png" width="15px" height="15px">';
+    dragHandle.innerHTML = '<img src="images/drag_handle_se_icon.png" width="15px" height="15px">';
     dragHandle.className = 'ui-resizable-handle ui-resizable-se';
     dragHandle.id = 'table-drag-handle';
 
+    $('#guide-grid-container').append(tableResizeDiv);
 
-    $('#main-cell-table').append(dragHandle).resizable({
+    $(tableResizeDiv).append(dragHandle).resizable({
         handles: {
             'se': '#table-drag-handle'
         },
-        alsoResize: '#main-grid-table',
-        resize: function () {
-            // TODO get rid of this later!
-            resetAllMergeHandleContainersSizeAndPosition();
+        start: function(){
+            $(this).css({
+                border: '#cdcdcd 1px dotted',
+            })
         },
         stop: function () {
-            resetAllMergeHandleContainersSizeAndPosition();
-            saveRowColRatiosCells();
-            saveRowColRatiosGrid();
+            $(this).css({
+                border: 'none',
+            });
+            selectedUserComponent.layout.tablePxDimensions.width = parseFloat($('#table-resize-div').css('width'));
+            selectedUserComponent.layout.tablePxDimensions.height = parseFloat($('#table-resize-div').css('height'));
+            gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
+            gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
+
+            loadTable(selectedUserComponent);
         }
+    }).css({
+        'pointer-events':'none',
+        position: 'absolute',
+        visibility: 'visible',
+        top: 0,
+        left: 0,
+        width: $('#main-grid-table').css('width'),
+        height: $('#main-grid-table').css('height'),
     });
 
     $('#table-drag-handle').css({
@@ -1269,7 +1294,8 @@ function addTableResizeHandler(){
         top: 'auto',
         bottom: 0,
         left: 'auto',
-        right: 0
+        right: 0,
+        'pointer-events': 'auto',
     });
 
 }

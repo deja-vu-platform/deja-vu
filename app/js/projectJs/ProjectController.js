@@ -28,6 +28,8 @@ $(function () {
     var currentProject = window.sessionStorage.getItem('selectedProject');
 
     if (currentProject){
+
+        // TODO set user inputs only in text
         $('.current-project .content').html('<a href="projectView">'+JSON.parse(currentProject).meta.name + '</a>');
     } else {
         $('.current-project').css({
