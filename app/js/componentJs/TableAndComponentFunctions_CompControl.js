@@ -530,9 +530,11 @@ function safeToMerge(cell1Id, cell2Id){
 }
 
 /**
- * here cell1 is the one whose component (if any) will be saved in case of a merge
+ *
+ * @param oldTopLeftCellId
  * @param cell1Id
  * @param cell2Id
+ * @param component
  */
 function openMergeConfirmDialogue(oldTopLeftCellId, cell1Id, cell2Id, component){
     $('#confirm-merge').modal('show');
@@ -552,61 +554,8 @@ function openMergeConfirmDialogue(oldTopLeftCellId, cell1Id, cell2Id, component)
         resetMergeHandleContainerSizeAndPositionCellId(oldTopLeftCellId);
         $('#confirm-merge').modal('hide');
     });
-
-
 };
 
-//$('#merge-btn').click(function(){
-//    var cell1Id =  $('#merge-btn').data('cell1Id');
-//    var cell2Id =  $('#merge-btn').data('cell2Id');
-//
-//    var rowcol1 = getRowColFromId(cell1Id);
-//    var row1 = rowcol1.row;
-//    var col1 = rowcol1.col;
-//
-//    if (selectedUserComponent.components[row1]){
-//        mergeCells(cell1Id, cell2Id, selectedUserComponent.components[row1][col1]);
-//    } else {
-//        mergeCells(cell1Id, cell2Id);
-//    }
-//
-//    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
-//});
-//
-//$('#merge-cancel-btn').click(function(){
-//    var cell1Id =  $('#merge-btn').data('cell1Id');
-//
-//    var rowcol1 = getRowColFromId(cell1Id);
-//    var row1 = rowcol1.row;
-//    var col1 = rowcol1.col;
-//
-//    if (selectedUserComponent.components[row1]){
-//        mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
-//    } else {
-//        mergeCells(cell1Id, cell1Id);
-//    }
-//
-//    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
-//    $('#confirm-merge').modal('hide');
-//});
-//
-//$('#confirm-merge .close').click(function(event){
-//    event.preventDefault();
-//    var cell1Id =  $('#merge-btn').data('cell1Id');
-//
-//    var rowcol1 = getRowColFromId(cell1Id);
-//    var row1 = rowcol1.row;
-//    var col1 = rowcol1.col;
-//
-//    if (selectedUserComponent.components[row1]){
-//        mergeCells(cell1Id, cell1Id, selectedUserComponent.components[row1][col1]);
-//    } else {
-//        mergeCells(cell1Id, cell1Id);
-//    }
-//
-//    $('#merge-btn').data('cell1Id', '').data('cell2Id','');
-//    $('#confirm-merge').modal('hide');
-//});
 
 /**
  * @param cell1Id
@@ -1744,31 +1693,26 @@ function deleteUserComponent(userComponentId){
 function openDeleteUserComponentConfirmDialogue(userComponentId){
     $('#confirm-delete-userComponent').modal('show');
     $('#delete-userComponent-name').text(selectedProject.components[userComponentId].meta.name);
-    $('#delete-userComponent-btn').data('deleteUserComponentId', userComponentId);
+
+    $('#delete-userComponent-btn').click(function(){
+        deleteUserComponent(userComponentId);
+
+        $('#delete-userComponent-name').text('');
+        $('#confirm-delete-userComponent').modal('hide');
+    });
+
+    $('#delete-userComponent-cancel-btn').click(function(){
+        $('#delete-userComponent-name').text('');
+        $('#confirm-delete-userComponent').modal('hide');
+    });
+
+    $('#confirm-delete-userComponent .close').click(function(event){
+        event.preventDefault();
+        $('#delete-userComponent-name').text('');
+        $('#confirm-delete-userComponent').modal('hide');
+    });
 };
 
-$('#delete-userComponent-btn').click(function(){
-    var userComponentId =  $('#delete-userComponent-btn').data('deleteUserComponentId');
-    deleteUserComponent(userComponentId);
-
-    $('#delete-userComponent-btn').data('deleteUserComponentId', '');
-
-    $('#delete-userComponent-name').text('');
-});
-
-$('#delete-userComponent-cancel-btn').click(function(){
-    $('#delete-userComponent-btn').data('deleteUserComponentId', '');
-
-    $('#delete-userComponent-name').text('');
-});
-
-$('#confirm-delete-userComponent .close').click(function(event){
-    event.preventDefault();
-    $('#delete-userComponent-btn').data('deleteUserComponentId', '');
-    $('#confirm-delete-userComponent').modal('hide');
-
-    $('#delete-userComponent-name').text('');
-});
 
 
 /**

@@ -11,6 +11,7 @@ var selectedProject;
 var projectsSavePath = path.join(__dirname, 'projects');
 
 var availableProjects = {};
+var currentProject;
 //TODO implement recent vs all
 
 // Initialization
@@ -25,16 +26,13 @@ $(function () {
         window.sessionStorage - stores data for one session (data is lost when the browser tab is closed)
 
      */
-    var currentProject = window.sessionStorage.getItem('selectedProject');
+    currentProject = window.sessionStorage.getItem('selectedProject');
 
     if (currentProject){
-
-        // TODO set user inputs only in text
-        $('.current-project .content').html('<a href="projectView">'+JSON.parse(currentProject).meta.name + '</a>');
-    } else {
-        $('.current-project').css({
-            //display: 'none'
-        })
+        currentProject = JSON.parse(currentProject);
+        var currentProjectLink = document.createElement('a');
+        $('.current-project .content').html('').append(currentProjectLink);
+        $(currentProjectLink).text(currentProject.meta.name);
     }
 
     readFiles(projectsSavePath, function(filename, content) {
@@ -49,7 +47,7 @@ $(function () {
                 '<div class="project-name">'+sanitizeStringOfSpecialChars(filenameToProjectName(filename))+'</div>' +
                 '</div></li>';
             $('#recent-projects-list').append(projectLink);
-            addDeleteProjectButton(projectsSavePath, filename);
+            addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
         }
     }, function(err) {
         throw err;
@@ -158,13 +156,20 @@ function deleteFile(dirname, filename){
 }
 
 
-function deleteFileAndDisplay(dirname, filename){
+function deleteFileAndDisplay(dirname, filename, id){
     deleteFile(dirname, filename);
     $(".recent-projects").find("[data-filename='" + filename + "']").parent().remove();
+
+    if (currentProject){
+        if (currentProject.meta.id === id){
+            currentProject = null;
+            $('.current-project .content').html('');
+        }
+    }
 }
 
 
-function addDeleteProjectButton(dirname, filename){
+function addDeleteProjectButton(dirname, filename, id){
     var spDelete = document.createElement('span');
     spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-project">' +
             //'<span>Delete User Component </span>' +
@@ -176,7 +181,7 @@ function addDeleteProjectButton(dirname, filename){
 
     $(buttonDeletProject).on("click", function (e) {
         // todo add safety
-        openDeleteProjectConfirmDialogue(dirname, filename);
+        openDeleteProjectConfirmDialogue(dirname, filename, id);
     });
 
 
@@ -203,37 +208,32 @@ function addDeleteProjectButton(dirname, filename){
 
 }
 
-function openDeleteProjectConfirmDialogue(dirname, filename){
-    var projectName = filenameToProjectName(filename);
+function openDeleteProjectConfirmDialogue(dirname, filename, id){
     $('#confirm-delete-project').modal('show');
+
+    var projectName = filenameToProjectName(filename);
     $('#delete-project-name').text(projectName);
-    $('#delete-project-btn').data('deleteProjectDirname', dirname).data('deleteFilename', filename);
+
+    $('#delete-project-btn').click(function(){
+        deleteFileAndDisplay(dirname, filename, id);
+
+        $('#delete-project-name').text('');
+        $('#confirm-delete-project').modal('hide');
+
+    });
+
+    $('#delete-project-cancel-btn').click(function(){
+        $('#delete-project-name').text('');
+        $('#confirm-delete-project').modal('hide');
+
+    });
+
+    $('#confirm-delete-project .close').click(function(event){
+        event.preventDefault();
+
+        $('#delete-project-name').text('');
+        $('#confirm-delete-project').modal('hide');
+    });
+
 };
-
-$('#delete-project-btn').click(function(){
-    var filename =  $('#delete-project-btn').data('deleteFilename');
-    var projectDirname =  $('#delete-project-btn').data('deleteProjectDirname');
-    deleteFileAndDisplay(projectDirname, filename);
-
-    $('#delete-project-btn').data('deleteFilename', '');
-    $('#delete-project-btn').data('deleteProjectDirname', '');
-
-    $('#delete-project-name').text('');
-});
-
-$('#delete-project-cancel-btn').click(function(){
-    $('#delete-project-btn').data('deleteFilename', '');
-    $('#delete-project-btn').data('deleteProjectDirname', '');
-
-    $('#delete-project-name').text('');
-});
-
-$('#confirm-delete-project .close').click(function(event){
-    event.preventDefault();
-    $('#delete-project-btn').data('deleteFilename', '');
-    $('#delete-project-btn').data('deleteProjectDirname', '');
-    $('#confirm-delete-project').modal('hide');
-
-    $('#delete-project-name').text('');
-});
 
