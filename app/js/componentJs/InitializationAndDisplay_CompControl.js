@@ -339,8 +339,12 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
                     selectedUserComponent.components[row][col].components[type] = value;
                 });
         } else { // pasted link to image
-            value.img_src = inputs[0].value;
-        } // TODO what if empty link given?
+            if (inputs[0].value.length>0){
+                value.img_src = inputs[0].value;
+            } else {
+                value.img_src = 'images/image_icon.png';
+            }
+        }
     } else if (type === 'panel') {
         value = {
             heading: $('#' + cellId).find('.panel-title')[0].textContent,
