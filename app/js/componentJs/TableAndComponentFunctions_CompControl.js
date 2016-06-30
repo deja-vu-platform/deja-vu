@@ -1049,17 +1049,6 @@ function addRowColResizeHandlers(){
         saveRowColRatiosCells();
         updateTableResizeHandler();
 
-        if (tableLockedResizeCol){
-            $('#guide-grid-container').css({
-                width: $('#main-grid-table').css('width'),
-            });
-        }
-        if (tableLockedResizeRow){
-            $('#guide-grid-container').css({
-                height: $('#main-grid-table').css('height'),
-            });
-        }
-
     };
 
     var tableLockedResizeRowFn = function(e, ui){
@@ -1288,7 +1277,7 @@ function addTableResizeHandler(){
         },
         start: function(){
             $(this).css({
-                border: '#cdcdcd 1px dotted',
+                border: 'black 1px dotted',
             })
         },
         stop: function () {
@@ -1327,13 +1316,6 @@ function addTableResizeHandler(){
 }
 
 
-function resetGuideGridContainer(){
-    $('#guide-grid-container').css({
-        height: DEFAULT_CONTAINER_HEIGHT,
-        width: DEFAULT_CONTAINER_WIDTH,
-    });
-}
-
 function addTableSizeLockUnlockButton(){
     tableLockedResizeCol = false;
     tableLockedResizeRow = false;
@@ -1362,12 +1344,6 @@ function addTableSizeLockUnlockButton(){
             tableLockedResizeCol = false;
             tableLockedResizeRow = false;
 
-
-            $('#guide-grid-container').css({
-                height: DEFAULT_CONTAINER_HEIGHT,
-                width: DEFAULT_CONTAINER_WIDTH,
-            });
-
             for (var col = 1; col < numCols; col++) {
                 $('#grid_1_' + col).resizable( "option", "containment", false );
             }
@@ -1390,16 +1366,11 @@ function addTableSizeLockUnlockButton(){
             tableLockedResizeCol = true;
             tableLockedResizeRow = true;
 
-            $('#guide-grid-container').css({
-                height: $('#main-grid-table').css('height'),
-                width: $('#main-grid-table').css('width'),
-            });
-
             for (var col = 1; col < numCols; col++) {
                 $('#grid_1_' + col).resizable( "option", "containment", '#guide-grid-container');
             }
             for (var row = 1; row < numRows; row++) {
-                $('#guide-grid-container .row_' + row).resizable("option", "containment", '#guide-grid-container');
+                $('#guide-grid-container .row_' + row).resizable("option", "containment", '#main-grid-table');
             }
 
             // Disable the last row and column
@@ -1579,11 +1550,11 @@ function addRowToEnd() {
         }
 
     }
-    resetGuideGridContainer();
+    
     //selectedUserComponent.recalculateRatios(1,0);
     loadTable(selectedUserComponent);
     saveRowColRatiosCells();
-
+    saveRowColRatiosGrid();
 }
 
 /**
@@ -1637,10 +1608,11 @@ function removeEndRow() {
     delete selectedUserComponent.layout[lastRowNum];
 
 
-    resetGuideGridContainer();
+    
     //selectedUserComponent.recalculateRatios(-1,0);
     loadTable(selectedUserComponent);
     saveRowColRatiosCells();
+    saveRowColRatiosGrid();
 
 }
 
@@ -1669,10 +1641,11 @@ function addColToEnd() {
         }
     }
 
-    resetGuideGridContainer();
+    
     //selectedUserComponent.recalculateRatios(0,1);
     loadTable(selectedUserComponent);
     saveRowColRatiosCells();
+    saveRowColRatiosGrid();
 }
 
 /**
@@ -1727,9 +1700,10 @@ function removeEndCol() {
     // and save rowcol ratios
 
 
-    resetGuideGridContainer();
+    
     loadTable(selectedUserComponent);
     saveRowColRatiosCells();
+    saveRowColRatiosGrid();
 }
 
 
