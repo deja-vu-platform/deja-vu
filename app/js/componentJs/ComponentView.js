@@ -76,6 +76,67 @@ function Display(cellId, html, callback) {
     if (callback) callback();
 }
 
+
+/**
+ *
+ * @param cellId
+ */
+function updateBaseComponentDisplayAt(cellId) {
+    var cell = $('#'+cellId);
+    var height = (parseFloat(cell.css('height'))-30) + 'px';
+    var width = (parseFloat(cell.css('width'))-10) + 'px';
+    var type = cell.get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    if (type === 'label'){
+        cell.find('.display-component').parent().css({
+            height: height,
+            width: width,
+        });
+    }
+    if (type === 'image'){
+        cell.find('.display-component').css({
+            'max-height': height,
+            'max-width': width,
+            height: 'auto',
+            width: 'auto',
+            'vertical-align':'top',
+
+        });
+    }
+
+    // TODO other types?
+
+}
+
+
+function hideBaseComponentDisplayAt(cellId){
+    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    if (type === 'label'){
+        $('#' + cellId).find('.display-component').parent().css({
+            display: 'none'
+        });
+    }
+    if (type === 'image'){
+        $('#' + cellId).find('.display-component').css({
+            display: 'none'
+        });
+    }
+}
+
+function showBaseComponentDisplayAt(cellId){
+    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    if (type === 'label'){
+        $('#' + cellId).find('.display-component').parent().css({
+            display: 'block'
+        });
+    }
+    if (type === 'image'){
+        $('#' + cellId).find('.display-component').css({
+            display: 'inline-block'
+        });
+    }
+}
+
+
 /**
  * Removes just the display part of the component. Useful for removing the old image
  * on upload

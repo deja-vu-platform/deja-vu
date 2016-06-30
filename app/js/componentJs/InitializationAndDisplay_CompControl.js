@@ -24,9 +24,6 @@ $(function () {
         // start a default component
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
-        //var grid = $('#table-container').get(0);
-        //gridWidth = grid.offsetWidth;
-        //gridHeight = grid.offsetHeight;
         createTable();
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
@@ -44,6 +41,7 @@ $(function () {
         loadTable(selectedUserComponent);
     }
 
+    //autoSave5Mins();
 
     basicComponents = $('#basic-components').html();
 
@@ -342,8 +340,12 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
                     selectedUserComponent.components[row][col].components[type] = value;
                 });
         } else { // pasted link to image
-            value.img_src = inputs[0].value;
-        } // TODO what if empty link given?
+            if (inputs[0].value.length>0){
+                value.img_src = inputs[0].value;
+            } else {
+                value.img_src = 'images/image_icon.png';
+            }
+        }
     } else if (type === 'panel') {
         value = {
             heading: $('#' + cellId).find('.panel-title')[0].textContent,
@@ -359,64 +361,6 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
         selectedUserComponent.components[row][col].components = {};
         selectedUserComponent.components[row][col].components[type] = value;
     }
-}
-
-function hideBaseComponentDisplayAt(cellId){
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    if (type === 'label'){
-        $('#' + cellId).find('.display-component').parent().css({
-            display: 'none'
-        });
-    }
-    if (type === 'image'){
-        $('#' + cellId).find('.display-component').css({
-            display: 'none'
-        });
-    }
-}
-
-function showBaseComponentDisplayAt(cellId){
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    if (type === 'label'){
-        $('#' + cellId).find('.display-component').parent().css({
-            display: 'block'
-        });
-    }
-    if (type === 'image'){
-        $('#' + cellId).find('.display-component').css({
-            display: 'inline-block'
-        });
-    }
-}
-
-/**
- *
- * @param cellId
- */
-function updateBaseComponentDisplayAt(cellId) {
-    var cell = $('#'+cellId);
-    var height = (parseFloat(cell.css('height'))-30) + 'px';
-    var width = (parseFloat(cell.css('width'))-10) + 'px';
-    var type = cell.get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    if (type === 'label'){
-        cell.find('.display-component').parent().css({
-            height: height,
-            width: width,
-        });
-    }
-    if (type === 'image'){
-        cell.find('.display-component').css({
-            'max-height': height,
-            'max-width': width,
-            height: 'auto',
-            width: 'auto',
-            'vertical-align':'top',
-
-        });
-    }
-
-    // TODO other types?
-
 }
 
 

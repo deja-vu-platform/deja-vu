@@ -1,4 +1,6 @@
 /** ** ** ** Global Variables ** ** ** **/
+const DEFAULT_GRID_WIDTH = 800;
+const DEFAULT_GRID_HEIGHT = 550;
 
 var numRows = DEFAULT_ROWS;
 var numCols = DEFAULT_COLS;
@@ -15,8 +17,8 @@ var selectedProject = null;
 var bitmapOld = null;
 var bitmapNew = null;
 
-var gridWidth = 800;
-var gridHeight = 550;
+var gridWidth = DEFAULT_GRID_WIDTH;
+var gridHeight = DEFAULT_GRID_HEIGHT;
 
 var currentZoom = 1.0;
 var basicComponents;
