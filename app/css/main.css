@@ -171,6 +171,11 @@ li#selected {
 }
 
 
+#main-grid-table{
+    padding: 10px 9px 10px 10px;
+}
+
+
 .main-table::after {
     content: 'Component name: ';
     display: block;
@@ -205,18 +210,6 @@ td {
     height: 3500px;
     border: 1px solid #dddddd;
     margin-left: 200px;
-    /*overflow: scroll;*/
-    /*-webkit-transform: scale(0.45,0.45);*/
-    /*-webkit-transform: scale(0.45,0.45);*/
-}
-#middle-container {
-    /*width: 2050px;*/
-    /*height: 1400px;*/
-}
-.inner-container {
-    /*width: 2000px;*/
-    /*height: 650px;*/
-    /*display: block;*/
 }
 
 #table-container, #guide-grid-container{

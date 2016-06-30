@@ -991,6 +991,14 @@ function checkWidthRatio(row){
     console.log(sum);
 }
 
+function getWidthSum(row){
+    var sum = 0;
+    for (var col = 1; col <= numCols; col++){
+        sum += parseFloat($('#grid'+'_'+row+'_'+col).css('width'));
+    }
+    return sum
+}
+
 
 function checkHeightRatio(col){
     var sum = 0;
@@ -999,6 +1007,15 @@ function checkHeightRatio(col){
     }
     console.log(sum);
 }
+
+function getHeightSum(col){
+    var sum = 0;
+    for (var row = 1; row <= numRows; row++){
+        sum += parseFloat($('#grid'+'_'+row+'_'+col).css('height'));
+    }
+    return sum;
+}
+
 
 /** ** ** Row/Col add/delete and resize functions ** ** ** **/
 
@@ -1065,7 +1082,6 @@ function addRowColResizeHandlers(){
                 $('#guide-grid-container .row_' + row + ' .ui-resizable-s').css({
                     height: newHeight + "px",
                 });
-                console.log(newHeight);
             }
         }
     };
@@ -1111,7 +1127,7 @@ function addRowColResizeHandlers(){
 
         uiResizable.addClass('ui-resizable-s-row_'+row).append(handle).css({
             cursor: 'ns-resize',
-            width: 0,
+            width: '1px',
             height: $('#guide-grid-container .row_' + row).css('height'),
             position: 'relative',
 
@@ -1391,13 +1407,19 @@ function saveRowColRatiosCells(){
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
 
+    var widthSum = getWidthSum(1);
+    var heightSum = getHeightSum(1);
+
     for (var row = 1; row<=numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             var cell = $('#cell' + '_' + row + '_' + col);
             var cellWidth = parseFloat(cell.css('width'));
             var cellHeight = parseFloat(cell.css('height'));
-            var widthRatioCell = cellWidth/(gridWidth-20);
-            var heightRatioCell = cellHeight/(gridHeight-20);
+            //var widthRatioCell = cellWidth/(gridWidth-20);
+            //var heightRatioCell = cellHeight/(gridHeight-20);
+
+            var widthRatioCell = cellWidth/widthSum;
+            var heightRatioCell = cellHeight/heightSum;
 
             selectedUserComponent.layout[row][col].ratio.cell.width = widthRatioCell;
             selectedUserComponent.layout[row][col].ratio.cell.height = heightRatioCell;
@@ -1413,13 +1435,20 @@ function saveRowColRatiosGrid(){
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
 
+    var widthSum = getWidthSum(1);
+    var heightSum = getHeightSum(1);
+
     for (var row = 1; row<=numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             var grid = $('#grid' + '_' + row + '_' + col);
             var gridCellWidth = parseFloat(grid.css('width'));
             var gridCellHeight = parseFloat(grid.css('height'));
-            var widthRatioGrid = gridCellWidth/(gridWidth-20);
-            var heightRatioGrid = gridCellHeight/(gridHeight-20);
+            //var widthRatioGrid = gridCellWidth/(gridWidth-20);
+            //var heightRatioGrid = gridCellHeight/(gridHeight-20);
+
+            var widthRatioGrid = gridCellWidth/widthSum;
+            var heightRatioGrid = gridCellHeight/heightSum;
+
 
             selectedUserComponent.layout[row][col].ratio.grid.width = widthRatioGrid;
             selectedUserComponent.layout[row][col].ratio.grid.height = heightRatioGrid;
