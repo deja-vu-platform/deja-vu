@@ -22,6 +22,7 @@ function Project() {
     this.objectType = "Project";
     //this.type = '';
     this.meta = {};
+    this.mainComponent = null; // one component for now
     this.components = {};
     this.numComponents = 0;
     this.componentIdSet = {};
@@ -48,6 +49,7 @@ function UserProject(name, id, version, author) {
         version: version,
         author: author
     };
+    this.mainComponent = null; // one component for now
     this.components = {};
     this.numComponents = 0;
     this.componentIdSet = {id:''};

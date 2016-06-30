@@ -84,3 +84,17 @@ function projectNameToFilename(projectName){
 function filenameToProjectName(filename){
     return filename.split('.').slice(0, -1).join('.')
 }
+
+
+/**
+ * Saves the file and the sets a timer to save the file every 5 minutes
+ */
+function autoSave5Mins(){ // every 5 minutes
+    console.log('saving!');
+    // update the session stored project too
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
+    setTimeout(function(){
+        autoSave5Mins();
+    }, 300000);
+}
