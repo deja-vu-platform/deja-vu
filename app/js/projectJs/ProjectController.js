@@ -11,6 +11,9 @@ var selectedProject;
 var projectsSavePath = path.join(__dirname, 'projects');
 
 var availableProjects = {};
+var currentProject;
+
+var componentToShow;
 //TODO implement recent vs all
 
 // Initialization
@@ -25,14 +28,14 @@ $(function () {
         window.sessionStorage - stores data for one session (data is lost when the browser tab is closed)
 
      */
-    var currentProject = window.sessionStorage.getItem('selectedProject');
+    currentProject = window.sessionStorage.getItem('selectedProject');
 
     if (currentProject){
-        $('.current-project .content').html('<a href="projectView">'+JSON.parse(currentProject).meta.name + '</a>');
-    } else {
-        $('.current-project').css({
-            //display: 'none'
-        })
+        currentProject = JSON.parse(currentProject);
+        var currentProjectLink = document.createElement('a');
+        $('.current-project .content').html('').append(currentProjectLink);
+        $(currentProjectLink).text(currentProject.meta.name);
+        displayProjectPreview(currentProject);
     }
 
     readFiles(projectsSavePath, function(filename, content) {
@@ -47,7 +50,8 @@ $(function () {
                 '<div class="project-name">'+sanitizeStringOfSpecialChars(filenameToProjectName(filename))+'</div>' +
                 '</div></li>';
             $('#recent-projects-list').append(projectLink);
-            addDeleteProjectButton(projectsSavePath, filename);
+            addLoadProjectButton(filename);
+            addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
         }
     }, function(err) {
         throw err;
@@ -69,18 +73,82 @@ $('#create-project').on('click', function () {
     window.location = 'index.html';
 });
 
-$('.current-project').on('click', 'a', function(){
+$('.current-project').on('click', 'a', function(e){
+    e.preventDefault();
     window.location = 'index.html';
+});
+
+$('.current-project').on('click', '.content', function(){
+    console.log('hi');
+    if (currentProject){
+        displayProjectPreview(currentProject);
+    } else {
+        $('#table-container-preview').html('');
+    }
+
 });
 
 
 $('.recent-projects').on('click', '.project-name', function(){
     var filename = $(this).parent().data('filename');
     selectedProject = availableProjects[filename];
-    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-    //console.log( window.sessionStorage.getItem('selectedProject'));
-    window.location = 'index.html';
+    displayProjectPreview(selectedProject);
+
+
+    // TODO add a load button
+
+    //window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+    //window.location = 'index.html';
 });
+
+function addLoadProjectButton(filename){
+    var spLoad = document.createElement('span');
+    spLoad.innerHTML = '<button type="button" class="btn btn-default btn-load-project">' +
+            //'<span>Delete User Component </span>' +
+        '<span>Load Project</span>' +
+        '</button>';
+
+    var buttonLoadProject = spLoad.firstChild;
+
+    $(buttonLoadProject).on("click", function () {
+        selectedProject = availableProjects[filename];
+        window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+        window.location = 'index.html';
+    });
+
+    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonLoadProject).hover(
+        function(){
+            $(this).find('.project-name').css({
+                width: '50%'
+            });
+            $(this).find('.btn-load-project').css({
+                display: 'inline-block',
+                'vertical-align': 'top',
+            });
+        }, function(){
+            $(this).find('.project-name').css({
+                width: '100%'
+            });
+            $(this).find('.btn-load-project').css({
+                display: 'none',
+
+            });
+        }
+    );
+
+}
+
+
+function displayProjectPreview(project){
+    // TODO make it select the main component
+    // TODO Also, have a way to click to change to another view?
+    var componentToShowId = Object.keys(project.components)[0];
+    componentToShow = project.components[componentToShowId];
+
+    $('#project-name-preview').text('Project Preview: '+project.meta.name);
+
+    loadTablePreview(componentToShow);
+}
 
 
 /**
@@ -156,13 +224,23 @@ function deleteFile(dirname, filename){
 }
 
 
-function deleteFileAndDisplay(dirname, filename){
+function deleteFileAndDisplay(dirname, filename, id){
     deleteFile(dirname, filename);
     $(".recent-projects").find("[data-filename='" + filename + "']").parent().remove();
+
+    if (currentProject){
+        if (currentProject.meta.id === id){
+            currentProject = null;
+            window.sessionStorage.setItem('selectedProject', '');
+            $('.current-project .content').html('');
+            $('#table-container-preview').html('');
+            $('#project-name-preview').html('');
+        }
+    }
 }
 
 
-function addDeleteProjectButton(dirname, filename){
+function addDeleteProjectButton(dirname, filename, id){
     var spDelete = document.createElement('span');
     spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-project">' +
             //'<span>Delete User Component </span>' +
@@ -170,11 +248,11 @@ function addDeleteProjectButton(dirname, filename){
         '</button>';
 
     var buttonDeletProject = spDelete.firstChild;
-    buttonDeletProject.id = 'btn-delete-project_'+filename;
+    buttonDeletProject.id = 'btn-delete-project_'+id;
 
     $(buttonDeletProject).on("click", function (e) {
         // todo add safety
-        openDeleteProjectConfirmDialogue(dirname, filename);
+        openDeleteProjectConfirmDialogue(dirname, filename, id);
     });
 
 
@@ -182,7 +260,7 @@ function addDeleteProjectButton(dirname, filename){
     $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonDeletProject).hover(
         function(){
             $(this).find('.project-name').css({
-                width: '70%'
+                width: '50%'
             });
             $(this).find('.btn-delete-project').css({
                 display: 'inline-block',
@@ -201,37 +279,32 @@ function addDeleteProjectButton(dirname, filename){
 
 }
 
-function openDeleteProjectConfirmDialogue(dirname, filename){
-    var projectName = filenameToProjectName(filename);
+function openDeleteProjectConfirmDialogue(dirname, filename, id){
     $('#confirm-delete-project').modal('show');
+
+    var projectName = filenameToProjectName(filename);
     $('#delete-project-name').text(projectName);
-    $('#delete-project-btn').data('deleteProjectDirname', dirname).data('deleteFilename', filename);
+
+    $('#delete-project-btn').click(function(){
+        deleteFileAndDisplay(dirname, filename, id);
+
+        $('#delete-project-name').text('');
+        $('#confirm-delete-project').modal('hide');
+
+    });
+
+    $('#delete-project-cancel-btn').click(function(){
+        $('#delete-project-name').text('');
+        $('#confirm-delete-project').modal('hide');
+
+    });
+
+    $('#confirm-delete-project .close').click(function(event){
+        event.preventDefault();
+
+        $('#delete-project-name').text('');
+        $('#confirm-delete-project').modal('hide');
+    });
+
 };
-
-$('#delete-project-btn').click(function(){
-    var filename =  $('#delete-project-btn').data('deleteFilename');
-    var projectDirname =  $('#delete-project-btn').data('deleteProjectDirname');
-    deleteFileAndDisplay(projectDirname, filename);
-
-    $('#delete-project-btn').data('deleteFilename', '');
-    $('#delete-project-btn').data('deleteProjectDirname', '');
-
-    $('#delete-project-name').text('');
-});
-
-$('#delete-project-cancel-btn').click(function(){
-    $('#delete-project-btn').data('deleteFilename', '');
-    $('#delete-project-btn').data('deleteProjectDirname', '');
-
-    $('#delete-project-name').text('');
-});
-
-$('#confirm-delete-project .close').click(function(event){
-    event.preventDefault();
-    $('#delete-project-btn').data('deleteFilename', '');
-    $('#delete-project-btn').data('deleteProjectDirname', '');
-    $('#confirm-delete-project').modal('hide');
-
-    $('#delete-project-name').text('');
-});
 

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/css/dropzone.css">
     <link rel="stylesheet" href="css/projectView.css">
+    <link rel="stylesheet" href="css/projectPreview.css">
 
 </head>
 <body>
@@ -49,12 +50,6 @@
 
 
 <div class="projects">
-    <div class="current-project">
-        <div class="header">Current project</div>
-        <div class="content">
-        </div>
-    </div>
-
     <div class="recent-projects">
         <div class="header">Recent projects</div>
         <div class="content">
@@ -62,12 +57,38 @@
             </ul>
         </div>
     </div>
+
+    <div class="current-and-preview-container">
+        <div class="current-project">
+            <div class="header">Current project</div>
+            <div class="content">
+            </div>
+        </div>
+
+        <div class="project-preview">
+            <span id="project-name-preview"></span>
+            <!--<img src="images/someSortOfPreview.png">-->
+            <div id="table-container-preview"></div>
+        </div>
+    </div>
+
 </div>
 
-<div class="project-preview">
-    <span>(Name of Project) Preview (Unimplemented)</span> <br>
-    <img src="images/someSortOfPreview.png">
+<div class="basic-components">
+    <div class="header">Basic components</div>
+    <div class="content">
+        <ul id="basic-components">
+            <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
+            <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
+            <li name="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Media</li>
+            <li name="tab-viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs</li>
+            <li name="menu" class="draggable widget"><img src="images/menu_icon.png" width="15px" height="15px"> Menu</li>
+            <li name="panel" class="draggable widget"><img src="images/panel_icon.png" width="15px" height="15px"> Panel</li>
+
+        </ul>
+    </div>
 </div>
+
 
 
 
@@ -156,7 +177,10 @@
 <script src="js/external/jquery-ui.min.js"></script>
 <script src="js/external/bootstrap.min.js"></script>
 <script src="js/utils/utilityFunctions.js"></script>
+<script src="js/projectJs/ProjectPreview.js"></script>
 <script src="js/projectJs/ProjectModel.js"></script>
 <script src="js/projectJs/ProjectController.js"></script>
+<script src="js/componentJs/ComponentView.js"></script>
+
 </body>
 </html>
