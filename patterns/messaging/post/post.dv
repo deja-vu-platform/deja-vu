@@ -6,7 +6,7 @@ data Post {
 }
 
 data User {
-  username: Text
+  username: Text (one)
 }
 
 widget Post, EditContent,

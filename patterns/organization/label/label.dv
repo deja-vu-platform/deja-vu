@@ -1,7 +1,7 @@
 cliche Label
 
 data Item {
-  name: Text,
+  name: Text (one),
   labels: set Label
 }
 

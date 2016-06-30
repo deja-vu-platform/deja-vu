@@ -1,12 +1,12 @@
 cliche Feed
 
 data Publisher {
-  name: Text,
+  name: Text (one),
   published: set Message
 }
 
 data Subscriber {
-  name: Text,
+  name: Text (one),
   subscriptions: set Publisher
 }
 

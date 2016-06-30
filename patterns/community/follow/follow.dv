@@ -1,6 +1,6 @@
 cliche Follow
 
 data User {
-  username: Text,
+  username: Text (one),
   follows: set User
 }

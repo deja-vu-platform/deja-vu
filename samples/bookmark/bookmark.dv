@@ -4,7 +4,7 @@ use Follow, Follow, Auth, Feed, Label, Post
 
 data User {
   posts: set Post,
-  username: Text,
+  username: Text (one),
   follows: set User
 }
 
@@ -14,7 +14,7 @@ data Post {
 }
 
 data Topic {
-  name: Text
+  name: Text (one)
 }
 
 bond {
@@ -28,8 +28,9 @@ bond {
 }
 bond { Feed/published, Post/posts, posts }
 bond { Post/content, Feed/content, content }
-bond { Feed/published, Label/labels, posts }
+bond { Feed/published, flip Label/labels, posts }
 bond { Follow_1/follows, Feed/subscriptions, follows }
+bond { Follow_2/follows, Feed/subscriptions, follows }
 bond { Label/labels, topics }
 bond {
   Follow_1/Source.name, Follow_1/Target.name,

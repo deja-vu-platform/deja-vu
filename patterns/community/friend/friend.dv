@@ -1,6 +1,6 @@
 cliche Friend
 
 data User {
-  username: Text,
+  username: Text (one),
   friends: set User
 }

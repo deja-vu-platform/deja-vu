@@ -1,7 +1,7 @@
 cliche Auth
 
 data User {
-  username: Text
+  username: Text (one)
 }
 
 data LoggedInUser extends User {}
