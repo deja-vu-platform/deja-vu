@@ -1,0 +1,34 @@
+cliche Forum
+
+use Auth, Post, Comment, Comment
+
+data User {
+  username: Text (one),
+  posts: set Post
+}
+
+data Post extends Target {
+  content: Text
+}
+
+data Comment extends Target {
+  author: User,
+  target: Target,
+  content: Text
+}
+
+abstract data Target {}
+
+bond { Post/User, Auth/User, Comment/Source, this/User }
+bond { Post/Post, this/Post }
+bond { Comment/Target, this/Target }
+
+bond { Post/Post.content, this/content }
+bond { Post/Post.posts, this/Post.posts }
+bond { Comment/Comment.content, this/Comment.content }
+bond { Comment/Comment.target, this/Comment.targe }
+bond { Comment/Comment.author, this/Comment.author }
+bond {
+  Auth/username, Post/username, Comment/Source.name,
+  this/username
+}

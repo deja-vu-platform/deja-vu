@@ -1,8 +1,11 @@
 cliche Comment
 
 data Comment {
-  content: Text,
-  target: Target
+  author: Source,
+  target: Target,
+  content: Text
 }
 
-data Target {}
+data Source, Target {
+  name: Text (one)
+}

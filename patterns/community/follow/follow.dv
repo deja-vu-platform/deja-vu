@@ -1,6 +1,10 @@
 cliche Follow
 
-data User {
-  username: Text (one),
-  follows: set User
+data Source {
+  name: Text (one),
+  follows: set Target
+}
+
+data Target {
+  name: Text (one)
 }

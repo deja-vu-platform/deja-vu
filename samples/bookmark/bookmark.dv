@@ -3,8 +3,8 @@ cliche Bookmark
 use Follow, Follow, Auth, Feed, Label, Post
 
 data User {
-  posts: set Post,
   username: Text (one),
+  posts: set Post,
   follows: set User
 }
 
