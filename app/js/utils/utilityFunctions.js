@@ -91,6 +91,8 @@ function filenameToProjectName(filename){
  */
 function autoSave5Mins(){ // every 5 minutes
     console.log('saving!');
+    // update the session stored project too
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
     saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
     setTimeout(function(){
         autoSave5Mins();

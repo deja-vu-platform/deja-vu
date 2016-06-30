@@ -93,12 +93,6 @@ $('.recent-projects').on('click', '.project-name', function(){
     var filename = $(this).parent().data('filename');
     selectedProject = availableProjects[filename];
     displayProjectPreview(selectedProject);
-
-
-    // TODO add a load button
-
-    //window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-    //window.location = 'index.html';
 });
 
 function addLoadProjectButton(filename){
