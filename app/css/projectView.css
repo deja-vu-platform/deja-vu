@@ -71,7 +71,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
 }
 
 /*===================================================
-                  COMPONENTS
+                  PROJECTS
 ===================================================*/
 .projects {
 
@@ -79,7 +79,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
 .recent-projects {
     position: absolute;
     border: #d5d5d5 1px solid;
-    width: 40%;
+    width: 400px;
     display: inline-block;
 }
 
@@ -96,7 +96,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
 }
 
 .current-project{
-    width: 60%;
+    width: 850px;
     display: inline-block;
 }
 .current-project .content{
@@ -104,16 +104,6 @@ fieldset { border: 0; margin: 0; padding: 0; }
     height: 40px;
 
 }
-
-.project-preview img{
-    max-width: 60%;
-    margin: auto;
-    padding: 10px;
-    border: black 1px solid;
-    -webkit-filter: blur(2px);
-    max-height: 500px;
-}
-
 
 .header {
     border-top: solid 5px #D5D5D5;

@@ -24,9 +24,6 @@ $(function () {
         // start a default component
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
-        //var grid = $('#table-container').get(0);
-        //gridWidth = grid.offsetWidth;
-        //gridHeight = grid.offsetHeight;
         createTable();
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
@@ -359,64 +356,6 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
         selectedUserComponent.components[row][col].components = {};
         selectedUserComponent.components[row][col].components[type] = value;
     }
-}
-
-function hideBaseComponentDisplayAt(cellId){
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    if (type === 'label'){
-        $('#' + cellId).find('.display-component').parent().css({
-            display: 'none'
-        });
-    }
-    if (type === 'image'){
-        $('#' + cellId).find('.display-component').css({
-            display: 'none'
-        });
-    }
-}
-
-function showBaseComponentDisplayAt(cellId){
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    if (type === 'label'){
-        $('#' + cellId).find('.display-component').parent().css({
-            display: 'block'
-        });
-    }
-    if (type === 'image'){
-        $('#' + cellId).find('.display-component').css({
-            display: 'inline-block'
-        });
-    }
-}
-
-/**
- *
- * @param cellId
- */
-function updateBaseComponentDisplayAt(cellId) {
-    var cell = $('#'+cellId);
-    var height = (parseFloat(cell.css('height'))-30) + 'px';
-    var width = (parseFloat(cell.css('width'))-10) + 'px';
-    var type = cell.get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    if (type === 'label'){
-        cell.find('.display-component').parent().css({
-            height: height,
-            width: width,
-        });
-    }
-    if (type === 'image'){
-        cell.find('.display-component').css({
-            'max-height': height,
-            'max-width': width,
-            height: 'auto',
-            width: 'auto',
-            'vertical-align':'top',
-
-        });
-    }
-
-    // TODO other types?
-
 }
 
 

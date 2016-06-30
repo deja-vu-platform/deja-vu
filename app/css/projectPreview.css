@@ -1,0 +1,122 @@
+/*===================================================
+                  MAIN TABLE
+===================================================*/
+#main-table-preview {
+    table-layout: fixed !important;
+    border-collapse: inherit;
+    -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    padding: 10px;
+    position: relative;
+    margin: auto;
+    pointer-events: none;
+}
+
+#main-table-preview::after {
+    content: 'Component name: ';
+    display: block;
+    position: absolute;
+    left: 20px;
+    bottom: 100%;
+    width: 200px;
+    height: 20px;
+    border-bottom: 20px solid white;
+    -webkit-box-shadow: 0 -3px 3px rgba(0,0,0,0.1);
+    padding: 2px 2px 4px 10px;
+}
+
+
+td {
+    background-color: #F0F1F2;
+    /*width: 170px;*/
+    /*min-width: 100px;*/
+    /*height: 170px;*/
+    border: 5px solid white;
+    resize: both;
+    position: relative;
+    text-align: center;
+    /*vertical-align: top;*/
+}
+
+
+.zero-height{
+    height: 1px;
+    border: 0;
+    visibility: hidden;
+}
+
+.zero-width{
+    width: 1px;
+    border: 0;
+    visibility: hidden;
+}
+
+#table-container-preview{
+    width: 850px;
+    height: 450px;
+
+    padding: 50px 30px;
+
+    pointer-events: none;
+}
+
+.basic-components{
+    display: none;
+}
+
+@media (max-width: 1050px) {
+    /*#grid-container { width: 650px; }*/
+}
+
+
+
+/*===================================================
+                   COMPONENTS
+===================================================*/
+.display-component {
+    white-space: initial;
+    font-weight: 400;
+}
+
+.lbl-small, .btn-size-xs {
+    font-size: 64%;
+}
+.lbl-default, .btn-size-df {
+    font-size: 14px ;
+}
+.lbl-large {
+    font-size: 150%;
+}
+.lbl-heading, .btn-size-lg {
+    font-size: 200%;
+}
+.btn-group-vertical>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 4px !important;
+}
+
+li.widget {
+    position: absolute;
+    bottom: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    border: 1px solid #e1e1e1;
+    line-height: 20px;
+    color: #6f6f6f;
+
+}
+
+
+.label-container {
+    position: absolute;
+    top: 0;
+    /*width: 200px;*/
+    /*height: 200px;*/
+    padding: 20% 5% 10% 5%;
+    background: #fff;
+    border: #e0e0e0 solid 1px;
+    display: block;
+}
+p.label {
+    white-space: initial;
+}

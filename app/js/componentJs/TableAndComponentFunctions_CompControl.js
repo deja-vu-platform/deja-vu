@@ -176,7 +176,7 @@ function createTable() {
     document.getElementById('table-container').appendChild(tableGrid);
 
     createGuideGrid();
-    initialResizeCells(numRows, numCols);
+    initialResizeCells();
 
     attachMergeHandlers();
     registerDroppable();
@@ -905,10 +905,8 @@ function alignCellsWithGrid(){
 
 /**
  * Resize cell such that all cells fill width and height of grid
- * @param numRows
- * @param numCols
  */
-function initialResizeCells(numRows, numCols) {
+function initialResizeCells() {
     if (!selectedUserComponent.layout.tablePxDimensions.isSet){
         selectedUserComponent.layout.tablePxDimensions.width = DEFAULT_GRID_WIDTH;
         selectedUserComponent.layout.tablePxDimensions.height = DEFAULT_GRID_HEIGHT;
@@ -920,9 +918,6 @@ function initialResizeCells(numRows, numCols) {
 
     cellWidth = ((gridWidth-20) / numCols);
     cellHeight = ((gridHeight-20) / numRows);
-
-    //console.log(cellWidth);
-    //console.log(cellHeight);
 
     resetAligners();
 

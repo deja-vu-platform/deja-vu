@@ -12,6 +12,8 @@ var projectsSavePath = path.join(__dirname, 'projects');
 
 var availableProjects = {};
 var currentProject;
+
+var componentToShow;
 //TODO implement recent vs all
 
 // Initialization
@@ -33,6 +35,10 @@ $(function () {
         var currentProjectLink = document.createElement('a');
         $('.current-project .content').html('').append(currentProjectLink);
         $(currentProjectLink).text(currentProject.meta.name);
+        var componentToShowId = Object.keys(currentProject.components)[0];
+        componentToShow = currentProject.components[componentToShowId];
+        loadTablePreview(componentToShow);
+
     }
 
     readFiles(projectsSavePath, function(filename, content) {
@@ -73,6 +79,17 @@ $('.current-project').on('click', 'a', function(){
     window.location = 'index.html';
 });
 
+$('.current-project').on('click', '.content', function(){
+    if (currentProject){
+        var componentToLoadId = Object.keys(currentProject.components)[0];
+        var componentToLoad = currentProject.components[componentToLoadId];
+        loadTablePreview(componentToLoad);
+    } else {
+        $('#table-container-preview').html('');
+    }
+
+});
+
 
 $('.recent-projects').on('click', '.project-name', function(){
     var filename = $(this).parent().data('filename');
@@ -81,6 +98,17 @@ $('.recent-projects').on('click', '.project-name', function(){
     //console.log( window.sessionStorage.getItem('selectedProject'));
     window.location = 'index.html';
 });
+
+
+
+$('.recent-projects').on('click', '.project-name', function(){
+    var filename = $(this).parent().data('filename');
+    selectedProject = availableProjects[filename];
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+    //console.log( window.sessionStorage.getItem('selectedProject'));
+    window.location = 'index.html';
+});
+
 
 
 /**
