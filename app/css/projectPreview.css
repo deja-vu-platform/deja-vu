@@ -50,13 +50,8 @@ td {
     visibility: hidden;
 }
 
-#table-container-preview{
-    width: 850px;
-    height: 450px;
-
-    padding: 50px 30px;
-
-    pointer-events: none;
+#project-name-preview{
+    display: block;
 }
 
 .basic-components{

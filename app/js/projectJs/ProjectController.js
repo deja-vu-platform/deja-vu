@@ -35,10 +35,7 @@ $(function () {
         var currentProjectLink = document.createElement('a');
         $('.current-project .content').html('').append(currentProjectLink);
         $(currentProjectLink).text(currentProject.meta.name);
-        var componentToShowId = Object.keys(currentProject.components)[0];
-        componentToShow = currentProject.components[componentToShowId];
-        loadTablePreview(componentToShow);
-
+        displayProjectPreview(currentProject);
     }
 
     readFiles(projectsSavePath, function(filename, content) {
@@ -53,6 +50,7 @@ $(function () {
                 '<div class="project-name">'+sanitizeStringOfSpecialChars(filenameToProjectName(filename))+'</div>' +
                 '</div></li>';
             $('#recent-projects-list').append(projectLink);
+            addLoadProjectButton(filename);
             addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
         }
     }, function(err) {
@@ -75,15 +73,15 @@ $('#create-project').on('click', function () {
     window.location = 'index.html';
 });
 
-$('.current-project').on('click', 'a', function(){
+$('.current-project').on('click', 'a', function(e){
+    e.preventDefault();
     window.location = 'index.html';
 });
 
 $('.current-project').on('click', '.content', function(){
+    console.log('hi');
     if (currentProject){
-        var componentToLoadId = Object.keys(currentProject.components)[0];
-        var componentToLoad = currentProject.components[componentToLoadId];
-        loadTablePreview(componentToLoad);
+        displayProjectPreview(currentProject);
     } else {
         $('#table-container-preview').html('');
     }
@@ -94,21 +92,63 @@ $('.current-project').on('click', '.content', function(){
 $('.recent-projects').on('click', '.project-name', function(){
     var filename = $(this).parent().data('filename');
     selectedProject = availableProjects[filename];
-    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-    //console.log( window.sessionStorage.getItem('selectedProject'));
-    window.location = 'index.html';
+    displayProjectPreview(selectedProject);
+
+
+    // TODO add a load button
+
+    //window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+    //window.location = 'index.html';
 });
 
+function addLoadProjectButton(filename){
+    var spLoad = document.createElement('span');
+    spLoad.innerHTML = '<button type="button" class="btn btn-default btn-load-project">' +
+            //'<span>Delete User Component </span>' +
+        '<span>Load Project</span>' +
+        '</button>';
+
+    var buttonLoadProject = spLoad.firstChild;
+
+    $(buttonLoadProject).on("click", function () {
+        selectedProject = availableProjects[filename];
+        window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+        window.location = 'index.html';
+    });
+
+    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonLoadProject).hover(
+        function(){
+            $(this).find('.project-name').css({
+                width: '50%'
+            });
+            $(this).find('.btn-load-project').css({
+                display: 'inline-block',
+                'vertical-align': 'top',
+            });
+        }, function(){
+            $(this).find('.project-name').css({
+                width: '100%'
+            });
+            $(this).find('.btn-load-project').css({
+                display: 'none',
+
+            });
+        }
+    );
+
+}
 
 
-$('.recent-projects').on('click', '.project-name', function(){
-    var filename = $(this).parent().data('filename');
-    selectedProject = availableProjects[filename];
-    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-    //console.log( window.sessionStorage.getItem('selectedProject'));
-    window.location = 'index.html';
-});
+function displayProjectPreview(project){
+    // TODO make it select the main component
+    // TODO Also, have a way to click to change to another view?
+    var componentToShowId = Object.keys(project.components)[0];
+    componentToShow = project.components[componentToShowId];
 
+    $('#project-name-preview').text('Project Preview: '+project.meta.name);
+
+    loadTablePreview(componentToShow);
+}
 
 
 /**
@@ -191,7 +231,10 @@ function deleteFileAndDisplay(dirname, filename, id){
     if (currentProject){
         if (currentProject.meta.id === id){
             currentProject = null;
+            window.sessionStorage.setItem('selectedProject', '');
             $('.current-project .content').html('');
+            $('#table-container-preview').html('');
+            $('#project-name-preview').html('');
         }
     }
 }
@@ -205,7 +248,7 @@ function addDeleteProjectButton(dirname, filename, id){
         '</button>';
 
     var buttonDeletProject = spDelete.firstChild;
-    buttonDeletProject.id = 'btn-delete-project_'+filename;
+    buttonDeletProject.id = 'btn-delete-project_'+id;
 
     $(buttonDeletProject).on("click", function (e) {
         // todo add safety
@@ -217,7 +260,7 @@ function addDeleteProjectButton(dirname, filename, id){
     $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonDeletProject).hover(
         function(){
             $(this).find('.project-name').css({
-                width: '70%'
+                width: '50%'
             });
             $(this).find('.btn-delete-project').css({
                 display: 'inline-block',

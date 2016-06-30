@@ -77,10 +77,10 @@ fieldset { border: 0; margin: 0; padding: 0; }
 
 }
 .recent-projects {
-    position: absolute;
     border: #d5d5d5 1px solid;
     width: 400px;
     display: inline-block;
+
 }
 
 .recent-projects .content{
@@ -95,6 +95,11 @@ fieldset { border: 0; margin: 0; padding: 0; }
     cursor: pointer;
 }
 
+.current-and-preview-container {
+    position: absolute;
+    display: inline-block;
+}
+
 .current-project{
     width: 850px;
     display: inline-block;
@@ -104,6 +109,22 @@ fieldset { border: 0; margin: 0; padding: 0; }
     height: 40px;
 
 }
+
+.project-preview{
+    text-align: center;
+}
+
+#table-container-preview{
+    display: block;
+
+    width: 850px;
+    height: 400px;
+
+    padding: 50px 30px;
+
+    pointer-events: none;
+}
+
 
 .header {
     border-top: solid 5px #D5D5D5;
@@ -128,7 +149,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
     display: inline-block;
 }
 
-.btn-delete-project{
+.btn-delete-project, .btn-load-project{
     display: none;
     vertical-align: top;
 }
