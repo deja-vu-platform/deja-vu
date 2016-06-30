@@ -41,6 +41,7 @@ $(function () {
         loadTable(selectedUserComponent);
     }
 
+    //autoSave5Mins();
 
     basicComponents = $('#basic-components').html();
 

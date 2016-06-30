@@ -174,7 +174,10 @@ function initNewProject() {
         copyNum++;
     }
     var newProject = new UserProject(copyName, generateId(copyName), version, author);
-    saveObjectToFile(projectsSavePath, projectNameToFilename(copyName), newProject);
+
+    // This will actually be saved after it's fully loaded (with a first component, etc) in the
+    // components page
+    //saveObjectToFile(projectsSavePath, projectNameToFilename(copyName), newProject);
     return newProject;
 
 }
