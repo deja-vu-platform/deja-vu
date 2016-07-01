@@ -3,7 +3,7 @@
 
 
 var projectsSavePath = path.join(__dirname, 'projects');
-
+var addedCliches;
 
 
 /** ** ** ** ** ** Initialization ** ** ** ** ** **/
@@ -19,6 +19,19 @@ $(function () {
     }
 
     $('.project-name .header').text(selectedProject.meta.name);
+
+    addedCliches = window.sessionStorage.getItem('addedCliches');
+    if (addedCliches) {
+        addedCliches = JSON.parse(addedCliches);
+
+        for (var id in addedCliches) {
+            showClicheInList(id, addedCliches[id]);
+        }
+
+    } else {
+        addedCliches = {};
+    }
+
 
     if (selectedProject.numComponents === 0){
         // start a default component
@@ -714,3 +727,9 @@ $(document).on('change', '#fileselect', function(evt) {
     $(this).parent().parent().parent().children().first().val(files[0].name);
 });
 
+
+/** ** ** ** ** ** ** ** Show Cliche Components in List  ** ** ** ** ** ** ** **/
+function showClicheInList(id, name){
+    var addedCliche = '<li id="added_'+id+'">'+name+'</li>';
+    $('.cliche-components ul').append(addedCliche);
+}
