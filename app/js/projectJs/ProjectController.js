@@ -74,7 +74,6 @@ $('#create-project').on('click', function () {
 });
 
 $('.current-project').on('click', 'a', function(e){
-    e.preventDefault();
     window.location = 'index.html';
 });
 
