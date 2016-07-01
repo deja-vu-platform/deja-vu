@@ -2,33 +2,19 @@
  * Created by Shinjini on 6/30/2016.
  */
 
-
-// TODO
-// We will have a cliche div
-// with a name, a description and a preview
-// for now precedurally generally a bunch
-// we can then import them into our index page
-
 var addedCliches;
 
 $(function(){
     generateFakeCliches100();
 
-    selectedProject = window.sessionStorage.getItem('selectedProject');
-    addedCliches = window.sessionStorage.getItem('addedCliches');
-    if (addedCliches) {
-        addedCliches = JSON.parse(addedCliches);
-
-        for (var id in addedCliches) {
-            showClicheInList(id, addedCliches[id]);
-            checkBoxes(id);
-        }
-
-    } else {
-        addedCliches = {};
+    selectedProject = JSON.parse(window.sessionStorage.getItem('selectedProject')); // TODO we assume that this
+                                                                                    // TODO will exist but shout enforce it!
+    for (var id in selectedProject.addedCliches) {
+        showClicheInList(id, selectedProject.addedCliches[id]);
+        checkBoxes(id);
     }
 
-    $('.project-name .header').text(JSON.parse(selectedProject).meta.name);
+    $('.project-name .header').text(selectedProject.meta.name);
 
 });
 
@@ -85,12 +71,13 @@ $('#all-cliche-container').on('click', 'input[type=checkbox]', function(){
         addClicheToListAndShow(id, name);
     }
     $(this).data('checked', !checked);
-    window.sessionStorage.setItem('addedCliches', JSON.stringify(addedCliches));
+
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
 
 });
 
 function addClicheToListAndShow(id, name){
-    addedCliches[id] = name;
+    selectedProject.addedCliches[id] = name;
     showClicheInList(id, name);
 }
 
@@ -100,7 +87,7 @@ function showClicheInList(id, name){
 }
 
 function removeClicheFromList(id){
-    delete addedCliches[id];
+    delete selectedProject.addedCliches[id];
     $('.content ul').find('#added_'+id).remove();
 }
 
@@ -114,7 +101,7 @@ $('#all-cliches-radio').change(function(){
     if (checked){
         $('#all-cliches').html('');
         generateFakeCliches100();
-        for (var id in addedCliches) {
+        for (var id in selectedProject.addedCliches) {
             checkBoxes(id);
         }
     }
@@ -126,7 +113,7 @@ $('#selected-cliches-radio').change(function(){
     var checked = $(this).prop('checked');
     if (checked){
         $('#all-cliches').html('');
-        for (var id in addedCliches) {
+        for (var id in selectedProject.addedCliches) {
             generateFakeCliches(id);
             checkBoxes(id);
         }

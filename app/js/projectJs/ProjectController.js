@@ -106,7 +106,6 @@ function addLoadProjectButton(filename){
     $(buttonLoadProject).on("click", function () {
         selectedProject = availableProjects[filename];
         window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-        window.sessionStorage.removeItem('addedCliches');
         window.location = 'index.html';
     });
 
@@ -125,7 +124,6 @@ function addLoadProjectButton(filename){
             });
             $(this).find('.btn-load-project').css({
                 display: 'none',
-
             });
         }
     );

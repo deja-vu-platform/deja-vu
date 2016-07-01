@@ -20,24 +20,10 @@ $(function () {
 
     $('.project-name .header').text(selectedProject.meta.name);
 
-    addedCliches = window.sessionStorage.getItem('addedCliches');
-    if (addedCliches) {
-        addedCliches = JSON.parse(addedCliches);
-
-        for (var id in addedCliches) {
-            showClicheInList(id, addedCliches[id]);
-        }
-
-        // make sure to clear the cliche when a new project is loaded
-        selectedProject.addedCliches = addedCliches;
-    } else {
-        addedCliches = selectedProject.addedCliches;
-        window.sessionStorage.setItem('addedCliches', JSON.stringify(addedCliches));
-        for (var id in addedCliches) {
-            showClicheInList(id, addedCliches[id]);
-        }
+    addedCliches = selectedProject.addedCliches;
+    for (var id in addedCliches) {
+        showClicheInList(id, addedCliches[id]);
     }
-
 
     if (selectedProject.numComponents === 0){
         // start a default component
