@@ -55,7 +55,7 @@ function generateFakeCliches100(){
 }
 
 function generateFakeCliches(id){ // For now
-        var name = 'fakeCliche_'+id;
+        var name = 'Fake Cliche #'+id;
         var description =
             'This is a fake cliche to test the functionality of the cliche page. ' +
             'Nulla vehicula eros in sapien posuere, eu luctus odio molestie. Praesent ' +
