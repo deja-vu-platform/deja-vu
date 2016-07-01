@@ -25,6 +25,9 @@
     },
     "es6-promise/es6-promise.d.ts": {
       "commit": "ba4c4fc6c9ec3d1b9b7e26437d6e0f4f8337c948"
+    },
+    "node/node.d.ts": {
+      "commit": "6e55288b1bce1abdb1696cdecf324467a6bcf1aa"
     }
   }
 }
