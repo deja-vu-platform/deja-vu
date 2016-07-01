@@ -11,6 +11,11 @@ $(function(){
 
     selectedProject = JSON.parse(window.sessionStorage.getItem('selectedProject')); // TODO we assume that this
                                                                                     // TODO will exist but shout enforce it!
+    if (!selectedProject.addedCliches){
+        selectedProject.addedCliches = {}; // a safety net
+    }
+
+
     for (var id in selectedProject.addedCliches) {
         showClicheInList(id, selectedProject.addedCliches[id]);
         checkBoxes(id);
