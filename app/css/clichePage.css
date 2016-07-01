@@ -147,29 +147,27 @@ li#selected {
     margin-left: 200px;
     padding: 50px;
     width: 1100px;
-    height: 600px;
-    overflow: scroll;
 }
 
 .name-and-description-container {
-    width: 600px;
+    width: 400px;
     display: inline-block;
     float: left;
 }
 
 .cliche-component-name{
     display: inline-block;
-    padding: 20px;
+    padding: 10px 20px;
 }
 
 .cliche-component-description{
-    height: 130px;
+    height: 120px;
     overflow: auto;
-    padding: 20px;
+    padding: 10px 20px;
 }
 
 .cliche-component-container img{
-    max-height: 300px;
+    max-height: 200px;
     max-width: 400px;
     height: auto;
     width: auto;
