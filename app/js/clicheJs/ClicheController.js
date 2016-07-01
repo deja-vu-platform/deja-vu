@@ -2,10 +2,12 @@
  * Created by Shinjini on 6/30/2016.
  */
 
-var addedCliches;
+var numFakeCliches = 100;
+var clichesPerPage = 5;
 
 $(function(){
-    generateFakeCliches100();
+    addPagination();
+    generateFakeClichesBulk(1, clichesPerPage);
 
     selectedProject = JSON.parse(window.sessionStorage.getItem('selectedProject')); // TODO we assume that this
                                                                                     // TODO will exist but shout enforce it!
@@ -34,8 +36,14 @@ function clicheDisplaySkeleton(name, id, description, previewHTML){
     return skeleton;
 }
 
-function generateFakeCliches100(){
-    for (var i = 0; i<100; i++) {
+/**
+ * start, end inclusive
+ * @param start
+ * @param end
+ */
+function generateFakeClichesBulk(start, end){
+    $('#all-cliches').html('');
+    for (var i = start; i<=end; i++) {
         generateFakeCliches(i);
     }
 }
@@ -99,13 +107,15 @@ function checkBoxes(id){
 $('#all-cliches-radio').change(function(){
     var checked = $(this).prop('checked');
     if (checked){
-        $('#all-cliches').html('');
-        generateFakeCliches100();
+        $('#pagination-holder').css('visibility','visible');
+        var id = $('.pagination .active').get(0).id.split('_')[1];
+        var start = (id-1)*clichesPerPage+1;
+        var end = id*clichesPerPage;
+        generateFakeClichesBulk(start, end);
         for (var id in selectedProject.addedCliches) {
             checkBoxes(id);
         }
     }
-
 
 });
 
@@ -117,6 +127,33 @@ $('#selected-cliches-radio').change(function(){
             generateFakeCliches(id);
             checkBoxes(id);
         }
+        $('#pagination-holder').css('visibility','hidden');
     }
 });
 
+function addPagination(){
+    var numPages = Math.ceil(numFakeCliches/clichesPerPage);
+    var paginationUL = document.createElement('ul');
+    paginationUL.className = 'pagination';
+    for (var i = 1; i<= numPages; i++){
+        if (i===1){
+            var page = '<li id="page_'+i+'" class="active"><a href="#"  >'+i+'</a></li>';
+        } else {
+            var page = '<li id="page_'+i+'"><a href="#"  >'+i+'</a></li>';
+        }
+        $(paginationUL).append(page);
+    }
+    $('#pagination-holder').append(paginationUL);
+}
+
+$('#pagination-holder').on('click', 'li', function(){
+    var id = this.id.split('_')[1];
+    $('#pagination-holder .active').removeClass('active');
+    $(this).addClass('active');
+    var start = (id-1)*clichesPerPage+1;
+    var end = id*clichesPerPage;
+    generateFakeClichesBulk(start, end);
+    for (var id in selectedProject.addedCliches) {
+        checkBoxes(id);
+    }
+});
