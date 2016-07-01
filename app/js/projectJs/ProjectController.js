@@ -106,6 +106,7 @@ function addLoadProjectButton(filename){
     $(buttonLoadProject).on("click", function () {
         selectedProject = availableProjects[filename];
         window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+        window.sessionStorage.removeItem('addedCliches');
         window.location = 'index.html';
     });
 
@@ -227,7 +228,7 @@ function deleteFileAndDisplay(dirname, filename, id){
     if (currentProject){
         if (currentProject.meta.id === id){
             currentProject = null;
-            window.sessionStorage.setItem('selectedProject', '');
+            window.sessionStorage.removeItem('selectedProject');
             $('.current-project .content').html('');
             $('#table-container-preview').html('');
             $('#project-name-preview').html('');

@@ -28,8 +28,14 @@ $(function () {
             showClicheInList(id, addedCliches[id]);
         }
 
+        // make sure to clear the cliche when a new project is loaded
+        selectedProject.addedCliches = addedCliches;
     } else {
-        addedCliches = {};
+        addedCliches = selectedProject.addedCliches;
+        window.sessionStorage.setItem('addedCliches', JSON.stringify(addedCliches));
+        for (var id in addedCliches) {
+            showClicheInList(id, addedCliches[id]);
+        }
     }
 
 

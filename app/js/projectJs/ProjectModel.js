@@ -27,6 +27,7 @@ function Project() {
     this.numComponents = 0;
     this.componentIdSet = {};
     this.lastAccessed = -Infinity;
+    this.addedCliches = {};
 }
 
 /**
@@ -54,6 +55,7 @@ function UserProject(name, id, version, author) {
     this.numComponents = 0;
     this.componentIdSet = {id:''};
     this.lastAccessed = new Date();
+    this.addedCliches = {};
 }
 
 UserProject.prototype.addComponent = function(componentId, component){

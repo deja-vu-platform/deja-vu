@@ -12,7 +12,7 @@
 var addedCliches;
 
 $(function(){
-    generateFakeCliches();
+    generateFakeCliches100();
 
     selectedProject = window.sessionStorage.getItem('selectedProject');
     addedCliches = window.sessionStorage.getItem('addedCliches');
@@ -48,12 +48,14 @@ function clicheDisplaySkeleton(name, id, description, previewHTML){
     return skeleton;
 }
 
-function generateFakeCliches(){ // For now
-    var numCliches = 100;
+function generateFakeCliches100(){
+    for (var i = 0; i<100; i++) {
+        generateFakeCliches(i);
+    }
+}
 
-    for (var i = 0; i<numCliches; i++){
-        var name = 'fakeCliche_'+i;
-        var id = i;
+function generateFakeCliches(id){ // For now
+        var name = 'fakeCliche_'+id;
         var description =
             'This is a fake cliche to test the functionality of the cliche page. ' +
             'Nulla vehicula eros in sapien posuere, eu luctus odio molestie. Praesent ' +
@@ -64,8 +66,7 @@ function generateFakeCliches(){ // For now
             'iaculis pharetra.';
         var html = '<img src="images/image_icon.png">';
         var skeleton = clicheDisplaySkeleton(name, id, description, html);
-        $('#all-cliche-container').append(skeleton);
-    }
+        $('#all-cliches').append(skeleton);
 }
 
 
@@ -76,6 +77,9 @@ $('#all-cliche-container').on('click', 'input[type=checkbox]', function(){
     if (checked){
         // uncheck
         removeClicheFromList(id);
+        if ($('#selected-cliches-radio').prop('checked')){ //if in selected section, get rid of it!
+            $(this).parent().parent().parent().remove(); // TODO find a more robust way to do this
+        }
     } else {
         // check
         addClicheToListAndShow(id, name);
@@ -103,3 +107,29 @@ function removeClicheFromList(id){
 function checkBoxes(id){
     $('#all-cliche-container').find('#check_'+id).prop("checked", true).data('checked', true);
 }
+
+
+$('#all-cliches-radio').change(function(){
+    var checked = $(this).prop('checked');
+    if (checked){
+        $('#all-cliches').html('');
+        generateFakeCliches100();
+        for (var id in addedCliches) {
+            checkBoxes(id);
+        }
+    }
+
+
+});
+
+$('#selected-cliches-radio').change(function(){
+    var checked = $(this).prop('checked');
+    if (checked){
+        $('#all-cliches').html('');
+        for (var id in addedCliches) {
+            generateFakeCliches(id);
+            checkBoxes(id);
+        }
+    }
+});
+
