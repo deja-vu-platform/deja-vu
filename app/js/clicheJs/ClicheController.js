@@ -7,7 +7,7 @@ var clichesPerPage = 5;
 
 $(function(){
     addPagination();
-    generateFakeClichesBulk(1, clichesPerPage);
+    generateFakeClichesBulk(1, clichesPerPage); //TODO
 
     selectedProject = JSON.parse(window.sessionStorage.getItem('selectedProject')); // TODO we assume that this
                                                                                     // TODO will exist but shout enforce it!
@@ -17,7 +17,7 @@ $(function(){
 
 
     for (var id in selectedProject.addedCliches) {
-        showClicheInList(id, selectedProject.addedCliches[id]);
+        showClicheInList(id, selectedProject.addedCliches[id].name);
         checkBoxes(id);
     }
 
@@ -25,9 +25,9 @@ $(function(){
 
 });
 
-function clicheDisplaySkeleton(name, id, description, previewHTML){
+function clicheDisplaySkeleton(name, id, description, previewHTML, clicheNumber){
     var skeleton =
-        '<div class="cliche-component-container" id="cliche_'+id+'">' +
+        '<div class="cliche-component-container" id="cliche_'+id+'" data-clichenum="'+clicheNumber+'">' +
             '<div class="name-and-description-container">' +
                 '<div class="cliche-component-name-and-check">'+
                     '<input type="checkbox" id="check_'+id+'" data-checked="'+false+'">' +
@@ -53,8 +53,8 @@ function generateFakeClichesBulk(start, end){
     }
 }
 
-function generateFakeCliches(id){ // For now
-        var name = 'Fake Cliche #'+id;
+function generateFakeCliches(clichenum){ // For now
+        var name = 'Fake Cliche #'+clichenum;
         var description =
             'This is a fake cliche to test the functionality of the cliche page. ' +
             'Nulla vehicula eros in sapien posuere, eu luctus odio molestie. Praesent ' +
@@ -64,7 +64,7 @@ function generateFakeCliches(id){ // For now
             'eros. Duis bibendum sem at nisi fermentum imperdiet. Fusce egestas elit quis ' +
             'iaculis pharetra.';
         var html = '<img src="images/image_icon.png">';
-        var skeleton = clicheDisplaySkeleton(name, id, description, html);
+        var skeleton = clicheDisplaySkeleton(name, clichenum, description, html, clichenum);
         $('#all-cliches').append(skeleton);
 }
 
@@ -72,6 +72,7 @@ function generateFakeCliches(id){ // For now
 $('#all-cliche-container').on('click', 'input[type=checkbox]', function(){
     var checked = $(this).data('checked');
     var id = this.id.split('_')[1];
+    var clicheNum = $(this).parent().parent().parent().data('clichenum');
     var name = $(this).parent().find('.cliche-component-name').text();
     if (checked){
         // uncheck
@@ -81,7 +82,7 @@ $('#all-cliche-container').on('click', 'input[type=checkbox]', function(){
         }
     } else {
         // check
-        addClicheToListAndShow(id, name);
+        addClicheToListAndShow(id, name, clicheNum);
     }
     $(this).data('checked', !checked);
 
@@ -89,8 +90,8 @@ $('#all-cliche-container').on('click', 'input[type=checkbox]', function(){
 
 });
 
-function addClicheToListAndShow(id, name){
-    selectedProject.addedCliches[id] = name;
+function addClicheToListAndShow(id, name, clicheNum){
+    selectedProject.addedCliches[id] = {name: name, clicheNum: clicheNum};
     showClicheInList(id, name);
 }
 
@@ -116,7 +117,7 @@ $('#all-cliches-radio').change(function(){
         var id = $('.pagination .active').get(0).id.split('_')[1];
         var start = (id-1)*clichesPerPage+1;
         var end = id*clichesPerPage;
-        generateFakeClichesBulk(start, end);
+        generateFakeClichesBulk(start, end); //TODO
         for (var id in selectedProject.addedCliches) {
             checkBoxes(id);
         }
@@ -128,9 +129,18 @@ $('#selected-cliches-radio').change(function(){
     var checked = $(this).prop('checked');
     if (checked){
         $('#all-cliches').html('');
+        var id = $('.pagination .active').get(0).id.split('_')[1];
+        var start = (id-1)*clichesPerPage+1;
+        var end = id*clichesPerPage;
         for (var id in selectedProject.addedCliches) {
-            generateFakeCliches(id);
+            var clicheNum = selectedProject.addedCliches[id].clicheNum;
+            //if ((clicheNum>=start)&&(clicheNum<=end)){
+            //    generateFakeCliches(clicheNum); //TODO
+            //    checkBoxes(id);
+            //}
+            generateFakeCliches(clicheNum); //TODO
             checkBoxes(id);
+
         }
         $('#pagination-holder').css('visibility','hidden');
     }
@@ -140,6 +150,7 @@ function addPagination(){
     var numPages = Math.ceil(numFakeCliches/clichesPerPage);
     var paginationUL = document.createElement('ul');
     paginationUL.className = 'pagination';
+
     for (var i = 1; i<= numPages; i++){
         if (i===1){
             var page = '<li id="page_'+i+'" class="active"><a href="#"  >'+i+'</a></li>';
@@ -152,12 +163,25 @@ function addPagination(){
 }
 
 $('#pagination-holder').on('click', 'li', function(){
-    var id = this.id.split('_')[1];
+    var pageNum = this.id.split('_')[1];
     $('#pagination-holder .active').removeClass('active');
     $(this).addClass('active');
-    var start = (id-1)*clichesPerPage+1;
-    var end = id*clichesPerPage;
-    generateFakeClichesBulk(start, end);
+    var start = (pageNum-1)*clichesPerPage+1;
+    var end = pageNum*clichesPerPage;
+    //if ($('#selected-cliches-radio').prop('checked')){ // if in selected section
+    //    $('#all-cliches').html('');
+    //    for (var id in selectedProject.addedCliches) {
+    //        var clicheNum = selectedProject.addedCliches[id].clicheNum;
+    //        if ((clicheNum>=start)&&(clicheNum<=end)){
+    //            generateFakeCliches(clicheNum); //TODO
+    //        }
+    //    }
+    //} else {
+    //    generateFakeClichesBulk(start, end); //TODO
+    //}
+
+        generateFakeClichesBulk(start, end); //TODO
+
     for (var id in selectedProject.addedCliches) {
         checkBoxes(id);
     }

@@ -22,7 +22,7 @@ $(function () {
 
     addedCliches = selectedProject.addedCliches;
     for (var id in addedCliches) {
-        showClicheInList(id, addedCliches[id]);
+        showClicheInList(id, addedCliches[id].name);
     }
 
     if (selectedProject.numComponents === 0){
