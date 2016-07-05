@@ -78,7 +78,6 @@ $('.current-project').on('click', 'a', function(e){
 });
 
 $('.current-project').on('click', '.content', function(){
-    console.log('hi');
     if (currentProject){
         displayProjectPreview(currentProject);
     } else {
@@ -134,14 +133,66 @@ function addLoadProjectButton(filename){
 function displayProjectPreview(project){
     // TODO make it select the main component
     // TODO Also, have a way to click to change to another view?
-    var componentToShowId = Object.keys(project.components)[0];
+    if (!$.isEmptyObject(project.mainComponents)){
+        var componentToShowId = Object.keys(project.mainComponents)[0];
+        var numMainPages = Object.keys(project.mainComponents).length;
+        if (numMainPages>1){
+            $('#table-container-preview').css('width', '790px');
+            $('#preview-prev-page').css('display', 'inline-block');
+            $('#preview-next-page').css('display', 'inline-block');
+        } else {
+            $('#table-container-preview').css('width', '850px');
+            $('#preview-prev-page').css('display', 'none');
+            $('#preview-next-page').css('display', 'none');
+        }
+
+    } else {
+        var componentToShowId = Object.keys(project.components)[0];
+        $('#project-name-preview').css('width', '850px');
+        $('#preview-prev-page').css('display', 'none');
+        $('#preview-next-page').css('display', 'none');
+    }
+
     componentToShow = project.components[componentToShowId];
-
-    $('#project-name-preview').text('Project Preview: '+project.meta.name);
-
     loadTablePreview(componentToShow);
+
+    $('#project-name-preview').text('Project Preview: '+project.meta.name)
+    $('#table-container-preview').data('pagenum', 0);
+
+    $('#preview-prev-page').unbind();
+    $('#preview-prev-page').click(function(){
+        var pageNum = $('#table-container-preview').data('pagenum');
+        showPrevMainPage(project, pageNum);
+    });
+
+    $('#preview-next-page').unbind();
+    $('#preview-next-page').click(function(){
+        var pageNum = $('#table-container-preview').data('pagenum');
+        showNextMainPage(project, pageNum);
+    });
+
+
+
+
 }
 
+function showNextMainPage(project, currentPageNumber){
+    var numMainPages = Object.keys(project.mainComponents).length;
+    var nextPageNum = (currentPageNumber+1)%(numMainPages);
+    var componentToShowId = Object.keys(project.mainComponents)[nextPageNum];
+    componentToShow = project.components[componentToShowId];
+    loadTablePreview(componentToShow);
+    $('#table-container-preview').data('pagenum', nextPageNum);
+
+}
+function showPrevMainPage(project, currentPageNumber){
+    var numMainPages = Object.keys(project.mainComponents).length;
+    var prevPageNum = (currentPageNumber-1+numMainPages)%(numMainPages);
+    var componentToShowId = Object.keys(project.mainComponents)[prevPageNum];
+    componentToShow = project.components[componentToShowId];
+    loadTablePreview(componentToShow);
+    $('#table-container-preview').data('pagenum', prevPageNum);
+}
 
 /**
  * Creates a new Project based on user inputs

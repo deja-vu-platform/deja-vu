@@ -32,7 +32,11 @@ $(function () {
         createTable();
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
-        var componentToLoadId = Object.keys(selectedProject.components)[0]; //TODO
+        if (!$.isEmptyObject(selectedProject.mainComponents)){
+            var componentToLoadId = Object.keys(selectedProject.mainComponents)[0];
+        } else {
+            var componentToLoadId = Object.keys(selectedProject.components)[0];
+        }
         selectedUserComponent = selectedProject.components[componentToLoadId];
         if (componentToLoadId in selectedProject.mainComponents){
             displayMainPageInListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
@@ -43,7 +47,7 @@ $(function () {
             if (componentId != componentToLoadId){
                 var componentName = selectedProject.components[componentId].meta.name;
                 if (componentId in selectedProject.mainComponents){
-                    displayMainPageInListAndSelect(componentName, componentId)
+                    displayNewComponentInMainPagesList(componentName, componentId)
                 } else {
                     displayNewComponentInUserComponentList(componentName, componentId);
                 }
