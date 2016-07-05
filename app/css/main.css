@@ -142,7 +142,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
     background-color: #E0E0E0;
 }
 
-li#selected {
+li.selected {
     background-color: #E0E0E0;
 }
 

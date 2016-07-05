@@ -186,6 +186,7 @@ function createTable() {
     addTableResizeHandler();
     addTableSizeLockUnlockButton();
     addClearButtons();
+    addAddToMainPagesButton();
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
@@ -1016,6 +1017,65 @@ function getHeightSum(col){
     return sum;
 }
 
+/** **/
+
+function addAddToMainPagesButton(){
+    var added = (selectedUserComponent.meta.id in selectedProject.mainComponents);
+    if (added){
+        var span = document.createElement('span');
+        span.innerHTML = '<button type="button" class="btn btn-default ">' +
+            '<span class="glyphicon glyphicon-remove"></span>' +
+            '<span> Remove from Main Pages</span>' +
+            '</button>';
+    }
+    else{
+        var span = document.createElement('span');
+        span.innerHTML = '<button type="button" class="btn btn-default ">' +
+            '<span class="glyphicon glyphicon-plus"></span>' +
+            '<span> Add to Main Pages</span>' +
+            '</button>';
+    }
+    var addToMainPageButton = span.firstChild;
+    addToMainPageButton.id = 'btn-add-main-page';;
+
+    $(addToMainPageButton).data('added', added).css({
+        position: 'absolute',
+        top:'-45px',
+        right:'-20px'
+
+    });
+
+    $(addToMainPageButton).on("click", function (e) {
+        var added = $(this).data('added');
+        var userComponentId = selectedUserComponent.meta.id;
+        var name = selectedUserComponent.meta.name;
+        if (added){
+            // then remove
+            $($(this).children().get(0)).removeClass('glyphicon-remove').addClass('glyphicon-plus');
+            $($(this).children().get(1)).text(' Add to Main Pages');
+            delete selectedProject.mainComponents[userComponentId];
+            $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
+            displayUserComponentInListAndSelect(name, userComponentId);
+            selectedUserComponent.inMainPages = false;
+        } else {
+            // then add
+            $($(this).children().get(0)).removeClass('glyphicon-plus').addClass('glyphicon-remove');
+            $($(this).children().get(1)).text(' Remove from Main Pages');
+
+            if (!selectedProject.mainComponents){
+                selectedProject.mainComponents = {}; // for safety
+            }
+            selectedProject.mainComponents[userComponentId] = name;
+            $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
+            displayMainPageInListAndSelect(name, userComponentId);
+            selectedUserComponent.inMainPages = true;
+        }
+        $(this).data('added', !added);
+    });
+
+    $('#main-cell-table').append(addToMainPageButton);
+
+}
 
 /** ** ** Row/Col add/delete and resize functions ** ** ** **/
 
@@ -1744,9 +1804,9 @@ function addClearButtons(){
 function addClearAllButton(){
     var spClearAll = document.createElement('span');
     spClearAll.innerHTML = '<button type="button" class="btn btn-default ">' +
-        '<span>Clear All </span>' +
-        '<span class="glyphicon glyphicon-remove"></span>' +
-        '</button>';
+                                '<span>Clear All </span>' +
+                                '<span class="glyphicon glyphicon-remove"></span>' +
+                            '</button>';
 
     var buttonClearAll = spClearAll.firstChild;
     buttonClearAll.id = 'btn-clear-all';
@@ -1807,7 +1867,14 @@ function addDeleteUserComponentButton(userComponentId){
         }
     });
 
-    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").append(buttonDeleteUserComponent).hover(
+    var listElt;
+    if (userComponentId in selectedProject.mainComponents){
+        listElt = $("#main-pages-list").find("[data-componentid='" + userComponentId + "']");
+    } else {
+        listElt = $("#user-components-list").find("[data-componentid='" + userComponentId + "']");
+    }
+
+    listElt.append(buttonDeleteUserComponent).hover(
         function(){
             $(this).find('.component-name-container').css({
                 width: '70%'
@@ -1839,6 +1906,7 @@ function deleteUserComponent(userComponentId){
         loadTable(selectedUserComponent);
     }
     $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
+    $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
 
 }
 
