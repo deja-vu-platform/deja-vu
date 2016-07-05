@@ -1,13 +1,13 @@
 /// <reference path="../typings/tsd.d.ts" />
+import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mean_mod = require("mean");
+import {Mean, ServerBus, Helpers} from "mean";
 
 import * as _u from "underscore";
 
 
-const mean = new mean_mod.Mean(
+const mean = new Mean(
   "label",
   (db, debug) => {
     db.createCollection("items", (err, items) => {
@@ -49,6 +49,11 @@ const mean = new mean_mod.Mean(
 );
 
 
+let bus;
+
+//////////////////////////////////////////////////
+
+
 let item_type;
 
 const label_type = new graphql.GraphQLObjectType({
@@ -88,10 +93,9 @@ item_type = new graphql.GraphQLObjectType({
         return mean.db.collection("items")
           .updateOne({name: item.name}, up_op)
           .then(_ => Promise.all([
-              mean.composer.update_atom(item_type, item.atom_id, up_op),
+              bus.update_atom(item_type, item.atom_id, up_op),
               Promise.all(
-                label_objs.map(l => mean
-                  .composer
+                label_objs.map(l => bus
                   .update_atom(
                     label_type, l.atom_id, {$addToSet: {items: l.atom_id}})))
               ]));
@@ -126,155 +130,124 @@ const schema = new graphql.GraphQLSchema({
         }
       },
     })
-  }),
-
-  mutation: new graphql.GraphQLObjectType({
-    name: "Mutation",
-    fields: () => ({
-      _dv_new_item: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: (_, args) => mean.resolve_dv_new("item")(undefined, args)
-                     .then(_ => {
-                       const atom_obj = JSON.parse(args.atom);
-                       atom_obj.atom_id = args.atom_id;
-                       console.log(
-                         "gOOOOOOOOOOTT item " + JSON.stringify(atom_obj));
-                       if (!_u.isEmpty(atom_obj.labels)) {
-                         return mean.db.collection("labels")
-                             .updateMany(
-                               {atom_id: {$in: atom_obj.labels}},
-                               {$addToSet: {items: atom_obj.atom_id}})
-                             .then(_ => Promise.all(
-                                 atom_obj.labels.map(l => mean
-                                   .composer
-                                   .update_atom(
-                                     label_type,
-                                     l.atom_id,
-                                     {$addToSet: {items: atom_obj.atom_id}}
-                                     )
-                                   )
-                                 )
-                               );
-                       }
-                       return true;
-                     })
-      },
-      _dv_update_item: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: (_, args) => mean.resolve_dv_up("item")(undefined, args)
-                     .then(_ => {
-                       console.log(
-                         "uUUUUp ITEMMM is " + JSON.stringify(args.update));
-                       const labels = [];
-                       for (const up of _u.keys(args.update)) {
-                         for (const field of _u.keys(up)) {
-                           if (field.indexOf("labels") === 0) {
-                             labels.push(up[field]);
-                           }
-                         }
-                       }
-
-                       if (!_u.isEmpty(labels)) {
-                         return mean.db.collection("labels")
-                             .updateMany(
-                               {atom_id: {$in: labels}},
-                               {$addToSet: {items: args.atom_id}})
-                             .then(_ => Promise.all(
-                                 labels.map(l => mean
-                                   .composer
-                                   .update_atom(
-                                     label_type,
-                                     l.atom_id,
-                                     {$addToSet: {items: args.atom_id}}
-                                     )
-                                   )
-                                 )
-                               );
-                       }
-                       return true;
-                     })
-      },
-      _dv_new_label: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: (_, args) => mean.resolve_dv_new("label")(undefined, args)
-                     .then(_ => {
-                       const atom_obj = JSON.parse(args.atom);
-                       atom_obj.atom_id = args.atom_id;
-                       console.log("gOOOOOOOOOOTT " + JSON.stringify(atom_obj));
-                       if (!_u.isEmpty(atom_obj.items)) {
-                         return mean.db.collection("items")
-                             .updateMany(
-                               {atom_id: {$in: atom_obj.items}},
-                               {$addToSet: {labels: atom_obj.atom_id}})
-                             .then(_ => Promise.all(
-                                 atom_obj.items.map(a => mean
-                                   .composer
-                                   .update_atom(
-                                     item_type,
-                                     a.atom_id,
-                                     {$addToSet: {labels: atom_obj.atom_id}}
-                                     )
-                                   )
-                                 )
-                               );
-                       }
-                     })
-      },
-      _dv_update_label: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: (_, args) => mean.resolve_dv_up("label")(undefined, args)
-                     .then(_ => {
-                       console.log(
-                         "UUUUUUUPPPPPPPPP is " + JSON.stringify(args.update));
-
-                       const items = [];
-                       for (const up of _u.keys(args.update)) {
-                         for (const field of _u.keys(up)) {
-                           if (field.indexOf("items") === 0) {
-                             items.push(up[field]);
-                           }
-                         }
-                       }
-
-                       if (!_u.isEmpty(items)) {
-                         return mean.db.collection("items")
-                             .updateMany(
-                               {atom_id: {$in: items}},
-                               {$addToSet: {labels: args.atom_id}})
-                             .then(_ => Promise.all(
-                                 items.map(i => mean
-                                   .composer
-                                   .update_atom(
-                                     item_type,
-                                     i.atom_id,
-                                     {$addToSet: {labels: args.atom_id}}
-                                     )
-                                   )
-                                 )
-                               );
-                       }
-                       return true;
-                     })
-      }
-    })
   })
 });
 
 
-mean.serve_schema(schema);
+Helpers.serve_schema(mean.ws, schema);
+
+
+const handlers = {
+  item: {
+    create: (_, args) => Helpers
+      .resolve_create(mean.db, "item")(undefined, args)
+      .then(_ => {
+        const atom_obj = JSON.parse(args.atom);
+        atom_obj.atom_id = args.atom_id;
+        if (!_u.isEmpty(atom_obj.labels)) {
+          return mean.db.collection("labels")
+              .updateMany(
+                {atom_id: {$in: atom_obj.labels}},
+                {$addToSet: {items: atom_obj.atom_id}})
+              .then(_ => Promise.all(
+                  atom_obj.labels.map(l => bus
+                    .update_atom(
+                      label_type,
+                      l.atom_id,
+                      {$addToSet: {items: atom_obj.atom_id}}
+                      )
+                    )
+                  )
+                );
+        }
+        return true;
+      }),
+    update: (_, args) => Helpers
+      .resolve_update(mean.db, "item")(undefined, args)
+      .then(_ => {
+        const labels = [];
+        for (const up of _u.keys(args.update)) {
+          for (const field of _u.keys(up)) {
+            if (field.indexOf("labels") === 0) {
+              labels.push(up[field]);
+            }
+          }
+        }
+
+        if (!_u.isEmpty(labels)) {
+          return mean.db.collection("labels")
+              .updateMany(
+                {atom_id: {$in: labels}},
+                {$addToSet: {items: args.atom_id}})
+              .then(_ => Promise.all(
+                  labels.map(l => bus
+                    .update_atom(
+                      label_type,
+                      l.atom_id,
+                      {$addToSet: {items: args.atom_id}}
+                      )
+                    )
+                  )
+                );
+        }
+        return true;
+      })
+  },
+  label: {
+    create: (_, args) => Helpers
+      .resolve_create(mean.db, "label")(undefined, args)
+      .then(_ => {
+        const atom_obj = JSON.parse(args.atom);
+        atom_obj.atom_id = args.atom_id;
+        if (!_u.isEmpty(atom_obj.items)) {
+          return mean.db.collection("items")
+              .updateMany(
+                {atom_id: {$in: atom_obj.items}},
+                {$addToSet: {labels: atom_obj.atom_id}})
+              .then(_ => Promise.all(
+                  atom_obj.items.map(a => bus
+                    .update_atom(
+                      item_type,
+                      a.atom_id,
+                      {$addToSet: {labels: atom_obj.atom_id}}
+                      )
+                    )
+                  )
+                );
+        }
+      }),
+     update: (_, args) => Helpers
+       .resolve_update(mean.db, "label")(undefined, args)
+       .then(_ => {
+         const items = [];
+         for (const up of _u.keys(args.update)) {
+           for (const field of _u.keys(up)) {
+             if (field.indexOf("items") === 0) {
+               items.push(up[field]);
+             }
+           }
+         }
+
+         if (!_u.isEmpty(items)) {
+           return mean.db.collection("items")
+               .updateMany(
+                 {atom_id: {$in: items}},
+                 {$addToSet: {labels: args.atom_id}})
+               .then(_ => Promise.all(
+                   items.map(i => bus
+                     .update_atom(
+                       item_type,
+                       i.atom_id,
+                       {$addToSet: {labels: args.atom_id}}
+                       )
+                     )
+                   )
+                 );
+         }
+         return true;
+       })
+  }
+};
+
+bus = new ServerBus(
+    "label", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);

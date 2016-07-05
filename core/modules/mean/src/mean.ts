@@ -2,10 +2,11 @@
 import * as express from "express";
 import morgan = require("morgan");
 // the mongodb tsd typings are wrong and we can't use them with promises
-let mongodb = require("mongodb");
+const mongodb = require("mongodb");
 import * as http from "http";
-let command_line_args = require("command-line-args");
-let express_graphql = require("express-graphql");
+const command_line_args = require("command-line-args");
+const express_graphql = require("express-graphql");
+const graphql = require("graphql");
 
 
 const cli = command_line_args([
@@ -25,13 +26,16 @@ const cli = command_line_args([
 
 export class Mean {
   db; //: mongodb.Db;
-  app: express.Express;
-  composer: Composer;
+  ws: express.Express;
   loc: string;
+  bushost: string;
+  busport: number;
 
   constructor(public name: string, init_db?: (db, debug) => void) {
     const opts = cli.parse();
     this.loc = `http://${opts.wshost}:${opts.wsport}`;
+    this.bushost = opts.bushost;
+    this.busport = opts.busport;
 
     console.log(`Starting MEAN ${name} at ${this.loc}`);
 
@@ -50,23 +54,22 @@ export class Mean {
       }
     });
 
-    this.app = express();
-    this.app.use(morgan("dev"));
+    this.ws = express();
+    this.ws.use(morgan("dev"));
 
     if (opts.servepublic) {
       console.log(`Serving public folder for MEAN ${name} at ${this.loc}`);
-      this.app.use(express.static("./dist/public"));
+      this.ws.use(express.static("./dist/public"));
     };
 
-    this.app.listen(opts.wsport, () => {
+    this.ws.listen(opts.wsport, () => {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
     });
-
-    this.composer = new Composer(
-        name, opts.bushost, opts.busport, this.loc);
   }
+}
 
-  serve_schema(graphql_schema) {
+export namespace Helpers {
+  export function serve_schema(ws, graphql_schema) {
     console.log(`Serving graphql schema for MEAN ${this.name} at ${this.loc}`);
     const gql = express_graphql({
       schema: graphql_schema,
@@ -77,13 +80,23 @@ export class Mean {
         stack: e.stack
       })
     });
-    this.app.options("/graphql", this._cors);
-    this.app.get("/graphql", this._cors, gql);
-    this.app.post("/graphql", this._cors, gql);
+    ws.options("/graphql", this.cors);
+    ws.get("/graphql", this.cors, gql);
+    ws.post("/graphql", this.cors, gql);
   }
 
-  resolve_dv_new(
-      item_name: string, col_name?: string, transform_fn?: (atom: any) => any) {
+  export function cors(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  }
+
+  export function resolve_create(
+      db: any, item_name: string, col_name?: string,
+      transform_fn?: (atom: any) => any) {
     if (col_name === undefined) col_name = item_name + "s";
 
     return (_, {atom_id, atom}) => {
@@ -93,13 +106,14 @@ export class Mean {
       atom_obj["atom_id"] = atom_id;
       if (transform_fn !== undefined) atom_obj = transform_fn(atom_obj);
 
-      return this.db.collection(col_name)
+      return db.collection(col_name)
         .insertOne(atom_obj)
         .then(res => res.insertedCount === 1);
     };
   }
 
-  resolve_dv_up(item_name: string, col_name?: string) {
+  export function resolve_update(
+      db: any, item_name: string, col_name?: string) {
     if (col_name === undefined) col_name = item_name + "s";
 
     return (_, {atom_id, update}) => {
@@ -107,28 +121,67 @@ export class Mean {
       console.log(
         "got update " + item_name + "(id " + atom_id + ") from bus " + update);
 
-      return this.db.collection(col_name)
+      return db.collection(col_name)
         .updateOne({atom_id: atom_id}, update_obj)
         .then(res => res.matchedCount === 1 && res.modifiedCount === 1);
     };
   }
-
-  private _cors(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  }
 }
 
 
-export class Composer {
+export class ServerBus {
   constructor(
       private _element: string,
+      private _loc: string,
+      private _ws: express.Express,
       private _hostname: string, private _port: number,
-      private _loc: string) {}
+      private _handlers: any) {
+
+    const build_field = (action, t, handlers) => {
+      const ret = {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: handlers[t][action]
+      };
+      let key = "atom";
+      if (action === "update") key = "update";
+      ret["args"][key] = {
+        "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+      };
+      return ret;
+    };
+    const mut = {};
+    for (let t of Object.keys(_handlers)) {
+      mut["create_" + t] = build_field("create", t, _handlers);
+      mut["update_" + t] = build_field("update", t, _handlers);
+      // mut["delete_" + t] = build_field("delete", t, _handlers);
+    }
+    const gql = express_graphql({
+      schema: new graphql.GraphQLSchema({
+          query: new graphql.GraphQLObjectType({
+            name: "Query",
+            fields: {
+              root: {"type": graphql.GraphQLString, resolve: "tbd"}
+            }
+          }),
+          mutation: new graphql.GraphQLObjectType({
+              name: "Mutation",
+              fields: mut
+          })
+      }),
+      pretty: true,
+      formatError: e => ({
+        message: e.message,
+        locations: e.locations,
+        stack: e.stack
+      })
+    });
+    _ws.options("/dv-bus", Helpers.cors);
+    _ws.get("/dv-bus", Helpers.cors, gql);
+    _ws.post("/dv-bus", Helpers.cors, gql);
+  }
 
   new_atom(t: any /* GraphQLObjectType */, atom_id: string, atom: any) {
     console.log("sending new atom to composer");

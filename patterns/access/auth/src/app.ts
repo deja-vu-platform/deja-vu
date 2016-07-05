@@ -4,7 +4,7 @@ const graphql = require("graphql");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-import {Mean} from "mean";
+import {Mean, ServerBus, Helpers} from "mean";
 
 
 const mean = new Mean(
@@ -20,6 +20,23 @@ const mean = new Mean(
     });
   }
 );
+
+const handlers = {
+  user: {
+    create: Helpers.resolve_create(mean.db, "user", "users", user => {
+          user["password"] = bcrypt.hashSync(user.username, 10);
+          return user;
+        }),
+    update: Helpers.resolve_update(mean.db, "user")
+  }
+};
+
+
+const bus = new ServerBus(
+    "post", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+
+
+//////////////////////////////////////////////////
 
 
 const user_type = new graphql.GraphQLObjectType({
@@ -71,7 +88,7 @@ const schema = new graphql.GraphQLSchema({
                 }
 
                 // report
-                mean.composer.new_atom(user_type, username, user);
+                bus.new_atom(user_type, username, user);
                 return true;
               });
           });
@@ -93,26 +110,6 @@ const schema = new graphql.GraphQLSchema({
             return token;
           });
         }
-      },
-
-      _dv_new_user: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_new("user", "users", user => {
-          user["password"] = bcrypt.hashSync(user.username, 10);
-          return user;
-        })
-      },
-      _dv_update_user: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("user")
       }
     })
   })
@@ -139,4 +136,4 @@ namespace Validation {
   }
 }
 
-mean.serve_schema(schema);
+Helpers.serve_schema(mean.ws, schema);

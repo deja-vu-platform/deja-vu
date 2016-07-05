@@ -2,11 +2,10 @@
 import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mean_mod = require("mean");
+import {Mean, ServerBus, Helpers} from "mean";
 
 
-const mean = new mean_mod.Mean(
+const mean = new Mean(
   "friend",
   (db, debug) => {
     db.createCollection("users", (err, users) => {
@@ -29,6 +28,20 @@ const mean = new mean_mod.Mean(
     });
   }
 );
+
+const handlers = {
+  user: {
+    create: Helpers.resolve_create(mean.db, "user"),
+    update: Helpers.resolve_update(mean.db, "user")
+  }
+};
+
+const bus = new ServerBus(
+    "post", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+
+
+//////////////////////////////////////////////////
+
 
 
 const user_type = new graphql.GraphQLObjectType({
@@ -114,23 +127,6 @@ const schema = new graphql.GraphQLSchema({
           }
         },
         resolve: mutate_friends("$pull")
-      },
-
-      _dv_new_user: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: mean.resolve_dv_new("user")
-      },
-      _dv_update_user: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("user")
       }
     })
   })
@@ -151,11 +147,9 @@ function mutate_friends(op) {
     const users_col = mean.db.collection("users");
     return Promise.all([
       users_col.updateOne({username: username1}, update(u2))
-          .then(_ => mean.composer
-            .update_atom(user_type, u1.atom_id, update(u2))),
+          .then(_ => bus.update_atom(user_type, u1.atom_id, update(u2))),
       users_col.updateOne({username: username2}, update(u1))
-          .then(_ => mean.composer
-            .update_atom(user_type, u2.atom_id, update(u1)))
+          .then(_ => bus.update_atom(user_type, u2.atom_id, update(u1)))
     ]);
   });
 }
@@ -172,4 +166,4 @@ namespace Validation {
   }
 }
 
-mean.serve_schema(schema);
+Helpers.serve_schema(mean.ws, schema);

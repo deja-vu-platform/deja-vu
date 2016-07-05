@@ -2,7 +2,7 @@
 const graphql = require("graphql");
 const rp = require("request-promise");
 
-import {Mean} from "mean";
+import {Mean, Helpers} from "mean";
 
 import * as _ from "underscore";
 
@@ -131,7 +131,7 @@ const schema = new graphql.GraphQLSchema({
   })
 });
 
-mean.serve_schema(schema);
+Helpers.serve_schema(mean.ws, schema);
 
 
 function process(op: string, args: any) {
@@ -175,7 +175,7 @@ function send_update(op: string, dst: Type, src: Type, args: any) {
         const atom_str = JSON.stringify(transformed_atom).replace(/"/g, "\\\"");
         console.log("now have <" + atom_str + ">");
         return post(dst.loc, `{
-            _dv_${op}_${dst.name.toLowerCase()}(
+            create_${dst.name.toLowerCase()}(
               atom_id: "${atom_id}", atom: "${atom_str}")
         }`);
       });
@@ -194,7 +194,7 @@ function send_update(op: string, dst: Type, src: Type, args: any) {
             .replace(/"/g, "\\\"");
         console.log("now have <" + update_str + ">");
         return post(dst.loc, `{
-            _dv_${op}_${dst.name.toLowerCase()}(
+            update_${dst.name.toLowerCase()}(
               atom_id: "${atom_id}", update: "${update_str}")
         }`);
       });
@@ -376,7 +376,7 @@ function post(loc, query) {
   const query_str = query.replace(/ /g, "");
 
   const options = {
-    uri: loc + "/graphql",
+    uri: loc + "/dv-bus",
     method: "post",
     body: {
       query: "mutation " + query_str

@@ -15,5 +15,6 @@ bootstrap(
   DevComponent, [
     provide("label.api", {useValue: APIS.label}),
     provide("element", {useValue: "label"}),
-    provide("loc", {useValue: loc})
+    provide("loc", {useValue: loc}),
+    provide("CompInfo", {useValue: {}})
   ]);

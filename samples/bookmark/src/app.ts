@@ -1,8 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
-// import {Promise} from "es6-promise";
 const graphql = require("graphql");
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mean_mod = require("mean");
+import {Mean, Helpers, ServerBus} from "mean";
 
 import {COMP_INFO} from "./shared/comp";
 
@@ -68,10 +66,12 @@ const schema = new graphql.GraphQLSchema({
 });
 
 
-const mean = new mean_mod.Mean("bookmark");
-mean.serve_schema(schema);
+const mean = new Mean("bookmark");
+const bus = new ServerBus(
+    "bookmark", mean.loc, mean.ws, mean.bushost, mean.busport,
+    {user: {create: undefined, update: undefined}});
 
-mean.app.use("/*", (req, res) => {
+mean.ws.use("/*", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
 });
 
@@ -79,43 +79,41 @@ setTimeout(init_composer, 10 * 1000);  // hack..
 setTimeout(init_db, 30 * 1000);  // hack..
 
 
-/*
- * - Users create posts and attach topics to them
- * - Users can follow other users or topics
- * - Users get a feed with all the posts of the users or topics they follow
- */
 function init_composer() {
   console.log("Creating bonds");
-  mean.composer.config(COMP_INFO);
+  bus.config(COMP_INFO);
 }
 
 
 function init_db() {
-  mean.composer.new_atom(
+  bus.new_atom(
       topic_type, "3", {
         name: "hello",
         posts: [{atom_id: "1"}, {atom_id: "2"}]
       });
-  mean.composer.new_atom(
+  bus.new_atom(
       post_type, "1", {
         name: "1",
         content: "hello, I'm Ben",
         topics: [{atom_id: "3"}]
       });
-  mean.composer.new_atom(
+  bus.new_atom(
       post_type, "2", {
         name: "2",
         content: "hello, I'm Alyssa",
         topics: [{atom_id: "3"}]
       });
-  mean.composer.new_atom(
+  bus.new_atom(
       user_type, "1", {
         username: "benbitdiddle", follows: [],
         posts: [{atom_id: "1"}]
       });
-  mean.composer.new_atom(
+  bus.new_atom(
       user_type, "2", {
         username: "alyssaphacker", follows: [],
         posts: [{atom_id: "2"}]
       });
 }
+
+
+Helpers.serve_schema(mean.ws, schema);

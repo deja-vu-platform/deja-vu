@@ -25,6 +25,9 @@
     },
     "bcryptjs/bcryptjs.d.ts": {
       "commit": "3a666d1bff92e944488c25599ec56a4937c17c4e"
+    },
+    "node/node.d.ts": {
+      "commit": "877406d815e6f891278b66fc991d92e8d24d5b38"
     }
   }
 }

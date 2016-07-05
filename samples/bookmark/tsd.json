@@ -16,6 +16,9 @@
     },
     "morgan/morgan.d.ts": {
       "commit": "984a41af67d76b5134e0d4991a30f813dfb8561f"
+    },
+    "node/node.d.ts": {
+      "commit": "69de0f48cdad23c179d05919ab77d6734fe0ed2e"
     }
   }
 }

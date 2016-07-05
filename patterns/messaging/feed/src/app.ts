@@ -1,11 +1,9 @@
 /// <reference path="../typings/tsd.d.ts" />
-// import {Promise} from "es6-promise";
 const graphql = require("graphql");
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mean_mod = require("mean");
+import {Mean, ServerBus, Helpers} from "mean";
 
 
-const mean = new mean_mod.Mean(
+const mean = new Mean(
   "feed",
   (db, debug) => {
     // Subs
@@ -54,6 +52,28 @@ const mean = new mean_mod.Mean(
     });
   }
 );
+
+
+const handlers = {
+  publisher: {
+    create: Helpers.resolve_create(mean.db, "pub"),
+    update: Helpers.resolve_update(mean.db, "pub")
+  },
+  subscriber: {
+    create: Helpers.resolve_create(mean.db, "sub"),
+    update: Helpers.resolve_update(mean.db, "sub")
+  },
+  message: {
+    create: Helpers.resolve_create(mean.db, "msg"),
+    update: Helpers.resolve_update(mean.db, "msg")
+  }
+};
+
+new ServerBus(
+    "feed", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+
+
+/////////////////////
 
 const msg_type = new graphql.GraphQLObjectType({
   name: "Message",
@@ -108,66 +128,8 @@ const schema = new graphql.GraphQLSchema({
         }
       }
     })
-  }),
-
-  mutation: new graphql.GraphQLObjectType({
-    name: "Mutation",
-    fields: () => ({
-      _dv_new_subscriber: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_new("sub")
-      },
-      _dv_update_subscriber: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("sub")
-      },
-
-      _dv_new_publisher: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_new("pub")
-      },
-
-      _dv_update_publisher: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("pub")
-      },
-
-      _dv_new_message: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_new("msg")
-      },
-
-      _dv_update_message: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("msg")
-      }
-    })
   })
 });
 
 
-mean.serve_schema(schema);
+Helpers.serve_schema(mean.ws, schema);

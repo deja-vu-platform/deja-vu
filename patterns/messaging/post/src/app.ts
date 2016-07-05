@@ -2,7 +2,7 @@
 import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
-import {Mean} from "mean";
+import {Mean, ServerBus, Helpers} from "mean";
 
 
 const mean = new Mean(
@@ -38,6 +38,23 @@ const mean = new Mean(
   }
 );
 
+
+const handlers = {
+  user: {
+    create: Helpers.resolve_create(mean.db, "user"),
+    update: Helpers.resolve_update(mean.db, "user")
+  },
+  post: {
+    create: Helpers.resolve_create(mean.db, "post"),
+    update: Helpers.resolve_update(mean.db, "post")
+  }
+};
+
+const bus = new ServerBus(
+    "post", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+
+
+//////////////////////////////////////////////////
 
 const post_type = new graphql.GraphQLObjectType({
   name: "Post",
@@ -76,7 +93,6 @@ const schema = new graphql.GraphQLSchema({
       }
     })
   }),
-
   mutation: new graphql.GraphQLObjectType({
     name: "Mutation",
     fields: () => ({
@@ -95,49 +111,13 @@ const schema = new graphql.GraphQLSchema({
                   .updateOne(
                     {atom_id: user.atom_id},
                     {$addToSet: {posts: {atom_id: post.atom_id}}}),
-                mean.composer.update_atom(
+                bus.update_atom(
                   user_type, user.atom_id,
                   {$addToSet: {posts: {atom_id: post.atom_id}}}),
-                mean.composer.new_atom(post_type, post.atom_id, post)
+                bus.new_atom(post_type, post.atom_id, post)
                 ]).then(_ => post));
         }
-      },
-
-      _dv_new_user: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_new("user")
-      },
-
-      _dv_update_user: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("user")
-      },
-
-      _dv_new_post: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_new("post")
-      },
-
-      _dv_update_post: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("post")
-      },
+      }
     })
   })
 });
@@ -153,4 +133,4 @@ namespace Validation {
   }
 }
 
-mean.serve_schema(schema);
+Helpers.serve_schema(mean.ws, schema);

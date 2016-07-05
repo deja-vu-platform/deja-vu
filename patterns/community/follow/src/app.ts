@@ -2,11 +2,10 @@
 import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mean_mod = require("mean");
+import {Mean, ServerBus, Helpers} from "mean";
 
 
-const mean = new mean_mod.Mean(
+const mean = new Mean(
   "follow",
   (db, debug) => {
     db.createCollection("sources", (err, sources) => {
@@ -48,6 +47,23 @@ const mean = new mean_mod.Mean(
     });
   }
 );
+
+const handlers = {
+  source: {
+    create: Helpers.resolve_create(mean.db, "source"),
+    update: Helpers.resolve_update(mean.db, "source")
+  },
+  target: {
+    create: Helpers.resolve_create(mean.db, "target"),
+    update: Helpers.resolve_update(mean.db, "target")
+  }
+};
+
+const bus = new ServerBus(
+    "follow", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+
+
+//////////////////////////////////////////////////
 
 
 const target_type = new graphql.GraphQLObjectType({
@@ -140,42 +156,7 @@ const schema = new graphql.GraphQLSchema({
           target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: update("$pull")
-      },
-
-      _dv_new_source: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: mean.resolve_dv_new("source")
-      },
-      _dv_update_source: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("source")
-      },
-
-      _dv_new_target: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          atom: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: mean.resolve_dv_new("target")
-      },
-
-      _dv_update_target: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          update: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: mean.resolve_dv_up("target")
-      },
+      }
     })
   })
 });
@@ -198,8 +179,7 @@ function update(op) {
         };
         return mean.db.collection("sources")
           .updateOne({atom_id: s.atom_id}, update_op(t))
-          .then(_ => mean.composer
-              .update_atom(source_type, s.atom_id, update_op(t)));
+          .then(_ => bus.update_atom(source_type, s.atom_id, update_op(t)));
       });
 }
 
@@ -222,4 +202,4 @@ namespace Validation {
   }
 }
 
-mean.serve_schema(schema);
+Helpers.serve_schema(mean.ws, schema);
