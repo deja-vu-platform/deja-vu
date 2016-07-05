@@ -22,28 +22,34 @@
         <div class="menu-item logo">Déjà Vu UI builder</div>
 
         <div class="menu-item">
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
-                <span class="glyphicon glyphicon-file"></span> Open...
-            </button>
-        </div>
-
-        <div class="menu-item">
             <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component">
                 <span class="glyphicon glyphicon-plus"></span> New component
             </button>
         </div>
 
         <div class="menu-item">
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="glyphicon glyphicon-save"></span> Save
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#" id="save-component">Save Component</a></li>
-                    <li><a href="#" id="save-project">Save Project</a></li>
-                </ul>
-            </div>
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
+                <span class="glyphicon glyphicon-file"></span> Import Component
+            </button>
+        </div>
+
+        <!--<div class="menu-item">-->
+            <!--<div class="btn-group">-->
+                <!--<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">-->
+                    <!--<span class="glyphicon glyphicon-save"></span> Save-->
+                    <!--<span class="caret"></span>-->
+                <!--</button>-->
+                <!--<ul class="dropdown-menu">-->
+                    <!--<li><a href="#" id="save-component">Save Component</a></li>-->
+                    <!--<li><a href="#" id="save-project">Save Project</a></li>-->
+                <!--</ul>-->
+            <!--</div>-->
+        <!--</div>-->
+
+        <div class="menu-item">
+            <button type="button" class="btn btn-default"  id="save-project">
+                <span class="glyphicon glyphicon-save"></span> Save Project
+            </button>
         </div>
 
         <div class="menu-item">
@@ -67,11 +73,18 @@
 
 <div class="components">
     <div class="project-name">
-        <div class="header"></div>
         <div  id="back-to-projects">
-            <a href="projectView.html">
+            <a>
                 <span class="glyphicon glyphicon-arrow-left"></span> Back to Projects
             </a>
+        </div>
+        <div class="header"></div>
+    </div>
+    <div class="main-pages">
+        <div class="header">Main Pages</div>
+        <div class="content">
+            <ul id="main-pages-list">
+            </ul>
         </div>
     </div>
     <div class="user-components">
@@ -98,13 +111,11 @@
     </div>
 
     <div class="cliche-components">
-        <div class="header">Cliché components</div>
+        <div class="header">Cliché components
+            <a href="clichePage.html">See All</a>
+        </div>
         <div class="content">
             <ul>
-
-                <li>ACCOUNT</li>
-                <li>USER</li>
-                <li>FRIEND</li>
             </ul>
         </div>
     </div>
@@ -622,7 +633,7 @@
 <script src="js/external/jquery-ui.min.js"></script>
 <script src="js/external/bootstrap.min.js"></script>
 <script src="js/external/parse.min.js"></script>
-<script src="js/utils/utilityFunctions.js"></script>
+<script src="js/utils/Utility.js"></script>
 <script src="js/projectJs/ProjectModel.js"></script>
 <script src="js/componentJs/ComponentModel.js"></script>
 <script src="js/componentJs/ComponentView.js"></script>

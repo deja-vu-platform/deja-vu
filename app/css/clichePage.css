@@ -1,0 +1,195 @@
+
+/*
+ Colors:
+ - body light gray: #F0F1F2
+ - light header:    #EBEBEB
+ - body selected:   #E0E0E0
+ - dark gray:       #D5D5D5
+ - td selected:     #4F9FCF
+ */
+
+/*===================================================
+                   BASE STYLES
+===================================================*/
+html {
+    color: #222;
+    font-size: 1em;
+    font-weight: 300;
+    margin: 0px;
+    line-height: 1.4;
+}
+body { margin: 0px; min-width:600px; }
+ul { list-style-type: none; }
+li { list-style-type: none; }
+/*
+ * Remove the gap between audio, canvas, iframes,
+ * images, videos and the bottom of their containers:
+ */
+audio, canvas, iframe, img, svg, video { vertical-align: middle; }
+/* Remove default fieldset styles. */
+fieldset { border: 0; margin: 0; padding: 0; }
+.clearfix:before, .clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+.clearfix:after { clear: both; }
+
+
+/*===================================================
+                   MENUBAR
+===================================================*/
+.menubar {
+    width: 100%;
+    display: block;
+    height: 70px;
+    background-color: #F0F1F2;
+    /*overflow-x: scroll;*/
+    z-index: 600;
+}
+
+.menubar-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1000px;
+    height: 70px;
+    background-color: #F0F1F2;
+
+}
+
+.menu-item {
+    float: left;
+    margin: 15px 5px 15px 5px;
+}
+
+.menu-item.logo {
+    width: 200px;
+    color: #555555;
+    font-weight: bold;
+    font-size: 23px;
+    font-family: "Adobe Garamond";
+}
+
+/*===================================================
+                  COMPONENTS
+===================================================*/
+.components {
+    float: left;
+    border: #d5d5d5 1px solid;
+    height: 100%;
+    width: 200px;
+    position: absolute;
+}
+
+.header {
+    border-top: solid 5px #D5D5D5;
+    text-align: center;
+    line-height: 250%;
+    background-color: #EBEBEB;
+}
+
+.project-name .header{
+    border: none;
+    background-color: white;
+    font-weight: bold;
+}
+
+#back-to-project{
+    width: 100%;
+    text-align: center;
+}
+
+.content {
+    overflow: scroll;
+    text-align: left;
+    resize: vertical;
+}
+
+.cliche-components .content {
+    height: 500px;
+}
+
+.component-name-container{
+    width: 100%;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.content li {
+    margin: 10px 10px 0px 0px;
+    padding: 5px;
+}
+.content ul {
+    padding-left: 15px;
+    padding-right: 5px;
+}
+.content li:hover {
+    background-color: #E0E0E0;
+}
+
+li#selected {
+    background-color: #E0E0E0;
+}
+
+.content img {
+    width: 20px;
+    height: 20px;
+    margin: 0px 15px 0px 5px;
+}
+
+
+/*===================================================
+                   CLICHE COMPONENTS
+===================================================*/
+
+
+#all-cliche-container{
+    margin-left: 200px;
+    padding: 50px;
+    width: 1100px;
+}
+
+.name-and-description-container {
+    width: 400px;
+    display: inline-block;
+    float: left;
+}
+
+.cliche-component-name{
+    display: inline-block;
+    padding: 10px 20px;
+}
+
+.cliche-component-description{
+    height: 120px;
+    overflow: auto;
+    padding: 10px 20px;
+}
+
+.cliche-component-container img{
+    max-height: 200px;
+    max-width: 400px;
+    height: auto;
+    width: auto;
+    padding: 20px;
+}
+
+/*===================================================
+                   COMPONENTS
+===================================================*/
+
+.lbl-small, .btn-size-xs {
+    font-size: 64%;
+}
+.lbl-default, .btn-size-df {
+    font-size: 14px ;
+}
+.lbl-large {
+    font-size: 150%;
+}
+.lbl-heading, .btn-size-lg {
+    font-size: 200%;
+}
+.btn-group-vertical>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 4px !important;
+}

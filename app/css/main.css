@@ -43,7 +43,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
     display: block;
     height: 70px;
     background-color: #F0F1F2;
-    overflow-x: scroll;
+    /*overflow-x: scroll;*/
     z-index: 600;
 }
 
@@ -105,6 +105,11 @@ fieldset { border: 0; margin: 0; padding: 0; }
     resize: vertical;
 }
 
+a{
+    cursor: pointer;
+}
+
+
 .basic-components .content {
     height: 250px;
 }
@@ -120,6 +125,10 @@ fieldset { border: 0; margin: 0; padding: 0; }
 }
 
 #user-components-list li{
+    height: 50px;
+}
+
+#main-pages-list li{
     height: 50px;
 }
 
@@ -142,7 +151,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
     background-color: #E0E0E0;
 }
 
-li#selected {
+li.selected {
     background-color: #E0E0E0;
 }
 

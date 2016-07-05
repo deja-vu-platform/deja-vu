@@ -67,8 +67,13 @@
 
         <div class="project-preview">
             <span id="project-name-preview"></span>
-            <!--<img src="images/someSortOfPreview.png">-->
+            <div id="preview-prev-page">
+                <span class="glyphicon glyphicon-chevron-left" id="preview-prev-page-icon"></span>
+            </div>
             <div id="table-container-preview"></div>
+            <div id="preview-next-page">
+                <span class="glyphicon glyphicon-chevron-right" id="preview-next-page-icon"></span>
+            </div>
         </div>
     </div>
 
@@ -88,14 +93,6 @@
         </ul>
     </div>
 </div>
-
-
-
-
-
-<!--<div id="trash" class="droppable">-->
-    <!--<span class="glyphicon glyphicon-trash"></span>-->
-<!--</div>-->
 
 <!--MODALS-->
 <div class="modal fade" id="new-project">
@@ -176,7 +173,7 @@
 <script src="js/external/jquery.min.js"></script>
 <script src="js/external/jquery-ui.min.js"></script>
 <script src="js/external/bootstrap.min.js"></script>
-<script src="js/utils/utilityFunctions.js"></script>
+<script src="js/utils/Utility.js"></script>
 <script src="js/projectJs/ProjectPreview.js"></script>
 <script src="js/projectJs/ProjectModel.js"></script>
 <script src="js/projectJs/ProjectController.js"></script>

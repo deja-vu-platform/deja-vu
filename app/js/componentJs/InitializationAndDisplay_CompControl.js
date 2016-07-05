@@ -3,7 +3,7 @@
 
 
 var projectsSavePath = path.join(__dirname, 'projects');
-
+var addedCliches;
 
 
 /** ** ** ** ** ** Initialization ** ** ** ** ** **/
@@ -20,6 +20,11 @@ $(function () {
 
     $('.project-name .header').text(selectedProject.meta.name);
 
+    addedCliches = selectedProject.addedCliches;
+    for (var id in addedCliches) {
+        showClicheInList(id, addedCliches[id].name);
+    }
+
     if (selectedProject.numComponents === 0){
         // start a default component
         selectedUserComponent = initUserComponent(true);
@@ -27,13 +32,25 @@ $(function () {
         createTable();
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
-        var componentToLoadId = Object.keys(selectedProject.components)[0];
+        if (!$.isEmptyObject(selectedProject.mainComponents)){
+            var componentToLoadId = Object.keys(selectedProject.mainComponents)[0];
+        } else {
+            var componentToLoadId = Object.keys(selectedProject.components)[0];
+        }
         selectedUserComponent = selectedProject.components[componentToLoadId];
-        displayNewUserComponentInListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
+        if (componentToLoadId in selectedProject.mainComponents){
+            displayMainPageInListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
+        } else {
+            displayUserComponentInListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
+        }
         for (var componentId in selectedProject.components){
             if (componentId != componentToLoadId){
                 var componentName = selectedProject.components[componentId].meta.name;
-                displayNewComponentInUserComponentList(componentName, componentId);
+                if (componentId in selectedProject.mainComponents){
+                    displayNewComponentInMainPagesList(componentName, componentId)
+                } else {
+                    displayNewComponentInUserComponentList(componentName, componentId);
+                }
 
 
             }
@@ -85,8 +102,9 @@ $('#save-component').on('click', function () {
 });
 
 $('#save-project').on('click', function () {
-
-    downloadObject(selectedProject.meta.name+'.json', selectedProject);
+    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
+    //downloadObject(selectedProject.meta.name+'.json', selectedProject);
 });
 
 
@@ -114,15 +132,15 @@ $('#back-to-projects').click(function(event){
     window.location = 'projectView.html';
 });
 
-$('#user-components-list').on('click', '.component-name-container', function () {
+$('.components').on('click', '.component-name-container', function () {
     var componentId = $(this).parent().data('componentid');
-    $('#selected').removeAttr('id');
-    $(this).parent().attr('id', 'selected');
+    $('.selected').removeClass('selected');
+    $(this).parent().addClass('selected');
     selectedUserComponent = selectedProject.components[componentId];
     loadTable(selectedUserComponent);
 });
 
-$('#user-components-list').on('dblclick', '.component-name', function () {
+$('.components').on('dblclick', '.component-name', function () {
     var newNameInputElt = $($(this).parent().find('.new-name-input'));
     var submitRenameElt = $($(this).parent().find('.submit-rename'));
     newNameInputElt.val($(this).text());
@@ -132,7 +150,7 @@ $('#user-components-list').on('dblclick', '.component-name', function () {
     newNameInputElt.select();
 });
 
-$('#user-components-list').on('keypress', '.new-name-input', function (event) {
+$('.components').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
         var componentNameElt = $($(this).parent().parent().find('.component-name'));
@@ -166,17 +184,9 @@ $('#user-components-list').on('keypress', '.new-name-input', function (event) {
 
 
 function displayUserComponentInListAndSelect(name, id){
-    $('#selected').removeAttr("id");
+    $('.selected').removeClass("selected");
     displayNewComponentInUserComponentList(name,id);
-    $("#user-components-list").find("[data-componentid='" + id + "']").attr('id', 'selected');
-}
-
-
-
-function displayNewUserComponentInListAndSelect(name, id){
-    $('#selected').removeAttr("id");
-    displayNewComponentInUserComponentList(name, id);
-    $("#user-components-list").find("[data-componentid='" + id + "']").attr('id', 'selected');
+    $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
 /**
@@ -197,6 +207,30 @@ function displayNewComponentInUserComponentList(name, id){
     addDeleteUserComponentButton(id);
 }
 
+
+/**
+ * Adds a component to the list of user components
+ * @param newComponent
+ */
+function displayNewComponentInMainPagesList(name, id){
+    var newComponentElt =
+        '<li data-componentid=' + id + '>'
+        + '<div class="component-name-container">'
+            + '<span class="component-name">' + name + '</span>'
+                + '<span class="submit-rename not-displayed">'
+                + '<input type="text" class="new-name-input form-control" autofocus>'
+            + '</span>'
+        + '</div>'
+        + '</li>';
+    $('#main-pages-list').append(newComponentElt);
+    addDeleteUserComponentButton(id);
+}
+
+function displayMainPageInListAndSelect(name, id){
+    $('.selected').removeClass("selected");
+    displayNewComponentInMainPagesList(name,id);
+    $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
+}
 
 /**
  * Adds a component to the table and displays it. If no component is given, it creates a
@@ -714,3 +748,9 @@ $(document).on('change', '#fileselect', function(evt) {
     $(this).parent().parent().parent().children().first().val(files[0].name);
 });
 
+
+/** ** ** ** ** ** ** ** Show Cliche Components in List  ** ** ** ** ** ** ** **/
+function showClicheInList(id, name){
+    var addedCliche = '<li id="added_'+id+'">'+name+'</li>';
+    $('.cliche-components ul').append(addedCliche);
+}
