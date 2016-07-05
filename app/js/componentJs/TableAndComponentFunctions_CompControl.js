@@ -1041,7 +1041,7 @@ function addAddToMainPagesButton(){
     $(addToMainPageButton).data('added', added).css({
         position: 'absolute',
         top:'-45px',
-        right:'-20px'
+        left:'300px'
 
     });
 

@@ -123,6 +123,10 @@ fieldset { border: 0; margin: 0; padding: 0; }
     height: 50px;
 }
 
+#main-pages-list li{
+    height: 50px;
+}
+
 .btn-delete-component{
     display: none;
     cursor: pointer;
