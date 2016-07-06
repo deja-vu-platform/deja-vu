@@ -161,9 +161,9 @@ a{
 }
 
 .content {
-    overflow: scroll;
+    overflow: auto;
     text-align: left;
-    resize: vertical;
+    /*resize: vertical;*/
 }
 
 .project-filename{
