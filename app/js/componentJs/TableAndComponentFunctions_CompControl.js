@@ -1077,6 +1077,30 @@ function addAddToMainPagesButton(){
 }
 
 /** ** ** Row/Col add/delete and resize functions ** ** ** **/
+/**
+ *
+ * @param ratios {Array}
+ */
+function resizeRowsBySetRatios(ratios){
+    for (var row = 1; row<=numRows; row++){
+        for (var col = 1; col<= numCols; col++) {
+            selectedUserComponent.layout[row][col].ratio.grid.height = ratios[row-1];
+            selectedUserComponent.layout[row][col].ratio.cell.height = ratios[row-1];
+        }
+    }
+    loadTable(selectedUserComponent);
+}
+
+
+function resizeColsBySetRatios(ratios){
+    for (var row = 1; row<=numRows; row++){
+        for (var col = 1; col<= numCols; col++) {
+            selectedUserComponent.layout[row][col].ratio.grid.width = ratios[col-1];
+            selectedUserComponent.layout[row][col].ratio.cell.width = ratios[col-1];
+        }
+    }
+    loadTable(selectedUserComponent);
+}
 
 
 function addRowColResizeHandlers(){
@@ -2009,3 +2033,8 @@ function updateBitmap() {
 }
 
 
+/** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **/
+
+function copyUserComponent(userComponent){
+    return UserComponent.fromString(JSON.stringify(userComponent));
+}
