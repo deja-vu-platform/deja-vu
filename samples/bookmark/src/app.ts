@@ -71,9 +71,12 @@ const bus = new ServerBus(
     "bookmark", mean.loc, mean.ws, mean.bushost, mean.busport,
     {user: {create: undefined, update: undefined}});
 
+Helpers.serve_schema(mean.ws, schema);
+
 mean.ws.use("/*", (req, res) => {
   res.sendFile(__dirname + "/public/index.html");
 });
+
 
 setTimeout(init_composer, 10 * 1000);  // hack..
 setTimeout(init_db, 30 * 1000);  // hack..
@@ -86,6 +89,7 @@ function init_composer() {
 
 
 function init_db() {
+  console.log("Initializing DB");
   bus.new_atom(
       topic_type, "3", {
         name: "hello",
@@ -114,6 +118,3 @@ function init_db() {
         posts: [{atom_id: "2"}]
       });
 }
-
-
-Helpers.serve_schema(mean.ws, schema);

@@ -70,7 +70,7 @@ export class Mean {
 
 export namespace Helpers {
   export function serve_schema(ws, graphql_schema) {
-    console.log(`Serving graphql schema for MEAN ${this.name} at ${this.loc}`);
+    console.log(`Serving graphql schema for MEAN`);
     const gql = express_graphql({
       schema: graphql_schema,
       pretty: true,
