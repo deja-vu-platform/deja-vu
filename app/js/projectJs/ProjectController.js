@@ -36,7 +36,11 @@ $(function () {
         $('.current-project .content').html('').append(currentProjectLink);
         $(currentProjectLink).text(currentProject.meta.name);
         displayProjectPreview(currentProject);
+    } else {
+        $('.current-project').css('display', 'none');
+        $('#project-name-preview').text('Project Preview')
     }
+
 
     readFiles(projectsSavePath, function(filename, content) {
         // TODO add a loading projects sign
@@ -57,6 +61,8 @@ $(function () {
         throw err;
         // handle errors
     });
+    // finish load animation
+    $('.loader-container').fadeOut("fast");
 
 });
 
@@ -173,8 +179,6 @@ function displayProjectPreview(project){
         $('#table-container-preview').css('width', '850px').text("This project does not have a main page yet...");
     }
 
-    // finish load animation
-    $('.loader-container').fadeOut("fast");
 }
 
 function showNextMainPage(project, currentPageNumber){

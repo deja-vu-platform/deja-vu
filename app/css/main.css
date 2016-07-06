@@ -605,6 +605,7 @@ p.label {
 }
 
 .loader-words{
+    display: inline-block;
     padding-bottom: 30px;
     font-size: 18px;
 }
