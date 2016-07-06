@@ -620,3 +620,10 @@ p.label {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+
+
+.navigation{
+    float: right;
+    padding-right: 20px;
+}

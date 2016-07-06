@@ -193,3 +193,10 @@ li#selected {
 .btn-group-vertical>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
     border-top-right-radius: 4px !important;
 }
+
+
+
+.navigation{
+    float: right;
+    padding-right: 20px;
+}
