@@ -10,7 +10,7 @@ module.exports = function(grunt, optPatterns, element) {
     "node_modules/angular2/bundles/angular2.dev.js",
     "node_modules/angular2/bundles/http.js",
     "node_modules/angular2/bundles/router.dev.js",
-    "node_modules/composer/lib/composer.js",
+    "node_modules/client-bus/lib/client-bus.js",
     "node_modules/underscore/underscore.js"
   ];
   deps = deps.concat(patternsSrc);

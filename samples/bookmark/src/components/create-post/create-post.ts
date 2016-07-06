@@ -9,7 +9,7 @@ import {NewPostContentComponent} from
 import {NewPostButtonComponent} from
 "dv-messaging-post/lib/components/new-post-button/new-post-button";
 
-import {Composer} from "composer";
+import {ClientBus} from "client-bus";
 
 
 @Component({
@@ -26,8 +26,8 @@ export class CreatePostComponent {
   private post_post;
   private label_item;
 
-  constructor(private _composer: Composer) {
-    this._post = this._composer.new_atom("Post");
+  constructor(private _client_bus: ClientBus) {
+    this._post = this._client_bus.new_atom("Post");
     this._post.content = "";
     this.post_post = this._post
       .adapt({name: "Post", element: "post", loc: "@@dv-messaging-post-1"});

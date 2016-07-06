@@ -239,7 +239,7 @@ export class Atom {
 
 
 @Injectable()
-export class Composer {
+export class ClientBus {
   constructor(
       @Inject("element") private _element: string,
       @Inject("loc") private _loc: string, private _http: Http,

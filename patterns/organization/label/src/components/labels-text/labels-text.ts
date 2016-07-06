@@ -1,6 +1,6 @@
 import {Component, provide} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
-import {Composer} from "composer";
+import {ClientBus} from "client-bus";
 
 import {Item} from "../../shared/label";
 
@@ -13,14 +13,14 @@ import {Item} from "../../shared/label";
     provide("element", {useValue: "label"}),
     provide("loc", {useValue: "@@dv-organization-label-1"}),
     provide("CompInfo", {useValue: {tbonds: [], fbonds: []}}),
-    Composer, HTTP_PROVIDERS
+    ClientBus, HTTP_PROVIDERS
   ]
 })
 export class LabelsTextComponent {
   private _item: Item = {name: "", labels: []};
   private _labels_text: string = "";
 
-  constructor(private _composer: Composer) {}
+  constructor(private _client_bus: ClientBus) {}
 
   get item() {
     return this._item;
@@ -43,7 +43,7 @@ export class LabelsTextComponent {
     new Set(this._labels_text.split(",").map(l => l.trim()))
       .forEach(
           l => {
-            const ret = this._composer.new_atom("Label");
+            const ret = this._client_bus.new_atom("Label");
             ret.name = l;
             ret.items = [this.item];
             this.item.labels.push(ret);

@@ -1,6 +1,6 @@
 import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
-import {Composer} from "composer";
+import {ClientBus} from "client-bus";
 
 import {Post, User} from "../../shared/data";
 import {PostService} from "../shared/post";
@@ -9,7 +9,7 @@ import {PostService} from "../shared/post";
 @Component({
   selector: "new-post-button",
   templateUrl: "./components/new-post-button/new-post-button.html",
-  providers: [PostService, Composer, HTTP_PROVIDERS],
+  providers: [PostService, ClientBus, HTTP_PROVIDERS],
   inputs: ["post", "user"]
 })
 export class NewPostButtonComponent {
@@ -17,7 +17,8 @@ export class NewPostButtonComponent {
   private _post: Post = {content: ""};
   private _user: User = {username: "", posts: []};
 
-  constructor(private _postService: PostService, private _composer: Composer) {}
+  constructor(
+    private _postService: PostService, private _client_bus: ClientBus) {}
 
   get post(): Post {
     return this._post;
@@ -50,11 +51,11 @@ export class NewPostButtonComponent {
       .subscribe(data => {
         this.submitted = true;
         this.post["atom_id"] = data.atom_id;
-        this._composer.report_save(data.atom_id, this.post).then(_ => {
+        this._client_bus.report_save(data.atom_id, this.post).then(_ => {
           console.log("looks like the save finished");
         });
         // const user_up = {$addToSet: {posts: {atom_id: data.atom_id}}};
-        // this._composer.report_update(user_up, this._user);
+        // this._client_bus.report_update(user_up, this._user);
       });
   }
 }

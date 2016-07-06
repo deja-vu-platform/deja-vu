@@ -7,14 +7,14 @@ import {CreatePostComponent} from "../create-post/create-post";
 import {FeedComponent} from
 "dv-messaging-feed/lib/components/feed/feed";
 
-import {Composer} from "composer";
+import {ClientBus} from "client-bus";
 
 
 @Component({
   selector: "home",
   templateUrl: "./components/home/home.html",
   directives: [LoggedInComponent, CreatePostComponent, FeedComponent],
-  providers: [Composer, HTTP_PROVIDERS]
+  providers: [ClientBus, HTTP_PROVIDERS]
 })
 export class HomeComponent {
   username: string;
@@ -22,13 +22,13 @@ export class HomeComponent {
   post_user;
   feed_sub = {name: ""};
 
-  constructor(private _composer: Composer) {}
+  constructor(private _client_bus: ClientBus) {}
 
   loggedInUser(username: string) {
     console.log("got a username");
     this.username = username;
     // tmp hack: auth should be returning an atom obj
-    this.user = this._composer.new_atom("User");
+    this.user = this._client_bus.new_atom("User");
     this.user.atom_id = username;
     this.user.username = username;
     //

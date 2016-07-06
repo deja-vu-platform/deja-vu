@@ -1,5 +1,5 @@
 {
-  "name": "composer",
+  "name": "client-bus",
   "version": "0.0.1",
   "scripts": {
     "lib": "grunt lib"
@@ -24,8 +24,8 @@
     "request-promise": "^3.0.0",
     "underscore": "^1.8.3"
   },
-  "typings": "./lib/composer",
-  "main": "./lib/composer",
+  "typings": "./lib/client-bus",
+  "main": "./lib/client-bus",
   "files": [
     "lib"
   ]
