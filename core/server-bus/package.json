@@ -1,0 +1,26 @@
+{
+  "name": "server-bus",
+  "version": "0.0.1",
+  "scripts": {
+    "lib": "grunt lib"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-dts-bundle": "^0.3.0",
+    "grunt-ts": "^5.3.2",
+    "grunt-tslint": "^3.0.2",
+    "tslint": "^3.3.0",
+    "typescript": "^1.7.5"
+  },
+  "typings": "./lib/server-bus",
+  "main": "./lib/server-bus",
+  "dependencies": {
+    "express-graphql": "^0.4.9",
+    "graphql": "^0.4.18"
+  },
+  "files": [
+    "lib"
+  ]
+}
