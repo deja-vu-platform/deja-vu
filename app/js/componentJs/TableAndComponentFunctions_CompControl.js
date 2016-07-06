@@ -1102,6 +1102,12 @@ function resizeColsBySetRatios(ratios){
     loadTable(selectedUserComponent);
 }
 
+function addResizeMenu(){
+    // TODO
+    // will make resize handles invisible until this is opened
+    // will also allow resizing by rows and cols by given ratios
+    //              this should calculate the last number by itself!
+}
 
 function addRowColResizeHandlers(){
     // Have a resizable on the rows

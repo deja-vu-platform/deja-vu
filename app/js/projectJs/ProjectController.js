@@ -173,6 +173,8 @@ function displayProjectPreview(project){
         $('#table-container-preview').css('width', '850px').text("This project does not have a main page yet...");
     }
 
+    // finish load animation
+    $('.loader-container').fadeOut("fast");
 }
 
 function showNextMainPage(project, currentPageNumber){
