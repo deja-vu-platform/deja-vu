@@ -991,7 +991,7 @@ function initialResizeCells() {
         }
     }
 
-    console.log(getWidthSum(1)/(gridWidth-20));
+    console.log(getWidthSumGrid()/(gridWidth-20));
 
     var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
 
@@ -999,7 +999,7 @@ function initialResizeCells() {
 
     resizeLabelDivs(cellWidth, cellHeight);
 
-    console.log(getWidthSum(1)/(gridWidth-20));
+    console.log(getWidthSumGrid()/(gridWidth-20));
 }
 
 function resetAligners() {
@@ -1045,10 +1045,19 @@ function checkWidthRatio(row){
     console.log(sum);
 }
 
-function getWidthSum(row){
+function getWidthSumGrid(){
     var sum = 0;
     for (var col = 1; col <= numCols; col++){
-        sum += parseFloat($('#grid'+'_'+row+'_'+col).css('width'));
+        sum += parseFloat($('#grid_1_'+col).css('width'));
+    }
+    return sum
+}
+
+
+function getWidthSumCells(){
+    var sum = 0;
+    for (var col = 1; col <= numCols; col++){
+        sum += parseFloat($('#cell_0_'+col).css('width'));
     }
     return sum
 }
@@ -1062,10 +1071,19 @@ function checkHeightRatio(col){
     console.log(sum);
 }
 
-function getHeightSum(col){
+function getHeightSumGrid(){
     var sum = 0;
     for (var row = 1; row <= numRows; row++){
-        sum += parseFloat($('#grid'+'_'+row+'_'+col).css('height'));
+        sum += parseFloat($('#grid'+'_'+row+'_1').css('height'));
+    }
+    return sum;
+}
+
+
+function getHeightSumCells(){
+    var sum = 0;
+    for (var row = 1; row <= numRows; row++){
+        sum += parseFloat($('#cell'+'_'+row+'_0').css('height'));
     }
     return sum;
 }
@@ -1171,6 +1189,7 @@ function addRowColResizeHandlers(){
 
     var onStart = function(){
         start = (new Date).getTime();
+        console.log('starting');
 
         $('.grid').css({
             visibility: 'visible',
@@ -1208,80 +1227,142 @@ function addRowColResizeHandlers(){
 
     };
 
+    //var tableLockedResizeRowFn = function(e, ui){
+    //    if ((new Date).getTime() > (start + 5000)){
+    //        console.log('hi');
+    //    }
+    //
+    //    var rowNum = getRowColFromId(ui.element.get(0).childNodes[0].id).row;
+    //    var newRemainingHeight = gridHeight - 20 - parseFloat(ui.size.height);
+    //    var oldRemainingHeight = gridHeight - 20 - parseFloat(ui.originalSize.height);
+    //
+    //    var sum = 0;
+    //
+    //    for (var row = 1; row <= numRows; row++) {
+    //        if (row != rowNum) {
+    //            var oldHeight = (gridHeight - 20)*selectedUserComponent.layout[row][1].ratio.grid.height;
+    //            var newHeight = newRemainingHeight*oldHeight/oldRemainingHeight;
+    //
+    //            sum += newHeight;
+    //
+    //            $('#guide-grid-container .row_' + row + ' .grid').css({
+    //                height: newHeight + "px"
+    //            });
+    //
+    //            $('#guide-grid-container .row_'+row).css({
+    //                height: newHeight + "px"
+    //            });
+    //            //$('#guide-grid-container .row_' + row + ' .ui-resizable-s').css({
+    //            //    width: '5px',
+    //            //    height: newHeight + "px",
+    //            //});
+    //        }
+    //    }
+    //
+    //    console.log(sum/newRemainingHeight);
+    //    checkHeightRatio(1);
+    //};
+    //
+
     var tableLockedResizeRowFn = function(e, ui){
-        if ((new Date).getTime() > (start + 5000)){
-            console.log('hi');
-        }
+        var rowNum = parseInt(getRowColFromId(ui.element.get(0).childNodes[0].id).row);
+        var nextRowNum = rowNum + 1; // having the last handle disabled means that there should always be a next col
 
-        var rowNum = getRowColFromId(ui.element.get(0).childNodes[0].id).row;
-        var newRemainingHeight = gridHeight - 20 - parseFloat(ui.size.height);
-        var oldRemainingHeight = gridHeight - 20 - parseFloat(ui.originalSize.height);
+        var totalHeight = (gridHeight - 20)*(selectedUserComponent.layout[rowNum][1].ratio.grid.height + selectedUserComponent.layout[nextRowNum][1].ratio.grid.height);
+        var remainingHeight = totalHeight - ui.size.height;
 
-        var sum = 0;
+        $('#guide-grid-container .row_' + nextRowNum + ' .grid').css({
+            height: remainingHeight + "px"
+        });
 
-        for (var row = 1; row <= numRows; row++) {
-            if (row != rowNum) {
-                var oldHeight = (gridHeight - 20)*selectedUserComponent.layout[row][1].ratio.grid.height;
-                var newHeight = newRemainingHeight*oldHeight/oldRemainingHeight;
-
-                sum += newHeight;
-
-                $('#guide-grid-container .row_' + row + ' .grid').css({
-                    height: newHeight + "px"
-                });
-
-                $('#guide-grid-container .row_'+row).css({
-                    height: newHeight + "px"
-                });
-                $('#guide-grid-container .row_' + row + ' .ui-resizable-s').css({
-                    width: '5px',
-                    height: newHeight + "px",
-                });
-            }
-        }
-
-        console.log(sum/newRemainingHeight);
-        checkHeightRatio(1);
+        $('#guide-grid-container .row_'+nextRowNum).css({
+            height: remainingHeight + "px"
+        });
     };
+
+    //var tableLockedResizeColFn = function(e, ui){
+    //    if ((new Date).getTime() > (start + 5000)){
+    //        console.log('hey');
+    //    }
+    //
+    //    //var widthSum = getWidthSumGrid();
+    //
+    //    var colNum = getRowColFromId(ui.element.get(0).id).col;
+    //    //var newRemainingWidth = gridWidth - 20 - (parseFloat(ui.size.width)); // there seems to be some weird descrepency between
+    //    //var oldRemainingWidth = gridWidth - 20 - (parseFloat(ui.originalSize.width)); // the reported widths and the actual widths!
+    //
+    //    var newRemainingWidth = gridWidth - 20 - parseFloat($('#grid_1_'+colNum).css('width'));
+    //    var oldRemainingWidth = (gridWidth - 20)*(1-selectedUserComponent.layout[1][colNum].ratio.grid.width); // using row 0 because there is no worry of it being merged
+    //
+    //    var sum = 0;
+    //    for (var col = 1; col <= numCols; col++) {
+    //        if (col != colNum) {
+    //            var oldWidth = (gridWidth - 20)*selectedUserComponent.layout[1][col].ratio.grid.width;
+    //            var newWidth = newRemainingWidth*oldWidth/oldRemainingWidth;
+    //            newWidth = Math.max(newWidth, 10); // because cells can't get smaller than that
+    //            //newWidth = Math.min(newWidth, newRemainingWidth - (numCols-2)*10);
+    //
+    //            sum += newWidth;
+    //            $('#guide-grid-container .col_'+col).css({
+    //                width: newWidth + "px"
+    //            });
+    //        }
+    //
+    //    }
+    //
+    //    var newWidth = gridWidth-20-sum;
+    //
+    //    //$('#guide-grid-container .col_'+colNum).css('width', newWidth+'px');
+    //
+    //    console.log(sum/newRemainingWidth);
+    //};
 
     var tableLockedResizeColFn = function(e, ui){
-        if ((new Date).getTime() > (start + 5000)){
-            console.log('hey');
-        }
+        var colNum = parseInt(getRowColFromId(ui.element.get(0).id).col);
+        var nextColNum = colNum + 1; // having the last handle disabled means that there should always be a next col
 
-        var colNum = getRowColFromId(ui.element.get(0).id).col;
-        //var newRemainingWidth = gridWidth - 20 - (parseFloat(ui.size.width)); // there seems to be some weird descrepency between
-        //var oldRemainingWidth = gridWidth - 20 - (parseFloat(ui.originalSize.width)+10); // the reported widths and the actual widths!
+        var totalWidth = (gridWidth - 20)*(selectedUserComponent.layout[1][colNum].ratio.grid.width + selectedUserComponent.layout[1][nextColNum].ratio.grid.width);
+        var remainingWidth = totalWidth - parseFloat($('#grid_1_'+colNum).css('width'));
 
-        var newRemainingWidth = gridWidth - 20 - parseFloat($('#grid_1_'+colNum).css('width'));
-        var oldRemainingWidth = gridWidth - 20 - parseFloat($('#cell_0_'+colNum).css('width')); // using row 0 because there is no worry of it being merged
-
-        var sum = 0;
-        for (var col = 1; col <= numCols; col++) {
-            if (col != colNum) {
-                var oldWidth = (gridWidth - 20)*selectedUserComponent.layout[1][col].ratio.grid.width;
-                var newWidth = newRemainingWidth*oldWidth/oldRemainingWidth;
-
-                sum += newWidth;
-                $('#guide-grid-container .col_'+col).css({
-                    width: newWidth + "px"
-                });
-            }
-
-        }
-
-        console.log(sum/newRemainingWidth);
+        $('#guide-grid-container .col_'+nextColNum).css({
+            width: remainingWidth + "px"
+        });
     };
 
+
+
+
     for (var row = 1; row <= numRows; row++) {
+        var handle = document.createElement('span');
+        handle.innerHTML = '<span class="glyphicon glyphicon-resize-vertical"></span>';
+        handle.className = 'ui-resizable-handle ui-resizable-s';
+        handle.id = 'ui-resizable-s-row_'+row;
+
+        $(handle).css({
+            position: 'absolute',
+            top: 'auto',
+            bottom: '10px',
+            left: '-10px',
+            width: 0,
+            height: 0,
+            cursor: 'ns-resize',
+            visibility: 'visible',
+            'pointer-events': 'auto',
+        });
+
+        $('#grid_'+row+'_1').append(handle);
+
         $('#guide-grid-container .row_' + row).resizable({
-            handles: 's',
+            handles: {'s': handle},
             alsoResize: //'#table-container .row_' + row + ' .cell, ' +  // also resize the td's
                             '#guide-grid-container .row_' + row + ' .grid,' + // also resize the td's
-                            ' #guide-grid-container .row_' + row + ', ' +
+                            ' #guide-grid-container .row_' + row +
+                            //', ' +
                           //  '#drag-handle-containers-container .row_' + row + ', ' +
                             //'#table-container .row_' + row + ' .ui-resizable-s' +
-                            ' .ui-resizable-s-row_'+row,
+                            //' .ui-resizable-s-row_'+row +
+                            '',
+
             start: onStart,
             resize: function(e, ui){
                 if (tableLockedResizeRow){
@@ -1291,30 +1372,21 @@ function addRowColResizeHandlers(){
             stop: onStop,
         });
 
-        var handle = document.createElement('div');
-        $(handle).addClass('glyphicon glyphicon-resize-vertical ');
 
-        var uiResizable = $('#guide-grid-container .row_' + row + ' .ui-resizable-s');
+        //
+        //var uiResizable = $('#guide-grid-container .row_' + row + ' .ui-resizable-s');
+        //
+        //uiResizable.addClass('ui-resizable-s-row_'+row).append(handle).css({
+        //    //display: 'none',
+        //    display: 'table-cell',
+        //    cursor: 'ns-resize',
+        //    width: '5px',
+        //    height: $('#guide-grid-container .row_' + row).css('height'),
+        //    position: 'relative',
+        //
+        //});
 
-        uiResizable.addClass('ui-resizable-s-row_'+row).append(handle).css({
-            //display: 'none',
-            display: 'table-cell',
-            cursor: 'ns-resize',
-            width: '5px',
-            height: $('#guide-grid-container .row_' + row).css('height'),
-            position: 'relative',
 
-        });
-
-        $(handle).css({
-            position: 'absolute',
-            top: 'auto',
-            bottom: '10px',
-            width: 0,
-            height: 0,
-            visibility: 'visible',
-            'pointer-events': 'auto',
-        })
     }
 
     for (var col = 1; col <= numCols; col++) {
@@ -1529,8 +1601,10 @@ function addTableSizeLockUnlockButton(){
         visibility: 'visible',
         top: 0,
         left: 0,
-        width: (parseFloat($('#main-grid-table').css('width')) - 40) + 'px',
-        height: (parseFloat($('#main-grid-table').css('height')) - 40) + 'px',
+        width: '1000px',
+        height: '1000px',
+        //width: (parseFloat($('#main-grid-table').css('width')) - 5- numCols*10) + 'px',
+        //height: (parseFloat($('#main-grid-table').css('height')) - 5 - numRows*10) + 'px',
     });
 
 
@@ -1545,11 +1619,11 @@ function addTableSizeLockUnlockButton(){
             tableLockedResizeRow = false;
 
             for (var col = 1; col <= numCols; col++) {
-                $('#grid_1_' + col).resizable( "option", "containment", false );
+                $('#grid_1_' + col).resizable( "option", "containment", false).resizable('option', 'maxWidth', null);
             }
 
             for (var row = 1; row <= numRows; row++) {
-                $('#guide-grid-container .row_' + row).resizable("option", "containment", false);
+                $('#guide-grid-container .row_' + row).resizable("option", "containment", false).resizable('option', 'maxHeight', null);
             }
 
 
@@ -1557,7 +1631,7 @@ function addTableSizeLockUnlockButton(){
             $( '#guide-grid-container .row_' + numRows ).resizable( "enable");
 
             $('#grid_1_' + numCols + ' .ui-resizable-ew').css('visibility', 'visible');
-            $('.ui-resizable-s-row_'+numRows).children().css('visibility', 'visible');
+            $('.ui-resizable-s-row_'+numRows).css('visibility', 'visible');
 
 
         } else {
@@ -1567,10 +1641,10 @@ function addTableSizeLockUnlockButton(){
             tableLockedResizeRow = true;
 
             for (var col = 1; col <= numCols; col++) {
-                $('#grid_1_' + col).resizable( "option", "containment", '#resize-containment-div');
+                $('#grid_1_' + col).resizable( "option", "containment", '#resize-containment-div').resizable('option', 'maxWidth', (gridWidth - 20 - numCols*10));
             }
             for (var row = 1; row <= numRows; row++) {
-                $('#guide-grid-container .row_' + row).resizable("option", "containment", '#resize-containment-div');
+                $('#guide-grid-container .row_' + row).resizable("option", "containment", '#resize-containment-div').resizable('option', 'maxHeight', (gridHeight - 20 - numRows*10));
             }
 
             // Disable the last row and column
@@ -1578,7 +1652,7 @@ function addTableSizeLockUnlockButton(){
             $( '#guide-grid-container .row_' + numRows ).resizable( "disable" );
 
             $('#grid_1_' + numCols + ' .ui-resizable-ew').css('visibility', 'hidden');
-            $('.ui-resizable-s-row_'+numRows).children().css('visibility', 'hidden');
+            $('.ui-resizable-s-row_'+numRows).css('visibility', 'hidden');
 
         }
         $(this).data('locked', !locked);
@@ -1591,8 +1665,8 @@ function addTableSizeLockUnlockButton(){
 
 function updateResizeContainmentDiv(){
     $('#resize-containment-div').css({
-        width: (parseFloat($('#main-grid-table').css('width')) - 40) + 'px',
-        height: (parseFloat($('#main-grid-table').css('height')) - 40) + 'px',
+        //width: (parseFloat($('#main-grid-table').css('width')) - 5 -  numCols*10) + 'px',
+        //height: (parseFloat($('#main-grid-table').css('height')) - 5 - numRows*10) + 'px',
     });
 
 }
@@ -1608,8 +1682,8 @@ function saveRowColRatiosCells(updateTableHeight, updateTableWidth){
         gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
     }
 
-    var widthSum = getWidthSum(1);
-    var heightSum = getHeightSum(1);
+    var widthSum = getWidthSumGrid();
+    var heightSum = getHeightSumGrid();
 
     for (var row = 1; row<=numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
@@ -1640,8 +1714,8 @@ function saveRowColRatiosGrid(updateTableWidth, updateTableHeight) {
         gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
     }
 
-    var widthSum = getWidthSum(1);
-    var heightSum = getHeightSum(1);
+    var widthSum = getWidthSumGrid();
+    var heightSum = getHeightSumGrid();
 
     for (var row = 1; row<=numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
