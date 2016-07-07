@@ -9,7 +9,7 @@
   "license": "MIT",
   "dependencies": {
     "angular2": "2.0.0-beta.0",
-    "client-bus": "file:../../core/modules/client-bus",
+    "client-bus": "file:../../core/client-bus",
     "dv-access-auth": "file:../../catalog/access/auth",
     "dv-community-follow": "file:../../catalog/community/follow",
     "dv-composer": "file:../../core/composer",
