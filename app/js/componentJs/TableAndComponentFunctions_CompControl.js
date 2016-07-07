@@ -1246,26 +1246,31 @@ function addRowColResizeHandlers(){
 
     var tableLockedResizeColFn = function(e, ui){
         if ((new Date).getTime() > (start + 5000)){
-            console.log('hi');
+            console.log('hey');
         }
 
         var colNum = getRowColFromId(ui.element.get(0).id).col;
-        var newRemainingWidth = gridWidth - 20 - parseFloat(ui.size.width);
-        var oldRemainingWidth = gridWidth - 20 - parseFloat(ui.originalSize.width);
+        //var newRemainingWidth = gridWidth - 20 - (parseFloat(ui.size.width)); // there seems to be some weird descrepency between
+        //var oldRemainingWidth = gridWidth - 20 - (parseFloat(ui.originalSize.width)+10); // the reported widths and the actual widths!
+
+        var newRemainingWidth = gridWidth - 20 - parseFloat($('#grid_1_'+colNum).css('width'));
+        var oldRemainingWidth = gridWidth - 20 - parseFloat($('#cell_0_'+colNum).css('width')); // using row 0 because there is no worry of it being merged
 
         var sum = 0;
         for (var col = 1; col <= numCols; col++) {
             if (col != colNum) {
                 var oldWidth = (gridWidth - 20)*selectedUserComponent.layout[1][col].ratio.grid.width;
                 var newWidth = newRemainingWidth*oldWidth/oldRemainingWidth;
+
                 sum += newWidth;
                 $('#guide-grid-container .col_'+col).css({
                     width: newWidth + "px"
                 });
             }
+
         }
+
         console.log(sum/newRemainingWidth);
-        checkWidthRatio(1);
     };
 
     for (var row = 1; row <= numRows; row++) {
@@ -1292,6 +1297,7 @@ function addRowColResizeHandlers(){
         var uiResizable = $('#guide-grid-container .row_' + row + ' .ui-resizable-s');
 
         uiResizable.addClass('ui-resizable-s-row_'+row).append(handle).css({
+            //display: 'none',
             display: 'table-cell',
             cursor: 'ns-resize',
             width: '5px',
