@@ -69,11 +69,10 @@ export class Mean {
 }
 
 export namespace GruntTask {
-  export function task(grunt, optPatterns, element) {
-    optPatterns = (typeof optPatterns === "undefined") ? {} : optPatterns;
-    const patternsSrc = Object.keys(optPatterns).map(function(p) {
-      return "node_modules/" + p + "/lib/components/**/*.{js,html,css}";
-    });
+  export function task(grunt, opt_patterns, element) {
+    opt_patterns = (typeof opt_patterns === "undefined") ? {} : opt_patterns;
+    const patterns_src = Object.keys(opt_patterns)
+        .map(p => `node_modules/${p}/lib/components/**/*.{js,html,css}`);
     let deps = [
       "node_modules/angular2/bundles/angular2-polyfills.js",
       "node_modules/systemjs/dist/system.src.js",
@@ -84,7 +83,7 @@ export namespace GruntTask {
       "node_modules/client-bus/lib/client-bus.js",
       "node_modules/underscore/underscore.js"
     ];
-    deps = deps.concat(patternsSrc);
+    deps = deps.concat(patterns_src);
 
     const components = "src/components/**/*.ts";
     const shared = "src/shared/**/*.ts";
@@ -181,14 +180,13 @@ export namespace GruntTask {
             // https://github.com/angular/angular/issues/6053
             {
               expand: true,
-              src: Object.keys(optPatterns).map(function(p) {
-                return "node_modules/" + p + "/lib/components/**/*.{html,css}";
-              }),
+              src: Object.keys(opt_patterns)
+                   .map(p => `node_modules/${p}/lib/components/` +
+                             "**/*.{html,css}"),
               dest: "dist/public/components/",
-              rename: function(dst, src) {
-                return dst +
-                  src.match("node_modules/.*/lib/components/(.*)")[1];
-              }
+              rename: (dst, src) => (
+                           dst +
+                           src.match("node_modules/.*/lib/components/(.*)")[1])
             }
           ]
           },
@@ -317,14 +315,14 @@ export namespace GruntTask {
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-replace");
 
-    grunt.registerTask("dv-mean", "Dv a mean element", function(action) {
+    grunt.registerTask("dv-mean", "Dv a mean element", action => {
       if (action === "dev") {
         grunt.log.writeln(this.name + " dev");
         grunt.task.run(
           ["clean:dev", "tslint", "ts:dev_client", "copy:dev",
             "ts:dev_server"]);
 
-        if (Object.keys(optPatterns).length > 0) {
+        if (Object.keys(opt_patterns).length > 0) {
           let express_config = {};
           let replace_patterns = [];
           let port = 3002;
@@ -344,8 +342,8 @@ export namespace GruntTask {
             }
           };
 
-          Object.keys(optPatterns).forEach(function(p) {
-            let process_instance = function(p, instance_number) {
+          Object.keys(opt_patterns).forEach(p => {
+            let process_instance = (p, instance_number) => {
               express_config[p + "-" + instance_number] = {
                 options: {
                   script: "node_modules/" + p + "/lib/app.js",
@@ -359,7 +357,7 @@ export namespace GruntTask {
               });
               ++port;
             };
-            let instances_number = optPatterns[p];
+            let instances_number = opt_patterns[p];
             for (let i = 1; i <= instances_number; ++i) {
               process_instance(p, i);
             }
