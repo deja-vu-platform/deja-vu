@@ -16,8 +16,11 @@ const cli = command_line_args([
   {name: "bushost", type: String, defaultValue: "localhost"},
   {name: "busport", type: Number, defaultValue: 3001},
 
-  {name: "servepublic", type: Boolean},
-  {name: "debugdata", type: Boolean}
+  // Mode can be "dev" or "test".  In dev mode the development page is shown,
+  // in test mode the main widget is shown
+  {name: "mode", type: String, defaultValue: "dev"},
+  // True if this is the cliche being run by the user
+  {name: "main", type: Boolean}
 ]);
 
 
@@ -28,7 +31,7 @@ export class Mean {
   bushost: string;
   busport: number;
 
-  constructor(public name: string, init_db?: (db, debug) => void) {
+  constructor(public name: string, init_db?: (db, debug: boolean) => void) {
     const opts = cli.parse();
     this.loc = `http://${opts.wshost}:${opts.wsport}`;
     this.bushost = opts.bushost;
@@ -47,14 +50,14 @@ export class Mean {
       }
       if (init_db !== undefined) {
         console.log(`Initializing db for MEAN ${name}`);
-        init_db(db, opts.debugdata);
+        init_db(db, opts.mode === "dev" && opts.main);
       }
     });
 
     this.ws = express();
     this.ws.use(morgan("dev"));
 
-    if (opts.servepublic) {
+    if (opts.main) {
       console.log(`Serving public folder for MEAN ${name} at ${this.loc}`);
       this.ws.use(express.static("./dist/public"));
     };
@@ -265,7 +268,7 @@ export namespace GruntTask {
             script: "dist/app.js",
             background: true,
             args: [
-              "--wsport=3000", "--busport=3001", "--servepublic", "--debugdata"]
+              "--wsport=3000", "--busport=3001", "--main", "--mode=dev"]
           }
         }
       },
@@ -315,13 +318,8 @@ export namespace GruntTask {
     grunt.loadNpmTasks("grunt-replace");
 
     grunt.registerTask("dv-mean", "Dv a mean element", function(action) {
-      if (action === "build") {
-        grunt.log.writeln(this.name + " build");
-        grunt.task.run(
-          ["clean:dev", "tslint", "ts:dev_client", "copy:dev",
-            "ts:dev_server"]);
-      } else if (action === "serve") {
-        grunt.log.writeln(this.name + " serve");
+      if (action === "dev") {
+        grunt.log.writeln(this.name + " dev");
         grunt.task.run(
           ["clean:dev", "tslint", "ts:dev_client", "copy:dev",
             "ts:dev_server"]);
