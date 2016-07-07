@@ -4,7 +4,7 @@ const graphql = require("graphql");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-import {Mean} from "mean";
+import {Mean} from "mean-loader";
 import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
 

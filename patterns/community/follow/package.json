@@ -12,7 +12,7 @@
     "es6-promise": "^3.0.2",
     "es6-shim": "^0.33.3",
     "graphql": "^0.4.18",
-    "mean": "file:../../../core/modules/mean",
+    "mean-loader": "file:../../../core/mean-loader",
     "helpers": "file:../../../core/helpers",
     "server-bus": "file:../../../core/server-bus",
     "reflect-metadata": "0.1.2",
@@ -22,7 +22,6 @@
   },
   "devDependencies": {
     "grunt": "^0.4.5",
-    "grunt-dv-mean": "file:../../../core/utils/grunt-dv-mean",
     "tslint": "^3.9.0",
     "typescript": "^1.8.10"
   },

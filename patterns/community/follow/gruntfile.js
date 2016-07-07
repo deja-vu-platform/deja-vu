@@ -1,3 +1,3 @@
 module.exports = function(grunt) {
-  require("grunt-dv-mean")(grunt);
+  require("mean-loader").GruntTask.task(grunt);
 }

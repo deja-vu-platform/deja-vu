@@ -2,7 +2,7 @@
 import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
-import {Mean} from "mean";
+import {Mean} from "mean-loader";
 import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
 

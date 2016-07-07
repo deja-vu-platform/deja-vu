@@ -1,6 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 const graphql = require("graphql");
-import {Mean} from "mean";
+import {Mean} from "mean-loader";
 import {ServerBus} from "server-bus";
 import {Helpers} from "helpers";
 
