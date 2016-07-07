@@ -177,7 +177,7 @@ li.selected {
 
 
 #main-grid-table{
-    padding: 10px 9px 10px 10px;
+    padding: 10px 5px 10px 10px;
 }
 
 
@@ -233,6 +233,9 @@ td {
 #guide-grid-container td {
     background-color: transparent;
     pointer-events: none;
+
+    border: 1px;
+    padding: 4px;
 }
 
 .zero-height{

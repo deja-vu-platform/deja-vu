@@ -10,6 +10,9 @@ var tableLockedResizeRow = false;
 var tableLockedResizeCol = false;
 
 
+var start;
+
+
 /** ** ** ** ** ** ** Table Related Functions ** ** ** ** ** ** **/
 
 /**
@@ -187,6 +190,7 @@ function createTable() {
     addTableSizeLockUnlockButton();
     addClearButtons();
     addAddToMainPagesButton();
+
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
@@ -933,10 +937,10 @@ function alignCellsAndGridWithSavedRatios(){
                 height: height,
             });
 
-            //grid.css({
-            //    width: width,
-            //    height: height,
-            //});
+            grid.css({
+                width: width,
+                height: height,
+            });
         }
     }
 
@@ -973,7 +977,6 @@ function initialResizeCells() {
             var thisGridCellWidth = widthRatioGrid * (gridWidth - 20);
             var thisGridCellHeight = heightRatioGrid * (gridHeight - 20);
 
-            var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
             $('#cell' + '_' + row + '_' + col).css({
                 //width: thisCellWidth + 'px',
                 //height: thisCellHeight + 'px',
@@ -988,10 +991,15 @@ function initialResizeCells() {
         }
     }
 
+    console.log(getWidthSum(1)/(gridWidth-20));
+
+    var tooltipWidth = Number($('.tooltip').css('width').substring(0, 3));
+
     getCSSRule('.tooltip').style.setProperty('left', -1 * Math.floor((tooltipWidth - (cellWidth - 40)) / 2) + 'px', null);
 
     resizeLabelDivs(cellWidth, cellHeight);
 
+    console.log(getWidthSum(1)/(gridWidth-20));
 }
 
 function resetAligners() {
@@ -1162,6 +1170,8 @@ function addRowColResizeHandlers(){
     //  Then also set the cell size in load table (or resize function) based on these values
 
     var onStart = function(){
+        start = (new Date).getTime();
+
         $('.grid').css({
             visibility: 'visible',
             border: 'black 1px dotted',
@@ -1194,17 +1204,27 @@ function addRowColResizeHandlers(){
         resetAllMergeHandleContainersSizeAndPosition();
         //saveRowColRatiosCells(!tableLockedResizeCol, !tableLockedResizeRow);
         updateTableResizeHandler();
+        updateResizeContainmentDiv();
 
     };
 
     var tableLockedResizeRowFn = function(e, ui){
+        if ((new Date).getTime() > (start + 5000)){
+            console.log('hi');
+        }
+
         var rowNum = getRowColFromId(ui.element.get(0).childNodes[0].id).row;
         var newRemainingHeight = gridHeight - 20 - parseFloat(ui.size.height);
         var oldRemainingHeight = gridHeight - 20 - parseFloat(ui.originalSize.height);
+
+        var sum = 0;
+
         for (var row = 1; row <= numRows; row++) {
             if (row != rowNum) {
                 var oldHeight = (gridHeight - 20)*selectedUserComponent.layout[row][1].ratio.grid.height;
                 var newHeight = newRemainingHeight*oldHeight/oldRemainingHeight;
+
+                sum += newHeight;
 
                 $('#guide-grid-container .row_' + row + ' .grid').css({
                     height: newHeight + "px"
@@ -1214,26 +1234,38 @@ function addRowColResizeHandlers(){
                     height: newHeight + "px"
                 });
                 $('#guide-grid-container .row_' + row + ' .ui-resizable-s').css({
+                    width: '5px',
                     height: newHeight + "px",
                 });
             }
         }
+
+        console.log(sum/newRemainingHeight);
+        checkHeightRatio(1);
     };
 
     var tableLockedResizeColFn = function(e, ui){
+        if ((new Date).getTime() > (start + 5000)){
+            console.log('hi');
+        }
+
         var colNum = getRowColFromId(ui.element.get(0).id).col;
         var newRemainingWidth = gridWidth - 20 - parseFloat(ui.size.width);
         var oldRemainingWidth = gridWidth - 20 - parseFloat(ui.originalSize.width);
+
+        var sum = 0;
         for (var col = 1; col <= numCols; col++) {
             if (col != colNum) {
                 var oldWidth = (gridWidth - 20)*selectedUserComponent.layout[1][col].ratio.grid.width;
                 var newWidth = newRemainingWidth*oldWidth/oldRemainingWidth;
-
+                sum += newWidth;
                 $('#guide-grid-container .col_'+col).css({
                     width: newWidth + "px"
                 });
             }
         }
+        console.log(sum/newRemainingWidth);
+        checkWidthRatio(1);
     };
 
     for (var row = 1; row <= numRows; row++) {
@@ -1260,8 +1292,9 @@ function addRowColResizeHandlers(){
         var uiResizable = $('#guide-grid-container .row_' + row + ' .ui-resizable-s');
 
         uiResizable.addClass('ui-resizable-s-row_'+row).append(handle).css({
+            display: 'table-cell',
             cursor: 'ns-resize',
-            width: '1px',
+            width: '5px',
             height: $('#guide-grid-container .row_' + row).css('height'),
             position: 'relative',
 
@@ -1300,8 +1333,8 @@ function addRowColResizeHandlers(){
             top: '-15px',
             left: 'auto',
             right: '5px',
-            width: 0,
-            height: 0,
+            width: '1px',
+            height: '1px',
             visibility: 'visible',
             'pointer-events': 'auto',
         });
@@ -1479,6 +1512,22 @@ function addTableSizeLockUnlockButton(){
 
     });
 
+    var resizeContainmentDiv = document.createElement('div');
+    resizeContainmentDiv.id = 'resize-containment-div';
+
+    $('#guide-grid-container').append(resizeContainmentDiv);
+
+    $(resizeContainmentDiv).css({
+        'pointer-events':'none',
+        position: 'absolute',
+        visibility: 'visible',
+        top: 0,
+        left: 0,
+        width: (parseFloat($('#main-grid-table').css('width')) - 40) + 'px',
+        height: (parseFloat($('#main-grid-table').css('height')) - 40) + 'px',
+    });
+
+
     $(tableSizeLockUnlockButton).on("click", function (e) {
         var locked = $(this).data('locked');
         if (locked){
@@ -1512,10 +1561,10 @@ function addTableSizeLockUnlockButton(){
             tableLockedResizeRow = true;
 
             for (var col = 1; col <= numCols; col++) {
-                $('#grid_1_' + col).resizable( "option", "containment", '#main-grid-table');
+                $('#grid_1_' + col).resizable( "option", "containment", '#resize-containment-div');
             }
             for (var row = 1; row <= numRows; row++) {
-                $('#guide-grid-container .row_' + row).resizable("option", "containment", '#main-grid-table');
+                $('#guide-grid-container .row_' + row).resizable("option", "containment", '#resize-containment-div');
             }
 
             // Disable the last row and column
@@ -1531,6 +1580,14 @@ function addTableSizeLockUnlockButton(){
     });
 
     $('#main-cell-table').append(tableSizeLockUnlockButton);
+
+}
+
+function updateResizeContainmentDiv(){
+    $('#resize-containment-div').css({
+        width: (parseFloat($('#main-grid-table').css('width')) - 40) + 'px',
+        height: (parseFloat($('#main-grid-table').css('height')) - 40) + 'px',
+    });
 
 }
 
