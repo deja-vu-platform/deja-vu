@@ -1,8 +1,10 @@
-import {provide, Component, PLATFORM_DIRECTIVES} from "angular2/core";
+import {provide, PLATFORM_DIRECTIVES} from "angular2/core";
 import {bootstrap} from "angular2/platform/browser";
 import {ROUTER_PROVIDERS} from "angular2/router";
 
 import {BookmarkComponent} from "../components/bookmark/bookmark";
+import {PostComponent} from "../components/post/post";
+import {UserComponent} from "../components/user/user";
 
 import "rxjs/add/operator/map";
 
@@ -19,20 +21,6 @@ const LOCS = {
   feed_1: "@@dv-messaging-feed-1"
 };
 
-@Component({
-  selector: "publisher-message",
-  template: `{{msg.content}}`,
-  inputs: ["msg"]
-})
-class PublisherMessageComponent {}
-
-@Component({
-  selector: "publisher",
-  template: `{{pub.name}}`,
-  inputs: ["pub"]
-})
-class PublisherComponent {}
-
 
 
 
@@ -46,9 +34,9 @@ bootstrap(
     provide("label.api", {useValue: LOCS.label_1}),
     ROUTER_PROVIDERS,
     provide(
-      PLATFORM_DIRECTIVES, {useValue: PublisherMessageComponent, multi: true}),
+      PLATFORM_DIRECTIVES, {useValue: PostComponent, multi: true}),
     provide(
-      PLATFORM_DIRECTIVES, {useValue: PublisherComponent, multi: true}),
+      PLATFORM_DIRECTIVES, {useValue: UserComponent, multi: true}),
     provide("element", {useValue: "bookmark"}),
     provide("loc", {useValue: LOCS.bookmark_1}),
     provide("CompInfo", {useValue: COMP_INFO})
