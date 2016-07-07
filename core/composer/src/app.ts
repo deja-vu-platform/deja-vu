@@ -2,7 +2,8 @@
 const graphql = require("graphql");
 const rp = require("request-promise");
 
-import {Mean, Helpers} from "mean";
+import {Mean} from "mean-loader";
+import {Helpers} from "helpers";
 
 import * as _ from "underscore";
 
