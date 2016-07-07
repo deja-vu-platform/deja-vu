@@ -1223,8 +1223,6 @@ function addRowColResizeHandlers(){
         resetAllMergeHandleContainersSizeAndPosition();
         //saveRowColRatiosCells(!tableLockedResizeCol, !tableLockedResizeRow);
         updateTableResizeHandler();
-        updateResizeContainmentDiv();
-
     };
 
     //var tableLockedResizeRowFn = function(e, ui){
@@ -1270,6 +1268,9 @@ function addRowColResizeHandlers(){
 
         var totalHeight = (gridHeight - 20)*(selectedUserComponent.layout[rowNum][1].ratio.grid.height + selectedUserComponent.layout[nextRowNum][1].ratio.grid.height);
         var remainingHeight = totalHeight - ui.size.height;
+
+        $('#guide-grid-container .row_' + rowNum).resizable('option', 'maxHeight', totalHeight - 10);
+
 
         $('#guide-grid-container .row_' + nextRowNum + ' .grid').css({
             height: remainingHeight + "px"
@@ -1324,9 +1325,13 @@ function addRowColResizeHandlers(){
         var totalWidth = (gridWidth - 20)*(selectedUserComponent.layout[1][colNum].ratio.grid.width + selectedUserComponent.layout[1][nextColNum].ratio.grid.width);
         var remainingWidth = totalWidth - parseFloat($('#grid_1_'+colNum).css('width'));
 
+        $('#grid_1_'+colNum).resizable('option', 'maxWidth', totalWidth-10);
+
         $('#guide-grid-container .col_'+nextColNum).css({
             width: remainingWidth + "px"
         });
+
+
     };
 
 
@@ -1590,24 +1595,6 @@ function addTableSizeLockUnlockButton(){
 
     });
 
-    var resizeContainmentDiv = document.createElement('div');
-    resizeContainmentDiv.id = 'resize-containment-div';
-
-    $('#guide-grid-container').append(resizeContainmentDiv);
-
-    $(resizeContainmentDiv).css({
-        'pointer-events':'none',
-        position: 'absolute',
-        visibility: 'visible',
-        top: 0,
-        left: 0,
-        width: '1000px',
-        height: '1000px',
-        //width: (parseFloat($('#main-grid-table').css('width')) - 5- numCols*10) + 'px',
-        //height: (parseFloat($('#main-grid-table').css('height')) - 5 - numRows*10) + 'px',
-    });
-
-
     $(tableSizeLockUnlockButton).on("click", function (e) {
         var locked = $(this).data('locked');
         if (locked){
@@ -1619,11 +1606,11 @@ function addTableSizeLockUnlockButton(){
             tableLockedResizeRow = false;
 
             for (var col = 1; col <= numCols; col++) {
-                $('#grid_1_' + col).resizable( "option", "containment", false).resizable('option', 'maxWidth', null);
+                $('#grid_1_' + col).resizable('option', 'maxWidth', null);
             }
 
             for (var row = 1; row <= numRows; row++) {
-                $('#guide-grid-container .row_' + row).resizable("option", "containment", false).resizable('option', 'maxHeight', null);
+                $('#guide-grid-container .row_' + row).resizable('option', 'maxHeight', null);
             }
 
 
@@ -1631,7 +1618,7 @@ function addTableSizeLockUnlockButton(){
             $( '#guide-grid-container .row_' + numRows ).resizable( "enable");
 
             $('#grid_1_' + numCols + ' .ui-resizable-ew').css('visibility', 'visible');
-            $('.ui-resizable-s-row_'+numRows).css('visibility', 'visible');
+            $('#ui-resizable-s-row_'+numRows).css('visibility', 'visible');
 
 
         } else {
@@ -1640,19 +1627,12 @@ function addTableSizeLockUnlockButton(){
             tableLockedResizeCol = true;
             tableLockedResizeRow = true;
 
-            for (var col = 1; col <= numCols; col++) {
-                $('#grid_1_' + col).resizable( "option", "containment", '#resize-containment-div').resizable('option', 'maxWidth', (gridWidth - 20 - numCols*10));
-            }
-            for (var row = 1; row <= numRows; row++) {
-                $('#guide-grid-container .row_' + row).resizable("option", "containment", '#resize-containment-div').resizable('option', 'maxHeight', (gridHeight - 20 - numRows*10));
-            }
-
             // Disable the last row and column
             $( '#grid_1_' + numCols ).resizable( "disable");
             $( '#guide-grid-container .row_' + numRows ).resizable( "disable" );
 
             $('#grid_1_' + numCols + ' .ui-resizable-ew').css('visibility', 'hidden');
-            $('.ui-resizable-s-row_'+numRows).css('visibility', 'hidden');
+            $('#ui-resizable-s-row_'+numRows).css('visibility', 'hidden');
 
         }
         $(this).data('locked', !locked);
@@ -1660,14 +1640,6 @@ function addTableSizeLockUnlockButton(){
     });
 
     $('#main-cell-table').append(tableSizeLockUnlockButton);
-
-}
-
-function updateResizeContainmentDiv(){
-    $('#resize-containment-div').css({
-        //width: (parseFloat($('#main-grid-table').css('width')) - 5 -  numCols*10) + 'px',
-        //height: (parseFloat($('#main-grid-table').css('height')) - 5 - numRows*10) + 'px',
-    });
 
 }
 
