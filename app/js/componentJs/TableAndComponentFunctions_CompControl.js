@@ -1972,10 +1972,14 @@ function removeEndCol() {
         //var ratioToRemoveCell = selectedUserComponent.layout[1][lastColNum].ratio.cell.width;
         var ratioToRemoveGrid = selectedUserComponent.layout[1][lastColNum].ratio.grid.width;
 
-        for (var col = 1; col<= (numCols-1); col++){
+        for (var col = 1; col<= numCols; col++){
             for (var row = 1; row<= numRows; row++){
                 //selectedUserComponent.layout[row][col].ratio.cell.width = selectedUserComponent.layout[row][col].ratio.grid.width/(1-ratioToRemoveCell);
-                selectedUserComponent.layout[row][col].ratio.grid.width = selectedUserComponent.layout[row][col].ratio.grid.width/(1-ratioToRemoveGrid);
+                var oldRatio = selectedUserComponent.layout[row][col].ratio.grid.width;
+                console.log(oldRatio);
+                selectedUserComponent.layout[row][col].ratio.grid.width = oldRatio/(1-ratioToRemoveGrid);
+                console.log(selectedUserComponent.layout[row][col].ratio.grid.width);
+                console.log(oldRatio/selectedUserComponent.layout[row][col].ratio.grid.width); // should be (1-ratioToRemoveGrid)
             }
         }
     }
@@ -2005,6 +2009,10 @@ function removeEndCol() {
                 $('#'+hidingCellId).data('merged', {isMerged: true, bottomRightCellId: newBottomRightId});
             }
         }
+    }
+
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+        // deleting later in case the calculations above need these values to exist
         delete selectedUserComponent.layout[row][lastColNum];
     }
 
