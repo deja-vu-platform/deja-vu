@@ -66,8 +66,12 @@
 <div id="all-cliche-container">
     <span>Cliché Components</span>
     <div>
-        <input type="radio" name="all-selected-toggle" id="all-cliches-radio" checked> All
-        <input type="radio" name="all-selected-toggle" id="selected-cliches-radio"> Selected
+        <ul class="nav nav-tabs">
+            <li class="active" id="all-cliches-radio"><a href="#">All Clichés</a></li>
+            <li id="selected-cliches-radio"><a href="#">Selected Clichés</a></li>
+        </ul>
+        <!--<input type="radio" name="all-selected-toggle" id="all-cliches-radio" checked> All-->
+        <!--<input type="radio" name="all-selected-toggle" id="selected-cliches-radio"> Selected-->
     </div>
     <div id="all-cliches"></div>
     <div id="pagination-holder"></div>

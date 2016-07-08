@@ -196,6 +196,10 @@ a{
     background-color: #E0E0E0;
 }
 
+.highlighted{
+    background-color: #E0E0E0;
+}
+
 li#selected {
     background-color: #E0E0E0;
 }
@@ -368,4 +372,10 @@ li#selected {
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+
+.last-access-time{
+    font-size: x-small;
+    color: grey;
 }
