@@ -102,7 +102,6 @@ $('.recent-projects').on('click', '.project-name', function(){
 function addLoadProjectButton(filename){
     var spLoad = document.createElement('span');
     spLoad.innerHTML = '<button type="button" class="btn btn-default btn-load-project">' +
-            //'<span>Delete User Component </span>' +
         '<span>Load Project</span>' +
         '</button>';
 
@@ -283,9 +282,10 @@ function deleteFileAndDisplay(dirname, filename, id){
         if (currentProject.meta.id === id){
             currentProject = null;
             window.sessionStorage.removeItem('selectedProject');
-            $('.current-project .content').html('');
+            $('.current-project .content').html('')
+            $('.current-project').css('display', 'none');
             $('#table-container-preview').html('');
-            $('#project-name-preview').html('');
+            $('#project-name-preview').text('Project Preview')
         }
     }
 }
@@ -336,6 +336,7 @@ function openDeleteProjectConfirmDialogue(dirname, filename, id){
     var projectName = filenameToProjectName(filename);
     $('#delete-project-name').text(projectName);
 
+    $('#delete-project-btn').unbind();
     $('#delete-project-btn').click(function(){
         deleteFileAndDisplay(dirname, filename, id);
 
