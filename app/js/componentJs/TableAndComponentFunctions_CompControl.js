@@ -1831,8 +1831,11 @@ function addRowToEnd() {
     }
     
     loadTable(selectedUserComponent);
-    saveRowColRatiosGrid(true, true);
-
+    if (saveTableLockedHeight){
+        alignCellsAndGridWithSavedRatios();
+    } else {
+        saveRowColRatiosGrid(true, true);
+    }
     // because load table resets this
     toggleTableSizeLock(saveTableLockedHeight);
 
@@ -1907,7 +1910,11 @@ function removeEndRow() {
     delete selectedUserComponent.layout[lastRowNum];
 
     loadTable(selectedUserComponent);
-    saveRowColRatiosGrid(true, true);
+    if (saveTableLockedHeight){
+        alignCellsAndGridWithSavedRatios();
+    } else {
+        saveRowColRatiosGrid(true, true);
+    }
     // because load table resets this
     toggleTableSizeLock(saveTableLockedHeight);
 
@@ -1977,7 +1984,11 @@ function addColToEnd() {
         }
     }
     loadTable(selectedUserComponent);
-    saveRowColRatiosGrid(true, true);
+    if (saveTableLockedWidth){
+        alignCellsAndGridWithSavedRatios();
+    } else {
+        saveRowColRatiosGrid(true, true);
+    }
 
     // because load table resets this
     toggleTableSizeLock(saveTableLockedWidth);
@@ -2051,7 +2062,11 @@ function removeEndCol() {
 
     
     loadTable(selectedUserComponent);
-    saveRowColRatiosGrid(true, true);
+    if (saveTableLockedWidth){
+        alignCellsAndGridWithSavedRatios();
+    } else {
+        saveRowColRatiosGrid(true, true);
+    }
 
     // because load table resets this
     toggleTableSizeLock(saveTableLockedWidth);
