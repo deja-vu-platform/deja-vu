@@ -7,7 +7,7 @@ const DEFAULT_CONTAINER_WIDTH = '3000px';
 const DEFAULT_CONTAINER_HEIGHT = '3000px';
 
 var tableLockedResizeRow = false;
-var tableLockedResizeCol = false;
+var tableLockedWidth = false;
 
 
 var start;
@@ -747,16 +747,16 @@ function unmergeCells(cellToUnmergeId, component) {
     cellTopLeft.attr("rowSpan", 1);
     cellTopLeft.attr("colSpan", 1);
 
-    var resetWidth = parseFloat($('#grid'+'_'+cellToUnmergeRow+'_'+cellToUnmergeCol).css('width'));
-    var resetHeight = parseFloat($('#grid'+'_'+cellToUnmergeRow+'_'+cellToUnmergeCol).css('height'));
-
-    $(cellTopLeft).css({
-        display: "table-cell",
-        width: resetWidth+'px',
-        height: resetHeight+'px',
-    });
-
-    selectedUserComponent.layout[topRowNum][leftColNum].ratio.cell = {width: resetWidth/gridWidth, height: resetHeight/gridHeight};
+    //var resetWidth = parseFloat($('#grid'+'_'+cellToUnmergeRow+'_'+cellToUnmergeCol).css('width'));
+    //var resetHeight = parseFloat($('#grid'+'_'+cellToUnmergeRow+'_'+cellToUnmergeCol).css('height'));
+    //
+    //$(cellTopLeft).css({
+    //    display: "table-cell",
+    //    width: resetWidth+'px',
+    //    height: resetHeight+'px',
+    //});
+    //
+    //selectedUserComponent.layout[topRowNum][leftColNum].ratio.cell = {width: resetWidth/gridWidth, height: resetHeight/gridHeight};
 
 
     // display all the other cells in that block
@@ -1156,7 +1156,7 @@ function resizeRowsBySetRatios(ratios){
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<= numCols; col++) {
             selectedUserComponent.layout[row][col].ratio.grid.height = ratios[row-1];
-            selectedUserComponent.layout[row][col].ratio.cell.height = ratios[row-1];
+            //selectedUserComponent.layout[row][col].ratio.cell.height = ratios[row-1];
         }
     }
     loadTable(selectedUserComponent);
@@ -1167,7 +1167,7 @@ function resizeColsBySetRatios(ratios){
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<= numCols; col++) {
             selectedUserComponent.layout[row][col].ratio.grid.width = ratios[col-1];
-            selectedUserComponent.layout[row][col].ratio.cell.width = ratios[col-1];
+            //selectedUserComponent.layout[row][col].ratio.cell.width = ratios[col-1];
         }
     }
     loadTable(selectedUserComponent);
@@ -1215,13 +1215,13 @@ function addRowColResizeHandlers(){
         $('.cell').css({
             opacity: '1',
         });
-        saveRowColRatiosGrid(!tableLockedResizeCol, !tableLockedResizeRow);
+        saveRowColRatiosGrid(!tableLockedWidth, !tableLockedResizeRow);
         hideBaseComponentDisplayAll();
         alignCellsAndGridWithSavedRatios();
         updateBaseComponentDisplayAll();
         showBaseComponentDisplayAll();
         resetAllMergeHandleContainersSizeAndPosition();
-        //saveRowColRatiosCells(!tableLockedResizeCol, !tableLockedResizeRow);
+        //saveRowColRatiosCells(!tableLockedWidth, !tableLockedResizeRow);
         updateTableResizeHandler();
     };
 
@@ -1403,7 +1403,7 @@ function addRowColResizeHandlers(){
             ,
             start : onStart,
             resize: function(e, ui){
-                if (tableLockedResizeCol){
+                if (tableLockedWidth){
                     tableLockedResizeColFn(e, ui);
                 }
             },
@@ -1578,7 +1578,7 @@ function addTableResizeHandler(){
 
 
 function addTableSizeLockUnlockButton(){
-    tableLockedResizeCol = false;
+    tableLockedWidth = false;
     tableLockedResizeRow = false;
 
     var span = document.createElement('span');
@@ -1602,7 +1602,7 @@ function addTableSizeLockUnlockButton(){
             $(this).find('img').get(0).src = 'images/unlock_icon.png';
 
             // TODO make these separate
-            tableLockedResizeCol = false;
+            tableLockedWidth = false;
             tableLockedResizeRow = false;
 
             for (var col = 1; col <= numCols; col++) {
@@ -1624,7 +1624,7 @@ function addTableSizeLockUnlockButton(){
         } else {
             // lock it
             $(this).find('img').get(0).src = 'images/lock_icon.png';
-            tableLockedResizeCol = true;
+            tableLockedWidth = true;
             tableLockedResizeRow = true;
 
             // Disable the last row and column
@@ -1643,37 +1643,37 @@ function addTableSizeLockUnlockButton(){
 
 }
 
-function saveRowColRatiosCells(updateTableHeight, updateTableWidth){
-    // save the new table dimensions
-    if (updateTableHeight) {
-        selectedUserComponent.layout.tablePxDimensions.height = parseFloat($('#main-grid-table').css('height'));
-        gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
-    }
-    if (updateTableWidth) {
-        selectedUserComponent.layout.tablePxDimensions.width = parseFloat($('#main-grid-table').css('width'));
-        gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
-    }
-
-    var widthSum = getWidthSumGrid();
-    var heightSum = getHeightSumGrid();
-
-    for (var row = 1; row<=numRows; row++) {
-        for (var col = 1; col <= numCols; col++) {
-            var cell = $('#cell' + '_' + row + '_' + col);
-            var cellWidth = parseFloat(cell.css('width'));
-            var cellHeight = parseFloat(cell.css('height'));
-            //var widthRatioCell = cellWidth/(gridWidth-20);
-            //var heightRatioCell = cellHeight/(gridHeight-20);
-
-            var widthRatioCell = cellWidth/widthSum;
-            var heightRatioCell = cellHeight/heightSum;
-
-            selectedUserComponent.layout[row][col].ratio.cell.width = widthRatioCell;
-            selectedUserComponent.layout[row][col].ratio.cell.height = heightRatioCell;
-        }
-    }
-
-}
+//function saveRowColRatiosCells(updateTableHeight, updateTableWidth){
+//    // save the new table dimensions
+//    if (updateTableHeight) {
+//        selectedUserComponent.layout.tablePxDimensions.height = parseFloat($('#main-grid-table').css('height'));
+//        gridHeight = selectedUserComponent.layout.tablePxDimensions.height;
+//    }
+//    if (updateTableWidth) {
+//        selectedUserComponent.layout.tablePxDimensions.width = parseFloat($('#main-grid-table').css('width'));
+//        gridWidth = selectedUserComponent.layout.tablePxDimensions.width;
+//    }
+//
+//    var widthSum = getWidthSumGrid();
+//    var heightSum = getHeightSumGrid();
+//
+//    for (var row = 1; row<=numRows; row++) {
+//        for (var col = 1; col <= numCols; col++) {
+//            var cell = $('#cell' + '_' + row + '_' + col);
+//            var cellWidth = parseFloat(cell.css('width'));
+//            var cellHeight = parseFloat(cell.css('height'));
+//            //var widthRatioCell = cellWidth/(gridWidth-20);
+//            //var heightRatioCell = cellHeight/(gridHeight-20);
+//
+//            var widthRatioCell = cellWidth/widthSum;
+//            var heightRatioCell = cellHeight/heightSum;
+//
+//            selectedUserComponent.layout[row][col].ratio.cell.width = widthRatioCell;
+//            selectedUserComponent.layout[row][col].ratio.cell.height = heightRatioCell;
+//        }
+//    }
+//
+//}
 
 function saveRowColRatiosGrid(updateTableWidth, updateTableHeight) {
     // save the new table dimensions
@@ -1820,7 +1820,8 @@ function addRowToEnd() {
                 bottomRightCellId: ''},
             hidden:{isHidden: false, hidingCellId: ''},
             // take the width of the grid-cell to the top (grid-cell, in case the cell is merged)
-            ratio:{cell:{width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width, height: standardCellHeight/(gridHeight-20)},
+            ratio:{
+                //cell:{width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width, height: standardCellHeight/(gridHeight-20)},
                     grid:{width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width, height: standardCellHeight/(gridHeight-20)}}
         }
 
@@ -1901,20 +1902,49 @@ function addColToEnd() {
     selectedUserComponent.dimensions.cols = lastColNum + 1;
     numCols += 1;
 
-    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
-        selectedUserComponent.layout[row][lastColNum + 1] ={
-            spans:{row:1,col:1},
-            merged:{isMerged: false,
-                topLeftCellId: '',
-                topRightCellId: '',
-                bottomLeftCellId: '',
-                bottomRightCellId: ''},
-            hidden:{isHidden: false, hidingCellId: ''},
-            // take the height of the grid-cell to the left (grid-cell, in case the cell is merged)
-            ratio:{cell:{width: standardCellWidth/(gridWidth-20), height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height},
+    if (tableLockedWidth){ // if table width constant
+        // for the new column, width is 1/newNumCols
+        for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+            selectedUserComponent.layout[row][lastColNum + 1] ={
+                spans:{row:1,col:1},
+                merged:{isMerged: false,
+                    topLeftCellId: '',
+                    topRightCellId: '',
+                    bottomLeftCellId: '',
+                    bottomRightCellId: ''},
+                hidden:{isHidden: false, hidingCellId: ''},
+                // take the height of the grid-cell to the left (grid-cell, in case the cell is merged)
+                ratio:{
+                    //cell:{width: 1/(lastColNum+1), height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height},
+                    grid:{width: 1/(lastColNum+1), height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height}}
+            }
+        }
+
+        // for all other columns, scale down the widths proportionally
+        for (var col = 1; col<= lastColNum; col++){
+            for (var row = 1; row<= numRows; row++){
+                //selectedUserComponent.layout[row][col].ratio.cell.width = selectedUserComponent.layout[row][col].ratio.cell.width*(1-1/(lastColNum+1));
+                selectedUserComponent.layout[row][col].ratio.grid.width = selectedUserComponent.layout[row][col].ratio.grid.width*(1-1/(lastColNum+1));
+            }
+        }
+    } else {
+        for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+            selectedUserComponent.layout[row][lastColNum + 1] ={
+                spans:{row:1,col:1},
+                merged:{isMerged: false,
+                    topLeftCellId: '',
+                    topRightCellId: '',
+                    bottomLeftCellId: '',
+                    bottomRightCellId: ''},
+                hidden:{isHidden: false, hidingCellId: ''},
+                // take the height of the grid-cell to the left (grid-cell, in case the cell is merged)
+                ratio:{
+                    //cell:{width: standardCellWidth/(gridWidth-20), height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height},
                     grid:{width: standardCellWidth/(gridWidth-20), height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height}}
+            }
         }
     }
+
 
     
     //selectedUserComponent.recalculateRatios(0,1);
@@ -1937,6 +1967,21 @@ function removeEndCol() {
     }
     selectedUserComponent.dimensions.cols = lastColNum - 1;
     numCols -= 1;
+    if (tableLockedWidth) {
+        // if table width locked, resize the other cells accordingly
+        //var ratioToRemoveCell = selectedUserComponent.layout[1][lastColNum].ratio.cell.width;
+        var ratioToRemoveGrid = selectedUserComponent.layout[1][lastColNum].ratio.grid.width;
+
+        for (var col = 1; col<= (numCols-1); col++){
+            for (var row = 1; row<= numRows; row++){
+                //selectedUserComponent.layout[row][col].ratio.cell.width = selectedUserComponent.layout[row][col].ratio.grid.width/(1-ratioToRemoveCell);
+                selectedUserComponent.layout[row][col].ratio.grid.width = selectedUserComponent.layout[row][col].ratio.grid.width/(1-ratioToRemoveGrid);
+            }
+        }
+    }
+
+
+    // for the deleted column (do this whether or not the table width is locked)
     for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
         var isHidden = selectedUserComponent.layout[row][lastColNum].hidden.isHidden;
         var hidingCellId = selectedUserComponent.layout[row][lastColNum].hidden.hidingCellId;
@@ -1958,15 +2003,8 @@ function removeEndCol() {
                 var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
                 selectedUserComponent.layout[hcRow][hcCol].merged.bottomRightCellId = newBottomRightId;
                 $('#'+hidingCellId).data('merged', {isMerged: true, bottomRightCellId: newBottomRightId});
-                //var widthheight = calculateMergedCellWidthHeight(hidingCellId);
-                //$('#'+hidingCellId).css({
-                //    width: widthheight.width + 'px',
-                //    height: widthheight.height+'px'
-                //});
-                //selectedUserComponent.layout[hcRow][hcCol].ratio.cell = {width: widthheight.width/(gridWidth-20), height: widthheight.height/(gridHeight-20)};
             }
         }
-
         delete selectedUserComponent.layout[row][lastColNum];
     }
 
