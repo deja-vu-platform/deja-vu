@@ -1820,8 +1820,8 @@ function addRowToEnd() {
                 bottomRightCellId: ''},
             hidden:{isHidden: false, hidingCellId: ''},
             // take the width of the grid-cell to the top (grid-cell, in case the cell is merged)
-            ratio:{cell:{width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width, height: standardCellHeight/gridHeight},
-                    grid:{width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width, height: standardCellHeight/gridHeight}}
+            ratio:{cell:{width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width, height: standardCellHeight/(gridHeight-20)},
+                    grid:{width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width, height: standardCellHeight/(gridHeight-20)}}
         }
 
     }
@@ -1911,8 +1911,8 @@ function addColToEnd() {
                 bottomRightCellId: ''},
             hidden:{isHidden: false, hidingCellId: ''},
             // take the height of the grid-cell to the left (grid-cell, in case the cell is merged)
-            ratio:{cell:{width: standardCellWidth/gridWidth, height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height},
-                    grid:{width: standardCellWidth/gridWidth, height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height}}
+            ratio:{cell:{width: standardCellWidth/(gridWidth-20), height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height},
+                    grid:{width: standardCellWidth/(gridWidth-20), height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height}}
         }
     }
 
