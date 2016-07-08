@@ -440,12 +440,20 @@ function showProjectInList(filename, id, lastAccessed){
 
 
 $('#recent-selector').click(function(){
+    if ($(this).hasClass('active')){
+        return;
+    }
+
     $(this).parent().find('.active').removeClass('active');
     $(this).addClass('active');
     displayRecentProjects();
 });
 
 $('#all-selector').click(function(){
+    if ($(this).hasClass('active')){
+        return;
+    }
+
     $(this).parent().find('.active').removeClass('active');
     $(this).addClass('active');
     displayAllProjects();

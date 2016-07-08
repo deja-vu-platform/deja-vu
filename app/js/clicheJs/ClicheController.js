@@ -109,41 +109,86 @@ function checkBoxes(id){
     $('#all-cliche-container').find('#check_'+id).prop("checked", true).data('checked', true);
 }
 
+//
+//$('#all-cliches-radio').change(function(){
+//    var checked = $(this).prop('checked');
+//    if (checked){
+//        $('#pagination-holder').css('visibility','visible');
+//        var id = $('.pagination .active').get(0).id.split('_')[1];
+//        var start = (id-1)*clichesPerPage+1;
+//        var end = id*clichesPerPage;
+//        generateFakeClichesBulk(start, end); //TODO
+//        for (var id in selectedProject.addedCliches) {
+//            checkBoxes(id);
+//        }
+//    }
+//
+//});
 
-$('#all-cliches-radio').change(function(){
-    var checked = $(this).prop('checked');
-    if (checked){
-        $('#pagination-holder').css('visibility','visible');
-        var id = $('.pagination .active').get(0).id.split('_')[1];
-        var start = (id-1)*clichesPerPage+1;
-        var end = id*clichesPerPage;
-        generateFakeClichesBulk(start, end); //TODO
-        for (var id in selectedProject.addedCliches) {
-            checkBoxes(id);
-        }
+$('#all-cliches-radio').click(function(){
+    if ($(this).hasClass('active')){
+        return;
+    }
+
+    $(this).parent().find('.active').removeClass('active');
+    $(this).addClass('active');
+
+    $('#pagination-holder').css('visibility','visible');
+    var id = $('.pagination .active').get(0).id.split('_')[1];
+    var start = (id-1)*clichesPerPage+1;
+    var end = id*clichesPerPage;
+    generateFakeClichesBulk(start, end); //TODO
+    for (var id in selectedProject.addedCliches) {
+        checkBoxes(id);
     }
 
 });
+//
+//$('#selected-cliches-radio').change(function(){
+//    var checked = $(this).prop('checked');
+//    if (checked){
+//        $('#all-cliches').html('');
+//        var id = $('.pagination .active').get(0).id.split('_')[1];
+//        var start = (id-1)*clichesPerPage+1;
+//        var end = id*clichesPerPage;
+//        for (var id in selectedProject.addedCliches) {
+//            var clicheNum = selectedProject.addedCliches[id].clicheNum;
+//            //if ((clicheNum>=start)&&(clicheNum<=end)){
+//            //    generateFakeCliches(clicheNum); //TODO
+//            //    checkBoxes(id);
+//            //}
+//            generateFakeCliches(clicheNum); //TODO
+//            checkBoxes(id);
+//
+//        }
+//        $('#pagination-holder').css('visibility','hidden');
+//    }
+//});
 
-$('#selected-cliches-radio').change(function(){
-    var checked = $(this).prop('checked');
-    if (checked){
-        $('#all-cliches').html('');
-        var id = $('.pagination .active').get(0).id.split('_')[1];
-        var start = (id-1)*clichesPerPage+1;
-        var end = id*clichesPerPage;
-        for (var id in selectedProject.addedCliches) {
-            var clicheNum = selectedProject.addedCliches[id].clicheNum;
-            //if ((clicheNum>=start)&&(clicheNum<=end)){
-            //    generateFakeCliches(clicheNum); //TODO
-            //    checkBoxes(id);
-            //}
-            generateFakeCliches(clicheNum); //TODO
-            checkBoxes(id);
 
-        }
-        $('#pagination-holder').css('visibility','hidden');
+$('#selected-cliches-radio').click(function(){
+    if ($(this).hasClass('active')){
+        return;
     }
+
+    $(this).parent().find('.active').removeClass('active');
+    $(this).addClass('active');
+
+    $('#all-cliches').html('');
+    var id = $('.pagination .active').get(0).id.split('_')[1];
+    var start = (id-1)*clichesPerPage+1;
+    var end = id*clichesPerPage;
+    for (var id in selectedProject.addedCliches) {
+        var clicheNum = selectedProject.addedCliches[id].clicheNum;
+        //if ((clicheNum>=start)&&(clicheNum<=end)){
+        //    generateFakeCliches(clicheNum); //TODO
+        //    checkBoxes(id);
+        //}
+        generateFakeCliches(clicheNum); //TODO
+        checkBoxes(id);
+
+    }
+    $('#pagination-holder').css('visibility','hidden');
 });
 
 function addPagination(){
