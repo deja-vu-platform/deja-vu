@@ -10,7 +10,10 @@ var selectedProject;
 // TODO get path emitted by main
 var projectsSavePath = path.join(__dirname, 'projects');
 
-var availableProjects = {};
+var availableProjectsByFilename = {};
+var availableProjectsByAccessTime = {};
+var recentProjectsByAccessTime = {};
+
 var currentProject;
 
 var componentToShow;
@@ -47,20 +50,23 @@ $(function () {
         // Check the types to only add projects
         var content = JSON.parse(content);
         if (content.objectType && (content.objectType === 'UserProject')){
-            availableProjects[filename] = content;
-            // TODO sanitise filename!
-            var projectLink = '<li><div class="project-filename" data-filename="'+filename+'">' +
-                    // sanitizing display because that's where the injections can play
-                '<div class="project-name">'+sanitizeStringOfSpecialChars(filenameToProjectName(filename))+'</div>' +
-                '</div></li>';
-            $('#recent-projects-list').append(projectLink);
-            addLoadProjectButton(filename);
-            addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
+            availableProjectsByFilename[filename] = content;
+            // TODO for now, recent is one week
+            var lastAccessed = (new Date(content.lastAccessed)).getTime();
+            var now = (new Date()).getTime();
+            availableProjectsByAccessTime[lastAccessed] = {content:content, filename: filename};
+            if ((now-lastAccessed) < 604800000){ // two weeks is 1209600000
+                recentProjectsByAccessTime[lastAccessed] = {content:content, filename: filename};
+            }
+
         }
     }, function(err) {
         throw err;
         // handle errors
+    }, function(){
+        displayRecentProjects();
     });
+
     // finish load animation
     $('.loader-container').fadeOut("fast");
 
@@ -95,7 +101,9 @@ $('.current-project').on('click', '.content', function(){
 
 $('.recent-projects').on('click', '.project-name', function(){
     var filename = $(this).parent().data('filename');
-    selectedProject = availableProjects[filename];
+    selectedProject = availableProjectsByFilename[filename];
+    $('.highlighted').removeClass('highlighted');
+    $(this).parent().parent().addClass('highlighted');
     displayProjectPreview(selectedProject);
 });
 
@@ -108,12 +116,13 @@ function addLoadProjectButton(filename){
     var buttonLoadProject = spLoad.firstChild;
 
     $(buttonLoadProject).on("click", function () {
-        selectedProject = availableProjects[filename];
+        selectedProject = availableProjectsByFilename[filename];
+        selectedProject.lastAccessed = new Date();
         window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
         window.location = 'index.html';
     });
 
-    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonLoadProject).hover(
+    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonLoadProject).parent().hover(
         function(){
             $(this).find('.project-name').css({
                 width: '50%'
@@ -122,6 +131,10 @@ function addLoadProjectButton(filename){
                 display: 'inline-block',
                 'vertical-align': 'top',
             });
+            $(this).find('.last-access-time').css({
+                display: 'none',
+            })
+
         }, function(){
             $(this).find('.project-name').css({
                 width: '100%'
@@ -129,6 +142,10 @@ function addLoadProjectButton(filename){
             $(this).find('.btn-load-project').css({
                 display: 'none',
             });
+
+            $(this).find('.last-access-time').css({
+                display: 'block',
+            })
         }
     );
 
@@ -221,7 +238,6 @@ function initNewProject() {
         copyNum++;
     }
     var newProject = new UserProject(copyName, generateId(copyName), version, author);
-
     // This will actually be saved after it's fully loaded (with a first component, etc) in the
     // components page
     //saveObjectToFile(projectsSavePath, projectNameToFilename(copyName), newProject);
@@ -241,13 +257,13 @@ function resetMenuOptions() {
 }
 
 // from http://stackoverflow.com/questions/10049557/reading-all-files-in-a-directory-store-them-in-objects-and-send-the-object
-// TODO should these calls be synch?
-function readFiles(dirname, onFileContent, onError) {
+function readFiles(dirname, onFileContent, onError, onFinish) {
     fs.readdir(dirname, function(err, filenames) {
         if (err) {
             onError(err);
             return;
         }
+        var numFilesProcessed = 0;
         filenames.forEach(function(filename) {
             fs.readFile(path.join(dirname, filename), 'utf-8', function(err, content) {
                 if (err) {
@@ -255,6 +271,10 @@ function readFiles(dirname, onFileContent, onError) {
                     return;
                 }
                 onFileContent(filename, content);
+                numFilesProcessed++;
+                if(numFilesProcessed===filenames.length){
+                    onFinish();
+                }
             });
         });
     });
@@ -308,7 +328,7 @@ function addDeleteProjectButton(dirname, filename, id){
 
 
 
-    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonDeletProject).hover(
+    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonDeletProject).parent().hover(
         function(){
             $(this).find('.project-name').css({
                 width: '50%'
@@ -317,6 +337,10 @@ function addDeleteProjectButton(dirname, filename, id){
                 display: 'inline-block',
                 'vertical-align': 'top',
             });
+
+            $(this).find('.last-access-time').css({
+                display: 'none',
+            })
         }, function(){
             $(this).find('.project-name').css({
                 width: '100%'
@@ -325,6 +349,10 @@ function addDeleteProjectButton(dirname, filename, id){
                 display: 'none',
 
             });
+
+            $(this).find('.last-access-time').css({
+                display: 'block',
+            })
         }
     );
 
@@ -358,5 +386,67 @@ function openDeleteProjectConfirmDialogue(dirname, filename, id){
         $('#confirm-delete-project').modal('hide');
     });
 
-};
+}
 
+function displayRecentProjects(){
+    $('#recent-projects-list').html('');
+    var lastAccessedTimes = Object.keys(recentProjectsByAccessTime);
+    lastAccessedTimes.sort().reverse();
+    for (var i = 0; i<lastAccessedTimes.length; i++){
+        var lastAccessed = parseInt(lastAccessedTimes[i]);
+        var filename = recentProjectsByAccessTime[lastAccessed].filename;
+        var content = recentProjectsByAccessTime[lastAccessed].content;
+        showProjectInList(filename, content.meta.id, lastAccessed);
+        addLoadProjectButton(filename);
+        addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
+    }
+}
+
+
+function displayAllProjects(){
+    $('#recent-projects-list').html('');
+    var lastAccessedTimes = Object.keys(availableProjectsByAccessTime);
+    lastAccessedTimes.sort().reverse();
+    for (var i = 0; i<lastAccessedTimes.length; i++){
+        var lastAccessed = parseInt(lastAccessedTimes[i]);
+        var filename = availableProjectsByAccessTime[lastAccessed].filename;
+        var content = availableProjectsByAccessTime[lastAccessed].content;
+        showProjectInList(filename, content.meta.id, lastAccessed);
+        addLoadProjectButton(filename);
+        addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
+    }
+}
+
+function showProjectInList(filename, id, lastAccessed){
+    // TODO sanitise filename!
+    var projectLink = document.createElement('li');
+    projectLink.innerHTML = '<div class="project-filename" data-filename="'+filename+'">' +
+        // sanitizing display because that's where the injections can play
+        '<div class="project-name">'+sanitizeStringOfSpecialChars(filenameToProjectName(filename))+'</div>' +
+        '<div class="last-access-time">' +
+            'Last Accessed: '+(new Date(lastAccessed)).toLocaleDateString() +
+            ' at '+(new Date(lastAccessed)).toLocaleTimeString()+
+        '</div>'+
+        '</div>';
+    $('#recent-projects-list').append(projectLink);
+
+    if (currentProject){
+        if (id == currentProject.meta.id){
+            $(projectLink).addClass('highlighted');
+        }
+    }
+}
+
+
+
+$('#recent-selector').click(function(){
+    $(this).parent().find('.active').removeClass('active');
+    $(this).addClass('active');
+    displayRecentProjects();
+});
+
+$('#all-selector').click(function(){
+    $(this).parent().find('.active').removeClass('active');
+    $(this).addClass('active');
+    displayAllProjects();
+});
