@@ -68,6 +68,8 @@ $(function () {
 
     registerZoom();
 
+    // finish load animation
+    $('.loader-container').fadeOut("fast");
 });
 
 

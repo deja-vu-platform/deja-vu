@@ -153,14 +153,14 @@ function initialResizeCellsPreview() {
     
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){
-            var widthRatioCell = componentToShow.layout[row][col].ratio.cell.width;
-            var heightRatioCell = componentToShow.layout[row][col].ratio.cell.height;
-            var thisCellWidth = scale * widthRatioCell * componentToShow.layout.tablePxDimensions.width;
-            var thisCellHeight = scale * heightRatioCell * componentToShow.layout.tablePxDimensions.height;
+            var widthRatioGrid = componentToShow.layout[row][col].ratio.grid.width;
+            var heightRatioGrid = componentToShow.layout[row][col].ratio.grid.height;
+            var thisGridCellWidth = scale * widthRatioGrid * componentToShow.layout.tablePxDimensions.width;
+            var thisGridCellHeight = scale * heightRatioGrid * componentToShow.layout.tablePxDimensions.height;
 
             $('#cell' + '_' + row + '_' + col).css({
-                width: thisCellWidth + 'px',
-                height: thisCellHeight + 'px',
+                width: thisGridCellWidth + 'px',
+                height: thisGridCellHeight + 'px',
             });
         }
     }

@@ -36,7 +36,11 @@ $(function () {
         $('.current-project .content').html('').append(currentProjectLink);
         $(currentProjectLink).text(currentProject.meta.name);
         displayProjectPreview(currentProject);
+    } else {
+        $('.current-project').css('display', 'none');
+        $('#project-name-preview').text('Project Preview')
     }
+
 
     readFiles(projectsSavePath, function(filename, content) {
         // TODO add a loading projects sign
@@ -57,6 +61,8 @@ $(function () {
         throw err;
         // handle errors
     });
+    // finish load animation
+    $('.loader-container').fadeOut("fast");
 
 });
 
@@ -96,7 +102,6 @@ $('.recent-projects').on('click', '.project-name', function(){
 function addLoadProjectButton(filename){
     var spLoad = document.createElement('span');
     spLoad.innerHTML = '<button type="button" class="btn btn-default btn-load-project">' +
-            //'<span>Delete User Component </span>' +
         '<span>Load Project</span>' +
         '</button>';
 
@@ -133,6 +138,11 @@ function addLoadProjectButton(filename){
 function displayProjectPreview(project){
     // TODO make it select the main component
     // TODO Also, have a way to click to change to another view?
+    $('#project-name-preview').text('Project Preview: '+project.meta.name)
+    $('#preview-prev-page').unbind();
+    $('#preview-next-page').unbind();
+
+
     if (!$.isEmptyObject(project.mainComponents)){
         var componentToShowId = Object.keys(project.mainComponents)[0];
         var numMainPages = Object.keys(project.mainComponents).length;
@@ -146,33 +156,27 @@ function displayProjectPreview(project){
             $('#preview-next-page').css('display', 'none');
         }
 
+        componentToShow = project.components[componentToShowId];
+        loadTablePreview(componentToShow);
+
+        $('#table-container-preview').data('pagenum', 0);
+
+        $('#preview-prev-page').click(function(){
+            var pageNum = $('#table-container-preview').data('pagenum');
+            showPrevMainPage(project, pageNum);
+        });
+
+        $('#preview-next-page').click(function(){
+            var pageNum = $('#table-container-preview').data('pagenum');
+            showNextMainPage(project, pageNum);
+        });
+
+
     } else {
-        var componentToShowId = Object.keys(project.components)[0];
-        $('#project-name-preview').css('width', '850px');
         $('#preview-prev-page').css('display', 'none');
         $('#preview-next-page').css('display', 'none');
+        $('#table-container-preview').css('width', '850px').text("This project does not have a main page yet...");
     }
-
-    componentToShow = project.components[componentToShowId];
-    loadTablePreview(componentToShow);
-
-    $('#project-name-preview').text('Project Preview: '+project.meta.name)
-    $('#table-container-preview').data('pagenum', 0);
-
-    $('#preview-prev-page').unbind();
-    $('#preview-prev-page').click(function(){
-        var pageNum = $('#table-container-preview').data('pagenum');
-        showPrevMainPage(project, pageNum);
-    });
-
-    $('#preview-next-page').unbind();
-    $('#preview-next-page').click(function(){
-        var pageNum = $('#table-container-preview').data('pagenum');
-        showNextMainPage(project, pageNum);
-    });
-
-
-
 
 }
 
@@ -278,9 +282,10 @@ function deleteFileAndDisplay(dirname, filename, id){
         if (currentProject.meta.id === id){
             currentProject = null;
             window.sessionStorage.removeItem('selectedProject');
-            $('.current-project .content').html('');
+            $('.current-project .content').html('')
+            $('.current-project').css('display', 'none');
             $('#table-container-preview').html('');
-            $('#project-name-preview').html('');
+            $('#project-name-preview').text('Project Preview')
         }
     }
 }
@@ -331,6 +336,7 @@ function openDeleteProjectConfirmDialogue(dirname, filename, id){
     var projectName = filenameToProjectName(filename);
     $('#delete-project-name').text(projectName);
 
+    $('#delete-project-btn').unbind();
     $('#delete-project-btn').click(function(){
         deleteFileAndDisplay(dirname, filename, id);
 

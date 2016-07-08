@@ -66,7 +66,7 @@
         </div>
 
         <div class="project-preview">
-            <span id="project-name-preview"></span>
+            <div id="project-name-preview" class="header"></div>
             <div id="preview-prev-page">
                 <span class="glyphicon glyphicon-chevron-left" id="preview-prev-page-icon"></span>
             </div>
@@ -106,7 +106,7 @@
                 <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Project name: </div>
-                    <div class="col-sm-7"><input id="new-project-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                    <div class="col-sm-7"><input id="new-project-name" type="text" class="form-control" required autofocus placeholder="e.g. My new project"/></div>
                     <div class="col-sm-1"></div>
                 </div><br/>
                 <div class="row">
@@ -118,7 +118,7 @@
                 <div class="row">
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Author: </div>
-                    <div class="col-sm-7"><input id="project-author" type="text" class="form-control" required placeholder="e.g.: Dijkstra..."/></div>
+                    <div class="col-sm-7"><input id="project-author" type="text" class="form-control" required placeholder="e.g.: Dijkstra"/></div>
                     <div class="col-sm-1"></div>
                 </div><br/>
             </div>
@@ -168,6 +168,11 @@
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!--------------Loader-------------->
+<div class="loader-container">
+    <div class="loader"></div>
+    <div class="loader-words">Loading, please wait...</div>
+</div>
 
 <script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
 <script src="js/external/jquery.min.js"></script>
