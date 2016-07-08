@@ -183,7 +183,7 @@ function createTable() {
 
     addRowColResizeHandlers();
     addTableResizeHandler();
-    addTableSizeLockUnlockButton();
+    addTableSizeLockUnlockButtons();
     addClearButtons();
     addAddToMainPagesButton();
 
@@ -1574,81 +1574,126 @@ function addTableResizeHandler(){
  *
  * @param lock {Boolean}
  */
-function toggleTableSizeLock(lock){
+function toggleTableWidthLock(lock){
     if (lock){
         // lock it
-        $('#btn-table-lock-unlock').find('img').get(0).src = 'images/lock_icon.png';
+        $('#btn-table-width-lock-unlock').find('img').get(0).src = 'images/lock_icon.png';
         tableLockedWidth = true;
-        tableLockedHeight = true;
 
-        // Disable the last row and column
+        // Disable the last column
         $( '#grid_1_' + numCols ).resizable( "disable");
-        $( '#guide-grid-container .row_' + numRows ).resizable( "disable" );
-
         $('#grid_1_' + numCols + ' .ui-resizable-ew').css('visibility', 'hidden');
-        $('#ui-resizable-s-row_'+numRows).css('visibility', 'hidden');
 
     } else {
         // unlock it
-        $('#btn-table-lock-unlock').find('img').get(0).src = 'images/unlock_icon.png';
+        $('#btn-table-width-lock-unlock').find('img').get(0).src = 'images/unlock_icon.png';
 
-        // TODO make these separate
         tableLockedWidth = false;
-        tableLockedHeight = false;
+
+        // Enable the last column
 
         for (var col = 1; col <= numCols; col++) {
             $('#grid_1_' + col).resizable('option', 'maxWidth', null);
         }
 
+        $( '#grid_1_' + numCols ).resizable( "enable");
+        $('#grid_1_' + numCols + ' .ui-resizable-ew').css('visibility', 'visible');
+
+    }
+
+    $('#btn-table-width-lock-unlock').data('locked', lock);
+
+}
+
+function toggleTableHeightLock(lock){
+    if (lock){
+        // lock it
+        $('#btn-table-height-lock-unlock').find('img').get(0).src = 'images/lock_icon.png';
+        tableLockedHeight = true;
+
+        // Disable the last row
+        $( '#guide-grid-container .row_' + numRows ).resizable( "disable" );
+        $('#ui-resizable-s-row_'+numRows).css('visibility', 'hidden');
+
+    } else {
+        // unlock it
+        $('#btn-table-height-lock-unlock').find('img').get(0).src = 'images/unlock_icon.png';
+
+        tableLockedHeight = false;
+
         for (var row = 1; row <= numRows; row++) {
             $('#guide-grid-container .row_' + row).resizable('option', 'maxHeight', null);
         }
-
-
-        $( '#grid_1_' + numCols ).resizable( "enable");
         $( '#guide-grid-container .row_' + numRows ).resizable( "enable");
-
-        $('#grid_1_' + numCols + ' .ui-resizable-ew').css('visibility', 'visible');
         $('#ui-resizable-s-row_'+numRows).css('visibility', 'visible');
 
     }
 
-    $('#btn-table-lock-unlock').data('locked', lock);
+    $('#btn-table-height-lock-unlock').data('locked', lock);
 
 }
 
-function addTableSizeLockUnlockButton(){
+function addTableSizeLockUnlockButtons(){
     tableLockedWidth = false;
     tableLockedHeight = false;
 
-    var span = document.createElement('span');
-    span.innerHTML = '<button type="button" class="btn btn-default ">' +
+    var spanWidth = document.createElement('span');
+    spanWidth.innerHTML = '<button type="button" class="btn btn-default ">' +
         '<img src="images/unlock_icon.png" width="20px" height="20px">' +
         '</button>';
 
-    var tableSizeLockUnlockButton = span.firstChild;
-    tableSizeLockUnlockButton.id = 'btn-table-lock-unlock';
-    $(tableSizeLockUnlockButton).data('locked', false).css({
+    var tableSizeLockUnlockButtonWidth = spanWidth.firstChild;
+    tableSizeLockUnlockButtonWidth.id = 'btn-table-width-lock-unlock';
+    $(tableSizeLockUnlockButtonWidth).data('locked', false).css({
         position: 'absolute',
         top:'-45px',
         right:'-20px'
 
     });
 
-    $(tableSizeLockUnlockButton).on("click", function (e) {
+    $(tableSizeLockUnlockButtonWidth).on("click", function (e) {
         var locked = $(this).data('locked');
         if (locked){
             // unlock it
-            toggleTableSizeLock(false);
+            toggleTableWidthLock(false);
 
         } else {
             // lock it
-            toggleTableSizeLock(true);
+            toggleTableWidthLock(true);
         }
 
     });
 
-    $('#main-cell-table').append(tableSizeLockUnlockButton);
+    var spanHeight = document.createElement('span');
+    spanHeight.innerHTML = '<button type="button" class="btn btn-default ">' +
+        '<img src="images/unlock_icon.png" width="20px" height="20px">' +
+        '</button>';
+
+    var tableSizeLockUnlockButtonHeight = spanHeight.firstChild;
+    tableSizeLockUnlockButtonHeight.id = 'btn-table-height-lock-unlock';
+    $(tableSizeLockUnlockButtonHeight).data('locked', false).css({
+        position: 'absolute',
+        bottom:'-70px',
+        left: 0
+
+    });
+
+    $(tableSizeLockUnlockButtonHeight).on("click", function (e) {
+        var locked = $(this).data('locked');
+        if (locked){
+            // unlock it
+            toggleTableHeightLock(false);
+
+        } else {
+            // lock it
+            toggleTableHeightLock(true);
+        }
+
+    });
+
+
+    $('#main-cell-table').append(tableSizeLockUnlockButtonWidth);
+    $('#main-cell-table').append(tableSizeLockUnlockButtonHeight);
 
 }
 
@@ -1787,6 +1832,7 @@ function addRowToEnd() {
     numRows += 1;
     selectedUserComponent.layout[lastRowNum + 1] = {};
 
+    var saveTableLockedWidth = tableLockedWidth;
     var saveTableLockedHeight = tableLockedHeight;
 
     if (tableLockedHeight) { // if table height constant
@@ -1837,7 +1883,8 @@ function addRowToEnd() {
         saveRowColRatiosGrid(true, true);
     }
     // because load table resets this
-    toggleTableSizeLock(saveTableLockedHeight);
+    toggleTableWidthLock(saveTableLockedWidth);
+    toggleTableHeightLock(saveTableLockedHeight);
 
 }
 
@@ -1858,6 +1905,7 @@ function removeEndRow() {
     selectedUserComponent.dimensions.rows = lastRowNum - 1;
     numRows -= 1;
 
+    var saveTableLockedWidth = tableLockedWidth;
     var saveTableLockedHeight = tableLockedHeight;
 
 
@@ -1896,13 +1944,6 @@ function removeEndRow() {
                 var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
                 selectedUserComponent.layout[hcRow][hcCol].merged.bottomRightCellId = newBottomRightId;
                 $('#'+hidingCellId).data('merged', {isMerged: true, bottomRightCellId: newBottomRightId});
-                //var widthheight = calculateMergedCellWidthHeight(hidingCellId);
-                //$('#'+hidingCellId).css({
-                //    width: widthheight.width + 'px',
-                //    height: widthheight.height+'px'
-                //})
-                //selectedUserComponent.layout[hcRow][hcCol].ratio.cell = {width: widthheight.width/(gridWidth-20), height: widthheight.height/(gridHeight-20)};
-
             }
         }
     }
@@ -1916,7 +1957,8 @@ function removeEndRow() {
         saveRowColRatiosGrid(true, true);
     }
     // because load table resets this
-    toggleTableSizeLock(saveTableLockedHeight);
+    toggleTableWidthLock(saveTableLockedWidth);
+    toggleTableHeightLock(saveTableLockedHeight);
 
 }
 
@@ -1931,6 +1973,7 @@ function addColToEnd() {
     numCols += 1;
 
     var saveTableLockedWidth = tableLockedWidth;
+    var saveTableLockedHeight = tableLockedHeight;
 
     if (tableLockedWidth) { // if table width constant
         // for the new column, width is 1/newNumCols
@@ -1991,7 +2034,8 @@ function addColToEnd() {
     }
 
     // because load table resets this
-    toggleTableSizeLock(saveTableLockedWidth);
+    toggleTableWidthLock(saveTableLockedWidth);
+    toggleTableHeightLock(saveTableLockedHeight);
 }
 
 
@@ -2011,6 +2055,8 @@ function removeEndCol() {
     numCols -= 1;
 
     var saveTableLockedWidth = tableLockedWidth;
+    var saveTableLockedHeight = tableLockedHeight;
+
     if (tableLockedWidth) {
         // if table width locked, resize the other cells accordingly
         var ratioToRemoveGrid = selectedUserComponent.layout[1][lastColNum].ratio.grid.width;
@@ -2069,7 +2115,8 @@ function removeEndCol() {
     }
 
     // because load table resets this
-    toggleTableSizeLock(saveTableLockedWidth);
+    toggleTableWidthLock(saveTableLockedWidth);
+    toggleTableHeightLock(saveTableLockedHeight);
 }
 
 
