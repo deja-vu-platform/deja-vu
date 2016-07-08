@@ -79,6 +79,33 @@ $(function () {
 
 // TODO on user component name input check for special chars
 
+$('#new-user-component-btn').click(function(){
+    $('#create-component').unbind();
+    $('#create-component').on('click', function () {
+        numRows = $('#select-rows').val();
+        numCols = $('#select-cols').val();
+        selectedUserComponent = initUserComponent(false);
+        selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+        displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+        createTable();
+        resetMenuOptions();
+    });
+});
+
+$('#new-main-component-btn').click(function(){
+    $('#create-component').unbind();
+    $('#create-component').on('click', function () {
+        numRows = $('#select-rows').val();
+        numCols = $('#select-cols').val();
+        selectedUserComponent = initUserComponent(false);
+        selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+        displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+        createTable();
+        resetMenuOptions();
+    });
+});
+
+
 $('#create-component').on('click', function () {
     numRows = $('#select-rows').val();
     numCols = $('#select-cols').val();

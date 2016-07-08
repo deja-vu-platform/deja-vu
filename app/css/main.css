@@ -74,10 +74,11 @@ fieldset { border: 0; margin: 0; padding: 0; }
                   COMPONENTS
 ===================================================*/
 .components {
+    padding-top: 75px;
     float: left;
     border: #d5d5d5 1px solid;
     height: 100%;
-    width: 200px;
+    width: 250px;
     position: absolute;
 }
 
@@ -92,6 +93,12 @@ fieldset { border: 0; margin: 0; padding: 0; }
     border: none;
     background-color: white;
     font-weight: bold;
+}
+
+.project-options{
+    float: left;
+    width: 250px;
+    height: 75px;
 }
 
 #back-to-projects{
@@ -214,7 +221,7 @@ td {
     width: 3500px;
     height: 3500px;
     border: 1px solid #dddddd;
-    margin-left: 200px;
+    margin-left: 250px;
 }
 
 #table-container, #guide-grid-container{
