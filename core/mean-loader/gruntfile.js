@@ -3,7 +3,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON("package.json"),
     ts: {
       lib: {
-        src: ["src/**/*.ts"],
+        src: ["src/mean.ts"],
         outDir: ["lib"],
         options: {
           verbose: true,
@@ -19,14 +19,20 @@ module.exports = function(grunt) {
         }
       },
     },
-
+    copy: {
+      lib: {
+        files: [{
+            expand: true, cwd: "src/", src: "dev/*", dest: "lib"
+            }]
+      }
+    },
     tslint: {
       options: {
         configuration: "tslint.json"
       },
       default: {
         files: {
-          src: ["src/**/*.ts"]
+          src: ["src/mean.ts"]
         }
       }
     },
@@ -44,7 +50,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-ts");
   grunt.loadNpmTasks("grunt-tslint");
   grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-contrib-copy");
 
   grunt.registerTask(
-      "lib", ["clean:lib", "tslint", "ts:lib"]);
+      "lib", ["clean:lib", "tslint", "ts:lib", "copy:lib"]);
 }

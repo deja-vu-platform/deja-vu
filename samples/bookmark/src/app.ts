@@ -4,8 +4,6 @@ import {Mean} from "mean-loader";
 import {ServerBus} from "server-bus";
 import {Helpers} from "helpers";
 
-import {COMP_INFO} from "./shared/comp";
-
 
 const topic_type = new graphql.GraphQLObjectType({
   name: "Topic",
@@ -71,7 +69,7 @@ const schema = new graphql.GraphQLSchema({
 const mean = new Mean("bookmark");
 const bus = new ServerBus(
     "bookmark", mean.loc, mean.ws, mean.bushost, mean.busport,
-    {user: {create: undefined, update: undefined}});
+    {user: {create: undefined, update: undefined}}, mean.comp, mean.locs);
 
 Helpers.serve_schema(mean.ws, schema);
 
@@ -80,15 +78,7 @@ mean.ws.use("/*", (req, res) => {
 });
 
 
-setTimeout(init_composer, 10 * 1000);  // hack..
 setTimeout(init_db, 30 * 1000);  // hack..
-
-
-function init_composer() {
-  console.log("Creating bonds");
-  bus.config(COMP_INFO);
-}
-
 
 function init_db() {
   console.log("Initializing DB");

@@ -11,7 +11,7 @@ export class ServerBus {
       private _loc: string,
       private _ws: express.Express,
       private _hostname: string, private _port: number,
-      private _handlers: any) {
+      private _handlers: any, private _comp_info: any, locs: any) {
 
     const build_field = (action, t, handlers) => {
       const ret = {
@@ -57,6 +57,10 @@ export class ServerBus {
     _ws.options("/dv-bus", this._cors);
     _ws.get("/dv-bus", this._cors, gql);
     _ws.post("/dv-bus", this._cors, gql);
+
+    if (_comp_info !== undefined) {
+      this._config(_comp_info, locs);
+    }
   }
 
   new_atom(t: any /* GraphQLObjectType */, atom_id: string, atom: any) {
@@ -94,10 +98,12 @@ export class ServerBus {
     this._post(`rm`);
   }
 
-  config(comp_info) {
+  private _config(comp_info, locs) {
     // JSON.stringify quotes properties and graphql doesn't like that
+    const e = e => e.split("-")[2];
+    const l = e => locs[e];
     const str_t = t => (
-        `{name: "${t.name}", element: "${t.element}", loc: "${t.loc}"}`);
+        `{name: "${t.name}", element: "${e(t.element)}", loc: "${l(t.loc)}"}`);
     const str_f = f => (`{
       name: "${f.name}",
       type: ${str_t(f.type)}

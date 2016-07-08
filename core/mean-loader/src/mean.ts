@@ -4,6 +4,8 @@ import morgan = require("morgan");
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mongodb = require("mongodb");
 const command_line_args = require("command-line-args");
+const fs = require("fs");
+import * as _u from "underscore";
 
 
 const cli = command_line_args([
@@ -15,6 +17,9 @@ const cli = command_line_args([
 
   {name: "bushost", type: String, defaultValue: "localhost"},
   {name: "busport", type: Number, defaultValue: 3001},
+
+  {name: "comppath", type: String},
+  {name: "locs", type: String},
 
   // Mode can be "dev" or "test".  In dev mode the development page is shown,
   // in test mode the main widget is shown
@@ -30,12 +35,18 @@ export class Mean {
   loc: string;
   bushost: string;
   busport: number;
+  comp: any;
+  locs: any;
 
   constructor(public name: string, init_db?: (db, debug: boolean) => void) {
     const opts = cli.parse();
     this.loc = `http://${opts.wshost}:${opts.wsport}`;
     this.bushost = opts.bushost;
     this.busport = opts.busport;
+    if (opts.comppath !== undefined) {
+      this.comp = JSON.parse(fs.readFileSync(opts.comppath, "utf8"));
+    }
+    this.locs = JSON.parse(opts.locs);
 
     console.log(`Starting MEAN ${name} at ${this.loc}`);
 
@@ -69,9 +80,9 @@ export class Mean {
 }
 
 export namespace GruntTask {
-  export function task(grunt, opt_patterns, element) {
-    opt_patterns = (typeof opt_patterns === "undefined") ? {} : opt_patterns;
-    const patterns_src = Object.keys(opt_patterns)
+  export function task(grunt, name, widgets?, main?, patterns?) {
+    patterns = (typeof patterns === "undefined") ? {} : patterns;
+    const patterns_src = Object.keys(patterns)
         .map(p => `node_modules/${p}/lib/components/**/*.{js,html,css}`);
     let deps = [
       "node_modules/angular2/bundles/angular2-polyfills.js",
@@ -88,73 +99,53 @@ export namespace GruntTask {
     const components = "src/components/**/*.ts";
     const shared = "src/shared/**/*.ts";
     const server = "src/*.ts";
-    const dev = "src/dev/**/*.ts";
+
+    const ts_base_opts = {
+      verbose: true,
+      target: "es5",
+      moduleResolution: "node",
+      sourceMap: true,
+      emitDecoratorMetadata: true,
+      experimentalDecorators: true,
+      removeComments: false,
+      noImplicitAny: false
+    };
+    const ts_client_opts = _u.extend({module: "system"}, ts_base_opts);
+    const ts_server_opts = _u.extend({module: "commonjs"}, ts_base_opts);
 
     grunt.initConfig({
       pkg: grunt.file.readJSON("package.json"),
       ts: {
         dev_client: {
-          src: [shared, components, dev],
+          src: [shared, components],
           outDir: ["dist/public"],
-          options: {
-            verbose: true,
-            target: "es5",
-            module: "system",
-            moduleResolution: "node",
-            sourceMap: true,
-            emitDecoratorMetadata: true,
-            experimentalDecorators: true,
-            removeComments: false,
-            noImplicitAny: false
-          }
+          options: ts_client_opts
+        },
+        dev_boot: {
+          src: ["dist/public/dev/boot.ts"],
+          outDir: ["dist/public"],
+          options: ts_client_opts
         },
         dev_server: {
           src: [shared, server],
           outDir: ["dist"],
-          options: {
-            verbose: true,
-            target: "es5",
-            module: "commonjs",
-            moduleResolution: "node",
-            sourceMap: true,
-            emitDecoratorMetadata: true,
-            experimentalDecorators: true,
-            removeComments: false,
-            noImplicitAny: false
-          }
+          options: ts_server_opts
         },
         lib_client: {
           src: [shared, components],
           outDir: ["lib"],
-          options: {
-            verbose: true,
-            target: "es5",
-            module: "system",
-            moduleResolution: "node",
-            sourceMap: true,
-            emitDecoratorMetadata: true,
-            experimentalDecorators: true,
-            removeComments: false,
-            noImplicitAny: false,
-            declaration: true
-          }
+          options: ts_client_opts
         },
         lib_server: {
           src: [shared, server],
           outDir: ["lib"],
-          options: {
-            verbose: true,
-            target: "es5",
-            module: "commonjs",
-            moduleResolution: "node",
-            sourceMap: true,
-            emitDecoratorMetadata: true,
-            experimentalDecorators: true,
-            removeComments: false,
-            noImplicitAny: false,
-            declaration: true
-          }
+          options: ts_server_opts
         },
+        boot: {
+          src: ["dist/public/dev/boot.ts"],
+          outDir: ["dist/public/dev"],
+          options: ts_client_opts
+        }
       },
 
       copy: {
@@ -163,13 +154,7 @@ export namespace GruntTask {
             {
               expand: true,
               cwd: "src",
-              src: ["components/**/*.{html,css}", "dev/**/*.{html,css}"],
-              dest: "dist/public"
-            },
-            {
-              expand: true,
-              cwd: "src/dev",
-              src: ["index.html"],
+              src: ["components/**/*.{html,css}"],
               dest: "dist/public"
             },
             {
@@ -180,7 +165,7 @@ export namespace GruntTask {
             // https://github.com/angular/angular/issues/6053
             {
               expand: true,
-              src: Object.keys(opt_patterns)
+              src: Object.keys(patterns)
                    .map(p => `node_modules/${p}/lib/components/` +
                              "**/*.{html,css}"),
               dest: "dist/public/components/",
@@ -260,17 +245,6 @@ export namespace GruntTask {
         }
       },
 
-      express: {
-        dev: {
-          options: {
-            script: "dist/app.js",
-            background: true,
-            args: [
-              "--wsport=3000", "--busport=3001", "--main", "--mode=dev"]
-          }
-        }
-      },
-
       watch: {
         express: {
           files: ["src/**/*.ts"],
@@ -287,20 +261,9 @@ export namespace GruntTask {
             {
               expand: true,
               flatten: true,
-              src: "dist/public/dev/boot.js",
-              dest: "dist/public/dev"
-            },
-            { // get this info via flags
-              expand: true,
-              flatten: true,
-              src: "dist/app.js",
-              dest: "dist"
-            },
-            { // tmp hack: shouldn't have to do the replaces everywhere
-              expand: true,
-              cwd: "dist/",
-              src: "**/**/**/*.js",
-              dest: "dist/",
+              src: "node_modules/mean-loader/lib/dev/*",
+              dest: "dist/public/dev",
+              rename: (dst, src) => dst + "/" + src.replace(".template", "")
             }
           ]
         }
@@ -315,40 +278,77 @@ export namespace GruntTask {
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-replace");
 
-    grunt.registerTask("dv-mean", "Dv a mean element", action => {
+    grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
       if (action === "dev") {
         grunt.log.writeln(this.name + " dev");
         grunt.task.run(
           ["clean:dev", "tslint", "ts:dev_client", "copy:dev",
-            "ts:dev_server"]);
+           "ts:dev_server"]);
 
-        if (Object.keys(opt_patterns).length > 0) {
+        let replace_patterns = [
+          {match: "name", replacement: name},
+          {match: "deps", replacement: _u.keys(patterns)},
+          {match: "comp_info", replacement: grunt.file.readJSON("comp.json")}
+        ];
+        if (Object.keys(patterns).length > 0) {
           let express_config = {};
-          let replace_patterns = [];
-          let port = 3002;
+
 
           replace_patterns.push({
-            match: element + "-1",
+            match: name + "-1",
             replacement: "http://localhost:3000"
           });
 
+          let port = 3002;
+          const locs = {};
+          locs[name] = "http://localhost:3001";
+
+          Object.keys(patterns).forEach(p => {
+            let instances_number = patterns[p];
+            if (instances_number === 1) {
+              locs[p] = "http://localhost:" + port;
+            } else {
+              for (let i = 1; i <= instances_number; ++i) {
+                locs[p + "-" + i] = "http://localhost:" + port;
+                ++port;
+              }
+            }
+          });
+
+          const locs_str = JSON.stringify(locs);
+
+          express_config["main"] = {
+            options: {
+              script: "dist/app.js",
+              background: true,
+              args: [
+                "--wsport=3000", "--busport=3001", "--main", "--mode=dev",
+                "--comppath=comp.json", "--locs=" + locs_str]
+            }
+          };
+
           grunt.log.writeln(
-            "This element is a compound, will start a composer");
+            "This cliche is a compound, will start a composer");
           express_config["composer"] = {
             options: {
               script: "node_modules/dv-composer/lib/app.js",
               background: true,
-              args: ["--wsport=3001"]
+              args: [
+                "--wsport=3001", "--comppath=comp.json", "--locs=" + locs_str]
             }
           };
 
-          Object.keys(opt_patterns).forEach(p => {
+
+          port = 3002;
+          Object.keys(patterns).forEach(p => {
             let process_instance = (p, instance_number) => {
               express_config[p + "-" + instance_number] = {
                 options: {
                   script: "node_modules/" + p + "/lib/app.js",
                   background: true,
-                  args: ["--wsport=" + port, "--busport=3001"]
+                  args: [
+                      "--wsport=" + port, "--busport=3001",
+                      "--comppath=comp.json", "--locs=" + locs_str]
                 }
               };
               replace_patterns.push({
@@ -357,18 +357,18 @@ export namespace GruntTask {
               });
               ++port;
             };
-            let instances_number = opt_patterns[p];
+            let instances_number = patterns[p];
             for (let i = 1; i <= instances_number; ++i) {
               process_instance(p, i);
             }
           });
+          replace_patterns.push({match: "locs", replacement: locs});
 
           grunt.config.merge({express: express_config});
           grunt.config.merge(
             {replace: {dev: {options: {patterns: replace_patterns}}}});
         }
-
-        grunt.task.run(["replace:dev", "express", "watch"]);
+        grunt.task.run(["replace:dev", "ts:boot", "express", "watch"]);
       } else if (action === "lib") {
         grunt.log.writeln(this.name + " lib");
         grunt.task.run(

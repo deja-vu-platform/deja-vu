@@ -1,0 +1,203 @@
+{
+  "tbonds": [
+    {
+      "types": [
+        {"name": "Source", "element": "dv-community-dv-community-follow-1"},
+        {"name": "Target", "element": "dv-community-follow-1"},
+        {"name": "Source", "element": "dv-community-follow-2"},
+        {"name": "User", "element": "dv-access-auth"},
+        {"name": "User", "element": "dv-messaging-post"},
+        {"name": "Subscriber", "element": "dv-messaging-feed"},
+        {"name": "Publisher", "element": "dv-messaging-feed"}
+      ],
+      "subtype": { "name": "User", "element": "dv-samples-bookmark" }
+    },
+
+    {
+      "types": [
+        {"name": "Item", "element": "dv-organization-label"},
+        {"name": "Post", "element": "dv-messaging-post"},
+        {"name": "Message", "element": "dv-messaging-feed"}
+      ],
+      "subtype": { "name": "Post", "element": "dv-samples-bookmark" }
+    },
+
+    {
+      "types": [
+        {"name": "Label", "element": "dv-organization-label"},
+        {"name": "Target", "element": "dv-community-follow-2"},
+        {"name": "Publisher", "element": "dv-messaging-feed"}
+      ],
+      "subtype": { "name": "Topic", "element": "dv-samples-bookmark" }
+    }
+  ],
+  "fbonds": [
+    {
+      "fields": [
+        {
+          "name": "published",
+          "type": { "name": "Publisher", "element": "dv-messaging-feed" }
+        },
+        {
+          "name": "posts",
+          "type": { "name": "User", "element": "dv-messaging-post" }
+        }
+      ],
+      "subfield": {
+        "name": "posts", "type": {
+          "name": "User", "element": "dv-samples-bookmark"
+        }
+      }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "content",
+          "type": {"name": "Post", "element": "dv-messaging-post"}
+        },
+        {
+          "name": "content",
+          "type": {"name": "Message", "element": "dv-messaging-feed"}
+        }
+      ],
+      "subfield": {
+        "name": "content", "type": {
+          "name": "Post", "element": "dv-samples-bookmark"
+        }
+      }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "published",
+          "type": {
+            "name": "Publisher", "element": "dv-messaging-feed"
+          }
+        },
+        {
+          "name": "items",
+          "type": {"name": "Label", "element": "label"}
+        }
+      ],
+      "subfield": {
+        "name": "posts", "type": {
+          "name": "Topic", "element": "dv-samples-bookmark"
+        }
+      }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "follows",
+          "type": {
+            "name": "Source", "element": "dv-community-follow-1"
+          }
+        },
+        {
+          "name": "subscriptions",
+          "type": {
+            "name": "Subscriber", "element": "dv-messaging-feed"
+          }
+        }
+      ],
+      "subfield": {
+        "name": "follows", "type": {
+          "name": "User", "element": "dv-samples-bookmark"
+        }
+      }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "follows",
+          "type": {
+            "name": "Source", "element": "dv-community-follow-2"
+          }
+        },
+        {
+          "name": "subscriptions",
+          "type": {
+            "name": "Subscriber", "element": "dv-messaging-feed-1"
+          }
+        }
+      ],
+      "subfield": {
+        "name": "follows", "type": {
+          "name": "User", "element": "dv-samples-bookmark-1"
+        }
+      }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "labels",
+          "type": {"name": "Item", "element": "label"}
+        }
+      ],
+      "subfield": {
+        "name": "topics", "type": {
+          "name": "Post", "element": "dv-samples-bookmark"
+        }
+      }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "name",
+          "type": {
+            "name": "Source", "element": "dv-community-follow-1"
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "name": "Target", "element": "dv-community-follow-1"
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "name": "Source", "element": "dv-community-follow-2"
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "name": "Target", "element": "dv-community-follow-2"
+          }
+        },
+        {
+          "name": "username",
+          "type": {"name": "User", "element": "dv-access-auth"}
+        },
+        {
+          "name": "username",
+          "type": {"name": "User", "element": "dv-messaging-post"}
+        },
+        {
+          "name": "name",
+          "type": {
+            "name": "Subscriber", "element": "dv-messaging-feed"
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "name": "Publisher", "element": "dv-messaging-feed"
+          }
+        }
+      ],
+      "subfield": {
+        "name": "username", "type": {
+          "name": "User", "element": "dv-samples-bookmark"
+        }
+      }
+    }
+  ]
+}
