@@ -1817,9 +1817,83 @@ function addRowColAddRemoveButtons(){
     $('#main-cell-table').append(buttonAddRow).append(buttonRemoveRow).append(buttonAddCol).append(buttonRemoveCol);
 }
 
-/*
- Adding and deleting rows and columns
- */
+/** ** ** ** Adding and deleting rows and columns **/
+
+function addNRowsToEnd(n) {
+    var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
+    var newNumRows = lastRowNum + n;
+
+    selectedUserComponent.dimensions.rows = newNumRows;
+    numRows = newNumRows;
+
+    var saveTableLockedWidth = tableLockedWidth;
+    var saveTableLockedHeight = tableLockedHeight;
+
+    if (tableLockedHeight) { // if table height constant
+        // for the new row, height is 1/newNumRows
+        for (var newRow = 1; newRow <= n; newRow++){
+            selectedUserComponent.layout[lastRowNum + newRow] = {};
+            for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+                selectedUserComponent.layout[lastRowNum + newRow][col] = {
+                    spans:{row:1,col:1},
+                    merged:{isMerged: false,
+                        topLeftCellId: '',
+                        topRightCellId: '',
+                        bottomLeftCellId: '',
+                        bottomRightCellId: ''},
+                    hidden:{isHidden: false, hidingCellId: ''},
+                    // take the width of the grid-cell to the top (grid-cell, in case the cell is merged)
+                    ratio:{
+                        grid:{width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width, height: 1/(newNumRows)}}
+                }
+            }
+        }
+
+
+        // for all other columns, scale down the widths proportionally = (1 - n/newNumRows)
+        for (var row = 1; row <= lastRowNum; row++) {
+            for (var col = 1; col <= numCols; col++) {
+                selectedUserComponent.layout[row][col].ratio.grid.height = selectedUserComponent.layout[row][col].ratio.grid.height * (1 - n / (newNumRows));
+            }
+        }
+    } else {
+        for (var newRow = 1; newRow <= n; newRow++) {
+            selectedUserComponent.layout[lastRowNum + newRow] = {};
+            for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+                selectedUserComponent.layout[lastRowNum + newRow][col] = {
+                    spans: {row: 1, col: 1},
+                    merged: {
+                        isMerged: false,
+                        topLeftCellId: '',
+                        topRightCellId: '',
+                        bottomLeftCellId: '',
+                        bottomRightCellId: ''
+                    },
+                    hidden: {isHidden: false, hidingCellId: ''},
+                    // take the width of the grid-cell to the top (grid-cell, in case the cell is merged)
+                    ratio: {
+                        grid: {
+                            width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width,
+                            height: standardCellHeight / (gridHeight - 20)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    loadTable(selectedUserComponent);
+    if (saveTableLockedHeight){
+        alignCellsAndGridWithSavedRatios();
+    } else {
+        saveRowColRatiosGrid(true, true);
+    }
+    // because load table resets this
+    toggleTableWidthLock(saveTableLockedWidth);
+    toggleTableHeightLock(saveTableLockedHeight);
+
+}
+
 
 /**
  * Adds a row to the end
@@ -1836,7 +1910,7 @@ function addRowToEnd() {
     var saveTableLockedHeight = tableLockedHeight;
 
     if (tableLockedHeight) { // if table height constant
-        // for the new column, width is 1/newNumRows
+        // for the new row, width is 1/newNumRows
         for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
             selectedUserComponent.layout[lastRowNum + 1][col] = {
                 spans:{row:1,col:1},
@@ -1875,7 +1949,7 @@ function addRowToEnd() {
             }
         }
     }
-    
+
     loadTable(selectedUserComponent);
     if (saveTableLockedHeight){
         alignCellsAndGridWithSavedRatios();
@@ -1887,6 +1961,83 @@ function addRowToEnd() {
     toggleTableHeightLock(saveTableLockedHeight);
 
 }
+
+function removeNRowsFromEnd(n) {
+    var cellsNeedingRowspanCut = {};
+
+    var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
+
+    if ((lastRowNum-n) < 1){
+        return
+    }
+
+    selectedUserComponent.dimensions.rows = lastRowNum - n;
+    numRows -= n;
+
+    var saveTableLockedWidth = tableLockedWidth;
+    var saveTableLockedHeight = tableLockedHeight;
+
+
+    if (tableLockedHeight) {
+        // if table width locked, resize the other cells accordingly
+        var ratioToRemoveGrid = 0;
+        for (var rowToRemove = 0; rowToRemove < n; rowToRemove++){
+            ratioToRemoveGrid += selectedUserComponent.layout[lastRowNum - rowToRemove][1].ratio.grid.height;
+        }
+
+        for (var row = 1; row<= numRows; row++){
+            for (var col = 1; col<= numCols; col++){
+                var oldRatio = selectedUserComponent.layout[row][col].ratio.grid.height;
+                selectedUserComponent.layout[row][col].ratio.grid.height = oldRatio/(1-ratioToRemoveGrid);
+            }
+        }
+    }
+
+    // for the first deleted row, look for merged cells to fix
+    // (do this whether or not the table height is locked)
+    for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+        var isHidden = selectedUserComponent.layout[lastRowNum-n+1][col].hidden.isHidden;
+        var hidingCellId = selectedUserComponent.layout[lastRowNum-n+1][col].hidden.hidingCellId;
+        if (isHidden){
+            if (!(hidingCellId in cellsNeedingRowspanCut)){
+                cellsNeedingRowspanCut[hidingCellId] = '';
+                var hcRowcol = getRowColFromId(hidingCellId);
+                var hcRow = Number(hcRowcol.row);
+                var hcCol = Number(hcRowcol.col);
+
+                var rowspan = selectedUserComponent.layout[hcRow][hcCol].spans.row;
+                $('#'+hidingCellId).attr('rowspan', rowspan - 1);
+                selectedUserComponent.layout[hcRow][hcCol].spans.row = rowspan - 1;
+
+                var oldBottomRightId = $('#'+hidingCellId).data('merged').bottomRightCellId;
+                var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
+                var newBottomRightRow = Number(oldBottomRightRowcol.row)-1;
+                var newBottomRightCol = oldBottomRightRowcol.col;
+                var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
+                selectedUserComponent.layout[hcRow][hcCol].merged.bottomRightCellId = newBottomRightId;
+                $('#'+hidingCellId).data('merged', {isMerged: true, bottomRightCellId: newBottomRightId});
+            }
+        }
+    }
+
+    for (var rowToRemove = 0; rowToRemove < n; rowToRemove++){
+        delete selectedUserComponent.layout[lastRowNum - rowToRemove];
+    }
+
+
+    loadTable(selectedUserComponent);
+    if (saveTableLockedHeight){
+        alignCellsAndGridWithSavedRatios();
+    } else {
+        saveRowColRatiosGrid(true, true);
+    }
+    // because load table resets this
+    toggleTableWidthLock(saveTableLockedWidth);
+    toggleTableHeightLock(saveTableLockedHeight);
+
+}
+
+
 
 /**
  * Removes the end row
@@ -2106,7 +2257,7 @@ function removeEndCol() {
     // and save rowcol ratios
 
 
-    
+
     loadTable(selectedUserComponent);
     if (saveTableLockedWidth){
         alignCellsAndGridWithSavedRatios();
