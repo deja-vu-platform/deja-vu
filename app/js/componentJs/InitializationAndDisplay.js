@@ -454,7 +454,8 @@ function truncate(str, len) {
 }
 
 function getCSSRule(search) {
-    var x = [].slice.call(document.styleSheets[2].cssRules);
+    var x = [].slice.call(document.styleSheets[2].cssRules)
+    x = x.concat([].slice.call(document.styleSheets[3].cssRules));
     return x.filter(function (rule) {
         return rule.selectorText === search;
     })[0];
