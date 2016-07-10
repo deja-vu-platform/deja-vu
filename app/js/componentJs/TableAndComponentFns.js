@@ -1774,7 +1774,8 @@ function addRowColAddRemoveButtons(){
     buttonAddRow.id = 'btn-add-row';
 
     $(buttonAddRow).on("click", function (e) {
-        addRowToEnd();
+        //addRowToEnd();
+        addNRowsToEnd(1);
     });
 
     var spRemoveRow = document.createElement('span');
@@ -1786,7 +1787,8 @@ function addRowColAddRemoveButtons(){
     buttonRemoveRow.id = 'btn-remove-row';
 
     $(buttonRemoveRow).on("click", function (e) {
-        removeEndRow();
+        //removeEndRow();
+        removeNRowsFromEnd(1);
     });
 
 
@@ -1799,7 +1801,8 @@ function addRowColAddRemoveButtons(){
     buttonAddCol.id = 'btn-add-col';
 
     $(buttonAddCol).on("click", function (e) {
-        addColToEnd();
+        //addColToEnd();
+        addNColsToEnd(1);
     });
 
     var spRemoveCol = document.createElement('span');
@@ -1811,7 +1814,8 @@ function addRowColAddRemoveButtons(){
     buttonRemoveCol.id = 'btn-remove-col';
 
     $(buttonRemoveCol).on("click", function (e) {
-        removeEndCol();
+        //removeEndCol();
+        removeNColsFromEnd(1);
     });
 
     $('#main-cell-table').append(buttonAddRow).append(buttonRemoveRow).append(buttonAddCol).append(buttonRemoveCol);
