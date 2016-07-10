@@ -58,11 +58,21 @@ fieldset { border: 0; margin: 0; padding: 0; }
 }
 
 .menu-item {
-    float: left;
+    display: inline-block;
+    float: right;
     margin: 15px 5px 15px 5px;
 }
 
+
+.navigation{
+    display: inline-block;
+    padding: 6px;
+    margin: 15px 5px 15px 5px;
+    font-size: medium;
+}
+
 .menu-item.logo {
+    float: left;
     width: 200px;
     color: #555555;
     font-weight: bold;
@@ -102,7 +112,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
 }
 
 #back-to-projects{
-    width: 100%;
+    display: inline-block;
     text-align: center;
 }
 
@@ -631,9 +641,3 @@ p.label {
     100% { transform: rotate(360deg); }
 }
 
-
-
-.navigation{
-    float: right;
-    padding-right: 20px;
-}
