@@ -2,10 +2,9 @@
                   COMPONENTS
 ===================================================*/
 .components {
-    padding-top: 75px;
+    margin-top: 75px;
     float: left;
-    border: #d5d5d5 1px solid;
-    height: 100%;
+    /*border: #d5d5d5 1px solid;*/
     width: 250px;
     position: absolute;
 }

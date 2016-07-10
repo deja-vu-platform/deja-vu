@@ -152,6 +152,31 @@ function resetMenuOptions() {
     $('#component-json').val('');
 }
 
+/** ** ** ** ** ** Mode Listeners ** ** ** ** ** ** ** ** **/
+$('#build-mode').click(function(){
+    if ($(this).hasClass('active')){
+        return;
+    }
+    $(this).parent().find('.active').removeClass('active');
+    $(this).addClass('active');
+});
+
+$('#layout-mode').click(function(){
+   if ($(this).hasClass('active')){
+       return;
+   }
+   $(this).parent().find('.active').removeClass('active');
+   $(this).addClass('active');
+});
+
+$('#style-mode').click(function(){
+    if ($(this).hasClass('active')){
+        return;
+    }
+    $(this).parent().find('.active').removeClass('active');
+    $(this).addClass('active');
+});
+
 /** ** ** ** ** ** Components Event Handlers ** ** ** ** ** **/
 
 $('#back-to-projects').click(function(event){
