@@ -3,9 +3,13 @@ import {bootstrap} from "angular2/platform/browser";
 import {ROUTER_PROVIDERS} from "angular2/router";
 
 
+@@wid_imports
+
 const COMP_INFO = @@comp_info;
 const LOCS = @@locs;
 const NAME = "@@name";
+const WIDGETS = @@widgets;
+const ATTACHMENTS = @@wid_attachments;
 
 
 let providers = [];
@@ -21,18 +25,21 @@ providers.concat([
     provide("CompInfo", {useValue: COMP_INFO})
     ]);
 
-providers.concat([
-//    provide(
-//      PLATFORM_DIRECTIVES, {useValue: PostComponent, multi: true}),
-//    provide(
-//      PLATFORM_DIRECTIVES, {useValue: UserComponent, multi: true}),
-    ]);
+providers.concat(
+  ATTACHMENTS
+    .map(a => provide(PLATFORM_DIRECTIVES, {useValue: a, multi: true})));
+
 
 @Component({
   selector: "dev",
-  templateUrl: "This is the development page"
+  template: `
+     This is the development page, widgets: {{widgets}}
+     @@wid_selectors
+  `,
+  directives: @@wid_directives
 })
 class DevComponent {
+  widgets = WIDGETS;
 }
 
 

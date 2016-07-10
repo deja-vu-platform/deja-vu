@@ -2,7 +2,7 @@
   <head>
     <title>@@name</title>
 
-    <base href="/" />
+    <base href="/"></base>
     <link rel="stylesheet"
      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
      integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
@@ -30,14 +30,14 @@
       map_obj["underscore"] = "node_modules/underscore/underscore.js";
       map_obj["client-bus"] = "node_modules/client-bus/lib/client-bus.js";
 
-      packages_obj["dev"] = regjs;
+      packages_obj["dv-dev"] = regjs;
       packages_obj["components"] = regjs;
       packages_obj["shared"] = regjs;
       packages_obj["client-bus"] = regjs;
       packages_obj["underscore"] = regjs;
 
-      System.config({map: map_obj, packages: package_obj});
-      System.import('./dev/boot')
+      System.config({map: map_obj, packages: packages_obj});
+      System.import('./dv-dev/boot')
             .then(null, console.error.bind(console));
     </script>
 

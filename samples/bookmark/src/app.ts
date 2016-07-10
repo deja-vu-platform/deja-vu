@@ -73,9 +73,9 @@ const bus = new ServerBus(
 
 Helpers.serve_schema(mean.ws, schema);
 
-mean.ws.use("/*", (req, res) => {
-  res.sendFile(__dirname + "/public/index.html");
-});
+// mean.ws.use("/*", (req, res) => {
+//   res.sendFile(__dirname + "/public/index.html");
+// });
 
 
 setTimeout(init_db, 30 * 1000);  // hack..

@@ -59,7 +59,8 @@ export class ServerBus {
     _ws.post("/dv-bus", this._cors, gql);
 
     if (_comp_info !== undefined) {
-      this._config(_comp_info, locs);
+      // hack
+      setTimeout(() => this._config(_comp_info, locs), 10 * 1000);
     }
   }
 
@@ -101,9 +102,9 @@ export class ServerBus {
   private _config(comp_info, locs) {
     // JSON.stringify quotes properties and graphql doesn't like that
     const e = e => e.split("-")[2];
-    const l = e => locs[e];
+    const l = t => locs[t.element];
     const str_t = t => (
-        `{name: "${t.name}", element: "${e(t.element)}", loc: "${l(t.loc)}"}`);
+        `{name: "${t.name}", element: "${e(t.element)}", loc: "${l(t)}"}`);
     const str_f = f => (`{
       name: "${f.name}",
       type: ${str_t(f.type)}

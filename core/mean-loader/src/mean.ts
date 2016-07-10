@@ -5,6 +5,7 @@ import morgan = require("morgan");
 const mongodb = require("mongodb");
 const command_line_args = require("command-line-args");
 const fs = require("fs");
+const path = require("path");
 import * as _u from "underscore";
 
 
@@ -71,7 +72,17 @@ export class Mean {
     if (opts.main) {
       console.log(`Serving public folder for MEAN ${name} at ${this.loc}`);
       this.ws.use(express.static("./dist/public"));
-    };
+      const dist_dir = path.resolve(__dirname + "/../../../dist");
+      if (opts.mode === "dev") {
+        this.ws.use("/*", (req, res) => {
+          res.sendFile("/public/dv-dev/index.html", {root: dist_dir});
+        });
+      } else {
+        this.ws.use("/*", (req, res) => {
+          res.sendFile("/public/index.html", {root: dist_dir});
+        });
+      }
+    }
 
     this.ws.listen(opts.wsport, () => {
       console.log(`Listening with opts ${JSON.stringify(opts)}`);
@@ -80,7 +91,7 @@ export class Mean {
 }
 
 export namespace GruntTask {
-  export function task(grunt, name, widgets?, main?, patterns?) {
+  export function task(grunt, name, widgets?, attachments?, main?, patterns?) {
     patterns = (typeof patterns === "undefined") ? {} : patterns;
     const patterns_src = Object.keys(patterns)
         .map(p => `node_modules/${p}/lib/components/**/*.{js,html,css}`);
@@ -96,10 +107,6 @@ export namespace GruntTask {
     ];
     deps = deps.concat(patterns_src);
 
-    const components = "src/components/**/*.ts";
-    const shared = "src/shared/**/*.ts";
-    const server = "src/*.ts";
-
     const ts_base_opts = {
       verbose: true,
       target: "es5",
@@ -113,16 +120,15 @@ export namespace GruntTask {
     const ts_client_opts = _u.extend({module: "system"}, ts_base_opts);
     const ts_server_opts = _u.extend({module: "commonjs"}, ts_base_opts);
 
+    const components = "src/components/**/*.ts";
+    const shared = "src/shared/**/*.ts";
+    const server = "src/*.ts";
+
     grunt.initConfig({
       pkg: grunt.file.readJSON("package.json"),
       ts: {
         dev_client: {
-          src: [shared, components],
-          outDir: ["dist/public"],
-          options: ts_client_opts
-        },
-        dev_boot: {
-          src: ["dist/public/dev/boot.ts"],
+          src: [shared, components, "src/dv-dev/**/*.ts"],
           outDir: ["dist/public"],
           options: ts_client_opts
         },
@@ -140,11 +146,6 @@ export namespace GruntTask {
           src: [shared, server],
           outDir: ["lib"],
           options: ts_server_opts
-        },
-        boot: {
-          src: ["dist/public/dev/boot.ts"],
-          outDir: ["dist/public/dev"],
-          options: ts_client_opts
         }
       },
 
@@ -172,9 +173,15 @@ export namespace GruntTask {
               rename: (dst, src) => (
                            dst +
                            src.match("node_modules/.*/lib/components/(.*)")[1])
+            },
+            {
+              expand: true,
+              cwd: "src/dv-dev",
+              src: ["**/*.{html,css}"],
+              dest: "dist/public/dv-dev"
             }
           ]
-          },
+        },
         lib: {
           files: [
             {
@@ -227,7 +234,7 @@ export namespace GruntTask {
         },
         default: {
           files: {
-            src: ["src/**/*.ts"]
+            src: ["src/**/!(boot).ts"]
           }
         }
       },
@@ -238,7 +245,7 @@ export namespace GruntTask {
             "dist", "lib", "src/**/*.js", "src/**/*.js.map", "src/**/*.d.ts"]
         },
         dev: {
-          src: ["dist"]
+          src: ["dist", "src/dv-dev"]
         },
         lib: {
           src: ["lib"]
@@ -262,7 +269,7 @@ export namespace GruntTask {
               expand: true,
               flatten: true,
               src: "node_modules/mean-loader/lib/dev/*",
-              dest: "dist/public/dev",
+              dest: "src/dv-dev",
               rename: (dst, src) => dst + "/" + src.replace(".template", "")
             }
           ]
@@ -281,14 +288,33 @@ export namespace GruntTask {
     grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
       if (action === "dev") {
         grunt.log.writeln(this.name + " dev");
-        grunt.task.run(
-          ["clean:dev", "tslint", "ts:dev_client", "copy:dev",
-           "ts:dev_server"]);
+
+
+        const hyphen = w => w.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+        const wid_imports = _u
+            .map(widgets,
+                 w => `import {${w}Component} from ` +
+                      `"../components/${hyphen(w)}/${hyphen(w)}";`)
+            .join("\n");
+        const wid_directives = "[" +
+            _u.map(widgets, w => w + "Component").join() + "]";
+
+        const wid_attachments = "[" +
+            _u.map(attachments, a => a + "Component").join() + "]";
+
+        const wid_selectors = _u
+            .map(widgets, w => `<${hyphen(w)}></${hyphen(w)}>`)
+            .join("\n");
 
         let replace_patterns = [
           {match: "name", replacement: name},
           {match: "deps", replacement: _u.keys(patterns)},
-          {match: "comp_info", replacement: grunt.file.readJSON("comp.json")}
+          {match: "comp_info", replacement: grunt.file.readJSON("comp.json")},
+          {match: "widgets", replacement: widgets},
+          {match: "wid_imports", replacement: wid_imports},
+          {match: "wid_directives", replacement: wid_directives},
+          {match: "wid_selectors", replacement: wid_selectors},
+          {match: "wid_attachments", replacement: wid_attachments}
         ];
         if (Object.keys(patterns).length > 0) {
           let express_config = {};
@@ -368,7 +394,11 @@ export namespace GruntTask {
           grunt.config.merge(
             {replace: {dev: {options: {patterns: replace_patterns}}}});
         }
-        grunt.task.run(["replace:dev", "ts:boot", "express", "watch"]);
+        grunt.task.run(["clean:dev"]);
+        grunt.task.run(["replace:dev"]);
+        grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
+        grunt.task.run(["copy:dev"]);
+        grunt.task.run(["express", "watch"]);
       } else if (action === "lib") {
         grunt.log.writeln(this.name + " lib");
         grunt.task.run(
