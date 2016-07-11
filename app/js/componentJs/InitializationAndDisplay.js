@@ -100,7 +100,9 @@ $('#new-main-component-btn').click(function(){
         numRows = $('#select-rows').val();
         numCols = $('#select-cols').val();
         selectedUserComponent = initUserComponent(false);
+        selectedUserComponent.inMainPages = true;
         selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+        selectedProject.mainComponents[selectedUserComponent.meta.id] = selectedUserComponent.meta.name;
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
         createTable();
         resetMenuOptions();
