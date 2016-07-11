@@ -1,12 +1,21 @@
 /*===================================================
                   COMPONENTS
 ===================================================*/
-.components {
+.project-options-container{
+    height: 90%;
+    position: absolute;
+}
+
+.components, .layout, .style {
     margin-top: 75px;
     float: left;
     /*border: #d5d5d5 1px solid;*/
     width: 250px;
     position: absolute;
+}
+
+.layout, .style {
+    display: none;
 }
 
 .header {
@@ -34,18 +43,15 @@
 }
 
 .content {
-    overflow: auto;
     text-align: left;
-    /*resize: vertical;*/
+}
+
+.components .content{
+    min-height: 120px;
 }
 
 a{
     cursor: pointer;
-}
-
-
-.content {
-    max-height: 130px;
 }
 
 .component-name-container{

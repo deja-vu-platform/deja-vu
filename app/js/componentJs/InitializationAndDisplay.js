@@ -159,6 +159,15 @@ $('#build-mode').click(function(){
     }
     $(this).parent().find('.active').removeClass('active');
     $(this).addClass('active');
+    $('.components').css({
+        display: 'block',
+    });
+    $('.layout').css({
+        display: 'none',
+    });
+    $('.style').css({
+        display: 'none',
+    });
 });
 
 $('#layout-mode').click(function(){
@@ -167,6 +176,15 @@ $('#layout-mode').click(function(){
    }
    $(this).parent().find('.active').removeClass('active');
    $(this).addClass('active');
+    $('.layout').css({
+        display: 'block',
+    });
+    $('.components').css({
+        display: 'none',
+    });
+    $('.style').css({
+        display: 'none',
+    });
 });
 
 $('#style-mode').click(function(){
@@ -175,6 +193,15 @@ $('#style-mode').click(function(){
     }
     $(this).parent().find('.active').removeClass('active');
     $(this).addClass('active');
+    $('.style').css({
+        display: 'block',
+    });
+    $('.layout').css({
+        display: 'none',
+    });
+    $('.components').css({
+        display: 'none',
+    });
 });
 
 /** ** ** ** ** ** Components Event Handlers ** ** ** ** ** **/

@@ -56,99 +56,162 @@
     </div>
 </div>
 
-<div class="project-options">
-    <div class="project-name">
-        <div class="header"></div>
-        <ul class="nav nav-tabs">
-            <li class="active" id="build-mode"><a href="#">Build</a></li>
-            <li id="layout-mode"><a href="#">Layout</a></li>
-            <li id="style-mode"><a href="#">Style</a></li>
-        </ul>
-    </div>
-</div>
-
-<div class="components">
-    <div class="user-made-components">
-        <div class="main-pages">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open">
-                    Main Pages
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-main-component-btn">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
-                    <span class="glyphicon glyphicon-import"></span>
-                </button>
-            </div>
-            <div class="content">
-                <ul id="main-pages-list">
-                </ul>
-            </div>
-        </div>
-        <div class="user-components">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open">
-                    User components
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-component-btn">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
-                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
-                    <span class="glyphicon glyphicon-import"></span>
-                </button>
-            </div>
-            <div class="content">
-                <ul id="user-components-list">
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="basic-components">
-        <div class="header">
-            <span class="dropdown-trigger dropdown-open">
-                Basic components
-                <span class="glyphicon glyphicon-triangle-bottom"></span>
-            </span>
-        </div>
-        <div class="content">
-            <ul id="basic-components">
-                <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
-                <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
-                <li name="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Media</li>
-                <li name="tab-viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs</li>
-                <li name="menu" class="draggable widget"><img src="images/menu_icon.png" width="15px" height="15px"> Menu</li>
-                <li name="panel" class="draggable widget"><img src="images/panel_icon.png" width="15px" height="15px"> Panel</li>
-
+<div class="project-options-container">
+    <div class="project-options">
+        <div class="project-name">
+            <div class="header"></div>
+            <ul class="nav nav-tabs">
+                <li class="active" id="build-mode"><a href="#">Build</a></li>
+                <li id="layout-mode"><a href="#">Layout</a></li>
+                <li id="style-mode"><a href="#">Style</a></li>
             </ul>
         </div>
     </div>
 
-    <div class="cliche-components">
-        <div class="header">
-            <span class="dropdown-trigger dropdown-open">
-                Cliché components
-                <span class="glyphicon glyphicon-triangle-bottom"></span>
-            </span>
+    <div class="components">
+        <div class="user-made-components">
+            <div class="main-pages">
+                <div class="header">
+                    <span class="dropdown-trigger dropdown-open">
+                        Main Pages
+                        <span class="glyphicon glyphicon-triangle-bottom"></span>
+                    </span>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-main-component-btn">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
+                        <span class="glyphicon glyphicon-import"></span>
+                    </button>
+                </div>
+                <div class="content">
+                    <ul id="main-pages-list">
+                    </ul>
+                </div>
+            </div>
+            <div class="user-components">
+                <div class="header">
+                    <span class="dropdown-trigger dropdown-open">
+                        User components
+                        <span class="glyphicon glyphicon-triangle-bottom"></span>
+                    </span>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-component-btn">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
+                        <span class="glyphicon glyphicon-import"></span>
+                    </button>
+                </div>
+                <div class="content">
+                    <ul id="user-components-list">
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="content">
-            <ul>
-            </ul>
+        <div class="basic-components">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open">
+                    Basic components
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content">
+                <ul id="basic-components">
+                    <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
+                    <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
+                    <li name="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Media</li>
+                    <li name="tab-viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs</li>
+                    <li name="menu" class="draggable widget"><img src="images/menu_icon.png" width="15px" height="15px"> Menu</li>
+                    <li name="panel" class="draggable widget"><img src="images/panel_icon.png" width="15px" height="15px"> Panel</li>
+
+                </ul>
+            </div>
         </div>
+
+        <div class="cliche-components">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open">
+                    Cliché components
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content">
+                <ul>
+                </ul>
+            </div>
+        </div>
+
     </div>
 
+    <div class="layout">
+        <div class="merge">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open">
+                    Merge Cells
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content">
+                <button class="btn btn-primary">Reset All Cells</button>
+            </div>
+        </div>
+        <div class="resize">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open">
+                    Resize
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content">
+                <div class="lock-width">
+                    Lock Width <input type="checkbox">
+                </div>
+                <div class="lock-height">
+                    Lock Height <input type="checkbox">
+                </div>
+                Resize To Fixed Ratios
+                <ul id="resize-fixed-rows">
+                </ul>
+                <ul id="resize-fixed-cols">
+                </ul>
+                <button class="btn btn-primary">Reset Width Ratios</button>
+                <button class="btn btn-primary">Reset Height Ratios</button>
+            </div>
+        </div>
+        <div class="add-remove-rows-cols">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open">
+                    Add/Delete Rows/Columns
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content">
+                <div class="lock-width">
+                    Lock Width <input type="checkbox">
+                </div>
+                <div class="lock-height">
+                    Lock Height <input type="checkbox">
+                </div>
+                <div class="add-n-rows">
+                    Add Rows <input type="text">
+                </div>
+                <div class="remove-n-rows">
+                    Remove Rows <input type="text">
+                </div>
+                <div class="add-n-cols">
+                    Add Cols <input type="text">
+                </div>
+                <div class="remove-n-cols">
+                    Remove Cols <input type="text">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="style">
+
+    </div>
 </div>
-
-<div class="layout">
-
-</div>
-
-<div class="style">
-
-</div>
-
 <div id="outer-container">
     <div id="middle-container">
         <div id="table-grid-container">
