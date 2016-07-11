@@ -140,12 +140,12 @@ export namespace GruntTask {
         lib_client: {
           src: [shared, components],
           outDir: ["lib"],
-          options: ts_client_opts
+          options: _u.extend({declaration: true}, ts_client_opts)
         },
         lib_server: {
           src: [shared, server],
           outDir: ["lib"],
-          options: ts_server_opts
+          options: _u.extend({declaration: true}, ts_server_opts)
         }
       },
 
