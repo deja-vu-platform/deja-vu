@@ -185,7 +185,7 @@ function createTable() {
     addTableResizeHandler();
     addTableSizeLockUnlockButtons();
     addClearButtons();
-    addAddToMainPagesButton();
+    //addAddToMainPagesButton();
 
 
     bitmapOld = make2dArray(numRows, numCols);

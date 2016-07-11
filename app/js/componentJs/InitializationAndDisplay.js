@@ -68,6 +68,8 @@ $(function () {
 
     registerZoom();
 
+    registerUserComponentAreaDroppable();
+
     // finish load animation
     $('.loader-container').fadeOut("fast");
 });
@@ -275,6 +277,7 @@ function displayUserComponentInListAndSelect(name, id){
  * @param newComponent
  */
 function displayNewComponentInUserComponentList(name, id){
+    // TODO changes in style
     var newComponentElt =
           '<li data-componentid=' + id + '>'
             + '<div class="component-name-container">'
@@ -286,14 +289,16 @@ function displayNewComponentInUserComponentList(name, id){
         + '</li>';
     $('#user-components-list').append(newComponentElt);
     addDeleteUserComponentButton(id);
+    registerUserComponentAsDraggable(id);
 }
 
 
 /**
- * Adds a component to the list of user components
+ * Adds a component to the list of main pages
  * @param newComponent
  */
 function displayNewComponentInMainPagesList(name, id){
+    // TODO changes in style
     var newComponentElt =
         '<li data-componentid=' + id + '>'
         + '<div class="component-name-container">'
@@ -305,6 +310,7 @@ function displayNewComponentInMainPagesList(name, id){
         + '</li>';
     $('#main-pages-list').append(newComponentElt);
     addDeleteUserComponentButton(id);
+    registerUserComponentAsDraggable(id);
 }
 
 function displayMainPageInListAndSelect(name, id){
@@ -524,7 +530,7 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and Display Helpers ** ** ** ** ** ** ** ** **/
 
 function registerDroppable() {
-    enableDrop = {
+    var enableDrop = {
         accept: ".widget",
         hoverClass: "highlight",
         tolerance: "intersect",
@@ -559,7 +565,9 @@ function registerDroppable() {
         }
     };
     $('.droppable').each(function() {
-        $(this).droppable(enableDrop);
+        if (!$(this).hasClass('page-component-toggle-drop')){
+            $(this).droppable(enableDrop);
+        }
     });
 }
 
@@ -839,11 +847,68 @@ function showClicheInList(id, name){
 
 /** ** ** ** ** ** Dragging and Dropping User Components to Main pages ** ** ** **/
 function registerUserComponentAreaDroppable(){
-
+    var enableDrop = {
+        accept: ".dragging-component",
+        hoverClass: "highlight",
+        tolerance: "intersect",
+        drop: function(event, ui) {
+            var userComponentId = ui.draggable.data('componentid');
+            var name = selectedProject.components[userComponentId].meta.name;
+            if ($(this).hasClass('main-pages')){
+                if (ui.draggable.hasClass('moving-user-component')){ // if type user
+                    // adding to main page
+                    selectedProject.mainComponents[userComponentId] = name;
+                    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
+                    displayMainPageInListAndSelect(name, userComponentId);
+                    selectedProject.components[userComponentId].inMainPages = true;
+                }
+            } else if ($(this).hasClass('user-components')){
+                if (ui.draggable.hasClass('moving-main-component')){ // if type user
+                    // removing from main page
+                    delete selectedProject.mainComponents[userComponentId];
+                    $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
+                    displayUserComponentInListAndSelect(name, userComponentId);
+                    selectedProject.components[userComponentId].inMainPages = false;
+                }
+            }
+        }
+    };
+    $('.page-component-toggle-drop').each(function() {
+        $(this).droppable(enableDrop);
+    });
 }
 
-function registerUserComponentAsDraggable(){
+function registerUserComponentAsDraggable(componentId) {
+    var enableDraggable = function (element, type) {
+        // type === 'user'||'main'
+        return {
+            opacity: 1,
+            revert: "invalid",
+            cursorAt: {top: 0, left: 0},
+            helper: function () {
+                $(this).addClass('dragging-component moving-' + type + '-component');
+                var clone = document.createElement('div');
+                // TODO display
+                clone.innerHTML = $(this).find('.component-name').text();
+                return clone;
+            },
+            appendTo: '#user-components-list',
+            containment: '#user-made-components',
+            cursor: '-webkit-grabbing',
+            scroll: true,
+            stop: function () {
+                $(this).removeClass('dragging-component moving-' + type + '-component');
+            }
+        }
 
+    };
+
+    $("#user-components-list").find("[data-componentid='" + componentId + "']").each(function () {
+        $(this).draggable(enableDraggable(this, 'user'));
+    });
+    $("#main-pages-list").find("[data-componentid='" + componentId + "']").each(function () {
+        $(this).draggable(enableDraggable(this, 'main'));
+    });
 }
 
 /** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
