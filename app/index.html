@@ -68,37 +68,51 @@
 </div>
 
 <div class="components">
-    <div class="main-pages">
-        <div class="header">Main Pages
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-main-component-btn">
-                <span class="glyphicon glyphicon-plus"></span>
-            </button>
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
-                <span class="glyphicon glyphicon-import"></span>
-            </button>
+    <div class="user-made-components">
+        <div class="main-pages">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open">
+                    Main Pages
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-main-component-btn">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
+                    <span class="glyphicon glyphicon-import"></span>
+                </button>
+            </div>
+            <div class="content">
+                <ul id="main-pages-list">
+                </ul>
+            </div>
         </div>
-        <div class="content">
-            <ul id="main-pages-list">
-            </ul>
+        <div class="user-components">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open">
+                    User components
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-component-btn">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
+                    <span class="glyphicon glyphicon-import"></span>
+                </button>
+            </div>
+            <div class="content">
+                <ul id="user-components-list">
+                </ul>
+            </div>
         </div>
     </div>
-    <div class="user-components">
-        <div class="header">User components
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-component-btn">
-                <span class="glyphicon glyphicon-plus"></span>
-            </button>
-            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
-                <span class="glyphicon glyphicon-import"></span>
-            </button>
-        </div>
-        <div class="content">
-            <ul id="user-components-list">
-            </ul>
-        </div>
-    </div>
-
     <div class="basic-components">
-        <div class="header">Basic components</div>
+        <div class="header">
+            <span class="dropdown-trigger dropdown-open">
+                Basic components
+                <span class="glyphicon glyphicon-triangle-bottom"></span>
+            </span>
+        </div>
         <div class="content">
             <ul id="basic-components">
                 <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
@@ -113,8 +127,11 @@
     </div>
 
     <div class="cliche-components">
-        <div class="header">Cliché components
-            <!--<a href="clichePage.html">See All</a>-->
+        <div class="header">
+            <span class="dropdown-trigger dropdown-open">
+                Cliché components
+                <span class="glyphicon glyphicon-triangle-bottom"></span>
+            </span>
         </div>
         <div class="content">
             <ul>
@@ -124,6 +141,13 @@
 
 </div>
 
+<div class="layout">
+
+</div>
+
+<div class="style">
+
+</div>
 
 <div id="outer-container">
     <div id="middle-container">

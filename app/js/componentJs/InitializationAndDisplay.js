@@ -809,3 +809,33 @@ function showClicheInList(id, name){
     var addedCliche = '<li id="added_'+id+'">'+name+'</li>';
     $('.cliche-components ul').append(addedCliche);
 }
+
+/** ** ** ** ** ** Dragging and Dropping User Components to Main pages ** ** ** **/
+function registerUserComponentAreaDroppable(){
+
+}
+
+function registerUserComponentAsDraggable(){
+
+}
+
+/** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
+$(".dropdown-trigger").click(function(ev) {
+    if ($(this).hasClass('dropdown-open')){
+        // close it
+        $(this).removeClass('dropdown-open').addClass('dropdown-closed');
+        $(this).find('.glyphicon').remove();
+        $(this).append('<span class="glyphicon glyphicon-triangle-right"></span>');
+        $(this).parent().parent().find('.content').css({
+            display: 'none',
+        })
+    } else {
+        // open it
+        $(this).removeClass('dropdown-closed').addClass('dropdown-open');
+        $(this).find('.glyphicon').remove();
+        $(this).append('<span class="glyphicon glyphicon-triangle-bottom"></span>');
+        $(this).parent().parent().find('.content').css({
+            display: 'block',
+        })
+    }
+});
