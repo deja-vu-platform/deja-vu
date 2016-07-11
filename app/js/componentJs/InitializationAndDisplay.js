@@ -608,6 +608,21 @@ function registerZoom() {
         //$('.main-table').after().css('font-size', '50px');
     });
 
+    $('#zoom-slider').change(function(){
+        // TODO, -1, 0 and 1 behave the same way
+        var val = parseFloat($(this).val());
+        var zoom = 1;
+        if (val===0){
+            zoom = 1;
+        } else if (val>0){
+            zoom = val;
+        } else {
+            zoom = -1/val;
+        }
+        $('#middle-container').animate({ 'zoom': currentZoom = zoom}, 'slow');
+
+    });
+
 }
 
 function resetDroppabilityAt(cellId){
