@@ -255,4 +255,7 @@ const handlers = {
 };
 
 bus = new ServerBus(
-    "label", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+    "label", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
+    mean.comp, mean.locs);
+
+mean.start();

@@ -29,12 +29,10 @@ export class CreatePostComponent {
   constructor(private _client_bus: ClientBus) {
     this._post = this._client_bus.new_atom("Post");
     this._post.content = "";
-    this.post_post = this._post
-      .adapt({name: "Post", element: "post", loc: "@@dv-messaging-post-1"});
-
-    this.label_item = this._post
-      .adapt({
-        name: "Item", element: "label", loc: "@@dv-organization-label-1"});
+    this.post_post = this._post.adapt({
+      name: "Post", fqelement: "dv-messaging-post"});
+    this.label_item = this._post.adapt({
+      name: "Item", fqelement: "dv-organization-label"});
   }
 
   get post() {

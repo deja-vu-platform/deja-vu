@@ -20,6 +20,6 @@ export class LandingComponent {
 
   onSignIn(user) {
     console.log("sign in of " + JSON.stringify(user) + " succ");
-    this._router.navigate(["App"]);
+    this._router.navigateByUrl("/app");
   }
 }

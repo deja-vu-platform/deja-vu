@@ -1,4 +1,4 @@
-import {Component} from "angular2/core";
+import {Component, provide} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 import {ClientBus} from "client-bus";
 
@@ -9,7 +9,9 @@ import {PostService} from "../shared/post";
 @Component({
   selector: "new-post-button",
   templateUrl: "./components/new-post-button/new-post-button.html",
-  providers: [PostService, ClientBus, HTTP_PROVIDERS],
+  providers: [
+    provide("fqelement", {useValue: "dv-messaging-post"}),
+    PostService, ClientBus, HTTP_PROVIDERS],
   inputs: ["post", "user"]
 })
 export class NewPostButtonComponent {

@@ -38,23 +38,25 @@ export class Mean {
   busport: number;
   comp: any;
   locs: any;
+  private _opts: any;
 
   constructor(public name: string, init_db?: (db, debug: boolean) => void) {
-    const opts = cli.parse();
-    this.loc = `http://${opts.wshost}:${opts.wsport}`;
-    this.bushost = opts.bushost;
-    this.busport = opts.busport;
-    if (opts.comppath !== undefined) {
-      this.comp = JSON.parse(fs.readFileSync(opts.comppath, "utf8"));
+    this._opts = cli.parse();
+    this.loc = `http://${this._opts.wshost}:${this._opts.wsport}`;
+    this.bushost = this._opts.bushost;
+    this.busport = this._opts.busport;
+    if (this._opts.comppath !== undefined) {
+      this.comp = JSON.parse(fs.readFileSync(this._opts.comppath, "utf8"));
     }
-    this.locs = JSON.parse(opts.locs);
+    this.locs = JSON.parse(this._opts.locs);
 
     console.log(`Starting MEAN ${name} at ${this.loc}`);
 
     const server = new mongodb.Server(
-      opts.dbhost, opts.dbport, {socketOptions: {autoReconnect: true}});
+      this._opts.dbhost, this._opts.dbport,
+      {socketOptions: {autoReconnect: true}});
     this.db = new mongodb.Db(
-        `${name}-${opts.wshost}-${opts.wsport}-db`, server, {w: 1});
+        `${name}-${this._opts.wshost}-${this._opts.wsport}-db`, server, {w: 1});
     this.db.open((err, db) => {
       if (err) {
         console.log("Error opening mongodb");
@@ -62,36 +64,40 @@ export class Mean {
       }
       if (init_db !== undefined) {
         console.log(`Initializing db for MEAN ${name}`);
-        init_db(db, opts.mode === "dev" && opts.main);
+        init_db(db, this._opts.mode === "dev" && this._opts.main);
       }
     });
 
     this.ws = express();
     this.ws.use(morgan("dev"));
+  }
 
-    if (opts.main) {
-      console.log(`Serving public folder for MEAN ${name} at ${this.loc}`);
+  start() {
+    if (this._opts.main) {
+      console.log(
+          `Serving public folder for MEAN ${this.name} at ${this.loc}`);
       this.ws.use(express.static("./dist/public"));
       const dist_dir = path.resolve(__dirname + "/../../../dist");
-      if (opts.mode === "dev") {
-        this.ws.use("/*", (req, res) => {
-          res.sendFile("/public/dv-dev/index.html", {root: dist_dir});
-        });
-      } else {
-        this.ws.use("/*", (req, res) => {
-          res.sendFile("/public/index.html", {root: dist_dir});
-        });
-      }
+      this.ws.use("/*", (req, res) => {
+        res.sendFile("/public/dv-dev/index.html", {root: dist_dir});
+      });
     }
 
-    this.ws.listen(opts.wsport, () => {
-      console.log(`Listening with opts ${JSON.stringify(opts)}`);
+    this.ws.listen(this._opts.wsport, () => {
+      console.log(`Listening with opts ${JSON.stringify(this._opts)}`);
     });
   }
 }
 
+export interface Widget {
+  name: string;
+  path: string;
+}
+
 export namespace GruntTask {
-  export function task(grunt, name, widgets?, attachments?, main?, patterns?) {
+  export function task(
+      grunt, name: string, widgets?: Widget[], attachments?: string[],
+      main?: string, patterns?) {
     patterns = (typeof patterns === "undefined") ? {} : patterns;
     const patterns_src = Object.keys(patterns)
         .map(p => `node_modules/${p}/lib/components/**/*.{js,html,css}`);
@@ -234,7 +240,7 @@ export namespace GruntTask {
         },
         default: {
           files: {
-            src: ["src/**/!(boot).ts"]
+            src: ["src/!(dv-dev)/**/*.ts"]
           }
         }
       },
@@ -286,39 +292,65 @@ export namespace GruntTask {
     grunt.loadNpmTasks("grunt-replace");
 
     grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
-      if (action === "dev") {
-        grunt.log.writeln(this.name + " dev");
-
+      if (action === "dev" || action === "test") {
+        grunt.log.writeln(name + " " + action);
 
         const hyphen = w => w.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-        const wid_imports = _u
-            .map(widgets,
-                 w => `import {${w}Component} from ` +
-                      `"../components/${hyphen(w)}/${hyphen(w)}";`)
-            .join("\n");
-        const wid_directives = "[" +
-            _u.map(widgets, w => w + "Component").join() + "]";
+        const component = w => w + "Component";
+        const imp = w => `import {${component(w)}} from ` +
+                         `"../components/${hyphen(w)}/${hyphen(w)}";`;
+        const selector = w => `<${hyphen(w)}></${hyphen(w)}>`;
+
+        let wid_imports = "";
+        let wid_directives = "[]";
+        let wid_selectors = "";
+
+        let route_config = "[]";
+
+        let attachments_imports = "";
+
+        const wid_names = _u.map(widgets, w => w.name);
+
+        if (action === "dev") {
+          wid_imports = _u.map(wid_names, imp).join("\n");
+          wid_directives = "[" + _u.map(wid_names, component).join() + "]";
+          wid_selectors = _u.map(wid_names, selector).join("\n");
+        } else {
+          const wid_with_paths = _u.filter(widgets, w => w.path !== undefined);
+          wid_imports = _u.map(wid_with_paths, w => imp(w.name)).join("\n");
+          route_config = "@RouteConfig([" + _u
+              .map(wid_with_paths,
+                   w => `{
+                     path: "${w.path}", component: ${component(w.name)},
+                     useAsDefault: ${w.name === main}
+                   }`)
+              .join() + "])";
+
+          attachments_imports =  _u.map(attachments, imp).join("\n");
+        }
 
         const wid_attachments = "[" +
-            _u.map(attachments, a => a + "Component").join() + "]";
+            _u.map(attachments, component).join() + "]";
 
-        const wid_selectors = _u
-            .map(widgets, w => `<${hyphen(w)}></${hyphen(w)}>`)
-            .join("\n");
 
         let replace_patterns = [
           {match: "name", replacement: name},
           {match: "deps", replacement: _u.keys(patterns)},
           {match: "comp_info", replacement: grunt.file.readJSON("comp.json")},
-          {match: "widgets", replacement: widgets},
+          {match: "wid_attachments", replacement: wid_attachments},
+          {match: "mode", replacement: action},
+
+          {match: "wid_names", replacement: wid_names},
           {match: "wid_imports", replacement: wid_imports},
+
           {match: "wid_directives", replacement: wid_directives},
           {match: "wid_selectors", replacement: wid_selectors},
-          {match: "wid_attachments", replacement: wid_attachments}
+
+          {match: "attachments_imports", replacement: attachments_imports},
+          {match: "route_config", replacement: route_config}
         ];
         if (Object.keys(patterns).length > 0) {
           let express_config = {};
-
 
           replace_patterns.push({
             match: name + "-1",
@@ -327,12 +359,13 @@ export namespace GruntTask {
 
           let port = 3002;
           const locs = {};
-          locs[name] = "http://localhost:3001";
+          locs[name] = "http://localhost:3000";
 
           Object.keys(patterns).forEach(p => {
             let instances_number = patterns[p];
             if (instances_number === 1) {
               locs[p] = "http://localhost:" + port;
+              ++port;
             } else {
               for (let i = 1; i <= instances_number; ++i) {
                 locs[p + "-" + i] = "http://localhost:" + port;
@@ -400,7 +433,7 @@ export namespace GruntTask {
         grunt.task.run(["copy:dev"]);
         grunt.task.run(["express", "watch"]);
       } else if (action === "lib") {
-        grunt.log.writeln(this.name + " lib");
+        grunt.log.writeln(name + " lib");
         grunt.task.run(
           ["clean:lib", "tslint", "ts:lib_client", "ts:lib_server",
            "copy:lib"]);

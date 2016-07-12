@@ -2,7 +2,7 @@
   <head>
     <title>@@name</title>
 
-    <base href="/"></base>
+    <base href="/">
     <link rel="stylesheet"
      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
      integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
@@ -23,7 +23,7 @@
 
       const map_obj = {};
       const packages_obj = {};
-      for (dep of DEPS) {
+      for (const dep of DEPS) {
         map_obj[dep] = "node_modules/" + dep;
         packages_obj[dep] = regjs;
       }
@@ -44,6 +44,6 @@
   </head>
 
   <body>
-    <dev></dev>
+    <root></root>
   </body>
 </html>

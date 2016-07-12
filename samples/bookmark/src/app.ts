@@ -71,13 +71,12 @@ const bus = new ServerBus(
     "bookmark", mean.loc, mean.ws, mean.bushost, mean.busport,
     {user: {create: undefined, update: undefined}}, mean.comp, mean.locs);
 
+
 Helpers.serve_schema(mean.ws, schema);
 
-// mean.ws.use("/*", (req, res) => {
-//   res.sendFile(__dirname + "/public/index.html");
-// });
+mean.start();
 
-
+setTimeout(() => bus.config(), 10 * 1000);
 setTimeout(init_db, 30 * 1000);  // hack..
 
 function init_db() {

@@ -68,7 +68,8 @@ const handlers = {
 };
 
 const bus = new ServerBus(
-    "follow", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+    "follow", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
+    mean.comp, mean.locs);
 
 
 //////////////////////////////////////////////////
@@ -211,3 +212,5 @@ namespace Validation {
 }
 
 Helpers.serve_schema(mean.ws, schema);
+
+mean.start();

@@ -11,7 +11,7 @@ export class ServerBus {
       private _loc: string,
       private _ws: express.Express,
       private _hostname: string, private _port: number,
-      private _handlers: any, private _comp_info: any, locs: any) {
+      private _handlers: any, private _comp_info: any, private _locs: any) {
 
     const build_field = (action, t, handlers) => {
       const ret = {
@@ -57,11 +57,6 @@ export class ServerBus {
     _ws.options("/dv-bus", this._cors);
     _ws.get("/dv-bus", this._cors, gql);
     _ws.post("/dv-bus", this._cors, gql);
-
-    if (_comp_info !== undefined) {
-      // hack
-      setTimeout(() => this._config(_comp_info, locs), 10 * 1000);
-    }
   }
 
   new_atom(t: any /* GraphQLObjectType */, atom_id: string, atom: any) {
@@ -73,7 +68,8 @@ export class ServerBus {
     this._post(`{
       newAtom(
         type: {
-          name: "${t.name}", element: "${this._element}", loc: "${this._loc}"
+          name: "${t.name}", element: "${this._element}",
+          loc: "${this._loc}"
         },
         atom_id: "${atom_id}",
         atom: "${atom_str}")
@@ -87,7 +83,8 @@ export class ServerBus {
     this._post(`{
       updateAtom(
         type: {
-          name: "${t.name}", element: "${this._element}", loc: "${this._loc}"
+          name: "${t.name}", element: "${this._element}",
+          loc: "${this._loc}"
         },
         atom_id: "${atom_id}",
         update: "${update_str}")
@@ -99,24 +96,25 @@ export class ServerBus {
     this._post(`rm`);
   }
 
-  private _config(comp_info, locs) {
+  config() {
     // JSON.stringify quotes properties and graphql doesn't like that
     const e = e => e.split("-")[2];
-    const l = t => locs[t.element];
+    const l = t => this._locs[t.fqelement];
     const str_t = t => (
-        `{name: "${t.name}", element: "${e(t.element)}", loc: "${l(t)}"}`);
+        `{name: "${t.name}", element: "${e(t.fqelement)}",
+          loc: "${l(t)}"}`);
     const str_f = f => (`{
       name: "${f.name}",
       type: ${str_t(f.type)}
     }`);
-    for (const tbond of comp_info.tbonds) {
+    for (const tbond of this._comp_info.tbonds) {
       this._post(`{
         newTypeBond(
           types: ${"[" + tbond.types.map(str_t).join(",") + "]"},
           subtype: ${str_t(tbond.subtype)})
       }`);
     }
-    for (const fbond of comp_info.fbonds) {
+    for (const fbond of this._comp_info.fbonds) {
       this._post(`{
         newFieldBond(
           fields: ${"[" + fbond.fields.map(str_f).join(",") + "]"},

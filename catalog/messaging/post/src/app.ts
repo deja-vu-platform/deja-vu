@@ -56,7 +56,8 @@ const handlers = {
 };
 
 const bus = new ServerBus(
-    "post", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+    "post", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
+    mean.comp, mean.locs);
 
 
 //////////////////////////////////////////////////
@@ -139,3 +140,5 @@ namespace Validation {
 }
 
 Helpers.serve_schema(mean.ws, schema);
+
+mean.start();

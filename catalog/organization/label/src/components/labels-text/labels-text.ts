@@ -10,11 +10,8 @@ import {Item} from "../../shared/label";
   templateUrl: "./components/labels-text/labels-text.html",
   inputs: ["item"],
   providers: [
-    provide("element", {useValue: "label"}),
-    provide("loc", {useValue: "@@dv-organization-label-1"}),
-    provide("CompInfo", {useValue: {tbonds: [], fbonds: []}}),
-    ClientBus, HTTP_PROVIDERS
-  ]
+    provide("fqelement", {useValue: "dv-organization-label"}),
+    ClientBus, HTTP_PROVIDERS]
 })
 export class LabelsTextComponent {
   private _item: Item = {name: "", labels: []};

@@ -5,11 +5,13 @@ import {LoggedInComponent} from
 import {EditFollowComponent} from
 "dv-community-follow/lib/components/edit-follow/edit-follow";
 
+import {LOCS} from "../../dv-dev/locs";
+
 
 @Component({
   selector: "topics",
   templateUrl: "./components/topics/topics.html",
-  providers: [provide("follow.api", {useValue: "@@dv-community-follow-2"})],
+  providers: [provide("follow.api", {useValue: LOCS["dv-community-follow-2"]})],
   directives: [LoggedInComponent, EditFollowComponent]
 })
 export class TopicsComponent {

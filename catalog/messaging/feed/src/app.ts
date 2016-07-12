@@ -76,7 +76,8 @@ const handlers = {
 };
 
 new ServerBus(
-    "feed", mean.loc, mean.ws, mean.bushost, mean.busport, handlers);
+    "feed", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
+    mean.comp, mean.locs);
 
 
 /////////////////////
@@ -139,3 +140,5 @@ const schema = new graphql.GraphQLSchema({
 
 
 Helpers.serve_schema(mean.ws, schema);
+
+mean.start();

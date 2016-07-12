@@ -134,6 +134,8 @@ const schema = new graphql.GraphQLSchema({
 
 Helpers.serve_schema(mean.ws, schema);
 
+mean.start();
+
 
 function process(op: string, args: any) {
   const t: Type = new Type(

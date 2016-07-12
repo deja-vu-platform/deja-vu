@@ -1,9 +1,17 @@
 module.exports = function(grunt) {
   require("mean-loader").GruntTask.task(grunt,
      "dv-samples-bookmark",  // name
-     ["Home", "Landing", "Bookmark", "CreatePost", "Post", "User"], // widgets
+     [
+       {name: "Home"},
+       {name: "App", path: "/app/..."},
+       {name: "Landing", path: "/landing"},
+       {name: "Bookmark"},
+       {name: "CreatePost"},
+       {name: "Post"},
+       {name: "User"}
+     ], // widgets
      ["Post", "User"],  // attachments
-     "",  // main
+     "Landing",  // main
      {
        "dv-access-auth": 1,
        "dv-community-follow": 2,

@@ -33,9 +33,9 @@ export class HomeComponent {
     this.user.username = username;
     //
 
-    this.post_user = this.user.adapt(
-        {name: "User", element: "Post", loc: "@@dv-messaging-post-1"});
-    this.feed_sub = this.user.adapt(
-        {name: "Subscriber", element: "Feed", loc: "@@dv-messaging-feed-1"});
+    this.post_user = this.user.adapt({
+      name: "User", fqelement: "dv-messaging-post"});
+    this.feed_sub = this.user.adapt({
+      name: "Subscriber", fqelement: "dv-messaging-feed"});
   }
 }

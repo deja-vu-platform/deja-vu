@@ -16,8 +16,7 @@ function uuid() {  // from SO
 
 export interface Type {
   name: string;
-  element: string;
-  loc: string;
+  fqelement: string;
 }
 
 export interface Field {
@@ -47,7 +46,7 @@ export class Atom {
   private _reverse;
   private _core: Atom;
 
-  constructor(private _helper, private _comp_info?: CompInfo) {
+  constructor(private _helper, private _comp_info: CompInfo) {
     this.atom_id = "unsaved";
     this._forwards = {};
     this._reverse = {};
@@ -232,8 +231,7 @@ export class Atom {
   _t_equals(t1: Type, t2: Type) {
     return (
       t1.name.toLowerCase() === t2.name.toLowerCase() &&
-      t1.element.toLowerCase() === t2.element.toLowerCase() &&
-      t1.loc === t2.loc);
+      t1.fqelement.toLowerCase() === t2.fqelement.toLowerCase());
   }
 }
 
@@ -241,13 +239,13 @@ export class Atom {
 @Injectable()
 export class ClientBus {
   constructor(
-      @Inject("element") private _element: string,
-      @Inject("loc") private _loc: string, private _http: Http,
-      @Inject("CompInfo") private _comp_info: CompInfo) {}
+      @Inject("fqelement") private _fqelement: string, private _http: Http,
+      @Inject("CompInfo") private _comp_info: CompInfo,
+      @Inject("locs") private _locs) {}
 
   new_atom(t: string): any {
-    return new Atom(new Helper(this._http), this._comp_info)
-      .adapt({name: t, element: this._element, loc: this._loc});
+    return new Atom(new Helper(this._http, this._locs), this._comp_info)
+      .adapt({name: t, fqelement: this._fqelement});
   }
 
   report_save(atom_id: string, atom: any) {
@@ -273,7 +271,7 @@ export class ClientBus {
 
 
 class Helper {
-  constructor(private _http) {}
+  constructor(private _http, private _locs) {}
 
   new_atom(t: Type, atom_id: string, atom: Atom): Promise<any> {
     return this._filter_atom(t, atom)
@@ -285,7 +283,8 @@ class Helper {
         return this._post("http://localhost:3001", `{
            newAtom(
              type: {
-               name: "${t.name}", element: "${t.element}", loc: "${t.loc}"
+               name: "${t.name}", element: "${this._element(t.fqelement)}",
+               loc: "${this._locs[t.fqelement]}"
              },
              atom_id: "${atom_id}",
              atom: "${atom_str}",
@@ -302,13 +301,18 @@ class Helper {
     return this._post("http://localhost:3001", `{
       updateAtom(
         type: {
-          name: "${t.name}", element: "${t.element}", loc: "${t.loc}"
+          name: "${t.name}", element: "${this._element(t.fqelement)}",
+          loc: "${this._locs[t.fqelement]}"
         },
         atom_id: "${atom_id}",
         update: "${update_str}",
         self_forward: true)
     }`)
     .toPromise();
+  }
+
+  private _element(fqelement: string) {
+    return fqelement.split("-")[2];
   }
 
   private _schema_query(t: Type) {
@@ -331,7 +335,7 @@ class Helper {
   }
 
   private _info(t: Type) {
-    return this._get(t.loc, this._schema_query(t))
+    return this._get(this._locs[t.fqelement], this._schema_query(t))
       .map(data => data.__type)
       .map(tinfo => tinfo.fields);
   }

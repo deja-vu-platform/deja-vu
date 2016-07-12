@@ -2,33 +2,33 @@
   "tbonds": [
     {
       "types": [
-        {"name": "Source", "element": "dv-community-dv-community-follow-1"},
-        {"name": "Target", "element": "dv-community-follow-1"},
-        {"name": "Source", "element": "dv-community-follow-2"},
-        {"name": "User", "element": "dv-access-auth"},
-        {"name": "User", "element": "dv-messaging-post"},
-        {"name": "Subscriber", "element": "dv-messaging-feed"},
-        {"name": "Publisher", "element": "dv-messaging-feed"}
+        {"name": "Source", "fqelement": "dv-community-follow-1"},
+        {"name": "Target", "fqelement": "dv-community-follow-1"},
+        {"name": "Source", "fqelement": "dv-community-follow-2"},
+        {"name": "User", "fqelement": "dv-access-auth"},
+        {"name": "User", "fqelement": "dv-messaging-post"},
+        {"name": "Subscriber", "fqelement": "dv-messaging-feed"},
+        {"name": "Publisher", "fqelement": "dv-messaging-feed"}
       ],
-      "subtype": { "name": "User", "element": "dv-samples-bookmark" }
+      "subtype": { "name": "User", "fqelement": "dv-samples-bookmark" }
     },
 
     {
       "types": [
-        {"name": "Item", "element": "dv-organization-label"},
-        {"name": "Post", "element": "dv-messaging-post"},
-        {"name": "Message", "element": "dv-messaging-feed"}
+        {"name": "Item", "fqelement": "dv-organization-label"},
+        {"name": "Post", "fqelement": "dv-messaging-post"},
+        {"name": "Message", "fqelement": "dv-messaging-feed"}
       ],
-      "subtype": { "name": "Post", "element": "dv-samples-bookmark" }
+      "subtype": { "name": "Post", "fqelement": "dv-samples-bookmark" }
     },
 
     {
       "types": [
-        {"name": "Label", "element": "dv-organization-label"},
-        {"name": "Target", "element": "dv-community-follow-2"},
-        {"name": "Publisher", "element": "dv-messaging-feed"}
+        {"name": "Label", "fqelement": "dv-organization-label"},
+        {"name": "Target", "fqelement": "dv-community-follow-2"},
+        {"name": "Publisher", "fqelement": "dv-messaging-feed"}
       ],
-      "subtype": { "name": "Topic", "element": "dv-samples-bookmark" }
+      "subtype": { "name": "Topic", "fqelement": "dv-samples-bookmark" }
     }
   ],
   "fbonds": [
@@ -36,16 +36,16 @@
       "fields": [
         {
           "name": "published",
-          "type": { "name": "Publisher", "element": "dv-messaging-feed" }
+          "type": { "name": "Publisher", "fqelement": "dv-messaging-feed" }
         },
         {
           "name": "posts",
-          "type": { "name": "User", "element": "dv-messaging-post" }
+          "type": { "name": "User", "fqelement": "dv-messaging-post" }
         }
       ],
       "subfield": {
         "name": "posts", "type": {
-          "name": "User", "element": "dv-samples-bookmark"
+          "name": "User", "fqelement": "dv-samples-bookmark"
         }
       }
     },
@@ -54,16 +54,16 @@
       "fields": [
         {
           "name": "content",
-          "type": {"name": "Post", "element": "dv-messaging-post"}
+          "type": {"name": "Post", "fqelement": "dv-messaging-post"}
         },
         {
           "name": "content",
-          "type": {"name": "Message", "element": "dv-messaging-feed"}
+          "type": {"name": "Message", "fqelement": "dv-messaging-feed"}
         }
       ],
       "subfield": {
         "name": "content", "type": {
-          "name": "Post", "element": "dv-samples-bookmark"
+          "name": "Post", "fqelement": "dv-samples-bookmark"
         }
       }
     },
@@ -73,17 +73,17 @@
         {
           "name": "published",
           "type": {
-            "name": "Publisher", "element": "dv-messaging-feed"
+            "name": "Publisher", "fqelement": "dv-messaging-feed"
           }
         },
         {
           "name": "items",
-          "type": {"name": "Label", "element": "label"}
+          "type": {"name": "Label", "fqelement": "dv-organization-label"}
         }
       ],
       "subfield": {
         "name": "posts", "type": {
-          "name": "Topic", "element": "dv-samples-bookmark"
+          "name": "Topic", "fqelement": "dv-samples-bookmark"
         }
       }
     },
@@ -93,19 +93,19 @@
         {
           "name": "follows",
           "type": {
-            "name": "Source", "element": "dv-community-follow-1"
+            "name": "Source", "fqelement": "dv-community-follow-1"
           }
         },
         {
           "name": "subscriptions",
           "type": {
-            "name": "Subscriber", "element": "dv-messaging-feed"
+            "name": "Subscriber", "fqelement": "dv-messaging-feed"
           }
         }
       ],
       "subfield": {
         "name": "follows", "type": {
-          "name": "User", "element": "dv-samples-bookmark"
+          "name": "User", "fqelement": "dv-samples-bookmark"
         }
       }
     },
@@ -115,19 +115,19 @@
         {
           "name": "follows",
           "type": {
-            "name": "Source", "element": "dv-community-follow-2"
+            "name": "Source", "fqelement": "dv-community-follow-2"
           }
         },
         {
           "name": "subscriptions",
           "type": {
-            "name": "Subscriber", "element": "dv-messaging-feed-1"
+            "name": "Subscriber", "fqelement": "dv-messaging-feed"
           }
         }
       ],
       "subfield": {
         "name": "follows", "type": {
-          "name": "User", "element": "dv-samples-bookmark-1"
+          "name": "User", "fqelement": "dv-samples-bookmark"
         }
       }
     },
@@ -136,12 +136,12 @@
       "fields": [
         {
           "name": "labels",
-          "type": {"name": "Item", "element": "label"}
+          "type": {"name": "Item", "fqelement": "dv-organization-label"}
         }
       ],
       "subfield": {
         "name": "topics", "type": {
-          "name": "Post", "element": "dv-samples-bookmark"
+          "name": "Post", "fqelement": "dv-samples-bookmark"
         }
       }
     },
@@ -151,51 +151,51 @@
         {
           "name": "name",
           "type": {
-            "name": "Source", "element": "dv-community-follow-1"
+            "name": "Source", "fqelement": "dv-community-follow-1"
           }
         },
         {
           "name": "name",
           "type": {
-            "name": "Target", "element": "dv-community-follow-1"
+            "name": "Target", "fqelement": "dv-community-follow-1"
           }
         },
         {
           "name": "name",
           "type": {
-            "name": "Source", "element": "dv-community-follow-2"
+            "name": "Source", "fqelement": "dv-community-follow-2"
           }
         },
         {
           "name": "name",
           "type": {
-            "name": "Target", "element": "dv-community-follow-2"
+            "name": "Target", "fqelement": "dv-community-follow-2"
           }
         },
         {
           "name": "username",
-          "type": {"name": "User", "element": "dv-access-auth"}
+          "type": {"name": "User", "fqelement": "dv-access-auth"}
         },
         {
           "name": "username",
-          "type": {"name": "User", "element": "dv-messaging-post"}
+          "type": {"name": "User", "fqelement": "dv-messaging-post"}
         },
         {
           "name": "name",
           "type": {
-            "name": "Subscriber", "element": "dv-messaging-feed"
+            "name": "Subscriber", "fqelement": "dv-messaging-feed"
           }
         },
         {
           "name": "name",
           "type": {
-            "name": "Publisher", "element": "dv-messaging-feed"
+            "name": "Publisher", "fqelement": "dv-messaging-feed"
           }
         }
       ],
       "subfield": {
         "name": "username", "type": {
-          "name": "User", "element": "dv-samples-bookmark"
+          "name": "User", "fqelement": "dv-samples-bookmark"
         }
       }
     }
