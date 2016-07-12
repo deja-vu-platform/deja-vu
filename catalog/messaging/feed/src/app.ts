@@ -29,7 +29,7 @@ const mean = new Mean(
       if (err) throw err;
       pubs.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} pubs`);
         if (debug) {
           pubs.insertMany([
             {name: "Software Engineering News", published: [
@@ -38,7 +38,10 @@ const mean = new Mean(
             {name: "U.S News", published: []},
             {name: "World News", published: []},
             {name: "New Books about Zombies", published: []}
-          ], (err, res) => { if (err) throw err; });
+          ], (err, res) => {
+            if (err) throw err;
+            console.log(`Inserted ${res.insertedCount} pubs for debug`);
+          });
         }
       });
     });
@@ -47,7 +50,7 @@ const mean = new Mean(
       if (err) throw err;
       pubs.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} msgs`);
         if (debug) {
           //
         }

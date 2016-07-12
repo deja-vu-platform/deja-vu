@@ -17,7 +17,7 @@ const mean = new Mean(
       console.log("Resetting items collection");
       items.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} items`);
         if (debug) {
           items.insertMany([
             {
@@ -28,7 +28,10 @@ const mean = new Mean(
               atom_id: "another-item", name: "another-item",
               labels: [{atom_id: "label1"}]
             }
-          ], (err, res) => { if (err) throw err; });
+          ], (err, res) => {
+            if (err) throw err;
+            console.log(`Inserted ${res.insertedCount} items for debug`);
+          });
         }
         });
     });

@@ -17,7 +17,7 @@ const mean = new Mean(
       console.log("Resetting users collection");
       users.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} users`);
       });
     });
   }

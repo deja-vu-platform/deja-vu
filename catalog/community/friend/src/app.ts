@@ -24,7 +24,10 @@ const mean = new Mean(
             {username: "louis", friends: []},
             {username: "cydfect", friends: []},
             {username: "lem", friends: []}
-          ], (err, res) => { if (err) throw err; });
+          ], (err, res) => {
+            if (err) throw err;
+            console.log(`Inserted ${res.insertedCount} elems for debug`);
+          });
         }
       });
     });

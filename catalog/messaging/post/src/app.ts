@@ -15,7 +15,7 @@ const mean = new Mean(
       console.log("Resetting users collection");
       users.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} users`);
         if (debug) {
           users.insertMany([
             {username: "benbitdiddle", posts: []},
@@ -24,7 +24,10 @@ const mean = new Mean(
             {username: "louis", posts: []},
             {username: "cydfect", posts: []},
             {username: "lem", posts: []}
-          ], (err, res) => { if (err) throw err; });
+          ], (err, res) => {
+            if (err) throw err;
+            console.log(`Inserted ${res.insertedCount} users for debug`);
+          });
         }
       });
     });
@@ -34,7 +37,7 @@ const mean = new Mean(
       console.log("Resetting posts collection");
       posts.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} posts`);
       });
     });
   }

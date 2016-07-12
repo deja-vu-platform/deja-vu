@@ -16,7 +16,7 @@ const mean = new Mean(
       console.log("Resetting tbonds collection");
       tbonds.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} tbonds`);
       });
     });
     db.createCollection("fbonds", (err, fbonds) => {
@@ -24,7 +24,7 @@ const mean = new Mean(
       console.log("Resetting fbonds collection");
       fbonds.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} fbonds`);
       });
     });
     db.createCollection("tinfo", (err, tinfo) => {
@@ -32,7 +32,7 @@ const mean = new Mean(
       console.log("Resetting tinfo collection");
       tinfo.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} tinfo`);
       });
     });
   }
@@ -83,8 +83,8 @@ const schema = new graphql.GraphQLSchema({
           subtype: {"type": type_input_type}
         },
         resolve: (root, {types, subtype}) => {
-          console.log("new type bond! " + JSON.stringify(types));
           types.push(subtype);
+          console.log("new type bond! " + JSON.stringify(types));
           return mean.db.collection("tbonds")
             .insertOne({types: types})
             .then(res => res.insertedCount === 1);
@@ -98,8 +98,8 @@ const schema = new graphql.GraphQLSchema({
           subfield: {"type": field_input_type}
         },
         resolve: (root, {fields, subfield}) => {
-          console.log("new field bond! " + JSON.stringify(fields));
           fields.push(subfield);
+          console.log("new field bond! " + JSON.stringify(fields));
           return mean.db.collection("fbonds")
             .insertOne({fields: fields})
             .then(res => res.insertedCount === 1);
@@ -235,7 +235,8 @@ class Type {
       .then(tinfo => {
         if (tinfo !== null) return tinfo.info;
         console.log(
-          "Need to retrieve info for " + this.element + this.loc + this.name);
+          `Need to retrieve info for ${this.element}/${this.name} at ` +
+          `${this.loc}`);
         return get(this.loc, query)
           .then(res => {
             const info = JSON.parse(res).data.__type;

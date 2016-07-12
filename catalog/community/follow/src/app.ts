@@ -15,7 +15,7 @@ const mean = new Mean(
       console.log("Resetting sources collection");
       sources.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} sources`);
         if (debug) {
           sources.insertMany([
             {atom_id: "benbitdiddle", name: "benbitdiddle", follows: []},
@@ -24,7 +24,10 @@ const mean = new Mean(
             {atom_id: "louis", name: "louis", follows: []},
             {atom_id: "cydfect", name: "cydfect", follows: []},
             {atom_id: "lem", name: "lem", follows: []}
-          ], (err, res) => { if (err) throw err; });
+          ], (err, res) => {
+            if (err) throw err;
+            console.log(`Inserted ${res.insertedCount} sources for debug`);
+          });
         }
       });
     });
@@ -34,7 +37,7 @@ const mean = new Mean(
       console.log("Resetting targets collection");
       sources.remove((err, remove_count) => {
         if (err) throw err;
-        console.log(`Removed ${remove_count} elems`);
+        console.log(`Removed ${remove_count} targets`);
         if (debug) {
           sources.insertMany([
             {atom_id: "benbitdiddle", name: "benbitdiddle"},
@@ -43,7 +46,10 @@ const mean = new Mean(
             {atom_id: "louis", name: "louis"},
             {atom_id: "cydfect", name: "cydfect"},
             {atom_id: "lem", name: "lem"}
-          ], (err, res) => { if (err) throw err; });
+          ], (err, res) => {
+            if (err) throw err;
+            console.log(`Inserted ${res.insertedCount} targets for debug`);
+          });
         }
       });
     });
