@@ -322,7 +322,7 @@ function attachMergeHandlers() {
                     // Then we look for the grid element underneath the mouse (this requires the element to be visible
                     // and able to accept mouse events).
                     // useful page http://stackoverflow.com/questions/6073505/what-is-the-difference-between-screenx-y-clientx-y-and-pagex-y
-                    // frame of reference fro clientX/Y does not change even if you scroll
+                    // frame of reference from clientX/Y does not change even if you scroll
                     var allEltsList = allElementsFromPoint(event.clientX, event.clientY);
                     // other interesting functions
                     // document.elementFromPoint(event.pageX, event.pageY)
@@ -974,8 +974,8 @@ function initialResizeCells() {
 
             var widthRatioGrid = selectedUserComponent.layout[row][col].ratio.grid.width;
             var heightRatioGrid = selectedUserComponent.layout[row][col].ratio.grid.height;
-            var thisGridCellWidth = widthRatioGrid * (gridWidth - 20);
-            var thisGridCellHeight = heightRatioGrid * (gridHeight - 20);
+            var thisGridCellWidth = currentZoom * widthRatioGrid * (gridWidth - 20);
+            var thisGridCellHeight = currentZoom * heightRatioGrid * (gridHeight - 20);
 
             $('#cell' + '_' + row + '_' + col).css({
                 //width: thisCellWidth + 'px',
@@ -998,7 +998,12 @@ function initialResizeCells() {
     resizeLabelDivs(cellWidth, cellHeight);
 }
 
+
 function resetAligners() {
+    if (!currentZoom){
+        currentZoom = 1;
+    }
+
     $('#cell_0_0').css({
         width: '1px',
         height: '1px',
@@ -1007,9 +1012,7 @@ function resetAligners() {
     // 0th col
     for (var row = 1; row<=numRows; row++){
         var heightRatioGrid = selectedUserComponent.layout[row][1].ratio.grid.height;
-        var thisGridCellHeight = heightRatioGrid * (gridHeight - 20);
-        //var thisGridCellHeight = parseFloat($('#grid'+'_'+row+'_1').css('height'));
-
+        var thisGridCellHeight = currentZoom * heightRatioGrid * (gridHeight - 20);
         $('#cell' + '_' + row + '_' + 0).css({
             width: '1px',
             height: thisGridCellHeight + 'px',
@@ -1019,9 +1022,7 @@ function resetAligners() {
     // 0th row
     for (var col = 1; col<=numCols; col++) {
         var widthRatioGrid = selectedUserComponent.layout[1][col].ratio.grid.width;
-        var thisGridCellWidth = widthRatioGrid * (gridWidth - 20);
-
-        //var thisGridCellWidth = parseFloat($('#grid_1'+col).css('width'));
+        var thisGridCellWidth = currentZoom * widthRatioGrid * (gridWidth - 20);
 
         $('#cell' + '_' + 0 + '_' + col).css({
             width: thisGridCellWidth + 'px',
@@ -1031,7 +1032,6 @@ function resetAligners() {
     }
 
 }
-
 
 function checkWidthRatio(row){
     var sum = 0;

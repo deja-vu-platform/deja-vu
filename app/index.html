@@ -225,11 +225,12 @@
 <div id="zoom-control">
     <button id="zoomIn" class="zoom-control-button">
         <span class="glyphicon glyphicon-zoom-in"></span>
-    </button><br/>
+    </button>
+    <input id="zoom-slider" type="range" min="-3" max="3" value="0" />
     <button id="zoomOut" class="zoom-control-button">
         <span class="glyphicon glyphicon-zoom-out"></span>
     </button>
-    <input id="zoom-slider" type="range" min="-10" max="10" value="0" />
+    <span id="zoom-control-value"></span>
 </div>
 
 <div id="trash" class="droppable">

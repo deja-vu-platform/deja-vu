@@ -98,7 +98,7 @@ function createTableCellPreview(row, col) {
 }
 
 
-function resetAligners(scale) {
+function resetAlignersPreview(scale) {
     if (!scale){
         scale = 1;
     }
@@ -149,7 +149,7 @@ function initialResizeCellsPreview() {
     cellWidth = scale*((gridWidth-20) / numCols);
     cellHeight = scale*((gridHeight-20) / numRows);
 
-    resetAligners(scale);
+    resetAlignersPreview(scale);
     
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){

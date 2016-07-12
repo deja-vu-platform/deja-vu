@@ -588,41 +588,123 @@ function registerDraggable() {
                 return $("#clone");
             },
             appendTo: 'body',
-            containment: 'body',
             cursor: '-webkit-grabbing',
-            scroll: true
+            scroll: true,
+            //start: function(e, ui){
+            //    dragZoomFixes(this, '#outer-container').start(e, ui);
+            //},
+            //drag: function(e, ui){
+            //    dragZoomFixes(this, '#outer-container').drag(e, ui);
+            //},
         });
     });
 
 }
+//
+//function dragZoomFixes(thisElement, zoomedContainerElement){
+//    return {
+//        start : function(evt, ui) {
+//            pointerY = (evt.pageY - $(zoomedContainerElement).offset().top) / currentZoom - parseInt($(evt.target).css('top'));
+//            pointerX = (evt.pageX - $(zoomedContainerElement).offset().left) / currentZoom - parseInt($(evt.target).css('left'));
+//        },
+//        drag : function(evt, ui) {
+//            var canvasTop = $(zoomedContainerElement).offset().top;
+//            var canvasLeft = $(zoomedContainerElement).offset().left;
+//            var canvasHeight = $(zoomedContainerElement).height();
+//            var canvasWidth = $(zoomedContainerElement).width();
+//
+//            //// Check if element is outside canvas
+//            //if (ui.position.left < 0) ui.position.left = 0;
+//            //if (ui.position.left + $(thisElement).width() > canvasWidth) ui.position.left = canvasWidth - $(thisElement).width();
+//            //if (ui.position.top < 0) ui.position.top = 0;
+//            //if (ui.position.top + $(thisElement).height() > canvasHeight) ui.position.top = canvasHeight - $(thisElement).height();
+//
+//            //// when it's inside the zoomed container
+//            //if (!((ui.position.left < 0) ||
+//            //    (ui.position.left + $(thisElement).width() > canvasWidth) ||
+//            //    (ui.position.top < 0) ||
+//            //    (ui.position.top + $(thisElement).height() > canvasHeight))) {
+//            //
+//            //    // Fix for zoom
+//            //    ui.position.top = Math.round((evt.clientY - canvasTop) / currentZoom);
+//            //    ui.position.left = Math.round((evt.clientX - canvasLeft) / currentZoom);
+//            //
+//            //    // Finally, make sure offset aligns with position
+//            //    ui.offset.top = Math.round(ui.position.top + canvasTop);
+//            //    ui.offset.left = Math.round(ui.position.left + canvasLeft);
+//            //}
+//
+//            // when it's inside the zoomed container
+//            if (
+//                (ui.offset.top >= canvasTop) &&
+//                (ui.offset.top + $(thisElement).height() <= canvasTop + canvasHeight) &&
+//                (ui.offset.left >= canvasLeft) &&
+//                (ui.offset.left + $(thisElement).width() <= canvasLeft + canvasWidth)
+//            ){
+//                ui.offset.top = Math.round((evt.clientY - canvasTop) / currentZoom + canvasTop);
+//                ui.offset.left = Math.round((evt.clientX - canvasLeft) / currentZoom + canvasLeft);
+//
+//                //ui.offset.top = Math.round((ui.offset.top - canvasTop) / currentZoom + canvasTop);
+//                //ui.offset.left = Math.round((ui.offset.left - canvasLeft) / currentZoom + canvasLeft);
+//
+//
+//                //ui.offset.top = Math.round(ui.offset.top / currentZoom);
+//                //ui.offset.left = Math.round(ui.offset.left / currentZoom);
+//                //ui.offset.top = Math.round(evt.screenY / currentZoom);
+//                //ui.offset.left = Math.round(evt.screenX / currentZoom);
+//
+//
+//            }
+//        }
+//    }
+//}
+
 
 function registerZoom() {
-    $('#zoomIn').click( function (e) {
-        e.preventDefault();
-        $('#middle-container').animate({ 'zoom': currentZoom = 1 }, 'slow');
-        $('.main-table').after().css('font-size', '14px');
-    });
-    $('#zoomOut').click( function (e) {
-        e.preventDefault();
-        $('#middle-container').animate({ 'zoom': currentZoom = 0.4 }, 'slow');
-        //$('.main-table').after().css('font-size', '50px');
-    });
-
-    $('#zoom-slider').change(function(){
-        // TODO, -1, 0 and 1 behave the same way
-        var val = parseFloat($(this).val());
+    var changeZoom = function(){
+        // TODO make this better
+        var val = parseFloat($('#zoom-slider').val());
         var zoom = 1;
         if (val===0){
             zoom = 1;
         } else if (val>0){
-            zoom = val;
+            zoom = (val+1);
         } else {
-            zoom = -1/val;
+            var max = parseFloat($('#zoom-slider').get(0).max)
+            zoom = 1+val/(max+1);
         }
-        $('#middle-container').animate({ 'zoom': currentZoom = zoom}, 'slow');
+        $('#zoom-control-value').text((zoom*100)+'%');
+        //$('#middle-container').animate({ 'zoom': currentZoom = zoom}, 'slow');
+        currentZoom = zoom;
+        //var fontSize = DEFAULT_FONT_SIZE*zoom;
+        //$('#outer-container').css('font-size', fontSize+'px')
+        loadTable(selectedUserComponent);
+        //$('#middle-container').css({'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')'})
+    };
 
+    $('#zoomIn').click( function (e) {
+        e.preventDefault();
+        var val = parseFloat($('#zoom-slider').val());
+        $('#zoom-slider').val(val+1);
+        changeZoom();
+
+        //$('#middle-container').animate({ 'zoom': currentZoom = 1 }, 'slow');
+        //$('.main-table').after().css('font-size', '14px');
     });
+    $('#zoomOut').click( function (e) {
+        e.preventDefault();
+        var val = parseFloat($('#zoom-slider').val());
+        $('#zoom-slider').val(val-1);
+        changeZoom();
 
+        //$('#middle-container').animate({ 'zoom': currentZoom = 0.4 }, 'slow');
+        //$('.main-table').after().css('font-size', '50px');
+    });
+    $('#zoom-control-value').text('100%');
+
+    $('#zoom-slider').change(function(){
+        changeZoom();
+    });
 }
 
 function resetDroppabilityAt(cellId){

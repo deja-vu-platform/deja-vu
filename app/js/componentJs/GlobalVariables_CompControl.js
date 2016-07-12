@@ -1,6 +1,7 @@
 /** ** ** ** Global Variables ** ** ** **/
 const DEFAULT_GRID_WIDTH = 800;
 const DEFAULT_GRID_HEIGHT = 550;
+const DEFAULT_FONT_SIZE = 14; // px
 
 var numRows = DEFAULT_ROWS;
 var numCols = DEFAULT_COLS;
