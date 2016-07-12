@@ -110,7 +110,7 @@ a{
     padding-left: 15px;
     padding-right: 5px;
 }
-.content li:hover {
+.components .content li:hover {
     background-color: #E0E0E0;
 }
 

@@ -83,7 +83,7 @@
                         <span class="glyphicon glyphicon-import"></span>
                     </button>
                 </div>
-                <div class="content">
+                <div class="content  dropdown-target">
                     <ul id="main-pages-list">
                     </ul>
                 </div>
@@ -101,7 +101,7 @@
                         <span class="glyphicon glyphicon-import"></span>
                     </button>
                 </div>
-                <div class="content">
+                <div class="content  dropdown-target">
                     <ul id="user-components-list">
                     </ul>
                 </div>
@@ -114,7 +114,7 @@
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content">
+            <div class="content  dropdown-target">
                 <ul id="basic-components">
                     <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
                     <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
@@ -134,7 +134,7 @@
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content">
+            <div class="content  dropdown-target">
                 <ul>
                 </ul>
             </div>
@@ -150,7 +150,7 @@
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content">
+            <div class="content dropdown-target">
                 <button class="btn btn-default" id="unmerge-all-cells">Reset All Cells</button>
             </div>
         </div>
@@ -161,7 +161,7 @@
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content">
+            <div class="content  dropdown-target">
                 <div class="lock-width">
                     Lock Width
                     <button type="button" class="btn btn-default btn-table-width-lock-unlock">
@@ -174,11 +174,34 @@
                         <img src="images/unlock_icon.png" width="20px" height="20px">
                     </button>
                 </div>
-                Resize To Fixed Ratios
-                <ul id="resize-fixed-rows">
-                </ul>
-                <ul id="resize-fixed-cols">
-                </ul>
+                <div><!--these two divs are a hack to get the hacky dropdown to work-->
+                    <div>
+                        <div class="dropdown-trigger">Resize To Fixed Ratios
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                        </div>
+                        <div class="dropdown-target">
+                            <ul id="resize-fixed-rows">
+                            </ul>
+                            <button type="button" class="btn btn-default" id="update-width-ratios">Update Width Ratios</button>
+                            <ul id="resize-fixed-cols">
+                            </ul>
+                            <button type="button" class="btn btn-default" id="update-height-ratios">Update Height Ratios</button>
+                        </div>
+                    </div>
+                </div>
+                <div><!--these two divs are a hack to get the hacky dropdown to work-->
+                    <div>
+                        <div class="dropdown-trigger">Resize To Fixed Pixels
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                        </div>
+                        <div class="dropdown-target">
+                            <ul id="resize-px-rows">
+                            </ul>
+                            <ul id="resize-px-cols">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <button class="btn btn-default" id="reset-width-ratios">Reset Width Ratios</button>
                 <button class="btn btn-default" id="reset-height-ratios">Reset Height Ratios</button>
             </div>
@@ -190,7 +213,7 @@
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content">
+            <div class="content  dropdown-target">
                 <div class="lock-width">
                     Lock Width
                     <button type="button" class="btn btn-default btn-table-width-lock-unlock">
@@ -204,17 +227,17 @@
                     </button>
                 </div>
                 <div class="add-remove-inputs">
-                    <div class="add-n-rows">
-                        <span>Add Rows</span><input type="text">
-                    </div>
-                    <div class="remove-n-rows">
-                        <span>Remove Rows</span> <input type="text">
-                    </div>
                     <div class="add-n-cols">
                         <span>Add Cols</span> <input type="text">
                     </div>
                     <div class="remove-n-cols">
                         <span>Remove Cols</span> <input type="text">
+                    </div>
+                    <div class="add-n-rows">
+                        <span>Add Rows</span><input type="text">
+                    </div>
+                    <div class="remove-n-rows">
+                        <span>Remove Rows</span> <input type="text">
                     </div>
                 </div>
             </div>

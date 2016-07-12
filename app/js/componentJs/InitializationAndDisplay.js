@@ -1027,7 +1027,7 @@ $(".dropdown-trigger").click(function(ev) {
         $(this).removeClass('dropdown-open').addClass('dropdown-closed');
         $(this).find('.glyphicon').remove();
         $(this).append('<span class="glyphicon glyphicon-triangle-right"></span>');
-        $(this).parent().parent().find('.content').css({
+        $(this).parent().parent().find('.dropdown-target').css({ //TODO make less hacky
             display: 'none',
         })
     } else {
@@ -1035,7 +1035,7 @@ $(".dropdown-trigger").click(function(ev) {
         $(this).removeClass('dropdown-closed').addClass('dropdown-open');
         $(this).find('.glyphicon').remove();
         $(this).append('<span class="glyphicon glyphicon-triangle-bottom"></span>');
-        $(this).parent().parent().find('.content').css({
+        $(this).parent().parent().find('.dropdown-target').css({
             display: 'block',
         })
     }
@@ -1124,3 +1124,17 @@ $('.remove-n-cols input').on('keypress',function(event, ui){
     }
 });
 
+function addResizeToFixedRatiosHandlers(){
+    for (var row = 1; row<= numRows; row++){
+        var toAdd = '<li><span>Row '+row+'</span> <input type="text"></li>';
+        $('#resize-fixed-rows').append(toAdd);
+    }
+
+    for (var col = 1; col<= numCols; col++){
+        var toAdd = '<li><span>Col '+col+'</span> <input type="text"></li>';
+        $('#resize-fixed-cols').append(toAdd);
+
+    }
+}
+
+// TODO add a resize to fixed px sizes function
