@@ -1660,21 +1660,22 @@ function addTableSizeLockUnlockButtons(){
         }
 
     });
-    //
-    //$('.btn-table-width-lock-unlock').each(function(){
-    //    $(this).on("click", function (e) {
-    //        var locked = tableLockedWidth;
-    //        if (locked){
-    //            // unlock it
-    //            toggleTableWidthLock(false);
-    //
-    //        } else {
-    //            // lock it
-    //            toggleTableWidthLock(true);
-    //        }
-    //
-    //    });
-    //})
+
+
+    $('.btn-table-width-lock-unlock').each(function(){
+        $(this).unbind().on("click", function (e) {
+            var locked = tableLockedWidth;
+            if (locked){
+                // unlock it
+                toggleTableWidthLock(false);
+
+            } else {
+                // lock it
+                toggleTableWidthLock(true);
+            }
+
+        });
+    })
 
     var spanHeight = document.createElement('span');
     spanHeight.innerHTML = '<button type="button" class="btn btn-default ">' +
@@ -1703,22 +1704,22 @@ function addTableSizeLockUnlockButtons(){
 
     });
 
-    //
-    //$('.btn-table-height-lock-unlock').each(function(){
-    //    $(this).on("click", function (e) {
-    //        var locked = tableLockedHeight;
-    //
-    //        if (locked){
-    //            // unlock it
-    //            toggleTableHeightLock(false);
-    //
-    //        } else {
-    //            // lock it
-    //            toggleTableHeightLock(true);
-    //        }
-    //
-    //    });
-    //})
+
+    $('.btn-table-height-lock-unlock').each(function(){
+        $(this).unbind().on("click", function (e) {
+            var locked = tableLockedHeight;
+
+            if (locked){
+                // unlock it
+                toggleTableHeightLock(false);
+
+            } else {
+                // lock it
+                toggleTableHeightLock(true);
+            }
+
+        });
+    })
 
 
     $('#main-cell-table').append(tableSizeLockUnlockButtonWidth);

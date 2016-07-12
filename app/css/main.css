@@ -118,7 +118,7 @@ li.selected {
     background-color: #E0E0E0;
 }
 
-.content img {
+.components .content img {
     width: 20px;
     height: 20px;
     margin: 0px 15px 0px 5px;
