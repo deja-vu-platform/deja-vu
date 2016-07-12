@@ -678,7 +678,17 @@ function registerZoom() {
         currentZoom = zoom;
         //var fontSize = DEFAULT_FONT_SIZE*zoom;
         //$('#outer-container').css('font-size', fontSize+'px')
+
+        var saveTableLockedWidth = tableLockedWidth;
+        var saveTableLockedHeight = tableLockedHeight;
+
+
         loadTable(selectedUserComponent);
+
+        // because load table resets this
+        toggleTableWidthLock(saveTableLockedWidth);
+        toggleTableHeightLock(saveTableLockedHeight);
+
         //$('#middle-container').css({'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')'})
     };
 

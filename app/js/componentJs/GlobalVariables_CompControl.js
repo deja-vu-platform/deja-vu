@@ -18,8 +18,8 @@ var selectedProject = null;
 var bitmapOld = null;
 var bitmapNew = null;
 
-var gridWidth = DEFAULT_GRID_WIDTH;
-var gridHeight = DEFAULT_GRID_HEIGHT;
+var gridWidth = DEFAULT_GRID_WIDTH; // This is without the padding! This is the zoomed version of the width
+var gridHeight = DEFAULT_GRID_HEIGHT; // This is without the padding! This is the zoomed version of the height
 
 var currentZoom = 1.0;
 var basicComponents;
