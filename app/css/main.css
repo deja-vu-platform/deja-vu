@@ -50,6 +50,33 @@
     min-height: 120px;
 }
 
+.layout .content{
+    padding: 15px;
+}
+
+.layout .content input[type='text']{
+    width: 60px;
+    float: right;
+    border: 1px grey solid;
+    margin-right: 30px;
+    text-align: right;
+    padding: 5px 10px;
+    vertical-align: baseline;
+}
+.layout .content input[type='checkbox'] {
+    float: right;
+    margin-right: 40px;
+}
+
+.add-remove-inputs div{
+    padding: 10px;
+}
+
+.layout .content .btn{
+    text-align: center;
+}
+
+
 a{
     cursor: pointer;
 }

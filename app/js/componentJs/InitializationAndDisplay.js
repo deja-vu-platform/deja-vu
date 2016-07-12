@@ -1030,3 +1030,87 @@ $(".dropdown-trigger").click(function(ev) {
         })
     }
 });
+
+
+/** ** ** ** ** ** ** Layout Listeners ** ** ** ** ** ** **/
+$('#unmerge-all-cells').click(function(){
+   //TODO some sort of warning? Components are placed in the top-left cell
+    for (var row = 1; row <= numRows; row++){
+        for (var col = 1; col<= numCols; col++){
+            var cellId = 'cell'+'_'+row+'_'+col;
+            if (selectedUserComponent.components[row]){
+                unmergeCells(cellId, selectedUserComponent.components[row][col]);
+            } else{
+                unmergeCells(cellId);
+            }
+        }
+    }
+});
+
+
+$('#reset-width-ratios').click(function(){
+    var widthRatio = 1/numCols;
+    for (var row = 1; row <= numRows; row++){
+        for (var col = 1; col<= numCols; col++){
+            selectedUserComponent.layout[row][col].ratio.grid.width = widthRatio;
+        }
+    }
+    loadTable(selectedUserComponent);
+});
+
+
+$('#reset-height-ratios').click(function(){
+    var heightRatio = 1/numRows;
+    for (var row = 1; row <= numRows; row++){
+        for (var col = 1; col<= numCols; col++){
+            selectedUserComponent.layout[row][col].ratio.grid.height = heightRatio;
+        }
+    }
+    loadTable(selectedUserComponent);
+});
+
+
+$('.add-n-rows input').on('keypress',function(event, ui){
+    if (event.which == 13) {
+        var value = parseInt($(this).val());
+        if (!isNaN(value)){
+            addNRowsToEnd(value);
+        }
+        $(this).val('');
+    }
+});
+
+
+$('.remove-n-rows input').on('keypress',function(event, ui){
+    if (event.which == 13) {
+        var value = parseInt($(this).val());
+        if (!isNaN(value)){
+            removeNRowsFromEnd(value);
+        }
+
+        $(this).val('');
+    }
+});
+
+
+$('.add-n-cols input').on('keypress',function(event, ui){
+    if (event.which == 13) {
+        var value = parseInt($(this).val());
+        if (!isNaN(value)){
+            addNColsToEnd(value);
+        }
+        $(this).val('');
+    }
+});
+
+
+$('.remove-n-cols input').on('keypress',function(event, ui){
+    if (event.which == 13) {
+        var value = parseInt($(this).val());
+        if (!isNaN(value)){
+            removeNColsFromEnd(value);
+        }
+        $(this).val('');
+    }
+});
+

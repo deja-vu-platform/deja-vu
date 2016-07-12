@@ -151,7 +151,7 @@
                 </span>
             </div>
             <div class="content">
-                <button class="btn btn-primary">Reset All Cells</button>
+                <button class="btn btn-default" id="unmerge-all-cells">Reset All Cells</button>
             </div>
         </div>
         <div class="resize">
@@ -173,8 +173,8 @@
                 </ul>
                 <ul id="resize-fixed-cols">
                 </ul>
-                <button class="btn btn-primary">Reset Width Ratios</button>
-                <button class="btn btn-primary">Reset Height Ratios</button>
+                <button class="btn btn-default" id="reset-width-ratios">Reset Width Ratios</button>
+                <button class="btn btn-default" id="reset-height-ratios">Reset Height Ratios</button>
             </div>
         </div>
         <div class="add-remove-rows-cols">
@@ -191,17 +191,19 @@
                 <div class="lock-height">
                     Lock Height <input type="checkbox">
                 </div>
-                <div class="add-n-rows">
-                    Add Rows <input type="text">
-                </div>
-                <div class="remove-n-rows">
-                    Remove Rows <input type="text">
-                </div>
-                <div class="add-n-cols">
-                    Add Cols <input type="text">
-                </div>
-                <div class="remove-n-cols">
-                    Remove Cols <input type="text">
+                <div class="add-remove-inputs">
+                    <div class="add-n-rows">
+                        <span>Add Rows</span><input type="text">
+                    </div>
+                    <div class="remove-n-rows">
+                        <span>Remove Rows</span> <input type="text">
+                    </div>
+                    <div class="add-n-cols">
+                        <span>Add Cols</span> <input type="text">
+                    </div>
+                    <div class="remove-n-cols">
+                        <span>Remove Cols</span> <input type="text">
+                    </div>
                 </div>
             </div>
         </div>
