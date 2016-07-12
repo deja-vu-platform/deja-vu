@@ -997,10 +997,6 @@ function initialResizeCells() {
 
 
 function resetAligners() {
-    if (!currentZoom){
-        currentZoom = 1;
-    }
-
     $('#cell_0_0').css({
         width: '1px',
         height: '1px',
@@ -1313,7 +1309,7 @@ function addRowColResizeHandlers(){
         var colNum = parseInt(getRowColFromId(ui.element.get(0).id).col);
         var nextColNum = colNum + 1; // having the last handle disabled means that there should always be a next col
 
-        var totalWidth = currentZoom * (gridWidth)*(selectedUserComponent.layout[1][colNum].ratio.grid.width + selectedUserComponent.layout[1][nextColNum].ratio.grid.width);
+        var totalWidth = (gridWidth)*(selectedUserComponent.layout[1][colNum].ratio.grid.width + selectedUserComponent.layout[1][nextColNum].ratio.grid.width);
         var remainingWidth = totalWidth - parseFloat($('#grid_1_'+colNum).css('width'));
 
         $('#grid_1_'+colNum).resizable('option', 'maxWidth', totalWidth-10);
