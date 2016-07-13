@@ -76,6 +76,9 @@
     text-align: center;
 }
 
+.dropdown-trigger {
+    cursor: pointer;
+}
 
 a{
     cursor: pointer;
@@ -100,6 +103,10 @@ a{
     cursor: pointer;
     vertical-align: top;
 
+}
+
+.content {
+    border: 1px #F0F1F2 solid;
 }
 
 .content li {
@@ -177,9 +184,10 @@ td {
     background-color: rgba(55, 131, 198, 0.2);
 }
 
+
 #outer-container {
-    width: 3500px;
-    height: 3500px;
+    width: 1020px;
+    height: 550px;
     border: 1px solid #dddddd;
     margin-left: 250px;
 }

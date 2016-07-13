@@ -72,7 +72,7 @@
         <div class="user-made-components">
             <div class="main-pages page-component-toggle-drop">
                 <div class="header">
-                    <span class="dropdown-trigger dropdown-open">
+                    <span class="dropdown-trigger dropdown-open" data-dropdownid="main-pages">
                         Main Pages
                         <span class="glyphicon glyphicon-triangle-bottom"></span>
                     </span>
@@ -83,14 +83,14 @@
                         <span class="glyphicon glyphicon-import"></span>
                     </button>
                 </div>
-                <div class="content  dropdown-target">
+                <div class="content  dropdown-target" data-dropdownid="main-pages">
                     <ul id="main-pages-list">
                     </ul>
                 </div>
             </div>
             <div class="user-components page-component-toggle-drop">
                 <div class="header">
-                    <span class="dropdown-trigger dropdown-open">
+                    <span class="dropdown-trigger dropdown-open" data-dropdownid="user-components">
                         User components
                         <span class="glyphicon glyphicon-triangle-bottom"></span>
                     </span>
@@ -101,7 +101,7 @@
                         <span class="glyphicon glyphicon-import"></span>
                     </button>
                 </div>
-                <div class="content  dropdown-target">
+                <div class="content  dropdown-target"  data-dropdownid="user-components">
                     <ul id="user-components-list">
                     </ul>
                 </div>
@@ -109,12 +109,12 @@
         </div>
         <div class="basic-components">
             <div class="header">
-                <span class="dropdown-trigger dropdown-open">
+                <span class="dropdown-trigger dropdown-open" data-dropdownid="basic-components">
                     Basic components
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content  dropdown-target">
+            <div class="content  dropdown-target" data-dropdownid="basic-components">
                 <ul id="basic-components">
                     <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
                     <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
@@ -129,12 +129,12 @@
 
         <div class="cliche-components">
             <div class="header">
-                <span class="dropdown-trigger dropdown-open">
+                <span class="dropdown-trigger dropdown-open"  data-dropdownid="cliche-components">
                     Cliché components
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content  dropdown-target">
+            <div class="content  dropdown-target" data-dropdownid="cliche-components">
                 <ul>
                 </ul>
             </div>
@@ -145,23 +145,23 @@
     <div class="layout">
         <div class="merge">
             <div class="header">
-                <span class="dropdown-trigger dropdown-open">
+                <span class="dropdown-trigger dropdown-open"  data-dropdownid="merge">
                     Merge Cells
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content dropdown-target">
+            <div class="content dropdown-target" data-dropdownid="merge">
                 <button class="btn btn-default" id="unmerge-all-cells">Reset All Cells</button>
             </div>
         </div>
         <div class="resize">
             <div class="header">
-                <span class="dropdown-trigger dropdown-open">
+                <span class="dropdown-trigger dropdown-open" data-dropdownid="resize">
                     Resize
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content  dropdown-target">
+            <div class="content  dropdown-target" data-dropdownid="resize">
                 <div class="lock-width">
                     Lock Width
                     <button type="button" class="btn btn-default btn-table-width-lock-unlock">
@@ -176,10 +176,10 @@
                 </div>
                 <div><!--these two divs are a hack to get the hacky dropdown to work-->
                     <div>
-                        <div class="dropdown-trigger">Resize To Fixed Ratios
+                        <div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-ratio">Resize To Fixed Ratios
                             <span class="glyphicon glyphicon-triangle-bottom"></span>
                         </div>
-                        <div class="dropdown-target">
+                        <div class="dropdown-target" data-dropdownid="resize-fixed-ratio">
                             <ul id="resize-fixed-rows">
                             </ul>
                             <button type="button" class="btn btn-default" id="update-width-ratios">Update Width Ratios</button>
@@ -189,18 +189,14 @@
                         </div>
                     </div>
                 </div>
-                <div><!--these two divs are a hack to get the hacky dropdown to work-->
-                    <div>
-                        <div class="dropdown-trigger">Resize To Fixed Pixels
-                            <span class="glyphicon glyphicon-triangle-bottom"></span>
-                        </div>
-                        <div class="dropdown-target">
-                            <ul id="resize-px-rows">
-                            </ul>
-                            <ul id="resize-px-cols">
-                            </ul>
-                        </div>
-                    </div>
+                <div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-px">Resize To Fixed Pixels
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </div>
+                <div class="dropdown-target"  data-dropdownid="resize-fixed-px">
+                    <ul id="resize-px-rows">
+                    </ul>
+                    <ul id="resize-px-cols">
+                    </ul>
                 </div>
                 <button class="btn btn-default" id="reset-width-ratios">Reset Width Ratios</button>
                 <button class="btn btn-default" id="reset-height-ratios">Reset Height Ratios</button>
@@ -208,12 +204,12 @@
         </div>
         <div class="add-remove-rows-cols">
             <div class="header">
-                <span class="dropdown-trigger dropdown-open">
+                <span class="dropdown-trigger dropdown-open"  data-dropdownid="add-del-row-col">
                     Add/Delete Rows/Columns
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
-            <div class="content  dropdown-target">
+            <div class="content  dropdown-target" data-dropdownid="add-del-row-col">
                 <div class="lock-width">
                     Lock Width
                     <button type="button" class="btn btn-default btn-table-width-lock-unlock">
@@ -260,14 +256,21 @@
 </div>
 
 <div id="zoom-control">
-    <button id="zoomIn" class="zoom-control-button">
+    <button id="zoom-in" class="zoom-control-button">
         <span class="glyphicon glyphicon-zoom-in"></span>
     </button>
     <input id="zoom-slider" type="range" min="-3" max="3" value="0" />
-    <button id="zoomOut" class="zoom-control-button">
+    <button id="zoom-out" class="zoom-control-button">
         <span class="glyphicon glyphicon-zoom-out"></span>
+    </button> <br>
+    <span id="zoom-control-value"></span> <br>
+    <button id="zoom-actual" class="btn btn-default">
+        Actual
+    </button> <br>
+    <button id="zoom-fit" class="btn btn-default">
+        Fit
     </button>
-    <span id="zoom-control-value"></span>
+
 </div>
 
 <div id="trash" class="droppable">

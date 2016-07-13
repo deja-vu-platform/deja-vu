@@ -692,7 +692,7 @@ function registerZoom() {
         //$('#middle-container').css({'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')'})
     };
 
-    $('#zoomIn').click( function (e) {
+    $('#zoom-in').click( function (e) {
         e.preventDefault();
         var val = parseFloat($('#zoom-slider').val());
         $('#zoom-slider').val(val+1);
@@ -701,7 +701,7 @@ function registerZoom() {
         //$('#middle-container').animate({ 'zoom': currentZoom = 1 }, 'slow');
         //$('.main-table').after().css('font-size', '14px');
     });
-    $('#zoomOut').click( function (e) {
+    $('#zoom-out').click( function (e) {
         e.preventDefault();
         var val = parseFloat($('#zoom-slider').val());
         $('#zoom-slider').val(val-1);
@@ -713,6 +713,12 @@ function registerZoom() {
     $('#zoom-control-value').text('100%');
 
     $('#zoom-slider').change(function(){
+        changeZoom();
+    });
+
+    $('#zoom-actual').click(function(e, ui){
+        e.preventDefault();
+        $('#zoom-slider').val(0);
         changeZoom();
     });
 }
@@ -1022,22 +1028,42 @@ function registerUserComponentAsDraggable(componentId) {
 
 /** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
 $(".dropdown-trigger").click(function(ev) {
+    var dropdownid = $(this).data('dropdownid');
+
     if ($(this).hasClass('dropdown-open')){
         // close it
         $(this).removeClass('dropdown-open').addClass('dropdown-closed');
         $(this).find('.glyphicon').remove();
         $(this).append('<span class="glyphicon glyphicon-triangle-right"></span>');
-        $(this).parent().parent().find('.dropdown-target').css({ //TODO make less hacky
-            display: 'none',
-        })
+        //$(this).parent().parent().find('.dropdown-target').css({ //TODO make less hacky
+        //    display: 'none',
+        //})
+
+        $("body").find("[data-dropdownid='" + dropdownid + "']").each(function(){
+            if ($(this).hasClass('dropdown-target')){
+                $(this).css({
+                    display: 'none',
+                });
+            }
+        });
+
     } else {
         // open it
         $(this).removeClass('dropdown-closed').addClass('dropdown-open');
         $(this).find('.glyphicon').remove();
         $(this).append('<span class="glyphicon glyphicon-triangle-bottom"></span>');
-        $(this).parent().parent().find('.dropdown-target').css({
-            display: 'block',
-        })
+        //$(this).parent().parent().find('.dropdown-target').css({
+        //    display: 'block',
+        //})
+
+        $("body").find("[data-dropdownid='" + dropdownid + "']").each(function(){
+            if ($(this).hasClass('dropdown-target')){
+                $(this).css({
+                    display: 'block',
+                });
+            }
+        });
+
     }
 });
 
