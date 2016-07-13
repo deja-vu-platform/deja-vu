@@ -661,19 +661,61 @@ function registerDraggable() {
 
 
 function registerZoom() {
-    var changeZoom = function(){
-        // TODO make this better
-        var val = parseFloat($('#zoom-slider').val());
+    $('#zoom-control-value').text('100%');
+
+    //$('#zoom-slider').slider({
+    //    max: 300,
+    //    min: -300,
+    //    value:0,
+    //    slide: function(e, ui){
+    //
+    //    },
+    //    stop: changeZoom,
+    //
+    //});
+
+
+
+    var getSliderValFromZoom = function(zoom){
+        var max = parseFloat($('#zoom-slider').get(0).max);
+        var min = parseFloat($('#zoom-slider').get(0).min);
+
+        //var max = $( "#zoom-slider" ).slider( "option", "max");
+        //var min = $( "#zoom-slider" ).slider( "option", "min");
+
+        var val = 0;
+        if (zoom === 1){
+            val = 0;
+        } else if ( zoom > 1 ){
+            val = (zoom-1)*100;
+        } else {
+            val = (zoom-1)*(max+100);
+        }
+        // rounding for extremes
+        val = Math.max(Math.min(val, max), min);
+        return Math.round(val);
+    };
+
+    var getZoomFromSliderVal = function(){
+        var val = parseFloat($('#zoom-slider').val())/100;
+        //var val = $( "#zoom-slider" ).slider( "option", "value" );
         var zoom = 1;
         if (val===0){
             zoom = 1;
         } else if (val>0){
             zoom = (val+1);
         } else {
-            var max = parseFloat($('#zoom-slider').get(0).max)
+            var max = parseFloat($('#zoom-slider').get(0).max)/100;
             zoom = 1+val/(max+1);
         }
-        $('#zoom-control-value').text((zoom*100)+'%');
+        return zoom;
+    };
+
+
+    var changeZoom = function(){
+        // TODO make this better
+        var zoom = getZoomFromSliderVal();
+        $('#zoom-control-value').text(Math.round(zoom*100)+'%');
         //$('#middle-container').animate({ 'zoom': currentZoom = zoom}, 'slow');
         currentZoom = zoom;
         //var fontSize = DEFAULT_FONT_SIZE*zoom;
@@ -695,31 +737,61 @@ function registerZoom() {
     $('#zoom-in').click( function (e) {
         e.preventDefault();
         var val = parseFloat($('#zoom-slider').val());
-        $('#zoom-slider').val(val+1);
+        //var val = $( "#zoom-slider" ).slider( "option", "value" );
+        $('#zoom-slider').val(val+100);
+        //$( "#zoom-slider" ).slider( "option", "value", val+100);
         changeZoom();
-
-        //$('#middle-container').animate({ 'zoom': currentZoom = 1 }, 'slow');
-        //$('.main-table').after().css('font-size', '14px');
     });
     $('#zoom-out').click( function (e) {
         e.preventDefault();
         var val = parseFloat($('#zoom-slider').val());
-        $('#zoom-slider').val(val-1);
+        //var val = $( "#zoom-slider" ).slider( "option", "value" );
+        $('#zoom-slider').val(val-100);
+        //$( "#zoom-slider" ).slider( "option", "value", val-100);
         changeZoom();
-
-        //$('#middle-container').animate({ 'zoom': currentZoom = 0.4 }, 'slow');
-        //$('.main-table').after().css('font-size', '50px');
     });
-    $('#zoom-control-value').text('100%');
 
-    $('#zoom-slider').change(function(){
+
+    $('#zoom-slider').on('input', function(){
+        var potentialZoom = getZoomFromSliderVal();
+        $('#zoom-control-value').text(Math.round(potentialZoom*100)+'%');
+    });
+
+    $('#zoom-slider').on('change', function(){
         changeZoom();
     });
 
     $('#zoom-actual').click(function(e, ui){
         e.preventDefault();
         $('#zoom-slider').val(0);
+        //$( "#zoom-slider" ).slider( "option", "value", 0);
         changeZoom();
+    });
+
+    $('#zoom-fit').click(function(e, ui){
+        e.preventDefault();
+        var zoomHeight = ($('#outer-container').height()-(20+100+70+17))/selectedUserComponent.layout.tablePxDimensions.height; // take into account padding and stuff
+        var zoomWidth = ($('#outer-container').width()-(20+100+40+17))/selectedUserComponent.layout.tablePxDimensions.width;
+        currentZoom = Math.min(zoomWidth, zoomHeight);
+
+
+        // TODO
+
+        $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
+        var saveTableLockedWidth = tableLockedWidth;
+        var saveTableLockedHeight = tableLockedHeight;
+
+        var sliderVal = getSliderValFromZoom(currentZoom);
+        $('#zoom-slider').val(sliderVal);
+        //$( "#zoom-slider" ).slider( "option", "value", sliderVal);
+
+        loadTable(selectedUserComponent);
+
+        // because load table resets this
+        toggleTableWidthLock(saveTableLockedWidth);
+        toggleTableHeightLock(saveTableLockedHeight);
+
+
     });
 }
 

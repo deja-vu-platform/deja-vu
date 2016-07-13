@@ -256,21 +256,22 @@
 </div>
 
 <div id="zoom-control">
-    <button id="zoom-in" class="zoom-control-button">
-        <span class="glyphicon glyphicon-zoom-in"></span>
-    </button>
-    <input id="zoom-slider" type="range" min="-3" max="3" value="0" />
-    <button id="zoom-out" class="zoom-control-button">
-        <span class="glyphicon glyphicon-zoom-out"></span>
-    </button> <br>
-    <span id="zoom-control-value"></span> <br>
     <button id="zoom-actual" class="btn btn-default">
         Actual
-    </button> <br>
+    </button>
     <button id="zoom-fit" class="btn btn-default">
         Fit
     </button>
-
+    <button id="zoom-out" class="zoom-control-button">
+        <span class="glyphicon glyphicon-zoom-out"></span>
+    </button>
+    <div id="zoom-slider-and-value">
+        <input id="zoom-slider" type="range" min="-300" max="300" value="0"/>
+        <div id="zoom-control-value"></div>
+    </div>
+    <button id="zoom-in" class="zoom-control-button">
+        <span class="glyphicon glyphicon-zoom-in"></span>
+    </button>
 </div>
 
 <div id="trash" class="droppable">

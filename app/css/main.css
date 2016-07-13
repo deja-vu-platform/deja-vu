@@ -2,8 +2,9 @@
                   COMPONENTS
 ===================================================*/
 .project-options-container{
-    height: 90%;
     position: absolute;
+    height: 500px;
+    overflow-y: scroll;
 }
 
 .components, .layout, .style {
@@ -132,8 +133,6 @@ li.selected {
 }
 
 
-
-
 /*===================================================
                   MAIN TABLE
 ===================================================*/
@@ -186,10 +185,12 @@ td {
 
 
 #outer-container {
-    width: 1020px;
+    width: 670px;
     height: 550px;
     border: 1px solid #dddddd;
-    margin-left: 250px;
+    margin-left: 267px;
+    overflow: scroll;
+    position: relative;
 }
 
 #table-container, #guide-grid-container{
@@ -383,21 +384,29 @@ p.label {
 #trash {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    left: 295px;
     font-size: 60px;
 }
 
 #zoom-control {
     position: fixed;
-    top: 80px;
+    bottom: 20px;
     right: 15px;
     border-radius: 4px;
 }
 
-.zoom-control-button {
-    font-size: 25px;
+#zoom-slider-and-value {
+    display: inline-block;
+    vertical-align: middle;
+}
+#zoom-slider{
+    width: 160px;
+}
+
+.zoom-control-button {font-size: 20px;
     background-color: rgba(0, 60, 136, 0.5);
-    width: 35px;
+    padding: 5px;
+    border-radius: 5px;
     color: white;
     border: white solid 1px;
     font-family: 'Lucida Grande';

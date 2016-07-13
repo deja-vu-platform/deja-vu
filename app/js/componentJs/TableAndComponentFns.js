@@ -2500,7 +2500,7 @@ function addClearAllButton(){
     $(buttonClearAll).css({
         position: 'absolute',
         top:'-45px',
-        right:'-140px'
+        left:'230px'
     })
 }
 
