@@ -3,7 +3,7 @@
 ===================================================*/
 .project-options-container{
     position: absolute;
-    height: 500px;
+    height: 550px;
     overflow-y: scroll;
 }
 
@@ -398,6 +398,7 @@ p.label {
 #zoom-slider-and-value {
     display: inline-block;
     vertical-align: middle;
+    text-align: center;
 }
 #zoom-slider{
     width: 160px;

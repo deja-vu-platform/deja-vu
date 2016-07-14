@@ -19,7 +19,6 @@
 
 <div class="menubar">
     <div class="menubar-inner">
-
         <div class="menu-item logo">Déjà Vu UI builder</div>
 
         <div class="navigation">  Navigate to:
@@ -174,20 +173,22 @@
                         <img src="images/unlock_icon.png" width="20px" height="20px">
                     </button>
                 </div>
-                <div><!--these two divs are a hack to get the hacky dropdown to work-->
-                    <div>
-                        <div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-ratio">Resize To Fixed Ratios
-                            <span class="glyphicon glyphicon-triangle-bottom"></span>
-                        </div>
-                        <div class="dropdown-target" data-dropdownid="resize-fixed-ratio">
-                            <ul id="resize-fixed-rows">
-                            </ul>
-                            <button type="button" class="btn btn-default" id="update-width-ratios">Update Width Ratios</button>
-                            <ul id="resize-fixed-cols">
-                            </ul>
-                            <button type="button" class="btn btn-default" id="update-height-ratios">Update Height Ratios</button>
-                        </div>
-                    </div>
+                <div>
+                    Resize Entire Component (in px)
+                    <div id="resize-table-width"><input type="text" placeholder="width"></div>
+                    <div id="resize-table-height"><input type="text" placeholder="height"></div>
+                    <button class="btn btn-default" id="resize-table">Resize Component</button>
+                </div>
+                <div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-ratio">Resize To Fixed Ratios
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </div>
+                <div class="dropdown-target" data-dropdownid="resize-fixed-ratio">
+                    <ul id="resize-fixed-rows">
+                    </ul>
+                    <button type="button" class="btn btn-default" id="update-width-ratios">Update Width Ratios</button>
+                    <ul id="resize-fixed-cols">
+                    </ul>
+                    <button type="button" class="btn btn-default" id="update-height-ratios">Update Height Ratios</button>
                 </div>
                 <div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-px">Resize To Fixed Pixels
                     <span class="glyphicon glyphicon-triangle-bottom"></span>

@@ -50,6 +50,13 @@ function loadTable(componentToShow) {
     registerTooltipBtnHandlers();
 }
 
+function loadTableWithLocksSaved(componentToShow){
+    var saveTableLockedWidth = tableLockedWidth;
+    var saveTableLockedHeight = tableLockedHeight;
+    loadTable(componentToShow);
+    toggleTableWidthLock(saveTableLockedWidth);
+    toggleTableHeightLock(saveTableLockedHeight);
+}
 
 /** ** ** Cell/Grid/Row/Col creation helpers ** ** ** **/
 
@@ -1647,6 +1654,11 @@ function addTableSizeLockUnlockButtons(){
         right:'-20px'
 
     });
+
+    // TODO HACK to reset the locks in the layout section
+    toggleTableWidthLock(false);
+    toggleTableHeightLock(false);
+
 
     $(tableSizeLockUnlockButtonWidth).on("click", function (e) {
         var locked = tableLockedWidth;

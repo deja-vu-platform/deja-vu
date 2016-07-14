@@ -721,15 +721,7 @@ function registerZoom() {
         //var fontSize = DEFAULT_FONT_SIZE*zoom;
         //$('#outer-container').css('font-size', fontSize+'px')
 
-        var saveTableLockedWidth = tableLockedWidth;
-        var saveTableLockedHeight = tableLockedHeight;
-
-
-        loadTable(selectedUserComponent);
-
-        // because load table resets this
-        toggleTableWidthLock(saveTableLockedWidth);
-        toggleTableHeightLock(saveTableLockedHeight);
+        loadTableWithLocksSaved(selectedUserComponent);
 
         //$('#middle-container').css({'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')'})
     };
@@ -778,19 +770,11 @@ function registerZoom() {
         // TODO
 
         $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
-        var saveTableLockedWidth = tableLockedWidth;
-        var saveTableLockedHeight = tableLockedHeight;
-
         var sliderVal = getSliderValFromZoom(currentZoom);
         $('#zoom-slider').val(sliderVal);
         //$( "#zoom-slider" ).slider( "option", "value", sliderVal);
 
-        loadTable(selectedUserComponent);
-
-        // because load table resets this
-        toggleTableWidthLock(saveTableLockedWidth);
-        toggleTableHeightLock(saveTableLockedHeight);
-
+        loadTableWithLocksSaved(selectedUserComponent);
 
     });
 }
@@ -1163,7 +1147,7 @@ $('#reset-width-ratios').click(function(){
             selectedUserComponent.layout[row][col].ratio.grid.width = widthRatio;
         }
     }
-    loadTable(selectedUserComponent);
+    loadTableWithLocksSaved(selectedUserComponent);
 });
 
 
@@ -1174,7 +1158,7 @@ $('#reset-height-ratios').click(function(){
             selectedUserComponent.layout[row][col].ratio.grid.height = heightRatio;
         }
     }
-    loadTable(selectedUserComponent);
+    loadTableWithLocksSaved(selectedUserComponent);
 });
 
 
@@ -1236,3 +1220,20 @@ function addResizeToFixedRatiosHandlers(){
 }
 
 // TODO add a resize to fixed px sizes function
+
+
+$('#resize-table').click(function(){
+    var newWidth = parseInt($('#resize-table-width').find('input').val());
+    var newHeight = parseInt($('#resize-table-height').find('input').val());
+    if (isNaN(newWidth)|| isNaN(newHeight)){
+       return;
+    }
+    selectedUserComponent.layout.tablePxDimensions.width = newWidth;
+    selectedUserComponent.layout.tablePxDimensions.height = newHeight;
+
+    gridWidth = newWidth*currentZoom;
+    gridHeight = newHeight*currentZoom;
+
+    loadTableWithLocksSaved(selectedUserComponent);
+
+});
