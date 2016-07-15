@@ -20,10 +20,10 @@ function loadTable(componentToShow) {
     numRows = componentToShow.dimensions.rows;
     numCols = componentToShow.dimensions.cols;
 
-    var id = componentToShow.meta.id;
+    var componentId = componentToShow.meta.id;
 
-    createTableGridContainer(id)
-    createTable(id);
+    createTableGridContainer(componentId);
+    createTable(componentId);
 
     $('.cell').each(function () {
         var cellId = $(this).get(0).id;
@@ -49,7 +49,7 @@ function loadTable(componentToShow) {
     });
 
 
-    updateBitmap();
+    updateBitmap(true);
     registerDraggable();
     registerTooltipBtnHandlers();
 }
@@ -138,11 +138,121 @@ function createEmptyRow(rowNumber) {
 
 
 /** ** ** Table, Grid, Merge-Handler Creation Functions ** ** ** **/
-function createTableGridContainer(id){
-    $('#outer-container').find('.active-component').removeClass('active-component').addClass('hidden-component');
+
+
+/**
+ * Disabled by changing the id and class names
+ * @param componentId
+ */
+function disableComponentDOMElements(componentId){
+    var tableGridContainer = $('#table-grid-container'+'_'+componentId);
+    $(tableGridContainer).addClass('hidden-component');
+
+    $(tableGridContainer).find('*').each(function() {
+        var id = this.id;
+        if (id.length>0){
+            this.id = 'disabled_'+componentId+'_'+this.id;
+        }
+        var classes = this.className;
+        if (classes.length>0){
+            classes = classes.split(' ');
+            var classNames = '';
+            classes.forEach(function(className){
+                classNames = classNames + ' ' + 'disabled_'+componentId+'_'+className;
+            });
+        this.className = classNames;
+        }
+    });
+}
+
+
+function enableComponentDOMElements(componentId){
+    var tableGridContainer = $('#table-grid-container'+'_'+componentId);
+    $(tableGridContainer).removeClass('hidden-component');
+
+    $(tableGridContainer).find('*').each(function() {
+        var id = this.id;
+        if (id.length>0){
+            this.id = id.replace('disabled_'+componentId+'_', '');
+        }
+        var classes = this.className;
+        if (classes.length>0){
+            classes = classes.split(' ');
+            var classNames = '';
+            var idx = 0;
+            classes.forEach(function(className){
+                if (idx = 0){
+                    classNames = className.replace('disabled_'+componentId+'_', '');
+                } else {
+                    classNames =  classNames  + ' ' +  className.replace('disabled_'+componentId+'_', '');
+                }
+                idx++;
+            });
+            this.className = classNames;
+        }
+    });
+}
+
+function enableOneDisableAllOtherComponentDomElements(componentToShow){
+    var componentToEnableId = componentToShow.meta.id;
+
+    // disable first, for toggle
+    for (var componentId in selectedProject.components){
+        if (componentToEnableId == componentId){
+            continue;
+        }
+        if ($('#table-grid-container'+'_'+componentId).hasClass('hidden-component')){
+            continue;
+        }
+        disableComponentDOMElements(componentId);
+    }
+
+    // first check that the table has been made (otherwise the reset will happen automatically,
+    // but more importantly, the table-grid-container won't exist yet
+    if ($('#table-grid-container'+'_'+componentToEnableId).length>0){
+        // enable first (for toggle)
+        if ($('#table-grid-container'+'_'+componentToEnableId).hasClass('hidden-component')){
+            enableComponentDOMElements(componentToEnableId);
+        }
+
+        // reset
+        $('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
+        numRows = componentToShow.dimensions.rows;
+        numCols = componentToShow.dimensions.cols;
+
+        gridWidth = componentToShow.layout.tablePxDimensions.width;
+        gridHeight = componentToShow.layout.tablePxDimensions.height;
+
+        currentZoom = $('#table-grid-container'+'_'+componentToEnableId).data('state').zoom;
+        $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
+        var sliderVal = getSliderValFromZoom(currentZoom);
+        $('#zoom-slider').val(sliderVal);
+
+        toggleTableHeightLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.height);
+        toggleTableWidthLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.width);
+
+    }
+
+
+
+    updateBitmap(true);
+}
+
+function createTableGridContainer(componentId){
     var tableGridContainer = document.createElement('div');
-    tableGridContainer.id = 'table-grid-container'+'_'+id;
-    tableGridContainer.className = 'table-grid-container active-component';
+    tableGridContainer.id = 'table-grid-container'+'_'+componentId;
+    tableGridContainer.className = 'table-grid-container';
+
+    var state = {
+        zoom: 1,
+        lock:{
+            width: false,
+            height: false
+        }
+    };
+
+    $(tableGridContainer).data('state', state);
+
     $('#outer-container').append(tableGridContainer);
 };
 
@@ -151,7 +261,7 @@ function createTableGridContainer(id){
 /**
  * Generate the table
  */
-function createTable(id) {
+function createTable(componentId) {
     /*
      Note about naming conventions:
      for naming id, try to follow this rule
@@ -161,8 +271,7 @@ function createTable(id) {
      */
 
     var tableContainer = document.createElement('div');
-    tableContainer.id = 'table-container'+'_'+id;
-    tableContainer.className = 'table-container';
+    tableContainer.id = 'table-container';
 
     var tableGrid = document.createElement('table');
     tableGrid.className = 'main-table';
@@ -197,12 +306,12 @@ function createTable(id) {
     }
 
     $(tableContainer).append(tableGrid);
-    $('#table-grid-container'+'_'+id).append(tableContainer);
+    $('#table-grid-container'+'_'+componentId).append(tableContainer);
 
-    createGuideGrid(id);
-    initialResizeCells(id);
+    createGuideGrid(componentId);
+    initialResizeCells();
 
-    attachMergeHandlers(id);
+    attachMergeHandlers(componentId);
     registerDroppable();
     addRowColAddRemoveButtons();
 
@@ -220,9 +329,7 @@ function createTable(id) {
 
 function createGuideGrid(id) {
     var guideGridContainer = document.createElement('div');
-    guideGridContainer.id = 'guide-grid-container'+'_'+id;
-    guideGridContainer.className = 'guide-grid-container';
-
+    guideGridContainer.id = 'guide-grid-container';
 
     var grid = document.createElement('table');
     grid.className = 'main-table';
@@ -243,10 +350,9 @@ function createGuideGrid(id) {
 }
 
 
-function attachMergeHandlers(id) {
+function attachMergeHandlers(componentId) {
     var dragHandleContainersContainer = document.createElement('div');
-    dragHandleContainersContainer.id = 'drag-handle-containers-container'+'_'+id;
-    dragHandleContainersContainer.className = 'drag-handle-containers-container';
+    dragHandleContainersContainer.id = 'drag-handle-containers-container';
 
 
     for (var row = 1; row <= numRows; row++) {
@@ -281,7 +387,7 @@ function attachMergeHandlers(id) {
             dragHandleContainer.appendChild(dragHandle_nw);
 
             $(dragHandleContainersContainer).append(dragHandleContainer);
-            $('#table-grid-container'+'_'+id).append(dragHandleContainersContainer);
+            $('#table-grid-container'+'_'+componentId).append(dragHandleContainersContainer);
 
             resetMergeHandleContainerSizeAndPosition(row, col);
 
@@ -306,8 +412,8 @@ function attachMergeHandlers(id) {
                 },
                 stop: function (event, ui) {
                     var dragHandleContainer = $(this);
-                    var containerId = dragHandleContainer.get(0).id;
-                    var rowcol = getRowColFromId(containerId);
+                    var componentId = dragHandleContainer.get(0).id;
+                    var rowcol = getRowColFromId(componentId);
                     var row = rowcol.row;
                     var col = rowcol.col;
                     var thisCellId = 'cell' + '_' + row + '_' + col;
@@ -467,6 +573,26 @@ function attachMergeHandlers(id) {
         }
     }
 
+
+    $('#table-grid-container'+'_'+componentId).on('click', '.cell', function(){
+        var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
+        var rowcol = getRowColFromId(this.id);
+        var row = rowcol.row;
+        var col = rowcol.col;
+        // the opposite of what it is before the click!
+        if (showMergeHandles){
+            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+                display: 'inline',
+            });
+        } else {
+            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+                display: 'none',
+            });
+        }
+        // now store the current state
+        $(this).data('show-merge-handles', showMergeHandles)
+    });
+
 }
 
 // from http://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
@@ -488,42 +614,6 @@ function allElementsFromPoint(x, y) {
     elements.reverse();
     return elements;
 }
-
-
-//$('#table-container').on('mouseenter', '.cell', function(){
-//    var rowcol = getRowColFromId(this.id);
-//    var row = rowcol.row;
-//    var col = rowcol.col;
-//    $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-//        display: 'inline',
-//    });
-//}).on('mouseleave', '.cell', function(){
-//    var rowcol = getRowColFromId(this.id);
-//    var row = rowcol.row;
-//    var col = rowcol.col;
-//    $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-//        display: 'none',
-//    });
-//});
-
-$('#table-container').on('click', '.cell', function(){
-    var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
-    var rowcol = getRowColFromId(this.id);
-    var row = rowcol.row;
-    var col = rowcol.col;
-    // the opposite of what it is before the click!
-    if (showMergeHandles){
-        $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-            display: 'inline',
-        });
-    } else {
-        $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-            display: 'none',
-        });
-    }
-    // now store the current state
-    $(this).data('show-merge-handles', showMergeHandles)
-});
 
 
 /** ** ** ** ** ** ** ** ** Merging and unmerging cells ** ** ** ** ** ** ** ** ** ** **/
@@ -981,12 +1071,16 @@ function alignCellsAndGridWithSavedRatios(){
 /**
  * Resize cell such that all cells fill width and height of grid
  */
-function initialResizeCells(id) {
+function initialResizeCells() {
     if (!selectedUserComponent.layout.tablePxDimensions.isSet){
         selectedUserComponent.layout.tablePxDimensions.width = DEFAULT_GRID_WIDTH;
         selectedUserComponent.layout.tablePxDimensions.height = DEFAULT_GRID_HEIGHT;
         selectedUserComponent.layout.tablePxDimensions.isSet = true;
     }
+
+    currentZoom = 1;
+    $('#zoom-control-value').text('100%');
+    $('#zoom-slider').val(0);
 
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
@@ -2742,8 +2836,14 @@ function findDeletedCoord() {
     return result;
 }
 
-function updateBitmap() {
-    bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
+function updateBitmap(isDifferentComponent) {
+    if (isDifferentComponent){
+        bitmapOld = make2dArray(numRows, numCols);
+        bitmapNew = make2dArray(numRows, numCols);
+    } else {
+        bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
+    }
+
     $('.cell').each(function () {
         var cellId = $(this).attr('id');
         var rowcol = getRowColFromId(cellId);
@@ -2755,6 +2855,7 @@ function updateBitmap() {
             bitmapNew[row][col] = 1;
         }
     });
+
 }
 
 

@@ -4,6 +4,7 @@
 var numRows;
 var numCols;
 
+var currentZoom = 1;
 
 var gridHeight;
 var gridWidth;
@@ -145,6 +146,8 @@ function initialResizeCellsPreview() {
     var heightScale = gridHeight/componentToShow.layout.tablePxDimensions.height;
 
     var scale = Math.min(widthScale,heightScale);
+
+    currentZoom = scale;
 
     cellWidth = scale*((gridWidth-20) / numCols);
     cellHeight = scale*((gridHeight-20) / numRows);

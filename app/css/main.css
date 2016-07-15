@@ -193,7 +193,7 @@ td {
     position: relative;
 }
 
-.table-container, .guide-grid-container{
+#table-container, #guide-grid-container{
     height: 3000px;
     width: 3000px;
     margin: 50px 100px 10px 50px;
@@ -201,12 +201,12 @@ td {
     position: absolute;
 }
 
-.guide-grid-container {
+#guide-grid-container {
     pointer-events: none;
     visibility: hidden;
 }
 
-.guide-grid-container td {
+#guide-grid-container td {
     background-color: transparent;
     pointer-events: none;
 
@@ -231,7 +231,7 @@ td {
     display: none;
 }
 
-.drag-handle-containers-container{
+#drag-handle-containers-container{
     position: absolute;
 }
 

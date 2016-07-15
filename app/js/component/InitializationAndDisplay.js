@@ -55,7 +55,11 @@ $(function () {
 
             }
         }
-        loadTable(selectedUserComponent);
+        window.setTimeout(function(){
+            loadTable(selectedUserComponent);
+        }, 1);
+        //loadTable(selectedUserComponent);
+
     }
 
     //autoSave5Mins();
@@ -72,6 +76,7 @@ $(function () {
 
     // finish load animation
     $('.loader-container').fadeOut("fast");
+
 });
 
 
@@ -218,11 +223,33 @@ $('#back-to-projects').click(function(event){
 });
 
 $('.components').on('click', '.component-name-container', function () {
-    var componentId = $(this).parent().data('componentid');
-    $('.selected').removeClass('selected');
-    $(this).parent().addClass('selected');
-    selectedUserComponent = selectedProject.components[componentId];
-    loadTable(selectedUserComponent);
+    //$('.loader-container').fadeIn('fast');
+
+
+    var load = function(componentNameContainer){
+        // Save the current values
+        var oldState = {zoom : currentZoom,
+                        lock:{
+                            width: tableLockedWidth,
+                            height: tableLockedHeight,
+                        }
+                        };
+        $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', oldState);
+
+        var componentId = $(componentNameContainer).parent().data('componentid');
+        $('.selected').removeClass('selected');
+        $(componentNameContainer).parent().addClass('selected');
+        selectedUserComponent = selectedProject.components[componentId];
+
+        enableOneDisableAllOtherComponentDomElements(selectedUserComponent);
+        if ($('#table-grid-container'+'_'+componentId).length===0){
+            loadTable(selectedUserComponent);
+        }
+        //$('.loader-container').fadeOut('fast');
+    };
+
+    // have this going in a separate thread
+    window.setTimeout(load(this), 2000);
 });
 
 $('.components').on('dblclick', '.component-name', function () {
@@ -379,7 +406,7 @@ function displayComponentInTable(cellId, widget, component) {
     }
     selectedUserComponent.components[row][col] = component;
 
-    updateBitmap();
+    updateBitmap(false);
     registerTooltipBtnHandlers();
 }
 
@@ -405,7 +432,7 @@ function deleteComponentFromUserComponentAndFromView(cellId) {
             $(cell).find('.widget').remove();
 
             resetDroppabilityAt(cellId);
-            updateBitmap();
+            updateBitmap(false);
 
         }
     }
@@ -666,6 +693,73 @@ function registerDraggable() {
 //}
 
 
+function getSliderValFromZoom(zoom){
+    var max = parseFloat($('#zoom-slider').get(0).max);
+    var min = parseFloat($('#zoom-slider').get(0).min);
+
+    //var max = $( "#zoom-slider" ).slider( "option", "max");
+    //var min = $( "#zoom-slider" ).slider( "option", "min");
+
+    var val = 0;
+    if (zoom === 1){
+        val = 0;
+    } else if ( zoom > 1 ){
+        val = (zoom-1)*100;
+    } else {
+        val = (zoom-1)*(max+100);
+    }
+    // rounding for extremes
+    val = Math.max(Math.min(val, max), min);
+    return Math.round(val);
+};
+
+function getZoomFromSliderVal(){
+    var val = parseFloat($('#zoom-slider').val())/100;
+    //var val = $( "#zoom-slider" ).slider( "option", "value" );
+    var zoom = 1;
+    if (val===0){
+        zoom = 1;
+    } else if (val>0){
+        zoom = (val+1);
+    } else {
+        var max = parseFloat($('#zoom-slider').get(0).max)/100;
+        zoom = 1+val/(max+1);
+    }
+    return zoom;
+};
+
+
+function changeZoom(){
+    // TODO make this better
+    var zoom = getZoomFromSliderVal();
+    $('#zoom-control-value').text(Math.round(zoom*100)+'%');
+    //$('#middle-container').animate({ 'zoom': currentZoom = zoom}, 'slow');
+    currentZoom = zoom;
+    //var fontSize = DEFAULT_FONT_SIZE*zoom;
+    //$('#outer-container').css('font-size', fontSize+'px')
+
+    //loadTableWithLocksSaved(selectedUserComponent);
+
+    $('.grid').each(function(){
+        var rowcol = getRowColFromId(this.id);
+        var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
+        var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+        $(this).css({
+            height: (actualHeight)*currentZoom + 'px',
+            width: (actualWidth)*currentZoom + 'px',
+        })
+    });
+
+    gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
+    gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+
+    cellResizeOnStopSaves(false, false);
+
+    //$('#middle-container').css({'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')'})
+};
+
+
+
 function registerZoom() {
     $('#zoom-control-value').text('100%');
 
@@ -681,71 +775,6 @@ function registerZoom() {
     //});
 
 
-
-    var getSliderValFromZoom = function(zoom){
-        var max = parseFloat($('#zoom-slider').get(0).max);
-        var min = parseFloat($('#zoom-slider').get(0).min);
-
-        //var max = $( "#zoom-slider" ).slider( "option", "max");
-        //var min = $( "#zoom-slider" ).slider( "option", "min");
-
-        var val = 0;
-        if (zoom === 1){
-            val = 0;
-        } else if ( zoom > 1 ){
-            val = (zoom-1)*100;
-        } else {
-            val = (zoom-1)*(max+100);
-        }
-        // rounding for extremes
-        val = Math.max(Math.min(val, max), min);
-        return Math.round(val);
-    };
-
-    var getZoomFromSliderVal = function(){
-        var val = parseFloat($('#zoom-slider').val())/100;
-        //var val = $( "#zoom-slider" ).slider( "option", "value" );
-        var zoom = 1;
-        if (val===0){
-            zoom = 1;
-        } else if (val>0){
-            zoom = (val+1);
-        } else {
-            var max = parseFloat($('#zoom-slider').get(0).max)/100;
-            zoom = 1+val/(max+1);
-        }
-        return zoom;
-    };
-
-
-    var changeZoom = function(){
-        // TODO make this better
-        var zoom = getZoomFromSliderVal();
-        $('#zoom-control-value').text(Math.round(zoom*100)+'%');
-        //$('#middle-container').animate({ 'zoom': currentZoom = zoom}, 'slow');
-        currentZoom = zoom;
-        //var fontSize = DEFAULT_FONT_SIZE*zoom;
-        //$('#outer-container').css('font-size', fontSize+'px')
-
-        //loadTableWithLocksSaved(selectedUserComponent);
-
-        $('.grid').each(function(){
-            var rowcol = getRowColFromId(this.id);
-            var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
-            var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
-            $(this).css({
-                height: (actualHeight)*currentZoom + 'px',
-                width: (actualWidth)*currentZoom + 'px',
-            })
-        });
-
-        gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
-        gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
-
-        cellResizeOnStopSaves(false, false);
-
-        //$('#middle-container').css({'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')'})
-    };
 
     $('#zoom-in').click( function (e) {
         e.preventDefault();
@@ -795,7 +824,20 @@ function registerZoom() {
         $('#zoom-slider').val(sliderVal);
         //$( "#zoom-slider" ).slider( "option", "value", sliderVal);
 
-        loadTableWithLocksSaved(selectedUserComponent);
+        $('.grid').each(function(){
+            var rowcol = getRowColFromId(this.id);
+            var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
+            var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+            $(this).css({
+                height: (actualHeight)*currentZoom + 'px',
+                width: (actualWidth)*currentZoom + 'px',
+            })
+        });
+
+        gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
+        gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+
+        cellResizeOnStopSaves(false, false);
 
     });
 }
@@ -816,7 +858,7 @@ function resetDroppability() {
 
 function movedComponent() {
 
-    updateBitmap();
+    updateBitmap(false);
 
     var coord = findDeletedCoord();
 
