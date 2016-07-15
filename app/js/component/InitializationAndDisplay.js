@@ -563,6 +563,8 @@ function registerDroppable() {
             resetDroppability();
             registerTooltipBtnHandlers();
 
+            //moveCellContentsToDisplayAreaAndScale(currentZoom, cellId);
+            //scaleCellComponents(currentZoom, cellId)
 
         }
     };
@@ -596,6 +598,10 @@ function registerDraggable() {
             //drag: function(e, ui){
             //    dragZoomFixes(this, '#outer-container').drag(e, ui);
             //},
+            drag: function(e, ui){
+                    ui.position.top = e.pageY;
+                    ui.position.left = e.pageX;
+                },
         });
     });
 

@@ -70,6 +70,7 @@ function createTableCell(row, col) {
     var td = document.createElement('td');
     td.className = 'droppable cell col' + '_' + col;
 
+
     td.id = 'cell' + '_' + row + '_' + col;
 
     var sp = document.createElement('span');
@@ -2708,4 +2709,48 @@ function updateBitmap() {
 
 function copyUserComponent(userComponent){
     return UserComponent.fromString(JSON.stringify(userComponent));
+}
+
+function moveCellContentsToDisplayArea(cellId){
+    // warning! can only be used once
+    var cell = $('#'+cellId);
+    if (cell.find('.display-area').length===0){
+        var children = cell.children();
+        var displayArea = document.createElement('div');
+        $(displayArea).addClass('scalable display-area').append(children);
+        cell.append(displayArea);
+    }
+    return
+}
+
+function moveCellContentsToDisplayAreaAndScale(zoom, cellId){
+    moveCellContentsToDisplayArea(cellId);
+    var cell = $('#'+cellId);
+    cell.find('.display-area').css({
+        '-webkit-transform': 'scale('+zoom+','+zoom+')',
+    });
+}
+
+function moveAllCellContentsToDisplayArea(cellId) {
+    for (var row = 1; row<=numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var cellId = 'cell'+'_'+row+'_'+col;
+            moveCellContentsToDisplayArea(cellId);
+        }
+    }
+}
+
+function scaleCellComponents(zoom, cellId){
+    $('#'+cellId).children().css({
+        '-webkit-transform': 'scale('+zoom+','+zoom+')',
+    })
+}
+
+function scaleAllCellComponents(zoom) {
+    for (var row = 1; row<=numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var cellId = 'cell'+'_'+row+'_'+col;
+            scaleCellComponents(zoom, cellId);
+        }
+    }
 }
