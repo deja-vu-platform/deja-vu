@@ -2661,13 +2661,17 @@ function initUserComponent(isDefault) {
     var name, version, author;
     if (isDefault) {
         name = DEFAULT_COMPONENT_NAME;
-        version = DEFAULT_VERSION;
-        author = DEFAULT_AUTHOR;
+        //version = DEFAULT_VERSION;
+        //author = DEFAULT_AUTHOR;
     } else {
         name = sanitizeStringOfSpecialChars($('#new-component-name').val());
-        version = $('#component-version').val();
-        author = $('#component-author').val();
+        //version = $('#component-version').val();
+        //author = $('#component-author').val();
     }
+
+    version = selectedProject.meta.version;
+    author = selectedProject.meta.author;
+
     $('<style>.main-table::after{content:"' + name + '"}</style>').appendTo('head');
     var id = generateId(name);
     while (id in selectedProject.componentIdSet){ // very unlikely to have a collision unless the user has 1 Million components!
