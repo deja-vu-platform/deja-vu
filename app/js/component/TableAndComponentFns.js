@@ -19,7 +19,11 @@ function loadTable(componentToShow) {
     $('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
     numRows = componentToShow.dimensions.rows;
     numCols = componentToShow.dimensions.cols;
-    createTable();
+
+    var id = componentToShow.meta.id;
+
+    createTableGridContainer(id)
+    createTable(id);
 
     $('.cell').each(function () {
         var cellId = $(this).get(0).id;
@@ -132,12 +136,22 @@ function createEmptyRow(rowNumber) {
     return tr;
 }
 
+
 /** ** ** Table, Grid, Merge-Handler Creation Functions ** ** ** **/
+function createTableGridContainer(id){
+    $('#outer-container').find('.active-component').removeClass('active-component').addClass('hidden-component');
+    var tableGridContainer = document.createElement('div');
+    tableGridContainer.id = 'table-grid-container'+'_'+id;
+    tableGridContainer.className = 'table-grid-container active-component';
+    $('#outer-container').append(tableGridContainer);
+};
+
+
 
 /**
  * Generate the table
  */
-function createTable() {
+function createTable(id) {
     /*
      Note about naming conventions:
      for naming id, try to follow this rule
@@ -146,7 +160,9 @@ function createTable() {
 
      */
 
-    $('#table-container').html('');
+    var tableContainer = document.createElement('div');
+    tableContainer.id = 'table-container'+'_'+id;
+    tableContainer.className = 'table-container';
 
     var tableGrid = document.createElement('table');
     tableGrid.className = 'main-table';
@@ -180,12 +196,13 @@ function createTable() {
 
     }
 
-    document.getElementById('table-container').appendChild(tableGrid);
+    $(tableContainer).append(tableGrid);
+    $('#table-grid-container'+'_'+id).append(tableContainer);
 
-    createGuideGrid();
-    initialResizeCells();
+    createGuideGrid(id);
+    initialResizeCells(id);
 
-    attachMergeHandlers();
+    attachMergeHandlers(id);
     registerDroppable();
     addRowColAddRemoveButtons();
 
@@ -201,8 +218,11 @@ function createTable() {
 
 }
 
-function createGuideGrid() {
-    $('#guide-grid-container').html('');
+function createGuideGrid(id) {
+    var guideGridContainer = document.createElement('div');
+    guideGridContainer.id = 'guide-grid-container'+'_'+id;
+    guideGridContainer.className = 'guide-grid-container';
+
 
     var grid = document.createElement('table');
     grid.className = 'main-table';
@@ -217,13 +237,18 @@ function createGuideGrid() {
         grid.appendChild(tr);
     }
 
-    document.getElementById('guide-grid-container').appendChild(grid);
+    $(guideGridContainer).append(grid);
+    $('#table-grid-container'+'_'+id).append(guideGridContainer);
 
 }
 
 
-function attachMergeHandlers() {
-    $('#drag-handle-containers-container').html('');
+function attachMergeHandlers(id) {
+    var dragHandleContainersContainer = document.createElement('div');
+    dragHandleContainersContainer.id = 'drag-handle-containers-container'+'_'+id;
+    dragHandleContainersContainer.className = 'drag-handle-containers-container';
+
+
     for (var row = 1; row <= numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             var dragHandleContainer = document.createElement('div');
@@ -255,7 +280,9 @@ function attachMergeHandlers() {
             dragHandleContainer.appendChild(dragHandle_ne);
             dragHandleContainer.appendChild(dragHandle_nw);
 
-            $('#drag-handle-containers-container').append(dragHandleContainer);
+            $(dragHandleContainersContainer).append(dragHandleContainer);
+            $('#table-grid-container'+'_'+id).append(dragHandleContainersContainer);
+
             resetMergeHandleContainerSizeAndPosition(row, col);
 
 
@@ -954,7 +981,7 @@ function alignCellsAndGridWithSavedRatios(){
 /**
  * Resize cell such that all cells fill width and height of grid
  */
-function initialResizeCells() {
+function initialResizeCells(id) {
     if (!selectedUserComponent.layout.tablePxDimensions.isSet){
         selectedUserComponent.layout.tablePxDimensions.width = DEFAULT_GRID_WIDTH;
         selectedUserComponent.layout.tablePxDimensions.height = DEFAULT_GRID_HEIGHT;
