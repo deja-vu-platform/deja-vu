@@ -732,7 +732,7 @@ function registerZoom() {
         $('.grid').each(function(){
             var rowcol = getRowColFromId(this.id);
             var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
-            var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.widtht;
+            var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
             $(this).css({
                 height: (actualHeight)*currentZoom + 'px',
                 width: (actualWidth)*currentZoom + 'px',

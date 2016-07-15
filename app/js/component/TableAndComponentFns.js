@@ -1154,9 +1154,15 @@ function resizeRowsBySetRatios(ratios){
         for (var col = 1; col<= numCols; col++) {
             selectedUserComponent.layout[row][col].ratio.grid.height = ratios[row-1];
             //selectedUserComponent.layout[row][col].ratio.cell.height = ratios[row-1];
+            var newHeight = selectedUserComponent.layout[row][col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
+            $('#grid'+'_'+row+'_'+col).css({
+                height: (newHeight)*currentZoom + 'px',
+            })
+
         }
     }
-    loadTable(selectedUserComponent);
+    cellResizeOnStopSaves(true, true);
+    //loadTable(selectedUserComponent);
 }
 
 
@@ -1165,9 +1171,15 @@ function resizeColsBySetRatios(ratios){
         for (var col = 1; col<= numCols; col++) {
             selectedUserComponent.layout[row][col].ratio.grid.width = ratios[col-1];
             //selectedUserComponent.layout[row][col].ratio.cell.width = ratios[col-1];
+            var newWidth = selectedUserComponent.layout[row][col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+            $('#grid'+'_'+row+'_'+col).css({
+                width: (newWidth)*currentZoom + 'px',
+            })
+
         }
     }
-    loadTable(selectedUserComponent);
+    cellResizeOnStopSaves(true, true);
+    //loadTable(selectedUserComponent);
 }
 
 function cellResizeOnStopSaves(saveNewTableWidth, saveNewTableHeight){
@@ -1543,7 +1555,19 @@ function addTableResizeHandler(){
             gridWidth = (parseFloat($('#table-resize-div').css('width'))-20);
             gridHeight = (parseFloat($('#table-resize-div').css('height'))-20);
 
-            loadTable(selectedUserComponent);
+            $('.grid').each(function(){
+                var rowcol = getRowColFromId(this.id);
+                var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
+                var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+                $(this).css({
+                    height: (actualHeight)*currentZoom + 'px',
+                    width: (actualWidth)*currentZoom + 'px',
+                })
+            });
+
+            cellResizeOnStopSaves(false, false);
+
+            //loadTable(selectedUserComponent);
         }
     }).css({
         'pointer-events':'none',
