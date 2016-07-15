@@ -727,7 +727,22 @@ function registerZoom() {
         //var fontSize = DEFAULT_FONT_SIZE*zoom;
         //$('#outer-container').css('font-size', fontSize+'px')
 
-        loadTableWithLocksSaved(selectedUserComponent);
+        //loadTableWithLocksSaved(selectedUserComponent);
+
+        $('.grid').each(function(){
+            var rowcol = getRowColFromId(this.id);
+            var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height;
+            var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width;
+            $(this).css({
+                height: (actualHeight)*currentZoom + 'px',
+                width: (actualWidth)*currentZoom + 'px',
+            })
+        });
+
+        gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
+        gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+
+        cellResizeOnStopSaves(false, false);
 
         //$('#middle-container').css({'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')'})
     };
@@ -736,7 +751,7 @@ function registerZoom() {
         e.preventDefault();
         var val = parseFloat($('#zoom-slider').val());
         //var val = $( "#zoom-slider" ).slider( "option", "value" );
-        $('#zoom-slider').val(val+100);
+        $('#zoom-slider').val(Math.round(val/100)*100+100);
         //$( "#zoom-slider" ).slider( "option", "value", val+100);
         changeZoom();
     });
@@ -744,7 +759,7 @@ function registerZoom() {
         e.preventDefault();
         var val = parseFloat($('#zoom-slider').val());
         //var val = $( "#zoom-slider" ).slider( "option", "value" );
-        $('#zoom-slider').val(val-100);
+        $('#zoom-slider').val(Math.round(val/100)*100-100);
         //$( "#zoom-slider" ).slider( "option", "value", val-100);
         changeZoom();
     });

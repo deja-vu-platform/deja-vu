@@ -111,15 +111,14 @@ function updateBaseComponentDisplayAt(cellId) {
                 width: 'auto',
                 'vertical-align':'top',
             });
+        } else {
+            // TODO other types?
+
+            displayComponent.css({
+                //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
+                zoom: currentZoom,
+            });
         }
-
-        // TODO other types?
-
-        displayComponent.css({
-            //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
-            zoom: currentZoom,
-        });
-
     }
 
 }

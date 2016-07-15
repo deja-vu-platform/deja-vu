@@ -1170,11 +1170,16 @@ function resizeColsBySetRatios(ratios){
     loadTable(selectedUserComponent);
 }
 
-function addResizeMenu(){
-    // TODO
-    // will make resize handles invisible until this is opened
-    // will also allow resizing by rows and cols by given ratios
-    //              this should calculate the last number by itself!
+function cellResizeOnStopSaves(saveNewTableWidth, saveNewTableHeight){
+
+    saveRowColRatiosGrid(saveNewTableWidth, saveNewTableHeight);
+    hideBaseComponentDisplayAll();
+    alignCellsAndGridWithSavedRatios();
+    updateBaseComponentDisplayAll();
+    showBaseComponentDisplayAll();
+    resetAllMergeHandleContainersSizeAndPosition();
+    //saveRowColRatiosCells(!tableLockedWidth, !tableLockedHeight);
+    updateTableResizeHandler();
 }
 
 function addRowColResizeHandlers(){
@@ -1210,14 +1215,7 @@ function addRowColResizeHandlers(){
         $('.cell').css({
             opacity: '1',
         });
-        saveRowColRatiosGrid(!tableLockedWidth, !tableLockedHeight);
-        hideBaseComponentDisplayAll();
-        alignCellsAndGridWithSavedRatios();
-        updateBaseComponentDisplayAll();
-        showBaseComponentDisplayAll();
-        resetAllMergeHandleContainersSizeAndPosition();
-        //saveRowColRatiosCells(!tableLockedWidth, !tableLockedHeight);
-        updateTableResizeHandler();
+        cellResizeOnStopSaves(!tableLockedWidth, !tableLockedHeight);
     };
 
     //var tableLockedResizeRowFn = function(e, ui){
