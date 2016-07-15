@@ -100,8 +100,12 @@ function updateBaseComponentDisplayAt(cellId) {
         displayComponent.parent().css({
             height: cellHeight,
             width: cellWidth,
-            '-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
         });
+        displayComponent.css({
+            //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
+            zoom: currentZoom,
+        });
+
     } else {
         if (type === 'image') {
             displayComponent.css({
