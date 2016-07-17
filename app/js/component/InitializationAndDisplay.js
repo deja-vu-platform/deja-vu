@@ -14,7 +14,7 @@ $(function () {
     });
 
     $('#outer-container').css({
-        height: ($('html').height() - 70) + 'px',
+        height: ($('html').height() - 70 - 44) + 'px',
     });
 
     resizeViewportToFitWindow();
@@ -290,8 +290,8 @@ $('.components').on('keypress', '.new-name-input', function (event) {
             return;
         }
         componentNameElt.text($(this).val());
-        // update the display of the component box
-        $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
+        // //update the display of the component box
+        //$('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
         selectedProject.components[componentId].meta.name = $(this).val();
         // changing the ids todo: is this a good idea?
@@ -333,15 +333,17 @@ function setComponentOptions(component){
 
             componentNameElt.removeClass('not-displayed');
             submitRenameElt.addClass('not-displayed');
+
             var newName = $(this).val();
             if (newName.length === 0) { // empty string entered, don't change the name!
                 return;
             }
             componentNameElt.text($(this).val());
-            // update the display of the component box
-            $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
+            //// update the display of the component box
+            //$('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
             component.meta.name = $(this).val();
+
 
             // changing the ids todo: is this a good idea?
             //var oldId = selectedUserComponent.meta.id;
@@ -410,6 +412,10 @@ function resizeViewportToFitWindow(){
     $('#outer-container').css({
         width: (newWidth-250-17) + 'px',
     });
+
+    $('.component-options').css({
+        width: (newWidth-250-17) + 'px',
+    });
 }
 
 window.addEventListener("resize", function(){
@@ -452,10 +458,10 @@ function displayNewComponentInMainPagesList(name, id){
     var newComponentElt =
         '<li data-componentid=' + id + '>'
         + '<div class="component-name-container">'
-            + '<span class="component-name">' + name + '</span>'
-                + '<span class="submit-rename not-displayed">'
+            + '<div class="component-name">' + name + '</div>'
+            + '<div class="submit-rename not-displayed">'
                 + '<input type="text" class="new-name-input form-control" autofocus>'
-            + '</span>'
+            + '</div>'
         + '</div>'
         + '</li>';
     $('#main-pages-list').append(newComponentElt);

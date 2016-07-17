@@ -38,9 +38,28 @@
     height: 75px;
 }
 
+
 #back-to-projects{
     display: inline-block;
     text-align: center;
+}
+
+.component-options{
+    margin-left: 267px;
+    padding: 5px 20px;
+    width: 500px;
+}
+
+.component-options .component-name-container{
+    width: 175px;
+    border-radius: 5px;
+    background-color: #E0E0E0;
+}
+
+.component-options #delete-options{
+    display: inline-block;
+    float: right;
+
 }
 
 .content {
@@ -85,8 +104,14 @@ a{
     cursor: pointer;
 }
 
-.component-name-container{
+.component-name{
+    padding: 6px 12px;
+}
+
+.components .component-name-container{
     width: 100%;
+}
+.component-name-container{
     display: inline-block;
     cursor: pointer;
 }
@@ -99,11 +124,14 @@ a{
     height: 50px;
 }
 
-.btn-delete-component{
+.components .btn-delete-component{
     display: none;
-    cursor: pointer;
     vertical-align: top;
 
+}
+
+.btn-delete-component{
+    cursor: pointer;
 }
 
 .content {
@@ -154,18 +182,18 @@ li.selected {
 }
 
 
-.main-table::after {
-    content: 'Component name: ';
-    display: block;
-    position: absolute;
-    left: 20px;
-    bottom: 100%;
-    width: 200px;
-    height: 20px;
-    border-bottom: 20px solid white;
-    -webkit-box-shadow: 0 -3px 3px rgba(0,0,0,0.1);
-    padding: 2px 2px 4px 10px;
-}
+/*.main-table::after {*/
+    /*content: 'Component name: ';*/
+    /*display: block;*/
+    /*position: absolute;*/
+    /*left: 20px;*/
+    /*bottom: 100%;*/
+    /*width: 200px;*/
+    /*height: 20px;*/
+    /*border-bottom: 20px solid white;*/
+    /*-webkit-box-shadow: 0 -3px 3px rgba(0,0,0,0.1);*/
+    /*padding: 2px 2px 4px 10px;*/
+/*}*/
 
 
 td {

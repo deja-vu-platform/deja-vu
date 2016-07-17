@@ -12,6 +12,9 @@ function resizeMenubarToFitWindow(){
     $('.menubar').css({
         width: newWidth + 'px',
     });
+    $('.menubar-inner').css({
+        width: newWidth + 'px',
+    });
 }
 
 window.addEventListener("resize", function(){

@@ -16,7 +16,7 @@ var tableLockedWidth = false;
  * @param componentToShow
  */
 function loadTable(componentToShow) {
-    $('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
+    //$('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
     numRows = componentToShow.dimensions.rows;
     numCols = componentToShow.dimensions.cols;
 
@@ -217,7 +217,8 @@ function enableOneDisableAllOtherComponentDomElements(componentToShow){
         }
 
         // reset
-        $('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
+        //$('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
+
         numRows = componentToShow.dimensions.rows;
         numCols = componentToShow.dimensions.cols;
 
@@ -265,7 +266,7 @@ function makeEmptyUserComponentDisplayTable(componentId){
 
     addTableResizeHandler(componentId);
     addTableSizeLockUnlockButtons(componentId);
-    addClearButtons(componentId);
+    //addClearButtons(componentId);
     //addAddToMainPagesButton();
 
 
@@ -2659,34 +2660,34 @@ function removeNColsFromEnd(n) {
 
 
 
-/**
- * Add buttons to clear a row, a column or the entire table of its components
- */
-function addClearButtons(componentId){
-    addClearAllButton(componentId);
-}
-
-function addClearAllButton(componentId){
-    var spClearAll = document.createElement('span');
-    spClearAll.innerHTML = '<button type="button" class="btn btn-default ">' +
-                                '<span>Clear All </span>' +
-                                '<span class="glyphicon glyphicon-remove"></span>' +
-                            '</button>';
-
-    var buttonClearAll = spClearAll.firstChild;
-    buttonClearAll.id = 'btn-clear-all';
-
-    $(buttonClearAll).on("click", function (e) {
-        clearAll();
-    });
-
-    $('#table-grid-container'+'_'+componentId+' '+'#main-cell-table').append(buttonClearAll);
-    $(buttonClearAll).css({
-        position: 'absolute',
-        top:'-45px',
-        left:'230px'
-    })
-}
+///**
+// * Add buttons to clear a row, a column or the entire table of its components
+// */
+//function addClearButtons(componentId){
+//    addClearAllButton(componentId);
+//}
+//
+//function addClearAllButton(componentId){
+//    var spClearAll = document.createElement('span');
+//    spClearAll.innerHTML = '<button type="button" class="btn btn-default ">' +
+//                                '<span>Clear All </span>' +
+//                                '<span class="glyphicon glyphicon-remove"></span>' +
+//                            '</button>';
+//
+//    var buttonClearAll = spClearAll.firstChild;
+//    buttonClearAll.id = 'btn-clear-all';
+//
+//    $(buttonClearAll).on("click", function (e) {
+//        clearAll();
+//    });
+//
+//    $('#table-grid-container'+'_'+componentId+' '+'#main-cell-table').append(buttonClearAll);
+//    $(buttonClearAll).css({
+//        position: 'absolute',
+//        top:'-45px',
+//        left:'230px'
+//    })
+//}
 
 function clearAll(){
     for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++){
@@ -2821,7 +2822,7 @@ function initUserComponent(isDefault) {
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
-    $('<style>.main-table::after{content:"' + name + '"}</style>').appendTo('head');
+    //$('<style>.main-table::after{content:"' + name + '"}</style>').appendTo('head');
     var id = generateId(name);
     while (id in selectedProject.componentIdSet){ // very unlikely to have a collision unless the user has 1 Million components!
         id = generateId(name);
