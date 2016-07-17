@@ -195,6 +195,8 @@ function enableComponentDOMElements(componentId){
 function enableOneDisableAllOtherComponentDomElements(componentToShow){
     var componentToEnableId = componentToShow.meta.id;
 
+    setComponentOptions(componentToShow);
+
     // disable first, for toggle
     for (var componentId in selectedProject.components){
         if (componentToEnableId == componentId){
@@ -236,8 +238,11 @@ function enableOneDisableAllOtherComponentDomElements(componentToShow){
 }
 
 function makeEmptyUserComponentDisplayTable(componentId){
+    var component = selectedProject.components[componentId];
+
     createOrResetTableGridContainer(componentId);
-    enableOneDisableAllOtherComponentDomElements(selectedProject.components[componentId]);
+    enableOneDisableAllOtherComponentDomElements(component);
+
 
     createTable(componentId);
 

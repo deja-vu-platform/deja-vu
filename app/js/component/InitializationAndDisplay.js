@@ -40,7 +40,7 @@ $(function () {
     if (selectedProject.numComponents === 0){
         // start a default component
         selectedUserComponent = initUserComponent(true);
-        selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+        selectedProject.addComponent(selectedUserComponent);
 
         makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
@@ -105,7 +105,7 @@ $('#new-user-component-btn').click(function(){
         numRows = $('#select-rows').val();
         numCols = $('#select-cols').val();
         selectedUserComponent = initUserComponent(false);
-        selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+        selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
         makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
         resetMenuOptions();
@@ -119,7 +119,7 @@ $('#new-main-component-btn').click(function(){
         numCols = $('#select-cols').val();
         selectedUserComponent = initUserComponent(false);
         selectedUserComponent.inMainPages = true;
-        selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+        selectedProject.addComponent(selectedUserComponent);
         selectedProject.mainComponents[selectedUserComponent.meta.id] = selectedUserComponent.meta.name;
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
@@ -133,7 +133,7 @@ $('#new-main-component-btn').click(function(){
 //    numRows = $('#select-rows').val();
 //    numCols = $('#select-cols').val();
 //    selectedUserComponent = initUserComponent(false);
-//    selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+//    selectedProject.addComponent(selectedUserComponent);
 //    displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 //    createTable(selectedUserComponent.meta.id);
 //    resetMenuOptions();
@@ -141,7 +141,7 @@ $('#new-main-component-btn').click(function(){
 
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
-    selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+    selectedProject.addComponent(selectedUserComponent);
     loadTable(selectedUserComponent);
     displayNewComponentInUserComponentList(selectedUserComponent.meta.name,selectedUserComponent.meta.id);
     resetMenuOptions();
@@ -307,11 +307,11 @@ $('.components').on('keypress', '.new-name-input', function (event) {
 });
 
 /** ** ** ** ** ** ** ** ** ** ** ** Component Options ** ** ** ** ** ** ** ** ** ** ** ** **/
-function setComponentOptions(){
+function setComponentOptions(component){
     // renaming
 
     $('.component-options .component-name')
-        .text(selectedUserComponent.meta.name)
+        .text(component.meta.name)
         .unbind()
         .on('dblclick', function () {
         var newNameInputElt = $($(this).parent().find('.new-name-input'));
@@ -341,7 +341,7 @@ function setComponentOptions(){
             // update the display of the component box
             $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
-            selectedUserComponent.meta.name = $(this).val();
+            component.meta.name = $(this).val();
 
             // changing the ids todo: is this a good idea?
             //var oldId = selectedUserComponent.meta.id;
@@ -365,10 +365,16 @@ function setComponentOptions(){
             copyComponent.meta.id = generateId(copyComponent.meta.name);
 
             if (originalId in selectedProject.mainComponents){
+                selectedProject.mainComponents[copyComponent.meta.id] = copyComponent.meta.name;
+                copyComponent.inMainPages = true;
                 displayMainPageInListAndSelect(copyComponent.meta.name, copyComponent.meta.id);
             } else {
                 displayUserComponentInListAndSelect(copyComponent.meta.name, copyComponent.meta.id);
             }
+
+            selectedProject.addComponent(copyComponent);
+            selectedUserComponent = copyComponent;
+            loadTable(selectedUserComponent);
 
         });
 
