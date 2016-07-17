@@ -39,7 +39,7 @@ fieldset { border: 0; margin: 0; padding: 0; }
                    MENUBAR
 ===================================================*/
 .menubar {
-    width: 100%;
+    width: 1000px;
     display: block;
     height: 70px;
     background-color: #F0F1F2;
@@ -51,7 +51,6 @@ fieldset { border: 0; margin: 0; padding: 0; }
     position: absolute;
     top: 0;
     left: 0;
-    width: 1000px;
     height: 70px;
     background-color: #F0F1F2;
 

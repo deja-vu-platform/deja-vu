@@ -8,6 +8,18 @@ var addedCliches;
 
 /** ** ** ** ** ** Initialization ** ** ** ** ** **/
 $(function () {
+    // fix some views
+    $('.project-options-container').css({
+        height: ($('html').height() - 70) + 'px',
+    });
+
+    $('#outer-container').css({
+        height: ($('html').height() - 70) + 'px',
+    });
+
+    resizeViewportsToFitWindow();
+
+
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
 
     // get selected project
@@ -294,6 +306,20 @@ $('.components').on('keypress', '.new-name-input', function (event) {
 
 /** ** ** ** ** ** Component Adding to Project and Display helpers ** ** ** ** ** ** ** ** ** **/
 
+function resizeViewportsToFitWindow(){
+    var windowWidth = $('html').width();
+    var newWidth = Math.max(860, windowWidth);
+    $('#outer-container').css({
+        width: (newWidth-250-17) + 'px',
+    });
+    $('.menubar').css({
+        width: newWidth + 'px',
+    });
+}
+
+window.addEventListener("resize", function(){
+    resizeViewportsToFitWindow();
+});
 
 function displayUserComponentInListAndSelect(name, id){
     $('.selected').removeClass("selected");
@@ -499,7 +525,7 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     } else if (type === 'panel') {
         value = {
             heading: $('#' + cellId).find('.panel-title')[0].textContent,
-            content: $('#' + cellId).find('.panel-body')[0].textContent
+            content: $('#' + cellId).find('.panel-html')[0].textContent
         }
     }
 
@@ -611,12 +637,12 @@ function registerDraggable() {
             cursorAt: { top: 0, left: 0 },
             helper: function(){
                 $('#table-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
-                //Hack to append the widget to the body (visible above others divs), but still belonging to the scrollable container
+                //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
                 $("#clone").hide();
-                setTimeout(function(){$('#clone').appendTo('body'); $("#clone").show();},1);
+                setTimeout(function(){$('#clone').appendTo('html'); $("#clone").show();},1);
                 return $("#clone");
             },
-            appendTo: 'body',
+            appendTo: 'html',
             cursor: '-webkit-grabbing',
             scroll: true,
             //start: function(e, ui){
@@ -1127,7 +1153,7 @@ function registerUserComponentAsDraggable(componentId) {
                 return clone;
             },
             appendTo: '#user-components-list',
-            containment: '#user-made-components',
+            containment: '.user-made-components',
             cursor: '-webkit-grabbing',
             scroll: true,
             stop: function () {
@@ -1158,7 +1184,7 @@ $(".dropdown-trigger").click(function(ev) {
         //    display: 'none',
         //})
 
-        $("body").find("[data-dropdownid='" + dropdownid + "']").each(function(){
+        $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
             if ($(this).hasClass('dropdown-target')){
                 $(this).css({
                     display: 'none',
@@ -1175,7 +1201,7 @@ $(".dropdown-trigger").click(function(ev) {
         //    display: 'block',
         //})
 
-        $("body").find("[data-dropdownid='" + dropdownid + "']").each(function(){
+        $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
             if ($(this).hasClass('dropdown-target')){
                 $(this).css({
                     display: 'block',
