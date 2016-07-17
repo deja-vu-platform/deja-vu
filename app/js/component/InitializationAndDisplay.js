@@ -17,7 +17,7 @@ $(function () {
         height: ($('html').height() - 70) + 'px',
     });
 
-    resizeViewportsToFitWindow();
+    resizeViewportToFitWindow();
 
 
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
@@ -306,19 +306,16 @@ $('.components').on('keypress', '.new-name-input', function (event) {
 
 /** ** ** ** ** ** Component Adding to Project and Display helpers ** ** ** ** ** ** ** ** ** **/
 
-function resizeViewportsToFitWindow(){
+function resizeViewportToFitWindow(){
     var windowWidth = $('html').width();
     var newWidth = Math.max(860, windowWidth);
     $('#outer-container').css({
         width: (newWidth-250-17) + 'px',
     });
-    $('.menubar').css({
-        width: newWidth + 'px',
-    });
 }
 
 window.addEventListener("resize", function(){
-    resizeViewportsToFitWindow();
+    resizeViewportToFitWindow();
 });
 
 function displayUserComponentInListAndSelect(name, id){
