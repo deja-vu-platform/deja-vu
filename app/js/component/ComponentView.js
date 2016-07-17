@@ -83,27 +83,47 @@ function Display(cellId, html, callback) {
  */
 function updateBaseComponentDisplayAt(cellId) {
     var cell = $('#'+cellId);
-    var height = (parseFloat(cell.css('height'))-30) + 'px';
-    var width = (parseFloat(cell.css('width'))-10) + 'px';
+    var cellHeight = (parseFloat(cell.css('height'))-10) + 'px';
+    var cellWidth = (parseFloat(cell.css('width'))-10) + 'px';
+
+    //var cellHeight = (parseFloat(cell.css('height'))/currentZoom-10) + 'px';
+    //var cellWidth = (parseFloat(cell.css('width'))/currentZoom-10) + 'px';
+
+
+    //var rowcol = getRowColFromId(cellId);
+    //var cellHeight = (selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height*selectedUserComponent.layout.tablePxDimensions.height-10) + 'px';
+    //var cellWidth = (selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width*selectedUserComponent.layout.tablePxDimensions.width-10) + 'px';
+
     var type = cell.get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    var displayComponent = cell.find('.display-component');
     if (type === 'label'){
-        cell.find('.display-component').parent().css({
-            height: height,
-            width: width,
+        displayComponent.parent().css({
+            height: cellHeight,
+            width: cellWidth,
         });
-    }
-    if (type === 'image'){
-        cell.find('.display-component').css({
-            'max-height': height,
-            'max-width': width,
-            height: 'auto',
-            width: 'auto',
-            'vertical-align':'top',
-
+        displayComponent.css({
+            //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
+            zoom: currentZoom,
         });
-    }
 
-    // TODO other types?
+    } else {
+        if (type === 'image') {
+            displayComponent.css({
+                'max-height': cellHeight,
+                'max-width': cellWidth,
+                height: 'auto',
+                width: 'auto',
+                'vertical-align':'top',
+            });
+        } else {
+            // TODO other types?
+
+            displayComponent.css({
+                //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
+                zoom: currentZoom,
+            });
+        }
+    }
 
 }
 

@@ -58,8 +58,8 @@ function UserProject(name, id, version, author) {
     this.addedCliches = {};
 }
 
-UserProject.prototype.addComponent = function(componentId, component){
-    this.components[componentId] = component;
+UserProject.prototype.addComponent = function(component){
+    this.components[component.meta.id] = component;
     this.numComponents++;
 };
 

@@ -1,84 +1,22 @@
-
-/*
- Colors:
- - body light gray: #F0F1F2
- - light header:    #EBEBEB
- - body selected:   #E0E0E0
- - dark gray:       #D5D5D5
- - td selected:     #4F9FCF
- */
-
-/*===================================================
-                   BASE STYLES
-===================================================*/
-html {
-    color: #222;
-    font-size: 1em;
-    font-weight: 300;
-    margin: 0px;
-    line-height: 1.4;
-}
-body { margin: 0px; min-width:600px; }
-ul { list-style-type: none; }
-li { list-style-type: none; }
-/*
- * Remove the gap between audio, canvas, iframes,
- * images, videos and the bottom of their containers:
- */
-audio, canvas, iframe, img, svg, video { vertical-align: middle; }
-/* Remove default fieldset styles. */
-fieldset { border: 0; margin: 0; padding: 0; }
-.clearfix:before, .clearfix:after {
-    content: " "; /* 1 */
-    display: table; /* 2 */
-}
-.clearfix:after { clear: both; }
-
-
-/*===================================================
-                   MENUBAR
-===================================================*/
-.menubar {
-    width: 100%;
-    display: block;
-    height: 70px;
-    background-color: #F0F1F2;
-    /*overflow-x: scroll;*/
-    z-index: 600;
-}
-
-.menubar-inner {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 1000px;
-    height: 70px;
-    background-color: #F0F1F2;
-
-}
-
-.menu-item {
-    float: left;
-    margin: 15px 5px 15px 5px;
-}
-
-.menu-item.logo {
-    width: 200px;
-    color: #555555;
-    font-weight: bold;
-    font-size: 23px;
-    font-family: "Adobe Garamond";
-}
-
 /*===================================================
                   COMPONENTS
 ===================================================*/
-.components {
-    float: left;
-    border: #d5d5d5 1px solid;
-    height: 100%;
-    width: 200px;
+.project-options-container{
     position: absolute;
+    height: 550px;
+    overflow-y: scroll;
+}
+
+.components, .layout, .style {
+    margin-top: 75px;
+    float: left;
+    /*border: #d5d5d5 1px solid;*/
+    width: 250px;
+    position: absolute;
+}
+
+.layout, .style {
+    display: none;
 }
 
 .header {
@@ -94,28 +32,86 @@ fieldset { border: 0; margin: 0; padding: 0; }
     font-weight: bold;
 }
 
+.project-options{
+    float: left;
+    width: 250px;
+    height: 75px;
+}
+
+
 #back-to-projects{
-    width: 100%;
+    display: inline-block;
     text-align: center;
 }
 
+.component-options{
+    margin-left: 267px;
+    padding: 5px 20px;
+    width: 500px;
+}
+
+.component-options .component-name-container{
+    width: 175px;
+    border-radius: 5px;
+    background-color: #E0E0E0;
+}
+
+.component-options #delete-options{
+    display: inline-block;
+    float: right;
+
+}
+
 .content {
-    overflow: auto;
     text-align: left;
-    /*resize: vertical;*/
+}
+
+.components .content{
+    min-height: 120px;
+}
+
+.layout .content{
+    padding: 15px;
+}
+
+.layout .content input[type='text']{
+    width: 60px;
+    float: right;
+    border: 1px grey solid;
+    margin-right: 30px;
+    text-align: right;
+    padding: 5px 10px;
+    vertical-align: baseline;
+}
+.layout .content input[type='checkbox'] {
+    float: right;
+    margin-right: 40px;
+}
+
+.add-remove-inputs div{
+    padding: 10px;
+}
+
+.layout .content .btn{
+    text-align: center;
+}
+
+.dropdown-trigger {
+    cursor: pointer;
 }
 
 a{
     cursor: pointer;
 }
 
-
-.content {
-    max-height: 130px;
+.component-name{
+    padding: 6px 12px;
 }
 
-.component-name-container{
+.components .component-name-container{
     width: 100%;
+}
+.component-name-container{
     display: inline-block;
     cursor: pointer;
 }
@@ -128,11 +124,18 @@ a{
     height: 50px;
 }
 
-.btn-delete-component{
+.components .btn-delete-component{
     display: none;
-    cursor: pointer;
     vertical-align: top;
 
+}
+
+.btn-delete-component{
+    cursor: pointer;
+}
+
+.content {
+    border: 1px #F0F1F2 solid;
 }
 
 .content li {
@@ -143,7 +146,7 @@ a{
     padding-left: 15px;
     padding-right: 5px;
 }
-.content li:hover {
+.components .content li:hover {
     background-color: #E0E0E0;
 }
 
@@ -151,13 +154,11 @@ li.selected {
     background-color: #E0E0E0;
 }
 
-.content img {
+.components .content img {
     width: 20px;
     height: 20px;
     margin: 0px 15px 0px 5px;
 }
-
-
 
 
 /*===================================================
@@ -181,18 +182,18 @@ li.selected {
 }
 
 
-.main-table::after {
-    content: 'Component name: ';
-    display: block;
-    position: absolute;
-    left: 20px;
-    bottom: 100%;
-    width: 200px;
-    height: 20px;
-    border-bottom: 20px solid white;
-    -webkit-box-shadow: 0 -3px 3px rgba(0,0,0,0.1);
-    padding: 2px 2px 4px 10px;
-}
+/*.main-table::after {*/
+    /*content: 'Component name: ';*/
+    /*display: block;*/
+    /*position: absolute;*/
+    /*left: 20px;*/
+    /*bottom: 100%;*/
+    /*width: 200px;*/
+    /*height: 20px;*/
+    /*border-bottom: 20px solid white;*/
+    /*-webkit-box-shadow: 0 -3px 3px rgba(0,0,0,0.1);*/
+    /*padding: 2px 2px 4px 10px;*/
+/*}*/
 
 
 td {
@@ -210,11 +211,14 @@ td {
     background-color: rgba(55, 131, 198, 0.2);
 }
 
+
 #outer-container {
-    width: 3500px;
-    height: 3500px;
+    width: 670px;
+    height: 550px;
     border: 1px solid #dddddd;
-    margin-left: 200px;
+    margin-left: 267px;
+    overflow: scroll;
+    position: relative;
 }
 
 #table-container, #guide-grid-container{
@@ -257,6 +261,10 @@ td {
 
 #drag-handle-containers-container{
     position: absolute;
+}
+
+.hidden-component{
+    display: none;
 }
 
 #grid-container2 {
@@ -408,21 +416,30 @@ p.label {
 #trash {
     position: fixed;
     bottom: 20px;
-    right: 20px;
+    left: 295px;
     font-size: 60px;
 }
 
 #zoom-control {
     position: fixed;
-    top: 80px;
+    bottom: 20px;
     right: 15px;
     border-radius: 4px;
 }
 
-.zoom-control-button {
-    font-size: 25px;
+#zoom-slider-and-value {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+}
+#zoom-slider{
+    width: 160px;
+}
+
+.zoom-control-button {font-size: 20px;
     background-color: rgba(0, 60, 136, 0.5);
-    width: 35px;
+    padding: 5px;
+    border-radius: 5px;
     color: white;
     border: white solid 1px;
     font-family: 'Lucida Grande';
@@ -438,126 +455,6 @@ p.label {
 #zoomOut { border-radius: 0 0 6px 6px; display: block; }
 
 
-
-/*===================================================
-                  POPUPS
-===================================================*/
-.not-displayed {
-    display: none;
-}
-
-.close-btn {
-    position: absolute; !important
-    opacity: 1;
-    top: 5px;
-    right: 9px;
-}
-
-.tooltip {
-    display: none;
-    left: -60px;
-    width: 350px;
-
-}
-
-.dropped .tooltip {
-    background: #fff;
-    border: #d5d5d5 solid 1px;
-    border-radius: 4px;
-    bottom: 0%;
-    display: inline-block;
-    margin-bottom: 30px;
-    opacity: 0;
-    padding: 0px;
-    position: absolute;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
-    z-index: -1;
-}
-
-.dropped .tooltip.open {
-    opacity: 1;
-    z-index: 100;
-}
-
-/* Triangle */
-.dropped .tooltip:after {
-    border-left: solid transparent 10px;
-    border-right: solid transparent 10px;
-    border-top: solid #fff 10px;
-    bottom: -10px;
-    content: " ";
-    height: 0;
-    left: 50%;
-    margin-left: -13px;
-    position: absolute;
-    width: 0;
-}
-
-.apply {
-    padding-left: 10px;
-}
-
-.tooltip > .panel {
-    margin-bottom: 0px;
-    border-width: 0px;
-}
-
-
-.tabs .col-sm-4 {
-    padding-right: 0px;
-}
-.tabs .col-sm-5 {
-    padding-right: 0px;
-}
-
-/* Image popup */
-/* layout.css Style */
-.upload-drop-zone {
-    height: 50px;
-    border-width: 2px;
-    margin-bottom: 0px;
-}
-
-/* skin.css Style*/
-.upload-drop-zone {
-    color: #2d2d2d;
-    border-style: dashed;
-    border-color: #ccc;
-    line-height: 50px;
-    text-align: center
-}
-.upload-drop-zone.hover {
-    border-color: #9ecaed;
-    box-shadow: 0 0 10px #9ecaed;
-}
-
-.upload-drop-zone.drop {
-    color: #222;
-    border-color: #222;
-}
-
-.image-preview-input {
-    position: relative;
-    overflow: hidden;
-    margin: 0px;
-    color: #333;
-    background-color: #fff;
-    border-color: #ccc;
-}
-.image-preview-input input[type=file] {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 0;
-    padding: 0;
-    font-size: 20px;
-    cursor: pointer;
-    opacity: 0;
-    filter: alpha(opacity=0);
-}
-.image-preview-input-title {
-    margin-left:2px;
-}
 
 
 
@@ -584,49 +481,4 @@ p.label {
 }
 .btn-group-vertical>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
     border-top-right-radius: 4px !important;
-}
-
-/*===================================================
-                   MISC
-===================================================*/
-.loader-container{
-    position: absolute;
-    top: 50%;
-    left: 50%;
-}
-
-.loader {
-    display: inline-block;
-    border: 8px solid #f3f3f3; /* Light grey */
-    border-top: 8px solid #3498db; /* Blue */
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 2s infinite;
-    -webkit-animation: spin 2s infinite;
-    -webkit-transform-origin: 50% 50%;
-}
-
-.loader-words{
-    display: inline-block;
-    padding-bottom: 30px;
-    font-size: 18px;
-}
-
-@-webkit-keyframes spin {
-    0% { -webkit-transform: rotate(0deg); }
-    100% { -webkit-transform: rotate(360deg); }
-}
-
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-
-
-.navigation{
-    float: right;
-    padding-right: 20px;
 }
