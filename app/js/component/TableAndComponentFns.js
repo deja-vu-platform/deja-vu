@@ -22,8 +22,7 @@ function loadTable(componentToShow) {
 
     var componentId = componentToShow.meta.id;
 
-    createTableGridContainer(componentId);
-    createTable(componentId);
+    makeEmptyUserComponentDisplayTable(componentId);
 
     $('.cell').each(function () {
         var cellId = $(this).get(0).id;
@@ -220,13 +219,11 @@ function enableOneDisableAllOtherComponentDomElements(componentToShow){
         numRows = componentToShow.dimensions.rows;
         numCols = componentToShow.dimensions.cols;
 
-        gridWidth = componentToShow.layout.tablePxDimensions.width;
-        gridHeight = componentToShow.layout.tablePxDimensions.height;
+        updateZoomFromState(componentToEnableId);
 
-        currentZoom = $('#table-grid-container'+'_'+componentToEnableId).data('state').zoom;
-        $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
-        var sliderVal = getSliderValFromZoom(currentZoom);
-        $('#zoom-slider').val(sliderVal);
+        gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
+        gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+
 
         toggleTableHeightLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.height);
         toggleTableWidthLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.width);
@@ -238,22 +235,58 @@ function enableOneDisableAllOtherComponentDomElements(componentToShow){
     updateBitmap(true);
 }
 
-function createTableGridContainer(componentId){
-    var tableGridContainer = document.createElement('div');
-    tableGridContainer.id = 'table-grid-container'+'_'+componentId;
-    tableGridContainer.className = 'table-grid-container';
+function makeEmptyUserComponentDisplayTable(componentId){
+    createOrResetTableGridContainer(componentId);
+    enableOneDisableAllOtherComponentDomElements(selectedProject.components[componentId]);
 
-    var state = {
-        zoom: 1,
-        lock:{
-            width: false,
-            height: false
-        }
-    };
+    createTable(componentId);
 
-    $(tableGridContainer).data('state', state);
+    createGuideGrid(componentId);
 
-    $('#outer-container').append(tableGridContainer);
+    updateZoomFromState(componentId);
+    // Note: this works because we disable all other classes that this affects beforehand
+    initialResizeCells();
+
+    attachMergeHandlers(componentId);
+
+    // Note: this works because we disable all other classes that this affects beforehand
+    registerDroppable();
+
+    addRowColAddRemoveButtons(componentId);
+
+
+    // Note: this works because we disable all other classes that this affects beforehand
+    addRowColResizeHandlers();
+
+    addTableResizeHandler(componentId);
+    addTableSizeLockUnlockButtons(componentId);
+    addClearButtons(componentId);
+    //addAddToMainPagesButton();
+
+
+    bitmapOld = make2dArray(numRows, numCols);
+    bitmapNew = make2dArray(numRows, numCols);
+
+}
+
+function createOrResetTableGridContainer(componentId){
+    if ($('#table-grid-container'+'_'+componentId).length===0){
+        var tableGridContainer = document.createElement('div');
+        tableGridContainer.id = 'table-grid-container'+'_'+componentId;
+        tableGridContainer.className = 'table-grid-container';
+        var state = {
+            zoom: 1,
+            lock:{
+                width: false,
+                height: false
+            }
+        };
+        $(tableGridContainer).data('state', state);
+        $('#outer-container').append(tableGridContainer);
+
+    } else {
+        $('#table-grid-container'+'_'+componentId).html('');
+    }
 };
 
 
@@ -307,23 +340,6 @@ function createTable(componentId) {
 
     $(tableContainer).append(tableGrid);
     $('#table-grid-container'+'_'+componentId).append(tableContainer);
-
-    createGuideGrid(componentId);
-    initialResizeCells();
-
-    attachMergeHandlers(componentId);
-    registerDroppable();
-    addRowColAddRemoveButtons();
-
-    addRowColResizeHandlers();
-    addTableResizeHandler();
-    addTableSizeLockUnlockButtons();
-    addClearButtons();
-    //addAddToMainPagesButton();
-
-
-    bitmapOld = make2dArray(numRows, numCols);
-    bitmapNew = make2dArray(numRows, numCols);
 
 }
 
@@ -1068,6 +1084,15 @@ function alignCellsAndGridWithSavedRatios(){
 
 }
 
+
+function updateZoomFromState(componentId){
+    currentZoom = $('#table-grid-container'+'_'+componentId).data('state').zoom;
+    $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
+    var sliderVal = getSliderValFromZoom(currentZoom);
+    $('#zoom-slider').val(sliderVal);
+
+}
+
 /**
  * Resize cell such that all cells fill width and height of grid
  */
@@ -1078,12 +1103,9 @@ function initialResizeCells() {
         selectedUserComponent.layout.tablePxDimensions.isSet = true;
     }
 
-    currentZoom = 1;
-    $('#zoom-control-value').text('100%');
-    $('#zoom-slider').val(0);
-
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+
 
     cellWidth = ((gridWidth) / numCols);
     cellHeight = ((gridHeight) / numRows);
@@ -1646,7 +1668,7 @@ function updateTableResizeHandler() {
     });
 }
 
-function addTableResizeHandler(){
+function addTableResizeHandler(componentId){
     var tableResizeDiv = document.createElement('div');
     tableResizeDiv.id = 'table-resize-div';
 
@@ -1656,7 +1678,7 @@ function addTableResizeHandler(){
     dragHandle.className = 'ui-resizable-handle ui-resizable-se';
     dragHandle.id = 'table-drag-handle';
 
-    $('#guide-grid-container').append(tableResizeDiv);
+    $('#table-grid-container'+'_'+componentId+' '+'#guide-grid-container').append(tableResizeDiv);
 
     $(tableResizeDiv).append(dragHandle).resizable({
         handles: {
@@ -1719,10 +1741,13 @@ function addTableResizeHandler(){
  * @param lock {Boolean}
  */
 function toggleTableWidthLock(lock){
+    tableLockedWidth = lock;
+    var state = $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state');
+    state.lock.width = lock;
+    $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', state);
+
     if (lock){
         // lock it
-        tableLockedWidth = true;
-
         $('.btn-table-width-lock-unlock').each(function(){
             $(this).find('img').get(0).src = 'images/lock_icon.png';
         });
@@ -1734,8 +1759,6 @@ function toggleTableWidthLock(lock){
 
     } else {
         // unlock it
-        tableLockedWidth = false;
-
         $('.btn-table-width-lock-unlock').each(function(){
             $(this).find('img').get(0).src = 'images/unlock_icon.png';
         });
@@ -1753,10 +1776,14 @@ function toggleTableWidthLock(lock){
 }
 
 function toggleTableHeightLock(lock){
+    tableLockedHeight = lock;
+
+    var state = $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state');
+    state.lock.height = lock;
+    $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', state);
+
     if (lock){
         // lock it
-        tableLockedHeight = true;
-
         $('.btn-table-height-lock-unlock').each(function(){
             $(this).find('img').get(0).src = 'images/lock_icon.png';
         });
@@ -1767,7 +1794,6 @@ function toggleTableHeightLock(lock){
 
     } else {
         // unlock it
-        tableLockedHeight = false;
         $('.btn-table-height-lock-unlock').each(function(){
             $(this).find('img').get(0).src = 'images/unlock_icon.png';
         });
@@ -1781,9 +1807,9 @@ function toggleTableHeightLock(lock){
     }
 }
 
-function addTableSizeLockUnlockButtons(){
-    tableLockedWidth = false;
-    tableLockedHeight = false;
+function addTableSizeLockUnlockButtons(componentId){
+    toggleTableWidthLock(false);
+    toggleTableHeightLock(false);
 
     var spanWidth = document.createElement('span');
     spanWidth.innerHTML = '<button type="button" class="btn btn-default ">' +
@@ -1799,9 +1825,6 @@ function addTableSizeLockUnlockButtons(){
 
     });
 
-    // TODO HACK to reset the locks in the layout section
-    toggleTableWidthLock(false);
-    toggleTableHeightLock(false);
 
 
     $(tableSizeLockUnlockButtonWidth).on("click", function (e) {
@@ -1878,8 +1901,8 @@ function addTableSizeLockUnlockButtons(){
     })
 
 
-    $('#main-cell-table').append(tableSizeLockUnlockButtonWidth);
-    $('#main-cell-table').append(tableSizeLockUnlockButtonHeight);
+    $('#table-grid-container'+'_'+componentId+' '+'#main-cell-table').append(tableSizeLockUnlockButtonWidth);
+    $('#table-grid-container'+'_'+componentId+' '+'#main-cell-table').append(tableSizeLockUnlockButtonHeight);
 
 }
 
@@ -1950,7 +1973,7 @@ function saveRowColRatiosGrid(updateTableWidth, updateTableHeight) {
 
 
 
-function addRowColAddRemoveButtons(){
+function addRowColAddRemoveButtons(componentId){
     var spAddRow = document.createElement('span');
     spAddRow.innerHTML = '<button type="button" class="btn btn-default ">' +
                     '<span class="glyphicon glyphicon-plus"></span>' +
@@ -2004,7 +2027,7 @@ function addRowColAddRemoveButtons(){
         removeNColsFromEnd(1);
     });
 
-    $('#main-cell-table').append(buttonAddRow).append(buttonRemoveRow).append(buttonAddCol).append(buttonRemoveCol);
+    $('#table-grid-container'+'_'+componentId+' '+'#main-cell-table').append(buttonAddRow).append(buttonRemoveRow).append(buttonAddCol).append(buttonRemoveCol);
 }
 
 /** ** ** ** Adding and deleting rows and columns **/
@@ -2634,11 +2657,11 @@ function removeNColsFromEnd(n) {
 /**
  * Add buttons to clear a row, a column or the entire table of its components
  */
-function addClearButtons(){
-    addClearAllButton();
+function addClearButtons(componentId){
+    addClearAllButton(componentId);
 }
 
-function addClearAllButton(){
+function addClearAllButton(componentId){
     var spClearAll = document.createElement('span');
     spClearAll.innerHTML = '<button type="button" class="btn btn-default ">' +
                                 '<span>Clear All </span>' +
@@ -2652,7 +2675,7 @@ function addClearAllButton(){
         clearAll();
     });
 
-    $('#main-cell-table').append(buttonClearAll);
+    $('#table-grid-container'+'_'+componentId+' '+'#main-cell-table').append(buttonClearAll);
     $(buttonClearAll).css({
         position: 'absolute',
         top:'-45px',
@@ -2861,7 +2884,7 @@ function updateBitmap(isDifferentComponent) {
 
 /** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **/
 
-function copyUserComponent(userComponent){
+function duplicateUserComponent(userComponent){
     return UserComponent.fromString(JSON.stringify(userComponent));
 }
 

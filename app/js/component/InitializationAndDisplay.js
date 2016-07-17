@@ -41,6 +41,8 @@ $(function () {
         // start a default component
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+
+        //makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
         createTable();
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
@@ -106,7 +108,7 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        createTable();
+        makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
         resetMenuOptions();
     });
 });
@@ -121,21 +123,22 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
         selectedProject.mainComponents[selectedUserComponent.meta.id] = selectedUserComponent.meta.name;
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        createTable();
+
+        makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
         resetMenuOptions();
     });
 });
 
 
-$('#create-component').on('click', function () {
-    numRows = $('#select-rows').val();
-    numCols = $('#select-cols').val();
-    selectedUserComponent = initUserComponent(false);
-    selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
-    displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-    createTable();
-    resetMenuOptions();
-});
+//$('#create-component').on('click', function () {
+//    numRows = $('#select-rows').val();
+//    numCols = $('#select-cols').val();
+//    selectedUserComponent = initUserComponent(false);
+//    selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
+//    displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+//    createTable(selectedUserComponent.meta.id);
+//    resetMenuOptions();
+//});
 
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
@@ -277,6 +280,7 @@ $('.components').on('dblclick', '.component-name', function () {
 $('.components').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
+        var componentId = $(this).parent().parent().parent().data('componentid');
         var componentNameElt = $($(this).parent().parent().find('.component-name'));
         var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
@@ -290,8 +294,7 @@ $('.components').on('keypress', '.new-name-input', function (event) {
         // update the display of the component box
         $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
-        selectedUserComponent.meta.name = $(this).val();
-
+        selectedProject.components[componentId].meta.name = $(this).val();
         // changing the ids todo: is this a good idea?
         //var oldId = selectedUserComponent.meta.id;
         //var newId = generateId(selectedUserComponent.meta.name);
@@ -303,6 +306,96 @@ $('.components').on('keypress', '.new-name-input', function (event) {
         //$(this).parent().parent().data('componentid', newId);
     }
 });
+
+/** ** ** ** ** ** ** ** ** ** ** ** Component Options ** ** ** ** ** ** ** ** ** ** ** ** **/
+function setComponentOptions(){
+    // renaming
+
+    $('.component-options .component-name')
+        .text(selectedUserComponent.meta.name)
+        .unbind()
+        .on('dblclick', function () {
+        var newNameInputElt = $($(this).parent().find('.new-name-input'));
+        var submitRenameElt = $($(this).parent().find('.submit-rename'));
+        newNameInputElt.val($(this).text());
+        submitRenameElt.removeClass('not-displayed');
+        $(this).addClass('not-displayed');
+        newNameInputElt.focus();
+        newNameInputElt.select();
+    });
+
+    $('.component-options .new-name-input')
+        .unbind()
+        .on('keypress' , function (event) {
+        if (event.which == 13) {
+            event.preventDefault();
+            var componentNameElt = $($(this).parent().parent().find('.component-name'));
+            var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
+
+            componentNameElt.removeClass('not-displayed');
+            submitRenameElt.addClass('not-displayed');
+            var newName = $(this).val();
+            if (newName.length === 0) { // empty string entered, don't change the name!
+                return;
+            }
+            componentNameElt.text($(this).val());
+            // update the display of the component box
+            $('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
+
+            selectedUserComponent.meta.name = $(this).val();
+
+            // changing the ids todo: is this a good idea?
+            //var oldId = selectedUserComponent.meta.id;
+            //var newId = generateId(selectedUserComponent.meta.name);
+            //selectedUserComponent.meta.id = newId;
+            //selectedProject.componentIdSet[newId] = "";
+            //delete selectedProject.componentIdSet[oldId];
+            //selectedProject.components[newId] = selectedUserComponent;
+            //delete selectedProject.components[oldId];
+            //$(this).parent().parent().data('componentid', newId);
+        }
+    });
+
+    // copy
+    $('.component-options #btn-duplicate-component')
+        .unbind()
+        .click(function(){
+            var copyComponent = duplicateUserComponent(selectedUserComponent);
+            var originalId = copyComponent.meta.id;
+            // change the id
+            copyComponent.meta.id = generateId(copyComponent.meta.name);
+
+            if (originalId in selectedProject.mainComponents){
+                displayMainPageInListAndSelect(copyComponent.meta.name, copyComponent.meta.id);
+            } else {
+                displayUserComponentInListAndSelect(copyComponent.meta.name, copyComponent.meta.id);
+            }
+
+        });
+
+    // clear all
+    $('.component-options #btn-clear-all')
+        .unbind()
+        .on("click", function (e) {
+            clearAll();
+        });
+
+    // delete
+    $('.component-options .btn-delete-component')
+        .unbind()
+        .on("click", function (e) {
+            var id = selectedUserComponent.meta.id;
+            if (confirmOnUserComponentDelete){
+                if (selectedProject.numComponents === 1){
+                    return; //don't delete the last one TODO is the the right way to go?
+                }
+                openDeleteUserComponentConfirmDialogue(id);
+            } else {
+                deleteUserComponent(id);
+            }
+        });
+
+}
 
 /** ** ** ** ** ** Component Adding to Project and Display helpers ** ** ** ** ** ** ** ** ** **/
 
@@ -581,7 +674,7 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and Display Helpers ** ** ** ** ** ** ** ** **/
 
-function registerDroppable() {
+function registerDroppable(componentId) {
     var enableDrop = {
         accept: ".widget",
         hoverClass: "highlight",
@@ -752,16 +845,22 @@ function getZoomFromSliderVal(){
 };
 
 
-function changeZoom(){
-    // TODO make this better
-    var zoom = getZoomFromSliderVal();
-    $('#zoom-control-value').text(Math.round(zoom*100)+'%');
-    //$('#middle-container').animate({ 'zoom': currentZoom = zoom}, 'slow');
-    currentZoom = zoom;
-    //var fontSize = DEFAULT_FONT_SIZE*zoom;
-    //$('#outer-container').css('font-size', fontSize+'px')
+function changeZoom(isFit){
+    if (!isFit){
+        // TODO make this better
+        var zoom = getZoomFromSliderVal();
+        $('#zoom-control-value').text(Math.round(zoom*100)+'%');
+        currentZoom = zoom;
 
-    //loadTableWithLocksSaved(selectedUserComponent);
+    } else {
+        var zoomHeight = ($('#outer-container').height()-(20+100+70+17))/selectedUserComponent.layout.tablePxDimensions.height; // take into account padding and stuff
+        var zoomWidth = ($('#outer-container').width()-(20+100+40+17))/selectedUserComponent.layout.tablePxDimensions.width;
+        currentZoom = Math.min(zoomWidth, zoomHeight);
+
+        $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
+        var sliderVal = getSliderValFromZoom(currentZoom);
+        $('#zoom-slider').val(sliderVal);
+    }
 
     $('.grid').each(function(){
         var rowcol = getRowColFromId(this.id);
@@ -773,12 +872,16 @@ function changeZoom(){
         })
     });
 
+    var state = $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state');
+    state.zoom = currentZoom;
+    $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', state);
+
+
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
 
     cellResizeOnStopSaves(false, false);
 
-    //$('#middle-container').css({'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')'})
 };
 
 
@@ -805,7 +908,7 @@ function registerZoom() {
         //var val = $( "#zoom-slider" ).slider( "option", "value" );
         $('#zoom-slider').val(Math.round(val/100)*100+100);
         //$( "#zoom-slider" ).slider( "option", "value", val+100);
-        changeZoom();
+        changeZoom(false);
     });
     $('#zoom-out').click( function (e) {
         e.preventDefault();
@@ -813,7 +916,7 @@ function registerZoom() {
         //var val = $( "#zoom-slider" ).slider( "option", "value" );
         $('#zoom-slider').val(Math.round(val/100)*100-100);
         //$( "#zoom-slider" ).slider( "option", "value", val-100);
-        changeZoom();
+        changeZoom(false);
     });
 
 
@@ -823,45 +926,19 @@ function registerZoom() {
     });
 
     $('#zoom-slider').on('change', function(){
-        changeZoom();
+        changeZoom(false);
     });
 
     $('#zoom-actual').click(function(e, ui){
         e.preventDefault();
         $('#zoom-slider').val(0);
         //$( "#zoom-slider" ).slider( "option", "value", 0);
-        changeZoom();
+        changeZoom(false);
     });
 
     $('#zoom-fit').click(function(e, ui){
         e.preventDefault();
-        var zoomHeight = ($('#outer-container').height()-(20+100+70+17))/selectedUserComponent.layout.tablePxDimensions.height; // take into account padding and stuff
-        var zoomWidth = ($('#outer-container').width()-(20+100+40+17))/selectedUserComponent.layout.tablePxDimensions.width;
-        currentZoom = Math.min(zoomWidth, zoomHeight);
-
-
-        // TODO
-
-        $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
-        var sliderVal = getSliderValFromZoom(currentZoom);
-        $('#zoom-slider').val(sliderVal);
-        //$( "#zoom-slider" ).slider( "option", "value", sliderVal);
-
-        $('.grid').each(function(){
-            var rowcol = getRowColFromId(this.id);
-            var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
-            var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
-            $(this).css({
-                height: (actualHeight)*currentZoom + 'px',
-                width: (actualWidth)*currentZoom + 'px',
-            })
-        });
-
-        gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
-        gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
-
-        cellResizeOnStopSaves(false, false);
-
+        changeZoom(true);
     });
 }
 
