@@ -42,8 +42,7 @@ $(function () {
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent.meta.id, selectedUserComponent);
 
-        //makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
-        createTable();
+        makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
