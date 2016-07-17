@@ -22,7 +22,7 @@ function loadTable(componentToShow) {
 
     var componentId = componentToShow.meta.id;
 
-    makeEmptyUserComponentDisplayTable(componentId);
+    makeUserEmptyComponentDisplayTable(componentId);
 
     $('.cell').each(function () {
         var cellId = $(this).get(0).id;
@@ -192,12 +192,7 @@ function enableComponentDOMElements(componentId){
     });
 }
 
-function enableOneDisableAllOtherComponentDomElements(componentToShow){
-    var componentToEnableId = componentToShow.meta.id;
-
-    setComponentOptions(componentToShow);
-
-    // disable first, for toggle
+function disableAllComponentDomElementsExcept(componentToEnableId){
     for (var componentId in selectedProject.components){
         if (componentToEnableId == componentId){
             continue;
@@ -207,59 +202,61 @@ function enableOneDisableAllOtherComponentDomElements(componentToShow){
         }
         disableComponentDOMElements(componentId);
     }
-
-    // first check that the table has been made (otherwise the reset will happen automatically,
-    // but more importantly, the table-grid-container won't exist yet
-    if ($('#table-grid-container'+'_'+componentToEnableId).length>0){
-        // enable first (for toggle)
-        if ($('#table-grid-container'+'_'+componentToEnableId).hasClass('hidden-component')){
-            enableComponentDOMElements(componentToEnableId);
-        }
-
-        // reset
-        //$('<style>.main-table::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
-
-        numRows = componentToShow.dimensions.rows;
-        numCols = componentToShow.dimensions.cols;
-
-        updateZoomFromState(componentToEnableId);
-
-        gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
-        gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
-
-
-        toggleTableHeightLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.height);
-        toggleTableWidthLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.width);
-
-    }
-
-
-
-    updateBitmap(true);
 }
 
-function makeEmptyUserComponentDisplayTable(componentId){
-    var component = selectedProject.components[componentId];
+function enableSpecificComponentDomElements(componentToEnableId){
+    // first check that the table has been made (otherwise the reset will happen automatically,
+    // but more importantly, the table-grid-container won't exist yet
+    if (!($('#table-grid-container'+'_'+componentToEnableId).length>0)) {
+        createOrResetTableGridContainer(componentToEnableId);
+        var state = {
+            zoom: 1,
+            lock:{
+                width: false,
+                height: false
+            }
+        };
+        $('#table-grid-container'+'_'+componentToEnableId).data('state', state);
+    }
+
+    var componentToEnable = selectedProject.components[componentToEnableId];
+
+    // enable first (toggle needs the id's and classes to be enabled)
+    if ($('#table-grid-container'+'_'+componentToEnableId).hasClass('hidden-component')){
+        enableComponentDOMElements(componentToEnableId);
+    }
+
+    // reset
+    numRows = componentToEnable.dimensions.rows;
+    numCols = componentToEnable.dimensions.cols;
+
+    updateZoomFromState(componentToEnableId);
+
+    gridWidth = componentToEnable.layout.tablePxDimensions.width * currentZoom;
+    gridHeight = componentToEnable.layout.tablePxDimensions.height * currentZoom;
+
+
+    toggleTableHeightLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.height);
+    toggleTableWidthLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.width);
+    updateBitmap(true);
+    setComponentOptions(componentToEnable);
+
+}
+
+function makeUserEmptyComponentDisplayTable(componentId){
+    disableAllComponentDomElementsExcept(componentId);
 
     createOrResetTableGridContainer(componentId);
-    enableOneDisableAllOtherComponentDomElements(component);
-
-
     createTable(componentId);
-
     createGuideGrid(componentId);
-
     updateZoomFromState(componentId);
     // Note: this works because we disable all other classes that this affects beforehand
     initialResizeCells();
-
     attachMergeHandlers(componentId);
 
     // Note: this works because we disable all other classes that this affects beforehand
     registerDroppable();
-
     addRowColAddRemoveButtons(componentId);
-
 
     // Note: this works because we disable all other classes that this affects beforehand
     addRowColResizeHandlers();
@@ -269,10 +266,11 @@ function makeEmptyUserComponentDisplayTable(componentId){
     //addClearButtons(componentId);
     //addAddToMainPagesButton();
 
+    setComponentOptions(selectedProject.components[componentId]);
+
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
-
 }
 
 function createOrResetTableGridContainer(componentId){

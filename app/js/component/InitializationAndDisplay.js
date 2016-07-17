@@ -42,7 +42,7 @@ $(function () {
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent);
 
-        makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
@@ -107,7 +107,7 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
         resetMenuOptions();
     });
 });
@@ -123,7 +123,7 @@ $('#new-main-component-btn').click(function(){
         selectedProject.mainComponents[selectedUserComponent.meta.id] = selectedUserComponent.meta.name;
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        makeEmptyUserComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
         resetMenuOptions();
     });
 });
@@ -255,9 +255,12 @@ $('.components').on('click', '.component-name-container', function () {
         $(componentNameContainer).parent().addClass('selected');
         selectedUserComponent = selectedProject.components[componentId];
 
-        enableOneDisableAllOtherComponentDomElements(selectedUserComponent);
+        disableAllComponentDomElementsExcept(selectedUserComponent.meta.id);
+
         if ($('#table-grid-container'+'_'+componentId).length===0){
             loadTable(selectedUserComponent);
+        } else {
+            enableSpecificComponentDomElements(selectedUserComponent.meta.id);
         }
         //$('.loader-container').fadeOut('fast');
     };
