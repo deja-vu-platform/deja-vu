@@ -894,7 +894,7 @@ function changeZoom(isFit){
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
 
-    cellResizeOnStopSaves(false, false);
+    propagateCellResizeToOtherElts();
 
 };
 

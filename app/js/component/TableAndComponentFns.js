@@ -1308,7 +1308,9 @@ function resizeRowsBySetRatios(ratios){
 
         }
     }
-    cellResizeOnStopSaves(true, true);
+    saveRowColRatiosGrid(true, true);
+    propagateCellResizeToOtherElts();
+
     //loadTable(selectedUserComponent);
 }
 
@@ -1325,13 +1327,12 @@ function resizeColsBySetRatios(ratios){
 
         }
     }
-    cellResizeOnStopSaves(true, true);
+    saveRowColRatiosGrid(true, true);
+    propagateCellResizeToOtherElts();
     //loadTable(selectedUserComponent);
 }
 
-function cellResizeOnStopSaves(saveNewTableWidth, saveNewTableHeight){
-
-    saveRowColRatiosGrid(saveNewTableWidth, saveNewTableHeight);
+function propagateCellResizeToOtherElts(){
     hideBaseComponentDisplayAll();
     alignCellsAndGridWithSavedRatios();
     updateBaseComponentDisplayAll();
@@ -1374,7 +1375,8 @@ function addRowColResizeHandlers(){
         $('.cell').css({
             opacity: '1',
         });
-        cellResizeOnStopSaves(!tableLockedWidth, !tableLockedHeight);
+        saveRowColRatiosGrid(!tableLockedWidth, !tableLockedHeight);
+        propagateCellResizeToOtherElts();
     };
 
     //var tableLockedResizeRowFn = function(e, ui){
@@ -1712,7 +1714,7 @@ function addTableResizeHandler(componentId){
                 })
             });
 
-            cellResizeOnStopSaves(false, false);
+            propagateCellResizeToOtherElts();
 
             //loadTable(selectedUserComponent);
         }
