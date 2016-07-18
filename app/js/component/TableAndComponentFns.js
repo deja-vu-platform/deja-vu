@@ -2066,7 +2066,10 @@ function addNRowsToEnd(n) {
     if (!savedTableLockedHeight){
         // if not locked resize the table height accordingly
         // do this after the table has been fitted to the new size
-        saveRowColRatiosGrid(true, true);
+        selectedUserComponent.layout.tablePxDimensions.height = selectedUserComponent.layout.tablePxDimensions.height + n*standardCellHeight;
+        gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+
+        saveRowColRatiosGrid(false, false);
     }
 
     toggleTableHeightLock(savedTableLockedHeight);
@@ -2237,6 +2240,8 @@ function removeNRowsFromEnd(n) {
         // if not locked resize the table height accordingly
         // do this after the table has been fitted to the new size
         selectedUserComponent.layout.tablePxDimensions.height = (1-ratioToRemoveGrid)*selectedUserComponent.layout.tablePxDimensions.height
+        gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+
         saveRowColRatiosGrid(false, false);
     }
 
@@ -2443,7 +2448,10 @@ function addNColsToEnd(n) {
     if (!savedTableLockedWidth){
         // if not locked resize the table height accordingly
         // do this after the table has been fitted to the new size
-        saveRowColRatiosGrid(true, true);
+        selectedUserComponent.layout.tablePxDimensions.width = selectedUserComponent.layout.tablePxDimensions.width + n*standardCellWidth;
+        gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
+
+        saveRowColRatiosGrid(false, false);
     }
 
     toggleTableWidthLock(savedTableLockedWidth);
@@ -2623,6 +2631,8 @@ function removeNColsFromEnd(n) {
         // if not locked resize the table width accordingly
         // do this after the table has been fitted to the new size
         selectedUserComponent.layout.tablePxDimensions.width = (1-ratioToRemoveGrid)*selectedUserComponent.layout.tablePxDimensions.width
+        gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
+
         saveRowColRatiosGrid(false, false);
     }
 
