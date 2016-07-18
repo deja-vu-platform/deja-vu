@@ -369,227 +369,231 @@ function createGuideGrid(id) {
 
 }
 
+function createMergeHandle(row, col){
+    var dragHandleContainer = document.createElement('div');
+    dragHandleContainer.id = 'drag-handle-container' + '_' + row + '_' + col;
 
-function attachMergeHandlers(componentId) {
-    var dragHandleContainersContainer = document.createElement('div');
-    dragHandleContainersContainer.id = 'drag-handle-containers-container';
+    var dragHandle_se = document.createElement('span');
+    dragHandle_se.innerHTML = '<img src="images/drag_handle_se_icon.png" width="15px" height="15px">';
+    dragHandle_se.className = 'ui-resizable-handle ui-resizable-se drag-handle';
+    dragHandle_se.id = 'drag-handle-se' + '_' + row + '_' + col;
 
+    var dragHandle_sw = document.createElement('span');
+    dragHandle_sw.innerHTML = '<img src="images/drag_handle_sw_icon.png" width="15px" height="15px">';
+    dragHandle_sw.className = 'ui-resizable-handle ui-resizable-sw drag-handle';
+    dragHandle_sw.id = 'drag-handle-sw' + '_' + row + '_' + col;
 
-    for (var row = 1; row <= numRows; row++) {
-        for (var col = 1; col <= numCols; col++) {
-            var dragHandleContainer = document.createElement('div');
-            dragHandleContainer.id = 'drag-handle-container' + '_' + row + '_' + col;
+    var dragHandle_ne = document.createElement('span');
+    dragHandle_ne.innerHTML = '<img src="images/drag_handle_ne_icon.png" width="15px" height="15px">';
+    dragHandle_ne.className = 'ui-resizable-handle ui-resizable-ne drag-handle';
+    dragHandle_ne.id = 'drag-handle-ne' + '_' + row + '_' + col;
 
-            var dragHandle_se = document.createElement('span');
-            dragHandle_se.innerHTML = '<img src="images/drag_handle_se_icon.png" width="15px" height="15px">';
-            dragHandle_se.className = 'ui-resizable-handle ui-resizable-se drag-handle';
-            dragHandle_se.id = 'drag-handle-se' + '_' + row + '_' + col;
-
-            var dragHandle_sw = document.createElement('span');
-            dragHandle_sw.innerHTML = '<img src="images/drag_handle_sw_icon.png" width="15px" height="15px">';
-            dragHandle_sw.className = 'ui-resizable-handle ui-resizable-sw drag-handle';
-            dragHandle_sw.id = 'drag-handle-sw' + '_' + row + '_' + col;
-
-            var dragHandle_ne = document.createElement('span');
-            dragHandle_ne.innerHTML = '<img src="images/drag_handle_ne_icon.png" width="15px" height="15px">';
-            dragHandle_ne.className = 'ui-resizable-handle ui-resizable-ne drag-handle';
-            dragHandle_ne.id = 'drag-handle-ne' + '_' + row + '_' + col;
-
-            var dragHandle_nw = document.createElement('span');
-            dragHandle_nw.innerHTML = '<img src="images/drag_handle_nw_icon.png" width="15px" height="15px">';
-            dragHandle_nw.className = 'ui-resizable-handle ui-resizable-nw drag-handle';
-            dragHandle_nw.id = 'drag-handle-nw' + '_' + row + '_' + col;
+    var dragHandle_nw = document.createElement('span');
+    dragHandle_nw.innerHTML = '<img src="images/drag_handle_nw_icon.png" width="15px" height="15px">';
+    dragHandle_nw.className = 'ui-resizable-handle ui-resizable-nw drag-handle';
+    dragHandle_nw.id = 'drag-handle-nw' + '_' + row + '_' + col;
 
 
-            dragHandleContainer.appendChild(dragHandle_se);
-            dragHandleContainer.appendChild(dragHandle_sw);
-            dragHandleContainer.appendChild(dragHandle_ne);
-            dragHandleContainer.appendChild(dragHandle_nw);
-
-            $(dragHandleContainersContainer).append(dragHandleContainer);
-            $('#table-grid-container'+'_'+componentId).append(dragHandleContainersContainer);
-
-            resetMergeHandleContainerSizeAndPosition(row, col);
+    dragHandleContainer.appendChild(dragHandle_se);
+    dragHandleContainer.appendChild(dragHandle_sw);
+    dragHandleContainer.appendChild(dragHandle_ne);
+    dragHandleContainer.appendChild(dragHandle_nw);
 
 
-            $(dragHandleContainer).resizable({
-                handles: {
-                    'se': '#drag-handle-se' + '_' + row + '_' + col,
-                    'sw': '#drag-handle-sw' + '_' + row + '_' + col,
-                    'ne': '#drag-handle-ne' + '_' + row + '_' + col,
-                    'nw': '#drag-handle-nw' + '_' + row + '_' + col
-                },
-                start: function (event, ui) {
-                    $('.grid').css({
-                        border: '#cdcdcd 1px dotted',
-                        visibility: 'visible'
-                    });
-                    $('.drag-handle').off('mouseenter mouseleave');
-                    $(event.target).css({
-                        border: 'black 1px dotted'
-                    });
-
-                },
-                stop: function (event, ui) {
-                    var dragHandleContainer = $(this);
-                    var componentId = dragHandleContainer.get(0).id;
-                    var rowcol = getRowColFromId(componentId);
-                    var row = rowcol.row;
-                    var col = rowcol.col;
-                    var thisCellId = 'cell' + '_' + row + '_' + col;
-
-                    var handleType = $(ui.element).data("ui-resizable").axis;
-
-                    // this will be one of the cell id's input into the merge function
-                    var cell1Id = thisCellId;
-                    if ($('#'+thisCellId).data('merged').isMerged){
-                        switch(handleType){
-                            case 'ne':
-                                cell1Id = $('#'+thisCellId).data('merged').bottomLeftCellId;
-                                break;
-                            case 'nw':
-                                cell1Id = $('#'+thisCellId).data('merged').bottomRightCellId;
-                                break;
-                            case 'se':
-                                cell1Id = $('#'+thisCellId).data('merged').topLeftCellId;
-                                break;
-                            case 'sw':
-                                cell1Id = $('#'+thisCellId).data('merged').topRightCellId;
-                                break;
-                            default:
-                                throw 'Something went wrong'; // TODO
-                        }
-                    }
-
-                    // extract the component from this cell
-                    var component;
-                    if (selectedUserComponent.components[row]) {
-                        if (selectedUserComponent.components[row][col]) {
-                            component = selectedUserComponent.components[row][col];
-                        }
-                    }
-
-
-                    // Now we look for the cell to merge into
-                    // In case the cell we are resizing was already merged (ie, we are making it smaller,
-                    // then the cell we want to merge will not be visible. So we need to use the grid.
-                    // For that, we first make the grid visible and able to take mouse events
-                    $('.grid').css({
-                        'z-index': 100,
-                        visibility: 'visible',
-                        'pointer-events': 'visiblePainted',
-                    });
-
-                    // Then we look for the grid element underneath the mouse (this requires the element to be visible
-                    // and able to accept mouse events).
-                    // useful page http://stackoverflow.com/questions/6073505/what-is-the-difference-between-screenx-y-clientx-y-and-pagex-y
-                    // frame of reference from clientX/Y does not change even if you scroll
-                    var allEltsList = allElementsFromPoint(event.clientX, event.clientY);
-                    // other interesting functions
-                    // document.elementFromPoint(event.pageX, event.pageY)
-                    // document.querySelectorAll(':hover');
-
-                    // then we reset these values
-                    $('.grid').css({
-                        'z-index': 0,
-                        visibility: 'hidden',
-                        'pointer-events': 'none',
-                    });
-
-                    var newCellGrid = $(allEltsList).filter('.grid');
-                    if (!newCellGrid[0]) { // it's outside the table
-                        resetMergeHandleContainerSizeAndPositionCellId(thisCellId);
-                    } else {
-                        var newCellGridRowcol = getRowColFromId(newCellGrid[0].id);
-                        var newCellId = 'cell' + '_' + newCellGridRowcol.row + '_' + newCellGridRowcol.col;
-                        // TODO: have a setting to turn this off?
-                        if (confirmOnDangerousMerge){
-                            if (safeToMerge(cell1Id, newCellId)){
-                                // if this is already a merged cell we should unmerge it now
-                                // since this cell (a top left cell), may not be in the final merge
-                                // so should be brought back to the original form
-                                unmergeCells(thisCellId); // without the component; it will get it back if it was its
-                                mergeCells(cell1Id, newCellId, component);
-                            } else {
-                                openMergeConfirmDialogue(thisCellId, cell1Id, newCellId, component);
-                            }
-                        } else {
-                            unmergeCells(thisCellId);
-                            mergeCells(cell1Id, newCellId, component);
-                        }
-                    }
-
-                    // rest event handlers
-                    $('.grid').css({
-                        border: 'none',
-                    });
-                    $('.drag-handle').mouseenter(function (event, ui) {
-                        $(this).parent().css({
-                            border: 'black 1px dotted'
-                        });
-                    });
-
-                    $('.drag-handle').mouseleave(function (event, ui) {
-                        $(this).parent().css({
-                            border: 'none'
-                        });
-                    });
-                    $('.drag-handle').parent().css({
-                        border: 'none'
-                    });
-                }
+    $(dragHandleContainer).resizable({
+        handles: {
+            'se': '#drag-handle-se' + '_' + row + '_' + col,
+            'sw': '#drag-handle-sw' + '_' + row + '_' + col,
+            'ne': '#drag-handle-ne' + '_' + row + '_' + col,
+            'nw': '#drag-handle-nw' + '_' + row + '_' + col
+        },
+        start: function (event, ui) {
+            $('.grid').css({
+                border: '#cdcdcd 1px dotted',
+                visibility: 'visible'
+            });
+            $('.drag-handle').off('mouseenter mouseleave');
+            $(event.target).css({
+                border: 'black 1px dotted'
             });
 
+        },
+        stop: function (event, ui) {
+            var dragHandleContainer = $(this);
+            var componentId = dragHandleContainer.get(0).id;
+            var rowcol = getRowColFromId(componentId);
+            var row = rowcol.row;
+            var col = rowcol.col;
+            var thisCellId = 'cell' + '_' + row + '_' + col;
 
-            // putting these css modifiers later to override any native drag handle css
-            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseenter(function (event, ui) {
+            var handleType = $(ui.element).data("ui-resizable").axis;
+
+            // this will be one of the cell id's input into the merge function
+            var cell1Id = thisCellId;
+            if ($('#'+thisCellId).data('merged').isMerged){
+                switch(handleType){
+                    case 'ne':
+                        cell1Id = $('#'+thisCellId).data('merged').bottomLeftCellId;
+                        break;
+                    case 'nw':
+                        cell1Id = $('#'+thisCellId).data('merged').bottomRightCellId;
+                        break;
+                    case 'se':
+                        cell1Id = $('#'+thisCellId).data('merged').topLeftCellId;
+                        break;
+                    case 'sw':
+                        cell1Id = $('#'+thisCellId).data('merged').topRightCellId;
+                        break;
+                    default:
+                        throw 'Something went wrong'; // TODO
+                }
+            }
+
+            // extract the component from this cell
+            var component;
+            if (selectedUserComponent.components[row]) {
+                if (selectedUserComponent.components[row][col]) {
+                    component = selectedUserComponent.components[row][col];
+                }
+            }
+
+
+            // Now we look for the cell to merge into
+            // In case the cell we are resizing was already merged (ie, we are making it smaller,
+            // then the cell we want to merge will not be visible. So we need to use the grid.
+            // For that, we first make the grid visible and able to take mouse events
+            $('.grid').css({
+                'z-index': 100,
+                visibility: 'visible',
+                'pointer-events': 'visiblePainted',
+            });
+
+            // Then we look for the grid element underneath the mouse (this requires the element to be visible
+            // and able to accept mouse events).
+            // useful page http://stackoverflow.com/questions/6073505/what-is-the-difference-between-screenx-y-clientx-y-and-pagex-y
+            // frame of reference from clientX/Y does not change even if you scroll
+            var allEltsList = allElementsFromPoint(event.clientX, event.clientY);
+            // other interesting functions
+            // document.elementFromPoint(event.pageX, event.pageY)
+            // document.querySelectorAll(':hover');
+
+            // then we reset these values
+            $('.grid').css({
+                'z-index': 0,
+                visibility: 'hidden',
+                'pointer-events': 'none',
+            });
+
+            var newCellGrid = $(allEltsList).filter('.grid');
+            if (!newCellGrid[0]) { // it's outside the table
+                resetMergeHandleContainerSizeAndPositionCellId(thisCellId);
+            } else {
+                var newCellGridRowcol = getRowColFromId(newCellGrid[0].id);
+                var newCellId = 'cell' + '_' + newCellGridRowcol.row + '_' + newCellGridRowcol.col;
+                // TODO: have a setting to turn this off?
+                if (confirmOnDangerousMerge){
+                    if (safeToMerge(cell1Id, newCellId)){
+                        // if this is already a merged cell we should unmerge it now
+                        // since this cell (a top left cell), may not be in the final merge
+                        // so should be brought back to the original form
+                        unmergeCells(thisCellId); // without the component; it will get it back if it was its
+                        mergeCells(cell1Id, newCellId, component);
+                    } else {
+                        openMergeConfirmDialogue(thisCellId, cell1Id, newCellId, component);
+                    }
+                } else {
+                    unmergeCells(thisCellId);
+                    mergeCells(cell1Id, newCellId, component);
+                }
+            }
+
+            // rest event handlers
+            $('.grid').css({
+                border: 'none',
+            });
+            $('.drag-handle').mouseenter(function (event, ui) {
                 $(this).parent().css({
                     border: 'black 1px dotted'
                 });
             });
 
-            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseleave(function (event, ui) {
+            $('.drag-handle').mouseleave(function (event, ui) {
                 $(this).parent().css({
                     border: 'none'
                 });
             });
-
-            $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).css({
-                display: 'none',
-                'pointer-events': 'auto',
-                position: 'absolute',
+            $('.drag-handle').parent().css({
+                border: 'none'
             });
-
-            $(dragHandle_se).css({
-                bottom: '5px',
-                right: '5px',
-                cursor: 'nwse-resize',
-            });
-
-            $(dragHandle_sw).css({
-                bottom: '5px',
-                left: '5px',
-                cursor: 'nesw-resize',
-            });
-
-            $(dragHandle_ne).css({
-                top: '5px',
-                right: '5px',
-                cursor: 'nesw-resize',
-            });
-
-            $(dragHandle_nw).css({
-                top: '5px',
-                left: '5px',
-                cursor: 'nwse-resize',
-            });
+        }
+    });
 
 
-            var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
+    // putting these css modifiers later to override any native drag handle css
+    $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseenter(function (event, ui) {
+        $(this).parent().css({
+            border: 'black 1px dotted'
+        });
+    });
 
-            if (isHidden) { // and thus also colspan
-                $(dragHandleContainer).css("display", "none");
-            }
+    $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).mouseleave(function (event, ui) {
+        $(this).parent().css({
+            border: 'none'
+        });
+    });
+
+    $([dragHandle_se, dragHandle_ne, dragHandle_sw, dragHandle_nw]).css({
+        display: 'none',
+        'pointer-events': 'auto',
+        position: 'absolute',
+    });
+
+    $(dragHandle_se).css({
+        bottom: '5px',
+        right: '5px',
+        cursor: 'nwse-resize',
+    });
+
+    $(dragHandle_sw).css({
+        bottom: '5px',
+        left: '5px',
+        cursor: 'nesw-resize',
+    });
+
+    $(dragHandle_ne).css({
+        top: '5px',
+        right: '5px',
+        cursor: 'nesw-resize',
+    });
+
+    $(dragHandle_nw).css({
+        top: '5px',
+        left: '5px',
+        cursor: 'nwse-resize',
+    });
+
+
+    var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
+
+    if (isHidden) { // and thus also colspan
+        $(dragHandleContainer).css("display", "none");
+    }
+
+    return dragHandleContainer;
+}
+
+
+function attachMergeHandlers(componentId) {
+    var dragHandleContainersContainer = document.createElement('div');
+    dragHandleContainersContainer.id = 'drag-handle-containers-container';
+
+    $('#table-grid-container'+'_'+componentId).append(dragHandleContainersContainer);
+
+    for (var row = 1; row <= numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var dragHandleContainer = createMergeHandle(row, col);
+            $(dragHandleContainersContainer).append(dragHandleContainer);
+            resetMergeHandleContainerSizeAndPosition(row, col);
         }
     }
 
@@ -1342,6 +1346,142 @@ function propagateCellResizeToOtherElts(){
     updateTableResizeHandler();
 }
 
+
+function rowColResizeOnStart(){
+
+    $('.grid').css({
+        visibility: 'visible',
+        border: 'black 1px dotted',
+    });
+    $('#drag-handle-containers-container').css({
+        visibility: 'hidden',
+    });
+    $('.cell').css({
+        opacity: '.5',
+    });
+};
+
+function rowColResizeOnStop(){
+    $('.grid').css({
+        visibility: 'hidden',
+        'background-color': 'transparent'
+    });
+    $('#drag-handle-containers-container').css({
+        visibility: 'visible',
+    });
+
+    $('.cell').css({
+        opacity: '1',
+    });
+    saveRowColRatiosGrid(!tableLockedWidth, !tableLockedHeight);
+    propagateCellResizeToOtherElts();
+};
+
+function tableLockedResizeRowFn(e, ui){
+    var rowNum = parseInt(getRowColFromId(ui.element.get(0).childNodes[0].id).row);
+    var nextRowNum = rowNum + 1; // having the last handle disabled means that there should always be a next col
+
+    var totalHeight = (gridHeight)*(selectedUserComponent.layout[rowNum][1].ratio.grid.height + selectedUserComponent.layout[nextRowNum][1].ratio.grid.height);
+    var remainingHeight = totalHeight - ui.size.height;
+
+    $('#guide-grid-container .row_' + rowNum).resizable('option', 'maxHeight', totalHeight - 10);
+
+
+    $('#guide-grid-container .row_' + nextRowNum + ' .grid').css({
+        height: remainingHeight + "px"
+    });
+
+    $('#guide-grid-container .row_'+nextRowNum).css({
+        height: remainingHeight + "px"
+    });
+};
+
+function tableLockedResizeColFn(e, ui){
+    var colNum = parseInt(getRowColFromId(ui.element.get(0).id).col);
+    var nextColNum = colNum + 1; // having the last handle disabled means that there should always be a next col
+
+    var totalWidth = (gridWidth)*(selectedUserComponent.layout[1][colNum].ratio.grid.width + selectedUserComponent.layout[1][nextColNum].ratio.grid.width);
+    var remainingWidth = totalWidth - parseFloat($('#grid_1_'+colNum).css('width'));
+
+    $('#grid_1_'+colNum).resizable('option', 'maxWidth', totalWidth-10);
+
+    $('#guide-grid-container .col_'+nextColNum).css({
+        width: remainingWidth + "px"
+    });
+};
+
+
+function addRowResizeHandler(row){
+    var handle = document.createElement('span');
+    handle.innerHTML = '<span class="glyphicon glyphicon-resize-vertical"></span>';
+    handle.className = 'ui-resizable-handle ui-resizable-s';
+    handle.id = 'ui-resizable-s-row_'+row;
+
+    $(handle).css({
+        position: 'absolute',
+        top: 'auto',
+        bottom: '10px',
+        left: '-10px',
+        width: 0,
+        height: 0,
+        cursor: 'ns-resize',
+        visibility: 'visible',
+        'pointer-events': 'auto',
+    });
+
+    $('#grid_'+row+'_1').append(handle);
+
+    $('#guide-grid-container .row_' + row).resizable({
+        handles: {'s': handle},
+        alsoResize: //'#table-container .row_' + row + ' .cell, ' +  // also resize the td's
+        '#guide-grid-container .row_' + row + ' .grid,' + // also resize the td's
+        ' #guide-grid-container .row_' + row +
+            //', ' +
+            //  '#drag-handle-containers-container .row_' + row + ', ' +
+            //'#table-container .row_' + row + ' .ui-resizable-s' +
+            //' .ui-resizable-s-row_'+row +
+        '',
+
+        start: rowColResizeOnStart,
+        resize: function(e, ui){
+            if (tableLockedHeight){
+                tableLockedResizeRowFn(e, ui);
+            }
+        },
+        stop: rowColResizeOnStop,
+    });
+}
+
+function addColResizeHandler(col){
+    $('#grid_1_' + col).resizable({ //there is always at least 1 cell, and grids can't merge
+        handles: 'ew',
+        alsoResize: //'#table-container .col_' + col + ',' + // the td's are already resized!
+        '#guide-grid-container .col_' + col // + ', ' +
+        //'#drag-handle-containers-container .col_' + col
+        ,
+        start : rowColResizeOnStart,
+        resize: function(e, ui){
+            if (tableLockedWidth){
+                tableLockedResizeColFn(e, ui);
+            }
+        },
+        stop: rowColResizeOnStop,
+    });
+
+    $('#grid_1_' + col + ' .ui-resizable-ew').addClass('glyphicon glyphicon-resize-horizontal').css({
+        cursor: 'ew-resize',
+        position: 'absolute',
+        top: '-15px',
+        left: 'auto',
+        right: '5px',
+        width: '1px',
+        height: '1px',
+        visibility: 'visible',
+        'pointer-events': 'auto',
+    });
+
+}
+
 function addRowColResizeHandlers(){
     // Have a resizable on the rows
     // once resize is stopped, loop through all the rows/cols, and store the
@@ -1349,234 +1489,14 @@ function addRowColResizeHandlers(){
     //
     //  Then also set the cell size in load table (or resize function) based on these values
 
-    var onStart = function(){
-
-        $('.grid').css({
-            visibility: 'visible',
-            border: 'black 1px dotted',
-        });
-        $('#drag-handle-containers-container').css({
-            visibility: 'hidden',
-        });
-        $('.cell').css({
-            opacity: '.5',
-        });
-    };
-
-    var onStop = function(){
-        $('.grid').css({
-            visibility: 'hidden',
-            'background-color': 'transparent'
-        });
-        $('#drag-handle-containers-container').css({
-            visibility: 'visible',
-        });
-
-        $('.cell').css({
-            opacity: '1',
-        });
-        saveRowColRatiosGrid(!tableLockedWidth, !tableLockedHeight);
-        propagateCellResizeToOtherElts();
-    };
-
-    //var tableLockedResizeRowFn = function(e, ui){
-    //    if ((new Date).getTime() > (start + 5000)){
-    //        console.log('hi');
-    //    }
-    //
-    //    var rowNum = getRowColFromId(ui.element.get(0).childNodes[0].id).row;
-    //    var newRemainingHeight = gridHeight - 20 - parseFloat(ui.size.height);
-    //    var oldRemainingHeight = gridHeight - 20 - parseFloat(ui.originalSize.height);
-    //
-    //    var sum = 0;
-    //
-    //    for (var row = 1; row <= numRows; row++) {
-    //        if (row != rowNum) {
-    //            var oldHeight = (gridHeight - 20)*selectedUserComponent.layout[row][1].ratio.grid.height;
-    //            var newHeight = newRemainingHeight*oldHeight/oldRemainingHeight;
-    //
-    //            sum += newHeight;
-    //
-    //            $('#guide-grid-container .row_' + row + ' .grid').css({
-    //                height: newHeight + "px"
-    //            });
-    //
-    //            $('#guide-grid-container .row_'+row).css({
-    //                height: newHeight + "px"
-    //            });
-    //            //$('#guide-grid-container .row_' + row + ' .ui-resizable-s').css({
-    //            //    width: '5px',
-    //            //    height: newHeight + "px",
-    //            //});
-    //        }
-    //    }
-    //
-    //    console.log(sum/newRemainingHeight);
-    //    checkHeightRatio(1);
-    //};
-    //
-
-    var tableLockedResizeRowFn = function(e, ui){
-        var rowNum = parseInt(getRowColFromId(ui.element.get(0).childNodes[0].id).row);
-        var nextRowNum = rowNum + 1; // having the last handle disabled means that there should always be a next col
-
-        var totalHeight = (gridHeight)*(selectedUserComponent.layout[rowNum][1].ratio.grid.height + selectedUserComponent.layout[nextRowNum][1].ratio.grid.height);
-        var remainingHeight = totalHeight - ui.size.height;
-
-        $('#guide-grid-container .row_' + rowNum).resizable('option', 'maxHeight', totalHeight - 10);
-
-
-        $('#guide-grid-container .row_' + nextRowNum + ' .grid').css({
-            height: remainingHeight + "px"
-        });
-
-        $('#guide-grid-container .row_'+nextRowNum).css({
-            height: remainingHeight + "px"
-        });
-    };
-
-    //var tableLockedResizeColFn = function(e, ui){
-    //    if ((new Date).getTime() > (start + 5000)){
-    //        console.log('hey');
-    //    }
-    //
-    //    //var widthSum = getWidthSumGrid();
-    //
-    //    var colNum = getRowColFromId(ui.element.get(0).id).col;
-    //    //var newRemainingWidth = gridWidth - 20 - (parseFloat(ui.size.width)); // there seems to be some weird descrepency between
-    //    //var oldRemainingWidth = gridWidth - 20 - (parseFloat(ui.originalSize.width)); // the reported widths and the actual widths!
-    //
-    //    var newRemainingWidth = gridWidth - 20 - parseFloat($('#grid_1_'+colNum).css('width'));
-    //    var oldRemainingWidth = (gridWidth - 20)*(1-selectedUserComponent.layout[1][colNum].ratio.grid.width); // using row 0 because there is no worry of it being merged
-    //
-    //    var sum = 0;
-    //    for (var col = 1; col <= numCols; col++) {
-    //        if (col != colNum) {
-    //            var oldWidth = (gridWidth - 20)*selectedUserComponent.layout[1][col].ratio.grid.width;
-    //            var newWidth = newRemainingWidth*oldWidth/oldRemainingWidth;
-    //            newWidth = Math.max(newWidth, 10); // because cells can't get smaller than that
-    //            //newWidth = Math.min(newWidth, newRemainingWidth - (numCols-2)*10);
-    //
-    //            sum += newWidth;
-    //            $('#guide-grid-container .col_'+col).css({
-    //                width: newWidth + "px"
-    //            });
-    //        }
-    //
-    //    }
-    //
-    //    var newWidth = gridWidth-20-sum;
-    //
-    //    //$('#guide-grid-container .col_'+colNum).css('width', newWidth+'px');
-    //
-    //    console.log(sum/newRemainingWidth);
-    //};
-
-    var tableLockedResizeColFn = function(e, ui){
-        var colNum = parseInt(getRowColFromId(ui.element.get(0).id).col);
-        var nextColNum = colNum + 1; // having the last handle disabled means that there should always be a next col
-
-        var totalWidth = (gridWidth)*(selectedUserComponent.layout[1][colNum].ratio.grid.width + selectedUserComponent.layout[1][nextColNum].ratio.grid.width);
-        var remainingWidth = totalWidth - parseFloat($('#grid_1_'+colNum).css('width'));
-
-        $('#grid_1_'+colNum).resizable('option', 'maxWidth', totalWidth-10);
-
-        $('#guide-grid-container .col_'+nextColNum).css({
-            width: remainingWidth + "px"
-        });
-
-
-    };
-
-
 
 
     for (var row = 1; row <= numRows; row++) {
-        var handle = document.createElement('span');
-        handle.innerHTML = '<span class="glyphicon glyphicon-resize-vertical"></span>';
-        handle.className = 'ui-resizable-handle ui-resizable-s';
-        handle.id = 'ui-resizable-s-row_'+row;
-
-        $(handle).css({
-            position: 'absolute',
-            top: 'auto',
-            bottom: '10px',
-            left: '-10px',
-            width: 0,
-            height: 0,
-            cursor: 'ns-resize',
-            visibility: 'visible',
-            'pointer-events': 'auto',
-        });
-
-        $('#grid_'+row+'_1').append(handle);
-
-        $('#guide-grid-container .row_' + row).resizable({
-            handles: {'s': handle},
-            alsoResize: //'#table-container .row_' + row + ' .cell, ' +  // also resize the td's
-                            '#guide-grid-container .row_' + row + ' .grid,' + // also resize the td's
-                            ' #guide-grid-container .row_' + row +
-                            //', ' +
-                          //  '#drag-handle-containers-container .row_' + row + ', ' +
-                            //'#table-container .row_' + row + ' .ui-resizable-s' +
-                            //' .ui-resizable-s-row_'+row +
-                            '',
-
-            start: onStart,
-            resize: function(e, ui){
-                if (tableLockedHeight){
-                    tableLockedResizeRowFn(e, ui);
-                }
-            },
-            stop: onStop,
-        });
-
-
-        //
-        //var uiResizable = $('#guide-grid-container .row_' + row + ' .ui-resizable-s');
-        //
-        //uiResizable.addClass('ui-resizable-s-row_'+row).append(handle).css({
-        //    //display: 'none',
-        //    display: 'table-cell',
-        //    cursor: 'ns-resize',
-        //    width: '5px',
-        //    height: $('#guide-grid-container .row_' + row).css('height'),
-        //    position: 'relative',
-        //
-        //});
-
-
+        addRowResizeHandler(row);
     }
 
     for (var col = 1; col <= numCols; col++) {
-        $('#grid_1_' + col).resizable({ //there is always at least 1 cell, and grids can't merge
-            handles: 'ew',
-            alsoResize: //'#table-container .col_' + col + ',' + // the td's are already resized!
-                        '#guide-grid-container .col_' + col // + ', ' +
-                        //'#drag-handle-containers-container .col_' + col
-            ,
-            start : onStart,
-            resize: function(e, ui){
-                if (tableLockedWidth){
-                    tableLockedResizeColFn(e, ui);
-                }
-            },
-            stop: onStop,
-        });
-
-        $('#grid_1_' + col + ' .ui-resizable-ew').addClass('glyphicon glyphicon-resize-horizontal').css({
-            cursor: 'ew-resize',
-            position: 'absolute',
-            top: '-15px',
-            left: 'auto',
-            right: '5px',
-            width: '1px',
-            height: '1px',
-            visibility: 'visible',
-            'pointer-events': 'auto',
-        });
-
-
+        addColResizeHandler(col);
     }
 }
 
@@ -2028,16 +1948,17 @@ function addRowColAddRemoveButtons(componentId){
 /** ** ** ** Adding and deleting rows and columns **/
 
 function addNRowsToEnd(n) {
+    // before anything has changed
+    var savedTableLockedHeight = tableLockedHeight;
+    toggleTableHeightLock(false);
+
     var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
     var newNumRows = lastRowNum + n;
 
     selectedUserComponent.dimensions.rows = newNumRows;
     numRows = newNumRows;
 
-    var saveTableLockedWidth = tableLockedWidth;
-    var saveTableLockedHeight = tableLockedHeight;
-
-    if (tableLockedHeight) { // if table height constant
+    if (savedTableLockedHeight) { // if table height constant
         // for the new row, height is 1/newNumRows
         for (var newRow = 1; newRow <= n; newRow++){
             selectedUserComponent.layout[lastRowNum + newRow] = {};
@@ -2066,9 +1987,11 @@ function addNRowsToEnd(n) {
         }
     } else {
         for (var newRow = 1; newRow <= n; newRow++) {
-            selectedUserComponent.layout[lastRowNum + newRow] = {};
+            var newRowNum = lastRowNum + newRow;
+            selectedUserComponent.layout[newRowNum] = {};
+
             for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
-                selectedUserComponent.layout[lastRowNum + newRow][col] = {
+                selectedUserComponent.layout[newRowNum][col] = {
                     spans: {row: 1, col: 1},
                     merged: {
                         isMerged: false,
@@ -2082,23 +2005,94 @@ function addNRowsToEnd(n) {
                     ratio: {
                         grid: {
                             width: selectedUserComponent.layout[lastRowNum][col].ratio.grid.width,
-                            height: (currentZoom * standardCellHeight) / (gridHeight)
+                            height: standardCellHeight/selectedUserComponent.layout.tablePxDimensions.height
                         }
                     }
                 }
+
+
             }
+        }
+
+    }
+
+    for (var newRow = 1; newRow <= n; newRow++) {
+        var newRowNum = lastRowNum + newRow;
+        var tableRow = createEmptyRow(newRowNum);
+        var gridRow = createEmptyRow(newRowNum);
+
+        for (var col = 0; col <= numCols; col++) {
+            if ((newRowNum === 0) || (col === 0)) {
+                if (newRowNum === 0) {
+                    if (col === 0) {
+                        var tableCell = document.createElement('td');
+                        tableCell.className = 'zero-height zero-width col' + '_' + col;
+                        tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
+                    } else {
+                        var tableCell = document.createElement('td');
+                        tableCell.className = 'zero-height col' + '_' + col;
+                        tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
+                    }
+                } else {
+                    var tableCell = document.createElement('td');
+                    tableCell.className = 'zero-width col' + '_' + col;
+                    tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
+                }
+            } else {
+                var tableCell = createTableCell(newRowNum, col);
+                var gridCell = createGridCell(newRowNum, col);
+                var dragHandleContainer = createMergeHandle(newRowNum, col);
+            }
+            tableRow.appendChild(tableCell);
+            if (!((newRowNum === 0) || (col === 0))) {
+                gridRow.appendChild(gridCell);
+                $('#drag-handle-containers-container').append(dragHandleContainer);
+            }
+        }
+
+        // it's the selected component, so this shouldn't cause problems
+        $('#main-cell-table tr:last').after(tableRow);
+        $('#main-grid-table tr:last').after(gridRow);
+        //$('#main-cell-table').append(tableRow);
+        //$('#main-grid-table').append(gridRow);
+
+    }
+
+    resizeTableToZoom();
+
+    // after the cells have been appended
+    for (var newRow = 1; newRow <= n; newRow++) {
+        var newRowNum = lastRowNum + newRow;
+        addRowResizeHandler(newRowNum);
+        for (var col = 0; col <= numCols; col++) {
+            resetMergeHandleContainerSizeAndPosition(newRowNum, col);
+            registerCellDroppable("cell"+'_'+newRowNum+'_'+col);
         }
     }
 
-    loadTable(selectedUserComponent);
-    if (saveTableLockedHeight){
-        alignCellsAndGridWithSavedRatios();
-    } else {
+    bitmapNew = make2dArray(numRows, numCols);
+    updateBitmap();
+    bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
+
+
+    if (!savedTableLockedHeight){
+        // if not locked resize the table height accordingly
+        // do this after the table has been fitted to the new size
         saveRowColRatiosGrid(true, true);
     }
-    // because load table resets this
-    toggleTableWidthLock(saveTableLockedWidth);
-    toggleTableHeightLock(saveTableLockedHeight);
+
+    toggleTableHeightLock(savedTableLockedHeight);
+
+
+    //loadTable(selectedUserComponent);
+    //if (saveTableLockedHeight){
+    //    alignCellsAndGridWithSavedRatios();
+    //} else {
+    //    saveRowColRatiosGrid(true, true);
+    //}
+    //// because load table resets this
+    //toggleTableWidthLock(saveTableLockedWidth);
+    //toggleTableHeightLock(saveTableLockedHeight);
 
 }
 
@@ -2171,6 +2165,10 @@ function addNRowsToEnd(n) {
 //}
 
 function removeNRowsFromEnd(n) {
+    // before anything has changed
+    var savedTableLockedHeight = tableLockedHeight;
+    toggleTableHeightLock(false);
+
     var cellsNeedingRowspanCut = {};
 
     var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
@@ -2182,15 +2180,13 @@ function removeNRowsFromEnd(n) {
     selectedUserComponent.dimensions.rows = lastRowNum - n;
     numRows -= n;
 
-    var saveTableLockedWidth = tableLockedWidth;
-    var saveTableLockedHeight = tableLockedHeight;
 
     var ratioToRemoveGrid = 0;
     for (var rowToRemove = 0; rowToRemove < n; rowToRemove++){
         ratioToRemoveGrid += selectedUserComponent.layout[lastRowNum - rowToRemove][1].ratio.grid.height;
     }
 
-    if (tableLockedHeight) {
+    if (savedTableLockedHeight) {
         // if table width locked, resize the other cells accordingly
         for (var row = 1; row<= numRows; row++){
             for (var col = 1; col<= numCols; col++){
@@ -2244,12 +2240,19 @@ function removeNRowsFromEnd(n) {
 
     resizeTableToZoom();
 
-    if (!tableLockedHeight){
+    bitmapNew = make2dArray(numRows, numCols);
+    updateBitmap();
+    bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
+
+
+    if (!savedTableLockedHeight){
         // if not locked resize the table height accordingly
         // do this after the table has been fitted to the new size
         selectedUserComponent.layout.tablePxDimensions.height = (1-ratioToRemoveGrid)*selectedUserComponent.layout.tablePxDimensions.height
         saveRowColRatiosGrid(false, false);
     }
+
+    toggleTableHeightLock(savedTableLockedHeight);
 
     //loadTable(selectedUserComponent);
     //if (saveTableLockedHeight){
@@ -2495,6 +2498,10 @@ function addNColsToEnd(n) {
 
 
 function removeNColsFromEnd(n) {
+    // before anything has changed
+    var savedTableLockedWidth = tableLockedWidth;
+    toggleTableWidthLock(false); // in order to unlock the last col
+
     var cellsNeedingColspanCut = {};
 
     var lastColNum = parseInt(selectedUserComponent.dimensions.cols);
@@ -2504,15 +2511,12 @@ function removeNColsFromEnd(n) {
     selectedUserComponent.dimensions.cols = lastColNum - n;
     numCols -= n;
 
-    var saveTableLockedWidth = tableLockedWidth;
-    var saveTableLockedHeight = tableLockedHeight;
-
     var ratioToRemoveGrid = 0;
     for (var colToRemove = 0; colToRemove<n; colToRemove++){
         ratioToRemoveGrid += selectedUserComponent.layout[1][lastColNum-colToRemove].ratio.grid.width;
     }
 
-    if (tableLockedWidth) {
+    if (savedTableLockedWidth) {
         // if table width locked, resize the other cells accordingly
         for (var col = 1; col<= numCols; col++){
             for (var row = 1; row<= numRows; row++){
@@ -2566,12 +2570,19 @@ function removeNColsFromEnd(n) {
     }
     resizeTableToZoom();
 
-    if (!tableLockedWidth) {
+    bitmapNew = make2dArray(numRows, numCols);
+    updateBitmap();
+    bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
+
+
+    if (!savedTableLockedWidth) {
         // if not locked resize the table width accordingly
         // do this after the table has been fitted to the new size
         selectedUserComponent.layout.tablePxDimensions.width = (1-ratioToRemoveGrid)*selectedUserComponent.layout.tablePxDimensions.width
         saveRowColRatiosGrid(false, false);
     }
+
+    toggleTableWidthLock(savedTableLockedWidth); // in order to lock last col again
 
     //loadTable(selectedUserComponent);
     //if (saveTableLockedWidth){

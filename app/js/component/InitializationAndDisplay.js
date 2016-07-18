@@ -687,8 +687,7 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and Display Helpers ** ** ** ** ** ** ** ** **/
-
-function registerDroppable(componentId) {
+function cellTrashDroppableSettings(){
     var enableDrop = {
         accept: ".widget",
         hoverClass: "highlight",
@@ -725,9 +724,18 @@ function registerDroppable(componentId) {
 
         }
     };
-    $('.droppable').each(function() {
+    return enableDrop;
+}
+
+function registerCellDroppable(cellId){
+    $('#'+cellId).droppable(cellTrashDroppableSettings());
+}
+
+
+function registerDroppable() {
+    $('.droppable').each(function(){
         if (!$(this).hasClass('page-component-toggle-drop')){
-            $(this).droppable(enableDrop);
+            $(this).droppable(cellTrashDroppableSettings());
         }
     });
 }
