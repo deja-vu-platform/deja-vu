@@ -341,11 +341,14 @@ function setComponentOptions(component){
             if (newName.length === 0) { // empty string entered, don't change the name!
                 return;
             }
+            $('.components').find('[data-componentid='+component.meta.id+']').find('.component-name').text(newName);
+
             componentNameElt.text($(this).val());
             //// update the display of the component box
             //$('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
             component.meta.name = $(this).val();
+
 
 
             // changing the ids todo: is this a good idea?
@@ -465,6 +468,8 @@ function displayNewComponentInMainPagesList(name, id){
             + '<div class="submit-rename not-displayed">'
                 + '<input type="text" class="new-name-input form-control" autofocus>'
             + '</div>'
+        + '</div>'
+        + '<div class="index-page-toggle">'
         + '</div>'
         + '</li>';
     $('#main-pages-list').append(newComponentElt);

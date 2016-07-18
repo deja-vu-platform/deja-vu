@@ -178,16 +178,10 @@ function enableComponentDOMElements(componentId){
         if (classes.length>0){
             classes = classes.split(' ');
             var classNames = '';
-            var idx = 0;
             classes.forEach(function(className){
-                if (idx = 0){
-                    classNames = className.replace('disabled_'+componentId+'_', '');
-                } else {
-                    classNames =  classNames  + ' ' +  className.replace('disabled_'+componentId+'_', '');
-                }
-                idx++;
+                classNames =  classNames  + ' ' +  className.replace('disabled_'+componentId+'_', '');
             });
-            this.className = classNames;
+            this.className = classNames.trim();
         }
     });
 }
@@ -2826,7 +2820,7 @@ function addDeleteUserComponentButton(userComponentId){
             });
         }, function(){
             $(this).find('.component-name-container').css({
-                width: '100%'
+                width: '95%'
             });
             $(this).find('.btn-delete-component').css({
                 display: 'none',

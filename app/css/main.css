@@ -109,7 +109,7 @@ a{
 }
 
 .components .component-name-container{
-    width: 100%;
+    width: 95%;
 }
 .component-name-container{
     display: inline-block;
@@ -160,6 +160,18 @@ li.selected {
     margin: 0px 15px 0px 5px;
 }
 
+.components .index-page-toggle{
+    border: 1px #888888 solid;
+    border-radius: 5px;
+    height: 100%;
+    width: 5%;
+    display: inline-block;
+    float: right;
+}
+
+.components .selected-index-page .index-page-toggle{
+    background: green;
+}
 
 /*===================================================
                   MAIN TABLE
