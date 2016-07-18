@@ -771,65 +771,6 @@ function registerDraggable() {
     });
 
 }
-//
-//function dragZoomFixes(thisElement, zoomedContainerElement){
-//    return {
-//        start : function(evt, ui) {
-//            pointerY = (evt.pageY - $(zoomedContainerElement).offset().top) / currentZoom - parseInt($(evt.target).css('top'));
-//            pointerX = (evt.pageX - $(zoomedContainerElement).offset().left) / currentZoom - parseInt($(evt.target).css('left'));
-//        },
-//        drag : function(evt, ui) {
-//            var canvasTop = $(zoomedContainerElement).offset().top;
-//            var canvasLeft = $(zoomedContainerElement).offset().left;
-//            var canvasHeight = $(zoomedContainerElement).height();
-//            var canvasWidth = $(zoomedContainerElement).width();
-//
-//            //// Check if element is outside canvas
-//            //if (ui.position.left < 0) ui.position.left = 0;
-//            //if (ui.position.left + $(thisElement).width() > canvasWidth) ui.position.left = canvasWidth - $(thisElement).width();
-//            //if (ui.position.top < 0) ui.position.top = 0;
-//            //if (ui.position.top + $(thisElement).height() > canvasHeight) ui.position.top = canvasHeight - $(thisElement).height();
-//
-//            //// when it's inside the zoomed container
-//            //if (!((ui.position.left < 0) ||
-//            //    (ui.position.left + $(thisElement).width() > canvasWidth) ||
-//            //    (ui.position.top < 0) ||
-//            //    (ui.position.top + $(thisElement).height() > canvasHeight))) {
-//            //
-//            //    // Fix for zoom
-//            //    ui.position.top = Math.round((evt.clientY - canvasTop) / currentZoom);
-//            //    ui.position.left = Math.round((evt.clientX - canvasLeft) / currentZoom);
-//            //
-//            //    // Finally, make sure offset aligns with position
-//            //    ui.offset.top = Math.round(ui.position.top + canvasTop);
-//            //    ui.offset.left = Math.round(ui.position.left + canvasLeft);
-//            //}
-//
-//            // when it's inside the zoomed container
-//            if (
-//                (ui.offset.top >= canvasTop) &&
-//                (ui.offset.top + $(thisElement).height() <= canvasTop + canvasHeight) &&
-//                (ui.offset.left >= canvasLeft) &&
-//                (ui.offset.left + $(thisElement).width() <= canvasLeft + canvasWidth)
-//            ){
-//                ui.offset.top = Math.round((evt.clientY - canvasTop) / currentZoom + canvasTop);
-//                ui.offset.left = Math.round((evt.clientX - canvasLeft) / currentZoom + canvasLeft);
-//
-//                //ui.offset.top = Math.round((ui.offset.top - canvasTop) / currentZoom + canvasTop);
-//                //ui.offset.left = Math.round((ui.offset.left - canvasLeft) / currentZoom + canvasLeft);
-//
-//
-//                //ui.offset.top = Math.round(ui.offset.top / currentZoom);
-//                //ui.offset.left = Math.round(ui.offset.left / currentZoom);
-//                //ui.offset.top = Math.round(evt.screenY / currentZoom);
-//                //ui.offset.left = Math.round(evt.screenX / currentZoom);
-//
-//
-//            }
-//        }
-//    }
-//}
-
 
 function getSliderValFromZoom(zoom){
     var max = parseFloat($('#zoom-slider').get(0).max);
@@ -1333,7 +1274,8 @@ $('#reset-width-ratios').click(function(){
             selectedUserComponent.layout[row][col].ratio.grid.width = widthRatio;
         }
     }
-    loadTableWithLocksSaved(selectedUserComponent);
+    resizeTableToZoom();
+    //loadTableWithLocksSaved(selectedUserComponent);
 });
 
 
@@ -1344,7 +1286,8 @@ $('#reset-height-ratios').click(function(){
             selectedUserComponent.layout[row][col].ratio.grid.height = heightRatio;
         }
     }
-    loadTableWithLocksSaved(selectedUserComponent);
+    resizeTableToZoom();
+    //loadTableWithLocksSaved(selectedUserComponent);
 });
 
 
@@ -1417,9 +1360,9 @@ $('#resize-table').click(function(){
     selectedUserComponent.layout.tablePxDimensions.width = newWidth;
     selectedUserComponent.layout.tablePxDimensions.height = newHeight;
 
-    gridWidth = newWidth*currentZoom;
-    gridHeight = newHeight*currentZoom;
-
-    loadTableWithLocksSaved(selectedUserComponent);
+    //gridWidth = newWidth*currentZoom;
+    //gridHeight = newHeight*currentZoom;
+    resizeTableToZoom();
+    //loadTableWithLocksSaved(selectedUserComponent);
 
 });
