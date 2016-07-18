@@ -2022,29 +2022,17 @@ function addNRowsToEnd(n) {
         var gridRow = createEmptyRow(newRowNum);
 
         for (var col = 0; col <= numCols; col++) {
-            if ((newRowNum === 0) || (col === 0)) {
-                if (newRowNum === 0) {
-                    if (col === 0) {
-                        var tableCell = document.createElement('td');
-                        tableCell.className = 'zero-height zero-width col' + '_' + col;
-                        tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
-                    } else {
-                        var tableCell = document.createElement('td');
-                        tableCell.className = 'zero-height col' + '_' + col;
-                        tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
-                    }
-                } else {
-                    var tableCell = document.createElement('td');
-                    tableCell.className = 'zero-width col' + '_' + col;
-                    tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
-                }
+            if (col === 0) {
+                var tableCell = document.createElement('td');
+                tableCell.className = 'zero-height zero-width col' + '_' + col;
+                tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
             } else {
                 var tableCell = createTableCell(newRowNum, col);
                 var gridCell = createGridCell(newRowNum, col);
                 var dragHandleContainer = createMergeHandle(newRowNum, col);
             }
             tableRow.appendChild(tableCell);
-            if (!((newRowNum === 0) || (col === 0))) {
+            if (!(col === 0)) {
                 gridRow.appendChild(gridCell);
                 $('#drag-handle-containers-container').append(dragHandleContainer);
             }
@@ -2344,16 +2332,17 @@ function removeNRowsFromEnd(n) {
 //
 
 function addNColsToEnd(n) {
+    var savedTableLockedWidth = tableLockedWidth;
+    toggleTableWidthLock(false);
+
+
     var lastColNum = parseInt(selectedUserComponent.dimensions.cols);
     var newNumCols = lastColNum + n;
 
     selectedUserComponent.dimensions.cols = newNumCols;
     numCols = newNumCols;
 
-    var saveTableLockedWidth = tableLockedWidth;
-    var saveTableLockedHeight = tableLockedHeight;
-
-    if (tableLockedWidth) { // if table width constant
+    if (savedTableLockedWidth) { // if table width constant
         // for each new column, width is 1/newNumCols
         for (var newCol = 1; newCol <= n; newCol++){
             for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
@@ -2399,7 +2388,7 @@ function addNColsToEnd(n) {
                     // take the height of the grid-cell to the left (grid-cell, in case the cell is merged)
                     ratio: {
                         grid: {
-                            width: (currentZoom * standardCellWidth) / (gridWidth),
+                            width: standardCellWidth / selectedUserComponent.layout.tablePxDimensions.width,
                             height: selectedUserComponent.layout[row][lastColNum].ratio.grid.height
                         }
                     }
@@ -2407,16 +2396,71 @@ function addNColsToEnd(n) {
             }
         }
     }
-    loadTable(selectedUserComponent);
-    if (saveTableLockedWidth){
-        alignCellsAndGridWithSavedRatios();
-    } else {
+
+    for (var newCol = 1; newCol <= n; newCol++){
+        for (var row = 0; row <= selectedUserComponent.dimensions.rows; row++) {
+            var newColNum = lastColNum + newCol;
+            if (row === 0) {
+                var tableCell = document.createElement('td');
+                tableCell.className = 'zero-height col' + '_' + newColNum;
+                tableCell.id = 'cell' + '_' + row + '_' + newColNum;
+            } else {
+                var tableCell = createTableCell(row, newColNum);
+                var gridCell = createGridCell(row, newColNum);
+                var dragHandleContainer = createMergeHandle(row, newColNum);
+            }
+            $('#main-cell-table .row_'+row).append(tableCell);
+            if (!(row === 0)) {
+                $('#main-grid-table .row_'+row).append(gridCell);
+                $('#drag-handle-containers-container').append(dragHandleContainer);
+            }
+        }
+    }
+
+    resizeTableToZoom();
+
+    // after the cells have been appended
+    for (var newCol = 1; newCol <= n; newCol++){
+        var newColNum = lastColNum + newCol;
+        addColResizeHandler(newColNum);
+        for (var row = 0; row <= selectedUserComponent.dimensions.rows; row++) {
+            resetMergeHandleContainerSizeAndPosition(row, newColNum);
+            registerCellDroppable("cell"+'_'+row+'_'+newColNum);
+        }
+    }
+
+
+
+    //addRowResizeHandler(newRowNum);
+
+
+
+    bitmapNew = make2dArray(numRows, numCols);
+    updateBitmap();
+    bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
+
+
+    if (!savedTableLockedWidth){
+        // if not locked resize the table height accordingly
+        // do this after the table has been fitted to the new size
         saveRowColRatiosGrid(true, true);
     }
 
-    // because load table resets this
-    toggleTableWidthLock(saveTableLockedWidth);
-    toggleTableHeightLock(saveTableLockedHeight);
+    toggleTableWidthLock(savedTableLockedWidth);
+
+
+
+    //loadTable(selectedUserComponent);
+    //
+    //if (saveTableLockedWidth){
+    //    alignCellsAndGridWithSavedRatios();
+    //} else {
+    //    saveRowColRatiosGrid(true, true);
+    //}
+    //
+    //// because load table resets this
+    //toggleTableWidthLock(saveTableLockedWidth);
+    //toggleTableHeightLock(saveTableLockedHeight);
 }
 
 
