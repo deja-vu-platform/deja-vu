@@ -2185,14 +2185,13 @@ function removeNRowsFromEnd(n) {
     var saveTableLockedWidth = tableLockedWidth;
     var saveTableLockedHeight = tableLockedHeight;
 
+    var ratioToRemoveGrid = 0;
+    for (var rowToRemove = 0; rowToRemove < n; rowToRemove++){
+        ratioToRemoveGrid += selectedUserComponent.layout[lastRowNum - rowToRemove][1].ratio.grid.height;
+    }
 
     if (tableLockedHeight) {
         // if table width locked, resize the other cells accordingly
-        var ratioToRemoveGrid = 0;
-        for (var rowToRemove = 0; rowToRemove < n; rowToRemove++){
-            ratioToRemoveGrid += selectedUserComponent.layout[lastRowNum - rowToRemove][1].ratio.grid.height;
-        }
-
         for (var row = 1; row<= numRows; row++){
             for (var col = 1; col<= numCols; col++){
                 var oldRatio = selectedUserComponent.layout[row][col].ratio.grid.height;
@@ -2244,6 +2243,13 @@ function removeNRowsFromEnd(n) {
     }
 
     resizeTableToZoom();
+
+    if (!tableLockedHeight){
+        // if not locked resize the table height accordingly
+        // do this after the table has been fitted to the new size
+        selectedUserComponent.layout.tablePxDimensions.height = (1-ratioToRemoveGrid)*selectedUserComponent.layout.tablePxDimensions.height
+        saveRowColRatiosGrid(false, false);
+    }
 
     //loadTable(selectedUserComponent);
     //if (saveTableLockedHeight){
@@ -2501,13 +2507,13 @@ function removeNColsFromEnd(n) {
     var saveTableLockedWidth = tableLockedWidth;
     var saveTableLockedHeight = tableLockedHeight;
 
+    var ratioToRemoveGrid = 0;
+    for (var colToRemove = 0; colToRemove<n; colToRemove++){
+        ratioToRemoveGrid += selectedUserComponent.layout[1][lastColNum-colToRemove].ratio.grid.width;
+    }
+
     if (tableLockedWidth) {
         // if table width locked, resize the other cells accordingly
-        var ratioToRemoveGrid = 0;
-        for (var colToRemove = 0; colToRemove<n; colToRemove++){
-            ratioToRemoveGrid += selectedUserComponent.layout[1][lastColNum-colToRemove].ratio.grid.width;
-        }
-
         for (var col = 1; col<= numCols; col++){
             for (var row = 1; row<= numRows; row++){
                 var oldRatio = selectedUserComponent.layout[row][col].ratio.grid.width;
@@ -2560,7 +2566,12 @@ function removeNColsFromEnd(n) {
     }
     resizeTableToZoom();
 
-
+    if (!tableLockedWidth) {
+        // if not locked resize the table width accordingly
+        // do this after the table has been fitted to the new size
+        selectedUserComponent.layout.tablePxDimensions.width = (1-ratioToRemoveGrid)*selectedUserComponent.layout.tablePxDimensions.width
+        saveRowColRatiosGrid(false, false);
+    }
 
     //loadTable(selectedUserComponent);
     //if (saveTableLockedWidth){
