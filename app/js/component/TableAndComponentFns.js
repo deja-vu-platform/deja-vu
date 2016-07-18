@@ -2841,6 +2841,9 @@ function deleteUserComponent(userComponentId){
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").attr('id', 'selected');
         loadTable(selectedUserComponent);
     }
+    if (userComponentId == selectedProject.mainComponents.indexId){
+        selectedProject.mainComponents.indexId = null;
+    }
     $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
     $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
 

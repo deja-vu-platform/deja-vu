@@ -167,6 +167,7 @@ li.selected {
     width: 5%;
     display: inline-block;
     float: right;
+    cursor: pointer;
 }
 
 .components .selected-index-page .index-page-toggle{
@@ -493,4 +494,20 @@ p.label {
 }
 .btn-group-vertical>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
     border-top-right-radius: 4px !important;
+}
+
+
+
+
+
+#blank-bg{
+    height: 640px;
+    width: 1200px;
+    position: absolute;
+    background-color: white;
+    top: 0;
+    left: 0;
+    z-index: 500;
+    pointer-events: none;
+    display: none;
 }

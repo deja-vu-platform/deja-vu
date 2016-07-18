@@ -1371,3 +1371,17 @@ $('#resize-table').click(function(){
     //loadTableWithLocksSaved(selectedUserComponent);
 
 });
+
+
+$('.components').on('click', '.index-page-toggle', function(){
+    var turnOn = !($(this).parent().hasClass('selected-index-page'));
+    $('.components .selected-index-page').removeClass('selected-index-page');
+    var componentId = $(this).parent().data('componentid');
+    if (turnOn){
+        selectedProject.mainComponents.indexId = componentId;
+        $(this).parent().addClass('selected-index-page');
+    } else {
+        selectedProject.mainComponents.indexId = null;
+    }
+});
+

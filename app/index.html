@@ -641,8 +641,41 @@
     </div>
 </div>
 
+<div id="blank-bg"></div>
 
 <!--MODALS-->
+<div class="modal fade" id="first-main-page">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">Create your first page...</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Page name: </div>
+                    <div class="col-sm-7"><input id="first-page-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Size: </div>
+                    <div class="col-sm-7">
+                        <select id="select-size">
+                            <option value="1" selected="selected">1200x640</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <p><button id="create-first-page" data-dismiss="modal" class="btn btn-primary">Create</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <div class="modal fade" id="new-component">
     <div class="modal-dialog modal-md">
         <div class="modal-content">
