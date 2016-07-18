@@ -1701,22 +1701,11 @@ function addTableResizeHandler(componentId){
             });
             selectedUserComponent.layout.tablePxDimensions.width = (parseFloat($('#table-resize-div').css('width'))-20)/currentZoom;
             selectedUserComponent.layout.tablePxDimensions.height = (parseFloat($('#table-resize-div').css('height'))-20)/currentZoom;
+            resizeTableToZoom();
+
+            // updating this again to fix for rounding errors
             gridWidth = (parseFloat($('#table-resize-div').css('width'))-20);
             gridHeight = (parseFloat($('#table-resize-div').css('height'))-20);
-
-            $('.grid').each(function(){
-                var rowcol = getRowColFromId(this.id);
-                var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
-                var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
-                $(this).css({
-                    height: (actualHeight)*currentZoom + 'px',
-                    width: (actualWidth)*currentZoom + 'px',
-                })
-            });
-
-            propagateCellResizeToOtherElts();
-
-            //loadTable(selectedUserComponent);
         }
     }).css({
         'pointer-events':'none',
@@ -2244,19 +2233,27 @@ function removeNRowsFromEnd(n) {
     }
 
     for (var rowToRemove = 0; rowToRemove < n; rowToRemove++){
-        delete selectedUserComponent.layout[lastRowNum - rowToRemove];
+        var rowToRemoveNum = lastRowNum - rowToRemove;
+        // update datatype
+        delete selectedUserComponent.layout[rowToRemoveNum];
+        // update view
+        $('.row'+'_'+rowToRemoveNum).remove();
+        for (var col = 1; col<= numCols; col++){
+            $('#drag-handle-container'+'_'+rowToRemoveNum+'_'+col).remove();
+        }
     }
 
+    resizeTableToZoom();
 
-    loadTable(selectedUserComponent);
-    if (saveTableLockedHeight){
-        alignCellsAndGridWithSavedRatios();
-    } else {
-        saveRowColRatiosGrid(true, true);
-    }
-    // because load table resets this
-    toggleTableWidthLock(saveTableLockedWidth);
-    toggleTableHeightLock(saveTableLockedHeight);
+    //loadTable(selectedUserComponent);
+    //if (saveTableLockedHeight){
+    //    alignCellsAndGridWithSavedRatios();
+    //} else {
+    //    saveRowColRatiosGrid(true, true);
+    //}
+    //// because load table resets this
+    //toggleTableWidthLock(saveTableLockedWidth);
+    //toggleTableHeightLock(saveTableLockedHeight);
 
 }
 
@@ -2553,25 +2550,28 @@ function removeNColsFromEnd(n) {
     // deleting later in case the calculations above need these values to exist
     for (var colToRemove = 0; colToRemove<n; colToRemove++) {
         for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
-            delete selectedUserComponent.layout[row][lastColNum-colToRemove];
+            var colToRemoveNum = lastColNum-colToRemove;
+            // update the datatype
+            delete selectedUserComponent.layout[row][colToRemoveNum];
+            // update the display
+            $('.col'+'_'+colToRemoveNum).remove();
+            $('#drag-handle-container'+'_'+row+'_'+colToRemoveNum).remove();
         }
     }
-    // can be done without reloiading the whole table,
-    // just delete the column from the view table
-    // and save rowcol ratios
+    resizeTableToZoom();
 
 
 
-    loadTable(selectedUserComponent);
-    if (saveTableLockedWidth){
-        alignCellsAndGridWithSavedRatios();
-    } else {
-        saveRowColRatiosGrid(true, true);
-    }
-
-    // because load table resets this
-    toggleTableWidthLock(saveTableLockedWidth);
-    toggleTableHeightLock(saveTableLockedHeight);
+    //loadTable(selectedUserComponent);
+    //if (saveTableLockedWidth){
+    //    alignCellsAndGridWithSavedRatios();
+    //} else {
+    //    saveRowColRatiosGrid(true, true);
+    //}
+    //
+    //// because load table resets this
+    //toggleTableWidthLock(saveTableLockedWidth);
+    //toggleTableHeightLock(saveTableLockedHeight);
 }
 
 

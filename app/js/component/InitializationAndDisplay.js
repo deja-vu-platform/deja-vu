@@ -858,6 +858,23 @@ function getZoomFromSliderVal(){
     return zoom;
 };
 
+function resizeTableToZoom(){
+    $('.grid').each(function(){
+        var rowcol = getRowColFromId(this.id);
+        var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
+        var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+        $(this).css({
+            height: (actualHeight)*currentZoom + 'px',
+            width: (actualWidth)*currentZoom + 'px',
+        })
+    });
+
+    gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
+    gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+
+    propagateCellResizeToOtherElts();
+
+}
 
 function changeZoom(isFit){
     if (!isFit){
@@ -875,27 +892,11 @@ function changeZoom(isFit){
         var sliderVal = getSliderValFromZoom(currentZoom);
         $('#zoom-slider').val(sliderVal);
     }
-
-    $('.grid').each(function(){
-        var rowcol = getRowColFromId(this.id);
-        var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
-        var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
-        $(this).css({
-            height: (actualHeight)*currentZoom + 'px',
-            width: (actualWidth)*currentZoom + 'px',
-        })
-    });
-
     var state = $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state');
     state.zoom = currentZoom;
     $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', state);
 
-
-    gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
-    gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
-
-    propagateCellResizeToOtherElts();
-
+    resizeTableToZoom();
 };
 
 
