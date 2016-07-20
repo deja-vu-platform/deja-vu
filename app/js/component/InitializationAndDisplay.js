@@ -408,6 +408,39 @@ function setComponentOptions(component){
             }
         });
 
+    if (selectedUserComponent.meta.id in selectedProject.mainComponents){
+        $('.component-options #btn-index-page-toggle').css({
+            display: 'inline-block',
+        });
+        setUpComponentOptionsIndexPageToggle();
+    } else {
+        $('.component-options #btn-index-page-toggle').css({
+            display: 'none',
+        })
+    }
+
+
+}
+
+function setUpComponentOptionsIndexPageToggle(){
+    if (selectedUserComponent.meta.id == selectedProject.mainComponents.indexId){
+        $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
+        $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
+        $('.component-options #btn-index-page-toggle').unbind().click(function(){
+            $(this).find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
+            $(this).find('.text').text('Assign as Index Page');
+            $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').find('.index-page-toggle').trigger('click');
+        });
+    } else {
+        $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
+        $('.component-options #btn-index-page-toggle').find('.text').text('Assign as Index Page');
+        $('.component-options #btn-index-page-toggle').unbind().click(function(){
+            $(this).find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
+            $(this).find('.text').text('Unassign as Index Page');
+            $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').find('.index-page-toggle').trigger('click');
+        });
+
+    }
 }
 
 /** ** ** ** ** ** Component Adding to Project and Display helpers ** ** ** ** ** ** ** ** ** **/
@@ -1383,5 +1416,6 @@ $('.components').on('click', '.index-page-toggle', function(){
     } else {
         selectedProject.mainComponents.indexId = null;
     }
+    setUpComponentOptionsIndexPageToggle();
 });
 
