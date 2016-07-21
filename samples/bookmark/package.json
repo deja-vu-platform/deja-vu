@@ -12,7 +12,6 @@
     "client-bus": "file:../../core/client-bus",
     "dv-access-auth": "file:../../catalog/access/auth",
     "dv-community-follow": "file:../../catalog/community/follow",
-    "dv-composer": "file:../../core/composer",
     "dv-messaging-feed": "file:../../catalog/messaging/feed",
     "dv-messaging-post": "file:../../catalog/messaging/post",
     "dv-organization-label": "file:../../catalog/organization/label",

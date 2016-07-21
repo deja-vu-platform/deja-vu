@@ -1,29 +1,89 @@
 /// <reference path="../typings/tsd.d.ts" />
+import {Promise} from "es6-promise";
 import * as express from "express";
-import * as http from "http";
 const express_graphql = require("express-graphql");
 const graphql = require("graphql");
+const rp = require("request-promise");
+
+import * as _u from "underscore";
+import * as _ustr from "underscore.string";
+
+
+export interface Type {
+  name: string;
+  fqelement: string;
+}
+
+export interface Field {
+  name: string;
+  "type": Type;
+}
+
+export interface TypeBond {
+  types: Type[];
+  subtype: Type;
+}
+
+export interface FieldBond {
+  fields: Field[];
+  subfield: Field;
+}
+
+export interface CompInfo {
+  tbonds: TypeBond[];
+  fbonds: FieldBond[];
+}
+
+
+const BUS_PATH = "/dv-bus";
 
 
 export class ServerBus {
+  private _dispatcher: Dispatcher;
+
   constructor(
-      private _element: string,
-      private _loc: string,
+      fqelement: string,
       private _ws: express.Express,
-      private _hostname: string, private _port: number,
-      private _handlers: any, private _comp_info: any, private _locs: any) {
+      private _handlers: any, comp_info: CompInfo, locs: any) {
+    this._dispatcher = new Dispatcher(fqelement, comp_info, locs);
 
     const build_field = (action, t, handlers) => {
+      const forward_wrap = handler => {
+        if (handler === undefined) {
+          console.log("WARNING: no handler provided for " + action + " " + t);
+          handler = _ => Promise.resolve(true);
+        }
+        return (_, args) => handler(_u.omit(args, "forward"))
+          .then(_ => {
+            if (args.forward !== undefined || args.forward) {
+              if (args.create !== undefined) {
+                console.log(
+                  `Forward requested for create(${t}, ${args.atom_id}, ` +
+                  `${args.create}) of ${fqelement}`);
+                return this.create_atom(
+                  t, args.atom_id, JSON.parse(args.create));
+              } else if (args.update !== undefined) {
+                console.log(
+                  `Forward requested for update(${t}, ${args.atom_id}, ` +
+                  `${args.update}) of ${fqelement}`);
+                return this.update_atom(
+                  t, args.atom_id, JSON.parse(args.update));
+              } else {
+                console.log("rm");
+              }
+            }
+            return Promise.resolve(true);
+          });
+      };
       const ret = {
         "type": graphql.GraphQLBoolean,
         args: {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          forward: {"type": graphql.GraphQLBoolean}
         },
-        resolve: handlers[t][action]
+        resolve: forward_wrap(handlers[t][action])
       };
-      let key = "atom";
-      if (action === "update") key = "update";
-      ret["args"][key] = {
+      ret["args"][action] = {
         "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
       };
       return ret;
@@ -54,74 +114,28 @@ export class ServerBus {
         stack: e.stack
       })
     });
-    _ws.options("/dv-bus", this._cors);
-    _ws.get("/dv-bus", this._cors, gql);
-    _ws.post("/dv-bus", this._cors, gql);
+    _ws.options(BUS_PATH, this._cors);
+    _ws.get(BUS_PATH, this._cors, gql);
+    _ws.post(BUS_PATH, this._cors, gql);
   }
 
-  new_atom(t: any /* GraphQLObjectType */, atom_id: string, atom: any) {
-    console.log("sending new atom to composer");
-    const atom_str = JSON.stringify(
-        this._filter_atom(t, atom)).replace(/"/g, "\\\"");
-    console.log("t is " + t.name);
-    console.log("atom id is " + atom_id);
-    this._post(`{
-      newAtom(
-        type: {
-          name: "${t.name}", element: "${this._element}",
-          loc: "${this._loc}"
-        },
-        atom_id: "${atom_id}",
-        atom: "${atom_str}")
-    }`);
+  create_atom(t_name: string, atom_id: string, create: any): Promise<boolean> {
+    console.log("sending new atom");
+    return this._dispatcher.create_atom(
+        _ustr.capitalize(t_name), atom_id, create);
   }
 
-  // no filtering update
-  update_atom(t: any /* GraphQLObjectType */, atom_id: string, update: any) {
-    console.log("sending up atom to composer");
-    const update_str = JSON.stringify(update).replace(/"/g, "\\\"");
-    this._post(`{
-      updateAtom(
-        type: {
-          name: "${t.name}", element: "${this._element}",
-          loc: "${this._loc}"
-        },
-        atom_id: "${atom_id}",
-        update: "${update_str}")
-    }`);
+  update_atom(t_name: string, atom_id: string, update: any): Promise<boolean> {
+    console.log("sending up atom");
+    return this._dispatcher.update_atom(
+        _ustr.capitalize(t_name), atom_id, update);
   }
 
-  rm_atom(t: any /* GraphQLObjectType */, id: string) {
-    console.log("sending rm atom to composer");
-    this._post(`rm`);
+  remove_atom(t_name: string, atom_id: string) {
+    console.log("sending remove atom");
+    return this._dispatcher.remove_atom(_ustr.capitalize(t_name), atom_id);
   }
 
-  config() {
-    // JSON.stringify quotes properties and graphql doesn't like that
-    const e = e => e.split("-")[2];
-    const l = t => this._locs[t.fqelement];
-    const str_t = t => (
-        `{name: "${t.name}", element: "${e(t.fqelement)}",
-          loc: "${l(t)}"}`);
-    const str_f = f => (`{
-      name: "${f.name}",
-      type: ${str_t(f.type)}
-    }`);
-    for (const tbond of this._comp_info.tbonds) {
-      this._post(`{
-        newTypeBond(
-          types: ${"[" + tbond.types.map(str_t).join(",") + "]"},
-          subtype: ${str_t(tbond.subtype)})
-      }`);
-    }
-    for (const fbond of this._comp_info.fbonds) {
-      this._post(`{
-        newFieldBond(
-          fields: ${"[" + fbond.fields.map(str_f).join(",") + "]"},
-          subfield: ${str_f(fbond.subfield)})
-      }`);
-    }
-  }
 
   private _cors(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -132,73 +146,172 @@ export class ServerBus {
     next();
   }
 
+}
 
-  private _filter_atom(t: any, atom: any) {
-    let filtered_atom = {};
-    for (const f of Object.keys(t._fields)) {
-      const atom_f = atom[f];
 
-      let filtered_atom_f = {};
-      if (Array.isArray(atom_f)) {   // list type
-        filtered_atom_f = this._filter_list(atom_f);
-      } else if (typeof atom_f === "object") {  // object type
-        filtered_atom_f["atom_id"] = atom_f["atom_id"];
-      } else {  // scalar type
-        filtered_atom_f = atom_f;
-      }
 
-      filtered_atom[f] = filtered_atom_f;
-    }
+class Dispatcher {
+  create_atom: (t_name: string, atom_id: string, create: any) =>
+    Promise<boolean>;
+  update_atom: (t_name: string, atom_id: string, update: string) =>
+    Promise<boolean>;
+  remove_atom: (t_name: string, atom_id: string) => Promise<boolean>;
+
+  private _dispatch_table;
+  private _str_t;
+
+  constructor(private _fqelement: string, comp_info: CompInfo, private _locs) {
+    this.create_atom = this._process("create", this._transform_create);
+    this.update_atom = this._process("update", this._transform_update);
+
+    this._str_t = t => JSON.stringify(t);
+    // Build dispatch table
+    this._dispatch_table = _u.chain(comp_info.tbonds)
+      .filter(tbond => _u.chain(tbond.types).union([tbond.subtype])
+          .pluck("fqelement").contains(this._fqelement).value())
+      .map(tbond => _u.chain(tbond.types).union([tbond.subtype])
+          .reduce((memo, t) => {
+            if (t.fqelement === this._fqelement) {
+              // Multiple types of the same fqelement can be part of the same
+              // bond
+              memo.names.push(t.name);
+            } else {
+              memo.targets[this._str_t(t)] = {};
+            }
+            return memo;
+          }, {names: [], targets: {}})
+          .value())
+      .reduce((memo, {names, targets}) => {
+        for (const name of names) {
+          if (memo[name] === undefined) memo[name] = {};
+          memo[name] = _u.extendOwn(memo[name], targets);
+        }
+        return memo;
+      }, {})
+      .value();
+
+    _u.chain(comp_info.fbonds)
+      .filter(fbond => _u.chain(fbond.fields).union([fbond.subfield])
+          .pluck("type").pluck("fqelement").contains(this._fqelement).value())
+      .map(fbond => _u.chain(fbond.fields).union([fbond.subfield])
+          .reduce((memo, f) => {
+            if (f.type.fqelement === this._fqelement) {
+              // Multiple fields of the same fqelement can be part of the same
+              // bond
+              memo.our_fields.push({fname: f.name, tname: f.type.name});
+            } else {
+              memo.fields.push(f);
+            }
+            return memo;
+          }, {our_fields: [], fields: []})
+          .value())
+      .each(obj => {
+        for (const f of obj.fields) {
+          for (const {fname, tname} of obj.our_fields) {
+            const t_str = this._str_t(f.type);
+            const field_map = {};
+            field_map[fname] = f.name;
+            _u.extend(this._dispatch_table[tname][t_str], field_map);
+          }
+        }
+      });
+
     console.log(
-        "BEFORE FILTER <" + JSON.stringify(atom) + "> AFTER FILTER <" +
-        JSON.stringify(filtered_atom) + ">");
-    return filtered_atom;
+        "Dispatch table for " + this._fqelement + ":" +
+        JSON.stringify(this._dispatch_table));
   }
 
-  private _filter_list(l: Array<any>) {
-    return l.map(atom => {
-      let filtered_atom = {};
-      if (typeof atom === "object") {
-        filtered_atom["atom_id"] = atom["atom_id"];
-      } else if (atom["Symbol.iterator"] === "function") {
-        filtered_atom = this._filter_list(atom);
-      } else {
-        filtered_atom = atom;
-      }
-      return filtered_atom;
-    });
+  private _process(op: string, transform_fn: any) {
+    return (t_name: string, atom_id: string, info: any) => Promise.all(
+        _u.values(_u.mapObject(
+            this._dispatch_table[t_name],
+            (field_map, target_str) => {
+              const target = JSON.parse(target_str);
+              const transformed_info = transform_fn(info, field_map);
+              if (op === "update" && _u.isEmpty(transformed_info)) {
+                console.log("No need to send update to " +  target_str);
+                return Promise.resolve(true);
+              }
+              const info_str = JSON.stringify(transformed_info)
+                   .replace(/"/g, "\\\"");
+              return this._post(this._locs[target.fqelement], `{
+                  ${op}_${target.name.toLowerCase()}(
+                    atom_id: "${atom_id}", ${op}: "${info_str}")
+              }`);
+            }))).then(_ => true);
   }
 
-  private _post(query) {
+  private _transform_create(atom: any, field_map: string) {
+    return _u.reduce(_u.keys(atom), (memo, field: string) => {
+        const target_field = field_map[field];
+        if (target_field !== undefined) {
+          memo[target_field] = atom[field];
+        }
+        return memo;
+    }, {});
+  }
+
+  private _transform_update(update: any, field_map: string) {
+    // { operator1: {field: value, ...}, operator2: {field: value, ...} }
+    return _u.reduce(
+            _u.keys(update),
+            (memo, op: string) => {
+              const op_update_obj = update[op];
+              const transformed_op_update_obj = _u
+                  .reduce(_u.keys(op_update_obj), (memo, field: string) => {
+                    // field could have dots (the update could be modifying
+                    // nested objs)
+                    const transformed_field: string = _u.chain(field.split("."))
+                      .map(subfield => {
+                        if (!_u.isNaN(Number(subfield))) {
+                          return subfield;
+                        } else {
+                          return field_map[subfield];
+                        }
+                      })
+                      .reduce((memo: string, subfield: string): string => {
+                        if (memo === undefined || subfield === undefined)  {
+                          return undefined;
+                        }
+                        memo = memo + "." + subfield;
+                        return memo;
+                      })
+                      .value();
+                    if (transformed_field !== undefined) {
+                      memo[transformed_field] = op_update_obj[field];
+                    }
+                    return memo;
+                  }, {});
+
+              if (!_u.isEmpty(transformed_op_update_obj)) {
+                memo[op] = transformed_op_update_obj;
+              }
+              return memo;
+            }, {});
+  }
+
+  private _post(loc, query) {
     const query_str = query.replace(/ /g, "");
-    const post_data = JSON.stringify({query: "mutation " + query_str});
 
     const options = {
-      hostname: this._hostname,
-      port: this._port,
+      uri: loc + BUS_PATH,
       method: "post",
-      path: "/graphql",
-      headers: {
-        "Content-type": "application/json",
-        "Content-length": post_data.length
-      }
+      body: {
+        query: "mutation " + query_str
+      },
+      json: true
     };
 
-    console.log("using options " + JSON.stringify(options));
-    console.log("query is <" + query_str + ">");
-    const req = http.request(options);
-    req.on("response", res => {
-      let body = "";
-      res.on("data", d => { body += d; });
-      res.on("end", () => {
-        console.log(
-          `got ${body} back from the bus for query ${query_str},
-           options ${JSON.stringify(options)}`);
-      });
-    });
-    req.on("error", err => console.log(err));
-
-    req.write(post_data);
-    req.end();
+    console.log(
+      "using options " + JSON.stringify(options) +
+      " for query <" + query_str + ">");
+    return rp(options)
+      .then(body => {
+        console.log(body);
+        return body;
+      })
+      .catch(reason => console.log(
+            `For ${loc} q ${query_str} got error: ` +
+            `${JSON.stringify(reason.error)}`));
   }
 }

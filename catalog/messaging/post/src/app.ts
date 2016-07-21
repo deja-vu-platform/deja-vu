@@ -8,7 +8,6 @@ import {ServerBus} from "server-bus";
 
 
 const mean = new Mean(
-  "post",
   (db, debug) => {
     db.createCollection("users", (err, users) => {
       if (err) throw err;
@@ -56,8 +55,7 @@ const handlers = {
 };
 
 const bus = new ServerBus(
-    "post", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
-    mean.comp, mean.locs);
+    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
 
 
 //////////////////////////////////////////////////
@@ -118,9 +116,9 @@ const schema = new graphql.GraphQLSchema({
                     {atom_id: user.atom_id},
                     {$addToSet: {posts: {atom_id: post.atom_id}}}),
                 bus.update_atom(
-                  user_type, user.atom_id,
+                  "User", user.atom_id,
                   {$addToSet: {posts: {atom_id: post.atom_id}}}),
-                bus.new_atom(post_type, post.atom_id, post)
+                bus.create_atom("Post", post.atom_id, post)
                 ]).then(_ => post));
         }
       }

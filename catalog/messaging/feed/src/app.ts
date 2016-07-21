@@ -7,7 +7,6 @@ import {ServerBus} from "server-bus";
 
 
 const mean = new Mean(
-  "feed",
   (db, debug) => {
     // Subs
     db.createCollection("subs", (err, subs) => {
@@ -76,8 +75,7 @@ const handlers = {
 };
 
 new ServerBus(
-    "feed", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
-    mean.comp, mean.locs);
+    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
 
 
 /////////////////////

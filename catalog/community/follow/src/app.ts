@@ -8,7 +8,6 @@ import {ServerBus} from "server-bus";
 
 
 const mean = new Mean(
-  "follow",
   (db, debug) => {
     db.createCollection("sources", (err, sources) => {
       if (err) throw err;
@@ -68,8 +67,7 @@ const handlers = {
 };
 
 const bus = new ServerBus(
-    "follow", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
-    mean.comp, mean.locs);
+    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
 
 
 //////////////////////////////////////////////////
@@ -188,7 +186,7 @@ function update(op) {
         };
         return mean.db.collection("sources")
           .updateOne({atom_id: s.atom_id}, update_op(t))
-          .then(_ => bus.update_atom(source_type, s.atom_id, update_op(t)));
+          .then(_ => bus.update_atom("Source", s.atom_id, update_op(t)));
       });
 }
 

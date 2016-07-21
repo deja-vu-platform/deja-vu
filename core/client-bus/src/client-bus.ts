@@ -2,7 +2,6 @@
 import {Injectable, Inject} from "angular2/core";
 import {Http, Headers} from "angular2/http";
 // import * as _ from "underscore";
-import {Observable} from "rxjs/rx";
 import "rxjs/add/operator/toPromise";
 
 
@@ -156,7 +155,7 @@ export class Atom {
     };
   }
 
-  _save(atom_id: string) {
+  _save(atom_id: string): Promise<boolean> {
     // pick some t to make the save
     const t = JSON.parse(Object.keys(this._forwards)[0]);
     console.log("picked t " + JSON.stringify(t) + " to do the save");
@@ -248,22 +247,24 @@ export class ClientBus {
       .adapt({name: t, fqelement: this._fqelement});
   }
 
-  report_save(atom_id: string, atom: any) {
+  report_save(atom_id: string, atom: any): Promise<boolean> {
     if (!(atom instanceof Atom)) {
       console.log("ERROR: reporting save on something that's not an atom");
       console.dir(atom);
-      return Promise.reject(
-          new Error("reporting save on something that's not an atom"));
+      return Promise
+        .reject(new Error("reporting save on something that's not an atom"))
+        .then(_ => true);
     }
     return atom.report_save(atom_id);
   }
 
-  report_update(update: any, atom: any) {
+  report_update(update: any, atom: any): Promise<boolean> {
     if (!(atom instanceof Atom)) {
       console.log("ERROR: reporting update on something that's not an atom");
       console.dir(atom);
-      return Promise.reject(
-          new Error("reporting update on something that's not an atom"));
+      return Promise
+        .reject(new Error("reporting update on something that's not an atom"))
+        .then(_ => true);
     }
     return atom.report_update(update);
   }
@@ -273,79 +274,40 @@ export class ClientBus {
 class Helper {
   constructor(private _http, private _locs) {}
 
-  new_atom(t: Type, atom_id: string, atom: Atom): Promise<any> {
+  new_atom(t: Type, atom_id: string, atom: Atom): Promise<boolean> {
     return this._filter_atom(t, atom)
-      .map(filtered_atom => {
+      .then(filtered_atom => {
         console.log("sending new atom to element");
         const atom_str = JSON.stringify(filtered_atom).replace(/"/g, "\\\"");
         console.log("t is " + t.name);
         console.log("atom id is " + atom_id);
-        return this._post("http://localhost:3001", `{
-           newAtom(
-             type: {
-               name: "${t.name}", element: "${this._element(t.fqelement)}",
-               loc: "${this._locs[t.fqelement]}"
-             },
+        return this._post(this._locs[t.fqelement], `{
+           create_${t.name.toLowerCase()}(
              atom_id: "${atom_id}",
-             atom: "${atom_str}",
-             self_forward: true)
-         }`).toPromise();
-      })
-      .toPromise();
+             create: "${atom_str}",
+             forward: true)
+         }`).then(_ => true);
+      });
   }
 
   // no filtering update
-  update_atom(t: Type, atom_id: string, update: any) {
+  update_atom(t: Type, atom_id: string, update: any): Promise<boolean> {
     console.log("sending up atom to composer");
     const update_str = JSON.stringify(update).replace(/"/g, "\\\"");
-    return this._post("http://localhost:3001", `{
-      updateAtom(
-        type: {
-          name: "${t.name}", element: "${this._element(t.fqelement)}",
-          loc: "${this._locs[t.fqelement]}"
-        },
+    return this._post(this._locs[t.fqelement], `{
+      update_${t.name.toLowerCase()}(
         atom_id: "${atom_id}",
         update: "${update_str}",
-        self_forward: true)
-    }`)
-    .toPromise();
+        forward: true)
+    }`).then(_ => true);
   }
 
-  private _element(fqelement: string) {
-    return fqelement.split("-")[2];
-  }
-
-  private _schema_query(t: Type) {
-    return `{
-       __type(name: "${t.name}") {
-         name,
-         fields {
-           name,
-           type {
-             name,
-             kind,
-             ofType {
-               name,
-               kind
-             }
-           }
-         }
-       }
-     }`;
-  }
-
-  private _info(t: Type) {
-    return this._get(this._locs[t.fqelement], this._schema_query(t))
-      .map(data => data.__type)
-      .map(tinfo => tinfo.fields);
-  }
-
-  private _filter_atom(t: Type, atom: Atom) {
-    let filtered_atom = {};
-    return this._info(t)
-      .map(fields => fields.map(f => f.name))
-      .map(fields => {
-        for (const f of fields) {
+  private _filter_atom(t: Type, atom: Atom): Promise<any> {
+    return this._get_fields(t)
+      .then(fields => {
+        let filtered_atom = {};
+        for (const field of fields) {
+          const f = field.name;
           const atom_f = atom[f];
 
           let filtered_atom_f = {};
@@ -380,45 +342,47 @@ class Helper {
     });
   }
 
-  private _get(loc, query): Observable<any> {
+  private _get_fields(t: Type): Promise<any> {
+    const loc = this._locs[t.fqelement];
+    const query = `{
+       __type(name: "${t.name}") {
+         name,
+         fields {
+           name,
+           type {
+             name,
+             kind,
+             ofType {
+               name,
+               kind
+             }
+           }
+         }
+       }
+     }`;
+
     const query_str = encodeURIComponent(
       query.replace(/ /g, "").replace(/\n/g, ""));
 
-    const options = {
-      uri: loc + `/graphql?query=query+${query_str}`
-    };
-
-    console.log(
-      "using options " + JSON.stringify(options) +
-      " for query <" + query_str + ">");
-    return this._http.get(options.uri)
+    console.log("Sending to" + loc + " query " + query_str);
+    return this._http.get(loc + `/graphql?query=query+${query_str}`)
       .map(res => res.json())
-      .map(json => json.data);
+      .map(json => json.data.__type.fields)
+      .toPromise();
   }
 
-  private _post(loc, query): Observable<any> {
+  private _post(loc, query): Promise<any> {
     const query_str = query.replace(/ /g, "");
-
-    const options = {
-      uri: loc + "/graphql",
-      method: "post",
-      body: {
-        query: "mutation " + query_str
-      },
-      json: true
-    };
-
-    console.log(
-      "using options " + JSON.stringify(options) +
-      " for query <" + query_str + ">");
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
 
+    console.log("Sending to" + loc + " query " + query_str);
     return this._http
       .post(
-          options.uri,
+          loc + "/dv-bus",
           JSON.stringify({query: "mutation " + query_str}),
           {headers: headers})
-      .map(res => res.json());
+      .map(res => res.json())
+      .toPromise();
   }
 }

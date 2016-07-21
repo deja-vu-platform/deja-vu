@@ -10,7 +10,6 @@ import * as _u from "underscore";
 
 
 const mean = new Mean(
-  "label",
   (db, debug) => {
     db.createCollection("items", (err, items) => {
       if (err) throw err;
@@ -98,7 +97,7 @@ item_type = new graphql.GraphQLObjectType({
         return mean.db.collection("items")
           .updateOne({name: item.name}, up_op)
           .then(_ => Promise.all([
-              bus.update_atom(item_type, item.atom_id, up_op),
+              bus.update_atom("Item", item.atom_id, up_op),
               Promise.all(
                 label_objs.map(l => bus
                   .update_atom(
@@ -144,10 +143,10 @@ Helpers.serve_schema(mean.ws, schema);
 
 const handlers = {
   item: {
-    create: (_, args) => Helpers
-      .resolve_create(mean.db, "item")(undefined, args)
+    create: args => Helpers
+      .resolve_create(mean.db, "item")(args)
       .then(_ => {
-        const atom_obj = JSON.parse(args.atom);
+        const atom_obj = JSON.parse(args.create);
         atom_obj.atom_id = args.atom_id;
         if (!_u.isEmpty(atom_obj.labels)) {
           return mean.db.collection("labels")
@@ -167,8 +166,8 @@ const handlers = {
         }
         return true;
       }),
-    update: (_, args) => Helpers
-      .resolve_update(mean.db, "item")(undefined, args)
+    update: args => Helpers
+      .resolve_update(mean.db, "item")(args)
       .then(_ => {
         const labels = [];
         for (const up of _u.keys(args.update)) {
@@ -199,10 +198,10 @@ const handlers = {
       })
   },
   label: {
-    create: (_, args) => Helpers
-      .resolve_create(mean.db, "label")(undefined, args)
+    create: args => Helpers
+      .resolve_create(mean.db, "label")(args)
       .then(_ => {
-        const atom_obj = JSON.parse(args.atom);
+        const atom_obj = JSON.parse(args.create);
         atom_obj.atom_id = args.atom_id;
         if (!_u.isEmpty(atom_obj.items)) {
           return mean.db.collection("items")
@@ -221,8 +220,8 @@ const handlers = {
                 );
         }
       }),
-     update: (_, args) => Helpers
-       .resolve_update(mean.db, "label")(undefined, args)
+     update: args => Helpers
+       .resolve_update(mean.db, "label")(args)
        .then(_ => {
          const items = [];
          for (const up of _u.keys(args.update)) {
@@ -255,7 +254,6 @@ const handlers = {
 };
 
 bus = new ServerBus(
-    "label", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
-    mean.comp, mean.locs);
+    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
 
 mean.start();

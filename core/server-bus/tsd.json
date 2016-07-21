@@ -24,7 +24,16 @@
       "commit": "1984ea435fe9e93a012d50db7773db58ae5d494b"
     },
     "node/node.d.ts": {
-      "commit": "bd269cad4cb2b495f940c7b6afc5825d568029be"
+      "commit": "5ccabc86eca6cfcda2b7ec83cca31dbd07c8a31b"
+    },
+    "underscore/underscore.d.ts": {
+      "commit": "2aa973a605d0fc7ae4ea5c32653331a819e81f71"
+    },
+    "es6-promise/es6-promise.d.ts": {
+      "commit": "5ccabc86eca6cfcda2b7ec83cca31dbd07c8a31b"
+    },
+    "underscore.string/underscore.string.d.ts": {
+      "commit": "2aa973a605d0fc7ae4ea5c32653331a819e81f71"
     }
   }
 }

@@ -34,7 +34,10 @@ bond { Follow_2/follows, Feed/subscriptions, follows }
 bond { Label/labels, topics }
 bond {
   Follow_1/Source.name, Follow_1/Target.name,
-  Follow_2/Source.name, Follow_2/Target.name,
+  Follow_2/Source.name, 
   Auth/username, Post/username, Feed/Subscriber.name,
   Feed/Publisher.name, username
+}
+bond {
+  Topic/name, Label/name, Feed/Publisher.name, Follow_2/Target.name
 }

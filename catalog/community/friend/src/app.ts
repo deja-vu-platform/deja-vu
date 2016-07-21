@@ -8,7 +8,6 @@ import {ServerBus} from "server-bus";
 
 
 const mean = new Mean(
-  "friend",
   (db, debug) => {
     db.createCollection("users", (err, users) => {
       if (err) throw err;
@@ -42,8 +41,7 @@ const handlers = {
 };
 
 const bus = new ServerBus(
-    "friend", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
-    mean.comp, mean.locs);
+    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
 
 
 //////////////////////////////////////////////////
@@ -153,9 +151,9 @@ function mutate_friends(op) {
     const users_col = mean.db.collection("users");
     return Promise.all([
       users_col.updateOne({username: username1}, update(u2))
-          .then(_ => bus.update_atom(user_type, u1.atom_id, update(u2))),
+          .then(_ => bus.update_atom("User", u1.atom_id, update(u2))),
       users_col.updateOne({username: username2}, update(u1))
-          .then(_ => bus.update_atom(user_type, u2.atom_id, update(u1)))
+          .then(_ => bus.update_atom("User", u2.atom_id, update(u1)))
     ]);
   });
 }

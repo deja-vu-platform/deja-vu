@@ -10,7 +10,6 @@ import {ServerBus} from "server-bus";
 
 
 const mean = new Mean(
-  "auth",
   (db, debug) => {
     db.createCollection("users", (err, users) => {
       if (err) throw err;
@@ -35,8 +34,7 @@ const handlers = {
 
 
 const bus = new ServerBus(
-    "auth", mean.loc, mean.ws, mean.bushost, mean.busport, handlers,
-    mean.comp, mean.locs);
+    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
 
 
 //////////////////////////////////////////////////
@@ -91,7 +89,7 @@ const schema = new graphql.GraphQLSchema({
                 }
 
                 // report
-                bus.new_atom(user_type, username, user);
+                bus.create_atom("User", username, user);
                 return true;
               });
           });

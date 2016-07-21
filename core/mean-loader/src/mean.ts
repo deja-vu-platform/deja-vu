@@ -10,14 +10,10 @@ import * as _u from "underscore";
 
 
 const cli = command_line_args([
+  {name: "fqelement", type: String},
+
   {name: "dbhost", type: String, defaultValue: "localhost"},
   {name: "dbport", type: Number, defaultValue: 27017},
-
-  {name: "wshost", type: String, defaultValue: "localhost"},
-  {name: "wsport", type: Number, defaultValue: 3000},
-
-  {name: "bushost", type: String, defaultValue: "localhost"},
-  {name: "busport", type: Number, defaultValue: 3001},
 
   {name: "comppath", type: String},
   {name: "locs", type: String},
@@ -31,39 +27,35 @@ const cli = command_line_args([
 
 
 export class Mean {
+  fqelement: string;
   db; //: mongodb.Db;
   ws: express.Express;
-  loc: string;
-  bushost: string;
-  busport: number;
   comp: any;
   locs: any;
   private _opts: any;
 
-  constructor(public name: string, init_db?: (db, debug: boolean) => void) {
+  constructor(init_db?: (db, debug: boolean) => void) {
     this._opts = cli.parse();
-    this.loc = `http://${this._opts.wshost}:${this._opts.wsport}`;
-    this.bushost = this._opts.bushost;
-    this.busport = this._opts.busport;
     if (this._opts.comppath !== undefined) {
       this.comp = JSON.parse(fs.readFileSync(this._opts.comppath, "utf8"));
     }
     this.locs = JSON.parse(this._opts.locs);
+    this.fqelement = this._opts.fqelement;
 
-    console.log(`Starting MEAN ${name} at ${this.loc}`);
+    console.log(
+        `Starting MEAN ${this.fqelement} at ${this.locs[this.fqelement]}`);
 
     const server = new mongodb.Server(
       this._opts.dbhost, this._opts.dbport,
       {socketOptions: {autoReconnect: true}});
-    this.db = new mongodb.Db(
-        `${name}-${this._opts.wshost}-${this._opts.wsport}-db`, server, {w: 1});
+    this.db = new mongodb.Db(`${this.fqelement}-db`, server, {w: 1});
     this.db.open((err, db) => {
       if (err) {
         console.log("Error opening mongodb");
         throw err;
       }
       if (init_db !== undefined) {
-        console.log(`Initializing db for MEAN ${name}`);
+        console.log(`Initializing db for MEAN ${this.fqelement}`);
         init_db(db, this._opts.mode === "dev" && this._opts.main);
       }
     });
@@ -74,8 +66,7 @@ export class Mean {
 
   start() {
     if (this._opts.main) {
-      console.log(
-          `Serving public folder for MEAN ${this.name} at ${this.loc}`);
+      console.log(`Serving public folder for main MEAN ${this.fqelement}`);
       this.ws.use(express.static("./dist/public"));
       const dist_dir = path.resolve(__dirname + "/../../../dist");
       this.ws.use("/*", (req, res) => {
@@ -83,7 +74,7 @@ export class Mean {
       });
     }
 
-    this.ws.listen(this._opts.wsport, () => {
+    this.ws.listen(this.locs[this.fqelement].split(":")[2], () => {
       console.log(`Listening with opts ${JSON.stringify(this._opts)}`);
     });
   }
@@ -352,28 +343,18 @@ export namespace GruntTask {
         if (Object.keys(patterns).length > 0) {
           let express_config = {};
 
-          replace_patterns.push({
-            match: name + "-1",
-            replacement: "http://localhost:3000"
-          });
-
           let port = 3002;
           const locs = {};
           locs[name] = "http://localhost:3000";
 
           Object.keys(patterns).forEach(p => {
             let instances_number = patterns[p];
-            if (instances_number === 1) {
-              locs[p] = "http://localhost:" + port;
+            for (let i = 1; i <= instances_number; ++i) {
+              const fqelement = (instances_number > 1) ? p + "-" + i : p;
+              locs[fqelement] = "http://localhost:" + port;
               ++port;
-            } else {
-              for (let i = 1; i <= instances_number; ++i) {
-                locs[p + "-" + i] = "http://localhost:" + port;
-                ++port;
-              }
             }
           });
-
           const locs_str = JSON.stringify(locs);
 
           express_config["main"] = {
@@ -381,44 +362,28 @@ export namespace GruntTask {
               script: "dist/app.js",
               background: true,
               args: [
-                "--wsport=3000", "--busport=3001", "--main", "--mode=dev",
+                "--main", "--mode=" + action,
+                "--fqelement=" + name,
                 "--comppath=comp.json", "--locs=" + locs_str]
-            }
-          };
-
-          grunt.log.writeln(
-            "This cliche is a compound, will start a composer");
-          express_config["composer"] = {
-            options: {
-              script: "node_modules/dv-composer/lib/app.js",
-              background: true,
-              args: [
-                "--wsport=3001", "--comppath=comp.json", "--locs=" + locs_str]
             }
           };
 
 
           port = 3002;
           Object.keys(patterns).forEach(p => {
-            let process_instance = (p, instance_number) => {
-              express_config[p + "-" + instance_number] = {
+            let instances_number = patterns[p];
+            for (let i = 1; i <= instances_number; ++i) {
+              const fqelement = (instances_number > 1) ? p + "-" + i : p;
+              express_config[fqelement] = {
                 options: {
                   script: "node_modules/" + p + "/lib/app.js",
                   background: true,
                   args: [
-                      "--wsport=" + port, "--busport=3001",
+                      "--fqelement=" + fqelement,
                       "--comppath=comp.json", "--locs=" + locs_str]
                 }
               };
-              replace_patterns.push({
-                match: p + "-" + instance_number,
-                replacement: "http://localhost:" + port
-              });
               ++port;
-            };
-            let instances_number = patterns[p];
-            for (let i = 1; i <= instances_number; ++i) {
-              process_instance(p, i);
             }
           });
           replace_patterns.push({match: "locs", replacement: locs});

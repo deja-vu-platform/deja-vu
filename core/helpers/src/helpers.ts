@@ -32,10 +32,12 @@ export namespace Helpers {
       transform_fn?: (atom: any) => any) {
     if (col_name === undefined) col_name = item_name + "s";
 
-    return (_, {atom_id, atom}) => {
-      let atom_obj = JSON.parse(atom);
+    return args => {
+      const atom_id = args.atom_id;
+      const create = args.create;
+      let atom_obj = JSON.parse(create);
       console.log(
-        "got new " + item_name + "(id " + atom_id + ") from bus " + atom);
+        "got new " + item_name + "(id " + atom_id + ") from bus " + create);
       atom_obj["atom_id"] = atom_id;
       if (transform_fn !== undefined) atom_obj = transform_fn(atom_obj);
 
@@ -49,7 +51,9 @@ export namespace Helpers {
       db: any, item_name: string, col_name?: string) {
     if (col_name === undefined) col_name = item_name + "s";
 
-    return (_, {atom_id, update}) => {
+    return args => {
+      const atom_id = args.atom_id;
+      const update = args.update;
       let update_obj = JSON.parse(update);
       console.log(
         "got update " + item_name + "(id " + atom_id + ") from bus " + update);
