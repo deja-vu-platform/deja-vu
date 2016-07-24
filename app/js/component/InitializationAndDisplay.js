@@ -1015,9 +1015,9 @@ function triggerEdit(cellId, popup) {
 function showConfigOptions(droppedComponentType, cell) {
     // Hide edit button if label or panel
     if (droppedComponentType==='label' || droppedComponentType==='panel') {
-        $('#'+cell.id).find('.edit-btn').css('visibility', 'hidden');
+        $('#'+cell.id).find('.edit-btn').css('display', 'none');
     } else {
-        $('#'+cell.id).find('.edit-btn').css('visibility', 'visible');
+        $('#'+cell.id).find('.edit-btn').css('display', 'block');
     }
 
     var configOptions = document.getElementById(droppedComponentType+'-properties');

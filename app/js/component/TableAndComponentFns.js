@@ -77,18 +77,101 @@ function createTableCell(row, col) {
     td.id = 'cell' + '_' + row + '_' + col;
 
     var sp = document.createElement('span');
-    sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
+    sp.innerHTML = '<div class="dropdown inner-component-options-small">'+
+                    '<button class="btn btn-default dropdown-toggle btn-xs" type="button" data-toggle="dropdown">'+
+                    '<span class="glyphicon glyphicon-option-horizontal"></span></button>'+
+                        '<ul class="dropdown-menu">'+
+                        '</ul>'+
+                    '</div>';
 
-    var button = sp.firstChild;
-    button.id = 'edit-btn' + '_' + row + '_' + col;
+    var optionsDropdown = sp.firstChild;
 
-    td.appendChild(button);
+    var sp = document.createElement('span');
+    //sp.innerHTML = '<button type="button" class="edit-btn btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>';
+
+    sp.innerHTML = '<li>' +
+                        '<a href="#" class="edit-btn">' +
+                            '<span class="glyphicon glyphicon-pencil"></span>' +
+                        '</a>' +
+                    '</li>';
 
 
-    $(button).on("click", function (e) {
+    var buttonEdit = sp.firstChild;
+    buttonEdit.id = 'edit-btn' + '_' + row + '_' + col;
+
+    $(buttonEdit).on("click", function (e) {
         var rowcol = getRowColFromId(this.id);
         $('#cell' + '_' + rowcol.row + '_' + rowcol.col).find('.tooltip').addClass('open');
     });
+
+    sp.innerHTML = '<li>' +
+        '<a href="#" class="inner-component-full-options">' +
+        '<span class="text">Start Merging</span>' +
+        '</a>' +
+        '</li>';
+
+    var buttonEnableMerge = sp.firstChild;
+    buttonEnableMerge.id = 'enable-merge' + '_' + row + '_' + col;
+    $(buttonEnableMerge).data('show-merge-handles', false); // hidden at first
+
+    $(buttonEnableMerge).click(function(){
+        var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
+        var rowcol = getRowColFromId(this.id);
+        var row = rowcol.row;
+        var col = rowcol.col;
+        // the opposite of what it is before the click!
+        if (showMergeHandles){
+            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+                display: 'inline',
+            });
+            $(this).find('.text').text('Stop Merging');
+        } else {
+            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+                display: 'none',
+            });
+            $(this).find('.text').text('Start Merging');
+        }
+        // now store the current state
+        $(this).data('show-merge-handles', showMergeHandles);
+    });
+
+
+    sp.innerHTML = '<li>' +
+                        '<a href="#" class="inner-component-full-options">' +
+                            '<span class="glyphicon glyphicon-fullscreen"></span>' +
+                        '</a>' +
+                    '</li>';
+
+    var buttonFullOptions = sp.firstChild;
+    buttonFullOptions.id = 'inner-component-full-options' + '_' + row + '_' + col;
+
+    $(buttonFullOptions).click(function(){
+        var rowcol = getRowColFromId(this.id);
+
+    });
+
+
+
+
+    sp.innerHTML = '<li>' +
+        '<a href="#" class="inner-component-trash">' +
+            '<span class="glyphicon glyphicon-trash"></span>' +
+            '</a>' +
+        '</li>';
+
+    var buttonTrash = sp.firstChild;
+    buttonTrash.id = 'inner-component-trash' + '_' + row + '_' + col;
+
+    $(buttonTrash).click(function(){
+        var rowcol = getRowColFromId(this.id);
+
+    });
+
+
+    $(optionsDropdown).find('ul').append(buttonEdit).append(buttonEnableMerge).append(buttonFullOptions).append('<li class="divider"></li>').append(buttonTrash);
+    td.appendChild(optionsDropdown);
+
+
 
     // change size of cell based on the layout
     var rowspan = selectedUserComponent.layout[row][col].spans.row;
@@ -591,25 +674,25 @@ function attachMergeHandlers(componentId) {
         }
     }
 
-
-    $('#table-grid-container'+'_'+componentId).on('click', '.cell', function(){
-        var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
-        var rowcol = getRowColFromId(this.id);
-        var row = rowcol.row;
-        var col = rowcol.col;
-        // the opposite of what it is before the click!
-        if (showMergeHandles){
-            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-                display: 'inline',
-            });
-        } else {
-            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-                display: 'none',
-            });
-        }
-        // now store the current state
-        $(this).data('show-merge-handles', showMergeHandles)
-    });
+    //
+    //$('#table-grid-container'+'_'+componentId).on('click', '.cell', function(){
+    //    var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
+    //    var rowcol = getRowColFromId(this.id);
+    //    var row = rowcol.row;
+    //    var col = rowcol.col;
+    //    // the opposite of what it is before the click!
+    //    if (showMergeHandles){
+    //        $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+    //            display: 'inline',
+    //        });
+    //    } else {
+    //        $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+    //            display: 'none',
+    //        });
+    //    }
+    //    // now store the current state
+    //    $(this).data('show-merge-handles', showMergeHandles);
+    //});
 
 }
 

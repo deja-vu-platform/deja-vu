@@ -44,7 +44,11 @@
     text-align: center;
 }
 
-.component-options{
+.inner-component-options{
+    display: none;
+}
+
+.component-options, .inner-component-options{
     margin-left: 267px;
     padding: 5px 20px;
     width: 500px;
@@ -330,11 +334,19 @@ td {
 }
 
 .edit-btn {
+    /*display: none;*/
+    /*position: absolute;*/
+    /*top: 2px;*/
+    /*right: 2px;*/
+    /*font-size: 15px;*/
+}
+
+.inner-component-options-small{
     display: none;
     position: absolute;
     top: 2px;
     right: 2px;
-    font-size: 15px;
+    /*font-size: 15px;*/
 }
 
 .config-btns {
@@ -344,7 +356,11 @@ td {
     left: 3px;
 }
 
-.dropped:hover .edit-btn{
+/*.dropped:hover .edit-btn{*/
+    /*display: inline-block;*/
+/*}*/
+
+.dropped:hover .inner-component-options-small{
     display: inline-block;
 }
 
