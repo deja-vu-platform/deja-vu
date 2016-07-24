@@ -77,6 +77,14 @@ function createTableCell(row, col) {
     td.id = 'cell' + '_' + row + '_' + col;
 
     var sp = document.createElement('span');
+
+    sp.innerHTML = '<button class="btn btn-default btn-xs merge-toggle-out merge-toggle merge-toggle' + '_' + row + '_' + col+'" type="button">'+
+                        '<span class="text">Start Merging</span>' +
+                    '</button>';
+
+    var btnMergeToggleOut = sp.firstChild;
+    btnMergeToggleOut.id = 'merge-toggle-out' + '_' + row + '_' + col;
+
     sp.innerHTML = '<div class="dropdown inner-component-options-small">'+
                     '<button class="btn btn-default dropdown-toggle btn-xs" type="button" data-toggle="dropdown">'+
                     '<span class="glyphicon glyphicon-option-horizontal"></span></button>'+
@@ -105,13 +113,13 @@ function createTableCell(row, col) {
     });
 
     sp.innerHTML = '<li>' +
-        '<a href="#" class="inner-component-full-options">' +
+        '<a href="#" class="merge-toggle merge-toggle'+ '_' + row + '_' + col+'">' +
         '<span class="text">Start Merging</span>' +
         '</a>' +
         '</li>';
 
     var buttonEnableMerge = sp.firstChild;
-    buttonEnableMerge.id = 'enable-merge' + '_' + row + '_' + col;
+    buttonEnableMerge.id = 'merge-toggle-in' + '_' + row + '_' + col;
     $(buttonEnableMerge).data('show-merge-handles', false); // hidden at first
 
     $(buttonEnableMerge).click(function(){
@@ -125,16 +133,24 @@ function createTableCell(row, col) {
                 display: 'inline',
             });
             $(this).find('.text').text('Stop Merging');
+            $('#merge-toggle-out'+ '_' + rowcol.row + '_' + rowcol.col).find('.text').text('Stop Merging');
+
         } else {
             $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
                 display: 'none',
             });
             $(this).find('.text').text('Start Merging');
+            $('#merge-toggle-out'+ '_' + rowcol.row + '_' + rowcol.col).find('.text').text('Start Merging');
+
         }
         // now store the current state
         $(this).data('show-merge-handles', showMergeHandles);
     });
 
+    $(btnMergeToggleOut).click(function(){
+        var rowcol = getRowColFromId(this.id);
+        $('#merge-toggle-in'+ '_' + rowcol.row + '_' + rowcol.col).trigger('click'); //TODO bad way of doing this
+    });
 
     sp.innerHTML = '<li>' +
                         '<a href="#" class="inner-component-full-options">' +
@@ -149,9 +165,6 @@ function createTableCell(row, col) {
         var rowcol = getRowColFromId(this.id);
 
     });
-
-
-
 
     sp.innerHTML = '<li>' +
         '<a href="#" class="inner-component-trash">' +
@@ -170,6 +183,7 @@ function createTableCell(row, col) {
 
     $(optionsDropdown).find('ul').append(buttonEdit).append(buttonEnableMerge).append(buttonFullOptions).append('<li class="divider"></li>').append(buttonTrash);
     td.appendChild(optionsDropdown);
+    td.appendChild(btnMergeToggleOut);
 
 
 
@@ -676,22 +690,25 @@ function attachMergeHandlers(componentId) {
 
     //
     //$('#table-grid-container'+'_'+componentId).on('click', '.cell', function(){
-    //    var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
-    //    var rowcol = getRowColFromId(this.id);
-    //    var row = rowcol.row;
-    //    var col = rowcol.col;
-    //    // the opposite of what it is before the click!
-    //    if (showMergeHandles){
-    //        $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-    //            display: 'inline',
-    //        });
-    //    } else {
-    //        $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-    //            display: 'none',
-    //        });
+    //    if (!$(this).hasClass('dropped')){
+    //        var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
+    //        var rowcol = getRowColFromId(this.id);
+    //        var row = rowcol.row;
+    //        var col = rowcol.col;
+    //        // the opposite of what it is before the click!
+    //        if (showMergeHandles){
+    //            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+    //                display: 'inline',
+    //            });
+    //        } else {
+    //            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+    //                display: 'none',
+    //            });
+    //        }
+    //        // now store the current state
+    //        $(this).data('show-merge-handles', showMergeHandles);
+    //
     //    }
-    //    // now store the current state
-    //    $(this).data('show-merge-handles', showMergeHandles);
     //});
 
 }

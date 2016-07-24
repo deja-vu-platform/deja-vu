@@ -48,6 +48,16 @@
     display: none;
 }
 
+.merge-toggle-out{
+    position: absolute;
+    top: 2px;
+    right: 2px;
+}
+
+.dropped .merge-toggle-out{
+    display: none;
+}
+
 .component-options, .inner-component-options{
     margin-left: 267px;
     padding: 5px 20px;
