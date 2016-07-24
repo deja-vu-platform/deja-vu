@@ -164,7 +164,7 @@ function createTableCell(row, col) {
 
     $(buttonTrash).click(function(){
         var rowcol = getRowColFromId(this.id);
-
+        deleteComponentFromUserComponentAndFromView("cell"+ '_' + rowcol.row + '_' + rowcol.col);
     });
 
 

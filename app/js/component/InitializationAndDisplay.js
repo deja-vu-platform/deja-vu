@@ -743,13 +743,14 @@ function cellTrashDroppableSettings(){
                 if (!movedComponent()) {
                     displayComponentInTable(cellId, $(ui.draggable));
                 }
-            } else { // if dropped in trash
-                var trashCopy = $(this).children().first();
-                $(ui.draggable).appendTo(this);
-                $(this).empty();
-                trashCopy.appendTo($(this));
-                movedComponent();
             }
+            //else { // if dropped in trash
+            //    var trashCopy = $(this).children().first();
+            //    $(ui.draggable).appendTo(this);
+            //    $(this).empty();
+            //    trashCopy.appendTo($(this));
+            //    movedComponent();
+            //}
 
             $('#basic-components').html(basicComponents);
 
