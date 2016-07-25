@@ -537,3 +537,29 @@ p.label {
     pointer-events: none;
     display: none;
 }
+
+.size-display{
+    position: absolute;
+    visibility: visible;
+
+    text-align: center;
+    pointer-events: auto;
+}
+
+.size-display-width{
+    top: -35px;
+    width: 100%;
+}
+
+.size-display-height{
+    left: -84px;
+    width: 100px;
+}
+
+.size-display-width .value{
+    display: inline-block;
+}
+
+.size-display-height .value{
+    display: block;
+}
