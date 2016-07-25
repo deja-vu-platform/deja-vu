@@ -79,7 +79,7 @@ function createTableCell(row, col) {
     var sp = document.createElement('span');
 
     sp.innerHTML = '<button class="btn btn-default btn-xs merge-toggle-out merge-toggle merge-toggle' + '_' + row + '_' + col+'" type="button">'+
-                        '<span class="text">Start Merging</span>' +
+                        '<img src="images/merge_icon.png" width="30px" height="30px" class="icon">' +
                     '</button>';
 
     var btnMergeToggleOut = sp.firstChild;
@@ -114,7 +114,7 @@ function createTableCell(row, col) {
 
     sp.innerHTML = '<li>' +
         '<a href="#" class="merge-toggle merge-toggle'+ '_' + row + '_' + col+'">' +
-        '<span class="text">Start Merging</span>' +
+            '<img src="images/merge_icon.png" width="30px" height="30px" class="icon">' +
         '</a>' +
         '</li>';
 
@@ -132,15 +132,15 @@ function createTableCell(row, col) {
             $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
                 display: 'inline',
             });
-            $(this).find('.text').text('Stop Merging');
-            $('#merge-toggle-out'+ '_' + rowcol.row + '_' + rowcol.col).find('.text').text('Stop Merging');
+            //$(this).find('.icon').src('Stop Merging');
+            //$('#merge-toggle-out'+ '_' + rowcol.row + '_' + rowcol.col).find('.text').text('Stop Merging');
 
         } else {
             $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
                 display: 'none',
             });
-            $(this).find('.text').text('Start Merging');
-            $('#merge-toggle-out'+ '_' + rowcol.row + '_' + rowcol.col).find('.text').text('Start Merging');
+            //$(this).find('.text').text('Start Merging');
+            //$('#merge-toggle-out'+ '_' + rowcol.row + '_' + rowcol.col).find('.text').text('Start Merging');
 
         }
         // now store the current state
