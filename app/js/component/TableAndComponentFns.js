@@ -120,11 +120,11 @@ function createTableCell(row, col) {
 
     var buttonEnableMerge = sp.firstChild;
     buttonEnableMerge.id = 'merge-toggle-in' + '_' + row + '_' + col;
-    $(buttonEnableMerge).data('show-merge-handles', false); // hidden at first
+    $(td).data('show-merge-handles', false); // hidden at first
 
     $(buttonEnableMerge).click(function(){
-        var showMergeHandles = (!$(this).data('show-merge-handles')); // whether or not to show after a click is
         var rowcol = getRowColFromId(this.id);
+        var showMergeHandles = (!$('#cell'+'_'+rowcol.row+'_'+rowcol.col).data('show-merge-handles')); // whether or not to show after a click is
         var row = rowcol.row;
         var col = rowcol.col;
         // the opposite of what it is before the click!
@@ -144,7 +144,7 @@ function createTableCell(row, col) {
 
         }
         // now store the current state
-        $(this).data('show-merge-handles', showMergeHandles);
+        $('#cell'+'_'+rowcol.row+'_'+rowcol.col).data('show-merge-handles', showMergeHandles);
     });
 
     $(btnMergeToggleOut).click(function(){
@@ -224,13 +224,13 @@ function createGridCell(row, col) {
     td.id = 'grid' + '_' + row + '_' + col;
     td.className = 'grid col' + '_' + col;
 
-    var sizeDisplayInner = '<div class="value" id="size-display-value_'+row+'_'+col+'">1000</div>'+
+    var sizeDisplayInner = '<input type="text" class="value" id="size-display-value_'+row+'_'+col+'">'+
         '<select class="select-unit" id="size-display-select_'+row+'_'+col+'">'+
         '<option value="px" selected>px</option>'+
         '<option value="%">%</option>'+
         '</select>';
-    var sizeDisplayWidth = '<div class="size-display size-display-width">' + sizeDisplayInner + '</div>';
-    var sizeDisplayHeight = '<div class="size-display size-display-height">' + sizeDisplayInner + '</div>';
+    var sizeDisplayWidth = '<div class="size-display size-display-width" data-dimension="width">' + sizeDisplayInner + '</div>';
+    var sizeDisplayHeight = '<div class="size-display size-display-height" data-dimension="height">' + sizeDisplayInner + '</div>';
 
     if (row == 1){
         $(td).append(sizeDisplayWidth);
@@ -238,6 +238,56 @@ function createGridCell(row, col) {
     if (col == 1){
         $(td).append(sizeDisplayHeight);
     }
+
+    $(td).on('change', '.select-unit', function(){
+        var rowcol = getRowColFromId(this.id);
+        if ($(this).parent().data('dimension')=='width'){
+            updateSizeDisplayAtCol(rowcol.col);
+        } else {
+            updateSizeDisplayAtRow(rowcol.row);
+        }
+    });
+
+    $(td).on('keypress', '.value', function(){
+        if (event.which == 13) {
+            console.log('hi');
+            var value = parseInt($(this).val());
+            var rowcol = getRowColFromId(this.id);
+            if (!isNaN(value)){
+                var type = $('#size-display-select_'+rowcol.row+'_'+rowcol.col).val();
+                if (type == 'px'){
+                    if ($(this).parent().data('dimension')=='width'){
+                        var dimension = selectedUserComponent.layout.tablePxDimensions.width;
+                    } else {
+                        var dimension = selectedUserComponent.layout.tablePxDimensions.height;
+                    }
+                    value = value/dimension; // now value is a ratio
+                } else {
+                    value = value/100; // now value is a ratio
+                }
+
+                if ($(this).parent().data('dimension')=='width'){
+                    for (var row = 1; row<=numRows; row++){
+                    }
+                    selectedUserComponent.layout[row][rowcol.col].ratio.grid.width = value;
+                } else {
+                    for (var col = 1; col<=numCols; col++){
+                        selectedUserComponent.layout[rowcol.row][col].ratio.grid.height = value;
+                    }
+                }
+
+                resizeTableToZoom();
+            }
+
+            if ($(this).parent().data('dimension')=='width'){
+                updateSizeDisplayAtCol(rowcol.col);
+            } else {
+                updateSizeDisplayAtRow(rowcol.row);
+            }
+        }
+    });
+
+
 
     return td;
 }
@@ -476,11 +526,6 @@ function createGuideGrid(id) {
 
     $(guideGridContainer).append(grid);
     $('#table-grid-container'+'_'+id).append(guideGridContainer);
-    $('.grid').on('change', '.select-unit', function(){
-        var rowcol = getRowColFromId(this.id);
-        updateSizeDisplayAtRow(rowcol.row);
-        updateSizeDisplayAtCol(rowcol.col);
-    });
 
 }
 
@@ -907,7 +952,7 @@ function mergeCells(cell1Id, cell2Id, component) {
                 cellToHide.data('hidden', {isHidden: true, hidingCellId: topLeftCellId});
 
                 var dragContainerToHide = $('#drag-handle-container' + '_' + row + '_' + col);
-                dragContainerToHide.css('display', 'none');
+                hideMergeHandles(row,col);
 
                 selectedUserComponent.layout[row][col].spans = {row:0,col:0};
                 selectedUserComponent.layout[row][col].merged = {isMerged: false,
@@ -966,7 +1011,6 @@ function mergeCells(cell1Id, cell2Id, component) {
 
         var dragContainer = $('#drag-handle-container' + '_' + topRowNum + '_' + leftColNum);
         dragContainer.css('display', 'block');
-
     }
 
     // Do these even if the cell is just merging to itself
@@ -1063,7 +1107,7 @@ function unmergeCells(cellToUnmergeId, component) {
             dragContainerToShow.css({
                 display: 'block',
             });
-            resetMergeHandleVisibility(row,col);
+            hideMergeHandles(row,col);
         }
     }
 
@@ -1108,7 +1152,7 @@ function resetMergeHandleContainerSizeAndPosition(row, col){
     });
 }
 
-function resetMergeHandleVisibility(row,col){
+function hideMergeHandles(row, col){
     var cell = $("#cell" + '_' + row + '_' + col);
     var dragHandleContainer = $('#drag-handle-container' + '_' + row + '_' + col);
 
@@ -1135,7 +1179,7 @@ function resetAllMergeHandleVisibilityExcept(spRow,spCol) {
     for (var row = 1; row <= numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             if ((row!=spRow) && (col != spCol)){
-                resetMergeHandleVisibility(row,col);
+                hideMergeHandles(row,col);
             }
         }
     }
@@ -1314,7 +1358,7 @@ function updateSizeDisplayAtRow(row, live){
         } else {
             var val = selectedUserComponent.layout[row][1].ratio.grid.height*selectedUserComponent.layout.tablePxDimensions.height;
         }
-        $('#grid_'+row+'_1').find('.size-display-height .value').text(Math.round(val));
+        $('#grid_'+row+'_1').find('.size-display-height .value').val(Math.round(val));
 
     } else {// %
         if (live){
@@ -1322,7 +1366,7 @@ function updateSizeDisplayAtRow(row, live){
         } else {
             var val = selectedUserComponent.layout[row][1].ratio.grid.height*100;
         }
-        $('#grid_'+row+'_1').find('.size-display-height .value').text((val).toFixed(2));
+        $('#grid_'+row+'_1').find('.size-display-height .value').val((val).toFixed(2));
 
     }
 
@@ -1336,7 +1380,7 @@ function updateSizeDisplayAtCol(col, live){
         } else {
             var val = selectedUserComponent.layout[1][col].ratio.grid.width*selectedUserComponent.layout.tablePxDimensions.width;
         }
-        $('#grid_1'+'_'+col).find('.size-display-width .value').text(Math.round(val));
+        $('#grid_1'+'_'+col).find('.size-display-width .value').val(Math.round(val));
 
     } else {// %
         if (live){
@@ -1344,7 +1388,7 @@ function updateSizeDisplayAtCol(col, live){
         } else {
             var val = selectedUserComponent.layout[1][col].ratio.grid.width*100;
         }
-        $('#grid_1'+'_'+col).find('.size-display-width .value').text((val).toFixed(2));
+        $('#grid_1'+'_'+col).find('.size-display-width .value').val((val).toFixed(2));
     }
 }
 

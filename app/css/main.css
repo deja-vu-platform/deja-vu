@@ -556,6 +556,11 @@ p.label {
     width: 100px;
 }
 
+.value{
+    width: 80px;
+    text-align: right;
+}
+
 .size-display-width .value{
     display: inline-block;
 }
