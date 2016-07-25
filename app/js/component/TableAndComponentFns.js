@@ -268,8 +268,8 @@ function createGridCell(row, col) {
 
                 if ($(this).parent().data('dimension')=='width'){
                     for (var row = 1; row<=numRows; row++){
+                        selectedUserComponent.layout[row][rowcol.col].ratio.grid.width = value;
                     }
-                    selectedUserComponent.layout[row][rowcol.col].ratio.grid.width = value;
                 } else {
                     for (var col = 1; col<=numCols; col++){
                         selectedUserComponent.layout[rowcol.row][col].ratio.grid.height = value;
@@ -277,6 +277,8 @@ function createGridCell(row, col) {
                 }
 
                 resizeTableToZoom();
+                saveRowColRatiosGrid(true, true);
+                updateSizeDisplay(false);
             }
 
             if ($(this).parent().data('dimension')=='width'){
