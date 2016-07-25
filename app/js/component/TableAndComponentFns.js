@@ -223,6 +223,22 @@ function createGridCell(row, col) {
     var td = document.createElement('td');
     td.id = 'grid' + '_' + row + '_' + col;
     td.className = 'grid col' + '_' + col;
+
+    var sizeDisplayInner = '<div class="value" id="size-display-value_'+row+'_'+col+'">1000</div>'+
+        '<select class="select-unit" id="size-display-select_'+row+'_'+col+'">'+
+        '<option value="px" selected>px</option>'+
+        '<option value="%">%</option>'+
+        '</select>';
+    var sizeDisplayWidth = '<div class="size-display size-display-width">' + sizeDisplayInner + '</div>';
+    var sizeDisplayHeight = '<div class="size-display size-display-height">' + sizeDisplayInner + '</div>';
+
+    if (row == 1){
+        $(td).append(sizeDisplayWidth);
+    }
+    if (col == 1){
+        $(td).append(sizeDisplayHeight);
+    }
+
     return td;
 }
 
@@ -452,20 +468,6 @@ function createGuideGrid(id) {
         for (var col = 1; col <= numCols; col++) {
             var td = createGridCell(row, col);
 
-            var sizeDisplayInner = '<div class="value" id="size-display-value_'+row+'_'+col+'">1000</div>'+
-                '<select class="select-unit" id="size-display-select_'+row+'_'+col+'">'+
-                '<option value="px" selected>px</option>'+
-                '<option value="%">%</option>'+
-                '</select>';
-            var sizeDisplayWidth = '<div class="size-display size-display-width">' + sizeDisplayInner + '</div>';
-            var sizeDisplayHeight = '<div class="size-display size-display-height">' + sizeDisplayInner + '</div>';
-
-            if (row == 1){
-                $(td).append(sizeDisplayWidth);
-            }
-            if (col == 1){
-                $(td).append(sizeDisplayHeight);
-            }
 
             tr.appendChild(td);
         }
@@ -1269,7 +1271,7 @@ function initialResizeCells() {
 
     resizeLabelDivs(cellWidth, cellHeight);
 
-    updateSizeDisplay();
+    updateSizeDisplay(false);
 }
 
 
@@ -1304,43 +1306,54 @@ function resetAligners() {
 }
 
 
-function updateSizeDisplayAtRow(row){
+function updateSizeDisplayAtRow(row, live){
     var type = $('#grid_'+row+'_1').find('.size-display-height select').val();
     if (type == 'px'){
-        //var val = selectedUserComponent.layout[row][1].ratio.grid.height*selectedUserComponent.layout.tablePxDimensions.height;
-        var val = parseFloat($('#grid_'+row+'_1').css('height'));
-        $('#grid_'+row+'_1').find('.size-display-height .value').text(val);
+        if (live){
+            var val = parseFloat($('#grid_'+row+'_1').css('height'))/currentZoom;
+        } else {
+            var val = selectedUserComponent.layout[row][1].ratio.grid.height*selectedUserComponent.layout.tablePxDimensions.height;
+        }
+        $('#grid_'+row+'_1').find('.size-display-height .value').text(Math.round(val));
 
     } else {// %
-        //var val = selectedUserComponent.layout[row][1].ratio.grid.height*100;
-        var val = 100*parseFloat($('#grid_'+row+'_1').css('height'))/($('#main-grid-table').height());
+        if (live){
+            var val = 100*parseFloat($('#grid_'+row+'_1').css('height'))/($('#main-grid-table').height());
+        } else {
+            var val = selectedUserComponent.layout[row][1].ratio.grid.height*100;
+        }
         $('#grid_'+row+'_1').find('.size-display-height .value').text((val).toFixed(2));
 
     }
 
 }
 
-function updateSizeDisplayAtCol(col){
+function updateSizeDisplayAtCol(col, live){
     var type = $('#grid_1'+'_'+col).find('.size-display-width select').val();
     if (type == 'px'){
-        //var val = selectedUserComponent.layout[1][col].ratio.grid.width*selectedUserComponent.layout.tablePxDimensions.width;
-        var val = parseFloat($('#grid_1_'+col).css('width'));
-        $('#grid_1'+'_'+col).find('.size-display-width .value').text(val);
+        if (live){
+            var val = parseFloat($('#grid_1_'+col).css('width'))/currentZoom;
+        } else {
+            var val = selectedUserComponent.layout[1][col].ratio.grid.width*selectedUserComponent.layout.tablePxDimensions.width;
+        }
+        $('#grid_1'+'_'+col).find('.size-display-width .value').text(Math.round(val));
 
     } else {// %
-        //var val = selectedUserComponent.layout[1][col].ratio.grid.width*100;
-        var val = 100*parseFloat($('#grid_1_'+col).css('width'))/($('#main-grid-table').width());
+        if (live){
+            var val = 100*parseFloat($('#grid_1_'+col).css('width'))/($('#main-grid-table').width());
+        } else {
+            var val = selectedUserComponent.layout[1][col].ratio.grid.width*100;
+        }
         $('#grid_1'+'_'+col).find('.size-display-width .value').text((val).toFixed(2));
-
     }
 }
 
-function updateSizeDisplay(){
+function updateSizeDisplay(live){
     for (var row = 1; row<=numRows; row++){
-        updateSizeDisplayAtRow(row);
+        updateSizeDisplayAtRow(row, live);
     }
     for (var col = 1; col<=numCols; col++){
-        updateSizeDisplayAtCol(col);
+        updateSizeDisplayAtCol(col, live);
     }
 }
 
@@ -1504,7 +1517,7 @@ function propagateCellResizeToOtherElts(){
     resetAllMergeHandleContainersSizeAndPosition();
     //saveRowColRatiosCells(!tableLockedWidth, !tableLockedHeight);
     updateTableResizeHandler();
-    updateSizeDisplay();
+    updateSizeDisplay(false);
 }
 
 
@@ -1557,8 +1570,8 @@ function tableLockedResizeRowFn(e, ui){
     });
 
 
-    updateSizeDisplayAtCol(rowNum);
-    updateSizeDisplayAtCol(nextRowNum);
+    updateSizeDisplayAtCol(rowNum, true);
+    updateSizeDisplayAtCol(nextRowNum, true);
 };
 
 function tableLockedResizeColFn(e, ui){
@@ -1574,8 +1587,8 @@ function tableLockedResizeColFn(e, ui){
         width: remainingWidth + "px"
     });
 
-    updateSizeDisplayAtCol(colNum);
-    updateSizeDisplayAtCol(nextColNum);
+    updateSizeDisplayAtCol(colNum, true);
+    updateSizeDisplayAtCol(nextColNum, true);
 
 };
 
@@ -1617,7 +1630,7 @@ function addRowResizeHandler(row){
                 tableLockedResizeRowFn(e, ui);
             } else {
                 var row = getRowColFromId($(this).find('.grid').get(0).id).row;
-                updateSizeDisplayAtRow(row);
+                updateSizeDisplayAtRow(row, true);
             }
         },
         stop: rowColResizeOnStop,
@@ -1637,7 +1650,7 @@ function addColResizeHandler(col){
                 tableLockedResizeColFn(e, ui);
             } else {
                 var col = getRowColFromId(this.id).col;
-                updateSizeDisplayAtCol(col);
+                updateSizeDisplayAtCol(col, true);
             }
         },
         stop: rowColResizeOnStop,
