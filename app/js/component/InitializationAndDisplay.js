@@ -846,7 +846,11 @@ function getZoomFromSliderVal(){
     return zoom;
 };
 
-function resizeTableToZoom(){
+/**
+ * Scales the table, based on the saved sizes, scaled to the zoom factor. If the saved sizes are changed beforhand,
+ * this function can be used to resize the table
+ */
+function scaleTableToZoom(){
     $('.grid').each(function(){
         var rowcol = getRowColFromId(this.id);
         var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
@@ -884,7 +888,7 @@ function changeZoom(isFit){
     state.zoom = currentZoom;
     $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', state);
 
-    resizeTableToZoom();
+    scaleTableToZoom();
 };
 
 
@@ -1313,7 +1317,7 @@ $('#reset-width-ratios').click(function(){
             selectedUserComponent.layout[row][col].ratio.grid.width = widthRatio;
         }
     }
-    resizeTableToZoom();
+    scaleTableToZoom();
     //loadTableWithLocksSaved(selectedUserComponent);
 });
 
@@ -1325,7 +1329,7 @@ $('#reset-height-ratios').click(function(){
             selectedUserComponent.layout[row][col].ratio.grid.height = heightRatio;
         }
     }
-    resizeTableToZoom();
+    scaleTableToZoom();
     //loadTableWithLocksSaved(selectedUserComponent);
 });
 
@@ -1401,7 +1405,7 @@ $('#resize-table').click(function(){
 
     //gridWidth = newWidth*currentZoom;
     //gridHeight = newHeight*currentZoom;
-    resizeTableToZoom();
+    scaleTableToZoom();
     //loadTableWithLocksSaved(selectedUserComponent);
 
 });

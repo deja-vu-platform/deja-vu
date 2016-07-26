@@ -262,22 +262,59 @@ function createGridCell(row, col) {
                         var dimension = selectedUserComponent.layout.tablePxDimensions.height;
                     }
                     value = value/dimension; // now value is a ratio
+
+                    if ($(this).parent().data('dimension')=='width'){
+                        for (var row = 1; row<=numRows; row++){
+                            selectedUserComponent.layout[row][rowcol.col].ratio.grid.width = value;
+                        }
+                    } else {
+                        for (var col = 1; col<=numCols; col++){
+                            selectedUserComponent.layout[rowcol.row][col].ratio.grid.height = value;
+                        }
+                    }
+
+
                 } else {
                     value = value/100; // now value is a ratio
+
+                    if ($(this).parent().data('dimension')=='width'){
+                        var oldRatio = selectedUserComponent.layout[1][rowcol.col].ratio.grid.width;
+                        var difference = value - oldRatio; // this difference is what we have to take away from the others
+                        var differencePerCol = difference/(numCols-1);
+
+                        for (var row = 1; row <= numRows; row++) {
+                            for (var col = 1; col <= numCols; col++) {
+                                if (col == rowcol.col){
+                                    selectedUserComponent.layout[row][col].ratio.grid.width = value;
+                                } else { // for all other columns, scale down the widths proportionally
+                                    selectedUserComponent.layout[row][col].ratio.grid.width = selectedUserComponent.layout[row][col].ratio.grid.width - differencePerCol;
+                                }
+                            }
+                        }
+                    } else {
+                        var oldRatio = selectedUserComponent.layout[rowcol.row][1].ratio.grid.height;
+                        var difference = value - oldRatio; // this difference is what we have to take away from the others
+                        var differencePerRow = difference/(numRows-1);
+
+                        for (var row = 1; row <= numRows; row++) {
+                            for (var col = 1; col <= numCols; col++) {
+                                if (row == rowcol.row){
+                                    selectedUserComponent.layout[row][col].ratio.grid.height = value;
+                                } else { // for all other columns, scale down the heights proportionally
+                                    selectedUserComponent.layout[row][col].ratio.grid.height = selectedUserComponent.layout[row][col].ratio.grid.height - differencePerRow;
+                                }
+                            }
+                        }
+
+
+                    }
+
+
                 }
 
-                if ($(this).parent().data('dimension')=='width'){
-                    for (var row = 1; row<=numRows; row++){
-                        selectedUserComponent.layout[row][rowcol.col].ratio.grid.width = value;
-                    }
-                } else {
-                    for (var col = 1; col<=numCols; col++){
-                        selectedUserComponent.layout[rowcol.row][col].ratio.grid.height = value;
-                    }
-                }
 
-                resizeTableToZoom();
-                saveRowColRatiosGrid(true, true);
+                scaleTableToZoom(); // this resizes the table based on the above changes in size
+                saveRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
                 updateSizeDisplay(false);
             }
 
@@ -1855,7 +1892,7 @@ function addTableResizeHandler(componentId){
             });
             selectedUserComponent.layout.tablePxDimensions.width = $('#table-resize-div').width()/currentZoom;
             selectedUserComponent.layout.tablePxDimensions.height = $('#table-resize-div').height()/currentZoom;
-            resizeTableToZoom();
+            scaleTableToZoom();
 
             // updating this again to fix for rounding errors
             gridWidth = $('#table-resize-div').width();
@@ -2213,7 +2250,7 @@ function addNRowsToEnd(n) {
         }
 
 
-        // for all other columns, scale down the widths proportionally = (1 - n/newNumRows)
+        // for all other columns, scale down the heights proportionally = (1 - n/newNumRows)
         for (var row = 1; row <= lastRowNum; row++) {
             for (var col = 1; col <= numCols; col++) {
                 selectedUserComponent.layout[row][col].ratio.grid.height = selectedUserComponent.layout[row][col].ratio.grid.height * (1 - n / (newNumRows));
@@ -2280,7 +2317,7 @@ function addNRowsToEnd(n) {
 
     }
 
-    resizeTableToZoom();
+    scaleTableToZoom();
 
     // after the cells have been appended
     for (var newRow = 1; newRow <= n; newRow++) {
@@ -2463,7 +2500,7 @@ function removeNRowsFromEnd(n) {
         }
     }
 
-    resizeTableToZoom();
+    scaleTableToZoom();
 
     bitmapNew = make2dArray(numRows, numCols);
     updateBitmap();
@@ -2656,7 +2693,7 @@ function addNColsToEnd(n) {
         }
     }
 
-    resizeTableToZoom();
+    scaleTableToZoom();
 
     // after the cells have been appended
     for (var newCol = 1; newCol <= n; newCol++){
@@ -2854,7 +2891,7 @@ function removeNColsFromEnd(n) {
             $('#drag-handle-container'+'_'+row+'_'+colToRemoveNum).remove();
         }
     }
-    resizeTableToZoom();
+    scaleTableToZoom();
 
     bitmapNew = make2dArray(numRows, numCols);
     updateBitmap();
