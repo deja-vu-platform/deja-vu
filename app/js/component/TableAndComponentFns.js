@@ -224,7 +224,7 @@ function createGridCell(row, col) {
     td.id = 'grid' + '_' + row + '_' + col;
     td.className = 'grid col' + '_' + col;
 
-    var sizeDisplayInner = '<input type="text" class="value" id="size-display-value_'+row+'_'+col+'">'+
+    var sizeDisplayInner = '<input type="text" class="value disabled" id="size-display-value_'+row+'_'+col+'">'+
         '<select class="select-unit" id="size-display-select_'+row+'_'+col+'">'+
         '<option value="px" selected>px</option>'+
         '<option value="%">%</option>'+
@@ -272,6 +272,9 @@ function createGridCell(row, col) {
                             selectedUserComponent.layout[rowcol.row][col].ratio.grid.height = value;
                         }
                     }
+                    scaleTableToZoom(); // this resizes the table based on the above changes in size
+                    saveRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
+                    updateSizeDisplay(false);
 
 
                 } else {
@@ -306,28 +309,13 @@ function createGridCell(row, col) {
                             }
                         }
 
-
                     }
-
-
+                    scaleTableToZoom(); // this resizes the table based on the above changes in size
+                    updateSizeDisplay(false);
                 }
-
-
-                scaleTableToZoom(); // this resizes the table based on the above changes in size
-                saveRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
-                updateSizeDisplay(false);
-            }
-
-            if ($(this).parent().data('dimension')=='width'){
-                updateSizeDisplayAtCol(rowcol.col);
-            } else {
-                updateSizeDisplayAtRow(rowcol.row);
             }
         }
     });
-
-
-
     return td;
 }
 

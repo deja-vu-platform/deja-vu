@@ -560,6 +560,11 @@ p.label {
     text-align: right;
 }
 
+.disabled .value{
+    pointer-events: none;
+}
+
+
 .size-display-width .value{
     display: inline-block;
 }
