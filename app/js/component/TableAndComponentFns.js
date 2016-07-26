@@ -224,13 +224,13 @@ function createGridCell(row, col) {
     td.id = 'grid' + '_' + row + '_' + col;
     td.className = 'grid col' + '_' + col;
 
-    var sizeDisplayInner = '<input type="text" class="value disabled" id="size-display-value_'+row+'_'+col+'">'+
+    var sizeDisplayInner = '<input type="text" class="value" id="size-display-value_'+row+'_'+col+'">'+
         '<select class="select-unit" id="size-display-select_'+row+'_'+col+'">'+
         '<option value="px" selected>px</option>'+
         '<option value="%">%</option>'+
         '</select>';
-    var sizeDisplayWidth = '<div class="size-display size-display-width" data-dimension="width">' + sizeDisplayInner + '</div>';
-    var sizeDisplayHeight = '<div class="size-display size-display-height" data-dimension="height">' + sizeDisplayInner + '</div>';
+    var sizeDisplayWidth = '<div class="size-display size-display-width input-disabled" data-dimension="width">' + sizeDisplayInner + '</div>';
+    var sizeDisplayHeight = '<div class="size-display size-display-height  input-disabled" data-dimension="height">' + sizeDisplayInner + '</div>';
 
     if (row == 1){
         $(td).append(sizeDisplayWidth);

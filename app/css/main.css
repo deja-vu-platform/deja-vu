@@ -560,7 +560,10 @@ p.label {
     text-align: right;
 }
 
-.disabled .value{
+.input-disabled .value{
+    border: none;
+    background: transparent;
+    color: #000;
     pointer-events: none;
 }
 
