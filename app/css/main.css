@@ -70,7 +70,7 @@
     background-color: #E0E0E0;
 }
 
-.component-options #delete-options{
+.component-options #delete-options, #inner-component-delete-options{
     display: inline-block;
     float: right;
 
@@ -238,8 +238,11 @@ td {
     background-color: rgba(55, 131, 198, 0.2);
 }
 
+#inner-component-focus{
+    display: none;
+}
 
-#outer-container {
+#outer-container, #inner-component-focus {
     width: 670px;
     height: 550px;
     border: 1px solid #dddddd;

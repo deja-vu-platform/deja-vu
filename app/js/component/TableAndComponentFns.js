@@ -250,7 +250,6 @@ function createGridCell(row, col) {
 
     $(td).on('keypress', '.value', function(){
         if (event.which == 13) {
-            console.log('hi');
             var value = parseInt($(this).val());
             var rowcol = getRowColFromId(this.id);
             if (!isNaN(value)){
@@ -428,6 +427,8 @@ function enableSpecificComponentDomElements(componentToEnableId){
 }
 
 function makeUserEmptyComponentDisplayTable(componentId){
+    toggleOneAllInnerComponentVisibility(true);
+
     disableAllComponentDomElementsExcept(componentId);
 
     createOrResetTableGridContainer(componentId);

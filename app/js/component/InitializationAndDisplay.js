@@ -17,6 +17,11 @@ $(function () {
         height: ($('html').height() - 70 - 44) + 'px',
     });
 
+    $('#inner-component-focus').css({
+        height: ($('html').height() - 70 - 44) + 'px',
+    });
+
+
     resizeViewportToFitWindow();
 
 
@@ -260,6 +265,7 @@ $('.components').on('click', '.component-name-container', function () {
         if ($('#table-grid-container'+'_'+componentId).length===0){
             loadTable(selectedUserComponent);
         } else {
+            toggleOneAllInnerComponentVisibility(true);
             enableSpecificComponentDomElements(selectedUserComponent.meta.id);
         }
         //$('.loader-container').fadeOut('fast');
@@ -453,6 +459,14 @@ function resizeViewportToFitWindow(){
     });
 
     $('.component-options').css({
+        width: (newWidth-250-17) + 'px',
+    });
+
+    $('#inner-component-focus').css({
+        width: (newWidth-250-17) + 'px',
+    });
+
+    $('.inner-component-options').css({
         width: (newWidth-250-17) + 'px',
     });
 }
@@ -1424,3 +1438,35 @@ $('.components').on('click', '.index-page-toggle', function(){
     setUpComponentOptionsIndexPageToggle();
 });
 
+$('#outer-container').on('dblclick', '.cell', function(){
+    var rowcol = getRowColFromId(this.id);
+    var cellToShow = $('#cell'+'_'+rowcol.row+'_'+rowcol.col).clone(true,true);
+
+    $('#inner-component-focus').html('').append(cellToShow);
+    toggleOneAllInnerComponentVisibility(false);
+    setUpInnerComponentOptions();
+});
+
+function setUpInnerComponentOptions(){
+    $('.back-to-all-components').unbind().click(function(){
+        toggleOneAllInnerComponentVisibility(true);
+    });
+}
+
+function toggleOneAllInnerComponentVisibility(showAll){
+    if (showAll){
+        $('#inner-component-focus').html('').css('display', 'none');
+        $('#outer-container').css('display', 'block');
+
+        $('.inner-component-options').css('display', 'none');
+        $('.component-options').css('display', 'block');
+
+    } else {
+        $('#inner-component-focus').css('display', 'block');
+        $('#outer-container').css('display', 'none');
+
+        $('.inner-component-options').css('display', 'block');
+        $('.component-options').css('display', 'none');
+
+    }
+}
