@@ -555,11 +555,11 @@ function displayComponentInTable(cellId, widget, component) {
         showConfigOptions(type, document.getElementById(cellId));
 
         if (type === 'label') {
-            Display(cellId, getHTML[type]("Type text here..."));
+            Display(cellId, type, getHTML[type]("Type text here..."), currentZoom);
         } else if (type === 'panel') {
-            Display(cellId, getHTML[type]({heading: "Type heading...", content: "Type content..."}));
+            Display(cellId, type, getHTML[type]({heading: "Type heading...", content: "Type content..."}), currentZoom);
         } else {
-            Display(cellId, getHTML[type]());
+            Display(cellId, type, getHTML[type](), currentZoom);
             triggerEdit(cellId, true); // since this is a new component, show edit options
         }
 
@@ -572,7 +572,7 @@ function displayComponentInTable(cellId, widget, component) {
             $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0))
         }
         // display requires widget to be placed before display happens
-        Display(cellId, getHTML[type](component.components[type]));
+        Display(cellId, type, getHTML[type](component.components[type]), currentZoom);
 
         triggerEdit(cellId, false); // no need to show edit options
 
@@ -668,7 +668,7 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
                 .then(function (savedFile) { // save was successful
                     RemoveDisplay(cellId);
                     value.img_src = savedFile.url();
-                    Display(cellId, getHTML[type](value));
+                    Display(cellId, type, getHTML[type](value), currentZoom);
                     selectedUserComponent.components[row][col].components[type] = value;
                 });
         } else { // pasted link to image
@@ -688,7 +688,7 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     if (!isUpload) {
         $('#' + cellId).find('.label-container').remove();
         $('#' + cellId).find('.display-component').remove();
-        Display(cellId, getHTML[type](value), function () {
+        Display(cellId, type, getHTML[type](value), currentZoom , function () {
         });
         selectedUserComponent.components[row][col].components = {};
         selectedUserComponent.components[row][col].components[type] = value;
@@ -994,7 +994,7 @@ function movedComponent() {
             var componentCopy = selectedUserComponent.components[delRow][delCol];
             selectedUserComponent.addComponent(componentCopy, newRow, newCol);
 
-            Display('cell'+ '_' + newRow + '_' + newCol, getHTML[componentCopy.type](componentCopy.components[componentCopy.type]));
+            Display('cell'+ '_' + newRow + '_' + newCol, componentCopy.type, getHTML[componentCopy.type](componentCopy.components[componentCopy.type]), currentZoom);
             triggerEdit('cell'+ '_' + newRow + '_' + newCol, false);
 
         }
@@ -1440,11 +1440,33 @@ $('.components').on('click', '.index-page-toggle', function(){
 
 $('#outer-container').on('dblclick', '.cell', function(){
     var rowcol = getRowColFromId(this.id);
-    var cellToShow = $('#cell'+'_'+rowcol.row+'_'+rowcol.col).clone(true,true);
+    var componentToShow;
+    if (selectedUserComponent.components[rowcol.row]){
+        var componentToShow = selectedUserComponent.components[rowcol.row][rowcol.col];
+    }
+    if (componentToShow){
+        toggleOneAllInnerComponentVisibility(false);
 
-    $('#inner-component-focus').html('').append(cellToShow);
-    toggleOneAllInnerComponentVisibility(false);
-    setUpInnerComponentOptions();
+        var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height;
+        var actualWidth =  selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+
+        var widthScale = ($('#inner-component-focus').width() - 20)/actualWidth;
+        var heightScale = ($('#inner-component-focus').height() - 20)/actualHeight;
+
+        var scale = Math.min(widthScale, heightScale);
+
+        $('#display-cell').css({
+            height: actualHeight*scale + 'px',
+            width: actualWidth*scale + 'px',
+            background: 'green',
+            border: '10px solid white',
+        });
+
+        Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
+
+        setUpInnerComponentOptions();
+    }
+
 });
 
 function setUpInnerComponentOptions(){
@@ -1455,7 +1477,9 @@ function setUpInnerComponentOptions(){
 
 function toggleOneAllInnerComponentVisibility(showAll){
     if (showAll){
-        $('#inner-component-focus').html('').css('display', 'none');
+        $('#inner-component-focus #display-cell').html('');
+
+        $('#inner-component-focus').css('display', 'none');
         $('#outer-container').css('display', 'block');
 
         $('.inner-component-options').css('display', 'none');

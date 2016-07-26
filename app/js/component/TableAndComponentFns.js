@@ -36,7 +36,7 @@ function loadTable(componentToShow) {
                 showConfigOptions(type, document.getElementById(cellId));
 
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
-                Display(cellId, getHTML[type](innerComponent.components[type]));
+                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom);
                 triggerEdit(cellId, false);
 
                 $('#' + cellId).addClass("dropped");
@@ -1771,7 +1771,7 @@ function updateBaseComponentDisplayRow(row){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                updateBaseComponentDisplayAt(cellId);
+                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom);
             }
         }
     }
@@ -1782,7 +1782,7 @@ function updateBaseComponentDisplayCol(col){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                updateBaseComponentDisplayAt(cellId);
+                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom);
             }
         }
     }
@@ -1800,7 +1800,7 @@ function hideBaseComponentDisplayCol(col){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                hideBaseComponentDisplayAt(cellId)
+                hideBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type)
             }
         }
     }
@@ -1811,7 +1811,7 @@ function hideBaseComponentDisplayRow(row){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                hideBaseComponentDisplayAt(cellId)
+                hideBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type)
             }
         }
     }
@@ -1830,7 +1830,7 @@ function showBaseComponentDisplayCol(col){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                showBaseComponentDisplayAt(cellId)
+                showBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type)
             }
         }
     }
@@ -1841,7 +1841,7 @@ function showBaseComponentDisplayRow(row){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                showBaseComponentDisplayAt(cellId)
+                showBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type)
             }
         }
     }

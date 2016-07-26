@@ -64,15 +64,15 @@ var getHTML = {
     }
 };
 
-function Display(cellId, html, callback) {
+function Display(cellId, type, html, zoom, callback) {
     var cell = document.getElementById(cellId);
     var sp = document.createElement('span');
     sp.innerHTML = html;
     var html_ = sp.firstElementChild;
     cell.insertBefore(html_, cell.firstChild);
-    hideBaseComponentDisplayAt(cellId);
-    updateBaseComponentDisplayAt(cellId);
-    showBaseComponentDisplayAt(cellId);
+    hideBaseComponentDisplayAt(cellId, type);
+    updateBaseComponentDisplayAt(cellId, type, zoom);
+    showBaseComponentDisplayAt(cellId, type);
     if (callback) callback();
 }
 
@@ -81,20 +81,19 @@ function Display(cellId, html, callback) {
  *
  * @param cellId
  */
-function updateBaseComponentDisplayAt(cellId) {
+function updateBaseComponentDisplayAt(cellId, type, zoom) {
     var cell = $('#'+cellId);
     var cellHeight = (parseFloat(cell.css('height'))-10) + 'px';
     var cellWidth = (parseFloat(cell.css('width'))-10) + 'px';
 
-    //var cellHeight = (parseFloat(cell.css('height'))/currentZoom-10) + 'px';
-    //var cellWidth = (parseFloat(cell.css('width'))/currentZoom-10) + 'px';
+    //var cellHeight = (parseFloat(cell.css('height'))/zoom-10) + 'px';
+    //var cellWidth = (parseFloat(cell.css('width'))/zoom-10) + 'px';
 
 
     //var rowcol = getRowColFromId(cellId);
     //var cellHeight = (selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height*selectedUserComponent.layout.tablePxDimensions.height-10) + 'px';
     //var cellWidth = (selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width*selectedUserComponent.layout.tablePxDimensions.width-10) + 'px';
 
-    var type = cell.get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     var displayComponent = cell.find('.display-component');
     if (type === 'label'){
         displayComponent.parent().css({
@@ -102,8 +101,8 @@ function updateBaseComponentDisplayAt(cellId) {
             width: cellWidth,
         });
         displayComponent.css({
-            //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
-            zoom: currentZoom,
+            //'-webkit-transform': 'scale('+zoom+','+zoom+')',
+            zoom: zoom,
         });
 
     } else {
@@ -119,8 +118,8 @@ function updateBaseComponentDisplayAt(cellId) {
             // TODO other types?
 
             displayComponent.css({
-                //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
-                zoom: currentZoom,
+                //'-webkit-transform': 'scale('+zoom+','+zoom+')',
+                zoom: zoom,
             });
         }
     }
@@ -128,8 +127,7 @@ function updateBaseComponentDisplayAt(cellId) {
 }
 
 
-function hideBaseComponentDisplayAt(cellId){
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+function hideBaseComponentDisplayAt(cellId, type){
     if (type === 'label'){
         $('#' + cellId).find('.display-component').parent().css({
             display: 'none'
@@ -142,8 +140,7 @@ function hideBaseComponentDisplayAt(cellId){
     }
 }
 
-function showBaseComponentDisplayAt(cellId){
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+function showBaseComponentDisplayAt(cellId, type){
     if (type === 'label'){
         $('#' + cellId).find('.display-component').parent().css({
             display: 'block'
