@@ -879,20 +879,20 @@ function getZoomFromSliderVal(){
  * this function can be used to resize the table
  */
 function scaleTableToZoom(){
-    $('.grid').each(function(){
-        var rowcol = getRowColFromId(this.id);
-        var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
-        var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
-        $(this).css({
-            height: (actualHeight)*currentZoom + 'px',
-            width: (actualWidth)*currentZoom + 'px',
-        })
-    });
+    //$('.grid').each(function(){
+    //    var rowcol = getRowColFromId(this.id);
+    //    var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
+    //    var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+    //    $(this).css({
+    //        height: (actualHeight)*currentZoom + 'px',
+    //        width: (actualWidth)*currentZoom + 'px',
+    //    })
+    //});
 
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
 
-    propagateCellResizeToOtherElts();
+    propagateRatioChangeToAllElts();
 
 }
 
@@ -1591,6 +1591,76 @@ function addResizeToFixedRatiosHandlers(){
 }
 
 // TODO add a resize to fixed px sizes function
+
+$('#btn-resize-to-inputs').click(function(){
+    $('.input-single').each(function() {
+        // this exists
+        $(this).removeClass('input-single neutral').addClass('input-multiple');
+        if ($(this).hasClass('input-single-editing')){
+            var rowcol = getRowColFromId($(this).find('.select-unit').get(0).id);
+            var type = $(this).data('dimension');
+            if (type == 'width'){
+                updateSizeValueDisplayAtCol(rowcol.col, false);
+            } else {
+                updateSizeValueDisplayAtRow(rowcol.row, false);
+            }
+            $(this).removeClass('input-single-editing');
+        }
+    });
+
+    $('#resize-to-inputs-done-cancel').css({
+        display: 'block',
+    });
+    $(this).css({
+        display: 'none',
+    })
+});
+
+function resetResizeToInputDisplays(){//ToDO better name
+    $('.input-multiple').removeClass('input-multiple').addClass('input-single neutral');
+
+    $('#resize-to-inputs-done-cancel').css({
+        display: 'none',
+    });
+    $('#btn-resize-to-inputs').css({
+        display: 'block',
+    });
+}
+
+$('#btn-resize-to-inputs-cancel').click(function(){
+    updateSizeValueDisplay(false);
+    resetResizeToInputDisplays();
+});
+
+$('#btn-resize-to-inputs-done').click(function(){
+    var type = $('.select-unit').val(); // this is a bit sketchy
+    if (type == 'px'){
+        for (var row = 1; row<= numRows; row++){
+            var newRatioRow = parseFloat($('.size-display-height').find('#size-display-value_'+row+'_1').val())/selectedUserComponent.layout.tablePxDimensions.height;
+            for (var col = 1; col<= numCols; col++){
+                var newRatioCol = parseFloat($('.size-display-width').find('#size-display-value_1_'+col).val())/selectedUserComponent.layout.tablePxDimensions.width
+                selectedUserComponent.layout[row][col].ratio.grid.width = newRatioCol;
+                selectedUserComponent.layout[row][col].ratio.grid.height = newRatioRow;
+            }
+        }
+        scaleTableToZoom(); // this resizes the table based on the above changes in size
+        saveTableSizeAndRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
+        updateSizeValueDisplay(false);
+    } else if (type == '%'){
+        var ratiosRow = [];
+        var ratiosCol = [];
+        for (var row = 1; row<= numRows; row++){
+            ratiosRow.push(parseFloat($('.size-display-height').find('#size-display-value_'+row+'_1').val())/100);
+        }
+        for (var col = 1; col<= numCols; col++){
+            ratiosCol.push(parseFloat($('.size-display-width').find('#size-display-value_1_'+col).val())/100);
+        }
+
+        resizeColsBySetRatios(ratiosCol);
+        resizeRowsBySetRatios(ratiosRow);
+    }
+    resetResizeToInputDisplays();
+});
 
 
 $('#resize-table').click(function(){

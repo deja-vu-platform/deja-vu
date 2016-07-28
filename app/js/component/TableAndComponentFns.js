@@ -229,8 +229,8 @@ function createGridCell(row, col) {
         '<option value="px" selected>px</option>'+
         '<option value="%">%</option>'+
         '</select>';
-    var sizeDisplayWidth = '<div class="size-display size-display-width input-single" data-dimension="width">' + sizeDisplayInner + '</div>';
-    var sizeDisplayHeight = '<div class="size-display size-display-height input-single" data-dimension="height">' + sizeDisplayInner + '</div>';
+    var sizeDisplayWidth = '<div class="size-display size-display-width input-single neutral" data-dimension="width">' + sizeDisplayInner + '</div>';
+    var sizeDisplayHeight = '<div class="size-display size-display-height input-single neutral" data-dimension="height">' + sizeDisplayInner + '</div>';
 
     if (row == 1){
         $(td).append(sizeDisplayWidth);
@@ -240,18 +240,21 @@ function createGridCell(row, col) {
     }
 
     $(td).on('change', '.select-unit', function(){
-        var rowcol = getRowColFromId(this.id);
-        if ($(this).parent().data('dimension')=='width'){
-            updateSizeDisplayAtCol(rowcol.col);
-        } else {
-            updateSizeDisplayAtRow(rowcol.row);
-        }
+        //var rowcol = getRowColFromId(this.id);
+        //if ($(this).parent().data('dimension')=='width'){
+        //    updateSizeValueDisplayAtCol(rowcol.col);
+        //} else {
+        //    updateSizeValueDisplayAtRow(rowcol.row);
+        //}
+        $('.select-unit').val($(this).val());
+        updateSizeValueDisplay(false);
     });
 
     $(td).on('click', '.value', function(){
-       disableAllSizeDisplays();
-       $(this).parent().removeClass('input-single').addClass('input-single-editing');
-
+        if ($(this).parent().hasClass('input-single')){ // editing only one
+            disableAllSizeDisplays();
+            $(this).parent().removeClass('neutral').addClass('input-single-editing');
+        }
     });
 
     $(td).on('keypress', '.value', function(){
@@ -279,7 +282,7 @@ function createGridCell(row, col) {
                             }
                         }
                         scaleTableToZoom(); // this resizes the table based on the above changes in size
-                        saveRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
+                        saveTableSizeAndRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
                         updateSizeValueDisplay(false);
 
 
@@ -321,16 +324,18 @@ function createGridCell(row, col) {
                     }
 
                 }
-            } else {
-               var type = $(this).parent().data('dimension');
-               if (type == 'width'){
-                   updateSizeDisplayAtCol(rowcol.col, false);
-               } else {
-                   updateSizeDisplayAtRow(rowcol.row, false);
-               }
+                $(this).parent().removeClass('input-single-editing').addClass('neutral');
+                document.activeElement.blur();
+
             }
-            $(this).parent().removeClass('input-single-editing').addClass('input-single');
-            document.activeElement.blur();
+            //else { // if we want the value reset
+            //   var type = $(this).parent().data('dimension');
+            //   if (type == 'width'){
+            //       updateSizeValueDisplayAtCol(rowcol.col, false);
+            //   } else {
+            //       updateSizeValueDisplayAtRow(rowcol.row, false);
+            //   }
+            //}
         }
     });
     return td;
@@ -349,16 +354,15 @@ $(document).click(function(event) {
 function disableAllSizeDisplays(){
     $('.input-single-editing').each(function() {
         // this exists
-        $(this).removeClass('input-single-editing').addClass('input-single');
+        $(this).removeClass('input-single-editing').addClass('neutral');
         var rowcol = getRowColFromId($(this).find('.select-unit').get(0).id);
         var type = $(this).data('dimension');
         if (type == 'width'){
-            updateSizeDisplayAtCol(rowcol.col, false);
+            updateSizeValueDisplayAtCol(rowcol.col, false);
         } else {
-            updateSizeDisplayAtRow(rowcol.row, false);
+            updateSizeValueDisplayAtRow(rowcol.row, false);
         }
     });
-
 }
 
 function createEmptyRow(rowNumber) {
@@ -1293,8 +1297,8 @@ function alignCellsAndGridWithSavedRatios(){
             var cellId = "cell" + '_' + row + '_' + col;
             var cell = $('#'+cellId);
 
-            var width = selectedUserComponent.layout[row][col].ratio.grid.width * (gridWidth);
-            var height = selectedUserComponent.layout[row][col].ratio.grid.height * (gridHeight);
+            var width = selectedUserComponent.layout[row][col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
+            var height = selectedUserComponent.layout[row][col].ratio.grid.height *  selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
 
 
             //if (cell.data('merged').isMerged){
@@ -1419,7 +1423,7 @@ function resetAligners() {
 }
 
 
-function updateSizeDisplayAtRow(row, live){
+function updateSizeValueDisplayAtRow(row, live){
     var type = $('#grid_'+row+'_1').find('.size-display-height select').val();
     if (type == 'px'){
         if (live){
@@ -1441,7 +1445,7 @@ function updateSizeDisplayAtRow(row, live){
 
 }
 
-function updateSizeDisplayAtCol(col, live){
+function updateSizeValueDisplayAtCol(col, live){
     var type = $('#grid_1'+'_'+col).find('.size-display-width select').val();
     if (type == 'px'){
         if (live){
@@ -1463,10 +1467,10 @@ function updateSizeDisplayAtCol(col, live){
 
 function updateSizeValueDisplay(live){
     for (var row = 1; row<=numRows; row++){
-        updateSizeDisplayAtRow(row, live);
+        updateSizeValueDisplayAtRow(row, live);
     }
     for (var col = 1; col<=numCols; col++){
-        updateSizeDisplayAtCol(col, live);
+        updateSizeValueDisplayAtCol(col, live);
     }
 }
 
@@ -1586,43 +1590,67 @@ function addAddToMainPagesButton(){
  * @param ratios {Array}
  */
 function resizeRowsBySetRatios(ratios){
+    var sum = 0;
+    for (var row = 1; row<=numRows; row++){
+        sum+= ratios[row-1];
+    }
+
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<= numCols; col++) {
-            selectedUserComponent.layout[row][col].ratio.grid.height = ratios[row-1];
+            selectedUserComponent.layout[row][col].ratio.grid.height = ratios[row-1]/sum;
             //selectedUserComponent.layout[row][col].ratio.cell.height = ratios[row-1];
-            var newHeight = selectedUserComponent.layout[row][col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
-            $('#grid'+'_'+row+'_'+col).css({
-                height:
-                (newHeight)*currentZoom + 'px',
-            })
+            //var newHeight = selectedUserComponent.layout[row][col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height*currentZoom ;
+            //$('#grid'+'_'+row+'_'+col).css({
+            //    height:
+            //    (newHeight)*currentZoom + 'px',
+            //})
 
         }
     }
-    saveRowColRatiosGrid(true, true);
-    propagateCellResizeToOtherElts();
 
+    propagateRatioChangeToAllElts();
+
+    // update the ratios if they didn't add up to 1
+    if ((sum >= .99) && (sum <= 1.01)){
+        //saveTableSizeAndRowColRatiosGrid(false, false);
+    } else {
+        saveRowRatiosGrid();
+        updateSizeValueDisplay(false);
+
+    }
     //loadTable(selectedUserComponent);
 }
 
 
 function resizeColsBySetRatios(ratios){
-    for (var row = 1; row<=numRows; row++){
-        for (var col = 1; col<= numCols; col++) {
-            selectedUserComponent.layout[row][col].ratio.grid.width = ratios[col-1];
-            //selectedUserComponent.layout[row][col].ratio.cell.width = ratios[col-1];
-            var newWidth = selectedUserComponent.layout[row][col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
-            $('#grid'+'_'+row+'_'+col).css({
-                width: (newWidth)*currentZoom + 'px',
-            })
+    var sum = 0;
+    for (var col = 1; col<= numCols; col++) {
+        sum+= ratios[col-1];
+    }
 
+    for (var col = 1; col<= numCols; col++) {
+        for (var row = 1; row<=numRows; row++){
+            selectedUserComponent.layout[row][col].ratio.grid.width = ratios[col-1]/sum;
         }
     }
-    saveRowColRatiosGrid(true, true);
-    propagateCellResizeToOtherElts();
+
+    propagateRatioChangeToAllElts();
+
+    // update the ratios if they didn't add up to 1
+    if ((sum >= .99) && (sum <= 1.01)){
+        //saveTableSizeAndRowColRatiosGrid(false, false);
+    } else {
+        saveColRatiosGrid();
+        updateSizeValueDisplay(false);
+    }
     //loadTable(selectedUserComponent);
 }
 
-function propagateCellResizeToOtherElts(){
+
+/**
+ * Update the saved ratios and then use this function
+ */
+function propagateRatioChangeToAllElts(){
     hideBaseComponentDisplayAll();
     alignCellsAndGridWithSavedRatios();
     updateBaseComponentDisplayAll();
@@ -1662,8 +1690,8 @@ function rowColResizeOnStop(){
     $('.cell').css({
         opacity: '1',
     });
-    saveRowColRatiosGrid(!tableLockedWidth, !tableLockedHeight);
-    propagateCellResizeToOtherElts();
+    saveTableSizeAndRowColRatiosGrid(!tableLockedWidth, !tableLockedHeight);
+    propagateRatioChangeToAllElts();
 };
 
 function tableLockedResizeRowFn(e, ui){
@@ -1685,8 +1713,8 @@ function tableLockedResizeRowFn(e, ui){
     });
 
 
-    updateSizeDisplayAtCol(rowNum, true);
-    updateSizeDisplayAtCol(nextRowNum, true);
+    updateSizeValueDisplayAtCol(rowNum, true);
+    updateSizeValueDisplayAtCol(nextRowNum, true);
 };
 
 function tableLockedResizeColFn(e, ui){
@@ -1702,8 +1730,8 @@ function tableLockedResizeColFn(e, ui){
         width: remainingWidth + "px"
     });
 
-    updateSizeDisplayAtCol(colNum, true);
-    updateSizeDisplayAtCol(nextColNum, true);
+    updateSizeValueDisplayAtCol(colNum, true);
+    updateSizeValueDisplayAtCol(nextColNum, true);
 
 };
 
@@ -1745,7 +1773,7 @@ function addRowResizeHandler(row){
                 tableLockedResizeRowFn(e, ui);
             } else {
                 var row = getRowColFromId($(this).find('.grid').get(0).id).row;
-                updateSizeDisplayAtRow(row, true);
+                updateSizeValueDisplayAtRow(row, true);
             }
         },
         stop: rowColResizeOnStop,
@@ -1765,7 +1793,7 @@ function addColResizeHandler(col){
                 tableLockedResizeColFn(e, ui);
             } else {
                 var col = getRowColFromId(this.id).col;
-                updateSizeDisplayAtCol(col, true);
+                updateSizeValueDisplayAtCol(col, true);
             }
         },
         stop: rowColResizeOnStop,
@@ -2156,7 +2184,7 @@ function addTableSizeLockUnlockButtons(componentId){
 //
 //}
 
-function saveRowColRatiosGrid(updateTableWidth, updateTableHeight) {
+function updateSavedTableSizeGrid(updateTableWidth, updateTableHeight) {
     // save the new table dimensions
     if (updateTableHeight) {
         selectedUserComponent.layout.tablePxDimensions.height = $('#main-grid-table').height()/currentZoom;
@@ -2166,27 +2194,41 @@ function saveRowColRatiosGrid(updateTableWidth, updateTableHeight) {
         selectedUserComponent.layout.tablePxDimensions.width = $('#main-grid-table').width()/currentZoom;
         gridWidth = $('#main-grid-table').width();
     }
+}
 
-    var widthSum = getWidthSumGrid();
+function saveRowRatiosGrid() {
     var heightSum = getHeightSumGrid();
 
     for (var row = 1; row<=numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             var grid = $('#grid' + '_' + row + '_' + col);
-            var gridCellWidth = parseFloat(grid.css('width'));
             var gridCellHeight = parseFloat(grid.css('height'));
-            var widthRatioGrid = gridCellWidth/(gridWidth);
             var heightRatioGrid = gridCellHeight/(gridHeight);
-
-            var widthRatioGrid = gridCellWidth/widthSum;
             var heightRatioGrid = gridCellHeight/heightSum;
-
-
-            selectedUserComponent.layout[row][col].ratio.grid.width = widthRatioGrid;
             selectedUserComponent.layout[row][col].ratio.grid.height = heightRatioGrid;
         }
     }
+}
 
+function saveColRatiosGrid(){
+    var widthSum = getWidthSumGrid();
+
+    for (var row = 1; row<=numRows; row++) {
+        for (var col = 1; col <= numCols; col++) {
+            var grid = $('#grid' + '_' + row + '_' + col);
+            var gridCellWidth = parseFloat(grid.css('width'));
+            var widthRatioGrid = gridCellWidth/(gridWidth);
+            var widthRatioGrid = gridCellWidth/widthSum;
+            selectedUserComponent.layout[row][col].ratio.grid.width = widthRatioGrid;
+        }
+    }
+}
+
+function saveTableSizeAndRowColRatiosGrid(updateTableWidth, updateTableHeight) {
+    // save the new table dimensions
+    updateSavedTableSizeGrid(updateTableWidth, updateTableHeight);
+    saveColRatiosGrid();
+    saveRowRatiosGrid()
 }
 
 
@@ -2372,7 +2414,7 @@ function addNRowsToEnd(n) {
         selectedUserComponent.layout.tablePxDimensions.height = selectedUserComponent.layout.tablePxDimensions.height + n*standardCellHeight;
         gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
 
-        saveRowColRatiosGrid(false, false);
+        saveRowRatiosGrid();
     }
 
     toggleTableHeightLock(savedTableLockedHeight);
@@ -2382,7 +2424,7 @@ function addNRowsToEnd(n) {
     //if (saveTableLockedHeight){
     //    alignCellsAndGridWithSavedRatios();
     //} else {
-    //    saveRowColRatiosGrid(true, true);
+    //    saveTableSizeAndRowColRatiosGrid(true, true);
     //}
     //// because load table resets this
     //toggleTableWidthLock(saveTableLockedWidth);
@@ -2450,7 +2492,7 @@ function addNRowsToEnd(n) {
 //    if (saveTableLockedHeight){
 //        alignCellsAndGridWithSavedRatios();
 //    } else {
-//        saveRowColRatiosGrid(true, true);
+//        saveTableSizeAndRowColRatiosGrid(true, true);
 //    }
 //    // because load table resets this
 //    toggleTableWidthLock(saveTableLockedWidth);
@@ -2544,8 +2586,7 @@ function removeNRowsFromEnd(n) {
         // do this after the table has been fitted to the new size
         selectedUserComponent.layout.tablePxDimensions.height = (1-ratioToRemoveGrid)*selectedUserComponent.layout.tablePxDimensions.height
         gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
-
-        saveRowColRatiosGrid(false, false);
+        saveRowRatiosGrid();
     }
 
     toggleTableHeightLock(savedTableLockedHeight);
@@ -2554,7 +2595,7 @@ function removeNRowsFromEnd(n) {
     //if (saveTableLockedHeight){
     //    alignCellsAndGridWithSavedRatios();
     //} else {
-    //    saveRowColRatiosGrid(true, true);
+    //    saveTableSizeAndRowColRatiosGrid(true, true);
     //}
     //// because load table resets this
     //toggleTableWidthLock(saveTableLockedWidth);
@@ -2630,7 +2671,7 @@ function removeNRowsFromEnd(n) {
 //    if (saveTableLockedHeight){
 //        alignCellsAndGridWithSavedRatios();
 //    } else {
-//        saveRowColRatiosGrid(true, true);
+//        saveTableSizeAndRowColRatiosGrid(true, true);
 //    }
 //    // because load table resets this
 //    toggleTableWidthLock(saveTableLockedWidth);
@@ -2753,8 +2794,7 @@ function addNColsToEnd(n) {
         // do this after the table has been fitted to the new size
         selectedUserComponent.layout.tablePxDimensions.width = selectedUserComponent.layout.tablePxDimensions.width + n*standardCellWidth;
         gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
-
-        saveRowColRatiosGrid(false, false);
+        saveColRatiosGrid();
     }
 
     toggleTableWidthLock(savedTableLockedWidth);
@@ -2766,7 +2806,7 @@ function addNColsToEnd(n) {
     //if (saveTableLockedWidth){
     //    alignCellsAndGridWithSavedRatios();
     //} else {
-    //    saveRowColRatiosGrid(true, true);
+    //    saveTableSizeAndRowColRatiosGrid(true, true);
     //}
     //
     //// because load table resets this
@@ -2843,7 +2883,7 @@ function addNColsToEnd(n) {
 //    if (saveTableLockedWidth){
 //        alignCellsAndGridWithSavedRatios();
 //    } else {
-//        saveRowColRatiosGrid(true, true);
+//        saveTableSizeAndRowColRatiosGrid(true, true);
 //    }
 //
 //    // because load table resets this
@@ -2936,7 +2976,7 @@ function removeNColsFromEnd(n) {
         selectedUserComponent.layout.tablePxDimensions.width = (1-ratioToRemoveGrid)*selectedUserComponent.layout.tablePxDimensions.width
         gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
 
-        saveRowColRatiosGrid(false, false);
+        saveColRatiosGrid();
     }
 
     toggleTableWidthLock(savedTableLockedWidth); // in order to lock last col again
@@ -2945,7 +2985,7 @@ function removeNColsFromEnd(n) {
     //if (saveTableLockedWidth){
     //    alignCellsAndGridWithSavedRatios();
     //} else {
-    //    saveRowColRatiosGrid(true, true);
+    //    saveTableSizeAndRowColRatiosGrid(true, true);
     //}
     //
     //// because load table resets this
@@ -3027,7 +3067,7 @@ function removeNColsFromEnd(n) {
 //    if (saveTableLockedWidth){
 //        alignCellsAndGridWithSavedRatios();
 //    } else {
-//        saveRowColRatiosGrid(true, true);
+//        saveTableSizeAndRowColRatiosGrid(true, true);
 //    }
 //
 //    // because load table resets this

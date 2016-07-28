@@ -584,7 +584,7 @@ p.label {
     text-align: right;
 }
 
-.input-single .value{
+.neutral .value{
     border: none;
     background: transparent;
     color: #000;
@@ -598,4 +598,8 @@ p.label {
 
 .size-display-height .value{
     display: block;
+}
+
+#resize-to-inputs-done-cancel{
+    display: none;
 }
