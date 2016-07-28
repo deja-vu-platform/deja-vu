@@ -163,7 +163,7 @@ function createTableCell(row, col) {
 
     $(buttonFullOptions).click(function(){
         var rowcol = getRowColFromId(this.id);
-
+        switchToInnerComponentFocusMode(rowcol.row, rowcol.col);
     });
 
     sp.innerHTML = '<li>' +

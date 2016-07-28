@@ -1625,34 +1625,38 @@ $('.components').on('click', '.index-page-toggle', function(){
 
 $('#outer-container').on('dblclick', '.cell', function(){
     var rowcol = getRowColFromId(this.id);
-    var componentToShow;
     if (selectedUserComponent.components[rowcol.row]){
-        var componentToShow = selectedUserComponent.components[rowcol.row][rowcol.col];
+        if (selectedUserComponent.components[rowcol.row][rowcol.col]){
+            switchToInnerComponentFocusMode(rowcol.row, rowcol.col)
+        }
     }
-    if (componentToShow){
-        toggleInnerComponentVisibility(false);
-
-        var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height;
-        var actualWidth =  selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
-
-        var widthScale = ($('#inner-component-focus').width() - 20)/actualWidth;
-        var heightScale = ($('#inner-component-focus').height() - 20)/actualHeight;
-
-        var scale = Math.min(widthScale, heightScale);
-
-        $('#display-cell').css({
-            height: actualHeight*scale + 'px',
-            width: actualWidth*scale + 'px',
-            background: 'green',
-            border: '10px solid white',
-        });
-
-        Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
-
-        setUpInnerComponentOptions();
-    }
-
 });
+
+function switchToInnerComponentFocusMode(row, col){
+    var componentToShow = selectedUserComponent.components[row][col];
+
+    toggleInnerComponentVisibility(false);
+
+    var actualHeight = selectedUserComponent.layout[row][col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height;
+    var actualWidth =  selectedUserComponent.layout[row][col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+
+    var widthScale = ($('#inner-component-focus').width() - 20)/actualWidth;
+    var heightScale = ($('#inner-component-focus').height() - 20)/actualHeight;
+
+    var scale = Math.min(widthScale, heightScale);
+
+    $('#display-cell').css({
+        height: actualHeight*scale + 'px',
+        width: actualWidth*scale + 'px',
+        background: 'green',
+        border: '10px solid white',
+    });
+
+    Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
+
+    setUpInnerComponentOptions();
+    
+}
 
 function setUpInnerComponentOptions(){
     $('.back-to-all-components').unbind().click(function(){
