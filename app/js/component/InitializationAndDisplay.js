@@ -280,7 +280,7 @@ $('.components').on('click', '.component-name-container', function () {
         if ($('#table-grid-container'+'_'+componentId).length===0){
             loadTable(selectedUserComponent);
         } else {
-            toggleOneAllInnerComponentVisibility(true);
+            toggleInnerComponentVisibility(true);
             enableSpecificComponentDomElements(selectedUserComponent.meta.id);
         }
         //$('.loader-container').fadeOut('fast');
@@ -1368,7 +1368,6 @@ $(document).click(function(event) {
     if ($(event.target).is('[contenteditable=true]')) {
         selectText($(event.target).get(0));
     }
-
 });
 
 /**
@@ -1631,7 +1630,7 @@ $('#outer-container').on('dblclick', '.cell', function(){
         var componentToShow = selectedUserComponent.components[rowcol.row][rowcol.col];
     }
     if (componentToShow){
-        toggleOneAllInnerComponentVisibility(false);
+        toggleInnerComponentVisibility(false);
 
         var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height;
         var actualWidth =  selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
@@ -1657,11 +1656,11 @@ $('#outer-container').on('dblclick', '.cell', function(){
 
 function setUpInnerComponentOptions(){
     $('.back-to-all-components').unbind().click(function(){
-        toggleOneAllInnerComponentVisibility(true);
+        toggleInnerComponentVisibility(true);
     });
 }
 
-function toggleOneAllInnerComponentVisibility(showAll){
+function toggleInnerComponentVisibility(showAll){
     if (showAll){
         $('#inner-component-focus #display-cell').html('');
 

@@ -229,8 +229,8 @@ function createGridCell(row, col) {
         '<option value="px" selected>px</option>'+
         '<option value="%">%</option>'+
         '</select>';
-    var sizeDisplayWidth = '<div class="size-display size-display-width input-disabled" data-dimension="width">' + sizeDisplayInner + '</div>';
-    var sizeDisplayHeight = '<div class="size-display size-display-height  input-disabled" data-dimension="height">' + sizeDisplayInner + '</div>';
+    var sizeDisplayWidth = '<div class="size-display size-display-width input-single" data-dimension="width">' + sizeDisplayInner + '</div>';
+    var sizeDisplayHeight = '<div class="size-display size-display-height input-single" data-dimension="height">' + sizeDisplayInner + '</div>';
 
     if (row == 1){
         $(td).append(sizeDisplayWidth);
@@ -248,74 +248,117 @@ function createGridCell(row, col) {
         }
     });
 
+    $(td).on('click', '.value', function(){
+       disableAllSizeDisplays();
+       $(this).parent().removeClass('input-single').addClass('input-single-editing');
+
+    });
+
     $(td).on('keypress', '.value', function(){
         if (event.which == 13) {
-            var value = parseInt($(this).val());
             var rowcol = getRowColFromId(this.id);
-            if (!isNaN(value)){
-                var type = $('#size-display-select_'+rowcol.row+'_'+rowcol.col).val();
-                if (type == 'px'){
-                    if ($(this).parent().data('dimension')=='width'){
-                        var dimension = selectedUserComponent.layout.tablePxDimensions.width;
-                    } else {
-                        var dimension = selectedUserComponent.layout.tablePxDimensions.height;
-                    }
-                    value = value/dimension; // now value is a ratio
-
-                    if ($(this).parent().data('dimension')=='width'){
-                        for (var row = 1; row<=numRows; row++){
-                            selectedUserComponent.layout[row][rowcol.col].ratio.grid.width = value;
+            if ($(this).parent().hasClass('input-single-editing')){
+                var value = parseInt($(this).val());
+                if (!isNaN(value)){
+                    var type = $('#size-display-select_'+rowcol.row+'_'+rowcol.col).val();
+                    if (type == 'px'){
+                        if ($(this).parent().data('dimension')=='width'){
+                            var dimension = selectedUserComponent.layout.tablePxDimensions.width;
+                        } else {
+                            var dimension = selectedUserComponent.layout.tablePxDimensions.height;
                         }
-                    } else {
-                        for (var col = 1; col<=numCols; col++){
-                            selectedUserComponent.layout[rowcol.row][col].ratio.grid.height = value;
-                        }
-                    }
-                    scaleTableToZoom(); // this resizes the table based on the above changes in size
-                    saveRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
-                    updateSizeValueDisplay(false);
+                        value = value/dimension; // now value is a ratio
 
-
-                } else {
-                    value = value/100; // now value is a ratio
-
-                    if ($(this).parent().data('dimension')=='width'){
-                        var oldRatio = selectedUserComponent.layout[1][rowcol.col].ratio.grid.width;
-                        var difference = value - oldRatio; // this difference is what we have to take away from the others
-                        var differencePerCol = difference/(numCols-1);
-
-                        for (var row = 1; row <= numRows; row++) {
-                            for (var col = 1; col <= numCols; col++) {
-                                if (col == rowcol.col){
-                                    selectedUserComponent.layout[row][col].ratio.grid.width = value;
-                                } else { // for all other columns, scale down the widths proportionally
-                                    selectedUserComponent.layout[row][col].ratio.grid.width = selectedUserComponent.layout[row][col].ratio.grid.width - differencePerCol;
-                                }
+                        if ($(this).parent().data('dimension')=='width'){
+                            for (var row = 1; row<=numRows; row++){
+                                selectedUserComponent.layout[row][rowcol.col].ratio.grid.width = value;
+                            }
+                        } else {
+                            for (var col = 1; col<=numCols; col++){
+                                selectedUserComponent.layout[rowcol.row][col].ratio.grid.height = value;
                             }
                         }
-                    } else {
-                        var oldRatio = selectedUserComponent.layout[rowcol.row][1].ratio.grid.height;
-                        var difference = value - oldRatio; // this difference is what we have to take away from the others
-                        var differencePerRow = difference/(numRows-1);
+                        scaleTableToZoom(); // this resizes the table based on the above changes in size
+                        saveRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
+                        updateSizeValueDisplay(false);
 
-                        for (var row = 1; row <= numRows; row++) {
-                            for (var col = 1; col <= numCols; col++) {
-                                if (row == rowcol.row){
-                                    selectedUserComponent.layout[row][col].ratio.grid.height = value;
-                                } else { // for all other columns, scale down the heights proportionally
-                                    selectedUserComponent.layout[row][col].ratio.grid.height = selectedUserComponent.layout[row][col].ratio.grid.height - differencePerRow;
+
+                    } else {
+                        value = value/100; // now value is a ratio
+
+                        if ($(this).parent().data('dimension')=='width'){
+                            var oldRatio = selectedUserComponent.layout[1][rowcol.col].ratio.grid.width;
+                            var difference = value - oldRatio; // this difference is what we have to take away from the others
+                            var differencePerCol = difference/(numCols-1);
+
+                            for (var row = 1; row <= numRows; row++) {
+                                for (var col = 1; col <= numCols; col++) {
+                                    if (col == rowcol.col){
+                                        selectedUserComponent.layout[row][col].ratio.grid.width = value;
+                                    } else { // for all other columns, scale down the widths proportionally
+                                        selectedUserComponent.layout[row][col].ratio.grid.width = selectedUserComponent.layout[row][col].ratio.grid.width - differencePerCol;
+                                    }
                                 }
                             }
-                        }
+                        } else {
+                            var oldRatio = selectedUserComponent.layout[rowcol.row][1].ratio.grid.height;
+                            var difference = value - oldRatio; // this difference is what we have to take away from the others
+                            var differencePerRow = difference/(numRows-1);
 
+                            for (var row = 1; row <= numRows; row++) {
+                                for (var col = 1; col <= numCols; col++) {
+                                    if (row == rowcol.row){
+                                        selectedUserComponent.layout[row][col].ratio.grid.height = value;
+                                    } else { // for all other columns, scale down the heights proportionally
+                                        selectedUserComponent.layout[row][col].ratio.grid.height = selectedUserComponent.layout[row][col].ratio.grid.height - differencePerRow;
+                                    }
+                                }
+                            }
+
+                        }
+                        scaleTableToZoom(); // this resizes the table based on the above changes in size
+                        updateSizeValueDisplay(false);
                     }
-                    scaleTableToZoom(); // this resizes the table based on the above changes in size
-                    updateSizeValueDisplay(false);
+
                 }
+            } else {
+               var type = $(this).parent().data('dimension');
+               if (type == 'width'){
+                   updateSizeDisplayAtCol(rowcol.col, false);
+               } else {
+                   updateSizeDisplayAtRow(rowcol.row, false);
+               }
             }
+            $(this).parent().removeClass('input-single-editing').addClass('input-single');
+            document.activeElement.blur();
         }
     });
     return td;
+}
+
+
+/**
+ * Click outside the size displays to hide it
+ */
+$(document).click(function(event) {
+    if(!$(event.target).is('.value')){
+        disableAllSizeDisplays();
+    }
+});
+
+function disableAllSizeDisplays(){
+    $('.input-single-editing').each(function() {
+        // this exists
+        $(this).removeClass('input-single-editing').addClass('input-single');
+        var rowcol = getRowColFromId($(this).find('.select-unit').get(0).id);
+        var type = $(this).data('dimension');
+        if (type == 'width'){
+            updateSizeDisplayAtCol(rowcol.col, false);
+        } else {
+            updateSizeDisplayAtRow(rowcol.row, false);
+        }
+    });
+
 }
 
 function createEmptyRow(rowNumber) {
@@ -427,7 +470,7 @@ function enableSpecificComponentDomElements(componentToEnableId){
 }
 
 function makeUserEmptyComponentDisplayTable(componentId){
-    toggleOneAllInnerComponentVisibility(true);
+    toggleInnerComponentVisibility(true);
     currentZoom = 1; // set zoom value 100%
 
     disableAllComponentDomElementsExcept(componentId);
@@ -1285,8 +1328,8 @@ function alignCellsAndGridWithSavedRatios(){
 
 
 function updateZoomFromState(componentId){
-    changeZoomDisplays($('#table-grid-container'+'_'+componentId).data('state').zoom);
-
+    currentZoom = $('#table-grid-container'+'_'+componentId).data('state').zoom;
+    changeZoomDisplays(currentZoom);
 }
 
 /**

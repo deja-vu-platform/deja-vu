@@ -584,11 +584,11 @@ p.label {
     text-align: right;
 }
 
-.input-disabled .value{
+.input-single .value{
     border: none;
     background: transparent;
     color: #000;
-    pointer-events: none;
+    /*pointer-events: none;*/
 }
 
 
