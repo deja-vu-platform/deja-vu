@@ -247,8 +247,11 @@ td {
     height: 550px;
     border: 1px solid #dddddd;
     margin-left: 267px;
-    overflow: scroll;
     position: relative;
+}
+
+#outer-container{
+    overflow: scroll;
     background: grey;
 }
 
@@ -446,7 +449,7 @@ td.dropped li.widget {
     /*width: 200px;*/
     /*height: 200px;*/
     padding: 20% 5% 10% 5%;
-    background: #fff;
+    /*background: #fff;*/
     border: #e0e0e0 solid 1px;
     display: block;
 }

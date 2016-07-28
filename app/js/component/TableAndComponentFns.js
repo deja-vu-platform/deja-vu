@@ -36,7 +36,9 @@ function loadTable(componentToShow) {
                 showConfigOptions(type, document.getElementById(cellId));
 
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
-                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom);
+
+                var padding = selectedUserComponent.layout[row][col].ratio.padding;
+                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding);
                 triggerEdit(cellId, false);
 
                 $('#' + cellId).addClass("dropped");
@@ -1842,7 +1844,8 @@ function updateBaseComponentDisplayRow(row){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom);
+                var padding = selectedUserComponent.layout[row][col].ratio.padding;
+                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding);
             }
         }
     }
@@ -1853,7 +1856,8 @@ function updateBaseComponentDisplayCol(col){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom);
+                var padding = selectedUserComponent.layout[row][col].ratio.padding;
+                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding);
             }
         }
     }
@@ -2052,6 +2056,26 @@ function toggleTableHeightLock(lock){
 
     }
 }
+
+function toggleTableLockDisable(disable){
+    if (disable){
+        //$('.btn-table-width-lock-unlock').addClass('disabled');
+        //$('.btn-table-height-lock-unlock').addClass('disabled');
+        $('.btn-table-width-lock-unlock').prop('disabled', true);
+        $('.btn-table-height-lock-unlock').prop('disabled', true);
+
+    } else {
+        //$('.btn-table-width-lock-unlock').removeClass('disabled');
+        //$('.btn-table-height-lock-unlock').removeClass('disabled');
+        $('.btn-table-width-lock-unlock').prop('disabled', false);
+        $('.btn-table-height-lock-unlock').prop('disabled', false);
+
+    }
+}
+
+$('body').on('click', '.disabled', function(event) {
+    event.preventDefault();
+});
 
 function addTableSizeLockUnlockButtons(componentId){
     toggleTableWidthLock(false);

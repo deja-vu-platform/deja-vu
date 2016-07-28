@@ -21,9 +21,9 @@ $(function () {
         height: ($('html').height() - 70 - 44) + 'px',
     });
 
-    $('#inner-component-focus').css({
-        height: ($('html').height() - 70 - 44) + 'px',
-    });
+    //$('#inner-component-focus').css({
+    //    height: ($('html').height() - 70 - 44) + 'px',
+    //});
 
     // todo get screenSizes for the user
 
@@ -477,9 +477,9 @@ function resizeViewportToFitWindow(){
         width: (newWidth-250-17) + 'px',
     });
 
-    $('#inner-component-focus').css({
-        width: (newWidth-250-17) + 'px',
-    });
+    //$('#inner-component-focus').css({
+    //    width: (newWidth-250-17) + 'px',
+    //});
 
     $('.inner-component-options').css({
         width: (newWidth-250-17) + 'px',
@@ -574,6 +574,7 @@ function displayComponentInTable(cellId, widget, component) {
 
         showConfigOptions(type, document.getElementById(cellId));
 
+        // note: no padding here because this is a new component we are adding
         if (type === 'label') {
             Display(cellId, type, getHTML[type]("Type text here..."), currentZoom);
         } else if (type === 'panel') {
@@ -592,7 +593,9 @@ function displayComponentInTable(cellId, widget, component) {
             $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0))
         }
         // display requires widget to be placed before display happens
-        Display(cellId, type, getHTML[type](component.components[type]), currentZoom);
+
+        var padding = selectedUserComponent.layout[row][col].ratio.padding;
+        Display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding);
 
         triggerEdit(cellId, false); // no need to show edit options
 
@@ -688,7 +691,8 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
                 .then(function (savedFile) { // save was successful
                     RemoveDisplay(cellId);
                     value.img_src = savedFile.url();
-                    Display(cellId, type, getHTML[type](value), currentZoom);
+                    var padding = selectedUserComponent.layout[row][col].ratio.padding;
+                    Display(cellId, type, getHTML[type](value), currentZoom, padding);
                     selectedUserComponent.components[row][col].components[type] = value;
                 });
         } else { // pasted link to image
@@ -708,7 +712,9 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     if (!isUpload) {
         $('#' + cellId).find('.label-container').remove();
         $('#' + cellId).find('.display-component').remove();
-        Display(cellId, type, getHTML[type](value), currentZoom , function () {
+
+        var padding = selectedUserComponent.layout[row][col].ratio.padding;
+        Display(cellId, type, getHTML[type](value), currentZoom , padding, function () {
         });
         selectedUserComponent.components[row][col].components = {};
         selectedUserComponent.components[row][col].components[type] = value;
@@ -1180,7 +1186,8 @@ function movedComponent() {
             var componentCopy = selectedUserComponent.components[delRow][delCol];
             selectedUserComponent.addComponent(componentCopy, newRow, newCol);
 
-            Display('cell'+ '_' + newRow + '_' + newCol, componentCopy.type, getHTML[componentCopy.type](componentCopy.components[componentCopy.type]), currentZoom);
+            var padding = selectedUserComponent.layout[row][col].ratio.padding;
+            Display('cell'+ '_' + newRow + '_' + newCol, componentCopy.type, getHTML[componentCopy.type](componentCopy.components[componentCopy.type]), currentZoom, padding);
             triggerEdit('cell'+ '_' + newRow + '_' + newCol, false);
 
         }
@@ -1710,29 +1717,165 @@ function switchToInnerComponentFocusMode(row, col){
     var actualHeight = selectedUserComponent.layout[row][col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height;
     var actualWidth =  selectedUserComponent.layout[row][col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
 
-    var widthScale = ($('#inner-component-focus').width() - 20)/actualWidth;
-    var heightScale = ($('#inner-component-focus').height() - 20)/actualHeight;
+    $('#inner-component-focus').css({
+        width: '600px',
+        height: '600px',
+    });
+
+    var widthScale = ($('#inner-component-focus').width())/actualWidth;
+    var heightScale = ($('#inner-component-focus').height())/actualHeight;
 
     var scale = Math.min(widthScale, heightScale);
 
-    $('#display-cell').css({
+    $('#inner-component-focus').css({ // update the width and height to something that actually looks like the cell
         height: actualHeight*scale + 'px',
         width: actualWidth*scale + 'px',
-        background: 'green',
-        border: '10px solid white',
+        //border: '5px solid white',
+        'background-color': '#F9F9F9',
+        position: 'relative',
     });
 
+    var padding = selectedUserComponent.layout[row][col].ratio.padding;
+    if (!padding){
+        padding = {top: 0, bottom: 0, left: 0, right: 0};
+    }
+
+    var displayTop = padding.top*actualHeight*scale;
+    var displayLeft = padding.left*actualWidth*scale;
+    var displayHeight = (1-padding.top-padding.bottom)*actualHeight*scale;
+    var displayWidth = (1-padding.left-padding.right)*actualWidth*scale;
+
+    $('#display-cell').css({
+        height: displayHeight + 'px',
+        width: displayWidth + 'px',
+        display: 'table-cell',
+        'text-align': 'center',
+        'vertical-align': 'middle',
+        border: '1px grey solid',
+        position: 'absolute',
+        top: displayTop,
+        left: displayLeft,
+    });
+
+    $('#display-cell-resize-helper').css({
+        height: displayHeight + 'px',
+        width: displayWidth + 'px',
+        'pointer-events': 'none',
+        position: 'absolute',
+        top: displayTop,
+        left: displayLeft,
+        'z-index':100,
+    });
+
+    // NOTE: don't use any padding here
     Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
 
-    setUpInnerComponentOptions();
+    $('#display-cell').children().css('position', 'relative');
+    $('#display-cell-resize-handle').css({
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        'pointer-events': 'auto'
+        //top: (actualHeight*scale - 15) + 'px',
+        //left: (actualWidth*scale - 15) + 'px',
+    });
+
+    $('#display-cell-resize-helper').resizable({
+        handles: {
+            'se': $('#display-cell-resize-handle')
+        },
+        //helper: "display-cell-resize-helper",
+
+        start: function(){
+            $('#display-cell-resize-helper').css({
+                border: 'black 1px dotted',
+            })
+        },
+        resize: function(){
+            //var helper = $('.display-cell-resize-helper');
+            //var displayCell = $('#display-cell');
+            //$('#display-cell-resize-handle').css({
+            //    top: (helper.height() - 15) + 'px',
+            //    left: (helper.width() - 15) + 'px',
+            //});
+            //console.log($(this).resizable('option', 'containment'));
+        },
+        stop: function () {
+            $('#display-cell-resize-helper').css({
+                border: 'none',
+            });
+            $('#inner-component-focus #display-cell').html('');
+            $('#inner-component-focus #display-cell').css({
+                height: $('#display-cell-resize-helper').css('height'),
+                width: $('#display-cell-resize-helper').css('width'),
+            });
+            // NOTE: shouldn't use any padding here
+            Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
+            //$('#display-cell-resize-handle').css({
+            //    top: ($('#display-cell').height() - 15) + 'px',
+            //    left: ($('#display-cell').width() - 15) + 'px',
+            //});
+
+            var top = $(this).position().top/$('#inner-component-focus').height();
+            var bottom = ($(this).position().top + $(this).height())/$('#inner-component-focus').height();
+            var left = $(this).position().left/$('#inner-component-focus').width();;
+            var right = ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
+
+            selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: top, bottom: bottom, right: right}
+            refreshCellDisplay(row, col);
+        },
+        containment: '#inner-component-focus',
+    });
+
+    $('#display-cell').draggable({
+        containment: '#inner-component-focus',
+        drag: function(){
+            $('#display-cell-resize-helper').css({
+                top: $(this).position().top,
+                left: $(this).position().left,
+            });
+        },
+        stop: function(){
+            $('#display-cell-resize-helper').css({
+                top: $(this).position().top,
+                left: $(this).position().left,
+            });
+
+            var top = $(this).position().top/$('#inner-component-focus').height();
+            var bottom = 1 - ($(this).position().top + $(this).height())/$('#inner-component-focus').height();
+            var left = $(this).position().left/$('#inner-component-focus').width();;
+            var right = 1 - ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
+
+            selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: top, bottom: bottom, right: right}
+            refreshCellDisplay(row, col);
+        }
+    });
+
+    setUpInnerComponentOptions(row,col);
     
 }
 
-function setUpInnerComponentOptions(){
+function setUpInnerComponentOptions(row,col){
     $('.back-to-all-components').unbind().click(function(){
+        refreshCellDisplay(row, col);
         toggleInnerComponentVisibility(true);
     });
+    $('.btn-delete-inner-component').unbind().click(function(){
+        deleteComponentFromUserComponentAndFromView('cell'+'_'+row+'_'+col);
+        toggleInnerComponentVisibility(true);
+    });
+
 }
+
+function refreshCellDisplay(row, col){
+    var cellId = 'cell'+'_'+row+'_'+col;
+    RemoveDisplay(cellId);
+    var componentToChange = selectedUserComponent.components[row][col];
+    var padding = selectedUserComponent.layout[row][col].ratio.padding;
+    Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), currentZoom, padding);
+
+}
+
 
 function toggleInnerComponentVisibility(showAll){
     if (showAll){

@@ -64,14 +64,14 @@ var getHTML = {
     }
 };
 
-function Display(cellId, type, html, zoom, callback) {
+function Display(cellId, type, html, zoom, padding, callback) {
     var cell = document.getElementById(cellId);
     var sp = document.createElement('span');
     sp.innerHTML = html;
     var html_ = sp.firstElementChild;
     cell.insertBefore(html_, cell.firstChild);
     hideBaseComponentDisplayAt(cellId, type);
-    updateBaseComponentDisplayAt(cellId, type, zoom);
+    updateBaseComponentDisplayAt(cellId, type, zoom, padding);
     showBaseComponentDisplayAt(cellId, type);
     if (callback) callback();
 }
@@ -81,10 +81,22 @@ function Display(cellId, type, html, zoom, callback) {
  *
  * @param cellId
  */
-function updateBaseComponentDisplayAt(cellId, type, zoom) {
+function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
     var cell = $('#'+cellId);
-    var cellHeight = (parseFloat(cell.css('height'))-10) + 'px';
-    var cellWidth = (parseFloat(cell.css('width'))-10) + 'px';
+    var cellHeight = (parseFloat(cell.css('height'))-10);
+    var cellWidth = (parseFloat(cell.css('width'))-10);
+
+    var rowcol = getRowColFromId(cellId);
+    if (!padding){
+        padding = {top: 0, bottom: 0, left: 0, right: 0};
+    }
+
+    var paddingPx = {
+        top: padding.top*cellHeight,
+        bottom: padding.bottom*cellHeight,
+        left: padding.left*cellWidth,
+        right: padding.right*cellWidth
+    }
 
     //var cellHeight = (parseFloat(cell.css('height'))/zoom-10) + 'px';
     //var cellWidth = (parseFloat(cell.css('width'))/zoom-10) + 'px';
@@ -97,22 +109,31 @@ function updateBaseComponentDisplayAt(cellId, type, zoom) {
     var displayComponent = cell.find('.display-component');
     if (type === 'label'){
         displayComponent.parent().css({
-            height: cellHeight,
-            width: cellWidth,
+            height: cellHeight + 'px',
+            width: cellWidth + 'px',
+            'padding-top': paddingPx.top + 'px',
+            'padding-left': paddingPx.left + 'px',
+            'padding-bottom': paddingPx.bottom + 'px',
+            'padding-right': paddingPx.right + 'px',
         });
         displayComponent.css({
             //'-webkit-transform': 'scale('+zoom+','+zoom+')',
             zoom: zoom,
+            background: 'white',
         });
 
     } else {
         if (type === 'image') {
             displayComponent.css({
-                'max-height': cellHeight,
-                'max-width': cellWidth,
+                'max-height': cellHeight + 'px',
+                'max-width': cellWidth + 'px',
                 height: 'auto',
                 width: 'auto',
                 'vertical-align':'top',
+                'padding-top': paddingPx.top + 'px',
+                'padding-left': paddingPx.left + 'px',
+                'padding-bottom': paddingPx.bottom + 'px',
+                'padding-right': paddingPx.right + 'px',
             });
         } else {
             // TODO other types?
@@ -120,6 +141,11 @@ function updateBaseComponentDisplayAt(cellId, type, zoom) {
             displayComponent.css({
                 //'-webkit-transform': 'scale('+zoom+','+zoom+')',
                 zoom: zoom,
+                // Todo: issue :(
+                'padding-top': paddingPx.top/zoom + 'px',
+                'padding-left': paddingPx.left/zoom + 'px',
+                'padding-bottom': paddingPx.bottom/zoom + 'px',
+                'padding-right': paddingPx.right/zoom + 'px',
             });
         }
     }
@@ -162,6 +188,7 @@ function showBaseComponentDisplayAt(cellId, type){
  * @constructor
  */
 function RemoveDisplay(cellId, callback) {
+    $('#'+cellId).find('.label-container').remove();
     $('#'+cellId).find('.display-component').remove();
     if (callback) callback();
 }
