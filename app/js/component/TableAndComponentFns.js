@@ -1328,6 +1328,9 @@ function alignCellsAndGridWithSavedRatios(){
                 height: height,
             });
         }
+        //$('.row_'+row).css({
+        //    height: height,
+        //});
     }
 
 }
@@ -1653,6 +1656,10 @@ function resizeColsBySetRatios(ratios){
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(){
+    // update these just incase
+    gridHeight = selectedUserComponent.layout.tablePxDimensions.height*currentZoom;
+    gridWidth = selectedUserComponent.layout.tablePxDimensions.width*currentZoom;
+
     hideBaseComponentDisplayAll();
     alignCellsAndGridWithSavedRatios();
     updateBaseComponentDisplayAll();
