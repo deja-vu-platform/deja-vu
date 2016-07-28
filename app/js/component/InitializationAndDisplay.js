@@ -4,7 +4,11 @@
 
 var projectsSavePath = path.join(__dirname, 'projects');
 var addedCliches;
+var navZoom = .1;
+var navDragging = false;
 
+var selectedScreenSizeHeight = 1600;
+var selectedScreenSizeWidth = 2000;
 
 /** ** ** ** ** ** Initialization ** ** ** ** ** **/
 $(function () {
@@ -21,8 +25,17 @@ $(function () {
         height: ($('html').height() - 70 - 44) + 'px',
     });
 
+    // todo get screenSizes for the user
+
+    $('#selected-screen-size').css({
+        height: selectedScreenSizeHeight*currentZoom + 'px',
+        width: selectedScreenSizeWidth*currentZoom + 'px',
+    });
+
 
     resizeViewportToFitWindow();
+    zoomNavInitialize();
+
 
 
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
@@ -80,6 +93,8 @@ $(function () {
 
     }
 
+    initializeZoomNavComponentSize();
+
     //autoSave5Mins();
 
     basicComponents = $('#basic-components').html();
@@ -124,8 +139,8 @@ $('#new-main-component-btn').click(function(){
         numCols = $('#select-cols').val();
         selectedUserComponent = initUserComponent(false);
         selectedUserComponent.inMainPages = true;
-        selectedProject.addComponent(selectedUserComponent);
         selectedProject.mainComponents[selectedUserComponent.meta.id] = selectedUserComponent.meta.name;
+        selectedProject.addComponent(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
         makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
@@ -469,6 +484,11 @@ function resizeViewportToFitWindow(){
     $('.inner-component-options').css({
         width: (newWidth-250-17) + 'px',
     });
+
+    $('#zoom-nav-position').css({
+        height: $('#outer-container').height()*navZoom + 'px',
+        width: $('#outer-container').width()*navZoom + 'px',
+    });
 }
 
 window.addEventListener("resize", function(){
@@ -810,12 +830,6 @@ function registerDraggable() {
             appendTo: 'html',
             cursor: '-webkit-grabbing',
             scroll: true,
-            //start: function(e, ui){
-            //    dragZoomFixes(this, '#outer-container').start(e, ui);
-            //},
-            //drag: function(e, ui){
-            //    dragZoomFixes(this, '#outer-container').drag(e, ui);
-            //},
             drag: function(e, ui){
                     ui.position.top = e.pageY;
                     ui.position.left = e.pageX;
@@ -882,30 +896,62 @@ function scaleTableToZoom(){
 
 }
 
-function changeZoom(isFit){
-    if (!isFit){
+function changeZoomViaZoomControl(type) {
+    if (type == 'slider') {
         // TODO make this better
         var zoom = getZoomFromSliderVal();
-        $('#zoom-control-value').text(Math.round(zoom*100)+'%');
+        $('#zoom-control-value').text(Math.round(zoom * 100) + '%');
         currentZoom = zoom;
-
-    } else {
-        var zoomHeight = ($('#outer-container').height()-(20+100+70+17))/selectedUserComponent.layout.tablePxDimensions.height; // take into account padding and stuff
-        var zoomWidth = ($('#outer-container').width()-(20+100+40+17))/selectedUserComponent.layout.tablePxDimensions.width;
+    } else if (type == 'fit') {
+        var zoomHeight = ($('#outer-container').height() - (20 + 100 + 70 + 17)) / selectedUserComponent.layout.tablePxDimensions.height; // take into account padding and stuff
+        var zoomWidth = ($('#outer-container').width() - (20 + 100 + 40 + 17)) / selectedUserComponent.layout.tablePxDimensions.width;
         currentZoom = Math.min(zoomWidth, zoomHeight);
+    } else {
+        var widthScale = ($('#outer-container').width())/$('#selected-screen-size').width();
+        var heightScale = ($('#outer-container').height())/$('#selected-screen-size').height();
 
-        $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
-        var sliderVal = getSliderValFromZoom(currentZoom);
-        $('#zoom-slider').val(sliderVal);
+        currentZoom = Math.min(widthScale, heightScale);
     }
+    changeZoomDisplays(currentZoom);
+
+    // update the state
     var state = $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state');
     state.zoom = currentZoom;
     $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', state);
 
     scaleTableToZoom();
-};
+}
+
+/**
+ * Changes the displays related to zoom
+ *
+ * @param zoom
+ */
+function changeZoomDisplays(zoom){
+    $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
+    var sliderVal = getSliderValFromZoom(currentZoom);
+    $('#zoom-slider').val(sliderVal);
 
 
+
+    // update zoom nav displays
+    $('#selected-screen-size').css({
+        height: selectedScreenSizeHeight*currentZoom + 'px',
+        width: selectedScreenSizeWidth*currentZoom + 'px',
+    });
+    $('#zoom-selected-screen-size').css({
+        height: selectedScreenSizeHeight*currentZoom*navZoom + 'px',
+        width: selectedScreenSizeWidth*currentZoom*navZoom + 'px',
+    });
+    updateZoomNavComponentSize();
+}
+
+function updateZoomNavComponentSize(){
+    $('#zoom-nav-component-size').css({
+        width: selectedUserComponent.layout.tablePxDimensions.width*navZoom*currentZoom + 'px',
+        height: selectedUserComponent.layout.tablePxDimensions.height*navZoom*currentZoom + 'px',
+    });
+}
 
 function registerZoom() {
     $('#zoom-control-value').text('100%');
@@ -917,7 +963,7 @@ function registerZoom() {
     //    slide: function(e, ui){
     //
     //    },
-    //    stop: changeZoom,
+    //    stop: changeZoomViaZoomControl,
     //
     //});
 
@@ -929,7 +975,7 @@ function registerZoom() {
         //var val = $( "#zoom-slider" ).slider( "option", "value" );
         $('#zoom-slider').val(Math.round(val/100)*100+100);
         //$( "#zoom-slider" ).slider( "option", "value", val+100);
-        changeZoom(false);
+        changeZoomViaZoomControl('slider');
     });
     $('#zoom-out').click( function (e) {
         e.preventDefault();
@@ -937,7 +983,7 @@ function registerZoom() {
         //var val = $( "#zoom-slider" ).slider( "option", "value" );
         $('#zoom-slider').val(Math.round(val/100)*100-100);
         //$( "#zoom-slider" ).slider( "option", "value", val-100);
-        changeZoom(false);
+        changeZoomViaZoomControl('slider');
     });
 
 
@@ -947,21 +993,118 @@ function registerZoom() {
     });
 
     $('#zoom-slider').on('change', function(){
-        changeZoom(false);
+        changeZoomViaZoomControl('slider');
     });
 
     $('#zoom-actual').click(function(e, ui){
         e.preventDefault();
         $('#zoom-slider').val(0);
         //$( "#zoom-slider" ).slider( "option", "value", 0);
-        changeZoom(false);
+        changeZoomViaZoomControl('slider');
     });
 
     $('#zoom-fit').click(function(e, ui){
         e.preventDefault();
-        changeZoom(true);
+        changeZoomViaZoomControl('fit');
     });
+    $('#zoom-full').click(function(e, ui){
+        e.preventDefault();
+        changeZoomViaZoomControl('full');
+    });
+
+
 }
+
+function zoomNavInitialize(){
+    var widthScale = ($('#zoom-nav').width())/$('#selected-screen-size').width();
+    var heightScale = ($('#zoom-nav').height())/$('#selected-screen-size').height();
+
+    var scale = Math.min(widthScale, heightScale);
+    navZoom = scale;
+
+    $('#zoom-selected-screen-size').css({
+        position: 'absolute',
+        height: $('#selected-screen-size').height()*scale*currentZoom + 'px',
+        width: $('#selected-screen-size').width()*scale*currentZoom + 'px',
+        border: '1px black solid',
+        background: 'white',
+    });
+
+    $('#zoom-nav-full-area').css({
+        position: 'absolute',
+        height: 3000*scale + 'px',
+        width: 3000*scale + 'px',
+    });
+    showZoomNavPosition();
+
+}
+
+$('#outer-container').on('scroll', function(){
+    if (!navDragging){
+        showZoomNavPosition();
+    }
+});
+
+$('#zoom-nav').click(function(e, ui){
+    var posX = e.offsetX;
+    var posY = e.offsetY;
+    $('#outer-container').scrollTop(posY/navZoom);
+    $('#outer-container').scrollLeft(posX/navZoom);
+
+    $('#zoom-nav-position').css({
+        top: Math.min(posY, $('#zoom-nav-full-area').height()- $('#zoom-nav-position').height()) + 'px',
+        left: Math.min(posX, $('#zoom-nav-full-area').width()- $('#zoom-nav-position').width()) + 'px',
+    });
+});
+
+function initializeZoomNavComponentSize(){
+    $('#zoom-nav-component-size').css({
+        background: 'grey',
+        width: $('#main-cell-table').width()*navZoom*currentZoom + 'px',
+        height: $('#main-cell-table').height()*navZoom*currentZoom + 'px',
+        margin: 50*navZoom + 'px',
+        position: 'absolute',
+    })
+}
+
+function showZoomNavPosition(){
+    var scrollTop = $('#outer-container').scrollTop()*navZoom;
+    var scrollLeft = $('#outer-container').scrollLeft()*navZoom;
+
+    $('#zoom-nav-position').css({
+        position: 'absolute',
+        top: scrollTop + 'px',
+        left: scrollLeft + 'px',
+
+        height: $('#outer-container').height()*navZoom + 'px',
+        width: $('#outer-container').width()*navZoom + 'px',
+        border: '1px black solid',
+        background: 'blue',
+        opacity: '0.5',
+    });
+
+    $('#zoom-nav').scrollTop(scrollTop);
+    $('#zoom-nav').scrollLeft(scrollLeft);
+}
+
+$('#zoom-nav-position').draggable({
+    containment: '#zoom-nav-full-area',
+    start: function(){
+        navDragging = true;
+    },
+    drag: function(e, ui){
+        var posX = ui.position.left;
+        var posY = ui.position.top;
+        $('#outer-container').scrollTop(posY/navZoom);
+        $('#outer-container').scrollLeft(posX/navZoom);
+
+    },
+    stop: function(){
+        navDragging = false;
+    },
+});
+
+
 
 function resetDroppabilityAt(cellId){
     if ($('#'+cellId).get(0).getElementsByClassName('draggable').length == 0) {

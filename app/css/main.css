@@ -249,6 +249,15 @@ td {
     margin-left: 267px;
     overflow: scroll;
     position: relative;
+    background: grey;
+}
+
+#selected-screen-size{
+    width: 2000px;
+    height: 1600px;
+    position: absolute;
+    float: left;
+    background: white;
 }
 
 #table-container, #guide-grid-container{
@@ -493,10 +502,22 @@ p.label {
     background-color: rgba(0, 60, 136, 0.8);
 }
 
-#zoomIn { border-radius: 6px 6px 0 0; }
-#zoomOut { border-radius: 0 0 6px 6px; display: block; }
+#zoom-in {
+    border-radius: 6px;
+}
+#zoom-out {
+    border-radius: 6px;
+}
 
-
+#zoom-nav{
+    position: fixed;
+    left: 300px;
+    bottom: 20px;
+    height: 120px;
+    width: 180px;
+    background: grey;
+    overflow: scroll;
+}
 
 
 

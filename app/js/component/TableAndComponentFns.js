@@ -273,7 +273,7 @@ function createGridCell(row, col) {
                     }
                     scaleTableToZoom(); // this resizes the table based on the above changes in size
                     saveRowColRatiosGrid(true, true); // this resets the saved ratios to the correct ones
-                    updateSizeDisplay(false);
+                    updateSizeValueDisplay(false);
 
 
                 } else {
@@ -310,7 +310,7 @@ function createGridCell(row, col) {
 
                     }
                     scaleTableToZoom(); // this resizes the table based on the above changes in size
-                    updateSizeDisplay(false);
+                    updateSizeValueDisplay(false);
                 }
             }
         }
@@ -428,13 +428,13 @@ function enableSpecificComponentDomElements(componentToEnableId){
 
 function makeUserEmptyComponentDisplayTable(componentId){
     toggleOneAllInnerComponentVisibility(true);
+    currentZoom = 1; // set zoom value 100%
 
     disableAllComponentDomElementsExcept(componentId);
 
     createOrResetTableGridContainer(componentId);
     createTable(componentId);
     createGuideGrid(componentId);
-    updateZoomFromState(componentId);
     // Note: this works because we disable all other classes that this affects beforehand
     initialResizeCells();
     attachMergeHandlers(componentId);
@@ -453,6 +453,7 @@ function makeUserEmptyComponentDisplayTable(componentId){
 
     setComponentOptions(selectedProject.components[componentId]);
 
+    changeZoomDisplays(currentZoom);
 
     bitmapOld = make2dArray(numRows, numCols);
     bitmapNew = make2dArray(numRows, numCols);
@@ -1284,10 +1285,7 @@ function alignCellsAndGridWithSavedRatios(){
 
 
 function updateZoomFromState(componentId){
-    currentZoom = $('#table-grid-container'+'_'+componentId).data('state').zoom;
-    $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
-    var sliderVal = getSliderValFromZoom(currentZoom);
-    $('#zoom-slider').val(sliderVal);
+    changeZoomDisplays($('#table-grid-container'+'_'+componentId).data('state').zoom);
 
 }
 
@@ -1343,7 +1341,7 @@ function initialResizeCells() {
 
     resizeLabelDivs(cellWidth, cellHeight);
 
-    updateSizeDisplay(false);
+    updateSizeValueDisplay(false);
 }
 
 
@@ -1420,7 +1418,7 @@ function updateSizeDisplayAtCol(col, live){
     }
 }
 
-function updateSizeDisplay(live){
+function updateSizeValueDisplay(live){
     for (var row = 1; row<=numRows; row++){
         updateSizeDisplayAtRow(row, live);
     }
@@ -1589,7 +1587,9 @@ function propagateCellResizeToOtherElts(){
     resetAllMergeHandleContainersSizeAndPosition();
     //saveRowColRatiosCells(!tableLockedWidth, !tableLockedHeight);
     updateTableResizeHandler();
-    updateSizeDisplay(false);
+    updateSizeValueDisplay(false);
+    updateZoomNavComponentSize();
+
 }
 
 
@@ -2333,7 +2333,7 @@ function addNRowsToEnd(n) {
     }
 
     toggleTableHeightLock(savedTableLockedHeight);
-
+    updateZoomNavComponentSize();
 
     //loadTable(selectedUserComponent);
     //if (saveTableLockedHeight){
@@ -2506,7 +2506,7 @@ function removeNRowsFromEnd(n) {
     }
 
     toggleTableHeightLock(savedTableLockedHeight);
-
+    updateZoomNavComponentSize();
     //loadTable(selectedUserComponent);
     //if (saveTableLockedHeight){
     //    alignCellsAndGridWithSavedRatios();
@@ -2715,7 +2715,7 @@ function addNColsToEnd(n) {
     }
 
     toggleTableWidthLock(savedTableLockedWidth);
-
+    updateZoomNavComponentSize();
 
 
     //loadTable(selectedUserComponent);
@@ -2897,7 +2897,7 @@ function removeNColsFromEnd(n) {
     }
 
     toggleTableWidthLock(savedTableLockedWidth); // in order to lock last col again
-
+    updateZoomNavComponentSize();
     //loadTable(selectedUserComponent);
     //if (saveTableLockedWidth){
     //    alignCellsAndGridWithSavedRatios();
