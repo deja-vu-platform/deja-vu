@@ -86,7 +86,6 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
     var cellHeight = (parseFloat(cell.css('height'))-10);
     var cellWidth = (parseFloat(cell.css('width'))-10);
 
-    var rowcol = getRowColFromId(cellId);
     if (!padding){
         padding = {top: 0, bottom: 0, left: 0, right: 0};
     }
@@ -96,7 +95,7 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
         bottom: padding.bottom*cellHeight,
         left: padding.left*cellWidth,
         right: padding.right*cellWidth
-    }
+    };
 
     //var cellHeight = (parseFloat(cell.css('height'))/zoom-10) + 'px';
     //var cellWidth = (parseFloat(cell.css('width'))/zoom-10) + 'px';
@@ -158,8 +157,7 @@ function hideBaseComponentDisplayAt(cellId, type){
         $('#' + cellId).find('.display-component').parent().css({
             display: 'none'
         });
-    }
-    if (type === 'image'){
+    } else {
         $('#' + cellId).find('.display-component').css({
             display: 'none'
         });
@@ -171,8 +169,7 @@ function showBaseComponentDisplayAt(cellId, type){
         $('#' + cellId).find('.display-component').parent().css({
             display: 'block'
         });
-    }
-    if (type === 'image'){
+    } else {
         $('#' + cellId).find('.display-component').css({
             display: 'inline-block'
         });

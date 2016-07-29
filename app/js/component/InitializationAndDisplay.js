@@ -575,12 +575,15 @@ function displayComponentInTable(cellId, widget, component) {
         showConfigOptions(type, document.getElementById(cellId));
 
         // note: no padding here because this is a new component we are adding
+        var padding = {top: 0, left: 0, bottom: 0, right: 0};
+        selectedUserComponent.layout[row][col].ratio.padding = padding;
+
         if (type === 'label') {
-            Display(cellId, type, getHTML[type]("Type text here..."), currentZoom);
+            Display(cellId, type, getHTML[type]("Type text here..."), currentZoom, padding);
         } else if (type === 'panel') {
-            Display(cellId, type, getHTML[type]({heading: "Type heading...", content: "Type content..."}), currentZoom);
+            Display(cellId, type, getHTML[type]({heading: "Type heading...", content: "Type content..."}), currentZoom, padding);
         } else {
-            Display(cellId, type, getHTML[type](), currentZoom);
+            Display(cellId, type, getHTML[type](), currentZoom, padding);
             triggerEdit(cellId, true); // since this is a new component, show edit options
         }
 
@@ -1186,7 +1189,10 @@ function movedComponent() {
             var componentCopy = selectedUserComponent.components[delRow][delCol];
             selectedUserComponent.addComponent(componentCopy, newRow, newCol);
 
-            var padding = selectedUserComponent.layout[row][col].ratio.padding;
+            var padding = selectedUserComponent.layout[delRow][delCol].ratio.padding;
+            // update the new paddings
+            selectedUserComponent.layout[delRow][delCol].ratio.padding = {top: 0, bottom: 0, left: 0, right: 0};
+            selectedUserComponent.layout[newRow][newCol].ratio.padding = padding;
             Display('cell'+ '_' + newRow + '_' + newCol, componentCopy.type, getHTML[componentCopy.type](componentCopy.components[componentCopy.type]), currentZoom, padding);
             triggerEdit('cell'+ '_' + newRow + '_' + newCol, false);
 
@@ -1817,11 +1823,11 @@ function switchToInnerComponentFocusMode(row, col){
             //});
 
             var top = $(this).position().top/$('#inner-component-focus').height();
-            var bottom = ($(this).position().top + $(this).height())/$('#inner-component-focus').height();
+            var bottom = 1 - ($(this).position().top + $(this).height())/$('#inner-component-focus').height();
             var left = $(this).position().left/$('#inner-component-focus').width();;
-            var right = ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
+            var right = 1 - ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
 
-            selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: top, bottom: bottom, right: right}
+            selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
             refreshCellDisplay(row, col);
         },
         containment: '#inner-component-focus',
@@ -1846,7 +1852,7 @@ function switchToInnerComponentFocusMode(row, col){
             var left = $(this).position().left/$('#inner-component-focus').width();;
             var right = 1 - ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
 
-            selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: top, bottom: bottom, right: right}
+            selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
             refreshCellDisplay(row, col);
         }
     });
