@@ -1927,8 +1927,10 @@ function switchToInnerComponentFocusMode(row, col){
 
 function setUpInnerComponentOptions(cellId){
     $('.back-to-all-components').unbind().click(function(){
-        refreshCellDisplay(cellId, currentZoom);
         toggleInnerComponentVisibility(true);
+        // refresh it after toggling, or else the display function will got get the right
+        // dimensions of the cells (for merged cells)
+        refreshCellDisplay(cellId, currentZoom);
     });
     $('.btn-delete-inner-component').unbind().click(function(){
         deleteComponentFromUserComponentAndFromView(cellId);
