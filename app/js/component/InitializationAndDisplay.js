@@ -660,7 +660,7 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     var actualCellId;
     var tooltip;
     if (cellId == 'display-cell') {
-        actualCellId = $('#display-cell').data('cellId');
+        actualCellId = $('#display-cell').data('cellid');
         tooltip = $('#inner-component-focus').find('.tooltip');
     } else {
         actualCellId = cellId;
@@ -1768,10 +1768,16 @@ $('#outer-container').on('dblclick', '.cell', function(){
 });
 
 function switchToInnerComponentFocusMode(row, col){
+    $('#inner-component-focus #display-cell').html('');
+    $('#inner-component-focus').find('.tooltip').remove();
+
+    $('#inner-component-focus #display-cell').removeData();
+
+
     var componentToShow = selectedUserComponent.components[row][col];
 
     var cellId = 'cell'+'_'+row+'_'+col;
-    $('#display-cell').data('cellId',cellId);
+    $('#display-cell').data('cellid',cellId);
 
     setUpInnerComponentOptions(cellId);
 
@@ -1892,7 +1898,10 @@ function switchToInnerComponentFocusMode(row, col){
             var left = $(this).position().left/$('#inner-component-focus').width();;
             var right = 1 - ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
 
-            selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
+            var cellId = $('#display-cell').data('cellid');
+            var rowcol = getRowColFromId(cellId);
+
+            selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
             refreshCellDisplay(cellId, currentZoom);
         },
         containment: '#inner-component-focus',
@@ -1917,7 +1926,10 @@ function switchToInnerComponentFocusMode(row, col){
             var left = $(this).position().left/$('#inner-component-focus').width();;
             var right = 1 - ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
 
-            selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
+            var cellId = $('#display-cell').data('cellid');
+            var rowcol = getRowColFromId(cellId);
+
+            selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
             refreshCellDisplay(cellId, currentZoom);
         }
     });
@@ -1948,7 +1960,7 @@ function setUpInnerComponentOptions(cellId){
 
 function refreshCellDisplay(cellId, zoom){
     if (cellId == 'display-cell'){
-        var rowcol  = getRowColFromId($('#display-cell').data('cellId'));
+        var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
     } else {
         var rowcol  = getRowColFromId(cellId);
     }
