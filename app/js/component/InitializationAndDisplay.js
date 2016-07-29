@@ -1378,10 +1378,15 @@ function registerTooltipBtnHandlers() {
 
 function findContainingCell(context) {
     var parent = $(context).parent();
-    while (!parent.hasClass('containing-cell')) {
+    while (!(parent.hasClass('containing-cell')||parent.hasClass('display-cell-parent'))) {
         parent = $(parent).parent();
     }
-    var cellId = $(parent).attr('id');
+    var cellId;
+    if (parent.hasClass('display-cell-parent')){
+        cellId = 'display-cell';
+    } else {
+        cellId = $(parent).attr('id');
+    }
     return cellId;
 }
 
@@ -1400,7 +1405,7 @@ function getContentEditableEdits() {
 function getContentEditableEditsAtCell(cellId){
     $('#'+cellId+' [contenteditable=true]').blur(function() {
         updateBaseComponentContentsAndDisplayAt(cellId);
-        getContentEditableEdits();
+        getContentEditableEditsAtCell(cellId);
     });
 }
 
@@ -1768,11 +1773,27 @@ function switchToInnerComponentFocusMode(row, col){
     var cellId = 'cell'+'_'+row+'_'+col;
     $('#display-cell').data('cellId',cellId);
 
+    setUpInnerComponentOptions(cellId);
 
     toggleInnerComponentVisibility(false);
 
-    var actualHeight = selectedUserComponent.layout[row][col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height;
-    var actualWidth =  selectedUserComponent.layout[row][col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+    // dealing with merges
+    var bottomRightCellId = $('#'+cellId).data('merged').bottomRightCellId;
+    if (bottomRightCellId.length == 0){
+        bottomRightCellId = cellId;
+    }
+
+    var actualHeight = 0;
+    var actualWidth = 0;
+    var endRowCol = getRowColFromId(bottomRightCellId);
+    var endRow = parseInt(endRowCol.row);
+    var endCol = parseInt(endRowCol.col);
+    for (var mergeRow = row; mergeRow<=endRow; mergeRow++){
+        actualHeight += selectedUserComponent.layout[mergeRow][col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height;
+    }
+    for (var mergeCol = col; mergeCol<=endCol; mergeCol++){
+        actualWidth += selectedUserComponent.layout[row][mergeCol].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
+    }
 
     $('#inner-component-focus').css({
         width: '600px',
@@ -1827,8 +1848,9 @@ function switchToInnerComponentFocusMode(row, col){
         'z-index':100,
     });
 
-    // NOTE: don't use any padding here
-    Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
+    // this isn't actually refreshing but this still works
+    refreshCellDisplay('display-cell', scale);
+    //Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
 
 
     $('#display-cell').children().css('position', 'relative');
@@ -1871,7 +1893,7 @@ function switchToInnerComponentFocusMode(row, col){
             var right = 1 - ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
 
             selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
-            refreshCellDisplay(cellId);
+            refreshCellDisplay(cellId, currentZoom);
         },
         containment: '#inner-component-focus',
     });
@@ -1896,18 +1918,16 @@ function switchToInnerComponentFocusMode(row, col){
             var right = 1 - ($(this).position().left + $(this).width())/$('#inner-component-focus').width();
 
             selectedUserComponent.layout[row][col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
-            refreshCellDisplay(cellId);
+            refreshCellDisplay(cellId, currentZoom);
         }
     });
 
-    setUpInnerComponentOptions(row,col);
-    
+
 }
 
-function setUpInnerComponentOptions(row,col){
-    var cellId = 'cell'+'_'+row+'_'+col;
+function setUpInnerComponentOptions(cellId){
     $('.back-to-all-components').unbind().click(function(){
-        refreshCellDisplay(cellId);
+        refreshCellDisplay(cellId, currentZoom);
         toggleInnerComponentVisibility(true);
     });
     $('.btn-delete-inner-component').unbind().click(function(){
@@ -1922,8 +1942,6 @@ function setUpInnerComponentOptions(row,col){
         $('#inner-component-focus').find('.tooltip').addClass('open');
     });
 
-    // attach event handlers to new texts
-    getContentEditableEditsAtCell('display-cell');
 }
 
 function refreshCellDisplay(cellId, zoom){
@@ -1940,6 +1958,8 @@ function refreshCellDisplay(cellId, zoom){
 
     // display itself gets rid of padding for the #display-cell
     Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding);
+    // attach event handlers to new texts
+    getContentEditableEditsAtCell('display-cell');
 }
 
 
