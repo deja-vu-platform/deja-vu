@@ -86,7 +86,7 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
     var cellHeight = (parseFloat(cell.css('height'))-10);
     var cellWidth = (parseFloat(cell.css('width'))-10);
 
-    if (!padding){
+    if ((!padding) || (cellId == 'display-cell')){
         padding = {top: 0, bottom: 0, left: 0, right: 0};
     }
 

@@ -73,7 +73,8 @@ function loadTableWithLocksSaved(componentToShow){
  */
 function createTableCell(row, col) {
     var td = document.createElement('td');
-    td.className = 'droppable cell col' + '_' + col;
+    td.className = 'droppable cell containing-cell col' + '_' + col; // the .containing-cell is there to aid finding the
+                                                                    // containing cell of an inner component (since .cell is overloaded)
 
 
     td.id = 'cell' + '_' + row + '_' + col;
