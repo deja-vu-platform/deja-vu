@@ -1893,12 +1893,18 @@ function toggleInnerComponentVisibility(showAll){
         $('.inner-component-options').css('display', 'none');
         $('.component-options').css('display', 'block');
 
+        $('#zoom-control').css('display', 'block');
+        $('#zoom-nav').css('display', 'block');
+
     } else {
         $('#inner-component-focus').css('display', 'block');
         $('#outer-container').css('display', 'none');
 
         $('.inner-component-options').css('display', 'block');
         $('.component-options').css('display', 'none');
+
+        $('#zoom-control').css('display', 'none');
+        $('#zoom-nav').css('display', 'none');
 
     }
 }
