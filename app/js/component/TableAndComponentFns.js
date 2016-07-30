@@ -1478,6 +1478,13 @@ function updateSizeValueDisplay(live){
     for (var col = 1; col<=numCols; col++){
         updateSizeValueDisplayAtCol(col, live);
     }
+    if (live){
+        $('#resize-table-height').find('input').val($('#main-cell-table').height());
+        $('#resize-table-width').find('input').val($('#main-cell-table').width());
+    } else {
+        $('#resize-table-height').find('input').val(selectedUserComponent.layout.tablePxDimensions.height);
+        $('#resize-table-width').find('input').val(selectedUserComponent.layout.tablePxDimensions.width);
+    }
 }
 
 function checkWidthRatio(row){
@@ -2223,12 +2230,10 @@ function updateSavedTableSizeGrid(updateTableWidth, updateTableHeight) {
     if (updateTableHeight) {
         selectedUserComponent.layout.tablePxDimensions.height = $('#main-grid-table').height()/currentZoom;
         gridHeight = $('#main-grid-table').height();
-        $('#resize-table-height').find('input').val(selectedUserComponent.layout.tablePxDimensions.height);
     }
     if (updateTableWidth) {
         selectedUserComponent.layout.tablePxDimensions.width = $('#main-grid-table').width()/currentZoom;
         gridWidth = $('#main-grid-table').width();
-        $('#resize-table-width').find('input').val(selectedUserComponent.layout.tablePxDimensions.width);
     }
 }
 
