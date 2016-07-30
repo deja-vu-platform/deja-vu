@@ -1962,8 +1962,10 @@ function addTableResizeHandler(componentId){
             $(this).css({
                 border: 'none',
             });
-            selectedUserComponent.layout.tablePxDimensions.width = $('#table-resize-div').width()/currentZoom;
-            selectedUserComponent.layout.tablePxDimensions.height = $('#table-resize-div').height()/currentZoom;
+
+            // NOTE: the table-resize-div's height and width includes the table's margins!
+            selectedUserComponent.layout.tablePxDimensions.width = ($('#table-resize-div').width()-20)/currentZoom;
+            selectedUserComponent.layout.tablePxDimensions.height = ($('#table-resize-div').height()-20)/currentZoom;
             scaleTableToZoom();
 
             // updating this again to fix for rounding errors
@@ -2221,10 +2223,12 @@ function updateSavedTableSizeGrid(updateTableWidth, updateTableHeight) {
     if (updateTableHeight) {
         selectedUserComponent.layout.tablePxDimensions.height = $('#main-grid-table').height()/currentZoom;
         gridHeight = $('#main-grid-table').height();
+        $('#resize-table-height').find('input').val(selectedUserComponent.layout.tablePxDimensions.height);
     }
     if (updateTableWidth) {
         selectedUserComponent.layout.tablePxDimensions.width = $('#main-grid-table').width()/currentZoom;
         gridWidth = $('#main-grid-table').width();
+        $('#resize-table-width').find('input').val(selectedUserComponent.layout.tablePxDimensions.width);
     }
 }
 
