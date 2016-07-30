@@ -64,15 +64,15 @@ var getHTML = {
     }
 };
 
-function Display(cellId, html, callback) {
+function Display(cellId, type, html, zoom, padding, callback) {
     var cell = document.getElementById(cellId);
     var sp = document.createElement('span');
     sp.innerHTML = html;
     var html_ = sp.firstElementChild;
     cell.insertBefore(html_, cell.firstChild);
-    hideBaseComponentDisplayAt(cellId);
-    updateBaseComponentDisplayAt(cellId);
-    showBaseComponentDisplayAt(cellId);
+    hideBaseComponentDisplayAt(cellId, type);
+    updateBaseComponentDisplayAt(cellId, type, zoom, padding);
+    showBaseComponentDisplayAt(cellId, type);
     if (callback) callback();
 }
 
@@ -81,46 +81,70 @@ function Display(cellId, html, callback) {
  *
  * @param cellId
  */
-function updateBaseComponentDisplayAt(cellId) {
+function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
     var cell = $('#'+cellId);
-    var cellHeight = (parseFloat(cell.css('height'))-10) + 'px';
-    var cellWidth = (parseFloat(cell.css('width'))-10) + 'px';
+    var cellHeight = (parseFloat(cell.css('height'))-10);
+    var cellWidth = (parseFloat(cell.css('width'))-10);
 
-    //var cellHeight = (parseFloat(cell.css('height'))/currentZoom-10) + 'px';
-    //var cellWidth = (parseFloat(cell.css('width'))/currentZoom-10) + 'px';
+    if ((!padding) || (cellId == 'display-cell')){
+        padding = {top: 0, bottom: 0, left: 0, right: 0};
+    }
+
+    var paddingPx = {
+        top: padding.top*cellHeight,
+        bottom: padding.bottom*cellHeight,
+        left: padding.left*cellWidth,
+        right: padding.right*cellWidth
+    };
+
+    //var cellHeight = (parseFloat(cell.css('height'))/zoom-10) + 'px';
+    //var cellWidth = (parseFloat(cell.css('width'))/zoom-10) + 'px';
 
 
     //var rowcol = getRowColFromId(cellId);
     //var cellHeight = (selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height*selectedUserComponent.layout.tablePxDimensions.height-10) + 'px';
     //var cellWidth = (selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width*selectedUserComponent.layout.tablePxDimensions.width-10) + 'px';
 
-    var type = cell.get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     var displayComponent = cell.find('.display-component');
     if (type === 'label'){
         displayComponent.parent().css({
-            height: cellHeight,
-            width: cellWidth,
+            height: cellHeight + 'px',
+            width: cellWidth + 'px',
+            'padding-top': paddingPx.top + 'px',
+            'padding-left': paddingPx.left + 'px',
+            'padding-bottom': paddingPx.bottom + 'px',
+            'padding-right': paddingPx.right + 'px',
         });
         displayComponent.css({
-            //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
-            zoom: currentZoom,
+            //'-webkit-transform': 'scale('+zoom+','+zoom+')',
+            zoom: zoom,
+            background: 'white',
         });
 
     } else {
         if (type === 'image') {
             displayComponent.css({
-                'max-height': cellHeight,
-                'max-width': cellWidth,
+                'max-height': cellHeight + 'px',
+                'max-width': cellWidth + 'px',
                 height: 'auto',
                 width: 'auto',
                 'vertical-align':'top',
+                'padding-top': paddingPx.top + 'px',
+                'padding-left': paddingPx.left + 'px',
+                'padding-bottom': paddingPx.bottom + 'px',
+                'padding-right': paddingPx.right + 'px',
             });
         } else {
             // TODO other types?
 
             displayComponent.css({
-                //'-webkit-transform': 'scale('+currentZoom+','+currentZoom+')',
-                zoom: currentZoom,
+                //'-webkit-transform': 'scale('+zoom+','+zoom+')',
+                zoom: zoom,
+                // Todo: issue :(
+                'padding-top': paddingPx.top/zoom + 'px',
+                'padding-left': paddingPx.left/zoom + 'px',
+                'padding-bottom': paddingPx.bottom/zoom + 'px',
+                'padding-right': paddingPx.right/zoom + 'px',
             });
         }
     }
@@ -128,28 +152,24 @@ function updateBaseComponentDisplayAt(cellId) {
 }
 
 
-function hideBaseComponentDisplayAt(cellId){
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+function hideBaseComponentDisplayAt(cellId, type){
     if (type === 'label'){
         $('#' + cellId).find('.display-component').parent().css({
             display: 'none'
         });
-    }
-    if (type === 'image'){
+    } else {
         $('#' + cellId).find('.display-component').css({
             display: 'none'
         });
     }
 }
 
-function showBaseComponentDisplayAt(cellId){
-    var type = $('#' + cellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+function showBaseComponentDisplayAt(cellId, type){
     if (type === 'label'){
         $('#' + cellId).find('.display-component').parent().css({
             display: 'block'
         });
-    }
-    if (type === 'image'){
+    } else {
         $('#' + cellId).find('.display-component').css({
             display: 'inline-block'
         });
@@ -165,6 +185,7 @@ function showBaseComponentDisplayAt(cellId){
  * @constructor
  */
 function RemoveDisplay(cellId, callback) {
+    $('#'+cellId).find('.label-container').remove();
     $('#'+cellId).find('.display-component').remove();
     if (callback) callback();
 }

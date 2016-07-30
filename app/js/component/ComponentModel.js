@@ -73,7 +73,9 @@ function BaseComponent(type, components) {
                              bottomLeftCellId: '',
                              bottomRightCellId: ''},
                         hidden:{isHidden: false, hidingCellId: ''},
-                        ratio: {cell:{width: 1, height: 1}, grid:{width: 1, height: 1}}
+                        ratio: {cell:{width: 1, height: 1}, grid:{width: 1, height: 1},
+                            padding:{top: 0, bottom: 0, left: 0, right: 0}
+                        }
                     }
                    }};
 }

@@ -26,7 +26,8 @@ function loadTablePreview(componentToShow) {
                 var type = innerComponent.type;
 
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
-                Display(cellId, getHTML[type](innerComponent.components[type]));
+                var padding = componentToShow.layout[row][col].ratio.padding;
+                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding);
             }
         }
     });

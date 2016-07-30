@@ -175,24 +175,33 @@
                 </div>
                 <div>
                     Resize Entire Component (in px)
-                    <div id="resize-table-width"><input type="text" placeholder="width"></div>
-                    <div id="resize-table-height"><input type="text" placeholder="height"></div>
+                    <div id="resize-table-width"> Width
+                        <input type="text" placeholder="width">
+                    </div>
+                    <div id="resize-table-height"> Height
+                        <input type="text" placeholder="height">
+                    </div>
                     <button class="btn btn-default" id="resize-table">Resize Component</button>
                 </div>
-                <div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-ratio">Resize To Fixed Ratios
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                <!--<div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-ratio">Resize To Inputs-->
+                    <!--<span class="glyphicon glyphicon-triangle-bottom"></span>-->
+                <!--</div>-->
+                <!--<div class="dropdown-target" data-dropdownid="resize-fixed-ratio">-->
+                    <!--<ul id="resize-fixed-rows">-->
+                    <!--</ul>-->
+                    <!--<button type="button" class="btn btn-default" id="update-width-ratios">Update Width Ratios</button>-->
+                    <!--<ul id="resize-fixed-cols">-->
+                    <!--</ul>-->
+                    <!--<button type="button" class="btn btn-default" id="update-height-ratios">Update Height Ratios</button>-->
+                <!--</div>-->
+                <div id="resize-to-inputs">
+                    <button class="btn btn-default" id="btn-resize-to-inputs">Resize To Inputs</button>
+                    <div id="resize-to-inputs-done-cancel">
+                        <button class="btn btn-default" id="btn-resize-to-inputs-done">Done</button>
+                        <button class="btn btn-default" id="btn-resize-to-inputs-cancel">Cancel</button>
+                    </div>
                 </div>
-                <div class="dropdown-target" data-dropdownid="resize-fixed-ratio">
-                    <ul id="resize-fixed-rows">
-                    </ul>
-                    <button type="button" class="btn btn-default" id="update-width-ratios">Update Width Ratios</button>
-                    <ul id="resize-fixed-cols">
-                    </ul>
-                    <button type="button" class="btn btn-default" id="update-height-ratios">Update Height Ratios</button>
-                </div>
-                <div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-px">Resize To Fixed Pixels
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </div>
+
                 <div class="dropdown-target"  data-dropdownid="resize-fixed-px">
                     <ul id="resize-px-rows">
                     </ul>
@@ -253,6 +262,11 @@
                <input type="text" class="new-name-input form-control" autofocus>
         </div>
     </div>
+    <button type="button" class="btn btn-default" id="btn-index-page-toggle">
+        <span class="glyphicon"></span>
+        <span class="text"></span>
+    </button>
+
     <button type="button" class="btn btn-default" id="btn-duplicate-component">
         <span class="glyphicon glyphicon-duplicate"></span>
     </button>
@@ -268,16 +282,42 @@
     </div>
 </div>
 
+<div class="inner-component-options">
+    <button class="btn btn-default back-to-all-components">Back</button>
+    <button class="btn btn-default edit-btn">
+        <span class="glyphicon glyphicon-pencil"></span>
+    </button>
+    <div id="inner-component-delete-options">
+        <button type="button" class="btn btn-default btn-delete-inner-component">
+            <span class="glyphicon glyphicon-trash"></span>
+        </button>
+    </div>
+</div>
+
+<div id="inner-component-focus" class="display-cell-parent">
+    <div id="display-cell" class="containing-cell"></div>
+    <div id="display-cell-resize-helper">
+        <img src="images/drag_handle_se_icon.png" width="15px" height="15px"
+             class="ui-resizable-handle ui-resizable-se display-cell-resize-handle" id="display-cell-resize-handle">
+    </div>
+</div>
 
 <div id="outer-container">
+    <div id="selected-screen-size"></div>
 </div>
 
 <div id="zoom-control">
+    <button id="zoom-control-minimize-btn" class="btn btn-default">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </button>
     <button id="zoom-actual" class="btn btn-default">
         Actual
     </button>
     <button id="zoom-fit" class="btn btn-default">
         Fit
+    </button>
+    <button id="zoom-full" class="btn btn-default">
+        Full
     </button>
     <button id="zoom-out" class="zoom-control-button">
         <span class="glyphicon glyphicon-zoom-out"></span>
@@ -291,9 +331,23 @@
     </button>
 </div>
 
-<div id="trash" class="droppable">
-    <span class="glyphicon glyphicon-trash"></span>
+<div id="zoom-nav-container">
+    <button id="zoom-nav-minimize-btn" class="btn btn-default btn-xs">
+        <!--<span class="glyphicon glyphicon-minus"></span>-->
+        _
+    </button>
+    <div id="zoom-nav">
+        <div id="zoom-nav-full-area"></div>
+        <div id="zoom-selected-screen-size"></div>
+        <div id="zoom-nav-component-size"></div>
+        <div id="zoom-nav-position"></div>
+    </div>
+
 </div>
+
+<!--<div id="trash" class="droppable">-->
+    <!--<span class="glyphicon glyphicon-trash"></span>-->
+<!--</div>-->
 
 <!--EDIT PROPERTIES POPUPS-->
 <div class="not-displayed">
@@ -641,8 +695,41 @@
     </div>
 </div>
 
+<div id="blank-bg"></div>
 
 <!--MODALS-->
+<div class="modal fade" id="first-main-page">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">Create your first page...</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Page name: </div>
+                    <div class="col-sm-7"><input id="first-page-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Size: </div>
+                    <div class="col-sm-7">
+                        <select id="select-size">
+                            <option value="1" selected="selected">1200x640</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-1"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <p><button id="create-first-page" data-dismiss="modal" class="btn btn-primary">Create</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
 <div class="modal fade" id="new-component">
     <div class="modal-dialog modal-md">
         <div class="modal-content">

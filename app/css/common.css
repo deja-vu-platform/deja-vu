@@ -35,6 +35,8 @@ fieldset { border: 0; margin: 0; padding: 0; }
 .clearfix:after { clear: both; }
 
 
+
+
 /*===================================================
                    MENUBAR
 ===================================================*/
@@ -79,127 +81,6 @@ fieldset { border: 0; margin: 0; padding: 0; }
     text-align: center;;
     font-family: "Adobe Garamond";
 }
-
-/*===================================================
-                  POPUPS
-===================================================*/
-.not-displayed {
-    display: none;
-}
-
-.close-btn {
-    position: absolute; !important
-opacity: 1;
-    top: 5px;
-    right: 9px;
-}
-
-.tooltip {
-    display: none;
-    left: -60px;
-    width: 350px;
-
-}
-
-.dropped .tooltip {
-    background: #fff;
-    border: #d5d5d5 solid 1px;
-    border-radius: 4px;
-    bottom: 0%;
-    display: inline-block;
-    margin-bottom: 30px;
-    opacity: 0;
-    padding: 0px;
-    position: absolute;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
-    z-index: -1;
-}
-
-.dropped .tooltip.open {
-    opacity: 1;
-    z-index: 100;
-}
-
-/* Triangle */
-.dropped .tooltip:after {
-    border-left: solid transparent 10px;
-    border-right: solid transparent 10px;
-    border-top: solid #fff 10px;
-    bottom: -10px;
-    content: " ";
-    height: 0;
-    left: 50%;
-    margin-left: -13px;
-    position: absolute;
-    width: 0;
-}
-
-.apply {
-    padding-left: 10px;
-}
-
-.tooltip > .panel {
-    margin-bottom: 0px;
-    border-width: 0px;
-}
-
-
-.tabs .col-sm-4 {
-    padding-right: 0px;
-}
-.tabs .col-sm-5 {
-    padding-right: 0px;
-}
-
-/* Image popup */
-/* layout.css Style */
-.upload-drop-zone {
-    height: 50px;
-    border-width: 2px;
-    margin-bottom: 0px;
-}
-
-/* skin.css Style*/
-.upload-drop-zone {
-    color: #2d2d2d;
-    border-style: dashed;
-    border-color: #ccc;
-    line-height: 50px;
-    text-align: center
-}
-.upload-drop-zone.hover {
-    border-color: #9ecaed;
-    box-shadow: 0 0 10px #9ecaed;
-}
-
-.upload-drop-zone.drop {
-    color: #222;
-    border-color: #222;
-}
-
-.image-preview-input {
-    position: relative;
-    overflow: hidden;
-    margin: 0px;
-    color: #333;
-    background-color: #fff;
-    border-color: #ccc;
-}
-.image-preview-input input[type=file] {
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 0;
-    padding: 0;
-    font-size: 20px;
-    cursor: pointer;
-    opacity: 0;
-    filter: alpha(opacity=0);
-}
-.image-preview-input-title {
-    margin-left:2px;
-}
-
 
 
 /*===================================================
