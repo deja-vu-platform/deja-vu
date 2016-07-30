@@ -447,6 +447,8 @@ function setUpComponentOptionsIndexPageToggle(){
     if (selectedUserComponent.meta.id == selectedProject.mainComponents.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
+        $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').addClass('selected-index-page');
+
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $(this).find('.text').text('Assign as Index Page');
@@ -1785,6 +1787,8 @@ $('.components').on('click', '.index-page-toggle', function(){
     }
     setUpComponentOptionsIndexPageToggle();
 });
+
+
 
 $('#outer-container').on('dblclick', '.cell', function(){
     var rowcol = getRowColFromId(this.id);
