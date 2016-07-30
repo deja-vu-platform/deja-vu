@@ -21,10 +21,6 @@ $(function () {
         height: ($('html').height() - 70 - 44) + 'px',
     });
 
-    //$('#inner-component-focus').css({
-    //    height: ($('html').height() - 70 - 44) + 'px',
-    //});
-
     // todo get screenSizes for the user
 
     $('#selected-screen-size').css({
@@ -89,7 +85,6 @@ $(function () {
         window.setTimeout(function(){
             loadTable(selectedUserComponent);
         }, 1);
-        //loadTable(selectedUserComponent);
 
     }
 
@@ -148,16 +143,6 @@ $('#new-main-component-btn').click(function(){
     });
 });
 
-
-//$('#create-component').on('click', function () {
-//    numRows = $('#select-rows').val();
-//    numCols = $('#select-cols').val();
-//    selectedUserComponent = initUserComponent(false);
-//    selectedProject.addComponent(selectedUserComponent);
-//    displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-//    createTable(selectedUserComponent.meta.id);
-//    resetMenuOptions();
-//});
 
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
@@ -257,9 +242,6 @@ $('#back-to-projects').click(function(event){
 });
 
 $('.components').on('click', '.component-name-container', function () {
-    //$('.loader-container').fadeIn('fast');
-
-
     var load = function(componentNameContainer){
         // Save the current values
         var oldState = {zoom : currentZoom,
@@ -283,7 +265,6 @@ $('.components').on('click', '.component-name-container', function () {
             toggleInnerComponentVisibility(true);
             enableSpecificComponentDomElements(selectedUserComponent.meta.id);
         }
-        //$('.loader-container').fadeOut('fast');
     };
 
     // have this going in a separate thread
@@ -314,8 +295,6 @@ $('.components').on('keypress', '.new-name-input', function (event) {
             return;
         }
         componentNameElt.text($(this).val());
-        // //update the display of the component box
-        //$('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
         selectedProject.components[componentId].meta.name = $(this).val();
         // changing the ids todo: is this a good idea?
@@ -365,8 +344,6 @@ function setComponentOptions(component){
             $('.components').find('[data-componentid='+component.meta.id+']').find('.component-name').text(newName);
 
             componentNameElt.text($(this).val());
-            //// update the display of the component box
-            //$('<style>.main-table::after{content:"' + $(this).val() + '"}</style>').appendTo('head');
 
             component.meta.name = $(this).val();
 
@@ -478,10 +455,6 @@ function resizeViewportToFitWindow(){
     $('.component-options').css({
         width: (newWidth-250-17) + 'px',
     });
-
-    //$('#inner-component-focus').css({
-    //    width: (newWidth-250-17) + 'px',
-    //});
 
     $('.inner-component-options').css({
         width: (newWidth-250-17) + 'px',
@@ -917,16 +890,6 @@ function getZoomFromSliderVal(){
  * this function can be used to resize the table
  */
 function scaleTableToZoom(){
-    //$('.grid').each(function(){
-    //    var rowcol = getRowColFromId(this.id);
-    //    var actualHeight = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height * selectedUserComponent.layout.tablePxDimensions.height ;
-    //    var actualWidth = selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width * selectedUserComponent.layout.tablePxDimensions.width;
-    //    $(this).css({
-    //        height: (actualHeight)*currentZoom + 'px',
-    //        width: (actualWidth)*currentZoom + 'px',
-    //    })
-    //});
-
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
 
@@ -994,33 +957,16 @@ function updateZoomNavComponentSize(){
 function registerZoom() {
     $('#zoom-control-value').text('100%');
 
-    //$('#zoom-slider').slider({
-    //    max: 300,
-    //    min: -300,
-    //    value:0,
-    //    slide: function(e, ui){
-    //
-    //    },
-    //    stop: changeZoomViaZoomControl,
-    //
-    //});
-
-
-
     $('#zoom-in').click( function (e) {
         e.preventDefault();
         var val = parseFloat($('#zoom-slider').val());
-        //var val = $( "#zoom-slider" ).slider( "option", "value" );
         $('#zoom-slider').val(Math.round(val/100)*100+100);
-        //$( "#zoom-slider" ).slider( "option", "value", val+100);
         changeZoomViaZoomControl('slider');
     });
     $('#zoom-out').click( function (e) {
         e.preventDefault();
         var val = parseFloat($('#zoom-slider').val());
-        //var val = $( "#zoom-slider" ).slider( "option", "value" );
         $('#zoom-slider').val(Math.round(val/100)*100-100);
-        //$( "#zoom-slider" ).slider( "option", "value", val-100);
         changeZoomViaZoomControl('slider');
     });
 
@@ -1037,7 +983,6 @@ function registerZoom() {
     $('#zoom-actual').click(function(e, ui){
         e.preventDefault();
         $('#zoom-slider').val(0);
-        //$( "#zoom-slider" ).slider( "option", "value", 0);
         changeZoomViaZoomControl('slider');
     });
 
@@ -1150,21 +1095,18 @@ function showZoomNavPosition(){
     });
 
     if ((scrollTop>($('#zoom-nav').scrollTop()+$('#zoom-nav').height()-$('#zoom-nav-position').height()))){
-        //var navScrollTop = scrollTop-($('#zoom-nav').height()-$('#zoom-nav-position').height())/2;
         var navScrollTop = scrollTop-($('#zoom-nav').height()-$('#zoom-nav-position').height());
         navScrollTop = Math.max(navScrollTop,0);
         navScrollTop = Math.min(navScrollTop, 3000/navZoom-$('#zoom-nav').height());
         $('#zoom-nav').scrollTop(navScrollTop);
     }
     if ((scrollTop<($('#zoom-nav').scrollTop()))){
-        //var navScrollTop = scrollTop-($('#zoom-nav').height()-$('#zoom-nav-position').height())/2;
         var navScrollTop = scrollTop;
         navScrollTop = Math.max(navScrollTop,0);
         navScrollTop = Math.min(navScrollTop, 3000/navZoom-$('#zoom-nav').height());
         $('#zoom-nav').scrollTop(navScrollTop);
     }
     if ((scrollLeft>($('#zoom-nav').scrollLeft()+$('#zoom-nav').width()-$('#zoom-nav-position').width()))){
-        //var navScrollLeft = scrollLeft-($('#zoom-nav').width()-$('#zoom-nav-position').width())/2;
         var navScrollLeft = scrollLeft-($('#zoom-nav').width()-$('#zoom-nav-position').width());
         navScrollLeft = Math.max(navScrollLeft,0);
         navScrollLeft = Math.min(navScrollLeft, 3000/navZoom-$('#zoom-nav').width());
@@ -1172,27 +1114,11 @@ function showZoomNavPosition(){
     }
 
     if ((scrollLeft<($('#zoom-nav').scrollLeft()))){
-        //var navScrollLeft = scrollLeft-($('#zoom-nav').width()-$('#zoom-nav-position').width())/2;
         var navScrollLeft = scrollLeft;
         navScrollLeft = Math.max(navScrollLeft,0);
         navScrollLeft = Math.min(navScrollLeft, 3000/navZoom-$('#zoom-nav').width());
         $('#zoom-nav').scrollLeft(navScrollLeft);
     }
-
-    //var navScrollTop = scrollTop-($('#zoom-nav').height()-$('#zoom-nav-position').height())/2;
-    //navScrollTop = Math.max(navScrollTop,0);
-    //navScrollTop = Math.min(navScrollTop, 3000/navZoom-$('#zoom-nav').height());
-    //
-    //var navScrollLeft = scrollLeft-($('#zoom-nav').width()-$('#zoom-nav-position').width())/2;
-    //navScrollLeft = Math.max(navScrollLeft,0);
-    //navScrollLeft = Math.min(navScrollLeft, 3000/navZoom-$('#zoom-nav').width());
-    //
-    //
-    //$('#zoom-nav').scrollTop(navScrollTop);
-    //$('#zoom-nav').scrollLeft(navScrollLeft);
-
-    //$('#zoom-nav').scrollTop(scrollTop);
-    //$('#zoom-nav').scrollLeft(scrollLeft);
 
 }
 
@@ -1555,9 +1481,6 @@ $(".dropdown-trigger").click(function(ev) {
         $(this).removeClass('dropdown-open').addClass('dropdown-closed');
         $(this).find('.glyphicon').remove();
         $(this).append('<span class="glyphicon glyphicon-triangle-right"></span>');
-        //$(this).parent().parent().find('.dropdown-target').css({ //TODO make less hacky
-        //    display: 'none',
-        //})
 
         $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
             if ($(this).hasClass('dropdown-target')){
@@ -1572,9 +1495,6 @@ $(".dropdown-trigger").click(function(ev) {
         $(this).removeClass('dropdown-closed').addClass('dropdown-open');
         $(this).find('.glyphicon').remove();
         $(this).append('<span class="glyphicon glyphicon-triangle-bottom"></span>');
-        //$(this).parent().parent().find('.dropdown-target').css({
-        //    display: 'block',
-        //})
 
         $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
             if ($(this).hasClass('dropdown-target')){
@@ -1612,7 +1532,6 @@ $('#reset-width-ratios').click(function(){
         }
     }
     scaleTableToZoom();
-    //loadTableWithLocksSaved(selectedUserComponent);
 });
 
 
@@ -1624,7 +1543,6 @@ $('#reset-height-ratios').click(function(){
         }
     }
     scaleTableToZoom();
-    //loadTableWithLocksSaved(selectedUserComponent);
 });
 
 
@@ -1685,8 +1603,6 @@ function addResizeToFixedRatiosHandlers(){
     }
 }
 
-// TODO add a resize to fixed px sizes function
-
 $('#btn-resize-to-inputs').click(function(){
     $('.input-single').each(function() {
         // this exists
@@ -1728,7 +1644,7 @@ $('#btn-resize-to-inputs-cancel').click(function(){
 });
 
 $('#btn-resize-to-inputs-done').click(function(){
-    var type = $('.select-unit').val(); // this is a bit sketchy
+    var type = $('.select-unit').val(); // TODO this is a bit sketchy, since we are only sampling one
     if (type == 'px'){
         for (var row = 1; row<= numRows; row++){
             var newRatioRow = parseFloat($('.size-display-height').find('#size-display-value_'+row+'_1').val())/selectedUserComponent.layout.tablePxDimensions.height;
@@ -1767,10 +1683,7 @@ $('#resize-table').click(function(){
     selectedUserComponent.layout.tablePxDimensions.width = newWidth;
     selectedUserComponent.layout.tablePxDimensions.height = newHeight;
 
-    //gridWidth = newWidth*currentZoom;
-    //gridHeight = newHeight*currentZoom;
     scaleTableToZoom();
-    //loadTableWithLocksSaved(selectedUserComponent);
 
 });
 
@@ -1888,7 +1801,6 @@ function switchToInnerComponentFocusMode(row, col){
 
     // this isn't actually refreshing but this still works
     refreshCellDisplay('display-cell', scale);
-    //Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
 
 
     $('#display-cell').children().css('position', 'relative');
