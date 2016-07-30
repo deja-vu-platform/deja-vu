@@ -1048,7 +1048,21 @@ function registerZoom() {
         changeZoomViaZoomControl('full');
     });
 
+    $('#zoom-control-minimize-btn').click(function(){
+        if ($(this).hasClass('minimized')){
+            $(this).removeClass('minimized').find('span').removeClass('glyphicon-chevron-left').addClass('glyphicon-chevron-right');
+            $('#zoom-slider-and-value, #zoom-actual, #zoom-fit, #zoom-full').css({
+                display: 'inline-block',
+            })
 
+
+        }else{
+            $(this).addClass('minimized').find('span').addClass(' glyphicon-chevron-left').removeClass('glyphicon-chevron-right');
+            $('#zoom-slider-and-value, #zoom-actual, #zoom-fit, #zoom-full').css({
+                display: 'none',
+            })
+        }
+    })
 }
 
 function zoomNavInitialize(){
