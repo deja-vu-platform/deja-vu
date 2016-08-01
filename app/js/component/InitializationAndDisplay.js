@@ -890,7 +890,6 @@ function getZoomFromSliderVal(){
  * this function can be used to resize the table
  */
 function scaleTableToZoom(){
-    gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
 
     propagateRatioChangeToAllElts();

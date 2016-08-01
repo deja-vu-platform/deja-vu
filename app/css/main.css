@@ -105,13 +105,17 @@
 
 .layout .content input[type='text']{
     width: 60px;
-    /*float: right;*/
     border: 1px grey solid;
-    margin-right: 30px;
     text-align: right;
+}
+
+input[type='text']{
+    min-width: 60px;
+    border: 1px grey solid;
     padding: 5px 10px;
     vertical-align: baseline;
 }
+
 
 .layout .layout-label, .layout .layout-input{
     display: inline-block;

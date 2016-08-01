@@ -222,7 +222,7 @@ function createGridCell(row, col) {
     td.className = 'grid col' + '_' + col;
 
     var sizeDisplayInner = '<input type="text" class="value" id="size-display-value_'+row+'_'+col+'">'+
-        '<select class="select-unit" id="size-display-select_'+row+'_'+col+'">'+
+        '<select class="select-unit btn-default btn btn-xs" id="size-display-select_'+row+'_'+col+'">'+
         '<option value="px" selected>px</option>'+
         '<option value="%">%</option>'+
         '</select>';
