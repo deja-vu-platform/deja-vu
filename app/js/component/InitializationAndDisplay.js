@@ -1036,12 +1036,13 @@ function zoomNavInitialize(){
 
     $('#zoom-nav-minimize-btn').click(function(){
        if ($(this).hasClass('minimized')){
-           $(this).removeClass('minimized')
+           $(this).removeClass('minimized').addClass('btn-xs');
            $('#zoom-nav').css({
                display: 'block',
-           })
+           });
+           $(this).text('_');
        } else {
-           $(this).addClass('minimized')
+           $(this).addClass('minimized').removeClass('btn-xs').text('Navigation');
            $('#zoom-nav').css({
                display: 'none',
            })
@@ -1070,7 +1071,7 @@ $('#zoom-nav').click(function(e){
 
 function initializeZoomNavComponentSize(){
     $('#zoom-nav-component-size').css({
-        background: 'grey',
+        background: '#D5D5D5',
         width: $('#main-cell-table').width()*navZoom*currentZoom + 'px',
         height: $('#main-cell-table').height()*navZoom*currentZoom + 'px',
         margin: 50*navZoom + 'px',

@@ -4,7 +4,7 @@
 .project-options-container{
     position: absolute;
     height: 550px;
-    overflow-y: scroll;
+
 }
 
 .components, .layout, .style {
@@ -13,10 +13,29 @@
     /*border: #d5d5d5 1px solid;*/
     width: 250px;
     position: absolute;
+    overflow-y: scroll;
+    height: 475px; /*TODO shouldn't be fixed*/
 }
 
 .layout, .style {
     display: none;
+}
+
+.layout-group{
+    border: #D5D5D5 1px solid;
+    /*margin: 5px;*/
+}
+.layout-group-header{
+    display: block;
+    font-weight: 200;
+    padding: 10px;
+    background: #F0F1FC;
+}
+
+.layout-group .btn, .layout-group input{
+    /*float: right;*/
+    display: block;
+    margin: 5px auto;
 }
 
 .header {
@@ -84,31 +103,25 @@
     min-height: 120px;
 }
 
-.layout .content{
-    padding: 15px;
-}
-
 .layout .content input[type='text']{
     width: 60px;
-    float: right;
+    /*float: right;*/
     border: 1px grey solid;
     margin-right: 30px;
     text-align: right;
     padding: 5px 10px;
     vertical-align: baseline;
 }
-.layout .content input[type='checkbox'] {
-    float: right;
-    margin-right: 40px;
-}
 
-.add-remove-inputs div{
-    padding: 10px;
-}
-
-.layout .content .btn{
+.layout .layout-label, .layout .layout-input{
+    display: inline-block;
+    width: 49%;
     text-align: center;
 }
+
+/*.add-remove-inputs div{*/
+    /*padding: 10px;*/
+/*}*/
 
 .dropdown-trigger {
     cursor: pointer;
@@ -657,6 +670,7 @@ opacity: 1;
     height: 100%;
     width: 100%;
     pointer-events: auto;
+    border: 1px black solid;
 }
 
 #zoom-nav-minimize-btn{
