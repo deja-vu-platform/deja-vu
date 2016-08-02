@@ -2870,10 +2870,15 @@ function testSaveHTML(){
 }
 
 function createDownloadPreview(){
+    var oldZoom = currentZoom;
+    currentZoom = 1;
+    scaleTableToZoom();
+
     $('#download-preview-area').html('').css({
-        //display: 'none',
+        display: 'none',
         position: 'absolute',
         'text-align': 'center',
+        //background: 'blue',
     });
 
 
@@ -2885,18 +2890,36 @@ function createDownloadPreview(){
             left: $(this).position().left,
             width: $(this).css('width'),
             height: $(this).css('height'),
-            border: 'black 1px solid',
-            background: 'blue',
+            //border: 'black 1px solid',
             'vertical-align': 'middle',
         };
         var container = $(document.createElement('div'));
         container.css(css);
+
         var labelContainer = $(this).find('.label-container').clone(true, true);
         if (labelContainer.get(0)){
+            labelContainer.css({// this is not carried over, since this was declared in the css file
+                position: 'absolute',
+                top: '0',
+                //border: '#e0e0e0 solid 1px',
+                display: 'block',
+            });
             container.append(labelContainer);
+            var displayComponent = labelContainer.find('.display-component');
+            displayComponent.css({// this is not carried over, since this was declared in the css file
+                'white-space': 'initial',
+                'font-weight': 400,
+                margin: 0,
+            });
             add = true;
         } else {
             var displayComponent = $(this).find('.display-component').clone(true, true);
+            displayComponent.css({// this is not carried over, since this was declared in the css file
+                'white-space': 'initial',
+                'font-weight': 400,
+            });
+
+
             if (displayComponent.get(0)){
                 container.append(displayComponent);
                 add = true;
@@ -2906,6 +2929,10 @@ function createDownloadPreview(){
             $('#download-preview-area').append(container);
         }
     });
+
+    currentZoom = oldZoom;
+    scaleTableToZoom();
+
     return $('#download-preview-area').html();
 }
 
