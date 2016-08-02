@@ -2871,32 +2871,40 @@ function testSaveHTML(){
 
 function createDownloadPreview(){
     $('#download-preview-area').html('').css({
-        display: 'none',
+        //display: 'none',
         position: 'absolute',
         'text-align': 'center',
     });
 
 
     $('.cell').each(function(){
-
+        var add = false;
         var css = {
             position: 'absolute',
             top: $(this).position().top,
             left: $(this).position().left,
             width: $(this).css('width'),
             height: $(this).css('height'),
+            border: 'black 1px solid',
+            background: 'blue',
+            'vertical-align': 'middle',
         };
         var container = $(document.createElement('div'));
         container.css(css);
         var labelContainer = $(this).find('.label-container').clone(true, true);
         if (labelContainer.get(0)){
             container.append(labelContainer);
-
+            add = true;
         } else {
             var displayComponent = $(this).find('.display-component').clone(true, true);
-            container.append(displayComponent);
+            if (displayComponent.get(0)){
+                container.append(displayComponent);
+                add = true;
+            }
         }
-        $('#download-preview-area').append(container);
+        if (add){
+            $('#download-preview-area').append(container);
+        }
     });
     return $('#download-preview-area').html();
 }

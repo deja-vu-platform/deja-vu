@@ -1354,7 +1354,7 @@ function getContentEditableEdits() {
     $('[contenteditable=true]').blur(function() {
         var cellId = findContainingCell(this);
         updateBaseComponentContentsAndDisplayAt(cellId);
-        getContentEditableEdits();
+        getContentEditableEditsAtCell(cellId);
     });
 }
 
@@ -1364,6 +1364,12 @@ function getContentEditableEditsAtCell(cellId){
         getContentEditableEditsAtCell(cellId);
     });
 }
+
+
+$('body').click(function(event){
+    console.log( allElementsFromPoint(event.clientX, event.clientY));
+});
+
 
 
 function selectText(container) {
@@ -1712,6 +1718,10 @@ $('#outer-container').on('dblclick', '.cell', function(){
     }
 });
 
+$('#display-cell').click(function(){
+    $( document.activeElement ).blur();
+});
+
 function switchToInnerComponentFocusMode(row, col){
     $('#inner-component-focus #display-cell').html('');
     $('#inner-component-focus').find('.tooltip').remove();
@@ -1816,12 +1826,14 @@ function switchToInnerComponentFocusMode(row, col){
             'se': $('#display-cell-resize-handle')
         },
 
-        start: function(){
+        start: function(e, ui){
             $('#display-cell-resize-helper').css({
                 border: 'black 1px dotted',
-            })
+            });
+
+            //e.stopPropagation();
         },
-        stop: function () {
+        stop: function (e, ui) {
             $('#display-cell-resize-helper').css({
                 border: 'none',
             });
@@ -1850,6 +1862,8 @@ function switchToInnerComponentFocusMode(row, col){
         },
         containment: '#inner-component-focus',
     });
+
+
 
     $('#display-cell').draggable({
         containment: '#inner-component-focus',
@@ -1916,8 +1930,8 @@ function refreshCellDisplay(cellId, zoom){
 
     // display itself gets rid of padding for the #display-cell
     Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding);
-    // attach event handlers to new texts
-    getContentEditableEditsAtCell('display-cell');
+    //attach event handlers to new texts
+    getContentEditableEditsAtCell(cellId);
 }
 
 

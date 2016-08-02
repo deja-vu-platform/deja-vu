@@ -248,7 +248,7 @@ td {
     border: 5px solid white;
     resize: both;
     position: relative;
-    /*vertical-align: top;*/
+    vertical-align: top;
 }
 
 .droppable:hover {
@@ -373,6 +373,7 @@ td {
 .dropped {
     background-color: #F9F9F9;
     text-align: center;
+
 }
 
 .edit-btn {
