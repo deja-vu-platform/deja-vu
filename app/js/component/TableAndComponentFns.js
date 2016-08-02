@@ -649,25 +649,28 @@ function createMergeHandle(row, col){
             var rowcol = getRowColFromId(componentId);
             var row = rowcol.row;
             var col = rowcol.col;
+            // This cell is the cell that was dragged in the first place (may not end up in the final merge)
             var thisCellId = 'cell' + '_' + row + '_' + col;
 
             var handleType = $(ui.element).data("ui-resizable").axis;
 
             // this will be one of the cell id's input into the merge function
-            var cell1Id = thisCellId;
+            // that is, cell1 will be the DIAGONALLY OPPOSITE cell to the new
+            // cell we are merging into
+            var cellOppId = thisCellId;
             if ($('#'+thisCellId).data('merged').isMerged){
                 switch(handleType){
                     case 'ne':
-                        cell1Id = $('#'+thisCellId).data('merged').bottomLeftCellId;
+                        cellOppId = $('#'+thisCellId).data('merged').bottomLeftCellId;
                         break;
                     case 'nw':
-                        cell1Id = $('#'+thisCellId).data('merged').bottomRightCellId;
+                        cellOppId = $('#'+thisCellId).data('merged').bottomRightCellId;
                         break;
                     case 'se':
-                        cell1Id = $('#'+thisCellId).data('merged').topLeftCellId;
+                        cellOppId = $('#'+thisCellId).data('merged').topLeftCellId;
                         break;
                     case 'sw':
-                        cell1Id = $('#'+thisCellId).data('merged').topRightCellId;
+                        cellOppId = $('#'+thisCellId).data('merged').topRightCellId;
                         break;
                     default:
                         throw 'Something went wrong'; // TODO
@@ -717,18 +720,18 @@ function createMergeHandle(row, col){
                 var newCellId = 'cell' + '_' + newCellGridRowcol.row + '_' + newCellGridRowcol.col;
                 // TODO: have a setting to turn this off?
                 if (confirmOnDangerousMerge){
-                    if (safeToMerge(cell1Id, newCellId)){
+                    if (safeToMerge(cellOppId, newCellId, thisCellId)){
                         // if this is already a merged cell we should unmerge it now
                         // since this cell (a top left cell), may not be in the final merge
                         // so should be brought back to the original form
                         unmergeCells(thisCellId); // without the component; it will get it back if it was its
-                        mergeCells(cell1Id, newCellId, component);
+                        mergeCells(cellOppId, newCellId, component);
                     } else {
-                        openMergeConfirmDialogue(thisCellId, cell1Id, newCellId, component);
+                        openMergeConfirmDialogue(thisCellId, cellOppId, newCellId, component);
                     }
                 } else {
                     unmergeCells(thisCellId);
-                    mergeCells(cell1Id, newCellId, component);
+                    mergeCells(cellOppId, newCellId, component);
                 }
             }
 
@@ -866,12 +869,12 @@ function getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id){
 }
 
 /**
- *  Cell1 is the one merging over
+ *  MergingCell is the one merging over (ie, it contains the original component)
  * @param cell1Id
  * @param cell2Id
  * @returns {boolean}
  */
-function safeToMerge(cell1Id, cell2Id){
+function safeToMerge(cell1Id, cell2Id, mergingCellId){
     // first check for top left cell and bottom right cell
     var topBottomLeftRight = getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id);
     var topRowNum = topBottomLeftRight[0];
@@ -883,13 +886,16 @@ function safeToMerge(cell1Id, cell2Id){
     for (var row = topRowNum; row <= bottomRowNum; row++) {
         for (var col = leftColNum; col <= rightColNum; col++) {
             var cellId = "cell" + '_' + row + '_' + col;
-            if (cellId === cell1Id){
+            if (cellId === mergingCellId){
                 continue;
             }
             // if the cell is hidden, check if the hiding cell has a component
             var isHidden = $('#'+cellId).data('hidden').isHidden;
             if (isHidden){
                 var hidingCellId = $('#'+cellId).data('hidden').hidingCellId;
+                if (hidingCellId === mergingCellId){
+                    continue;
+                }
                 var hcRowcol = getRowColFromId(hidingCellId);
                 if (selectedUserComponent.components[hcRowcol.row]) {
                     if (selectedUserComponent.components[hcRowcol.row][hcRowcol.col]) {
