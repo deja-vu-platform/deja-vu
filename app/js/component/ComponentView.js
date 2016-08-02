@@ -83,8 +83,8 @@ function Display(cellId, type, html, zoom, padding, callback) {
  */
 function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
     var cell = $('#'+cellId);
-    var cellHeight = (parseFloat(cell.css('height'))-10);
-    var cellWidth = (parseFloat(cell.css('width'))-10);
+    var cellHeight = cell.height();
+    var cellWidth = cell.width();
 
     if ((!padding) || (cellId == 'display-cell')){
         padding = {top: 0, bottom: 0, left: 0, right: 0};

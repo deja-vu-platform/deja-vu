@@ -454,8 +454,14 @@ td.dropped li.widget {
     border: 1px solid #e1e1e1;
     line-height: 20px;
     color: #6f6f6f;
+    display: none;
 
 }
+
+td.dropped:hover li.widget  {
+    display: block;
+}
+
 .nav {
     margin-bottom: 10px;
 }
