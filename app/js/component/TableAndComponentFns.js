@@ -2862,3 +2862,48 @@ function testSaveHTML(){
     }
     return html;
 }
+
+function createDownloadPreview(){
+    $('#download-preview-area').html('').css({
+        display: 'none',
+        position: 'absolute',
+        'text-align': 'center',
+    });
+
+
+    $('.cell').each(function(){
+
+        var css = {
+            position: 'absolute',
+            top: $(this).position().top,
+            left: $(this).position().left,
+            width: $(this).css('width'),
+            height: $(this).css('height'),
+        };
+        var container = $(document.createElement('div'));
+        container.css(css);
+        var labelContainer = $(this).find('.label-container').clone(true, true);
+        if (labelContainer.get(0)){
+            container.append(labelContainer);
+
+        } else {
+            var displayComponent = $(this).find('.display-component').clone(true, true);
+            container.append(displayComponent);
+        }
+        $('#download-preview-area').append(container);
+    });
+    return $('#download-preview-area').html();
+}
+
+function downloadHTML(){
+    var innerHTML = createDownloadPreview();
+    var HTML = '<!doctype html><html><head></head><body>'+innerHTML+'</body></html>';
+    var element = document.createElement('a');
+    var data = "data:text/html;charset=utf-8," + encodeURIComponent(HTML);
+
+    element.setAttribute('href', data);
+    element.setAttribute('download', selectedUserComponent.meta.name+'.html');
+
+    element.click();
+
+}
