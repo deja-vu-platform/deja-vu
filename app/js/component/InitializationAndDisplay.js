@@ -1366,9 +1366,9 @@ function getContentEditableEditsAtCell(cellId){
 }
 
 
-$('body').click(function(event){
-    console.log( allElementsFromPoint(event.clientX, event.clientY));
-});
+//$('body').click(function(event){
+//    console.log( allElementsFromPoint(event.clientX, event.clientY));
+//});
 
 
 
@@ -1718,8 +1718,10 @@ $('#outer-container').on('dblclick', '.cell', function(){
     }
 });
 
-$('#display-cell').click(function(){
-    $( document.activeElement ).blur();
+$('#display-cell').click(function(event){
+    if (!$(allElementsFromPoint(event.clientX, event.clientY)).filter('[contenteditable=true]').get(0)){
+        $( document.activeElement ).blur();
+    }
 });
 
 function switchToInnerComponentFocusMode(row, col){
