@@ -2878,7 +2878,7 @@ function createDownloadPreview(){
         display: 'none',
         position: 'absolute',
         'text-align': 'center',
-        //background: 'blue',
+
     });
 
 
@@ -2888,10 +2888,10 @@ function createDownloadPreview(){
             position: 'absolute',
             top: $(this).position().top,
             left: $(this).position().left,
-            width: $(this).css('width'),
-            height: $(this).css('height'),
-            //border: 'black 1px solid',
+            width: $(this).width()+'px',
+            height: $(this).height()+'px',
             'vertical-align': 'middle',
+            background: '#F9F9F9',
         };
         var container = $(document.createElement('div'));
         container.css(css);
@@ -2938,7 +2938,10 @@ function createDownloadPreview(){
 
 function downloadHTML(){
     var innerHTML = createDownloadPreview();
-    var HTML = '<!doctype html><html><head></head><body>'+innerHTML+'</body></html>';
+    var stylesheets = '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">';
+    var js = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>'+
+        '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>';
+    var HTML = '<!doctype html><html>'+stylesheets+'<head></head><body>'+innerHTML+js+'</body></html>';
     var element = document.createElement('a');
     var data = "data:text/html;charset=utf-8," + encodeURIComponent(HTML);
 

@@ -549,6 +549,11 @@ function displayComponentInTable(cellId, widget, component) {
 
         showConfigOptions(type, cellId);
 
+        if (!selectedUserComponent.components.hasOwnProperty(row)) {
+            selectedUserComponent.components[row] = {};
+        }
+        selectedUserComponent.components[row][col] = component;
+
         // note: no padding here because this is a new component we are adding
         var padding = {top: 0, left: 0, bottom: 0, right: 0};
         selectedUserComponent.layout[row][col].ratio.padding = padding;
@@ -583,11 +588,6 @@ function displayComponentInTable(cellId, widget, component) {
     $('#' + cellId).removeClass("droppable");
     $('#' + cellId).droppable('disable');
     registerDraggable();
-
-    if (!selectedUserComponent.components.hasOwnProperty(row)) {
-        selectedUserComponent.components[row] = {};
-    }
-    selectedUserComponent.components[row][col] = component;
 
     updateBitmap(false);
     registerTooltipBtnHandlers();
