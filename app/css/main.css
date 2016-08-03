@@ -411,6 +411,10 @@ td {
     display: inline-block;
 }
 
+#inner-component-focus:hover .config-btns{
+    display: inline-block;
+}
+
 #btn-add-row, #btn-remove-row{
     position: absolute;
     bottom: -33px;

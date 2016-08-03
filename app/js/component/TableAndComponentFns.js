@@ -32,7 +32,7 @@ function loadTable(componentToShow) {
             if (componentToShow.components[row][col]) {
                 var innerComponent = componentToShow.components[row][col];
                 var type = innerComponent.type;
-                showConfigOptions(type, document.getElementById(cellId));
+                showConfigOptions(type, cellId);
 
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
 

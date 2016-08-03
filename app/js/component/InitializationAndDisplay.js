@@ -547,7 +547,7 @@ function displayComponentInTable(cellId, widget, component) {
         type = span.firstElementChild.getAttribute('name');
         component = new BaseComponent(type, {});
 
-        showConfigOptions(type, document.getElementById(cellId));
+        showConfigOptions(type, cellId);
 
         // note: no padding here because this is a new component we are adding
         var padding = {top: 0, left: 0, bottom: 0, right: 0};
@@ -565,7 +565,7 @@ function displayComponentInTable(cellId, widget, component) {
     } else {// a component is there
         type = component.type;
 
-        showConfigOptions(type, document.getElementById(cellId));
+        showConfigOptions(type, cellId);
 
         if (!widget) {
             $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0))
@@ -783,8 +783,8 @@ function cellTrashDroppableSettings(){
                 $(ui.draggable).appendTo(this);
                 $(this).droppable('disable');
                 var cellId = $(this).attr('id');
-                var droppedComponent =$('#'+cellId).children().last().attr('name').toLowerCase();
-                showConfigOptions(droppedComponent, document.getElementById(cellId));
+                var droppedComponentType =$('#'+cellId).children().last().attr('name').toLowerCase();
+                showConfigOptions(droppedComponentType, cellId);
                 if (!movedComponent()) {
                     displayComponentInTable(cellId, $(ui.draggable));
                 }
@@ -868,7 +868,7 @@ function getSliderValFromZoom(zoom){
     // rounding for extremes
     val = Math.max(Math.min(val, max), min);
     return Math.round(val);
-};
+}
 
 function getZoomFromSliderVal(){
     var val = parseFloat($('#zoom-slider').val())/100;
@@ -883,7 +883,7 @@ function getZoomFromSliderVal(){
         zoom = 1+val/(max+1);
     }
     return zoom;
-};
+}
 
 /**
  * Scales the table, based on the saved sizes, scaled to the zoom factor. If the saved sizes are changed beforhand,
@@ -1213,9 +1213,10 @@ function triggerEdit(cellId, popup) {
 
 }
 
-function showConfigOptions(droppedComponentType, cell) {
+function showConfigOptions(droppedComponentType, cellId) {
+    var cell = document.getElementById(cellId);
     // Hide edit button if label or panel
-    if (droppedComponentType==='label' || droppedComponentType==='panel') {
+    if (droppedComponentType=='label' || droppedComponentType=='panel') {
         $('#'+cell.id).find('.edit-btn').css('display', 'none');
     } else {
         $('#'+cell.id).find('.edit-btn').css('display', 'block');
@@ -1230,7 +1231,12 @@ function showConfigOptions(droppedComponentType, cell) {
     sp.innerHTML = configOptions.innerHTML;
     var configDiv = sp.firstElementChild;
 
-    cell.insertBefore(configDiv, cell.firstChild);
+    if (cellId == 'display-cell'){
+        $('#inner-component-focus').get(0).insertBefore(configDiv, cell.firstChild);
+    } else{
+        cell.insertBefore(configDiv, cell.firstChild);
+    }
+
 }
 
 
@@ -1279,16 +1285,30 @@ function registerTooltipBtnHandlers() {
             e.preventDefault();
             var cellId = findContainingCell(this);
             var element = $('#'+cellId).find('.display-component');
+            if (cellId == 'display-cell') {
+                var element2 = $('#'+$('#display-cell').data('cellid')).find('.display-component');
+            }
             var bootstrapClass = bootstrapPrefix+"-"+optionsList[index];
             element.addClass(bootstrapClass);
+            if (cellId == 'display-cell') {
+                element2.addClass(bootstrapClass);
+            }
+
 
             for (var j=0; j<optionsList.length; j++) {
                 if (j!==index) {
                     element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
+                    if (cellId == 'display-cell') {
+                        element2.removeClass(bootstrapPrefix+'-'+optionsList[j]);
+                    }
                 }
             }
 
-            var rowcol = getRowColFromId(cellId);
+            if (cellId == 'display-cell'){
+                var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
+            } else {
+                var rowcol  = getRowColFromId(cellId);
+            }
             var row = rowcol.row;
             var col = rowcol.col;
             selectedUserComponent.components[row][col].properties[propertyName] = bootstrapClass;
@@ -1898,6 +1918,10 @@ function switchToInnerComponentFocusMode(row, col){
 }
 
 function setUpInnerComponentOptions(cellId){
+    var rowcol  = getRowColFromId(cellId);
+    var row = rowcol.row;
+    var col = rowcol.col;
+
     $('.back-to-all-components').unbind().click(function(){
         toggleInnerComponentVisibility(true);
         // refresh it after toggling, or else the display function will got get the right
@@ -1909,12 +1933,25 @@ function setUpInnerComponentOptions(cellId){
         toggleInnerComponentVisibility(true);
     });
 
-    var tooltipClone = $('#'+cellId).find('.tooltip').clone(true, true);
-    $('#inner-component-focus').append(tooltipClone);
+    var type = selectedUserComponent.components[row][col].type;
 
-    $('.inner-component-options .edit-btn').on("click", function (e) {
-        $('#inner-component-focus').find('.tooltip').addClass('open');
-    });
+    if (type == 'label'|| type=='panel'){
+        $('.inner-component-options .edit-btn').css({
+            display: 'none',
+        });
+    } else {
+        $('.inner-component-options .edit-btn').css({
+            display: 'inline-block',
+        });
+        var tooltipClone = $('#'+cellId).find('.tooltip').clone(true, true);
+        $('#inner-component-focus').append(tooltipClone);
+
+        $('.inner-component-options .edit-btn').unbind().on("click", function (e) {
+            $('#inner-component-focus').find('.tooltip').addClass('open');
+        });
+    }
+
+    showConfigOptions(type, 'display-cell');
 
 }
 
@@ -1933,7 +1970,8 @@ function refreshCellDisplay(cellId, zoom){
     // display itself gets rid of padding for the #display-cell
     Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding);
     //attach event handlers to new texts
-    getContentEditableEditsAtCell(cellId);
+    //getContentEditableEditsAtCell(cellId);
+    registerTooltipBtnHandlers();
 }
 
 

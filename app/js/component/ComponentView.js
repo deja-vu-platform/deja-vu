@@ -147,7 +147,19 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
                 'padding-right': paddingPx.right/zoom + 'px',
             });
         }
+
     }
+
+    if (cellId == 'display-cell'){
+        var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
+    } else {
+        var rowcol  = getRowColFromId(cellId);
+    }
+    // TODO SKETCHY!!!
+    for (var propertyName in selectedUserComponent.components[rowcol.row][rowcol.col].properties){
+        displayComponent.addClass(selectedUserComponent.components[rowcol.row][rowcol.col].properties[propertyName]);
+    }
+
 
 }
 
