@@ -150,7 +150,10 @@
                 </span>
             </div>
             <div class="content dropdown-target" data-dropdownid="merge">
-                <button class="btn btn-default" id="unmerge-all-cells">Reset All Merges</button>
+                <div class="layout-group">
+                    <span class="layout-group-header">Reset</span>
+                    <button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>
+                </div>
             </div>
         </div>
         <div class="resize">
@@ -161,94 +164,102 @@
                 </span>
             </div>
             <div class="content  dropdown-target" data-dropdownid="resize">
-                <div class="lock-width">
-                    Lock Width
-                    <button type="button" class="btn btn-default btn-table-width-lock-unlock">
-                        <img src="images/unlock_icon.png" width="20px" height="20px">
-                    </button>
-                </div>
-                <div class="lock-height">
-                    Lock Height
-                    <button type="button" class="btn btn-default btn-table-height-lock-unlock">
-                        <img src="images/unlock_icon.png" width="20px" height="20px">
-                    </button>
-                </div>
-                <div>
-                    Resize Entire Component (in px)
-                    <div id="resize-table-width"> Width
-                        <input type="text" placeholder="width">
+                <div class="layout-group">
+                    <span class="layout-group-header">Lock</span>
+                    <div class="lock-width">
+                        <div class="layout-label">Width</div>
+                        <div class="layout-input">
+                            <button type="button" class="btn btn-default btn-table-width-lock-unlock">
+                                <img src="images/unlock_icon.png" width="20px" height="20px">
+                            </button>
+                        </div>
                     </div>
-                    <div id="resize-table-height"> Height
-                        <input type="text" placeholder="height">
+                    <div class="lock-height">
+                        <div class="layout-label">Height</div>
+                        <div class="layout-input">
+                            <button type="button" class="btn btn-default btn-table-height-lock-unlock">
+                                <img src="images/unlock_icon.png" width="20px" height="20px">
+                            </button>
+                        </div>
                     </div>
-                    <button class="btn btn-default" id="resize-table">Resize Component</button>
                 </div>
-                <!--<div class="dropdown-trigger dropdown-open" data-dropdownid="resize-fixed-ratio">Resize To Inputs-->
-                    <!--<span class="glyphicon glyphicon-triangle-bottom"></span>-->
-                <!--</div>-->
-                <!--<div class="dropdown-target" data-dropdownid="resize-fixed-ratio">-->
-                    <!--<ul id="resize-fixed-rows">-->
-                    <!--</ul>-->
-                    <!--<button type="button" class="btn btn-default" id="update-width-ratios">Update Width Ratios</button>-->
-                    <!--<ul id="resize-fixed-cols">-->
-                    <!--</ul>-->
-                    <!--<button type="button" class="btn btn-default" id="update-height-ratios">Update Height Ratios</button>-->
-                <!--</div>-->
-                <div id="resize-to-inputs">
-                    <button class="btn btn-default" id="btn-resize-to-inputs">Resize To Inputs</button>
+                <div class="layout-group" id="resize-to-inputs">
+                    <span class="layout-group-header">Resize Rows and Columns to Inputs</span>
+                    <button class="btn btn-default" id="btn-resize-to-inputs">Start</button>
                     <div id="resize-to-inputs-done-cancel">
                         <button class="btn btn-default" id="btn-resize-to-inputs-done">Done</button>
                         <button class="btn btn-default" id="btn-resize-to-inputs-cancel">Cancel</button>
                     </div>
                 </div>
-
-                <div class="dropdown-target"  data-dropdownid="resize-fixed-px">
-                    <ul id="resize-px-rows">
-                    </ul>
-                    <ul id="resize-px-cols">
-                    </ul>
+                <div class="layout-group">
+                    <span class="layout-group-header">Resize Entire Component</span>
+                    <div id="resize-table-width">
+                        <div class="layout-label">Width (px)</div>
+                        <div class="layout-input">
+                            <input type="text" placeholder="width">
+                        </div>
+                    </div>
+                    <div id="resize-table-height">
+                        <div class="layout-label">Height (px)</div>
+                        <div class="layout-input"><input type="text" placeholder="height"></div>
+                    </div>
+                    <button class="btn btn-default" id="resize-table">Resize Component</button>
                 </div>
-                <button class="btn btn-default" id="reset-width-ratios">Reset Width Ratios</button>
-                <button class="btn btn-default" id="reset-height-ratios">Reset Height Ratios</button>
+                <div class="layout-group">
+                    <span class="layout-group-header">Reset</span>
+                    <button class="btn btn-default" id="reset-width-ratios">Equalize Width Ratios</button>
+                    <button class="btn btn-default" id="reset-height-ratios">Equalize Height Ratios</button>
+                </div>
             </div>
         </div>
         <div class="add-remove-rows-cols">
             <div class="header">
                 <span class="dropdown-trigger dropdown-open"  data-dropdownid="add-del-row-col">
-                    Add/Delete Rows/Columns
+                    Add/Remove Rows/Columns
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
             <div class="content  dropdown-target" data-dropdownid="add-del-row-col">
-                <div class="lock-width">
-                    Lock Width
-                    <button type="button" class="btn btn-default btn-table-width-lock-unlock">
-                        <img src="images/unlock_icon.png" width="20px" height="20px">
-                    </button>
-                </div>
-                <div class="lock-height">
-                    Lock Height
-                    <button type="button" class="btn btn-default btn-table-height-lock-unlock">
-                        <img src="images/unlock_icon.png" width="20px" height="20px">
-                    </button>
-                </div>
-                <div class="add-remove-inputs">
-                    <div class="add-n-cols">
-                        <span>Add Cols</span> <input type="text">
+                <div class="layout-group">
+                    <span class="layout-group-header">Lock</span>
+                    <div class="lock-width">
+                        <div class="layout-label">Width</div>
+                        <div class="layout-input">
+                            <button type="button" class="btn btn-default btn-table-width-lock-unlock">
+                                <img src="images/unlock_icon.png" width="20px" height="20px">
+                            </button>
+                        </div>
                     </div>
-                    <div class="remove-n-cols">
-                        <span>Remove Cols</span> <input type="text">
+                    <div class="lock-height">
+                        <div class="layout-label">Height</div>
+                        <div class="layout-input">
+                            <button type="button" class="btn btn-default btn-table-height-lock-unlock">
+                                <img src="images/unlock_icon.png" width="20px" height="20px">
+                            </button>
+                        </div>
                     </div>
+                </div>
+                <div class="add-remove-inputs layout-group">
+                    <span class="layout-group-header">Add/Remove Rows/Columns</span>
                     <div class="add-n-rows">
-                        <span>Add Rows</span><input type="text">
+                        <div class="layout-label"><span>Add Rows</span></div>
+                        <div class="layout-input"><input type="text"></div>
                     </div>
                     <div class="remove-n-rows">
-                        <span>Remove Rows</span> <input type="text">
+                        <div class="layout-label"><span>Remove Rows</span></div>
+                        <div class="layout-input"><input type="text"></div>
+                    </div>
+                    <div class="add-n-cols">
+                        <div class="layout-label"><span>Add Cols</span></div>
+                        <div class="layout-input"><input type="text"></div>
+                    </div>
+                    <div class="remove-n-cols">
+                        <div class="layout-label"><span>Remove Cols</span></div>
+                        <div class="layout-input"><input type="text"></div>
                     </div>
                 </div>
             </div>
         </div>
-
     </div>
 
     <div class="style">
@@ -305,6 +316,8 @@
 <div id="outer-container">
     <div id="selected-screen-size"></div>
 </div>
+
+<div id="download-preview-area"></div>
 
 <div id="zoom-control">
     <button id="zoom-control-minimize-btn" class="btn btn-default">

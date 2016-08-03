@@ -87,6 +87,7 @@ $('#create-project').on('click', function () {
 
 $('.current-project').on('click', 'a', function(e){
     window.location = 'index.html';
+    e.stopPropagation();
 });
 
 $('.current-project').on('click', '.content', function(){
@@ -96,6 +97,15 @@ $('.current-project').on('click', '.content', function(){
         $('#table-container-preview').html('');
     }
 
+});
+
+$('#table-container-preview').on('dblclick', '#main-table-preview', function(){
+    // this div's existance means there is some project showing
+
+   selectedProject = availableProjectsByFilename[$('#table-container-preview').data('projectfilename')];
+   selectedProject.lastAccessed = new Date();
+   window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+   window.location = 'index.html';
 });
 
 
@@ -155,6 +165,7 @@ function addLoadProjectButton(filename){
 function displayProjectPreview(project){
     // TODO make it select the main component
     // TODO Also, have a way to click to change to another view?
+    $('#table-container-preview').data('projectfilename', projectNameToFilename(project.meta.name));
     $('#project-name-preview').text('Project Preview: '+project.meta.name)
     $('#preview-prev-page').unbind();
     $('#preview-next-page').unbind();

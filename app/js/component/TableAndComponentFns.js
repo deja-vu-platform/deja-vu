@@ -32,12 +32,14 @@ function loadTable(componentToShow) {
             if (componentToShow.components[row][col]) {
                 var innerComponent = componentToShow.components[row][col];
                 var type = innerComponent.type;
-                showConfigOptions(type, document.getElementById(cellId));
+                showConfigOptions(type, cellId);
 
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
 
                 var padding = selectedUserComponent.layout[row][col].ratio.padding;
-                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding);
+                var properties = selectedUserComponent.components[row][col].properties;
+
+                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
                 triggerEdit(cellId, false);
 
                 $('#' + cellId).addClass("dropped");
@@ -222,7 +224,7 @@ function createGridCell(row, col) {
     td.className = 'grid col' + '_' + col;
 
     var sizeDisplayInner = '<input type="text" class="value" id="size-display-value_'+row+'_'+col+'">'+
-        '<select class="select-unit" id="size-display-select_'+row+'_'+col+'">'+
+        '<select class="select-unit btn-default btn btn-xs" id="size-display-select_'+row+'_'+col+'">'+
         '<option value="px" selected>px</option>'+
         '<option value="%">%</option>'+
         '</select>';
@@ -649,25 +651,28 @@ function createMergeHandle(row, col){
             var rowcol = getRowColFromId(componentId);
             var row = rowcol.row;
             var col = rowcol.col;
+            // This cell is the cell that was dragged in the first place (may not end up in the final merge)
             var thisCellId = 'cell' + '_' + row + '_' + col;
 
             var handleType = $(ui.element).data("ui-resizable").axis;
 
             // this will be one of the cell id's input into the merge function
-            var cell1Id = thisCellId;
+            // that is, cell1 will be the DIAGONALLY OPPOSITE cell to the new
+            // cell we are merging into
+            var cellOppId = thisCellId;
             if ($('#'+thisCellId).data('merged').isMerged){
                 switch(handleType){
                     case 'ne':
-                        cell1Id = $('#'+thisCellId).data('merged').bottomLeftCellId;
+                        cellOppId = $('#'+thisCellId).data('merged').bottomLeftCellId;
                         break;
                     case 'nw':
-                        cell1Id = $('#'+thisCellId).data('merged').bottomRightCellId;
+                        cellOppId = $('#'+thisCellId).data('merged').bottomRightCellId;
                         break;
                     case 'se':
-                        cell1Id = $('#'+thisCellId).data('merged').topLeftCellId;
+                        cellOppId = $('#'+thisCellId).data('merged').topLeftCellId;
                         break;
                     case 'sw':
-                        cell1Id = $('#'+thisCellId).data('merged').topRightCellId;
+                        cellOppId = $('#'+thisCellId).data('merged').topRightCellId;
                         break;
                     default:
                         throw 'Something went wrong'; // TODO
@@ -717,18 +722,18 @@ function createMergeHandle(row, col){
                 var newCellId = 'cell' + '_' + newCellGridRowcol.row + '_' + newCellGridRowcol.col;
                 // TODO: have a setting to turn this off?
                 if (confirmOnDangerousMerge){
-                    if (safeToMerge(cell1Id, newCellId)){
+                    if (safeToMerge(cellOppId, newCellId, thisCellId)){
                         // if this is already a merged cell we should unmerge it now
                         // since this cell (a top left cell), may not be in the final merge
                         // so should be brought back to the original form
                         unmergeCells(thisCellId); // without the component; it will get it back if it was its
-                        mergeCells(cell1Id, newCellId, component);
+                        mergeCells(cellOppId, newCellId, component);
                     } else {
-                        openMergeConfirmDialogue(thisCellId, cell1Id, newCellId, component);
+                        openMergeConfirmDialogue(thisCellId, cellOppId, newCellId, component);
                     }
                 } else {
                     unmergeCells(thisCellId);
-                    mergeCells(cell1Id, newCellId, component);
+                    mergeCells(cellOppId, newCellId, component);
                 }
             }
 
@@ -866,12 +871,12 @@ function getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id){
 }
 
 /**
- *  Cell1 is the one merging over
+ *  MergingCell is the one merging over (ie, it contains the original component)
  * @param cell1Id
  * @param cell2Id
  * @returns {boolean}
  */
-function safeToMerge(cell1Id, cell2Id){
+function safeToMerge(cell1Id, cell2Id, mergingCellId){
     // first check for top left cell and bottom right cell
     var topBottomLeftRight = getTopRowBottomRowLeftColRightCol(cell1Id, cell2Id);
     var topRowNum = topBottomLeftRight[0];
@@ -883,13 +888,16 @@ function safeToMerge(cell1Id, cell2Id){
     for (var row = topRowNum; row <= bottomRowNum; row++) {
         for (var col = leftColNum; col <= rightColNum; col++) {
             var cellId = "cell" + '_' + row + '_' + col;
-            if (cellId === cell1Id){
+            if (cellId === mergingCellId){
                 continue;
             }
             // if the cell is hidden, check if the hiding cell has a component
             var isHidden = $('#'+cellId).data('hidden').isHidden;
             if (isHidden){
                 var hidingCellId = $('#'+cellId).data('hidden').hidingCellId;
+                if (hidingCellId === mergingCellId){
+                    continue;
+                }
                 var hcRowcol = getRowColFromId(hidingCellId);
                 if (selectedUserComponent.components[hcRowcol.row]) {
                     if (selectedUserComponent.components[hcRowcol.row][hcRowcol.col]) {
@@ -1750,7 +1758,9 @@ function updateBaseComponentDisplayRow(row){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
                 var padding = selectedUserComponent.layout[row][col].ratio.padding;
-                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding);
+                var properties = selectedUserComponent.components[row][col].properties;
+
+                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding, properties);
             }
         }
     }
@@ -1762,7 +1772,9 @@ function updateBaseComponentDisplayCol(col){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
                 var padding = selectedUserComponent.layout[row][col].ratio.padding;
-                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding);
+                var properties = selectedUserComponent.components[row][col].properties;
+
+                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding, properties);
             }
         }
     }
@@ -2861,4 +2873,87 @@ function testSaveHTML(){
         }
     }
     return html;
+}
+
+function createDownloadPreview(){
+    var oldZoom = currentZoom;
+    currentZoom = 1;
+    scaleTableToZoom();
+
+    $('#download-preview-area').html('').css({
+        display: 'none',
+        position: 'absolute',
+        'text-align': 'center',
+
+    });
+
+
+    $('.cell').each(function(){
+        var add = false;
+        var css = {
+            position: 'absolute',
+            top: $(this).position().top,
+            left: $(this).position().left,
+            width: $(this).width()+'px',
+            height: $(this).height()+'px',
+            'vertical-align': 'middle',
+            background: '#F9F9F9',
+        };
+        var container = $(document.createElement('div'));
+        container.css(css);
+
+        var labelContainer = $(this).find('.label-container').clone(true, true);
+        if (labelContainer.get(0)){
+            labelContainer.css({// this is not carried over, since this was declared in the css file
+                position: 'absolute',
+                top: '0',
+                //border: '#e0e0e0 solid 1px',
+                display: 'block',
+            });
+            container.append(labelContainer);
+            var displayComponent = labelContainer.find('.display-component');
+            displayComponent.css({// this is not carried over, since this was declared in the css file
+                'white-space': 'initial',
+                'font-weight': 400,
+                margin: 0,
+            });
+            add = true;
+        } else {
+            var displayComponent = $(this).find('.display-component').clone(true, true);
+            displayComponent.css({// this is not carried over, since this was declared in the css file
+                'white-space': 'initial',
+                'font-weight': 400,
+            });
+
+
+            if (displayComponent.get(0)){
+                container.append(displayComponent);
+                add = true;
+            }
+        }
+        if (add){
+            $('#download-preview-area').append(container);
+        }
+    });
+
+    currentZoom = oldZoom;
+    scaleTableToZoom();
+
+    return $('#download-preview-area').html();
+}
+
+function downloadHTML(){
+    var innerHTML = createDownloadPreview();
+    var stylesheets = '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">';
+    var js = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>'+
+        '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>';
+    var HTML = '<!doctype html><html>'+stylesheets+'<head></head><body>'+innerHTML+js+'</body></html>';
+    var element = document.createElement('a');
+    var data = "data:text/html;charset=utf-8," + encodeURIComponent(HTML);
+
+    element.setAttribute('href', data);
+    element.setAttribute('download', selectedUserComponent.meta.name+'.html');
+
+    element.click();
+
 }

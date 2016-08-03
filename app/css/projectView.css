@@ -61,7 +61,7 @@ a{
 
     padding: 50px 30px;
 
-    pointer-events: none;
+    /*pointer-events: none;*/
 }
 
 #preview-prev-page, #preview-next-page{

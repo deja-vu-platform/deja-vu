@@ -27,7 +27,9 @@ function loadTablePreview(componentToShow) {
 
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
                 var padding = componentToShow.layout[row][col].ratio.padding;
-                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding);
+                var properties = componentToShow.components[row][col].properties;
+
+                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
             }
         }
     });
@@ -113,7 +115,7 @@ function resetAlignersPreview(scale) {
     // 0th col
     for (var row = 1; row<=numRows; row++){
         var heightRatioGrid = componentToShow.layout[row][1].ratio.grid.height;
-        var thisGridCellHeight = scale * heightRatioGrid * (gridHeight - 20);
+        var thisGridCellHeight = scale * heightRatioGrid * componentToShow.layout.tablePxDimensions.height;
         $('#cell' + '_' + row + '_' + 0).css({
             width: '1px',
             height: thisGridCellHeight + 'px',
@@ -123,7 +125,7 @@ function resetAlignersPreview(scale) {
     // 0th row
     for (var col = 1; col<=numCols; col++) {
         var widthRatioGrid = componentToShow.layout[1][col].ratio.grid.width;
-        var thisGridCellWidth = scale * widthRatioGrid * (gridWidth - 20);
+        var thisGridCellWidth = scale * widthRatioGrid * componentToShow.layout.tablePxDimensions.width;
 
         $('#cell' + '_' + 0 + '_' + col).css({
             width: thisGridCellWidth + 'px',
@@ -136,8 +138,12 @@ function resetAlignersPreview(scale) {
 
 
 function initialResizeCellsPreview() {
-    gridHeight = parseFloat($('#table-container-preview').css('height')) - 100;
-    gridWidth = parseFloat($('#table-container-preview').css('width')) - 60;
+    //gridHeight = parseFloat($('#table-container-preview').css('height')) - 100;
+    //gridWidth = parseFloat($('#table-container-preview').css('width')) - 60;
+
+    gridHeight = parseFloat($('#table-container-preview').height());
+    gridWidth = parseFloat($('#table-container-preview').width());
+
 
     //gridWidth = componentToShow.layout.tablePxDimensions.width;
     //gridHeight = componentToShow.layout.tablePxDimensions.height;

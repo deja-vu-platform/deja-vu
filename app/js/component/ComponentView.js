@@ -1,3 +1,12 @@
+var mainDisplayClasses = {
+    'label': "display-component",
+    'link': "btn display-component",
+    'tab-viewer': "nav display-component",
+    'menu': "btn-group display-component",
+    'image': "display-component",
+    'panel': "panel display-component"
+};
+
 /**
  * Display element in cell
  */
@@ -64,14 +73,14 @@ var getHTML = {
     }
 };
 
-function Display(cellId, type, html, zoom, padding, callback) {
+function Display(cellId, type, html, zoom, padding, properties, callback) {
     var cell = document.getElementById(cellId);
     var sp = document.createElement('span');
     sp.innerHTML = html;
     var html_ = sp.firstElementChild;
     cell.insertBefore(html_, cell.firstChild);
     hideBaseComponentDisplayAt(cellId, type);
-    updateBaseComponentDisplayAt(cellId, type, zoom, padding);
+    updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties);
     showBaseComponentDisplayAt(cellId, type);
     if (callback) callback();
 }
@@ -80,11 +89,14 @@ function Display(cellId, type, html, zoom, padding, callback) {
 /**
  *
  * @param cellId
+ * @param type
+ * @param zoom
+ * @param padding
  */
-function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
+function updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties) {
     var cell = $('#'+cellId);
-    var cellHeight = (parseFloat(cell.css('height'))-10);
-    var cellWidth = (parseFloat(cell.css('width'))-10);
+    var cellHeight = cell.height();
+    var cellWidth = cell.width();
 
     if ((!padding) || (cellId == 'display-cell')){
         padding = {top: 0, bottom: 0, left: 0, right: 0};
@@ -146,6 +158,23 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
                 'padding-bottom': paddingPx.bottom/zoom + 'px',
                 'padding-right': paddingPx.right/zoom + 'px',
             });
+        }
+
+    }
+
+    //if (cellId == 'display-cell'){
+    //    var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
+    //} else {
+    //    var rowcol  = getRowColFromId(cellId);
+    //}
+    //// TODO SKETCHY!!!
+    if (properties){
+        if (Object.keys(properties).length>0){
+            displayComponent.removeClass();
+            for (var propertyName in properties){
+                displayComponent.addClass(properties[propertyName]);
+            }
+            displayComponent.addClass(mainDisplayClasses[type]);
         }
     }
 

@@ -8,6 +8,9 @@
     padding: 10px;
     position: relative;
     margin: auto;
+}
+
+#main-table-preview td{
     pointer-events: none;
 }
 
@@ -34,7 +37,7 @@ td {
     resize: both;
     position: relative;
     text-align: center;
-    /*vertical-align: top;*/
+    vertical-align: top;
 }
 
 
@@ -89,6 +92,7 @@ td {
 }
 
 li.widget {
+    display: none;
     position: absolute;
     bottom: 0px;
     margin-left: auto;
@@ -101,13 +105,13 @@ li.widget {
 
 }
 
+#main-table-preview:hover li.widget{
+    display: block;
+}
 
 .label-container {
     position: absolute;
     top: 0;
-    /*width: 200px;*/
-    /*height: 200px;*/
-    padding: 20% 5% 10% 5%;
     /*background: #fff;*/
     border: #e0e0e0 solid 1px;
     display: block;

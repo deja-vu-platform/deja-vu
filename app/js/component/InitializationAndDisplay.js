@@ -271,7 +271,7 @@ $('.components').on('click', '.component-name-container', function () {
     window.setTimeout(load(this), 2000);
 });
 
-$('.components').on('dblclick', '.component-name', function () {
+$('.components').on('dblclick', '.component-name', function (e) {
     var newNameInputElt = $($(this).parent().find('.new-name-input'));
     var submitRenameElt = $($(this).parent().find('.submit-rename'));
     newNameInputElt.val($(this).text());
@@ -547,9 +547,15 @@ function displayComponentInTable(cellId, widget, component) {
         type = span.firstElementChild.getAttribute('name');
         component = new BaseComponent(type, {});
 
-        showConfigOptions(type, document.getElementById(cellId));
+        showConfigOptions(type, cellId);
+
+        if (!selectedUserComponent.components.hasOwnProperty(row)) {
+            selectedUserComponent.components[row] = {};
+        }
+        selectedUserComponent.components[row][col] = component;
 
         // note: no padding here because this is a new component we are adding
+        // also note: no properties because of the same reason
         var padding = {top: 0, left: 0, bottom: 0, right: 0};
         selectedUserComponent.layout[row][col].ratio.padding = padding;
 
@@ -565,7 +571,7 @@ function displayComponentInTable(cellId, widget, component) {
     } else {// a component is there
         type = component.type;
 
-        showConfigOptions(type, document.getElementById(cellId));
+        showConfigOptions(type, cellId);
 
         if (!widget) {
             $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0))
@@ -573,7 +579,9 @@ function displayComponentInTable(cellId, widget, component) {
         // display requires widget to be placed before display happens
 
         var padding = selectedUserComponent.layout[row][col].ratio.padding;
-        Display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding);
+        var properties = selectedUserComponent.components[row][col].properties;
+
+        Display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding, properties);
 
         triggerEdit(cellId, false); // no need to show edit options
 
@@ -583,11 +591,6 @@ function displayComponentInTable(cellId, widget, component) {
     $('#' + cellId).removeClass("droppable");
     $('#' + cellId).droppable('disable');
     registerDraggable();
-
-    if (!selectedUserComponent.components.hasOwnProperty(row)) {
-        selectedUserComponent.components[row] = {};
-    }
-    selectedUserComponent.components[row][col] = component;
 
     updateBitmap(false);
     registerTooltipBtnHandlers();
@@ -783,8 +786,8 @@ function cellTrashDroppableSettings(){
                 $(ui.draggable).appendTo(this);
                 $(this).droppable('disable');
                 var cellId = $(this).attr('id');
-                var droppedComponent =$('#'+cellId).children().last().attr('name').toLowerCase();
-                showConfigOptions(droppedComponent, document.getElementById(cellId));
+                var droppedComponentType =$('#'+cellId).children().last().attr('name').toLowerCase();
+                showConfigOptions(droppedComponentType, cellId);
                 if (!movedComponent()) {
                     displayComponentInTable(cellId, $(ui.draggable));
                 }
@@ -868,7 +871,7 @@ function getSliderValFromZoom(zoom){
     // rounding for extremes
     val = Math.max(Math.min(val, max), min);
     return Math.round(val);
-};
+}
 
 function getZoomFromSliderVal(){
     var val = parseFloat($('#zoom-slider').val())/100;
@@ -883,14 +886,13 @@ function getZoomFromSliderVal(){
         zoom = 1+val/(max+1);
     }
     return zoom;
-};
+}
 
 /**
  * Scales the table, based on the saved sizes, scaled to the zoom factor. If the saved sizes are changed beforhand,
  * this function can be used to resize the table
  */
 function scaleTableToZoom(){
-    gridWidth = selectedUserComponent.layout.tablePxDimensions.width * currentZoom;
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
 
     propagateRatioChangeToAllElts();
@@ -908,8 +910,8 @@ function changeZoomViaZoomControl(type) {
         var zoomWidth = ($('#outer-container').width() - (20 + 100 + 40 + 17)) / selectedUserComponent.layout.tablePxDimensions.width;
         currentZoom = Math.min(zoomWidth, zoomHeight);
     } else {
-        var widthScale = ($('#outer-container').width())/$('#selected-screen-size').width();
-        var heightScale = ($('#outer-container').height())/$('#selected-screen-size').height();
+        var widthScale = ($('#outer-container').width())/selectedScreenSizeWidth;
+        var heightScale = ($('#outer-container').height())/selectedScreenSizeHeight;
 
         currentZoom = Math.min(widthScale, heightScale);
     }
@@ -1036,12 +1038,13 @@ function zoomNavInitialize(){
 
     $('#zoom-nav-minimize-btn').click(function(){
        if ($(this).hasClass('minimized')){
-           $(this).removeClass('minimized')
+           $(this).removeClass('minimized').addClass('btn-xs');
            $('#zoom-nav').css({
                display: 'block',
-           })
+           });
+           $(this).text('_');
        } else {
-           $(this).addClass('minimized')
+           $(this).addClass('minimized').removeClass('btn-xs').text('Navigation');
            $('#zoom-nav').css({
                display: 'none',
            })
@@ -1070,7 +1073,7 @@ $('#zoom-nav').click(function(e){
 
 function initializeZoomNavComponentSize(){
     $('#zoom-nav-component-size').css({
-        background: 'grey',
+        background: '#D5D5D5',
         width: $('#main-cell-table').width()*navZoom*currentZoom + 'px',
         height: $('#main-cell-table').height()*navZoom*currentZoom + 'px',
         margin: 50*navZoom + 'px',
@@ -1169,14 +1172,18 @@ function movedComponent() {
             var newRow = coord[2];
             var newCol = coord[3];
 
-            var componentCopy = selectedUserComponent.components[delRow][delCol];
-            selectedUserComponent.addComponent(componentCopy, newRow, newCol);
+            var innerComponentCopy = selectedUserComponent.components[delRow][delCol];
+            selectedUserComponent.addComponent(innerComponentCopy, newRow, newCol);
 
             var padding = selectedUserComponent.layout[delRow][delCol].ratio.padding;
             // update the new paddings
             selectedUserComponent.layout[delRow][delCol].ratio.padding = {top: 0, bottom: 0, left: 0, right: 0};
             selectedUserComponent.layout[newRow][newCol].ratio.padding = padding;
-            Display('cell'+ '_' + newRow + '_' + newCol, componentCopy.type, getHTML[componentCopy.type](componentCopy.components[componentCopy.type]), currentZoom, padding);
+            // update the new properties
+
+            var properties = innerComponentCopy.properties;
+
+            Display('cell'+ '_' + newRow + '_' + newCol, innerComponentCopy.type, getHTML[innerComponentCopy.type](innerComponentCopy.components[innerComponentCopy.type]), currentZoom, padding, properties);
             triggerEdit('cell'+ '_' + newRow + '_' + newCol, false);
 
         }
@@ -1213,9 +1220,10 @@ function triggerEdit(cellId, popup) {
 
 }
 
-function showConfigOptions(droppedComponentType, cell) {
+function showConfigOptions(droppedComponentType, cellId) {
+    var cell = document.getElementById(cellId);
     // Hide edit button if label or panel
-    if (droppedComponentType==='label' || droppedComponentType==='panel') {
+    if (droppedComponentType=='label' || droppedComponentType=='panel') {
         $('#'+cell.id).find('.edit-btn').css('display', 'none');
     } else {
         $('#'+cell.id).find('.edit-btn').css('display', 'block');
@@ -1230,7 +1238,12 @@ function showConfigOptions(droppedComponentType, cell) {
     sp.innerHTML = configOptions.innerHTML;
     var configDiv = sp.firstElementChild;
 
-    cell.insertBefore(configDiv, cell.firstChild);
+    if (cellId == 'display-cell'){
+        $('#inner-component-focus').get(0).insertBefore(configDiv, cell.firstChild);
+    } else{
+        cell.insertBefore(configDiv, cell.firstChild);
+    }
+
 }
 
 
@@ -1279,16 +1292,30 @@ function registerTooltipBtnHandlers() {
             e.preventDefault();
             var cellId = findContainingCell(this);
             var element = $('#'+cellId).find('.display-component');
+            if (cellId == 'display-cell') {
+                var element2 = $('#'+$('#display-cell').data('cellid')).find('.display-component');
+            }
             var bootstrapClass = bootstrapPrefix+"-"+optionsList[index];
             element.addClass(bootstrapClass);
+            if (cellId == 'display-cell') {
+                element2.addClass(bootstrapClass);
+            }
+
 
             for (var j=0; j<optionsList.length; j++) {
                 if (j!==index) {
                     element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
+                    if (cellId == 'display-cell') {
+                        element2.removeClass(bootstrapPrefix+'-'+optionsList[j]);
+                    }
                 }
             }
 
-            var rowcol = getRowColFromId(cellId);
+            if (cellId == 'display-cell'){
+                var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
+            } else {
+                var rowcol  = getRowColFromId(cellId);
+            }
             var row = rowcol.row;
             var col = rowcol.col;
             selectedUserComponent.components[row][col].properties[propertyName] = bootstrapClass;
@@ -1354,7 +1381,7 @@ function getContentEditableEdits() {
     $('[contenteditable=true]').blur(function() {
         var cellId = findContainingCell(this);
         updateBaseComponentContentsAndDisplayAt(cellId);
-        getContentEditableEdits();
+        getContentEditableEditsAtCell(cellId);
     });
 }
 
@@ -1364,6 +1391,12 @@ function getContentEditableEditsAtCell(cellId){
         getContentEditableEditsAtCell(cellId);
     });
 }
+
+
+//$('body').click(function(event){
+//    console.log( allElementsFromPoint(event.clientX, event.clientY));
+//});
+
 
 
 function selectText(container) {
@@ -1712,6 +1745,12 @@ $('#outer-container').on('dblclick', '.cell', function(){
     }
 });
 
+$('#display-cell').click(function(event){
+    if (!$(allElementsFromPoint(event.clientX, event.clientY)).filter('[contenteditable=true]').get(0)){
+        $( document.activeElement ).blur();
+    }
+});
+
 function switchToInnerComponentFocusMode(row, col){
     $('#inner-component-focus #display-cell').html('');
     $('#inner-component-focus').find('.tooltip').remove();
@@ -1720,6 +1759,7 @@ function switchToInnerComponentFocusMode(row, col){
 
 
     var componentToShow = selectedUserComponent.components[row][col];
+    var type = componentToShow.type;
 
     var cellId = 'cell'+'_'+row+'_'+col;
     $('#display-cell').data('cellid',cellId);
@@ -1816,12 +1856,14 @@ function switchToInnerComponentFocusMode(row, col){
             'se': $('#display-cell-resize-handle')
         },
 
-        start: function(){
+        start: function(e, ui){
             $('#display-cell-resize-helper').css({
                 border: 'black 1px dotted',
-            })
+            });
+
+            //e.stopPropagation();
         },
-        stop: function () {
+        stop: function (e, ui) {
             $('#display-cell-resize-helper').css({
                 border: 'none',
             });
@@ -1835,7 +1877,24 @@ function switchToInnerComponentFocusMode(row, col){
                 width: $('#display-cell-resize-helper').css('width'),
             });
             // NOTE: shouldn't use any padding here
-            Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
+            var padding = null;
+            var properties = selectedUserComponent.components[row][col].properties;
+
+
+            Display('display-cell', type, getHTML[type](componentToShow.components[type]), scale, padding, properties);
+
+
+            //$('#inner-component-focus #display-cell').css({
+            //    height: $('#display-cell .display-component').css('height'),
+            //    width: $('#display-cell .display-component').css('width'),
+            //});
+            //
+            //
+            //$('#inner-component-focus #display-cell-resize-helper').css({
+            //    height: $('#display-cell .display-component').css('height'),
+            //    width: $('#display-cell .display-component').css('width'),
+            //});
+
 
             var top = $(this).position().top/$('#inner-component-focus').height();
             var bottom = 1 - ($(this).position().top + $(this).height())/$('#inner-component-focus').height();
@@ -1850,6 +1909,8 @@ function switchToInnerComponentFocusMode(row, col){
         },
         containment: '#inner-component-focus',
     });
+
+
 
     $('#display-cell').draggable({
         containment: '#inner-component-focus',
@@ -1882,6 +1943,10 @@ function switchToInnerComponentFocusMode(row, col){
 }
 
 function setUpInnerComponentOptions(cellId){
+    var rowcol  = getRowColFromId(cellId);
+    var row = rowcol.row;
+    var col = rowcol.col;
+
     $('.back-to-all-components').unbind().click(function(){
         toggleInnerComponentVisibility(true);
         // refresh it after toggling, or else the display function will got get the right
@@ -1893,12 +1958,25 @@ function setUpInnerComponentOptions(cellId){
         toggleInnerComponentVisibility(true);
     });
 
-    var tooltipClone = $('#'+cellId).find('.tooltip').clone(true, true);
-    $('#inner-component-focus').append(tooltipClone);
+    var type = selectedUserComponent.components[row][col].type;
 
-    $('.inner-component-options .edit-btn').on("click", function (e) {
-        $('#inner-component-focus').find('.tooltip').addClass('open');
-    });
+    if (type == 'label'|| type=='panel'){
+        $('.inner-component-options .edit-btn').css({
+            display: 'none',
+        });
+    } else {
+        $('.inner-component-options .edit-btn').css({
+            display: 'inline-block',
+        });
+        var tooltipClone = $('#'+cellId).find('.tooltip').clone(true, true);
+        $('#inner-component-focus').append(tooltipClone);
+
+        $('.inner-component-options .edit-btn').unbind().on("click", function (e) {
+            $('#inner-component-focus').find('.tooltip').addClass('open');
+        });
+    }
+
+    showConfigOptions(type, 'display-cell');
 
 }
 
@@ -1913,11 +1991,13 @@ function refreshCellDisplay(cellId, zoom){
     RemoveDisplay(cellId);
     var componentToChange = selectedUserComponent.components[row][col];
     var padding = selectedUserComponent.layout[row][col].ratio.padding;
+    var properties = selectedUserComponent.components[row][col].properties;
 
     // display itself gets rid of padding for the #display-cell
-    Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding);
-    // attach event handlers to new texts
-    getContentEditableEditsAtCell('display-cell');
+    Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
+    //attach event handlers to new texts
+    //getContentEditableEditsAtCell(cellId);
+    registerTooltipBtnHandlers();
 }
 
 
@@ -1925,6 +2005,7 @@ function toggleInnerComponentVisibility(showAll){
     if (showAll){
         $('#inner-component-focus #display-cell').html('');
         $('#inner-component-focus').find('.tooltip').remove();
+        $('#inner-component-focus').find('.config-btns').remove()
 
         $('#inner-component-focus #display-cell').removeData();
 

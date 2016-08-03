@@ -4,7 +4,7 @@
 .project-options-container{
     position: absolute;
     height: 550px;
-    overflow-y: scroll;
+
 }
 
 .components, .layout, .style {
@@ -13,10 +13,29 @@
     /*border: #d5d5d5 1px solid;*/
     width: 250px;
     position: absolute;
+    overflow-y: auto;
+    height: 475px; /*TODO shouldn't be fixed*/
 }
 
 .layout, .style {
     display: none;
+}
+
+.layout-group{
+    border: #D5D5D5 1px solid;
+    /*margin: 5px;*/
+}
+.layout-group-header{
+    display: block;
+    font-weight: 200;
+    padding: 10px;
+    background: #F0F1FC;
+}
+
+.layout-group .btn, .layout-group input{
+    /*float: right;*/
+    display: block;
+    margin: 5px auto;
 }
 
 .header {
@@ -84,31 +103,29 @@
     min-height: 120px;
 }
 
-.layout .content{
-    padding: 15px;
-}
-
 .layout .content input[type='text']{
     width: 60px;
-    float: right;
     border: 1px grey solid;
-    margin-right: 30px;
     text-align: right;
+}
+
+input[type='text']{
+    min-width: 60px;
+    border: 1px grey solid;
     padding: 5px 10px;
     vertical-align: baseline;
 }
-.layout .content input[type='checkbox'] {
-    float: right;
-    margin-right: 40px;
-}
 
-.add-remove-inputs div{
-    padding: 10px;
-}
 
-.layout .content .btn{
+.layout .layout-label, .layout .layout-input{
+    display: inline-block;
+    width: 49%;
     text-align: center;
 }
+
+/*.add-remove-inputs div{*/
+    /*padding: 10px;*/
+/*}*/
 
 .dropdown-trigger {
     cursor: pointer;
@@ -231,7 +248,7 @@ td {
     border: 5px solid white;
     resize: both;
     position: relative;
-    /*vertical-align: top;*/
+    vertical-align: top;
 }
 
 .droppable:hover {
@@ -356,6 +373,7 @@ td {
 .dropped {
     background-color: #F9F9F9;
     text-align: center;
+
 }
 
 .edit-btn {
@@ -390,6 +408,10 @@ td {
 }
 
 .dropped:hover .config-btns{
+    display: inline-block;
+}
+
+#inner-component-focus:hover .config-btns{
     display: inline-block;
 }
 
@@ -436,8 +458,14 @@ td.dropped li.widget {
     border: 1px solid #e1e1e1;
     line-height: 20px;
     color: #6f6f6f;
+    display: none;
 
 }
+
+td.dropped:hover li.widget  {
+    display: block;
+}
+
 .nav {
     margin-bottom: 10px;
 }
@@ -446,9 +474,6 @@ td.dropped li.widget {
 .label-container {
     position: absolute;
     top: 0;
-    /*width: 200px;*/
-    /*height: 200px;*/
-    padding: 20% 5% 10% 5%;
     /*background: #fff;*/
     border: #e0e0e0 solid 1px;
     display: block;
@@ -657,6 +682,7 @@ opacity: 1;
     height: 100%;
     width: 100%;
     pointer-events: auto;
+    border: 1px black solid;
 }
 
 #zoom-nav-minimize-btn{
@@ -682,6 +708,7 @@ opacity: 1;
 .display-component {
     white-space: initial;
     font-weight: 400;
+    margin: 0;
 }
 
 .lbl-small, .btn-size-xs {
@@ -724,13 +751,17 @@ opacity: 1;
     pointer-events: auto;
 }
 
+.select-unit{
+    padding: 1px;
+}
+
 .size-display-width{
     top: -40px;
     width: 100%;
 }
 
 .size-display-height{
-    left: -54px;
+    left: -65px;
 }
 
 .value{
