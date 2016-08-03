@@ -751,13 +751,17 @@ opacity: 1;
     pointer-events: auto;
 }
 
+.select-unit{
+    padding: 1px;
+}
+
 .size-display-width{
     top: -40px;
     width: 100%;
 }
 
 .size-display-height{
-    left: -54px;
+    left: -65px;
 }
 
 .value{

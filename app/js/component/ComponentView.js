@@ -1,3 +1,12 @@
+var mainDisplayClasses = {
+    'label': "display-component",
+    'link': "btn display-component",
+    'tab-viewer': "nav display-component",
+    'menu': "btn-group display-component",
+    'image': "display-component",
+    'panel': "panel display-component"
+};
+
 /**
  * Display element in cell
  */
@@ -80,6 +89,9 @@ function Display(cellId, type, html, zoom, padding, callback) {
 /**
  *
  * @param cellId
+ * @param type
+ * @param zoom
+ * @param padding
  */
 function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
     var cell = $('#'+cellId);
@@ -156,11 +168,14 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
         var rowcol  = getRowColFromId(cellId);
     }
     // TODO SKETCHY!!!
-    for (var propertyName in selectedUserComponent.components[rowcol.row][rowcol.col].properties){
-        displayComponent.addClass(selectedUserComponent.components[rowcol.row][rowcol.col].properties[propertyName]);
+    var properties = selectedUserComponent.components[rowcol.row][rowcol.col].properties;
+    if (Object.keys(properties).length>0){
+        displayComponent.removeClass();
+        for (var propertyName in properties){
+            displayComponent.addClass(properties[propertyName]);
+        }
+        displayComponent.addClass(mainDisplayClasses[type]);
     }
-
-
 }
 
 

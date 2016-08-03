@@ -907,8 +907,8 @@ function changeZoomViaZoomControl(type) {
         var zoomWidth = ($('#outer-container').width() - (20 + 100 + 40 + 17)) / selectedUserComponent.layout.tablePxDimensions.width;
         currentZoom = Math.min(zoomWidth, zoomHeight);
     } else {
-        var widthScale = ($('#outer-container').width())/$('#selected-screen-size').width();
-        var heightScale = ($('#outer-container').height())/$('#selected-screen-size').height();
+        var widthScale = ($('#outer-container').width())/selectedScreenSizeWidth;
+        var heightScale = ($('#outer-container').height())/selectedScreenSizeHeight;
 
         currentZoom = Math.min(widthScale, heightScale);
     }
@@ -1993,6 +1993,7 @@ function toggleInnerComponentVisibility(showAll){
     if (showAll){
         $('#inner-component-focus #display-cell').html('');
         $('#inner-component-focus').find('.tooltip').remove();
+        $('#inner-component-focus').find('.config-btns').remove()
 
         $('#inner-component-focus #display-cell').removeData();
 
