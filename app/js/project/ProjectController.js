@@ -87,6 +87,7 @@ $('#create-project').on('click', function () {
 
 $('.current-project').on('click', 'a', function(e){
     window.location = 'index.html';
+    e.stopPropagation();
 });
 
 $('.current-project').on('click', '.content', function(){

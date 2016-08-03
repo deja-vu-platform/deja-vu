@@ -271,7 +271,7 @@ $('.components').on('click', '.component-name-container', function () {
     window.setTimeout(load(this), 2000);
 });
 
-$('.components').on('dblclick', '.component-name', function () {
+$('.components').on('dblclick', '.component-name', function (e) {
     var newNameInputElt = $($(this).parent().find('.new-name-input'));
     var submitRenameElt = $($(this).parent().find('.submit-rename'));
     newNameInputElt.val($(this).text());
