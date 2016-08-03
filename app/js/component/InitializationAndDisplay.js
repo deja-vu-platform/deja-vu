@@ -1752,6 +1752,7 @@ function switchToInnerComponentFocusMode(row, col){
 
 
     var componentToShow = selectedUserComponent.components[row][col];
+    var type = componentToShow.type;
 
     var cellId = 'cell'+'_'+row+'_'+col;
     $('#display-cell').data('cellid',cellId);
@@ -1869,7 +1870,20 @@ function switchToInnerComponentFocusMode(row, col){
                 width: $('#display-cell-resize-helper').css('width'),
             });
             // NOTE: shouldn't use any padding here
-            Display('display-cell', componentToShow.type, getHTML[componentToShow.type](componentToShow.components[componentToShow.type]), scale);
+            Display('display-cell', type, getHTML[type](componentToShow.components[type]), scale);
+
+
+            //$('#inner-component-focus #display-cell').css({
+            //    height: $('#display-cell .display-component').css('height'),
+            //    width: $('#display-cell .display-component').css('width'),
+            //});
+            //
+            //
+            //$('#inner-component-focus #display-cell-resize-helper').css({
+            //    height: $('#display-cell .display-component').css('height'),
+            //    width: $('#display-cell .display-component').css('width'),
+            //});
+
 
             var top = $(this).position().top/$('#inner-component-focus').height();
             var bottom = 1 - ($(this).position().top + $(this).height())/$('#inner-component-focus').height();
