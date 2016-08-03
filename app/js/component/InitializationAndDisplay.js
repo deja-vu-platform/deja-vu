@@ -555,6 +555,7 @@ function displayComponentInTable(cellId, widget, component) {
         selectedUserComponent.components[row][col] = component;
 
         // note: no padding here because this is a new component we are adding
+        // also note: no properties because of the same reason
         var padding = {top: 0, left: 0, bottom: 0, right: 0};
         selectedUserComponent.layout[row][col].ratio.padding = padding;
 
@@ -578,7 +579,9 @@ function displayComponentInTable(cellId, widget, component) {
         // display requires widget to be placed before display happens
 
         var padding = selectedUserComponent.layout[row][col].ratio.padding;
-        Display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding);
+        var properties = selectedUserComponent.components[row][col].properties;
+
+        Display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding, properties);
 
         triggerEdit(cellId, false); // no need to show edit options
 
@@ -1169,14 +1172,18 @@ function movedComponent() {
             var newRow = coord[2];
             var newCol = coord[3];
 
-            var componentCopy = selectedUserComponent.components[delRow][delCol];
-            selectedUserComponent.addComponent(componentCopy, newRow, newCol);
+            var innerComponentCopy = selectedUserComponent.components[delRow][delCol];
+            selectedUserComponent.addComponent(innerComponentCopy, newRow, newCol);
 
             var padding = selectedUserComponent.layout[delRow][delCol].ratio.padding;
             // update the new paddings
             selectedUserComponent.layout[delRow][delCol].ratio.padding = {top: 0, bottom: 0, left: 0, right: 0};
             selectedUserComponent.layout[newRow][newCol].ratio.padding = padding;
-            Display('cell'+ '_' + newRow + '_' + newCol, componentCopy.type, getHTML[componentCopy.type](componentCopy.components[componentCopy.type]), currentZoom, padding);
+            // update the new properties
+
+            var properties = innerComponentCopy.properties;
+
+            Display('cell'+ '_' + newRow + '_' + newCol, innerComponentCopy.type, getHTML[innerComponentCopy.type](innerComponentCopy.components[innerComponentCopy.type]), currentZoom, padding, properties);
             triggerEdit('cell'+ '_' + newRow + '_' + newCol, false);
 
         }
@@ -1870,7 +1877,11 @@ function switchToInnerComponentFocusMode(row, col){
                 width: $('#display-cell-resize-helper').css('width'),
             });
             // NOTE: shouldn't use any padding here
-            Display('display-cell', type, getHTML[type](componentToShow.components[type]), scale);
+            var padding = null;
+            var properties = selectedUserComponent.components[row][col].properties;
+
+
+            Display('display-cell', type, getHTML[type](componentToShow.components[type]), scale, padding, properties);
 
 
             //$('#inner-component-focus #display-cell').css({
@@ -1980,9 +1991,10 @@ function refreshCellDisplay(cellId, zoom){
     RemoveDisplay(cellId);
     var componentToChange = selectedUserComponent.components[row][col];
     var padding = selectedUserComponent.layout[row][col].ratio.padding;
+    var properties = selectedUserComponent.components[row][col].properties;
 
     // display itself gets rid of padding for the #display-cell
-    Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding);
+    Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
     //attach event handlers to new texts
     //getContentEditableEditsAtCell(cellId);
     registerTooltipBtnHandlers();

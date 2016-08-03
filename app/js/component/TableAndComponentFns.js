@@ -37,7 +37,9 @@ function loadTable(componentToShow) {
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
 
                 var padding = selectedUserComponent.layout[row][col].ratio.padding;
-                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding);
+                var properties = selectedUserComponent.components[row][col].properties;
+
+                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
                 triggerEdit(cellId, false);
 
                 $('#' + cellId).addClass("dropped");
@@ -1756,7 +1758,9 @@ function updateBaseComponentDisplayRow(row){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
                 var padding = selectedUserComponent.layout[row][col].ratio.padding;
-                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding);
+                var properties = selectedUserComponent.components[row][col].properties;
+
+                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding, properties);
             }
         }
     }
@@ -1768,7 +1772,9 @@ function updateBaseComponentDisplayCol(col){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
                 var padding = selectedUserComponent.layout[row][col].ratio.padding;
-                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding);
+                var properties = selectedUserComponent.components[row][col].properties;
+
+                updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding, properties);
             }
         }
     }

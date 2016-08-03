@@ -13,7 +13,7 @@
     /*border: #d5d5d5 1px solid;*/
     width: 250px;
     position: absolute;
-    overflow-y: scroll;
+    overflow-y: auto;
     height: 475px; /*TODO shouldn't be fixed*/
 }
 

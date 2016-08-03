@@ -8,6 +8,9 @@
     padding: 10px;
     position: relative;
     margin: auto;
+}
+
+#main-table-preview td{
     pointer-events: none;
 }
 
@@ -89,6 +92,7 @@ td {
 }
 
 li.widget {
+    display: none;
     position: absolute;
     bottom: 0px;
     margin-left: auto;
@@ -101,6 +105,9 @@ li.widget {
 
 }
 
+#main-table-preview:hover li.widget{
+    display: block;
+}
 
 .label-container {
     position: absolute;

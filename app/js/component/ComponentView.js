@@ -73,14 +73,14 @@ var getHTML = {
     }
 };
 
-function Display(cellId, type, html, zoom, padding, callback) {
+function Display(cellId, type, html, zoom, padding, properties, callback) {
     var cell = document.getElementById(cellId);
     var sp = document.createElement('span');
     sp.innerHTML = html;
     var html_ = sp.firstElementChild;
     cell.insertBefore(html_, cell.firstChild);
     hideBaseComponentDisplayAt(cellId, type);
-    updateBaseComponentDisplayAt(cellId, type, zoom, padding);
+    updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties);
     showBaseComponentDisplayAt(cellId, type);
     if (callback) callback();
 }
@@ -93,7 +93,7 @@ function Display(cellId, type, html, zoom, padding, callback) {
  * @param zoom
  * @param padding
  */
-function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
+function updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties) {
     var cell = $('#'+cellId);
     var cellHeight = cell.height();
     var cellWidth = cell.width();
@@ -162,20 +162,22 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding) {
 
     }
 
-    if (cellId == 'display-cell'){
-        var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
-    } else {
-        var rowcol  = getRowColFromId(cellId);
-    }
-    // TODO SKETCHY!!!
-    var properties = selectedUserComponent.components[rowcol.row][rowcol.col].properties;
-    if (Object.keys(properties).length>0){
-        displayComponent.removeClass();
-        for (var propertyName in properties){
-            displayComponent.addClass(properties[propertyName]);
+    //if (cellId == 'display-cell'){
+    //    var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
+    //} else {
+    //    var rowcol  = getRowColFromId(cellId);
+    //}
+    //// TODO SKETCHY!!!
+    if (properties){
+        if (Object.keys(properties).length>0){
+            displayComponent.removeClass();
+            for (var propertyName in properties){
+                displayComponent.addClass(properties[propertyName]);
+            }
+            displayComponent.addClass(mainDisplayClasses[type]);
         }
-        displayComponent.addClass(mainDisplayClasses[type]);
     }
+
 }
 
 

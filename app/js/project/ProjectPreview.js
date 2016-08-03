@@ -27,7 +27,9 @@ function loadTablePreview(componentToShow) {
 
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
                 var padding = componentToShow.layout[row][col].ratio.padding;
-                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding);
+                var properties = componentToShow.components[row][col].properties;
+
+                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
             }
         }
     });
