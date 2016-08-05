@@ -1,7 +1,8 @@
 /// <reference path="../typings/tsd.d.ts" />
 import {Injectable, Inject} from "angular2/core";
 import {Http, Headers} from "angular2/http";
-// import * as _ from "underscore";
+
+import * as Rx from "rxjs/Rx";
 import "rxjs/add/operator/toPromise";
 
 
@@ -237,10 +238,14 @@ export class Atom {
 
 @Injectable()
 export class ClientBus {
+  private _event_bus;
+
   constructor(
       @Inject("fqelement") private _fqelement: string, private _http: Http,
       @Inject("CompInfo") private _comp_info: CompInfo,
-      @Inject("locs") private _locs) {}
+      @Inject("locs") private _locs) {
+    this._event_bus = new EventBus();
+  }
 
   new_atom(t: string): any {
     return new Atom(new Helper(this._http, this._locs), this._comp_info)
@@ -267,6 +272,42 @@ export class ClientBus {
         .then(_ => true);
     }
     return atom.report_update(update);
+  }
+
+  on(name, listener) {
+    return this._event_bus.on(name, listener);
+  }
+
+  broadcast(name, args) {
+    return this._event_bus.broadcast(name, args);
+  }
+}
+
+class EventBus {
+  private _listeners = {};
+  private _events_subject;
+  private _events;
+
+  constructor() {
+    this._events_subject = new Rx.Subject();
+    this._events = Rx.Observable.from(this._events_subject);
+
+    this._events.subscribe(
+        e => {
+          if (this._listeners[e.name] === undefined) return;
+          for (const l of this._listeners[e.name]) {
+            l(e.args);
+          }
+        });
+  }
+
+  on(name, listener: (any) => void) {
+    if (this._listeners[name] === undefined) this._listeners[name] = [];
+    this._listeners[name].push(listener);
+  }
+
+  broadcast(name, args) {
+    this._events_subject.next({name: name, args: args});
   }
 }
 

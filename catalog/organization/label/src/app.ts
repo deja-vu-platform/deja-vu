@@ -64,6 +64,7 @@ const label_type = new graphql.GraphQLObjectType({
   name: "Label",
   fields: () => ({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     // tmp hack until the composer can do undirected field bonds
     items: {"type": new graphql.GraphQLList(item_type)}
   })
@@ -113,6 +114,16 @@ const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
     fields: () => ({
+      label: {
+        "type": label_type,
+        args: {
+          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, {name}) => {
+          console.log(`getting ${name}`);
+          return mean.db.collection("labels").findOne({name: name});
+        }
+      },
       item: {
         "type": item_type,
         args: {
@@ -133,6 +144,23 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("items").find().toArray();
         }
       },
+    })
+  }),
+  mutation: new graphql.GraphQLObjectType({
+    name: "Mutation",
+    fields: () => ({
+      createOrGetLabel: {
+        "type": label_type,
+        args: {
+          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (_, {name}) => mean.db.collection("labels").findAndModify({
+          query: {name: name},
+          update: {$setOnInsert: {atom_id: name, name: name, items: []}},
+          new: true,
+          upsert: true
+          })
+      } 
     })
   })
 });

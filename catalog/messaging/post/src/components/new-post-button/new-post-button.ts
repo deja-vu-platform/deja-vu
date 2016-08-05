@@ -53,9 +53,10 @@ export class NewPostButtonComponent {
       .subscribe(data => {
         this.submitted = true;
         this.post["atom_id"] = data.atom_id;
-        this._client_bus.report_save(data.atom_id, this.post).then(_ => {
-          console.log("looks like the save finished");
-        });
+        // this._client_bus.report_save(data.atom_id, this.post).then(_ => {
+        //   console.log("looks like the save finished");
+        // });
+        this._client_bus.broadcast("submit", {});
         // const user_up = {$addToSet: {posts: {atom_id: data.atom_id}}};
         // this._client_bus.report_update(user_up, this._user);
       });

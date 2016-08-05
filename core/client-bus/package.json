@@ -21,8 +21,7 @@
     "zone.js": "0.5.10"
   },
   "dependencies": {
-    "request-promise": "^3.0.0",
-    "underscore": "^1.8.3"
+    "request-promise": "^3.0.0"
   },
   "typings": "./lib/client-bus",
   "main": "./lib/client-bus",

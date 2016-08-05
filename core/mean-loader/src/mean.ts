@@ -207,7 +207,6 @@ export namespace GruntTask {
               ],
               "no-arg": true,
               "no-construct": true,
-              "no-duplicate-key": true,
               "no-duplicate-variable": true,
               "no-empty": true,
               "no-eval": true,

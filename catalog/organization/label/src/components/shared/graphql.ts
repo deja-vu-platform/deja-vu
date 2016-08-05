@@ -1,6 +1,9 @@
+/// <reference path="../../../typings/underscore/underscore.d.ts" />
 import {Injectable, Inject} from "angular2/core";
 import {Http, Headers} from "angular2/http";
 import {Observable} from "rxjs/observable";
+
+import * as _u from "underscore";
 
 
 @Injectable()
@@ -27,5 +30,16 @@ export class GraphQlService {
       .get(this._api + `/graphql?query=query+${query_str}`)
       .map(res => res.json())
       .map(json_res => json_res.data);
+  }
+
+  pobj(o: Object) {
+    return "{" + _u
+      .reduce(
+          _u.keys(o), (memo, key: string) => memo + "," + key + ": " + o[key]) +
+      "}";
+  }
+
+  plist(l: any[]) {
+    return "[" + _u.reduce(l, (memo, i) => memo + "," + this.pobj(i)) + "]";
   }
 }

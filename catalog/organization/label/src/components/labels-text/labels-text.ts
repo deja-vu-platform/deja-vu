@@ -1,8 +1,12 @@
+/// <reference path="../../../typings/underscore/underscore.d.ts" />
 import {Component, provide} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 import {ClientBus} from "client-bus";
 
 import {Item} from "../../shared/label";
+import {GraphQlService} from "../shared/graphql";
+
+import * as _u from "underscore";
 
 
 @Component({
@@ -11,13 +15,17 @@ import {Item} from "../../shared/label";
   inputs: ["item"],
   providers: [
     provide("fqelement", {useValue: "dv-organization-label"}),
-    ClientBus, HTTP_PROVIDERS]
+    ClientBus, GraphQlService, HTTP_PROVIDERS]
 })
 export class LabelsTextComponent {
   private _item: Item = {name: "", labels: []};
   private _labels_text: string = "";
 
-  constructor(private _client_bus: ClientBus) {}
+  constructor(
+      private _client_bus: ClientBus,
+      private _graphQlService: GraphQlService) {
+    _client_bus.on("submit", _ => this.onSubmit());
+  }
 
   get item() {
     return this._item;
@@ -34,16 +42,40 @@ export class LabelsTextComponent {
 
   set labels_text(labels_text: string) {
     if (labels_text === undefined) return;
-    console.log("got labels_text " + labels_text);
     this._labels_text = labels_text;
+  }
+
+  // On submit will attach labels to the item
+  onSubmit() {
     this.item.labels = [];
-    new Set(this._labels_text.split(",").map(l => l.trim()))
-      .forEach(
-          l => {
-            const ret = this._client_bus.new_atom("Label");
-            ret.name = l;
-            ret.items = [this.item];
-            this.item.labels.push(ret);
-          });
+    console.log("On submit at labels-text");
+    Promise.all(
+        _u.chain(this._labels_text.split(","))
+          .map(l => l.trim())
+          .uniq()
+          .map(
+              l => this._graphQlService
+                .get(`{
+                  createOrGetLabel(name: "${l}") {
+                    atom_id,
+                    items
+                  }
+                }`)
+                .subscribe(({atom_id, items}) => {
+                  const ret = this._client_bus.new_atom("Label");
+                  ret.atom_id = atom_id;
+                  ret.name = l;
+                  items.push(this.item);
+                  ret.items = items;
+                  this.item.labels.push(ret);
+                })
+                )
+          .value()
+          )
+          .then(_ => this._graphQlService.post(`{
+      item(name: "${this.item.name}") {
+        attach_labels(${this._graphQlService.plist(this.item.labels)})
+      }
+    }`));
   }
 }
