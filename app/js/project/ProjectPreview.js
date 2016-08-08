@@ -29,7 +29,7 @@ function loadTablePreview(componentToShow) {
                 var padding = componentToShow.layout[row][col].ratio.padding;
                 var properties = componentToShow.components[row][col].properties;
 
-                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
+                display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
             }
         }
     });

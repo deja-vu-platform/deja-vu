@@ -443,7 +443,7 @@ function setUpComponentOptionsIndexPageToggle(){
     }
 }
 
-/** ** ** ** ** ** Component Adding to Project and Display helpers ** ** ** ** ** ** ** ** ** **/
+/** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
 
 function resizeViewportToFitWindow(){
     var windowWidth = $('html').width();
@@ -557,14 +557,14 @@ function displayComponentInTable(cellId, widget, component) {
         // note: no padding here because this is a new component we are adding
         // also note: no properties because of the same reason
         var padding = {top: 0, left: 0, bottom: 0, right: 0};
-        selectedUserComponent.layout[row][col].ratio.padding = padding;
+        selectedUserComponent.components[row][col].padding = padding;
 
         if (type === 'label') {
-            Display(cellId, type, getHTML[type]("Type text here..."), currentZoom, padding);
+            display(cellId, type, getHTML[type]("Type text here..."), currentZoom, padding);
         } else if (type === 'panel') {
-            Display(cellId, type, getHTML[type]({heading: "Type heading...", content: "Type content..."}), currentZoom, padding);
+            display(cellId, type, getHTML[type]({heading: "Type heading...", content: "Type content..."}), currentZoom, padding);
         } else {
-            Display(cellId, type, getHTML[type](), currentZoom, padding);
+            display(cellId, type, getHTML[type](), currentZoom, padding);
             triggerEdit(cellId, true); // since this is a new component, show edit options
         }
 
@@ -578,10 +578,10 @@ function displayComponentInTable(cellId, widget, component) {
         }
         // display requires widget to be placed before display happens
 
-        var padding = selectedUserComponent.layout[row][col].ratio.padding;
-        var properties = selectedUserComponent.components[row][col].properties;
+        var padding = selectedUserComponent.components[row][col].padding;
+        var properties = component.properties;
 
-        Display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding, properties);
+        display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding, properties);
 
         triggerEdit(cellId, false); // no need to show edit options
 
@@ -607,23 +607,29 @@ function deleteComponentFromUserComponentAndFromView(cellId) {
 
     if (selectedUserComponent.components[row]) {
         if (selectedUserComponent.components[row][col]) {
-
             delete selectedUserComponent.components[row][col];
-            var cell = $('#cell' + '_' + row + '_' + col).get(0);
-
-            $(cell).find('.config-btns').remove();
-            $(cell).find('.tooltip').remove();
-            $(cell).find('.label-container').remove();
-            $(cell).find('.display-component').remove();
-            $(cell).find('.widget').remove();
-
-            resetDroppabilityAt(cellId);
-            updateBitmap(false);
-
         }
     }
+    deleteComponentFromView(cellId);
+    updateBitmap(false);
 
 }
+function deleteComponentFromView(cellId) {
+    var rowcol = getRowColFromId(cellId);
+    var row = rowcol.row;
+    var col = rowcol.col;
+
+    var cell = $('#cell' + '_' + row + '_' + col).get(0);
+
+    $(cell).find('.config-btns').remove();
+    $(cell).find('.tooltip').remove();
+    $(cell).find('.label-container').remove();
+    $(cell).find('.display-component').remove();
+    $(cell).find('.widget').remove();
+
+    resetDroppabilityAt(cellId);
+}
+
 
 /**
  * Updates the contents of a base component info at a particular cell based on inputs
@@ -693,10 +699,6 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
                     if (cellId=='display-cell'){
                         refreshCellDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
                     }
-
-                    //RemoveDisplay(actualCellId);
-                    //var padding = selectedUserComponent.layout[row][col].ratio.padding;
-                    //Display(actualCellId, type, getHTML[type](value), currentZoom, padding);
                 });
         } else { // pasted link to image
             if (inputs[0].value.length>0){
@@ -713,12 +715,6 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     }
 
     if (!isUpload) {
-        //$('#' + actualCellId).find('.label-container').remove();
-        //$('#' + actualCellId).find('.display-component').remove();
-        //
-        //var padding = selectedUserComponent.layout[row][col].ratio.padding;
-        //Display(actualCellId, type, getHTML[type](value), currentZoom , padding, function () {
-        //});
         selectedUserComponent.components[row][col].components = {};
         selectedUserComponent.components[row][col].components[type] = value;
 
@@ -772,7 +768,7 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 
 
-/** ** ** ** ** ** ** ** ** Table Cells Interaction and Display Helpers ** ** ** ** ** ** ** ** **/
+/** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/
 function cellTrashDroppableSettings(){
     var enableDrop = {
         accept: ".widget",
@@ -1175,15 +1171,10 @@ function movedComponent() {
             var innerComponentCopy = selectedUserComponent.components[delRow][delCol];
             selectedUserComponent.addComponent(innerComponentCopy, newRow, newCol);
 
-            var padding = selectedUserComponent.layout[delRow][delCol].ratio.padding;
-            // update the new paddings
-            selectedUserComponent.layout[delRow][delCol].ratio.padding = {top: 0, bottom: 0, left: 0, right: 0};
-            selectedUserComponent.layout[newRow][newCol].ratio.padding = padding;
-            // update the new properties
-
+            var padding = selectedUserComponent.components[delRow][delCol].padding;
             var properties = innerComponentCopy.properties;
 
-            Display('cell'+ '_' + newRow + '_' + newCol, innerComponentCopy.type, getHTML[innerComponentCopy.type](innerComponentCopy.components[innerComponentCopy.type]), currentZoom, padding, properties);
+            display('cell'+ '_' + newRow + '_' + newCol, innerComponentCopy.type, getHTML[innerComponentCopy.type](innerComponentCopy.components[innerComponentCopy.type]), currentZoom, padding, properties);
             triggerEdit('cell'+ '_' + newRow + '_' + newCol, false);
 
         }
@@ -1425,7 +1416,7 @@ $(document).click(function(event) {
 });
 
 /**
- * Display name of uploaded image
+ * display name of uploaded image
  */
 $(document).on('change', '#fileselect', function(evt) {
     files = $(this).get(0).files;
@@ -1807,7 +1798,7 @@ function switchToInnerComponentFocusMode(row, col){
         position: 'relative',
     });
 
-    var padding = selectedUserComponent.layout[row][col].ratio.padding;
+    var padding = selectedUserComponent.components[row][col].padding;
     if (!padding){
         padding = {top: 0, bottom: 0, left: 0, right: 0};
     }
@@ -1881,7 +1872,7 @@ function switchToInnerComponentFocusMode(row, col){
             var properties = selectedUserComponent.components[row][col].properties;
 
 
-            Display('display-cell', type, getHTML[type](componentToShow.components[type]), scale, padding, properties);
+            display('display-cell', type, getHTML[type](componentToShow.components[type]), scale, padding, properties);
 
 
             //$('#inner-component-focus #display-cell').css({
@@ -1904,7 +1895,7 @@ function switchToInnerComponentFocusMode(row, col){
             var cellId = $('#display-cell').data('cellid');
             var rowcol = getRowColFromId(cellId);
 
-            selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
+            selectedUserComponent.components[rowcol.row][rowcol.col].padding = {top: top, left: left, bottom: bottom, right: right}
             refreshCellDisplay(cellId, currentZoom);
         },
         containment: '#inner-component-focus',
@@ -1934,7 +1925,7 @@ function switchToInnerComponentFocusMode(row, col){
             var cellId = $('#display-cell').data('cellid');
             var rowcol = getRowColFromId(cellId);
 
-            selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
+            selectedUserComponent.components[rowcol.row][rowcol.col].padding = {top: top, left: left, bottom: bottom, right: right}
             refreshCellDisplay(cellId, currentZoom);
         }
     });
@@ -1988,16 +1979,22 @@ function refreshCellDisplay(cellId, zoom){
     }
     var row = rowcol.row;
     var col = rowcol.col;
-    RemoveDisplay(cellId);
-    var componentToChange = selectedUserComponent.components[row][col];
-    var padding = selectedUserComponent.layout[row][col].ratio.padding;
-    var properties = selectedUserComponent.components[row][col].properties;
+    if (selectedUserComponent.components[row]){
+        var componentToChange = selectedUserComponent.components[row][col];
+        if (componentToChange){
+            removeDisplay(cellId);
+            var padding = selectedUserComponent.components[row][col].padding;
+            var properties = selectedUserComponent.components[row][col].properties;
 
-    // display itself gets rid of padding for the #display-cell
-    Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
-    //attach event handlers to new texts
-    //getContentEditableEditsAtCell(cellId);
-    registerTooltipBtnHandlers();
+            // display itself gets rid of padding for the #display-cell
+            display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
+            //attach event handlers to new texts
+            //getContentEditableEditsAtCell(cellId);
+            registerTooltipBtnHandlers();
+        } else {
+            deleteComponentFromView(cellId);
+        }
+    }
 }
 
 

@@ -8,7 +8,7 @@ var mainDisplayClasses = {
 };
 
 /**
- * Display element in cell
+ * display element in cell
  */
 var getHTML = {
     'label': function(value) {
@@ -73,7 +73,7 @@ var getHTML = {
     }
 };
 
-function Display(cellId, type, html, zoom, padding, properties, callback) {
+function display(cellId, type, html, zoom, padding, properties, callback) {
     var cell = document.getElementById(cellId);
     var sp = document.createElement('span');
     sp.innerHTML = html;
@@ -213,7 +213,7 @@ function showBaseComponentDisplayAt(cellId, type){
  * @param callback
  * @constructor
  */
-function RemoveDisplay(cellId, callback) {
+function removeDisplay(cellId, callback) {
     $('#'+cellId).find('.label-container').remove();
     $('#'+cellId).find('.display-component').remove();
     if (callback) callback();

@@ -36,10 +36,10 @@ function loadTable(componentToShow) {
 
                 $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
 
-                var padding = selectedUserComponent.layout[row][col].ratio.padding;
+                var padding = selectedUserComponent.components[row][col].padding;
                 var properties = selectedUserComponent.components[row][col].properties;
 
-                Display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
+                display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
                 triggerEdit(cellId, false);
 
                 $('#' + cellId).addClass("dropped");
@@ -686,6 +686,7 @@ function createMergeHandle(row, col){
             if (selectedUserComponent.components[row]) {
                 if (selectedUserComponent.components[row][col]) {
                     component = selectedUserComponent.components[row][col];
+                    delete selectedUserComponent.components[row][col];
                 }
             }
 
@@ -1054,12 +1055,16 @@ function mergeCells(cell1Id, cell2Id, component) {
 
     // Do these even if the cell is just merging to itself
 
-
-
     // then put the component in there
     if (component) {
         // add the component to the cell
+        if (!selectedUserComponent.components[topRowNum]){
+            selectedUserComponent.components[topRowNum] = {};
+        }
+        selectedUserComponent.components[topRowNum][leftColNum] = component;
         displayComponentInTable(topLeftCellId, false, component);
+    } else {
+        deleteComponentFromUserComponentAndFromView(topLeftCellId);
     }
 
     showMergeHandle(topRowNum,leftColNum);
@@ -1141,7 +1146,14 @@ function unmergeCells(cellToUnmergeId, component) {
 
     if (component) {
         // add the component to the cell
+        if (!selectedUserComponent.components[topRowNum]){
+            selectedUserComponent.components[topRowNum] = {};
+        }
+        selectedUserComponent.components[topRowNum][leftColNum] = component;
         displayComponentInTable(topLeftCellId, false, component);
+    } else {
+        deleteComponentFromUserComponentAndFromView(topLeftCellId);
+
     }
     resetAllMergeHandleContainersSizeAndPosition();
 }
@@ -1759,7 +1771,7 @@ function updateBaseComponentDisplayRow(row){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                var padding = selectedUserComponent.layout[row][col].ratio.padding;
+                var padding = selectedUserComponent.components[row][col].padding;
                 var properties = selectedUserComponent.components[row][col].properties;
 
                 updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding, properties);
@@ -1773,7 +1785,7 @@ function updateBaseComponentDisplayCol(col){
         if (selectedUserComponent.components[row]){
             if (selectedUserComponent.components[row][col]){
                 var cellId = 'cell'+'_'+row+'_'+col;
-                var padding = selectedUserComponent.layout[row][col].ratio.padding;
+                var padding = selectedUserComponent.components[row][col].padding;
                 var properties = selectedUserComponent.components[row][col].properties;
 
                 updateBaseComponentDisplayAt(cellId, selectedUserComponent.components[row][col].type, currentZoom, padding, properties);
@@ -2201,6 +2213,166 @@ function addRowColAddRemoveButtons(componentId){
 
 /** ** ** ** Adding and deleting rows and columns **/
 
+/**
+ * Adds n rows to the end
+ * Mutates selectedUserComponent
+ */
+function addNRows(n, chosenRowNum) {
+    addNRowsToEnd(n);
+    for (var row = numRows-n; row >= chosenRowNum; row--) { // going backwards to prevent dataloss
+        selectedUserComponent.components[row+n] = selectedUserComponent.components[row];
+        var temp = selectedUserComponent.layout[row+n];
+        selectedUserComponent.layout[row+n] = selectedUserComponent.layout[row];
+        selectedUserComponent.components[row] = {};
+        selectedUserComponent.layout[row] = temp;
+    }
+    loadTable(selectedUserComponent);
+    //
+    //for (var row=1; row<=numRows; row++){
+    //    for (var col=1; col<=numCols; col++){
+    //        var cellId = 'cell'+'_'+row+'_'+col;
+    //        refreshCellDisplay(cellId,currentZoom);
+    //    }
+    //}
+
+    //
+    //// before anything has changed
+    //var savedTableLockedHeight = tableLockedHeight;
+    //toggleTableHeightLock(false);
+    //
+    //var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
+    //var newNumRows = lastRowNum + n;
+    //
+    //selectedUserComponent.dimensions.rows = newNumRows;
+    //numRows = newNumRows;
+    //
+    //if (savedTableLockedHeight) { // if table height constant
+    //    // for all existing rows, scale down the heights proportionally = (1 - n/newNumRows)
+    //    for (var row = 1; row <= lastRowNum; row++) {
+    //        for (var col = 1; col <= numCols; col++) {
+    //            selectedUserComponent.layout[row][col].ratio.grid.height = selectedUserComponent.layout[row][col].ratio.grid.height * (1 - n / (newNumRows));
+    //        }
+    //    }
+    //    // next shift the rows from the chosen row number to the last row number by n
+    //
+    //
+    //    // for the new rows, height is 1/newNumRows
+    //    for (var newRow = 1; newRow <= n; newRow++){
+    //        var newRowNum = chosenRowNum + newRow - 1;
+    //        selectedUserComponent.layout[newRowNum] = {};
+    //        for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+    //            selectedUserComponent.layout[newRowNum][col] = {
+    //                spans:{row:1,col:1},
+    //                merged:{isMerged: false,
+    //                    topLeftCellId: '',
+    //                    topRightCellId: '',
+    //                    bottomLeftCellId: '',
+    //                    bottomRightCellId: ''},
+    //                hidden:{isHidden: false, hidingCellId: ''},
+    //                // take the width of the grid-cell to the top (grid-cell, in case the cell is merged)
+    //                ratio:{
+    //                    grid:{width: selectedUserComponent.layout[chosenRowNum-1][col].ratio.grid.width, height: 1/(newNumRows)}}
+    //            }
+    //        }
+    //    }
+    //
+    //} else {
+    //    // shift the rows from the chosen row number to the last row number by n
+    //    for (var row = lastRowNum; row >= chosenRowNum; row--) { // going backwards to prevent dataloss
+    //        for (var col = 1; col <= numCols; col++) {
+    //            selectedUserComponent.components[row+n] = selectedUserComponent.components[row];
+    //            selectedUserComponent.layout[row+n] = selectedUserComponent.layout[row];
+    //        }
+    //    }
+    //
+    //    for (var newRow = 1; newRow <= n; newRow++) {
+    //        var newRowNum = chosenRowNum + newRow - 1;
+    //        selectedUserComponent.layout[newRowNum] = {};
+    //
+    //        for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+    //            selectedUserComponent.layout[newRowNum][col] = {
+    //                spans: {row: 1, col: 1},
+    //                merged: {
+    //                    isMerged: false,
+    //                    topLeftCellId: '',
+    //                    topRightCellId: '',
+    //                    bottomLeftCellId: '',
+    //                    bottomRightCellId: ''
+    //                },
+    //                hidden: {isHidden: false, hidingCellId: ''},
+    //                // take the width of the grid-cell to the top (grid-cell, in case the cell is merged)
+    //                ratio: {
+    //                    grid: {
+    //                        width: selectedUserComponent.layout[chosenRowNum-1][col].ratio.grid.width,
+    //                        height: standardCellHeight/selectedUserComponent.layout.tablePxDimensions.height
+    //                    }
+    //                }
+    //            }
+    //
+    //
+    //        }
+    //    }
+    //
+    //}
+    //
+    //for (var newRow = 1; newRow <= n; newRow++) {
+    //    var newRowNum = chosenRowNum + newRow - 1;
+    //    var tableRow = createEmptyRow(newRowNum);
+    //    var gridRow = createEmptyRow(newRowNum);
+    //
+    //    for (var col = 0; col <= numCols; col++) {
+    //        if (col === 0) {
+    //            var tableCell = document.createElement('td');
+    //            tableCell.className = 'zero-height zero-width col' + '_' + col;
+    //            tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
+    //        } else {
+    //            var tableCell = createTableCell(newRowNum, col);
+    //            var gridCell = createGridCell(newRowNum, col);
+    //            var dragHandleContainer = createMergeHandle(newRowNum, col);
+    //        }
+    //        tableRow.appendChild(tableCell);
+    //        if (!(col === 0)) {
+    //            gridRow.appendChild(gridCell);
+    //            $('#drag-handle-containers-container').append(dragHandleContainer);
+    //        }
+    //    }
+    //
+    //    // it's the selected component, so this shouldn't cause problems
+    //    $('#main-cell-table '+'.row_'+(chosenRowNum-1)).after(tableRow);
+    //    $('#main-grid-table '+'.row_'+(chosenRowNum-1)).after(gridRow);
+    //
+    //}
+    //
+    //scaleTableToZoom();
+    //
+    ////// after the cells have been appended
+    ////for (var newRow = 1; newRow <= n; newRow++) {
+    ////    var newRowNum = lastRowNum + newRow;
+    ////    addRowResizeHandler(newRowNum);
+    ////    for (var col = 0; col <= numCols; col++) {
+    ////        resetMergeHandleContainerSizeAndPosition(newRowNum, col);
+    ////        registerCellDroppable("cell"+'_'+newRowNum+'_'+col);
+    ////    }
+    ////}
+    //
+    //bitmapNew = make2dArray(numRows, numCols);
+    //updateBitmap();
+    //bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
+    //
+    //
+    //if (!savedTableLockedHeight){
+    //    // if not locked resize the table height accordingly
+    //    // do this after the table has been fitted to the new size
+    //    selectedUserComponent.layout.tablePxDimensions.height = selectedUserComponent.layout.tablePxDimensions.height + n*standardCellHeight;
+    //    gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
+    //
+    //    saveRowRatiosGrid();
+    //}
+    //
+    //toggleTableHeightLock(savedTableLockedHeight);
+    //updateZoomNavComponentSize();
+
+}
 
 
 /**
