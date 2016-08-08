@@ -280,6 +280,7 @@ function createGridCell(row, col) {
 
 
                     } else {
+                        //TODO: need to deal with inner components having a min width!!
                         value = value/100; // now value is a ratio
 
                         if ($(this).parent().data('dimension')=='width'){
@@ -292,7 +293,7 @@ function createGridCell(row, col) {
                                     if (col == rowcol.col){
                                         selectedUserComponent.layout[row][col].ratio.grid.width = value;
                                     } else { // for all other columns, scale down the widths proportionally
-                                        selectedUserComponent.layout[row][col].ratio.grid.width = selectedUserComponent.layout[row][col].ratio.grid.width - differencePerCol;
+                                        selectedUserComponent.layout[row][col].ratio.grid.width = Math.max(selectedUserComponent.layout[row][col].ratio.grid.width - differencePerCol,  5/selectedUserComponent.layout.tablePxDimensions.width);
                                     }
                                 }
                             }
@@ -306,13 +307,14 @@ function createGridCell(row, col) {
                                     if (row == rowcol.row){
                                         selectedUserComponent.layout[row][col].ratio.grid.height = value;
                                     } else { // for all other columns, scale down the heights proportionally
-                                        selectedUserComponent.layout[row][col].ratio.grid.height = selectedUserComponent.layout[row][col].ratio.grid.height - differencePerRow;
+                                        selectedUserComponent.layout[row][col].ratio.grid.height = Math.max(selectedUserComponent.layout[row][col].ratio.grid.height - differencePerRow, 5/selectedUserComponent.layout.tablePxDimensions.height);
                                     }
                                 }
                             }
 
                         }
                         scaleTableToZoom(); // this resizes the table based on the above changes in size
+                        saveTableSizeAndRowColRatiosGrid(true, true);
                         updateSizeValueDisplay(false);
                     }
 
@@ -2198,6 +2200,8 @@ function addRowColAddRemoveButtons(componentId){
 }
 
 /** ** ** ** Adding and deleting rows and columns **/
+
+
 
 /**
  * Adds n rows to the end
