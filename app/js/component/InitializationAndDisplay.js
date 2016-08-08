@@ -56,7 +56,7 @@ $(function () {
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent);
 
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
@@ -83,7 +83,7 @@ $(function () {
             }
         }
         window.setTimeout(function(){
-            loadTable(selectedUserComponent);
+            loadTable(selectedUserComponent, 1);
         }, 1);
 
     }
@@ -122,7 +122,7 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
         resetMenuOptions();
     });
 });
@@ -138,7 +138,7 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addComponent(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
         resetMenuOptions();
     });
 });
@@ -147,7 +147,7 @@ $('#new-main-component-btn').click(function(){
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
     selectedProject.addComponent(selectedUserComponent);
-    loadTable(selectedUserComponent);
+    loadTable(selectedUserComponent, 1);
     displayNewComponentInUserComponentList(selectedUserComponent.meta.name,selectedUserComponent.meta.id);
     resetMenuOptions();
 });
@@ -260,7 +260,7 @@ $('.components').on('click', '.component-name-container', function () {
         disableAllComponentDomElementsExcept(selectedUserComponent.meta.id);
 
         if ($('#table-grid-container'+'_'+componentId).length===0){
-            loadTable(selectedUserComponent);
+            loadTable(selectedUserComponent, 1);
         } else {
             toggleInnerComponentVisibility(true);
             enableSpecificComponentDomElements(selectedUserComponent.meta.id);
@@ -380,7 +380,7 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            loadTable(selectedUserComponent);
+            loadTable(selectedUserComponent, 1);
 
         });
 

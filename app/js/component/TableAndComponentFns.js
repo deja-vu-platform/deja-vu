@@ -15,13 +15,13 @@ var tableLockedWidth = false;
  * Creates and displays a table based on the component given
  * @param componentToShow
  */
-function loadTable(componentToShow) {
+function loadTable(componentToShow, zoom) {
     numRows = componentToShow.dimensions.rows;
     numCols = componentToShow.dimensions.cols;
 
     var componentId = componentToShow.meta.id;
 
-    makeUserEmptyComponentDisplayTable(componentId);
+    makeUserEmptyComponentDisplayTable(componentId, zoom);
 
     $('.cell').each(function () {
         var cellId = $(this).get(0).id;
@@ -59,7 +59,7 @@ function loadTable(componentToShow) {
 function loadTableWithLocksSaved(componentToShow){
     var saveTableLockedWidth = tableLockedWidth;
     var saveTableLockedHeight = tableLockedHeight;
-    loadTable(componentToShow);
+    loadTable(componentToShow, 1);
     toggleTableWidthLock(saveTableLockedWidth);
     toggleTableHeightLock(saveTableLockedHeight);
 }
@@ -132,14 +132,16 @@ function createTableCell(row, col) {
         var col = rowcol.col;
         // the opposite of what it is before the click!
         if (showMergeHandles){
-            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-                display: 'inline',
-            });
+            showMergeHandle(row,col);
+            //$('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+            //    display: 'inline',
+            //});
 
         } else {
-            $('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
-                display: 'none',
-            });
+            hideMergeHandle(row,col);
+            //$('#drag-handle-container'+'_'+row+'_'+col).find('.drag-handle').css({
+            //    display: 'none',
+            //});
 
         }
         // now store the current state
@@ -468,9 +470,9 @@ function enableSpecificComponentDomElements(componentToEnableId){
 
 }
 
-function makeUserEmptyComponentDisplayTable(componentId){
+function makeUserEmptyComponentDisplayTable(componentId, zoom){
     toggleInnerComponentVisibility(true);
-    currentZoom = 1; // set zoom value 100%
+    currentZoom = zoom; // set zoom value 100%
 
     disableAllComponentDomElementsExcept(componentId);
 
@@ -686,7 +688,7 @@ function createMergeHandle(row, col){
             if (selectedUserComponent.components[row]) {
                 if (selectedUserComponent.components[row][col]) {
                     component = selectedUserComponent.components[row][col];
-                    delete selectedUserComponent.components[row][col];
+                    // Note, don't delete selectedUserComponent.components[row][col], since the user might cancel the merge
                 }
             }
 
@@ -1005,7 +1007,7 @@ function mergeCells(cell1Id, cell2Id, component) {
                 cellToHide.data('hidden', {isHidden: true, hidingCellId: topLeftCellId});
 
                 var dragContainerToHide = $('#drag-handle-container' + '_' + row + '_' + col);
-                hideMergeHandles(row,col);
+                hideMergeHandle(row,col);
 
                 selectedUserComponent.layout[row][col].spans = {row:0,col:0};
                 selectedUserComponent.layout[row][col].merged = {isMerged: false,
@@ -1140,7 +1142,7 @@ function unmergeCells(cellToUnmergeId, component) {
             dragContainerToShow.css({
                 display: 'block',
             });
-            hideMergeHandles(row,col);
+            hideMergeHandle(row,col);
         }
     }
 
@@ -1192,7 +1194,7 @@ function resetMergeHandleContainerSizeAndPosition(row, col){
     });
 }
 
-function hideMergeHandles(row, col){
+function hideMergeHandle(row, col){
     var cell = $("#cell" + '_' + row + '_' + col);
     var dragHandleContainer = $('#drag-handle-container' + '_' + row + '_' + col);
 
@@ -1200,7 +1202,16 @@ function hideMergeHandles(row, col){
         display: 'none',
     });
 
-    cell.data('show-merge-handles', false)
+    cell.data('show-merge-handles', false);
+    cell.css({
+        'pointer-events':'auto',
+    });
+
+    cell.find('.merge-toggle-out').css({
+        display: 'none',
+        'z-index': 100,
+        'pointer-events':'auto',
+    });
 }
 
 function showMergeHandle(row,col){
@@ -1212,6 +1223,16 @@ function showMergeHandle(row,col){
     });
 
     cell.data('show-merge-handles', true);
+    cell.css({
+        'pointer-events':'none',
+    });
+
+    cell.find('.merge-toggle-out').css({
+        display: 'inline-block',
+        'z-index': 100,
+        'pointer-events':'auto',
+    });
+
 }
 
 
@@ -1219,7 +1240,7 @@ function resetAllMergeHandleVisibilityExcept(spRow,spCol) {
     for (var row = 1; row <= numRows; row++) {
         for (var col = 1; col <= numCols; col++) {
             if ((row!=spRow) && (col != spCol)){
-                hideMergeHandles(row,col);
+                hideMergeHandle(row,col);
             }
         }
     }
@@ -2219,14 +2240,56 @@ function addRowColAddRemoveButtons(componentId){
  */
 function addNRows(n, chosenRowNum) {
     addNRowsToEnd(n);
+    var cellsNeedingRowspanExtended = {};
+
+    // for chosenRowNum - 1 and the chosenRowNum, look for merged cells to fix
+    for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+        var isHiddenUp = selectedUserComponent.layout[chosenRowNum-1][col].hidden.isHidden;
+        var hidingCellIdUp = selectedUserComponent.layout[chosenRowNum-1][col].hidden.hidingCellId;
+        var isHiddenDown = selectedUserComponent.layout[chosenRowNum][col].hidden.isHidden;
+        var hidingCellIdDown = selectedUserComponent.layout[chosenRowNum][col].hidden.hidingCellId;
+
+        if ((isHiddenUp && isHiddenDown)||(selectedUserComponent.layout[chosenRowNum-1][col].merged.isMerged&&isHiddenDown)){
+            if ((hidingCellIdDown==hidingCellIdUp)|| 'cell'+'_'+(chosenRowNum-1)+'_'+col == hidingCellIdDown){
+                // there is always a hiding cell down
+                if (!(hidingCellIdDown in cellsNeedingRowspanExtended)){
+                    cellsNeedingRowspanExtended[hidingCellIdDown] = '';
+                    var hcRowcol = getRowColFromId(hidingCellIdDown);
+                    var hcRow = Number(hcRowcol.row);
+                    var hcCol = Number(hcRowcol.col);
+                    var oldRowspan = selectedUserComponent.layout[hcRow][hcCol].spans.row;
+
+                    $('#'+hidingCellIdDown).attr('rowspan', oldRowspan+n);
+                    selectedUserComponent.layout[hcRow][hcCol].spans.row = oldRowspan+n;
+
+                    var oldBottomRightId = $('#'+hidingCellIdDown).data('merged').bottomRightCellId;
+                    var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
+                    var newBottomRightRow = Number(oldBottomRightRowcol.row)+n;
+                    var newBottomRightCol = oldBottomRightRowcol.col;
+                    var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
+                    selectedUserComponent.layout[hcRow][hcCol].merged.bottomRightCellId = newBottomRightId;
+                    $('#'+hidingCellIdDown).data('merged', {isMerged: true, bottomRightCellId: newBottomRightId});
+                }
+            }
+
+        }
+    }
+
+    var oldChosenRowLayout = selectedUserComponent.layout[chosenRowNum];
     for (var row = numRows-n; row >= chosenRowNum; row--) { // going backwards to prevent dataloss
         selectedUserComponent.components[row+n] = selectedUserComponent.components[row];
-        var temp = selectedUserComponent.layout[row+n];
+        var newLayout = selectedUserComponent.layout[row+n];
         selectedUserComponent.layout[row+n] = selectedUserComponent.layout[row];
         selectedUserComponent.components[row] = {};
-        selectedUserComponent.layout[row] = temp;
+        selectedUserComponent.layout[row] = newLayout;
+        for (var col = 1; col<=numCols; col++){
+            selectedUserComponent.layout[row][col].hidden = oldChosenRowLayout[col].hidden;
+        }
     }
-    loadTable(selectedUserComponent);
+
+    //scaleTableToZoom();
+
+    loadTable(selectedUserComponent, currentZoom);
     //
     //for (var row=1; row<=numRows; row++){
     //    for (var col=1; col<=numCols; col++){
@@ -2911,7 +2974,7 @@ function deleteUserComponent(userComponentId){
         var otherIds = Object.keys(selectedProject.components);
         selectedUserComponent = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").attr('id', 'selected');
-        loadTable(selectedUserComponent);
+        loadTable(selectedUserComponent, 1);
     }
     if (userComponentId == selectedProject.mainComponents.indexId){
         selectedProject.mainComponents.indexId = null;
