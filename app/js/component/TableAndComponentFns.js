@@ -2492,68 +2492,52 @@ function addNRowsToEnd(n) {
  * Mutates selectedUserComponent
  */
 function removeNRows(n, chosenRowNum) {
-    addNRowsToEnd(n);
-    var oldChosenRowLayout = selectedUserComponent.layout[chosenRowNum];
-    var newLayout = selectedUserComponent.layout[numRows];
+    // TODO: still need to deal with merged cells being deleted
+    var cellsNeedingRowspanShortened = {};
 
-    var cellsNeedingRowspanExtended = {};
-
-    // for chosenRowNum - 1 and the chosenRowNum, look for merged cells to fix
+    // for chosenRowNum + n - 1 (the first row not deleted), look for merged cells to fix
     for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
-        var isHiddenUp = selectedUserComponent.layout[chosenRowNum-1][col].hidden.isHidden;
-        var hidingCellIdUp = selectedUserComponent.layout[chosenRowNum-1][col].hidden.hidingCellId;
-        var isHiddenDown = selectedUserComponent.layout[chosenRowNum][col].hidden.isHidden;
-        var hidingCellIdDown = selectedUserComponent.layout[chosenRowNum][col].hidden.hidingCellId;
+        var isHidden = selectedUserComponent.layout[chosenRowNum+n-1][col].hidden.isHidden;
+        var hidingCellId = selectedUserComponent.layout[chosenRowNum+n-1][col].hidden.hidingCellId;
 
-        if ((isHiddenUp && isHiddenDown)||(selectedUserComponent.layout[chosenRowNum-1][col].merged.isMerged&&isHiddenDown)){
-            if ((hidingCellIdDown==hidingCellIdUp)|| 'cell'+'_'+(chosenRowNum-1)+'_'+col == hidingCellIdDown){
-                // there is always a hiding cell down
-                if (!(hidingCellIdDown in cellsNeedingRowspanExtended)){
-                    cellsNeedingRowspanExtended[hidingCellIdDown] = '';
-                    var hcRowcol = getRowColFromId(hidingCellIdDown);
-                    var hcRow = Number(hcRowcol.row);
-                    var hcCol = Number(hcRowcol.col);
-                    var oldRowspan = selectedUserComponent.layout[hcRow][hcCol].spans.row;
+        if (isHidden){
+            if (!(hidingCellId in cellsNeedingRowspanShortened)){
+                cellsNeedingRowspanShortened[hidingCellId] = '';
+                var hcRowcol = getRowColFromId(hidingCellId);
+                var hcRow = Number(hcRowcol.row);
+                var hcCol = Number(hcRowcol.col);
+                var oldRowspan = selectedUserComponent.layout[hcRow][hcCol].spans.row;
 
-                    $('#'+hidingCellIdDown).attr('rowspan', oldRowspan+n);
-                    selectedUserComponent.layout[hcRow][hcCol].spans.row = oldRowspan+n;
+                $('#'+hidingCellId).attr('rowspan', oldRowspan-n);
+                selectedUserComponent.layout[hcRow][hcCol].spans.row = oldRowspan-n;
 
-                    var mergeData = $('#'+hidingCellIdDown).data('merged');
-                    var oldBottomRightId = mergeData.bottomRightCellId;
-                    var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
-                    var newBottomRightRow = Number(oldBottomRightRowcol.row)+n;
-                    var newBottomRightCol = oldBottomRightRowcol.col;
-                    var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
-                    var oldBottomLeftId = mergeData.bottomLeftCellId;
-                    var oldBottomLeftRowcol = getRowColFromId(oldBottomLeftId);
-                    var newBottomLeftRow = Number(oldBottomLeftRowcol.row)+n;
-                    var newBottomLeftCol = Number(oldBottomLeftRowcol.col);
-                    var newBottomLeftId = 'cell'+'_'+ newBottomLeftRow + '_' + newBottomLeftCol;
+                var mergeData = $('#'+hidingCellId).data('merged');
+                var oldBottomRightId = mergeData.bottomRightCellId;
+                var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
+                var newBottomRightRow = Number(oldBottomRightRowcol.row)-n;
+                var newBottomRightCol = oldBottomRightRowcol.col;
+                var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
+                var oldBottomLeftId = mergeData.bottomLeftCellId;
+                var oldBottomLeftRowcol = getRowColFromId(oldBottomLeftId);
+                var newBottomLeftRow = Number(oldBottomLeftRowcol.row)-n;
+                var newBottomLeftCol = Number(oldBottomLeftRowcol.col);
+                var newBottomLeftId = 'cell'+'_'+ newBottomLeftRow + '_' + newBottomLeftCol;
 
-                    mergeData.bottomRightCellId = newBottomRightId;
-                    mergeData.bottomLeftCellId = newBottomLeftId;
+                mergeData.bottomRightCellId = newBottomRightId;
+                mergeData.bottomLeftCellId = newBottomLeftId;
 
-                    selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
-                    $('#'+hidingCellIdDown).data('merged', mergeData);
+                selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
+                $('#'+hidingCellId).data('merged', mergeData);
 
-                }
             }
 
         }
     }
 
-    for (var row = numRows-n; row >= chosenRowNum; row--) { // going backwards to prevent dataloss
-        selectedUserComponent.components[row+n] = selectedUserComponent.components[row];
-        selectedUserComponent.layout[row+n] = selectedUserComponent.layout[row];
-        selectedUserComponent.components[row] = {};
-    }
-
-    // for the new rows
-    for (var row = chosenRowNum; row <= chosenRowNum+n-1; row++) { // going backwards to prevent dataloss
-        selectedUserComponent.layout[row] = newLayout;
-        for (var col = 1; col<=numCols; col++){
-            selectedUserComponent.layout[row][col].hidden = oldChosenRowLayout[col].hidden;
-        }
+    for (var row = chosenRowNum; row <= numRows-n; row++) {
+        selectedUserComponent.components[row] = selectedUserComponent.components[row+n];
+        selectedUserComponent.layout[row] = selectedUserComponent.layout[row+n];
+        selectedUserComponent.components[row+n] = {};
     }
 
     for (var row=1; row<=numRows; row++){
@@ -2586,13 +2570,15 @@ function removeNRows(n, chosenRowNum) {
     }
 
     propagateRatioChangeToAllElts();
-
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){
             var cellId = 'cell'+'_'+row+'_'+col;
             refreshCellDisplay(cellId, currentZoom);
         }
     }
+
+    removeNRowsFromEnd(n);
+
 }
 
 
@@ -2660,7 +2646,15 @@ function removeNRowsFromEnd(n) {
                 var newBottomRightRow = hcRow+newRowSpan-1;
                 var newBottomRightCol = oldBottomRightRowcol.col;
                 var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
-                mergeData.bottomRightCellId= newBottomRightId;
+                var oldBottomLeftId = mergeData.bottomLeftCellId;
+                var oldBottomLeftRowcol = getRowColFromId(oldBottomLeftId);
+                var newBottomLeftRow = hcRow+newRowSpan-1;
+                var newBottomLeftCol = oldBottomLeftRowcol.col;
+                var newBottomLeftId = 'cell'+'_'+ newBottomLeftRow + '_' + newBottomLeftCol;
+
+
+                mergeData.bottomRightCellId = newBottomRightId;
+                mergeData.bottomLeftCellId = newBottomLeftId;
 
                 selectedUserComponent.layout[hcRow][hcCol].merged.bottomRightCellId = newBottomRightId;
                 $('#'+hidingCellId).data('merged', mergeData);
@@ -2946,6 +2940,107 @@ function addNColsToEnd(n) {
 
 }
 
+
+/**
+ * Adds n rows to the chosenRowNum
+ * Mutates selectedUserComponent
+ */
+function removeNCols(n, chosenColNum) {
+    // TODO: still need to deal with merged cells being deleted
+
+    var cellsNeedingColspanShortened = {};
+
+    // for chosenColNum + n - 1 (the first col not deleted), look for merged cells to fix
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+        var isHidden = selectedUserComponent.layout[row][chosenColNum+n-1].hidden.isHidden;
+        var hidingCellId = selectedUserComponent.layout[row][chosenColNum+n-1].hidden.hidingCellId;
+
+        if (isHidden){
+            if (!(hidingCellId in cellsNeedingColspanShortened)){
+                cellsNeedingColspanShortened[hidingCellId] = '';
+                var hcRowcol = getRowColFromId(hidingCellId);
+                var hcRow = Number(hcRowcol.row);
+                var hcCol = Number(hcRowcol.col);
+                var oldColspan = selectedUserComponent.layout[hcRow][hcCol].spans.col;
+
+                $('#'+hidingCellId).attr('colspan', oldColspan-n);
+                selectedUserComponent.layout[hcRow][hcCol].spans.col = oldColspan-n;
+
+                var mergeData = $('#'+hidingCellId).data('merged');
+                var oldBottomRightId = mergeData.bottomRightCellId;
+                var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
+                var newBottomRightRow = oldBottomRightRowcol.row;
+                var newBottomRightCol = Number(oldBottomRightRowcol.col)-n;
+                var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
+
+                var oldTopRightId = mergeData.bottomLeftCellId;
+                var oldTopRightRowcol = getRowColFromId(oldTopRightId);
+                var newTopRightRow = oldTopRightRowcol.row;
+                var newTopRightCol = Number(oldBottomRightRowcol.col)-n;
+                var newTopRightId = 'cell'+'_'+ newTopRightRow + '_' + newTopRightCol;
+
+                mergeData.bottomRightCellId = newBottomRightId;
+                mergeData.topRightCellId = newTopRightId;
+
+                selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
+                $('#'+hidingCellId).data('merged', mergeData);
+
+            }
+
+        }
+    }
+    for (var row=1; row<=numRows; row++) {
+        if (!selectedUserComponent.components[row]){
+            selectedUserComponent.components[row] = {};
+        }
+        for (var col = chosenColNum; col <= numCols-n; col++) {
+            selectedUserComponent.components[row][col] = selectedUserComponent.components[row][col + n];
+            selectedUserComponent.layout[row][col] = selectedUserComponent.layout[row][col + n];
+            selectedUserComponent.components[row][col + n] = null;
+        }
+    }
+
+    for (var row=1; row<=numRows; row++){
+        for (var col=1; col<=numCols; col++) {
+            var cellId = 'cell' + '_' + row + '_' + col;
+            var cell = $('#' + cellId);
+            var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
+            var rowspan = selectedUserComponent.layout[row][col].spans.row;
+            var colspan = selectedUserComponent.layout[row][col].spans.col;
+
+            if (isHidden) {
+                cell.css("display", "none");
+            } else {
+                cell.attr("rowSpan", rowspan);
+                cell.attr("colSpan", colspan);
+            }
+
+            if (selectedUserComponent.components[row]) {
+                var component = selectedUserComponent.components[row][col];
+                if (component) {
+                    cell.addClass("dropped");
+                    cell.removeClass("droppable");
+                    cell.droppable('disable');
+                    displayComponentInTable(cellId, null, component);
+                }
+            } else {
+                deleteComponentFromView(cellId);
+            }
+        }
+    }
+
+    propagateRatioChangeToAllElts();
+    for (var row = 1; row<=numRows; row++){
+        for (var col = 1; col<=numCols; col++){
+            var cellId = 'cell'+'_'+row+'_'+col;
+            refreshCellDisplay(cellId, currentZoom);
+        }
+    }
+
+    removeNColsFromEnd(n);
+}
+
+
 /**
  * Removes n columns from the end
  * Does nothing if there is only one column left
@@ -3008,7 +3103,16 @@ function removeNColsFromEnd(n) {
                 var newBottomRightRow = oldBottomRightRowcol.row;
                 var newBottomRightCol = hcCol+newColspan-1;
                 var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
+
+                var oldTopRightId = mergeData.topRightCellId;
+                var oldTopRightRowcol = getRowColFromId(oldTopRightId);
+                var newTopRightRow = oldTopRightRowcol.row;
+                var newTopRightCol = hcCol+newColspan-1;
+                var newTopRightId = 'cell'+'_'+ newTopRightRow + '_' + newTopRightCol;
+
                 mergeData.bottomRightCellId = newBottomRightId;
+                mergeData.topRightCellId = newTopRightId;
+
                 selectedUserComponent.layout[hcRow][hcCol].merged.bottomRightCellId = newBottomRightId;
                 $('#'+hidingCellId).data('merged', mergeData);
             }
