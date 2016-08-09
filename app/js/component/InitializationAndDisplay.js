@@ -769,6 +769,7 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/
+
 function cellTrashDroppableSettings(){
     var enableDrop = {
         accept: ".widget",
@@ -782,8 +783,6 @@ function cellTrashDroppableSettings(){
                 $(ui.draggable).appendTo(this);
                 $(this).droppable('disable');
                 var cellId = $(this).attr('id');
-                var droppedComponentType =$('#'+cellId).children().last().attr('name').toLowerCase();
-                showConfigOptions(droppedComponentType, cellId);
                 if (!movedComponent()) {
                     displayComponentInTable(cellId, $(ui.draggable));
                 }
@@ -889,10 +888,7 @@ function getZoomFromSliderVal(){
  * this function can be used to resize the table
  */
 function scaleTableToZoom(){
-    gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
-
     propagateRatioChangeToAllElts();
-
 }
 
 function changeZoomViaZoomControl(type) {

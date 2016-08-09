@@ -1607,7 +1607,7 @@ function resizeColsBySetRatios(ratios){
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(){
-    // update these just incase
+    // update these just in case
     gridHeight = selectedUserComponent.layout.tablePxDimensions.height*currentZoom;
     gridWidth = selectedUserComponent.layout.tablePxDimensions.width*currentZoom;
 
@@ -2235,11 +2235,14 @@ function addRowColAddRemoveButtons(componentId){
 /** ** ** ** Adding and deleting rows and columns **/
 
 /**
- * Adds n rows to the end
+ * Adds n rows to the chosenRowNum
  * Mutates selectedUserComponent
  */
 function addNRows(n, chosenRowNum) {
     addNRowsToEnd(n);
+    var oldChosenRowLayout = selectedUserComponent.layout[chosenRowNum];
+    var newLayout = selectedUserComponent.layout[numRows];
+
     var cellsNeedingRowspanExtended = {};
 
     // for chosenRowNum - 1 and the chosenRowNum, look for merged cells to fix
@@ -2262,179 +2265,81 @@ function addNRows(n, chosenRowNum) {
                     $('#'+hidingCellIdDown).attr('rowspan', oldRowspan+n);
                     selectedUserComponent.layout[hcRow][hcCol].spans.row = oldRowspan+n;
 
-                    var oldBottomRightId = $('#'+hidingCellIdDown).data('merged').bottomRightCellId;
+                    var mergeData = $('#'+hidingCellIdDown).data('merged');
+                    var oldBottomRightId = mergeData.bottomRightCellId;
                     var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
                     var newBottomRightRow = Number(oldBottomRightRowcol.row)+n;
                     var newBottomRightCol = oldBottomRightRowcol.col;
                     var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
-                    selectedUserComponent.layout[hcRow][hcCol].merged.bottomRightCellId = newBottomRightId;
-                    $('#'+hidingCellIdDown).data('merged', {isMerged: true, bottomRightCellId: newBottomRightId});
+                    var oldBottomLeftId = mergeData.bottomLeftCellId;
+                    var oldBottomLeftRowcol = getRowColFromId(oldBottomLeftId);
+                    var newBottomLeftRow = Number(oldBottomLeftRowcol.row)+n;
+                    var newBottomLeftCol = Number(oldBottomLeftRowcol.col);
+                    var newBottomLeftId = 'cell'+'_'+ newBottomLeftRow + '_' + newBottomLeftCol;
+
+                    mergeData.bottomRightCellId = newBottomRightId;
+                    mergeData.bottomLeftCellId = newBottomLeftId;
+
+                    selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
+                    $('#'+hidingCellIdDown).data('merged', mergeData);
+
                 }
             }
 
         }
     }
 
-    var oldChosenRowLayout = selectedUserComponent.layout[chosenRowNum];
     for (var row = numRows-n; row >= chosenRowNum; row--) { // going backwards to prevent dataloss
         selectedUserComponent.components[row+n] = selectedUserComponent.components[row];
-        var newLayout = selectedUserComponent.layout[row+n];
         selectedUserComponent.layout[row+n] = selectedUserComponent.layout[row];
         selectedUserComponent.components[row] = {};
+    }
+
+    // for the new rows
+    for (var row = chosenRowNum; row <= chosenRowNum+n-1; row++) { // going backwards to prevent dataloss
         selectedUserComponent.layout[row] = newLayout;
         for (var col = 1; col<=numCols; col++){
             selectedUserComponent.layout[row][col].hidden = oldChosenRowLayout[col].hidden;
         }
     }
 
-    //scaleTableToZoom();
+    for (var row=1; row<=numRows; row++){
+        for (var col=1; col<=numCols; col++) {
+            var cellId = 'cell' + '_' + row + '_' + col;
+            var cell = $('#' + cellId);
+            var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
+            var rowspan = selectedUserComponent.layout[row][col].spans.row;
+            var colspan = selectedUserComponent.layout[row][col].spans.col;
 
-    loadTable(selectedUserComponent, currentZoom);
-    //
-    //for (var row=1; row<=numRows; row++){
-    //    for (var col=1; col<=numCols; col++){
-    //        var cellId = 'cell'+'_'+row+'_'+col;
-    //        refreshCellDisplay(cellId,currentZoom);
-    //    }
-    //}
+            if (isHidden) {
+                cell.css("display", "none");
+            } else {
+                cell.attr("rowSpan", rowspan);
+                cell.attr("colSpan", colspan);
+            }
 
-    //
-    //// before anything has changed
-    //var savedTableLockedHeight = tableLockedHeight;
-    //toggleTableHeightLock(false);
-    //
-    //var lastRowNum = parseInt(selectedUserComponent.dimensions.rows);
-    //var newNumRows = lastRowNum + n;
-    //
-    //selectedUserComponent.dimensions.rows = newNumRows;
-    //numRows = newNumRows;
-    //
-    //if (savedTableLockedHeight) { // if table height constant
-    //    // for all existing rows, scale down the heights proportionally = (1 - n/newNumRows)
-    //    for (var row = 1; row <= lastRowNum; row++) {
-    //        for (var col = 1; col <= numCols; col++) {
-    //            selectedUserComponent.layout[row][col].ratio.grid.height = selectedUserComponent.layout[row][col].ratio.grid.height * (1 - n / (newNumRows));
-    //        }
-    //    }
-    //    // next shift the rows from the chosen row number to the last row number by n
-    //
-    //
-    //    // for the new rows, height is 1/newNumRows
-    //    for (var newRow = 1; newRow <= n; newRow++){
-    //        var newRowNum = chosenRowNum + newRow - 1;
-    //        selectedUserComponent.layout[newRowNum] = {};
-    //        for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
-    //            selectedUserComponent.layout[newRowNum][col] = {
-    //                spans:{row:1,col:1},
-    //                merged:{isMerged: false,
-    //                    topLeftCellId: '',
-    //                    topRightCellId: '',
-    //                    bottomLeftCellId: '',
-    //                    bottomRightCellId: ''},
-    //                hidden:{isHidden: false, hidingCellId: ''},
-    //                // take the width of the grid-cell to the top (grid-cell, in case the cell is merged)
-    //                ratio:{
-    //                    grid:{width: selectedUserComponent.layout[chosenRowNum-1][col].ratio.grid.width, height: 1/(newNumRows)}}
-    //            }
-    //        }
-    //    }
-    //
-    //} else {
-    //    // shift the rows from the chosen row number to the last row number by n
-    //    for (var row = lastRowNum; row >= chosenRowNum; row--) { // going backwards to prevent dataloss
-    //        for (var col = 1; col <= numCols; col++) {
-    //            selectedUserComponent.components[row+n] = selectedUserComponent.components[row];
-    //            selectedUserComponent.layout[row+n] = selectedUserComponent.layout[row];
-    //        }
-    //    }
-    //
-    //    for (var newRow = 1; newRow <= n; newRow++) {
-    //        var newRowNum = chosenRowNum + newRow - 1;
-    //        selectedUserComponent.layout[newRowNum] = {};
-    //
-    //        for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
-    //            selectedUserComponent.layout[newRowNum][col] = {
-    //                spans: {row: 1, col: 1},
-    //                merged: {
-    //                    isMerged: false,
-    //                    topLeftCellId: '',
-    //                    topRightCellId: '',
-    //                    bottomLeftCellId: '',
-    //                    bottomRightCellId: ''
-    //                },
-    //                hidden: {isHidden: false, hidingCellId: ''},
-    //                // take the width of the grid-cell to the top (grid-cell, in case the cell is merged)
-    //                ratio: {
-    //                    grid: {
-    //                        width: selectedUserComponent.layout[chosenRowNum-1][col].ratio.grid.width,
-    //                        height: standardCellHeight/selectedUserComponent.layout.tablePxDimensions.height
-    //                    }
-    //                }
-    //            }
-    //
-    //
-    //        }
-    //    }
-    //
-    //}
-    //
-    //for (var newRow = 1; newRow <= n; newRow++) {
-    //    var newRowNum = chosenRowNum + newRow - 1;
-    //    var tableRow = createEmptyRow(newRowNum);
-    //    var gridRow = createEmptyRow(newRowNum);
-    //
-    //    for (var col = 0; col <= numCols; col++) {
-    //        if (col === 0) {
-    //            var tableCell = document.createElement('td');
-    //            tableCell.className = 'zero-height zero-width col' + '_' + col;
-    //            tableCell.id = 'cell' + '_' + newRowNum + '_' + col;
-    //        } else {
-    //            var tableCell = createTableCell(newRowNum, col);
-    //            var gridCell = createGridCell(newRowNum, col);
-    //            var dragHandleContainer = createMergeHandle(newRowNum, col);
-    //        }
-    //        tableRow.appendChild(tableCell);
-    //        if (!(col === 0)) {
-    //            gridRow.appendChild(gridCell);
-    //            $('#drag-handle-containers-container').append(dragHandleContainer);
-    //        }
-    //    }
-    //
-    //    // it's the selected component, so this shouldn't cause problems
-    //    $('#main-cell-table '+'.row_'+(chosenRowNum-1)).after(tableRow);
-    //    $('#main-grid-table '+'.row_'+(chosenRowNum-1)).after(gridRow);
-    //
-    //}
-    //
-    //scaleTableToZoom();
-    //
-    ////// after the cells have been appended
-    ////for (var newRow = 1; newRow <= n; newRow++) {
-    ////    var newRowNum = lastRowNum + newRow;
-    ////    addRowResizeHandler(newRowNum);
-    ////    for (var col = 0; col <= numCols; col++) {
-    ////        resetMergeHandleContainerSizeAndPosition(newRowNum, col);
-    ////        registerCellDroppable("cell"+'_'+newRowNum+'_'+col);
-    ////    }
-    ////}
-    //
-    //bitmapNew = make2dArray(numRows, numCols);
-    //updateBitmap();
-    //bitmapOld = JSON.parse(JSON.stringify(bitmapNew));
-    //
-    //
-    //if (!savedTableLockedHeight){
-    //    // if not locked resize the table height accordingly
-    //    // do this after the table has been fitted to the new size
-    //    selectedUserComponent.layout.tablePxDimensions.height = selectedUserComponent.layout.tablePxDimensions.height + n*standardCellHeight;
-    //    gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
-    //
-    //    saveRowRatiosGrid();
-    //}
-    //
-    //toggleTableHeightLock(savedTableLockedHeight);
-    //updateZoomNavComponentSize();
+            if (selectedUserComponent.components[row]) {
+                var component = selectedUserComponent.components[row][col];
+                if (component) {
+                    cell.addClass("dropped");
+                    cell.removeClass("droppable");
+                    cell.droppable('disable');
+                    displayComponentInTable(cellId, null, component);
+                }
+            } else {
+                deleteComponentFromView(cellId);
+            }
+        }
+    }
 
+    propagateRatioChangeToAllElts();
+
+    for (var row = 1; row<=numRows; row++){
+        for (var col = 1; col<=numCols; col++){
+            var cellId = 'cell'+'_'+row+'_'+col;
+            refreshCellDisplay(cellId, currentZoom);
+        }
+    }
 }
 
 
@@ -2671,6 +2576,128 @@ function removeNRowsFromEnd(n) {
 
 }
 
+
+/**
+ * Adds n cols to the chosenRowNum
+ * Mutates selectedUserComponent
+ */
+function addNCols(n, chosenColNum) {
+    addNColsToEnd(n);
+    var oldChosenColLayout = {};
+    var newLayout = {};
+
+    for (var row = 1; row<=numRows; row++){
+        oldChosenColLayout[row] = selectedUserComponent.layout[row][chosenColNum];
+        newLayout[row] = selectedUserComponent.layout[row][numCols];
+    }
+
+
+    var cellsNeedingColspanExtended = {};
+
+
+
+    // for chosenColNum - 1 and the chosenColNum, look for merged cells to fix
+    for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+        var isHiddenLeft = selectedUserComponent.layout[row][chosenColNum-1].hidden.isHidden;
+        var hidingCellIdLeft = selectedUserComponent.layout[row][chosenColNum-1].hidden.hidingCellId;
+        var isHiddenRight = selectedUserComponent.layout[row][chosenColNum].hidden.isHidden;
+        var hidingCellIdRight = selectedUserComponent.layout[row][chosenColNum].hidden.hidingCellId;
+
+        if ((isHiddenLeft && isHiddenRight)||(selectedUserComponent.layout[row][chosenColNum-1].merged.isMerged&&isHiddenRight)){
+            if ((hidingCellIdRight==hidingCellIdLeft)|| 'cell'+'_'+row+'_'+(chosenColNum-1) == hidingCellIdRight){
+                // there is always a hiding cell right
+                if (!(hidingCellIdRight in cellsNeedingColspanExtended)){
+                    cellsNeedingColspanExtended[hidingCellIdRight] = '';
+                    var hcRowcol = getRowColFromId(hidingCellIdRight);
+                    var hcRow = Number(hcRowcol.row);
+                    var hcCol = Number(hcRowcol.col);
+                    var oldColspan = selectedUserComponent.layout[hcRow][hcCol].spans.col;
+
+                    $('#'+hidingCellIdRight).attr('colspan', oldColspan+n);
+                    selectedUserComponent.layout[hcRow][hcCol].spans.col = oldColspan+n;
+
+                    var mergeData = $('#'+hidingCellIdRight).data('merged');
+                    var oldBottomRightId = mergeData.bottomRightCellId;
+                    var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
+                    var newBottomRightRow = Number(oldBottomRightRowcol.row);
+                    var newBottomRightCol = Number(oldBottomRightRowcol.col)+n;
+                    var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
+                    var oldTopRightId = mergeData.bottomLeftCellId;
+                    var oldTopRightRowcol = getRowColFromId(oldTopRightId);
+                    var newTopRightRow = Number(oldTopRightRowcol.row);
+                    var newTopRightCol = Number(oldTopRightRowcol.col)+n;
+                    var newTopRightId = 'cell'+'_'+ newTopRightRow + '_' + newTopRightCol;
+
+                    mergeData.bottomRightCellId = newBottomRightId;
+                    mergeData.topRightCellId = newTopRightId;
+
+                    selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
+                    $('#'+hidingCellIdRight).data('merged', mergeData);
+
+                }
+            }
+
+        }
+    }
+    for (var row=1; row<=numRows; row++) {
+        if (!selectedUserComponent.components[row]){
+            selectedUserComponent.components[row]={};
+        }
+        for (var col = numCols-n; col >= chosenColNum; col--) { // going backwards to prevent dataloss
+            selectedUserComponent.components[row][col + n] = selectedUserComponent.components[row][col];
+            selectedUserComponent.layout[row][col + n] = selectedUserComponent.layout[row][col];
+            delete selectedUserComponent.components[row][col];
+        }
+    }
+
+    // for the new cols
+    for (var col = chosenColNum; col <= chosenColNum+n-1; col++) {
+        for (var row = 1; row<=numRows; row++){
+            selectedUserComponent.layout[row][col] = newLayout[row];
+            selectedUserComponent.layout[row][col].hidden = oldChosenColLayout[row].hidden;
+        }
+    }
+
+    for (var row=1; row<=numRows; row++){
+        for (var col=1; col<=numCols; col++){
+            var cellId = 'cell'+'_'+row+'_'+col;
+            var cell = $('#'+cellId);
+
+            var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
+            var rowspan = selectedUserComponent.layout[row][col].spans.row;
+            var colspan = selectedUserComponent.layout[row][col].spans.col;
+
+            if (isHidden) {
+                $('#'+cellId).css("display", "none");
+            } else {
+                $('#'+cellId).attr("rowSpan", rowspan);
+                $('#'+cellId).attr("colSpan", colspan);
+            }
+
+
+            if (selectedUserComponent.components[row]) {
+                var component = selectedUserComponent.components[row][col];
+                if (component) {
+                    cell.addClass("dropped");
+                    cell.removeClass("droppable");
+                    cell.droppable('disable');
+                    displayComponentInTable(cellId, null, component);
+                }
+            } else {
+                deleteComponentFromView(cellId);
+            }
+
+        }
+    }
+
+    propagateRatioChangeToAllElts();
+    for (var row = 1; row<=numRows; row++){
+        for (var col = 1; col<=numCols; col++){
+            var cellId = 'cell'+'_'+row+'_'+col;
+            refreshCellDisplay(cellId, currentZoom);
+        }
+    }
+}
 
 
 
