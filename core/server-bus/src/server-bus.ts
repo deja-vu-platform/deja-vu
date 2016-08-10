@@ -45,7 +45,9 @@ export class ServerBus {
       fqelement: string,
       private _ws: express.Express,
       private _handlers: any, comp_info: CompInfo, locs: any) {
-    this._dispatcher = new Dispatcher(fqelement, comp_info, locs);
+    if (comp_info !== undefined) {
+      this._dispatcher = new Dispatcher(fqelement, comp_info, locs);
+    }
 
     const build_field = (action, t, handlers) => {
       const forward_wrap = handler => {
@@ -121,18 +123,27 @@ export class ServerBus {
 
   create_atom(t_name: string, atom_id: string, create: any): Promise<boolean> {
     console.log("sending new atom");
+    if (this._dispatcher === undefined) {
+      return Promise.resolve(true);
+    }
     return this._dispatcher.create_atom(
         _ustr.capitalize(t_name), atom_id, create);
   }
 
   update_atom(t_name: string, atom_id: string, update: any): Promise<boolean> {
     console.log("sending up atom");
+    if (this._dispatcher === undefined) {
+      return Promise.resolve(true);
+    }
     return this._dispatcher.update_atom(
         _ustr.capitalize(t_name), atom_id, update);
   }
 
   remove_atom(t_name: string, atom_id: string) {
     console.log("sending remove atom");
+    if (this._dispatcher === undefined) {
+      return Promise.resolve(true);
+    }
     return this._dispatcher.remove_atom(_ustr.capitalize(t_name), atom_id);
   }
 
