@@ -36,7 +36,7 @@ export class Mean {
 
   constructor(init_db?: (db, debug: boolean) => void) {
     this._opts = cli.parse();
-    if (this._opts.comppath !== undefined) {
+    if (this._opts.comppath) {
       this.comp = JSON.parse(fs.readFileSync(this._opts.comppath, "utf8"));
     }
     this.locs = JSON.parse(this._opts.locs);
@@ -89,9 +89,12 @@ export namespace GruntTask {
   export function task(
       grunt, name: string, widgets?: Widget[], attachments?: string[],
       main?: string, patterns?) {
-    patterns = (typeof patterns === "undefined") ? {} : patterns;
+    attachments = attachments === undefined ? [] : attachments;
+    widgets = widgets === undefined ? [] : widgets;
+    patterns = patterns === undefined ? {} : patterns;
     const patterns_src = Object.keys(patterns)
-        .map(p => `node_modules/${p}/lib/components/**/*.{js,html,css}`);
+        .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
+                  "*.{js,html,css}");
     let deps = [
       "node_modules/angular2/bundles/angular2-polyfills.js",
       "node_modules/systemjs/dist/system.src.js",
@@ -295,7 +298,7 @@ export namespace GruntTask {
         let wid_directives = "[]";
         let wid_selectors = "";
 
-        let route_config = "[]";
+        let route_config = "";
 
         let attachments_imports = "";
 
@@ -326,7 +329,9 @@ export namespace GruntTask {
         let replace_patterns = [
           {match: "name", replacement: name},
           {match: "deps", replacement: _u.keys(patterns)},
-          {match: "comp_info", replacement: grunt.file.readJSON("comp.json")},
+          {match: "comp_info", replacement: (
+              grunt.file.exists("comp.json") ?
+              grunt.file.readJSON("comp.json") : "{}")},
           {match: "wid_attachments", replacement: wid_attachments},
           {match: "mode", replacement: action},
 
@@ -339,58 +344,60 @@ export namespace GruntTask {
           {match: "attachments_imports", replacement: attachments_imports},
           {match: "route_config", replacement: route_config}
         ];
-        if (Object.keys(patterns).length > 0) {
-          let express_config = {};
-
-          let port = 3002;
-          const locs = {};
-          locs[name] = "http://localhost:3000";
-
-          Object.keys(patterns).forEach(p => {
-            let instances_number = patterns[p];
-            for (let i = 1; i <= instances_number; ++i) {
-              const fqelement = (instances_number > 1) ? p + "-" + i : p;
-              locs[fqelement] = "http://localhost:" + port;
-              ++port;
-            }
-          });
-          const locs_str = JSON.stringify(locs);
-
-          express_config["main"] = {
-            options: {
-              script: "dist/app.js",
-              background: true,
-              args: [
-                "--main", "--mode=" + action,
-                "--fqelement=" + name,
-                "--comppath=comp.json", "--locs=" + locs_str]
-            }
-          };
 
 
-          port = 3002;
-          Object.keys(patterns).forEach(p => {
-            let instances_number = patterns[p];
-            for (let i = 1; i <= instances_number; ++i) {
-              const fqelement = (instances_number > 1) ? p + "-" + i : p;
-              express_config[fqelement] = {
-                options: {
-                  script: "node_modules/" + p + "/lib/app.js",
-                  background: true,
-                  args: [
-                      "--fqelement=" + fqelement,
-                      "--comppath=comp.json", "--locs=" + locs_str]
-                }
-              };
-              ++port;
-            }
-          });
-          replace_patterns.push({match: "locs", replacement: locs});
+        let port = 3002;
+        const locs = {};
+        locs[name] = "http://localhost:3000";
 
-          grunt.config.merge({express: express_config});
-          grunt.config.merge(
-            {replace: {dev: {options: {patterns: replace_patterns}}}});
-        }
+        Object.keys(patterns).forEach(p => {
+          let instances_number = patterns[p];
+          for (let i = 1; i <= instances_number; ++i) {
+            const fqelement = (instances_number > 1) ? p + "-" + i : p;
+            locs[fqelement] = "http://localhost:" + port;
+            ++port;
+          }
+        });
+        const locs_str = JSON.stringify(locs);
+        replace_patterns.push({match: "locs", replacement: locs});
+
+        grunt.config.merge(
+          {replace: {dev: {options: {patterns: replace_patterns}}}});
+
+
+        const comppath = grunt.file.exists("comp.json") ? "comp.json" : "";
+        let express_config = {};
+        express_config["main"] = {
+          options: {
+            script: "dist/app.js",
+            background: true,
+            args: [
+              "--main", "--mode=" + action,
+              "--fqelement=" + name,
+              "--comppath=" + comppath ,
+              "--locs=" + locs_str]
+          }
+        };
+
+        port = 3002;
+        Object.keys(patterns).forEach(p => {
+          let instances_number = patterns[p];
+          for (let i = 1; i <= instances_number; ++i) {
+            const fqelement = (instances_number > 1) ? p + "-" + i : p;
+            express_config[fqelement] = {
+              options: {
+                script: "node_modules/" + p + "/lib/app.js",
+                background: true,
+                args: [
+                    "--fqelement=" + fqelement,
+                    "--comppath=" + comppath, "--locs=" + locs_str]
+              }
+            };
+            ++port;
+          }
+        });
+        grunt.config.merge({express: express_config});
+
         grunt.task.run(["clean:dev"]);
         grunt.task.run(["replace:dev"]);
         grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
