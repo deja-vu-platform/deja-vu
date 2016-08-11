@@ -2495,10 +2495,11 @@ function removeNRows(n, chosenRowNum) {
     // TODO: still need to deal with merged cells being deleted
     var cellsNeedingRowspanShortened = {};
 
-    // for chosenRowNum + n - 1 (the first row not deleted), look for merged cells to fix
+    var firstLowerRowNotDeletedNum = chosenRowNum + n;
+    // for the chosenRowNum check for merged cells to be fixed (merged cells will be fixed later)
     for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
-        var isHidden = selectedUserComponent.layout[chosenRowNum+n-1][col].hidden.isHidden;
-        var hidingCellId = selectedUserComponent.layout[chosenRowNum+n-1][col].hidden.hidingCellId;
+        var isHidden = selectedUserComponent.layout[chosenRowNum][col].hidden.isHidden;
+        var hidingCellId = selectedUserComponent.layout[chosenRowNum][col].hidden.hidingCellId;
 
         if (isHidden){
             if (!(hidingCellId in cellsNeedingRowspanShortened)){
@@ -2506,27 +2507,34 @@ function removeNRows(n, chosenRowNum) {
                 var hcRowcol = getRowColFromId(hidingCellId);
                 var hcRow = Number(hcRowcol.row);
                 var hcCol = Number(hcRowcol.col);
-                var oldRowspan = selectedUserComponent.layout[hcRow][hcCol].spans.row;
+                var layout = selectedUserComponent.layout[hcRow][hcCol];
 
-                $('#'+hidingCellId).attr('rowspan', oldRowspan-n);
-                selectedUserComponent.layout[hcRow][hcCol].spans.row = oldRowspan-n;
+                var bottomRow = getRowColFromId(layout.merged.bottomRightCellId).row;
 
-                var mergeData = $('#'+hidingCellId).data('merged');
+                var oldRowspan = layout.spans.row;
+                var numOfRowsDeletedFromThisCell = Math.min(bottomRow - chosenRowNum + 1, n);
+
+                $('#'+hidingCellId).attr('rowspan', oldRowspan-numOfRowsDeletedFromThisCell);
+                // since the rows are going to be flipped
+                layout.spans.row = oldRowspan-numOfRowsDeletedFromThisCell;
+
+                var mergeData = layout.merged;
                 var oldBottomRightId = mergeData.bottomRightCellId;
                 var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
-                var newBottomRightRow = Number(oldBottomRightRowcol.row)-n;
+                var newBottomRightRow = Number(oldBottomRightRowcol.row)-numOfRowsDeletedFromThisCell;
                 var newBottomRightCol = oldBottomRightRowcol.col;
                 var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
                 var oldBottomLeftId = mergeData.bottomLeftCellId;
                 var oldBottomLeftRowcol = getRowColFromId(oldBottomLeftId);
-                var newBottomLeftRow = Number(oldBottomLeftRowcol.row)-n;
+                var newBottomLeftRow = Number(oldBottomLeftRowcol.row)-numOfRowsDeletedFromThisCell;
                 var newBottomLeftCol = Number(oldBottomLeftRowcol.col);
                 var newBottomLeftId = 'cell'+'_'+ newBottomLeftRow + '_' + newBottomLeftCol;
 
                 mergeData.bottomRightCellId = newBottomRightId;
                 mergeData.bottomLeftCellId = newBottomLeftId;
 
-                selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
+                layout.merged = mergeData;
+                selectedUserComponent.layout[hcRow][hcCol] = layout;
                 $('#'+hidingCellId).data('merged', mergeData);
 
             }
@@ -2534,10 +2542,56 @@ function removeNRows(n, chosenRowNum) {
         }
     }
 
-    for (var row = chosenRowNum; row <= numRows-n; row++) {
-        selectedUserComponent.components[row] = selectedUserComponent.components[row+n];
-        selectedUserComponent.layout[row] = selectedUserComponent.layout[row+n];
-        selectedUserComponent.components[row+n] = {};
+
+    // for chosenRowNum + n (the first row not deleted), look for merged cells to fix
+    if (firstLowerRowNotDeletedNum<=numRows){
+        for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
+            var isHidden = selectedUserComponent.layout[firstLowerRowNotDeletedNum][col].hidden.isHidden;
+            var hidingCellId = selectedUserComponent.layout[firstLowerRowNotDeletedNum][col].hidden.hidingCellId;
+
+            if (isHidden){
+                if (!(hidingCellId in cellsNeedingRowspanShortened)){
+                    cellsNeedingRowspanShortened[hidingCellId] = '';
+                    var hcRowcol = getRowColFromId(hidingCellId);
+                    var hcRow = Number(hcRowcol.row);
+                    var hcCol = Number(hcRowcol.col);
+                    var layout = selectedUserComponent.layout[hcRow][hcCol];
+
+                    var oldRowspan = layout.spans.row;
+                    var numOfRowsDeletedFromThisCell = firstLowerRowNotDeletedNum - hcRow;
+
+                    $('#'+hidingCellId).attr('rowspan', oldRowspan-numOfRowsDeletedFromThisCell);
+                    // since the rows are going to be flipped
+                    layout.spans.row = oldRowspan-numOfRowsDeletedFromThisCell;
+
+                    var mergeData = layout.merged;
+                    var oldBottomRightId = mergeData.bottomRightCellId;
+                    var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
+                    var newBottomRightRow = Number(oldBottomRightRowcol.row)-numOfRowsDeletedFromThisCell;
+                    var newBottomRightCol = oldBottomRightRowcol.col;
+                    var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
+                    var oldBottomLeftId = mergeData.bottomLeftCellId;
+                    var oldBottomLeftRowcol = getRowColFromId(oldBottomLeftId);
+                    var newBottomLeftRow = Number(oldBottomLeftRowcol.row)-numOfRowsDeletedFromThisCell;
+                    var newBottomLeftCol = Number(oldBottomLeftRowcol.col);
+                    var newBottomLeftId = 'cell'+'_'+ newBottomLeftRow + '_' + newBottomLeftCol;
+
+                    mergeData.bottomRightCellId = newBottomRightId;
+                    mergeData.bottomLeftCellId = newBottomLeftId;
+
+                    layout.merged = mergeData;
+                    selectedUserComponent.layout[firstLowerRowNotDeletedNum][hcCol] = layout;
+                    $('#'+hidingCellId).data('merged', mergeData);
+
+                }
+
+            }
+        }
+    }
+
+    for (var row = firstLowerRowNotDeletedNum; row <= numRows; row++) { // to prevent dataloss
+        selectedUserComponent.components[row-n] = selectedUserComponent.components[row];
+        selectedUserComponent.layout[row-n] = selectedUserComponent.layout[row];
     }
 
     for (var row=1; row<=numRows; row++){
@@ -2551,6 +2605,7 @@ function removeNRows(n, chosenRowNum) {
             if (isHidden) {
                 cell.css("display", "none");
             } else {
+                cell.css("display", "table-cell");
                 cell.attr("rowSpan", rowspan);
                 cell.attr("colSpan", colspan);
             }
@@ -2950,10 +3005,11 @@ function removeNCols(n, chosenColNum) {
 
     var cellsNeedingColspanShortened = {};
 
-    // for chosenColNum + n - 1 (the first col not deleted), look for merged cells to fix
+    var firstLowerColNotDeletedNum = chosenColNum + n;
+    // for the chosenColNum check for merged cells to be fixed (merged cells will be fixed later)
     for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
-        var isHidden = selectedUserComponent.layout[row][chosenColNum+n-1].hidden.isHidden;
-        var hidingCellId = selectedUserComponent.layout[row][chosenColNum+n-1].hidden.hidingCellId;
+        var isHidden = selectedUserComponent.layout[row][chosenColNum].hidden.isHidden;
+        var hidingCellId = selectedUserComponent.layout[row][chosenColNum].hidden.hidingCellId;
 
         if (isHidden){
             if (!(hidingCellId in cellsNeedingColspanShortened)){
@@ -2961,32 +3017,88 @@ function removeNCols(n, chosenColNum) {
                 var hcRowcol = getRowColFromId(hidingCellId);
                 var hcRow = Number(hcRowcol.row);
                 var hcCol = Number(hcRowcol.col);
-                var oldColspan = selectedUserComponent.layout[hcRow][hcCol].spans.col;
+                var layout = selectedUserComponent.layout[hcRow][hcCol];
 
-                $('#'+hidingCellId).attr('colspan', oldColspan-n);
-                selectedUserComponent.layout[hcRow][hcCol].spans.col = oldColspan-n;
+                var rightCol = getRowColFromId(layout.merged.bottomRightCellId).col;
 
-                var mergeData = $('#'+hidingCellId).data('merged');
+                var oldColspan = layout.spans.col;
+                var numOfColsDeletedFromThisCell = Math.min(rightCol - chosenColNum + 1, n);
+
+                $('#'+hidingCellId).attr('colspan', oldColspan-numOfColsDeletedFromThisCell);
+                // since the rows are going to be flipped
+                layout.spans.col = oldColspan-numOfColsDeletedFromThisCell;
+
+                var mergeData = layout.merged;
                 var oldBottomRightId = mergeData.bottomRightCellId;
                 var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
-                var newBottomRightRow = oldBottomRightRowcol.row;
-                var newBottomRightCol = Number(oldBottomRightRowcol.col)-n;
+                var newBottomRightRow = Number(oldBottomRightRowcol.row)-numOfColsDeletedFromThisCell;
+                var newBottomRightCol = oldBottomRightRowcol.col;
                 var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
-
-                var oldTopRightId = mergeData.bottomLeftCellId;
-                var oldTopRightRowcol = getRowColFromId(oldTopRightId);
-                var newTopRightRow = oldTopRightRowcol.row;
-                var newTopRightCol = Number(oldBottomRightRowcol.col)-n;
-                var newTopRightId = 'cell'+'_'+ newTopRightRow + '_' + newTopRightCol;
+                var oldBottomLeftId = mergeData.bottomLeftCellId;
+                var oldBottomLeftRowcol = getRowColFromId(oldBottomLeftId);
+                var newBottomLeftRow = Number(oldBottomLeftRowcol.row)-numOfColsDeletedFromThisCell;
+                var newBottomLeftCol = Number(oldBottomLeftRowcol.col);
+                var newBottomLeftId = 'cell'+'_'+ newBottomLeftRow + '_' + newBottomLeftCol;
 
                 mergeData.bottomRightCellId = newBottomRightId;
-                mergeData.topRightCellId = newTopRightId;
+                mergeData.bottomLeftCellId = newBottomLeftId;
 
-                selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
+                layout.merged = mergeData;
+                selectedUserComponent.layout[hcRow][firstLowerColNotDeletedNum] = layout;
                 $('#'+hidingCellId).data('merged', mergeData);
 
             }
 
+        }
+    }
+
+
+
+    // for chosenColNum + n (the first col not deleted), look for merged cells to fix
+    if (firstLowerColNotDeletedNum<=numCols) {
+        for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
+            var isHidden = selectedUserComponent.layout[row][firstLowerColNotDeletedNum].hidden.isHidden;
+            var hidingCellId = selectedUserComponent.layout[row][firstLowerColNotDeletedNum].hidden.hidingCellId;
+
+            if (isHidden){
+                if (!(hidingCellId in cellsNeedingColspanShortened)){
+
+                    cellsNeedingColspanShortened[hidingCellId] = '';
+                    var hcRowcol = getRowColFromId(hidingCellId);
+                    var hcRow = Number(hcRowcol.row);
+                    var hcCol = Number(hcRowcol.col);
+                    var layout = selectedUserComponent.layout[hcRow][hcCol];
+
+                    var oldColspan = layout.spans.col;
+                    var numOfColsDeletedFromThisCell = firstLowerColNotDeletedNum - hcCol;
+
+
+                    $('#'+hidingCellId).attr('colspan', oldColspan-numOfColsDeletedFromThisCell);
+                    selectedUserComponent.layout[hcRow][hcCol].spans.col = oldColspan-numOfColsDeletedFromThisCell;
+
+                    var mergeData = $('#'+hidingCellId).data('merged');
+                    var oldBottomRightId = mergeData.bottomRightCellId;
+                    var oldBottomRightRowcol = getRowColFromId(oldBottomRightId);
+                    var newBottomRightRow = oldBottomRightRowcol.row;
+                    var newBottomRightCol = Number(oldBottomRightRowcol.col)-numOfColsDeletedFromThisCell;
+                    var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
+
+                    var oldTopRightId = mergeData.bottomLeftCellId;
+                    var oldTopRightRowcol = getRowColFromId(oldTopRightId);
+                    var newTopRightRow = oldTopRightRowcol.row;
+                    var newTopRightCol = Number(oldBottomRightRowcol.col)-numOfColsDeletedFromThisCell;
+                    var newTopRightId = 'cell'+'_'+ newTopRightRow + '_' + newTopRightCol;
+
+                    mergeData.bottomRightCellId = newBottomRightId;
+                    mergeData.topRightCellId = newTopRightId;
+
+                    layout.merged = mergeData;
+                    selectedUserComponent.layout[firstLowerColNotDeletedNum][hcCol] = layout;
+                    $('#'+hidingCellId).data('merged', mergeData);
+
+                }
+
+            }
         }
     }
     for (var row=1; row<=numRows; row++) {
