@@ -34,12 +34,13 @@ export class GraphQlService {
 
   pobj(o: Object) {
     return "{" + _u
-      .reduce(
-          _u.keys(o), (memo, key: string) => memo + "," + key + ": " + o[key]) +
-      "}";
+      .map(
+          _u.filter(_u.keys(o), k => !k.startsWith("_")),
+          k => k + ": \"" + o[k] + "\"")
+      .join(", ") + "}";
   }
 
   plist(l: any[]) {
-    return "[" + _u.reduce(l, (memo, i) => memo + "," + this.pobj(i)) + "]";
+    return "[" + _u.map(l, i => this.pobj(i)).join(", ") + "]";
   }
 }

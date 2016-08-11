@@ -5,6 +5,7 @@ export interface Label {
 }
 
 export interface Item {
+  atom_id?: String;
   name: Name;
   labels: Label[];
 }

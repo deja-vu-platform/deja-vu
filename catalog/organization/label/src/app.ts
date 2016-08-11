@@ -5,6 +5,7 @@ const graphql = require("graphql");
 import {Mean} from "mean-loader";
 import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
+import {Label} from "./shared/label";
 
 import * as _u from "underscore";
 
@@ -91,20 +92,24 @@ item_type = new graphql.GraphQLObjectType({
       args: {
         labels: {"type": new graphql.GraphQLList(label_input_type)}
       },
-      resolve: (item, {labels}) => {
-        const label_objs = mean.db.collection("labels")
-            .find({name: {$in: labels}}, {atom_id: 1}).toArray();
-        const up_op = {$addToSet: {labels: {$each: label_objs}}};
-        return mean.db.collection("items")
-          .updateOne({name: item.name}, up_op)
-          .then(_ => Promise.all([
-              bus.update_atom("Item", item.atom_id, up_op),
-              Promise.all(
-                label_objs.map(l => bus
-                  .update_atom(
-                    label_type, l.atom_id, {$addToSet: {items: l.atom_id}})))
-              ]));
-      }
+      resolve: (item, {labels}) => mean.db.collection("labels")
+            .find({name: {$in: _u.map(labels, (l: Label) => l.name)}})
+            .project({atom_id: 1, _id: 0})
+            .toArray()
+            .then(label_objs => {
+              const up_op = {$addToSet: {labels: {$each: label_objs}}};
+              return mean.db.collection("items")
+                .updateOne({name: item.name}, up_op)
+                .then(_ => Promise.all([
+                    bus.update_atom("Item", item.atom_id, up_op),
+                    Promise.all(
+                      label_objs.map(l => bus
+                        .update_atom(
+                          "Label", l.atom_id,
+                          {$addToSet: {items: {atom_id: item.atom_id}}})))
+                    ]));
+                  })
+            .then(_ => true)
     }
   })
 });
@@ -134,6 +139,16 @@ const schema = new graphql.GraphQLSchema({
           return mean.db.collection("items").findOne({name: name});
         }
       },
+      item_by_id: {
+        "type": item_type,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, {atom_id}) => {
+          console.log(`getting ${atom_id}`);
+          return mean.db.collection("items").findOne({atom_id: atom_id});
+        }
+      },
       items: {
         "type": new graphql.GraphQLList(item_type),
         args: {
@@ -154,11 +169,19 @@ const schema = new graphql.GraphQLSchema({
         args: {
           name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (_, {name}) => mean.db.collection("labels").findAndModify({
-          query: {name: name},
-          update: {$setOnInsert: {atom_id: name, name: name, items: []}},
-          new: true,
-          upsert: true
+        resolve: (_, {name}) => mean.db.collection("labels").findOneAndReplace(
+          {name: name},
+          {atom_id: name, name: name, items: []},
+          {
+            upsert: true,
+            returnOriginal: false
+          })
+          .then(up => {
+            const l = up.value;
+            if (!up.lastErrorObject.updatedExisting) {
+              return bus.create_atom("Label", l.atom_id, l).then(_ => l);
+            }
+            return l;
           })
       } 
     })

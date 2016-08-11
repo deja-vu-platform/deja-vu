@@ -1,11 +1,11 @@
 <div class="col-md-3">
   <div class="row">
-    <new-post-content [(post)]="post_post"></new-post-content>
+    <new-post-content [post]="post_post"></new-post-content>
   </div>
   <div class="row">
-    <labels-text [(item)]="label_item"></labels-text>
+    <labels-text [item]="label_item" [submitted]="submitted"></labels-text>
   </div>
   <div class="row">
-    <new-post-button [(post)]="post_post" [(user)]="user"></new-post-button>
+    <new-post-button [post]="post_post" [user]="user" [submitted]="submitted"></new-post-button>
   </div>
 </div>

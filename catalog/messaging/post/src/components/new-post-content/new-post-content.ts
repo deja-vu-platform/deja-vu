@@ -21,6 +21,5 @@ export class NewPostContentComponent {
   set post(post: Post) {
     if (!post) return;
     this._post = post;
-    console.log("at new-post-content, got post" + post.content);
   }
 }

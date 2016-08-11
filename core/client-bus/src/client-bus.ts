@@ -1,18 +1,6 @@
 /// <reference path="../typings/tsd.d.ts" />
 import {Injectable, Inject} from "angular2/core";
-import {Http, Headers} from "angular2/http";
 
-import * as Rx from "rxjs/Rx";
-import "rxjs/add/operator/toPromise";
-
-
-function uuid() {  // from SO
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
-    .replace(/[xy]/g, c => {
-      var r = Math.random()*16|0, v = c === "x" ? r : (r&0x3|0x8);
-      return v.toString(16);
-    });
-}
 
 export interface Type {
   name: string;
@@ -40,16 +28,34 @@ export interface CompInfo {
 }
 
 
-export class Atom {
-  atom_id: string;
-  private _forwards;
-  private _reverse;
-  private _core: Atom;
+export class PrimitiveAtom {
+  private _on_change_listeners: (() => void)[] = [];
 
-  constructor(private _helper, private _comp_info: CompInfo) {
-    this.atom_id = "unsaved";
+  constructor() {
+    return new Proxy(this, {
+      set: (target, name, value) => {
+             target[name] = value;
+
+             for (const on_change of this._on_change_listeners) {
+               on_change();
+             }
+             return true;
+           }
+    });
+  }
+
+  on_change(handler: () => void) {
+    this._on_change_listeners.push(handler);
+  }
+}
+
+export class Atom {
+  private _forwards;
+  private _core: Atom;
+  private _on_change_listeners: (() => void)[] = [];
+
+  constructor(private _comp_info: CompInfo) {
     this._forwards = {};
-    this._reverse = {};
     this._core = this;
   }
 
@@ -60,12 +66,6 @@ export class Atom {
     console.dir(this._forwards);
     return new Proxy(this._core, {
       get: (target, name) => {
-             // console.log("getting " + JSON.stringify(name));
-             if (name === "report_save") {
-               return target._report_save(t);
-             } else if (name === "report_update") {
-               return target._report_update(t);
-             }
              const core_name = target._forwards[tinfo_str][name];
              if (core_name !== undefined) {
                name = core_name;
@@ -74,141 +74,21 @@ export class Atom {
            },
       set: (target, name, value) => {
              const core_name = target._forwards[tinfo_str][name];
-             console.log(
-               "setting " + JSON.stringify(name) + " core name " + core_name);
-             console.log("beging val");
-             console.dir(value);
-             console.log("end val");
-
              if (core_name !== undefined) {
                name = core_name;
              }
 
-             target._reverse[name] = tinfo_str;
              target[name] = value;
+             for (const on_change of this._on_change_listeners) {
+               on_change();
+             }
              return true;
            }
     });
   }
 
-  _report_save(t: Type) {
-    return (atom_id: string) => {
-      console.log(
-          "Reporting save (id " + atom_id + ", t " + t.name + ") ");
-
-      const ps = [];
-      for (let field of Object.keys(this._reverse)) {
-        // For each field that was not saved by the reporting type
-        // we compute the update op to include unsaved fields
-
-        const value = this[field];
-        const owner = this._reverse[field];
-        if (this._t_equals(JSON.parse(owner), t)) {
-          continue;
-        }
-
-        console.log("Looking at " + field + " owned by " + owner);
-
-        // Remap up so that it makes sense to owner
-        for (const src_field of Object.keys(this._forwards[owner])) {
-          const dst_field = this._forwards[owner][src_field];
-          if (dst_field === field) {
-            field = src_field;
-          }
-        }
-        ps.push(this._get_up(field, value).then(up => {
-          console.log("got up");
-          console.dir(up);
-          console.log("got up end");
-          const ret = {};
-          ret[owner] = up;
-          return ret;
-        }));
-      }
-
-      return Promise.all(ps)
-          .then(values => {
-             const ups = {};
-             console.log("begin values");
-             console.dir(values);
-             console.log("end values");
-             for (const value of values) {
-               const owner = Object.keys(value)[0];
-               const up = value[owner];
-               if (ups[owner] === undefined) ups[owner] = {};
-               ups[owner] = Object.assign(ups[owner], up);
-             }
-             return ups;
-          })
-          .then(ups => {
-            console.log("got ups");
-            console.dir(ups);
-
-            const ps = [];
-            for (const owner of Object.keys(ups)) {
-              ps.push(
-                  this._helper
-                      .update_atom(
-                        JSON.parse(owner), atom_id, {$set: ups[owner]}));
-            }
-            return Promise.all(ps);
-          });
-    };
-  }
-
-  _save(atom_id: string): Promise<boolean> {
-    // pick some t to make the save
-    const t = JSON.parse(Object.keys(this._forwards)[0]);
-    console.log("picked t " + JSON.stringify(t) + " to do the save");
-    return this._helper.new_atom(t, atom_id, this);
-  }
-
-  _get_up(field: string, value: any): Promise<any> {
-    let ret;
-    if (value instanceof Array) {
-      console.log("it's an array");
-      return Promise
-        .all(value.map((arr_val, i) => this._get_up(field + "." + i, arr_val)))
-        .then(pvalues => {
-          console.log("pval begin");
-          console.dir(pvalues);
-          console.log("pval end");
-          return pvalues
-            .reduce((acc, pval) => Object.assign(acc, pval), {});
-        });
-    } else if (value instanceof Atom) {
-      console.log("it's an atom");
-      if (value.atom_id === "unsaved") {
-        const atom_id = uuid();
-        ret = value._save(atom_id).then(_ => {
-          console.log("returned from saving " + atom_id);
-          const up = {};
-          up[field] = atom_id;
-          return up;
-        });
-      } else {
-        const up = {};
-        up[field] = value.atom_id;
-        ret = Promise.resolve(up);
-      }
-    } else if (value instanceof Object) {
-      // can't have objects that are not atoms
-      console.log("ERROR: it's an object");
-    } else {
-      console.log("it's a basic value: " + value);
-      const up = {};
-      up[field] = value;
-      ret = Promise.resolve(up);
-    }
-    return ret;
-  }
-
-  _report_update(t: Type) {
-    return (update: any) => {
-      console.log(
-          "Reporting up (id " + this.atom_id + ") " +
-          JSON.stringify(update));
-    };
+  on_change(handler: () => void) {
+    this._on_change_listeners.push(handler);
   }
 
   // from a type to the core
@@ -238,192 +118,16 @@ export class Atom {
 
 @Injectable()
 export class ClientBus {
-  private _event_bus;
-
   constructor(
-      @Inject("fqelement") private _fqelement: string, private _http: Http,
-      @Inject("CompInfo") private _comp_info: CompInfo,
-      @Inject("locs") private _locs) {
-    this._event_bus = new EventBus();
-  }
+      @Inject("fqelement") private _fqelement: string,
+      @Inject("CompInfo") private _comp_info: CompInfo) {}
 
   new_atom(t: string): any {
-    return new Atom(new Helper(this._http, this._locs), this._comp_info)
+    return new Atom(this._comp_info)
       .adapt({name: t, fqelement: this._fqelement});
   }
 
-  report_save(atom_id: string, atom: any): Promise<boolean> {
-    if (!(atom instanceof Atom)) {
-      console.log("ERROR: reporting save on something that's not an atom");
-      console.dir(atom);
-      return Promise
-        .reject(new Error("reporting save on something that's not an atom"))
-        .then(_ => true);
-    }
-    return atom.report_save(atom_id);
-  }
-
-  report_update(update: any, atom: any): Promise<boolean> {
-    if (!(atom instanceof Atom)) {
-      console.log("ERROR: reporting update on something that's not an atom");
-      console.dir(atom);
-      return Promise
-        .reject(new Error("reporting update on something that's not an atom"))
-        .then(_ => true);
-    }
-    return atom.report_update(update);
-  }
-
-  on(name, listener) {
-    return this._event_bus.on(name, listener);
-  }
-
-  broadcast(name, args) {
-    return this._event_bus.broadcast(name, args);
-  }
-}
-
-class EventBus {
-  private _listeners = {};
-  private _events_subject;
-  private _events;
-
-  constructor() {
-    this._events_subject = new Rx.Subject();
-    this._events = Rx.Observable.from(this._events_subject);
-
-    this._events.subscribe(
-        e => {
-          if (this._listeners[e.name] === undefined) return;
-          for (const l of this._listeners[e.name]) {
-            l(e.args);
-          }
-        });
-  }
-
-  on(name, listener: (any) => void) {
-    if (this._listeners[name] === undefined) this._listeners[name] = [];
-    this._listeners[name].push(listener);
-  }
-
-  broadcast(name, args) {
-    this._events_subject.next({name: name, args: args});
-  }
-}
-
-
-class Helper {
-  constructor(private _http, private _locs) {}
-
-  new_atom(t: Type, atom_id: string, atom: Atom): Promise<boolean> {
-    return this._filter_atom(t, atom)
-      .then(filtered_atom => {
-        console.log("sending new atom to element");
-        const atom_str = JSON.stringify(filtered_atom).replace(/"/g, "\\\"");
-        console.log("t is " + t.name);
-        console.log("atom id is " + atom_id);
-        return this._post(this._locs[t.fqelement], `{
-           create_${t.name.toLowerCase()}(
-             atom_id: "${atom_id}",
-             create: "${atom_str}",
-             forward: true)
-         }`).then(_ => true);
-      });
-  }
-
-  // no filtering update
-  update_atom(t: Type, atom_id: string, update: any): Promise<boolean> {
-    console.log("sending up atom to composer");
-    const update_str = JSON.stringify(update).replace(/"/g, "\\\"");
-    return this._post(this._locs[t.fqelement], `{
-      update_${t.name.toLowerCase()}(
-        atom_id: "${atom_id}",
-        update: "${update_str}",
-        forward: true)
-    }`).then(_ => true);
-  }
-
-  private _filter_atom(t: Type, atom: Atom): Promise<any> {
-    return this._get_fields(t)
-      .then(fields => {
-        let filtered_atom = {};
-        for (const field of fields) {
-          const f = field.name;
-          const atom_f = atom[f];
-
-          let filtered_atom_f = {};
-          if (Array.isArray(atom_f)) {   // list type
-            filtered_atom_f = this._filter_list(atom_f);
-          } else if (typeof atom_f === "object") {  // object type
-            filtered_atom_f["atom_id"] = atom_f["atom_id"];
-          } else {  // scalar type
-            filtered_atom_f = atom_f;
-          }
-
-          filtered_atom[f] = filtered_atom_f;
-        }
-        console.log("BEFORE FILTER ");
-        console.dir(atom);
-        console.log("AFTER FILTER <" + JSON.stringify(filtered_atom) + ">");
-        return filtered_atom;
-      });
-  }
-
-  private _filter_list(l: Array<any>) {
-    return l.map(atom => {
-      let filtered_atom = {};
-      if (typeof atom === "object") {
-        filtered_atom["atom_id"] = atom["atom_id"];
-      } else if (atom["Symbol.iterator"] === "function") {
-        filtered_atom = this._filter_list(atom);
-      } else {
-        filtered_atom = atom;
-      }
-      return filtered_atom;
-    });
-  }
-
-  private _get_fields(t: Type): Promise<any> {
-    const loc = this._locs[t.fqelement];
-    const query = `{
-       __type(name: "${t.name}") {
-         name,
-         fields {
-           name,
-           type {
-             name,
-             kind,
-             ofType {
-               name,
-               kind
-             }
-           }
-         }
-       }
-     }`;
-
-    const query_str = encodeURIComponent(
-      query.replace(/ /g, "").replace(/\n/g, ""));
-
-    console.log("Sending to" + loc + " query " + query_str);
-    return this._http.get(loc + `/graphql?query=query+${query_str}`)
-      .map(res => res.json())
-      .map(json => json.data.__type.fields)
-      .toPromise();
-  }
-
-  private _post(loc, query): Promise<any> {
-    const query_str = query.replace(/ /g, "");
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-
-    console.log("Sending to" + loc + " query " + query_str);
-    return this._http
-      .post(
-          loc + "/dv-bus",
-          JSON.stringify({query: "mutation " + query_str}),
-          {headers: headers})
-      .map(res => res.json())
-      .toPromise();
+  new_primitive_atom(): any {
+    return new PrimitiveAtom();
   }
 }
