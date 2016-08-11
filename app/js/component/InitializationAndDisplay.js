@@ -549,7 +549,7 @@ function displayComponentInTable(cellId, widget, component) {
 
         showConfigOptions(type, cellId);
 
-        if (!selectedUserComponent.components.hasOwnProperty(row)) {
+        if (!selectedUserComponent.components[row]) {
             selectedUserComponent.components[row] = {};
         }
         selectedUserComponent.components[row][col] = component;

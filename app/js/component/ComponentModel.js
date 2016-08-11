@@ -168,7 +168,7 @@ function UserComponent(dimensions, name, id, version, author) {
 //}
 
 UserComponent.prototype.addComponent = function(component, row, col) {
-    if (!this.components.hasOwnProperty(row)) {
+    if (!this.components[row]) {
         this.components[row]={};
     }
     this.components[row][col]=component;
