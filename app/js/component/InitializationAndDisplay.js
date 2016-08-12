@@ -122,7 +122,7 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
         resetMenuOptions();
     });
 });
@@ -138,7 +138,7 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addComponent(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
         resetMenuOptions();
     });
 });
