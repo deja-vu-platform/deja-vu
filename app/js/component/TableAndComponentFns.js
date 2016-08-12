@@ -225,6 +225,20 @@ function createGridCell(row, col) {
     td.id = 'grid' + '_' + row + '_' + col;
     td.className = 'grid col' + '_' + col;
 
+    var sp = document.createElement('span');
+    sp.innerHTML = '<button type="button" class="btn btn-default add-row-btn btn-xs" id="add-row-btn'+'_'+row+'_'+col+'">+</button>';
+    var addRowButton = sp.innerHTML;
+
+    sp.innerHTML = '<button type="button" class="btn btn-default remove-row-btn btn-xs" id="remove-row-btn'+'_'+row+'_'+col+'">x</button>';
+    var removeRowButton =  sp.innerHTML;
+
+    sp.innerHTML = '<button type="button" class="btn btn-default add-col-btn btn-xs" id="add-col-btn'+'_'+row+'_'+col+'">+</button>';
+    var addColButton =  sp.innerHTML;
+
+    sp.innerHTML = '<button type="button" class="btn btn-default remove-col-btn btn-xs" id="remove-col-btn'+'_'+row+'_'+col+'">x</button>';
+    var removeColButton = sp.innerHTML;
+
+
     var sizeDisplayInner = '<input type="text" class="value" id="size-display-value_'+row+'_'+col+'">'+
         '<select class="select-unit btn-default btn btn-xs" id="size-display-select_'+row+'_'+col+'">'+
         '<option value="px" selected>px</option>'+
@@ -234,11 +248,28 @@ function createGridCell(row, col) {
     var sizeDisplayHeight = '<div class="size-display size-display-height input-single neutral" data-dimension="height">' + sizeDisplayInner + '</div>';
 
     if (row == 1){
-        $(td).append(sizeDisplayWidth);
+        $(td).append(sizeDisplayWidth).append(addColButton).append(removeColButton);
     }
     if (col == 1){
-        $(td).append(sizeDisplayHeight);
+        $(td).append(sizeDisplayHeight).append(addRowButton).append(removeRowButton);
     }
+
+    $(td).on('click', '.add-row-btn', function(){
+        console.log('clicked');
+        addNRows(1, getRowColFromId(this.id).row);
+    });
+
+    $(td).on('click', '.remove-row-btn', function(){
+        removeNRows(1, getRowColFromId(this.id).row);
+    });
+
+    $(td).on('click', '.add-col-btn', function(){
+        addNCols(1, getRowColFromId(this.id).col);
+    });
+
+    $(td).on('click', '.remove-col-btn', function(){
+        removeNCols(1, getRowColFromId(this.id).col);
+    });
 
     $(td).on('change', '.select-unit', function(){
         $('.select-unit').val($(this).val());
@@ -2255,6 +2286,7 @@ function addRowColAddRemoveButtons(componentId){
  */
 function addNRows(n, chosenRowNum) {
     addNRowsToEnd(n);
+    chosenRowNum = Number(chosenRowNum);
     var oldChosenRowLayout = selectedUserComponent.layout[chosenRowNum];
     var newLayout = selectedUserComponent.layout[numRows];
 
@@ -2535,6 +2567,7 @@ function addNRowsToEnd(n) {
  */
 function removeNRows(n, chosenRowNum) {
     // TODO: still need to deal with merged cells being deleted
+    chosenRowNum = Number(chosenRowNum);
     var cellsNeedingRowspanShortened = {};
 
     var firstLowerRowNotDeletedNum = chosenRowNum + n;
@@ -2800,6 +2833,8 @@ function removeNRowsFromEnd(n) {
  */
 function addNCols(n, chosenColNum) {
     addNColsToEnd(n);
+    chosenColNum = Number(chosenColNum);
+
     var oldChosenColLayout = {};
     var newLayout = {};
 
@@ -3085,6 +3120,7 @@ function removeNCols(n, chosenColNum) {
 
     // TODO: still need to deal with merged cells being deleted
 
+    chosenColNum = Number(chosenColNum);
     var cellsNeedingColspanShortened = {};
 
     var firstLowerColNotDeletedNum = chosenColNum + n;
