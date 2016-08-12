@@ -2581,7 +2581,7 @@ function removeNRows(n, chosenRowNum) {
                 var hcRow = Number(hcRowcol.row);
                 var hcCol = Number(hcRowcol.col);
                 if (hcRow == chosenRowNum){
-                    continue; // this has to be dealt with later
+                    continue; // this will be dealt with later (in the next iteration)
                 }
                 cellsNeedingRowspanShortened[hidingCellId] = '';
 
@@ -2618,6 +2618,7 @@ function removeNRows(n, chosenRowNum) {
                     layout.spans.row = oldRowspan-numOfRowsDeletedFromThisCell;
                     // since the rows are going to be flipped
                     selectedUserComponent.layout[firstLowerRowNotDeletedNum][hcCol] = layout;
+                    selectedUserComponent.components[firstLowerRowNotDeletedNum][hcCol] = selectedUserComponent.components[hcRow][hcCol];
                 }
             }
         }
@@ -3135,7 +3136,7 @@ function removeNCols(n, chosenColNum) {
                 var hcRow = Number(hcRowcol.row);
                 var hcCol = Number(hcRowcol.col);
                 if (hcCol == chosenColNum){
-                    continue; // this has to be dealt with later
+                    continue; // this will be dealt with later (in the next iteration)
                 }
                 cellsNeedingColspanShortened[hidingCellId] = '';
 
@@ -3176,6 +3177,7 @@ function removeNCols(n, chosenColNum) {
 
                     layout.spans.col = oldColspan-numOfColsDeletedFromThisCell;
                     selectedUserComponent.layout[hcRow][firstLowerColNotDeletedNum] = layout;
+                    selectedUserComponent.components[hcRow][firstLowerColNotDeletedNum] = selectedUserComponent.components[hcRow][hcCol];
 
                 }
 
