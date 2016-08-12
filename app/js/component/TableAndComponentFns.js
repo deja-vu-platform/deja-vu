@@ -2305,6 +2305,7 @@ function addNRows(n, chosenRowNum) {
                     mergeData.bottomRightCellId = newBottomRightId;
                     mergeData.bottomLeftCellId = newBottomLeftId;
 
+                    // note that this cell will not move
                     selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
                     $('#'+hidingCellIdDown).data('merged', mergeData);
 
@@ -2318,6 +2319,10 @@ function addNRows(n, chosenRowNum) {
         selectedUserComponent.components[row+n] = selectedUserComponent.components[row];
         selectedUserComponent.layout[row+n] = selectedUserComponent.layout[row];
         selectedUserComponent.components[row] = {};
+        for (var col = 1; col<=numCols; col++){
+            $('#cell'+'_'+(row+n)+'_'+col).data($('#cell'+'_'+row+'_'+col).data());
+        }
+
     }
 
     // for the new rows
@@ -2354,6 +2359,29 @@ function addNRows(n, chosenRowNum) {
                     selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
                     selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
                     selectedUserComponent.layout[row][col].merged.bottomRightCellId = bottomRightCellId;
+                    cell.data('merged', selectedUserComponent.layout[row][col].merged);
+                    for (var hiddenCellRow = row; hiddenCellRow <= row+rowspan-1; hiddenCellRow++){
+                        for (var hiddenCellCol = col; hiddenCellCol <= col+colspan-1; hiddenCellCol++){
+                            if (!(hiddenCellRow==row && hiddenCellCol == col)){
+                                var hidden = {
+                                    isHidden: true,
+                                    hidingCellId : 'cell'+'_'+row+'_'+col
+                                };
+                                $('#cell'+'_'+hiddenCellRow+'_'+hiddenCellCol).data('hidden', hidden);
+                                selectedUserComponent.layout[hiddenCellRow][hiddenCellCol].hidden = hidden;
+                            }
+                        }
+                    }
+                } else {
+                    var topLeftCellId = '';
+                    var topRightCellId = '';
+                    var bottomLeftCellId = '';
+                    var bottomRightCellId = '';
+                    selectedUserComponent.layout[row][col].merged.topLeftCellId = topLeftCellId;
+                    selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
+                    selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
+                    selectedUserComponent.layout[row][col].merged.bottomRightCellId = bottomRightCellId;
+
                     cell.data('merged', selectedUserComponent.layout[row][col].merged);
                 }
             }
@@ -2530,13 +2558,16 @@ function removeNRows(n, chosenRowNum) {
     for (var col = 1; col <= selectedUserComponent.dimensions.cols; col++) {
         var isHidden = selectedUserComponent.layout[chosenRowNum][col].hidden.isHidden;
         var hidingCellId = selectedUserComponent.layout[chosenRowNum][col].hidden.hidingCellId;
-
         if (isHidden){
             if (!(hidingCellId in cellsNeedingRowspanShortened)){
-                cellsNeedingRowspanShortened[hidingCellId] = '';
                 var hcRowcol = getRowColFromId(hidingCellId);
                 var hcRow = Number(hcRowcol.row);
                 var hcCol = Number(hcRowcol.col);
+                if (hcRow == chosenRowNum){
+                    continue; // this has to be dealt with later
+                }
+                cellsNeedingRowspanShortened[hidingCellId] = '';
+
                 var layout = selectedUserComponent.layout[hcRow][hcCol];
 
                 var bottomRow = getRowColFromId(layout.merged.bottomRightCellId).row;
@@ -2564,6 +2595,7 @@ function removeNRows(n, chosenRowNum) {
                 mergeData.bottomLeftCellId = newBottomLeftId;
 
                 layout.merged = mergeData;
+
                 selectedUserComponent.layout[hcRow][hcCol] = layout;
                 $('#'+hidingCellId).data('merged', mergeData);
 
@@ -2611,7 +2643,8 @@ function removeNRows(n, chosenRowNum) {
 
                     layout.merged = mergeData;
                     selectedUserComponent.layout[firstLowerRowNotDeletedNum][hcCol] = layout;
-                    $('#'+hidingCellId).data('merged', mergeData);
+                    // this will move
+                    $('#cell'+'_'+firstLowerRowNotDeletedNum+'_'+hcCol).data('merged', mergeData);
 
                 }
 
@@ -2622,9 +2655,13 @@ function removeNRows(n, chosenRowNum) {
     for (var row = firstLowerRowNotDeletedNum; row <= numRows; row++) { // to prevent dataloss
         selectedUserComponent.components[row-n] = selectedUserComponent.components[row];
         selectedUserComponent.layout[row-n] = selectedUserComponent.layout[row];
+        for (var col=1; col<=numCols; col++) {
+            $('#cell'+'_'+(row-n)+'_'+col).data($('#cell'+'_'+row+'_'+col).data());
+        }
+
     }
 
-    for (var row=1; row<=numRows; row++){
+    for (var row=1; row<=numRows-n; row++){
         for (var col=1; col<=numCols; col++) {
             var cellId = 'cell' + '_' + row + '_' + col;
             var cell = $('#' + cellId);
@@ -2648,6 +2685,30 @@ function removeNRows(n, chosenRowNum) {
                     selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
                     selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
                     selectedUserComponent.layout[row][col].merged.bottomRightCellId = bottomRightCellId;
+                    cell.data('merged', selectedUserComponent.layout[row][col].merged);
+                    for (var hiddenCellRow = row; hiddenCellRow <= row+rowspan-1; hiddenCellRow++){
+                        for (var hiddenCellCol = col; hiddenCellCol <= col+colspan-1; hiddenCellCol++){
+                            if (!(hiddenCellRow==row && hiddenCellCol == col)){
+                                var hidden = {
+                                    isHidden: true,
+                                    hidingCellId : 'cell'+'_'+row+'_'+col
+                                };
+                                $('#cell'+'_'+hiddenCellRow+'_'+hiddenCellCol).data('hidden', hidden);
+                                selectedUserComponent.layout[hiddenCellRow][hiddenCellCol].hidden = hidden;
+                            }
+                        }
+                    }
+
+                } else {
+                    var topLeftCellId = '';
+                    var topRightCellId = '';
+                    var bottomLeftCellId = '';
+                    var bottomRightCellId = '';
+                    selectedUserComponent.layout[row][col].merged.topLeftCellId = topLeftCellId;
+                    selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
+                    selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
+                    selectedUserComponent.layout[row][col].merged.bottomRightCellId = bottomRightCellId;
+
                     cell.data('merged', selectedUserComponent.layout[row][col].merged);
                 }
             }
@@ -2807,10 +2868,8 @@ function addNCols(n, chosenColNum) {
         newLayout[row] = selectedUserComponent.layout[row][numCols];
     }
 
-
     var cellsNeedingColspanExtended = {};
-
-
+    var squeeshed = false;
 
     // for chosenColNum - 1 and the chosenColNum, look for merged cells to fix
     for (var row = 1; row <= selectedUserComponent.dimensions.rows; row++) {
@@ -2821,6 +2880,7 @@ function addNCols(n, chosenColNum) {
 
         if ((isHiddenLeft && isHiddenRight)||(selectedUserComponent.layout[row][chosenColNum-1].merged.isMerged&&isHiddenRight)){
             if ((hidingCellIdRight==hidingCellIdLeft)|| 'cell'+'_'+row+'_'+(chosenColNum-1) == hidingCellIdRight){
+                squeeshed = true;
                 // there is always a hiding cell right
                 if (!(hidingCellIdRight in cellsNeedingColspanExtended)){
                     cellsNeedingColspanExtended[hidingCellIdRight] = '';
@@ -2838,7 +2898,7 @@ function addNCols(n, chosenColNum) {
                     var newBottomRightRow = Number(oldBottomRightRowcol.row);
                     var newBottomRightCol = Number(oldBottomRightRowcol.col)+n;
                     var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
-                    var oldTopRightId = mergeData.bottomLeftCellId;
+                    var oldTopRightId = mergeData.topRightCellId;
                     var oldTopRightRowcol = getRowColFromId(oldTopRightId);
                     var newTopRightRow = Number(oldTopRightRowcol.row);
                     var newTopRightCol = Number(oldTopRightRowcol.col)+n;
@@ -2847,6 +2907,7 @@ function addNCols(n, chosenColNum) {
                     mergeData.bottomRightCellId = newBottomRightId;
                     mergeData.topRightCellId = newTopRightId;
 
+                    // note this cell will not move
                     selectedUserComponent.layout[hcRow][hcCol].merged = mergeData;
                     $('#'+hidingCellIdRight).data('merged', mergeData);
 
@@ -2863,6 +2924,8 @@ function addNCols(n, chosenColNum) {
             selectedUserComponent.components[row][col + n] = selectedUserComponent.components[row][col];
             selectedUserComponent.layout[row][col + n] = selectedUserComponent.layout[row][col];
             delete selectedUserComponent.components[row][col];
+            $('#cell'+'_'+row+'_'+(col+n)).data($('#cell'+'_'+row+'_'+col).data());
+
         }
     }
 
@@ -2870,7 +2933,9 @@ function addNCols(n, chosenColNum) {
     for (var col = chosenColNum; col <= chosenColNum+n-1; col++) {
         for (var row = 1; row<=numRows; row++){
             selectedUserComponent.layout[row][col] = newLayout[row];
-            selectedUserComponent.layout[row][col].hidden = oldChosenColLayout[row].hidden;
+            if (squeeshed){
+                selectedUserComponent.layout[row][col].hidden = oldChosenColLayout[row].hidden;
+            }
         }
     }
 
@@ -2898,6 +2963,29 @@ function addNCols(n, chosenColNum) {
                     selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
                     selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
                     selectedUserComponent.layout[row][col].merged.bottomRightCellId = bottomRightCellId;
+                    cell.data('merged', selectedUserComponent.layout[row][col].merged);
+                    for (var hiddenCellRow = row; hiddenCellRow <= row+rowspan-1; hiddenCellRow++){
+                        for (var hiddenCellCol = col; hiddenCellCol <= col+colspan-1; hiddenCellCol++){
+                            if (!(hiddenCellRow==row && hiddenCellCol == col)){
+                                var hidden = {
+                                    isHidden: true,
+                                    hidingCellId : 'cell'+'_'+row+'_'+col
+                                };
+                                $('#cell'+'_'+hiddenCellRow+'_'+hiddenCellCol).data('hidden', hidden);
+                                selectedUserComponent.layout[hiddenCellRow][hiddenCellCol].hidden = hidden;
+                            }
+                        }
+                    }
+                } else {
+                    var topLeftCellId = '';
+                    var topRightCellId = '';
+                    var bottomLeftCellId = '';
+                    var bottomRightCellId = '';
+                    selectedUserComponent.layout[row][col].merged.topLeftCellId = topLeftCellId;
+                    selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
+                    selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
+                    selectedUserComponent.layout[row][col].merged.bottomRightCellId = bottomRightCellId;
+
                     cell.data('merged', selectedUserComponent.layout[row][col].merged);
                 }
             }
@@ -3071,10 +3159,14 @@ function removeNCols(n, chosenColNum) {
 
         if (isHidden){
             if (!(hidingCellId in cellsNeedingColspanShortened)){
-                cellsNeedingColspanShortened[hidingCellId] = '';
                 var hcRowcol = getRowColFromId(hidingCellId);
                 var hcRow = Number(hcRowcol.row);
                 var hcCol = Number(hcRowcol.col);
+                if (hcCol == chosenColNum){
+                    continue; // this has to be dealt with later
+                }
+                cellsNeedingColspanShortened[hidingCellId] = '';
+
                 var layout = selectedUserComponent.layout[hcRow][hcCol];
 
                 var rightCol = getRowColFromId(layout.merged.bottomRightCellId).col;
@@ -3092,17 +3184,18 @@ function removeNCols(n, chosenColNum) {
                 var newBottomRightRow = Number(oldBottomRightRowcol.row)-numOfColsDeletedFromThisCell;
                 var newBottomRightCol = oldBottomRightRowcol.col;
                 var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
-                var oldBottomLeftId = mergeData.bottomLeftCellId;
-                var oldBottomLeftRowcol = getRowColFromId(oldBottomLeftId);
-                var newBottomLeftRow = Number(oldBottomLeftRowcol.row)-numOfColsDeletedFromThisCell;
-                var newBottomLeftCol = Number(oldBottomLeftRowcol.col);
-                var newBottomLeftId = 'cell'+'_'+ newBottomLeftRow + '_' + newBottomLeftCol;
+
+                var oldTopRightId = mergeData.topRightCellId;
+                var oldTopRightRowcol = getRowColFromId(oldTopRightId);
+                var newTopRightRow = oldTopRightRowcol.row;
+                var newTopRightCol = Number(oldBottomRightRowcol.col)-numOfColsDeletedFromThisCell;
+                var newTopRightId = 'cell'+'_'+ newTopRightRow + '_' + newTopRightCol;
 
                 mergeData.bottomRightCellId = newBottomRightId;
-                mergeData.bottomLeftCellId = newBottomLeftId;
+                mergeData.topRightCellId = newTopRightId;
 
                 layout.merged = mergeData;
-                selectedUserComponent.layout[hcRow][firstLowerColNotDeletedNum] = layout;
+                selectedUserComponent.layout[hcRow][hcCol] = layout;
                 $('#'+hidingCellId).data('merged', mergeData);
 
             }
@@ -3132,7 +3225,7 @@ function removeNCols(n, chosenColNum) {
 
 
                     $('#'+hidingCellId).attr('colspan', oldColspan-numOfColsDeletedFromThisCell);
-                    selectedUserComponent.layout[hcRow][hcCol].spans.col = oldColspan-numOfColsDeletedFromThisCell;
+                    layout.spans.col = oldColspan-numOfColsDeletedFromThisCell;
 
                     var mergeData = $('#'+hidingCellId).data('merged');
                     var oldBottomRightId = mergeData.bottomRightCellId;
@@ -3141,7 +3234,7 @@ function removeNCols(n, chosenColNum) {
                     var newBottomRightCol = Number(oldBottomRightRowcol.col)-numOfColsDeletedFromThisCell;
                     var newBottomRightId = 'cell'+'_'+ newBottomRightRow + '_' + newBottomRightCol;
 
-                    var oldTopRightId = mergeData.bottomLeftCellId;
+                    var oldTopRightId = mergeData.topRightCellId;
                     var oldTopRightRowcol = getRowColFromId(oldTopRightId);
                     var newTopRightRow = oldTopRightRowcol.row;
                     var newTopRightCol = Number(oldBottomRightRowcol.col)-numOfColsDeletedFromThisCell;
@@ -3151,14 +3244,16 @@ function removeNCols(n, chosenColNum) {
                     mergeData.topRightCellId = newTopRightId;
 
                     layout.merged = mergeData;
-                    selectedUserComponent.layout[firstLowerColNotDeletedNum][hcCol] = layout;
-                    $('#'+hidingCellId).data('merged', mergeData);
+                    selectedUserComponent.layout[hcRow][firstLowerColNotDeletedNum] = layout;
+                    // this will move
+                    $('#cell'+'_'+hcRow+'_'+firstLowerColNotDeletedNum).data('merged', mergeData);
 
                 }
 
             }
         }
     }
+    // move
     for (var row=1; row<=numRows; row++) {
         if (!selectedUserComponent.components[row]){
             selectedUserComponent.components[row] = {};
@@ -3167,11 +3262,12 @@ function removeNCols(n, chosenColNum) {
             selectedUserComponent.components[row][col] = selectedUserComponent.components[row][col + n];
             selectedUserComponent.layout[row][col] = selectedUserComponent.layout[row][col + n];
             selectedUserComponent.components[row][col + n] = null;
+            $('#cell'+'_'+row+'_'+col).data($('#cell'+'_'+row+'_'+(col+n)).data());
         }
     }
 
     for (var row=1; row<=numRows; row++){
-        for (var col=1; col<=numCols; col++) {
+        for (var col=1; col<=numCols-n; col++) {
             var cellId = 'cell' + '_' + row + '_' + col;
             var cell = $('#' + cellId);
             var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
@@ -3190,6 +3286,29 @@ function removeNCols(n, chosenColNum) {
                     var topRightCellId = 'cell'+'_'+row+'_'+(col+colspan-1);
                     var bottomLeftCellId = 'cell'+'_'+(row+rowspan-1)+'_'+col;
                     var bottomRightCellId = 'cell'+'_'+(row+rowspan-1)+'_'+(col+colspan-1);
+                    selectedUserComponent.layout[row][col].merged.topLeftCellId = topLeftCellId;
+                    selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
+                    selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
+                    selectedUserComponent.layout[row][col].merged.bottomRightCellId = bottomRightCellId;
+
+                    cell.data('merged', selectedUserComponent.layout[row][col].merged);
+                    for (var hiddenCellRow = row; hiddenCellRow <= row+rowspan-1; hiddenCellRow++){
+                        for (var hiddenCellCol = col; hiddenCellCol <= col+colspan-1; hiddenCellCol++){
+                            if (!(hiddenCellRow==row && hiddenCellCol == col)){
+                                var hidden = {
+                                    isHidden: true,
+                                    hidingCellId : 'cell'+'_'+row+'_'+col
+                                };
+                                $('#cell'+'_'+hiddenCellRow+'_'+hiddenCellCol).data('hidden', hidden);
+                                selectedUserComponent.layout[hiddenCellRow][hiddenCellCol].hidden = hidden;
+                            }
+                        }
+                    }
+                } else {
+                    var topLeftCellId = '';
+                    var topRightCellId = '';
+                    var bottomLeftCellId = '';
+                    var bottomRightCellId = '';
                     selectedUserComponent.layout[row][col].merged.topLeftCellId = topLeftCellId;
                     selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
                     selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
@@ -3412,11 +3531,11 @@ function deleteUserComponent(userComponentId){
     if (selectedProject.numComponents === 1){
         return; //don't delete the last one TODO is the the right way to go?
     }
-    selectedProject.removeComponent(userComponentId);
     if (userComponentId == selectedUserComponent.meta.id){ // strings will also do
         var otherIds = Object.keys(selectedProject.components);
         selectedUserComponent = selectedProject.components[otherIds[0]];
-        $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").attr('id', 'selected');
+        $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
+        $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         loadTable(selectedUserComponent, 1);
     }
     if (userComponentId == selectedProject.mainComponents.indexId){
@@ -3425,6 +3544,8 @@ function deleteUserComponent(userComponentId){
     $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
     $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
 
+    selectedProject.removeComponent(userComponentId);
+    $('#table-grid-container_'+userComponentId).remove();
 }
 
 function openDeleteUserComponentConfirmDialogue(userComponentId){
