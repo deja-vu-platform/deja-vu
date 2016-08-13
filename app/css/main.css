@@ -815,3 +815,21 @@ opacity: 1;
     right: 5px;
 }
 
+
+
+#color-picker-container{
+    position: absolute;
+    display: none;
+    top: 170px;
+    left: 370px;
+    border: 1px solid black;
+    z-index: 100;
+    background: white;
+
+}
+
+#color-picker-dismiss{
+    position: absolute;
+    top: -22px;
+    right: -18px;
+}

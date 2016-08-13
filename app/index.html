@@ -263,9 +263,43 @@
     </div>
 
     <div class="style">
-
+        <div class="style-text">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open" data-dropdownid="style-text">
+                    Text
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content dropdown-target" data-dropdownid="style-text">
+                <div>
+                    <span>Color</span>
+                    <input type="text" id="pick-color-text-input">
+                    <button class="btn btn-xs btn-default pick-color" id="pick-color-text">Pick Color</button>
+                </div>
+                <div>
+                    <span>Size</span>
+                    <input type="text">
+                </div>
+                <div>
+                    <span>Font</span>
+                    <input type="text">
+                </div>
+                <!--<div class="style-group">-->
+                    <!--<span class="style-group-header">Reset</span>-->
+                    <!--<button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>-->
+                <!--</div>-->
+            </div>
+        </div>
     </div>
 </div>
+
+<div id="color-picker-container">
+    <canvas width="400" height="400" id="color-picker"></canvas>
+    <button class="btn btn-xs btn-default" id="color-picker-dismiss">
+        <span>x</span>
+    </button>
+</div>
+
 <div class="component-options">
     <div class="component-name-container">
         <div class="component-name"></div>
