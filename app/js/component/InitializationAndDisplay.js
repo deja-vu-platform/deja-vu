@@ -384,6 +384,10 @@ function setComponentOptions(component){
 
         });
 
+    $('.component-options #btn-download-component').unbind().on('click', function(){
+        downloadHTML();
+    });
+
     // clear all
     $('.component-options #btn-clear-all')
         .unbind()
