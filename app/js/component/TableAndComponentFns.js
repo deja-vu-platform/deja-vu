@@ -2624,6 +2624,8 @@ function removeNRows(n, chosenRowNum) {
         }
     }
 
+
+    // flip
     for (var row = firstLowerRowNotDeletedNum; row <= numRows; row++) { // to prevent dataloss
         selectedUserComponent.components[row-n] = selectedUserComponent.components[row];
         selectedUserComponent.layout[row-n] = selectedUserComponent.layout[row];
@@ -2633,8 +2635,30 @@ function removeNRows(n, chosenRowNum) {
 
     }
 
+    // for the deleted rows, reset the layout and components
+    for (var col=1; col<=numCols; col++){
+        delete selectedUserComponent.components[row];
+        for (var row=numRows-n+1; row<=numRows; row++) {
+            selectedUserComponent.layout[row][col] = {
+                spans:{row:1,col:1},
+                merged:{isMerged: false,
+                    topLeftCellId: '',
+                    topRightCellId: '',
+                    bottomLeftCellId: '',
+                    bottomRightCellId: ''},
+                hidden:{isHidden: false, hidingCellId: ''},
+                // ratio will be measured in %
+                ratio: {cell:{width: 0, height: 0},
+                    grid:{width: 1/numCols, height: 1/numRows}}
+            };
+        }
+    }
+
     for (var row=1; row<=numRows-n; row++){
         for (var col=1; col<=numCols; col++) {
+            // at this point, the isHidden, isMerged, and span details are correct
+            // cellIds have to be updated, and the data in the elements have to be updated
+
             var cellId = 'cell' + '_' + row + '_' + col;
             var cell = $('#' + cellId);
             var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
@@ -2659,6 +2683,7 @@ function removeNRows(n, chosenRowNum) {
                     selectedUserComponent.layout[row][col].merged.topRightCellId = topRightCellId;
                     selectedUserComponent.layout[row][col].merged.bottomLeftCellId = bottomLeftCellId;
                     selectedUserComponent.layout[row][col].merged.bottomRightCellId = bottomRightCellId;
+
                     cell.data('merged', selectedUserComponent.layout[row][col].merged);
                     for (var hiddenCellRow = row; hiddenCellRow <= row+rowspan-1; hiddenCellRow++){
                         for (var hiddenCellCol = col; hiddenCellCol <= col+colspan-1; hiddenCellCol++){
@@ -2667,12 +2692,21 @@ function removeNRows(n, chosenRowNum) {
                                     isHidden: true,
                                     hidingCellId : 'cell'+'_'+row+'_'+col
                                 };
+                                var merged = {
+                                    isMerged: false,
+                                    topLeftCellId: '',
+                                    toRightCellId: '',
+                                    bottomLeftCellId: '',
+                                    bottomRightCellId: '',
+                                }
                                 $('#cell'+'_'+hiddenCellRow+'_'+hiddenCellCol).data('hidden', hidden);
                                 selectedUserComponent.layout[hiddenCellRow][hiddenCellCol].hidden = hidden;
+                                $('#cell'+'_'+hiddenCellRow+'_'+hiddenCellCol).data('merged', merged);
+                                selectedUserComponent.layout[hiddenCellRow][hiddenCellCol].merged = merged;
+
                             }
                         }
                     }
-
                 } else {
                     var topLeftCellId = '';
                     var topRightCellId = '';
@@ -3192,13 +3226,36 @@ function removeNCols(n, chosenColNum) {
         for (var col = chosenColNum; col <= numCols-n; col++) {
             selectedUserComponent.components[row][col] = selectedUserComponent.components[row][col + n];
             selectedUserComponent.layout[row][col] = selectedUserComponent.layout[row][col + n];
-            selectedUserComponent.components[row][col + n] = null;
             //$('#cell'+'_'+row+'_'+col).data($('#cell'+'_'+row+'_'+(col+n)).data());
+        }
+    }
+
+    // for the deleted cols, reset the layout and components
+    for (var row=1; row<=numRows; row++){
+        for (var col=numCols-n+1; col<=numCols; col++) {
+            if (selectedUserComponent.components[row]){
+                delete selectedUserComponent.components[row][col];
+            }
+            selectedUserComponent.layout[row][col] = {
+                spans:{row:1,col:1},
+                merged:{isMerged: false,
+                    topLeftCellId: '',
+                    topRightCellId: '',
+                    bottomLeftCellId: '',
+                    bottomRightCellId: ''},
+                hidden:{isHidden: false, hidingCellId: ''},
+                // ratio will be measured in %
+                ratio: {cell:{width: 0, height: 0},
+                    grid:{width: 1/numCols, height: 1/numRows}}
+            };
         }
     }
 
     for (var row=1; row<=numRows; row++){
         for (var col=1; col<=numCols-n; col++) {
+            // at this point, the isHidden, isMerged, and span details are correct
+            // cellIds have to be updated, and the data in the elements have to be updated
+
             var cellId = 'cell' + '_' + row + '_' + col;
             var cell = $('#' + cellId);
             var isHidden = selectedUserComponent.layout[row][col].hidden.isHidden;
@@ -3232,8 +3289,18 @@ function removeNCols(n, chosenColNum) {
                                     isHidden: true,
                                     hidingCellId : 'cell'+'_'+row+'_'+col
                                 };
+                                var merged = {
+                                    isMerged: false,
+                                    topLeftCellId: '',
+                                    toRightCellId: '',
+                                    bottomLeftCellId: '',
+                                    bottomRightCellId: '',
+                                }
                                 $('#cell'+'_'+hiddenCellRow+'_'+hiddenCellCol).data('hidden', hidden);
                                 selectedUserComponent.layout[hiddenCellRow][hiddenCellCol].hidden = hidden;
+                                $('#cell'+'_'+hiddenCellRow+'_'+hiddenCellCol).data('merged', merged);
+                                selectedUserComponent.layout[hiddenCellRow][hiddenCellCol].merged = merged;
+
                             }
                         }
                     }
