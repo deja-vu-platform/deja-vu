@@ -2073,13 +2073,20 @@ $('#color-picker').click(function(event){
     //    'background-color': '#' + hex,
     //});
 
-    if (whoseColorToChange == 'text'){
-        $('#pick-color-text-input').val('#' + hex).css({
+    if (whoseColorToChange == 'overall-text'){
+        $('#pick-color-overall-text-input').val('#' + hex).css({
             'background-color': '#' + hex,
         });
         $('.display-component').css({
             color: '#' + hex,
         })
+    } else if (whoseColorToChange == 'overall-bg'){
+        $('#pick-color-overall-bg-input').val('#' + hex).css({
+            'background-color': '#' + hex,
+        });
+        $('#main-cell-table').css({
+            'background-color': '#' + hex,
+        });
     }
 
     $('#color-picker-container').hide();
@@ -2088,8 +2095,10 @@ $('#color-picker').click(function(event){
 var whoseColorToChange = '';
 
 $('.pick-color').click(function(){
-    if (this.id == 'pick-color-text'){
-        whoseColorToChange = 'text';
+    if (this.id == 'pick-color-overall-text'){
+        whoseColorToChange = 'overall-text';
+    } else if (this.id == 'pick-color-overall-bg'){
+        whoseColorToChange = 'overall-bg';
     }
     $('#color-picker-container').show();
 });

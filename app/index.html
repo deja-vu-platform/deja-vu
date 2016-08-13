@@ -265,17 +265,34 @@
     <div class="style">
         <div class="style-text">
             <div class="header">
+                <span class="dropdown-trigger dropdown-open" data-dropdownid="style-color">
+                    Color
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content dropdown-target" data-dropdownid="style-color">
+                <div>
+                    <span>Text</span>
+                    <input type="text" id="pick-color-overall-text-input">
+                    <button class="btn btn-xs btn-default pick-color" id="pick-color-overall-text">Pick Color</button>
+                </div>
+                <div>
+                    <span>Background</span>
+                    <input type="text" id="pick-color-overall-bg-input">
+                    <button class="btn btn-xs btn-default pick-color" id="pick-color-overall-bg">Pick Color</button>
+                </div>
+                <!--<div class="style-group">-->
+                <!--<span class="style-group-header">Reset</span>-->
+                <!--<button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>-->
+                <!--</div>-->
+            </div>
+            <div class="header">
                 <span class="dropdown-trigger dropdown-open" data-dropdownid="style-text">
                     Text
                     <span class="glyphicon glyphicon-triangle-bottom"></span>
                 </span>
             </div>
             <div class="content dropdown-target" data-dropdownid="style-text">
-                <div>
-                    <span>Color</span>
-                    <input type="text" id="pick-color-text-input">
-                    <button class="btn btn-xs btn-default pick-color" id="pick-color-text">Pick Color</button>
-                </div>
                 <div>
                     <span>Size</span>
                     <input type="text">
@@ -284,10 +301,6 @@
                     <span>Font</span>
                     <input type="text">
                 </div>
-                <!--<div class="style-group">-->
-                    <!--<span class="style-group-header">Reset</span>-->
-                    <!--<button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>-->
-                <!--</div>-->
             </div>
         </div>
     </div>
