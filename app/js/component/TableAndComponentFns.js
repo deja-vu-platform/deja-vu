@@ -3684,12 +3684,11 @@ function createDownloadPreview(){
     scaleTableToZoom();
 
     $('#download-preview-area').html('').css({
-        display: 'none',
-        position: 'absolute',
+        position: 'relative',
         'text-align': 'center',
-
+        margin: 'auto',
+        width: $('#main-grid-table').css('width'),
     });
-
 
     $('.cell').each(function(){
         var add = false;
@@ -3720,6 +3719,7 @@ function createDownloadPreview(){
                 'font-weight': 400,
                 margin: 0,
             });
+            displayComponent.attr('contenteditable', false);
             add = true;
         } else {
             var displayComponent = $(this).find('.display-component').clone(true, true);
@@ -3742,7 +3742,7 @@ function createDownloadPreview(){
     currentZoom = oldZoom;
     scaleTableToZoom();
 
-    return $('#download-preview-area').html();
+    return $('#download-preview-area-container').html();
 }
 
 function downloadHTML(){

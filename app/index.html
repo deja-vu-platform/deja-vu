@@ -263,7 +263,12 @@
     </div>
 
     <div class="style">
-        <div class="style-text">
+        <div class="header">
+            <span id="style-overall-vs-specific">
+                Overall
+            </span>
+        </div>
+        <div class="style-color">
             <div class="header">
                 <span class="dropdown-trigger dropdown-open" data-dropdownid="style-color">
                     Color
@@ -286,6 +291,8 @@
                 <!--<button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>-->
                 <!--</div>-->
             </div>
+        </div>
+        <div class="style-text">
             <div class="header">
                 <span class="dropdown-trigger dropdown-open" data-dropdownid="style-text">
                     Text
@@ -294,11 +301,16 @@
             </div>
             <div class="content dropdown-target" data-dropdownid="style-text">
                 <div>
-                    <span>Size</span>
+                    <span>Font family</span>
+                    <input type="text">
+                    <!--Do a dropdown-->
+                </div>
+                <div>
+                    <span>Font Size (px)</span>
                     <input type="text">
                 </div>
                 <div>
-                    <span>Font</span>
+                    <span>Font Weight</span>
                     <input type="text">
                 </div>
             </div>
@@ -369,7 +381,9 @@
     <div id="selected-screen-size"></div>
 </div>
 
-<div id="download-preview-area"></div>
+<div id="download-preview-area-container">
+    <div id="download-preview-area"></div>
+</div>
 
 <div id="zoom-control">
     <button id="zoom-control-minimize-btn" class="btn btn-default">

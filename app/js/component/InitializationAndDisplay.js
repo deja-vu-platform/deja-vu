@@ -7,6 +7,8 @@ var addedCliches;
 var navZoom = .1;
 var navDragging = false;
 
+var innerComponentFocused = false;
+
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
 
@@ -1748,6 +1750,7 @@ function switchToInnerComponentFocusMode(row, col){
 
     $('#inner-component-focus #display-cell').removeData();
 
+    $('#style-overall-vs-specific').text('Specific, Row:'+row+' Col:'+col);
 
     var componentToShow = selectedUserComponent.components[row][col];
     var type = componentToShow.type;
@@ -2015,6 +2018,10 @@ function toggleInnerComponentVisibility(showAll){
         $('#zoom-control').css('display', 'block');
         $('#zoom-nav-container').css('display', 'block');
 
+        $('#style-overall-vs-specific').text('Overall');
+        innerComponentFocused = false;
+
+
     } else {
         $('#inner-component-focus').css('display', 'block');
         $('#outer-container').css('display', 'none');
@@ -2024,6 +2031,8 @@ function toggleInnerComponentVisibility(showAll){
 
         $('#zoom-control').css('display', 'none');
         $('#zoom-nav-container').css('display', 'none');
+
+        innerComponentFocused = true;
 
     }
 }
@@ -2073,20 +2082,24 @@ $('#color-picker').click(function(event){
     //    'background-color': '#' + hex,
     //});
 
-    if (whoseColorToChange == 'overall-text'){
-        $('#pick-color-overall-text-input').val('#' + hex).css({
-            'background-color': '#' + hex,
-        });
-        $('.display-component').css({
-            color: '#' + hex,
-        })
-    } else if (whoseColorToChange == 'overall-bg'){
-        $('#pick-color-overall-bg-input').val('#' + hex).css({
-            'background-color': '#' + hex,
-        });
-        $('#main-cell-table').css({
-            'background-color': '#' + hex,
-        });
+    if (innerComponentFocused){
+
+    } else {
+        if (whoseColorToChange == 'overall-text'){
+            $('#pick-color-overall-text-input').val('#' + hex).css({
+                'background-color': '#' + hex,
+            });
+            $('.display-component').css({
+                color: '#' + hex,
+            })
+        } else if (whoseColorToChange == 'overall-bg'){
+            $('#pick-color-overall-bg-input').val('#' + hex).css({
+                'background-color': '#' + hex,
+            });
+            $('#main-cell-table').css({
+                'background-color': '#' + hex,
+            });
+        }
     }
 
     $('#color-picker-container').hide();

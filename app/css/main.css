@@ -833,3 +833,11 @@ opacity: 1;
     top: -22px;
     right: -18px;
 }
+
+
+/* DOWNLOAD STUFF*/
+
+#download-preview-area-container{
+    display: none;
+    position: absolute;
+}
