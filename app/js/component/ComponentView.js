@@ -136,8 +136,8 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties) {
     } else {
         if (type === 'image') {
             displayComponent.css({
-                'max-height': cellHeight + 'px',
-                'max-width': cellWidth + 'px',
+                'max-height': cellHeight/zoom + 'px',
+                'max-width': cellWidth/zoom + 'px',
                 height: 'auto',
                 width: 'auto',
                 'vertical-align':'top',
@@ -145,6 +145,7 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties) {
                 'padding-left': paddingPx.left + 'px',
                 'padding-bottom': paddingPx.bottom + 'px',
                 'padding-right': paddingPx.right + 'px',
+                zoom: zoom,
             });
         } else {
             // TODO other types?
