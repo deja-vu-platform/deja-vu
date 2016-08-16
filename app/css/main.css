@@ -69,8 +69,8 @@
 
 .merge-toggle-out{
     position: absolute;
-    top: 2px;
-    right: 2px;
+    bottom: 10px;
+    right: 10px;
 }
 
 .dropped .merge-toggle-out{
@@ -787,4 +787,57 @@ opacity: 1;
 
 #resize-to-inputs-done-cancel{
     display: none;
+}
+
+.add-row-btn, .remove-row-btn, .add-col-btn, .remove-col-btn{
+    position: absolute;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.add-row-btn{
+    left: -60px;
+    top: -5px;
+}
+
+.remove-row-btn{
+    left: -60px;
+    bottom: 49%;
+}
+
+.add-col-btn{
+    top: -60px;
+    left: -5px;
+}
+
+.remove-col-btn{
+    top: -60px;
+    right: 49%;
+}
+
+
+
+#color-picker-container{
+    position: absolute;
+    display: none;
+    top: 170px;
+    left: 370px;
+    border: 1px solid black;
+    z-index: 100;
+    background: white;
+
+}
+
+#color-picker-dismiss{
+    position: absolute;
+    top: -22px;
+    right: -18px;
+}
+
+
+/* DOWNLOAD STUFF*/
+
+#download-preview-area-container{
+    display: none;
+    position: absolute;
 }

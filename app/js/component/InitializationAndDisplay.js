@@ -7,6 +7,8 @@ var addedCliches;
 var navZoom = .1;
 var navDragging = false;
 
+var innerComponentFocused = false;
+
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
 
@@ -56,7 +58,7 @@ $(function () {
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent);
 
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
@@ -83,7 +85,7 @@ $(function () {
             }
         }
         window.setTimeout(function(){
-            loadTable(selectedUserComponent);
+            loadTable(selectedUserComponent, 1);
         }, 1);
 
     }
@@ -122,7 +124,7 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
         resetMenuOptions();
     });
 });
@@ -138,7 +140,7 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addComponent(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id);
+        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
         resetMenuOptions();
     });
 });
@@ -147,7 +149,7 @@ $('#new-main-component-btn').click(function(){
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
     selectedProject.addComponent(selectedUserComponent);
-    loadTable(selectedUserComponent);
+    loadTable(selectedUserComponent, 1);
     displayNewComponentInUserComponentList(selectedUserComponent.meta.name,selectedUserComponent.meta.id);
     resetMenuOptions();
 });
@@ -260,7 +262,7 @@ $('.components').on('click', '.component-name-container', function () {
         disableAllComponentDomElementsExcept(selectedUserComponent.meta.id);
 
         if ($('#table-grid-container'+'_'+componentId).length===0){
-            loadTable(selectedUserComponent);
+            loadTable(selectedUserComponent, 1);
         } else {
             toggleInnerComponentVisibility(true);
             enableSpecificComponentDomElements(selectedUserComponent.meta.id);
@@ -380,9 +382,13 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            loadTable(selectedUserComponent);
+            loadTable(selectedUserComponent, 1);
 
         });
+
+    $('.component-options #btn-download-component').unbind().on('click', function(){
+        downloadHTML();
+    });
 
     // clear all
     $('.component-options #btn-clear-all')
@@ -443,7 +449,7 @@ function setUpComponentOptionsIndexPageToggle(){
     }
 }
 
-/** ** ** ** ** ** Component Adding to Project and Display helpers ** ** ** ** ** ** ** ** ** **/
+/** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
 
 function resizeViewportToFitWindow(){
     var windowWidth = $('html').width();
@@ -549,7 +555,7 @@ function displayComponentInTable(cellId, widget, component) {
 
         showConfigOptions(type, cellId);
 
-        if (!selectedUserComponent.components.hasOwnProperty(row)) {
+        if (!selectedUserComponent.components[row]) {
             selectedUserComponent.components[row] = {};
         }
         selectedUserComponent.components[row][col] = component;
@@ -557,14 +563,14 @@ function displayComponentInTable(cellId, widget, component) {
         // note: no padding here because this is a new component we are adding
         // also note: no properties because of the same reason
         var padding = {top: 0, left: 0, bottom: 0, right: 0};
-        selectedUserComponent.layout[row][col].ratio.padding = padding;
+        selectedUserComponent.components[row][col].padding = padding;
 
         if (type === 'label') {
-            Display(cellId, type, getHTML[type]("Type text here..."), currentZoom, padding);
+            display(cellId, type, getHTML[type]("Type text here..."), currentZoom, padding);
         } else if (type === 'panel') {
-            Display(cellId, type, getHTML[type]({heading: "Type heading...", content: "Type content..."}), currentZoom, padding);
+            display(cellId, type, getHTML[type]({heading: "Type heading...", content: "Type content..."}), currentZoom, padding);
         } else {
-            Display(cellId, type, getHTML[type](), currentZoom, padding);
+            display(cellId, type, getHTML[type](), currentZoom, padding);
             triggerEdit(cellId, true); // since this is a new component, show edit options
         }
 
@@ -578,10 +584,10 @@ function displayComponentInTable(cellId, widget, component) {
         }
         // display requires widget to be placed before display happens
 
-        var padding = selectedUserComponent.layout[row][col].ratio.padding;
-        var properties = selectedUserComponent.components[row][col].properties;
+        var padding = selectedUserComponent.components[row][col].padding;
+        var properties = component.properties;
 
-        Display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding, properties);
+        display(cellId, type, getHTML[type](component.components[type]), currentZoom, padding, properties);
 
         triggerEdit(cellId, false); // no need to show edit options
 
@@ -607,23 +613,29 @@ function deleteComponentFromUserComponentAndFromView(cellId) {
 
     if (selectedUserComponent.components[row]) {
         if (selectedUserComponent.components[row][col]) {
-
             delete selectedUserComponent.components[row][col];
-            var cell = $('#cell' + '_' + row + '_' + col).get(0);
-
-            $(cell).find('.config-btns').remove();
-            $(cell).find('.tooltip').remove();
-            $(cell).find('.label-container').remove();
-            $(cell).find('.display-component').remove();
-            $(cell).find('.widget').remove();
-
-            resetDroppabilityAt(cellId);
-            updateBitmap(false);
-
         }
     }
+    deleteComponentFromView(cellId);
+    updateBitmap(false);
 
 }
+function deleteComponentFromView(cellId) {
+    var rowcol = getRowColFromId(cellId);
+    var row = rowcol.row;
+    var col = rowcol.col;
+
+    var cell = $('#cell' + '_' + row + '_' + col).get(0);
+
+    $(cell).find('.config-btns').remove();
+    $(cell).find('.tooltip').remove();
+    $(cell).find('.label-container').remove();
+    $(cell).find('.display-component').remove();
+    $(cell).find('.widget').remove();
+
+    resetDroppabilityAt(cellId);
+}
+
 
 /**
  * Updates the contents of a base component info at a particular cell based on inputs
@@ -693,10 +705,6 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
                     if (cellId=='display-cell'){
                         refreshCellDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
                     }
-
-                    //RemoveDisplay(actualCellId);
-                    //var padding = selectedUserComponent.layout[row][col].ratio.padding;
-                    //Display(actualCellId, type, getHTML[type](value), currentZoom, padding);
                 });
         } else { // pasted link to image
             if (inputs[0].value.length>0){
@@ -713,12 +721,6 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     }
 
     if (!isUpload) {
-        //$('#' + actualCellId).find('.label-container').remove();
-        //$('#' + actualCellId).find('.display-component').remove();
-        //
-        //var padding = selectedUserComponent.layout[row][col].ratio.padding;
-        //Display(actualCellId, type, getHTML[type](value), currentZoom , padding, function () {
-        //});
         selectedUserComponent.components[row][col].components = {};
         selectedUserComponent.components[row][col].components[type] = value;
 
@@ -772,7 +774,8 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 
 
-/** ** ** ** ** ** ** ** ** Table Cells Interaction and Display Helpers ** ** ** ** ** ** ** ** **/
+/** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/
+
 function cellTrashDroppableSettings(){
     var enableDrop = {
         accept: ".widget",
@@ -786,8 +789,6 @@ function cellTrashDroppableSettings(){
                 $(ui.draggable).appendTo(this);
                 $(this).droppable('disable');
                 var cellId = $(this).attr('id');
-                var droppedComponentType =$('#'+cellId).children().last().attr('name').toLowerCase();
-                showConfigOptions(droppedComponentType, cellId);
                 if (!movedComponent()) {
                     displayComponentInTable(cellId, $(ui.draggable));
                 }
@@ -893,10 +894,7 @@ function getZoomFromSliderVal(){
  * this function can be used to resize the table
  */
 function scaleTableToZoom(){
-    gridHeight = selectedUserComponent.layout.tablePxDimensions.height * currentZoom;
-
     propagateRatioChangeToAllElts();
-
 }
 
 function changeZoomViaZoomControl(type) {
@@ -1175,15 +1173,10 @@ function movedComponent() {
             var innerComponentCopy = selectedUserComponent.components[delRow][delCol];
             selectedUserComponent.addComponent(innerComponentCopy, newRow, newCol);
 
-            var padding = selectedUserComponent.layout[delRow][delCol].ratio.padding;
-            // update the new paddings
-            selectedUserComponent.layout[delRow][delCol].ratio.padding = {top: 0, bottom: 0, left: 0, right: 0};
-            selectedUserComponent.layout[newRow][newCol].ratio.padding = padding;
-            // update the new properties
-
+            var padding = selectedUserComponent.components[delRow][delCol].padding;
             var properties = innerComponentCopy.properties;
 
-            Display('cell'+ '_' + newRow + '_' + newCol, innerComponentCopy.type, getHTML[innerComponentCopy.type](innerComponentCopy.components[innerComponentCopy.type]), currentZoom, padding, properties);
+            display('cell'+ '_' + newRow + '_' + newCol, innerComponentCopy.type, getHTML[innerComponentCopy.type](innerComponentCopy.components[innerComponentCopy.type]), currentZoom, padding, properties);
             triggerEdit('cell'+ '_' + newRow + '_' + newCol, false);
 
         }
@@ -1425,7 +1418,7 @@ $(document).click(function(event) {
 });
 
 /**
- * Display name of uploaded image
+ * display name of uploaded image
  */
 $(document).on('change', '#fileselect', function(evt) {
     files = $(this).get(0).files;
@@ -1757,6 +1750,7 @@ function switchToInnerComponentFocusMode(row, col){
 
     $('#inner-component-focus #display-cell').removeData();
 
+    $('#style-overall-vs-specific').text('Specific, Row:'+row+' Col:'+col);
 
     var componentToShow = selectedUserComponent.components[row][col];
     var type = componentToShow.type;
@@ -1807,7 +1801,7 @@ function switchToInnerComponentFocusMode(row, col){
         position: 'relative',
     });
 
-    var padding = selectedUserComponent.layout[row][col].ratio.padding;
+    var padding = selectedUserComponent.components[row][col].padding;
     if (!padding){
         padding = {top: 0, bottom: 0, left: 0, right: 0};
     }
@@ -1881,7 +1875,7 @@ function switchToInnerComponentFocusMode(row, col){
             var properties = selectedUserComponent.components[row][col].properties;
 
 
-            Display('display-cell', type, getHTML[type](componentToShow.components[type]), scale, padding, properties);
+            display('display-cell', type, getHTML[type](componentToShow.components[type]), scale, padding, properties);
 
 
             //$('#inner-component-focus #display-cell').css({
@@ -1904,7 +1898,7 @@ function switchToInnerComponentFocusMode(row, col){
             var cellId = $('#display-cell').data('cellid');
             var rowcol = getRowColFromId(cellId);
 
-            selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
+            selectedUserComponent.components[rowcol.row][rowcol.col].padding = {top: top, left: left, bottom: bottom, right: right}
             refreshCellDisplay(cellId, currentZoom);
         },
         containment: '#inner-component-focus',
@@ -1934,7 +1928,7 @@ function switchToInnerComponentFocusMode(row, col){
             var cellId = $('#display-cell').data('cellid');
             var rowcol = getRowColFromId(cellId);
 
-            selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.padding = {top: top, left: left, bottom: bottom, right: right}
+            selectedUserComponent.components[rowcol.row][rowcol.col].padding = {top: top, left: left, bottom: bottom, right: right}
             refreshCellDisplay(cellId, currentZoom);
         }
     });
@@ -1988,16 +1982,22 @@ function refreshCellDisplay(cellId, zoom){
     }
     var row = rowcol.row;
     var col = rowcol.col;
-    RemoveDisplay(cellId);
-    var componentToChange = selectedUserComponent.components[row][col];
-    var padding = selectedUserComponent.layout[row][col].ratio.padding;
-    var properties = selectedUserComponent.components[row][col].properties;
+    if (selectedUserComponent.components[row]){
+        var componentToChange = selectedUserComponent.components[row][col];
+        if (componentToChange){
+            removeDisplay(cellId);
+            var padding = selectedUserComponent.components[row][col].padding;
+            var properties = selectedUserComponent.components[row][col].properties;
 
-    // display itself gets rid of padding for the #display-cell
-    Display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
-    //attach event handlers to new texts
-    //getContentEditableEditsAtCell(cellId);
-    registerTooltipBtnHandlers();
+            // display itself gets rid of padding for the #display-cell
+            display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
+            //attach event handlers to new texts
+            //getContentEditableEditsAtCell(cellId);
+            registerTooltipBtnHandlers();
+        } else {
+            deleteComponentFromView(cellId);
+        }
+    }
 }
 
 
@@ -2018,6 +2018,10 @@ function toggleInnerComponentVisibility(showAll){
         $('#zoom-control').css('display', 'block');
         $('#zoom-nav-container').css('display', 'block');
 
+        $('#style-overall-vs-specific').text('Overall');
+        innerComponentFocused = false;
+
+
     } else {
         $('#inner-component-focus').css('display', 'block');
         $('#outer-container').css('display', 'none');
@@ -2028,5 +2032,90 @@ function toggleInnerComponentVisibility(showAll){
         $('#zoom-control').css('display', 'none');
         $('#zoom-nav-container').css('display', 'none');
 
+        innerComponentFocused = true;
+
     }
 }
+
+////http://www.webdesignerdepot.com/2013/03/how-to-create-a-color-picker-with-html5-canvas/
+// The color picker
+var colorPickerCanvas = document.getElementById('color-picker').getContext('2d');
+
+// create an image object and get it’s source
+var img = new Image();
+img.src = 'images/colorpicker.png';
+//$(img).css({
+//    width: '100px',
+//    height: 'auto'
+//});
+
+// copy the image to the colorPickerCanvas
+$(img).load(function(){
+    colorPickerCanvas.drawImage(img,0,0);
+});
+
+// http://www.javascripter.net/faq/rgbtohex.htm
+function rgbToHex(R,G,B) {return toHex(R)+toHex(G)+toHex(B)}
+function toHex(n) {
+    n = parseInt(n,10);
+    if (isNaN(n)) return "00";
+    n = Math.max(0,Math.min(n,255));
+    return "0123456789ABCDEF".charAt((n-n%16)/16)  + "0123456789ABCDEF".charAt(n%16);
+}
+$('#color-picker').click(function(event){
+    // getting user coordinates
+    var x = event.pageX - $(this).offset().left;
+    var y = event.pageY - $(this).offset().top;
+
+    // getting image data and RGB values
+    var img_data = colorPickerCanvas.getImageData(x, y, 1, 1).data;
+    var R = img_data[0];
+    var G = img_data[1];
+    var B = img_data[2];  var rgb = R + ',' + G + ',' + B;
+    // convert RGB to HEX
+    var hex = rgbToHex(R,G,B);
+    // making the color the value of the input
+    //$('#rgb input').val(rgb).css({
+    //    'background-color': '#' + hex,
+    //});
+    //$('#hex input').val('#' + hex).css({
+    //    'background-color': '#' + hex,
+    //});
+
+    if (innerComponentFocused){
+
+    } else {
+        if (whoseColorToChange == 'overall-text'){
+            $('#pick-color-overall-text-input').val('#' + hex).css({
+                'background-color': '#' + hex,
+            });
+            $('.display-component').css({
+                color: '#' + hex,
+            })
+        } else if (whoseColorToChange == 'overall-bg'){
+            $('#pick-color-overall-bg-input').val('#' + hex).css({
+                'background-color': '#' + hex,
+            });
+            $('#main-cell-table').css({
+                'background-color': '#' + hex,
+            });
+        }
+    }
+
+    $('#color-picker-container').hide();
+});
+
+var whoseColorToChange = '';
+
+$('.pick-color').click(function(){
+    if (this.id == 'pick-color-overall-text'){
+        whoseColorToChange = 'overall-text';
+    } else if (this.id == 'pick-color-overall-bg'){
+        whoseColorToChange = 'overall-bg';
+    }
+    $('#color-picker-container').show();
+});
+
+$('#color-picker-dismiss').click(function(){
+    $('#color-picker-container').hide();
+})

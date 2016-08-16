@@ -263,9 +263,68 @@
     </div>
 
     <div class="style">
-
+        <div class="header">
+            <span id="style-overall-vs-specific">
+                Overall
+            </span>
+        </div>
+        <div class="style-color">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open" data-dropdownid="style-color">
+                    Color
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content dropdown-target" data-dropdownid="style-color">
+                <div>
+                    <span>Text</span>
+                    <input type="text" id="pick-color-overall-text-input">
+                    <button class="btn btn-xs btn-default pick-color" id="pick-color-overall-text">Pick Color</button>
+                </div>
+                <div>
+                    <span>Background</span>
+                    <input type="text" id="pick-color-overall-bg-input">
+                    <button class="btn btn-xs btn-default pick-color" id="pick-color-overall-bg">Pick Color</button>
+                </div>
+                <!--<div class="style-group">-->
+                <!--<span class="style-group-header">Reset</span>-->
+                <!--<button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>-->
+                <!--</div>-->
+            </div>
+        </div>
+        <div class="style-text">
+            <div class="header">
+                <span class="dropdown-trigger dropdown-open" data-dropdownid="style-text">
+                    Text
+                    <span class="glyphicon glyphicon-triangle-bottom"></span>
+                </span>
+            </div>
+            <div class="content dropdown-target" data-dropdownid="style-text">
+                <div>
+                    <span>Font family</span>
+                    <input type="text">
+                    <!--Do a dropdown-->
+                </div>
+                <div>
+                    <span>Font Size (px)</span>
+                    <input type="text">
+                </div>
+                <div>
+                    <span>Font Weight</span>
+                    <input type="text">
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<div id="color-picker-container">
+    <canvas width="400" height="400" id="color-picker"></canvas>
+    <button class="btn btn-xs btn-default" id="color-picker-dismiss">
+        <span>x</span>
+    </button>
+</div>
+
 <div class="component-options">
     <div class="component-name-container">
         <div class="component-name"></div>
@@ -280,6 +339,11 @@
 
     <button type="button" class="btn btn-default" id="btn-duplicate-component">
         <span class="glyphicon glyphicon-duplicate"></span>
+    </button>
+
+    <button type="button" class="btn btn-default" id="btn-download-component">
+        <span class="glyphicon glyphicon-download-alt"></span>
+        <span>Download</span>
     </button>
 
     <div id="delete-options">
@@ -317,7 +381,9 @@
     <div id="selected-screen-size"></div>
 </div>
 
-<div id="download-preview-area"></div>
+<div id="download-preview-area-container">
+    <div id="download-preview-area"></div>
+</div>
 
 <div id="zoom-control">
     <button id="zoom-control-minimize-btn" class="btn btn-default">
