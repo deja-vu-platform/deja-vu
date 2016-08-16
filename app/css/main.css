@@ -802,7 +802,7 @@ opacity: 1;
 
 .remove-row-btn{
     left: -60px;
-    bottom: 5px;
+    bottom: 49%;
 }
 
 .add-col-btn{
@@ -812,7 +812,7 @@ opacity: 1;
 
 .remove-col-btn{
     top: -60px;
-    right: 5px;
+    right: 49%;
 }
 
 
