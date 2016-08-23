@@ -2,6 +2,7 @@ export type Username = string;
 export type Content = string;
 
 export interface Post {
+  atom_id?: string;
   content: Content;
 }
 

@@ -2,23 +2,30 @@ import {Component, Input, OnInit} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Post, Username} from "../../shared/data";
-import {PostService} from "../shared/post";
+import {GraphQlService} from "gql";
 
 
 @Component({
   selector: "posts",
   templateUrl: "./components/posts/posts.html",
-  providers: [PostService, HTTP_PROVIDERS]
+  providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class PostsComponent implements OnInit {
   @Input() username: Username;
   posts: Post[];
 
-  constructor(private _postService: PostService) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   ngOnInit() {
     console.log("got as input " + this.username);
-    this._postService.getPosts(this.username).subscribe(
-      posts => this.posts = posts);
+    this._graphQlService
+      .get(`
+        user(username: "${this.username}") {
+          posts {
+            content
+          }
+        }
+      `)
+      .subscribe(posts => this.posts = posts);
   }
 }

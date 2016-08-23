@@ -4,7 +4,7 @@ import {HTTP_PROVIDERS} from "angular2/http";
 import {ClientBus} from "client-bus";
 
 import {Item, Label} from "../../shared/label";
-import {GraphQlService} from "../shared/graphql";
+import {GraphQlService} from "gql";
 
 import "rxjs/add/operator/toPromise";
 

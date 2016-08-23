@@ -1,6 +1,5 @@
-/// <reference path="../typings/tsd.d.ts" />
-import * as express from "express";
-import morgan = require("morgan");
+const express = require("express");
+const morgan = require("morgan");
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mongodb = require("mongodb");
 const command_line_args = require("command-line-args");
@@ -29,7 +28,7 @@ const cli = command_line_args([
 export class Mean {
   fqelement: string;
   db; //: mongodb.Db;
-  ws: express.Express;
+  ws; //: express.Express;
   comp: any;
   locs: any;
   private _opts: any;
@@ -96,20 +95,18 @@ export namespace GruntTask {
         .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
                   "*.{js,html,css}");
     let deps = [
-      "node_modules/angular2/bundles/angular2-polyfills.js",
       "node_modules/systemjs/dist/system.src.js",
       "node_modules/rxjs/bundles/Rx.js",
-      "node_modules/angular2/bundles/angular2.dev.js",
-      "node_modules/angular2/bundles/http.js",
-      "node_modules/angular2/bundles/router.dev.js",
       "node_modules/client-bus/lib/client-bus.js",
-      "node_modules/underscore/underscore.js"
+      "node_modules/gql/lib/gql.js",
+      "node_modules/underscore/underscore.js",
+      "node_modules/underscore.string/dist/underscore.string.min.js"
     ];
     deps = deps.concat(patterns_src);
 
     const ts_base_opts = {
       verbose: true,
-      target: "es5",
+      target: "es6",
       moduleResolution: "node",
       sourceMap: true,
       emitDecoratorMetadata: true,
@@ -292,7 +289,7 @@ export namespace GruntTask {
         const component = w => w + "Component";
         const imp = w => `import {${component(w)}} from ` +
                          `"../components/${hyphen(w)}/${hyphen(w)}";`;
-        const selector = w => `<${hyphen(w)}></${hyphen(w)}>`;
+        const selector = w => `<dv-widget name="${w}"></dv-widget>`;
 
         let wid_imports = "";
         let wid_directives = "[]";
@@ -305,8 +302,10 @@ export namespace GruntTask {
         const wid_names = _u.map(widgets, w => w.name);
 
         if (action === "dev") {
-          wid_imports = _u.map(wid_names, imp).join("\n");
-          wid_directives = "[" + _u.map(wid_names, component).join() + "]";
+          // wid_imports = _u.map(wid_names, imp).join("\n");
+          wid_imports = "import {WidgetLoader} from 'client-bus'";
+          // wid_directives = "[" + _u.map(wid_names, component).join() + "]";
+          wid_directives = "[WidgetLoader]";
           wid_selectors = _u.map(wid_names, selector).join("\n");
         } else {
           const wid_with_paths = _u.filter(widgets, w => w.path !== undefined);

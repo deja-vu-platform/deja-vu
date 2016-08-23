@@ -1,12 +1,9 @@
-import {Component, Output, EventEmitter, OnInit} from "angular2/core";
+import {Output, EventEmitter, OnInit} from "@angular/core";
 
-// import {User} from "../../shared/data";
+import {Widget} from "client-bus";
 
 
-@Component({
-  selector: "logged-in",
-  template: ""
-})
+@Widget({template: ""})
 export class LoggedInComponent implements OnInit {
   @Output() loggedInUser = new EventEmitter();
 

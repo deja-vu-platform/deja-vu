@@ -2,7 +2,7 @@ import {Component, Output, EventEmitter} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 // import {Observable} from "rxjs/observable";
 
-import {GraphQlService} from "../shared/graphql";
+import {GraphQlService} from "gql";
 
 
 @Component({

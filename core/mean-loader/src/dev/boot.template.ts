@@ -1,7 +1,7 @@
-import {Component, provide, PLATFORM_DIRECTIVES} from "angular2/core";
-import {bootstrap} from "angular2/platform/browser";
+import {Component, provide, PLATFORM_DIRECTIVES} from "@angular/core";
+import {bootstrap} from "@angular/platform/browser";
 import {ROUTER_PROVIDERS, RouteConfig, ROUTER_DIRECTIVES}
-from "angular2/router";
+from "@angular/router";
 
 import {LOCS} from "./locs";
 

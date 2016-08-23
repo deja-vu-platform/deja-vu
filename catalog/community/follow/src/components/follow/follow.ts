@@ -1,9 +1,8 @@
 import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
-import {Observable} from "rxjs/observable";
 
 import {Target, Name} from "../../shared/data";
-import {GraphQlService} from "../shared/graphql";
+import {GraphQlService} from "gql";
 
 
 @Component({
@@ -20,7 +19,9 @@ export class FollowComponent {
 
   follow(target: Target) {
     console.log(`following ${target.name}`);
-    this._follow(this._name, target.name).subscribe(res => undefined);
+    this._graphQlService
+      .post(`follow(source: "${this._name}", target: "${target.name}")`)
+      .subscribe(res => undefined);
   }
 
   get name() {
@@ -31,24 +32,15 @@ export class FollowComponent {
     if (!name) return;
     console.log("got name " + name);
     this._name = name;
-    this._getPotentialFollows(this._name).subscribe(
-        potentialFollows => this.potentialFollows = potentialFollows);
-  }
-
-  private _getPotentialFollows(source: Name): Observable<Target[]> {
-    return this._graphQlService.get(`{
-      source(name: "${source}") {
-        name,
-        potentialFollows {
-          name
-        } 
-      }
-    }`).map(data => data.source.potentialFollows);
-  }
-
-  private _follow(source: Name, target: Name): any {
-    return this._graphQlService.post(`{
-      follow(source: "${source}", target: "${target}")
-    }`);
+    this._graphQlService
+      .get(`
+        source(name: "${this._name}") {
+          potentialFollows {
+            name
+          } 
+        }
+      `)
+      .map(data => data.source.potentialFollows)
+      .subscribe(potentialFollows => this.potentialFollows = potentialFollows);
   }
 }

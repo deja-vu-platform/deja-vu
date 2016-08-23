@@ -2,7 +2,7 @@ import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Item, Label} from "../../shared/label";
-import {GraphQlService} from "../shared/graphql";
+import {GraphQlService} from "gql";
 
 
 @Component({

@@ -1,27 +1,29 @@
-import {Component, Output, EventEmitter} from "angular2/core";
-import {HTTP_PROVIDERS} from "angular2/http";
+import {Output, EventEmitter} from "@angular/core";
+import {HTTP_PROVIDERS} from "@angular/http";
 
 import {User} from "../../shared/data";
-import {AuthService} from "../shared/auth";
+import {GraphQlService} from "gql";
+import {Widget} from "client-bus";
 
 
-@Component({
-  selector: "register",
-  templateUrl: "./components/register/register.html",
-  providers: [AuthService, HTTP_PROVIDERS]
+@Widget({
+  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class RegisterComponent {
   user: User = {username: "", password: "", read: [], write: []};
   @Output() onRegister = new EventEmitter();
 
-  constructor(private _authService: AuthService) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   onSubmit() {
-    this._authService.register(this.user).subscribe(
-      res => {
+    this._graphQlService
+      .post(`
+        register(
+          username: "${this.user.username}", password: "${this.user.password}")
+      `)
+      .subscribe(res => {
         console.log("about to emit from register");
         this.onRegister.emit(this.user);
-      }
-    );
+      });
   }
 }

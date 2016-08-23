@@ -17,7 +17,8 @@
     "systemjs": "0.19.6",
     "zone.js": "0.5.10",
     "mean-loader": "file:../../../core/mean-loader",
-    "helpers": "file:../../../core/helpers",
+    "helpers": "file:../../../helpers",
+    "gql": "file:../../../gql",
     "server-bus": "file:../../../core/server-bus",
     "graphql": "^0.4.18"
   },

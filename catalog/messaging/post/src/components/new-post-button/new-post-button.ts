@@ -2,7 +2,7 @@ import {Component, provide} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Post, User} from "../../shared/data";
-import {PostService} from "../shared/post";
+import {GraphQlService} from "gql";
 
 
 @Component({
@@ -10,7 +10,7 @@ import {PostService} from "../shared/post";
   templateUrl: "./components/new-post-button/new-post-button.html",
   providers: [
     provide("fqelement", {useValue: "dv-messaging-post"}),
-    PostService, HTTP_PROVIDERS],
+    GraphQlService, HTTP_PROVIDERS],
   inputs: ["post", "user", "submitted"]
 })
 export class NewPostButtonComponent {
@@ -18,7 +18,7 @@ export class NewPostButtonComponent {
   post: Post = {content: ""};
   user: User = {username: "", posts: []};
 
-  constructor(private _postService: PostService) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   valid(): boolean {
     return this.post.content !== "";
@@ -27,7 +27,13 @@ export class NewPostButtonComponent {
   create() {
     console.log(
         "at new-post-button on save, got post " + this.post.content);
-    this._postService.newPost(this.user.username, this.post.content)
+    this._graphQlService
+      .post(`
+        newPost(
+          author: "${this.user.username}", content: "${this.post.content}") {
+          atom_id
+        }
+      `)
       .subscribe(data => {
         this.submitted.value = true;
         this.post["atom_id"] = data.atom_id;
