@@ -1,16 +1,13 @@
-import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {User, Username} from "../../shared/user";
 import {GraphQlService} from "gql";
 
+import {Widget} from "client-bus";
 
-@Component({
-  selector: "friends",
-  templateUrl: "./components/friends/friends.html",
-  styleUrls: ["./components/friends/friends.css"],
-  providers: [GraphQlService, HTTP_PROVIDERS],
-  inputs: ["username"]
+
+@Widget({
+  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class FriendsComponent {
   friends: User[];

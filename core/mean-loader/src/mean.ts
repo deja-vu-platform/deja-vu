@@ -1,5 +1,7 @@
-const express = require("express");
-const morgan = require("morgan");
+/// <reference path="../typings/tsd.d.ts" />
+import * as express from "express";
+import morgan = require("morgan");
+
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mongodb = require("mongodb");
 const command_line_args = require("command-line-args");
@@ -95,18 +97,22 @@ export namespace GruntTask {
         .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
                   "*.{js,html,css}");
     let deps = [
+      "node_modules/angular2/bundles/angular2-polyfills.js",
       "node_modules/systemjs/dist/system.src.js",
       "node_modules/rxjs/bundles/Rx.js",
+      "node_modules/angular2/bundles/angular2.dev.js",
+      "node_modules/angular2/bundles/http.js",
+      "node_modules/angular2/bundles/router.dev.js",
       "node_modules/client-bus/lib/client-bus.js",
-      "node_modules/gql/lib/gql.js",
       "node_modules/underscore/underscore.js",
+      "node_modules/gql/lib/gql.js",
       "node_modules/underscore.string/dist/underscore.string.min.js"
     ];
     deps = deps.concat(patterns_src);
 
     const ts_base_opts = {
       verbose: true,
-      target: "es6",
+      target: "es5",
       moduleResolution: "node",
       sourceMap: true,
       emitDecoratorMetadata: true,

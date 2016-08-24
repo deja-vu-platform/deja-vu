@@ -1,15 +1,14 @@
-import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Item, Label} from "../../shared/label";
 import {GraphQlService} from "gql";
 
+import {Widget} from "client-bus";
 
-@Component({
-  selector: "attach",
+
+@Widget({
   template: "",
-  providers: [GraphQlService, HTTP_PROVIDERS],
-  inputs: ["item", "labels"]
+  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class AttachComponent {
   private _item: Item;

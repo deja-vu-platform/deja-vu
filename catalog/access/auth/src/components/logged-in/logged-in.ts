@@ -1,4 +1,4 @@
-import {Output, EventEmitter, OnInit} from "@angular/core";
+import {Output, EventEmitter, OnInit} from "angular2/core";
 
 import {Widget} from "client-bus";
 

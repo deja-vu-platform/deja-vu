@@ -1,17 +1,13 @@
-import {Component, provide} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Post, User} from "../../shared/data";
 import {GraphQlService} from "gql";
 
+import {Widget} from "client-bus";
 
-@Component({
-  selector: "new-post-button",
-  templateUrl: "./components/new-post-button/new-post-button.html",
-  providers: [
-    provide("fqelement", {useValue: "dv-messaging-post"}),
-    GraphQlService, HTTP_PROVIDERS],
-  inputs: ["post", "user", "submitted"]
+
+@Widget({
+  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class NewPostButtonComponent {
   submitted;

@@ -1,12 +1,12 @@
 <div class="container">
   <div class="col-md-12">
-    <logged-in (loggedInUser)="loggedInUser($event)"></logged-in>
+    <dv-widget name="LoggedIn" fqelement="dv-access-auth"></dv-widget>
     <div class="row">
-      <create-post [(user)]="post_user"></create-post>
+      <dv-widget name="CreatePost" fqelement="dv-messaging-post"></dv-widget>
     </div>
     <div class="row">
       <h1>Feed</h1>
-      <feed [(sub)]="feed_sub.name"></feed>
+      <dv-widget name="Feed" fqelement="dv-messaging-feed"></dv-widget>
     </div>
   </div>
 </div>

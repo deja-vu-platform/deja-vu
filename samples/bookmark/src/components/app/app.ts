@@ -1,16 +1,14 @@
-import {Component} from "angular2/core";
 import {RouteConfig, ROUTER_DIRECTIVES, Router} from "angular2/router";
 
 import {HomeComponent} from "../home/home";
 import {TopicsComponent} from "../topics/topics";
 import {UsersComponent} from "../users/users";
 
+import {Widget, WidgetLoader} from "client-bus";
 
-@Component({
-  selector: "app",
-  templateUrl: "./components/app/app.html",
-  directives: [
-    HomeComponent, TopicsComponent, UsersComponent, ROUTER_DIRECTIVES]
+
+@Widget({
+  ng2_directives: [WidgetLoader, ROUTER_DIRECTIVES]
 })
 @RouteConfig([
   {path: "/home", name: "Home", component: HomeComponent, useAsDefault: true},

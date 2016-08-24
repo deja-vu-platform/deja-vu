@@ -1,21 +1,8 @@
-import {Component} from "angular2/core";
-
-import {LabelsTextComponent} from
-"dv-organization-label/lib/components/labels-text/labels-text";
-import {NewPostContentComponent} from
-"dv-messaging-post/lib/components/new-post-content/new-post-content";
-import {NewPostButtonComponent} from
-"dv-messaging-post/lib/components/new-post-button/new-post-button";
-
-import {ClientBus} from "client-bus";
+import {Widget, WidgetLoader, ClientBus} from "client-bus";
 
 
-@Component({
-  selector: "create-post",
-  templateUrl: "./components/create-post/create-post.html",
-  directives: [
-    NewPostContentComponent, LabelsTextComponent, NewPostButtonComponent],
-  inputs: ["user"]
+@Widget({
+  ng2_directives: [WidgetLoader]
 })
 export class CreatePostComponent {
   submitted;

@@ -1,5 +1,4 @@
 /// <reference path="../../../typings/underscore/underscore.d.ts" />
-import {Component, provide} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 import {ClientBus} from "client-bus";
 
@@ -10,14 +9,11 @@ import "rxjs/add/operator/toPromise";
 
 import * as _u from "underscore";
 
+import {Widget} from "client-bus";
 
-@Component({
-  selector: "labels-text",
-  templateUrl: "./components/labels-text/labels-text.html",
-  providers: [
-    provide("fqelement", {useValue: "dv-organization-label"}),
-    ClientBus, GraphQlService, HTTP_PROVIDERS],
-  inputs: ["item", "submitted"]
+
+@Widget({
+  ng2_providers: [ClientBus, GraphQlService, HTTP_PROVIDERS]
 })
 export class LabelsTextComponent {
   item: Item = {name: "", labels: []};

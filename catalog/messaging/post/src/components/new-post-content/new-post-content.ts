@@ -1,14 +1,12 @@
-import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Post} from "../../shared/data";
 
+import {Widget} from "client-bus";
 
-@Component({
-  selector: "new-post-content",
-  templateUrl: "./components/new-post-content/new-post-content.html",
-  providers: [HTTP_PROVIDERS],
-  inputs: ["post"]
+
+@Widget({
+  ng2_providers: [HTTP_PROVIDERS]
 })
 export class NewPostContentComponent {
   private _post: Post = {content: ""};

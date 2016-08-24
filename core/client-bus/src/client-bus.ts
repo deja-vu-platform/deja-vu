@@ -1,6 +1,9 @@
-import {Injectable, Inject, Component, ViewContainerRef, Injector}
-from "@angular/core";
+/// <reference path="../typings/tsd.d.ts" />
+import {Injectable, Inject, Component} from "angular2/core";
+import {DynamicComponentLoader, Injector, ElementRef} from "angular2/core";
+import {provide} from "angular2/core";
 
+import * as _u from "underscore";
 import * as _ustring from "underscore.string";
 
 declare const System: any;
@@ -136,42 +139,43 @@ export class ClientBus {
   }
 }
 
+
 @Component({
   selector: "dv-widget",
-  template:  "",
-  inputs: ["fqelement", "name"]
+  template:  "<div #widget></div>",
+  inputs: ["fqelement", "name", "fields"]
 })
 export class WidgetLoader {
   fqelement: string;
   name: string;
+  fields: any = {};
 
   constructor(
-      private _vcr: ViewContainerRef, private _injector: Injector) {}
+      private _dcl: DynamicComponentLoader, private _elementRef: ElementRef) {}
 
   ngOnInit() {
     const d_name = _ustring.dasherize(this.name).slice(1);
     let imp_string_prefix = "";
+    let providers = [];
     if (this.fqelement !== undefined) {
       imp_string_prefix =  `${this.fqelement}/lib/`;
+      providers = [provide("fqelement", {useValue: this.fqelement})];
     }
+
     console.log(`Loading ${this.name} of ${this.fqelement}`);
-    // make clone of injector and provide different value for fqelement
+
     System.import(imp_string_prefix + `components/${d_name}/${d_name}`)
-      .then(mod => this._vcr
-          .createComponent(
-            mod[this.name + "Component"], 0, this._injector))
-      .then(componentRef => {
-        // for each bonded field
-        // component.field = myparentelement.field.adapt..
-        console.log(componentRef);
-      });
+      .then(mod => this._dcl
+          .loadIntoLocation(
+            mod[this.name + "Component"], this._elementRef, "widget",
+            Injector.resolve(providers)))
+      .then(componentRef => componentRef.instance)
+      .then(c => _u.each(_u.keys(this.fields), f => c[f] = this.fields[f]));
   }
 }
 
 
 export interface WidgetMetadata {
-  fields?: string[];
-  widgets?: any[];
   ng2_directives?: any[];
   ng2_providers?: any[];
   template?: string;
@@ -183,18 +187,12 @@ export function Widget(options: WidgetMetadata) {
     const dname = _ustring.dasherize(target.name).slice(1, -10);
     const metadata = {
       selector: dname,
-      inputs: options.fields,
       providers: options.ng2_providers
     };
 
-    let directives = [];
-    if (options.widgets !== undefined) {
-      directives = directives.concat(options.widgets);
-    }
     if (options.ng2_directives !== undefined) {
-      directives = directives.concat(options.ng2_directives);
+      metadata["directives"] = options.ng2_directives;
     }
-    metadata["directives"] = directives;
 
     if (options.template !== undefined) {
       metadata["template"] = options.template;

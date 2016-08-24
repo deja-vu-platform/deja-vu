@@ -1,20 +1,11 @@
-import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
-import {LoggedInComponent} from
-"dv-access-auth/lib/components/logged-in/logged-in";
-import {CreatePostComponent} from "../create-post/create-post";
-import {FeedComponent} from
-"dv-messaging-feed/lib/components/feed/feed";
-
-import {ClientBus} from "client-bus";
+import {Widget, WidgetLoader, ClientBus} from "client-bus";
 
 
-@Component({
-  selector: "home",
-  templateUrl: "./components/home/home.html",
-  directives: [LoggedInComponent, CreatePostComponent, FeedComponent],
-  providers: [ClientBus, HTTP_PROVIDERS]
+@Widget({
+  ng2_directives: [WidgetLoader],
+  ng2_providers: [ClientBus, HTTP_PROVIDERS]
 })
 export class HomeComponent {
   username: string;

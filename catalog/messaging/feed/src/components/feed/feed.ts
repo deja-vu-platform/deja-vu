@@ -1,4 +1,3 @@
-import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Observable} from "rxjs/Observable";
@@ -11,18 +10,17 @@ import {Name, Message, Publisher} from "../../shared/data";
 import {GraphQlService} from "gql";
 
 
+import {Widget} from "client-bus";
+
+
 export interface FeedItem {
   message: Message;
   publisher: Publisher;
 }
 
 
-@Component({
-  selector: "feed",
-  templateUrl: "./components/feed/feed.html",
-  styleUrls: ["./components/feed/feed.css"],
-  providers: [GraphQlService, HTTP_PROVIDERS],
-  inputs: ["sub"]
+@Widget({
+  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class FeedComponent {
   feed: FeedItem[];

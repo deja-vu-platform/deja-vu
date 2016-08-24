@@ -1,14 +1,13 @@
-import {Component, Output, EventEmitter} from "angular2/core";
+import {Output, EventEmitter} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
-// import {Observable} from "rxjs/observable";
 
 import {GraphQlService} from "gql";
 
+import {Widget} from "client-bus";
 
-@Component({
-  selector: "search",
-  templateUrl: "./components/search/search.html",
-  providers: [GraphQlService, HTTP_PROVIDERS]
+
+@Widget({
+  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class SearchComponent {
   query: string;

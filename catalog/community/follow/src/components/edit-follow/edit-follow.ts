@@ -1,8 +1,9 @@
-import {Component} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Target, Name} from "../../shared/data";
 import {GraphQlService} from "gql";
+
+import {Widget} from "client-bus";
 
 
 export interface SourceFollowInfo {
@@ -10,11 +11,8 @@ export interface SourceFollowInfo {
   followed_by: boolean;
 }
 
-@Component({
-  selector: "edit-follow",
-  templateUrl: "./components/edit-follow/edit-follow.html",
-  providers: [GraphQlService, HTTP_PROVIDERS],
-  inputs: ["name"]
+@Widget({
+  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class EditFollowComponent {
   targets: SourceFollowInfo[];

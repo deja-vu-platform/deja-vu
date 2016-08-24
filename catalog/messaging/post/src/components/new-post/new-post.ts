@@ -1,17 +1,16 @@
-import {Component, Input} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {Post, Username} from "../../shared/data";
 import {GraphQlService} from "gql";
 
+import {Widget} from "client-bus";
 
-@Component({
-  selector: "new-post",
-  templateUrl: "./components/new-post/new-post.html",
-  providers: [GraphQlService, HTTP_PROVIDERS]
+
+@Widget({
+  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class NewPostComponent {
-  @Input() username: Username;
+  username: Username;
   post: Post = {atom_id: "", content: ""};
   submitted: boolean = false;
 
