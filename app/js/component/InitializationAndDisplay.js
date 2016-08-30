@@ -104,6 +104,8 @@ $(function () {
 
     registerUserComponentAreaDroppable();
 
+    setUpStyleColors();
+
     // finish load animation
     $('.loader-container').fadeOut("fast");
 
@@ -2044,6 +2046,7 @@ function toggleInnerComponentVisibility(showAll){
         innerComponentFocused = true;
 
     }
+    setUpStyleColors();
 }
 
 ////http://www.webdesignerdepot.com/2013/03/how-to-create-a-color-picker-with-html5-canvas/
@@ -2339,3 +2342,40 @@ $('.remove-color').click(function(){
     }
 
 });
+
+function setUpStyleColors(){
+    if (innerComponentFocused) {
+        var rowcol = getRowColFromId($('#display-cell').data('cellid'));
+        var row = rowcol.row;
+        var col = rowcol.col;
+        var customStyles = selectedUserComponent.components[row][col].properties.custom;
+        var textColor = customStyles['color'] || '';
+        $('#pick-color-text-input').val(textColor).css({
+            'background-color': textColor
+        });
+        var bgColor = customStyles['background-color'] || '';
+        $('#pick-color-bg-input').val(bgColor).css({
+            'background-color': bgColor
+        });
+
+    } else {
+        if (selectedUserComponent.layout.overallStyles){
+            var overallStyles = selectedUserComponent.layout.overallStyles;
+            var textColor = overallStyles['color'] || '';
+            $('#pick-color-text-input').val(textColor).css({
+                'background-color': textColor
+            });
+            var bgColor = overallStyles['background-color'] || '';
+            $('#pick-color-bg-input').val(bgColor).css({
+                'background-color': bgColor
+            });
+        } else {
+            $('#pick-color-text-input').val('').css({
+                'background-color': ''
+            });
+            $('#pick-color-bg-input').val('').css({
+                'background-color': ''
+            });
+        }
+    }
+}
