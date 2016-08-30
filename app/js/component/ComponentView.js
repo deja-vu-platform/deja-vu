@@ -86,6 +86,31 @@ function display(cellId, type, html, zoom, padding, properties, callback) {
 }
 
 
+function hideBaseComponentDisplayAt(cellId, type){
+    if (type === 'label'){
+        $('#' + cellId).find('.display-component').parent().css({
+            display: 'none'
+        });
+    } else {
+        $('#' + cellId).find('.display-component').css({
+            display: 'none'
+        });
+    }
+}
+
+
+function showBaseComponentDisplayAt(cellId, type){
+    if (type === 'label'){
+        $('#' + cellId).find('.display-component').parent().css({
+            display: 'block'
+        });
+    } else {
+        $('#' + cellId).find('.display-component').css({
+            display: 'inline-block'
+        });
+    }
+}
+
 /**
  *
  * @param cellId
@@ -163,46 +188,30 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties) {
 
     }
 
-    //if (cellId == 'display-cell'){
-    //    var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
-    //} else {
-    //    var rowcol  = getRowColFromId(cellId);
-    //}
     //// TODO SKETCHY!!!
     if (properties){
         if (Object.keys(properties).length>0){
-            displayComponent.removeClass();
+            var classes = '';
             for (var propertyName in properties){
-                displayComponent.addClass(properties[propertyName]);
+                //displayComponent.addClass(properties[propertyName]);
+                if (propertyName == 'custom'){
+                    continue;
+                }
+                classes = classes+' '+properties[propertyName];
             }
-            displayComponent.addClass(mainDisplayClasses[type]);
+            classes.trim();
+
+            displayComponent.removeClass();
+            displayComponent.addClass(classes).addClass(mainDisplayClasses[type]);
         }
-    }
+        if (properties.custom){
+            if (Object.keys(properties.custom).length>0){
+                for (var customProperty in properties.custom){
+                    displayComponent.css(customProperty, properties.custom[customProperty]);
+                }
 
-}
-
-
-function hideBaseComponentDisplayAt(cellId, type){
-    if (type === 'label'){
-        $('#' + cellId).find('.display-component').parent().css({
-            display: 'none'
-        });
-    } else {
-        $('#' + cellId).find('.display-component').css({
-            display: 'none'
-        });
-    }
-}
-
-function showBaseComponentDisplayAt(cellId, type){
-    if (type === 'label'){
-        $('#' + cellId).find('.display-component').parent().css({
-            display: 'block'
-        });
-    } else {
-        $('#' + cellId).find('.display-component').css({
-            display: 'inline-block'
-        });
+            }
+        }
     }
 }
 
