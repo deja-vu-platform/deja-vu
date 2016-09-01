@@ -16,6 +16,7 @@ export interface SourceFollowInfo {
 })
 export class EditFollowComponent {
   targets: SourceFollowInfo[];
+  source = {name: "", on_change: (x) => undefined};
   private _name: Name;
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -34,22 +35,24 @@ export class EditFollowComponent {
       .subscribe(res => undefined);
   }
 
-  get name() {
-    return this._name;
-  }
+  dvAfterInit() {
+    const update_targets = () => {
+      const name = this.source.name;
+      if (!name) return;
+      console.log("got name " + name);
+      this._name = name;
+      this._graphQlService
+        .get(`
+          targets {
+            name,
+            followed_by(name: "${this._name}")
+          }
+        `)
+        .map(data => data.targets.filter(u => u.name !== this._name))
+        .subscribe(targets => this.targets = targets);
+    };
 
-  set name(name: Name) {
-    if (!name) return;
-    console.log("got name " + name);
-    this._name = name;
-    this._graphQlService
-      .get(`
-        targets {
-          name,
-          followed_by(name: "${this._name}")
-        }
-      `)
-      .map(data => data.targets.filter(u => u.name !== this._name))
-      .subscribe(targets => this.targets = targets);
+    update_targets();
+    this.source.on_change(update_targets);
   }
 }

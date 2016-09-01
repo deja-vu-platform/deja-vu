@@ -337,6 +337,9 @@ export namespace GruntTask {
           {match: "comp_info", replacement: (
               grunt.file.exists("comp.json") ?
               grunt.file.readJSON("comp.json") : "{}")},
+          {match: "wcomp_info", replacement: (
+              grunt.file.exists("wcomp.json") ?
+              grunt.file.readJSON("wcomp.json") : "{}")},
           {match: "wid_attachments", replacement: wid_attachments},
           {match: "mode", replacement: action},
 

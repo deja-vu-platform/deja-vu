@@ -1,4 +1,3 @@
-import {Output, EventEmitter} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {User} from "../../shared/data";
@@ -11,7 +10,7 @@ import {Widget} from "client-bus";
 })
 export class SignInComponent {
   user: User = {username: "", password: "", read: [], write: []};
-  @Output() onSignIn = new EventEmitter();
+  signin_ok = {value: false};
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -25,7 +24,7 @@ export class SignInComponent {
         console.log("setting username " + this.user.username);
         localStorage.setItem("id_token", token);
         localStorage.setItem("username", this.user.username);
-        this.onSignIn.emit(this.user);
+        this.signin_ok.value = true;
       });
   }
 }

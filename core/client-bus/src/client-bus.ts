@@ -17,6 +17,7 @@ export interface Type {
 export interface Field {
   name: string;
   "type": Type;
+  widget?: Type;
 }
 
 export interface TypeBond {
@@ -34,43 +35,18 @@ export interface CompInfo {
   fbonds: FieldBond[];
 }
 
-
-export class PrimitiveAtom {
-  private _on_change_listeners: (() => void)[] = [];
-
-  constructor() {
-    return new Proxy(this, {
-      set: (target, name, value) => {
-             target[name] = value;
-
-             for (const on_change of this._on_change_listeners) {
-               on_change();
-             }
-             return true;
-           }
-    });
-  }
-
-  on_change(handler: () => void) {
-    this._on_change_listeners.push(handler);
-  }
-}
-
 export class Atom {
-  private _forwards;
-  private _core: Atom;
+  private _forwards = {};
   private _on_change_listeners: (() => void)[] = [];
+  private _core;
 
   constructor(private _comp_info: CompInfo) {
-    this._forwards = {};
     this._core = this;
   }
 
   adapt(t: Type) {
     const tinfo_str = JSON.stringify(t);
-    console.log("Adapting to " + tinfo_str);
     this._forwards[tinfo_str] = this._forward_map(t);
-    console.dir(this._forwards);
     return new Proxy(this._core, {
       get: (target, name) => {
              const core_name = target._forwards[tinfo_str][name];
@@ -105,21 +81,21 @@ export class Atom {
     // find the field bonds where t is part of, map field to core
     for (const fbond of this._comp_info.fbonds) {
       for (const field of fbond.fields) {
-        if (this._t_equals(field.type, t)) {
+        if (t_equals(field.type, t)) {
           // use the subfield name
           forward_map[field.name] = fbond.subfield.name;
         }
       }
     }
-    console.log("ret forward map is " + JSON.stringify(forward_map));
     return forward_map;
   }
+}
 
-  _t_equals(t1: Type, t2: Type) {
-    return (
-      t1.name.toLowerCase() === t2.name.toLowerCase() &&
-      t1.fqelement.toLowerCase() === t2.fqelement.toLowerCase());
-  }
+
+function t_equals(t1: Type, t2: Type) {
+  return (
+    t1.name.toLowerCase() === t2.name.toLowerCase() &&
+    t1.fqelement.toLowerCase() === t2.fqelement.toLowerCase());
 }
 
 
@@ -133,10 +109,11 @@ export class ClientBus {
     return new Atom(this._comp_info)
       .adapt({name: t, fqelement: this._fqelement});
   }
+}
 
-  new_primitive_atom(): any {
-    return new PrimitiveAtom();
-  }
+
+export interface WCompInfo {
+  wbonds: FieldBond[];
 }
 
 
@@ -148,17 +125,64 @@ export class ClientBus {
 export class WidgetLoader {
   fqelement: string;
   name: string;
-  fields: any = {};
+  fields;
 
   constructor(
-      private _dcl: DynamicComponentLoader, private _elementRef: ElementRef) {}
+      private _dcl: DynamicComponentLoader, private _element_ref: ElementRef,
+      @Inject("WCompInfo") private _wcomp_info: WCompInfo,
+      private _client_bus: ClientBus,
+      @Inject("wname") private _host_wname,
+      @Inject("fqelement") private _host_fqelement) {}
+
+  _adapt_table() {
+    const host_widget_t = {
+      name: this._host_wname,
+      fqelement: this._host_fqelement
+    };
+    const widget_t = { name: this.name, fqelement: this.fqelement };
+    if (widget_t.fqelement === undefined) {
+      widget_t.fqelement = this._host_fqelement;
+    }
+    const ret = _u.chain(this._wcomp_info.wbonds)
+      .filter(wbond => t_equals(wbond.subfield.widget, host_widget_t))
+      .filter(wbond => !_u.chain(wbond.fields).pluck("widget")
+          .where(widget_t).isEmpty().value())
+      .map((wbond: FieldBond) => {
+        const wfield: Field = _u.chain(wbond.fields)
+          .filter(f => t_equals(f.widget, widget_t)).value()[0];
+        return {
+          fname: wfield.name,
+          info: {
+            ftype: wfield.type,
+            host_fname: wbond.subfield.name,
+            host_tname: wbond.subfield.type.name
+          }
+        };
+      })
+      .reduce((memo, finfo) => {
+        memo[finfo.fname] = finfo.info;
+        return memo;
+      }, {})
+      .value();
+
+    console.log(
+        "Adapt table for " + JSON.stringify(host_widget_t) + " to " +
+        JSON.stringify(widget_t) + " :" +
+        JSON.stringify(ret));
+    return ret;
+  }
 
   ngOnInit() {
+    const adapt_table = this._adapt_table();
     const d_name = _ustring.dasherize(this.name).slice(1);
     let imp_string_prefix = "";
     let providers = [];
     if (this.fqelement !== undefined) {
       imp_string_prefix =  `${this.fqelement}/lib/`;
+      const fqelement_split = this.fqelement.split("-");
+      if (fqelement_split.length === 4) {
+        imp_string_prefix =  `${fqelement_split.slice(0, 3).join("-")}/lib/`;
+      }
       providers = [provide("fqelement", {useValue: this.fqelement})];
     }
 
@@ -167,10 +191,46 @@ export class WidgetLoader {
     System.import(imp_string_prefix + `components/${d_name}/${d_name}`)
       .then(mod => this._dcl
           .loadIntoLocation(
-            mod[this.name + "Component"], this._elementRef, "widget",
+            mod[this.name + "Component"], this._element_ref, "widget",
             Injector.resolve(providers)))
       .then(componentRef => componentRef.instance)
-      .then(c => _u.each(_u.keys(this.fields), f => c[f] = this.fields[f]));
+      .then(c => {
+        _u.each(_u.keys(c), f => {
+          // get rid of init and do the inits here?
+          // widgets define their fields in the annotation
+          // so over here you are going to know your parent fields
+          // if you don't have any children then you don't really need to
+          // do anything so you can just let them be
+          // see if this.fields[..] has been initialized (it's an atom)
+          // if not, initialize and then adapt. It it has been, just adapt
+          const adapt_info = adapt_table[f];
+          if (adapt_info !== undefined) {
+            c[f] = this.fields[adapt_info.host_fname].adapt(adapt_info.ftype);
+            if (c.fields !== undefined) {
+              c.fields[f] = c[f];
+            }
+          }
+        });
+        return c;
+      })
+      .then(c => {
+        if (c.dvAfterInit !== undefined) {
+          c.dvAfterInit();
+        }
+      });
+  }
+}
+
+
+export function field(name: string, t: string) {
+  return {name: name, t: t};
+}
+
+export function init(w, client_bus, fields) {
+  w.fields = {};
+  for (const f of fields) {
+    w[f.name] = client_bus.new_atom(f.t);
+    w.fields[f.name] = w[f.name];
   }
 }
 
@@ -185,10 +245,13 @@ export interface WidgetMetadata {
 export function Widget(options: WidgetMetadata) {
   return (target: Function): any => {
     const dname = _ustring.dasherize(target.name).slice(1, -10);
-    const metadata = {
-      selector: dname,
-      providers: options.ng2_providers
-    };
+    const metadata = { selector: dname };
+
+    let providers = [provide("wname", {useValue: target.name.slice(0, -9)})];
+    if (options.ng2_providers !== undefined) {
+      providers = providers.concat(options.ng2_providers);
+    }
+    metadata["providers"] = providers;
 
     if (options.ng2_directives !== undefined) {
       metadata["directives"] = options.ng2_directives;

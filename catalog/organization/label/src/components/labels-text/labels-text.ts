@@ -18,60 +18,46 @@ import {Widget} from "client-bus";
 export class LabelsTextComponent {
   item: Item = {name: "", labels: []};
   labels_text: string = "";
-  private _submitted;
+  submit_ok = {value: false, on_change: undefined};
 
   constructor(
       private _client_bus: ClientBus,
       private _graphQlService: GraphQlService) {}
 
-  get submitted() { return this._submitted; }
-  set submitted(submitted) {
-    if (submitted !== undefined) {
-      console.log("GOT SUBMITTEEDD on labels" + submitted.value);
-      this._submitted = submitted;
-      this._submitted.on_change(_ => {
-        if (this._submitted.value) {
-          this.onSubmit();
-        }
-      });
-    }
-  }
-
   // On submit will attach labels to the item
-  onSubmit() {
-    this.item.labels = [];
-    console.log("On submit at labels-text");
-    return Promise.all<Label>(
-        _u.chain(this.labels_text.split(","))
-          .map(l => l.trim())
-          .uniq()
-          .map(l => this._graphQlService
-                  .post(`{
-                    createOrGetLabel(name: "${l}") {
-                      atom_id
-                    }
-                  }`)
-                  .toPromise()
-                  .then(({atom_id}) => {
-                    const ret = this._client_bus.new_atom("Label");
-                    ret.atom_id = atom_id;
-                    ret.name = l;
-                    return ret;
-                  })
-               )
-          .value()
-        )
-        .then((labels: Label[]) => {
-          this.item.labels = labels;
-          const attach_labels_str = this._graphQlService
-              .plist(_u.map(labels, l => _u.pick(l, "name")));
-          return this._graphQlService
-            .get(`{
-              item_by_id(atom_id: "${this.item.atom_id}") {
-                attach_labels(labels: ${attach_labels_str})
-              }
-            }`)
-            .toPromise();
-        });
+  dvAfterInit() {
+    this.submit_ok.on_change(() => {
+      if (this.submit_ok.value === false) return;
+
+      this.item.labels = [];
+      console.log("On submit at labels-text");
+      return Promise.all<Label>(
+          _u.chain(this.labels_text.split(","))
+            .map(l => l.trim())
+            .uniq()
+            .map(l => this._graphQlService
+                    .post(`
+                      createOrGetLabel(name: "${l}") {
+                        atom_id
+                      }
+                    `)
+                    .toPromise()
+                    .then(_ => ({name: l}))
+                 )
+            .value()
+          )
+          .then((labels: Label[]) => {
+            this.item.labels = labels;
+            const attach_labels_str = this._graphQlService
+                .plist(_u.map(labels, l => _u.pick(l, "name")));
+            return this._graphQlService
+              .get(`
+                item_by_id(atom_id: "${this.item.atom_id}") {
+                  attach_labels(labels: ${attach_labels_str})
+                }
+              `)
+              .toPromise();
+          });
+    });
   }
 }

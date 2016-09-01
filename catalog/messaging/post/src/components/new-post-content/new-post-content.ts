@@ -9,14 +9,5 @@ import {Widget} from "client-bus";
   ng2_providers: [HTTP_PROVIDERS]
 })
 export class NewPostContentComponent {
-  private _post: Post = {content: ""};
-
-  get post() {
-    return this._post;
-  }
-
-  set post(post: Post) {
-    if (!post) return;
-    this._post = post;
-  }
+  post: Post = {content: ""};
 }

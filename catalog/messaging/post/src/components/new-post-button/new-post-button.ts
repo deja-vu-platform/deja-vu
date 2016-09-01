@@ -10,7 +10,7 @@ import {Widget} from "client-bus";
   ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class NewPostButtonComponent {
-  submitted;
+  submit_ok = {value: false};
   post: Post = {content: ""};
   user: User = {username: "", posts: []};
 
@@ -31,10 +31,8 @@ export class NewPostButtonComponent {
         }
       `)
       .subscribe(data => {
-        this.submitted.value = true;
-        this.post["atom_id"] = data.atom_id;
-        // const user_up = {$addToSet: {posts: {atom_id: data.atom_id}}};
-        // this._client_bus.report_update(user_up, this._user);
+        this.post["atom_id"] = data.newPost.atom_id;
+        this.submit_ok.value = true;
       });
   }
 }

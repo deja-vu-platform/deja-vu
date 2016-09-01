@@ -1,4 +1,3 @@
-import {Output, EventEmitter} from "angular2/core";
 import {HTTP_PROVIDERS} from "angular2/http";
 
 import {User} from "../../shared/data";
@@ -11,7 +10,7 @@ import {Widget} from "client-bus";
 })
 export class RegisterComponent {
   user: User = {username: "", password: "", read: [], write: []};
-  @Output() onRegister = new EventEmitter();
+  register_ok = {value: false};
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -23,7 +22,7 @@ export class RegisterComponent {
       `)
       .subscribe(res => {
         console.log("about to emit from register");
-        this.onRegister.emit(this.user);
+        this.register_ok.value = true;
       });
   }
 }

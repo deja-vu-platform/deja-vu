@@ -28,7 +28,8 @@ export class GraphQlService {
           this._api + "/graphql",
           JSON.stringify({query: "mutation {" + query_str + "}"}),
           {headers: headers})
-      .map(res => res.json());
+      .map(res => res.json())
+      .map(json_res => json_res.data);
   }
 
   get(query): Observable<any> {

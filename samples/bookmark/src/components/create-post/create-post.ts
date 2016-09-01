@@ -1,23 +1,20 @@
-import {Widget, WidgetLoader, ClientBus} from "client-bus";
+import {Widget, WidgetLoader, ClientBus, init, field} from "client-bus";
 
 
 @Widget({
   ng2_directives: [WidgetLoader]
 })
 export class CreatePostComponent {
-  submitted;
-  user = {username: "", posts: []};
-  post_post;
-  label_item;
+  submit_ok;
+  post;
 
-  constructor(private _client_bus: ClientBus) {
-    const post = this._client_bus.new_atom("Post");
-    post.content = "";
-    this.post_post = post.adapt({name: "Post", fqelement: "dv-messaging-post"});
-    this.label_item = post.adapt({
-      name: "Item", fqelement: "dv-organization-label"});
+  constructor(client_bus: ClientBus) {
+    init(this, client_bus, [
+      field("user", "User"),
+      field("post", "Post"),
+      field("submit_ok", "Boolean")]);
 
-    this.submitted = this._client_bus.new_primitive_atom();
-    this.submitted.value = false;
+    this.post.content = "";
+    this.submit_ok.value = false;
   }
 }

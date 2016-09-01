@@ -9,6 +9,7 @@ import {LOCS} from "./locs";
 @@attachments_imports
 
 const COMP_INFO = @@comp_info;
+const WCOMP_INFO = @@wcomp_info;
 const NAME = "@@name";
 const MODE = "@@mode";
 const ATTACHMENTS = @@wid_attachments;
@@ -34,7 +35,8 @@ providers = providers.concat([
     ROUTER_PROVIDERS,
     provide("fqelement", {useValue: NAME}),
     provide("locs", {useValue: LOCS}),
-    provide("CompInfo", {useValue: COMP_INFO})
+    provide("CompInfo", {useValue: COMP_INFO}),
+    provide("WCompInfo", {useValue: WCOMP_INFO})
     ]);
 
 providers = providers.concat(
