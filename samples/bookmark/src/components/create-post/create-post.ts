@@ -1,9 +1,7 @@
-import {Widget, WidgetLoader, ClientBus, init, field} from "client-bus";
+import {Widget, ClientBus, init, field} from "client-bus";
 
 
-@Widget({
-  ng2_directives: [WidgetLoader]
-})
+@Widget()
 export class CreatePostComponent {
   submit_ok;
   post;

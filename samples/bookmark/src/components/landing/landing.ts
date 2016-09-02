@@ -1,11 +1,11 @@
-import {Widget, WidgetLoader} from "client-bus";
+import {Widget} from "client-bus";
 import {Router, ROUTER_DIRECTIVES} from "angular2/router";
 
 import {ClientBus, init, field} from "client-bus";
 
 
 @Widget({
-  ng2_directives: [WidgetLoader, ROUTER_DIRECTIVES],
+  ng2_directives: [ROUTER_DIRECTIVES],
   ng2_providers: [ClientBus]
 })
 export class LandingComponent {

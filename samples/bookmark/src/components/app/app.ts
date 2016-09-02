@@ -4,12 +4,10 @@ import {HomeComponent} from "../home/home";
 import {TopicsComponent} from "../topics/topics";
 import {UsersComponent} from "../users/users";
 
-import {Widget, WidgetLoader} from "client-bus";
+import {Widget} from "client-bus";
 
 
-@Widget({
-  ng2_directives: [WidgetLoader, ROUTER_DIRECTIVES]
-})
+@Widget({ng2_directives: [ROUTER_DIRECTIVES]})
 @RouteConfig([
   {path: "/home", name: "Home", component: HomeComponent, useAsDefault: true},
   {path: "/topics", name: "Topics", component: TopicsComponent},

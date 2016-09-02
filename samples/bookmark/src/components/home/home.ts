@@ -1,12 +1,9 @@
 import {HTTP_PROVIDERS} from "angular2/http";
 
-import {Widget, WidgetLoader, ClientBus, init, field} from "client-bus";
+import {Widget, ClientBus, init, field} from "client-bus";
 
 
-@Widget({
-  ng2_directives: [WidgetLoader],
-  ng2_providers: [ClientBus, HTTP_PROVIDERS]
-})
+@Widget({ng2_providers: [ClientBus, HTTP_PROVIDERS]})
 export class HomeComponent {
   user = {};
 

@@ -242,10 +242,15 @@ export interface WidgetMetadata {
   styles?: string[];
 }
 
-export function Widget(options: WidgetMetadata) {
+
+const WidgetLoaderRef = WidgetLoader;
+
+export function Widget(options?: WidgetMetadata) {
+  if (options === undefined) options = {};
+
   return (target: Function): any => {
     const dname = _ustring.dasherize(target.name).slice(1, -10);
-    const metadata = { selector: dname };
+    const metadata = {selector: dname};
 
     let providers = [provide("wname", {useValue: target.name.slice(0, -9)})];
     if (options.ng2_providers !== undefined) {
@@ -253,9 +258,11 @@ export function Widget(options: WidgetMetadata) {
     }
     metadata["providers"] = providers;
 
+    let directives = [WidgetLoaderRef];
     if (options.ng2_directives !== undefined) {
-      metadata["directives"] = options.ng2_directives;
+      directives = directives.concat(options.ng2_directives);
     }
+    metadata["directives"] = directives;
 
     if (options.template !== undefined) {
       metadata["template"] = options.template;
