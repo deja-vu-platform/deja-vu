@@ -1,0 +1,194 @@
+{
+  "wbonds": [
+    {
+      "fields": [
+        {
+          "name": "user",
+          "type": { "name": "User", "fqelement": "dv-access-auth" },
+          "widget": { "name": "Register", "fqelement": "dv-access-auth" }
+        }
+      ],
+      "subfield": {
+        "name": "register_user", "type": {
+          "name": "User", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "Landing", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+    {
+      "fields": [
+        {
+          "name": "user",
+          "type": { "name": "User", "fqelement": "dv-access-auth" },
+          "widget": { "name": "SignIn", "fqelement": "dv-access-auth" }
+        }
+      ],
+      "subfield": {
+        "name": "signin_user", "type": {
+          "name": "User", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "Landing", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+    {
+      "fields": [
+        {
+          "name": "signin_ok",
+          "type": { "name": "Boolean", "fqelement": "dv-access-auth" },
+          "widget": { "name": "SignIn", "fqelement": "dv-access-auth" }
+        },
+        {
+          "name": "register_ok",
+          "type": { "name": "Boolean", "fqelement": "dv-access-auth" },
+          "widget": { "name": "Register", "fqelement": "dv-access-auth" }
+        }
+      ],
+      "subfield": {
+        "name": "signin_or_register_ok", "type": {
+          "name": "Boolean", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "Landing", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+
+    
+    {
+      "fields": [
+        {
+          "name": "user",
+          "type": { "name": "User", "fqelement": "dv-access-auth" },
+          "widget": { "name": "LoggedIn", "fqelement": "dv-access-auth" }
+        },
+        {
+          "name": "source",
+          "type": { "name": "Source", "fqelement": "dv-community-follow-2" },
+          "widget": { "name": "EditFollow", "fqelement": "dv-community-follow-2" }
+        }
+      ],
+      "subfield": {
+        "name": "user", "type": {
+          "name": "User", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "Topics", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "user",
+          "type": { "name": "User", "fqelement": "dv-access-auth" },
+          "widget": { "name": "LoggedIn", "fqelement": "dv-access-auth" }
+        },
+        {
+          "name": "source",
+          "type": { "name": "Source", "fqelement": "dv-community-follow-1" },
+          "widget": { "name": "EditFollow", "fqelement": "dv-community-follow-1" }
+        }
+      ],
+      "subfield": {
+        "name": "user", "type": {
+          "name": "User", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "Users", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "post",
+          "type": { "name": "Post", "fqelement": "dv-messaging-post" },
+          "widget": { "name": "NewPostContent", "fqelement": "dv-messaging-post" }
+        },
+        {
+          "name": "post",
+          "type": { "name": "Post", "fqelement": "dv-messaging-post" },
+          "widget": { "name": "NewPostButton", "fqelement": "dv-messaging-post" }
+        },
+        {
+          "name": "item",
+          "type": { "name": "Item", "fqelement": "dv-organization-label" },
+          "widget": { "name": "LabelsText", "fqelement": "dv-organization-label" }
+        }
+      ],
+      "subfield": {
+        "name": "post", "type": {
+          "name": "Post", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "CreatePost", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+    {
+      "fields": [
+        {
+          "name": "user",
+          "type": { "name": "User", "fqelement": "dv-messaging-post" },
+          "widget": { "name": "NewPostButton", "fqelement": "dv-messaging-post" }
+        }
+      ],
+      "subfield": {
+        "name": "user", "type": {
+          "name": "User", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "CreatePost", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+    {
+      "fields": [
+        {
+          "name": "submit_ok",
+          "type": { "name": "Boolean", "fqelement": "dv-messaging-post" },
+          "widget": { "name": "NewPostButton", "fqelement": "dv-messaging-post" }
+        },
+        {
+          "name": "submit_ok",
+          "type": { "name": "Boolean", "fqelement": "dv-messaging-post" },
+          "widget": { "name": "LabelsText", "fqelement": "dv-organization-label" }
+        }
+      ],
+      "subfield": {
+        "name": "submit_ok", "type": {
+          "name": "Boolean", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "CreatePost", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+
+
+    {
+      "fields": [
+        {
+          "name": "user",
+          "type": { "name": "User", "fqelement": "dv-access-auth" },
+          "widget": { "name": "LoggedIn", "fqelement": "dv-access-auth" }
+        },
+        {
+          "name": "user",
+          "type": { "name": "User", "fqelement": "dv-samples-bookmark" },
+          "widget": { "name": "CreatePost", "fqelement": "dv-samples-bookmark" }
+        },
+        {
+          "name": "sub",
+          "type": { "name": "Subscriber", "fqelement": "dv-messaging-feed" },
+          "widget": { "name": "Feed", "fqelement": "dv-messaging-feed" }
+        }
+      ],
+      "subfield": {
+        "name": "user", "type": {
+          "name": "User", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "Home", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    }
+  ]
+}
