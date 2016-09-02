@@ -1,9 +1,9 @@
-import {ClientBus, init, field, Widget} from "client-bus";
+import {Widget, ClientBus, field} from "client-bus";
 
 
-@Widget({ng2_providers: [ClientBus]})
+@Widget()
 export class TopicsComponent {
   constructor(client_bus: ClientBus) {
-    init(this, client_bus, [field("user", "User")]);
+    client_bus.init(this, [field("user", "User")]);
   }
 }

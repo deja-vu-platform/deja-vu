@@ -1,4 +1,4 @@
-import {Widget, ClientBus, init, field} from "client-bus";
+import {Widget, ClientBus, field} from "client-bus";
 
 
 @Widget()
@@ -7,10 +7,11 @@ export class CreatePostComponent {
   post;
 
   constructor(client_bus: ClientBus) {
-    init(this, client_bus, [
+    client_bus.init(this, [
       field("user", "User"),
       field("post", "Post"),
-      field("submit_ok", "Boolean")]);
+      field("submit_ok", "Boolean")
+      ]);
 
     this.post.content = "";
     this.submit_ok.value = false;

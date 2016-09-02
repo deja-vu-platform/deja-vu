@@ -99,6 +99,11 @@ function t_equals(t1: Type, t2: Type) {
 }
 
 
+export function field(name: string, t: string) {
+  return {name: name, t: t};
+}
+
+
 @Injectable()
 export class ClientBus {
   constructor(
@@ -108,6 +113,14 @@ export class ClientBus {
   new_atom(t: string): any {
     return new Atom(this._comp_info)
       .adapt({name: t, fqelement: this._fqelement});
+  }
+
+  init(w, fields) {
+    w.fields = {};
+    for (const f of fields) {
+      w[f.name] = this.new_atom(f.t);
+      w.fields[f.name] = w[f.name];
+    }
   }
 }
 
@@ -196,13 +209,6 @@ export class WidgetLoader {
       .then(componentRef => componentRef.instance)
       .then(c => {
         _u.each(_u.keys(c), f => {
-          // get rid of init and do the inits here?
-          // widgets define their fields in the annotation
-          // so over here you are going to know your parent fields
-          // if you don't have any children then you don't really need to
-          // do anything so you can just let them be
-          // see if this.fields[..] has been initialized (it's an atom)
-          // if not, initialize and then adapt. It it has been, just adapt
           const adapt_info = adapt_table[f];
           if (adapt_info !== undefined) {
             c[f] = this.fields[adapt_info.host_fname].adapt(adapt_info.ftype);
@@ -218,19 +224,6 @@ export class WidgetLoader {
           c.dvAfterInit();
         }
       });
-  }
-}
-
-
-export function field(name: string, t: string) {
-  return {name: name, t: t};
-}
-
-export function init(w, client_bus, fields) {
-  w.fields = {};
-  for (const f of fields) {
-    w[f.name] = client_bus.new_atom(f.t);
-    w.fields[f.name] = w[f.name];
   }
 }
 

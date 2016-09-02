@@ -3,6 +3,8 @@ import {bootstrap} from "angular2/platform/browser";
 import {ROUTER_PROVIDERS, RouteConfig, ROUTER_DIRECTIVES}
 from "angular2/router";
 
+import {ClientBus} from "client-bus";
+
 import {LOCS} from "./locs";
 
 @@wid_imports
@@ -36,7 +38,8 @@ providers = providers.concat([
     provide("fqelement", {useValue: NAME}),
     provide("locs", {useValue: LOCS}),
     provide("CompInfo", {useValue: COMP_INFO}),
-    provide("WCompInfo", {useValue: WCOMP_INFO})
+    provide("WCompInfo", {useValue: WCOMP_INFO}),
+    ClientBus
     ]);
 
 providers = providers.concat(
