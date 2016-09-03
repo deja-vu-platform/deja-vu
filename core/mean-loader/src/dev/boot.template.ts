@@ -5,7 +5,6 @@ from "angular2/router";
 
 import {ClientBus} from "client-bus";
 
-import {LOCS} from "./locs";
 
 @@wid_imports
 @@attachments_imports
@@ -15,6 +14,7 @@ const WCOMP_INFO = @@wcomp_info;
 const NAME = "@@name";
 const MODE = "@@mode";
 const ATTACHMENTS = @@wid_attachments;
+const LOCS = @@locs;
 
 const WID_NAMES = @@wid_names;
 
