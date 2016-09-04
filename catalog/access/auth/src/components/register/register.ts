@@ -9,7 +9,7 @@ import {Widget} from "client-bus";
   ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class RegisterComponent {
-  user: User = {username: "", password: "", read: [], write: []};
+  user: User = {username: "", password: ""};
   register_ok = {value: false};
 
   constructor(private _graphQlService: GraphQlService) {}

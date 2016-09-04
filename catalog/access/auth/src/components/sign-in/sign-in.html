@@ -1,5 +1,5 @@
 <!-- SignIn -->
-<form (ngSubmit)="onSubmit()" #signInForm="ngForm" class="form-inline">
+<form (ngSubmit)="onSubmit()" #signInForm="ngForm" class="form-inline" [ngClass]="{'has-error': error}">
   <fieldset class="form-group">
     <label class="sr-only" for="username">Username</label>
     <input type="text" id="username" required class="form-control"

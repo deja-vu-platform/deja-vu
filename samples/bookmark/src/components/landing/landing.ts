@@ -7,7 +7,7 @@ export class LandingComponent {
   signin_or_register_ok;
   signin_user;
 
-  constructor(client_bus: ClientBus, router: Router) {
+  constructor(client_bus: ClientBus, private _router: Router) {
     client_bus.init(this, [
       field("signin_user", "User"),
       field("register_user", "User"),
@@ -18,7 +18,9 @@ export class LandingComponent {
       console.log("val is " + this.signin_or_register_ok.value);
       console.log(
         "sign in of " + JSON.stringify(this.signin_user.username) + " succ");
-      router.navigateByUrl("/app");
+      if (this.signin_or_register_ok.value) {
+        this._router.navigateByUrl("/app");
+      }
     });
   }
 }

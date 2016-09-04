@@ -1,9 +1,10 @@
 /// <reference path="../typings/tsd.d.ts" />
 import {Injectable, Inject} from "angular2/core";
 import {Http, Headers} from "angular2/http";
-import {Observable} from "rxjs/observable";
+import {Observable} from "rxjs/Rx";
 
 import "rxjs/add/operator/map";
+// import "rxjs/add/operator/let";
 
 import * as _u from "underscore";
 
@@ -23,21 +24,20 @@ export class GraphQlService {
     headers.append("Content-type", "application/json");
     const query_str = query.replace(/ /g, "");
 
-    return this._http
+    return this._gql_map(this._http
       .post(
           this._api + "/graphql",
           JSON.stringify({query: "mutation {" + query_str + "}"}),
-          {headers: headers})
-      .map(res => res.json())
-      .map(json_res => json_res.data);
+          {headers: headers}));
+     // .let(this._gql_map);
+
   }
 
   get(query): Observable<any> {
     const query_str = query.replace(/ /g, "");
-    return this._http
-      .get(this._api + `/graphql?query=query+{${query_str}}`)
-      .map(res => res.json())
-      .map(json_res => json_res.data);
+    return this._gql_map(this._http
+      .get(this._api + `/graphql?query=query+{${query_str}}`));
+      // .let(this._gql_map);
   }
 
   pobj(o: Object) {
@@ -50,5 +50,16 @@ export class GraphQlService {
 
   plist(l: any[]) {
     return "[" + _u.map(l, i => this.pobj(i)).join(", ") + "]";
+  }
+
+  _gql_map(obs: Observable<any>) {
+    return obs
+      .map(res => res.json())
+      .map(json_res => {
+        if (json_res.errors !== undefined) {
+          throw new Error(json_res.errors[0].message);
+        }
+        return json_res.data;
+      });
   }
 }
