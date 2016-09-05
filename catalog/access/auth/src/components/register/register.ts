@@ -10,19 +10,28 @@ import {Widget} from "client-bus";
 })
 export class RegisterComponent {
   user: User = {username: "", password: ""};
+  reenter_password = "";
   register_ok = {value: false};
+  username_error = false;
+  reenter_password_error = false;
 
   constructor(private _graphQlService: GraphQlService) {}
 
   onSubmit() {
+    this.reenter_password_error = this.reenter_password !== this.user.password;
+    if (this.reenter_password_error) return;
+
     this._graphQlService
       .post(`
         register(
           username: "${this.user.username}", password: "${this.user.password}")
       `)
-      .subscribe(res => {
-        console.log("about to emit from register");
-        this.register_ok.value = true;
-      });
+      .subscribe(
+        _ => {
+          this.register_ok.value = true;
+        },
+        err => {
+          this.username_error = true;
+        });
   }
 }

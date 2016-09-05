@@ -31,7 +31,6 @@ export class SignInComponent {
           this.signin_ok.value = true;
         },
         err => {
-          console.log(err);
           this.error = true;
         });
   }
