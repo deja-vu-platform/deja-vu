@@ -1,8 +1,7 @@
 /// <reference path="../../../typings/underscore/underscore.d.ts" />
 import {HTTP_PROVIDERS} from "angular2/http";
-import {ClientBus} from "client-bus";
 
-import {Item, Label} from "../../shared/label";
+import {Label} from "../../shared/label";
 import {GraphQlService} from "gql";
 
 import "rxjs/add/operator/toPromise";
@@ -12,24 +11,19 @@ import * as _u from "underscore";
 import {Widget} from "client-bus";
 
 
-@Widget({
-  ng2_providers: [ClientBus, GraphQlService, HTTP_PROVIDERS]
-})
+@Widget({ng2_providers: [GraphQlService, HTTP_PROVIDERS]})
 export class LabelsTextComponent {
-  item: Item = {name: "", labels: []};
+  item = {labels: [], on_change: undefined, atom_id: undefined};
   labels_text: string = "";
   submit_ok = {value: false, on_change: undefined};
 
-  constructor(
-      private _client_bus: ClientBus,
-      private _graphQlService: GraphQlService) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   // On submit will attach labels to the item
   dvAfterInit() {
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === false) return;
 
-      this.item.labels = [];
       console.log("On submit at labels-text");
       return Promise.all<Label>(
           _u.chain(this.labels_text.split(","))
