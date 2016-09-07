@@ -189,6 +189,23 @@
           "name": "Home", "fqelement": "dv-samples-bookmark"
         }
       }
+    },
+
+    {
+      "fields": [
+        {
+          "name": "signout_ok",
+          "type": { "name": "Boolean", "fqelement": "dv-access-auth" },
+          "widget": { "name": "SignOut", "fqelement": "dv-access-auth" }
+        }
+      ],
+      "subfield": {
+        "name": "signout_ok", "type": {
+          "name": "Boolean", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "App", "fqelement": "dv-samples-bookmark"
+        }
+      }
     }
   ]
 }
