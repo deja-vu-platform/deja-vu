@@ -308,9 +308,7 @@ export namespace GruntTask {
         const wid_names = _u.map(widgets, w => w.name);
 
         if (action === "dev") {
-          // wid_imports = _u.map(wid_names, imp).join("\n");
           wid_imports = "import {WidgetLoader} from 'client-bus'";
-          // wid_directives = "[" + _u.map(wid_names, component).join() + "]";
           wid_directives = "[WidgetLoader]";
           wid_selectors = _u.map(wid_names, selector).join("\n");
         } else {

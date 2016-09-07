@@ -1,5 +1,5 @@
 /// <reference path="../typings/tsd.d.ts" />
-import {Injectable, Inject, Component} from "angular2/core";
+import {Injectable, Inject, Component, Optional} from "angular2/core";
 import {DynamicComponentLoader, Injector, ElementRef} from "angular2/core";
 import {provide} from "angular2/core";
 
@@ -144,15 +144,16 @@ export class WidgetLoader {
       private _dcl: DynamicComponentLoader, private _element_ref: ElementRef,
       @Inject("WCompInfo") private _wcomp_info: WCompInfo,
       private _client_bus: ClientBus,
-      @Inject("wname") private _host_wname,
-      @Inject("fqelement") private _host_fqelement) {}
+      @Inject("wname") @Optional() private _host_wname,
+      @Inject("fqelement") @Optional() private _host_fqelement) {}
 
   _adapt_table() {
+    if (this._host_wname !== undefined) return {};
     const host_widget_t = {
       name: this._host_wname,
       fqelement: this._host_fqelement
     };
-    const widget_t = { name: this.name, fqelement: this.fqelement };
+    const widget_t = {name: this.name, fqelement: this.fqelement};
     if (widget_t.fqelement === undefined) {
       widget_t.fqelement = this._host_fqelement;
     }
