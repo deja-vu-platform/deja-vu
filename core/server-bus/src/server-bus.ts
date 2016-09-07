@@ -316,13 +316,26 @@ class Dispatcher {
     console.log(
       "using options " + JSON.stringify(options) +
       " for query <" + query_str + ">");
-    return rp(options)
+
+    let attempt = 1;
+    const req = () => rp(options)
       .then(body => {
         console.log(body);
         return body;
       })
-      .catch(reason => console.log(
+      .catch(reason => {
+        if (reason.error.code === "ECONNREFUSED") {
+          ++attempt;
+          const delay = Math.floor(Math.random() * Math.pow(2, attempt)) + 2;
+          console.log(`Failed to reach ${loc}, will retry in ${delay}s`);
+          return new Promise(r => setTimeout(r, delay * 1000)).then(_ => req());
+        } else {
+          console.log(
             `For ${loc} q ${query_str} got error: ` +
-            `${JSON.stringify(reason.error)}`));
+            `${JSON.stringify(reason.error)}`);
+        }
+        return Promise.resolve("");
+      });
+    return req();
   }
 }
