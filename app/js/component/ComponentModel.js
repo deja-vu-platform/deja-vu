@@ -64,7 +64,8 @@ function BaseComponent(type, components) {
         author: ''
     };
     this.dimensions = {rows: 1, cols: 1};
-    this.layout = {1:{
+    this.layout = {
+                1:{
                     1:{
                         spans:{row:1,col:1},
                         merged:{isMerged: false,

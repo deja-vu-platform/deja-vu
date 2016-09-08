@@ -566,7 +566,11 @@ function displayComponentInTable(cellId, widget, component) {
         // also note: no properties because of the same reason
         var padding = {top: 0, left: 0, bottom: 0, right: 0};
         selectedUserComponent.components[row][col].padding = padding;
-        selectedUserComponent.components[row][col].properties.custom = selectedUserComponent.layout.overallStyles;
+        if (selectedUserComponent.layout.overallStyles){
+            selectedUserComponent.components[row][col].properties.custom = selectedUserComponent.layout.overallStyles;
+        } else {
+            selectedUserComponent.components[row][col].properties.custom = {};
+        }
         var properties = selectedUserComponent.components[row][col].properties;
 
         if (type === 'label') {
