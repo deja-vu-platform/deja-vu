@@ -236,11 +236,6 @@
           "name": "post",
           "type": { "name": "Post", "fqelement": "dv-messaging-post" },
           "widget": { "name": "Author", "fqelement": "dv-messaging-post" }
-        },
-        {
-          "name": "target",
-          "type": { "name": "Target", "fqelement": "dv-messaging-comment" },
-          "widget": { "name": "Comments", "fqelement": "dv-messaging-comment" }
         }
       ],
       "subfield": {
