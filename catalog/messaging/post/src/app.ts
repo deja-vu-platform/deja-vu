@@ -65,6 +65,11 @@ const post_type = new graphql.GraphQLObjectType({
   fields: () => ({
     atom_id: {"type": graphql.GraphQLString},
     content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    author: {
+      "type": new graphql.GraphQLNonNull(user_type),
+      resolve: post => mean.db.collection("users")
+          .findOne({atom_id: post.author.atom_id})
+    }
   })
 });
 
@@ -91,9 +96,16 @@ const schema = new graphql.GraphQLSchema({
         args: {
           username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, {username}) => {
-          return mean.db.collection("users").findOne({username: username});
-        }
+        resolve: (root, {username}) => mean.db.collection("users")
+          .findOne({username: username})
+      },
+      post_by_id: {
+        "type": post_type,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, {atom_id}) => mean.db.collection("posts")
+          .findOne({atom_id: atom_id})
       }
     })
   }),
@@ -106,21 +118,25 @@ const schema = new graphql.GraphQLSchema({
           author: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
           content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: (_, {author, content}) => {
-          const post = {atom_id: content, content: content};
-          return Validation.user_exists(author)
-            .then(user => Promise.all([
-                mean.db.collection("posts").insertOne(post),
-                mean.db.collection("users")
-                  .updateOne(
-                    {atom_id: user.atom_id},
-                    {$addToSet: {posts: {atom_id: post.atom_id}}}),
-                bus.update_atom(
-                  "User", user.atom_id,
+        resolve: (_, {author, content}) => Validation.user_exists(author)
+          .then(user => ({
+            atom_id: content,
+            content: content,
+            author: {atom_id: user.atom_id}
+          }))
+          .then(post => Promise
+            .all([
+              mean.db.collection("posts").insertOne(post),
+              mean.db.collection("users")
+                .updateOne(
+                  {atom_id: post.author.atom_id},
                   {$addToSet: {posts: {atom_id: post.atom_id}}}),
-                bus.create_atom("Post", post.atom_id, post)
-                ]).then(_ => post));
-        }
+              bus.update_atom(
+                "User", post.author.atom_id,
+                {$addToSet: {posts: {atom_id: post.atom_id}}}),
+              bus.create_atom("Post", post.atom_id, post)
+              ])
+            .then(_ => post))
       }
     })
   })

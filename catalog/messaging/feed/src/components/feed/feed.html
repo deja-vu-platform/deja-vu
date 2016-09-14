@@ -1,12 +1,9 @@
 <!-- Feed(Name) -->
-<ul *ngIf="feed && feed.length > 0" class="row" style="list-style-type: none">
-  <li *ngFor="#feedItem of feed" class="col-md-12">
-    <div class="row">
-      <message [msg]="feedItem.message"></message>
-    </div>
-    <div class="row">
-      by <publisher [pub]="feedItem.publisher"></publisher>
-    </div>
+<ul *ngIf="feed && feed.length > 0" class="list-group">
+  <li *ngFor="#feedItem of feed" class="list-group-item">
+    <!-- tmp hack -->
+    <dv-widget name="FeedItem" fqelement="dv-samples-bookmark"
+     [fields]="feedItem"></dv-widget>
   </li>
 </ul>
 <div *ngIf="!feed || feed.length == 0">

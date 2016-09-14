@@ -118,7 +118,8 @@ export namespace GruntTask {
       emitDecoratorMetadata: true,
       experimentalDecorators: true,
       removeComments: false,
-      noImplicitAny: false
+      noImplicitAny: false,
+      rootDir: "src"
     };
     const ts_client_opts = _u.extend({module: "system"}, ts_base_opts);
     const ts_server_opts = _u.extend({module: "commonjs"}, ts_base_opts);

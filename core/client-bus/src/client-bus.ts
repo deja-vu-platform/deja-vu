@@ -148,7 +148,7 @@ export class WidgetLoader {
       @Inject("fqelement") @Optional() private _host_fqelement) {}
 
   _adapt_table() {
-    if (this._host_wname !== undefined) return {};
+    if (this._host_wname === undefined) return {};
     const host_widget_t = {
       name: this._host_wname,
       fqelement: this._host_fqelement
@@ -191,7 +191,8 @@ export class WidgetLoader {
     const d_name = _ustring.dasherize(this.name).slice(1);
     let imp_string_prefix = "";
     let providers = [];
-    if (this.fqelement !== undefined) {
+    if (this.fqelement !== undefined &&
+        /* hack */ this.fqelement !== "dv-samples-bookmark") {
       imp_string_prefix =  `${this.fqelement}/lib/`;
       const fqelement_split = this.fqelement.split("-");
       if (fqelement_split.length === 4) {

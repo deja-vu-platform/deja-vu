@@ -1,4 +1,5 @@
 import {HTTP_PROVIDERS} from "angular2/http";
+import {Component} from "angular2/core";
 
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/operator/map";
@@ -10,7 +11,7 @@ import {Message, Publisher} from "../../shared/data";
 import {GraphQlService} from "gql";
 
 
-import {Widget} from "client-bus";
+import {Widget, ClientBus} from "client-bus";
 
 
 export interface FeedItem {
@@ -26,7 +27,8 @@ export class FeedComponent {
   feed: FeedItem[];
   sub = {name: "", on_change: undefined};
 
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(
+      private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
 
   dvAfterInit() {
     const update_feed = () => {
@@ -40,6 +42,7 @@ export class FeedComponent {
             subscriptions {
               name,
               published {
+                atom_id,
                 content
               }
             }
@@ -55,10 +58,33 @@ export class FeedComponent {
              unused_ci: number) => {
               return {message: message, publisher: pub};
             })
-        .subscribe(feedItem => this.feed.push(feedItem));
+        .subscribe(feedItem => {
+          const message = this._clientBus.new_atom("Message");
+          message.content = feedItem.message.content;
+          message.atom_id = feedItem.message.atom_id;
+          const publisher = this._clientBus.new_atom("Publisher");
+          publisher.name = feedItem.publisher.name;
+
+          this.feed.push({message: message, publisher: publisher});
+        });
     };
 
     update_feed();
     this.sub.on_change(update_feed);
   }
 }
+
+
+@Component({
+  selector: "feed-item",
+  template: `
+    <div class="row">
+      <message [msg]="msg"></message>
+    </div>
+    <div class="row">
+      by <publisher [pub]="pub"></publisher>
+    </div>
+  `,
+  inputs: ["msg", "pub"]
+})
+export class FeedItemComponent {}

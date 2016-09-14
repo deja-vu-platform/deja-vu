@@ -17,6 +17,7 @@ module.exports = function(grunt) {
        "dv-community-follow": 2,
        "dv-messaging-post": 1,
        "dv-messaging-feed": 1,
-       "dv-organization-label": 1,
+       "dv-messaging-comment": 1,
+       "dv-organization-label": 1
      });
 }

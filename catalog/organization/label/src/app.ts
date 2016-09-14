@@ -86,6 +86,7 @@ item_type = new graphql.GraphQLObjectType({
       "type": new graphql.GraphQLList(label_type),
       resolve: item => mean.db.collection("labels")
           .find({atom_id: {$in: item.labels.map(l => l.atom_id)}})
+          .toArray()
     },
     attach_labels: {
       "type": graphql.GraphQLBoolean,

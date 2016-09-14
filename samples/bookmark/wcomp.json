@@ -206,6 +206,50 @@
           "name": "App", "fqelement": "dv-samples-bookmark"
         }
       }
+    },
+
+
+    {
+      "fields": [
+        {
+          "name": "post",
+          "type": {"name": "Post", "fqelement": "dv-samples-bookmark"},
+          "widget": {"name": "FeedItem", "fqelement": "dv-samples-bookmark"}
+        }
+      ],
+      "subfield": {
+          "name": "message",
+          "type": { "name": "Message", "fqelement": "dv-messaging-feed" },
+          "widget": { "name": "Feed", "fqelement": "dv-messaging-feed" }
+      }
+    },
+
+
+    {
+      "fields": [
+        {
+          "name": "item",
+          "type": { "name": "Item", "fqelement": "dv-organization-label" },
+          "widget": { "name": "Labels", "fqelement": "dv-organization-label" }
+        },
+        {
+          "name": "post",
+          "type": { "name": "Post", "fqelement": "dv-messaging-post" },
+          "widget": { "name": "Author", "fqelement": "dv-messaging-post" }
+        },
+        {
+          "name": "target",
+          "type": { "name": "Target", "fqelement": "dv-messaging-comment" },
+          "widget": { "name": "Comments", "fqelement": "dv-messaging-comment" }
+        }
+      ],
+      "subfield": {
+        "name": "post", "type": {
+          "name": "Post", "fqelement": "dv-samples-bookmark"
+        }, "widget": {
+          "name": "FeedItem", "fqelement": "dv-samples-bookmark"
+        }
+      }
     }
   ]
 }

@@ -8,7 +8,8 @@
         {"name": "User", "fqelement": "dv-access-auth"},
         {"name": "User", "fqelement": "dv-messaging-post"},
         {"name": "Subscriber", "fqelement": "dv-messaging-feed"},
-        {"name": "Publisher", "fqelement": "dv-messaging-feed"}
+        {"name": "Publisher", "fqelement": "dv-messaging-feed"},
+        {"name": "Author", "fqelement": "dv-messaging-comment"}
       ],
       "subtype": { "name": "User", "fqelement": "dv-samples-bookmark" }
     },
@@ -17,7 +18,8 @@
       "types": [
         {"name": "Item", "fqelement": "dv-organization-label"},
         {"name": "Post", "fqelement": "dv-messaging-post"},
-        {"name": "Message", "fqelement": "dv-messaging-feed"}
+        {"name": "Message", "fqelement": "dv-messaging-feed"},
+        {"name": "Target", "fqelement": "dv-messaging-comment"}
       ],
       "subtype": { "name": "Post", "fqelement": "dv-samples-bookmark" }
     },
@@ -63,6 +65,21 @@
       ],
       "subfield": {
         "name": "content", "type": {
+          "name": "Post", "fqelement": "dv-samples-bookmark"
+        }
+      }
+    },
+
+
+    {
+      "fields": [
+        {
+          "name": "author",
+          "type": {"name": "Post", "fqelement": "dv-messaging-post"}
+        }
+      ],
+      "subfield": {
+        "name": "author", "type": {
           "name": "Post", "fqelement": "dv-samples-bookmark"
         }
       }
@@ -179,6 +196,12 @@
           "name": "name",
           "type": {
             "name": "Subscriber", "fqelement": "dv-messaging-feed"
+          }
+        },
+        {
+          "name": "name",
+          "type": {
+            "name": "Author", "fqelement": "dv-messaging-comment"
           }
         },
         {

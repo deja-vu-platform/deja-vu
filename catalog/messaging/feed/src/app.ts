@@ -84,7 +84,8 @@ const msg_type = new graphql.GraphQLObjectType({
   name: "Message",
   fields: () => ({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    content: {"type": graphql.GraphQLString}
+    content: {"type": graphql.GraphQLString},
+    atom_id: {"type": graphql.GraphQLString}
   })
 });
 
