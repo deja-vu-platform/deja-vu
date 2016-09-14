@@ -37,7 +37,8 @@ export interface CompInfo {
 
 export class Atom {
   private _forwards = {};
-  private _on_change_listeners: (() => void)[] = [];
+  private _on_change_listeners: (() => Promise<Boolean>)[] = [];
+  private _on_after_change_listeners: (() => Promise<Boolean>)[] = [];
   private _core;
 
   constructor(private _comp_info: CompInfo) {
@@ -62,16 +63,22 @@ export class Atom {
              }
 
              target[name] = value;
-             for (const on_change of this._on_change_listeners) {
-               on_change();
-             }
+
+             Promise
+               .all(this._on_change_listeners.map(oc => oc()))
+               .then(_ => Promise
+                 .all(this._on_after_change_listeners.map(ac => ac())));
              return true;
            }
     });
   }
 
-  on_change(handler: () => void) {
+  on_change(handler: () => Promise<Boolean>) {
     this._on_change_listeners.push(handler);
+  }
+
+  on_after_change(handler: () => Promise<Boolean>) {
+    this._on_after_change_listeners.push(handler);
   }
 
   // from a type to the core
