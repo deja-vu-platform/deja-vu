@@ -84,9 +84,12 @@ item_type = new graphql.GraphQLObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     labels: {
       "type": new graphql.GraphQLList(label_type),
-      resolve: item => mean.db.collection("labels")
+      resolve: item => {
+        if (_u.isEmpty(item.labels)) return [];
+        return mean.db.collection("labels")
           .find({atom_id: {$in: item.labels.map(l => l.atom_id)}})
-          .toArray()
+          .toArray();
+      }
     },
     attach_labels: {
       "type": graphql.GraphQLBoolean,
@@ -100,7 +103,7 @@ item_type = new graphql.GraphQLObjectType({
             .then(label_objs => {
               const up_op = {$addToSet: {labels: {$each: label_objs}}};
               return mean.db.collection("items")
-                .updateOne({name: item.name}, up_op)
+                .updateOne({atom_id: item.atom_id}, up_op)
                 .then(_ => Promise.all([
                     bus.update_atom("Item", item.atom_id, up_op),
                     Promise.all(
@@ -170,21 +173,20 @@ const schema = new graphql.GraphQLSchema({
         args: {
           name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (_, {name}) => mean.db.collection("labels").findOneAndReplace(
-          {name: name},
-          {atom_id: name, name: name, items: []},
-          {
-            upsert: true,
-            returnOriginal: false
-          })
-          .then(up => {
-            const l = up.value;
-            if (!up.lastErrorObject.updatedExisting) {
-              return bus.create_atom("Label", l.atom_id, l).then(_ => l);
+        resolve: (_, {name}) => mean.db.collection("labels")
+          .find({name: name})
+          .toArray()
+          .then(res => {
+            if (res.length === 0) {
+              const l = {atom_id: name, name: name, items: []};
+              return mean.db.collection("labels")
+                .insertOne(l)
+                .then(_ => bus.create_atom("Label", l.atom_id, l))
+                .then(_ => l);
             }
-            return l;
+            return res[0];
           })
-      } 
+        }
     })
   })
 });
