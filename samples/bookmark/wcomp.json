@@ -151,6 +151,11 @@
         {
           "name": "submit_ok",
           "type": { "name": "Boolean", "fqelement": "dv-messaging-post" },
+          "widget": { "name": "NewPostContent", "fqelement": "dv-messaging-post" }
+        },
+        {
+          "name": "submit_ok",
+          "type": { "name": "Boolean", "fqelement": "dv-messaging-post" },
           "widget": { "name": "LabelsText", "fqelement": "dv-organization-label" }
         }
       ],

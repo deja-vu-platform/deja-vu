@@ -13,9 +13,9 @@ import {Widget} from "client-bus";
 
 @Widget({ng2_providers: [GraphQlService, HTTP_PROVIDERS]})
 export class LabelsTextComponent {
-  item = {labels: [], on_change: undefined, atom_id: undefined};
+  item = {labels: [], atom_id: undefined};
   labels_text: string = "";
-  submit_ok = {value: false, on_change: undefined};
+  submit_ok = {value: false, on_change: undefined, on_after_change: undefined};
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -52,6 +52,12 @@ export class LabelsTextComponent {
               `)
               .toPromise();
           });
+    });
+
+    this.submit_ok.on_after_change(() => {
+      this.item.atom_id = undefined;
+      this.item.labels = [];
+      this.labels_text = "";
     });
   }
 }
