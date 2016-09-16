@@ -1,14 +1,12 @@
-<div class="container">
-  <form (ngSubmit)="onSubmit()" #commentForm="ngForm" class="form-horizontal">
-    <div class="form-group">
-      <label class="sr-only" for="content">Content</label>
-      <textarea required id="content"
-        [(ngModel)]="comment.content" ngControl="comment.content"
-        placeholder="Your comment"></textarea>
-    </div>
-    <div class="form-group">
-      <button type="submit" class="btn btn-default btn-sm"
-       [disabled]="!commentForm.valid">Comment</button>
-    </div>
-  </form>
-</div>
+<form (ngSubmit)="onSubmit()" #commentForm="ngForm" class="form-horizontal">
+  <fieldset class="form-group">
+    <label class="sr-only" for="content">Content</label>
+    <textarea required id="content" class="form-control"
+      [(ngModel)]="comment.content" ngControl="comment.content"
+      placeholder="Your comment"></textarea>
+  </fieldset>
+  <div class="form-group">
+    <button type="submit" class="btn btn-default btn-sm pull-right"
+     [disabled]="!commentForm.valid">Comment</button>
+  </div>
+</form>

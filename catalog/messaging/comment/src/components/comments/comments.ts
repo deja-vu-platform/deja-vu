@@ -13,7 +13,7 @@ import {CommentComponent} from "../comment/comment";
 })
 export class CommentsComponent {
   comments: any[];
-  target = {name: "", on_change: _ => undefined};
+  target = {name: "", atom_id: "", on_change: _ => undefined};
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -25,7 +25,7 @@ export class CommentsComponent {
       this.comments = [];
       this._graphQlService
         .get(`
-          target(name: "${this.target.name}") {
+          target_by_id(atom_id: "${this.target.atom_id}") {
             comments {
               message,
               author {

@@ -94,17 +94,17 @@ const target_type = new graphql.GraphQLObjectType({
     newComment: {
       "type": graphql.GraphQLBoolean,
       args: {
-        author: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        author_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
       },
-      resolve: (target, {author, content}) => {
+      resolve: (target, {author_id, content}) => {
         const atom_id = "foo";
-        return Validation.author_exists(author)
+        return Validation.author_exists(author_id)
           .then(author => Promise.all([
               mean.db.collection("comments").insertOne({
                 atom_id: atom_id,
                 content: content,
-                author: author.atom_id
+                author: {atom_id: author.atom_id}
               }),
               mean.db.collection("targets")
                 .updateOne(
@@ -130,24 +130,24 @@ const schema = new graphql.GraphQLSchema({
   query: new graphql.GraphQLObjectType({
     name: "Query",
     fields: () => ({
-      target: {
+      target_by_id: {
         "type": target_type,
         args: {
-          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
-        resolve: (root, {name}) => mean.db
-          .collection("targets").findOne({name: name})
+        resolve: (root, {atom_id}) => mean.db
+          .collection("targets").findOne({atom_id: atom_id})
       }
     })
   })
 });
 
 namespace Validation {
-  export function author_exists(name) {
+  export function author_exists(atom_id) {
     return mean.db.collection("authors")
-      .findOne({name: name}, {atom_id: 1})
+      .findOne({atom_id: atom_id}, {atom_id: 1})
       .then(author => {
-        if (!author) throw new Error(`author ${name} not found`);
+        if (!author) throw new Error(`author of id ${atom_id} not found`);
         return author;
       });
   }

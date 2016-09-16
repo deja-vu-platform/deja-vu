@@ -9,9 +9,9 @@ import {Widget} from "client-bus";
   ng2_providers: [GraphQlService, HTTP_PROVIDERS]
 })
 export class NewCommentComponent {
-  author = {name: ""};
+  author = {name: "", atom_id: ""};
   comment = {atom_id: "", content: ""};
-  target = {name: ""};
+  target = {name: "", atom_id: ""};
   submit_ok = {value: false};
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -19,9 +19,9 @@ export class NewCommentComponent {
   onSubmit() {
     this._graphQlService
       .get(`
-        target(name: "${this.target.name}") {
+        target_by_id(atom_id: "${this.target.atom_id}") {
           newComment(
-            author: "${this.author.name}",
+            author_id: "${this.author.atom_id}",
             content: "${this.comment.content}") {
             atom_id
         }
