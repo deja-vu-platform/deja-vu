@@ -217,13 +217,15 @@ export class WidgetLoader {
             Injector.resolve(providers)))
       .then(componentRef => componentRef.instance)
       .then(c => {
+        if (c.fields === undefined) {
+          c.fields = {};
+        }
+        c.fields = _u.extend(c.fields, this.fields);
         _u.each(_u.keys(c), f => {
           const adapt_info = adapt_table[f];
           if (adapt_info !== undefined) {
             c[f] = this.fields[adapt_info.host_fname].adapt(adapt_info.ftype);
-            if (c.fields !== undefined) {
-              c.fields[f] = c[f];
-            }
+            c.fields[f] = c[f];
           }
         });
         return c;
