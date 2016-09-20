@@ -1,3 +1,4 @@
+/// <reference path="../../../typings/underscore/underscore.d.ts" />
 import {HTTP_PROVIDERS} from "angular2/http";
 import {Component} from "angular2/core";
 
@@ -13,6 +14,8 @@ import {GraphQlService} from "gql";
 
 import {Widget, ClientBus} from "client-bus";
 
+import * as _u from "underscore";
+
 
 export interface FeedItem {
   message: Message;
@@ -26,6 +29,7 @@ export interface FeedItem {
 export class FeedComponent {
   feed: FeedItem[];
   sub = {name: "", on_change: undefined};
+  fields = {};
 
   constructor(
       private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
@@ -58,14 +62,17 @@ export class FeedComponent {
              unused_ci: number) => {
               return {message: message, publisher: pub};
             })
-        .subscribe(feedItem => {
+        .map(feedItem => {
           const message = this._clientBus.new_atom("Message");
           message.content = feedItem.message.content;
           message.atom_id = feedItem.message.atom_id;
           const publisher = this._clientBus.new_atom("Publisher");
           publisher.name = feedItem.publisher.name;
-
-          this.feed.push({message: message, publisher: publisher});
+          return {message: message, publisher: publisher};
+        })
+        .map(feedItem => _u.extend(feedItem, this.fields))
+        .subscribe(feedItem => {
+          this.feed.push(feedItem);
         });
     };
 

@@ -21,9 +21,10 @@ export class NewCommentComponent {
       .get(`
         target_by_id(atom_id: "${this.target.atom_id}") {
           newComment(
-            author_id: "${this.author.atom_id}",
+            author: "${this.author.name}",
             content: "${this.comment.content}") {
-            atom_id
+              atom_id
+            }
         }
       `)
       .subscribe(atom_id => {

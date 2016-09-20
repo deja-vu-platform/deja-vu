@@ -19,22 +19,22 @@ export class CommentsComponent {
 
   dvAfterInit() {
     const update_comments = () => {
-      if (!this.target.name) return;
-      console.log("got new target" + this.target.name);
+      if (!this.target.atom_id) return;
+      console.log("got new target" + this.target.atom_id);
 
       this.comments = [];
       this._graphQlService
         .get(`
           target_by_id(atom_id: "${this.target.atom_id}") {
             comments {
-              message,
+              content,
               author {
                 name
               }
             }
           }
         `)
-        .map(data => data.target.comments)
+        .map(data => data.target_by_id.comments)
         .subscribe(comments => {
           this.comments = comments;
         });

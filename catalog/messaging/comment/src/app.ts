@@ -6,6 +6,8 @@ import {Mean} from "mean-loader";
 import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
 
+import * as _u from "underscore";
+
 
 const mean = new Mean(
   (db, debug) => {
@@ -67,8 +69,8 @@ const comment_type = new graphql.GraphQLObjectType({
     content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     author: {
       "type": author_type,
-      resolve: comment => mean.db.collection("authors").
-        find({atom_id: comment.author.atom_id})
+      resolve: comment => mean.db.collection("authors")
+        .findOne({atom_id: comment.author.atom_id})
     }
   })
 });
@@ -87,39 +89,38 @@ const target_type = new graphql.GraphQLObjectType({
     name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     comments: {
       "type": new graphql.GraphQLList(comment_type),
-      resolve: target => mean.db.collection("comments")
+      resolve: target => {
+        if (_u.isEmpty(target.comments)) return [];
+        return mean.db.collection("comments")
           .find({atom_id: {$in: target.comments.map(p => p.atom_id)}})
-          .toArray()
+          .toArray();
+      }
     },
     newComment: {
-      "type": graphql.GraphQLBoolean,
+      "type": comment_type,
       args: {
-        author_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        author: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
       },
-      resolve: (target, {author_id, content}) => {
+      resolve: (target, {author, content}) => {
         const atom_id = "foo";
-        return Validation.author_exists(author_id)
-          .then(author => Promise.all([
-              mean.db.collection("comments").insertOne({
-                atom_id: atom_id,
-                content: content,
-                author: {atom_id: author.atom_id}
-              }),
+        return Validation.author_exists(author)
+          .then(author => ({
+             atom_id: atom_id,
+             content: content,
+             author: {atom_id: author.atom_id}
+          }))
+          .then(comment => Promise.all([
+              mean.db.collection("comments").insertOne(comment),
               mean.db.collection("targets")
                 .updateOne(
                   {atom_id: target.atom_id},
                   {$addToSet: {comments: {atom_id: atom_id}}}),
-              bus.create_atom("Comment", atom_id, {
-                atom_id: atom_id,
-                content: content,
-                author: author.atom_id
-              }),
+              bus.create_atom("Comment", atom_id, comment),
               bus.update_atom(
                 "Target", target.atom_id,
                 {$addToSet: {comments: {atom_id: atom_id}}})
-              ])
-          .then(_ => true));
+              ]).then(_ => comment));
       }
     }
   })
@@ -143,11 +144,11 @@ const schema = new graphql.GraphQLSchema({
 });
 
 namespace Validation {
-  export function author_exists(atom_id) {
+  export function author_exists(name) {
     return mean.db.collection("authors")
-      .findOne({atom_id: atom_id}, {atom_id: 1})
+      .findOne({name: name}, {atom_id: 1})
       .then(author => {
-        if (!author) throw new Error(`author of id ${atom_id} not found`);
+        if (!author) throw new Error(`author of name ${name} not found`);
         return author;
       });
   }

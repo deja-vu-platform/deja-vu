@@ -232,15 +232,16 @@
     {
       "fields": [
         {
-          "name": "sub",
-          "type": {"name": "Subscriber", "fqelement": "dv-messaging-feed"},
-          "widget": {"name": "Feed", "fqelement": "dv-messaging-feed"}
-        }
-      ],
-      "subfield": {
           "name": "author",
           "type": {"name": "Author", "fqelement": "dv-messaging-comment"},
           "widget": {"name": "CommentsWithComment", "fqelement": "dv-messaging-comment"}
+        }
+
+      ],
+      "subfield": {
+          "name": "sub",
+          "type": {"name": "Subscriber", "fqelement": "dv-messaging-feed"},
+          "widget": {"name": "Feed", "fqelement": "dv-messaging-feed"}
         }
     },
 
