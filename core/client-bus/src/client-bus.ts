@@ -140,12 +140,14 @@ export interface WCompInfo {
 @Component({
   selector: "dv-widget",
   template:  "<div #widget></div>",
-  inputs: ["fqelement", "name", "fields"]
+  inputs: ["fqelement", "name", "fields", "hosts"]
 })
 export class WidgetLoader {
   fqelement: string;
   name: string;
   fields;
+  hosts;
+  c_hosts;
 
   constructor(
       private _dcl: DynamicComponentLoader, private _element_ref: ElementRef,
@@ -160,12 +162,18 @@ export class WidgetLoader {
       name: this._host_wname,
       fqelement: this._host_fqelement
     };
+    this.c_hosts = [];
+    if (this.hosts !== undefined) {
+      this.c_hosts = this.c_hosts.concat(this.hosts);
+    }
+    this.c_hosts.push(host_widget_t);
     const widget_t = {name: this.name, fqelement: this.fqelement};
     if (widget_t.fqelement === undefined) {
       widget_t.fqelement = this._host_fqelement;
     }
     const ret = _u.chain(this._wcomp_info.wbonds)
-      .filter(wbond => t_equals(wbond.subfield.widget, host_widget_t))
+      .filter(wbond => _u
+          .findWhere(this.c_hosts, wbond.subfield.widget) !== undefined)
       .filter(wbond => !_u.chain(wbond.fields).pluck("widget")
           .where(widget_t).isEmpty().value())
       .map((wbond: FieldBond) => {
@@ -217,6 +225,7 @@ export class WidgetLoader {
             Injector.resolve(providers)))
       .then(componentRef => componentRef.instance)
       .then(c => {
+        c.hosts = this.c_hosts;
         if (c.fields === undefined) {
           c.fields = {};
         }

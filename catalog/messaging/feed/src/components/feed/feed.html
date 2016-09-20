@@ -3,7 +3,7 @@
   <li *ngFor="#feedItem of feed" class="list-group-item">
     <!-- tmp hack -->
     <dv-widget name="FeedItem" fqelement="dv-samples-bookmark"
-     [fields]="feedItem"></dv-widget>
+     [fields]="feedItem" [hosts]="hosts"></dv-widget>
   </li>
 </ul>
 <div *ngIf="!feed || feed.length == 0">
