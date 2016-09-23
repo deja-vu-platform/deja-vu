@@ -43,7 +43,10 @@ export class Grafo {
     };
 
     this.types = _u.mapObject(this.types, t => {
-      const f = t.fields();
+      let f = t.fields;
+      if (_u.isFunction(f)) {
+        f = t.fields();
+      }
       t.fields = () => _u.mapObject(f, process_type);
       return t;
     });

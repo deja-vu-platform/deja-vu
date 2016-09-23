@@ -69,24 +69,24 @@ const schema = grafo
   // Comment
   .add_type({
     name: "Comment",
-    fields: () => ({
+    fields: {
       atom_id: {"type": graphql.GraphQLString},
       content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       author: {"type": "Author"}
-    })
+    }
   })
   // Author
   .add_type({
     name: "Author",
-    fields: () => ({
+    fields: {
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-    })
+    }
   })
   // Target
   .add_type({
     name: "Target",
-    fields: () => ({
+    fields: {
       name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       comments: {"type": "[Comment]"},
       newComment: {
@@ -116,11 +116,11 @@ const schema = grafo
                 ]).then(_ => comment));
         }
       }
-    })
+    }
   })
   .add_type({
     name: "Query",
-    fields: () => ({
+    fields: {
       target_by_id: {
         "type": "Target",
         args: {
@@ -128,8 +128,8 @@ const schema = grafo
         },
         resolve: (root, {atom_id}) => mean.db
           .collection("targets").findOne({atom_id: atom_id})
-     }
-    })
+      }
+    }
   })
   .schema();
 
