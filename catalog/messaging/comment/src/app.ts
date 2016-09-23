@@ -9,6 +9,8 @@ import {Grafo} from "grafo";
 
 import * as _u from "underscore";
 
+const uuid = require("uuid");
+
 
 const mean = new Mean(
   (db, debug) => {
@@ -96,7 +98,7 @@ const schema = grafo
           content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
         resolve: (target, {author, content}) => {
-          const atom_id = "foo";
+          const atom_id = uuid.v4();
           return Validation.author_exists(author)
             .then(author => ({
                atom_id: atom_id,

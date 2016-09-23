@@ -6,6 +6,8 @@ import {Mean} from "mean-loader";
 import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
 
+const uuid = require("uuid");
+
 
 const mean = new Mean(
   (db, debug) => {
@@ -120,7 +122,7 @@ const schema = new graphql.GraphQLSchema({
         },
         resolve: (_, {author, content}) => Validation.user_exists(author)
           .then(user => ({
-            atom_id: content,
+            atom_id: uuid.v4(),
             content: content,
             author: {atom_id: user.atom_id}
           }))

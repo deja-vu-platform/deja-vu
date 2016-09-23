@@ -8,6 +8,8 @@ import {Mean} from "mean-loader";
 import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
 
+const uuid = require("uuid");
+
 
 const mean = new Mean(
   (db, debug) => {
@@ -80,7 +82,7 @@ const schema = new graphql.GraphQLSchema({
             // TODO: promisify
             const hash = bcrypt.hashSync(password, 10);
             const user = {
-              username: username, password: hash, atom_id: username};
+              username: username, password: hash, atom_id: uuid.v4()};
             return mean.db.collection("users")
               .insertOne(user)
               .then(write_res => {

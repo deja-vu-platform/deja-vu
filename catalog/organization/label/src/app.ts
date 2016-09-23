@@ -9,6 +9,8 @@ import {Label} from "./shared/label";
 
 import * as _u from "underscore";
 
+const uuid = require("uuid");
+
 
 const mean = new Mean(
   (db, debug) => {
@@ -178,7 +180,7 @@ const schema = new graphql.GraphQLSchema({
           .toArray()
           .then(res => {
             if (res.length === 0) {
-              const l = {atom_id: name, name: name, items: []};
+              const l = {atom_id: uuid.v4(), name: name, items: []};
               return mean.db.collection("labels")
                 .insertOne(l)
                 .then(_ => bus.create_atom("Label", l.atom_id, l))
