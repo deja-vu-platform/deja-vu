@@ -5,7 +5,7 @@ import * as _u from "underscore";
 
 
 export class Grafo {
-  types = {};
+  types: any = {};
 
   constructor(private db) {}
 
@@ -54,6 +54,20 @@ export class Grafo {
       return new graphql.GraphQLObjectType(t);
     });
 
-    return new graphql.GraphQLSchema({query: this.types["Query"]});
+    const queries = {};
+    _u.each(this.types, (t, t_name: string) => {
+      queries[t_name.toLowerCase() + "_by_id"] = {
+        "type": t,
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (root, {atom_id}) => this.db
+          .collection(t_name.toLowerCase() + "s").findOne({atom_id: atom_id})
+      };
+    });
+
+    return new graphql.GraphQLSchema({
+      query: new graphql.GraphQLObjectType({name: "Query", fields: queries})
+    });
   }
 }

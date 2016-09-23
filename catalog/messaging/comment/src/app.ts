@@ -118,19 +118,6 @@ const schema = grafo
       }
     }
   })
-  .add_type({
-    name: "Query",
-    fields: {
-      target_by_id: {
-        "type": "Target",
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: (root, {atom_id}) => mean.db
-          .collection("targets").findOne({atom_id: atom_id})
-      }
-    }
-  })
   .schema();
 
 
