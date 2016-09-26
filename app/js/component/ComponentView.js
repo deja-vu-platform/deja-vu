@@ -166,10 +166,10 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties) {
                 height: 'auto',
                 width: 'auto',
                 'vertical-align':'top',
-                'padding-top': paddingPx.top + 'px',
-                'padding-left': paddingPx.left + 'px',
-                'padding-bottom': paddingPx.bottom + 'px',
-                'padding-right': paddingPx.right + 'px',
+                'padding-top': paddingPx.top/zoom + 'px',
+                'padding-left': paddingPx.left/zoom + 'px',
+                'padding-bottom': paddingPx.bottom/zoom + 'px',
+                'padding-right': paddingPx.right/zoom + 'px',
                 zoom: zoom,
             });
         } else {

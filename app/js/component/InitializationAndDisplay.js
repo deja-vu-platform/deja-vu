@@ -566,7 +566,11 @@ function displayComponentInTable(cellId, widget, component) {
         // also note: no properties because of the same reason
         var padding = {top: 0, left: 0, bottom: 0, right: 0};
         selectedUserComponent.components[row][col].padding = padding;
-        selectedUserComponent.components[row][col].properties.custom = selectedUserComponent.layout.overallStyles;
+        if (selectedUserComponent.layout.overallStyles){
+            selectedUserComponent.components[row][col].properties.custom = selectedUserComponent.layout.overallStyles;
+        } else {
+            selectedUserComponent.components[row][col].properties.custom = {};
+        }
         var properties = selectedUserComponent.components[row][col].properties;
 
         if (type === 'label') {
@@ -670,8 +674,11 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     //var inputs = Array.prototype.slice.call(
     //    $('#' + cellId).get(0).getElementsByTagName('input'), 0);
 
-    var inputs = Array.prototype.slice.call(
-        tooltip.get(0).getElementsByTagName('input'), 0);
+
+    if (tooltip.length>0){
+        var inputs = Array.prototype.slice.call(
+            tooltip.get(0).getElementsByTagName('input'), 0);
+    } // else it is label and is handled
 
     if (type === 'label') {
         value = $('#' + cellId).find('p')[0].textContent;
@@ -763,8 +770,10 @@ function truncate(str, len) {
 }
 
 function getCSSRule(search) {
-    var x = [].slice.call(document.styleSheets[2].cssRules)
-    x = x.concat([].slice.call(document.styleSheets[3].cssRules));
+    var x = [];
+    for (var sheetnum =0; sheetnum< document.styleSheets.length; sheetnum++){
+        x = x.concat([].slice.call(document.styleSheets[sheetnum].cssRules));
+    }
     return x.filter(function (rule) {
         return rule.selectorText === search;
     })[0];
@@ -1378,16 +1387,32 @@ function getContentEditableEdits() {
     $('[contenteditable=true]').blur(function() {
         var cellId = findContainingCell(this);
         updateBaseComponentContentsAndDisplayAt(cellId);
-        getContentEditableEditsAtCell(cellId);
+        //getContentEditableEditsAtCell(cellId);
     });
 }
 
-function getContentEditableEditsAtCell(cellId){
-    $('#'+cellId+' [contenteditable=true]').blur(function() {
-        updateBaseComponentContentsAndDisplayAt(cellId);
-        getContentEditableEditsAtCell(cellId);
-    });
-}
+//function getContentEditableEditsAtCell(cellId){
+//    $('#'+cellId+' [contenteditable=true]').blur(function() {
+//        updateBaseComponentContentsAndDisplayAt(cellId);
+//        getContentEditableEditsAtCell(cellId);
+//    });
+//}
+
+//
+//function getContentEditableEdits() {
+//    $('[contenteditable=true]').on('input propertychange paste', function() {
+//        var cellId = findContainingCell(this);
+//        updateBaseComponentContentsAndDisplayAt(cellId);
+//        $(this).focus();
+//    });
+//}
+//
+//function getContentEditableEditsAtCell(cellId){
+//    $('#'+cellId+' [contenteditable=true]').on('input propertychange paste', function() {
+//        updateBaseComponentContentsAndDisplayAt(cellId);
+//        $(this).focus();
+//    });
+//}
 
 
 //$('body').click(function(event){
