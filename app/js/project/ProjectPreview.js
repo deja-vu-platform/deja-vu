@@ -185,10 +185,19 @@ function resizeLabelDivs(cellWidth, cellHeight) {
     getCSSRule('.label-container').style.setProperty('padding-top', (cellHeight / 4) + 'px', null);
 }
 
+//function getCSSRule(search) {
+//    var x = [].slice.call(document.styleSheets[3].cssRules);
+//    return x.filter(function (rule) {
+//        return rule.selectorText === search;
+//    })[0];
+//}
+//
 function getCSSRule(search) {
-    var x = [].slice.call(document.styleSheets[3].cssRules);
+    var x = [];
+    for (var sheetnum =0; sheetnum< document.styleSheets.length; sheetnum++){
+        x = x.concat([].slice.call(document.styleSheets[sheetnum].cssRules));
+    }
     return x.filter(function (rule) {
         return rule.selectorText === search;
     })[0];
 }
-
