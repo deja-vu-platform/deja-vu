@@ -58,7 +58,7 @@ $(function () {
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent);
 
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
+        //makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
@@ -85,7 +85,7 @@ $(function () {
             }
         }
         window.setTimeout(function(){
-            loadTable(selectedUserComponent, 1);
+            //loadTable(selectedUserComponent, 1);
         }, 1);
 
     }
@@ -849,7 +849,8 @@ function registerDraggable() {
             revert: "invalid",
             cursorAt: { top: 0, left: 0 },
             helper: function(){
-                $('#table-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
+                //$('#table-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
+                $('#outer-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
                 //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
                 $("#clone").hide();
                 setTimeout(function(){$('#clone').appendTo('html'); $("#clone").show();},1);

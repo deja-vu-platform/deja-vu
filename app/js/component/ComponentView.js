@@ -73,6 +73,16 @@ var getHTML = {
     }
 };
 
+function displayNew(containerId, html, callback) {
+    var cell = document.getElementById(containerId);
+    var sp = document.createElement('span');
+    sp.innerHTML = html;
+    var html_ = sp.firstElementChild;
+    cell.insertBefore(html_, cell.firstChild);
+    if (callback) callback();
+}
+
+
 function display(cellId, type, html, zoom, padding, properties, callback) {
     var cell = document.getElementById(cellId);
     var sp = document.createElement('span');
