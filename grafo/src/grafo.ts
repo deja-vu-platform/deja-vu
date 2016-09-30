@@ -1,4 +1,5 @@
 /// <reference path="../typings/tsd.d.ts" />
+import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
 import * as _u from "underscore";
@@ -8,6 +9,22 @@ export class Grafo {
   types: any = {};
 
   constructor(private db) {}
+
+  init() {
+    return this.db.open()
+      .then(_ => Promise
+        .all(_u.map(_u.keys(this.types), t_name => this.db
+               .createCollection(this._col_name(t_name))
+               .then(col => col.remove())
+               .then(rcount => {
+                 const col_name = this._col_name(t_name);
+                 console.log(`Reset ${col_name}`);
+                 console.log(`Removed ${rcount} ${col_name}`);
+                 return true;
+               })
+               .catch(e => console.log(e)))
+            ));
+  }
 
   add_type(t) {
     this.types[t.name] = t;
@@ -62,12 +79,16 @@ export class Grafo {
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
         resolve: (root, {atom_id}) => this.db
-          .collection(t_name.toLowerCase() + "s").findOne({atom_id: atom_id})
+          .collection(this._col_name(t_name)).findOne({atom_id: atom_id})
       };
     });
 
     return new graphql.GraphQLSchema({
       query: new graphql.GraphQLObjectType({name: "Query", fields: queries})
     });
+  }
+
+  private _col_name(t_name) {
+    return t_name.toLowerCase() + "s";
   }
 }

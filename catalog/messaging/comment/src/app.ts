@@ -12,37 +12,7 @@ import * as _u from "underscore";
 const uuid = require("uuid");
 
 
-const mean = new Mean(
-  (db, debug) => {
-    db.createCollection("comments", (err, comments) => {
-      if (err) throw err;
-      console.log("Resetting comments collection");
-      comments.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} comments`);
-      });
-    });
-
-    db.createCollection("targets", (err, targets) => {
-      if (err) throw err;
-      console.log("Resetting targets collection");
-      targets.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} targets`);
-      });
-    });
-
-    db.createCollection("authors", (err, authors) => {
-      if (err) throw err;
-      console.log("Resetting authors collection");
-      authors.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} authors`);
-      });
-    });
-  }
-);
-
+const mean = new Mean();
 
 const handlers = {
   comment: {
@@ -136,4 +106,4 @@ namespace Validation {
 
 Helpers.serve_schema(mean.ws, schema);
 
-mean.start();
+grafo.init().then(_ => mean.start());

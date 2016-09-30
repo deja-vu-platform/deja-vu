@@ -1,0 +1,42 @@
+{
+  "name": "dv-organization-rralocator",
+  "version": "0.0.1",
+  "scripts": {
+    "build.dev": "grunt dv-mean:build",
+    "serve.dev": "grunt dv-mean:serve",
+    "start": "grunt dv-mean:serve"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "angular2": "2.0.0-beta.0",
+    "body-parser": "^1.14.2",
+    "client-bus": "file:../../../core/client-bus",
+    "es6-promise": "^3.0.2",
+    "es6-shim": "^0.33.3",
+    "gql": "file:../../../gql",
+    "grafo": "file:../../../grafo",
+    "graphql": "^0.4.18",
+    "helpers": "file:../../../helpers",
+    "mean-loader": "file:../../../core/mean-loader",
+    "reflect-metadata": "0.1.2",
+    "rxjs": "5.0.0-beta.0",
+    "server-bus": "file:../../../core/server-bus",
+    "systemjs": "0.19.6",
+    "uuid": "^2.0.3",
+    "zone.js": "0.5.10"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "tslint": "^3.9.0",
+    "typescript": "^1.8.10"
+  },
+  "peerDependencies": {
+    "tslint": "^3.9.0",
+    "typescript": "^1.8.10"
+  },
+  "main": "./lib",
+  "typings": "./lib",
+  "files": [
+    "lib"
+  ]
+}
