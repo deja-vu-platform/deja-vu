@@ -3,10 +3,10 @@ const DEFAULT_GRID_WIDTH = 800;
 const DEFAULT_GRID_HEIGHT = 550;
 const DEFAULT_FONT_SIZE = 14; // px
 
-var numRows = DEFAULT_ROWS;
-var numCols = DEFAULT_COLS;
-var cellWidth = DEFAULT_CELL_WIDTH;
-var cellHeight = DEFAULT_CELL_HEIGHT;
+//var numRows = DEFAULT_ROWS;
+//var numCols = DEFAULT_COLS;
+//var cellWidth = DEFAULT_CELL_WIDTH;
+//var cellHeight = DEFAULT_CELL_HEIGHT;
 var files = [];
 
 var standardCellWidth = 267;

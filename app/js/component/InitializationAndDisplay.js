@@ -59,6 +59,8 @@ $(function () {
         selectedProject.addComponent(selectedUserComponent);
 
         //makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
+
+        loadComponentIntoWorkSurface(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
@@ -81,10 +83,10 @@ $(function () {
                     displayNewComponentInUserComponentList(componentName, componentId);
                 }
 
-
             }
         }
         window.setTimeout(function(){
+            loadComponentIntoWorkSurface(selectedUserComponent);
             //loadTable(selectedUserComponent, 1);
         }, 1);
 
@@ -628,20 +630,16 @@ function deleteComponentFromUserComponentAndFromView(cellId) {
     updateBitmap(false);
 
 }
-function deleteComponentFromView(cellId) {
-    var rowcol = getRowColFromId(cellId);
-    var row = rowcol.row;
-    var col = rowcol.col;
+function deleteComponentFromView(containerId) {
+    var cell = $('#'+containerId);
 
-    var cell = $('#cell' + '_' + row + '_' + col).get(0);
+    cell.find('.config-btns').remove();
+    cell.find('.tooltip').remove();
+    cell.find('.label-container').remove();
+    cell.find('.display-component').remove();
+    cell.find('.widget').remove();
 
-    $(cell).find('.config-btns').remove();
-    $(cell).find('.tooltip').remove();
-    $(cell).find('.label-container').remove();
-    $(cell).find('.display-component').remove();
-    $(cell).find('.widget').remove();
-
-    resetDroppabilityAt(cellId);
+    resetDroppabilityAt(containerId);
 }
 
 
@@ -849,7 +847,6 @@ function registerDraggable() {
             revert: "invalid",
             cursorAt: { top: 0, left: 0 },
             helper: function(){
-                //$('#table-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
                 $('#outer-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
                 //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
                 $("#clone").hide();
@@ -1206,7 +1203,7 @@ function movedComponent() {
  * @param cellId
  */
 function triggerEdit(cellId, popup) {
-    var droppedComponent =$('#'+cellId).children().last().attr('name').toLowerCase();
+    var droppedComponent =$('#'+cellId).find('.widget').attr('name').toLowerCase();
 
     var editDialogTemplate = $('#'+droppedComponent+'-popup-holder').html();
 
@@ -1355,17 +1352,6 @@ function registerTooltipBtnHandlers() {
     }
 }
 
-//function findContainingCell(context) {
-//    var parent = $(context).parent();
-//    var tagName = parent.get(0).tagName;
-//    while (tagName !== 'TD') {
-//        parent = $(parent).parent();
-//        tagName = parent.get(0).tagName;
-//    }
-//    var cellId = $(parent).attr('id');
-//    return cellId;
-//}
-
 function findContainingCell(context) {
     var parent = $(context).parent();
     while (!(parent.hasClass('containing-cell')||parent.hasClass('display-cell-parent'))) {
@@ -1391,35 +1377,6 @@ function getContentEditableEdits() {
         //getContentEditableEditsAtCell(cellId);
     });
 }
-
-//function getContentEditableEditsAtCell(cellId){
-//    $('#'+cellId+' [contenteditable=true]').blur(function() {
-//        updateBaseComponentContentsAndDisplayAt(cellId);
-//        getContentEditableEditsAtCell(cellId);
-//    });
-//}
-
-//
-//function getContentEditableEdits() {
-//    $('[contenteditable=true]').on('input propertychange paste', function() {
-//        var cellId = findContainingCell(this);
-//        updateBaseComponentContentsAndDisplayAt(cellId);
-//        $(this).focus();
-//    });
-//}
-//
-//function getContentEditableEditsAtCell(cellId){
-//    $('#'+cellId+' [contenteditable=true]').on('input propertychange paste', function() {
-//        updateBaseComponentContentsAndDisplayAt(cellId);
-//        $(this).focus();
-//    });
-//}
-
-
-//$('body').click(function(event){
-//    console.log( allElementsFromPoint(event.clientX, event.clientY));
-//});
-
 
 
 function selectText(container) {

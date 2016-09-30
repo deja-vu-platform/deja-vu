@@ -448,7 +448,7 @@ td {
     font-weight: bold;
 }
 
-td.dropped li.widget {
+.dropped .widget {
     position: absolute;
     bottom: 0px;
     margin-left: auto;
@@ -462,7 +462,7 @@ td.dropped li.widget {
 
 }
 
-td.dropped:hover li.widget  {
+.dropped:hover .widget  {
     display: block;
 }
 
@@ -478,7 +478,8 @@ td.dropped:hover li.widget  {
     border: #e0e0e0 solid 1px;
     display: block;
 }
-p.label {
+
+.label {
     white-space: initial;
 }
 
@@ -497,7 +498,7 @@ p.label {
 
 .close-btn {
     position: absolute; !important
-opacity: 1;
+    opacity: 1;
     top: 5px;
     right: 9px;
 }
@@ -506,7 +507,8 @@ opacity: 1;
     display: none;
     left: -60px;
     width: 350px;
-
+    opacity: 1; /*overriding*/
+    visibility: hidden;
 }
 
 .dropped .tooltip, #inner-component-focus .tooltip {
@@ -514,7 +516,7 @@ opacity: 1;
     border: #d5d5d5 solid 1px;
     border-radius: 4px;
     display: inline-block;
-    opacity: 0;
+    visibility: hidden;
     padding: 0;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
     z-index: -1;
@@ -533,7 +535,7 @@ opacity: 1;
 }
 
 .dropped .tooltip.open, #inner-component-focus .tooltip.open {
-    opacity: 1;
+    visibility: visible;
     z-index: 100;
 }
 

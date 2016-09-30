@@ -3596,8 +3596,7 @@ function initUserComponent(isDefault) {
     }
     selectedProject.componentIdSet[id] = '';
 
-    var newComponent = new UserComponent({rows: numRows, cols: numCols}, name, id, version, author);
-    return newComponent;
+    return UserComponent({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
 }
 
 

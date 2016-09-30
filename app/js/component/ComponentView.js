@@ -74,11 +74,9 @@ var getHTML = {
 };
 
 function displayNew(containerId, html, callback) {
-    var cell = document.getElementById(containerId);
-    var sp = document.createElement('span');
-    sp.innerHTML = html;
-    var html_ = sp.firstElementChild;
-    cell.insertBefore(html_, cell.firstChild);
+    var container = $('#'+containerId);
+    var displayElement = $(html);
+    container.prepend(displayElement);
     if (callback) callback();
 }
 

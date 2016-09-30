@@ -71,8 +71,7 @@ var UserComponent = function (dimensions, name, id, version, author) {
     // user outer component should define where the inner components are
     userComponent.layout = {}; // componentId: { top: Number (px),
                                                 // left: Number (px),
-                                                // height: Number (px)
-                                                // width: Number (px)}
+
     userComponent.properties = {};
     return userComponent
 };
