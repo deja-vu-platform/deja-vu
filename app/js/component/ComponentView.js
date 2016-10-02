@@ -60,7 +60,7 @@ var getHTML = {
         if (!value){
             return '<img class="display-component" src="images/image_icon.png" width="15px" height="15px">';
         }
-        return '<img src="'+value.img_src+'" width="'+cellWidth+"px"+'" class="display-component">';
+        return '<img src="'+value.img_src+'" class="display-component">';
     },
     'panel': function(value) {
         if (!value){
@@ -73,10 +73,13 @@ var getHTML = {
     }
 };
 
-function displayNew(containerId, html, callback) {
+function displayNew(containerId, type, html, callback) {
     var container = $('#'+containerId);
     var displayElement = $(html);
     container.prepend(displayElement);
+    hideBaseComponentDisplayAt(containerId, type);
+    updateBaseComponentDisplayAt(containerId, type, 1);
+    showBaseComponentDisplayAt(containerId, type);
     if (callback) callback();
 }
 

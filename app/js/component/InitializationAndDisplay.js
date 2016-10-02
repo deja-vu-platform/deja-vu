@@ -639,7 +639,7 @@ function deleteComponentFromView(containerId) {
     cell.find('.display-component').remove();
     cell.find('.widget').remove();
 
-    resetDroppabilityAt(containerId);
+    //resetDroppabilityAt(containerId);
 }
 
 
@@ -654,17 +654,22 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     // tooltip is the tooltip currently being edited
 
     var actualCellId;
+    var cell;
     var tooltip;
+    var componentId;
     if (cellId == 'display-cell') {
         actualCellId = $('#display-cell').data('cellid');
         tooltip = $('#inner-component-focus').find('.tooltip');
+        componentId = null; //TODO
     } else {
         actualCellId = cellId;
-        tooltip = $('#'+cellId).find('.tooltip');
+        cell = $('#'+cellId);
+        tooltip = cell.find('.tooltip');
+        componentId = cell.data('componentId');
     }
-    var rowcol = getRowColFromId(actualCellId);
-    var row = rowcol.row;
-    var col = rowcol.col;
+    //var rowcol = getRowColFromId(actualCellId);
+    //var row = rowcol.row;
+    //var col = rowcol.col;
 
     var type = $('#' + actualCellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
     var value;
@@ -709,7 +714,9 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
             parseFile.save()
                 .then(function (savedFile) { // save was successful
                     value.img_src = savedFile.url();
-                    selectedUserComponent.components[row][col].components[type] = value;
+                    selectedUserComponent.components[componentId].components[type] = value;
+
+                    //selectedUserComponent.components[row][col].components[type] = value;
                     refreshCellDisplay(actualCellId, currentZoom);
                     if (cellId=='display-cell'){
                         refreshCellDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
@@ -730,8 +737,11 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     }
 
     if (!isUpload) {
-        selectedUserComponent.components[row][col].components = {};
-        selectedUserComponent.components[row][col].components[type] = value;
+        //selectedUserComponent.components[row][col].components = {};
+        //selectedUserComponent.components[row][col].components[type] = value;
+        selectedUserComponent.components[componentId].components = {};
+        selectedUserComponent.components[componentId].components[type] = value;
+
 
         refreshCellDisplay(actualCellId, currentZoom);
         if (cellId=='display-cell'){
@@ -1963,35 +1973,34 @@ function setUpInnerComponentOptions(cellId){
 
 function refreshCellDisplay(cellId, zoom){
     if (cellId == 'display-cell'){
-        var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
+        //var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
         if (!zoom){
             zoom = $('#display-cell').data('display-cell-scale');
         };
     } else {
-        var rowcol  = getRowColFromId(cellId);
+        //var rowcol  = getRowColFromId(cellId);
         if (!zoom){
             zoom = 1;
         };
+        var componentId = $('#'+cellId).data('componentId');
     }
 
-    var row = rowcol.row;
-    var col = rowcol.col;
-    if (selectedUserComponent.components[row]){
-        var componentToChange = selectedUserComponent.components[row][col];
-        if (componentToChange){
-            removeDisplay(cellId);
-            var padding = selectedUserComponent.components[row][col].padding;
-            var properties = selectedUserComponent.components[row][col].properties;
+    if (selectedUserComponent.components[componentId]){
+        var componentToChange = selectedUserComponent.components[componentId];
 
-            // display itself gets rid of padding for the #display-cell
-            display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
-            //attach event handlers to new texts
-            //getContentEditableEditsAtCell(cellId);
-            registerTooltipBtnHandlers();
-        } else {
-            deleteComponentFromView(cellId);
-        }
+        removeDisplay(cellId);
+        var padding = componentToChange.padding;
+        var properties = componentToChange.properties;
+
+        // display itself gets rid of padding for the #display-cell
+        display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
+        //attach event handlers to new texts
+        //getContentEditableEditsAtCell(cellId);
+        registerTooltipBtnHandlers();
+    } else {
+        deleteComponentFromView(cellId);
     }
+
 }
 
 
