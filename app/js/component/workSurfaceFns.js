@@ -3,7 +3,34 @@
  */
 
 
-function makeEmptyWorkSurface(component, zoom){
+/**
+ * enables it if its elements have already been created,
+ * otherwise loads the elements into the DOM
+ * @param component
+ * @param zoom
+ */
+function loadComponent(component, zoom){
+    var componentId = component.meta.id;
+    var workSurface = $('#work-surface'+'_'+componentId);
+    if (workSurface.length===0){
+        loadComponentIntoWorkSurface(component, zoom);
+    } else {
+        disableAllComponentDomElementsExcept(componentId);
+    }
+}
+
+function createOrResetWorkSurface(component, zoom){
+    var componentId = component.meta.id;
+    var workSurface = $('#work-surface'+'_'+componentId);
+    if (workSurface.length===0){
+        workSurface = createEmptyWorkSurface(component, zoom);
+    } else {
+        workSurface.html('');
+    }
+    return workSurface
+}
+
+function createEmptyWorkSurface(component, zoom){
     currentZoom = zoom; // set zoom value 100%
     var componentId = component.meta.id;
     disableAllComponentDomElementsExcept(componentId);
@@ -15,9 +42,14 @@ function makeEmptyWorkSurface(component, zoom){
 }
 
 
-
+/**
+ * Loads elements into the DOM. If the elements were already there, gets rid of them
+ * and creates them afresh.
+ * @param component
+ * @param zoom
+ */
 var loadComponentIntoWorkSurface = function(component, zoom){
-    var workSurface = makeEmptyWorkSurface(component, zoom);
+    var workSurface = createOrResetWorkSurface(component, zoom);
 
     Object.keys(component.components).forEach(function(innerComponentId){
         var innerComponent = component.components[innerComponentId];
@@ -32,7 +64,7 @@ var loadComponentIntoWorkSurface = function(component, zoom){
             top: component.layout[innerComponentId].top
         });
 
-        setUpContainer(componentContainer, widget, innerComponent);
+        setUpContainer(componentContainer, widget, innerComponent, zoom);
         registerDraggable(widget);
         workSurface.append(componentContainer);
 

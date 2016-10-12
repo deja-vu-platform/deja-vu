@@ -496,36 +496,59 @@ function createEmptyRow(rowNumber) {
 //
 // }
 //
-// function makeUserEmptyComponentDisplayTable(componentId, zoom){
-//     toggleInnerComponentVisibility(true);
-//     currentZoom = zoom; // set zoom value 100%
-//
-//     disableAllComponentDomElementsExcept(componentId);
-//
-//     createOrResetTableGridContainer(componentId);
-//     createTable(componentId);
-//     createGuideGrid(componentId);
-//     // Note: this works because we disable all other classes that this affects beforehand
-//     initialResizeCells();
-//     attachMergeHandlers(componentId);
-//
-//     // Note: this works because we disable all other classes that this affects beforehand
-//     registerDroppable();
-//     addRowColAddRemoveButtons(componentId);
-//
-//     // Note: this works because we disable all other classes that this affects beforehand
-//     addRowColResizeHandlers();
-//
-//     addTableResizeHandler(componentId);
-//     addTableSizeLockUnlockButtons(componentId);
-//
-//     setComponentOptions(selectedProject.components[componentId]);
-//
-//     changeZoomDisplays(currentZoom);
-//
-//     bitmapOld = make2dArray(numRows, numCols);
-//     bitmapNew = make2dArray(numRows, numCols);
-// }
+
+function createOrResetTableGridContainer(componentId){
+    if ($('#table-grid-container'+'_'+componentId).length===0){
+        var tableGridContainer = document.createElement('div');
+        tableGridContainer.id = 'table-grid-container'+'_'+componentId;
+        tableGridContainer.className = 'table-grid-container';
+        var state = {
+            zoom: 1,
+            lock:{
+                width: false,
+                height: false
+            }
+        };
+        $(tableGridContainer).data('state', state);
+        $('#outer-container').append(tableGridContainer);
+
+    } else {
+        $('#table-grid-container'+'_'+componentId).html('');
+    }
+};
+
+
+
+ function makeUserEmptyComponentDisplayTable(componentId, zoom){
+     toggleInnerComponentVisibility(true);
+     currentZoom = zoom; // set zoom value 100%
+
+     disableAllComponentDomElementsExcept(componentId);
+
+     createOrResetTableGridContainer(componentId);
+     createTable(componentId);
+     createGuideGrid(componentId);
+     // Note: this works because we disable all other classes that this affects beforehand
+     initialResizeCells();
+     attachMergeHandlers(componentId);
+
+     // Note: this works because we disable all other classes that this affects beforehand
+     registerDroppable();
+     addRowColAddRemoveButtons(componentId);
+
+     // Note: this works because we disable all other classes that this affects beforehand
+     addRowColResizeHandlers();
+
+     addTableResizeHandler(componentId);
+     addTableSizeLockUnlockButtons(componentId);
+
+     setComponentOptions(selectedProject.components[componentId]);
+
+     changeZoomDisplays(currentZoom);
+
+     bitmapOld = make2dArray(numRows, numCols);
+     bitmapNew = make2dArray(numRows, numCols);
+ }
 
 
 /**

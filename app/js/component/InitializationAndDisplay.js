@@ -55,13 +55,12 @@ $(function () {
         showClicheInList(id, addedCliches[id].name);
     }
 
-    if (selectedProject.numComponents === 0){
+    if (selectedProject.numComponents == 0){
         // start a default component
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent);
 
-
-        loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
+        loadComponent(selectedUserComponent, currentZoom);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
@@ -87,7 +86,7 @@ $(function () {
             }
         }
         window.setTimeout(function(){
-            loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
+            loadComponent(selectedUserComponent, currentZoom);
         }, 1);
 
     }
@@ -126,7 +125,7 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        makeEmptyWorkSurface(selectedUserComponent, 1)
+        createEmptyWorkSurface(selectedUserComponent, 1);
         resetMenuOptions();
     });
 });
@@ -142,7 +141,7 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addComponent(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        makeEmptyWorkSurface(selectedUserComponent, 1)
+        createEmptyWorkSurface(selectedUserComponent, 1)
 
         resetMenuOptions();
     });
@@ -242,23 +241,13 @@ $('.components').on('click', '.component-name-container', function () {
                             height: tableLockedHeight,
                         }
                         };
-        $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', oldState);
+        $('#work-surface'+'_'+selectedUserComponent.meta.id).data('state', oldState);
 
         var componentId = $(componentNameContainer).parent().data('componentid');
         $('.selected').removeClass('selected');
         $(componentNameContainer).parent().addClass('selected');
         selectedUserComponent = selectedProject.components[componentId];
-
-        disableAllComponentDomElementsExcept(selectedUserComponent.meta.id);
-
-        // if ($('#table-grid-container'+'_'+componentId).length===0){
-        if ($('#work-surface'+'_'+componentId).length===0){
-
-            loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
-        } else {
-            //toggleInnerComponentVisibility(true);
-            enableSpecificComponentDomElements(selectedUserComponent.meta.id);
-        }
+        loadComponent(selectedUserComponent, currentZoom);
     };
 
     // have this going in a separate thread
@@ -375,7 +364,7 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
+            loadComponent(selectedUserComponent, currentZoom);
 
         });
 

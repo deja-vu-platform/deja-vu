@@ -66,6 +66,7 @@ UserProject.prototype.addComponent = function(component){
 
 UserProject.prototype.removeComponent = function(componentId){
     delete this.components[componentId];
+    delete this.mainComponents[componentId];
     this.numComponents--;
 };
 

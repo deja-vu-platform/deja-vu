@@ -68,6 +68,7 @@ function enableComponentDOMElements(componentId){
 function disableAllComponentDomElementsExcept(componentToEnableId){
     for (var componentId in selectedProject.components){
         if (componentToEnableId == componentId){
+            enableComponentDOMElements(componentId);
             continue;
         }
         if ($('#work-surface'+'_'+componentId).hasClass('hidden-component')){
@@ -90,7 +91,7 @@ function enableSpecificComponentDomElements(componentToEnableId){
                 height: false
             }
         };
-        $('#table-grid-container'+'_'+componentToEnableId).data('state', state);
+        $('#work-surface'+'_'+componentToEnableId).data('state', state);
     }
 
     var componentToEnable = selectedProject.components[componentToEnableId];
@@ -100,32 +101,12 @@ function enableSpecificComponentDomElements(componentToEnableId){
         enableComponentDOMElements(componentToEnableId);
     }
 
-    // updateZoomFromState(componentToEnableId);
+     updateZoomFromState(componentToEnableId);
 
     setComponentOptions(componentToEnable);
 
 }
 
-
-function createOrResetTableGridContainer(componentId){
-    if ($('#table-grid-container'+'_'+componentId).length===0){
-        var tableGridContainer = document.createElement('div');
-        tableGridContainer.id = 'table-grid-container'+'_'+componentId;
-        tableGridContainer.className = 'table-grid-container';
-        var state = {
-            zoom: 1,
-            lock:{
-                width: false,
-                height: false
-            }
-        };
-        $(tableGridContainer).data('state', state);
-        $('#outer-container').append(tableGridContainer);
-
-    } else {
-        $('#table-grid-container'+'_'+componentId).html('');
-    }
-};
 
 
 
@@ -374,12 +355,16 @@ function deleteUserComponent(userComponentId){
     if (selectedProject.numComponents === 1){
         return; //don't delete the last one TODO is the the right way to go?
     }
+    selectedProject.removeComponent(userComponentId);
+    $('#work-surface_'+userComponentId).remove();
+    $('#disabled_'+userComponentId+'_work-surface_'+userComponentId).remove(); // also remove disabled ones
+
     if (userComponentId == selectedUserComponent.meta.id){ // strings will also do
         var otherIds = Object.keys(selectedProject.components);
         selectedUserComponent = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
+        loadComponent(selectedUserComponent, currentZoom);
         // loadTable(selectedUserComponent, 1);
     }
     if (userComponentId == selectedProject.mainComponents.indexId){
@@ -388,8 +373,6 @@ function deleteUserComponent(userComponentId){
     $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
     $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
 
-    selectedProject.removeComponent(userComponentId);
-    $('#table-grid-container_'+userComponentId).remove();
 }
 
 function openDeleteUserComponentConfirmDialogue(userComponentId){
