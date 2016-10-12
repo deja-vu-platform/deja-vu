@@ -60,7 +60,6 @@ $(function () {
         selectedUserComponent = initUserComponent(true);
         selectedProject.addComponent(selectedUserComponent);
 
-        //makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, currentZoom);
 
         loadComponentIntoWorkSurface(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
@@ -89,7 +88,6 @@ $(function () {
         }
         window.setTimeout(function(){
             loadComponentIntoWorkSurface(selectedUserComponent);
-            //loadTable(selectedUserComponent, 1);
         }, 1);
 
     }
@@ -128,7 +126,6 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        // makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
         makeEmptyWorkSurface(selectedUserComponent, 1)
         resetMenuOptions();
     });
@@ -145,7 +142,6 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addComponent(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        // makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
         makeEmptyWorkSurface(selectedUserComponent, 1)
 
         resetMenuOptions();
@@ -156,7 +152,6 @@ $('#new-main-component-btn').click(function(){
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
     selectedProject.addComponent(selectedUserComponent);
-    // loadTable(selectedUserComponent, 1);
     loadComponentIntoWorkSurface(selectedUserComponent);
     displayNewComponentInUserComponentList(selectedUserComponent.meta.name,selectedUserComponent.meta.id);
     resetMenuOptions();
@@ -272,7 +267,6 @@ $('.components').on('click', '.component-name-container', function () {
         // if ($('#table-grid-container'+'_'+componentId).length===0){
         if ($('#work-surface'+'_'+componentId).length===0){
 
-                // loadTable(selectedUserComponent, 1);
             loadComponentIntoWorkSurface(selectedUserComponent);
         } else {
             toggleInnerComponentVisibility(true);
@@ -394,7 +388,6 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            // loadTable(selectedUserComponent, 1);
             loadComponentIntoWorkSurface(selectedUserComponent);
 
         });

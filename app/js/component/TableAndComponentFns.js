@@ -58,14 +58,14 @@ function loadTable(componentToShow, zoom) {
     registerDraggable();
     registerTooltipBtnHandlers();
 }
-
-function loadTableWithLocksSaved(componentToShow){
-    var saveTableLockedWidth = tableLockedWidth;
-    var saveTableLockedHeight = tableLockedHeight;
-    loadTable(componentToShow, 1);
-    toggleTableWidthLock(saveTableLockedWidth);
-    toggleTableHeightLock(saveTableLockedHeight);
-}
+//
+// function loadTableWithLocksSaved(componentToShow){
+//     var saveTableLockedWidth = tableLockedWidth;
+//     var saveTableLockedHeight = tableLockedHeight;
+//     loadTable(componentToShow, 1);
+//     toggleTableWidthLock(saveTableLockedWidth);
+//     toggleTableHeightLock(saveTableLockedHeight);
+// }
 
 /** ** ** Cell/Grid/Row/Col creation helpers ** ** ** **/
 
@@ -3632,7 +3632,8 @@ function deleteUserComponent(userComponentId){
         selectedUserComponent = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        loadTable(selectedUserComponent, 1);
+        loadComponentIntoWorkSurface(selectedUserComponent);
+        // loadTable(selectedUserComponent, 1);
     }
     if (userComponentId == selectedProject.mainComponents.indexId){
         selectedProject.mainComponents.indexId = null;

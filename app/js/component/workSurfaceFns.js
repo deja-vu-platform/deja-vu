@@ -48,7 +48,7 @@ var createWorkSurface = function(componentId, height, width){
     workSurface.attr('id', 'work-surface_'+componentId);
 
     workSurface.height(height).width(width);
-    workSurface.css('background', 'blue');
+    workSurface.css('background', 'lightblue');
 
     makeDroppableToComponents(workSurface);
     return workSurface;
