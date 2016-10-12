@@ -186,8 +186,9 @@ var makeDroppableToComponents = function(workSurface){
 
             workSurface.append(componentContainer);
 
-            var top = event.clientY - workSurface.offset().top; // - component.dimensions.height; // TODO
-            var left = event.clientX - workSurface.offset().left; // TODO
+            var top = ui.position.top - workSurface.offset().top;
+            var left = ui.position.left - workSurface.offset().left;
+
             componentContainer.css({
                 position: 'absolute',
                 left: left,

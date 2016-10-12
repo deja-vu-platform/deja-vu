@@ -854,12 +854,17 @@ function registerDraggable(widgetToRegister) {
         opacity: 1,
         revert: "invalid",
         cursorAt: { top: 0, left: 0 },
-        helper: function(){
+        helper: function(e, ui){
             var widget = $(this);
             if (widget.hasClass('associated')){
                 var componentId = widget.data('componentId');
                 draggingComponent = selectedUserComponent.components[componentId];
                 var componentContainer = $('#component-container_'+componentId);
+                // console.log(componentContainer.offset());
+                draggableOptions.offset = {top: e.pageY - componentContainer.offset().top,
+                    left: e.pageX - componentContainer.offset().left
+                };
+
             } else {
 
                 var type = $(this).attr('name');
@@ -876,10 +881,10 @@ function registerDraggable(widgetToRegister) {
             //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
             componentContainer.hide();
             setTimeout(function(){componentContainer.appendTo('html'); componentContainer.show();},1);
-            componentContainer.css({
-                left: 0,
-                top: 0
-            });
+            // componentContainer.css({
+            //     left: 0,
+            //     top: 0
+            // });
             componentContainer.attr('id', 'dragging_container');
             return componentContainer;
 
@@ -887,9 +892,13 @@ function registerDraggable(widgetToRegister) {
         appendTo: 'html',
         cursor: '-webkit-grabbing',
         scroll: true,
+        offset: { top: 0, left: 0 },
+        start: function(e, ui){
+            $(this).draggable( "option", "cursorAt", draggableOptions.offset );
+        },
         drag: function(e, ui){
-            ui.position.top = e.pageY;
-            ui.position.left = e.pageX;
+            ui.position.top = e.pageY - draggableOptions.offset.top;
+            ui.position.left = e.pageX - draggableOptions.offset.left;
         },
     };
 
