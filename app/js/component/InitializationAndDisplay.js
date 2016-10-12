@@ -1429,7 +1429,7 @@ function refreshContainerDisplay(cellId, zoom){
         var properties = componentToChange.properties;
 
         // display itself gets rid of padding for the #display-cell
-        displayNew($('#'+cellId), componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom);
+        display($('#'+cellId), componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom);
         // display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
         //attach event handlers to new texts
         //getContentEditableEditsAtCell(cellId);

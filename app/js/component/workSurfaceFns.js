@@ -211,7 +211,7 @@ function setUpContainer(container, widget, component, zoom){
     } else {
         var html = getHTML[type]();
     }
-    displayNew(container, type, html, zoom);
+    display(container, type, html, zoom);
 
 }
 

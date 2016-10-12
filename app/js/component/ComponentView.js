@@ -77,7 +77,7 @@ function getDimensions(type){
     return {height: 200, width: 200}
 }
 
-function displayNew(container, type, html, zoom, callback) {
+function display(container, type, html, zoom, callback) {
     var displayElement = $(html);
     container.prepend(displayElement);
     hideBaseComponentDisplayAt(container, type);
@@ -87,17 +87,17 @@ function displayNew(container, type, html, zoom, callback) {
 }
 
 
-function display(cellId, type, html, zoom, padding, properties, callback) {
-    var cell = document.getElementById(cellId);
-    var sp = document.createElement('span');
-    sp.innerHTML = html;
-    var html_ = sp.firstElementChild;
-    cell.insertBefore(html_, cell.firstChild);
-    hideBaseComponentDisplayAt(cellId, type);
-    updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties);
-    showBaseComponentDisplayAt(cellId, type);
-    if (callback) callback();
-}
+//function display(cellId, type, html, zoom, padding, properties, callback) {
+//    var cell = document.getElementById(cellId);
+//    var sp = document.createElement('span');
+//    sp.innerHTML = html;
+//    var html_ = sp.firstElementChild;
+//    cell.insertBefore(html_, cell.firstChild);
+//    hideBaseComponentDisplayAt(cellId, type);
+//    updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties);
+//    showBaseComponentDisplayAt(cellId, type);
+//    if (callback) callback();
+//}
 
 
 function hideBaseComponentDisplayAt(container, type){
