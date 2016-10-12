@@ -9,13 +9,15 @@
  * @param component
  * @param zoom
  */
-function loadComponent(component, zoom){
+function loadComponent(component){
     var componentId = component.meta.id;
     var workSurface = $('#work-surface'+'_'+componentId);
     if (workSurface.length===0){
-        loadComponentIntoWorkSurface(component, zoom);
+        currentZoom = 1;
+        loadComponentIntoWorkSurface(component, currentZoom);
     } else {
         disableAllComponentDomElementsExcept(componentId);
+        updateZoomFromState(componentId);
     }
 }
 
@@ -23,21 +25,39 @@ function createOrResetWorkSurface(component, zoom){
     var componentId = component.meta.id;
     var workSurface = $('#work-surface'+'_'+componentId);
     if (workSurface.length===0){
-        workSurface = createEmptyWorkSurface(component, zoom);
+        workSurface = setUpEmptyWorkSurface(component, zoom);
     } else {
-        workSurface.html('');
+        resetWorkSurface(workSurface);
     }
+
     return workSurface
 }
 
-function createEmptyWorkSurface(component, zoom){
+function resetWorkSurface(workSurface){
+    var state = {
+        zoom: 1,
+    };
+    workSurface.data('state', state);
+    workSurface.html('');
+}
+
+/**
+ * creates an empty worksurface and appends it to the outer container
+ * @param component
+ * @param zoom
+ */
+function setUpEmptyWorkSurface(component, zoom){
     currentZoom = zoom; // set zoom value 100%
     var componentId = component.meta.id;
     disableAllComponentDomElementsExcept(componentId);
     var workSurface = createWorkSurface(componentId, component.dimensions.height, component.dimensions.width);
+    resetWorkSurface(workSurface);
+
     $('#outer-container').append(workSurface);
 
     setComponentOptions(selectedProject.components[componentId]);
+    updateZoomFromState(componentId);
+
     return workSurface
 }
 
@@ -70,6 +90,7 @@ var loadComponentIntoWorkSurface = function(component, zoom){
 
         triggerEdit(componentContainer, false);
         registerTooltipBtnHandlers('component-container_'+innerComponentId);
+
     });
 };
 

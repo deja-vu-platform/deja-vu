@@ -101,7 +101,7 @@ function enableSpecificComponentDomElements(componentToEnableId){
         enableComponentDOMElements(componentToEnableId);
     }
 
-     updateZoomFromState(componentToEnableId);
+    updateZoomFromState(componentToEnableId);
 
     setComponentOptions(componentToEnable);
 

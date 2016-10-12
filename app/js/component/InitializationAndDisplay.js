@@ -125,7 +125,7 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        createEmptyWorkSurface(selectedUserComponent, 1);
+        setUpEmptyWorkSurface(selectedUserComponent, 1);
         resetMenuOptions();
     });
 });
@@ -141,7 +141,7 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addComponent(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        createEmptyWorkSurface(selectedUserComponent, 1)
+        setUpEmptyWorkSurface(selectedUserComponent, 1)
 
         resetMenuOptions();
     });
@@ -236,10 +236,6 @@ $('.components').on('click', '.component-name-container', function () {
     var load = function(componentNameContainer){
         // Save the current values
         var oldState = {zoom : currentZoom,
-                        lock:{
-                            width: tableLockedWidth,
-                            height: tableLockedHeight,
-                        }
                         };
         $('#work-surface'+'_'+selectedUserComponent.meta.id).data('state', oldState);
 
@@ -247,7 +243,7 @@ $('.components').on('click', '.component-name-container', function () {
         $('.selected').removeClass('selected');
         $(componentNameContainer).parent().addClass('selected');
         selectedUserComponent = selectedProject.components[componentId];
-        loadComponent(selectedUserComponent, currentZoom);
+        loadComponent(selectedUserComponent);
     };
 
     // have this going in a separate thread
@@ -835,8 +831,6 @@ function changeZoomDisplays(zoom){
     var sliderVal = getSliderValFromZoom(currentZoom);
     $('#zoom-slider').val(sliderVal);
 
-
-
     // update zoom nav displays
     $('#selected-screen-size').css({
         height: selectedScreenSizeHeight*currentZoom + 'px',
@@ -846,15 +840,18 @@ function changeZoomDisplays(zoom){
         height: selectedScreenSizeHeight*currentZoom*navZoom + 'px',
         width: selectedScreenSizeWidth*currentZoom*navZoom + 'px',
     });
+    $('.work-surface').css({
+        width: selectedUserComponent.dimensions.width*zoom + 'px',
+        height: selectedUserComponent.dimensions.height*zoom + 'px',
+    })
+
     updateZoomNavComponentSize(zoom);
 }
 
-function updateZoomNavComponentSize(newRatio){
+function updateZoomNavComponentSize(zoom){
     $('#zoom-nav-component-size').css({
-        // width: selectedUserComponent.layout.tablePxDimensions.width*navZoom*currentZoom + 'px',
-        // height: selectedUserComponent.layout.tablePxDimensions.height*navZoom*currentZoom + 'px',
-        width: selectedUserComponent.dimensions.width*navZoom*newRatio + 'px',
-        height: selectedUserComponent.dimensions.height*navZoom*newRatio + 'px',
+        width: selectedUserComponent.dimensions.width*navZoom*zoom + 'px',
+        height: selectedUserComponent.dimensions.height*navZoom*zoom + 'px',
 
     });
 }
