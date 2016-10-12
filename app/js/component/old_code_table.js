@@ -2249,7 +2249,7 @@ function addNRows(n, chosenRowNum) {
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){
             var cellId = 'cell'+'_'+row+'_'+col;
-            refreshCellDisplay(cellId, currentZoom);
+            refreshContainerDisplay(cellId, currentZoom);
         }
     }
 }
@@ -2567,7 +2567,7 @@ function removeNRows(n, chosenRowNum) {
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){
             var cellId = 'cell'+'_'+row+'_'+col;
-            refreshCellDisplay(cellId, currentZoom);
+            refreshContainerDisplay(cellId, currentZoom);
         }
     }
 
@@ -2843,7 +2843,7 @@ function addNCols(n, chosenColNum) {
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){
             var cellId = 'cell'+'_'+row+'_'+col;
-            refreshCellDisplay(cellId, currentZoom);
+            refreshContainerDisplay(cellId, currentZoom);
         }
     }
 }
@@ -3164,7 +3164,7 @@ function removeNCols(n, chosenColNum) {
     for (var row = 1; row<=numRows; row++){
         for (var col = 1; col<=numCols; col++){
             var cellId = 'cell'+'_'+row+'_'+col;
-            refreshCellDisplay(cellId, currentZoom);
+            refreshContainerDisplay(cellId, currentZoom);
         }
     }
 

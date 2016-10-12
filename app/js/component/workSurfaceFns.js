@@ -93,7 +93,7 @@ function createResizeHandle(container, component){
         resize: function(e, ui){
             component.dimensions.height = ui.size.height;
             component.dimensions.width = ui.size.width;
-            refreshCellDisplay(container.attr('id'), 1); // TODO
+            refreshContainerDisplay(container.attr('id'), 1); // TODO
 
         }
     });

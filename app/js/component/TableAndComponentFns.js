@@ -260,6 +260,7 @@ function updateTableResizeHandler() {
     });
 }
 
+// TODO: modify to make it work for the work surface
 function addTableResizeHandler(componentId){
     var tableResizeDiv = document.createElement('div');
     tableResizeDiv.id = 'table-resize-div';
