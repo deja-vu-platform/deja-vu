@@ -73,13 +73,16 @@ var getHTML = {
     }
 };
 
-function displayNew(containerId, type, html, callback) {
-    var container = $('#'+containerId);
+function getDimensions(type){
+    return {height: 200, width: 200}
+}
+
+function displayNew(container, type, html, callback) {
     var displayElement = $(html);
     container.prepend(displayElement);
-    hideBaseComponentDisplayAt(containerId, type);
-    updateBaseComponentDisplayAt(containerId, type, 1);
-    showBaseComponentDisplayAt(containerId, type);
+    hideBaseComponentDisplayAt(container, type);
+    updateBaseComponentDisplayAt(container, type, 1);
+    showBaseComponentDisplayAt(container, type);
     if (callback) callback();
 }
 
@@ -97,26 +100,26 @@ function display(cellId, type, html, zoom, padding, properties, callback) {
 }
 
 
-function hideBaseComponentDisplayAt(cellId, type){
+function hideBaseComponentDisplayAt(container, type){
     if (type === 'label'){
-        $('#' + cellId).find('.display-component').parent().css({
+        container.find('.display-component').parent().css({
             display: 'none'
         });
     } else {
-        $('#' + cellId).find('.display-component').css({
+        container.find('.display-component').css({
             display: 'none'
         });
     }
 }
 
 
-function showBaseComponentDisplayAt(cellId, type){
+function showBaseComponentDisplayAt(container, type){
     if (type === 'label'){
-        $('#' + cellId).find('.display-component').parent().css({
+        container.find('.display-component').parent().css({
             display: 'block'
         });
     } else {
-        $('#' + cellId).find('.display-component').css({
+        container.find('.display-component').css({
             display: 'inline-block'
         });
     }
@@ -129,12 +132,11 @@ function showBaseComponentDisplayAt(cellId, type){
  * @param zoom
  * @param padding
  */
-function updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties) {
-    var cell = $('#'+cellId);
+function updateBaseComponentDisplayAt(cell, type, zoom, padding, properties) {
     var cellHeight = cell.height();
     var cellWidth = cell.width();
 
-    if ((!padding) || (cellId == 'display-cell')){
+    if ((!padding) || (cell.attr('id') == 'display-cell')){
         padding = {top: 0, bottom: 0, left: 0, right: 0};
     }
 
@@ -144,14 +146,6 @@ function updateBaseComponentDisplayAt(cellId, type, zoom, padding, properties) {
         left: padding.left*cellWidth,
         right: padding.right*cellWidth
     };
-
-    //var cellHeight = (parseFloat(cell.css('height'))/zoom-10) + 'px';
-    //var cellWidth = (parseFloat(cell.css('width'))/zoom-10) + 'px';
-
-
-    //var rowcol = getRowColFromId(cellId);
-    //var cellHeight = (selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.height*selectedUserComponent.layout.tablePxDimensions.height-10) + 'px';
-    //var cellWidth = (selectedUserComponent.layout[rowcol.row][rowcol.col].ratio.grid.width*selectedUserComponent.layout.tablePxDimensions.width-10) + 'px';
 
     var displayComponent = cell.find('.display-component');
     if (type === 'label'){

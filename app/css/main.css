@@ -489,6 +489,30 @@ td {
 }
 
 
+.component-container .ui-resizable-se{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.component-container .ui-resizable-ne{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.component-container .ui-resizable-sw{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.component-container .ui-resizable-nw{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
 /*===================================================
                   TOOLTIP POPUPS
 ===================================================*/

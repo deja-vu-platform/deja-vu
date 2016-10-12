@@ -9,23 +9,22 @@ var loadComponentIntoWorkSurface = function(component){
         var innerComponent = component.components[innerComponentId];
         var type = innerComponent.type;
         var componentContainer = createComponentContainer(innerComponent);
-        //componentContainer.append(widget);
-        workSurface.append(componentContainer);
-        displayNew('component-container_'+innerComponentId, type, getHTML[type](innerComponent.components[type]));
         var widget = $('.draggable[name=' + type + ']').clone();
         widget.addClass('associated').data('componentId', innerComponentId);
-        componentContainer.append(widget);
 
         componentContainer.css({
             position: 'absolute',
             left: component.layout[innerComponentId].left,
             top: component.layout[innerComponentId].top
         });
-        //$('#basic-components').html(basicComponents);
-        triggerEdit('component-container_'+innerComponentId, false);
+
+        setUpContainer(componentContainer, widget, innerComponent);
+        registerDraggable(widget);
+        workSurface.append(componentContainer);
+
+        triggerEdit(componentContainer, false);
         registerTooltipBtnHandlers('component-container_'+innerComponentId);
     });
-    registerDraggable();
 };
 
 
@@ -55,9 +54,9 @@ function createResizeHandle(container, component){
     dragHandle_sw.attr('id', 'drag-handle-sw' + '_' + componentId);
 
     var dragHandle_ne = $('<span></span>');
-    dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
-    dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
-    dragHandle_se.attr('id', 'drag-handle-se' + '_' + componentId);
+    dragHandle_ne.html('<img src="images/drag_handle_ne_icon.png" width="15px" height="15px">');
+    dragHandle_ne.addClass('ui-resizable-handle ui-resizable-ne drag-handle');
+    dragHandle_ne.attr('id', 'drag-handle-se' + '_' + componentId);
 
     var dragHandle_nw = $('<span></span>');
     dragHandle_nw.html('<img src="images/drag_handle_nw_icon.png" width="15px" height="15px">');
@@ -137,6 +136,17 @@ function createComponentContainer(component) {
     return container;
 }
 
+function setUpContainer(container, widget, component){
+    container.append(widget);
+    var type = widget.attr('name');
+    if (component){
+        var html = getHTML[type](component.components[type]);
+    } else {
+        var html = getHTML[type]();
+    }
+    displayNew(container, type, html);
+
+}
 
 var makeDroppableToComponents = function(workSurface){
 
@@ -146,30 +156,24 @@ var makeDroppableToComponents = function(workSurface){
         tolerance: "intersect",
         drop: function(event, ui) {
             var widget = $(ui.draggable);
-            var type = widget.attr('name');
-            var componentContainer;
-            var component;
-            var componentId;
-            if (widget.hasClass('associated')){
-                componentId = widget.data('componentId');
-                componentContainer = $('#component-container_'+componentId);
-                component = selectedUserComponent.components[componentId];
-            } else {
-                component = BaseComponent(type, {}, {height: 200, width: 200} /* dimensions, maybe from a table of defaults?*/);
-                componentId = component.meta.id;
-                widget.addClass('associated').data('componentId', componentId);
-                selectedUserComponent.components[componentId] = component;
-                componentContainer = createComponentContainer(component);
-                componentContainer.append(widget);
-                workSurface.append(componentContainer);
-                displayNew(componentContainer[0].id, type, getHTML[type]());
+            // on drop, there should always be a dragging component
+            var component = draggingComponent;
+            var componentId = component.meta.id;
+            var componentContainer = createComponentContainer(component);
+            setUpContainer(componentContainer, widget, component);
+            registerDraggable(widget);
 
-                $('#basic-components').html(basicComponents);
-                registerDraggable();
-                triggerEdit('component-container_'+component.meta.id, true);
+            if (!widget.hasClass('associated')){
+                selectedUserComponent.components[componentId] = component;
+                widget.addClass('associated').data('componentId', componentId);
+                triggerEdit(componentContainer, true);
+            } else {
+                triggerEdit(componentContainer, false);
             }
 
-            var top = event.clientY - workSurface.offset().top - component.dimensions.height; // TODO
+            workSurface.append(componentContainer);
+
+            var top = event.clientY - workSurface.offset().top; // - component.dimensions.height; // TODO
             var left = event.clientX - workSurface.offset().left; // TODO
             componentContainer.css({
                 position: 'absolute',

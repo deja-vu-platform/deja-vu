@@ -12,6 +12,8 @@ var innerComponentFocused = false;
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
 
+var draggingComponent = null;
+
 /** ** ** ** ** ** Initialization ** ** ** ** ** **/
 $(function () {
     // fix some views
@@ -97,8 +99,6 @@ $(function () {
     //autoSave5Mins();
 
     basicComponents = $('#basic-components').html();
-
-    registerDroppable();
 
     registerDraggable();
 
@@ -822,8 +822,6 @@ function cellTrashDroppableSettings(){
             //    movedComponent();
             //}
 
-            $('#basic-components').html(basicComponents);
-
             registerDraggable();
             resetDroppability();
             registerTooltipBtnHandlers();
@@ -840,38 +838,72 @@ function registerCellDroppable(cellId){
     $('#'+cellId).droppable(cellTrashDroppableSettings());
 }
 
+//
+// function registerDroppable() {
+//     $('.droppable').each(function(){
+//         if (!$(this).hasClass('page-component-toggle-drop')){
+//             $(this).droppable(cellTrashDroppableSettings());
+//         }
+//     });
+// }
 
-function registerDroppable() {
-    $('.droppable').each(function(){
-        if (!$(this).hasClass('page-component-toggle-drop')){
-            $(this).droppable(cellTrashDroppableSettings());
-        }
-    });
-}
+function registerDraggable(widgetToRegister) {
+    var draggableOptions = {
+        opacity: 1,
+        revert: "invalid",
+        cursorAt: { top: 0, left: 0 },
+        helper: function(){
+            var widget = $(this);
+            if (widget.hasClass('associated')){
+                var componentId = widget.data('componentId');
+                draggingComponent = selectedUserComponent.components[componentId];
+                var componentContainer = $('#component-container_'+componentId);
+            } else {
 
-function registerDraggable() {
+                var type = $(this).attr('name');
+                var component = BaseComponent(type, {}, getDimensions(type));
+                draggingComponent = component;
 
-    $('.widget').each(function() {
-        $(this).draggable({
-            opacity: 1,
-            revert: "invalid",
-            cursorAt: { top: 0, left: 0 },
-            helper: function(){
-                $('#outer-container').append('<div id="clone" class="widget">' + $(this).html() + '</div>');
-                //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
-                $("#clone").hide();
-                setTimeout(function(){$('#clone').appendTo('html'); $("#clone").show();},1);
-                return $("#clone");
-            },
-            appendTo: 'html',
-            cursor: '-webkit-grabbing',
-            scroll: true,
-            drag: function(e, ui){
-                    ui.position.top = e.pageY;
-                    ui.position.left = e.pageX;
-                },
+                var componentContainer = createComponentContainer(component);
+                setUpContainer(componentContainer, widget);
+                $('#basic-components').html(basicComponents);
+            }
+
+            $('#outer-container').append(componentContainer);
+            // $('#outer-container').append('<div id="clone" class="widget cell dropped containing-cell component-container">' + $(this).html() + '</div>');
+
+            //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
+            componentContainer.hide();
+            setTimeout(function(){componentContainer.appendTo('html'); componentContainer.show();},1);
+            componentContainer.css({
+                left: 0,
+                top: 0
+            });
+            componentContainer.attr('id', 'dragging_container');
+            return componentContainer;
+
+            // $("#clone").hide();
+            // setTimeout(function(){$('#clone').appendTo('html'); $("#clone").show();},1);
+            // return $("#clone");
+        },
+        appendTo: 'html',
+        cursor: '-webkit-grabbing',
+        scroll: true,
+        drag: function(e, ui){
+            ui.position.top = e.pageY;
+            ui.position.left = e.pageX;
+        },
+    };
+
+    if (widgetToRegister){
+        widgetToRegister.draggable(draggableOptions)
+    }
+
+    else {
+        $('.widget').each(function() {
+            $(this).draggable(draggableOptions);
         });
-    });
+    }
 
 }
 
@@ -1210,28 +1242,24 @@ function movedComponent() {
 
 /**
  * Register listener for click on edit button
- * @param cellId
+ * @param container
+ * @param popup
  */
-function triggerEdit(cellId, popup) {
-    var droppedComponent =$('#'+cellId).find('.widget').attr('name').toLowerCase();
+function triggerEdit(container, popup) {
+    var droppedComponent = container.find('.widget').attr('name').toLowerCase();
+    var editDialog = $('#'+droppedComponent+'-popup-holder').clone();
+    container.prepend(editDialog);
 
-    var editDialogTemplate = $('#'+droppedComponent+'-popup-holder').html();
-
-    var sp = document.createElement('span');
-    sp.innerHTML = editDialogTemplate;
-    var editDialog = sp.firstElementChild;
-
-    var cell = document.getElementById(cellId);
-    cell.insertBefore(editDialog, cell.firstChild);
 
     $(Array.prototype.slice.call(
-        $('#'+cellId).get(0).getElementsByClassName('form-control'), 0)[0]).trigger("focus");
+        container.find('form-control'), 0)[0]).trigger("focus");
+
     if (popup){
         setTimeout(function(){
-            $($('#'+cellId).children().first()).addClass('open');
+            $(container.find('form-control')[0]).trigger("focus");
+            editDialog.find('.tooltip').addClass('open');
         }, 1);
     }
-
 }
 
 function showConfigOptions(droppedComponentType, cellId) {
@@ -1993,7 +2021,8 @@ function refreshCellDisplay(cellId, zoom){
         var properties = componentToChange.properties;
 
         // display itself gets rid of padding for the #display-cell
-        display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
+        displayNew($('#'+cellId), componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]));
+        // display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
         //attach event handlers to new texts
         //getContentEditableEditsAtCell(cellId);
         registerTooltipBtnHandlers();
