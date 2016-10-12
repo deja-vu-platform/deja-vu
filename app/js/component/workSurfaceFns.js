@@ -2,9 +2,23 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-var loadComponentIntoWorkSurface = function(component){
-    var workSurface = createWorkSurface(component.meta.id, component.dimensions.height, component.dimensions.width);
+
+function makeEmptyWorkSurface(component, zoom){
+    currentZoom = zoom; // set zoom value 100%
+    var componentId = component.meta.id;
+    disableAllComponentDomElementsExcept(componentId);
+    var workSurface = createWorkSurface(componentId, component.dimensions.height, component.dimensions.width);
     $('#outer-container').append(workSurface);
+
+    setComponentOptions(selectedProject.components[componentId]);
+    return workSurface
+}
+
+
+
+var loadComponentIntoWorkSurface = function(component){
+    var workSurface = makeEmptyWorkSurface(component, 1);
+
     Object.keys(component.components).forEach(function(innerComponentId){
         var innerComponent = component.components[innerComponentId];
         var type = innerComponent.type;
@@ -77,7 +91,6 @@ function createResizeHandle(container, component){
             'nw': dragHandle_nw
         },
         resize: function(e, ui){
-            console.log(ui);
             component.dimensions.height = ui.size.height;
             component.dimensions.width = ui.size.width;
             refreshCellDisplay(container.attr('id'), 1); // TODO

@@ -6,6 +6,9 @@
 const DEFAULT_CONTAINER_WIDTH = '3000px';
 const DEFAULT_CONTAINER_HEIGHT = '3000px';
 
+const DEFAULT_ROWS = 3;
+const DEFAULT_COLS = 3;
+
 var tableLockedHeight = false;
 var tableLockedWidth = false;
 
@@ -402,16 +405,15 @@ function createEmptyRow(rowNumber) {
 
 /** ** ** Table, Grid, Merge-Handler Creation Functions ** ** ** **/
 
-
 /**
  * Disabled by changing the id and class names
  * @param componentId
  */
 function disableComponentDOMElements(componentId){
-    var tableGridContainer = $('#table-grid-container'+'_'+componentId);
-    $(tableGridContainer).addClass('hidden-component');
+    var workSurface = $('#work-surface'+'_'+componentId);
+    $(workSurface).addClass('hidden-component');
 
-    $(tableGridContainer).find('*').each(function() {
+    $(workSurface).find('*').each(function() {
         var id = this.id;
         if (id.length>0){
             this.id = 'disabled_'+componentId+'_'+this.id;
@@ -423,17 +425,17 @@ function disableComponentDOMElements(componentId){
             classes.forEach(function(className){
                 classNames = classNames + ' ' + 'disabled_'+componentId+'_'+className;
             });
-        this.className = classNames;
+            this.className = classNames;
         }
     });
 }
 
 
 function enableComponentDOMElements(componentId){
-    var tableGridContainer = $('#table-grid-container'+'_'+componentId);
-    $(tableGridContainer).removeClass('hidden-component');
+    var workSurface = $('#work-surface'+'_'+componentId);
+    $(workSurface).removeClass('hidden-component');
 
-    $(tableGridContainer).find('*').each(function() {
+    $(workSurface).find('*').each(function() {
         var id = this.id;
         if (id.length>0){
             this.id = id.replace('disabled_'+componentId+'_', '');
@@ -455,7 +457,7 @@ function disableAllComponentDomElementsExcept(componentToEnableId){
         if (componentToEnableId == componentId){
             continue;
         }
-        if ($('#table-grid-container'+'_'+componentId).hasClass('hidden-component')){
+        if ($('#work-surface'+'_'+componentId).hasClass('hidden-component')){
             continue;
         }
         disableComponentDOMElements(componentId);
@@ -465,7 +467,8 @@ function disableAllComponentDomElementsExcept(componentToEnableId){
 function enableSpecificComponentDomElements(componentToEnableId){
     // first check that the table has been made (otherwise the reset will happen automatically,
     // but more importantly, the table-grid-container won't exist yet
-    if (!($('#table-grid-container'+'_'+componentToEnableId).length>0)) {
+    var workSurfaceToEnable = $('#work-surface'+'_'+componentToEnableId);
+    if (!(workSurfaceToEnable.length>0)) {
         createOrResetTableGridContainer(componentToEnableId);
         var state = {
             zoom: 1,
@@ -480,57 +483,146 @@ function enableSpecificComponentDomElements(componentToEnableId){
     var componentToEnable = selectedProject.components[componentToEnableId];
 
     // enable first (toggle needs the id's and classes to be enabled)
-    if ($('#table-grid-container'+'_'+componentToEnableId).hasClass('hidden-component')){
+    if (workSurfaceToEnable.hasClass('hidden-component')){
         enableComponentDOMElements(componentToEnableId);
     }
 
-    // reset
-    numRows = componentToEnable.dimensions.rows;
-    numCols = componentToEnable.dimensions.cols;
+    // updateZoomFromState(componentToEnableId);
 
-    updateZoomFromState(componentToEnableId);
-
-    gridWidth = componentToEnable.layout.tablePxDimensions.width * currentZoom;
-    gridHeight = componentToEnable.layout.tablePxDimensions.height * currentZoom;
-
-
-    toggleTableHeightLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.height);
-    toggleTableWidthLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.width);
-    updateBitmap(true);
     setComponentOptions(componentToEnable);
 
 }
 
-function makeUserEmptyComponentDisplayTable(componentId, zoom){
-    toggleInnerComponentVisibility(true);
-    currentZoom = zoom; // set zoom value 100%
-
-    disableAllComponentDomElementsExcept(componentId);
-
-    createOrResetTableGridContainer(componentId);
-    createTable(componentId);
-    createGuideGrid(componentId);
-    // Note: this works because we disable all other classes that this affects beforehand
-    initialResizeCells();
-    attachMergeHandlers(componentId);
-
-    // Note: this works because we disable all other classes that this affects beforehand
-    registerDroppable();
-    addRowColAddRemoveButtons(componentId);
-
-    // Note: this works because we disable all other classes that this affects beforehand
-    addRowColResizeHandlers();
-
-    addTableResizeHandler(componentId);
-    addTableSizeLockUnlockButtons(componentId);
-
-    setComponentOptions(selectedProject.components[componentId]);
-
-    changeZoomDisplays(currentZoom);
-
-    bitmapOld = make2dArray(numRows, numCols);
-    bitmapNew = make2dArray(numRows, numCols);
-}
+//
+// /**
+//  * Disabled by changing the id and class names
+//  * @param componentId
+//  */
+// function disableComponentDOMElements(componentId){
+//     var tableGridContainer = $('#table-grid-container'+'_'+componentId);
+//     $(tableGridContainer).addClass('hidden-component');
+//
+//     $(tableGridContainer).find('*').each(function() {
+//         var id = this.id;
+//         if (id.length>0){
+//             this.id = 'disabled_'+componentId+'_'+this.id;
+//         }
+//         var classes = this.className;
+//         if (classes.length>0){
+//             classes = classes.split(' ');
+//             var classNames = '';
+//             classes.forEach(function(className){
+//                 classNames = classNames + ' ' + 'disabled_'+componentId+'_'+className;
+//             });
+//         this.className = classNames;
+//         }
+//     });
+// }
+//
+//
+//
+// function enableComponentDOMElements(componentId){
+//     var tableGridContainer = $('#table-grid-container'+'_'+componentId);
+//     $(tableGridContainer).removeClass('hidden-component');
+//
+//     $(tableGridContainer).find('*').each(function() {
+//         var id = this.id;
+//         if (id.length>0){
+//             this.id = id.replace('disabled_'+componentId+'_', '');
+//         }
+//         var classes = this.className;
+//         if (classes.length>0){
+//             classes = classes.split(' ');
+//             var classNames = '';
+//             classes.forEach(function(className){
+//                 classNames =  classNames  + ' ' +  className.replace('disabled_'+componentId+'_', '');
+//             });
+//             this.className = classNames.trim();
+//         }
+//     });
+// }
+//
+// function disableAllComponentDomElementsExcept(componentToEnableId){
+//     for (var componentId in selectedProject.components){
+//         if (componentToEnableId == componentId){
+//             continue;
+//         }
+//         if ($('#table-grid-container'+'_'+componentId).hasClass('hidden-component')){
+//             continue;
+//         }
+//         disableComponentDOMElements(componentId);
+//     }
+// }
+//
+// function enableSpecificComponentDomElements(componentToEnableId){
+//     // first check that the table has been made (otherwise the reset will happen automatically,
+//     // but more importantly, the table-grid-container won't exist yet
+//     if (!($('#table-grid-container'+'_'+componentToEnableId).length>0)) {
+//         createOrResetTableGridContainer(componentToEnableId);
+//         var state = {
+//             zoom: 1,
+//             lock:{
+//                 width: false,
+//                 height: false
+//             }
+//         };
+//         $('#table-grid-container'+'_'+componentToEnableId).data('state', state);
+//     }
+//
+//     var componentToEnable = selectedProject.components[componentToEnableId];
+//
+//     // enable first (toggle needs the id's and classes to be enabled)
+//     if ($('#table-grid-container'+'_'+componentToEnableId).hasClass('hidden-component')){
+//         enableComponentDOMElements(componentToEnableId);
+//     }
+//
+//     // reset
+//     numRows = componentToEnable.dimensions.rows;
+//     numCols = componentToEnable.dimensions.cols;
+//
+//     updateZoomFromState(componentToEnableId);
+//
+//     gridWidth = componentToEnable.layout.tablePxDimensions.width * currentZoom;
+//     gridHeight = componentToEnable.layout.tablePxDimensions.height * currentZoom;
+//
+//
+//     toggleTableHeightLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.height);
+//     toggleTableWidthLock($('#table-grid-container'+'_'+componentToEnableId).data('state').lock.width);
+//     updateBitmap(true);
+//     setComponentOptions(componentToEnable);
+//
+// }
+//
+// function makeUserEmptyComponentDisplayTable(componentId, zoom){
+//     toggleInnerComponentVisibility(true);
+//     currentZoom = zoom; // set zoom value 100%
+//
+//     disableAllComponentDomElementsExcept(componentId);
+//
+//     createOrResetTableGridContainer(componentId);
+//     createTable(componentId);
+//     createGuideGrid(componentId);
+//     // Note: this works because we disable all other classes that this affects beforehand
+//     initialResizeCells();
+//     attachMergeHandlers(componentId);
+//
+//     // Note: this works because we disable all other classes that this affects beforehand
+//     registerDroppable();
+//     addRowColAddRemoveButtons(componentId);
+//
+//     // Note: this works because we disable all other classes that this affects beforehand
+//     addRowColResizeHandlers();
+//
+//     addTableResizeHandler(componentId);
+//     addTableSizeLockUnlockButtons(componentId);
+//
+//     setComponentOptions(selectedProject.components[componentId]);
+//
+//     changeZoomDisplays(currentZoom);
+//
+//     bitmapOld = make2dArray(numRows, numCols);
+//     bitmapNew = make2dArray(numRows, numCols);
+// }
 
 function createOrResetTableGridContainer(componentId){
     if ($('#table-grid-container'+'_'+componentId).length===0){
@@ -1345,11 +1437,15 @@ function alignCellsAndGridWithSavedRatios(){
 
 }
 
-
 function updateZoomFromState(componentId){
-    currentZoom = $('#table-grid-container'+'_'+componentId).data('state').zoom;
+    currentZoom = $('#work-surface'+'_'+componentId).data('state').zoom;
     changeZoomDisplays(currentZoom);
 }
+
+// function updateZoomFromState(componentId){
+//     currentZoom = $('#table-grid-container'+'_'+componentId).data('state').zoom;
+//     changeZoomDisplays(currentZoom);
+// }
 
 /**
  * Resize cell such that all cells fill width and height of grid

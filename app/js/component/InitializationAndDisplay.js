@@ -128,7 +128,8 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
+        // makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
+        makeEmptyWorkSurface(selectedUserComponent, 1)
         resetMenuOptions();
     });
 });
@@ -144,7 +145,9 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addComponent(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
+        // makeUserEmptyComponentDisplayTable(selectedUserComponent.meta.id, 1);
+        makeEmptyWorkSurface(selectedUserComponent, 1)
+
         resetMenuOptions();
     });
 });
@@ -153,7 +156,8 @@ $('#new-main-component-btn').click(function(){
 $('#load-component-btn').on('click', function () {
     selectedUserComponent = UserComponent.fromString($('#component-json').val());
     selectedProject.addComponent(selectedUserComponent);
-    loadTable(selectedUserComponent, 1);
+    // loadTable(selectedUserComponent, 1);
+    loadComponentIntoWorkSurface(selectedUserComponent);
     displayNewComponentInUserComponentList(selectedUserComponent.meta.name,selectedUserComponent.meta.id);
     resetMenuOptions();
 });
@@ -265,8 +269,11 @@ $('.components').on('click', '.component-name-container', function () {
 
         disableAllComponentDomElementsExcept(selectedUserComponent.meta.id);
 
-        if ($('#table-grid-container'+'_'+componentId).length===0){
-            loadTable(selectedUserComponent, 1);
+        // if ($('#table-grid-container'+'_'+componentId).length===0){
+        if ($('#work-surface'+'_'+componentId).length===0){
+
+                // loadTable(selectedUserComponent, 1);
+            loadComponentIntoWorkSurface(selectedUserComponent);
         } else {
             toggleInnerComponentVisibility(true);
             enableSpecificComponentDomElements(selectedUserComponent.meta.id);
@@ -300,9 +307,10 @@ $('.components').on('keypress', '.new-name-input', function (event) {
         if (newName.length === 0) { // empty string entered, don't change the name!
             return;
         }
-        componentNameElt.text($(this).val());
+        componentNameElt.text(newName);
+        $('.component-options .component-name').text(newName);
 
-        selectedProject.components[componentId].meta.name = $(this).val();
+        selectedProject.components[componentId].meta.name = newName;
         // changing the ids todo: is this a good idea?
         //var oldId = selectedUserComponent.meta.id;
         //var newId = generateId(selectedUserComponent.meta.name);
@@ -386,7 +394,8 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            loadTable(selectedUserComponent, 1);
+            // loadTable(selectedUserComponent, 1);
+            loadComponentIntoWorkSurface(selectedUserComponent);
 
         });
 
@@ -870,7 +879,6 @@ function registerDraggable(widgetToRegister) {
             }
 
             $('#outer-container').append(componentContainer);
-            // $('#outer-container').append('<div id="clone" class="widget cell dropped containing-cell component-container">' + $(this).html() + '</div>');
 
             //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
             componentContainer.hide();
@@ -882,9 +890,6 @@ function registerDraggable(widgetToRegister) {
             componentContainer.attr('id', 'dragging_container');
             return componentContainer;
 
-            // $("#clone").hide();
-            // setTimeout(function(){$('#clone').appendTo('html'); $("#clone").show();},1);
-            // return $("#clone");
         },
         appendTo: 'html',
         cursor: '-webkit-grabbing',
@@ -1002,8 +1007,11 @@ function changeZoomDisplays(zoom){
 
 function updateZoomNavComponentSize(){
     $('#zoom-nav-component-size').css({
-        width: selectedUserComponent.layout.tablePxDimensions.width*navZoom*currentZoom + 'px',
-        height: selectedUserComponent.layout.tablePxDimensions.height*navZoom*currentZoom + 'px',
+        // width: selectedUserComponent.layout.tablePxDimensions.width*navZoom*currentZoom + 'px',
+        // height: selectedUserComponent.layout.tablePxDimensions.height*navZoom*currentZoom + 'px',
+        width: selectedUserComponent.dimensions.width*navZoom*currentZoom + 'px',
+        height: selectedUserComponent.dimensions.height*navZoom*currentZoom + 'px',
+
     });
 }
 
