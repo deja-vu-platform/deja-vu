@@ -16,13 +16,13 @@ function makeEmptyWorkSurface(component, zoom){
 
 
 
-var loadComponentIntoWorkSurface = function(component){
-    var workSurface = makeEmptyWorkSurface(component, 1);
+var loadComponentIntoWorkSurface = function(component, zoom){
+    var workSurface = makeEmptyWorkSurface(component, zoom);
 
     Object.keys(component.components).forEach(function(innerComponentId){
         var innerComponent = component.components[innerComponentId];
         var type = innerComponent.type;
-        var componentContainer = createComponentContainer(innerComponent);
+        var componentContainer = createComponentContainer(innerComponent, zoom);
         var widget = $('.draggable[name=' + type + ']').clone();
         widget.addClass('associated').data('componentId', innerComponentId);
 
@@ -91,19 +91,20 @@ function createResizeHandle(container, component){
             'nw': dragHandle_nw
         },
         resize: function(e, ui){
-            component.dimensions.height = ui.size.height;
-            component.dimensions.width = ui.size.width;
-            refreshContainerDisplay(container.attr('id'), 1); // TODO
+            component.dimensions.height = ui.size.height/currentZoom;
+            component.dimensions.width = ui.size.width/currentZoom;
+            // TODO woah! It resizes as you go!
+            refreshContainerDisplay(container.attr('id'), currentZoom); // TODO
 
         }
     });
 }
 
-function createComponentContainer(component) {
+function createComponentContainer(component, zoom) {
     var container = $('<div></div>');
     var containerId = 'component-container_'+component.meta.id;
     container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
-    container.height(component.dimensions.height).width(component.dimensions.width);
+    container.height(component.dimensions.height * zoom).width(component.dimensions.width * zoom);
     container.data('componentId', component.meta.id);
 
     createResizeHandle(container, component);
@@ -149,7 +150,7 @@ function createComponentContainer(component) {
     return container;
 }
 
-function setUpContainer(container, widget, component){
+function setUpContainer(container, widget, component, zoom){
     container.append(widget);
     var type = widget.attr('name');
     if (component){
@@ -157,7 +158,7 @@ function setUpContainer(container, widget, component){
     } else {
         var html = getHTML[type]();
     }
-    displayNew(container, type, html);
+    displayNew(container, type, html, zoom);
 
 }
 
@@ -172,8 +173,8 @@ var makeDroppableToComponents = function(workSurface){
             // on drop, there should always be a dragging component
             var component = draggingComponent;
             var componentId = component.meta.id;
-            var componentContainer = createComponentContainer(component);
-            setUpContainer(componentContainer, widget, component);
+            var componentContainer = createComponentContainer(component, currentZoom);
+            setUpContainer(componentContainer, widget, component, currentZoom);
             registerDraggable();
 
             if (!widget.hasClass('associated')){
@@ -195,7 +196,7 @@ var makeDroppableToComponents = function(workSurface){
                 left: left,
                 top: top
             });
-            selectedUserComponent.layout[componentId] = {top: top, left: left};
+            selectedUserComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
 
         }
     };

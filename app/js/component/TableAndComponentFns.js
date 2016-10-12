@@ -379,7 +379,7 @@ function deleteUserComponent(userComponentId){
         selectedUserComponent = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        loadComponentIntoWorkSurface(selectedUserComponent);
+        loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
         // loadTable(selectedUserComponent, 1);
     }
     if (userComponentId == selectedProject.mainComponents.indexId){
@@ -472,7 +472,7 @@ function testSaveHTML(){
 function createDownloadPreview(){
     var oldZoom = currentZoom;
     currentZoom = 1;
-    scaleTableToZoom();
+    propagateRatioChangeToAllElts(currentZoom);
 
     $('#download-preview-area').html('').css({
         position: 'relative',
@@ -481,7 +481,7 @@ function createDownloadPreview(){
         width: $('#main-grid-table').css('width'),
     });
 
-    $('.cell').each(function(){
+    $('.component-container').each(function(){
         var add = false;
         var css = {
             position: 'absolute',
@@ -531,7 +531,7 @@ function createDownloadPreview(){
     });
 
     currentZoom = oldZoom;
-    scaleTableToZoom();
+    propagateRatioChangeToAllElts(currentZoom);
 
     return $('#download-preview-area-container').html();
 }

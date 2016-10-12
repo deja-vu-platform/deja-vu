@@ -61,7 +61,7 @@ $(function () {
         selectedProject.addComponent(selectedUserComponent);
 
 
-        loadComponentIntoWorkSurface(selectedUserComponent);
+        loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
@@ -87,7 +87,7 @@ $(function () {
             }
         }
         window.setTimeout(function(){
-            loadComponentIntoWorkSurface(selectedUserComponent);
+            loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
         }, 1);
 
     }
@@ -254,7 +254,7 @@ $('.components').on('click', '.component-name-container', function () {
         // if ($('#table-grid-container'+'_'+componentId).length===0){
         if ($('#work-surface'+'_'+componentId).length===0){
 
-            loadComponentIntoWorkSurface(selectedUserComponent);
+            loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
         } else {
             //toggleInnerComponentVisibility(true);
             enableSpecificComponentDomElements(selectedUserComponent.meta.id);
@@ -375,7 +375,7 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            loadComponentIntoWorkSurface(selectedUserComponent);
+            loadComponentIntoWorkSurface(selectedUserComponent, currentZoom);
 
         });
 
@@ -731,7 +731,7 @@ function registerDraggable(widgetToRegister) {
                 var component = BaseComponent(type, {}, getDimensions(type));
                 draggingComponent = component;
 
-                var componentContainer = createComponentContainer(component);
+                var componentContainer = createComponentContainer(component, currentZoom);
                 setUpContainer(componentContainer, widget);
                 $('#basic-components').html(basicComponents);
             }
@@ -1443,7 +1443,7 @@ function refreshContainerDisplay(cellId, zoom){
         var properties = componentToChange.properties;
 
         // display itself gets rid of padding for the #display-cell
-        displayNew($('#'+cellId), componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]));
+        displayNew($('#'+cellId), componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom);
         // display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
         //attach event handlers to new texts
         //getContentEditableEditsAtCell(cellId);

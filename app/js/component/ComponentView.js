@@ -77,11 +77,11 @@ function getDimensions(type){
     return {height: 200, width: 200}
 }
 
-function displayNew(container, type, html, callback) {
+function displayNew(container, type, html, zoom, callback) {
     var displayElement = $(html);
     container.prepend(displayElement);
     hideBaseComponentDisplayAt(container, type);
-    updateBaseComponentDisplayAt(container, type, 1);
+    updateBaseComponentDisplayAt(container, type, zoom);
     showBaseComponentDisplayAt(container, type);
     if (callback) callback();
 }
