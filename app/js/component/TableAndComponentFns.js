@@ -1748,21 +1748,57 @@ function resizeColsBySetRatios(ratios){
 /**
  * Update the saved ratios and then use this function
  */
-function propagateRatioChangeToAllElts(){
-    // update these just in case
-    gridHeight = selectedUserComponent.layout.tablePxDimensions.height*currentZoom;
-    gridWidth = selectedUserComponent.layout.tablePxDimensions.width*currentZoom;
+function propagateRatioChangeToAllElts(newRatio){
+    for (var componentId in selectedUserComponent.components){
+        var container = $('#component-container_'+componentId);
+        var component = selectedUserComponent.components[componentId];
+        var type = component.type;
+        hideBaseComponentDisplayAt(container, type);
 
-    hideBaseComponentDisplayAll();
-    alignCellsAndGridWithSavedRatios();
-    updateBaseComponentDisplayAll();
-    showBaseComponentDisplayAll();
-    resetAllMergeHandleContainersSizeAndPosition();
-    updateTableResizeHandler();
-    updateSizeValueDisplay(false);
-    updateZoomNavComponentSize();
+        var width = component.dimensions.width * newRatio;
+        var top = selectedUserComponent.layout[componentId].top * newRatio;
+        var height = component.dimensions.height * newRatio;
+        var left = selectedUserComponent.layout[componentId].left *  newRatio;
+
+        container.css({
+            width: width + 'px',
+            height: height + 'px',
+            top: top + 'px',
+            left: left + 'px'
+        });
+
+        updateBaseComponentDisplayAt(container, type, newRatio);
+        showBaseComponentDisplayAt(container, type);
+    }
+
+    var outerWidth = selectedUserComponent.dimensions.width * newRatio;
+    var outerHeight = selectedUserComponent.dimensions.height * newRatio;
+
+    $('.work-surface').css({
+        height: outerHeight + 'px',
+        width: outerWidth + 'px'
+    });
+
+    updateZoomNavComponentSize(newRatio);
 
 }
+
+//
+// function propagateRatioChangeToAllElts(){
+//     // update these just in case
+//     gridHeight = selectedUserComponent.layout.tablePxDimensions.height*currentZoom;
+//     gridWidth = selectedUserComponent.layout.tablePxDimensions.width*currentZoom;
+//
+//     hideBaseComponentDisplayAll();
+//     alignCellsAndGridWithSavedRatios();
+//     updateBaseComponentDisplayAll();
+//     showBaseComponentDisplayAll();
+//     resetAllMergeHandleContainersSizeAndPosition();
+//     updateTableResizeHandler();
+//     updateSizeValueDisplay(false);
+//     updateZoomNavComponentSize();
+//
+// }
 
 
 function rowColResizeOnStart(){

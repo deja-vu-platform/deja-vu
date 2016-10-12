@@ -881,10 +881,6 @@ function registerDraggable(widgetToRegister) {
             //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
             componentContainer.hide();
             setTimeout(function(){componentContainer.appendTo('html'); componentContainer.show();},1);
-            // componentContainer.css({
-            //     left: 0,
-            //     top: 0
-            // });
             componentContainer.attr('id', 'dragging_container');
             return componentContainer;
 
@@ -917,9 +913,6 @@ function registerDraggable(widgetToRegister) {
 function getSliderValFromZoom(zoom){
     var max = parseFloat($('#zoom-slider').get(0).max);
     var min = parseFloat($('#zoom-slider').get(0).min);
-
-    //var max = $( "#zoom-slider" ).slider( "option", "max");
-    //var min = $( "#zoom-slider" ).slider( "option", "min");
 
     var val = 0;
     if (zoom === 1){
@@ -976,11 +969,16 @@ function changeZoomViaZoomControl(type) {
     changeZoomDisplays(currentZoom);
 
     // update the state
-    var state = $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state');
+    var workSurface = $('#work-surface'+'_'+selectedUserComponent.meta.id);
+    // var state = $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state');
+    var state = workSurface.data('state');
+    if (!state){
+        state = {zoom: 1}
+    }
     state.zoom = currentZoom;
-    $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state', state);
+    workSurface.data('state', state);
 
-    scaleTableToZoom();
+    propagateRatioChangeToAllElts(currentZoom);
 }
 
 /**
@@ -1004,15 +1002,15 @@ function changeZoomDisplays(zoom){
         height: selectedScreenSizeHeight*currentZoom*navZoom + 'px',
         width: selectedScreenSizeWidth*currentZoom*navZoom + 'px',
     });
-    updateZoomNavComponentSize();
+    updateZoomNavComponentSize(zoom);
 }
 
-function updateZoomNavComponentSize(){
+function updateZoomNavComponentSize(newRatio){
     $('#zoom-nav-component-size').css({
         // width: selectedUserComponent.layout.tablePxDimensions.width*navZoom*currentZoom + 'px',
         // height: selectedUserComponent.layout.tablePxDimensions.height*navZoom*currentZoom + 'px',
-        width: selectedUserComponent.dimensions.width*navZoom*currentZoom + 'px',
-        height: selectedUserComponent.dimensions.height*navZoom*currentZoom + 'px',
+        width: selectedUserComponent.dimensions.width*navZoom*newRatio + 'px',
+        height: selectedUserComponent.dimensions.height*navZoom*newRatio + 'px',
 
     });
 }

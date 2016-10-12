@@ -174,7 +174,7 @@ var makeDroppableToComponents = function(workSurface){
             var componentId = component.meta.id;
             var componentContainer = createComponentContainer(component);
             setUpContainer(componentContainer, widget, component);
-            registerDraggable(widget);
+            registerDraggable();
 
             if (!widget.hasClass('associated')){
                 selectedUserComponent.components[componentId] = component;
@@ -185,6 +185,7 @@ var makeDroppableToComponents = function(workSurface){
             }
 
             workSurface.append(componentContainer);
+            registerTooltipBtnHandlers();
 
             var top = ui.position.top - workSurface.offset().top;
             var left = ui.position.left - workSurface.offset().left;
