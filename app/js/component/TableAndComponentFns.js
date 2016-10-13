@@ -440,15 +440,12 @@ function duplicateUserComponent(userComponent){
 /************************************************************/
 function testSaveHTML(){
     var html = '';
-    for (var row = 1; row<= numRows; row++){
-        for (var col = 1; col<=numCols; col++){
-            var cellId = 'cell'+'_'+row+'_'+col;
-            var displayComponent = $('#'+cellId).find('.display-component');
-            if (displayComponent.get(0)){
-                html = html + displayComponent.get(0).outerHTML+'/n';
-            }
+    $('.component-container').each(function(){
+        var displayComponent = $(this).find('.display-component');
+        if (displayComponent.get(0)){
+            html = html + displayComponent.get(0).outerHTML+'/n';
         }
-    }
+    });
     return html;
 }
 

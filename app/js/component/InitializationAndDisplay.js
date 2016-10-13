@@ -509,23 +509,6 @@ function displayMainPageInListAndSelect(name, id){
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
-/**
- * Deletes a component from the datatype and also from the view
- */
-function deleteComponentFromUserComponentAndFromView(cellId) {
-    var rowcol = getRowColFromId(cellId);
-    var row = rowcol.row;
-    var col = rowcol.col;
-
-    if (selectedUserComponent.components[row]) {
-        if (selectedUserComponent.components[row][col]) {
-            delete selectedUserComponent.components[row][col];
-        }
-    }
-    deleteComponentFromView(cellId);
-    updateBitmap(false);
-
-}
 function deleteComponentFromView(containerId) {
     var cell = $('#'+containerId);
 
@@ -534,8 +517,6 @@ function deleteComponentFromView(containerId) {
     cell.find('.label-container').remove();
     cell.find('.display-component').remove();
     cell.find('.widget').remove();
-
-    //resetDroppabilityAt(containerId);
 }
 
 
@@ -543,44 +524,27 @@ function deleteComponentFromView(containerId) {
  * Updates the contents of a base component info at a particular cell based on inputs
  * @param cellId
  */
-function updateBaseComponentContentsAndDisplayAt(cellId) {
+function updateBaseComponentContentsAndDisplayAt(containerId) {
     // NOTE: actual cell is the cell in the main table
     // cellId could be either display-cell or the actual cell id, but it is the one
     // that contains text edits
     // tooltip is the tooltip currently being edited
 
-    var actualCellId;
-    var cell;
-    var tooltip;
-    var componentId;
-    if (cellId == 'display-cell') {
-        actualCellId = $('#display-cell').data('cellid');
-        tooltip = $('#inner-component-focus').find('.tooltip');
-        componentId = null; //TODO
-    } else {
-        actualCellId = cellId;
-        cell = $('#'+cellId);
-        tooltip = cell.find('.tooltip');
-        componentId = cell.data('componentId');
-    }
-    //var rowcol = getRowColFromId(actualCellId);
-    //var row = rowcol.row;
-    //var col = rowcol.col;
+    var container = $('#'+containerId);
+    var tooltip = container.find('.tooltip');
+    var componentId = container.data('componentId');
 
-    var type = $('#' + actualCellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+    var type = container.find('.draggable').attr('name');
     var value;
     var isUpload = false;
-    //var inputs = Array.prototype.slice.call(
-    //    $('#' + cellId).get(0).getElementsByTagName('input'), 0);
-
 
     if (tooltip.length>0){
         var inputs = Array.prototype.slice.call(
             tooltip.get(0).getElementsByTagName('input'), 0);
-    } // else it is label and is handled
+    } // TODO // else it is label and is handled
 
     if (type === 'label') {
-        value = $('#' + cellId).find('p')[0].textContent;
+        value = container.find('p')[0].textContent;
     } else if (type === 'link') {
         value = {
             link_text: inputs[0].value,
@@ -613,10 +577,7 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
                     selectedUserComponent.components[componentId].components[type] = value;
 
                     //selectedUserComponent.components[row][col].components[type] = value;
-                    refreshContainerDisplay(actualCellId, currentZoom);
-                    if (cellId=='display-cell'){
-                        refreshContainerDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
-                    }
+                    refreshContainerDisplay(container.attr('id'), currentZoom);
                 });
         } else { // pasted link to image
             if (inputs[0].value.length>0){
@@ -633,16 +594,10 @@ function updateBaseComponentContentsAndDisplayAt(cellId) {
     }
 
     if (!isUpload) {
-        //selectedUserComponent.components[row][col].components = {};
-        //selectedUserComponent.components[row][col].components[type] = value;
         selectedUserComponent.components[componentId].components = {};
         selectedUserComponent.components[componentId].components[type] = value;
 
-
-        refreshContainerDisplay(actualCellId, currentZoom);
-        if (cellId=='display-cell'){
-            refreshContainerDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
-        }
+        refreshContainerDisplay(container.attr('id'), currentZoom);
     }
 }
 
@@ -1199,8 +1154,14 @@ function registerTooltipBtnHandlers() {
 // TODO needs to be updated to use more relevant classes
 function findContainingCell(context) {
     var parent = $(context).parent();
-    while (!(parent.hasClass('containing-cell')||parent.hasClass('display-cell-parent'))) {
+
+    while (!(parent.hasClass('component-container'))) {
         parent = $(parent).parent();
+        if (parent.length == 0){ // TODO this is a check to see if anything went awry
+            console.log('something went wrong');
+            console.log(context);
+            return null
+        }
     }
     var cellId;
     if (parent.hasClass('display-cell-parent')){
@@ -1213,13 +1174,12 @@ function findContainingCell(context) {
 
 
 /**
- * The recursion is there so that ???
  */
 function getContentEditableEdits() {
-    $('[contenteditable=true]').blur(function() {
+    $('[contenteditable=true]').unbind() // unbind to prevent this from firing multiple times
+        .blur(function() {
         var cellId = findContainingCell(this);
         updateBaseComponentContentsAndDisplayAt(cellId);
-        //getContentEditableEditsAtCell(cellId);
     });
 }
 
@@ -1408,18 +1368,10 @@ $('#outer-container').on('dblclick', '.cell', function(){
 });
 
 function refreshContainerDisplay(cellId, zoom){
-    if (cellId == 'display-cell'){
-        //var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
-        if (!zoom){
-            zoom = $('#display-cell').data('display-cell-scale');
-        };
-    } else {
-        //var rowcol  = getRowColFromId(cellId);
-        if (!zoom){
-            zoom = 1;
-        };
-        var componentId = $('#'+cellId).data('componentId');
+    if (!zoom){
+        zoom = 1;
     }
+    var componentId = $('#'+cellId).data('componentId');
 
     if (selectedUserComponent.components[componentId]){
         var componentToChange = selectedUserComponent.components[componentId];
