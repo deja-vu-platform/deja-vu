@@ -28,6 +28,11 @@ function getRowColFromId(id){
     return {row:row,col:col}
 }
 
+function getComponentIdFromContainerId(id){
+    var split = id.split('_');
+    return split[split.length - 1]
+}
+
 function sanitizeStringOfSpecialChars(string){
     // from http://stackoverflow.com/questions/4374822/javascript-regexp-remove-all-special-characters
     // edited to include _ and -

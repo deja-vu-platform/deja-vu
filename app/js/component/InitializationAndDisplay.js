@@ -57,11 +57,11 @@ $(function () {
 
     if (selectedProject.numComponents == 0){
         // start a default component
-        selectedUserComponent = initUserComponent(true);
-        selectedProject.addComponent(selectedUserComponent);
+        selectedUserComponent = initUserComponent(true, true);
+        selectedProject.addMainPage(selectedUserComponent);
 
         loadComponent(selectedUserComponent, currentZoom);
-        displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+        displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
         if (!$.isEmptyObject(selectedProject.mainComponents)){
             var componentToLoadId = Object.keys(selectedProject.mainComponents)[0];
@@ -122,7 +122,7 @@ $('#new-user-component-btn').click(function(){
     $('#create-component').on('click', function () {
         numRows = $('#select-rows').val();
         numCols = $('#select-cols').val();
-        selectedUserComponent = initUserComponent(false);
+        selectedUserComponent = initUserComponent(false, false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
         setUpEmptyWorkSurface(selectedUserComponent, 1);
@@ -135,10 +135,8 @@ $('#new-main-component-btn').click(function(){
     $('#create-component').on('click', function () {
         numRows = $('#select-rows').val();
         numCols = $('#select-cols').val();
-        selectedUserComponent = initUserComponent(false);
-        selectedUserComponent.inMainPages = true;
-        selectedProject.mainComponents[selectedUserComponent.meta.id] = selectedUserComponent.meta.name;
-        selectedProject.addComponent(selectedUserComponent);
+        selectedUserComponent = initUserComponent(false, true);
+        selectedProject.addMainPage(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
         setUpEmptyWorkSurface(selectedUserComponent, 1)
@@ -351,8 +349,7 @@ function setComponentOptions(component){
             copyComponent.meta.id = generateId(copyComponent.meta.name);
 
             if (originalId in selectedProject.mainComponents){
-                selectedProject.mainComponents[copyComponent.meta.id] = copyComponent.meta.name;
-                copyComponent.inMainPages = true;
+                selectedProject.addMainPage(copyComponent);
                 displayMainPageInListAndSelect(copyComponent.meta.name, copyComponent.meta.id);
             } else {
                 displayUserComponentInListAndSelect(copyComponent.meta.name, copyComponent.meta.id);
@@ -660,27 +657,36 @@ function registerDraggable(widgetToRegister) {
                 var componentId = widget.data('componentId');
                 draggingComponent = selectedUserComponent.components[componentId];
                 var componentContainer = $('#component-container_'+componentId);
-                // console.log(componentContainer.offset());
-                draggableOptions.offset = {top: e.pageY - componentContainer.offset().top,
+                draggableOptions.customOffset = {
+                    top: e.pageY - componentContainer.offset().top,
                     left: e.pageX - componentContainer.offset().left
                 };
 
-            } else {
 
+            } else {
                 var type = $(this).attr('name');
                 var component = BaseComponent(type, {}, getDimensions(type));
                 draggingComponent = component;
 
                 var componentContainer = createComponentContainer(component, currentZoom);
-                setUpContainer(componentContainer, widget);
+                setUpContainer(componentContainer, widget, component, currentZoom);
                 $('#basic-components').html(basicComponents);
+                registerDraggable();
             }
 
             $('#outer-container').append(componentContainer);
 
             //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
             componentContainer.hide();
-            setTimeout(function(){componentContainer.appendTo('html'); componentContainer.show();},1);
+            setTimeout(function(){
+                componentContainer.appendTo('html');
+                componentContainer.show();
+                // componentContainer.css({
+                //     position: 'absolute',
+                //     top: (draggableOptions.customOffset.top) + 'px',
+                //     left: (draggableOptions.customOffset.left) + 'px',
+                // });
+            },1);
             componentContainer.attr('id', 'dragging_container');
             return componentContainer;
 
@@ -688,13 +694,44 @@ function registerDraggable(widgetToRegister) {
         appendTo: 'html',
         cursor: '-webkit-grabbing',
         scroll: true,
-        offset: { top: 0, left: 0 },
+        customOffset: { top: 0, left: 0 },
         start: function(e, ui){
-            $(this).draggable( "option", "cursorAt", draggableOptions.offset );
+            // $(this).draggable( "option", "cursorAt", draggableOptions.customOffset );
+            // var offset = {
+                // top: -(e.pageY - draggableOptions.customOffset.top),
+                // left: -(e.pageX - draggableOptions.customOffset.left),
+                // top: 0,
+                // left: 0
+            //
+            // };
+            // $(this).draggable( "option", "cursorAt", offset);
+            // console.log( draggableOptions.customOffset);
+            // ui.position.top = draggableOptions.customOffset.top;
+            // ui.position.left = draggableOptions.customOffset.left;
+            // var helper = $(ui.helper);
+            // helper.css({
+            //     position: 'absolute',
+            //     top: (draggableOptions.customOffset.top) + 'px',
+            //     left: (draggableOptions.customOffset.left) + 'px',
+            // });
+            // console.log(helper.offset().top);
         },
         drag: function(e, ui){
-            ui.position.top = e.pageY - draggableOptions.offset.top;
-            ui.position.left = e.pageX - draggableOptions.offset.left;
+            // var top = e.pageY - draggableOptions.customOffset.top;
+            // ui.position.top = e.pageY - draggableOptions.customOffset.top;
+            // ui.position.left = e.pageX - draggableOptions.customOffset.left;
+            // var helper = $(ui.helper);
+            // helper.css(
+            // var offset = {
+            //     top: (e.pageY - draggableOptions.customOffset.top) + 'px',
+            //     left: (e.pageX - draggableOptions.customOffset.left) + 'px',
+            // };
+            // $(this).draggable( "option", "cursorAt", offset);
+
+            // console.log('mouse', e.pageY);
+            // console.log('top', ui.position.top);
+            // ui.position.top = 300;
+            // ui.position.left = 300;
         },
     };
 
@@ -752,20 +789,23 @@ function changeZoomViaZoomControl(type) {
         $('#zoom-control-value').text(Math.round(zoom * 100) + '%');
         currentZoom = zoom;
     } else if (type == 'fit') {
-        var zoomHeight = ($('#outer-container').height() - (20 + 100 + 70 + 17)) / selectedUserComponent.layout.tablePxDimensions.height; // take into account padding and stuff
-        var zoomWidth = ($('#outer-container').width() - (20 + 100 + 40 + 17)) / selectedUserComponent.layout.tablePxDimensions.width;
+        var zoomHeight = $('#outer-container').height() / selectedUserComponent.dimensions.height;
+        var zoomWidth = $('#outer-container').width() / selectedUserComponent.dimensions.width;
         currentZoom = Math.min(zoomWidth, zoomHeight);
-    } else {
+    } else if (type == 'full'){
         var widthScale = ($('#outer-container').width())/selectedScreenSizeWidth;
         var heightScale = ($('#outer-container').height())/selectedScreenSizeHeight;
-
         currentZoom = Math.min(widthScale, heightScale);
+    } else if (type == 'actual'){
+        $('#zoom-slider').val(0);
+        changeZoomViaZoomControl('slider');
+    } else {
+    //    Do nothing
     }
     changeZoomDisplays(currentZoom);
 
     // update the state
     var workSurface = $('#work-surface'+'_'+selectedUserComponent.meta.id);
-    // var state = $('#table-grid-container'+'_'+selectedUserComponent.meta.id).data('state');
     var state = workSurface.data('state');
     if (!state){
         state = {zoom: 1}
@@ -839,8 +879,8 @@ function registerZoom() {
 
     $('#zoom-actual').click(function(e, ui){
         e.preventDefault();
-        $('#zoom-slider').val(0);
-        changeZoomViaZoomControl('slider');
+        changeZoomViaZoomControl('actual');
+
     });
 
     $('#zoom-fit').click(function(e, ui){
@@ -1094,33 +1134,16 @@ function registerTooltipBtnHandlers() {
             e.preventDefault();
             var cellId = findContainingCell(this);
             var element = $('#'+cellId).find('.display-component');
-            if (cellId == 'display-cell') {
-                var element2 = $('#'+$('#display-cell').data('cellid')).find('.display-component');
-            }
             var bootstrapClass = bootstrapPrefix+"-"+optionsList[index];
             element.addClass(bootstrapClass);
-            if (cellId == 'display-cell') {
-                element2.addClass(bootstrapClass);
-            }
-
 
             for (var j=0; j<optionsList.length; j++) {
                 if (j!==index) {
                     element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
-                    if (cellId == 'display-cell') {
-                        element2.removeClass(bootstrapPrefix+'-'+optionsList[j]);
-                    }
                 }
             }
-
-            if (cellId == 'display-cell'){
-                var rowcol  = getRowColFromId($('#display-cell').data('cellid'));
-            } else {
-                var rowcol  = getRowColFromId(cellId);
-            }
-            var row = rowcol.row;
-            var col = rowcol.col;
-            selectedUserComponent.components[row][col].properties[propertyName] = bootstrapClass;
+            var componentId = getComponentIdFromContainerId(cellId);
+            selectedUserComponent.components[componentId].properties[propertyName] = bootstrapClass;
 
         }
     }
@@ -1236,18 +1259,17 @@ function registerUserComponentAreaDroppable(){
             if ($(this).hasClass('main-pages')){
                 if (ui.draggable.hasClass('moving-user-component')){ // if type user
                     // adding to main page
-                    selectedProject.mainComponents[userComponentId] = name;
+                    selectedProject.addMainPage(selectedProject.components[userComponentId]);
                     $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
                     displayMainPageInListAndSelect(name, userComponentId);
-                    selectedProject.components[userComponentId].inMainPages = true;
                 }
             } else if ($(this).hasClass('user-components')){
                 if (ui.draggable.hasClass('moving-main-component')){ // if type user
                     // removing from main page
-                    delete selectedProject.mainComponents[userComponentId];
+                    selectedProject.removeMainPage(selectedProject.components[userComponentId]);
                     $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
                     displayUserComponentInListAndSelect(name, userComponentId);
-                    selectedProject.components[userComponentId].inMainPages = false;
+
                 }
             }
         }
@@ -1355,18 +1377,6 @@ $('.components').on('click', '.index-page-toggle', function(){
 });
 
 
-// TODO are we keeping the inner component focus thing? Might be better to
-// TODO go straight to a usercomponent edit mode (ie, just switch to that component)
-// TODO and do nothing on the base and cliche components
-$('#outer-container').on('dblclick', '.cell', function(){
-    var rowcol = getRowColFromId(this.id);
-    if (selectedUserComponent.components[rowcol.row]){
-        if (selectedUserComponent.components[rowcol.row][rowcol.col]){
-            switchToInnerComponentFocusMode(rowcol.row, rowcol.col)
-        }
-    }
-});
-
 function refreshContainerDisplay(cellId, zoom){
     if (!zoom){
         zoom = 1;
@@ -1377,14 +1387,11 @@ function refreshContainerDisplay(cellId, zoom){
         var componentToChange = selectedUserComponent.components[componentId];
 
         removeDisplay(cellId);
-        var padding = componentToChange.padding;
         var properties = componentToChange.properties;
 
         // display itself gets rid of padding for the #display-cell
         display($('#'+cellId), componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom);
-        // display(cellId, componentToChange.type, getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, padding, properties);
         //attach event handlers to new texts
-        //getContentEditableEditsAtCell(cellId);
         registerTooltipBtnHandlers();
     } else {
         deleteComponentFromView(cellId);
@@ -1392,6 +1399,8 @@ function refreshContainerDisplay(cellId, zoom){
 
 }
 
+
+// TODO this needs to be revamped entirely
 
 ////http://www.webdesignerdepot.com/2013/03/how-to-create-a-color-picker-with-html5-canvas/
 // The color picker

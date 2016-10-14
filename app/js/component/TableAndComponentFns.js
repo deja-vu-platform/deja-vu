@@ -406,7 +406,7 @@ function openDeleteUserComponentConfirmDialogue(userComponentId){
  * @param isDefault
  * @constructor
  */
-function initUserComponent(isDefault) {
+function initUserComponent(isDefault, isMainPage) {
     var name, version, author;
     if (isDefault) {
         name = DEFAULT_COMPONENT_NAME;
@@ -423,7 +423,10 @@ function initUserComponent(isDefault) {
     }
     selectedProject.componentIdSet[id] = '';
 
-    return UserComponent({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
+    if (isMainPage){
+        return UserComponent({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
+    }
+    return UserComponent({height: 400, width: 600}, name, id, version, author); // experimentation
 }
 
 

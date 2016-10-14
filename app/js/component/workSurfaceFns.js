@@ -55,6 +55,8 @@ function setUpEmptyWorkSurface(component, zoom){
 
     $('#outer-container').append(workSurface);
 
+    makeWorkSurfaceResizable(workSurface, component); // TODO experimentation
+    makeDroppableToComponents(workSurface);
     setComponentOptions(selectedProject.components[componentId]);
     updateZoomFromState(componentId);
 
@@ -92,6 +94,7 @@ var loadComponentIntoWorkSurface = function(component, zoom){
         registerTooltipBtnHandlers('component-container_'+innerComponentId);
 
     });
+
 };
 
 
@@ -101,13 +104,33 @@ var createWorkSurface = function(componentId, height, width){
     workSurface.attr('id', 'work-surface_'+componentId);
 
     workSurface.height(height).width(width);
-    workSurface.css('background', 'lightblue');
-
-    makeDroppableToComponents(workSurface);
     return workSurface;
 };
 
-function createResizeHandle(container, component){
+function makeWorkSurfaceResizable(workSurface, component){
+    var componentId = component.meta.id;
+
+    var dragHandle_se = $('<span></span>');
+    dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
+    dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
+    dragHandle_se.attr('id', 'drag-handle-se' + '_' + componentId);
+
+    workSurface.append(dragHandle_se);
+
+
+    $(workSurface).resizable({
+        handles: {
+            'se': dragHandle_se,
+        },
+        resize: function(e, ui){
+            component.dimensions.height = ui.size.height/currentZoom;
+            component.dimensions.width = ui.size.width/currentZoom;
+        }
+    });
+
+}
+
+function makeContainerResizable(container, component, isWorkSurface){
     var componentId = component.meta.id;
 
     var dragHandle_se = $('<span></span>');
@@ -147,8 +170,7 @@ function createResizeHandle(container, component){
             component.dimensions.height = ui.size.height/currentZoom;
             component.dimensions.width = ui.size.width/currentZoom;
             // TODO woah! It resizes as you go!
-            refreshContainerDisplay(container.attr('id'), currentZoom); // TODO
-
+            refreshContainerDisplay(container.attr('id'), currentZoom);
         }
     });
 }
@@ -160,7 +182,7 @@ function createComponentContainer(component, zoom) {
     container.height(component.dimensions.height * zoom).width(component.dimensions.width * zoom);
     container.data('componentId', component.meta.id);
 
-    createResizeHandle(container, component);
+    makeContainerResizable(container, component);
 
     var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
         '<button class="btn btn-default dropdown-toggle btn-xs" type="button" data-toggle="dropdown">'+
@@ -220,7 +242,7 @@ var makeDroppableToComponents = function(workSurface){
     var dropSettings = {
         accept: ".widget",
         hoverClass: "highlight",
-        tolerance: "intersect",
+        tolerance: "fit",
         drop: function(event, ui) {
             var widget = $(ui.draggable);
             // on drop, there should always be a dragging component

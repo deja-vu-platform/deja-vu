@@ -53,14 +53,27 @@ function UserProject(name, id, version, author) {
     this.mainComponents = {}; // one component for now
     this.components = {};
     this.numComponents = 0;
-    this.componentIdSet = {id:''};
+    this.componentIdSet = {}; // {id:''}
     this.lastAccessed = new Date();
     this.addedCliches = {};
 }
 
 UserProject.prototype.addComponent = function(component){
-    this.components[component.meta.id] = component;
-    this.numComponents++;
+    if (!this.components[component.meta.id]) {
+        this.components[component.meta.id] = component;
+        this.numComponents++;
+    }
+};
+
+UserProject.prototype.addMainPage = function(component){
+    component.inMainPages = true;
+    this.mainComponents[component.meta.id] = component.meta.name;
+    this.addComponent(component);
+};
+
+UserProject.prototype.removeMainPage = function(component){
+    delete selectedProject.mainComponents[component.meta.id];
+    component.inMainPages = false;
 };
 
 

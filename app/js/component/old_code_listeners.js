@@ -666,108 +666,121 @@ function toggleInnerComponentVisibility(showAll){
 }
 
 
+//
+// /**
+//  * Updates the contents of a base component info at a particular cell based on inputs
+//  * @param cellId
+//  */
+// function updateBaseComponentContentsAndDisplayAt_OLD(cellId) {
+//     // NOTE: actual cell is the cell in the main table
+//     // cellId could be either display-cell or the actual cell id, but it is the one
+//     // that contains text edits
+//     // tooltip is the tooltip currently being edited
+//
+//     var actualCellId;
+//     var cell;
+//     var tooltip;
+//     var componentId;
+//     if (cellId == 'display-cell') {
+//         actualCellId = $('#display-cell').data('cellid');
+//         tooltip = $('#inner-component-focus').find('.tooltip');
+//         componentId = null; //TODO
+//     } else {
+//         actualCellId = cellId;
+//         cell = $('#'+cellId);
+//         tooltip = cell.find('.tooltip');
+//         componentId = cell.data('componentId');
+//     }
+//
+//     var type = $('#' + actualCellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
+//     var value;
+//     var isUpload = false;
+//     //var inputs = Array.prototype.slice.call(
+//     //    $('#' + cellId).get(0).getElementsByTagName('input'), 0);
+//
+//
+//     if (tooltip.length>0){
+//         var inputs = Array.prototype.slice.call(
+//             tooltip.get(0).getElementsByTagName('input'), 0);
+//     } // else it is label and is handled
+//
+//     if (type === 'label') {
+//         value = $('#' + cellId).find('p')[0].textContent;
+//     } else if (type === 'link') {
+//         value = {
+//             link_text: inputs[0].value,
+//             target: inputs[1].value
+//         }
+//     } else if (type === 'tab_viewer') {
+//         value = {
+//             "tab1": {text: inputs[0].value, target: inputs[1].value},
+//             "tab2": {text: inputs[2].value, target: inputs[3].value},
+//             "tab3": {text: inputs[4].value, target: inputs[5].value}
+//         }
+//     } else if (type === 'menu') {
+//         value = {
+//             "menu_item1": {text: inputs[0].value, target: inputs[1].value},
+//             "menu_item2": {text: inputs[2].value, target: inputs[3].value},
+//             "menu_item3": {text: inputs[4].value, target: inputs[5].value}
+//         }
+//     } else if (type === 'image') {
+//         value = {};
+//
+//         if (files.length > 0) { // if there's a file to upload
+//
+//             var file = files[0];
+//             var parseFile = new Parse.File(file.name, file);
+//             isUpload = true;
+//             files.length = 0; // clear the old file
+//             parseFile.save()
+//                 .then(function (savedFile) { // save was successful
+//                     value.img_src = savedFile.url();
+//                     selectedUserComponent.components[componentId].components[type] = value;
+//
+//                     //selectedUserComponent.components[row][col].components[type] = value;
+//                     refreshContainerDisplay(actualCellId, currentZoom);
+//                     if (cellId=='display-cell'){
+//                         refreshContainerDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
+//                     }
+//                 });
+//         } else { // pasted link to image
+//             if (inputs[0].value.length>0){
+//                 value.img_src = inputs[0].value;
+//             } else {
+//                 value.img_src = 'images/image_icon.png';
+//             }
+//         }
+//     } else if (type === 'panel') {
+//         value = {
+//             heading: $('#' + cellId).find('.panel-title')[0].textContent,
+//             content: $('#' + cellId).find('.panel-html')[0].textContent
+//         }
+//     }
+//
+//     if (!isUpload) {
+//         //selectedUserComponent.components[row][col].components = {};
+//         //selectedUserComponent.components[row][col].components[type] = value;
+//         selectedUserComponent.components[componentId].components = {};
+//         selectedUserComponent.components[componentId].components[type] = value;
+//
+//
+//         refreshContainerDisplay(actualCellId, currentZoom);
+//         if (cellId=='display-cell'){
+//             refreshContainerDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
+//         }
+//     }
+// }
 
-/**
- * Updates the contents of a base component info at a particular cell based on inputs
- * @param cellId
- */
-function updateBaseComponentContentsAndDisplayAt_OLD(cellId) {
-    // NOTE: actual cell is the cell in the main table
-    // cellId could be either display-cell or the actual cell id, but it is the one
-    // that contains text edits
-    // tooltip is the tooltip currently being edited
 
-    var actualCellId;
-    var cell;
-    var tooltip;
-    var componentId;
-    if (cellId == 'display-cell') {
-        actualCellId = $('#display-cell').data('cellid');
-        tooltip = $('#inner-component-focus').find('.tooltip');
-        componentId = null; //TODO
-    } else {
-        actualCellId = cellId;
-        cell = $('#'+cellId);
-        tooltip = cell.find('.tooltip');
-        componentId = cell.data('componentId');
+
+// TODO are we keeping the inner component focus thing? Might be better to
+// TODO go straight to a usercomponent edit mode (ie, just switch to that component)
+// TODO and do nothing on the base and cliche components
+$('#outer-container').on('dblclick', '.cell', function(){
+    var rowcol = getRowColFromId(this.id);
+    if (selectedUserComponent.components[rowcol.row]){
+        if (selectedUserComponent.components[rowcol.row][rowcol.col]){
+            switchToInnerComponentFocusMode(rowcol.row, rowcol.col)
+        }
     }
-
-    var type = $('#' + actualCellId).get(0).getElementsByClassName('draggable')[0].getAttribute('name');
-    var value;
-    var isUpload = false;
-    //var inputs = Array.prototype.slice.call(
-    //    $('#' + cellId).get(0).getElementsByTagName('input'), 0);
-
-
-    if (tooltip.length>0){
-        var inputs = Array.prototype.slice.call(
-            tooltip.get(0).getElementsByTagName('input'), 0);
-    } // else it is label and is handled
-
-    if (type === 'label') {
-        value = $('#' + cellId).find('p')[0].textContent;
-    } else if (type === 'link') {
-        value = {
-            link_text: inputs[0].value,
-            target: inputs[1].value
-        }
-    } else if (type === 'tab_viewer') {
-        value = {
-            "tab1": {text: inputs[0].value, target: inputs[1].value},
-            "tab2": {text: inputs[2].value, target: inputs[3].value},
-            "tab3": {text: inputs[4].value, target: inputs[5].value}
-        }
-    } else if (type === 'menu') {
-        value = {
-            "menu_item1": {text: inputs[0].value, target: inputs[1].value},
-            "menu_item2": {text: inputs[2].value, target: inputs[3].value},
-            "menu_item3": {text: inputs[4].value, target: inputs[5].value}
-        }
-    } else if (type === 'image') {
-        value = {};
-
-        if (files.length > 0) { // if there's a file to upload
-
-            var file = files[0];
-            var parseFile = new Parse.File(file.name, file);
-            isUpload = true;
-            files.length = 0; // clear the old file
-            parseFile.save()
-                .then(function (savedFile) { // save was successful
-                    value.img_src = savedFile.url();
-                    selectedUserComponent.components[componentId].components[type] = value;
-
-                    //selectedUserComponent.components[row][col].components[type] = value;
-                    refreshContainerDisplay(actualCellId, currentZoom);
-                    if (cellId=='display-cell'){
-                        refreshContainerDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
-                    }
-                });
-        } else { // pasted link to image
-            if (inputs[0].value.length>0){
-                value.img_src = inputs[0].value;
-            } else {
-                value.img_src = 'images/image_icon.png';
-            }
-        }
-    } else if (type === 'panel') {
-        value = {
-            heading: $('#' + cellId).find('.panel-title')[0].textContent,
-            content: $('#' + cellId).find('.panel-html')[0].textContent
-        }
-    }
-
-    if (!isUpload) {
-        //selectedUserComponent.components[row][col].components = {};
-        //selectedUserComponent.components[row][col].components[type] = value;
-        selectedUserComponent.components[componentId].components = {};
-        selectedUserComponent.components[componentId].components[type] = value;
-
-
-        refreshContainerDisplay(actualCellId, currentZoom);
-        if (cellId=='display-cell'){
-            refreshContainerDisplay('display-cell', parseFloat($('#display-cell').data('display-cell-scale')));
-        }
-    }
-}
-
+});

@@ -17,7 +17,6 @@ var recentProjectsByAccessTime = {};
 var currentProject;
 
 var componentToShow;
-//TODO implement recent vs all
 
 // Initialization
 $(function () {

@@ -76,11 +76,9 @@ var UserComponent = function (dimensions, name, id, version, author) {
     return userComponent
 };
 
-UserComponent.prototype.addComponent = function(component, row, col) {
-    if (!this.components[row]) {
-        this.components[row]={};
-    }
-    this.components[row][col]=component;
+UserComponent.prototype.addComponent = function(component) {
+    var componentId = component.meta.id;
+    this.components[componentId]=component;
     return true;
 };
 
