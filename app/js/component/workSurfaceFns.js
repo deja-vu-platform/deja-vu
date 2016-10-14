@@ -83,7 +83,8 @@ var loadComponentIntoWorkSurface = function(component, zoom){
         componentContainer.css({
             position: 'absolute',
             left: component.layout[innerComponentId].left,
-            top: component.layout[innerComponentId].top
+            top: component.layout[innerComponentId].top,
+
         });
 
         setUpContainer(componentContainer, widget, innerComponent, zoom);
