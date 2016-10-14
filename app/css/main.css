@@ -1,3 +1,7 @@
+body{
+    scroll: auto;
+}
+
 /*===================================================
                   COMPONENTS
 ===================================================*/
@@ -259,17 +263,14 @@ td {
     display: none;
 }
 
-#outer-container, #inner-component-focus {
+#outer-container {
     width: 670px;
     height: 550px;
     border: 1px solid #dddddd;
     margin-left: 267px;
     position: relative;
-}
-
-#outer-container{
-    overflow: scroll;
     background: grey;
+    overflow: auto;
 }
 
 #selected-screen-size{

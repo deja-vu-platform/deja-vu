@@ -89,7 +89,7 @@ var loadComponentIntoWorkSurface = function(component, zoom){
         setUpContainer(componentContainer, widget, innerComponent, zoom);
         registerDraggable(widget);
         workSurface.append(componentContainer);
-
+        showConfigOptions(type, componentContainer);
         triggerEdit(componentContainer, false);
         registerTooltipBtnHandlers('component-container_'+innerComponentId);
 
@@ -130,7 +130,7 @@ function makeWorkSurfaceResizable(workSurface, component){
 
 }
 
-function makeContainerResizable(container, component, isWorkSurface){
+function makeContainerResizable(container, component){
     var componentId = component.meta.id;
 
     var dragHandle_se = $('<span></span>');
@@ -251,7 +251,7 @@ var makeDroppableToComponents = function(workSurface){
             var componentContainer = createComponentContainer(component, currentZoom);
             setUpContainer(componentContainer, widget, component, currentZoom);
             registerDraggable();
-
+            showConfigOptions(component.type, componentContainer);
             if (!widget.hasClass('associated')){
                 selectedUserComponent.components[componentId] = component;
                 widget.addClass('associated').data('componentId', componentId);
@@ -263,8 +263,10 @@ var makeDroppableToComponents = function(workSurface){
             workSurface.append(componentContainer);
             registerTooltipBtnHandlers();
 
-            var top = ui.position.top - workSurface.offset().top;
-            var left = ui.position.left - workSurface.offset().left;
+            // var top = ui.position.top - workSurface.offset().top;
+            // var left = ui.position.left - workSurface.offset().left;
+            var top = ui.position.top;
+            var left = ui.position.left;
 
             componentContainer.css({
                 position: 'absolute',
@@ -272,10 +274,8 @@ var makeDroppableToComponents = function(workSurface){
                 top: top
             });
             selectedUserComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
-
         }
     };
 
     workSurface.droppable(dropSettings);
-
 };

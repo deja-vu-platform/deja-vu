@@ -653,11 +653,12 @@ function registerDraggable(widgetToRegister) {
         cursorAt: { top: 0, left: 0 },
         helper: function(e, ui){
             var widget = $(this);
+            var offsetFromMouse = { top: 0, left: 0 };
             if (widget.hasClass('associated')){
                 var componentId = widget.data('componentId');
                 draggingComponent = selectedUserComponent.components[componentId];
                 var componentContainer = $('#component-container_'+componentId);
-                draggableOptions.customOffset = {
+                offsetFromMouse = {
                     top: e.pageY - componentContainer.offset().top,
                     left: e.pageX - componentContainer.offset().left
                 };
@@ -675,64 +676,41 @@ function registerDraggable(widgetToRegister) {
             }
 
             $('#outer-container').append(componentContainer);
+            $(this).draggable( "option", "cursorAt", offsetFromMouse );
 
             //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
-            componentContainer.hide();
-            setTimeout(function(){
-                componentContainer.appendTo('html');
-                componentContainer.show();
-                // componentContainer.css({
-                //     position: 'absolute',
-                //     top: (draggableOptions.customOffset.top) + 'px',
-                //     left: (draggableOptions.customOffset.left) + 'px',
-                // });
-            },1);
+            // componentContainer.hide();
+            // setTimeout(function(){
+            //     componentContainer.appendTo('html');
+            //     componentContainer.show();
+            // },1);
             componentContainer.attr('id', 'dragging_container');
+            componentContainer.css('position', 'absolute');
             return componentContainer;
 
         },
         appendTo: 'html',
         cursor: '-webkit-grabbing',
         scroll: true,
-        customOffset: { top: 0, left: 0 },
-        start: function(e, ui){
-            // $(this).draggable( "option", "cursorAt", draggableOptions.customOffset );
-            // var offset = {
-                // top: -(e.pageY - draggableOptions.customOffset.top),
-                // left: -(e.pageX - draggableOptions.customOffset.left),
-                // top: 0,
-                // left: 0
-            //
-            // };
-            // $(this).draggable( "option", "cursorAt", offset);
-            // console.log( draggableOptions.customOffset);
-            // ui.position.top = draggableOptions.customOffset.top;
-            // ui.position.left = draggableOptions.customOffset.left;
-            // var helper = $(ui.helper);
-            // helper.css({
-            //     position: 'absolute',
-            //     top: (draggableOptions.customOffset.top) + 'px',
-            //     left: (draggableOptions.customOffset.left) + 'px',
-            // });
-            // console.log(helper.offset().top);
-        },
         drag: function(e, ui){
-            // var top = e.pageY - draggableOptions.customOffset.top;
-            // ui.position.top = e.pageY - draggableOptions.customOffset.top;
-            // ui.position.left = e.pageX - draggableOptions.customOffset.left;
-            // var helper = $(ui.helper);
-            // helper.css(
-            // var offset = {
-            //     top: (e.pageY - draggableOptions.customOffset.top) + 'px',
-            //     left: (e.pageX - draggableOptions.customOffset.left) + 'px',
-            // };
-            // $(this).draggable( "option", "cursorAt", offset);
-
-            // console.log('mouse', e.pageY);
-            // console.log('top', ui.position.top);
-            // ui.position.top = 300;
-            // ui.position.left = 300;
-        },
+            // console.log($('body').is(':hover'));
+            // console.log($(this).draggable( "option", "cursorAt"));
+            // var componentContainer = $(ui.helper);
+            // console.log($(allElementsFromPoint(e.pageX, e.pageY)).find('#outer-container'));
+            // if ($(allElementsFromPoint(e.pageX, e.pageY)).find('#outer-container').length>0){
+            //     componentContainer.hide();
+            //     setTimeout(function(){
+            //         componentContainer.appendTo('#outer-container');
+            //         componentContainer.show();
+            //     },1);
+            // } else {
+            //     componentContainer.hide();
+            //     setTimeout(function(){
+            //         componentContainer.appendTo('html');
+            //         componentContainer.show();
+            //     },1);
+            // }
+        }
     };
 
     if (widgetToRegister){
@@ -1062,30 +1040,20 @@ function triggerEdit(container, popup) {
     }
 }
 
-function showConfigOptions(droppedComponentType, cellId) {
-    var cell = document.getElementById(cellId);
+function showConfigOptions(droppedComponentType, container) {
     // Hide edit button if label or panel
     if (droppedComponentType=='label' || droppedComponentType=='panel') {
-        $('#'+cell.id).find('.edit-btn').css('display', 'none');
+        container.find('.edit-btn').css('display', 'none');
     } else {
-        $('#'+cell.id).find('.edit-btn').css('display', 'block');
+        container.find('.edit-btn').css('display', 'block');
     }
 
-    var configOptions = document.getElementById(droppedComponentType+'-properties');
-    if (configOptions==null || configOptions==undefined) {
+    var configOptions = $('#'+droppedComponentType+'-properties').clone();
+    if (configOptions.length==0) {
         return;
     }
 
-    var sp = document.createElement('span');
-    sp.innerHTML = configOptions.innerHTML;
-    var configDiv = sp.firstElementChild;
-
-    if (cellId == 'display-cell'){
-        $('#inner-component-focus').get(0).insertBefore(configDiv, cell.firstChild);
-    } else{
-        cell.insertBefore(configDiv, cell.firstChild);
-    }
-
+    container.prepend(configOptions);
 }
 
 
