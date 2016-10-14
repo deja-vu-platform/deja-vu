@@ -508,12 +508,7 @@ function displayMainPageInListAndSelect(name, id){
 
 function deleteComponentFromView(containerId) {
     var cell = $('#'+containerId);
-
-    cell.find('.config-btns').remove();
-    cell.find('.tooltip').remove();
-    cell.find('.label-container').remove();
-    cell.find('.display-component').remove();
-    cell.find('.widget').remove();
+    cell.remove();
 }
 
 

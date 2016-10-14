@@ -534,3 +534,18 @@ function downloadHTML(){
     element.click();
 
 }
+
+/**
+ * Deletes a component from the datatype and also from the view
+ */
+function deleteComponentFromUserComponentAndFromView(componentId) {
+    var containerId = "component-container_"+componentId;
+    delete selectedUserComponent.components[componentId];
+    deleteComponentFromView(containerId);
+}
+
+function clearAll(){
+    for (var componentId in selectedUserComponent.components){
+        deleteComponentFromUserComponentAndFromView(componentId);
+    }
+}

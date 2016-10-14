@@ -213,9 +213,7 @@ function createComponentContainer(component, zoom) {
     buttonTrash.attr('id', 'inner-component-trash' + '_' + component.meta.id);
 
     buttonTrash.click(function(){
-        deleteComponentFromView(containerId);
-        container.remove();
-        delete selectedUserComponent.components[component.meta.id]; // TODO
+        deleteComponentFromUserComponentAndFromView(component.meta.id)
     });
 
     optionsDropdown.find('.dropdown-menu').append(buttonEdit).append('<li class="divider"></li>').append(buttonTrash);
