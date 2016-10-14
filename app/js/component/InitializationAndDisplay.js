@@ -693,8 +693,9 @@ function registerDraggable(widgetToRegister) {
         scroll: true,
         stop: function(event, ui){
             var componentId = draggingComponent.meta.id;
-            var componentContainerOld = $('#component-container_'+componentId);
-            if (componentContainerOld.length>0){ // and it was originally there
+            var isNewComponent = $(ui.helper).data('newcomponent');
+            if (!isNewComponent){
+                var componentContainerOld = $('#component-container_'+componentId);
                 if (!$(ui.helper).data('dropped')){// not properly dropped!
                     componentContainerOld.css({
                         opacity: 1,
@@ -703,6 +704,7 @@ function registerDraggable(widgetToRegister) {
                     componentContainerOld.remove();
                 }
             }
+
         }
     };
 

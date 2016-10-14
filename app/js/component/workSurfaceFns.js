@@ -255,6 +255,7 @@ var makeDroppableToComponents = function(workSurface){
             registerDraggable();
             showConfigOptions(component.type, componentContainer);
             if (!widget.hasClass('associated')){
+                $(ui.helper).data('newcomponent', true);
                 selectedUserComponent.components[componentId] = component;
                 widget.addClass('associated').data('componentId', componentId);
                 triggerEdit(componentContainer, true);
