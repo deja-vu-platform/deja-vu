@@ -811,10 +811,15 @@ function changeZoomDisplays(zoom){
         height: selectedUserComponent.dimensions.height*zoom + 'px',
     });
 
-    updateNavComponentSize(zoom);
+    updateNavComponentSizeZoom(zoom);
 }
 
 function updateNavComponentSize(zoom){
+    setUpNavComponentSize();
+    updateNavComponentSizeZoom(zoom);
+}
+
+function updateNavComponentSizeZoom(zoom){
     $('#zoom-nav-component-size').css({
         zoom: zoom,
     });

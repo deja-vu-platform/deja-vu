@@ -230,7 +230,7 @@ function propagateRatioChangeToAllElts(newRatio){
         width: outerWidth + 'px'
     });
 
-    updateNavComponentSize(newRatio);
+    updateNavComponentSizeZoom(newRatio);
 
 }
 

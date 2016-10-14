@@ -276,6 +276,7 @@ var makeDroppableToComponents = function(workSurface){
                 top: top
             });
             selectedUserComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
+            updateNavComponentSize(currentZoom);
         }
     };
 
