@@ -738,7 +738,10 @@ td {
     bottom: 0;
 }
 
-
+#zoom-nav-component-size{
+    background: #D5D5D5;
+    position: absolute;
+}
 
 /*===================================================
                    COMPONENTS

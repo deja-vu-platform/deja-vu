@@ -1579,7 +1579,7 @@ function resizeColsBySetRatios(ratios){
 //     resetAllMergeHandleContainersSizeAndPosition();
 //     updateTableResizeHandler();
 //     updateSizeValueDisplay(false);
-//     updateZoomNavComponentSize();
+//     updateNavComponentSize();
 //
 // }
 
@@ -2408,7 +2408,7 @@ function addNRowsToEnd(n) {
     }
 
     toggleTableHeightLock(savedTableLockedHeight);
-    updateZoomNavComponentSize();
+    updateNavComponentSize();
 
 }
 
@@ -2708,7 +2708,7 @@ function removeNRowsFromEnd(n) {
     }
 
     toggleTableHeightLock(savedTableLockedHeight);
-    updateZoomNavComponentSize();
+    updateNavComponentSize();
 
 }
 
@@ -2993,7 +2993,7 @@ function addNColsToEnd(n) {
     }
 
     toggleTableWidthLock(savedTableLockedWidth);
-    updateZoomNavComponentSize();
+    updateNavComponentSize();
 
 }
 
@@ -3303,7 +3303,7 @@ function removeNColsFromEnd(n) {
     }
 
     toggleTableWidthLock(savedTableLockedWidth); // in order to lock last col again
-    updateZoomNavComponentSize();
+    updateNavComponentSize();
 }
 
 

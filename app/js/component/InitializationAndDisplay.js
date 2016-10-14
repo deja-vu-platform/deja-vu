@@ -34,7 +34,6 @@ $(function () {
 
 
     resizeViewportToFitWindow();
-    zoomNavInitialize();
 
 
 
@@ -91,7 +90,6 @@ $(function () {
 
     }
 
-    initializeZoomNavComponentSize();
 
     //autoSave5Mins();
 
@@ -104,6 +102,7 @@ $(function () {
     registerUserComponentAreaDroppable();
 
     setUpStyleColors();
+    zoomNavInitialize();
 
     // finish load animation
     $('.loader-container').fadeOut("fast");
@@ -810,16 +809,37 @@ function changeZoomDisplays(zoom){
     $('.work-surface').css({
         width: selectedUserComponent.dimensions.width*zoom + 'px',
         height: selectedUserComponent.dimensions.height*zoom + 'px',
-    })
+    });
 
-    updateZoomNavComponentSize(zoom);
+    updateNavComponentSize(zoom);
 }
 
-function updateZoomNavComponentSize(zoom){
+function updateNavComponentSize(zoom){
     $('#zoom-nav-component-size').css({
-        width: selectedUserComponent.dimensions.width*navZoom*zoom + 'px',
-        height: selectedUserComponent.dimensions.height*navZoom*zoom + 'px',
+        zoom: zoom,
+    });
+}
 
+function setUpNavComponentSize(){
+    $('#zoom-nav-component-size').html('').css({
+        width: selectedUserComponent.dimensions.width*navZoom + 'px',
+        height: selectedUserComponent.dimensions.height*navZoom + 'px',
+    });
+
+    Object.keys(selectedUserComponent.components).forEach(function(innerComponentId){
+        var innerComponent = selectedUserComponent.components[innerComponentId];
+        var componentSizeDiv = $('<div></div>');
+        componentSizeDiv.addClass('zoom-nav-inner-component-size');
+        componentSizeDiv.css({
+            position: 'absolute',
+            left: selectedUserComponent.layout[innerComponentId].left*navZoom,
+            top: selectedUserComponent.layout[innerComponentId].top*navZoom,
+            width: innerComponent.dimensions.width*navZoom,
+            height: innerComponent.dimensions.height*navZoom,
+            background: 'black'
+        });
+
+        $('#zoom-nav-component-size').append(componentSizeDiv);
     });
 }
 
@@ -888,10 +908,11 @@ function zoomNavInitialize(){
     var scale = Math.min(widthScale, heightScale);
     navZoom = scale;
 
+    setUpNavComponentSize();
     $('#zoom-selected-screen-size').css({
         position: 'absolute',
-        height: $('#selected-screen-size').height()*scale*currentZoom + 'px',
-        width: $('#selected-screen-size').width()*scale*currentZoom + 'px',
+        // height: $('#selected-screen-size').height()*scale*currentZoom + 'px',
+        // width: $('#selected-screen-size').width()*scale*currentZoom + 'px',
         border: '1px black solid',
         background: 'white',
     });
@@ -937,16 +958,6 @@ $('#zoom-nav').click(function(e){
         left: Math.min(posX, $('#zoom-nav-full-area').width()- $('#zoom-nav-position').width()) + 'px',
     });
 });
-
-function initializeZoomNavComponentSize(){
-    $('#zoom-nav-component-size').css({
-        background: '#D5D5D5',
-        width: $('#main-cell-table').width()*navZoom*currentZoom + 'px',
-        height: $('#main-cell-table').height()*navZoom*currentZoom + 'px',
-        margin: 50*navZoom + 'px',
-        position: 'absolute',
-    })
-}
 
 function showZoomNavPosition(){
     var scrollTop = $('#outer-container').scrollTop()*navZoom;
