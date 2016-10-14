@@ -243,6 +243,9 @@ var makeDroppableToComponents = function(workSurface){
         hoverClass: "highlight",
         tolerance: "fit",
         drop: function(event, ui) {
+            // alert the draggable that drop was successful:
+            $(ui.helper).data('dropped', true);
+
             var widget = $(ui.draggable);
             // on drop, there should always be a dragging component
             var component = draggingComponent;

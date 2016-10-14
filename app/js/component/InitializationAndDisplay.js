@@ -652,10 +652,15 @@ function registerDraggable(widgetToRegister) {
             if (widget.hasClass('associated')){
                 var componentId = widget.data('componentId');
                 draggingComponent = selectedUserComponent.components[componentId];
-                var componentContainer = $('#component-container_'+componentId);
+                // keep the old one for now, for guidance and all
+                var componentContainerOld = $('#component-container_'+componentId);
+                componentContainerOld.css({
+                    opacity: .3,
+                });
+                var componentContainer = componentContainerOld.clone();
                 offsetFromMouse = {
-                    top: e.pageY - componentContainer.offset().top,
-                    left: e.pageX - componentContainer.offset().left
+                    top: e.pageY - componentContainerOld.offset().top,
+                    left: e.pageX - componentContainerOld.offset().left
                 };
 
 
@@ -687,24 +692,18 @@ function registerDraggable(widgetToRegister) {
         appendTo: 'html',
         cursor: '-webkit-grabbing',
         scroll: true,
-        drag: function(e, ui){
-            // console.log($('body').is(':hover'));
-            // console.log($(this).draggable( "option", "cursorAt"));
-            // var componentContainer = $(ui.helper);
-            // console.log($(allElementsFromPoint(e.pageX, e.pageY)).find('#outer-container'));
-            // if ($(allElementsFromPoint(e.pageX, e.pageY)).find('#outer-container').length>0){
-            //     componentContainer.hide();
-            //     setTimeout(function(){
-            //         componentContainer.appendTo('#outer-container');
-            //         componentContainer.show();
-            //     },1);
-            // } else {
-            //     componentContainer.hide();
-            //     setTimeout(function(){
-            //         componentContainer.appendTo('html');
-            //         componentContainer.show();
-            //     },1);
-            // }
+        stop: function(event, ui){
+            var componentId = draggingComponent.meta.id;
+            var componentContainerOld = $('#component-container_'+componentId);
+            if (componentContainerOld.length>0){ // and it was originally there
+                if (!$(ui.helper).data('dropped')){// not properly dropped!
+                    componentContainerOld.css({
+                        opacity: 1,
+                    });
+                } else { // properly dropped
+                    componentContainerOld.remove();
+                }
+            }
         }
     };
 
@@ -1235,7 +1234,7 @@ function registerUserComponentAreaDroppable(){
 
                 }
             }
-        }
+        },
     };
     $('.page-component-toggle-drop').each(function() {
         $(this).droppable(enableDrop);
