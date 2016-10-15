@@ -93,7 +93,7 @@ var loadComponentIntoWorkSurface = function(component, zoom){
         showConfigOptions(type, componentContainer);
         triggerEdit(componentContainer, false);
         registerTooltipBtnHandlers('component-container_'+innerComponentId);
-
+        zoomNavInitialize();
     });
 
 };

@@ -133,6 +133,8 @@ function allElementsFromPoint(x, y) {
 
 function updateZoomFromState(componentId){
     currentZoom = $('#work-surface'+'_'+componentId).data('state').zoom;
+    // it's updating from state, so that means new initializations are in order
+    setUpNavComponentSize();
     changeZoomDisplays(currentZoom);
 }
 

@@ -102,7 +102,7 @@ $(function () {
     registerUserComponentAreaDroppable();
 
     setUpStyleColors();
-    zoomNavInitialize();
+
 
     // finish load animation
     $('.loader-container').fadeOut("fast");
