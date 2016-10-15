@@ -126,6 +126,10 @@ function makeWorkSurfaceResizable(workSurface, component){
         resize: function(e, ui){
             component.dimensions.height = ui.size.height/currentZoom;
             component.dimensions.width = ui.size.width/currentZoom;
+        },
+        stop: function(e, ui){
+            // not super important to update as you resize so just do it at the end
+            updateNavComponentSize(currentZoom);
         }
     });
 
