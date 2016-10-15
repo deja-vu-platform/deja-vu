@@ -1,20 +1,10 @@
 /*===================================================
               MAIN TABLE (PREVIEW)
 ===================================================*/
-#main-table-preview {
-    table-layout: fixed !important;
-    border-collapse: inherit;
-    -webkit-box-shadow: 0 0 20px rgba(0,0,0,0.2);
-    padding: 10px;
-    position: relative;
-    margin: auto;
+#page{
+    background: lavender;
 }
-
-#main-table-preview td{
-    pointer-events: none;
-}
-
-#main-table-preview::after {
+#page::after {
     content: 'Component name: ';
     display: block;
     position: absolute;
@@ -105,7 +95,7 @@ li.widget {
 
 }
 
-#main-table-preview:hover li.widget{
+#page-preview:hover li.widget{
     display: block;
 }
 

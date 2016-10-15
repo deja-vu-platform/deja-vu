@@ -93,15 +93,15 @@ $('.current-project').on('click', '.content', function(){
     if (currentProject){
         displayProjectPreview(currentProject);
     } else {
-        $('#table-container-preview').html('');
+        $('#page-preview').html('');
     }
 
 });
 
-$('#table-container-preview').on('dblclick', '#main-table-preview', function(){
+$('#page-preview').on('dblclick', '#main-table-preview', function(){
     // this div's existance means there is some project showing
 
-   selectedProject = availableProjectsByFilename[$('#table-container-preview').data('projectfilename')];
+   selectedProject = availableProjectsByFilename[$('#page-preview').data('projectfilename')];
    selectedProject.lastAccessed = new Date();
    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
    window.location = 'index.html';
@@ -164,7 +164,7 @@ function addLoadProjectButton(filename){
 function displayProjectPreview(project){
     // TODO make it select the main component
     // TODO Also, have a way to click to change to another view?
-    $('#table-container-preview').data('projectfilename', projectNameToFilename(project.meta.name));
+    $('#page-preview').data('projectfilename', projectNameToFilename(project.meta.name));
     $('#project-name-preview').text('Project Preview: '+project.meta.name)
     $('#preview-prev-page').unbind();
     $('#preview-next-page').unbind();
@@ -174,11 +174,11 @@ function displayProjectPreview(project){
         var componentToShowId = Object.keys(project.mainComponents)[0];
         var numMainPages = Object.keys(project.mainComponents).length;
         if (numMainPages>1){
-            $('#table-container-preview').css('width', '790px');
+            $('#page-preview').css('width', '790px');
             $('#preview-prev-page').css('display', 'inline-block');
             $('#preview-next-page').css('display', 'inline-block');
         } else {
-            $('#table-container-preview').css('width', '850px');
+            $('#page-preview').css('width', '850px');
             $('#preview-prev-page').css('display', 'none');
             $('#preview-next-page').css('display', 'none');
         }
@@ -186,15 +186,15 @@ function displayProjectPreview(project){
         componentToShow = project.components[componentToShowId];
         loadTablePreview(componentToShow);
 
-        $('#table-container-preview').data('pagenum', 0);
+        $('#page-preview').data('pagenum', 0);
 
         $('#preview-prev-page').click(function(){
-            var pageNum = $('#table-container-preview').data('pagenum');
+            var pageNum = $('#page-preview').data('pagenum');
             showPrevMainPage(project, pageNum);
         });
 
         $('#preview-next-page').click(function(){
-            var pageNum = $('#table-container-preview').data('pagenum');
+            var pageNum = $('#page-preview').data('pagenum');
             showNextMainPage(project, pageNum);
         });
 
@@ -202,7 +202,7 @@ function displayProjectPreview(project){
     } else {
         $('#preview-prev-page').css('display', 'none');
         $('#preview-next-page').css('display', 'none');
-        $('#table-container-preview').css('width', '850px').text("This project does not have a main page yet...");
+        $('#page-preview').css('width', '850px').text("This project does not have a main page yet...");
     }
 
 }
@@ -213,7 +213,7 @@ function showNextMainPage(project, currentPageNumber){
     var componentToShowId = Object.keys(project.mainComponents)[nextPageNum];
     componentToShow = project.components[componentToShowId];
     loadTablePreview(componentToShow);
-    $('#table-container-preview').data('pagenum', nextPageNum);
+    $('#page-preview').data('pagenum', nextPageNum);
 
 }
 function showPrevMainPage(project, currentPageNumber){
@@ -222,7 +222,7 @@ function showPrevMainPage(project, currentPageNumber){
     var componentToShowId = Object.keys(project.mainComponents)[prevPageNum];
     componentToShow = project.components[componentToShowId];
     loadTablePreview(componentToShow);
-    $('#table-container-preview').data('pagenum', prevPageNum);
+    $('#page-preview').data('pagenum', prevPageNum);
 }
 
 /**
@@ -314,7 +314,7 @@ function deleteFileAndDisplay(dirname, filename, id){
             window.sessionStorage.removeItem('selectedProject');
             $('.current-project .content').html('')
             $('.current-project').css('display', 'none');
-            $('#table-container-preview').html('');
+            $('#page-preview').html('');
             $('#project-name-preview').text('Project Preview')
         }
     }
