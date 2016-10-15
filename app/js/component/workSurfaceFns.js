@@ -172,6 +172,10 @@ function makeContainerResizable(container, component){
             component.dimensions.width = ui.size.width/currentZoom;
             // TODO woah! It resizes as you go!
             refreshContainerDisplay(container.attr('id'), currentZoom);
+        },
+        stop: function(e, ui){
+            // not super important to update as you resize so just do it at the end
+            updateNavComponentSize(currentZoom);
         }
     });
 }

@@ -408,6 +408,7 @@ td {
     position: absolute;
     top: -25px;
     left: 3px;
+    width: 204px;
 }
 
 /*.dropped:hover .edit-btn{*/
