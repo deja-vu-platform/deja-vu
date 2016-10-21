@@ -245,53 +245,58 @@ function setUpContainer(container, widget, component, zoom){
 }
 
 var shiftOrder = function(componentId, top, left, width, height){
-    var right = left+width;
-    var bottom = top+height;
+    // var right = left+width;
+    // var bottom = top+height;
+    //
+    // var componentsToShift = {};
+    // var numComponents = selectedUserComponent.layout.stackOrder.length;
+    // [left, right].forEach(function(x){
+    //     [top, bottom].forEach(function(y){
+    //         var allElements = allElementsFromPoint(x, y);
+    //         var overlappingComponents = [];
+    //         $(allElements).find('.component-container').each(function(idx, elt){
+    //             var containerId = $(elt).attr('id');
+    //             if (containerId != 'dragging-container'){
+    //                 var id = getComponentIdFromContainerId($(elt).attr('id'));
+    //                 if (id != componentId){
+    //                     overlappingComponents.push(id);
+    //                 }
+    //             }
+    //         });
+    //
+    //         overlappingComponents.forEach(function(id){
+    //             if (!(id in componentsToShift)){
+    //                 componentsToShift[id] = "";
+    //             }
+    //         })
+    //     });
+    // });
+    // console.log(componentsToShift);
+    // var stackOrderOld = selectedUserComponent.layout.stackOrder;
+    // var idxToReorder = [];
+    // var oldIdxThisComponent;
+    // stackOrderOld.forEach(function(id, idx){
+    //     if (id == componentId){
+    //         oldIdxThisComponent = idx;
+    //     }
+    //     if (id in componentsToShift){
+    //         idxToReorder.push(idx);
+    //     }
+    // });
+    // // we know that the index to reorder list is ordered lowest to highest
+    // var idxToSwap = oldIdxThisComponent;
+    // stackOrderOld.forEach(function(id, idx){
+    //     if (idx> oldIdxThisComponent){
+    //         selectedUserComponent.layout.stackOrder[idxToSwap] = id;
+    //     }
+    // });
+    // selectedUserComponent.layout.stackOrder[numComponents - 1] = componentId;
+    // console.log(selectedUserComponent.layout.stackOrder);
 
-    var componentsToShift = {};
-    var numComponents = selectedUserComponent.layout.stackOrder.length;
-    [left, right].forEach(function(x){
-        [top, bottom].forEach(function(y){
-            var allElements = allElementsFromPoint(x, y);
-            var overlappingComponents = [];
-            $(allElements).find('.component-container').each(function(idx, elt){
-                var containerId = $(elt).attr('id');
-                if (containerId != 'dragging-container'){
-                    var id = getComponentIdFromContainerId($(elt).attr('id'));
-                    if (id != componentId){
-                        overlappingComponents.push(id);
-                    }
-                }
-            });
+    var index = selectedUserComponent.layout.stackOrder.indexOf(componentId);
+    selectedUserComponent.layout.stackOrder.splice(index, 1);
+    selectedUserComponent.layout.stackOrder.push(componentId);
 
-            overlappingComponents.forEach(function(id){
-                if (!(id in componentsToShift)){
-                    componentsToShift[id] = "";
-                }
-            })
-        });
-    });
-    console.log(componentsToShift);
-    var stackOrderOld = selectedUserComponent.layout.stackOrder;
-    var idxToReorder = [];
-    var oldIdxThisComponent;
-    stackOrderOld.forEach(function(id, idx){
-        if (id == componentId){
-            oldIdxThisComponent = idx;
-        }
-        if (id in componentsToShift){
-            idxToReorder.push(idx);
-        }
-    });
-    // we know that the index to reorder list is ordered lowest to highest
-    var idxToSwap = oldIdxThisComponent;
-    stackOrderOld.forEach(function(id, idx){
-        if (idx> oldIdxThisComponent){
-            selectedUserComponent.layout.stackOrder[idxToSwap] = id;
-        }
-    });
-    selectedUserComponent.layout.stackOrder[numComponents - 1] = componentId;
-    console.log(selectedUserComponent.layout.stackOrder);
 };
 
 var makeDroppableToComponents = function(workSurface){
