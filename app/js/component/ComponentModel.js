@@ -69,7 +69,7 @@ var UserComponent = function (dimensions, name, id, version, author) {
                                                             // different starting defaults for component vs page!
     userComponent.components = {}; // componentId: component
     // user outer component should define where the inner components are
-    userComponent.layout = {}; // componentId: { top: Number (px),
+    userComponent.layout = {stackOrder : []}; // componentId: { top: Number (px),
                                                 // left: Number (px),
 
     userComponent.properties = {};
@@ -79,6 +79,15 @@ var UserComponent = function (dimensions, name, id, version, author) {
 UserComponent.prototype.addComponent = function(component) {
     var componentId = component.meta.id;
     this.components[componentId]=component;
+    this.layout.stackOrder.push(componentId);
+    return true;
+};
+
+
+UserComponent.prototype.deleteComponent = function(componentId) {
+    delete this.components[componentId];
+    var index = this.layout.stackOrder.indexOf(5);
+    this.layout.stackOrder.splice(index, 1);
     return true;
 };
 

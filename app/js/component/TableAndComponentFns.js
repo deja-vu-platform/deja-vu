@@ -542,7 +542,7 @@ function downloadHTML(){
  */
 function deleteComponentFromUserComponentAndFromView(componentId) {
     var containerId = "component-container_"+componentId;
-    delete selectedUserComponent.components[componentId];
+    selectedUserComponent.deleteComponent(componentId);
     deleteComponentFromView(containerId);
 }
 

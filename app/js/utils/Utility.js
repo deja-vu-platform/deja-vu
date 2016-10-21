@@ -29,7 +29,13 @@ function getRowColFromId(id){
 }
 
 function getComponentIdFromContainerId(id){
+    if (!id){
+        return null
+    }
     var split = id.split('_');
+    if (split.length == 1){
+        return null
+    }
     return split[split.length - 1]
 }
 

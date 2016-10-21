@@ -683,7 +683,7 @@ function registerDraggable(widgetToRegister) {
             //     componentContainer.appendTo('html');
             //     componentContainer.show();
             // },1);
-            componentContainer.attr('id', 'dragging_container');
+            componentContainer.attr('id', 'dragging-container');
             componentContainer.css('position', 'absolute');
             return componentContainer;
 

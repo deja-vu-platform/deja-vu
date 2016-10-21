@@ -73,7 +73,7 @@ function setUpEmptyWorkSurface(component, zoom){
 var loadComponentIntoWorkSurface = function(component, zoom){
     var workSurface = createOrResetWorkSurface(component, zoom);
 
-    Object.keys(component.components).forEach(function(innerComponentId){
+    component.layout.stackOrder.forEach(function(innerComponentId){
         var innerComponent = component.components[innerComponentId];
         var type = innerComponent.type;
         var componentContainer = createComponentContainer(innerComponent, zoom);
@@ -244,6 +244,56 @@ function setUpContainer(container, widget, component, zoom){
 
 }
 
+var shiftOrder = function(componentId, top, left, width, height){
+    var right = left+width;
+    var bottom = top+height;
+
+    var componentsToShift = {};
+    var numComponents = selectedUserComponent.layout.stackOrder.length;
+    [left, right].forEach(function(x){
+        [top, bottom].forEach(function(y){
+            var allElements = allElementsFromPoint(x, y);
+            var overlappingComponents = [];
+            $(allElements).find('.component-container').each(function(idx, elt){
+                var containerId = $(elt).attr('id');
+                if (containerId != 'dragging-container'){
+                    var id = getComponentIdFromContainerId($(elt).attr('id'));
+                    if (id != componentId){
+                        overlappingComponents.push(id);
+                    }
+                }
+            });
+
+            overlappingComponents.forEach(function(id){
+                if (!(id in componentsToShift)){
+                    componentsToShift[id] = "";
+                }
+            })
+        });
+    });
+    console.log(componentsToShift);
+    var stackOrderOld = selectedUserComponent.layout.stackOrder;
+    var idxToReorder = [];
+    var oldIdxThisComponent;
+    stackOrderOld.forEach(function(id, idx){
+        if (id == componentId){
+            oldIdxThisComponent = idx;
+        }
+        if (id in componentsToShift){
+            idxToReorder.push(idx);
+        }
+    });
+    // we know that the index to reorder list is ordered lowest to highest
+    var idxToSwap = oldIdxThisComponent;
+    stackOrderOld.forEach(function(id, idx){
+        if (idx> oldIdxThisComponent){
+            selectedUserComponent.layout.stackOrder[idxToSwap] = id;
+        }
+    });
+    selectedUserComponent.layout.stackOrder[numComponents - 1] = componentId;
+    console.log(selectedUserComponent.layout.stackOrder);
+};
+
 var makeDroppableToComponents = function(workSurface){
 
     var dropSettings = {
@@ -253,6 +303,9 @@ var makeDroppableToComponents = function(workSurface){
         drop: function(event, ui) {
             // alert the draggable that drop was successful:
             $(ui.helper).data('dropped', true);
+            var top = ui.position.top;
+            var left = ui.position.left;
+
 
             var widget = $(ui.draggable);
             // on drop, there should always be a dragging component
@@ -264,20 +317,17 @@ var makeDroppableToComponents = function(workSurface){
             showConfigOptions(component.type, componentContainer);
             if (!widget.hasClass('associated')){
                 $(ui.helper).data('newcomponent', true);
-                selectedUserComponent.components[componentId] = component;
+                selectedUserComponent.addComponent(component);
                 widget.addClass('associated').data('componentId', componentId);
                 triggerEdit(componentContainer, true);
             } else {
+                shiftOrder(componentId, top, left, component.dimensions.height, component.dimensions.width);
                 triggerEdit(componentContainer, false);
             }
 
             workSurface.append(componentContainer);
             registerTooltipBtnHandlers();
 
-            // var top = ui.position.top - workSurface.offset().top;
-            // var left = ui.position.left - workSurface.offset().left;
-            var top = ui.position.top;
-            var left = ui.position.left;
 
             componentContainer.css({
                 position: 'absolute',
