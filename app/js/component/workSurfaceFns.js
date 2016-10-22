@@ -245,10 +245,104 @@ function setUpContainer(container, widget, component, zoom){
 }
 
 var shiftOrder = function(componentId){
-    var index = selectedUserComponent.layout.stackOrder.indexOf(componentId);
+    var stackOrder = selectedUserComponent.layout.stackOrder;
+
+    var index;
+    for (var i = 0; i < stackOrder.length; i++){
+        var id = stackOrder[i];
+        if (componentId == id){
+            index = i;
+            break
+        }
+    }
     selectedUserComponent.layout.stackOrder.splice(index, 1);
     selectedUserComponent.layout.stackOrder.push(componentId);
 };
+
+var findComponentsToShift = function(movingId, otherId){// TODO better naming?
+    var container = $('#component-container_'+otherId);
+
+    var top = container.offset().top;
+    var left = container.offset().left;
+    var right = left + container.width();
+    var bottom = top + container.height();
+    var componentsToShift = {};
+    [left, right].forEach(function(x) {
+        [top, bottom].forEach(function (y) {
+            var allElements = allElementsFromPoint(x, y);
+            var overlappingComponents = [];
+            $(allElements).filter('.component-container').each(function (idx, elt) {
+                var containerId = $(elt).attr('id');
+                if (containerId != 'dragging-container') {
+                    var id = getComponentIdFromContainerId($(elt).attr('id'));
+                    if (movingId == otherId){ // if we are looking at the moving container
+                        if (!(id == movingId)) {
+                            overlappingComponents.push(id); // push in every other overlapping container
+                        }
+                    } else {
+                        if (id == movingId){ // if we overlap with the moving container
+                            overlappingComponents.push(otherId); // push it in
+                        }
+                    }
+                }
+            });
+            overlappingComponents.forEach(function (id) {
+                if (!(id in componentsToShift)) {
+                    componentsToShift[id] = "";
+                }
+            })
+        });
+    });
+    return Object.keys(componentsToShift);
+};
+
+var changeOrderByOne = function(componentId, isUp){
+    var componentsToShift = {};
+    for (var id in selectedUserComponent.components){
+        var overlappingComponents = findComponentsToShift(componentId, id);
+        overlappingComponents.forEach(function(id){
+            if (!(id in componentsToShift)){
+                componentsToShift[id] = "";
+            }
+        })
+    }
+
+    var stackOrder = selectedUserComponent.layout.stackOrder;
+    var idxThisComponent;
+    var idxNextComponent;
+    if (!isUp){
+         stackOrder.reverse();
+    }
+    for (var i = 0; i<stackOrder.length; i++){
+        var id = stackOrder[i];
+        if (id == componentId){
+            idxThisComponent = i;
+        }
+        if (typeof idxThisComponent !== 'undefined'){ // 0 is considered false!
+            // we have passed this component!
+            if (id in componentsToShift){
+                idxNextComponent = i;
+                break;
+            }
+        }
+    }
+    if (typeof idxNextComponent !== 'undefined') { // there is something to move
+        var idxToSwap = idxThisComponent;
+        // from the component after this to the next
+        for (var i = idxThisComponent + 1; i < idxNextComponent + 1; i++) {
+            var id = stackOrder[i];
+            stackOrder[idxToSwap] = id;
+            idxToSwap = i;
+        }
+        stackOrder[idxNextComponent] = componentId;
+    }
+    if (!isUp){
+        stackOrder.reverse();
+    }
+    selectedUserComponent.layout.stackOrder = stackOrder;
+    console.log(stackOrder);
+};
+
 
 var makeDroppableToComponents = function(workSurface){
 
