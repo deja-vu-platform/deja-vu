@@ -124,7 +124,15 @@ function makeWorkSurfaceResizable(workSurface, component){
         handles: {
             'se': dragHandle_se,
         },
-
+        minHeight: 0,
+        minWidth: 0,
+        start: function(){
+            var numComponents = selectedUserComponent.layout.stackOrder.length;
+            var minWidth = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().left;
+            var minHeight = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().top;
+            $(this).resizable('option', 'minWidth', minWidth);
+            $(this).resizable('option', 'minHeight', minHeight);
+        },
         resize: function(e, ui){
             component.dimensions.height = ui.size.height/currentZoom;
             component.dimensions.width = ui.size.width/currentZoom;
@@ -133,6 +141,7 @@ function makeWorkSurfaceResizable(workSurface, component){
             // not super important to update as you resize so just do it at the end
             updateNavComponentSize(currentZoom);
             setUpGrid();
+
         }
     });
 

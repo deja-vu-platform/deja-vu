@@ -641,7 +641,7 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 function setUpGrid(){
     $('.grid').remove();
-    var workSurface = $('.work-surface');
+    var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
 
     var grid = {x: {}, y:{}};
     for (var componentId in selectedUserComponent.components){
@@ -695,6 +695,7 @@ function setUpGrid(){
         for (var row=0; row<numRows; row++){
             var cellElt = $('<div></div>');
             cellElt.addClass('grid-cell');
+            cellElt.attr('id', 'grid-cell_'+row+'_'+col);
             colElt.append(cellElt);
             cellElt.css({
                 width: xs[col+1] - xs[col],
