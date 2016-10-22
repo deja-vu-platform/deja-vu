@@ -93,8 +93,9 @@ var loadComponentIntoWorkSurface = function(component, zoom){
         showConfigOptions(type, componentContainer);
         triggerEdit(componentContainer, false);
         registerTooltipBtnHandlers('component-container_'+innerComponentId);
-        zoomNavInitialize();
     });
+    zoomNavInitialize();
+    setUpGrid();
 
 };
 
@@ -123,6 +124,7 @@ function makeWorkSurfaceResizable(workSurface, component){
         handles: {
             'se': dragHandle_se,
         },
+
         resize: function(e, ui){
             component.dimensions.height = ui.size.height/currentZoom;
             component.dimensions.width = ui.size.width/currentZoom;
@@ -130,6 +132,7 @@ function makeWorkSurfaceResizable(workSurface, component){
         stop: function(e, ui){
             // not super important to update as you resize so just do it at the end
             updateNavComponentSize(currentZoom);
+            setUpGrid();
         }
     });
 
@@ -171,15 +174,34 @@ function makeContainerResizable(container, component){
             'ne': dragHandle_ne,
             'nw': dragHandle_nw
         },
+        snap: '.grid-cell',
+        snapTolerance: 10,
+        // helper: function(e, ui){
+        //     setUpGrid();
+        //     var helper = $(ui).clone();
+        //     helper.data('componentId', $(ui).data('componentId'));
+        //     helper.attr('id', 'resize-helper')
+        //     return $(ui).attr('id');
+        // },
+        start: function(){
+            $('.grid').css({
+                visibility: 'visible'
+            });
+        },
         resize: function(e, ui){
             component.dimensions.height = ui.size.height/currentZoom;
             component.dimensions.width = ui.size.width/currentZoom;
             // TODO woah! It resizes as you go!
             refreshContainerDisplay(container.attr('id'), currentZoom);
+            // refreshContainerDisplay('resize-helper', currentZoom);
         },
         stop: function(e, ui){
             // not super important to update as you resize so just do it at the end
             updateNavComponentSize(currentZoom);
+
+            $('.grid').css({
+                visibility: 'hidden'
+            });
         }
     });
 }
@@ -386,6 +408,7 @@ var makeDroppableToComponents = function(workSurface){
             });
             selectedUserComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
             updateNavComponentSize(currentZoom);
+            setUpGrid();
         }
     };
 

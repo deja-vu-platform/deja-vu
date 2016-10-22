@@ -233,7 +233,7 @@ function propagateRatioChangeToAllElts(newRatio){
     });
 
     updateNavComponentSizeZoom(newRatio);
-
+    setUpGrid();
 }
 
 function updateTableResizeHandler() {

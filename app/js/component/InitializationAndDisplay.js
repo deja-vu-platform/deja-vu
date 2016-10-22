@@ -639,89 +639,92 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/
 
+function setUpGrid(){
+    $('.grid').remove();
+    var workSurface = $('.work-surface');
+
+    var grid = {x: {}, y:{}};
+    for (var componentId in selectedUserComponent.components){
+        // existing components should also be in the work surface!
+        var container = $('#component-container_'+componentId);
+        var top = container.position().top;
+        var left = container.position().left;
+        var right = left + container.width();
+        var bottom = top + container.height();
+        grid.x[left] = '';
+        grid.x[right] = '';
+        grid.y[top] = '';
+        grid.y[bottom] = '';
+    }
+    var xs = Object.keys(grid.x).map(function(key){
+        return parseFloat(key);
+    });
+
+    // var top = workSurface.offset().top;
+    var top = 0;
+    var bottom = top + workSurface.height();
+    // var left = workSurface.offset().left;
+    var left = 0;
+    var right = left + workSurface.width();
+
+    xs.push(left);
+    xs.push(right);
+    xs.sort(function(a, b){
+        return a-b;
+    });
+
+    var ys = Object.keys(grid.y).map(function(key){
+        return parseFloat(key);
+    });
+    ys.push(top);
+    ys.push(bottom);
+    ys.sort(function(a, b){
+        return a-b;
+    });
+
+    var numRows = ys.length-1;
+    var numCols = xs.length-1;
+
+    var gridElt = $('<div></div>');
+    gridElt.addClass('grid');
+    for (var col=0; col<numCols; col++){
+        var colElt = $('<div></div>');
+        colElt.addClass('grid-col');
+        gridElt.append(colElt);
+
+        for (var row=0; row<numRows; row++){
+            var cellElt = $('<div></div>');
+            cellElt.addClass('grid-cell');
+            colElt.append(cellElt);
+            cellElt.css({
+                width: xs[col+1] - xs[col],
+                height: ys[row+1] - ys[row],
+            });
+        }
+    }
+    gridElt.css({
+        position: 'absolute',
+        // top: ys[0] - workSurface.offset().top,
+        // left: xs[0] - workSurface.offset().left,
+        top: 0,
+        left: 0,
+        width: 1.1*(xs[numCols] - xs[0]),
+        visibility: 'hidden',
+    });
+    workSurface.append(gridElt);
+    // $('body').append(gridElt);
+    $('.grid-col').css({
+        display: 'inline-block'
+    });
+    $('.grid-cell').css({
+        display: 'block',
+        border: '1px dashed grey'
+    });
+};
+
+
 
 function registerDraggable(widgetToRegister) {
-    var setUpGrid = function(){
-        var workSurface = $('.work-surface');
-
-        var grid = {x: {}, y:{}};
-        for (var componentId in selectedUserComponent.components){
-            // existing components should also be in the work surface!
-            var container = $('#component-container_'+componentId);
-            var top = container.position().top;
-            var left = container.position().left;
-            var right = left + container.width();
-            var bottom = top + container.height();
-            grid.x[left] = '';
-            grid.x[right] = '';
-            grid.y[top] = '';
-            grid.y[bottom] = '';
-        }
-        var xs = Object.keys(grid.x).map(function(key){
-            return parseFloat(key);
-        });
-
-        // var top = workSurface.offset().top;
-        var top = 0;
-        var bottom = top + workSurface.height();
-        // var left = workSurface.offset().left;
-        var left = 0;
-        var right = left + workSurface.width();
-
-        xs.push(left);
-        xs.push(right);
-        xs.sort(function(a, b){
-            return a-b;
-        });
-
-        var ys = Object.keys(grid.y).map(function(key){
-            return parseFloat(key);
-        });
-        ys.push(top);
-        ys.push(bottom);
-        ys.sort(function(a, b){
-            return a-b;
-        });
-        console.log(xs);
-        console.log(ys);
-
-        var numRows = ys.length-1;
-        var numCols = xs.length-1;
-
-        var gridElt = $('<div></div>');
-        gridElt.addClass('grid');
-        for (var col=0; col<numCols; col++){
-            var colElt = $('<div></div>');
-            colElt.addClass('grid-col');
-            gridElt.append(colElt);
-            for (var row=0; row<numRows; row++){
-                var cellElt = $('<div></div>');
-                cellElt.addClass('grid-cell');
-                colElt.append(cellElt);
-                cellElt.css({
-                    width: xs[col+1] - xs[col],
-                    height: ys[row+1] - ys[row],
-                });
-            }
-        }
-        gridElt.css({
-            position: 'absolute',
-            // top: ys[0] - workSurface.offset().top,
-            // left: xs[0] - workSurface.offset().left,
-            top: 0,
-            left: 0,
-            width: xs[numCols] - xs[0]
-        });
-        workSurface.append(gridElt);
-        // $('body').append(gridElt);
-        $('.grid-col').css({
-            display: 'inline-block'
-        });
-        $('.grid-cell').css({
-            display: 'block',
-            border: '1px dashed grey'
-        });
-    };
 
     var draggableOptions = {
         opacity: 1,
@@ -768,8 +771,6 @@ function registerDraggable(widgetToRegister) {
             componentContainer.attr('id', 'dragging-container');
             componentContainer.css('position', 'absolute');
 
-            setUpGrid();
-
             return componentContainer;
 
         },
@@ -778,35 +779,18 @@ function registerDraggable(widgetToRegister) {
         scroll: true,
         snap: '.grid-cell',
         snapTolerance: 10,
+        start: function(){
+            $('.grid').css({
+                visibility: 'visible'
+            });
+        },
         drag: function(event, ui){
-            // var helper = $(ui.helper);
-            // var top = helper.offset().top;
-            // var left = helper.offset().left;
-            // var right = left + helper.width();
-            // var bottom = top + helper.height();
-            //
-            // var margin = 5;
-            // [left, right].forEach(function(x){
-            //     draggableOptions.customGridLines.x.forEach(function(xGridline){
-            //         if ((parseFloat(x)+margin>=parseFloat(xGridline)) && (parseFloat(x)-margin<=parseFloat(xGridline))){
-            //             // console.log(x, 'near x', xGridline);
-            //
-            //         }
-            //     });
-            // });
-            // [top, bottom].forEach(function(y){
-            //     draggableOptions.customGridLines.y.forEach(function(yGridline){
-            //         if ((parseFloat(y)+margin>=parseFloat(yGridline)) && (parseFloat(y)-margin<=parseFloat(yGridline))){
-            //             // console.log(y, 'near y', yGridline);
-            //
-            //         }
-            //     });
-            // });
 
         },
         stop: function(event, ui){
-            // TODO
-            $('.grid').remove();
+            $('.grid').css({
+                visibility: 'hidden'
+            });
 
             var componentId = draggingComponent.meta.id;
             var isNewComponent = $(ui.helper).data('newcomponent');
