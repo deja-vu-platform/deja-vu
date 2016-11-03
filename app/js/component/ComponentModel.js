@@ -118,5 +118,7 @@ UserComponent.fromObject = function(object){
         throw notCorrectObjectError;
     }
 
-    return $.extend(new UserComponent(object.dimensions), object)
+    object.prototype = UserComponent.prototype;
+    return object
+    // return $.extend(new UserComponent(object.dimensions), object)
 };

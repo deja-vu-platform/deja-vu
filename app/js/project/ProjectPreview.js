@@ -26,10 +26,11 @@ function loadTablePreview(componentToShow) {
     var scale = Math.min(widthScale,heightScale);
     page.height(componentHeight*scale).width(componentWidth*scale);
 
-    Object.keys(componentToShow.components).forEach(function(innerComponentId){
+    componentToShow.layout.stackOrder.forEach(function(innerComponentId){
         var innerComponent = componentToShow.components[innerComponentId];
         var type = innerComponent.type;
         var componentContainer = $('<div></div>');
+        componentContainer.addClass('component-container');
         componentContainer.height(innerComponent.dimensions.height*scale).width(innerComponent.dimensions.width*scale);
 
         var widget = $('.draggable[name=' + type + ']').clone(); // TODO do we have an a copy of this? needs a better way of getting this

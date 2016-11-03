@@ -1480,6 +1480,9 @@ function refreshContainerDisplay(cellId, zoom){
 
 }
 
+// possible sources http://jscolor.com/, http://www.w3schools.com/colors/colors_picker.asp
+// http://jscolor.com/examples/
+
 
 // TODO this needs to be revamped entirely
 

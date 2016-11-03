@@ -104,13 +104,14 @@ UserProject.fromObject = function(object){
         throw notCorrectObjectError;
     }
 
-    var project = $.extend(new UserProject(), object);
+    object.prototype = UserProject.prototype;
+    // var project = $.extend(new UserProject(), object);
 
-    for (var componentId in project.components) {
-        var component = project.components[componentId];
-        project.components[componentId] = UserComponent.fromObject(component);
+    for (var componentId in object.components) {
+        var component = object.components[componentId];
+        object.components[componentId] = UserComponent.fromObject(component);
     }
-    return project
+    return object
 };
 
 //selectedUserProject = new UserProject(DEFAULT_PROJECT_NAME, 1, DEFAULT_VERSION, DEFAULT_AUTHOR);
