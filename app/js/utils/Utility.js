@@ -16,9 +16,10 @@ function stringHash(string){
     return hash;
 }
 
-function generateId(name){
-    var nameHash = stringHash(name);
-    return (nameHash%997) + Math.floor(Math.random()*1000)*1000;
+function generateId(){
+    // var nameHash = stringHash(name);
+    // return (nameHash%997) + Math.floor(Math.random()*1000)*1000;
+    return (new Date).getTime()
 }
 
 function getRowColFromId(id){

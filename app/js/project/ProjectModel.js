@@ -25,7 +25,6 @@ function Project() {
     this.mainComponents = {};
     this.components = {};
     this.numComponents = 0;
-    this.componentIdSet = {};
     this.lastAccessed = -Infinity;
     this.addedCliches = {};
 }

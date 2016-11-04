@@ -24,7 +24,7 @@ var BaseComponent = function (type, components, dimensions) {
     baseComponent.properties = {};
     baseComponent.meta = {
         name: '',
-        id: generateId(type),
+        id: generateId(),
         version: '',
         author: ''
     };

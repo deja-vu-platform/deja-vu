@@ -33,7 +33,7 @@ $(function(){
     if (selectedProject){ // if it exists, load it
         selectedProject = UserProject.fromString(selectedProject);
     } else { // if not, make a new one
-        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, generateId(DEFAULT_PROJECT_NAME), DEFAULT_VERSION, DEFAULT_AUTHOR);
+        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, generateId(), DEFAULT_VERSION, DEFAULT_AUTHOR);
     }
 
     $('.project-name .header').text(selectedProject.meta.name);

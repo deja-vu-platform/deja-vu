@@ -682,11 +682,7 @@ function initUserComponent(isDefault, isMainPage) {
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
-    var id = generateId(name);
-    while (id in selectedProject.componentIdSet){ // very unlikely to have a collision unless the user has 1 Million components!
-        id = generateId(name);
-    }
-    selectedProject.componentIdSet[id] = '';
+    var id = generateId();
 
     if (isMainPage){
         return UserComponent({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);

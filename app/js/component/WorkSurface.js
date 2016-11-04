@@ -51,7 +51,7 @@ var WorkSurface = function(){
             var innerComponent = component.components[innerComponentId];
             var type = innerComponent.type;
             var componentContainer = componentContainerMaker.createComponentContainer(innerComponent, zoom);
-            var widget = $('.draggable[name=' + type + ']').clone();
+            var widget = $('#basic-components .draggable[name=' + type + ']').clone();
             widget.addClass('associated').data('componentId', innerComponentId);
 
             componentContainer.css({

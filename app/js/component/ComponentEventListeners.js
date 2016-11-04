@@ -139,7 +139,7 @@ function setComponentOptions(component){
             var copyComponent = duplicateUserComponent(selectedUserComponent);
             var originalId = copyComponent.meta.id;
             // change the id
-            copyComponent.meta.id = generateId(copyComponent.meta.name);
+            copyComponent.meta.id = generateId();
 
             if (originalId in selectedProject.mainComponents){
                 selectedProject.addMainPage(copyComponent);
