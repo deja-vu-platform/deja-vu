@@ -116,6 +116,7 @@ function resizeViewportToFitWindow(){
 
 window.addEventListener("resize", function(){
     resizeViewportToFitWindow();
+    window.setTimeout(resizeViewportToFitWindow, 100);
 });
 
 

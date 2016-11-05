@@ -22,7 +22,6 @@ $(function(){
     });
 
 
-    resizeViewportToFitWindow();
 
 
 
@@ -93,6 +92,7 @@ $(function(){
 
     setUpStyleColors();
 
+    resizeViewportToFitWindow();
 
     // finish load animation
     $('.loader-container').fadeOut("fast");
