@@ -116,12 +116,14 @@ var ComponentContainerMaker = function(){
     that.setUpContainer = function(container, widget, component, zoom){
         container.append(widget);
         var type = widget.attr('name');
+        var properties;
         if (component){
             var html = view.getHTML[type](component.components[type]);
+            properties = component.properties;
         } else {
             var html = view.getHTML[type]();
         }
-        view.display(container, type, html, zoom);
+        view.displayInnerComponent(container, type, html, zoom, properties);
 
     };
 

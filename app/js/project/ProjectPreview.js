@@ -9,7 +9,7 @@ var currentZoom = 1;
 var gridHeight;
 var gridWidth;
 
-var view = ComponentView();
+var view = Display();
 
 function loadTablePreview(componentToShow) {
 
@@ -58,11 +58,13 @@ function loadTablePreview(componentToShow) {
 function setUpContainer(container, widget, component, zoom){
     container.append(widget);
     var type = widget.attr('name');
+    var properties;
     if (component){
         var html = view.getHTML[type](component.components[type]);
+        properties = component.properties;
     } else {
         var html = view.getHTML[type]();
     }
-    view.display(container, type, html, zoom);
+    view.displayInnerComponent(container, type, html, zoom, properties);
 
 }

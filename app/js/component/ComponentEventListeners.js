@@ -56,6 +56,7 @@ $('.components').on('click', '.component-name-container', function () {
         $(componentNameContainer).parent().addClass('selected');
         selectedUserComponent = selectedProject.components[componentId];
         workSurface.loadUserComponent(selectedUserComponent);
+        setUpStyleColors();
     };
 
     // have this going in a separate thread
@@ -817,11 +818,11 @@ $('.components').on('click', '.index-page-toggle', function(){
 });
 
 
-function refreshContainerDisplay(cellId, zoom){
+function refreshContainerDisplay(containerId, zoom){
     if (!zoom){
         zoom = 1;
     }
-    var container =  $('#'+cellId);
+    var container =  $('#'+containerId);
     var componentId = container.data('componentId');
 
     if (selectedUserComponent.components[componentId]){
@@ -831,11 +832,11 @@ function refreshContainerDisplay(cellId, zoom){
         var properties = componentToChange.properties;
 
         // display itself gets rid of padding for the #display-cell
-        view.display(container, componentToChange.type, view.getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom);
+        view.displayInnerComponent(container, componentToChange.type, view.getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, properties);
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
     } else {
-        deleteComponentFromView(cellId);
+        deleteComponentFromView(containerId);
     }
 
 }

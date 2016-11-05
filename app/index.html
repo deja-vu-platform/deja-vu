@@ -278,7 +278,7 @@
             <div class="content dropdown-target" data-dropdownid="style-color">
                 <div>
                     <span>Text</span>
-                    <input type="text" id="pick-color-text-input">
+                    <input id="pick-color-text-input">
                     <button class="btn btn-xs btn-default pick-color" id="pick-color-text">Color Picker</button>
                     <button class="btn btn-xs btn-default set-color" id="set-color-text">Set Color</button>
                     <button class="btn btn-xs btn-default remove-color" id="remove-color-text">Remove</button>
@@ -286,7 +286,7 @@
                 </div>
                 <div>
                     <span>Background</span>
-                    <input type="text" id="pick-color-bg-input">
+                    <input id="pick-color-bg-input">
                     <button class="btn btn-xs btn-default pick-color" id="pick-color-bg">Color Picker</button>
                     <button class="btn btn-xs btn-default set-color" id="set-color-bg">Set Color</button>
                     <button class="btn btn-xs btn-default remove-color" id="remove-color-bg">Remove</button>
@@ -959,6 +959,8 @@
 <script src="js/external/jquery-ui.min.js"></script>
 <!--addon for jqueryui resizable enabling snap-->
 <script type="text/javascript" src="https://rawgit.com/polomoshnov/jQuery-UI-Resizable-Snap-extension/master/jquery.ui.resizable.snap.ext.js"></script>
+<script src="js/external/jscolor.js"></script>
+<script src="js/fonts.js"></script>
 
 
 <script src="js/external/bootstrap.min.js"></script>
@@ -970,7 +972,7 @@
 <script src="js/project/ProjectModel.js"></script>
 
 <script src="js/component/ComponentModel.js"></script>
-<script src="js/component/ComponentView.js"></script>
+<script src="js/component/Display.js"></script>
 <script src="js/component/GlobalVariables_CompControl.js"></script>
 
 <script src="js/component/Zoom.js"></script>

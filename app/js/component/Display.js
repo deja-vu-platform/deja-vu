@@ -1,5 +1,5 @@
-var ComponentView = function(){
-    var that = Object.create(ComponentView);
+var Display = function(){
+    var that = Object.create(Display);
 
     var defaultDisplayClasses = {
         'label': "display-component",
@@ -86,7 +86,7 @@ var ComponentView = function(){
         }
     };
 
-    that.display = function(container, type, html, zoom, properties, callback) {
+    that.displayInnerComponent = function(container, type, html, zoom, properties, callback) {
         var displayElement = $(html);
         container.prepend(displayElement);
         that.hideBaseComponentDisplayAt(container, type);

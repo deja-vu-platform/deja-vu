@@ -4,7 +4,7 @@
 
 var zoomElement = ZoomElement();
 var miniNav = MiniNav();
-var view = ComponentView();
+var view = Display();
 $(function(){
     $('.project-options-container').css({
         height: ($('html').height() - 70) + 'px',

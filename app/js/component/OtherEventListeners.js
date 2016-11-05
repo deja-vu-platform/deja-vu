@@ -1,7 +1,7 @@
 // This file mostly has the initialization and functions that help with
 // the display and interaction handling
 
-var view = ComponentView();
+var view = Display();
 var miniNav = MiniNav();
 var componentContainerMaker = ComponentContainerMaker();
 var workSurface = WorkSurface();
@@ -133,6 +133,51 @@ function showClicheInList(id, name){
 
 
 // TODO this needs to be revamped entirely
+var setUpStyleColors = function(){
+    var picker = $('#pick-color-text-input')[0]._jscLinkedInstance;
+    picker.fromString('000000');
+
+    if (selectedUserComponent.layout) {
+        if (selectedUserComponent.layout.overallStyles) {
+            var overallStyles = selectedUserComponent.layout.overallStyles;
+            var textColor = overallStyles['color'] || '';
+            picker.fromString(textColor);
+
+            // var bgColor = overallStyles['background-color'] || '';
+            // $('#pick-color-bg-input').val(bgColor).css({
+            //     'background-color': bgColor
+            // });
+
+        }
+    }
+};
+
+
+(function(){
+    var input = $('#pick-color-text-input');
+    var picker = new jscolor(input[0]);
+    picker.closable = true;
+    picker.closeText = 'X';
+    input.change(function(){
+        if (!selectedUserComponent.layout.overallStyles){
+            selectedUserComponent.layout.overallStyles = {}
+        }
+        var color = picker.toHEXString();
+        selectedUserComponent.layout.overallStyles['color'] = color;
+
+        for (var id in selectedUserComponent.components){
+            var innerComponent = selectedUserComponent.components[id];
+            if (!innerComponent.properties.custom){
+                innerComponent.properties.custom = {};
+            }
+            innerComponent.properties.custom['color'] = color;
+            refreshContainerDisplay('component-container_'+id, currentZoom);
+        }
+
+    });
+})();
+
+
 
 ////http://www.webdesignerdepot.com/2013/03/how-to-create-a-color-picker-with-html5-canvas/
 // The color picker
@@ -428,42 +473,42 @@ $('.remove-color').click(function(){
 
 });
 
-function setUpStyleColors(){
-    if (innerComponentFocused) {
-        var rowcol = getRowColFromId($('#display-cell').data('cellid'));
-        var row = rowcol.row;
-        var col = rowcol.col;
-        var customStyles = selectedUserComponent.components[row][col].properties.custom;
-        var textColor = customStyles['color'] || '';
-        $('#pick-color-text-input').val(textColor).css({
-            'background-color': textColor
-        });
-        var bgColor = customStyles['background-color'] || '';
-        $('#pick-color-bg-input').val(bgColor).css({
-            'background-color': bgColor
-        });
-
-    } else {
-        if (selectedUserComponent.layout.overallStyles){
-            var overallStyles = selectedUserComponent.layout.overallStyles;
-            var textColor = overallStyles['color'] || '';
-            $('#pick-color-text-input').val(textColor).css({
-                'background-color': textColor
-            });
-            var bgColor = overallStyles['background-color'] || '';
-            $('#pick-color-bg-input').val(bgColor).css({
-                'background-color': bgColor
-            });
-        } else {
-            $('#pick-color-text-input').val('').css({
-                'background-color': ''
-            });
-            $('#pick-color-bg-input').val('').css({
-                'background-color': ''
-            });
-        }
-    }
-}
+// function setUpStyleColors(){
+//     if (innerComponentFocused) {
+//         var rowcol = getRowColFromId($('#display-cell').data('cellid'));
+//         var row = rowcol.row;
+//         var col = rowcol.col;
+//         var customStyles = selectedUserComponent.components[row][col].properties.custom;
+//         var textColor = customStyles['color'] || '';
+//         $('#pick-color-text-input').val(textColor).css({
+//             'background-color': textColor
+//         });
+//         var bgColor = customStyles['background-color'] || '';
+//         $('#pick-color-bg-input').val(bgColor).css({
+//             'background-color': bgColor
+//         });
+//
+//     } else {
+//         if (selectedUserComponent.layout.overallStyles){
+//             var overallStyles = selectedUserComponent.layout.overallStyles;
+//             var textColor = overallStyles['color'] || '';
+//             $('#pick-color-text-input').val(textColor).css({
+//                 'background-color': textColor
+//             });
+//             var bgColor = overallStyles['background-color'] || '';
+//             $('#pick-color-bg-input').val(bgColor).css({
+//                 'background-color': bgColor
+//             });
+//         } else {
+//             $('#pick-color-text-input').val('').css({
+//                 'background-color': ''
+//             });
+//             $('#pick-color-bg-input').val('').css({
+//                 'background-color': ''
+//             });
+//         }
+//     }
+// }
 
 
 
