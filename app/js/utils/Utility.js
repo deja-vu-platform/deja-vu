@@ -16,9 +16,10 @@ function stringHash(string){
     return hash;
 }
 
-function generateId(name){
-    var nameHash = stringHash(name);
-    return (nameHash%997) + Math.floor(Math.random()*1000)*1000;
+function generateId(){
+    // var nameHash = stringHash(name);
+    // return (nameHash%997) + Math.floor(Math.random()*1000)*1000;
+    return (new Date).getTime()
 }
 
 function getRowColFromId(id){
@@ -26,6 +27,17 @@ function getRowColFromId(id){
     var row = rowcol[rowcol.length - 2];
     var col = rowcol[rowcol.length - 1];
     return {row:row,col:col}
+}
+
+function getComponentIdFromContainerId(id){
+    if (!id){
+        return null
+    }
+    var split = id.split('_');
+    if (split.length == 1){
+        return null
+    }
+    return split[split.length - 1]
 }
 
 function sanitizeStringOfSpecialChars(string){

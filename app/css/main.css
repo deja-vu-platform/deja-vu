@@ -1,3 +1,7 @@
+body{
+    scroll: auto;
+}
+
 /*===================================================
                   COMPONENTS
 ===================================================*/
@@ -259,17 +263,14 @@ td {
     display: none;
 }
 
-#outer-container, #inner-component-focus {
+#outer-container {
     width: 670px;
     height: 550px;
     border: 1px solid #dddddd;
     margin-left: 267px;
     position: relative;
-}
-
-#outer-container{
-    overflow: scroll;
     background: grey;
+    overflow: auto;
 }
 
 #selected-screen-size{
@@ -315,7 +316,7 @@ td {
 
 .drag-handle{
     z-index: 50;
-    display: none;
+    /*display: none;*/
 }
 
 #drag-handle-containers-container{
@@ -367,9 +368,18 @@ td {
 
 }
 
-.highlight {
-    background-color: rgba(55, 131, 198, 0.2);
+.work-surface{
+    background-color: lightblue;
+    position: relative;
 }
+
+
+.highlight {
+    /*background-color: rgba(55, 131, 198, 0.2);*/
+    background-color: lightcoral;
+}
+
+
 .dropped {
     background-color: #F9F9F9;
     text-align: center;
@@ -393,10 +403,12 @@ td {
 }
 
 .config-btns {
-    display: none;
+    /*display: none;*/
+    display: inline-block;
     position: absolute;
-    top: 3px;
+    top: -25px;
     left: 3px;
+    width: 204px;
 }
 
 /*.dropped:hover .edit-btn{*/
@@ -407,9 +419,9 @@ td {
     display: inline-block;
 }
 
-.dropped:hover .config-btns{
-    display: inline-block;
-}
+/*.dropped:hover .config-btns{*/
+    /*display: inline-block;*/
+/*}*/
 
 #inner-component-focus:hover .config-btns{
     display: inline-block;
@@ -448,9 +460,9 @@ td {
     font-weight: bold;
 }
 
-td.dropped li.widget {
+.dropped .widget {
     position: absolute;
-    bottom: 0px;
+    bottom: -25px;
     margin-left: auto;
     margin-right: auto;
     left: 0;
@@ -458,13 +470,14 @@ td.dropped li.widget {
     border: 1px solid #e1e1e1;
     line-height: 20px;
     color: #6f6f6f;
-    display: none;
-
-}
-
-td.dropped:hover li.widget  {
+    /*display: none;*/
     display: block;
+
 }
+
+/*.dropped:hover .widget  {*/
+    /*display: block;*/
+/*}*/
 
 .nav {
     margin-bottom: 10px;
@@ -478,7 +491,8 @@ td.dropped:hover li.widget  {
     border: #e0e0e0 solid 1px;
     display: block;
 }
-p.label {
+
+.label {
     white-space: initial;
 }
 
@@ -487,6 +501,30 @@ p.label {
     /*#grid-container { width: 650px; }*/
 }
 
+
+.ui-resizable-se{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.ui-resizable-ne{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.ui-resizable-sw{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.ui-resizable-nw{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
 /*===================================================
                   TOOLTIP POPUPS
@@ -497,7 +535,7 @@ p.label {
 
 .close-btn {
     position: absolute; !important
-opacity: 1;
+    opacity: 1;
     top: 5px;
     right: 9px;
 }
@@ -506,7 +544,8 @@ opacity: 1;
     display: none;
     left: -60px;
     width: 350px;
-
+    opacity: 1; /*overriding*/
+    visibility: hidden;
 }
 
 .dropped .tooltip, #inner-component-focus .tooltip {
@@ -514,7 +553,7 @@ opacity: 1;
     border: #d5d5d5 solid 1px;
     border-radius: 4px;
     display: inline-block;
-    opacity: 0;
+    visibility: hidden;
     padding: 0;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
     z-index: -1;
@@ -533,7 +572,7 @@ opacity: 1;
 }
 
 .dropped .tooltip.open, #inner-component-focus .tooltip.open {
-    opacity: 1;
+    visibility: visible;
     z-index: 100;
 }
 
@@ -667,7 +706,7 @@ opacity: 1;
     border-radius: 6px;
 }
 
-#zoom-nav-container{
+#mini-nav-container{
     position: fixed;
     left: 300px;
     bottom: 20px;
@@ -675,7 +714,7 @@ opacity: 1;
     width: 180px;
     pointer-events: none;
 }
-#zoom-nav{
+#mini-nav{
     position: absolute;
     background: grey;
     overflow: scroll;
@@ -685,7 +724,7 @@ opacity: 1;
     border: 1px black solid;
 }
 
-#zoom-nav-minimize-btn{
+#mini-nav-minimize-btn{
     position: absolute;
     top: 0px;
     right: -19px;
@@ -693,14 +732,17 @@ opacity: 1;
     z-index: 100;
 }
 
-#zoom-nav-container .minimized{ /* the minimize button */
+#mini-nav-container .minimized{ /* the minimize button */
     top: auto;
     left: 0;
     right: auto;
     bottom: 0;
 }
 
-
+#mini-nav-component-sizes{
+    background: #D5D5D5;
+    position: absolute;
+}
 
 /*===================================================
                    COMPONENTS

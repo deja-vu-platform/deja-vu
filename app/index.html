@@ -278,7 +278,7 @@
             <div class="content dropdown-target" data-dropdownid="style-color">
                 <div>
                     <span>Text</span>
-                    <input type="text" id="pick-color-text-input">
+                    <input id="pick-color-text-input">
                     <button class="btn btn-xs btn-default pick-color" id="pick-color-text">Color Picker</button>
                     <button class="btn btn-xs btn-default set-color" id="set-color-text">Set Color</button>
                     <button class="btn btn-xs btn-default remove-color" id="remove-color-text">Remove</button>
@@ -286,7 +286,7 @@
                 </div>
                 <div>
                     <span>Background</span>
-                    <input type="text" id="pick-color-bg-input">
+                    <input id="pick-color-bg-input">
                     <button class="btn btn-xs btn-default pick-color" id="pick-color-bg">Color Picker</button>
                     <button class="btn btn-xs btn-default set-color" id="set-color-bg">Set Color</button>
                     <button class="btn btn-xs btn-default remove-color" id="remove-color-bg">Remove</button>
@@ -387,6 +387,8 @@
     <div id="selected-screen-size"></div>
 </div>
 
+
+
 <div id="download-preview-area-container">
     <div id="download-preview-area"></div>
 </div>
@@ -416,16 +418,16 @@
     </button>
 </div>
 
-<div id="zoom-nav-container">
-    <button id="zoom-nav-minimize-btn" class="btn btn-default btn-xs">
+<div id="mini-nav-container">
+    <button id="mini-nav-minimize-btn" class="btn btn-default btn-xs">
         <!--<span class="glyphicon glyphicon-minus"></span>-->
         _
     </button>
-    <div id="zoom-nav">
-        <div id="zoom-nav-full-area"></div>
+    <div id="mini-nav">
+        <div id="mini-nav-full-area"></div>
         <div id="zoom-selected-screen-size"></div>
-        <div id="zoom-nav-component-size"></div>
-        <div id="zoom-nav-position"></div>
+        <div id="mini-nav-component-sizes"></div>
+        <div id="mini-nav-position"></div>
     </div>
 
 </div>
@@ -955,16 +957,33 @@
 <script src="js/external/jquery.min.js"></script>
 
 <script src="js/external/jquery-ui.min.js"></script>
+<!--addon for jqueryui resizable enabling snap-->
+<script type="text/javascript" src="https://rawgit.com/polomoshnov/jQuery-UI-Resizable-Snap-extension/master/jquery.ui.resizable.snap.ext.js"></script>
+<script src="js/external/jscolor.js"></script>
+<script src="js/fonts.js"></script>
+
+
 <script src="js/external/bootstrap.min.js"></script>
 <script src="js/external/parse.min.js"></script>
+
 <script src="js/common.js"></script>
 <script src="js/utils/Utility.js"></script>
+
 <script src="js/project/ProjectModel.js"></script>
+
 <script src="js/component/ComponentModel.js"></script>
-<script src="js/component/ComponentView.js"></script>
+<script src="js/component/Display.js"></script>
 <script src="js/component/GlobalVariables_CompControl.js"></script>
-<script src="js/component/TableAndComponentFns.js"></script>
-<script src="js/component/InitializationAndDisplay.js"></script>
+
+<script src="js/component/Zoom.js"></script>
+<script src="js/component/MiniNav.js"></script>
+
+<script src="js/component/ComponentContainerMaker.js"></script>
+<script src="js/component/WorkSurface.js"></script>
+<script src="js/component/OtherEventListeners.js"></script>
+<script src="js/component/ComponentEventListeners.js"></script>
+<script src="js/component/index.js"></script>
+
 <script src="js/external/zoomooz.min.js"></script>
 
 </body>

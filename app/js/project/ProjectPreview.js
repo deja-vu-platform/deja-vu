@@ -9,195 +9,62 @@ var currentZoom = 1;
 var gridHeight;
 var gridWidth;
 
+var view = Display();
+
 function loadTablePreview(componentToShow) {
-    $('<style>#main-table-preview::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
-    numRows = componentToShow.dimensions.rows;
-    numCols = componentToShow.dimensions.cols;
-    createTablePreview();
 
-    $('.cell').each(function () {
-        var cellId = $(this).get(0).id;
-        var rowcol = getRowColFromId(cellId);
-        var row = rowcol.row;
-        var col = rowcol.col;
-        if (componentToShow.components[row]) {
-            if (componentToShow.components[row][col]) {
-                var innerComponent = componentToShow.components[row][col];
-                var type = innerComponent.type;
+    $('#page-preview').html('');
 
-                $($('.draggable[name=' + type + ']').get(0)).clone().appendTo($('#' + cellId).get(0));
-                var padding = componentToShow.layout[row][col].ratio.padding;
-                var properties = componentToShow.components[row][col].properties;
+    var page = $('<div></div>');
+    page.attr('id', 'page');
 
-                display(cellId, type, getHTML[type](innerComponent.components[type]), currentZoom, padding, properties);
-            }
-        }
-    });
-}
-
-
-function createTablePreview() {
-    $('#table-container-preview').html('');
-
-    var tableGrid = document.createElement('table');
-    tableGrid.id = 'main-table-preview';
-    for (var row = 0; row <= numRows; row++) {
-        var tr = createEmptyRow(row);
-        for (var col = 0; col <= numCols; col++) {
-            if ((row === 0)||(col === 0)){
-                if (row === 0){
-                    if (col===0){
-                        var td = document.createElement('td');
-                        td.className = 'zero-height zero-width col' + '_' + col;
-                        td.id = 'cell' + '_' + row + '_' + col;
-                    } else {
-                        var td = document.createElement('td');
-                        td.className = 'zero-height col' + '_' + col;
-                        td.id = 'cell' + '_' + row + '_' + col;
-                    }
-                } else {
-                    var td = document.createElement('td');
-                    td.className = 'zero-width col' + '_' + col;
-                    td.id = 'cell' + '_' + row + '_' + col;
-                }
-            } else {
-                var td = createTableCellPreview(row, col);
-            }
-            tr.appendChild(td);
-        }
-        tableGrid.appendChild(tr);
-    }
-
-    document.getElementById('table-container-preview').appendChild(tableGrid);
-
-    initialResizeCellsPreview();
-}
-
-function createEmptyRow(rowNumber) {
-    var tr = document.createElement('tr');
-    tr.className = 'row' + '_' + rowNumber;
-    return tr;
-}
-
-function createTableCellPreview(row, col) {
-    var td = document.createElement('td');
-    td.className = 'cell col' + '_' + col;
-
-    td.id = 'cell' + '_' + row + '_' + col;
-
-    // change size of cell based on the layout
-    var rowspan = componentToShow.layout[row][col].spans.row;
-    var colspan = componentToShow.layout[row][col].spans.col;
-
-    var isHidden = componentToShow.layout[row][col].hidden.isHidden;
-
-    if (isHidden) {
-        $(td).css("display", "none");
-    } else {
-        $(td).attr("rowSpan", rowspan);
-        $(td).attr("colSpan", colspan);
-    }
-
-    return td;
-}
-
-
-function resetAlignersPreview(scale) {
-    if (!scale){
-        scale = 1;
-    }
-
-    $('#cell_0_0').css({
-        width: '1px',
-        height: '1px',
-    });
-
-    // 0th col
-    for (var row = 1; row<=numRows; row++){
-        var heightRatioGrid = componentToShow.layout[row][1].ratio.grid.height;
-        var thisGridCellHeight = scale * heightRatioGrid * componentToShow.layout.tablePxDimensions.height;
-        $('#cell' + '_' + row + '_' + 0).css({
-            width: '1px',
-            height: thisGridCellHeight + 'px',
-        })
-    }
-
-    // 0th row
-    for (var col = 1; col<=numCols; col++) {
-        var widthRatioGrid = componentToShow.layout[1][col].ratio.grid.width;
-        var thisGridCellWidth = scale * widthRatioGrid * componentToShow.layout.tablePxDimensions.width;
-
-        $('#cell' + '_' + 0 + '_' + col).css({
-            width: thisGridCellWidth + 'px',
-            height: '1px',
-        })
-
-    }
-
-}
-
-
-function initialResizeCellsPreview() {
-    //gridHeight = parseFloat($('#table-container-preview').css('height')) - 100;
-    //gridWidth = parseFloat($('#table-container-preview').css('width')) - 60;
-
-    gridHeight = parseFloat($('#table-container-preview').height());
-    gridWidth = parseFloat($('#table-container-preview').width());
-
-
-    //gridWidth = componentToShow.layout.tablePxDimensions.width;
-    //gridHeight = componentToShow.layout.tablePxDimensions.height;
-
-    // have to assume that the tablePxDimensions are set
-    var widthScale = gridWidth/componentToShow.layout.tablePxDimensions.width;
-    var heightScale = gridHeight/componentToShow.layout.tablePxDimensions.height;
+    gridHeight = parseFloat($('#page-preview').height());
+    gridWidth = parseFloat($('#page-preview').width());
+    var componentHeight = componentToShow.dimensions.height;
+    var componentWidth = componentToShow.dimensions.width;
+    var widthScale = gridWidth/componentWidth;
+    var heightScale = gridHeight/componentHeight;
 
     var scale = Math.min(widthScale,heightScale);
+    page.height(componentHeight*scale).width(componentWidth*scale);
 
-    currentZoom = scale;
+    componentToShow.layout.stackOrder.forEach(function(innerComponentId){
+        var innerComponent = componentToShow.components[innerComponentId];
+        var type = innerComponent.type;
+        var componentContainer = $('<div></div>');
+        componentContainer.addClass('component-container');
+        componentContainer.height(innerComponent.dimensions.height*scale).width(innerComponent.dimensions.width*scale);
 
-    cellWidth = scale*((gridWidth-20) / numCols);
-    cellHeight = scale*((gridHeight-20) / numRows);
+        var widget = $('.draggable[name=' + type + ']').clone(); // TODO do we have an a copy of this? needs a better way of getting this
 
-    resetAlignersPreview(scale);
-    
-    for (var row = 1; row<=numRows; row++){
-        for (var col = 1; col<=numCols; col++){
-            var widthRatioGrid = componentToShow.layout[row][col].ratio.grid.width;
-            var heightRatioGrid = componentToShow.layout[row][col].ratio.grid.height;
-            var thisGridCellWidth = scale * widthRatioGrid * componentToShow.layout.tablePxDimensions.width;
-            var thisGridCellHeight = scale * heightRatioGrid * componentToShow.layout.tablePxDimensions.height;
+        componentContainer.css({
+            position: 'absolute',
+            left: componentToShow.layout[innerComponentId].left*scale,
+            top: componentToShow.layout[innerComponentId].top*scale,
 
-            $('#cell' + '_' + row + '_' + col).css({
-                width: thisGridCellWidth + 'px',
-                height: thisGridCellHeight + 'px',
-            });
-        }
-    }
+        });
 
-    resizeLabelDivs(cellWidth, cellHeight);
+        setUpContainer(componentContainer, widget, innerComponent, scale);
+        page.append(componentContainer);
+    });
+    page.css({
+        position: 'relative',
+    });
 
+    $('#page-preview').append(page);
+    $('<style>#page::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
 }
 
-function resizeLabelDivs(cellWidth, cellHeight) {
-    getCSSRule('.label-container').style.setProperty('width', (cellWidth - 10) + 'px', null);
-    getCSSRule('.label-container').style.setProperty('height', (cellHeight - 30) + 'px', null);
-    getCSSRule('.label-container').style.setProperty('padding-top', (cellHeight / 4) + 'px', null);
-}
-
-//function getCSSRule(search) {
-//    var x = [].slice.call(document.styleSheets[3].cssRules);
-//    return x.filter(function (rule) {
-//        return rule.selectorText === search;
-//    })[0];
-//}
-//
-function getCSSRule(search) {
-    var x = [];
-    for (var sheetnum =0; sheetnum< document.styleSheets.length; sheetnum++){
-        x = x.concat([].slice.call(document.styleSheets[sheetnum].cssRules));
+function setUpContainer(container, widget, component, zoom){
+    container.append(widget);
+    var type = widget.attr('name');
+    var properties;
+    if (component){
+        var html = view.getHTML[type](component.components[type]);
+        properties = component.properties;
+    } else {
+        var html = view.getHTML[type]();
     }
-    return x.filter(function (rule) {
-        return rule.selectorText === search;
-    })[0];
+    view.displayInnerComponent(container, type, html, zoom, properties);
+
 }
