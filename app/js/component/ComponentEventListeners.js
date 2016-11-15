@@ -11,8 +11,6 @@ var zoom = ZoomElement();
 $('#new-user-component-btn').click(function(){
     $('#create-component').unbind();
     $('#create-component').on('click', function () {
-        numRows = $('#select-rows').val();
-        numCols = $('#select-cols').val();
         selectedUserComponent = initUserComponent(false, false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
@@ -24,13 +22,11 @@ $('#new-user-component-btn').click(function(){
 $('#new-main-component-btn').click(function(){
     $('#create-component').unbind();
     $('#create-component').on('click', function () {
-        numRows = $('#select-rows').val();
-        numCols = $('#select-cols').val();
         selectedUserComponent = initUserComponent(false, true);
         selectedProject.addMainPage(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1)
+        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
 
         resetMenuOptions();
     });
@@ -45,22 +41,17 @@ $('#save-project').on('click', function () {
 });
 
 $('.components').on('click', '.component-name-container', function () {
-    var load = function(componentNameContainer){
-        // Save the current values
-        var oldState = {zoom : currentZoom,
-        };
-        $('#work-surface'+'_'+selectedUserComponent.meta.id).data('state', oldState);
-
-        var componentId = $(componentNameContainer).parent().data('componentid');
-        $('.selected').removeClass('selected');
-        $(componentNameContainer).parent().addClass('selected');
-        selectedUserComponent = selectedProject.components[componentId];
-        workSurface.loadUserComponent(selectedUserComponent);
-        setUpStyleColors();
+    // Save the current values
+    var oldState = {zoom : currentZoom,
     };
+    $('#work-surface'+'_'+selectedUserComponent.meta.id).data('state', oldState);
 
-    // have this going in a separate thread
-    window.setTimeout(load(this), 2000);
+    var componentId = $(this).parent().data('componentid');
+    $('.selected').removeClass('selected');
+    $(this).parent().addClass('selected');
+    selectedUserComponent = selectedProject.components[componentId];
+    workSurface.loadUserComponent(selectedUserComponent);
+    setUpStyleColors();
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {
@@ -151,7 +142,7 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            workSurface.loadUserComponent(copyComponent, currentZoom);
+            workSurface.loadUserComponent(copyComponent, 1);
 
         });
 

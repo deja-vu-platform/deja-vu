@@ -1,9 +1,6 @@
 /**
  * Created by Shinjini on 6/30/2016.
  */
-var numRows;
-var numCols;
-
 var currentZoom = 1;
 
 var gridHeight;

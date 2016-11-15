@@ -296,6 +296,7 @@ var WorkSurface = function(){
             loadComponentIntoWorkSurface(component, currentZoom);
         } else {
             disableAllComponentDomElementsExcept(componentId);
+            setComponentOptions(component);
             zoomElement.updateZoomFromState(componentId);
         }
     };

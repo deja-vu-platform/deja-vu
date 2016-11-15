@@ -156,6 +156,7 @@ var setUpStyleColors = function(){
 })();
 
 
+/*
 
 ////http://www.webdesignerdepot.com/2013/03/how-to-create-a-color-picker-with-html5-canvas/
 // The color picker
@@ -488,7 +489,7 @@ $('.remove-color').click(function(){
 //     }
 // }
 
-
+*/
 
 /** **/
 
