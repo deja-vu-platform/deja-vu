@@ -534,7 +534,8 @@ function showConfigOptions(droppedComponentType, container) {
         container.find('.edit-btn').css('display', 'block');
     }
 
-    var configOptions = $('#'+droppedComponentType+'-properties').clone();
+    var configOptions = $('.default-properties').find('.'+droppedComponentType+'-properties').clone();
+
     if (configOptions.length==0) {
         return;
     }
@@ -940,6 +941,7 @@ function testSaveHTML(){
 
 function createDownloadPreview(){
     var oldZoom = currentZoom;
+    var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
     currentZoom = 1;
     propagateRatioChangeToAllElts(currentZoom);
 
@@ -947,7 +949,9 @@ function createDownloadPreview(){
         position: 'relative',
         'text-align': 'center',
         margin: 'auto',
-        width: $('#main-grid-table').css('width'),
+        width: workSurface.css('width'),
+        height: workSurface.css('height'),
+        'background-color': workSurface.css('background-color'),
     });
 
     $('.component-container').each(function(){
@@ -959,9 +963,8 @@ function createDownloadPreview(){
             width: $(this).width()+'px',
             height: $(this).height()+'px',
             'vertical-align': 'middle',
-            background: '#F9F9F9',
         };
-        var container = $(document.createElement('div'));
+        var container = $('<div></div>');
         container.css(css);
 
         var labelContainer = $(this).find('.label-container').clone(true, true);
@@ -969,7 +972,6 @@ function createDownloadPreview(){
             labelContainer.css({// this is not carried over, since this was declared in the css file
                 position: 'absolute',
                 top: '0',
-                //border: '#e0e0e0 solid 1px',
                 display: 'block',
             });
             container.append(labelContainer);
@@ -987,8 +989,6 @@ function createDownloadPreview(){
                 'white-space': 'initial',
                 'font-weight': 400,
             });
-
-
             if (displayComponent.get(0)){
                 container.append(displayComponent);
                 add = true;

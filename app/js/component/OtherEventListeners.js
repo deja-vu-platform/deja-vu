@@ -11,8 +11,6 @@ var addedCliches;
 var navZoom = .1;
 var navDragging = false;
 
-var innerComponentFocused = false;
-
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
 
@@ -112,43 +110,73 @@ function showClicheInList(id, name){
 
 // TODO this needs to be revamped entirely
 var setUpStyleColors = function(){
-    var picker = $('#pick-color-text-input')[0]._jscLinkedInstance;
-    picker.fromString('000000');
+    var pickerText = $('#pick-color-text-input')[0]._jscLinkedInstance;
+    pickerText.fromString('000000');
+    var pickerBG = $('#pick-color-bg-input')[0]._jscLinkedInstance;
+    pickerBG.fromString('FFFFFF');
 
-    if (selectedUserComponent.layout) {
-        if (selectedUserComponent.layout.overallStyles) {
-            var overallStyles = selectedUserComponent.layout.overallStyles;
-            var textColor = overallStyles['color'] || '';
-            picker.fromString(textColor);
+    if (selectedUserComponent.properties.custom) {
+        var overallStyles = selectedUserComponent.properties.custom;
+        var textColor = overallStyles['color'] || '';
+        pickerText.fromString(textColor);
 
-            // var bgColor = overallStyles['background-color'] || '';
-            // $('#pick-color-bg-input').val(bgColor).css({
-            //     'background-color': bgColor
-            // });
-
-        }
+        var bgColor = overallStyles['background-color'] || '';
+        pickerBG.fromString(bgColor);
+        console.log($('#work-surface_'+selectedUserComponent.meta.id));
+        $('#work-surface_'+selectedUserComponent.meta.id).css({
+            'background-color': bgColor,
+        });
     }
 };
 
 
 (function(){
-    var input = $('#pick-color-text-input');
-    var picker = new jscolor(input[0]);
-    picker.closable = true;
-    picker.closeText = 'X';
-    input.change(function(){
-        if (!selectedUserComponent.layout.overallStyles){
-            selectedUserComponent.layout.overallStyles = {}
+    var inputText = $('#pick-color-text-input');
+    var pickerText = new jscolor(inputText[0]);
+    pickerText.closable = true;
+    pickerText.closeText = 'X';
+    inputText.change(function(){
+        if (!selectedUserComponent.properties.custom){
+            selectedUserComponent.properties.custom = {}
         }
-        var color = picker.toHEXString();
-        selectedUserComponent.layout.overallStyles['color'] = color;
+        var color = pickerText.toHEXString();
+        selectedUserComponent.properties.custom['color'] = color;
 
         for (var id in selectedUserComponent.components){
             var innerComponent = selectedUserComponent.components[id];
             if (!innerComponent.properties.custom){
                 innerComponent.properties.custom = {};
             }
-            innerComponent.properties.custom['color'] = color;
+            if (!innerComponent.properties.custom['color']){
+                innerComponent.properties.custom['color'] = color;
+            }
+            refreshContainerDisplay('component-container_'+id, currentZoom);
+        }
+
+    });
+
+    var inputBG = $('#pick-color-bg-input');
+    var pickerBG = new jscolor(inputBG[0]);
+    pickerBG.closable = true;
+    pickerBG.closeText = 'X';
+    inputBG.change(function(){
+        if (!selectedUserComponent.properties.custom){
+            selectedUserComponent.properties.custom = {}
+        }
+        var color = pickerBG.toHEXString();
+        selectedUserComponent.properties.custom['background-color'] = color;
+        $('#work-surface_'+selectedUserComponent.meta.id).css({
+            'background-color': color,
+        });
+
+        for (var id in selectedUserComponent.components){
+            var innerComponent = selectedUserComponent.components[id];
+            if (!innerComponent.properties.custom){
+                innerComponent.properties.custom = {};
+            }
+            if (!innerComponent.properties.custom['background-color']){
+                innerComponent.properties.custom['background-color'] = color;
+            }
             refreshContainerDisplay('component-container_'+id, currentZoom);
         }
 
@@ -566,6 +594,8 @@ function propagateRatioChangeToAllElts(newRatio){
         var height = component.dimensions.height * newRatio;
         var left = selectedUserComponent.layout[componentId].left *  newRatio;
 
+        var properties = component.properties;
+
         container.css({
             width: width + 'px',
             height: height + 'px',
@@ -573,7 +603,7 @@ function propagateRatioChangeToAllElts(newRatio){
             left: left + 'px'
         });
 
-        view.updateBaseComponentDisplayAt(container, type, newRatio);
+        view.updateBaseComponentDisplayAt(container, type, newRatio, properties);
         view.showBaseComponentDisplayAt(container, type);
     }
 

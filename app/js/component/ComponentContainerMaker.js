@@ -113,19 +113,76 @@ var ComponentContainerMaker = function(){
         return container;
     };
 
+    var setUpColorOptions = function(container, component){
+        if (!component.properties.custom){
+            component.properties.custom = {}
+        }
+
+        var customStyles = component.properties.custom;
+        var overallStyles = selectedUserComponent.properties.custom;
+        // var colorOptions = $('<div>'+
+        //     '<span>Text</span>'+
+        //     '<input id="pick-color-text-input">'+
+        //     '</div>'+
+        //     '<div>'+
+        //     '<span>Background</span>'+
+        //     '<input id="pick-color-bg-input">'+
+        //     '</div>');
+        var colorOptions = $('<div></div>');
+        var textColorOption = $('<input id="pick-color-inner-text-input">');
+        var bgColorOption = $('<input id="pick-color-inner-bg-input">');
+
+        var pickerText = new jscolor(textColorOption[0]);
+        pickerText.closable = true;
+        pickerText.closeText = 'X';
+        textColorOption.change(function(){
+            var color = pickerText.toHEXString();
+            component.properties.custom['color'] = color;
+            refreshContainerDisplay(container.attr('id'), currentZoom);
+        });
+
+        var pickerBG = new jscolor(bgColorOption[0]);
+        pickerBG.closable = true;
+        pickerBG.closeText = 'X';
+        bgColorOption.change(function(){
+            var color = pickerBG.toHEXString();
+            component.properties.custom['background-color'] = color;
+            refreshContainerDisplay(container.attr('id'), currentZoom);
+        });
+
+        var textColor = customStyles['color'] || overallStyles['color'] || '000000';
+        pickerText.fromString(textColor);
+
+        var bgColor = customStyles['background-color'] ||  overallStyles['background-color'] || 'FFFFFF';
+        pickerBG.fromString(bgColor);
+
+
+        colorOptions.append(textColorOption).append(bgColorOption);
+        container.find('.config-btns').append(colorOptions);
+    };
+
     that.setUpContainer = function(container, widget, component, zoom){
         container.append(widget);
         var type = widget.attr('name');
         var properties;
         if (component){
             var html = view.getHTML(type)(component.components[type]);
+            if (!component.properties.custom['color']){
+                component.properties.custom['color'] = selectedUserComponent.properties.custom['color'];
+            }
+            if (!component.properties.custom['background-color']){
+                component.properties.custom['background-color'] = selectedUserComponent.properties.custom['background-color'];
+            }
             properties = component.properties;
         } else {
             var html = view.getHTML(type)();
         }
         view.displayInnerComponent(container, type, html, zoom, properties);
+        showConfigOptions(type, container);
+        setUpColorOptions(container, component);
 
     };
+
 
     return that;
 };

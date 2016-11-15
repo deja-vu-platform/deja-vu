@@ -72,10 +72,7 @@ $(function(){
 
             }
         }
-        window.setTimeout(function(){
-            workSurface.loadUserComponent(selectedUserComponent, currentZoom);
-        }, 1);
-
+        workSurface.loadUserComponent(selectedUserComponent, currentZoom);
     }
 
 

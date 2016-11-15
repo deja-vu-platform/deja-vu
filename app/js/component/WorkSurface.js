@@ -64,7 +64,6 @@ var WorkSurface = function(){
             componentContainerMaker.setUpContainer(componentContainer, widget, innerComponent, zoom);
             registerDraggable(widget);
             workSurface.append(componentContainer);
-            showConfigOptions(type, componentContainer);
             triggerEdit(componentContainer, false);
             registerTooltipBtnHandlers('component-container_'+innerComponentId);
         });
@@ -130,7 +129,6 @@ var WorkSurface = function(){
                 var componentContainer = componentContainerMaker.createComponentContainer(component, currentZoom);
                 componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom);
                 registerDraggable();
-                showConfigOptions(component.type, componentContainer);
                 if (!widget.hasClass('associated')){
                     $(ui.helper).data('newcomponent', true);
                     selectedUserComponent.addComponent(component);
@@ -159,7 +157,7 @@ var WorkSurface = function(){
         workSurface.droppable(dropSettings);
     };
 
-
+    // puts componentId at the top!
     var shiftOrder = function(componentId){
         var stackOrder = selectedUserComponent.layout.stackOrder;
 
