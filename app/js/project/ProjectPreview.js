@@ -60,10 +60,10 @@ function setUpContainer(container, widget, component, zoom){
     var type = widget.attr('name');
     var properties;
     if (component){
-        var html = view.getHTML[type](component.components[type]);
+        var html = view.getHTML(type)(component.components[type]);
         properties = component.properties;
     } else {
-        var html = view.getHTML[type]();
+        var html = view.getHTML(type)();
     }
     view.displayInnerComponent(container, type, html, zoom, properties);
 

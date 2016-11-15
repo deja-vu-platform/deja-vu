@@ -61,7 +61,6 @@
             <div class="header"></div>
             <ul class="nav nav-tabs">
                 <li class="active" id="build-mode"><a href="#">Build</a></li>
-                <li id="layout-mode"><a href="#">Layout</a></li>
                 <li id="style-mode"><a href="#">Style</a></li>
             </ul>
         </div>
@@ -138,130 +137,7 @@
                 </ul>
             </div>
         </div>
-
     </div>
-
-    <div class="layout">
-        <div class="merge">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open"  data-dropdownid="merge">
-                    Merge Cells
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-            </div>
-            <div class="content dropdown-target" data-dropdownid="merge">
-                <div class="layout-group">
-                    <span class="layout-group-header">Reset</span>
-                    <button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>
-                </div>
-            </div>
-        </div>
-        <div class="resize">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open" data-dropdownid="resize">
-                    Resize
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-            </div>
-            <div class="content  dropdown-target" data-dropdownid="resize">
-                <div class="layout-group">
-                    <span class="layout-group-header">Lock</span>
-                    <div class="lock-width">
-                        <div class="layout-label">Width</div>
-                        <div class="layout-input">
-                            <button type="button" class="btn btn-default btn-table-width-lock-unlock">
-                                <img src="images/unlock_icon.png" width="20px" height="20px">
-                            </button>
-                        </div>
-                    </div>
-                    <div class="lock-height">
-                        <div class="layout-label">Height</div>
-                        <div class="layout-input">
-                            <button type="button" class="btn btn-default btn-table-height-lock-unlock">
-                                <img src="images/unlock_icon.png" width="20px" height="20px">
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="layout-group" id="resize-to-inputs">
-                    <span class="layout-group-header">Resize Rows and Columns to Inputs</span>
-                    <button class="btn btn-default" id="btn-resize-to-inputs">Start</button>
-                    <div id="resize-to-inputs-done-cancel">
-                        <button class="btn btn-default" id="btn-resize-to-inputs-done">Done</button>
-                        <button class="btn btn-default" id="btn-resize-to-inputs-cancel">Cancel</button>
-                    </div>
-                </div>
-                <div class="layout-group">
-                    <span class="layout-group-header">Resize Entire Component</span>
-                    <div id="resize-table-width">
-                        <div class="layout-label">Width (px)</div>
-                        <div class="layout-input">
-                            <input type="text" placeholder="width">
-                        </div>
-                    </div>
-                    <div id="resize-table-height">
-                        <div class="layout-label">Height (px)</div>
-                        <div class="layout-input"><input type="text" placeholder="height"></div>
-                    </div>
-                    <button class="btn btn-default" id="resize-table">Resize Component</button>
-                </div>
-                <div class="layout-group">
-                    <span class="layout-group-header">Reset</span>
-                    <button class="btn btn-default" id="reset-width-ratios">Equalize Width Ratios</button>
-                    <button class="btn btn-default" id="reset-height-ratios">Equalize Height Ratios</button>
-                </div>
-            </div>
-        </div>
-        <div class="add-remove-rows-cols">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open"  data-dropdownid="add-del-row-col">
-                    Add/Remove Rows/Columns
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-            </div>
-            <div class="content  dropdown-target" data-dropdownid="add-del-row-col">
-                <div class="layout-group">
-                    <span class="layout-group-header">Lock</span>
-                    <div class="lock-width">
-                        <div class="layout-label">Width</div>
-                        <div class="layout-input">
-                            <button type="button" class="btn btn-default btn-table-width-lock-unlock">
-                                <img src="images/unlock_icon.png" width="20px" height="20px">
-                            </button>
-                        </div>
-                    </div>
-                    <div class="lock-height">
-                        <div class="layout-label">Height</div>
-                        <div class="layout-input">
-                            <button type="button" class="btn btn-default btn-table-height-lock-unlock">
-                                <img src="images/unlock_icon.png" width="20px" height="20px">
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="add-remove-inputs layout-group">
-                    <span class="layout-group-header">Add/Remove Rows/Columns</span>
-                    <div class="add-n-rows">
-                        <div class="layout-label"><span>Add Rows</span></div>
-                        <div class="layout-input"><input type="text"></div>
-                    </div>
-                    <div class="remove-n-rows">
-                        <div class="layout-label"><span>Remove Rows</span></div>
-                        <div class="layout-input"><input type="text"></div>
-                    </div>
-                    <div class="add-n-cols">
-                        <div class="layout-label"><span>Add Cols</span></div>
-                        <div class="layout-input"><input type="text"></div>
-                    </div>
-                    <div class="remove-n-cols">
-                        <div class="layout-label"><span>Remove Cols</span></div>
-                        <div class="layout-input"><input type="text"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="style">
         <div class="header">
             <span id="style-overall-vs-specific">
@@ -324,13 +200,6 @@
     </div>
 </div>
 
-<div id="color-picker-container">
-    <canvas width="400" height="400" id="color-picker"></canvas>
-    <button class="btn btn-xs btn-default" id="color-picker-dismiss">
-        <span>x</span>
-    </button>
-</div>
-
 <div class="component-options">
     <div class="component-name-container">
         <div class="component-name"></div>
@@ -375,19 +244,9 @@
     </div>
 </div>
 
-<div id="inner-component-focus" class="display-cell-parent">
-    <div id="display-cell" class="containing-cell"></div>
-    <div id="display-cell-resize-helper">
-        <img src="images/drag_handle_se_icon.png" width="15px" height="15px"
-             class="ui-resizable-handle ui-resizable-se display-cell-resize-handle" id="display-cell-resize-handle">
-    </div>
-</div>
-
 <div id="outer-container">
     <div id="selected-screen-size"></div>
 </div>
-
-
 
 <div id="download-preview-area-container">
     <div id="download-preview-area"></div>
@@ -782,8 +641,6 @@
     </div>
 </div>
 
-<div id="blank-bg"></div>
-
 <!--MODALS-->
 <div class="modal fade" id="first-main-page">
     <div class="modal-dialog modal-md">
@@ -829,42 +686,6 @@
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Component name: </div>
                     <div class="col-sm-7"><input id="new-component-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
-                    <div class="col-sm-1"></div>
-                </div><br/>
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3 form-lbl">Rows: </div>
-                    <div class="col-sm-7">
-                        <select id="select-rows">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected="selected">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-1"></div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3 form-lbl">Columns: </div>
-                    <div class="col-sm-7">
-                        <select id="select-cols">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected="selected">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                        </select>
-                    </div>
                     <div class="col-sm-1"></div>
                 </div><br/>
                 <!--<div class="row">-->

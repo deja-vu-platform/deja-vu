@@ -16,7 +16,7 @@ $('#new-user-component-btn').click(function(){
         selectedUserComponent = initUserComponent(false, false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        setUpEmptyWorkSurface(selectedUserComponent, 1);
+        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
         resetMenuOptions();
     });
 });
@@ -30,7 +30,7 @@ $('#new-main-component-btn').click(function(){
         selectedProject.addMainPage(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        setUpEmptyWorkSurface(selectedUserComponent, 1)
+        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1)
 
         resetMenuOptions();
     });
@@ -137,7 +137,7 @@ function setComponentOptions(component){
     $('.component-options #btn-duplicate-component')
         .unbind()
         .click(function(){
-            var copyComponent = duplicateUserComponent(selectedUserComponent);
+            var copyComponent = duplicateUserComponent(component);
             var originalId = copyComponent.meta.id;
             // change the id
             copyComponent.meta.id = generateId();
@@ -151,7 +151,7 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            workSurface.loadUserComponent(selectedUserComponent, currentZoom);
+            workSurface.loadUserComponent(copyComponent, currentZoom);
 
         });
 
@@ -170,7 +170,7 @@ function setComponentOptions(component){
     $('.component-options .btn-delete-component')
         .unbind()
         .on("click", function (e) {
-            var id = selectedUserComponent.meta.id;
+            var id = component.meta.id;
             if (confirmOnUserComponentDelete){
                 if (selectedProject.numComponents === 1){
                     return; //don't delete the last one TODO is the the right way to go?
@@ -181,11 +181,12 @@ function setComponentOptions(component){
             }
         });
 
-    if (selectedUserComponent.meta.id in selectedProject.mainComponents){
+    // if the component is in the main pages, set it up accordingly
+    if (component.meta.id in selectedProject.mainComponents){
         $('.component-options #btn-index-page-toggle').css({
             display: 'inline-block',
         });
-        setUpComponentOptionsIndexPageToggle();
+        setUpComponentOptionsIndexPageToggle(component);
     } else {
         $('.component-options #btn-index-page-toggle').css({
             display: 'none',
@@ -195,16 +196,16 @@ function setComponentOptions(component){
 
 }
 
-function setUpComponentOptionsIndexPageToggle(){
-    if (selectedUserComponent.meta.id == selectedProject.mainComponents.indexId){
+function setUpComponentOptionsIndexPageToggle(component){
+    if (component.meta.id == selectedProject.mainComponents.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
-        $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').addClass('selected-index-page');
+        $('.components').find('[data-componentid='+component.meta.id+']').addClass('selected-index-page');
 
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $(this).find('.text').text('Assign as Index Page');
-            $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.components').find('[data-componentid='+component.meta.id+']').find('.index-page-toggle').trigger('click');
         });
     } else {
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
@@ -212,7 +213,7 @@ function setUpComponentOptionsIndexPageToggle(){
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
             $(this).find('.text').text('Unassign as Index Page');
-            $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.components').find('[data-componentid='+component.meta.id+']').find('.index-page-toggle').trigger('click');
         });
 
     }
@@ -814,7 +815,7 @@ $('.components').on('click', '.index-page-toggle', function(){
     } else {
         selectedProject.mainComponents.indexId = null;
     }
-    setUpComponentOptionsIndexPageToggle();
+    setUpComponentOptionsIndexPageToggle(selectedProject.components[componentId]);
 });
 
 
@@ -832,7 +833,7 @@ function refreshContainerDisplay(containerId, zoom){
         var properties = componentToChange.properties;
 
         // display itself gets rid of padding for the #display-cell
-        view.displayInnerComponent(container, componentToChange.type, view.getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, properties);
+        view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
     } else {
