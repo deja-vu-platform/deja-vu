@@ -296,7 +296,7 @@ li.selected {
     position: absolute;
     top: -25px;
     left: 3px;
-    width: 204px;
+    width: 600px;
 }
 
 /*.dropped:hover .edit-btn{*/

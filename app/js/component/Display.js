@@ -168,7 +168,7 @@ var Display = function(){
                 var classes = '';
                 for (var propertyName in properties){
                     //displayComponent.addClass(properties[propertyName]);
-                    if (propertyName == 'custom'){
+                    if (propertyName == 'custom' || propertyName == 'overall'){
                         continue;
                     }
                     classes = classes+' '+properties[propertyName];
@@ -177,6 +177,13 @@ var Display = function(){
 
                 displayComponent.removeClass();
                 displayComponent.addClass(classes).addClass(defaultDisplayClasses[type]);
+            }
+            if (properties.overall){
+                if (Object.keys(properties.overall).length>0){
+                    for (var customProperty in properties.overall){
+                        displayComponent.css(customProperty, properties.overall[customProperty]);
+                    }
+                }
             }
             if (properties.custom){
                 if (Object.keys(properties.custom).length>0){

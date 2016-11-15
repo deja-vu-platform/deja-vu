@@ -122,7 +122,6 @@ var setUpStyleColors = function(){
 
         var bgColor = overallStyles['background-color'] || '';
         pickerBG.fromString(bgColor);
-        console.log($('#work-surface_'+selectedUserComponent.meta.id));
         $('#work-surface_'+selectedUserComponent.meta.id).css({
             'background-color': bgColor,
         });
@@ -144,12 +143,10 @@ var setUpStyleColors = function(){
 
         for (var id in selectedUserComponent.components){
             var innerComponent = selectedUserComponent.components[id];
-            if (!innerComponent.properties.custom){
-                innerComponent.properties.custom = {};
+            if (!innerComponent.properties.overall){
+                innerComponent.properties.overall = {};
             }
-            if (!innerComponent.properties.custom['color']){
-                innerComponent.properties.custom['color'] = color;
-            }
+            innerComponent.properties.overall['color'] = color;
             refreshContainerDisplay('component-container_'+id, currentZoom);
         }
 
@@ -171,12 +168,10 @@ var setUpStyleColors = function(){
 
         for (var id in selectedUserComponent.components){
             var innerComponent = selectedUserComponent.components[id];
-            if (!innerComponent.properties.custom){
-                innerComponent.properties.custom = {};
+            if (!innerComponent.properties.overall){
+                innerComponent.properties.overall = {};
             }
-            if (!innerComponent.properties.custom['background-color']){
-                innerComponent.properties.custom['background-color'] = color;
-            }
+            innerComponent.properties.overall['background-color'] = color;
             refreshContainerDisplay('component-container_'+id, currentZoom);
         }
 

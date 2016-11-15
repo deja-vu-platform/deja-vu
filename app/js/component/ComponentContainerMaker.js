@@ -150,10 +150,10 @@ var ComponentContainerMaker = function(){
             refreshContainerDisplay(container.attr('id'), currentZoom);
         });
 
-        var textColor = customStyles['color'] || overallStyles['color'] || '000000';
+        var textColor = customStyles['color'] || '000000'; // TODO
         pickerText.fromString(textColor);
 
-        var bgColor = customStyles['background-color'] ||  overallStyles['background-color'] || 'FFFFFF';
+        var bgColor = customStyles['background-color'] || 'FFFFFF'; // TODO
         pickerBG.fromString(bgColor);
 
 
@@ -167,12 +167,7 @@ var ComponentContainerMaker = function(){
         var properties;
         if (component){
             var html = view.getHTML(type)(component.components[type]);
-            if (!component.properties.custom['color']){
-                component.properties.custom['color'] = selectedUserComponent.properties.custom['color'];
-            }
-            if (!component.properties.custom['background-color']){
-                component.properties.custom['background-color'] = selectedUserComponent.properties.custom['background-color'];
-            }
+            component.properties.overall = selectedUserComponent.properties.custom;
             properties = component.properties;
         } else {
             var html = view.getHTML(type)();

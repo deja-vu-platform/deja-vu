@@ -21,7 +21,7 @@ var BaseComponent = function (type, components, dimensions) {
     baseComponent.objectType = "BaseComponent";
     baseComponent.type = type;
     baseComponent.components = components;
-    baseComponent.properties = {custom:{}};
+    baseComponent.properties = {custom:{}, overall: {}};
     baseComponent.meta = {
         name: '',
         id: generateId(),
@@ -72,7 +72,7 @@ var UserComponent = function (dimensions, name, id, version, author) {
     userComponent.layout = {stackOrder : []}; // componentId: { top: Number (px),
                                                 // left: Number (px),
 
-    userComponent.properties = {custom:{}};
+    userComponent.properties = {custom:{}, overall: {}};
     return userComponent
 };
 
