@@ -22,6 +22,7 @@
 
     "helpers": "file:../../../helpers",
     "gql": "file:../../../gql",
+    "grafo": "file:../../../grafo",
     "mean-loader": "file:../../../core/mean-loader",
     "server-bus": "file:../../../core/server-bus",
     "client-bus": "file:../../../core/client-bus"

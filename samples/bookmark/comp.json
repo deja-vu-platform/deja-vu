@@ -37,7 +37,7 @@
     {
       "fields": [
         {
-          "name": "published",
+          "name": "messages",
           "type": { "name": "Publisher", "fqelement": "dv-messaging-feed" }
         },
         {
@@ -88,7 +88,7 @@
     {
       "fields": [
         {
-          "name": "published",
+          "name": "messages",
           "type": {
             "name": "Publisher", "fqelement": "dv-messaging-feed"
           }

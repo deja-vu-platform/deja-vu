@@ -45,7 +45,7 @@ export class FeedComponent {
           sub(name: "${this.sub.name}") {
             subscriptions {
               name,
-              published {
+              messages {
                 atom_id,
                 content
               }
@@ -56,7 +56,7 @@ export class FeedComponent {
         .flatMap((pubs: Publisher[], unused_ix) => Observable.fromArray(pubs))
         .flatMap(
             (pub: Publisher, unused_ix: number) => {
-              return Observable.fromArray(pub.published);
+              return Observable.fromArray(pub.messages);
             },
             (pub: Publisher, message: Message, unused_pubi: number,
              unused_ci: number) => {

@@ -15,6 +15,7 @@
     "mean-loader": "file:../../../core/mean-loader",
     "helpers": "file:../../../helpers",
     "gql": "file:../../../gql",
+    "grafo": "file:../../../grafo",
     "server-bus": "file:../../../core/server-bus",
     "client-bus": "file:../../../core/client-bus",
     "reflect-metadata": "0.1.2",

@@ -42,11 +42,13 @@ export class AttachComponent {
   private _maybe_attach() {
     if (!this._ready) this._ready = true;
     if (this._ready) {
-      this._attach(this._item, this._labels).subscribe(res => undefined);
+      this
+        ._attach(this._item, this._labels.map(l => l.name))
+        .subscribe(res => undefined);
     }
   }
 
-  private _attach(item: Item, labels: Label[]): any {
+  private _attach(item: Item, labels: string[]): any {
     return this._graphQlService.post(`{
       item(name: "${name}") {
         attach_labels(labels: "${labels}")

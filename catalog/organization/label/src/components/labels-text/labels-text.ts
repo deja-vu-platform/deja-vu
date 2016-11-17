@@ -43,7 +43,7 @@ export class LabelsTextComponent {
           .then((labels: Label[]) => {
             this.item.labels = labels;
             const attach_labels_str = this._graphQlService
-                .plist(_u.map(labels, l => _u.pick(l, "name")));
+                .list(_u.map(labels, l => l.name));
             return this._graphQlService
               .get(`
                 item_by_id(atom_id: "${this.item.atom_id}") {

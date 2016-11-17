@@ -33,9 +33,10 @@ export class Mean {
   ws; //: express.Express;
   comp: any;
   locs: any;
+  debug: boolean;
   private _opts: any;
 
-  constructor(init_db?: (db, debug: boolean) => void) {
+  constructor() {
     this._opts = cli.parse();
     if (this._opts.comppath) {
       this.comp = JSON.parse(fs.readFileSync(this._opts.comppath, "utf8"));
@@ -50,17 +51,8 @@ export class Mean {
       this._opts.dbhost, this._opts.dbport,
       {socketOptions: {autoReconnect: true}});
     this.db = new mongodb.Db(`${this.fqelement}-db`, server, {w: 1});
-    this.db.open((err, db) => {
-      if (err) {
-        console.log("Error opening mongodb");
-        throw err;
-      }
-      if (init_db !== undefined) {
-        console.log(`Initializing db for MEAN ${this.fqelement}`);
-        init_db(db, this._opts.mode === "dev" && this._opts.main);
-      }
-    });
 
+    this.debug = this._opts.mode === "dev" && this._opts.main;
     this.ws = express();
     this.ws.use(morgan("dev"));
   }

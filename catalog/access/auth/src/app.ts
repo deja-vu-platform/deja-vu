@@ -7,22 +7,13 @@ const jwt = require("jsonwebtoken");
 import {Mean} from "mean-loader";
 import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
+import {Grafo} from "grafo";
 
 const uuid = require("uuid");
 
 
-const mean = new Mean(
-  (db, debug) => {
-    db.createCollection("users", (err, users) => {
-      if (err) throw err;
-      console.log("Resetting users collection");
-      users.remove((err, remove_count) => {
-        if (err) throw err;
-        console.log(`Removed ${remove_count} users`);
-      });
-    });
-  }
-);
+const mean = new Mean();
+
 
 const handlers = {
   user: {
@@ -41,82 +32,73 @@ const bus = new ServerBus(
 
 //////////////////////////////////////////////////
 
+const grafo = new Grafo(mean.db);
 
-const user_type = new graphql.GraphQLObjectType({
-  name: "User",
-  fields: () => ({
-    username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+const schema = grafo
+  .add_type({
+    name: "User",
+    fields: {
+      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    }
   })
-});
-
-
-const schema = new graphql.GraphQLSchema({
-  query: new graphql.GraphQLObjectType({
-    name: "Query",
-    fields: () => ({
-      user: {
-        "type": user_type,
-        args: {
-          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: (root, {username}) => {
-          console.log(`getting ${username}`);
-          // const fields = {username: 1, friends: {username: 1}}; TODO: project
-          return mean.db.collection("users").findOne({username: username});
-        }
-      }
-    })
-  }),
-
-  mutation: new graphql.GraphQLObjectType({
-    name: "Mutation",
-    fields: () => ({
-      register: {
-        "type": graphql.GraphQLBoolean,
-        args: {
-          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: (_, {username, password}) => {
-          return Validation.userIsNew(username).then(_ => {
-            // TODO: promisify
-            const hash = bcrypt.hashSync(password, 10);
-            const user = {
-              username: username, password: hash, atom_id: uuid.v4()};
-            return mean.db.collection("users")
-              .insertOne(user)
-              .then(write_res => {
-                if (write_res.insertedCount !== 1) {
-                  throw new Error("Couldn't save new user");
-                }
-
-                // report
-                bus.create_atom("User", username, user);
-                return true;
-              });
-          });
-        }
-      },
-      signIn: {
-        "type": graphql.GraphQLString,
-        args: {
-          username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: (_, {username, password}) => {
-          return Validation.userExists(username).then(user => {
-            // TODO: promisify
-            if (!bcrypt.compareSync(password, user.password)) {
-              throw new Error("Incorrect password");
+  .add_query({
+    name: "user",
+    "type": "User",
+    args: {
+      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    },
+    resolve: (root, {username}) => {
+      console.log(`getting ${username}`);
+      // const fields = {username: 1, friends: {username: 1}}; TODO: project
+      return mean.db.collection("users").findOne({username: username});
+    }
+  })
+  .add_mutation({
+    name: "register",
+    "type": graphql.GraphQLBoolean,
+    args: {
+      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {username, password}) => {
+      return Validation.userIsNew(username).then(_ => {
+        // TODO: promisify
+        const hash = bcrypt.hashSync(password, 10);
+        const user = {
+          username: username, password: hash, atom_id: uuid.v4()};
+        return mean.db.collection("users")
+          .insertOne(user)
+          .then(write_res => {
+            if (write_res.insertedCount !== 1) {
+              throw new Error("Couldn't save new user");
             }
-            const token = jwt.sign(username, "ultra-secret-key");
-            return token;
+
+            // report
+            bus.create_atom("User", username, user);
+            return true;
           });
-        }
-      }
-    })
+      });
+    }
   })
-});
+  .add_mutation({
+    name: "signIn",
+    "type": graphql.GraphQLString,
+    args: {
+      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {username, password}) => {
+      return Validation.userExists(username).then(user => {
+        // TODO: promisify
+        if (!bcrypt.compareSync(password, user.password)) {
+          throw new Error("Incorrect password");
+        }
+        const token = jwt.sign(username, "ultra-secret-key");
+        return token;
+      });
+    }
+  })
+ .schema();
 
 
 namespace Validation {
@@ -141,4 +123,4 @@ namespace Validation {
 
 Helpers.serve_schema(mean.ws, schema);
 
-mean.start();
+grafo.init().then(_ => mean.start());

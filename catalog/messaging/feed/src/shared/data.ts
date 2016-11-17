@@ -13,5 +13,5 @@ export interface Subscriber {
 
 export interface Publisher {
   name: Name;
-  published: Message[];
+  messages: Message[];
 }

@@ -52,6 +52,10 @@ export class GraphQlService {
     return "[" + _u.map(l, i => this.pobj(i)).join(", ") + "]";
   }
 
+  list(l: string[]) {
+    return "[\"" + l.join("\", \"") + "\"]";
+  }
+
   _gql_map(obs: Observable<any>) {
     return obs
       .map(res => res.json())
