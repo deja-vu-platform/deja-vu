@@ -285,8 +285,8 @@ li.selected {
 .inner-component-options-small{
     /*display: none;*/
     position: absolute;
-    top: 2px;
-    right: 2px;
+    top: 0px;
+    right: -25px;
     /*font-size: 15px;*/
 }
 
@@ -593,6 +593,7 @@ li.selected {
     height: 120px;
     width: 180px;
     pointer-events: none;
+    z-index: 1000;
 }
 #mini-nav{
     position: absolute;
