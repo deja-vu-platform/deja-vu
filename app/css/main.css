@@ -283,7 +283,7 @@ li.selected {
 }
 
 .inner-component-options-small{
-    display: none;
+    /*display: none;*/
     position: absolute;
     top: 2px;
     right: 2px;
@@ -654,4 +654,17 @@ li.selected {
 #download-preview-area-container{
     display: none;
     position: absolute;
+}
+
+
+.color-input{
+    width: 80px;
+}
+
+.overall-color-input{
+    align: right;
+}
+
+.text-input{
+    width: 120px;
 }

@@ -75,11 +75,16 @@ var ComponentContainerMaker = function(){
         makeContainerResizable(container, component);
 
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
-            '<button class="btn btn-default dropdown-toggle btn-xs" type="button" data-toggle="dropdown">'+
+            '<button class="btn btn-default dropdown-toggle btn-xs" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
             '<ul class="dropdown-menu">'+
+
             '</ul>'+
             '</div>');
+
+        // optionsDropdown.click(function(){
+        //     container.find('.inner-component-options-small').toggleClass('open');
+        // });
 
         var buttonEdit = $('<li>' +
             '<a href="#" class="edit-btn">' +
@@ -93,6 +98,39 @@ var ComponentContainerMaker = function(){
             container.find('.tooltip').addClass('open');
         });
 
+        var buttonStyle = $('<li class="dropdown-submenu">'+
+                                '<a tabindex="-1" href="#" class="inner-component-style">Style</a>'+
+                                '<ul class="dropdown-menu inner-component-style-dropdown">'+
+                                    '<li class="dropdown-submenu">'+
+                                        '<a tabindex="-1" href="#" class="inner-component-custom-style">Custom</a>'+
+                                        '<ul class="dropdown-menu inner-component-custom-style-dropdown">'+
+                                        '</ul>'+
+                                    '</li>'+
+                                    '<li class="dropdown-submenu">'+
+                                        '<a tabindex="-1" href="#" class="inner-component-premade-style">Premade</a>'+
+                                        '<ul class="dropdown-menu inner-component-premade-style-dropdown">'+
+                                        '</ul>'+
+                                    '</li>'+
+                                '</ul>'+
+                            '</li>');
+
+        buttonStyle.find('.inner-component-style').click(function(e){
+            // container.find('.inner-component-options-small').addClass('open');
+            $(this).parent().addClass('open'); // TODO temporary fix
+            e.stopPropagation();
+        });
+        buttonStyle.find('.inner-component-custom-style').click(function(e){
+            // container.find('.inner-component-options-small').addClass('open');
+            $(this).parent().addClass('open'); // TODO temporary fix
+            e.stopPropagation();
+        });
+        buttonStyle.find('.inner-component-premade-style').click(function(e){
+            // container.find('.inner-component-options-small').addClass('open');
+            $(this).parent().addClass('open'); // TODO temporary fix
+            e.stopPropagation();
+        });
+
+
         var buttonTrash = $('<li>' +
             '<a href="#" class="inner-component-trash">' +
             '<span class="glyphicon glyphicon-trash"></span>' +
@@ -105,7 +143,12 @@ var ComponentContainerMaker = function(){
             deleteComponentFromUserComponentAndFromView(component.meta.id)
         });
 
-        optionsDropdown.find('.dropdown-menu').append(buttonEdit).append('<li class="divider"></li>').append(buttonTrash);
+        optionsDropdown.find('.dropdown-menu')
+            .append(buttonEdit)
+            .append('<li class="divider"></li>')
+            .append(buttonStyle)
+            .append('<li class="divider"></li>')
+            .append(buttonTrash);
         container.append(optionsDropdown);
 
 
@@ -129,22 +172,31 @@ var ComponentContainerMaker = function(){
         //     '<input id="pick-color-bg-input">'+
         //     '</div>');
         var colorOptions = $('<div></div>');
-        var textColorOption = $('<input id="pick-color-inner-text-input">');
-        var bgColorOption = $('<input id="pick-color-inner-bg-input">');
+        var textColorOption = $('<li><div>Text Color: </div></li>');
+        var bgColorOption = $('<li><div>Background Color: </div></li>');
+        var textColorInput = $('<input id="pick-color-inner-text-input" class="color-input">');
+        var bgColorInput = $('<input id="pick-color-inner-bg-input" class="color-input">');
+        textColorOption.append(textColorInput);
+        bgColorOption.append(bgColorInput);
 
-        var pickerText = new jscolor(textColorOption[0]);
+
+        var pickerText = new jscolor(textColorInput[0]);
         pickerText.closable = true;
         pickerText.closeText = 'X';
-        textColorOption.change(function(){
+        textColorInput.change(function(e){
+            // e.stopPropagation();
+            // container.find('.inner-component-options-small').addClass('open');
             var color = pickerText.toHEXString();
             component.properties.custom['color'] = color;
             refreshContainerDisplay(container.attr('id'), currentZoom);
         });
 
-        var pickerBG = new jscolor(bgColorOption[0]);
+        var pickerBG = new jscolor(bgColorInput[0]);
         pickerBG.closable = true;
         pickerBG.closeText = 'X';
-        bgColorOption.change(function(){
+        bgColorInput.change(function(e){
+            // e.stopPropagation();
+            // container.find('.inner-component-options-small').addClass('open');
             var color = pickerBG.toHEXString();
             component.properties.custom['background-color'] = color;
             refreshContainerDisplay(container.attr('id'), currentZoom);
@@ -156,9 +208,9 @@ var ComponentContainerMaker = function(){
         var bgColor = customStyles['background-color'] || 'FFFFFF'; // TODO
         pickerBG.fromString(bgColor);
 
-
-        colorOptions.append(textColorOption).append(bgColorOption);
-        container.find('.config-btns').append(colorOptions);
+        // colorOptions.append(textColorInput).append(bgColorInput);
+        // container.find('.config-btns').append(colorOptions);
+        container.find('.inner-component-custom-style-dropdown').append(textColorOption).append(bgColorOption);
     };
 
     that.setUpContainer = function(container, widget, component, zoom){

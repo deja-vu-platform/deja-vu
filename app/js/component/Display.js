@@ -83,7 +83,7 @@ var Display = function(){
         if (type == 'label'){
             return {height: 40, width: 200}
         }else if (type == 'link'){
-            return {height: 20, width: 100}
+            return {height: 36, width: 100}
         } else {
             return {height: 200, width: 200}
         }

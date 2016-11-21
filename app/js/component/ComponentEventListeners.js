@@ -534,13 +534,23 @@ function showConfigOptions(droppedComponentType, container) {
         container.find('.edit-btn').css('display', 'block');
     }
 
-    var configOptions = $('.default-properties').find('.'+droppedComponentType+'-properties').clone();
+    var labelProperties = $('.default-properties').find('.'+droppedComponentType+'-properties').clone();
 
-    if (configOptions.length==0) {
+    if (labelProperties.length==0) {
         return;
     }
+    var configOptions = labelProperties.find('.config-btns');
 
-    container.prepend(configOptions);
+    configOptions.children().each(function(idx, elt){
+        var li = $('<li class="dropdown-submenu"></li>');
+        li.append($(elt).children());
+        li.find('.dropdown-toggle').click(function(){
+            $(li).addClass('open'); // TODO temporary fix!
+        });
+        container.find('.inner-component-premade-style-dropdown').append(li);
+    });
+    container.find('.inner-component-style-dropdown').append(configOptions);
+    // container.prepend(configOptions);
 }
 
 

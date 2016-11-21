@@ -154,11 +154,11 @@
             <div class="content dropdown-target" data-dropdownid="style-color">
                 <div>
                     <span>Text</span>
-                    <input id="pick-color-text-input">
+                    <input  type="text" id="pick-color-text-input" class="color-input overall-color-input">
                 </div>
                 <div>
                     <span>Background</span>
-                    <input id="pick-color-bg-input">
+                    <input  type="text" id="pick-color-bg-input" class="color-input overall-color-input">
                 </div>
             </div>
         </div>
@@ -172,16 +172,16 @@
             <div class="content dropdown-target" data-dropdownid="style-text">
                 <div>
                     <span>Font family</span>
-                    <input type="text">
+                    <input type="text" class="text-input overall-text-input">
                     <!--Do a dropdown-->
                 </div>
                 <div>
                     <span>Font Size (px)</span>
-                    <input type="text">
+                    <input type="text" class="text-input overall-text-input">
                 </div>
                 <div>
                     <span>Font Weight</span>
-                    <input type="text">
+                    <input type="text" class="text-input overall-text-input">
                 </div>
             </div>
         </div>
@@ -298,7 +298,7 @@
 
     <div class="link-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-tint"></span> Style
                     <span class="caret"></span>
@@ -314,8 +314,8 @@
                     <li><a href="#" class="btn-style-warning">Warning</a></li>
                     <li><a href="#" class="btn-style-danger">Danger</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-text-size"></span> Size
                     <span class="caret"></span>
@@ -325,7 +325,7 @@
                     <li><a href="#" class="btn-size-df">Default</a></li>
                     <li><a href="#" class="btn-size-lg">Large</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -350,7 +350,7 @@
 
     <div class="label-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-indent-left"></span> Align
                     <span class="caret"></span>
@@ -361,8 +361,8 @@
                     <li><a href="#" class="align-left">Left</a></li>
                     <li><a href="#" class="align-justify">Justify</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-text-size"></span> Size
                     <span class="caret"></span>
@@ -373,8 +373,8 @@
                     <li><a href="#" class="lbl-large">Large</a></li>
                     <li><a href="#" class="lbl-heading">H1</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-text-color"></span> Color
                     <span class="caret"></span>
@@ -388,7 +388,7 @@
                     <li><a href="#" class="lbl-text-warning">Warning</a></li>
                     <li><a href="#" class="lbl-text-danger">Danger</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -467,7 +467,7 @@
 
     <div class="tab-viewer-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-th-list"></span> Alignment
                     <span class="caret"></span>
@@ -476,8 +476,8 @@
                     <li><a href="#" class="tab-align-stacked">Stacked</a></li>
                     <li><a href="#" class="tab-align-horizontal">Horizontal</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-tint"></span> Style
                     <span class="caret"></span>
@@ -486,7 +486,7 @@
                     <li><a href="#" class="tab-style-pills">Pills</a></li>
                     <li><a href="#" class="tab-style-tabs">Tabs</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -532,7 +532,7 @@
 
     <div class="menu-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-th-list"></span> Alignment
                     <span class="caret"></span>
@@ -541,7 +541,7 @@
                     <li><a href="#" class="menu-horizontal">Horizontal</a></li>
                     <li><a href="#" class="menu-vertical">Stacked</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -569,7 +569,7 @@
 
     <div class="panel-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-indent-left"></span> Align
                     <span class="caret"></span>
@@ -580,8 +580,8 @@
                     <li><a href="#" class="align-left">Left</a></li>
                     <li><a href="#" class="align-justify">Justify</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-text-size"></span> Size
                     <span class="caret"></span>
@@ -592,8 +592,8 @@
                     <li><a href="#" class="lbl-large">Large</a></li>
                     <li><a href="#" class="lbl-heading">H1</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-tint"></span> Style
                     <span class="caret"></span>
@@ -606,7 +606,7 @@
                     <li><a href="#" class="panel-text-warning">Warning</a></li>
                     <li><a href="#" class="panel-text-danger">Danger</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
