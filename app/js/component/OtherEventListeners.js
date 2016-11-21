@@ -611,7 +611,7 @@ function propagateRatioChangeToAllElts(newRatio){
     });
 
     miniNav.updateNavInnerComponentSizes(newRatio);
-    workSurface.setUpGrid();
+    setUpGrid();
 }
 
 function addDeleteUserComponentButton(userComponentId){
