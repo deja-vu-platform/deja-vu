@@ -46,6 +46,7 @@ function loadTablePreview(componentToShow) {
     });
     page.css({
         position: 'relative',
+        'background-color': (componentToShow.properties.custom['background-color'] || '87CEFA')
     });
 
     $('#page-preview').append(page);

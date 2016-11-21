@@ -113,7 +113,7 @@ var setUpStyleColors = function(){
     var pickerText = $('#pick-color-text-input')[0]._jscLinkedInstance;
     pickerText.fromString('000000');
     var pickerBG = $('#pick-color-bg-input')[0]._jscLinkedInstance;
-    pickerBG.fromString('FFFFFF');
+    pickerBG.fromString('87CEFA');
 
     if (selectedUserComponent.properties.custom) {
         var overallStyles = selectedUserComponent.properties.custom;

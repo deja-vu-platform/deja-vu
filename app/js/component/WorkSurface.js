@@ -89,9 +89,12 @@ var WorkSurface = function(){
             minHeight: 0,
             minWidth: 0,
             start: function(){
-                var numComponents = selectedUserComponent.layout.stackOrder.length;
-                var minWidth = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().left;
-                var minHeight = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().top;
+                // var numComponents = selectedUserComponent.layout.stackOrder.length;
+                // var minWidth = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().left;
+                // var minHeight = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().top;
+                var minWidth = $('.grid-cell:last').position().left;
+                var minHeight = $('.grid-cell:last').position().top;
+
                 $(this).resizable('option', 'minWidth', minWidth);
                 $(this).resizable('option', 'minHeight', minHeight);
             },
