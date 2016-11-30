@@ -526,32 +526,6 @@ function triggerEdit(container, popup) {
     }
 }
 
-function showConfigOptions(droppedComponentType, container) {
-    // Hide edit button if label or panel
-    if (droppedComponentType=='label' || droppedComponentType=='panel') {
-        container.find('.edit-btn').css('display', 'none');
-    } else {
-        container.find('.edit-btn').css('display', 'block');
-    }
-
-    var labelProperties = $('.default-properties').find('.'+droppedComponentType+'-properties').clone();
-
-    if (labelProperties.length==0) {
-        return;
-    }
-    var configOptions = labelProperties.find('.config-btns');
-
-    configOptions.children().each(function(idx, elt){
-        var li = $('<li class="dropdown-submenu"></li>');
-        li.append($(elt).children());
-        li.find('.dropdown-toggle').click(function(){
-            $(li).addClass('open'); // TODO temporary fix!
-        });
-        container.find('.inner-component-premade-style-dropdown').append(li);
-    });
-    container.find('.inner-component-style-dropdown').append(configOptions);
-    // container.prepend(configOptions);
-}
 
 
 function registerTooltipBtnHandlers() {

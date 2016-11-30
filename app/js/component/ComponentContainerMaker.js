@@ -65,26 +65,28 @@ var ComponentContainerMaker = function(){
         });
     };
 
-    that.createComponentContainer = function(component, zoom) {
-        var container = $('<div></div>');
-        var containerId = 'component-container_'+component.meta.id;
-        container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
-        container.height(component.dimensions.height * zoom).width(component.dimensions.width * zoom);
-        container.data('componentId', component.meta.id);
+    var toggleOpenClose = function(e, parent){
+        var shouldBeOpen = (!parent.hasClass('open')); // TODO temporary fix
+        $(parent).parent().find('*').removeClass('open');
+        if (shouldBeOpen){
+            parent.addClass('open'); // TODO temporary fix
+        }
+        //
+        // if (!$(parent).hasClass('open')){ // if closed just now
+        //     $(parent).find('*').removeClass('open');
+        // }
+        e.stopPropagation();
+    };
 
-        makeContainerResizable(container, component);
 
+    var createEditOptions = function(component, container){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
-            '<button class="btn btn-default dropdown-toggle btn-xs" type="button"  data-toggle="dropdown">'+
+            '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
             '<ul class="dropdown-menu">'+
 
             '</ul>'+
             '</div>');
-
-        // optionsDropdown.click(function(){
-        //     container.find('.inner-component-options-small').toggleClass('open');
-        // });
 
         var buttonEdit = $('<li>' +
             '<a href="#" class="edit-btn">' +
@@ -95,6 +97,7 @@ var ComponentContainerMaker = function(){
         buttonEdit.attr('id', 'edit-btn' + '_' + component.meta.id);
 
         buttonEdit.on("click", function (e) {
+            e.stopPropagation();
             container.find('.tooltip').addClass('open');
         });
 
@@ -114,20 +117,18 @@ var ComponentContainerMaker = function(){
                                 '</ul>'+
                             '</li>');
 
+
+        optionsDropdown.find('.inner-component-options-dropdown').click(function(e){
+            toggleOpenClose(e, $(this).parent());
+        });
         buttonStyle.find('.inner-component-style').click(function(e){
-            // container.find('.inner-component-options-small').addClass('open');
-            $(this).parent().addClass('open'); // TODO temporary fix
-            e.stopPropagation();
+            toggleOpenClose(e, $(this).parent());
         });
         buttonStyle.find('.inner-component-custom-style').click(function(e){
-            // container.find('.inner-component-options-small').addClass('open');
-            $(this).parent().addClass('open'); // TODO temporary fix
-            e.stopPropagation();
+            toggleOpenClose(e, $(this).parent());
         });
         buttonStyle.find('.inner-component-premade-style').click(function(e){
-            // container.find('.inner-component-options-small').addClass('open');
-            $(this).parent().addClass('open'); // TODO temporary fix
-            e.stopPropagation();
+            toggleOpenClose(e, $(this).parent());
         });
 
 
@@ -149,10 +150,19 @@ var ComponentContainerMaker = function(){
             .append(buttonStyle)
             .append('<li class="divider"></li>')
             .append(buttonTrash);
-        container.append(optionsDropdown);
 
+        return optionsDropdown;
+    };
 
+    that.createComponentContainer = function(component, zoom) {
+        var container = $('<div></div>');
+        var containerId = 'component-container_'+component.meta.id;
+        container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
+        container.height(component.dimensions.height * zoom).width(component.dimensions.width * zoom);
+        container.data('componentId', component.meta.id);
 
+        makeContainerResizable(container, component);
+        container.append(createEditOptions(component, container));
         return container;
     };
 
@@ -162,16 +172,6 @@ var ComponentContainerMaker = function(){
         }
 
         var customStyles = component.properties.custom;
-        var overallStyles = selectedUserComponent.properties.custom;
-        // var colorOptions = $('<div>'+
-        //     '<span>Text</span>'+
-        //     '<input id="pick-color-text-input">'+
-        //     '</div>'+
-        //     '<div>'+
-        //     '<span>Background</span>'+
-        //     '<input id="pick-color-bg-input">'+
-        //     '</div>');
-        var colorOptions = $('<div></div>');
         var textColorOption = $('<li><div>Text Color: </div></li>');
         var bgColorOption = $('<li><div>Background Color: </div></li>');
         var textColorInput = $('<input id="pick-color-inner-text-input" class="color-input">');
@@ -212,6 +212,38 @@ var ComponentContainerMaker = function(){
         // container.find('.config-btns').append(colorOptions);
         container.find('.inner-component-custom-style-dropdown').append(textColorOption).append(bgColorOption);
     };
+
+    var showConfigOptions = function(droppedComponentType, container) {
+        // Hide edit button if label or panel
+        if (droppedComponentType=='label' || droppedComponentType=='panel') {
+            container.find('.edit-btn').css('display', 'none');
+        } else {
+            container.find('.edit-btn').css('display', 'block');
+        }
+
+        var labelProperties = $('.default-properties').find('.'+droppedComponentType+'-properties').clone();
+
+        if (labelProperties.length==0) {
+            return;
+        }
+        var configOptions = labelProperties.find('.config-btns');
+
+        configOptions.children().each(function(idx, elt){
+            var li = $('<li class="dropdown-submenu"></li>');
+            li.append($(elt).children());
+            li.find('.dropdown-toggle').click(function(e){
+                var thisLi = li;
+                toggleOpenClose(e, thisLi);
+            });
+            li.find('.premade-style').click(function(e){
+                e.stopPropagation();
+            });
+
+            container.find('.inner-component-premade-style-dropdown').append(li);
+        });
+        container.find('.inner-component-style-dropdown').append(configOptions);
+    };
+
 
     that.setUpContainer = function(container, widget, component, zoom){
         container.append(widget);
