@@ -582,7 +582,7 @@ function registerTooltipBtnHandlers() {
                 }
             }
             var componentId = getComponentIdFromContainerId(cellId);
-            selectedUserComponent.components[componentId].properties[propertyName] = bootstrapClass;
+            selectedUserComponent.components[componentId].properties.bsClasses[propertyName] = bootstrapClass;
 
         }
     }

@@ -175,6 +175,16 @@ var setUpStyleColors = function(){
         }
 
     });
+
+    $('#reset-overall-color').click(function(){
+        selectedUserComponent.properties.custom = {};
+        setUpStyleColors();
+        for (var id in selectedUserComponent.components){
+            var innerComponent = selectedUserComponent.components[id];
+            innerComponent.properties.overall = {};
+            refreshContainerDisplay('component-container_'+id, currentZoom);
+        }
+    });
 })();
 
 

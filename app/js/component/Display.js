@@ -164,34 +164,25 @@ var Display = function(){
 
         //// TODO SKETCHY!!!
         if (properties){
-            if (Object.keys(properties).length>0){
+            if (Object.keys(properties.overall).length>0){
+                for (var customProperty in properties.overall){
+                    displayComponent.css(customProperty, properties.overall[customProperty]);
+                }
+            }
+            if (Object.keys(properties.bsClasses).length>0){ // bootstrap classes
                 var classes = '';
-                for (var propertyName in properties){
-                    //displayComponent.addClass(properties[propertyName]);
-                    if (propertyName == 'custom' || propertyName == 'overall'){
-                        continue;
-                    }
-                    classes = classes+' '+properties[propertyName];
+                for (var propertyName in properties.bsClasses){
+                    classes = classes+' '+properties.bsClasses[propertyName];
                 }
                 classes.trim();
-
                 displayComponent.removeClass();
-                displayComponent.addClass(classes).addClass(defaultDisplayClasses[type]);
+                displayComponent.addClass(classes).addClass(defaultDisplayClasses[type]); // TODO what's going on here?
             }
-            if (properties.overall){
-                if (Object.keys(properties.overall).length>0){
-                    for (var customProperty in properties.overall){
-                        displayComponent.css(customProperty, properties.overall[customProperty]);
-                    }
+            if (Object.keys(properties.custom).length>0){
+                for (var customProperty in properties.custom){
+                    displayComponent.css(customProperty, properties.custom[customProperty]);
                 }
-            }
-            if (properties.custom){
-                if (Object.keys(properties.custom).length>0){
-                    for (var customProperty in properties.custom){
-                        displayComponent.css(customProperty, properties.custom[customProperty]);
-                    }
 
-                }
             }
         }
     };

@@ -106,6 +106,10 @@ var ComponentContainerMaker = function(){
                                         '<ul class="dropdown-menu inner-component-premade-style-dropdown">'+
                                         '</ul>'+
                                     '</li>'+
+                                    '<li class="divider"></li>'+
+                                    '<li>' +
+                                        '<a tabindex="-1" href="#" class="inner-component-delete-style">Clear Styles</a>'+
+                                    '</li>'+
                                 '</ul>'+
                             '</li>');
 
@@ -130,11 +134,18 @@ var ComponentContainerMaker = function(){
 
         optionsDropdown.find('.inner-component-options-dropdown, .inner-component-style,' +
             ' .inner-component-custom-style, .inner-component-premade-style').each(function(idx, elt){
-            console.log(elt);
             $(elt).click(function(e){
                 var thisElt = elt;
                 toggleOpenClose(e, $(thisElt).parent());
             });
+        });
+
+        buttonStyle.find('.inner-component-delete-style').click(function(e){
+            e.stopPropagation();
+            component.properties.custom = {};
+            component.properties.bsClasses = {};
+            refreshContainerDisplay(container.attr('id'), currentZoom);
+
         });
 
         buttonEdit.on("click", function (e) {
