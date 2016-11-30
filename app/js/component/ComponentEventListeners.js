@@ -812,8 +812,10 @@ function refreshContainerDisplay(containerId, zoom){
         view.removeDisplay(container);
         var properties = componentToChange.properties;
 
-        // display itself gets rid of padding for the #display-cell
-        view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
+
+        view.displayComponent(componentToChange, container, zoom);
+
+        // view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
     } else {

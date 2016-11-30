@@ -75,8 +75,8 @@ var Display = function(){
                     '<h3 contenteditable="true" class="panel-title">' + value.heading + '</h3>' +
                     '</div><div contenteditable="true" class="panel-body">' + value.content + '</div></div>';
             },
-            'user': function(){
-                return '<div class="empty display-component"></div>';
+            'blank': function(){
+                return '<div class="blank display-component"></div>';
             }
         };
         return defaultHTML[type];
@@ -87,7 +87,7 @@ var Display = function(){
             return {height: 40, width: 200}
         }else if (type == 'link'){
             return {height: 36, width: 100}
-        } else if (type == 'user'){
+        } else if (type == 'blank'){
             return {height: 300, width: 300}
         } else {
             return {height: 200, width: 200}
@@ -172,6 +172,12 @@ var Display = function(){
                     height: 'auto',
                     width: 'auto',
                     'vertical-align':'top',
+                    zoom: zoom,
+                });
+            } else if (type === 'blank') {
+                displayComponent.css({
+                    width: '100%',
+                    height: '100%',
                     zoom: zoom,
                 });
             } else {
