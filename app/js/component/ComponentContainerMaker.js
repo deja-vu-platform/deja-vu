@@ -174,6 +174,44 @@ var ComponentContainerMaker = function(){
         return container;
     };
 
+    var setUpTextOptions = function(container, component){
+        if (!component.properties.custom){
+            component.properties.custom = {}
+        }
+
+        var fontSizeOption = $('<li><div>Font Size: </div></li>');
+        var fontWeightOption = $('<li><div>Font Weight: </div></li>');
+        var fontSizeInput = $('<input class="font-size-input">');
+        var fontWeightInput = $('<input class="font-weight-input">');
+        var fontSizeSetButton = $('<button class="btn font-size-set-button">Set</button>');
+        var fontWeightSetButton = $('<button class="btn font-size-set-button">Set</button>');
+
+        fontSizeOption.append(fontSizeInput).append(fontSizeSetButton);
+        fontWeightOption.append(fontWeightInput).append(fontWeightSetButton);
+        container.find('.inner-component-custom-style-dropdown').append(fontSizeOption).append(fontWeightOption);
+
+
+        fontSizeSetButton.click(function(){
+            var value = fontSizeInput.val();
+            if (!isNaN(parseInt(value))){
+                component.properties.custom['font-size'] = value + 'px';
+                refreshContainerDisplay(container.attr('id'), currentZoom);
+
+            }
+
+        });
+
+        fontWeightSetButton.click(function(){
+            var value = fontWeightInput.val();
+            if (!isNaN(parseInt(value))){
+                component.properties.custom['font-weight'] = value;
+                refreshContainerDisplay(container.attr('id'), currentZoom);
+
+            }
+        });
+
+    };
+
     var setUpColorOptions = function(container, component){
         if (!component.properties.custom){
             component.properties.custom = {}
@@ -182,8 +220,8 @@ var ComponentContainerMaker = function(){
         var customStyles = component.properties.custom;
         var textColorOption = $('<li><div>Text Color: </div></li>');
         var bgColorOption = $('<li><div>Background Color: </div></li>');
-        var textColorInput = $('<input id="pick-color-inner-text-input" class="color-input">');
-        var bgColorInput = $('<input id="pick-color-inner-bg-input" class="color-input">');
+        var textColorInput = $('<input class="color-input">');
+        var bgColorInput = $('<input class="color-input">');
         textColorOption.append(textColorInput);
         bgColorOption.append(bgColorInput);
 
@@ -192,7 +230,7 @@ var ComponentContainerMaker = function(){
         pickerText.closable = true;
         pickerText.closeText = 'X';
         textColorInput.change(function(e){
-            // e.stopPropagation();
+            e.stopPropagation();
             // container.find('.inner-component-options-small').addClass('open');
             var color = pickerText.toHEXString();
             component.properties.custom['color'] = color;
@@ -203,7 +241,7 @@ var ComponentContainerMaker = function(){
         pickerBG.closable = true;
         pickerBG.closeText = 'X';
         bgColorInput.change(function(e){
-            // e.stopPropagation();
+            e.stopPropagation();
             // container.find('.inner-component-options-small').addClass('open');
             var color = pickerBG.toHEXString();
             component.properties.custom['background-color'] = color;
@@ -267,6 +305,7 @@ var ComponentContainerMaker = function(){
         view.displayInnerComponent(container, type, html, zoom, properties);
         showConfigOptions(type, container);
         setUpColorOptions(container, component);
+        setUpTextOptions(container, component);
 
     };
 

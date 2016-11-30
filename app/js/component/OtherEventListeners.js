@@ -127,6 +127,19 @@ var setUpStyleColors = function(){
     }
 };
 
+var setOverallStyleAndUpdateView = function(styleName, styleValue){
+    selectedUserComponent.properties.custom[styleName] = styleValue;
+
+    for (var id in selectedUserComponent.components){
+        var innerComponent = selectedUserComponent.components[id];
+        if (!innerComponent.properties.overall){
+            innerComponent.properties.overall = {};
+        }
+        innerComponent.properties.overall[styleName] = styleValue;
+        refreshContainerDisplay('component-container_'+id, currentZoom);
+    }
+
+};
 
 (function(){
     var inputText = $('#pick-color-text-input');
@@ -138,17 +151,7 @@ var setUpStyleColors = function(){
             selectedUserComponent.properties.custom = {}
         }
         var color = pickerText.toHEXString();
-        selectedUserComponent.properties.custom['color'] = color;
-
-        for (var id in selectedUserComponent.components){
-            var innerComponent = selectedUserComponent.components[id];
-            if (!innerComponent.properties.overall){
-                innerComponent.properties.overall = {};
-            }
-            innerComponent.properties.overall['color'] = color;
-            refreshContainerDisplay('component-container_'+id, currentZoom);
-        }
-
+        setOverallStyleAndUpdateView('color', color);
     });
 
     var inputBG = $('#pick-color-bg-input');
@@ -160,20 +163,7 @@ var setUpStyleColors = function(){
             selectedUserComponent.properties.custom = {}
         }
         var color = pickerBG.toHEXString();
-        selectedUserComponent.properties.custom['background-color'] = color;
-        $('#work-surface_'+selectedUserComponent.meta.id).css({
-            'background-color': color,
-        });
-
-        for (var id in selectedUserComponent.components){
-            var innerComponent = selectedUserComponent.components[id];
-            if (!innerComponent.properties.overall){
-                innerComponent.properties.overall = {};
-            }
-            innerComponent.properties.overall['background-color'] = color;
-            refreshContainerDisplay('component-container_'+id, currentZoom);
-        }
-
+        setOverallStyleAndUpdateView('background-color', color);
     });
 
     $('#reset-overall-color').click(function(){
@@ -187,6 +177,22 @@ var setUpStyleColors = function(){
     });
 })();
 
+(function(){
+    $('.overall-text-size-input-set').click(function(){
+        var value = $('.overall-text-size-input').val();
+        if (!isNaN(parseInt(value))){
+            setOverallStyleAndUpdateView('font-size', value + 'px');
+        }
+    });
+
+    $('.overall-text-weight-input-set').click(function(){
+        var value = $('.overall-text-weight-input').val();
+        if (!isNaN(parseInt(value))){
+            setOverallStyleAndUpdateView('font-weight', value);
+        }
+    });
+
+})();
 
 
 /** **/
