@@ -94,6 +94,21 @@ var Display = function(){
         }
     };
 
+    that.displayComponent = function(component, container, zoom){
+
+        if (component.type == 'user'){
+            component.layout.stackOrder.forEach(function(innerComponentId){
+                var innerComponent = component.components[innerComponentId];
+                var innerContainer = container.find('#component-container_'+innerComponentId);
+                that.displayComponent(innerComponent, innerContainer, zoom);
+            });
+        } else {
+            var html = view.getHTML(component.type)(component.components[component.type]);
+            var properties = component.properties;
+            that.displayInnerComponent(container, component.type, html, zoom, properties);
+        }
+    };
+
     that.displayInnerComponent = function(container, type, html, zoom, properties, callback) {
         var displayElement = $(html);
         container.prepend(displayElement);

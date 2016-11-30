@@ -162,6 +162,31 @@ var ComponentContainerMaker = function(){
     };
 
 
+
+    var createUneditableComponentContainer = function(component, zoom){
+        var container = $('<div></div>');
+        var containerId = 'component-container_'+component.meta.id;
+        container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
+        container.height(component.dimensions.height * zoom).width(component.dimensions.width * zoom);
+        container.data('componentId', component.meta.id);
+        if (component.type == 'user'){
+            component.layout.stackOrder.forEach(function(innerComponentId){
+                var innerComponent = component.components[innerComponentId];
+                var type = innerComponent.type;
+                var componentContainer = createUneditableComponentContainer(innerComponent, zoom);
+                var widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                widget.addClass('associated').data('componentId', innerComponentId);
+                componentContainer.css({
+                    position: 'absolute',
+                    left: component.layout[innerComponentId].left,
+                    top: component.layout[innerComponentId].top,
+                });
+                container.append(componentContainer);
+            });
+        }
+        return container;
+    };
+
     that.createComponentContainer = function(component, zoom) {
         var container = $('<div></div>');
         var containerId = 'component-container_'+component.meta.id;
@@ -173,7 +198,7 @@ var ComponentContainerMaker = function(){
             component.layout.stackOrder.forEach(function(innerComponentId){
                 var innerComponent = component.components[innerComponentId];
                 var type = innerComponent.type;
-                var componentContainer = componentContainerMaker.createComponentContainer(innerComponent, zoom);
+                var componentContainer = createUneditableComponentContainer(innerComponent, zoom);
                 var widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
                 widget.addClass('associated').data('componentId', innerComponentId);
 
@@ -314,13 +339,14 @@ var ComponentContainerMaker = function(){
         var type = widget.data('type');
         var properties;
         if (component){
-            var html = view.getHTML(type)(component.components[type]);
+            // var html = view.getHTML(type)(component.components[type]);
             component.properties.overall = selectedUserComponent.properties.custom;
-            properties = component.properties;
+            // properties = component.properties;
+            view.displayComponent(component, container, zoom);
         } else {
             var html = view.getHTML(type)();
+            view.displayInnerComponent(container, type, html, zoom, properties);
         }
-        view.displayInnerComponent(container, type, html, zoom, properties);
         showConfigOptions(type, container);
         setUpColorOptions(container, component);
         setUpTextOptions(container, component);
