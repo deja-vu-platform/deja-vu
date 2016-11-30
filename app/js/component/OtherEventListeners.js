@@ -11,8 +11,6 @@ var addedCliches;
 var navZoom = .1;
 var navDragging = false;
 
-var innerComponentFocused = false;
-
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
 
@@ -42,26 +40,6 @@ $('#build-mode').click(function(){
     $('.components').css({
         display: 'block',
     });
-    $('.layout').css({
-        display: 'none',
-    });
-    $('.style').css({
-        display: 'none',
-    });
-});
-
-$('#layout-mode').click(function(){
-   if ($(this).hasClass('active')){
-       return;
-   }
-   $(this).parent().find('.active').removeClass('active');
-   $(this).addClass('active');
-    $('.layout').css({
-        display: 'block',
-    });
-    $('.components').css({
-        display: 'none',
-    });
     $('.style').css({
         display: 'none',
     });
@@ -75,9 +53,6 @@ $('#style-mode').click(function(){
     $(this).addClass('active');
     $('.style').css({
         display: 'block',
-    });
-    $('.layout').css({
-        display: 'none',
     });
     $('.components').css({
         display: 'none',
@@ -116,6 +91,7 @@ function resizeViewportToFitWindow(){
 
 window.addEventListener("resize", function(){
     resizeViewportToFitWindow();
+    window.setTimeout(resizeViewportToFitWindow, 100);
 });
 
 
@@ -132,384 +108,91 @@ function showClicheInList(id, name){
 // http://jscolor.com/examples/
 
 
-// TODO this needs to be revamped entirely
 var setUpStyleColors = function(){
-    var picker = $('#pick-color-text-input')[0]._jscLinkedInstance;
-    picker.fromString('000000');
+    var pickerText = $('#pick-color-text-input')[0]._jscLinkedInstance;
+    pickerText.fromString('000000');
+    var pickerBG = $('#pick-color-bg-input')[0]._jscLinkedInstance;
+    pickerBG.fromString('87CEFA');
 
-    if (selectedUserComponent.layout) {
-        if (selectedUserComponent.layout.overallStyles) {
-            var overallStyles = selectedUserComponent.layout.overallStyles;
-            var textColor = overallStyles['color'] || '';
-            picker.fromString(textColor);
+    if (selectedUserComponent.properties.custom) {
+        var overallStyles = selectedUserComponent.properties.custom;
+        var textColor = overallStyles['color'] || '';
+        pickerText.fromString(textColor);
 
-            // var bgColor = overallStyles['background-color'] || '';
-            // $('#pick-color-bg-input').val(bgColor).css({
-            //     'background-color': bgColor
-            // });
-
-        }
+        var bgColor = overallStyles['background-color'] || '';
+        pickerBG.fromString(bgColor);
+        $('#work-surface_'+selectedUserComponent.meta.id).css({
+            'background-color': bgColor,
+        });
     }
 };
 
+var setOverallStyleAndUpdateView = function(styleName, styleValue){
+    selectedUserComponent.properties.custom[styleName] = styleValue;
+
+    for (var id in selectedUserComponent.components){
+        var innerComponent = selectedUserComponent.components[id];
+        if (!innerComponent.properties.overall){
+            innerComponent.properties.overall = {};
+        }
+        innerComponent.properties.overall[styleName] = styleValue;
+        refreshContainerDisplay('component-container_'+id, currentZoom);
+    }
+
+};
 
 (function(){
-    var input = $('#pick-color-text-input');
-    var picker = new jscolor(input[0]);
-    picker.closable = true;
-    picker.closeText = 'X';
-    input.change(function(){
-        if (!selectedUserComponent.layout.overallStyles){
-            selectedUserComponent.layout.overallStyles = {}
+    var inputText = $('#pick-color-text-input');
+    var pickerText = new jscolor(inputText[0]);
+    pickerText.closable = true;
+    pickerText.closeText = 'X';
+    inputText.change(function(){
+        if (!selectedUserComponent.properties.custom){
+            selectedUserComponent.properties.custom = {}
         }
-        var color = picker.toHEXString();
-        selectedUserComponent.layout.overallStyles['color'] = color;
+        var color = pickerText.toHEXString();
+        setOverallStyleAndUpdateView('color', color);
+    });
 
+    var inputBG = $('#pick-color-bg-input');
+    var pickerBG = new jscolor(inputBG[0]);
+    pickerBG.closable = true;
+    pickerBG.closeText = 'X';
+    inputBG.change(function(){
+        if (!selectedUserComponent.properties.custom){
+            selectedUserComponent.properties.custom = {}
+        }
+        var color = pickerBG.toHEXString();
+        setOverallStyleAndUpdateView('background-color', color);
+    });
+
+    $('#reset-overall-color').click(function(){
+        selectedUserComponent.properties.custom = {};
+        setUpStyleColors();
         for (var id in selectedUserComponent.components){
             var innerComponent = selectedUserComponent.components[id];
-            if (!innerComponent.properties.custom){
-                innerComponent.properties.custom = {};
-            }
-            innerComponent.properties.custom['color'] = color;
+            innerComponent.properties.overall = {};
             refreshContainerDisplay('component-container_'+id, currentZoom);
         }
-
     });
 })();
 
-
-
-////http://www.webdesignerdepot.com/2013/03/how-to-create-a-color-picker-with-html5-canvas/
-// The color picker
-var colorPickerCanvas = document.getElementById('color-picker').getContext('2d');
-
-// create an image object and get it’s source
-var img = new Image();
-img.src = 'images/colorpicker.png';
-//$(img).css({
-//    width: '100px',
-//    height: 'auto'
-//});
-
-// copy the image to the colorPickerCanvas
-$(img).load(function(){
-    colorPickerCanvas.drawImage(img,0,0);
-});
-
-// http://www.javascripter.net/faq/rgbtohex.htm
-function rgbToHex(R,G,B) {return toHex(R)+toHex(G)+toHex(B)}
-function toHex(n) {
-    n = parseInt(n,10);
-    if (isNaN(n)) return "00";
-    n = Math.max(0,Math.min(n,255));
-    return "0123456789ABCDEF".charAt((n-n%16)/16)  + "0123456789ABCDEF".charAt(n%16);
-}
-$('#color-picker').click(function(event){
-    // getting user coordinates
-    var x = event.pageX - $(this).offset().left;
-    var y = event.pageY - $(this).offset().top;
-
-    // getting image data and RGB values
-    var img_data = colorPickerCanvas.getImageData(x, y, 1, 1).data;
-    var R = img_data[0];
-    var G = img_data[1];
-    var B = img_data[2];  var rgb = R + ',' + G + ',' + B;
-    // convert RGB to HEX
-    var hex = rgbToHex(R,G,B);
-    // making the color the value of the input
-    //$('#rgb input').val(rgb).css({
-    //    'background-color': '#' + hex,
-    //});
-    //$('#hex input').val('#' + hex).css({
-    //    'background-color': '#' + hex,
-    //});
-
-    if (whoseColorToChange == 'text'){
-        $('#pick-color-text-input').val('#' + hex).css({
-            'background-color': '#' + hex,
-        });
-    } else if (whoseColorToChange == 'bg'){
-        $('#pick-color-bg-input').val('#' + hex).css({
-            'background-color': '#' + hex,
-        });
-    }
-
-
-    $('#color-picker-container').hide();
-});
-
-var whoseColorToChange = '';
-
-$('.pick-color').click(function(){
-    if (this.id == 'pick-color-text'){
-        whoseColorToChange = 'text';
-    } else if (this.id == 'pick-color-bg'){
-        whoseColorToChange = 'bg';
-    }
-    $('#color-picker-container').show();
-});
-
-$('#color-picker-dismiss').click(function(){
-    $('#color-picker-container').hide();
-});
-
-$('.set-color').click(function(){
-    if (this.id == 'set-color-text'){
-        whoseColorToChange = 'text';
-    } else if (this.id == 'set-color-bg'){
-        whoseColorToChange = 'bg';
-    }
-
-    if (innerComponentFocused){
-        var rowcol = getRowColFromId($('#display-cell').data('cellid'));
-        var row = rowcol.row;
-        var col = rowcol.col;
-        if (whoseColorToChange == 'text'){
-            var color = $('#pick-color-text-input').val();
-            if (color == ''){
-                return;
-            }
-            $('#pick-color-text-input').css({
-                'background-color': color,
-            });
-
-
-            $('#cell'+'_'+row+'_'+col+' .display-component').css({
-                color: color,
-            });
-
-            var innerComponent = selectedUserComponent.components[row][col];
-            if (!innerComponent.properties.custom){
-                innerComponent.properties.custom = {};
-            }
-            innerComponent.properties.custom['color'] = color;
-        } else if (whoseColorToChange == 'bg'){
-            var color = $('#pick-color-bg-input').val();
-            if (color == ''){
-                return;
-            }
-            $('#pick-color-bg-input').css({
-                'background-color': color,
-            });
-            $('#cell'+'_'+row+'_'+col+' .display-component').css({
-                'background-color': color,
-            });
-            var innerComponent = selectedUserComponent.components[row][col];
-            if (!innerComponent.properties.custom){
-                innerComponent.properties.custom = {};
-            }
-            innerComponent.properties.custom['background-color'] = color;
+(function(){
+    $('.overall-text-size-input-set').click(function(){
+        var value = $('.overall-text-size-input').val();
+        if (!isNaN(parseInt(value))){
+            setOverallStyleAndUpdateView('font-size', value + 'px');
         }
-        refreshContainerDisplay('display-cell');
-    } else {
-        if (whoseColorToChange == 'text'){
-            var color = $('#pick-color-text-input').val();
-            if (color == ''){
-                return;
-            }
-            $('#pick-color-text-input').css({
-                'background-color': color,
-            });
-            $('.display-component').css({
-                color: color,
-            });
+    });
 
-            if (!selectedUserComponent.layout.overallStyles){
-                selectedUserComponent.layout.overallStyles = {}
-            };
-
-            selectedUserComponent.layout.overallStyles['color'] = color;
-
-            for (var row = 1; row<=numRows; row++){
-                for (var col = 1; col<=numCols; col++){
-                    if (selectedUserComponent.components[row]){
-                        if (selectedUserComponent.components[row][col]){
-                            var innerComponent = selectedUserComponent.components[row][col];
-                            if (!innerComponent.properties.custom){
-                                innerComponent.properties.custom = {};
-                            }
-                            innerComponent.properties.custom['color'] = color;
-                        }
-                    }
-                }
-            }
-        } else if (whoseColorToChange == 'bg'){
-            var color = $('#pick-color-bg-input').val();
-            if (color == ''){
-                return;
-            }
-            $('#pick-color-bg-input').css({
-                'background-color': color,
-            });
-            $('#main-cell-table').css({
-                'background-color': color,
-            });
-
-            if (!selectedUserComponent.layout.overallStyles){
-                selectedUserComponent.layout.overallStyles = {}
-            };
-            selectedUserComponent.layout.overallStyles['background-color'] = color;
-
-            for (var row = 1; row<=numRows; row++){
-                for (var col = 1; col<=numCols; col++){
-                    if (selectedUserComponent.components[row]){
-                        if (selectedUserComponent.components[row][col]){
-                            var innerComponent = selectedUserComponent.components[row][col];
-                            if (!innerComponent.properties.custom){
-                                innerComponent.properties.custom = {};
-                            }
-                            innerComponent.properties.custom['background-color'] = color;
-                        }
-                    }
-                }
-            }
+    $('.overall-text-weight-input-set').click(function(){
+        var value = $('.overall-text-weight-input').val();
+        if (!isNaN(parseInt(value))){
+            setOverallStyleAndUpdateView('font-weight', value);
         }
-    }
+    });
 
-});
-
-$('.remove-color').click(function(){
-    if (this.id == 'remove-color-text'){
-        whoseColorToChange = 'text';
-    } else if (this.id == 'remove-color-bg'){
-        whoseColorToChange = 'bg';
-    }
-
-    if (innerComponentFocused){
-        var rowcol = getRowColFromId($('#display-cell').data('cellid'));
-        var row = rowcol.row;
-        var col = rowcol.col;
-        if (whoseColorToChange == 'text'){
-            $('#pick-color-text-input').val('').css({
-                'background-color': ''
-            });
-
-            $('#cell'+'_'+row+'_'+col+' .display-component').css({
-                color: '',
-            });
-            var innerComponent = selectedUserComponent.components[row][col];
-            if (!innerComponent.properties.custom){
-                innerComponent.properties.custom = {};
-            }
-            if (innerComponent.properties.custom['color']){
-                delete innerComponent.properties.custom['color'];
-            }
-        } else if (whoseColorToChange == 'bg'){
-            $('#pick-color-bg-input').val('').css({
-                'background-color': ''
-            });
-            $('#cell'+'_'+row+'_'+col+' .display-component').css({
-                'background-color': '',
-            });
-            var innerComponent = selectedUserComponent.components[row][col];
-            if (!innerComponent.properties.custom){
-                innerComponent.properties.custom = {};
-            }
-            if (innerComponent.properties.custom['background-color']){
-                delete innerComponent.properties.custom['background-color'];
-            }
-        }
-        refreshContainerDisplay('display-cell');
-    } else {
-        if (whoseColorToChange == 'text'){
-            $('#pick-color-text-input').val('').css({
-                'background-color': ''
-            });
-            $('.display-component').css({
-                color: '',
-            });
-
-            if (selectedUserComponent.layout.overallStyles){
-                if (selectedUserComponent.layout.overallStyles['color']){
-                    delete selectedUserComponent.layout.overallStyles['color'];
-                }
-            }
-            for (var row = 1; row<=numRows; row++){
-                for (var col = 1; col<=numCols; col++){
-                    if (selectedUserComponent.components[row]){
-                        if (selectedUserComponent.components[row][col]){
-                            var innerComponent = selectedUserComponent.components[row][col];
-                            if (!innerComponent.properties.custom){
-                                innerComponent.properties.custom = {};
-                            }
-                            if (innerComponent.properties.custom['color']){
-                                delete innerComponent.properties.custom['color'];
-                            }
-                        }
-                    }
-                }
-            }
-        } else if (whoseColorToChange == 'bg'){
-            $('#pick-color-bg-input').val('').css({
-                'background-color': ''
-            });
-            $('#main-cell-table').css({
-                'background-color': '',
-            });
-
-            if (selectedUserComponent.layout.overallStyles){
-                if (selectedUserComponent.layout.overallStyles['background-color']){
-                    delete selectedUserComponent.layout.overallStyles['background-color'];
-                }
-            }
-
-            for (var row = 1; row<=numRows; row++){
-                for (var col = 1; col<=numCols; col++){
-                    if (selectedUserComponent.components[row]){
-                        if (selectedUserComponent.components[row][col]){
-                            var innerComponent = selectedUserComponent.components[row][col];
-                            if (!innerComponent.properties.custom){
-                                innerComponent.properties.custom = {};
-                            }
-                            if (innerComponent.properties.custom['background-color']){
-                                delete innerComponent.properties.custom['background-color'];
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-});
-
-// function setUpStyleColors(){
-//     if (innerComponentFocused) {
-//         var rowcol = getRowColFromId($('#display-cell').data('cellid'));
-//         var row = rowcol.row;
-//         var col = rowcol.col;
-//         var customStyles = selectedUserComponent.components[row][col].properties.custom;
-//         var textColor = customStyles['color'] || '';
-//         $('#pick-color-text-input').val(textColor).css({
-//             'background-color': textColor
-//         });
-//         var bgColor = customStyles['background-color'] || '';
-//         $('#pick-color-bg-input').val(bgColor).css({
-//             'background-color': bgColor
-//         });
-//
-//     } else {
-//         if (selectedUserComponent.layout.overallStyles){
-//             var overallStyles = selectedUserComponent.layout.overallStyles;
-//             var textColor = overallStyles['color'] || '';
-//             $('#pick-color-text-input').val(textColor).css({
-//                 'background-color': textColor
-//             });
-//             var bgColor = overallStyles['background-color'] || '';
-//             $('#pick-color-bg-input').val(bgColor).css({
-//                 'background-color': bgColor
-//             });
-//         } else {
-//             $('#pick-color-text-input').val('').css({
-//                 'background-color': ''
-//             });
-//             $('#pick-color-bg-input').val('').css({
-//                 'background-color': ''
-//             });
-//         }
-//     }
-// }
-
+})();
 
 
 /** **/
@@ -587,6 +270,8 @@ function propagateRatioChangeToAllElts(newRatio){
         var height = component.dimensions.height * newRatio;
         var left = selectedUserComponent.layout[componentId].left *  newRatio;
 
+        var properties = component.properties;
+
         container.css({
             width: width + 'px',
             height: height + 'px',
@@ -594,7 +279,7 @@ function propagateRatioChangeToAllElts(newRatio){
             left: left + 'px'
         });
 
-        view.updateBaseComponentDisplayAt(container, type, newRatio);
+        view.updateBaseComponentDisplayAt(container, type, newRatio, properties);
         view.showBaseComponentDisplayAt(container, type);
     }
 
@@ -607,7 +292,7 @@ function propagateRatioChangeToAllElts(newRatio){
     });
 
     miniNav.updateNavInnerComponentSizes(newRatio);
-    workSurface.setUpGrid();
+    setUpGrid();
 }
 
 function addDeleteUserComponentButton(userComponentId){

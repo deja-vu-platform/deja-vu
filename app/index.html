@@ -61,7 +61,6 @@
             <div class="header"></div>
             <ul class="nav nav-tabs">
                 <li class="active" id="build-mode"><a href="#">Build</a></li>
-                <li id="layout-mode"><a href="#">Layout</a></li>
                 <li id="style-mode"><a href="#">Style</a></li>
             </ul>
         </div>
@@ -138,130 +137,7 @@
                 </ul>
             </div>
         </div>
-
     </div>
-
-    <div class="layout">
-        <div class="merge">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open"  data-dropdownid="merge">
-                    Merge Cells
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-            </div>
-            <div class="content dropdown-target" data-dropdownid="merge">
-                <div class="layout-group">
-                    <span class="layout-group-header">Reset</span>
-                    <button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>
-                </div>
-            </div>
-        </div>
-        <div class="resize">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open" data-dropdownid="resize">
-                    Resize
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-            </div>
-            <div class="content  dropdown-target" data-dropdownid="resize">
-                <div class="layout-group">
-                    <span class="layout-group-header">Lock</span>
-                    <div class="lock-width">
-                        <div class="layout-label">Width</div>
-                        <div class="layout-input">
-                            <button type="button" class="btn btn-default btn-table-width-lock-unlock">
-                                <img src="images/unlock_icon.png" width="20px" height="20px">
-                            </button>
-                        </div>
-                    </div>
-                    <div class="lock-height">
-                        <div class="layout-label">Height</div>
-                        <div class="layout-input">
-                            <button type="button" class="btn btn-default btn-table-height-lock-unlock">
-                                <img src="images/unlock_icon.png" width="20px" height="20px">
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="layout-group" id="resize-to-inputs">
-                    <span class="layout-group-header">Resize Rows and Columns to Inputs</span>
-                    <button class="btn btn-default" id="btn-resize-to-inputs">Start</button>
-                    <div id="resize-to-inputs-done-cancel">
-                        <button class="btn btn-default" id="btn-resize-to-inputs-done">Done</button>
-                        <button class="btn btn-default" id="btn-resize-to-inputs-cancel">Cancel</button>
-                    </div>
-                </div>
-                <div class="layout-group">
-                    <span class="layout-group-header">Resize Entire Component</span>
-                    <div id="resize-table-width">
-                        <div class="layout-label">Width (px)</div>
-                        <div class="layout-input">
-                            <input type="text" placeholder="width">
-                        </div>
-                    </div>
-                    <div id="resize-table-height">
-                        <div class="layout-label">Height (px)</div>
-                        <div class="layout-input"><input type="text" placeholder="height"></div>
-                    </div>
-                    <button class="btn btn-default" id="resize-table">Resize Component</button>
-                </div>
-                <div class="layout-group">
-                    <span class="layout-group-header">Reset</span>
-                    <button class="btn btn-default" id="reset-width-ratios">Equalize Width Ratios</button>
-                    <button class="btn btn-default" id="reset-height-ratios">Equalize Height Ratios</button>
-                </div>
-            </div>
-        </div>
-        <div class="add-remove-rows-cols">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open"  data-dropdownid="add-del-row-col">
-                    Add/Remove Rows/Columns
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-            </div>
-            <div class="content  dropdown-target" data-dropdownid="add-del-row-col">
-                <div class="layout-group">
-                    <span class="layout-group-header">Lock</span>
-                    <div class="lock-width">
-                        <div class="layout-label">Width</div>
-                        <div class="layout-input">
-                            <button type="button" class="btn btn-default btn-table-width-lock-unlock">
-                                <img src="images/unlock_icon.png" width="20px" height="20px">
-                            </button>
-                        </div>
-                    </div>
-                    <div class="lock-height">
-                        <div class="layout-label">Height</div>
-                        <div class="layout-input">
-                            <button type="button" class="btn btn-default btn-table-height-lock-unlock">
-                                <img src="images/unlock_icon.png" width="20px" height="20px">
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="add-remove-inputs layout-group">
-                    <span class="layout-group-header">Add/Remove Rows/Columns</span>
-                    <div class="add-n-rows">
-                        <div class="layout-label"><span>Add Rows</span></div>
-                        <div class="layout-input"><input type="text"></div>
-                    </div>
-                    <div class="remove-n-rows">
-                        <div class="layout-label"><span>Remove Rows</span></div>
-                        <div class="layout-input"><input type="text"></div>
-                    </div>
-                    <div class="add-n-cols">
-                        <div class="layout-label"><span>Add Cols</span></div>
-                        <div class="layout-input"><input type="text"></div>
-                    </div>
-                    <div class="remove-n-cols">
-                        <div class="layout-label"><span>Remove Cols</span></div>
-                        <div class="layout-input"><input type="text"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="style">
         <div class="header">
             <span id="style-overall-vs-specific">
@@ -278,24 +154,15 @@
             <div class="content dropdown-target" data-dropdownid="style-color">
                 <div>
                     <span>Text</span>
-                    <input id="pick-color-text-input">
-                    <button class="btn btn-xs btn-default pick-color" id="pick-color-text">Color Picker</button>
-                    <button class="btn btn-xs btn-default set-color" id="set-color-text">Set Color</button>
-                    <button class="btn btn-xs btn-default remove-color" id="remove-color-text">Remove</button>
-
+                    <input  type="text" id="pick-color-text-input" class="color-input overall-color-input">
                 </div>
                 <div>
                     <span>Background</span>
-                    <input id="pick-color-bg-input">
-                    <button class="btn btn-xs btn-default pick-color" id="pick-color-bg">Color Picker</button>
-                    <button class="btn btn-xs btn-default set-color" id="set-color-bg">Set Color</button>
-                    <button class="btn btn-xs btn-default remove-color" id="remove-color-bg">Remove</button>
-
+                    <input  type="text" id="pick-color-bg-input" class="color-input overall-color-input">
                 </div>
-                <!--<div class="style-group">-->
-                <!--<span class="style-group-header">Reset</span>-->
-                <!--<button class="btn btn-default" id="unmerge-all-cells">Unmerge All Cells</button>-->
-                <!--</div>-->
+                <div>
+                    <button class="btn" id="reset-overall-color">Reset Colors to Default</button>
+                </div>
             </div>
         </div>
         <div class="style-text">
@@ -308,27 +175,22 @@
             <div class="content dropdown-target" data-dropdownid="style-text">
                 <div>
                     <span>Font family</span>
-                    <input type="text">
+                    <input type="text" class="text-input overall-text-input">
                     <!--Do a dropdown-->
                 </div>
                 <div>
                     <span>Font Size (px)</span>
-                    <input type="text">
+                    <input type="text" class="text-input overall-text-input overall-text-size-input">
+                    <button class="btn overall-text-size-input-set">Set</button>
                 </div>
                 <div>
                     <span>Font Weight</span>
-                    <input type="text">
+                    <input type="text" class="text-input overall-text-input overall-text-weight-input">
+                    <button class="btn overall-text-weight-input-set">Set</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<div id="color-picker-container">
-    <canvas width="400" height="400" id="color-picker"></canvas>
-    <button class="btn btn-xs btn-default" id="color-picker-dismiss">
-        <span>x</span>
-    </button>
 </div>
 
 <div class="component-options">
@@ -363,31 +225,9 @@
     </div>
 </div>
 
-<div class="inner-component-options">
-    <button class="btn btn-default back-to-all-components">Back</button>
-    <button class="btn btn-default edit-btn">
-        <span class="glyphicon glyphicon-pencil"></span>
-    </button>
-    <div id="inner-component-delete-options">
-        <button type="button" class="btn btn-default btn-delete-inner-component">
-            <span class="glyphicon glyphicon-trash"></span>
-        </button>
-    </div>
-</div>
-
-<div id="inner-component-focus" class="display-cell-parent">
-    <div id="display-cell" class="containing-cell"></div>
-    <div id="display-cell-resize-helper">
-        <img src="images/drag_handle_se_icon.png" width="15px" height="15px"
-             class="ui-resizable-handle ui-resizable-se display-cell-resize-handle" id="display-cell-resize-handle">
-    </div>
-</div>
-
 <div id="outer-container">
     <div id="selected-screen-size"></div>
 </div>
-
-
 
 <div id="download-preview-area-container">
     <div id="download-preview-area"></div>
@@ -437,7 +277,7 @@
 <!--</div>-->
 
 <!--EDIT PROPERTIES POPUPS-->
-<div class="not-displayed">
+<div class="not-displayed default-properties">
     <div id="link-popup-holder">
         <div class="tooltip">
             <div class="panel panel-default">
@@ -461,36 +301,36 @@
     </div>
 
 
-    <div id="link-properties">
+    <div class="link-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-tint"></span> Style
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="btn-style-link">Link</a></li>
+                    <li><a href="#" class="premade-style btn-style-link">Link</a></li>
                     <li role="separator" class="divider"></li>
                     <li class="dropdown-header">Button</li>
-                    <li><a href="#" class="btn-style-default">Default</a></li>
-                    <li><a href="#" class="btn-style-primary">Primary</a></li>
-                    <li><a href="#" class="btn-style-success">Success</a></li>
-                    <li><a href="#" class="btn-style-info">Info</a></li>
-                    <li><a href="#" class="btn-style-warning">Warning</a></li>
-                    <li><a href="#" class="btn-style-danger">Danger</a></li>
+                    <li><a href="#" class="premade-style btn-style-default">Default</a></li>
+                    <li><a href="#" class="premade-style btn-style-primary">Primary</a></li>
+                    <li><a href="#" class="premade-style btn-style-success">Success</a></li>
+                    <li><a href="#" class="premade-style btn-style-info">Info</a></li>
+                    <li><a href="#" class="premade-style btn-style-warning">Warning</a></li>
+                    <li><a href="#" class="premade-style btn-style-danger">Danger</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-text-size"></span> Size
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="btn-size-xs">Small</a></li>
-                    <li><a href="#" class="btn-size-df">Default</a></li>
-                    <li><a href="#" class="btn-size-lg">Large</a></li>
+                    <li><a href="#" class="premade-style btn-size-xs">Small</a></li>
+                    <li><a href="#" class="premade-style btn-size-df">Default</a></li>
+                    <li><a href="#" class="premade-style btn-size-lg">Large</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -513,47 +353,47 @@
 
 
 
-    <div id="label-properties">
+    <div class="label-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-indent-left"></span> Align
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="align-center">Center</a></li>
-                    <li><a href="#" class="align-right">Right</a></li>
-                    <li><a href="#" class="align-left">Left</a></li>
-                    <li><a href="#" class="align-justify">Justify</a></li>
+                    <li><a href="#" class="premade-style align-center">Center</a></li>
+                    <li><a href="#" class="premade-style align-right">Right</a></li>
+                    <li><a href="#" class="premade-style align-left">Left</a></li>
+                    <li><a href="#" class="premade-style align-justify">Justify</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-text-size"></span> Size
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="lbl-small">Small</a></li>
-                    <li><a href="#" class="lbl-default">Default</a></li>
-                    <li><a href="#" class="lbl-large">Large</a></li>
-                    <li><a href="#" class="lbl-heading">H1</a></li>
+                    <li><a href="#" class="premade-style lbl-small">Small</a></li>
+                    <li><a href="#" class="premade-style lbl-default">Default</a></li>
+                    <li><a href="#" class="premade-style lbl-large">Large</a></li>
+                    <li><a href="#" class="premade-style lbl-heading">H1</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-text-color"></span> Color
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="lbl-text-default">Default</a></li>
-                    <li><a href="#" class="lbl-text-muted">Muted</a></li>
-                    <li><a href="#" class="lbl-text-primary">Primary</a></li>
-                    <li><a href="#" class="lbl-text-success">Success</a></li>
-                    <li><a href="#" class="lbl-text-info">Info</a></li>
-                    <li><a href="#" class="lbl-text-warning">Warning</a></li>
-                    <li><a href="#" class="lbl-text-danger">Danger</a></li>
+                    <li><a href="#" class="premade-style lbl-text-default">Default</a></li>
+                    <li><a href="#" class="premade-style lbl-text-muted">Muted</a></li>
+                    <li><a href="#" class="premade-style lbl-text-primary">Primary</a></li>
+                    <li><a href="#" class="premade-style lbl-text-success">Success</a></li>
+                    <li><a href="#" class="premade-style lbl-text-info">Info</a></li>
+                    <li><a href="#" class="premade-style lbl-text-warning">Warning</a></li>
+                    <li><a href="#" class="premade-style lbl-text-danger">Danger</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -630,28 +470,28 @@
         </div>
     </div>
 
-    <div id="tab-viewer-properties">
+    <div class="tab-viewer-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-th-list"></span> Alignment
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="tab-align-stacked">Stacked</a></li>
-                    <li><a href="#" class="tab-align-horizontal">Horizontal</a></li>
+                    <li><a href="#" class="premade-style tab-align-stacked">Stacked</a></li>
+                    <li><a href="#" class="premade-style tab-align-horizontal">Horizontal</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-tint"></span> Style
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="tab-style-pills">Pills</a></li>
-                    <li><a href="#" class="tab-style-tabs">Tabs</a></li>
+                    <li><a href="#" class="premade-style tab-style-pills">Pills</a></li>
+                    <li><a href="#" class="premade-style tab-style-tabs">Tabs</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -695,18 +535,18 @@
         </div>
     </div>
 
-    <div id="menu-properties">
+    <div class="menu-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-th-list"></span> Alignment
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="menu-horizontal">Horizontal</a></li>
-                    <li><a href="#" class="menu-vertical">Stacked</a></li>
+                    <li><a href="#" class="premade-style menu-horizontal">Horizontal</a></li>
+                    <li><a href="#" class="premade-style menu-vertical">Stacked</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -732,46 +572,46 @@
         </div>
     </div>
 
-    <div id="panel-properties">
+    <div class="panel-properties">
         <div class="config-btns">
-            <span class="btn-group btn-group-xs">
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-indent-left"></span> Align
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="align-center">Center</a></li>
-                    <li><a href="#" class="align-right">Right</a></li>
-                    <li><a href="#" class="align-left">Left</a></li>
-                    <li><a href="#" class="align-justify">Justify</a></li>
+                    <li><a href="#" class="premade-style align-center">Center</a></li>
+                    <li><a href="#" class="premade-style align-right">Right</a></li>
+                    <li><a href="#" class="premade-style align-left">Left</a></li>
+                    <li><a href="#" class="premade-style align-justify">Justify</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-text-size"></span> Size
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="lbl-small">Small</a></li>
-                    <li><a href="#" class="lbl-default">Default</a></li>
-                    <li><a href="#" class="lbl-large">Large</a></li>
-                    <li><a href="#" class="lbl-heading">H1</a></li>
+                    <li><a href="#" class="premade-style lbl-small">Small</a></li>
+                    <li><a href="#" class="premade-style lbl-default">Default</a></li>
+                    <li><a href="#" class="premade-style lbl-large">Large</a></li>
+                    <li><a href="#" class="premade-style lbl-heading">H1</a></li>
                 </ul>
-            </span>
-            <span class="btn-group btn-group-xs">
+            </div>
+            <div><!-- class="btn-group-vertical btn-group-xs">-->
                 <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="glyphicon glyphicon-tint"></span> Style
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                    <li><a href="#" class="panel-text-default">Default</a></li>
-                    <li><a href="#" class="panel-text-primary">Primary</a></li>
-                    <li><a href="#" class="panel-text-success">Success</a></li>
-                    <li><a href="#" class="panel-text-info">Info</a></li>
-                    <li><a href="#" class="panel-text-warning">Warning</a></li>
-                    <li><a href="#" class="panel-text-danger">Danger</a></li>
+                    <li><a href="#" class="premade-style panel-text-default">Default</a></li>
+                    <li><a href="#" class="premade-style panel-text-primary">Primary</a></li>
+                    <li><a href="#" class="premade-style panel-text-success">Success</a></li>
+                    <li><a href="#" class="premade-style panel-text-info">Info</a></li>
+                    <li><a href="#" class="premade-style panel-text-warning">Warning</a></li>
+                    <li><a href="#" class="premade-style panel-text-danger">Danger</a></li>
                 </ul>
-            </span>
+            </div>
         </div>
     </div>
 
@@ -781,8 +621,6 @@
         <div class="tab-pane" id="3a"></div>
     </div>
 </div>
-
-<div id="blank-bg"></div>
 
 <!--MODALS-->
 <div class="modal fade" id="first-main-page">
@@ -829,42 +667,6 @@
                     <div class="col-sm-1"></div>
                     <div class="col-sm-3 form-lbl">Component name: </div>
                     <div class="col-sm-7"><input id="new-component-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
-                    <div class="col-sm-1"></div>
-                </div><br/>
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3 form-lbl">Rows: </div>
-                    <div class="col-sm-7">
-                        <select id="select-rows">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected="selected">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                        </select>
-                    </div>
-                    <div class="col-sm-1"></div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3 form-lbl">Columns: </div>
-                    <div class="col-sm-7">
-                        <select id="select-cols">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected="selected">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                        </select>
-                    </div>
                     <div class="col-sm-1"></div>
                 </div><br/>
                 <!--<div class="row">-->

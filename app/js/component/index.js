@@ -22,7 +22,6 @@ $(function(){
     });
 
 
-    resizeViewportToFitWindow();
 
 
 
@@ -73,10 +72,7 @@ $(function(){
 
             }
         }
-        window.setTimeout(function(){
-            workSurface.loadUserComponent(selectedUserComponent, currentZoom);
-        }, 1);
-
+        workSurface.loadUserComponent(selectedUserComponent, currentZoom);
     }
 
 
@@ -93,6 +89,7 @@ $(function(){
 
     setUpStyleColors();
 
+    resizeViewportToFitWindow();
 
     // finish load animation
     $('.loader-container').fadeOut("fast");

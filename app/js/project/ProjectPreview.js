@@ -1,9 +1,6 @@
 /**
  * Created by Shinjini on 6/30/2016.
  */
-var numRows;
-var numCols;
-
 var currentZoom = 1;
 
 var gridHeight;
@@ -49,6 +46,7 @@ function loadTablePreview(componentToShow) {
     });
     page.css({
         position: 'relative',
+        'background-color': (componentToShow.properties.custom['background-color'] || '87CEFA')
     });
 
     $('#page-preview').append(page);
@@ -60,10 +58,10 @@ function setUpContainer(container, widget, component, zoom){
     var type = widget.attr('name');
     var properties;
     if (component){
-        var html = view.getHTML[type](component.components[type]);
+        var html = view.getHTML(type)(component.components[type]);
         properties = component.properties;
     } else {
-        var html = view.getHTML[type]();
+        var html = view.getHTML(type)();
     }
     view.displayInnerComponent(container, type, html, zoom, properties);
 

@@ -11,12 +11,10 @@ var zoom = ZoomElement();
 $('#new-user-component-btn').click(function(){
     $('#create-component').unbind();
     $('#create-component').on('click', function () {
-        numRows = $('#select-rows').val();
-        numCols = $('#select-cols').val();
         selectedUserComponent = initUserComponent(false, false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        setUpEmptyWorkSurface(selectedUserComponent, 1);
+        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
         resetMenuOptions();
     });
 });
@@ -24,13 +22,11 @@ $('#new-user-component-btn').click(function(){
 $('#new-main-component-btn').click(function(){
     $('#create-component').unbind();
     $('#create-component').on('click', function () {
-        numRows = $('#select-rows').val();
-        numCols = $('#select-cols').val();
         selectedUserComponent = initUserComponent(false, true);
         selectedProject.addMainPage(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        setUpEmptyWorkSurface(selectedUserComponent, 1)
+        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
 
         resetMenuOptions();
     });
@@ -45,22 +41,17 @@ $('#save-project').on('click', function () {
 });
 
 $('.components').on('click', '.component-name-container', function () {
-    var load = function(componentNameContainer){
-        // Save the current values
-        var oldState = {zoom : currentZoom,
-        };
-        $('#work-surface'+'_'+selectedUserComponent.meta.id).data('state', oldState);
-
-        var componentId = $(componentNameContainer).parent().data('componentid');
-        $('.selected').removeClass('selected');
-        $(componentNameContainer).parent().addClass('selected');
-        selectedUserComponent = selectedProject.components[componentId];
-        workSurface.loadUserComponent(selectedUserComponent);
-        setUpStyleColors();
+    // Save the current values
+    var oldState = {zoom : currentZoom,
     };
+    $('#work-surface'+'_'+selectedUserComponent.meta.id).data('state', oldState);
 
-    // have this going in a separate thread
-    window.setTimeout(load(this), 2000);
+    var componentId = $(this).parent().data('componentid');
+    $('.selected').removeClass('selected');
+    $(this).parent().addClass('selected');
+    selectedUserComponent = selectedProject.components[componentId];
+    workSurface.loadUserComponent(selectedUserComponent);
+    setUpStyleColors();
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {
@@ -137,7 +128,7 @@ function setComponentOptions(component){
     $('.component-options #btn-duplicate-component')
         .unbind()
         .click(function(){
-            var copyComponent = duplicateUserComponent(selectedUserComponent);
+            var copyComponent = duplicateUserComponent(component);
             var originalId = copyComponent.meta.id;
             // change the id
             copyComponent.meta.id = generateId();
@@ -151,7 +142,7 @@ function setComponentOptions(component){
 
             selectedProject.addComponent(copyComponent);
             selectedUserComponent = copyComponent;
-            workSurface.loadUserComponent(selectedUserComponent, currentZoom);
+            workSurface.loadUserComponent(copyComponent, 1);
 
         });
 
@@ -170,7 +161,7 @@ function setComponentOptions(component){
     $('.component-options .btn-delete-component')
         .unbind()
         .on("click", function (e) {
-            var id = selectedUserComponent.meta.id;
+            var id = component.meta.id;
             if (confirmOnUserComponentDelete){
                 if (selectedProject.numComponents === 1){
                     return; //don't delete the last one TODO is the the right way to go?
@@ -181,11 +172,12 @@ function setComponentOptions(component){
             }
         });
 
-    if (selectedUserComponent.meta.id in selectedProject.mainComponents){
+    // if the component is in the main pages, set it up accordingly
+    if (component.meta.id in selectedProject.mainComponents){
         $('.component-options #btn-index-page-toggle').css({
             display: 'inline-block',
         });
-        setUpComponentOptionsIndexPageToggle();
+        setUpComponentOptionsIndexPageToggle(component);
     } else {
         $('.component-options #btn-index-page-toggle').css({
             display: 'none',
@@ -195,16 +187,16 @@ function setComponentOptions(component){
 
 }
 
-function setUpComponentOptionsIndexPageToggle(){
-    if (selectedUserComponent.meta.id == selectedProject.mainComponents.indexId){
+function setUpComponentOptionsIndexPageToggle(component){
+    if (component.meta.id == selectedProject.mainComponents.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
-        $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').addClass('selected-index-page');
+        $('.components').find('[data-componentid='+component.meta.id+']').addClass('selected-index-page');
 
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $(this).find('.text').text('Assign as Index Page');
-            $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.components').find('[data-componentid='+component.meta.id+']').find('.index-page-toggle').trigger('click');
         });
     } else {
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
@@ -212,7 +204,7 @@ function setUpComponentOptionsIndexPageToggle(){
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
             $(this).find('.text').text('Unassign as Index Page');
-            $('.components').find('[data-componentid='+selectedUserComponent.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.components').find('[data-componentid='+component.meta.id+']').find('.index-page-toggle').trigger('click');
         });
 
     }
@@ -534,21 +526,6 @@ function triggerEdit(container, popup) {
     }
 }
 
-function showConfigOptions(droppedComponentType, container) {
-    // Hide edit button if label or panel
-    if (droppedComponentType=='label' || droppedComponentType=='panel') {
-        container.find('.edit-btn').css('display', 'none');
-    } else {
-        container.find('.edit-btn').css('display', 'block');
-    }
-
-    var configOptions = $('#'+droppedComponentType+'-properties').clone();
-    if (configOptions.length==0) {
-        return;
-    }
-
-    container.prepend(configOptions);
-}
 
 
 function registerTooltipBtnHandlers() {
@@ -605,7 +582,7 @@ function registerTooltipBtnHandlers() {
                 }
             }
             var componentId = getComponentIdFromContainerId(cellId);
-            selectedUserComponent.components[componentId].properties[propertyName] = bootstrapClass;
+            selectedUserComponent.components[componentId].properties.bsClasses[propertyName] = bootstrapClass;
 
         }
     }
@@ -814,7 +791,7 @@ $('.components').on('click', '.index-page-toggle', function(){
     } else {
         selectedProject.mainComponents.indexId = null;
     }
-    setUpComponentOptionsIndexPageToggle();
+    setUpComponentOptionsIndexPageToggle(selectedProject.components[componentId]);
 });
 
 
@@ -832,7 +809,7 @@ function refreshContainerDisplay(containerId, zoom){
         var properties = componentToChange.properties;
 
         // display itself gets rid of padding for the #display-cell
-        view.displayInnerComponent(container, componentToChange.type, view.getHTML[componentToChange.type](componentToChange.components[componentToChange.type]), zoom, properties);
+        view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
     } else {
@@ -931,6 +908,91 @@ function enableSpecificComponentDomElements(componentToEnableId){
 
 }
 
+function setUpGrid(){
+    $('.grid').remove();
+    var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
+
+    var grid = {x: {}, y:{}};
+    for (var componentId in selectedUserComponent.components){
+        // existing components should also be in the work surface!
+        var container = $('#component-container_'+componentId);
+        var top = container.position().top;
+        var left = container.position().left;
+        var right = left + container.width();
+        var bottom = top + container.height();
+        grid.x[left] = '';
+        grid.x[right] = '';
+        grid.y[top] = '';
+        grid.y[bottom] = '';
+    }
+    var xs = Object.keys(grid.x).map(function(key){
+        return parseFloat(key);
+    });
+
+    // var top = workSurface.offset().top;
+    var top = 0;
+    var bottom = top + workSurface.height();
+    // var left = workSurface.offset().left;
+    var left = 0;
+    var right = left + workSurface.width();
+
+    xs.push(left);
+    xs.push(right);
+    xs.sort(function(a, b){
+        return a-b;
+    });
+
+    var ys = Object.keys(grid.y).map(function(key){
+        return parseFloat(key);
+    });
+    ys.push(top);
+    ys.push(bottom);
+    ys.sort(function(a, b){
+        return a-b;
+    });
+
+    var numRows = ys.length-1;
+    var numCols = xs.length-1;
+
+    var gridElt = $('<div></div>');
+    gridElt.addClass('grid');
+    for (var col=0; col<numCols; col++){
+        var colElt = $('<div></div>');
+        colElt.addClass('grid-col');
+        gridElt.append(colElt);
+
+        for (var row=0; row<numRows; row++){
+            var cellElt = $('<div></div>');
+            cellElt.addClass('grid-cell');
+            cellElt.attr('id', 'grid-cell_'+row+'_'+col);
+            colElt.append(cellElt);
+            cellElt.css({
+                width: xs[col+1] - xs[col],
+                height: ys[row+1] - ys[row],
+            });
+        }
+    }
+    gridElt.css({
+        position: 'absolute',
+        // top: ys[0] - workSurface.offset().top,
+        // left: xs[0] - workSurface.offset().left,
+        top: 0,
+        left: 0,
+        width: 1.1*(xs[numCols] - xs[0]),
+        visibility: 'hidden',
+    });
+    workSurface.append(gridElt);
+    // $('body').append(gridElt);
+    $('.grid-col').css({
+        display: 'inline-block'
+    });
+    $('.grid-cell').css({
+        display: 'block',
+        border: '1px dashed grey'
+    });
+};
+
+
 
 
 
@@ -948,6 +1010,7 @@ function testSaveHTML(){
 
 function createDownloadPreview(){
     var oldZoom = currentZoom;
+    var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
     currentZoom = 1;
     propagateRatioChangeToAllElts(currentZoom);
 
@@ -955,7 +1018,9 @@ function createDownloadPreview(){
         position: 'relative',
         'text-align': 'center',
         margin: 'auto',
-        width: $('#main-grid-table').css('width'),
+        width: workSurface.css('width'),
+        height: workSurface.css('height'),
+        'background-color': workSurface.css('background-color'),
     });
 
     $('.component-container').each(function(){
@@ -967,9 +1032,8 @@ function createDownloadPreview(){
             width: $(this).width()+'px',
             height: $(this).height()+'px',
             'vertical-align': 'middle',
-            background: '#F9F9F9',
         };
-        var container = $(document.createElement('div'));
+        var container = $('<div></div>');
         container.css(css);
 
         var labelContainer = $(this).find('.label-container').clone(true, true);
@@ -977,14 +1041,12 @@ function createDownloadPreview(){
             labelContainer.css({// this is not carried over, since this was declared in the css file
                 position: 'absolute',
                 top: '0',
-                //border: '#e0e0e0 solid 1px',
                 display: 'block',
             });
             container.append(labelContainer);
             var displayComponent = labelContainer.find('.display-component');
             displayComponent.css({// this is not carried over, since this was declared in the css file
                 'white-space': 'initial',
-                'font-weight': 400,
                 margin: 0,
             });
             displayComponent.attr('contenteditable', false);
@@ -993,10 +1055,7 @@ function createDownloadPreview(){
             var displayComponent = $(this).find('.display-component').clone(true, true);
             displayComponent.css({// this is not carried over, since this was declared in the css file
                 'white-space': 'initial',
-                'font-weight': 400,
             });
-
-
             if (displayComponent.get(0)){
                 container.append(displayComponent);
                 add = true;

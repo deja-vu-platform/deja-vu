@@ -13,74 +13,77 @@ var Display = function(){
     /**
      * display element in cell
      */
-    that.getHTML = {
-        'label': function(value) {
-            if (!value){
-                value = "Type text here...";
-            }
-            return '<div class="label-container"><p contenteditable="true" class="display-component">'+value+'</p></div>';
-        },
-        'link': function(value) {
-            if (!value){
-                return '<a class="btn btn-link display-component" href="#">Link</a>';
-            }
-            return '<a class="btn btn-link display-component" href="'+value.target+'">'+value.link_text+'</a>';
-        },
-        'tab-viewer': function(value) {
-            if (!value){
-                var html = '<ul class="nav nav-pills nav-stacked display-component">' +
-                    '<li role="presentation" class="active"><a href="#" data-toggle="tab">Tab 1</a></li>' +
-                    '<li role="presentation"><a href="#" data-toggle="tab">Tab 2</a></li>' +
-                    '<li role="presentation"><a href="#" data-toggle="tab">Tab 3</a></li>' +
-                    '</ul>';
+    that.getHTML = function(type){
+        var defaultHTML = {
+            'label': function (value) {
+                if (!value) {
+                    value = "Type text here...";
+                }
+                return '<div class="label-container"><p contenteditable="true" class="display-component">' + value + '</p></div>';
+            },
+            'link': function (value) {
+                if (!value) {
+                    return '<a class="btn btn-link display-component" href="#">Link</a>';
+                }
+                return '<a class="btn btn-link display-component" href="' + value.target + '">' + value.link_text + '</a>';
+            },
+            'tab-viewer': function (value) {
+                if (!value) {
+                    var html = '<ul class="nav nav-pills nav-stacked display-component">' +
+                        '<li role="presentation" class="active"><a href="#" data-toggle="tab">Tab 1</a></li>' +
+                        '<li role="presentation"><a href="#" data-toggle="tab">Tab 2</a></li>' +
+                        '<li role="presentation"><a href="#" data-toggle="tab">Tab 3</a></li>' +
+                        '</ul>';
 
+                    return html;
+                }
+                var html = '<ul class="nav nav-pills nav-stacked display-component">' +
+                    '<li role="presentation" class="active"><a href="#1a" data-toggle="tab">' + value.tab1.text + '</a></li>' +
+                    '<li role="presentation"><a href="#2a" data-toggle="tab">' + value.tab2.text + '</a></li>' +
+                    '<li role="presentation"><a href="#3a" data-toggle="tab">' + value.tab3.text + '</a></li>' +
+                    '</ul>'; //TODO: tab target
                 return html;
-            }
-            var html = '<ul class="nav nav-pills nav-stacked display-component">' +
-                '<li role="presentation" class="active"><a href="#1a" data-toggle="tab">'+value.tab1.text+'</a></li>' +
-                '<li role="presentation"><a href="#2a" data-toggle="tab">'+value.tab2.text+'</a></li>' +
-                '<li role="presentation"><a href="#3a" data-toggle="tab">'+value.tab3.text+'</a></li>' +
-                '</ul>'; //TODO: tab target
-            return html;
-        },
-        'menu': function(value) {
-            if (!value){
+            },
+            'menu': function (value) {
+                if (!value) {
+                    var html = '<div class="btn-group display-component" role="group">' +
+                        '<a type="button" class="btn btn-default" role="button" href="#">Item 1</a>' +
+                        '<a type="button" class="btn btn-default" role="button" href="#">Item 2</a>' +
+                        '<a type="button" class="btn btn-default" role="button" href="#">Item 3</a>' +
+                        '</div>';
+                    return html;
+                }
                 var html = '<div class="btn-group display-component" role="group">' +
-                    '<a type="button" class="btn btn-default" role="button" href="#">Item 1</a>' +
-                    '<a type="button" class="btn btn-default" role="button" href="#">Item 2</a>' +
-                    '<a type="button" class="btn btn-default" role="button" href="#">Item 3</a>' +
+                    '<a type="button" class="btn btn-default" role="button" href="' + value.menu_item1.value + '">' + value.menu_item1.text + '</a>' +
+                    '<a type="button" class="btn btn-default" role="button" href="' + value.menu_item2.value + '">' + value.menu_item2.text + '</a>' +
+                    '<a type="button" class="btn btn-default" role="button" href="' + value.menu_item3.value + '">' + value.menu_item3.text + '</a>' +
                     '</div>';
                 return html;
+            },
+            'image': function (value) {
+                if (!value) {
+                    return '<img class="display-component" src="images/image_icon.png" width="15px" height="15px">';
+                }
+                return '<img src="' + value.img_src + '" class="display-component">';
+            },
+            'panel': function (value) {
+                if (!value) {
+                    value = {heading: "Type heading...", content: "Type content..."};
+                }
+                return '<div class="panel panel-default display-component">' +
+                    '<div class="panel-heading">' +
+                    '<h3 contenteditable="true" class="panel-title">' + value.heading + '</h3>' +
+                    '</div><div contenteditable="true" class="panel-body">' + value.content + '</div></div>';
             }
-            var html = '<div class="btn-group display-component" role="group">' +
-                '<a type="button" class="btn btn-default" role="button" href="'+value.menu_item1.value+'">'+value.menu_item1.text+'</a>' +
-                '<a type="button" class="btn btn-default" role="button" href="'+value.menu_item2.value+'">'+value.menu_item2.text+'</a>' +
-                '<a type="button" class="btn btn-default" role="button" href="'+value.menu_item3.value+'">'+value.menu_item3.text+'</a>' +
-                '</div>';
-            return html;
-        },
-        'image': function(value) {
-            if (!value){
-                return '<img class="display-component" src="images/image_icon.png" width="15px" height="15px">';
-            }
-            return '<img src="'+value.img_src+'" class="display-component">';
-        },
-        'panel': function(value) {
-            if (!value){
-                value = {heading: "Type heading...", content: "Type content..."};
-            }
-            return '<div class="panel panel-default display-component">'+
-                '<div class="panel-heading">'+
-                '<h3 contenteditable="true" class="panel-title">'+value.heading+'</h3>'+
-                '</div><div contenteditable="true" class="panel-body">'+value.content+'</div></div>';
-        }
+        };
+        return defaultHTML[type];
     };
 
     that.getDimensions = function(type){
         if (type == 'label'){
             return {height: 40, width: 200}
         }else if (type == 'link'){
-            return {height: 20, width: 100}
+            return {height: 36, width: 100}
         } else {
             return {height: 200, width: 200}
         }
@@ -161,27 +164,25 @@ var Display = function(){
 
         //// TODO SKETCHY!!!
         if (properties){
-            if (Object.keys(properties).length>0){
+            if (Object.keys(properties.overall).length>0){
+                for (var customProperty in properties.overall){
+                    displayComponent.css(customProperty, properties.overall[customProperty]);
+                }
+            }
+            if (Object.keys(properties.bsClasses).length>0){ // bootstrap classes
                 var classes = '';
-                for (var propertyName in properties){
-                    //displayComponent.addClass(properties[propertyName]);
-                    if (propertyName == 'custom'){
-                        continue;
-                    }
-                    classes = classes+' '+properties[propertyName];
+                for (var propertyName in properties.bsClasses){
+                    classes = classes+' '+properties.bsClasses[propertyName];
                 }
                 classes.trim();
-
                 displayComponent.removeClass();
-                displayComponent.addClass(classes).addClass(defaultDisplayClasses[type]);
+                displayComponent.addClass(classes).addClass(defaultDisplayClasses[type]); // TODO what's going on here?
             }
-            if (properties.custom){
-                if (Object.keys(properties.custom).length>0){
-                    for (var customProperty in properties.custom){
-                        displayComponent.css(customProperty, properties.custom[customProperty]);
-                    }
-
+            if (Object.keys(properties.custom).length>0){
+                for (var customProperty in properties.custom){
+                    displayComponent.css(customProperty, properties.custom[customProperty]);
                 }
+
             }
         }
     };
