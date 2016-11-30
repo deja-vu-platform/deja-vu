@@ -1047,7 +1047,6 @@ function createDownloadPreview(){
             var displayComponent = labelContainer.find('.display-component');
             displayComponent.css({// this is not carried over, since this was declared in the css file
                 'white-space': 'initial',
-                'font-weight': 400,
                 margin: 0,
             });
             displayComponent.attr('contenteditable', false);
@@ -1056,7 +1055,6 @@ function createDownloadPreview(){
             var displayComponent = $(this).find('.display-component').clone(true, true);
             displayComponent.css({// this is not carried over, since this was declared in the css file
                 'white-space': 'initial',
-                'font-weight': 400,
             });
             if (displayComponent.get(0)){
                 container.append(displayComponent);
