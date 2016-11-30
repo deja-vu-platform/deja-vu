@@ -66,15 +66,11 @@ var ComponentContainerMaker = function(){
     };
 
     var toggleOpenClose = function(e, parent){
-        var shouldBeOpen = (!parent.hasClass('open')); // TODO temporary fix
-        $(parent).parent().find('*').removeClass('open');
+        var shouldBeOpen = (!parent.hasClass('open'));
+        $(parent).parent().find('*').removeClass('open'); // close all siblings
         if (shouldBeOpen){
-            parent.addClass('open'); // TODO temporary fix
+            parent.addClass('open');
         }
-        //
-        // if (!$(parent).hasClass('open')){ // if closed just now
-        //     $(parent).find('*').removeClass('open');
-        // }
         e.stopPropagation();
     };
 
@@ -96,10 +92,6 @@ var ComponentContainerMaker = function(){
 
         buttonEdit.attr('id', 'edit-btn' + '_' + component.meta.id);
 
-        buttonEdit.on("click", function (e) {
-            e.stopPropagation();
-            container.find('.tooltip').addClass('open');
-        });
 
         var buttonStyle = $('<li class="dropdown-submenu">'+
                                 '<a tabindex="-1" href="#" class="inner-component-style">Style</a>'+
@@ -118,19 +110,6 @@ var ComponentContainerMaker = function(){
                             '</li>');
 
 
-        optionsDropdown.find('.inner-component-options-dropdown').click(function(e){
-            toggleOpenClose(e, $(this).parent());
-        });
-        buttonStyle.find('.inner-component-style').click(function(e){
-            toggleOpenClose(e, $(this).parent());
-        });
-        buttonStyle.find('.inner-component-custom-style').click(function(e){
-            toggleOpenClose(e, $(this).parent());
-        });
-        buttonStyle.find('.inner-component-premade-style').click(function(e){
-            toggleOpenClose(e, $(this).parent());
-        });
-
 
         var buttonTrash = $('<li>' +
             '<a href="#" class="inner-component-trash">' +
@@ -140,10 +119,6 @@ var ComponentContainerMaker = function(){
 
         buttonTrash.attr('id', 'inner-component-trash' + '_' + component.meta.id);
 
-        buttonTrash.click(function(){
-            deleteComponentFromUserComponentAndFromView(component.meta.id)
-        });
-
         optionsDropdown.find('.dropdown-menu')
             .append(buttonEdit)
             .append('<li class="divider"></li>')
@@ -151,8 +126,30 @@ var ComponentContainerMaker = function(){
             .append('<li class="divider"></li>')
             .append(buttonTrash);
 
+        // behaviour
+
+        optionsDropdown.find('.inner-component-options-dropdown, .inner-component-style,' +
+            ' .inner-component-custom-style, .inner-component-premade-style').each(function(idx, elt){
+            console.log(elt);
+            $(elt).click(function(e){
+                var thisElt = elt;
+                toggleOpenClose(e, $(thisElt).parent());
+            });
+        });
+
+        buttonEdit.on("click", function (e) {
+            e.stopPropagation();
+            container.find('.tooltip').addClass('open');
+        });
+
+
+        buttonTrash.click(function(){
+            deleteComponentFromUserComponentAndFromView(component.meta.id)
+        });
+
         return optionsDropdown;
     };
+
 
     that.createComponentContainer = function(component, zoom) {
         var container = $('<div></div>');
