@@ -9,8 +9,8 @@ var zoom = ZoomElement();
 // TODO on user component name input check for special chars
 
 $('#new-user-component-btn').click(function(){
-    $('#create-component').unbind();
-    $('#create-component').on('click', function () {
+    $('#create-component').unbind()
+        .on('click', function () {
         selectedUserComponent = initUserComponent(false, false);
         selectedProject.addComponent(selectedUserComponent);
         displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
@@ -20,8 +20,8 @@ $('#new-user-component-btn').click(function(){
 });
 
 $('#new-main-component-btn').click(function(){
-    $('#create-component').unbind();
-    $('#create-component').on('click', function () {
+    $('#create-component').unbind()
+        .on('click', function () {
         selectedUserComponent = initUserComponent(false, true);
         selectedProject.addMainPage(selectedUserComponent);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
@@ -224,18 +224,19 @@ function displayUserComponentInListAndSelect(name, id){
  */
 function displayNewComponentInUserComponentList(name, id){
     // TODO changes in style
-    var newComponentElt =
-        '<li data-componentid=' + id + '>'
+    var newComponentElt = $(
+        '<li data-type="'+'user'+'" class="widget draggable" data-componentid=' + id + '>'
         + '<div class="component-name-container">'
         + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
         + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</span>'
         + '</div>'
-        + '</li>';
+        + '</li>');
     $('#user-components-list').append(newComponentElt);
     addDeleteUserComponentButton(id);
-    registerUserComponentAsDraggable(id);
+    // registerUserComponentAsDraggable(id);
+    registerDraggable(newComponentElt);
 }
 
 
@@ -258,7 +259,7 @@ function displayNewComponentInMainPagesList(name, id){
         + '</li>';
     $('#main-pages-list').append(newComponentElt);
     addDeleteUserComponentButton(id);
-    registerUserComponentAsDraggable(id);
+    // registerUserComponentAsDraggable(id);
 }
 
 function displayMainPageInListAndSelect(name, id){
@@ -287,7 +288,7 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
     var tooltip = container.find('.tooltip');
     var componentId = container.data('componentId');
 
-    var type = container.find('.draggable').attr('name');
+    var type = container.find('.draggable').data('type');
     var value;
     var isUpload = false;
 
@@ -425,11 +426,14 @@ function registerDraggable(widgetToRegister) {
                     top: e.pageY - componentContainerOld.offset().top,
                     left: e.pageX - componentContainerOld.offset().left
                 };
-
-
             } else {
-                var type = $(this).attr('name');
-                var component = BaseComponent(type, {}, view.getDimensions(type));
+                var type = $(this).data('type');
+                if (type == 'user'){
+                    var id = $(this).data('componentid');
+                    var component = selectedProject.components[id];
+                } else {
+                    var component = BaseComponent(type, {}, view.getDimensions(type));
+                }
                 draggingComponent = component;
 
                 var componentContainer = componentContainerMaker.createComponentContainer(component, currentZoom);
@@ -506,7 +510,7 @@ function registerDraggable(widgetToRegister) {
  * @param popup
  */
 function triggerEdit(container, popup) {
-    var type = container.find('.widget').attr('name').toLowerCase();
+    var type = container.find('.widget').data('type').toLowerCase();
     var editDialog = $('#'+type+'-popup-holder').clone();
 
     if (!(type == 'label')){
@@ -802,7 +806,7 @@ function refreshContainerDisplay(containerId, zoom){
     var container =  $('#'+containerId);
     var componentId = container.data('componentId');
 
-    if (selectedUserComponent.components[componentId]){
+    if (selectedUserComponent.components[componentId]){ // component exists
         var componentToChange = selectedUserComponent.components[componentId];
 
         view.removeDisplay(container);

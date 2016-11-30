@@ -51,7 +51,7 @@ var WorkSurface = function(){
             var innerComponent = component.components[innerComponentId];
             var type = innerComponent.type;
             var componentContainer = componentContainerMaker.createComponentContainer(innerComponent, zoom);
-            var widget = $('#basic-components .draggable[name=' + type + ']').clone();
+            var widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
             widget.addClass('associated').data('componentId', innerComponentId);
 
             componentContainer.css({
@@ -89,9 +89,6 @@ var WorkSurface = function(){
             minHeight: 0,
             minWidth: 0,
             start: function(){
-                // var numComponents = selectedUserComponent.layout.stackOrder.length;
-                // var minWidth = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().left;
-                // var minHeight = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().top;
                 var minWidth = $('.grid-cell:last').position().left;
                 var minHeight = $('.grid-cell:last').position().top;
 
@@ -110,7 +107,7 @@ var WorkSurface = function(){
             }
         });
 
-    }
+    };
 
     var makeWorkSurfaceDroppableToComponents = function(workSurface){
 

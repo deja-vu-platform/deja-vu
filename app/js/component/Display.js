@@ -74,6 +74,9 @@ var Display = function(){
                     '<div class="panel-heading">' +
                     '<h3 contenteditable="true" class="panel-title">' + value.heading + '</h3>' +
                     '</div><div contenteditable="true" class="panel-body">' + value.content + '</div></div>';
+            },
+            'user': function(){
+                return '<div class="empty display-component"></div>';
             }
         };
         return defaultHTML[type];
@@ -84,6 +87,8 @@ var Display = function(){
             return {height: 40, width: 200}
         }else if (type == 'link'){
             return {height: 36, width: 100}
+        } else if (type == 'user'){
+            return {height: 300, width: 300}
         } else {
             return {height: 200, width: 200}
         }

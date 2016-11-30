@@ -168,7 +168,24 @@ var ComponentContainerMaker = function(){
         container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
         container.height(component.dimensions.height * zoom).width(component.dimensions.width * zoom);
         container.data('componentId', component.meta.id);
+        if (component.type == 'user'){
+            
+            component.layout.stackOrder.forEach(function(innerComponentId){
+                var innerComponent = component.components[innerComponentId];
+                var type = innerComponent.type;
+                var componentContainer = componentContainerMaker.createComponentContainer(innerComponent, zoom);
+                var widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                widget.addClass('associated').data('componentId', innerComponentId);
 
+                componentContainer.css({
+                    position: 'absolute',
+                    left: component.layout[innerComponentId].left,
+                    top: component.layout[innerComponentId].top,
+
+                });
+                container.append(componentContainer);
+            });
+        }
         makeContainerResizable(container, component);
         container.append(createEditOptions(component, container));
         return container;
@@ -285,6 +302,7 @@ var ComponentContainerMaker = function(){
                 e.stopPropagation();
             });
 
+
             container.find('.inner-component-premade-style-dropdown').append(li);
         });
         container.find('.inner-component-style-dropdown').append(configOptions);
@@ -293,7 +311,7 @@ var ComponentContainerMaker = function(){
 
     that.setUpContainer = function(container, widget, component, zoom){
         container.append(widget);
-        var type = widget.attr('name');
+        var type = widget.data('type');
         var properties;
         if (component){
             var html = view.getHTML(type)(component.components[type]);
