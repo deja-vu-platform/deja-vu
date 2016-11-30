@@ -13,8 +13,8 @@ const mean = new Mean();
 
 const handlers = {
   allocation: {
-    create: Helpers.resolve_create(mean.db, "allocations"),
-    update: Helpers.resolve_update(mean.db, "allocations")
+    create: Helpers.resolve_create(mean.db, "allocation"),
+    update: Helpers.resolve_update(mean.db, "allocation")
   },
   consumer: {
     create: Helpers.resolve_create(mean.db, "consumer"),
