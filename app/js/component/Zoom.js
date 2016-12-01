@@ -37,15 +37,15 @@ var ZoomElement = function(){
         return zoom;
     };
 
-    var changeZoomViaZoomControl = function(type) {
+    var changeZoomViaZoomControl = function(outerComponent, type) {
         if (type == 'slider') {
             // TODO make this better
             var zoom = getZoomFromSliderVal();
             $('#zoom-control-value').text(Math.round(zoom * 100) + '%');
             currentZoom = zoom;
         } else if (type == 'fit') {
-            var zoomHeight = $('#outer-container').height() / selectedUserComponent.dimensions.height;
-            var zoomWidth = $('#outer-container').width() / selectedUserComponent.dimensions.width;
+            var zoomHeight = $('#outer-container').height() / outerComponent.dimensions.height;
+            var zoomWidth = $('#outer-container').width() / outerComponent.dimensions.width;
             currentZoom = Math.min(zoomWidth, zoomHeight);
         } else if (type == 'full'){
             var widthScale = ($('#outer-container').width())/selectedScreenSizeWidth;
@@ -53,14 +53,14 @@ var ZoomElement = function(){
             currentZoom = Math.min(widthScale, heightScale);
         } else if (type == 'actual'){
             $('#zoom-slider').val(0);
-            changeZoomViaZoomControl('slider');
+            changeZoomViaZoomControl(outerComponent, 'slider');
         } else {
             //    Do nothing
         }
-        changeZoomDisplays(currentZoom);
+        changeZoomDisplays(outerComponent, currentZoom);
 
         // update the state
-        var workSurface = $('#work-surface'+'_'+selectedUserComponent.meta.id);
+        var workSurface = $('#work-surface'+'_'+outerComponent.meta.id);
         var state = workSurface.data('state');
         if (!state){
             state = {zoom: 1}
@@ -68,7 +68,7 @@ var ZoomElement = function(){
         state.zoom = currentZoom;
         workSurface.data('state', state);
 
-        propagateRatioChangeToAllElts(currentZoom);
+        propagateRatioChangeToAllElts(currentZoom, outerComponent);
     };
 
 
@@ -78,7 +78,7 @@ var ZoomElement = function(){
      *
      * @param zoom
      */
-    var changeZoomDisplays = function(zoom){
+    var changeZoomDisplays = function(outerComponent, zoom){
         $('#zoom-control-value').text(Math.round(currentZoom*100)+'%');
         var sliderVal = getSliderValFromZoom(currentZoom);
         $('#zoom-slider').val(sliderVal);
@@ -93,34 +93,35 @@ var ZoomElement = function(){
             width: selectedScreenSizeWidth*currentZoom*navZoom + 'px',
         });
         $('.work-surface').css({
-            width: selectedUserComponent.dimensions.width*zoom + 'px',
-            height: selectedUserComponent.dimensions.height*zoom + 'px',
+            width: outerComponent.dimensions.width*zoom + 'px',
+            height: outerComponent.dimensions.height*zoom + 'px',
         });
 
         miniNav.updateNavInnerComponentSizes(zoom);
     };
 
-    that.updateZoomFromState = function(componentId){
+    that.updateZoomFromState = function(component){
+        var componentId = component.meta.id;
         currentZoom = $('#work-surface'+'_'+componentId).data('state').zoom;
         // it's updating from state, so that means new initializations are in order
-        miniNav.setUpMiniNavElementAndInnerComponentSizes();
-        changeZoomDisplays(currentZoom);
+        miniNav.setUpMiniNavElementAndInnerComponentSizes(component);
+        changeZoomDisplays(component, currentZoom);
     };
 
-    that.registerZoom = function() {
+    that.registerZoom = function(outerComponent) {
         $('#zoom-control-value').text('100%');
 
         $('#zoom-in').click( function (e) {
             e.preventDefault();
             var val = parseFloat($('#zoom-slider').val());
             $('#zoom-slider').val(Math.round(val/100)*100+100);
-            changeZoomViaZoomControl('slider');
+            changeZoomViaZoomControl(outerComponent, 'slider');
         });
         $('#zoom-out').click( function (e) {
             e.preventDefault();
             var val = parseFloat($('#zoom-slider').val());
             $('#zoom-slider').val(Math.round(val/100)*100-100);
-            changeZoomViaZoomControl('slider');
+            changeZoomViaZoomControl(outerComponent, 'slider');
         });
 
 
@@ -130,22 +131,22 @@ var ZoomElement = function(){
         });
 
         $('#zoom-slider').on('change', function(){
-            changeZoomViaZoomControl('slider');
+            changeZoomViaZoomControl(outerComponent, 'slider');
         });
 
         $('#zoom-actual').click(function(e, ui){
             e.preventDefault();
-            changeZoomViaZoomControl('actual');
+            changeZoomViaZoomControl(outerComponent, 'actual');
 
         });
 
         $('#zoom-fit').click(function(e, ui){
             e.preventDefault();
-            changeZoomViaZoomControl('fit');
+            changeZoomViaZoomControl(outerComponent, 'fit');
         });
         $('#zoom-full').click(function(e, ui){
             e.preventDefault();
-            changeZoomViaZoomControl('full');
+            changeZoomViaZoomControl(outerComponent, 'full');
         });
 
         $('#zoom-control-minimize-btn').click(function(){

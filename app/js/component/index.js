@@ -82,12 +82,12 @@ $(function(){
 
     registerDraggable();
 
-    zoom.registerZoom();
-    miniNav.miniNavInitialize();
+    zoom.registerZoom(selectedUserComponent);
+    miniNav.miniNavInitialize(selectedUserComponent);
 
     registerUserComponentAreaDroppable();
 
-    setUpStyleColors();
+    setUpStyleColors(selectedUserComponent);
 
     resizeViewportToFitWindow();
 

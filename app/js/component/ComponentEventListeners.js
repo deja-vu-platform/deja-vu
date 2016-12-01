@@ -9,26 +9,28 @@ var zoom = ZoomElement();
 // TODO on user component name input check for special chars
 
 $('#new-user-component-btn').click(function(){
-    $('#create-component').unbind();
-    $('#create-component').on('click', function () {
-        selectedUserComponent = initUserComponent(false, false);
-        selectedProject.addComponent(selectedUserComponent);
-        displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
-        resetMenuOptions();
+    $('#create-component').unbind()
+        .on('click', function () {
+            selectedUserComponent = initUserComponent(false, false);
+            selectedProject.addComponent(selectedUserComponent);
+            displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+            workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
+            setUpStyleColors(selectedUserComponent);
+
+            resetMenuOptions();
     });
 });
 
 $('#new-main-component-btn').click(function(){
-    $('#create-component').unbind();
-    $('#create-component').on('click', function () {
-        selectedUserComponent = initUserComponent(false, true);
-        selectedProject.addMainPage(selectedUserComponent);
-        displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+    $('#create-component').unbind()
+        .on('click', function () {
+            selectedUserComponent = initUserComponent(false, true);
+            selectedProject.addMainPage(selectedUserComponent);
+            displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
-
-        resetMenuOptions();
+            workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
+            setUpStyleColors(selectedUserComponent);
+            resetMenuOptions();
     });
 });
 
@@ -51,7 +53,7 @@ $('.components').on('click', '.component-name-container', function () {
     $(this).parent().addClass('selected');
     selectedUserComponent = selectedProject.components[componentId];
     workSurface.loadUserComponent(selectedUserComponent);
-    setUpStyleColors();
+    setUpStyleColors(selectedUserComponent);
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {
@@ -224,18 +226,19 @@ function displayUserComponentInListAndSelect(name, id){
  */
 function displayNewComponentInUserComponentList(name, id){
     // TODO changes in style
-    var newComponentElt =
-        '<li data-componentid=' + id + '>'
+    var newComponentElt = $(
+        '<li data-type="'+'user'+'" class="widget draggable" data-componentid=' + id + '>'
         + '<div class="component-name-container">'
         + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
         + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</span>'
         + '</div>'
-        + '</li>';
+        + '</li>');
     $('#user-components-list').append(newComponentElt);
     addDeleteUserComponentButton(id);
-    registerUserComponentAsDraggable(id);
+    // registerUserComponentAsDraggable(id);
+    registerDraggable(newComponentElt);
 }
 
 
@@ -258,7 +261,7 @@ function displayNewComponentInMainPagesList(name, id){
         + '</li>';
     $('#main-pages-list').append(newComponentElt);
     addDeleteUserComponentButton(id);
-    registerUserComponentAsDraggable(id);
+    // registerUserComponentAsDraggable(id);
 }
 
 function displayMainPageInListAndSelect(name, id){
@@ -267,9 +270,9 @@ function displayMainPageInListAndSelect(name, id){
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
-function deleteComponentFromView(containerId) {
+function deleteComponentFromView(container) {
     var cell = $('#'+containerId);
-    cell.remove();
+    container.remove();
 }
 
 
@@ -287,7 +290,7 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
     var tooltip = container.find('.tooltip');
     var componentId = container.data('componentId');
 
-    var type = container.find('.draggable').attr('name');
+    var type = container.find('.draggable').data('type');
     var value;
     var isUpload = false;
 
@@ -324,13 +327,16 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
             var parseFile = new Parse.File(file.name, file);
             isUpload = true;
             files.length = 0; // clear the old file
+            console.log('trying?');
+
             parseFile.save()
                 .then(function (savedFile) { // save was successful
+                    console.log('success');
                     value.img_src = savedFile.url();
                     selectedUserComponent.components[componentId].components[type] = value;
 
                     //selectedUserComponent.components[row][col].components[type] = value;
-                    refreshContainerDisplay(container.attr('id'), currentZoom);
+                    refreshContainerDisplay(true, container, currentZoom);
                 });
         } else { // pasted link to image
             if (inputs[0].value.length>0){
@@ -350,7 +356,7 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
         selectedUserComponent.components[componentId].components = {};
         selectedUserComponent.components[componentId].components[type] = value;
 
-        refreshContainerDisplay(container.attr('id'), currentZoom);
+        refreshContainerDisplay(true, container, currentZoom);
     }
 }
 
@@ -411,35 +417,60 @@ function registerDraggable(widgetToRegister) {
         cursorAt: { top: 0, left: 0 },
         helper: function(e, ui){
             var widget = $(this);
+            var type = widget.data('type');
+            if (type == 'user'){
+                if (!widget.hasClass('associated')){
+                    widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                    // widget = $(this).clone();
+                    widget.data('componentid', $(this).data('componentid'));
+                    widget.data('type', type);
+                    registerDraggable(widget);
+                }
+            }
+            widget.addClass('dragging-component');
             var offsetFromMouse = { top: 0, left: 0 };
+            var componentContainer;
             if (widget.hasClass('associated')){
-                var componentId = widget.data('componentId');
+                var componentId = widget.data('componentid');
                 draggingComponent = selectedUserComponent.components[componentId];
                 // keep the old one for now, for guidance and all
-                var componentContainerOld = $('#component-container_'+componentId);
+                var oldContainerId = 'component-container_'+componentId;
+                var componentContainerOld = $('#'+oldContainerId);
                 componentContainerOld.css({
                     opacity: .3,
                 });
-                var componentContainer = componentContainerOld.clone();
+                componentContainer = componentContainerOld.clone();
+                componentContainerOld.attr('id', oldContainerId+'_old');
                 offsetFromMouse = {
                     top: e.pageY - componentContainerOld.offset().top,
                     left: e.pageX - componentContainerOld.offset().left
                 };
-
-
             } else {
-                var type = $(this).attr('name');
-                var component = BaseComponent(type, {}, view.getDimensions(type));
+                var component;
+                if (type == 'user'){
+                    var id = widget.data('componentid');
+                    // TODO
+                    // FIXME
+                    // How to have two copies of the same widget in the same place?
+                    component = UserComponent.fromString(JSON.stringify(selectedProject.components[id]));
+                    component.meta.id = (new Date()).getTime();
+                    widget.data('componentid', component.meta.id);
+                    widget.text(component.meta.name);
+                    widget.css('display', 'block');
+                } else {
+                    component = BaseComponent(type, {}, view.getDimensions(type));
+                }
                 draggingComponent = component;
+                componentContainer = workSurface.makeRecursiveComponentContainersAndDisplay(component, selectedUserComponent, true, widget, $('#work-surface_'+selectedUserComponent.meta.id), currentZoom, selectedUserComponent.properties.custom);
 
-                var componentContainer = componentContainerMaker.createComponentContainer(component, currentZoom);
-                componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom);
+                // var componentContainer = componentContainerMaker.createEditableComponentContainer(component, selectedUserComponent, currentZoom);
+                // componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom, true);
                 $('#basic-components').html(basicComponents);
                 registerDraggable();
             }
 
             $('#outer-container').append(componentContainer);
-            $(this).draggable( "option", "cursorAt", offsetFromMouse );
+            widget.draggable( "option", "cursorAt", offsetFromMouse );
 
             //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
             // componentContainer.hide();
@@ -474,8 +505,9 @@ function registerDraggable(widgetToRegister) {
             var componentId = draggingComponent.meta.id;
             var isNewComponent = $(ui.helper).data('newcomponent');
             if (!isNewComponent){
-                var componentContainerOld = $('#component-container_'+componentId);
+                var componentContainerOld = $('#component-container_'+componentId+'_old');
                 if (!$(ui.helper).data('dropped')){// not properly dropped!
+                    componentContainerOld.attr('id','component-container_'+componentId);
                     componentContainerOld.css({
                         opacity: 1,
                     });
@@ -489,9 +521,7 @@ function registerDraggable(widgetToRegister) {
 
     if (widgetToRegister){
         widgetToRegister.draggable(draggableOptions)
-    }
-
-    else {
+    } else {
         $('.widget').each(function() {
             $(this).draggable(draggableOptions);
         });
@@ -506,30 +536,32 @@ function registerDraggable(widgetToRegister) {
  * @param popup
  */
 function triggerEdit(container, popup) {
-    var type = container.find('.widget').attr('name').toLowerCase();
-    var editDialog = $('#'+type+'-popup-holder').clone();
+    if (container.find('.tooltip').length==0){
+        var type = container.find('.widget').data('type').toLowerCase();
+        var editDialog = $('#'+type+'-popup-holder').clone();
 
-    if (!(type == 'label')){
+        if (!(type == 'label')){
 
-        container.prepend(editDialog);
+            container.prepend(editDialog);
 
+            $(Array.prototype.slice.call(
+                container.find('form-control'), 0)[0]).trigger("focus");
 
-        $(Array.prototype.slice.call(
-            container.find('form-control'), 0)[0]).trigger("focus");
-
-        if (popup){
-            setTimeout(function(){
-                $(container.find('form-control')[0]).trigger("focus");
-                editDialog.find('.tooltip').addClass('open');
-            }, 1);
         }
     }
+    if (popup){
+        setTimeout(function(){
+            $(container.find('form-control')[0]).trigger("focus");
+            editDialog.find('.tooltip').addClass('open');
+        }, 1);
+    }
+
 }
 
 
 
 function registerTooltipBtnHandlers() {
-    $('.close').on("click", function() {
+    $('.close').unbind().on("click", function() {
         setTimeout(function(){
             $('.tooltip').removeClass('open');
         }, 1);
@@ -540,7 +572,7 @@ function registerTooltipBtnHandlers() {
             })
     });
 
-    $('.apply').on("click", function(event) {
+    $('.apply').unbind().on("click", function(event) {
         var cellId = findContainingCell(this);
         updateBaseComponentContentsAndDisplayAt(cellId);
         $('.tooltip').removeClass('open');
@@ -795,25 +827,26 @@ $('.components').on('click', '.index-page-toggle', function(){
 });
 
 
-function refreshContainerDisplay(containerId, zoom){
+function refreshContainerDisplay(fresh, container, zoom){
     if (!zoom){
         zoom = 1;
     }
-    var container =  $('#'+containerId);
     var componentId = container.data('componentId');
 
-    if (selectedUserComponent.components[componentId]){
+    if (selectedUserComponent.components[componentId]){ // component exists
         var componentToChange = selectedUserComponent.components[componentId];
 
-        view.removeDisplay(container);
+        // view.removeDisplay(container);
         var properties = componentToChange.properties;
 
-        // display itself gets rid of padding for the #display-cell
-        view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
+
+        view.displayComponent(fresh, componentToChange, container, selectedUserComponent.properties.custom, zoom);
+
+        // view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
     } else {
-        deleteComponentFromView(containerId);
+        container.remove();
     }
 
 }
@@ -902,7 +935,7 @@ function enableSpecificComponentDomElements(componentToEnableId){
         enableComponentDOMElements(componentToEnableId);
     }
 
-    zoom.updateZoomFromState(componentToEnableId);
+    zoom.updateZoomFromState(componentToEnable);
 
     setComponentOptions(componentToEnable);
 
@@ -1010,17 +1043,17 @@ function testSaveHTML(){
 
 function createDownloadPreview(){
     var oldZoom = currentZoom;
-    var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
+    var workSurfaceElt = $('#work-surface_'+selectedUserComponent.meta.id);
     currentZoom = 1;
-    propagateRatioChangeToAllElts(currentZoom);
+    propagateRatioChangeToAllElts(currentZoom, selectedUserComponent);
 
     $('#download-preview-area').html('').css({
         position: 'relative',
         'text-align': 'center',
         margin: 'auto',
-        width: workSurface.css('width'),
-        height: workSurface.css('height'),
-        'background-color': workSurface.css('background-color'),
+        width: workSurfaceElt.css('width'),
+        height: workSurfaceElt.css('height'),
+        'background-color': workSurfaceElt.css('background-color'),
     });
 
     $('.component-container').each(function(){
@@ -1067,7 +1100,7 @@ function createDownloadPreview(){
     });
 
     currentZoom = oldZoom;
-    propagateRatioChangeToAllElts(currentZoom);
+    propagateRatioChangeToAllElts(currentZoom, selectedUserComponent);
 
     return $('#download-preview-area-container').html();
 }
@@ -1094,5 +1127,5 @@ function downloadHTML(){
 function deleteComponentFromUserComponentAndFromView(componentId) {
     var containerId = "component-container_"+componentId;
     selectedUserComponent.deleteComponent(componentId);
-    deleteComponentFromView(containerId);
+    $('#'+containerId).remove();
 }

@@ -74,6 +74,12 @@ var Display = function(){
                     '<div class="panel-heading">' +
                     '<h3 contenteditable="true" class="panel-title">' + value.heading + '</h3>' +
                     '</div><div contenteditable="true" class="panel-body">' + value.content + '</div></div>';
+            },
+            'blank': function(){
+                return '<div class="blank display-component"></div>';
+            },
+            'user': function(){
+                return '<div class="blank display-component"></div>';
             }
         };
         return defaultHTML[type];
@@ -84,19 +90,89 @@ var Display = function(){
             return {height: 40, width: 200}
         }else if (type == 'link'){
             return {height: 36, width: 100}
+        } else if (type == 'blank'){
+            return {height: 300, width: 300}
         } else {
             return {height: 200, width: 200}
         }
     };
 
-    that.displayInnerComponent = function(container, type, html, zoom, properties, callback) {
+    var displayInnerComponent = function(container, type, html, zoom, properties, overallStyles, callback) {
         var displayElement = $(html);
         container.prepend(displayElement);
         that.hideBaseComponentDisplayAt(container, type);
-        that.updateBaseComponentDisplayAt(container, type, zoom, properties);
+        that.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
         that.showBaseComponentDisplayAt(container, type);
         if (callback) callback();
     };
+
+
+    that.displayComponent = function(fresh, component, container, overallStyles, zoom){
+        if (component.type == 'user'){
+            var width = component.dimensions.width * zoom;
+            var height = component.dimensions.height * zoom;
+            var properties = component.properties;
+
+            container.css({
+                width: width + 'px',
+                height: height + 'px',
+            });
+
+            // make styles more specific
+            overallStyles = JSON.parse(JSON.stringify(overallStyles));
+            for (var customProperty in properties.custom){
+                overallStyles[customProperty] = properties.custom[customProperty];
+            }
+
+            // FIXME this appears twice
+            if (overallStyles['background-color']){
+                container.css({
+                    'background-color':overallStyles['background-color']
+                })
+            }
+
+
+            component.layout.stackOrder.forEach(function(innerComponentId){
+                var innerComponent = component.components[innerComponentId];
+                var innerContainer = container.find('#component-container_'+innerComponentId);
+                var top = component.layout[innerComponentId].top * zoom;
+                var left = component.layout[innerComponentId].left * zoom;
+
+                innerContainer.css({
+                    top: top + 'px',
+                    left: left + 'px',
+                });
+
+                that.displayComponent(fresh, innerComponent, innerContainer, overallStyles, zoom);
+            });
+        } else {
+            var html;
+            if (fresh){
+                container.find('.display-component').remove(); // FIXME this is going to do this a lot, unnecessarily!
+                html = view.getHTML(component.type)(component.components[component.type]);
+                var properties = component.properties;
+                displayInnerComponent(container, component.type, html, zoom, properties, overallStyles);
+            } else if (container){
+                var type = component.type;
+                view.hideBaseComponentDisplayAt(container, type);
+
+                var width = component.dimensions.width * zoom;
+                var height = component.dimensions.height * zoom;
+
+                var properties = component.properties;
+
+                container.css({
+                    width: width + 'px',
+                    height: height + 'px',
+                });
+
+                view.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
+                view.showBaseComponentDisplayAt(container, type);
+
+            }
+        }
+    };
+
 
     that.hideBaseComponentDisplayAt = function(container, type){
         if (type === 'label'){
@@ -129,7 +205,7 @@ var Display = function(){
      * @param type
      * @param zoom
      */
-    that.updateBaseComponentDisplayAt = function(container, type, zoom, properties) {
+    that.updateBaseComponentDisplayAt = function(container, type, zoom, properties, overallStyles) {
         var containerHeight = container.height();
         var containerWidth = container.width();
 
@@ -154,6 +230,12 @@ var Display = function(){
                     'vertical-align':'top',
                     zoom: zoom,
                 });
+            } else if (type === 'blank') {
+                displayComponent.css({
+                    width: '100%',
+                    height: '100%',
+                    zoom: zoom,
+                });
             } else {
                 displayComponent.css({
                     zoom: zoom,
@@ -164,9 +246,14 @@ var Display = function(){
 
         //// TODO SKETCHY!!!
         if (properties){
-            if (Object.keys(properties.overall).length>0){
-                for (var customProperty in properties.overall){
-                    displayComponent.css(customProperty, properties.overall[customProperty]);
+            if (overallStyles){
+                if (overallStyles['background-color']){
+                    container.css({
+                        'background-color':overallStyles['background-color']
+                    })
+                }
+                for (var customProperty in overallStyles){
+                    displayComponent.css(customProperty, overallStyles[customProperty]);
                 }
             }
             if (Object.keys(properties.bsClasses).length>0){ // bootstrap classes

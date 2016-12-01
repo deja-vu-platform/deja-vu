@@ -86,6 +86,7 @@ UserComponent.prototype.addComponent = function(component) {
 
 UserComponent.prototype.deleteComponent = function(componentId) {
     delete this.components[componentId];
+    delete this.layout[componentId];
     var index = this.layout.stackOrder.indexOf(componentId);
     this.layout.stackOrder.splice(index, 1);
     return true;

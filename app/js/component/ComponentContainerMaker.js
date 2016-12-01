@@ -6,7 +6,7 @@ var ComponentContainerMaker = function(){
     var that = Object.create(ComponentContainerMaker);
 
 
-    var makeContainerResizable = function(container, component){
+    var makeContainerResizable = function(component, outerComponent, container){
         var componentId = component.meta.id;
 
         var dragHandle_se = $('<span></span>');
@@ -52,11 +52,13 @@ var ComponentContainerMaker = function(){
                 component.dimensions.height = ui.size.height/currentZoom;
                 component.dimensions.width = ui.size.width/currentZoom;
                 // TODO woah! It resizes as you go!
-                refreshContainerDisplay(container.attr('id'), currentZoom);
+                refreshContainerDisplay(false, container, currentZoom);
             },
             stop: function(e, ui){
+                outerComponent.layout[component.meta.id].left = ui.position.left/currentZoom;
+                outerComponent.layout[component.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
-                miniNav.updateMiniNavInnerComponentSizes(currentZoom);
+                miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
                 setUpGrid();
                 $('.grid').css({
                     visibility: 'hidden'
@@ -75,7 +77,7 @@ var ComponentContainerMaker = function(){
     };
 
 
-    var createEditOptions = function(component, container){
+    var createEditOptions = function(component, outerComponent, container){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -121,6 +123,17 @@ var ComponentContainerMaker = function(){
             '</a>' +
             '</li>');
 
+        var buttonMoveUp = $('<li>' +
+            '<a href="#" class="inner-component-move-up">' +
+            '<span>Move Up</span>' +
+            '</a>' +
+            '</li>');
+        var buttonMoveDown = $('<li>' +
+            '<a href="#" class="inner-component-move-up">' +
+            '<span>Move Down</span>' +
+            '</a>' +
+            '</li>');
+
         buttonTrash.attr('id', 'inner-component-trash' + '_' + component.meta.id);
 
         optionsDropdown.find('.dropdown-menu')
@@ -128,7 +141,10 @@ var ComponentContainerMaker = function(){
             .append('<li class="divider"></li>')
             .append(buttonStyle)
             .append('<li class="divider"></li>')
-            .append(buttonTrash);
+            .append(buttonTrash)
+            .append('<li class="divider"></li>')
+            .append(buttonMoveUp)
+            .append(buttonMoveDown);
 
         // behaviour
 
@@ -144,7 +160,7 @@ var ComponentContainerMaker = function(){
             e.stopPropagation();
             component.properties.custom = {};
             component.properties.bsClasses = {};
-            refreshContainerDisplay(container.attr('id'), currentZoom);
+            refreshContainerDisplay(false, container, currentZoom);
 
         });
 
@@ -158,19 +174,32 @@ var ComponentContainerMaker = function(){
             deleteComponentFromUserComponentAndFromView(component.meta.id)
         });
 
+        buttonMoveUp.click(function(){
+           WorkSurface().changeOrderByOne(component.meta.id, outerComponent, true);
+        });
+
+
+        buttonMoveDown.click(function(){
+            WorkSurface().changeOrderByOne(component.meta.id, outerComponent, false);
+        });
+
         return optionsDropdown;
     };
 
 
-    that.createComponentContainer = function(component, zoom) {
+    that.createBasicComponentContainer = function(component, zoom){
         var container = $('<div></div>');
         var containerId = 'component-container_'+component.meta.id;
         container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
         container.height(component.dimensions.height * zoom).width(component.dimensions.width * zoom);
         container.data('componentId', component.meta.id);
+        return container;
+    };
 
-        makeContainerResizable(container, component);
-        container.append(createEditOptions(component, container));
+    that.createEditableComponentContainer = function(component, outerComponent, zoom) {
+        var container = that.createBasicComponentContainer(component, zoom);
+        makeContainerResizable(component, outerComponent, container);
+        container.append(createEditOptions(component, outerComponent, container));
         return container;
     };
 
@@ -195,7 +224,7 @@ var ComponentContainerMaker = function(){
             var value = fontSizeInput.val();
             if (!isNaN(parseInt(value))){
                 component.properties.custom['font-size'] = value + 'px';
-                refreshContainerDisplay(container.attr('id'), currentZoom);
+                refreshContainerDisplay(false, container, currentZoom);
 
             }
 
@@ -205,7 +234,7 @@ var ComponentContainerMaker = function(){
             var value = fontWeightInput.val();
             if (!isNaN(parseInt(value))){
                 component.properties.custom['font-weight'] = value;
-                refreshContainerDisplay(container.attr('id'), currentZoom);
+                refreshContainerDisplay(false, container, currentZoom);
 
             }
         });
@@ -234,7 +263,7 @@ var ComponentContainerMaker = function(){
             // container.find('.inner-component-options-small').addClass('open');
             var color = pickerText.toHEXString();
             component.properties.custom['color'] = color;
-            refreshContainerDisplay(container.attr('id'), currentZoom);
+            refreshContainerDisplay(false, container, currentZoom);
         });
 
         var pickerBG = new jscolor(bgColorInput[0]);
@@ -245,7 +274,7 @@ var ComponentContainerMaker = function(){
             // container.find('.inner-component-options-small').addClass('open');
             var color = pickerBG.toHEXString();
             component.properties.custom['background-color'] = color;
-            refreshContainerDisplay(container.attr('id'), currentZoom);
+            refreshContainerDisplay(false, container, currentZoom);
         });
 
         var textColor = customStyles['color'] || '000000'; // TODO
@@ -285,24 +314,15 @@ var ComponentContainerMaker = function(){
                 e.stopPropagation();
             });
 
+
             container.find('.inner-component-premade-style-dropdown').append(li);
         });
         container.find('.inner-component-style-dropdown').append(configOptions);
     };
 
-
-    that.setUpContainer = function(container, widget, component, zoom){
+    that.setUpContainer = function(container, widget, component){
+        var type = widget.data('type');
         container.append(widget);
-        var type = widget.attr('name');
-        var properties;
-        if (component){
-            var html = view.getHTML(type)(component.components[type]);
-            component.properties.overall = selectedUserComponent.properties.custom;
-            properties = component.properties;
-        } else {
-            var html = view.getHTML(type)();
-        }
-        view.displayInnerComponent(container, type, html, zoom, properties);
         showConfigOptions(type, container);
         setUpColorOptions(container, component);
         setUpTextOptions(container, component);

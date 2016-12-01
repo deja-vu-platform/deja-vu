@@ -37,6 +37,65 @@ var WorkSurface = function(){
         workSurface.html('');
     };
 
+    that.makeRecursiveComponentContainersAndDisplay = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom, overallStyles){
+        var container = that.makeRecursiveComponentContainers(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom);
+        view.displayComponent(true, component, container, overallStyles, zoom);
+        return container;
+    };
+
+    // isEditable == component is the selected user component and all its contents are editable
+    that.makeRecursiveComponentContainers = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom){
+        var type = component.type;
+        var componentId = component.meta.id;
+
+        // first create a container for this component
+        var componentContainer;
+        if (isThisEditable){
+            componentContainer = componentContainerMaker.createEditableComponentContainer(component, outerComponent, zoom);
+            if (!widget){
+                widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                if (type == 'user'){
+                    widget.text(component.meta.name);
+                    widget.css('display', 'block');
+                }
+                widget.addClass('associated').data('componentid', componentId);
+            }
+            componentContainerMaker.setUpContainer(componentContainer, widget, component);
+            registerDraggable(widget);
+            var editPopup = false;
+            if (widget){
+                if (!widget.hasClass('associated')){
+                    if (!widget.hasClass('dragging-component')){
+                        editPopup = true;
+                    }
+                }
+            }
+            triggerEdit(componentContainer, editPopup);
+        } else {
+            componentContainer = componentContainerMaker.createBasicComponentContainer(component, zoom);
+        }
+        if (outerComponentContainer){
+            outerComponentContainer.append(componentContainer);
+            registerTooltipBtnHandlers();
+        }
+
+        if (outerComponent.layout[componentId]){ // means it's not not added yet
+            componentContainer.css({
+                position: 'absolute',
+                left: outerComponent.layout[componentId].left*zoom,
+                top: outerComponent.layout[componentId].top*zoom,
+
+            });
+        }
+
+        if (type === 'user'){ // do the recursion
+            component.layout.stackOrder.forEach(function(innerComponentId){
+                var innerComponent = component.components[innerComponentId];
+                that.makeRecursiveComponentContainers(innerComponent, component, false, null, componentContainer, zoom);
+            });
+        }
+        return componentContainer;
+    };
 
     /**
      * Loads elements into the DOM. If the elements were already there, gets rid of them
@@ -46,26 +105,10 @@ var WorkSurface = function(){
      */
     var loadComponentIntoWorkSurface = function(component, zoom){
         var workSurface = createOrResetWorkSurface(component, zoom);
-
         component.layout.stackOrder.forEach(function(innerComponentId){
             var innerComponent = component.components[innerComponentId];
-            var type = innerComponent.type;
-            var componentContainer = componentContainerMaker.createComponentContainer(innerComponent, zoom);
-            var widget = $('#basic-components .draggable[name=' + type + ']').clone();
-            widget.addClass('associated').data('componentId', innerComponentId);
-
-            componentContainer.css({
-                position: 'absolute',
-                left: component.layout[innerComponentId].left,
-                top: component.layout[innerComponentId].top,
-
-            });
-
-            componentContainerMaker.setUpContainer(componentContainer, widget, innerComponent, zoom);
-            registerDraggable(widget);
-            workSurface.append(componentContainer);
-            triggerEdit(componentContainer, false);
-            registerTooltipBtnHandlers('component-container_'+innerComponentId);
+            var container = that.makeRecursiveComponentContainers(innerComponent, component, true, null, workSurface, zoom);
+            view.displayComponent(true, innerComponent, container, component.properties.custom, zoom)
         });
         setUpGrid();
 
@@ -89,9 +132,6 @@ var WorkSurface = function(){
             minHeight: 0,
             minWidth: 0,
             start: function(){
-                // var numComponents = selectedUserComponent.layout.stackOrder.length;
-                // var minWidth = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().left;
-                // var minHeight = $('#grid-cell_'+(2*numComponents)+'_'+(2*numComponents)).position().top;
                 var minWidth = $('.grid-cell:last').position().left;
                 var minHeight = $('.grid-cell:last').position().top;
 
@@ -104,15 +144,15 @@ var WorkSurface = function(){
             },
             stop: function(e, ui){
                 // not super important to update as you resize so just do it at the end
-                miniNav.updateMiniNavInnerComponentSizes(currentZoom);
+                miniNav.updateMiniNavInnerComponentSizes(component, currentZoom);
                 setUpGrid();
 
             }
         });
 
-    }
+    };
 
-    var makeWorkSurfaceDroppableToComponents = function(workSurface){
+    var makeWorkSurfaceDroppableToComponents = function(workSurface, outerComponent){
 
         var dropSettings = {
             accept: ".widget",
@@ -126,33 +166,32 @@ var WorkSurface = function(){
 
 
                 var widget = $(ui.draggable);
+                var type = $(ui.draggable).data('type');
+                if (type == 'user'){
+                    if (!widget.hasClass('associated')) {
+                        widget = $(ui.draggable).clone();
+                        widget.data('componentid', $(ui.draggable).data('componentid'));
+                        widget.data('type', type);
+                        registerDraggable(widget);
+                    }
+                }
+
                 // on drop, there should always be a dragging component
                 var component = draggingComponent;
                 var componentId = component.meta.id;
-                var componentContainer = componentContainerMaker.createComponentContainer(component, currentZoom);
-                componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom);
-                registerDraggable();
+                widget.removeClass('dragging-component');
+                outerComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
+                that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, widget, workSurface, currentZoom, outerComponent.properties.custom);
+
                 if (!widget.hasClass('associated')){
                     $(ui.helper).data('newcomponent', true);
-                    selectedUserComponent.addComponent(component);
-                    widget.addClass('associated').data('componentId', componentId);
-                    triggerEdit(componentContainer, true);
+                    outerComponent.addComponent(component);
+                    widget.addClass('associated').data('componentid', componentId);
                 } else {
-                    shiftOrder(componentId);
-                    triggerEdit(componentContainer, false);
+                    shiftOrder(componentId, outerComponent);
                 }
 
-                workSurface.append(componentContainer);
-                registerTooltipBtnHandlers();
-
-
-                componentContainer.css({
-                    position: 'absolute',
-                    left: left,
-                    top: top
-                });
-                selectedUserComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
-                miniNav.updateMiniNavInnerComponentSizes(currentZoom);
+                miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
                 setUpGrid();
 
             }
@@ -162,8 +201,8 @@ var WorkSurface = function(){
     };
 
     // puts componentId at the top!
-    var shiftOrder = function(componentId){
-        var stackOrder = selectedUserComponent.layout.stackOrder;
+    var shiftOrder = function(componentId, outerComponent){
+        var stackOrder = outerComponent.layout.stackOrder;
 
         var index;
         for (var i = 0; i < stackOrder.length; i++){
@@ -173,8 +212,8 @@ var WorkSurface = function(){
                 break
             }
         }
-        selectedUserComponent.layout.stackOrder.splice(index, 1);
-        selectedUserComponent.layout.stackOrder.push(componentId);
+        outerComponent.layout.stackOrder.splice(index, 1);
+        outerComponent.layout.stackOrder.push(componentId);
     };
 
 
@@ -235,9 +274,9 @@ var WorkSurface = function(){
         return Object.keys(componentsToShift);
     };
 
-    var changeOrderByOne = function(componentId, isUp){
+    that.changeOrderByOne = function(componentId, outerComponent, isUp){
         var componentsToShift = {};
-        for (var id in selectedUserComponent.components){
+        for (var id in outerComponent.components){
             var overlappingComponents = findComponentsToShift(componentId, id);
             overlappingComponents.forEach(function(id){
                 if (!(id in componentsToShift)){
@@ -246,7 +285,7 @@ var WorkSurface = function(){
             })
         }
 
-        var stackOrder = selectedUserComponent.layout.stackOrder;
+        var stackOrder = outerComponent.layout.stackOrder;
         var idxThisComponent;
         var idxNextComponent;
         if (!isUp){
@@ -278,8 +317,9 @@ var WorkSurface = function(){
         if (!isUp){
             stackOrder.reverse();
         }
-        selectedUserComponent.layout.stackOrder = stackOrder;
-        console.log(stackOrder);
+        outerComponent.layout.stackOrder = stackOrder;
+        // FIXME faster implem?
+        loadComponentIntoWorkSurface(outerComponent, currentZoom);
     };
 
 
@@ -299,7 +339,7 @@ var WorkSurface = function(){
         } else {
             disableAllComponentDomElementsExcept(componentId);
             setComponentOptions(component);
-            zoomElement.updateZoomFromState(componentId);
+            zoomElement.updateZoomFromState(component);
         }
     };
 
@@ -320,9 +360,9 @@ var WorkSurface = function(){
         $('#outer-container').append(workSurface);
 
         makeWorkSurfaceResizable(workSurface, component); // TODO experimentation
-        makeWorkSurfaceDroppableToComponents(workSurface);
+        makeWorkSurfaceDroppableToComponents(workSurface, component);
         setComponentOptions(selectedProject.components[componentId]);
-        zoomElement.updateZoomFromState(componentId);
+        zoomElement.updateZoomFromState(component);
 
         return workSurface
     };

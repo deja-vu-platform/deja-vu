@@ -1,0 +1,25 @@
+11/20/2016 test notes
+
+things that I'd really like:
+	a box (empty box component) so that I can set add sorts of background colors
+	grouping and moving together
+	changing text size significantly
+	feedback on image loading or is name is not acceptable
+
+things I did not like:
+	working while zoomed then coming back results in incorrect placement of components
+	grids seems to not be functioning correctly, adding components may not correctly update the grid
+	menu and dragging handle may get hidden under other components
+
+11/30/2016 issues
+x color change does not penetrate the recursive components
+link between components not remembered
+background color is not remembered
+x zoom does not work very well (ratios not zoomed)
+x list component disappears
+x need to consolidate the code into smaller chunks
+x need to update view to work with components (maybe view should be moved into component containers?)
+x resizing upwards does not change the top, left position, just the size!!
+x at a lot of places, using selected user component as opposed to a given component might cause problems
+need ui components for moving up and down the stack order.
+how to allow copies of the same component in multiple places (same id)?
