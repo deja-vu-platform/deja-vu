@@ -11,10 +11,10 @@ import {Widget} from "client-bus";
   styles: [``]
 })
 export class NewWeeklyEventComponent {
-  starts_on: string;
-  ends_on: string;
-  start_time; end_time;
-  guests;
+  starts_on: string = "";
+  ends_on: string = "";
+  start_time: string = "";
+  end_time: string = "";
   weeklyEvent = {atom_id: undefined};
 
   constructor(
@@ -22,12 +22,16 @@ export class NewWeeklyEventComponent {
       private _elementRef: ElementRef) {}
 
   onSubmit() {
+    this.starts_on = document.getElementById("starts-on-text")["value"];
+    this.ends_on = document.getElementById("ends-on-text")["value"];
+    this.start_time = document.getElementById("start-time-text")["value"];
+    this.end_time = document.getElementById("end-time-text")["value"];
+
     this._graphQlService
       .post(`
         newWeeklyEvent(
-          starts_on: "${this.starts_on}", ends_on: "${this.ends_on},
-          start_time: "${this.start_time}", end_time: "${this.end_time}",
-          guests: ${this.guests}) {
+          starts_on: "${this.starts_on}", ends_on: "${this.ends_on}",
+          start_time: "${this.start_time}", end_time: "${this.end_time}") {
           atom_id
         }
       `)
@@ -36,8 +40,13 @@ export class NewWeeklyEventComponent {
       });
   }
 
+  update(e) {
+    console.log(e);
+  }
+
   ngAfterViewInit() {
     this._loadScript("bootstrap-datepicker/bootstrap-datepicker.min.js");
+    this._loadScript("bootstrap-timepicker/bootstrap-timepicker.min.js");
   }
 
   _loadScript(src: string) {

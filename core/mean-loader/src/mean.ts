@@ -174,7 +174,7 @@ export namespace GruntTask {
             {
               expand: true,
               cwd: "src/dv-dev",
-              src: ["**/*.{html,css}"],
+              src: ["**/*.{html,css,js}"],
               dest: "dist/public/dv-dev"
             }
           ]
@@ -184,7 +184,7 @@ export namespace GruntTask {
             {
               expand: true,
               cwd: "src",
-              src: ["components/**/*.{html,css}"],
+              src: ["components/**/*.{html,css,js}"],
               dest: "lib"
             }
           ]

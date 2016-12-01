@@ -56,7 +56,7 @@ const schema = grafo
       events: {"type": "[Event]"}
     }
   })
-  .add_query({
+  .add_mutation({
     name: "newWeeklyEvent",
     "type": "WeeklyEvent",
     args: {
