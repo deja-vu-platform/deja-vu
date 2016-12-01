@@ -276,7 +276,7 @@ var WorkSurface = function(){
         return Object.keys(componentsToShift);
     };
 
-    var changeOrderByOne = function(componentId, outerComponent, isUp){
+    that.changeOrderByOne = function(componentId, outerComponent, isUp){
         var componentsToShift = {};
         for (var id in outerComponent.components){
             var overlappingComponents = findComponentsToShift(componentId, id);
@@ -320,6 +320,8 @@ var WorkSurface = function(){
             stackOrder.reverse();
         }
         outerComponent.layout.stackOrder = stackOrder;
+        // FIXME faster implem?
+        loadComponentIntoWorkSurface(outerComponent, currentZoom);
     };
 
 

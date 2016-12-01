@@ -77,7 +77,7 @@ var ComponentContainerMaker = function(){
     };
 
 
-    var createEditOptions = function(component, container){
+    var createEditOptions = function(component, outerComponent, container){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -123,6 +123,17 @@ var ComponentContainerMaker = function(){
             '</a>' +
             '</li>');
 
+        var buttonMoveUp = $('<li>' +
+            '<a href="#" class="inner-component-move-up">' +
+            '<span>Move Up</span>' +
+            '</a>' +
+            '</li>');
+        var buttonMoveDown = $('<li>' +
+            '<a href="#" class="inner-component-move-up">' +
+            '<span>Move Down</span>' +
+            '</a>' +
+            '</li>');
+
         buttonTrash.attr('id', 'inner-component-trash' + '_' + component.meta.id);
 
         optionsDropdown.find('.dropdown-menu')
@@ -130,7 +141,10 @@ var ComponentContainerMaker = function(){
             .append('<li class="divider"></li>')
             .append(buttonStyle)
             .append('<li class="divider"></li>')
-            .append(buttonTrash);
+            .append(buttonTrash)
+            .append('<li class="divider"></li>')
+            .append(buttonMoveUp)
+            .append(buttonMoveDown);
 
         // behaviour
 
@@ -160,6 +174,16 @@ var ComponentContainerMaker = function(){
             deleteComponentFromUserComponentAndFromView(component.meta.id)
         });
 
+        buttonMoveUp.click(function(){
+           WorkSurface().changeOrderByOne(component.meta.id, outerComponent, true);
+        });
+
+
+        buttonMoveDown.click(function(){
+            console.log(WorkSurface().changeOrderByOne);
+            WorkSurface().changeOrderByOne(component.meta.id, outerComponent, false);
+        });
+
         return optionsDropdown;
     };
 
@@ -176,7 +200,7 @@ var ComponentContainerMaker = function(){
     that.createEditableComponentContainer = function(component, outerComponent, zoom) {
         var container = that.createBasicComponentContainer(component, zoom);
         makeContainerResizable(component, outerComponent, container);
-        container.append(createEditOptions(component, container));
+        container.append(createEditOptions(component, outerComponent, container));
         return container;
     };
 
