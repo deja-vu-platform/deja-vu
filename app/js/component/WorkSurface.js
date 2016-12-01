@@ -37,6 +37,57 @@ var WorkSurface = function(){
         workSurface.html('');
     };
 
+    // isEditable == component is the selected user component and all its contents are editable
+    that.makeRecursiveComponentContainers = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom){
+        var type = component.type;
+        var componentId = component.meta.id;
+
+        // first create a container for this component
+        var componentContainer;
+        if (isThisEditable){
+            componentContainer = componentContainerMaker.createEditableComponentContainer(component, outerComponent, zoom);
+            if (!widget){
+                widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                widget.addClass('associated').data('componentId', componentId);
+            }
+            componentContainerMaker.setUpContainer(componentContainer, widget, component, zoom);
+            registerDraggable(widget);
+            if (widget){
+                if (!widget.hasClass('associated')){
+                    if (!widget.hasClass('dragging-component')){
+                        triggerEdit(componentContainer, true);
+                    }
+                }
+            } else {
+                triggerEdit(componentContainer, false);
+            }
+        } else {
+            componentContainer = componentContainerMaker.createBasicComponentContainer(component, zoom);
+            // var widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+            componentContainerMaker.setUpBasicContainer(componentContainer, null, component, zoom);
+        }
+        if (outerComponentContainer){
+            outerComponentContainer.append(componentContainer);
+            registerTooltipBtnHandlers();
+        }
+
+        if (outerComponent.layout[componentId]){ // means it's not not added yet
+            componentContainer.css({
+                position: 'absolute',
+                left: outerComponent.layout[componentId].left*zoom,
+                top: outerComponent.layout[componentId].top*zoom,
+
+            });
+        }
+
+        if (type === 'user'){ // do the recursion
+            component.layout.stackOrder.forEach(function(innerComponentId){
+                var innerComponent = component.components[innerComponentId];
+                that.makeRecursiveComponentContainers(innerComponent, component, false, null, componentContainer, zoom);
+            });
+        }
+        return componentContainer;
+    };
 
     /**
      * Loads elements into the DOM. If the elements were already there, gets rid of them
@@ -46,26 +97,9 @@ var WorkSurface = function(){
      */
     var loadComponentIntoWorkSurface = function(component, zoom){
         var workSurface = createOrResetWorkSurface(component, zoom);
-
         component.layout.stackOrder.forEach(function(innerComponentId){
             var innerComponent = component.components[innerComponentId];
-            var type = innerComponent.type;
-            var componentContainer = componentContainerMaker.createComponentContainer(innerComponent, zoom);
-            var widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
-            widget.addClass('associated').data('componentId', innerComponentId);
-
-            componentContainer.css({
-                position: 'absolute',
-                left: component.layout[innerComponentId].left,
-                top: component.layout[innerComponentId].top,
-
-            });
-
-            componentContainerMaker.setUpContainer(componentContainer, widget, innerComponent, zoom);
-            registerDraggable(widget);
-            workSurface.append(componentContainer);
-            triggerEdit(componentContainer, false);
-            registerTooltipBtnHandlers('component-container_'+innerComponentId);
+            that.makeRecursiveComponentContainers(innerComponent, component, true, null, workSurface, zoom);
         });
         setUpGrid();
 
@@ -123,32 +157,50 @@ var WorkSurface = function(){
 
 
                 var widget = $(ui.draggable);
+                var type = $(ui.draggable).data('type');
+                if (type == 'user'){
+                    if (!widget.hasClass('associated')) {
+                        widget = $(ui.draggable).clone();
+                        widget.data('componentId', $(ui.draggable).data('componentId'));
+                        widget.data('type', type);
+                        registerDraggable(widget);
+                    }
+                }
+
+                // var widget = $(ui.draggable).clone();
+                // widget.data('componentid', $(ui.draggable).data('componentId'));
+                // widget.data('type', $(ui.draggable).data('type'));
                 // on drop, there should always be a dragging component
                 var component = draggingComponent;
                 var componentId = component.meta.id;
-                var componentContainer = componentContainerMaker.createComponentContainer(component, currentZoom);
-                componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom);
-                registerDraggable();
+
+                widget.removeClass('dragging-component');
+                selectedUserComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
+
+                that.makeRecursiveComponentContainers(component, selectedUserComponent, true, widget, workSurface, currentZoom);
+
+                // var componentContainer = componentContainerMaker.createEditableComponentContainer(component, selectedUserComponent, currentZoom);
+                // componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom, true);
+                // registerDraggable();
                 if (!widget.hasClass('associated')){
                     $(ui.helper).data('newcomponent', true);
                     selectedUserComponent.addComponent(component);
                     widget.addClass('associated').data('componentId', componentId);
-                    triggerEdit(componentContainer, true);
                 } else {
                     shiftOrder(componentId);
-                    triggerEdit(componentContainer, false);
                 }
 
-                workSurface.append(componentContainer);
-                registerTooltipBtnHandlers();
 
 
-                componentContainer.css({
-                    position: 'absolute',
-                    left: left,
-                    top: top
-                });
-                selectedUserComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
+                // workSurface.append(componentContainer);
+                // registerTooltipBtnHandlers();
+
+
+                // componentContainer.css({
+                //     position: 'absolute',
+                //     left: left,
+                //     top: top
+                // });
                 miniNav.updateMiniNavInnerComponentSizes(currentZoom);
                 setUpGrid();
 
@@ -276,7 +328,6 @@ var WorkSurface = function(){
             stackOrder.reverse();
         }
         selectedUserComponent.layout.stackOrder = stackOrder;
-        console.log(stackOrder);
     };
 
 

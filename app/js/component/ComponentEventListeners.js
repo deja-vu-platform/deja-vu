@@ -412,7 +412,19 @@ function registerDraggable(widgetToRegister) {
         cursorAt: { top: 0, left: 0 },
         helper: function(e, ui){
             var widget = $(this);
+            var type = widget.data('type');
+
+            if (type == 'user'){
+                if (!widget.hasClass('associated')){
+                    widget = $(this).clone();
+                    widget.data('componentId', $(this).data('componentId'));
+                    widget.data('type', type);
+                    registerDraggable(widget);
+                }
+            }
+            widget.addClass('dragging-component');
             var offsetFromMouse = { top: 0, left: 0 };
+            var componentContainer;
             if (widget.hasClass('associated')){
                 var componentId = widget.data('componentId');
                 draggingComponent = selectedUserComponent.components[componentId];
@@ -421,29 +433,29 @@ function registerDraggable(widgetToRegister) {
                 componentContainerOld.css({
                     opacity: .3,
                 });
-                var componentContainer = componentContainerOld.clone();
+                componentContainer = componentContainerOld.clone();
                 offsetFromMouse = {
                     top: e.pageY - componentContainerOld.offset().top,
                     left: e.pageX - componentContainerOld.offset().left
                 };
             } else {
-                var type = $(this).data('type');
                 if (type == 'user'){
-                    var id = $(this).data('componentid');
+                    var id = widget.data('componentid');
                     var component = selectedProject.components[id];
                 } else {
                     var component = BaseComponent(type, {}, view.getDimensions(type));
                 }
                 draggingComponent = component;
+                componentContainer = workSurface.makeRecursiveComponentContainers(component, selectedUserComponent, true, widget, $('#work-surface_'+selectedUserComponent.meta.id), currentZoom);
 
-                var componentContainer = componentContainerMaker.createComponentContainer(component, currentZoom);
-                componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom);
+                // var componentContainer = componentContainerMaker.createEditableComponentContainer(component, selectedUserComponent, currentZoom);
+                // componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom, true);
                 $('#basic-components').html(basicComponents);
                 registerDraggable();
             }
 
             $('#outer-container').append(componentContainer);
-            $(this).draggable( "option", "cursorAt", offsetFromMouse );
+            widget.draggable( "option", "cursorAt", offsetFromMouse );
 
             //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
             // componentContainer.hide();
@@ -493,9 +505,7 @@ function registerDraggable(widgetToRegister) {
 
     if (widgetToRegister){
         widgetToRegister.draggable(draggableOptions)
-    }
-
-    else {
+    } else {
         $('.widget').each(function() {
             $(this).draggable(draggableOptions);
         });
@@ -1016,7 +1026,7 @@ function testSaveHTML(){
 
 function createDownloadPreview(){
     var oldZoom = currentZoom;
-    var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
+    var workSurfaceElt = $('#work-surface_'+selectedUserComponent.meta.id);
     currentZoom = 1;
     propagateRatioChangeToAllElts(currentZoom);
 
@@ -1024,9 +1034,9 @@ function createDownloadPreview(){
         position: 'relative',
         'text-align': 'center',
         margin: 'auto',
-        width: workSurface.css('width'),
-        height: workSurface.css('height'),
-        'background-color': workSurface.css('background-color'),
+        width: workSurfaceElt.css('width'),
+        height: workSurfaceElt.css('height'),
+        'background-color': workSurfaceElt.css('background-color'),
     });
 
     $('.component-container').each(function(){

@@ -259,38 +259,7 @@ function addAddToMainPagesButton(){
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(newRatio){
-    for (var componentId in selectedUserComponent.components){
-        var container = $('#component-container_'+componentId);
-        var component = selectedUserComponent.components[componentId];
-        var type = component.type;
-        view.hideBaseComponentDisplayAt(container, type);
-
-        var width = component.dimensions.width * newRatio;
-        var top = selectedUserComponent.layout[componentId].top * newRatio;
-        var height = component.dimensions.height * newRatio;
-        var left = selectedUserComponent.layout[componentId].left *  newRatio;
-
-        var properties = component.properties;
-
-        container.css({
-            width: width + 'px',
-            height: height + 'px',
-            top: top + 'px',
-            left: left + 'px'
-        });
-
-        view.updateBaseComponentDisplayAt(container, type, newRatio, properties);
-        view.showBaseComponentDisplayAt(container, type);
-    }
-
-    var outerWidth = selectedUserComponent.dimensions.width * newRatio;
-    var outerHeight = selectedUserComponent.dimensions.height * newRatio;
-
-    $('.work-surface').css({
-        height: outerHeight + 'px',
-        width: outerWidth + 'px'
-    });
-
+    view.displayComponent(selectedUserComponent, $('#work-surface_'+selectedUserComponent.meta.id), newRatio);
     miniNav.updateNavInnerComponentSizes(newRatio);
     setUpGrid();
 }

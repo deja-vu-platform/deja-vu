@@ -77,6 +77,9 @@ var Display = function(){
             },
             'blank': function(){
                 return '<div class="blank display-component"></div>';
+            },
+            'user': function(){
+                return '<div class="blank display-component"></div>';
             }
         };
         return defaultHTML[type];
@@ -94,18 +97,59 @@ var Display = function(){
         }
     };
 
+    that.changeDisplayRatios = function(component, container, zoom){
+
+    };
+
     that.displayComponent = function(component, container, zoom){
 
         if (component.type == 'user'){
+            var width = component.dimensions.width * zoom;
+            var height = component.dimensions.height * zoom;
+            var properties = component.properties;
+
+            container.css({
+                width: width + 'px',
+                height: height + 'px',
+            });
+
             component.layout.stackOrder.forEach(function(innerComponentId){
                 var innerComponent = component.components[innerComponentId];
-                var innerContainer = container.find('#component-container_'+innerComponentId);
+                var innerContainer = $('#component-container_'+innerComponentId);
+                var top = component.layout[innerComponentId].top * zoom;
+                var left = component.layout[innerComponentId].left * zoom;
+
+                innerContainer.css({
+                    top: top + 'px',
+                    left: left + 'px',
+                });
+
                 that.displayComponent(innerComponent, innerContainer, zoom);
             });
         } else {
-            var html = view.getHTML(component.type)(component.components[component.type]);
-            var properties = component.properties;
-            that.displayInnerComponent(container, component.type, html, zoom, properties);
+            var html;
+            if (container){
+                var type = component.type;
+                view.hideBaseComponentDisplayAt(container, type);
+
+                var width = component.dimensions.width * zoom;
+                var height = component.dimensions.height * zoom;
+
+                var properties = component.properties;
+
+                container.css({
+                    width: width + 'px',
+                    height: height + 'px',
+                });
+
+                view.updateBaseComponentDisplayAt(container, type, zoom, properties);
+                view.showBaseComponentDisplayAt(container, type);
+
+            } else {
+                html = view.getHTML(component.type)(component.components[component.type]);
+                var properties = component.properties;
+                that.displayInnerComponent(container, component.type, html, zoom, properties);
+            }
         }
     };
 
