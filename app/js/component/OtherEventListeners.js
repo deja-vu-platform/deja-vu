@@ -132,7 +132,6 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent
         userComponent.properties.custom = {}
     }
     userComponent.properties.custom[styleName] = styleValue;
-    console.log(styleName, styleValue);
     for (var id in userComponent.components){
         var container = $('#work-surface_'+userComponent.meta.id).find('#component-container_'+id);
         refreshContainerDisplay(container, currentZoom);

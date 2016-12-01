@@ -415,13 +415,10 @@ function registerDraggable(widgetToRegister) {
         helper: function(e, ui){
             var widget = $(this);
             var type = widget.data('type');
-            console.log(widget.hasClass('associated'));
             if (type == 'user'){
                 if (!widget.hasClass('associated')){
                     widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
                     // widget = $(this).clone();
-                    console.log(this);
-                    console.log($(this).data('componentid'));
                     widget.data('componentid', $(this).data('componentid'));
                     widget.data('type', type);
                     registerDraggable(widget);
@@ -431,7 +428,6 @@ function registerDraggable(widgetToRegister) {
             var offsetFromMouse = { top: 0, left: 0 };
             var componentContainer;
             if (widget.hasClass('associated')){
-                console.log('associated');
                 var componentId = widget.data('componentid');
                 draggingComponent = selectedUserComponent.components[componentId];
                 // keep the old one for now, for guidance and all
@@ -447,7 +443,6 @@ function registerDraggable(widgetToRegister) {
                     left: e.pageX - componentContainerOld.offset().left
                 };
             } else {
-                console.log('not associated');
                 var component;
                 if (type == 'user'){
                     var id = widget.data('componentid');
