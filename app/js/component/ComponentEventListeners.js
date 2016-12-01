@@ -819,11 +819,11 @@ function refreshContainerDisplay(containerId, zoom){
     if (selectedUserComponent.components[componentId]){ // component exists
         var componentToChange = selectedUserComponent.components[componentId];
 
-        view.removeDisplay(container);
+        // view.removeDisplay(container);
         var properties = componentToChange.properties;
 
 
-        view.displayComponent(componentToChange, container, zoom);
+        view.displayComponent(componentToChange, container, selectedUserComponent.properties.custom, zoom);
 
         // view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
         //attach event handlers to new texts

@@ -97,12 +97,7 @@ var Display = function(){
         }
     };
 
-    that.changeDisplayRatios = function(component, container, zoom){
-
-    };
-
-    that.displayComponent = function(component, container, zoom){
-
+    that.displayComponent = function(component, container, overallStyles, zoom){
         if (component.type == 'user'){
             var width = component.dimensions.width * zoom;
             var height = component.dimensions.height * zoom;
@@ -112,6 +107,11 @@ var Display = function(){
                 width: width + 'px',
                 height: height + 'px',
             });
+
+            // make styles more specific
+            for (var customProperty in properties.custom){
+                overallStyles[customProperty] = properties.custom[customProperty];
+            }
 
             component.layout.stackOrder.forEach(function(innerComponentId){
                 var innerComponent = component.components[innerComponentId];
@@ -124,7 +124,7 @@ var Display = function(){
                     left: left + 'px',
                 });
 
-                that.displayComponent(innerComponent, innerContainer, zoom);
+                that.displayComponent(innerComponent, innerContainer, overallStyles, zoom);
             });
         } else {
             var html;
@@ -142,22 +142,22 @@ var Display = function(){
                     height: height + 'px',
                 });
 
-                view.updateBaseComponentDisplayAt(container, type, zoom, properties);
+                view.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
                 view.showBaseComponentDisplayAt(container, type);
 
             } else {
                 html = view.getHTML(component.type)(component.components[component.type]);
                 var properties = component.properties;
-                that.displayInnerComponent(container, component.type, html, zoom, properties);
+                that.displayInnerComponent(container, component.type, html, zoom, properties, overallStyles);
             }
         }
     };
 
-    that.displayInnerComponent = function(container, type, html, zoom, properties, callback) {
+    that.displayInnerComponent = function(container, type, html, zoom, properties, overallStyles, callback) {
         var displayElement = $(html);
         container.prepend(displayElement);
         that.hideBaseComponentDisplayAt(container, type);
-        that.updateBaseComponentDisplayAt(container, type, zoom, properties);
+        that.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
         that.showBaseComponentDisplayAt(container, type);
         if (callback) callback();
     };
@@ -193,7 +193,7 @@ var Display = function(){
      * @param type
      * @param zoom
      */
-    that.updateBaseComponentDisplayAt = function(container, type, zoom, properties) {
+    that.updateBaseComponentDisplayAt = function(container, type, zoom, properties, overallStyles) {
         var containerHeight = container.height();
         var containerWidth = container.width();
 
@@ -234,9 +234,9 @@ var Display = function(){
 
         //// TODO SKETCHY!!!
         if (properties){
-            if (Object.keys(properties.overall).length>0){
-                for (var customProperty in properties.overall){
-                    displayComponent.css(customProperty, properties.overall[customProperty]);
+            if (overallStyles){
+                for (var customProperty in overallStyles){
+                    displayComponent.css(customProperty, overallStyles[customProperty]);
                 }
             }
             if (Object.keys(properties.bsClasses).length>0){ // bootstrap classes

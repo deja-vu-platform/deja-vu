@@ -259,7 +259,7 @@ function addAddToMainPagesButton(){
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(newRatio){
-    view.displayComponent(selectedUserComponent, $('#work-surface_'+selectedUserComponent.meta.id), newRatio);
+    view.displayComponent(selectedUserComponent, $('#work-surface_'+selectedUserComponent.meta.id), null, newRatio);
     miniNav.updateNavInnerComponentSizes(newRatio);
     setUpGrid();
 }
