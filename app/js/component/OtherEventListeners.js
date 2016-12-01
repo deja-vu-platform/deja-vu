@@ -134,7 +134,7 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent
     userComponent.properties.custom[styleName] = styleValue;
     for (var id in userComponent.components){
         var container = $('#work-surface_'+userComponent.meta.id).find('#component-container_'+id);
-        refreshContainerDisplay(container, currentZoom);
+        refreshContainerDisplay(false, container, currentZoom);
     }
 
 };
@@ -168,7 +168,7 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent
             // var innerComponent = selectedUserComponent.components[id];
             // innerComponent.properties.overall = {};
             var container = $('#work-surface_'+selectedUserComponent.meta.id).find('#component-container_'+id);
-            refreshContainerDisplay(container, currentZoom);
+            refreshContainerDisplay(false, container, currentZoom);
         }
     });
 })();

@@ -58,19 +58,19 @@ var WorkSurface = function(){
                     widget.text(component.meta.name);
                     widget.css('display', 'block');
                 }
-                widget.addClass('associated').data('componentId', componentId);
+                widget.addClass('associated').data('componentid', componentId);
             }
             componentContainerMaker.setUpContainer(componentContainer, widget, component);
             registerDraggable(widget);
+            var editPopup = false;
             if (widget){
                 if (!widget.hasClass('associated')){
                     if (!widget.hasClass('dragging-component')){
-                        triggerEdit(componentContainer, true);
+                        editPopup = true;
                     }
                 }
-            } else {
-                triggerEdit(componentContainer, false);
             }
+            triggerEdit(componentContainer, editPopup);
         } else {
             componentContainer = componentContainerMaker.createBasicComponentContainer(component, zoom);
         }
@@ -171,7 +171,7 @@ var WorkSurface = function(){
                     console.log(widget.hasClass('associated'));
                     if (!widget.hasClass('associated')) {
                         widget = $(ui.draggable).clone();
-                        widget.data('componentId', $(ui.draggable).data('componentId'));
+                        widget.data('componentid', $(ui.draggable).data('componentid'));
                         widget.data('type', type);
                         registerDraggable(widget);
                     }
@@ -188,7 +188,7 @@ var WorkSurface = function(){
                 if (!widget.hasClass('associated')){
                     $(ui.helper).data('newcomponent', true);
                     outerComponent.addComponent(component);
-                    widget.addClass('associated').data('componentId', componentId);
+                    widget.addClass('associated').data('componentid', componentId);
                 } else {
                     shiftOrder(componentId, outerComponent);
                 }

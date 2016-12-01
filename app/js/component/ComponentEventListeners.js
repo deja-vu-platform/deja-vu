@@ -327,13 +327,16 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
             var parseFile = new Parse.File(file.name, file);
             isUpload = true;
             files.length = 0; // clear the old file
+            console.log('trying?');
+
             parseFile.save()
                 .then(function (savedFile) { // save was successful
+                    console.log('success');
                     value.img_src = savedFile.url();
                     selectedUserComponent.components[componentId].components[type] = value;
 
                     //selectedUserComponent.components[row][col].components[type] = value;
-                    refreshContainerDisplay(container, currentZoom);
+                    refreshContainerDisplay(true, container, currentZoom);
                 });
         } else { // pasted link to image
             if (inputs[0].value.length>0){
@@ -353,7 +356,7 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
         selectedUserComponent.components[componentId].components = {};
         selectedUserComponent.components[componentId].components[type] = value;
 
-        refreshContainerDisplay(container, currentZoom);
+        refreshContainerDisplay(true, container, currentZoom);
     }
 }
 
@@ -433,11 +436,11 @@ function registerDraggable(widgetToRegister) {
                 // keep the old one for now, for guidance and all
                 var oldContainerId = 'component-container_'+componentId;
                 var componentContainerOld = $('#'+oldContainerId);
-                componentContainerOld.attr('id', oldContainerId+'_old');
                 componentContainerOld.css({
                     opacity: .3,
                 });
                 componentContainer = componentContainerOld.clone();
+                componentContainerOld.attr('id', oldContainerId+'_old');
                 offsetFromMouse = {
                     top: e.pageY - componentContainerOld.offset().top,
                     left: e.pageX - componentContainerOld.offset().left
@@ -533,30 +536,32 @@ function registerDraggable(widgetToRegister) {
  * @param popup
  */
 function triggerEdit(container, popup) {
-    var type = container.find('.widget').data('type').toLowerCase();
-    var editDialog = $('#'+type+'-popup-holder').clone();
+    if (container.find('.tooltip').length==0){
+        var type = container.find('.widget').data('type').toLowerCase();
+        var editDialog = $('#'+type+'-popup-holder').clone();
 
-    if (!(type == 'label')){
+        if (!(type == 'label')){
 
-        container.prepend(editDialog);
+            container.prepend(editDialog);
 
+            $(Array.prototype.slice.call(
+                container.find('form-control'), 0)[0]).trigger("focus");
 
-        $(Array.prototype.slice.call(
-            container.find('form-control'), 0)[0]).trigger("focus");
-
-        if (popup){
-            setTimeout(function(){
-                $(container.find('form-control')[0]).trigger("focus");
-                editDialog.find('.tooltip').addClass('open');
-            }, 1);
         }
     }
+    if (popup){
+        setTimeout(function(){
+            $(container.find('form-control')[0]).trigger("focus");
+            editDialog.find('.tooltip').addClass('open');
+        }, 1);
+    }
+
 }
 
 
 
 function registerTooltipBtnHandlers() {
-    $('.close').on("click", function() {
+    $('.close').unbind().on("click", function() {
         setTimeout(function(){
             $('.tooltip').removeClass('open');
         }, 1);
@@ -567,7 +572,7 @@ function registerTooltipBtnHandlers() {
             })
     });
 
-    $('.apply').on("click", function(event) {
+    $('.apply').unbind().on("click", function(event) {
         var cellId = findContainingCell(this);
         updateBaseComponentContentsAndDisplayAt(cellId);
         $('.tooltip').removeClass('open');
@@ -822,7 +827,7 @@ $('.components').on('click', '.index-page-toggle', function(){
 });
 
 
-function refreshContainerDisplay(container, zoom){
+function refreshContainerDisplay(fresh, container, zoom){
     if (!zoom){
         zoom = 1;
     }
@@ -835,7 +840,7 @@ function refreshContainerDisplay(container, zoom){
         var properties = componentToChange.properties;
 
 
-        view.displayComponent(false, componentToChange, container, selectedUserComponent.properties.custom, zoom);
+        view.displayComponent(fresh, componentToChange, container, selectedUserComponent.properties.custom, zoom);
 
         // view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
         //attach event handlers to new texts

@@ -52,7 +52,7 @@ var ComponentContainerMaker = function(){
                 component.dimensions.height = ui.size.height/currentZoom;
                 component.dimensions.width = ui.size.width/currentZoom;
                 // TODO woah! It resizes as you go!
-                refreshContainerDisplay(container, currentZoom);
+                refreshContainerDisplay(false, container, currentZoom);
             },
             stop: function(e, ui){
                 outerComponent.layout[component.meta.id].left = ui.position.left/currentZoom;
@@ -146,7 +146,7 @@ var ComponentContainerMaker = function(){
             e.stopPropagation();
             component.properties.custom = {};
             component.properties.bsClasses = {};
-            refreshContainerDisplay(container, currentZoom);
+            refreshContainerDisplay(false, container, currentZoom);
 
         });
 
@@ -201,7 +201,7 @@ var ComponentContainerMaker = function(){
             var value = fontSizeInput.val();
             if (!isNaN(parseInt(value))){
                 component.properties.custom['font-size'] = value + 'px';
-                refreshContainerDisplay(container, currentZoom);
+                refreshContainerDisplay(false, container, currentZoom);
 
             }
 
@@ -211,7 +211,7 @@ var ComponentContainerMaker = function(){
             var value = fontWeightInput.val();
             if (!isNaN(parseInt(value))){
                 component.properties.custom['font-weight'] = value;
-                refreshContainerDisplay(container, currentZoom);
+                refreshContainerDisplay(false, container, currentZoom);
 
             }
         });
@@ -240,7 +240,7 @@ var ComponentContainerMaker = function(){
             // container.find('.inner-component-options-small').addClass('open');
             var color = pickerText.toHEXString();
             component.properties.custom['color'] = color;
-            refreshContainerDisplay(container, currentZoom);
+            refreshContainerDisplay(false, container, currentZoom);
         });
 
         var pickerBG = new jscolor(bgColorInput[0]);
@@ -251,7 +251,7 @@ var ComponentContainerMaker = function(){
             // container.find('.inner-component-options-small').addClass('open');
             var color = pickerBG.toHEXString();
             component.properties.custom['background-color'] = color;
-            refreshContainerDisplay(container, currentZoom);
+            refreshContainerDisplay(false, container, currentZoom);
         });
 
         var textColor = customStyles['color'] || '000000'; // TODO
