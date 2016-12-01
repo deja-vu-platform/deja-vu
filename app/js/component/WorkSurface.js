@@ -56,6 +56,7 @@ var WorkSurface = function(){
                 widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
                 if (type == 'user'){
                     widget.text(component.meta.name);
+                    widget.css('display', 'block');
                 }
                 widget.addClass('associated').data('componentId', componentId);
             }

@@ -418,8 +418,11 @@ function registerDraggable(widgetToRegister) {
             console.log(widget.hasClass('associated'));
             if (type == 'user'){
                 if (!widget.hasClass('associated')){
-                    widget = $(this).clone();
-                    widget.data('componentId', $(this).data('componentId'));
+                    widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                    // widget = $(this).clone();
+                    console.log(this);
+                    console.log($(this).data('componentid'));
+                    widget.data('componentid', $(this).data('componentid'));
                     widget.data('type', type);
                     registerDraggable(widget);
                 }
@@ -429,7 +432,7 @@ function registerDraggable(widgetToRegister) {
             var componentContainer;
             if (widget.hasClass('associated')){
                 console.log('associated');
-                var componentId = widget.data('componentId');
+                var componentId = widget.data('componentid');
                 draggingComponent = selectedUserComponent.components[componentId];
                 // keep the old one for now, for guidance and all
                 var oldContainerId = 'component-container_'+componentId;
@@ -451,11 +454,11 @@ function registerDraggable(widgetToRegister) {
                     // TODO
                     // FIXME
                     // How to have two copies of the same widget in the same place?
-
                     component = UserComponent.fromString(JSON.stringify(selectedProject.components[id]));
                     component.meta.id = (new Date()).getTime();
-                    widget.data('componentId', component.meta.id);
-
+                    widget.data('componentid', component.meta.id);
+                    widget.text(component.meta.name);
+                    widget.css('display', 'block');
                 } else {
                     component = BaseComponent(type, {}, view.getDimensions(type));
                 }

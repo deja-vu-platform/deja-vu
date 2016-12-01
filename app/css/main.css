@@ -669,3 +669,7 @@ li.selected {
 .text-input{
     width: 120px;
 }
+
+#basic-components .widget[data-type="user"]{
+    display: none;
+}
