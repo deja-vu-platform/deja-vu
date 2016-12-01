@@ -89,6 +89,7 @@ export namespace GruntTask {
         .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
                   "*.{js,html,css}");
     let deps = [
+      "node_modules/jquery/dist/jquery.min.js",
       "node_modules/angular2/bundles/angular2-polyfills.js",
       "node_modules/systemjs/dist/system.src.js",
       "node_modules/rxjs/bundles/Rx.js",
@@ -151,7 +152,7 @@ export namespace GruntTask {
             {
               expand: true,
               cwd: "src",
-              src: ["components/**/*.{html,css}"],
+              src: ["components/**/*.{html,css,js}"],
               dest: "dist/public"
             },
             {
@@ -164,7 +165,7 @@ export namespace GruntTask {
               expand: true,
               src: Object.keys(patterns)
                    .map(p => `node_modules/${p}/lib/components/` +
-                             "**/*.{html,css}"),
+                             "**/*.{html,css,js}"),
               dest: "dist/public/components/",
               rename: (dst, src) => (
                            dst +

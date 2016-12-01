@@ -1,19 +1,33 @@
+<!-- for some reason, the styling doesn't work -->
+<link rel="stylesheet" type="text/css"
+  href="./vendor/bootstrap-datepicker/bootstrap-datepicker3.min.css">
+<!-- -->
 <div class="container">
   <form (ngSubmit)="onSubmit()" #newWeeklyEventForm="ngForm"
     class="form-horizontal">
     <div class="form-group">
       <label class="sr-only" for="starts-on">Starts On</label>
-      <!-- <datetime required id="starts-on" [(ngModel)]="starts_on">
-      </datetime> -->
+      <div id="starts-on" class="input-group date" data-provide="datepicker"
+       data-today-higlight="true" data-autoclose="true">
+        <input type="text" class="form-control">
+        <div class="input-group-addon">
+            <span class="glyphicon glyphicon-th"></span>
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <label class="sr-only" for="ends-on">Ends On</label>
-      <!-- <datetime required id="ends-on" [(date)]="ends_on">
-      </datetime> -->
+      <div id="ends-on" class="input-group date" data-provide="datepicker"
+       data-today-higlight="true" data-autoclose="true">
+        <input type="text" class="form-control">
+        <div class="input-group-addon">
+            <span class="glyphicon glyphicon-th"></span>
+        </div>
+      </div>
     </div>
     <div class="form-group">
       <button type="submit" class="btn btn-default btn-sm"
-       [disabled]="!postForm.form.valid">Create Weekly Event</button>
+       [disabled]="!newWeeklyEventForm.form.valid">Create Weekly Event</button>
     </div>
   </form>
 </div>
