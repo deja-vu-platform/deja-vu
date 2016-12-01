@@ -415,7 +415,7 @@ function registerDraggable(widgetToRegister) {
         helper: function(e, ui){
             var widget = $(this);
             var type = widget.data('type');
-
+            console.log(widget.hasClass('associated'));
             if (type == 'user'){
                 if (!widget.hasClass('associated')){
                     widget = $(this).clone();
@@ -428,10 +428,13 @@ function registerDraggable(widgetToRegister) {
             var offsetFromMouse = { top: 0, left: 0 };
             var componentContainer;
             if (widget.hasClass('associated')){
+                console.log('associated');
                 var componentId = widget.data('componentId');
                 draggingComponent = selectedUserComponent.components[componentId];
                 // keep the old one for now, for guidance and all
-                var componentContainerOld = $('#component-container_'+componentId);
+                var oldContainerId = 'component-container_'+componentId;
+                var componentContainerOld = $('#'+oldContainerId);
+                componentContainerOld.attr('id', oldContainerId+'_old');
                 componentContainerOld.css({
                     opacity: .3,
                 });
@@ -441,11 +444,20 @@ function registerDraggable(widgetToRegister) {
                     left: e.pageX - componentContainerOld.offset().left
                 };
             } else {
+                console.log('not associated');
+                var component;
                 if (type == 'user'){
                     var id = widget.data('componentid');
-                    var component = selectedProject.components[id];
+                    // TODO
+                    // FIXME
+                    // How to have two copies of the same widget in the same place?
+
+                    component = UserComponent.fromString(JSON.stringify(selectedProject.components[id]));
+                    component.meta.id = (new Date()).getTime();
+                    widget.data('componentId', component.meta.id);
+
                 } else {
-                    var component = BaseComponent(type, {}, view.getDimensions(type));
+                    component = BaseComponent(type, {}, view.getDimensions(type));
                 }
                 draggingComponent = component;
                 componentContainer = workSurface.makeRecursiveComponentContainersAndDisplay(component, selectedUserComponent, true, widget, $('#work-surface_'+selectedUserComponent.meta.id), currentZoom, selectedUserComponent.properties.custom);
@@ -492,8 +504,9 @@ function registerDraggable(widgetToRegister) {
             var componentId = draggingComponent.meta.id;
             var isNewComponent = $(ui.helper).data('newcomponent');
             if (!isNewComponent){
-                var componentContainerOld = $('#component-container_'+componentId);
+                var componentContainerOld = $('#component-container_'+componentId+'_old');
                 if (!$(ui.helper).data('dropped')){// not properly dropped!
+                    componentContainerOld.attr('id','component-container_'+componentId);
                     componentContainerOld.css({
                         opacity: 1,
                     });

@@ -54,6 +54,9 @@ var WorkSurface = function(){
             componentContainer = componentContainerMaker.createEditableComponentContainer(component, outerComponent, zoom);
             if (!widget){
                 widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                if (type == 'user'){
+                    widget.text(component.meta.name);
+                }
                 widget.addClass('associated').data('componentId', componentId);
             }
             componentContainerMaker.setUpContainer(componentContainer, widget, component);
@@ -164,6 +167,7 @@ var WorkSurface = function(){
                 var widget = $(ui.draggable);
                 var type = $(ui.draggable).data('type');
                 if (type == 'user'){
+                    console.log(widget.hasClass('associated'));
                     if (!widget.hasClass('associated')) {
                         widget = $(ui.draggable).clone();
                         widget.data('componentId', $(ui.draggable).data('componentId'));
@@ -175,10 +179,9 @@ var WorkSurface = function(){
                 // on drop, there should always be a dragging component
                 var component = draggingComponent;
                 var componentId = component.meta.id;
-
+                console.log(component);
                 widget.removeClass('dragging-component');
                 outerComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
-
                 that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, widget, workSurface, currentZoom, outerComponent.properties.custom);
 
                 if (!widget.hasClass('associated')){

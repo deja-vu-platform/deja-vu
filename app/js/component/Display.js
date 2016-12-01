@@ -124,9 +124,17 @@ var Display = function(){
                 overallStyles[customProperty] = properties.custom[customProperty];
             }
 
+            // FIXME this appears twice
+            if (overallStyles['background-color']){
+                container.css({
+                    'background-color':overallStyles['background-color']
+                })
+            }
+
+
             component.layout.stackOrder.forEach(function(innerComponentId){
                 var innerComponent = component.components[innerComponentId];
-                var innerContainer = $('#component-container_'+innerComponentId);
+                var innerContainer = container.find('#component-container_'+innerComponentId);
                 var top = component.layout[innerComponentId].top * zoom;
                 var left = component.layout[innerComponentId].left * zoom;
 
@@ -238,6 +246,11 @@ var Display = function(){
         //// TODO SKETCHY!!!
         if (properties){
             if (overallStyles){
+                if (overallStyles['background-color']){
+                    container.css({
+                        'background-color':overallStyles['background-color']
+                    })
+                }
                 for (var customProperty in overallStyles){
                     displayComponent.css(customProperty, overallStyles[customProperty]);
                 }
