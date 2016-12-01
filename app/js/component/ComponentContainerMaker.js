@@ -180,7 +180,6 @@ var ComponentContainerMaker = function(){
 
 
         buttonMoveDown.click(function(){
-            console.log(WorkSurface().changeOrderByOne);
             WorkSurface().changeOrderByOne(component.meta.id, outerComponent, false);
         });
 

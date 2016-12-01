@@ -168,7 +168,6 @@ var WorkSurface = function(){
                 var widget = $(ui.draggable);
                 var type = $(ui.draggable).data('type');
                 if (type == 'user'){
-                    console.log(widget.hasClass('associated'));
                     if (!widget.hasClass('associated')) {
                         widget = $(ui.draggable).clone();
                         widget.data('componentid', $(ui.draggable).data('componentid'));
@@ -180,7 +179,6 @@ var WorkSurface = function(){
                 // on drop, there should always be a dragging component
                 var component = draggingComponent;
                 var componentId = component.meta.id;
-                console.log(component);
                 widget.removeClass('dragging-component');
                 outerComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
                 that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, widget, workSurface, currentZoom, outerComponent.properties.custom);
