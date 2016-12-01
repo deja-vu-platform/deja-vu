@@ -11,24 +11,26 @@ var zoom = ZoomElement();
 $('#new-user-component-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
-        selectedUserComponent = initUserComponent(false, false);
-        selectedProject.addComponent(selectedUserComponent);
-        displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
-        resetMenuOptions();
+            selectedUserComponent = initUserComponent(false, false);
+            selectedProject.addComponent(selectedUserComponent);
+            displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+            workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
+            setUpStyleColors(selectedUserComponent);
+
+            resetMenuOptions();
     });
 });
 
 $('#new-main-component-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
-        selectedUserComponent = initUserComponent(false, true);
-        selectedProject.addMainPage(selectedUserComponent);
-        displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+            selectedUserComponent = initUserComponent(false, true);
+            selectedProject.addMainPage(selectedUserComponent);
+            displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
 
-        workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
-
-        resetMenuOptions();
+            workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
+            setUpStyleColors(selectedUserComponent);
+            resetMenuOptions();
     });
 });
 
@@ -51,7 +53,7 @@ $('.components').on('click', '.component-name-container', function () {
     $(this).parent().addClass('selected');
     selectedUserComponent = selectedProject.components[componentId];
     workSurface.loadUserComponent(selectedUserComponent);
-    setUpStyleColors();
+    setUpStyleColors(selectedUserComponent);
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {
@@ -268,9 +270,9 @@ function displayMainPageInListAndSelect(name, id){
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
-function deleteComponentFromView(containerId) {
+function deleteComponentFromView(container) {
     var cell = $('#'+containerId);
-    cell.remove();
+    container.remove();
 }
 
 
@@ -331,7 +333,7 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
                     selectedUserComponent.components[componentId].components[type] = value;
 
                     //selectedUserComponent.components[row][col].components[type] = value;
-                    refreshContainerDisplay(container.attr('id'), currentZoom);
+                    refreshContainerDisplay(container, currentZoom);
                 });
         } else { // pasted link to image
             if (inputs[0].value.length>0){
@@ -351,7 +353,7 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
         selectedUserComponent.components[componentId].components = {};
         selectedUserComponent.components[componentId].components[type] = value;
 
-        refreshContainerDisplay(container.attr('id'), currentZoom);
+        refreshContainerDisplay(container, currentZoom);
     }
 }
 
@@ -446,7 +448,7 @@ function registerDraggable(widgetToRegister) {
                     var component = BaseComponent(type, {}, view.getDimensions(type));
                 }
                 draggingComponent = component;
-                componentContainer = workSurface.makeRecursiveComponentContainers(component, selectedUserComponent, true, widget, $('#work-surface_'+selectedUserComponent.meta.id), currentZoom);
+                componentContainer = workSurface.makeRecursiveComponentContainersAndDisplay(component, selectedUserComponent, true, widget, $('#work-surface_'+selectedUserComponent.meta.id), currentZoom, selectedUserComponent.properties.custom);
 
                 // var componentContainer = componentContainerMaker.createEditableComponentContainer(component, selectedUserComponent, currentZoom);
                 // componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom, true);
@@ -809,11 +811,10 @@ $('.components').on('click', '.index-page-toggle', function(){
 });
 
 
-function refreshContainerDisplay(containerId, zoom){
+function refreshContainerDisplay(container, zoom){
     if (!zoom){
         zoom = 1;
     }
-    var container =  $('#'+containerId);
     var componentId = container.data('componentId');
 
     if (selectedUserComponent.components[componentId]){ // component exists
@@ -823,13 +824,13 @@ function refreshContainerDisplay(containerId, zoom){
         var properties = componentToChange.properties;
 
 
-        view.displayComponent(componentToChange, container, selectedUserComponent.properties.custom, zoom);
+        view.displayComponent(false, componentToChange, container, selectedUserComponent.properties.custom, zoom);
 
         // view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
     } else {
-        deleteComponentFromView(containerId);
+        container.remove();
     }
 
 }
@@ -918,7 +919,7 @@ function enableSpecificComponentDomElements(componentToEnableId){
         enableComponentDOMElements(componentToEnableId);
     }
 
-    zoom.updateZoomFromState(componentToEnableId);
+    zoom.updateZoomFromState(componentToEnable);
 
     setComponentOptions(componentToEnable);
 
@@ -1028,7 +1029,7 @@ function createDownloadPreview(){
     var oldZoom = currentZoom;
     var workSurfaceElt = $('#work-surface_'+selectedUserComponent.meta.id);
     currentZoom = 1;
-    propagateRatioChangeToAllElts(currentZoom);
+    propagateRatioChangeToAllElts(currentZoom, selectedUserComponent);
 
     $('#download-preview-area').html('').css({
         position: 'relative',
@@ -1083,7 +1084,7 @@ function createDownloadPreview(){
     });
 
     currentZoom = oldZoom;
-    propagateRatioChangeToAllElts(currentZoom);
+    propagateRatioChangeToAllElts(currentZoom, selectedUserComponent);
 
     return $('#download-preview-area-container').html();
 }
@@ -1110,5 +1111,5 @@ function downloadHTML(){
 function deleteComponentFromUserComponentAndFromView(componentId) {
     var containerId = "component-container_"+componentId;
     selectedUserComponent.deleteComponent(componentId);
-    deleteComponentFromView(containerId);
+    $('#'+containerId).remove();
 }

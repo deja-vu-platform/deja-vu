@@ -97,7 +97,17 @@ var Display = function(){
         }
     };
 
-    that.displayComponent = function(component, container, overallStyles, zoom){
+    var displayInnerComponent = function(container, type, html, zoom, properties, overallStyles, callback) {
+        var displayElement = $(html);
+        container.prepend(displayElement);
+        that.hideBaseComponentDisplayAt(container, type);
+        that.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
+        that.showBaseComponentDisplayAt(container, type);
+        if (callback) callback();
+    };
+
+
+    that.displayComponent = function(fresh, component, container, overallStyles, zoom){
         if (component.type == 'user'){
             var width = component.dimensions.width * zoom;
             var height = component.dimensions.height * zoom;
@@ -109,6 +119,7 @@ var Display = function(){
             });
 
             // make styles more specific
+            overallStyles = JSON.parse(JSON.stringify(overallStyles));
             for (var customProperty in properties.custom){
                 overallStyles[customProperty] = properties.custom[customProperty];
             }
@@ -124,11 +135,15 @@ var Display = function(){
                     left: left + 'px',
                 });
 
-                that.displayComponent(innerComponent, innerContainer, overallStyles, zoom);
+                that.displayComponent(fresh, innerComponent, innerContainer, overallStyles, zoom);
             });
         } else {
             var html;
-            if (container){
+            if (fresh){
+                html = view.getHTML(component.type)(component.components[component.type]);
+                var properties = component.properties;
+                displayInnerComponent(container, component.type, html, zoom, properties, overallStyles);
+            } else if (container){
                 var type = component.type;
                 view.hideBaseComponentDisplayAt(container, type);
 
@@ -145,22 +160,10 @@ var Display = function(){
                 view.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
                 view.showBaseComponentDisplayAt(container, type);
 
-            } else {
-                html = view.getHTML(component.type)(component.components[component.type]);
-                var properties = component.properties;
-                that.displayInnerComponent(container, component.type, html, zoom, properties, overallStyles);
             }
         }
     };
 
-    that.displayInnerComponent = function(container, type, html, zoom, properties, overallStyles, callback) {
-        var displayElement = $(html);
-        container.prepend(displayElement);
-        that.hideBaseComponentDisplayAt(container, type);
-        that.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
-        that.showBaseComponentDisplayAt(container, type);
-        if (callback) callback();
-    };
 
     that.hideBaseComponentDisplayAt = function(container, type){
         if (type === 'label'){

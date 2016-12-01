@@ -52,13 +52,13 @@ var ComponentContainerMaker = function(){
                 component.dimensions.height = ui.size.height/currentZoom;
                 component.dimensions.width = ui.size.width/currentZoom;
                 // TODO woah! It resizes as you go!
-                refreshContainerDisplay(container.attr('id'), currentZoom);
+                refreshContainerDisplay(container, currentZoom);
             },
             stop: function(e, ui){
                 outerComponent.layout[component.meta.id].left = ui.position.left/currentZoom;
                 outerComponent.layout[component.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
-                miniNav.updateMiniNavInnerComponentSizes(currentZoom);
+                miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
                 setUpGrid();
                 $('.grid').css({
                     visibility: 'hidden'
@@ -146,7 +146,7 @@ var ComponentContainerMaker = function(){
             e.stopPropagation();
             component.properties.custom = {};
             component.properties.bsClasses = {};
-            refreshContainerDisplay(container.attr('id'), currentZoom);
+            refreshContainerDisplay(container, currentZoom);
 
         });
 
@@ -201,7 +201,7 @@ var ComponentContainerMaker = function(){
             var value = fontSizeInput.val();
             if (!isNaN(parseInt(value))){
                 component.properties.custom['font-size'] = value + 'px';
-                refreshContainerDisplay(container.attr('id'), currentZoom);
+                refreshContainerDisplay(container, currentZoom);
 
             }
 
@@ -211,7 +211,7 @@ var ComponentContainerMaker = function(){
             var value = fontWeightInput.val();
             if (!isNaN(parseInt(value))){
                 component.properties.custom['font-weight'] = value;
-                refreshContainerDisplay(container.attr('id'), currentZoom);
+                refreshContainerDisplay(container, currentZoom);
 
             }
         });
@@ -240,7 +240,7 @@ var ComponentContainerMaker = function(){
             // container.find('.inner-component-options-small').addClass('open');
             var color = pickerText.toHEXString();
             component.properties.custom['color'] = color;
-            refreshContainerDisplay(container.attr('id'), currentZoom);
+            refreshContainerDisplay(container, currentZoom);
         });
 
         var pickerBG = new jscolor(bgColorInput[0]);
@@ -251,7 +251,7 @@ var ComponentContainerMaker = function(){
             // container.find('.inner-component-options-small').addClass('open');
             var color = pickerBG.toHEXString();
             component.properties.custom['background-color'] = color;
-            refreshContainerDisplay(container.attr('id'), currentZoom);
+            refreshContainerDisplay(container, currentZoom);
         });
 
         var textColor = customStyles['color'] || '000000'; // TODO
@@ -297,34 +297,9 @@ var ComponentContainerMaker = function(){
         container.find('.inner-component-style-dropdown').append(configOptions);
     };
 
-
-    that.setUpBasicContainer = function(container, widget, component, zoom){
-        if (widget){
-            container.append(widget);
-            var type = widget.data('type');
-        }
-        var properties;
-        var html;
-        if (component){
-            var type = component.type;
-            component.properties.overall = selectedUserComponent.properties.custom;
-            if (type == 'user'){
-                html = '';
-            } else {
-                html = view.getHTML(type)(component.components[type]);
-
-            }
-            properties = component.properties;
-        } else {
-            html = view.getHTML(type)();
-        }
-        view.displayInnerComponent(container, type, html, zoom, properties);
-    };
-
-    that.setUpContainer = function(container, widget, component, zoom){
+    that.setUpContainer = function(container, widget, component){
         var type = widget.data('type');
-
-        that.setUpBasicContainer(container, widget, component, zoom);
+        container.append(widget);
         showConfigOptions(type, container);
         setUpColorOptions(container, component);
         setUpTextOptions(container, component);

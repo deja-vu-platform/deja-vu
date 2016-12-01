@@ -49,14 +49,14 @@ var MiniNav = function(){
 
     };
 
-    that.miniNavInitialize = function(){
+    that.miniNavInitialize = function(userComponent){
         var widthScale = ($('#mini-nav').width())/$('#selected-screen-size').width();
         var heightScale = ($('#mini-nav').height())/$('#selected-screen-size').height();
 
         var scale = Math.min(widthScale, heightScale);
         navZoom = scale;
 
-        that.setUpMiniNavElementAndInnerComponentSizes();
+        that.setUpMiniNavElementAndInnerComponentSizes(userComponent);
         $('#zoom-selected-screen-size').css({
             position: 'absolute',
             // height: $('#selected-screen-size').height()*scale*currentZoom + 'px',
@@ -89,8 +89,8 @@ var MiniNav = function(){
         });
     };
 
-    that.updateMiniNavInnerComponentSizes = function(zoom){
-        that.setUpMiniNavElementAndInnerComponentSizes();
+    that.updateMiniNavInnerComponentSizes = function(component, zoom){
+        that.setUpMiniNavElementAndInnerComponentSizes(component);
         that.updateNavInnerComponentSizes(zoom);
     };
 
@@ -100,20 +100,20 @@ var MiniNav = function(){
         });
     };
 
-    that.setUpMiniNavElementAndInnerComponentSizes = function(){
+    that.setUpMiniNavElementAndInnerComponentSizes = function(outerComponent){
         $('#mini-nav-component-sizes').html('').css({
-            width: selectedUserComponent.dimensions.width*navZoom + 'px',
-            height: selectedUserComponent.dimensions.height*navZoom + 'px',
+            width: outerComponent.dimensions.width*navZoom + 'px',
+            height: outerComponent.dimensions.height*navZoom + 'px',
         });
 
-        Object.keys(selectedUserComponent.components).forEach(function(innerComponentId){
-            var innerComponent = selectedUserComponent.components[innerComponentId];
+        Object.keys(outerComponent.components).forEach(function(innerComponentId){
+            var innerComponent = outerComponent.components[innerComponentId];
             var componentSizeDiv = $('<div></div>');
             componentSizeDiv.addClass('mini-nav-inner-component-size');
             componentSizeDiv.css({
                 position: 'absolute',
-                left: selectedUserComponent.layout[innerComponentId].left*navZoom,
-                top: selectedUserComponent.layout[innerComponentId].top*navZoom,
+                left: outerComponent.layout[innerComponentId].left*navZoom,
+                top: outerComponent.layout[innerComponentId].top*navZoom,
                 width: innerComponent.dimensions.width*navZoom,
                 height: innerComponent.dimensions.height*navZoom,
                 background: 'black'

@@ -108,35 +108,34 @@ function showClicheInList(id, name){
 // http://jscolor.com/examples/
 
 
-var setUpStyleColors = function(){
+var setUpStyleColors = function(userComponent){
     var pickerText = $('#pick-color-text-input')[0]._jscLinkedInstance;
     pickerText.fromString('000000');
     var pickerBG = $('#pick-color-bg-input')[0]._jscLinkedInstance;
     pickerBG.fromString('87CEFA');
 
-    if (selectedUserComponent.properties.custom) {
-        var overallStyles = selectedUserComponent.properties.custom;
+    if (userComponent.properties.custom) {
+        var overallStyles = userComponent.properties.custom;
         var textColor = overallStyles['color'] || '';
         pickerText.fromString(textColor);
 
         var bgColor = overallStyles['background-color'] || '';
         pickerBG.fromString(bgColor);
-        $('#work-surface_'+selectedUserComponent.meta.id).css({
+        $('#work-surface_'+userComponent.meta.id).css({
             'background-color': bgColor,
         });
     }
 };
 
-var setOverallStyleAndUpdateView = function(styleName, styleValue){
-    selectedUserComponent.properties.custom[styleName] = styleValue;
-
-    for (var id in selectedUserComponent.components){
-        var innerComponent = selectedUserComponent.components[id];
-        if (!innerComponent.properties.overall){
-            innerComponent.properties.overall = {};
-        }
-        innerComponent.properties.overall[styleName] = styleValue;
-        refreshContainerDisplay('component-container_'+id, currentZoom);
+var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent){
+    if (!userComponent.properties.custom){
+        userComponent.properties.custom = {}
+    }
+    userComponent.properties.custom[styleName] = styleValue;
+    console.log(styleName, styleValue);
+    for (var id in userComponent.components){
+        var container = $('#work-surface_'+userComponent.meta.id).find('#component-container_'+id);
+        refreshContainerDisplay(container, currentZoom);
     }
 
 };
@@ -147,11 +146,8 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue){
     pickerText.closable = true;
     pickerText.closeText = 'X';
     inputText.change(function(){
-        if (!selectedUserComponent.properties.custom){
-            selectedUserComponent.properties.custom = {}
-        }
         var color = pickerText.toHEXString();
-        setOverallStyleAndUpdateView('color', color);
+        setOverallStyleAndUpdateView('color', color, selectedUserComponent);
     });
 
     var inputBG = $('#pick-color-bg-input');
@@ -159,20 +155,21 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue){
     pickerBG.closable = true;
     pickerBG.closeText = 'X';
     inputBG.change(function(){
-        if (!selectedUserComponent.properties.custom){
-            selectedUserComponent.properties.custom = {}
-        }
         var color = pickerBG.toHEXString();
-        setOverallStyleAndUpdateView('background-color', color);
+        setOverallStyleAndUpdateView('background-color', color, selectedUserComponent);
+        $('#work-surface_'+selectedUserComponent.meta.id).css({
+            'background-color': color,
+        });
     });
 
     $('#reset-overall-color').click(function(){
         selectedUserComponent.properties.custom = {};
-        setUpStyleColors();
+        setUpStyleColors(selectedUserComponent);
         for (var id in selectedUserComponent.components){
-            var innerComponent = selectedUserComponent.components[id];
-            innerComponent.properties.overall = {};
-            refreshContainerDisplay('component-container_'+id, currentZoom);
+            // var innerComponent = selectedUserComponent.components[id];
+            // innerComponent.properties.overall = {};
+            var container = $('#work-surface_'+selectedUserComponent.meta.id).find('#component-container_'+id);
+            refreshContainerDisplay(container, currentZoom);
         }
     });
 })();
@@ -181,14 +178,14 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue){
     $('.overall-text-size-input-set').click(function(){
         var value = $('.overall-text-size-input').val();
         if (!isNaN(parseInt(value))){
-            setOverallStyleAndUpdateView('font-size', value + 'px');
+            setOverallStyleAndUpdateView('font-size', value + 'px', selectedUserComponent);
         }
     });
 
     $('.overall-text-weight-input-set').click(function(){
         var value = $('.overall-text-weight-input').val();
         if (!isNaN(parseInt(value))){
-            setOverallStyleAndUpdateView('font-weight', value);
+            setOverallStyleAndUpdateView('font-weight', value, selectedUserComponent);
         }
     });
 
@@ -197,8 +194,8 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue){
 
 /** **/
 
-function addAddToMainPagesButton(){
-    var added = (selectedUserComponent.meta.id in selectedProject.mainComponents);
+function addAddToMainPagesButton(userComponent){
+    var added = (userComponent.meta.id in selectedProject.mainComponents);
     if (added){
         var span = document.createElement('span');
         span.innerHTML = '<button type="button" class="btn btn-default ">' +
@@ -258,8 +255,8 @@ function addAddToMainPagesButton(){
 /**
  * Update the saved ratios and then use this function
  */
-function propagateRatioChangeToAllElts(newRatio){
-    view.displayComponent(selectedUserComponent, $('#work-surface_'+selectedUserComponent.meta.id), null, newRatio);
+function propagateRatioChangeToAllElts(newRatio, userComponent){
+    view.displayComponent(false, userComponent, $('#work-surface_'+userComponent.meta.id), {}, newRatio);
     miniNav.updateNavInnerComponentSizes(newRatio);
     setUpGrid();
 }
@@ -326,7 +323,6 @@ function deleteUserComponent(userComponentId){
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         workSurface.loadUserComponent(selectedUserComponent, currentZoom);
-        // loadTable(selectedUserComponent, 1);
     }
     if (userComponentId == selectedProject.mainComponents.indexId){
         selectedProject.mainComponents.indexId = null;
