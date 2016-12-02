@@ -253,6 +253,7 @@ export interface WidgetMetadata {
   ng2_providers?: any[];
   template?: string;
   styles?: string[];
+  external_styles?: string[];
 }
 
 
@@ -287,6 +288,13 @@ export function Widget(options?: WidgetMetadata) {
       metadata["styles"] = options.styles;
     } else {
       metadata["styleUrls"] = [`./components/${dname}/${dname}.css`];
+    }
+    if (options.external_styles !== undefined) {
+      if (metadata["styleUrls"] === undefined) {
+        metadata["styleUrls"] = [];
+      }
+      metadata["styleUrls"] = metadata["styleUrls"]
+        .concat(options.external_styles);
     }
 
     return Component(metadata)(target);
