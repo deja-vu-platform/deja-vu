@@ -104,6 +104,12 @@ export class Grafo {
         resolve: (root, {atom_id}) => this.db
           .collection(this._col_name(t_name)).findOne({atom_id: atom_id})
       };
+
+      default_queries[t_name.toLowerCase() + "_all"] = {
+        "type": new graphql.GraphQLList(t),
+        resolve: (root) => this.db
+          .collection(this._col_name(t_name)).find().toArray()
+      };
     });
 
     const get_type = (t: string) => {
