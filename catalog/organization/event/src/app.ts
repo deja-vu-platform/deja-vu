@@ -55,7 +55,9 @@ const schema = grafo
     name: "WeeklyEvent",
     fields: {
       atom_id: {"type": graphql.GraphQLString},
-      events: {"type": "[Event]"}
+      events: {"type": "[Event]"},
+      starts_on: {"type": graphql.GraphQLString},
+      ends_on: {"type": graphql.GraphQLString}
     }
   })
   .add_mutation({
@@ -96,7 +98,9 @@ const schema = grafo
       }
       const weekly_event = {
         atom_id: uuid.v4,
-        events: _u.map(event_ids, eid => ({atom_id: eid}))
+        events: _u.map(event_ids, eid => ({atom_id: eid})),
+        starts_on: starts_on,
+        ends_on: ends_on
       };
       return Promise.all(inserts)
         .then(_ => mean.db.collection("weeklyevents").insertOne(weekly_event))

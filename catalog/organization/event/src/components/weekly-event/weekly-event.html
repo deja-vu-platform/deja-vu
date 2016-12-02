@@ -1,0 +1,7 @@
+<select (change)="onChange($event)" title="Choose Weekly Event"
+ class="selectpicker">
+  <option *ngFor="#weekly_event of weekly_events">
+      {{weekly_event.name}}
+      {{weekly_event.starts_on}} - {{weekly_event.ends_on}}
+  </option>
+</select>
