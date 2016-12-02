@@ -52,7 +52,9 @@ let directives;
 if (MODE === "dev") {
   template = `
      This is the development page, widgets: {{wid_names}}
-     @@wid_selectors
+     <div class="container">
+       @@wid_selectors
+     </div>
   `;
   directives = @@wid_directives;
 } else {
