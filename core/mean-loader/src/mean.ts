@@ -237,8 +237,7 @@ export namespace GruntTask {
 
       clean: {
         default: {
-          src: [
-            "dist", "lib", "src/**/*.js", "src/**/*.js.map", "src/**/*.d.ts"]
+          src: ["dist", "lib"]
         },
         dev: {
           src: ["dist", "src/dv-dev"]
