@@ -7,8 +7,14 @@ import {Widget} from "client-bus";
 
 
 interface WeeklyEvent {
+  atom_id: string;
   starts_on: Date;
   ends_on: Date;
+}
+
+interface Event {
+  start_date: Date;
+  end_date: Date;
 }
 
 @Widget({
@@ -20,6 +26,7 @@ interface WeeklyEvent {
 })
 export class WeeklyEventComponent {
   weekly_events: WeeklyEvent[];
+  events: Event[];
 
   constructor(
       private _graphQlService: GraphQlService,
@@ -29,6 +36,7 @@ export class WeeklyEventComponent {
     this._graphQlService
       .get(`
         weeklyevent_all {
+          atom_id,
           starts_on,
           ends_on
         }
@@ -40,8 +48,19 @@ export class WeeklyEventComponent {
       });
   }
 
-  onChange(e) {
-    console.log(e);
+  updateEvents(atom_id) {
+    console.log(atom_id);
+    this._graphQlService
+      .get(`
+        weeklyevent_by_id(atom_id: "${atom_id}") {
+          events {
+            start_date,
+            end_date
+          }
+        }
+      `)
+      .map(data => data.weeklyevent_by_id.events)
+      .subscribe(events => this.events = events);
   }
 
   ngAfterViewInit() {
