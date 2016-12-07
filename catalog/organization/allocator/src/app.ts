@@ -40,7 +40,7 @@ const schema = grafo
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       consumers: {"type": "[Consumer]"},
-      resources: {"type": "[Resources]"}
+      resources: {"type": "[Resource]"}
     }
   })
   .add_type({

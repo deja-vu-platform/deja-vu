@@ -1,0 +1,59 @@
+{
+  "tbonds": [
+    {
+      "types": [
+        {"name": "WeeklyEvent", "fqelement": "dv-organization-event"},
+        {"name": "RoundRobinAllocation",
+         "fqelement": "dv-organization-allocator"}
+      ],
+      "subtype": {"name": "WeeklyGroupMeeting", "fqelement": "dv-samples-morg"}
+    },
+    {
+      "types": [
+        {"name": "Event", "fqelement": "dv-organization-event"},
+        {"name": "Resource", "fqelement": "dv-organization-allocator"}
+      ],
+      "subtype": {"name": "GroupMeeting", "fqelement": "dv-samples-morg"}
+    },
+    {
+      "types": [
+        {"name": "Guest", "fqelement": "dv-organization-event"},
+        {"name": "Description", "fqelement": "dv-organization-event"},
+        {"name": "Consumer", "fqelement": "dv-organization-allocator"}
+      ],
+      "subtype": {"name": "Member", "fqelement": "dv-samples-morg"}
+    }
+  ],
+  "fbonds": [
+    {
+      "fields": [
+        {
+          "name": "events",
+          "type": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
+        }
+      ],
+      "subfield": {
+        "name": "meetings", "type": {
+          "name": "WeeklyGroupMeeting", "fqelement": "dv-samples-morg"
+        }
+      }
+    },
+    {
+      "fields": [
+        {
+          "name": "description",
+          "type": { "name": "Event", "fqelement": "dv-organization-event" }
+        },
+        {
+          "name": "consumer",
+          "type": { "name": "Resource", "fqelement": "dv-organization-allocator" }
+        }
+      ],
+      "subfield": {
+        "name": "champion", "type": {
+          "name": "GroupMeeting", "fqelement": "dv-samples-morg"
+        }
+      }
+    }
+  ]
+}

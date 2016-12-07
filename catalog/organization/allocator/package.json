@@ -1,5 +1,5 @@
 {
-  "name": "dv-organization-alocator",
+  "name": "dv-organization-allocator",
   "version": "0.0.1",
   "scripts": {
     "build.dev": "grunt dv-mean:build",
