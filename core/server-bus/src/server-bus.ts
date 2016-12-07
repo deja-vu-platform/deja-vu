@@ -96,19 +96,22 @@ export class ServerBus {
       mut["update_" + t] = build_field("update", t, _handlers);
       // mut["delete_" + t] = build_field("delete", t, _handlers);
     }
+    const schema = {
+      query: new graphql.GraphQLObjectType({
+        name: "Query",
+        fields: {
+          root: {"type": graphql.GraphQLString, resolve: "tbd"}
+        }
+      })
+    };
+    if (!_u.isEmpty(mut)) {
+      schema["mutation"] = new graphql.GraphQLObjectType({
+        name: "Mutation",
+        fields: mut
+      });
+    }
     const gql = express_graphql({
-      schema: new graphql.GraphQLSchema({
-          query: new graphql.GraphQLObjectType({
-            name: "Query",
-            fields: {
-              root: {"type": graphql.GraphQLString, resolve: "tbd"}
-            }
-          }),
-          mutation: new graphql.GraphQLObjectType({
-              name: "Mutation",
-              fields: mut
-          })
-      }),
+      schema: new graphql.GraphQLSchema(schema),
       pretty: true,
       formatError: e => ({
         message: e.message,

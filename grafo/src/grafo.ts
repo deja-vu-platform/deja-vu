@@ -150,11 +150,18 @@ export class Grafo {
     const queries = {};
     _u.extendOwn(queries, default_queries, this.user_queries);
     const schema = {};
-    if (!_u.isEmpty(queries)) {
-      schema["query"] = new graphql.GraphQLObjectType({
-        name: "Query", fields: queries
-      });
+
+    if (_u.isEmpty(queries)) {
+      // put a dummy query so that graphql doesn't complain
+      queries["dummy"] = {
+        "type": graphql.GraphQLBoolean,
+        resolve: _ => true
+      };
     }
+    schema["query"] = new graphql.GraphQLObjectType({
+      name: "Query", fields: queries
+    });
+
     if (!_u.isEmpty(this.mutations)) {
       schema["mutation"] = new graphql.GraphQLObjectType({
         name: "Mutation", fields: this.mutations
