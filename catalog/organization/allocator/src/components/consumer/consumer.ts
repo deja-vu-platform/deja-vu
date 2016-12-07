@@ -8,8 +8,8 @@ import {GraphQlService} from "gql";
   inputs: ["allocation", "resource"]
 })
 export class ConsumerComponent {
-  allocation = {on_change: undefined};
-  resource = {on_change: undefined};
+  allocation = {atom_id: undefined, on_change: undefined};
+  resource = {atom_id: undefined, on_change: undefined};
   consumer = {atom_id: ""};
 
   constructor(private _graphQlService: GraphQlService) {}

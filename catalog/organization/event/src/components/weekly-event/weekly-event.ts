@@ -6,13 +6,13 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-interface WeeklyEvent {
+export interface WeeklyEvent {
   atom_id: string;
   starts_on: Date;
   ends_on: Date;
 }
 
-interface Event {
+export interface Event {
   start_date: Date;
   end_date: Date;
 }
