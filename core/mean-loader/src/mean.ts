@@ -407,8 +407,12 @@ export namespace GruntTask {
         grunt.task.run(
           ["clean:lib", "tslint", "ts:lib_client", "ts:lib_server",
            "copy:lib"]);
-      } else { // clean
+      } else if (action === "clean") {
         grunt.task.run("clean");
+      } else {
+        grunt.fail.fatal(
+          "Unrecognized action " + action +
+          ". Choose one of dev, test, or lib");
       }
     });
   }
