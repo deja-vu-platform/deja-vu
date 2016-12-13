@@ -1,0 +1,55 @@
+{
+  "wbonds": [
+    {
+      "fields": [
+        {
+          "name": "group_meeting",
+          "type": {"name": "GroupMeeting", "fqelement": "dv-samples-morg"},
+          "widget": {"name": "GroupMeeting", "fqelement": "dv-samples-morg"}
+        }
+      ],
+      "subfield": {
+          "name": "event",
+          "type": { "name": "Event", "fqelement": "dv-organization-event" },
+          "widget": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
+      }
+    },
+    {
+      "fields": [
+        {
+          "name": "event",
+          "type": { "name": "Event", "fqelement": "dv-organization-event" },
+          "widget": { "name": "Event", "fqelement": "dv-organization-event" }
+        },
+        {
+          "name": "resource",
+          "type": { "name": "Resource", "fqelement": "dv-organization-allocator" },
+          "widget": { "name": "Consumer", "fqelement": "dv-organization-allocator" }
+        }
+      ],
+      "subfield": {
+        "name": "group_meeting", "type": {
+          "name": "GroupMeeting", "fqelement": "dv-samples-morg"
+        }, "widget": {
+          "name": "GroupMeeting", "fqelement": "dv-samples-morg"
+        }
+      }
+    },
+    {
+      "fields": [
+        {
+          "name": "allocation",
+          "type": { "name": "Allocation", "fqelement": "dv-organization-allocator" },
+          "widget": { "name": "Consumer", "fqelement": "dv-organization-allocator" }
+        }
+      ],
+      "subfield": {
+        "name": "selected_weekly_event", "type": {
+          "name": "WeeklyEvent", "fqelement": "dv-organization-event"
+        }, "widget": {
+          "name": "WeeklyEvent", "fqelement": "dv-organization-event"
+        }
+      }
+    }
+  ]
+}

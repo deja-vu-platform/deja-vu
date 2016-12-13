@@ -2,7 +2,8 @@ module.exports = function(grunt) {
   require("mean-loader").GruntTask.task(grunt,
      "dv-samples-morg",  // name
      [
-       {name: "Home", path: "/home"}
+       {name: "Home", path: "/home"},
+       {name: "GroupMeeting"}
      ], // widgets,
      [],
      "Home",  // main

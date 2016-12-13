@@ -15,8 +15,12 @@ export class GraphQlService {
 
   constructor(
     private _http: Http, @Inject("fqelement") fqelement,
-    @Inject("locs") locs) {
-    this._api = locs[fqelement];
+    @Inject("locs") private _locs) {
+    this._api = _locs[fqelement];
+  }
+
+  reset_fqelement(new_fqelement: string) {
+    this._api = this._locs[new_fqelement];
   }
 
   post(query): Observable<any> {

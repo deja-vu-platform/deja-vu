@@ -29,7 +29,7 @@ export class NewWeeklyEventComponent {
 
     this._graphQlService
       .post(`
-        newWeeklyEvent(
+        newWeeklyPublicEvent(
           starts_on: "${this.starts_on}", ends_on: "${this.ends_on}",
           start_time: "${this.start_time}", end_time: "${this.end_time}") {
           atom_id

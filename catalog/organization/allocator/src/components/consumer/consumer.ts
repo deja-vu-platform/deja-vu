@@ -1,15 +1,11 @@
-import {Component} from "angular2/core";
+import {Widget} from "client-bus";
 import {GraphQlService} from "gql";
 
 
-@Component({
-  selector: "consumer",
-  template: `{{consumer.atom_id}}`,
-  inputs: ["allocation", "resource"]
-})
+@Widget({template: `{{consumer.atom_id}}`})
 export class ConsumerComponent {
-  allocation = {atom_id: undefined, on_change: undefined};
-  resource = {atom_id: undefined, on_change: undefined};
+  allocation = {atom_id: undefined, on_change: _ => undefined};
+  resource = {atom_id: undefined, on_change: _ => undefined};
   consumer = {atom_id: ""};
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -19,13 +15,13 @@ export class ConsumerComponent {
       if (!this.allocation.atom_id || !this.resource.atom_id) return;
       this._graphQlService
         .get(`
-          allocation_by_id(atom_id: "${this.allocation.atom_id}") {
-            consumer(resource_id: "${this.resource.atom_id}") {
+          resource_by_id(atom_id: "${this.resource.atom_id}") {
+            consumed_by {
               atom_id
             }
           }
         `)
-        .map(data => data.allocation_by_id.consumer)
+        .map(data => data.resource_by_id.consumed_by)
         .subscribe(consumer => this.consumer = consumer);
     };
     update_consumer();

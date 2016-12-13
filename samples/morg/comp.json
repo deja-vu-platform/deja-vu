@@ -3,7 +3,7 @@
     {
       "types": [
         {"name": "WeeklyEvent", "fqelement": "dv-organization-event"},
-        {"name": "RoundRobinAllocation",
+        {"name": "Allocation",
          "fqelement": "dv-organization-allocator"}
       ],
       "subtype": {"name": "WeeklyGroupMeeting", "fqelement": "dv-samples-morg"}
@@ -30,6 +30,10 @@
         {
           "name": "events",
           "type": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
+        },
+        {
+          "name": "resources",
+          "type": { "name": "Allocation", "fqelement": "dv-organization-allocator" }
         }
       ],
       "subfield": {
@@ -41,11 +45,28 @@
     {
       "fields": [
         {
+          "name": "guests",
+          "type": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
+        },
+        {
+          "name": "consumers",
+          "type": { "name": "Allocation", "fqelement": "dv-organization-allocator" }
+        }
+      ],
+      "subfield": {
+        "name": "guests", "type": {
+          "name": "WeeklyGroupMeeting", "fqelement": "dv-samples-morg"
+        }
+      }
+    },
+    {
+      "fields": [
+        {
           "name": "description",
           "type": { "name": "Event", "fqelement": "dv-organization-event" }
         },
         {
-          "name": "consumer",
+          "name": "consumed_by",
           "type": { "name": "Resource", "fqelement": "dv-organization-allocator" }
         }
       ],

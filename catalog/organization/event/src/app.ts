@@ -61,16 +61,15 @@ const schema = grafo
     }
   })
   .add_mutation({
-    name: "newWeeklyEvent",
+    name: "newWeeklyPublicEvent",
     "type": "WeeklyEvent",
     args: {
       starts_on: {"type": graphql.GraphQLString},
       ends_on: {"type": graphql.GraphQLString},
       start_time: {"type": graphql.GraphQLString},
-      end_time: {"type": graphql.GraphQLString},
-      guests: {"type": new graphql.GraphQLList(graphql.GraphQLString)}
+      end_time: {"type": graphql.GraphQLString}
     },
-    resolve: (_, {starts_on, ends_on, start_time, end_time, guests}) => {
+    resolve: (_, {starts_on, ends_on, start_time, end_time}) => {
       const starts_on_date = new Date(starts_on);
       const ends_on_date = new Date(ends_on);
 
@@ -101,23 +100,31 @@ const schema = grafo
 
         const eid = uuid.v4();
         event_ids.push(eid);
+        const e = {
+          atom_id: eid,
+          start_date: start_date.toString(),
+          end_date: end_date.toString()
+        };
         inserts.push(
             mean.db.collection("events")
-              .insertOne({
-                atom_id: eid,
-                start_date: start_date.toString(),
-                end_date: end_date.toString()
-              }));
+              .insertOne(e)
+              .then(_ => bus.create_atom("Event", eid, e)));
       }
-      const weekly_event = {
-        atom_id: uuid.v4(),
-        events: _u.map(event_ids, eid => ({atom_id: eid})),
-        starts_on: starts_on,
-        ends_on: ends_on
-      };
+      const weid = uuid.v4();
       return Promise.all(inserts)
-        .then(_ => mean.db.collection("weeklyevents").insertOne(weekly_event))
-        .then(_ => weekly_event);
+        .then(_ => mean.db.collection("guests")
+          .find({}).project({atom_id: 1}).toArray()
+          .then(guests => ({
+            atom_id: weid,
+            events: _u.map(event_ids, eid => ({atom_id: eid})),
+            starts_on: starts_on,
+            ends_on: ends_on,
+            guests: guests
+          })))
+        .then(weekly_event => mean.db.collection("weeklyevents")
+          .insertOne(weekly_event)
+          .then(_ => bus.create_atom("WeeklyEvent", weid, weekly_event))
+          .then(_ => weekly_event));
     }
   })
   .add_type({

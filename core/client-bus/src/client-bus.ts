@@ -207,7 +207,7 @@ export class WidgetLoader {
     let imp_string_prefix = "";
     let providers = [];
     if (this.fqelement !== undefined &&
-        /* hack */ this.fqelement !== "dv-samples-bookmark") {
+        /* hack */ !this.fqelement.startsWith("dv-samples-")) {
       imp_string_prefix =  `${this.fqelement}/lib/`;
       const fqelement_split = this.fqelement.split("-");
       if (fqelement_split.length === 4) {
@@ -239,10 +239,19 @@ export class WidgetLoader {
         });
         return c;
       })
+      .then(c => { /* hack */
+        if (c._graphQlService !== undefined &&
+            this.fqelement !== undefined &&
+            !this.fqelement.startsWith("dv-samples-")) {
+          c._graphQlService.reset_fqelement(this.fqelement);
+        }
+        return c;
+      })
       .then(c => {
         if (c.dvAfterInit !== undefined) {
           c.dvAfterInit();
         }
+        return c;
       });
   }
 }
