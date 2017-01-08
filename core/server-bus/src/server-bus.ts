@@ -48,7 +48,8 @@ export class ServerBus {
    * Args:
    *   - the fully-qualified name of the cliche (fqelement)
    *   - the web server to use to mount the BUS_PATH route (_ws)
-   *   - a set of handlers to process state updates from other cliches (_hadlers)
+   *   - a set of handlers to process state updates from other cliches
+   *     (_handlers)
    *   - the bond information (comp_info)
    *   - locs (the location of the other cliches)
    **/
@@ -157,7 +158,7 @@ export class ServerBus {
    * Args:
    *   - the type of the atom to update (t_name)
    *   - the id of the atom to update (atom_id)
-   *   - the update to perform (update). The bus uses mongodb's update operators.
+   *   - the update to perform (update). The bus uses mongodb's update operators
    **/
   update_atom(t_name: string, atom_id: string, update: any): Promise<boolean> {
     console.log("sending up atom");
@@ -191,11 +192,12 @@ export class ServerBus {
         "Origin, X-Requested-With, Content-Type, Accept");
     next();
   }
-
 }
 
 
-
+/**
+ * This class is used by the server bus to dispatch state reports
+ **/
 class Dispatcher {
   create_atom: (t_name: string, atom_id: string, create: any) =>
     Promise<boolean>;
