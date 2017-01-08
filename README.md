@@ -1,6 +1,16 @@
 dv
 ==
 
+Building and running Deja Vu
+----------------------------
+
+The Deja Vu code is organized in the following way:
+
+- `catalog/` contains all the cliches organized by category
+- `core/` contains the core platform libraries
+- `gql/`, `grafo/` and `helpers/` contain useful libraries used to build the
+   cliches
+
 Here's a list of annoying things you need to remember to do:
 
 - if you get:
