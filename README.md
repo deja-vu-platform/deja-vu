@@ -10,6 +10,14 @@ The Deja Vu code is organized in the following way:
 - `core/` contains the core platform libraries
 - `gql/`, `grafo/` and `helpers/` contain useful libraries used to build the
    cliches
+- `samples/` contains a set of samples that use the cliches
+
+Each cliche and sample is its own node project. Like any other node project, you need to run
+`npm install` to install dependencies. Since we use typescript, you also need to run
+`tsd install` to install type dependencies. We use Grunt to compile and run the code. To build
+a library do `grunt lib`, to build a cliche `grunt dv-mean:lib`, to run a sample
+`grunt dv-mean:test`.
+
 
 Here's a list of annoying things you need to remember to do:
 
@@ -17,7 +25,7 @@ Here's a list of annoying things you need to remember to do:
 ```
 node_modules/angular2/src/facade/promise.d.ts(1,10): error TS2661: Cannot re-export name that is not defined in the module.
 ```
-You need to add the following to the top of the file:
+You need to add the following to the top of the file (`node_modules/angular2/src/facade/promise.d.ts):
 ```
    declare var Promise;
 ```
