@@ -1,20 +1,6 @@
 // This file mostly has the initialization and functions that help with
 // the display and interaction handling
 
-var view = Display();
-var miniNav = MiniNav();
-var componentContainerMaker = ComponentContainerMaker();
-var workSurface = WorkSurface();
-
-var projectsSavePath = path.join(__dirname, 'projects');
-var addedCliches;
-var navZoom = .1;
-var navDragging = false;
-
-var selectedScreenSizeHeight = 1600;
-var selectedScreenSizeWidth = 2000;
-
-var draggingComponent = null;
 
 
 /** ** ** ** ** ** Menu Related Functions ** ** ** ** ** **/
@@ -83,10 +69,7 @@ function resizeViewportToFitWindow(){
         width: (newWidth-250-17) + 'px',
     });
 
-    $('#zoom-nav-position').css({
-        height: $('#outer-container').height()*navZoom + 'px',
-        width: $('#outer-container').width()*navZoom + 'px',
-    });
+    miniNav.updateMiniNavPositionSize($('#outer-container').width(),  $('#outer-container').height());
 }
 
 window.addEventListener("resize", function(){

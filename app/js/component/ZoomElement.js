@@ -4,7 +4,6 @@
 var ZoomElement = function(){
     var that = Object.create(ZoomElement);
 
-
     var getSliderValFromZoom = function(zoom){
         var max = parseFloat($('#zoom-slider').get(0).max);
         var min = parseFloat($('#zoom-slider').get(0).min);
@@ -89,8 +88,8 @@ var ZoomElement = function(){
             width: selectedScreenSizeWidth*currentZoom + 'px',
         });
         $('#zoom-selected-screen-size').css({
-            height: selectedScreenSizeHeight*currentZoom*navZoom + 'px',
-            width: selectedScreenSizeWidth*currentZoom*navZoom + 'px',
+            height: selectedScreenSizeHeight*currentZoom*miniNav.getNavZoom() + 'px',
+            width: selectedScreenSizeWidth*currentZoom*miniNav.getNavZoom() + 'px',
         });
         $('.work-surface').css({
             width: outerComponent.dimensions.width*zoom + 'px',

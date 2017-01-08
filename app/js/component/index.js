@@ -5,6 +5,27 @@
 var zoomElement = ZoomElement();
 var miniNav = MiniNav();
 var view = Display();
+var workSurface = WorkSurface();
+var dragAndDrop = DragAndDropController();
+
+var projectsSavePath = path.join(__dirname, 'projects');
+var addedCliches;
+
+var selectedScreenSizeHeight = 1600;
+var selectedScreenSizeWidth = 2000;
+
+var files = [];
+
+var selectedUserComponent = null;
+var selectedProject = null;
+
+var currentZoom = 1.0;
+var basicComponents;
+
+
+// settings
+var confirmOnUserComponentDelete = true;
+
 $(function(){
     $('.project-options-container').css({
         height: ($('html').height() - 70) + 'px',
@@ -46,14 +67,13 @@ $(function(){
         // start a default component
         selectedUserComponent = initUserComponent(true, true);
         selectedProject.addMainPage(selectedUserComponent);
-
-        workSurface.loadUserComponent(selectedUserComponent, currentZoom);
         displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
     } else {
+        var componentToLoadId;
         if (!$.isEmptyObject(selectedProject.mainComponents)){
-            var componentToLoadId = Object.keys(selectedProject.mainComponents)[0];
+            componentToLoadId = Object.keys(selectedProject.mainComponents)[0];
         } else {
-            var componentToLoadId = Object.keys(selectedProject.components)[0];
+            componentToLoadId = Object.keys(selectedProject.components)[0];
         }
         selectedUserComponent = selectedProject.components[componentToLoadId];
         if (componentToLoadId in selectedProject.mainComponents){
@@ -72,9 +92,9 @@ $(function(){
 
             }
         }
-        workSurface.loadUserComponent(selectedUserComponent, currentZoom);
-    }
 
+    }
+    workSurface.loadUserComponent(selectedUserComponent, currentZoom);
 
     //autoSave5Mins();
 
@@ -82,7 +102,7 @@ $(function(){
 
     registerDraggable();
 
-    zoom.registerZoom(selectedUserComponent);
+    zoomElement.registerZoom(selectedUserComponent);
     miniNav.miniNavInitialize(selectedUserComponent);
 
     registerUserComponentAreaDroppable();

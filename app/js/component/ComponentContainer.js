@@ -2,8 +2,8 @@
  * Created by Shinjini on 11/3/2016.
  */
 
-var ComponentContainerMaker = function(){
-    var that = Object.create(ComponentContainerMaker);
+var ComponentContainer = function(){
+    var that = Object.create(ComponentContainer);
 
 
     var makeContainerResizable = function(component, outerComponent, container){
@@ -330,5 +330,6 @@ var ComponentContainerMaker = function(){
     };
 
 
+    Object.freeze(that);
     return that;
 };

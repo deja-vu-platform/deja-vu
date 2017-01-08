@@ -14,12 +14,12 @@ things I did not like:
 11/30/2016 issues
 x color change does not penetrate the recursive components
 link between components not remembered
-background color is not remembered
+x background color is not remembered
 x zoom does not work very well (ratios not zoomed)
 x list component disappears
 x need to consolidate the code into smaller chunks
 x need to update view to work with components (maybe view should be moved into component containers?)
 x resizing upwards does not change the top, left position, just the size!!
 x at a lot of places, using selected user component as opposed to a given component might cause problems
-need ui components for moving up and down the stack order.
+x need ui components for moving up and down the stack order.
 how to allow copies of the same component in multiple places (same id)?

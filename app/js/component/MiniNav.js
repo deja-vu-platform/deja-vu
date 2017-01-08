@@ -5,6 +5,14 @@
 var MiniNav = function(){
     var that = Object.create(MiniNav);
 
+    var navZoom = .1;
+    var navDragging = false;
+
+
+    that.getNavZoom = function(){
+        return navZoom;
+    };
+
     var showMiniNavPosition = function(){
         var scrollTop = $('#outer-container').scrollTop()*navZoom;
         var scrollLeft = $('#outer-container').scrollLeft()*navZoom;
@@ -157,6 +165,13 @@ var MiniNav = function(){
             navDragging = false;
         },
     });
+
+    that.updateMiniNavPositionSize = function(outerContainerWidth, outerContainerHeight){
+        $('#mini-nav-position').css({
+            height: outerContainerHeight*navZoom + 'px',
+            width: outerContainerWidth*navZoom + 'px',
+        });
+    }
 
     return that;
 };

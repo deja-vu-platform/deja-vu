@@ -2,7 +2,7 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-var componentContainerMaker = ComponentContainerMaker();
+var componentContainerMaker = ComponentContainer();
 
 var WorkSurface = function(){
     var that = Object.create(WorkSurface);
@@ -38,13 +38,13 @@ var WorkSurface = function(){
     };
 
     that.makeRecursiveComponentContainersAndDisplay = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom, overallStyles){
-        var container = that.makeRecursiveComponentContainers(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom);
+        var container = makeRecursiveComponentContainers(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom);
         view.displayComponent(true, component, container, overallStyles, zoom);
         return container;
     };
 
     // isEditable == component is the selected user component and all its contents are editable
-    that.makeRecursiveComponentContainers = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom){
+    var makeRecursiveComponentContainers = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom){
         var type = component.type;
         var componentId = component.meta.id;
 
@@ -91,7 +91,7 @@ var WorkSurface = function(){
         if (type === 'user'){ // do the recursion
             component.layout.stackOrder.forEach(function(innerComponentId){
                 var innerComponent = component.components[innerComponentId];
-                that.makeRecursiveComponentContainers(innerComponent, component, false, null, componentContainer, zoom);
+                makeRecursiveComponentContainers(innerComponent, component, false, null, componentContainer, zoom);
             });
         }
         return componentContainer;
@@ -107,7 +107,7 @@ var WorkSurface = function(){
         var workSurface = createOrResetWorkSurface(component, zoom);
         component.layout.stackOrder.forEach(function(innerComponentId){
             var innerComponent = component.components[innerComponentId];
-            var container = that.makeRecursiveComponentContainers(innerComponent, component, true, null, workSurface, zoom);
+            var container = makeRecursiveComponentContainers(innerComponent, component, true, null, workSurface, zoom);
             view.displayComponent(true, innerComponent, container, component.properties.custom, zoom)
         });
         setUpGrid();
@@ -153,49 +153,16 @@ var WorkSurface = function(){
     };
 
     var makeWorkSurfaceDroppableToComponents = function(workSurface, outerComponent){
-
-        var dropSettings = {
-            accept: ".widget",
-            hoverClass: "highlight",
-            tolerance: "fit",
-            drop: function(event, ui) {
-                // alert the draggable that drop was successful:
-                $(ui.helper).data('dropped', true);
-                var top = ui.position.top;
-                var left = ui.position.left;
-
-
-                var widget = $(ui.draggable);
-                var type = $(ui.draggable).data('type');
-                if (type == 'user'){
-                    if (!widget.hasClass('associated')) {
-                        widget = $(ui.draggable).clone();
-                        widget.data('componentid', $(ui.draggable).data('componentid'));
-                        widget.data('type', type);
-                        registerDraggable(widget);
-                    }
-                }
-
-                // on drop, there should always be a dragging component
-                var component = draggingComponent;
-                var componentId = component.meta.id;
-                widget.removeClass('dragging-component');
-                outerComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
-                that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, widget, workSurface, currentZoom, outerComponent.properties.custom);
-
-                if (!widget.hasClass('associated')){
-                    $(ui.helper).data('newcomponent', true);
-                    outerComponent.addComponent(component);
-                    widget.addClass('associated').data('componentid', componentId);
-                } else {
-                    shiftOrder(componentId, outerComponent);
-                }
-
-                miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
-                setUpGrid();
-
+        var onDropFinished = function(widget, component){
+            if (widget.associated){
+                shiftOrder(component.meta.id, outerComponent);
             }
+            that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, widget, workSurface, currentZoom, outerComponent.properties.custom);
+            miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
+            setUpGrid();
         };
+
+        var dropSettings = dragAndDrop.widgetToWorksurfaceDropSettings(outerComponent, onDropFinished);
 
         workSurface.droppable(dropSettings);
     };
@@ -367,5 +334,7 @@ var WorkSurface = function(){
         return workSurface
     };
 
+
+    Object.freeze(that);
     return that
 };
