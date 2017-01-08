@@ -34,13 +34,24 @@ export interface CompInfo {
   fbonds: FieldBond[];
 }
 
-
+/* Route to which other cliches will issue requests to report state updates */
 const BUS_PATH = "/dv-bus";
 
-
+/**
+ * The server bus is used to keep the servers of the different cliches in
+ * sync. This class provides a way for a cliche to report state updates, and to
+ * provide handlers to process updates reported by other cliches.
+ **/
 export class ServerBus {
   private _dispatcher: Dispatcher;
-
+  /**
+   * Args:
+   *   - the fully-qualified name of the cliche (fqelement)
+   *   - the web server to use to mount the BUS_PATH route (_ws)
+   *   - a set of handlers to process state updates from other cliches (_hadlers)
+   *   - the bond information (comp_info)
+   *   - locs (the location of the other cliches)
+   **/
   constructor(
       fqelement: string,
       private _ws: express.Express,
@@ -124,6 +135,14 @@ export class ServerBus {
     _ws.post(BUS_PATH, this._cors, gql);
   }
 
+  /**
+   *  Report the creation of a new atom
+   * 
+   *  Args:
+   *     - the type of the new atom (t_name)
+   *     - the id of the new atom (atom_id)
+   *     - the new atom (create)
+   **/
   create_atom(t_name: string, atom_id: string, create: any): Promise<boolean> {
     console.log("sending new atom");
     if (this._dispatcher === undefined) {
@@ -132,7 +151,14 @@ export class ServerBus {
     return this._dispatcher.create_atom(
         _ustr.capitalize(t_name), atom_id, create);
   }
-
+  /**
+   * Report the update of an existing atom
+   * 
+   * Args:
+   *   - the type of the atom to update (t_name)
+   *   - the id of the atom to update (atom_id)
+   *   - the update to perform (update). The bus uses mongodb's update operators.
+   **/
   update_atom(t_name: string, atom_id: string, update: any): Promise<boolean> {
     console.log("sending up atom");
     if (this._dispatcher === undefined) {
@@ -141,7 +167,13 @@ export class ServerBus {
     return this._dispatcher.update_atom(
         _ustr.capitalize(t_name), atom_id, update);
   }
-
+  /**
+   * Report the removal of an atom
+   * 
+   * Args:
+   *   - the type of the atom to remove (t_name)
+   *   - the id of the atom to remove (atom_id)
+   **/
   remove_atom(t_name: string, atom_id: string) {
     console.log("sending remove atom");
     if (this._dispatcher === undefined) {
