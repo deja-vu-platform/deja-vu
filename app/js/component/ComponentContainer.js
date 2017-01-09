@@ -59,7 +59,7 @@ var ComponentContainer = function(){
                 outerComponent.layout[component.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
                 miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
-                setUpGrid();
+                grid.setUpGrid();
                 $('.grid').css({
                     visibility: 'hidden'
                 });

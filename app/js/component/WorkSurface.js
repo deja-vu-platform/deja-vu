@@ -110,8 +110,6 @@ var WorkSurface = function(){
             var container = makeRecursiveComponentContainers(innerComponent, component, true, null, workSurface, zoom);
             view.displayComponent(true, innerComponent, container, component.properties.custom, zoom)
         });
-        setUpGrid();
-
     };
 
     var makeWorkSurfaceResizable = function(workSurface, component){
@@ -145,7 +143,7 @@ var WorkSurface = function(){
             stop: function(e, ui){
                 // not super important to update as you resize so just do it at the end
                 miniNav.updateMiniNavInnerComponentSizes(component, currentZoom);
-                setUpGrid();
+                grid.setUpGrid();
 
             }
         });
@@ -159,7 +157,7 @@ var WorkSurface = function(){
             }
             that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, widget, workSurface, currentZoom, outerComponent.properties.custom);
             miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
-            setUpGrid();
+            grid.setUpGrid();
         };
 
         var dropSettings = dragAndDrop.widgetToWorksurfaceDropSettings(outerComponent, onDropFinished);
@@ -311,7 +309,7 @@ var WorkSurface = function(){
             zoomElement.updateZoomFromState(component);
         }
         miniNav.setUpMiniNavElementAndInnerComponentSizes(component);
-
+        grid.setUpGrid();
     };
 
 

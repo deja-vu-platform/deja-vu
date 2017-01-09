@@ -136,6 +136,7 @@ var DragAndDropController = function () {
                 });
             },
             drag: function (event, ui) {
+                grid.detectGridLines(ui.helper);
 
             },
             stop: function (event, ui) {

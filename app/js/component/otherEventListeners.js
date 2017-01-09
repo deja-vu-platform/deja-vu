@@ -240,7 +240,7 @@ function addAddToMainPagesButton(userComponent){
 function propagateRatioChangeToAllElts(newRatio, userComponent){
     view.displayComponent(false, userComponent, $('#work-surface_'+userComponent.meta.id), {}, newRatio);
     miniNav.updateNavInnerComponentSizes(newRatio);
-    setUpGrid();
+    grid.setUpGrid();
 }
 
 function addDeleteUserComponentButton(userComponentId){

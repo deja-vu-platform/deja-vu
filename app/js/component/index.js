@@ -7,6 +7,7 @@ var miniNav = MiniNav();
 var view = Display();
 var workSurface = WorkSurface();
 var dragAndDrop = DragAndDropController();
+var grid = Grid();
 
 var projectsSavePath = path.join(__dirname, 'projects');
 var addedCliches;
@@ -102,7 +103,7 @@ $(function(){
     registerDraggable();
 
 
-    registerUserComponentAreaDroppable();
+    // registerUserComponentAreaDroppable();
 
     setUpStyleColors(selectedUserComponent);
 
