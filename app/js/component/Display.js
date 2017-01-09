@@ -152,7 +152,7 @@ var Display = function(){
                 html = view.getHTML(component.type)(component.components[component.type]);
                 var properties = component.properties;
                 displayInnerComponent(container, component.type, html, zoom, properties, overallStyles);
-            } else if (container){
+            } else if (container.length>0){
                 var type = component.type;
                 view.hideBaseComponentDisplayAt(container, type);
 

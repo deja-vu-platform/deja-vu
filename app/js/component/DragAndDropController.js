@@ -128,7 +128,7 @@ var DragAndDropController = function () {
             appendTo: 'html',
             cursor: '-webkit-grabbing',
             scroll: true,
-            snap: '.grid-cell',
+            snap: '.grid-cell, .grid-x, .grid-y',
             snapTolerance: 10,
             start: function () {
                 $('.grid').css({

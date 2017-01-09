@@ -42,8 +42,7 @@ $(function(){
         width: selectedScreenSizeWidth*currentZoom + 'px',
     });
 
-
-
+    miniNav.miniNavInitialize();
 
 
     Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
@@ -102,8 +101,6 @@ $(function(){
 
     registerDraggable();
 
-    zoomElement.registerZoom(selectedUserComponent);
-    miniNav.miniNavInitialize(selectedUserComponent);
 
     registerUserComponentAreaDroppable();
 

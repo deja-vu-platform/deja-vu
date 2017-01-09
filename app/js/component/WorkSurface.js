@@ -300,6 +300,8 @@ var WorkSurface = function(){
     that.loadUserComponent = function(component){
         var componentId = component.meta.id;
         var workSurface = $('#work-surface'+'_'+componentId);
+        zoomElement.registerZoom(selectedUserComponent);
+
         if (workSurface.length===0){
             currentZoom = 1;
             loadComponentIntoWorkSurface(component, currentZoom);
@@ -308,6 +310,8 @@ var WorkSurface = function(){
             setComponentOptions(component);
             zoomElement.updateZoomFromState(component);
         }
+        miniNav.setUpMiniNavElementAndInnerComponentSizes(component);
+
     };
 
 

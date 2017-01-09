@@ -57,14 +57,13 @@ var MiniNav = function(){
 
     };
 
-    that.miniNavInitialize = function(userComponent){
+    that.miniNavInitialize = function(){
         var widthScale = ($('#mini-nav').width())/$('#selected-screen-size').width();
         var heightScale = ($('#mini-nav').height())/$('#selected-screen-size').height();
 
         var scale = Math.min(widthScale, heightScale);
         navZoom = scale;
 
-        that.setUpMiniNavElementAndInnerComponentSizes(userComponent);
         $('#zoom-selected-screen-size').css({
             position: 'absolute',
             // height: $('#selected-screen-size').height()*scale*currentZoom + 'px',

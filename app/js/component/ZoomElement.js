@@ -103,20 +103,21 @@ var ZoomElement = function(){
         var componentId = component.meta.id;
         currentZoom = $('#work-surface'+'_'+componentId).data('state').zoom;
         // it's updating from state, so that means new initializations are in order
-        miniNav.setUpMiniNavElementAndInnerComponentSizes(component);
+        // miniNav.setUpMiniNavElementAndInnerComponentSizes(component);
+        // that.registerZoom(component);
         changeZoomDisplays(component, currentZoom);
     };
 
     that.registerZoom = function(outerComponent) {
         $('#zoom-control-value').text('100%');
 
-        $('#zoom-in').click( function (e) {
+        $('#zoom-in').unbind().click( function (e) {
             e.preventDefault();
             var val = parseFloat($('#zoom-slider').val());
             $('#zoom-slider').val(Math.round(val/100)*100+100);
             changeZoomViaZoomControl(outerComponent, 'slider');
         });
-        $('#zoom-out').click( function (e) {
+        $('#zoom-out').unbind().click( function (e) {
             e.preventDefault();
             var val = parseFloat($('#zoom-slider').val());
             $('#zoom-slider').val(Math.round(val/100)*100-100);
@@ -124,31 +125,31 @@ var ZoomElement = function(){
         });
 
 
-        $('#zoom-slider').on('input', function(){
+        $('#zoom-slider').unbind().on('input', function(){
             var potentialZoom = getZoomFromSliderVal();
             $('#zoom-control-value').text(Math.round(potentialZoom*100)+'%');
         });
 
-        $('#zoom-slider').on('change', function(){
+        $('#zoom-slider').unbind().on('change', function(){
             changeZoomViaZoomControl(outerComponent, 'slider');
         });
 
-        $('#zoom-actual').click(function(e, ui){
+        $('#zoom-actual').unbind().click(function(e, ui){
             e.preventDefault();
             changeZoomViaZoomControl(outerComponent, 'actual');
 
         });
 
-        $('#zoom-fit').click(function(e, ui){
+        $('#zoom-fit').unbind().click(function(e, ui){
             e.preventDefault();
             changeZoomViaZoomControl(outerComponent, 'fit');
         });
-        $('#zoom-full').click(function(e, ui){
+        $('#zoom-full').unbind().click(function(e, ui){
             e.preventDefault();
             changeZoomViaZoomControl(outerComponent, 'full');
         });
 
-        $('#zoom-control-minimize-btn').click(function(){
+        $('#zoom-control-minimize-btn').unbind().click(function(){
             if ($(this).hasClass('minimized')){
                 $(this).removeClass('minimized').find('span').removeClass('glyphicon-chevron-left').addClass('glyphicon-chevron-right');
                 $('#zoom-slider-and-value, #zoom-actual, #zoom-fit, #zoom-full').css({
@@ -165,6 +166,7 @@ var ZoomElement = function(){
         })
     };
 
+    Object.freeze(that);
     return that;
 };
 
