@@ -733,6 +733,49 @@ function refreshContainerDisplay(fresh, container, zoom){
 
 }
 
+function createUserComponentCopy (userComponent){
+    var component = UserComponent.fromString(JSON.stringify(userComponent));
+
+    var recursiveReIding = function(component){
+        if (component.meta){ // ie, it's not the totally inner component // TODO make this more robust
+            var newId = generateId(); // FIXME gaaah, get time does not produce unique ids!
+                // (new Date()).getTime();
+            component.meta.id = newId;
+            if (component.type == 'user'){
+                for (var idx = 0; idx< component.layout.stackOrder.length; idx++){
+                    var oldId = component.layout.stackOrder[idx];
+                    var result = recursiveReIding(component.components[oldId]);
+                    if (result.success){
+                        component.layout.stackOrder[idx] = result.newId;
+                        component.components[result.newId] = component.components[oldId];
+                        delete component.components[oldId];
+                        component.layout[result.newId] = component.layout[oldId];
+                        delete component.layout[oldId];
+
+                    }
+                }
+                // component.layout.stackOrder.forEach(function(oldId, idx){
+                //     var result = recursiveReIding(component.components[oldId]);
+                //     if (result.success){
+                //         component.layout.stackOrder[idx] = result.newId;
+                //         component.components[result.newId] = component.components[oldId];
+                //         delete component.components[oldId];
+                //         component.layout[result.newId] = component.layout[oldId];
+                //         delete component.layout[oldId];
+                //
+                //     }
+                // });
+                console.log(component);
+            }
+            return {success: true, newId: newId};
+        }
+        return {success: false}
+    };
+
+    recursiveReIding(component);
+    return component;
+}
+
 
 /**
  * Disabled by changing the id and class names

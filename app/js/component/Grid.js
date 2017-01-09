@@ -5,6 +5,9 @@
 var Grid = function(){
     var that = Object.create(Grid);
 
+    var xsWithoutBoundary = [];
+    var ysWithoutBoundary = [];
+
     var xs = [];
     var ys = [];
 
@@ -32,6 +35,23 @@ var Grid = function(){
         // var left = workSurface.offset().left;
         var workSurfaceLeft = 0;
         var workSurfaceRight = workSurfaceLeft + workSurface.width();
+
+        // TODO make more elegant
+        // get the sets of xs and ys
+        xsWithoutBoundary = Object.keys(grid.x).map(function(key){
+            return parseFloat(key);
+        });
+        xsWithoutBoundary.sort(function(a, b){
+            return a-b;
+        });
+
+        ysWithoutBoundary = Object.keys(grid.y).map(function(key){
+            return parseFloat(key);
+        });
+        ysWithoutBoundary.sort(function(a, b){
+            return a-b;
+        });
+
 
         grid.x[workSurfaceLeft] = '';
         grid.x[workSurfaceRight] = '';
@@ -138,6 +158,38 @@ var Grid = function(){
 
 
 
+    };
+
+    that.getLeftMostGridPosition = function(){
+        var len = xsWithoutBoundary.length;
+        if (len>0){
+            return xs[0];
+        }
+        return false;
+    };
+
+    that.getRightMostGridPosition = function(){
+        var len = xsWithoutBoundary.length;
+        if (len>0){
+            return xsWithoutBoundary[len-1];
+        }
+        return false;
+    };
+
+    that.getTopMostGridPosition = function(){
+        var len = ysWithoutBoundary.length;
+        if (len>0){
+            return ysWithoutBoundary[0];
+        }
+        return false;
+    };
+
+    that.getBottomMostGridPosition = function(){
+        var len = ysWithoutBoundary.length;
+        if (len>0){
+            return ysWithoutBoundary[len-1];
+        }
+        return false;
     };
 
     Object.freeze(that);

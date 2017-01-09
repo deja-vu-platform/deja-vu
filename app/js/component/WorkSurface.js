@@ -105,8 +105,12 @@ var WorkSurface = function(){
      */
     var loadComponentIntoWorkSurface = function(component, zoom){
         var workSurface = createOrResetWorkSurface(component, zoom);
+
         component.layout.stackOrder.forEach(function(innerComponentId){
             var innerComponent = component.components[innerComponentId];
+            // if (innerComponent.type == 'user'){ // TODO FIXME
+            //     innerComponent = createUserComponentCopy(UserComponent.fromString(JSON.stringify(selectedProject.components[innerComponent.meta.parentId])));
+            // }
             var container = makeRecursiveComponentContainers(innerComponent, component, true, null, workSurface, zoom);
             view.displayComponent(true, innerComponent, container, component.properties.custom, zoom)
         });
@@ -130,8 +134,12 @@ var WorkSurface = function(){
             minHeight: 0,
             minWidth: 0,
             start: function(){
-                var minWidth = $('.grid-cell:last').position().left;
-                var minHeight = $('.grid-cell:last').position().top;
+                // var minWidth = $('.grid-cell:last').position().left;
+                // var minHeight = $('.grid-cell:last').position().top;
+
+                var minWidth = grid.getRightMostGridPosition();
+                var minHeight = grid.getBottomMostGridPosition();
+
 
                 $(this).resizable('option', 'minWidth', minWidth);
                 $(this).resizable('option', 'minHeight', minHeight);

@@ -96,7 +96,12 @@ var DragAndDropController = function () {
                         // FIXME
                         // How to have two copies of the same widget in the same place?
                         component = UserComponent.fromString(JSON.stringify(selectedProject.components[id]));
-                        component.meta.id = (new Date()).getTime();
+
+                        // component.meta.id = (new Date()).getTime();
+
+                        component.meta.parentId = component.meta.id;
+                        component = createUserComponentCopy(component);
+
                         widget.data('componentid', component.meta.id);
                         widget.text(component.meta.name);
                         widget.css('display', 'block');
