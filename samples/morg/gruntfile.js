@@ -5,7 +5,6 @@ module.exports = function(grunt) {
        {name: "Home", path: "/home"},
        {name: "GroupMeeting"}
      ], // widgets,
-     [],
      "Home",  // main
      {
        "dv-organization-event": 1,

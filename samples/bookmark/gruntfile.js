@@ -10,7 +10,6 @@ module.exports = function(grunt) {
        {name: "Post"},
        {name: "User"}
      ], // widgets
-     ["Post", "User"],  // attachments
      "Landing",  // main
      {
        "dv-access-auth": 1,

@@ -7,17 +7,14 @@ import {ClientBus} from "client-bus";
 
 
 @@wid_imports
-@@attachments_imports
 
 const COMP_INFO = @@comp_info;
 const WCOMP_INFO = @@wcomp_info;
 const NAME = "@@name";
 const MODE = "@@mode";
-const ATTACHMENTS = @@wid_attachments;
 const LOCS = @@locs;
 
 const WID_NAMES = @@wid_names;
-
 
 
 let providers = [];
@@ -41,10 +38,6 @@ providers = providers.concat([
     provide("WCompInfo", {useValue: WCOMP_INFO}),
     ClientBus
     ]);
-
-providers = providers.concat(
-  ATTACHMENTS
-    .map(a => provide(PLATFORM_DIRECTIVES, {useValue: a, multi: true})));
 
 
 let template;

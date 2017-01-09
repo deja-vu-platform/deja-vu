@@ -80,9 +80,7 @@ export interface Widget {
 
 export namespace GruntTask {
   export function task(
-      grunt, name: string, widgets?: Widget[], attachments?: string[],
-      main?: string, patterns?) {
-    attachments = attachments === undefined ? [] : attachments;
+      grunt, name: string, widgets?: Widget[], main?: string, patterns?) {
     widgets = widgets === undefined ? [] : widgets;
     patterns = patterns === undefined ? {} : patterns;
     const patterns_src = Object.keys(patterns)
@@ -296,8 +294,6 @@ export namespace GruntTask {
 
         let route_config = "";
 
-        let attachments_imports = "";
-
         const wid_names = _u.map(widgets, w => w.name);
 
         if (action === "dev") {
@@ -314,13 +310,7 @@ export namespace GruntTask {
                      useAsDefault: ${w.name === main}
                    }`)
               .join() + "])";
-
-          attachments_imports =  _u.map(attachments, imp).join("\n");
         }
-
-        const wid_attachments = "[" +
-            _u.map(attachments, component).join() + "]";
-
 
         let replace_patterns = [
           {match: "name", replacement: name},
@@ -331,7 +321,6 @@ export namespace GruntTask {
           {match: "wcomp_info", replacement: (
               grunt.file.exists("wcomp.json") ?
               grunt.file.readJSON("wcomp.json") : "{}")},
-          {match: "wid_attachments", replacement: wid_attachments},
           {match: "mode", replacement: action},
 
           {match: "wid_names", replacement: wid_names},
@@ -340,7 +329,6 @@ export namespace GruntTask {
           {match: "wid_directives", replacement: wid_directives},
           {match: "wid_selectors", replacement: wid_selectors},
 
-          {match: "attachments_imports", replacement: attachments_imports},
           {match: "route_config", replacement: route_config}
         ];
 
