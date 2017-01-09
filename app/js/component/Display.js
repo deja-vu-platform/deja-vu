@@ -10,6 +10,12 @@ var Display = function(){
         'panel': "panel display-component"
     };
 
+    var blankProperties = {
+        'background-color': '#FFFFFF',
+        'color': '#000000',
+        // TODO others
+    };
+
     /**
      * display element in cell
      */
@@ -247,6 +253,16 @@ var Display = function(){
         //// TODO SKETCHY!!!
         if (properties){
             if (overallStyles){
+
+                // Reset old overall styles
+                container.css({
+                    'background-color': '#FFFFFF',
+                });
+
+
+                // TODO finish resetting other styles
+                displayComponent.css(blankProperties);
+
                 if (overallStyles['background-color']){
                     container.css({
                         'background-color':overallStyles['background-color']
@@ -266,6 +282,11 @@ var Display = function(){
                 displayComponent.addClass(classes).addClass(defaultDisplayClasses[type]); // TODO what's going on here?
             }
             if (Object.keys(properties.custom).length>0){
+                if (properties.custom['background-color']){
+                    container.css({
+                        'background-color':properties.custom['background-color']
+                    })
+                }
                 for (var customProperty in properties.custom){
                     displayComponent.css(customProperty, properties.custom[customProperty]);
                 }
