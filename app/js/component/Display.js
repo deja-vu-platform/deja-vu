@@ -11,8 +11,8 @@ var Display = function(){
     };
 
     var blankProperties = {
-        'background-color': '#FFFFFF',
-        'color': '#000000',
+        'background-color': '',
+        'color': '',
         // TODO others
     };
 
