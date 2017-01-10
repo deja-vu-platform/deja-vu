@@ -40,4 +40,4 @@ under `lib/` and remove the first line (the one with the tripleslashes)
 
 
 To run:
-- you need to start the mongo deamon: run `mongod`
+- you need to start the mongo daemon: run `mongod`
