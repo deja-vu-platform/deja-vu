@@ -3,11 +3,11 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON("package.json"),
     ts: {
       lib: {
-        src: ["src/mean.ts"],
+        src: ["src/mean.ts", "typings/index.d.ts"],
         outDir: ["lib"],
         options: {
           verbose: true,
-          target: "es5",
+          target: "es6",
           module: "commonjs",
           moduleResolution: "node",
           sourceMap: true,
@@ -50,7 +50,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks("grunt-ts");
   grunt.loadNpmTasks("grunt-tslint");
   grunt.loadNpmTasks("grunt-contrib-clean");
-    grunt.loadNpmTasks("grunt-contrib-copy");
+  grunt.loadNpmTasks("grunt-contrib-copy");
 
   grunt.registerTask(
       "lib", ["clean:lib", "tslint", "ts:lib", "copy:lib"]);

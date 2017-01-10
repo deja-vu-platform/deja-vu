@@ -1,5 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
-import {Promise} from "es6-promise";
 import * as express from "express";
 const express_graphql = require("express-graphql");
 const graphql = require("graphql");

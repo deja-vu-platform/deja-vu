@@ -1,5 +1,4 @@
-import {OnInit} from "angular2/core";
-import {HTTP_PROVIDERS} from "angular2/http";
+import {OnInit} from "@angular/core";
 
 import {Post, Username} from "../../shared/data";
 import {GraphQlService} from "gql";
@@ -8,7 +7,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
+  ng2_providers: [GraphQlService]
 })
 export class PostsComponent implements OnInit {
   username: Username;

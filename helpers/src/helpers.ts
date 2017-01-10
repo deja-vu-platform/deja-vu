@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 const express_graphql = require("express-graphql");
 
 export namespace Helpers {

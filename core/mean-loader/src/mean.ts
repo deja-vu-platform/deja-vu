@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 import * as express from "express";
 import morgan = require("morgan");
 
@@ -103,7 +102,7 @@ export namespace GruntTask {
 
     const ts_base_opts = {
       verbose: true,
-      target: "es5",
+      target: "es6",
       moduleResolution: "node",
       sourceMap: true,
       emitDecoratorMetadata: true,
@@ -115,6 +114,7 @@ export namespace GruntTask {
     const ts_client_opts = _u.extend({module: "system"}, ts_base_opts);
     const ts_server_opts = _u.extend({module: "commonjs"}, ts_base_opts);
 
+    const typings = "typings/index.d.ts";
     const components = "src/components/**/*.ts";
     const shared = "src/shared/**/*.ts";
     const server = "src/*.ts";
@@ -123,22 +123,22 @@ export namespace GruntTask {
       pkg: grunt.file.readJSON("package.json"),
       ts: {
         dev_client: {
-          src: [shared, components, "src/dv-dev/**/*.ts"],
+          src: [typings, shared, components, "src/dv-dev/**/*.ts"],
           outDir: ["dist/public"],
           options: ts_client_opts
         },
         dev_server: {
-          src: [shared, server],
+          src: [typings, shared, server],
           outDir: ["dist"],
           options: ts_server_opts
         },
         lib_client: {
-          src: [shared, components],
+          src: [typings, shared, components],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_client_opts)
         },
         lib_server: {
-          src: [shared, server],
+          src: [typings, shared, server],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_server_opts)
         }

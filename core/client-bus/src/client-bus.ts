@@ -1,7 +1,7 @@
-/// <reference path="../typings/tsd.d.ts" />
-import {Injectable, Inject, Component, Optional} from "angular2/core";
-import {DynamicComponentLoader, Injector, ElementRef} from "angular2/core";
-import {provide} from "angular2/core";
+import {Injectable, Inject, Component, Optional} from "@angular/core";
+// import {DynamicComponentLoader, Injector, ElementRef} from "@angular/core";
+import {ElementRef} from "@angular/core";
+// import {provide} from "@angular/core";
 
 import * as _u from "underscore";
 import * as _ustring from "underscore.string";
@@ -150,7 +150,8 @@ export class WidgetLoader {
   c_hosts;
 
   constructor(
-      private _dcl: DynamicComponentLoader, private _element_ref: ElementRef,
+      // private _dcl: DynamicComponentLoader, private _element_ref: ElementRef,
+      private _element_ref: ElementRef,
       @Inject("WCompInfo") private _wcomp_info: WCompInfo,
       private _client_bus: ClientBus,
       @Inject("wname") @Optional() private _host_wname,
@@ -205,7 +206,7 @@ export class WidgetLoader {
     const adapt_table = this._adapt_table();
     const d_name = _ustring.dasherize(this.name).slice(1);
     let imp_string_prefix = "";
-    let providers = [];
+    // let providers = [];
     if (this.fqelement !== undefined &&
         /* hack */ !this.fqelement.startsWith("dv-samples-")) {
       imp_string_prefix =  `${this.fqelement}/lib/`;
@@ -213,16 +214,16 @@ export class WidgetLoader {
       if (fqelement_split.length === 4) {
         imp_string_prefix =  `${fqelement_split.slice(0, 3).join("-")}/lib/`;
       }
-      providers = [provide("fqelement", {useValue: this.fqelement})];
+      // providers = [provide("fqelement", {useValue: this.fqelement})];
     }
 
     console.log(`Loading ${this.name} of ${this.fqelement}`);
 
     System.import(imp_string_prefix + `components/${d_name}/${d_name}`)
-      .then(mod => this._dcl
+      /*.then(mod => this._dcl
           .loadIntoLocation(
             mod[this.name + "Component"], this._element_ref, "widget",
-            Injector.resolve(providers)))
+            Injector.resolve(providers))) */
       .then(componentRef => componentRef.instance)
       .then(c => {
         c.hosts = this.c_hosts;
@@ -275,7 +276,8 @@ export function Widget(options?: WidgetMetadata) {
     const dname = _ustring.dasherize(target.name).slice(1, -10);
     const metadata = {selector: dname};
 
-    let providers = [provide("wname", {useValue: target.name.slice(0, -9)})];
+    // let providers = [provide("wname", {useValue: target.name.slice(0, -9)})];
+    let providers = [];
     if (options.ng2_providers !== undefined) {
       providers = providers.concat(options.ng2_providers);
     }
