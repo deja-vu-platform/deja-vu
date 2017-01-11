@@ -8,8 +8,9 @@
   "dependencies": {
     "@angular/core": "~2.4.0",
     "@angular/http": "~2.4.0",
-    "rxjs": "5.0.0-beta.0",
     "graphql": "^0.4.18",
+    "reflect-metadata": "^0.1.9",
+    "rxjs": "5.0.0-beta.0",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
