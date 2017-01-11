@@ -63,6 +63,6 @@ function setUpContainer(container, widget, component, zoom){
     } else {
         var html = view.getHTML(type)();
     }
-    view.displayInnerComponent(container, type, html, zoom, properties);
+    view.displayComponent(true, component, container, component.properties.custom, zoom);
 
 }
