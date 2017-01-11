@@ -97,8 +97,8 @@ var setUpStyleColors = function(userComponent){
     var pickerBG = $('#pick-color-bg-input')[0]._jscLinkedInstance;
     pickerBG.fromString('87CEFA');
 
-    if (userComponent.properties.custom) {
-        var overallStyles = userComponent.properties.custom;
+    if (userComponent.properties.main) {
+        var overallStyles = userComponent.properties.main;
         var textColor = overallStyles['color'] || '';
         pickerText.fromString(textColor);
 
@@ -111,10 +111,10 @@ var setUpStyleColors = function(userComponent){
 };
 
 var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent){
-    if (!userComponent.properties.custom){
-        userComponent.properties.custom = {}
+    if (!userComponent.properties.main){
+        userComponent.properties.main = {}
     }
-    userComponent.properties.custom[styleName] = styleValue;
+    userComponent.properties.main[styleName] = styleValue;
     for (var id in userComponent.components){
         var container = $('#work-surface_'+userComponent.meta.id).find('#component-container_'+id);
         refreshContainerDisplay(false, container, currentZoom);
@@ -145,7 +145,7 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent
     });
 
     $('#reset-overall-color').click(function(){
-        selectedUserComponent.properties.custom = {};
+        selectedUserComponent.properties.main = {};
         setUpStyleColors(selectedUserComponent);
         for (var id in selectedUserComponent.components){
             // var innerComponent = selectedUserComponent.components[id];

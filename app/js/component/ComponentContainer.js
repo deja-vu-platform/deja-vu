@@ -320,9 +320,9 @@ var ComponentContainer = function(){
         container.find('.inner-component-style-dropdown').append(configOptions);
     };
 
-    that.setUpContainer = function(container, widget, component){
-        var type = widget.data('type');
-        container.append(widget);
+    that.setUpContainer = function(container, dragHandle, component){
+        var type = dragHandle.data('type');
+        container.append(dragHandle);
         showConfigOptions(type, container);
         setUpColorOptions(container, component);
         setUpTextOptions(container, component);

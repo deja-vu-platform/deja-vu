@@ -37,14 +37,18 @@ var WorkSurface = function(){
         workSurface.html('');
     };
 
-    that.makeRecursiveComponentContainersAndDisplay = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom, overallStyles){
-        var container = makeRecursiveComponentContainers(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom);
+    that.makeRecursiveComponentContainersAndDisplay = function(component, outerComponent, isThisEditable, dragHandle, outerComponentContainer, overallStyles, zoom){
+        var container = makeRecursiveComponentContainers(component, outerComponent, isThisEditable, dragHandle, zoom);
+        if (outerComponentContainer){
+            outerComponentContainer.append(container);
+            registerTooltipBtnHandlers();
+        }
         view.displayComponent(true, component, container, overallStyles, zoom);
         return container;
     };
 
     // isEditable == component is the selected user component and all its contents are editable
-    var makeRecursiveComponentContainers = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom){
+    var makeRecursiveComponentContainers = function(component, outerComponent, isThisEditable, dragHandle, zoom){
         var type = component.type;
         var componentId = component.meta.id;
 
@@ -52,20 +56,20 @@ var WorkSurface = function(){
         var componentContainer;
         if (isThisEditable){
             componentContainer = componentContainerMaker.createEditableComponentContainer(component, outerComponent, zoom);
-            if (!widget){
-                widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
+            if (!dragHandle){
+                dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
                 if (type == 'user'){
-                    widget.text(component.meta.name);
-                    widget.css('display', 'block');
+                    dragHandle.text(component.meta.name);
+                    dragHandle.css('display', 'block');
                 }
-                widget.addClass('associated').data('componentid', componentId);
+                dragHandle.addClass('associated').data('componentid', componentId);
             }
-            componentContainerMaker.setUpContainer(componentContainer, widget, component);
-            registerDraggable(widget);
+            componentContainerMaker.setUpContainer(componentContainer, dragHandle, component);
+            registerDraggable(dragHandle);
             var editPopup = false;
-            if (widget){
-                if (!widget.hasClass('associated')){
-                    if (!widget.hasClass('dragging-component')){
+            if (dragHandle){
+                if (!dragHandle.hasClass('associated')){
+                    if (!dragHandle.hasClass('dragging-component')){
                         editPopup = true;
                     }
                 }
@@ -73,10 +77,6 @@ var WorkSurface = function(){
             triggerEdit(componentContainer, editPopup);
         } else {
             componentContainer = componentContainerMaker.createBasicComponentContainer(component, zoom);
-        }
-        if (outerComponentContainer){
-            outerComponentContainer.append(componentContainer);
-            registerTooltipBtnHandlers();
         }
 
         if (outerComponent.layout[componentId]){ // means it's not not added yet
@@ -91,7 +91,8 @@ var WorkSurface = function(){
         if (type === 'user'){ // do the recursion
             component.layout.stackOrder.forEach(function(innerComponentId){
                 var innerComponent = component.components[innerComponentId];
-                makeRecursiveComponentContainers(innerComponent, component, false, null, componentContainer, zoom);
+                var innerComponentContainer = makeRecursiveComponentContainers(innerComponent, component, false, null, zoom);
+                componentContainer.append(innerComponentContainer);
             });
         }
         return componentContainer;
@@ -108,11 +109,18 @@ var WorkSurface = function(){
 
         component.layout.stackOrder.forEach(function(innerComponentId){
             var innerComponent = component.components[innerComponentId];
-            // if (innerComponent.type == 'user'){ // TODO FIXME
-            //     innerComponent = createUserComponentCopy(UserComponent.fromString(JSON.stringify(selectedProject.components[innerComponent.meta.parentId])));
-            // }
-            var container = makeRecursiveComponentContainers(innerComponent, component, true, null, workSurface, zoom);
-            view.displayComponent(true, innerComponent, container, component.properties.custom, zoom)
+                 if (innerComponent.type == 'user'){ // TODO FIXME doing some sketchy shit here
+                     var customStyles = innerComponent.properties.custom;
+                     var parentId = innerComponent.meta.parentId;
+                     innerComponent = createUserComponentCopy(UserComponent.fromString(JSON.stringify(selectedProject.components[parentId])));
+                     innerComponent.meta.id = innerComponentId;
+                     innerComponent.meta.parentId = parentId;
+                     innerComponent.properties.custom = customStyles;
+                     component.components[innerComponentId] = innerComponent;
+                 }
+
+            var overallStyles = component.properties.custom;
+            that.makeRecursiveComponentContainersAndDisplay(innerComponent, component, true, null, workSurface, overallStyles, zoom);
         });
     };
 
@@ -159,11 +167,11 @@ var WorkSurface = function(){
     };
 
     var makeWorkSurfaceDroppableToComponents = function(workSurface, outerComponent){
-        var onDropFinished = function(widget, component){
-            if (widget.associated){
+        var onDropFinished = function(dragHandle, component){
+            if (dragHandle.associated){
                 shiftOrder(component.meta.id, outerComponent);
             }
-            that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, widget, workSurface, currentZoom, outerComponent.properties.custom);
+            that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, dragHandle, workSurface, outerComponent.properties.custom, currentZoom);
             miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
             grid.setUpGrid();
         };

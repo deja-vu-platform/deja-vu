@@ -23,32 +23,32 @@ var DragAndDropController = function () {
                 var left = ui.position.left;
 
 
-                var widget = $(ui.draggable);
+                var dragHandle = $(ui.draggable);
                 var type = $(ui.draggable).data('type');
                 if (type == 'user') {
-                    if (!widget.hasClass('associated')) {
-                        widget = $(ui.draggable).clone();
-                        widget.data('componentid', $(ui.draggable).data('componentid'));
-                        widget.data('type', type);
-                        registerDraggable(widget);
+                    if (!dragHandle.hasClass('associated')) {
+                        dragHandle = $(ui.draggable).clone();
+                        dragHandle.data('componentid', $(ui.draggable).data('componentid'));
+                        dragHandle.data('type', type);
+                        registerDraggable(dragHandle);
                     }
                 }
 
                 // on drop, there should always be a dragging component
                 var component = draggingComponent;
                 var componentId = component.meta.id;
-                widget.removeClass('dragging-component');
+                dragHandle.removeClass('dragging-component');
                 outerComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
 
-                var widgetIsAssociated = widget.hasClass('associated');
-                widget.associated = widgetIsAssociated;
+                var widgetIsAssociated = dragHandle.hasClass('associated');
+                dragHandle.associated = widgetIsAssociated;
                 if (!widgetIsAssociated) {
                     $(ui.helper).data('newcomponent', true);
                     outerComponent.addComponent(component);
-                    widget.addClass('associated').data('componentid', componentId);
+                    dragHandle.addClass('associated').data('componentid', componentId);
                 }
 
-                dropFinished(widget, component);
+                dropFinished(dragHandle, component);
             }
         }
     };
@@ -59,22 +59,21 @@ var DragAndDropController = function () {
             revert: "invalid",
             cursorAt: {top: 0, left: 0},
             helper: function (e, ui) {
-                var widget = $(this);
-                var type = widget.data('type');
+                var dragHandle = $(this);
+                var type = dragHandle.data('type');
                 if (type == 'user') {
-                    if (!widget.hasClass('associated')) {
-                        widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
-                        // widget = $(this).clone();
-                        widget.data('componentid', $(this).data('componentid'));
-                        widget.data('type', type);
-                        registerDraggable(widget);
+                    if (!dragHandle.hasClass('associated')) {
+                        dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                        dragHandle.data('componentid', $(this).data('componentid'));
+                        dragHandle.data('type', type);
+                        registerDraggable(dragHandle);
                     }
                 }
-                widget.addClass('dragging-component');
+                dragHandle.addClass('dragging-component');
                 var offsetFromMouse = {top: 0, left: 0};
                 var componentContainer;
-                if (widget.hasClass('associated')) {
-                    var componentId = widget.data('componentid');
+                if (dragHandle.hasClass('associated')) {
+                    var componentId = dragHandle.data('componentid');
                     draggingComponent = selectedUserComponent.components[componentId];
                     // keep the old one for now, for guidance and all
                     var oldContainerId = 'component-container_' + componentId;
@@ -91,7 +90,7 @@ var DragAndDropController = function () {
                 } else {
                     var component;
                     if (type == 'user') {
-                        var id = widget.data('componentid');
+                        var id = dragHandle.data('componentid');
                         // TODO
                         // FIXME
                         // How to have two copies of the same widget in the same place?
@@ -102,21 +101,21 @@ var DragAndDropController = function () {
                         component.meta.parentId = component.meta.id;
                         component = createUserComponentCopy(component);
 
-                        widget.data('componentid', component.meta.id);
-                        widget.text(component.meta.name);
-                        widget.css('display', 'block');
+                        dragHandle.data('componentid', component.meta.id);
+                        dragHandle.text(component.meta.name);
+                        dragHandle.css('display', 'block');
                     } else {
                         component = BaseComponent(type, {}, view.getDimensions(type));
                     }
                     draggingComponent = component;
-                    componentContainer = workSurface.makeRecursiveComponentContainersAndDisplay(component, selectedUserComponent, true, widget, $('#work-surface_' + selectedUserComponent.meta.id), currentZoom, selectedUserComponent.properties.custom);
+                    componentContainer = workSurface.makeRecursiveComponentContainersAndDisplay(component, selectedUserComponent, true, dragHandle, null, selectedUserComponent.properties.custom, currentZoom);
 
                     $('#basic-components').html(basicComponents);
                     registerDraggable();
                 }
 
                 $('#outer-container').append(componentContainer);
-                widget.draggable("option", "cursorAt", offsetFromMouse);
+                dragHandle.draggable("option", "cursorAt", offsetFromMouse);
 
                 //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
                 // componentContainer.hide();

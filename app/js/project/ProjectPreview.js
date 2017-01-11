@@ -7,6 +7,7 @@ var gridHeight;
 var gridWidth;
 
 var view = Display();
+var workSurface = WorkSurface();
 
 function loadTablePreview(componentToShow) {
 
@@ -14,6 +15,14 @@ function loadTablePreview(componentToShow) {
 
     var page = $('<div></div>');
     page.attr('id', 'page');
+
+    $('#page-preview').append(page);
+    $('<style>#page::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
+
+    page.css({
+        position: 'relative',
+        'background-color': (componentToShow.properties.custom['background-color'] || '87CEFA')
+    });
 
     gridHeight = parseFloat($('#page-preview').height());
     gridWidth = parseFloat($('#page-preview').width());
@@ -28,11 +37,17 @@ function loadTablePreview(componentToShow) {
     componentToShow.layout.stackOrder.forEach(function(innerComponentId){
         var innerComponent = componentToShow.components[innerComponentId];
         var type = innerComponent.type;
+        var dragHandle = $('.draggable[name=' + type + ']').clone(); // TODO do we have an a copy of this? needs a better way of getting this
+
+
         var componentContainer = $('<div></div>');
+        if (innerComponent.type == 'user'){
+            componentContainer = workSurface.makeRecursiveComponentContainersAndDisplay(innerComponent, componentToShow, false, dragHandle, null, currentZoom, componentToShow.properties.custom);
+        }
+
         componentContainer.addClass('component-container');
         componentContainer.height(innerComponent.dimensions.height*scale).width(innerComponent.dimensions.width*scale);
 
-        var widget = $('.draggable[name=' + type + ']').clone(); // TODO do we have an a copy of this? needs a better way of getting this
 
         componentContainer.css({
             position: 'absolute',
@@ -41,28 +56,12 @@ function loadTablePreview(componentToShow) {
 
         });
 
-        setUpContainer(componentContainer, widget, innerComponent, scale);
+        setUpContainer(componentContainer, dragHandle, innerComponent, scale);
         page.append(componentContainer);
     });
-    page.css({
-        position: 'relative',
-        'background-color': (componentToShow.properties.custom['background-color'] || '87CEFA')
-    });
-
-    $('#page-preview').append(page);
-    $('<style>#page::after{content:"' + componentToShow.meta.name + '"}</style>').appendTo('head');
 }
 
-function setUpContainer(container, widget, component, zoom){
-    container.append(widget);
-    var type = widget.attr('name');
-    var properties;
-    if (component){
-        var html = view.getHTML(type)(component.components[type]);
-        properties = component.properties;
-    } else {
-        var html = view.getHTML(type)();
-    }
-    view.displayComponent(true, component, container, component.properties.custom, zoom);
-
+function setUpContainer(container, dragHandle, component, zoom){
+    container.append(dragHandle);
+    view.displayComponent(true, component, container, component.properties.main, zoom);
 }

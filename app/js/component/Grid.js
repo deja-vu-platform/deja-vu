@@ -36,6 +36,9 @@ var Grid = function(){
         var workSurfaceLeft = 0;
         var workSurfaceRight = workSurfaceLeft + workSurface.width();
 
+        xsWithoutBoundary.push(workSurfaceLeft, workSurfaceRight);
+        ysWithoutBoundary.push(workSurfaceTop, workSurfaceBottom);
+
         // TODO make more elegant
         // get the sets of xs and ys
         xsWithoutBoundary = Object.keys(grid.x).map(function(key){
@@ -51,6 +54,7 @@ var Grid = function(){
         ysWithoutBoundary.sort(function(a, b){
             return a-b;
         });
+
 
 
         grid.x[workSurfaceLeft] = '';

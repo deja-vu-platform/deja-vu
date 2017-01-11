@@ -14,6 +14,9 @@ things I did not like:
 11/30/2016 issues
 x color change does not penetrate the recursive components
 link between components not remembered
+	this is working but implem is skecthy and needs work
+	only remembered to one level: needs to be fully recursive
+	needs to be refreshed for changes to show
 x background color is not remembered
 x zoom does not work very well (ratios not zoomed)
 x list component disappears
@@ -23,3 +26,26 @@ x resizing upwards does not change the top, left position, just the size!!
 x at a lot of places, using selected user component as opposed to a given component might cause problems
 x need ui components for moving up and down the stack order.
 how to allow copies of the same component in multiple places (same id)?
+	this is currently working, but implem is sketchy and needs work
+
+1/10/2017 issues
+x made "main" a property for the template object that the user can make instances of, but the implementation
+is a bit sketchy because they are both "UserComponent"s. Might be actually better to seperate them into 
+UserComponentTemplate and UserComponentInstance or something...
+Here's the idea:
+	Have two classes Template and Instance (or some other names)
+	Instance has parentId and custom changes including styles and resize (maybe)
+	Then in DISPLAY (which is already recursive), if it is of type instance, we read from the project
+		(side note, if the user is deleting some UserComponentTemplate, we warn them that all uses of it will be deleted,
+		and delete them as we find them (ie, can't find it in the Project))
+	
+	So, the allowed structure is
+	
+	BaseComponent (is like a base case)
+	UserComponentTemplate: 
+		BaseComponent + UserComponentInstance (ie, just a reference)
+	UserComponentInstance: ref back to UserComponentTemplate
+
+ALSO, change userCOMPONENT to userWidget
+
+AND change WIDGET to DRAG-HANDLE

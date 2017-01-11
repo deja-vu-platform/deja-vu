@@ -72,7 +72,7 @@ var UserComponent = function (dimensions, name, id, version, author) {
     userComponent.layout = {stackOrder : []}; // componentId: { top: Number (px),
                                                 // left: Number (px),
 
-    userComponent.properties = {custom:{}, overall: {}, bsClasses: {}};
+    userComponent.properties = {custom:{}, main: {}, bsClasses: {}};
     return userComponent
 };
 

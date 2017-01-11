@@ -126,6 +126,9 @@ var Display = function(){
 
             // make styles more specific
             overallStyles = JSON.parse(JSON.stringify(overallStyles));
+            for (var mainProperty in properties.main){
+                overallStyles[mainProperty] = properties.main[mainProperty];
+            }
             for (var customProperty in properties.custom){
                 overallStyles[customProperty] = properties.custom[customProperty];
             }
@@ -281,13 +284,25 @@ var Display = function(){
                 displayComponent.removeClass();
                 displayComponent.addClass(classes).addClass(defaultDisplayClasses[type]); // TODO what's going on here?
             }
-            if (Object.keys(properties.custom).length>0){
+            if (Object.keys(properties.main).length>0){ //TODO make succinct
+                if (properties.main['background-color']){
+                    container.css({
+                        'background-color':properties.main['background-color']
+                    })
+                }
+                for (var mainProperty in properties.main){//TODO make succinct
+                    displayComponent.css(mainProperty, properties.main[mainProperty]);
+                }
+
+            }
+
+            if (Object.keys(properties.custom).length>0){//TODO make succinct
                 if (properties.custom['background-color']){
                     container.css({
                         'background-color':properties.custom['background-color']
                     })
                 }
-                for (var customProperty in properties.custom){
+                for (var customProperty in properties.custom){//TODO make succinct
                     displayComponent.css(customProperty, properties.custom[customProperty]);
                 }
 

@@ -405,9 +405,9 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 
 
-function registerDraggable(widgetToRegister) {
-    if (widgetToRegister){
-        widgetToRegister.draggable(dragAndDrop.widgetDragSettings())
+function registerDraggable(dragHandleToRegister) {
+    if (dragHandleToRegister){
+        dragHandleToRegister.draggable(dragAndDrop.widgetDragSettings())
     } else {
         $('.widget').each(function() {
             $(this).draggable(dragAndDrop.widgetDragSettings());
@@ -723,7 +723,7 @@ function refreshContainerDisplay(fresh, container, zoom){
     if (selectedUserComponent.components[componentId]){ // component exists
         var componentToChange = selectedUserComponent.components[componentId];
 
-        view.displayComponent(fresh, componentToChange, container, selectedUserComponent.properties.custom, zoom);
+        view.displayComponent(fresh, componentToChange, container, selectedUserComponent.properties.main, zoom);
 
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
@@ -754,18 +754,6 @@ function createUserComponentCopy (userComponent){
 
                     }
                 }
-                // component.layout.stackOrder.forEach(function(oldId, idx){
-                //     var result = recursiveReIding(component.components[oldId]);
-                //     if (result.success){
-                //         component.layout.stackOrder[idx] = result.newId;
-                //         component.components[result.newId] = component.components[oldId];
-                //         delete component.components[oldId];
-                //         component.layout[result.newId] = component.layout[oldId];
-                //         delete component.layout[oldId];
-                //
-                //     }
-                // });
-                console.log(component);
             }
             return {success: true, newId: newId};
         }
