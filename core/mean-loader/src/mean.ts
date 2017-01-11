@@ -312,19 +312,20 @@ export namespace GruntTask {
                          `"../components/${hyphen(w)}/${hyphen(w)}";`;
         const selector = w => `<dv-widget name="${w}"></dv-widget>`;
 
-        let wid_imports = "";
+        const wid_imports = _u.map(widgets, w => imp(w.name)).join("\n");
         let wid_selectors = "";
 
         let route_config = "[]";
 
         const wid_names = _u.map(widgets, w => w.name);
+        const wid_classes = "[" +
+          _u.map(widgets, w => w.name + "Component").join() + "]";
 
         if (action === "dev") {
           wid_selectors = _u.map(wid_names, selector).join("\n");
         } else {
           const wid_with_paths = _u.filter(widgets, w => w.path !== undefined);
           const default_path = _u.findWhere(wid_with_paths, {name: main}).path;
-          wid_imports = _u.map(wid_with_paths, w => imp(w.name)).join("\n");
           route_config = "[" + _u
               .map(wid_with_paths,
                    w => `{
@@ -350,6 +351,7 @@ export namespace GruntTask {
 
           {match: "wid_names", replacement: wid_names},
           {match: "wid_imports", replacement: wid_imports},
+          {match: "wid_classes", replacement: wid_classes},
 
           {match: "wid_selectors", replacement: wid_selectors},
 

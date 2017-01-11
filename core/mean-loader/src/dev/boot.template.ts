@@ -2,6 +2,8 @@ import {NgModule, Component} from "@angular/core";
 import {platformBrowserDynamic} from "@angular/platform-browser-dynamic";
 import {BrowserModule} from "@angular/platform-browser";
 import {RouterModule, Routes} from "@angular/router";
+import {FormsModule} from "@angular/forms";
+import {HttpModule} from "@angular/http";
 
 import {WidgetLoader, ClientBus} from "client-bus";
 
@@ -39,11 +41,15 @@ if (MODE === "dev") {
 })
 class RootComponent {}
 
+let declarations: any[] = [RootComponent, WidgetLoader];
+declarations = declarations.concat(@@wid_classes);
 
 @NgModule({
-  imports: [BrowserModule, RouterModule.forRoot(appRoutes)],
-  declarations: [RootComponent, WidgetLoader],
-  bootstrap: [RootComponent]
+  imports: [
+    BrowserModule, RouterModule.forRoot(appRoutes), FormsModule, HttpModule],
+  declarations: declarations,
+  bootstrap: [RootComponent],
+  entryComponents: @@wid_classes
 })
 export class RootModule {}
 
