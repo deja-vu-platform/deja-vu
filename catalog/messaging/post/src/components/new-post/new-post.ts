@@ -1,5 +1,3 @@
-import {HTTP_PROVIDERS} from "angular2/http";
-
 import {Post, Username} from "../../shared/data";
 import {GraphQlService} from "gql";
 
@@ -7,7 +5,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
+  ng2_providers: [GraphQlService]
 })
 export class NewPostComponent {
   username: Username;

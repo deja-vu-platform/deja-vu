@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 const graphql = require("graphql");
 
 import {Mean} from "mean-loader";

@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 import * as express from "express";
 import morgan = require("morgan");
 
@@ -78,32 +77,58 @@ export interface Widget {
   path: string;
 }
 
+export interface UsedWidget {
+  name: string;
+  fqelement: string;
+}
+
 export namespace GruntTask {
   export function task(
-      grunt, name: string, widgets?: Widget[], main?: string, patterns?) {
+      grunt, name: string, widgets?: Widget[], main?: string, patterns?,
+      used_widgets?: UsedWidget[]) {
     widgets = widgets === undefined ? [] : widgets;
     patterns = patterns === undefined ? {} : patterns;
+    used_widgets = used_widgets === undefined ? [] : used_widgets;
+
+    const npm = "node_modules";
     const patterns_src = Object.keys(patterns)
-        .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
+        .map(p => `${npm}/${p}/lib/{components,shared}/**/` +
                   "*.{js,html,css}");
     let deps = [
-      "node_modules/jquery/dist/jquery.min.js",
-      "node_modules/angular2/bundles/angular2-polyfills.js",
-      "node_modules/systemjs/dist/system.src.js",
-      "node_modules/rxjs/bundles/Rx.js",
-      "node_modules/angular2/bundles/angular2.dev.js",
-      "node_modules/angular2/bundles/http.js",
-      "node_modules/angular2/bundles/router.dev.js",
-      "node_modules/client-bus/lib/client-bus.js",
-      "node_modules/underscore/underscore.js",
-      "node_modules/gql/lib/gql.js",
-      "node_modules/underscore.string/dist/underscore.string.min.js"
+      `${npm}/zone.js/dist/zone.js`,
+      `${npm}/reflect-metadata/Reflect.js`,
+      `${npm}/jquery/dist/jquery.min.js`,
+      `${npm}/systemjs/dist/system.src.js`
     ];
     deps = deps.concat(patterns_src);
 
+    let module_map = {
+      // angular bundles
+      "@angular/core": `${npm}/@angular/core/bundles/core.umd.js`,
+      "@angular/common": `${npm}/@angular/common/bundles/common.umd.js`,
+      "@angular/compiler": `${npm}/@angular/compiler/bundles/compiler.umd.js`,
+      "@angular/platform-browser": `${npm}/@angular/platform-browser/bundles/` +
+        "platform-browser.umd.js",
+      "@angular/platform-browser-dynamic": `${npm}/@angular/` +
+        "platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js",
+      "@angular/http": `${npm}/@angular/http/bundles/http.umd.js`,
+      "@angular/router": `${npm}/@angular/router/bundles/router.umd.js`,
+      "@angular/forms": `${npm}/@angular/forms/bundles/forms.umd.js`,
+
+      // other libraries
+      "underscore": `${npm}/underscore/underscore.js`,
+      "underscore.string": `${npm}/underscore.string/dist/` +
+        "underscore.string.min.js",
+      "rxjs": `${npm}/rxjs`,
+
+      // Deja Vu stuff
+      "client-bus": `${npm}/client-bus/lib/client-bus.js`,
+      "gql": `${npm}/gql/lib/gql.js`
+    };
+
     const ts_base_opts = {
       verbose: true,
-      target: "es5",
+      target: "es6",
       moduleResolution: "node",
       sourceMap: true,
       emitDecoratorMetadata: true,
@@ -115,6 +140,7 @@ export namespace GruntTask {
     const ts_client_opts = _u.extend({module: "system"}, ts_base_opts);
     const ts_server_opts = _u.extend({module: "commonjs"}, ts_base_opts);
 
+    const typings = "typings/index.d.ts";
     const components = "src/components/**/*.ts";
     const shared = "src/shared/**/*.ts";
     const server = "src/*.ts";
@@ -123,22 +149,22 @@ export namespace GruntTask {
       pkg: grunt.file.readJSON("package.json"),
       ts: {
         dev_client: {
-          src: [shared, components, "src/dv-dev/**/*.ts"],
+          src: [typings, shared, components, "src/dv-dev/**/*.ts"],
           outDir: ["dist/public"],
           options: ts_client_opts
         },
         dev_server: {
-          src: [shared, server],
+          src: [typings, shared, server],
           outDir: ["dist"],
           options: ts_server_opts
         },
         lib_client: {
-          src: [shared, components],
+          src: [typings, shared, components],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_client_opts)
         },
         lib_server: {
-          src: [shared, server],
+          src: [typings, shared, server],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_server_opts)
         }
@@ -155,7 +181,12 @@ export namespace GruntTask {
             },
             {
               expand: true,
-              src: deps,
+              src: _u.values(module_map).concat(deps),
+              dest: "dist/public"
+            },
+            {
+              expand: true,
+              src: [`${npm}/rxjs/**`],
               dest: "dist/public"
             },
             // https://github.com/angular/angular/issues/6053
@@ -284,37 +315,42 @@ export namespace GruntTask {
 
         const hyphen = w => w.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
         const component = w => w + "Component";
-        const imp = w => `import {${component(w)}} from ` +
-                         `"../components/${hyphen(w)}/${hyphen(w)}";`;
+        const imp = (w_name, w_imp_prefix) => `import {${component(w_name)}} ` +
+          `from "${w_imp_prefix}/components/${hyphen(w_name)}/` +
+          `${hyphen(w_name)}";`;
         const selector = w => `<dv-widget name="${w}"></dv-widget>`;
 
-        let wid_imports = "";
-        let wid_directives = "[]";
+        const wid_imports = _u
+          .map(widgets, w => imp(w.name, ".."))
+          .concat(_u.map(used_widgets, w => imp(w.name, w.fqelement + "/lib")))
+          .join("\n");
         let wid_selectors = "";
 
-        let route_config = "";
+        let route_config = "[]";
 
         const wid_names = _u.map(widgets, w => w.name);
+        const wid_classes = "[" +
+          _u.map(widgets, w => w.name + "Component")
+          .concat(_u.map(used_widgets, w => w.name + "Component"))
+          .join() + "]";
 
         if (action === "dev") {
-          wid_imports = "import {WidgetLoader} from 'client-bus'";
-          wid_directives = "[WidgetLoader]";
           wid_selectors = _u.map(wid_names, selector).join("\n");
         } else {
           const wid_with_paths = _u.filter(widgets, w => w.path !== undefined);
-          wid_imports = _u.map(wid_with_paths, w => imp(w.name)).join("\n");
-          route_config = "@RouteConfig([" + _u
+          const default_path = _u.findWhere(wid_with_paths, {name: main}).path;
+          route_config = "[" + _u
               .map(wid_with_paths,
-                   w => `{
-                     path: "${w.path}", component: ${component(w.name)},
-                     useAsDefault: ${w.name === main}
-                   }`)
-              .join() + "])";
+                   w => `{path: "${w.path}", component: ${component(w.name)}}`)
+              .join() + ", " +
+              `{path: '', redirectTo: '${default_path}', pathMatch: 'full'}` +
+              "]";
         }
 
         let replace_patterns = [
           {match: "name", replacement: name},
-          {match: "deps", replacement: _u.keys(patterns)},
+          {match: "module_map", replacement: module_map},
+          {match: "cliches", replacement: _u.keys(patterns)},
           {match: "comp_info", replacement: (
               grunt.file.exists("comp.json") ?
               grunt.file.readJSON("comp.json") : "{}")},
@@ -325,8 +361,8 @@ export namespace GruntTask {
 
           {match: "wid_names", replacement: wid_names},
           {match: "wid_imports", replacement: wid_imports},
+          {match: "wid_classes", replacement: wid_classes},
 
-          {match: "wid_directives", replacement: wid_directives},
           {match: "wid_selectors", replacement: wid_selectors},
 
           {match: "route_config", replacement: route_config}

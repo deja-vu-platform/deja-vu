@@ -3,11 +3,11 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON("package.json"),
     ts: {
       lib: {
-        src: ["src/**/*.ts"],
+        src: ["src/**/*.ts", "typings/index.d.ts"],
         outDir: ["lib"],
         options: {
           verbose: true,
-          target: "es5",
+          target: "es6",
           module: "commonjs",
           moduleResolution: "node",
           sourceMap: true,

@@ -1,13 +1,9 @@
-import {HTTP_PROVIDERS} from "angular2/http";
-
 import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
 
 
-@Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
-})
+@Widget({ng2_providers: [GraphQlService]})
 export class NewCommentComponent {
   author = {name: "", atom_id: ""};
   comment = {atom_id: "", content: ""};

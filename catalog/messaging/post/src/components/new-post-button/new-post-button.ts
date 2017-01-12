@@ -1,12 +1,10 @@
-import {HTTP_PROVIDERS} from "angular2/http";
-
 import {Post, User} from "../../shared/data";
 import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
 
 
-@Widget({ng2_providers: [GraphQlService, HTTP_PROVIDERS]})
+@Widget({ng2_providers: [GraphQlService]})
 export class NewPostButtonComponent {
   submit_ok = {value: false};
   post: Post = {content: ""};

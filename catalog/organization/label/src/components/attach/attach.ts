@@ -1,5 +1,3 @@
-import {HTTP_PROVIDERS} from "angular2/http";
-
 import {Item, Label} from "../../shared/label";
 import {GraphQlService} from "gql";
 
@@ -8,7 +6,7 @@ import {Widget} from "client-bus";
 
 @Widget({
   template: "",
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
+  ng2_providers: [GraphQlService]
 })
 export class AttachComponent {
   private _item: Item;

@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 const graphql = require("graphql");
 // typings don't have the call with no callback
 const bcrypt = require("bcryptjs");

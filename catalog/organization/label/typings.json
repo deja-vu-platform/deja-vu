@@ -1,0 +1,13 @@
+{
+  "name": "dv-organization-label",
+  "globalDependencies": {
+    "express": "github:DefinitelyTyped/DefinitelyTyped/express/express.d.ts#1984ea435fe9e93a012d50db7773db58ae5d494b",
+    "serve-static": "github:DefinitelyTyped/DefinitelyTyped/serve-static/serve-static.d.ts#1984ea435fe9e93a012d50db7773db58ae5d494b",
+    "mime": "github:DefinitelyTyped/DefinitelyTyped/mime/mime.d.ts#1984ea435fe9e93a012d50db7773db58ae5d494b",
+    "mongodb": "github:DefinitelyTyped/DefinitelyTyped/mongodb/mongodb.d.ts#b4646ff708f39d2896bcb3e3974667f92e26c5a4",
+    "morgan": "github:DefinitelyTyped/DefinitelyTyped/morgan/morgan.d.ts#984a41af67d76b5134e0d4991a30f813dfb8561f",
+    "body-parser": "github:DefinitelyTyped/DefinitelyTyped/body-parser/body-parser.d.ts#1984ea435fe9e93a012d50db7773db58ae5d494b",
+    "underscore": "github:DefinitelyTyped/DefinitelyTyped/underscore/underscore.d.ts#26a1f8c44f5fe76168df717020bfb93839b63db3",
+    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#33585c55fbb7cd3cfc59d18a3b87f4ae6012eaff"
+  }
+}

@@ -1,10 +1,8 @@
-/// <reference path="../../../typings/underscore/underscore.d.ts" />
-import {ElementRef} from "angular2/core";
-import {HTTP_PROVIDERS} from "angular2/http";
+import {ElementRef} from "@angular/core";
 
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/operator/map";
-import "rxjs/add/observable/fromArray";
+import "rxjs/add/observable/from";
 import "rxjs/add/operator/mergeMap";
 
 import {GraphQlService} from "gql";
@@ -30,7 +28,7 @@ export interface EventItem {
 }
 
 @Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS],
+  ng2_providers: [GraphQlService],
   external_styles: [
     `https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/` +
     `bootstrap-select.min.css`
@@ -62,7 +60,7 @@ export class WeeklyEventComponent {
       `)
       .map(data => data.weeklyevent_all)
       .flatMap((weekly_events: WeeklyEvent[], unused_ix) => Observable
-          .fromArray(weekly_events))
+          .from(weekly_events))
       .map(weekly_event => _u
           .extendOwn(this._clientBus.new_atom("WeeklyEvent"), weekly_event))
       .subscribe(weekly_event => this.weekly_events.push(weekly_event));
@@ -82,7 +80,7 @@ export class WeeklyEventComponent {
         }
       `)
       .map(data => data.weeklyevent_by_id.events)
-      .flatMap((events: Event[], unused_ix) => Observable.fromArray(events))
+      .flatMap((events: Event[], unused_ix) => Observable.from(events))
       .map(e => _u.extendOwn(this._clientBus.new_atom("Event"), e))
       .map(e => ({event: e}))
       .map(e_field => _u.extendOwn(e_field, this.fields))

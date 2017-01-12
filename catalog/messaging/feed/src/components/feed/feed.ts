@@ -1,11 +1,12 @@
-/// <reference path="../../../typings/underscore/underscore.d.ts" />
-import {HTTP_PROVIDERS} from "angular2/http";
-import {Component} from "angular2/core";
+import {Component} from "@angular/core";
 
 import {Observable} from "rxjs/Observable";
+import "rxjs/add/observable/from";
+/*
 import "rxjs/add/operator/map";
-import "rxjs/add/observable/fromArray";
+import "rxjs/add/observable/from";
 import "rxjs/add/operator/mergeMap";
+*/
 
 
 import {Message, Publisher} from "../../shared/data";
@@ -24,7 +25,7 @@ export interface FeedItem {
 
 
 @Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
+  ng2_providers: [GraphQlService]
 })
 export class FeedComponent {
   feed: FeedItem[];
@@ -53,10 +54,10 @@ export class FeedComponent {
           }
         `)
         .map(data => data.sub.subscriptions)
-        .flatMap((pubs: Publisher[], unused_ix) => Observable.fromArray(pubs))
+        .flatMap((pubs: Publisher[], unused_ix) => Observable.from(pubs))
         .flatMap(
             (pub: Publisher, unused_ix: number) => {
-              return Observable.fromArray(pub.messages);
+              return Observable.from(pub.messages);
             },
             (pub: Publisher, message: Message, unused_pubi: number,
              unused_ci: number) => {

@@ -2,13 +2,13 @@
 <form (ngSubmit)="onSubmit()" #signInForm="ngForm" class="form-inline"
  [ngClass]="{'has-error': error}">
   <fieldset class="form-group">
-    <label class="sr-only" for="username">Username</label>
-    <input type="text" id="username" required class="form-control"
+    <label class="sr-only" for="signin-username">Username</label>
+    <input type="text" required class="form-control" name="username"
      [(ngModel)]="user.username" ngControl="username" placeholder="Username"/>
   </fieldset>
   <fieldset class="form-group">
-    <label class="sr-only" for="password">Password</label>
-    <input type="password" id="password" required class="form-control"
+    <label class="sr-only" for="signin-password">Password</label>
+    <input type="password" required class="form-control" name="password"
      [(ngModel)]="user.password" ngControl="password" placeholder="Password"/>
   </fieldset>
   <button type="submit" class="btn btn-default btn-sm"

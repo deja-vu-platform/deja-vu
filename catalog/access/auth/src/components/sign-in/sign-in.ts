@@ -1,5 +1,4 @@
-import {HTTP_PROVIDERS} from "angular2/http";
-import {NgClass} from "angular2/common";
+import {NgClass} from "@angular/common";
 
 import {User} from "../../shared/data";
 import {GraphQlService} from "gql";
@@ -7,7 +6,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-   ng2_providers: [GraphQlService, HTTP_PROVIDERS],
+   ng2_providers: [GraphQlService],
    ng2_directives: [NgClass]
 })
 export class SignInComponent {

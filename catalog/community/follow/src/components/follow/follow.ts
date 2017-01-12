@@ -1,14 +1,10 @@
-import {HTTP_PROVIDERS} from "angular2/http";
-
 import {Target, Name} from "../../shared/data";
 import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
 
 
-@Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
-})
+@Widget({ng2_providers: [GraphQlService]})
 export class FollowComponent {
   potentialFollows: Target[];
   private _name: Name;

@@ -1,11 +1,10 @@
 import {Widget} from "client-bus";
 
-import {HTTP_PROVIDERS} from "angular2/http";
 import {GraphQlService} from "gql";
 
 
 @Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS],
+  ng2_providers: [GraphQlService],
   template: `
     <ul *ngIf="item.labels && item.labels.length > 0" class="row"
      style="list-style-type: none; padding-top: 10px; padding-bottom: 10px;">

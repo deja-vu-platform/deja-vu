@@ -1,7 +1,7 @@
-/// <reference path="../typings/tsd.d.ts" />
-import {Injectable, Inject, Component, Optional} from "angular2/core";
-import {DynamicComponentLoader, Injector, ElementRef} from "angular2/core";
-import {provide} from "angular2/core";
+import {Injectable, Inject, Component, Optional} from "@angular/core";
+import {
+  ViewContainerRef, ViewChild, ReflectiveInjector, ComponentFactoryResolver
+} from "@angular/core";
 
 import * as _u from "underscore";
 import * as _ustring from "underscore.string";
@@ -84,6 +84,7 @@ export class Atom {
   // from a type to the core
   _forward_map(t: Type) {
     if (this._comp_info === undefined) return {};
+    if (this._comp_info.fbonds === undefined) return {};
     const forward_map = {};
     // find the field bonds where t is part of, map field to core
     for (const fbond of this._comp_info.fbonds) {
@@ -143,6 +144,9 @@ export interface WCompInfo {
   inputs: ["fqelement", "name", "fields", "hosts"]
 })
 export class WidgetLoader {
+  @ViewChild("widget", {read: ViewContainerRef})
+  widgetContainer: ViewContainerRef;
+
   fqelement: string;
   name: string;
   fields;
@@ -150,7 +154,7 @@ export class WidgetLoader {
   c_hosts;
 
   constructor(
-      private _dcl: DynamicComponentLoader, private _element_ref: ElementRef,
+      private _resolver: ComponentFactoryResolver,
       @Inject("WCompInfo") private _wcomp_info: WCompInfo,
       private _client_bus: ClientBus,
       @Inject("wname") @Optional() private _host_wname,
@@ -213,17 +217,21 @@ export class WidgetLoader {
       if (fqelement_split.length === 4) {
         imp_string_prefix =  `${fqelement_split.slice(0, 3).join("-")}/lib/`;
       }
-      providers = [provide("fqelement", {useValue: this.fqelement})];
+      providers = [{provide: "fqelement", useValue: this.fqelement}];
     }
 
     console.log(`Loading ${this.name} of ${this.fqelement}`);
 
     System.import(imp_string_prefix + `components/${d_name}/${d_name}`)
-      .then(mod => this._dcl
-          .loadIntoLocation(
-            mod[this.name + "Component"], this._element_ref, "widget",
-            Injector.resolve(providers)))
-      .then(componentRef => componentRef.instance)
+      .then(mod => mod[this.name + "Component"])
+      .then(c => this._resolver.resolveComponentFactory(c))
+      .then(factory => {
+        const injector = ReflectiveInjector
+            .resolveAndCreate(providers, this.widgetContainer.parentInjector);
+        const component = factory.create(injector);
+        this.widgetContainer.insert(component.hostView);
+        return component._component;
+      })
       .then(c => {
         c.hosts = this.c_hosts;
         if (c.fields === undefined) {
@@ -275,7 +283,7 @@ export function Widget(options?: WidgetMetadata) {
     const dname = _ustring.dasherize(target.name).slice(1, -10);
     const metadata = {selector: dname};
 
-    let providers = [provide("wname", {useValue: target.name.slice(0, -9)})];
+    let providers = [{provide: "wname", useValue: target.name.slice(0, -9)}];
     if (options.ng2_providers !== undefined) {
       providers = providers.concat(options.ng2_providers);
     }

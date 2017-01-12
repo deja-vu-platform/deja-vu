@@ -10,38 +10,31 @@
 
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
 
-    <script src="node_modules/angular2/bundles/angular2-polyfills.js"></script>
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/reflect-metadata/Reflect.js"></script>
     <script src="node_modules/systemjs/dist/system.src.js"></script>
-    <script src="node_modules/rxjs/bundles/Rx.js"></script>
-    <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
-    <script src="node_modules/angular2/bundles/http.js"></script>
-    <script src="node_modules/angular2/bundles/router.dev.js"></script>
-
-
 
     <script>
-      const DEPS = @@deps;
+      const cliches = @@cliches;
 
-      const regjs = {format: "register", defaultExtension: "js"};
+      const map_obj = @@module_map; 
 
-      const map_obj = {};
+      const regjs = {defaultExtension: "js"};
+
       const packages_obj = {};
-      for (const dep of DEPS) {
-        map_obj[dep] = "node_modules/" + dep;
-        packages_obj[dep] = regjs;
+      for (const cliche of cliches) {
+        map_obj[cliche] = "node_modules/" + cliche;
+        packages_obj[cliche] = regjs;
       }
-      map_obj["underscore"] = "node_modules/underscore/underscore.js";
-      map_obj["underscore.string"] = "node_modules/underscore.string/dist/underscore.string.min.js";
-      map_obj["client-bus"] = "node_modules/client-bus/lib/client-bus.js";
-      map_obj["gql"] = "node_modules/gql/lib/gql.js";
 
-      packages_obj["dv-dev"] = regjs;
+      packages_obj["dv-dev"] = {main: "./boot.js", defaultExtension: "js"};
       packages_obj["components"] = regjs;
       packages_obj["shared"] = regjs;
+      packages_obj["rxjs"] = regjs;
 
       System.config({map: map_obj, packages: packages_obj});
-      System.import('./dv-dev/boot')
-            .then(null, console.error.bind(console));
+      System.import('dv-dev')
+        .catch(function(err) { console.error(err); });
     </script>
 
   </head>
