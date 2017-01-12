@@ -1,5 +1,5 @@
 <!-- Register --> 
-<form (ngSubmit)="onSubmit()" #signInForm="ngForm" class="form-horizontal">
+<form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="form-horizontal">
   <fieldset class="form-group" [ngClass]="{'has-error': username_error}">
     <label class="sr-only" for="username">Username</label>
     <input type="text" required class="form-control"
@@ -26,6 +26,6 @@
   </fieldset>
   <fieldset class="form-group">
     <button type="submit" class="btn btn-default btn-sm"
-     [disabled]="!signInForm.form.valid">Register</button>
+     [disabled]="!registerForm.form.valid">Register</button>
   </fieldset>
 </form>
