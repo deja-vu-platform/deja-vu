@@ -77,11 +77,18 @@ export interface Widget {
   path: string;
 }
 
+export interface UsedWidget {
+  name: string;
+  fqelement: string;
+}
+
 export namespace GruntTask {
   export function task(
-      grunt, name: string, widgets?: Widget[], main?: string, patterns?) {
+      grunt, name: string, widgets?: Widget[], main?: string, patterns?,
+      used_widgets?: UsedWidget[]) {
     widgets = widgets === undefined ? [] : widgets;
     patterns = patterns === undefined ? {} : patterns;
+    used_widgets = used_widgets === undefined ? [] : used_widgets;
 
     const npm = "node_modules";
     const patterns_src = Object.keys(patterns)
@@ -308,18 +315,24 @@ export namespace GruntTask {
 
         const hyphen = w => w.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
         const component = w => w + "Component";
-        const imp = w => `import {${component(w)}} from ` +
-                         `"../components/${hyphen(w)}/${hyphen(w)}";`;
+        const imp = (w_name, w_imp_prefix) => `import {${component(w_name)}} ` +
+          `from "${w_imp_prefix}/components/${hyphen(w_name)}/` +
+          `${hyphen(w_name)}";`;
         const selector = w => `<dv-widget name="${w}"></dv-widget>`;
 
-        const wid_imports = _u.map(widgets, w => imp(w.name)).join("\n");
+        const wid_imports = _u
+          .map(widgets, w => imp(w.name, ".."))
+          .concat(_u.map(used_widgets, w => imp(w.name, w.fqelement + "/lib")))
+          .join("\n");
         let wid_selectors = "";
 
         let route_config = "[]";
 
         const wid_names = _u.map(widgets, w => w.name);
         const wid_classes = "[" +
-          _u.map(widgets, w => w.name + "Component").join() + "]";
+          _u.map(widgets, w => w.name + "Component")
+          .concat(_u.map(used_widgets, w => w.name + "Component"))
+          .join() + "]";
 
         if (action === "dev") {
           wid_selectors = _u.map(wid_names, selector).join("\n");
@@ -328,11 +341,8 @@ export namespace GruntTask {
           const default_path = _u.findWhere(wid_with_paths, {name: main}).path;
           route_config = "[" + _u
               .map(wid_with_paths,
-                   w => `{
-                     path: "${w.path}", component: ${component(w.name)},
-                     useAsDefault: ${w.name === main}
-                   }`)
-              .join() +
+                   w => `{path: "${w.path}", component: ${component(w.name)}}`)
+              .join() + ", " +
               `{path: '', redirectTo: '${default_path}', pathMatch: 'full'}` +
               "]";
         }

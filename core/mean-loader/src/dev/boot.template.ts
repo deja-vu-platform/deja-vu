@@ -10,7 +10,7 @@ import {WidgetLoader, ClientBus} from "client-bus";
 
 @@wid_imports
 
-const MODE = "@@mode";
+const MODE: string = "@@mode";
 
 const WID_NAMES = @@wid_names;
 
