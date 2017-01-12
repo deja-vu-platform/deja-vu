@@ -1,6 +1,6 @@
 import {Injectable, Inject, Component, Optional} from "@angular/core";
 import {
-  ComponentFactoryResolver, ReflectiveInjector, Injector, ElementRef
+  ViewContainerRef, ViewChild, ReflectiveInjector, ComponentFactoryResolver
 } from "@angular/core";
 
 import * as _u from "underscore";
@@ -143,6 +143,9 @@ export interface WCompInfo {
   inputs: ["fqelement", "name", "fields", "hosts"]
 })
 export class WidgetLoader {
+  @ViewChild("widget", {read: ViewContainerRef})
+  widgetContainer: ViewContainerRef;
+
   fqelement: string;
   name: string;
   fields;
@@ -151,8 +154,6 @@ export class WidgetLoader {
 
   constructor(
       private _resolver: ComponentFactoryResolver,
-      private _element_ref: ElementRef,
-      private _injector: Injector,
       @Inject("WCompInfo") private _wcomp_info: WCompInfo,
       private _client_bus: ClientBus,
       @Inject("wname") @Optional() private _host_wname,
@@ -221,15 +222,14 @@ export class WidgetLoader {
     console.log(`Loading ${this.name} of ${this.fqelement}`);
 
     System.import(imp_string_prefix + `components/${d_name}/${d_name}`)
-      .then(mod => this._resolver
-          .resolveComponentFactory(mod[this.name + "Component"]))
+      .then(mod => mod[this.name + "Component"])
+      .then(c => this._resolver.resolveComponentFactory(c))
       .then(factory => {
-        const component = factory.create(
-          ReflectiveInjector.resolveAndCreate(providers, this._injector),
-          "widget", this._element_ref.nativeElement
-        );
-
-        return component;
+        const injector = ReflectiveInjector
+            .resolveAndCreate(providers, this.widgetContainer.parentInjector);
+        const component = factory.create(injector);
+        this.widgetContainer.insert(component.hostView);
+        return component._component;
       })
       .then(c => {
         c.hosts = this.c_hosts;
