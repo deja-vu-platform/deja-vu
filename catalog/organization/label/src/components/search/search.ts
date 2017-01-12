@@ -1,5 +1,4 @@
-import {Output, EventEmitter} from "angular2/core";
-import {HTTP_PROVIDERS} from "angular2/http";
+import {Output, EventEmitter} from "@angular/core";
 
 import {GraphQlService} from "gql";
 
@@ -7,7 +6,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
+  ng2_providers: [GraphQlService]
 })
 export class SearchComponent {
   query: string;

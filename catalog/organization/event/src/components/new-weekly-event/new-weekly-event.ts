@@ -1,5 +1,4 @@
-import {ElementRef} from "angular2/core";
-import {HTTP_PROVIDERS} from "angular2/http";
+import {ElementRef} from "@angular/core";
 
 import {GraphQlService} from "gql";
 
@@ -7,7 +6,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS],
+  ng2_providers: [GraphQlService],
   styles: [``]
 })
 export class NewWeeklyEventComponent {

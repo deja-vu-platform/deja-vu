@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 import {Promise} from "es6-promise";
 const graphql = require("graphql");
 

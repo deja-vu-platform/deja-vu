@@ -1,6 +1,3 @@
-/// <reference path="../../../typings/underscore/underscore.d.ts" />
-import {HTTP_PROVIDERS} from "angular2/http";
-
 import {Label} from "../../shared/label";
 import {GraphQlService} from "gql";
 
@@ -11,7 +8,7 @@ import * as _u from "underscore";
 import {Widget} from "client-bus";
 
 
-@Widget({ng2_providers: [GraphQlService, HTTP_PROVIDERS]})
+@Widget({ng2_providers: [GraphQlService]})
 export class LabelsTextComponent {
   item = {labels: [], atom_id: undefined};
   labels_text: string = "";

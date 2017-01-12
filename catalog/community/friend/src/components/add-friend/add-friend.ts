@@ -1,14 +1,10 @@
-import {HTTP_PROVIDERS} from "angular2/http";
-
 import {User, Username} from "../../shared/user";
 import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
 
 
-@Widget({
-  ng2_providers: [GraphQlService, HTTP_PROVIDERS]
-})
+@Widget({ng2_providers: [GraphQlService]})
 export class AddFriendComponent {
   potentialFriends: User[];
   private _username: Username;

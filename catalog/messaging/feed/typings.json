@@ -1,0 +1,13 @@
+{
+  "name": "dv-messaging-feed",
+  "globalDependencies": {
+    "express": "github:DefinitelyTyped/DefinitelyTyped/express/express.d.ts#1984ea435fe9e93a012d50db7773db58ae5d494b",
+    "serve-static": "github:DefinitelyTyped/DefinitelyTyped/serve-static/serve-static.d.ts#1984ea435fe9e93a012d50db7773db58ae5d494b",
+    "mime": "github:DefinitelyTyped/DefinitelyTyped/mime/mime.d.ts#1984ea435fe9e93a012d50db7773db58ae5d494b",
+    "mongodb": "github:DefinitelyTyped/DefinitelyTyped/mongodb/mongodb.d.ts#b4646ff708f39d2896bcb3e3974667f92e26c5a4",
+    "morgan": "github:DefinitelyTyped/DefinitelyTyped/morgan/morgan.d.ts#984a41af67d76b5134e0d4991a30f813dfb8561f",
+    "body-parser": "github:DefinitelyTyped/DefinitelyTyped/body-parser/body-parser.d.ts#1984ea435fe9e93a012d50db7773db58ae5d494b",
+    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#877406d815e6f891278b66fc991d92e8d24d5b38",
+    "underscore": "github:DefinitelyTyped/DefinitelyTyped/underscore/underscore.d.ts#8eedd1b9f7f009f14435f73c53a88d537c546a02"
+  }
+}
