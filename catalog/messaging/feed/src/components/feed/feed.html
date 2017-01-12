@@ -1,6 +1,6 @@
 <!-- Feed(Name) -->
 <ul *ngIf="feed && feed.length > 0" class="list-group">
-  <li *ngFor="#feedItem of feed" class="list-group-item">
+  <li *ngFor="let feedItem of feed" class="list-group-item">
     <!-- tmp hack -->
     <dv-widget name="FeedItem" fqelement="dv-samples-bookmark"
      [fields]="feedItem" [hosts]="hosts"></dv-widget>

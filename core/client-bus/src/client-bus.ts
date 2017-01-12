@@ -84,6 +84,7 @@ export class Atom {
   // from a type to the core
   _forward_map(t: Type) {
     if (this._comp_info === undefined) return {};
+    if (this._comp_info.fbonds === undefined) return {};
     const forward_map = {};
     // find the field bonds where t is part of, map field to core
     for (const fbond of this._comp_info.fbonds) {
