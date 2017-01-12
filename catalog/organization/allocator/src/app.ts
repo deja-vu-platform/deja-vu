@@ -57,6 +57,7 @@ const schema = grafo
         "type": "Consumer",
         resolve: (resource) => {
           if (resource.consumed_by === undefined) {
+            // todo: need to lock until this is done
             // Trigger round-robin allocation
             return mean.db.collection("allocations")
               .findOne({resources: {atom_id: resource.atom_id}})
