@@ -1,18 +1,9 @@
 import {Widget, ClientBus, field} from "client-bus";
 
-import {RouteConfig, ROUTER_DIRECTIVES, Router} from "angular2/router";
-
-import {HomeComponent} from "../home/home";
-import {TopicsComponent} from "../topics/topics";
-import {UsersComponent} from "../users/users";
+import {Router} from "@angular/router";
 
 
-@Widget({ng2_directives: [ROUTER_DIRECTIVES]})
-@RouteConfig([
-  {path: "/home", name: "Home", component: HomeComponent, useAsDefault: true},
-  {path: "/topics", name: "Topics", component: TopicsComponent},
-  {path: "/users", name: "Users", component: UsersComponent}
-])
+@Widget({})
 export class AppComponent {
   signout_ok = {value: false, on_change: undefined};
 
@@ -24,9 +15,5 @@ export class AppComponent {
         this._router.navigateByUrl("/landing");
       }
     });
-  }
-
-  isRouteActive(route) {
-    return this._router.isRouteActive(this._router.generate([route]));
   }
 }

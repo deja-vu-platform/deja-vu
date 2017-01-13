@@ -75,6 +75,7 @@ export class Mean {
 export interface Widget {
   name: string;
   path: string;
+  children?: Widget[];
 }
 
 export interface UsedWidget {
@@ -320,8 +321,17 @@ export namespace GruntTask {
           `${hyphen(w_name)}";`;
         const selector = w => `<dv-widget name="${w}"></dv-widget>`;
 
+        let flat_widgets: Widget[] = _u.chain(widgets)
+            .pluck("children")
+            .without(null, undefined)
+            .flatten()
+            .value();
+        flat_widgets = flat_widgets
+          .concat(_u.map(widgets, w => ({name: w.name, path: w.path})));
+        flat_widgets = _u.uniq(flat_widgets);
+
         const wid_imports = _u
-          .map(widgets, w => imp(w.name, ".."))
+          .map(flat_widgets, w => imp(w.name, ".."))
           .concat(_u.map(used_widgets, w => imp(w.name, w.fqelement + "/lib")))
           .join("\n");
         let wid_selectors = "";
@@ -330,7 +340,7 @@ export namespace GruntTask {
 
         const wid_names = _u.map(widgets, w => w.name);
         const wid_classes = "[" +
-          _u.map(widgets, w => w.name + "Component")
+          _u.map(flat_widgets, w => w.name + "Component")
           .concat(_u.map(used_widgets, w => w.name + "Component"))
           .join() + "]";
 
@@ -339,9 +349,18 @@ export namespace GruntTask {
         } else {
           const wid_with_paths = _u.filter(widgets, w => w.path !== undefined);
           const default_path = _u.findWhere(wid_with_paths, {name: main}).path;
+          const routify = w => {
+            if (w.children === undefined) {
+              return `{path: "${w.path}", component: ${component(w.name)}}`;
+            } else {
+              return `{
+                path: "${w.path}", component: ${component(w.name)},
+                children: [${_u.map(w.children, routify).join()}]
+              }`;
+            }
+          };
           route_config = "[" + _u
-              .map(wid_with_paths,
-                   w => `{path: "${w.path}", component: ${component(w.name)}}`)
+              .map(wid_with_paths, routify)
               .join() + ", " +
               `{path: '', redirectTo: '${default_path}', pathMatch: 'full'}` +
               "]";

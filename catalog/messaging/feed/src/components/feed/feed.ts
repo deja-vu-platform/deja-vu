@@ -2,11 +2,8 @@ import {Component} from "@angular/core";
 
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/from";
-/*
 import "rxjs/add/operator/map";
-import "rxjs/add/observable/from";
 import "rxjs/add/operator/mergeMap";
-*/
 
 
 import {Message, Publisher} from "../../shared/data";

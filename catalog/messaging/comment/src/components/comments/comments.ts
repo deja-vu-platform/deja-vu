@@ -2,12 +2,9 @@ import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
 
-import {CommentComponent} from "../comment/comment";
-
 
 @Widget({
-  ng2_providers: [GraphQlService],
-  ng2_directives: [CommentComponent]
+  ng2_providers: [GraphQlService]
 })
 export class CommentsComponent {
   comments: any[];

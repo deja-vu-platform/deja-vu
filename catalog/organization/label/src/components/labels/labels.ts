@@ -8,7 +8,7 @@ import {GraphQlService} from "gql";
   template: `
     <ul *ngIf="item.labels && item.labels.length > 0" class="row"
      style="list-style-type: none; padding-top: 10px; padding-bottom: 10px;">
-      <li *ngFor="#label of item.labels" class="label label-primary">
+      <li *ngFor="let label of item.labels" class="label label-primary">
         {{label.name}}
       </li>
     </ul>

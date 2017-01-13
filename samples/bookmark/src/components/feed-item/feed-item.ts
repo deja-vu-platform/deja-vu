@@ -1,7 +1,5 @@
 import {Widget, ClientBus, field} from "client-bus";
 
-import {provide} from "angular2/core";
-
 
 // tmp hack
 @Widget({
@@ -28,7 +26,7 @@ import {provide} from "angular2/core";
 
     </div>
   `,
-  ng2_providers: [provide("fqelement", {useValue: "dv-samples-bookmark"})]
+  ng2_providers: [{provide: "fqelement", useValue: "dv-samples-bookmark"}]
 })
 export class FeedItemComponent {
   post = {};

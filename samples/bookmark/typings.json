@@ -1,0 +1,10 @@
+{
+  "name": "dv-samples-bookmark",
+  "globalDependencies": {
+    "express": "github:DefinitelyTyped/DefinitelyTyped/express/express.d.ts#fab683ca77d0286b9d51aba6375deaceb41b22f5",
+    "serve-static": "github:DefinitelyTyped/DefinitelyTyped/serve-static/serve-static.d.ts#fab683ca77d0286b9d51aba6375deaceb41b22f5",
+    "mime": "github:DefinitelyTyped/DefinitelyTyped/mime/mime.d.ts#fab683ca77d0286b9d51aba6375deaceb41b22f5",
+    "morgan": "github:DefinitelyTyped/DefinitelyTyped/morgan/morgan.d.ts#984a41af67d76b5134e0d4991a30f813dfb8561f",
+    "node": "github:DefinitelyTyped/DefinitelyTyped/node/node.d.ts#69de0f48cdad23c179d05919ab77d6734fe0ed2e"
+  }
+}
