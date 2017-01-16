@@ -57,7 +57,7 @@ function UserProject(name, id, version, author) {
     this.addedCliches = {};
 }
 
-UserProject.prototype.addComponent = function(component){
+UserProject.prototype.addInnerWidget = function(component){
     if (!this.components[component.meta.id]) {
         this.components[component.meta.id] = component;
         this.numComponents++;
@@ -67,7 +67,7 @@ UserProject.prototype.addComponent = function(component){
 UserProject.prototype.addMainPage = function(component){
     component.inMainPages = true;
     this.mainComponents[component.meta.id] = component.meta.name;
-    this.addComponent(component);
+    this.addInnerWidget(component);
 };
 
 UserProject.prototype.removeMainPage = function(component){
@@ -107,7 +107,7 @@ UserProject.fromObject = function(object){
 
     for (var componentId in object.components) {
         var component = object.components[componentId];
-        object.components[componentId] = UserComponent.fromObject(component);
+        object.components[componentId] = UserWidget.fromObject(component);
     }
     return project
 };

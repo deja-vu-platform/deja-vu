@@ -96,37 +96,37 @@ var MiniNav = function(){
         });
     };
 
-    that.updateMiniNavInnerComponentSizes = function(component, zoom){
-        that.setUpMiniNavElementAndInnerComponentSizes(component);
-        that.updateNavInnerComponentSizes(zoom);
+    that.updateMiniNavInnerWidgetSizes = function(outerWidget, zoom){
+        that.setUpMiniNavElementAndInnerWidgetSizes(outerWidget);
+        that.updateNavInnerWidgetSizes(zoom);
     };
 
-    that.updateNavInnerComponentSizes = function(zoom){
+    that.updateNavInnerWidgetSizes = function(zoom){
         $('#mini-nav-component-sizes').css({
             zoom: zoom,
         });
     };
 
-    that.setUpMiniNavElementAndInnerComponentSizes = function(outerComponent){
+    that.setUpMiniNavElementAndInnerWidgetSizes = function(outerWidget){
         $('#mini-nav-component-sizes').html('').css({
-            width: outerComponent.dimensions.width*navZoom + 'px',
-            height: outerComponent.dimensions.height*navZoom + 'px',
+            width: outerWidget.dimensions.width*navZoom + 'px',
+            height: outerWidget.dimensions.height*navZoom + 'px',
         });
 
-        Object.keys(outerComponent.components).forEach(function(innerComponentId){
-            var innerComponent = outerComponent.components[innerComponentId];
-            var componentSizeDiv = $('<div></div>');
-            componentSizeDiv.addClass('mini-nav-inner-component-size');
-            componentSizeDiv.css({
+        Object.keys(outerWidget.innerWidgets).forEach(function(innerWidgetId){
+            var innerWidget = outerWidget.innerWidgets[innerWidgetId];
+            var widgetSizeDiv = $('<div></div>');
+            widgetSizeDiv.addClass('mini-nav-inner-component-size');
+            widgetSizeDiv.css({
                 position: 'absolute',
-                left: outerComponent.layout[innerComponentId].left*navZoom,
-                top: outerComponent.layout[innerComponentId].top*navZoom,
-                width: innerComponent.dimensions.width*navZoom,
-                height: innerComponent.dimensions.height*navZoom,
+                left: outerWidget.layout[innerWidgetId].left*navZoom,
+                top: outerWidget.layout[innerWidgetId].top*navZoom,
+                width: innerWidget.dimensions.width*navZoom,
+                height: innerWidget.dimensions.height*navZoom,
                 background: 'black'
             });
 
-            $('#mini-nav-component-sizes').append(componentSizeDiv);
+            $('#mini-nav-component-sizes').append(widgetSizeDiv);
         });
     };
 

@@ -13,12 +13,12 @@ var Grid = function(){
 
     that.setUpGrid = function(){
         $('.grid').remove();
-        var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
+        var workSurface = $('#work-surface_'+selectedUserWidget.meta.id);
 
         var grid = {x: {}, y:{}};
-        for (var componentId in selectedUserComponent.components){
+        for (var widgetId in selectedUserWidget.innerWidgets){
             // existing components should also be in the work surface!
-            var container = $('#component-container_'+componentId);
+            var container = $('#component-container_'+widgetId);
             var top = container.position().top;
             var left = container.position().left;
             var right = left + container.width();
@@ -205,10 +205,10 @@ var Grid = function(){
 //
 function setUpGrid(){
 //     $('.grid').remove();
-//     var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
+//     var workSurface = $('#work-surface_'+selectedUserWidget.meta.id);
 //
 //     var grid = {x: {}, y:{}};
-//     for (var componentId in selectedUserComponent.components){
+//     for (var componentId in selectedUserWidget.components){
 //         // existing components should also be in the work surface!
 //         var container = $('#component-container_'+componentId);
 //         var top = container.position().top;

@@ -47,5 +47,6 @@ Here's the idea:
 	UserComponentInstance: ref back to UserComponentTemplate
 
 ALSO, change userCOMPONENT to userWidget
+	underway
 
 AND change WIDGET to DRAG-HANDLE

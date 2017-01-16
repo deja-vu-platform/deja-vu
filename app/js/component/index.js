@@ -17,15 +17,15 @@ var selectedScreenSizeWidth = 2000;
 
 var files = [];
 
-var selectedUserComponent = null;
+var selectedUserWidget = null;
 var selectedProject = null;
 
 var currentZoom = 1.0;
-var basicComponents;
+var basicWidgets;
 
 
 // settings
-var confirmOnUserComponentDelete = true;
+var confirmOnUserWidgetDelete = true;
 
 $(function(){
     $('.project-options-container').css({
@@ -65,47 +65,50 @@ $(function(){
 
     if (selectedProject.numComponents == 0){
         // start a default component
-        selectedUserComponent = initUserComponent(true, true);
-        selectedProject.addMainPage(selectedUserComponent);
-        displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+        selectedUserWidget = initUserWidget(true, true);
+        selectedProject.addMainPage(selectedUserWidget);
+        displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
     } else {
-        var componentToLoadId;
+        var widgetToLoadId;
         if (!$.isEmptyObject(selectedProject.mainComponents)){
-            componentToLoadId = Object.keys(selectedProject.mainComponents)[0];
+            widgetToLoadId = Object.keys(selectedProject.mainComponents)[0];
         } else {
-            componentToLoadId = Object.keys(selectedProject.components)[0];
+            widgetToLoadId = Object.keys(selectedProject.components)[0];
         }
-        selectedUserComponent = selectedProject.components[componentToLoadId];
-        if (componentToLoadId in selectedProject.mainComponents){
-            displayMainPageInListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
+        selectedUserWidget = selectedProject.components[widgetToLoadId];
+        if (widgetToLoadId in selectedProject.mainComponents){
+            displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         } else {
-            displayUserComponentInListAndSelect(selectedUserComponent.meta.name, componentToLoadId);
+            displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         }
+        // TODO this will need to be changed once we bring in a userComponent which will be a
+        // superset of userWidgets
+
         for (var componentId in selectedProject.components){
-            if (componentId != componentToLoadId){
+            if (componentId != widgetToLoadId){
                 var componentName = selectedProject.components[componentId].meta.name;
                 if (componentId in selectedProject.mainComponents){
-                    displayNewComponentInMainPagesList(componentName, componentId)
+                    displayNewWidgetInMainPagesList(componentName, componentId)
                 } else {
-                    displayNewComponentInUserComponentList(componentName, componentId);
+                    displayNewWidgetInUserWidgetList(componentName, componentId);
                 }
 
             }
         }
 
     }
-    workSurface.loadUserComponent(selectedUserComponent, currentZoom);
+    workSurface.loadUserWidget(selectedUserWidget, currentZoom);
 
     //autoSave5Mins();
 
-    basicComponents = $('#basic-components').html();
+    basicWidgets = $('#basic-components').html();
 
     registerDraggable();
 
 
-    // registerUserComponentAreaDroppable();
+    // registerUserWidgetAreaDroppable();
 
-    setUpStyleColors(selectedUserComponent);
+    setUpStyleColors(selectedUserWidget);
 
     resizeViewportToFitWindow();
 

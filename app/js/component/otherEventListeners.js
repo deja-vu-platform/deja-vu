@@ -91,32 +91,32 @@ function showClicheInList(id, name){
 // http://jscolor.com/examples/
 
 
-var setUpStyleColors = function(userComponent){
+var setUpStyleColors = function(userWidget){
     var pickerText = $('#pick-color-text-input')[0]._jscLinkedInstance;
     pickerText.fromString('000000');
     var pickerBG = $('#pick-color-bg-input')[0]._jscLinkedInstance;
     pickerBG.fromString('87CEFA');
 
-    if (userComponent.properties.main) {
-        var overallStyles = userComponent.properties.main;
+    if (userWidget.properties.main) {
+        var overallStyles = userWidget.properties.main;
         var textColor = overallStyles['color'] || '';
         pickerText.fromString(textColor);
 
         var bgColor = overallStyles['background-color'] || '';
         pickerBG.fromString(bgColor);
-        $('#work-surface_'+userComponent.meta.id).css({
+        $('#work-surface_'+userWidget.meta.id).css({
             'background-color': bgColor,
         });
     }
 };
 
-var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent){
-    if (!userComponent.properties.main){
-        userComponent.properties.main = {}
+var setOverallStyleAndUpdateView = function(styleName, styleValue, userWidget){
+    if (!userWidget.properties.main){
+        userWidget.properties.main = {}
     }
-    userComponent.properties.main[styleName] = styleValue;
-    for (var id in userComponent.components){
-        var container = $('#work-surface_'+userComponent.meta.id).find('#component-container_'+id);
+    userWidget.properties.main[styleName] = styleValue;
+    for (var id in userWidget.innerWidgets){
+        var container = $('#work-surface_'+userWidget.meta.id).find('#component-container_'+id);
         refreshContainerDisplay(false, container, currentZoom);
     }
 
@@ -129,7 +129,7 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent
     pickerText.closeText = 'X';
     inputText.change(function(){
         var color = pickerText.toHEXString();
-        setOverallStyleAndUpdateView('color', color, selectedUserComponent);
+        setOverallStyleAndUpdateView('color', color, selectedUserWidget);
     });
 
     var inputBG = $('#pick-color-bg-input');
@@ -138,19 +138,17 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent
     pickerBG.closeText = 'X';
     inputBG.change(function(){
         var color = pickerBG.toHEXString();
-        setOverallStyleAndUpdateView('background-color', color, selectedUserComponent);
-        $('#work-surface_'+selectedUserComponent.meta.id).css({
+        setOverallStyleAndUpdateView('background-color', color, selectedUserWidget);
+        $('#work-surface_'+selectedUserWidget.meta.id).css({
             'background-color': color,
         });
     });
 
     $('#reset-overall-color').click(function(){
-        selectedUserComponent.properties.main = {};
-        setUpStyleColors(selectedUserComponent);
-        for (var id in selectedUserComponent.components){
-            // var innerComponent = selectedUserComponent.components[id];
-            // innerComponent.properties.overall = {};
-            var container = $('#work-surface_'+selectedUserComponent.meta.id).find('#component-container_'+id);
+        selectedUserWidget.properties.main = {};
+        setUpStyleColors(selectedUserWidget);
+        for (var id in selectedUserWidget.innerWidgets){
+            var container = $('#work-surface_'+selectedUserWidget.meta.id).find('#component-container_'+id);
             refreshContainerDisplay(false, container, currentZoom);
         }
     });
@@ -160,14 +158,14 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent
     $('.overall-text-size-input-set').click(function(){
         var value = $('.overall-text-size-input').val();
         if (!isNaN(parseInt(value))){
-            setOverallStyleAndUpdateView('font-size', value + 'px', selectedUserComponent);
+            setOverallStyleAndUpdateView('font-size', value + 'px', selectedUserWidget);
         }
     });
 
     $('.overall-text-weight-input-set').click(function(){
         var value = $('.overall-text-weight-input').val();
         if (!isNaN(parseInt(value))){
-            setOverallStyleAndUpdateView('font-weight', value, selectedUserComponent);
+            setOverallStyleAndUpdateView('font-weight', value, selectedUserWidget);
         }
     });
 
@@ -176,8 +174,8 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userComponent
 
 /** **/
 
-function addAddToMainPagesButton(userComponent){
-    var added = (userComponent.meta.id in selectedProject.mainComponents);
+function addAddToMainPagesButton(userWidget){
+    var added = (userWidget.meta.id in selectedProject.mainComponents);
     if (added){
         var span = document.createElement('span');
         span.innerHTML = '<button type="button" class="btn btn-default ">' +
@@ -203,16 +201,16 @@ function addAddToMainPagesButton(userComponent){
 
     $(addToMainPageButton).on("click", function (e) {
         var added = $(this).data('added');
-        var userComponentId = selectedUserComponent.meta.id;
-        var name = selectedUserComponent.meta.name;
+        var userWidgetId = selectedUserWidget.meta.id;
+        var name = selectedUserWidget.meta.name;
         if (added){
             // then remove
             $($(this).children().get(0)).removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $($(this).children().get(1)).text(' Add to Main Pages');
-            delete selectedProject.mainComponents[userComponentId];
-            $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
-            displayUserComponentInListAndSelect(name, userComponentId);
-            selectedUserComponent.inMainPages = false;
+            delete selectedProject.mainComponents[userWidgetId];
+            $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
+            displayUserWidgetInListAndSelect(name, userWidgetId);
+            selectedUserWidget.inMainPages = false;
         } else {
             // then add
             $($(this).children().get(0)).removeClass('glyphicon-plus').addClass('glyphicon-remove');
@@ -221,10 +219,10 @@ function addAddToMainPagesButton(userComponent){
             if (!selectedProject.mainComponents){
                 selectedProject.mainComponents = {}; // for safety
             }
-            selectedProject.mainComponents[userComponentId] = name;
-            $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
-            displayMainPageInListAndSelect(name, userComponentId);
-            selectedUserComponent.inMainPages = true;
+            selectedProject.mainComponents[userWidgetId] = name;
+            $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
+            displayMainPageInListAndSelect(name, userWidgetId);
+            selectedUserWidget.inMainPages = true;
         }
         $(this).data('added', !added);
     });
@@ -237,41 +235,40 @@ function addAddToMainPagesButton(userComponent){
 /**
  * Update the saved ratios and then use this function
  */
-function propagateRatioChangeToAllElts(newRatio, userComponent){
-    view.displayComponent(false, userComponent, $('#work-surface_'+userComponent.meta.id), {}, newRatio);
-    miniNav.updateNavInnerComponentSizes(newRatio);
+function propagateRatioChangeToAllElts(newRatio, userWidget){
+    view.displayWidget(false, userWidget, $('#work-surface_'+userWidget.meta.id), {}, newRatio);
+    miniNav.updateNavInnerWidgetSizes(newRatio);
     grid.setUpGrid();
 }
 
-function addDeleteUserComponentButton(userComponentId){
+function addDeleteUserWidgetButton(userWidgetId){
     var spDelete = document.createElement('span');
     spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-component">' +
-        //'<span>Delete User Component </span>' +
         '<span class="glyphicon glyphicon-trash"></span>' +
         '</button>';
 
-    var buttonDeleteUserComponent = spDelete.firstChild;
-    buttonDeleteUserComponent.id = 'btn-delete-component_'+userComponentId;
+    var buttonDeleteUserWidget = spDelete.firstChild;
+    buttonDeleteUserWidget.id = 'btn-delete-component_'+userWidgetId;
 
-    $(buttonDeleteUserComponent).on("click", function (e) {
+    $(buttonDeleteUserWidget).on("click", function (e) {
         if (selectedProject.numComponents === 1){
             return; //don't delete the last one TODO is the the right way to go?
         }
-        if (confirmOnUserComponentDelete){
-            openDeleteUserComponentConfirmDialogue(userComponentId);
+        if (confirmOnUserWidgetDelete){
+            openDeleteUserWidgetConfirmDialogue(userWidgetId);
         } else {
-            deleteUserComponent(userComponentId);
+            deleteUserWidget(userWidgetId);
         }
     });
 
     var listElt;
-    if (userComponentId in selectedProject.mainComponents){
-        listElt = $("#main-pages-list").find("[data-componentid='" + userComponentId + "']");
+    if (userWidgetId in selectedProject.mainComponents){
+        listElt = $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']");
     } else {
-        listElt = $("#user-components-list").find("[data-componentid='" + userComponentId + "']");
+        listElt = $("#user-components-list").find("[data-componentid='" + userWidgetId + "']");
     }
 
-    listElt.append(buttonDeleteUserComponent).hover(
+    listElt.append(buttonDeleteUserWidget).hover(
         function(){
             $(this).find('.component-name-container').css({
                 width: '70%'
@@ -291,36 +288,36 @@ function addDeleteUserComponentButton(userComponentId){
     );
 }
 
-function deleteUserComponent(userComponentId){
+function deleteUserWidget(userWidgetId){
     if (selectedProject.numComponents === 1){
         return; //don't delete the last one TODO is the the right way to go?
     }
-    selectedProject.removeComponent(userComponentId);
-    $('#work-surface_'+userComponentId).remove();
-    $('#disabled_'+userComponentId+'_work-surface_'+userComponentId).remove(); // also remove disabled ones
+    selectedProject.removeComponent(userWidgetId);
+    $('#work-surface_'+userWidgetId).remove();
+    $('#disabled_'+userWidgetId+'_work-surface_'+userWidgetId).remove(); // also remove disabled ones
 
-    if (userComponentId == selectedUserComponent.meta.id){ // strings will also do
+    if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
         var otherIds = Object.keys(selectedProject.components);
-        selectedUserComponent = selectedProject.components[otherIds[0]];
+        selectedUserWidget = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        workSurface.loadUserComponent(selectedUserComponent, currentZoom);
+        workSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
-    if (userComponentId == selectedProject.mainComponents.indexId){
+    if (userWidgetId == selectedProject.mainComponents.indexId){
         selectedProject.mainComponents.indexId = null;
     }
-    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
-    $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
+    $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
+    $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
 
 }
 
-function openDeleteUserComponentConfirmDialogue(userComponentId){
+function openDeleteUserWidgetConfirmDialogue(userWidgetId){
     $('#confirm-delete-userComponent').modal('show');
-    $('#delete-userComponent-name').text(selectedProject.components[userComponentId].meta.name);
+    $('#delete-userComponent-name').text(selectedProject.components[userWidgetId].meta.name);
 
     $('#delete-userComponent-btn').unbind();
     $('#delete-userComponent-btn').click(function(){
-        deleteUserComponent(userComponentId);
+        deleteUserWidget(userWidgetId);
 
         $('#delete-userComponent-name').text('');
         $('#confirm-delete-userComponent').modal('hide');
@@ -348,7 +345,7 @@ function openDeleteUserComponentConfirmDialogue(userComponentId){
  * @param isDefault
  * @constructor
  */
-function initUserComponent(isDefault, isMainPage) {
+function initUserWidget(isDefault, isMainPage) {
     var name, version, author;
     if (isDefault) {
         name = DEFAULT_COMPONENT_NAME;
@@ -362,20 +359,20 @@ function initUserComponent(isDefault, isMainPage) {
     var id = generateId();
 
     if (isMainPage){
-        return UserComponent({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
+        return UserWidget({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
     }
-    return UserComponent({height: 400, width: 600}, name, id, version, author); // experimentation
+    return UserWidget({height: 400, width: 600}, name, id, version, author);
 }
 
 
 
-function duplicateUserComponent(userComponent){
-    return UserComponent.fromString(JSON.stringify(userComponent));
+function duplicateUserWidget(userWidget){
+    return UserWidget.fromString(JSON.stringify(userWidget));
 }
 
 function clearAll(){
-    for (var componentId in selectedUserComponent.components){
-        deleteComponentFromUserComponentAndFromView(componentId);
+    for (var widgetId in selectedUserWidget.innerWidgets){
+        deleteWidgetFromUserWidgetAndFromView(widgetId);
     }
 }
 

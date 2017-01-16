@@ -103,21 +103,21 @@ var Display = function(){
         }
     };
 
-    var displayInnerComponent = function(container, type, html, zoom, properties, overallStyles, callback) {
+    var displayInnerWidget = function(container, type, html, zoom, properties, overallStyles, callback) {
         var displayElement = $(html);
         container.prepend(displayElement);
-        that.hideBaseComponentDisplayAt(container, type);
-        that.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
-        that.showBaseComponentDisplayAt(container, type);
+        that.hideBaseWidgetDisplayAt(container, type);
+        that.updateBaseWidgetDisplayAt(container, type, zoom, properties, overallStyles);
+        that.showBaseWidgetDisplayAt(container, type);
         if (callback) callback();
     };
 
 
-    that.displayComponent = function(fresh, component, container, overallStyles, zoom){
-        if (component.type == 'user'){
-            var width = component.dimensions.width * zoom;
-            var height = component.dimensions.height * zoom;
-            var properties = component.properties;
+    that.displayWidget = function(fresh, widget, container, overallStyles, zoom){
+        if (widget.type == 'user'){
+            var width = widget.dimensions.width * zoom;
+            var height = widget.dimensions.height * zoom;
+            var properties = widget.properties;
 
             container.css({
                 width: width + 'px',
@@ -141,49 +141,49 @@ var Display = function(){
             }
 
 
-            component.layout.stackOrder.forEach(function(innerComponentId){
-                var innerComponent = component.components[innerComponentId];
-                var innerContainer = container.find('#component-container_'+innerComponentId);
-                var top = component.layout[innerComponentId].top * zoom;
-                var left = component.layout[innerComponentId].left * zoom;
+            widget.layout.stackOrder.forEach(function(innerWidgetId){
+                var innerWidget = widget.innerWidgets[innerWidgetId];
+                var innerContainer = container.find('#component-container_'+innerWidgetId);
+                var top = widget.layout[innerWidgetId].top * zoom;
+                var left = widget.layout[innerWidgetId].left * zoom;
 
                 innerContainer.css({
                     top: top + 'px',
                     left: left + 'px',
                 });
 
-                that.displayComponent(fresh, innerComponent, innerContainer, overallStyles, zoom);
+                that.displayWidget(fresh, innerWidget, innerContainer, overallStyles, zoom);
             });
         } else {
             var html;
             if (fresh){
                 container.find('.display-component').remove(); // FIXME this is going to do this a lot, unnecessarily!
-                html = view.getHTML(component.type)(component.components[component.type]);
-                var properties = component.properties;
-                displayInnerComponent(container, component.type, html, zoom, properties, overallStyles);
+                html = view.getHTML(widget.type)(widget.innerWidgets[widget.type]);
+                var properties = widget.properties;
+                displayInnerWidget(container, widget.type, html, zoom, properties, overallStyles);
             } else if (container.length>0){
-                var type = component.type;
-                view.hideBaseComponentDisplayAt(container, type);
+                var type = widget.type;
+                view.hideBaseWidgetDisplayAt(container, type);
 
-                var width = component.dimensions.width * zoom;
-                var height = component.dimensions.height * zoom;
+                var width = widget.dimensions.width * zoom;
+                var height = widget.dimensions.height * zoom;
 
-                var properties = component.properties;
+                var properties = widget.properties;
 
                 container.css({
                     width: width + 'px',
                     height: height + 'px',
                 });
 
-                view.updateBaseComponentDisplayAt(container, type, zoom, properties, overallStyles);
-                view.showBaseComponentDisplayAt(container, type);
+                view.updateBaseWidgetDisplayAt(container, type, zoom, properties, overallStyles);
+                view.showBaseWidgetDisplayAt(container, type);
 
             }
         }
     };
 
 
-    that.hideBaseComponentDisplayAt = function(container, type){
+    that.hideBaseWidgetDisplayAt = function(container, type){
         if (type === 'label'){
             container.find('.display-component').parent().css({
                 display: 'none'
@@ -196,7 +196,7 @@ var Display = function(){
     };
 
 
-    that.showBaseComponentDisplayAt = function(container, type){
+    that.showBaseWidgetDisplayAt = function(container, type){
         if (type === 'label'){
             container.find('.display-component').parent().css({
                 display: 'block'
@@ -214,24 +214,24 @@ var Display = function(){
      * @param type
      * @param zoom
      */
-    that.updateBaseComponentDisplayAt = function(container, type, zoom, properties, overallStyles) {
+    that.updateBaseWidgetDisplayAt = function(container, type, zoom, properties, overallStyles) {
         var containerHeight = container.height();
         var containerWidth = container.width();
 
-        var displayComponent = container.find('.display-component');
+        var displayWidget = container.find('.display-component');
         if (type === 'label'){
-            displayComponent.parent().css({
+            displayWidget.parent().css({
                 height: containerHeight + 'px',
                 width: containerWidth + 'px',
             });
-            displayComponent.css({
+            displayWidget.css({
                 zoom: zoom,
                 background: 'white',
             });
 
         } else {
             if (type === 'image') {
-                displayComponent.css({
+                displayWidget.css({
                     'max-height': containerHeight/zoom + 'px',
                     'max-width': containerWidth/zoom + 'px',
                     height: 'auto',
@@ -240,13 +240,13 @@ var Display = function(){
                     zoom: zoom,
                 });
             } else if (type === 'blank') {
-                displayComponent.css({
+                displayWidget.css({
                     width: '100%',
                     height: '100%',
                     zoom: zoom,
                 });
             } else {
-                displayComponent.css({
+                displayWidget.css({
                     zoom: zoom,
                 });
             }
@@ -264,7 +264,7 @@ var Display = function(){
 
 
                 // TODO finish resetting other styles
-                displayComponent.css(blankProperties);
+                displayWidget.css(blankProperties);
 
                 if (overallStyles['background-color']){
                     container.css({
@@ -272,7 +272,7 @@ var Display = function(){
                     })
                 }
                 for (var customProperty in overallStyles){
-                    displayComponent.css(customProperty, overallStyles[customProperty]);
+                    displayWidget.css(customProperty, overallStyles[customProperty]);
                 }
             }
             if (Object.keys(properties.bsClasses).length>0){ // bootstrap classes
@@ -281,21 +281,22 @@ var Display = function(){
                     classes = classes+' '+properties.bsClasses[propertyName];
                 }
                 classes.trim();
-                displayComponent.removeClass();
-                displayComponent.addClass(classes).addClass(defaultDisplayClasses[type]); // TODO what's going on here?
+                displayWidget.removeClass();
+                displayWidget.addClass(classes).addClass(defaultDisplayClasses[type]); // TODO what's going on here?
             }
-            if (Object.keys(properties.main).length>0){ //TODO make succinct
-                if (properties.main['background-color']){
-                    container.css({
-                        'background-color':properties.main['background-color']
-                    })
-                }
-                for (var mainProperty in properties.main){//TODO make succinct
-                    displayComponent.css(mainProperty, properties.main[mainProperty]);
-                }
+            if (properties.main){
+                if (Object.keys(properties.main).length>0){ //TODO make succinct
+                    if (properties.main['background-color']){
+                        container.css({
+                            'background-color':properties.main['background-color']
+                        })
+                    }
+                    for (var mainProperty in properties.main){//TODO make succinct
+                        displayWidget.css(mainProperty, properties.main[mainProperty]);
+                    }
 
+                }
             }
-
             if (Object.keys(properties.custom).length>0){//TODO make succinct
                 if (properties.custom['background-color']){
                     container.css({
@@ -303,7 +304,7 @@ var Display = function(){
                     })
                 }
                 for (var customProperty in properties.custom){//TODO make succinct
-                    displayComponent.css(customProperty, properties.custom[customProperty]);
+                    displayWidget.css(customProperty, properties.custom[customProperty]);
                 }
 
             }

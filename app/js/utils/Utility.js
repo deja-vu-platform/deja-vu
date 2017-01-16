@@ -30,7 +30,7 @@ function getRowColFromId(id){
     return {row:row,col:col}
 }
 
-function getComponentIdFromContainerId(id){
+function getWidgetIdFromContainerId(id){
     if (!id){
         return null
     }

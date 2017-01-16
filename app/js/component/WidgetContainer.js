@@ -2,32 +2,32 @@
  * Created by Shinjini on 11/3/2016.
  */
 
-var ComponentContainer = function(){
-    var that = Object.create(ComponentContainer);
+var WidgetContainer = function(){
+    var that = Object.create(WidgetContainer);
 
 
-    var makeContainerResizable = function(component, outerComponent, container){
-        var componentId = component.meta.id;
+    var makeContainerResizable = function(widget, outerWidget, container){
+        var widgetId = widget.meta.id;
 
         var dragHandle_se = $('<span></span>');
         dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
         dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
-        dragHandle_se.attr('id', 'drag-handle-se' + '_' + componentId);
+        dragHandle_se.attr('id', 'drag-handle-se' + '_' + widgetId);
 
         var dragHandle_sw = $('<span></span>');
         dragHandle_sw.html('<img src="images/drag_handle_sw_icon.png" width="15px" height="15px">');
         dragHandle_sw.addClass('ui-resizable-handle ui-resizable-sw drag-handle');
-        dragHandle_sw.attr('id', 'drag-handle-sw' + '_' + componentId);
+        dragHandle_sw.attr('id', 'drag-handle-sw' + '_' + widgetId);
 
         var dragHandle_ne = $('<span></span>');
         dragHandle_ne.html('<img src="images/drag_handle_ne_icon.png" width="15px" height="15px">');
         dragHandle_ne.addClass('ui-resizable-handle ui-resizable-ne drag-handle');
-        dragHandle_ne.attr('id', 'drag-handle-se' + '_' + componentId);
+        dragHandle_ne.attr('id', 'drag-handle-se' + '_' + widgetId);
 
         var dragHandle_nw = $('<span></span>');
         dragHandle_nw.html('<img src="images/drag_handle_nw_icon.png" width="15px" height="15px">');
         dragHandle_nw.addClass('ui-resizable-handle ui-resizable-nw drag-handle');
-        dragHandle_nw.attr('id', 'drag-handle-nw' + '_' + componentId);
+        dragHandle_nw.attr('id', 'drag-handle-nw' + '_' + widgetId);
 
         container.append(dragHandle_se);
         container.append(dragHandle_sw);
@@ -49,16 +49,16 @@ var ComponentContainer = function(){
                 });
             },
             resize: function(e, ui){
-                component.dimensions.height = ui.size.height/currentZoom;
-                component.dimensions.width = ui.size.width/currentZoom;
+                widget.dimensions.height = ui.size.height/currentZoom;
+                widget.dimensions.width = ui.size.width/currentZoom;
                 // TODO woah! It resizes as you go!
                 refreshContainerDisplay(false, container, currentZoom);
             },
             stop: function(e, ui){
-                outerComponent.layout[component.meta.id].left = ui.position.left/currentZoom;
-                outerComponent.layout[component.meta.id].top = ui.position.top/currentZoom;
+                outerWidget.layout[widget.meta.id].left = ui.position.left/currentZoom;
+                outerWidget.layout[widget.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
-                miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
+                miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
                 grid.setUpGrid();
                 $('.grid').css({
                     visibility: 'hidden'
@@ -77,7 +77,7 @@ var ComponentContainer = function(){
     };
 
 
-    var createEditOptions = function(component, outerComponent, container){
+    var createEditOptions = function(widget, outerWidget, container){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -92,7 +92,7 @@ var ComponentContainer = function(){
             '</a>' +
             '</li>');
 
-        buttonEdit.attr('id', 'edit-btn' + '_' + component.meta.id);
+        buttonEdit.attr('id', 'edit-btn' + '_' + widget.meta.id);
 
 
         var buttonStyle = $('<li class="dropdown-submenu">'+
@@ -134,7 +134,7 @@ var ComponentContainer = function(){
             '</a>' +
             '</li>');
 
-        buttonTrash.attr('id', 'inner-component-trash' + '_' + component.meta.id);
+        buttonTrash.attr('id', 'inner-component-trash' + '_' + widget.meta.id);
 
         optionsDropdown.find('.dropdown-menu')
             .append(buttonEdit)
@@ -158,8 +158,8 @@ var ComponentContainer = function(){
 
         buttonStyle.find('.inner-component-delete-style').click(function(e){
             e.stopPropagation();
-            component.properties.custom = {};
-            component.properties.bsClasses = {};
+            widget.properties.custom = {};
+            widget.properties.bsClasses = {};
             refreshContainerDisplay(false, container, currentZoom);
 
         });
@@ -171,41 +171,41 @@ var ComponentContainer = function(){
 
 
         buttonTrash.click(function(){
-            deleteComponentFromUserComponentAndFromView(component.meta.id)
+            deleteWidgetFromUserWidgetAndFromView(widget.meta.id)
         });
 
         buttonMoveUp.click(function(){
-           WorkSurface().changeOrderByOne(component.meta.id, outerComponent, true);
+           WorkSurface().changeOrderByOne(widget.meta.id, outerWidget, true);
         });
 
 
         buttonMoveDown.click(function(){
-            WorkSurface().changeOrderByOne(component.meta.id, outerComponent, false);
+            WorkSurface().changeOrderByOne(widget.meta.id, outerWidget, false);
         });
 
         return optionsDropdown;
     };
 
 
-    that.createBasicComponentContainer = function(component, zoom){
+    that.createBasicWidgetContainer = function(widget, zoom){
         var container = $('<div></div>');
-        var containerId = 'component-container_'+component.meta.id;
+        var containerId = 'component-container_'+widget.meta.id;
         container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
-        container.height(component.dimensions.height * zoom).width(component.dimensions.width * zoom);
-        container.data('componentId', component.meta.id);
+        container.height(widget.dimensions.height * zoom).width(widget.dimensions.width * zoom);
+        container.data('componentId', widget.meta.id);
         return container;
     };
 
-    that.createEditableComponentContainer = function(component, outerComponent, zoom) {
-        var container = that.createBasicComponentContainer(component, zoom);
-        makeContainerResizable(component, outerComponent, container);
-        container.append(createEditOptions(component, outerComponent, container));
+    that.createEditableWidgetContainer = function(widget, outerWidget, zoom) {
+        var container = that.createBasicWidgetContainer(widget, zoom);
+        makeContainerResizable(widget, outerWidget, container);
+        container.append(createEditOptions(widget, outerWidget, container));
         return container;
     };
 
-    var setUpTextOptions = function(container, component){
-        if (!component.properties.custom){
-            component.properties.custom = {}
+    var setUpTextOptions = function(container, widget){
+        if (!widget.properties.custom){
+            widget.properties.custom = {}
         }
 
         var fontSizeOption = $('<li><div>Font Size: </div></li>');
@@ -223,7 +223,7 @@ var ComponentContainer = function(){
         fontSizeSetButton.click(function(){
             var value = fontSizeInput.val();
             if (!isNaN(parseInt(value))){
-                component.properties.custom['font-size'] = value + 'px';
+                widget.properties.custom['font-size'] = value + 'px';
                 refreshContainerDisplay(false, container, currentZoom);
 
             }
@@ -233,7 +233,7 @@ var ComponentContainer = function(){
         fontWeightSetButton.click(function(){
             var value = fontWeightInput.val();
             if (!isNaN(parseInt(value))){
-                component.properties.custom['font-weight'] = value;
+                widget.properties.custom['font-weight'] = value;
                 refreshContainerDisplay(false, container, currentZoom);
 
             }
@@ -241,12 +241,12 @@ var ComponentContainer = function(){
 
     };
 
-    var setUpColorOptions = function(container, component){
-        if (!component.properties.custom){
-            component.properties.custom = {}
+    var setUpColorOptions = function(container, widget){
+        if (!widget.properties.custom){
+            widget.properties.custom = {}
         }
 
-        var customStyles = component.properties.custom;
+        var customStyles = widget.properties.custom;
         var textColorOption = $('<li><div>Text Color: </div></li>');
         var bgColorOption = $('<li><div>Background Color: </div></li>');
         var textColorInput = $('<input class="color-input">');
@@ -260,9 +260,8 @@ var ComponentContainer = function(){
         pickerText.closeText = 'X';
         textColorInput.change(function(e){
             e.stopPropagation();
-            // container.find('.inner-component-options-small').addClass('open');
             var color = pickerText.toHEXString();
-            component.properties.custom['color'] = color;
+            widget.properties.custom['color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
         });
 
@@ -271,9 +270,8 @@ var ComponentContainer = function(){
         pickerBG.closeText = 'X';
         bgColorInput.change(function(e){
             e.stopPropagation();
-            // container.find('.inner-component-options-small').addClass('open');
             var color = pickerBG.toHEXString();
-            component.properties.custom['background-color'] = color;
+            widget.properties.custom['background-color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
         });
 
@@ -283,20 +281,18 @@ var ComponentContainer = function(){
         var bgColor = customStyles['background-color'] || 'FFFFFF'; // TODO
         pickerBG.fromString(bgColor);
 
-        // colorOptions.append(textColorInput).append(bgColorInput);
-        // container.find('.config-btns').append(colorOptions);
         container.find('.inner-component-custom-style-dropdown').append(textColorOption).append(bgColorOption);
     };
 
-    var showConfigOptions = function(droppedComponentType, container) {
+    var showConfigOptions = function(droppedWidgetType, container) {
         // Hide edit button if label or panel
-        if (droppedComponentType=='label' || droppedComponentType=='panel') {
+        if (droppedWidgetType=='label' || droppedWidgetType=='panel') {
             container.find('.edit-btn').css('display', 'none');
         } else {
             container.find('.edit-btn').css('display', 'block');
         }
 
-        var labelProperties = $('.default-properties').find('.'+droppedComponentType+'-properties').clone();
+        var labelProperties = $('.default-properties').find('.'+droppedWidgetType+'-properties').clone();
 
         if (labelProperties.length==0) {
             return;
@@ -306,10 +302,13 @@ var ComponentContainer = function(){
         configOptions.children().each(function(idx, elt){
             var li = $('<li class="dropdown-submenu"></li>');
             li.append($(elt).children());
-            li.find('.dropdown-toggle').click(function(e){
+            (function(){
                 var thisLi = li;
-                toggleOpenClose(e, thisLi);
-            });
+                li.find('.dropdown-toggle').click(function(e){
+                    toggleOpenClose(e, thisLi);
+                });
+            })();
+
             li.find('.premade-style').click(function(e){
                 e.stopPropagation();
             });
@@ -320,12 +319,12 @@ var ComponentContainer = function(){
         container.find('.inner-component-style-dropdown').append(configOptions);
     };
 
-    that.setUpContainer = function(container, dragHandle, component){
+    that.setUpContainer = function(container, dragHandle, widget){
         var type = dragHandle.data('type');
         container.append(dragHandle);
         showConfigOptions(type, container);
-        setUpColorOptions(container, component);
-        setUpTextOptions(container, component);
+        setUpColorOptions(container, widget);
+        setUpTextOptions(container, widget);
 
     };
 

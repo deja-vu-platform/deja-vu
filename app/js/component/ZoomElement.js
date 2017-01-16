@@ -96,14 +96,14 @@ var ZoomElement = function(){
             height: outerComponent.dimensions.height*zoom + 'px',
         });
 
-        miniNav.updateNavInnerComponentSizes(zoom);
+        miniNav.updateNavInnerWidgetSizes(zoom);
     };
 
     that.updateZoomFromState = function(component){
         var componentId = component.meta.id;
         currentZoom = $('#work-surface'+'_'+componentId).data('state').zoom;
         // it's updating from state, so that means new initializations are in order
-        // miniNav.setUpMiniNavElementAndInnerComponentSizes(component);
+        // miniNav.setUpMiniNavElementAndInnerWidgetSizes(component);
         // that.registerZoom(component);
         changeZoomDisplays(component, currentZoom);
     };
