@@ -45,8 +45,16 @@ Here's the idea:
 	UserComponentTemplate: 
 		BaseComponent + UserComponentInstance (ie, just a reference)
 	UserComponentInstance: ref back to UserComponentTemplate
+	
+	1/16/2017 question: how to save custom changes in instance of a base component, eg a link or a label to particular values?
 
 ALSO, change userCOMPONENT to userWidget
 	underway
+	mostly done, still have the css class names left
 
 AND change WIDGET to DRAG-HANDLE
+	done
+
+1/16/2017 notes
+	to allow changes in userInstance widgets such as a inner link or an inner label? Probably. In that case,
+	the relevant function, registerTooltipBtnHandlers, needs to be updated.
