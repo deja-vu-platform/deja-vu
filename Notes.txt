@@ -28,26 +28,56 @@ x need ui components for moving up and down the stack order.
 how to allow copies of the same component in multiple places (same id)?
 	this is currently working, but implem is sketchy and needs work
 
-1/10/2017 issues
-x made "main" a property for the template object that the user can make instances of, but the implementation
-is a bit sketchy because they are both "UserComponent"s. Might be actually better to seperate them into 
-UserComponentTemplate and UserComponentInstance or something...
-Here's the idea:
-	Have two classes Template and Instance (or some other names)
-	Instance has parentId and custom changes including styles and resize (maybe)
-	Then in DISPLAY (which is already recursive), if it is of type instance, we read from the project
-		(side note, if the user is deleting some UserComponentTemplate, we warn them that all uses of it will be deleted,
-		and delete them as we find them (ie, can't find it in the Project))
-	
-	So, the allowed structure is
-	
-	BaseComponent (is like a base case)
-	UserComponentTemplate: 
-		BaseComponent + UserComponentInstance (ie, just a reference)
-	UserComponentInstance: ref back to UserComponentTemplate
-	
-	1/16/2017 question: how to save custom changes in instance of a base component, eg a link or a label to particular values?
-
+/** IGNORE THIS!	
+**1/10/2017 issues
+**x made "main" a property for the template object that the user can make instances of, but the implementation
+**is a bit sketchy because they are both "UserComponent"s. Might be actually better to seperate them into 
+**UserComponentTemplate and UserComponentInstance or something...
+**Here's the idea:
+**	Have two classes Template and Instance (or some other names)
+**	Instance has parentId and custom changes including styles and resize (maybe)
+**	Then in DISPLAY (which is already recursive), if it is of type instance, we read from the project
+**		(side note, if the user is deleting some UserComponentTemplate, we warn them that all uses of it will be deleted,
+**		and delete them as we find them (ie, can't find it in the Project))
+**	
+**	So, the allowed structure is
+**	
+**	BaseComponent (is like a base case)
+**	UserComponentTemplate: 
+**		BaseComponent + UserComponentInstance (ie, just a reference)
+**	UserComponentInstance: ref back to UserComponentTemplate + Custom changes
+**	
+**	1/16/2017 question: how to save custom changes in instance of a base component, eg a link or a label to particular values?
+**		So what are things that can change? 
+**			For UserWidgetTemplate:
+**				(saved in main?)
+**				font size, text color, background color
+**				values for base widgets
+**			For UserWidgetInstance:
+**				(saved in custom?)
+**				font size, text color, background color
+**				values for base widgets
+**				
+**				
+**		customChanges = {
+**			parentId (UserWidget that is the immediate parent of the component):{
+**				baseWidgetType/Id:{
+**					changes/values
+**				}
+**				UserWidgetChanges?
+**			} 
+**		}
+**		
+**		So in display we will do:
+**			Look up parent Id (the UserWidgetTemplate) and get the info from main, and display those
+**			then look up the info from custom and display those and override
+**			
+**		BUT! For base widgets, their particular values are stored in the objects themselves, should we move them to their containing
+**		widget? Or do we just keep it as is? Probably keep it as is, so we can just reuse the method for displaying that we have currently.
+**		
+**/		
+		
+		
 ALSO, change userCOMPONENT to userWidget
 	underway
 	mostly done, still have the css class names left
@@ -58,3 +88,52 @@ AND change WIDGET to DRAG-HANDLE
 1/16/2017 notes
 	to allow changes in userInstance widgets such as a inner link or an inner label? Probably. In that case,
 	the relevant function, registerTooltipBtnHandlers, needs to be updated.
+
+	Restructuring notes:
+		Details in OneNote
+		
+		Main Ideas: 
+			*Layers* of trees (*levels*) of changes
+			Templates and Instances will have the same structure, only difference is a template is a child of the project and 
+			a Instance is a child of a UserWidget
+			Now, the tree is structured like this
+				
+				Instance Widget
+					id
+					parentId (Template Widget)
+					TREE of changes
+					
+				Template Widget
+					id (which is to be used as the parentId)
+					immidiate children ids (TemplateWidget)
+					TREE of changes
+
+				TREE of changes 
+					if any descendant is changed at this level, save
+					path to child, and then the change
+					widgetInstanceId:{ (= top level Id of the current widget)
+						changes : changes, 
+						widgetInstanceId:{
+							changes : changes,
+							widgetInstanceId:{
+								...
+							}
+						},
+						widgetInstanceId:{
+							changes : changes,
+							widgetInstanceId:{
+								...
+							}
+						},
+						...
+					}
+				
+				the changes at any *level* is the default and overrides any unspecified values at *levels* below it
+				but any changes at the same *level* at a higher *layer* can override this change.
+				
+				higher level overrides unspecifieds at lower level
+				higher layer but same level overrides specified (and unspecified) changes at that level, and unspecified changes
+					below that level (will behave like a new default at that level)
+				
+				
+				
