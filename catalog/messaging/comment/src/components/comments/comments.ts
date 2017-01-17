@@ -21,8 +21,6 @@ export interface Comment {
   author: Author;
 }
 
-import {CommentComponent} from "../comment/comment";
-
 
 @Widget({
   fqelement: "dv-messaging-comment",

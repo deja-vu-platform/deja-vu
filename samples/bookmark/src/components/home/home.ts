@@ -1,5 +1,4 @@
 import {Widget, ClientBus, field} from "client-bus";
-import {HTTP_PROVIDERS} from "angular2/http";
 
 
 @Widget({fqelement: "dv-samples-bookmark"})

@@ -231,6 +231,12 @@ export class WidgetLoader {
     // need to preprend lib if the widget is not from the current cliche
     System.import(imp_string_prefix + `/lib/components/${d_name}/${d_name}`)
       .then(mod => mod[this.name + "Component"])
+      .then(c => {
+        if (c === undefined) {
+          throw new Error(`Component ${d_name}/${this.name} not found`);
+        }
+        return c;
+      })
       .then(c => this._resolver.resolveComponentFactory(c))
       .then(factory => {
         const injector = ReflectiveInjector

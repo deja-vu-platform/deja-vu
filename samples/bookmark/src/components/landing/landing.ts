@@ -1,5 +1,5 @@
 import {Widget, ClientBus, field} from "client-bus";
-import {Router, ROUTER_DIRECTIVES} from "angular2/router";
+import {Router} from "@angular/router";
 
 
 @Widget({fqelement: "dv-samples-bookmark"})
@@ -19,7 +19,7 @@ export class LandingComponent {
       console.log(
         "sign in of " + JSON.stringify(this.signin_user.username) + " succ");
       if (this.signin_or_register_ok.value) {
-        this._router.navigateByUrl("/app");
+        this._router.navigate(["/app/home"]);
       }
     });
   }

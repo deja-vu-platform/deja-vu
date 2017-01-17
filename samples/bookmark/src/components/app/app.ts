@@ -1,10 +1,6 @@
 import {Widget, ClientBus, field} from "client-bus";
 
-import {RouteConfig, ROUTER_DIRECTIVES, Router} from "angular2/router";
-
-import {HomeComponent} from "../home/home";
-import {TopicsComponent} from "../topics/topics";
-import {UsersComponent} from "../users/users";
+import {Router} from "@angular/router";
 
 
 @Widget({fqelement: "dv-samples-bookmark"})
@@ -19,9 +15,5 @@ export class AppComponent {
         this._router.navigateByUrl("/landing");
       }
     });
-  }
-
-  isRouteActive(route) {
-    return this._router.isRouteActive(this._router.generate([route]));
   }
 }

@@ -1,4 +1,3 @@
-/// <reference path="../typings/tsd.d.ts" />
 import {Mean} from "mean-loader";
 import {ServerBus} from "server-bus";
 

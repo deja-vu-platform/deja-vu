@@ -1,7 +1,5 @@
 import {Widget} from "client-bus";
 
-import {provide} from "angular2/core";
-
 
 @Widget({
   fqelement: "dv-samples-bookmark",
