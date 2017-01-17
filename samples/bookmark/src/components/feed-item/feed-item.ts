@@ -1,10 +1,10 @@
-import {Widget, ClientBus, field} from "client-bus";
+import {Widget} from "client-bus";
 
 import {provide} from "angular2/core";
 
 
-// tmp hack
 @Widget({
+  fqelement: "dv-samples-bookmark",
   template: `
     <div class="list-group">
       <h4 class="list-group-item-heading">
@@ -27,13 +27,8 @@ import {provide} from "angular2/core";
       </div>
 
     </div>
-  `,
-  ng2_providers: [provide("fqelement", {useValue: "dv-samples-bookmark"})]
+  `
 })
 export class FeedItemComponent {
   post = {};
-
-  constructor(client_bus: ClientBus) {
-    client_bus.init(this, [field("post", "Post")]);
-  }
 }

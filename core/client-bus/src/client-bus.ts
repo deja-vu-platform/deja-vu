@@ -123,6 +123,10 @@ export class ClientBus {
       .adapt({name: t, fqelement: this._fqelement});
   }
 
+  // This method is only necessary for those widgets that are loaded from a
+  // route. Since they are loaded via ng2's component system, the dv fields
+  // are not initialized automatically and it thus needs to be done explicitly
+  // todo: ditch ng2's routing system and do it ourselves
   init(w, fields) {
     w.fields = {};
     for (const f of fields) {
@@ -161,6 +165,7 @@ export class WidgetLoader {
       @Inject("fqelement") @Optional() private _host_fqelement) {}
 
   _adapt_table() {
+    if (this.name === undefined) throw new Error("Widget name is required");
     if (this._host_wname === undefined) return {};
     const host_widget_t = {
       name: this._host_wname,
@@ -209,25 +214,29 @@ export class WidgetLoader {
     const adapt_table = this._adapt_table();
     const d_name = _ustring.dasherize(this.name).slice(1);
     let imp_string_prefix = "";
-    let providers = [];
-    if (this.fqelement !== undefined &&
-        /* hack */ !this.fqelement.startsWith("dv-samples-")) {
-      imp_string_prefix =  `${this.fqelement}/lib/`;
-      const fqelement_split = this.fqelement.split("-");
-      if (fqelement_split.length === 4) {
-        imp_string_prefix =  `${fqelement_split.slice(0, 3).join("-")}/lib/`;
-      }
-      providers = [{provide: "fqelement", useValue: this.fqelement}];
+
+    if (this.fqelement === undefined) {
+      this.fqelement = this._host_fqelement;
+    }
+
+    const fqelement_split = this.fqelement.split("-");
+    if (fqelement_split.length === 4) {
+      imp_string_prefix = fqelement_split.slice(0, 3).join("-");
+    } else {
+      imp_string_prefix = this.fqelement;
     }
 
     console.log(`Loading ${this.name} of ${this.fqelement}`);
 
-    System.import(imp_string_prefix + `components/${d_name}/${d_name}`)
+    // need to preprend lib if the widget is not from the current cliche
+    System.import(imp_string_prefix + `/lib/components/${d_name}/${d_name}`)
       .then(mod => mod[this.name + "Component"])
       .then(c => this._resolver.resolveComponentFactory(c))
       .then(factory => {
         const injector = ReflectiveInjector
-            .resolveAndCreate(providers, this.widgetContainer.parentInjector);
+            .resolveAndCreate(
+              [{provide: "fqelement", useValue: this.fqelement}],
+              this.widgetContainer.parentInjector);
         const component = factory.create(injector);
         this.widgetContainer.insert(component.hostView);
         return component._component;
@@ -241,6 +250,10 @@ export class WidgetLoader {
         _u.each(_u.keys(c), f => {
           const adapt_info = adapt_table[f];
           if (adapt_info !== undefined) {
+            if (this.fields[adapt_info.host_fname] === undefined) {
+              throw new Error(
+                `Expected field ${adapt_info.host_fname} is undefined`);
+            }
             c[f] = this.fields[adapt_info.host_fname].adapt(adapt_info.ftype);
             c.fields[f] = c[f];
           }
@@ -248,9 +261,7 @@ export class WidgetLoader {
         return c;
       })
       .then(c => { /* hack */
-        if (c._graphQlService !== undefined &&
-            this.fqelement !== undefined &&
-            !this.fqelement.startsWith("dv-samples-")) {
+        if (c._graphQlService !== undefined) {
           c._graphQlService.reset_fqelement(this.fqelement);
         }
         return c;
@@ -266,6 +277,7 @@ export class WidgetLoader {
 
 
 export interface WidgetMetadata {
+  fqelement: string;
   ng2_directives?: any[];
   ng2_providers?: any[];
   template?: string;
@@ -274,11 +286,7 @@ export interface WidgetMetadata {
 }
 
 
-const WidgetLoaderRef = WidgetLoader;
-
-export function Widget(options?: WidgetMetadata) {
-  if (options === undefined) options = {};
-
+export function Widget(options: WidgetMetadata) {
   return (target: Function): any => {
     const dname = _ustring.dasherize(target.name).slice(1, -10);
     const metadata = {selector: dname};
@@ -289,22 +297,29 @@ export function Widget(options?: WidgetMetadata) {
     }
     metadata["providers"] = providers;
 
-    let directives = [WidgetLoaderRef];
+    let directives = [];
     if (options.ng2_directives !== undefined) {
       directives = directives.concat(options.ng2_directives);
     }
     metadata["directives"] = directives;
-
+    const system_map = System.getConfig().map;
+    let module_id = system_map[options.fqelement];
+    if (module_id === undefined) {
+      module_id = system_map[options.fqelement + "/lib"];
+    } else {
+      module_id = module_id + "/lib";
+    }
     if (options.template !== undefined) {
       metadata["template"] = options.template;
     } else {
-      metadata["templateUrl"] = `./components/${dname}/${dname}.html`;
+      metadata["templateUrl"] = `${module_id}/components/` +
+        `${dname}/${dname}.html`;
     }
 
     if (options.styles !== undefined) {
       metadata["styles"] = options.styles;
     } else {
-      metadata["styleUrls"] = [`./components/${dname}/${dname}.css`];
+      metadata["styleUrls"] = [`${module_id}/components/${dname}/${dname}.css`];
     }
     if (options.external_styles !== undefined) {
       if (metadata["styleUrls"] === undefined) {

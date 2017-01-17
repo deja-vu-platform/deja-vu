@@ -1,5 +1,3 @@
-import {Component} from "@angular/core";
-
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/from";
 /*
@@ -25,12 +23,14 @@ export interface FeedItem {
 
 
 @Widget({
+  fqelement: "dv-messaging-feed",
   ng2_providers: [GraphQlService]
 })
 export class FeedComponent {
   feed: FeedItem[];
   sub = {name: "", on_change: undefined};
   fields = {};
+  feed_item_widget = {name: "FeedItem"};
 
   constructor(
       private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
@@ -81,18 +81,3 @@ export class FeedComponent {
     this.sub.on_change(update_feed);
   }
 }
-
-
-@Component({
-  selector: "feed-item",
-  template: `
-    <div class="row">
-      <message [msg]="msg"></message>
-    </div>
-    <div class="row">
-      by <publisher [pub]="pub"></publisher>
-    </div>
-  `,
-  inputs: ["msg", "pub"]
-})
-export class FeedItemComponent {}

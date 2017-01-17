@@ -1,9 +1,8 @@
-import {Component} from "@angular/core";
+import {Widget} from "client-bus";
 
-@Component({
-  selector: "comment",
+@Widget({
+  fqelement: "dv-messaging-comment",
   template: `{{comment.content}} by {{comment.author.name}}`,
-  inputs: ["comment"]
 })
 export class CommentComponent {
   comment = {content: "", author: {name: ""}};

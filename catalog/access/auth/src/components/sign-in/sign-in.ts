@@ -6,6 +6,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
+   fqelement: "dv-access-auth",
    ng2_providers: [GraphQlService],
    ng2_directives: [NgClass]
 })

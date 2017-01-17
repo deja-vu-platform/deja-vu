@@ -217,6 +217,21 @@
     {
       "fields": [
         {
+          "name": "feed_item_widget",
+          "type": {"name": "Widget", "fqelement": "dv-messaging-feed"},
+          "widget": {"name": "Feed", "fqelement": "dv-messaging-feed"}
+        }
+      ],
+      "subfield": {
+          "name": "feed_item_widget",
+          "type": { "name": "Widget", "fqelement": "dv-samples-bookmark" },
+          "widget": { "name": "Home", "fqelement": "dv-samples-bookmark" }
+      }
+    },
+
+    {
+      "fields": [
+        {
           "name": "post",
           "type": {"name": "Post", "fqelement": "dv-samples-bookmark"},
           "widget": {"name": "FeedItem", "fqelement": "dv-samples-bookmark"}
@@ -308,6 +323,20 @@
         }, "widget": {
           "name": "CommentsWithComment", "fqelement": "dv-messaging-comment"
         }
+      }
+    },
+    {
+      "fields": [
+        {
+          "name": "comment",
+          "type": {"name": "Comment", "fqelement": "dv-messaging-comment"},
+          "widget": {"name": "Comment", "fqelement": "dv-messaging-comment"}
+        }
+      ],
+      "subfield": {
+          "name": "comment",
+          "type": { "name": "Comment", "fqelement": "dv-messaging-comment" },
+          "widget": { "name": "Comments", "fqelement": "dv-messaging-comment" }
       }
     }
   ]

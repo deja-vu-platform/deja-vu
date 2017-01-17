@@ -189,17 +189,6 @@ export namespace GruntTask {
               src: [`${npm}/rxjs/**`],
               dest: "dist/public"
             },
-            // https://github.com/angular/angular/issues/6053
-            {
-              expand: true,
-              src: Object.keys(patterns)
-                   .map(p => `node_modules/${p}/lib/components/` +
-                             "**/*.{html,css,js}"),
-              dest: "dist/public/components/",
-              rename: (dst, src) => (
-                           dst +
-                           src.match("node_modules/.*/lib/components/(.*)")[1])
-            },
             {
               expand: true,
               cwd: "src/dv-dev",

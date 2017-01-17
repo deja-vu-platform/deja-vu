@@ -8,7 +8,10 @@ import * as _u from "underscore";
 import {Widget} from "client-bus";
 
 
-@Widget({ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "dv-organization-label",
+  ng2_providers: [GraphQlService]
+})
 export class LabelsTextComponent {
   item = {labels: [], atom_id: undefined};
   labels_text: string = "";

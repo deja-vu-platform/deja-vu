@@ -5,6 +5,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
+  fqelement: "dv-organization-label",
   template: "",
   ng2_providers: [GraphQlService]
 })

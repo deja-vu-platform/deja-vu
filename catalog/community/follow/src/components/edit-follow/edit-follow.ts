@@ -9,7 +9,7 @@ export interface SourceFollowInfo {
   followed_by: boolean;
 }
 
-@Widget({ng2_providers: [GraphQlService]})
+@Widget({fqelement: "dv-community-follow", ng2_providers: [GraphQlService]})
 export class EditFollowComponent {
   targets: SourceFollowInfo[];
   source = {name: "", on_change: (x) => undefined};

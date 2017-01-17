@@ -6,6 +6,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
+  fqelement: "dv-organization-event",
   ng2_providers: [GraphQlService],
   styles: [``]
 })

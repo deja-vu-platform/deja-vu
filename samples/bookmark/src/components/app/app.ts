@@ -7,12 +7,7 @@ import {TopicsComponent} from "../topics/topics";
 import {UsersComponent} from "../users/users";
 
 
-@Widget({ng2_directives: [ROUTER_DIRECTIVES]})
-@RouteConfig([
-  {path: "/home", name: "Home", component: HomeComponent, useAsDefault: true},
-  {path: "/topics", name: "Topics", component: TopicsComponent},
-  {path: "/users", name: "Users", component: UsersComponent}
-])
+@Widget({fqelement: "dv-samples-bookmark"})
 export class AppComponent {
   signout_ok = {value: false, on_change: undefined};
 

@@ -42,6 +42,7 @@ const schema = grafo
   .add_type({
     name: "User",
     fields: {
+      atom_id: {"type": graphql.GraphQLString},
       username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       posts: {"type": "[Post]"}
     }

@@ -2,6 +2,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
+  fqelement: "dv-access-auth",
   template: `
     <button class="btn btn-default navbar-btn" (click)="signOut()">
       Sign Out

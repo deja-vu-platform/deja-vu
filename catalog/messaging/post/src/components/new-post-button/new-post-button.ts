@@ -4,7 +4,10 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "dv-messaging-post",
+  ng2_providers: [GraphQlService]
+})
 export class NewPostButtonComponent {
   submit_ok = {value: false};
   post: Post = {content: ""};

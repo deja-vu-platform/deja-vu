@@ -2,6 +2,7 @@ import {Widget, ClientBus, field} from "client-bus";
 
 
 @Widget({
+  fqelement: "dv-messaging-comment",
   template: `
     <div class="list-group">
       <div class="list-group-item-text">

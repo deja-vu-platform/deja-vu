@@ -3,7 +3,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({ng2_providers: [GraphQlService]})
+@Widget({fqelement: "dv-access-auth", ng2_providers: [GraphQlService]})
 export class RegisterComponent {
   user: User = {username: "", password: ""};
   reenter_password = "";

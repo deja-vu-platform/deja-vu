@@ -1,7 +1,7 @@
 import {Widget, ClientBus, field} from "client-bus";
 
 
-@Widget()
+@Widget({fqelement: "dv-samples-bookmark"})
 export class CreatePostComponent {
   submit_ok;
   post;

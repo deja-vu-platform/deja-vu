@@ -2,7 +2,7 @@ import {Widget, ClientBus, field} from "client-bus";
 import {Router, ROUTER_DIRECTIVES} from "angular2/router";
 
 
-@Widget({ng2_directives: [ROUTER_DIRECTIVES]})
+@Widget({fqelement: "dv-samples-bookmark"})
 export class LandingComponent {
   signin_or_register_ok;
   signin_user;

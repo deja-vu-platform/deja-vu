@@ -6,6 +6,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
+  fqelement: "dv-organization-label",
   ng2_providers: [GraphQlService]
 })
 export class SearchComponent {

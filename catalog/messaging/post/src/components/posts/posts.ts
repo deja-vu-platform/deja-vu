@@ -7,6 +7,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
+  fqelement: "dv-messaging-post",
   ng2_providers: [GraphQlService]
 })
 export class PostsComponent implements OnInit {

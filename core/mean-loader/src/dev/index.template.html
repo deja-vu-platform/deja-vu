@@ -31,6 +31,7 @@
       packages_obj["components"] = regjs;
       packages_obj["shared"] = regjs;
       packages_obj["rxjs"] = regjs;
+      map_obj["@@name/lib"] = "";
 
       System.config({map: map_obj, packages: packages_obj});
       System.import('dv-dev')

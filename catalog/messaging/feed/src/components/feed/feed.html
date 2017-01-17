@@ -1,9 +1,10 @@
 <!-- Feed(Name) -->
 <ul *ngIf="feed && feed.length > 0" class="list-group">
   <li *ngFor="let feedItem of feed" class="list-group-item">
-    <!-- tmp hack -->
-    <dv-widget name="FeedItem" fqelement="dv-samples-bookmark"
-     [fields]="feedItem" [hosts]="hosts"></dv-widget>
+    <dv-widget [name]="feed_item_widget.name"
+     [fqelement]="feed_item_widget.fqelement"
+     [fields]="feedItem" [hosts]="hosts">
+    </dv-widget>
   </li>
 </ul>
 <div *ngIf="!feed || feed.length == 0">

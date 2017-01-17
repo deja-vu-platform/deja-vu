@@ -4,7 +4,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({ng2_providers: [GraphQlService]})
+@Widget({fqelement: "dv-community-follow", ng2_providers: [GraphQlService]})
 export class FollowComponent {
   potentialFollows: Target[];
   private _name: Name;

@@ -2,7 +2,11 @@ import {Widget} from "client-bus";
 import {GraphQlService} from "gql";
 
 
-@Widget({template: `{{consumer.atom_id}}`, ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "dv-organization-allocator",
+  template: `{{consumer.atom_id}}`,
+  ng2_providers: [GraphQlService]
+})
 export class ConsumerComponent {
   allocation = {atom_id: undefined, on_change: _ => undefined};
   resource = {atom_id: undefined, on_change: _ => undefined};
