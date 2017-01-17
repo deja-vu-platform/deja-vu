@@ -1,4 +1,4 @@
 import {Widget} from "client-bus";
 
-@Widget({})
+@Widget({fqelement: "dv-samples-morg"})
 export class HomeComponent {}

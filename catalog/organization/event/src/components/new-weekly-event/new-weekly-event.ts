@@ -52,7 +52,8 @@ export class NewWeeklyEventComponent {
   _loadScript(src: string) {
     const s = document.createElement("script");
     s.type = "text/javascript";
-    s.src = "components/new-weekly-event/vendor/" + src;
+    s.src = "node_modules/dv-organization-event/lib/components/" +
+      "new-weekly-event/vendor/" + src;
     this._elementRef.nativeElement.appendChild(s);
   }
 }
