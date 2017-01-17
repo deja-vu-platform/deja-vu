@@ -190,15 +190,12 @@ var WorkSurface = function(){
             if (dragHandle.associated){
                 shiftOrder(widget.meta.id, userWidget);
             }
-            that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.custom, currentZoom);
-            miniNav.updateMiniNavInnerWidgetSizes(userWidget, currentZoom);
+            that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.main, currentZoom);
+            // need the container to be placed before setting up the grid!
             grid.setUpGrid();
-            if (!dragHandle.associated){
-
-            }
         };
 
-        var dropSettings = dragAndDrop.widgetToWorksurfaceDropSettings(userWidget, onDropFinished);
+        var dropSettings = dragAndDrop.widgetToWorkSurfaceDropSettings(userWidget, onDropFinished);
 
         workSurface.droppable(dropSettings);
     };

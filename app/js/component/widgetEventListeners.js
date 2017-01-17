@@ -944,4 +944,7 @@ function deleteWidgetFromUserWidgetAndFromView(widgetId) {
     var containerId = "component-container_"+widgetId;
     selectedUserWidget.deleteInnerWidget(widgetId);
     $('#'+containerId).remove();
+    grid.setUpGrid();
+    miniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
+    zoomElement.registerZoom(selectedUserWidget);
 }

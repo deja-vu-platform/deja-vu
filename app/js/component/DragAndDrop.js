@@ -11,7 +11,7 @@ var DragAndDropController = function () {
         return draggingWidget;
     };
 
-    that.widgetToWorksurfaceDropSettings = function (outerWidget, dropFinished) {
+    that.widgetToWorkSurfaceDropSettings = function (outerWidget, dropFinished) {
         return {
             accept: ".widget",
             hoverClass: "highlight",
@@ -47,7 +47,9 @@ var DragAndDropController = function () {
                     dragHandle.newWidget = true;
                     outerWidget.addInnerWidget(widget);
                     dragHandle.addClass('associated').data('componentid', widgetId);
+                    zoomElement.registerZoom(outerWidget);
                 }
+                miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
 
                 dropFinished(dragHandle, widget);
             }
@@ -107,7 +109,7 @@ var DragAndDropController = function () {
                         widget = BaseWidget(type, {}, view.getDimensions(type));
                     }
                     draggingWidget = widget;
-                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, true, dragHandle, null, selectedUserWidget.properties.custom, currentZoom);
+                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, true, dragHandle, null, selectedUserWidget.properties.main, currentZoom);
 
                     $('#basic-components').html(basicWidgets);
                     registerDraggable();

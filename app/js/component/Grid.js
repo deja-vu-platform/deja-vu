@@ -12,6 +12,8 @@ var Grid = function(){
     var ys = [];
 
     that.setUpGrid = function(){
+        // TODO this should be able to be done based on the userWidget!
+
         $('.grid').remove();
         var workSurface = $('#work-surface_'+selectedUserWidget.meta.id);
 
