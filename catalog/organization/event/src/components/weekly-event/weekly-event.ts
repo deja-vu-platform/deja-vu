@@ -42,6 +42,7 @@ export class WeeklyEventComponent {
     atom_id: undefined, starts_on: undefined, ends_on: undefined
   };
   fields = {};
+  event_widget = {name: "Event"};
 
   constructor(
       private _graphQlService: GraphQlService,
