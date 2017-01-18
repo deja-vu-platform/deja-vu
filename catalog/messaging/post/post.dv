@@ -1,28 +1,24 @@
-cliche Post
-
-data Post {
-  content: Text,
-  author: User
+cliche Post {
+  data Post {
+    one content one: Text,
+    author one: User
+  }
+  
+  data User {
+    one username one: Text
+  }
+  
+  widget Post, EditContent, NewPostButton {
+    post: Post
+  }
+  
+  widget User {
+    user: User
+  }
+  
+  widget Posts {
+    author: User
+  }
+  
+  widget AllPosts {}
 }
-
-data User {
-  username: Text (one)
-}
-
-widget Post, EditContent,
-       NewPostButton {
-  post: Post
-}
-
-widget User {
-  user: User
-}
-
-widget Posts {
-  author: User
-}
-
-widget AllPosts {}
-
-attach Post to Post
-attach User to User

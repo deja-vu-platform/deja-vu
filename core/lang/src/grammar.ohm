@@ -1,0 +1,30 @@
+Cliche {
+  DvCliche = UseDecl* ClicheDecl
+  UseDecl = use name eol
+
+  ClicheDecl = cliche name "{" Paragraph* "}"
+
+  Paragraph = DataDecl | WidgetDecl
+
+  DataDecl = data name ("," name)* "{" FieldBody* "}"
+
+  WidgetDecl = main? widget name ("," name)* "{" FieldBody* "}"
+
+  FieldBody = FieldDecl ("," FieldDecl)*
+  FieldDecl = mult? name mult?":" name
+
+  mult = lone | one | some | set
+
+  name = alnum* 
+  eol = "\r"? "\n"
+
+  use = "use"
+  widget = "widget"
+  cliche = "cliche"
+  data = "data"
+  main = "main"
+  lone = "lone"
+  one = "one"
+  some = "some"
+  set = "set"
+}
