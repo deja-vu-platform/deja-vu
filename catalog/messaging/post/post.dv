@@ -1,11 +1,11 @@
 cliche Post {
   data Post {
-    one content one: Text,
-    author one: User
+    content: Text,
+    author: User
   }
   
   data User {
-    one username one: Text
+    username: Text
   }
   
   widget Post, EditContent, NewPostButton {

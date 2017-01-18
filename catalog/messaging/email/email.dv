@@ -1,0 +1,8 @@
+cliche Email {
+  // Shows a button that when clicked it sends an email the address
+  // given in `to` and the content `content`
+  widget SendEmail {
+    to: Email,
+    content: Text
+  }
+}

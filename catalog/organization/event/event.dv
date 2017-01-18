@@ -1,0 +1,36 @@
+cliche Event {
+  data Event {
+    start_date: Datetime,
+    end_date: Datetime
+  }
+
+  data WeeklyEvent {
+    events: Event,
+    starts_on: Date,  // the date of the first occurrence of the weekly event
+    ends_on: Date,  // the date of the last occurrence of the weekly event
+    start_time: Time,
+    end_time: Time,
+    description: Description
+  }
+
+  data Description {}
+
+  data Guest {
+    name: Text
+  }
+
+  // Shows the start and end date of the event
+  widget ShowEvent {
+    event: Event
+  }
+
+  // Lets the user choose a weekly event from a dropdown and displays the
+  // selected weekly event by showing a list of all the events using
+  // `event_widget`
+  widget ShowWeeklyEvent {
+    event_widget: ShowEvent,
+    // the weekly event selected by the user from the dropdown
+    selected_weekly_event: WeeklyEvent,
+    event: Event // this one is special
+  }
+}

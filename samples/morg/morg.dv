@@ -1,0 +1,48 @@
+cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
+  data WeeklyGroupMeeting {
+    meetings: GroupMeeting,
+    guests: Member
+  }
+  data GroupMeeting {
+    champion: Member
+  }
+  data Member {
+    name: Text
+  }
+
+  data GroupEmailAddress {}
+
+  // Shows a form to create a new weekly group meeting and lets the user choose
+  // from a dropdown and display a weekly group meeting
+  main widget Home {
+    group_meeting_widget: ShowGroupMeeting
+  }
+
+  // Shows the date of the event, the name of the champion, and a button to
+  // send an email to the group with information regarding the event
+  widget ShowGroupMeeting {
+    group_meeting: GroupMeeting
+  }
+
+  data-bond {
+    WeeklyGroupMeeting, Allocation, WeeklyEvent {
+      data-bond { events, resources, meetings }
+      data-bond { WeeklyGroupMeeting.guests, WeeklyEvent.guests, consumers }
+    }
+  }
+  data-bond {
+    GroupMeeting, Event, Resource {
+      data-bond { champion, description, consumed_by }
+    }
+  }
+
+  widget-bond {
+    ShowGroupMeeting.group_meeting, ShowEvent.event, ShowResource.resource
+  }
+  widget-bond {
+    group_meeting_widget, ShowWeeklyEvent.event_widget
+  }
+  widget-bond {
+    ShowWeeklyEvent.event, ShowGroupMeeting.group_meeting
+  }
+}

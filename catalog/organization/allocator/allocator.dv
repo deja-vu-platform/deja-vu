@@ -1,0 +1,21 @@
+// Only one allocation per instance of the cliche
+// The allocation is triggered when the consumed_by field is first accessed. Once
+// allocated, the modification of consumers or resources will throw an error
+cliche Allocator {
+  data Allocation {
+    consumers: Consumer,
+    resources: Resource
+  }
+  data Consumer {
+    name: Text
+  }
+  data Resource {
+    name: Text,
+    consumed_by: Consumer
+  }
+
+  // Shows the name of the consumer of the given resource
+  widget ShowConsumer {
+    resource: Resource
+  }
+}
