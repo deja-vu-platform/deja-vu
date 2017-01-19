@@ -3,7 +3,7 @@
  */
 
 var WidgetContainer = function(){
-    var that = Object.create(WidgetContainer);
+    var that = Object.create(WidgetContainer.prototype);
 
 
     var makeContainerResizable = function(widget, outerWidget, container){
@@ -49,14 +49,14 @@ var WidgetContainer = function(){
                 });
             },
             resize: function(e, ui){
-                widget.dimensions.height = ui.size.height/currentZoom;
-                widget.dimensions.width = ui.size.width/currentZoom;
+                widget.properties.dimensions.height = ui.size.height/currentZoom;
+                widget.properties.dimensions.width = ui.size.width/currentZoom;
                 // TODO woah! It resizes as you go!
                 refreshContainerDisplay(false, container, currentZoom);
             },
             stop: function(e, ui){
-                outerWidget.layout[widget.meta.id].left = ui.position.left/currentZoom;
-                outerWidget.layout[widget.meta.id].top = ui.position.top/currentZoom;
+                outerWidget.properties.layout[widget.meta.id].left = ui.position.left/currentZoom;
+                outerWidget.properties.layout[widget.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
                 miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
                 grid.setUpGrid();
@@ -158,8 +158,8 @@ var WidgetContainer = function(){
 
         buttonStyle.find('.inner-component-delete-style').click(function(e){
             e.stopPropagation();
-            widget.properties.custom = {};
-            widget.properties.bsClasses = {};
+            widget.properties.styles.custom = {};
+            widget.properties.styles.bsClasses = {};
             refreshContainerDisplay(false, container, currentZoom);
 
         });
@@ -191,7 +191,7 @@ var WidgetContainer = function(){
         var container = $('<div></div>');
         var containerId = 'component-container_'+widget.meta.id;
         container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
-        container.height(widget.dimensions.height * zoom).width(widget.dimensions.width * zoom);
+        container.height(widget.properties.dimensions.height * zoom).width(widget.properties.dimensions.width * zoom);
         container.data('componentId', widget.meta.id);
         return container;
     };
@@ -204,8 +204,8 @@ var WidgetContainer = function(){
     };
 
     var setUpTextOptions = function(container, widget){
-        if (!widget.properties.custom){
-            widget.properties.custom = {}
+        if (!widget.properties.styles.custom){
+            widget.properties.styles.custom = {}
         }
 
         var fontSizeOption = $('<li><div>Font Size: </div></li>');
@@ -223,7 +223,7 @@ var WidgetContainer = function(){
         fontSizeSetButton.click(function(){
             var value = fontSizeInput.val();
             if (!isNaN(parseInt(value))){
-                widget.properties.custom['font-size'] = value + 'px';
+                widget.properties.styles.custom['font-size'] = value + 'px';
                 refreshContainerDisplay(false, container, currentZoom);
 
             }
@@ -233,7 +233,7 @@ var WidgetContainer = function(){
         fontWeightSetButton.click(function(){
             var value = fontWeightInput.val();
             if (!isNaN(parseInt(value))){
-                widget.properties.custom['font-weight'] = value;
+                widget.properties.styles.custom['font-weight'] = value;
                 refreshContainerDisplay(false, container, currentZoom);
 
             }
@@ -242,11 +242,11 @@ var WidgetContainer = function(){
     };
 
     var setUpColorOptions = function(container, widget){
-        if (!widget.properties.custom){
-            widget.properties.custom = {}
+        if (!widget.properties.styles.custom){
+            widget.properties.styles.custom = {}
         }
 
-        var customStyles = widget.properties.custom;
+        var customStyles = widget.properties.styles.custom;
         var textColorOption = $('<li><div>Text Color: </div></li>');
         var bgColorOption = $('<li><div>Background Color: </div></li>');
         var textColorInput = $('<input class="color-input">');
@@ -261,7 +261,7 @@ var WidgetContainer = function(){
         textColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerText.toHEXString();
-            widget.properties.custom['color'] = color;
+            widget.properties.styles.custom['color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
         });
 
@@ -271,7 +271,7 @@ var WidgetContainer = function(){
         bgColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerBG.toHEXString();
-            widget.properties.custom['background-color'] = color;
+            widget.properties.styles.custom['background-color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
         });
 

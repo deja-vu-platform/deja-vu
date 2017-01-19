@@ -5,7 +5,7 @@
 var widgetContainerMaker = WidgetContainer();
 
 var WorkSurface = function(){
-    var that = Object.create(WorkSurface);
+    var that = Object.create(WorkSurface.prototype);
 
 
     var createWorkSurface = function(outerWidgetId, height, width){
@@ -82,23 +82,23 @@ var WorkSurface = function(){
             widgetContainer = widgetContainerMaker.createBasicWidgetContainer(innerWidget, zoom);
         }
 
-        if (outerWidget.layout[widgetId]){ // means it's not not added yet
+        if (outerWidget.properties.layout[widgetId]){ // means it's not not added yet
             widgetContainer.css({
                 position: 'absolute',
-                left: outerWidget.layout[widgetId].left*zoom,
-                top: outerWidget.layout[widgetId].top*zoom,
+                left: outerWidget.properties.layout[widgetId].left*zoom,
+                top: outerWidget.properties.layout[widgetId].top*zoom,
 
             });
         }
 
         if (type === 'user'){ // do the recursion
-            innerWidget.layout.stackOrder.forEach(function(innerInnerWidgetId){
+            innerWidget.properties.layout.stackOrder.forEach(function(innerInnerWidgetId){
                 var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
 
-                var diff = innerWidget.layout.stackOrder.length - Object.keys(innerWidget.innerWidgets).length;
+                var diff = innerWidget.properties.layout.stackOrder.length - Object.keys(innerWidget.innerWidgets).length;
                 if (diff != 0){
                     console.log('in make recursive containers')
-                    console.log(innerWidget.layout.stackOrder);
+                    console.log(innerWidget.properties.layout.stackOrder);
                     console.log(Object.keys(innerWidget.innerWidgets));
                     console.log(innerInnerWidget);
                 }
@@ -118,15 +118,15 @@ var WorkSurface = function(){
     var loadUserWidgetIntoWorkSurface = function(userWidget, zoom){
         var workSurface = createOrResetWorkSurface(userWidget, zoom);
 
-        var diff = userWidget.layout.stackOrder.length - Object.keys(userWidget.innerWidgets).length;
+        var diff = userWidget.properties.layout.stackOrder.length - Object.keys(userWidget.innerWidgets).length;
         if (diff != 0){
             console.log('in load user widget into worksurface');
-            console.log(userWidget.layout.stackOrder);
+            console.log(userWidget.properties.layout.stackOrder);
             console.log(Object.keys(userWidget.innerWidgets));
             console.log(userWidget);
         }
 
-        userWidget.layout.stackOrder.forEach(function(innerWidgetId){
+        userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
                  if (innerWidget.type == 'user'){ // TODO FIXME doing some sketchy shit here
                      var customStyles = innerWidget.properties.custom;
@@ -138,7 +138,7 @@ var WorkSurface = function(){
                      userWidget.innerWidgets[innerWidgetId] = innerWidget;
                  }
 
-            var overallStyles = userWidget.properties.main;
+            var overallStyles = userWidget.properties.styles.custom;
             that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, true, null, workSurface, overallStyles, zoom);
         });
     };
@@ -172,8 +172,8 @@ var WorkSurface = function(){
                 $(this).resizable('option', 'minHeight', minHeight);
             },
             resize: function(e, ui){
-                userWidget.dimensions.height = ui.size.height/currentZoom;
-                userWidget.dimensions.width = ui.size.width/currentZoom;
+                userWidget.properties.dimensions.height = ui.size.height/currentZoom;
+                userWidget.properties.dimensions.width = ui.size.width/currentZoom;
             },
             stop: function(e, ui){
                 // not super important to update as you resize so just do it at the end
@@ -190,7 +190,7 @@ var WorkSurface = function(){
             if (dragHandle.associated){
                 shiftOrder(widget.meta.id, userWidget);
             }
-            that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.main, currentZoom);
+            that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.styles.custom, currentZoom);
             // need the container to be placed before setting up the grid!
             grid.setUpGrid();
         };
@@ -202,7 +202,7 @@ var WorkSurface = function(){
 
     // puts componentId at the top!
     var shiftOrder = function(widgetId, userWidget){
-        var stackOrder = userWidget.layout.stackOrder;
+        var stackOrder = userWidget.properties.layout.stackOrder;
 
         var index;
         for (var i = 0; i < stackOrder.length; i++){
@@ -212,8 +212,8 @@ var WorkSurface = function(){
                 break
             }
         }
-        userWidget.layout.stackOrder.splice(index, 1);
-        userWidget.layout.stackOrder.push(widgetId);
+        userWidget.properties.layout.stackOrder.splice(index, 1);
+        userWidget.properties.layout.stackOrder.push(widgetId);
     };
 
 
@@ -285,7 +285,7 @@ var WorkSurface = function(){
             })
         }
 
-        var stackOrder = userWidget.layout.stackOrder;
+        var stackOrder = userWidget.properties.layout.stackOrder;
         var idxThisWidget;
         var idxNextWidget;
         if (!isUp){
@@ -317,7 +317,7 @@ var WorkSurface = function(){
         if (!isUp){
             stackOrder.reverse();
         }
-        userWidget.layout.stackOrder = stackOrder;
+        userWidget.properties.layout.stackOrder = stackOrder;
         // FIXME faster implem?
         loadUserWidgetIntoWorkSurface(userWidget, currentZoom);
     };
@@ -342,6 +342,8 @@ var WorkSurface = function(){
             disableAllWidgetDomElementsExcept(widgetId);
             setWidgetOptions(userWidget);
             zoomElement.updateZoomFromState(userWidget);
+            // for now, reload the thinger
+            loadUserWidgetIntoWorkSurface(userWidget, currentZoom);
         }
         miniNav.setUpMiniNavElementAndInnerWidgetSizes(userWidget);
         grid.setUpGrid();
@@ -358,7 +360,7 @@ var WorkSurface = function(){
         currentZoom = zoom; // set zoom value 100%
         var widgetId = userWidget.meta.id;
         disableAllWidgetDomElementsExcept(widgetId);
-        var workSurface = createWorkSurface(widgetId, userWidget.dimensions.height, userWidget.dimensions.width);
+        var workSurface = createWorkSurface(widgetId, userWidget.properties.dimensions.height, userWidget.properties.dimensions.width);
         resetWorkSurface(workSurface);
 
         $('#outer-container').append(workSurface);

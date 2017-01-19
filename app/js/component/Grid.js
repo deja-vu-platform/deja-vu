@@ -3,7 +3,7 @@
  */
 
 var Grid = function(){
-    var that = Object.create(Grid);
+    var that = Object.create(Grid.prototype);
 
     var xsWithoutBoundary = [];
     var ysWithoutBoundary = [];

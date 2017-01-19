@@ -3,7 +3,7 @@
  */
 
 var MiniNav = function(){
-    var that = Object.create(MiniNav);
+    var that = Object.create(MiniNav.prototype);
 
     var navZoom = .1;
     var navDragging = false;
@@ -109,8 +109,8 @@ var MiniNav = function(){
 
     that.setUpMiniNavElementAndInnerWidgetSizes = function(outerWidget){
         $('#mini-nav-component-sizes').html('').css({
-            width: outerWidget.dimensions.width*navZoom + 'px',
-            height: outerWidget.dimensions.height*navZoom + 'px',
+            width: outerWidget.properties.dimensions.width*navZoom + 'px',
+            height: outerWidget.properties.dimensions.height*navZoom + 'px',
         });
 
         Object.keys(outerWidget.innerWidgets).forEach(function(innerWidgetId){
@@ -119,10 +119,10 @@ var MiniNav = function(){
             widgetSizeDiv.addClass('mini-nav-inner-component-size');
             widgetSizeDiv.css({
                 position: 'absolute',
-                left: outerWidget.layout[innerWidgetId].left*navZoom,
-                top: outerWidget.layout[innerWidgetId].top*navZoom,
-                width: innerWidget.dimensions.width*navZoom,
-                height: innerWidget.dimensions.height*navZoom,
+                left: outerWidget.properties.layout[innerWidgetId].left*navZoom,
+                top: outerWidget.properties.layout[innerWidgetId].top*navZoom,
+                width: innerWidget.properties.dimensions.width*navZoom,
+                height: innerWidget.properties.dimensions.height*navZoom,
                 background: 'black'
             });
 

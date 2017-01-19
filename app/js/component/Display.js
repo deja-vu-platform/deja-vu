@@ -1,5 +1,5 @@
 var Display = function(){
-    var that = Object.create(Display);
+    var that = Object.create(Display.prototype);
 
     var defaultDisplayClasses = {
         'label': "display-component",
@@ -115,9 +115,9 @@ var Display = function(){
 
     that.displayWidget = function(fresh, widget, container, overallStyles, zoom){
         if (widget.type == 'user'){
-            var width = widget.dimensions.width * zoom;
-            var height = widget.dimensions.height * zoom;
-            var properties = widget.properties;
+            var width = widget.properties.dimensions.width * zoom;
+            var height = widget.properties.dimensions.height * zoom;
+            var styles = widget.properties.styles;
 
             container.css({
                 width: width + 'px',
@@ -126,11 +126,11 @@ var Display = function(){
 
             // make styles more specific
             overallStyles = JSON.parse(JSON.stringify(overallStyles));
-            for (var mainProperty in properties.main){
-                overallStyles[mainProperty] = properties.main[mainProperty];
-            }
-            for (var customProperty in properties.custom){
-                overallStyles[customProperty] = properties.custom[customProperty];
+            // for (var mainProperty in styles.main){
+            //     overallStyles[mainProperty] = styles.main[mainProperty];
+            // }
+            for (var customProperty in styles.custom){
+                overallStyles[customProperty] = styles.custom[customProperty];
             }
 
             // FIXME this appears twice
@@ -141,11 +141,11 @@ var Display = function(){
             }
 
 
-            widget.layout.stackOrder.forEach(function(innerWidgetId){
+            widget.properties.layout.stackOrder.forEach(function(innerWidgetId){
                 var innerWidget = widget.innerWidgets[innerWidgetId];
                 var innerContainer = container.find('#component-container_'+innerWidgetId);
-                var top = widget.layout[innerWidgetId].top * zoom;
-                var left = widget.layout[innerWidgetId].left * zoom;
+                var top = widget.properties.layout[innerWidgetId].top * zoom;
+                var left = widget.properties.layout[innerWidgetId].left * zoom;
 
                 innerContainer.css({
                     top: top + 'px',
@@ -159,23 +159,23 @@ var Display = function(){
             if (fresh){
                 container.find('.display-component').remove(); // FIXME this is going to do this a lot, unnecessarily!
                 html = view.getHTML(widget.type)(widget.innerWidgets[widget.type]);
-                var properties = widget.properties;
-                displayInnerWidget(container, widget.type, html, zoom, properties, overallStyles);
+                var styles = widget.properties.styles;
+                displayInnerWidget(container, widget.type, html, zoom, styles, overallStyles);
             } else if (container.length>0){
                 var type = widget.type;
                 view.hideBaseWidgetDisplayAt(container, type);
 
-                var width = widget.dimensions.width * zoom;
-                var height = widget.dimensions.height * zoom;
+                var width = widget.properties.dimensions.width * zoom;
+                var height = widget.properties.dimensions.height * zoom;
 
-                var properties = widget.properties;
+                var styles = widget.properties.styles;
 
                 container.css({
                     width: width + 'px',
                     height: height + 'px',
                 });
 
-                view.updateBaseWidgetDisplayAt(container, type, zoom, properties, overallStyles);
+                view.updateBaseWidgetDisplayAt(container, type, zoom, styles, overallStyles);
                 view.showBaseWidgetDisplayAt(container, type);
 
             }
@@ -284,19 +284,19 @@ var Display = function(){
                 displayWidget.removeClass();
                 displayWidget.addClass(classes).addClass(defaultDisplayClasses[type]); // TODO what's going on here?
             }
-            if (properties.main){
-                if (Object.keys(properties.main).length>0){ //TODO make succinct
-                    if (properties.main['background-color']){
-                        container.css({
-                            'background-color':properties.main['background-color']
-                        })
-                    }
-                    for (var mainProperty in properties.main){//TODO make succinct
-                        displayWidget.css(mainProperty, properties.main[mainProperty]);
-                    }
-
-                }
-            }
+            // if (properties.main){
+            //     if (Object.keys(properties.main).length>0){ //TODO make succinct
+            //         if (properties.main['background-color']){
+            //             container.css({
+            //                 'background-color':properties.main['background-color']
+            //             })
+            //         }
+            //         for (var mainProperty in properties.main){//TODO make succinct
+            //             displayWidget.css(mainProperty, properties.main[mainProperty]);
+            //         }
+            //
+            //     }
+            // }
             if (Object.keys(properties.custom).length>0){//TODO make succinct
                 if (properties.custom['background-color']){
                     container.css({

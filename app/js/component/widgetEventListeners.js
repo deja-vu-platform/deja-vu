@@ -495,7 +495,7 @@ function registerTooltipBtnHandlers() {
                 }
             }
             var widgetId = getWidgetIdFromContainerId(containerId);
-            selectedUserWidget.innerWidgets[widgetId].properties.bsClasses[propertyName] = bootstrapClass;
+            selectedUserWidget.innerWidgets[widgetId].properties,style.bsClasses[propertyName] = bootstrapClass;
 
         }
     }
@@ -711,7 +711,7 @@ function refreshContainerDisplay(fresh, container, zoom){
     if (selectedUserWidget.innerWidgets[widgetId]){ // component exists
         var widgetToChange = selectedUserWidget.innerWidgets[widgetId];
 
-        view.displayWidget(fresh, widgetToChange, container, selectedUserWidget.properties.main, zoom);
+        view.displayWidget(fresh, widgetToChange, container, selectedUserWidget.properties.styles.custom, zoom);
 
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
@@ -730,15 +730,15 @@ function createUserWidgetCopy (outerWidget){
                 // (new Date()).getTime();
             widget.meta.id = newId;
             if (widget.type == 'user'){
-                for (var idx = 0; idx< widget.layout.stackOrder.length; idx++){
-                    var oldId = widget.layout.stackOrder[idx];
+                for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
+                    var oldId = widget.properties.layout.stackOrder[idx];
                     var result = recursiveReIding(widget.innerWidgets[oldId]);
                     if (result.success){
-                        widget.layout.stackOrder[idx] = result.newId;
+                        widget.properties.layout.stackOrder[idx] = result.newId;
                         widget.innerWidgets[result.newId] = widget.innerWidgets[oldId];
                         delete widget.innerWidgets[oldId];
-                        widget.layout[result.newId] = widget.layout[oldId];
-                        delete widget.layout[oldId];
+                        widget.properties.layout[result.newId] = widget.properties.layout[oldId];
+                        delete widget.properties.layout[oldId];
 
                     }
                 }

@@ -46,7 +46,7 @@ function loadTablePreview(widgetToShow) {
         }
 
         widgetContainer.addClass('component-container');
-        widgetContainer.height(innerWidget.dimensions.height*scale).width(innerWidget.dimensions.width*scale);
+        widgetContainer.height(innerWidget.properties.dimensions.height*scale).width(innerWidget.properties.dimensions.width*scale);
 
 
         widgetContainer.css({
@@ -63,5 +63,5 @@ function loadTablePreview(widgetToShow) {
 
 function setUpContainer(container, dragHandle, widget, zoom){
     container.append(dragHandle);
-    view.displayWidget(true, widget, container, widget.properties.main, zoom);
+    view.displayWidget(true, widget, container, widget.properties.styles.custom, zoom);
 }

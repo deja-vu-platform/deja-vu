@@ -97,8 +97,8 @@ var setUpStyleColors = function(userWidget){
     var pickerBG = $('#pick-color-bg-input')[0]._jscLinkedInstance;
     pickerBG.fromString('87CEFA');
 
-    if (userWidget.properties.main) {
-        var overallStyles = userWidget.properties.main;
+    if (userWidget.properties.styles.custom) {
+        var overallStyles = userWidget.properties.styles.custom;
         var textColor = overallStyles['color'] || '';
         pickerText.fromString(textColor);
 
@@ -111,10 +111,10 @@ var setUpStyleColors = function(userWidget){
 };
 
 var setOverallStyleAndUpdateView = function(styleName, styleValue, userWidget){
-    if (!userWidget.properties.main){
-        userWidget.properties.main = {}
+    if (!userWidget.properties.styles.custom){
+        userWidget.properties.styles.custom = {}
     }
-    userWidget.properties.main[styleName] = styleValue;
+    userWidget.properties.styles.custom[styleName] = styleValue;
     for (var id in userWidget.innerWidgets){
         var container = $('#work-surface_'+userWidget.meta.id).find('#component-container_'+id);
         refreshContainerDisplay(false, container, currentZoom);
@@ -145,7 +145,7 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userWidget){
     });
 
     $('#reset-overall-color').click(function(){
-        selectedUserWidget.properties.main = {};
+        selectedUserWidget.properties.styles.custom = {};
         setUpStyleColors(selectedUserWidget);
         for (var id in selectedUserWidget.innerWidgets){
             var container = $('#work-surface_'+selectedUserWidget.meta.id).find('#component-container_'+id);

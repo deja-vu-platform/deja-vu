@@ -98,16 +98,18 @@ AND change WIDGET to DRAG-HANDLE
 			a Instance is a child of a UserWidget
 			Now, the tree is structured like this
 				
+				Template Widget
+					id (which is to be used as the parentId)
+					immidiate children ids (TemplateWidget)
+					TREE of changes
+				
+
 				Instance Widget
 					id
 					parentId (Template Widget)
 					TREE of changes
 					
-				Template Widget
-					id (which is to be used as the parentId)
-					immidiate children ids (TemplateWidget)
-					TREE of changes
-
+				
 				TREE of changes 
 					if any descendant is changed at this level, save
 					path to child, and then the change
@@ -127,7 +129,37 @@ AND change WIDGET to DRAG-HANDLE
 						},
 						...
 					}
+
+// Tree of Changes
+// widgetInstanceId:{ (= top level Id of the current widget)
+//     properties : {
+//        layout : {
+//              stackOrder: []
+//        },
+//        styles : {
+//              custom: {}, bsClasses: {}
+//        }
+//     },
+//     children:{
+//          widgetInstanceId:{
+//                properties : changes,
+//                  children: {
+//                    widgetInstanceId:{
+//                      ...
+//                    },
+//                     widgetInstanceId:{
+//                       ...
+//                     }
+//              }
+//      }
+//
+// },
+// 
+
 				
+				// we use InstanceIds because at the point this is used, we don't care about the template,
+				// but we DO care about the unique path to this widget!				
+
 				the changes at any *level* is the default and overrides any unspecified values at *levels* below it
 				but any changes at the same *level* at a higher *layer* can override this change.
 				

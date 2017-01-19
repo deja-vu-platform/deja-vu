@@ -3,7 +3,7 @@
  */
 
 var DragAndDropController = function () {
-    var that = Object.create(DragAndDropController);
+    var that = Object.create(DragAndDropController.prototype);
 
     var draggingWidget = null;
 
@@ -38,7 +38,7 @@ var DragAndDropController = function () {
                 var widget = draggingWidget;
                 var widgetId = widget.meta.id;
                 dragHandle.removeClass('dragging-component');
-                outerWidget.layout[widgetId] = {top: top/currentZoom, left: left/currentZoom};
+                outerWidget.properties.layout[widgetId] = {top: top/currentZoom, left: left/currentZoom};
 
                 var widgetIsAssociated = dragHandle.hasClass('associated');
                 dragHandle.associated = widgetIsAssociated;
@@ -109,7 +109,8 @@ var DragAndDropController = function () {
                         widget = BaseWidget(type, {}, view.getDimensions(type));
                     }
                     draggingWidget = widget;
-                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, true, dragHandle, null, selectedUserWidget.properties.main, currentZoom);
+                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, true,
+                        dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom);
 
                     $('#basic-components').html(basicWidgets);
                     registerDraggable();
