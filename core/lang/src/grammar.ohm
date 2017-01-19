@@ -1,30 +1,49 @@
 Cliche {
-  DvCliche = UseDecl* ClicheDecl
-  UseDecl = use name eol
+  /**
+   * Capitalized ("syntactic") rules implicitly skip whitespace characters
+   * Lowercase ("lexical") rules don't
+   **/
+  ClicheDecl = cliche name UsesDecl* "{" Paragraph* "}"
 
-  ClicheDecl = cliche name "{" Paragraph* "}"
+  RouteDecl = route "\""name"\""
+  UsesDecl = uses name AsDecl* ("," name AsDecl*)*
+  AsDecl = as name
 
   Paragraph = DataDecl | WidgetDecl
 
-  DataDecl = data name ("," name)* "{" FieldBody* "}"
+  DataDecl = data name ("," name)* "{" FieldBody* "}" BondDecl*
 
-  WidgetDecl = main? widget name ("," name)* "{" FieldBody* "}"
+  WidgetDecl = main? widget name ("," name)* RouteDecl* WidgetUsesDecl* "{" FieldBody* "}"
+  WidgetUsesDecl = uses name AsDecl* RouteDecl* ("," name AsDecl* RouteDecl*)*
 
   FieldBody = FieldDecl ("," FieldDecl)*
-  FieldDecl = mult? name mult?":" name
+  FieldDecl = name ":" name BondDecl*
 
-  mult = lone | one | some | set
+  BondDecl = "=" name (("+" | "|") name)*
 
-  name = alnum* 
-  eol = "\r"? "\n"
+  name = alnum* (("/" | "." | "_") alnum*)*
+  comment = singleLineComment | multiLineComment
+  singleLineComment = "//" (~eol any)*
+  eol = "\r"?"\n"
+  multiLineComment = "/*" (~"*/" any)* "*/"
 
-  use = "use"
+  uses = "uses"
   widget = "widget"
   cliche = "cliche"
   data = "data"
   main = "main"
-  lone = "lone"
-  one = "one"
-  some = "some"
-  set = "set"
+  route = "route"
+  as = "as"
+
+  // from the es5 grammar example
+  space := whitespace | lineTerminator | comment
+  whitespace = "\t"
+             | "\x0B"    -- verticalTab
+             | "\x0C"    -- formFeed
+             | " "
+             | "\u00A0"  -- noBreakSpace
+             | "\uFEFF"  -- byteOrderMark
+             | unicodeSpaceSeparator
+  unicodeSpaceSeparator = "\u2000".."\u200B" | "\u3000"
+  lineTerminator = "\n" | "\r" | "\u2028" | "\u2029"
 }

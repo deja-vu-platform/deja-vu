@@ -1,43 +1,90 @@
-cliche Bookmark
+// Bookmark is an app for users to post updates with topics and follow other
+// users or topics. Users get a feed with all the relevant updates given the
+// topics and users they follow.
+cliche Bookmark uses
+  community/Follow as FollowUsers,
+  community/Follow as FollowTopics, 
+  access/Auth, messaging/Feed,
+  organization/Label,
+  messaging/Post as MessagingPost {
 
-use Follow, Follow, Auth, Feed, Label, Post
+  /**
+   *  Data definitions
+   */
+  data User {
+    username: Text =
+      FollowUsers.Source.name + FollowUsers.Target.name +
+      FollowTopics.Source.name + Auth.username + Post.username +
+      Feed.Subscriber.name + Feed.Publisher.name,
+    posts: Post = Feed.published + Post.User.posts,
+    follows: User = FollowUsers.follows + Feed.Subscriber.subscriptions |
+      FollowTopics.follows + Feed.Subscriber.subscriptions
+  } = // users can follow other users
+      FollowUsers.Source + FollowUsers.Target +
+      // users can follow topics
+      FollowTopics.Source +
+      Post.User + Feed.Subscriber + Feed.Publisher
+  
+  data Post {
+    content: Text = MessagingPost.Post.content + Feed.Message.content,
+    topics: Topic = Label.Item.labels
+  } = Label.Item + MessagingPost.Post + Feed.Message
+  
+  data Topic {
+    name: Text = Label.Item.name + Feed.Publisher.name +
+        FollowTopics.Target.name
+  } = Label.Label + FollowTopics.Target + Feed.Publisher
 
-data User {
-  username: Text (one),
-  posts: set Post,
-  follows: set User
-}
+  // The landing page gives the user the option to sign in or register
+  main widget Landing route "landing" uses
+    Auth.SignInWithRedirect, Auth.RegisterWithRedirect {
+    user_ok_redirect: App = RegisterWithRedirect.register_ok_redirect +
+      SignInWithRedirect.signin_ok_redirect
+  }
 
-data Post {
-  content: Text,
-  topics: Topic
-}
+  /**
+   * Widgets
+   */
+  widget App route "app" uses
+    Auth.SignOutWithRedirect,
+    Home route "home",
+    Users route "users",
+    Topics route "topics" {
+    sign_out_ok_redirect: Landing = Auth.SignOutWithRedirect.signout_ok_redirect
+  }
 
-data Topic {
-  name: Text (one)
-}
+  widget Home uses Auth.LoggedIn, CreatePost, Feed.ShowFeed {
+    user: User = Auth.LoggedIn.user + CreatePost.author + Feed.ShowFeed.user,
+    feed_item_widget: FeedItem = Feed.ShowFeed.feed_item_widget
+  }
 
-bond {
-  Follow_1/Source, Follow_1/Target, Follow_2/Source,
-  Auth/User, Post/User, Feed/Subscriber, Feed/Publisher,
-  User
-}
-bond { Label/Item, Post/Post, Feed/Message, Post }
-bond {
-  Label/Label, Follow_2/Target, Feed/Publisher, Topic
-}
-bond { Feed/published, Post/posts, posts }
-bond { Post/content, Feed/content, content }
-bond { Feed/published, flip Label/labels, posts }
-bond { Follow_1/follows, Feed/subscriptions, follows }
-bond { Follow_2/follows, Feed/subscriptions, follows }
-bond { Label/labels, topics }
-bond {
-  Follow_1/Source.name, Follow_1/Target.name,
-  Follow_2/Source.name, 
-  Auth/username, Post/username, Feed/Subscriber.name,
-  Feed/Publisher.name, username
-}
-bond {
-  Topic/name, Label/name, Feed/Publisher.name, Follow_2/Target.name
+  widget CreatePost uses
+    Post.NewPostContent,
+    Label.LabelsText,
+    Post.NewPostButton {
+    post: Post = Post.NewPostContent.post + Label.LabelsText.item +
+      Post.NewPostButton.post
+    author: User = Post.NewPostButton.author,
+    submit_ok: Boolean = Post.NewPostContent.submit_ok +
+      Label.LabelsText.submit_ok + Post.NewPostButton.submit_ok
+  }
+
+  // Shows the post, with its author, attached labels and comments. Also has
+  // a field that lets the logged in user comment on the post
+  widget FeedItem uses Author, Labels, CommentsWithComment {
+    post: Post
+  }
+
+  // Displays the list of topics and lets the logged in user follow or unfollow
+  // them
+  widget Topics uses Auth.LoggedIn, FollowTopics.EditFollow {
+    user: User = Auth.LoggedIn.user + FollowTopics.EditFollow.source
+  }
+
+
+  // Displays the list of users and lets the logged in user follow or unfollow
+  // them
+  widget Users uses LoggedIn, FollowUsers.EditFollow {
+    user: User = Auth.LoggedIn.user + FollowUsers.EditFollow.source
+  }
 }
