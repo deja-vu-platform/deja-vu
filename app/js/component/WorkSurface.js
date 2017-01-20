@@ -38,8 +38,8 @@ var WorkSurface = function(){
     };
 
     that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, dragHandle,
-                                                            outerWidgetContainer, overallStyles, zoom){
-        var container = makeRecursiveWidgetContainers(innerWidget, outerWidget, isThisEditable, dragHandle, zoom);
+                                                            outerWidgetContainer, overallStyles, zoom, associated){
+        var container = makeRecursiveWidgetContainers(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated);
         if (outerWidgetContainer){
             outerWidgetContainer.append(container);
         }
@@ -51,7 +51,7 @@ var WorkSurface = function(){
     };
 
     // isEditable == component is the selected user component and all its contents are editable
-    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, dragHandle, zoom){
+    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated){
         var type = innerWidget.type;
         var widgetId = innerWidget.meta.id;
 
@@ -67,7 +67,7 @@ var WorkSurface = function(){
                 }
                 dragHandle.addClass('associated').data('componentid', widgetId);
             }
-            widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget);
+            widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated);
             registerDraggable(dragHandle);
             var editPopup = false;
             if (dragHandle){
@@ -102,11 +102,101 @@ var WorkSurface = function(){
                     console.log(Object.keys(innerWidget.innerWidgets));
                     console.log(innerInnerWidget);
                 }
-                var innerInnerWidgetContainer = makeRecursiveWidgetContainers(innerInnerWidget, innerWidget, false, null, zoom);
+                var innerInnerWidgetContainer = makeRecursiveWidgetContainers(innerInnerWidget, innerWidget, false, null, zoom, associated);
                 widgetContainer.append(innerInnerWidgetContainer);
             });
         }
         return widgetContainer;
+    };
+
+    var refreshFromProject = function(outerWidget){
+        var path = [];
+        var getPropertyChanges = function(path){
+            var change = outerWidget.properties;
+            for (var pathValueIdx = 0; pathValueIdx<path.length; pathValueIdx++){
+                if (change.children){
+                    if (change.children[path[pathValueIdx]]){
+                        change = change.children[path[pathValueIdx]]
+                    } else {
+                        change = {};
+                        break;
+                    }
+                } else {
+                    change = {};
+                    break;
+                }
+            }
+            return change;
+        };
+
+        var recursiveWidgetMaking = function(widget){
+            if (widget.type == 'user') {
+                path.push(widget.meta.id);
+                widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
+                    var innerWidget = widget.innerWidgets[innerWidgetId];
+                    innerWidget.parentId = widget.meta.id;
+                    if (innerWidget.type == 'user') { // TODO FIXME doing some sketchy shit here
+                        // var customStyles = innerWidget.properties.styles.custom;
+                        var templateId = innerWidget.meta.templateId;
+                        innerWidget = createUserWidgetCopy(
+                            UserWidget.fromString(
+                                JSON.stringify(selectedProject.components[templateId])
+                            )
+                        );
+                        innerWidget.meta.id = innerWidgetId;
+                        innerWidget.meta.templateId = templateId;
+
+                        // do it after the id and templateId are overwitten
+                        innerWidget = recursiveWidgetMaking(innerWidget);
+
+                        path.push(widget.meta.id);
+                        var properties = getPropertyChanges(path);
+                        path.pop();
+                        if (properties.styles){
+                            if (properties.styles.custom){
+                                var customStyles = properties.styles.custom;
+                                for (var style in customStyles) {
+                                    innerWidget.properties.styles.custom[style] = customStyles[style];
+                                }
+                            }
+                        }
+                        innerWidget.parentId = widget.meta.id;
+                        widget.innerWidgets[innerWidgetId] = innerWidget;
+                    }
+
+                });
+                path.pop();
+            }
+            return widget
+        };
+
+        return recursiveWidgetMaking(outerWidget);
+    };
+
+    var recursiveWidgetMaking = function(widget){
+        if (widget.type == 'user') {
+            widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
+                var innerWidget = widget.innerWidgets[innerWidgetId];
+                if (innerWidget.type == 'user') { // TODO FIXME doing some sketchy shit here
+                    var customStyles = innerWidget.properties.styles.custom;
+                    var templateId = innerWidget.meta.templateId;
+                    innerWidget = recursiveWidgetMaking(
+                        createUserWidgetCopy(
+                            UserWidget.fromString(
+                                JSON.stringify(selectedProject.components[templateId])
+                            )
+                        )
+                    );
+                    innerWidget.meta.id = innerWidgetId;
+                    innerWidget.meta.templateId = templateId;
+                    for (var style in customStyles) {
+                        innerWidget.properties.styles.custom[style] = customStyles[style];
+                    }
+                    widget.innerWidgets[innerWidgetId] = innerWidget;
+                }
+            });
+        }
+        return widget
     };
 
     /**
@@ -126,20 +216,12 @@ var WorkSurface = function(){
             console.log(userWidget);
         }
 
+        userWidget = refreshFromProject(userWidget);
+
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
-                 if (innerWidget.type == 'user'){ // TODO FIXME doing some sketchy shit here
-                     var customStyles = innerWidget.properties.custom;
-                     var parentId = innerWidget.meta.parentId;
-                     innerWidget = createUserWidgetCopy(UserWidget.fromString(JSON.stringify(selectedProject.components[parentId])));
-                     innerWidget.meta.id = innerWidgetId;
-                     innerWidget.meta.parentId = parentId;
-                     innerWidget.properties.custom = customStyles;
-                     userWidget.innerWidgets[innerWidgetId] = innerWidget;
-                 }
-
             var overallStyles = userWidget.properties.styles.custom;
-            that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, true, null, workSurface, overallStyles, zoom);
+            that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, true, null, workSurface, overallStyles, zoom, true);
         });
     };
 
@@ -190,7 +272,7 @@ var WorkSurface = function(){
             if (dragHandle.associated){
                 shiftOrder(widget.meta.id, userWidget);
             }
-            that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.styles.custom, currentZoom);
+            that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.styles.custom, currentZoom, true);
             // need the container to be placed before setting up the grid!
             grid.setUpGrid();
         };

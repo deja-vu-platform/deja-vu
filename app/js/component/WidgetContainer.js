@@ -204,9 +204,19 @@ var WidgetContainer = function(){
     };
 
     var setUpTextOptions = function(container, widget){
-        if (!widget.properties.styles.custom){
-            widget.properties.styles.custom = {}
+        var changes = createCustomPropertyPath(getPath(widget.meta.id));
+        if (!changes.styles) {
+            changes.styles = {};
         }
+        if (!changes.styles.custom){
+            changes.styles.custom = {};
+        }
+        var customStyles = changes.styles.custom;
+
+        //
+        // if (!widget.properties.styles.custom){
+        //     widget.properties.styles.custom = {}
+        // }
 
         var fontSizeOption = $('<li><div>Font Size: </div></li>');
         var fontWeightOption = $('<li><div>Font Weight: </div></li>');
@@ -223,7 +233,8 @@ var WidgetContainer = function(){
         fontSizeSetButton.click(function(){
             var value = fontSizeInput.val();
             if (!isNaN(parseInt(value))){
-                widget.properties.styles.custom['font-size'] = value + 'px';
+                customStyles['font-size'] = value + 'px';
+                // widget.properties.styles.custom['font-size'] = value + 'px';
                 refreshContainerDisplay(false, container, currentZoom);
 
             }
@@ -233,7 +244,8 @@ var WidgetContainer = function(){
         fontWeightSetButton.click(function(){
             var value = fontWeightInput.val();
             if (!isNaN(parseInt(value))){
-                widget.properties.styles.custom['font-weight'] = value;
+                customStyles['font-weight'] = value;
+                // widget.properties.styles.custom['font-weight'] = value;
                 refreshContainerDisplay(false, container, currentZoom);
 
             }
@@ -241,12 +253,64 @@ var WidgetContainer = function(){
 
     };
 
-    var setUpColorOptions = function(container, widget){
-        if (!widget.properties.styles.custom){
-            widget.properties.styles.custom = {}
-        }
+    // var getPath = function(widget, path){
+    //     path = path || [];
+    //     var id = widget.parentId;
+    //     if (id){
+    //         path.push(id);
+    //         getPath(selectedProject.components[id], path);
+    //     }
+    //     return path;
+    // };
 
-        var customStyles = widget.properties.styles.custom;
+    var getPath = function(widgetId){
+        var wantedPath;
+        var getPathHelper = function(widget, path, targetId){
+            if (widget.meta){
+                path.push(widget.meta.id);
+                for (var id in widget.innerWidgets){
+                    if (id == targetId){
+                        path.push(id); // include the last id
+                        wantedPath = path;
+                    } else {
+                        getPathHelper(widget.innerWidgets[id], JSON.parse(JSON.stringify(path)), targetId);
+                    }
+                }
+            }
+        };
+        getPathHelper(selectedUserWidget, [], widgetId);
+        return wantedPath;
+    };
+
+    var createCustomPropertyPath = function(path){
+        var currPath = selectedUserWidget.properties;
+        path.forEach(function(pathVal){
+            if (!currPath.children[pathVal]){
+                currPath.children[pathVal] = {children:{}};
+            }
+            currPath = currPath.children[pathVal];
+        });
+        return currPath;
+    };
+
+
+
+    var createCustomStylesPath = function(path){
+        var changes = createCustomPropertyPath(path);
+        if (!changes.styles) {
+            changes.styles = {};
+        }
+        if (!changes.styles.custom){
+            changes.styles.custom = {};
+        }
+        return changes.styles.custom;
+    }
+
+    var setUpColorOptions = function(container, widget){
+
+        var customStyles = createCustomStylesPath(getPath(widget.meta.id));
+
+
         var textColorOption = $('<li><div>Text Color: </div></li>');
         var bgColorOption = $('<li><div>Background Color: </div></li>');
         var textColorInput = $('<input class="color-input">');
@@ -261,7 +325,8 @@ var WidgetContainer = function(){
         textColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerText.toHEXString();
-            widget.properties.styles.custom['color'] = color;
+            customStyles['color'] = color;
+            // widget.properties.styles.custom['color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
         });
 
@@ -271,7 +336,8 @@ var WidgetContainer = function(){
         bgColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerBG.toHEXString();
-            widget.properties.styles.custom['background-color'] = color;
+            customStyles['background-color'] = color;
+            // widget.properties.styles.custom['background-color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
         });
 
@@ -319,13 +385,14 @@ var WidgetContainer = function(){
         container.find('.inner-component-style-dropdown').append(configOptions);
     };
 
-    that.setUpContainer = function(container, dragHandle, widget){
+    that.setUpContainer = function(container, dragHandle, widget, associated){
         var type = dragHandle.data('type');
         container.append(dragHandle);
-        showConfigOptions(type, container);
-        setUpColorOptions(container, widget);
-        setUpTextOptions(container, widget);
-
+        if (associated){
+            showConfigOptions(type, container);
+            setUpColorOptions(container, widget);
+            setUpTextOptions(container, widget);
+        }
     };
 
 

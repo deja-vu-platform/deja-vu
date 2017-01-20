@@ -99,7 +99,7 @@ var DragAndDropController = function () {
                         // How to have two copies of the same widget in the same place?
                         widget = UserWidget.fromString(JSON.stringify(selectedProject.components[id]));
 
-                        widget.meta.parentId = widget.meta.id;
+                        widget.meta.templateId = widget.meta.id;
                         widget = createUserWidgetCopy(widget);
 
                         dragHandle.data('componentid', widget.meta.id);
@@ -108,9 +108,10 @@ var DragAndDropController = function () {
                     } else {
                         widget = BaseWidget(type, {}, view.getDimensions(type));
                     }
+                    widget.parentId = selectedUserWidget.meta.id;
                     draggingWidget = widget;
                     widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, true,
-                        dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom);
+                        dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom, false);
 
                     $('#basic-components').html(basicWidgets);
                     registerDraggable();

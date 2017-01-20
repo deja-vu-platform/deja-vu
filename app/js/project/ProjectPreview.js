@@ -42,7 +42,7 @@ function loadTablePreview(widgetToShow) {
 
         var widgetContainer = $('<div></div>');
         if (innerWidget.type == 'user'){
-            widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(innerWidget, widgetToShow, false, dragHandle, null, currentZoom, widgetToShow.properties.custom);
+            widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(innerWidget, widgetToShow, false, dragHandle, null, currentZoom, widgetToShow.properties.styles.custom, true);
         }
 
         widgetContainer.addClass('component-container');
