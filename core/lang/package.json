@@ -17,7 +17,8 @@
   "typings": "./lib/lang",
   "main": "./lib/lang",
   "dependencies": {
-    "ohm-js": "^0.12.3"
+    "ohm-js": "^0.12.3",
+    "underscore": "^1.8.3"
   },
   "files": [
     "lib"
