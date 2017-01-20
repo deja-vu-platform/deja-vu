@@ -3,10 +3,10 @@ Cliche {
    * Capitalized ("syntactic") rules implicitly skip whitespace characters
    * Lowercase ("lexical") rules don't
    **/
-  ClicheDecl = cliche name UsesDecl* "{" Paragraph* "}"
+  ClicheDecl = cliche name ClicheUsesDecl? "{" Paragraph* "}"
 
   RouteDecl = route "\""name"\""
-  UsesDecl = uses name AsDecl* ("," name AsDecl*)*
+  ClicheUsesDecl = uses usedClicheName AsDecl* ("," usedClicheName AsDecl*)*
   AsDecl = as name
 
   Paragraph = DataDecl | WidgetDecl
@@ -22,6 +22,7 @@ Cliche {
   BondDecl = "=" name (("+" | "|") name)*
 
   name = alnum* (("/" | "." | "_") alnum*)*
+  usedClicheName = alnum* "/" alnum*
   comment = singleLineComment | multiLineComment
   singleLineComment = "//" (~eol any)*
   eol = "\r"?"\n"
