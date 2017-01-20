@@ -15,8 +15,9 @@ Cliche {
 
   DataDecl = data name ("," name)* "{" FieldBody* "}" BondDecl*
 
-  WidgetDecl = main? widget name ("," name)* RouteDecl* WidgetUsesDecl* "{" FieldBody* "}"
-  WidgetUsesDecl = uses usedWidgetName AsDecl? RouteDecl? ("," usedWidgetName AsDecl* RouteDecl*)*
+  WidgetDecl = main? widget name RouteDecl? WidgetUsesDecl? "{" FieldBody* "}"
+  WidgetUsesDecl = uses UsedWidgetDecl ("," UsedWidgetDecl)*
+  UsedWidgetDecl = usedWidgetName AsDecl? RouteDecl?
 
   FieldBody = FieldDecl ("," FieldDecl)*
   FieldDecl = name ":" name BondDecl*

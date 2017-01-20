@@ -12,14 +12,46 @@ const semantics = grammar.createSemantics()
   })
   .addOperation("wcomp", {
   })
-  .addOperation("routeInfo", {
+  .addOperation("widgets", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
+      .filter(para.widgets(), w => !_u.isEmpty(w)),
+    Paragraph_widget: decl => decl.widgets(),
+    Paragraph_data: decl => [],
+    WidgetDecl: (m, w, n1, route_decl, wUses, k1, fields, k2) => {
+      const ret:{name?: string, path?: string, children?: any[]} = {};
+      ret.name = n1.sourceString;
+      const path = route_decl.widgets();
+      if (!_u.isEmpty(path)) ret.path = path[0];
+      const children = _u.chain(wUses.widgets())
+        .flatten().filter(c => !_u.isEmpty(c)).value();
+      if (!_u.isEmpty(children)) ret.children = children;
+      return ret;
+    },
+    WidgetUsesDecl: (u, used_widget, comma, used_widgets) => []
+      .concat(_u.filter([used_widget.widgets()], c => !_u.isEmpty(c)))
+      .concat(_u
+        .chain(used_widgets.widgets()).flatten()
+        .filter(c => !_u.isEmpty(c))
+        .value()),
+    UsedWidgetDecl: (used_widget_name, as_decl, route_decl) => {
+      const ret:{name?: string, path?: string} = {};
+      const name = used_widget_name.widgets();
+      const path = route_decl.widgets();
+      if (name) ret.name = name;
+      if (!_u.isEmpty(path)) ret.path = path[0];
+      return ret;
+    },
+    usedWidgetName: (cliche, dot, name) => {
+      return (!cliche.sourceString) ? name.sourceString : "";
+    },
+    RouteDecl: (route, quote1, name, quote2) => name.sourceString
   })
   .addOperation("main", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
       .find(para.main(), m => m),
     Paragraph_widget: decl => decl.main(),
     Paragraph_data: decl => "",
-    WidgetDecl: (m, w, n1, comma, n2, routes, wUses, k1, fields, k2) => m.
+    WidgetDecl: (m, w, n1, route, wUses, k1, fields, k2) => m.
       sourceString ? n1.sourceString : ""
   })
   .addOperation("usedCliches", {
@@ -94,11 +126,11 @@ const semantics = grammar.createSemantics()
     },
     Paragraph_widget: decl => decl.usedWidgets(),
     Paragraph_data: decl => [],
-    WidgetDecl: (m, w, n1, comma, n2, routes, wUses, k1, fields, k2) => wUses
-      .usedWidgets(),
-    WidgetUsesDecl: (u, name1, asDecl1, routes1, comma, name2, asDecl2,
-                     routes2) => []
-      .concat(name1.usedWidgets()).concat(name2.usedWidgets()),
+    WidgetDecl: (m, w, n1, route, wUses, k1, fields, k2) => wUses.usedWidgets(),
+    WidgetUsesDecl: (u, used_widget1, comma, used_widgets) => []
+      .concat(used_widget1.usedWidgets())
+      .concat(used_widgets.usedWidgets()),
+    UsedWidgetDecl: (name, as_decl, route) => name.usedWidgets(),
     usedWidgetName: (cliche, dot, name) => ({
       name: name.sourceString, cliche: cliche.sourceString.slice(0, -1)
     })
@@ -125,5 +157,7 @@ function debug_match(fp) {
     console.log("Used Widgets");
     console.log(JSON.stringify(semantics(r).usedWidgets()));
     console.log(`Main widget is ${semantics(r).main()}`);
+    console.log("Widgets");
+    console.log(JSON.stringify(semantics(r).widgets()));
   }
 }
