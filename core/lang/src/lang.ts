@@ -14,6 +14,14 @@ const semantics = grammar.createSemantics()
   })
   .addOperation("routeInfo", {
   })
+  .addOperation("main", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
+      .find(para.main(), m => m),
+    Paragraph_widget: decl => decl.main(),
+    Paragraph_data: decl => "",
+    WidgetDecl: (m, w, n1, comma, n2, routes, wUses, k1, fields, k2) => m.
+      sourceString ? n1.sourceString : ""
+  })
   .addOperation("usedCliches", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => {
       const ret = {};
@@ -116,5 +124,6 @@ function debug_match(fp) {
     console.log(JSON.stringify(semantics(r).usedClicheMap()));
     console.log("Used Widgets");
     console.log(JSON.stringify(semantics(r).usedWidgets()));
+    console.log(`Main widget is ${semantics(r).main()}`);
   }
 }
