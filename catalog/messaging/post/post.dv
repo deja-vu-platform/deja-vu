@@ -8,7 +8,15 @@ cliche Post {
     username: Text
   }
   
-  widget Post, EditContent, NewPostButton {
+  widget Post {
+    post: Post
+  }
+
+  widget EditContent {
+    post: Post
+  }
+
+  widget NewPostButton {
     post: Post
   }
   

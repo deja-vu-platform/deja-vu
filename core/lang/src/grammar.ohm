@@ -13,17 +13,20 @@ Cliche {
     = DataDecl -- data
     | WidgetDecl -- widget
 
-  DataDecl = data name ("," name)* "{" FieldBody* "}" BondDecl*
+  DataDecl = data name "{" FieldBody* "}" DataBondDecl?
 
   WidgetDecl = main? widget name RouteDecl? WidgetUsesDecl? "{" FieldBody* "}"
   WidgetUsesDecl = uses UsedWidgetDecl ("," UsedWidgetDecl)*
   UsedWidgetDecl = usedWidgetName AsDecl? RouteDecl?
 
   FieldBody = FieldDecl ("," FieldDecl)*
-  FieldDecl = name ":" name BondDecl*
+  FieldDecl = name ":" name FieldBondDecl*
 
-  BondDecl = "=" name (("+" | "|") name)*
+  DataBondDecl = "=" DataBond ("|" DataBond)*
+  DataBond = dataBondName ("+" dataBondName)*
+  FieldBondDecl = "=" name (("+" | "|") name)*
 
+  dataBondName = (alnum* ".")? alnum*
   name = alnum* (("/" | "." | "_") alnum*)*
   usedClicheName = alnum* "/" alnum*
   usedWidgetName = (alnum* ".")? alnum*

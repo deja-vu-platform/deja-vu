@@ -8,7 +8,27 @@ import * as _u from "underscore";
 const grammar_path = path.join(__dirname, "grammar.ohm");
 const grammar = ohm.grammar(fs.readFileSync(grammar_path, "utf-8"));
 const semantics = grammar.createSemantics()
-  .addOperation("comp", {
+  .addOperation("tbonds", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
+      .filter(para.tbonds(), tbond => !_u.isEmpty(tbond))[0],
+    Paragraph_widget: decl => [],
+    Paragraph_data: decl => decl.tbonds(),
+    DataDecl: (data, name, key1, fields, key2, bond) => {
+      const subtype = name.sourceString;
+      return _u.map(bond.tbonds(), tbond => ({
+        subtype: subtype, types: _u.flatten(bond.tbonds())
+      }));
+    },
+    DataBondDecl: (eq, data_bond, bar, data_bonds) => {
+      return [data_bond.tbonds(), data_bond.tbonds()];
+    },
+    DataBond: (data_bond_name, plus, data_bond_names) => {
+      return [].concat(data_bond_name.tbonds())
+        .concat(data_bond_names.tbonds());
+    },
+    dataBondName: (cliche, dot, name) => {
+      return {name: name.sourceString, cliche: cliche.sourceString};
+    }
   })
   .addOperation("wcomp", {
   })
@@ -159,5 +179,7 @@ function debug_match(fp) {
     console.log(`Main widget is ${semantics(r).main()}`);
     console.log("Widgets");
     console.log(JSON.stringify(semantics(r).widgets()));
+    console.log("tbonds");
+    console.log(JSON.stringify(semantics(r).tbonds()));
   }
 }
