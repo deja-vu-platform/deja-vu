@@ -1,11 +1,13 @@
 cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
   data WeeklyGroupMeeting {
-    meetings: GroupMeeting = resources + meetings,
-    guests: Member = WeeklyEvent.guests + consumers
+    meetings: GroupMeeting = Allocator.Allocation.resources +
+      Event.WeeklyEvent.meetings,
+    guests: Member = Event.WeeklyEvent.guests +
+      Allocator.Allocation.consumers
   } = Allocation + WeeklyEvent
 
   data GroupMeeting {
-    champion: Member = description + consumed_by
+    champion: Member = Event.Event.description + Allocator.Resource.consumed_by
   } = Event + Resource
 
   data Member {
@@ -18,19 +20,14 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
   // from a dropdown and display a weekly group meeting
   main widget Home
     route "home"
-    uses NewWeeklyEvent, WeeklyEvent {
-    group_meeting_widget: ShowGroupMeeting = event_widget
+    uses Event.NewWeeklyEvent, Event.WeeklyEvent {
+    group_meeting_widget: ShowGroupMeeting = Event.WeeklyEvent.event_widget
   }
 
   // Shows the date of the event, the name of the champion, and a button to
   // send an email to the group with information regarding the event
-  widget ShowGroupMeeting uses ShowEvent, ShowResource {
-    group_meeting: GroupMeeting = event + resource
+  widget ShowGroupMeeting uses Event.ShowEvent, Event.ShowResource {
+    group_meeting: GroupMeeting = Event.ShowEvent.event +
+      Allocation.ShowResoure.resource
   }
-
-  /* this one should happen automatically
-  widget-bond {
-    ShowWeeklyEvent.event, ShowGroupMeeting.group_meeting
-  }
-  */
 }

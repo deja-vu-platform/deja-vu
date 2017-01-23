@@ -5,7 +5,7 @@ Cliche {
    **/
   ClicheDecl = cliche name ClicheUsesDecl? "{" Paragraph* "}"
 
-  RouteDecl = route "\""name"\""
+  RouteDecl = route "\""routeName"\""
   ClicheUsesDecl = uses usedClicheName AsDecl* ("," usedClicheName AsDecl*)*
   AsDecl = as name
 
@@ -13,21 +13,24 @@ Cliche {
     = DataDecl -- data
     | WidgetDecl -- widget
 
-  DataDecl = data name "{" FieldBody* "}" DataBondDecl?
+  DataDecl = data name "{" FieldBody? "}" DataBondDecl?
 
-  WidgetDecl = main? widget name RouteDecl? WidgetUsesDecl? "{" FieldBody* "}"
+  WidgetDecl = main? widget name RouteDecl? WidgetUsesDecl? "{" FieldBody? "}"
   WidgetUsesDecl = uses UsedWidgetDecl ("," UsedWidgetDecl)*
   UsedWidgetDecl = usedWidgetName AsDecl? RouteDecl?
 
   FieldBody = FieldDecl ("," FieldDecl)*
-  FieldDecl = name ":" name FieldBondDecl*
+  FieldDecl = name ":" name FieldBondDecl?
 
   DataBondDecl = "=" DataBond ("|" DataBond)*
   DataBond = dataBondName ("+" dataBondName)*
-  FieldBondDecl = "=" name (("+" | "|") name)*
+  FieldBondDecl = "=" FieldBond ("|" FieldBond)*
+  FieldBond = fieldBondName ("+" fieldBondName)*
 
+  fieldBondName = (alnum* ".")? (alnum* ".")? ("_" | alnum)*
   dataBondName = (alnum* ".")? alnum*
-  name = alnum* (("/" | "." | "_") alnum*)*
+  name = ("_" | alnum)*
+  routeName = ("/" | alnum)*
   usedClicheName = alnum* "/" alnum*
   usedWidgetName = (alnum* ".")? alnum*
   comment = singleLineComment | multiLineComment

@@ -30,6 +30,43 @@ const semantics = grammar.createSemantics()
       return {name: name.sourceString, cliche: cliche.sourceString};
     }
   })
+  .addOperation("fbonds", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
+      .filter(para.fbonds(), fbond => !_u.isEmpty(fbond))[0],
+    Paragraph_widget: decl => [],
+    Paragraph_data: decl => decl.fbonds(),
+    DataDecl: (data, name, key1, fields, key2, bond) => fields.fbonds(),
+    FieldBody: (field_decl, comma, field_decls) => {
+      return [].concat(field_decl.fbonds())
+        .concat(field_decls.fbonds());
+    },
+    FieldDecl: (name, colon, t, field_bond_decl) => {
+      const subfield = name.sourceString;
+      return _u
+        .chain(field_bond_decl.fbonds())
+        .filter(fbond => !_u.isEmpty(fbond))
+        .map(fbond => {
+          return {
+            subfield: subfield, fields: _u.flatten(fbond)
+          };
+        });
+    },
+    FieldBondDecl: (eq, field_bond, bar, field_bonds) => {
+      return [field_bond.fbonds(), field_bonds.fbonds()];
+    },
+    FieldBond: (field_bond_name, plus, field_bond_names) => {
+      return [].concat(field_bond_name.fbonds())
+        .concat(field_bond_names.fbonds());
+    },
+    fieldBondName: (cliche, dot1, t, dot2, name) => {
+      return {
+        name: name.sourceString, "type": {
+          name: t.sourceString,
+          cliche: cliche.sourceString
+        }
+      };
+    }
+  })
   .addOperation("wcomp", {
   })
   .addOperation("widgets", {
@@ -181,5 +218,7 @@ function debug_match(fp) {
     console.log(JSON.stringify(semantics(r).widgets()));
     console.log("tbonds");
     console.log(JSON.stringify(semantics(r).tbonds()));
+    console.log("fbonds");
+    console.log(JSON.stringify(semantics(r).fbonds()));
   }
 }
