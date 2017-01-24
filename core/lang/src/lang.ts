@@ -72,7 +72,19 @@ const semantics = grammar.createSemantics()
       };
     }
   })
-  .addOperation("wcomp", {
+  .addOperation("wbonds", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+      return _u
+        .chain(para.wbonds())
+        .flatten()
+        .reject(_u.isEmpty)
+        .value();
+    },
+    Paragraph_widget: decl => decl.wbonds(),
+    Paragraph_data: decl => [],
+    WidgetDecl: (m, w, n1, route_decl, wU, k1, fields, k2) => {
+      return _u.flatten(fields.fbonds());
+    }
   })
   .addOperation("widgets", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
@@ -212,18 +224,20 @@ function debug_match(fp) {
     console.log(r.message);
     // console.log(grammar.trace(dv).toString());
   } else {
-    console.log("Used Cliches");
+    console.log("//////////Used Cliches//////////");
     console.log(semantics(r).usedCliches());
-    console.log("Used Cliche Map");
-    console.log(JSON.stringify(semantics(r).usedClicheMap()));
-    console.log("Used Widgets");
-    console.log(JSON.stringify(semantics(r).usedWidgets()));
-    console.log(`Main widget is ${semantics(r).main()}`);
-    console.log("Widgets");
-    console.log(JSON.stringify(semantics(r).widgets()));
-    console.log("tbonds");
-    console.log(JSON.stringify(semantics(r).tbonds()));
-    console.log("fbonds");
-    console.log(JSON.stringify(semantics(r).fbonds()));
+    console.log("//////////Used Cliche Map//////////");
+    console.log(JSON.stringify(semantics(r).usedClicheMap(), null, 2));
+    console.log("//////////Used Widgets//////////");
+    console.log(JSON.stringify(semantics(r).usedWidgets(), null, 2));
+    console.log(`//////////Main widget is ${semantics(r).main()}//////////`);
+    console.log("//////////Widgets//////////");
+    console.log(JSON.stringify(semantics(r).widgets(), null, 2));
+    console.log("//////////tbonds//////////");
+    console.log(JSON.stringify(semantics(r).tbonds(), null, 2));
+    console.log("//////////fbonds//////////");
+    console.log(JSON.stringify(semantics(r).fbonds(), null, 2));
+    console.log("//////////wbonds//////////");
+    console.log(JSON.stringify(semantics(r).wbonds(), null, 2));
   }
 }
