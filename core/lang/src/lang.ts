@@ -70,6 +70,7 @@ const semantics = grammar.createSemantics()
         fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
         name: cliche_name
       };
+      this.ft_map = build_uses_ft_map(uses);
       return _u
         .chain(para.fbonds())
         .flatten()
@@ -98,6 +99,9 @@ const semantics = grammar.createSemantics()
             subfield: {
               name: subfield, "of": {
                 name: this.of_name, fqelement: mapped_cliche.fqelement
+              },
+              "type": {
+                name: t.sourceString, fqelement: mapped_cliche.fqelement
               }
             },
             fields: fbond
@@ -118,9 +122,29 @@ const semantics = grammar.createSemantics()
       if (!mapped_cliche) {
         throw new Error(`Can't find cliche ${cliche_name}`);
       }
+      let ft_key = mapped_cliche.fqelement;
+      if (ft_key.split("-").length === 4) ft_key = ft_key.slice(0, -2);
+      let ft_name = this.ft_map[ft_key][t.sourceString];
+      if (!ft_name) {
+        throw new Error(
+          `Can't find type ${t.sourceString} of ${cliche_name}` +
+          ` used in ${cliche_name}.${t.sourceString}.${name.sourceString}`
+        );
+      }
+      ft_name = ft_name[name.sourceString];
+      if (!ft_name) {
+        throw new Error(
+          `Can't find field ${name.sourceString} of ${t.sourceString} on ` +
+          `cliche ${cliche_name}`);
+      }
+
       return {
         name: name.sourceString, "of": {
           name: t.sourceString,
+          fqelement: mapped_cliche.fqelement
+        },
+        "type": {
+          name: ft_name,
           fqelement: mapped_cliche.fqelement
         }
       };
@@ -208,6 +232,55 @@ const semantics = grammar.createSemantics()
       return `dv-${category.sourceString}-${name.sourceString.toLowerCase()}`;
     }
   })
+  // A map of cliche -> of -> field name -> type name
+  .addOperation("usesFieldTypesMap", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+      return build_uses_ft_map(uses);
+    }
+  })
+  // A map of of -> field name -> type name
+  .addOperation("fieldTypesMap", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+      const ftmap = para.fieldTypesMap();
+      return _u
+        .reduce(ftmap, (memo, ft) => {
+          if (memo[ft.of] !== undefined) {
+            throw new Error("Duplicate type " + ft.of);
+          }
+          memo[ft.of] = _u
+            .reduce(ft.fields, (memo, ft) => {
+              if (memo[ft.name] !== undefined) {
+                throw new Error("Duplicate field " + ft.name);
+              }
+              memo[ft.name] = ft.t;
+              return memo;
+            }, {});
+          return memo;
+        }, {});
+    },
+    Paragraph_widget: decl => decl.fieldTypesMap(),
+    Paragraph_data: decl => decl.fieldTypesMap(),
+    DataDecl: (data, name, key1, fields, key2, bond) => {
+      return {
+        "of": name.sourceString,
+        fields: _u.flatten(fields.fieldTypesMap())
+      };
+    },
+    WidgetDecl: (m, w, name, route_decl, wU, k1, fields, k2) => {
+      return {
+        "of": name.sourceString,
+        fields: _u.flatten(fields.fieldTypesMap())
+      };
+    },
+    FieldBody: (field_decl, comma, field_decls) => {
+      return [].concat(field_decl.fieldTypesMap())
+        .concat(_u.flatten(field_decls.fieldTypesMap()));
+    },
+    FieldDecl: (name, colon, t, field_bond_decl) => {
+      return {name: name.sourceString, t: t.sourceString};
+    }
+  })
+  // A map of alias -> {alias, fqelement, type name}
   .addOperation("clicheMap", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => {
       const cliche_name = name.sourceString;
@@ -307,6 +380,31 @@ debug_match("../../samples/morg/morg.dv");
 debug_match("../../samples/bookmark/bookmark.dv");
 
 
+function build_uses_ft_map(uses) {
+  function get_fp(cliche) {
+    const cliche_split = cliche.split("-");
+    const category = cliche_split[1];
+    const name = cliche_split[2];
+    return `../../catalog/${category}/${name}/${name}.dv`;
+  }
+  function get_ftmap(cliche) {
+    const dv = fs.readFileSync(get_fp(cliche), "utf-8");
+    const r = grammar.match(dv);
+    if (r.failed()) {
+      throw new Error("Failed to parse " + cliche + " " + r.message);
+    }
+    return semantics(r).fieldTypesMap();
+  }
+
+  const used_cliches = _u.uniq(_u.flatten(uses.usedCliches()));
+  return _u
+    .reduce(used_cliches, (memo, c) => {
+      memo[c] = get_ftmap(c);
+      return memo;
+    }, {});
+}
+
+
 function debug_match(fp) {
   const dv = fs.readFileSync(fp, "utf-8");
   // console.log(dv);
@@ -320,6 +418,10 @@ function debug_match(fp) {
     console.log(semantics(r).usedCliches());
     console.log("//////////Cliche Map//////////");
     console.log(JSON.stringify(semantics(r).clicheMap(), null, 2));
+    console.log("//////////Field Types Map//////////");
+    console.log(JSON.stringify(semantics(r).fieldTypesMap(), null, 2));
+    console.log("//////////Uses Field Types Map//////////");
+    console.log(JSON.stringify(semantics(r).usesFieldTypesMap(), null, 2));
     console.log("//////////Used Widgets//////////");
     console.log(JSON.stringify(semantics(r).usedWidgets(), null, 2));
     console.log(`//////////Main widget is ${semantics(r).main()}//////////`);

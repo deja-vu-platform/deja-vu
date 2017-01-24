@@ -1,10 +1,14 @@
-cliche Follow
+cliche Follow {
+  data Source {
+    name: Text,
+    follows: Target
+  }
+  
+  data Target {
+    name: Text
+  }
 
-data Source {
-  name: Text (one),
-  follows: set Target
-}
-
-data Target {
-  name: Text (one)
+  widget EditFollow {
+    source: Source
+  }
 }

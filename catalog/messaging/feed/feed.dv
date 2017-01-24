@@ -1,17 +1,24 @@
-cliche Feed
+cliche Feed {
+  data Publisher {
+    name: Text,
+    published: Message
+  }
 
-data Publisher {
-  name: Text (one),
-  published: set Message
-}
+  data Subscriber {
+    name: Text,
+    subscriptions: Publisher
+  }
 
-data Subscriber {
-  name: Text (one),
-  subscriptions: set Publisher
-}
+  data Content {}
 
-data Content {}
+  data Message {
+    content: Content
+  }
 
-data Message {
-  content: Content
+  widget ShowFeed {
+    subscriber: Subscriber,
+    feed_item_widget: ShowFeedItem
+  }
+
+  widget ShowFeedItem {}
 }

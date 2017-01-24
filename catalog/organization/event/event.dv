@@ -1,7 +1,8 @@
 cliche Event {
   data Event {
     start_date: Datetime,
-    end_date: Datetime
+    end_date: Datetime,
+    description: Description
   }
 
   data WeeklyEvent {
@@ -10,7 +11,8 @@ cliche Event {
     ends_on: Date,  // the date of the last occurrence of the weekly event
     start_time: Time,
     end_time: Time,
-    description: Description
+    description: Description,
+    guests: Guest
   }
 
   data Description {}

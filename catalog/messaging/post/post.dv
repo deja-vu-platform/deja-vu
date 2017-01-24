@@ -5,10 +5,11 @@ cliche Post {
   }
   
   data User {
-    username: Text
+    username: Text,
+    posts: Post
   }
   
-  widget Post {
+  widget ShowPost {
     post: Post
   }
 
@@ -17,14 +18,20 @@ cliche Post {
   }
 
   widget NewPostButton {
-    post: Post
+    post: Post,
+    submit_ok: Boolean
+  }
+
+  widget NewPostContent {
+    post: Post,
+    submit_ok: Boolean
   }
   
-  widget User {
+  widget ShowUser {
     user: User
   }
   
-  widget Posts {
+  widget ShowPosts {
     author: User
   }
   

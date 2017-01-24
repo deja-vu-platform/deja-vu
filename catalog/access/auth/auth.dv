@@ -1,7 +1,18 @@
-cliche Auth
-
-data User {
-  username: Text (one)
+cliche Auth {
+  data User {
+    username: Text
+  }
+  
+  widget RegisterWithRedirect {
+    register_ok_redirect: Widget
+  }
+  widget SignInWithRedirect {
+    signin_ok_redirect: Widget
+  }
+  widget SignOutWithRedirect {
+    signout_ok_redirect: Widget
+  }
+  widget LoggedIn {
+    user: User
+  }
 }
-
-data LoggedInUser extends User {}

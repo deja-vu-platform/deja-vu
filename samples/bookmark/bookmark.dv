@@ -55,7 +55,7 @@ cliche Bookmark uses
   }
 
   widget Home uses Auth.LoggedIn, CreatePost, Feed.ShowFeed {
-    user: User = Auth.LoggedIn.user + CreatePost.author + Feed.ShowFeed.user,
+    user: User = Auth.LoggedIn.user + CreatePost.author + Feed.ShowFeed.subscriber,
     feed_item_widget: FeedItem = Feed.ShowFeed.feed_item_widget
   }
 
@@ -65,7 +65,6 @@ cliche Bookmark uses
     MessagingPost.NewPostButton {
     post: Post = MessagingPost.NewPostContent.post + Label.LabelsText.item +
       MessagingPost.NewPostButton.post,
-    author: User = MessagingPost.NewPostButton.author,
     submit_ok: Boolean = MessagingPost.NewPostContent.submit_ok +
       Label.LabelsText.submit_ok + MessagingPost.NewPostButton.submit_ok
   }

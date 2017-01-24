@@ -1,20 +1,19 @@
-cliche Label
+cliche Label {
+  data Item {
+    name: Text,
+    labels: Label
+  }
+  
+  data Label {
+    name: Text
+  }
 
-data Item {
-  name: Text (one),
-  labels: set Label
+  data LabelsText {
+    item: Item,
+    submit_ok: Boolean
+  }
+
+  widget AttachLabels {
+    item: Item
+  }
 }
-
-data Label {
-  name: Text
-}
-
-widget AttachLabels {
-  item: Item
-}
-
-widget Label {
-  label: Label
-}
-
-attach Label to Label
