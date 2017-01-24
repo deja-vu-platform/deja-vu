@@ -18,28 +18,35 @@ const semantics = grammar.createSemantics()
         name: cliche_name
       };
       return _u
-        .chain(para.tbonds()).reject(_u.isEmpty).value()[0];
+        .chain(para.tbonds())
+        .flatten()
+        .reject(_u.isEmpty)
+        .value();
     },
     Paragraph_widget: decl => [],
     Paragraph_data: decl => decl.tbonds(),
     DataDecl: (data, name, key1, fields, key2, bond) => {
       const subtype = name.sourceString;
       const mapped_cliche = this.cliche_map["this"];
-      return _u.map(bond.tbonds(), tbond => ({
-        subtype: {
-          name: subtype, "of": {
-            name: this.of_name, fqelement: mapped_cliche.fqelement
-          }
-        },
-        types: _u.flatten(bond.tbonds())
-      }));
+      return _u
+        .chain(bond.tbonds())
+        .reject(_u.isEmpty)
+        .map(tbond => ({
+          subtype: {
+            name: subtype, "of": {
+              name: this.of_name, fqelement: mapped_cliche.fqelement
+            }
+          },
+          types: tbond
+        }))
+        .value();
     },
     DataBondDecl: (eq, data_bond, bar, data_bonds) => {
-      return [data_bond.tbonds(), data_bond.tbonds()];
+      return [data_bond.tbonds(), data_bonds.tbonds()];
     },
     DataBond: (data_bond_name, plus, data_bond_names) => {
       return [].concat(data_bond_name.tbonds())
-        .concat(data_bond_names.tbonds());
+        .concat(_u.flatten(data_bond_names.tbonds()));
     },
     dataBondName_other: (cliche, dot, name) => {
       const cliche_name = cliche.sourceString;
