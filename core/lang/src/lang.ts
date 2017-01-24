@@ -10,7 +10,13 @@ const grammar = ohm.grammar(fs.readFileSync(grammar_path, "utf-8"));
 const semantics = grammar.createSemantics()
   .addOperation("tbonds", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-      this.cliche_map = uses.usedClicheMap()[0];
+      const cliche_name = name.sourceString;
+      this.cliche_map = uses.clicheMap()[0];
+      if (this.cliche_map === undefined) this.cliche_map = {};
+      this.cliche_map["this"] = {
+        fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
+        name: cliche_name
+      };
       return _u
         .chain(para.tbonds()).reject(_u.isEmpty).value()[0];
     },
@@ -18,8 +24,14 @@ const semantics = grammar.createSemantics()
     Paragraph_data: decl => decl.tbonds(),
     DataDecl: (data, name, key1, fields, key2, bond) => {
       const subtype = name.sourceString;
+      const mapped_cliche = this.cliche_map["this"];
       return _u.map(bond.tbonds(), tbond => ({
-        subtype: subtype, types: _u.flatten(bond.tbonds())
+        subtype: {
+          name: subtype, "of": {
+            name: this.of_name, fqelement: mapped_cliche.fqelement
+          }
+        },
+        types: _u.flatten(bond.tbonds())
       }));
     },
     DataBondDecl: (eq, data_bond, bar, data_bonds) => {
@@ -38,12 +50,19 @@ const semantics = grammar.createSemantics()
       return {name: name.sourceString, fqelement: mapped_cliche.fqelement};
     },
     dataBondName_this: name => {
-      return {name: name.sourceString, fqelement: "this-fqelement"};
+      const mapped_cliche = this.cliche_map["this"];
+      return {name: name.sourceString, fqelement: mapped_cliche.fqelement};
     }
   })
   .addOperation("fbonds", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-      this.cliche_map = uses.usedClicheMap()[0];
+      const cliche_name = name.sourceString;
+      this.cliche_map = uses.clicheMap()[0];
+      if (this.cliche_map === undefined) this.cliche_map = {};
+      this.cliche_map["this"] = {
+        fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
+        name: cliche_name
+      };
       return _u
         .chain(para.fbonds())
         .flatten()
@@ -52,20 +71,29 @@ const semantics = grammar.createSemantics()
     },
     Paragraph_widget: decl => [],
     Paragraph_data: decl => decl.fbonds(),
-    DataDecl: (data, name, key1, fields, key2, bond) => fields.fbonds(),
+    DataDecl: (data, name, key1, fields, key2, bond) => {
+      this.of_name = name.sourceString;
+      return fields.fbonds();
+    },
     FieldBody: (field_decl, comma, field_decls) => {
       return [].concat(field_decl.fbonds())
         .concat(_u.flatten(field_decls.fbonds()));
     },
     FieldDecl: (name, colon, t, field_bond_decl) => {
       const subfield = name.sourceString;
+      const mapped_cliche = this.cliche_map["this"];
       const field_bonds = field_bond_decl.fbonds()[0];
       return _u
         .chain(field_bonds)
         .reject(_u.isEmpty)
         .map(fbond => {
           return {
-            subfield: subfield, fields: fbond
+            subfield: {
+              name: subfield, "of": {
+                name: this.of_name, fqelement: mapped_cliche.fqelement
+              }
+            },
+            fields: fbond
           };
         })
         .value();
@@ -84,17 +112,18 @@ const semantics = grammar.createSemantics()
         throw new Error(`Can't find cliche ${cliche_name}`);
       }
       return {
-        name: name.sourceString, "type": {
+        name: name.sourceString, "of": {
           name: t.sourceString,
           fqelement: mapped_cliche.fqelement
         }
       };
     },
     fieldBondName_this: (t, dot2, name) => {
+      const mapped_cliche = this.cliche_map["this"];
       return {
-        name: name.sourceString, "type": {
+        name: name.sourceString, "of": {
           name: t.sourceString,
-          fqelement: "this-fqelement"
+          fqelement: mapped_cliche.fqelement
         }
       };
     }
@@ -172,21 +201,29 @@ const semantics = grammar.createSemantics()
       return `dv-${category.sourceString}-${name.sourceString.toLowerCase()}`;
     }
   })
-  .addOperation("usedClicheMap", {
-    ClicheDecl: (cliche, name, uses, key1, para, key2) => uses
-      .usedClicheMap()[0],
+  .addOperation("clicheMap", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+      const cliche_name = name.sourceString;
+      let ret = uses.clicheMap()[0];
+      if (ret === undefined) ret = {};
+      ret["this"] = {
+        fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
+        name: cliche_name
+      };
+      return ret;
+    },
     ClicheUsesDecl: (uses, name1, asDecl1, comma, name2, asDecl2) => {
       function get_list() {
-        const name1_used_cliche_map = name1.usedClicheMap();
+        const name1_used_cliche_map = name1.clicheMap();
         return []
           .concat({
-            alias: asDecl1.usedClicheMap()[0],
+            alias: asDecl1.clicheMap()[0],
             fqelement: name1_used_cliche_map.fqelement,
             name: name1_used_cliche_map.name
           })
           .concat(
             _u.map(
-              _u.zip(asDecl2.usedClicheMap(), name2.usedClicheMap()),
+              _u.zip(asDecl2.clicheMap(), name2.clicheMap()),
               alias_cliche => ({
                 alias: alias_cliche[0][0],
                 fqelement: alias_cliche[1].fqelement,
@@ -196,6 +233,7 @@ const semantics = grammar.createSemantics()
           );
       }
       const ret = {};
+
       _u.flatten(get_list()).forEach(c => {
         ret[c.alias ? c.alias : c.name] = c;
       });
@@ -212,7 +250,7 @@ const semantics = grammar.createSemantics()
   })
   .addOperation("usedWidgets", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-      const cliche_map = uses.usedClicheMap()[0];
+      const cliche_map = uses.clicheMap()[0];
       return _u.chain(para.usedWidgets()).flatten()
          // Ignore widgets that are of the current cliche
         .filter(w => cliche_map[w.cliche])
@@ -253,8 +291,8 @@ function debug_match(fp) {
   } else {
     console.log("//////////Used Cliches//////////");
     console.log(semantics(r).usedCliches());
-    console.log("//////////Used Cliche Map//////////");
-    console.log(JSON.stringify(semantics(r).usedClicheMap(), null, 2));
+    console.log("//////////Cliche Map//////////");
+    console.log(JSON.stringify(semantics(r).clicheMap(), null, 2));
     console.log("//////////Used Widgets//////////");
     console.log(JSON.stringify(semantics(r).usedWidgets(), null, 2));
     console.log(`//////////Main widget is ${semantics(r).main()}//////////`);
