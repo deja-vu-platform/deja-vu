@@ -10,7 +10,7 @@ const grammar = ohm.grammar(fs.readFileSync(grammar_path, "utf-8"));
 const semantics = grammar.createSemantics()
   .addOperation("tbonds", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
-      .filter(para.tbonds(), tbond => !_u.isEmpty(tbond))[0],
+      .chain(para.tbonds()).reject(_u.isEmpty).value()[0],
     Paragraph_widget: decl => [],
     Paragraph_data: decl => decl.tbonds(),
     DataDecl: (data, name, key1, fields, key2, bond) => {
@@ -32,27 +32,32 @@ const semantics = grammar.createSemantics()
   })
   .addOperation("fbonds", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
-      .filter(para.fbonds(), fbond => !_u.isEmpty(fbond))[0],
+      .chain(para.fbonds())
+      .flatten()
+      .reject(_u.isEmpty)
+      .value(),
     Paragraph_widget: decl => [],
     Paragraph_data: decl => decl.fbonds(),
     DataDecl: (data, name, key1, fields, key2, bond) => fields.fbonds(),
     FieldBody: (field_decl, comma, field_decls) => {
       return [].concat(field_decl.fbonds())
-        .concat(field_decls.fbonds());
+        .concat(_u.flatten(field_decls.fbonds()));
     },
     FieldDecl: (name, colon, t, field_bond_decl) => {
       const subfield = name.sourceString;
+      const field_bonds = field_bond_decl.fbonds()[0];
       return _u
-        .chain(field_bond_decl.fbonds())
-        .filter(fbond => !_u.isEmpty(fbond))
+        .chain(field_bonds)
+        .reject(_u.isEmpty)
         .map(fbond => {
           return {
-            subfield: subfield, fields: _u.flatten(fbond)
+            subfield: subfield, fields: fbond
           };
-        });
+        })
+        .value();
     },
     FieldBondDecl: (eq, field_bond, bar, field_bonds) => {
-      return [field_bond.fbonds(), field_bonds.fbonds()];
+      return [field_bond.fbonds(), _u.flatten(field_bonds.fbonds())];
     },
     FieldBond: (field_bond_name, plus, field_bond_names) => {
       return [].concat(field_bond_name.fbonds())

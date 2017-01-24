@@ -4,7 +4,7 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
       Event.WeeklyEvent.meetings,
     guests: Member = Event.WeeklyEvent.guests +
       Allocator.Allocation.consumers
-  } = Allocation + WeeklyEvent
+  } = Allocator.Allocation + Event.WeeklyEvent
 
   data GroupMeeting {
     champion: Member = Event.Event.description + Allocator.Resource.consumed_by

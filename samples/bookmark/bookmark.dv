@@ -17,8 +17,8 @@ cliche Bookmark uses
       FollowTopics.Source.name + Auth.username + Post.username +
       Feed.Subscriber.name + Feed.Publisher.name,
     posts: Post = Feed.Publisher.published + Post.User.posts,
-    follows: User = FollowUsers.follows + Feed.Subscriber.subscriptions |
-      FollowTopics.follows + Feed.Subscriber.subscriptions
+    follows: User = FollowUsers.Source.follows + Feed.Subscriber.subscriptions |
+      FollowTopics.Source.follows + Feed.Subscriber.subscriptions
   } = // users can follow other users
       FollowUsers.Source + FollowUsers.Target +
       // users can follow topics
@@ -35,6 +35,9 @@ cliche Bookmark uses
         FollowTopics.Target.name
   } = Label.Label + FollowTopics.Target + Feed.Publisher
 
+  /**
+   * Widgets
+   */
   // The landing page gives the user the option to sign in or register
   main widget Landing route "landing" uses
     Auth.SignInWithRedirect, Auth.RegisterWithRedirect {
@@ -42,9 +45,6 @@ cliche Bookmark uses
       Auth.SignInWithRedirect.signin_ok_redirect
   }
 
-  /**
-   * Widgets
-   */
   widget App route "app" uses
     Auth.SignOutWithRedirect,
     Home route "home",
