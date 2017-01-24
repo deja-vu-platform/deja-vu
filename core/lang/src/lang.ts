@@ -9,8 +9,11 @@ const grammar_path = path.join(__dirname, "grammar.ohm");
 const grammar = ohm.grammar(fs.readFileSync(grammar_path, "utf-8"));
 const semantics = grammar.createSemantics()
   .addOperation("tbonds", {
-    ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
-      .chain(para.tbonds()).reject(_u.isEmpty).value()[0],
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+      this.cliche_map = uses.usedClicheMap()[0];
+      return _u
+        .chain(para.tbonds()).reject(_u.isEmpty).value()[0];
+    },
     Paragraph_widget: decl => [],
     Paragraph_data: decl => decl.tbonds(),
     DataDecl: (data, name, key1, fields, key2, bond) => {
@@ -26,16 +29,27 @@ const semantics = grammar.createSemantics()
       return [].concat(data_bond_name.tbonds())
         .concat(data_bond_names.tbonds());
     },
-    dataBondName: (cliche, dot, name) => {
-      return {name: name.sourceString, cliche: cliche.sourceString};
+    dataBondName_other: (cliche, dot, name) => {
+      const cliche_name = cliche.sourceString;
+      const mapped_cliche = this.cliche_map[cliche_name];
+      if (!mapped_cliche) {
+        throw new Error(`Can't find cliche ${cliche_name}`);
+      }
+      return {name: name.sourceString, fqelement: mapped_cliche.fqelement};
+    },
+    dataBondName_this: name => {
+      return {name: name.sourceString, fqelement: "this-fqelement"};
     }
   })
   .addOperation("fbonds", {
-    ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
-      .chain(para.fbonds())
-      .flatten()
-      .reject(_u.isEmpty)
-      .value(),
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+      this.cliche_map = uses.usedClicheMap()[0];
+      return _u
+        .chain(para.fbonds())
+        .flatten()
+        .reject(_u.isEmpty)
+        .value();
+    },
     Paragraph_widget: decl => [],
     Paragraph_data: decl => decl.fbonds(),
     DataDecl: (data, name, key1, fields, key2, bond) => fields.fbonds(),
@@ -63,11 +77,24 @@ const semantics = grammar.createSemantics()
       return [].concat(field_bond_name.fbonds())
         .concat(field_bond_names.fbonds());
     },
-    fieldBondName: (cliche, dot1, t, dot2, name) => {
+    fieldBondName_other: (cliche, dot1, t, dot2, name) => {
+      const cliche_name = cliche.sourceString;
+      const mapped_cliche = this.cliche_map[cliche_name];
+      if (!mapped_cliche) {
+        throw new Error(`Can't find cliche ${cliche_name}`);
+      }
       return {
         name: name.sourceString, "type": {
           name: t.sourceString,
-          cliche: cliche.sourceString
+          fqelement: mapped_cliche.fqelement
+        }
+      };
+    },
+    fieldBondName_this: (t, dot2, name) => {
+      return {
+        name: name.sourceString, "type": {
+          name: t.sourceString,
+          fqelement: "this-fqelement"
         }
       };
     }
@@ -192,7 +219,7 @@ const semantics = grammar.createSemantics()
         .map(w => {
           const mapped_cliche = cliche_map[w.cliche];
           if (!mapped_cliche) {
-            throw new Error(`Can't find cliche ${mapped_cliche}`);
+            throw new Error(`Can't find cliche ${w.cliche}`);
           }
           return {name: w.name, fqelement: mapped_cliche.fqelement};
         })

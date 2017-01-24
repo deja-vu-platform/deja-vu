@@ -14,16 +14,17 @@ cliche Bookmark uses
   data User {
     username: Text =
       FollowUsers.Source.name + FollowUsers.Target.name +
-      FollowTopics.Source.name + Auth.username + Post.username +
+      FollowTopics.Source.name + Auth.User.username +
+      MessagingPost.User.username +
       Feed.Subscriber.name + Feed.Publisher.name,
-    posts: Post = Feed.Publisher.published + Post.User.posts,
+    posts: Post = Feed.Publisher.published + MessagingPost.User.posts,
     follows: User = FollowUsers.Source.follows + Feed.Subscriber.subscriptions |
       FollowTopics.Source.follows + Feed.Subscriber.subscriptions
   } = // users can follow other users
       FollowUsers.Source + FollowUsers.Target +
       // users can follow topics
       FollowTopics.Source +
-      Post.User + Feed.Subscriber + Feed.Publisher
+      MessagingPost.User + Feed.Subscriber + Feed.Publisher
   
   data Post {
     content: Text = MessagingPost.Post.content + Feed.Message.content,
@@ -59,14 +60,14 @@ cliche Bookmark uses
   }
 
   widget CreatePost uses
-    Post.NewPostContent,
+    MessagingPost.NewPostContent,
     Label.LabelsText,
-    Post.NewPostButton {
-    post: Post = Post.NewPostContent.post + Label.LabelsText.item +
-      Post.NewPostButton.post,
-    author: User = Post.NewPostButton.author,
-    submit_ok: Boolean = Post.NewPostContent.submit_ok +
-      Label.LabelsText.submit_ok + Post.NewPostButton.submit_ok
+    MessagingPost.NewPostButton {
+    post: Post = MessagingPost.NewPostContent.post + Label.LabelsText.item +
+      MessagingPost.NewPostButton.post,
+    author: User = MessagingPost.NewPostButton.author,
+    submit_ok: Boolean = MessagingPost.NewPostContent.submit_ok +
+      Label.LabelsText.submit_ok + MessagingPost.NewPostButton.submit_ok
   }
 
   // Shows the post, with its author, attached labels and comments. Also has

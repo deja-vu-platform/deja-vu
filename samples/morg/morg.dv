@@ -28,6 +28,6 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
   // send an email to the group with information regarding the event
   widget ShowGroupMeeting uses Event.ShowEvent, Event.ShowResource {
     group_meeting: GroupMeeting = Event.ShowEvent.event +
-      Allocation.ShowResoure.resource
+      Allocator.ShowResoure.resource
   }
 }

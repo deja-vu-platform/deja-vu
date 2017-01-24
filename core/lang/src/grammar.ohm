@@ -27,8 +27,12 @@ Cliche {
   FieldBondDecl = "=" FieldBond ("|" FieldBond)*
   FieldBond = fieldBondName ("+" fieldBondName)*
 
-  fieldBondName = (alnum* ".")? (alnum* ".")? ("_" | alnum)*
-  dataBondName = (alnum* ".")? alnum*
+  fieldBondName
+    = (alnum* "." alnum* ".") ("_" | alnum)* -- other
+    | (alnum* ".") ("_" | alnum)* -- this
+  dataBondName
+    = (alnum* ".") alnum* -- other
+    | alnum*  -- this
   name = ("_" | alnum)*
   routeName = ("/" | alnum)*
   usedClicheName = alnum* "/" alnum*
