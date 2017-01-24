@@ -234,7 +234,27 @@ const semantics = grammar.createSemantics()
       }
       const ret = {};
 
-      _u.flatten(get_list()).forEach(c => {
+      const seen_names = {};
+      const have_multiple = {};
+      const count = {};
+      const list_of_entries = get_list();
+      _u.flatten(list_of_entries).forEach(c => {
+        if (c.alias) {
+          if (seen_names[c.name]) {
+            have_multiple[c.name] = true;
+          }
+          seen_names[c.name] = true;
+        }
+      });
+      _u.flatten(list_of_entries).forEach(c => {
+        if (have_multiple[c.name]) {
+          if (count[c.name] === undefined) {
+            count[c.name] = 1;
+          } else {
+            count[c.name] = count[c.name] + 1;
+          }
+          c.fqelement = c.fqelement + "-" + count[c.name];
+        }
         ret[c.alias ? c.alias : c.name] = c;
       });
       return ret;
