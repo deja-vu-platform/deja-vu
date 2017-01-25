@@ -15,8 +15,13 @@ Cliche {
 
   DataDecl = data name "{" FieldBody? "}" DataBondDecl?
 
-  WidgetDecl = main? widget name RouteDecl? WidgetUsesDecl? "{" FieldBody? "}"
+  WidgetDecl = main? widget name RouteDecl? WidgetUsesDecl? "{"
+    FieldBody?
+  "}" ReplacesDecl?
   WidgetUsesDecl = uses UsedWidgetDecl ("," UsedWidgetDecl)*
+  ReplacesDecl = replaces replaceName "{" ReplaceMap? "}"
+  replaceName = (alnum* ".") alnum*
+  ReplaceMap = alnum* "=" alnum*
   UsedWidgetDecl = usedWidgetName AsDecl? RouteDecl?
 
   FieldBody = FieldDecl ("," FieldDecl)*
@@ -43,6 +48,7 @@ Cliche {
   multiLineComment = "/*" (~"*/" any)* "*/"
 
   uses = "uses"
+  replaces = "replaces"
   widget = "widget"
   cliche = "cliche"
   data = "data"

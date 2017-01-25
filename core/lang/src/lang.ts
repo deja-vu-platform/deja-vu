@@ -169,7 +169,7 @@ const semantics = grammar.createSemantics()
     },
     Paragraph_widget: decl => decl.wbonds(),
     Paragraph_data: decl => [],
-    WidgetDecl: (m, w, n1, route_decl, wU, k1, fields, k2) => {
+    WidgetDecl: (m, w, n1, route_decl, wU, k1, fields, k2, r) => {
       return _u.flatten(fields.fbonds());
     }
   })
@@ -178,7 +178,7 @@ const semantics = grammar.createSemantics()
       .filter(para.widgets(), w => !_u.isEmpty(w)),
     Paragraph_widget: decl => decl.widgets(),
     Paragraph_data: decl => [],
-    WidgetDecl: (m, w, n1, route_decl, wUses, k1, fields, k2) => {
+    WidgetDecl: (m, w, n1, route_decl, wUses, k1, fields, k2, r) => {
       const ret:{name?: string, path?: string, children?: any[]} = {};
       ret.name = n1.sourceString;
       const path = route_decl.widgets();
@@ -212,7 +212,7 @@ const semantics = grammar.createSemantics()
       .find(para.main(), m => m),
     Paragraph_widget: decl => decl.main(),
     Paragraph_data: decl => "",
-    WidgetDecl: (m, w, n1, route, wUses, k1, fields, k2) => m.
+    WidgetDecl: (m, w, n1, route, wUses, k1, fields, k2, r) => m.
       sourceString ? n1.sourceString : ""
   })
   .addOperation("usedCliches", {
@@ -266,7 +266,7 @@ const semantics = grammar.createSemantics()
         fields: _u.flatten(fields.fieldTypesMap())
       };
     },
-    WidgetDecl: (m, w, name, route_decl, wU, k1, fields, k2) => {
+    WidgetDecl: (m, w, name, route_decl, wU, k1, fields, k2, r) => {
       return {
         "of": name.sourceString,
         fields: _u.flatten(fields.fieldTypesMap())
@@ -365,7 +365,8 @@ const semantics = grammar.createSemantics()
     },
     Paragraph_widget: decl => decl.usedWidgets(),
     Paragraph_data: decl => [],
-    WidgetDecl: (m, w, n1, route, wUses, k1, fields, k2) => wUses.usedWidgets(),
+    WidgetDecl: (
+      m, w, n1, route, wUses, k1, fields, k2, r) => wUses.usedWidgets(),
     WidgetUsesDecl: (u, used_widget1, comma, used_widgets) => []
       .concat(used_widget1.usedWidgets())
       .concat(used_widgets.usedWidgets()),

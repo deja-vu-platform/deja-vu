@@ -54,10 +54,38 @@ cliche Bookmark uses
     sign_out_ok_redirect: Landing = Auth.SignOutWithRedirect.signout_ok_redirect
   }
 
+/* option 1
   widget Home uses Auth.LoggedIn, CreatePost, Feed.ShowFeed {
-    user: User = Auth.LoggedIn.user + CreatePost.author + Feed.ShowFeed.subscriber,
-    feed_item_widget: FeedItem = Feed.ShowFeed.feed_item_widget
+    user: User = Auth.LoggedIn.user + CreatePost.author +
+      Feed.ShowFeed.subscriber,
+    [feed_item_widget]: ShowFeedPost(post -> message) = 
+      Feed.ShowFeed.[feed_item_widget]
   }
+
+  // Shows the post, with its author, attached labels and comments. Also has
+  // a field that lets the logged in user comment on the post
+  widget ShowFeedPost uses Author, Labels, CommentsWithComment {
+    post: Post
+  }
+  */
+
+  // option 2
+  widget Home uses Auth.LoggedIn, CreatePost, Feed.ShowFeed {
+    user: User = Auth.LoggedIn.user + CreatePost.author +
+      Feed.ShowFeed.subscriber
+  }
+
+  // Shows the post, with its author, attached labels and comments. Also has
+  // a field that lets the logged in user comment on the post
+  widget ShowFeedPost uses Author, Labels, CommentsWithComment {
+    post: Post
+  } replaces Feed.ShowFeedItem { message = post }
+  // the only problem with this is that what happens if in different lists
+  // of the cliche you use you want to use different widgets => well then
+  // the cliche writer should define different widgets for each list (which
+  // gives you the oppt to do that)
+  // same thing happens with types (e.g., user vs Source and Target in
+  // follower)
 
   widget CreatePost uses
     MessagingPost.NewPostContent,
@@ -69,18 +97,11 @@ cliche Bookmark uses
       Label.LabelsText.submit_ok + MessagingPost.NewPostButton.submit_ok
   }
 
-  // Shows the post, with its author, attached labels and comments. Also has
-  // a field that lets the logged in user comment on the post
-  widget FeedItem uses Author, Labels, CommentsWithComment {
-    post: Post
-  }
-
   // Displays the list of topics and lets the logged in user follow or unfollow
   // them
   widget Topics uses Auth.LoggedIn, FollowTopics.EditFollow {
     user: User = Auth.LoggedIn.user + FollowTopics.EditFollow.source
   }
-
 
   // Displays the list of users and lets the logged in user follow or unfollow
   // them
