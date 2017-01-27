@@ -31,7 +31,7 @@ const semantics = grammar.createSemantics()
               name: this.of_name, fqelement: mapped_cliche.fqelement
             }
           },
-          types: tbond
+          types: _u.reject(tbond, _u.isEmpty)
         }))
         .value();
     },
