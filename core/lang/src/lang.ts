@@ -10,13 +10,7 @@ const grammar = ohm.grammar(fs.readFileSync(grammar_path, "utf-8"));
 const semantics = grammar.createSemantics()
   .addOperation("tbonds", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-      const cliche_name = name.sourceString;
-      this.cliche_map = uses.clicheMap()[0];
-      if (this.cliche_map === undefined) this.cliche_map = {};
-      this.cliche_map["this"] = {
-        fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
-        name: cliche_name
-      };
+      this.cliche_map = get_cliche_map(name.sourceString, uses);
       return _u
         .chain(para.tbonds())
         .flatten()
@@ -378,6 +372,7 @@ const semantics = grammar.createSemantics()
   // widget that is replaced -> replacement -> w field -> replacement field
   .addOperation("replaceMap", {
     ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+      this.cliche_map = get_cliche_map(name.sourceString, uses);
       const rmap = _u
         .chain(para.replaceMap())
         .flatten()
@@ -385,9 +380,9 @@ const semantics = grammar.createSemantics()
         .value();
       return _u
         .reduce(rmap, (memo, r) => {
-          const r_map = {};
-          r_map[r.replaced_by] = r.map;
-          memo[r.name] = r_map;
+          const r_name = {};
+          r_name[r.widget.name] = _u.pick(r, "replaced_by", "map");
+          memo[r.widget.fqelement] = r_name;
           return memo;
         }, {});
     },
@@ -400,9 +395,18 @@ const semantics = grammar.createSemantics()
       },
     ReplacesDecl: (r, r_name, k1, r_map, k2) => {
       return {
-        name: r_name.sourceString,
-        replaced_by: this.name,
+        widget: r_name.replaceMap(),
+        replaced_by: {
+          name: this.name,
+          fqelement: this.cliche_map["this"].fqelement
+        },
         map: r_map.replaceMap()[0]
+      };
+    },
+    replaceName: (cliche, dot, widget) => {
+      return {
+        name: widget.sourceString,
+        fqelement: this.cliche_map[cliche.sourceString].fqelement
       };
     },
     ReplaceMap: (n1, eq, n2) => {
@@ -439,6 +443,16 @@ function build_uses_ft_map(uses) {
       memo[c] = get_ftmap(c);
       return memo;
     }, {});
+}
+
+function get_cliche_map(cliche_name, uses) {
+  let ret = uses.clicheMap()[0];
+  if (ret === undefined) ret = {};
+  ret["this"] = {
+    fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
+    name: cliche_name
+  };
+  return ret;
 }
 
 
