@@ -415,11 +415,6 @@ const semantics = grammar.createSemantics()
       return ret;
     }
   });
-// console.log(grammar);
-debug_match("../../catalog/messaging/post/post.dv");
-debug_match("../../samples/morg/morg.dv");
-debug_match("../../samples/bookmark/bookmark.dv");
-
 
 function build_uses_ft_map(uses) {
   function get_fp(cliche) {
@@ -455,36 +450,91 @@ function get_cliche_map(cliche_name, uses) {
   return ret;
 }
 
+export interface Widget {
+  name: string;
+  fqelement: string;
+}
 
-function debug_match(fp) {
+export interface UsedClicheMap { [cliche: string]: number; }
+export interface ClicheMap {
+  [alias: string]: {fqelement: string, name: string};
+}
+export interface FieldType { [f_name: string]: string; }
+export interface FieldTypesMap { [of_name: string]: FieldType; }
+export interface FieldMap {
+  [src_field: string]: string;
+}
+export interface WidgetReplaceMap {
+  [w_name: string]: {
+    replaced_by: Widget, map: FieldMap;
+  };
+}
+export interface ReplaceMap { [cliche: string]: WidgetReplaceMap; }
+export interface Cliche {
+  used_cliches: UsedClicheMap;
+  cliche_map: ClicheMap;
+  ft_map: FieldMap;
+  replace_map: ReplaceMap;
+  // tbd
+  uft_map: any;
+  used_widgets: any[];
+  main_widget: string;
+  widgets: any[];
+  tbonds: any[];
+  fbonds: any[];
+  wbonds: any[];
+}
+
+export function parse(fp: string): Cliche {
   const dv = fs.readFileSync(fp, "utf-8");
-  // console.log(dv);
   const r = grammar.match(dv);
-  console.log(`The matching for ${fp} succeeded: ${r.succeeded()}`);
   if (r.failed()) {
-    console.log(r.message);
-    // console.log(grammar.trace(dv).toString());
-  } else {
-    console.log("//////////Used Cliches//////////");
-    console.log(semantics(r).usedCliches());
-    console.log("//////////Cliche Map//////////");
-    console.log(JSON.stringify(semantics(r).clicheMap(), null, 2));
-    console.log("//////////Field Types Map//////////");
-    console.log(JSON.stringify(semantics(r).fieldTypesMap(), null, 2));
-    console.log("//////////Replace Map//////////");
-    console.log(JSON.stringify(semantics(r).replaceMap(), null, 2));
-    console.log("//////////Uses Field Types Map//////////");
-    console.log(JSON.stringify(semantics(r).usesFieldTypesMap(), null, 2));
-    console.log("//////////Used Widgets//////////");
-    console.log(JSON.stringify(semantics(r).usedWidgets(), null, 2));
-    console.log(`//////////Main widget is ${semantics(r).main()}//////////`);
-    console.log("//////////Widgets//////////");
-    console.log(JSON.stringify(semantics(r).widgets(), null, 2));
-    console.log("//////////tbonds//////////");
-    console.log(JSON.stringify(semantics(r).tbonds(), null, 2));
-    console.log("//////////fbonds//////////");
-    console.log(JSON.stringify(semantics(r).fbonds(), null, 2));
-    console.log("//////////wbonds//////////");
-    console.log(JSON.stringify(semantics(r).wbonds(), null, 2));
+    throw new Error(r.message);
   }
+  const s = semantics(r);
+  return {
+    used_cliches: s.usedCliches(),
+    cliche_map: s.clicheMap(),
+    ft_map: s.fieldTypesMap(),
+    replace_map: s.replaceMap(),
+    uft_map: s.usesFieldTypesMap(),
+    used_widgets: s.usedWidgets(),
+    main_widget: s.main(),
+    widgets: s.widgets(),
+    tbonds: s.tbonds(),
+    fbonds: s.fbonds(),
+    wbonds: s.wbonds()
+  };
+}
+
+// console.log(grammar);
+// debug_match("../../catalog/messaging/post/post.dv");
+// debug_match("../../samples/morg/morg.dv");
+// debug_match("../../samples/bookmark/bookmark.dv");
+
+export function debug_match(fp) {
+  const p = parse(fp);
+  const debug = obj => JSON.stringify(obj, null, 2);
+
+  console.log("//////////Used Cliches//////////");
+  console.log(debug(p.used_cliches));
+  console.log("//////////Cliche Map//////////");
+  console.log(debug(p.cliche_map));
+  console.log("//////////Field Types Map//////////");
+  console.log(debug(p.ft_map));
+  console.log("//////////Replace Map//////////");
+  console.log(debug(p.replace_map));
+  console.log("//////////Uses Field Types Map//////////");
+  console.log(debug(p.uft_map));
+  console.log("//////////Used Widgets//////////");
+  console.log(debug(p.used_widgets));
+  console.log(`//////////Main widget is ${p.main_widget}//////////`);
+  console.log("//////////Widgets//////////");
+  console.log(debug(p.widgets));
+  console.log("//////////tbonds//////////");
+  console.log(debug(p.tbonds));
+  console.log("//////////fbonds//////////");
+  console.log(debug(p.fbonds));
+  console.log("//////////wbonds//////////");
+  console.log(debug(p.wbonds));
 }
