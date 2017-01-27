@@ -31,6 +31,6 @@ cliche Event {
   // ShowEvent
   widget ShowWeeklyEvent uses ShowEvent {
     // the weekly event selected by the user from the dropdown
-    selected_weekly_event: WeeklyEvent,
+    selected_weekly_event: WeeklyEvent
   }
 }

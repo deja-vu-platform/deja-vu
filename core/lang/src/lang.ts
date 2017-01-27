@@ -374,6 +374,42 @@ const semantics = grammar.createSemantics()
     usedWidgetName: (cliche, dot, name) => ({
       name: name.sourceString, cliche: cliche.sourceString.slice(0, -1)
     })
+  })
+  // widget that is replaced -> replacement -> w field -> replacement field
+  .addOperation("replaceMap", {
+    ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+      const rmap = _u
+        .chain(para.replaceMap())
+        .flatten()
+        .reject(_u.isEmpty)
+        .value();
+      return _u
+        .reduce(rmap, (memo, r) => {
+          const r_map = {};
+          r_map[r.replaced_by] = r.map;
+          memo[r.name] = r_map;
+          return memo;
+        }, {});
+    },
+    Paragraph_widget: decl => decl.replaceMap(),
+    Paragraph_data: decl => ({}),
+    WidgetDecl: (
+      m, w, name, route, wUses, k1, fields, k2, r) => {
+        this.name = name.sourceString;
+        return r.replaceMap();
+      },
+    ReplacesDecl: (r, r_name, k1, r_map, k2) => {
+      return {
+        name: r_name.sourceString,
+        replaced_by: this.name,
+        map: r_map.replaceMap()[0]
+      };
+    },
+    ReplaceMap: (n1, eq, n2) => {
+      const ret = {};
+      ret[n2.sourceString] = n1.sourceString;
+      return ret;
+    }
   });
 // console.log(grammar);
 debug_match("../../catalog/messaging/post/post.dv");
@@ -421,6 +457,8 @@ function debug_match(fp) {
     console.log(JSON.stringify(semantics(r).clicheMap(), null, 2));
     console.log("//////////Field Types Map//////////");
     console.log(JSON.stringify(semantics(r).fieldTypesMap(), null, 2));
+    console.log("//////////Replace Map//////////");
+    console.log(JSON.stringify(semantics(r).replaceMap(), null, 2));
     console.log("//////////Uses Field Types Map//////////");
     console.log(JSON.stringify(semantics(r).usesFieldTypesMap(), null, 2));
     console.log("//////////Used Widgets//////////");
