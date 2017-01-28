@@ -18,7 +18,7 @@ console.log(JSON.stringify(cliche, null, 2));
 
 grunt.task.init = () => ({});
 GruntTask.task(
-  grunt, "name",
+  grunt, cliche.fqelement,
   cliche.widgets,
   cliche.main_widget,
   cliche.used_cliches,

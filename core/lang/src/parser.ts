@@ -30,6 +30,7 @@ export interface Cliche {
   cliche_map: ClicheMap;
   ft_map: FieldMap;
   replace_map: ReplaceMap;
+  fqelement: string;
   // tbd
   uft_map: any;
   used_widgets: any[];
@@ -456,6 +457,12 @@ export class Parser {
           ret[n2.sourceString] = n1.sourceString;
           return ret;
         }
+      })
+      .addOperation("fqelement", {
+        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+          const cliche_name = name.sourceString;
+          return `dv-samples-${cliche_name.toLowerCase()}`;
+        }
       });
   }
 
@@ -472,6 +479,7 @@ export class Parser {
       cliche_map: s.clicheMap(),
       ft_map: s.fieldTypesMap(),
       replace_map: s.replaceMap(),
+      fqelement: s.fqelement(),
       uft_map: s.usesFieldTypesMap(),
       used_widgets: s.usedWidgets(),
       main_widget: s.main(),
