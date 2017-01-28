@@ -3,7 +3,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON("package.json"),
     ts: {
       lib: {
-        src: ["src/lang.ts", "typings/index.d.ts"],
+        src: ["src/*.ts", "typings/index.d.ts"],
         outDir: ["lib"],
         options: {
           verbose: true,
@@ -32,7 +32,7 @@ module.exports = function(grunt) {
       },
       default: {
         files: {
-          src: ["src/lang.ts"]
+          src: ["src/*.ts"]
         }
       }
     },

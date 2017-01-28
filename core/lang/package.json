@@ -14,11 +14,14 @@
     "tslint": "^3.3.0",
     "typescript": "^2.0.10"
   },
-  "typings": "./lib/lang",
-  "main": "./lib/lang",
+  "typings": "./lib/dv",
+  "main": "./lib/dv",
   "dependencies": {
     "ohm-js": "^0.12.3",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "command-line-args": "^2.1.6",
+    "mean-loader": "file:..//mean-loader",
+    "grunt": "^0.4.5"
   },
   "files": [
     "lib"
