@@ -3,7 +3,7 @@ module.exports = function(grunt) {
      "dv-samples-morg",  // name
      [
        {name: "Home", path: "home"},
-       {name: "GroupMeeting"}
+       {name: "ShowGroupMeeting"}
      ], // widgets,
      "Home",  // main
      { // cliches

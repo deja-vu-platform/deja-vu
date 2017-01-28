@@ -4,8 +4,8 @@
       "fields": [
         {
           "name": "group_meeting",
-          "type": {"name": "GroupMeeting", "fqelement": "dv-samples-morg"},
-          "widget": {"name": "GroupMeeting", "fqelement": "dv-samples-morg"}
+          "type": {"name": "ShowGroupMeeting", "fqelement": "dv-samples-morg"},
+          "widget": {"name": "ShowGroupMeeting", "fqelement": "dv-samples-morg"}
         }
       ],
       "subfield": {
@@ -29,9 +29,9 @@
       ],
       "subfield": {
         "name": "group_meeting", "type": {
-          "name": "GroupMeeting", "fqelement": "dv-samples-morg"
+          "name": "ShowGroupMeeting", "fqelement": "dv-samples-morg"
         }, "widget": {
-          "name": "GroupMeeting", "fqelement": "dv-samples-morg"
+          "name": "ShowGroupMeeting", "fqelement": "dv-samples-morg"
         }
       }
     },
