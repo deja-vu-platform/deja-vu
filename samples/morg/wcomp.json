@@ -24,7 +24,7 @@
         {
           "name": "resource",
           "type": { "name": "Resource", "fqelement": "dv-organization-allocator" },
-          "widget": { "name": "Consumer", "fqelement": "dv-organization-allocator" }
+          "widget": { "name": "ShowConsumer", "fqelement": "dv-organization-allocator" }
         }
       ],
       "subfield": {
@@ -40,7 +40,7 @@
         {
           "name": "allocation",
           "type": { "name": "Allocation", "fqelement": "dv-organization-allocator" },
-          "widget": { "name": "Consumer", "fqelement": "dv-organization-allocator" }
+          "widget": { "name": "ShowConsumer", "fqelement": "dv-organization-allocator" }
         }
       ],
       "subfield": {

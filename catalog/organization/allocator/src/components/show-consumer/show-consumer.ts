@@ -7,7 +7,7 @@ import {GraphQlService} from "gql";
   template: `{{consumer.atom_id}}`,
   ng2_providers: [GraphQlService]
 })
-export class ConsumerComponent {
+export class ShowConsumerComponent {
   allocation = {atom_id: undefined, on_change: _ => undefined};
   resource = {atom_id: undefined, on_change: _ => undefined};
   consumer = {atom_id: ""};

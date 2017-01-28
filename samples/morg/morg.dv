@@ -20,7 +20,7 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
   // from a dropdown and display a weekly group meeting
   main widget Home
     route "home"
-    uses Event.NewWeeklyEvent, Event.WeeklyEvent {}
+    uses Event.NewWeeklyEvent, Event.ChooseAndShowWeeklyEvent {}
 
   // Shows the date of the event, the name of the champion, and a button to
   // send an email to the group with information regarding the event
