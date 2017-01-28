@@ -13,8 +13,8 @@ module.exports = function(grunt) {
      },
      [ // used widgets
        {name: "NewWeeklyEvent", fqelement: "dv-organization-event"},
-       {name: "WeeklyEvent", fqelement: "dv-organization-event"},
-       {name: "Event", fqelement: "dv-organization-event"},
+       {name: "ChooseAndShowWeeklyEvent", fqelement: "dv-organization-event"},
+       {name: "ShowEvent", fqelement: "dv-organization-event"},
        {name: "Consumer", fqelement: "dv-organization-allocator"},
        {name: "SendEmail", fqelement: "dv-messaging-email"}
      ]);

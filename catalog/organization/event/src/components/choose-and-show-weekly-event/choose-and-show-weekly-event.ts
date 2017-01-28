@@ -35,7 +35,7 @@ export interface EventItem {
     `bootstrap-select.min.css`
   ]
 })
-export class WeeklyEventComponent {
+export class ChooseAndShowWeeklyEventComponent {
   weekly_events: WeeklyEvent[] = [];
   events: EventItem[] = [];
   selected_weekly_event: WeeklyEvent = {

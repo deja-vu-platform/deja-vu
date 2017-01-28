@@ -7,6 +7,6 @@ import {Widget} from "client-bus";
     {{event.start_date}} - {{event.end_date}}
   `
 })
-export class EventComponent {
+export class ShowEventComponent {
   event = {start_date: "", end_date: ""};
 }

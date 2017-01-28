@@ -11,7 +11,7 @@
       "subfield": {
           "name": "event",
           "type": { "name": "Event", "fqelement": "dv-organization-event" },
-          "widget": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
+          "widget": { "name": "ChooseAndShowWeeklyEvent", "fqelement": "dv-organization-event" }
       }
     },
     {
@@ -19,7 +19,7 @@
         {
           "name": "event",
           "type": { "name": "Event", "fqelement": "dv-organization-event" },
-          "widget": { "name": "Event", "fqelement": "dv-organization-event" }
+          "widget": { "name": "ShowEvent", "fqelement": "dv-organization-event" }
         },
         {
           "name": "resource",
@@ -47,7 +47,7 @@
         "name": "selected_weekly_event", "type": {
           "name": "WeeklyEvent", "fqelement": "dv-organization-event"
         }, "widget": {
-          "name": "WeeklyEvent", "fqelement": "dv-organization-event"
+          "name": "ChooseAndShowWeeklyEvent", "fqelement": "dv-organization-event"
         }
       }
     },
@@ -56,7 +56,7 @@
         {
           "name": "event_widget",
           "type": { "name": "Widget", "fqelement": "dv-organization-event" },
-          "widget": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
+          "widget": { "name": "ChooseAndShowWeeklyEvent", "fqelement": "dv-organization-event" }
         }
       ],
       "subfield": {

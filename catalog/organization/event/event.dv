@@ -29,7 +29,7 @@ cliche Event {
   // Lets the user choose a weekly event from a dropdown and displays the
   // selected weekly event by showing a list of all the events using
   // ShowEvent
-  widget ShowWeeklyEvent uses ShowEvent {
+  widget ChooseAndShowWeeklyEvent uses ShowEvent {
     // the weekly event selected by the user from the dropdown
     selected_weekly_event: WeeklyEvent
   }
