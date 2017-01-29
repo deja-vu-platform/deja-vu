@@ -6,7 +6,8 @@ cliche Bookmark uses
   community/Follow as FollowTopics, 
   access/Auth, messaging/Feed,
   organization/Label,
-  messaging/Post as MessagingPost {
+  messaging/Post as MessagingPost,
+  messaging/Comment {
 
   /**
    *  Data definitions
@@ -15,7 +16,7 @@ cliche Bookmark uses
     username: Text =
       FollowUsers.Source.name + FollowUsers.Target.name +
       FollowTopics.Source.name + Auth.User.username +
-      MessagingPost.User.username +
+      MessagingPost.User.username + Comment.Author.name +
       Feed.Subscriber.name + Feed.Publisher.name,
     posts: Post = Feed.Publisher.published + MessagingPost.User.posts,
     follows: User = FollowUsers.Source.follows + Feed.Subscriber.subscriptions |
@@ -24,12 +25,13 @@ cliche Bookmark uses
       FollowUsers.Source + FollowUsers.Target +
       // users can follow topics
       FollowTopics.Source +
-      MessagingPost.User + Feed.Subscriber + Feed.Publisher
+      MessagingPost.User + Comment.Author +
+      Feed.Subscriber + Feed.Publisher
   
   data Post {
     content: Text = MessagingPost.Post.content + Feed.Message.content,
     topics: Topic = Label.Item.labels
-  } = Label.Item + MessagingPost.Post + Feed.Message
+  } = Label.Item + MessagingPost.Post + Feed.Message + Comment.Target
   
   data Topic {
     name: Text = Label.Item.name + Feed.Publisher.name +
@@ -62,8 +64,9 @@ cliche Bookmark uses
   // Shows the post, with its author, attached labels and comments. Also has
   // a field that lets the logged in user comment on the post
   widget ShowFeedPost uses
-    MessagingPost.Author, Label.Labels, MessagingPost.CommentsWithComment {
-    post: Post
+    MessagingPost.ShowAuthor, Label.Labels, Comment.CommentsWithComment {
+    post: Post = Label.ShowLabels.item + MessagingPost.ShowAuthor.post +
+      Comment.CommentsWithComment.target
   } replaces Feed.ShowFeedItem { message = post }
 
   widget CreatePost uses

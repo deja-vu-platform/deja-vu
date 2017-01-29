@@ -1,11 +1,21 @@
-cliche Comment
+cliche Comment {
+  data Comment {
+    author: Author,
+    target: Target,
+    content: Text
+  }
 
-data Comment {
-  author: Author,
-  target: Target,
-  content: Text
-}
+  data Author {
+    name: Text
+  }
 
-data Author, Target {
-  name: Text (one)
+  data Target {
+    name: Text
+  }
+
+  widget CommentsWithComment {
+    target: Target,
+    author: Author
+  }
+  
 }

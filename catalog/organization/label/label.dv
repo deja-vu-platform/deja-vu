@@ -16,4 +16,8 @@ cliche Label {
   widget AttachLabels {
     item: Item
   }
+
+  widget ShowLabels {
+    item: Item
+  }
 }
