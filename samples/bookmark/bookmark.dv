@@ -61,7 +61,8 @@ cliche Bookmark uses
 
   // Shows the post, with its author, attached labels and comments. Also has
   // a field that lets the logged in user comment on the post
-  widget ShowFeedPost uses Author, Labels, CommentsWithComment {
+  widget ShowFeedPost uses
+    MessagingPost.Author, Label.Labels, MessagingPost.CommentsWithComment {
     post: Post
   } replaces Feed.ShowFeedItem { message = post }
 
@@ -83,7 +84,7 @@ cliche Bookmark uses
 
   // Displays the list of users and lets the logged in user follow or unfollow
   // them
-  widget Users uses LoggedIn, FollowUsers.EditFollow {
+  widget Users uses Auth.LoggedIn, FollowUsers.EditFollow {
     user: User = Auth.LoggedIn.user + FollowUsers.EditFollow.source
   }
 }

@@ -317,7 +317,18 @@ export namespace GruntTask {
             .value();
         flat_widgets = flat_widgets
           .concat(_u.map(widgets, w => ({name: w.name, path: w.path})));
-        flat_widgets = _u.uniq(flat_widgets);
+        flat_widgets = _u.uniq(flat_widgets, false, w => w.name);
+
+        used_widgets = _u.chain(used_widgets)
+          .map(uw => {
+            const uw_split = uw.fqelement.split("-");
+            if (uw_split.length === 4) {
+              uw.fqelement = uw_split.slice(0, -1).join("-");
+            }
+            return uw;
+          })
+          .unique(false, uw => uw.name + uw.fqelement)
+          .value();
 
         const wid_imports = _u
           .map(flat_widgets, w => imp(w.name, ".."))
