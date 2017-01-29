@@ -18,6 +18,7 @@
     "dv-organization-event": "file:../../catalog/organization/event",
     "dv-organization-allocator": "file:../../catalog/organization/allocator",
     "mean-loader": "file:../../core/mean-loader",
+    "dv-lang": "file:../../core/lang",
     "reflect-metadata": "^0.1.9",
     "rxjs": "5.0.1",
     "server-bus": "file:../../core/server-bus",
