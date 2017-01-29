@@ -9,7 +9,7 @@ export class HomeComponent {
     client_bus.init(this, [
       field("user", "User"),
       field("feed_item_widget", "Widget")]);
-    this.feed_item_widget.name = "FeedItem";
+    this.feed_item_widget.name = "ShowFeedPost";
     this.feed_item_widget.fqelement = "dv-samples-bookmark";
   }
 }

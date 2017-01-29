@@ -234,7 +234,7 @@
         {
           "name": "post",
           "type": {"name": "Post", "fqelement": "dv-samples-bookmark"},
-          "widget": {"name": "FeedItem", "fqelement": "dv-samples-bookmark"}
+          "widget": {"name": "ShowFeedPost", "fqelement": "dv-samples-bookmark"}
         }
       ],
       "subfield": {
@@ -283,7 +283,7 @@
         "name": "post", "type": {
           "name": "Post", "fqelement": "dv-samples-bookmark"
         }, "widget": {
-          "name": "FeedItem", "fqelement": "dv-samples-bookmark"
+          "name": "ShowFeedPost", "fqelement": "dv-samples-bookmark"
         }
       }
     },

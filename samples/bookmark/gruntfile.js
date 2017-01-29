@@ -12,7 +12,7 @@ module.exports = function(grunt) {
          ]
        },
        {name: "CreatePost"},
-       {name: "FeedItem"},
+       {name: "ShowFeedPost"},
        {name: "Post"},
        {name: "User"}
      ], // widgets

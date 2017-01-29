@@ -27,6 +27,6 @@ import {Widget} from "client-bus";
     </div>
   `
 })
-export class FeedItemComponent {
+export class ShowFeedPostComponent {
   post = {};
 }
