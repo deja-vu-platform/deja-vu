@@ -151,6 +151,8 @@ export class WidgetLoader {
   @ViewChild("widget", {read: ViewContainerRef})
   widgetContainer: ViewContainerRef;
 
+  called: boolean;
+
   fqelement: string;
   name: string;
   fields;
@@ -211,6 +213,8 @@ export class WidgetLoader {
   }
 
   ngOnInit() {
+    if (this.called) return;
+    this.called = true;
     const adapt_table = this._adapt_table();
     const d_name = _ustring.dasherize(this.name).slice(1);
     let imp_string_prefix = "";
@@ -229,7 +233,8 @@ export class WidgetLoader {
     console.log(`Loading ${this.name} of ${this.fqelement}`);
 
     // need to preprend lib if the widget is not from the current cliche
-    System.import(imp_string_prefix + `/lib/components/${d_name}/${d_name}`)
+    return System
+       .import(imp_string_prefix + `/lib/components/${d_name}/${d_name}`)
       .then(mod => mod[this.name + "Component"])
       .then(c => {
         if (c === undefined) {
