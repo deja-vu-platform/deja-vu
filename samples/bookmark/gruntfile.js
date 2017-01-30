@@ -35,7 +35,7 @@ module.exports = function(grunt) {
        {name: "LabelsText", fqelement: "dv-organization-label"},
        {name: "NewPostButton", fqelement: "dv-messaging-post"},
        // Feed Item
-       {name: "Author", fqelement: "dv-messaging-post"},
+       {name: "ShowAuthor", fqelement: "dv-messaging-post"},
        {name: "Labels", fqelement: "dv-organization-label"},
        {name: "CommentsWithComment", fqelement: "dv-messaging-comment"},
        // hack..shouldn't have to specify these

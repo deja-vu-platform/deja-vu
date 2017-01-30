@@ -8,7 +8,7 @@ import {GraphQlService} from "gql";
   ng2_providers: [GraphQlService],
   template: `{{post?.author?.username}}`
 })
-export class AuthorComponent {
+export class ShowAuthorComponent {
   post = {on_change: undefined, atom_id: undefined, author: undefined};
   private fetched = false;
 

@@ -271,7 +271,7 @@
         {
           "name": "post",
           "type": { "name": "Post", "fqelement": "dv-messaging-post" },
-          "widget": { "name": "Author", "fqelement": "dv-messaging-post" }
+          "widget": { "name": "ShowAuthor", "fqelement": "dv-messaging-post" }
         },
         {
           "name": "target",

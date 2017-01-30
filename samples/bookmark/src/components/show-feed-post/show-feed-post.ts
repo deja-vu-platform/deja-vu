@@ -6,7 +6,7 @@ import {Widget} from "client-bus";
   template: `
     <div class="list-group">
       <h4 class="list-group-item-heading">
-        <dv-widget name="Author" fqelement="dv-messaging-post"
+        <dv-widget name="ShowAuthor" fqelement="dv-messaging-post"
          [fields]="fields" [hosts]="hosts">
         </dv-widget>
       </h4>
