@@ -23,7 +23,7 @@ export interface FeedItem {
   fqelement: "dv-messaging-feed",
   ng2_providers: [GraphQlService]
 })
-export class FeedComponent {
+export class ShowFeedComponent {
   feed: FeedItem[];
   sub = {name: "", on_change: undefined};
   fields = {};

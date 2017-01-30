@@ -14,21 +14,7 @@ cliche Feed {
   data Message {
     content: Content
   }
-/* option 1
-  widget ShowFeed {
-    subscriber: Subscriber,
-    [feed_item_widget]: ShowFeedItem,
-    [message]: Message = ShowFeed.[feed_item_widget].message,
-    [publisher]: Publisher = ShowFeed.[feed_item_widget].publisher
-  }
 
-  widget ShowFeedItem {
-    message: Message,
-    publisher: Publisher
-  }
-  */
-
-  // option 2
   widget ShowFeed uses ShowFeedItem {
     subscriber: Subscriber
   }

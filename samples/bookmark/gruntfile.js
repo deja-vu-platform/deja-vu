@@ -27,7 +27,7 @@ module.exports = function(grunt) {
      },
      [ // used widgets
        // Home
-       {name: "Feed", fqelement: "dv-messaging-feed"},
+       {name: "ShowFeed", fqelement: "dv-messaging-feed"},
        // App
        {name: "SignOut", fqelement: "dv-access-auth"},
        // Create Post

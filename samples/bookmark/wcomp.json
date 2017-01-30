@@ -184,7 +184,7 @@
         {
           "name": "sub",
           "type": { "name": "Subscriber", "fqelement": "dv-messaging-feed" },
-          "widget": { "name": "Feed", "fqelement": "dv-messaging-feed" }
+          "widget": { "name": "ShowFeed", "fqelement": "dv-messaging-feed" }
         }
       ],
       "subfield": {
@@ -219,7 +219,7 @@
         {
           "name": "feed_item_widget",
           "type": {"name": "Widget", "fqelement": "dv-messaging-feed"},
-          "widget": {"name": "Feed", "fqelement": "dv-messaging-feed"}
+          "widget": {"name": "ShowFeed", "fqelement": "dv-messaging-feed"}
         }
       ],
       "subfield": {
@@ -240,7 +240,7 @@
       "subfield": {
           "name": "message",
           "type": { "name": "Message", "fqelement": "dv-messaging-feed" },
-          "widget": { "name": "Feed", "fqelement": "dv-messaging-feed" }
+          "widget": { "name": "ShowFeed", "fqelement": "dv-messaging-feed" }
       }
     },
 
@@ -256,7 +256,7 @@
       "subfield": {
           "name": "sub",
           "type": {"name": "Subscriber", "fqelement": "dv-messaging-feed"},
-          "widget": {"name": "Feed", "fqelement": "dv-messaging-feed"}
+          "widget": {"name": "ShowFeed", "fqelement": "dv-messaging-feed"}
         }
     },
 
