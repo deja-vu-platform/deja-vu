@@ -169,4 +169,12 @@ AND change WIDGET to DRAG-HANDLE
 					below that level (will behave like a new default at that level)
 				
 				
-				
+		
+1/31:
+made the layered diff structure work; 
+next is to use it for other things such as 
+	location, 
+	and enable editing lower levels, 
+
+also need to deal with deleted components'
+		
