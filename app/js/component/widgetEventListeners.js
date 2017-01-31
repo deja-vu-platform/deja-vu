@@ -724,10 +724,11 @@ function refreshContainerDisplay(fresh, container, zoom){
 function createUserWidgetCopy (outerWidget){
     var widget = UserWidget.fromString(JSON.stringify(outerWidget));
 
+    // updates the ids to a new id, also updates them in layout.stackOrder
     var recursiveReIding = function(widget){
         if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
-            var newId = generateId(); // FIXME gaaah, get time does not produce unique ids!
-                // (new Date()).getTime();
+            var newId = generateId();
+                // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
             widget.meta.id = newId;
             if (widget.type == 'user'){
                 for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
@@ -739,7 +740,6 @@ function createUserWidgetCopy (outerWidget){
                         delete widget.innerWidgets[oldId];
                         widget.properties.layout[result.newId] = widget.properties.layout[oldId];
                         delete widget.properties.layout[oldId];
-
                     }
                 }
             }

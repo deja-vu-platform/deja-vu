@@ -150,7 +150,8 @@ AND change WIDGET to DRAG-HANDLE
 //                     widgetInstanceId:{
 //                       ...
 //                     }
-//              }
+//              }, 
+// 		...
 //      }
 //
 // },

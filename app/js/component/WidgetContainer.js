@@ -158,8 +158,14 @@ var WidgetContainer = function(){
 
         buttonStyle.find('.inner-component-delete-style').click(function(e){
             e.stopPropagation();
+
+            // TODO this is wrong, because at this point I'm supposed to go back and read the old colors
+            // TODO that were previously overwritten
             widget.properties.styles.custom = {};
             widget.properties.styles.bsClasses = {};
+            /////////////
+
+            outerWidget.properties.children[widget.meta.id] = {};
             refreshContainerDisplay(false, container, currentZoom);
 
         });
@@ -204,7 +210,7 @@ var WidgetContainer = function(){
     };
 
     var setUpTextOptions = function(container, widget){
-        var changes = createCustomPropertyPath(getPath(widget.meta.id));
+        var changes = createCustomPropertyGivenPath(getPath(widget.meta.id));
         if (!changes.styles) {
             changes.styles = {};
         }
@@ -282,21 +288,53 @@ var WidgetContainer = function(){
         return wantedPath;
     };
 
-    var createCustomPropertyPath = function(path){
+    var createCustomPropertyGivenPath = function(path){
         var currPath = selectedUserWidget.properties;
-        path.forEach(function(pathVal){
-            if (!currPath.children[pathVal]){
-                currPath.children[pathVal] = {children:{}};
+        path.forEach(function(pathVal, idx){
+            if (idx != 0){
+                if (!currPath.children[pathVal]){
+                    currPath.children[pathVal] = {children:{}};
+                }
+                currPath = currPath.children[pathVal];
             }
-            currPath = currPath.children[pathVal];
+
         });
         return currPath;
     };
 
+    var getCustomPropertyGivenPath = function(path){
+        var currPath = selectedUserWidget.properties;
+        var noProperty = false;
+        path.forEach(function(pathVal, idx){
+            if (!noProperty){
+                if (idx != 0){
+                    if (!currPath.children[pathVal]){
+                        noProperty = true;
+                        currPath = {};
+                    } else {
+                        currPath = currPath.children[pathVal];
+                    }
+                }
+            }
+        });
+
+        return currPath;
+
+    };
+
+    var getCustomStylesGivenPath = function(path){
+        var changes = getCustomPropertyGivenPath(path);
+        if (changes.styles) {
+            if (changes.styles.custom){
+                return changes.styles.custom;
+            }
+        }
+        return {};
+    };
 
 
-    var createCustomStylesPath = function(path){
-        var changes = createCustomPropertyPath(path);
+    var createCustomStylesGivenPath = function(path){
+        var changes = createCustomPropertyGivenPath(path);
         if (!changes.styles) {
             changes.styles = {};
         }
@@ -304,11 +342,18 @@ var WidgetContainer = function(){
             changes.styles.custom = {};
         }
         return changes.styles.custom;
-    }
+    };
+
+    var updateCustomStylesGivenPath = function(path, newCustomStyles){
+        var customStyles = createCustomStylesGivenPath(path);
+        for (var style in newCustomStyles){
+            customStyles[style] = newCustomStyles[style];
+        }
+    };
 
     var setUpColorOptions = function(container, widget){
 
-        var customStyles = createCustomStylesPath(getPath(widget.meta.id));
+        var customStyles = getCustomStylesGivenPath(getPath(widget.meta.id));
 
 
         var textColorOption = $('<li><div>Text Color: </div></li>');
@@ -325,8 +370,10 @@ var WidgetContainer = function(){
         textColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerText.toHEXString();
-            customStyles['color'] = color;
-            // widget.properties.styles.custom['color'] = color;
+            // customStyles['color'] = color;
+            updateCustomStylesGivenPath(getPath(widget.meta.id), {'color': color});
+            // update both the inner widget's property and also save it in the outer widget
+            widget.properties.styles.custom['color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
         });
 
@@ -336,8 +383,10 @@ var WidgetContainer = function(){
         bgColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerBG.toHEXString();
-            customStyles['background-color'] = color;
-            // widget.properties.styles.custom['background-color'] = color;
+            // customStyles['background-color'] = color;
+            updateCustomStylesGivenPath(getPath(widget.meta.id), {'background-color': color});
+            // update both the inner widget's property and also save it in the outer widget
+            widget.properties.styles.custom['background-color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
         });
 

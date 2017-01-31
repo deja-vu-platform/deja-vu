@@ -34,7 +34,7 @@ var WorkSurface = function(){
             zoom: 1,
         };
         workSurface.data('state', state);
-        workSurface.html('');
+        workSurface.find('.component-container').remove();
     };
 
     that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, dragHandle,
@@ -110,10 +110,15 @@ var WorkSurface = function(){
     };
 
     var refreshFromProject = function(outerWidget){
-        var path = [];
-        var getPropertyChanges = function(path){
+
+        // TODO. This is a confusing function
+        // TODO. Document what's going on!!!
+
+        // TODO This does NOT get the property changes for the inner widgets made at a previous level!
+        var getPropertyChanges = function(outerWidget, path){
+            // get the changes at this level
             var change = outerWidget.properties;
-            for (var pathValueIdx = 0; pathValueIdx<path.length; pathValueIdx++){
+            for (var pathValueIdx = 1; pathValueIdx<path.length; pathValueIdx++){
                 if (change.children){
                     if (change.children[path[pathValueIdx]]){
                         change = change.children[path[pathValueIdx]]
@@ -129,75 +134,141 @@ var WorkSurface = function(){
             return change;
         };
 
+        // gets the changes made at the level of the outer widget and
+        // puts them in the properties of the involved inner widget
+        // saved in the outer widget. NOTE: this does not reference the
+        // templates from the project! Use this before re-id-ing the components
+        var applyPropertyChanges = function(outerWidget, sourceWidget){
+            var path = [];
+            var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
+                path.push(sourceInnerWidget.meta.id);
+                // get changed properties
+                var properties = getPropertyChanges(sourceWidget, path);
+
+                // if there is a change, override the old one
+                if (properties.styles){
+                    if (properties.styles.custom){
+                        var customStyles = properties.styles.custom;
+                        for (var style in customStyles) {
+                            innerWidget.properties.styles.custom[style] = customStyles[style];
+                        }
+                    }
+                }
+
+                if (innerWidget.type == 'user'){
+                    innerWidget.properties.layout.stackOrder.forEach(function (innerInnerWidgetId, idx) {
+                        var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
+                        var innerInnerSourceWidgetId = sourceInnerWidget.properties.layout.stackOrder[idx];
+                        var innerInnerSourceWidget = sourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
+                        applyPropertyChangesHelper(innerInnerWidget, innerInnerSourceWidget);
+                    });
+                }
+                path.pop();
+            };
+            applyPropertyChangesHelper(outerWidget, sourceWidget);
+
+        };
+
+        // goes down each level recursively.
+        // As it goes up, it reads from the source code (Project) to override changes
         var recursiveWidgetMaking = function(widget){
             if (widget.type == 'user') {
-                path.push(widget.meta.id);
+                // path.push(widget.meta.id);
                 widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
                     var innerWidget = widget.innerWidgets[innerWidgetId];
-                    innerWidget.parentId = widget.meta.id;
                     if (innerWidget.type == 'user') { // TODO FIXME doing some sketchy shit here
                         // var customStyles = innerWidget.properties.styles.custom;
                         var templateId = innerWidget.meta.templateId;
-                        innerWidget = createUserWidgetCopy(
-                            UserWidget.fromString(
-                                JSON.stringify(selectedProject.components[templateId])
-                            )
+                        var projectComponentCopy = UserWidget.fromString(
+                            JSON.stringify(selectedProject.components[templateId])
                         );
+
+                        innerWidget =  createUserWidgetCopy(UserWidget.fromString(
+                                JSON.stringify(selectedProject.components[templateId])
+                        ));
+
                         innerWidget.meta.id = innerWidgetId;
                         innerWidget.meta.templateId = templateId;
 
-                        // do it after the id and templateId are overwitten
+                        // do it after the id and templateId are overwritten
                         innerWidget = recursiveWidgetMaking(innerWidget);
 
-                        path.push(widget.meta.id);
-                        var properties = getPropertyChanges(path);
-                        path.pop();
-                        if (properties.styles){
-                            if (properties.styles.custom){
-                                var customStyles = properties.styles.custom;
-                                for (var style in customStyles) {
-                                    innerWidget.properties.styles.custom[style] = customStyles[style];
-                                }
-                            }
-                        }
-                        innerWidget.parentId = widget.meta.id;
+                        applyPropertyChanges(innerWidget, projectComponentCopy);
+
                         widget.innerWidgets[innerWidgetId] = innerWidget;
+                    } else {
+                        applyPropertyChanges(innerWidget, innerWidget);
                     }
 
+                    // at this point, the inner widget and its inner widgets, recursively, are copies
+                    // of their respective templates, and also have all the property changes recursively updated
+                    // at this point. We need to update each inner widget which has had its properties changed
+                    // at THIS level
+
+                    // get the path to this widget
+                    // path.push(innerWidgetId);
+
+                    // get changed properties
+                    // var properties = getPropertyChanges(outerWidget, path);
+                    // path.pop();
+                    //
+                    // // if there is a change, override the old one
+                    // if (properties.styles){
+                    //     if (properties.styles.custom){
+                    //         var customStyles = properties.styles.custom;
+                    //         for (var style in customStyles) {
+                    //             innerWidget.properties.styles.custom[style] = customStyles[style];
+                    //         }
+                    //     }
+                    // }
+                    innerWidget.parentId = widget.meta.id;
                 });
-                path.pop();
+                // path.pop();
+            } else {
+                // else it's a base component, so we'll just take it as is from the component we are reading from
             }
             return widget
         };
 
-        return recursiveWidgetMaking(outerWidget);
-    };
+        // var originalId = outerWidget.meta.id;
+        // var reIDedCopy = createUserWidgetCopy(recursiveWidgetMaking(outerWidget));
+        // reIDedCopy.meta.id = originalId;
+        // selectedUserWidget = reIDedCopy;
+        // // TODO this seems sketchy
+        // selectedProject.components[originalId] = selectedUserWidget;
 
-    var recursiveWidgetMaking = function(widget){
-        if (widget.type == 'user') {
-            widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
-                var innerWidget = widget.innerWidgets[innerWidgetId];
-                if (innerWidget.type == 'user') { // TODO FIXME doing some sketchy shit here
-                    var customStyles = innerWidget.properties.styles.custom;
-                    var templateId = innerWidget.meta.templateId;
-                    innerWidget = recursiveWidgetMaking(
-                        createUserWidgetCopy(
-                            UserWidget.fromString(
-                                JSON.stringify(selectedProject.components[templateId])
-                            )
-                        )
-                    );
-                    innerWidget.meta.id = innerWidgetId;
-                    innerWidget.meta.templateId = templateId;
-                    for (var style in customStyles) {
-                        innerWidget.properties.styles.custom[style] = customStyles[style];
-                    }
-                    widget.innerWidgets[innerWidgetId] = innerWidget;
-                }
-            });
-        }
-        return widget
+        var recursiveWidget = recursiveWidgetMaking(outerWidget);
+        applyPropertyChanges(recursiveWidget, outerWidget);
+
+        // return recursiveWidgetMaking(outerWidget);
+        return recursiveWidget
     };
+    //
+    // var recursiveWidgetMaking = function(widget){
+    //     if (widget.type == 'user') {
+    //         widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
+    //             var innerWidget = widget.innerWidgets[innerWidgetId];
+    //             if (innerWidget.type == 'user') { // TODO FIXME doing some sketchy shit here
+    //                 var customStyles = innerWidget.properties.styles.custom;
+    //                 var templateId = innerWidget.meta.templateId;
+    //                 innerWidget = recursiveWidgetMaking(
+    //                     createUserWidgetCopy(
+    //                         UserWidget.fromString(
+    //                             JSON.stringify(selectedProject.components[templateId])
+    //                         )
+    //                     )
+    //                 );
+    //                 innerWidget.meta.id = innerWidgetId;
+    //                 innerWidget.meta.templateId = templateId;
+    //                 for (var style in customStyles) {
+    //                     innerWidget.properties.styles.custom[style] = customStyles[style];
+    //                 }
+    //                 widget.innerWidgets[innerWidgetId] = innerWidget;
+    //             }
+    //         });
+    //     }
+    //     return widget
+    // };
 
     /**
      * Loads elements into the DOM. If the elements were already there, gets rid of them
@@ -443,14 +514,16 @@ var WorkSurface = function(){
         var widgetId = userWidget.meta.id;
         disableAllWidgetDomElementsExcept(widgetId);
         var workSurface = createWorkSurface(widgetId, userWidget.properties.dimensions.height, userWidget.properties.dimensions.width);
-        resetWorkSurface(workSurface);
 
         $('#outer-container').append(workSurface);
 
+        resetWorkSurface(workSurface);
+
         makeWorkSurfaceResizable(workSurface, userWidget); // TODO experimentation
         makeWorkSurfaceDroppableToWidgets(workSurface, userWidget);
-        setWidgetOptions(selectedProject.components[widgetId]);
         zoomElement.updateZoomFromState(userWidget);
+
+        setWidgetOptions(selectedProject.components[widgetId]);
 
         return workSurface
     };
