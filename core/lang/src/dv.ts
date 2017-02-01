@@ -8,19 +8,30 @@ const cli = command_line_args([
 
   // Mode can be "dev" or "test".  In dev mode the development page is shown,
   // in test mode the main widget is shown
-  {name: "mode", type: String, defaultValue: "dev"}
+  {name: "mode", type: String, defaultValue: "dev"},
+  {name: "debug", type: Boolean, defaultValue: false}
 ]);
 
-const opts = cli.parse();
-const p = new Parser();
-const cliche: Cliche = p.parse(opts.file);
-console.log(JSON.stringify(cliche, null, 2));
 
-grunt.task.init = () => ({});
-GruntTask.task(
-  grunt, cliche.fqelement,
-  cliche.widgets,
-  cliche.main_widget,
-  cliche.used_cliches,
-  cliche.used_widgets);
-grunt.tasks(["dv-mean:test"]);
+function main() {
+  const opts = cli.parse();
+  const p = new Parser();
+
+  if (opts.debug) {
+    p.debug_match(opts.file);
+    return;
+  }
+
+  const cliche: Cliche = p.parse(opts.file);
+
+  grunt.task.init = () => ({});
+  GruntTask.task(
+    grunt, cliche.fqelement,
+    cliche.widgets,
+    cliche.main_widget,
+    cliche.used_cliches,
+    cliche.used_widgets);
+  grunt.tasks(["dv-mean:test"]);
+}
+
+main();
