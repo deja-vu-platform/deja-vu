@@ -388,15 +388,12 @@ export class Parser {
       .addOperation("usedWidgets", {
         ClicheDecl: (cliche, name, uses, key1, para, key2) => {
           const cliche_map = uses.clicheMap()[0];
+          if (cliche_map === undefined) return [];
           return _u.chain(para.usedWidgets()).flatten()
              // Ignore widgets that are of the current cliche
             .filter(w => cliche_map[w.cliche])
             .map(w => {
-              const mapped_cliche = cliche_map[w.cliche];
-              if (!mapped_cliche) {
-                throw new Error(`Can't find cliche ${w.cliche}`);
-              }
-              return {name: w.name, fqelement: mapped_cliche.fqelement};
+              return {name: w.name, fqelement: cliche_map[w.cliche].fqelement};
             })
             .value();
         },
