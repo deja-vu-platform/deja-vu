@@ -5,7 +5,7 @@
         {
           "name": "user",
           "type": { "name": "User", "fqelement": "dv-access-auth" },
-          "widget": { "name": "Register", "fqelement": "dv-access-auth" }
+          "widget": { "name": "RegisterWithRedirect", "fqelement": "dv-access-auth" }
         }
       ],
       "subfield": {
@@ -21,7 +21,7 @@
         {
           "name": "user",
           "type": { "name": "User", "fqelement": "dv-access-auth" },
-          "widget": { "name": "SignIn", "fqelement": "dv-access-auth" }
+          "widget": { "name": "SignInWithRedirect", "fqelement": "dv-access-auth" }
         }
       ],
       "subfield": {
@@ -35,19 +35,19 @@
     {
       "fields": [
         {
-          "name": "signin_ok",
-          "type": { "name": "Boolean", "fqelement": "dv-access-auth" },
-          "widget": { "name": "SignIn", "fqelement": "dv-access-auth" }
+          "name": "route",
+          "type": { "name": "Text", "fqelement": "dv-access-auth" },
+          "widget": { "name": "SignInWithRedirect", "fqelement": "dv-access-auth" }
         },
         {
-          "name": "register_ok",
-          "type": { "name": "Boolean", "fqelement": "dv-access-auth" },
-          "widget": { "name": "Register", "fqelement": "dv-access-auth" }
+          "name": "route",
+          "type": { "name": "Text", "fqelement": "dv-access-auth" },
+          "widget": { "name": "RegisterWithRedirect", "fqelement": "dv-access-auth" }
         }
       ],
       "subfield": {
-        "name": "signin_or_register_ok", "type": {
-          "name": "Boolean", "fqelement": "dv-samples-bookmark"
+        "name": "route", "type": {
+          "name": "Text", "fqelement": "dv-samples-bookmark"
         }, "widget": {
           "name": "Landing", "fqelement": "dv-samples-bookmark"
         }
@@ -199,14 +199,14 @@
     {
       "fields": [
         {
-          "name": "signout_ok",
-          "type": { "name": "Boolean", "fqelement": "dv-access-auth" },
-          "widget": { "name": "SignOut", "fqelement": "dv-access-auth" }
+          "name": "route",
+          "type": { "name": "Text", "fqelement": "dv-access-auth" },
+          "widget": { "name": "SignOutWithRedirect", "fqelement": "dv-access-auth" }
         }
       ],
       "subfield": {
-        "name": "signout_ok", "type": {
-          "name": "Boolean", "fqelement": "dv-samples-bookmark"
+        "name": "route", "type": {
+          "name": "Text", "fqelement": "dv-samples-bookmark"
         }, "widget": {
           "name": "App", "fqelement": "dv-samples-bookmark"
         }

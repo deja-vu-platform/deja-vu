@@ -29,7 +29,7 @@ module.exports = function(grunt) {
        // Home
        {name: "ShowFeed", fqelement: "dv-messaging-feed"},
        // App
-       {name: "SignOut", fqelement: "dv-access-auth"},
+       {name: "SignOutWithRedirect", fqelement: "dv-access-auth"},
        // Create Post
        {name: "NewPostContent", fqelement: "dv-messaging-post"},
        {name: "LabelsText", fqelement: "dv-organization-label"},
@@ -43,8 +43,8 @@ module.exports = function(grunt) {
        {name: "Comments", fqelement: "dv-messaging-comment"},
        {name: "Comment", fqelement: "dv-messaging-comment"},
        // Landing
-       {name: "SignIn", fqelement: "dv-access-auth"},
-       {name: "Register", fqelement: "dv-access-auth"},
+       {name: "SignInWithRedirect", fqelement: "dv-access-auth"},
+       {name: "RegisterWithRedirect", fqelement: "dv-access-auth"},
        // Topics and Users
        {name: "LoggedIn", fqelement: "dv-access-auth"},
        {name: "EditFollow", fqelement: "dv-community-follow"}

@@ -1,0 +1,31 @@
+<!-- Register --> 
+<form (ngSubmit)="onSubmit()" #registerForm="ngForm" class="form-horizontal">
+  <fieldset class="form-group" [ngClass]="{'has-error': username_error}">
+    <label class="sr-only" for="username">Username</label>
+    <input type="text" required class="form-control" name="username"
+    [(ngModel)]="user.username" ngControl="username" placeholder="Username"/>
+    <div id="username-status" class="alert alert-danger"
+     [hidden]="!username_error">
+      Username already exists
+    </div>
+  </fieldset>
+  <fieldset class="form-group">
+    <label class="sr-only" for="password">Password</label>
+    <input type="password" required class="form-control" name="password"
+     [(ngModel)]="user.password" ngControl="password" placeholder="Password"/>
+  </fieldset>
+  <fieldset class="form-group" [ngClass]="{'has-error': reenter_password_error}">
+    <label class="sr-only" for="reenter-password">Re-enter password</label>
+    <input type="password" required class="form-control" name="reenter-password"
+     [(ngModel)]="reenter_password" ngControl="reenter-password"
+     placeholder="Re-enter password"/>
+    <div id="reenter-password-status" class="alert alert-danger"
+     [hidden]="!reenter_password_error">
+      Passwords don't match
+    </div>
+  </fieldset>
+  <fieldset class="form-group">
+    <button type="submit" class="btn btn-default btn-sm"
+     [disabled]="!registerForm.form.valid">Register</button>
+  </fieldset>
+</form>

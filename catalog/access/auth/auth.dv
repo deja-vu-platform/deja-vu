@@ -2,7 +2,8 @@ cliche Auth {
   data User {
     username: Text
   }
-  
+ 
+  // Will also sign in the user
   widget RegisterWithRedirect {
     register_ok_redirect: Widget
   }
