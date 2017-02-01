@@ -13,9 +13,18 @@ cliche Comment {
     name: Text
   }
 
-  widget CommentsWithComment {
-    target: Target,
-    author: Author
+  widget Comments {
+    target: Target
+  }
+
+  widget NewComment {
+    author: Author,
+    target: Target
+  }
+
+  widget CommentsWithComment uses Comments, NewComment {
+    target: Target = Comments.target + NewComment.target,
+    author: Author = NewComment.target
   }
   
 }
