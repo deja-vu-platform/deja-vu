@@ -32,11 +32,11 @@ module.exports = function(grunt) {
        {name: "SignOutWithRedirect", fqelement: "dv-access-auth"},
        // Create Post
        {name: "NewPostContent", fqelement: "dv-messaging-post"},
-       {name: "LabelsText", fqelement: "dv-organization-label"},
+       {name: "AttachLabels", fqelement: "dv-organization-label"},
        {name: "NewPostButton", fqelement: "dv-messaging-post"},
        // Feed Item
        {name: "ShowAuthor", fqelement: "dv-messaging-post"},
-       {name: "Labels", fqelement: "dv-organization-label"},
+       {name: "ShowLabels", fqelement: "dv-organization-label"},
        {name: "CommentsWithComment", fqelement: "dv-messaging-comment"},
        // hack..shouldn't have to specify these
        {name: "NewComment", fqelement: "dv-messaging-comment"},

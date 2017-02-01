@@ -14,7 +14,7 @@ import {Widget} from "client-bus";
         {{post.content}}
       </p>
       <div class="list-group-item-text">
-        <dv-widget name="Labels" fqelement="dv-organization-label"
+        <dv-widget name="ShowLabels" fqelement="dv-organization-label"
          [fields]="fields" [hosts]="hosts">
         </dv-widget>
       </div>

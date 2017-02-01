@@ -15,7 +15,7 @@ import {GraphQlService} from "gql";
     </ul>
   `
 })
-export class LabelsComponent {
+export class ShowLabelsComponent {
   item = {on_change: undefined, atom_id: undefined, labels: undefined};
   fetched = false;
   constructor(private _graphQlService: GraphQlService) {}

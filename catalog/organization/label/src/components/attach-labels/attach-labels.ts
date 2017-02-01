@@ -12,7 +12,7 @@ import {Widget} from "client-bus";
   fqelement: "dv-organization-label",
   ng2_providers: [GraphQlService]
 })
-export class LabelsTextComponent {
+export class AttachLabelsComponent {
   item = {labels: [], atom_id: undefined};
   labels_text: string = "";
   submit_ok = {value: false, on_change: undefined, on_after_change: undefined};
@@ -24,7 +24,7 @@ export class LabelsTextComponent {
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === false) return;
 
-      console.log("On submit at labels-text");
+      console.log("On submit at attach-labels");
       return Promise.all<Label>(
           _u.chain(this.labels_text.split(","))
             .map(l => l.trim())
