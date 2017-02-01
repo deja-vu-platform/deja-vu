@@ -14,7 +14,8 @@ cliche Label {
   }
 
   widget AttachLabels {
-    item: Item
+    item: Item,
+    submit_ok: Boolean
   }
 
   widget ShowLabels {

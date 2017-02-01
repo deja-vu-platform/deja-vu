@@ -64,19 +64,19 @@ cliche Bookmark uses
   // Shows the post, with its author, attached labels and comments. Also has
   // a field that lets the logged in user comment on the post
   widget ShowFeedPost uses
-    MessagingPost.ShowAuthor, Label.Labels, Comment.CommentsWithComment {
+    MessagingPost.ShowAuthor, Label.ShowLabels, Comment.CommentsWithComment {
     post: Post = Label.ShowLabels.item + MessagingPost.ShowAuthor.post +
       Comment.CommentsWithComment.target
   } replaces Feed.ShowFeedItem in Feed.ShowFeed { message = ShowFeedPost.post }
 
   widget CreatePost uses
     MessagingPost.NewPostContent,
-    Label.LabelsText,
+    Label.AttachLabels,
     MessagingPost.NewPostButton {
-    post: Post = MessagingPost.NewPostContent.post + Label.LabelsText.item +
+    post: Post = MessagingPost.NewPostContent.post + Label.AttachLabels.item +
       MessagingPost.NewPostButton.post,
     submit_ok: Boolean = MessagingPost.NewPostContent.submit_ok +
-      Label.LabelsText.submit_ok + MessagingPost.NewPostButton.submit_ok
+      Label.AttachLabels.submit_ok + MessagingPost.NewPostButton.submit_ok
   }
 
   // Displays the list of topics and lets the logged in user follow or unfollow
