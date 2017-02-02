@@ -165,7 +165,9 @@ var WidgetContainer = function(){
             widget.properties.styles.bsClasses = {};
             /////////////
 
-            outerWidget.properties.children[widget.meta.id] = {};
+            clearCustomStylesGivenPath(getPath(selectedUserWidget, widget.meta.id));
+
+            // outerWidget.properties.children[widget.meta.id] = {};
             refreshContainerDisplay(false, container, currentZoom);
 
         });
@@ -317,8 +319,22 @@ var WidgetContainer = function(){
 
     var updateCustomStylesGivenPath = function(path, newCustomStyles){
         var customStyles = createCustomStylesGivenPath(path);
+        var widget = getInnerWidget(selectedUserWidget, path[path.length-1]);
         for (var style in newCustomStyles){
             customStyles[style] = newCustomStyles[style];
+            widget.properties.styles.custom[style] = newCustomStyles[style];
+        }
+    };
+
+    var clearCustomStylesGivenPath = function(path){
+        var customProperties = getCustomPropertyGivenPath(path);
+        var widget = getInnerWidget(selectedUserWidget, path[path.length-1]);
+        if (customProperties.styles){
+            customProperties.styles.custom = {};
+            customProperties.styles.bsClasses = {};
+            widget.properties.styles.custom = {};
+            widget.properties.styles.bsClasses = {};
+
         }
     };
 

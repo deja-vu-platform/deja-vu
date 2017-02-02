@@ -116,10 +116,13 @@ var WorkSurface = function(){
         // TODO. This is a confusing function
         // TODO. Document what's going on!!!
 
-        // TODO This does NOT get the property changes for the inner widgets made at a previous level!
         var getPropertyChanges = function(outerWidget, path){
             // get the changes at this level
+
+            // if path is just the outer widget's id, will just return outerWidget.properties
             var change = outerWidget.properties;
+
+            // else go down and find the correct one
             for (var pathValueIdx = 1; pathValueIdx<path.length; pathValueIdx++){
                 if (change.children){
                     if (change.children[path[pathValueIdx]]){
@@ -144,6 +147,8 @@ var WorkSurface = function(){
             var path = [];
             var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
                 path.push(sourceInnerWidget.meta.id);
+
+
                 // get changed properties
                 var properties = getPropertyChanges(sourceWidget, path);
 
@@ -158,6 +163,7 @@ var WorkSurface = function(){
                 }
 
                 if (innerWidget.type == 'user'){
+                    // then recurse down
                     innerWidget.properties.layout.stackOrder.forEach(function (innerInnerWidgetId, idx) {
                         var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
                         var innerInnerSourceWidgetId = sourceInnerWidget.properties.layout.stackOrder[idx];
