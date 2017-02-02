@@ -209,9 +209,8 @@ var WidgetContainer = function(){
         return container;
     };
 
-    var setUpTextOptions = function(container, widget){
+    var setUpTextOptions = function(container, widget, path){
         var customStyles = {};
-        var path = getPath(widget.meta.id);
         if (path){ // FIXME make more robust
             customStyles = getCustomStylesGivenPath(path);
         }
@@ -236,8 +235,10 @@ var WidgetContainer = function(){
         fontSizeSetButton.click(function(){
             var value = fontSizeInput.val();
             if (!isNaN(parseInt(value))){
-                customStyles['font-size'] = value + 'px';
-                // widget.properties.styles.custom['font-size'] = value + 'px';
+                updateCustomStylesGivenPath(path, {'font-size': value + 'px'});
+
+                // customStyles['font-size'] = value + 'px';
+                widget.properties.styles.custom['font-size'] = value + 'px';
                 refreshContainerDisplay(false, container, currentZoom);
 
             }
@@ -247,42 +248,14 @@ var WidgetContainer = function(){
         fontWeightSetButton.click(function(){
             var value = fontWeightInput.val();
             if (!isNaN(parseInt(value))){
-                customStyles['font-weight'] = value;
-                // widget.properties.styles.custom['font-weight'] = value;
+                updateCustomStylesGivenPath(path, {'font-weight': value});
+                // customStyles['font-weight'] = value;
+                widget.properties.styles.custom['font-weight'] = value;
                 refreshContainerDisplay(false, container, currentZoom);
 
             }
         });
 
-    };
-
-    // var getPath = function(widget, path){
-    //     path = path || [];
-    //     var id = widget.parentId;
-    //     if (id){
-    //         path.push(id);
-    //         getPath(selectedProject.components[id], path);
-    //     }
-    //     return path;
-    // };
-
-    var getPath = function(widgetId){
-        var wantedPath;
-        var getPathHelper = function(widget, path, targetId){
-            if (widget.meta){
-                path.push(widget.meta.id);
-                for (var id in widget.innerWidgets){
-                    if (id == targetId){
-                        path.push(id); // include the last id
-                        wantedPath = path;
-                    } else {
-                        getPathHelper(widget.innerWidgets[id], JSON.parse(JSON.stringify(path)), targetId);
-                    }
-                }
-            }
-        };
-        getPathHelper(selectedUserWidget, [], widgetId);
-        return wantedPath;
     };
 
     var createCustomPropertyGivenPath = function(path){
@@ -348,9 +321,8 @@ var WidgetContainer = function(){
         }
     };
 
-    var setUpColorOptions = function(container, widget){
+    var setUpColorOptions = function(container, widget, path){
         var customStyles = {};
-        var path = getPath(widget.meta.id);
         if (path){ // FIXME make more robust
             customStyles = getCustomStylesGivenPath(path);
         }
@@ -370,7 +342,7 @@ var WidgetContainer = function(){
             e.stopPropagation();
             var color = pickerText.toHEXString();
             // customStyles['color'] = color;
-            updateCustomStylesGivenPath(getPath(widget.meta.id), {'color': color});
+            updateCustomStylesGivenPath(path, {'color': color});
             // update both the inner widget's property and also save it in the outer widget
             widget.properties.styles.custom['color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
@@ -383,7 +355,7 @@ var WidgetContainer = function(){
             e.stopPropagation();
             var color = pickerBG.toHEXString();
             // customStyles['background-color'] = color;
-            updateCustomStylesGivenPath(getPath(widget.meta.id), {'background-color': color});
+            updateCustomStylesGivenPath(path, {'background-color': color});
             // update both the inner widget's property and also save it in the outer widget
             widget.properties.styles.custom['background-color'] = color;
             refreshContainerDisplay(false, container, currentZoom);
@@ -433,13 +405,14 @@ var WidgetContainer = function(){
         container.find('.inner-component-style-dropdown').append(configOptions);
     };
 
-    that.setUpContainer = function(container, dragHandle, widget, associated){
+    that.setUpContainer = function(container, dragHandle, widget, associated, outerMostWidget){
         var type = dragHandle.data('type');
         container.append(dragHandle);
         if (associated){
+            var path = getPath(outerMostWidget, widget.meta.id);
             showConfigOptions(type, container);
-            setUpColorOptions(container, widget);
-            setUpTextOptions(container, widget);
+            setUpColorOptions(container, widget, path);
+            setUpTextOptions(container, widget, path);
         }
     };
 

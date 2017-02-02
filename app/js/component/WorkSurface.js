@@ -39,7 +39,7 @@ var WorkSurface = function(){
 
     that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, dragHandle,
                                                             outerWidgetContainer, overallStyles, zoom, associated){
-        var container = makeRecursiveWidgetContainers(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated);
+        var container = makeRecursiveWidgetContainers(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated, outerWidget);
         if (outerWidgetContainer){
             outerWidgetContainer.append(container);
         }
@@ -51,13 +51,13 @@ var WorkSurface = function(){
     };
 
     // isEditable == component is the selected user component and all its contents are editable
-    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated){
+    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated, outerMostWidget, hackityHack){ //FIXME!
         var type = innerWidget.type;
         var widgetId = innerWidget.meta.id;
 
         // first create a container for this component
         var widgetContainer;
-        if (isThisEditable){
+        if (!hackityHack){
             widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom);
             if (!dragHandle){
                 dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
@@ -67,7 +67,7 @@ var WorkSurface = function(){
                 }
                 dragHandle.addClass('associated').data('componentid', widgetId);
             }
-            widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated);
+            widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated, outerMostWidget);
             registerDraggable(dragHandle);
             var editPopup = false;
             if (dragHandle){
@@ -102,7 +102,7 @@ var WorkSurface = function(){
                     console.log(Object.keys(innerWidget.innerWidgets));
                     console.log(innerInnerWidget);
                 }
-                var innerInnerWidgetContainer = makeRecursiveWidgetContainers(innerInnerWidget, innerWidget, false, null, zoom, associated);
+                var innerInnerWidgetContainer = makeRecursiveWidgetContainers(innerInnerWidget, innerWidget, false, null, zoom, associated, outerMostWidget);
                 widgetContainer.append(innerInnerWidgetContainer);
             });
         }

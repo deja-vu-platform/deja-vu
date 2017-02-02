@@ -42,7 +42,9 @@ function loadTablePreview(widgetToShow) {
 
         var widgetContainer = $('<div></div>');
         if (innerWidget.type == 'user'){
-            widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(innerWidget, widgetToShow, false, dragHandle, null, currentZoom, widgetToShow.properties.styles.custom, true);
+            widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(
+                innerWidget, widgetToShow, false, dragHandle, null, currentZoom,
+                widgetToShow.properties.styles.custom, true, widgetToShow, true);
         }
 
         widgetContainer.addClass('component-container');
@@ -65,3 +67,23 @@ function setUpContainer(container, dragHandle, widget, zoom){
     container.append(dragHandle);
     view.displayWidget(true, widget, container, widget.properties.styles.custom, zoom);
 }
+
+// FIXME: DRY this up, it is a repeat!
+function getPath(outerMostWidget, widgetId){
+    var wantedPath;
+    var getPathHelper = function(widget, path, targetId){
+        if (widget.meta){
+            path.push(widget.meta.id);
+            for (var id in widget.innerWidgets){
+                if (id == targetId){
+                    path.push(id); // include the last id
+                    wantedPath = path;
+                } else {
+                    getPathHelper(widget.innerWidgets[id], JSON.parse(JSON.stringify(path)), targetId);
+                }
+            }
+        }
+    };
+    getPathHelper(outerMostWidget, [], widgetId);
+    return wantedPath;
+};
