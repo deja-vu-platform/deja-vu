@@ -21,20 +21,20 @@ function loadTablePreview(widgetToShow) {
 
     page.css({
         position: 'relative',
-        'background-color': (widgetToShow.properties.custom['background-color'] || '87CEFA')
+        'background-color': (widgetToShow.properties.styles.custom['background-color'] || '87CEFA')
     });
 
     gridHeight = parseFloat($('#page-preview').height());
     gridWidth = parseFloat($('#page-preview').width());
-    var widgetHeight = widgetToShow.dimensions.height;
-    var widgetWidth = widgetToShow.dimensions.width;
+    var widgetHeight = widgetToShow.properties.dimensions.height;
+    var widgetWidth = widgetToShow.properties.dimensions.width;
     var widthScale = gridWidth/widgetWidth;
     var heightScale = gridHeight/widgetHeight;
 
     var scale = Math.min(widthScale,heightScale);
     page.height(widgetHeight*scale).width(widgetWidth*scale);
 
-    widgetToShow.layout.stackOrder.forEach(function(innerWidgetId){
+    widgetToShow.properties.layout.stackOrder.forEach(function(innerWidgetId){
         var innerWidget = widgetToShow.innerWidgets[innerWidgetId];
         var type = innerWidget.type;
         var dragHandle = $('.draggable[name=' + type + ']').clone(); // TODO do we have an a copy of this? needs a better way of getting this
@@ -51,8 +51,8 @@ function loadTablePreview(widgetToShow) {
 
         widgetContainer.css({
             position: 'absolute',
-            left: widgetToShow.layout[innerWidgetId].left*scale,
-            top: widgetToShow.layout[innerWidgetId].top*scale,
+            left: widgetToShow.properties.layout[innerWidgetId].left*scale,
+            top: widgetToShow.properties.layout[innerWidgetId].top*scale,
 
         });
 

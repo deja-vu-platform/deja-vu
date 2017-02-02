@@ -111,6 +111,8 @@ var WorkSurface = function(){
 
     var refreshFromProject = function(outerWidget){
 
+        var oldCopy = UserWidget.fromString(JSON.stringify(outerWidget));
+
         // TODO. This is a confusing function
         // TODO. Document what's going on!!!
 
@@ -183,11 +185,15 @@ var WorkSurface = function(){
                             JSON.stringify(selectedProject.components[templateId])
                         );
 
-                        innerWidget =  createUserWidgetCopy(UserWidget.fromString(
-                                JSON.stringify(selectedProject.components[templateId])
-                        ));
+                        // innerWidget =  createUserWidgetCopy(UserWidget.fromString(
+                        //         JSON.stringify(selectedProject.components[templateId])
+                        // ));
 
-                        innerWidget.meta.id = innerWidgetId;
+                        innerWidget =  UserWidget.fromString(
+                            JSON.stringify(selectedProject.components[templateId])
+                        );
+
+                        // innerWidget.meta.id = innerWidgetId;
                         innerWidget.meta.templateId = templateId;
 
                         // do it after the id and templateId are overwritten
@@ -221,7 +227,6 @@ var WorkSurface = function(){
                     //         }
                     //     }
                     // }
-                    innerWidget.parentId = widget.meta.id;
                 });
                 // path.pop();
             } else {
@@ -238,7 +243,12 @@ var WorkSurface = function(){
         // selectedProject.components[originalId] = selectedUserWidget;
 
         var recursiveWidget = recursiveWidgetMaking(outerWidget);
-        applyPropertyChanges(recursiveWidget, outerWidget);
+        recursiveReIding(recursiveWidget, oldCopy);
+        applyPropertyChanges(recursiveWidget, oldCopy);
+
+        //FIXME sketchy!
+        // selectedUserWidget = recursiveWidget;
+        // selectedProject[selectedUserWidget.meta.id] = selectedUserWidget;
 
         // return recursiveWidgetMaking(outerWidget);
         return recursiveWidget

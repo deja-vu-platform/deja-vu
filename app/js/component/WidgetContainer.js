@@ -210,14 +210,11 @@ var WidgetContainer = function(){
     };
 
     var setUpTextOptions = function(container, widget){
-        var changes = createCustomPropertyGivenPath(getPath(widget.meta.id));
-        if (!changes.styles) {
-            changes.styles = {};
+        var customStyles = {};
+        var path = getPath(widget.meta.id);
+        if (path){ // FIXME make more robust
+            customStyles = getCustomStylesGivenPath(path);
         }
-        if (!changes.styles.custom){
-            changes.styles.custom = {};
-        }
-        var customStyles = changes.styles.custom;
 
         //
         // if (!widget.properties.styles.custom){
@@ -352,9 +349,11 @@ var WidgetContainer = function(){
     };
 
     var setUpColorOptions = function(container, widget){
-
-        var customStyles = getCustomStylesGivenPath(getPath(widget.meta.id));
-
+        var customStyles = {};
+        var path = getPath(widget.meta.id);
+        if (path){ // FIXME make more robust
+            customStyles = getCustomStylesGivenPath(path);
+        }
 
         var textColorOption = $('<li><div>Text Color: </div></li>');
         var bgColorOption = $('<li><div>Background Color: </div></li>');

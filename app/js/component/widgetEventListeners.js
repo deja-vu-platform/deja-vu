@@ -721,20 +721,32 @@ function refreshContainerDisplay(fresh, container, zoom){
 
 }
 
-function createUserWidgetCopy (outerWidget){
-    var widget = UserWidget.fromString(JSON.stringify(outerWidget));
+// updates the ids to a new id, also updates them in layout.stackOrder
 
-    // updates the ids to a new id, also updates them in layout.stackOrder
-    var recursiveReIding = function(widget){
-        if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
-            var newId = generateId();
-                // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
-            widget.meta.id = newId;
-            if (widget.type == 'user'){
-                for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
-                    var oldId = widget.properties.layout.stackOrder[idx];
-                    var result = recursiveReIding(widget.innerWidgets[oldId]);
-                    if (result.success){
+// source outer widget is if you already have a copy of your Widget
+// and you want the given widget (not a copy) to have the same recursive ids as that one
+function recursiveReIding(widget, sourceWidget){
+    if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
+        var newId;
+        if (sourceWidget){
+            newId = sourceWidget.meta.id;
+        } else {
+            newId = generateId();
+        }
+        // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
+        widget.meta.id = newId;
+        if (widget.type == 'user'){
+            for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
+                var oldId = widget.properties.layout.stackOrder[idx];
+                var result;
+                if (sourceWidget){
+                    var oldSourceId = sourceWidget.properties.layout.stackOrder[idx];
+                    result = recursiveReIding(widget.innerWidgets[oldId], sourceWidget.innerWidgets[oldSourceId]);
+                } else {
+                    result = recursiveReIding(widget.innerWidgets[oldId]);
+                }
+                if (result.success){
+                    if (result.newId != oldId){ // or else the delete will delete the things!
                         widget.properties.layout.stackOrder[idx] = result.newId;
                         widget.innerWidgets[result.newId] = widget.innerWidgets[oldId];
                         delete widget.innerWidgets[oldId];
@@ -743,12 +755,16 @@ function createUserWidgetCopy (outerWidget){
                     }
                 }
             }
-            return {success: true, newId: newId};
         }
-        return {success: false}
-    };
+        return {success: true, newId: newId};
+    }
+    return {success: false}
+};
 
-    recursiveReIding(widget);
+function createUserWidgetCopy (outerWidget, sourceOuterWidget){
+    var widget = UserWidget.fromString(JSON.stringify(outerWidget));
+
+    recursiveReIding(widget, sourceOuterWidget);
     return widget;
 }
 

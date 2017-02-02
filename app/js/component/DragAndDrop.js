@@ -98,17 +98,16 @@ var DragAndDropController = function () {
                         // FIXME
                         // How to have two copies of the same widget in the same place?
                         widget = UserWidget.fromString(JSON.stringify(selectedProject.components[id]));
-
+                        console.log(widget);
                         widget.meta.templateId = widget.meta.id;
                         widget = createUserWidgetCopy(widget);
-
+                        console.log(widget);
                         dragHandle.data('componentid', widget.meta.id);
                         dragHandle.text(widget.meta.name);
                         dragHandle.css('display', 'block');
                     } else {
                         widget = BaseWidget(type, {}, view.getDimensions(type));
                     }
-                    widget.parentId = selectedUserWidget.meta.id;
                     draggingWidget = widget;
                     widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, true,
                         dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom, false);
