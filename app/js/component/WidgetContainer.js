@@ -158,19 +158,11 @@ var WidgetContainer = function(){
 
         buttonStyle.find('.inner-component-delete-style').click(function(e){
             e.stopPropagation();
-
-            // TODO this is wrong, because at this point I'm supposed to go back and read the old colors
-            // TODO that were previously overwritten
-            widget.properties.styles.custom = {};
-            widget.properties.styles.bsClasses = {};
-            /////////////
-
-            clearCustomStylesGivenPath(widgetEditsManager.getPath(selectedUserWidget, widget.meta.id));
-
-            widgetEditsManager.applyPropertyChangesAtAllLevel(selectedUserWidget);
-            // outerWidget.properties.children[widget.meta.id] = {};
+            clearCustomStyles(outerWidget, widget.meta.id);
+            widgetEditsManager.applyPropertyChangesAtAllLevel(outerWidget);
             refreshContainerDisplay(false, container, currentZoom);
 
+            // TODO reset the values in the inputs
         });
 
         buttonEdit.on("click", function (e) {
@@ -212,58 +204,11 @@ var WidgetContainer = function(){
         return container;
     };
 
-    var setUpTextOptions = function(container, widget, path){
-        var customStyles = {};
-        if (path){ // FIXME make more robust
-            customStyles = getCustomStylesGivenPath(path);
-        }
 
-        //
-        // if (!widget.properties.styles.custom){
-        //     widget.properties.styles.custom = {}
-        // }
+    var createCustomProperty = function(outermostWidget, targetId){
+        var path = widgetEditsManager.getPath(outermostWidget, targetId);
 
-        var fontSizeOption = $('<li><div>Font Size: </div></li>');
-        var fontWeightOption = $('<li><div>Font Weight: </div></li>');
-        var fontSizeInput = $('<input class="font-size-input">');
-        var fontWeightInput = $('<input class="font-weight-input">');
-        var fontSizeSetButton = $('<button class="btn font-size-set-button">Set</button>');
-        var fontWeightSetButton = $('<button class="btn font-size-set-button">Set</button>');
-
-        fontSizeOption.append(fontSizeInput).append(fontSizeSetButton);
-        fontWeightOption.append(fontWeightInput).append(fontWeightSetButton);
-        container.find('.inner-component-custom-style-dropdown').append(fontSizeOption).append(fontWeightOption);
-
-
-        fontSizeSetButton.click(function(){
-            var value = fontSizeInput.val();
-            if (!isNaN(parseInt(value))){
-                updateCustomStylesGivenPath(path, {'font-size': value + 'px'});
-
-                // customStyles['font-size'] = value + 'px';
-                widget.properties.styles.custom['font-size'] = value + 'px';
-                refreshContainerDisplay(false, container, currentZoom);
-
-            }
-
-        });
-
-        fontWeightSetButton.click(function(){
-            var value = fontWeightInput.val();
-            if (!isNaN(parseInt(value))){
-                updateCustomStylesGivenPath(path, {'font-weight': value});
-                // customStyles['font-weight'] = value;
-                // TODO this does not seem to be carried over to the selectedUserComponent
-                widget.properties.styles.custom['font-weight'] = value;
-                refreshContainerDisplay(false, container, currentZoom);
-
-            }
-        });
-
-    };
-
-    var createCustomPropertyGivenPath = function(path){
-        var currPath = selectedUserWidget.properties;
+        var currPath = outermostWidget.properties;
         path.forEach(function(pathVal, idx){
             if (idx != 0){
                 if (!currPath.children[pathVal]){
@@ -276,8 +221,10 @@ var WidgetContainer = function(){
         return currPath;
     };
 
-    var getCustomPropertyGivenPath = function(path){
-        var currPath = selectedUserWidget.properties;
+    var getCustomProperty = function(outermostWidget, targetId){
+        var path = widgetEditsManager.getPath(outermostWidget, targetId);
+
+        var currPath = outermostWidget.properties;
         var noProperty = false;
         path.forEach(function(pathVal, idx){
             if (!noProperty){
@@ -296,8 +243,8 @@ var WidgetContainer = function(){
 
     };
 
-    var getCustomStylesGivenPath = function(path){
-        var changes = getCustomPropertyGivenPath(path);
+    var getCustomStyles = function(outermostWidget, targetId){
+        var changes = getCustomProperty(outermostWidget, targetId);
         if (changes.styles) {
             if (changes.styles.custom){
                 return changes.styles.custom;
@@ -307,29 +254,35 @@ var WidgetContainer = function(){
     };
 
 
-    var createCustomStylesGivenPath = function(path){
-        var changes = createCustomPropertyGivenPath(path);
-        if (!changes.styles) {
-            changes.styles = {};
-        }
-        if (!changes.styles.custom){
-            changes.styles.custom = {};
-        }
-        return changes.styles.custom;
-    };
 
-    var updateCustomStylesGivenPath = function(path, newCustomStyles){
-        var customStyles = createCustomStylesGivenPath(path);
-        var widget = widgetEditsManager.getInnerWidget(selectedUserWidget, path[path.length-1]);
+
+    var updateCustomStyles = function(outermostWidget, targetId, newCustomStyles){
+        var path = widgetEditsManager.getPath(outermostWidget, targetId);
+
+        var createCustomStyles = function(outermostWidget, targetId){
+            var changes = createCustomProperty(outermostWidget, targetId);
+            if (!changes.styles) {
+                changes.styles = {};
+            }
+            if (!changes.styles.custom){
+                changes.styles.custom = {};
+            }
+            return changes.styles.custom;
+        };
+
+        var customStyles = createCustomStyles(outermostWidget, targetId);
+        var widget = widgetEditsManager.getInnerWidget(outermostWidget, path[path.length-1]);
         for (var style in newCustomStyles){
             customStyles[style] = newCustomStyles[style];
             widget.properties.styles.custom[style] = newCustomStyles[style];
         }
     };
 
-    var clearCustomStylesGivenPath = function(path){
-        var customProperties = getCustomPropertyGivenPath(path);
-        var widget = widgetEditsManager.getInnerWidget(selectedUserWidget, path[path.length-1]);
+    var clearCustomStyles = function(outermostWidget, targetId){
+        var path = widgetEditsManager.getPath(outermostWidget, targetId);
+
+        var customProperties = getCustomProperty(path);
+        var widget = widgetEditsManager.getInnerWidget(outermostWidget, path[path.length-1]);
         if (customProperties.styles){
             customProperties.styles.custom = {};
             customProperties.styles.bsClasses = {};
@@ -339,10 +292,59 @@ var WidgetContainer = function(){
         }
     };
 
-    var setUpColorOptions = function(container, widget, path){
+
+    var setUpTextOptions = function(container, widget, outermostWidget){
         var customStyles = {};
-        if (path){ // FIXME make more robust
-            customStyles = getCustomStylesGivenPath(path);
+        var targetId = widget.meta.id;
+        if (outermostWidget){ // FIXME make more robust
+            customStyles = getCustomStyles(outermostWidget, targetId);
+        }
+
+        var fontSizeOption = $('<li><div>Font Size: </div></li>');
+        var fontWeightOption = $('<li><div>Font Weight: </div></li>');
+        var fontSizeInput = $('<input class="font-size-input">');
+        var fontWeightInput = $('<input class="font-weight-input">');
+        var fontSizeSetButton = $('<button class="btn font-size-set-button">Set</button>');
+        var fontWeightSetButton = $('<button class="btn font-size-set-button">Set</button>');
+
+        var fontSize = customStyles['font-size'] || '14px'; // TODO
+        fontSizeInput.val(fontSize);
+
+        var fontWeight = customStyles['font-weight'] || '100'; // TODO
+        fontWeightInput.val(fontWeight);
+
+
+        fontSizeOption.append(fontSizeInput).append(fontSizeSetButton);
+        fontWeightOption.append(fontWeightInput).append(fontWeightSetButton);
+        container.find('.inner-component-custom-style-dropdown').append(fontSizeOption).append(fontWeightOption);
+
+
+        fontSizeSetButton.click(function(){
+            var value = fontSizeInput.val();
+            if (!isNaN(parseInt(value))){
+                updateCustomStyles(outermostWidget, targetId, {'font-size': value + 'px'});
+                refreshContainerDisplay(false, container, currentZoom);
+
+            }
+
+        });
+
+        fontWeightSetButton.click(function(){
+            var value = fontWeightInput.val();
+            if (!isNaN(parseInt(value))){
+                updateCustomStyles(outermostWidget, targetId, {'font-weight': value});
+                refreshContainerDisplay(false, container, currentZoom);
+
+            }
+        });
+
+    };
+
+    var setUpColorOptions = function(container, widget, outermostWidget){
+        var customStyles = {};
+        var targetId = widget.meta.id;
+        if (outermostWidget){
+            customStyles = getCustomStyles(outermostWidget, targetId);
         }
 
         var textColorOption = $('<li><div>Text Color: </div></li>');
@@ -359,10 +361,7 @@ var WidgetContainer = function(){
         textColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerText.toHEXString();
-            // customStyles['color'] = color;
-            updateCustomStylesGivenPath(path, {'color': color});
-            // update both the inner widget's property and also save it in the outer widget
-            widget.properties.styles.custom['color'] = color;
+            updateCustomStyles(outermostWidget, targetId, {'color': color});
             refreshContainerDisplay(false, container, currentZoom);
         });
 
@@ -372,10 +371,7 @@ var WidgetContainer = function(){
         bgColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerBG.toHEXString();
-            // customStyles['background-color'] = color;
-            updateCustomStylesGivenPath(path, {'background-color': color});
-            // update both the inner widget's property and also save it in the outer widget
-            widget.properties.styles.custom['background-color'] = color;
+            updateCustomStyles(outermostWidget, targetId, {'background-color': color});
             refreshContainerDisplay(false, container, currentZoom);
         });
 
@@ -423,14 +419,13 @@ var WidgetContainer = function(){
         container.find('.inner-component-style-dropdown').append(configOptions);
     };
 
-    that.setUpContainer = function(container, dragHandle, widget, associated, outerMostWidget){
+    that.setUpContainer = function(container, dragHandle, widget, associated, outermostWidget){
         var type = dragHandle.data('type');
         container.append(dragHandle);
         if (associated){
-            var path = widgetEditsManager.getPath(outerMostWidget, widget.meta.id);
             showConfigOptions(type, container);
-            setUpColorOptions(container, widget, path);
-            setUpTextOptions(container, widget, path);
+            setUpColorOptions(container, widget, outermostWidget);
+            setUpTextOptions(container, widget, outermostWidget);
         }
     };
 

@@ -38,8 +38,11 @@ var WorkSurface = function(){
     };
 
     that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, dragHandle,
-                                                            outerWidgetContainer, overallStyles, zoom, associated){
-        var container = makeRecursiveWidgetContainers(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated, outerWidget);
+                                                            outerWidgetContainer, overallStyles, zoom, associated,
+                                                            hackityHack){
+        var container = makeRecursiveWidgetContainers(
+            innerWidget, outerWidget, isThisEditable, dragHandle,
+            zoom, associated, outerWidget, hackityHack);
         if (outerWidgetContainer){
             outerWidgetContainer.append(container);
         }
@@ -51,7 +54,7 @@ var WorkSurface = function(){
     };
 
     // isEditable == component is the selected user component and all its contents are editable
-    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated, outerMostWidget, hackityHack){ //FIXME!
+    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated, outermostWidget, hackityHack){ //FIXME!
         var type = innerWidget.type;
         var widgetId = innerWidget.meta.id;
 
@@ -67,7 +70,7 @@ var WorkSurface = function(){
                 }
                 dragHandle.addClass('associated').data('componentid', widgetId);
             }
-            widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated, outerMostWidget);
+            widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated, outermostWidget);
             registerDraggable(dragHandle);
             var editPopup = false;
             if (dragHandle){
@@ -102,7 +105,9 @@ var WorkSurface = function(){
                     console.log(Object.keys(innerWidget.innerWidgets));
                     console.log(innerInnerWidget);
                 }
-                var innerInnerWidgetContainer = makeRecursiveWidgetContainers(innerInnerWidget, innerWidget, false, null, zoom, associated, outerMostWidget);
+                var innerInnerWidgetContainer = makeRecursiveWidgetContainers(
+                    innerInnerWidget, innerWidget, false, null, zoom,
+                    associated, outermostWidget, hackityHack);
                 widgetContainer.append(innerInnerWidgetContainer);
             });
         }
@@ -325,7 +330,7 @@ var WorkSurface = function(){
     that.loadUserWidget = function(userWidget){
         var widgetId = userWidget.meta.id;
         var workSurface = $('#work-surface'+'_'+widgetId);
-        zoomElement.registerZoom(selectedUserWidget);
+        zoomElement.registerZoom(userWidget);
 
         if (workSurface.length===0){
             currentZoom = 1;
@@ -334,7 +339,7 @@ var WorkSurface = function(){
             disableAllWidgetDomElementsExcept(widgetId);
             setWidgetOptions(userWidget);
             zoomElement.updateZoomFromState(userWidget);
-            // for now, reload the thinger
+            // TODO other way? for now, reload the thinger
             loadUserWidgetIntoWorkSurface(userWidget, currentZoom);
         }
         miniNav.setUpMiniNavElementAndInnerWidgetSizes(userWidget);
@@ -366,6 +371,102 @@ var WorkSurface = function(){
 
         return workSurface
     };
+
+
+
+    /**
+     * Disabled by changing the id and class names
+     * @param widgetId
+     */
+    var disableWidgetDOMElements = function(widgetId){
+        var workSurface = $('#work-surface'+'_'+widgetId);
+        $(workSurface).addClass('hidden-component');
+
+        $(workSurface).find('*').each(function() {
+            var elt = this;
+            
+            var id = elt.id;
+            if (id.length>0){
+                elt.id = 'disabled_'+widgetId+'_'+elt.id;
+            }
+            var classes = elt.className;
+            if (classes.length>0){
+                classes = classes.split(' ');
+                var classNames = '';
+                classes.forEach(function(className){
+                    classNames = classNames + ' ' + 'disabled_'+widgetId+'_'+className;
+                });
+                elt.className = classNames;
+            }
+        });
+    };
+
+
+    var enableWidgetDOMElements = function(widgetId){
+        var workSurface = $('#work-surface'+'_'+widgetId);
+        $(workSurface).removeClass('hidden-component');
+
+        $(workSurface).find('*').each(function() {
+            var elt = this;
+
+            var id = elt.id;
+            if (id.length>0){
+                elt.id = id.replace('disabled_'+widgetId+'_', '');
+            }
+            var classes = elt.className;
+            if (classes.length>0){
+                classes = classes.split(' ');
+                var classNames = '';
+                classes.forEach(function(className){
+                    classNames =  classNames  + ' ' +  className.replace('disabled_'+widgetId+'_', '');
+                });
+                elt.className = classNames.trim();
+            }
+        });
+    };
+
+    var disableAllWidgetDomElementsExcept = function(widgetToEnableId){
+        for (var widgetId in selectedProject.components){
+            if (widgetToEnableId == widgetId){
+                enableWidgetDOMElements(widgetId);
+                continue;
+            }
+            if ($('#work-surface'+'_'+widgetId).hasClass('hidden-component')){
+                continue;
+            }
+            disableWidgetDOMElements(widgetId);
+        }
+    };
+
+    // var enableSpecificComponentDomElements = function(componentToEnableId){
+    //     // first check that the table has been made (otherwise the reset will happen automatically,
+    //     // but more importantly, the table-grid-container won't exist yet
+    //     var workSurfaceToEnable = $('#work-surface'+'_'+componentToEnableId);
+    //     if (!(workSurfaceToEnable.length>0)) {
+    //         createOrResetTableGridContainer(componentToEnableId);
+    //         var state = {
+    //             zoom: 1,
+    //             lock:{
+    //                 width: false,
+    //                 height: false
+    //             }
+    //         };
+    //         $('#work-surface'+'_'+componentToEnableId).data('state', state);
+    //     }
+    //
+    //     var componentToEnable = selectedProject.components[componentToEnableId];
+    //
+    //     // enable first (toggle needs the id's and classes to be enabled)
+    //     if (workSurfaceToEnable.hasClass('hidden-component')){
+    //         enableWidgetDOMElements(componentToEnableId);
+    //     }
+    //
+    //     zoomElt.updateZoomFromState(componentToEnable);
+    //
+    //     setWidgetOptions(componentToEnable);
+    //
+    // }
+
 
 
     Object.freeze(that);

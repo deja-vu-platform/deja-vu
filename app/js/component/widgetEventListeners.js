@@ -266,10 +266,6 @@ function displayMainPageInListAndSelect(name, id){
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
-function deleteWidgetFromView(container) {
-    container.remove();
-}
-
 
 /**
  * Updates the contents of a base component info at a particular cell based on inputs
@@ -720,11 +716,18 @@ function refreshContainerDisplay(fresh, container, zoom){
     }
 
 }
+/**
+ *
+ // updates the ids to a new id, also updates them in layout.stackOrder
 
-// updates the ids to a new id, also updates them in layout.stackOrder
+ // source outer widget is if you already have a copy of your Widget
+ // and you want the given widget (not a copy) to have the same recursive ids as that one
 
-// source outer widget is if you already have a copy of your Widget
-// and you want the given widget (not a copy) to have the same recursive ids as that one
+ *
+ * @param widget
+ * @param sourceWidget
+ * @returns {*}
+ */
 function recursiveReIding(widget, sourceWidget){
     if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
         var newId;
@@ -759,7 +762,7 @@ function recursiveReIding(widget, sourceWidget){
         return {success: true, newId: newId};
     }
     return {success: false}
-};
+}
 
 function createUserWidgetCopy (outerWidget, sourceOuterWidget){
     var widget = UserWidget.fromString(JSON.stringify(outerWidget));
@@ -767,96 +770,6 @@ function createUserWidgetCopy (outerWidget, sourceOuterWidget){
     recursiveReIding(widget, sourceOuterWidget);
     return widget;
 }
-
-
-/**
- * Disabled by changing the id and class names
- * @param widgetId
- */
-function disableWidgetDOMElements(widgetId){
-    var workSurface = $('#work-surface'+'_'+widgetId);
-    $(workSurface).addClass('hidden-component');
-
-    $(workSurface).find('*').each(function() {
-        var id = this.id;
-        if (id.length>0){
-            this.id = 'disabled_'+widgetId+'_'+this.id;
-        }
-        var classes = this.className;
-        if (classes.length>0){
-            classes = classes.split(' ');
-            var classNames = '';
-            classes.forEach(function(className){
-                classNames = classNames + ' ' + 'disabled_'+widgetId+'_'+className;
-            });
-            this.className = classNames;
-        }
-    });
-}
-
-
-function enableWidgetDOMElements(widgetId){
-    var workSurface = $('#work-surface'+'_'+widgetId);
-    $(workSurface).removeClass('hidden-component');
-
-    $(workSurface).find('*').each(function() {
-        var id = this.id;
-        if (id.length>0){
-            this.id = id.replace('disabled_'+widgetId+'_', '');
-        }
-        var classes = this.className;
-        if (classes.length>0){
-            classes = classes.split(' ');
-            var classNames = '';
-            classes.forEach(function(className){
-                classNames =  classNames  + ' ' +  className.replace('disabled_'+widgetId+'_', '');
-            });
-            this.className = classNames.trim();
-        }
-    });
-}
-
-function disableAllWidgetDomElementsExcept(widgetToEnableId){
-    for (var widgetId in selectedProject.components){
-        if (widgetToEnableId == widgetId){
-            enableWidgetDOMElements(widgetId);
-            continue;
-        }
-        if ($('#work-surface'+'_'+widgetId).hasClass('hidden-component')){
-            continue;
-        }
-        disableWidgetDOMElements(widgetId);
-    }
-}
-
-// function enableSpecificComponentDomElements(componentToEnableId){
-//     // first check that the table has been made (otherwise the reset will happen automatically,
-//     // but more importantly, the table-grid-container won't exist yet
-//     var workSurfaceToEnable = $('#work-surface'+'_'+componentToEnableId);
-//     if (!(workSurfaceToEnable.length>0)) {
-//         createOrResetTableGridContainer(componentToEnableId);
-//         var state = {
-//             zoom: 1,
-//             lock:{
-//                 width: false,
-//                 height: false
-//             }
-//         };
-//         $('#work-surface'+'_'+componentToEnableId).data('state', state);
-//     }
-//
-//     var componentToEnable = selectedProject.components[componentToEnableId];
-//
-//     // enable first (toggle needs the id's and classes to be enabled)
-//     if (workSurfaceToEnable.hasClass('hidden-component')){
-//         enableWidgetDOMElements(componentToEnableId);
-//     }
-//
-//     zoomElt.updateZoomFromState(componentToEnable);
-//
-//     setWidgetOptions(componentToEnable);
-//
-// }
 
 
 
