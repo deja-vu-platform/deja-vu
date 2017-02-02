@@ -701,43 +701,6 @@ $('.components').on('click', '.index-page-toggle', function(){
     setUpWidgetOptionsIndexPageToggle(selectedProject.components[widgetId]);
 });
 
-// TODO find a good place for this!
-function getPath(outerMostWidget, widgetId){
-    var wantedPath;
-    var getPathHelper = function(widget, path, targetId){
-        if (widget.meta){
-            path.push(widget.meta.id);
-            for (var id in widget.innerWidgets){
-                if (id == targetId){
-                    path.push(id); // include the last id
-                    wantedPath = path;
-                } else {
-                    getPathHelper(widget.innerWidgets[id], JSON.parse(JSON.stringify(path)), targetId);
-                }
-            }
-        }
-    };
-    getPathHelper(outerMostWidget, [], widgetId);
-    return wantedPath;
-};
-
-function getInnerWidget(outerWidget, innerWidgetId){
-    var wantedWidget;
-    var getInnerWidgetHelper = function(widget, targetId){
-        if (widget.meta){
-            for (var id in widget.innerWidgets){
-                if (id == targetId){
-                    wantedWidget = widget.innerWidgets[id];
-                } else {
-                    getInnerWidgetHelper(widget.innerWidgets[id], targetId);
-                }
-            }
-        }
-    };
-    getInnerWidgetHelper(outerWidget, innerWidgetId);
-    return wantedWidget;
-};
-
 function refreshContainerDisplay(fresh, container, zoom){
     if (!zoom){
         zoom = 1;
@@ -745,8 +708,8 @@ function refreshContainerDisplay(fresh, container, zoom){
     var widgetId = container.data('componentId');
 
 
-    if (getPath(selectedUserWidget, widgetId)){ // component exists
-        var widgetToChange = getInnerWidget(selectedUserWidget, widgetId);
+    if (widgetEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
+        var widgetToChange = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
 
         view.displayWidget(fresh, widgetToChange, container, selectedUserWidget.properties.styles.custom, zoom);
 

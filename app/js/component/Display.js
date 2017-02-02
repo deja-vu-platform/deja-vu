@@ -13,6 +13,8 @@ var Display = function(){
     var blankProperties = {
         'background-color': '',
         'color': '',
+        'font-size': '',
+        'font-weight': ''
         // TODO others
     };
 
@@ -284,19 +286,6 @@ var Display = function(){
                 displayWidget.removeClass();
                 displayWidget.addClass(classes).addClass(defaultDisplayClasses[type]); // TODO what's going on here?
             }
-            // if (properties.main){
-            //     if (Object.keys(properties.main).length>0){ //TODO make succinct
-            //         if (properties.main['background-color']){
-            //             container.css({
-            //                 'background-color':properties.main['background-color']
-            //             })
-            //         }
-            //         for (var mainProperty in properties.main){//TODO make succinct
-            //             displayWidget.css(mainProperty, properties.main[mainProperty]);
-            //         }
-            //
-            //     }
-            // }
             if (Object.keys(properties.custom).length>0){//TODO make succinct
                 if (properties.custom['background-color']){
                     container.css({

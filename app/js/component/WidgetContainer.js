@@ -165,8 +165,9 @@ var WidgetContainer = function(){
             widget.properties.styles.bsClasses = {};
             /////////////
 
-            clearCustomStylesGivenPath(getPath(selectedUserWidget, widget.meta.id));
+            clearCustomStylesGivenPath(widgetEditsManager.getPath(selectedUserWidget, widget.meta.id));
 
+            widgetEditsManager.applyPropertyChangesAtAllLevel(selectedUserWidget);
             // outerWidget.properties.children[widget.meta.id] = {};
             refreshContainerDisplay(false, container, currentZoom);
 
@@ -319,7 +320,7 @@ var WidgetContainer = function(){
 
     var updateCustomStylesGivenPath = function(path, newCustomStyles){
         var customStyles = createCustomStylesGivenPath(path);
-        var widget = getInnerWidget(selectedUserWidget, path[path.length-1]);
+        var widget = widgetEditsManager.getInnerWidget(selectedUserWidget, path[path.length-1]);
         for (var style in newCustomStyles){
             customStyles[style] = newCustomStyles[style];
             widget.properties.styles.custom[style] = newCustomStyles[style];
@@ -328,7 +329,7 @@ var WidgetContainer = function(){
 
     var clearCustomStylesGivenPath = function(path){
         var customProperties = getCustomPropertyGivenPath(path);
-        var widget = getInnerWidget(selectedUserWidget, path[path.length-1]);
+        var widget = widgetEditsManager.getInnerWidget(selectedUserWidget, path[path.length-1]);
         if (customProperties.styles){
             customProperties.styles.custom = {};
             customProperties.styles.bsClasses = {};
@@ -426,7 +427,7 @@ var WidgetContainer = function(){
         var type = dragHandle.data('type');
         container.append(dragHandle);
         if (associated){
-            var path = getPath(outerMostWidget, widget.meta.id);
+            var path = widgetEditsManager.getPath(outerMostWidget, widget.meta.id);
             showConfigOptions(type, container);
             setUpColorOptions(container, widget, path);
             setUpTextOptions(container, widget, path);
