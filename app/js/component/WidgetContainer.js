@@ -250,6 +250,7 @@ var WidgetContainer = function(){
             if (!isNaN(parseInt(value))){
                 updateCustomStylesGivenPath(path, {'font-weight': value});
                 // customStyles['font-weight'] = value;
+                // TODO this does not seem to be carried over to the selectedUserComponent
                 widget.properties.styles.custom['font-weight'] = value;
                 refreshContainerDisplay(false, container, currentZoom);
 
