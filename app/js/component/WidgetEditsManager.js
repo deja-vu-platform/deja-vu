@@ -114,7 +114,9 @@ var WidgetEditsManager = function(){
         }
 
         var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
-            path.push(sourceInnerWidget.meta.id);
+            var sourceInnerWidgetId = sourceInnerWidget.meta.id;
+
+            path.push(sourceInnerWidgetId);
 
 
             // get changed properties
@@ -127,6 +129,24 @@ var WidgetEditsManager = function(){
                     for (var style in customStyles) {
                         innerWidget.properties.styles.custom[style] = customStyles[style];
                     }
+                }
+                if (properties.styles.bsClasses){
+                    var bsClasses = properties.styles.bsClasses;
+                    for (var bsClass in customStyles) {
+                        innerWidget.properties.styles.bsClasses[bsClass] = bsClasses[bsClass];
+                    }
+                }
+            }
+            if (properties.dimensions) {
+                innerWidget.properties.dimensions = properties.dimensions;
+            }
+
+            if (properties.layout) {
+                if (properties.layout.stackOrder) {
+                    innerWidget.properties.stackOrder = properties.stackOrder;
+                }
+                if (properties.layout){ // TODO some change in the layout?
+
                 }
             }
 

@@ -284,11 +284,13 @@ var WidgetContainer = function(){
         var customProperties = getCustomProperty(path);
         var widget = widgetEditsManager.getInnerWidget(outermostWidget, path[path.length-1]);
         if (customProperties.styles){
-            customProperties.styles.custom = {};
-            customProperties.styles.bsClasses = {};
+            // want these things removed if they have nothing
+            delete customProperties.styles.custom;
+            delete customProperties.styles.bsClasses;
             widget.properties.styles.custom = {};
             widget.properties.styles.bsClasses = {};
 
+            // TODO at this point might even be good to clear out all properties if they are empty
         }
     };
 
