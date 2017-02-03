@@ -177,4 +177,13 @@ next is to use it for other things such as
 	and enable editing lower levels, 
 
 also need to deal with deleted components'
-		
+	
+2/2:
+made it so that ids once set stay the same 
+	this enabled the editing to be fully recursive, >1 levels deep
+enabled changes at deeper levels
+still need to make it work for other things
+	location, size, order, etc
+
+bug: 
+	on deleting a project, changing tabs makes it look like it was not deleted: needs to be updated
