@@ -187,3 +187,12 @@ still need to make it work for other things
 
 bug: 
 	on deleting a project, changing tabs makes it look like it was not deleted: needs to be updated
+
+
+2/3:
+fixed problem with specific styles moving up levels and overall styles moving down layers which was causing issues with delete
+Have to figure out: 
+	What does it mean to "resize" a userWidget: would the inner things scale accordingly? Probs no.
+	Adding and deleting (mostly adding) a component to the inner userWidget?
+	How much stuff in the inner widget should be allowed to change? Color seems ok, position, maybe? Size (also refer
+		to related question above), maybe? 
