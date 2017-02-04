@@ -44,6 +44,29 @@ var WidgetEditsManager = function(){
         return wantedWidget;
     };
 
+    that.getMostRelevantOverallCustomChanges = function(outermostWidget, targetId){
+        // if path is just the outer widget's id, will just return outerWidget.properties
+        var change = JSON.parse(JSON.stringify(outermostWidget.properties.styles.custom));
+        var outerWidget = outermostWidget;
+        var path = that.getPath(outermostWidget, targetId);
+
+        // else go down and find the correct one
+        for (var pathValueIdx = 1; pathValueIdx<path.length; pathValueIdx++){
+            if (outerWidget.innerWidgets[path[pathValueIdx]]){
+                outerWidget = outerWidget.innerWidgets[path[pathValueIdx]];
+                // moving down so that the inner styles override the outer styles
+                if (!$.isEmptyObject(outerWidget.properties.styles.custom)){
+                    for (var style in outerWidget.properties.styles.custom){
+                        change[style] = outerWidget.properties.styles.custom[style];
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+        return change;
+    };
+
     that.applyPropertyChangesAtAllLevel = function(outermostWidget){
         var recursiveApplyPropertyChangesHelper = function(widget){
             if (widget.type == 'user') {
@@ -83,7 +106,7 @@ var WidgetEditsManager = function(){
      * @param outerWidget
      * @param sourceWidget
      */
-    applyPropertyChanges = function(outerWidget, sourceWidget){
+    var applyPropertyChanges = function(outerWidget, sourceWidget){
         var getPropertyChanges = function(outerWidget, path){
             // get the changes at this level
 
@@ -107,43 +130,63 @@ var WidgetEditsManager = function(){
             return change;
         };
 
-        var path = [];
-
-        if (!sourceWidget){
-            sourceWidget = outerWidget;
-        }
-
-        var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
-            var sourceInnerWidgetId = sourceInnerWidget.meta.id;
-
-            path.push(sourceInnerWidgetId);
 
 
-            // get changed properties
-            var properties = getPropertyChanges(sourceWidget, path);
-
+        var insertStylesIntoWidget = function(widget, properties){
             // if there is a change, override the old one
             if (properties.styles){
                 if (properties.styles.custom){
                     var customStyles = properties.styles.custom;
                     for (var style in customStyles) {
-                        innerWidget.properties.styles.custom[style] = customStyles[style];
+                        widget.properties.styles.custom[style] = customStyles[style];
                     }
                 }
                 if (properties.styles.bsClasses){
                     var bsClasses = properties.styles.bsClasses;
                     for (var bsClass in customStyles) {
-                        innerWidget.properties.styles.bsClasses[bsClass] = bsClasses[bsClass];
+                        widget.properties.styles.bsClasses[bsClass] = bsClasses[bsClass];
                     }
                 }
             }
+
+        };
+
+        var path = [];
+
+        if (!sourceWidget){ // if this is a new added component?
+            sourceWidget = outerWidget;
+        }
+
+
+        var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
+
+            if (!sourceInnerWidget){
+                console.log('something went wrong in applyPropertyChangesHelper()');
+                console.log(innerWidget);
+                console.log(that.getPath(selectedUserWidget, innerWidget.meta.id));
+            }
+
+            var sourceInnerWidgetId = sourceInnerWidget.meta.id;
+
+            path.push(sourceInnerWidgetId);
+
+            //TODO this is applying the overall styles at this level;
+            //TODO If this is successful, then Display won't have to care about overallstyles...
+            //
+            // var overallProperties = getMostRelevantOverallCustomChanges(outerWidget, innerWidget.meta.id);
+            // insertStylesIntoWidget(innerWidget, overallProperties);
+
+            // get changed properties
+            var properties = getPropertyChanges(sourceWidget, path);
+
+            insertStylesIntoWidget(innerWidget, properties);
             if (properties.dimensions) {
-                innerWidget.properties.dimensions = properties.dimensions;
+                // widget.properties.dimensions = properties.dimensions;
             }
 
             if (properties.layout) {
                 if (properties.layout.stackOrder) {
-                    innerWidget.properties.stackOrder = properties.stackOrder;
+                    // widget.properties.layout.stackOrder = properties.layout.stackOrder;
                 }
                 if (properties.layout){ // TODO some change in the layout?
 

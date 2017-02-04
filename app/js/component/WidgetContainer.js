@@ -77,7 +77,7 @@ var WidgetContainer = function(){
     };
 
 
-    var createEditOptions = function(widget, outerWidget, container){
+    var createEditOptions = function(widget, outerWidget, container, outermostWidget){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -158,8 +158,8 @@ var WidgetContainer = function(){
 
         buttonStyle.find('.inner-component-delete-style').click(function(e){
             e.stopPropagation();
-            clearCustomStyles(outerWidget, widget.meta.id);
-            widgetEditsManager.applyPropertyChangesAtAllLevel(outerWidget);
+            clearCustomStyles(outermostWidget, widget.meta.id);
+            widgetEditsManager.applyPropertyChangesAtAllLevel(outermostWidget);
             refreshContainerDisplay(false, container, currentZoom);
 
             // TODO reset the values in the inputs
@@ -197,10 +197,10 @@ var WidgetContainer = function(){
         return container;
     };
 
-    that.createEditableWidgetContainer = function(widget, outerWidget, zoom) {
+    that.createEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget) {
         var container = that.createBasicWidgetContainer(widget, zoom);
         makeContainerResizable(widget, outerWidget, container);
-        container.append(createEditOptions(widget, outerWidget, container));
+        container.append(createEditOptions(widget, outerWidget, container, outermostWidget));
         return container;
     };
 
@@ -281,7 +281,7 @@ var WidgetContainer = function(){
     var clearCustomStyles = function(outermostWidget, targetId){
         var path = widgetEditsManager.getPath(outermostWidget, targetId);
 
-        var customProperties = getCustomProperty(path);
+        var customProperties = getCustomProperty(outermostWidget, targetId);
         var widget = widgetEditsManager.getInnerWidget(outermostWidget, path[path.length-1]);
         if (customProperties.styles){
             // want these things removed if they have nothing

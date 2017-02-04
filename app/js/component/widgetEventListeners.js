@@ -707,7 +707,9 @@ function refreshContainerDisplay(fresh, container, zoom){
     if (widgetEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
         var widgetToChange = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
 
-        view.displayWidget(fresh, widgetToChange, container, selectedUserWidget.properties.styles.custom, zoom);
+        var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
+        // var overallStyles = selectedUserWidget.properties.styles.custom;
+        view.displayWidget(fresh, widgetToChange, container, overallStyles, zoom);
 
         //attach event handlers to new texts
         registerTooltipBtnHandlers();

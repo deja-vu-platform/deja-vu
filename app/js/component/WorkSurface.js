@@ -61,7 +61,7 @@ var WorkSurface = function(){
         // first create a container for this component
         var widgetContainer;
         if (!hackityHack){
-            widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom);
+            widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
             if (!dragHandle){
                 dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
                 if (type == 'user'){
