@@ -94,10 +94,16 @@ var WidgetEditsManager = function(){
                 widget.properties.styles.custom[property] = newProperties[property];
             }
         } else if (typeString == "layout.stackOrder"){
-            changes = newProperties;
-            widget.properties.layout.stackOrder = newProperties;
+            // changes = newProperties;
+            // widget.properties.layout.stackOrder = newProperties;
+        } else if (typeString == 'value'){
+            for (var property in newProperties){
+                changes[property] = newProperties[property];
+            }
+            widget.innerWidgets[newProperties.type] = newProperties.value;
         } else {
             // TODO is this right??
+            // FIXME problem with dot notation
             for (var property in newProperties){
                 changes[property] = newProperties[property];
                 // this might have problems with dot notation
@@ -230,6 +236,7 @@ var WidgetEditsManager = function(){
                 });
             } else {
                 // else it's a base component, so we'll just take it as is from the component we are reading from
+                applyPropertyChanges(widget);
             }
             return widget
         };
@@ -307,6 +314,9 @@ var WidgetEditsManager = function(){
                 }
             }
 
+            if (properties.value){
+                widget.innerWidgets[properties.value.type] = properties.value.value;
+            }
 
         };
 

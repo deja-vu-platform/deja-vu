@@ -281,6 +281,16 @@ function updateBaseWidgetContentsAndDisplayAt(containerId) {
     var value;
     var isUpload = false;
 
+    var done = function(value){
+        var newValue = {type: type, value: value};
+        widgetEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'value', newValue);
+
+        // selectedUserWidget.innerWidgets[widgetId].innerWidgets = {};
+        // selectedUserWidget.innerWidgets[widgetId].innerWidgets[type] = value;
+
+        refreshContainerDisplay(true, container, currentZoom);
+    };
+
     if (tooltip.length>0){
         var inputs = Array.prototype.slice.call(
             tooltip.get(0).getElementsByTagName('input'), 0);
@@ -320,9 +330,7 @@ function updateBaseWidgetContentsAndDisplayAt(containerId) {
                 .then(function (savedFile) { // save was successful
                     console.log('success');
                     value.img_src = savedFile.url();
-                    selectedUserWidget.innerWidgets[widgetId].innerWidgets[type] = value;
-
-                    refreshContainerDisplay(true, container, currentZoom);
+                    done(value);
                 });
         } else { // pasted link to image
             if (inputs[0].value.length>0){
@@ -339,10 +347,7 @@ function updateBaseWidgetContentsAndDisplayAt(containerId) {
     }
 
     if (!isUpload) {
-        selectedUserWidget.innerWidgets[widgetId].innerWidgets = {};
-        selectedUserWidget.innerWidgets[widgetId].innerWidgets[type] = value;
-
-        refreshContainerDisplay(true, container, currentZoom);
+        done(value);
     }
 }
 

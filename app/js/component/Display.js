@@ -159,7 +159,11 @@ var Display = function(){
         } else {
             var html;
             if (fresh){
-                container.find('.display-component').remove(); // FIXME this is going to do this a lot, unnecessarily!
+                if (widget.type == 'label'){
+                    container.find('.label-container').remove(); // FIXME this is going to do this a lot, unnecessarily!
+                } else {
+                    container.find('.display-component').remove(); // FIXME this is going to do this a lot, unnecessarily!
+                }
                 html = view.getHTML(widget.type)(widget.innerWidgets[widget.type]);
                 var styles = widget.properties.styles;
                 displayInnerWidget(container, widget.type, html, zoom, styles, overallStyles);

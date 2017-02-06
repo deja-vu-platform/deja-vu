@@ -202,3 +202,5 @@ Have to figure out:
 Repositioning inner inner widgets is hard 
 However, since it does not make a lot of sense to do either of these (see 2/3 notes), resizing and reposition
 is currently disabled. The colors, however, can be changed.
+
+Need to clean up and condense a lot of things. Also think about the resizing aspect of user widgets which are allowed right now. 
