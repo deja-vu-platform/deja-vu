@@ -30,7 +30,7 @@ var DragAndDropController = function () {
                         dragHandle = $(ui.draggable).clone();
                         dragHandle.data('componentid', $(ui.draggable).data('componentid'));
                         dragHandle.data('type', type);
-                        registerDraggable(dragHandle);
+                        that.registerWidgetDragHandleDraggable(dragHandle);
                     }
                 }
 
@@ -38,11 +38,6 @@ var DragAndDropController = function () {
                 var widget = draggingWidget;
                 var widgetId = widget.meta.id;
                 dragHandle.removeClass('dragging-component');
-                var path = widgetEditsManager.getPath(selectedUserWidget, widgetId);
-                var parentId = path[path.length - 2];
-                var newLayout = {top: top/currentZoom, left: left/currentZoom};
-                widgetEditsManager.updateCustomProperties(selectedUserWidget, parentId, 'layout', newLayout);
-                // outerWidget.properties.layout[widgetId] = newLayout;
 
                 var widgetIsAssociated = dragHandle.hasClass('associated');
                 dragHandle.associated = widgetIsAssociated;
@@ -53,6 +48,14 @@ var DragAndDropController = function () {
                     dragHandle.addClass('associated').data('componentid', widgetId);
                     zoomElement.registerZoom(outerWidget);
                 }
+
+                var newPosition = {top: top/currentZoom, left: left/currentZoom};
+                var newLayout = {};
+                newLayout[widgetId] = newPosition;
+                // after it has been added
+                widgetEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'layout', newLayout, true);
+                // outerWidget.properties.layout[widgetId] = newLayout;
+
                 miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
 
                 dropFinished(dragHandle, widget);
@@ -73,7 +76,7 @@ var DragAndDropController = function () {
                         dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
                         dragHandle.data('componentid', $(this).data('componentid'));
                         dragHandle.data('type', type);
-                        registerDraggable(dragHandle);
+                        that.registerWidgetDragHandleDraggable(dragHandle);
                     }
                 }
                 dragHandle.addClass('dragging-component');
@@ -99,14 +102,9 @@ var DragAndDropController = function () {
                     var widget;
                     if (type == 'user') {
                         var id = dragHandle.data('componentid');
-                        // TODO
-                        // FIXME
-                        // How to have two copies of the same widget in the same place?
                         widget = UserWidget.fromString(JSON.stringify(selectedProject.components[id]));
-                        console.log(widget);
                         widget.meta.templateId = widget.meta.id;
                         widget = createUserWidgetCopy(widget);
-                        console.log(widget);
                         dragHandle.data('componentid', widget.meta.id);
                         dragHandle.text(widget.meta.name);
                         dragHandle.css('display', 'block');
@@ -114,11 +112,11 @@ var DragAndDropController = function () {
                         widget = BaseWidget(type, {}, view.getDimensions(type));
                     }
                     draggingWidget = widget;
-                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, true,
+                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, false,
                         dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom, false);
 
                     $('#basic-components').html(basicWidgets);
-                    registerDraggable();
+                    that.registerWidgetDragHandleDraggable();
                 }
 
                 $('#outer-container').append(widgetContainer);
@@ -178,6 +176,21 @@ var DragAndDropController = function () {
 
             }
         };
+    };
+
+
+
+    that.registerWidgetDragHandleDraggable = function(dragHandleToRegister) {
+        if (dragHandleToRegister){
+            if (!dragHandleToRegister.notDraggable){
+                dragHandleToRegister.draggable(that.widgetDragSettings());
+            }
+        } else {
+            $('.widget').not('.not-draggable').each(function() {
+                $(this).draggable(that.widgetDragSettings());
+            });
+        }
+
     };
 
 

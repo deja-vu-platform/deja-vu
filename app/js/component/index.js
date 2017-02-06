@@ -104,7 +104,7 @@ $(function(){
 
     basicWidgets = $('#basic-components').html();
 
-    registerDraggable();
+    dragAndDrop.registerWidgetDragHandleDraggable();
 
 
     // registerUserWidgetAreaDroppable();

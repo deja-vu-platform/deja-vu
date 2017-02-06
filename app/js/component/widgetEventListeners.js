@@ -234,7 +234,7 @@ function displayNewWidgetInUserWidgetList(name, id){
     $('#user-components-list').append(newWidgetElt);
     addDeleteUserWidgetButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
-    registerDraggable(newWidgetElt);
+    dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
 }
 
 
@@ -392,19 +392,6 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 
 
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/
-
-
-
-function registerDraggable(dragHandleToRegister) {
-    if (dragHandleToRegister){
-        dragHandleToRegister.draggable(dragAndDrop.widgetDragSettings())
-    } else {
-        $('.widget').each(function() {
-            $(this).draggable(dragAndDrop.widgetDragSettings());
-        });
-    }
-
-}
 
 
 /**

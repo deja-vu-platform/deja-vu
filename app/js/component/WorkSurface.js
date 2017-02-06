@@ -61,17 +61,26 @@ var WorkSurface = function(){
         // first create a container for this component
         var widgetContainer;
         if (!hackityHack){
-            widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
-            if (!dragHandle){
+            if (!dragHandle) {
                 dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
-                if (type == 'user'){
+                if (type == 'user') {
                     dragHandle.text(innerWidget.meta.name);
                     dragHandle.css('display', 'block');
                 }
                 dragHandle.addClass('associated').data('componentid', widgetId);
             }
+
+            if (isThisEditable){
+                widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
+                dragAndDrop.registerWidgetDragHandleDraggable(dragHandle);
+            } else {
+                widgetContainer = widgetContainerMaker.createMinimallyEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
+                dragHandle.addClass('not-draggable');
+                dragHandle.notDraggable = true;
+            }
+
             widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated, outermostWidget);
-            registerDraggable(dragHandle);
+
             var editPopup = false;
             if (dragHandle){
                 if (dragHandle.newWidget){
@@ -81,6 +90,8 @@ var WorkSurface = function(){
                 }
             }
             triggerEdit(widgetContainer, editPopup);
+
+
         } else {
             widgetContainer = widgetContainerMaker.createBasicWidgetContainer(innerWidget, zoom);
         }
@@ -198,9 +209,11 @@ var WorkSurface = function(){
     };
 
     // puts componentId at the top!
-    var shiftOrder = function(widgetId, userWidget){
+    var shiftOrder = function(widgetId, outermostWidget){
         // TODO make this work for inner widgets
-        var stackOrder = userWidget.properties.layout.stackOrder;
+        var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+
+        var stackOrder = parent.properties.layout.stackOrder;
 
         var index;
         for (var i = 0; i < stackOrder.length; i++){
@@ -210,8 +223,10 @@ var WorkSurface = function(){
                 break
             }
         }
-        userWidget.properties.layout.stackOrder.splice(index, 1);
-        userWidget.properties.layout.stackOrder.push(widgetId);
+
+        parent.properties.layout.stackOrder.splice(index, 1);
+        parent.properties.layout.stackOrder.push(widgetId);
+        widgetEditsManager.updateCustomProperties(outermostWidget, widgetId, 'layout.stackOrder', stackOrder, true);
     };
 
 

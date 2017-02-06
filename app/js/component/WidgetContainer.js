@@ -51,15 +51,20 @@ var WidgetContainer = function(){
             resize: function(e, ui){
                 var newDimensions = {height: ui.size.height/currentZoom, width: ui.size.width/currentZoom};
 
-                widget.properties.dimensions = newDimensions;
+                // widget.properties.dimensions = newDimensions;
 
                 widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'dimensions', newDimensions);
                 // TODO woah! It resizes as you go!
                 refreshContainerDisplay(false, container, currentZoom);
             },
             stop: function(e, ui){
-                outerWidget.properties.layout[widget.meta.id].left = ui.position.left/currentZoom;
-                outerWidget.properties.layout[widget.meta.id].top = ui.position.top/currentZoom;
+                var newPosition = {left:  ui.position.left/currentZoom, top: ui.position.top/currentZoom};
+                var newLayout = {};
+                newLayout[widget.meta.id] = newPosition;
+                widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'layout', newLayout, true);
+
+                // outerWidget.properties.layout[widget.meta.id].left = ui.position.left/currentZoom;
+                // outerWidget.properties.layout[widget.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
                 miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
                 grid.setUpGrid();
@@ -199,6 +204,12 @@ var WidgetContainer = function(){
         return container;
     };
 
+    that.createMinimallyEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget) {
+        var container = that.createBasicWidgetContainer(widget, zoom);
+        container.append(createEditOptions(widget, outerWidget, container, outermostWidget));
+        return container;
+    };
+
     that.createEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget) {
         var container = that.createBasicWidgetContainer(widget, zoom);
         makeContainerResizable(widget, outerWidget, container, outermostWidget);
@@ -218,12 +229,12 @@ var WidgetContainer = function(){
 
 
     var updateCustomStyles = function(outermostWidget, targetId, customStyles){
-        updateCustomStyles(outermostWidget, targetId, 'styles', customStyles);
+        widgetEditsManager.updateCustomProperties(outermostWidget, targetId, 'styles.custom', customStyles);
     };
 
 
     var clearCustomStyles = function(outermostWidget, targetId){
-        widgetEditsManager.clearCustomProperties(outermostWidget, targetId, 'styles');
+        widgetEditsManager.clearCustomProperties(outermostWidget, targetId, 'styles.custom');
 
         // TODO at this point might even be good to clear out all properties if they are empty
     };
@@ -356,7 +367,7 @@ var WidgetContainer = function(){
     };
 
     that.setUpContainer = function(container, dragHandle, widget, associated, outermostWidget){
-        var type = dragHandle.data('type');
+        var type = widget.type;
         container.append(dragHandle);
         if (associated){
             showConfigOptions(type, container);

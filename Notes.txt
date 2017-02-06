@@ -196,3 +196,9 @@ Have to figure out:
 	Adding and deleting (mostly adding) a component to the inner userWidget?
 	How much stuff in the inner widget should be allowed to change? Color seems ok, position, maybe? Size (also refer
 		to related question above), maybe? 
+
+2/6:
+(Mostly) implemented inner inner widget resizing;
+Repositioning inner inner widgets is hard 
+However, since it does not make a lot of sense to do either of these (see 2/3 notes), resizing and reposition
+is currently disabled. The colors, however, can be changed.
