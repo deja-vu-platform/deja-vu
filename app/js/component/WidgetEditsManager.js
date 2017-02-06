@@ -27,6 +27,126 @@ var WidgetEditsManager = function(){
     };
 
 
+    var getOrCreateCustomProperty = function(outermostWidget, targetId){
+        var path = that.getPath(outermostWidget, targetId);
+
+        var currPath = outermostWidget.properties;
+        path.forEach(function(pathVal, idx){
+            if (idx != 0){
+                if (!currPath.children[pathVal]){
+                    currPath.children[pathVal] = {children:{}};
+                }
+                currPath = currPath.children[pathVal];
+            }
+
+        });
+        return currPath;
+    };
+
+
+    // TODO make this general
+    that.updateCustomProperties = function(outermostWidget, targetId, type, newProperties){
+        var path = that.getPath(outermostWidget, targetId);
+
+        var createCustomStyles = function(outermostWidget, targetId){
+            var changes = getOrCreateCustomProperty(outermostWidget, targetId);
+            if (!changes.styles) {
+                changes.styles = {};
+            }
+            if (!changes.styles.custom){
+                changes.styles.custom = {};
+            }
+            return changes.styles.custom;
+        };
+        var widget = that.getInnerWidget(outermostWidget, path[path.length-1]);
+        if (type == 'style'){
+            var customStyles = createCustomStyles(outermostWidget, targetId);
+            for (var property in newProperties){
+                customStyles[property] = newProperties[property];
+                widget.properties.styles.custom[property] = newProperties[property];
+            }
+        } else if (type == "layout"){
+            var changes = getOrCreateCustomProperty(outermostWidget, targetId);
+            if (!changes.layout){
+                changes.layout = {}
+            }
+            for (var property in newProperties){
+                changes.layout[property] = newProperties[property];
+                widget.properties.layout[property] = newProperties[property];
+            }
+        } else if (type == "layout.stackOrder"){
+            var changes = getOrCreateCustomProperty(outermostWidget, targetId);
+            if (!changes.layout){
+                changes.layout = {}
+            }
+            changes.layout.stackOrder = newProperties;
+            widget.properties.layout.stackOrder = newProperties;
+        } else {
+            // TODO is this right??
+            var changes = getOrCreateCustomProperty(outermostWidget, targetId);
+            changes[type] = newProperties;
+            widget.properties[type] = newProperties;
+        }
+    };
+
+
+
+
+
+    that.getCustomProperty = function(outermostWidget, targetId){
+        var path = that.getPath(outermostWidget, targetId);
+
+        var currPath = outermostWidget.properties;
+        var noProperty = false;
+        path.forEach(function(pathVal, idx){
+            if (!noProperty){
+                if (idx != 0){
+                    if (!currPath.children[pathVal]){
+                        noProperty = true;
+                        currPath = {};
+                    } else {
+                        currPath = currPath.children[pathVal];
+                    }
+                }
+            }
+        });
+
+        return currPath;
+
+    };
+
+
+
+    // property name can be of the form "asdas.asda" like "layout.stackOrder"
+    that.clearCustomProperties = function(outermostWidget, targetId, propertyName){
+        var path = that.getPath(outermostWidget, targetId);
+
+        var customProperties = that.getCustomProperty(outermostWidget, targetId);
+        var widget = that.getInnerWidget(outermostWidget, path[path.length-1]);
+        if (!propertyName){
+            for (var property in customProperties){
+                delete customProperties[property];
+                delete widget.properties[property];
+            }
+        } else {
+            if (customProperties[propertyName]){
+                delete customProperties[propertyName];
+                if (propertyName == 'styles'){
+                    widget.properties.styles.custom = {};
+                    widget.properties.styles.bsClasses = {};
+                } else if (propertyName == 'layout'){
+                    widget.properties.layout = {stackOrder:[]};
+                } else {
+                    widget.properties[propertyName] = {};
+                }
+
+            }
+        }
+        that.applyPropertyChangesAtAllLevel(outermostWidget);
+    };
+
+
+
     that.getInnerWidget = function(outermostWidget, innerWidgetId){
         var wantedWidget;
         var getInnerWidgetHelper = function(widget, targetId){

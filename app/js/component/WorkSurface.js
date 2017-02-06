@@ -199,6 +199,7 @@ var WorkSurface = function(){
 
     // puts componentId at the top!
     var shiftOrder = function(widgetId, userWidget){
+        // TODO make this work for inner widgets
         var stackOrder = userWidget.properties.layout.stackOrder;
 
         var index;

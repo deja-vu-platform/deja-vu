@@ -38,7 +38,11 @@ var DragAndDropController = function () {
                 var widget = draggingWidget;
                 var widgetId = widget.meta.id;
                 dragHandle.removeClass('dragging-component');
-                outerWidget.properties.layout[widgetId] = {top: top/currentZoom, left: left/currentZoom};
+                var path = widgetEditsManager.getPath(selectedUserWidget, widgetId);
+                var parentId = path[path.length - 2];
+                var newLayout = {top: top/currentZoom, left: left/currentZoom};
+                widgetEditsManager.updateCustomProperties(selectedUserWidget, parentId, 'layout', newLayout);
+                // outerWidget.properties.layout[widgetId] = newLayout;
 
                 var widgetIsAssociated = dragHandle.hasClass('associated');
                 dragHandle.associated = widgetIsAssociated;
@@ -77,7 +81,8 @@ var DragAndDropController = function () {
                 var widgetContainer;
                 if (dragHandle.hasClass('associated')) {
                     var widgetId = dragHandle.data('componentid');
-                    draggingWidget = selectedUserWidget.innerWidgets[widgetId];
+                    draggingWidget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId)
+                    //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
                     var oldContainerId = 'component-container_' + widgetId;
                     var widgetContainerOld = $('#' + oldContainerId);

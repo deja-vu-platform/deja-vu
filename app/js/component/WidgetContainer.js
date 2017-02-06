@@ -6,7 +6,7 @@ var WidgetContainer = function(){
     var that = Object.create(WidgetContainer.prototype);
 
 
-    var makeContainerResizable = function(widget, outerWidget, container){
+    var makeContainerResizable = function(widget, outerWidget, container, outermostWidget){
         var widgetId = widget.meta.id;
 
         var dragHandle_se = $('<span></span>');
@@ -49,8 +49,11 @@ var WidgetContainer = function(){
                 });
             },
             resize: function(e, ui){
-                widget.properties.dimensions.height = ui.size.height/currentZoom;
-                widget.properties.dimensions.width = ui.size.width/currentZoom;
+                var newDimensions = {height: ui.size.height/currentZoom, width: ui.size.width/currentZoom};
+
+                widget.properties.dimensions = newDimensions;
+
+                widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'dimensions', newDimensions);
                 // TODO woah! It resizes as you go!
                 refreshContainerDisplay(false, container, currentZoom);
             },
@@ -159,7 +162,6 @@ var WidgetContainer = function(){
         buttonStyle.find('.inner-component-delete-style').click(function(e){
             e.stopPropagation();
             clearCustomStyles(outermostWidget, widget.meta.id);
-            widgetEditsManager.applyPropertyChangesAtAllLevel(outermostWidget);
             refreshContainerDisplay(false, container, currentZoom);
 
             // TODO reset the values in the inputs
@@ -199,52 +201,13 @@ var WidgetContainer = function(){
 
     that.createEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget) {
         var container = that.createBasicWidgetContainer(widget, zoom);
-        makeContainerResizable(widget, outerWidget, container);
+        makeContainerResizable(widget, outerWidget, container, outermostWidget);
         container.append(createEditOptions(widget, outerWidget, container, outermostWidget));
         return container;
     };
 
-
-    var createCustomProperty = function(outermostWidget, targetId){
-        var path = widgetEditsManager.getPath(outermostWidget, targetId);
-
-        var currPath = outermostWidget.properties;
-        path.forEach(function(pathVal, idx){
-            if (idx != 0){
-                if (!currPath.children[pathVal]){
-                    currPath.children[pathVal] = {children:{}};
-                }
-                currPath = currPath.children[pathVal];
-            }
-
-        });
-        return currPath;
-    };
-
-    var getCustomProperty = function(outermostWidget, targetId){
-        var path = widgetEditsManager.getPath(outermostWidget, targetId);
-
-        var currPath = outermostWidget.properties;
-        var noProperty = false;
-        path.forEach(function(pathVal, idx){
-            if (!noProperty){
-                if (idx != 0){
-                    if (!currPath.children[pathVal]){
-                        noProperty = true;
-                        currPath = {};
-                    } else {
-                        currPath = currPath.children[pathVal];
-                    }
-                }
-            }
-        });
-
-        return currPath;
-
-    };
-
     var getCustomStyles = function(outermostWidget, targetId){
-        var changes = getCustomProperty(outermostWidget, targetId);
+        var changes = widgetEditsManager.getCustomProperty(outermostWidget, targetId);
         if (changes.styles) {
             if (changes.styles.custom){
                 return changes.styles.custom;
@@ -254,44 +217,15 @@ var WidgetContainer = function(){
     };
 
 
-
-
-    var updateCustomStyles = function(outermostWidget, targetId, newCustomStyles){
-        var path = widgetEditsManager.getPath(outermostWidget, targetId);
-
-        var createCustomStyles = function(outermostWidget, targetId){
-            var changes = createCustomProperty(outermostWidget, targetId);
-            if (!changes.styles) {
-                changes.styles = {};
-            }
-            if (!changes.styles.custom){
-                changes.styles.custom = {};
-            }
-            return changes.styles.custom;
-        };
-
-        var customStyles = createCustomStyles(outermostWidget, targetId);
-        var widget = widgetEditsManager.getInnerWidget(outermostWidget, path[path.length-1]);
-        for (var style in newCustomStyles){
-            customStyles[style] = newCustomStyles[style];
-            widget.properties.styles.custom[style] = newCustomStyles[style];
-        }
+    var updateCustomStyles = function(outermostWidget, targetId, customStyles){
+        updateCustomStyles(outermostWidget, targetId, 'styles', customStyles);
     };
 
+
     var clearCustomStyles = function(outermostWidget, targetId){
-        var path = widgetEditsManager.getPath(outermostWidget, targetId);
+        widgetEditsManager.clearCustomProperties(outermostWidget, targetId, 'styles');
 
-        var customProperties = getCustomProperty(outermostWidget, targetId);
-        var widget = widgetEditsManager.getInnerWidget(outermostWidget, path[path.length-1]);
-        if (customProperties.styles){
-            // want these things removed if they have nothing
-            delete customProperties.styles.custom;
-            delete customProperties.styles.bsClasses;
-            widget.properties.styles.custom = {};
-            widget.properties.styles.bsClasses = {};
-
-            // TODO at this point might even be good to clear out all properties if they are empty
-        }
+        // TODO at this point might even be good to clear out all properties if they are empty
     };
 
 
