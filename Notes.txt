@@ -197,10 +197,24 @@ Have to figure out:
 	How much stuff in the inner widget should be allowed to change? Color seems ok, position, maybe? Size (also refer
 		to related question above), maybe? 
 
-2/6:
+2/5:
 (Mostly) implemented inner inner widget resizing;
 Repositioning inner inner widgets is hard 
 However, since it does not make a lot of sense to do either of these (see 2/3 notes), resizing and reposition
 is currently disabled. The colors, however, can be changed.
 
 Need to clean up and condense a lot of things. Also think about the resizing aspect of user widgets which are allowed right now. 
+
+2/7:
+Need to think of how to get the change in ids when a new widget is instantiated from a project. Right now it uses
+the stackOrder, but that doesn't work if the stackOrder changes or if components are deleted or added.
+Perhaps when a new widget is made we can have an id table that tracks which id went where so that we can get it back 
+{newId: oldId} so that we can get the old id back from the new?
+
+Adding inner component: perhaps when someone moves a new widget onto another widget we can ask if we add it to the outermost
+widget or the inner widget (or have a keyboard shortcut).
+
+Also right now we are disallowing the widget to be smaller than the total bounding box of the inner components. This is not 
+necessarily the correct behaviour: what if they want an option that is outside the component's border? 
+Maybe the worksurface needs to become a container and there needs to be a work surface that we can move around in, but doens't
+actually have a meaning in terms of the components/widgets. 
