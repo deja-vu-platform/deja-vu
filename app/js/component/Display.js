@@ -116,6 +116,7 @@ var Display = function(){
 
 
     that.displayWidget = function(fresh, widget, container, overallStyles, zoom){
+        // TODO this function needs to be cleaned up
         if (widget.type == 'user'){
             var width = widget.properties.dimensions.width * zoom;
             var height = widget.properties.dimensions.height * zoom;
@@ -131,17 +132,14 @@ var Display = function(){
             // for (var mainProperty in styles.main){
             //     overallStyles[mainProperty] = styles.main[mainProperty];
             // }
-            for (var customProperty in styles.custom){
-                overallStyles[customProperty] = styles.custom[customProperty];
+            for (var customStyle in styles.custom){
+                overallStyles[customStyle] = styles.custom[customStyle];
             }
 
             // FIXME this appears twice
-            if (overallStyles['background-color']){
-                container.css({
-                    'background-color':overallStyles['background-color']
-                })
-            }
-
+            container.css({
+                'background-color':overallStyles['background-color'] || ''
+            })
 
             widget.properties.layout.stackOrder.forEach(function(innerWidgetId){
                 var innerWidget = widget.innerWidgets[innerWidgetId];
@@ -259,6 +257,11 @@ var Display = function(){
 
         }
 
+        applyStyles(properties, overallStyles, container, displayWidget, type);
+
+    };
+
+    var applyStyles = function(properties, overallStyles, container, displayWidget, type){
         //// TODO SKETCHY!!!
         if (properties){
             if (overallStyles){
@@ -272,11 +275,10 @@ var Display = function(){
                 // TODO finish resetting other styles
                 displayWidget.css(blankProperties);
 
-                if (overallStyles['background-color']){
-                    container.css({
-                        'background-color':overallStyles['background-color']
-                    })
-                }
+                container.css({
+                    'background-color':overallStyles['background-color'] || ''
+                });
+
                 for (var customProperty in overallStyles){
                     displayWidget.css(customProperty, overallStyles[customProperty]);
                 }
@@ -303,7 +305,6 @@ var Display = function(){
             }
         }
     };
-
 
     /**
      * Removes just the display part of the component. Useful for removing the old image

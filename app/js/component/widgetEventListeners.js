@@ -724,38 +724,38 @@ function refreshContainerDisplay(fresh, container, zoom){
  */
 function recursiveReIding(widget, sourceWidget){
     if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
-        var newId;
+        var thisWidgetNewId;
         if (sourceWidget){
-            newId = sourceWidget.meta.id;
+            thisWidgetNewId = sourceWidget.meta.id;
         } else {
-            newId = generateId();
+            thisWidgetNewId = generateId();
         }
         // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
-        widget.meta.id = newId;
+        widget.meta.id = thisWidgetNewId;
         if (widget.type == 'user'){
             for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
-                var oldId = widget.properties.layout.stackOrder[idx];
+                var innerWidgetOldId = widget.properties.layout.stackOrder[idx];
                 var result;
                 if (sourceWidget){
                     var oldSourceId = sourceWidget.properties.layout.stackOrder[idx];
-                    result = recursiveReIding(widget.innerWidgets[oldId], sourceWidget.innerWidgets[oldSourceId]);
+                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], sourceWidget.innerWidgets[oldSourceId]);
                 } else {
-                    result = recursiveReIding(widget.innerWidgets[oldId]);
+                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId]);
                 }
                 if (result.success){
-                    if (result.newId != oldId){ // or else the delete will delete the things!
+                    if (result.newId != innerWidgetOldId){ // or else the delete will delete the things!
                         widget.properties.layout.stackOrder[idx] = result.newId;
-                        widget.innerWidgets[result.newId] = widget.innerWidgets[oldId];
-                        delete widget.innerWidgets[oldId];
-                        widget.properties.layout[result.newId] = widget.properties.layout[oldId];
-                        delete widget.properties.layout[oldId];
+                        widget.innerWidgets[result.newId] = widget.innerWidgets[innerWidgetOldId];
+                        delete widget.innerWidgets[innerWidgetOldId];
+                        widget.properties.layout[result.newId] = widget.properties.layout[innerWidgetOldId];
+                        delete widget.properties.layout[innerWidgetOldId];
                         widget.idMap = widget.idMap || {};
-                        widget.idMap[newId] = oldId;
+                        widget.idMap[result.newId] = innerWidgetOldId;
                     }
                 }
             }
         }
-        return {success: true, newId: newId};
+        return {success: true, newId: thisWidgetNewId};
     }
     return {success: false}
 }
