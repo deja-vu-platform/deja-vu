@@ -40,7 +40,7 @@ var DragAndDropController = function () {
                 var widgetIsAssociated = dragHandle.hasClass('associated');
                 dragHandle.associated = widgetIsAssociated;
 
-                var offset = {top: 0, left: 0};
+                var difference = {top: 0, left: 0};
 
                 if (!widgetIsAssociated) {
                     $(ui.helper).data('newcomponent', true);
@@ -53,12 +53,15 @@ var DragAndDropController = function () {
                     var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
                     var parentId = parent.meta.id;
                     if (parentId != selectedUserWidget.meta.id){ // it is not the outermost widget
-                        offset = $('#component-container_'+parentId).position();
+                        var workSurfaceOffset = $('#work-surface_'+selectedUserWidget.meta.id).offset();
+                        var widgetOffset = $('#component-container_'+parentId).offset();
+                        difference.top = widgetOffset.top - workSurfaceOffset.top;
+                        difference.left = widgetOffset.left - workSurfaceOffset.left;
                     }
                 }
 
-                var top = ui.position.top - offset.top;
-                var left = ui.position.left - offset.left;
+                var top = ui.position.top - difference.top;
+                var left = ui.position.left - difference.left;
 
                 var newPosition = {top: top/currentZoom, left: left/currentZoom};
                 var newLayout = {};

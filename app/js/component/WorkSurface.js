@@ -204,11 +204,22 @@ var WorkSurface = function(){
                     shiftOrder(widgetId, outermostWidget);
                 }
             }
-            var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
-            var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
+            var firstInnerWidgetId = widgetEditsManager.getPath(outermostWidget, widgetId)[1]; // this should always exist
+            if (!firstInnerWidgetId){
+                console.log('something went wrong in onDropFinished');
+            }
+
+            var firstInnerWidget = widgetEditsManager.getInnerWidget(outermostWidget, firstInnerWidgetId);
+
+            // var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+            var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(outermostWidget, widgetId);
 
             // TODO this needs fixing
-            // that.makeRecursiveWidgetContainersAndDisplay(widget, parent, true, dragHandle, workSurface, overallStyles, currentZoom, true);
+            // var firstInnerWidgetContainer = $("#component-container_"+firstInnerWidgetId);
+            // firstInnerWidgetContainer.find('*').remove();
+            // firstInnerWidgetContainer.remove();
+            // $('#component-container_'+widgetId).remove();
+            // that.makeRecursiveWidgetContainersAndDisplay(firstInnerWidget, outermostWidget, true, dragHandle, workSurface, overallStyles, currentZoom, true);
             loadUserWidgetIntoWorkSurface(outermostWidget, currentZoom);
             // that.makeRecursiveWidgetContainersAndDisplay(widget, outermostWidget, true, dragHandle, workSurface, outermostWidget.properties.styles.custom, currentZoom, true);
             // need the container to be placed before setting up the grid!
