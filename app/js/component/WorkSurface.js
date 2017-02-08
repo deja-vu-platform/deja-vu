@@ -199,7 +199,10 @@ var WorkSurface = function(){
             var widgetId = widget.meta.id;
 
             if (dragHandle.associated){
-                shiftOrder(widgetId, outermostWidget);
+                var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+                if (parent.meta.id == outermostWidget.meta.id){ // fixme SUPERHACK :'(
+                    shiftOrder(widgetId, outermostWidget);
+                }
             }
             var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
             var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
