@@ -330,8 +330,8 @@ var WidgetEditsManager = function(){
                 // then recurse down
                 innerWidget.properties.layout.stackOrder.forEach(function (innerInnerWidgetId, idx) {
                     var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
-                    var innerInnerSourceWidgetId = innerWidget.idMap[innerInnerWidgetId];
-                    // var innerInnerSourceWidgetId = correspondingSourceInnerWidget.properties.layout.stackOrder[idx];
+                    // var innerInnerSourceWidgetId = innerWidget.idMap[innerInnerWidgetId];
+                    var innerInnerSourceWidgetId = correspondingSourceInnerWidget.properties.layout.stackOrder[idx];
                     var innerInnerSourceWidget = correspondingSourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
                     if (!innerInnerWidget){
                         console.log(innerWidget, sourceWidget);
