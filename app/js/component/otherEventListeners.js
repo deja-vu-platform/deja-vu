@@ -145,7 +145,8 @@ var setOverallStyleAndUpdateView = function(styleName, styleValue, userWidget){
     });
 
     $('#reset-overall-color').click(function(){
-        selectedUserWidget.properties.styles.custom = {};
+        widgetEditsManager.clearCustomProperties(selectedUserWidget, selectedUserWidget.meta.id, 'styles.custom');
+
         setUpStyleColors(selectedUserWidget);
         for (var id in selectedUserWidget.innerWidgets){
             var container = $('#work-surface_'+selectedUserWidget.meta.id).find('#component-container_'+id);

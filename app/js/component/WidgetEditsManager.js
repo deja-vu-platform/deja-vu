@@ -155,6 +155,9 @@ var WidgetEditsManager = function(){
                 delete customProperties[propertyName];
             }
             if (propertyName == 'styles.custom'){
+                if (customProperties.styles){
+                    delete customProperties.styles.custom;
+                }
                 widget.properties.styles.custom = {};
                 widget.properties.styles.bsClasses = {};
             } else if (propertyName == 'layout'){
@@ -163,7 +166,7 @@ var WidgetEditsManager = function(){
                 widget.properties[propertyName] = {};
             }
         }
-        that.applyPropertyChangesAtAllLevel(outermostWidget);
+        that.applyPropertyChangesAtAllLevelsBelow(outermostWidget);
     };
 
 
@@ -214,26 +217,26 @@ var WidgetEditsManager = function(){
         return change;
     };
 
-    that.applyPropertyChangesAtAllLevel = function(outermostWidget){
+    that.applyPropertyChangesAtAllLevelsBelow = function(outermostWidget){
         var recursiveApplyPropertyChangesHelper = function(widget){
             if (widget.type == 'user') {
+
+                var templateId = widget.meta.templateId;
+                if (!templateId){ // it is an outermost widget!
+                    templateId = widget.meta.id;
+                }
+                var projectCopy =  UserWidget.fromString(
+                    JSON.stringify(selectedProject.components[templateId])
+                );
+
                 widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
                     var innerWidget = widget.innerWidgets[innerWidgetId];
-                    if (innerWidget.type == 'user') {
-                        var templateId = innerWidget.meta.templateId;
-                        var projectCopy =  UserWidget.fromString(
-                            JSON.stringify(selectedProject.components[templateId])
-                        );
-
-                        recursiveApplyPropertyChangesHelper(innerWidget);
-
-                        // apply changes after calling the recursion so that higher levels override
-                        // lower level changes
-                        applyPropertyChanges(innerWidget, projectCopy);
-                    } else {
-                        applyPropertyChanges(innerWidget);
-                    }
+                    recursiveApplyPropertyChangesHelper(innerWidget);
                 });
+
+                // apply changes after calling the recursion so that higher levels override
+                // lower level changes
+                applyPropertyChanges(widget, projectCopy);
             } else {
                 // else it's a base component, so we'll just take it as is from the component we are reading from
                 applyPropertyChanges(widget);
@@ -327,17 +330,15 @@ var WidgetEditsManager = function(){
         }
 
 
-        var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
+        var applyPropertyChangesHelper = function(innerWidget, sourceWidget, correspondingSourceInnerWidget){
 
-            if (!sourceInnerWidget){
+            if (!sourceWidget){
                 console.log('something went wrong in applyPropertyChangesHelper()');
                 console.log(innerWidget);
                 console.log(that.getPath(selectedUserWidget, innerWidget.meta.id));
             }
 
-            var sourceInnerWidgetId = sourceInnerWidget.meta.id;
-
-            path.push(sourceInnerWidgetId);
+            path.push(correspondingSourceInnerWidget.meta.id);
 
             // get changed properties
             var properties = getPropertyChanges(sourceWidget, path);
@@ -348,17 +349,20 @@ var WidgetEditsManager = function(){
                 // then recurse down
                 innerWidget.properties.layout.stackOrder.forEach(function (innerInnerWidgetId, idx) {
                     var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
-                    var innerInnerSourceWidgetId = sourceInnerWidget.properties.layout.stackOrder[idx];
-                    var innerInnerSourceWidget = sourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
+                    var innerInnerSourceWidgetId = correspondingSourceInnerWidget.properties.layout.stackOrder[idx];
+                    var innerInnerSourceWidget = correspondingSourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
                     if (!innerInnerWidget){
-                        console.log(innerWidget, sourceInnerWidget);
+                        console.log(innerWidget, sourceWidget);
                     }
-                    applyPropertyChangesHelper(innerInnerWidget, innerInnerSourceWidget);
+                    if (!innerInnerSourceWidget){
+                        console.log(innerWidget, sourceWidget);
+                    }
+                    applyPropertyChangesHelper(innerInnerWidget, sourceWidget, innerInnerSourceWidget);
                 });
             }
             path.pop();
         };
-        applyPropertyChangesHelper(outerWidget, sourceWidget);
+        applyPropertyChangesHelper(outerWidget, sourceWidget, sourceWidget);
 
     };
 
@@ -401,7 +405,7 @@ var WidgetEditsManager = function(){
 
                     // apply changes after calling the recursion so that higher levels override
                     // lower level changes
-                    applyPropertyChanges(innerWidget);
+                    // applyPropertyChanges(innerWidget);
                 });
             } else {
                 // else it's a base component, so we'll just take it as is from the component we are reading from
@@ -419,7 +423,8 @@ var WidgetEditsManager = function(){
 
     that.refreshFromProject = function(outerWidget){
         var recursiveWidget = recursiveWidgetMaking(outerWidget);
-        applyPropertyChanges(recursiveWidget);
+        // applyPropertyChanges(recursiveWidget);
+        that.applyPropertyChangesAtAllLevelsBelow(recursiveWidget);
 
         return recursiveWidget
     };

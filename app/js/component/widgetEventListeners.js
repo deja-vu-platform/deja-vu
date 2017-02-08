@@ -749,6 +749,8 @@ function recursiveReIding(widget, sourceWidget){
                         delete widget.innerWidgets[oldId];
                         widget.properties.layout[result.newId] = widget.properties.layout[oldId];
                         delete widget.properties.layout[oldId];
+                        widget.idMap = widget.idMap || {};
+                        widget.idMap[newId] = oldId;
                     }
                 }
             }
