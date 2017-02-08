@@ -109,6 +109,8 @@ var UserWidget = function(dimensions, name, id, version, author){
         children: {}
     };
 
+    template.idMap = {};
+
     return template;
 };
 

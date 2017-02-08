@@ -867,7 +867,9 @@ function downloadHTML(){
  */
 function deleteWidgetFromUserWidgetAndFromView(widgetId) {
     var containerId = "component-container_"+widgetId;
-    selectedUserWidget.deleteInnerWidget(widgetId);
+    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+    parent.deleteInnerWidget(widgetId);
+    // selectedUserWidget.deleteInnerWidget(widgetId);
     $('#'+containerId).remove();
     grid.setUpGrid();
     miniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);

@@ -19,9 +19,6 @@ var DragAndDropController = function () {
             drop: function (event, ui) {
                 // alert the draggable that drop was successful:
                 $(ui.helper).data('dropped', true);
-                var top = ui.position.top;
-                var left = ui.position.left;
-
 
                 var dragHandle = $(ui.draggable);
                 var type = $(ui.draggable).data('type');
@@ -39,15 +36,29 @@ var DragAndDropController = function () {
                 var widgetId = widget.meta.id;
                 dragHandle.removeClass('dragging-component');
 
+
                 var widgetIsAssociated = dragHandle.hasClass('associated');
                 dragHandle.associated = widgetIsAssociated;
+
+                var offset = {top: 0, left: 0};
+
                 if (!widgetIsAssociated) {
                     $(ui.helper).data('newcomponent', true);
                     dragHandle.newWidget = true;
                     outerWidget.addInnerWidget(widget);
+                    outerWidget.idMap[widget.meta.id] = widget.meta.templateId;
                     dragHandle.addClass('associated').data('componentid', widgetId);
                     zoomElement.registerZoom(outerWidget);
+                } else {
+                    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+                    var parentId = parent.meta.id;
+                    if (parentId != selectedUserWidget.meta.id){ // it is not the outermost widget
+                        offset = $('#component-container_'+parentId).position();
+                    }
                 }
+
+                var top = ui.position.top - offset.top;
+                var left = ui.position.left - offset.left;
 
                 var newPosition = {top: top/currentZoom, left: left/currentZoom};
                 var newLayout = {};

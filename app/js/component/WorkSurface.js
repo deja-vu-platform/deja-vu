@@ -193,17 +193,25 @@ var WorkSurface = function(){
 
     };
 
-    var makeWorkSurfaceDroppableToWidgets = function(workSurface, userWidget){
+    var makeWorkSurfaceDroppableToWidgets = function(workSurface, outermostWidget){
         var onDropFinished = function(dragHandle, widget){
+
+            var widgetId = widget.meta.id;
+
             if (dragHandle.associated){
-                shiftOrder(widget.meta.id, userWidget);
+                shiftOrder(widgetId, outermostWidget);
             }
-            that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.styles.custom, currentZoom, true);
+            var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+            var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
+
+            // TODO this needs fixing
+            that.makeRecursiveWidgetContainersAndDisplay(widget, parent, true, dragHandle, workSurface, overallStyles, currentZoom, true);
+            // that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.styles.custom, currentZoom, true);
             // need the container to be placed before setting up the grid!
             grid.setUpGrid();
         };
 
-        var dropSettings = dragAndDrop.widgetToWorkSurfaceDropSettings(userWidget, onDropFinished);
+        var dropSettings = dragAndDrop.widgetToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
 
         workSurface.droppable(dropSettings);
     };

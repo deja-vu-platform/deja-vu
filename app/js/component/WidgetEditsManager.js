@@ -25,25 +25,6 @@ var WidgetEditsManager = function(){
         getPathHelper(outermostWidget, [], widgetId);
         return wantedPath;
     };
-    //
-    // that.getPath = function(outermostWidget, widgetId){
-    //     var wantedPath;
-    //     var getPathHelper = function(widget, path, targetId){
-    //         if (widget.meta){
-    //             path.push(widget.meta.id);
-    //             for (var id in widget.innerWidgets){
-    //                 if (id == targetId){
-    //                     path.push(id); // include the last id
-    //                     wantedPath = path;
-    //                 } else {
-    //                     getPathHelper(widget.innerWidgets[id], JSON.parse(JSON.stringify(path)), targetId);
-    //                 }
-    //             }
-    //         }
-    //     };
-    //     getPathHelper(outermostWidget, [], widgetId);
-    //     return wantedPath;
-    // };
 
     var getOrCreateCustomProperty = function(outermostWidget, targetId){
         var path = that.getPath(outermostWidget, targetId);
@@ -349,13 +330,15 @@ var WidgetEditsManager = function(){
                 // then recurse down
                 innerWidget.properties.layout.stackOrder.forEach(function (innerInnerWidgetId, idx) {
                     var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
-                    var innerInnerSourceWidgetId = correspondingSourceInnerWidget.properties.layout.stackOrder[idx];
+                    var innerInnerSourceWidgetId = innerWidget.idMap[innerInnerWidgetId];
+                    // var innerInnerSourceWidgetId = correspondingSourceInnerWidget.properties.layout.stackOrder[idx];
                     var innerInnerSourceWidget = correspondingSourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
                     if (!innerInnerWidget){
                         console.log(innerWidget, sourceWidget);
                     }
                     if (!innerInnerSourceWidget){
                         console.log(innerWidget, sourceWidget);
+                        innerInnerSourceWidget = innerInnerWidget;
                     }
                     applyPropertyChangesHelper(innerInnerWidget, sourceWidget, innerInnerSourceWidget);
                 });
@@ -415,6 +398,8 @@ var WidgetEditsManager = function(){
 
         var recursiveWidget = recursiveWidgetMakingHelper(outerWidget);
         recursiveReIding(recursiveWidget, oldCopy);
+        // do this after fixing ids, because at the top level the correct ids are used to store changes
+        that.applyPropertyChangesAtAllLevelsBelow(recursiveWidget);
 
         return recursiveWidget;
     };
@@ -423,8 +408,6 @@ var WidgetEditsManager = function(){
 
     that.refreshFromProject = function(outerWidget){
         var recursiveWidget = recursiveWidgetMaking(outerWidget);
-        // applyPropertyChanges(recursiveWidget);
-        that.applyPropertyChangesAtAllLevelsBelow(recursiveWidget);
 
         return recursiveWidget
     };
