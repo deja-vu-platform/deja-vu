@@ -205,8 +205,9 @@ var WorkSurface = function(){
             var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
 
             // TODO this needs fixing
-            that.makeRecursiveWidgetContainersAndDisplay(widget, parent, true, dragHandle, workSurface, overallStyles, currentZoom, true);
-            // that.makeRecursiveWidgetContainersAndDisplay(widget, userWidget, true, dragHandle, workSurface, userWidget.properties.styles.custom, currentZoom, true);
+            // that.makeRecursiveWidgetContainersAndDisplay(widget, parent, true, dragHandle, workSurface, overallStyles, currentZoom, true);
+            loadUserWidgetIntoWorkSurface(outermostWidget, currentZoom);
+            // that.makeRecursiveWidgetContainersAndDisplay(widget, outermostWidget, true, dragHandle, workSurface, outermostWidget.properties.styles.custom, currentZoom, true);
             // need the container to be placed before setting up the grid!
             grid.setUpGrid();
         };
@@ -234,7 +235,7 @@ var WorkSurface = function(){
 
         parent.properties.layout.stackOrder.splice(index, 1);
         parent.properties.layout.stackOrder.push(widgetId);
-        widgetEditsManager.updateCustomProperties(outermostWidget, widgetId, 'layout.stackOrder', stackOrder, true);
+        widgetEditsManager.updateCustomProperties(outermostWidget, widgetId, 'stackOrder', stackOrder, true);
     };
 
 

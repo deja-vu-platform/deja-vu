@@ -74,7 +74,7 @@ var WidgetEditsManager = function(){
                 changes[property] = newProperties[property];
                 widget.properties.styles.custom[property] = newProperties[property];
             }
-        } else if (typeString == "layout.stackOrder"){
+        } else if (typeString == "stackOrder"){
             // changes = newProperties;
             // widget.properties.layout.stackOrder = newProperties;
         } else if (typeString == 'value'){
@@ -287,7 +287,7 @@ var WidgetEditsManager = function(){
 
             if (properties.layout) {
                 // TODO this has problems because the IDs CHANGE!
-                // if (!$.isEmptyObject(properties.layout.stackOrder)) {
+                // if (!$.isEmptyObject(properties.stackOrder)) {
                 //     widget.properties.layout.stackOrder = properties.layout.stackOrder;
                 // }
                 // FIXME this will cause unnecessary weird id stuff :(
