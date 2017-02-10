@@ -86,10 +86,11 @@ export interface UsedWidget {
 export namespace GruntTask {
   export function task(
       grunt, name: string, widgets?: Widget[], main?: string, patterns?,
-      used_widgets?: UsedWidget[]) {
+      used_widgets?: UsedWidget[], replace_map?) {
     widgets = widgets === undefined ? [] : widgets;
     patterns = patterns === undefined ? {} : patterns;
     used_widgets = used_widgets === undefined ? [] : used_widgets;
+    replace_map = replace_map === undefined ? {} : replace_map;
 
     const npm = "node_modules";
     const patterns_src = Object.keys(patterns)
@@ -369,6 +370,7 @@ export namespace GruntTask {
         let replace_patterns = [
           {match: "name", replacement: name},
           {match: "module_map", replacement: module_map},
+          {match: "replace_map", replacement: replace_map},
           {match: "cliches", replacement: _u.keys(patterns)},
           {match: "comp_info", replacement: (
               grunt.file.exists("comp.json") ?

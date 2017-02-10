@@ -162,13 +162,16 @@ export class WidgetLoader {
   constructor(
       private _resolver: ComponentFactoryResolver,
       @Inject("WCompInfo") private _wcomp_info: WCompInfo,
+      @Inject("ReplaceMap") private _replace_map,
       private _client_bus: ClientBus,
       @Inject("wname") @Optional() private _host_wname,
       @Inject("fqelement") @Optional() private _host_fqelement) {}
 
   _adapt_table() {
     if (this.name === undefined) throw new Error("Widget name is required");
-    if (this._host_wname === undefined) return {};
+    if (this._host_wname === undefined) {
+      throw new Error("Host widget name is required");
+    }
     const host_widget_t = {
       name: this._host_wname,
       fqelement: this._host_fqelement
@@ -215,30 +218,54 @@ export class WidgetLoader {
   ngOnInit() {
     if (this.called) return;
     this.called = true;
-    const adapt_table = this._adapt_table();
-    const d_name = _ustring.dasherize(this.name).slice(1);
-    let imp_string_prefix = "";
 
     if (this.fqelement === undefined) {
       this.fqelement = this._host_fqelement;
     }
 
-    const fqelement_split = this.fqelement.split("-");
+    const adapt_table = this._adapt_table();
+
+    console.log(this._replace_map);
+
+    let replace_field_map = {};
+    if (this._replace_map[this.fqelement] !== undefined &&
+        this._replace_map[this.fqelement][this._host_wname]) {
+      const replace_widget = this.
+        _replace_map[this.fqelement][this._host_wname][this.name];
+      if (replace_widget !== undefined) {
+        console.log(
+            `Replacing ${this.name} with ${replace_widget.replaced_by.name} ` +
+            `of ${replace_widget.replaced_by.fqelement}`);
+        this.name = replace_widget.replaced_by.name;
+        this.fqelement = replace_widget.replaced_by.fqelement;
+        replace_field_map = replace_widget.map;
+      }
+    }
+
+
+    return this._load_widget(
+        this.name, this.fqelement, adapt_table, replace_field_map);
+  }
+
+  private _load_widget(
+      name: string, fqelement: string, adapt_table, replace_field_map) {
+    const fqelement_split = fqelement.split("-");
+    let imp_string_prefix = "";
     if (fqelement_split.length === 4) {
       imp_string_prefix = fqelement_split.slice(0, 3).join("-");
     } else {
-      imp_string_prefix = this.fqelement;
+      imp_string_prefix = fqelement;
     }
 
-    console.log(`Loading ${this.name} of ${this.fqelement}`);
-
+    console.log(`Loading ${name} of ${fqelement}`);
+    const d_name = _ustring.dasherize(name).slice(1);
     // need to preprend lib if the widget is not from the current cliche
     return System
-       .import(imp_string_prefix + `/lib/components/${d_name}/${d_name}`)
-      .then(mod => mod[this.name + "Component"])
+      .import(imp_string_prefix + `/lib/components/${d_name}/${d_name}`)
+      .then(mod => mod[name + "Component"])
       .then(c => {
         if (c === undefined) {
-          throw new Error(`Component ${d_name}/${this.name} not found`);
+          throw new Error(`Component ${d_name}/${name} not found`);
         }
         return c;
       })
@@ -246,7 +273,7 @@ export class WidgetLoader {
       .then(factory => {
         const injector = ReflectiveInjector
             .resolveAndCreate(
-              [{provide: "fqelement", useValue: this.fqelement}],
+              [{provide: "fqelement", useValue: fqelement}],
               this.widgetContainer.parentInjector);
         const component = factory.create(injector);
         this.widgetContainer.insert(component.hostView);
@@ -259,21 +286,27 @@ export class WidgetLoader {
         }
         c.fields = _u.extend(c.fields, this.fields);
         _u.each(_u.keys(c), f => {
-          const adapt_info = adapt_table[f];
-          if (adapt_info !== undefined) {
-            if (this.fields[adapt_info.host_fname] === undefined) {
-              throw new Error(
-                `Expected field ${adapt_info.host_fname} is undefined`);
-            }
-            c[f] = this.fields[adapt_info.host_fname].adapt(adapt_info.ftype);
+          if (replace_field_map[f] !== undefined) {
+            c[f] = this.fields[replace_field_map[f].maps_to]
+              .adapt(replace_field_map[f].type);
             c.fields[f] = c[f];
+          } else {
+            const adapt_info = adapt_table[f];
+            if (adapt_info !== undefined) {
+              const host_fname = adapt_info.host_fname;
+              if (this.fields[host_fname] === undefined) {
+                throw new Error(`Expected field ${host_fname} is undefined`);
+              }
+              c[f] = this.fields[host_fname].adapt(adapt_info.ftype);
+              c.fields[f] = c[f];
+            }
           }
         });
         return c;
       })
       .then(c => { /* hack */
         if (c._graphQlService !== undefined) {
-          c._graphQlService.reset_fqelement(this.fqelement);
+          c._graphQlService.reset_fqelement(fqelement);
         }
         return c;
       })

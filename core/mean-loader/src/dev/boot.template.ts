@@ -36,6 +36,7 @@ if (MODE === "dev") {
     {provide: "fqelement", useValue: "@@name"},
     {provide: "CompInfo", useValue: @@comp_info},
     {provide: "WCompInfo", useValue: @@wcomp_info},
+    {provide: "ReplaceMap", useValue: @@replace_map},
     {provide: "locs", useValue: @@locs},
     ClientBus]
 })

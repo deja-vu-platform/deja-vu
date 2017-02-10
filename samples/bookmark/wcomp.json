@@ -213,22 +213,6 @@
       }
     },
 
-
-    {
-      "fields": [
-        {
-          "name": "feed_item_widget",
-          "type": {"name": "Widget", "fqelement": "dv-messaging-feed"},
-          "widget": {"name": "ShowFeed", "fqelement": "dv-messaging-feed"}
-        }
-      ],
-      "subfield": {
-          "name": "feed_item_widget",
-          "type": { "name": "Widget", "fqelement": "dv-samples-bookmark" },
-          "widget": { "name": "Home", "fqelement": "dv-samples-bookmark" }
-      }
-    },
-
     {
       "fields": [
         {

@@ -17,5 +17,27 @@ module.exports = function(grunt) {
        {name: "ShowEvent", fqelement: "dv-organization-event"},
        {name: "ShowConsumer", fqelement: "dv-organization-allocator"},
        {name: "SendEmail", fqelement: "dv-messaging-email"}
-     ]);
+     ],
+     { // replace map
+       "dv-organization-event": {
+         "ChooseAndShowWeeklyEvent": {
+           "ShowEvent": {
+             "replaced_by": {
+               "name": "ShowGroupMeeting",
+               "fqelement": "dv-samples-morg"
+             },
+             "map": {
+               "group_meeting": {
+                 "type": {
+                   "name": "GroupMeeting",
+                   "fqelement": "dv-samples-morg"
+                 },
+                 "maps_to": "event"
+               }
+             }
+           }
+         }
+       }
+     }
+     );
 }

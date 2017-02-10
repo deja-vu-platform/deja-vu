@@ -27,7 +27,6 @@ export class ShowFeedComponent {
   feed: FeedItem[];
   sub = {name: "", on_change: undefined};
   fields = {};
-  feed_item_widget = {name: "FeedItem"};
 
   constructor(
       private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}

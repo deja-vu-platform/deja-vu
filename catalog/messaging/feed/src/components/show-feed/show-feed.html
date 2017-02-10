@@ -1,9 +1,7 @@
 <!-- Feed(Name) -->
 <ul *ngIf="feed && feed.length > 0" class="list-group">
   <li *ngFor="let feedItem of feed" class="list-group-item">
-    <dv-widget [name]="feed_item_widget.name"
-     [fqelement]="feed_item_widget.fqelement"
-     [fields]="feedItem" [hosts]="hosts">
+    <dv-widget name="ShowFeedItem" [fields]="feedItem" [hosts]="hosts">
     </dv-widget>
   </li>
 </ul>

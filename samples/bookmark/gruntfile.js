@@ -48,6 +48,24 @@ module.exports = function(grunt) {
        // Topics and Users
        {name: "LoggedIn", fqelement: "dv-access-auth"},
        {name: "EditFollow", fqelement: "dv-community-follow"}
-     ]
+     ],
+     { // replace map
+       "dv-messaging-feed": {
+         "ShowFeed": {
+           "ShowFeedItem": {
+             "replaced_by": {
+               "name": "ShowFeedPost",
+               "fqelement": "dv-samples-bookmark"
+             },
+             "map": {
+               "post": {
+                 "type": { "name": "Post", "fqelement": "dv-samples-bookmark" },
+                 "maps_to": "message"
+               }
+             }
+           }
+         }
+       }
+     }
      );
 }

@@ -12,7 +12,7 @@
 <div class="row">
   <ul *ngIf="events && events.length > 0" class="list-group">
     <li *ngFor="let event of events" class="list-group-item">
-      <dv-widget [name]="event_widget.name" [fqelement]="event_widget.fqelement"
+      <dv-widget name="ShowEvent"
       [fields]="event" [hosts]="hosts"></dv-widget>
     </li>
   </ul>

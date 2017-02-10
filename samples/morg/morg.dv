@@ -28,5 +28,7 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
     uses Event.ShowEvent, Allocator.ShowConsumer, Email.SendEmail {
     group_meeting: GroupMeeting = Event.ShowEvent.event +
       Allocator.ShowConsumer.resource
-  } replaces Event.ShowEvent { group_meeting = event }
+  } replaces Event.ShowEvent in Event.ChooseAndShowWeeklyEvent {
+    group_meeting = event
+  }
 }

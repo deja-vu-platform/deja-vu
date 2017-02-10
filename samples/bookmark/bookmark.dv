@@ -67,7 +67,7 @@ cliche Bookmark uses
     MessagingPost.ShowAuthor, Label.Labels, Comment.CommentsWithComment {
     post: Post = Label.ShowLabels.item + MessagingPost.ShowAuthor.post +
       Comment.CommentsWithComment.target
-  } replaces Feed.ShowFeedItem { message = post }
+  } replaces Feed.ShowFeedItem in Feed.ShowFeed { message = post }
 
   widget CreatePost uses
     MessagingPost.NewPostContent,

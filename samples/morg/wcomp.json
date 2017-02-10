@@ -50,22 +50,6 @@
           "name": "ChooseAndShowWeeklyEvent", "fqelement": "dv-organization-event"
         }
       }
-    },
-    {
-      "fields": [
-        {
-          "name": "event_widget",
-          "type": { "name": "Widget", "fqelement": "dv-organization-event" },
-          "widget": { "name": "ChooseAndShowWeeklyEvent", "fqelement": "dv-organization-event" }
-        }
-      ],
-      "subfield": {
-        "name": "event_widget", "type": {
-          "name": "Widget", "fqelement": "dv-samples-morg"
-        }, "widget": {
-          "name": "Home", "fqelement": "dv-samples-morg"
-        }
-      }
     }
   ]
 }
