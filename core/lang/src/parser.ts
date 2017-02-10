@@ -277,24 +277,8 @@ export class Parser {
       })
       // A map of of -> field name -> type name
       .addOperation("fieldTypesMap", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          const ftmap = para.fieldTypesMap();
-          return _u
-            .reduce(ftmap, (memo, ft) => {
-              if (memo[ft.of] !== undefined) {
-                throw new Error("Duplicate type " + ft.of);
-              }
-              memo[ft.of] = _u
-                .reduce(ft.fields, (memo, ft) => {
-                  if (memo[ft.name] !== undefined) {
-                    throw new Error("Duplicate field " + ft.name);
-                  }
-                  memo[ft.name] = ft.t;
-                  return memo;
-                }, {});
-              return memo;
-            }, {});
-        },
+        ClicheDecl: (cliche, name, uses, key1, para, key2) => this
+          ._get_ft_map(para),
         Paragraph_widget: decl => decl.fieldTypesMap(),
         Paragraph_data: decl => decl.fieldTypesMap(),
         DataDecl: (data, name, key1, fields, key2, bond) => {
@@ -413,6 +397,7 @@ export class Parser {
       .addOperation("replaceMap", {
         ClicheDecl: (cliche, name, uses, key1, para, key2) => {
           this.cliche_map = this._get_cliche_map(name.sourceString, uses);
+          this.ft_map = this._get_ft_map(para);
           const rmap = _u
             .chain(para.replaceMap())
             .flatten()
@@ -422,7 +407,9 @@ export class Parser {
             .reduce(rmap, (memo, r) => {
               const r_name = {};
               r_name[r.widget.name] = _u.pick(r, "replaced_by", "map");
-              memo[r.widget.fqelement] = r_name;
+              const r_in = {};
+              r_in[r.in_widget.name] = r_name;
+              memo[r.widget.fqelement] = r_in;
               return memo;
             }, {});
         },
@@ -433,9 +420,10 @@ export class Parser {
             this.name = name.sourceString;
             return r.replaceMap();
           },
-        ReplacesDecl: (r, r_name, k1, r_map, k2) => {
+        ReplacesDecl: (r, r_name, i, in_name, k1, r_map, k2) => {
           return {
             widget: r_name.replaceMap(),
+            in_widget: in_name.replaceMap(),
             replaced_by: {
               name: this.name,
               fqelement: this.cliche_map["this"].fqelement
@@ -449,9 +437,15 @@ export class Parser {
             fqelement: this.cliche_map[cliche.sourceString].fqelement
           };
         },
-        ReplaceMap: (n1, eq, n2) => {
+        ReplaceMap: (n1, eq, ct2, dot2, n2) => {
           const ret = {};
-          ret[n2.sourceString] = n1.sourceString;
+          ret[n2.sourceString] = {
+            "type": {
+              "name": this.ft_map[ct2.sourceString][n2.sourceString],
+              "fqelement": this.cliche_map["this"].fqelement
+            },
+            "maps_to": n1.sourceString
+          };
           return ret;
         }
       })
@@ -548,5 +542,24 @@ export class Parser {
       name: cliche_name
     };
     return ret;
+  }
+
+  private _get_ft_map(para) {
+    const ftmap = para.fieldTypesMap();
+    return _u
+      .reduce(ftmap, (memo, ft) => {
+        if (memo[ft.of] !== undefined) {
+          throw new Error("Duplicate type " + ft.of);
+        }
+        memo[ft.of] = _u
+          .reduce(ft.fields, (memo, ft) => {
+            if (memo[ft.name] !== undefined) {
+              throw new Error("Duplicate field " + ft.name);
+            }
+            memo[ft.name] = ft.t;
+            return memo;
+          }, {});
+        return memo;
+      }, {});
   }
 }
