@@ -465,6 +465,8 @@ export class Parser {
       throw new Error(r.message);
     }
     const s = this._semantics(r);
+    // fqelement -> widgets
+    const widget_map = {};
     return {
       used_cliches: s.usedCliches(),
       cliche_map: s.clicheMap(),
@@ -472,7 +474,28 @@ export class Parser {
       replace_map: s.replaceMap(),
       fqelement: s.fqelement(),
       uft_map: s.usesFieldTypesMap(),
-      used_widgets: s.usedWidgets(),
+      used_widgets: _u
+        .chain(s.usedWidgets())
+        .map(uw => {
+          if (widget_map[uw.fqelement] === undefined) {
+            widget_map[uw.fqelement] = _u
+              .reduce(
+                this._parse_cliche(uw.fqelement).widgets(),
+                (memo, w) => {
+                  memo[w.name] = w.children ? w.children : [];
+                  return memo;
+                }, {});
+          }
+          return []
+            .concat(
+              uw, _u.map(widget_map[uw.fqelement][uw.name], w => {
+                w.fqelement = uw.fqelement;
+                return w;
+              }));
+        })
+        .flatten()
+        .uniq(uw => uw.name + uw.fqelement)
+        .value(),
       main_widget: s.main(),
       widgets: s.widgets(),
       tbonds: s.tbonds(),
@@ -509,27 +532,11 @@ export class Parser {
   }
 
   private _build_uses_ft_map(uses) {
-    const dv_grammar = this._grammar;
-    const dv_semantics = this._semantics;
-    function get_fp(cliche) {
-      const cliche_split = cliche.split("-");
-      const category = cliche_split[1];
-      const name = cliche_split[2];
-      return `../../catalog/${category}/${name}/${name}.dv`;
-    }
-    function get_ftmap(cliche) {
-      const dv = fs.readFileSync(get_fp(cliche), "utf-8");
-      const r = dv_grammar.match(dv);
-      if (r.failed()) {
-        throw new Error("Failed to parse " + cliche + " " + r.message);
-      }
-      return dv_semantics(r).fieldTypesMap();
-    }
-
+    const get_ftmap_of_cliche = c => this._parse_cliche(c).fieldTypesMap();
     const used_cliches = _u.uniq(_u.flatten(uses.usedCliches()));
     return _u
       .reduce(used_cliches, (memo, c) => {
-        memo[c] = get_ftmap(c);
+        memo[c] = get_ftmap_of_cliche(c);
         return memo;
       }, {});
   }
@@ -561,5 +568,21 @@ export class Parser {
           }, {});
         return memo;
       }, {});
+  }
+
+  private _parse_cliche(cliche) {
+    function get_fp(cliche) {
+      const cliche_split = cliche.split("-");
+      const category = cliche_split[1];
+      const name = cliche_split[2];
+      return `../../catalog/${category}/${name}/${name}.dv`;
+    }
+
+    const dv = fs.readFileSync(get_fp(cliche), "utf-8");
+    const r = this._grammar.match(dv);
+    if (r.failed()) {
+      throw new Error("Failed to parse " + cliche + " " + r.message);
+    }
+    return this._semantics(r);
   }
 }
