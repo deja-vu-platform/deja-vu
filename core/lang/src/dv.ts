@@ -30,7 +30,8 @@ function main() {
     cliche.widgets,
     cliche.main_widget,
     cliche.used_cliches,
-    cliche.used_widgets);
+    cliche.used_widgets,
+    cliche.replace_map);
   grunt.tasks(["dv-mean:test"]);
 }
 
