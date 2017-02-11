@@ -2,9 +2,7 @@
   "name": "dv-samples-morg",
   "version": "0.0.1",
   "scripts": {
-    "build.dev": "grunt dv-mean:build",
-    "serve.dev": "grunt dv-mean:serve",
-    "start": "grunt dv-mean:serve"
+    "start": "grunt dv-mean:test"
   },
   "license": "MIT",
   "dependencies": {
