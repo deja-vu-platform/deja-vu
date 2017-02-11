@@ -44,8 +44,9 @@ cliche Bookmark uses
   // The landing page gives the user the option to sign in or register
   main widget Landing route "landing" uses
     Auth.SignInWithRedirect, Auth.RegisterWithRedirect {
-    user_ok_redirect: App = Auth.RegisterWithRedirect.register_ok_redirect +
-      Auth.SignInWithRedirect.signin_ok_redirect
+    user_ok_redirect_route: Text =
+      Auth.RegisterWithRedirect.register_ok_redirect_route +
+      Auth.SignInWithRedirect.signin_ok_redirect_route
   }
 
   widget App route "app" uses
@@ -53,7 +54,8 @@ cliche Bookmark uses
     Home route "home",
     Users route "users",
     Topics route "topics" {
-    sign_out_ok_redirect: Landing = Auth.SignOutWithRedirect.signout_ok_redirect
+    sign_out_ok_redirect_route: Text =
+      Auth.SignOutWithRedirect.signout_ok_redirect_route
   }
 
   widget Home uses Auth.LoggedIn, CreatePost, Feed.ShowFeed {

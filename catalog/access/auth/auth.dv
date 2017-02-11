@@ -5,13 +5,13 @@ cliche Auth {
  
   // Will also sign in the user
   widget RegisterWithRedirect {
-    register_ok_redirect: Widget
+    register_ok_redirect_route: Text
   }
   widget SignInWithRedirect {
-    signin_ok_redirect: Widget
+    signin_ok_redirect_route: Text 
   }
   widget SignOutWithRedirect {
-    signout_ok_redirect: Widget
+    signout_ok_redirect_route: Text 
   }
   widget LoggedIn {
     user: User
