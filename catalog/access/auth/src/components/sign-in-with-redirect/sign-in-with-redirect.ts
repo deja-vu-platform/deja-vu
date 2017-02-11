@@ -13,7 +13,7 @@ import {Router} from "@angular/router";
 })
 export class SignInWithRedirectComponent {
   user: User = {username: "", password: ""};
-  route = {value: "/"};
+  signin_ok_redirect_route = {value: "/"};
   error = false;
 
   constructor(
@@ -30,7 +30,7 @@ export class SignInWithRedirectComponent {
           console.log("setting username " + this.user.username);
           localStorage.setItem("id_token", token);
           localStorage.setItem("username", this.user.username);
-          this._router.navigate([this.route.value]);
+          this._router.navigate([this.signin_ok_redirect_route.value]);
         },
         err => {
           this.error = true;

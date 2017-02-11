@@ -11,13 +11,13 @@ import {Router} from "@angular/router";
   `
 })
 export class SignOutWithRedirectComponent {
-  route = {value: "/"};
+  signout_ok_redirect_route = {value: "/"};
 
   constructor(private _router: Router) {}
 
   signOut() {
     localStorage.removeItem("id_token");
     localStorage.removeItem("username");
-    this._router.navigate([this.route.value]);
+    this._router.navigate([this.signout_ok_redirect_route.value]);
   }
 }

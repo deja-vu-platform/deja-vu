@@ -9,7 +9,7 @@ export class RegisterWithRedirectComponent {
   user: User = {username: "", password: ""};
   reenter_password = "";
   username_error = false;
-  route = {value: "/"};
+  register_ok_redirect_route = {value: "/"};
   reenter_password_error = false;
 
   constructor(
@@ -36,7 +36,7 @@ export class RegisterWithRedirectComponent {
               token => {
                 localStorage.setItem("id_token", token);
                 localStorage.setItem("username", this.user.username);
-                this._router.navigate([this.route.value]);
+                this._router.navigate([this.register_ok_redirect_route.value]);
               });
         },
         err => {

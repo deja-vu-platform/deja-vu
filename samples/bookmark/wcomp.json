@@ -3,18 +3,18 @@
     {
       "fields": [
         {
-          "name": "route",
+          "name": "signin_ok_redirect_route",
           "type": { "name": "Text", "fqelement": "dv-access-auth" },
           "widget": { "name": "SignInWithRedirect", "fqelement": "dv-access-auth" }
         },
         {
-          "name": "route",
+          "name": "register_ok_redirect_route",
           "type": { "name": "Text", "fqelement": "dv-access-auth" },
           "widget": { "name": "RegisterWithRedirect", "fqelement": "dv-access-auth" }
         }
       ],
       "subfield": {
-        "name": "route", "type": {
+        "name": "user_ok_redirect_route", "type": {
           "name": "Text", "fqelement": "dv-samples-bookmark"
         }, "widget": {
           "name": "Landing", "fqelement": "dv-samples-bookmark"
@@ -167,13 +167,13 @@
     {
       "fields": [
         {
-          "name": "route",
+          "name": "signout_ok_redirect_route",
           "type": { "name": "Text", "fqelement": "dv-access-auth" },
           "widget": { "name": "SignOutWithRedirect", "fqelement": "dv-access-auth" }
         }
       ],
       "subfield": {
-        "name": "route", "type": {
+        "name": "signout_ok_redirect_route", "type": {
           "name": "Text", "fqelement": "dv-samples-bookmark"
         }, "widget": {
           "name": "App", "fqelement": "dv-samples-bookmark"
