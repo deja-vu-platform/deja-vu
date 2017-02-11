@@ -184,21 +184,6 @@
     {
       "fields": [
         {
-          "name": "post",
-          "type": {"name": "Post", "fqelement": "dv-samples-bookmark"},
-          "of": {"name": "ShowFeedPost", "fqelement": "dv-samples-bookmark"}
-        }
-      ],
-      "subfield": {
-          "name": "message",
-          "type": { "name": "Message", "fqelement": "dv-messaging-feed" },
-          "of": { "name": "ShowFeed", "fqelement": "dv-messaging-feed" }
-      }
-    },
-
-    {
-      "fields": [
-        {
           "name": "author",
           "type": {"name": "Author", "fqelement": "dv-messaging-comment"},
           "of": {"name": "CommentsWithComment", "fqelement": "dv-messaging-comment"}
