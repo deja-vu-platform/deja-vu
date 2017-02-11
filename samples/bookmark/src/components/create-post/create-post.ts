@@ -8,7 +8,7 @@ export class CreatePostComponent {
 
   constructor(client_bus: ClientBus) {
     client_bus.init(this, [
-      field("user", "User"),
+      field("author", "User"),
       field("post", "Post"),
       field("submit_ok", "Boolean")
       ]);

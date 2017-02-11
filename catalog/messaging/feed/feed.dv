@@ -16,11 +16,11 @@ cliche Feed {
   }
 
   widget ShowFeed uses ShowFeedItem {
-    subscriber: Subscriber
+    sub: Subscriber
   }
 
   widget ShowFeedItem {
-    message: Message,
-    publisher: Publisher
+    msg: Message,
+    pub: Publisher
   }
 }

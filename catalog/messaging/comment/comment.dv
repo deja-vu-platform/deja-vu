@@ -13,8 +13,12 @@ cliche Comment {
     name: Text
   }
 
-  widget Comments {
+  widget Comments uses ShowComment {
     target: Target
+  }
+
+  widget ShowComment {
+    comment: Comment
   }
 
   widget NewComment {
@@ -23,6 +27,7 @@ cliche Comment {
   }
 
   widget CommentsWithComment uses Comments, NewComment {
+    // hmmm is this ok?
     target: Target = Comments.target + NewComment.target,
     author: Author = NewComment.target
   }

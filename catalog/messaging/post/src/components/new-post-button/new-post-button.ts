@@ -11,7 +11,7 @@ import {Widget} from "client-bus";
 export class NewPostButtonComponent {
   submit_ok = {value: false};
   post: Post = {content: ""};
-  user: User = {username: "", posts: []};
+  author: User = {username: "", posts: []};
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -25,7 +25,7 @@ export class NewPostButtonComponent {
     this._graphQlService
       .post(`
         newPost(
-          author: "${this.user.username}", content: "${this.post.content}") {
+          author: "${this.author.username}", content: "${this.post.content}") {
           atom_id
         }
       `)

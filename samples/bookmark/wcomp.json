@@ -96,13 +96,13 @@
     {
       "fields": [
         {
-          "name": "user",
+          "name": "author",
           "type": { "name": "User", "fqelement": "dv-messaging-post" },
           "of": { "name": "NewPostButton", "fqelement": "dv-messaging-post" }
         }
       ],
       "subfield": {
-        "name": "user", "type": {
+        "name": "author", "type": {
           "name": "User", "fqelement": "dv-samples-bookmark"
         }, "of": {
           "name": "CreatePost", "fqelement": "dv-samples-bookmark"
@@ -145,7 +145,7 @@
           "of": { "name": "LoggedIn", "fqelement": "dv-access-auth" }
         },
         {
-          "name": "user",
+          "name": "author",
           "type": { "name": "User", "fqelement": "dv-samples-bookmark" },
           "of": { "name": "CreatePost", "fqelement": "dv-samples-bookmark" }
         },
@@ -267,7 +267,7 @@
         {
           "name": "comment",
           "type": {"name": "Comment", "fqelement": "dv-messaging-comment"},
-          "of": {"name": "Comment", "fqelement": "dv-messaging-comment"}
+          "of": {"name": "ShowComment", "fqelement": "dv-messaging-comment"}
         }
       ],
       "subfield": {

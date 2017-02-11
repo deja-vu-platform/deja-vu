@@ -41,7 +41,7 @@ module.exports = function(grunt) {
        // hack..shouldn't have to specify these
        {name: "NewComment", fqelement: "dv-messaging-comment"},
        {name: "Comments", fqelement: "dv-messaging-comment"},
-       {name: "Comment", fqelement: "dv-messaging-comment"},
+       {name: "ShowComment", fqelement: "dv-messaging-comment"},
        // Landing
        {name: "SignInWithRedirect", fqelement: "dv-access-auth"},
        {name: "RegisterWithRedirect", fqelement: "dv-access-auth"},

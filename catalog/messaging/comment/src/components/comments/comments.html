@@ -1,7 +1,7 @@
 <ul *ngIf="comments && comments.length > 0" class="row"
  style="list-style-type: none">
   <li *ngFor="let comment of comments" class="col-md-12">
-    <dv-widget name="Comment"
+    <dv-widget name="ShowComment"
      [fields]="comment" [hosts]="hosts">
     </dv-widget>
   </li>

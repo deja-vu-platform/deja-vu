@@ -4,6 +4,6 @@ import {Widget} from "client-bus";
   fqelement: "dv-messaging-comment",
   template: `{{comment.content}} by {{comment.author.name}}`,
 })
-export class CommentComponent {
+export class ShowCommentComponent {
   comment = {content: "", author: {name: ""}};
 }
