@@ -17,7 +17,7 @@ export interface Type {
 export interface Field {
   name: string;
   "type": Type;
-  widget?: Type;
+  "of"?: Type;
 }
 
 export interface TypeBond {
@@ -187,12 +187,12 @@ export class WidgetLoader {
     }
     const ret = _u.chain(this._wcomp_info.wbonds)
       .filter(wbond => _u
-          .findWhere(this.c_hosts, wbond.subfield.widget) !== undefined)
-      .filter(wbond => !_u.chain(wbond.fields).pluck("widget")
+          .findWhere(this.c_hosts, wbond.subfield.of) !== undefined)
+      .filter(wbond => !_u.chain(wbond.fields).pluck("of")
           .where(widget_t).isEmpty().value())
       .map((wbond: FieldBond) => {
         const wfield: Field = _u.chain(wbond.fields)
-          .filter(f => t_equals(f.widget, widget_t)).value()[0];
+          .filter(f => t_equals(f.of, widget_t)).value()[0];
         return {
           fname: wfield.name,
           info: {
