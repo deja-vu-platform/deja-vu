@@ -205,8 +205,9 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.wbonds(),
         Paragraph_data: decl => [],
-        WidgetDecl: (m, w, n1, route_decl, wU, k1, fields, k2, r) => {
-          return _u.flatten(fields.fbonds());
+        WidgetDecl: (m, w, name, route_decl, wU, k1, fields, k2, r) => {
+          this.of_name = name.sourceString;
+          return fields.fbonds();
         }
       })
       .addOperation("widgets", {
