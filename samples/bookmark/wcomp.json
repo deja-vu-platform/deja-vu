@@ -3,38 +3,6 @@
     {
       "fields": [
         {
-          "name": "user",
-          "type": { "name": "User", "fqelement": "dv-access-auth" },
-          "widget": { "name": "RegisterWithRedirect", "fqelement": "dv-access-auth" }
-        }
-      ],
-      "subfield": {
-        "name": "register_user", "type": {
-          "name": "User", "fqelement": "dv-samples-bookmark"
-        }, "widget": {
-          "name": "Landing", "fqelement": "dv-samples-bookmark"
-        }
-      }
-    },
-    {
-      "fields": [
-        {
-          "name": "user",
-          "type": { "name": "User", "fqelement": "dv-access-auth" },
-          "widget": { "name": "SignInWithRedirect", "fqelement": "dv-access-auth" }
-        }
-      ],
-      "subfield": {
-        "name": "signin_user", "type": {
-          "name": "User", "fqelement": "dv-samples-bookmark"
-        }, "widget": {
-          "name": "Landing", "fqelement": "dv-samples-bookmark"
-        }
-      }
-    },
-    {
-      "fields": [
-        {
           "name": "route",
           "type": { "name": "Text", "fqelement": "dv-access-auth" },
           "widget": { "name": "SignInWithRedirect", "fqelement": "dv-access-auth" }
