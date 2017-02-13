@@ -69,9 +69,7 @@ export class Parser {
             .reject(_u.isEmpty)
             .map(tbond => ({
               subtype: {
-                name: subtype, "of": {
-                  name: this.of_name, fqelement: mapped_cliche.fqelement
-                }
+                name: subtype, fqelement: mapped_cliche.fqelement
               },
               types: _u.reject(tbond, _u.isEmpty)
             }))

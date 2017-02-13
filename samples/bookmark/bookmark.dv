@@ -18,7 +18,7 @@ cliche Bookmark uses
       FollowTopics.Source.name + Auth.User.username +
       MessagingPost.User.username + Comment.Author.name +
       Feed.Subscriber.name + Feed.Publisher.name,
-    posts: Post = Feed.Publisher.published + MessagingPost.User.posts,
+    posts: Post = Feed.Publisher.messages + MessagingPost.User.posts,
     follows: User = FollowUsers.Source.follows + Feed.Subscriber.subscriptions |
       FollowTopics.Source.follows + Feed.Subscriber.subscriptions
   } = // users can follow other users
@@ -31,7 +31,7 @@ cliche Bookmark uses
   data Post {
     content: Text = MessagingPost.Post.content + Feed.Message.content,
     topics: Topic = Label.Item.labels,
-    author: User = MessagingPost.author
+    author: User = MessagingPost.Post.author
   } = Label.Item + MessagingPost.Post + Feed.Message + Comment.Target
   
   data Topic {
