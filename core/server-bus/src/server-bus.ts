@@ -14,7 +14,7 @@ export interface Type {
 
 export interface Field {
   name: string;
-  "type": Type;
+  "of": Type;
 }
 
 export interface TypeBond {
@@ -238,13 +238,13 @@ class Dispatcher {
 
     _u.chain(comp_info.fbonds)
       .filter(fbond => _u.chain(fbond.fields).union([fbond.subfield])
-          .pluck("type").pluck("fqelement").contains(this._fqelement).value())
+          .pluck("of").pluck("fqelement").contains(this._fqelement).value())
       .map(fbond => _u.chain(fbond.fields).union([fbond.subfield])
           .reduce((memo, f) => {
-            if (f.type.fqelement === this._fqelement) {
+            if (f.of.fqelement === this._fqelement) {
               // Multiple fields of the same fqelement can be part of the same
               // bond
-              memo.our_fields.push({fname: f.name, tname: f.type.name});
+              memo.our_fields.push({fname: f.name, tname: f.of.name});
             } else {
               memo.fields.push(f);
             }
@@ -254,7 +254,7 @@ class Dispatcher {
       .each(obj => {
         for (const f of obj.fields) {
           for (const {fname, tname} of obj.our_fields) {
-            const t_str = this._str_t(f.type);
+            const t_str = this._str_t(f.of);
             const field_map = {};
             field_map[fname] = f.name;
             _u.extend(this._dispatch_table[tname][t_str], field_map);

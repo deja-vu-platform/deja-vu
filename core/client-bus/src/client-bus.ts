@@ -89,7 +89,7 @@ export class Atom {
     // find the field bonds where t is part of, map field to core
     for (const fbond of this._comp_info.fbonds) {
       for (const field of fbond.fields) {
-        if (t_equals(field.type, t)) {
+        if (t_equals(field.of, t)) {
           // use the subfield name
           forward_map[field.name] = fbond.subfield.name;
         }

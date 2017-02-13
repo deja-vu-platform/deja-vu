@@ -29,15 +29,15 @@
       "fields": [
         {
           "name": "events",
-          "type": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
+          "of": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
         },
         {
           "name": "resources",
-          "type": { "name": "Allocation", "fqelement": "dv-organization-allocator" }
+          "of": { "name": "Allocation", "fqelement": "dv-organization-allocator" }
         }
       ],
       "subfield": {
-        "name": "meetings", "type": {
+        "name": "meetings", "of": {
           "name": "WeeklyGroupMeeting", "fqelement": "dv-samples-morg"
         }
       }
@@ -46,15 +46,15 @@
       "fields": [
         {
           "name": "guests",
-          "type": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
+          "of": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
         },
         {
           "name": "consumers",
-          "type": { "name": "Allocation", "fqelement": "dv-organization-allocator" }
+          "of": { "name": "Allocation", "fqelement": "dv-organization-allocator" }
         }
       ],
       "subfield": {
-        "name": "guests", "type": {
+        "name": "guests", "of": {
           "name": "WeeklyGroupMeeting", "fqelement": "dv-samples-morg"
         }
       }
@@ -63,15 +63,15 @@
       "fields": [
         {
           "name": "description",
-          "type": { "name": "Event", "fqelement": "dv-organization-event" }
+          "of": { "name": "Event", "fqelement": "dv-organization-event" }
         },
         {
           "name": "consumed_by",
-          "type": { "name": "Resource", "fqelement": "dv-organization-allocator" }
+          "of": { "name": "Resource", "fqelement": "dv-organization-allocator" }
         }
       ],
       "subfield": {
-        "name": "champion", "type": {
+        "name": "champion", "of": {
           "name": "GroupMeeting", "fqelement": "dv-samples-morg"
         }
       }
