@@ -5,7 +5,8 @@ cliche Label {
   }
   
   data Label {
-    name: Text
+    name: Text,
+    items: Item
   }
 
   data LabelsText {

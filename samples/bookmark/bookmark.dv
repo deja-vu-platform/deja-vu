@@ -26,16 +26,18 @@ cliche Bookmark uses
       // users can follow topics
       FollowTopics.Source +
       MessagingPost.User + Comment.Author +
-      Feed.Subscriber + Feed.Publisher
+      Feed.Subscriber + Feed.Publisher + Auth.User
   
   data Post {
     content: Text = MessagingPost.Post.content + Feed.Message.content,
-    topics: Topic = Label.Item.labels
+    topics: Topic = Label.Item.labels,
+    author: User = MessagingPost.author
   } = Label.Item + MessagingPost.Post + Feed.Message + Comment.Target
   
   data Topic {
-    name: Text = Label.Item.name + Feed.Publisher.name +
-        FollowTopics.Target.name
+    name: Text = Label.Label.name + Feed.Publisher.name +
+        FollowTopics.Target.name,
+    posts: Post = Feed.Publisher.messages + Label.Label.items
   } = Label.Label + FollowTopics.Target + Feed.Publisher
 
   /**

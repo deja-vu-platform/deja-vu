@@ -12,7 +12,7 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
 
   data Member {
     name: Text
-  } = Guest
+  } = Guest + Event.Description + Allocator.Consumer
 
   data GroupEmailAddress {}
 

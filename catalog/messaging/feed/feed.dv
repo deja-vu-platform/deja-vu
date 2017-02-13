@@ -1,7 +1,7 @@
 cliche Feed {
   data Publisher {
     name: Text,
-    published: Message
+    messages: Message
   }
 
   data Subscriber {
