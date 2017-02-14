@@ -301,39 +301,24 @@ var WidgetContainer = function(){
         textColorOption.append(textColorInput);
         bgColorOption.append(bgColorInput);
 
+        var makeOnColorChangeFunction = function(type){
+            return function(color) {
+                var newStyle = {};
+                newStyle[type] = color;
+                updateCustomStyles(outermostWidget, targetId, newStyle);
+                refreshContainerDisplay(false, container, currentZoom);
+            };
+        };
 
-        var pickerText = new jscolor(textColorInput[0]);
-        pickerText.closable = true;
-        pickerText.closeText = 'X';
-        textColorInput.change(function(e){
-            e.stopPropagation();
-            var color = pickerText.toHEXString();
-            updateCustomStyles(outermostWidget, targetId, {'color': color});
-            refreshContainerDisplay(false, container, currentZoom);
-        });
-
-        var pickerBG = new jscolor(bgColorInput[0]);
-        pickerBG.closable = true;
-        pickerBG.closeText = 'X';
-        bgColorInput.change(function(e){
-            e.stopPropagation();
-            var color = pickerBG.toHEXString();
-            updateCustomStyles(outermostWidget, targetId, {'background-color': color});
-            refreshContainerDisplay(false, container, currentZoom);
-        });
-
-        var textColor = customStyles['color'] || '000000'; // TODO
-        pickerText.fromString(textColor);
-
-        var bgColor = customStyles['background-color'] || 'FFFFFF'; // TODO
-        pickerBG.fromString(bgColor);
+        style.setUpInnerWidgetTextColor(textColorInput, customStyles['color'], makeOnColorChangeFunction('color'));
+        style.setUpInnerWidgetBGColor(bgColorInput, customStyles['background-color'],  makeOnColorChangeFunction('background-color'));
 
         container.find('.inner-component-custom-style-dropdown').append(textColorOption).append(bgColorOption);
     };
 
     var showConfigOptions = function(droppedWidgetType, container) {
-        // Hide edit button if label or panel
-        if (droppedWidgetType=='label' || droppedWidgetType=='panel') {
+        // Hide edit button if label or panel or user
+        if (droppedWidgetType=='label' || droppedWidgetType=='panel' || droppedWidgetType=='user') { //TODO
             container.find('.edit-btn').css('display', 'none');
         } else {
             container.find('.edit-btn').css('display', 'block');

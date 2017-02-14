@@ -12,7 +12,7 @@ $('#new-user-component-btn').click(function(){
             selectedProject.addInnerWidget(selectedUserWidget);
             displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
-            setUpStyleColors(selectedUserWidget);
+            style.setUpStyleColors(selectedUserWidget);
 
             resetMenuOptions();
     });
@@ -26,7 +26,7 @@ $('#new-main-component-btn').click(function(){
             displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
 
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
-            setUpStyleColors(selectedUserWidget);
+            style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
     });
 });
@@ -49,7 +49,7 @@ $('.components').on('click', '.component-name-container', function () {
     $(this).parent().addClass('selected');
     selectedUserWidget = selectedProject.components[widgetId];
     workSurface.loadUserWidget(selectedUserWidget);
-    setUpStyleColors(selectedUserWidget);
+    style.setUpStyleColors(selectedUserWidget);
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {

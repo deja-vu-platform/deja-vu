@@ -87,91 +87,10 @@ function showClicheInList(id, name){
 
 
 
-// possible sources http://jscolor.com/, http://www.w3schools.com/colors/colors_picker.asp
-// http://jscolor.com/examples/
 
 
-var setUpStyleColors = function(userWidget){
-    var pickerText = $('#pick-color-text-input')[0]._jscLinkedInstance;
-    pickerText.fromString('000000');
-    var pickerBG = $('#pick-color-bg-input')[0]._jscLinkedInstance;
-    pickerBG.fromString('87CEFA');
 
-    if (userWidget.properties.styles.custom) {
-        var overallStyles = userWidget.properties.styles.custom;
-        var textColor = overallStyles['color'] || '';
-        pickerText.fromString(textColor);
-
-        var bgColor = overallStyles['background-color'] || '';
-        pickerBG.fromString(bgColor);
-        $('#work-surface_'+userWidget.meta.id).css({
-            'background-color': bgColor,
-        });
-    }
-};
-
-var setOverallStyleAndUpdateView = function(styleName, styleValue, userWidget){
-    if (!userWidget.properties.styles.custom){
-        userWidget.properties.styles.custom = {}
-    }
-    userWidget.properties.styles.custom[styleName] = styleValue;
-    for (var id in userWidget.innerWidgets){
-        var container = $('#work-surface_'+userWidget.meta.id).find('#component-container_'+id);
-        refreshContainerDisplay(false, container, currentZoom);
-    }
-
-};
-
-(function(){
-    var inputText = $('#pick-color-text-input');
-    var pickerText = new jscolor(inputText[0]);
-    pickerText.closable = true;
-    pickerText.closeText = 'X';
-    inputText.change(function(){
-        var color = pickerText.toHEXString();
-        setOverallStyleAndUpdateView('color', color, selectedUserWidget);
-    });
-
-    var inputBG = $('#pick-color-bg-input');
-    var pickerBG = new jscolor(inputBG[0]);
-    pickerBG.closable = true;
-    pickerBG.closeText = 'X';
-    inputBG.change(function(){
-        var color = pickerBG.toHEXString();
-        setOverallStyleAndUpdateView('background-color', color, selectedUserWidget);
-        $('#work-surface_'+selectedUserWidget.meta.id).css({
-            'background-color': color,
-        });
-    });
-
-    $('#reset-overall-color').click(function(){
-        widgetEditsManager.clearCustomProperties(selectedUserWidget, selectedUserWidget.meta.id, 'styles.custom');
-
-        setUpStyleColors(selectedUserWidget);
-        for (var id in selectedUserWidget.innerWidgets){
-            var container = $('#work-surface_'+selectedUserWidget.meta.id).find('#component-container_'+id);
-            refreshContainerDisplay(false, container, currentZoom);
-        }
-    });
-})();
-
-(function(){
-    $('.overall-text-size-input-set').click(function(){
-        var value = $('.overall-text-size-input').val();
-        if (!isNaN(parseInt(value))){
-            setOverallStyleAndUpdateView('font-size', value + 'px', selectedUserWidget);
-        }
-    });
-
-    $('.overall-text-weight-input-set').click(function(){
-        var value = $('.overall-text-weight-input').val();
-        if (!isNaN(parseInt(value))){
-            setOverallStyleAndUpdateView('font-weight', value, selectedUserWidget);
-        }
-    });
-
-})();
-
+style.setUpOverallInputs();
 
 /** **/
 

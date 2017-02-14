@@ -9,6 +9,7 @@ var workSurface = WorkSurface();
 var dragAndDrop = DragAndDropController();
 var grid = Grid();
 var widgetEditsManager = WidgetEditsManager();
+var style = Style();
 
 var projectsSavePath = path.join(__dirname, 'projects');
 var addedCliches;
@@ -109,7 +110,7 @@ $(function(){
 
     // registerUserWidgetAreaDroppable();
 
-    setUpStyleColors(selectedUserWidget);
+    style.setUpStyleColors(selectedUserWidget);
 
     resizeViewportToFitWindow();
 

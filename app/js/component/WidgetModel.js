@@ -8,6 +8,8 @@ const DEFAULT_SCREEN_HEIGHT = 1000;
 const DEFAULT_COMPONENT_NAME = "New Widget";
 /** ** ** ** ** ** ** ** ** ** **/
 
+// TODO eventually freeze the object and only allow updates using the objects!
+
 /**
  * Base Widget model
  * @param type

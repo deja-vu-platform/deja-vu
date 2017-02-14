@@ -70,14 +70,14 @@ var WorkSurface = function(){
                 dragHandle.addClass('associated').data('componentid', widgetId);
             }
 
-            // if (isThisEditable){
+            if (isThisEditable){
                 widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
                 dragAndDrop.registerWidgetDragHandleDraggable(dragHandle);
-            // } else {
-            //     widgetContainer = widgetContainerMaker.createMinimallyEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
-            //     dragHandle.addClass('not-draggable');
-            //     dragHandle.notDraggable = true;
-            // }
+            } else {
+                widgetContainer = widgetContainerMaker.createMinimallyEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
+                dragHandle.addClass('not-draggable');
+                dragHandle.notDraggable = true;
+            }
 
             widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated, outermostWidget);
 

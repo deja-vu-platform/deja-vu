@@ -218,3 +218,13 @@ Also right now we are disallowing the widget to be smaller than the total boundi
 necessarily the correct behaviour: what if they want an option that is outside the component's border? 
 Maybe the worksurface needs to become a container and there needs to be a work surface that we can move around in, but doens't
 actually have a meaning in terms of the components/widgets. 
+
+2/8:
+
+Figure out and write test srsly. !!!!
+
+color palette
+timeline
+fix html generator
+make worksurface itself moveable?
+small: make the files have a last opened + last modified
