@@ -2,7 +2,7 @@
   "name": "dv-samples-bookmark",
   "version": "0.0.1",
   "scripts": {
-    "start": "grunt dv-mean:test"
+    "start": "node node_modules/dv-lang/lib/dv.js"
   },
   "license": "MIT",
   "dependencies": {
