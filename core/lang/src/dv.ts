@@ -1,6 +1,9 @@
 const command_line_args = require("command-line-args");
 import {Parser, Cliche} from "./parser";
 import {GruntTask} from "mean-loader";
+
+import * as fs from "fs";
+
 const grunt = require("grunt");
 
 const cli = command_line_args([
@@ -16,6 +19,16 @@ const cli = command_line_args([
 function main() {
   const opts = cli.parse();
   const p = new Parser();
+
+  if (opts.file === undefined) {
+    for (const f of fs.readdirSync(process.cwd())) {
+      if (f.endsWith(".dv")) {
+        console.log("Using dv file " + f);
+        opts.file = f;
+        break;
+      }
+    }
+  }
 
   if (opts.debug) {
     p.debug_match(opts.file);
