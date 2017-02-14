@@ -392,6 +392,28 @@ export class Parser {
           name: name.sourceString, cliche: cliche.sourceString.slice(0, -1)
         })
       })
+      .addOperation("replaceList", {
+        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+          this.cliche_map = this._get_cliche_map(name.sourceString, uses);
+          return _u
+            .chain(para.replaceList())
+            .flatten()
+            .reject(_u.isEmpty)
+            .value();
+        },
+        Paragraph_widget: decl => decl.replaceList(),
+        Paragraph_data: decl => ({}),
+        WidgetDecl: (
+          m, w, name, route, wUses, k1, fields, k2, r) => r.replaceList(),
+        ReplacesDecl: (r, r_name, i, in_name, k1, r_map, k2) => r_name
+          .replaceList(),
+        replaceName: (cliche, dot, widget) => {
+          return {
+            name: widget.sourceString,
+            fqelement: this.cliche_map[cliche.sourceString].fqelement
+          };
+        }
+      })
       // widget that is replaced -> replacement -> w field -> replacement field
       .addOperation("replaceMap", {
         ClicheDecl: (cliche, name, uses, key1, para, key2) => {
@@ -466,6 +488,8 @@ export class Parser {
     const s = this._semantics(r);
     // fqelement -> widgets
     const widget_map = {};
+    // Widgets that are replaced
+    const replaced = _u.map(s.replaceList(), w => w.name + w.fqelement);
     return {
       used_cliches: s.usedCliches(),
       cliche_map: s.clicheMap(),
@@ -485,14 +509,30 @@ export class Parser {
                   return memo;
                 }, {});
           }
+          const all_children = _u
+            .chain(widget_map[uw.fqelement][uw.name])
+            .map(c => [].concat(c, widget_map[uw.fqelement][c.name]))
+            .flatten()
+            .value();
+
           return []
-            .concat(
-              uw, _u.map(widget_map[uw.fqelement][uw.name], w => {
-                w.fqelement = uw.fqelement;
-                return w;
-              }));
+            .concat(uw, _u.map(all_children, w => {
+              w.fqelement = uw.fqelement;
+              return w;
+            }));
         })
         .flatten()
+        // Remove replaced widgets
+        // if the widget that's replaced is also used in another context it
+        // will appear twice, so we until want to filter it out once
+        .filter(uw => {
+          const replaced_index = replaced.indexOf(uw.name + uw.fqelement);
+          if (replaced_index > -1) {
+            replaced.splice(replaced_index, 1);
+            return false;
+          }
+          return true;
+        })
         .uniq(uw => uw.name + uw.fqelement)
         .value(),
       main_widget: s.main(),
