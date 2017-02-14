@@ -27,9 +27,8 @@ cliche Comment {
   }
 
   widget CommentsWithComment uses Comments, NewComment {
-    // hmmm is this ok?
-    target: Target = Comments.target + NewComment.target,
-    author: Author = NewComment.target
+    target: Target,
+    author: Author
   }
   
 }
