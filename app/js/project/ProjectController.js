@@ -21,6 +21,7 @@ var componentToShow;
 // Initialization
 $(function () {
     /*
+    TODO
         1. In main.js, create a new directory for the files on load of the app (if there isn't one)
         2. Look at all the available files in that directory, and display it for opening
         3. On click, save which project is selected (local storage or query strin) and shift to the
@@ -47,7 +48,7 @@ $(function () {
     readFiles(projectsSavePath, function(filename, content) {
         // TODO add a loading projects sign
         // Check the types to only add projects
-        var content = JSON.parse(content);
+        content = JSON.parse(content);
         if (content.objectType && (content.objectType === 'UserProject')){
             availableProjectsByFilename[filename] = content;
             // TODO for now, recent is one week
@@ -165,7 +166,7 @@ function displayProjectPreview(project){
     // TODO make it select the main component
     // TODO Also, have a way to click to change to another view?
     $('#page-preview').data('projectfilename', projectNameToFilename(project.meta.name));
-    $('#project-name-preview').text('Project Preview: '+project.meta.name)
+    $('#project-name-preview').text('Project Preview: '+project.meta.name);
     $('#preview-prev-page').unbind();
     $('#preview-next-page').unbind();
 
@@ -307,6 +308,8 @@ function deleteFile(dirname, filename){
 function deleteFileAndDisplay(dirname, filename, id){
     deleteFile(dirname, filename);
     $(".recent-projects").find("[data-filename='" + filename + "']").parent().remove();
+
+    // todo refresh lists
 
     if (currentProject){
         if (currentProject.meta.id === id){

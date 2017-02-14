@@ -2,26 +2,26 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-var componentContainerMaker = ComponentContainerMaker();
+var widgetContainerMaker = WidgetContainer();
 
 var WorkSurface = function(){
-    var that = Object.create(WorkSurface);
+    var that = Object.create(WorkSurface.prototype);
 
 
-    var createWorkSurface = function(componentId, height, width){
+    var createWorkSurface = function(outerWidgetId, height, width){
         var workSurface = $('<div></div>');
         workSurface.addClass('work-surface');
-        workSurface.attr('id', 'work-surface_'+componentId);
+        workSurface.attr('id', 'work-surface_'+outerWidgetId);
 
         workSurface.height(height).width(width);
         return workSurface;
     };
 
-    var createOrResetWorkSurface = function(component, zoom){
-        var componentId = component.meta.id;
-        var workSurface = $('#work-surface'+'_'+componentId);
+    var createOrResetWorkSurface = function(outerWidget, zoom){
+        var widgetId = outerWidget.meta.id;
+        var workSurface = $('#work-surface'+'_'+widgetId);
         if (workSurface.length===0){
-            workSurface = that.setUpEmptyWorkSurface(component, zoom);
+            workSurface = that.setUpEmptyWorkSurface(outerWidget, zoom);
         } else {
             resetWorkSurface(workSurface);
         }
@@ -34,93 +34,130 @@ var WorkSurface = function(){
             zoom: 1,
         };
         workSurface.data('state', state);
-        workSurface.html('');
+        workSurface.find('.component-container').remove();
     };
 
-    that.makeRecursiveComponentContainersAndDisplay = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom, overallStyles){
-        var container = that.makeRecursiveComponentContainers(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom);
-        view.displayComponent(true, component, container, overallStyles, zoom);
+    that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, dragHandle,
+                                                            outerWidgetContainer, overallStyles, zoom, associated,
+                                                            hackityHack){
+        var container = makeRecursiveWidgetContainers(
+            innerWidget, outerWidget, isThisEditable, dragHandle,
+            zoom, associated, outerWidget, hackityHack);
+        if (outerWidgetContainer){
+            outerWidgetContainer.append(container);
+        }
+        view.displayWidget(true, innerWidget, container, overallStyles, zoom);
+        if (outerWidgetContainer){ // because order matters :(
+            registerTooltipBtnHandlers();
+        }
         return container;
     };
 
     // isEditable == component is the selected user component and all its contents are editable
-    that.makeRecursiveComponentContainers = function(component, outerComponent, isThisEditable, widget, outerComponentContainer, zoom){
-        var type = component.type;
-        var componentId = component.meta.id;
+    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated, outermostWidget, hackityHack){ //FIXME!
+        var type = innerWidget.type;
+        var widgetId = innerWidget.meta.id;
 
         // first create a container for this component
-        var componentContainer;
-        if (isThisEditable){
-            componentContainer = componentContainerMaker.createEditableComponentContainer(component, outerComponent, zoom);
-            if (!widget){
-                widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
-                if (type == 'user'){
-                    widget.text(component.meta.name);
-                    widget.css('display', 'block');
+        var widgetContainer;
+        if (!hackityHack){
+            if (!dragHandle) {
+                dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                if (type == 'user') {
+                    dragHandle.text(innerWidget.meta.name);
+                    dragHandle.css('display', 'block');
                 }
-                widget.addClass('associated').data('componentid', componentId);
+                dragHandle.addClass('associated').data('componentid', widgetId);
             }
-            componentContainerMaker.setUpContainer(componentContainer, widget, component);
-            registerDraggable(widget);
+
+            if (isThisEditable){
+                widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
+                dragAndDrop.registerWidgetDragHandleDraggable(dragHandle);
+            } else {
+                widgetContainer = widgetContainerMaker.createMinimallyEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
+                dragHandle.addClass('not-draggable');
+                dragHandle.notDraggable = true;
+            }
+
+            widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated, outermostWidget);
+
             var editPopup = false;
-            if (widget){
-                if (!widget.hasClass('associated')){
-                    if (!widget.hasClass('dragging-component')){
+            if (dragHandle){
+                if (dragHandle.newWidget){
+                    if (!dragHandle.hasClass('dragging-component')){
                         editPopup = true;
                     }
                 }
             }
-            triggerEdit(componentContainer, editPopup);
+            triggerEdit(widgetContainer, editPopup);
+
+
         } else {
-            componentContainer = componentContainerMaker.createBasicComponentContainer(component, zoom);
-        }
-        if (outerComponentContainer){
-            outerComponentContainer.append(componentContainer);
-            registerTooltipBtnHandlers();
+            widgetContainer = widgetContainerMaker.createBasicWidgetContainer(innerWidget, zoom);
         }
 
-        if (outerComponent.layout[componentId]){ // means it's not not added yet
-            componentContainer.css({
+        if (outerWidget.properties.layout[widgetId]){ // means it's not not added yet
+            widgetContainer.css({
                 position: 'absolute',
-                left: outerComponent.layout[componentId].left*zoom,
-                top: outerComponent.layout[componentId].top*zoom,
+                left: outerWidget.properties.layout[widgetId].left*zoom,
+                top: outerWidget.properties.layout[widgetId].top*zoom,
 
             });
         }
 
         if (type === 'user'){ // do the recursion
-            component.layout.stackOrder.forEach(function(innerComponentId){
-                var innerComponent = component.components[innerComponentId];
-                that.makeRecursiveComponentContainers(innerComponent, component, false, null, componentContainer, zoom);
+            innerWidget.properties.layout.stackOrder.forEach(function(innerInnerWidgetId){
+                var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
+
+                var diff = innerWidget.properties.layout.stackOrder.length - Object.keys(innerWidget.innerWidgets).length;
+                if (diff != 0){
+                    console.log('in make recursive containers')
+                    console.log(innerWidget.properties.layout.stackOrder);
+                    console.log(Object.keys(innerWidget.innerWidgets));
+                    console.log(innerInnerWidget);
+                }
+                var innerInnerWidgetContainer = makeRecursiveWidgetContainers(
+                    innerInnerWidget, innerWidget, false, null, zoom,
+                    associated, outermostWidget, hackityHack);
+                widgetContainer.append(innerInnerWidgetContainer);
             });
         }
-        return componentContainer;
+        return widgetContainer;
     };
 
     /**
      * Loads elements into the DOM. If the elements were already there, gets rid of them
      * and creates them afresh.
-     * @param component
+     * @param userWidget
      * @param zoom
      */
-    var loadComponentIntoWorkSurface = function(component, zoom){
-        var workSurface = createOrResetWorkSurface(component, zoom);
-        component.layout.stackOrder.forEach(function(innerComponentId){
-            var innerComponent = component.components[innerComponentId];
-            var container = that.makeRecursiveComponentContainers(innerComponent, component, true, null, workSurface, zoom);
-            view.displayComponent(true, innerComponent, container, component.properties.custom, zoom)
-        });
-        setUpGrid();
+    var loadUserWidgetIntoWorkSurface = function(userWidget, zoom){
+        var workSurface = createOrResetWorkSurface(userWidget, zoom);
 
+        var diff = userWidget.properties.layout.stackOrder.length - Object.keys(userWidget.innerWidgets).length;
+        if (diff != 0){
+            console.log('in load user widget into worksurface');
+            console.log(userWidget.properties.layout.stackOrder);
+            console.log(Object.keys(userWidget.innerWidgets));
+            console.log(userWidget);
+        }
+
+        userWidget = widgetEditsManager.refreshFromProject(userWidget);
+
+        userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
+            var innerWidget = userWidget.innerWidgets[innerWidgetId];
+            var overallStyles = userWidget.properties.styles.custom;
+            that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, true, null, workSurface, overallStyles, zoom, true);
+        });
     };
 
-    var makeWorkSurfaceResizable = function(workSurface, component){
-        var componentId = component.meta.id;
+    var makeWorkSurfaceResizable = function(workSurface, userWidget){
+        var widgetId = userWidget.meta.id;
 
         var dragHandle_se = $('<span></span>');
         dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
         dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
-        dragHandle_se.attr('id', 'drag-handle-se' + '_' + componentId);
+        dragHandle_se.attr('id', 'drag-handle-se' + '_' + widgetId);
 
         workSurface.append(dragHandle_se);
 
@@ -132,88 +169,87 @@ var WorkSurface = function(){
             minHeight: 0,
             minWidth: 0,
             start: function(){
-                var minWidth = $('.grid-cell:last').position().left;
-                var minHeight = $('.grid-cell:last').position().top;
+                // var minWidth = $('.grid-cell:last').position().left;
+                // var minHeight = $('.grid-cell:last').position().top;
+
+                var minWidth = grid.getRightMostGridPosition();
+                var minHeight = grid.getBottomMostGridPosition();
+
 
                 $(this).resizable('option', 'minWidth', minWidth);
                 $(this).resizable('option', 'minHeight', minHeight);
             },
             resize: function(e, ui){
-                component.dimensions.height = ui.size.height/currentZoom;
-                component.dimensions.width = ui.size.width/currentZoom;
+                userWidget.properties.dimensions.height = ui.size.height/currentZoom;
+                userWidget.properties.dimensions.width = ui.size.width/currentZoom;
             },
             stop: function(e, ui){
                 // not super important to update as you resize so just do it at the end
-                miniNav.updateMiniNavInnerComponentSizes(component, currentZoom);
-                setUpGrid();
+                miniNav.updateMiniNavInnerWidgetSizes(userWidget, currentZoom);
+                grid.setUpGrid();
 
             }
         });
 
     };
 
-    var makeWorkSurfaceDroppableToComponents = function(workSurface, outerComponent){
+    var makeWorkSurfaceDroppableToWidgets = function(workSurface, outermostWidget){
+        var onDropFinished = function(dragHandle, widget){
 
-        var dropSettings = {
-            accept: ".widget",
-            hoverClass: "highlight",
-            tolerance: "fit",
-            drop: function(event, ui) {
-                // alert the draggable that drop was successful:
-                $(ui.helper).data('dropped', true);
-                var top = ui.position.top;
-                var left = ui.position.left;
+            var widgetId = widget.meta.id;
 
-
-                var widget = $(ui.draggable);
-                var type = $(ui.draggable).data('type');
-                if (type == 'user'){
-                    if (!widget.hasClass('associated')) {
-                        widget = $(ui.draggable).clone();
-                        widget.data('componentid', $(ui.draggable).data('componentid'));
-                        widget.data('type', type);
-                        registerDraggable(widget);
-                    }
+            if (dragHandle.associated){
+                var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+                if (parent.meta.id == outermostWidget.meta.id){ // fixme SUPERHACK :'(
+                    shiftOrder(widgetId, outermostWidget);
                 }
-
-                // on drop, there should always be a dragging component
-                var component = draggingComponent;
-                var componentId = component.meta.id;
-                widget.removeClass('dragging-component');
-                outerComponent.layout[componentId] = {top: top/currentZoom, left: left/currentZoom};
-                that.makeRecursiveComponentContainersAndDisplay(component, outerComponent, true, widget, workSurface, currentZoom, outerComponent.properties.custom);
-
-                if (!widget.hasClass('associated')){
-                    $(ui.helper).data('newcomponent', true);
-                    outerComponent.addComponent(component);
-                    widget.addClass('associated').data('componentid', componentId);
-                } else {
-                    shiftOrder(componentId, outerComponent);
-                }
-
-                miniNav.updateMiniNavInnerComponentSizes(outerComponent, currentZoom);
-                setUpGrid();
-
             }
+            var firstInnerWidgetId = widgetEditsManager.getPath(outermostWidget, widgetId)[1]; // this should always exist
+            if (!firstInnerWidgetId){
+                console.log('something went wrong in onDropFinished');
+            }
+
+            var firstInnerWidget = widgetEditsManager.getInnerWidget(outermostWidget, firstInnerWidgetId);
+
+            // var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+            var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(outermostWidget, widgetId);
+
+            // TODO this needs fixing
+            // var firstInnerWidgetContainer = $("#component-container_"+firstInnerWidgetId);
+            // firstInnerWidgetContainer.find('*').remove();
+            // firstInnerWidgetContainer.remove();
+            // $('#component-container_'+widgetId).remove();
+            // that.makeRecursiveWidgetContainersAndDisplay(firstInnerWidget, outermostWidget, true, dragHandle, workSurface, overallStyles, currentZoom, true);
+            loadUserWidgetIntoWorkSurface(outermostWidget, currentZoom);
+            // that.makeRecursiveWidgetContainersAndDisplay(widget, outermostWidget, true, dragHandle, workSurface, outermostWidget.properties.styles.custom, currentZoom, true);
+            // need the container to be placed before setting up the grid!
+            grid.setUpGrid();
         };
+
+        var dropSettings = dragAndDrop.widgetToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
 
         workSurface.droppable(dropSettings);
     };
 
     // puts componentId at the top!
-    var shiftOrder = function(componentId, outerComponent){
-        var stackOrder = outerComponent.layout.stackOrder;
+    var shiftOrder = function(widgetId, outermostWidget){
+        // TODO make this work for inner widgets
+        var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+
+        var stackOrder = parent.properties.layout.stackOrder;
 
         var index;
         for (var i = 0; i < stackOrder.length; i++){
             var id = stackOrder[i];
-            if (componentId == id){
+            if (widgetId == id){
                 index = i;
                 break
             }
         }
-        outerComponent.layout.stackOrder.splice(index, 1);
-        outerComponent.layout.stackOrder.push(componentId);
+
+        parent.properties.layout.stackOrder.splice(index, 1);
+        parent.properties.layout.stackOrder.push(widgetId);
+        widgetEditsManager.updateCustomProperties(outermostWidget, widgetId, 'stackOrder', stackOrder, true);
     };
 
 
@@ -237,89 +273,89 @@ var WorkSurface = function(){
         return elements;
     };
 
-    var findComponentsToShift = function(movingId, otherId){// TODO better naming?
+    var findWidgetsToShift = function(movingId, otherId){// TODO better naming?
         var container = $('#component-container_'+otherId);
 
         var top = container.offset().top;
         var left = container.offset().left;
         var right = left + container.width();
         var bottom = top + container.height();
-        var componentsToShift = {};
+        var widgetsToShift = {};
         [left, right].forEach(function(x) {
             [top, bottom].forEach(function (y) {
                 var allElements = allElementsFromPoint(x, y);
-                var overlappingComponents = [];
+                var overlappingWidgets = [];
                 $(allElements).filter('.component-container').each(function (idx, elt) {
                     var containerId = $(elt).attr('id');
                     if (containerId != 'dragging-container') {
-                        var id = getComponentIdFromContainerId($(elt).attr('id'));
+                        var id = getWidgetIdFromContainerId($(elt).attr('id'));
                         if (movingId == otherId){ // if we are looking at the moving container
                             if (!(id == movingId)) {
-                                overlappingComponents.push(id); // push in every other overlapping container
+                                overlappingWidgets.push(id); // push in every other overlapping container
                             }
                         } else {
                             if (id == movingId){ // if we overlap with the moving container
-                                overlappingComponents.push(otherId); // push it in
+                                overlappingWidgets.push(otherId); // push it in
                             }
                         }
                     }
                 });
-                overlappingComponents.forEach(function (id) {
-                    if (!(id in componentsToShift)) {
-                        componentsToShift[id] = "";
+                overlappingWidgets.forEach(function (id) {
+                    if (!(id in widgetsToShift)) {
+                        widgetsToShift[id] = "";
                     }
                 })
             });
         });
-        return Object.keys(componentsToShift);
+        return Object.keys(widgetsToShift);
     };
 
-    that.changeOrderByOne = function(componentId, outerComponent, isUp){
-        var componentsToShift = {};
-        for (var id in outerComponent.components){
-            var overlappingComponents = findComponentsToShift(componentId, id);
-            overlappingComponents.forEach(function(id){
-                if (!(id in componentsToShift)){
-                    componentsToShift[id] = "";
+    that.changeOrderByOne = function(widgetId, userWidget, isUp){
+        var widgetsToShift = {};
+        for (var id in userWidget.innerWidgets){
+            var overlappingWidgets = findWidgetsToShift(widgetId, id);
+            overlappingWidgets.forEach(function(id){
+                if (!(id in widgetsToShift)){
+                    widgetsToShift[id] = "";
                 }
             })
         }
 
-        var stackOrder = outerComponent.layout.stackOrder;
-        var idxThisComponent;
-        var idxNextComponent;
+        var stackOrder = userWidget.properties.layout.stackOrder;
+        var idxThisWidget;
+        var idxNextWidget;
         if (!isUp){
             stackOrder.reverse();
         }
         for (var i = 0; i<stackOrder.length; i++){
             var id = stackOrder[i];
-            if (id == componentId){
-                idxThisComponent = i;
+            if (id == widgetId){
+                idxThisWidget = i;
             }
-            if (typeof idxThisComponent !== 'undefined'){ // 0 is considered false!
+            if (typeof idxThisWidget !== 'undefined'){ // 0 is considered false!
                 // we have passed this component!
-                if (id in componentsToShift){
-                    idxNextComponent = i;
+                if (id in widgetsToShift){
+                    idxNextWidget = i;
                     break;
                 }
             }
         }
-        if (typeof idxNextComponent !== 'undefined') { // there is something to move
-            var idxToSwap = idxThisComponent;
+        if (typeof idxNextWidget !== 'undefined') { // there is something to move
+            var idxToSwap = idxThisWidget;
             // from the component after this to the next
-            for (var i = idxThisComponent + 1; i < idxNextComponent + 1; i++) {
+            for (var i = idxThisWidget + 1; i < idxNextWidget + 1; i++) {
                 var id = stackOrder[i];
                 stackOrder[idxToSwap] = id;
                 idxToSwap = i;
             }
-            stackOrder[idxNextComponent] = componentId;
+            stackOrder[idxNextWidget] = widgetId;
         }
         if (!isUp){
             stackOrder.reverse();
         }
-        outerComponent.layout.stackOrder = stackOrder;
+        userWidget.properties.layout.stackOrder = stackOrder;
         // FIXME faster implem?
-        loadComponentIntoWorkSurface(outerComponent, currentZoom);
+        loadUserWidgetIntoWorkSurface(userWidget, currentZoom);
     };
 
 
@@ -327,45 +363,151 @@ var WorkSurface = function(){
     /**
      * enables it if its elements have already been created,
      * otherwise loads the elements into the DOM
-     * @param component
+     * @param userWidget
      * @param zoom
      */
-    that.loadUserComponent = function(component){
-        var componentId = component.meta.id;
-        var workSurface = $('#work-surface'+'_'+componentId);
+    that.loadUserWidget = function(userWidget){
+        var widgetId = userWidget.meta.id;
+        var workSurface = $('#work-surface'+'_'+widgetId);
+        zoomElement.registerZoom(userWidget);
+
         if (workSurface.length===0){
             currentZoom = 1;
-            loadComponentIntoWorkSurface(component, currentZoom);
+            loadUserWidgetIntoWorkSurface(userWidget, currentZoom);
         } else {
-            disableAllComponentDomElementsExcept(componentId);
-            setComponentOptions(component);
-            zoomElement.updateZoomFromState(component);
+            disableAllWidgetDomElementsExcept(widgetId);
+            setWidgetOptions(userWidget);
+            zoomElement.updateZoomFromState(userWidget);
+            // TODO other way? for now, reload the thinger
+            loadUserWidgetIntoWorkSurface(userWidget, currentZoom);
         }
+        miniNav.setUpMiniNavElementAndInnerWidgetSizes(userWidget);
+        grid.setUpGrid();
     };
 
 
 
     /**
      * creates an empty worksurface and appends it to the outer container
-     * @param component
+     * @param userWidget
      * @param zoom
      */
-    that.setUpEmptyWorkSurface = function(component, zoom){
+    that.setUpEmptyWorkSurface = function(userWidget, zoom){
         currentZoom = zoom; // set zoom value 100%
-        var componentId = component.meta.id;
-        disableAllComponentDomElementsExcept(componentId);
-        var workSurface = createWorkSurface(componentId, component.dimensions.height, component.dimensions.width);
-        resetWorkSurface(workSurface);
+        var widgetId = userWidget.meta.id;
+        disableAllWidgetDomElementsExcept(widgetId);
+        var workSurface = createWorkSurface(widgetId, userWidget.properties.dimensions.height, userWidget.properties.dimensions.width);
 
         $('#outer-container').append(workSurface);
 
-        makeWorkSurfaceResizable(workSurface, component); // TODO experimentation
-        makeWorkSurfaceDroppableToComponents(workSurface, component);
-        setComponentOptions(selectedProject.components[componentId]);
-        zoomElement.updateZoomFromState(component);
+        resetWorkSurface(workSurface);
+
+        makeWorkSurfaceResizable(workSurface, userWidget); // TODO experimentation
+        makeWorkSurfaceDroppableToWidgets(workSurface, userWidget);
+        zoomElement.updateZoomFromState(userWidget);
+
+        setWidgetOptions(selectedProject.components[widgetId]);
 
         return workSurface
     };
 
+
+
+    /**
+     * Disabled by changing the id and class names
+     * @param widgetId
+     */
+    var disableWidgetDOMElements = function(widgetId){
+        var workSurface = $('#work-surface'+'_'+widgetId);
+        $(workSurface).addClass('hidden-component');
+
+        $(workSurface).find('*').each(function() {
+            var elt = this;
+            
+            var id = elt.id;
+            if (id.length>0){
+                elt.id = 'disabled_'+widgetId+'_'+elt.id;
+            }
+            var classes = elt.className;
+            if (classes.length>0){
+                classes = classes.split(' ');
+                var classNames = '';
+                classes.forEach(function(className){
+                    classNames = classNames + ' ' + 'disabled_'+widgetId+'_'+className;
+                });
+                elt.className = classNames;
+            }
+        });
+    };
+
+
+    var enableWidgetDOMElements = function(widgetId){
+        var workSurface = $('#work-surface'+'_'+widgetId);
+        $(workSurface).removeClass('hidden-component');
+
+        $(workSurface).find('*').each(function() {
+            var elt = this;
+
+            var id = elt.id;
+            if (id.length>0){
+                elt.id = id.replace('disabled_'+widgetId+'_', '');
+            }
+            var classes = elt.className;
+            if (classes.length>0){
+                classes = classes.split(' ');
+                var classNames = '';
+                classes.forEach(function(className){
+                    classNames =  classNames  + ' ' +  className.replace('disabled_'+widgetId+'_', '');
+                });
+                elt.className = classNames.trim();
+            }
+        });
+    };
+
+    var disableAllWidgetDomElementsExcept = function(widgetToEnableId){
+        for (var widgetId in selectedProject.components){
+            if (widgetToEnableId == widgetId){
+                enableWidgetDOMElements(widgetId);
+                continue;
+            }
+            if ($('#work-surface'+'_'+widgetId).hasClass('hidden-component')){
+                continue;
+            }
+            disableWidgetDOMElements(widgetId);
+        }
+    };
+
+    // var enableSpecificComponentDomElements = function(componentToEnableId){
+    //     // first check that the table has been made (otherwise the reset will happen automatically,
+    //     // but more importantly, the table-grid-container won't exist yet
+    //     var workSurfaceToEnable = $('#work-surface'+'_'+componentToEnableId);
+    //     if (!(workSurfaceToEnable.length>0)) {
+    //         createOrResetTableGridContainer(componentToEnableId);
+    //         var state = {
+    //             zoom: 1,
+    //             lock:{
+    //                 width: false,
+    //                 height: false
+    //             }
+    //         };
+    //         $('#work-surface'+'_'+componentToEnableId).data('state', state);
+    //     }
+    //
+    //     var componentToEnable = selectedProject.components[componentToEnableId];
+    //
+    //     // enable first (toggle needs the id's and classes to be enabled)
+    //     if (workSurfaceToEnable.hasClass('hidden-component')){
+    //         enableWidgetDOMElements(componentToEnableId);
+    //     }
+    //
+    //     zoomElt.updateZoomFromState(componentToEnable);
+    //
+    //     setWidgetOptions(componentToEnable);
+    //
+    // }
+
+
+
+    Object.freeze(that);
     return that
 };

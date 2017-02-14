@@ -3,7 +3,15 @@
  */
 
 var MiniNav = function(){
-    var that = Object.create(MiniNav);
+    var that = Object.create(MiniNav.prototype);
+
+    var navZoom = .1;
+    var navDragging = false;
+
+
+    that.getNavZoom = function(){
+        return navZoom;
+    };
 
     var showMiniNavPosition = function(){
         var scrollTop = $('#outer-container').scrollTop()*navZoom;
@@ -49,14 +57,13 @@ var MiniNav = function(){
 
     };
 
-    that.miniNavInitialize = function(userComponent){
+    that.miniNavInitialize = function(){
         var widthScale = ($('#mini-nav').width())/$('#selected-screen-size').width();
         var heightScale = ($('#mini-nav').height())/$('#selected-screen-size').height();
 
         var scale = Math.min(widthScale, heightScale);
         navZoom = scale;
 
-        that.setUpMiniNavElementAndInnerComponentSizes(userComponent);
         $('#zoom-selected-screen-size').css({
             position: 'absolute',
             // height: $('#selected-screen-size').height()*scale*currentZoom + 'px',
@@ -89,37 +96,37 @@ var MiniNav = function(){
         });
     };
 
-    that.updateMiniNavInnerComponentSizes = function(component, zoom){
-        that.setUpMiniNavElementAndInnerComponentSizes(component);
-        that.updateNavInnerComponentSizes(zoom);
+    that.updateMiniNavInnerWidgetSizes = function(outerWidget, zoom){
+        that.setUpMiniNavElementAndInnerWidgetSizes(outerWidget);
+        that.updateNavInnerWidgetSizes(zoom);
     };
 
-    that.updateNavInnerComponentSizes = function(zoom){
+    that.updateNavInnerWidgetSizes = function(zoom){
         $('#mini-nav-component-sizes').css({
             zoom: zoom,
         });
     };
 
-    that.setUpMiniNavElementAndInnerComponentSizes = function(outerComponent){
+    that.setUpMiniNavElementAndInnerWidgetSizes = function(outerWidget){
         $('#mini-nav-component-sizes').html('').css({
-            width: outerComponent.dimensions.width*navZoom + 'px',
-            height: outerComponent.dimensions.height*navZoom + 'px',
+            width: outerWidget.properties.dimensions.width*navZoom + 'px',
+            height: outerWidget.properties.dimensions.height*navZoom + 'px',
         });
 
-        Object.keys(outerComponent.components).forEach(function(innerComponentId){
-            var innerComponent = outerComponent.components[innerComponentId];
-            var componentSizeDiv = $('<div></div>');
-            componentSizeDiv.addClass('mini-nav-inner-component-size');
-            componentSizeDiv.css({
+        Object.keys(outerWidget.innerWidgets).forEach(function(innerWidgetId){
+            var innerWidget = outerWidget.innerWidgets[innerWidgetId];
+            var widgetSizeDiv = $('<div></div>');
+            widgetSizeDiv.addClass('mini-nav-inner-component-size');
+            widgetSizeDiv.css({
                 position: 'absolute',
-                left: outerComponent.layout[innerComponentId].left*navZoom,
-                top: outerComponent.layout[innerComponentId].top*navZoom,
-                width: innerComponent.dimensions.width*navZoom,
-                height: innerComponent.dimensions.height*navZoom,
+                left: outerWidget.properties.layout[innerWidgetId].left*navZoom,
+                top: outerWidget.properties.layout[innerWidgetId].top*navZoom,
+                width: innerWidget.properties.dimensions.width*navZoom,
+                height: innerWidget.properties.dimensions.height*navZoom,
                 background: 'black'
             });
 
-            $('#mini-nav-component-sizes').append(componentSizeDiv);
+            $('#mini-nav-component-sizes').append(widgetSizeDiv);
         });
     };
 
@@ -157,6 +164,13 @@ var MiniNav = function(){
             navDragging = false;
         },
     });
+
+    that.updateMiniNavPositionSize = function(outerContainerWidth, outerContainerHeight){
+        $('#mini-nav-position').css({
+            height: outerContainerHeight*navZoom + 'px',
+            width: outerContainerWidth*navZoom + 'px',
+        });
+    }
 
     return that;
 };

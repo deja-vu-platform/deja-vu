@@ -249,7 +249,7 @@ li.selected {
     display: none;
 }
 
-.widget:hover {
+.widget:not(.not-draggable):hover {
     cursor: -webkit-grab;
     cursor: grab;
     background-color: #E0E0E0;

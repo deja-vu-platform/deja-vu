@@ -2,20 +2,17 @@
  * Created by Shinjini on 11/3/2016.
  */
 
-var zoom = ZoomElement();
-
-
 /** ** ** ** ** ** Menu Event Handlers ** ** ** ** ** **/
 // TODO on user component name input check for special chars
 
 $('#new-user-component-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
-            selectedUserComponent = initUserComponent(false, false);
-            selectedProject.addComponent(selectedUserComponent);
-            displayUserComponentInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
-            workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
-            setUpStyleColors(selectedUserComponent);
+            selectedUserWidget = initUserWidget(false, false);
+            selectedProject.addInnerWidget(selectedUserWidget);
+            displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            style.setUpStyleColors(selectedUserWidget);
 
             resetMenuOptions();
     });
@@ -24,12 +21,12 @@ $('#new-user-component-btn').click(function(){
 $('#new-main-component-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
-            selectedUserComponent = initUserComponent(false, true);
-            selectedProject.addMainPage(selectedUserComponent);
-            displayMainPageInListAndSelect(selectedUserComponent.meta.name, selectedUserComponent.meta.id);
+            selectedUserWidget = initUserWidget(false, true);
+            selectedProject.addMainPage(selectedUserWidget);
+            displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
 
-            workSurface.setUpEmptyWorkSurface(selectedUserComponent, 1);
-            setUpStyleColors(selectedUserComponent);
+            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
     });
 });
@@ -44,16 +41,15 @@ $('#save-project').on('click', function () {
 
 $('.components').on('click', '.component-name-container', function () {
     // Save the current values
-    var oldState = {zoom : currentZoom,
-    };
-    $('#work-surface'+'_'+selectedUserComponent.meta.id).data('state', oldState);
+    var oldState = {zoom : currentZoom};
+    $('#work-surface'+'_'+selectedUserWidget.meta.id).data('state', oldState);
 
-    var componentId = $(this).parent().data('componentid');
+    var widgetId = $(this).parent().data('componentid');
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
-    selectedUserComponent = selectedProject.components[componentId];
-    workSurface.loadUserComponent(selectedUserComponent);
-    setUpStyleColors(selectedUserComponent);
+    selectedUserWidget = selectedProject.components[widgetId];
+    workSurface.loadUserWidget(selectedUserWidget);
+    style.setUpStyleColors(selectedUserWidget);
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {
@@ -69,29 +65,29 @@ $('.components').on('dblclick', '.component-name', function (e) {
 $('.components').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
-        var componentId = $(this).parent().parent().parent().data('componentid');
-        var componentNameElt = $($(this).parent().parent().find('.component-name'));
+        var widgetId = $(this).parent().parent().parent().data('componentid');
+        var widgetNameElt = $($(this).parent().parent().find('.component-name'));
         var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
-        componentNameElt.removeClass('not-displayed');
+        widgetNameElt.removeClass('not-displayed');
         submitRenameElt.addClass('not-displayed');
         var newName = $(this).val();
         if (newName.length === 0) { // empty string entered, don't change the name!
             return;
         }
-        componentNameElt.text(newName);
+        widgetNameElt.text(newName);
         $('.component-options .component-name').text(newName);
 
-        selectedProject.components[componentId].meta.name = newName;
+        selectedProject.components[widgetId].meta.name = newName;
     }
 });
 
 /** ** ** ** ** ** ** ** ** ** ** ** Component Options ** ** ** ** ** ** ** ** ** ** ** ** **/
-function setComponentOptions(component){
+function setWidgetOptions(outerWidget){
     // renaming
 
     $('.component-options .component-name')
-        .text(component.meta.name)
+        .text(outerWidget.meta.name)
         .unbind()
         .on('dblclick', function () {
             var newNameInputElt = $($(this).parent().find('.new-name-input'));
@@ -108,21 +104,21 @@ function setComponentOptions(component){
         .on('keypress' , function (event) {
             if (event.which == 13) {
                 event.preventDefault();
-                var componentNameElt = $($(this).parent().parent().find('.component-name'));
+                var widgetNameElt = $($(this).parent().parent().find('.component-name'));
                 var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
-                componentNameElt.removeClass('not-displayed');
+                widgetNameElt.removeClass('not-displayed');
                 submitRenameElt.addClass('not-displayed');
 
                 var newName = $(this).val();
                 if (newName.length === 0) { // empty string entered, don't change the name!
                     return;
                 }
-                $('.components').find('[data-componentid='+component.meta.id+']').find('.component-name').text(newName);
+                $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.component-name').text(newName);
 
-                componentNameElt.text($(this).val());
+                widgetNameElt.text($(this).val());
 
-                component.meta.name = $(this).val();
+                outerWidget.meta.name = $(this).val();
             }
         });
 
@@ -130,21 +126,21 @@ function setComponentOptions(component){
     $('.component-options #btn-duplicate-component')
         .unbind()
         .click(function(){
-            var copyComponent = duplicateUserComponent(component);
-            var originalId = copyComponent.meta.id;
+            var copyWidget = duplicateUserWidget(outerWidget);
+            var originalId = copyWidget.meta.id;
             // change the id
-            copyComponent.meta.id = generateId();
+            copyWidget.meta.id = generateId();
 
             if (originalId in selectedProject.mainComponents){
-                selectedProject.addMainPage(copyComponent);
-                displayMainPageInListAndSelect(copyComponent.meta.name, copyComponent.meta.id);
+                selectedProject.addMainPage(copyWidget);
+                displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             } else {
-                displayUserComponentInListAndSelect(copyComponent.meta.name, copyComponent.meta.id);
+                displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             }
 
-            selectedProject.addComponent(copyComponent);
-            selectedUserComponent = copyComponent;
-            workSurface.loadUserComponent(copyComponent, 1);
+            selectedProject.addInnerWidget(copyWidget);
+            selectedUserWidget = copyWidget;
+            workSurface.loadUserWidget(copyWidget, 1);
 
         });
 
@@ -163,23 +159,23 @@ function setComponentOptions(component){
     $('.component-options .btn-delete-component')
         .unbind()
         .on("click", function (e) {
-            var id = component.meta.id;
-            if (confirmOnUserComponentDelete){
+            var id = outerWidget.meta.id;
+            if (confirmOnUserWidgetDelete){
                 if (selectedProject.numComponents === 1){
                     return; //don't delete the last one TODO is the the right way to go?
                 }
-                openDeleteUserComponentConfirmDialogue(id);
+                openDeleteUserWidgetConfirmDialogue(id);
             } else {
-                deleteUserComponent(id);
+                deleteUserWidget(id);
             }
         });
 
     // if the component is in the main pages, set it up accordingly
-    if (component.meta.id in selectedProject.mainComponents){
+    if (outerWidget.meta.id in selectedProject.mainComponents){
         $('.component-options #btn-index-page-toggle').css({
             display: 'inline-block',
         });
-        setUpComponentOptionsIndexPageToggle(component);
+        setUpWidgetOptionsIndexPageToggle(outerWidget);
     } else {
         $('.component-options #btn-index-page-toggle').css({
             display: 'none',
@@ -189,16 +185,16 @@ function setComponentOptions(component){
 
 }
 
-function setUpComponentOptionsIndexPageToggle(component){
-    if (component.meta.id == selectedProject.mainComponents.indexId){
+function setUpWidgetOptionsIndexPageToggle(outerWidget){
+    if (outerWidget.meta.id == selectedProject.mainComponents.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
-        $('.components').find('[data-componentid='+component.meta.id+']').addClass('selected-index-page');
+        $('.components').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
 
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $(this).find('.text').text('Assign as Index Page');
-            $('.components').find('[data-componentid='+component.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
         });
     } else {
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
@@ -206,7 +202,7 @@ function setUpComponentOptionsIndexPageToggle(component){
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
             $(this).find('.text').text('Unassign as Index Page');
-            $('.components').find('[data-componentid='+component.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
         });
 
     }
@@ -214,9 +210,9 @@ function setUpComponentOptionsIndexPageToggle(component){
 
 /** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
 
-function displayUserComponentInListAndSelect(name, id){
+function displayUserWidgetInListAndSelect(name, id){
     $('.selected').removeClass("selected");
-    displayNewComponentInUserComponentList(name,id);
+    displayNewWidgetInUserWidgetList(name,id);
     $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
@@ -224,9 +220,9 @@ function displayUserComponentInListAndSelect(name, id){
  * Adds a component to the list of user components
  * @param newComponent
  */
-function displayNewComponentInUserComponentList(name, id){
+function displayNewWidgetInUserWidgetList(name, id){
     // TODO changes in style
-    var newComponentElt = $(
+    var newWidgetElt = $(
         '<li data-type="'+'user'+'" class="widget draggable" data-componentid=' + id + '>'
         + '<div class="component-name-container">'
         + '<span class="component-name">' + name + '</span>'
@@ -235,10 +231,10 @@ function displayNewComponentInUserComponentList(name, id){
         + '</span>'
         + '</div>'
         + '</li>');
-    $('#user-components-list').append(newComponentElt);
-    addDeleteUserComponentButton(id);
-    // registerUserComponentAsDraggable(id);
-    registerDraggable(newComponentElt);
+    $('#user-components-list').append(newWidgetElt);
+    addDeleteUserWidgetButton(id);
+    // registerUserWidgetAsDraggableForMainPages(id);
+    dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
 }
 
 
@@ -246,9 +242,9 @@ function displayNewComponentInUserComponentList(name, id){
  * Adds a component to the list of main pages
  * @param newComponent
  */
-function displayNewComponentInMainPagesList(name, id){
+function displayNewWidgetInMainPagesList(name, id){
     // TODO changes in style
-    var newComponentElt =
+    var newWidgetElt =
         '<li data-componentid=' + id + '>'
         + '<div class="component-name-container">'
         + '<div class="component-name">' + name + '</div>'
@@ -259,40 +255,41 @@ function displayNewComponentInMainPagesList(name, id){
         + '<div class="index-page-toggle">'
         + '</div>'
         + '</li>';
-    $('#main-pages-list').append(newComponentElt);
-    addDeleteUserComponentButton(id);
-    // registerUserComponentAsDraggable(id);
+    $('#main-pages-list').append(newWidgetElt);
+    addDeleteUserWidgetButton(id);
+    // registerUserWidgetAsDraggableForMainPages(id);
 }
 
 function displayMainPageInListAndSelect(name, id){
     $('.selected').removeClass("selected");
-    displayNewComponentInMainPagesList(name,id);
+    displayNewWidgetInMainPagesList(name,id);
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
-}
-
-function deleteComponentFromView(container) {
-    var cell = $('#'+containerId);
-    container.remove();
 }
 
 
 /**
  * Updates the contents of a base component info at a particular cell based on inputs
- * @param cellId
+ * @param containerId
  */
-function updateBaseComponentContentsAndDisplayAt(containerId) {
-    // NOTE: actual cell is the cell in the main table
-    // cellId could be either display-cell or the actual cell id, but it is the one
-    // that contains text edits
-    // tooltip is the tooltip currently being edited
+function updateBaseWidgetContentsAndDisplayAt(containerId) {
 
     var container = $('#'+containerId);
     var tooltip = container.find('.tooltip');
-    var componentId = container.data('componentId');
+    var widgetId = container.data('componentId');
 
     var type = container.find('.draggable').data('type');
     var value;
     var isUpload = false;
+
+    var done = function(value){
+        var newValue = {type: type, value: value};
+        widgetEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'value', newValue);
+
+        // selectedUserWidget.innerWidgets[widgetId].innerWidgets = {};
+        // selectedUserWidget.innerWidgets[widgetId].innerWidgets[type] = value;
+
+        refreshContainerDisplay(true, container, currentZoom);
+    };
 
     if (tooltip.length>0){
         var inputs = Array.prototype.slice.call(
@@ -333,10 +330,7 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
                 .then(function (savedFile) { // save was successful
                     console.log('success');
                     value.img_src = savedFile.url();
-                    selectedUserComponent.components[componentId].components[type] = value;
-
-                    //selectedUserComponent.components[row][col].components[type] = value;
-                    refreshContainerDisplay(true, container, currentZoom);
+                    done(value);
                 });
         } else { // pasted link to image
             if (inputs[0].value.length>0){
@@ -347,16 +341,13 @@ function updateBaseComponentContentsAndDisplayAt(containerId) {
         }
     } else if (type === 'panel') {
         value = {
-            heading: $('#' + cellId).find('.panel-title')[0].textContent,
-            content: $('#' + cellId).find('.panel-html')[0].textContent
+            heading: container.find('.panel-title')[0].textContent,
+            content: container.find('.panel-html')[0].textContent
         }
     }
 
     if (!isUpload) {
-        selectedUserComponent.components[componentId].components = {};
-        selectedUserComponent.components[componentId].components[type] = value;
-
-        refreshContainerDisplay(true, container, currentZoom);
+        done(value);
     }
 }
 
@@ -408,128 +399,6 @@ function resizeLabelDivs(cellWidth, cellHeight) {
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/
 
 
-
-function registerDraggable(widgetToRegister) {
-
-    var draggableOptions = {
-        opacity: 1,
-        revert: "invalid",
-        cursorAt: { top: 0, left: 0 },
-        helper: function(e, ui){
-            var widget = $(this);
-            var type = widget.data('type');
-            if (type == 'user'){
-                if (!widget.hasClass('associated')){
-                    widget = $('#basic-components .draggable[data-type=' + type + ']').clone();
-                    // widget = $(this).clone();
-                    widget.data('componentid', $(this).data('componentid'));
-                    widget.data('type', type);
-                    registerDraggable(widget);
-                }
-            }
-            widget.addClass('dragging-component');
-            var offsetFromMouse = { top: 0, left: 0 };
-            var componentContainer;
-            if (widget.hasClass('associated')){
-                var componentId = widget.data('componentid');
-                draggingComponent = selectedUserComponent.components[componentId];
-                // keep the old one for now, for guidance and all
-                var oldContainerId = 'component-container_'+componentId;
-                var componentContainerOld = $('#'+oldContainerId);
-                componentContainerOld.css({
-                    opacity: .3,
-                });
-                componentContainer = componentContainerOld.clone();
-                componentContainerOld.attr('id', oldContainerId+'_old');
-                offsetFromMouse = {
-                    top: e.pageY - componentContainerOld.offset().top,
-                    left: e.pageX - componentContainerOld.offset().left
-                };
-            } else {
-                var component;
-                if (type == 'user'){
-                    var id = widget.data('componentid');
-                    // TODO
-                    // FIXME
-                    // How to have two copies of the same widget in the same place?
-                    component = UserComponent.fromString(JSON.stringify(selectedProject.components[id]));
-                    component.meta.id = (new Date()).getTime();
-                    widget.data('componentid', component.meta.id);
-                    widget.text(component.meta.name);
-                    widget.css('display', 'block');
-                } else {
-                    component = BaseComponent(type, {}, view.getDimensions(type));
-                }
-                draggingComponent = component;
-                componentContainer = workSurface.makeRecursiveComponentContainersAndDisplay(component, selectedUserComponent, true, widget, $('#work-surface_'+selectedUserComponent.meta.id), currentZoom, selectedUserComponent.properties.custom);
-
-                // var componentContainer = componentContainerMaker.createEditableComponentContainer(component, selectedUserComponent, currentZoom);
-                // componentContainerMaker.setUpContainer(componentContainer, widget, component, currentZoom, true);
-                $('#basic-components').html(basicComponents);
-                registerDraggable();
-            }
-
-            $('#outer-container').append(componentContainer);
-            widget.draggable( "option", "cursorAt", offsetFromMouse );
-
-            //Hack to append the widget to the html (visible above others divs), but still belonging to the scrollable container
-            // componentContainer.hide();
-            // setTimeout(function(){
-            //     componentContainer.appendTo('html');
-            //     componentContainer.show();
-            // },1);
-            componentContainer.attr('id', 'dragging-container');
-            componentContainer.css('position', 'absolute');
-
-            return componentContainer;
-
-        },
-        appendTo: 'html',
-        cursor: '-webkit-grabbing',
-        scroll: true,
-        snap: '.grid-cell',
-        snapTolerance: 10,
-        start: function(){
-            $('.grid').css({
-                visibility: 'visible'
-            });
-        },
-        drag: function(event, ui){
-
-        },
-        stop: function(event, ui){
-            $('.grid').css({
-                visibility: 'hidden'
-            });
-
-            var componentId = draggingComponent.meta.id;
-            var isNewComponent = $(ui.helper).data('newcomponent');
-            if (!isNewComponent){
-                var componentContainerOld = $('#component-container_'+componentId+'_old');
-                if (!$(ui.helper).data('dropped')){// not properly dropped!
-                    componentContainerOld.attr('id','component-container_'+componentId);
-                    componentContainerOld.css({
-                        opacity: 1,
-                    });
-                } else { // properly dropped
-                    componentContainerOld.remove();
-                }
-            }
-
-        }
-    };
-
-    if (widgetToRegister){
-        widgetToRegister.draggable(draggableOptions)
-    } else {
-        $('.widget').each(function() {
-            $(this).draggable(draggableOptions);
-        });
-    }
-
-}
-
-
 /**
  * Register listener for click on edit button
  * @param container
@@ -573,8 +442,8 @@ function registerTooltipBtnHandlers() {
     });
 
     $('.apply').unbind().on("click", function(event) {
-        var cellId = findContainingCell(this);
-        updateBaseComponentContentsAndDisplayAt(cellId);
+        var cellId = findContainingContainer(this);
+        updateBaseWidgetContentsAndDisplayAt(cellId);
         $('.tooltip').removeClass('open');
     });
 
@@ -603,8 +472,8 @@ function registerTooltipBtnHandlers() {
     function generateHandler(index, optionsList, bootstrapPrefix, propertyName) {
         return function(e) {
             e.preventDefault();
-            var cellId = findContainingCell(this);
-            var element = $('#'+cellId).find('.display-component');
+            var containerId = findContainingContainer(this);
+            var element = $('#'+containerId).find('.display-component');
             var bootstrapClass = bootstrapPrefix+"-"+optionsList[index];
             element.addClass(bootstrapClass);
 
@@ -613,8 +482,8 @@ function registerTooltipBtnHandlers() {
                     element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
                 }
             }
-            var componentId = getComponentIdFromContainerId(cellId);
-            selectedUserComponent.components[componentId].properties.bsClasses[propertyName] = bootstrapClass;
+            var widgetId = getWidgetIdFromContainerId(containerId);
+            selectedUserWidget.innerWidgets[widgetId].properties,style.bsClasses[propertyName] = bootstrapClass;
 
         }
     }
@@ -646,7 +515,7 @@ function registerTooltipBtnHandlers() {
 
 
 // TODO needs to be updated to use more relevant classes
-function findContainingCell(context) {
+function findContainingContainer(context) {
     var parent = $(context).parent();
 
     while (!(parent.hasClass('component-container'))) {
@@ -657,13 +526,7 @@ function findContainingCell(context) {
             return null
         }
     }
-    var cellId;
-    if (parent.hasClass('display-cell-parent')){
-        cellId = 'display-cell';
-    } else {
-        cellId = $(parent).attr('id');
-    }
-    return cellId;
+    return $(parent).attr('id');
 }
 
 
@@ -672,8 +535,8 @@ function findContainingCell(context) {
 function getContentEditableEdits() {
     $('[contenteditable=true]').unbind() // unbind to prevent this from firing multiple times
         .blur(function() {
-            var cellId = findContainingCell(this);
-            updateBaseComponentContentsAndDisplayAt(cellId);
+            var containerId = findContainingContainer(this);
+            updateBaseWidgetContentsAndDisplayAt(containerId);
         });
 }
 
@@ -714,27 +577,27 @@ $(document).on('change', '#fileselect', function(evt) {
 });
 
 /** ** ** ** ** ** Dragging and Dropping User Components to Main pages ** ** ** **/
-function registerUserComponentAreaDroppable(){
+function registerUserWidgetAreaDroppable(){
     var enableDrop = {
         accept: ".dragging-component",
         hoverClass: "highlight",
         tolerance: "intersect",
         drop: function(event, ui) {
-            var userComponentId = ui.draggable.data('componentid');
-            var name = selectedProject.components[userComponentId].meta.name;
+            var userWidgetId = ui.draggable.data('componentid');
+            var name = selectedProject.components[userWidgetId].meta.name;
             if ($(this).hasClass('main-pages')){
                 if (ui.draggable.hasClass('moving-user-component')){ // if type user
                     // adding to main page
-                    selectedProject.addMainPage(selectedProject.components[userComponentId]);
-                    $("#user-components-list").find("[data-componentid='" + userComponentId + "']").remove();
-                    displayMainPageInListAndSelect(name, userComponentId);
+                    selectedProject.addMainPage(selectedProject.components[userWidgetId]);
+                    $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
+                    displayMainPageInListAndSelect(name, userWidgetId);
                 }
             } else if ($(this).hasClass('user-components')){
                 if (ui.draggable.hasClass('moving-main-component')){ // if type user
                     // removing from main page
-                    selectedProject.removeMainPage(selectedProject.components[userComponentId]);
-                    $("#main-pages-list").find("[data-componentid='" + userComponentId + "']").remove();
-                    displayUserComponentInListAndSelect(name, userComponentId);
+                    selectedProject.removeMainPage(selectedProject.components[userWidgetId]);
+                    $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
+                    displayUserWidgetInListAndSelect(name, userWidgetId);
 
                 }
             }
@@ -745,7 +608,7 @@ function registerUserComponentAreaDroppable(){
     });
 }
 
-function registerUserComponentAsDraggable(componentId) {
+function registerUserWidgetAsDraggableForMainPages(widgetId) {
     var enableDraggable = function (element, type) {
         // type === 'user'||'main'
         return {
@@ -770,10 +633,10 @@ function registerUserComponentAsDraggable(componentId) {
 
     };
 
-    $("#user-components-list").find("[data-componentid='" + componentId + "']").each(function () {
+    $("#user-components-list").find("[data-componentid='" + widgetId + "']").each(function () {
         $(this).draggable(enableDraggable(this, 'user'));
     });
-    $("#main-pages-list").find("[data-componentid='" + componentId + "']").each(function () {
+    $("#main-pages-list").find("[data-componentid='" + widgetId + "']").each(function () {
         $(this).draggable(enableDraggable(this, 'main'));
     });
 }
@@ -816,33 +679,30 @@ $(".dropdown-trigger").click(function(ev) {
 $('.components').on('click', '.index-page-toggle', function(){
     var turnOn = !($(this).parent().hasClass('selected-index-page'));
     $('.components .selected-index-page').removeClass('selected-index-page');
-    var componentId = $(this).parent().data('componentid');
+    var widgetId = $(this).parent().data('componentid');
     if (turnOn){
-        selectedProject.mainComponents.indexId = componentId;
+        selectedProject.mainComponents.indexId = widgetId;
         $(this).parent().addClass('selected-index-page');
     } else {
         selectedProject.mainComponents.indexId = null;
     }
-    setUpComponentOptionsIndexPageToggle(selectedProject.components[componentId]);
+    setUpWidgetOptionsIndexPageToggle(selectedProject.components[widgetId]);
 });
-
 
 function refreshContainerDisplay(fresh, container, zoom){
     if (!zoom){
         zoom = 1;
     }
-    var componentId = container.data('componentId');
-
-    if (selectedUserComponent.components[componentId]){ // component exists
-        var componentToChange = selectedUserComponent.components[componentId];
-
-        // view.removeDisplay(container);
-        var properties = componentToChange.properties;
+    var widgetId = container.data('componentId');
 
 
-        view.displayComponent(fresh, componentToChange, container, selectedUserComponent.properties.custom, zoom);
+    if (widgetEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
+        var widgetToChange = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
 
-        // view.displayInnerComponent(container, componentToChange.type, view.getHTML(componentToChange.type)(componentToChange.components[componentToChange.type]), zoom, properties);
+        var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
+        // var overallStyles = selectedUserWidget.properties.styles.custom;
+        view.displayWidget(fresh, widgetToChange, container, overallStyles, zoom);
+
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
     } else {
@@ -850,181 +710,62 @@ function refreshContainerDisplay(fresh, container, zoom){
     }
 
 }
-
-
 /**
- * Disabled by changing the id and class names
- * @param componentId
+ *
+ // updates the ids to a new id, also updates them in layout.stackOrder
+
+ // source outer widget is if you already have a copy of your Widget
+ // and you want the given widget (not a copy) to have the same recursive ids as that one
+
+ *
+ * @param widget
+ * @param sourceWidget
+ * @returns {*}
  */
-function disableComponentDOMElements(componentId){
-    var workSurface = $('#work-surface'+'_'+componentId);
-    $(workSurface).addClass('hidden-component');
-
-    $(workSurface).find('*').each(function() {
-        var id = this.id;
-        if (id.length>0){
-            this.id = 'disabled_'+componentId+'_'+this.id;
+function recursiveReIding(widget, sourceWidget){
+    if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
+        var thisWidgetNewId;
+        if (sourceWidget){
+            thisWidgetNewId = sourceWidget.meta.id;
+        } else {
+            thisWidgetNewId = generateId();
         }
-        var classes = this.className;
-        if (classes.length>0){
-            classes = classes.split(' ');
-            var classNames = '';
-            classes.forEach(function(className){
-                classNames = classNames + ' ' + 'disabled_'+componentId+'_'+className;
-            });
-            this.className = classNames;
-        }
-    });
-}
-
-
-function enableComponentDOMElements(componentId){
-    var workSurface = $('#work-surface'+'_'+componentId);
-    $(workSurface).removeClass('hidden-component');
-
-    $(workSurface).find('*').each(function() {
-        var id = this.id;
-        if (id.length>0){
-            this.id = id.replace('disabled_'+componentId+'_', '');
-        }
-        var classes = this.className;
-        if (classes.length>0){
-            classes = classes.split(' ');
-            var classNames = '';
-            classes.forEach(function(className){
-                classNames =  classNames  + ' ' +  className.replace('disabled_'+componentId+'_', '');
-            });
-            this.className = classNames.trim();
-        }
-    });
-}
-
-function disableAllComponentDomElementsExcept(componentToEnableId){
-    for (var componentId in selectedProject.components){
-        if (componentToEnableId == componentId){
-            enableComponentDOMElements(componentId);
-            continue;
-        }
-        if ($('#work-surface'+'_'+componentId).hasClass('hidden-component')){
-            continue;
-        }
-        disableComponentDOMElements(componentId);
-    }
-}
-
-function enableSpecificComponentDomElements(componentToEnableId){
-    // first check that the table has been made (otherwise the reset will happen automatically,
-    // but more importantly, the table-grid-container won't exist yet
-    var workSurfaceToEnable = $('#work-surface'+'_'+componentToEnableId);
-    if (!(workSurfaceToEnable.length>0)) {
-        createOrResetTableGridContainer(componentToEnableId);
-        var state = {
-            zoom: 1,
-            lock:{
-                width: false,
-                height: false
+        // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
+        widget.meta.id = thisWidgetNewId;
+        if (widget.type == 'user'){
+            for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
+                var innerWidgetOldId = widget.properties.layout.stackOrder[idx];
+                var result;
+                if (sourceWidget){
+                    var oldSourceId = sourceWidget.properties.layout.stackOrder[idx];
+                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], sourceWidget.innerWidgets[oldSourceId]);
+                } else {
+                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId]);
+                }
+                if (result.success){
+                    if (result.newId != innerWidgetOldId){ // or else the delete will delete the things!
+                        widget.properties.layout.stackOrder[idx] = result.newId;
+                        widget.innerWidgets[result.newId] = widget.innerWidgets[innerWidgetOldId];
+                        delete widget.innerWidgets[innerWidgetOldId];
+                        widget.properties.layout[result.newId] = widget.properties.layout[innerWidgetOldId];
+                        delete widget.properties.layout[innerWidgetOldId];
+                        widget.idMap = widget.idMap || {};
+                        widget.idMap[result.newId] = innerWidgetOldId;
+                    }
+                }
             }
-        };
-        $('#work-surface'+'_'+componentToEnableId).data('state', state);
+        }
+        return {success: true, newId: thisWidgetNewId};
     }
-
-    var componentToEnable = selectedProject.components[componentToEnableId];
-
-    // enable first (toggle needs the id's and classes to be enabled)
-    if (workSurfaceToEnable.hasClass('hidden-component')){
-        enableComponentDOMElements(componentToEnableId);
-    }
-
-    zoom.updateZoomFromState(componentToEnable);
-
-    setComponentOptions(componentToEnable);
-
+    return {success: false}
 }
 
-function setUpGrid(){
-    $('.grid').remove();
-    var workSurface = $('#work-surface_'+selectedUserComponent.meta.id);
+function createUserWidgetCopy (outerWidget, sourceOuterWidget){
+    var widget = UserWidget.fromString(JSON.stringify(outerWidget));
 
-    var grid = {x: {}, y:{}};
-    for (var componentId in selectedUserComponent.components){
-        // existing components should also be in the work surface!
-        var container = $('#component-container_'+componentId);
-        var top = container.position().top;
-        var left = container.position().left;
-        var right = left + container.width();
-        var bottom = top + container.height();
-        grid.x[left] = '';
-        grid.x[right] = '';
-        grid.y[top] = '';
-        grid.y[bottom] = '';
-    }
-    var xs = Object.keys(grid.x).map(function(key){
-        return parseFloat(key);
-    });
-
-    // var top = workSurface.offset().top;
-    var top = 0;
-    var bottom = top + workSurface.height();
-    // var left = workSurface.offset().left;
-    var left = 0;
-    var right = left + workSurface.width();
-
-    xs.push(left);
-    xs.push(right);
-    xs.sort(function(a, b){
-        return a-b;
-    });
-
-    var ys = Object.keys(grid.y).map(function(key){
-        return parseFloat(key);
-    });
-    ys.push(top);
-    ys.push(bottom);
-    ys.sort(function(a, b){
-        return a-b;
-    });
-
-    var numRows = ys.length-1;
-    var numCols = xs.length-1;
-
-    var gridElt = $('<div></div>');
-    gridElt.addClass('grid');
-    for (var col=0; col<numCols; col++){
-        var colElt = $('<div></div>');
-        colElt.addClass('grid-col');
-        gridElt.append(colElt);
-
-        for (var row=0; row<numRows; row++){
-            var cellElt = $('<div></div>');
-            cellElt.addClass('grid-cell');
-            cellElt.attr('id', 'grid-cell_'+row+'_'+col);
-            colElt.append(cellElt);
-            cellElt.css({
-                width: xs[col+1] - xs[col],
-                height: ys[row+1] - ys[row],
-            });
-        }
-    }
-    gridElt.css({
-        position: 'absolute',
-        // top: ys[0] - workSurface.offset().top,
-        // left: xs[0] - workSurface.offset().left,
-        top: 0,
-        left: 0,
-        width: 1.1*(xs[numCols] - xs[0]),
-        visibility: 'hidden',
-    });
-    workSurface.append(gridElt);
-    // $('body').append(gridElt);
-    $('.grid-col').css({
-        display: 'inline-block'
-    });
-    $('.grid-cell').css({
-        display: 'block',
-        border: '1px dashed grey'
-    });
-};
-
+    recursiveReIding(widget, sourceOuterWidget);
+    return widget;
+}
 
 
 
@@ -1033,9 +774,9 @@ function setUpGrid(){
 function testSaveHTML(){
     var html = '';
     $('.component-container').each(function(){
-        var displayComponent = $(this).find('.display-component');
-        if (displayComponent.get(0)){
-            html = html + displayComponent.get(0).outerHTML+'/n';
+        var displayWidget = $(this).find('.display-component');
+        if (displayWidget.get(0)){
+            html = html + displayWidget.get(0).outerHTML+'/n';
         }
     });
     return html;
@@ -1043,9 +784,9 @@ function testSaveHTML(){
 
 function createDownloadPreview(){
     var oldZoom = currentZoom;
-    var workSurfaceElt = $('#work-surface_'+selectedUserComponent.meta.id);
+    var workSurfaceElt = $('#work-surface_'+selectedUserWidget.meta.id);
     currentZoom = 1;
-    propagateRatioChangeToAllElts(currentZoom, selectedUserComponent);
+    propagateRatioChangeToAllElts(currentZoom, selectedUserWidget);
 
     $('#download-preview-area').html('').css({
         position: 'relative',
@@ -1077,20 +818,20 @@ function createDownloadPreview(){
                 display: 'block',
             });
             container.append(labelContainer);
-            var displayComponent = labelContainer.find('.display-component');
-            displayComponent.css({// this is not carried over, since this was declared in the css file
+            var displayWidget = labelContainer.find('.display-component');
+            displayWidget.css({// this is not carried over, since this was declared in the css file
                 'white-space': 'initial',
                 margin: 0,
             });
-            displayComponent.attr('contenteditable', false);
+            displayWidget.attr('contenteditable', false);
             add = true;
         } else {
-            var displayComponent = $(this).find('.display-component').clone(true, true);
-            displayComponent.css({// this is not carried over, since this was declared in the css file
+            var displayWidget = $(this).find('.display-component').clone(true, true);
+            displayWidget.css({// this is not carried over, since this was declared in the css file
                 'white-space': 'initial',
             });
-            if (displayComponent.get(0)){
-                container.append(displayComponent);
+            if (displayWidget.get(0)){
+                container.append(displayWidget);
                 add = true;
             }
         }
@@ -1100,7 +841,7 @@ function createDownloadPreview(){
     });
 
     currentZoom = oldZoom;
-    propagateRatioChangeToAllElts(currentZoom, selectedUserComponent);
+    propagateRatioChangeToAllElts(currentZoom, selectedUserWidget);
 
     return $('#download-preview-area-container').html();
 }
@@ -1115,7 +856,7 @@ function downloadHTML(){
     var data = "data:text/html;charset=utf-8," + encodeURIComponent(HTML);
 
     element.setAttribute('href', data);
-    element.setAttribute('download', selectedUserComponent.meta.name+'.html');
+    element.setAttribute('download', selectedUserWidget.meta.name+'.html');
 
     element.click();
 
@@ -1124,8 +865,13 @@ function downloadHTML(){
 /**
  * Deletes a component from the datatype and also from the view
  */
-function deleteComponentFromUserComponentAndFromView(componentId) {
-    var containerId = "component-container_"+componentId;
-    selectedUserComponent.deleteComponent(componentId);
+function deleteWidgetFromUserWidgetAndFromView(widgetId) {
+    var containerId = "component-container_"+widgetId;
+    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+    parent.deleteInnerWidget(widgetId);
+    // selectedUserWidget.deleteInnerWidget(widgetId);
     $('#'+containerId).remove();
+    grid.setUpGrid();
+    miniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
+    zoomElement.registerZoom(selectedUserWidget);
 }
