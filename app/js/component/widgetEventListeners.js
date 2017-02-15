@@ -783,6 +783,42 @@ function testSaveHTML(){
 }
 
 function createDownloadPreview(){
+    // from http://stackoverflow.com/questions/754607/can-jquery-get-all-css-styles-associated-with-an-element
+    function css(a) {
+        var sheets = document.styleSheets, o = {};
+        for (var i in sheets) {
+            var rules = sheets[i].rules || sheets[i].cssRules;
+            for (var r in rules) {
+                if (a.is(rules[r].selectorText)) {
+                    o = $.extend(o, css2json(rules[r].style), css2json(a.attr('style')));
+                }
+            }
+        }
+        return o;
+    }
+
+    function css2json(css) {
+        var s = {};
+        if (!css) return s;
+        if (css instanceof CSSStyleDeclaration) {
+            for (var i in css) {
+                if ((css[i]).toLowerCase) {
+                    s[(css[i]).toLowerCase()] = (css[css[i]]);
+                }
+            }
+        } else if (typeof css == "string") {
+            css = css.split("; ");
+            for (var i in css) {
+                var l = css[i].split(": ");
+                s[l[0].toLowerCase()] = (l[1]);
+            }
+        }
+        return s;
+    }
+
+
+
+
     var oldZoom = currentZoom;
     var workSurfaceElt = $('#work-surface_'+selectedUserWidget.meta.id);
     currentZoom = 1;
@@ -799,16 +835,19 @@ function createDownloadPreview(){
 
     $('.component-container').each(function(){
         var add = false;
-        var css = {
-            position: 'absolute',
-            top: $(this).position().top,
-            left: $(this).position().left,
-            width: $(this).width()+'px',
-            height: $(this).height()+'px',
-            'vertical-align': 'middle',
-        };
+        //var css = {
+        //    position: 'absolute',
+        //    top: $(this).position().top,
+        //    left: $(this).position().left,
+        //    width: $(this).width()+'px',
+        //    height: $(this).height()+'px',
+        //    'vertical-align': 'middle',
+        //    //'background-color': $(this).css('background-color'),
+        //};
+
         var container = $('<div></div>');
-        container.css(css);
+        container.css(css($(this)));
+        //container.css(css);
 
         var labelContainer = $(this).find('.label-container').clone(true, true);
         if (labelContainer.get(0)){
