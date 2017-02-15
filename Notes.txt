@@ -228,3 +228,13 @@ timeline
 fix html generator
 make worksurface itself moveable?
 small: make the files have a last opened + last modified
+
+2/14
+The DENIM paper might be a good reference for me! : Broaden the UI builder to a web app builder in the sense that it should be 
+a whole experience, from conceptualizing the website to building and iterating on it
+	Interesting ideas:
+		overview for all the pages and how they connect (links?)
+		some sort of sketching mechanism?
+		Perhaps the display of the different levels of widgets can take inspiration from this
+		Also possibly take inspiration for user testing
+		Look at the papers citing this paper, also what happened to it recently?
