@@ -238,3 +238,8 @@ a whole experience, from conceptualizing the website to building and iterating o
 		Perhaps the display of the different levels of widgets can take inspiration from this
 		Also possibly take inspiration for user testing
 		Look at the papers citing this paper, also what happened to it recently?
+		
+2/15
+Do the grouping
+Do the grouping -> new widget
+Do the grabby grabby navigation thing
