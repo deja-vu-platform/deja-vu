@@ -50,6 +50,9 @@ $('.components').on('click', '.component-name-container', function () {
     selectedUserWidget = selectedProject.components[widgetId];
     workSurface.loadUserWidget(selectedUserWidget);
     style.setUpStyleColors(selectedUserWidget);
+    $('#outer-container').scrollTop(0); // TODO DRY
+    $('#outer-container').scrollLeft(0);
+
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {
@@ -784,40 +787,38 @@ function testSaveHTML(){
 
 function createDownloadPreview(){
     // from http://stackoverflow.com/questions/754607/can-jquery-get-all-css-styles-associated-with-an-element
-    function css(a) {
-        var sheets = document.styleSheets, o = {};
+    var getCSSasJSON = function(elm) {
+        var css2json= function(CSSFile){
+            var json = {};
+            if (!CSSFile) return json;
+            if (CSSFile instanceof CSSStyleDeclaration) {
+                for (var i in CSSFile) {
+                    if ((CSSFile[i]).toLowerCase) {
+                        json[(CSSFile[i]).toLowerCase()] = (CSSFile[CSSFile[i]]);
+                    }
+                }
+            } else if (typeof CSSFile == "string") {
+                CSSFile = CSSFile.split("; ");
+                for (var i in CSSFile) {
+                    var keyValue = CSSFile[i].split(": ");
+                    json[keyValue[0].toLowerCase()] = (keyValue[1]);
+                }
+            }
+            return json;
+        };
+
+        var sheets = document.styleSheets;
+        var json = {};
         for (var i in sheets) {
             var rules = sheets[i].rules || sheets[i].cssRules;
-            for (var r in rules) {
-                if (a.is(rules[r].selectorText)) {
-                    o = $.extend(o, css2json(rules[r].style), css2json(a.attr('style')));
+            for (var rule in rules) {
+                if (elm.is(rules[rule].selectorText)) {
+                    json = $.extend(json, css2json(rules[rule].style), css2json(elm.attr('style')));
                 }
             }
         }
-        return o;
-    }
-
-    function css2json(css) {
-        var s = {};
-        if (!css) return s;
-        if (css instanceof CSSStyleDeclaration) {
-            for (var i in css) {
-                if ((css[i]).toLowerCase) {
-                    s[(css[i]).toLowerCase()] = (css[css[i]]);
-                }
-            }
-        } else if (typeof css == "string") {
-            css = css.split("; ");
-            for (var i in css) {
-                var l = css[i].split(": ");
-                s[l[0].toLowerCase()] = (l[1]);
-            }
-        }
-        return s;
-    }
-
-
-
+        return json;
+    };
 
     var oldZoom = currentZoom;
     var workSurfaceElt = $('#work-surface_'+selectedUserWidget.meta.id);
@@ -846,34 +847,41 @@ function createDownloadPreview(){
         //};
 
         var container = $('<div></div>');
-        container.css(css($(this)));
+        container.css(getCSSasJSON($(this)));
         //container.css(css);
 
         var labelContainer = $(this).find('.label-container').clone(true, true);
+        var displayWidget;
         if (labelContainer.get(0)){
-            labelContainer.css({// this is not carried over, since this was declared in the css file
-                position: 'absolute',
-                top: '0',
-                display: 'block',
-            });
+            //labelContainer.css({// this is not carried over, since this was declared in the css file
+            //    position: 'absolute',
+            //    top: '0',
+            //    display: 'block',
+            //});
+            labelContainer.css(getCSSasJSON(labelContainer));
             container.append(labelContainer);
-            var displayWidget = labelContainer.find('.display-component');
-            displayWidget.css({// this is not carried over, since this was declared in the css file
-                'white-space': 'initial',
-                margin: 0,
-            });
+            displayWidget = labelContainer.find('.display-component');
+            //displayWidget.css({// this is not carried over, since this was declared in the css file
+            //    'white-space': 'initial',
+            //    margin: 0,
+            //});
+            displayWidget.css(getCSSasJSON(displayWidget));
+
             displayWidget.attr('contenteditable', false);
             add = true;
         } else {
-            var displayWidget = $(this).find('.display-component').clone(true, true);
-            displayWidget.css({// this is not carried over, since this was declared in the css file
-                'white-space': 'initial',
-            });
+            displayWidget = $(this).find('.display-component').clone(true, true);
+            //displayWidget.css({// this is not carried over, since this was declared in the css file
+            //    'white-space': 'initial',
+            //});
+            displayWidget.css(getCSSasJSON(displayWidget));
+
             if (displayWidget.get(0)){
                 container.append(displayWidget);
                 add = true;
             }
         }
+
         if (add){
             $('#download-preview-area').append(container);
         }
@@ -914,3 +922,14 @@ function deleteWidgetFromUserWidgetAndFromView(widgetId) {
     miniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
     zoomElement.registerZoom(selectedUserWidget);
 }
+
+
+
+// keyboard shortcuts
+$(document).keydown(function(e){
+    // Save combination
+    if ((event.which == 115 && event.ctrlKey) || (event.which == 19)){
+        alert("Ctrl-S pressed");
+        event.preventDefault();
+    }
+});

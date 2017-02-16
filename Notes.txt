@@ -243,3 +243,4 @@ a whole experience, from conceptualizing the website to building and iterating o
 Do the grouping
 Do the grouping -> new widget
 Do the grabby grabby navigation thing
+fix: upon changing to a new widget view reset scroll
