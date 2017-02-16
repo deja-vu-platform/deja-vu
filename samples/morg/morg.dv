@@ -8,11 +8,11 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
 
   data GroupMeeting {
     champion: Member = Event.Event.description + Allocator.Resource.consumed_by
-  } = Event + Resource
+  } = Event.Event + Allocator.Resource
 
   data Member {
     name: Text
-  } = Guest + Event.Description + Allocator.Consumer
+  } = Event.Guest + Event.Description + Allocator.Consumer
 
   data GroupEmailAddress {}
 
