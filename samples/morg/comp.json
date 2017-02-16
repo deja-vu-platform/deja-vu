@@ -45,6 +45,23 @@
     {
       "fields": [
         {
+          "name": "name",
+          "of": { "name": "Guest", "fqelement": "dv-organization-event" }
+        },
+        {
+          "name": "name",
+          "of": { "name": "Consumer", "fqelement": "dv-organization-allocator" }
+        }
+      ],
+      "subfield": {
+        "name": "name", "of": {
+          "name": "Member", "fqelement": "dv-samples-morg"
+        }
+      }
+    },
+    {
+      "fields": [
+        {
           "name": "guests",
           "of": { "name": "WeeklyEvent", "fqelement": "dv-organization-event" }
         },

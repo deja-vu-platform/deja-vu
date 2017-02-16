@@ -46,7 +46,8 @@ const schema = grafo
   .add_type({
     name: "Consumer",
     fields: {
-      atom_id: {"type": graphql.GraphQLString}
+      atom_id: {"type": graphql.GraphQLString},
+      name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     }
   })
   .add_type({
