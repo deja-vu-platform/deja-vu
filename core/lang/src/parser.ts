@@ -71,7 +71,7 @@ export class Parser {
               subtype: {
                 name: subtype, fqelement: mapped_cliche.fqelement
               },
-              types: _u.reject(tbond, _u.isEmpty)
+              types: _u.flatten(_u.reject(tbond, _u.isEmpty))
             }))
             .value();
         },
