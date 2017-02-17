@@ -56,7 +56,7 @@ cliche Bookmark uses
     Home route "home",
     Users route "users",
     Topics route "topics" {
-    sign_out_ok_redirect_route: Text =
+    signout_ok_redirect_route: Text =
       Auth.SignOutWithRedirect.signout_ok_redirect_route
   }
 
