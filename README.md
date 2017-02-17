@@ -25,6 +25,3 @@ page will display all widgets.
 
 To run a sample do `npm start`. You also need to start the mongo daemon before running any
 cliche, to do so run `mongod`. To check the sample visit `http://localhost:3000`
-
-Note: the migration to using the dv language is currently in progress, to specify new bonds or edit
-existing ones you should modify the `comp.json` and `wcomp.json` files
