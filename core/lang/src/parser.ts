@@ -42,7 +42,7 @@ export interface Cliche {
 }
 
 export class Parser {
-  cliche_map; of_name; name; ft_map;
+  cliche_map; of_name; name; ft_map; this_ft_map;
   private _grammar;
   private _semantics;
 
@@ -105,6 +105,7 @@ export class Parser {
             name: cliche_name
           };
           this.ft_map = this._build_uses_ft_map(uses);
+          this.this_ft_map = this._get_ft_map(para);
           return _u
             .chain(para.fbonds())
             .flatten()
@@ -185,9 +186,27 @@ export class Parser {
         },
         fieldBondName_this: (t, dot2, name) => {
           const mapped_cliche = this.cliche_map["this"];
-          return {
+
+          let ft_name = this.this_ft_map[t.sourceString];
+          if (!ft_name) {
+            throw new Error(
+              `Can't find type ${t.sourceString}` +
+              ` used in ${t.sourceString}.${name.sourceString}`
+            );
+          }
+          ft_name = ft_name[name.sourceString];
+          if (!ft_name) {
+            throw new Error(
+              `Can't find field ${name.sourceString} of ${t.sourceString}`);
+          }
+
+         return {
             name: name.sourceString, "of": {
               name: t.sourceString,
+              fqelement: mapped_cliche.fqelement
+            },
+            "type": {
+              name: ft_name,
               fqelement: mapped_cliche.fqelement
             }
           };
@@ -195,6 +214,16 @@ export class Parser {
       })
       .addOperation("wbonds", {
         ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+          const cliche_name = name.sourceString;
+          this.cliche_map = uses.clicheMap()[0];
+          if (this.cliche_map === undefined) this.cliche_map = {};
+          this.cliche_map["this"] = {
+            fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
+            name: cliche_name
+          };
+          this.ft_map = this._build_uses_ft_map(uses);
+          this.this_ft_map = this._get_ft_map(para);
+
           return _u
             .chain(para.wbonds())
             .flatten()
