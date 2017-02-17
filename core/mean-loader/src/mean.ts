@@ -4,7 +4,6 @@ import morgan = require("morgan");
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mongodb = require("mongodb");
 const command_line_args = require("command-line-args");
-const fs = require("fs");
 const path = require("path");
 import * as _u from "underscore";
 
@@ -15,7 +14,7 @@ const cli = command_line_args([
   {name: "dbhost", type: String, defaultValue: "localhost"},
   {name: "dbport", type: Number, defaultValue: 27017},
 
-  {name: "comppath", type: String},
+  {name: "comp", type: String},
   {name: "locs", type: String},
 
   // Mode can be "dev" or "test".  In dev mode the development page is shown,
@@ -37,8 +36,8 @@ export class Mean {
 
   constructor() {
     this._opts = cli.parse();
-    if (this._opts.comppath) {
-      this.comp = JSON.parse(fs.readFileSync(this._opts.comppath, "utf8"));
+    if (this._opts.comp) {
+      this.comp = JSON.parse(this._opts.comp);
     }
     this.locs = JSON.parse(this._opts.locs);
     this.fqelement = this._opts.fqelement;
@@ -408,7 +407,7 @@ export namespace GruntTask {
           {replace: {dev: {options: {patterns: replace_patterns}}}});
 
 
-        const comppath = grunt.file.exists("comp.json") ? "comp.json" : "";
+        const comp_info_str = JSON.stringify(comp_info);
         let express_config = {};
         express_config["main"] = {
           options: {
@@ -417,7 +416,7 @@ export namespace GruntTask {
             args: [
               "--main", "--mode=" + action,
               "--fqelement=" + name,
-              "--comppath=" + comppath ,
+              "--comp=" + comp_info_str ,
               "--locs=" + locs_str]
           }
         };
@@ -433,7 +432,7 @@ export namespace GruntTask {
                 background: true,
                 args: [
                     "--fqelement=" + fqelement,
-                    "--comppath=" + comppath, "--locs=" + locs_str]
+                    "--comp=" + comp_info_str, "--locs=" + locs_str]
               }
             };
             ++port;

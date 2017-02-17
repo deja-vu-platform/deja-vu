@@ -37,11 +37,6 @@ function main() {
 
   const cliche: Cliche = p.parse(opts.file);
 
-  const comp_info = fs.existsSync("comp.json") ?
-    JSON.parse(fs.readFileSync("comp.json", "utf-8")) : {};
-  const wcomp_info = fs.existsSync("wcomp.json") ?
-    JSON.parse(fs.readFileSync("wcomp.json", "utf-8")) : {};
-
   grunt.task.init = () => ({});
   GruntTask.task(
     grunt, cliche.fqelement,
@@ -50,7 +45,8 @@ function main() {
     cliche.used_cliches,
     cliche.used_widgets,
     cliche.replace_map,
-    comp_info, wcomp_info);
+    {"tbonds": cliche.tbonds, "fbonds": cliche.fbonds},
+    {"wbonds": cliche.wbonds});
   grunt.tasks(["dv-mean:test"]);
 }
 

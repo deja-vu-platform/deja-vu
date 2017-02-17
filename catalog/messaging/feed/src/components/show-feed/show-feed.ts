@@ -65,7 +65,7 @@ export class ShowFeedComponent {
           message.atom_id = feedItem.message.atom_id;
           const publisher = this._clientBus.new_atom("Publisher");
           publisher.name = feedItem.publisher.name;
-          return {message: message, publisher: publisher};
+          return {message: message, publisher: publisher, sub: this.sub};
         })
         .map(feedItem => _u.extend(feedItem, this.fields))
         .subscribe(feedItem => {
