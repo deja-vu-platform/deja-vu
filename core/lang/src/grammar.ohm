@@ -19,7 +19,8 @@ Cliche {
     FieldBody?
   "}" ReplacesDecl?
   WidgetUsesDecl = uses UsedWidgetDecl ("," UsedWidgetDecl)*
-  ReplacesDecl = replaces replaceName in replaceName "{" ReplaceMap? "}"
+  ReplacesDecl = replaces replaceName in replaceName "{" ReplaceMapBody? "}"
+  ReplaceMapBody = ReplaceMap ("," ReplaceMap)*
   replaceName = (alnum* ".") alnum*
   ReplaceMap = ("_" | alnum)* "=" (alnum* ".") ("_" | alnum)*
   UsedWidgetDecl = usedWidgetName AsDecl? RouteDecl?

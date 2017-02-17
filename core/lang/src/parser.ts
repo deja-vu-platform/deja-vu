@@ -452,12 +452,9 @@ export class Parser {
             map: r_map.replaceMap()[0]
           };
         },
-        replaceName: (cliche, dot, widget) => {
-          return {
-            name: widget.sourceString,
-            fqelement: this.cliche_map[cliche.sourceString].fqelement
-          };
-        },
+        ReplaceMapBody: (r_map1, comma, r_map2) => _u
+          .extend(
+              r_map1.replaceMap(), _u.reduce(r_map2.replaceMap(), _u.extend)),
         ReplaceMap: (n1, eq, ct2, dot2, n2) => {
           const ret = {};
           ret[n2.sourceString] = {
@@ -468,6 +465,12 @@ export class Parser {
             "maps_to": n1.sourceString
           };
           return ret;
+        },
+        replaceName: (cliche, dot, widget) => {
+          return {
+            name: widget.sourceString,
+            fqelement: this.cliche_map[cliche.sourceString].fqelement
+          };
         }
       })
       .addOperation("fqelement", {
