@@ -16,6 +16,7 @@ cliche Allocator {
 
   // Shows the name of the consumer of the given resource
   widget ShowConsumer {
+    allocation: Allocation,
     resource: Resource
   }
 }

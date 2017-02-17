@@ -30,10 +30,10 @@
         }
       ],
       "subfield": {
-        "name": "selected_weekly_event", "type": {
-          "name": "WeeklyEvent", "fqelement": "dv-organization-event"
+        "name": "weekly_group_meeting", "type": {
+          "name": "ShowGroupMeeting", "fqelement": "dv-samples-morg"
         }, "of": {
-          "name": "ChooseAndShowWeeklyEvent", "fqelement": "dv-organization-event"
+          "name": "ShowGroupMeeting", "fqelement": "dv-samples-morg"
         }
       }
     }

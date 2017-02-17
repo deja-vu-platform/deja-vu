@@ -61,7 +61,7 @@ cliche Bookmark uses
   }
 
   widget Home uses Auth.LoggedIn, CreatePost, Feed.ShowFeed {
-    user: User = Auth.LoggedIn.user + CreatePost.user +
+    user: User = Auth.LoggedIn.user + CreatePost.author +
       Feed.ShowFeed.sub
   }
 
@@ -69,9 +69,13 @@ cliche Bookmark uses
   // a field that lets the logged in user comment on the post
   widget ShowFeedPost uses
     MessagingPost.ShowAuthor, Label.ShowLabels, Comment.CommentsWithComment {
+    feed_user: User = Comment.CommentsWithComment.author,
     post: Post = Label.ShowLabels.item + MessagingPost.ShowAuthor.post +
       Comment.CommentsWithComment.target
-  } replaces Feed.ShowFeedItem in Feed.ShowFeed { message = ShowFeedPost.post }
+  } replaces Feed.ShowFeedItem in Feed.ShowFeed {
+    message = ShowFeedPost.post,
+    sub = ShowFeedPost.feed_user
+  }
 
   widget CreatePost uses
     MessagingPost.NewPostContent,

@@ -20,6 +20,7 @@ cliche Feed {
   }
 
   widget ShowFeedItem {
+    sub: Subscriber,
     msg: Message,
     pub: Publisher
   }

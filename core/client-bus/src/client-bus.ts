@@ -286,20 +286,24 @@ export class WidgetLoader {
         }
         c.fields = _u.extend(c.fields, this.fields);
         _u.each(_u.keys(c), f => {
-          if (replace_field_map[f] !== undefined) {
-            c[f] = this.fields[replace_field_map[f].maps_to]
-              .adapt(replace_field_map[f].type);
+          if (f === "fields" || f === "hosts") return;
+          const replace_field_info = replace_field_map[f];
+          const adapt_info = adapt_table[f];
+
+          if (replace_field_info !== undefined) {
+            c[f] = this.fields[replace_field_info.maps_to]
+              .adapt(replace_field_info.type);
             c.fields[f] = c[f];
-          } else {
-            const adapt_info = adapt_table[f];
-            if (adapt_info !== undefined) {
-              const host_fname = adapt_info.host_fname;
-              if (this.fields[host_fname] === undefined) {
-                throw new Error(`Expected field ${host_fname} is undefined`);
-              }
-              c[f] = this.fields[host_fname].adapt(adapt_info.ftype);
-              c.fields[f] = c[f];
+          } else if (adapt_info !== undefined) {
+            const host_fname = adapt_info.host_fname;
+            if (this.fields[host_fname] === undefined) {
+              throw new Error(`Expected field ${host_fname} is undefined`);
             }
+            c[f] = this.fields[host_fname].adapt(adapt_info.ftype);
+            c.fields[f] = c[f];
+          } else if ( // let cliches pass info directly to their widgets
+            fqelement === this._host_fqelement && c.fields[f] !== undefined) {
+            c[f] = c.fields[f];
           }
         });
         return c;

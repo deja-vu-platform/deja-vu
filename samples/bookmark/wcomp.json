@@ -184,23 +184,6 @@
     {
       "fields": [
         {
-          "name": "author",
-          "type": {"name": "Author", "fqelement": "dv-messaging-comment"},
-          "of": {"name": "CommentsWithComment", "fqelement": "dv-messaging-comment"}
-        }
-
-      ],
-      "subfield": {
-          "name": "sub",
-          "type": {"name": "Subscriber", "fqelement": "dv-messaging-feed"},
-          "of": {"name": "ShowFeed", "fqelement": "dv-messaging-feed"}
-        }
-    },
-
-
-    {
-      "fields": [
-        {
           "name": "item",
           "type": { "name": "Item", "fqelement": "dv-organization-label" },
           "of": { "name": "ShowLabels", "fqelement": "dv-organization-label" }
@@ -224,57 +207,32 @@
         }
       }
     },
-
-    {
-      "fields": [
-        {
-          "name": "target",
-          "type": { "name": "Target", "fqelement": "dv-messaging-comment" },
-          "of": { "name": "Comments", "fqelement": "dv-messaging-comment" }
+  {
+    "subfield": {
+      "name": "feed_user",
+      "of": {
+        "name": "ShowFeedPost",
+        "fqelement": "dv-samples-bookmark"
+      },
+      "type": {
+        "name": "User",
+        "fqelement": "dv-samples-bookmark"
+      }
+    },
+    "fields": [
+      {
+        "name": "author",
+        "of": {
+          "name": "CommentsWithComment",
+          "fqelement": "dv-messaging-comment"
         },
-        {
-          "name": "target",
-          "type": { "name": "Target", "fqelement": "dv-messaging-comment" },
-          "of": { "name": "NewComment", "fqelement": "dv-messaging-comment" }
-        }
-      ],
-      "subfield": {
-        "name": "target", "type": {
-          "name": "Target", "fqelement": "dv-messaging-comment"
-        }, "of": {
-          "name": "CommentsWithComment", "fqelement": "dv-messaging-comment"
+        "type": {
+          "name": "Author",
+          "fqelement": "dv-messaging-comment"
         }
       }
-    },
-    {
-      "fields": [
-        {
-          "name": "author",
-          "type": { "name": "Author", "fqelement": "dv-messaging-comment" },
-          "of": { "name": "NewComment", "fqelement": "dv-messaging-comment" }
-        }
-      ],
-      "subfield": {
-        "name": "author", "type": {
-          "name": "Author", "fqelement": "dv-messaging-comment"
-        }, "of": {
-          "name": "CommentsWithComment", "fqelement": "dv-messaging-comment"
-        }
-      }
-    },
-    {
-      "fields": [
-        {
-          "name": "comment",
-          "type": {"name": "Comment", "fqelement": "dv-messaging-comment"},
-          "of": {"name": "ShowComment", "fqelement": "dv-messaging-comment"}
-        }
-      ],
-      "subfield": {
-          "name": "comment",
-          "type": { "name": "Comment", "fqelement": "dv-messaging-comment" },
-          "of": { "name": "Comments", "fqelement": "dv-messaging-comment" }
-      }
-    }
+    ]
+  }
+
   ]
 }

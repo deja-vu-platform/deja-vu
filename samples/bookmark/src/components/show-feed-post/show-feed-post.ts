@@ -28,5 +28,6 @@ import {Widget} from "client-bus";
   `
 })
 export class ShowFeedPostComponent {
+  feed_user = {};
   post = {};
 }
