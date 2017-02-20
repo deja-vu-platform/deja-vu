@@ -59,7 +59,7 @@ Cliche {
   singleLineComment = "//" (~eol any)*
   eol = "\r"?"\n"
   multiLineComment = "/*" (~"*/" any)* "*/"
-  number = ("0".."9")+
+  number = digit+
 
   uses = "uses"
   replaces = "replaces"
