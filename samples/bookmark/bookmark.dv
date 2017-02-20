@@ -27,18 +27,32 @@ cliche Bookmark uses
       FollowTopics.Source +
       MessagingPost.User + Comment.Author +
       Feed.Subscriber + Feed.Publisher + Auth.User
+
+  User := [
+    {username: "benbitdiddle", posts: [post-1]},
+    {username: "alyssaphacker", posts: [post-2]}
+  ]
   
   data Post {
     content: Text = MessagingPost.Post.content + Feed.Message.content,
     topics: Topic = Label.Item.labels,
     author: User = MessagingPost.Post.author
   } = Label.Item + MessagingPost.Post + Feed.Message + Comment.Target
+
+  Post := [
+    {content: "hello, I'm Ben", author: user-1, topics: [topic-1]},
+    {content: "hello, I'm Alyssa", author: user-2, topics: [topic-1]}
+  ]
   
   data Topic {
     name: Text = Label.Label.name + Feed.Publisher.name +
         FollowTopics.Target.name,
     posts: Post = Feed.Publisher.messages + Label.Label.items
   } = Label.Label + FollowTopics.Target + Feed.Publisher
+
+  Topic := [
+    {name: "hello", posts: [post-1, post-2]}
+  ]
 
   /**
    * Widgets
@@ -51,6 +65,11 @@ cliche Bookmark uses
       Auth.SignInWithRedirect.signin_ok_redirect_route
   }
 
+  Landing := [
+    {user_ok_redirect_route: "/app/home"}
+  ]
+
+
   widget App route "app" uses
     Auth.SignOutWithRedirect,
     Home route "home",
@@ -59,6 +78,10 @@ cliche Bookmark uses
     signout_ok_redirect_route: Text =
       Auth.SignOutWithRedirect.signout_ok_redirect_route
   }
+
+  App := [
+    {signout_ok_redirect_route: "/landing"}
+  ]
 
   widget Home uses Auth.LoggedIn, CreatePost, Feed.ShowFeed {
     user: User = Auth.LoggedIn.user + CreatePost.author +

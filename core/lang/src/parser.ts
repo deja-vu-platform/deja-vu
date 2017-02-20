@@ -61,6 +61,7 @@ export class Parser {
         },
         Paragraph_widget: decl => [],
         Paragraph_data: decl => decl.tbonds(),
+        Paragraph_assignment: decl => [],
         DataDecl: (data, name, key1, fields, key2, bond) => {
           const subtype = name.sourceString;
           const mapped_cliche = this.cliche_map["this"];
@@ -114,6 +115,7 @@ export class Parser {
         },
         Paragraph_widget: decl => [],
         Paragraph_data: decl => decl.fbonds(),
+        Paragraph_assignment: decl => [],
         DataDecl: (data, name, key1, fields, key2, bond) => {
           this.of_name = name.sourceString;
           return fields.fbonds();
@@ -232,6 +234,7 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.wbonds(),
         Paragraph_data: decl => [],
+        Paragraph_assignment: decl => [],
         WidgetDecl: (m, w, name, route_decl, wU, k1, fields, k2, r) => {
           this.of_name = name.sourceString;
           return fields.fbonds();
@@ -242,6 +245,7 @@ export class Parser {
           .filter(para.widgets(), w => !_u.isEmpty(w)),
         Paragraph_widget: decl => decl.widgets(),
         Paragraph_data: decl => [],
+        Paragraph_assignment: decl => [],
         WidgetDecl: (m, w, n1, route_decl, wUses, k1, fields, k2, r) => {
           const ret:{name?: string, path?: string, children?: any[]} = {};
           ret.name = n1.sourceString;
@@ -276,6 +280,7 @@ export class Parser {
           .find(para.main(), m => m),
         Paragraph_widget: decl => decl.main(),
         Paragraph_data: decl => "",
+        Paragraph_assignment: decl => "",
         WidgetDecl: (m, w, n1, route, wUses, k1, fields, k2, r) => m.
           sourceString ? n1.sourceString : ""
       })
@@ -309,6 +314,7 @@ export class Parser {
           ._get_ft_map(para),
         Paragraph_widget: decl => decl.fieldTypesMap(),
         Paragraph_data: decl => decl.fieldTypesMap(),
+        Paragraph_assignment: decl => ({}),
         DataDecl: (data, name, key1, fields, key2, bond) => {
           return {
             "of": name.sourceString,
@@ -411,6 +417,7 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.usedWidgets(),
         Paragraph_data: decl => [],
+        Paragraph_assignment: decl => [],
         WidgetDecl: (
           m, w, n1, route, wUses, k1, fields, k2, r) => wUses.usedWidgets(),
         WidgetUsesDecl: (u, used_widget1, comma, used_widgets) => []
@@ -432,6 +439,7 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.replaceList(),
         Paragraph_data: decl => ({}),
+        Paragraph_assignment: decl => ({}),
         WidgetDecl: (
           m, w, name, route, wUses, k1, fields, k2, r) => r.replaceList(),
         ReplacesDecl: (r, r_name, i, in_name, k1, r_map, k2) => r_name
@@ -465,6 +473,7 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.replaceMap(),
         Paragraph_data: decl => ({}),
+        Paragraph_assignment: decl => ({}),
         WidgetDecl: (
           m, w, name, route, wUses, k1, fields, k2, r) => {
             this.name = name.sourceString;
@@ -625,7 +634,9 @@ export class Parser {
   private _get_ft_map(para) {
     const ftmap = para.fieldTypesMap();
     return _u
-      .reduce(ftmap, (memo, ft) => {
+      .chain(ftmap)
+      .reject(_u.isEmpty)
+      .reduce((memo, ft) => {
         if (memo[ft.of] !== undefined) {
           throw new Error("Duplicate type " + ft.of);
         }
@@ -638,7 +649,8 @@ export class Parser {
             return memo;
           }, {});
         return memo;
-      }, {});
+      }, {})
+      .value();
   }
 
   private _parse_cliche(cliche) {
