@@ -23,5 +23,7 @@ a library do `grunt lib` and to build a cliche `grunt dv-mean:lib`. You can also
 see a "development" page for a cliche with `grunt dv-mean:test`. The development
 page will display all widgets.
 
+You can install and build all packages in this repo using `node install-all.js`.
+
 To run a sample do `npm start`. You also need to start the mongo daemon before running any
 cliche, to do so run `mongod`. To check the sample visit `http://localhost:3000`
