@@ -17,11 +17,12 @@
   "typings": "./lib/dv",
   "main": "./lib/dv",
   "dependencies": {
-    "ohm-js": "^0.12.3",
-    "underscore": "^1.8.3",
     "command-line-args": "^2.1.6",
+    "grunt": "^0.4.5",
+    "jsonic": "^0.2.2",
     "mean-loader": "file:..//mean-loader",
-    "grunt": "^0.4.5"
+    "ohm-js": "^0.12.3",
+    "underscore": "^1.8.3"
   },
   "files": [
     "lib"

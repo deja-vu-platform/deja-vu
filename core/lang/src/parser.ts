@@ -1,4 +1,6 @@
 const ohm = require("ohm-js");
+const jsonic = require("jsonic");
+
 import * as fs from "fs";
 import * as path from "path";
 
@@ -39,6 +41,7 @@ export interface Cliche {
   tbonds: any[];
   fbonds: any[];
   wbonds: any[];
+  data: any;
 }
 
 export class Parser {
@@ -516,6 +519,24 @@ export class Parser {
           const cliche_name = name.sourceString;
           return `dv-samples-${cliche_name.toLowerCase()}`;
         }
+      })
+      // A map of tname -> list of values
+      .addOperation("data", {
+        ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
+          .chain(para.data())
+          .flatten().reject(_u.isEmpty)
+          // for some strange reason .reduce(_u.extendOwn) doesn't work
+          .reduce((memo, e) => _u.extendOwn(memo, e))
+          .value(),
+        Paragraph_data: decl => ({}), Paragraph_widget: decl => ({}),
+        Paragraph_assignment: decl => decl.data(),
+        AssignmentDecl: (name, assign, bracket1, body, bracket2) => {
+          const ret = {};
+          const body_w_ids = body.sourceString
+            .replace(/id-(\d*)/g, "{atom_id: $1}");
+          ret[name.sourceString] = jsonic(`[${body_w_ids}]`);
+          return ret;
+        }
       });
   }
 
@@ -580,7 +601,8 @@ export class Parser {
       widgets: s.widgets(),
       tbonds: s.tbonds(),
       fbonds: s.fbonds(),
-      wbonds: s.wbonds()
+      wbonds: s.wbonds(),
+      data: s.data()
     };
   }
 
@@ -609,6 +631,8 @@ export class Parser {
     console.log(debug(p.fbonds));
     console.log("//////////wbonds//////////");
     console.log(debug(p.wbonds));
+    console.log("//////////data//////////");
+    console.log(debug(p.data));
   }
 
   private _build_uses_ft_map(uses) {

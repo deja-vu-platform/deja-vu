@@ -29,8 +29,8 @@ cliche Bookmark uses
       Feed.Subscriber + Feed.Publisher + Auth.User
 
   User := [
-    {username: "benbitdiddle", posts: [post-1]},
-    {username: "alyssaphacker", posts: [post-2]}
+    {username: "benbitdiddle", posts: [id-1]},
+    {username: "alyssaphacker", posts: [id-2]}
   ]
   
   data Post {
@@ -40,8 +40,8 @@ cliche Bookmark uses
   } = Label.Item + MessagingPost.Post + Feed.Message + Comment.Target
 
   Post := [
-    {content: "hello, I'm Ben", author: user-1, topics: [topic-1]},
-    {content: "hello, I'm Alyssa", author: user-2, topics: [topic-1]}
+    {content: "hello, I'm Ben", author: id-1, topics: [id-1]},
+    {content: "hello, I'm Alyssa", author: id-2, topics: [id-1]}
   ]
   
   data Topic {
@@ -51,7 +51,7 @@ cliche Bookmark uses
   } = Label.Label + FollowTopics.Target + Feed.Publisher
 
   Topic := [
-    {name: "hello", posts: [post-1, post-2]}
+    {name: "hello", posts: [id-1, id-2]}
   ]
 
   /**
