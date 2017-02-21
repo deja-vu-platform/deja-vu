@@ -48,8 +48,6 @@ $(function(){
     miniNav.miniNavInitialize();
 
 
-    Parse.initialize("8jPwCfzXBGpPR2WVW935pey0C66bWtjMLRZPIQc8", "zgB9cjo7JifswwYBTtSvU1MSJCMVZMwEZI3Etw4d");
-
     // get selected project
     selectedProject = window.sessionStorage.getItem('selectedProject');
     if (selectedProject){ // if it exists, load it

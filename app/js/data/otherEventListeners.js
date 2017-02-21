@@ -279,15 +279,15 @@ function initUserWidget(isDefault, isMainPage) {
     var id = generateId();
 
     if (isMainPage){
-        return UserWidget({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
+        return UserData({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
     }
-    return UserWidget({height: 400, width: 600}, name, id, version, author);
+    return UserData({height: 400, width: 600}, name, id, version, author);
 }
 
 
 
 function duplicateUserWidget(userWidget){
-    return UserWidget.fromString(JSON.stringify(userWidget));
+    return UserData.fromString(JSON.stringify(userWidget));
 }
 
 function clearAll(){

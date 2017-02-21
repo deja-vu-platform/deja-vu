@@ -116,7 +116,7 @@ var DragAndDropController = function () {
                     var widget;
                     if (type == 'user') {
                         var id = dragHandle.data('componentid');
-                        widget = UserWidget.fromString(JSON.stringify(selectedProject.components[id]));
+                        widget = UserData.fromString(JSON.stringify(selectedProject.components[id]));
                         widget.meta.templateId = widget.meta.id;
                         widget = createUserWidgetCopy(widget);
                         dragHandle.data('componentid', widget.meta.id);

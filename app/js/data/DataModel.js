@@ -53,41 +53,17 @@ BaseWidget.prototype.updateWidget = function(type, value) {
  * @param author
  * @returns {UserWidget}
  * @constructor
-//  */
-// var UserWidget = function (dimensions, name, id, version, author) {
-//     var userWidget = Object.create(UserWidget.prototype);
-//     // TODO: later, change these to private variables
-//     userWidget.objectType = "UserWidget";
-//     userWidget.type = "user";
-//     userWidget.meta = {
-//         name: name,
-//         id: id,
-//         version: version,
-//         author: author
-//     };
-//     userWidget.dimensions = dimensions; // dimension = { height: Number (px)
-//                                                             // width: Number (px) }
-//                                                             // == desired dimensions
-//                                                             // start at some default and then resize?
-//                                                             // different starting defaults for widget vs page!
-//     userWidget.innerWidgets = {}; // widgetId: widget
-//     // user outer widget should define where the inner widgets are
-//     userWidget.layout = {stackOrder : []}; // widgetId: { top: Number (px),
-//                                                 // left: Number (px),
-//
-//     userWidget.properties = {custom:{}, main: {}, bsClasses: {}};
-//     return userWidget
-// };
+ */
 
-var UserWidget = function(dimensions, name, id, version, author){
+var UserData = function(dimensions, name, id, version, author){
     // id
     // children = instances
     // properties // tree of changes
     //
 
-    var template = Object.create(UserWidget.prototype);
+    var template = Object.create(UserData.prototype);
 
-    template.objectType = "UserWidget";
+    template.objectType = "UserData";
     template.type = "user";
     template.meta = {
         name: name,
@@ -174,7 +150,7 @@ var UserWidget = function(dimensions, name, id, version, author){
 //
 
 
-UserWidget.prototype.addInnerWidget = function(widget) {
+UserData.prototype.addInnerWidget = function(widget) {
     var widgetId = widget.meta.id;
     this.innerWidgets[widgetId]=widget;
     this.properties.layout.stackOrder.push(widgetId);
@@ -182,7 +158,7 @@ UserWidget.prototype.addInnerWidget = function(widget) {
 };
 
 
-UserWidget.prototype.deleteInnerWidget = function(widgetId) {
+UserData.prototype.deleteInnerWidget = function(widgetId) {
     delete this.innerWidgets[widgetId];
     delete this.properties.layout[widgetId];
     var index = this.properties.layout.stackOrder.indexOf(widgetId);
@@ -190,14 +166,14 @@ UserWidget.prototype.deleteInnerWidget = function(widgetId) {
     return true;
 };
 
-UserWidget.fromString = function(string){
+UserData.fromString = function(string){
     var object = JSON.parse(string);
-    return UserWidget.fromObject(object)
+    return UserData.fromObject(object)
 };
 
-UserWidget.fromObject = function(object){
+UserData.fromObject = function(object){
     // Check that the object has all the required fields
-    var notCorrectObjectError = "notCorrectObjectError: object object is not an instance of a UserWidget";
+    var notCorrectObjectError = "notCorrectObjectError: object object is not an instance of a UserData";
     if (!object.objectType){
         throw notCorrectObjectError;
     }
@@ -214,5 +190,5 @@ UserWidget.fromObject = function(object){
         throw notCorrectObjectError;
     }
 
-    return $.extend(new UserWidget(object.dimensions), object)
+    return $.extend(new UserData(object.dimensions), object)
 };

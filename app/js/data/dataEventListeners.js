@@ -764,7 +764,7 @@ function recursiveReIding(widget, sourceWidget){
 }
 
 function createUserWidgetCopy (outerWidget, sourceOuterWidget){
-    var widget = UserWidget.fromString(JSON.stringify(outerWidget));
+    var widget = UserData.fromString(JSON.stringify(outerWidget));
 
     recursiveReIding(widget, sourceOuterWidget);
     return widget;
