@@ -249,3 +249,7 @@ fix: upon changing to a new widget view reset scroll
 2/20:
 For undo/redo
 find everywhere where a widget is editted; make a function that moves the editing function add an image to the undo/redo queue
+
+2/21
+Copy widget code and strip it down to barebones for data
+	after making it work, we can combine the two to minimize the copied code
