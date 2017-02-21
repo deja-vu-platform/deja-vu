@@ -3,3 +3,4 @@
 *.iml
 node_modules
 app/projects
+npm-debug.log

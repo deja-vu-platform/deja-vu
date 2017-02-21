@@ -53,32 +53,7 @@ BaseWidget.prototype.updateWidget = function(type, value) {
  * @param author
  * @returns {UserWidget}
  * @constructor
-//  */
-// var UserWidget = function (dimensions, name, id, version, author) {
-//     var userWidget = Object.create(UserWidget.prototype);
-//     // TODO: later, change these to private variables
-//     userWidget.objectType = "UserWidget";
-//     userWidget.type = "user";
-//     userWidget.meta = {
-//         name: name,
-//         id: id,
-//         version: version,
-//         author: author
-//     };
-//     userWidget.dimensions = dimensions; // dimension = { height: Number (px)
-//                                                             // width: Number (px) }
-//                                                             // == desired dimensions
-//                                                             // start at some default and then resize?
-//                                                             // different starting defaults for widget vs page!
-//     userWidget.innerWidgets = {}; // widgetId: widget
-//     // user outer widget should define where the inner widgets are
-//     userWidget.layout = {stackOrder : []}; // widgetId: { top: Number (px),
-//                                                 // left: Number (px),
-//
-//     userWidget.properties = {custom:{}, main: {}, bsClasses: {}};
-//     return userWidget
-// };
-
+  */
 var UserWidget = function(dimensions, name, id, version, author){
     // id
     // children = instances
@@ -113,66 +88,10 @@ var UserWidget = function(dimensions, name, id, version, author){
 
     template.idMap = {};
 
+
+    //Object.freeze(template);
     return template;
 };
-
-// var UserWidgetInstance = function(parentId){
-//     var instance = Object.create(UserWidgetInstance);
-//
-//     instance.parentId = parentId;
-//     instance.id = 123; // generate ID here
-//
-//     // parent id = template
-//     // id
-//     // children = instances
-//     // properties // tree of changes
-//
-//
-//     return instance;
-// };
-
-// var instantiateProperties = function(){
-//     return {
-//         properties : {
-//             layout: {
-//                 stackOrder: []
-//             },
-//
-//             styles : {
-//                 custom: {}, bsClasses: {}
-//             }
-//         },
-//         children: {}
-//     };
-// };
-
-// Tree of Changes
-// widgetInstanceId:{ (= top level Id of the current widget)
-//     properties : {
-//        layout : {
-//              stackOrder: []
-//        },
-//        styles : {
-//              custom: {}, bsClasses: {}
-//        }
-//     },
-//     children:{
-//          widgetInstanceId:{
-//                properties : changes,
-//                  children: {
-//                    widgetInstanceId:{
-//                      ...
-//                    },
-//                     widgetInstanceId:{
-//                       ...
-//                     }
-//              },
-// 		    ...
-//      }
-//
-// },
-//
-
 
 UserWidget.prototype.addInnerWidget = function(widget) {
     var widgetId = widget.meta.id;

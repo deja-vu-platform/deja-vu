@@ -169,15 +169,16 @@ var WorkSurface = function(){
             minHeight: 0,
             minWidth: 0,
             start: function(){
+                // keeping this just as reference to how to do this
                 // var minWidth = $('.grid-cell:last').position().left;
                 // var minHeight = $('.grid-cell:last').position().top;
 
-                var minWidth = grid.getRightMostGridPosition();
-                var minHeight = grid.getBottomMostGridPosition();
-
-
-                $(this).resizable('option', 'minWidth', minWidth);
-                $(this).resizable('option', 'minHeight', minHeight);
+                //var minWidth = grid.getRightMostGridPosition();
+                //var minHeight = grid.getBottomMostGridPosition();
+                //
+                //
+                //$(this).resizable('option', 'minWidth', minWidth);
+                //$(this).resizable('option', 'minHeight', minHeight);
             },
             resize: function(e, ui){
                 userWidget.properties.dimensions.height = ui.size.height/currentZoom;
@@ -227,6 +228,8 @@ var WorkSurface = function(){
         };
 
         var dropSettings = dragAndDrop.widgetToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
+
+        //$('#outer-container').droppable(dropSettings);
 
         workSurface.droppable(dropSettings);
     };

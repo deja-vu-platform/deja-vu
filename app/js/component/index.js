@@ -10,6 +10,7 @@ var dragAndDrop = DragAndDropController();
 var grid = Grid();
 var widgetEditsManager = WidgetEditsManager();
 var style = Style($('.palette-container'));
+var undo = Undo();
 
 var projectsSavePath = path.join(__dirname, 'projects');
 var addedCliches;
