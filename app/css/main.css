@@ -673,3 +673,9 @@ li.selected {
 #basic-components .widget[data-type="user"]{
     display: none;
 }
+
+.palette-elt{
+    height: 16px;
+    width: 16px;
+    display: inline-block;
+}

@@ -1,7 +1,7 @@
 /**
  * Created by Shinjini on 2/13/2017.
  */
-var Style = function(){
+var Style = function(paletteContainer){
     var that = Object.create(Style.prototype);
 
 
@@ -18,18 +18,10 @@ var Style = function(){
 
     var palette = [];
 
+    var paletteElt;
 
-    var loadPalette = function(givenPalette){
-        if (!givenPalette){
-            for (var i = 0; i<PALETTE_SIZE; i++){
-                palette.push(WHITE);
-            }
-        } else {
-            palette = JSON.stringify(JSON.parse(givenPalette));
-        }
-    };
-    // TODO load palette function input
-    loadPalette();
+
+
 
     var updatePalette = function(color, idx){
         // if real color; TODO check with pickerObject
@@ -46,7 +38,7 @@ var Style = function(){
                 }
             }
         }
-        console.log(palette);
+        updatePaletteElt();
     };
 
 
@@ -172,6 +164,53 @@ var Style = function(){
         var bgColor = customColor || WHITE;
         pickerBG.fromString(bgColor);
     };
+
+    var makeColorPaletteElt = function(){
+        var container = $('<div></div>');
+        container.attr('id', 'palette');
+
+        for (var i = 0; i<PALETTE_SIZE; i++){
+            var elt = $('<div></div>');
+            elt.attr('id', 'palette-elt_'+i);
+            elt.addClass('palette-elt');
+            elt.css({
+                'background-color': palette[i],
+            });
+
+            elt.click(function(){
+                // TODO maybe we'll have a selected component variable
+                // and if you click this, the color gets set to that color
+                // console.log($(this).css('background-color'));
+            });
+            container.prepend(elt);
+        }
+
+        return container;
+    };
+
+    var updatePaletteElt = function(){
+        for (var i = 0; i<PALETTE_SIZE; i++) {
+            paletteElt.find('#palette-elt_' + i).css({
+                'background-color': palette[i],
+            })
+        }
+    };
+
+
+    var loadPalette = function(givenPalette){
+        if (!givenPalette){
+            for (var i = 0; i<PALETTE_SIZE; i++){
+                palette.push(WHITE);
+            }
+        } else {
+            palette = JSON.stringify(JSON.parse(givenPalette));
+        }
+
+        paletteElt = makeColorPaletteElt();
+        paletteContainer.append(paletteElt);
+    };
+    // TODO load palette function input
+    loadPalette();
 
     Object.freeze(that);
     return that;

@@ -9,7 +9,7 @@ var workSurface = WorkSurface();
 var dragAndDrop = DragAndDropController();
 var grid = Grid();
 var widgetEditsManager = WidgetEditsManager();
-var style = Style();
+var style = Style($('.palette-container'));
 
 var projectsSavePath = path.join(__dirname, 'projects');
 var addedCliches;
