@@ -2,8 +2,8 @@
  * Created by Shinjini on 1/8/2017.
  */
 
-var Grid = function(){
-    var that = Object.create(Grid.prototype);
+var WidgetGrid = function(){
+    var that = Object.create(WidgetGrid.prototype);
 
     var xsWithoutBoundary = [];
     var ysWithoutBoundary = [];

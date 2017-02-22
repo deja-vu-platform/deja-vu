@@ -90,12 +90,12 @@ function showClicheInList(id, name){
 
 
 
-style.setUpOverallInputs();
+//style.setUpOverallInputs();
 
 /** **/
 
 function addAddToMainPagesButton(userWidget){
-    var added = (userWidget.meta.id in selectedProject.mainComponents);
+    var added = (userWidget.meta.id in selectedProject.mainComponent);
     if (added){
         var span = document.createElement('span');
         span.innerHTML = '<button type="button" class="btn btn-default ">' +
@@ -127,7 +127,7 @@ function addAddToMainPagesButton(userWidget){
             // then remove
             $($(this).children().get(0)).removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $($(this).children().get(1)).text(' Add to Main Pages');
-            delete selectedProject.mainComponents[userWidgetId];
+            delete selectedProject.mainComponent[userWidgetId];
             $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
             displayUserWidgetInListAndSelect(name, userWidgetId);
             selectedUserWidget.inMainPages = false;
@@ -136,10 +136,10 @@ function addAddToMainPagesButton(userWidget){
             $($(this).children().get(0)).removeClass('glyphicon-plus').addClass('glyphicon-remove');
             $($(this).children().get(1)).text(' Remove from Main Pages');
 
-            if (!selectedProject.mainComponents){
-                selectedProject.mainComponents = {}; // for safety
+            if (!selectedProject.mainComponent){
+                selectedProject.mainComponent = {}; // for safety
             }
-            selectedProject.mainComponents[userWidgetId] = name;
+            selectedProject.mainComponent[userWidgetId] = name;
             $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
             displayMainPageInListAndSelect(name, userWidgetId);
             selectedUserWidget.inMainPages = true;
@@ -182,7 +182,7 @@ function addDeleteUserWidgetButton(userWidgetId){
     });
 
     var listElt;
-    if (userWidgetId in selectedProject.mainComponents){
+    if (userWidgetId in selectedProject.mainComponent){
         listElt = $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']");
     } else {
         listElt = $("#user-components-list").find("[data-componentid='" + userWidgetId + "']");
@@ -223,8 +223,8 @@ function deleteUserWidget(userWidgetId){
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         workSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
-    if (userWidgetId == selectedProject.mainComponents.indexId){
-        selectedProject.mainComponents.indexId = null;
+    if (userWidgetId == selectedProject.mainComponent.indexId){
+        selectedProject.mainComponent.indexId = null;
     }
     $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
     $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
@@ -268,7 +268,7 @@ function openDeleteUserWidgetConfirmDialogue(userWidgetId){
 function initUserWidget(isDefault, isMainPage) {
     var name, version, author;
     if (isDefault) {
-        name = DEFAULT_COMPONENT_NAME;
+        name = DEFAULT_WIDGET_NAME;
     } else {
         name = sanitizeStringOfSpecialChars($('#new-component-name').val());
     }
@@ -279,15 +279,15 @@ function initUserWidget(isDefault, isMainPage) {
     var id = generateId();
 
     if (isMainPage){
-        return UserWidget({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
+        return UserDatatype({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
     }
-    return UserWidget({height: 400, width: 600}, name, id, version, author);
+    return UserDatatype({height: 400, width: 600}, name, id, version, author);
 }
 
 
 
 function duplicateUserWidget(userWidget){
-    return UserWidget.fromString(JSON.stringify(userWidget));
+    return UserDatatype.fromString(JSON.stringify(userWidget));
 }
 
 function clearAll(){

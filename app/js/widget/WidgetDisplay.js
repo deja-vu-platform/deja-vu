@@ -1,5 +1,5 @@
-var Display = function(){
-    var that = Object.create(Display.prototype);
+var WidgetDisplay = function(){
+    var that = Object.create(WidgetDisplay.prototype);
 
     var defaultDisplayClasses = {
         'label': "display-component",

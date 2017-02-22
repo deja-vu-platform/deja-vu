@@ -4,8 +4,8 @@
 /**
  * Created by Shinjini on 2/13/2017.
  */
-var Undo = function(){
-    var that = Object.create(Undo.prototype);
+var WidgetUndo = function(){
+    var that = Object.create(WidgetUndo.prototype);
 
     var undoStack = [];
     var redoStack = [];

@@ -171,9 +171,9 @@ function displayProjectPreview(project){
     $('#preview-next-page').unbind();
 
 
-    if (!$.isEmptyObject(project.mainComponents)){
-        var componentToShowId = Object.keys(project.mainComponents)[0];
-        var numMainPages = Object.keys(project.mainComponents).length;
+    if (!$.isEmptyObject(project.mainComponent)){
+        var componentToShowId = Object.keys(project.mainComponent)[0];
+        var numMainPages = Object.keys(project.mainComponent).length;
         if (numMainPages>1){
             $('#page-preview').css('width', '790px');
             $('#preview-prev-page').css('display', 'inline-block');
@@ -209,18 +209,18 @@ function displayProjectPreview(project){
 }
 
 function showNextMainPage(project, currentPageNumber){
-    var numMainPages = Object.keys(project.mainComponents).length;
+    var numMainPages = Object.keys(project.mainComponent).length;
     var nextPageNum = (currentPageNumber+1)%(numMainPages);
-    var componentToShowId = Object.keys(project.mainComponents)[nextPageNum];
+    var componentToShowId = Object.keys(project.mainComponent)[nextPageNum];
     componentToShow = project.components[componentToShowId];
     loadTablePreview(componentToShow);
     $('#page-preview').data('pagenum', nextPageNum);
 
 }
 function showPrevMainPage(project, currentPageNumber){
-    var numMainPages = Object.keys(project.mainComponents).length;
+    var numMainPages = Object.keys(project.mainComponent).length;
     var prevPageNum = (currentPageNumber-1+numMainPages)%(numMainPages);
-    var componentToShowId = Object.keys(project.mainComponents)[prevPageNum];
+    var componentToShowId = Object.keys(project.mainComponent)[prevPageNum];
     componentToShow = project.components[componentToShowId];
     loadTablePreview(componentToShow);
     $('#page-preview').data('pagenum', prevPageNum);

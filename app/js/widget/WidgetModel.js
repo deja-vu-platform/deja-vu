@@ -5,7 +5,7 @@
 const DEFAULT_SCREEN_WIDTH = 2500;
 const DEFAULT_SCREEN_HEIGHT = 1000;
 
-const DEFAULT_COMPONENT_NAME = "New Widget";
+const DEFAULT_WIDGET_NAME = "New Widget";
 /** ** ** ** ** ** ** ** ** ** **/
 
 // TODO eventually freeze the object and only allow updates using the objects!
@@ -60,22 +60,22 @@ var UserWidget = function(dimensions, name, id, version, author){
     // properties // tree of changes
     //
 
-    var template = Object.create(UserWidget.prototype);
+    var that = Object.create(UserWidget.prototype);
 
-    template.objectType = "UserWidget";
-    template.type = "user";
-    template.meta = {
+    that.objectType = "UserWidget";
+    that.type = "user";
+    that.meta = {
         name: name,
         id: id,
         version: version,
         author: author
     };
 
-    template.innerWidgets = {
+    that.innerWidgets = {
         // widgetId: UserWidgetInstance
     };
 
-    template.properties = {
+    that.properties = {
         dimensions: dimensions,
         layout: {
             stackOrder: []
@@ -86,9 +86,7 @@ var UserWidget = function(dimensions, name, id, version, author){
         children: {}
     };
 
-    template.idMap = {};
-
-    return template;
+    return that;
 };
 
 // var UserWidgetInstance = function(parentId){
@@ -149,7 +147,7 @@ var UserWidget = function(dimensions, name, id, version, author){
 //
 
 
-UserWidget.prototype.addInnerWidget = function(widget) {
+UserWidget.prototype.addComponent = function(widget) {
     var widgetId = widget.meta.id;
     this.innerWidgets[widgetId]=widget;
     this.properties.layout.stackOrder.push(widgetId);

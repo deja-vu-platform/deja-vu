@@ -45,8 +45,7 @@ var DragAndDropController = function () {
                 if (!widgetIsAssociated) {
                     $(ui.helper).data('newcomponent', true);
                     dragHandle.newWidget = true;
-                    outerWidget.addInnerWidget(widget);
-                    outerWidget.idMap[widget.meta.id] = widget.meta.templateId;
+                    outerWidget.addComponent(widget);
                     dragHandle.addClass('associated').data('componentid', widgetId);
                     zoomElement.registerZoom(outerWidget);
                 } else {
@@ -116,7 +115,7 @@ var DragAndDropController = function () {
                     var widget;
                     if (type == 'user') {
                         var id = dragHandle.data('componentid');
-                        widget = UserData.fromString(JSON.stringify(selectedProject.components[id]));
+                        widget = UserDatatype.fromString(JSON.stringify(selectedProject.components[id]));
                         widget.meta.templateId = widget.meta.id;
                         widget = createUserWidgetCopy(widget);
                         dragHandle.data('componentid', widget.meta.id);

@@ -1,8 +1,8 @@
 /**
  * Created by Shinjini on 2/13/2017.
  */
-var Style = function(paletteContainer){
-    var that = Object.create(Style.prototype);
+var WidgetStyle = function(paletteContainer){
+    var that = Object.create(WidgetStyle.prototype);
 
 
     // possible sources http://jscolor.com/, http://www.w3schools.com/colors/colors_picker.asp

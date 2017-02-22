@@ -183,12 +183,12 @@ var WidgetContainer = function(){
         });
 
         buttonMoveUp.click(function(){
-           WorkSurface().changeOrderByOne(widget.meta.id, outerWidget, true);
+           WidgetWorkSurface().changeOrderByOne(widget.meta.id, outerWidget, true);
         });
 
 
         buttonMoveDown.click(function(){
-            WorkSurface().changeOrderByOne(widget.meta.id, outerWidget, false);
+            WidgetWorkSurface().changeOrderByOne(widget.meta.id, outerWidget, false);
         });
 
         return optionsDropdown;

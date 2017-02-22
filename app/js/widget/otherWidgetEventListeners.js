@@ -90,66 +90,66 @@ function showClicheInList(id, name){
 
 
 
-//style.setUpOverallInputs();
+style.setUpOverallInputs();
 
 /** **/
-
-function addAddToMainPagesButton(userWidget){
-    var added = (userWidget.meta.id in selectedProject.mainComponents);
-    if (added){
-        var span = document.createElement('span');
-        span.innerHTML = '<button type="button" class="btn btn-default ">' +
-            '<span class="glyphicon glyphicon-remove"></span>' +
-            '<span> Remove from Main Pages</span>' +
-            '</button>';
-    }
-    else{
-        var span = document.createElement('span');
-        span.innerHTML = '<button type="button" class="btn btn-default ">' +
-            '<span class="glyphicon glyphicon-plus"></span>' +
-            '<span> Add to Main Pages</span>' +
-            '</button>';
-    }
-    var addToMainPageButton = span.firstChild;
-    addToMainPageButton.id = 'btn-add-main-page';;
-
-    $(addToMainPageButton).data('added', added).css({
-        position: 'absolute',
-        top:'-45px',
-        left:'230px',
-    });
-
-    $(addToMainPageButton).on("click", function (e) {
-        var added = $(this).data('added');
-        var userWidgetId = selectedUserWidget.meta.id;
-        var name = selectedUserWidget.meta.name;
-        if (added){
-            // then remove
-            $($(this).children().get(0)).removeClass('glyphicon-remove').addClass('glyphicon-plus');
-            $($(this).children().get(1)).text(' Add to Main Pages');
-            delete selectedProject.mainComponents[userWidgetId];
-            $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
-            displayUserWidgetInListAndSelect(name, userWidgetId);
-            selectedUserWidget.inMainPages = false;
-        } else {
-            // then add
-            $($(this).children().get(0)).removeClass('glyphicon-plus').addClass('glyphicon-remove');
-            $($(this).children().get(1)).text(' Remove from Main Pages');
-
-            if (!selectedProject.mainComponents){
-                selectedProject.mainComponents = {}; // for safety
-            }
-            selectedProject.mainComponents[userWidgetId] = name;
-            $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
-            displayMainPageInListAndSelect(name, userWidgetId);
-            selectedUserWidget.inMainPages = true;
-        }
-        $(this).data('added', !added);
-    });
-
-    $('#main-cell-table').append(addToMainPageButton);
-
-}
+//
+//function addAddToMainPagesButton(userWidget){
+//    var added = (userWidget.meta.id in selectedProject.mainComponent);
+//    if (added){
+//        var span = document.createElement('span');
+//        span.innerHTML = '<button type="button" class="btn btn-default ">' +
+//            '<span class="glyphicon glyphicon-remove"></span>' +
+//            '<span> Remove from Main Pages</span>' +
+//            '</button>';
+//    }
+//    else{
+//        var span = document.createElement('span');
+//        span.innerHTML = '<button type="button" class="btn btn-default ">' +
+//            '<span class="glyphicon glyphicon-plus"></span>' +
+//            '<span> Add to Main Pages</span>' +
+//            '</button>';
+//    }
+//    var addToMainPageButton = span.firstChild;
+//    addToMainPageButton.id = 'btn-add-main-page';;
+//
+//    $(addToMainPageButton).data('added', added).css({
+//        position: 'absolute',
+//        top:'-45px',
+//        left:'230px',
+//    });
+//
+//    $(addToMainPageButton).on("click", function (e) {
+//        var added = $(this).data('added');
+//        var userWidgetId = selectedUserWidget.meta.id;
+//        var name = selectedUserWidget.meta.name;
+//        if (added){
+//            // then remove
+//            $($(this).children().get(0)).removeClass('glyphicon-remove').addClass('glyphicon-plus');
+//            $($(this).children().get(1)).text(' Add to Main Pages');
+//            delete selectedProject.mainComponent[userWidgetId];
+//            $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
+//            displayUserWidgetInListAndSelect(name, userWidgetId);
+//            selectedUserWidget.inMainPages = false;
+//        } else {
+//            // then add
+//            $($(this).children().get(0)).removeClass('glyphicon-plus').addClass('glyphicon-remove');
+//            $($(this).children().get(1)).text(' Remove from Main Pages');
+//
+//            if (!selectedProject.mainComponent){
+//                selectedProject.mainComponent = {}; // for safety
+//            }
+//            selectedProject.mainComponent[userWidgetId] = name;
+//            $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
+//            displayMainPageInListAndSelect(name, userWidgetId);
+//            selectedUserWidget.inMainPages = true;
+//        }
+//        $(this).data('added', !added);
+//    });
+//
+//    $('#main-cell-table').append(addToMainPageButton);
+//
+//}
 
 
 /**
@@ -171,7 +171,7 @@ function addDeleteUserWidgetButton(userWidgetId){
     buttonDeleteUserWidget.id = 'btn-delete-component_'+userWidgetId;
 
     $(buttonDeleteUserWidget).on("click", function (e) {
-        if (selectedProject.numComponents === 1){
+        if (selectedComponent.getNumWidgets() == 1){
             return; //don't delete the last one TODO is the the right way to go?
         }
         if (confirmOnUserWidgetDelete){
@@ -182,7 +182,7 @@ function addDeleteUserWidgetButton(userWidgetId){
     });
 
     var listElt;
-    if (userWidgetId in selectedProject.mainComponents){
+    if (userWidgetId in selectedComponent.mainPages){
         listElt = $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']");
     } else {
         listElt = $("#user-components-list").find("[data-componentid='" + userWidgetId + "']");
@@ -209,22 +209,22 @@ function addDeleteUserWidgetButton(userWidgetId){
 }
 
 function deleteUserWidget(userWidgetId){
-    if (selectedProject.numComponents === 1){
+    if (selectedComponent.getNumWidgets() == 1){
         return; //don't delete the last one TODO is the the right way to go?
     }
-    selectedProject.removeComponent(userWidgetId);
+    selectedComponent.removeWidget(userWidgetId);
     $('#work-surface_'+userWidgetId).remove();
     $('#disabled_'+userWidgetId+'_work-surface_'+userWidgetId).remove(); // also remove disabled ones
 
     if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
-        var otherIds = Object.keys(selectedProject.components);
-        selectedUserWidget = selectedProject.components[otherIds[0]];
+        var otherIds = Object.keys(selectedComponent.widgets);
+        selectedUserWidget = selectedComponent.widgets[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         workSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
-    if (userWidgetId == selectedProject.mainComponents.indexId){
-        selectedProject.mainComponents.indexId = null;
+    if (userWidgetId == selectedComponent.mainPages.indexId){
+        selectedComponent.mainPages.indexId = null;
     }
     $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
     $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
@@ -233,7 +233,7 @@ function deleteUserWidget(userWidgetId){
 
 function openDeleteUserWidgetConfirmDialogue(userWidgetId){
     $('#confirm-delete-userComponent').modal('show');
-    $('#delete-userComponent-name').text(selectedProject.components[userWidgetId].meta.name);
+    $('#delete-userComponent-name').text(selectedComponent.widgets[userWidgetId].meta.name);
 
     $('#delete-userComponent-btn').unbind();
     $('#delete-userComponent-btn').click(function(){
@@ -265,10 +265,10 @@ function openDeleteUserWidgetConfirmDialogue(userWidgetId){
  * @param isDefault
  * @constructor
  */
-function initUserWidget(isDefault, isMainPage) {
+function initUserWidget(isDefault, inMainPage) {
     var name, version, author;
     if (isDefault) {
-        name = DEFAULT_COMPONENT_NAME;
+        name = DEFAULT_WIDGET_NAME;
     } else {
         name = sanitizeStringOfSpecialChars($('#new-component-name').val());
     }
@@ -278,16 +278,29 @@ function initUserWidget(isDefault, isMainPage) {
 
     var id = generateId();
 
-    if (isMainPage){
-        return UserData({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
+    if (inMainPage){
+        return UserWidget({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
     }
-    return UserData({height: 400, width: 600}, name, id, version, author);
+    return UserWidget({height: 400, width: 600}, name, id, version, author);
+}
+
+function initUserComponent() {
+    var name, version, author;
+    name = selectedProject.meta.name;
+    version = selectedProject.meta.version;
+    author = selectedProject.meta.author;
+
+    var id = generateId();
+
+    var firstPage = initUserWidget(true, true);
+    var component = UserComponent(name, id, version, author);
+    component.addMainPage(firstPage);
+    return component;
 }
 
 
-
 function duplicateUserWidget(userWidget){
-    return UserData.fromString(JSON.stringify(userWidget));
+    return UserWidget.fromString(JSON.stringify(userWidget));
 }
 
 function clearAll(){

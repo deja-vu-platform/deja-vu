@@ -9,7 +9,7 @@ $('#new-user-component-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, false);
-            selectedProject.addInnerWidget(selectedUserWidget);
+            selectedProject.addComponent(selectedUserWidget);
             displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
@@ -134,14 +134,14 @@ function setWidgetOptions(outerWidget){
             // change the id
             copyWidget.meta.id = generateId();
 
-            if (originalId in selectedProject.mainComponents){
+            if (originalId in selectedProject.mainComponent){
                 selectedProject.addMainPage(copyWidget);
                 displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             } else {
                 displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             }
 
-            selectedProject.addInnerWidget(copyWidget);
+            selectedProject.addComponent(copyWidget);
             selectedUserWidget = copyWidget;
             workSurface.loadUserWidget(copyWidget, 1);
 
@@ -174,7 +174,7 @@ function setWidgetOptions(outerWidget){
         });
 
     // if the component is in the main pages, set it up accordingly
-    if (outerWidget.meta.id in selectedProject.mainComponents){
+    if (outerWidget.meta.id in selectedProject.mainComponent){
         $('.component-options #btn-index-page-toggle').css({
             display: 'inline-block',
         });
@@ -189,7 +189,7 @@ function setWidgetOptions(outerWidget){
 }
 
 function setUpWidgetOptionsIndexPageToggle(outerWidget){
-    if (outerWidget.meta.id == selectedProject.mainComponents.indexId){
+    if (outerWidget.meta.id == selectedProject.mainComponent.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
         $('.components').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
@@ -684,10 +684,10 @@ $('.components').on('click', '.index-page-toggle', function(){
     $('.components .selected-index-page').removeClass('selected-index-page');
     var widgetId = $(this).parent().data('componentid');
     if (turnOn){
-        selectedProject.mainComponents.indexId = widgetId;
+        selectedProject.mainComponent.indexId = widgetId;
         $(this).parent().addClass('selected-index-page');
     } else {
-        selectedProject.mainComponents.indexId = null;
+        selectedProject.mainComponent.indexId = null;
     }
     setUpWidgetOptionsIndexPageToggle(selectedProject.components[widgetId]);
 });
@@ -764,7 +764,7 @@ function recursiveReIding(widget, sourceWidget){
 }
 
 function createUserWidgetCopy (outerWidget, sourceOuterWidget){
-    var widget = UserData.fromString(JSON.stringify(outerWidget));
+    var widget = UserDatatype.fromString(JSON.stringify(outerWidget));
 
     recursiveReIding(widget, sourceOuterWidget);
     return widget;

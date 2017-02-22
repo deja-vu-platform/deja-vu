@@ -6,8 +6,8 @@ var currentZoom = 1;
 var gridHeight;
 var gridWidth;
 
-var view = Display();
-var workSurface = WorkSurface();
+var view = WidgetDisplay();
+var workSurface = WidgetWorkSurface();
 
 function loadTablePreview(widgetToShow) {
 

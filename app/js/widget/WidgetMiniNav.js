@@ -2,8 +2,8 @@
  * Created by Shinjini on 11/3/2016.
  */
 
-var MiniNav = function(){
-    var that = Object.create(MiniNav.prototype);
+var WidgetMiniNav = function(){
+    var that = Object.create(WidgetMiniNav.prototype);
 
     var navZoom = .1;
     var navDragging = false;

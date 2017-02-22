@@ -4,8 +4,8 @@
 
 var widgetContainerMaker = WidgetContainer();
 
-var WorkSurface = function(){
-    var that = Object.create(WorkSurface.prototype);
+var WidgetWorkSurface = function(){
+    var that = Object.create(WidgetWorkSurface.prototype);
 
 
     var createWorkSurface = function(outerWidgetId, height, width){
@@ -406,7 +406,7 @@ var WorkSurface = function(){
         makeWorkSurfaceDroppableToWidgets(workSurface, userWidget);
         zoomElement.updateZoomFromState(userWidget);
 
-        setWidgetOptions(selectedProject.components[widgetId]);
+        setWidgetOptions(userWidget);
 
         return workSurface
     };
@@ -465,7 +465,7 @@ var WorkSurface = function(){
     };
 
     var disableAllWidgetDomElementsExcept = function(widgetToEnableId){
-        for (var widgetId in selectedProject.components){
+        for (var widgetId in selectedComponent.widgets){
             if (widgetToEnableId == widgetId){
                 enableWidgetDOMElements(widgetId);
                 continue;

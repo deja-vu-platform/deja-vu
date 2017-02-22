@@ -206,8 +206,8 @@ var WidgetEditsManager = function(){
                 if (!templateId){ // it is an outermost widget!
                     templateId = widget.meta.id;
                 }
-                var projectCopy =  UserWidget.fromString(
-                    JSON.stringify(selectedProject.components[templateId])
+                var componentVersionCopy =  UserWidget.fromString(
+                    JSON.stringify(selectedComponent.widgets[templateId])
                 );
 
                 widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
@@ -217,7 +217,7 @@ var WidgetEditsManager = function(){
 
                 // apply changes after calling the recursion so that higher levels override
                 // lower level changes
-                applyPropertyChanges(widget, projectCopy);
+                applyPropertyChanges(widget, componentVersionCopy);
             } else {
                 // else it's a base component, so we'll just take it as is from the component we are reading from
                 applyPropertyChanges(widget);
@@ -376,7 +376,7 @@ var WidgetEditsManager = function(){
                         // the information using the ids.
                         // We will be changing the ids altogether later on.
                         innerWidget =  UserWidget.fromString(
-                            JSON.stringify(selectedProject.components[templateId])
+                            JSON.stringify(selectedComponent.widgets[templateId])
                         );
 
                         innerWidget.meta.templateId = templateId;

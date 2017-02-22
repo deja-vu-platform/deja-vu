@@ -1,8 +1,8 @@
 /**
  * Created by Shinjini on 11/3/2016.
  */
-var ZoomElement = function(){
-    var that = Object.create(ZoomElement.prototype);
+var WidgetZoomElement = function(){
+    var that = Object.create(WidgetZoomElement.prototype);
 
     var getSliderValFromZoom = function(zoom){
         var max = parseFloat($('#zoom-slider').get(0).max);

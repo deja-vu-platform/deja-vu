@@ -22,9 +22,8 @@ function Project() {
     this.objectType = "Project";
     //this.type = '';
     this.meta = {};
-    this.mainComponents = {};
+    this.mainComponent = null;
     this.components = {};
-    this.numComponents = 0;
     this.lastAccessed = -Infinity;
     this.addedCliches = {};
 }
@@ -49,37 +48,38 @@ function UserProject(name, id, version, author) {
         version: version,
         author: author
     };
-    this.mainComponents = {}; // one component for now
+    this.mainComponent = null; // one component for now
     this.components = {};
-    this.numComponents = 0;
-    this.componentIdSet = {}; // {id:''}
     this.lastAccessed = new Date();
-    this.addedCliches = {};
+
 }
 
-UserProject.prototype.addInnerWidget = function(component){
+UserProject.prototype.addComponent = function(component){
     if (!this.components[component.meta.id]) {
         this.components[component.meta.id] = component;
-        this.numComponents++;
     }
 };
 
-UserProject.prototype.addMainPage = function(component){
-    component.inMainPages = true;
-    this.mainComponents[component.meta.id] = component.meta.name;
-    this.addInnerWidget(component);
-};
-
-UserProject.prototype.removeMainPage = function(component){
-    delete selectedProject.mainComponents[component.meta.id];
-    component.inMainPages = false;
-};
-
-
 UserProject.prototype.removeComponent = function(componentId){
     delete this.components[componentId];
-    delete this.mainComponents[componentId];
-    this.numComponents--;
+    delete this.mainComponent[componentId];
+};
+
+
+// TODO Ummm this should be fixed
+UserProject.prototype.makeMainComponent = function(component){
+    if (component.meta.id in this.components){
+        this.mainComponent = component.meta.id;
+    }
+};
+
+UserProject.prototype.removeMainComponent = function(){
+    selectedProject.mainComponent = null;
+
+};
+
+UserProject.prototype.getNumComponents = function(){
+    return Object.keys(this.components).length;
 };
 
 UserProject.fromString = function(string){
@@ -99,15 +99,12 @@ UserProject.fromObject = function(object){
     if (!object.components){
         throw notCorrectObjectError;
     }
-    if (!object.componentIdSet){
-        throw notCorrectObjectError;
-    }
 
     var project = $.extend(new UserProject(), object);
 
     for (var componentId in object.components) {
         var component = object.components[componentId];
-        object.components[componentId] = UserWidget.fromObject(component);
+        project.components[componentId] = UserComponent.fromObject(component);
     }
     return project
 };

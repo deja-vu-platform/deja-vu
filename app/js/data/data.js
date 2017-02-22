@@ -2,11 +2,11 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-var zoomElement = ZoomElement();
-var miniNav = MiniNav();
-var view = Display();
-var workSurface = WorkSurface();
-var dragAndDrop = DragAndDropController();
+var zoomElement = WidgetZoomElement();
+var miniNav = WidgetMiniNav();
+var view = WidgetDisplay();
+var workSurface = WidgetWorkSurface();
+var dragAndDrop = WidgetDragAndDropController();
 //var grid = Grid();
 var widgetEditsManager = WidgetEditsManager();
 //var style = Style($('.palette-container'));
@@ -63,20 +63,20 @@ $(function(){
         showClicheInList(id, addedCliches[id].name);
     }
 
-    if (selectedProject.numComponents == 0){
+    if (selectedProject.getNumComponents() == 0){
         // start a default component
         selectedUserWidget = initUserWidget(true, true);
         selectedProject.addMainPage(selectedUserWidget);
         displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
     } else {
         var widgetToLoadId;
-        if (!$.isEmptyObject(selectedProject.mainComponents)){
-            widgetToLoadId = Object.keys(selectedProject.mainComponents)[0];
+        if (!$.isEmptyObject(selectedProject.mainComponent)){
+            widgetToLoadId = Object.keys(selectedProject.mainComponent)[0];
         } else {
             widgetToLoadId = Object.keys(selectedProject.components)[0];
         }
         selectedUserWidget = selectedProject.components[widgetToLoadId];
-        if (widgetToLoadId in selectedProject.mainComponents){
+        if (widgetToLoadId in selectedProject.mainComponent){
             displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         } else {
             displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
@@ -87,7 +87,7 @@ $(function(){
         for (var componentId in selectedProject.components){
             if (componentId != widgetToLoadId){
                 var componentName = selectedProject.components[componentId].meta.name;
-                if (componentId in selectedProject.mainComponents){
+                if (componentId in selectedProject.mainComponent){
                     displayNewWidgetInMainPagesList(componentName, componentId)
                 } else {
                     displayNewWidgetInUserWidgetList(componentName, componentId);
