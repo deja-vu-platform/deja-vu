@@ -486,7 +486,7 @@ function registerTooltipBtnHandlers() {
                 }
             }
             var widgetId = getWidgetIdFromContainerId(containerId);
-            selectedUserWidget.innerWidgets[widgetId].properties,style.bsClasses[propertyName] = bootstrapClass;
+            selectedUserWidget.innerWidgets[widgetId].properties.styles.bsClasses[propertyName] = bootstrapClass;
 
         }
     }
