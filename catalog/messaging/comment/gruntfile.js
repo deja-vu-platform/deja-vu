@@ -3,5 +3,5 @@ module.exports = function(grunt) {
       grunt,
       "dv-messaging-comment",
       [{name: "NewComment"}, {name: "Comments"},
-       {name: "CommentsWithComment"}, {name: "Comment"}]);
+       {name: "CommentsWithComment"}, {name: "ShowComment"}]);
 }
