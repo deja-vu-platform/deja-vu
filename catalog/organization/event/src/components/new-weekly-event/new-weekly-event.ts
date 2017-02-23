@@ -22,10 +22,20 @@ export class NewWeeklyEventComponent {
       private _elementRef: ElementRef) {}
 
   onSubmit() {
-    this.starts_on = document.getElementById("starts-on-text")["value"];
-    this.ends_on = document.getElementById("ends-on-text")["value"];
-    this.start_time = document.getElementById("start-time-text")["value"];
-    this.end_time = document.getElementById("end-time-text")["value"];
+    let startsOnText = document.getElementById("starts-on-text");
+    let endsOnText = document.getElementById("ends-on-text");
+    let startTimeText = document.getElementById("start-time-text");
+    let endTimeText = document.getElementById("end-time-text");
+
+    this.starts_on = startsOnText["value"];
+    this.ends_on = endsOnText["value"];
+    this.start_time = startTimeText["value"];
+    this.end_time = endTimeText["value"];
+
+    startsOnText["value"] = "";
+    endsOnText["value"] = "";
+    startTimeText["value"] = "";
+    endTimeText["value"] = "";
 
     this._graphQlService
       .post(`
