@@ -25,7 +25,7 @@ export interface FeedItem {
 })
 export class ShowFeedComponent {
   feed: FeedItem[];
-  sub = {name: "", on_change: undefined};
+  sub = {name: "", on_change: _ => undefined};
   fields = {};
 
   constructor(
