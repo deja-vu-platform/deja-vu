@@ -22,10 +22,10 @@ export class NewWeeklyEventComponent {
       private _elementRef: ElementRef) {}
 
   onSubmit() {
-    let startsOnText = document.getElementById("starts-on-text");
-    let endsOnText = document.getElementById("ends-on-text");
-    let startTimeText = document.getElementById("start-time-text");
-    let endTimeText = document.getElementById("end-time-text");
+    let startsOnText: Element = document.getElementById("starts-on-text");
+    let endsOnText: Element = document.getElementById("ends-on-text");
+    let startTimeText: Element = document.getElementById("start-time-text");
+    let endTimeText: Element = document.getElementById("end-time-text");
 
     this.starts_on = startsOnText["value"];
     this.ends_on = endsOnText["value"];
@@ -65,5 +65,36 @@ export class NewWeeklyEventComponent {
     s.src = "node_modules/dv-organization-event/lib/components/" +
       "new-weekly-event/vendor/" + src;
     this._elementRef.nativeElement.appendChild(s);
+  }
+
+  /**
+   * Fix an inconsistency with the current time appearing in time boxes when
+   * they are clicked.
+   */
+  timeClickHandler(event: Event) {
+    const MINUTE_ROUNDING_FACTOR = 15;
+    const FIRST_PM_HOUR = 12;
+
+    if (!event.srcElement["value"]) {
+      // Get a string containing the current time
+      let currentTime: Date = new Date();
+
+      // Note: The behavior of the control is a bit weird in that it rounds up
+      // to the nearest 15 minutes. We need to do that to keep consistent
+      let minutes: number = currentTime.getMinutes();
+      if (minutes % MINUTE_ROUNDING_FACTOR !== 0) {
+        // Pushing the time forward wraps properly
+        currentTime.setMinutes(minutes
+          + (MINUTE_ROUNDING_FACTOR
+            - (minutes % MINUTE_ROUNDING_FACTOR)));
+        minutes = currentTime.getMinutes();
+      }
+
+      let totalHours: number = currentTime.getHours();
+      let actualHours: number = totalHours % FIRST_PM_HOUR;
+      let amPm: string = totalHours >= FIRST_PM_HOUR ? "PM" : "AM";
+      event.srcElement["value"] = actualHours.toString() + ":"
+        + minutes.toString() + " " + amPm;
+    }
   }
 }
