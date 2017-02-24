@@ -5,28 +5,14 @@
 /** ** ** ** ** ** Menu Event Handlers ** ** ** ** ** **/
 // TODO on user component name input check for special chars
 
-$('#new-user-component-btn').click(function(){
+$('#new-user-datatype-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
-            selectedUserWidget = initUserWidget(false, false);
-            selectedProject.addComponent(selectedUserWidget);
-            displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
-            dataWorkSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
-            style.setUpStyleColors(selectedUserWidget);
+            var datatype = UserDatatype(1,1,1,1);
+            selectedComponent.addDatatype(datatype);
+            displayUserWidgetInListAndSelect(datatype.meta.name, datatype.meta.id);
+            dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
 
-            resetMenuOptions();
-    });
-});
-
-$('#new-main-component-btn').click(function(){
-    $('#create-component').unbind()
-        .on('click', function () {
-            selectedUserWidget = initUserWidget(false, true);
-            selectedProject.addMainPage(selectedUserWidget);
-            displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
-
-            dataWorkSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
-            style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
     });
 });

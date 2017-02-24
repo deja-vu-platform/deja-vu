@@ -64,6 +64,16 @@ UserComponent.prototype.removeWidget = function(widgetId){
     delete this.mainPages[widgetId];
 };
 
+UserComponent.prototype.addDatatype = function(datatype){
+    if (!this.datatypes[datatype.meta.id]) {
+        this.datatypes[datatype.meta.id] = datatype;
+    }
+};
+
+UserComponent.prototype.removeDatatype = function(datatypeId){
+    delete this.datatypes[datatypeId];
+};
+
 
 UserComponent.fromString = function(string){
     var object = JSON.parse(string);

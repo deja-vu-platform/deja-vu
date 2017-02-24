@@ -140,7 +140,7 @@ var DataWorkSurface = function(){
             }
         }
 
-        dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(datatype);
+        //dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(datatype);
         //grid.setUpGrid();
     };
 

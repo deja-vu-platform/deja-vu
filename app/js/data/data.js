@@ -17,6 +17,7 @@ var selectedScreenSizeWidth = 2000;
 var files = [];
 
 var selectedUserWidget = null;
+var selectedDatatype = null;
 var selectedComponent = null;
 var selectedProject = null;
 

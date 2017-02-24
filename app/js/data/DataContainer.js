@@ -5,11 +5,15 @@
 var DataContainer = function(){
     var that = Object.create(DataContainer.prototype);
 
-    var DATA_CONT_ID = 'datatype-container';
+    var DATA_CONT_REF = 'datatype-container';
 
 
-    var makeContainerResizable = function(widget, outerWidget, container, outermostWidget){
-        var widgetId = widget.meta.id;
+    that.getContainerRef = function(){
+        return DATA_CONT_REF;
+    };
+
+    var makeContainerResizable = function(datatype, outerWidget, container, outermostWidget){
+        var widgetId = datatype.meta.id;
 
         var dragHandle_se = $('<span></span>');
         dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
@@ -55,15 +59,15 @@ var DataContainer = function(){
 
                 // widget.properties.dimensions = newDimensions;
 
-                dataEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'dimensions', newDimensions);
+                dataEditsManager.updateCustomProperties(outermostWidget, datatype.meta.id, 'dimensions', newDimensions);
                 // TODO woah! It resizes as you go!
                 refreshContainerDisplay(false, container, currentZoom);
             },
             stop: function(e, ui){
                 var newPosition = {left:  ui.position.left/currentZoom, top: ui.position.top/currentZoom};
                 var newLayout = {};
-                newLayout[widget.meta.id] = newPosition;
-                dataEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'layout', newLayout, true);
+                newLayout[datatype.meta.id] = newPosition;
+                dataEditsManager.updateCustomProperties(outermostWidget, datatype.meta.id, 'layout', newLayout, true);
 
                 // outerWidget.properties.layout[widget.meta.id].left = ui.position.left/currentZoom;
                 // outerWidget.properties.layout[widget.meta.id].top = ui.position.top/currentZoom;
