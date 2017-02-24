@@ -7,6 +7,8 @@ var WidgetWorkSurface = function(){
 
     var WIDGET_WS_REF = 'widget-work-surface';
 
+    var containerRef = widgetContainerMaker.getContainerRef();
+
     that.getWorkSurfaceRef = function(){
         return WIDGET_WS_REF;
     };
@@ -38,7 +40,7 @@ var WidgetWorkSurface = function(){
             zoom: 1,
         };
         workSurface.data('state', state);
-        workSurface.find('.component-container').remove();
+        workSurface.find('.'+containerRef).remove();
     };
 
     that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, dragHandle,
@@ -278,7 +280,7 @@ var WidgetWorkSurface = function(){
     };
 
     var findWidgetsToShift = function(movingId, otherId){// TODO better naming?
-        var container = $('#component-container_'+otherId);
+        var container = $('#'+containerRef+'_'+otherId);
 
         var top = container.offset().top;
         var left = container.offset().left;
@@ -289,7 +291,7 @@ var WidgetWorkSurface = function(){
             [top, bottom].forEach(function (y) {
                 var allElements = allElementsFromPoint(x, y);
                 var overlappingWidgets = [];
-                $(allElements).filter('.component-container').each(function (idx, elt) {
+                $(allElements).filter('.'+containerRef).each(function (idx, elt) {
                     var containerId = $(elt).attr('id');
                     if (containerId != 'dragging-container') {
                         var id = getWidgetIdFromContainerId($(elt).attr('id'));

@@ -521,7 +521,9 @@ function registerTooltipBtnHandlers() {
 function findContainingContainer(context) {
     var parent = $(context).parent();
 
-    while (!(parent.hasClass('component-container'))) {
+    var containerRef = widgetContainerMaker.getContainerRef();
+
+    while (!(parent.hasClass(containerRef))) {
         parent = $(parent).parent();
         if (parent.length == 0){ // TODO this is a check to see if anything went awry
             console.log('something went wrong');
