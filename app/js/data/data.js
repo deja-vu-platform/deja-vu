@@ -2,17 +2,14 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-var zoomElement = WidgetZoomElement();
-var miniNav = WidgetMiniNav();
-var view = WidgetDisplay();
-var workSurface = WidgetWorkSurface();
-var dragAndDrop = WidgetDragAndDropController();
-//var grid = Grid();
-var widgetEditsManager = WidgetEditsManager();
-//var style = Style($('.palette-container'));
+var dataZoomElement = DataZoomElement();
+var dataMiniNav = DataMiniNav();
+var dataView = DataDisplay();
+var dataWorkSurface = DataWorkSurface();
+var dataDragAndDrop = DataDragAndDropController();
+var dataEditsManager = DataEditsManager();
 
 var projectsSavePath = path.join(__dirname, 'projects');
-var addedCliches;
 
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
@@ -20,6 +17,7 @@ var selectedScreenSizeWidth = 2000;
 var files = [];
 
 var selectedUserWidget = null;
+var selectedComponent = null;
 var selectedProject = null;
 
 var currentZoom = 1.0;
@@ -45,8 +43,7 @@ $(function(){
         width: selectedScreenSizeWidth*currentZoom + 'px',
     });
 
-    miniNav.miniNavInitialize();
-
+    dataMiniNav.miniNavInitialize();
 
     // get selected project
     selectedProject = window.sessionStorage.getItem('selectedProject');
@@ -58,57 +55,48 @@ $(function(){
 
     $('.project-name .header').text(selectedProject.meta.name);
 
-    addedCliches = selectedProject.addedCliches;
-    for (var id in addedCliches) {
-        showClicheInList(id, addedCliches[id].name);
-    }
-
     if (selectedProject.getNumComponents() == 0){
         // start a default component
-        selectedUserWidget = initUserWidget(true, true);
-        selectedProject.addMainPage(selectedUserWidget);
+        selectedComponent = initUserComponent();
+        selectedProject.addComponent(selectedComponent);
+        selectedProject.makeMainComponent(selectedComponent);
+
+        selectedUserWidget = selectedComponent.widgets[Object.keys(selectedComponent.widgets)[0]];
         displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
     } else {
-        var widgetToLoadId;
-        if (!$.isEmptyObject(selectedProject.mainComponent)){
-            widgetToLoadId = Object.keys(selectedProject.mainComponent)[0];
-        } else {
-            widgetToLoadId = Object.keys(selectedProject.components)[0];
-        }
-        selectedUserWidget = selectedProject.components[widgetToLoadId];
-        if (widgetToLoadId in selectedProject.mainComponent){
-            displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
-        } else {
-            displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
-        }
+        var selectedComponentId = selectedProject.mainComponent;
+        selectedComponent = selectedProject.components[selectedComponentId];
+        //var datatypeToLoadId;
+        //if (!$.isEmptyObject(selectedComponent.mainPages)){
+        //    datatypeToLoadId = Object.keys(selectedComponent.mainPages)[0];
+        //} else {
+        //    datatypeToLoadId = Object.keys(selectedComponent.widgets)[0];
+        //}
+        //selectedUserWidget = selectedComponent.widgets[datatypeToLoadId];
+        //if (datatypeToLoadId in selectedComponent.mainPages){
+        //    displayMainPageInListAndSelect(selectedUserWidget.meta.name, datatypeToLoadId);
+        //} else {
+        //    displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, datatypeToLoadId);
+        //}
         // TODO this will need to be changed once we bring in a userComponent which will be a
         // superset of userWidgets
 
-        for (var componentId in selectedProject.components){
-            if (componentId != widgetToLoadId){
-                var componentName = selectedProject.components[componentId].meta.name;
-                if (componentId in selectedProject.mainComponent){
-                    displayNewWidgetInMainPagesList(componentName, componentId)
-                } else {
-                    displayNewWidgetInUserWidgetList(componentName, componentId);
-                }
-
-            }
+        for (var datatypeId in selectedComponent.datatypes){
+            var componentName = selectedComponent.datatypes[datatypeId].meta.name;
+            displayNewDatatypeInUserDatatypeList(componentName, datatypeId);
         }
 
     }
-    workSurface.loadUserWidget(selectedUserWidget, currentZoom);
+    dataWorkSurface.loadDatatype(selectedComponent, currentZoom);
 
     //autoSave5Mins();
 
     basicWidgets = $('#basic-components').html();
 
-    dragAndDrop.registerWidgetDragHandleDraggable();
+    dataDragAndDrop.registerWidgetDragHandleDraggable();
 
 
     // registerUserWidgetAreaDroppable();
-
-    //style.setUpStyleColors(selectedUserWidget);
 
     resizeViewportToFitWindow();
 

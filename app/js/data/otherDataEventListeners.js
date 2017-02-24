@@ -69,7 +69,7 @@ function resizeViewportToFitWindow(){
         width: (newWidth-250-17) + 'px',
     });
 
-    miniNav.updateMiniNavPositionSize($('#outer-container').width(),  $('#outer-container').height());
+    dataMiniNav.updateMiniNavPositionSize($('#outer-container').width(),  $('#outer-container').height());
 }
 
 window.addEventListener("resize", function(){
@@ -102,8 +102,7 @@ function addAddToMainPagesButton(userWidget){
             '<span class="glyphicon glyphicon-remove"></span>' +
             '<span> Remove from Main Pages</span>' +
             '</button>';
-    }
-    else{
+    } else {
         var span = document.createElement('span');
         span.innerHTML = '<button type="button" class="btn btn-default ">' +
             '<span class="glyphicon glyphicon-plus"></span>' +
@@ -156,12 +155,12 @@ function addAddToMainPagesButton(userWidget){
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(newRatio, userWidget){
-    view.displayWidget(false, userWidget, $('#work-surface_'+userWidget.meta.id), {}, newRatio);
-    miniNav.updateNavInnerWidgetSizes(newRatio);
+    dataView.displayWidget(false, userWidget, $('#work-surface_'+userWidget.meta.id), {}, newRatio);
+    dataMiniNav.updateNavInnerWidgetSizes(newRatio);
     grid.setUpGrid();
 }
 
-function addDeleteUserWidgetButton(userWidgetId){
+function addDeleteUserDatatypeButton(userWidgetId){
     var spDelete = document.createElement('span');
     spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-component">' +
         '<span class="glyphicon glyphicon-trash"></span>' +
@@ -221,7 +220,7 @@ function deleteUserWidget(userWidgetId){
         selectedUserWidget = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        workSurface.loadUserWidget(selectedUserWidget, currentZoom);
+        dataWorkSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
     if (userWidgetId == selectedProject.mainComponent.indexId){
         selectedProject.mainComponent.indexId = null;

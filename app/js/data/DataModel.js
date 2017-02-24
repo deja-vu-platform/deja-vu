@@ -2,7 +2,7 @@
  * Created by Shinjini on 9/26/2016.
  */
 /** ** ** ** Constants ** ** ** **/
-const DEFAULT_COMPONENT_NAME = "New Datatype";
+const DEFAULT_DATATYPE_NAME = "New Datatype";
 /** ** ** ** ** ** ** ** ** ** **/
 
 // TODO eventually freeze the object and only allow updates using the objects!

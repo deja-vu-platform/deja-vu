@@ -5,6 +5,7 @@
 var zoomElement = WidgetZoomElement();
 var miniNav = WidgetMiniNav();
 var view = WidgetDisplay();
+var widgetContainerMaker = WidgetContainer();
 var workSurface = WidgetWorkSurface();
 var dragAndDrop = WidgetDragAndDropController();
 var grid = WidgetGrid();
@@ -94,11 +95,11 @@ $(function(){
 
         for (var widgetId in selectedComponent.widgets){
             if (widgetId != widgetToLoadId){
-                var componentName = selectedComponent.widgets[widgetId].meta.name;
+                var widgetName = selectedComponent.widgets[widgetId].meta.name;
                 if (widgetId in selectedComponent.mainPages){
-                    displayNewWidgetInMainPagesList(componentName, widgetId)
+                    displayNewWidgetInMainPagesList(widgetName, widgetId)
                 } else {
-                    displayNewWidgetInUserWidgetList(componentName, widgetId);
+                    displayNewWidgetInUserWidgetList(widgetName, widgetId);
                 }
 
             }

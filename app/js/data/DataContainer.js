@@ -5,6 +5,8 @@
 var DataContainer = function(){
     var that = Object.create(DataContainer.prototype);
 
+    var DATA_CONT_ID = 'datatype-container';
+
 
     var makeContainerResizable = function(widget, outerWidget, container, outermostWidget){
         var widgetId = widget.meta.id;
@@ -53,7 +55,7 @@ var DataContainer = function(){
 
                 // widget.properties.dimensions = newDimensions;
 
-                widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'dimensions', newDimensions);
+                dataEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'dimensions', newDimensions);
                 // TODO woah! It resizes as you go!
                 refreshContainerDisplay(false, container, currentZoom);
             },
@@ -61,12 +63,12 @@ var DataContainer = function(){
                 var newPosition = {left:  ui.position.left/currentZoom, top: ui.position.top/currentZoom};
                 var newLayout = {};
                 newLayout[widget.meta.id] = newPosition;
-                widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'layout', newLayout, true);
+                dataEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'layout', newLayout, true);
 
                 // outerWidget.properties.layout[widget.meta.id].left = ui.position.left/currentZoom;
                 // outerWidget.properties.layout[widget.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
-                miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
+                dataMiniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
                 grid.setUpGrid();
                 $('.grid').css({
                     visibility: 'hidden'

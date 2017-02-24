@@ -4,14 +4,15 @@
 
 var dataContainerMaker = DataContainer();
 
-var WorkSurface = function(){
-    var that = Object.create(WorkSurface.prototype);
+var DataWorkSurface = function(){
+    var that = Object.create(DataWorkSurface.prototype);
 
+    var DATA_WS_ID = 'data-work-surface';
 
     var createWorkSurface = function(outerWidgetId, height, width){
         var workSurface = $('<div></div>');
-        workSurface.addClass('work-surface');
-        workSurface.attr('id', 'work-surface_'+outerWidgetId);
+        workSurface.addClass(DATA_WS_ID);
+        workSurface.attr('id', DATA_WS_ID+'_'+outerWidgetId);
 
         workSurface.height(height).width(width);
         return workSurface;
@@ -19,7 +20,7 @@ var WorkSurface = function(){
 
     var createOrResetWorkSurface = function(outerWidget, zoom){
         var widgetId = outerWidget.meta.id;
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+DATA_WS_ID+'_'+widgetId);
         if (workSurface.length===0){
             workSurface = that.setUpEmptyWorkSurface(outerWidget, zoom);
         } else {
@@ -43,7 +44,7 @@ var WorkSurface = function(){
      * @param userWidget
      * @param zoom
      */
-    var loadUserWidgetIntoWorkSurface = function(userWidget, zoom){
+    var loadDatatypeIntoWorkSurface = function(userWidget, zoom){
         var workSurface = createOrResetWorkSurface(userWidget, zoom);
 
         var diff = userWidget.properties.layout.stackOrder.length - Object.keys(userWidget.innerWidgets).length;
@@ -54,7 +55,7 @@ var WorkSurface = function(){
             console.log(userWidget);
         }
 
-        userWidget = widgetEditsManager.refreshFromProject(userWidget);
+        userWidget = dataEditsManager.refreshFromProject(userWidget);
 
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
@@ -70,19 +71,19 @@ var WorkSurface = function(){
             var widgetId = widget.meta.id;
 
             if (dragHandle.associated){
-                var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+                var parent = dataEditsManager.getInnerWidget(outermostWidget, widgetId, true);
             }
-            var firstInnerWidgetId = widgetEditsManager.getPath(outermostWidget, widgetId)[1]; // this should always exist
+            var firstInnerWidgetId = dataEditsManager.getPath(outermostWidget, widgetId)[1]; // this should always exist
             if (!firstInnerWidgetId){
                 console.log('something went wrong in onDropFinished');
             }
 
-            var firstInnerWidget = widgetEditsManager.getInnerWidget(outermostWidget, firstInnerWidgetId);
+            var firstInnerWidget = dataEditsManager.getInnerWidget(outermostWidget, firstInnerWidgetId);
 
              dataContainerMaker.createBasicWidgetContainer(firstInnerWidget, currentZoom);
         };
 
-        var dropSettings = dragAndDrop.widgetToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
+        var dropSettings = dataDragAndDrop.widgetToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
 
         workSurface.droppable(dropSettings);
     };
@@ -116,22 +117,30 @@ var WorkSurface = function(){
      * @param userWidget
      * @param zoom
      */
-    that.loadUserWidget = function(userWidget){
-        var widgetId = userWidget.meta.id;
-        var workSurface = $('#work-surface'+'_'+widgetId);
-        zoomElement.registerZoom(userWidget);
-
-        if (workSurface.length===0){
-            currentZoom = 1;
-            loadUserWidgetIntoWorkSurface(userWidget, currentZoom);
+    that.loadDatatype = function(object){
+        if (object.objectType == "UserComponent"){
+            // load all the stuff
         } else {
-            disableAllWidgetDomElementsExcept(widgetId);
-            setWidgetOptions(userWidget);
-            zoomElement.updateZoomFromState(userWidget);
-            // TODO other way? for now, reload the thinger
-            loadUserWidgetIntoWorkSurface(userWidget, currentZoom);
+            var datatype = object;
+
+
+            var datatypeId = datatype.meta.id;
+            var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
+            dataZoomElement.registerZoom(datatype);
+
+            if (workSurface.length===0){
+                currentZoom = 1;
+                loadDatatypeIntoWorkSurface(datatype, currentZoom);
+            } else {
+                disableAllWidgetDomElementsExcept(datatypeId);
+                setWidgetOptions(datatype);
+                dataZoomElement.updateZoomFromState(datatype);
+                // TODO other way? for now, reload the thinger
+                loadDatatypeIntoWorkSurface(datatype, currentZoom);
+            }
         }
-        miniNav.setUpMiniNavElementAndInnerWidgetSizes(userWidget);
+
+        dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(datatype);
         //grid.setUpGrid();
     };
 
@@ -152,9 +161,8 @@ var WorkSurface = function(){
 
         resetWorkSurface(workSurface);
 
-        makeWorkSurfaceResizable(workSurface, userWidget); // TODO experimentation
         makeWorkSurfaceDroppableToWidgets(workSurface, userWidget);
-        zoomElement.updateZoomFromState(userWidget);
+        dataZoomElement.updateZoomFromState(userWidget);
 
         setWidgetOptions(selectedProject.components[widgetId]);
 
@@ -168,7 +176,7 @@ var WorkSurface = function(){
      * @param widgetId
      */
     var disableWidgetDOMElements = function(widgetId){
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+DATA_WS_ID+'_'+widgetId);
         $(workSurface).addClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -192,7 +200,7 @@ var WorkSurface = function(){
 
 
     var enableWidgetDOMElements = function(widgetId){
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+DATA_WS_ID+'_'+widgetId);
         $(workSurface).removeClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -220,43 +228,12 @@ var WorkSurface = function(){
                 enableWidgetDOMElements(widgetId);
                 continue;
             }
-            if ($('#work-surface'+'_'+widgetId).hasClass('hidden-component')){
+            if ($('#'+DATA_WS_ID+'_'+widgetId).hasClass('hidden-component')){
                 continue;
             }
             disableWidgetDOMElements(widgetId);
         }
     };
-
-    // var enableSpecificComponentDomElements = function(componentToEnableId){
-    //     // first check that the table has been made (otherwise the reset will happen automatically,
-    //     // but more importantly, the table-grid-container won't exist yet
-    //     var workSurfaceToEnable = $('#work-surface'+'_'+componentToEnableId);
-    //     if (!(workSurfaceToEnable.length>0)) {
-    //         createOrResetTableGridContainer(componentToEnableId);
-    //         var state = {
-    //             zoom: 1,
-    //             lock:{
-    //                 width: false,
-    //                 height: false
-    //             }
-    //         };
-    //         $('#work-surface'+'_'+componentToEnableId).data('state', state);
-    //     }
-    //
-    //     var componentToEnable = selectedProject.components[componentToEnableId];
-    //
-    //     // enable first (toggle needs the id's and classes to be enabled)
-    //     if (workSurfaceToEnable.hasClass('hidden-component')){
-    //         enableWidgetDOMElements(componentToEnableId);
-    //     }
-    //
-    //     zoomElt.updateZoomFromState(componentToEnable);
-    //
-    //     setWidgetOptions(componentToEnable);
-    //
-    // }
-
-
 
     Object.freeze(that);
     return that

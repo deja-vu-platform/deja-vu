@@ -11,7 +11,7 @@ $('#new-user-component-btn').click(function(){
             selectedUserWidget = initUserWidget(false, false);
             selectedProject.addComponent(selectedUserWidget);
             displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            dataWorkSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
 
             resetMenuOptions();
@@ -25,7 +25,7 @@ $('#new-main-component-btn').click(function(){
             selectedProject.addMainPage(selectedUserWidget);
             displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
 
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            dataWorkSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
     });
@@ -48,7 +48,7 @@ $('.components').on('click', '.component-name-container', function () {
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
     selectedUserWidget = selectedProject.components[widgetId];
-    workSurface.loadUserWidget(selectedUserWidget);
+    dataWorkSurface.loadUserWidget(selectedUserWidget);
     style.setUpStyleColors(selectedUserWidget);
     $('#outer-container').scrollTop(0); // TODO DRY
     $('#outer-container').scrollLeft(0);
@@ -143,7 +143,7 @@ function setWidgetOptions(outerWidget){
 
             selectedProject.addComponent(copyWidget);
             selectedUserWidget = copyWidget;
-            workSurface.loadUserWidget(copyWidget, 1);
+            dataWorkSurface.loadUserWidget(copyWidget, 1);
 
         });
 
@@ -223,10 +223,10 @@ function displayUserWidgetInListAndSelect(name, id){
  * Adds a component to the list of user components
  * @param newComponent
  */
-function displayNewWidgetInUserWidgetList(name, id){
+function displayNewDatatypeInUserDatatypeList(name, id){
     // TODO changes in style
-    var newWidgetElt = $(
-        '<li data-type="'+'user'+'" class="widget draggable" data-componentid=' + id + '>'
+    var newDatatypeElt = $(
+        '<li data-type="'+'user'+'" class="datatype draggable" data-componentid=' + id + '>'
         + '<div class="component-name-container">'
         + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
@@ -234,10 +234,10 @@ function displayNewWidgetInUserWidgetList(name, id){
         + '</span>'
         + '</div>'
         + '</li>');
-    $('#user-components-list').append(newWidgetElt);
-    addDeleteUserWidgetButton(id);
+    $('#user-components-list').append(newDatatypeElt);
+    addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
-    dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
+    dataDragAndDrop.registerWidgetDragHandleDraggable(newDatatypeElt);
 }
 
 
@@ -286,7 +286,7 @@ function updateBaseWidgetContentsAndDisplayAt(containerId) {
 
     var done = function(value){
         var newValue = {type: type, value: value};
-        widgetEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'value', newValue);
+        dataEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'value', newValue);
 
         // selectedUserWidget.innerWidgets[widgetId].innerWidgets = {};
         // selectedUserWidget.innerWidgets[widgetId].innerWidgets[type] = value;
@@ -699,12 +699,12 @@ function refreshContainerDisplay(fresh, container, zoom){
     var widgetId = container.data('componentId');
 
 
-    if (widgetEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
-        var widgetToChange = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
+    if (dataEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
+        var widgetToChange = dataEditsManager.getInnerWidget(selectedUserWidget, widgetId);
 
-        var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
+        var overallStyles = dataEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
         // var overallStyles = selectedUserWidget.properties.styles.custom;
-        view.displayWidget(fresh, widgetToChange, container, overallStyles, zoom);
+        dataView.displayWidget(fresh, widgetToChange, container, overallStyles, zoom);
 
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
@@ -914,13 +914,13 @@ function downloadHTML(){
  */
 function deleteWidgetFromUserWidgetAndFromView(widgetId) {
     var containerId = "component-container_"+widgetId;
-    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+    var parent = dataEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
     parent.deleteInnerWidget(widgetId);
     // selectedUserWidget.deleteInnerWidget(widgetId);
     $('#'+containerId).remove();
     grid.setUpGrid();
-    miniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
-    zoomElement.registerZoom(selectedUserWidget);
+    dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
+    dataZoomElement.registerZoom(selectedUserWidget);
 }
 
 

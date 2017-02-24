@@ -2,16 +2,22 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-var widgetContainerMaker = WidgetContainer();
+
 
 var WidgetWorkSurface = function(){
     var that = Object.create(WidgetWorkSurface.prototype);
 
+    var WIDGET_WS_REF = 'work-surface';
+
+    that.getWorkSurfaceRef = function(){
+        return WIDGET_WS_REF;
+    };
+
 
     var createWorkSurface = function(outerWidgetId, height, width){
         var workSurface = $('<div></div>');
-        workSurface.addClass('work-surface');
-        workSurface.attr('id', 'work-surface_'+outerWidgetId);
+        workSurface.addClass(WIDGET_WS_REF);
+        workSurface.attr('id', WIDGET_WS_REF+'_'+outerWidgetId);
 
         workSurface.height(height).width(width);
         return workSurface;
@@ -19,7 +25,7 @@ var WidgetWorkSurface = function(){
 
     var createOrResetWorkSurface = function(outerWidget, zoom){
         var widgetId = outerWidget.meta.id;
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         if (workSurface.length===0){
             workSurface = that.setUpEmptyWorkSurface(outerWidget, zoom);
         } else {
@@ -368,7 +374,7 @@ var WidgetWorkSurface = function(){
      */
     that.loadUserWidget = function(userWidget){
         var widgetId = userWidget.meta.id;
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         zoomElement.registerZoom(userWidget);
 
         if (workSurface.length===0){
@@ -418,7 +424,7 @@ var WidgetWorkSurface = function(){
      * @param widgetId
      */
     var disableWidgetDOMElements = function(widgetId){
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         $(workSurface).addClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -442,7 +448,7 @@ var WidgetWorkSurface = function(){
 
 
     var enableWidgetDOMElements = function(widgetId){
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         $(workSurface).removeClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -470,7 +476,7 @@ var WidgetWorkSurface = function(){
                 enableWidgetDOMElements(widgetId);
                 continue;
             }
-            if ($('#work-surface'+'_'+widgetId).hasClass('hidden-component')){
+            if ($('#'+WIDGET_WS_REF+'_'+widgetId).hasClass('hidden-component')){
                 continue;
             }
             disableWidgetDOMElements(widgetId);

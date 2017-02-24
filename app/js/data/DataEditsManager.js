@@ -3,8 +3,8 @@
  */
 
 
-var WidgetEditsManager = function(){
-    var that = Object.create(WidgetEditsManager.prototype);
+var DataEditsManager = function(){
+    var that = Object.create(DataEditsManager.prototype);
 
 
     that.getPath = function(outermostWidget, widgetId){
@@ -154,7 +154,7 @@ var WidgetEditsManager = function(){
 
     that.getInnerWidget = function(outermostWidget, targetId, forParent){
         if (forParent){
-            var path = widgetEditsManager.getPath(outermostWidget, targetId);
+            var path = dataEditsManager.getPath(outermostWidget, targetId);
             targetId = path[path.length-2];
         }
         var wantedWidget;

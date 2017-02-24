@@ -2,8 +2,8 @@
  * Created by Shinjini on 1/7/2017.
  */
 
-var DragAndDropController = function () {
-    var that = Object.create(DragAndDropController.prototype);
+var DataDragAndDropController = function () {
+    var that = Object.create(DataDragAndDropController.prototype);
 
     var draggingWidget = null;
 
@@ -47,9 +47,9 @@ var DragAndDropController = function () {
                     dragHandle.newWidget = true;
                     outerWidget.addComponent(widget);
                     dragHandle.addClass('associated').data('componentid', widgetId);
-                    zoomElement.registerZoom(outerWidget);
+                    dataZoomElement.registerZoom(outerWidget);
                 } else {
-                    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+                    var parent = dataEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
                     var parentId = parent.meta.id;
                     if (parentId != selectedUserWidget.meta.id){ // it is not the outermost widget
                         var workSurfaceOffset = $('#work-surface_'+selectedUserWidget.meta.id).offset();
@@ -66,10 +66,10 @@ var DragAndDropController = function () {
                 var newLayout = {};
                 newLayout[widgetId] = newPosition;
                 // after it has been added
-                widgetEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'layout', newLayout, true);
+                dataEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'layout', newLayout, true);
                 // outerWidget.properties.layout[widgetId] = newLayout;
 
-                miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
+                dataMiniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
 
                 dropFinished(dragHandle, widget);
             }
@@ -97,7 +97,7 @@ var DragAndDropController = function () {
                 var widgetContainer;
                 if (dragHandle.hasClass('associated')) {
                     var widgetId = dragHandle.data('componentid');
-                    draggingWidget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId)
+                    draggingWidget = dataEditsManager.getInnerWidget(selectedUserWidget, widgetId)
                     //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
                     var oldContainerId = 'component-container_' + widgetId;
@@ -122,10 +122,10 @@ var DragAndDropController = function () {
                         dragHandle.text(widget.meta.name);
                         dragHandle.css('display', 'block');
                     } else {
-                        widget = BaseWidget(type, {}, view.getDimensions(type));
+                        widget = BaseWidget(type, {}, dataView.getDimensions(type));
                     }
                     draggingWidget = widget;
-                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, false,
+                    widgetContainer = dataWorkSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, false,
                         dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom, false);
 
                     $('#basic-components').html(basicWidgets);
