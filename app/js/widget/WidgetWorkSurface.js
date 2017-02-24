@@ -2,12 +2,10 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-
-
 var WidgetWorkSurface = function(){
     var that = Object.create(WidgetWorkSurface.prototype);
 
-    var WIDGET_WS_REF = 'work-surface';
+    var WIDGET_WS_REF = 'widget-work-surface';
 
     that.getWorkSurfaceRef = function(){
         return WIDGET_WS_REF;

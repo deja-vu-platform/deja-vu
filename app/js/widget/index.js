@@ -2,11 +2,11 @@
  * Created by Shinjini on 9/26/2016.
  */
 
+var widgetContainerMaker = WidgetContainer();
+var workSurface = WidgetWorkSurface();
 var zoomElement = WidgetZoomElement();
 var miniNav = WidgetMiniNav();
 var view = WidgetDisplay();
-var widgetContainerMaker = WidgetContainer();
-var workSurface = WidgetWorkSurface();
 var dragAndDrop = WidgetDragAndDropController();
 var grid = WidgetGrid();
 var widgetEditsManager = WidgetEditsManager();

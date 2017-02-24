@@ -4,6 +4,8 @@
 var WidgetZoomElement = function(){
     var that = Object.create(WidgetZoomElement.prototype);
 
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
     var getSliderValFromZoom = function(zoom){
         var max = parseFloat($('#zoom-slider').get(0).max);
         var min = parseFloat($('#zoom-slider').get(0).min);
@@ -59,7 +61,7 @@ var WidgetZoomElement = function(){
         changeZoomDisplays(outerWidget, currentZoom);
 
         // update the state
-        var workSurface = $('#work-surface'+'_'+outerWidget.meta.id);
+        var workSurface = $('#'+workSurfaceRef+'_'+outerWidget.meta.id);
         var state = workSurface.data('state');
         if (!state){
             state = {zoom: 1}
@@ -91,7 +93,7 @@ var WidgetZoomElement = function(){
             height: selectedScreenSizeHeight*currentZoom*miniNav.getNavZoom() + 'px',
             width: selectedScreenSizeWidth*currentZoom*miniNav.getNavZoom() + 'px',
         });
-        $('.work-surface').css({
+        $('.'+workSurfaceRef).css({
             width: outerWidget.properties.dimensions.width*zoom + 'px',
             height: outerWidget.properties.dimensions.height*zoom + 'px',
         });
@@ -101,7 +103,7 @@ var WidgetZoomElement = function(){
 
     that.updateZoomFromState = function(widget){
         var widgetId = widget.meta.id;
-        currentZoom = $('#work-surface'+'_'+widgetId).data('state').zoom;
+        currentZoom = $('#'+workSurfaceRef+'_'+widgetId).data('state').zoom;
         // it's updating from state, so that means new initializations are in order
         changeZoomDisplays(widget, currentZoom);
     };
