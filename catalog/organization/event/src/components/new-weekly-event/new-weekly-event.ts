@@ -32,11 +32,6 @@ export class NewWeeklyEventComponent {
     this.start_time = startTimeText["value"];
     this.end_time = endTimeText["value"];
 
-    startsOnText["value"] = "";
-    endsOnText["value"] = "";
-    startTimeText["value"] = "";
-    endTimeText["value"] = "";
-
     this._graphQlService
       .post(`
         newWeeklyPublicEvent(
@@ -47,6 +42,17 @@ export class NewWeeklyEventComponent {
       `)
       .subscribe(atom_id => {
         this.weeklyEvent.atom_id = atom_id;
+
+        // Clear out the fields on success
+        startsOnText["value"] = "";
+        endsOnText["value"] = "";
+        startTimeText["value"] = "";
+        endTimeText["value"] = "";
+
+        this.starts_on = "";
+        this.ends_on = "";
+        this.start_time = "";
+        this.end_time = "";
       });
   }
 
@@ -69,7 +75,9 @@ export class NewWeeklyEventComponent {
 
   /**
    * Fix an inconsistency with the current time appearing in time boxes when
-   * they are clicked.
+   * they are clicked. The inconsistency is that when a user clicks the time
+   * control for the first time, the current (rounded) time appears.
+   * Subsequently, after the time is cleared, this doesn't happen anymore.
    */
   timeClickHandler(event: Event) {
     const MINUTE_ROUNDING_FACTOR = 15;
