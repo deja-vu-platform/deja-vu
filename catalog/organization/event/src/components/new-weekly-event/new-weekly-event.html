@@ -30,7 +30,7 @@
     <label class="sr-only" for="start-time">Start Time</label>
     <div id="start-time" class="input-group bootstrap-timepicker timepicker">
       <input id="start-time-text" class="form-control" type="text"
-       data-provide="timepicker"/>
+       data-provide="timepicker" (click)="timeClickHandler($event)"/>
       <div class="input-group-addon">
         <span class="glyphicon glyphicon-time"></span>
       </div>
@@ -40,7 +40,7 @@
     <label class="sr-only" for="start-time">End Time</label>
     <div id="end-time" class="input-group bootstrap-timepicker timepicker">
       <input id="end-time-text" type="text" class="form-control"
-       data-provide="timepicker"/>
+       data-provide="timepicker" (click)="timeClickHandler($event)"/>
       <div class="input-group-addon">
         <span class="glyphicon glyphicon-time"></span>
       </div>
