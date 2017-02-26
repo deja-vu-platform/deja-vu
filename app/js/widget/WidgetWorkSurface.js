@@ -2,6 +2,8 @@
  * Created by Shinjini on 9/26/2016.
  */
 
+var widgetContainerMaker = WidgetContainer();
+
 var WidgetWorkSurface = function(){
     var that = Object.create(WidgetWorkSurface.prototype);
 

@@ -170,11 +170,12 @@ function displayProjectPreview(project){
     $('#preview-prev-page').unbind();
     $('#preview-next-page').unbind();
 
-
-    if (!$.isEmptyObject(project.mainComponent)){
-        var componentToShowId = Object.keys(project.mainComponent)[0];
-        var numMainPages = Object.keys(project.mainComponent).length;
-        if (numMainPages>1){
+    var mainComponent = project.components[project.mainComponent];
+    var hasMainPages = (!$.isEmptyObject(mainComponent)) && (!$.isEmptyObject(mainComponent.mainPages));
+    if (hasMainPages){
+        var componentToShowId = Object.keys(mainComponent.mainPages)[0];
+        var numMainPages = Object.keys(mainComponent.mainPages).length;
+        if (numMainPages > 1) {
             $('#page-preview').css('width', '790px');
             $('#preview-prev-page').css('display', 'inline-block');
             $('#preview-next-page').css('display', 'inline-block');
@@ -184,21 +185,20 @@ function displayProjectPreview(project){
             $('#preview-next-page').css('display', 'none');
         }
 
-        componentToShow = project.components[componentToShowId];
+        componentToShow = mainComponent.widgets[componentToShowId];
         loadTablePreview(componentToShow);
 
         $('#page-preview').data('pagenum', 0);
 
-        $('#preview-prev-page').click(function(){
+        $('#preview-prev-page').click(function () {
             var pageNum = $('#page-preview').data('pagenum');
             showPrevMainPage(project, pageNum);
         });
 
-        $('#preview-next-page').click(function(){
+        $('#preview-next-page').click(function () {
             var pageNum = $('#page-preview').data('pagenum');
             showNextMainPage(project, pageNum);
         });
-
 
     } else {
         $('#preview-prev-page').css('display', 'none');
