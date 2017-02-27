@@ -1,5 +1,7 @@
-var Display = function(){
-    var that = Object.create(Display.prototype);
+var WidgetDisplay = function(){
+    var that = Object.create(WidgetDisplay.prototype);
+
+    var containerRef = widgetContainerMaker.getContainerRef();
 
     var defaultDisplayClasses = {
         'label': "display-component",
@@ -143,7 +145,7 @@ var Display = function(){
 
             widget.properties.layout.stackOrder.forEach(function(innerWidgetId){
                 var innerWidget = widget.innerWidgets[innerWidgetId];
-                var innerContainer = container.find('#component-container_'+innerWidgetId);
+                var innerContainer = container.find('#'+containerRef+'_'+innerWidgetId);
                 var top = widget.properties.layout[innerWidgetId].top * zoom;
                 var left = widget.properties.layout[innerWidgetId].left * zoom;
 

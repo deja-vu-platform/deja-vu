@@ -3,8 +3,8 @@
  */
 
 
-var WidgetEditsManager = function(){
-    var that = Object.create(WidgetEditsManager.prototype);
+var DataEditsManager = function(){
+    var that = Object.create(DataEditsManager.prototype);
 
 
     that.getPath = function(outermostWidget, widgetId){
@@ -154,7 +154,7 @@ var WidgetEditsManager = function(){
 
     that.getInnerWidget = function(outermostWidget, targetId, forParent){
         if (forParent){
-            var path = widgetEditsManager.getPath(outermostWidget, targetId);
+            var path = dataEditsManager.getPath(outermostWidget, targetId);
             targetId = path[path.length-2];
         }
         var wantedWidget;
@@ -206,7 +206,7 @@ var WidgetEditsManager = function(){
                 if (!templateId){ // it is an outermost widget!
                     templateId = widget.meta.id;
                 }
-                var projectCopy =  UserWidget.fromString(
+                var projectCopy =  UserDatatype.fromString(
                     JSON.stringify(selectedProject.components[templateId])
                 );
 
@@ -356,7 +356,7 @@ var WidgetEditsManager = function(){
      * @param outerWidget
      */
     var recursiveWidgetMaking = function(outerWidget){
-        var oldCopy = UserWidget.fromString(JSON.stringify(outerWidget));
+        var oldCopy = UserDatatype.fromString(JSON.stringify(outerWidget));
 
         // NOTE: the returned widget does not have its IDs correct, the ids are currently the same
         // the template code it reads.
@@ -375,7 +375,7 @@ var WidgetEditsManager = function(){
                         // the same as the project we are copying from since the project stores
                         // the information using the ids.
                         // We will be changing the ids altogether later on.
-                        innerWidget =  UserWidget.fromString(
+                        innerWidget =  UserDatatype.fromString(
                             JSON.stringify(selectedProject.components[templateId])
                         );
 

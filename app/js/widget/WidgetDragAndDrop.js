@@ -2,10 +2,14 @@
  * Created by Shinjini on 1/7/2017.
  */
 
-var DragAndDropController = function () {
-    var that = Object.create(DragAndDropController.prototype);
+var WidgetDragAndDropController = function () {
+    var that = Object.create(WidgetDragAndDropController.prototype);
 
     var draggingWidget = null;
+
+    var containerRef = widgetContainerMaker.getContainerRef();
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
 
     that.getDraggingWidget = function () {
         return draggingWidget;
@@ -46,15 +50,14 @@ var DragAndDropController = function () {
                     $(ui.helper).data('newcomponent', true);
                     dragHandle.newWidget = true;
                     outerWidget.addInnerWidget(widget);
-                    outerWidget.idMap[widget.meta.id] = widget.meta.templateId;
                     dragHandle.addClass('associated').data('componentid', widgetId);
                     zoomElement.registerZoom(outerWidget);
                 } else {
                     var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
                     var parentId = parent.meta.id;
                     if (parentId != selectedUserWidget.meta.id){ // it is not the outermost widget
-                        var workSurfaceOffset = $('#work-surface_'+selectedUserWidget.meta.id).offset();
-                        var widgetOffset = $('#component-container_'+parentId).offset();
+                        var workSurfaceOffset = $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).offset();
+                        var widgetOffset = $('#'+containerRef+'_'+parentId).offset();
                         difference.top = widgetOffset.top - workSurfaceOffset.top;
                         difference.left = widgetOffset.left - workSurfaceOffset.left;
                     }
@@ -101,7 +104,7 @@ var DragAndDropController = function () {
                     draggingWidget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId)
                     //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
-                    var oldContainerId = 'component-container_' + widgetId;
+                    var oldContainerId = containerRef+'_' + widgetId;
                     var widgetContainerOld = $('#' + oldContainerId);
                     widgetContainerOld.css({
                         opacity: .3,
@@ -116,7 +119,7 @@ var DragAndDropController = function () {
                     var widget;
                     if (type == 'user') {
                         var id = dragHandle.data('componentid');
-                        widget = UserWidget.fromString(JSON.stringify(selectedProject.components[id]));
+                        widget = UserWidget.fromString(JSON.stringify(selectedComponent.widgets[id]));
                         widget.meta.templateId = widget.meta.id;
                         widget = createUserWidgetCopy(widget);
                         dragHandle.data('componentid', widget.meta.id);
@@ -177,9 +180,9 @@ var DragAndDropController = function () {
                 var widgetId = draggingWidget.meta.id;
                 var isNewWidget = $(ui.helper).data('newcomponent');
                 if (!isNewWidget) {
-                    var widgetContainerOld = $('#component-container_' + widgetId + '_old');
+                    var widgetContainerOld = $('#'+containerRef+'_' + widgetId + '_old');
                     if (!$(ui.helper).data('dropped')) {// not properly dropped!
-                        widgetContainerOld.attr('id', 'component-container_' + widgetId);
+                        widgetContainerOld.attr('id', containerRef+'_' + widgetId);
                         widgetContainerOld.css({
                             opacity: 1,
                         });

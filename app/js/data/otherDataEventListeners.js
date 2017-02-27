@@ -69,7 +69,7 @@ function resizeViewportToFitWindow(){
         width: (newWidth-250-17) + 'px',
     });
 
-    miniNav.updateMiniNavPositionSize($('#outer-container').width(),  $('#outer-container').height());
+    dataMiniNav.updateMiniNavPositionSize($('#outer-container').width(),  $('#outer-container').height());
 }
 
 window.addEventListener("resize", function(){
@@ -90,20 +90,19 @@ function showClicheInList(id, name){
 
 
 
-style.setUpOverallInputs();
+//style.setUpOverallInputs();
 
 /** **/
 
 function addAddToMainPagesButton(userWidget){
-    var added = (userWidget.meta.id in selectedProject.mainComponents);
+    var added = (userWidget.meta.id in selectedProject.mainComponent);
     if (added){
         var span = document.createElement('span');
         span.innerHTML = '<button type="button" class="btn btn-default ">' +
             '<span class="glyphicon glyphicon-remove"></span>' +
             '<span> Remove from Main Pages</span>' +
             '</button>';
-    }
-    else{
+    } else {
         var span = document.createElement('span');
         span.innerHTML = '<button type="button" class="btn btn-default ">' +
             '<span class="glyphicon glyphicon-plus"></span>' +
@@ -127,7 +126,7 @@ function addAddToMainPagesButton(userWidget){
             // then remove
             $($(this).children().get(0)).removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $($(this).children().get(1)).text(' Add to Main Pages');
-            delete selectedProject.mainComponents[userWidgetId];
+            delete selectedProject.mainComponent[userWidgetId];
             $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
             displayUserWidgetInListAndSelect(name, userWidgetId);
             selectedUserWidget.inMainPages = false;
@@ -136,10 +135,10 @@ function addAddToMainPagesButton(userWidget){
             $($(this).children().get(0)).removeClass('glyphicon-plus').addClass('glyphicon-remove');
             $($(this).children().get(1)).text(' Remove from Main Pages');
 
-            if (!selectedProject.mainComponents){
-                selectedProject.mainComponents = {}; // for safety
+            if (!selectedProject.mainComponent){
+                selectedProject.mainComponent = {}; // for safety
             }
-            selectedProject.mainComponents[userWidgetId] = name;
+            selectedProject.mainComponent[userWidgetId] = name;
             $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
             displayMainPageInListAndSelect(name, userWidgetId);
             selectedUserWidget.inMainPages = true;
@@ -156,12 +155,12 @@ function addAddToMainPagesButton(userWidget){
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(newRatio, userWidget){
-    view.displayWidget(false, userWidget, $('#work-surface_'+userWidget.meta.id), {}, newRatio);
-    miniNav.updateNavInnerWidgetSizes(newRatio);
+    dataView.displayWidget(false, userWidget, $('#work-surface_'+userWidget.meta.id), {}, newRatio);
+    dataMiniNav.updateNavInnerWidgetSizes(newRatio);
     grid.setUpGrid();
 }
 
-function addDeleteUserWidgetButton(userWidgetId){
+function addDeleteUserDatatypeButton(userWidgetId){
     var spDelete = document.createElement('span');
     spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-component">' +
         '<span class="glyphicon glyphicon-trash"></span>' +
@@ -182,7 +181,7 @@ function addDeleteUserWidgetButton(userWidgetId){
     });
 
     var listElt;
-    if (userWidgetId in selectedProject.mainComponents){
+    if (userWidgetId in selectedProject.mainComponent){
         listElt = $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']");
     } else {
         listElt = $("#user-components-list").find("[data-componentid='" + userWidgetId + "']");
@@ -221,10 +220,10 @@ function deleteUserWidget(userWidgetId){
         selectedUserWidget = selectedProject.components[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        workSurface.loadUserWidget(selectedUserWidget, currentZoom);
+        dataWorkSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
-    if (userWidgetId == selectedProject.mainComponents.indexId){
-        selectedProject.mainComponents.indexId = null;
+    if (userWidgetId == selectedProject.mainComponent.indexId){
+        selectedProject.mainComponent.indexId = null;
     }
     $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
     $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
@@ -265,10 +264,10 @@ function openDeleteUserWidgetConfirmDialogue(userWidgetId){
  * @param isDefault
  * @constructor
  */
-function initUserWidget(isDefault, isMainPage) {
+function initDatatype(isOverall) {
     var name, version, author;
-    if (isDefault) {
-        name = DEFAULT_COMPONENT_NAME;
+    if (isOverall) {
+        name = DEFAULT_WIDGET_NAME;
     } else {
         name = sanitizeStringOfSpecialChars($('#new-component-name').val());
     }
@@ -278,16 +277,16 @@ function initUserWidget(isDefault, isMainPage) {
 
     var id = generateId();
 
-    if (isMainPage){
-        return UserWidget({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
+    if (isOverall){
+        return UserDatatype({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
     }
-    return UserWidget({height: 400, width: 600}, name, id, version, author);
+    return UserDatatype({height: 400, width: 600}, name, id, version, author);
 }
 
 
 
 function duplicateUserWidget(userWidget){
-    return UserWidget.fromString(JSON.stringify(userWidget));
+    return UserDatatype.fromString(JSON.stringify(userWidget));
 }
 
 function clearAll(){

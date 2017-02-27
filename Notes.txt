@@ -249,3 +249,16 @@ fix: upon changing to a new widget view reset scroll
 2/20:
 For undo/redo
 find everywhere where a widget is editted; make a function that moves the editing function add an image to the undo/redo queue
+
+2/21
+Copy widget code and strip it down to barebones for data
+	after making it work, we can combine the two to minimize the copied code
+	
+Data does not container other data, they are just bonded to them.
+There can be a whole bunch of data that are bonded but they are at the same level
+So similar to the Widgets, we would have to go back to the source to figure out what the things are bonded to 
+and if things changed. 
+So a data object can be immediately bonded to other data (which can be secretly bonded to other things?) but we 
+don't wanna show the implicitly bonded data objects, we still want to have a layered structure.
+When are figuring out everything that's connected, we can follow the links (or maybe santiago's platform can do that)
+but we don't want to do that prematurely, since they user would probably want that layered structure.

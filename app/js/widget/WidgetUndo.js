@@ -4,8 +4,8 @@
 /**
  * Created by Shinjini on 2/13/2017.
  */
-var Undo = function(){
-    var that = Object.create(Undo.prototype);
+var WidgetUndo = function(){
+    var that = Object.create(WidgetUndo.prototype);
 
     // Either it can deal with just local changes
     // or it can work with global changes (harder) by saving

@@ -4,14 +4,24 @@
 
 var widgetContainerMaker = WidgetContainer();
 
-var WorkSurface = function(){
-    var that = Object.create(WorkSurface.prototype);
+var WidgetWorkSurface = function(){
+    var that = Object.create(WidgetWorkSurface.prototype);
+
+    var WIDGET_WS_REF = 'widget-work-surface';
+
+    var containerRef = widgetContainerMaker.getContainerRef();
+
+    // make it such that it takes in a component and a widget Id instead of the widget straight
+
+    that.getWorkSurfaceRef = function(){
+        return WIDGET_WS_REF;
+    };
 
 
     var createWorkSurface = function(outerWidgetId, height, width){
         var workSurface = $('<div></div>');
-        workSurface.addClass('work-surface');
-        workSurface.attr('id', 'work-surface_'+outerWidgetId);
+        workSurface.addClass(WIDGET_WS_REF);
+        workSurface.attr('id', WIDGET_WS_REF+'_'+outerWidgetId);
 
         workSurface.height(height).width(width);
         return workSurface;
@@ -19,7 +29,7 @@ var WorkSurface = function(){
 
     var createOrResetWorkSurface = function(outerWidget, zoom){
         var widgetId = outerWidget.meta.id;
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         if (workSurface.length===0){
             workSurface = that.setUpEmptyWorkSurface(outerWidget, zoom);
         } else {
@@ -34,7 +44,7 @@ var WorkSurface = function(){
             zoom: 1,
         };
         workSurface.data('state', state);
-        workSurface.find('.component-container').remove();
+        workSurface.find('.'+containerRef).remove();
     };
 
     that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, dragHandle,
@@ -277,7 +287,7 @@ var WorkSurface = function(){
     };
 
     var findWidgetsToShift = function(movingId, otherId){// TODO better naming?
-        var container = $('#component-container_'+otherId);
+        var container = $('#'+containerRef+'_'+otherId);
 
         var top = container.offset().top;
         var left = container.offset().left;
@@ -288,7 +298,7 @@ var WorkSurface = function(){
             [top, bottom].forEach(function (y) {
                 var allElements = allElementsFromPoint(x, y);
                 var overlappingWidgets = [];
-                $(allElements).filter('.component-container').each(function (idx, elt) {
+                $(allElements).filter('.'+containerRef).each(function (idx, elt) {
                     var containerId = $(elt).attr('id');
                     if (containerId != 'dragging-container') {
                         var id = getWidgetIdFromContainerId($(elt).attr('id'));
@@ -371,7 +381,7 @@ var WorkSurface = function(){
      */
     that.loadUserWidget = function(userWidget){
         var widgetId = userWidget.meta.id;
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         zoomElement.registerZoom(userWidget);
 
         if (workSurface.length===0){
@@ -409,7 +419,7 @@ var WorkSurface = function(){
         makeWorkSurfaceDroppableToWidgets(workSurface, userWidget);
         zoomElement.updateZoomFromState(userWidget);
 
-        setWidgetOptions(selectedProject.components[widgetId]);
+        setWidgetOptions(userWidget);
 
         return workSurface
     };
@@ -421,7 +431,7 @@ var WorkSurface = function(){
      * @param widgetId
      */
     var disableWidgetDOMElements = function(widgetId){
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         $(workSurface).addClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -445,7 +455,7 @@ var WorkSurface = function(){
 
 
     var enableWidgetDOMElements = function(widgetId){
-        var workSurface = $('#work-surface'+'_'+widgetId);
+        var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         $(workSurface).removeClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -468,12 +478,12 @@ var WorkSurface = function(){
     };
 
     var disableAllWidgetDomElementsExcept = function(widgetToEnableId){
-        for (var widgetId in selectedProject.components){
+        for (var widgetId in selectedComponent.widgets){
             if (widgetToEnableId == widgetId){
                 enableWidgetDOMElements(widgetId);
                 continue;
             }
-            if ($('#work-surface'+'_'+widgetId).hasClass('hidden-component')){
+            if ($('#'+WIDGET_WS_REF+'_'+widgetId).hasClass('hidden-component')){
                 continue;
             }
             disableWidgetDOMElements(widgetId);

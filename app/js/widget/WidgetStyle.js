@@ -1,8 +1,8 @@
 /**
  * Created by Shinjini on 2/13/2017.
  */
-var Style = function(paletteContainer){
-    var that = Object.create(Style.prototype);
+var WidgetStyle = function(paletteContainer){
+    var that = Object.create(WidgetStyle.prototype);
 
 
     // possible sources http://jscolor.com/, http://www.w3schools.com/colors/colors_picker.asp
@@ -20,6 +20,8 @@ var Style = function(paletteContainer){
 
     var paletteElt;
 
+    var containerRef = widgetContainerMaker.getContainerRef();
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
 
 
 
@@ -60,7 +62,7 @@ var Style = function(paletteContainer){
 
             var bgColor = overallStyles['background-color'] || '';
             pickerBG.fromString(bgColor);
-            $('#work-surface_'+userWidget.meta.id).css({
+            $('#'+workSurfaceRef+'_'+userWidget.meta.id).css({
                 'background-color': bgColor,
             });
         }
@@ -72,7 +74,7 @@ var Style = function(paletteContainer){
         }
         userWidget.properties.styles.custom[styleName] = styleValue;
         for (var id in userWidget.innerWidgets){
-            var container = $('#work-surface_'+userWidget.meta.id).find('#component-container_'+id);
+            var container = $('#'+workSurfaceRef+'_'+userWidget.meta.id).find('#'+containerRef+'_'+id);
             refreshContainerDisplay(false, container, currentZoom);
         }
 
@@ -96,7 +98,7 @@ var Style = function(paletteContainer){
         inputBG.change(function(){
             var color = pickerBG.toHEXString();
             setOverallStyleAndUpdateView('background-color', color, selectedUserWidget);
-            $('#work-surface_'+selectedUserWidget.meta.id).css({
+            $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).css({
                 'background-color': color,
             });
             updatePalette(color);
@@ -107,7 +109,7 @@ var Style = function(paletteContainer){
 
             style.setUpStyleColors(selectedUserWidget);
             for (var id in selectedUserWidget.innerWidgets){
-                var container = $('#work-surface_'+selectedUserWidget.meta.id).find('#component-container_'+id);
+                var container = $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).find('#'+containerRef+'_'+id);
                 refreshContainerDisplay(false, container, currentZoom);
             }
         });

@@ -5,6 +5,11 @@
 var WidgetContainer = function(){
     var that = Object.create(WidgetContainer.prototype);
 
+    var WIDGET_CONT_REF = 'widget-container';
+
+    that.getContainerRef = function(){
+        return WIDGET_CONT_REF;
+    };
 
     var makeContainerResizable = function(widget, outerWidget, container, outermostWidget){
         var widgetId = widget.meta.id;
@@ -183,12 +188,12 @@ var WidgetContainer = function(){
         });
 
         buttonMoveUp.click(function(){
-           WorkSurface().changeOrderByOne(widget.meta.id, outerWidget, true);
+           WidgetWorkSurface().changeOrderByOne(widget.meta.id, outerWidget, true);
         });
 
 
         buttonMoveDown.click(function(){
-            WorkSurface().changeOrderByOne(widget.meta.id, outerWidget, false);
+            WidgetWorkSurface().changeOrderByOne(widget.meta.id, outerWidget, false);
         });
 
         return optionsDropdown;
@@ -197,8 +202,8 @@ var WidgetContainer = function(){
 
     that.createBasicWidgetContainer = function(widget, zoom){
         var container = $('<div></div>');
-        var containerId = 'component-container_'+widget.meta.id;
-        container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
+        var containerId = WIDGET_CONT_REF+'_'+widget.meta.id;
+        container.addClass('cell dropped '+WIDGET_CONT_REF).attr('id', containerId);
         container.height(widget.properties.dimensions.height * zoom).width(widget.properties.dimensions.width * zoom);
         container.data('componentId', widget.meta.id);
         return container;

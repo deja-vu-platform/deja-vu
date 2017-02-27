@@ -2,18 +2,20 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-var zoomElement = ZoomElement();
-var miniNav = MiniNav();
-var view = Display();
-var workSurface = WorkSurface();
-var dragAndDrop = DragAndDropController();
-var grid = Grid();
+var widgetContainerMaker = WidgetContainer();
+var workSurface = WidgetWorkSurface();
+var zoomElement = WidgetZoomElement();
+var miniNav = WidgetMiniNav();
+var view = WidgetDisplay();
+var dragAndDrop = WidgetDragAndDropController();
+var grid = WidgetGrid();
 var widgetEditsManager = WidgetEditsManager();
-var style = Style($('.palette-container'));
-var undo = Undo();
+var undo = WidgetUndo();
+
+var style = WidgetStyle($('.palette-container'));
 
 var projectsSavePath = path.join(__dirname, 'projects');
-var addedCliches;
+//var addedCliches;
 
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
@@ -22,6 +24,7 @@ var files = [];
 
 var selectedUserWidget = null;
 var selectedProject = null;
+var selectedComponent = null;
 
 var currentZoom = 1.0;
 var basicWidgets;
@@ -61,25 +64,30 @@ $(function(){
 
     $('.project-name .header').text(selectedProject.meta.name);
 
-    addedCliches = selectedProject.addedCliches;
-    for (var id in addedCliches) {
-        showClicheInList(id, addedCliches[id].name);
-    }
+    //addedCliches = selectedProject.addedCliches;
+    //for (var id in addedCliches) {
+    //    showClicheInList(id, addedCliches[id].name);
+    //}
 
-    if (selectedProject.numComponents == 0){
+    if (selectedProject.getNumComponents() == 0){
         // start a default component
-        selectedUserWidget = initUserWidget(true, true);
-        selectedProject.addMainPage(selectedUserWidget);
+        selectedComponent = initUserComponent();
+        selectedProject.addComponent(selectedComponent);
+        selectedProject.makeMainComponent(selectedComponent);
+
+        selectedUserWidget = selectedComponent.widgets[Object.keys(selectedComponent.widgets)[0]];
         displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
     } else {
+        var selectedComponentId = selectedProject.mainComponent;
+        selectedComponent = selectedProject.components[selectedComponentId];
         var widgetToLoadId;
-        if (!$.isEmptyObject(selectedProject.mainComponents)){
-            widgetToLoadId = Object.keys(selectedProject.mainComponents)[0];
+        if (!$.isEmptyObject(selectedComponent.mainPages)){
+            widgetToLoadId = Object.keys(selectedComponent.mainPages)[0];
         } else {
-            widgetToLoadId = Object.keys(selectedProject.components)[0];
+            widgetToLoadId = Object.keys(selectedComponent.widgets)[0];
         }
-        selectedUserWidget = selectedProject.components[widgetToLoadId];
-        if (widgetToLoadId in selectedProject.mainComponents){
+        selectedUserWidget = selectedComponent.widgets[widgetToLoadId];
+        if (widgetToLoadId in selectedComponent.mainPages){
             displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         } else {
             displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
@@ -87,13 +95,13 @@ $(function(){
         // TODO this will need to be changed once we bring in a userComponent which will be a
         // superset of userWidgets
 
-        for (var componentId in selectedProject.components){
-            if (componentId != widgetToLoadId){
-                var componentName = selectedProject.components[componentId].meta.name;
-                if (componentId in selectedProject.mainComponents){
-                    displayNewWidgetInMainPagesList(componentName, componentId)
+        for (var widgetId in selectedComponent.widgets){
+            if (widgetId != widgetToLoadId){
+                var widgetName = selectedComponent.widgets[widgetId].meta.name;
+                if (widgetId in selectedComponent.mainPages){
+                    displayNewWidgetInMainPagesList(widgetName, widgetId)
                 } else {
-                    displayNewWidgetInUserWidgetList(componentName, componentId);
+                    displayNewWidgetInUserWidgetList(widgetName, widgetId);
                 }
 
             }
