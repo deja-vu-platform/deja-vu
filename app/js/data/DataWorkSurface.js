@@ -9,20 +9,27 @@ var DataWorkSurface = function(){
 
     var DATA_WS_ID = 'data-work-surface';
 
-    var createWorkSurface = function(outerWidgetId, height, width){
+    // takes in a component object and the id of the selected datatype, and does
+    // any work based on the data you obtain from the component
+
+    that.getWorkSurfaceRef = function(){
+        return DATA_WS_ID;
+    };
+
+    var createWorkSurface = function(datatypeId, height, width){
         var workSurface = $('<div></div>');
         workSurface.addClass(DATA_WS_ID);
-        workSurface.attr('id', DATA_WS_ID+'_'+outerWidgetId);
+        workSurface.attr('id', DATA_WS_ID+'_'+datatypeId);
 
         workSurface.height(height).width(width);
         return workSurface;
     };
 
-    var createOrResetWorkSurface = function(outerWidget, zoom){
-        var widgetId = outerWidget.meta.id;
-        var workSurface = $('#'+DATA_WS_ID+'_'+widgetId);
+    var createOrResetWorkSurface = function(datatype, zoom){
+        var datatypeId = datatype.meta.id;
+        var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
         if (workSurface.length===0){
-            workSurface = that.setUpEmptyWorkSurface(outerWidget, zoom);
+            workSurface = that.setUpEmptyWorkSurface(datatype, zoom);
         } else {
             resetWorkSurface(workSurface);
         }
@@ -148,23 +155,23 @@ var DataWorkSurface = function(){
 
     /**
      * creates an empty worksurface and appends it to the outer container
-     * @param userWidget
+     * @param datatype
      * @param zoom
      */
-    that.setUpEmptyWorkSurface = function(userWidget, zoom){
+    that.setUpEmptyWorkSurface = function(datatype, zoom){
         currentZoom = zoom; // set zoom value 100%
-        var widgetId = userWidget.meta.id;
-        disableAllWidgetDomElementsExcept(widgetId);
-        var workSurface = createWorkSurface(widgetId, userWidget.properties.dimensions.height, userWidget.properties.dimensions.width);
+        var datatypeId = datatype.meta.id;
+        disableAllWidgetDomElementsExcept(datatypeId);
+        var workSurface = createWorkSurface(datatypeId, datatype.properties.dimensions.height, datatype.properties.dimensions.width);
 
         $('#outer-container').append(workSurface);
 
         resetWorkSurface(workSurface);
 
-        makeWorkSurfaceDroppableToWidgets(workSurface, userWidget);
-        dataZoomElement.updateZoomFromState(userWidget);
+        makeWorkSurfaceDroppableToWidgets(workSurface, datatype);
+        dataZoomElement.updateZoomFromState(datatype);
 
-        setWidgetOptions(selectedProject.components[widgetId]);
+        setWidgetOptions(selectedProject.components[datatypeId]);
 
         return workSurface
     };

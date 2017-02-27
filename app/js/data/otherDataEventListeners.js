@@ -264,9 +264,9 @@ function openDeleteUserWidgetConfirmDialogue(userWidgetId){
  * @param isDefault
  * @constructor
  */
-function initUserWidget(isDefault, isMainPage) {
+function initDatatype(isOverall) {
     var name, version, author;
-    if (isDefault) {
+    if (isOverall) {
         name = DEFAULT_WIDGET_NAME;
     } else {
         name = sanitizeStringOfSpecialChars($('#new-component-name').val());
@@ -277,7 +277,7 @@ function initUserWidget(isDefault, isMainPage) {
 
     var id = generateId();
 
-    if (isMainPage){
+    if (isOverall){
         return UserDatatype({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
     }
     return UserDatatype({height: 400, width: 600}, name, id, version, author);

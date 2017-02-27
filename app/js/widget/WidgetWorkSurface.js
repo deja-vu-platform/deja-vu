@@ -11,6 +11,8 @@ var WidgetWorkSurface = function(){
 
     var containerRef = widgetContainerMaker.getContainerRef();
 
+    // make it such that it takes in a component and a widget Id instead of the widget straight
+
     that.getWorkSurfaceRef = function(){
         return WIDGET_WS_REF;
     };

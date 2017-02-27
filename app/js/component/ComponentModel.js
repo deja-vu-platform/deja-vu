@@ -28,6 +28,21 @@ var UserComponent = function(name, id, version, author){
         // datatypeId: UserDataInstance
     };
 
+
+    that.datatypeDisplays = {
+        overview: UserDatatypeDisplay(),
+        particulars: {
+            // datatypeId : DatatypeDisplay object
+        }
+    };
+
+    that.widgetBondDisplays = {
+        overview: {}, //UserWidgetBondDisplay(),
+        particulars: {
+            // datatypeId : DatatypeDisplay object
+        }
+    };
+
     that.properties = {
     };
     return that;
