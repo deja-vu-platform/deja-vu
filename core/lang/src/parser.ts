@@ -1,5 +1,4 @@
 const ohm = require("ohm-js");
-const jsonic = require("jsonic");
 
 import * as fs from "fs";
 import * as path from "path";
@@ -525,18 +524,38 @@ export class Parser {
         ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
           .chain(para.data())
           .flatten().reject(_u.isEmpty)
-          // for some strange reason .reduce(_u.extendOwn) doesn't work
-          .reduce((memo, e) => _u.extendOwn(memo, e))
+          .reduce((memo, e) => {
+            if (memo[e.t_name] === undefined) memo[e.t_name] = [];
+            memo[e.t_name] = memo[e.t_name].concat(e.obj);
+            return memo;
+          }, {})
           .value(),
         Paragraph_data: decl => ({}), Paragraph_widget: decl => ({}),
         Paragraph_assignment: decl => decl.data(),
-        AssignmentDecl: (name, assign, bracket1, body, bracket2) => {
+        AssignmentDecl: (name, colon, t_name, assign, obj) => ({
+          t_name: t_name.sourceString,
+          obj: _u.extendOwn({atom_id: name.sourceString}, obj.data())
+        }),
+        Obj: (cbrace1, obj_body, comma, more_obj_body, cbrace2) => _u
+          .extendOwn(obj_body.data(), _u
+            .chain(more_obj_body.data())
+            // for some strange reason .reduce(_u.extendOwn) doesn't work
+            .reduce((memo, e) => _u.extendOwn(memo, e))
+            .value()),
+        ObjBody: (name, colon, value) => {
           const ret = {};
-          const body_w_ids = body.sourceString
-            .replace(/id-(\d*)/g, "{atom_id: $1}");
-          ret[name.sourceString] = jsonic(`[${body_w_ids}]`);
+          ret[name.sourceString] = value.data();
           return ret;
-        }
+        },
+        Value_number: (num) => Number(num.sourceString),
+        Value_text: (quote1, text, quote2) => text.sourceString,
+        Value_array: (sqbracket1, arr_decl, sqbracket2) => arr_decl.data()[0],
+        ArrayDecl: (val, comma, more_val) => {
+          console.log("y" + JSON.stringify(more_val.data()));
+          return []
+          .concat(val.data()).concat(more_val.data());
+        },
+        Value_ref: (name) => ({atom_id: name.sourceString})
       });
   }
 

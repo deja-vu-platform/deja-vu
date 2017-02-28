@@ -34,15 +34,15 @@ Cliche {
   FieldBondDecl = "=" FieldBond ("|" FieldBond)*
   FieldBond = fieldBondName ("+" fieldBondName)*
 
-  AssignmentDecl = name assign "[" AssignmentBody "]"
-  AssignmentBody = Obj ("," Obj)*
+  AssignmentDecl = name ":" name "=" Obj
   Obj = "{" ObjBody ("," ObjBody)* "}"
   ObjBody = name ":" Value
   Value
     = number -- number
     | "\"" (~"\"" any)* "\"" -- text
-    | name "-" number -- id
-    | "[" (Value ("," Value)*)? "]" -- array
+    | "[" ArrayDecl? "]" -- array
+    | (~"\"" name) -- ref
+  ArrayDecl = Value ("," Value)*
 
 
   fieldBondName
@@ -70,7 +70,6 @@ Cliche {
   main = "main"
   route = "route"
   as = "as"
-  assign = ":="
 
   // from the es5 grammar example
   space := whitespace | lineTerminator | comment
