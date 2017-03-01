@@ -89,13 +89,57 @@ const schema = grafo
               })
           } else {
             return mean.db.collection("consumers")
-              .findOne({atom_id: resource.consumed_by});
+              .findOne({atom_id: resource.consumed_by.atom_id});
           }
         }
       }
     }
   })
+  .add_mutation({
+    name: 'editChampion',
+    type: graphql.GraphQLBoolean,
+    args: {
+      resource_atom_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      champion_atom_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+    },
+    resolve: (_, {resource_atom_id, champion_atom_id}) => Promise.all([
+      Validation.resourceExists(resource_atom_id),
+      Validation.consumerExists(champion_atom_id)
+    ]).then(consumer => {
+      let updateOp = { $set: { "consumed_by.atom_id": champion_atom_id } };
+      return mean.db.collection("resources")
+        .updateOne(
+          { atom_id: resource_atom_id },
+          updateOp,
+      ).then(_ => bus.update_atom("Resource", resource_atom_id, updateOp))
+      .then(_ => true);
+    })
+  })
   .schema();
+
+namespace Validation {
+  export function resourceExists(resource_atom_id) {
+    return mean.db.collection("resources")
+      .findOne({ atom_id: resource_atom_id })
+      .then(resource => {
+        if (!resource) {
+          throw new Error(`Resource ${resource_atom_id} not found`);
+        }
+        return resource;
+      })
+  }
+
+  export function consumerExists(champion_atom_id) {
+    return mean.db.collection("consumers")
+      .findOne({ atom_id: champion_atom_id })
+      .then(consumer => {
+        if (!consumer) {
+          throw new Error(`Consumer ${champion_atom_id} not found`);
+        }
+        return consumer;
+      })
+  }
+}
 
 Helpers.serve_schema(mean.ws, schema);
 
