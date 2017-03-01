@@ -203,7 +203,7 @@ var WidgetContainer = function(){
     that.createBasicWidgetContainer = function(widget, zoom){
         var container = $('<div></div>');
         var containerId = WIDGET_CONT_REF+'_'+widget.meta.id;
-        container.addClass('cell dropped '+WIDGET_CONT_REF).attr('id', containerId);
+        container.addClass('dropped '+WIDGET_CONT_REF).attr('id', containerId);
         container.height(widget.properties.dimensions.height * zoom).width(widget.properties.dimensions.width * zoom);
         container.data('componentId', widget.meta.id);
         return container;

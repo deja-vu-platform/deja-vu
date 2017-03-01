@@ -156,7 +156,9 @@ style.setUpOverallInputs();
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(newRatio, userWidget){
-    view.displayWidget(false, userWidget, $('#work-surface_'+userWidget.meta.id), {}, newRatio);
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
+    view.displayWidget(false, userWidget, $('#'+workSurfaceRef+'_'+userWidget.meta.id), {}, newRatio);
     miniNav.updateNavInnerWidgetSizes(newRatio);
     grid.setUpGrid();
 }
@@ -213,8 +215,10 @@ function deleteUserWidget(userWidgetId){
         return; //don't delete the last one TODO is the the right way to go?
     }
     selectedComponent.removeWidget(userWidgetId);
-    $('#work-surface_'+userWidgetId).remove();
-    $('#disabled_'+userWidgetId+'_work-surface_'+userWidgetId).remove(); // also remove disabled ones
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
+    $('#'+workSurfaceRef+'_'+userWidgetId).remove();
+    $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
 
     if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
         var otherIds = Object.keys(selectedComponent.widgets);

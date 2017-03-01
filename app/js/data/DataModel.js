@@ -67,7 +67,7 @@ UserDatatype.fromObject = function(object){
     return $.extend(new UserDatatype(object.dimensions), object)
 };
 
-var UserDatatypeDisplay = function(){
+var UserDatatypeDisplay = function(position, dimensions){
     // this is a totally local object, the position, size, etc of any object
     // is for display for this particular user only
 
@@ -75,7 +75,16 @@ var UserDatatypeDisplay = function(){
 
 
     that.displayProperties = {
-        // datatypeId : position, size
+        position: position,
+        //{
+        //      top: ...,
+        //      left: ...,
+        // }
+        dimensions: dimensions
+        //{
+        //      height: ...,
+        //      width: ...,
+        // }
     };
 
     return that;

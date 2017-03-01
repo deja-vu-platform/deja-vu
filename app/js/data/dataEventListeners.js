@@ -8,10 +8,13 @@
 $('#new-user-datatype-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
-            var datatype = UserDatatype(1,1,1,1);
-            selectedComponent.addDatatype(datatype);
-            displayUserWidgetInListAndSelect(datatype.meta.name, datatype.meta.id);
-            dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
+            var name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+            var datatypeInfo = initDatatype();
+            var datatype = datatypeInfo[0];
+            var datatypeDisplayProps = datatypeInfo[1];
+            selectedComponent.addDatatype(datatype, datatypeDisplayProps);
+            displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id);
+            // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
 
             resetMenuOptions();
     });
@@ -28,17 +31,15 @@ $('#save-project').on('click', function () {
 $('.components').on('click', '.component-name-container', function () {
     // Save the current values
     var oldState = {zoom : currentZoom};
-    $('#work-surface'+'_'+selectedUserWidget.meta.id).data('state', oldState);
+    var workSurfaceRef = dataWorkSurface.getWorkSurfaceRef();
+    $('#'+workSurfaceRef+'_'+selectedComponent.meta.id).data('state', oldState);
 
     var widgetId = $(this).parent().data('componentid');
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
-    selectedUserWidget = selectedProject.components[widgetId];
-    dataWorkSurface.loadUserWidget(selectedUserWidget);
-    style.setUpStyleColors(selectedUserWidget);
+    dataWorkSurface.loadDatatype(selectedComponent, null);
     $('#outer-container').scrollTop(0); // TODO DRY
     $('#outer-container').scrollLeft(0);
-
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {
@@ -199,9 +200,9 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
 
 /** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
 
-function displayUserWidgetInListAndSelect(name, id){
+function displayDatatypeInListAndSelect(name, id){
     $('.selected').removeClass("selected");
-    displayNewWidgetInUserWidgetList(name,id);
+    displayNewDatatypeInUserDatatypeList(name,id);
     $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
@@ -221,7 +222,7 @@ function displayNewDatatypeInUserDatatypeList(name, id){
         + '</div>'
         + '</li>');
     $('#user-components-list').append(newDatatypeElt);
-    addDeleteUserDatatypeButton(id);
+    // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
     dataDragAndDrop.registerWidgetDragHandleDraggable(newDatatypeElt);
 }
@@ -231,7 +232,7 @@ function displayNewDatatypeInUserDatatypeList(name, id){
  * Adds a component to the list of main pages
  * @param newComponent
  */
-function displayNewWidgetInMainPagesList(name, id){
+function displayOverallDatatypesInList(name, id){
     // TODO changes in style
     var newWidgetElt =
         '<li data-componentid=' + id + '>'
@@ -245,13 +246,11 @@ function displayNewWidgetInMainPagesList(name, id){
         + '</div>'
         + '</li>';
     $('#main-pages-list').append(newWidgetElt);
-    addDeleteUserWidgetButton(id);
-    // registerUserWidgetAsDraggableForMainPages(id);
 }
 
-function displayMainPageInListAndSelect(name, id){
+function displayOverallDatatypesInListAndSelect(name, id){
     $('.selected').removeClass("selected");
-    displayNewWidgetInMainPagesList(name,id);
+    displayOverallDatatypesInList(name,id);
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 

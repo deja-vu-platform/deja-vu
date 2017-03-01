@@ -155,9 +155,11 @@ function addAddToMainPagesButton(userWidget){
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(newRatio, userWidget){
-    dataView.displayWidget(false, userWidget, $('#work-surface_'+userWidget.meta.id), {}, newRatio);
-    dataMiniNav.updateNavInnerWidgetSizes(newRatio);
-    grid.setUpGrid();
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
+    view.displayWidget(false, userWidget, $('#'+workSurfaceRef+'_'+userWidget.meta.id), {}, newRatio);
+    miniNav.updateNavInnerWidgetSizes(newRatio);
+
 }
 
 function addDeleteUserDatatypeButton(userWidgetId){
@@ -208,22 +210,24 @@ function addDeleteUserDatatypeButton(userWidgetId){
 }
 
 function deleteUserWidget(userWidgetId){
-    if (selectedProject.numComponents === 1){
+    if (selectedComponent.getNumWidgets() == 1){
         return; //don't delete the last one TODO is the the right way to go?
     }
-    selectedProject.removeComponent(userWidgetId);
-    $('#work-surface_'+userWidgetId).remove();
-    $('#disabled_'+userWidgetId+'_work-surface_'+userWidgetId).remove(); // also remove disabled ones
+    selectedComponent.removeWidget(userWidgetId);
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
+    $('#'+workSurfaceRef+'_'+userWidgetId).remove();
+    $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
 
     if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
-        var otherIds = Object.keys(selectedProject.components);
-        selectedUserWidget = selectedProject.components[otherIds[0]];
+        var otherIds = Object.keys(selectedComponent.widgets);
+        selectedUserWidget = selectedComponent.widgets[otherIds[0]];
         $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        dataWorkSurface.loadUserWidget(selectedUserWidget, currentZoom);
+        workSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
-    if (userWidgetId == selectedProject.mainComponent.indexId){
-        selectedProject.mainComponent.indexId = null;
+    if (userWidgetId == selectedComponent.mainPages.indexId){
+        selectedComponent.mainPages.indexId = null;
     }
     $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
     $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
@@ -264,23 +268,24 @@ function openDeleteUserWidgetConfirmDialogue(userWidgetId){
  * @param isDefault
  * @constructor
  */
-function initDatatype(isOverall) {
+function initDatatype() {
     var name, version, author;
-    if (isOverall) {
-        name = DEFAULT_WIDGET_NAME;
-    } else {
-        name = sanitizeStringOfSpecialChars($('#new-component-name').val());
-    }
-
+    name = sanitizeStringOfSpecialChars($('#new-component-name').val());
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
     var id = generateId();
+    var position = {
+        top: 200,
+        left: 200
+    };
+    var dimensions = {
+        height: 40,
+        width: 60
+    };
 
-    if (isOverall){
-        return UserDatatype({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
-    }
-    return UserDatatype({height: 400, width: 600}, name, id, version, author);
+    var displayProperties = UserDatatypeDisplay(position, dimensions);
+    return [UserDatatype(name, id, version, author), displayProperties];
 }
 
 

@@ -20,7 +20,7 @@ var WidgetWorkSurface = function(){
 
     var createWorkSurface = function(outerWidgetId, height, width){
         var workSurface = $('<div></div>');
-        workSurface.addClass(WIDGET_WS_REF);
+        workSurface.addClass(WIDGET_WS_REF).addClass('work-surface');
         workSurface.attr('id', WIDGET_WS_REF+'_'+outerWidgetId);
 
         workSurface.height(height).width(width);

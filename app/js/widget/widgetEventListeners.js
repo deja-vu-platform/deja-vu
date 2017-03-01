@@ -42,7 +42,8 @@ $('#save-project').on('click', function () {
 $('.components').on('click', '.component-name-container', function () {
     // Save the current values
     var oldState = {zoom : currentZoom};
-    $('#work-surface'+'_'+selectedUserWidget.meta.id).data('state', oldState);
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+    $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
 
     var widgetId = $(this).parent().data('componentid');
     $('.selected').removeClass('selected');

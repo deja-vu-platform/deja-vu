@@ -18,7 +18,7 @@ var DataWorkSurface = function(){
 
     var createWorkSurface = function(datatypeId, height, width){
         var workSurface = $('<div></div>');
-        workSurface.addClass(DATA_WS_ID);
+        workSurface.addClass(DATA_WS_ID).addClass('work-surface');
         workSurface.attr('id', DATA_WS_ID+'_'+datatypeId);
 
         workSurface.height(height).width(width);
@@ -44,6 +44,25 @@ var DataWorkSurface = function(){
         workSurface.data('state', state);
         workSurface.find('.component-container').remove();
     };
+
+    var loadAllDatatypesIntoOverallWorkSurface = function(component, zoom){
+        var workSurface = createOrResetWorkSurface(component, zoom);
+
+        for (var datatypeId in component.datatypes){
+            var datatype = component.datatypes[datatypeId];
+            var displayPropObj = component.datatypeDisplays[datatypeId];
+            var container = dataContainerMaker.createResizableDatatypeContainer(datatype, displayPropObj, zoom);
+            workSurface.append(container);
+            container.css({
+                position: 'absolute',
+                top: displayPropObj.displayProperties.position.top,
+                left: displayPropObj.displayProperties.position.left,
+            })
+        }
+
+    };
+
+
 
     /**
      * Loads elements into the DOM. If the elements were already there, gets rid of them
@@ -124,14 +143,9 @@ var DataWorkSurface = function(){
      * @param userWidget
      * @param zoom
      */
-    that.loadDatatype = function(object){
-        if (object.objectType == "UserComponent"){
-            // load all the stuff
-        } else {
-            var datatype = object;
-
-
-            var datatypeId = datatype.meta.id;
+    that.loadDatatype = function(component, datatypeId){
+        if (datatype){
+            var datatype = component.datatypes[datatypeId];
             var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
             dataZoomElement.registerZoom(datatype);
 
@@ -139,11 +153,27 @@ var DataWorkSurface = function(){
                 currentZoom = 1;
                 loadDatatypeIntoWorkSurface(datatype, currentZoom);
             } else {
-                disableAllWidgetDomElementsExcept(datatypeId);
-                setWidgetOptions(datatype);
-                dataZoomElement.updateZoomFromState(datatype);
+                disableAllDataDomElementsExcept(datatypeId);
+                //setWidgetOptions(datatype);
+                //dataZoomElement.updateZoomFromState(datatype);
                 // TODO other way? for now, reload the thinger
                 loadDatatypeIntoWorkSurface(datatype, currentZoom);
+            }
+        } else {
+            // load all the stuff
+            var componentId = component.meta.id;
+            var workSurface = $('#'+DATA_WS_ID+'_'+componentId);
+            //dataZoomElement.registerZoom(datatype);
+
+            if (workSurface.length===0){
+                currentZoom = 1;
+                loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
+            } else {
+                disableAllDataDomElementsExcept(componentId);
+                //setWidgetOptions(datatype);
+                //dataZoomElement.updateZoomFromState(datatype);
+                // TODO other way? for now, reload the thinger
+                loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
             }
         }
 
@@ -161,17 +191,17 @@ var DataWorkSurface = function(){
     that.setUpEmptyWorkSurface = function(datatype, zoom){
         currentZoom = zoom; // set zoom value 100%
         var datatypeId = datatype.meta.id;
-        disableAllWidgetDomElementsExcept(datatypeId);
-        var workSurface = createWorkSurface(datatypeId, datatype.properties.dimensions.height, datatype.properties.dimensions.width);
+        disableAllDataDomElementsExcept(datatypeId);
+        var workSurface = createWorkSurface(datatypeId, selectedScreenSizeHeight, selectedScreenSizeWidth);
 
         $('#outer-container').append(workSurface);
 
         resetWorkSurface(workSurface);
 
         makeWorkSurfaceDroppableToWidgets(workSurface, datatype);
-        dataZoomElement.updateZoomFromState(datatype);
+        //dataZoomElement.updateZoomFromState(datatype);
 
-        setWidgetOptions(selectedProject.components[datatypeId]);
+        //setWidgetOptions(selectedProject.components[datatypeId]);
 
         return workSurface
     };
@@ -206,8 +236,8 @@ var DataWorkSurface = function(){
     };
 
 
-    var enableWidgetDOMElements = function(widgetId){
-        var workSurface = $('#'+DATA_WS_ID+'_'+widgetId);
+    var enableDataDOMElements = function(dataId){
+        var workSurface = $('#'+DATA_WS_ID+'_'+dataId);
         $(workSurface).removeClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -215,30 +245,30 @@ var DataWorkSurface = function(){
 
             var id = elt.id;
             if (id.length>0){
-                elt.id = id.replace('disabled_'+widgetId+'_', '');
+                elt.id = id.replace('disabled_'+dataId+'_', '');
             }
             var classes = elt.className;
             if (classes.length>0){
                 classes = classes.split(' ');
                 var classNames = '';
                 classes.forEach(function(className){
-                    classNames =  classNames  + ' ' +  className.replace('disabled_'+widgetId+'_', '');
+                    classNames =  classNames  + ' ' +  className.replace('disabled_'+dataId+'_', '');
                 });
                 elt.className = classNames.trim();
             }
         });
     };
 
-    var disableAllWidgetDomElementsExcept = function(widgetToEnableId){
-        for (var widgetId in selectedProject.components){
-            if (widgetToEnableId == widgetId){
-                enableWidgetDOMElements(widgetId);
+    var disableAllDataDomElementsExcept = function(dataToEnableId){
+        for (var dataId in selectedComponent.datatypes){
+            if (dataToEnableId == dataId){
+                enableDataDOMElements(dataId);
                 continue;
             }
-            if ($('#'+DATA_WS_ID+'_'+widgetId).hasClass('hidden-component')){
+            if ($('#'+DATA_WS_ID+'_'+dataId).hasClass('hidden-component')){
                 continue;
             }
-            disableWidgetDOMElements(widgetId);
+            disableWidgetDOMElements(dataId);
         }
     };
 

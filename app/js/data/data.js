@@ -67,6 +67,8 @@ $(function(){
     } else {
         var selectedComponentId = selectedProject.mainComponent;
         selectedComponent = selectedProject.components[selectedComponentId];
+        selectedUserWidget = selectedComponent.widgets[Object.keys(selectedComponent.widgets)[0]];
+
         //var datatypeToLoadId;
         //if (!$.isEmptyObject(selectedComponent.mainPages)){
         //    datatypeToLoadId = Object.keys(selectedComponent.mainPages)[0];
@@ -81,14 +83,16 @@ $(function(){
         //}
         // TODO this will need to be changed once we bring in a userComponent which will be a
         // superset of userWidgets
+        var componentName = selectedComponent.meta.name;
+        displayOverallDatatypesInListAndSelect(componentName, selectedComponentId);
 
         for (var datatypeId in selectedComponent.datatypes){
-            var componentName = selectedComponent.datatypes[datatypeId].meta.name;
-            displayNewDatatypeInUserDatatypeList(componentName, datatypeId);
+            var datatypeName = selectedComponent.datatypes[datatypeId].meta.name;
+            displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId);
         }
 
     }
-    dataWorkSurface.loadDatatype(selectedComponent, currentZoom);
+    dataWorkSurface.loadDatatype(selectedComponent, null, currentZoom);
 
     //autoSave5Mins();
 

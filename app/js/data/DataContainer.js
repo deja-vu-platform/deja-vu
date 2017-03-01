@@ -72,11 +72,7 @@ var DataContainer = function(){
                 // outerWidget.properties.layout[widget.meta.id].left = ui.position.left/currentZoom;
                 // outerWidget.properties.layout[widget.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
-                dataMiniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
-                grid.setUpGrid();
-                $('.grid').css({
-                    visibility: 'hidden'
-                });
+                //dataMiniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
             }
         });
     };
@@ -91,7 +87,7 @@ var DataContainer = function(){
     };
 
 
-    var createEditOptions = function(widget, outerWidget, container, outermostWidget){
+    var createEditOptions = function(datatype, outerWidget, container){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -106,7 +102,7 @@ var DataContainer = function(){
             '</a>' +
             '</li>');
 
-        buttonEdit.attr('id', 'edit-btn' + '_' + widget.meta.id);
+        buttonEdit.attr('id', 'edit-btn' + '_' + datatype.meta.id);
 
         var buttonTrash = $('<li>' +
             '<a href="#" class="inner-component-trash">' +
@@ -114,12 +110,12 @@ var DataContainer = function(){
             '</a>' +
             '</li>');
 
-        buttonTrash.attr('id', 'inner-component-trash' + '_' + widget.meta.id);
+        buttonTrash.attr('id', 'inner-component-trash' + '_' + datatype.meta.id);
 
         optionsDropdown.find('.dropdown-menu')
             .append(buttonEdit)
             .append('<li class="divider"></li>')
-            .append(buttonTrash)
+            .append(buttonTrash);
 
         // behaviour
 
@@ -139,7 +135,7 @@ var DataContainer = function(){
 
 
         buttonTrash.click(function(){
-            deleteWidgetFromUserWidgetAndFromView(widget.meta.id)
+            deleteWidgetFromUserWidgetAndFromView(datatype.meta.id)
         });
 
 
@@ -147,25 +143,20 @@ var DataContainer = function(){
     };
 
 
-    that.createBasicWidgetContainer = function(widget, zoom){
+    that.createBasicDatatypeContainer = function(datatype, datatypeDisplayProps, zoom){
         var container = $('<div></div>');
-        var containerId = 'component-container_'+widget.meta.id;
-        container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
-        container.height(widget.properties.dimensions.height * zoom).width(widget.properties.dimensions.width * zoom);
-        container.data('componentId', widget.meta.id);
+        var containerId = DATA_CONT_REF+'_'+datatype.meta.id;
+        container.addClass('dropped '+DATA_CONT_REF).attr('id', containerId);
+        container.height(datatypeDisplayProps.displayProperties.dimensions.height * zoom)
+            .width(datatypeDisplayProps.displayProperties.dimensions.width * zoom);
+        container.data('componentId', datatype.meta.id);
         return container;
     };
 
-    that.createMinimallyEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget) {
-        var container = that.createBasicWidgetContainer(widget, zoom);
-        container.append(createEditOptions(widget, outerWidget, container, outermostWidget));
-        return container;
-    };
-
-    that.createEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget) {
-        var container = that.createBasicWidgetContainer(widget, zoom);
-        makeContainerResizable(widget, outerWidget, container, outermostWidget);
-        container.append(createEditOptions(widget, outerWidget, container, outermostWidget));
+    that.createResizableDatatypeContainer = function(datatype, datatypeDisplayProps, zoom) {
+        var container = that.createBasicDatatypeContainer(datatype, datatypeDisplayProps, zoom);
+        makeContainerResizable(datatype, null, container, null);
+        container.append(createEditOptions(datatype, null, container));
         return container;
     };
 

@@ -79,9 +79,10 @@ UserComponent.prototype.removeWidget = function(widgetId){
     delete this.mainPages[widgetId];
 };
 
-UserComponent.prototype.addDatatype = function(datatype){
+UserComponent.prototype.addDatatype = function(datatype, displayProps){
     if (!this.datatypes[datatype.meta.id]) {
         this.datatypes[datatype.meta.id] = datatype;
+        this.datatypeDisplays[datatype.meta.id] = displayProps;
     }
 };
 
