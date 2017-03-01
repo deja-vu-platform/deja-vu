@@ -224,7 +224,7 @@ function displayNewDatatypeInUserDatatypeList(name, id){
     $('#user-components-list').append(newDatatypeElt);
     // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
-    dataDragAndDrop.registerWidgetDragHandleDraggable(newDatatypeElt);
+    dataDragAndDrop.registerDataDragHandleDraggable(newDatatypeElt);
 }
 
 
@@ -748,11 +748,12 @@ function recursiveReIding(widget, sourceWidget){
     return {success: false}
 }
 
-function createUserWidgetCopy (outerWidget, sourceOuterWidget){
-    var widget = UserDatatype.fromString(JSON.stringify(outerWidget));
-
-    recursiveReIding(widget, sourceOuterWidget);
-    return widget;
+function createDatatypeCopy (datatype, sourceDatatype){
+    var datatypeCopy = UserDatatype.fromString(JSON.stringify(datatype));
+    if (!sourceDatatype){
+        datatypeCopy.meta.id = generateId();
+    }
+    return datatypeCopy;
 }
 
 

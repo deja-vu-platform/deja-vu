@@ -57,7 +57,7 @@ UserDatatype.fromObject = function(object){
     if (!object.meta){
         throw notCorrectObjectError;
     }
-    if (!object.innerWidgets){
+    if (!object.bonds){
         throw notCorrectObjectError;
     }
     if (!object.properties){

@@ -50,19 +50,33 @@ var DataWorkSurface = function(){
 
         for (var datatypeId in component.datatypes){
             var datatype = component.datatypes[datatypeId];
+
+            var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
+            dragHandle.text(datatype.meta.name);
+            dragHandle.css('display', 'block');
+
             var displayPropObj = component.datatypeDisplays[datatypeId];
-            var container = dataContainerMaker.createResizableDatatypeContainer(datatype, displayPropObj, zoom);
+            var container = that.makeDatatypeContainers(datatype, displayPropObj, dragHandle, zoom);
             workSurface.append(container);
-            container.css({
-                position: 'absolute',
-                top: displayPropObj.displayProperties.position.top,
-                left: displayPropObj.displayProperties.position.left,
-            })
+            dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
         }
 
     };
 
 
+    that.makeDatatypeContainers = function(datatype, displayPropObj, dragHandle,
+                                                            zoom){
+
+        dragHandle.addClass('associated').data('componentid', datatype.meta.id);
+        var container = dataContainerMaker.createResizableDatatypeContainer(datatype, displayPropObj, zoom);
+        container.css({
+            position: 'absolute',
+            top: displayPropObj.displayProperties.position.top,
+            left: displayPropObj.displayProperties.position.left,
+        });
+        dataContainerMaker.setUpContainer(container, dragHandle);
+        return container;
+    };
 
     /**
      * Loads elements into the DOM. If the elements were already there, gets rid of them
@@ -109,7 +123,7 @@ var DataWorkSurface = function(){
              dataContainerMaker.createBasicWidgetContainer(firstInnerWidget, currentZoom);
         };
 
-        var dropSettings = dataDragAndDrop.widgetToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
+        var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
 
         workSurface.droppable(dropSettings);
     };

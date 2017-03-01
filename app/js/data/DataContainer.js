@@ -160,7 +160,7 @@ var DataContainer = function(){
         return container;
     };
 
-    that.setUpContainer = function(container, dragHandle, widget){
+    that.setUpContainer = function(container, dragHandle){
         container.append(dragHandle);
     };
 

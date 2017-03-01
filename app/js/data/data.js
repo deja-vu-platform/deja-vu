@@ -98,7 +98,7 @@ $(function(){
 
     basicWidgets = $('#basic-components').html();
 
-    dataDragAndDrop.registerWidgetDragHandleDraggable();
+    dataDragAndDrop.registerDataDragHandleDraggable();
 
 
     // registerUserWidgetAreaDroppable();
