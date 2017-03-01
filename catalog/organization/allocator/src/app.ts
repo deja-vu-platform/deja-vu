@@ -102,17 +102,20 @@ const schema = grafo
       resource_atom_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
       champion_atom_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
     },
-    resolve: (_, {resource_atom_id, champion_atom_id}) => Promise.all([
-      Validation.resourceExists(resource_atom_id),
-      Validation.consumerExists(champion_atom_id)
-    ]).then(consumer => {
-      let updateOp = { $set: { "consumed_by.atom_id": champion_atom_id } };
-      return mean.db.collection("resources")
-        .updateOne(
-          { atom_id: resource_atom_id },
-          updateOp,
-      ).then(_ => bus.update_atom("Resource", resource_atom_id, updateOp))
-      .then(_ => true);
+    resolve: (_, {resource_atom_id, champion_atom_id}) => Promise
+      .all([
+        Validation.resourceExists(resource_atom_id),
+        Validation.consumerExists(champion_atom_id)
+      ])
+      .then(consumer => {
+        let updateOp = { $set: { "consumed_by.atom_id": champion_atom_id } };
+        return mean.db.collection("resources")
+          .updateOne(
+            { atom_id: resource_atom_id },
+            updateOp,
+        )
+        .then(_ => bus.update_atom("Resource", resource_atom_id, updateOp))
+        .then(_ => true);
     })
   })
   .schema();

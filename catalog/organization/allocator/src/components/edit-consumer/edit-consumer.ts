@@ -19,7 +19,8 @@ export class EditConsumerComponent {
         editChampion(
           resource_atom_id: "${this.resource.atom_id}",
           champion_atom_id: "${newSelection}")
-      `).subscribe(res => {
+      `)
+      .subscribe(res => {
         if (res) {
           this.consumer_atom_id = newSelection;
         }
@@ -38,7 +39,8 @@ export class EditConsumerComponent {
             name,
             atom_id
           }
-        `).map(data => data.consumer_all)
+        `)
+        .map(data => data.consumer_all)
         .subscribe(consumers => this.consumers = consumers);
     };
 
