@@ -129,6 +129,7 @@ var WidgetDragAndDropController = function () {
                         widget = BaseWidget(type, {}, view.getDimensions(type));
                     }
                     draggingWidget = widget;
+
                     widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, false,
                         dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom, false);
 
@@ -176,7 +177,6 @@ var WidgetDragAndDropController = function () {
                 $('.grid-line').css({
                     visibility: 'hidden'
                 });
-
                 var widgetId = draggingWidget.meta.id;
                 var isNewWidget = $(ui.helper).data('newcomponent');
                 if (!isNewWidget) {

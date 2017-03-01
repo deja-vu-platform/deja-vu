@@ -44,11 +44,17 @@ $('.components').on('click', '.component-name-container', function () {
     var oldState = {zoom : currentZoom};
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
     $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
+    if (!selectedUserWidget.inMainPages){
+        $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']').draggable('enable');
+    }
 
     var widgetId = $(this).parent().data('componentid');
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
     selectedUserWidget = selectedComponent.widgets[widgetId];
+    if (!selectedUserWidget.inMainPages){
+        $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']').draggable('disable');
+    }
     workSurface.loadUserWidget(selectedUserWidget);
     style.setUpStyleColors(selectedUserWidget);
     $('#outer-container').scrollTop(0); // TODO DRY
@@ -217,7 +223,7 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
 function displayUserWidgetInListAndSelect(name, id){
     $('.selected').removeClass("selected");
     displayNewWidgetInUserWidgetList(name,id);
-    $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
+    $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected').draggable('disable');
 }
 
 /**
