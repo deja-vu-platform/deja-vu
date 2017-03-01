@@ -45,7 +45,7 @@ var DataDragAndDropController = function () {
                 if (!widgetIsAssociated) {
                     $(ui.helper).data('newcomponent', true);
                     dragHandle.newWidget = true;
-                    outerWidget.addComponent(widget);
+                    outerWidget.addInnerWidget(widget);
                     dragHandle.addClass('associated').data('componentid', widgetId);
                     dataZoomElement.registerZoom(outerWidget);
                 } else {

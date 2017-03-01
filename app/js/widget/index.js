@@ -10,6 +10,8 @@ var view = WidgetDisplay();
 var dragAndDrop = WidgetDragAndDropController();
 var grid = WidgetGrid();
 var widgetEditsManager = WidgetEditsManager();
+var undo = WidgetUndo();
+
 var style = WidgetStyle($('.palette-container'));
 
 var projectsSavePath = path.join(__dirname, 'projects');

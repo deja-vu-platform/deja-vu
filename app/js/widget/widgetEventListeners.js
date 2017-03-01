@@ -142,7 +142,7 @@ function setWidgetOptions(outerWidget){
                 displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             }
 
-            selectedComponent.addComponent(copyWidget);
+            selectedComponent.addWidget(copyWidget);
             selectedUserWidget = copyWidget;
             workSurface.loadUserWidget(copyWidget, 1);
 

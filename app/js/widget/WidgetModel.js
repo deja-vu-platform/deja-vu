@@ -86,74 +86,16 @@ var UserWidget = function(dimensions, name, id, version, author){
         children: {}
     };
 
+    //Object.freeze(that);
     return that;
 };
 
-// var UserWidgetInstance = function(parentId){
-//     var instance = Object.create(UserWidgetInstance);
-//
-//     instance.parentId = parentId;
-//     instance.id = 123; // generate ID here
-//
-//     // parent id = template
-//     // id
-//     // children = instances
-//     // properties // tree of changes
-//
-//
-//     return instance;
-// };
-
-// var instantiateProperties = function(){
-//     return {
-//         properties : {
-//             layout: {
-//                 stackOrder: []
-//             },
-//
-//             styles : {
-//                 custom: {}, bsClasses: {}
-//             }
-//         },
-//         children: {}
-//     };
-// };
-
-// Tree of Changes
-// widgetInstanceId:{ (= top level Id of the current widget)
-//     properties : {
-//        layout : {
-//              stackOrder: []
-//        },
-//        styles : {
-//              custom: {}, bsClasses: {}
-//        }
-//     },
-//     children:{
-//          widgetInstanceId:{
-//                properties : changes,
-//                  children: {
-//                    widgetInstanceId:{
-//                      ...
-//                    },
-//                     widgetInstanceId:{
-//                       ...
-//                     }
-//              },
-// 		    ...
-//      }
-//
-// },
-//
-
-
-UserWidget.prototype.addComponent = function(widget) {
+UserWidget.prototype.addInnerWidget = function(widget) {
     var widgetId = widget.meta.id;
     this.innerWidgets[widgetId]=widget;
     this.properties.layout.stackOrder.push(widgetId);
     return true;
 };
-
 
 UserWidget.prototype.deleteInnerWidget = function(widgetId) {
     delete this.innerWidgets[widgetId];

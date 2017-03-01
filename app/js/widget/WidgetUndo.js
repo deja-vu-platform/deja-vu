@@ -7,6 +7,10 @@
 var WidgetUndo = function(){
     var that = Object.create(WidgetUndo.prototype);
 
+    // Either it can deal with just local changes
+    // or it can work with global changes (harder) by saving
+    // the entire project?
+
     var undoStack = [];
     var redoStack = [];
 
