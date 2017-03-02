@@ -85,13 +85,15 @@ export interface UsedWidget {
 export namespace GruntTask {
   export function task(
       grunt, name: string, widgets?: Widget[], main?: string, patterns?,
-      used_widgets?: UsedWidget[], replace_map?, comp_info?, wcomp_info?) {
+      used_widgets?: UsedWidget[], replace_map?, comp_info?, wcomp_info?,
+      data?) {
     widgets = widgets === undefined ? [] : widgets;
     patterns = patterns === undefined ? {} : patterns;
     used_widgets = used_widgets === undefined ? [] : used_widgets;
     replace_map = replace_map === undefined ? {} : replace_map;
     comp_info = comp_info === undefined ? {} : comp_info;
     wcomp_info = wcomp_info === undefined ? {} : wcomp_info;
+    data = data === undefined ? {} : data;
 
 
     const npm = "node_modules";
