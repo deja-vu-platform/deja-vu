@@ -1,0 +1,81 @@
+*** proposed new syntax ***
+// Bookmark is an app for users to post updates with topics and follow other
+// users or topics. Users get a feed with all the relevant updates given the
+// topics and users they follow.
+app Bookmark
+
+/**
+ *  Cliches used
+ */
+use community/Follow[User: Source, User: Target]
+use community/Follow[User: Source, Post: Target]
+use access/Auth[User: User]
+use messaging/Feed[User: Subscriber, User | Label: Publisher, Post: Message]
+use organization/Label[Post: Item, Topic: Label]
+use messaging/Post[User: User, Post: Post]
+use messaging/Comment[User: Author, Post: Target]
+
+/**
+ *  Data definitions
+ */
+data User {
+  username: Text,
+  posts: [Post],
+  follows: [User | Post]
+}
+
+u1: User = {username: "benbitdiddle", posts: [p1]}
+u2: User = {username: "alyssaphacker", posts: [p2]}
+
+data Post {
+  content: Text,
+  topics: [Topic],
+  author: User
+}
+
+p1: Post = {content: "hello, I'm Ben", author: u1, topics: [t1]}
+p2: Post = {content: "hello, I'm Alyssa", author: u2, topics: [t1]}
+
+data Topic {
+  name: Text,
+  posts: [Post]
+}
+
+t1: Topic = {name: "hello", posts: [p1, p2]}
+
+/**
+ * Widgets
+ */
+// The landing page gives the user the option to sign in or register
+main widget Landing route "landing" {
+  user_ok_redirect_route: Text = "/app/home"
+}
+
+
+widget App route "app" {
+  signout_ok_redirect_route: Text = "/landing"
+}
+
+
+widget Home route "app/home" { user: User }
+
+// Shows the post, with its author, attached labels and comments. Also has
+// a field that lets the logged in user comment on the post
+widget ShowFeedPost {
+  feed_user: User,
+  post: Post
+}
+
+widget CreatePost {
+  author: User,
+  post: Post,
+  submit_ok: Boolean
+}
+
+// Displays the list of topics and lets the logged in user follow or unfollow
+// them
+widget Topics route "app/topics" { user: User }
+
+// Displays the list of users and lets the logged in user follow or unfollow
+// them
+widget Users route "app/users" { user: User }
