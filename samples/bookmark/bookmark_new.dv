@@ -10,7 +10,12 @@ app Bookmark
 use community/Follow[User: Source, User: Target]
 use community/Follow[User: Source, Post: Target]
 use access/Auth[User: User]
-use messaging/Feed[User: Subscriber, User | Label: Publisher, Post: Message]
+use messaging/Feed[
+  User: Subscriber,
+  User | Label: Publisher,
+  Post: Message,
+  ShowFeedPost replaces ShowFeedItem in ShowFeed
+]
 use organization/Label[Post: Item, Topic: Label]
 use messaging/Post[User: User, Post: Post]
 use messaging/Comment[User: Author, Post: Target]
