@@ -2,5 +2,5 @@ module.exports = function(grunt) {
   require("mean-loader").GruntTask.task(
       grunt,
       "dv-organization-rralocator",
-      [{name: "ShowConsumer"}]);
+      [{name: "ShowConsumer"}, {name: "EditConsumer"}]);
 }
