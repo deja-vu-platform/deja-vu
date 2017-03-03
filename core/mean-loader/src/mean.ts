@@ -137,7 +137,8 @@ export namespace GruntTask {
       if (action === "dev" || action === "test") {
         grunt.log.writeln(name + " " + action);
 
-        const app_widgets_js: WidgetJs[] = app_widgets(widgets);
+        const app_widgets_js: WidgetJs[] = app_widgets(
+          widgets, wcomp_info, data);
         const cliche_widgets_js: WidgetJs[] = cliche_widgets(used_widgets);
         const all_widgets_js: WidgetJs[] = app_widgets_js
           .concat(cliche_widgets_js);
@@ -212,9 +213,10 @@ export namespace GruntTask {
     class_name: string;
     name: string;
     selector?: string;
+    fields?: any[];
   }
 
-  function app_widgets(app_widgets: Widget[]): WidgetJs[] {
+  function app_widgets(app_widgets: Widget[], wcomp_info, data): WidgetJs[] {
     let flat_widgets: Widget[] = _u.chain(app_widgets)
         .pluck("children")
         .without(null, undefined)
@@ -224,11 +226,22 @@ export namespace GruntTask {
       .concat(_u.map(app_widgets, w => ({name: w.name, path: w.path})));
     flat_widgets = _u.uniq(flat_widgets, false, w => w.name);
 
+    const all_widgets_fields = _u.pluck(wcomp_info.wbonds, "subfield");
     return _u.map(flat_widgets, fw => ({
       import_stmt: imp(fw.name, ".."),
       class_name: component(fw.name),
       name: fw.name,
-      selector: `<dv-widget name="${fw.name}"></dv-widget>`
+      selector: `<dv-widget name="${fw.name}"></dv-widget>`,
+      fields: _u
+        .chain(all_widgets_fields)
+        .filter(f => f.of.name === fw.name)
+        .map(f => {
+          if (data[fw.name] !== undefined) {
+            f.data = data[fw.name][0][f.name];
+          }
+          return f;
+        })
+        .value()
     }));
   }
 
