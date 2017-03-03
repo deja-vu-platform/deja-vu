@@ -61,8 +61,12 @@ export class NewWeeklyEventComponent {
   }
 
   ngAfterViewInit() {
+    // Datepicker and timepicker scripts need to be loaded this way
     this._loadScript("bootstrap-datepicker/bootstrap-datepicker.min.js");
+    this._loadStyle("bootstrap-datepicker/bootstrap-datepicker3.min.css");
+
     this._loadScript("bootstrap-timepicker/bootstrap-timepicker.min.js");
+    this._loadStyle("bootstrap-timepicker/bootstrap-timepicker.css");
   }
 
   _loadScript(src: string) {
@@ -70,6 +74,15 @@ export class NewWeeklyEventComponent {
     s.type = "text/javascript";
     s.src = "node_modules/dv-organization-event/lib/components/" +
       "new-weekly-event/vendor/" + src;
+    this._elementRef.nativeElement.appendChild(s);
+  }
+
+  _loadStyle(href: string) {
+    const s = document.createElement("link");
+    s.type = "text/css";
+    s.rel = "stylesheet";
+    s.href = "node_modules/dv-organization-event/lib/components/" +
+      "new-weekly-event/vendor/" + href;
     this._elementRef.nativeElement.appendChild(s);
   }
 
