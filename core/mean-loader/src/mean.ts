@@ -73,7 +73,7 @@ export class Mean {
 
 export interface Widget {
   name: string;
-  path: string;
+  path?: string;
   children?: Widget[];
 }
 
@@ -83,55 +83,265 @@ export interface UsedWidget {
 }
 
 export namespace GruntTask {
+  const module_map = {
+    // angular bundles
+    "@angular/core": "node_modules/@angular/core/bundles/core.umd.js",
+    "@angular/common": "node_modules/@angular/common/bundles/common.umd.js",
+    "@angular/compiler": "node_modules/@angular/compiler/bundles/" +
+      "compiler.umd.js",
+    "@angular/platform-browser": "node_modules/@angular/platform-browser/" +
+      "bundles/platform-browser.umd.js",
+    "@angular/platform-browser-dynamic": "node_modules/@angular/" +
+      "platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js",
+    "@angular/http": "node_modules/@angular/http/bundles/http.umd.js",
+    "@angular/router": "node_modules/@angular/router/bundles/router.umd.js",
+    "@angular/forms": "node_modules/@angular/forms/bundles/forms.umd.js",
+
+    // other libraries
+    "underscore": "node_modules/underscore/underscore.js",
+    "underscore.string": "node_modules/underscore.string/dist/" +
+      "underscore.string.min.js",
+    "rxjs": "node_modules/rxjs",
+
+    // Deja Vu stuff
+    "client-bus": "node_modules/client-bus/lib/client-bus.js",
+    "gql": "node_modules/gql/lib/gql.js"
+  };
+
+  const base_deps = [
+    "node_modules/zone.js/dist/zone.js",
+    "node_modules/reflect-metadata/Reflect.js",
+    "node_modules/jquery/dist/jquery.min.js",
+    "node_modules/systemjs/dist/system.src.js"
+  ];
+
   export function task(
-      grunt, name: string, widgets?: Widget[], main?: string, patterns?,
-      used_widgets?: UsedWidget[], replace_map?, comp_info?, wcomp_info?,
-      data?) {
-    widgets = widgets === undefined ? [] : widgets;
-    patterns = patterns === undefined ? {} : patterns;
-    used_widgets = used_widgets === undefined ? [] : used_widgets;
-    replace_map = replace_map === undefined ? {} : replace_map;
-    comp_info = comp_info === undefined ? {} : comp_info;
-    wcomp_info = wcomp_info === undefined ? {} : wcomp_info;
-    data = data === undefined ? {} : data;
-
-
-    const npm = "node_modules";
-    const patterns_src = Object.keys(patterns)
-        .map(p => `${npm}/${p}/lib/{components,shared}/**/` +
+      grunt, name: string, widgets: Widget[] = [], main?: string,
+      cliches = {}, used_widgets: UsedWidget[] = [], replace_map = {},
+      comp_info = {}, wcomp_info = {}, data = {}) {
+    const cliches_src = Object.keys(cliches)
+        .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
                   "*.{js,html,css}");
-    let deps = [
-      `${npm}/zone.js/dist/zone.js`,
-      `${npm}/reflect-metadata/Reflect.js`,
-      `${npm}/jquery/dist/jquery.min.js`,
-      `${npm}/systemjs/dist/system.src.js`
-    ];
-    deps = deps.concat(patterns_src);
+    const deps = _u.values(module_map).concat(base_deps).concat(cliches_src);
 
-    let module_map = {
-      // angular bundles
-      "@angular/core": `${npm}/@angular/core/bundles/core.umd.js`,
-      "@angular/common": `${npm}/@angular/common/bundles/common.umd.js`,
-      "@angular/compiler": `${npm}/@angular/compiler/bundles/compiler.umd.js`,
-      "@angular/platform-browser": `${npm}/@angular/platform-browser/bundles/` +
-        "platform-browser.umd.js",
-      "@angular/platform-browser-dynamic": `${npm}/@angular/` +
-        "platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js",
-      "@angular/http": `${npm}/@angular/http/bundles/http.umd.js`,
-      "@angular/router": `${npm}/@angular/router/bundles/router.umd.js`,
-      "@angular/forms": `${npm}/@angular/forms/bundles/forms.umd.js`,
+    grunt.initConfig(config(deps));
+    grunt.loadNpmTasks("grunt-ts");
+    grunt.loadNpmTasks("grunt-tslint");
+    grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-contrib-copy");
+    grunt.loadNpmTasks("grunt-express-server");
+    grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.loadNpmTasks("grunt-replace");
 
-      // other libraries
-      "underscore": `${npm}/underscore/underscore.js`,
-      "underscore.string": `${npm}/underscore.string/dist/` +
-        "underscore.string.min.js",
-      "rxjs": `${npm}/rxjs`,
+    grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
+      if (action === "dev" || action === "test") {
+        grunt.log.writeln(name + " " + action);
 
-      // Deja Vu stuff
-      "client-bus": `${npm}/client-bus/lib/client-bus.js`,
-      "gql": `${npm}/gql/lib/gql.js`
+        const app_widgets_js: WidgetJs[] = app_widgets(widgets);
+        const cliche_widgets_js: WidgetJs[] = cliche_widgets(used_widgets);
+        const all_widgets_js: WidgetJs[] = app_widgets_js
+          .concat(cliche_widgets_js);
+
+        const cliches_servers_info: ClicheServer[] = cliches_servers(
+          cliches, name);
+        const locs = _u
+          .reduce(cliches_servers_info, (memo, cs: ClicheServer) => {
+            memo[cs.fqelement] = cs.loc;
+            return memo;
+          }, {});
+        const express_config_info = express_config(
+          cliches_servers_info, name, comp_info, locs, action);
+
+        let route_config_str = "[]";
+        if (action === "test") {
+          route_config_str = JSON.stringify(route_config(widgets, main))
+            .replace(/\"component\":\"([^"\""]*)\"/g, "component: $1");
+        }
+
+        const replace_patterns = [
+          {match: "name", replacement: name},
+          {match: "module_map", replacement: module_map},
+          {match: "replace_map", replacement: replace_map},
+          {match: "cliches", replacement: _u.keys(cliches)},
+          {match: "comp_info", replacement: comp_info},
+          {match: "wcomp_info", replacement: wcomp_info},
+          {match: "mode", replacement: action},
+
+          {match: "wid_names", replacement: _u.pluck(app_widgets_js, "name")},
+          {match: "wid_imports", replacement: _u
+            .pluck(all_widgets_js, "import_stmt").join("\n")},
+          {match: "wid_classes", replacement: "[" + _u
+            .pluck(all_widgets_js, "class_name").join() + "]"},
+
+          {match: "wid_selectors", replacement: _u
+            .pluck(app_widgets_js, "selector").join("\n")},
+
+          {match: "route_config", replacement: route_config_str},
+          {match: "locs", replacement: locs}
+        ];
+
+        grunt.config.merge({
+          replace: {dev: {options: {patterns: replace_patterns}}},
+          express: _u.reduce(express_config_info, (memo, cs: ClicheServer) => {
+              memo[cs.fqelement] = {options: cs.express_config};
+              return memo;
+            }, {})
+        });
+
+        grunt.task.run(["clean:dev"]);
+        grunt.task.run(["replace:dev"]);
+        grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
+        grunt.task.run(["copy:dev"]);
+        grunt.task.run(["express", "watch"]);
+      } else if (action === "lib") {
+        grunt.log.writeln(name + " lib");
+        grunt.task.run(["clean:lib"]);
+        grunt.task.run(["tslint", "ts:lib_client", "ts:lib_server"]);
+        grunt.task.run(["copy:lib"]);
+      } else if (action === "clean") {
+        grunt.task.run("clean");
+      } else {
+        grunt.fail.fatal(
+          `Unrecognized action ${action}. Choose one of dev, test, or lib`);
+      }
+    });
+  }
+
+  interface WidgetJs {
+    import_stmt: string;
+    class_name: string;
+    name: string;
+    selector?: string;
+  }
+
+  function app_widgets(app_widgets: Widget[]): WidgetJs[] {
+    let flat_widgets: Widget[] = _u.chain(app_widgets)
+        .pluck("children")
+        .without(null, undefined)
+        .flatten()
+        .value();
+    flat_widgets = flat_widgets
+      .concat(_u.map(app_widgets, w => ({name: w.name, path: w.path})));
+    flat_widgets = _u.uniq(flat_widgets, false, w => w.name);
+
+    return _u.map(flat_widgets, fw => ({
+      import_stmt: imp(fw.name, ".."),
+      class_name: component(fw.name),
+      name: fw.name,
+      selector: `<dv-widget name="${fw.name}"></dv-widget>`
+    }));
+  }
+
+  function cliche_widgets(cliche_widgets: UsedWidget[]): WidgetJs[] {
+    return _u.chain(cliche_widgets)
+      .map((cw: UsedWidget) => {
+        cw.fqelement = cliche(cw.fqelement);
+        return cw;
+      })
+      .unique(false, cw => cw.name + cw.fqelement)
+      .map(cw => ({
+        import_stmt: imp(cw.name, cw.fqelement + "/lib"),
+        class_name: component(cw.name),
+        name: cw.name
+      }))
+      .value();
+  }
+
+  function route_config(app_widgets: Widget[], main: string): any[] {
+    const wid_with_paths = _u.filter(app_widgets, w => w.path !== undefined);
+    const default_path = _u.findWhere(wid_with_paths, {name: main}).path;
+    const routify = w => {
+      if (w.children === undefined) {
+        return {path: w.path, component: component(w.name)};
+      } else {
+        return {
+          path: w.path, component: component(w.name),
+          children: _u.map(w.children, routify)
+        };
+      }
     };
+    return  _u
+      .map(wid_with_paths, routify)
+      .concat({path: "", redirectTo: default_path, pathMatch: "full"});
+  }
 
+  interface ClicheServer {
+    fqelement: string;
+    loc: string;
+    port: number;
+    express_config;
+  }
+
+  function cliches_servers(cliches, name: string): ClicheServer[] {
+    const ret = [];
+    ret.push({fqelement: name, loc: "http://localhost:3000"});
+
+    let port = 3001;
+    _u.each(cliches, (instances_number, name) => {
+      for (let i = 1; i <= instances_number; ++i) {
+        const fqelement = (instances_number > 1) ? name + "-" + i : name;
+        ret.push({
+          fqelement: fqelement,
+          loc: "http://localhost:" + port,
+          port: port
+        });
+        ++port;
+      }
+    });
+    return ret;
+  }
+
+  function express_config(
+      cliches: ClicheServer[], name: string, comp_info, locs, action: string) {
+    return _u.map(cliches, (cs: ClicheServer) => {
+      const comp_info_str: string = JSON.stringify(comp_info);
+      const locs_str: string = JSON.stringify(locs);
+      if (cs.fqelement === name) {
+        cs.express_config = {
+          script: "dist/app.js",
+          background: true,
+          args: [
+            "--main", `--mode=${action}`, `--fqelement=${cs.fqelement}`,
+            `--comp=${comp_info_str}`, `--locs=${locs_str}`
+          ],
+          port: cs.port
+        };
+      } else {
+        cs.express_config = {
+          script: `node_modules/${cliche(cs.fqelement)}/lib/app.js`,
+          background: true,
+          args: [
+            `--fqelement=${cs.fqelement}`,
+            `--comp=${comp_info_str}`, `--locs=${locs_str}`
+          ],
+          port: cs.port
+        };
+      }
+      return cs;
+    });
+  }
+
+  function imp(w_name: string, w_imp_prefix: string): string {
+    const hyphen = w => w.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
+    return `import {${component(w_name)}} from ` +
+      `"${w_imp_prefix}/components/${hyphen(w_name)}/` +
+      `${hyphen(w_name)}";`;
+  }
+
+  function component(w_name: string): string {
+    return `${w_name}Component`;
+  }
+
+  function cliche(fqelement: string): string {
+    let ret = fqelement;
+    const fqelement_split = fqelement.split("-");
+    if (fqelement_split.length === 4) {
+      ret = fqelement_split.slice(0, -1).join("-");
+    }
+    return ret;
+  }
+
+  function config(deps: string[]) {
     const ts_base_opts = {
       verbose: true,
       target: "es6",
@@ -151,8 +361,7 @@ export namespace GruntTask {
     const shared = "src/shared/**/*.ts";
     const server = "src/*.ts";
 
-    grunt.initConfig({
-      pkg: grunt.file.readJSON("package.json"),
+    return {
       ts: {
         dev_client: {
           src: [typings, shared, components, "src/dv-dev/**/*.ts"],
@@ -187,12 +396,12 @@ export namespace GruntTask {
             },
             {
               expand: true,
-              src: _u.values(module_map).concat(deps),
+              src: deps,
               dest: "dist/public"
             },
             {
               expand: true,
-              src: [`${npm}/rxjs/**`],
+              src: ["node_modules/rxjs/**"],
               dest: "dist/public"
             },
             {
@@ -260,24 +469,16 @@ export namespace GruntTask {
       },
 
       clean: {
-        default: {
-          src: ["dist", "lib"]
-        },
-        dev: {
-          src: ["dist", "src/dv-dev"]
-        },
-        lib: {
-          src: ["lib"]
-        }
+        default: {src: ["dist", "lib"]},
+        dev: {src: ["dist", "src/dv-dev"]},
+        lib: {src: ["lib"]}
       },
 
       watch: {
         express: {
           files: ["src/**/*.ts"],
           tasks: ["dv-mean:serve"],
-          options: {
-            spawn: false
-          }
+          options: {spawn: false}
         }
       },
 
@@ -294,171 +495,6 @@ export namespace GruntTask {
           ]
         }
       }
-    });
-
-    grunt.loadNpmTasks("grunt-ts");
-    grunt.loadNpmTasks("grunt-tslint");
-    grunt.loadNpmTasks("grunt-contrib-clean");
-    grunt.loadNpmTasks("grunt-contrib-copy");
-    grunt.loadNpmTasks("grunt-express-server");
-    grunt.loadNpmTasks("grunt-contrib-watch");
-    grunt.loadNpmTasks("grunt-replace");
-
-    grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
-      if (action === "dev" || action === "test") {
-        grunt.log.writeln(name + " " + action);
-
-        const hyphen = w => w.replace(/([a-z])([A-Z])/g, "$1-$2").toLowerCase();
-        const component = w => w + "Component";
-        const imp = (w_name, w_imp_prefix) => `import {${component(w_name)}} ` +
-          `from "${w_imp_prefix}/components/${hyphen(w_name)}/` +
-          `${hyphen(w_name)}";`;
-        const selector = w => `<dv-widget name="${w}"></dv-widget>`;
-
-        let flat_widgets: Widget[] = _u.chain(widgets)
-            .pluck("children")
-            .without(null, undefined)
-            .flatten()
-            .value();
-        flat_widgets = flat_widgets
-          .concat(_u.map(widgets, w => ({name: w.name, path: w.path})));
-        flat_widgets = _u.uniq(flat_widgets, false, w => w.name);
-
-        used_widgets = _u.chain(used_widgets)
-          .map(uw => {
-            const uw_split = uw.fqelement.split("-");
-            if (uw_split.length === 4) {
-              uw.fqelement = uw_split.slice(0, -1).join("-");
-            }
-            return uw;
-          })
-          .unique(false, uw => uw.name + uw.fqelement)
-          .value();
-
-        const wid_imports = _u
-          .map(flat_widgets, w => imp(w.name, ".."))
-          .concat(_u.map(used_widgets, w => imp(w.name, w.fqelement + "/lib")))
-          .join("\n");
-        let wid_selectors = "";
-
-        let route_config = "[]";
-
-        const wid_names = _u.map(widgets, w => w.name);
-        const wid_classes = "[" +
-          _u.map(flat_widgets, w => w.name + "Component")
-          .concat(_u.map(used_widgets, w => w.name + "Component"))
-          .join() + "]";
-
-        if (action === "dev") {
-          wid_selectors = _u.map(wid_names, selector).join("\n");
-        } else {
-          const wid_with_paths = _u.filter(widgets, w => w.path !== undefined);
-          const default_path = _u.findWhere(wid_with_paths, {name: main}).path;
-          const routify = w => {
-            if (w.children === undefined) {
-              return `{path: "${w.path}", component: ${component(w.name)}}`;
-            } else {
-              return `{
-                path: "${w.path}", component: ${component(w.name)},
-                children: [${_u.map(w.children, routify).join()}]
-              }`;
-            }
-          };
-          route_config = "[" + _u
-              .map(wid_with_paths, routify)
-              .join() + ", " +
-              `{path: '', redirectTo: '${default_path}', pathMatch: 'full'}` +
-              "]";
-        }
-
-        let replace_patterns = [
-          {match: "name", replacement: name},
-          {match: "module_map", replacement: module_map},
-          {match: "replace_map", replacement: replace_map},
-          {match: "cliches", replacement: _u.keys(patterns)},
-          {match: "comp_info", replacement: comp_info},
-          {match: "wcomp_info", replacement: wcomp_info},
-          {match: "mode", replacement: action},
-
-          {match: "wid_names", replacement: wid_names},
-          {match: "wid_imports", replacement: wid_imports},
-          {match: "wid_classes", replacement: wid_classes},
-
-          {match: "wid_selectors", replacement: wid_selectors},
-
-          {match: "route_config", replacement: route_config}
-        ];
-
-
-        let port = 3002;
-        const locs = {};
-        locs[name] = "http://localhost:3000";
-
-        Object.keys(patterns).forEach(p => {
-          let instances_number = patterns[p];
-          for (let i = 1; i <= instances_number; ++i) {
-            const fqelement = (instances_number > 1) ? p + "-" + i : p;
-            locs[fqelement] = "http://localhost:" + port;
-            ++port;
-          }
-        });
-        const locs_str = JSON.stringify(locs);
-        replace_patterns.push({match: "locs", replacement: locs});
-
-        grunt.config.merge(
-          {replace: {dev: {options: {patterns: replace_patterns}}}});
-
-
-        const comp_info_str = JSON.stringify(comp_info);
-        let express_config = {};
-        express_config["main"] = {
-          options: {
-            script: "dist/app.js",
-            background: true,
-            args: [
-              "--main", "--mode=" + action,
-              "--fqelement=" + name,
-              "--comp=" + comp_info_str ,
-              "--locs=" + locs_str]
-          }
-        };
-
-        port = 3002;
-        Object.keys(patterns).forEach(p => {
-          let instances_number = patterns[p];
-          for (let i = 1; i <= instances_number; ++i) {
-            const fqelement = (instances_number > 1) ? p + "-" + i : p;
-            express_config[fqelement] = {
-              options: {
-                script: "node_modules/" + p + "/lib/app.js",
-                background: true,
-                args: [
-                    "--fqelement=" + fqelement,
-                    "--comp=" + comp_info_str, "--locs=" + locs_str]
-              }
-            };
-            ++port;
-          }
-        });
-        grunt.config.merge({express: express_config});
-
-        grunt.task.run(["clean:dev"]);
-        grunt.task.run(["replace:dev"]);
-        grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
-        grunt.task.run(["copy:dev"]);
-        grunt.task.run(["express", "watch"]);
-      } else if (action === "lib") {
-        grunt.log.writeln(name + " lib");
-        grunt.task.run(
-          ["clean:lib", "tslint", "ts:lib_client", "ts:lib_server",
-           "copy:lib"]);
-      } else if (action === "clean") {
-        grunt.task.run("clean");
-      } else {
-        grunt.fail.fatal(
-          "Unrecognized action " + action +
-          ". Choose one of dev, test, or lib");
-      }
-    });
+    };
   }
 }
