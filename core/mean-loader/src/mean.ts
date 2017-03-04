@@ -137,8 +137,8 @@ export namespace GruntTask {
       if (action === "dev" || action === "test") {
         grunt.log.writeln(name + " " + action);
 
-        const app_widgets_js: WidgetJs[] = app_widgets(
-          widgets, wcomp_info, data);
+        const app_widgets_js: WidgetJs[] = widget_definitions(
+          app_widgets(widgets, wcomp_info, data));
         const cliche_widgets_js: WidgetJs[] = cliche_widgets(used_widgets);
         const all_widgets_js: WidgetJs[] = app_widgets_js
           .concat(cliche_widgets_js);
@@ -170,7 +170,7 @@ export namespace GruntTask {
 
           {match: "wid_names", replacement: _u.pluck(app_widgets_js, "name")},
           {match: "wid_imports", replacement: _u
-            .pluck(all_widgets_js, "import_stmt").join("\n")},
+            .pluck(cliche_widgets_js, "import_stmt").join("\n")},
           {match: "wid_classes", replacement: "[" + _u
             .pluck(all_widgets_js, "class_name").join() + "]"},
 
@@ -178,7 +178,9 @@ export namespace GruntTask {
             .pluck(app_widgets_js, "selector").join("\n")},
 
           {match: "route_config", replacement: route_config_str},
-          {match: "locs", replacement: locs}
+          {match: "locs", replacement: locs},
+          {match: "wid_definitions", replacement: _u
+            .pluck(app_widgets_js, "definition").join("\n")}
         ];
 
         grunt.config.merge({
@@ -208,12 +210,26 @@ export namespace GruntTask {
     });
   }
 
+  interface TypeInfo {
+    name: string;
+    fqelement: string;
+  }
+
+  interface FieldInfo {
+    name: string;
+    type: TypeInfo;
+    of: TypeInfo;
+    data: any;
+  }
+
   interface WidgetJs {
     import_stmt: string;
     class_name: string;
     name: string;
     selector?: string;
-    fields?: any[];
+    fields?: FieldInfo[];
+    definition?: string;
+    path?: string;
   }
 
   function app_widgets(app_widgets: Widget[], wcomp_info, data): WidgetJs[] {
@@ -241,7 +257,8 @@ export namespace GruntTask {
           }
           return f;
         })
-        .value()
+        .value(),
+      path: fw.path
     }));
   }
 
@@ -331,6 +348,70 @@ export namespace GruntTask {
         };
       }
       return cs;
+    });
+  }
+
+  function widget_definitions(widgets: WidgetJs[]): WidgetJs[] {
+    const field_defs = w => _u
+      .chain(w.fields)
+      .filter(f => f.data)
+      .pluck("name")
+      .value()
+      .join(";");
+    const field_init = w => _u
+      .map(w.fields, (f: FieldInfo) => `field("${f.name}", "${f.type.name}")`)
+      .join();
+    const field_assignments = w => _u
+      .chain(w.fields)
+      .filter(f => f.data)
+      .map(f => {
+        let ret = "";
+        if (f.type.name === "Text") {
+          ret = `this.${f.name}.value = "${f.data}"`;
+        } else if (f.type.name === "Boolean") {
+          ret = `this.${f.name}.value = ${f.data}$`;
+        } else {
+          throw new Error("to be implemented");
+        }
+        return ret;
+      })
+      .value()
+      .join(";");
+
+    const wid_with_paths = _u
+      .chain(widgets)
+      .filter(w => w.path !== undefined)
+      .pluck("name")
+      .value();
+    const template_route_widget = w => `
+      @AppWidget()
+      export class ${w.class_name} {
+        ${field_defs(w)};
+        constructor(client_bus: ClientBus) {
+          client_bus.init(this, [${field_init(w)}]);
+          ${field_assignments(w)};
+        }
+      }
+    `;
+    const template_inner_widget = w => `
+      @AppWidget()
+      export class ${w.class_name} {
+        ${field_defs(w)};
+        constructor(client_bus: ClientBus) {
+          client_bus.init(this, [${field_init(w)}]);
+        }
+        dvAfterInit() {
+          ${field_assignments(w)};
+        }
+      }
+    `;
+    return _u.map(widgets, (w: WidgetJs) => {
+      let template = template_inner_widget;
+      if (_u.contains(wid_with_paths, w.name)) {
+        template = template_route_widget;
+      }
+      w.definition = template(w);
+      return w;
     });
   }
 
