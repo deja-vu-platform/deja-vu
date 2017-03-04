@@ -6,7 +6,7 @@ import {Widget} from "client-bus";
 @Widget({fqelement: "dv-messaging-post"})
 export class NewPostContentComponent {
   post: Post = {content: ""};
-  submit_ok = {value: false, on_change: undefined, on_after_change: undefined};
+  submit_ok = {value: false, on_after_change: _ => undefined};
 
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {

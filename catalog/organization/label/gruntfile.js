@@ -3,6 +3,6 @@ module.exports = function(grunt) {
       grunt,
       "dv-organization-label",
       [
-        {name: "LabelsText"}
+        {name: "AttachLabels"}
       ]);
 }

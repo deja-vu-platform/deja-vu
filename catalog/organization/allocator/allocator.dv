@@ -19,4 +19,10 @@ cliche Allocator {
     allocation: Allocation,
     resource: Resource
   }
+
+  // Edits the name of the consumer of the given resource
+  widget EditConsumer {
+    allocation: Allocation,
+    resource: Resource
+  }
 }
