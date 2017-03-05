@@ -48,10 +48,10 @@ var DataWorkSurface = function(){
     var loadAllDatatypesIntoOverallWorkSurface = function(component, zoom){
         var workSurface = createOrResetWorkSurface(component, zoom);
 
-        for (var datatypeId in component.datatypes){
-            var datatype = component.datatypes[datatypeId];
+        for (var datatypeId in component.datatypes.used){
+            var datatype = component.datatypes.used[datatypeId];
 
-            var dragHandle = $('#basic-cliches .draggable[data-type=' + 'user' + ']').clone();
+            var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
             dragHandle.text(datatype.meta.name);
             dragHandle.css('display', 'block');
 
@@ -275,16 +275,16 @@ var DataWorkSurface = function(){
 
     var disableAllDataDomElementsExcept = function(dataToEnableId){
         // TODO this also needs to disable the overall component
-        for (var dataId in userApp.getAllDatatypeIds()){
+        userApp.getAllDatatypeIds().forEach(function(dataId){
             if (dataToEnableId == dataId){
                 enableDataDOMElements(dataId);
-                continue;
+                return;
             }
             if ($('#'+DATA_WS_ID+'_'+dataId).hasClass('hidden-component')){
-                continue;
+                return;
             }
             disableWidgetDOMElements(dataId);
-        }
+        })
     };
 
     Object.freeze(that);

@@ -28,7 +28,7 @@ $('#save-project').on('click', function () {
     //downloadObject(selectedProject.meta.name+'.json', selectedProject);
 });
 
-$('.cliches').on('click', '.component-name-container', function () {
+$('.components').on('click', '.component-name-container', function () {
     // Save the current values
     var oldState = {zoom : currentZoom};
     var workSurfaceRef = dataWorkSurface.getWorkSurfaceRef();
@@ -42,7 +42,7 @@ $('.cliches').on('click', '.component-name-container', function () {
     $('#outer-container').scrollLeft(0);
 });
 
-$('.cliches').on('dblclick', '.component-name', function (e) {
+$('.components').on('dblclick', '.component-name', function (e) {
     var newNameInputElt = $($(this).parent().find('.new-name-input'));
     var submitRenameElt = $($(this).parent().find('.submit-rename'));
     newNameInputElt.val($(this).text());
@@ -52,7 +52,7 @@ $('.cliches').on('dblclick', '.component-name', function (e) {
     newNameInputElt.select();
 });
 
-$('.cliches').on('keypress', '.new-name-input', function (event) {
+$('.components').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
         var widgetId = $(this).parent().parent().parent().data('componentid');
@@ -104,7 +104,7 @@ function setWidgetOptions(outerWidget){
                 if (newName.length === 0) { // empty string entered, don't change the name!
                     return;
                 }
-                $('.cliches').find('[data-componentid='+outerWidget.meta.id+']').find('.component-name').text(newName);
+                $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.component-name').text(newName);
 
                 widgetNameElt.text($(this).val());
 
@@ -179,12 +179,12 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
     if (outerWidget.meta.id == selectedProject.userApp.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
-        $('.cliches').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
+        $('.components').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
 
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $(this).find('.text').text('Assign as Index Page');
-            $('.cliches').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
         });
     } else {
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
@@ -192,7 +192,7 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
             $(this).find('.text').text('Unassign as Index Page');
-            $('.cliches').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
         });
 
     }
@@ -203,11 +203,11 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
 function displayDatatypeInListAndSelect(name, id){
     $('.selected').removeClass("selected");
     displayNewDatatypeInUserDatatypeList(name,id);
-    $("#user-cliches-list").find("[data-componentid='" + id + "']").addClass('selected');
+    $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
 /**
- * Adds a component to the list of user cliches
+ * Adds a component to the list of user components
  * @param newComponent
  */
 function displayNewDatatypeInUserDatatypeList(name, id){
@@ -221,7 +221,7 @@ function displayNewDatatypeInUserDatatypeList(name, id){
         + '</span>'
         + '</div>'
         + '</li>');
-    $('#user-cliches-list').append(newDatatypeElt);
+    $('#user-components-list').append(newDatatypeElt);
     // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
     dataDragAndDrop.registerDataDragHandleDraggable(newDatatypeElt);
@@ -577,10 +577,10 @@ function registerUserWidgetAreaDroppable(){
                 if (ui.draggable.hasClass('moving-user-component')){ // if type user
                     // adding to main page
                     selectedProject.addPage(selectedProject.cliches[userWidgetId]);
-                    $("#user-cliches-list").find("[data-componentid='" + userWidgetId + "']").remove();
+                    $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
                     displayMainPageInListAndSelect(name, userWidgetId);
                 }
-            } else if ($(this).hasClass('user-cliches')){
+            } else if ($(this).hasClass('user-components')){
                 if (ui.draggable.hasClass('moving-main-component')){ // if type user
                     // removing from main page
                     selectedProject.deletePage(selectedProject.cliches[userWidgetId]);
@@ -610,8 +610,8 @@ function registerUserWidgetAsDraggableForMainPages(widgetId) {
                 clone.innerHTML = $(this).find('.component-name').text();
                 return clone;
             },
-            appendTo: '#user-cliches-list',
-            containment: '.user-made-cliches',
+            appendTo: '#user-components-list',
+            containment: '.user-made-components',
             cursor: '-webkit-grabbing',
             scroll: true,
             stop: function () {
@@ -621,7 +621,7 @@ function registerUserWidgetAsDraggableForMainPages(widgetId) {
 
     };
 
-    $("#user-cliches-list").find("[data-componentid='" + widgetId + "']").each(function () {
+    $("#user-components-list").find("[data-componentid='" + widgetId + "']").each(function () {
         $(this).draggable(enableDraggable(this, 'user'));
     });
     $("#main-pages-list").find("[data-componentid='" + widgetId + "']").each(function () {
@@ -664,9 +664,9 @@ $(".dropdown-trigger").click(function(ev) {
     }
 });
 
-$('.cliches').on('click', '.index-page-toggle', function(){
+$('.components').on('click', '.index-page-toggle', function(){
     var turnOn = !($(this).parent().hasClass('selected-index-page'));
-    $('.cliches .selected-index-page').removeClass('selected-index-page');
+    $('.components .selected-index-page').removeClass('selected-index-page');
     var widgetId = $(this).parent().data('componentid');
     if (turnOn){
         selectedProject.userApp.indexId = widgetId;

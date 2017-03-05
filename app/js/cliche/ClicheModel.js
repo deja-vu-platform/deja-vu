@@ -179,8 +179,8 @@ UserApp.prototype.deleteWidget = function(widgetId){
 };
 
 UserApp.prototype.addDatatype = function(datatype, displayProps){
-    if (!(this.datatypes[datatype.meta.id])) {
-        this.datatypes[datatype.meta.id] = datatype;
+    if (!(this.datatypes.unused[datatype.meta.id])) {
+        this.datatypes.unused[datatype.meta.id] = datatype;
         this.datatypeDisplays[datatype.meta.id] = displayProps;
     }
 };

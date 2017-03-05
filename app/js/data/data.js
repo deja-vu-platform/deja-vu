@@ -18,7 +18,7 @@ var files = [];
 
 var selectedUserWidget = null;
 var selectedDatatype = null;
-var selectedComponent = null;
+var userApp = null;
 var selectedProject = null;
 
 var currentZoom = 1.0;
@@ -56,47 +56,32 @@ $(function(){
 
     $('.project-name .header').text(selectedProject.meta.name);
 
-    if (selectedProject.getNumCliches() == 0){
+
+    if (!selectedProject.userApp){
         // start a default component
-        selectedComponent = initUserApp();
-        selectedProject.addCliche(selectedComponent);
-        selectedProject.makeUserApp(selectedComponent);
-
-        selectedUserWidget = selectedComponent.widgets[Object.keys(selectedComponent.widgets)[0]];
-        displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+        userApp = initUserApp();
+        selectedProject.addCliche(userApp);
+        selectedProject.makeUserApp(userApp);
     } else {
-        var selectedComponentId = selectedProject.userApp;
-        selectedComponent = selectedProject.cliches[selectedComponentId];
-        selectedUserWidget = selectedComponent.widgets[Object.keys(selectedComponent.widgets)[0]];
+        var userAppId = selectedProject.userApp;
+        userApp = selectedProject.cliches[userAppId];
 
-        //var datatypeToLoadId;
-        //if (!$.isEmptyObject(userApp.mainPages)){
-        //    datatypeToLoadId = Object.keys(userApp.mainPages)[0];
-        //} else {
-        //    datatypeToLoadId = Object.keys(userApp.widgets)[0];
-        //}
-        //selectedUserWidget = userApp.widgets[datatypeToLoadId];
-        //if (datatypeToLoadId in userApp.mainPages){
-        //    displayMainPageInListAndSelect(selectedUserWidget.meta.name, datatypeToLoadId);
-        //} else {
-        //    displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, datatypeToLoadId);
-        //}
         // TODO this will need to be changed once we bring in a userComponent which will be a
         // superset of userWidgets
-        var componentName = selectedComponent.meta.name;
-        displayOverallDatatypesInListAndSelect(componentName, selectedComponentId);
+        var appName = userApp.meta.name;
+        displayOverallDatatypesInListAndSelect(appName, userAppId);
 
-        for (var datatypeId in selectedComponent.datatypes){
-            var datatypeName = selectedComponent.datatypes[datatypeId].meta.name;
+        for (var datatypeId in userApp.datatypes.unused){
+            var datatypeName = userApp.datatypes.unused[datatypeId].meta.name;
             displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId);
         }
-
     }
-    dataWorkSurface.loadDatatype(selectedComponent, null, currentZoom);
+
+    dataWorkSurface.loadDatatype(userApp, null, currentZoom);
 
     //autoSave5Mins();
 
-    basicWidgets = $('#basic-cliches').html();
+    basicWidgets = $('#basic-components').html();
 
     dataDragAndDrop.registerDataDragHandleDraggable();
 
