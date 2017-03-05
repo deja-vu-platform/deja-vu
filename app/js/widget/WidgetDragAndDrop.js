@@ -101,7 +101,7 @@ var WidgetDragAndDropController = function () {
                 var widgetContainer;
                 if (dragHandle.hasClass('associated')) {
                     var widgetId = dragHandle.data('componentid');
-                    draggingWidget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId)
+                    draggingWidget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
                     //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
                     var oldContainerId = containerRef+'_' + widgetId;
@@ -119,9 +119,14 @@ var WidgetDragAndDropController = function () {
                     var widget;
                     if (type == 'user') {
                         var id = dragHandle.data('componentid');
-                        widget = UserWidget.fromString(JSON.stringify(selectedComponent.widgets[id]));
-                        widget.meta.templateId = widget.meta.id;
-                        widget = createUserWidgetCopy(widget);
+                        if (id in userApp.widgets.templates){
+                            widget = UserWidget.fromString(JSON.stringify(userApp.widgets.templates[id]));
+                            widget.meta.templateId = userApp.meta.id + '_' + widget.meta.id;
+                            widget = createUserWidgetCopy(widget);
+                        } else { // it is unused
+                            widget = userApp.widgets.unused[id];
+
+                        }
                         dragHandle.data('componentid', widget.meta.id);
                         dragHandle.text(widget.meta.name);
                         dragHandle.css('display', 'block');
@@ -189,6 +194,9 @@ var WidgetDragAndDropController = function () {
                     } else { // properly dropped
                         widgetContainerOld.remove();
                     }
+                } else {
+                    delete userApp.widgets.unused[widgetId];
+                    $("#user-components-list").find("[data-componentid='" + widgetId + "']").remove();
                 }
 
             }

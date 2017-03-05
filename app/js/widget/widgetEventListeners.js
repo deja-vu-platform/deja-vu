@@ -9,7 +9,7 @@ $('#new-user-component-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, false);
-            selectedComponent.addWidget(selectedUserWidget);
+            userApp.addWidget(selectedUserWidget);
             displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
@@ -22,7 +22,7 @@ $('#new-main-component-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, true);
-            selectedComponent.addMainPage(selectedUserWidget);
+            userApp.addPage(selectedUserWidget);
             displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
 
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
@@ -31,6 +31,18 @@ $('#new-main-component-btn').click(function(){
     });
 });
 
+$('#new-widget-template-btn').click(function(){
+    $('#create-component').unbind()
+        .on('click', function () {
+            selectedUserWidget = initUserWidget(false, false);
+            userApp.addTemplate(selectedUserWidget);
+            displayNewWidgetTemplateInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+
+            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            style.setUpStyleColors(selectedUserWidget);
+            resetMenuOptions();
+        });
+});
 
 
 $('#save-project').on('click', function () {
@@ -44,15 +56,15 @@ $('.components').on('click', '.component-name-container', function () {
     var oldState = {zoom : currentZoom};
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
     $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
-    if (!selectedUserWidget.inMainPages){
+    if (!selectedUserWidget.isPage){
         $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']').draggable('enable');
     }
 
     var widgetId = $(this).parent().data('componentid');
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
-    selectedUserWidget = selectedComponent.widgets[widgetId];
-    if (!selectedUserWidget.inMainPages){
+    selectedUserWidget = userApp.getWidget(widgetId);
+    if (!selectedUserWidget.isPage){
         $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']').draggable('disable');
     }
     workSurface.loadUserWidget(selectedUserWidget);
@@ -88,7 +100,7 @@ $('.components').on('keypress', '.new-name-input', function (event) {
         widgetNameElt.text(newName);
         $('.component-options .component-name').text(newName);
 
-        selectedComponent.widgets[widgetId].meta.name = newName;
+        userApp.getWidget(widgetId).meta.name = newName;
     }
 });
 
@@ -141,14 +153,14 @@ function setWidgetOptions(outerWidget){
             // change the id
             copyWidget.meta.id = generateId();
 
-            if (originalId in selectedComponent.mainPages){
-                selectedComponent.addMainPage(copyWidget);
+            if (originalId in userApp.widgets.pages){
+                userApp.addPage(copyWidget);
                 displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             } else {
                 displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             }
 
-            selectedComponent.addWidget(copyWidget);
+            userApp.addWidget(copyWidget);
             selectedUserWidget = copyWidget;
             workSurface.loadUserWidget(copyWidget, 1);
 
@@ -171,7 +183,7 @@ function setWidgetOptions(outerWidget){
         .on("click", function (e) {
             var id = outerWidget.meta.id;
             if (confirmOnUserWidgetDelete){
-                if (selectedComponent.getNumWidgets() == 1){
+                if (userApp.getNumWidgets() == 1){
                     return; //don't delete the last one TODO is the the right way to go?
                 }
                 openDeleteUserWidgetConfirmDialogue(id);
@@ -181,7 +193,7 @@ function setWidgetOptions(outerWidget){
         });
 
     // if the component is in the main pages, set it up accordingly
-    if (outerWidget.meta.id in selectedComponent.mainPages){
+    if (outerWidget.meta.id in userApp.widgets.pages){
         $('.component-options #btn-index-page-toggle').css({
             display: 'inline-block',
         });
@@ -196,7 +208,7 @@ function setWidgetOptions(outerWidget){
 }
 
 function setUpWidgetOptionsIndexPageToggle(outerWidget){
-    if (outerWidget.meta.id == selectedComponent.mainPages.indexId){
+    if (outerWidget.meta.id == userApp.widgets.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
         $('.components').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
@@ -254,7 +266,7 @@ function displayNewWidgetInUserWidgetList(name, id){
  */
 function displayNewWidgetInMainPagesList(name, id){
     // TODO changes in style
-    var newWidgetElt =
+    var newWidgetElt = $(
         '<li data-componentid=' + id + '>'
         + '<div class="component-name-container">'
         + '<div class="component-name">' + name + '</div>'
@@ -264,7 +276,7 @@ function displayNewWidgetInMainPagesList(name, id){
         + '</div>'
         + '<div class="index-page-toggle">'
         + '</div>'
-        + '</li>';
+        + '</li>');
     $('#main-pages-list').append(newWidgetElt);
     addDeleteUserWidgetButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
@@ -274,6 +286,28 @@ function displayMainPageInListAndSelect(name, id){
     $('.selected').removeClass("selected");
     displayNewWidgetInMainPagesList(name,id);
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
+}
+
+function displayNewWidgetTemplateInList(name, id){
+    // TODO changes in style
+    var newWidgetElt = $(
+        '<li data-type="'+'user'+'" class="widget draggable" data-componentid=' + id + '>'
+        + '<div class="component-name-container">'
+        + '<div class="component-name">' + name + '</div>'
+        + '<div class="submit-rename not-displayed">'
+        + '<input type="text" class="new-name-input form-control" autofocus>'
+        + '</div>'
+        + '</div>'
+        + '</li>');
+    $('#widget-templates-list').append(newWidgetElt);
+    addDeleteUserWidgetButton(id);
+    dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
+}
+
+function displayNewWidgetTemplateInListAndSelect(name, id){
+    $('.selected').removeClass("selected");
+    displayNewWidgetTemplateInList(name,id);
+    $('#widget-templates-list').find("[data-componentid='" + id + "']").addClass('selected');
 }
 
 
@@ -589,36 +623,36 @@ $(document).on('change', '#fileselect', function(evt) {
 });
 
 /** ** ** ** ** ** Dragging and Dropping User Components to Main pages ** ** ** **/
-function registerUserWidgetAreaDroppable(){
-    var enableDrop = {
-        accept: ".dragging-component",
-        hoverClass: "highlight",
-        tolerance: "intersect",
-        drop: function(event, ui) {
-            var userWidgetId = ui.draggable.data('componentid');
-            var name = selectedComponent.widgets[userWidgetId].meta.name;
-            if ($(this).hasClass('main-pages')){
-                if (ui.draggable.hasClass('moving-user-component')){ // if type user
-                    // adding to main page
-                    selectedComponent.addMainPage(selectedComponent.widgets[userWidgetId]);
-                    $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
-                    displayMainPageInListAndSelect(name, userWidgetId);
-                }
-            } else if ($(this).hasClass('user-components')){
-                if (ui.draggable.hasClass('moving-main-component')){ // if type user
-                    // removing from main page
-                    selectedComponent.removeMainPage(selectedComponent.widgets[userWidgetId]);
-                    $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
-                    displayUserWidgetInListAndSelect(name, userWidgetId);
-
-                }
-            }
-        },
-    };
-    $('.page-component-toggle-drop').each(function() {
-        $(this).droppable(enableDrop);
-    });
-}
+// function registerUserWidgetAreaDroppable(){
+//     var enableDrop = {
+//         accept: ".dragging-component",
+//         hoverClass: "highlight",
+//         tolerance: "intersect",
+//         drop: function(event, ui) {
+//             var userWidgetId = ui.draggable.data('componentid');
+//             var name = userApp.widgets[userWidgetId].meta.name;
+//             if ($(this).hasClass('main-pages')){
+//                 if (ui.draggable.hasClass('moving-user-component')){ // if type user
+//                     // adding to main page
+//                     userApp.addPage(userApp.widgets[userWidgetId]);
+//                     $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
+//                     displayMainPageInListAndSelect(name, userWidgetId);
+//                 }
+//             } else if ($(this).hasClass('user-components')){
+//                 if (ui.draggable.hasClass('moving-main-component')){ // if type user
+//                     // removing from main page
+//                     userApp.deletePage(userApp.widgets[userWidgetId]);
+//                     $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
+//                     displayUserWidgetInListAndSelect(name, userWidgetId);
+//
+//                 }
+//             }
+//         },
+//     };
+//     $('.page-component-toggle-drop').each(function() {
+//         $(this).droppable(enableDrop);
+//     });
+// }
 
 function registerUserWidgetAsDraggableForMainPages(widgetId) {
     var enableDraggable = function (element, type) {
@@ -693,12 +727,12 @@ $('.components').on('click', '.index-page-toggle', function(){
     $('.components .selected-index-page').removeClass('selected-index-page');
     var widgetId = $(this).parent().data('componentid');
     if (turnOn){
-        selectedComponent.mainPages.indexId = widgetId;
+        userApp.widgets.indexId = widgetId;
         $(this).parent().addClass('selected-index-page');
     } else {
-        selectedComponent.mainPages.indexId = null;
+        userApp.widgets.indexId = null;
     }
-    setUpWidgetOptionsIndexPageToggle(selectedComponent.widgets[widgetId]);
+    setUpWidgetOptionsIndexPageToggle(userApp.getWidget(widgetId));
 });
 
 function refreshContainerDisplay(fresh, container, zoom){
@@ -761,8 +795,6 @@ function recursiveReIding(widget, sourceWidget){
                         delete widget.innerWidgets[innerWidgetOldId];
                         widget.properties.layout[result.newId] = widget.properties.layout[innerWidgetOldId];
                         delete widget.properties.layout[innerWidgetOldId];
-                        widget.idMap = widget.idMap || {};
-                        widget.idMap[result.newId] = innerWidgetOldId;
                     }
                 }
             }
@@ -918,20 +950,33 @@ function downloadHTML(){
 
 }
 
-/**
- * Deletes a component from the datatype and also from the view
- */
-function deleteWidgetFromUserWidgetAndFromView(widgetId) {
-    var containerId = "component-container_"+widgetId;
-    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
-    parent.deleteInnerWidget(widgetId);
-    // selectedUserWidget.deleteInnerWidget(widgetId);
+var removeUserWidgetFromView = function(widgetId){
+    var containerRef = widgetContainerMaker.getContainerRef();
+
+    var containerId = containerRef+"_"+widgetId;
     $('#'+containerId).remove();
     grid.setUpGrid();
     miniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
     zoomElement.registerZoom(selectedUserWidget);
 }
 
+/**
+ * Deletes a component from the datatype and also from the view
+ */
+function deleteWidgetFromUserWidgetAndFromView(widgetId) {
+    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+    parent.deleteInnerWidget(widgetId);
+    removeUserWidgetFromView(widgetId);
+}
+
+function removeWidgetFromUserWidgetAndFromView(widgetId) {
+    var widget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
+    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+    parent.deleteInnerWidget(widgetId);
+    userApp.addWidget(widget);
+    removeUserWidgetFromView(widgetId);
+    displayNewWidgetInUserWidgetList(widget.meta.name, widgetId);
+}
 
 
 // keyboard shortcuts
@@ -942,3 +987,170 @@ $(document).keydown(function(e){
         event.preventDefault();
     }
 });
+
+
+
+/**
+ * Update the saved ratios and then use this function
+ */
+function propagateRatioChangeToAllElts(newRatio, userWidget){
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
+    view.displayWidget(false, userWidget, $('#'+workSurfaceRef+'_'+userWidget.meta.id), {}, newRatio);
+    miniNav.updateNavInnerWidgetSizes(newRatio);
+    grid.setUpGrid();
+}
+
+function addDeleteUserWidgetButton(userWidgetId){
+    var spDelete = document.createElement('span');
+    spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-component">' +
+        '<span class="glyphicon glyphicon-trash"></span>' +
+        '</button>';
+
+    var buttonDeleteUserWidget = spDelete.firstChild;
+    buttonDeleteUserWidget.id = 'btn-delete-component_'+userWidgetId;
+
+    $(buttonDeleteUserWidget).on("click", function (e) {
+        if (userApp.getNumWidgets() == 1){
+            return; //don't delete the last one TODO is the the right way to go?
+        }
+        if (confirmOnUserWidgetDelete){
+            openDeleteUserWidgetConfirmDialogue(userWidgetId);
+        } else {
+            deleteUserWidget(userWidgetId);
+        }
+    });
+
+    var listElt;
+    if (userWidgetId in userApp.widgets.pages){
+        listElt = $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']");
+    } else if (userWidgetId in userApp.widgets.unused) {
+        listElt = $("#user-components-list").find("[data-componentid='" + userWidgetId + "']");
+    } else {
+        listElt = $("#widget-templates-list").find("[data-componentid='" + userWidgetId + "']");
+    }
+
+    listElt.append(buttonDeleteUserWidget).hover(
+        function(){
+            $(this).find('.component-name-container').css({
+                width: '70%'
+            });
+            $(this).find('.btn-delete-component').css({
+                display: 'inline-block',
+            });
+        }, function(){
+            $(this).find('.component-name-container').css({
+                width: '95%'
+            });
+            $(this).find('.btn-delete-component').css({
+                display: 'none',
+
+            });
+        }
+    );
+}
+
+function deleteUserWidget(userWidgetId){
+    if (userApp.getNumWidgets() == 1){
+        return; //don't delete the last one TODO is the the right way to go?
+    }
+    userApp.deleteWidget(userWidgetId);
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
+    $('#'+workSurfaceRef+'_'+userWidgetId).remove();
+    $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
+
+    if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
+        var otherIds = userApp.getAllWidgetIds();
+        selectedUserWidget = userApp.getWidget(otherIds[0]);
+        $("#user-cliches-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
+        $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
+        $("#widget-templates-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
+        workSurface.loadUserWidget(selectedUserWidget, currentZoom);
+    }
+    if (userWidgetId == userApp.widgets.indexId){
+        userApp.widgets.indexId = null;
+    }
+    $("#user-cliches-list").find("[data-componentid='" + userWidgetId + "']").remove();
+    $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
+    $("#widget-templates-list").find("[data-componentid='" + userWidgetId + "']").remove();
+}
+
+function openDeleteUserWidgetConfirmDialogue(userWidgetId){
+    $('#confirm-delete-userComponent').modal('show');
+    $('#delete-userComponent-name').text(userApp.getWidget(userWidgetId).meta.name);
+
+    $('#delete-userComponent-btn').unbind();
+    $('#delete-userComponent-btn').click(function(){
+        deleteUserWidget(userWidgetId);
+
+        $('#delete-userComponent-name').text('');
+        $('#confirm-delete-userComponent').modal('hide');
+    });
+
+    $('#delete-userComponent-cancel-btn').click(function(){
+        $('#delete-userComponent-name').text('');
+        $('#confirm-delete-userComponent').modal('hide');
+    });
+
+    $('#confirm-delete-userComponent .close').click(function(event){
+        event.preventDefault();
+        $('#delete-userComponent-name').text('');
+        $('#confirm-delete-userComponent').modal('hide');
+    });
+};
+
+
+
+
+/** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **/
+
+/**
+ * Creates a new User component based on user inputs
+ * @param isDefault
+ * @constructor
+ */
+function initUserWidget(isDefault, inMainPage) {
+    var name, version, author;
+    if (isDefault) {
+        name = DEFAULT_WIDGET_NAME;
+    } else {
+        name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+    }
+
+    version = selectedProject.meta.version;
+    author = selectedProject.meta.author;
+
+    var id = generateId();
+
+    if (inMainPage){
+        return UserWidget({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
+    }
+    return UserWidget({height: 400, width: 600}, name, id, version, author);
+}
+
+function initUserApp() {
+    var name, version, author;
+    name = selectedProject.meta.name;
+    version = selectedProject.meta.version;
+    author = selectedProject.meta.author;
+
+    var id = generateId();
+
+    var firstPage = initUserWidget(true, true);
+    var component = UserApp(name, id, version, author);
+    component.addPage(firstPage);
+    return component;
+}
+
+
+function duplicateUserWidget(userWidget){
+    return UserWidget.fromString(JSON.stringify(userWidget));
+}
+
+function clearAll(){
+    for (var widgetId in selectedUserWidget.innerWidgets){
+        deleteWidgetFromUserWidgetAndFromView(widgetId);
+    }
+}
+

@@ -56,27 +56,27 @@ $(function(){
 
     $('.project-name .header').text(selectedProject.meta.name);
 
-    if (selectedProject.getNumComponents() == 0){
+    if (selectedProject.getNumCliches() == 0){
         // start a default component
-        selectedComponent = initUserComponent();
-        selectedProject.addComponent(selectedComponent);
-        selectedProject.makeMainComponent(selectedComponent);
+        selectedComponent = initUserApp();
+        selectedProject.addCliche(selectedComponent);
+        selectedProject.makeUserApp(selectedComponent);
 
         selectedUserWidget = selectedComponent.widgets[Object.keys(selectedComponent.widgets)[0]];
         displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
     } else {
-        var selectedComponentId = selectedProject.mainComponent;
-        selectedComponent = selectedProject.components[selectedComponentId];
+        var selectedComponentId = selectedProject.userApp;
+        selectedComponent = selectedProject.cliches[selectedComponentId];
         selectedUserWidget = selectedComponent.widgets[Object.keys(selectedComponent.widgets)[0]];
 
         //var datatypeToLoadId;
-        //if (!$.isEmptyObject(selectedComponent.mainPages)){
-        //    datatypeToLoadId = Object.keys(selectedComponent.mainPages)[0];
+        //if (!$.isEmptyObject(userApp.mainPages)){
+        //    datatypeToLoadId = Object.keys(userApp.mainPages)[0];
         //} else {
-        //    datatypeToLoadId = Object.keys(selectedComponent.widgets)[0];
+        //    datatypeToLoadId = Object.keys(userApp.widgets)[0];
         //}
-        //selectedUserWidget = selectedComponent.widgets[datatypeToLoadId];
-        //if (datatypeToLoadId in selectedComponent.mainPages){
+        //selectedUserWidget = userApp.widgets[datatypeToLoadId];
+        //if (datatypeToLoadId in userApp.mainPages){
         //    displayMainPageInListAndSelect(selectedUserWidget.meta.name, datatypeToLoadId);
         //} else {
         //    displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, datatypeToLoadId);
@@ -96,7 +96,7 @@ $(function(){
 
     //autoSave5Mins();
 
-    basicWidgets = $('#basic-components').html();
+    basicWidgets = $('#basic-cliches').html();
 
     dataDragAndDrop.registerDataDragHandleDraggable();
 

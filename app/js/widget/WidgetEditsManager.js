@@ -203,21 +203,37 @@ var WidgetEditsManager = function(){
             if (widget.type == 'user') {
 
                 var templateId = widget.meta.templateId;
-                if (!templateId){ // it is an outermost widget!
-                    templateId = widget.meta.id;
+                if (!templateId){
+                    templateId = userApp.meta.id + '_' + widget.meta.id;
                 }
-                var componentVersionCopy =  UserWidget.fromString(
-                    JSON.stringify(selectedComponent.widgets[templateId])
-                );
 
-                widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
-                    var innerWidget = widget.innerWidgets[innerWidgetId];
-                    recursiveApplyPropertyChangesHelper(innerWidget);
-                });
+                var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(templateId);
+                var templateClicheId = clicheAndWidgetId.clicheId;
+                var templateWidgetId = clicheAndWidgetId.widgetId;
 
-                // apply changes after calling the recursion so that higher levels override
-                // lower level changes
-                applyPropertyChanges(widget, componentVersionCopy);
+                var template = true;
+
+                if (templateClicheId == userApp.meta.id){
+                    // might not be there, at which point need to just continue
+                    if (!(templateWidgetId in userApp.widgets.templates)){
+                        template = false;
+                        applyPropertyChanges(widget);
+                    }
+                }
+                if (template){
+                    var componentVersionCopy =  UserWidget.fromString(
+                        JSON.stringify(selectedProject.cliches[templateClicheId].widgets.templates[templateWidgetId])
+                    );
+
+                    widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
+                        var innerWidget = widget.innerWidgets[innerWidgetId];
+                        recursiveApplyPropertyChangesHelper(innerWidget);
+                    });
+
+                    // apply changes after calling the recursion so that higher levels override
+                    // lower level changes
+                    applyPropertyChanges(widget, componentVersionCopy);
+                }
             } else {
                 // else it's a base component, so we'll just take it as is from the component we are reading from
                 applyPropertyChanges(widget);
@@ -233,7 +249,7 @@ var WidgetEditsManager = function(){
      * Gets the changes made at the level of the outer widget and
      * puts them in the properties of the involved inner widget
      * saved in the outer widget. NOTE: this does not reference the
-     * templates from the project! Use this before re-id-ing the components
+     * templates from the project! Use this before re-id-ing the cliches
      * or use the source widget as the id reference
      * @param outerWidget
      * @param sourceWidget
@@ -349,6 +365,12 @@ var WidgetEditsManager = function(){
 
     };
 
+    var getClicheAndWidgetIdFromTemplateId = function(templateId){
+        var clicheAndWidgetId = templateId.split('_');
+        var clicheId = clicheAndWidgetId[clicheAndWidgetId.length - 2];
+        var widgetId = clicheAndWidgetId[clicheAndWidgetId.length - 1];
+        return {clicheId:clicheId,widgetId:widgetId}
+    }
 
     /**
      * Goes down each level recursively.
@@ -369,19 +391,39 @@ var WidgetEditsManager = function(){
                         // save the templateId here since the projectCopy does not have
                         // any idea of a template id
                         var templateId = innerWidget.meta.templateId;
+                        if (!templateId){
+                            templateId = userApp.meta.id + '_' + widget.meta.id;
+                        }
+                        var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(templateId);
+                        var templateClicheId = clicheAndWidgetId.clicheId;
+                        var templateWidgetId = clicheAndWidgetId.widgetId;
 
-                        // make a copy of the project
-                        // NOTE: applying property changes requires that the widget's ids are
-                        // the same as the project we are copying from since the project stores
-                        // the information using the ids.
-                        // We will be changing the ids altogether later on.
-                        innerWidget =  UserWidget.fromString(
-                            JSON.stringify(selectedComponent.widgets[templateId])
-                        );
+                        var template = true;
 
-                        innerWidget.meta.templateId = templateId;
+                        if (templateClicheId == userApp.meta.id){
+                            // might not be there, at which point need to just continue
+                            if (!(templateWidgetId in userApp.widgets.templates)){
+                                template = false;
+                            }
+                        }
 
-                        innerWidget = recursiveWidgetMakingHelper(innerWidget);
+                        if (template){
+                            // make a copy of the project
+                            // NOTE: applying property changes requires that the widget's ids are
+                            // the same as the project we are copying from since the project stores
+                            // the information using the ids.
+                            // We will be changing the ids altogether later on.
+                            // innerWidget =  UserWidget.fromString(
+                            //     JSON.stringify(userApp.widgets[templateId])
+                            // );
+                            innerWidget =  UserWidget.fromString(
+                                JSON.stringify(selectedProject.cliches[templateClicheId].widgets.templates[templateWidgetId])
+                            );
+
+                            innerWidget.meta.templateId = templateId;
+
+                            innerWidget = recursiveWidgetMakingHelper(innerWidget);
+                        }
 
                         widget.innerWidgets[innerWidgetId] = innerWidget;
                     }

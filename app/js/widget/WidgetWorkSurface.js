@@ -478,16 +478,16 @@ var WidgetWorkSurface = function(){
     };
 
     var disableAllWidgetDomElementsExcept = function(widgetToEnableId){
-        for (var widgetId in selectedComponent.widgets){
+        userApp.getAllWidgetIds().forEach(function(widgetId){
             if (widgetToEnableId == widgetId){
                 enableWidgetDOMElements(widgetId);
-                continue;
+                return;
             }
             if ($('#'+WIDGET_WS_REF+'_'+widgetId).hasClass('hidden-component')){
-                continue;
+                return;
             }
             disableWidgetDOMElements(widgetId);
-        }
+        });
     };
 
     // var enableSpecificComponentDomElements = function(componentToEnableId){
@@ -506,7 +506,7 @@ var WidgetWorkSurface = function(){
     //         $('#work-surface'+'_'+componentToEnableId).data('state', state);
     //     }
     //
-    //     var componentToEnable = selectedProject.components[componentToEnableId];
+    //     var componentToEnable = selectedProject.cliches[componentToEnableId];
     //
     //     // enable first (toggle needs the id's and classes to be enabled)
     //     if (workSurfaceToEnable.hasClass('hidden-component')){

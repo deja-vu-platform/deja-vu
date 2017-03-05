@@ -23,7 +23,7 @@ $('#build-mode').click(function(){
     }
     $(this).parent().find('.active').removeClass('active');
     $(this).addClass('active');
-    $('.components').css({
+    $('.cliches').css({
         display: 'block',
     });
     $('.style').css({
@@ -40,7 +40,7 @@ $('#style-mode').click(function(){
     $('.style').css({
         display: 'block',
     });
-    $('.components').css({
+    $('.cliches').css({
         display: 'none',
     });
 });
@@ -82,7 +82,7 @@ window.addEventListener("resize", function(){
 /** ** ** ** ** ** ** ** Show Cliche Components in List  ** ** ** ** ** ** ** **/
 function showClicheInList(id, name){
     var addedCliche = '<li id="added_'+id+'">'+name+'</li>';
-    $('.cliche-components ul').append(addedCliche);
+    $('.cliche-cliches ul').append(addedCliche);
 }
 
 
@@ -92,64 +92,64 @@ function showClicheInList(id, name){
 
 //style.setUpOverallInputs();
 
-/** **/
-
-function addAddToMainPagesButton(userWidget){
-    var added = (userWidget.meta.id in selectedProject.mainComponent);
-    if (added){
-        var span = document.createElement('span');
-        span.innerHTML = '<button type="button" class="btn btn-default ">' +
-            '<span class="glyphicon glyphicon-remove"></span>' +
-            '<span> Remove from Main Pages</span>' +
-            '</button>';
-    } else {
-        var span = document.createElement('span');
-        span.innerHTML = '<button type="button" class="btn btn-default ">' +
-            '<span class="glyphicon glyphicon-plus"></span>' +
-            '<span> Add to Main Pages</span>' +
-            '</button>';
-    }
-    var addToMainPageButton = span.firstChild;
-    addToMainPageButton.id = 'btn-add-main-page';;
-
-    $(addToMainPageButton).data('added', added).css({
-        position: 'absolute',
-        top:'-45px',
-        left:'230px',
-    });
-
-    $(addToMainPageButton).on("click", function (e) {
-        var added = $(this).data('added');
-        var userWidgetId = selectedUserWidget.meta.id;
-        var name = selectedUserWidget.meta.name;
-        if (added){
-            // then remove
-            $($(this).children().get(0)).removeClass('glyphicon-remove').addClass('glyphicon-plus');
-            $($(this).children().get(1)).text(' Add to Main Pages');
-            delete selectedProject.mainComponent[userWidgetId];
-            $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
-            displayUserWidgetInListAndSelect(name, userWidgetId);
-            selectedUserWidget.inMainPages = false;
-        } else {
-            // then add
-            $($(this).children().get(0)).removeClass('glyphicon-plus').addClass('glyphicon-remove');
-            $($(this).children().get(1)).text(' Remove from Main Pages');
-
-            if (!selectedProject.mainComponent){
-                selectedProject.mainComponent = {}; // for safety
-            }
-            selectedProject.mainComponent[userWidgetId] = name;
-            $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
-            displayMainPageInListAndSelect(name, userWidgetId);
-            selectedUserWidget.inMainPages = true;
-        }
-        $(this).data('added', !added);
-    });
-
-    $('#main-cell-table').append(addToMainPageButton);
-
-}
-
+// /** **/
+//
+// function addAddToMainPagesButton(userWidget){
+//     var added = (userWidget.meta.id in selectedProject.userApp);
+//     if (added){
+//         var span = document.createElement('span');
+//         span.innerHTML = '<button type="button" class="btn btn-default ">' +
+//             '<span class="glyphicon glyphicon-remove"></span>' +
+//             '<span> Remove from Main Pages</span>' +
+//             '</button>';
+//     } else {
+//         var span = document.createElement('span');
+//         span.innerHTML = '<button type="button" class="btn btn-default ">' +
+//             '<span class="glyphicon glyphicon-plus"></span>' +
+//             '<span> Add to Main Pages</span>' +
+//             '</button>';
+//     }
+//     var addToMainPageButton = span.firstChild;
+//     addToMainPageButton.id = 'btn-add-main-page';;
+//
+//     $(addToMainPageButton).data('added', added).css({
+//         position: 'absolute',
+//         top:'-45px',
+//         left:'230px',
+//     });
+//
+//     $(addToMainPageButton).on("click", function (e) {
+//         var added = $(this).data('added');
+//         var userWidgetId = selectedUserWidget.meta.id;
+//         var name = selectedUserWidget.meta.name;
+//         if (added){
+//             // then remove
+//             $($(this).children().get(0)).removeClass('glyphicon-remove').addClass('glyphicon-plus');
+//             $($(this).children().get(1)).text(' Add to Main Pages');
+//             delete selectedProject.userApp[userWidgetId];
+//             $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
+//             displayUserWidgetInListAndSelect(name, userWidgetId);
+//             selectedUserWidget.isPage = false;
+//         } else {
+//             // then add
+//             $($(this).children().get(0)).removeClass('glyphicon-plus').addClass('glyphicon-remove');
+//             $($(this).children().get(1)).text(' Remove from Main Pages');
+//
+//             if (!selectedProject.userApp){
+//                 selectedProject.userApp = {}; // for safety
+//             }
+//             selectedProject.userApp[userWidgetId] = name;
+//             $("#user-cliches-list").find("[data-componentid='" + userWidgetId + "']").remove();
+//             displayMainPageInListAndSelect(name, userWidgetId);
+//             selectedUserWidget.inMainPages = true;
+//         }
+//         $(this).data('added', !added);
+//     });
+//
+//     $('#main-cell-table').append(addToMainPageButton);
+//
+// }
+//
 
 /**
  * Update the saved ratios and then use this function
@@ -183,10 +183,10 @@ function addDeleteUserDatatypeButton(userWidgetId){
     });
 
     var listElt;
-    if (userWidgetId in selectedProject.mainComponent){
+    if (userWidgetId in selectedProject.userApp){
         listElt = $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']");
     } else {
-        listElt = $("#user-components-list").find("[data-componentid='" + userWidgetId + "']");
+        listElt = $("#user-cliches-list").find("[data-componentid='" + userWidgetId + "']");
     }
 
     listElt.append(buttonDeleteUserWidget).hover(
@@ -210,33 +210,33 @@ function addDeleteUserDatatypeButton(userWidgetId){
 }
 
 function deleteUserWidget(userWidgetId){
-    if (selectedComponent.getNumWidgets() == 1){
+    if (userApp.getNumWidgets() == 1){
         return; //don't delete the last one TODO is the the right way to go?
     }
-    selectedComponent.removeWidget(userWidgetId);
+    userApp.deleteWidget(userWidgetId);
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
 
     $('#'+workSurfaceRef+'_'+userWidgetId).remove();
     $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
 
     if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
-        var otherIds = Object.keys(selectedComponent.widgets);
-        selectedUserWidget = selectedComponent.widgets[otherIds[0]];
-        $("#user-components-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
+        var otherIds = userApp.getAllWidgetIds();
+        selectedUserWidget = userApp.getWidget(otherIds[0]);
+        $("#user-cliches-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         workSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
-    if (userWidgetId == selectedComponent.mainPages.indexId){
-        selectedComponent.mainPages.indexId = null;
+    if (userWidgetId == userApp.widgets.pages.indexId){
+        userApp.widgets.pages.indexId = null;
     }
-    $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
+    $("#user-cliches-list").find("[data-componentid='" + userWidgetId + "']").remove();
     $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
 
 }
 
 function openDeleteUserWidgetConfirmDialogue(userWidgetId){
     $('#confirm-delete-userComponent').modal('show');
-    $('#delete-userComponent-name').text(selectedProject.components[userWidgetId].meta.name);
+    $('#delete-userComponent-name').text(selectedProject.cliches[userWidgetId].meta.name);
 
     $('#delete-userComponent-btn').unbind();
     $('#delete-userComponent-btn').click(function(){

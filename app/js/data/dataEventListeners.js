@@ -12,7 +12,7 @@ $('#new-user-datatype-btn').click(function(){
             var datatypeInfo = initDatatype();
             var datatype = datatypeInfo[0];
             var datatypeDisplayProps = datatypeInfo[1];
-            selectedComponent.addDatatype(datatype, datatypeDisplayProps);
+            userApp.addDatatype(datatype, datatypeDisplayProps);
             displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id);
             // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
 
@@ -28,21 +28,21 @@ $('#save-project').on('click', function () {
     //downloadObject(selectedProject.meta.name+'.json', selectedProject);
 });
 
-$('.components').on('click', '.component-name-container', function () {
+$('.cliches').on('click', '.component-name-container', function () {
     // Save the current values
     var oldState = {zoom : currentZoom};
     var workSurfaceRef = dataWorkSurface.getWorkSurfaceRef();
-    $('#'+workSurfaceRef+'_'+selectedComponent.meta.id).data('state', oldState);
+    $('#'+workSurfaceRef+'_'+userApp.meta.id).data('state', oldState);
 
     var widgetId = $(this).parent().data('componentid');
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
-    dataWorkSurface.loadDatatype(selectedComponent, null);
+    dataWorkSurface.loadDatatype(userApp, null);
     $('#outer-container').scrollTop(0); // TODO DRY
     $('#outer-container').scrollLeft(0);
 });
 
-$('.components').on('dblclick', '.component-name', function (e) {
+$('.cliches').on('dblclick', '.component-name', function (e) {
     var newNameInputElt = $($(this).parent().find('.new-name-input'));
     var submitRenameElt = $($(this).parent().find('.submit-rename'));
     newNameInputElt.val($(this).text());
@@ -52,7 +52,7 @@ $('.components').on('dblclick', '.component-name', function (e) {
     newNameInputElt.select();
 });
 
-$('.components').on('keypress', '.new-name-input', function (event) {
+$('.cliches').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
         var widgetId = $(this).parent().parent().parent().data('componentid');
@@ -68,7 +68,7 @@ $('.components').on('keypress', '.new-name-input', function (event) {
         widgetNameElt.text(newName);
         $('.component-options .component-name').text(newName);
 
-        selectedProject.components[widgetId].meta.name = newName;
+        selectedProject.cliches[widgetId].meta.name = newName;
     }
 });
 
@@ -104,7 +104,7 @@ function setWidgetOptions(outerWidget){
                 if (newName.length === 0) { // empty string entered, don't change the name!
                     return;
                 }
-                $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.component-name').text(newName);
+                $('.cliches').find('[data-componentid='+outerWidget.meta.id+']').find('.component-name').text(newName);
 
                 widgetNameElt.text($(this).val());
 
@@ -121,14 +121,14 @@ function setWidgetOptions(outerWidget){
             // change the id
             copyWidget.meta.id = generateId();
 
-            if (originalId in selectedProject.mainComponent){
-                selectedProject.addMainPage(copyWidget);
+            if (originalId in selectedProject.userApp){
+                selectedProject.addPage(copyWidget);
                 displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             } else {
                 displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             }
 
-            selectedProject.addComponent(copyWidget);
+            selectedProject.addCliche(copyWidget);
             selectedUserWidget = copyWidget;
             dataWorkSurface.loadUserWidget(copyWidget, 1);
 
@@ -161,7 +161,7 @@ function setWidgetOptions(outerWidget){
         });
 
     // if the component is in the main pages, set it up accordingly
-    if (outerWidget.meta.id in selectedProject.mainComponent){
+    if (outerWidget.meta.id in selectedProject.userApp){
         $('.component-options #btn-index-page-toggle').css({
             display: 'inline-block',
         });
@@ -176,15 +176,15 @@ function setWidgetOptions(outerWidget){
 }
 
 function setUpWidgetOptionsIndexPageToggle(outerWidget){
-    if (outerWidget.meta.id == selectedProject.mainComponent.indexId){
+    if (outerWidget.meta.id == selectedProject.userApp.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
-        $('.components').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
+        $('.cliches').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
 
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
             $(this).find('.text').text('Assign as Index Page');
-            $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.cliches').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
         });
     } else {
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
@@ -192,7 +192,7 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
         $('.component-options #btn-index-page-toggle').unbind().click(function(){
             $(this).find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
             $(this).find('.text').text('Unassign as Index Page');
-            $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
+            $('.cliches').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
         });
 
     }
@@ -203,11 +203,11 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
 function displayDatatypeInListAndSelect(name, id){
     $('.selected').removeClass("selected");
     displayNewDatatypeInUserDatatypeList(name,id);
-    $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
+    $("#user-cliches-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
 /**
- * Adds a component to the list of user components
+ * Adds a component to the list of user cliches
  * @param newComponent
  */
 function displayNewDatatypeInUserDatatypeList(name, id){
@@ -221,7 +221,7 @@ function displayNewDatatypeInUserDatatypeList(name, id){
         + '</span>'
         + '</div>'
         + '</li>');
-    $('#user-components-list').append(newDatatypeElt);
+    $('#user-cliches-list').append(newDatatypeElt);
     // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
     dataDragAndDrop.registerDataDragHandleDraggable(newDatatypeElt);
@@ -572,18 +572,18 @@ function registerUserWidgetAreaDroppable(){
         tolerance: "intersect",
         drop: function(event, ui) {
             var userWidgetId = ui.draggable.data('componentid');
-            var name = selectedProject.components[userWidgetId].meta.name;
+            var name = selectedProject.cliches[userWidgetId].meta.name;
             if ($(this).hasClass('main-pages')){
                 if (ui.draggable.hasClass('moving-user-component')){ // if type user
                     // adding to main page
-                    selectedProject.addMainPage(selectedProject.components[userWidgetId]);
-                    $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
+                    selectedProject.addPage(selectedProject.cliches[userWidgetId]);
+                    $("#user-cliches-list").find("[data-componentid='" + userWidgetId + "']").remove();
                     displayMainPageInListAndSelect(name, userWidgetId);
                 }
-            } else if ($(this).hasClass('user-components')){
+            } else if ($(this).hasClass('user-cliches')){
                 if (ui.draggable.hasClass('moving-main-component')){ // if type user
                     // removing from main page
-                    selectedProject.removeMainPage(selectedProject.components[userWidgetId]);
+                    selectedProject.deletePage(selectedProject.cliches[userWidgetId]);
                     $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
                     displayUserWidgetInListAndSelect(name, userWidgetId);
 
@@ -610,8 +610,8 @@ function registerUserWidgetAsDraggableForMainPages(widgetId) {
                 clone.innerHTML = $(this).find('.component-name').text();
                 return clone;
             },
-            appendTo: '#user-components-list',
-            containment: '.user-made-components',
+            appendTo: '#user-cliches-list',
+            containment: '.user-made-cliches',
             cursor: '-webkit-grabbing',
             scroll: true,
             stop: function () {
@@ -621,7 +621,7 @@ function registerUserWidgetAsDraggableForMainPages(widgetId) {
 
     };
 
-    $("#user-components-list").find("[data-componentid='" + widgetId + "']").each(function () {
+    $("#user-cliches-list").find("[data-componentid='" + widgetId + "']").each(function () {
         $(this).draggable(enableDraggable(this, 'user'));
     });
     $("#main-pages-list").find("[data-componentid='" + widgetId + "']").each(function () {
@@ -664,17 +664,17 @@ $(".dropdown-trigger").click(function(ev) {
     }
 });
 
-$('.components').on('click', '.index-page-toggle', function(){
+$('.cliches').on('click', '.index-page-toggle', function(){
     var turnOn = !($(this).parent().hasClass('selected-index-page'));
-    $('.components .selected-index-page').removeClass('selected-index-page');
+    $('.cliches .selected-index-page').removeClass('selected-index-page');
     var widgetId = $(this).parent().data('componentid');
     if (turnOn){
-        selectedProject.mainComponent.indexId = widgetId;
+        selectedProject.userApp.indexId = widgetId;
         $(this).parent().addClass('selected-index-page');
     } else {
-        selectedProject.mainComponent.indexId = null;
+        selectedProject.userApp.indexId = null;
     }
-    setUpWidgetOptionsIndexPageToggle(selectedProject.components[widgetId]);
+    setUpWidgetOptionsIndexPageToggle(selectedProject.cliches[widgetId]);
 });
 
 function refreshContainerDisplay(fresh, container, zoom){

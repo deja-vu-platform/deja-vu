@@ -51,7 +51,7 @@ var DataWorkSurface = function(){
         for (var datatypeId in component.datatypes){
             var datatype = component.datatypes[datatypeId];
 
-            var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
+            var dragHandle = $('#basic-cliches .draggable[data-type=' + 'user' + ']').clone();
             dragHandle.text(datatype.meta.name);
             dragHandle.css('display', 'block');
 
@@ -215,7 +215,7 @@ var DataWorkSurface = function(){
         makeWorkSurfaceDroppableToWidgets(workSurface, datatype);
         //dataZoomElement.updateZoomFromState(datatype);
 
-        //setWidgetOptions(selectedProject.components[datatypeId]);
+        //setWidgetOptions(selectedProject.cliches[datatypeId]);
 
         return workSurface
     };
@@ -274,7 +274,8 @@ var DataWorkSurface = function(){
     };
 
     var disableAllDataDomElementsExcept = function(dataToEnableId){
-        for (var dataId in selectedComponent.datatypes){
+        // TODO this also needs to disable the overall component
+        for (var dataId in userApp.getAllDatatypeIds()){
             if (dataToEnableId == dataId){
                 enableDataDOMElements(dataId);
                 continue;

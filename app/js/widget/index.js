@@ -24,7 +24,7 @@ var files = [];
 
 var selectedUserWidget = null;
 var selectedProject = null;
-var selectedComponent = null;
+var userApp = null;
 
 var currentZoom = 1.0;
 var basicWidgets;
@@ -69,50 +69,54 @@ $(function(){
     //    showClicheInList(id, addedCliches[id].name);
     //}
 
-    if (selectedProject.getNumComponents() == 0){
+    if (!selectedProject.userApp){
         // start a default component
-        selectedComponent = initUserComponent();
-        selectedProject.addComponent(selectedComponent);
-        selectedProject.makeMainComponent(selectedComponent);
+        userApp = initUserApp();
+        selectedProject.addCliche(userApp);
+        selectedProject.makeUserApp(userApp);
 
-        selectedUserWidget = selectedComponent.widgets[Object.keys(selectedComponent.widgets)[0]];
+        selectedUserWidget = userApp.widgets.pages[Object.keys(userApp.widgets.pages)[0]];
         displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
     } else {
-        var selectedComponentId = selectedProject.mainComponent;
-        selectedComponent = selectedProject.components[selectedComponentId];
+        var userAppId = selectedProject.userApp;
+        userApp = selectedProject.cliches[userAppId];
         var widgetToLoadId;
-        if (!$.isEmptyObject(selectedComponent.mainPages)){
-            widgetToLoadId = Object.keys(selectedComponent.mainPages)[0];
-        } else {
-            widgetToLoadId = Object.keys(selectedComponent.widgets)[0];
-        }
-        selectedUserWidget = selectedComponent.widgets[widgetToLoadId];
-        if (widgetToLoadId in selectedComponent.mainPages){
+        if (!$.isEmptyObject(userApp.widgets.pages)){
+            widgetToLoadId = Object.keys(userApp.widgets.pages)[0];
+            selectedUserWidget = userApp.widgets.pages[widgetToLoadId];
             displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         } else {
+            widgetToLoadId = Object.keys(userApp.widgets.unused)[0];
+            selectedUserWidget = userApp.widgets.unused[widgetToLoadId];
             displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         }
+
         // TODO this will need to be changed once we bring in a userComponent which will be a
         // superset of userWidgets
 
-        for (var widgetId in selectedComponent.widgets){
+        userApp.getAllWidgetIds().forEach(function(widgetId){
             if (widgetId != widgetToLoadId){
-                var widgetName = selectedComponent.widgets[widgetId].meta.name;
-                if (widgetId in selectedComponent.mainPages){
+                var widgetName;
+                if (widgetId in userApp.widgets.pages){
+                    widgetName = userApp.widgets.pages[widgetId].meta.name;
                     displayNewWidgetInMainPagesList(widgetName, widgetId)
-                } else {
+                } else if (widgetId in userApp.widgets.unused){
+                    widgetName = userApp.widgets.unused[widgetId].meta.name;
                     displayNewWidgetInUserWidgetList(widgetName, widgetId);
+                } else {
+                    widgetName = userApp.widgets.templates[widgetId].meta.name;
+                    displayNewWidgetTemplateInList(widgetName, widgetId);
                 }
 
             }
-        }
+        });
 
     }
     workSurface.loadUserWidget(selectedUserWidget, currentZoom);
 
     //autoSave5Mins();
 
-    basicWidgets = $('#basic-components').html();
+    basicWidgets = $('#basic-cliches').html();
 
     dragAndDrop.registerWidgetDragHandleDraggable();
 

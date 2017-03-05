@@ -22,8 +22,8 @@ function Project() {
     this.objectType = "Project";
     //this.type = '';
     this.meta = {};
-    this.mainComponent = null;
-    this.components = {};
+    this.userApp = null;
+    this.cliches = {};
     this.lastAccessed = -Infinity;
     this.addedCliches = {};
 }
@@ -48,38 +48,39 @@ function UserProject(name, id, version, author) {
         version: version,
         author: author
     };
-    this.mainComponent = null; // one component for now
-    this.components = {};
+    this.userApp = null; // one component for now
+    this.cliches = {};
+
     this.lastAccessed = new Date();
 
 }
 
-UserProject.prototype.addComponent = function(component){
-    if (!this.components[component.meta.id]) {
-        this.components[component.meta.id] = component;
+UserProject.prototype.addCliche = function(component){
+    if (!this.cliches[component.meta.id]) {
+        this.cliches[component.meta.id] = component;
     }
 };
 
 UserProject.prototype.removeComponent = function(componentId){
-    delete this.components[componentId];
-    delete this.mainComponent[componentId];
+    delete this.cliches[componentId];
+    delete this.userApp[componentId];
 };
 
 
 // TODO Ummm this should be fixed
-UserProject.prototype.makeMainComponent = function(component){
-    if (component.meta.id in this.components){
-        this.mainComponent = component.meta.id;
+UserProject.prototype.makeUserApp = function(component){
+    if (component.meta.id in this.cliches){
+        this.userApp = component.meta.id;
     }
 };
 
 UserProject.prototype.removeMainComponent = function(){
-    selectedProject.mainComponent = null;
+    selectedProject.userApp = null;
 
 };
 
-UserProject.prototype.getNumComponents = function(){
-    return Object.keys(this.components).length;
+UserProject.prototype.getNumCliches = function(){
+    return Object.keys(this.cliches).length;
 };
 
 UserProject.fromString = function(string){
@@ -93,18 +94,26 @@ UserProject.fromObject = function(object){
     if (!object.objectType){
         throw notCorrectObjectError;
     }
+    // if (!object.userApp){
+    //     throw notCorrectObjectError;
+    // }
     if (!object.meta){
         throw notCorrectObjectError;
     }
-    if (!object.components){
+    if (!object.cliches){
         throw notCorrectObjectError;
     }
 
     var project = $.extend(new UserProject(), object);
 
-    for (var componentId in object.components) {
-        var component = object.components[componentId];
-        project.components[componentId] = UserComponent.fromObject(component);
+    for (var clicheId in object.cliches) {
+        var cliche = object.cliches[clicheId];
+        if (cliche.meta.id == object.userApp){
+            project.cliches[clicheId] = UserApp.fromObject(cliche);
+        } else {
+            project.cliches[clicheId] = Cliche.fromObject(cliche);
+        }
+
     }
     return project
 };

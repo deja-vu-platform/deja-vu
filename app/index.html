@@ -89,7 +89,7 @@
             <div class="user-components page-component-toggle-drop">
                 <div class="header">
                     <span class="dropdown-trigger dropdown-open" data-dropdownid="user-components">
-                        User components
+                        Unused Widgets
                         <span class="glyphicon glyphicon-triangle-bottom"></span>
                     </span>
                     <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-component-btn">
@@ -104,6 +104,25 @@
                     </ul>
                 </div>
             </div>
+            <div>
+                <div class="header">
+                    <span class="dropdown-trigger dropdown-open" data-dropdownid="widget-templates">
+                        Widget Templates
+                        <span class="glyphicon glyphicon-triangle-bottom"></span>
+                    </span>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-widget-template-btn">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </button>
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
+                        <span class="glyphicon glyphicon-import"></span>
+                    </button>
+                </div>
+                <div class="content  dropdown-target" data-dropdownid="widget-templates">
+                    <ul id="widget-templates-list">
+                    </ul>
+                </div>
+            </div>
+
         </div>
         <div class="basic-components">
             <div class="header">
@@ -775,7 +794,7 @@
     <script src="js/utils/Utility.js"></script>
 
     <script src="js/project/ProjectModel.js"></script>
-    <script src="js/component/ComponentModel.js"></script>
+    <script src="js/cliche/ClicheModel.js"></script>
     <script src="js/data/DataModel.js"></script>
     <script src="js/widget/WidgetModel.js"></script>
 

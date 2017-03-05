@@ -207,7 +207,7 @@ var DataEditsManager = function(){
     //                 templateId = widget.meta.id;
     //             }
     //             var projectCopy =  UserDatatype.fromString(
-    //                 JSON.stringify(selectedProject.components[templateId])
+    //                 JSON.stringify(selectedProject.cliches[templateId])
     //             );
     //
     //             widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
@@ -233,7 +233,7 @@ var DataEditsManager = function(){
     //  * Gets the changes made at the level of the outer widget and
     //  * puts them in the properties of the involved inner widget
     //  * saved in the outer widget. NOTE: this does not reference the
-    //  * templates from the project! Use this before re-id-ing the components
+    //  * templates from the project! Use this before re-id-ing the cliches
     //  * or use the source widget as the id reference
     //  * @param outerWidget
     //  * @param sourceWidget
@@ -376,7 +376,7 @@ var DataEditsManager = function(){
     //                     // the information using the ids.
     //                     // We will be changing the ids altogether later on.
     //                     innerWidget =  UserDatatype.fromString(
-    //                         JSON.stringify(selectedProject.components[templateId])
+    //                         JSON.stringify(selectedProject.cliches[templateId])
     //                     );
     //
     //                     innerWidget.meta.templateId = templateId;

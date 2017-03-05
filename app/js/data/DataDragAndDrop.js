@@ -90,7 +90,7 @@ var DataDragAndDropController = function () {
                 var type = dragHandle.data('type');
                 if (type == 'user') {
                     if (!dragHandle.hasClass('associated')) {
-                        dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
+                        dragHandle = $('#basic-cliches .draggable[data-type=' + type + ']').clone();
                         dragHandle.data('componentid', $(this).data('componentid'));
                         dragHandle.data('type', type);
                         that.registerDataDragHandleDraggable(dragHandle);
@@ -101,7 +101,7 @@ var DataDragAndDropController = function () {
                 var datatypeContainer;
                 if (dragHandle.hasClass('associated')) {
                     var datatypeId = dragHandle.data('componentid');
-                    draggingDatatype = selectedComponent.datatypes[datatypeId];
+                    draggingDatatype = userApp.datatypes.used[datatypeId];
                     //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
                     var oldContainerId = containerRef+'_' + datatypeId;
@@ -118,17 +118,17 @@ var DataDragAndDropController = function () {
                 } else {
                     var datatype;
                     var id = dragHandle.data('componentid');
-                    datatype = UserDatatype.fromString(JSON.stringify(selectedComponent.datatypes[id]));
+                    datatype = UserDatatype.fromString(JSON.stringify(userApp.datatypes.used[id]));
                     datatype.meta.templateId = datatype.meta.id;
                     datatype = createDatatypeCopy(datatype);
                     dragHandle.data('componentid', datatype.meta.id);
                     dragHandle.text(datatype.meta.name);
                     dragHandle.css('display', 'block');
                     draggingDatatype = datatype;
-                    var displayPropObj = selectedComponent.datatypeDisplays[id];
+                    var displayPropObj = userApp.datatypeDisplays[id];
                     datatypeContainer = dataWorkSurface.makeDatatypeContainers(datatype, displayPropObj, dragHandle, zoom);
 
-                    $('#basic-components').html(basicWidgets);
+                    $('#basic-cliches').html(basicWidgets);
                     that.registerWidgetDragHandleDraggable();
                 }
 
