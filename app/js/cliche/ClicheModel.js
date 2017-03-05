@@ -4,10 +4,10 @@
 
 const DEFAULT_COMPONENT_NAME = "New Component";
 
-var UserComponent = function(name, id, version, author){
-    var that = Object.create(UserComponent.prototype);
+var Cliche = function(name, id, version, author){
+    var that = Object.create(Cliche.prototype);
 
-    that.objectType = "UserComponent";
+    that.objectType = "Cliche";
     that.type = "user";
     that.meta = {
         name: name,
@@ -21,88 +21,81 @@ var UserComponent = function(name, id, version, author){
     };
 
     that.widgets = {
-        // widgetId: UserWidgetInstance
+        pages: {
+            // widgetId: UserWidgetInstance
+        },
+        unused:{
+
+        },
+        templates:{
+
+        }
     };
 
     that.datatypes = {
         // datatypeId: UserDataInstance
+
     };
 
 
-    that.datatypeDisplays = {
-        overview: UserDatatypeDisplay(),
-        particulars: {
-            // datatypeId : DatatypeDisplay object
-        }
-    };
-
-    that.widgetBondDisplays = {
-        overview: {}, //UserWidgetBondDisplay(),
-        particulars: {
-            // datatypeId : DatatypeDisplay object
-        }
-    };
-
-    that.properties = {
-    };
     return that;
 };
 
 
 
 
-UserComponent.prototype.inMainPage = function(widgetId){
+Cliche.prototype.inMainPage = function(widgetId){
     var widget = this.widgets[widgetId];
     return widget.inMainPages;
 };
 
 
-UserComponent.prototype.addMainPage = function(widget){
+Cliche.prototype.addMainPage = function(widget){
     widget.inMainPages = true;
     this.mainPages[widget.meta.id] = widget.meta.name;
     this.addWidget(widget);
 };
 
-UserComponent.prototype.removeMainPage = function(widget){
+Cliche.prototype.removeMainPage = function(widget){
     delete this.mainPages[widget.meta.id];
     widget.inMainPages = false;
 };
 
-UserComponent.prototype.addWidget = function(widget){
+Cliche.prototype.addWidget = function(widget){
     if (!this.widgets[widget.meta.id]) {
         this.widgets[widget.meta.id] = widget;
     }
 };
 
-UserComponent.prototype.removeWidget = function(widgetId){
+Cliche.prototype.removeWidget = function(widgetId){
     delete this.widgets[widgetId];
     delete this.mainPages[widgetId];
 };
 
-UserComponent.prototype.addDatatype = function(datatype, displayProps){
+Cliche.prototype.addDatatype = function(datatype, displayProps){
     if (!this.datatypes[datatype.meta.id]) {
         this.datatypes[datatype.meta.id] = datatype;
         this.datatypeDisplays[datatype.meta.id] = displayProps;
     }
 };
 
-UserComponent.prototype.removeDatatype = function(datatypeId){
+Cliche.prototype.removeDatatype = function(datatypeId){
     delete this.datatypes[datatypeId];
 };
 
 
-UserComponent.fromString = function(string){
+Cliche.fromString = function(string){
     var object = JSON.parse(string);
-    return UserComponent.fromObject(object)
+    return Cliche.fromObject(object)
 };
 
 
-UserComponent.prototype.getNumWidgets = function(){
+Cliche.prototype.getNumWidgets = function(){
     return Object.keys(this.widgets).length;
 };
 
 
-UserComponent.fromObject = function(object){
+Cliche.fromObject = function(object){
     // Check that the object has all the required fields
     var notCorrectObjectError = "notCorrectObjectError: object object is not an instance of a UserProject";
     if (!object.objectType){
@@ -121,7 +114,7 @@ UserComponent.fromObject = function(object){
         throw notCorrectObjectError;
     }
 
-    var component = $.extend(new UserComponent(), object);
+    var component = $.extend(new Cliche(), object);
 
     for (var widgetId in object.widgets) {
         var widget = object.widgets[widgetId];
@@ -134,3 +127,26 @@ UserComponent.fromObject = function(object){
     return component
 };
 
+
+var UserApp = function(){
+    var that = Object.create(Cliche.prototype);
+
+    that.datatypeDisplays = {
+        overview: UserDatatypeDisplay(),
+        particulars: {
+            // datatypeId : DatatypeDisplay object
+        }
+    };
+
+    that.widgetBondDisplays = {
+        overview: {}, //UserWidgetBondDisplay(),
+        particulars: {
+            // datatypeId : DatatypeDisplay object
+        }
+    };
+
+    that.properties = {
+    };
+
+    return that;
+};
