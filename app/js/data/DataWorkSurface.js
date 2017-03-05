@@ -173,6 +173,7 @@ var DataWorkSurface = function(){
                 // TODO other way? for now, reload the thinger
                 loadDatatypeIntoWorkSurface(datatype, currentZoom);
             }
+
         } else {
             // load all the stuff
             var componentId = component.meta.id;
@@ -184,7 +185,7 @@ var DataWorkSurface = function(){
                 loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
             } else {
                 disableAllDataDomElementsExcept(componentId);
-                //setWidgetOptions(datatype);
+                // setDatatypeOptions(datatype);
                 //dataZoomElement.updateZoomFromState(datatype);
                 // TODO other way? for now, reload the thinger
                 loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
@@ -215,7 +216,7 @@ var DataWorkSurface = function(){
         makeWorkSurfaceDroppableToWidgets(workSurface, datatype);
         //dataZoomElement.updateZoomFromState(datatype);
 
-        //setWidgetOptions(selectedProject.cliches[datatypeId]);
+        // setDatatypeOptions(selectedProject.cliches[datatypeId]);
 
         return workSurface
     };

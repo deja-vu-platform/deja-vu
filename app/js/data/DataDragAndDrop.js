@@ -90,7 +90,7 @@ var DataDragAndDropController = function () {
                 var type = dragHandle.data('type');
                 if (type == 'user') {
                     if (!dragHandle.hasClass('associated')) {
-                        dragHandle = $('#basic-cliches .draggable[data-type=' + type + ']').clone();
+                        dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
                         dragHandle.data('componentid', $(this).data('componentid'));
                         dragHandle.data('type', type);
                         that.registerDataDragHandleDraggable(dragHandle);
@@ -128,7 +128,7 @@ var DataDragAndDropController = function () {
                     var displayPropObj = userApp.datatypeDisplays[id];
                     datatypeContainer = dataWorkSurface.makeDatatypeContainers(datatype, displayPropObj, dragHandle, zoom);
 
-                    $('#basic-cliches').html(basicWidgets);
+                    $('#basic-components').html(basicWidgets);
                     that.registerWidgetDragHandleDraggable();
                 }
 

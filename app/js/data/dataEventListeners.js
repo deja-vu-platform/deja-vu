@@ -73,7 +73,7 @@ $('.components').on('keypress', '.new-name-input', function (event) {
 });
 
 /** ** ** ** ** ** ** ** ** ** ** ** Component Options ** ** ** ** ** ** ** ** ** ** ** ** **/
-function setWidgetOptions(outerWidget){
+function setDatatypeOptions(outerWidget){
     // renaming
 
     $('.component-options .component-name')
@@ -161,7 +161,7 @@ function setWidgetOptions(outerWidget){
         });
 
     // if the component is in the main pages, set it up accordingly
-    if (outerWidget.meta.id in selectedProject.userApp){
+    if (outerWidget.meta.id == selectedProject.userApp){
         $('.component-options #btn-index-page-toggle').css({
             display: 'inline-block',
         });

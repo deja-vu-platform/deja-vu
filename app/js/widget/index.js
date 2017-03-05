@@ -99,13 +99,13 @@ $(function(){
                 var widgetName;
                 if (widgetId in userApp.widgets.pages){
                     widgetName = userApp.widgets.pages[widgetId].meta.name;
-                    displayNewWidgetInMainPagesList(widgetName, widgetId)
+                    displayNewWidgetInMainPagesList(widgetName, widgetId, userAppId)
                 } else if (widgetId in userApp.widgets.unused){
                     widgetName = userApp.widgets.unused[widgetId].meta.name;
-                    displayNewWidgetInUserWidgetList(widgetName, widgetId);
+                    displayNewWidgetInUserWidgetList(widgetName, widgetId, userAppId);
                 } else {
                     widgetName = userApp.widgets.templates[widgetId].meta.name;
-                    displayNewWidgetTemplateInList(widgetName, widgetId);
+                    displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
                 }
 
             }

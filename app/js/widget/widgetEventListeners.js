@@ -232,9 +232,9 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
 
 /** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
 
-function displayUserWidgetInListAndSelect(name, id){
+function displayUserWidgetInListAndSelect(name, id, clicheId){
     $('.selected').removeClass("selected");
-    displayNewWidgetInUserWidgetList(name,id);
+    displayNewWidgetInUserWidgetList(name,id, clicheId);
     $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected').draggable('disable');
 }
 
@@ -242,10 +242,10 @@ function displayUserWidgetInListAndSelect(name, id){
  * Adds a component to the list of user components
  * @param newComponent
  */
-function displayNewWidgetInUserWidgetList(name, id){
+function displayNewWidgetInUserWidgetList(name, id, clicheId){
     // TODO changes in style
     var newWidgetElt = $(
-        '<li data-type="'+'user'+'" class="widget draggable" data-componentid=' + id + '>'
+        '<li data-type="'+'user'+'" class="widget draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
         + '<div class="component-name-container">'
         + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
@@ -264,10 +264,10 @@ function displayNewWidgetInUserWidgetList(name, id){
  * Adds a component to the list of main pages
  * @param newComponent
  */
-function displayNewWidgetInMainPagesList(name, id){
+function displayNewWidgetInMainPagesList(name, id, clicheId){
     // TODO changes in style
     var newWidgetElt = $(
-        '<li data-componentid=' + id + '>'
+        '<li data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
         + '<div class="component-name-container">'
         + '<div class="component-name">' + name + '</div>'
         + '<div class="submit-rename not-displayed">'
@@ -282,16 +282,16 @@ function displayNewWidgetInMainPagesList(name, id){
     // registerUserWidgetAsDraggableForMainPages(id);
 }
 
-function displayMainPageInListAndSelect(name, id){
+function displayMainPageInListAndSelect(name, id, clicheId){
     $('.selected').removeClass("selected");
-    displayNewWidgetInMainPagesList(name,id);
+    displayNewWidgetInMainPagesList(name,id, clicheId);
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
-function displayNewWidgetTemplateInList(name, id){
+function displayNewWidgetTemplateInList(name, id, clicheId){
     // TODO changes in style
     var newWidgetElt = $(
-        '<li data-type="'+'user'+'" class="widget draggable" data-componentid=' + id + '>'
+        '<li data-type="'+'user'+'" class="widget draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
         + '<div class="component-name-container">'
         + '<div class="component-name">' + name + '</div>'
         + '<div class="submit-rename not-displayed">'
@@ -304,9 +304,9 @@ function displayNewWidgetTemplateInList(name, id){
     dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
 }
 
-function displayNewWidgetTemplateInListAndSelect(name, id){
+function displayNewWidgetTemplateInListAndSelect(name, id, clicheId){
     $('.selected').removeClass("selected");
-    displayNewWidgetTemplateInList(name,id);
+    displayNewWidgetTemplateInList(name,id, clicheId);
     $('#widget-templates-list').find("[data-componentid='" + id + "']").addClass('selected');
 }
 
@@ -975,7 +975,7 @@ function removeWidgetFromUserWidgetAndFromView(widgetId) {
     parent.deleteInnerWidget(widgetId);
     userApp.addWidget(widget);
     removeUserWidgetFromView(widgetId);
-    displayNewWidgetInUserWidgetList(widget.meta.name, widgetId);
+    displayNewWidgetInUserWidgetList(widget.meta.name, widgetId, userApp.meta.id);
 }
 
 

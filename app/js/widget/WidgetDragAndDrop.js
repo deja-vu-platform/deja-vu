@@ -30,6 +30,7 @@ var WidgetDragAndDropController = function () {
                     if (!dragHandle.hasClass('associated')) {
                         dragHandle = $(ui.draggable).clone();
                         dragHandle.data('componentid', $(ui.draggable).data('componentid'));
+                        dragHandle.data('clicheid', $(ui.draggable).data('clicheid'));
                         dragHandle.data('type', type);
                         that.registerWidgetDragHandleDraggable(dragHandle);
                     }
@@ -88,10 +89,13 @@ var WidgetDragAndDropController = function () {
             helper: function (e, ui) {
                 var dragHandle = $(this);
                 var type = dragHandle.data('type');
+                var clicheId = dragHandle.data('clicheid');
+                var widgetId = dragHandle.data('componentid');
                 if (type == 'user') {
                     if (!dragHandle.hasClass('associated')) {
                         dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
-                        dragHandle.data('componentid', $(this).data('componentid'));
+                        dragHandle.data('componentid', widgetId);
+                        dragHandle.data('clicheid', clicheId);
                         dragHandle.data('type', type);
                         that.registerWidgetDragHandleDraggable(dragHandle);
                     }
@@ -100,7 +104,6 @@ var WidgetDragAndDropController = function () {
                 var offsetFromMouse = {top: 0, left: 0};
                 var widgetContainer;
                 if (dragHandle.hasClass('associated')) {
-                    var widgetId = dragHandle.data('componentid');
                     draggingWidget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
                     //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
@@ -118,14 +121,13 @@ var WidgetDragAndDropController = function () {
                 } else {
                     var widget;
                     if (type == 'user') {
-                        var id = dragHandle.data('componentid');
-                        if (id in userApp.widgets.templates){
-                            widget = UserWidget.fromString(JSON.stringify(userApp.widgets.templates[id]));
-                            widget.meta.templateId = userApp.meta.id + '_' + widget.meta.id;
+                        var cliche = selectedProject.cliches[clicheId];
+                        if (widgetId in cliche.widgets.templates){
+                            widget = UserWidget.fromString(JSON.stringify(cliche.widgets.templates[widgetId]));
+                            widget.meta.templateId = clicheId + '_' + widgetId;
                             widget = createUserWidgetCopy(widget);
                         } else { // it is unused
-                            widget = userApp.widgets.unused[id];
-
+                            widget = userApp.widgets.unused[widgetId];
                         }
                         dragHandle.data('componentid', widget.meta.id);
                         dragHandle.text(widget.meta.name);
