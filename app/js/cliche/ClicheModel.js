@@ -88,7 +88,7 @@ Cliche.fromObject = function(object){
     for (var datatypeType in object.datatypes) {
         for (var datatypeId in object.datatypes[datatypeType]) {
             var datatype = object.datatypes[datatypeType][datatypeId];
-            cliche.datatypes[datatypeId] = UserDatatype.fromObject(datatype);
+            cliche.datatypes[datatypeType][datatypeId] = UserDatatype.fromObject(datatype);
         }
     }
     return cliche

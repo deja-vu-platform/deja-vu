@@ -201,25 +201,24 @@ var WidgetEditsManager = function(){
     that.applyPropertyChangesAtAllLevelsBelow = function(outermostWidget){
         var recursiveApplyPropertyChangesHelper = function(widget){
             if (widget.type == 'user') {
-
-                var templateId = widget.meta.templateId;
-                if (!templateId){
-                    templateId = userApp.meta.id + '_' + widget.meta.id;
-                }
-
-                var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(templateId);
-                var templateClicheId = clicheAndWidgetId.clicheId;
-                var templateWidgetId = clicheAndWidgetId.widgetId;
-
                 var template = true;
 
-                if (templateClicheId == userApp.meta.id){
-                    // might not be there, at which point need to just continue
-                    if (!(templateWidgetId in userApp.widgets.templates)){
-                        template = false;
-                        applyPropertyChanges(widget);
+                var templateId = widget.meta.templateId;
+                if (templateId){
+                    var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(templateId);
+                    var templateClicheId = clicheAndWidgetId.clicheId;
+                    var templateWidgetId = clicheAndWidgetId.widgetId;
+                    
+                    if (templateClicheId == userApp.meta.id){
+                        // might not be there, at which point need to just continue
+                        if (!(templateWidgetId in userApp.widgets.templates)){
+                            template = false;
+                        }
                     }
+                } else {
+                    template = false
                 }
+
                 if (template){
                     var componentVersionCopy =  UserWidget.fromString(
                         JSON.stringify(selectedProject.cliches[templateClicheId].widgets.templates[templateWidgetId])
@@ -233,6 +232,8 @@ var WidgetEditsManager = function(){
                     // apply changes after calling the recursion so that higher levels override
                     // lower level changes
                     applyPropertyChanges(widget, componentVersionCopy);
+                } else {
+                    applyPropertyChanges(widget);
                 }
             } else {
                 // else it's a base component, so we'll just take it as is from the component we are reading from
@@ -390,21 +391,24 @@ var WidgetEditsManager = function(){
 
                         // save the templateId here since the projectCopy does not have
                         // any idea of a template id
-                        var templateId = innerWidget.meta.templateId;
-                        if (!templateId){
-                            templateId = userApp.meta.id + '_' + widget.meta.id;
-                        }
-                        var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(templateId);
-                        var templateClicheId = clicheAndWidgetId.clicheId;
-                        var templateWidgetId = clicheAndWidgetId.widgetId;
-
                         var template = true;
 
-                        if (templateClicheId == userApp.meta.id){
-                            // might not be there, at which point need to just continue
-                            if (!(templateWidgetId in userApp.widgets.templates)){
-                                template = false;
+                        var templateId = innerWidget.meta.templateId;
+                        if (templateId){
+                            var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(templateId);
+                            var templateClicheId = clicheAndWidgetId.clicheId;
+                            var templateWidgetId = clicheAndWidgetId.widgetId;
+
+
+                            if (templateClicheId == userApp.meta.id){
+                                // might not be there, at which point need to just continue
+                                if (!(templateWidgetId in userApp.widgets.templates)){
+                                    template = false;
+                                }
                             }
+
+                        } else {
+                            template = false;
                         }
 
                         if (template){
