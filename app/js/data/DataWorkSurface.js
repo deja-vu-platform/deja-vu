@@ -64,8 +64,7 @@ var DataWorkSurface = function(){
     };
 
 
-    that.makeDatatypeContainers = function(datatype, displayPropObj, dragHandle,
-                                                            zoom){
+    that.makeDatatypeContainers = function(datatype, displayPropObj, dragHandle, zoom){
 
         dragHandle.addClass('associated').data('componentid', datatype.meta.id);
         var container = dataContainerMaker.createResizableDatatypeContainer(datatype, displayPropObj, zoom);
@@ -106,21 +105,13 @@ var DataWorkSurface = function(){
 
 
     var makeWorkSurfaceDroppableToWidgets = function(workSurface, outermostWidget){
-        var onDropFinished = function(dragHandle, widget){
+        var onDropFinished = function(dragHandle, datatype){
 
-            var widgetId = widget.meta.id;
+            var datatypeId = datatype.meta.id;
 
-            if (dragHandle.associated){
-                var parent = dataEditsManager.getInnerWidget(outermostWidget, widgetId, true);
-            }
-            var firstInnerWidgetId = dataEditsManager.getPath(outermostWidget, widgetId)[1]; // this should always exist
-            if (!firstInnerWidgetId){
-                console.log('something went wrong in onDropFinished');
-            }
-
-            var firstInnerWidget = dataEditsManager.getInnerWidget(outermostWidget, firstInnerWidgetId);
-
-             dataContainerMaker.createBasicWidgetContainer(firstInnerWidget, currentZoom);
+            var displayPropObj = userApp.datatypeDisplays[datatypeId];
+            var container = that.makeDatatypeContainers(datatype, displayPropObj, dragHandle, currentZoom);
+            workSurface.append(container);
         };
 
         var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(outermostWidget, onDropFinished);

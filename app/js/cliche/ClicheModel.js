@@ -185,8 +185,12 @@ UserApp.prototype.addDatatype = function(datatype, displayProps){
     }
 };
 
+
+
 UserApp.prototype.removeDatatype = function(datatypeId){
-    delete this.datatypes[datatypeId];
+    delete this.datatypes.used[datatypeId];
+    delete this.datatypes.unused[datatypeId];
+    delete this.datatypeDisplays[datatypeId];
 };
 
 

@@ -275,16 +275,9 @@ function initDatatype() {
     author = selectedProject.meta.author;
 
     var id = generateId();
-    var position = {
-        top: 200,
-        left: 200
-    };
-    var dimensions = {
-        height: 40,
-        width: 60
-    };
 
-    var displayProperties = UserDatatypeDisplay(position, dimensions);
+
+    var displayProperties = UserDatatypeDisplay();
     return [UserDatatype(name, id, version, author), displayProperties];
 }
 

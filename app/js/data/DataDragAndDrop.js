@@ -6,6 +6,7 @@ var DataDragAndDropController = function () {
     var that = Object.create(DataDragAndDropController.prototype);
 
     var draggingDatatype = null;
+    var displayPropObj = null;
 
     that.getDraggingWidget = function () {
         return draggingDatatype;
@@ -15,9 +16,9 @@ var DataDragAndDropController = function () {
     var workSurfaceRef = dataWorkSurface.getWorkSurfaceRef();
 
 
-    that.dataToWorkSurfaceDropSettings = function (component, dropFinished) {
+    that.dataToWorkSurfaceDropSettings = function (userApp, dropFinished) {
         return {
-            accept: ".widget",
+            accept: ".datatype",
             hoverClass: "highlight",
             tolerance: "fit",
             drop: function (event, ui) {
@@ -30,8 +31,9 @@ var DataDragAndDropController = function () {
                     if (!dragHandle.hasClass('associated')) {
                         dragHandle = $(ui.draggable).clone();
                         dragHandle.data('componentid', $(ui.draggable).data('componentid'));
+                        dragHandle.data('clicheid', $(ui.draggable).data('clicheid'));
                         dragHandle.data('type', type);
-                        that.registerWidgetDragHandleDraggable(dragHandle);
+                        that.registerDataDragHandleDraggable(dragHandle);
                     }
                 }
 
@@ -41,39 +43,30 @@ var DataDragAndDropController = function () {
                 dragHandle.removeClass('dragging-component');
 
 
-                var widgetIsAssociated = dragHandle.hasClass('associated');
-                dragHandle.associated = widgetIsAssociated;
+                var dataIsAssociated = dragHandle.hasClass('associated');
+                dragHandle.associated = dataIsAssociated;
 
-                var difference = {top: 0, left: 0};
-
-                if (!widgetIsAssociated) {
-                    $(ui.helper).data('newcomponent', true);
-                    dragHandle.newWidget = true;
-                    component.addInnerWidget(datatype);
-                    dragHandle.addClass('associated').data('componentid', datatypeId);
-                    dataZoomElement.registerZoom(component);
-                } else {
-                    var parent = dataEditsManager.getInnerWidget(selectedUserWidget, datatypeId, true);
-                    var parentId = parent.meta.id;
-                    if (parentId != selectedUserWidget.meta.id){ // it is not the outermost widget
-                        var workSurfaceOffset = $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).offset();
-                        var widgetOffset = $('#'+containerRef+'_'+parentId).offset();
-                        difference.top = widgetOffset.top - workSurfaceOffset.top;
-                        difference.left = widgetOffset.left - workSurfaceOffset.left;
-                    }
-                }
-
-                var top = ui.position.top - difference.top;
-                var left = ui.position.left - difference.left;
+                var top = ui.position.top;
+                var left = ui.position.left;
 
                 var newPosition = {top: top/currentZoom, left: left/currentZoom};
-                var newLayout = {};
-                newLayout[datatypeId] = newPosition;
-                // after it has been added
-                dataEditsManager.updateCustomProperties(selectedUserWidget, datatypeId, 'layout', newLayout, true);
-                // outerWidget.properties.layout[widgetId] = newLayout;
+                displayPropObj.displayProperties.position = newPosition;
 
-                dataMiniNav.updateMiniNavInnerWidgetSizes(component, currentZoom);
+                if (!dataIsAssociated) { // it's a new datatype thing
+                    $(ui.helper).data('newcomponent', true);
+                    dragHandle.newDatatype = true;
+                    userApp.datatypes.used[datatype.meta.id] = datatype;
+                    delete userApp.datatypes.unused[datatype.meta.id]
+                    dragHandle.addClass('associated').data('componentid', datatypeId);
+                    // dataZoomElement.registerZoom(component);
+                }
+
+                userApp.datatypeDisplays[datatypeId].displayProperties.position = newPosition;
+
+                // after it has been added
+
+
+                // dataMiniNav.updateMiniNavInnerWidgetSizes(userApp, currentZoom);
 
                 dropFinished(dragHandle, datatype);
             }
@@ -88,10 +81,13 @@ var DataDragAndDropController = function () {
             helper: function (e, ui) {
                 var dragHandle = $(this);
                 var type = dragHandle.data('type');
+                var clicheId = dragHandle.data('clicheid');
+                var datatypeId = dragHandle.data('componentid');
                 if (type == 'user') {
                     if (!dragHandle.hasClass('associated')) {
                         dragHandle = $('#basic-components .draggable[data-type=' + type + ']').clone();
-                        dragHandle.data('componentid', $(this).data('componentid'));
+                        dragHandle.data('componentid', datatypeId);
+                        dragHandle.data('clicheid', clicheId);
                         dragHandle.data('type', type);
                         that.registerDataDragHandleDraggable(dragHandle);
                     }
@@ -99,8 +95,9 @@ var DataDragAndDropController = function () {
                 dragHandle.addClass('dragging-component');
                 var offsetFromMouse = {top: 0, left: 0};
                 var datatypeContainer;
+                displayPropObj = userApp.datatypeDisplays[datatypeId]; // might not exists
+
                 if (dragHandle.hasClass('associated')) {
-                    var datatypeId = dragHandle.data('componentid');
                     draggingDatatype = userApp.datatypes.used[datatypeId];
                     //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
@@ -117,19 +114,25 @@ var DataDragAndDropController = function () {
                     };
                 } else {
                     var datatype;
-                    var id = dragHandle.data('componentid');
-                    datatype = UserDatatype.fromString(JSON.stringify(userApp.datatypes.used[id]));
-                    datatype.meta.templateId = datatype.meta.id;
-                    datatype = createDatatypeCopy(datatype);
+                    var cliche = selectedProject.cliches[clicheId];
+                    if (datatypeId in cliche.widgets.templates){
+                        datatype = UserDatatype.fromString(JSON.stringify(userApp.datatypes.used[datatypeId]));
+                        datatype.meta.templateId = datatype.meta.id;
+                        datatype = createDatatypeCopy(datatype);
+                        displayPropObj = UserDatatypeDisplay();
+
+                    } else { // it is unused
+                        datatype = userApp.datatypes.unused[datatypeId];
+
+                    }
                     dragHandle.data('componentid', datatype.meta.id);
                     dragHandle.text(datatype.meta.name);
                     dragHandle.css('display', 'block');
                     draggingDatatype = datatype;
-                    var displayPropObj = userApp.datatypeDisplays[id];
-                    datatypeContainer = dataWorkSurface.makeDatatypeContainers(datatype, displayPropObj, dragHandle, zoom);
+                    datatypeContainer = dataWorkSurface.makeDatatypeContainers(datatype, displayPropObj, dragHandle, currentZoom);
 
                     $('#basic-components').html(basicWidgets);
-                    that.registerWidgetDragHandleDraggable();
+                    that.registerDataDragHandleDraggable();
                 }
 
                 $('#outer-container').append(datatypeContainer);

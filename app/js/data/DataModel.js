@@ -73,6 +73,14 @@ var UserDatatypeDisplay = function(position, dimensions){
 
     var that = Object.create(UserDatatype.prototype);
 
+    position = position || {
+        top: 200,
+        left: 200
+    };
+    dimensions = dimensions || {
+        height: 40,
+        width: 60
+    };
 
     that.displayProperties = {
         position: position,

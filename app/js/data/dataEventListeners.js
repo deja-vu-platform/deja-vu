@@ -13,7 +13,7 @@ $('#new-user-datatype-btn').click(function(){
             var datatype = datatypeInfo[0];
             var datatypeDisplayProps = datatypeInfo[1];
             userApp.addDatatype(datatype, datatypeDisplayProps);
-            displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id);
+            displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
             // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
 
             resetMenuOptions();
@@ -200,9 +200,9 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
 
 /** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
 
-function displayDatatypeInListAndSelect(name, id){
+function displayDatatypeInListAndSelect(name, id, clicheId){
     $('.selected').removeClass("selected");
-    displayNewDatatypeInUserDatatypeList(name,id);
+    displayNewDatatypeInUserDatatypeList(name,id, clicheId);
     $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
@@ -210,10 +210,10 @@ function displayDatatypeInListAndSelect(name, id){
  * Adds a component to the list of user components
  * @param newComponent
  */
-function displayNewDatatypeInUserDatatypeList(name, id){
+function displayNewDatatypeInUserDatatypeList(name, id, clicheId){
     // TODO changes in style
     var newDatatypeElt = $(
-        '<li data-type="'+'user'+'" class="datatype draggable" data-componentid=' + id + '>'
+        '<li data-type="'+'user'+'" class="datatype draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
         + '<div class="component-name-container">'
         + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
@@ -253,135 +253,6 @@ function displayOverallDatatypesInListAndSelect(name, id){
     displayOverallDatatypesInList(name,id);
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
-
-
-/**
- * Updates the contents of a base component info at a particular cell based on inputs
- * @param containerId
- */
-function updateBaseWidgetContentsAndDisplayAt(containerId) {
-
-    var container = $('#'+containerId);
-    var tooltip = container.find('.tooltip');
-    var widgetId = container.data('componentId');
-
-    var type = container.find('.draggable').data('type');
-    var value;
-    var isUpload = false;
-
-    var done = function(value){
-        var newValue = {type: type, value: value};
-        dataEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'value', newValue);
-
-        // selectedUserWidget.innerWidgets[widgetId].innerWidgets = {};
-        // selectedUserWidget.innerWidgets[widgetId].innerWidgets[type] = value;
-
-        refreshContainerDisplay(true, container, currentZoom);
-    };
-
-    if (tooltip.length>0){
-        var inputs = Array.prototype.slice.call(
-            tooltip.get(0).getElementsByTagName('input'), 0);
-    } // TODO // else it is label and is handled
-
-    if (type === 'label') {
-        value = container.find('p')[0].textContent;
-    } else if (type === 'link') {
-        value = {
-            link_text: inputs[0].value,
-            target: inputs[1].value
-        }
-    } else if (type === 'tab_viewer') {
-        value = {
-            "tab1": {text: inputs[0].value, target: inputs[1].value},
-            "tab2": {text: inputs[2].value, target: inputs[3].value},
-            "tab3": {text: inputs[4].value, target: inputs[5].value}
-        }
-    } else if (type === 'menu') {
-        value = {
-            "menu_item1": {text: inputs[0].value, target: inputs[1].value},
-            "menu_item2": {text: inputs[2].value, target: inputs[3].value},
-            "menu_item3": {text: inputs[4].value, target: inputs[5].value}
-        }
-    } else if (type === 'image') {
-        value = {};
-
-        if (files.length > 0) { // if there's a file to upload
-
-            var file = files[0];
-            var parseFile = new Parse.File(file.name, file);
-            isUpload = true;
-            files.length = 0; // clear the old file
-            console.log('trying?');
-
-            parseFile.save()
-                .then(function (savedFile) { // save was successful
-                    console.log('success');
-                    value.img_src = savedFile.url();
-                    done(value);
-                });
-        } else { // pasted link to image
-            if (inputs[0].value.length>0){
-                value.img_src = inputs[0].value;
-            } else {
-                value.img_src = 'images/image_icon.png';
-            }
-        }
-    } else if (type === 'panel') {
-        value = {
-            heading: container.find('.panel-title')[0].textContent,
-            content: container.find('.panel-html')[0].textContent
-        }
-    }
-
-    if (!isUpload) {
-        done(value);
-    }
-}
-
-
-
-/** ** ** ** ** ** ** ** IMAGE UPLOAD HELPERS ** ** ** ** ** ** ** **/
-// file drag hover
-function FileDragHover(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    if (e.type == "dragover") {
-        $(e.target).addClass("hover");
-    } else if (e.type == "dragleave") {
-        $(e.target).removeClass("hover");
-    }
-}
-// file selection
-function FileSelectHandler(e) {
-
-    FileDragHover(e); // cancel event and hover styling
-
-    files = e.target.files || e.dataTransfer.files;
-
-    $(e.target).text("Got file: " + truncate(files[0].name, 30));
-}
-
-function truncate(str, len) {
-    return str.substring(0, len) + (str.length > len ? "... " + str.substring(str.length - 4) : "");
-}
-
-function getCSSRule(search) {
-    var x = [];
-    for (var sheetnum =0; sheetnum< document.styleSheets.length; sheetnum++){
-        x = x.concat([].slice.call(document.styleSheets[sheetnum].cssRules));
-    }
-    return x.filter(function (rule) {
-        return rule.selectorText === search;
-    })[0];
-}
-
-function resizeLabelDivs(cellWidth, cellHeight) {
-    getCSSRule('.label-container').style.setProperty('width', (cellWidth - 10) + 'px', null);
-    getCSSRule('.label-container').style.setProperty('height', (cellHeight - 30) + 'px', null);
-    getCSSRule('.label-container').style.setProperty('padding-top', (cellHeight / 4) + 'px', null);
-}
-
 
 
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/

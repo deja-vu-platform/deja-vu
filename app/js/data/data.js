@@ -73,7 +73,7 @@ $(function(){
 
         for (var datatypeId in userApp.datatypes.unused){
             var datatypeName = userApp.datatypes.unused[datatypeId].meta.name;
-            displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId);
+            displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId, userAppId);
         }
     }
 
