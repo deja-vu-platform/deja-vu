@@ -3,7 +3,11 @@ Cliche {
    * Capitalized ("syntactic") rules implicitly skip whitespace characters
    * Lowercase ("lexical") rules don't
    **/
-  ClicheDecl = cliche name ClicheUsesDecl? "{" Paragraph* "}"
+  Decl
+    = ClicheDecl -- cliche
+    | AppDecl  -- app
+  ClicheDecl = cliche name "{" Paragraph* "}"
+  AppDecl = "app" name ClicheUsesDecl? "{" Paragraph* "}"
 
   RouteDecl = route "\""routeName"\""
   ClicheUsesDecl = uses usedClicheName AsDecl* ("," usedClicheName AsDecl*)*

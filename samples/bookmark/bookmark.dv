@@ -1,7 +1,7 @@
 // Bookmark is an app for users to post updates with topics and follow other
 // users or topics. Users get a feed with all the relevant updates given the
 // topics and users they follow.
-cliche Bookmark uses
+app Bookmark uses
   community/Follow as FollowUsers,
   community/Follow as FollowTopics, 
   access/Auth, messaging/Feed,

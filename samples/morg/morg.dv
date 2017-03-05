@@ -1,4 +1,4 @@
-cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
+app Morg uses organization/Allocator, organization/Event, messaging/Email {
   data WeeklyGroupMeeting {
     meetings: GroupMeeting = Allocator.Allocation.resources +
       Event.WeeklyEvent.events,
