@@ -2,17 +2,20 @@
  * Created by Shinjini on 9/26/2016.
  */
 
-var zoomElement = ZoomElement();
-var miniNav = MiniNav();
-var view = Display();
-var workSurface = WorkSurface();
-var dragAndDrop = DragAndDropController();
-var grid = Grid();
+var widgetContainerMaker = WidgetContainer();
+var workSurface = WidgetWorkSurface();
+var zoomElement = WidgetZoomElement();
+var miniNav = WidgetMiniNav();
+var view = WidgetDisplay();
+var dragAndDrop = WidgetDragAndDropController();
+var grid = WidgetGrid();
 var widgetEditsManager = WidgetEditsManager();
-var style = Style();
+var undo = WidgetUndo();
+
+var style = WidgetStyle($('.palette-container'));
 
 var projectsSavePath = path.join(__dirname, 'projects');
-var addedCliches;
+//var addedCliches;
 
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
@@ -21,6 +24,7 @@ var files = [];
 
 var selectedUserWidget = null;
 var selectedProject = null;
+var userApp = null;
 
 var currentZoom = 1.0;
 var basicWidgets;
@@ -60,50 +64,59 @@ $(function(){
 
     $('.project-name .header').text(selectedProject.meta.name);
 
-    addedCliches = selectedProject.addedCliches;
-    for (var id in addedCliches) {
-        showClicheInList(id, addedCliches[id].name);
-    }
+    //addedCliches = selectedProject.addedCliches;
+    //for (var id in addedCliches) {
+    //    showClicheInList(id, addedCliches[id].name);
+    //}
 
-    if (selectedProject.numComponents == 0){
+    if (!selectedProject.userApp){
         // start a default component
-        selectedUserWidget = initUserWidget(true, true);
-        selectedProject.addMainPage(selectedUserWidget);
+        userApp = initUserApp();
+        selectedProject.addCliche(userApp);
+        selectedProject.makeUserApp(userApp);
+
+        selectedUserWidget = userApp.widgets.pages[Object.keys(userApp.widgets.pages)[0]];
         displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
     } else {
+        var userAppId = selectedProject.userApp;
+        userApp = selectedProject.cliches[userAppId];
         var widgetToLoadId;
-        if (!$.isEmptyObject(selectedProject.mainComponents)){
-            widgetToLoadId = Object.keys(selectedProject.mainComponents)[0];
-        } else {
-            widgetToLoadId = Object.keys(selectedProject.components)[0];
-        }
-        selectedUserWidget = selectedProject.components[widgetToLoadId];
-        if (widgetToLoadId in selectedProject.mainComponents){
+        if (!$.isEmptyObject(userApp.widgets.pages)){
+            widgetToLoadId = Object.keys(userApp.widgets.pages)[0];
+            selectedUserWidget = userApp.widgets.pages[widgetToLoadId];
             displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         } else {
+            widgetToLoadId = Object.keys(userApp.widgets.unused)[0];
+            selectedUserWidget = userApp.widgets.unused[widgetToLoadId];
             displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         }
+
         // TODO this will need to be changed once we bring in a userComponent which will be a
         // superset of userWidgets
 
-        for (var componentId in selectedProject.components){
-            if (componentId != widgetToLoadId){
-                var componentName = selectedProject.components[componentId].meta.name;
-                if (componentId in selectedProject.mainComponents){
-                    displayNewWidgetInMainPagesList(componentName, componentId)
+        userApp.getAllWidgetIds().forEach(function(widgetId){
+            if (widgetId != widgetToLoadId){
+                var widgetName;
+                if (widgetId in userApp.widgets.pages){
+                    widgetName = userApp.widgets.pages[widgetId].meta.name;
+                    displayNewWidgetInMainPagesList(widgetName, widgetId, userAppId)
+                } else if (widgetId in userApp.widgets.unused){
+                    widgetName = userApp.widgets.unused[widgetId].meta.name;
+                    displayNewWidgetInUserWidgetList(widgetName, widgetId, userAppId);
                 } else {
-                    displayNewWidgetInUserWidgetList(componentName, componentId);
+                    widgetName = userApp.widgets.templates[widgetId].meta.name;
+                    displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
                 }
 
             }
-        }
+        });
 
     }
     workSurface.loadUserWidget(selectedUserWidget, currentZoom);
 
     //autoSave5Mins();
 
-    basicWidgets = $('#basic-components').html();
+    basicWidgets = $('#basic-cliches').html();
 
     dragAndDrop.registerWidgetDragHandleDraggable();
 

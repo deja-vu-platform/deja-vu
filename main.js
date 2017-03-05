@@ -13,6 +13,9 @@ var BrowserWindow = electron.BrowserWindow;  // Module to create native browser 
 // be closed automatically when the JavaScript object is garbage collected.
 var mainWindow = null;
 
+
+
+
 function createWindow() {
     // Create the browser window.
     mainWindow = new BrowserWindow({width: 1200, height: 700, 'min-height': 500, 'min-width': 850});

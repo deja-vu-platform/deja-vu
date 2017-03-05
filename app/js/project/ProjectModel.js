@@ -22,9 +22,8 @@ function Project() {
     this.objectType = "Project";
     //this.type = '';
     this.meta = {};
-    this.mainComponents = {};
-    this.components = {};
-    this.numComponents = 0;
+    this.userApp = null;
+    this.cliches = {};
     this.lastAccessed = -Infinity;
     this.addedCliches = {};
 }
@@ -49,37 +48,39 @@ function UserProject(name, id, version, author) {
         version: version,
         author: author
     };
-    this.mainComponents = {}; // one component for now
-    this.components = {};
-    this.numComponents = 0;
-    this.componentIdSet = {}; // {id:''}
+    this.userApp = null; // one component for now
+    this.cliches = {};
+
     this.lastAccessed = new Date();
-    this.addedCliches = {};
+
 }
 
-UserProject.prototype.addInnerWidget = function(component){
-    if (!this.components[component.meta.id]) {
-        this.components[component.meta.id] = component;
-        this.numComponents++;
+UserProject.prototype.addCliche = function(component){
+    if (!this.cliches[component.meta.id]) {
+        this.cliches[component.meta.id] = component;
     }
 };
 
-UserProject.prototype.addMainPage = function(component){
-    component.inMainPages = true;
-    this.mainComponents[component.meta.id] = component.meta.name;
-    this.addInnerWidget(component);
-};
-
-UserProject.prototype.removeMainPage = function(component){
-    delete selectedProject.mainComponents[component.meta.id];
-    component.inMainPages = false;
-};
-
-
 UserProject.prototype.removeComponent = function(componentId){
-    delete this.components[componentId];
-    delete this.mainComponents[componentId];
-    this.numComponents--;
+    delete this.cliches[componentId];
+    delete this.userApp[componentId];
+};
+
+
+// TODO Ummm this should be fixed
+UserProject.prototype.makeUserApp = function(component){
+    if (component.meta.id in this.cliches){
+        this.userApp = component.meta.id;
+    }
+};
+
+UserProject.prototype.removeMainComponent = function(){
+    selectedProject.userApp = null;
+
+};
+
+UserProject.prototype.getNumCliches = function(){
+    return Object.keys(this.cliches).length;
 };
 
 UserProject.fromString = function(string){
@@ -93,21 +94,26 @@ UserProject.fromObject = function(object){
     if (!object.objectType){
         throw notCorrectObjectError;
     }
+    // if (!object.userApp){
+    //     throw notCorrectObjectError;
+    // }
     if (!object.meta){
         throw notCorrectObjectError;
     }
-    if (!object.components){
-        throw notCorrectObjectError;
-    }
-    if (!object.componentIdSet){
+    if (!object.cliches){
         throw notCorrectObjectError;
     }
 
     var project = $.extend(new UserProject(), object);
 
-    for (var componentId in object.components) {
-        var component = object.components[componentId];
-        object.components[componentId] = UserWidget.fromObject(component);
+    for (var clicheId in object.cliches) {
+        var cliche = object.cliches[clicheId];
+        if (cliche.meta.id == object.userApp){
+            project.cliches[clicheId] = UserApp.fromObject(cliche);
+        } else {
+            project.cliches[clicheId] = Cliche.fromObject(cliche);
+        }
+
     }
     return project
 };

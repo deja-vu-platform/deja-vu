@@ -1,8 +1,8 @@
 /**
  * Created by Shinjini on 2/13/2017.
  */
-var Style = function(){
-    var that = Object.create(Style.prototype);
+var WidgetStyle = function(paletteContainer){
+    var that = Object.create(WidgetStyle.prototype);
 
 
     // possible sources http://jscolor.com/, http://www.w3schools.com/colors/colors_picker.asp
@@ -18,18 +18,12 @@ var Style = function(){
 
     var palette = [];
 
+    var paletteElt;
 
-    var loadPalette = function(givenPalette){
-        if (!givenPalette){
-            for (var i = 0; i<PALETTE_SIZE; i++){
-                palette.push(WHITE);
-            }
-        } else {
-            palette = JSON.stringify(JSON.parse(givenPalette));
-        }
-    };
-    // TODO load palette function input
-    loadPalette();
+    var containerRef = widgetContainerMaker.getContainerRef();
+    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+
+
 
     var updatePalette = function(color, idx){
         // if real color; TODO check with pickerObject
@@ -46,7 +40,7 @@ var Style = function(){
                 }
             }
         }
-        console.log(palette);
+        updatePaletteElt();
     };
 
 
@@ -68,7 +62,7 @@ var Style = function(){
 
             var bgColor = overallStyles['background-color'] || '';
             pickerBG.fromString(bgColor);
-            $('#work-surface_'+userWidget.meta.id).css({
+            $('#'+workSurfaceRef+'_'+userWidget.meta.id).css({
                 'background-color': bgColor,
             });
         }
@@ -80,7 +74,7 @@ var Style = function(){
         }
         userWidget.properties.styles.custom[styleName] = styleValue;
         for (var id in userWidget.innerWidgets){
-            var container = $('#work-surface_'+userWidget.meta.id).find('#component-container_'+id);
+            var container = $('#'+workSurfaceRef+'_'+userWidget.meta.id).find('#'+containerRef+'_'+id);
             refreshContainerDisplay(false, container, currentZoom);
         }
 
@@ -104,7 +98,7 @@ var Style = function(){
         inputBG.change(function(){
             var color = pickerBG.toHEXString();
             setOverallStyleAndUpdateView('background-color', color, selectedUserWidget);
-            $('#work-surface_'+selectedUserWidget.meta.id).css({
+            $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).css({
                 'background-color': color,
             });
             updatePalette(color);
@@ -115,7 +109,7 @@ var Style = function(){
 
             style.setUpStyleColors(selectedUserWidget);
             for (var id in selectedUserWidget.innerWidgets){
-                var container = $('#work-surface_'+selectedUserWidget.meta.id).find('#component-container_'+id);
+                var container = $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).find('#'+containerRef+'_'+id);
                 refreshContainerDisplay(false, container, currentZoom);
             }
         });
@@ -172,6 +166,53 @@ var Style = function(){
         var bgColor = customColor || WHITE;
         pickerBG.fromString(bgColor);
     };
+
+    var makeColorPaletteElt = function(){
+        var container = $('<div></div>');
+        container.attr('id', 'palette');
+
+        for (var i = 0; i<PALETTE_SIZE; i++){
+            var elt = $('<div></div>');
+            elt.attr('id', 'palette-elt_'+i);
+            elt.addClass('palette-elt');
+            elt.css({
+                'background-color': palette[i],
+            });
+
+            elt.click(function(){
+                // TODO maybe we'll have a selected component variable
+                // and if you click this, the color gets set to that color
+                // console.log($(this).css('background-color'));
+            });
+            container.prepend(elt);
+        }
+
+        return container;
+    };
+
+    var updatePaletteElt = function(){
+        for (var i = 0; i<PALETTE_SIZE; i++) {
+            paletteElt.find('#palette-elt_' + i).css({
+                'background-color': palette[i],
+            })
+        }
+    };
+
+
+    var loadPalette = function(givenPalette){
+        if (!givenPalette){
+            for (var i = 0; i<PALETTE_SIZE; i++){
+                palette.push(WHITE);
+            }
+        } else {
+            palette = JSON.stringify(JSON.parse(givenPalette));
+        }
+
+        paletteElt = makeColorPaletteElt();
+        paletteContainer.append(paletteElt);
+    };
+    // TODO load palette function input
+    loadPalette();
 
     Object.freeze(that);
     return that;

@@ -249,7 +249,7 @@ li.selected {
     display: none;
 }
 
-.widget:not(.not-draggable):hover {
+.widget:not(.not-draggable):hover, .datatype:not(.not-draggable):hover {
     cursor: -webkit-grab;
     cursor: grab;
     background-color: #E0E0E0;
@@ -348,7 +348,7 @@ li.selected {
     font-weight: bold;
 }
 
-.dropped .widget {
+.dropped .widget, .dropped .datatype{
     position: absolute;
     bottom: -25px;
     margin-left: auto;
@@ -670,6 +670,12 @@ li.selected {
     width: 120px;
 }
 
-#basic-components .widget[data-type="user"]{
+#basic-components .widget[data-type="user"], #basic-components .datatype[data-type="user"]{
     display: none;
+}
+
+.palette-elt{
+    height: 16px;
+    width: 16px;
+    display: inline-block;
 }

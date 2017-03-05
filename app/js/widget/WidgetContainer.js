@@ -5,6 +5,11 @@
 var WidgetContainer = function(){
     var that = Object.create(WidgetContainer.prototype);
 
+    var WIDGET_CONT_REF = 'widget-container';
+
+    that.getContainerRef = function(){
+        return WIDGET_CONT_REF;
+    };
 
     var makeContainerResizable = function(widget, outerWidget, container, outermostWidget){
         var widgetId = widget.meta.id;
@@ -131,6 +136,19 @@ var WidgetContainer = function(){
             '</a>' +
             '</li>');
 
+        // TODO should inner widgets be deletable/unlinkable?
+        var buttonUnlink = $('<li>' +
+            '<a href="#" class="inner-component-unlink">' +
+            '<span>Unlink</span>' +
+            '</a>' +
+            '</li>');
+
+        var buttonCreateTemplate = $('<li>' +
+            '<a href="#" class="inner-component-unlink">' +
+            '<span>Create Template</span>' +
+            '</a>' +
+            '</li>');
+
         var buttonMoveUp = $('<li>' +
             '<a href="#" class="inner-component-move-up">' +
             '<span>Move Up</span>' +
@@ -149,6 +167,9 @@ var WidgetContainer = function(){
             .append('<li class="divider"></li>')
             .append(buttonStyle)
             .append('<li class="divider"></li>')
+            .append(buttonCreateTemplate)
+            .append('<li class="divider"></li>')
+            .append(buttonUnlink)
             .append(buttonTrash)
             .append('<li class="divider"></li>')
             .append(buttonMoveUp)
@@ -177,18 +198,31 @@ var WidgetContainer = function(){
             container.find('.tooltip').addClass('open');
         });
 
+        buttonCreateTemplate.click(function(){
+            // TODO these functions should be somewhere else
+            var copy = createUserWidgetCopy(widget);
+            userApp.addTemplate(copy);
+            displayNewWidgetTemplateInList(copy.meta.name, copy.meta.id, userApp.meta.id);
+
+        });
 
         buttonTrash.click(function(){
             deleteWidgetFromUserWidgetAndFromView(widget.meta.id)
         });
 
+        buttonUnlink.click(function(){
+            removeWidgetFromUserWidgetAndFromView(widget.meta.id)
+        });
+
+
+
         buttonMoveUp.click(function(){
-           WorkSurface().changeOrderByOne(widget.meta.id, outerWidget, true);
+           WidgetWorkSurface().changeOrderByOne(widget.meta.id, outerWidget, true);
         });
 
 
         buttonMoveDown.click(function(){
-            WorkSurface().changeOrderByOne(widget.meta.id, outerWidget, false);
+            WidgetWorkSurface().changeOrderByOne(widget.meta.id, outerWidget, false);
         });
 
         return optionsDropdown;
@@ -197,8 +231,8 @@ var WidgetContainer = function(){
 
     that.createBasicWidgetContainer = function(widget, zoom){
         var container = $('<div></div>');
-        var containerId = 'component-container_'+widget.meta.id;
-        container.addClass('cell dropped component-container containing-cell').attr('id', containerId);
+        var containerId = WIDGET_CONT_REF+'_'+widget.meta.id;
+        container.addClass('dropped '+WIDGET_CONT_REF).attr('id', containerId);
         container.height(widget.properties.dimensions.height * zoom).width(widget.properties.dimensions.width * zoom);
         container.data('componentId', widget.meta.id);
         return container;

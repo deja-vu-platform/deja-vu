@@ -1,8 +1,8 @@
 /**
  * Created by Shinjini on 11/3/2016.
  */
-var ZoomElement = function(){
-    var that = Object.create(ZoomElement.prototype);
+var DataZoomElement = function(){
+    var that = Object.create(DataZoomElement.prototype);
 
     var getSliderValFromZoom = function(zoom){
         var max = parseFloat($('#zoom-slider').get(0).max);
@@ -88,15 +88,15 @@ var ZoomElement = function(){
             width: selectedScreenSizeWidth*currentZoom + 'px',
         });
         $('#zoom-selected-screen-size').css({
-            height: selectedScreenSizeHeight*currentZoom*miniNav.getNavZoom() + 'px',
-            width: selectedScreenSizeWidth*currentZoom*miniNav.getNavZoom() + 'px',
+            height: selectedScreenSizeHeight*currentZoom*dataMiniNav.getNavZoom() + 'px',
+            width: selectedScreenSizeWidth*currentZoom*dataMiniNav.getNavZoom() + 'px',
         });
         $('.work-surface').css({
             width: outerWidget.properties.dimensions.width*zoom + 'px',
             height: outerWidget.properties.dimensions.height*zoom + 'px',
         });
 
-        miniNav.updateNavInnerWidgetSizes(zoom);
+        dataMiniNav.updateNavInnerWidgetSizes(zoom);
     };
 
     that.updateZoomFromState = function(widget){

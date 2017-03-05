@@ -2,8 +2,8 @@
  * Created by Shinjini on 1/8/2017.
  */
 
-var Grid = function(){
-    var that = Object.create(Grid.prototype);
+var WidgetGrid = function(){
+    var that = Object.create(WidgetGrid.prototype);
 
     var xsWithoutBoundary = [];
     var ysWithoutBoundary = [];
@@ -15,12 +15,14 @@ var Grid = function(){
         // TODO this should be able to be done based on the userWidget!
 
         $('.grid').remove();
-        var workSurface = $('#work-surface_'+selectedUserWidget.meta.id);
+        var workSurfaceRef = workSurface.getWorkSurfaceRef();
+        var workSurfaceElt = $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id);
 
         var grid = {x: {}, y:{}};
         for (var widgetId in selectedUserWidget.innerWidgets){
             // existing components should also be in the work surface!
-            var container = $('#component-container_'+widgetId);
+            var containerRef = widgetContainerMaker.getContainerRef();
+            var container = $('#'+containerRef+'_'+widgetId);
             var top = container.position().top;
             var left = container.position().left;
             var right = left + container.width();
@@ -33,10 +35,10 @@ var Grid = function(){
 
         // var top = workSurface.offset().top;
         var workSurfaceTop = 0;
-        var workSurfaceBottom = workSurfaceTop + workSurface.height();
+        var workSurfaceBottom = workSurfaceTop + workSurfaceElt.height();
         // var left = workSurface.offset().left;
         var workSurfaceLeft = 0;
-        var workSurfaceRight = workSurfaceLeft + workSurface.width();
+        var workSurfaceRight = workSurfaceLeft + workSurfaceElt.width();
 
         xsWithoutBoundary.push(workSurfaceLeft, workSurfaceRight);
         ysWithoutBoundary.push(workSurfaceTop, workSurfaceBottom);
@@ -92,7 +94,7 @@ var Grid = function(){
             gridElt.append(xElt);
             xElt.css({
                 position: 'absolute',
-                height: workSurface.height(),
+                height: workSurfaceElt.height(),
                 width: '1px',
                 top: 0,
                 left: xs[xNum],
@@ -108,7 +110,7 @@ var Grid = function(){
             yElt.css({
                 position: 'absolute',
                 height: '1px',
-                width: workSurface.width(),
+                width: workSurfaceElt.width(),
                 top: ys[yNum],
                 left: 0,
                 border: '1px dashed black'
@@ -120,7 +122,7 @@ var Grid = function(){
             left: 0,
             visibility: 'hidden',
         });
-        workSurface.append(gridElt);
+        workSurfaceElt.append(gridElt);
     };
 
 
@@ -200,91 +202,4 @@ var Grid = function(){
 
     Object.freeze(that);
     return that;
-};
-
-
-
-//
-function setUpGrid(){
-//     $('.grid').remove();
-//     var workSurface = $('#work-surface_'+selectedUserWidget.meta.id);
-//
-//     var grid = {x: {}, y:{}};
-//     for (var componentId in selectedUserWidget.components){
-//         // existing components should also be in the work surface!
-//         var container = $('#component-container_'+componentId);
-//         var top = container.position().top;
-//         var left = container.position().left;
-//         var right = left + container.width();
-//         var bottom = top + container.height();
-//         grid.x[left] = '';
-//         grid.x[right] = '';
-//         grid.y[top] = '';
-//         grid.y[bottom] = '';
-//     }
-//     var xs = Object.keys(grid.x).map(function(key){
-//         return parseFloat(key);
-//     });
-//
-//     // var top = workSurface.offset().top;
-//     var top = 0;
-//     var bottom = top + workSurface.height();
-//     // var left = workSurface.offset().left;
-//     var left = 0;
-//     var right = left + workSurface.width();
-//
-//     xs.push(left);
-//     xs.push(right);
-//     xs.sort(function(a, b){
-//         return a-b;
-//     });
-//
-//     var ys = Object.keys(grid.y).map(function(key){
-//         return parseFloat(key);
-//     });
-//     ys.push(top);
-//     ys.push(bottom);
-//     ys.sort(function(a, b){
-//         return a-b;
-//     });
-//
-//     var numRows = ys.length-1;
-//     var numCols = xs.length-1;
-//
-//     var gridElt = $('<div></div>');
-//     gridElt.addClass('grid');
-//     for (var col=0; col<numCols; col++){
-//         var colElt = $('<div></div>');
-//         colElt.addClass('grid-col');
-//         gridElt.append(colElt);
-//
-//         for (var row=0; row<numRows; row++){
-//             var cellElt = $('<div></div>');
-//             cellElt.addClass('grid-cell');
-//             cellElt.attr('id', 'grid-cell_'+row+'_'+col);
-//             colElt.append(cellElt);
-//             cellElt.css({
-//                 width: xs[col+1] - xs[col],
-//                 height: ys[row+1] - ys[row],
-//             });
-//         }
-//     }
-//     gridElt.css({
-//         position: 'absolute',
-//         // top: ys[0] - workSurface.offset().top,
-//         // left: xs[0] - workSurface.offset().left,
-//         top: 0,
-//         left: 0,
-//         width: 1.1*(xs[numCols] - xs[0]),
-//         visibility: 'hidden',
-//     });
-//     workSurface.append(gridElt);
-//     // $('body').append(gridElt);
-//     $('.grid-col').css({
-//         display: 'inline-block'
-//     });
-//     $('.grid-cell').css({
-//         display: 'block',
-//         border: '1px dashed grey'
-//     });
 };

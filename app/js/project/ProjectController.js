@@ -170,11 +170,12 @@ function displayProjectPreview(project){
     $('#preview-prev-page').unbind();
     $('#preview-next-page').unbind();
 
-
-    if (!$.isEmptyObject(project.mainComponents)){
-        var componentToShowId = Object.keys(project.mainComponents)[0];
-        var numMainPages = Object.keys(project.mainComponents).length;
-        if (numMainPages>1){
+    var mainComponent = project.cliches[project.userApp];
+    var hasMainPages = (!$.isEmptyObject(mainComponent)) && (!$.isEmptyObject(mainComponent.mainPages));
+    if (hasMainPages){
+        var componentToShowId = Object.keys(mainComponent.mainPages)[0];
+        var numMainPages = Object.keys(mainComponent.mainPages).length;
+        if (numMainPages > 1) {
             $('#page-preview').css('width', '790px');
             $('#preview-prev-page').css('display', 'inline-block');
             $('#preview-next-page').css('display', 'inline-block');
@@ -184,21 +185,20 @@ function displayProjectPreview(project){
             $('#preview-next-page').css('display', 'none');
         }
 
-        componentToShow = project.components[componentToShowId];
+        componentToShow = mainComponent.widgets[componentToShowId];
         loadTablePreview(componentToShow);
 
         $('#page-preview').data('pagenum', 0);
 
-        $('#preview-prev-page').click(function(){
+        $('#preview-prev-page').click(function () {
             var pageNum = $('#page-preview').data('pagenum');
             showPrevMainPage(project, pageNum);
         });
 
-        $('#preview-next-page').click(function(){
+        $('#preview-next-page').click(function () {
             var pageNum = $('#page-preview').data('pagenum');
             showNextMainPage(project, pageNum);
         });
-
 
     } else {
         $('#preview-prev-page').css('display', 'none');
@@ -209,19 +209,19 @@ function displayProjectPreview(project){
 }
 
 function showNextMainPage(project, currentPageNumber){
-    var numMainPages = Object.keys(project.mainComponents).length;
+    var numMainPages = Object.keys(project.userApp).length;
     var nextPageNum = (currentPageNumber+1)%(numMainPages);
-    var componentToShowId = Object.keys(project.mainComponents)[nextPageNum];
-    componentToShow = project.components[componentToShowId];
+    var componentToShowId = Object.keys(project.userApp)[nextPageNum];
+    componentToShow = project.cliches[componentToShowId];
     loadTablePreview(componentToShow);
     $('#page-preview').data('pagenum', nextPageNum);
 
 }
 function showPrevMainPage(project, currentPageNumber){
-    var numMainPages = Object.keys(project.mainComponents).length;
+    var numMainPages = Object.keys(project.userApp).length;
     var prevPageNum = (currentPageNumber-1+numMainPages)%(numMainPages);
-    var componentToShowId = Object.keys(project.mainComponents)[prevPageNum];
-    componentToShow = project.components[componentToShowId];
+    var componentToShowId = Object.keys(project.userApp)[prevPageNum];
+    componentToShow = project.cliches[componentToShowId];
     loadTablePreview(componentToShow);
     $('#page-preview').data('pagenum', prevPageNum);
 }
@@ -250,7 +250,7 @@ function initNewProject() {
     }
     var newProject = new UserProject(copyName, generateId(), version, author);
     // This will actually be saved after it's fully loaded (with a first component, etc) in the
-    // components page
+    // cliches page
     //saveObjectToFile(projectsSavePath, projectNameToFilename(copyName), newProject);
     return newProject;
 

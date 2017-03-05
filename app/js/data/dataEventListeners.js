@@ -5,28 +5,17 @@
 /** ** ** ** ** ** Menu Event Handlers ** ** ** ** ** **/
 // TODO on user component name input check for special chars
 
-$('#new-user-component-btn').click(function(){
+$('#new-user-datatype-btn').click(function(){
     $('#create-component').unbind()
         .on('click', function () {
-            selectedUserWidget = initUserWidget(false, false);
-            selectedProject.addInnerWidget(selectedUserWidget);
-            displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
-            style.setUpStyleColors(selectedUserWidget);
+            var name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+            var datatypeInfo = initDatatype();
+            var datatype = datatypeInfo[0];
+            var datatypeDisplayProps = datatypeInfo[1];
+            userApp.addDatatype(datatype, datatypeDisplayProps);
+            displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
+            // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
 
-            resetMenuOptions();
-    });
-});
-
-$('#new-main-component-btn').click(function(){
-    $('#create-component').unbind()
-        .on('click', function () {
-            selectedUserWidget = initUserWidget(false, true);
-            selectedProject.addMainPage(selectedUserWidget);
-            displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
-
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
-            style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
     });
 });
@@ -42,14 +31,15 @@ $('#save-project').on('click', function () {
 $('.components').on('click', '.component-name-container', function () {
     // Save the current values
     var oldState = {zoom : currentZoom};
-    $('#work-surface'+'_'+selectedUserWidget.meta.id).data('state', oldState);
+    var workSurfaceRef = dataWorkSurface.getWorkSurfaceRef();
+    $('#'+workSurfaceRef+'_'+userApp.meta.id).data('state', oldState);
 
     var widgetId = $(this).parent().data('componentid');
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
-    selectedUserWidget = selectedProject.components[widgetId];
-    workSurface.loadUserWidget(selectedUserWidget);
-    style.setUpStyleColors(selectedUserWidget);
+    dataWorkSurface.loadDatatype(userApp, null);
+    $('#outer-container').scrollTop(0); // TODO DRY
+    $('#outer-container').scrollLeft(0);
 });
 
 $('.components').on('dblclick', '.component-name', function (e) {
@@ -78,12 +68,12 @@ $('.components').on('keypress', '.new-name-input', function (event) {
         widgetNameElt.text(newName);
         $('.component-options .component-name').text(newName);
 
-        selectedProject.components[widgetId].meta.name = newName;
+        selectedProject.cliches[widgetId].meta.name = newName;
     }
 });
 
 /** ** ** ** ** ** ** ** ** ** ** ** Component Options ** ** ** ** ** ** ** ** ** ** ** ** **/
-function setWidgetOptions(outerWidget){
+function setDatatypeOptions(outerWidget){
     // renaming
 
     $('.component-options .component-name')
@@ -131,16 +121,16 @@ function setWidgetOptions(outerWidget){
             // change the id
             copyWidget.meta.id = generateId();
 
-            if (originalId in selectedProject.mainComponents){
-                selectedProject.addMainPage(copyWidget);
+            if (originalId in selectedProject.userApp){
+                selectedProject.addPage(copyWidget);
                 displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             } else {
                 displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             }
 
-            selectedProject.addInnerWidget(copyWidget);
+            selectedProject.addCliche(copyWidget);
             selectedUserWidget = copyWidget;
-            workSurface.loadUserWidget(copyWidget, 1);
+            dataWorkSurface.loadUserWidget(copyWidget, 1);
 
         });
 
@@ -171,7 +161,7 @@ function setWidgetOptions(outerWidget){
         });
 
     // if the component is in the main pages, set it up accordingly
-    if (outerWidget.meta.id in selectedProject.mainComponents){
+    if (outerWidget.meta.id == selectedProject.userApp){
         $('.component-options #btn-index-page-toggle').css({
             display: 'inline-block',
         });
@@ -186,7 +176,7 @@ function setWidgetOptions(outerWidget){
 }
 
 function setUpWidgetOptionsIndexPageToggle(outerWidget){
-    if (outerWidget.meta.id == selectedProject.mainComponents.indexId){
+    if (outerWidget.meta.id == selectedProject.userApp.indexId){
         $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
         $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
         $('.components').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
@@ -210,9 +200,9 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
 
 /** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
 
-function displayUserWidgetInListAndSelect(name, id){
+function displayDatatypeInListAndSelect(name, id, clicheId){
     $('.selected').removeClass("selected");
-    displayNewWidgetInUserWidgetList(name,id);
+    displayNewDatatypeInUserDatatypeList(name,id, clicheId);
     $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
@@ -220,10 +210,10 @@ function displayUserWidgetInListAndSelect(name, id){
  * Adds a component to the list of user components
  * @param newComponent
  */
-function displayNewWidgetInUserWidgetList(name, id){
+function displayNewDatatypeInUserDatatypeList(name, id, clicheId){
     // TODO changes in style
-    var newWidgetElt = $(
-        '<li data-type="'+'user'+'" class="widget draggable" data-componentid=' + id + '>'
+    var newDatatypeElt = $(
+        '<li data-type="'+'user'+'" class="datatype draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
         + '<div class="component-name-container">'
         + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
@@ -231,10 +221,10 @@ function displayNewWidgetInUserWidgetList(name, id){
         + '</span>'
         + '</div>'
         + '</li>');
-    $('#user-components-list').append(newWidgetElt);
-    addDeleteUserWidgetButton(id);
+    $('#user-components-list').append(newDatatypeElt);
+    // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
-    dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
+    dataDragAndDrop.registerDataDragHandleDraggable(newDatatypeElt);
 }
 
 
@@ -242,7 +232,7 @@ function displayNewWidgetInUserWidgetList(name, id){
  * Adds a component to the list of main pages
  * @param newComponent
  */
-function displayNewWidgetInMainPagesList(name, id){
+function displayOverallDatatypesInList(name, id){
     // TODO changes in style
     var newWidgetElt =
         '<li data-componentid=' + id + '>'
@@ -256,144 +246,13 @@ function displayNewWidgetInMainPagesList(name, id){
         + '</div>'
         + '</li>';
     $('#main-pages-list').append(newWidgetElt);
-    addDeleteUserWidgetButton(id);
-    // registerUserWidgetAsDraggableForMainPages(id);
 }
 
-function displayMainPageInListAndSelect(name, id){
+function displayOverallDatatypesInListAndSelect(name, id){
     $('.selected').removeClass("selected");
-    displayNewWidgetInMainPagesList(name,id);
+    displayOverallDatatypesInList(name,id);
     $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
-
-
-/**
- * Updates the contents of a base component info at a particular cell based on inputs
- * @param containerId
- */
-function updateBaseWidgetContentsAndDisplayAt(containerId) {
-
-    var container = $('#'+containerId);
-    var tooltip = container.find('.tooltip');
-    var widgetId = container.data('componentId');
-
-    var type = container.find('.draggable').data('type');
-    var value;
-    var isUpload = false;
-
-    var done = function(value){
-        var newValue = {type: type, value: value};
-        widgetEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'value', newValue);
-
-        // selectedUserWidget.innerWidgets[widgetId].innerWidgets = {};
-        // selectedUserWidget.innerWidgets[widgetId].innerWidgets[type] = value;
-
-        refreshContainerDisplay(true, container, currentZoom);
-    };
-
-    if (tooltip.length>0){
-        var inputs = Array.prototype.slice.call(
-            tooltip.get(0).getElementsByTagName('input'), 0);
-    } // TODO // else it is label and is handled
-
-    if (type === 'label') {
-        value = container.find('p')[0].textContent;
-    } else if (type === 'link') {
-        value = {
-            link_text: inputs[0].value,
-            target: inputs[1].value
-        }
-    } else if (type === 'tab_viewer') {
-        value = {
-            "tab1": {text: inputs[0].value, target: inputs[1].value},
-            "tab2": {text: inputs[2].value, target: inputs[3].value},
-            "tab3": {text: inputs[4].value, target: inputs[5].value}
-        }
-    } else if (type === 'menu') {
-        value = {
-            "menu_item1": {text: inputs[0].value, target: inputs[1].value},
-            "menu_item2": {text: inputs[2].value, target: inputs[3].value},
-            "menu_item3": {text: inputs[4].value, target: inputs[5].value}
-        }
-    } else if (type === 'image') {
-        value = {};
-
-        if (files.length > 0) { // if there's a file to upload
-
-            var file = files[0];
-            var parseFile = new Parse.File(file.name, file);
-            isUpload = true;
-            files.length = 0; // clear the old file
-            console.log('trying?');
-
-            parseFile.save()
-                .then(function (savedFile) { // save was successful
-                    console.log('success');
-                    value.img_src = savedFile.url();
-                    done(value);
-                });
-        } else { // pasted link to image
-            if (inputs[0].value.length>0){
-                value.img_src = inputs[0].value;
-            } else {
-                value.img_src = 'images/image_icon.png';
-            }
-        }
-    } else if (type === 'panel') {
-        value = {
-            heading: container.find('.panel-title')[0].textContent,
-            content: container.find('.panel-html')[0].textContent
-        }
-    }
-
-    if (!isUpload) {
-        done(value);
-    }
-}
-
-
-
-/** ** ** ** ** ** ** ** IMAGE UPLOAD HELPERS ** ** ** ** ** ** ** **/
-// file drag hover
-function FileDragHover(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    if (e.type == "dragover") {
-        $(e.target).addClass("hover");
-    } else if (e.type == "dragleave") {
-        $(e.target).removeClass("hover");
-    }
-}
-// file selection
-function FileSelectHandler(e) {
-
-    FileDragHover(e); // cancel event and hover styling
-
-    files = e.target.files || e.dataTransfer.files;
-
-    $(e.target).text("Got file: " + truncate(files[0].name, 30));
-}
-
-function truncate(str, len) {
-    return str.substring(0, len) + (str.length > len ? "... " + str.substring(str.length - 4) : "");
-}
-
-function getCSSRule(search) {
-    var x = [];
-    for (var sheetnum =0; sheetnum< document.styleSheets.length; sheetnum++){
-        x = x.concat([].slice.call(document.styleSheets[sheetnum].cssRules));
-    }
-    return x.filter(function (rule) {
-        return rule.selectorText === search;
-    })[0];
-}
-
-function resizeLabelDivs(cellWidth, cellHeight) {
-    getCSSRule('.label-container').style.setProperty('width', (cellWidth - 10) + 'px', null);
-    getCSSRule('.label-container').style.setProperty('height', (cellHeight - 30) + 'px', null);
-    getCSSRule('.label-container').style.setProperty('padding-top', (cellHeight / 4) + 'px', null);
-}
-
 
 
 /** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/
@@ -584,18 +443,18 @@ function registerUserWidgetAreaDroppable(){
         tolerance: "intersect",
         drop: function(event, ui) {
             var userWidgetId = ui.draggable.data('componentid');
-            var name = selectedProject.components[userWidgetId].meta.name;
+            var name = selectedProject.cliches[userWidgetId].meta.name;
             if ($(this).hasClass('main-pages')){
                 if (ui.draggable.hasClass('moving-user-component')){ // if type user
                     // adding to main page
-                    selectedProject.addMainPage(selectedProject.components[userWidgetId]);
+                    selectedProject.addPage(selectedProject.cliches[userWidgetId]);
                     $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
                     displayMainPageInListAndSelect(name, userWidgetId);
                 }
             } else if ($(this).hasClass('user-components')){
                 if (ui.draggable.hasClass('moving-main-component')){ // if type user
                     // removing from main page
-                    selectedProject.removeMainPage(selectedProject.components[userWidgetId]);
+                    selectedProject.deletePage(selectedProject.cliches[userWidgetId]);
                     $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
                     displayUserWidgetInListAndSelect(name, userWidgetId);
 
@@ -681,12 +540,12 @@ $('.components').on('click', '.index-page-toggle', function(){
     $('.components .selected-index-page').removeClass('selected-index-page');
     var widgetId = $(this).parent().data('componentid');
     if (turnOn){
-        selectedProject.mainComponents.indexId = widgetId;
+        selectedProject.userApp.indexId = widgetId;
         $(this).parent().addClass('selected-index-page');
     } else {
-        selectedProject.mainComponents.indexId = null;
+        selectedProject.userApp.indexId = null;
     }
-    setUpWidgetOptionsIndexPageToggle(selectedProject.components[widgetId]);
+    setUpWidgetOptionsIndexPageToggle(selectedProject.cliches[widgetId]);
 });
 
 function refreshContainerDisplay(fresh, container, zoom){
@@ -696,12 +555,12 @@ function refreshContainerDisplay(fresh, container, zoom){
     var widgetId = container.data('componentId');
 
 
-    if (widgetEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
-        var widgetToChange = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
+    if (dataEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
+        var widgetToChange = dataEditsManager.getInnerWidget(selectedUserWidget, widgetId);
 
-        var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
+        var overallStyles = dataEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
         // var overallStyles = selectedUserWidget.properties.styles.custom;
-        view.displayWidget(fresh, widgetToChange, container, overallStyles, zoom);
+        dataView.displayWidget(fresh, widgetToChange, container, overallStyles, zoom);
 
         //attach event handlers to new texts
         registerTooltipBtnHandlers();
@@ -760,11 +619,12 @@ function recursiveReIding(widget, sourceWidget){
     return {success: false}
 }
 
-function createUserWidgetCopy (outerWidget, sourceOuterWidget){
-    var widget = UserWidget.fromString(JSON.stringify(outerWidget));
-
-    recursiveReIding(widget, sourceOuterWidget);
-    return widget;
+function createDatatypeCopy (datatype, sourceDatatype){
+    var datatypeCopy = UserDatatype.fromString(JSON.stringify(datatype));
+    if (!sourceDatatype){
+        datatypeCopy.meta.id = generateId();
+    }
+    return datatypeCopy;
 }
 
 
@@ -783,6 +643,40 @@ function testSaveHTML(){
 }
 
 function createDownloadPreview(){
+    // from http://stackoverflow.com/questions/754607/can-jquery-get-all-css-styles-associated-with-an-element
+    var getCSSasJSON = function(elm) {
+        var css2json= function(CSSFile){
+            var json = {};
+            if (!CSSFile) return json;
+            if (CSSFile instanceof CSSStyleDeclaration) {
+                for (var i in CSSFile) {
+                    if ((CSSFile[i]).toLowerCase) {
+                        json[(CSSFile[i]).toLowerCase()] = (CSSFile[CSSFile[i]]);
+                    }
+                }
+            } else if (typeof CSSFile == "string") {
+                CSSFile = CSSFile.split("; ");
+                for (var i in CSSFile) {
+                    var keyValue = CSSFile[i].split(": ");
+                    json[keyValue[0].toLowerCase()] = (keyValue[1]);
+                }
+            }
+            return json;
+        };
+
+        var sheets = document.styleSheets;
+        var json = {};
+        for (var i in sheets) {
+            var rules = sheets[i].rules || sheets[i].cssRules;
+            for (var rule in rules) {
+                if (elm.is(rules[rule].selectorText)) {
+                    json = $.extend(json, css2json(rules[rule].style), css2json(elm.attr('style')));
+                }
+            }
+        }
+        return json;
+    };
+
     var oldZoom = currentZoom;
     var workSurfaceElt = $('#work-surface_'+selectedUserWidget.meta.id);
     currentZoom = 1;
@@ -799,42 +693,52 @@ function createDownloadPreview(){
 
     $('.component-container').each(function(){
         var add = false;
-        var css = {
-            position: 'absolute',
-            top: $(this).position().top,
-            left: $(this).position().left,
-            width: $(this).width()+'px',
-            height: $(this).height()+'px',
-            'vertical-align': 'middle',
-        };
+        //var css = {
+        //    position: 'absolute',
+        //    top: $(this).position().top,
+        //    left: $(this).position().left,
+        //    width: $(this).width()+'px',
+        //    height: $(this).height()+'px',
+        //    'vertical-align': 'middle',
+        //    //'background-color': $(this).css('background-color'),
+        //};
+
         var container = $('<div></div>');
-        container.css(css);
+        container.css(getCSSasJSON($(this)));
+        //container.css(css);
 
         var labelContainer = $(this).find('.label-container').clone(true, true);
+        var displayWidget;
         if (labelContainer.get(0)){
-            labelContainer.css({// this is not carried over, since this was declared in the css file
-                position: 'absolute',
-                top: '0',
-                display: 'block',
-            });
+            //labelContainer.css({// this is not carried over, since this was declared in the css file
+            //    position: 'absolute',
+            //    top: '0',
+            //    display: 'block',
+            //});
+            labelContainer.css(getCSSasJSON(labelContainer));
             container.append(labelContainer);
-            var displayWidget = labelContainer.find('.display-component');
-            displayWidget.css({// this is not carried over, since this was declared in the css file
-                'white-space': 'initial',
-                margin: 0,
-            });
+            displayWidget = labelContainer.find('.display-component');
+            //displayWidget.css({// this is not carried over, since this was declared in the css file
+            //    'white-space': 'initial',
+            //    margin: 0,
+            //});
+            displayWidget.css(getCSSasJSON(displayWidget));
+
             displayWidget.attr('contenteditable', false);
             add = true;
         } else {
-            var displayWidget = $(this).find('.display-component').clone(true, true);
-            displayWidget.css({// this is not carried over, since this was declared in the css file
-                'white-space': 'initial',
-            });
+            displayWidget = $(this).find('.display-component').clone(true, true);
+            //displayWidget.css({// this is not carried over, since this was declared in the css file
+            //    'white-space': 'initial',
+            //});
+            displayWidget.css(getCSSasJSON(displayWidget));
+
             if (displayWidget.get(0)){
                 container.append(displayWidget);
                 add = true;
             }
         }
+
         if (add){
             $('#download-preview-area').append(container);
         }
@@ -867,11 +771,22 @@ function downloadHTML(){
  */
 function deleteWidgetFromUserWidgetAndFromView(widgetId) {
     var containerId = "component-container_"+widgetId;
-    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+    var parent = dataEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
     parent.deleteInnerWidget(widgetId);
     // selectedUserWidget.deleteInnerWidget(widgetId);
     $('#'+containerId).remove();
     grid.setUpGrid();
-    miniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
-    zoomElement.registerZoom(selectedUserWidget);
+    dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
+    dataZoomElement.registerZoom(selectedUserWidget);
 }
+
+
+
+// keyboard shortcuts
+$(document).keydown(function(e){
+    // Save combination
+    if ((event.which == 115 && event.ctrlKey) || (event.which == 19)){
+        alert("Ctrl-S pressed");
+        event.preventDefault();
+    }
+});
