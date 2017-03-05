@@ -162,7 +162,7 @@ var DataWorkSurface = function(){
                 //setWidgetOptions(datatype);
                 //dataZoomElement.updateZoomFromState(datatype);
                 // TODO other way? for now, reload the thinger
-                loadDatatypeIntoWorkSurface(datatype, currentZoom);
+                // loadDatatypeIntoWorkSurface(datatype, currentZoom);
             }
 
         } else {
@@ -179,7 +179,7 @@ var DataWorkSurface = function(){
                 // setDatatypeOptions(datatype);
                 //dataZoomElement.updateZoomFromState(datatype);
                 // TODO other way? for now, reload the thinger
-                loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
+                // loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
             }
         }
 
