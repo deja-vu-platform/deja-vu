@@ -180,7 +180,8 @@ export namespace GruntTask {
           {match: "route_config", replacement: route_config_str},
           {match: "locs", replacement: locs},
           {match: "wid_definitions", replacement: _u
-            .pluck(app_widgets_js, "definition").join("\n")}
+            .pluck(app_widgets_js, "definition").join("\n")},
+          {match: "server_data", replacement: server_data(data, comp_info)}
         ];
 
         grunt.config.merge({
@@ -262,6 +263,32 @@ export namespace GruntTask {
     }));
   }
 
+  function server_data(data, comp_info): string {
+    const create_atom = atom => `
+      bus.create_atom(
+          "${atom.type}",
+          "${atom.data.atom_id}",
+           ${JSON.stringify(_u.omit(atom.data, "atom_id"))})
+    `;
+    const all_tbonds = _u
+      .chain(comp_info.tbonds)
+      .pluck("subtype").pluck("name")
+      .uniq()
+      .value();
+    return _u
+        .chain(
+           _u.values(
+             _u.mapObject(_u.pick(data, ...all_tbonds), (atoms, atom_type) => _u
+               .map(atoms, atom => ({
+                 type: atom_type,
+                 data: atom
+               })))))
+        .flatten()
+        .map(create_atom)
+        .value()
+        .join(";");
+  }
+
   function cliche_widgets(cliche_widgets: UsedWidget[]): WidgetJs[] {
     return _u.chain(cliche_widgets)
       .map((cw: UsedWidget) => {
@@ -328,7 +355,7 @@ export namespace GruntTask {
       const locs_str: string = JSON.stringify(locs);
       if (cs.fqelement === name) {
         cs.express_config = {
-          script: "dist/app.js",
+          script: "dist/dv-dev/app.js",
           background: true,
           args: [
             "--main", `--mode=${action}`, `--fqelement=${cs.fqelement}`,
@@ -458,12 +485,12 @@ export namespace GruntTask {
     return {
       ts: {
         dev_client: {
-          src: [typings, shared, components, "src/dv-dev/**/*.ts"],
+          src: [typings, shared, components, "src/dv-dev/!(app).ts"],
           outDir: ["dist/public"],
           options: ts_client_opts
         },
         dev_server: {
-          src: [typings, shared, server],
+          src: [typings, shared, server, "src/dv-dev/app.ts"],
           outDir: ["dist"],
           options: ts_server_opts
         },
