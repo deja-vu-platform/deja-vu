@@ -44,8 +44,7 @@ const schema = grafo
         text: content
       };
 
-      return mailgun.messages().send(emailData)
-        .then(_ => true);
+      return mailgun.messages().send(emailData);
     }
   })
   .schema();

@@ -38,4 +38,6 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
     selected_weekly_event = ShowGroupMeeting.weekly_group_meeting,
     event = ShowGroupMeeting.group_meeting
   }
+
+  s: ShowGroupMeeting = {email: "deja-vu@mit.edu"}
 }
