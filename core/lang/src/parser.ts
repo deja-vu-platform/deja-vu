@@ -26,13 +26,12 @@ export interface WidgetReplaceMap {
   };
 }
 export interface ReplaceMap { [cliche: string]: WidgetReplaceMap; }
-export interface Cliche {
+export interface App {
+  fqelement: string;
   used_cliches: UsedClicheMap;
   cliche_map: ClicheMap;
   ft_map: FieldMap;
   replace_map: ReplaceMap;
-  fqelement: string;
-  // tbd
   uft_map: any;
   used_widgets: any[];
   main_widget: string;
@@ -41,6 +40,10 @@ export interface Cliche {
   fbonds: any[];
   wbonds: any[];
   data: any;
+}
+export interface Cliche {
+  fqelement: string;
+  widgets: any[];
 }
 
 export class Parser {
@@ -539,11 +542,21 @@ export class Parser {
           };
         }
       })
+      .addOperation("isApp", {
+        Decl: decl => decl.isApp(),
+        AppDecl: (app, name, uses, key1, para, key2) => true,
+        ClicheDecl: (cliche, name, key1, para, key2) => false
+      })
       .addOperation("fqelement", {
         Decl: decl => decl.fqelement(),
-        AppDecl: (app, name, uses, key1, para, key2) => name.fqelement(),
-        ClicheDecl: (cliche, name, key1, para, key2) => name.fqelement(),
-        name: (name) => `dv-samples-${name.sourceString.toLowerCase()}`
+        AppDecl: (app, name, uses, key1, para, key2) => {
+          return `dv-samples-${name.fqelement()}`;
+        },
+        ClicheDecl: (cliche, name, key1, para, key2) => {
+          // todo
+          return name.fqelement();
+        },
+        name: name => name.sourceString.toLowerCase()
       })
       // A map of tname -> list of values
       .addOperation("data", {
@@ -588,98 +601,111 @@ export class Parser {
   }
 
 
-  parse(fp: string): Cliche {
+  parse(fp: string): (App | Cliche) {
     const dv = fs.readFileSync(fp, "utf-8");
     const r = this._grammar.match(dv);
     if (r.failed()) {
       throw new Error(r.message);
     }
     const s = this._semantics(r);
-    // fqelement -> widgets
-    const widget_map = {};
-    // Widgets that are replaced
-    const replaced = _u.map(s.replaceList(), w => w.name + w.fqelement);
-    return {
-      used_cliches: s.usedCliches(),
-      cliche_map: s.clicheMap(),
-      ft_map: s.fieldTypesMap(),
-      replace_map: s.replaceMap(),
-      fqelement: s.fqelement(),
-      uft_map: s.usesFieldTypesMap(),
-      used_widgets: _u
-        .chain(s.usedWidgets())
-        .map(uw => {
-          if (widget_map[uw.fqelement] === undefined) {
-            widget_map[uw.fqelement] = _u
-              .reduce(
-                this._parse_cliche(uw.fqelement).widgets(),
-                (memo, w) => {
-                  memo[w.name] = w.children ? w.children : [];
-                  return memo;
-                }, {});
-          }
-          const all_children = _u
-            .chain(widget_map[uw.fqelement][uw.name])
-            .map(c => [].concat(c, widget_map[uw.fqelement][c.name]))
-            .flatten()
-            .value();
+    if (s.isApp()) {
+      // fqelement -> widgets
+      const widget_map = {};
+      // Widgets that are replaced
+      const replaced = _u.map(s.replaceList(), w => w.name + w.fqelement);
+      return {
+        used_cliches: s.usedCliches(),
+        cliche_map: s.clicheMap(),
+        ft_map: s.fieldTypesMap(),
+        replace_map: s.replaceMap(),
+        fqelement: s.fqelement(),
+        uft_map: s.usesFieldTypesMap(),
+        used_widgets: _u
+          .chain(s.usedWidgets())
+          .map(uw => {
+            if (widget_map[uw.fqelement] === undefined) {
+              widget_map[uw.fqelement] = _u
+                .reduce(
+                  this._parse_cliche(uw.fqelement).widgets(),
+                  (memo, w) => {
+                    memo[w.name] = w.children ? w.children : [];
+                    return memo;
+                  }, {});
+            }
+            const all_children = _u
+              .chain(widget_map[uw.fqelement][uw.name])
+              .map(c => [].concat(c, widget_map[uw.fqelement][c.name]))
+              .flatten()
+              .value();
 
-          return []
-            .concat(uw, _u.map(all_children, w => {
-              w.fqelement = uw.fqelement;
-              return w;
-            }));
-        })
-        .flatten()
-        // Remove replaced widgets
-        // if the widget that's replaced is also used in another context it
-        // will appear twice, so we until want to filter it out once
-        .filter(uw => {
-          const replaced_index = replaced.indexOf(uw.name + uw.fqelement);
-          if (replaced_index > -1) {
-            replaced.splice(replaced_index, 1);
-            return false;
-          }
-          return true;
-        })
-        .uniq(uw => uw.name + uw.fqelement)
-        .value(),
-      main_widget: s.main(),
-      widgets: s.widgets(),
-      tbonds: s.tbonds(),
-      fbonds: s.fbonds(),
-      wbonds: s.wbonds(),
-      data: s.data()
-    };
+            return []
+              .concat(uw, _u.map(all_children, w => {
+                w.fqelement = uw.fqelement;
+                return w;
+              }));
+          })
+          .flatten()
+          // Remove replaced widgets
+          // if the widget that's replaced is also used in another context it
+          // will appear twice, so we until want to filter it out once
+          .filter(uw => {
+            const replaced_index = replaced.indexOf(uw.name + uw.fqelement);
+            if (replaced_index > -1) {
+              replaced.splice(replaced_index, 1);
+              return false;
+            }
+            return true;
+          })
+          .uniq(uw => uw.name + uw.fqelement)
+          .value(),
+        main_widget: s.main(),
+        widgets: s.widgets(),
+        tbonds: s.tbonds(),
+        fbonds: s.fbonds(),
+        wbonds: s.wbonds(),
+        data: s.data()
+      };
+    } else {
+      return {fqelement: s.fqelement(), widgets: s.widgets()};
+    }
+  }
+
+  isApp(parseObj: App | Cliche): parseObj is App {
+    return (<App>parseObj).data !== undefined;
   }
 
   debug_match(fp: string) {
     const p = this.parse(fp);
     const debug = obj => JSON.stringify(obj, null, 2);
 
-    console.log("//////////Used Cliches//////////");
-    console.log(debug(p.used_cliches));
-    console.log("//////////Cliche Map//////////");
-    console.log(debug(p.cliche_map));
-    console.log("//////////Field Types Map//////////");
-    console.log(debug(p.ft_map));
-    console.log("//////////Replace Map//////////");
-    console.log(debug(p.replace_map));
-    console.log("//////////Uses Field Types Map//////////");
-    console.log(debug(p.uft_map));
-    console.log("//////////Used Widgets//////////");
-    console.log(debug(p.used_widgets));
-    console.log(`//////////Main widget is ${p.main_widget}//////////`);
-    console.log("//////////Widgets//////////");
-    console.log(debug(p.widgets));
-    console.log("//////////tbonds//////////");
-    console.log(debug(p.tbonds));
-    console.log("//////////fbonds//////////");
-    console.log(debug(p.fbonds));
-    console.log("//////////wbonds//////////");
-    console.log(debug(p.wbonds));
-    console.log("//////////data//////////");
-    console.log(debug(p.data));
+    if (this.isApp(p)) {
+      console.log("//////////Used Cliches//////////");
+      console.log(debug(p.used_cliches));
+      console.log("//////////Cliche Map//////////");
+      console.log(debug(p.cliche_map));
+      console.log("//////////Field Types Map//////////");
+      console.log(debug(p.ft_map));
+      console.log("//////////Replace Map//////////");
+      console.log(debug(p.replace_map));
+      console.log("//////////Uses Field Types Map//////////");
+      console.log(debug(p.uft_map));
+      console.log("//////////Used Widgets//////////");
+      console.log(debug(p.used_widgets));
+      console.log(`//////////Main widget is ${p.main_widget}//////////`);
+      console.log("//////////Widgets//////////");
+      console.log(debug(p.widgets));
+      console.log("//////////tbonds//////////");
+      console.log(debug(p.tbonds));
+      console.log("//////////fbonds//////////");
+      console.log(debug(p.fbonds));
+      console.log("//////////wbonds//////////");
+      console.log(debug(p.wbonds));
+      console.log("//////////data//////////");
+      console.log(debug(p.data));
+    } else {
+      console.log("//////////Widgets//////////");
+      console.log(debug(p.widgets));
+    }
   }
 
   private _build_uses_ft_map(uses) {

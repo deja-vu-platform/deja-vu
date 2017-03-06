@@ -1,5 +1,5 @@
 const command_line_args = require("command-line-args");
-import {Parser, Cliche} from "./parser";
+import {Parser} from "./parser";
 import {GruntTask} from "mean-loader";
 
 import * as fs from "fs";
@@ -35,20 +35,27 @@ function main() {
     return;
   }
 
-  const cliche: Cliche = p.parse(opts.file);
+  const pObj = p.parse(opts.file);
 
   grunt.task.init = () => ({});
-  GruntTask.task(
-    grunt, cliche.fqelement,
-    cliche.widgets,
-    cliche.main_widget,
-    cliche.used_cliches,
-    cliche.used_widgets,
-    cliche.replace_map,
-    {"tbonds": cliche.tbonds, "fbonds": cliche.fbonds},
-    {"wbonds": cliche.wbonds},
-    cliche.data);
-  grunt.tasks(["dv-mean:test"]);
+  if (p.isApp(pObj)) {
+    GruntTask.task(
+      grunt, pObj.fqelement,
+      pObj.widgets,
+      pObj.main_widget,
+      pObj.used_cliches,
+      pObj.used_widgets,
+      pObj.replace_map,
+      {"tbonds": pObj.tbonds, "fbonds": pObj.fbonds},
+      {"wbonds": pObj.wbonds},
+      pObj.data);
+    grunt.tasks(["dv-mean:test"]);
+  } else {
+    GruntTask.task(
+      grunt, pObj.fqelement,
+      pObj.widgets);
+    grunt.tasks(["dv-mean:dev"]);
+  }
 }
 
 main();
