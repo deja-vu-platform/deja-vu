@@ -333,7 +333,6 @@ export interface WidgetMetadata {
   external_styles?: string[];
 }
 
-
 export function Widget(options: WidgetMetadata) {
   return (target: Function): any => {
     const dname = _ustring.dasherize(target.name).slice(1, -10);

@@ -32,7 +32,15 @@ export class Mean {
   comp: any;
   locs: any;
   debug: boolean;
-  private _opts: any;
+  private _opts: {
+    fqelement: string,
+    dbhost: string,
+    dbport: number,
+    comp: string,
+    locs: string,
+    mode: string,
+    main: boolean
+  };
 
   constructor() {
     this._opts = cli.parse();
