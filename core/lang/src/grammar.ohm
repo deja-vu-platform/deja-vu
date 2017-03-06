@@ -12,6 +12,7 @@ Cliche {
   Paragraph
     = DataDecl -- data
     | WidgetDecl -- widget
+    | AssignmentDecl -- assignment
 
   DataDecl = data name "{" FieldBody? "}" DataBondDecl?
 
@@ -33,6 +34,17 @@ Cliche {
   FieldBondDecl = "=" FieldBond ("|" FieldBond)*
   FieldBond = fieldBondName ("+" fieldBondName)*
 
+  AssignmentDecl = name ":" name "=" Obj
+  Obj = "{" ObjBody ("," ObjBody)* "}"
+  ObjBody = name ":" Value
+  Value
+    = number -- number
+    | "\"" (~"\"" any)* "\"" -- text
+    | "[" ArrayDecl? "]" -- array
+    | (~"\"" name) -- ref
+  ArrayDecl = Value ("," Value)*
+
+
   fieldBondName
     = (alnum* "." alnum* ".") ("_" | alnum)* -- other
     | (alnum* ".") ("_" | alnum)* -- this
@@ -47,6 +59,7 @@ Cliche {
   singleLineComment = "//" (~eol any)*
   eol = "\r"?"\n"
   multiLineComment = "/*" (~"*/" any)* "*/"
+  number = digit+
 
   uses = "uses"
   replaces = "replaces"

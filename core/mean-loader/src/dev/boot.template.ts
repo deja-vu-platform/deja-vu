@@ -1,26 +1,39 @@
 import {NgModule, Component} from "@angular/core";
-import {platformBrowserDynamic} from "@angular/platform-browser-dynamic";
 import {BrowserModule} from "@angular/platform-browser";
 import {RouterModule, Routes} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 
-import {WidgetLoader, ClientBus} from "client-bus";
+import {WidgetLoader, ClientBus, Widget, field} from "client-bus";
 
+import * as _ustring from "underscore.string";
 
 @@wid_imports
 
+
+export function AppWidget() {
+  return (target: Function): any => {
+    const dname = _ustring.dasherize(target.name).slice(1, -10);
+    const metadata = {
+      selector: dname,
+      providers: [{provide: "wname", useValue: target.name.slice(0, -9)}]
+    };
+    metadata["templateUrl"] = `components/${dname}/${dname}.html`;
+    metadata["styleUrls"] = [`components/${dname}/${dname}.css`];
+    return Component(metadata)(target);
+  };
+}
+
+@@wid_definitions
+
 const MODE: string = "@@mode";
-
-const WID_NAMES = @@wid_names;
-
 const appRoutes: Routes = @@route_config;
 
 
 let template;
 if (MODE === "dev") {
   template = `
-     This is the development page, widgets: ${WID_NAMES}
+     This is the development page, widgets: @@wid_names 
      <div class="container">
        @@wid_selectors
      </div>
@@ -38,6 +51,7 @@ if (MODE === "dev") {
     {provide: "WCompInfo", useValue: @@wcomp_info},
     {provide: "ReplaceMap", useValue: @@replace_map},
     {provide: "locs", useValue: @@locs},
+    {provide: "app", useValue: "@@name"},
     ClientBus]
 })
 class RootComponent {}
@@ -53,5 +67,3 @@ declarations = declarations.concat(@@wid_classes);
   entryComponents: @@wid_classes
 })
 export class RootModule {}
-
-platformBrowserDynamic().bootstrapModule(RootModule);

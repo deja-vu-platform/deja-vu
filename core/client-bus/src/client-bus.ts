@@ -125,7 +125,9 @@ export class ClientBus {
 
   // This method is only necessary for those widgets that are loaded from a
   // route. Since they are loaded via ng2's component system, the dv fields
-  // are not initialized automatically and it thus needs to be done explicitly
+  // are not initialized automatically and it thus needs to be done explicitly.
+  // Note also that when a widget is loaded from a route, the dvAfterInit method
+  // won't get called so all initialization needs to happen in the constructor
   // todo: ditch ng2's routing system and do it ourselves
   init(w, fields) {
     w.fields = {};
@@ -165,7 +167,8 @@ export class WidgetLoader {
       @Inject("ReplaceMap") private _replace_map,
       private _client_bus: ClientBus,
       @Inject("wname") @Optional() private _host_wname,
-      @Inject("fqelement") @Optional() private _host_fqelement) {}
+      @Inject("fqelement") @Optional() private _host_fqelement,
+      @Inject("app") private _app) {}
 
   _adapt_table() {
     if (this.name === undefined) throw new Error("Widget name is required");
@@ -249,23 +252,28 @@ export class WidgetLoader {
 
   private _load_widget(
       name: string, fqelement: string, adapt_table, replace_field_map) {
-    const fqelement_split = fqelement.split("-");
-    let imp_string_prefix = "";
-    if (fqelement_split.length === 4) {
-      imp_string_prefix = fqelement_split.slice(0, 3).join("-");
+    let imp = "";
+    if (fqelement === this._app) {
+      imp = this._app;
     } else {
-      imp_string_prefix = fqelement;
+      const fqelement_split = fqelement.split("-");
+      let imp_string_prefix = "";
+      if (fqelement_split.length === 4) {
+        imp_string_prefix = fqelement_split.slice(0, 3).join("-");
+      } else {
+        imp_string_prefix = fqelement;
+      }
+      const d_name = _ustring.dasherize(name).slice(1);
+      imp = imp_string_prefix + `/lib/components/${d_name}/${d_name}`;
     }
 
     console.log(`Loading ${name} of ${fqelement}`);
-    const d_name = _ustring.dasherize(name).slice(1);
-    // need to preprend lib if the widget is not from the current cliche
     return System
-      .import(imp_string_prefix + `/lib/components/${d_name}/${d_name}`)
+      .import(imp)
       .then(mod => mod[name + "Component"])
       .then(c => {
         if (c === undefined) {
-          throw new Error(`Component ${d_name}/${name} not found`);
+          throw new Error(`Component ${name} not found`);
         }
         return c;
       })

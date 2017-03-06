@@ -46,7 +46,8 @@ function main() {
     cliche.used_widgets,
     cliche.replace_map,
     {"tbonds": cliche.tbonds, "fbonds": cliche.fbonds},
-    {"wbonds": cliche.wbonds});
+    {"wbonds": cliche.wbonds},
+    cliche.data);
   grunt.tasks(["dv-mean:test"]);
 }
 
