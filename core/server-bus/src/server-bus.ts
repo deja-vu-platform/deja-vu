@@ -95,7 +95,7 @@ export class ServerBus {
         },
         resolve: forward_wrap(handlers[t][action])
       };
-      ret["args"][action] = {
+      ret.args[action] = {
         "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
       };
       return ret;
@@ -136,7 +136,7 @@ export class ServerBus {
 
   /**
    *  Report the creation of a new atom
-   * 
+   *
    *  Args:
    *     - the type of the new atom (t_name)
    *     - the id of the new atom (atom_id)
@@ -152,7 +152,7 @@ export class ServerBus {
   }
   /**
    * Report the update of an existing atom
-   * 
+   *
    * Args:
    *   - the type of the atom to update (t_name)
    *   - the id of the atom to update (atom_id)
@@ -168,7 +168,7 @@ export class ServerBus {
   }
   /**
    * Report the removal of an atom
-   * 
+   *
    * Args:
    *   - the type of the atom to remove (t_name)
    *   - the id of the atom to remove (atom_id)
