@@ -1,4 +1,5 @@
 const ohm = require("ohm-js");
+
 import * as fs from "fs";
 import * as path from "path";
 
@@ -39,6 +40,7 @@ export interface Cliche {
   tbonds: any[];
   fbonds: any[];
   wbonds: any[];
+  data: any;
 }
 
 export class Parser {
@@ -61,6 +63,7 @@ export class Parser {
         },
         Paragraph_widget: decl => [],
         Paragraph_data: decl => decl.tbonds(),
+        Paragraph_assignment: decl => [],
         DataDecl: (data, name, key1, fields, key2, bond) => {
           const subtype = name.sourceString;
           const mapped_cliche = this.cliche_map["this"];
@@ -114,6 +117,7 @@ export class Parser {
         },
         Paragraph_widget: decl => [],
         Paragraph_data: decl => decl.fbonds(),
+        Paragraph_assignment: decl => [],
         DataDecl: (data, name, key1, fields, key2, bond) => {
           this.of_name = name.sourceString;
           return fields.fbonds();
@@ -232,6 +236,7 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.wbonds(),
         Paragraph_data: decl => [],
+        Paragraph_assignment: decl => [],
         WidgetDecl: (m, w, name, route_decl, wU, k1, fields, k2, r) => {
           this.of_name = name.sourceString;
           return fields.fbonds();
@@ -242,6 +247,7 @@ export class Parser {
           .filter(para.widgets(), w => !_u.isEmpty(w)),
         Paragraph_widget: decl => decl.widgets(),
         Paragraph_data: decl => [],
+        Paragraph_assignment: decl => [],
         WidgetDecl: (m, w, n1, route_decl, wUses, k1, fields, k2, r) => {
           const ret:{name?: string, path?: string, children?: any[]} = {};
           ret.name = n1.sourceString;
@@ -276,6 +282,7 @@ export class Parser {
           .find(para.main(), m => m),
         Paragraph_widget: decl => decl.main(),
         Paragraph_data: decl => "",
+        Paragraph_assignment: decl => "",
         WidgetDecl: (m, w, n1, route, wUses, k1, fields, k2, r) => m.
           sourceString ? n1.sourceString : ""
       })
@@ -309,6 +316,7 @@ export class Parser {
           ._get_ft_map(para),
         Paragraph_widget: decl => decl.fieldTypesMap(),
         Paragraph_data: decl => decl.fieldTypesMap(),
+        Paragraph_assignment: decl => ({}),
         DataDecl: (data, name, key1, fields, key2, bond) => {
           return {
             "of": name.sourceString,
@@ -411,6 +419,7 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.usedWidgets(),
         Paragraph_data: decl => [],
+        Paragraph_assignment: decl => [],
         WidgetDecl: (
           m, w, n1, route, wUses, k1, fields, k2, r) => wUses.usedWidgets(),
         WidgetUsesDecl: (u, used_widget1, comma, used_widgets) => []
@@ -432,6 +441,7 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.replaceList(),
         Paragraph_data: decl => ({}),
+        Paragraph_assignment: decl => ({}),
         WidgetDecl: (
           m, w, name, route, wUses, k1, fields, k2, r) => r.replaceList(),
         ReplacesDecl: (r, r_name, i, in_name, k1, r_map, k2) => r_name
@@ -465,6 +475,7 @@ export class Parser {
         },
         Paragraph_widget: decl => decl.replaceMap(),
         Paragraph_data: decl => ({}),
+        Paragraph_assignment: decl => ({}),
         WidgetDecl: (
           m, w, name, route, wUses, k1, fields, k2, r) => {
             this.name = name.sourceString;
@@ -507,6 +518,44 @@ export class Parser {
           const cliche_name = name.sourceString;
           return `dv-samples-${cliche_name.toLowerCase()}`;
         }
+      })
+      // A map of tname -> list of values
+      .addOperation("data", {
+        ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
+          .chain(para.data())
+          .flatten().reject(_u.isEmpty)
+          .reduce((memo, e) => {
+            if (memo[e.t_name] === undefined) memo[e.t_name] = [];
+            memo[e.t_name] = memo[e.t_name].concat(e.obj);
+            return memo;
+          }, {})
+          .value(),
+        Paragraph_data: decl => ({}), Paragraph_widget: decl => ({}),
+        Paragraph_assignment: decl => decl.data(),
+        AssignmentDecl: (name, colon, t_name, assign, obj) => ({
+          t_name: t_name.sourceString,
+          obj: _u.extendOwn({atom_id: name.sourceString}, obj.data())
+        }),
+        Obj: (cbrace1, obj_body, comma, more_obj_body, cbrace2) => _u
+          .extendOwn(obj_body.data(), _u
+            .chain(more_obj_body.data())
+            // for some strange reason .reduce(_u.extendOwn) doesn't work
+            .reduce((memo, e) => _u.extendOwn(memo, e))
+            .value()),
+        ObjBody: (name, colon, value) => {
+          const ret = {};
+          ret[name.sourceString] = value.data();
+          return ret;
+        },
+        Value_number: (num) => Number(num.sourceString),
+        Value_text: (quote1, text, quote2) => text.sourceString,
+        Value_array: (sqbracket1, arr_decl, sqbracket2) => arr_decl.data()[0],
+        ArrayDecl: (val, comma, more_val) => {
+          console.log("y" + JSON.stringify(more_val.data()));
+          return []
+          .concat(val.data()).concat(more_val.data());
+        },
+        Value_ref: (name) => ({atom_id: name.sourceString})
       });
   }
 
@@ -571,7 +620,8 @@ export class Parser {
       widgets: s.widgets(),
       tbonds: s.tbonds(),
       fbonds: s.fbonds(),
-      wbonds: s.wbonds()
+      wbonds: s.wbonds(),
+      data: s.data()
     };
   }
 
@@ -600,6 +650,8 @@ export class Parser {
     console.log(debug(p.fbonds));
     console.log("//////////wbonds//////////");
     console.log(debug(p.wbonds));
+    console.log("//////////data//////////");
+    console.log(debug(p.data));
   }
 
   private _build_uses_ft_map(uses) {
@@ -625,7 +677,9 @@ export class Parser {
   private _get_ft_map(para) {
     const ftmap = para.fieldTypesMap();
     return _u
-      .reduce(ftmap, (memo, ft) => {
+      .chain(ftmap)
+      .reject(_u.isEmpty)
+      .reduce((memo, ft) => {
         if (memo[ft.of] !== undefined) {
           throw new Error("Duplicate type " + ft.of);
         }
@@ -638,7 +692,8 @@ export class Parser {
             return memo;
           }, {});
         return memo;
-      }, {});
+      }, {})
+      .value();
   }
 
   private _parse_cliche(cliche) {

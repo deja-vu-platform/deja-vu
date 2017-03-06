@@ -14,6 +14,9 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
     name: Text = Allocator.Consumer.name + Event.Guest.name
   } = Event.Guest + Event.Description + Allocator.Consumer
 
+  m1: Member = {name: "Alyssa"}
+  m2: Member = {name: "Ben"}
+
   data GroupEmailAddress {}
 
   // Shows a form to create a new weekly group meeting and lets the user choose

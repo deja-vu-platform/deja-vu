@@ -3,15 +3,27 @@ const graphql = require("graphql");
 
 import * as _u from "underscore";
 
+type Mutation = {
+  name: string
+  type: string
+  args: {}
+  resolve: () => Promise<any>
+}
+
+type Type = {
+  name: string
+  fields: {}
+}
+
 
 export class Grafo {
-  types: any = {};
+  types: { [name: string]: Type } = {};
   user_queries: any = {};
-  mutations: any = {};
+  mutations: { [name: string]: Mutation } = {};
 
   constructor(private db) {}
 
-  init() {
+  init(): Promise<void> {
     return this.db.open()
       .then(_ => Promise
         .all(_u.map(_u.keys(this.types), t_name => this.db
@@ -27,7 +39,7 @@ export class Grafo {
       .catch(e => console.log(e));
   }
 
-  add_type(t) {
+  add_type(t: Type) {
     this.types[t.name] = t;
     return this;
   }
@@ -37,7 +49,7 @@ export class Grafo {
     return this;
   }
 
-  add_mutation(m) {
+  add_mutation(m: Mutation) {
     this.mutations[m.name] = m;
     return this;
   }

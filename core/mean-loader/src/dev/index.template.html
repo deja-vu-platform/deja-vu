@@ -27,11 +27,11 @@
         packages_obj[cliche] = regjs;
       }
 
-      packages_obj["dv-dev"] = {main: "./boot.js", defaultExtension: "js"};
-      packages_obj["components"] = regjs;
+      packages_obj["dv-dev"] = {main: "./main.js", defaultExtension: "js"};
+      packages_obj["components"] = regjs;  // AppWidget uses this
       packages_obj["shared"] = regjs;
       packages_obj["rxjs"] = regjs;
-      map_obj["@@name/lib"] = "";
+      map_obj["@@name"] = "dv-dev/boot.js";
 
       System.config({map: map_obj, packages: packages_obj});
       System.import('dv-dev')
