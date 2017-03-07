@@ -48,10 +48,15 @@ export interface Cliche {
 }
 
 export class Parser {
-  cliche_map; of_name; name; ft_map; this_ft_map;
+  of_name; name;
   private _grammar;
   private _semantics;
+
+  // Some auxiliary structures
   private _symbol_table;
+  private _cliche_map;
+  private _ft_map;
+  private _this_ft_map;
 
   constructor() {
     const grammar_path = path.join(__dirname, "grammar.ohm");
@@ -61,7 +66,6 @@ export class Parser {
         Decl: decl => decl.tbonds(),
         ClicheDecl: (cliche, name, key1, para, key2) => [],
         AppDecl: (app, name, uses, key1, para, key2) => {
-          this.cliche_map = this._get_cliche_map(name.sourceString, uses);
           return _u
             .chain(para.tbonds())
             .flatten()
@@ -73,7 +77,7 @@ export class Parser {
         Paragraph_assignment: decl => [],
         DataDecl: (data, name, key1, fields, key2, bond) => {
           const subtype = name.sourceString;
-          const mapped_cliche = this.cliche_map["this"];
+          const mapped_cliche = this._cliche_map["this"];
           return _u
             .chain(bond.tbonds())
             .reject(_u.isEmpty)
@@ -94,14 +98,14 @@ export class Parser {
         },
         dataBondName_other: (cliche, dot, name) => {
           const cliche_name = cliche.sourceString;
-          const mapped_cliche = this.cliche_map[cliche_name];
+          const mapped_cliche = this._cliche_map[cliche_name];
           if (!mapped_cliche) {
             throw new Error(`Can't find cliche ${cliche_name}`);
           }
           return {name: name.sourceString, fqelement: mapped_cliche.fqelement};
         },
         dataBondName_this: name => {
-          const mapped_cliche = this.cliche_map["this"];
+          const mapped_cliche = this._cliche_map["this"];
           return {name: name.sourceString, fqelement: mapped_cliche.fqelement};
         }
       })
@@ -109,15 +113,6 @@ export class Parser {
         Decl: decl => decl.fbonds(),
         ClicheDecl: (cliche, name, key1, para, key2) => [],
         AppDecl: (app, name, uses, key1, para, key2) => {
-          const cliche_name = name.sourceString;
-          this.cliche_map = uses.clicheMap()[0];
-          if (this.cliche_map === undefined) this.cliche_map = {};
-          this.cliche_map["this"] = {
-            fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
-            name: cliche_name
-          };
-          this.ft_map = this._build_uses_ft_map(uses);
-          this.this_ft_map = this._get_ft_map(para);
           return _u
             .chain(para.fbonds())
             .flatten()
@@ -137,7 +132,7 @@ export class Parser {
         },
         FieldDecl: (name, colon, t, field_bond_decl) => {
           const subfield = name.sourceString;
-          const mapped_cliche = this.cliche_map["this"];
+          const mapped_cliche = this._cliche_map["this"];
           const field_bonds = field_bond_decl.fbonds()[0];
           return _u
             .chain(field_bonds)
@@ -166,13 +161,13 @@ export class Parser {
         },
         fieldBondName_other: (cliche, dot1, t, dot2, name) => {
           const cliche_name = cliche.sourceString;
-          const mapped_cliche = this.cliche_map[cliche_name];
+          const mapped_cliche = this._cliche_map[cliche_name];
           if (!mapped_cliche) {
             throw new Error(`Can't find cliche ${cliche_name}`);
           }
           let ft_key = mapped_cliche.fqelement;
           if (ft_key.split("-").length === 4) ft_key = ft_key.slice(0, -2);
-          let ft_name = this.ft_map[ft_key][t.sourceString];
+          let ft_name = this._ft_map[ft_key][t.sourceString];
           if (!ft_name) {
             throw new Error(
               `Can't find type ${t.sourceString} of ${cliche_name}` +
@@ -198,9 +193,9 @@ export class Parser {
           };
         },
         fieldBondName_this: (t, dot2, name) => {
-          const mapped_cliche = this.cliche_map["this"];
+          const mapped_cliche = this._cliche_map["this"];
 
-          let ft_name = this.this_ft_map[t.sourceString];
+          let ft_name = this._this_ft_map[t.sourceString];
           if (!ft_name) {
             throw new Error(
               `Can't find type ${t.sourceString}` +
@@ -229,16 +224,6 @@ export class Parser {
         Decl: decl => decl.wbonds(),
         ClicheDecl: (cliche, name, key1, para, key2) => [],
         AppDecl: (app, name, uses, key1, para, key2) => {
-          const cliche_name = name.sourceString;
-          this.cliche_map = uses.clicheMap()[0];
-          if (this.cliche_map === undefined) this.cliche_map = {};
-          this.cliche_map["this"] = {
-            fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
-            name: cliche_name
-          };
-          this.ft_map = this._build_uses_ft_map(uses);
-          this.this_ft_map = this._get_ft_map(para);
-
           return _u
             .chain(para.wbonds())
             .flatten()
@@ -325,21 +310,28 @@ export class Parser {
             name.sourceString.toLowerCase();
         }
       })
-      // A map of cliche -> of -> field name -> type name
-      .addOperation("usesFieldTypesMap", {
-        Decl: decl => decl.usesFieldTypesMap(),
-        ClicheDecl: (cliche, name, key1, para, key2) => ({}),
-        AppDecl: (app, name, uses, key1, para, key2) => {
-          return this._build_uses_ft_map(uses);
-        }
-      })
       // A map of of -> field name -> type name
       .addOperation("fieldTypesMap", {
-        Decl: decl => decl.fieldTypesMap(),
-        AppDecl: (app, name, uses, key1, para, key2) => this
-          ._get_ft_map(para),
-        ClicheDecl: (cliche, name, key1, para, key2) => this
-          ._get_ft_map(para),
+        Decl: decl => _u
+            .chain(decl.fieldTypesMap())
+            .reject(_u.isEmpty)
+            .reduce((memo, ft) => {
+              if (memo[ft.of] !== undefined) {
+                throw new Error("Duplicate type " + ft.of);
+              }
+              memo[ft.of] = _u
+                .reduce(ft.fields, (memo, ft) => {
+                  if (memo[ft.name] !== undefined) {
+                    throw new Error("Duplicate field " + ft.name);
+                  }
+                  memo[ft.name] = ft.t;
+                  return memo;
+                }, {});
+              return memo;
+            }, {})
+            .value(),
+        AppDecl: (app, name, uses, key1, para, key2) => para.fieldTypesMap(),
+        ClicheDecl: (cliche, name, key1, para, key2) => para.fieldTypesMap(),
         Paragraph_widget: decl => decl.fieldTypesMap(),
         Paragraph_data: decl => decl.fieldTypesMap(),
         Paragraph_assignment: decl => ({}),
@@ -437,7 +429,6 @@ export class Parser {
         Decl: decl => decl.replaceList(),
         ClicheDecl: (cliche, name, key1, para, key2) => [],
         AppDecl: (app, name, uses, key1, para, key2) => {
-          this.cliche_map = this._get_cliche_map(name.sourceString, uses);
           return _u
             .chain(para.replaceList())
             .flatten()
@@ -453,7 +444,7 @@ export class Parser {
         replaceName: (cliche, dot, widget) => {
           return {
             name: widget.sourceString,
-            fqelement: this.cliche_map[cliche.sourceString].fqelement
+            fqelement: this._cliche_map[cliche.sourceString].fqelement
           };
         }
       })
@@ -462,8 +453,6 @@ export class Parser {
         Decl: decl => decl.replaceMap(),
         ClicheDecl: (cliche, name, key1, para, key2) => ({}),
         AppDecl: (app, name, uses, key1, para, key2) => {
-          this.cliche_map = this._get_cliche_map(name.sourceString, uses);
-          this.ft_map = this._get_ft_map(para);
           const rmap = _u
             .chain(para.replaceMap())
             .flatten()
@@ -492,7 +481,7 @@ export class Parser {
             in_widget: in_name.replaceMap(),
             replaced_by: {
               name: this.name,
-              fqelement: this.cliche_map["this"].fqelement
+              fqelement: this._cliche_map["this"].fqelement
             },
             map: r_map.replaceMap()[0]
           };
@@ -504,8 +493,8 @@ export class Parser {
           const ret = {};
           ret[n2.sourceString] = {
             "type": {
-              "name": this.ft_map[ct2.sourceString][n2.sourceString],
-              "fqelement": this.cliche_map["this"].fqelement
+              "name": this._this_ft_map[ct2.sourceString][n2.sourceString],
+              "fqelement": this._cliche_map["this"].fqelement
             },
             "maps_to": n1.sourceString
           };
@@ -514,7 +503,7 @@ export class Parser {
         replaceName: (cliche, dot, widget) => {
           return {
             name: widget.sourceString,
-            fqelement: this.cliche_map[cliche.sourceString].fqelement
+            fqelement: this._cliche_map[cliche.sourceString].fqelement
           };
         }
       })
@@ -535,17 +524,17 @@ export class Parser {
         name: name => name.sourceString.toLowerCase()
       })
       // A map of id -> type
-      .addOperation("symbol_table", {
+      .addOperation("symbolTable", {
         Decl: decl => _u
-          .reduce(decl.symbol_table(), (memo, s) => {
+          .reduce(decl.symbolTable(), (memo, s) => {
             memo[s.id] = s;
             return memo;
           }, {}),
-        ClicheDecl: (cliche, name, key1, para, key2) => para.symbol_table(),
-        AppDecl: (app, name, uses, key1, para, key2) => para.symbol_table(),
-        Paragraph_data: decl => decl.symbol_table(),
-        Paragraph_widget: decl => decl.symbol_table(),
-        Paragraph_assignment: decl => decl.symbol_table(),
+        ClicheDecl: (cliche, name, key1, para, key2) => para.symbolTable(),
+        AppDecl: (app, name, uses, key1, para, key2) => para.symbolTable(),
+        Paragraph_data: decl => decl.symbolTable(),
+        Paragraph_widget: decl => decl.symbolTable(),
+        Paragraph_assignment: decl => decl.symbolTable(),
         DataDecl: (data, name, k1, fields, k2, bonds) => ({
           id: name.sourceString, type: "data"}),
         WidgetDecl: (main, widget, name, uses, k1, fields, k2, replace) => ({
@@ -608,7 +597,6 @@ export class Parser {
       });
   }
 
-
   parse(fp: string): (App | Cliche) {
     const dv = fs.readFileSync(fp, "utf-8");
     const r = this._grammar.match(dv);
@@ -616,7 +604,12 @@ export class Parser {
       throw new Error(r.message);
     }
     const s = this._semantics(r);
-    this._symbol_table = s.symbol_table();
+    this._symbol_table = s.symbolTable();
+    this._cliche_map = s.clicheMap();
+    this._this_ft_map = s.fieldTypesMap();
+    // A map of cliche -> of -> field name -> type name
+    this._ft_map = this._build_uses_ft_map(_u.uniq(_u.keys(s.usedCliches())));
+
     const widgets = s.widgets();
     if (s.isApp()) {
       return {
@@ -625,7 +618,7 @@ export class Parser {
         ft_map: s.fieldTypesMap(),
         replace_map: s.replaceMap(),
         fqelement: s.fqelement(),
-        uft_map: s.usesFieldTypesMap(),
+        uft_map: this._ft_map,
         used_widgets: this.used_widgets(widgets, s.replaceList()),
         main_widget: s.main(),
         widgets: widgets,
@@ -750,46 +743,13 @@ export class Parser {
     }
   }
 
-  private _build_uses_ft_map(uses) {
+  private _build_uses_ft_map(used_cliches: string[]) {
     const get_ftmap_of_cliche = c => this._parse_cliche(c).fieldTypesMap();
-    const used_cliches = _u.uniq(_u.flatten(uses.usedCliches()));
     return _u
       .reduce(used_cliches, (memo, c) => {
         memo[c] = get_ftmap_of_cliche(c);
         return memo;
       }, {});
-  }
-
-  private _get_cliche_map(cliche_name, uses) {
-    let ret = uses.clicheMap()[0];
-    if (ret === undefined) ret = {};
-    ret["this"] = {
-      fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
-      name: cliche_name
-    };
-    return ret;
-  }
-
-  private _get_ft_map(para) {
-    const ftmap = para.fieldTypesMap();
-    return _u
-      .chain(ftmap)
-      .reject(_u.isEmpty)
-      .reduce((memo, ft) => {
-        if (memo[ft.of] !== undefined) {
-          throw new Error("Duplicate type " + ft.of);
-        }
-        memo[ft.of] = _u
-          .reduce(ft.fields, (memo, ft) => {
-            if (memo[ft.name] !== undefined) {
-              throw new Error("Duplicate field " + ft.name);
-            }
-            memo[ft.name] = ft.t;
-            return memo;
-          }, {});
-        return memo;
-      }, {})
-      .value();
   }
 
   private _parse_cliche(cliche) {
