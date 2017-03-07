@@ -52,8 +52,7 @@ app Bookmark uses
    * Widgets
    */
   // The landing page gives the user the option to sign in or register
-  main widget Landing route "landing" uses
-    Auth.SignInWithRedirect, Auth.RegisterWithRedirect {
+  main widget Landing {
     user_ok_redirect_route: Text =
       Auth.RegisterWithRedirect.register_ok_redirect_route +
       Auth.SignInWithRedirect.signin_ok_redirect_route
@@ -62,26 +61,21 @@ app Bookmark uses
   l: Landing = {user_ok_redirect_route: "/app/home"}
 
 
-  widget App route "app" uses
-    Auth.SignOutWithRedirect,
-    Home route "home",
-    Users route "users",
-    Topics route "topics" {
+  widget App {
     signout_ok_redirect_route: Text =
       Auth.SignOutWithRedirect.signout_ok_redirect_route
   }
 
   a: App = {signout_ok_redirect_route: "/landing"}
 
-  widget Home uses Auth.LoggedIn, CreatePost, Feed.ShowFeed {
+  widget Home {
     user: User = Auth.LoggedIn.user + CreatePost.author +
       Feed.ShowFeed.sub
   }
 
   // Shows the post, with its author, attached labels and comments. Also has
   // a field that lets the logged in user comment on the post
-  widget ShowFeedPost uses
-    MessagingPost.ShowAuthor, Label.ShowLabels, Comment.CommentsWithComment {
+  widget ShowFeedPost {
     feed_user: User = Comment.CommentsWithComment.author,
     post: Post = Label.ShowLabels.item + MessagingPost.ShowAuthor.post +
       Comment.CommentsWithComment.target
@@ -90,10 +84,7 @@ app Bookmark uses
     sub = ShowFeedPost.feed_user
   }
 
-  widget CreatePost uses
-    MessagingPost.NewPostContent,
-    Label.AttachLabels,
-    MessagingPost.NewPostButton {
+  widget CreatePost {
     author: User = MessagingPost.NewPostButton.author,
     post: Post = MessagingPost.NewPostContent.post + Label.AttachLabels.item +
       MessagingPost.NewPostButton.post,
@@ -103,13 +94,23 @@ app Bookmark uses
 
   // Displays the list of topics and lets the logged in user follow or unfollow
   // them
-  widget Topics uses Auth.LoggedIn, FollowTopics.EditFollow {
+  widget Topics {
     user: User = Auth.LoggedIn.user + FollowTopics.EditFollow.source
   }
 
   // Displays the list of users and lets the logged in user follow or unfollow
   // them
-  widget Users uses Auth.LoggedIn, FollowUsers.EditFollow {
+  widget Users {
     user: User = Auth.LoggedIn.user + FollowUsers.EditFollow.source
+  }
+
+  landing_route: Route = {path: "landing", widget: Landing}
+  app_route: Route = {
+    path: "app", widget: App,
+    children: [
+      {path: "home", widget: Home},
+      {path: "users", widget: Users},
+      {path: "topics", widget: Topics}
+    ]
   }
 }

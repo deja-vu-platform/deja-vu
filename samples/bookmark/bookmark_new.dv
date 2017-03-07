@@ -52,17 +52,11 @@ t1: Topic = {name: "hello", posts: [p1, p2]}
  * Widgets
  */
 // The landing page gives the user the option to sign in or register
-main widget Landing route "landing" {
-  user_ok_redirect_route: Text = "/app/home"
-}
+main widget Landing { user_ok_redirect_route: Route = app_route }
 
+widget App { signout_ok_redirect_route: Route = landing_route }
 
-widget App route "app" {
-  signout_ok_redirect_route: Text = "/landing"
-}
-
-
-widget Home route "app/home" { user: User }
+widget Home { user: User }
 
 // Shows the post, with its author, attached labels and comments. Also has
 // a field that lets the logged in user comment on the post
@@ -79,8 +73,18 @@ widget CreatePost {
 
 // Displays the list of topics and lets the logged in user follow or unfollow
 // them
-widget Topics route "app/topics" { user: User }
+widget Topics { user: User }
 
 // Displays the list of users and lets the logged in user follow or unfollow
 // them
-widget Users route "app/users" { user: User }
+widget Users { user: User }
+
+landing_route: Route = {path: "landing", widget: Landing}
+app_route: Route = {
+  path: "app", widget: App,
+  children: [
+    {path: "home", widget: Home},
+    {path: "users", widget: Users},
+    {path: "topics", widget: Topics}
+  ]
+}

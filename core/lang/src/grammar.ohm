@@ -9,7 +9,6 @@ Cliche {
   ClicheDecl = cliche name "{" Paragraph* "}"
   AppDecl = "app" name ClicheUsesDecl? "{" Paragraph* "}"
 
-  RouteDecl = route "\""routeName"\""
   ClicheUsesDecl = uses usedClicheName AsDecl* ("," usedClicheName AsDecl*)*
   AsDecl = as name
 
@@ -20,7 +19,7 @@ Cliche {
 
   DataDecl = data name "{" FieldBody? "}" DataBondDecl?
 
-  WidgetDecl = main? widget name RouteDecl? WidgetUsesDecl? "{"
+  WidgetDecl = main? widget name WidgetUsesDecl? "{"
     FieldBody?
   "}" ReplacesDecl?
   WidgetUsesDecl = uses UsedWidgetDecl ("," UsedWidgetDecl)*
@@ -28,7 +27,7 @@ Cliche {
   ReplaceMapBody = ReplaceMap ("," ReplaceMap)*
   replaceName = (alnum* ".") alnum*
   ReplaceMap = ("_" | alnum)* "=" (alnum* ".") ("_" | alnum)*
-  UsedWidgetDecl = usedWidgetName AsDecl? RouteDecl?
+  UsedWidgetDecl = usedWidgetName AsDecl?
 
   FieldBody = FieldDecl ("," FieldDecl)*
   FieldDecl = name ":" name FieldBondDecl?
@@ -43,11 +42,12 @@ Cliche {
   ObjBody = name ":" Value
   Value
     = number -- number
+    | Obj -- obj
     | "\"" (~"\"" any)* "\"" -- text
     | "[" ArrayDecl? "]" -- array
     | (~"\"" name) -- ref
-  ArrayDecl = Value ("," Value)*
 
+  ArrayDecl = Value ("," Value)*
 
   fieldBondName
     = (alnum* "." alnum* ".") ("_" | alnum)* -- other
