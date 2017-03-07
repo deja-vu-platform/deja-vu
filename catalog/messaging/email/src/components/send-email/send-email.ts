@@ -9,15 +9,17 @@ import {Widget} from "client-bus";
   styles: [``]
 })
 export class SendEmailComponent {
-  to: string = "";
-  content: string = "";
+  to = {value: ""};
+  content = {atom_id: ""};
 
   constructor(private _graphQlService: GraphQlService) {}
 
   send_email() {
+    // Just send the atom ID in the email for now
+    // TODO: update to send more informative emails
     this._graphQlService
       .post(`
-        sendEmail(to: "${this.to}", content: "${this.content}") 
+        sendEmail(to: "${this.to.value}", content: "${this.content.atom_id}")
       `)
       .subscribe(result => undefined);
   }

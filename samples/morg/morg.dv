@@ -8,7 +8,7 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
 
   data GroupMeeting {
     champion: Member = Event.Event.description + Allocator.Resource.consumed_by
-  } = Event.Event + Allocator.Resource
+  } = Event.Event + Allocator.Resource + Email.Content
 
   data Member {
     name: Text = Allocator.Consumer.name + Event.Guest.name
@@ -32,9 +32,12 @@ cliche Morg uses organization/Allocator, organization/Event, messaging/Email {
     weekly_group_meeting: WeeklyGroupMeeting =
       Allocator.EditConsumer.allocation,
     group_meeting: GroupMeeting = Event.ShowEvent.event +
-      Allocator.EditConsumer.resource
+      Allocator.EditConsumer.resource + Email.SendEmail.content,
+    email: Text = Email.SendEmail.to
   } replaces Event.ShowEvent in Event.ChooseAndShowWeeklyEvent {
     selected_weekly_event = ShowGroupMeeting.weekly_group_meeting,
     event = ShowGroupMeeting.group_meeting
   }
+
+  s: ShowGroupMeeting = {email: "deja-vu@mit.edu"}
 }
