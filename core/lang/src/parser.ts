@@ -29,14 +29,11 @@ export interface WidgetReplaceMap {
 export interface ReplaceMap { [cliche: string]: WidgetReplaceMap; }
 export interface App {
   fqelement: string;
-  used_cliches: UsedClicheMap;
-  cliche_map: ClicheMap;
-  ft_map: FieldMap;
-  replace_map: ReplaceMap;
-  uft_map: any;
-  used_widgets: any[];
-  main_widget: string;
   widgets: string[];
+  main_widget: string;
+  used_cliches: UsedClicheMap;
+  used_widgets: any[];
+  replace_map: ReplaceMap;
   tbonds: any[];
   fbonds: any[];
   wbonds: any[];
@@ -613,15 +610,12 @@ export class Parser {
     const widgets = s.widgets();
     if (s.isApp()) {
       return {
-        used_cliches: s.usedCliches(),
-        cliche_map: s.clicheMap(),
-        ft_map: s.fieldTypesMap(),
-        replace_map: s.replaceMap(),
         fqelement: s.fqelement(),
-        uft_map: this._ft_map,
-        used_widgets: this.used_widgets(widgets, s.replaceList()),
-        main_widget: s.main(),
         widgets: widgets,
+        main_widget: s.main(),
+        used_cliches: s.usedCliches(),
+        used_widgets: this.used_widgets(widgets, s.replaceList()),
+        replace_map: s.replaceMap(),
         tbonds: s.tbonds(),
         fbonds: s.fbonds(),
         wbonds: s.wbonds(),
@@ -714,21 +708,15 @@ export class Parser {
     const debug = obj => JSON.stringify(obj, null, 2);
 
     if (this.isApp(p)) {
-      console.log("//////////Used Cliches//////////");
-      console.log(debug(p.used_cliches));
-      console.log("//////////Cliche Map//////////");
-      console.log(debug(p.cliche_map));
-      console.log("//////////Field Types Map//////////");
-      console.log(debug(p.ft_map));
-      console.log("//////////Replace Map//////////");
-      console.log(debug(p.replace_map));
-      console.log("//////////Uses Field Types Map//////////");
-      console.log(debug(p.uft_map));
-      console.log("//////////Used Widgets//////////");
-      console.log(debug(p.used_widgets));
-      console.log(`//////////Main widget is ${p.main_widget}//////////`);
       console.log("//////////Widgets//////////");
       console.log(debug(p.widgets));
+      console.log(`//////////Main widget is ${p.main_widget}//////////`);
+      console.log("//////////Used Cliches//////////");
+      console.log(debug(p.used_cliches));
+      console.log("//////////Used Widgets//////////");
+      console.log(debug(p.used_widgets));
+      console.log("//////////Replace Map//////////");
+      console.log(debug(p.replace_map));
       console.log("//////////tbonds//////////");
       console.log(debug(p.tbonds));
       console.log("//////////fbonds//////////");
