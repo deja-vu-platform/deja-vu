@@ -8,14 +8,6 @@ cliche Post {
     username: Text,
     posts: Post
   }
-  
-  widget ShowPost {
-    post: Post
-  }
-
-  widget EditContent {
-    post: Post
-  }
 
   widget NewPostButton {
     post: Post,
@@ -27,18 +19,17 @@ cliche Post {
     post: Post,
     submit_ok: Boolean
   }
-  
-  widget ShowUser {
-    user: User
-  }
-  
-  widget ShowPosts {
-    author: User
-  }
 
   widget ShowAuthor {
    post: Post
   }
-  
-  widget AllPosts {}
+
+  widget NewPost {
+    post: Post,
+    author: User
+  }
+
+  widget Posts {
+    author: User
+  }
 }

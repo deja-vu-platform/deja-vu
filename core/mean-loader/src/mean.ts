@@ -79,12 +79,6 @@ export class Mean {
   }
 }
 
-export interface Widget {
-  name: string;
-  path?: string;
-  children?: Widget[];
-}
-
 export interface UsedWidget {
   name: string;
   fqelement: string;
@@ -124,7 +118,7 @@ export namespace GruntTask {
   ];
 
   export function task(
-      grunt, name: string, widgets: Widget[] = [], main?: string,
+      grunt, name: string, widgets: string[] = [], main?: string,
       cliches = {}, used_widgets: UsedWidget[] = [], replace_map = {},
       comp_info = {}, wcomp_info = {}, data = {}) {
     const cliches_src = Object.keys(cliches)
@@ -146,7 +140,7 @@ export namespace GruntTask {
         grunt.log.writeln(name + " " + action);
 
         const app_widgets_js: WidgetJs[] = widget_definitions(
-          app_widgets(widgets, wcomp_info, data));
+          app_widgets(widgets, wcomp_info, data), data);
         const cliche_widgets_js: WidgetJs[] = cliche_widgets(used_widgets);
         const all_widgets_js: WidgetJs[] = app_widgets_js
           .concat(cliche_widgets_js);
@@ -163,7 +157,7 @@ export namespace GruntTask {
 
         let route_config_str = "[]";
         if (action === "test") {
-          route_config_str = JSON.stringify(route_config(widgets, main))
+          route_config_str = JSON.stringify(route_config(data, main))
             .replace(/\"component\":\"([^"\""]*)\"/g, "component: $1");
         }
 
@@ -238,36 +232,25 @@ export namespace GruntTask {
     selector?: string;
     fields?: FieldInfo[];
     definition?: string;
-    path?: string;
   }
 
-  function app_widgets(app_widgets: Widget[], wcomp_info, data): WidgetJs[] {
-    let flat_widgets: Widget[] = _u.chain(app_widgets)
-        .pluck("children")
-        .without(null, undefined)
-        .flatten()
-        .value();
-    flat_widgets = flat_widgets
-      .concat(_u.map(app_widgets, w => ({name: w.name, path: w.path})));
-    flat_widgets = _u.uniq(flat_widgets, false, w => w.name);
-
+  function app_widgets(app_widgets: string[], wcomp_info, data): WidgetJs[] {
     const all_widgets_fields = _u.pluck(wcomp_info.wbonds, "subfield");
-    return _u.map(flat_widgets, fw => ({
-      import_stmt: imp(fw.name, ".."),
-      class_name: component(fw.name),
-      name: fw.name,
-      selector: `<dv-widget name="${fw.name}"></dv-widget>`,
+    return _u.map(app_widgets, w => ({
+      import_stmt: imp(w, ".."),
+      class_name: component(w),
+      name: w,
+      selector: `<dv-widget name="${w}"></dv-widget>`,
       fields: _u
         .chain(all_widgets_fields)
-        .filter(f => f.of.name === fw.name)
+        .filter(f => f.of.name === w)
         .map(f => {
-          if (data[fw.name] !== undefined) {
-            f.data = data[fw.name][0][f.name];
+          if (data[w] !== undefined) {
+            f.data = data[w][0][f.name];
           }
           return f;
         })
-        .value(),
-      path: fw.path
+        .value()
     }));
   }
 
@@ -312,22 +295,29 @@ export namespace GruntTask {
       .value();
   }
 
-  function route_config(app_widgets: Widget[], main: string): any[] {
-    const wid_with_paths = _u.filter(app_widgets, w => w.path !== undefined);
-    const default_path = _u.findWhere(wid_with_paths, {name: main}).path;
-    const routify = w => {
-      if (w.children === undefined) {
-        return {path: w.path, component: component(w.name)};
-      } else {
-        return {
-          path: w.path, component: component(w.name),
-          children: _u.map(w.children, routify)
-        };
+  interface Route {
+    path: string;
+    component?: string;
+    children?: Route[];
+    redirectTo?: string;
+    pathMatch?: string;
+  }
+
+  function route_config(data, main: string): Route[] {
+    let default_path: string;
+    const process_route = r => {
+      if (main === r.widget) {
+        default_path = r.path;
       }
+      const ret: Route = {path: r.path, component: component(r.widget)};
+      if (r.children !== undefined) {
+        ret.children = _u.map(r.children, process_route);
+      }
+      return ret;
     };
-    return  _u
-      .map(wid_with_paths, routify)
-      .concat({path: "", redirectTo: default_path, pathMatch: "full"});
+    return _u
+      .map(data["Route"], process_route)
+      .concat([{path: "", redirectTo: default_path, pathMatch: "full"}]);
   }
 
   interface ClicheServer {
@@ -386,7 +376,7 @@ export namespace GruntTask {
     });
   }
 
-  function widget_definitions(widgets: WidgetJs[]): WidgetJs[] {
+  function widget_definitions(widgets: WidgetJs[], data): WidgetJs[] {
     const field_defs = w => _u
       .chain(w.fields)
       .filter(f => f.data)
@@ -413,10 +403,17 @@ export namespace GruntTask {
       .value()
       .join(";");
 
-    const wid_with_paths = _u
-      .chain(widgets)
-      .filter(w => w.path !== undefined)
-      .pluck("name")
+    const wids_from_route = r => {
+      const ret = [].concat(r.widget);
+      if (r.children !== undefined) {
+        ret.concat(_u.map(r.children, wids_from_route));
+      }
+      return ret;
+    };
+    const wid_with_paths: string[] = _u
+      .chain(data["Route"])
+      .map(wids_from_route)
+      .flatten()
       .value();
     const template_route_widget = w => `
       @AppWidget()

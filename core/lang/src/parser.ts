@@ -4,6 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import * as _u from "underscore";
+import * as _ustring from "underscore.string";
 
 
 export interface Widget {
@@ -26,35 +27,42 @@ export interface WidgetReplaceMap {
   };
 }
 export interface ReplaceMap { [cliche: string]: WidgetReplaceMap; }
-export interface Cliche {
-  used_cliches: UsedClicheMap;
-  cliche_map: ClicheMap;
-  ft_map: FieldMap;
-  replace_map: ReplaceMap;
+export interface App {
   fqelement: string;
-  // tbd
-  uft_map: any;
-  used_widgets: any[];
+  widgets: string[];
   main_widget: string;
-  widgets: any[];
+  used_cliches: UsedClicheMap;
+  used_widgets: any[];
+  replace_map: ReplaceMap;
   tbonds: any[];
   fbonds: any[];
   wbonds: any[];
   data: any;
 }
+export interface Cliche {
+  fqelement: string;
+  widgets: string[];
+}
 
 export class Parser {
-  cliche_map; of_name; name; ft_map; this_ft_map;
+  of_name; name;
   private _grammar;
   private _semantics;
+
+  // Some auxiliary structures
+  private _symbol_table;
+  private _cliche_map;
+  private _ft_map;
+  private _this_ft_map;
 
   constructor() {
     const grammar_path = path.join(__dirname, "grammar.ohm");
     this._grammar = ohm.grammar(fs.readFileSync(grammar_path, "utf-8"));
     this._semantics = this._grammar.createSemantics()
       .addOperation("tbonds", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          this.cliche_map = this._get_cliche_map(name.sourceString, uses);
+        Decl: decl => decl.tbonds(),
+        ClicheDecl: (cliche, name, key1, para, key2) => [],
+        AppDecl: (app, name, uses, key1, para, key2) => {
           return _u
             .chain(para.tbonds())
             .flatten()
@@ -66,7 +74,7 @@ export class Parser {
         Paragraph_assignment: decl => [],
         DataDecl: (data, name, key1, fields, key2, bond) => {
           const subtype = name.sourceString;
-          const mapped_cliche = this.cliche_map["this"];
+          const mapped_cliche = this._cliche_map["this"];
           return _u
             .chain(bond.tbonds())
             .reject(_u.isEmpty)
@@ -87,28 +95,21 @@ export class Parser {
         },
         dataBondName_other: (cliche, dot, name) => {
           const cliche_name = cliche.sourceString;
-          const mapped_cliche = this.cliche_map[cliche_name];
+          const mapped_cliche = this._cliche_map[cliche_name];
           if (!mapped_cliche) {
             throw new Error(`Can't find cliche ${cliche_name}`);
           }
           return {name: name.sourceString, fqelement: mapped_cliche.fqelement};
         },
         dataBondName_this: name => {
-          const mapped_cliche = this.cliche_map["this"];
+          const mapped_cliche = this._cliche_map["this"];
           return {name: name.sourceString, fqelement: mapped_cliche.fqelement};
         }
       })
       .addOperation("fbonds", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          const cliche_name = name.sourceString;
-          this.cliche_map = uses.clicheMap()[0];
-          if (this.cliche_map === undefined) this.cliche_map = {};
-          this.cliche_map["this"] = {
-            fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
-            name: cliche_name
-          };
-          this.ft_map = this._build_uses_ft_map(uses);
-          this.this_ft_map = this._get_ft_map(para);
+        Decl: decl => decl.fbonds(),
+        ClicheDecl: (cliche, name, key1, para, key2) => [],
+        AppDecl: (app, name, uses, key1, para, key2) => {
           return _u
             .chain(para.fbonds())
             .flatten()
@@ -128,7 +129,7 @@ export class Parser {
         },
         FieldDecl: (name, colon, t, field_bond_decl) => {
           const subfield = name.sourceString;
-          const mapped_cliche = this.cliche_map["this"];
+          const mapped_cliche = this._cliche_map["this"];
           const field_bonds = field_bond_decl.fbonds()[0];
           return _u
             .chain(field_bonds)
@@ -157,13 +158,13 @@ export class Parser {
         },
         fieldBondName_other: (cliche, dot1, t, dot2, name) => {
           const cliche_name = cliche.sourceString;
-          const mapped_cliche = this.cliche_map[cliche_name];
+          const mapped_cliche = this._cliche_map[cliche_name];
           if (!mapped_cliche) {
             throw new Error(`Can't find cliche ${cliche_name}`);
           }
           let ft_key = mapped_cliche.fqelement;
           if (ft_key.split("-").length === 4) ft_key = ft_key.slice(0, -2);
-          let ft_name = this.ft_map[ft_key][t.sourceString];
+          let ft_name = this._ft_map[ft_key][t.sourceString];
           if (!ft_name) {
             throw new Error(
               `Can't find type ${t.sourceString} of ${cliche_name}` +
@@ -189,9 +190,9 @@ export class Parser {
           };
         },
         fieldBondName_this: (t, dot2, name) => {
-          const mapped_cliche = this.cliche_map["this"];
+          const mapped_cliche = this._cliche_map["this"];
 
-          let ft_name = this.this_ft_map[t.sourceString];
+          let ft_name = this._this_ft_map[t.sourceString];
           if (!ft_name) {
             throw new Error(
               `Can't find type ${t.sourceString}` +
@@ -217,17 +218,9 @@ export class Parser {
         }
       })
       .addOperation("wbonds", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          const cliche_name = name.sourceString;
-          this.cliche_map = uses.clicheMap()[0];
-          if (this.cliche_map === undefined) this.cliche_map = {};
-          this.cliche_map["this"] = {
-            fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
-            name: cliche_name
-          };
-          this.ft_map = this._build_uses_ft_map(uses);
-          this.this_ft_map = this._get_ft_map(para);
-
+        Decl: decl => decl.wbonds(),
+        ClicheDecl: (cliche, name, key1, para, key2) => [],
+        AppDecl: (app, name, uses, key1, para, key2) => {
           return _u
             .chain(para.wbonds())
             .flatten()
@@ -237,57 +230,67 @@ export class Parser {
         Paragraph_widget: decl => decl.wbonds(),
         Paragraph_data: decl => [],
         Paragraph_assignment: decl => [],
-        WidgetDecl: (m, w, name, route_decl, wU, k1, fields, k2, r) => {
+        WidgetDecl: (m, w, name, wU, k1, fields, k2, r) => {
           this.of_name = name.sourceString;
           return fields.fbonds();
         }
       })
       .addOperation("widgets", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
-          .filter(para.widgets(), w => !_u.isEmpty(w)),
+        Decl: decl => decl.widgets(),
+        AppDecl: (app, name, uses, key1, para, key2) => _u
+          .reject(para.widgets(), _u.isEmpty),
+        ClicheDecl: (cliche, name, key1, para, key2) => _u
+          .reject(para.widgets(), _u.isEmpty),
         Paragraph_widget: decl => decl.widgets(),
-        Paragraph_data: decl => [],
-        Paragraph_assignment: decl => [],
-        WidgetDecl: (m, w, n1, route_decl, wUses, k1, fields, k2, r) => {
-          const ret:{name?: string, path?: string, children?: any[]} = {};
+        Paragraph_data: decl => [], Paragraph_assignment: decl => [],
+        WidgetDecl: (m, w, name, wUses, k1, fields, k2, r) => name.sourceString
+      })
+      .addOperation("widgetsTree", {
+        Decl: decl => decl.widgetsTree(),
+        AppDecl: (app, name, uses, key1, para, key2) => [],
+        ClicheDecl: (cliche, name, key1, para, key2) => _u
+          .filter(para.widgetsTree(), w => !_u.isEmpty(w)),
+        Paragraph_widget: decl => decl.widgetsTree(),
+        Paragraph_data: decl => [], Paragraph_assignment: decl => [],
+        WidgetDecl: (m, w, n1, wUses, k1, fields, k2, r) => {
+          const ret:{name?: string, children?: any[]} = {};
           ret.name = n1.sourceString;
-          const path = route_decl.widgets();
-          if (!_u.isEmpty(path)) ret.path = path[0];
-          const children = _u.chain(wUses.widgets())
-            .flatten().filter(c => !_u.isEmpty(c)).value();
+          const children = _u.chain(wUses.widgetsTree())
+            .flatten().reject(_u.isEmpty).value();
           if (!_u.isEmpty(children)) ret.children = children;
           return ret;
         },
         WidgetUsesDecl: (u, used_widget, comma, used_widgets) => []
-          .concat(_u.filter([used_widget.widgets()], c => !_u.isEmpty(c)))
+          .concat(_u.reject([used_widget.widgetsTree()], _u.isEmpty))
           .concat(_u
-            .chain(used_widgets.widgets()).flatten()
-            .filter(c => !_u.isEmpty(c))
+            .chain(used_widgets.widgetsTree()).flatten()
+            .reject(_u.isEmpty)
             .value()),
-        UsedWidgetDecl: (used_widget_name, as_decl, route_decl) => {
-          const ret:{name?: string, path?: string} = {};
-          const name = used_widget_name.widgets();
-          const path = route_decl.widgets();
+        UsedWidgetDecl: (used_widget_name, as_decl) => {
+          const ret:{name?: string} = {};
+          const name = used_widget_name.widgetsTree();
           if (name) ret.name = name;
-          if (!_u.isEmpty(path)) ret.path = path[0];
           return ret;
         },
         usedWidgetName: (cliche, dot, name) => {
           return (!cliche.sourceString) ? name.sourceString : "";
-        },
-        RouteDecl: (route, quote1, name, quote2) => name.sourceString
+        }
       })
       .addOperation("main", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
+        Decl: decl => decl.main(),
+        ClicheDecl: (cliche, name, key1, para, key2) => "",
+        AppDecl: (app, name, uses, key1, para, key2) => _u
           .find(para.main(), m => m),
         Paragraph_widget: decl => decl.main(),
         Paragraph_data: decl => "",
         Paragraph_assignment: decl => "",
-        WidgetDecl: (m, w, n1, route, wUses, k1, fields, k2, r) => m.
+        WidgetDecl: (m, w, n1, wUses, k1, fields, k2, r) => m.
           sourceString ? n1.sourceString : ""
       })
       .addOperation("usedCliches", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+        Decl: decl => decl.usedCliches(),
+        ClicheDecl: (cliche, name, key1, para, key2) => ({}),
+        AppDecl: (app, name, uses, key1, para, key2) => {
           const ret = {};
           const uses_used_cliches = uses.usedCliches()[0];
           if (uses_used_cliches !== undefined) {
@@ -304,16 +307,28 @@ export class Parser {
             name.sourceString.toLowerCase();
         }
       })
-      // A map of cliche -> of -> field name -> type name
-      .addOperation("usesFieldTypesMap", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          return this._build_uses_ft_map(uses);
-        }
-      })
       // A map of of -> field name -> type name
       .addOperation("fieldTypesMap", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => this
-          ._get_ft_map(para),
+        Decl: decl => _u
+            .chain(decl.fieldTypesMap())
+            .reject(_u.isEmpty)
+            .reduce((memo, ft) => {
+              if (memo[ft.of] !== undefined) {
+                throw new Error("Duplicate type " + ft.of);
+              }
+              memo[ft.of] = _u
+                .reduce(ft.fields, (memo, ft) => {
+                  if (memo[ft.name] !== undefined) {
+                    throw new Error("Duplicate field " + ft.name);
+                  }
+                  memo[ft.name] = ft.t;
+                  return memo;
+                }, {});
+              return memo;
+            }, {})
+            .value(),
+        AppDecl: (app, name, uses, key1, para, key2) => para.fieldTypesMap(),
+        ClicheDecl: (cliche, name, key1, para, key2) => para.fieldTypesMap(),
         Paragraph_widget: decl => decl.fieldTypesMap(),
         Paragraph_data: decl => decl.fieldTypesMap(),
         Paragraph_assignment: decl => ({}),
@@ -323,7 +338,7 @@ export class Parser {
             fields: _u.flatten(fields.fieldTypesMap())
           };
         },
-        WidgetDecl: (m, w, name, route_decl, wU, k1, fields, k2, r) => {
+        WidgetDecl: (m, w, name, wU, k1, fields, k2, r) => {
           return {
             "of": name.sourceString,
             fields: _u.flatten(fields.fieldTypesMap())
@@ -339,7 +354,9 @@ export class Parser {
       })
       // A map of alias -> {alias, fqelement, type name}
       .addOperation("clicheMap", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
+        Decl: decl => decl.clicheMap(),
+        ClicheDecl: (cliche, name, key1, para, key2) => ({}),
+        AppDecl: (app, name, uses, key1, para, key2) => {
           const cliche_name = name.sourceString;
           let ret = uses.clicheMap()[0];
           if (ret === undefined) ret = {};
@@ -405,34 +422,10 @@ export class Parser {
             `${name.sourceString.toLowerCase()}`
         })
       })
-      .addOperation("usedWidgets", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          const cliche_map = uses.clicheMap()[0];
-          if (cliche_map === undefined) return [];
-          return _u.chain(para.usedWidgets()).flatten()
-             // Ignore widgets that are of the current cliche
-            .filter(w => cliche_map[w.cliche])
-            .map(w => {
-              return {name: w.name, fqelement: cliche_map[w.cliche].fqelement};
-            })
-            .value();
-        },
-        Paragraph_widget: decl => decl.usedWidgets(),
-        Paragraph_data: decl => [],
-        Paragraph_assignment: decl => [],
-        WidgetDecl: (
-          m, w, n1, route, wUses, k1, fields, k2, r) => wUses.usedWidgets(),
-        WidgetUsesDecl: (u, used_widget1, comma, used_widgets) => []
-          .concat(used_widget1.usedWidgets())
-          .concat(used_widgets.usedWidgets()),
-        UsedWidgetDecl: (name, as_decl, route) => name.usedWidgets(),
-        usedWidgetName: (cliche, dot, name) => ({
-          name: name.sourceString, cliche: cliche.sourceString.slice(0, -1)
-        })
-      })
       .addOperation("replaceList", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          this.cliche_map = this._get_cliche_map(name.sourceString, uses);
+        Decl: decl => decl.replaceList(),
+        ClicheDecl: (cliche, name, key1, para, key2) => [],
+        AppDecl: (app, name, uses, key1, para, key2) => {
           return _u
             .chain(para.replaceList())
             .flatten()
@@ -442,22 +435,21 @@ export class Parser {
         Paragraph_widget: decl => decl.replaceList(),
         Paragraph_data: decl => ({}),
         Paragraph_assignment: decl => ({}),
-        WidgetDecl: (
-          m, w, name, route, wUses, k1, fields, k2, r) => r.replaceList(),
+        WidgetDecl: (m, w, name, wUses, k1, fields, k2, r) => r.replaceList(),
         ReplacesDecl: (r, r_name, i, in_name, k1, r_map, k2) => r_name
           .replaceList(),
         replaceName: (cliche, dot, widget) => {
           return {
             name: widget.sourceString,
-            fqelement: this.cliche_map[cliche.sourceString].fqelement
+            fqelement: this._cliche_map[cliche.sourceString].fqelement
           };
         }
       })
       // widget that is replaced -> replacement -> w field -> replacement field
       .addOperation("replaceMap", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          this.cliche_map = this._get_cliche_map(name.sourceString, uses);
-          this.ft_map = this._get_ft_map(para);
+        Decl: decl => decl.replaceMap(),
+        ClicheDecl: (cliche, name, key1, para, key2) => ({}),
+        AppDecl: (app, name, uses, key1, para, key2) => {
           const rmap = _u
             .chain(para.replaceMap())
             .flatten()
@@ -476,8 +468,7 @@ export class Parser {
         Paragraph_widget: decl => decl.replaceMap(),
         Paragraph_data: decl => ({}),
         Paragraph_assignment: decl => ({}),
-        WidgetDecl: (
-          m, w, name, route, wUses, k1, fields, k2, r) => {
+        WidgetDecl: (m, w, name, wUses, k1, fields, k2, r) => {
             this.name = name.sourceString;
             return r.replaceMap();
           },
@@ -487,7 +478,7 @@ export class Parser {
             in_widget: in_name.replaceMap(),
             replaced_by: {
               name: this.name,
-              fqelement: this.cliche_map["this"].fqelement
+              fqelement: this._cliche_map["this"].fqelement
             },
             map: r_map.replaceMap()[0]
           };
@@ -499,8 +490,8 @@ export class Parser {
           const ret = {};
           ret[n2.sourceString] = {
             "type": {
-              "name": this.ft_map[ct2.sourceString][n2.sourceString],
-              "fqelement": this.cliche_map["this"].fqelement
+              "name": this._this_ft_map[ct2.sourceString][n2.sourceString],
+              "fqelement": this._cliche_map["this"].fqelement
             },
             "maps_to": n1.sourceString
           };
@@ -509,19 +500,50 @@ export class Parser {
         replaceName: (cliche, dot, widget) => {
           return {
             name: widget.sourceString,
-            fqelement: this.cliche_map[cliche.sourceString].fqelement
+            fqelement: this._cliche_map[cliche.sourceString].fqelement
           };
         }
       })
+      .addOperation("isApp", {
+        Decl: decl => decl.isApp(),
+        AppDecl: (app, name, uses, key1, para, key2) => true,
+        ClicheDecl: (cliche, name, key1, para, key2) => false
+      })
       .addOperation("fqelement", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => {
-          const cliche_name = name.sourceString;
-          return `dv-samples-${cliche_name.toLowerCase()}`;
-        }
+        Decl: decl => decl.fqelement(),
+        AppDecl: (app, name, uses, key1, para, key2) => {
+          return `dv-samples-${name.fqelement()}`;
+        },
+        ClicheDecl: (cliche, name, key1, para, key2) => {
+          // todo
+          return name.fqelement();
+        },
+        name: name => name.sourceString.toLowerCase()
+      })
+      // A map of id -> type
+      .addOperation("symbolTable", {
+        Decl: decl => _u
+          .reduce(decl.symbolTable(), (memo, s) => {
+            memo[s.id] = s;
+            return memo;
+          }, {}),
+        ClicheDecl: (cliche, name, key1, para, key2) => para.symbolTable(),
+        AppDecl: (app, name, uses, key1, para, key2) => para.symbolTable(),
+        Paragraph_data: decl => decl.symbolTable(),
+        Paragraph_widget: decl => decl.symbolTable(),
+        Paragraph_assignment: decl => decl.symbolTable(),
+        DataDecl: (data, name, k1, fields, k2, bonds) => ({
+          id: name.sourceString, type: "data"}),
+        WidgetDecl: (main, widget, name, uses, k1, fields, k2, replace) => ({
+          id: name.sourceString, type: "widget"}),
+        AssignmentDecl: (name, colon, t_name, assign, obj) => ({
+          id: name.sourceString, type: t_name.sourceString})
       })
       // A map of tname -> list of values
       .addOperation("data", {
-        ClicheDecl: (cliche, name, uses, key1, para, key2) => _u
+        Decl: decl => decl.data(),
+        ClicheDecl: (cliche, name, key1, para, key2) => ({}),
+        AppDecl: (app, name, uses, key1, para, key2) => _u
           .chain(para.data())
           .flatten().reject(_u.isEmpty)
           .reduce((memo, e) => {
@@ -532,10 +554,13 @@ export class Parser {
           .value(),
         Paragraph_data: decl => ({}), Paragraph_widget: decl => ({}),
         Paragraph_assignment: decl => decl.data(),
-        AssignmentDecl: (name, colon, t_name, assign, obj) => ({
-          t_name: t_name.sourceString,
-          obj: _u.extendOwn({atom_id: name.sourceString}, obj.data())
-        }),
+        AssignmentDecl: (name, colon, t_name, assign, obj) => {
+          let obj_data = obj.data();
+          if (t_name.sourceString !== "Route") {
+            obj_data = _u.extendOwn({atom_id: name.sourceString}, obj_data);
+          }
+          return {t_name: t_name.sourceString, obj: obj_data};
+        },
         Obj: (cbrace1, obj_body, comma, more_obj_body, cbrace2) => _u
           .extendOwn(obj_body.data(), _u
             .chain(more_obj_body.data())
@@ -552,148 +577,167 @@ export class Parser {
         Value_array: (sqbracket1, arr_decl, sqbracket2) => arr_decl.data()[0],
         ArrayDecl: (val, comma, more_val) => {
           console.log("y" + JSON.stringify(more_val.data()));
-          return []
-          .concat(val.data()).concat(more_val.data());
+          return [].concat(val.data()).concat(more_val.data());
         },
-        Value_ref: (name) => ({atom_id: name.sourceString})
+        Value_ref: (name) => {
+          const ref = name.sourceString;
+          const s = this._symbol_table[ref];
+          if (s === undefined) {
+            throw new Error("Unknown identifier " + ref);
+          }
+          if (s.type === "widget") {
+            return ref;
+          } else {
+            return {atom_id: ref};
+          }
+        }
       });
   }
 
-
-  parse(fp: string): Cliche {
+  parse(fp: string): (App | Cliche) {
     const dv = fs.readFileSync(fp, "utf-8");
     const r = this._grammar.match(dv);
     if (r.failed()) {
       throw new Error(r.message);
     }
     const s = this._semantics(r);
+    this._symbol_table = s.symbolTable();
+    this._cliche_map = s.clicheMap();
+    this._this_ft_map = s.fieldTypesMap();
+    // A map of cliche -> of -> field name -> type name
+    this._ft_map = this._build_uses_ft_map(_u.uniq(_u.keys(s.usedCliches())));
+
+    const widgets = s.widgets();
+    if (s.isApp()) {
+      return {
+        fqelement: s.fqelement(),
+        widgets: widgets,
+        main_widget: s.main(),
+        used_cliches: s.usedCliches(),
+        used_widgets: this.used_widgets(widgets, s.replaceList()),
+        replace_map: s.replaceMap(),
+        tbonds: s.tbonds(),
+        fbonds: s.fbonds(),
+        wbonds: s.wbonds(),
+        data: s.data()
+      };
+    } else {
+      return {fqelement: s.fqelement(), widgets: widgets};
+    }
+  }
+
+  /**
+   * Gets all widgets from cliches used by the app by looking at the HTML files
+   **/
+  cliche_widgets_used(widgets: string[]): Widget[] {
+    const fp = w => {
+      const dashed = _ustring.dasherize(w).slice(1);
+      return `src/components/${dashed}/${dashed}.html`;
+    };
+    const re = /<dv-widget\s*name="(.*)"\s*fqelement="(.*)"[^>]*>/g;
+    return _u.chain(widgets)
+      .map(w => fs.readFileSync(fp(w), "utf-8"))
+      .map(html => {
+        const ret = [];
+        let match = re.exec(html);
+        while (match !== null) {
+          ret.push(match);
+          match = re.exec(html);
+        }
+        return ret;
+      })
+      .reject(match => match === null)
+      .flatten(true)
+      .map(match => ({fqelement: match[2], name: match[1]}))
+      .unique(false, w => w.fqelement + w.name)
+      .value();
+  }
+
+  used_widgets(widgets: string[], replace_list: Widget[]): Widget[] {
     // fqelement -> widgets
     const widget_map = {};
     // Widgets that are replaced
-    const replaced = _u.map(s.replaceList(), w => w.name + w.fqelement);
-    return {
-      used_cliches: s.usedCliches(),
-      cliche_map: s.clicheMap(),
-      ft_map: s.fieldTypesMap(),
-      replace_map: s.replaceMap(),
-      fqelement: s.fqelement(),
-      uft_map: s.usesFieldTypesMap(),
-      used_widgets: _u
-        .chain(s.usedWidgets())
-        .map(uw => {
-          if (widget_map[uw.fqelement] === undefined) {
-            widget_map[uw.fqelement] = _u
-              .reduce(
-                this._parse_cliche(uw.fqelement).widgets(),
-                (memo, w) => {
-                  memo[w.name] = w.children ? w.children : [];
-                  return memo;
-                }, {});
-          }
-          const all_children = _u
-            .chain(widget_map[uw.fqelement][uw.name])
-            .map(c => [].concat(c, widget_map[uw.fqelement][c.name]))
-            .flatten()
-            .value();
+    const replaced = _u.map(replace_list, w => w.name + w.fqelement);
 
-          return []
-            .concat(uw, _u.map(all_children, w => {
-              w.fqelement = uw.fqelement;
-              return w;
-            }));
-        })
-        .flatten()
-        // Remove replaced widgets
-        // if the widget that's replaced is also used in another context it
-        // will appear twice, so we until want to filter it out once
-        .filter(uw => {
-          const replaced_index = replaced.indexOf(uw.name + uw.fqelement);
-          if (replaced_index > -1) {
-            replaced.splice(replaced_index, 1);
-            return false;
-          }
-          return true;
-        })
-        .uniq(uw => uw.name + uw.fqelement)
-        .value(),
-      main_widget: s.main(),
-      widgets: s.widgets(),
-      tbonds: s.tbonds(),
-      fbonds: s.fbonds(),
-      wbonds: s.wbonds(),
-      data: s.data()
-    };
+    return _u
+      .chain(this.cliche_widgets_used(widgets))
+      .map(uw => {
+        if (widget_map[uw.fqelement] === undefined) {
+          widget_map[uw.fqelement] = _u
+            .reduce(
+              this._parse_cliche(uw.fqelement).widgetsTree(),
+              (memo, w) => {
+                memo[w.name] = w.children ? w.children : [];
+                return memo;
+              }, {});
+        }
+        const all_children = _u
+          .chain(widget_map[uw.fqelement][uw.name])
+          .map(c => [].concat(c, widget_map[uw.fqelement][c.name]))
+          .flatten()
+          .value();
+
+        return []
+          .concat(uw, _u.map(all_children, w => {
+            w.fqelement = uw.fqelement;
+            return w;
+          }));
+      })
+      .flatten()
+      // Remove replaced widgets
+      // if the widget that's replaced is also used in another context it
+      // will appear twice, so we want to filter it out once
+      .filter(uw => {
+        const replaced_index = replaced.indexOf(uw.name + uw.fqelement);
+        if (replaced_index > -1) {
+          replaced.splice(replaced_index, 1);
+          return false;
+        }
+        return true;
+      })
+      .uniq(uw => uw.name + uw.fqelement)
+      .value();
+  }
+
+  isApp(parseObj: App | Cliche): parseObj is App {
+    return (<App>parseObj).data !== undefined;
   }
 
   debug_match(fp: string) {
     const p = this.parse(fp);
     const debug = obj => JSON.stringify(obj, null, 2);
 
-    console.log("//////////Used Cliches//////////");
-    console.log(debug(p.used_cliches));
-    console.log("//////////Cliche Map//////////");
-    console.log(debug(p.cliche_map));
-    console.log("//////////Field Types Map//////////");
-    console.log(debug(p.ft_map));
-    console.log("//////////Replace Map//////////");
-    console.log(debug(p.replace_map));
-    console.log("//////////Uses Field Types Map//////////");
-    console.log(debug(p.uft_map));
-    console.log("//////////Used Widgets//////////");
-    console.log(debug(p.used_widgets));
-    console.log(`//////////Main widget is ${p.main_widget}//////////`);
-    console.log("//////////Widgets//////////");
-    console.log(debug(p.widgets));
-    console.log("//////////tbonds//////////");
-    console.log(debug(p.tbonds));
-    console.log("//////////fbonds//////////");
-    console.log(debug(p.fbonds));
-    console.log("//////////wbonds//////////");
-    console.log(debug(p.wbonds));
-    console.log("//////////data//////////");
-    console.log(debug(p.data));
+    if (this.isApp(p)) {
+      console.log("//////////Widgets//////////");
+      console.log(debug(p.widgets));
+      console.log(`//////////Main widget is ${p.main_widget}//////////`);
+      console.log("//////////Used Cliches//////////");
+      console.log(debug(p.used_cliches));
+      console.log("//////////Used Widgets//////////");
+      console.log(debug(p.used_widgets));
+      console.log("//////////Replace Map//////////");
+      console.log(debug(p.replace_map));
+      console.log("//////////tbonds//////////");
+      console.log(debug(p.tbonds));
+      console.log("//////////fbonds//////////");
+      console.log(debug(p.fbonds));
+      console.log("//////////wbonds//////////");
+      console.log(debug(p.wbonds));
+      console.log("//////////data//////////");
+      console.log(debug(p.data));
+    } else {
+      console.log("//////////Widgets//////////");
+      console.log(debug(p.widgets));
+    }
   }
 
-  private _build_uses_ft_map(uses) {
+  private _build_uses_ft_map(used_cliches: string[]) {
     const get_ftmap_of_cliche = c => this._parse_cliche(c).fieldTypesMap();
-    const used_cliches = _u.uniq(_u.flatten(uses.usedCliches()));
     return _u
       .reduce(used_cliches, (memo, c) => {
         memo[c] = get_ftmap_of_cliche(c);
         return memo;
       }, {});
-  }
-
-  private _get_cliche_map(cliche_name, uses) {
-    let ret = uses.clicheMap()[0];
-    if (ret === undefined) ret = {};
-    ret["this"] = {
-      fqelement: `dv-samples-${cliche_name.toLowerCase()}`,
-      name: cliche_name
-    };
-    return ret;
-  }
-
-  private _get_ft_map(para) {
-    const ftmap = para.fieldTypesMap();
-    return _u
-      .chain(ftmap)
-      .reject(_u.isEmpty)
-      .reduce((memo, ft) => {
-        if (memo[ft.of] !== undefined) {
-          throw new Error("Duplicate type " + ft.of);
-        }
-        memo[ft.of] = _u
-          .reduce(ft.fields, (memo, ft) => {
-            if (memo[ft.name] !== undefined) {
-              throw new Error("Duplicate field " + ft.name);
-            }
-            memo[ft.name] = ft.t;
-            return memo;
-          }, {});
-        return memo;
-      }, {})
-      .value();
   }
 
   private _parse_cliche(cliche) {
