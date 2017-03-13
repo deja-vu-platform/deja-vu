@@ -20,7 +20,7 @@ Each cliché and sample is its own node project. Like any other node project, yo
 `npm install` to install dependencies. Since we use TypeScript, you also need to run
 `typings install` to install type dependencies. We use Grunt to compile and run the code. To build
 a library do `grunt lib` and to build a cliche `grunt dv-mean:lib`. You can also
-see a "development" page for a cliche with `grunt dv-mean:test`. The development
+see a "development" page for a cliché with `grunt dv-mean:dev`. The development
 page will display all widgets.
 
 You can install and build all packages in this repo using `node install-all.js`.
