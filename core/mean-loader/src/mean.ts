@@ -118,7 +118,7 @@ export namespace GruntTask {
   ];
 
   export function task(
-      grunt, name: string, widgets: string[] = [], main?: string,
+      grunt, name: string, widgets = [], main?: string,
       cliches = {}, used_widgets: UsedWidget[] = [], replace_map = {},
       comp_info = {}, wcomp_info = {}, data = {}) {
     const cliches_src = Object.keys(cliches)
@@ -139,8 +139,10 @@ export namespace GruntTask {
       if (action === "dev" || action === "test") {
         grunt.log.writeln(name + " " + action);
 
+        const widgetNames = widgets.map(w => w.name);
+
         const app_widgets_js: WidgetJs[] = widget_definitions(
-          app_widgets(widgets, wcomp_info, data), data);
+          app_widgets(widgetNames, wcomp_info, data), data);
         const cliche_widgets_js: WidgetJs[] = cliche_widgets(used_widgets);
         const all_widgets_js: WidgetJs[] = app_widgets_js
           .concat(cliche_widgets_js);

@@ -8,5 +8,13 @@ import {Widget} from "client-bus";
   styles: [``]
 })
 export class RateTargetComponent {
+  target = {atom_id: ""};
+  source = {atom_id: ""};
+  rating = 0;
+
   constructor(private _graphQlService: GraphQlService) {}
+
+  dvAfterInit() {
+    // TODO: Do something intererting
+  }
 }
