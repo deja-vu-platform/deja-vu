@@ -22,12 +22,11 @@ Cliche {
   WidgetDecl = main? widget name WidgetUsesDecl? "{"
     FieldBody?
   "}" ReplacesDecl?
-  WidgetUsesDecl = uses UsedWidgetDecl ("," UsedWidgetDecl)*
+  WidgetUsesDecl = uses name ("," name)*
   ReplacesDecl = replaces replaceName in replaceName "{" ReplaceMapBody? "}"
   ReplaceMapBody = ReplaceMap ("," ReplaceMap)*
   replaceName = (alnum* ".") alnum*
   ReplaceMap = ("_" | alnum)* "=" (alnum* ".") ("_" | alnum)*
-  UsedWidgetDecl = usedWidgetName AsDecl?
 
   FieldBody = FieldDecl ("," FieldDecl)*
   FieldDecl = name ":" name FieldBondDecl?
@@ -56,9 +55,7 @@ Cliche {
     = (alnum* ".") alnum* -- other
     | alnum*  -- this
   name = ("_" | alnum)*
-  routeName = ("/" | alnum)*
   usedClicheName = alnum* "/" alnum*
-  usedWidgetName = (alnum* ".")? alnum*
   comment = singleLineComment | multiLineComment
   singleLineComment = "//" (~eol any)*
   eol = "\r"?"\n"
