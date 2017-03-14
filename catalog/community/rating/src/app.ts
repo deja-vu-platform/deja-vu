@@ -53,7 +53,7 @@ const schema = grafo
     }
   })
   .add_mutation({
-    name: "createRating",
+    name: "updateRating",
     type: "Rating",
     args: {
       // These are both atom IDs
@@ -62,33 +62,61 @@ const schema = grafo
       rating: {"type": graphql.GraphQLInt}
     },
     resolve: (_, {source, target, rating}) => {
-      let ratingObject = {
-        source: source,
-        target: target,
-        rating: rating,
-        atom_id: uuid.v4(),
-      };
-      mean.db.collection("ratings")
-        .insertOne(ratingObject)
-        .then(rating => {
-          bus.create_atom("Rating", rating.atom_id, rating);
+      return mean.db.collection("ratings")
+        .find({ source: source, target: target })
+        .toArray()
+        .then(res => {
+          // If no rating already exists w/ the specified source and target,
+          // then we need to make one
+          if (res.length === 0) {
+            let ratingObject = {
+              source: source,
+              target: target,
+              rating: rating,
+              atom_id: uuid.v4(),
+            };
+            return mean.db.collection("ratings")
+              .insertOne(ratingObject)
+              .then(_ => bus.create_atom("Rating", rating.atom_id, rating))
+              .then(_ => ratingObject);
+          } else {
+            // If something already exists, we can just return it
+            let ratingObject = {
+              atom_id: ""
+            };
+            return mean.db.collection("ratings")
+              .updateOne({
+                source: source,
+                target: target
+              }, {
+                $set: {
+                  rating: rating
+                }
+              })
+              .then(updated => ratingObject = updated)
+              .then(_ => bus.update_atom("Rating", ratingObject.atom_id, ratingObject))
+              .then(_ => ratingObject);
+          }
         });
-        console.log("inserted");
-        return ratingObject; // TODO: promisify properly
-
-      // TODO
     }
   })
   .schema();
 
-// TODO: Do this more intelligently
 // namespace Validation {
-//   export function rating_not_found(source, target) {
+//   /**
+//    * Verify a rating of the specified target exists from the specified source.
+//    * If no rating exists, then one is created.
+//   */
+//   export function verifyRatingExists(source, target) {
 //     return mean.db.collection("ratings")
-//       .find({ source: source, target: target })
-//       .count()
-//       .then(count => {
-//         return count === 0;
+//       .findOne({ source: source, target: target })
+//       .then(rating => {
+//         if (!rating) {
+//           // Create
+//           mean.db.collection("ratings")
+
+//         }
+//         return rating;
 //       });
 //   }
 // }

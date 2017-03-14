@@ -1,1 +1,17 @@
-Rate Target
+<div class="target-rater">
+    <div class="target" *ngFor="let option of [1, 2, 3, 4, 5]">
+        <span class="target-radio">
+            <input type="radio"
+                [name]="radioName"
+                [value]="option"
+                [(ngModel)]="rating.value">
+        </span>
+        <br>
+        <span class="target-label">
+            {{option}}
+        </span>
+    </div>
+</div>
+<div>
+    Rating is {{rating}}
+</div>
