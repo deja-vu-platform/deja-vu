@@ -30,6 +30,7 @@ var basicWidgets;
 var confirmOnUserWidgetDelete = true;
 
 $(function(){
+    canvas.createCanvas($('#outer-container'), selectedScreenSizeHeight, selectedScreenSizeWidth);
     $('.project-options-container').css({
         height: ($('html').height() - 70) + 'px',
     });
@@ -79,8 +80,10 @@ $(function(){
     }
 
     dataWorkSurface.loadDatatype(userApp, null, currentZoom);
-    canvas.createCanvas($('#outer-container'), selectedScreenSizeHeight, selectedScreenSizeWidth);
-    canvas.drawLine([10,10],[102,52]);
+    // canvas.drawLineBetweenContainers(
+    //     $('#datatype-container_913108507959743'),
+    //     $('#datatype-container_5775263495373'));
+    // canvas.drawLine([10,10],[102,52]);
     //autoSave5Mins();
 
     basicWidgets = $('#basic-components').html();
