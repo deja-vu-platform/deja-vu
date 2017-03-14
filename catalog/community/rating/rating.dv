@@ -1,0 +1,16 @@
+cliche Rating {
+  // The target of something being rated
+  data Target {}
+
+  // An actor who has rated a target
+  data Source {}
+
+  // Shows stars and allows a source to rate a target
+  widget RateTarget {
+    source: Source,
+    target: Target,
+    rating: Number
+  }
+
+  // TODO: ShowRatings widget, which shows aggregate rating info for a target
+}
