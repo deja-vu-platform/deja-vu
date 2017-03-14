@@ -91,8 +91,7 @@ export class Parser {
         },
         dataBondName_other: (cliche, dot, name) => {
           const cliche_name = cliche.sourceString;
-          const cliche_info = this._symbol_table[cliche_name];
-          if (!cliche_info) {
+          if (!this._symbol_table[cliche_name]) {
             throw new Error(`Can't find cliche ${cliche_name}`);
           }
           return {name: name.sourceString, of: cliche_name};
@@ -222,16 +221,6 @@ export class Parser {
           this.of_name = name.sourceString;
           return fields.fbonds();
         }
-      })
-      .addOperation("widgets", {
-        Decl: decl => decl.widgets(),
-        AppDecl: (app, name, uses, key1, para, key2) => _u
-          .reject(para.widgets(), _u.isEmpty),
-        ClicheDecl: (cliche, name, key1, para, key2) => _u
-          .reject(para.widgets(), _u.isEmpty),
-        Paragraph_widget: decl => decl.widgets(),
-        Paragraph_data: decl => [], Paragraph_assignment: decl => [],
-        WidgetDecl: (m, w, name, wUses, k1, fields, k2, r) => name.sourceString
       })
       .addOperation("main", {
         Decl: decl => decl.main(),
