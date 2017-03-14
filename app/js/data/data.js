@@ -8,6 +8,7 @@ var dataView = DataDisplay();
 var dataWorkSurface = DataWorkSurface();
 var dataDragAndDrop = DataDragAndDropController();
 var dataEditsManager = DataEditsManager();
+var canvas = Canvas();
 
 var projectsSavePath = path.join(__dirname, 'projects');
 
@@ -78,7 +79,8 @@ $(function(){
     }
 
     dataWorkSurface.loadDatatype(userApp, null, currentZoom);
-
+    canvas.createCanvas($('#outer-container'), selectedScreenSizeHeight, selectedScreenSizeWidth);
+    canvas.drawLine([10,10],[102,52]);
     //autoSave5Mins();
 
     basicWidgets = $('#basic-components').html();

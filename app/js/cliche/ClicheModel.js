@@ -16,7 +16,7 @@ var Cliche = function(name, id, version, author){
         author: author
     };
 
-    // UserApp has all types of widgets
+    // ClicheWithDisplay has all types of widgets
     // Other cliches only use templates
     that.widgets = {
         pages: {
@@ -30,7 +30,7 @@ var Cliche = function(name, id, version, author){
         }
     };
 
-    // UserApp uses *only* used and unused
+    // ClicheWithDisplay uses *only* used and unused
     // Here templates are *only* used by Cliches
     that.datatypes = {
         used:{
@@ -95,12 +95,12 @@ Cliche.fromObject = function(object){
 };
 
 
-var UserApp = function(name, id, version, author){
+var ClicheWithDisplay = function(name, id, version, author){
     var cliche = Cliche(name, id, version, author);
-    var that = Object.create(UserApp.prototype);
+    var that = Object.create(ClicheWithDisplay.prototype);
     that = $.extend(that, cliche); // TODO sketchy
 
-    that.objectType = "UserApp";
+    that.objectType = "ClicheWithDisplay";
 
     that.datatypeDisplays = {
         overview: UserDatatypeDisplay(),
@@ -122,41 +122,41 @@ var UserApp = function(name, id, version, author){
     return that;
 };
 
-UserApp.fromString = function(string){
+ClicheWithDisplay.fromString = function(string){
     var object = JSON.parse(string);
-    return UserApp.fromObject(object)
+    return ClicheWithDisplay.fromObject(object)
 };
 
-UserApp.fromObject = function(object){
+ClicheWithDisplay.fromObject = function(object){
     var app = Cliche.fromObject(object);
-    app = $.extend(new UserApp(), app);
+    app = $.extend(new ClicheWithDisplay(), app);
 
     return app
 };
 
 
 
-UserApp.prototype.isPage = function(widgetId){
+ClicheWithDisplay.prototype.isPage = function(widgetId){
     return widgetId in this.widgets.pages;
 };
 
 
-UserApp.prototype.addPage = function(widget){
+ClicheWithDisplay.prototype.addPage = function(widget){
     widget.isPage = true;
     this.widgets.pages[widget.meta.id] = widget;
 };
 
-UserApp.prototype.deletePage = function(widget){
+ClicheWithDisplay.prototype.deletePage = function(widget){
     delete this.widgets.pages[widget.meta.id];
     widget.isPage = false; // it will no longer be usable but still...
 };
 
-UserApp.prototype.addTemplate = function(widget){
+ClicheWithDisplay.prototype.addTemplate = function(widget){
     widget.isTemplate = true;
     this.widgets.templates[widget.meta.id] = widget;
 };
 
-UserApp.prototype.deletePage = function(widget){
+ClicheWithDisplay.prototype.deletePage = function(widget){
     delete this.widgets.templates[widget.meta.id];
     widget.isTemplate = false; // it will no longer be usable but still...
 };
@@ -166,19 +166,19 @@ UserApp.prototype.deletePage = function(widget){
  * makes a new unused widget
  * @param widget
  */
-UserApp.prototype.addWidget = function(widget){
+ClicheWithDisplay.prototype.addWidget = function(widget){
     if (!(this.widgets.pages[widget.meta.id] || this.widgets.unused[widget.meta.id])) {
         this.widgets.unused[widget.meta.id] = widget;
     }
 };
 
-UserApp.prototype.deleteWidget = function(widgetId){
+ClicheWithDisplay.prototype.deleteWidget = function(widgetId){
     delete this.widgets.pages[widgetId];
     delete this.widgets.unused[widgetId];
     delete this.widgets.templates[widgetId];
 };
 
-UserApp.prototype.addDatatype = function(datatype, displayProps){
+ClicheWithDisplay.prototype.addDatatype = function(datatype, displayProps){
     if (!(this.datatypes.unused[datatype.meta.id])) {
         this.datatypes.unused[datatype.meta.id] = datatype;
         this.datatypeDisplays[datatype.meta.id] = displayProps;
@@ -187,31 +187,31 @@ UserApp.prototype.addDatatype = function(datatype, displayProps){
 
 
 
-UserApp.prototype.removeDatatype = function(datatypeId){
+ClicheWithDisplay.prototype.removeDatatype = function(datatypeId){
     delete this.datatypes.used[datatypeId];
     delete this.datatypes.unused[datatypeId];
     delete this.datatypeDisplays[datatypeId];
 };
 
 
-UserApp.prototype.getNumWidgets = function(){
+ClicheWithDisplay.prototype.getNumWidgets = function(){
     return Object.keys(this.widgets.pages).length +  Object.keys(this.widgets.unused).length + Object.keys(this.widgets.templates).length;
 };
 
-UserApp.prototype.getAllDatatypeIds = function(){
+ClicheWithDisplay.prototype.getAllDatatypeIds = function(){
     var used = Object.keys(this.datatypes.used);
     var unused = Object.keys(this.datatypes.unused);
     return used.concat(unused)
 };
 
-UserApp.prototype.getAllWidgetIds = function(){
+ClicheWithDisplay.prototype.getAllWidgetIds = function(){
     var used = Object.keys(this.widgets.pages);
     var unused = Object.keys(this.widgets.unused);
     var templates = Object.keys(this.widgets.templates);
     return used.concat(unused).concat(templates)
 };
 
-UserApp.prototype.getWidget = function(widgetId){
+ClicheWithDisplay.prototype.getWidget = function(widgetId){
     if (widgetId in this.widgets.pages){
         return this.widgets.pages[widgetId]
     }

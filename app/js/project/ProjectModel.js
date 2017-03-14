@@ -109,7 +109,7 @@ UserProject.fromObject = function(object){
     for (var clicheId in object.cliches) {
         var cliche = object.cliches[clicheId];
         if (cliche.meta.id == object.userApp){
-            project.cliches[clicheId] = UserApp.fromObject(cliche);
+            project.cliches[clicheId] = ClicheWithDisplay.fromObject(cliche);
         } else {
             project.cliches[clicheId] = Cliche.fromObject(cliche);
         }
