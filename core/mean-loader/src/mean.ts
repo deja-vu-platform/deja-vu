@@ -353,7 +353,8 @@ export namespace GruntTask {
       const locs_str: string = JSON.stringify(locs);
       if (cs.fqelement === name) {
         cs.express_config = {
-          script: "dist/dv-dev/app.js",
+          script: name.indexOf("sample") !== -1 ?
+            "dist/dv-dev/app.js" : "dist/app.js",
           background: true,
           args: [
             "--main", `--mode=${action}`, `--fqelement=${cs.fqelement}`,
