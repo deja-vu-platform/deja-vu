@@ -138,7 +138,7 @@ var DataWorkSurface = function(){
             var container = that.makeDatatypeContainers(cliche.meta.id, datatypeId, displayPropObj, dragHandle, currentZoom, isOverall);
             workSurface.append(container);
 
-            canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]) // TODO dry
+            canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]); // TODO dry
         };
 
         var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(cliche, isOverall, onDropFinished);
@@ -175,25 +175,25 @@ var DataWorkSurface = function(){
      * @param userWidget
      * @param zoom
      */
-    that.loadDatatype = function(component, datatypeId){
-        if (datatype){
-            var datatype = component.datatypes[datatypeId];
-            var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
-            dataZoomElement.registerZoom(datatype);
-
-            if (workSurface.length===0){
-                currentZoom = 1;
-                loadDatatypeIntoWorkSurface(datatype, currentZoom);
-            } else {
-                disableAllDataDomElementsExcept(datatypeId);
-                //setWidgetOptions(datatype);
-                //dataZoomElement.updateZoomFromState(datatype);
-                // TODO other way? for now, reload the thinger
-                // loadDatatypeIntoWorkSurface(datatype, currentZoom);
-            }
-
-        } else {
-            // load all the stuff
+    that.loadCliche = function(component, zoom, isOverall){
+        // if (datatypeId){
+        //     var datatype = component.datatypes[datatypeId];
+        //     var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
+        //     dataZoomElement.registerZoom(datatype);
+        //
+        //     if (workSurface.length===0){
+        //         currentZoom = 1;
+        //         loadDatatypeIntoWorkSurface(datatype, currentZoom);
+        //     } else {
+        //         disableAllDataDomElementsExcept(datatypeId);
+        //         //setWidgetOptions(datatype);
+        //         //dataZoomElement.updateZoomFromState(datatype);
+        //         // TODO other way? for now, reload the thinger
+        //         // loadDatatypeIntoWorkSurface(datatype, currentZoom);
+        //     }
+        //
+        // } else {
+        //     // load all the stuff
             var componentId = component.meta.id;
             var workSurface = $('#'+DATA_WS_ID+'_'+componentId);
             //dataZoomElement.registerZoom(datatype);
@@ -208,7 +208,7 @@ var DataWorkSurface = function(){
                 // TODO other way? for now, reload the thinger
                 // loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
             }
-        }
+        // }
 
         //dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(datatype);
         //grid.setUpGrid();

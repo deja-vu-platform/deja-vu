@@ -60,7 +60,7 @@ var DataDragAndDropController = function () {
                     // dataZoomElement.registerZoom(component);
                 }
                 if (isOverall){
-                    selectedProject.bondDisplays[originClicheId].dataBondDisplays[originClicheId].displayProperties.position = newPosition;
+                    selectedProject.bondDisplays[originClicheId].dataBondDisplays[datatypeId].displayProperties.position = newPosition;
                 } else {
                     cliche.dataBondDisplays[datatypeId].displayProperties.position = newPosition;
                 }

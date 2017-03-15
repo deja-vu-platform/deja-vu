@@ -1,7 +1,7 @@
 /**
  * Created by Shinjini on 9/26/2016.
  */
-
+var isOverall = true;
 var dataZoomElement = DataZoomElement();
 var dataMiniNav = DataMiniNav();
 var dataView = DataDisplay();
@@ -21,7 +21,7 @@ var selectedUserWidget = null;
 var selectedDatatype = null;
 var userApp = null;
 var selectedProject = null;
-var isOverall = true;
+
 
 var currentZoom = 1.0;
 var basicWidgets;
@@ -81,7 +81,7 @@ $(function(){
         }
     }
 
-    dataWorkSurface.loadDatatype(userApp, null, currentZoom);
+    dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
     // canvas.drawLineBetweenContainers(
     //     $('#datatype-container_913108507959743'),
     //     $('#datatype-container_5775263495373'));

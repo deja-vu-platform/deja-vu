@@ -12,7 +12,7 @@ var DataContainer = function(){
         return DATA_CONT_REF;
     };
 
-    var makeContainerResizable = function(clicheId, datatypeId, outerWidget, container, isOverall){
+    var makeContainerResizable = function(clicheId, datatypeId, container, isOverall){
 
         var dragHandle_se = $('<span></span>');
         dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
@@ -75,6 +75,10 @@ var DataContainer = function(){
                 }
                 // not super important to update as you resize so just do it at the end
                 //dataMiniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
+
+                // TODO dry
+                var cliche = selectedProject.cliches[clicheId];
+                canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]);
             }
         });
     };
@@ -89,7 +93,7 @@ var DataContainer = function(){
     };
 
 
-    var createEditOptions = function(datatypeId, outerWidget, container){
+    var createEditOptions = function(datatypeId, container){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -157,8 +161,8 @@ var DataContainer = function(){
 
     that.createResizableDatatypeContainer = function(clicheId, datatypeId, datatypeDisplayProps, zoom, isOverall) {
         var container = that.createBasicDatatypeContainer(clicheId, datatypeId, datatypeDisplayProps, zoom);
-        makeContainerResizable(clicheId, datatypeId, null, container, null, isOverall);
-        container.append(createEditOptions(datatypeId, null, container));
+        makeContainerResizable(clicheId, datatypeId, container, isOverall);
+        container.append(createEditOptions(datatypeId, container));
         return container;
     };
 

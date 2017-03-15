@@ -38,7 +38,7 @@ $('.components').on('click', '.component-name-container', function () {
     var widgetId = $(this).parent().data('componentid');
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
-    dataWorkSurface.loadDatatype(userApp, null);
+    dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
     $('#outer-container').scrollTop(0); // TODO DRY
     $('#outer-container').scrollLeft(0);
 });
