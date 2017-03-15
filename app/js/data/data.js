@@ -21,6 +21,7 @@ var selectedUserWidget = null;
 var selectedDatatype = null;
 var userApp = null;
 var selectedProject = null;
+var isOverall = true;
 
 var currentZoom = 1.0;
 var basicWidgets;

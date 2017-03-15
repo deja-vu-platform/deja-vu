@@ -13,9 +13,10 @@ $('#new-user-datatype-btn').click(function(){
             var datatype = datatypeInfo[0];
             var datatypeDisplayProps = datatypeInfo[1];
             userApp.addDatatype(datatype, datatypeDisplayProps);
+            selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id);
             displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
             // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
-
+            // TODO add to overall and to userApp display
             resetMenuOptions();
     });
 });

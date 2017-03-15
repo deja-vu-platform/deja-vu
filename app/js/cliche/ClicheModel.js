@@ -96,10 +96,10 @@ var ClicheWithDisplay = function(name, id, version, author){
 
     that.objectType = "ClicheWithDisplay";
 
-    that.datatypeDisplays = {
+    that.dataBondDisplays = {
         // datatypeId : DatatypeDisplay object
     };
-    that.datatypeDisplays[id] = UserDatatypeDisplay();
+    that.dataBondDisplays[id] = UserDatatypeDisplay();
 
     that.widgetBondDisplays = {
         cliche: null, //UserWidgetBondDisplay(),
@@ -175,7 +175,7 @@ ClicheWithDisplay.prototype.deleteWidget = function(widgetId){
 ClicheWithDisplay.prototype.addDatatype = function(datatype, displayProps){
     if (!(this.datatypes[datatype.meta.id])) {
         this.datatypes[datatype.meta.id] = datatype;
-        this.datatypeDisplays[datatype.meta.id] = displayProps;
+        this.dataBondDisplays[datatype.meta.id] = displayProps;
     }
 };
 
@@ -183,7 +183,7 @@ ClicheWithDisplay.prototype.addDatatype = function(datatype, displayProps){
 
 ClicheWithDisplay.prototype.removeDatatype = function(datatypeId){
     delete this.datatypes[datatypeId];
-    delete this.datatypeDisplays[datatypeId];
+    delete this.dataBondDisplays[datatypeId];
 };
 
 
