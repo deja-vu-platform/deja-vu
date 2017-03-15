@@ -45,7 +45,15 @@ var DataWorkSurface = function(){
         workSurface.find('.component-container').remove();
     };
 
-    var loadClicheWorkSurface = function(cliche, zoom, isOverall, focusDatatype){ // TODO should input a Project
+    var loadOverallWorkSurface = function(zoom){
+        for (var clicheId in selectedProject.cliches){
+            var cliche = selectedProject.cliches[clicheId];
+            loadClicheToWorkSurface(cliche, zoom, true);
+        }
+    };
+
+
+    var loadClicheToWorkSurface = function(cliche, zoom, isOverall, focusDatatype){ // TODO should input a Project
         var workSurface = createOrResetWorkSurface(cliche, zoom);
 
 
@@ -200,7 +208,12 @@ var DataWorkSurface = function(){
 
             if (workSurface.length===0){
                 currentZoom = 1;
-                loadClicheWorkSurface(component, currentZoom, isOverall);
+                if (isOverall){
+                    loadOverallWorkSurface(currentZoom);
+                } else {
+                    loadClicheToWorkSurface(component, currentZoom);
+                }
+
             } else {
                 disableAllDataDomElementsExcept(componentId);
                 // setDatatypeOptions(datatype);
