@@ -77,6 +77,12 @@ $(function(){
 
         selectedUserWidget = userApp.widgets.pages[Object.keys(userApp.widgets.pages)[0]];
         displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+
+        // TODO dry
+        window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
+        saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
+
+
     } else {
         var userAppId = selectedProject.userApp;
         userApp = selectedProject.cliches[userAppId];

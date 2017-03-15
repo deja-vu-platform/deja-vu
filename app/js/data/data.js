@@ -71,10 +71,11 @@ $(function(){
         // TODO this will need to be changed once we bring in a userComponent which will be a
         // superset of userWidgets
         var appName = userApp.meta.name;
+        displayNewClicheInList(userApp);
         displayOverallDatatypesInListAndSelect(appName, userAppId);
 
-        for (var datatypeId in userApp.datatypes.unused){
-            var datatypeName = userApp.datatypes.unused[datatypeId].meta.name;
+        for (var datatypeId in userApp.datatypes){
+            var datatypeName = userApp.datatypes[datatypeId].meta.name;
             displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId, userAppId);
         }
     }

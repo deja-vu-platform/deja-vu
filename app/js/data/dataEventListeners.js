@@ -206,14 +206,51 @@ function displayDatatypeInListAndSelect(name, id, clicheId){
     $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
+
+/**
+ * Adds a component to the list of user components
+ * @param newComponent
+ */
+function displayNewClicheInList(cliche){
+    // TODO changes in style
+    var dropdownId = cliche.meta.id+'_datatypes';
+    var newClicheElt = $(
+        '<div class="user-components page-component-toggle-drop">'+
+        '<div class="header">'+
+        '<span class="dropdown-trigger dropdown-open" data-dropdownid="'+dropdownId+'">'+
+        '<span class="glyphicon glyphicon-triangle-bottom"></span>'+
+        cliche.meta.name+
+        '</span>'+
+        //'<button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-datatype-btn">'+
+        //'<span class="glyphicon glyphicon-plus"></span>'+
+        //'</button>'+
+        //'<button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">'+
+        //'<span class="glyphicon glyphicon-import"></span>'+
+        //'</button>'+
+        '</div>'+
+        '<div class="content  dropdown-target"  data-dropdownid="'+dropdownId+'">'+
+        '<ul id="'+dropdownId+'-list">'+
+        '</ul>'+
+        '</div>'+
+        '</div>');
+    $('#user-components-list').append(newClicheElt);
+    // addDeleteUserDatatypeButton(id);
+    // registerUserWidgetAsDraggableForMainPages(id);
+    // dataDragAndDrop.registerDataDragHandleDraggable(newClicheElt);
+    enableDropdownTrigger();
+}
+
+
 /**
  * Adds a component to the list of user components
  * @param newComponent
  */
 function displayNewDatatypeInUserDatatypeList(name, id, clicheId){
     // TODO changes in style
+    var dropdownId = clicheId+'_datatypes-list';
+
     var newDatatypeElt = $(
-        '<li data-type="'+'user'+'" class="datatype draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
+        '<li data-type="'+'user'+'" class="datatype" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
         + '<div class="component-name-container">'
         + '<span class="component-name">' + name + '</span>'
         + '<span class="submit-rename not-displayed">'
@@ -221,10 +258,10 @@ function displayNewDatatypeInUserDatatypeList(name, id, clicheId){
         + '</span>'
         + '</div>'
         + '</li>');
-    $('#user-components-list').append(newDatatypeElt);
+    $('#'+dropdownId).append(newDatatypeElt);
     // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
-    dataDragAndDrop.registerDataDragHandleDraggable(newDatatypeElt);
+    // dataDragAndDrop.registerDataDragHandleDraggable(newDatatypeElt);
 }
 
 
@@ -501,39 +538,44 @@ function registerUserWidgetAsDraggableForMainPages(widgetId) {
 }
 
 /** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
-$(".dropdown-trigger").click(function(ev) {
-    var dropdownid = $(this).data('dropdownid');
+function enableDropdownTrigger(){
+    $(".dropdown-trigger").unbind().click(function(ev) {
+        var dropdownid = $(this).data('dropdownid');
 
-    if ($(this).hasClass('dropdown-open')){
-        // close it
-        $(this).removeClass('dropdown-open').addClass('dropdown-closed');
-        $(this).find('.glyphicon').remove();
-        $(this).append('<span class="glyphicon glyphicon-triangle-right"></span>');
+        if ($(this).hasClass('dropdown-open')){
+            // close it
+            $(this).removeClass('dropdown-open').addClass('dropdown-closed');
+            $(this).find('.glyphicon').remove();
+            $(this).prepend('<span class="glyphicon glyphicon-triangle-right"></span>');
 
-        $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-            if ($(this).hasClass('dropdown-target')){
-                $(this).css({
-                    display: 'none',
-                });
-            }
-        });
+            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
+                if ($(this).hasClass('dropdown-target')){
+                    $(this).css({
+                        display: 'none',
+                    });
+                }
+            });
 
-    } else {
-        // open it
-        $(this).removeClass('dropdown-closed').addClass('dropdown-open');
-        $(this).find('.glyphicon').remove();
-        $(this).append('<span class="glyphicon glyphicon-triangle-bottom"></span>');
+        } else {
+            // open it
+            $(this).removeClass('dropdown-closed').addClass('dropdown-open');
+            $(this).find('.glyphicon').remove();
+            $(this).prepend('<span class="glyphicon glyphicon-triangle-bottom"></span>');
 
-        $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-            if ($(this).hasClass('dropdown-target')){
-                $(this).css({
-                    display: 'block',
-                });
-            }
-        });
+            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
+                if ($(this).hasClass('dropdown-target')){
+                    $(this).css({
+                        display: 'block',
+                    });
+                }
+            });
 
-    }
-});
+        }
+    });
+
+}
+
+enableDropdownTrigger();
 
 $('.components').on('click', '.index-page-toggle', function(){
     var turnOn = !($(this).parent().hasClass('selected-index-page'));
@@ -567,202 +609,6 @@ function refreshContainerDisplay(fresh, container, zoom){
     } else {
         container.remove();
     }
-
-}
-/**
- *
- // updates the ids to a new id, also updates them in layout.stackOrder
-
- // source outer widget is if you already have a copy of your Widget
- // and you want the given widget (not a copy) to have the same recursive ids as that one
-
- *
- * @param widget
- * @param sourceWidget
- * @returns {*}
- */
-function recursiveReIding(widget, sourceWidget){
-    if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
-        var thisWidgetNewId;
-        if (sourceWidget){
-            thisWidgetNewId = sourceWidget.meta.id;
-        } else {
-            thisWidgetNewId = generateId();
-        }
-        // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
-        widget.meta.id = thisWidgetNewId;
-        if (widget.type == 'user'){
-            for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
-                var innerWidgetOldId = widget.properties.layout.stackOrder[idx];
-                var result;
-                if (sourceWidget){
-                    var oldSourceId = sourceWidget.properties.layout.stackOrder[idx];
-                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], sourceWidget.innerWidgets[oldSourceId]);
-                } else {
-                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId]);
-                }
-                if (result.success){
-                    if (result.newId != innerWidgetOldId){ // or else the delete will delete the things!
-                        widget.properties.layout.stackOrder[idx] = result.newId;
-                        widget.innerWidgets[result.newId] = widget.innerWidgets[innerWidgetOldId];
-                        delete widget.innerWidgets[innerWidgetOldId];
-                        widget.properties.layout[result.newId] = widget.properties.layout[innerWidgetOldId];
-                        delete widget.properties.layout[innerWidgetOldId];
-                        widget.idMap = widget.idMap || {};
-                        widget.idMap[result.newId] = innerWidgetOldId;
-                    }
-                }
-            }
-        }
-        return {success: true, newId: thisWidgetNewId};
-    }
-    return {success: false}
-}
-
-function createDatatypeCopy (datatype, sourceDatatype){
-    var datatypeCopy = UserDatatype.fromString(JSON.stringify(datatype));
-    if (!sourceDatatype){
-        datatypeCopy.meta.id = generateId();
-    }
-    return datatypeCopy;
-}
-
-
-
-
-/************************************************************/
-function testSaveHTML(){
-    var html = '';
-    $('.component-container').each(function(){
-        var displayWidget = $(this).find('.display-component');
-        if (displayWidget.get(0)){
-            html = html + displayWidget.get(0).outerHTML+'/n';
-        }
-    });
-    return html;
-}
-
-function createDownloadPreview(){
-    // from http://stackoverflow.com/questions/754607/can-jquery-get-all-css-styles-associated-with-an-element
-    var getCSSasJSON = function(elm) {
-        var css2json= function(CSSFile){
-            var json = {};
-            if (!CSSFile) return json;
-            if (CSSFile instanceof CSSStyleDeclaration) {
-                for (var i in CSSFile) {
-                    if ((CSSFile[i]).toLowerCase) {
-                        json[(CSSFile[i]).toLowerCase()] = (CSSFile[CSSFile[i]]);
-                    }
-                }
-            } else if (typeof CSSFile == "string") {
-                CSSFile = CSSFile.split("; ");
-                for (var i in CSSFile) {
-                    var keyValue = CSSFile[i].split(": ");
-                    json[keyValue[0].toLowerCase()] = (keyValue[1]);
-                }
-            }
-            return json;
-        };
-
-        var sheets = document.styleSheets;
-        var json = {};
-        for (var i in sheets) {
-            var rules = sheets[i].rules || sheets[i].cssRules;
-            for (var rule in rules) {
-                if (elm.is(rules[rule].selectorText)) {
-                    json = $.extend(json, css2json(rules[rule].style), css2json(elm.attr('style')));
-                }
-            }
-        }
-        return json;
-    };
-
-    var oldZoom = currentZoom;
-    var workSurfaceElt = $('#work-surface_'+selectedUserWidget.meta.id);
-    currentZoom = 1;
-    propagateRatioChangeToAllElts(currentZoom, selectedUserWidget);
-
-    $('#download-preview-area').html('').css({
-        position: 'relative',
-        'text-align': 'center',
-        margin: 'auto',
-        width: workSurfaceElt.css('width'),
-        height: workSurfaceElt.css('height'),
-        'background-color': workSurfaceElt.css('background-color'),
-    });
-
-    $('.component-container').each(function(){
-        var add = false;
-        //var css = {
-        //    position: 'absolute',
-        //    top: $(this).position().top,
-        //    left: $(this).position().left,
-        //    width: $(this).width()+'px',
-        //    height: $(this).height()+'px',
-        //    'vertical-align': 'middle',
-        //    //'background-color': $(this).css('background-color'),
-        //};
-
-        var container = $('<div></div>');
-        container.css(getCSSasJSON($(this)));
-        //container.css(css);
-
-        var labelContainer = $(this).find('.label-container').clone(true, true);
-        var displayWidget;
-        if (labelContainer.get(0)){
-            //labelContainer.css({// this is not carried over, since this was declared in the css file
-            //    position: 'absolute',
-            //    top: '0',
-            //    display: 'block',
-            //});
-            labelContainer.css(getCSSasJSON(labelContainer));
-            container.append(labelContainer);
-            displayWidget = labelContainer.find('.display-component');
-            //displayWidget.css({// this is not carried over, since this was declared in the css file
-            //    'white-space': 'initial',
-            //    margin: 0,
-            //});
-            displayWidget.css(getCSSasJSON(displayWidget));
-
-            displayWidget.attr('contenteditable', false);
-            add = true;
-        } else {
-            displayWidget = $(this).find('.display-component').clone(true, true);
-            //displayWidget.css({// this is not carried over, since this was declared in the css file
-            //    'white-space': 'initial',
-            //});
-            displayWidget.css(getCSSasJSON(displayWidget));
-
-            if (displayWidget.get(0)){
-                container.append(displayWidget);
-                add = true;
-            }
-        }
-
-        if (add){
-            $('#download-preview-area').append(container);
-        }
-    });
-
-    currentZoom = oldZoom;
-    propagateRatioChangeToAllElts(currentZoom, selectedUserWidget);
-
-    return $('#download-preview-area-container').html();
-}
-
-function downloadHTML(){
-    var innerHTML = createDownloadPreview();
-    var stylesheets = '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">';
-    var js = '<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>'+
-        '<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>';
-    var HTML = '<!doctype html><html>'+stylesheets+'<head></head><body>'+innerHTML+js+'</body></html>';
-    var element = document.createElement('a');
-    var data = "data:text/html;charset=utf-8," + encodeURIComponent(HTML);
-
-    element.setAttribute('href', data);
-    element.setAttribute('download', selectedUserWidget.meta.name+'.html');
-
-    element.click();
 
 }
 

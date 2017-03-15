@@ -45,29 +45,40 @@ var DataWorkSurface = function(){
         workSurface.find('.component-container').remove();
     };
 
-    var loadAllDatatypesIntoOverallWorkSurface = function(component, zoom){
-        var workSurface = createOrResetWorkSurface(component, zoom);
+    var loadClicheWorkSurface = function(cliche, zoom, focusDatatype){ // TODO should input a Project
+        var workSurface = createOrResetWorkSurface(cliche, zoom);
 
-        for (var datatypeId in component.datatypes.used){
-            var datatype = component.datatypes.used[datatypeId];
+
+        var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
+        dragHandle.text(cliche.meta.name);
+        dragHandle.css('display', 'block');
+
+        var displayPropObj = cliche.datatypeDisplays[cliche.meta.id];
+        var container = that.makeDatatypeContainers(cliche.meta.id, cliche.meta.id, displayPropObj, dragHandle, zoom);
+        workSurface.append(container);
+        dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
+
+        for (var datatypeId in cliche.datatypes){
+            var datatype = cliche.datatypes[datatypeId];
 
             var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
             dragHandle.text(datatype.meta.name);
             dragHandle.css('display', 'block');
 
-            var displayPropObj = component.datatypeDisplays[datatypeId];
-            var container = that.makeDatatypeContainers(datatype, displayPropObj, dragHandle, zoom);
+            var displayPropObj = cliche.datatypeDisplays[datatypeId];
+            var container = that.makeDatatypeContainers(cliche.meta.id, datatypeId, displayPropObj, dragHandle, zoom);
             workSurface.append(container);
             dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
         }
 
+        canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]);
     };
 
 
-    that.makeDatatypeContainers = function(datatype, displayPropObj, dragHandle, zoom){
+    that.makeDatatypeContainers = function(clicheId, datatypeId, displayPropObj, dragHandle, zoom){
 
-        dragHandle.addClass('associated').data('componentid', datatype.meta.id);
-        var container = dataContainerMaker.createResizableDatatypeContainer(datatype, displayPropObj, zoom);
+        dragHandle.addClass('associated').data('componentid', datatypeId).data('clicheid', clicheId);
+        var container = dataContainerMaker.createResizableDatatypeContainer(clicheId, datatypeId, displayPropObj, zoom);
         container.css({
             position: 'absolute',
             top: displayPropObj.displayProperties.position.top,
@@ -108,10 +119,11 @@ var DataWorkSurface = function(){
         var onDropFinished = function(dragHandle, datatype){
 
             var datatypeId = datatype.meta.id;
-
             var displayPropObj = userApp.datatypeDisplays[datatypeId];
-            var container = that.makeDatatypeContainers(datatype, displayPropObj, dragHandle, currentZoom);
+            var container = that.makeDatatypeContainers(userApp.meta.id, datatypeId, displayPropObj, dragHandle, currentZoom);
             workSurface.append(container);
+
+            canvas.drawClicheDataLines([{clicheId:userApp.meta.id, dataIds: Object.keys(userApp.datatypes)}]) // TODO dry
         };
 
         var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
@@ -173,7 +185,7 @@ var DataWorkSurface = function(){
 
             if (workSurface.length===0){
                 currentZoom = 1;
-                loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
+                loadClicheWorkSurface(component, currentZoom);
             } else {
                 disableAllDataDomElementsExcept(componentId);
                 // setDatatypeOptions(datatype);

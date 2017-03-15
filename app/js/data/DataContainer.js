@@ -12,28 +12,27 @@ var DataContainer = function(){
         return DATA_CONT_REF;
     };
 
-    var makeContainerResizable = function(datatype, outerWidget, container, outermostWidget){
-        var widgetId = datatype.meta.id;
+    var makeContainerResizable = function(clicheId, datatypeId, outerWidget, container){
 
         var dragHandle_se = $('<span></span>');
         dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
         dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
-        dragHandle_se.attr('id', 'drag-handle-se' + '_' + widgetId);
+        dragHandle_se.attr('id', 'drag-handle-se' + '_' + datatypeId);
 
         var dragHandle_sw = $('<span></span>');
         dragHandle_sw.html('<img src="images/drag_handle_sw_icon.png" width="15px" height="15px">');
         dragHandle_sw.addClass('ui-resizable-handle ui-resizable-sw drag-handle');
-        dragHandle_sw.attr('id', 'drag-handle-sw' + '_' + widgetId);
+        dragHandle_sw.attr('id', 'drag-handle-sw' + '_' + datatypeId);
 
         var dragHandle_ne = $('<span></span>');
         dragHandle_ne.html('<img src="images/drag_handle_ne_icon.png" width="15px" height="15px">');
         dragHandle_ne.addClass('ui-resizable-handle ui-resizable-ne drag-handle');
-        dragHandle_ne.attr('id', 'drag-handle-se' + '_' + widgetId);
+        dragHandle_ne.attr('id', 'drag-handle-se' + '_' + datatypeId);
 
         var dragHandle_nw = $('<span></span>');
         dragHandle_nw.html('<img src="images/drag_handle_nw_icon.png" width="15px" height="15px">');
         dragHandle_nw.addClass('ui-resizable-handle ui-resizable-nw drag-handle');
-        dragHandle_nw.attr('id', 'drag-handle-nw' + '_' + widgetId);
+        dragHandle_nw.attr('id', 'drag-handle-nw' + '_' + datatypeId);
 
         container.append(dragHandle_se);
         container.append(dragHandle_sw);
@@ -58,12 +57,11 @@ var DataContainer = function(){
                 var newDimensions = {height: ui.size.height/currentZoom, width: ui.size.width/currentZoom};
 
                 // widget.properties.dimensions = newDimensions;
-                userApp.datatypeDisplays[datatype.meta.id].displayProperties.dimensions = newDimensions;
-
+                selectedProject.cliches[clicheId].datatypeDisplays[datatypeId].displayProperties.dimensions = newDimensions;
             },
             stop: function(e, ui){
                 var newPosition = {left:  ui.position.left/currentZoom, top: ui.position.top/currentZoom};
-                userApp.datatypeDisplays[datatype.meta.id].displayProperties.position = newPosition;
+                selectedProject.cliches[clicheId].datatypeDisplays[datatypeId].displayProperties.position = newPosition;
 
                 // not super important to update as you resize so just do it at the end
                 //dataMiniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
@@ -81,7 +79,7 @@ var DataContainer = function(){
     };
 
 
-    var createEditOptions = function(datatype, outerWidget, container){
+    var createEditOptions = function(datatypeId, outerWidget, container){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -96,7 +94,7 @@ var DataContainer = function(){
             '</a>' +
             '</li>');
 
-        buttonEdit.attr('id', 'edit-btn' + '_' + datatype.meta.id);
+        buttonEdit.attr('id', 'edit-btn' + '_' + datatypeId);
 
         var buttonTrash = $('<li>' +
             '<a href="#" class="inner-component-trash">' +
@@ -104,7 +102,7 @@ var DataContainer = function(){
             '</a>' +
             '</li>');
 
-        buttonTrash.attr('id', 'inner-component-trash' + '_' + datatype.meta.id);
+        buttonTrash.attr('id', 'inner-component-trash' + '_' + datatypeId);
 
         optionsDropdown.find('.dropdown-menu')
             .append(buttonEdit)
@@ -129,7 +127,7 @@ var DataContainer = function(){
 
 
         buttonTrash.click(function(){
-            deleteWidgetFromUserWidgetAndFromView(datatype.meta.id)
+            deleteWidgetFromUserWidgetAndFromView(datatypeId)
         });
 
 
@@ -137,20 +135,20 @@ var DataContainer = function(){
     };
 
 
-    that.createBasicDatatypeContainer = function(datatype, datatypeDisplayProps, zoom){
+    that.createBasicDatatypeContainer = function(clicheId, datatypeId, datatypeDisplayProps, zoom){
         var container = $('<div></div>');
-        var containerId = DATA_CONT_REF+'_'+datatype.meta.id;
+        var containerId = DATA_CONT_REF+'_'+datatypeId;
         container.addClass('dropped '+DATA_CONT_REF).attr('id', containerId);
         container.height(datatypeDisplayProps.displayProperties.dimensions.height * zoom)
             .width(datatypeDisplayProps.displayProperties.dimensions.width * zoom);
-        container.data('componentId', datatype.meta.id);
+        container.data('componentId', datatypeId);
         return container;
     };
 
-    that.createResizableDatatypeContainer = function(datatype, datatypeDisplayProps, zoom) {
-        var container = that.createBasicDatatypeContainer(datatype, datatypeDisplayProps, zoom);
-        makeContainerResizable(datatype, null, container, null);
-        container.append(createEditOptions(datatype, null, container));
+    that.createResizableDatatypeContainer = function(clicheId, datatypeId, datatypeDisplayProps, zoom) {
+        var container = that.createBasicDatatypeContainer(clicheId, datatypeId, datatypeDisplayProps, zoom);
+        makeContainerResizable(clicheId, datatypeId, null, container, null);
+        container.append(createEditOptions(datatypeId, null, container));
         return container;
     };
 

@@ -18,6 +18,11 @@ var Cliche = function(name, id, version, author){
 
     // ClicheWithDisplay has all types of widgets
     // Other cliches only use templates
+
+    // TODO
+    // separate widgets and pages:
+    // ClicheWithDisplay (A user app) will have pages a normal cliche will only have widgets
+    // templates will be moved to a completely separate datatype
     that.widgets = {
         pages: {
             // widgetId: UserWidgetInstance
@@ -31,17 +36,8 @@ var Cliche = function(name, id, version, author){
     };
 
     // ClicheWithDisplay uses *only* used and unused
-    // Here templates are *only* used by Cliches
     that.datatypes = {
-        used:{
-            // datatypeId: UserDataInstance
-        },
-        unused:{
-
-        },
-        templates:{
-
-        }
+        // datatypeId: UserDataInstance
     };
 
 
@@ -85,11 +81,9 @@ Cliche.fromObject = function(object){
             cliche.widgets[widgetType][widgetId] = UserWidget.fromObject(widget);
         }
     }
-    for (var datatypeType in object.datatypes) {
-        for (var datatypeId in object.datatypes[datatypeType]) {
-            var datatype = object.datatypes[datatypeType][datatypeId];
-            cliche.datatypes[datatypeType][datatypeId] = UserDatatype.fromObject(datatype);
-        }
+    for (var datatypeId in object.datatypes) {
+        var datatype = object.datatypes[datatypeId];
+        cliche.datatypes[datatypeId] = UserDatatype.fromObject(datatype);
     }
     return cliche
 };
@@ -103,16 +97,16 @@ var ClicheWithDisplay = function(name, id, version, author){
     that.objectType = "ClicheWithDisplay";
 
     that.datatypeDisplays = {
-        overview: UserDatatypeDisplay(),
-        particulars: {
-            // datatypeId : DatatypeDisplay object
-        }
+        // datatypeId : DatatypeDisplay object
     };
+    that.datatypeDisplays[id] = UserDatatypeDisplay();
 
     that.widgetBondDisplays = {
-        overview: {}, //UserWidgetBondDisplay(),
-        particulars: {
-            // datatypeId : DatatypeDisplay object
+        cliche: null, //UserWidgetBondDisplay(),
+        widgets: {
+            // don't care about pages b/c they don't have behavior by themselves
+            // widgetId : WidgetDisplay object
+
         }
     };
 
@@ -179,8 +173,8 @@ ClicheWithDisplay.prototype.deleteWidget = function(widgetId){
 };
 
 ClicheWithDisplay.prototype.addDatatype = function(datatype, displayProps){
-    if (!(this.datatypes.unused[datatype.meta.id])) {
-        this.datatypes.unused[datatype.meta.id] = datatype;
+    if (!(this.datatypes[datatype.meta.id])) {
+        this.datatypes[datatype.meta.id] = datatype;
         this.datatypeDisplays[datatype.meta.id] = displayProps;
     }
 };
@@ -188,8 +182,7 @@ ClicheWithDisplay.prototype.addDatatype = function(datatype, displayProps){
 
 
 ClicheWithDisplay.prototype.removeDatatype = function(datatypeId){
-    delete this.datatypes.used[datatypeId];
-    delete this.datatypes.unused[datatypeId];
+    delete this.datatypes[datatypeId];
     delete this.datatypeDisplays[datatypeId];
 };
 
@@ -199,9 +192,8 @@ ClicheWithDisplay.prototype.getNumWidgets = function(){
 };
 
 ClicheWithDisplay.prototype.getAllDatatypeIds = function(){
-    var used = Object.keys(this.datatypes.used);
-    var unused = Object.keys(this.datatypes.unused);
-    return used.concat(unused)
+    return Object.keys(this.datatypes);
+
 };
 
 ClicheWithDisplay.prototype.getAllWidgetIds = function(){
