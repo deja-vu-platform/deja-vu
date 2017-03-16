@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <title>@@name</title>
+
+    <base href="/">
+    <link rel="stylesheet"
+     href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+     integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+     crossorigin="anonymous">
+
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/reflect-metadata/Reflect.js"></script>
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
+
+    <script>
+      const cliches = @@cliches;
+
+      const map_obj = @@module_map; 
+
+      const regjs = {defaultExtension: "js"};
+
+      const packages_obj = {};
+      for (const cliche of cliches) {
+        map_obj[cliche] = "node_modules/" + cliche;
+        packages_obj[cliche] = regjs;
+      }
+
+      packages_obj["dv-dev"] = {main: "./main.js", defaultExtension: "js"};
+      packages_obj["components"] = regjs;  // AppWidget uses this
+      packages_obj["shared"] = regjs;
+      packages_obj["rxjs"] = regjs;
+      map_obj["@@name"] = "dv-dev/root.js";
+
+      System.config({map: map_obj, packages: packages_obj});
+      System.import('dv-dev')
+        .catch(function(err) { console.error(err); });
+    </script>
+
+  </head>
+
+  <body>
+    <root></root>
+  </body>
+</html>
