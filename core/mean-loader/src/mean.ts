@@ -117,7 +117,87 @@ export namespace GruntTask {
     "node_modules/systemjs/dist/system.src.js"
   ];
 
-  export function task(
+
+  export function cliche_task(grunt, name: string, widgets: string[]) {
+    const deps = _u.values(module_map).concat(base_deps);
+
+    grunt.initConfig(config(deps, "cliche"));
+    grunt.loadNpmTasks("grunt-ts");
+    grunt.loadNpmTasks("grunt-tslint");
+    grunt.loadNpmTasks("grunt-contrib-clean");
+    grunt.loadNpmTasks("grunt-contrib-copy");
+    grunt.loadNpmTasks("grunt-express-server");
+    grunt.loadNpmTasks("grunt-contrib-watch");
+    grunt.loadNpmTasks("grunt-replace");
+
+    grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
+      if (action === "dev") {
+        grunt.log.writeln(name + " " + action);
+
+        const widgets_js: WidgetJs[] = _u.map(widgets, w => ({
+          import_stmt: imp(w, ".."),
+          class_name: component(w),
+          name: w,
+          selector: `<dv-widget name="${w}"></dv-widget>`
+        }));
+
+        const locs = {};
+        locs[name] = "http://localhost:3000";
+
+        const replace_patterns = [
+          {match: "name", replacement: name},
+          {match: "module_map", replacement: module_map},
+
+          {match: "wid_names", replacement: _u.pluck(widgets_js, "name")},
+          {match: "wid_imports", replacement: _u
+            .pluck(widgets_js, "import_stmt").join("\n")},
+          {match: "wid_classes", replacement: "[" + _u
+            .pluck(widgets_js, "class_name").join() + "]"},
+
+          {match: "wid_selectors", replacement: _u
+            .pluck(widgets_js, "selector").join("\n")},
+          {match: "locs", replacement: locs}
+        ];
+
+        const express_config = {};
+        express_config[name] = {
+          options: {
+            script: "dist/app.js",
+            background: true,
+            args: [
+              "--main", `--mode=${action}`, `--fqelement=${name}`,
+              `--locs=${JSON.stringify(locs)}`
+            ],
+            port: 3000
+          }
+        };
+
+        grunt.config.merge({
+          replace: {dev: {options: {patterns: replace_patterns}}},
+          express: express_config
+        });
+
+        grunt.task.run(["clean:dev"]);
+        grunt.task.run(["replace:dev"]);
+        grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
+        grunt.task.run(["copy:dev"]);
+        grunt.task.run(["express", "watch"]);
+      } else if (action === "lib") {
+        grunt.log.writeln(name + " lib");
+        grunt.task.run(["clean:lib"]);
+        grunt.task.run(["tslint", "ts:lib_client", "ts:lib_server"]);
+        grunt.task.run(["copy:lib"]);
+      } else if (action === "clean") {
+        grunt.task.run("clean");
+      } else {
+        grunt.fail.fatal(
+          `Unrecognized action ${action}. Choose one of dev or lib`);
+      }
+    });
+
+  }
+
+  export function app_task(
       grunt, name: string, widgets: string[] = [], main?: string,
       cliches = {}, used_widgets: UsedWidget[] = [], replace_map = {},
       comp_info = {}, wcomp_info = {}, data = {}) {
@@ -126,7 +206,7 @@ export namespace GruntTask {
                   "*.{js,html,css}");
     const deps = _u.values(module_map).concat(base_deps).concat(cliches_src);
 
-    grunt.initConfig(config(deps));
+    grunt.initConfig(config(deps, "app"));
     grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks("grunt-tslint");
     grunt.loadNpmTasks("grunt-contrib-clean");
@@ -353,8 +433,7 @@ export namespace GruntTask {
       const locs_str: string = JSON.stringify(locs);
       if (cs.fqelement === name) {
         cs.express_config = {
-          script: name.indexOf("sample") !== -1 ?
-            "dist/dv-dev/app.js" : "dist/app.js",
+          script: "dist/dv-dev/app.js",
           background: true,
           args: [
             "--main", `--mode=${action}`, `--fqelement=${cs.fqelement}`,
@@ -468,7 +547,7 @@ export namespace GruntTask {
     return ret;
   }
 
-  function config(deps: string[]) {
+  function config(deps: string[], t: string) {
     const ts_base_opts = {
       verbose: true,
       target: "es6",
@@ -615,9 +694,8 @@ export namespace GruntTask {
             {
               expand: true,
               flatten: true,
-              src: "node_modules/mean-loader/lib/dev/*",
-              dest: "src/dv-dev",
-              rename: (dst, src) => dst + "/" + src.replace(".template", "")
+              src: [`node_modules/mean-loader/lib/templates/${t}/*.{html,ts}`],
+              dest: "src/dv-dev"
             }
           ]
         }
