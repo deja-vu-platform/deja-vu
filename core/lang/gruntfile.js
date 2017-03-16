@@ -22,7 +22,7 @@ module.exports = function(grunt) {
     copy: {
       lib: {
         files: [{
-            expand: true, cwd: "src/", src: "grammar.ohm", dest: "lib"
+            expand: true, cwd: "src/", src: "*.ohm", dest: "lib"
             }]
       }
     },

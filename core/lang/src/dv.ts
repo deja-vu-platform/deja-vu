@@ -1,10 +1,11 @@
 const command_line_args = require("command-line-args");
-import {Parser} from "./parser";
-import {GruntTask} from "mean-loader";
+import {ClicheParser} from "./cliche_parser";
+import {AppParser} from "./app_parser";
+// import {GruntTask} from "mean-loader";
 
 import * as fs from "fs";
 
-const grunt = require("grunt");
+// const grunt = require("grunt");
 
 const cli = command_line_args([
   {name: "file", alias: "f", type: String, defaultOption: true},
@@ -18,7 +19,6 @@ const cli = command_line_args([
 
 function main() {
   const opts = cli.parse();
-  const p = new Parser();
 
   if (opts.file === undefined) {
     for (const f of fs.readdirSync(process.cwd())) {
@@ -30,11 +30,18 @@ function main() {
     }
   }
 
+  let p;
+  if (opts.file.includes("catalog")) {
+    p = new ClicheParser();
+  } else {
+    p = new AppParser();
+  }
+
   if (opts.debug) {
     p.debug_match(opts.file);
     return;
   }
-
+/*
   const pObj = p.parse(opts.file);
 
   grunt.task.init = () => ({});
@@ -55,7 +62,9 @@ function main() {
       grunt, pObj.fqelement,
       pObj.widgets);
     grunt.tasks(["dv-mean:dev"]);
-  }
+  }*/
 }
+
+// have a pass here that generates the fbonds, wbonds and replacemap
 
 main();
