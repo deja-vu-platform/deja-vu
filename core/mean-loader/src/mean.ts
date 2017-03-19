@@ -118,7 +118,7 @@ export namespace GruntTask {
   ];
 
   export function task(
-      grunt, name: string, widgets = [], main?: string,
+      grunt, name: string, widgets: string[] = [], main?: string,
       cliches = {}, used_widgets: UsedWidget[] = [], replace_map = {},
       comp_info = {}, wcomp_info = {}, data = {}) {
     const cliches_src = Object.keys(cliches)
@@ -126,7 +126,7 @@ export namespace GruntTask {
                   "*.{js,html,css}");
     const deps = _u.values(module_map).concat(base_deps).concat(cliches_src);
 
-    grunt.initConfig(config(deps));
+    grunt.initConfig(config(deps, "app"));
     grunt.loadNpmTasks("grunt-ts");
     grunt.loadNpmTasks("grunt-tslint");
     grunt.loadNpmTasks("grunt-contrib-clean");
@@ -139,10 +139,8 @@ export namespace GruntTask {
       if (action === "dev" || action === "test") {
         grunt.log.writeln(name + " " + action);
 
-        const widgetNames = widgets.map(w => w.name);
-
         const app_widgets_js: WidgetJs[] = widget_definitions(
-          app_widgets(widgetNames, wcomp_info, data), data);
+          app_widgets(widgets, wcomp_info, data), data);
         const cliche_widgets_js: WidgetJs[] = cliche_widgets(used_widgets);
         const all_widgets_js: WidgetJs[] = app_widgets_js
           .concat(cliche_widgets_js);
@@ -469,7 +467,7 @@ export namespace GruntTask {
     return ret;
   }
 
-  function config(deps: string[]) {
+  function config(deps: string[], t: string) {
     const ts_base_opts = {
       verbose: true,
       target: "es6",
@@ -616,9 +614,8 @@ export namespace GruntTask {
             {
               expand: true,
               flatten: true,
-              src: "node_modules/mean-loader/lib/dev/*",
-              dest: "src/dv-dev",
-              rename: (dst, src) => dst + "/" + src.replace(".template", "")
+              src: [`node_modules/mean-loader/lib/templates/${t}/*.{html,ts}`],
+              dest: "src/dv-dev"
             }
           ]
         }

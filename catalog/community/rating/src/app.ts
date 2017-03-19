@@ -123,4 +123,28 @@ const schema = grafo
 
 Helpers.serve_schema(mean.ws, schema);
 
-grafo.init().then(_ => mean.start());
+console.log("Starting grafo...");
+
+grafo.init().then(_ => {
+  console.log("Grafo init complete!");
+  if (mean.debug) {
+    console.log("Mean debug active.");
+    let createSources = () => mean.db.collection("sources")
+      .insertOne({
+        atom_id: "1"
+      }, (err, res) => {
+        if (err) throw err;
+        console.log("Created sources.");
+        createTargets();
+      });
+    let createTargets = () => mean.db.collection("targets")
+      .insertOne({
+        atom_id: "1"
+      }, (err, res) => {
+        if (err) throw err;
+        console.log("Created targets.")
+      });
+    createSources();
+  }
+  mean.start();
+});

@@ -22,7 +22,7 @@ module.exports = function(grunt) {
     copy: {
       lib: {
         files: [{
-            expand: true, cwd: "src/", src: "dev/*", dest: "lib"
+            expand: true, cwd: "src/", src: "templates/**/*.{html,ts}", dest: "lib"
             }]
       }
     },

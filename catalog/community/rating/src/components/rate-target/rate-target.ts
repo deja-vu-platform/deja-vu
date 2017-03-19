@@ -8,10 +8,12 @@ import {Widget} from "client-bus";
   styles: [``]
 })
 export class RateTargetComponent {
-  target = {atom_id: ""};
-  source = {atom_id: ""};
-  rating = {value: 0, on_change: _ => undefined};
+  target = {atom_id: "1"};
+  source = {atom_id: "1"};
+  rating = {value: 0};
   radioName = "";
+
+  _rating: 0; // Internal rating value to pass along
 
   constructor(private _graphQlService: GraphQlService) {
     // This creates a presumably unique name for our radio buttons
@@ -19,20 +21,24 @@ export class RateTargetComponent {
       + Math.floor(Math.random() * 100000).toString();
   }
 
-  syncRating() {
+  syncRating(newRating) {
+    this._rating = newRating;
+
+    console.log("We invoked syncRating! :)");
     this._graphQlService
       .post(`
         updateRating(source: "${this.source.atom_id}",
           target: "${this.target.atom_id}",
-          rating: ${this.rating.value})
+          rating: ${this._rating})
       `)
       .subscribe(res => {
         console.log(res);
+        this.rating.value = this._rating;
       });
   }
 
   dvAfterInit() {
     console.log("hi rating is", this.rating, this.rating.value);
-    this.rating.on_change(this.syncRating);
+    // this.rating.on_change(this.syncRating);
   }
 }

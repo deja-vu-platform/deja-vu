@@ -4,7 +4,8 @@
             <input type="radio"
                 [name]="radioName"
                 [value]="option"
-                [(ngModel)]="rating.value">
+                [checked]="_rating===option"
+                (change)="syncRating(option)">
         </span>
         <br>
         <span class="target-label">
@@ -13,5 +14,5 @@
     </div>
 </div>
 <div>
-    Rating is {{rating}}
+    Rating is {{_rating}}
 </div>

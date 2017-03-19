@@ -20,7 +20,4 @@ cliche Rating {
   }
 
   // TODO: ShowRatings widget, which shows aggregate rating info for a target
-  t1: Target = {}
-  s1: Source = {}
-  rt: RateTarget = {source:s1, target:t1}
 }

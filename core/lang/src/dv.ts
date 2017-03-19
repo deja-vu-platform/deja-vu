@@ -9,9 +9,10 @@ const grunt = require("grunt");
 const cli = command_line_args([
   {name: "file", alias: "f", type: String, defaultOption: true},
 
-  // Mode can be "dev" or "test".  In dev mode the development page is shown,
-  // in test mode the main widget is shown
-  {name: "mode", type: String, defaultValue: "dev"},
+  // Apps can can be run in "dev" or "test" mode. In dev mode, the development
+  // page is shown. In test mode, the main widget is shown
+  // todo: let apps be run in dev mode
+  // {name: "mode", type: String, defaultValue: "dev"},
   {name: "debug", type: Boolean, defaultValue: false}
 ]);
 
@@ -39,7 +40,7 @@ function main() {
 
   grunt.task.init = () => ({});
   if (p.isApp(pObj)) {
-    GruntTask.task(
+    GruntTask.app_task(
       grunt, pObj.fqelement,
       pObj.widgets,
       pObj.main_widget,
@@ -50,11 +51,6 @@ function main() {
       {"wbonds": pObj.wbonds},
       pObj.data);
     grunt.tasks(["dv-mean:test"]);
-  } else {
-    GruntTask.task(
-      grunt, pObj.fqelement,
-      pObj.widgets);
-    grunt.tasks(["dv-mean:dev"]);
   }
 }
 
