@@ -21,24 +21,48 @@ export class RateTargetComponent {
       + Math.floor(Math.random() * 100000).toString();
   }
 
+  /**
+   * Sync the rating on the server with the rating on the client.
+   *
+   * @param newRating Number containing the new rating
+   */
   syncRating(newRating) {
     this._rating = newRating;
 
-    console.log("We invoked syncRating! :)");
     this._graphQlService
       .post(`
         updateRating(source: "${this.source.atom_id}",
           target: "${this.target.atom_id}",
-          rating: ${this._rating})
+          rating: ${this._rating}) {
+            rating
+          }
       `)
       .subscribe(res => {
-        console.log(res);
         this.rating.value = this._rating;
       });
   }
 
+  /**
+   * Load a rating from the server (if any), and set the value of the widget.
+   */
+  loadRating() {
+    this._graphQlService
+      .get(`
+        ratingBySourceTarget(source: "${this.source.atom_id}",
+          target: "${this.target.atom_id}") {
+            rating
+          }
+      `)
+      .subscribe(res => {
+        // If a rating already exists, then we pre-populate the value
+        if (res.ratingBySourceTarget) {
+          this._rating = res.ratingBySourceTarget.rating;
+          this.rating.value = this._rating;
+        }
+      });
+  }
+
   dvAfterInit() {
-    console.log("hi rating is", this.rating, this.rating.value);
-    // this.rating.on_change(this.syncRating);
+    this.loadRating();
   }
 }

@@ -52,8 +52,20 @@ const schema = grafo
       rating: {"type": graphql.GraphQLInt}
     }
   })
+  .add_query({
+    name: "ratingBySourceTarget", // Get rating info by source and target
+    type: "Rating",
+    args: {
+      source: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    },
+    resolve: (_, {source, target}) => {
+      return mean.db.collection("ratings")
+        .findOne({ source: source, target: target });
+    }
+  })
   .add_mutation({
-    name: "updateRating",
+    name: "updateRating", // Create or modify a rating for a source and target
     type: "Rating",
     args: {
       // These are both atom IDs
@@ -102,33 +114,10 @@ const schema = grafo
   })
   .schema();
 
-// namespace Validation {
-//   /**
-//    * Verify a rating of the specified target exists from the specified source.
-//    * If no rating exists, then one is created.
-//   */
-//   export function verifyRatingExists(source, target) {
-//     return mean.db.collection("ratings")
-//       .findOne({ source: source, target: target })
-//       .then(rating => {
-//         if (!rating) {
-//           // Create
-//           mean.db.collection("ratings")
-
-//         }
-//         return rating;
-//       });
-//   }
-// }
-
 Helpers.serve_schema(mean.ws, schema);
 
-console.log("Starting grafo...");
-
 grafo.init().then(_ => {
-  console.log("Grafo init complete!");
   if (mean.debug) {
-    console.log("Mean debug active.");
     let createSources = () => mean.db.collection("sources")
       .insertOne({
         atom_id: "1"
