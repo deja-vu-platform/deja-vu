@@ -19,5 +19,8 @@ cliche Rating {
     rating: Number
   }
 
-  // TODO: ShowRatings widget, which shows aggregate rating info for a target
+  // Shows aggregate rating info for a target
+  widget ShowRatings {
+    target: Target
+  }
 }

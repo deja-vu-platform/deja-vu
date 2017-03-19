@@ -1,4 +1,3 @@
-// import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
 import {Mean} from "mean-loader";
@@ -6,7 +5,7 @@ import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
 import {Grafo} from "grafo";
 
-// import * as _u from "underscore";
+import * as _u from "underscore";
 
 const uuid = require("uuid");
 
@@ -64,6 +63,35 @@ const schema = grafo
         .findOne({ source: source, target: target });
     }
   })
+  .add_query({
+    name: "averageRatingForTarget", // Get average rating for a certain target
+    type: graphql.GraphQLFloat,
+    args: {
+      target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    },
+    resolve: (_, {target}) => {
+      return mean.db.collection("ratings")
+        .find({ target: target })
+        .toArray()
+        .then(res => res.reduce(
+          // Sum over all the values, adjusting each for the number of results
+          (prev, current) => prev + (current.rating / res.length),
+          0)
+        );
+    }
+  })
+  .add_query({
+    name: "ratingCountForTarget", // Number of times target has been rated
+    type: graphql.GraphQLInt,
+    args: {
+      target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    },
+    resolve: (_, {target}) => {
+      return mean.db.collection("ratings")
+        .find({ target: target })
+        .count();
+    }
+  })
   .add_mutation({
     name: "updateRating", // Create or modify a rating for a source and target
     type: "Rating",
@@ -119,20 +147,40 @@ Helpers.serve_schema(mean.ws, schema);
 grafo.init().then(_ => {
   if (mean.debug) {
     let createSources = () => mean.db.collection("sources")
-      .insertOne({
-        atom_id: "1"
-      }, (err, res) => {
+      .insertMany([
+        {
+          atom_id: "1"
+        },
+        {
+          atom_id: "2"
+        }
+      ], (err, res) => {
         if (err) throw err;
         console.log("Created sources.");
         createTargets();
       });
     let createTargets = () => mean.db.collection("targets")
+      .insertMany([
+        {
+          atom_id: "1"
+        },
+        {
+          atom_id: "2"
+        }
+      ], (err, res) => {
+        if (err) throw err;
+        console.log("Created targets.");
+        createRatings();
+      });
+    let createRatings = () => mean.db.collection("ratings")
       .insertOne({
-        atom_id: "1"
+        source: "2",
+        target: "1",
+        rating: 4
       }, (err, res) => {
         if (err) throw err;
-        console.log("Created targets.")
-      });
+        console.log("Created ratings.");
+      })
     createSources();
   }
   mean.start();

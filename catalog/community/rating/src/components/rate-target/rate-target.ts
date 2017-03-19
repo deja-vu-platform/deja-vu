@@ -8,9 +8,9 @@ import {Widget} from "client-bus";
   styles: [``]
 })
 export class RateTargetComponent {
-  target = {atom_id: "1"};
-  source = {atom_id: "1"};
-  rating = {value: 0};
+  target = { atom_id: undefined, on_change: _ => undefined };
+  source = { atom_id: undefined, on_change: _ => undefined };
+  rating = { value: 0 };
   radioName = "";
 
   _rating: 0; // Internal rating value to pass along
@@ -64,5 +64,7 @@ export class RateTargetComponent {
 
   dvAfterInit() {
     this.loadRating();
+    this.target.on_change(this.loadRating);
+    this.source.on_change(this.loadRating);
   }
 }
