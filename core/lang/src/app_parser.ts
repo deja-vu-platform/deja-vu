@@ -50,6 +50,7 @@ export class AppParser {
   private _cliche_parser;
 
   private _symbol_table: SymbolTable;
+  private _dirname: string;
 
   constructor() {
     this._cliche_parser = new ClicheParser();
@@ -97,8 +98,7 @@ export class AppParser {
           // Get used widgets from the HTML
           const fp = w => {
             const dashed = _ustring.dasherize(w).slice(1);
-            return `../../samples/bookmark/` +
-              `src/components/${dashed}/${dashed}.html`;
+            return `${this._dirname}/src/components/${dashed}/${dashed}.html`;
           };
           const html = fs.readFileSync(fp(name.sourceString), "utf-8");
           const matches = [];
@@ -346,6 +346,7 @@ export class AppParser {
   }
 
   parse(fp: string): App {
+    this._dirname = path.dirname(fp);
     const dv = fs.readFileSync(fp, "utf-8");
     const r = this._grammar.match(dv);
     if (r.failed()) {
