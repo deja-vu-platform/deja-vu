@@ -3,7 +3,7 @@ cliche Post {
     content: Text,
     author: User
   }
-  
+
   data User {
     username: Text,
     posts: Post
