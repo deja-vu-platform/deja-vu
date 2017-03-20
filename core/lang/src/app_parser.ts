@@ -45,7 +45,6 @@ interface StEntry {
 }
 
 export class AppParser {
-  of_name; name;
   private _grammar;
   private _semantics;
   private _cliche_parser;
