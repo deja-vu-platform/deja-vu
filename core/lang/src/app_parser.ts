@@ -31,8 +31,8 @@ export interface App {
   used_widgets: any[];
   replace_map: ReplaceMap;
   tbonds: any[];
-  fbonds: any[];
-  wbonds: any[];
+  dfbonds: any[];
+  wfbonds: any[];
   data: any;
 }
 
@@ -104,14 +104,20 @@ export class AppParser {
           const html = fs.readFileSync(fp(name.sourceString), "utf-8");
           const matches = [];
           // todo: might not have of field for app widgets
-          const re = /<dv-widget\s*name="([^"]*)"\s*of="([^"]*)"[^>]*>/g;
+          const re = /<dv-widget\s*name="([^"]*)"\s*(of="([^"]*)")?[^>]*>/g;
           let match = re.exec(html);
           while (match !== null) {
             matches.push(match);
             match = re.exec(html);
           }
           ret.attr.uses = _u
-            .map(matches, match => ({of: match[2], name: match[1]}));
+            .map(matches, match => {
+              if (match[2] === undefined) {
+                return match[1];
+              } else {
+                return {of: match[3], name: match[1]};
+              }
+            });
           return ret;
         },
         AssignmentDecl: (name, colon, t_name, assign, obj) => ({
@@ -367,46 +373,72 @@ export class AppParser {
       used_widgets: this.used_widgets(app_widget_symbols, s.replaceList()),
       replace_map: s.replaceMap(),
       tbonds: tbonds,
-      fbonds: this.fbonds(tbonds),
-      wbonds: undefined, //wbonds(tbonds),
+      dfbonds: this._dfbonds(tbonds),
+      wfbonds: this._wfbonds(tbonds),
       data: s.data()
     };
   }
 
-  _fbond_fields(subf, tbonds) {
+  _dfbonds(tbonds) {
+    return this._fbonds("data", subfof => tbonds[subfof], tbonds);
+  }
+
+  _wfbonds(tbonds) {
+    return this._fbonds(
+      "widget", subfof => this._symbol_table[subfof].attr.uses, tbonds);
+  }
+
+  _fbond_fields(subf, bondedts_fn, tbonds) {
     // map all types that are bonded with the container
-    return _u.reject(_u.map(tbonds[subf.of], bondedt => {
+    return _u.reject(_u.map(bondedts_fn(subf.of), bondedt => {
       const is_subtype = ({name, of}, subft) => (
-        (this.BASIC_TYPES.indexOf(name) > -1 && name === subft) ||
-        (_u.find(tbonds[subft], b => b.name === name && b.of === of)
-         !== undefined)
+        (!of && name === subft) ||
+        (of && this.BASIC_TYPES.indexOf(name) > -1 && name === subft) ||
+        (of && !!_u.find(tbonds[subft], b => b.name === name && b.of === of))
       );
-      const t = this._symbol_table[bondedt.of].attr.symbol_table[bondedt.name];
+      const is_app_t = bondedt.of === undefined;
+      let t;
+      if (is_app_t) {
+        t = this._symbol_table[bondedt];
+        if (t === undefined) {
+          throw new Error("Can't find type " + bondedt);
+        }
+      } else {
+        t = this._symbol_table[bondedt.of].attr.symbol_table[bondedt.name];
+        if (t === undefined) {
+          throw new Error("Can't find cliche " + bondedt.of);
+        }
+      }
       // look through the fields of the type bonded with the container
       // and retrieve the field that has a type that matches the
       // type of the subfield
       const fname =  _u
         .findKey(t.attr.fields,
                  ft => is_subtype({name: ft, of: bondedt.of}, subf.type));
-      if (fname === undefined) return {};
-      return {
-        name: fname, of: {name: bondedt.name, fqelement: bondedt.of},
-        type: {name: t.attr.fields[fname], fqelement: bondedt.of}
-      };
+      let ret = {};
+      if (fname !== undefined && is_app_t) {
+        ret = {name: fname, of: bondedt, type: t.attr.fields[fname]};
+      } else if (fname !== undefined) {
+        ret = {
+          name: fname, of: {name: bondedt.name, fqelement: bondedt.of},
+          type: {name: t.attr.fields[fname], fqelement: bondedt.of}
+        };
+      }
+      return ret;
     }), _u.isEmpty);
   }
 
-  fbonds(tbonds) {
+  _fbonds(t, bondedts_fn, tbonds) {
     return _u
       .chain(_u.values(this._symbol_table))
-      .filter(s => s.type === "data")
+      .filter(s => s.type === t)
       .map(data => _u
         .map(data.attr.fields, (subftype, subfname) => _u
           .map(subftype.split("|"), subft => ({
             subfield: {name: subfname, of: data.id, type: subftype},
             fields: this
               ._fbond_fields({name: subfname, of: data.id, type: subft.trim()},
-                             tbonds)
+                             bondedts_fn, tbonds)
           }))))
       .flatten()
       .value();
@@ -420,18 +452,27 @@ export class AppParser {
       .map(w => w.attr.uses)
       .flatten()
       .reject(_u.isUndefined)
+      .reject(w => w.of === undefined) // reject app widgets
       .map(cw => {
         // get all used widget of the app widgets
         // need to see what widgets the cliche widgets we use uses so that we
         // add them to the list
-        const traverse = cw_name => [cw_name].concat(
-          _u
-            .chain(this
-              ._symbol_table[cw.of].attr.symbol_table[cw_name].attr.uses)
+        const traverse = cw_name => {
+          const cliche_st = this._symbol_table[cw.of];
+          if (cliche_st === undefined) {
+            throw new Error(`Can't find cliche ${cw.of}`);
+          }
+          const widget_ste = cliche_st.attr.symbol_table[cw_name];
+          if (widget_ste === undefined) {
+            throw new Error(`Can't find widget ${cw_name} of cliche ${cw.of}`);
+          }
+          return [cw_name].concat(_u
+            .chain(widget_ste.attr.uses)
             .reject(_u.isUndefined)
             .map(traverse)
             .flatten()
             .value());
+        };
         return [cw]
           .concat(_u
             .map(traverse(cw.name), cw_name => ({name: cw_name, of: cw.of})));
@@ -467,10 +508,10 @@ export class AppParser {
     console.log(debug(p.replace_map));
     console.log("//////////tbonds//////////");
     console.log(debug(p.tbonds));
-    console.log("//////////fbonds//////////");
-    console.log(debug(p.fbonds));
-    console.log("//////////wbonds//////////");
-    console.log(debug(p.wbonds));
+    console.log("//////////dfbonds//////////");
+    console.log(debug(p.dfbonds));
+    console.log("//////////wfbonds//////////");
+    console.log(debug(p.wfbonds));
     console.log("//////////data//////////");
     console.log(debug(p.data));
   }
