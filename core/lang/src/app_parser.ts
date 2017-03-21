@@ -45,6 +45,7 @@ interface StEntry {
 }
 
 export class AppParser {
+  BASIC_TYPES = ["Text", "Boolean", "Date", "Datetime", "Number"];
   private _grammar;
   private _semantics;
   private _cliche_parser;
@@ -357,6 +358,7 @@ export class AppParser {
     console.log(JSON.stringify(this._symbol_table, null, 2));
     const app_widget_symbols = _u
       .filter(_u.values(this._symbol_table), s => s.type === "widget");
+    const tbonds = s.tbonds();
     return {
       fqelement: s.fqelement(),
       widgets: _u.pluck(app_widget_symbols, "id"),
@@ -364,11 +366,50 @@ export class AppParser {
       used_cliches: s.usedCliches(),
       used_widgets: this.used_widgets(app_widget_symbols, s.replaceList()),
       replace_map: s.replaceMap(),
-      tbonds: s.tbonds(),
-      fbonds: undefined, // s.fbonds(),
-      wbonds: undefined, // s.wbonds(),
+      tbonds: tbonds,
+      fbonds: this.fbonds(tbonds),
+      wbonds: undefined, //wbonds(tbonds),
       data: s.data()
     };
+  }
+
+  _fbond_fields(subf, tbonds) {
+    // map all types that are bonded with the container
+    return _u.reject(_u.map(tbonds[subf.of], bondedt => {
+      const is_subtype = ({name, of}, subft) => (
+        (this.BASIC_TYPES.indexOf(name) > -1 && name === subft) ||
+        (_u.find(tbonds[subft], b => b.name === name && b.of === of)
+         !== undefined)
+      );
+      const t = this._symbol_table[bondedt.of].attr.symbol_table[bondedt.name];
+      // look through the fields of the type bonded with the container
+      // and retrieve the field that has a type that matches the
+      // type of the subfield
+      const fname =  _u
+        .findKey(t.attr.fields,
+                 ft => is_subtype({name: ft, of: bondedt.of}, subf.type));
+      if (fname === undefined) return {};
+      return {
+        name: fname, of: {name: bondedt.name, fqelement: bondedt.of},
+        type: {name: t.attr.fields[fname], fqelement: bondedt.of}
+      };
+    }), _u.isEmpty);
+  }
+
+  fbonds(tbonds) {
+    return _u
+      .chain(_u.values(this._symbol_table))
+      .filter(s => s.type === "data")
+      .map(data => _u
+        .map(data.attr.fields, (subftype, subfname) => _u
+          .map(subftype.split("|"), subft => ({
+            subfield: {name: subfname, of: data.id, type: subftype},
+            fields: this
+              ._fbond_fields({name: subfname, of: data.id, type: subft.trim()},
+                             tbonds)
+          }))))
+      .flatten()
+      .value();
   }
 
   used_widgets(widgets: any[], replace_list: Widget[]): Widget[] {
