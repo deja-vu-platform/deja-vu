@@ -1,18 +1,24 @@
-app Morg uses organization/Allocator, organization/Event, messaging/Email {
+app Morg {
+  use organization/Allocator[
+    WeeklyGroupMeeting: Allocation, GroupMeeting: Resource,
+    Member: Consumer,
+    ShowGroupMeeting replaces ShowEvent in ChooseAndShowWeeklyEvent]
+  use organization/Event[
+    WeeklyGroupMeeting: WeeklyEvent, GroupMeeting: Event, Member: Guest]
+  use messaging/Email[GroupMeeting: Content]
+
   data WeeklyGroupMeeting {
-    meetings: GroupMeeting = Allocator.Allocation.resources +
-      Event.WeeklyEvent.events,
-    guests: Member = Event.WeeklyEvent.guests +
-      Allocator.Allocation.consumers
-  } = Allocator.Allocation + Event.WeeklyEvent
+    meetings: GroupMeeting,
+    guests: Member
+  }
 
   data GroupMeeting {
-    champion: Member = Event.Event.description + Allocator.Resource.consumed_by
-  } = Event.Event + Allocator.Resource + Email.Content
+    champion: Member
+  }
 
   data Member {
-    name: Text = Allocator.Consumer.name + Event.Guest.name
-  } = Event.Guest + Event.Description + Allocator.Consumer
+    name: Text
+  }
 
   m1: Member = {name: "Alyssa"}
   m2: Member = {name: "Ben"}
@@ -26,14 +32,9 @@ app Morg uses organization/Allocator, organization/Event, messaging/Email {
   // Shows the date of the event, the name of the champion, and a button to
   // send an email to the group with information regarding the event
   widget ShowGroupMeeting {
-    weekly_group_meeting: WeeklyGroupMeeting =
-      Allocator.EditConsumer.allocation,
-    group_meeting: GroupMeeting = Event.ShowEvent.event +
-      Allocator.EditConsumer.resource + Email.SendEmail.content,
-    email: Text = Email.SendEmail.to
-  } replaces Event.ShowEvent in Event.ChooseAndShowWeeklyEvent {
-    selected_weekly_event = ShowGroupMeeting.weekly_group_meeting,
-    event = ShowGroupMeeting.group_meeting
+    weekly_group_meeting: WeeklyGroupMeeting,
+    group_meeting: GroupMeeting,
+    email: Text
   }
 
   s: ShowGroupMeeting = {email: "deja-vu@mit.edu"}
