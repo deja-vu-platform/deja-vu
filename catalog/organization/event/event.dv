@@ -21,6 +21,8 @@ cliche Event {
     name: Text
   }
 
+  widget NewWeeklyEvent {}
+
   // Shows the start and end date of the event
   widget ShowEvent {
     event: Event
