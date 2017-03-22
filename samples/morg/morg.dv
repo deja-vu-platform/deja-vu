@@ -1,10 +1,10 @@
 app Morg {
   use organization/Allocator[
     WeeklyGroupMeeting: Allocation, GroupMeeting: Resource,
-    Member: Consumer,
-    ShowGroupMeeting replaces ShowEvent in ChooseAndShowWeeklyEvent]
+    Member: Consumer]
   use organization/Event[
-    WeeklyGroupMeeting: WeeklyEvent, GroupMeeting: Event, Member: Guest]
+    WeeklyGroupMeeting: WeeklyEvent, GroupMeeting: Event, Member: Guest,
+    ShowGroupMeeting replaces ShowEvent in ChooseAndShowWeeklyEvent]
   use messaging/Email[GroupMeeting: Content]
 
   data WeeklyGroupMeeting {
