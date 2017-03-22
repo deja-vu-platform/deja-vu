@@ -391,38 +391,33 @@ export class AppParser {
   _fbond_fields(subf, bondedts_fn, tbonds) {
     // map all types that are bonded with the container
     return _u.reject(_u.map(bondedts_fn(subf.of), bondedt => {
-      const is_subtype = ({name, of}, subft) => (
-        (!of && name === subft) ||
-        (of && this.BASIC_TYPES.indexOf(name) > -1 && name === subft) ||
-        (of && !!_u.find(tbonds[subft], b => b.name === name && b.of === of))
+      const is_subtype = (t1: string, t2: {name: string, of: string}) => (
+        (this.BASIC_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
+        !!_u.find(tbonds[t1], b => b.name === t2.name && b.of === t2.of)
       );
-      const is_app_t = bondedt.of === undefined;
-      let t;
-      if (is_app_t) {
-        t = this._symbol_table[bondedt];
-        if (t === undefined) {
-          throw new Error("Can't find type " + bondedt);
+      let ret = {};
+      if (bondedt.of === undefined) {  // is an app t
+        const t = this._symbol_table[bondedt];
+        if (t === undefined) throw new Error(`Can't find type ${bondedt}`);
+        const fname =  _u.findKey(t.attr.fields, ft => ft === subf.type);
+        if (fname !== undefined) {
+          ret = {name: fname, of: bondedt, type: t.attr.fields[fname]};
         }
       } else {
-        t = this._symbol_table[bondedt.of].attr.symbol_table[bondedt.name];
+        const t = this
+          ._symbol_table[bondedt.of].attr.symbol_table[bondedt.name];
         if (t === undefined) {
-          throw new Error("Can't find cliche " + bondedt.of);
+          throw new Error(`Can't find type ${bondedt.name} of ${bondedt.of}`);
         }
-      }
-      // look through the fields of the type bonded with the container
-      // and retrieve the field that has a type that matches the
-      // type of the subfield
-      const fname =  _u
-        .findKey(t.attr.fields,
-                 ft => is_subtype({name: ft, of: bondedt.of}, subf.type));
-      let ret = {};
-      if (fname !== undefined && is_app_t) {
-        ret = {name: fname, of: bondedt, type: t.attr.fields[fname]};
-      } else if (fname !== undefined) {
-        ret = {
-          name: fname, of: {name: bondedt.name, fqelement: bondedt.of},
-          type: {name: t.attr.fields[fname], fqelement: bondedt.of}
-        };
+        const fname =  _u
+          .findKey(t.attr.fields,
+                   ft => is_subtype(subf.type, {name: ft, of: bondedt.of}));
+        if (fname !== undefined) {
+          ret = {
+            name: fname, of: {name: bondedt.name, fqelement: bondedt.of},
+            type: {name: t.attr.fields[fname], fqelement: bondedt.of}
+          };
+        }
       }
       return ret;
     }), _u.isEmpty);
