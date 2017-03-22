@@ -371,12 +371,44 @@ export class AppParser {
       main_widget: s.main(),
       used_cliches: s.usedCliches(),
       used_widgets: this.used_widgets(app_widget_symbols, s.replaceList()),
-      replace_map: s.replaceMap(),
+      replace_map: this._fmaps(s.replaceMap(), tbonds),
       tbonds: tbonds,
       dfbonds: this._dfbonds(tbonds),
       wfbonds: this._wfbonds(tbonds),
       data: s.data()
     };
+  }
+
+  _fmaps(rmap, tbonds) {
+    return _u
+      .mapObject(rmap, (widget, cliche) => _u
+        .mapObject(widget, (widget, parent_widget) => _u
+          .mapObject(widget, (rinfo, widget) => {
+            rinfo.map = _u
+              .chain(this._symbol_table[rinfo.replaced_by.name].attr.fields)
+              .map((subftype, subfname) => {
+                const finfo = _u.reject(_u
+                  .map(subftype.split("|"), subft => this
+                    ._match(subft.trim(), {name: widget, of: cliche}, tbonds)),
+                  _u.isEmpty);
+                let ret = {};
+                if (finfo.length > 1) {
+                  throw new Error(`TBD ${JSON.stringify(finfo)}`);
+                } else if (finfo.length === 1) {
+                  ret = {
+                    name: subfname, type: subftype, maps_to: finfo[0].name
+                  };
+                }
+                return ret;
+              })
+              .reject(_u.isEmpty)
+              .reduce((memo, {name, type, maps_to}) => {
+                memo[name] = {type: type, maps_to: maps_to};
+                return memo;
+              }, {})
+              .value();
+            return rinfo;
+          })));
   }
 
   _dfbonds(tbonds) {
@@ -388,42 +420,42 @@ export class AppParser {
       "widget", subfof => this._symbol_table[subfof].attr.uses, tbonds);
   }
 
-  _fbond_fields(subf, bondedts_fn, tbonds) {
-    // map all types that are bonded with the container
-    return _u.reject(_u.map(bondedts_fn(subf.of), bondedt => {
-      const is_subtype = (t1: string, t2: {name: string, of: string}) => (
-        (this.BASIC_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
-        !!_u.find(tbonds[t1], b => b.name === t2.name && b.of === t2.of)
-      );
-      let ret = {};
-      if (bondedt.of === undefined) {  // is an app t
-        const t = this._symbol_table[bondedt];
-        if (t === undefined) throw new Error(`Can't find type ${bondedt}`);
-        const fname =  _u.findKey(t.attr.fields, ft => ft === subf.type);
-        if (fname !== undefined) {
-          ret = {name: fname, of: bondedt, type: t.attr.fields[fname]};
-        }
-      } else {
-        const t = this
-          ._symbol_table[bondedt.of].attr.symbol_table[bondedt.name];
-        if (t === undefined) {
-          throw new Error(`Can't find type ${bondedt.name} of ${bondedt.of}`);
-        }
-        const fname =  _u
-          .findKey(t.attr.fields,
-                   ft => is_subtype(subf.type, {name: ft, of: bondedt.of}));
-        if (fname !== undefined) {
-          ret = {
-            name: fname, of: {name: bondedt.name, fqelement: bondedt.of},
-            type: {name: t.attr.fields[fname], fqelement: bondedt.of}
-          };
-        }
+  // t is the type of the field
+  // matchts is a list record types to use to look for a field that has as a
+  // type one that matches t
+  _match(t: string, matcht, tbonds) {
+    const is_subtype = (t1: string, t2: {name: string, of: string}) => (
+      (this.BASIC_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
+      !!_u.find(tbonds[t1], b => b.name === t2.name && b.of === t2.of)
+    );
+    let ret = {};
+    if (matcht.of === undefined) {  // is an app t
+      const t_st = this._symbol_table[matcht];
+      if (t_st === undefined) throw new Error(`Can't find type ${matcht}`);
+      const fname =  _u.findKey(t_st.attr.fields, ft => ft === t);
+      if (fname !== undefined) {
+        ret = {name: fname, of: matcht, type: t_st.attr.fields[fname]};
       }
-      return ret;
-    }), _u.isEmpty);
+    } else {
+      const t_st = this
+        ._symbol_table[matcht.of].attr.symbol_table[matcht.name];
+      if (t_st === undefined) {
+        throw new Error(`Can't find type ${matcht.name} of ${matcht.of}`);
+      }
+      const fname =  _u
+        .findKey(t_st.attr.fields,
+                 ft => is_subtype(t, {name: ft, of: matcht.of}));
+      if (fname !== undefined) {
+        ret = {
+          name: fname, of: {name: matcht.name, fqelement: matcht.of},
+          type: {name: t_st.attr.fields[fname], fqelement: matcht.of}
+        };
+      }
+    }
+    return ret;
   }
 
-  _fbonds(t, bondedts_fn, tbonds) {
+  _fbonds(t, matchts_fn, tbonds) {
     return _u
       .chain(_u.values(this._symbol_table))
       .filter(s => s.type === t)
@@ -431,9 +463,11 @@ export class AppParser {
         .map(data.attr.fields, (subftype, subfname) => _u
           .map(subftype.split("|"), subft => ({
             subfield: {name: subfname, of: data.id, type: subftype},
-            fields: this
-              ._fbond_fields({name: subfname, of: data.id, type: subft.trim()},
-                             bondedts_fn, tbonds)
+            fields: _u
+              .reject(_u
+                .map(matchts_fn(data.id),
+                     matcht => this._match(subft.trim(), matcht, tbonds)),
+                _u.isEmpty)
           }))))
       .flatten()
       .value();
