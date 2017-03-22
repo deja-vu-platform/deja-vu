@@ -1,5 +1,5 @@
 {
-  "name": "dv-access-auth",
+  "name": "dv-community-rating",
   "version": "0.0.1",
   "scripts": {
     "lib": "grunt dv-mean:lib",
@@ -24,9 +24,7 @@
     "server-bus": "file:../../../core/server-bus",
     "systemjs": "0.19.40",
     "zone.js": "^0.7.4",
-
-    "bcryptjs": "^2.3.0",
-    "jsonwebtoken": "^5.7.0"
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -35,7 +33,5 @@
   },
   "main": "./lib",
   "typings": "./lib",
-  "files": [
-    "lib"
-  ]
+  "files": ["lib"]
 }

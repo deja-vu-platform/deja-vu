@@ -374,7 +374,12 @@ export function Widget(options: WidgetMetadata) {
     if (options.styles !== undefined) {
       metadata["styles"] = options.styles;
     } else {
-      metadata["styleUrls"] = [`${module_id}/components/${dname}/${dname}.css`];
+      let style_url = `${module_id}/components/${dname}/${dname}.css`;
+      // https://github.com/angular/angular/issues/4974
+      if (module_id === "") {
+        style_url = `components/${dname}/${dname}.css`;
+      }
+      metadata["styleUrls"] = [style_url];
     }
     if (options.external_styles !== undefined) {
       if (metadata["styleUrls"] === undefined) {
