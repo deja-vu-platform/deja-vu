@@ -25,7 +25,8 @@ cliche Event {
 
   // Shows the start and end date of the event
   widget ShowEvent {
-    event: Event
+    event: Event,
+    selected_weekly_event: WeeklyEvent
   }
 
   // Lets the user choose a weekly event from a dropdown and displays the
