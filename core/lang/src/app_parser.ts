@@ -371,7 +371,6 @@ export class AppParser {
     }
     const s = this._semantics(r);
     this._symbol_table = s.symbolTable();
-    console.log(JSON.stringify(this._symbol_table, null, 2));
     const app_widget_symbols = _u
       .filter(_u.values(this._symbol_table), s => s.type === "widget");
     const tbonds = s.tbonds();
