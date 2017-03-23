@@ -22,9 +22,12 @@
       const regjs = {defaultExtension: "js"};
 
       const packages_obj = {};
-      for (const cliche of cliches) {
-        map_obj[cliche] = "node_modules/" + cliche;
-        packages_obj[cliche] = regjs;
+      for (const fqelement of Object.keys(cliches)) {
+        map_obj[fqelement] = "node_modules/" + cliches[fqelement];
+        packages_obj[fqelement] = regjs;
+
+        map_obj[cliches[fqelement]] = "node_modules/" + cliches[fqelement];
+        packages_obj[cliches[fqelement]] = regjs;
       }
 
       packages_obj["dv-dev"] = {main: "./main.js", defaultExtension: "js"};

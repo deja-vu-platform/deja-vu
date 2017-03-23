@@ -4,7 +4,7 @@ import {GraphQlService} from "gql";
 
 
 @Widget({
-  fqelement: "dv-organization-label",
+  fqelement: "Label",
   ng2_providers: [GraphQlService],
   template: `
     <ul *ngIf="item.labels && item.labels.length > 0" class="row"

@@ -9,7 +9,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  fqelement: "dv-organization-label",
+  fqelement: "Label",
   ng2_providers: [GraphQlService]
 })
 export class AttachLabelsComponent {

@@ -3,7 +3,7 @@ import {GraphQlService} from "gql";
 
 
 @Widget({
-  fqelement: "dv-organization-allocator",
+  fqelement: "Allocator",
   template: `{{consumer.name}}`,
   ng2_providers: [GraphQlService]
 })

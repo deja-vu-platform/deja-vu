@@ -1,11 +1,11 @@
 const command_line_args = require("command-line-args");
 import {ClicheParser} from "./cliche_parser";
-import {AppParser} from "./app_parser";
-// import {GruntTask} from "mean-loader";
+import {AppParser, App} from "./app_parser";
+import {GruntTask} from "mean-loader";
 
 import * as fs from "fs";
 
-// const grunt = require("grunt");
+const grunt = require("grunt");
 
 const cli = command_line_args([
   {name: "file", alias: "f", type: String, defaultOption: true},
@@ -36,31 +36,26 @@ function main() {
     p = new ClicheParser();
   } else {
     p = new AppParser();
-  }
 
-  if (opts.debug) {
-    p.debug_match(opts.file);
-    return;
-  }
-/*
-  const pObj = p.parse(opts.file);
+    if (opts.debug) {
+      p.debug_match(opts.file);
+    } else {
+      const pObj: App = p.parse(opts.file);
 
-  grunt.task.init = () => ({});
-  if (p.isApp(pObj)) {
-    GruntTask.app_task(
-      grunt, pObj.fqelement,
-      pObj.widgets,
-      pObj.main_widget,
-      pObj.used_cliches,
-      pObj.used_widgets,
-      pObj.replace_map,
-      {"tbonds": pObj.tbonds, "fbonds": pObj.fbonds},
-      {"wbonds": pObj.wbonds},
-      pObj.data);
-    grunt.tasks(["dv-mean:test"]);
-  }*/
+      grunt.task.init = () => ({});
+      GruntTask.app_task(
+        grunt, pObj.fqelement,
+        pObj.widgets,
+        pObj.main_widget,
+        pObj.used_cliches,
+        pObj.used_widgets,
+        pObj.replace_map,
+        {"tbonds": pObj.tbonds, "fbonds": pObj.dfbonds},
+        {"wbonds": pObj.wfbonds},
+        pObj.data);
+      grunt.tasks(["dv-mean:test"]);
+    }
+  }
 }
-
-// have a pass here that generates the fbonds, wbonds and replacemap
 
 main();

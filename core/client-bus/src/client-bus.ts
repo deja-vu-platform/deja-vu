@@ -147,7 +147,7 @@ export interface WCompInfo {
 @Component({
   selector: "dv-widget",
   template:  "<div #widget></div>",
-  inputs: ["fqelement", "name", "fields", "hosts"]
+  inputs: ["of", "name", "fields", "hosts"]
 })
 export class WidgetLoader {
   @ViewChild("widget", {read: ViewContainerRef})
@@ -155,7 +155,7 @@ export class WidgetLoader {
 
   called: boolean;
 
-  fqelement: string;
+  of: string;
   name: string;
   fields;
   hosts;
@@ -184,7 +184,7 @@ export class WidgetLoader {
       this.c_hosts = this.c_hosts.concat(this.hosts);
     }
     this.c_hosts.push(host_widget_t);
-    const widget_t = {name: this.name, fqelement: this.fqelement};
+    const widget_t = {name: this.name, fqelement: this.of};
     if (widget_t.fqelement === undefined) {
       widget_t.fqelement = this._host_fqelement;
     }
@@ -222,8 +222,8 @@ export class WidgetLoader {
     if (this.called) return;
     this.called = true;
 
-    if (this.fqelement === undefined) {
-      this.fqelement = this._host_fqelement;
+    if (this.of === undefined) {
+      this.of = this._host_fqelement;
     }
 
     const adapt_table = this._adapt_table();
@@ -231,23 +231,23 @@ export class WidgetLoader {
     console.log(this._replace_map);
 
     let replace_field_map = {};
-    if (this._replace_map[this.fqelement] !== undefined &&
-        this._replace_map[this.fqelement][this._host_wname]) {
+    if (this._replace_map[this.of] !== undefined &&
+        this._replace_map[this.of][this._host_wname]) {
       const replace_widget = this.
-        _replace_map[this.fqelement][this._host_wname][this.name];
+        _replace_map[this.of][this._host_wname][this.name];
       if (replace_widget !== undefined) {
         console.log(
             `Replacing ${this.name} with ${replace_widget.replaced_by.name} ` +
             `of ${replace_widget.replaced_by.fqelement}`);
         this.name = replace_widget.replaced_by.name;
-        this.fqelement = replace_widget.replaced_by.fqelement;
+        this.of = replace_widget.replaced_by.fqelement;
         replace_field_map = replace_widget.map;
       }
     }
 
 
     return this._load_widget(
-        this.name, this.fqelement, adapt_table, replace_field_map);
+        this.name, this.of, adapt_table, replace_field_map);
   }
 
   private _load_widget(
@@ -256,15 +256,8 @@ export class WidgetLoader {
     if (fqelement === this._app) {
       imp = this._app;
     } else {
-      const fqelement_split = fqelement.split("-");
-      let imp_string_prefix = "";
-      if (fqelement_split.length === 4) {
-        imp_string_prefix = fqelement_split.slice(0, 3).join("-");
-      } else {
-        imp_string_prefix = fqelement;
-      }
       const d_name = _ustring.dasherize(name).slice(1);
-      imp = imp_string_prefix + `/lib/components/${d_name}/${d_name}`;
+      imp = fqelement + `/lib/components/${d_name}/${d_name}`;
     }
 
     console.log(`Loading ${name} of ${fqelement}`);
