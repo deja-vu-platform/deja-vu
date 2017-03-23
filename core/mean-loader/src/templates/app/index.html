@@ -23,11 +23,19 @@
 
       const packages_obj = {};
       for (const fqelement of Object.keys(cliches)) {
-        map_obj[fqelement] = "node_modules/" + cliches[fqelement];
+        const pkg = cliches[fqelement]
+        map_obj[fqelement] = "node_modules/" + pkg;
         packages_obj[fqelement] = regjs;
 
-        map_obj[cliches[fqelement]] = "node_modules/" + cliches[fqelement];
-        packages_obj[cliches[fqelement]] = regjs;
+        const cliche_name_split = pkg.split("-")[2];
+        const cliche_name = cliche_name_split.charAt(0).toUpperCase() +
+          cliche_name_split.slice(1).toLowerCase();
+
+        map_obj[cliche_name] = "node_modules/" + pkg;
+        packages_obj[cliche_name] = regjs;
+
+        map_obj[pkg] = "node_modules/" + pkg;
+        packages_obj[pkg] = regjs;
       }
 
       packages_obj["dv-dev"] = {main: "./main.js", defaultExtension: "js"};
