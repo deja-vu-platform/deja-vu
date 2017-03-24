@@ -19,6 +19,14 @@ export class EditPostComponent {
     this.editedContent = this.fields.post.content;
   }
 
+  startEditing() {
+    this.isEditing = true;
+  }
+
+  stopEditing() {
+    this.isEditing = false;
+  }
+
   onSubmit() {
     this._graphQlService
       .post(`
