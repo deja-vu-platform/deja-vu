@@ -9,13 +9,15 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  fqelement: "dv-organization-label",
+  fqelement: "Label",
   ng2_providers: [GraphQlService]
 })
 export class AttachLabelsComponent {
   item = {labels: [], atom_id: undefined};
   labels_text: string = "";
-  submit_ok = {value: false, on_change: undefined, on_after_change: undefined};
+  submit_ok = {
+    value: false, on_change: _ => undefined, on_after_change: _ => undefined
+  };
 
   constructor(private _graphQlService: GraphQlService) {}
 

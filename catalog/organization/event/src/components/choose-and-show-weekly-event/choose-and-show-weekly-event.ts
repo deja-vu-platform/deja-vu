@@ -28,7 +28,7 @@ export interface EventItem {
 }
 
 @Widget({
-  fqelement: "dv-organization-event",
+  fqelement: "Event",
   ng2_providers: [GraphQlService],
   external_styles: [
     `https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/` +

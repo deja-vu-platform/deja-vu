@@ -74,7 +74,7 @@ export class Mean {
     }
 
     this.ws.listen(this.locs[this.fqelement].split(":")[2], () => {
-      console.log(`Listening with opts ${JSON.stringify(this._opts)}`);
+      console.log(`Listening with opts ${JSON.stringify(this._opts, null, 2)}`);
     });
   }
 }
@@ -82,6 +82,7 @@ export class Mean {
 export interface UsedWidget {
   name: string;
   fqelement: string;
+  cliche: string;
 }
 
 export namespace GruntTask {
@@ -201,7 +202,7 @@ export namespace GruntTask {
       grunt, name: string, widgets: string[] = [], main?: string,
       cliches = {}, used_widgets: UsedWidget[] = [], replace_map = {},
       comp_info = {}, wcomp_info = {}, data = {}) {
-    const cliches_src = Object.keys(cliches)
+    const cliches_src = _u.uniq(_u.values(cliches))
         .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
                   "*.{js,html,css}");
     const deps = _u.values(module_map).concat(base_deps).concat(cliches_src);
@@ -221,7 +222,8 @@ export namespace GruntTask {
 
         const app_widgets_js: WidgetJs[] = widget_definitions(
           app_widgets(widgets, wcomp_info, data), data);
-        const cliche_widgets_js: WidgetJs[] = cliche_widgets(used_widgets);
+        const cliche_widgets_js: WidgetJs[] = cliche_widgets(
+          used_widgets, cliches);
         const all_widgets_js: WidgetJs[] = app_widgets_js
           .concat(cliche_widgets_js);
 
@@ -245,7 +247,7 @@ export namespace GruntTask {
           {match: "name", replacement: name},
           {match: "module_map", replacement: module_map},
           {match: "replace_map", replacement: replace_map},
-          {match: "cliches", replacement: _u.keys(cliches)},
+          {match: "cliches", replacement: cliches},
           {match: "comp_info", replacement: comp_info},
           {match: "wcomp_info", replacement: wcomp_info},
           {match: "mode", replacement: action},
@@ -360,15 +362,11 @@ export namespace GruntTask {
         .join(";");
   }
 
-  function cliche_widgets(cliche_widgets: UsedWidget[]): WidgetJs[] {
+  function cliche_widgets(cliche_widgets: UsedWidget[], cliches): WidgetJs[] {
     return _u.chain(cliche_widgets)
-      .map((cw: UsedWidget) => {
-        cw.fqelement = cliche(cw.fqelement);
-        return cw;
-      })
-      .unique(false, cw => cw.name + cw.fqelement)
+      .unique(false, cw => cw.name + cw.cliche)
       .map(cw => ({
-        import_stmt: imp(cw.name, cw.fqelement + "/lib"),
+        import_stmt: imp(cw.name, cliches[cw.fqelement] + "/lib"),
         class_name: component(cw.name),
         name: cw.name
       }))
@@ -402,6 +400,7 @@ export namespace GruntTask {
 
   interface ClicheServer {
     fqelement: string;
+    cliche: string; // pkg name
     loc: string;
     port: number;
     express_config;
@@ -409,19 +408,19 @@ export namespace GruntTask {
 
   function cliches_servers(cliches, name: string): ClicheServer[] {
     const ret = [];
-    ret.push({fqelement: name, loc: "http://localhost:3000"});
+    ret.push({
+      fqelement: name, loc: "http://localhost:3000",
+      cliche: `dv-samples-${name}`});
 
     let port = 3001;
-    _u.each(cliches, (instances_number, name) => {
-      for (let i = 1; i <= instances_number; ++i) {
-        const fqelement = (instances_number > 1) ? name + "-" + i : name;
-        ret.push({
-          fqelement: fqelement,
-          loc: "http://localhost:" + port,
-          port: port
-        });
-        ++port;
-      }
+    _u.each(cliches, (cliche, fqelement) => {
+      ret.push({
+        fqelement: fqelement,
+        loc: "http://localhost:" + port,
+        cliche: cliche,
+        port: port
+      });
+      ++port;
     });
     return ret;
   }
@@ -443,7 +442,7 @@ export namespace GruntTask {
         };
       } else {
         cs.express_config = {
-          script: `node_modules/${cliche(cs.fqelement)}/lib/app.js`,
+          script: `node_modules/${cs.cliche}/lib/app.js`,
           background: true,
           args: [
             `--fqelement=${cs.fqelement}`,
@@ -536,15 +535,6 @@ export namespace GruntTask {
 
   function component(w_name: string): string {
     return `${w_name}Component`;
-  }
-
-  function cliche(fqelement: string): string {
-    let ret = fqelement;
-    const fqelement_split = fqelement.split("-");
-    if (fqelement_split.length === 4) {
-      ret = fqelement_split.slice(0, -1).join("-");
-    }
-    return ret;
   }
 
   function config(deps: string[], t: string) {

@@ -6,10 +6,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({
-  fqelement: "dv-messaging-post",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "Post", ng2_providers: [GraphQlService]})
 export class PostsComponent implements OnInit {
   username: Username;
   posts: Post[];

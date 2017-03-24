@@ -16,10 +16,7 @@ export interface Item {
 }
 
 
-@Widget({
-  fqelement: "dv-organization-list",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "List", ng2_providers: [GraphQlService]})
 export class ShowListComponent {
   list = {atom_id: "", items: [], on_change: _ => undefined};
   fields = {};
