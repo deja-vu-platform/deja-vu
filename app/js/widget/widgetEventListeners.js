@@ -65,7 +65,10 @@ $('.components').on('click', '.component-name-container', function () {
     $(this).parent().addClass('selected');
     selectedUserWidget = userApp.getWidget(widgetId);
     if (!selectedUserWidget.isPage){
-        $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']').draggable('disable');
+        var dragHandle = $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']');
+        if (!dragHandle.draggable()){
+            dragHandle.draggable('disable');
+        }
     }
     workSurface.loadUserWidget(selectedUserWidget);
     style.setUpStyleColors(selectedUserWidget);
@@ -671,8 +674,8 @@ function refreshContainerDisplay(fresh, container, zoom){
     var widgetId = container.data('componentId');
 
 
-    if (widgetEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
-        var widgetToChange = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
+    if (selectedUserWidget.getPath(widgetId)){ // component exists
+        var widgetToChange = selectedUserWidget.getInnerWidget(widgetId);
 
         var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
         // var overallStyles = selectedUserWidget.properties.styles.custom;
@@ -893,19 +896,19 @@ var removeUserWidgetFromView = function(widgetId){
  * Deletes a component from the datatype and also from the view
  */
 function deleteWidgetFromUserWidgetAndFromView(widgetId) {
-    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+    var parent = selectedUserWidget.getInnerWidget(widgetId, true);
     parent.deleteInnerWidget(widgetId);
     removeUserWidgetFromView(widgetId);
     // TODO remove from list too?
 }
 
 function unlinkWidgetAndRemoveFromView(widgetId) {
-    var widget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
-    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+    var widget = selectedUserWidget.getInnerWidget(widgetId);
+    var parent = selectedUserWidget.getInnerWidget(widgetId, true);
     parent.deleteInnerWidget(widgetId);
     userApp.addWidget(widget);
     removeUserWidgetFromView(widgetId);
-    listDisplay.displayNewWidgetInUserWidgetList(widget.meta.name, widgetId, userApp.meta.id);
+    listDisplay.displayUnusedWidgetInList(widget.meta.name, widgetId, userApp.meta.id);
 }
 
 
@@ -931,7 +934,7 @@ function propagateRatioChangeToAllElts(newRatio, userWidget){
     grid.setUpGrid();
 }
 
-function addDeleteUserWidgetButton(userWidgetId){
+function addDeleteUserWidgetButton(userWidgetId, listElt){
     var spDelete = document.createElement('span');
     spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-component">' +
         '<span class="glyphicon glyphicon-trash"></span>' +
@@ -950,15 +953,6 @@ function addDeleteUserWidgetButton(userWidgetId){
             deleteUserWidget(userWidgetId);
         }
     });
-
-    var listElt;
-    if (userWidgetId in userApp.widgets.pages){
-        listElt = $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']");
-    } else if (userWidgetId in userApp.widgets.unused) {
-        listElt = $("#user-components-list").find("[data-componentid='" + userWidgetId + "']");
-    } else {
-        listElt = $("#widget-templates-list").find("[data-componentid='" + userWidgetId + "']");
-    }
 
     listElt.append(buttonDeleteUserWidget).hover(
         function(){
@@ -991,7 +985,7 @@ function deleteUserWidget(userWidgetId){
     $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
 
     if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
-        var otherIds = userApp.getAllWidgetIds();
+        var otherIds = userApp.getAllOuterWidgetIds();
         selectedUserWidget = userApp.getWidget(otherIds[0]);
         $("#user-cliches-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');

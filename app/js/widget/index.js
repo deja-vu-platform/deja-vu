@@ -77,7 +77,7 @@ $(function(){
         selectedProject.makeUserApp(userApp);
 
         selectedUserWidget = userApp.widgets.pages[Object.keys(userApp.widgets.pages)[0]];
-        listDisplay.displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+        //listDisplay.displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
 
         // TODO dry
         window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
@@ -91,34 +91,18 @@ $(function(){
         if (!$.isEmptyObject(userApp.widgets.pages)){
             widgetToLoadId = Object.keys(userApp.widgets.pages)[0];
             selectedUserWidget = userApp.widgets.pages[widgetToLoadId];
-            listDisplay.displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
-        } else {
+        } else if (!$.isEmptyObject(userApp.widgets.unused)){
             widgetToLoadId = Object.keys(userApp.widgets.unused)[0];
             selectedUserWidget = userApp.widgets.unused[widgetToLoadId];
-            listDisplay.displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
+        } else {
+            // todo make a new huan
         }
 
-        // TODO this will need to be changed once we bring in a userComponent which will be a
-        // superset of userWidgets
-
-        userApp.getAllWidgetIds().forEach(function(widgetId){
-            if (widgetId != widgetToLoadId){
-                var widgetName;
-                if (widgetId in userApp.widgets.pages){
-                    widgetName = userApp.widgets.pages[widgetId].meta.name;
-                    listDisplay.displayNewWidgetInMainPagesList(widgetName, widgetId, userAppId)
-                } else if (widgetId in userApp.widgets.unused){
-                    widgetName = userApp.widgets.unused[widgetId].meta.name;
-                    listDisplay.displayNewWidgetInUserWidgetList(widgetName, widgetId, userAppId);
-                } else {
-                    widgetName = userApp.widgets.templates[widgetId].meta.name;
-                    listDisplay.displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
-                }
-
-            }
-        });
 
     }
+    listDisplay.loadClicheIntoWidgetList(userApp, widgetToLoadId);
+    // Todo will also need to load other cliches
+
     workSurface.loadUserWidget(selectedUserWidget, currentZoom);
 
     //autoSave5Mins();
