@@ -61,8 +61,9 @@ $('.components').on('click', '.component-name-container', function () {
     }
 
     var widgetId = $(this).parent().data('componentid');
-    $('.selected').removeClass('selected');
-    $(this).parent().addClass('selected');
+    listDisplay.select(widgetId);
+    //$('.selected').removeClass('selected');
+    //$(this).parent().addClass('selected');
     selectedUserWidget = userApp.getWidget(widgetId);
     if (!selectedUserWidget.isPage){
         var dragHandle = $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']');

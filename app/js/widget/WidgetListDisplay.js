@@ -67,9 +67,8 @@ var WidgetListDisplay = function(){
     };
 
     that.displayUserWidgetInListAndSelect = function(name, id, clicheId){
-        $('.selected').removeClass("selected");
         that.displayUnusedWidgetInList(name,id, clicheId);
-        $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected').draggable('disable');
+        that.select(id);
     };
 
     /**
@@ -136,9 +135,8 @@ var WidgetListDisplay = function(){
     };
 
     that.displayMainPageInListAndSelect = function(name, id, clicheId){
-        $('.selected').removeClass("selected");
         var listElt = that.displayNewWidgetInMainPagesList(name,id, clicheId);
-        $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
+        that.select(id);
         return listElt;
     };
 
@@ -160,12 +158,15 @@ var WidgetListDisplay = function(){
     };
 
     that.displayNewWidgetTemplateInListAndSelect = function(name, id, clicheId){
-        $('.selected').removeClass("selected");
         var listElt = that.displayNewWidgetTemplateInList(name,id, clicheId);
-        $('#widget-templates-list').find("[data-componentid='" + id + "']").addClass('selected');
+        that.select(id);
         return listElt;
     };
 
+    that.select = function(id){
+        $('.selected').removeClass("selected");
+        $("[data-componentid='" + id + "']").addClass('selected');
+    };
 
 
 
