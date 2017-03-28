@@ -202,7 +202,7 @@ var WidgetContainer = function(){
             // TODO these functions should be somewhere else
             var copy = createUserWidgetCopy(widget);
             userApp.addTemplate(copy);
-            displayNewWidgetTemplateInList(copy.meta.name, copy.meta.id, userApp.meta.id);
+            listDisplay.displayNewWidgetTemplateInList(copy.meta.name, copy.meta.id, userApp.meta.id);
 
         });
 

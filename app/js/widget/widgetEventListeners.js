@@ -10,7 +10,7 @@ $('#new-user-component-btn').click(function(){
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, false);
             userApp.addWidget(selectedUserWidget);
-            displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+            listDisplay.displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id, userApp.meta.id);
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
 
@@ -23,7 +23,7 @@ $('#new-main-component-btn').click(function(){
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, true);
             userApp.addPage(selectedUserWidget);
-            displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+            listDisplay.displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id, userApp.meta.id);
 
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
@@ -36,7 +36,7 @@ $('#new-widget-template-btn').click(function(){
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, false);
             userApp.addTemplate(selectedUserWidget);
-            displayNewWidgetTemplateInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+            listDisplay.displayNewWidgetTemplateInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id, userApp.meta.id);
 
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
@@ -155,9 +155,9 @@ function setWidgetOptions(outerWidget){
 
             if (originalId in userApp.widgets.pages){
                 userApp.addPage(copyWidget);
-                displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
+                listDisplay.displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             } else {
-                displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
+                listDisplay.displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
             }
 
             userApp.addWidget(copyWidget);
@@ -232,83 +232,12 @@ function setUpWidgetOptionsIndexPageToggle(outerWidget){
 
 /** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
 
-function displayUserWidgetInListAndSelect(name, id, clicheId){
-    $('.selected').removeClass("selected");
-    displayNewWidgetInUserWidgetList(name,id, clicheId);
-    $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected').draggable('disable');
-}
-
-/**
- * Adds a component to the list of user components
- * @param newComponent
- */
-function displayNewWidgetInUserWidgetList(name, id, clicheId){
-    // TODO changes in style
-    var newWidgetElt = $(
-        '<li data-type="'+'user'+'" class="widget draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
-        + '<div class="component-name-container">'
-        + '<span class="component-name">' + name + '</span>'
-        + '<span class="submit-rename not-displayed">'
-        + '<input type="text" class="new-name-input form-control" autofocus>'
-        + '</span>'
-        + '</div>'
-        + '</li>');
-    $('#user-components-list').append(newWidgetElt);
-    addDeleteUserWidgetButton(id);
-    // registerUserWidgetAsDraggableForMainPages(id);
-    dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
-}
 
 
-/**
- * Adds a component to the list of main pages
- * @param newComponent
- */
-function displayNewWidgetInMainPagesList(name, id, clicheId){
-    // TODO changes in style
-    var newWidgetElt = $(
-        '<li data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
-        + '<div class="component-name-container">'
-        + '<div class="component-name">' + name + '</div>'
-        + '<div class="submit-rename not-displayed">'
-        + '<input type="text" class="new-name-input form-control" autofocus>'
-        + '</div>'
-        + '</div>'
-        + '<div class="index-page-toggle">'
-        + '</div>'
-        + '</li>');
-    $('#main-pages-list').append(newWidgetElt);
-    addDeleteUserWidgetButton(id);
-    // registerUserWidgetAsDraggableForMainPages(id);
-}
 
-function displayMainPageInListAndSelect(name, id, clicheId){
-    $('.selected').removeClass("selected");
-    displayNewWidgetInMainPagesList(name,id, clicheId);
-    $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
-}
 
-function displayNewWidgetTemplateInList(name, id, clicheId){
-    // TODO changes in style
-    var newWidgetElt = $(
-        '<li data-type="'+'user'+'" class="widget draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
-        + '<div class="component-name-container">'
-        + '<div class="component-name">' + name + '</div>'
-        + '<div class="submit-rename not-displayed">'
-        + '<input type="text" class="new-name-input form-control" autofocus>'
-        + '</div>'
-        + '</div>'
-        + '</li>');
-    $('#widget-templates-list').append(newWidgetElt);
-    addDeleteUserWidgetButton(id);
-    dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
-}
 
-function displayNewWidgetTemplateInListAndSelect(name, id, clicheId){
-    $('.selected').removeClass("selected");
-    displayNewWidgetTemplateInList(name,id, clicheId);
-    $('#widget-templates-list').find("[data-componentid='" + id + "']").addClass('selected');
-}
+
 
 
 /**
@@ -976,7 +905,7 @@ function unlinkWidgetAndRemoveFromView(widgetId) {
     parent.deleteInnerWidget(widgetId);
     userApp.addWidget(widget);
     removeUserWidgetFromView(widgetId);
-    displayNewWidgetInUserWidgetList(widget.meta.name, widgetId, userApp.meta.id);
+    listDisplay.displayNewWidgetInUserWidgetList(widget.meta.name, widgetId, userApp.meta.id);
 }
 
 

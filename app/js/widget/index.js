@@ -7,6 +7,7 @@ var workSurface = WidgetWorkSurface();
 var zoomElement = WidgetZoomElement();
 var miniNav = WidgetMiniNav();
 var view = WidgetDisplay();
+var listDisplay = WidgetListDisplay();
 var dragAndDrop = WidgetDragAndDropController();
 var grid = WidgetGrid();
 var widgetEditsManager = WidgetEditsManager();
@@ -76,7 +77,7 @@ $(function(){
         selectedProject.makeUserApp(userApp);
 
         selectedUserWidget = userApp.widgets.pages[Object.keys(userApp.widgets.pages)[0]];
-        displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
+        listDisplay.displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id);
 
         // TODO dry
         window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
@@ -90,11 +91,11 @@ $(function(){
         if (!$.isEmptyObject(userApp.widgets.pages)){
             widgetToLoadId = Object.keys(userApp.widgets.pages)[0];
             selectedUserWidget = userApp.widgets.pages[widgetToLoadId];
-            displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
+            listDisplay.displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         } else {
             widgetToLoadId = Object.keys(userApp.widgets.unused)[0];
             selectedUserWidget = userApp.widgets.unused[widgetToLoadId];
-            displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
+            listDisplay.displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId);
         }
 
         // TODO this will need to be changed once we bring in a userComponent which will be a
@@ -105,13 +106,13 @@ $(function(){
                 var widgetName;
                 if (widgetId in userApp.widgets.pages){
                     widgetName = userApp.widgets.pages[widgetId].meta.name;
-                    displayNewWidgetInMainPagesList(widgetName, widgetId, userAppId)
+                    listDisplay.displayNewWidgetInMainPagesList(widgetName, widgetId, userAppId)
                 } else if (widgetId in userApp.widgets.unused){
                     widgetName = userApp.widgets.unused[widgetId].meta.name;
-                    displayNewWidgetInUserWidgetList(widgetName, widgetId, userAppId);
+                    listDisplay.displayNewWidgetInUserWidgetList(widgetName, widgetId, userAppId);
                 } else {
                     widgetName = userApp.widgets.templates[widgetId].meta.name;
-                    displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
+                    listDisplay.displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
                 }
 
             }

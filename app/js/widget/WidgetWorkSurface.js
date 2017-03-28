@@ -77,7 +77,7 @@ var WidgetWorkSurface = function(){
                     dragHandle.text(innerWidget.meta.name);
                     dragHandle.css('display', 'block');
                 }
-                dragHandle.addClass('associated').data('componentid', widgetId);
+                dragHandle.addClass('associated').data('componentid', widgetId).data('clicheid', userApp.meta.id); // TODO is this always userApp?
             }
 
             if (isThisEditable){
