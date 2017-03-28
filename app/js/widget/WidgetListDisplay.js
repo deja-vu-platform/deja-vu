@@ -72,9 +72,10 @@ var WidgetListDisplay = function(){
             '<li data-type="'+'user'+'" class="widget" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
             + '<div class="component-name-container">'
             + '<span class="component-name">' + name + '</span>'
-            + '<span class="submit-rename not-displayed">'
+            + '<div class="submit-rename not-displayed">'
             + '<input type="text" class="new-name-input form-control" autofocus>'
-            + '</span>'
+            + '</div>'
+            + '<div class="delete-button-container"></div>'
             + '</div>'
             + '<ul class="inner-widgets"></ul>'
             + '</li>');
@@ -90,9 +91,10 @@ var WidgetListDisplay = function(){
             '<li data-type="'+'user'+'" class="widget not-draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
             + '<div class="component-name-container">'
             + '<span class="component-name">' + name + '</span>'
-            + '<span class="submit-rename not-displayed">'
+            + '<div class="submit-rename not-displayed">'
             + '<input type="text" class="new-name-input form-control" autofocus>'
-            + '</span>'
+            + '</div>'
+            + '<div class="delete-button-container"></div>'
             + '</div>'
             + '<ul class="inner-widgets"></ul>'
             + '</li>');
@@ -118,6 +120,7 @@ var WidgetListDisplay = function(){
             + '</div>'
             + '<div class="index-page-toggle">'
             + '</div>'
+            + '<div class="delete-button-container"></div>'
             + '<ul class="inner-widgets"></ul>'
             + '</li>');
         $('#main-pages-list').append(newWidgetElt);
@@ -130,10 +133,11 @@ var WidgetListDisplay = function(){
         var newWidgetElt = $(
             '<li data-type="'+'user'+'" class="widget" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
             + '<div class="component-name-container">'
-            + '<div class="component-name">' + name + '</div>'
-            + '<div class="submit-rename not-displayed">'
-            + '<input type="text" class="new-name-input form-control" autofocus>'
-            + '</div>'
+                + '<div class="component-name">' + name + '</div>'
+                + '<div class="submit-rename not-displayed">'
+                    + '<input type="text" class="new-name-input form-control" autofocus>'
+                + '</div>'
+                + '<div class="delete-button-container"></div>'
             + '</div>'
             + '<ul class="inner-widgets"></ul>'
             + '</li>');

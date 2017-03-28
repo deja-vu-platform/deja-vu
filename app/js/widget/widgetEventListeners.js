@@ -54,10 +54,13 @@ $('.components').on('click', '.component-name-container', function () {
     var oldState = {zoom : currentZoom};
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
     $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
-    if (!selectedUserWidget.isPage){
-        $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']').draggable('enable');
-    }
-
+    $('.widget').each(function(idx, elt){
+        elt = $(elt);
+        if (elt.data('draggable')){
+            elt.draggable('enable');
+        }
+    });
+    dragAndDrop.registerWidgetDragHandleDraggable();
     var widgetId = $(this).parent().data('componentid');
     listDisplay.select(widgetId);
     //$('.selected').removeClass('selected');
@@ -65,7 +68,7 @@ $('.components').on('click', '.component-name-container', function () {
     selectedUserWidget = userApp.getWidget(widgetId);
     if (!selectedUserWidget.isPage){
         var dragHandle = $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']');
-        if (!dragHandle.draggable()){
+        if (dragHandle.data('draggable')){
             dragHandle.draggable('disable');
         }
     }
@@ -926,15 +929,12 @@ function propagateRatioChangeToAllElts(newRatio, userWidget){
 }
 
 function addDeleteUserWidgetButton(userWidgetId, listElt){
-    var spDelete = document.createElement('span');
-    spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-component">' +
+    var buttonDeleteUserWidget = $('<button type="button" class="btn btn-default btn-delete-component">' +
         '<span class="glyphicon glyphicon-trash"></span>' +
-        '</button>';
+        '</button>');
+    buttonDeleteUserWidget.attr('id', 'btn-delete-component_'+userWidgetId);
 
-    var buttonDeleteUserWidget = spDelete.firstChild;
-    buttonDeleteUserWidget.id = 'btn-delete-component_'+userWidgetId;
-
-    $(buttonDeleteUserWidget).on("click", function (e) {
+    buttonDeleteUserWidget.on("click", function (e) {
         if (userApp.getNumWidgets() == 1){
             return; //don't delete the last one TODO is the the right way to go?
         }
@@ -945,19 +945,20 @@ function addDeleteUserWidgetButton(userWidgetId, listElt){
         }
     });
 
-    listElt.append(buttonDeleteUserWidget).hover(
+    listElt.find('.delete-button-container').append(buttonDeleteUserWidget);
+    listElt.hover(
         function(){
             $(this).find('.component-name-container').css({
                 width: '70%'
             });
-            $(this).find('.btn-delete-component').css({
+            $(this).find('.delete-button-container').css({
                 display: 'inline-block',
             });
         }, function(){
             $(this).find('.component-name-container').css({
                 width: '95%'
             });
-            $(this).find('.btn-delete-component').css({
+            $(this).find('.delete-button-container').css({
                 display: 'none',
 
             });
