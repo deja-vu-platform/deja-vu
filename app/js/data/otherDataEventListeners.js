@@ -220,7 +220,7 @@ function deleteUserWidget(userWidgetId){
     $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
 
     if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
-        var otherIds = userApp.getAllOuterWidgetIds();
+        var otherIds = userApp.getAllWidgetIds();
         selectedUserWidget = userApp.getWidget(otherIds[0]);
         $("#user-cliches-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');

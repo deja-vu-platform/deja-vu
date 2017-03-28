@@ -8,7 +8,7 @@ var WidgetListDisplay = function(){
     var recursivelyLoadWidgetIntoList = function(widget, clicheId, listElt){
         var innerWidgetsInfoList = widget.getAllInnerWidgetsIds();
 
-        var ul = $('<ul>');
+        var list = [];
 
         innerWidgetsInfoList.forEach(function(innerWidgetId){
             var widgetInfo = widget.getInnerWidget(innerWidgetId).meta;
@@ -16,48 +16,44 @@ var WidgetListDisplay = function(){
                 '<li data-type="'+'user'+'" class="widget not-draggable inner-widget" data-componentid="' + widgetInfo.id + '" data-clicheid=' + clicheId + '>'
                 + '<div class="component-name-container">'
                 + '<span class="component-name">' + widgetInfo.name + '</span>'
+                + '<div class="submit-rename not-displayed">'
+                + '<input type="text" class="new-name-input form-control" autofocus>'
+                + '</div>'
                 + '</div>'
                 + '</li>');
-            ul.append(elt);
+            list.push(elt);
         });
-        listElt.find('.inner-widgets').append(ul);
+        listElt.find('.inner-widgets').append(list);
 
-        return ul;
+        return list;
     };
 
     that.loadClicheIntoWidgetList = function(cliche, widgetToLoadId){
         var usedWidgetsIds = cliche.getAllUsedWidgetIds();
+        console.log(usedWidgetsIds);
         var userAppId = userApp.meta.id;
         if (cliche.meta.id == userAppId){
-            if (widgetToLoadId in userApp.widgets.pages){
-                var listElt = that.displayMainPageInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId, userAppId);
-            } else {
-                var listElt = that.displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, widgetToLoadId, userAppId);
-            }
-
-            recursivelyLoadWidgetIntoList(userApp.widgets.pages[widgetToLoadId], userAppId, listElt);
-
             userApp.getAllOuterWidgetIds().forEach(function(widgetId){
-                if (widgetId != widgetToLoadId){
-                    var widgetName;
-                    if (widgetId in userApp.widgets.pages){
-                        widgetName = userApp.widgets.pages[widgetId].meta.name;
-                        var listElt = that.displayNewWidgetInMainPagesList(widgetName, widgetId, userAppId);
-                        recursivelyLoadWidgetIntoList(userApp.widgets.pages[widgetId], userAppId, listElt);
-                    } else if (widgetId in userApp.widgets.unused){
-                        widgetName = userApp.widgets.unused[widgetId].meta.name;
-                        var listElt = that.displayUnusedWidgetInList(widgetName, widgetId, userAppId);
-                        recursivelyLoadWidgetIntoList(userApp.widgets.unused[widgetId], userAppId, listElt);
-                    } else if (widgetId in userApp.widgets.templates) {
-                        widgetName = userApp.widgets.templates[widgetId].meta.name;
-                        that.displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
-                    }
-
+                var widgetName;
+                if (widgetId in userApp.widgets.pages){
+                    widgetName = userApp.widgets.pages[widgetId].meta.name;
+                    var listElt = displayNewWidgetInMainPagesList(widgetName, widgetId, userAppId);
+                    recursivelyLoadWidgetIntoList(userApp.widgets.pages[widgetId], userAppId, listElt);
+                } else if (widgetId in userApp.widgets.unused){
+                    widgetName = userApp.widgets.unused[widgetId].meta.name;
+                    var listElt = displayUnusedWidgetInList(widgetName, widgetId, userAppId);
+                    recursivelyLoadWidgetIntoList(userApp.widgets.unused[widgetId], userAppId, listElt);
+                } else if (widgetId in userApp.widgets.templates) {
+                    widgetName = userApp.widgets.templates[widgetId].meta.name;
+                    displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
                 }
             });
+            if (widgetToLoadId){
+                that.select(widgetToLoadId);
+            }
             usedWidgetsIds.forEach(function(id){
                 var widget = cliche.getWidget(id);
-                var listElt = that.displayUsedWidgetInList(widget.meta.name, widget.meta.id, userAppId);
+                var listElt = displayUsedWidgetInList(widget.meta.name, widget.meta.id, userAppId);
                 recursivelyLoadWidgetIntoList(widget, userAppId, listElt);
             });
 
@@ -66,19 +62,14 @@ var WidgetListDisplay = function(){
         }
     };
 
-    that.displayUserWidgetInListAndSelect = function(name, id, clicheId){
-        that.displayUnusedWidgetInList(name,id, clicheId);
-        that.select(id);
-    };
-
     /**
      * Adds a component to the list of user components
      * @param newComponent
      */
-    that.displayUnusedWidgetInList = function(name, id, clicheId){
+    var displayUnusedWidgetInList = function(name, id, clicheId){
         // TODO changes in style
         var newWidgetElt = $(
-            '<li data-type="'+'user'+'" class="widget draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
+            '<li data-type="'+'user'+'" class="widget" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
             + '<div class="component-name-container">'
             + '<span class="component-name">' + name + '</span>'
             + '<span class="submit-rename not-displayed">'
@@ -89,11 +80,11 @@ var WidgetListDisplay = function(){
             + '</li>');
         $('#user-components-list').append(newWidgetElt);
         addDeleteUserWidgetButton(id, newWidgetElt);
-        // registerUserWidgetAsDraggableForMainPages(id);
         dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
+        return newWidgetElt;
     };
 
-    that.displayUsedWidgetInList = function(name, id, clicheId){
+    var displayUsedWidgetInList = function(name, id, clicheId){
         // TODO changes in style
         var newWidgetElt = $(
             '<li data-type="'+'user'+'" class="widget not-draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
@@ -115,7 +106,7 @@ var WidgetListDisplay = function(){
      * Adds a component to the list of main pages
      * @param newComponent
      */
-    that.displayNewWidgetInMainPagesList = function(name, id, clicheId){
+    var displayNewWidgetInMainPagesList = function(name, id, clicheId){
         // TODO changes in style
         var newWidgetElt = $(
             '<li data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
@@ -134,16 +125,10 @@ var WidgetListDisplay = function(){
         return newWidgetElt;
     };
 
-    that.displayMainPageInListAndSelect = function(name, id, clicheId){
-        var listElt = that.displayNewWidgetInMainPagesList(name,id, clicheId);
-        that.select(id);
-        return listElt;
-    };
-
-    that.displayNewWidgetTemplateInList = function(name, id, clicheId){
+    var displayNewWidgetTemplateInList = function(name, id, clicheId){
         // TODO changes in style
         var newWidgetElt = $(
-            '<li data-type="'+'user'+'" class="widget draggable" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
+            '<li data-type="'+'user'+'" class="widget" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
             + '<div class="component-name-container">'
             + '<div class="component-name">' + name + '</div>'
             + '<div class="submit-rename not-displayed">'
@@ -157,21 +142,15 @@ var WidgetListDisplay = function(){
         dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
     };
 
-    that.displayNewWidgetTemplateInListAndSelect = function(name, id, clicheId){
-        var listElt = that.displayNewWidgetTemplateInList(name,id, clicheId);
-        that.select(id);
-        return listElt;
-    };
-
     that.select = function(id){
         $('.selected').removeClass("selected");
         $("[data-componentid='" + id + "']").addClass('selected');
     };
 
-
-
-
-
+    that.refresh = function(){
+        $('.widget-list').html("");
+        that.loadClicheIntoWidgetList(userApp, selectedUserWidget.meta.id);
+    };
 
     Object.freeze(that);
     return that;

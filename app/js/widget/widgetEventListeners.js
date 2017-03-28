@@ -10,7 +10,7 @@ $('#new-user-component-btn').click(function(){
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, false);
             userApp.addWidget(selectedUserWidget);
-            listDisplay.displayUserWidgetInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id, userApp.meta.id);
+            listDisplay.refresh();
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
 
@@ -23,8 +23,7 @@ $('#new-main-component-btn').click(function(){
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, true);
             userApp.addPage(selectedUserWidget);
-            listDisplay.displayMainPageInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id, userApp.meta.id);
-
+            listDisplay.refresh();
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
@@ -36,8 +35,7 @@ $('#new-widget-template-btn').click(function(){
         .on('click', function () {
             selectedUserWidget = initUserWidget(false, false);
             userApp.addTemplate(selectedUserWidget);
-            listDisplay.displayNewWidgetTemplateInListAndSelect(selectedUserWidget.meta.name, selectedUserWidget.meta.id, userApp.meta.id);
-
+            listDisplay.refresh();
             workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
             style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
@@ -153,17 +151,9 @@ function setWidgetOptions(outerWidget){
         .unbind()
         .click(function(){
             var copyWidget = duplicateUserWidget(outerWidget);
-            var originalId = copyWidget.meta.id;
             // change the id
             copyWidget.meta.id = generateId();
-
-            if (originalId in userApp.widgets.pages){
-                userApp.addPage(copyWidget);
-                listDisplay.displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
-            } else {
-                listDisplay.displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
-            }
-
+            listDisplay.refresh();
             userApp.addWidget(copyWidget);
             selectedUserWidget = copyWidget;
             workSurface.loadUserWidget(copyWidget, 1);
@@ -900,7 +890,7 @@ function deleteWidgetFromUserWidgetAndFromView(widgetId) {
     var parent = selectedUserWidget.getInnerWidget(widgetId, true);
     parent.deleteInnerWidget(widgetId);
     removeUserWidgetFromView(widgetId);
-    // TODO remove from list too?
+    listDisplay.refresh();
 }
 
 function unlinkWidgetAndRemoveFromView(widgetId) {
@@ -909,7 +899,7 @@ function unlinkWidgetAndRemoveFromView(widgetId) {
     parent.deleteInnerWidget(widgetId);
     userApp.addWidget(widget);
     removeUserWidgetFromView(widgetId);
-    listDisplay.displayUnusedWidgetInList(widget.meta.name, widgetId, userApp.meta.id);
+    listDisplay.refresh();
 }
 
 
@@ -986,19 +976,14 @@ function deleteUserWidget(userWidgetId){
     $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
 
     if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
-        var otherIds = userApp.getAllOuterWidgetIds();
+        var otherIds = userApp.getAllWidgetIds();
         selectedUserWidget = userApp.getWidget(otherIds[0]);
-        $("#user-cliches-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        $("#widget-templates-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         workSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
     if (userWidgetId == userApp.widgets.indexId){
         userApp.widgets.indexId = null;
     }
-    $("#user-cliches-list").find("[data-componentid='" + userWidgetId + "']").remove();
-    $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
-    $("#widget-templates-list").find("[data-componentid='" + userWidgetId + "']").remove();
+    listDisplay.refresh();
 }
 
 function openDeleteUserWidgetConfirmDialogue(userWidgetId){

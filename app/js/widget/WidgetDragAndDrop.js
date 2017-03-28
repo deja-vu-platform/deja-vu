@@ -200,7 +200,7 @@ var WidgetDragAndDropController = function () {
                     delete userApp.widgets.unused[widgetId];
                     $("#user-components-list").find("[data-componentid='" + widgetId + "']").remove();
                 }
-
+                listDisplay.refresh();
             }
         };
     };

@@ -202,8 +202,13 @@ ClicheWithDisplay.prototype.getAllOuterWidgetIds = function(){
     var pages = Object.keys(this.widgets.pages);
     var unused = Object.keys(this.widgets.unused);
     var templates = Object.keys(this.widgets.templates);
-    var used = this.getAllUsedWidgetIds()
-    return pages.concat(unused).concat(templates).concat(used);
+    return pages.concat(unused).concat(templates);
+};
+
+ClicheWithDisplay.prototype.getAllWidgetIds = function(){
+    var allOuterWidgetIds = this.getAllOuterWidgetIds();
+    var used = this.getAllUsedWidgetIds();
+    return allOuterWidgetIds.concat(used);
 };
 
 ClicheWithDisplay.prototype.getAllUsedWidgetIds = function(){
@@ -223,31 +228,22 @@ ClicheWithDisplay.prototype.getAllUsedWidgetIds = function(){
 
 var findUsedWidget = function(cliche, wantedWidgetId){
     var wantedWidget = null;
-    var findUsedWidgetHelper = function(widget, targetId){
-        if (widget.meta){
-            var widgetId = widget.meta.id;
-            if (widgetId == targetId){
-                wantedWidget = widget;
-            } else {
-                for (var id in widget.innerWidgets){
-                    findUsedWidgetHelper(widget.innerWidgets[id], targetId);
-                }
-            }
-        }
-    };
 
     for (var widgetId in cliche.widgets.pages){
         var outermostWidget = cliche.widgets.pages[widgetId];
-        findUsedWidgetHelper(outermostWidget, wantedWidgetId);
+        var innerWidget = outermostWidget.getInnerWidget(wantedWidgetId);
+        if (innerWidget){
+            wantedWidget = innerWidget;
+        }
     }
     for (var widgetId in cliche.widgets.unused){
         var outermostWidget = cliche.widgets.unused[widgetId];
-        findUsedWidgetHelper(outermostWidget, wantedWidgetId);
+        var innerWidget = outermostWidget.getInnerWidget(wantedWidgetId);
+        if (innerWidget){
+            wantedWidget = innerWidget;
+        }
     }
 
-    if (wantedWidget){
-        wantedWidget = UserWidget.fromObject(wantedWidget);
-    }
     return wantedWidget;
 };
 

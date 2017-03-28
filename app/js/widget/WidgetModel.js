@@ -131,7 +131,7 @@ UserWidget.prototype.getInnerWidget = function(targetId, forParent){
         var path = outermostWidget.getPath(targetId);
         targetId = path[path.length-2];
     }
-    var wantedWidget;
+    var wantedWidget = null;
     var getInnerWidgetHelper = function(widget, targetId){
         if (widget.meta){
             var widgetId = widget.meta.id;
@@ -146,11 +146,15 @@ UserWidget.prototype.getInnerWidget = function(targetId, forParent){
         }
     };
     getInnerWidgetHelper(outermostWidget, targetId);
+    if (wantedWidget){
+        wantedWidget = UserWidget.fromObject(wantedWidget);
+    }
+
     return wantedWidget;
 };
 
 
-
+// Note: returns only one copy!
 UserWidget.prototype.getAllInnerWidgetsIds = function() {
     var innerWidgetsInfoList = [];
 
