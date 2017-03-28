@@ -5,21 +5,6 @@
 /** ** ** ** ** ** Menu Event Handlers ** ** ** ** ** **/
 // TODO on user component name input check for special chars
 
-$('#new-user-datatype-btn').click(function(){
-    $('#create-component').unbind()
-        .on('click', function () {
-            var name = sanitizeStringOfSpecialChars($('#new-component-name').val());
-            var datatypeInfo = initDatatype();
-            var datatype = datatypeInfo[0];
-            var datatypeDisplayProps = datatypeInfo[1];
-            userApp.addDatatype(datatype, datatypeDisplayProps);
-            selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id);
-            displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
-            // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
-            // TODO add to overall and to userApp display
-            resetMenuOptions();
-    });
-});
 
 
 
@@ -74,11 +59,11 @@ $('.components').on('keypress', '.new-name-input', function (event) {
 });
 
 /** ** ** ** ** ** ** ** ** ** ** ** Component Options ** ** ** ** ** ** ** ** ** ** ** ** **/
-function setDatatypeOptions(outerWidget){
+function setDatatypeOptions(cliche){
     // renaming
 
     $('.component-options .component-name')
-        .text(outerWidget.meta.name)
+        .text(cliche.meta.name)
         .unbind()
         .on('dblclick', function () {
             var newNameInputElt = $($(this).parent().find('.new-name-input'));
@@ -105,52 +90,19 @@ function setDatatypeOptions(outerWidget){
                 if (newName.length === 0) { // empty string entered, don't change the name!
                     return;
                 }
-                $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.component-name').text(newName);
+                $('.components').find('[data-componentid='+cliche.meta.id+']').find('.component-name').text(newName);
 
                 widgetNameElt.text($(this).val());
 
-                outerWidget.meta.name = $(this).val();
+                cliche.meta.name = $(this).val();
             }
-        });
-
-    // copy
-    $('.component-options #btn-duplicate-component')
-        .unbind()
-        .click(function(){
-            var copyWidget = duplicateUserWidget(outerWidget);
-            var originalId = copyWidget.meta.id;
-            // change the id
-            copyWidget.meta.id = generateId();
-
-            if (originalId in selectedProject.userApp){
-                selectedProject.addPage(copyWidget);
-                displayMainPageInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
-            } else {
-                displayUserWidgetInListAndSelect(copyWidget.meta.name, copyWidget.meta.id);
-            }
-
-            selectedProject.addCliche(copyWidget);
-            selectedUserWidget = copyWidget;
-            dataWorkSurface.loadUserWidget(copyWidget, 1);
-
-        });
-
-    $('.component-options #btn-download-component').unbind().on('click', function(){
-        downloadHTML();
-    });
-
-    // clear all
-    $('.component-options #btn-clear-all')
-        .unbind()
-        .on("click", function (e) {
-            clearAll();
         });
 
     // delete
     $('.component-options .btn-delete-component')
         .unbind()
         .on("click", function (e) {
-            var id = outerWidget.meta.id;
+            var id = cliche.meta.id;
             if (confirmOnUserWidgetDelete){
                 if (selectedProject.numComponents === 1){
                     return; //don't delete the last one TODO is the the right way to go?
@@ -161,51 +113,10 @@ function setDatatypeOptions(outerWidget){
             }
         });
 
-    // if the component is in the main pages, set it up accordingly
-    if (outerWidget.meta.id == selectedProject.userApp){
-        $('.component-options #btn-index-page-toggle').css({
-            display: 'inline-block',
-        });
-        setUpWidgetOptionsIndexPageToggle(outerWidget);
-    } else {
-        $('.component-options #btn-index-page-toggle').css({
-            display: 'none',
-        })
-    }
 
-
-}
-
-function setUpWidgetOptionsIndexPageToggle(outerWidget){
-    if (outerWidget.meta.id == selectedProject.userApp.indexId){
-        $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
-        $('.component-options #btn-index-page-toggle').find('.text').text('Unassign as Index Page');
-        $('.components').find('[data-componentid='+outerWidget.meta.id+']').addClass('selected-index-page');
-
-        $('.component-options #btn-index-page-toggle').unbind().click(function(){
-            $(this).find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
-            $(this).find('.text').text('Assign as Index Page');
-            $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
-        });
-    } else {
-        $('.component-options #btn-index-page-toggle').find('.glyphicon').removeClass('glyphicon-remove').addClass('glyphicon-plus');
-        $('.component-options #btn-index-page-toggle').find('.text').text('Assign as Index Page');
-        $('.component-options #btn-index-page-toggle').unbind().click(function(){
-            $(this).find('.glyphicon').removeClass('glyphicon-plus').addClass('glyphicon-remove');
-            $(this).find('.text').text('Unassign as Index Page');
-            $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.index-page-toggle').trigger('click');
-        });
-
-    }
 }
 
 /** ** ** ** ** ** Component Adding to Project and display helpers ** ** ** ** ** ** ** ** ** **/
-
-function displayDatatypeInListAndSelect(name, id, clicheId){
-    $('.selected').removeClass("selected");
-    displayNewDatatypeInUserDatatypeList(name,id, clicheId);
-    $("#user-components-list").find("[data-componentid='" + id + "']").addClass('selected');
-}
 
 
 /**
@@ -214,7 +125,14 @@ function displayDatatypeInListAndSelect(name, id, clicheId){
  */
 function displayNewClicheInList(cliche){
     // TODO changes in style
-    var dropdownId = cliche.meta.id+'_datatypes';
+    var clicheId = cliche.meta.id;
+    var dropdownId = clicheId+'_datatypes';
+    var isUserApp = (clicheId == userApp.meta.id);
+
+    var newDTButton = isUserApp? '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-datatype-btn">'
+    +'<span class="glyphicon glyphicon-plus"></span>'
+    +'</button>': "";
+
     var newClicheElt = $(
         '<div class="user-components page-component-toggle-drop">'+
         '<div class="header">'+
@@ -222,12 +140,7 @@ function displayNewClicheInList(cliche){
         '<span class="glyphicon glyphicon-triangle-bottom"></span>'+
         cliche.meta.name+
         '</span>'+
-        //'<button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-datatype-btn">'+
-        //'<span class="glyphicon glyphicon-plus"></span>'+
-        //'</button>'+
-        //'<button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">'+
-        //'<span class="glyphicon glyphicon-import"></span>'+
-        //'</button>'+
+        newDTButton+
         '</div>'+
         '<div class="content  dropdown-target"  data-dropdownid="'+dropdownId+'">'+
         '<ul id="'+dropdownId+'-list">'+
@@ -239,6 +152,24 @@ function displayNewClicheInList(cliche){
     // registerUserWidgetAsDraggableForMainPages(id);
     // dataDragAndDrop.registerDataDragHandleDraggable(newClicheElt);
     enableDropdownTrigger();
+
+    if (isUserApp) {
+        $('#new-user-datatype-btn').click(function () {
+            $('#create-component').unbind()
+                .on('click', function () {
+                    var name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+                    var datatypeInfo = initDatatype();
+                    var datatype = datatypeInfo[0];
+                    var datatypeDisplayProps = datatypeInfo[1];
+                    userApp.addDatatype(datatype, datatypeDisplayProps);
+                    selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id);
+                    displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
+                    // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
+                    // TODO add to overall and to userApp display
+                    resetMenuOptions();
+                });
+        });
+    }
 }
 
 
@@ -250,6 +181,7 @@ function displayNewDatatypeInUserDatatypeList(name, id, clicheId){
     // TODO changes in style
     var dropdownId = clicheId+'_datatypes-list';
 
+
     var newDatatypeElt = $(
         '<li data-type="'+'user'+'" class="datatype" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
         + '<div class="component-name-container">'
@@ -260,6 +192,10 @@ function displayNewDatatypeInUserDatatypeList(name, id, clicheId){
         + '</div>'
         + '</li>');
     $('#'+dropdownId).append(newDatatypeElt);
+
+
+
+
     // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
     // dataDragAndDrop.registerDataDragHandleDraggable(newDatatypeElt);
@@ -411,132 +347,6 @@ function registerTooltipBtnHandlers() {
 }
 
 
-// TODO needs to be updated to use more relevant classes
-function findContainingContainer(context) {
-    var parent = $(context).parent();
-
-    while (!(parent.hasClass('component-container'))) {
-        parent = $(parent).parent();
-        if (parent.length == 0){ // TODO this is a check to see if anything went awry
-            console.log('something went wrong');
-            console.log(context);
-            return null
-        }
-    }
-    return $(parent).attr('id');
-}
-
-
-/**
- */
-function getContentEditableEdits() {
-    $('[contenteditable=true]').unbind() // unbind to prevent this from firing multiple times
-        .blur(function() {
-            var containerId = findContainingContainer(this);
-            updateBaseWidgetContentsAndDisplayAt(containerId);
-        });
-}
-
-
-function selectText(container) {
-    var range = document.createRange();
-    range.selectNodeContents(container);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
-}
-
-/**
- * Click outside the tooltip to hide it
- */
-
-
-$(document).click(function(event) {
-    if(!$(event.target).closest('.tooltip').length &&
-        !$(event.target).is('.tooltip') &&
-        !$(event.target).is('.edit-btn') &&
-        !$(event.target).is('.glyphicon')) {
-        if($('.tooltip').hasClass('open')) {
-            $('.tooltip').removeClass('open');
-        }
-    }
-    // also listen for clicks in contenteditables
-    if ($(event.target).is('[contenteditable=true]')) {
-        selectText($(event.target).get(0));
-    }
-});
-
-/**
- * display name of uploaded image
- */
-$(document).on('change', '#fileselect', function(evt) {
-    files = $(this).get(0).files;
-    $(this).parent().parent().parent().children().first().val(files[0].name);
-});
-
-/** ** ** ** ** ** Dragging and Dropping User Components to Main pages ** ** ** **/
-function registerUserWidgetAreaDroppable(){
-    var enableDrop = {
-        accept: ".dragging-component",
-        hoverClass: "highlight",
-        tolerance: "intersect",
-        drop: function(event, ui) {
-            var userWidgetId = ui.draggable.data('componentid');
-            var name = selectedProject.cliches[userWidgetId].meta.name;
-            if ($(this).hasClass('main-pages')){
-                if (ui.draggable.hasClass('moving-user-component')){ // if type user
-                    // adding to main page
-                    selectedProject.addPage(selectedProject.cliches[userWidgetId]);
-                    $("#user-components-list").find("[data-componentid='" + userWidgetId + "']").remove();
-                    displayMainPageInListAndSelect(name, userWidgetId);
-                }
-            } else if ($(this).hasClass('user-components')){
-                if (ui.draggable.hasClass('moving-main-component')){ // if type user
-                    // removing from main page
-                    selectedProject.deletePage(selectedProject.cliches[userWidgetId]);
-                    $("#main-pages-list").find("[data-componentid='" + userWidgetId + "']").remove();
-                    displayUserWidgetInListAndSelect(name, userWidgetId);
-
-                }
-            }
-        },
-    };
-    $('.page-component-toggle-drop').each(function() {
-        $(this).droppable(enableDrop);
-    });
-}
-
-function registerUserWidgetAsDraggableForMainPages(widgetId) {
-    var enableDraggable = function (element, type) {
-        // type === 'user'||'main'
-        return {
-            opacity: 1,
-            revert: "invalid",
-            cursorAt: {top: 0, left: 0},
-            helper: function () {
-                $(this).addClass('dragging-component moving-' + type + '-component');
-                var clone = document.createElement('div');
-                // TODO display
-                clone.innerHTML = $(this).find('.component-name').text();
-                return clone;
-            },
-            appendTo: '#user-components-list',
-            containment: '.user-made-components',
-            cursor: '-webkit-grabbing',
-            scroll: true,
-            stop: function () {
-                $(this).removeClass('dragging-component moving-' + type + '-component');
-            }
-        }
-
-    };
-
-    $("#user-components-list").find("[data-componentid='" + widgetId + "']").each(function () {
-        $(this).draggable(enableDraggable(this, 'user'));
-    });
-    $("#main-pages-list").find("[data-componentid='" + widgetId + "']").each(function () {
-        $(this).draggable(enableDraggable(this, 'main'));
-    });
-}
 
 /** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
 function enableDropdownTrigger(){
@@ -591,49 +401,16 @@ $('.components').on('click', '.index-page-toggle', function(){
     setUpWidgetOptionsIndexPageToggle(selectedProject.cliches[widgetId]);
 });
 
-function refreshContainerDisplay(fresh, container, zoom){
-    if (!zoom){
-        zoom = 1;
-    }
-    var widgetId = container.data('componentId');
-
-
-    if (dataEditsManager.getPath(selectedUserWidget, widgetId)){ // component exists
-        var widgetToChange = dataEditsManager.getInnerWidget(selectedUserWidget, widgetId);
-
-        var overallStyles = dataEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
-        // var overallStyles = selectedUserWidget.properties.styles.custom;
-        dataView.displayWidget(fresh, widgetToChange, container, overallStyles, zoom);
-
-        //attach event handlers to new texts
-        registerTooltipBtnHandlers();
-    } else {
-        container.remove();
-    }
-
-}
-
 /**
  * Deletes a component from the datatype and also from the view
  */
-function deleteWidgetFromUserWidgetAndFromView(widgetId) {
-    var containerId = "component-container_"+widgetId;
-    var parent = dataEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
-    parent.deleteInnerWidget(widgetId);
-    // selectedUserWidget.deleteInnerWidget(widgetId);
+function deleteDatatypeFromUserDatatypeAndFromView(datatypeId) {
+    var containerRef = dataContainerMaker.getContainerRef();
+
+    var containerId = containerRef+"_"+datatypeId;
+    userApp.deleteDatatype(datatypeId);
     $('#'+containerId).remove();
-    grid.setUpGrid();
-    dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
-    dataZoomElement.registerZoom(selectedUserWidget);
+    //dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(selectedUserWidget);
+    //dataZoomElement.registerZoom(selectedUserWidget);
 }
 
-
-
-// keyboard shortcuts
-$(document).keydown(function(e){
-    // Save combination
-    if ((event.which == 115 && event.ctrlKey) || (event.which == 19)){
-        alert("Ctrl-S pressed");
-        event.preventDefault();
-    }
-});

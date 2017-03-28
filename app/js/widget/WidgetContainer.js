@@ -211,7 +211,7 @@ var WidgetContainer = function(){
         });
 
         buttonUnlink.click(function(){
-            removeWidgetFromUserWidgetAndFromView(widget.meta.id)
+            unlinkWidgetAndRemoveFromView(widget.meta.id)
         });
 
 

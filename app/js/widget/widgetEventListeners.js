@@ -967,9 +967,10 @@ function deleteWidgetFromUserWidgetAndFromView(widgetId) {
     var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
     parent.deleteInnerWidget(widgetId);
     removeUserWidgetFromView(widgetId);
+    // TODO remove from list too?
 }
 
-function removeWidgetFromUserWidgetAndFromView(widgetId) {
+function unlinkWidgetAndRemoveFromView(widgetId) {
     var widget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
     var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
     parent.deleteInnerWidget(widgetId);
@@ -979,14 +980,14 @@ function removeWidgetFromUserWidgetAndFromView(widgetId) {
 }
 
 
-// keyboard shortcuts
-$(document).keydown(function(e){
-    // Save combination
-    if ((event.which == 115 && event.ctrlKey) || (event.which == 19)){
-        alert("Ctrl-S pressed");
-        event.preventDefault();
-    }
-});
+//// keyboard shortcuts
+//$(document).keydown(function(e){
+//    // Save combination
+//    if ((event.which == 115 && event.ctrlKey) || (event.which == 19)){
+//        alert("Ctrl-S pressed");
+//        event.preventDefault();
+//    }
+//});
 
 
 

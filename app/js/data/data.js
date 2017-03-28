@@ -4,10 +4,8 @@
 var isOverall = true;
 var dataZoomElement = DataZoomElement();
 var dataMiniNav = DataMiniNav();
-var dataView = DataDisplay();
 var dataWorkSurface = DataWorkSurface();
 var dataDragAndDrop = DataDragAndDropController();
-var dataEditsManager = DataEditsManager();
 var canvas = Canvas();
 
 var projectsSavePath = path.join(__dirname, 'projects');
@@ -18,7 +16,7 @@ var selectedScreenSizeWidth = 2000;
 var files = [];
 
 var selectedUserWidget = null;
-var selectedDatatype = null;
+var selectedCliche = null;
 var userApp = null;
 var selectedProject = null;
 
@@ -82,18 +80,11 @@ $(function(){
     }
 
     dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
-    // canvas.drawLineBetweenContainers(
-    //     $('#datatype-container_913108507959743'),
-    //     $('#datatype-container_5775263495373'));
-    // canvas.drawLine([10,10],[102,52]);
     //autoSave5Mins();
 
     basicWidgets = $('#basic-components').html();
 
     dataDragAndDrop.registerDataDragHandleDraggable();
-
-
-    // registerUserWidgetAreaDroppable();
 
     resizeViewportToFitWindow();
 

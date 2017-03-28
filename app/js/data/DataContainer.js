@@ -141,7 +141,7 @@ var DataContainer = function(){
 
 
         buttonTrash.click(function(){
-            deleteWidgetFromUserWidgetAndFromView(datatypeId)
+            deleteDatatypeFromUserDatatypeAndFromView(datatypeId)
         });
 
 

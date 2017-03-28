@@ -170,11 +170,11 @@ function displayProjectPreview(project){
     $('#preview-prev-page').unbind();
     $('#preview-next-page').unbind();
 
-    var mainComponent = project.cliches[project.userApp];
-    var hasMainPages = (!$.isEmptyObject(mainComponent)) && (!$.isEmptyObject(mainComponent.mainPages));
-    if (hasMainPages){
-        var componentToShowId = Object.keys(mainComponent.mainPages)[0];
-        var numMainPages = Object.keys(mainComponent.mainPages).length;
+    var userApp = project.cliches[project.userApp];
+    var hasPages = (!$.isEmptyObject(userApp)) && (!$.isEmptyObject(userApp.widgets.pages));
+    if (hasPages){
+        var componentToShowId = Object.keys(userApp.widgets.pages)[0];
+        var numMainPages = Object.keys(userApp.widgets.pages).length;
         if (numMainPages > 1) {
             $('#page-preview').css('width', '790px');
             $('#preview-prev-page').css('display', 'inline-block');
@@ -185,7 +185,7 @@ function displayProjectPreview(project){
             $('#preview-next-page').css('display', 'none');
         }
 
-        componentToShow = mainComponent.widgets[componentToShowId];
+        componentToShow = userApp.widgets.pages[componentToShowId];
         loadTablePreview(componentToShow);
 
         $('#page-preview').data('pagenum', 0);
@@ -209,19 +209,21 @@ function displayProjectPreview(project){
 }
 
 function showNextMainPage(project, currentPageNumber){
-    var numMainPages = Object.keys(project.userApp).length;
+    var pages = project.cliches[project.userApp].widgets.pages;
+    var numMainPages = Object.keys(pages).length;
     var nextPageNum = (currentPageNumber+1)%(numMainPages);
-    var componentToShowId = Object.keys(project.userApp)[nextPageNum];
-    componentToShow = project.cliches[componentToShowId];
+    var componentToShowId = Object.keys(pages)[nextPageNum];
+    componentToShow = pages[componentToShowId];
     loadTablePreview(componentToShow);
     $('#page-preview').data('pagenum', nextPageNum);
 
 }
 function showPrevMainPage(project, currentPageNumber){
-    var numMainPages = Object.keys(project.userApp).length;
+    var pages = project.cliches[project.userApp].widgets.pages;
+    var numMainPages = Object.keys(pages).length;
     var prevPageNum = (currentPageNumber-1+numMainPages)%(numMainPages);
-    var componentToShowId = Object.keys(project.userApp)[prevPageNum];
-    componentToShow = project.cliches[componentToShowId];
+    var componentToShowId = Object.keys(pages)[prevPageNum];
+    componentToShow = pages[componentToShowId];
     loadTablePreview(componentToShow);
     $('#page-preview').data('pagenum', prevPageNum);
 }

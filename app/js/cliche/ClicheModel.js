@@ -181,7 +181,7 @@ ClicheWithDisplay.prototype.addDatatype = function(datatype, displayProps){
 
 
 
-ClicheWithDisplay.prototype.removeDatatype = function(datatypeId){
+ClicheWithDisplay.prototype.deleteDatatype = function(datatypeId){
     delete this.datatypes[datatypeId];
     delete this.dataBondDisplays[datatypeId];
 };
