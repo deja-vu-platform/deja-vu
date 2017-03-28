@@ -77,7 +77,7 @@ var WidgetWorkSurface = function(){
                     dragHandle.text(innerWidget.meta.name);
                     dragHandle.css('display', 'block');
                 }
-                dragHandle.addClass('associated').data('componentid', widgetId);
+                dragHandle.addClass('associated').data('componentid', widgetId).data('clicheid', userApp.meta.id); // TODO is this always userApp?
             }
 
             if (isThisEditable){
@@ -210,17 +210,17 @@ var WidgetWorkSurface = function(){
             var widgetId = widget.meta.id;
 
             if (dragHandle.associated){
-                var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+                var parent = outermostWidget.getInnerWidget(widgetId, true);
                 if (parent.meta.id == outermostWidget.meta.id){ // fixme SUPERHACK :'(
                     shiftOrder(widgetId, outermostWidget);
                 }
             }
-            var firstInnerWidgetId = widgetEditsManager.getPath(outermostWidget, widgetId)[1]; // this should always exist
+            var firstInnerWidgetId = outermostWidget.getPath(widgetId)[1]; // this should always exist
             if (!firstInnerWidgetId){
                 console.log('something went wrong in onDropFinished');
             }
 
-            var firstInnerWidget = widgetEditsManager.getInnerWidget(outermostWidget, firstInnerWidgetId);
+            var firstInnerWidget = outermostWidget.getInnerWidget(firstInnerWidgetId);
 
             // var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
             var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(outermostWidget, widgetId);
@@ -247,7 +247,7 @@ var WidgetWorkSurface = function(){
     // puts componentId at the top!
     var shiftOrder = function(widgetId, outermostWidget){
         // TODO make this work for inner widgets
-        var parent = widgetEditsManager.getInnerWidget(outermostWidget, widgetId, true);
+        var parent = outermostWidget.getInnerWidget(widgetId, true);
 
         var stackOrder = parent.properties.layout.stackOrder;
 

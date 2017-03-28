@@ -17,369 +17,341 @@
 </head>
 <body>
 
-<div class="menubar">
-    <div class="menubar-inner">
-        <div class="menu-item logo">Déjà Vu UI builder</div>
+    <div class="menubar">
+        <div class="menubar-inner">
+            <div class="menu-item logo">Déjà Vu UI builder</div>
 
-        <div class="navigation">  Navigate to:
-            <div  id="back-to-projects">
-                <a>All Projects</a>
+            <div class="navigation">  Navigate to:
+                <div  id="back-to-projects">
+                    <a>All Projects</a>
+                </div>
+                <a href="clichePage.html">Cliche Page</a>
+                <a href="index.html">Widget Page</a>
             </div>
-            <a href="clichePage.html">Cliche Page</a>
-            <a href="index.html">Widget Page</a>
-        </div>
 
 
-        <div class="menu-item">
-            <div class="btn-group">
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="glyphicon glyphicon-file"></span> Help
-                    <span class="caret"></span>
+            <div class="menu-item">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="glyphicon glyphicon-file"></span> Help
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a href="#">About</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#">Report an issue</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="menu-item">
+                <button type="button" class="btn btn-default"  id="save-project">
+                    <span class="glyphicon glyphicon-save"></span> Save Project
                 </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#">About</a></li>
-                    <li><a href="#">Tutorials</a></li>
-                    <li role="separator" class="divider"></li>
-                    <li><a href="#">Report an issue</a></li>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="project-options-container">
+        <div class="project-options">
+            <div class="project-name">
+                <div class="header"></div>
+                <ul class="nav nav-tabs">
+                    <li class="active" id="build-mode"><a href="#">Build</a></li>
                 </ul>
             </div>
         </div>
 
-        <div class="menu-item">
-            <button type="button" class="btn btn-default"  id="save-project">
-                <span class="glyphicon glyphicon-save"></span> Save Project
+        <div class="components">
+            <div class="user-made-components">
+                <div class="main-pages page-component-toggle-drop">
+                    <div class="header">
+                        <span class="dropdown-trigger dropdown-open" data-dropdownid="main-pages">
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                            Overview
+                        </span>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
+                            <span class="glyphicon glyphicon-import"></span>
+                        </button>
+                    </div>
+                    <div class="content  dropdown-target" data-dropdownid="main-pages">
+                        <ul id="main-pages-list">
+                        </ul>
+                    </div>
+                </div>
+                <div class="user-components page-component-toggle-drop">
+                    <div class="header">
+                        <span class="dropdown-trigger dropdown-open" data-dropdownid="user-components">
+                            <span class="glyphicon glyphicon-triangle-bottom"></span>
+                            Cliches
+                        </span>
+                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
+                            <span class="glyphicon glyphicon-import"></span>
+                        </button>
+                    </div>
+                    <div class="content  dropdown-target"  data-dropdownid="user-components">
+                        <ul id="user-components-list">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="basic-components" style="display: none">
+                <div class="header">
+                    <span class="dropdown-trigger dropdown-open" data-dropdownid="basic-components">
+                        Basic components
+                        <span class="glyphicon glyphicon-triangle-bottom"></span>
+                    </span>
+                </div>
+                <div class="content  dropdown-target" data-dropdownid="basic-components">
+                    <ul id="basic-components">
+                        <li data-type="user" class="draggable datatype"><img src="images/empty_icon.png" width="15px" height="15px"> Component Holder</li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="component-options">
+        <div class="component-name-container">
+            <div class="component-name"></div>
+            <div class="submit-rename not-displayed">
+                   <input type="text" class="new-name-input form-control" autofocus>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-default" id="btn-download-component">
+            <span class="glyphicon glyphicon-download-alt"></span>
+            <span>Export</span>
+        </button>
+
+        <div id="delete-options">
+            <button type="button" class="btn btn-default btn-delete-component">
+                <span class="glyphicon glyphicon-trash"></span>
             </button>
         </div>
-
-
-    </div>
-</div>
-
-<div class="project-options-container">
-    <div class="project-options">
-        <div class="project-name">
-            <div class="header"></div>
-            <ul class="nav nav-tabs">
-                <li class="active" id="build-mode"><a href="#">Build</a></li>
-            </ul>
-        </div>
     </div>
 
-    <div class="components">
-        <div class="user-made-components">
-            <div class="main-pages page-component-toggle-drop">
-                <div class="header">
-                    <span class="dropdown-trigger dropdown-open" data-dropdownid="main-pages">
-                        Over view
-                        <span class="glyphicon glyphicon-triangle-bottom"></span>
-                    </span>
-                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
-                        <span class="glyphicon glyphicon-import"></span>
-                    </button>
-                </div>
-                <div class="content  dropdown-target" data-dropdownid="main-pages">
-                    <ul id="main-pages-list">
-                    </ul>
-                </div>
-            </div>
-            <div class="user-components page-component-toggle-drop">
-                <div class="header">
-                    <span class="dropdown-trigger dropdown-open" data-dropdownid="user-components">
-                        Unused User Datatypes
-                        <span class="glyphicon glyphicon-triangle-bottom"></span>
-                    </span>
-                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-datatype-btn">
-                        <span class="glyphicon glyphicon-plus"></span>
-                    </button>
-                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-component">
-                        <span class="glyphicon glyphicon-import"></span>
-                    </button>
-                </div>
-                <div class="content  dropdown-target"  data-dropdownid="user-components">
-                    <ul id="user-components-list">
-                    </ul>
-                </div>
-            </div>
-        </div>
-        <div class="basic-components" style="display: none">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open" data-dropdownid="basic-components">
-                    Basic components
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-            </div>
-            <div class="content  dropdown-target" data-dropdownid="basic-components">
-                <ul id="basic-components">
-                    <li data-type="user" class="draggable datatype"><img src="images/empty_icon.png" width="15px" height="15px"> Component Holder</li>
-
-                </ul>
-            </div>
-        </div>
-
-        <div class="cliche-components">
-            <div class="header">
-                <span class="dropdown-trigger dropdown-open"  data-dropdownid="cliche-components">
-                    Cliché components
-                    <span class="glyphicon glyphicon-triangle-bottom"></span>
-                </span>
-            </div>
-            <div class="content  dropdown-target" data-dropdownid="cliche-components">
-                <ul>
-                </ul>
-            </div>
-        </div>
+    <div id="outer-container">
+        <div id="selected-screen-size"></div>
     </div>
-</div>
 
-<div class="component-options">
-    <div class="component-name-container">
-        <div class="component-name"></div>
-        <div class="submit-rename not-displayed">
-               <input type="text" class="new-name-input form-control" autofocus>
-        </div>
+    <div id="download-preview-area-container">
+        <div id="download-preview-area"></div>
     </div>
-    <button type="button" class="btn btn-default" id="btn-index-page-toggle">
-        <span class="glyphicon"></span>
-        <span class="text"></span>
-    </button>
 
-    <button type="button" class="btn btn-default" id="btn-duplicate-component">
-        <span class="glyphicon glyphicon-duplicate"></span>
-    </button>
-
-    <button type="button" class="btn btn-default" id="btn-download-component">
-        <span class="glyphicon glyphicon-download-alt"></span>
-        <span>Export</span>
-    </button>
-
-    <div id="delete-options">
-        <button type="button" class="btn btn-default" id="btn-clear-all">
-            <span>Clear All </span>
-            <span class="glyphicon glyphicon-remove"></span>
+    <div id="zoom-control">
+        <button id="zoom-control-minimize-btn" class="btn btn-default">
+            <span class="glyphicon glyphicon-chevron-right"></span>
         </button>
-        <button type="button" class="btn btn-default btn-delete-component">
-            <span class="glyphicon glyphicon-trash"></span>
+        <button id="zoom-actual" class="btn btn-default">
+            Actual
+        </button>
+        <button id="zoom-fit" class="btn btn-default">
+            Fit
+        </button>
+        <button id="zoom-full" class="btn btn-default">
+            Full
+        </button>
+        <button id="zoom-out" class="zoom-control-button">
+            <span class="glyphicon glyphicon-zoom-out"></span>
+        </button>
+        <div id="zoom-slider-and-value">
+            <input id="zoom-slider" type="range" min="-300" max="300" value="0"/>
+            <div id="zoom-control-value"></div>
+        </div>
+        <button id="zoom-in" class="zoom-control-button">
+            <span class="glyphicon glyphicon-zoom-in"></span>
         </button>
     </div>
-</div>
 
-<div id="outer-container">
-    <div id="selected-screen-size"></div>
-</div>
+    <div id="mini-nav-container">
+        <button id="mini-nav-minimize-btn" class="btn btn-default btn-xs">
+            <!--<span class="glyphicon glyphicon-minus"></span>-->
+            _
+        </button>
+        <div id="mini-nav">
+            <div id="mini-nav-full-area"></div>
+            <div id="zoom-selected-screen-size"></div>
+            <div id="mini-nav-component-sizes"></div>
+            <div id="mini-nav-position"></div>
+        </div>
 
-<div id="download-preview-area-container">
-    <div id="download-preview-area"></div>
-</div>
-
-<div id="zoom-control">
-    <button id="zoom-control-minimize-btn" class="btn btn-default">
-        <span class="glyphicon glyphicon-chevron-right"></span>
-    </button>
-    <button id="zoom-actual" class="btn btn-default">
-        Actual
-    </button>
-    <button id="zoom-fit" class="btn btn-default">
-        Fit
-    </button>
-    <button id="zoom-full" class="btn btn-default">
-        Full
-    </button>
-    <button id="zoom-out" class="zoom-control-button">
-        <span class="glyphicon glyphicon-zoom-out"></span>
-    </button>
-    <div id="zoom-slider-and-value">
-        <input id="zoom-slider" type="range" min="-300" max="300" value="0"/>
-        <div id="zoom-control-value"></div>
-    </div>
-    <button id="zoom-in" class="zoom-control-button">
-        <span class="glyphicon glyphicon-zoom-in"></span>
-    </button>
-</div>
-
-<div id="mini-nav-container">
-    <button id="mini-nav-minimize-btn" class="btn btn-default btn-xs">
-        <!--<span class="glyphicon glyphicon-minus"></span>-->
-        _
-    </button>
-    <div id="mini-nav">
-        <div id="mini-nav-full-area"></div>
-        <div id="zoom-selected-screen-size"></div>
-        <div id="mini-nav-component-sizes"></div>
-        <div id="mini-nav-position"></div>
     </div>
 
-</div>
-
-<!--MODALS-->
-<div class="modal fade" id="first-main-page">
-    <div class="modal-dialog modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">x</button>
-                <h4 class="modal-title">Create your first page...</h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3 form-lbl">Page name: </div>
-                    <div class="col-sm-7"><input id="first-page-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
-                    <div class="col-sm-1"></div>
-                </div><br/>
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3 form-lbl">Size: </div>
-                    <div class="col-sm-7">
-                        <select id="select-size">
-                            <option value="1" selected="selected">1200x640</option>
-                        </select>
+    <!--MODALS-->
+    <div class="modal fade" id="first-main-page">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">x</button>
+                    <h4 class="modal-title">Create your first page...</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-3 form-lbl">Page name: </div>
+                        <div class="col-sm-7"><input id="first-page-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                        <div class="col-sm-1"></div>
+                    </div><br/>
+                    <div class="row">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-3 form-lbl">Size: </div>
+                        <div class="col-sm-7">
+                            <select id="select-size">
+                                <option value="1" selected="selected">1200x640</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-1"></div>
                     </div>
-                    <div class="col-sm-1"></div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <p><button id="create-first-page" data-dismiss="modal" class="btn btn-primary">Create</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<div class="modal fade" id="new-component">
-    <div class="modal-dialog modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">x</button>
-                <h4 class="modal-title">New Component</h4>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-1"></div>
-                    <div class="col-sm-3 form-lbl">Component name: </div>
-                    <div class="col-sm-7"><input id="new-component-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
-                    <div class="col-sm-1"></div>
-                </div><br/>
-                <!--<div class="row">-->
-                    <!--<div class="col-sm-1"></div>-->
-                    <!--<div class="col-sm-3 form-lbl">Version: </div>-->
-                    <!--<div class="col-sm-7"><input id="component-version" type="text" class="form-control" required placeholder="e.g.: 0.1.0"/></div>-->
-                    <!--<div class="col-sm-1"></div>-->
-                <!--</div><br/>-->
-                <!--<div class="row">-->
-                    <!--<div class="col-sm-1"></div>-->
-                    <!--<div class="col-sm-3 form-lbl">Author: </div>-->
-                    <!--<div class="col-sm-7"><input id="component-author" type="text" class="form-control" required placeholder="e.g.: Dijkstra"/></div>-->
-                    <!--<div class="col-sm-1"></div>-->
-                <!--</div><br/>-->
-            </div>
-            <div class="modal-footer">
-                <p><button id="create-component" data-dismiss="modal" class="btn btn-primary">Create</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<div class="modal fade" id="load-component">
-    <div class="modal-dialog modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">x</button>
-                <h4 class="modal-title">Load component</h4>
-            </div>
-            <div class="modal-body">
-                <div>Paste JSON here:</div>
-                <div><textarea id="component-json" rows="10" class="form-control" required></textarea></div>
-            </div>
-            <div class="modal-footer">
-                <button id="load-component-btn" data-dismiss="modal" class="btn btn-primary">Load</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<div class="modal fade" id="confirm-merge">
-    <div class="modal-dialog modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">x</button>
-                <h4 class="modal-title">Confirm Merge?</h4>
-            </div>
-            <div class="modal-body">
-                <div>
-                    You are about to merge over cell(s) containing a component. The merge will
-                    cause the component(s) to be deleted. Continue?
+                <div class="modal-footer">
+                    <p><button id="create-first-page" data-dismiss="modal" class="btn btn-primary">Create</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button id="merge-btn" data-dismiss="modal" class="btn btn-primary" data-cell1Id="" data-cell2Id="">Yes</button>
-                <button id="merge-cancel-btn" data-dismiss="modal" class="btn btn-primary">No</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
-
-<div class="modal fade" id="confirm-delete-userComponent">
-    <div class="modal-dialog modal-md">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">x</button>
-                <h4 class="modal-title">Confirm Delete?</h4>
-            </div>
-            <div class="modal-body">
-                <div>
-                    You are about to delete your component named <div style="display: inline" id="delete-userComponent-name"></div>. Continue?
+    <div class="modal fade" id="new-component">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">x</button>
+                    <h4 class="modal-title">New Component</h4>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button id="delete-userComponent-btn" data-dismiss="modal" class="btn btn-primary" data-deleteUserComponentId="">Yes</button>
-                <button id="delete-userComponent-cancel-btn" data-dismiss="modal" class="btn btn-primary">No</button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-3 form-lbl">Component name: </div>
+                        <div class="col-sm-7"><input id="new-component-name" type="text" class="form-control" required autofocus placeholder="e.g. Post"/></div>
+                        <div class="col-sm-1"></div>
+                    </div><br/>
+                    <!--<div class="row">-->
+                        <!--<div class="col-sm-1"></div>-->
+                        <!--<div class="col-sm-3 form-lbl">Version: </div>-->
+                        <!--<div class="col-sm-7"><input id="component-version" type="text" class="form-control" required placeholder="e.g.: 0.1.0"/></div>-->
+                        <!--<div class="col-sm-1"></div>-->
+                    <!--</div><br/>-->
+                    <!--<div class="row">-->
+                        <!--<div class="col-sm-1"></div>-->
+                        <!--<div class="col-sm-3 form-lbl">Author: </div>-->
+                        <!--<div class="col-sm-7"><input id="component-author" type="text" class="form-control" required placeholder="e.g.: Dijkstra"/></div>-->
+                        <!--<div class="col-sm-1"></div>-->
+                    <!--</div><br/>-->
+                </div>
+                <div class="modal-footer">
+                    <p><button id="create-component" data-dismiss="modal" class="btn btn-primary">Create</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
-<!--------------Loader-------------->
-<div class="loader-container">
-    <div class="loader"></div>
-    <div class="loader-words">Loading, please wait...</div>
-</div>
-<!--------------Scripts-------------->
-<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
-<script src="js/external/jquery.min.js"></script>
+    <div class="modal fade" id="load-component">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">x</button>
+                    <h4 class="modal-title">Load component</h4>
+                </div>
+                <div class="modal-body">
+                    <div>Paste JSON here:</div>
+                    <div><textarea id="component-json" rows="10" class="form-control" required></textarea></div>
+                </div>
+                <div class="modal-footer">
+                    <button id="load-component-btn" data-dismiss="modal" class="btn btn-primary">Load</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
-<script src="js/external/jquery-ui.min.js"></script>
-<!--addon for jqueryui resizable enabling snap-->
-<script type="text/javascript" src="https://rawgit.com/polomoshnov/jQuery-UI-Resizable-Snap-extension/master/jquery.ui.resizable.snap.ext.js"></script>
-<script src="js/external/jscolor.js"></script>
-<script src="js/fonts.js"></script>
+    <div class="modal fade" id="confirm-merge">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">x</button>
+                    <h4 class="modal-title">Confirm Merge?</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        You are about to merge over cell(s) containing a component. The merge will
+                        cause the component(s) to be deleted. Continue?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="merge-btn" data-dismiss="modal" class="btn btn-primary" data-cell1Id="" data-cell2Id="">Yes</button>
+                    <button id="merge-cancel-btn" data-dismiss="modal" class="btn btn-primary">No</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
 
-<script src="js/external/bootstrap.min.js"></script>
-<script src="js/external/parse.min.js"></script>
+    <div class="modal fade" id="confirm-delete-userComponent">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">x</button>
+                    <h4 class="modal-title">Confirm Delete?</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        You are about to delete your component named <div style="display: inline" id="delete-userComponent-name"></div>. Continue?
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="delete-userComponent-btn" data-dismiss="modal" class="btn btn-primary" data-deleteUserComponentId="">Yes</button>
+                    <button id="delete-userComponent-cancel-btn" data-dismiss="modal" class="btn btn-primary">No</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
-<script src="js/common.js"></script>
-<script src="js/utils/Utility.js"></script>
+    <!--------------Loader-------------->
+    <div class="loader-container">
+        <div class="loader"></div>
+        <div class="loader-words">Loading, please wait...</div>
+    </div>
+    <!--------------Scripts-------------->
+    <div id="scripts">
+        <script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
+        <script src="js/external/jquery.min.js"></script>
 
-<script src="js/project/ProjectModel.js"></script>
-<script src="js/cliche/ClicheModel.js"></script>
-<script src="js/data/DataModel.js"></script>
-<script src="js/widget/WidgetModel.js"></script>
+        <script src="js/external/jquery-ui.min.js"></script>
+        <!--addon for jqueryui resizable enabling snap-->
+        <script type="text/javascript" src="https://rawgit.com/polomoshnov/jQuery-UI-Resizable-Snap-extension/master/jquery.ui.resizable.snap.ext.js"></script>
+        <script src="js/external/jscolor.js"></script>
+        <script src="js/fonts.js"></script>
 
-<script src="js/data/DataEditsManager.js"></script>
-<script src="js/data/DataDisplay.js"></script>
-<!--<script src="js/data/Style.js"></script>-->
 
-<script src="js/data/DataZoomElement.js"></script>
-<script src="js/data/DataMiniNav.js"></script>
+        <script src="js/external/bootstrap.min.js"></script>
+        <script src="js/external/parse.min.js"></script>
 
-<!--<script src="js/data/Grid.js"></script>-->
+        <script src="js/common.js"></script>
+        <script src="js/utils/Utility.js"></script>
 
-<script src="js/data/DataDragAndDrop.js"></script>
-<script src="js/data/DataContainer.js"></script>
-<script src="js/data/DataWorkSurface.js"></script>
+        <script src="js/data/DataModel.js"></script>
+        <script src="js/widget/WidgetModel.js"></script>
+        <script src="js/cliche/ClicheModel.js"></script>
+        <script src="js/project/ProjectModel.js"></script>
 
-<script src="js/data/data.js"></script>
-<script src="js/data/otherDataEventListeners.js"></script>
-<script src="js/data/dataEventListeners.js"></script>
 
-</body>
+        <script src="js/data/Canvas.js"></script>
+        <script src="js/data/DataZoomElement.js"></script>
+        <script src="js/data/DataMiniNav.js"></script>
+
+        <!--<script src="js/data/Grid.js"></script>-->
+
+        <script src="js/data/DataDragAndDrop.js"></script>
+        <script src="js/data/DataContainer.js"></script>
+        <script src="js/data/DataWorkSurface.js"></script>
+
+        <script src="js/data/data.js"></script>
+        <script src="js/data/otherDataEventListeners.js"></script>
+        <script src="js/data/dataEventListeners.js"></script>
+    </div>
+
+    </body>
 </html>

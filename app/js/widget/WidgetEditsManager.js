@@ -27,7 +27,7 @@ var WidgetEditsManager = function(){
     };
 
     var getOrCreateCustomProperty = function(outermostWidget, targetId){
-        var path = that.getPath(outermostWidget, targetId);
+        var path = outermostWidget.getPath(targetId);
 
         var currPath = outermostWidget.properties;
         path.forEach(function(pathVal, idx){
@@ -47,7 +47,7 @@ var WidgetEditsManager = function(){
     // TODO make this robust
     that.updateCustomProperties = function(outermostWidget, targetId, typeString, newProperties, forParent){
         if (forParent){
-            var path = that.getPath(outermostWidget, targetId);
+            var path = outermostWidget.getPath(targetId);
             targetId = path[path.length - 2];
         }
 
@@ -66,7 +66,7 @@ var WidgetEditsManager = function(){
             return changes;
         };
 
-        var widget = that.getInnerWidget(outermostWidget, targetId);
+        var widget = outermostWidget.getInnerWidget(targetId);
         var changes = createCustomPropertyOfType(outermostWidget, targetId, typeString);
 
         if (typeString == 'styles.custom'){
@@ -95,7 +95,7 @@ var WidgetEditsManager = function(){
 
 
     that.getCustomProperty = function(outermostWidget, targetId){
-        var path = that.getPath(outermostWidget, targetId);
+        var path = outermostWidget.getPath(targetId);
 
         var currPath = outermostWidget.properties;
         var noProperty = false;
@@ -121,10 +121,10 @@ var WidgetEditsManager = function(){
     // property name can be of the form "asdas.asda" like "layout.stackOrder"
     // TODO Make more robust
     that.clearCustomProperties = function(outermostWidget, targetId, propertyName){
-        var path = that.getPath(outermostWidget, targetId);
+        var path = outermostWidget.getPath(targetId);
 
         var customProperties = that.getCustomProperty(outermostWidget, targetId);
-        var widget = that.getInnerWidget(outermostWidget, path[path.length-1]);
+        var widget = outermostWidget.getInnerWidget(path[path.length-1]);
         if (!propertyName){
             for (var property in customProperties){
                 delete customProperties[property];
@@ -152,34 +152,11 @@ var WidgetEditsManager = function(){
 
 
 
-    that.getInnerWidget = function(outermostWidget, targetId, forParent){
-        if (forParent){
-            var path = widgetEditsManager.getPath(outermostWidget, targetId);
-            targetId = path[path.length-2];
-        }
-        var wantedWidget;
-        var getInnerWidgetHelper = function(widget, targetId){
-            if (widget.meta){
-                var widgetId = widget.meta.id;
-                if (widgetId == targetId){
-                    wantedWidget = widget;
-                } else {
-                    for (var id in widget.innerWidgets){
-                        getInnerWidgetHelper(widget.innerWidgets[id], targetId);
-                    }
-                }
-
-            }
-        };
-        getInnerWidgetHelper(outermostWidget, targetId);
-        return wantedWidget;
-    };
-
     that.getMostRelevantOverallCustomChanges = function(outermostWidget, targetId){
         // if path is just the outer widget's id, will just return outerWidget.properties
         var change = JSON.parse(JSON.stringify(outermostWidget.properties.styles.custom));
         var outerWidget = outermostWidget;
-        var path = that.getPath(outermostWidget, targetId);
+        var path = outermostWidget.getPath(targetId);
 
         // else go down and find the correct one
         for (var pathValueIdx = 1; pathValueIdx<path.length; pathValueIdx++){
@@ -333,7 +310,7 @@ var WidgetEditsManager = function(){
             if (!sourceWidget){
                 console.log('something went wrong in applyPropertyChangesHelper()');
                 console.log(innerWidget);
-                console.log(that.getPath(selectedUserWidget, innerWidget.meta.id));
+                console.log(selectedUserWidget.getPath(innerWidget.meta.id));
             }
 
             path.push(correspondingSourceInnerWidget.meta.id);

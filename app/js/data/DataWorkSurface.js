@@ -45,29 +45,59 @@ var DataWorkSurface = function(){
         workSurface.find('.component-container').remove();
     };
 
-    var loadAllDatatypesIntoOverallWorkSurface = function(component, zoom){
-        var workSurface = createOrResetWorkSurface(component, zoom);
+    var loadOverallWorkSurface = function(zoom){
+        for (var clicheId in selectedProject.cliches){
+            var cliche = selectedProject.cliches[clicheId];
+            loadClicheToWorkSurface(cliche, zoom, true);
+        }
+    };
 
-        for (var datatypeId in component.datatypes.used){
-            var datatype = component.datatypes.used[datatypeId];
+
+    var loadClicheToWorkSurface = function(cliche, zoom, isOverall, focusDatatype){ // TODO should input a Project
+        var workSurface = createOrResetWorkSurface(cliche, zoom);
+
+
+        var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
+        dragHandle.text(cliche.meta.name);
+        dragHandle.css('display', 'block');
+
+        // TODO dry
+        if (isOverall){
+            var displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[cliche.meta.id];
+
+        } else {
+            var displayPropObj = cliche.dataBondDisplays[cliche.meta.id];
+        }
+        var container = that.makeDatatypeContainers(cliche.meta.id, cliche.meta.id, displayPropObj, dragHandle, zoom, isOverall);
+        workSurface.append(container);
+        dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
+
+        for (var datatypeId in cliche.datatypes){
+            var datatype = cliche.datatypes[datatypeId];
 
             var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
             dragHandle.text(datatype.meta.name);
             dragHandle.css('display', 'block');
 
-            var displayPropObj = component.datatypeDisplays[datatypeId];
-            var container = that.makeDatatypeContainers(datatype, displayPropObj, dragHandle, zoom);
+            if (isOverall){
+                var displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[datatypeId];
+
+            } else {
+                var displayPropObj = cliche.dataBondDisplays[datatypeId];
+            }
+            var container = that.makeDatatypeContainers(cliche.meta.id, datatypeId, displayPropObj, dragHandle, zoom, isOverall);
             workSurface.append(container);
             dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
         }
 
+        canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]);
     };
 
 
-    that.makeDatatypeContainers = function(datatype, displayPropObj, dragHandle, zoom){
+    that.makeDatatypeContainers = function(clicheId, datatypeId, displayPropObj, dragHandle, zoom, isOverall){
 
-        dragHandle.addClass('associated').data('componentid', datatype.meta.id);
-        var container = dataContainerMaker.createResizableDatatypeContainer(datatype, displayPropObj, zoom);
+        dragHandle.addClass('associated').data('componentid', datatypeId).data('clicheid', clicheId);
+        var container = dataContainerMaker.createResizableDatatypeContainer(clicheId, datatypeId, displayPropObj, zoom, isOverall);
         container.css({
             position: 'absolute',
             top: displayPropObj.displayProperties.position.top,
@@ -104,17 +134,22 @@ var DataWorkSurface = function(){
     };
 
 
-    var makeWorkSurfaceDroppableToWidgets = function(workSurface, outermostWidget){
+    var makeWorkSurfaceDroppableToDatatypes = function(workSurface, cliche){
         var onDropFinished = function(dragHandle, datatype){
 
             var datatypeId = datatype.meta.id;
-
-            var displayPropObj = userApp.datatypeDisplays[datatypeId];
-            var container = that.makeDatatypeContainers(datatype, displayPropObj, dragHandle, currentZoom);
+            if (isOverall){
+                var displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[datatypeId];
+            } else {
+                var displayPropObj = cliche.dataBondDisplays[datatypeId];
+            }
+            var container = that.makeDatatypeContainers(cliche.meta.id, datatypeId, displayPropObj, dragHandle, currentZoom, isOverall);
             workSurface.append(container);
+
+            canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]); // TODO dry
         };
 
-        var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(outermostWidget, onDropFinished);
+        var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(cliche, isOverall, onDropFinished);
 
         workSurface.droppable(dropSettings);
     };
@@ -148,32 +183,37 @@ var DataWorkSurface = function(){
      * @param userWidget
      * @param zoom
      */
-    that.loadDatatype = function(component, datatypeId){
-        if (datatype){
-            var datatype = component.datatypes[datatypeId];
-            var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
-            dataZoomElement.registerZoom(datatype);
-
-            if (workSurface.length===0){
-                currentZoom = 1;
-                loadDatatypeIntoWorkSurface(datatype, currentZoom);
-            } else {
-                disableAllDataDomElementsExcept(datatypeId);
-                //setWidgetOptions(datatype);
-                //dataZoomElement.updateZoomFromState(datatype);
-                // TODO other way? for now, reload the thinger
-                // loadDatatypeIntoWorkSurface(datatype, currentZoom);
-            }
-
-        } else {
-            // load all the stuff
+    that.loadCliche = function(component, zoom, isOverall){
+        // if (datatypeId){
+        //     var datatype = component.datatypes[datatypeId];
+        //     var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
+        //     dataZoomElement.registerZoom(datatype);
+        //
+        //     if (workSurface.length===0){
+        //         currentZoom = 1;
+        //         loadDatatypeIntoWorkSurface(datatype, currentZoom);
+        //     } else {
+        //         disableAllDataDomElementsExcept(datatypeId);
+        //         //setWidgetOptions(datatype);
+        //         //dataZoomElement.updateZoomFromState(datatype);
+        //         // TODO other way? for now, reload the thinger
+        //         // loadDatatypeIntoWorkSurface(datatype, currentZoom);
+        //     }
+        //
+        // } else {
+        //     // load all the stuff
             var componentId = component.meta.id;
             var workSurface = $('#'+DATA_WS_ID+'_'+componentId);
             //dataZoomElement.registerZoom(datatype);
 
             if (workSurface.length===0){
                 currentZoom = 1;
-                loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
+                if (isOverall){
+                    loadOverallWorkSurface(currentZoom);
+                } else {
+                    loadClicheToWorkSurface(component, currentZoom);
+                }
+
             } else {
                 disableAllDataDomElementsExcept(componentId);
                 // setDatatypeOptions(datatype);
@@ -181,7 +221,7 @@ var DataWorkSurface = function(){
                 // TODO other way? for now, reload the thinger
                 // loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
             }
-        }
+        // }
 
         //dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(datatype);
         //grid.setUpGrid();
@@ -191,20 +231,20 @@ var DataWorkSurface = function(){
 
     /**
      * creates an empty worksurface and appends it to the outer container
-     * @param datatype
+     * @param cliche
      * @param zoom
      */
-    that.setUpEmptyWorkSurface = function(datatype, zoom){
+    that.setUpEmptyWorkSurface = function(cliche, zoom){
         currentZoom = zoom; // set zoom value 100%
-        var datatypeId = datatype.meta.id;
-        disableAllDataDomElementsExcept(datatypeId);
-        var workSurface = createWorkSurface(datatypeId, selectedScreenSizeHeight, selectedScreenSizeWidth);
+        var clicheId = cliche.meta.id;
+        disableAllDataDomElementsExcept(clicheId);
+        var workSurface = createWorkSurface(clicheId, selectedScreenSizeHeight, selectedScreenSizeWidth);
 
         $('#outer-container').append(workSurface);
 
         resetWorkSurface(workSurface);
 
-        makeWorkSurfaceDroppableToWidgets(workSurface, datatype);
+        makeWorkSurfaceDroppableToDatatypes(workSurface, cliche);
         //dataZoomElement.updateZoomFromState(datatype);
 
         // setDatatypeOptions(selectedProject.cliches[datatypeId]);

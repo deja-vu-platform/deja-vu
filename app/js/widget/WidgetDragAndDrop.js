@@ -54,7 +54,7 @@ var WidgetDragAndDropController = function () {
                     dragHandle.addClass('associated').data('componentid', widgetId);
                     zoomElement.registerZoom(outerWidget);
                 } else {
-                    var parent = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId, true);
+                    var parent = selectedUserWidget.getInnerWidget(widgetId, true);
                     var parentId = parent.meta.id;
                     if (parentId != selectedUserWidget.meta.id){ // it is not the outermost widget
                         var workSurfaceOffset = $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).offset();
@@ -104,7 +104,7 @@ var WidgetDragAndDropController = function () {
                 var offsetFromMouse = {top: 0, left: 0};
                 var widgetContainer;
                 if (dragHandle.hasClass('associated')) {
-                    draggingWidget = widgetEditsManager.getInnerWidget(selectedUserWidget, widgetId);
+                    draggingWidget = selectedUserWidget.getInnerWidget(widgetId);
                     //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
                     var oldContainerId = containerRef+'_' + widgetId;
@@ -200,7 +200,7 @@ var WidgetDragAndDropController = function () {
                     delete userApp.widgets.unused[widgetId];
                     $("#user-components-list").find("[data-componentid='" + widgetId + "']").remove();
                 }
-
+                listDisplay.refresh();
             }
         };
     };

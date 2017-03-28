@@ -82,7 +82,19 @@
                     </button>
                 </div>
                 <div class="content  dropdown-target" data-dropdownid="main-pages">
-                    <ul id="main-pages-list">
+                    <ul id="main-pages-list" class="widget-list">
+                    </ul>
+                </div>
+            </div>
+            <div class="user-components page-component-toggle-drop">
+                <div class="header">
+                    <span class="dropdown-trigger dropdown-open" data-dropdownid="user-used-components">
+                        Used Widgets
+                        <span class="glyphicon glyphicon-triangle-bottom"></span>
+                    </span>
+                </div>
+                <div class="content  dropdown-target"  data-dropdownid="user-used-components">
+                    <ul id="user-used-components-list" class="widget-list">
                     </ul>
                 </div>
             </div>
@@ -100,7 +112,7 @@
                     </button>
                 </div>
                 <div class="content  dropdown-target"  data-dropdownid="user-components">
-                    <ul id="user-components-list">
+                    <ul id="user-components-list" class="widget-list">
                     </ul>
                 </div>
             </div>
@@ -118,7 +130,7 @@
                     </button>
                 </div>
                 <div class="content  dropdown-target" data-dropdownid="widget-templates">
-                    <ul id="widget-templates-list">
+                    <ul id="widget-templates-list" class="widget-list">
                     </ul>
                 </div>
             </div>
@@ -793,13 +805,14 @@
     <script src="js/common.js"></script>
     <script src="js/utils/Utility.js"></script>
 
-    <script src="js/project/ProjectModel.js"></script>
-    <script src="js/cliche/ClicheModel.js"></script>
     <script src="js/data/DataModel.js"></script>
     <script src="js/widget/WidgetModel.js"></script>
+    <script src="js/cliche/ClicheModel.js"></script>
+    <script src="js/project/ProjectModel.js"></script>
 
     <script src="js/widget/WidgetEditsManager.js"></script>
     <script src="js/widget/WidgetDisplay.js"></script>
+    <script src="js/widget/WidgetListDisplay.js"></script>
     <script src="js/widget/WidgetStyle.js"></script>
 
     <script src="js/widget/WidgetZoomElement.js"></script>

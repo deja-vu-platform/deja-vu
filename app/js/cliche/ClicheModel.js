@@ -16,8 +16,13 @@ var Cliche = function(name, id, version, author){
         author: author
     };
 
-    // UserApp has all types of widgets
+    // ClicheWithDisplay has all types of widgets
     // Other cliches only use templates
+
+    // TODO
+    // separate widgets and pages:
+    // ClicheWithDisplay (A user app) will have pages a normal cliche will only have widgets
+    // templates will be moved to a completely separate datatype
     that.widgets = {
         pages: {
             // widgetId: UserWidgetInstance
@@ -30,18 +35,9 @@ var Cliche = function(name, id, version, author){
         }
     };
 
-    // UserApp uses *only* used and unused
-    // Here templates are *only* used by Cliches
+    // ClicheWithDisplay uses *only* used and unused
     that.datatypes = {
-        used:{
-            // datatypeId: UserDataInstance
-        },
-        unused:{
-
-        },
-        templates:{
-
-        }
+        // datatypeId: UserDataInstance
     };
 
 
@@ -80,39 +76,39 @@ Cliche.fromObject = function(object){
     var cliche = $.extend(new Cliche(), object);
 
     for (var widgetType in object.widgets) {
+        // TODO what about innerWidgets? is updated later, but should be here
         for (var widgetId in object.widgets[widgetType]) {
             var widget = object.widgets[widgetType][widgetId];
             cliche.widgets[widgetType][widgetId] = UserWidget.fromObject(widget);
+
         }
     }
-    for (var datatypeType in object.datatypes) {
-        for (var datatypeId in object.datatypes[datatypeType]) {
-            var datatype = object.datatypes[datatypeType][datatypeId];
-            cliche.datatypes[datatypeType][datatypeId] = UserDatatype.fromObject(datatype);
-        }
+    for (var datatypeId in object.datatypes) {
+        var datatype = object.datatypes[datatypeId];
+        cliche.datatypes[datatypeId] = UserDatatype.fromObject(datatype);
     }
     return cliche
 };
 
 
-var UserApp = function(name, id, version, author){
+var ClicheWithDisplay = function(name, id, version, author){
     var cliche = Cliche(name, id, version, author);
-    var that = Object.create(UserApp.prototype);
+    var that = Object.create(ClicheWithDisplay.prototype);
     that = $.extend(that, cliche); // TODO sketchy
 
-    that.objectType = "UserApp";
+    that.objectType = "ClicheWithDisplay";
 
-    that.datatypeDisplays = {
-        overview: UserDatatypeDisplay(),
-        particulars: {
-            // datatypeId : DatatypeDisplay object
-        }
+    that.dataBondDisplays = {
+        // datatypeId : DatatypeDisplay object
     };
+    that.dataBondDisplays[id] = UserDatatypeDisplay();
 
     that.widgetBondDisplays = {
-        overview: {}, //UserWidgetBondDisplay(),
-        particulars: {
-            // datatypeId : DatatypeDisplay object
+        cliche: null, //UserWidgetBondDisplay(),
+        widgets: {
+            // don't care about pages b/c they don't have behavior by themselves
+            // widgetId : WidgetDisplay object
+
         }
     };
 
@@ -122,41 +118,41 @@ var UserApp = function(name, id, version, author){
     return that;
 };
 
-UserApp.fromString = function(string){
+ClicheWithDisplay.fromString = function(string){
     var object = JSON.parse(string);
-    return UserApp.fromObject(object)
+    return ClicheWithDisplay.fromObject(object)
 };
 
-UserApp.fromObject = function(object){
+ClicheWithDisplay.fromObject = function(object){
     var app = Cliche.fromObject(object);
-    app = $.extend(new UserApp(), app);
+    app = $.extend(new ClicheWithDisplay(), app);
 
     return app
 };
 
 
 
-UserApp.prototype.isPage = function(widgetId){
+ClicheWithDisplay.prototype.isPage = function(widgetId){
     return widgetId in this.widgets.pages;
 };
 
 
-UserApp.prototype.addPage = function(widget){
+ClicheWithDisplay.prototype.addPage = function(widget){
     widget.isPage = true;
     this.widgets.pages[widget.meta.id] = widget;
 };
 
-UserApp.prototype.deletePage = function(widget){
+ClicheWithDisplay.prototype.deletePage = function(widget){
     delete this.widgets.pages[widget.meta.id];
     widget.isPage = false; // it will no longer be usable but still...
 };
 
-UserApp.prototype.addTemplate = function(widget){
+ClicheWithDisplay.prototype.addTemplate = function(widget){
     widget.isTemplate = true;
     this.widgets.templates[widget.meta.id] = widget;
 };
 
-UserApp.prototype.deletePage = function(widget){
+ClicheWithDisplay.prototype.deletePage = function(widget){
     delete this.widgets.templates[widget.meta.id];
     widget.isTemplate = false; // it will no longer be usable but still...
 };
@@ -166,52 +162,92 @@ UserApp.prototype.deletePage = function(widget){
  * makes a new unused widget
  * @param widget
  */
-UserApp.prototype.addWidget = function(widget){
+ClicheWithDisplay.prototype.addWidget = function(widget){
     if (!(this.widgets.pages[widget.meta.id] || this.widgets.unused[widget.meta.id])) {
         this.widgets.unused[widget.meta.id] = widget;
     }
 };
 
-UserApp.prototype.deleteWidget = function(widgetId){
+ClicheWithDisplay.prototype.deleteWidget = function(widgetId){
     delete this.widgets.pages[widgetId];
     delete this.widgets.unused[widgetId];
     delete this.widgets.templates[widgetId];
 };
 
-UserApp.prototype.addDatatype = function(datatype, displayProps){
-    if (!(this.datatypes.unused[datatype.meta.id])) {
-        this.datatypes.unused[datatype.meta.id] = datatype;
-        this.datatypeDisplays[datatype.meta.id] = displayProps;
+ClicheWithDisplay.prototype.addDatatype = function(datatype, displayProps){
+    if (!(this.datatypes[datatype.meta.id])) {
+        this.datatypes[datatype.meta.id] = datatype;
+        this.dataBondDisplays[datatype.meta.id] = displayProps;
     }
 };
 
 
 
-UserApp.prototype.removeDatatype = function(datatypeId){
-    delete this.datatypes.used[datatypeId];
-    delete this.datatypes.unused[datatypeId];
-    delete this.datatypeDisplays[datatypeId];
+ClicheWithDisplay.prototype.deleteDatatype = function(datatypeId){
+    delete this.datatypes[datatypeId];
+    delete this.dataBondDisplays[datatypeId];
 };
 
 
-UserApp.prototype.getNumWidgets = function(){
+ClicheWithDisplay.prototype.getNumWidgets = function(){
     return Object.keys(this.widgets.pages).length +  Object.keys(this.widgets.unused).length + Object.keys(this.widgets.templates).length;
 };
 
-UserApp.prototype.getAllDatatypeIds = function(){
-    var used = Object.keys(this.datatypes.used);
-    var unused = Object.keys(this.datatypes.unused);
-    return used.concat(unused)
+ClicheWithDisplay.prototype.getAllDatatypeIds = function(){
+    return Object.keys(this.datatypes);
+
 };
 
-UserApp.prototype.getAllWidgetIds = function(){
-    var used = Object.keys(this.widgets.pages);
+ClicheWithDisplay.prototype.getAllOuterWidgetIds = function(){
+    var pages = Object.keys(this.widgets.pages);
     var unused = Object.keys(this.widgets.unused);
     var templates = Object.keys(this.widgets.templates);
-    return used.concat(unused).concat(templates)
+    return pages.concat(unused).concat(templates);
 };
 
-UserApp.prototype.getWidget = function(widgetId){
+ClicheWithDisplay.prototype.getAllWidgetIds = function(){
+    var allOuterWidgetIds = this.getAllOuterWidgetIds();
+    var used = this.getAllUsedWidgetIds();
+    return allOuterWidgetIds.concat(used);
+};
+
+ClicheWithDisplay.prototype.getAllUsedWidgetIds = function(){
+    var allUsedWidgetsIds = [];
+    var cliche = this;
+    for (var pageId in cliche.widgets.pages){
+        var page = cliche.widgets.pages[pageId];
+        allUsedWidgetsIds = allUsedWidgetsIds.concat(page.getAllInnerWidgetsIds());
+    }
+    for (var widgetId in cliche.widgets.unused){
+        var widget = cliche.widgets.unused[widgetId];
+        allUsedWidgetsIds = allUsedWidgetsIds.concat(widget.getAllInnerWidgetsIds());
+    }
+    return allUsedWidgetsIds;
+};
+
+
+var findUsedWidget = function(cliche, wantedWidgetId){
+    var wantedWidget = null;
+
+    for (var widgetId in cliche.widgets.pages){
+        var outermostWidget = cliche.widgets.pages[widgetId];
+        var innerWidget = outermostWidget.getInnerWidget(wantedWidgetId);
+        if (innerWidget){
+            wantedWidget = innerWidget;
+        }
+    }
+    for (var widgetId in cliche.widgets.unused){
+        var outermostWidget = cliche.widgets.unused[widgetId];
+        var innerWidget = outermostWidget.getInnerWidget(wantedWidgetId);
+        if (innerWidget){
+            wantedWidget = innerWidget;
+        }
+    }
+
+    return wantedWidget;
+};
+
+ClicheWithDisplay.prototype.getWidget = function(widgetId){
     if (widgetId in this.widgets.pages){
         return this.widgets.pages[widgetId]
     }
@@ -221,6 +257,6 @@ UserApp.prototype.getWidget = function(widgetId){
     if (widgetId in this.widgets.templates){
         return this.widgets.templates[widgetId]
     }
-
-    return null
-}
+    // TODO deal with inner widgets
+    return findUsedWidget(this, widgetId);
+};

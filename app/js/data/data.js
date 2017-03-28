@@ -1,13 +1,12 @@
 /**
  * Created by Shinjini on 9/26/2016.
  */
-
+var isOverall = true;
 var dataZoomElement = DataZoomElement();
 var dataMiniNav = DataMiniNav();
-var dataView = DataDisplay();
 var dataWorkSurface = DataWorkSurface();
 var dataDragAndDrop = DataDragAndDropController();
-var dataEditsManager = DataEditsManager();
+var canvas = Canvas();
 
 var projectsSavePath = path.join(__dirname, 'projects');
 
@@ -17,9 +16,10 @@ var selectedScreenSizeWidth = 2000;
 var files = [];
 
 var selectedUserWidget = null;
-var selectedDatatype = null;
+var selectedCliche = null;
 var userApp = null;
 var selectedProject = null;
+
 
 var currentZoom = 1.0;
 var basicWidgets;
@@ -29,6 +29,7 @@ var basicWidgets;
 var confirmOnUserWidgetDelete = true;
 
 $(function(){
+    canvas.createCanvas($('#outer-container'), selectedScreenSizeHeight, selectedScreenSizeWidth);
     $('.project-options-container').css({
         height: ($('html').height() - 70) + 'px',
     });
@@ -69,24 +70,21 @@ $(function(){
         // TODO this will need to be changed once we bring in a userComponent which will be a
         // superset of userWidgets
         var appName = userApp.meta.name;
+        displayNewClicheInList(userApp);
         displayOverallDatatypesInListAndSelect(appName, userAppId);
 
-        for (var datatypeId in userApp.datatypes.unused){
-            var datatypeName = userApp.datatypes.unused[datatypeId].meta.name;
+        for (var datatypeId in userApp.datatypes){
+            var datatypeName = userApp.datatypes[datatypeId].meta.name;
             displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId, userAppId);
         }
     }
 
-    dataWorkSurface.loadDatatype(userApp, null, currentZoom);
-
+    dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
     //autoSave5Mins();
 
     basicWidgets = $('#basic-components').html();
 
     dataDragAndDrop.registerDataDragHandleDraggable();
-
-
-    // registerUserWidgetAreaDroppable();
 
     resizeViewportToFitWindow();
 

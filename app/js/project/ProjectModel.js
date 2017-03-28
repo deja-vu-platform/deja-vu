@@ -50,20 +50,45 @@ function UserProject(name, id, version, author) {
     };
     this.userApp = null; // one component for now
     this.cliches = {};
+    this.bondDisplays = { // overall display
+        // clicheId: {
+        //      dataBondDisplays:{
+        //          id: displayObj
+        //      },
+        //      widgetBondDisplays:{
+        //          id: displayObj
+        //      }
+        // }
+
+    };
 
     this.lastAccessed = new Date();
 
 }
 
-UserProject.prototype.addCliche = function(component){
-    if (!this.cliches[component.meta.id]) {
-        this.cliches[component.meta.id] = component;
+UserProject.prototype.addCliche = function(cliche){
+    if (!this.cliches[cliche.meta.id]) {
+        this.cliches[cliche.meta.id] = cliche;
+        this.bondDisplays[cliche.meta.id] = {};
+        this.bondDisplays[cliche.meta.id].dataBondDisplays = {};
+        this.bondDisplays[cliche.meta.id].dataBondDisplays[cliche.meta.id] = UserDatatypeDisplay();
+        this.bondDisplays[cliche.meta.id].widgetBondDisplays = {};
+        this.bondDisplays[cliche.meta.id].widgetBondDisplays[cliche.meta.id] = UserDatatypeDisplay(); //TODO fixme
     }
+
 };
 
-UserProject.prototype.removeComponent = function(componentId){
-    delete this.cliches[componentId];
-    delete this.userApp[componentId];
+UserProject.prototype.addDataBondDisplay = function(clicheId, datatypeId){
+    this.bondDisplays[clicheId].dataBondDisplays[datatypeId] = UserDatatypeDisplay();
+};
+
+UserProject.prototype.removeCliche = function(clicheId){
+    if (!(clicheId == this.userApp)){ // FIXME
+        delete this.cliches[clicheId];
+    }
+    // if (clicheId == this.userApp){ // FIXME
+    //     this.userApp = null;
+    // }
 };
 
 
@@ -109,7 +134,7 @@ UserProject.fromObject = function(object){
     for (var clicheId in object.cliches) {
         var cliche = object.cliches[clicheId];
         if (cliche.meta.id == object.userApp){
-            project.cliches[clicheId] = UserApp.fromObject(cliche);
+            project.cliches[clicheId] = ClicheWithDisplay.fromObject(cliche);
         } else {
             project.cliches[clicheId] = Cliche.fromObject(cliche);
         }

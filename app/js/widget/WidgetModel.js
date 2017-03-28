@@ -105,6 +105,75 @@ UserWidget.prototype.deleteInnerWidget = function(widgetId) {
     return true;
 };
 
+UserWidget.prototype.getPath = function(widgetId){
+    var outermostWidget = this;
+    var wantedPath;
+    var getPathHelper = function(widget, path, targetId){
+        if (widget.meta){
+            var widgetId = widget.meta.id;
+            path.push(widgetId);
+            if (widgetId == targetId){
+                wantedPath = path;
+            } else {
+                for (var id in widget.innerWidgets){
+                    getPathHelper(widget.innerWidgets[id], JSON.parse(JSON.stringify(path)), targetId);
+                }
+            }
+        }
+    };
+    getPathHelper(outermostWidget, [], widgetId);
+    return wantedPath;
+};
+
+UserWidget.prototype.getInnerWidget = function(targetId, forParent){
+    var outermostWidget = this;
+    if (forParent){
+        var path = outermostWidget.getPath(targetId);
+        targetId = path[path.length-2];
+    }
+    var wantedWidget = null;
+    var getInnerWidgetHelper = function(widget, targetId){
+        if (widget.meta){
+            var widgetId = widget.meta.id;
+            if (widgetId == targetId){
+                wantedWidget = widget;
+            } else {
+                for (var id in widget.innerWidgets){
+                    getInnerWidgetHelper(widget.innerWidgets[id], targetId);
+                }
+            }
+
+        }
+    };
+    getInnerWidgetHelper(outermostWidget, targetId);
+    if (wantedWidget){
+        wantedWidget = UserWidget.fromObject(wantedWidget);
+    }
+
+    return wantedWidget;
+};
+
+
+// Note: returns only one copy!
+UserWidget.prototype.getAllInnerWidgetsIds = function() {
+    var innerWidgetsInfoList = [];
+
+    var getInnerWidgetInfo = function(widget, innerWidgetsList){
+        for (var innerWidgetId in widget.innerWidgets){
+            var innerWidget = widget.innerWidgets[innerWidgetId];
+            innerWidgetsList.push(innerWidget.meta.id);
+            getInnerWidgetInfo(innerWidget, innerWidgetsList);
+
+        }
+    };
+
+    getInnerWidgetInfo(this, innerWidgetsInfoList);
+
+    return innerWidgetsInfoList;
+};
+
+
+
 UserWidget.fromString = function(string){
     var object = JSON.parse(string);
     return UserWidget.fromObject(object)
