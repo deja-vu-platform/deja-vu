@@ -216,8 +216,6 @@ function displayOverallDatatypesInList(name, id){
         + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</div>'
         + '</div>'
-        + '<div class="index-page-toggle">'
-        + '</div>'
         + '</li>';
     $('#main-pages-list').append(newWidgetElt);
 }
@@ -387,19 +385,6 @@ function enableDropdownTrigger(){
 }
 
 enableDropdownTrigger();
-
-$('.components').on('click', '.index-page-toggle', function(){
-    var turnOn = !($(this).parent().hasClass('selected-index-page'));
-    $('.components .selected-index-page').removeClass('selected-index-page');
-    var widgetId = $(this).parent().data('componentid');
-    if (turnOn){
-        selectedProject.userApp.indexId = widgetId;
-        $(this).parent().addClass('selected-index-page');
-    } else {
-        selectedProject.userApp.indexId = null;
-    }
-    setUpWidgetOptionsIndexPageToggle(selectedProject.cliches[widgetId]);
-});
 
 /**
  * Deletes a component from the datatype and also from the view

@@ -86,6 +86,8 @@ $(function(){
 
     dataDragAndDrop.registerDataDragHandleDraggable();
 
+    dataZoomElement.registerZoom(userApp);
+
     resizeViewportToFitWindow();
 
     // finish load animation
