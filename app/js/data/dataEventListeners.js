@@ -171,8 +171,8 @@ function displayNewClicheInList(cliche){
                     };
 
                     while(checkCoords(position, dimensions)){
-                        position.left += Math.pow(-1, Math.round(Math.random()))*30;
-                        position.top += Math.pow(-1, Math.round(Math.random()))*30;
+                        position.left += Math.pow(-1, Math.round(Math.random()))*100;
+                        position.top += Math.pow(-1, Math.round(Math.random()))*50;
                     }
 
                     userApp.addDatatype(datatype, datatypeDisplayProps);

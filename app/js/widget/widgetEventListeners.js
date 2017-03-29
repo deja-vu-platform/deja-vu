@@ -1048,9 +1048,9 @@ function initUserApp() {
     var id = utils.generateId();
 
     var firstPage = initUserWidget(true, true);
-    var component = ClicheWithDisplay(name, id, version, author);
-    component.addPage(firstPage);
-    return component;
+    var userApp = ClicheWithDisplay(name, id, version, author);
+    userApp.addPage(firstPage);
+    return userApp;
 }
 
 
