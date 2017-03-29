@@ -160,11 +160,23 @@ function displayNewClicheInList(cliche){
                     var datatypeInfo = initDatatype();
                     var datatype = datatypeInfo[0];
                     var datatypeDisplayProps = datatypeInfo[1];
+                    var position = datatypeDisplayProps.displayProperties.position;
+                    var dimensions = datatypeDisplayProps.displayProperties.dimensions;
+                    var checkCoords = function(position, dimensions){
+                        var containerRef = dataContainerMaker.getContainerRef();
+                        var outerContainerOffset = $('#outer-container').offset();
+                        var x = position.left + outerContainerOffset.left + dimensions.width/2;
+                        var y = position.top + outerContainerOffset.top + dimensions.height/2;
+                        return $(utils.allElementsFromPoint(x, y)).filter('.'+containerRef).length>0;
+                    };
 
-
+                    while(checkCoords(position, dimensions)){
+                        position.left += Math.pow(-1, Math.round(Math.random()))*30;
+                        position.top += Math.pow(-1, Math.round(Math.random()))*30;
+                    }
 
                     userApp.addDatatype(datatype, datatypeDisplayProps);
-                    selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id);
+                    selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id, datatypeDisplayProps);
                     displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
                     // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
                     // TODO add to overall and to userApp display

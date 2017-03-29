@@ -11,7 +11,7 @@ var DataWorkSurface = function(){
 
     // takes in a component object and the id of the selected datatype, and does
     // any work based on the data you obtain from the component
-
+    var containerRef = dataContainerMaker.getContainerRef();
     that.getWorkSurfaceRef = function(){
         return DATA_WS_ID;
     };
@@ -25,11 +25,11 @@ var DataWorkSurface = function(){
         return workSurface;
     };
 
-    var createOrResetWorkSurface = function(datatype, zoom){
-        var datatypeId = datatype.meta.id;
+    var createOrResetWorkSurface = function(cliche, zoom){
+        var datatypeId = cliche.meta.id;
         var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
         if (workSurface.length===0){
-            workSurface = that.setUpEmptyWorkSurface(datatype, zoom);
+            workSurface = that.setUpEmptyWorkSurface(cliche, zoom);
         } else {
             resetWorkSurface(workSurface);
         }
@@ -42,7 +42,7 @@ var DataWorkSurface = function(){
             zoom: 1,
         };
         workSurface.data('state', state);
-        workSurface.find('.component-container').remove();
+        workSurface.find('.'+containerRef).remove();
     };
 
     var loadOverallWorkSurface = function(zoom){
@@ -55,8 +55,6 @@ var DataWorkSurface = function(){
 
     var loadClicheToWorkSurface = function(cliche, zoom, isOverall, focusDatatype){ // TODO should input a Project
         var workSurface = createOrResetWorkSurface(cliche, zoom);
-
-
         var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
         dragHandle.text(cliche.meta.name);
         dragHandle.css('display', 'block');
@@ -124,7 +122,7 @@ var DataWorkSurface = function(){
             console.log(userWidget);
         }
 
-        userWidget = dataEditsManager.refreshFromProject(userWidget);
+        //userWidget = dataEditsManager.refreshFromProject(userWidget);
 
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
