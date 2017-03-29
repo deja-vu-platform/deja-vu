@@ -8,6 +8,7 @@ var WidgetListDisplay = function(){
     var recursivelyLoadWidgetIntoList = function(widget, clicheId, listElt){
         var innerWidgetsInfoList = widget.getAllInnerWidgetsIds();
 
+        // can keep the structure instead of linearizing it so it can have a folding structure
         var list = [];
 
         innerWidgetsInfoList.forEach(function(innerWidgetId){
@@ -30,7 +31,6 @@ var WidgetListDisplay = function(){
 
     that.loadClicheIntoWidgetList = function(cliche, widgetToLoadId){
         var usedWidgetsIds = cliche.getAllUsedWidgetIds();
-        console.log(usedWidgetsIds);
         var userAppId = userApp.meta.id;
         if (cliche.meta.id == userAppId){
             userApp.getAllOuterWidgetIds().forEach(function(widgetId){

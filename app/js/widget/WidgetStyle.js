@@ -12,35 +12,42 @@ var WidgetStyle = function(paletteContainer){
     const WHITE = 'FFFFFF';
     const BLACK = '000000';
     const PALETTE_SIZE = 16;
+    const CURRENT_COLORS_SIZE = 8;
 
+    const CURRENT_COLORS_CLASS = 'current-colors-elt';
+    const PALETTE_CLASS = 'palette-elt';
 
     var pickerObject = new jscolor($('<div>')[0]); // Needs an object to bind to
 
     var palette = [];
+    var currentColors = [];
 
     var paletteElt;
+    var currentColorsElt;
+
+    var selectedPaletteElt = null;
 
     var containerRef = widgetContainerMaker.getContainerRef();
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
 
 
 
-    var updatePalette = function(color, idx){
-        // if real color; TODO check with pickerObject
+    var addNewColorToCurrentColors = function(color, idx){
+        // if real color;
         var realColor = pickerObject.fromString(color); // returns true if it's a real color string
         if (realColor){
             if (idx || idx == 0){ // index given
-                if (idx>= 0 && idx<palette.length){
-                    palette[idx] = color;
+                if (idx>= 0 && idx<currentColors.length){
+                    currentColors[idx] = color;
                 }
             } else {
-                palette.push(color);
-                if (palette.length> PALETTE_SIZE){
-                    palette.shift(); // keeping a max size
+                currentColors.push(color);
+                if (currentColors.length> CURRENT_COLORS_SIZE){
+                    currentColors.shift(); // keeping a max size
                 }
             }
         }
-        updatePaletteElt();
+        updateElt(true);
     };
 
 
@@ -88,7 +95,7 @@ var WidgetStyle = function(paletteContainer){
         inputText.change(function(){
             var color = pickerText.toHEXString();
             setOverallStyleAndUpdateView('color', color, selectedUserWidget);
-            updatePalette(color);
+            addNewColorToCurrentColors(color);
         });
 
         var inputBG = $('#pick-color-bg-input');
@@ -101,7 +108,7 @@ var WidgetStyle = function(paletteContainer){
             $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).css({
                 'background-color': color,
             });
-            updatePalette(color);
+            addNewColorToCurrentColors(color);
         });
 
         $('#reset-overall-color').click(function(){
@@ -144,7 +151,7 @@ var WidgetStyle = function(paletteContainer){
         textColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerText.toHEXString();
-            updatePalette(color);
+            addNewColorToCurrentColors(color);
             onChange(color);
         });
         var textColor = customColor || BLACK;
@@ -159,7 +166,7 @@ var WidgetStyle = function(paletteContainer){
         bgColorInput.change(function(e){
             e.stopPropagation();
             var color = pickerBG.toHEXString();
-            updatePalette(color);
+            addNewColorToCurrentColors(color);
             onChange(color);
         });
 
@@ -167,52 +174,94 @@ var WidgetStyle = function(paletteContainer){
         pickerBG.fromString(bgColor);
     };
 
-    var makeColorPaletteElt = function(){
+    var makePaletteElt = function(forCurrentColorsElt){
         var container = $('<div></div>');
-        container.attr('id', 'palette');
-
-        for (var i = 0; i<PALETTE_SIZE; i++){
+        forCurrentColorsElt? container.attr('id', 'current-colors'):container.attr('id', 'palette');
+        var size = forCurrentColorsElt? CURRENT_COLORS_SIZE:PALETTE_SIZE;
+        for (var i = 0; i<size; i++){
             var elt = $('<div></div>');
-            elt.attr('id', 'palette-elt_'+i);
-            elt.addClass('palette-elt');
-            elt.css({
-                'background-color': palette[i],
-            });
+            if (forCurrentColorsElt){
+                var color = currentColors[i];
+                var makeOnClickFunction = function(i){
+                    return function(){
+                        if (selectedPaletteElt){
+                            var idx = selectedPaletteElt.data('index');
+                            palette[idx] = currentColors[i];
+                            savePalette(userApp); // TODO fixme
+                            updateElt();
+                            selectedPaletteElt = null;
+                        }
+                    }
+                };
 
-            elt.click(function(){
-                // TODO maybe we'll have a selected component variable
-                // and if you click this, the color gets set to that color
-                // console.log($(this).css('background-color'));
-            });
+
+                elt.attr('id', CURRENT_COLORS_CLASS+'_'+i)
+                    .data('index', i)
+                    .addClass(CURRENT_COLORS_CLASS)
+                    .css({
+                        'background-color': color,
+                    })
+                    .click(makeOnClickFunction(i));
+            } else {
+                elt.attr('id', PALETTE_CLASS+'_'+i)
+                    .data('index', i)
+                    .addClass(PALETTE_CLASS)
+                    .css({
+                        'background-color': palette[i],
+                    })
+                    .click(function(){
+                        // TODO maybe we'll have a selected component variable
+                        // and if you click this, the color gets set to that color
+                        // console.log($(this).css('background-color'));
+                        selectedPaletteElt = $(this);
+                    });
+
+            }
             container.prepend(elt);
         }
 
         return container;
     };
 
-    var updatePaletteElt = function(){
-        for (var i = 0; i<PALETTE_SIZE; i++) {
-            paletteElt.find('#palette-elt_' + i).css({
-                'background-color': palette[i],
+    var updateElt = function(forCurrentColors){
+        var size = forCurrentColors? CURRENT_COLORS_SIZE: PALETTE_SIZE;
+        var source = forCurrentColors? currentColors: palette;
+        var id = forCurrentColors? CURRENT_COLORS_CLASS: PALETTE_CLASS;
+        var elt = forCurrentColors? currentColorsElt: paletteElt;
+        for (var i = 0; i<size; i++) {
+            elt.find('#'+id+'_' + i).css({
+                'background-color': source[i],
             })
         }
     };
 
 
-    var loadPalette = function(givenPalette){
-        if (!givenPalette){
+    that.loadPalette = function(userApp){
+        currentColors = [];
+        palette = [];
+
+        if (!userApp || !userApp.properties.palette){
             for (var i = 0; i<PALETTE_SIZE; i++){
                 palette.push(WHITE);
             }
         } else {
-            palette = JSON.stringify(JSON.parse(givenPalette));
+            var currentPalette = userApp.properties.palette;
+            palette = JSON.parse(JSON.stringify(currentPalette));
         }
-
-        paletteElt = makeColorPaletteElt();
-        paletteContainer.append(paletteElt);
+        for (var i = 0; i<CURRENT_COLORS_SIZE; i++){
+            currentColors.push(WHITE);
+        }
+        paletteElt = makePaletteElt();
+        currentColorsElt = makePaletteElt(true);
+        paletteContainer.append(paletteElt).append(currentColorsElt);
     };
+
+    var savePalette = function(userApp){
+        userApp.properties.palette = JSON.parse(JSON.stringify(palette));
+    };
+
     // TODO load palette function input
-    loadPalette();
+    that.loadPalette();
 
     Object.freeze(that);
     return that;

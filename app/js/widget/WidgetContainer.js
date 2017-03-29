@@ -56,10 +56,7 @@ var WidgetContainer = function(){
             resize: function(e, ui){
                 var newDimensions = {height: ui.size.height/currentZoom, width: ui.size.width/currentZoom};
 
-                // widget.properties.dimensions = newDimensions;
-
                 widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'dimensions', newDimensions);
-                // TODO woah! It resizes as you go!
                 refreshContainerDisplay(false, container, currentZoom);
             },
             stop: function(e, ui){
@@ -68,8 +65,6 @@ var WidgetContainer = function(){
                 newLayout[widget.meta.id] = newPosition;
                 widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'layout', newLayout, true);
 
-                // outerWidget.properties.layout[widget.meta.id].left = ui.position.left/currentZoom;
-                // outerWidget.properties.layout[widget.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
                 miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
                 grid.setUpGrid();

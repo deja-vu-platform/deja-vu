@@ -115,6 +115,8 @@ $(function(){
     // registerUserWidgetAreaDroppable();
 
     style.setUpStyleColors(selectedUserWidget);
+    style.loadPalette(userApp);
+
 
     resizeViewportToFitWindow();
 
