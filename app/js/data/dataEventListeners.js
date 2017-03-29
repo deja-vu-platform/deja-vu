@@ -135,7 +135,7 @@ function displayNewClicheInList(cliche){
 
     var newClicheElt = $(
         '<div class="user-components page-component-toggle-drop">'+
-        '<div class="header">'+
+        '<div>'+
         '<span class="dropdown-trigger dropdown-open" data-dropdownid="'+dropdownId+'">'+
         '<span class="glyphicon glyphicon-triangle-bottom"></span>'+
         cliche.meta.name+
@@ -167,6 +167,7 @@ function displayNewClicheInList(cliche){
                     // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
                     // TODO add to overall and to userApp display
                     resetMenuOptions();
+                    canvas.drawClicheDataLines(cliche);
                 });
         });
     }

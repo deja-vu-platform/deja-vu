@@ -90,7 +90,7 @@ var DataWorkSurface = function(){
             dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
         }
 
-        canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]);
+        canvas.drawClicheDataLines(cliche);
     };
 
 
@@ -146,7 +146,7 @@ var DataWorkSurface = function(){
             var container = that.makeDatatypeContainers(cliche.meta.id, datatypeId, displayPropObj, dragHandle, currentZoom, isOverall);
             workSurface.append(container);
 
-            canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]); // TODO dry
+            canvas.drawClicheDataLines(cliche);
         };
 
         var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(cliche, isOverall, onDropFinished);
