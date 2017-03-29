@@ -391,6 +391,16 @@ var WidgetContainer = function(){
         }
     };
 
+    that.getWidgetIdFromContainerId = function(containerId){
+        if (!containerId){
+            return null
+        }
+        var split = containerId.split('_');
+        if (split.length == 1){
+            return null
+        }
+        return split[split.length - 1]
+    };
 
     Object.freeze(that);
     return that;

@@ -50,7 +50,7 @@ $('#style-mode').click(function(){
 $('#back-to-projects').click(function(event){
     event.preventDefault();
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
-    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
+    utils.saveProject(selectedProject);
     window.location = 'projectView.html';
 });
 
@@ -269,11 +269,11 @@ function openDeleteUserWidgetConfirmDialogue(userWidgetId){
  */
 function initDatatype() {
     var name, version, author;
-    name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+    name = utils.sanitizeStringOfSpecialChars($('#new-component-name').val());
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
-    var id = generateId();
+    var id = utils.generateId();
 
 
     var displayProperties = UserDatatypeDisplay();

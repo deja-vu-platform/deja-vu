@@ -29,7 +29,7 @@ var BaseWidget = function (type, widgets, dimensions) {
     };
     baseWidget.meta = {
         name: '',
-        id: generateId(),
+        id: Utility().generateId(),
         version: '',
         author: ''
     };

@@ -10,8 +10,7 @@
 
 $('#save-project').on('click', function () {
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
-    //downloadObject(selectedProject.meta.name+'.json', selectedProject);
+    utils.saveProject(selectedProject);
 });
 
 $('.components').on('click', '.component-name-container', function () {
@@ -157,17 +156,20 @@ function displayNewClicheInList(cliche){
         $('#new-user-datatype-btn').click(function () {
             $('#create-component').unbind()
                 .on('click', function () {
-                    var name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+                    var name = utils.sanitizeStringOfSpecialChars($('#new-component-name').val());
                     var datatypeInfo = initDatatype();
                     var datatype = datatypeInfo[0];
                     var datatypeDisplayProps = datatypeInfo[1];
+
+
+
                     userApp.addDatatype(datatype, datatypeDisplayProps);
                     selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id);
                     displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
                     // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
                     // TODO add to overall and to userApp display
                     resetMenuOptions();
-                    canvas.drawClicheDataLines(cliche);
+                    dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
                 });
         });
     }
@@ -314,7 +316,7 @@ function registerTooltipBtnHandlers() {
                     element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
                 }
             }
-            var widgetId = getWidgetIdFromContainerId(containerId);
+            var widgetId = widgetContainerMaker.getWidgetIdFromContainerId(containerId);
             selectedUserWidget.innerWidgets[widgetId].properties,style.bsClasses[propertyName] = bootstrapClass;
 
         }

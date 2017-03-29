@@ -45,8 +45,7 @@ $('#new-widget-template-btn').click(function(){
 
 $('#save-project').on('click', function () {
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
-    //downloadObject(selectedProject.meta.name+'.json', selectedProject);
+    utils.saveProject(selectedProject);
 });
 
 $('.components').on('click', '.component-name-container', function () {
@@ -155,7 +154,7 @@ function setWidgetOptions(outerWidget){
         .click(function(){
             var copyWidget = duplicateUserWidget(outerWidget);
             // change the id
-            copyWidget.meta.id = generateId();
+            copyWidget.meta.id = utils.generateId();
             listDisplay.refresh();
             userApp.addWidget(copyWidget);
             selectedUserWidget = copyWidget;
@@ -452,7 +451,7 @@ function registerTooltipBtnHandlers() {
                     element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
                 }
             }
-            var widgetId = getWidgetIdFromContainerId(containerId);
+            var widgetId = widgetContainerMaker.getWidgetIdFromContainerId(containerId);
             selectedUserWidget.innerWidgets[widgetId].properties.styles.bsClasses[propertyName] = bootstrapClass;
 
         }
@@ -700,7 +699,7 @@ function recursiveReIding(widget, sourceWidget){
         if (sourceWidget){
             thisWidgetNewId = sourceWidget.meta.id;
         } else {
-            thisWidgetNewId = generateId();
+            thisWidgetNewId = utils.generateId();
         }
         // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
         widget.meta.id = thisWidgetNewId;
@@ -1026,13 +1025,13 @@ function initUserWidget(isDefault, inMainPage) {
     if (isDefault) {
         name = DEFAULT_WIDGET_NAME;
     } else {
-        name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+        name = utils.sanitizeStringOfSpecialChars($('#new-component-name').val());
     }
 
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
-    var id = generateId();
+    var id = utils.generateId();
 
     if (inMainPage){
         return UserWidget({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
@@ -1046,7 +1045,7 @@ function initUserApp() {
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
-    var id = generateId();
+    var id = utils.generateId();
 
     var firstPage = initUserWidget(true, true);
     var component = ClicheWithDisplay(name, id, version, author);

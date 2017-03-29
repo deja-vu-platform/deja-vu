@@ -206,7 +206,7 @@ var DataWorkSurface = function(){
             var workSurface = $('#'+DATA_WS_ID+'_'+componentId);
             //dataZoomElement.registerZoom(datatype);
 
-            if (workSurface.length===0){
+            //if (workSurface.length===0){
                 currentZoom = 1;
                 if (isOverall){
                     loadOverallWorkSurface(currentZoom);
@@ -214,13 +214,13 @@ var DataWorkSurface = function(){
                     loadClicheToWorkSurface(component, currentZoom);
                 }
 
-            } else {
-                disableAllDataDomElementsExcept(componentId);
+            //} else {
+            //    disableAllDataDomElementsExcept(componentId);
                 // setDatatypeOptions(datatype);
                 //dataZoomElement.updateZoomFromState(datatype);
                 // TODO other way? for now, reload the thinger
                 // loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
-            }
+            //}
         // }
 
         //dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(datatype);

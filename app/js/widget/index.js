@@ -12,11 +12,10 @@ var dragAndDrop = WidgetDragAndDropController();
 var grid = WidgetGrid();
 var widgetEditsManager = WidgetEditsManager();
 var undo = WidgetUndo();
+var utils = Utility();
 
 var style = WidgetStyle($('.palette-container'));
 
-var projectsSavePath = path.join(__dirname, 'projects');
-//var addedCliches;
 
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
@@ -60,7 +59,7 @@ $(function(){
     if (selectedProject){ // if it exists, load it
         selectedProject = UserProject.fromString(selectedProject);
     } else { // if not, make a new one
-        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, generateId(), DEFAULT_VERSION, DEFAULT_AUTHOR);
+        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, utils.generateId(), DEFAULT_VERSION, DEFAULT_AUTHOR);
     }
 
     $('.project-name .header').text(selectedProject.meta.name);
@@ -81,9 +80,7 @@ $(function(){
 
         // TODO dry
         window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
-        saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
-
-
+        utils.saveProject(selectedProject);
     } else {
         var userAppId = selectedProject.userApp;
         userApp = selectedProject.cliches[userAppId];
