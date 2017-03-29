@@ -1,6 +1,8 @@
+var fs = require('fs');
+var path = require('path');
+
+
 var Utility = function(){
-    var fs = require('fs');
-    var path = require('path');
 
     // special characters not allowed in inputs
     //var regex = /[`~!@#$%^&*()|+=?;:'",.<>\{\}\[\]\\\/]/gi;
@@ -9,7 +11,7 @@ var Utility = function(){
     var that = Object.create(Utility.prototype);
 
     // TODO get path emitted by main
-    const projectsSavePath = path.join(__dirname, 'projects');
+    that.projectsSavePath = path.join(__dirname, 'projects');
 
 
     // from http://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
@@ -52,10 +54,10 @@ var Utility = function(){
             if(err) return console.log(err);
             return true;
         });
-    }
+    };
 
     that.saveProject = function(project){
-        saveObjectToFile(projectsSavePath, that.projectNameToFilename(project.meta.name), project);
+        saveObjectToFile(that.projectsSavePath, that.projectNameToFilename(project.meta.name), project);
     };
 
     that.filenameToProjectName = function(filename){

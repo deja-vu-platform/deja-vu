@@ -45,7 +45,7 @@ $(function () {
     }
 
 
-    readFiles(projectsSavePath, function(filename, content) {
+    readFiles(utils.projectsSavePath, function(filename, content) {
         // TODO add a loading projects sign
         // Check the types to only add projects
         content = JSON.parse(content);
@@ -242,7 +242,7 @@ function initNewProject() {
     var copyName = projectName;
     var copyNum = 0;
     // TODO should give user warning or options
-    while(utils.isCopyOfFile(projectsSavePath, copyName+'.json')){
+    while(utils.isCopyOfFile(utils.projectsSavePath, copyName+'.json')){
         if (copyNum == 0){
             copyName = projectName + ' - Copy';
         } else {
@@ -413,7 +413,7 @@ function displayRecentProjects(){
         var content = recentProjectsByAccessTime[lastAccessed].content;
         showProjectInList(filename, content.meta.id, lastAccessed);
         addLoadProjectButton(filename);
-        addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
+        addDeleteProjectButton(utils.projectsSavePath, filename, content.meta.id);
     }
 }
 
@@ -428,7 +428,7 @@ function displayAllProjects(){
         var content = availableProjectsByAccessTime[lastAccessed].content;
         showProjectInList(filename, content.meta.id, lastAccessed);
         addLoadProjectButton(filename);
-        addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
+        addDeleteProjectButton(utils.projectsSavePath, filename, content.meta.id);
     }
 }
 

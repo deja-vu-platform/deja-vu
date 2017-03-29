@@ -165,6 +165,28 @@ function displayNewClicheInList(cliche){
                     var checkCoords = function(position, dimensions){
                         var containerRef = dataContainerMaker.getContainerRef();
                         var outerContainerOffset = $('#outer-container').offset();
+                        var endCheckX = false;
+                        var endCheckY = false;
+                        if (position.top<0){
+                            position.top = 0;
+                            endCheckY = true;
+                        }
+                        if (position.top + dimensions.height>selectedScreenSizeHeight){
+                            position.top = selectedScreenSizeHeight-dimensions.height;
+                            endCheckY = true;
+                        }
+                        if (position.left<0){
+                            position.left = 0;
+                            endCheckX = true;
+                        }
+                        if (position.left + dimensions.width>selectedScreenSizeWidth){
+                            position.left = selectedScreenSizeWidth-dimensions.width;
+                            endCheckX = true;
+                        }
+                        if (endCheckX && endCheckY){
+                            return true
+                        }
+
                         var x = position.left + outerContainerOffset.left + dimensions.width/2;
                         var y = position.top + outerContainerOffset.top + dimensions.height/2;
                         return $(utils.allElementsFromPoint(x, y)).filter('.'+containerRef).length>0;
