@@ -155,24 +155,22 @@ UserWidget.prototype.getInnerWidget = function(targetId, forParent){
 
 
 // keepStructure: Returns a nested list structure representing the structure of usage
-// structure: [id1, id2, id3, [recursive ids of children of id3], id4,[recursive children of ld4]]
+// recursive structure [widgetId, [recursive structure of children]]
+// expanded structure: [[id1, []], [id2, []], [id3, [recursive ids of children of id3]], [id4,[recursive children of ld4]]]
 UserWidget.prototype.getAllInnerWidgetsIds = function(keepStructure) {
-    var innerWidgetsInfoListStructured = [];
     var innerWidgetsInfoListLinearlized = [];
-    var getInnerWidgetInfo = function(widget, structureList){
+    var getInnerWidgetInfo = function(widget){
+        var outerRecursiveChildrenIds= [];
         for (var innerWidgetId in widget.innerWidgets){
             var innerWidget = widget.innerWidgets[innerWidgetId];
-            structureList.push(innerWidgetId);
-            var innerList = [];
             innerWidgetsInfoListLinearlized.push(innerWidgetId);
-            getInnerWidgetInfo(innerWidget, innerList);
-            if (innerList.length>0){
-                structureList.push(innerList);
-            }
+            var recursiveChildrenIds = getInnerWidgetInfo(innerWidget);
+            outerRecursiveChildrenIds.push([innerWidgetId, recursiveChildrenIds]);
         }
+        return outerRecursiveChildrenIds
     };
 
-    getInnerWidgetInfo(this, innerWidgetsInfoListStructured);
+    var innerWidgetsInfoListStructured = getInnerWidgetInfo(this);
 
     if (keepStructure){
         return innerWidgetsInfoListStructured;

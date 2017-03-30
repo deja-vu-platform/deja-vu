@@ -9,37 +9,30 @@ var WidgetListDisplay = function(){
 
         // keeps the structure instead of linearizing so it can have a folding structure
         var recursiveListMakerHelper = function(innerWidgetList, parentElt){
-            innerWidgetList.forEach(function(item){
-                if (Array.isArray(item)){
-                    var innerList= item;
-                    var ul = $('<ul>');
-                    recursiveListMakerHelper(innerList, ul);
-                    parentElt.append(ul);
-                } else {
-                    var innerWidgetId = item;
-                    var widgetInfo = widget.getInnerWidget(innerWidgetId).meta;
-                    var elt = $(
-                        '<li data-type="'+'user'+'" class="widget not-draggable inner-widget" data-componentid="' + widgetInfo.id + '" data-clicheid=' + clicheId + '>'
-                        + '<div class="component-name-container">'
+            innerWidgetList.forEach(function(parentAndChildren){
+                var parentId = parentAndChildren[0];
+                var children = parentAndChildren[1];
+                var widgetInfo = widget.getInnerWidget(parentId).meta;
+                var elt = $(
+                    '<li data-type="'+'user'+'" class="widget not-draggable inner-widget" data-componentid="' + widgetInfo.id + '" data-clicheid=' + clicheId + '>'
+                    + '<div class="component-name-container">'
                         + '<span class="component-name">' + widgetInfo.name + '</span>'
                         + '<div class="submit-rename not-displayed">'
-                        + '<input type="text" class="new-name-input form-control" autofocus>'
+                            + '<input type="text" class="new-name-input form-control" autofocus>'
                         + '</div>'
-                        + '</div>'
-                        + '</li>');
-                    parentElt.append(elt);
+                    + '</div>'
+                    + '</li>');
+                if (children.length>0){
+                    var ul = $('<ul class="children"></ul>');
+                    recursiveListMakerHelper(children, ul);
+                    elt.append(ul);
                 }
-
+                parentElt.append(elt);
             });
         };
 
         var innerWidgetsInfoList = widget.getAllInnerWidgetsIds(true);
-
-        var list = $('<ul>');
-        recursiveListMakerHelper(innerWidgetsInfoList, list);
-        listElt.find('.inner-widgets').append(list);
-
-        return list;
+        recursiveListMakerHelper(innerWidgetsInfoList, listElt.find('.inner-widgets'));
     };
 
     that.loadClicheIntoWidgetList = function(cliche, widgetToLoadId){
