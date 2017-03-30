@@ -107,7 +107,7 @@ UserWidget.prototype.deleteInnerWidget = function(widgetId) {
 
 UserWidget.prototype.getPath = function(widgetId){
     var outermostWidget = this;
-    var wantedPath;
+    var wantedPath = [];
     var getPathHelper = function(widget, path, targetId){
         if (widget.meta){
             var widgetId = widget.meta.id;
@@ -154,22 +154,31 @@ UserWidget.prototype.getInnerWidget = function(targetId, forParent){
 };
 
 
-// Note: returns only one copy!
-UserWidget.prototype.getAllInnerWidgetsIds = function() {
-    var innerWidgetsInfoList = [];
-
-    var getInnerWidgetInfo = function(widget, innerWidgetsList){
+// keepStructure: Returns a nested list structure representing the structure of usage
+// structure: [id1, id2, id3, [recursive ids of children of id3], id4,[recursive children of ld4]]
+UserWidget.prototype.getAllInnerWidgetsIds = function(keepStructure) {
+    var innerWidgetsInfoListStructured = [];
+    var innerWidgetsInfoListLinearlized = [];
+    var getInnerWidgetInfo = function(widget, structureList){
         for (var innerWidgetId in widget.innerWidgets){
             var innerWidget = widget.innerWidgets[innerWidgetId];
-            innerWidgetsList.push(innerWidget.meta.id);
-            getInnerWidgetInfo(innerWidget, innerWidgetsList);
-
+            structureList.push(innerWidgetId);
+            var innerList = [];
+            innerWidgetsInfoListLinearlized.push(innerWidgetId);
+            getInnerWidgetInfo(innerWidget, innerList);
+            if (innerList.length>0){
+                structureList.push(innerList);
+            }
         }
     };
 
-    getInnerWidgetInfo(this, innerWidgetsInfoList);
+    getInnerWidgetInfo(this, innerWidgetsInfoListStructured);
 
-    return innerWidgetsInfoList;
+    if (keepStructure){
+        return innerWidgetsInfoListStructured;
+    } else {
+        return innerWidgetsInfoListLinearlized;
+    }
 };
 
 

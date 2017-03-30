@@ -40,20 +40,20 @@ $('.components').on('dblclick', '.component-name', function (e) {
 $('.components').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
-        var widgetId = $(this).parent().parent().parent().data('componentid');
-        var widgetNameElt = $($(this).parent().parent().find('.component-name'));
+        var id = $(this).parent().parent().parent().data('componentid');
+        var nameElt = $($(this).parent().parent().find('.component-name'));
         var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
-        widgetNameElt.removeClass('not-displayed');
+        nameElt.removeClass('not-displayed');
         submitRenameElt.addClass('not-displayed');
         var newName = $(this).val();
         if (newName.length === 0) { // empty string entered, don't change the name!
             return;
         }
-        widgetNameElt.text(newName);
+        nameElt.text(newName);
         $('.component-options .component-name').text(newName);
 
-        selectedProject.cliches[widgetId].meta.name = newName;
+        selectedProject.cliches[id].meta.name = newName;
     }
 });
 

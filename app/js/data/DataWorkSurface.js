@@ -59,12 +59,13 @@ var DataWorkSurface = function(){
         dragHandle.text(cliche.meta.name);
         dragHandle.css('display', 'block');
 
+        var displayPropObj;
         // TODO dry
         if (isOverall){
-            var displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[cliche.meta.id];
+            displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[cliche.meta.id];
 
         } else {
-            var displayPropObj = cliche.dataBondDisplays[cliche.meta.id];
+            displayPropObj = cliche.dataBondDisplays[cliche.meta.id];
         }
         var container = that.makeDatatypeContainers(cliche.meta.id, cliche.meta.id, displayPropObj, dragHandle, zoom, isOverall);
         workSurface.append(container);

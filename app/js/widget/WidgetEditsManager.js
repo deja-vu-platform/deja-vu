@@ -6,26 +6,6 @@
 var WidgetEditsManager = function(){
     var that = Object.create(WidgetEditsManager.prototype);
 
-
-    that.getPath = function(outermostWidget, widgetId){
-        var wantedPath;
-        var getPathHelper = function(widget, path, targetId){
-            if (widget.meta){
-                var widgetId = widget.meta.id;
-                path.push(widgetId);
-                if (widgetId == targetId){
-                    wantedPath = path;
-                } else {
-                    for (var id in widget.innerWidgets){
-                        getPathHelper(widget.innerWidgets[id], JSON.parse(JSON.stringify(path)), targetId);
-                    }
-                }
-            }
-        };
-        getPathHelper(outermostWidget, [], widgetId);
-        return wantedPath;
-    };
-
     var getOrCreateCustomProperty = function(outermostWidget, targetId){
         var path = outermostWidget.getPath(targetId);
 

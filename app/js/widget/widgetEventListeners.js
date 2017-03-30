@@ -53,24 +53,13 @@ $('.components').on('click', '.component-name-container', function () {
     var oldState = {zoom : currentZoom};
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
     $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
-    $('.widget').each(function(idx, elt){
-        elt = $(elt);
-        if (elt.data('draggable')){
-            elt.draggable('enable');
-        }
-    });
     dragAndDrop.registerWidgetDragHandleDraggable();
     var widgetId = $(this).parent().data('componentid');
     listDisplay.select(widgetId);
     //$('.selected').removeClass('selected');
     //$(this).parent().addClass('selected');
     selectedUserWidget = userApp.getWidget(widgetId);
-    if (!selectedUserWidget.isPage){
-        var dragHandle = $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']');
-        if (dragHandle.data('draggable')){
-            dragHandle.draggable('disable');
-        }
-    }
+    listDisplay.updateDraggables(selectedUserWidget);
     workSurface.loadUserWidget(selectedUserWidget);
     style.setUpStyleColors(selectedUserWidget);
     $('#outer-container').scrollTop(0); // TODO DRY
@@ -667,7 +656,7 @@ function refreshContainerDisplay(fresh, container, zoom){
     var widgetId = container.data('componentId');
 
 
-    if (selectedUserWidget.getPath(widgetId)){ // component exists
+    if (selectedUserWidget.getPath(widgetId).length>0){ // component exists
         var widgetToChange = selectedUserWidget.getInnerWidget(widgetId);
 
         var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);

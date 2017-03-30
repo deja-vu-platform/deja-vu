@@ -6,24 +6,37 @@ var WidgetListDisplay = function(){
     var that = Object.create(WidgetListDisplay.prototype);
 
     var recursivelyLoadWidgetIntoList = function(widget, clicheId, listElt){
-        var innerWidgetsInfoList = widget.getAllInnerWidgetsIds();
 
-        // can keep the structure instead of linearizing it so it can have a folding structure
-        var list = [];
+        // keeps the structure instead of linearizing so it can have a folding structure
+        var recursiveListMakerHelper = function(innerWidgetList, parentElt){
+            innerWidgetList.forEach(function(item){
+                if (Array.isArray(item)){
+                    var innerList= item;
+                    var ul = $('<ul>');
+                    recursiveListMakerHelper(innerList, ul);
+                    parentElt.append(ul);
+                } else {
+                    var innerWidgetId = item;
+                    var widgetInfo = widget.getInnerWidget(innerWidgetId).meta;
+                    var elt = $(
+                        '<li data-type="'+'user'+'" class="widget not-draggable inner-widget" data-componentid="' + widgetInfo.id + '" data-clicheid=' + clicheId + '>'
+                        + '<div class="component-name-container">'
+                        + '<span class="component-name">' + widgetInfo.name + '</span>'
+                        + '<div class="submit-rename not-displayed">'
+                        + '<input type="text" class="new-name-input form-control" autofocus>'
+                        + '</div>'
+                        + '</div>'
+                        + '</li>');
+                    parentElt.append(elt);
+                }
 
-        innerWidgetsInfoList.forEach(function(innerWidgetId){
-            var widgetInfo = widget.getInnerWidget(innerWidgetId).meta;
-            var elt = $(
-                '<li data-type="'+'user'+'" class="widget not-draggable inner-widget" data-componentid="' + widgetInfo.id + '" data-clicheid=' + clicheId + '>'
-                + '<div class="component-name-container">'
-                + '<span class="component-name">' + widgetInfo.name + '</span>'
-                + '<div class="submit-rename not-displayed">'
-                + '<input type="text" class="new-name-input form-control" autofocus>'
-                + '</div>'
-                + '</div>'
-                + '</li>');
-            list.push(elt);
-        });
+            });
+        };
+
+        var innerWidgetsInfoList = widget.getAllInnerWidgetsIds(true);
+
+        var list = $('<ul>');
+        recursiveListMakerHelper(innerWidgetsInfoList, list);
         listElt.find('.inner-widgets').append(list);
 
         return list;
@@ -154,6 +167,27 @@ var WidgetListDisplay = function(){
     that.refresh = function(){
         $('.widget-list').html("");
         that.loadClicheIntoWidgetList(userApp, selectedUserWidget.meta.id);
+    };
+
+    that.updateDraggables = function(selectedWidget){
+        // first enable all draggables
+        $('.widget').each(function(idx, elt){
+            elt = $(elt);
+            if (elt.data('uiDraggable')){
+                elt.draggable('enable');
+            }
+        });
+        // then disable the relevant ones
+        userApp.getAllOuterWidgetIds().forEach(function(widgetId){
+            var widget = userApp.getWidget(widgetId);
+            var path = widget.getPath(selectedWidget.meta.id);
+            path.forEach(function(pathWidgteId){ // note this includes the selectedWidgetId
+                var dragHandle = $('.components').find('[data-componentid='+pathWidgteId+']');
+                if (dragHandle.data('uiDraggable')){
+                    dragHandle.draggable('disable');
+                }
+            });
+        });
     };
 
     Object.freeze(that);
