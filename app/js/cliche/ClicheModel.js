@@ -204,46 +204,65 @@ ClicheWithDisplay.prototype.getAllOuterWidgetIds = function(){
     return pages.concat(unused).concat(templates);
 };
 
-ClicheWithDisplay.prototype.getAllWidgetIds = function(){
+ClicheWithDisplay.prototype.getAllWidgetIds = function(includeTemplates){
     var allOuterWidgetIds = this.getAllOuterWidgetIds();
-    var used = this.getAllUsedWidgetIds();
+    var used = this.getAllUsedWidgetIds(includeTemplates);
     return allOuterWidgetIds.concat(used);
 };
 
-ClicheWithDisplay.prototype.getAllUsedWidgetIds = function(){
+ClicheWithDisplay.prototype.getAllUsedWidgetIds = function(includeTemplates){
     var allUsedWidgetsIds = [];
     var cliche = this;
-    for (var pageId in cliche.widgets.pages){
-        var page = cliche.widgets.pages[pageId];
-        allUsedWidgetsIds = allUsedWidgetsIds.concat(page.getAllInnerWidgetsIds());
+    var getInnerIds = function(widgetType, widgetId){
+        var widget = cliche.widgets[widgetType][widgetId];
+        return widget.getAllInnerWidgetsIds();
+    };
+
+    for (var widgetId in cliche.widgets.pages){
+        allUsedWidgetsIds = allUsedWidgetsIds.concat(getInnerIds('pages', widgetId));
     }
     for (var widgetId in cliche.widgets.unused){
-        var widget = cliche.widgets.unused[widgetId];
-        allUsedWidgetsIds = allUsedWidgetsIds.concat(widget.getAllInnerWidgetsIds());
+        allUsedWidgetsIds = allUsedWidgetsIds.concat(getInnerIds('unused', widgetId));
+    }
+    if (includeTemplates){
+        for (var widgetId in cliche.widgets.templates){
+            allUsedWidgetsIds = allUsedWidgetsIds.concat(getInnerIds('templates', widgetId));
+        }
     }
     return allUsedWidgetsIds;
 };
 
 
-var findUsedWidget = function(cliche, wantedWidgetId){
+ClicheWithDisplay.prototype.findUsedWidget = function(wantedWidgetId){
+    var cliche = this;
     var wantedWidget = null;
-
-    for (var widgetId in cliche.widgets.pages){
-        var outermostWidget = cliche.widgets.pages[widgetId];
+    var usingWidgetId = null;
+    var findUsedWidgetHelper = function(widgetType, widgetId){
+        var outermostWidget = cliche.widgets[widgetType][widgetId];
         var innerWidget = outermostWidget.getInnerWidget(wantedWidgetId);
         if (innerWidget){
             wantedWidget = innerWidget;
+        }
+        return innerWidget? true: false;
+    };
+
+    for (var widgetId in cliche.widgets.pages){
+        if (findUsedWidgetHelper('pages', widgetId)){
+            usingWidgetId = widgetId;
         }
     }
     for (var widgetId in cliche.widgets.unused){
-        var outermostWidget = cliche.widgets.unused[widgetId];
-        var innerWidget = outermostWidget.getInnerWidget(wantedWidgetId);
-        if (innerWidget){
-            wantedWidget = innerWidget;
+        if (findUsedWidgetHelper('unused', widgetId)){
+            usingWidgetId = widgetId;
+        }
+    }
+    for (var widgetId in cliche.widgets.templates){
+        if (findUsedWidgetHelper('templates', widgetId)){
+            usingWidgetId = widgetId;
         }
     }
 
-    return wantedWidget;
+    return [wantedWidget, usingWidgetId];
 };
 
 ClicheWithDisplay.prototype.getWidget = function(widgetId){
@@ -257,5 +276,5 @@ ClicheWithDisplay.prototype.getWidget = function(widgetId){
         return this.widgets.templates[widgetId]
     }
     // TODO deal with inner widgets
-    return findUsedWidget(this, widgetId);
+    return this.findUsedWidget(widgetId)[0];
 };

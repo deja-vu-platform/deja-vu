@@ -26,12 +26,10 @@ var WidgetEditsManager = function(){
     // TODO make this general
     // TODO make this robust
     that.updateCustomProperties = function(outermostWidget, targetId, typeString, newProperties, forParent){
+        var path = outermostWidget.getPath(targetId);
         if (forParent){
-            var path = outermostWidget.getPath(targetId);
             targetId = path[path.length - 2];
         }
-
-
 
         var createCustomPropertyOfType = function(outermostWidget, targetId, typeString){
             var types = typeString.split('.');
@@ -46,31 +44,37 @@ var WidgetEditsManager = function(){
             return changes;
         };
 
-        var widget = outermostWidget.getInnerWidget(targetId);
-        var changes = createCustomPropertyOfType(outermostWidget, targetId, typeString);
 
-        if (typeString == 'styles.custom'){
-            for (var property in newProperties){
-                changes[property] = newProperties[property];
-                widget.properties.styles.custom[property] = newProperties[property];
+        var updateCustomPropertiesHelper = function(outermostWidget, targetId, typeString, newProperties){
+            var targetWidget = outermostWidget.getInnerWidget(targetId);
+            var changes = createCustomPropertyOfType(outermostWidget, targetId, typeString);
+
+            if (typeString == 'styles.custom'){
+                for (var property in newProperties){
+                    changes[property] = newProperties[property];
+                    targetWidget.properties.styles.custom[property] = newProperties[property];
+                }
+            } else if (typeString == "stackOrder"){
+                // changes = newProperties;
+                // widget.properties.layout.stackOrder = newProperties;
+            } else if (typeString == 'value'){
+                for (var property in newProperties){
+                    changes[property] = newProperties[property];
+                }
+                targetWidget.innerWidgets[newProperties.type] = newProperties.value;
+            } else {
+                // TODO is this right??
+                // FIXME problem with dot notation
+                for (var property in newProperties){
+                    changes[property] = newProperties[property];
+                    // this might have problems with dot notation
+                    targetWidget.properties[typeString][property] = newProperties[property];
+                }
             }
-        } else if (typeString == "stackOrder"){
-            // changes = newProperties;
-            // widget.properties.layout.stackOrder = newProperties;
-        } else if (typeString == 'value'){
-            for (var property in newProperties){
-                changes[property] = newProperties[property];
-            }
-            widget.innerWidgets[newProperties.type] = newProperties.value;
-        } else {
-            // TODO is this right??
-            // FIXME problem with dot notation
-            for (var property in newProperties){
-                changes[property] = newProperties[property];
-                // this might have problems with dot notation
-                widget.properties[typeString][property] = newProperties[property];
-            }
-        }
+        };
+
+        updateCustomPropertiesHelper(outermostWidget, targetId, typeString, newProperties);
+        that.applyPropertyChangesAtAllLevelsBelow(outermostWidget);
     };
 
 
@@ -100,7 +104,9 @@ var WidgetEditsManager = function(){
 
     // property name can be of the form "asdas.asda" like "layout.stackOrder"
     // TODO Make more robust
-    that.clearCustomProperties = function(outermostWidget, targetId, propertyName){
+    that.clearCustomProperties = function(targetId, propertyName){
+        var outermostWidget = userApp.getWidget(userApp.findUsedWidget(targetId)[1]);
+
         var path = outermostWidget.getPath(targetId);
 
         var customProperties = that.getCustomProperty(outermostWidget, targetId);
@@ -156,11 +162,11 @@ var WidgetEditsManager = function(){
     };
 
     that.applyPropertyChangesAtAllLevelsBelow = function(outermostWidget){
-        var recursiveApplyPropertyChangesHelper = function(widget){
-            if (widget.type == 'user') {
+        var recursiveApplyPropertyChangesHelper = function(widgetToModify){
+            if (widgetToModify.type == 'user') {
                 var template = true;
 
-                var templateId = widget.meta.templateId;
+                var templateId = widgetToModify.meta.templateId;
                 if (templateId){
                     var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(templateId);
                     var templateClicheId = clicheAndWidgetId.clicheId;
@@ -181,22 +187,22 @@ var WidgetEditsManager = function(){
                         JSON.stringify(selectedProject.cliches[templateClicheId].widgets.templates[templateWidgetId])
                     );
 
-                    widget.properties.layout.stackOrder.forEach(function (innerWidgetId) {
-                        var innerWidget = widget.innerWidgets[innerWidgetId];
+                    widgetToModify.properties.layout.stackOrder.forEach(function (innerWidgetId) {
+                        var innerWidget = widgetToModify.innerWidgets[innerWidgetId];
                         recursiveApplyPropertyChangesHelper(innerWidget);
                     });
 
                     // apply changes after calling the recursion so that higher levels override
                     // lower level changes
-                    applyPropertyChanges(widget, componentVersionCopy);
+                    applyPropertyChanges(widgetToModify, componentVersionCopy);
                 } else {
-                    applyPropertyChanges(widget);
+                    applyPropertyChanges(widgetToModify);
                 }
             } else {
                 // else it's a base component, so we'll just take it as is from the component we are reading from
-                applyPropertyChanges(widget);
+                applyPropertyChanges(widgetToModify);
             }
-            return widget
+            return widgetToModify
         };
 
         recursiveApplyPropertyChangesHelper(outermostWidget);
@@ -213,6 +219,7 @@ var WidgetEditsManager = function(){
      * @param sourceWidget
      */
     var applyPropertyChanges = function(outerWidget, sourceWidget){
+
         var getPropertyChanges = function(outerWidget, path){
             // get the changes at this level
 
@@ -275,6 +282,9 @@ var WidgetEditsManager = function(){
             if (properties.value){
                 widget.innerWidgets[properties.value.type] = properties.value.value;
             }
+            if (properties.name){
+                widget.meta.name = properties.name;
+            }
 
         };
 
@@ -300,6 +310,14 @@ var WidgetEditsManager = function(){
 
             insertPropertiesIntoWidget(innerWidget, properties);
 
+            // if this itself is a used widget, apply the top ones
+            var usingWidgetId = userApp.findUsedWidget(innerWidget.meta.id)[1];
+            if (usingWidgetId){
+                var usingWidget = userApp.getWidget(usingWidgetId);
+                var topmostProperties = getPropertyChanges(usingWidget, usingWidget.getPath(innerWidget.meta.id));
+                insertPropertiesIntoWidget(innerWidget, topmostProperties);
+            }
+
             if (innerWidget.type == 'user'){
                 // then recurse down
                 innerWidget.properties.layout.stackOrder.forEach(function (innerInnerWidgetId, idx) {
@@ -319,6 +337,8 @@ var WidgetEditsManager = function(){
             }
             path.pop();
         };
+
+        // apply the properties to all lower levels
         applyPropertyChangesHelper(outerWidget, sourceWidget, sourceWidget);
 
     };

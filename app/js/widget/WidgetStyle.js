@@ -76,10 +76,12 @@ var WidgetStyle = function(paletteContainer){
     };
 
     var setOverallStyleAndUpdateView = function(styleName, styleValue, userWidget){
-        if (!userWidget.properties.styles.custom){
-            userWidget.properties.styles.custom = {}
-        }
-        userWidget.properties.styles.custom[styleName] = styleValue;
+        var widgetId = userWidget.meta.id;
+        var firstAncestor = userApp.getWidget(userApp.findUsedWidget(widgetId)[1]);
+        var customStyle = {};
+        customStyle[styleName] = styleValue;
+        widgetEditsManager.updateCustomProperties(firstAncestor, widgetId, 'styles.custom', customStyle);
+
         for (var id in userWidget.innerWidgets){
             var container = $('#'+workSurfaceRef+'_'+userWidget.meta.id).find('#'+containerRef+'_'+id);
             refreshContainerDisplay(false, container, currentZoom);
@@ -112,7 +114,8 @@ var WidgetStyle = function(paletteContainer){
         });
 
         $('#reset-overall-color').click(function(){
-            widgetEditsManager.clearCustomProperties(selectedUserWidget, selectedUserWidget.meta.id, 'styles.custom');
+            //delete selectedUserWidget.properties.styles.custom;
+            widgetEditsManager.clearCustomProperties(selectedUserWidget.meta.id, 'styles.custom');
 
             style.setUpStyleColors(selectedUserWidget);
             for (var id in selectedUserWidget.innerWidgets){

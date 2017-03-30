@@ -264,7 +264,7 @@ var WidgetContainer = function(){
 
 
     var clearCustomStyles = function(outermostWidget, targetId){
-        widgetEditsManager.clearCustomProperties(outermostWidget, targetId, 'styles.custom');
+        widgetEditsManager.clearCustomProperties(targetId, 'styles.custom');
 
         // TODO at this point might even be good to clear out all properties if they are empty
     };

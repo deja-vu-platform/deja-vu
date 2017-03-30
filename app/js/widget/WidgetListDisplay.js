@@ -51,7 +51,8 @@ var WidgetListDisplay = function(){
                     recursivelyLoadWidgetIntoList(userApp.widgets.unused[widgetId], userAppId, listElt);
                 } else if (widgetId in userApp.widgets.templates) {
                     widgetName = userApp.widgets.templates[widgetId].meta.name;
-                    displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
+                    var listElt = displayNewWidgetTemplateInList(widgetName, widgetId, userAppId);
+                    recursivelyLoadWidgetIntoList(userApp.widgets.templates[widgetId], userAppId, listElt);
                 }
             });
             if (widgetToLoadId){
@@ -150,6 +151,7 @@ var WidgetListDisplay = function(){
         $('#widget-templates-list').append(newWidgetElt);
         addDeleteUserWidgetButton(id, newWidgetElt);
         dragAndDrop.registerWidgetDragHandleDraggable(newWidgetElt);
+        return newWidgetElt;
     };
 
     that.select = function(id){

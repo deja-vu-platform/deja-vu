@@ -458,7 +458,7 @@ var WidgetWorkSurface = function(){
     };
 
     var disableAllWidgetDomElementsExcept = function(widgetToEnableId){
-        userApp.getAllWidgetIds().forEach(function(widgetId){
+        userApp.getAllWidgetIds(true).forEach(function(widgetId){
             if (widgetToEnableId == widgetId){
                 enableWidgetDOMElements(widgetId);
                 return;
