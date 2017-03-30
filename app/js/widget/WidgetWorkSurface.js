@@ -152,11 +152,11 @@ var WidgetWorkSurface = function(){
             console.log(userWidget);
         }
 
-        userWidget = widgetEditsManager.refreshFromProject(userWidget);
+        widgetEditsManager.refreshPropertyValues(userWidget);
 
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
-            var overallStyles = userWidget.properties.styles.custom;
+            var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(userWidget, innerWidgetId);;
             that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, true, null, workSurface, overallStyles, zoom, true);
         });
     };
@@ -266,26 +266,6 @@ var WidgetWorkSurface = function(){
     };
 
 
-    // from http://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
-    var allElementsFromPoint = function(x, y) {
-        var element, elements = [];
-        var oldVisibility = [];
-        while (true) {
-            element = document.elementFromPoint(x, y);
-            if (!element || element === document.documentElement) {
-                break;
-            }
-            elements.push(element);
-            oldVisibility.push(element.style.visibility);
-            element.style.visibility = 'hidden'; // Temporarily hide the element (without changing the layout)
-        }
-        for (var k = 0; k < elements.length; k++) {
-            elements[k].style.visibility = oldVisibility[k];
-        }
-        elements.reverse();
-        return elements;
-    };
-
     var findWidgetsToShift = function(movingId, otherId){// TODO better naming?
         var container = $('#'+containerRef+'_'+otherId);
 
@@ -296,12 +276,12 @@ var WidgetWorkSurface = function(){
         var widgetsToShift = {};
         [left, right].forEach(function(x) {
             [top, bottom].forEach(function (y) {
-                var allElements = allElementsFromPoint(x, y);
+                var allElements = utils.allElementsFromPoint(x, y);
                 var overlappingWidgets = [];
                 $(allElements).filter('.'+containerRef).each(function (idx, elt) {
                     var containerId = $(elt).attr('id');
                     if (containerId != 'dragging-container') {
-                        var id = getWidgetIdFromContainerId($(elt).attr('id'));
+                        var id = widgetContainerMaker.getWidgetIdFromContainerId($(elt).attr('id'));
                         if (movingId == otherId){ // if we are looking at the moving container
                             if (!(id == movingId)) {
                                 overlappingWidgets.push(id); // push in every other overlapping container
@@ -478,7 +458,7 @@ var WidgetWorkSurface = function(){
     };
 
     var disableAllWidgetDomElementsExcept = function(widgetToEnableId){
-        userApp.getAllWidgetIds().forEach(function(widgetId){
+        userApp.getAllWidgetIds(true).forEach(function(widgetId){
             if (widgetToEnableId == widgetId){
                 enableWidgetDOMElements(widgetId);
                 return;

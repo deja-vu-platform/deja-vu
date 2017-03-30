@@ -11,7 +11,7 @@ var DataWorkSurface = function(){
 
     // takes in a component object and the id of the selected datatype, and does
     // any work based on the data you obtain from the component
-
+    var containerRef = dataContainerMaker.getContainerRef();
     that.getWorkSurfaceRef = function(){
         return DATA_WS_ID;
     };
@@ -25,11 +25,11 @@ var DataWorkSurface = function(){
         return workSurface;
     };
 
-    var createOrResetWorkSurface = function(datatype, zoom){
-        var datatypeId = datatype.meta.id;
+    var createOrResetWorkSurface = function(cliche, zoom){
+        var datatypeId = cliche.meta.id;
         var workSurface = $('#'+DATA_WS_ID+'_'+datatypeId);
         if (workSurface.length===0){
-            workSurface = that.setUpEmptyWorkSurface(datatype, zoom);
+            workSurface = that.setUpEmptyWorkSurface(cliche, zoom);
         } else {
             resetWorkSurface(workSurface);
         }
@@ -42,7 +42,7 @@ var DataWorkSurface = function(){
             zoom: 1,
         };
         workSurface.data('state', state);
-        workSurface.find('.component-container').remove();
+        workSurface.find('.'+containerRef).remove();
     };
 
     var loadOverallWorkSurface = function(zoom){
@@ -55,18 +55,17 @@ var DataWorkSurface = function(){
 
     var loadClicheToWorkSurface = function(cliche, zoom, isOverall, focusDatatype){ // TODO should input a Project
         var workSurface = createOrResetWorkSurface(cliche, zoom);
-
-
         var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
         dragHandle.text(cliche.meta.name);
         dragHandle.css('display', 'block');
 
+        var displayPropObj;
         // TODO dry
         if (isOverall){
-            var displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[cliche.meta.id];
+            displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[cliche.meta.id];
 
         } else {
-            var displayPropObj = cliche.dataBondDisplays[cliche.meta.id];
+            displayPropObj = cliche.dataBondDisplays[cliche.meta.id];
         }
         var container = that.makeDatatypeContainers(cliche.meta.id, cliche.meta.id, displayPropObj, dragHandle, zoom, isOverall);
         workSurface.append(container);
@@ -90,7 +89,7 @@ var DataWorkSurface = function(){
             dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
         }
 
-        canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]);
+        canvas.drawClicheDataLines(cliche);
     };
 
 
@@ -124,7 +123,7 @@ var DataWorkSurface = function(){
             console.log(userWidget);
         }
 
-        userWidget = dataEditsManager.refreshFromProject(userWidget);
+        //userWidget = dataEditsManager.refreshPropertyValues(userWidget);
 
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
@@ -146,7 +145,7 @@ var DataWorkSurface = function(){
             var container = that.makeDatatypeContainers(cliche.meta.id, datatypeId, displayPropObj, dragHandle, currentZoom, isOverall);
             workSurface.append(container);
 
-            canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]); // TODO dry
+            canvas.drawClicheDataLines(cliche);
         };
 
         var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(cliche, isOverall, onDropFinished);
@@ -206,7 +205,7 @@ var DataWorkSurface = function(){
             var workSurface = $('#'+DATA_WS_ID+'_'+componentId);
             //dataZoomElement.registerZoom(datatype);
 
-            if (workSurface.length===0){
+            //if (workSurface.length===0){
                 currentZoom = 1;
                 if (isOverall){
                     loadOverallWorkSurface(currentZoom);
@@ -214,13 +213,13 @@ var DataWorkSurface = function(){
                     loadClicheToWorkSurface(component, currentZoom);
                 }
 
-            } else {
-                disableAllDataDomElementsExcept(componentId);
+            //} else {
+            //    disableAllDataDomElementsExcept(componentId);
                 // setDatatypeOptions(datatype);
                 //dataZoomElement.updateZoomFromState(datatype);
                 // TODO other way? for now, reload the thinger
                 // loadAllDatatypesIntoOverallWorkSurface(component, currentZoom);
-            }
+            //}
         // }
 
         //dataMiniNav.setUpMiniNavElementAndInnerWidgetSizes(datatype);

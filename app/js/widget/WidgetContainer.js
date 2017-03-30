@@ -56,10 +56,7 @@ var WidgetContainer = function(){
             resize: function(e, ui){
                 var newDimensions = {height: ui.size.height/currentZoom, width: ui.size.width/currentZoom};
 
-                // widget.properties.dimensions = newDimensions;
-
                 widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'dimensions', newDimensions);
-                // TODO woah! It resizes as you go!
                 refreshContainerDisplay(false, container, currentZoom);
             },
             stop: function(e, ui){
@@ -68,8 +65,6 @@ var WidgetContainer = function(){
                 newLayout[widget.meta.id] = newPosition;
                 widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'layout', newLayout, true);
 
-                // outerWidget.properties.layout[widget.meta.id].left = ui.position.left/currentZoom;
-                // outerWidget.properties.layout[widget.meta.id].top = ui.position.top/currentZoom;
                 // not super important to update as you resize so just do it at the end
                 miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
                 grid.setUpGrid();
@@ -252,11 +247,13 @@ var WidgetContainer = function(){
         return container;
     };
 
-    var getCustomStyles = function(outermostWidget, targetId){
-        var changes = widgetEditsManager.getCustomProperty(outermostWidget, targetId);
-        if (changes.styles) {
-            if (changes.styles.custom){
-                return changes.styles.custom;
+    var getCustomStyles = function(target){
+        var changes = target.overrideProperties; //widgetEditsManager.getCustomProperty(outermostWidget, targetId);
+        if (changes){
+            if (changes.styles) {
+                if (changes.styles.custom){
+                    return changes.styles.custom;
+                }
             }
         }
         return {};
@@ -269,7 +266,7 @@ var WidgetContainer = function(){
 
 
     var clearCustomStyles = function(outermostWidget, targetId){
-        widgetEditsManager.clearCustomProperties(outermostWidget, targetId, 'styles.custom');
+        widgetEditsManager.clearCustomProperties(targetId, 'styles.custom');
 
         // TODO at this point might even be good to clear out all properties if they are empty
     };
@@ -279,7 +276,7 @@ var WidgetContainer = function(){
         var customStyles = {};
         var targetId = widget.meta.id;
         if (outermostWidget){ // FIXME make more robust
-            customStyles = getCustomStyles(outermostWidget, targetId);
+            customStyles = getCustomStyles(widget);
         }
 
         var fontSizeOption = $('<li><div>Font Size: </div></li>');
@@ -326,7 +323,7 @@ var WidgetContainer = function(){
         var customStyles = {};
         var targetId = widget.meta.id;
         if (outermostWidget){
-            customStyles = getCustomStyles(outermostWidget, targetId);
+            customStyles = getCustomStyles(widget);
         }
 
         var textColorOption = $('<li><div>Text Color: </div></li>');
@@ -396,6 +393,16 @@ var WidgetContainer = function(){
         }
     };
 
+    that.getWidgetIdFromContainerId = function(containerId){
+        if (!containerId){
+            return null
+        }
+        var split = containerId.split('_');
+        if (split.length == 1){
+            return null
+        }
+        return split[split.length - 1]
+    };
 
     Object.freeze(that);
     return that;

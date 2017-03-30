@@ -10,8 +10,7 @@
 
 $('#save-project').on('click', function () {
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
-    //downloadObject(selectedProject.meta.name+'.json', selectedProject);
+    utils.saveProject(selectedProject);
 });
 
 $('.components').on('click', '.component-name-container', function () {
@@ -41,20 +40,20 @@ $('.components').on('dblclick', '.component-name', function (e) {
 $('.components').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
-        var widgetId = $(this).parent().parent().parent().data('componentid');
-        var widgetNameElt = $($(this).parent().parent().find('.component-name'));
+        var id = $(this).parent().parent().parent().data('componentid');
+        var nameElt = $($(this).parent().parent().find('.component-name'));
         var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
-        widgetNameElt.removeClass('not-displayed');
+        nameElt.removeClass('not-displayed');
         submitRenameElt.addClass('not-displayed');
         var newName = $(this).val();
         if (newName.length === 0) { // empty string entered, don't change the name!
             return;
         }
-        widgetNameElt.text(newName);
+        nameElt.text(newName);
         $('.component-options .component-name').text(newName);
 
-        selectedProject.cliches[widgetId].meta.name = newName;
+        selectedProject.cliches[id].meta.name = newName;
     }
 });
 
@@ -135,7 +134,7 @@ function displayNewClicheInList(cliche){
 
     var newClicheElt = $(
         '<div class="user-components page-component-toggle-drop">'+
-        '<div class="header">'+
+        '<div>'+
         '<span class="dropdown-trigger dropdown-open" data-dropdownid="'+dropdownId+'">'+
         '<span class="glyphicon glyphicon-triangle-bottom"></span>'+
         cliche.meta.name+
@@ -157,16 +156,54 @@ function displayNewClicheInList(cliche){
         $('#new-user-datatype-btn').click(function () {
             $('#create-component').unbind()
                 .on('click', function () {
-                    var name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+                    var name = utils.sanitizeStringOfSpecialChars($('#new-component-name').val());
                     var datatypeInfo = initDatatype();
                     var datatype = datatypeInfo[0];
                     var datatypeDisplayProps = datatypeInfo[1];
+                    var position = datatypeDisplayProps.displayProperties.position;
+                    var dimensions = datatypeDisplayProps.displayProperties.dimensions;
+                    var checkCoords = function(position, dimensions){
+                        var containerRef = dataContainerMaker.getContainerRef();
+                        var outerContainerOffset = $('#outer-container').offset();
+                        var endCheckX = false;
+                        var endCheckY = false;
+                        if (position.top<0){
+                            position.top = 0;
+                            endCheckY = true;
+                        }
+                        if (position.top + dimensions.height>selectedScreenSizeHeight){
+                            position.top = selectedScreenSizeHeight-dimensions.height;
+                            endCheckY = true;
+                        }
+                        if (position.left<0){
+                            position.left = 0;
+                            endCheckX = true;
+                        }
+                        if (position.left + dimensions.width>selectedScreenSizeWidth){
+                            position.left = selectedScreenSizeWidth-dimensions.width;
+                            endCheckX = true;
+                        }
+                        if (endCheckX && endCheckY){
+                            return true
+                        }
+
+                        var x = position.left + outerContainerOffset.left + dimensions.width/2;
+                        var y = position.top + outerContainerOffset.top + dimensions.height/2;
+                        return $(utils.allElementsFromPoint(x, y)).filter('.'+containerRef).length>0;
+                    };
+
+                    while(checkCoords(position, dimensions)){
+                        position.left += Math.pow(-1, Math.round(Math.random()))*100;
+                        position.top += Math.pow(-1, Math.round(Math.random()))*50;
+                    }
+
                     userApp.addDatatype(datatype, datatypeDisplayProps);
-                    selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id);
+                    selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id, datatypeDisplayProps);
                     displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
                     // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
                     // TODO add to overall and to userApp display
                     resetMenuOptions();
+                    dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
                 });
         });
     }
@@ -215,8 +252,6 @@ function displayOverallDatatypesInList(name, id){
         + '<div class="submit-rename not-displayed">'
         + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</div>'
-        + '</div>'
-        + '<div class="index-page-toggle">'
         + '</div>'
         + '</li>';
     $('#main-pages-list').append(newWidgetElt);
@@ -315,7 +350,7 @@ function registerTooltipBtnHandlers() {
                     element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
                 }
             }
-            var widgetId = getWidgetIdFromContainerId(containerId);
+            var widgetId = widgetContainerMaker.getWidgetIdFromContainerId(containerId);
             selectedUserWidget.innerWidgets[widgetId].properties,style.bsClasses[propertyName] = bootstrapClass;
 
         }
@@ -387,19 +422,6 @@ function enableDropdownTrigger(){
 }
 
 enableDropdownTrigger();
-
-$('.components').on('click', '.index-page-toggle', function(){
-    var turnOn = !($(this).parent().hasClass('selected-index-page'));
-    $('.components .selected-index-page').removeClass('selected-index-page');
-    var widgetId = $(this).parent().data('componentid');
-    if (turnOn){
-        selectedProject.userApp.indexId = widgetId;
-        $(this).parent().addClass('selected-index-page');
-    } else {
-        selectedProject.userApp.indexId = null;
-    }
-    setUpWidgetOptionsIndexPageToggle(selectedProject.cliches[widgetId]);
-});
 
 /**
  * Deletes a component from the datatype and also from the view

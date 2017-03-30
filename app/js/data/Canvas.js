@@ -26,7 +26,8 @@ var Canvas = function(){
         container.append(canvasElt);
     };
 
-    that.drawClicheDataLines = function(list){
+    that.drawClicheDataLines = function(cliche){
+        var list = [{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}];
         that.clear();
         list.forEach(function (thing) {
             drawSingleClicheDataLines(thing.clicheId, thing.dataIds);

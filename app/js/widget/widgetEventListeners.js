@@ -45,8 +45,7 @@ $('#new-widget-template-btn').click(function(){
 
 $('#save-project').on('click', function () {
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
-    //downloadObject(selectedProject.meta.name+'.json', selectedProject);
+    utils.saveProject(selectedProject);
 });
 
 $('.components').on('click', '.component-name-container', function () {
@@ -54,24 +53,13 @@ $('.components').on('click', '.component-name-container', function () {
     var oldState = {zoom : currentZoom};
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
     $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
-    $('.widget').each(function(idx, elt){
-        elt = $(elt);
-        if (elt.data('draggable')){
-            elt.draggable('enable');
-        }
-    });
     dragAndDrop.registerWidgetDragHandleDraggable();
     var widgetId = $(this).parent().data('componentid');
     listDisplay.select(widgetId);
     //$('.selected').removeClass('selected');
     //$(this).parent().addClass('selected');
     selectedUserWidget = userApp.getWidget(widgetId);
-    if (!selectedUserWidget.isPage){
-        var dragHandle = $('.components').find('[data-componentid='+selectedUserWidget.meta.id+']');
-        if (dragHandle.data('draggable')){
-            dragHandle.draggable('disable');
-        }
-    }
+    listDisplay.updateDraggables(selectedUserWidget);
     workSurface.loadUserWidget(selectedUserWidget);
     style.setUpStyleColors(selectedUserWidget);
     $('#outer-container').scrollTop(0); // TODO DRY
@@ -155,7 +143,7 @@ function setWidgetOptions(outerWidget){
         .click(function(){
             var copyWidget = duplicateUserWidget(outerWidget);
             // change the id
-            copyWidget.meta.id = generateId();
+            copyWidget.meta.id = utils.generateId();
             listDisplay.refresh();
             userApp.addWidget(copyWidget);
             selectedUserWidget = copyWidget;
@@ -452,7 +440,7 @@ function registerTooltipBtnHandlers() {
                     element.removeClass(bootstrapPrefix+'-'+optionsList[j]);
                 }
             }
-            var widgetId = getWidgetIdFromContainerId(containerId);
+            var widgetId = widgetContainerMaker.getWidgetIdFromContainerId(containerId);
             selectedUserWidget.innerWidgets[widgetId].properties.styles.bsClasses[propertyName] = bootstrapClass;
 
         }
@@ -668,7 +656,7 @@ function refreshContainerDisplay(fresh, container, zoom){
     var widgetId = container.data('componentId');
 
 
-    if (selectedUserWidget.getPath(widgetId)){ // component exists
+    if (selectedUserWidget.getPath(widgetId).length>0){ // component exists
         var widgetToChange = selectedUserWidget.getInnerWidget(widgetId);
 
         var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(selectedUserWidget, widgetId);
@@ -700,7 +688,7 @@ function recursiveReIding(widget, sourceWidget){
         if (sourceWidget){
             thisWidgetNewId = sourceWidget.meta.id;
         } else {
-            thisWidgetNewId = generateId();
+            thisWidgetNewId = utils.generateId();
         }
         // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
         widget.meta.id = thisWidgetNewId;
@@ -1026,13 +1014,13 @@ function initUserWidget(isDefault, inMainPage) {
     if (isDefault) {
         name = DEFAULT_WIDGET_NAME;
     } else {
-        name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+        name = utils.sanitizeStringOfSpecialChars($('#new-component-name').val());
     }
 
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
-    var id = generateId();
+    var id = utils.generateId();
 
     if (inMainPage){
         return UserWidget({height: selectedScreenSizeHeight, width: selectedScreenSizeWidth}, name, id, version, author);
@@ -1046,12 +1034,12 @@ function initUserApp() {
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
-    var id = generateId();
+    var id = utils.generateId();
 
     var firstPage = initUserWidget(true, true);
-    var component = ClicheWithDisplay(name, id, version, author);
-    component.addPage(firstPage);
-    return component;
+    var userApp = ClicheWithDisplay(name, id, version, author);
+    userApp.addPage(firstPage);
+    return userApp;
 }
 
 

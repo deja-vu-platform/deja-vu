@@ -3,12 +3,12 @@
  */
 
 // TODO difference between project name and filename? .json vs sans .json?
+var utils = Utility();
+
 var selectedProject;
 //var fs = require('fs');
 //var path = require('path');
 
-// TODO get path emitted by main
-var projectsSavePath = path.join(__dirname, 'projects');
 
 var availableProjectsByFilename = {};
 var availableProjectsByAccessTime = {};
@@ -45,7 +45,7 @@ $(function () {
     }
 
 
-    readFiles(projectsSavePath, function(filename, content) {
+    readFiles(utils.projectsSavePath, function(filename, content) {
         // TODO add a loading projects sign
         // Check the types to only add projects
         content = JSON.parse(content);
@@ -165,7 +165,7 @@ function addLoadProjectButton(filename){
 function displayProjectPreview(project){
     // TODO make it select the main component
     // TODO Also, have a way to click to change to another view?
-    $('#page-preview').data('projectfilename', projectNameToFilename(project.meta.name));
+    $('#page-preview').data('projectfilename', utils.projectNameToFilename(project.meta.name));
     $('#project-name-preview').text('Project Preview: '+project.meta.name);
     $('#preview-prev-page').unbind();
     $('#preview-next-page').unbind();
@@ -234,7 +234,7 @@ function showPrevMainPage(project, currentPageNumber){
  * @constructor
  */
 function initNewProject() {
-    var projectName = sanitizeStringOfSpecialChars($('#new-project-name').val());
+    var projectName = utils.sanitizeStringOfSpecialChars($('#new-project-name').val());
     var version = $('#project-version').val();
     var author = $('#project-author').val();
 
@@ -242,7 +242,7 @@ function initNewProject() {
     var copyName = projectName;
     var copyNum = 0;
     // TODO should give user warning or options
-    while(isCopyOfFile(projectsSavePath, copyName+'.json')){
+    while(utils.isCopyOfFile(utils.projectsSavePath, copyName+'.json')){
         if (copyNum == 0){
             copyName = projectName + ' - Copy';
         } else {
@@ -250,7 +250,7 @@ function initNewProject() {
         }
         copyNum++;
     }
-    var newProject = new UserProject(copyName, generateId(), version, author);
+    var newProject = new UserProject(copyName, utils.generateId(), version, author);
     // This will actually be saved after it's fully loaded (with a first component, etc) in the
     // cliches page
     //saveObjectToFile(projectsSavePath, projectNameToFilename(copyName), newProject);
@@ -376,7 +376,7 @@ function addDeleteProjectButton(dirname, filename, id){
 function openDeleteProjectConfirmDialogue(dirname, filename, id){
     $('#confirm-delete-project').modal('show');
 
-    var projectName = filenameToProjectName(filename);
+    var projectName = utils.filenameToProjectName(filename);
     $('#delete-project-name').text(projectName);
 
     $('#delete-project-btn').unbind();
@@ -413,7 +413,7 @@ function displayRecentProjects(){
         var content = recentProjectsByAccessTime[lastAccessed].content;
         showProjectInList(filename, content.meta.id, lastAccessed);
         addLoadProjectButton(filename);
-        addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
+        addDeleteProjectButton(utils.projectsSavePath, filename, content.meta.id);
     }
 }
 
@@ -428,7 +428,7 @@ function displayAllProjects(){
         var content = availableProjectsByAccessTime[lastAccessed].content;
         showProjectInList(filename, content.meta.id, lastAccessed);
         addLoadProjectButton(filename);
-        addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
+        addDeleteProjectButton(utils.projectsSavePath, filename, content.meta.id);
     }
 }
 
@@ -437,7 +437,7 @@ function showProjectInList(filename, id, lastAccessed){
     var projectLink = document.createElement('li');
     projectLink.innerHTML = '<div class="project-filename" data-filename="'+filename+'">' +
         // sanitizing display because that's where the injections can play
-        '<div class="project-name">'+sanitizeStringOfSpecialChars(filenameToProjectName(filename))+'</div>' +
+        '<div class="project-name">'+utils.sanitizeStringOfSpecialChars(utils.filenameToProjectName(filename))+'</div>' +
         '<div class="last-access-time">' +
             'Last Accessed: '+(new Date(lastAccessed)).toLocaleDateString() +
             ' at '+(new Date(lastAccessed)).toLocaleTimeString()+

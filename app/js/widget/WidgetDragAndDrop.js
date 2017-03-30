@@ -126,6 +126,7 @@ var WidgetDragAndDropController = function () {
                             widget = UserWidget.fromString(JSON.stringify(cliche.widgets.templates[widgetId]));
                             widget.meta.templateId = clicheId + '_' + widgetId;
                             widget = createUserWidgetCopy(widget);
+                            delete widget.isTemplate;
                         } else { // it is unused
                             widget = userApp.widgets.unused[widgetId];
                         }
@@ -138,7 +139,7 @@ var WidgetDragAndDropController = function () {
                     draggingWidget = widget;
 
                     widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, false,
-                        dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom, false);
+                        dragHandle, null, {}, currentZoom, false);
 
                     $('#basic-components').html(basicWidgets);
                     that.registerWidgetDragHandleDraggable();

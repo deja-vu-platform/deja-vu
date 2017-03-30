@@ -50,7 +50,7 @@ $('#style-mode').click(function(){
 $('#back-to-projects').click(function(event){
     event.preventDefault();
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
-    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
+    utils.saveProject(selectedProject);
     window.location = 'projectView.html';
 });
 

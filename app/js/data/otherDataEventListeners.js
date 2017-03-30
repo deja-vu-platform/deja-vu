@@ -50,7 +50,7 @@ $('#style-mode').click(function(){
 $('#back-to-projects').click(function(event){
     event.preventDefault();
     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject)); // save the updated project
-    saveObjectToFile(projectsSavePath, projectNameToFilename(selectedProject.meta.name), selectedProject);
+    utils.saveProject(selectedProject);
     window.location = 'projectView.html';
 });
 
@@ -155,10 +155,9 @@ function showClicheInList(id, name){
  * Update the saved ratios and then use this function
  */
 function propagateRatioChangeToAllElts(newRatio, userWidget){
-    var workSurfaceRef = workSurface.getWorkSurfaceRef();
-
-    view.displayWidget(false, userWidget, $('#'+workSurfaceRef+'_'+userWidget.meta.id), {}, newRatio);
-    miniNav.updateNavInnerWidgetSizes(newRatio);
+    var workSurfaceRef =dataWorkSurface.getWorkSurfaceRef();
+    //view.displayWidget(false, userWidget, $('#'+workSurfaceRef+'_'+userWidget.meta.id), {}, newRatio);
+    //miniNav.updateNavInnerWidgetSizes(newRatio);
 
 }
 
@@ -214,7 +213,7 @@ function deleteUserWidget(userWidgetId){
         return; //don't delete the last one TODO is the the right way to go?
     }
     userApp.deleteWidget(userWidgetId);
-    var workSurfaceRef = workSurface.getWorkSurfaceRef();
+    var workSurfaceRef = dataWorkSurface.getWorkSurfaceRef();
 
     $('#'+workSurfaceRef+'_'+userWidgetId).remove();
     $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
@@ -224,7 +223,7 @@ function deleteUserWidget(userWidgetId){
         selectedUserWidget = userApp.getWidget(otherIds[0]);
         $("#user-cliches-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
         $("#main-pages-list").find("[data-componentid='" + otherIds[0] + "']").addClass('selected');
-        workSurface.loadUserWidget(selectedUserWidget, currentZoom);
+       dataWorkSurface.loadUserWidget(selectedUserWidget, currentZoom);
     }
     if (userWidgetId == userApp.widgets.pages.indexId){
         userApp.widgets.pages.indexId = null;
@@ -270,11 +269,11 @@ function openDeleteUserWidgetConfirmDialogue(userWidgetId){
  */
 function initDatatype() {
     var name, version, author;
-    name = sanitizeStringOfSpecialChars($('#new-component-name').val());
+    name = utils.sanitizeStringOfSpecialChars($('#new-component-name').val());
     version = selectedProject.meta.version;
     author = selectedProject.meta.author;
 
-    var id = generateId();
+    var id = utils.generateId();
 
 
     var displayProperties = UserDatatypeDisplay();

@@ -29,7 +29,7 @@ var BaseWidget = function (type, widgets, dimensions) {
     };
     baseWidget.meta = {
         name: '',
-        id: generateId(),
+        id: Utility().generateId(),
         version: '',
         author: ''
     };
@@ -79,11 +79,12 @@ var UserWidget = function(dimensions, name, id, version, author){
         dimensions: dimensions,
         layout: {
             stackOrder: []
-        },
+        }
+    };
+    that.overrideProperties = {
         styles : {
             custom: {}, bsClasses: {}
-        },
-        children: {}
+        }
     };
 
     //Object.freeze(that);
@@ -107,7 +108,7 @@ UserWidget.prototype.deleteInnerWidget = function(widgetId) {
 
 UserWidget.prototype.getPath = function(widgetId){
     var outermostWidget = this;
-    var wantedPath;
+    var wantedPath = [];
     var getPathHelper = function(widget, path, targetId){
         if (widget.meta){
             var widgetId = widget.meta.id;
@@ -127,6 +128,9 @@ UserWidget.prototype.getPath = function(widgetId){
 
 UserWidget.prototype.getInnerWidget = function(targetId, forParent){
     var outermostWidget = this;
+    if (outermostWidget.meta.id == targetId){
+        return outermostWidget;
+    }
     if (forParent){
         var path = outermostWidget.getPath(targetId);
         targetId = path[path.length-2];
@@ -146,30 +150,34 @@ UserWidget.prototype.getInnerWidget = function(targetId, forParent){
         }
     };
     getInnerWidgetHelper(outermostWidget, targetId);
-    if (wantedWidget){
-        wantedWidget = UserWidget.fromObject(wantedWidget);
-    }
 
     return wantedWidget;
 };
 
 
-// Note: returns only one copy!
-UserWidget.prototype.getAllInnerWidgetsIds = function() {
-    var innerWidgetsInfoList = [];
-
-    var getInnerWidgetInfo = function(widget, innerWidgetsList){
+// keepStructure: Returns a nested list structure representing the structure of usage
+// recursive structure [widgetId, [recursive structure of children]]
+// expanded structure: [[id1, []], [id2, []], [id3, [recursive ids of children of id3]], [id4,[recursive children of ld4]]]
+UserWidget.prototype.getAllInnerWidgetsIds = function(keepStructure) {
+    var innerWidgetsInfoListLinearlized = [];
+    var getInnerWidgetInfo = function(widget){
+        var outerRecursiveChildrenIds= [];
         for (var innerWidgetId in widget.innerWidgets){
             var innerWidget = widget.innerWidgets[innerWidgetId];
-            innerWidgetsList.push(innerWidget.meta.id);
-            getInnerWidgetInfo(innerWidget, innerWidgetsList);
-
+            innerWidgetsInfoListLinearlized.push(innerWidgetId);
+            var recursiveChildrenIds = getInnerWidgetInfo(innerWidget);
+            outerRecursiveChildrenIds.push([innerWidgetId, recursiveChildrenIds]);
         }
+        return outerRecursiveChildrenIds
     };
 
-    getInnerWidgetInfo(this, innerWidgetsInfoList);
+    var innerWidgetsInfoListStructured = getInnerWidgetInfo(this);
 
-    return innerWidgetsInfoList;
+    if (keepStructure){
+        return innerWidgetsInfoListStructured;
+    } else {
+        return innerWidgetsInfoListLinearlized;
+    }
 };
 
 
@@ -179,24 +187,36 @@ UserWidget.fromString = function(string){
     return UserWidget.fromObject(object)
 };
 
-UserWidget.fromObject = function(object){
+
+var fromObjectHelper = function(object){
     // Check that the object has all the required fields
     var notCorrectObjectError = "notCorrectObjectError: object object is not an instance of a UserWidget";
     if (!object.objectType){
         throw notCorrectObjectError;
     }
-    if (!object.type){
-        throw notCorrectObjectError;
-    }
     if (!object.meta){
-        throw notCorrectObjectError;
-    }
-    if (!object.innerWidgets){
         throw notCorrectObjectError;
     }
     if (!object.properties){
         throw notCorrectObjectError;
     }
+    if (!object.type){
+        throw notCorrectObjectError;
+    }
+    if (object.type != 'user'){
+        return $.extend(new BaseWidget(), object)
+    }
+    if (!object.innerWidgets){
+        throw notCorrectObjectError;
+    }
 
-    return $.extend(new UserWidget(object.dimensions), object)
+    for (var widgetId in object.innerWidgets){
+        object.innerWidgets[widgetId] = fromObjectHelper(object.innerWidgets[widgetId]);
+    }
+
+    return $.extend(new UserWidget(), object)
+};
+
+UserWidget.fromObject = function(object){
+    return fromObjectHelper(object);
 };

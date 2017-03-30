@@ -666,8 +666,10 @@ li.selected {
     display: none;
 }
 
-.palette-elt{
+.palette-elt, .current-colors-elt{
     height: 16px;
     width: 16px;
     display: inline-block;
+    border: 1px black solid
 }
+

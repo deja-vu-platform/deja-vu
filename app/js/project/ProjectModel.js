@@ -78,8 +78,11 @@ UserProject.prototype.addCliche = function(cliche){
 
 };
 
-UserProject.prototype.addDataBondDisplay = function(clicheId, datatypeId){
-    this.bondDisplays[clicheId].dataBondDisplays[datatypeId] = UserDatatypeDisplay();
+UserProject.prototype.addDataBondDisplay = function(clicheId, datatypeId, displayObject){
+    if (!displayObject){
+        displayObject = UserDatatypeDisplay();
+    }
+    this.bondDisplays[clicheId].dataBondDisplays[datatypeId] = displayObject;
 };
 
 UserProject.prototype.removeCliche = function(clicheId){

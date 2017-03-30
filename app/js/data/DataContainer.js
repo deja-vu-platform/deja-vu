@@ -78,7 +78,7 @@ var DataContainer = function(){
 
                 // TODO dry
                 var cliche = selectedProject.cliches[clicheId];
-                canvas.drawClicheDataLines([{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}]);
+                canvas.drawClicheDataLines(cliche);
             }
         });
     };

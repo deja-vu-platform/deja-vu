@@ -7,8 +7,7 @@ var dataMiniNav = DataMiniNav();
 var dataWorkSurface = DataWorkSurface();
 var dataDragAndDrop = DataDragAndDropController();
 var canvas = Canvas();
-
-var projectsSavePath = path.join(__dirname, 'projects');
+var utils = Utility();
 
 var selectedScreenSizeHeight = 1600;
 var selectedScreenSizeWidth = 2000;
@@ -52,7 +51,7 @@ $(function(){
     if (selectedProject){ // if it exists, load it
         selectedProject = UserProject.fromString(selectedProject);
     } else { // if not, make a new one
-        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, generateId(), DEFAULT_VERSION, DEFAULT_AUTHOR);
+        selectedProject = new UserProject(DEFAULT_PROJECT_NAME, utils.generateId(), DEFAULT_VERSION, DEFAULT_AUTHOR);
     }
 
     $('.project-name .header').text(selectedProject.meta.name);
@@ -85,6 +84,8 @@ $(function(){
     basicWidgets = $('#basic-components').html();
 
     dataDragAndDrop.registerDataDragHandleDraggable();
+
+    dataZoomElement.registerZoom(userApp);
 
     resizeViewportToFitWindow();
 

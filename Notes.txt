@@ -262,3 +262,15 @@ So a data object can be immediately bonded to other data (which can be secretly 
 don't wanna show the implicitly bonded data objects, we still want to have a layered structure.
 When are figuring out everything that's connected, we can follow the links (or maybe santiago's platform can do that)
 but we don't want to do that prematurely, since they user would probably want that layered structure.
+
+3/28 plan:
+For datatypes:
+	Fix up some displays:
+		zoom, navigation
+		naming
+		visuals (cliche looks different)
+	Make fake cliches
+	Work on bonding
+
+For widgets:
+	make googlemap thing, but very low priority
