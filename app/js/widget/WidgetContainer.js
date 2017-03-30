@@ -247,11 +247,13 @@ var WidgetContainer = function(){
         return container;
     };
 
-    var getCustomStyles = function(outermostWidget, targetId){
-        var changes = widgetEditsManager.getCustomProperty(outermostWidget, targetId);
-        if (changes.styles) {
-            if (changes.styles.custom){
-                return changes.styles.custom;
+    var getCustomStyles = function(target){
+        var changes = target.overrideProperties; //widgetEditsManager.getCustomProperty(outermostWidget, targetId);
+        if (changes){
+            if (changes.styles) {
+                if (changes.styles.custom){
+                    return changes.styles.custom;
+                }
             }
         }
         return {};
@@ -274,7 +276,7 @@ var WidgetContainer = function(){
         var customStyles = {};
         var targetId = widget.meta.id;
         if (outermostWidget){ // FIXME make more robust
-            customStyles = getCustomStyles(outermostWidget, targetId);
+            customStyles = getCustomStyles(widget);
         }
 
         var fontSizeOption = $('<li><div>Font Size: </div></li>');
@@ -321,7 +323,7 @@ var WidgetContainer = function(){
         var customStyles = {};
         var targetId = widget.meta.id;
         if (outermostWidget){
-            customStyles = getCustomStyles(outermostWidget, targetId);
+            customStyles = getCustomStyles(widget);
         }
 
         var textColorOption = $('<li><div>Text Color: </div></li>');

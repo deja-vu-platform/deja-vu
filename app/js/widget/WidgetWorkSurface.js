@@ -152,11 +152,11 @@ var WidgetWorkSurface = function(){
             console.log(userWidget);
         }
 
-        userWidget = widgetEditsManager.refreshFromProject(userWidget);
+        widgetEditsManager.refreshPropertyValues(userWidget);
 
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
-            var overallStyles = userWidget.properties.styles.custom;
+            var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(userWidget, innerWidgetId);;
             that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, true, null, workSurface, overallStyles, zoom, true);
         });
     };

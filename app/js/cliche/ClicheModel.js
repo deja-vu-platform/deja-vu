@@ -76,7 +76,6 @@ Cliche.fromObject = function(object){
     var cliche = $.extend(new Cliche(), object);
 
     for (var widgetType in object.widgets) {
-        // TODO what about innerWidgets? It is updated later, but should be here
         for (var widgetId in object.widgets[widgetType]) {
             var widget = object.widgets[widgetType][widgetId];
             cliche.widgets[widgetType][widgetId] = UserWidget.fromObject(widget);

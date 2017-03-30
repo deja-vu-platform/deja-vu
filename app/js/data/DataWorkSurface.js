@@ -123,7 +123,7 @@ var DataWorkSurface = function(){
             console.log(userWidget);
         }
 
-        //userWidget = dataEditsManager.refreshFromProject(userWidget);
+        //userWidget = dataEditsManager.refreshPropertyValues(userWidget);
 
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];

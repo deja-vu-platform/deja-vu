@@ -139,7 +139,7 @@ var WidgetDragAndDropController = function () {
                     draggingWidget = widget;
 
                     widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, false,
-                        dragHandle, null, selectedUserWidget.properties.styles.custom, currentZoom, false);
+                        dragHandle, null, {}, currentZoom, false);
 
                     $('#basic-components').html(basicWidgets);
                     that.registerWidgetDragHandleDraggable();
