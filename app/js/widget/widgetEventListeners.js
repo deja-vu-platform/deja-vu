@@ -54,7 +54,7 @@ $('.components').on('click', '.component-name-container', function () {
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
     $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
     dragAndDrop.registerWidgetDragHandleDraggable();
-    var widgetId = $(this).parent().data('componentid');
+    var widgetId = $(this).closest('.widget').data('componentid');
     listDisplay.select(widgetId);
     //$('.selected').removeClass('selected');
     //$(this).parent().addClass('selected');
