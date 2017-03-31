@@ -56,6 +56,7 @@ $(function(){
 
     $('.project-name .header').text(selectedProject.meta.name);
 
+    //addFakeClichesToProject(selectedProject);
 
     if (!selectedProject.userApp){
         // start a default component
@@ -63,30 +64,19 @@ $(function(){
         selectedProject.addCliche(userApp);
         selectedProject.makeUserApp(userApp);
     } else {
-        var userAppId = selectedProject.userApp;
-        userApp = selectedProject.cliches[userAppId];
-
-        displayNewClicheInList(userApp);
         displayOverallDatatypesInListAndSelect();
-
-        for (var datatypeId in userApp.datatypes){
-            var datatypeName = userApp.datatypes[datatypeId].meta.name;
-            displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId, userAppId);
+        for (var clicheId in selectedProject.cliches){
+            var cliche = selectedProject.cliches[clicheId];
+            displayNewClicheInList(cliche);
+            if (clicheId == selectedProject.userApp){
+                userApp = cliche;
+            }
         }
     }
-    var fakeCliche = ClicheWithDisplay.fromObject(getFakeCliches()[0]);
-    var fakeClicheId = fakeCliche.meta.id;
-    selectedProject.addCliche(fakeCliche);
-    selectedProject.bondDisplays[fakeClicheId].dataBondDisplays[fakeClicheId] = fakeCliche.dataBondDisplays[fakeClicheId];
-    for (var fakeClicheDatatypeId in fakeCliche.datatypes){
-        selectedProject.bondDisplays[fakeClicheId].dataBondDisplays[fakeClicheDatatypeId] = fakeCliche.dataBondDisplays[fakeClicheDatatypeId];
-    }
-    dataWorkSurface.loadBondingData(null, null, currentZoom);
     //autoSave5Mins();
+    dataWorkSurface.loadBondingData(null, null, currentZoom);
 
     basicWidgets = $('#basic-components').html();
-
-    dataDragAndDrop.registerDataDragHandleDraggable();
 
     dataZoomElement.registerZoom(userApp);
 

@@ -15,10 +15,7 @@ var DataDragAndDropController = function () {
     var containerRef = dataContainerMaker.getContainerRef();
     var workSurfaceRef = dataWorkSurface.getWorkSurfaceRef();
 
-
-    that.dataToWorkSurfaceDropSettings = function (cliche, dropFinished) {
-        var isOverall = cliche? false: true;
-
+    that.dataToWorkSurfaceDropSettings = function (isOverall, dropFinished) {
         return {
             accept: ".datatype",
             hoverClass: "highlight",
@@ -34,7 +31,7 @@ var DataDragAndDropController = function () {
                         dragHandle.data('componentid', $(ui.draggable).data('componentid'));
                         dragHandle.data('clicheid', $(ui.draggable).data('clicheid'));
                         dragHandle.data('type', type);
-                        that.registerDataDragHandleDraggable(dragHandle);
+                        that.registerDataDragHandleDraggable(dragHandle, isOverall);
                     }
                 }
 
@@ -65,7 +62,7 @@ var DataDragAndDropController = function () {
                 if (isOverall){
                     selectedProject.bondDisplays[originClicheId].dataBondDisplays[objectId].displayProperties.position = newPosition;
                 } else {
-                    cliche.dataBondDisplays[objectId].displayProperties.position = newPosition;
+                    originCliche.dataBondDisplays[objectId].displayProperties.position = newPosition;
                 }
 
                 // after it has been added
@@ -78,7 +75,7 @@ var DataDragAndDropController = function () {
         }
     };
 
-    that.datatypeDragSettings = function () {
+    that.datatypeDragSettings = function (isOverall) {
         return {
             opacity: 1,
             revert: "invalid",
@@ -88,7 +85,7 @@ var DataDragAndDropController = function () {
                 var type = dragHandle.data('type');
                 var clicheId = dragHandle.data('clicheid');
                 var datatypeId = dragHandle.data('componentid');
-
+                var parentCliche = selectedProject.cliches[clicheId];
 
 
                 if (type == 'user') {
@@ -97,24 +94,25 @@ var DataDragAndDropController = function () {
                         dragHandle.data('componentid', datatypeId);
                         dragHandle.data('clicheid', clicheId);
                         dragHandle.data('type', type);
-                        that.registerDataDragHandleDraggable(dragHandle);
+                        that.registerDataDragHandleDraggable(dragHandle, isOverall);
                     }
                 }
                 dragHandle.addClass('dragging-component');
                 var offsetFromMouse = {top: 0, left: 0};
                 var datatypeContainer;
-                if (!selectedCliche){
+                if (isOverall){
                     displayPropObj = selectedProject.bondDisplays[clicheId].dataBondDisplays[datatypeId]; // might not exists
                 } else {
-                    displayPropObj = selectedProject.cliches[clicheId].dataBondDisplays[datatypeId]; // might not exists
+                    displayPropObj = parentCliche.dataBondDisplays[datatypeId]; // might not exists
+                }
+
+                if (datatypeId in selectedProject.cliches){ // if it is a cliche
+                    draggingObject = parentCliche;
+                } else {
+                    draggingObject = parentCliche.datatypes[datatypeId];
                 }
 
                 if (dragHandle.hasClass('associated')) {
-                    if (datatypeId in selectedProject.cliches){ // if it is a cliche
-                        draggingObject = selectedProject.cliches[clicheId];
-                    } else {
-                        draggingObject = userApp.datatypes[datatypeId];
-                    }
                     // keep the old one for now, for guidance and all
                     var oldContainerId = containerRef+'_' + datatypeId;
                     var widgetContainerOld = $('#' + oldContainerId);
@@ -128,21 +126,13 @@ var DataDragAndDropController = function () {
                         left: e.pageX - widgetContainerOld.offset().left
                     };
                 } else {
-                    var datatype;
-                    if (datatypeId in selectedProject.cliches){ // if it is a cliche
-                        datatype = selectedProject.cliches[clicheId];
-                    } else {
-                        datatype = userApp.datatypes[datatypeId];
-                    }
-
-                    dragHandle.data('componentid', datatype.meta.id);
-                    dragHandle.text(datatype.meta.name);
+                    dragHandle.data('componentid', draggingObject.meta.id);
+                    dragHandle.text(draggingObject.meta.name);
                     dragHandle.css('display', 'block');
-                    draggingObject = datatype;
-                    datatypeContainer = dataWorkSurface.makeContainer(clicheId, datatype.meta.id, displayPropObj, dragHandle, currentZoom, isOverall);
+                    datatypeContainer = dataWorkSurface.makeContainer(clicheId, draggingObject.meta.id, displayPropObj, dragHandle, currentZoom, isOverall);
 
                     $('#basic-components').html(basicWidgets);
-                    that.registerDataDragHandleDraggable();
+                    that.registerDataDragHandleDraggable(dragHandle, isOverall);
                 }
 
                 $('#outer-container').append(datatypeContainer);
@@ -192,18 +182,12 @@ var DataDragAndDropController = function () {
 
 
 
-    that.registerDataDragHandleDraggable = function(dragHandleToRegister) {
+    that.registerDataDragHandleDraggable = function(dragHandleToRegister, isOverall) {
         if (dragHandleToRegister){
             if (!dragHandleToRegister.notDraggable){
-                dragHandleToRegister.draggable(that.datatypeDragSettings());
+                dragHandleToRegister.draggable(that.datatypeDragSettings(isOverall));
             }
         }
-        // else {
-        //     $('.widget').not('.not-draggable').each(function() {
-        //         $(this).draggable(that.datatypeDragSettings());
-        //     });
-        // }
-
     };
 
 

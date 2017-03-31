@@ -20,7 +20,11 @@ $('.components').on('click', '.component-name-container', function () {
     $('#'+workSurfaceRef+'_'+userApp.meta.id).data('state', oldState);
 
     var clicheId = $(this).parent().data('clicheid');
-    var cliche = selectedProject.cliches[clicheId];
+    var cliche;
+    if (clicheId){
+        cliche = selectedProject.cliches[clicheId];
+        selectedCliche = cliche;
+    }
     var datatypeId = $(this).parent().data('componentid');
     var datatype;
     if (datatypeId){
@@ -132,7 +136,7 @@ function displayNewClicheInList(cliche){
     // TODO changes in style
     var clicheId = cliche.meta.id;
     var dropdownId = clicheId+'_datatypes';
-    var isUserApp = (clicheId == userApp.meta.id);
+    var isUserApp = (clicheId == selectedProject.userApp);
 
     var newDTButton = isUserApp? '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-datatype-btn">'
     +'<span class="glyphicon glyphicon-plus"></span>'
@@ -155,6 +159,11 @@ function displayNewClicheInList(cliche){
         +   '</div>'
         +'</div>');
     $('#user-components-list').append(newClicheElt);
+
+    for (var datatypeId in cliche.datatypes){
+        var datatypeName = cliche.datatypes[datatypeId].meta.name;
+        displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId, clicheId);
+    }
     // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
     // dataDragAndDrop.registerDataDragHandleDraggable(newClicheElt);
