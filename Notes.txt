@@ -278,3 +278,4 @@ For widgets:
 	
 3/30:
 	on datatype focused, don't allow any movements, it's just a change in visuals
+	implement group moving!
