@@ -143,7 +143,7 @@ function displayNewClicheInList(cliche){
     +'</button>': "";
 
     var newClicheElt = $(
-        '<div class="user-components page-component-toggle-drop">'
+        '<div class="user-components dropdown-encapsulatorp">'
         +   '<span class="dropdown-trigger dropdown-open" data-dropdownid="'+ dropdownId +'" data-clicheid=' + cliche.meta.id + '>'
         +       '<span class="glyphicon glyphicon-triangle-bottom"></span>'
         +       '<div class="component-name-container" >'

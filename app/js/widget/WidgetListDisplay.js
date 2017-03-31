@@ -50,6 +50,9 @@ var WidgetListDisplay = function(){
         if (!isDraggable){
             elt.addClass('not-draggable')
         }
+        if (hasChildren){
+            elt.addClass('dropdown-encapsulator')
+        }
         return elt;
     };
 
@@ -68,7 +71,6 @@ var WidgetListDisplay = function(){
 
                 if (hasChildren) {
                     var ul = elt.find('.inner-widgets');
-                    console.log(ul);
                     recursiveListMakerHelper(children, ul);
                 }
                 parentElt.append(elt);

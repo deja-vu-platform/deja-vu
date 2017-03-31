@@ -13,7 +13,6 @@ var WidgetEditsManager = function(){
         if (forParent){
             targetId = path[path.length - 2];
         }
-
         var targetWidget = userApp.getWidget(targetId);
         targetWidget.overrideProperties = {};
         if (typeString == 'styles.custom'){
@@ -28,13 +27,18 @@ var WidgetEditsManager = function(){
             }
         } else if (typeString == 'value'){
             targetWidget.innerWidgets[newProperties.type] = newProperties.value;
+        } else if (typeString == 'layout'){
+            for (var id in newProperties){
+                targetWidget.properties.layout[id] = newProperties[id];
+            }
+            targetWidget.overrideProperties.layout = targetWidget.properties.layout;
         } else {
             // TODO is this right??
             // FIXME problem with dot notation
+            if (!targetWidget.overrideProperties[typeString]){
+                targetWidget.overrideProperties[typeString] = {};
+            }
             for (var property in newProperties){
-                if (!targetWidget.overrideProperties[typeString]){
-                    targetWidget.overrideProperties[typeString] = {};
-                }
                 targetWidget.overrideProperties[typeString][property] = newProperties[property];
             }
         }
@@ -66,10 +70,18 @@ var WidgetEditsManager = function(){
                     delete customProperties.styles.custom;
                 }
                 targetWidget.properties.styles.custom = {};
+            }
+            if (propertyName == 'styles.bsClasses'){
+                if (customProperties.styles){
+                    delete customProperties.styles.bsClasses;
+                }
                 targetWidget.properties.styles.bsClasses = {};
-            } else if (propertyName == 'layout'){
-                targetWidget.properties.layout = {stackOrder:[]};
-            } else {
+            }
+            //else if (propertyName == 'layout'){
+            //    targetWidget.properties.layout = {stackOrder:[]};
+            //}
+            else {
+                delete customProperties[propertyName];
                 targetWidget.properties[propertyName] = {};
             }
         }
@@ -82,6 +94,11 @@ var WidgetEditsManager = function(){
         // if path is just the outer widget's id, will just return outerWidget.properties
         var change = {};
         var updateChange = function(widget){
+            if (widget.properties.styles.custom) {
+                for (var style in widget.properties.styles.custom) {
+                    change[style] = widget.properties.styles.custom[style];
+                }
+            }
             if (widget.overrideProperties) {
                 if (widget.overrideProperties.styles) {
                     if (widget.overrideProperties.styles.custom) {
@@ -96,7 +113,7 @@ var WidgetEditsManager = function(){
         var path = outermostWidget.getPath(targetId);
 
         // else go down and find the correct one
-        for (var pathValueIdx = 0; pathValueIdx<path.length; pathValueIdx++){
+        for (var pathValueIdx = 0; pathValueIdx<path.length-1; pathValueIdx++){
             outerWidget = outermostWidget.getInnerWidget(path[pathValueIdx]);
             // moving down so that the inner styles override the outer styles
             updateChange(outerWidget);
@@ -138,9 +155,11 @@ var WidgetEditsManager = function(){
                 var templateVersionCopy;
                 var templateInfo = isFromTemplate(widgetToModify);
                 if (templateInfo.fromTemplate){
-                    templateVersionCopy =  UserWidget.fromString(
-                        JSON.stringify(selectedProject.cliches[templateInfo.clicheId].widgets.templates[templateInfo.widgetId])
-                    );
+                    templateVersionCopy =  createUserWidgetCopy(UserWidget.fromString(
+                        JSON.stringify(
+                            selectedProject.cliches[templateInfo.clicheId].widgets.templates[templateInfo.widgetId]
+                        )
+                    ), widgetToModify);
                 } else {
                     templateVersionCopy = widgetToModify;
                 }
@@ -181,12 +200,18 @@ var WidgetEditsManager = function(){
                 if (overrideProperties.styles){
                     if (overrideProperties.styles.custom){
                         var customStyles = overrideProperties.styles.custom;
+                        if (!widget.properties.styles.custom){
+                            widget.properties.styles.custom = {}
+                        }
                         for (var style in customStyles) {
                             widget.properties.styles.custom[style] = customStyles[style];
                         }
                     }
                     if (overrideProperties.styles.bsClasses){
                         var bsClasses = overrideProperties.styles.bsClasses;
+                        if (!widget.properties.styles.bsClasses){
+                            widget.properties.styles.bsClasses = {}
+                        }
                         for (var bsClass in customStyles) {
                             widget.properties.styles.bsClasses[bsClass] = bsClasses[bsClass];
                         }
@@ -197,13 +222,13 @@ var WidgetEditsManager = function(){
                     widget.properties.dimensions = overrideProperties.dimensions;
                 }
 
+                if (overrideProperties.layout) {
+                    widget.properties.layout = overrideProperties.layout;
+                }
+
                 if (overrideProperties.value){
                     widget.innerWidgets[overrideProperties.value.type] = overrideProperties.value.value;
                 }
-                if (overrideProperties.name){
-                    widget.meta.name = overrideProperties.name;
-                }
-
             }
 
         };

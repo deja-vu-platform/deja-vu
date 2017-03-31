@@ -25,8 +25,9 @@ window.addEventListener("resize", function(){
 /** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
 function enableDropdownTrigger(){
     $(".dropdown-trigger").find('.glyphicon').unbind().click(function(ev) {
-        var triggerElt = $(this).closest('.dropdown-trigger');
 
+        var triggerElt = $(this).closest('.dropdown-trigger');
+        var encapsulatingElt = triggerElt.closest('.dropdown-encapsulator');
         var dropdownid = triggerElt.data('dropdownid');
 
         if (triggerElt.hasClass('dropdown-open')){
@@ -35,7 +36,7 @@ function enableDropdownTrigger(){
             triggerElt.find('.glyphicon').remove();
             triggerElt.prepend('<span class="glyphicon glyphicon-triangle-right"></span>');
 
-            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(idx, elt){
+            encapsulatingElt.find("[data-dropdownid='" + dropdownid + "']").each(function(idx, elt){
                 var targetElt = $(elt);
                 if (targetElt.hasClass('dropdown-target')){
                     targetElt.css({
@@ -50,7 +51,7 @@ function enableDropdownTrigger(){
             triggerElt.find('.glyphicon').remove();
             triggerElt.prepend('<span class="glyphicon glyphicon-triangle-bottom"></span>');
 
-            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(idx, elt){
+            encapsulatingElt.find("[data-dropdownid='" + dropdownid + "']").each(function(idx, elt){
                 var targetElt = $(elt);
 
                 if (targetElt.hasClass('dropdown-target')){

@@ -153,10 +153,11 @@ var WidgetWorkSurface = function(){
         }
 
         widgetEditsManager.refreshPropertyValues(userWidget);
-
+        // TODO this should be somewhere else
+        userWidget.properties.styles = $.extend(userWidget.properties.styles, userWidget.overrideProperties.styles);
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
-            var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(userWidget, innerWidgetId);;
+            var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(userWidget, innerWidgetId);
             that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, true, null, workSurface, overallStyles, zoom, true);
         });
     };

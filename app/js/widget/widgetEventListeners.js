@@ -56,8 +56,6 @@ $('.components').on('click', '.component-name-container', function () {
     dragAndDrop.registerWidgetDragHandleDraggable();
     var widgetId = $(this).closest('.widget').data('componentid');
     listDisplay.select(widgetId);
-    //$('.selected').removeClass('selected');
-    //$(this).parent().addClass('selected');
     selectedUserWidget = userApp.getWidget(widgetId);
     listDisplay.updateDraggables(selectedUserWidget);
     workSurface.loadUserWidget(selectedUserWidget);
@@ -80,9 +78,10 @@ $('.components').on('dblclick', '.component-name', function (e) {
 $('.components').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
-        var widgetId = $(this).parent().parent().parent().data('componentid');
-        var widgetNameElt = $($(this).parent().parent().find('.component-name'));
-        var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
+        var widgetListElt = $(this).closest('.widget');
+        var widgetId = widgetListElt.data('componentid');
+        var widgetNameElt = widgetListElt.find('.component-name');
+        var submitRenameElt = widgetListElt.closest('.widget').find('.submit-rename');
 
         widgetNameElt.removeClass('not-displayed');
         submitRenameElt.addClass('not-displayed');
@@ -93,7 +92,8 @@ $('.components').on('keypress', '.new-name-input', function (event) {
         widgetNameElt.text(newName);
         $('.component-options .component-name').text(newName);
 
-        userApp.getWidget(widgetId).meta.name = newName;
+        var widget = userApp.getWidget(widgetId);
+        widget.meta.name = newName;
     }
 });
 
@@ -105,6 +105,7 @@ function setWidgetOptions(outerWidget){
         .text(outerWidget.meta.name)
         .unbind()
         .on('dblclick', function () {
+
             var newNameInputElt = $($(this).parent().find('.new-name-input'));
             var submitRenameElt = $($(this).parent().find('.submit-rename'));
             newNameInputElt.val($(this).text());
@@ -119,6 +120,7 @@ function setWidgetOptions(outerWidget){
         .on('keypress' , function (event) {
             if (event.which == 13) {
                 event.preventDefault();
+                // TODO DRY
                 var widgetNameElt = $($(this).parent().parent().find('.component-name'));
                 var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
@@ -131,9 +133,10 @@ function setWidgetOptions(outerWidget){
                 }
                 $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.component-name').text(newName);
 
-                widgetNameElt.text($(this).val());
+                var newName = $(this).val();
+                widgetNameElt.text(newName);
 
-                outerWidget.meta.name = $(this).val();
+                outerWidget.meta.name = newName;
             }
         });
 
@@ -604,12 +607,13 @@ function registerUserWidgetAsDraggableForMainPages(widgetId) {
 enableDropdownTrigger();
 
 $('.components').on('click', '.index-page-toggle', function(){
-    var turnOn = !($(this).parent().hasClass('selected-index-page'));
+    var widgetListElt = $(this).closest('.widget');
+    var turnOn = !(widgetListElt.hasClass('selected-index-page'));
     $('.components .selected-index-page').removeClass('selected-index-page');
-    var widgetId = $(this).parent().data('componentid');
+    var widgetId = widgetListElt.data('componentid');
     if (turnOn){
         userApp.widgets.indexId = widgetId;
-        $(this).parent().addClass('selected-index-page');
+        widgetListElt.addClass('selected-index-page');
     } else {
         userApp.widgets.indexId = null;
     }
@@ -676,6 +680,7 @@ function recursiveReIding(widget, sourceWidget){
                         delete widget.innerWidgets[innerWidgetOldId];
                         widget.properties.layout[result.newId] = widget.properties.layout[innerWidgetOldId];
                         delete widget.properties.layout[innerWidgetOldId];
+                        widget.overrideProperties.layout = widget.properties.layout;
                     }
                 }
             }
@@ -903,16 +908,10 @@ function addDeleteUserWidgetButton(userWidgetId, listElt){
     listElt.find('.delete-button-container').append(buttonDeleteUserWidget);
     listElt.hover(
         function(){
-            $(this).find('.component-name-container').css({
-                width: '70%'
-            });
             $(this).find('.delete-button-container').css({
                 display: 'inline-block',
             });
         }, function(){
-            $(this).find('.component-name-container').css({
-                width: '95%'
-            });
             $(this).find('.delete-button-container').css({
                 display: 'none',
 
