@@ -20,3 +20,48 @@ function resizeMenubarToFitWindow(){
 window.addEventListener("resize", function(){
     resizeMenubarToFitWindow();
 });
+
+
+/** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
+function enableDropdownTrigger(){
+    $(".dropdown-trigger").find('.glyphicon').unbind().click(function(ev) {
+        var triggerElt = $(this).closest('.dropdown-trigger');
+
+        var dropdownid = triggerElt.data('dropdownid');
+
+        if (triggerElt.hasClass('dropdown-open')){
+            // close it
+            triggerElt.removeClass('dropdown-open').addClass('dropdown-closed');
+            triggerElt.find('.glyphicon').remove();
+            triggerElt.prepend('<span class="glyphicon glyphicon-triangle-right"></span>');
+
+            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(idx, elt){
+                var targetElt = $(elt);
+                if (targetElt.hasClass('dropdown-target')){
+                    targetElt.css({
+                        display: 'none',
+                    });
+                }
+            });
+
+        } else {
+            // open it
+            triggerElt.removeClass('dropdown-closed').addClass('dropdown-open');
+            triggerElt.find('.glyphicon').remove();
+            triggerElt.prepend('<span class="glyphicon glyphicon-triangle-bottom"></span>');
+
+            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(idx, elt){
+                var targetElt = $(elt);
+
+                if (targetElt.hasClass('dropdown-target')){
+                    targetElt.css({
+                        display: 'block',
+                    });
+                }
+            });
+
+        }
+        enableDropdownTrigger();
+    });
+
+}

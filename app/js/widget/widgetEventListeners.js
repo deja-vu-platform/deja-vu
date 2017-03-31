@@ -601,40 +601,7 @@ function registerUserWidgetAsDraggableForMainPages(widgetId) {
     });
 }
 
-/** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
-$(".dropdown-trigger").click(function(ev) {
-    var dropdownid = $(this).data('dropdownid');
-
-    if ($(this).hasClass('dropdown-open')){
-        // close it
-        $(this).removeClass('dropdown-open').addClass('dropdown-closed');
-        $(this).find('.glyphicon').remove();
-        $(this).append('<span class="glyphicon glyphicon-triangle-right"></span>');
-
-        $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-            if ($(this).hasClass('dropdown-target')){
-                $(this).css({
-                    display: 'none',
-                });
-            }
-        });
-
-    } else {
-        // open it
-        $(this).removeClass('dropdown-closed').addClass('dropdown-open');
-        $(this).find('.glyphicon').remove();
-        $(this).append('<span class="glyphicon glyphicon-triangle-bottom"></span>');
-
-        $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-            if ($(this).hasClass('dropdown-target')){
-                $(this).css({
-                    display: 'block',
-                });
-            }
-        });
-
-    }
-});
+enableDropdownTrigger();
 
 $('.components').on('click', '.index-page-toggle', function(){
     var turnOn = !($(this).parent().hasClass('selected-index-page'));

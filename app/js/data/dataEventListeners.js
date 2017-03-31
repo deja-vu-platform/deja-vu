@@ -399,44 +399,6 @@ function registerTooltipBtnHandlers() {
 
 
 
-/** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
-function enableDropdownTrigger(){
-    $(".dropdown-trigger").unbind().click(function(ev) {
-        var dropdownid = $(this).data('dropdownid');
-
-        if ($(this).hasClass('dropdown-open')){
-            // close it
-            $(this).removeClass('dropdown-open').addClass('dropdown-closed');
-            $(this).find('.glyphicon').remove();
-            $(this).prepend('<span class="glyphicon glyphicon-triangle-right"></span>');
-
-            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-                if ($(this).hasClass('dropdown-target')){
-                    $(this).css({
-                        display: 'none',
-                    });
-                }
-            });
-
-        } else {
-            // open it
-            $(this).removeClass('dropdown-closed').addClass('dropdown-open');
-            $(this).find('.glyphicon').remove();
-            $(this).prepend('<span class="glyphicon glyphicon-triangle-bottom"></span>');
-
-            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-                if ($(this).hasClass('dropdown-target')){
-                    $(this).css({
-                        display: 'block',
-                    });
-                }
-            });
-
-        }
-    });
-
-}
-
 enableDropdownTrigger();
 
 /**
