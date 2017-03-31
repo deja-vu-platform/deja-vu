@@ -153,8 +153,7 @@ var WidgetWorkSurface = function(){
         }
 
         widgetEditsManager.refreshPropertyValues(userWidget);
-        // TODO this should be somewhere else
-        userWidget.properties.styles = $.extend(userWidget.properties.styles, userWidget.overrideProperties.styles);
+        userWidget.properties.styles = widgetEditsManager.getMostRelevantOverallCustomChanges(userWidget, userWidget);
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
             var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(userWidget, innerWidgetId);

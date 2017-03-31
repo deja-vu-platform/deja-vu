@@ -653,9 +653,13 @@ function refreshContainerDisplay(fresh, container, zoom){
  * @param sourceWidget
  * @returns {*}
  */
-function recursiveReIding(widget, sourceWidget){
+var recursiveReIding = function(widget, sourceWidget, isTemplate){
     if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
         var thisWidgetNewId;
+        if (isTemplate){
+            widget.meta.templateCorrespondingId = widget.meta.id;
+        }
+
         if (sourceWidget){
             thisWidgetNewId = sourceWidget.meta.id;
         } else {
@@ -663,15 +667,16 @@ function recursiveReIding(widget, sourceWidget){
         }
         // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
         widget.meta.id = thisWidgetNewId;
+
         if (widget.type == 'user'){
             for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
                 var innerWidgetOldId = widget.properties.layout.stackOrder[idx];
                 var result;
                 if (sourceWidget){
                     var oldSourceId = sourceWidget.properties.layout.stackOrder[idx];
-                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], sourceWidget.innerWidgets[oldSourceId]);
+                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], sourceWidget.innerWidgets[oldSourceId],isTemplate);
                 } else {
-                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId]);
+                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], null, isTemplate);
                 }
                 if (result.success){
                     if (result.newId != innerWidgetOldId){ // or else the delete will delete the things!
@@ -688,12 +693,16 @@ function recursiveReIding(widget, sourceWidget){
         return {success: true, newId: thisWidgetNewId};
     }
     return {success: false}
-}
+};
 
-function createUserWidgetCopy (outerWidget, sourceOuterWidget){
+function createUserWidgetCopy (outerWidget, sourceOuterWidget, fromTemplate){
     var widget = UserWidget.fromString(JSON.stringify(outerWidget));
 
-    recursiveReIding(widget, sourceOuterWidget);
+
+    recursiveReIding(widget, sourceOuterWidget, fromTemplate);
+    if (fromTemplate){
+        delete widget.isTemplate;
+    }
     return widget;
 }
 
@@ -701,16 +710,6 @@ function createUserWidgetCopy (outerWidget, sourceOuterWidget){
 
 
 /************************************************************/
-function testSaveHTML(){
-    var html = '';
-    $('.component-container').each(function(){
-        var displayWidget = $(this).find('.display-component');
-        if (displayWidget.get(0)){
-            html = html + displayWidget.get(0).outerHTML+'/n';
-        }
-    });
-    return html;
-}
 
 function createDownloadPreview(){
     // from http://stackoverflow.com/questions/754607/can-jquery-get-all-css-styles-associated-with-an-element

@@ -79,6 +79,9 @@ var UserWidget = function(dimensions, name, id, version, author){
         dimensions: dimensions,
         layout: {
             stackOrder: []
+        },
+        styles : {
+            custom: {}, bsClasses: {}
         }
     };
     that.overrideProperties = {

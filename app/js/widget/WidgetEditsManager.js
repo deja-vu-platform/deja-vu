@@ -32,6 +32,9 @@ var WidgetEditsManager = function(){
                 targetWidget.properties.layout[id] = newProperties[id];
             }
             targetWidget.overrideProperties.layout = targetWidget.properties.layout;
+        } else if (typeString == 'stackOrder'){
+            targetWidget.properties.layout.stackOrder = newProperties;
+            targetWidget.overrideProperties.layout = targetWidget.properties.layout;
         } else {
             // TODO is this right??
             // FIXME problem with dot notation
@@ -94,27 +97,36 @@ var WidgetEditsManager = function(){
         // if path is just the outer widget's id, will just return outerWidget.properties
         var change = {};
         var updateChange = function(widget){
-            if (widget.properties.styles.custom) {
-                for (var style in widget.properties.styles.custom) {
-                    change[style] = widget.properties.styles.custom[style];
-                }
-            }
+            //if (widget.properties.styles.custom) {
+            //    for (var style in widget.properties.styles.custom) {
+            //        change[style] = widget.properties.styles.custom[style];
+            //    }
+            //}
+            //if (widget.overrideProperties) {
+            //    if (widget.overrideProperties.styles) {
+            //        if (widget.overrideProperties.styles.custom) {
+            //            for (var style in widget.overrideProperties.styles.custom) {
+            //                change[style] = widget.overrideProperties.styles.custom[style];
+            //            }
+            //        }
+            //    }
+            //}
+            change = $.extend(change, widget.properties.styles);
+
             if (widget.overrideProperties) {
                 if (widget.overrideProperties.styles) {
-                    if (widget.overrideProperties.styles.custom) {
-                        for (var style in widget.overrideProperties.styles.custom) {
-                            change[style] = widget.overrideProperties.styles.custom[style];
-                        }
-                    }
+                    change = $.extend(change, widget.overrideProperties.styles);
                 }
             }
         };
-        var outerWidget = outermostWidget;
-        var path = outermostWidget.getPath(targetId);
 
+        // add properties of the outermost widget
+        updateChange(outermostWidget);
+
+        var path = outermostWidget.getPath(targetId);
         // else go down and find the correct one
-        for (var pathValueIdx = 0; pathValueIdx<path.length-1; pathValueIdx++){
-            outerWidget = outermostWidget.getInnerWidget(path[pathValueIdx]);
+        for (var pathValueIdx = 1; pathValueIdx<path.length-1; pathValueIdx++){
+            var outerWidget = outermostWidget.getInnerWidget(path[pathValueIdx]);
             // moving down so that the inner styles override the outer styles
             updateChange(outerWidget);
         }
@@ -155,11 +167,11 @@ var WidgetEditsManager = function(){
                 var templateVersionCopy;
                 var templateInfo = isFromTemplate(widgetToModify);
                 if (templateInfo.fromTemplate){
-                    templateVersionCopy =  createUserWidgetCopy(UserWidget.fromString(
+                    templateVersionCopy = UserWidget.fromString(
                         JSON.stringify(
                             selectedProject.cliches[templateInfo.clicheId].widgets.templates[templateInfo.widgetId]
                         )
-                    ), widgetToModify);
+                    );
                 } else {
                     templateVersionCopy = widgetToModify;
                 }
@@ -194,7 +206,7 @@ var WidgetEditsManager = function(){
      */
     var applyPropertyChanges = function(outerWidget, sourceWidget){
 
-        var insertPropertiesIntoWidget = function(widget, overrideProperties){
+        var insertPropertiesIntoWidget = function(widget, overrideProperties, mappings){
             // if there is a change, override the old one
             if (overrideProperties){
                 if (overrideProperties.styles){
@@ -223,7 +235,18 @@ var WidgetEditsManager = function(){
                 }
 
                 if (overrideProperties.layout) {
-                    widget.properties.layout = overrideProperties.layout;
+                    if (mappings){ // only do this if reading from a template
+                        for (var id in overrideProperties.layout){
+                            var mappedId = mappings.tTW[id];
+                            if (id != 'stackOrder'){
+                                widget.properties.layout[mappedId] = overrideProperties.layout[id];
+                            }
+                        }
+                    }
+                    //else {
+                    //    widget.properties.layout = overrideProperties.layout;
+                    //}
+
                 }
 
                 if (overrideProperties.value){
@@ -233,32 +256,85 @@ var WidgetEditsManager = function(){
 
         };
 
-        var applyPropertyChangesHelper = function(innerWidget, correspondingSourceInnerWidget){
-
-            path.push(correspondingSourceInnerWidget.meta.id);
-
-            // get source properties
-
-            var sourceProperties = correspondingSourceInnerWidget.overrideProperties; //getPropertyChanges(sourceWidget, path);
-            insertPropertiesIntoWidget(innerWidget, sourceProperties);
-
-            // get changed properties
-            var properties = innerWidget.overrideProperties; //getPropertyChanges(sourceWidget, path);
-            insertPropertiesIntoWidget(innerWidget, properties);
-
-            if (innerWidget.type == 'user'){
-                // then recurse down
-                innerWidget.properties.layout.stackOrder.forEach(function (innerInnerWidgetId, idx) {
-                    var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
-                    var innerInnerSourceWidgetId = correspondingSourceInnerWidget.properties.layout.stackOrder[idx];
-                    var innerInnerSourceWidget = correspondingSourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
-                    applyPropertyChangesHelper(innerInnerWidget, innerInnerSourceWidget);
-                });
+        var getMappings = function(widgets){
+            var widgetToTemplate = {};
+            var templateToWidget = {};
+            for (var id in widgets){
+                widgetToTemplate[id] = widgets[id].meta.templateCorrespondingId;
+                templateToWidget[widgets[id].meta.templateCorrespondingId] = id;
             }
-            path.pop();
+
+            return {wTT: widgetToTemplate, tTW: templateToWidget}
+
         };
 
-        var path = [];
+        var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
+            var fromTemplate = (innerWidget.meta.id != sourceInnerWidget.meta.id);
+
+            if (fromTemplate){
+                if (innerWidget.type == 'user'){
+                    var idMappings = getMappings(innerWidget.innerWidgets);
+                    // get any new additions
+                    Object.keys(sourceInnerWidget.innerWidgets).forEach(function (innerInnerSourceWidgetId, idx) {
+                        var innerInnerSourceWidget = sourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
+
+                        var innerInnerWidgetId = idMappings.tTW[innerInnerSourceWidgetId];
+                        if (!innerInnerWidgetId){
+                            var innerInnerWidget = createUserWidgetCopy(innerInnerSourceWidget, null, true);
+                            innerInnerWidgetId = innerInnerWidget.meta.id;
+                            innerWidget.innerWidgets[innerInnerWidgetId] = innerInnerWidget;
+                            innerWidget.properties.layout.stackOrder.push(innerInnerWidgetId);
+                            innerWidget.properties.layout[innerInnerWidgetId] =
+                                innerWidget.properties.layout[innerInnerSourceWidgetId]
+                        }
+                    });
+                }
+
+                var updatedIdMappings = getMappings(innerWidget.innerWidgets);
+
+                // get source properties
+                var sourceProperties = sourceWidget.overrideProperties; //getPropertyChanges(sourceWidget, path);
+                insertPropertiesIntoWidget(innerWidget, sourceProperties, updatedIdMappings);
+                // get changed properties
+                var properties = innerWidget.overrideProperties; //getPropertyChanges(sourceWidget, path);
+                insertPropertiesIntoWidget(innerWidget, properties);
+
+                if (innerWidget.type == 'user'){
+                    // then recurse down
+                    // now all the widgets are there
+                    Object.keys(innerWidget.innerWidgets).forEach(function (innerInnerWidgetId) {
+                        var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
+
+                        var innerInnerSourceWidgetId = updatedIdMappings.wTT[innerInnerWidgetId];
+                        var innerInnerSourceWidget = sourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
+                        if (innerInnerSourceWidget){
+                            applyPropertyChangesHelper(innerInnerWidget, innerInnerSourceWidget);
+                        } else if (innerInnerSourceWidgetId) {
+                            // ie, it's deleted
+                            innerWidget.deleteInnerWidget(innerInnerWidgetId);
+                        }
+
+                    });
+                }
+
+
+            } else {
+                // get changed properties
+                var properties = innerWidget.overrideProperties; //getPropertyChanges(sourceWidget, path);
+                insertPropertiesIntoWidget(innerWidget, properties);
+
+
+                if (innerWidget.type == 'user'){
+                    // then recurse down
+                    Object.keys(innerWidget.innerWidgets).forEach(function (innerInnerWidgetId) {
+                        var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
+                        applyPropertyChangesHelper(innerInnerWidget, innerInnerWidget);
+                    });
+                }
+
+            }
+
+        };
 
         if (!sourceWidget){ // if this is a new added component?
             sourceWidget = outerWidget;
@@ -282,9 +358,12 @@ var WidgetEditsManager = function(){
             var templateVersion =  selectedProject.cliches[templateInfo.clicheId].widgets.templates[templateInfo.widgetId];
             outerWidget.properties.styles = JSON.parse(JSON.stringify(templateVersion.properties.styles));
         }
-        outerWidget.properties.layout.stackOrder.forEach(function(id){
-            resetStyleValues(outerWidget.innerWidgets[id]);
-        });
+        if (outerWidget.type == 'user'){ // not BaseWidgets
+            Object.keys(outerWidget.innerWidgets).forEach(function(id){
+                resetStyleValues(outerWidget.innerWidgets[id]);
+            });
+        }
+
     };
 
     that.refreshPropertyValues = function(outerWidget){

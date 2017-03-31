@@ -131,17 +131,15 @@ var WidgetDisplay = function(){
 
             // make styles more specific
             overallStyles = JSON.parse(JSON.stringify(overallStyles));
-            // for (var mainProperty in styles.main){
-            //     overallStyles[mainProperty] = styles.main[mainProperty];
-            // }
+            overallStyles.custom = overallStyles.custom || {};
             for (var customStyle in styles.custom){
-                overallStyles[customStyle] = styles.custom[customStyle];
+                overallStyles.custom[customStyle] = styles.custom[customStyle];
             }
 
             // FIXME this appears twice
             container.css({
-                'background-color':overallStyles['background-color'] || ''
-            })
+                'background-color':overallStyles.custom['background-color'] || ''
+            });
 
             widget.properties.layout.stackOrder.forEach(function(innerWidgetId){
                 var innerWidget = widget.innerWidgets[innerWidgetId];
@@ -266,7 +264,7 @@ var WidgetDisplay = function(){
     var applyStyles = function(properties, overallStyles, container, displayWidget, type){
         //// TODO SKETCHY!!!
         if (properties){
-            if (overallStyles){
+            if (overallStyles.custom){
 
                 // Reset old overall styles
                 container.css({
@@ -278,13 +276,15 @@ var WidgetDisplay = function(){
                 displayWidget.css(blankProperties);
 
                 container.css({
-                    'background-color':overallStyles['background-color'] || ''
+                    'background-color':overallStyles.custom['background-color'] || ''
                 });
-
-                for (var customProperty in overallStyles){
-                    displayWidget.css(customProperty, overallStyles[customProperty]);
+            }
+            for (var styleType in overallStyles){
+                for (var customProperty in overallStyles[styleType]){
+                    displayWidget.css(customProperty, overallStyles[styleType][customProperty]);
                 }
             }
+
             if (Object.keys(properties.bsClasses).length>0){ // bootstrap classes
                 var classes = '';
                 for (var propertyName in properties.bsClasses){

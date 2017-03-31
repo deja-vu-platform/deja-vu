@@ -76,9 +76,10 @@ var WidgetListDisplay = function(){
                 parentElt.append(elt);
             });
         };
-
-        var innerWidgetsInfoList = widget.getAllInnerWidgetsIds(true);
-        recursiveListMakerHelper(innerWidgetsInfoList, listElt.find('.inner-widgets'));
+        if (widget.type == 'user'){
+            var innerWidgetsInfoList = widget.getAllInnerWidgetsIds(true);
+            recursiveListMakerHelper(innerWidgetsInfoList, listElt.find('.inner-widgets'));
+        }
         enableDropdownTrigger();
     };
 
@@ -105,7 +106,9 @@ var WidgetListDisplay = function(){
             }
             usedWidgetsIds.forEach(function(id){
                 var widget = cliche.getWidget(id);
-                displayUsedWidgetInList(widget, clicheId);
+                if (widget.type == 'user'){
+                    displayUsedWidgetInList(widget, clicheId);
+                }
             });
 
         } else {

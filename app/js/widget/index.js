@@ -104,7 +104,7 @@ $(function(){
 
     //autoSave5Mins();
 
-    basicWidgets = $('#basic-cliches').html();
+    basicWidgets = $('#basic-components').html();
 
     dragAndDrop.registerWidgetDragHandleDraggable();
 
