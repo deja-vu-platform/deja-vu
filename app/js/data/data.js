@@ -1,7 +1,6 @@
 /**
  * Created by Shinjini on 9/26/2016.
  */
-var isOverall = true;
 var dataZoomElement = DataZoomElement();
 var dataMiniNav = DataMiniNav();
 var dataWorkSurface = DataWorkSurface();
@@ -16,6 +15,7 @@ var files = [];
 
 var selectedUserWidget = null;
 var selectedCliche = null;
+var selectedDatatype = null;
 var userApp = null;
 var selectedProject = null;
 
@@ -66,11 +66,8 @@ $(function(){
         var userAppId = selectedProject.userApp;
         userApp = selectedProject.cliches[userAppId];
 
-        // TODO this will need to be changed once we bring in a userComponent which will be a
-        // superset of userWidgets
-        var appName = userApp.meta.name;
         displayNewClicheInList(userApp);
-        displayOverallDatatypesInListAndSelect(appName, userAppId);
+        displayOverallDatatypesInListAndSelect();
 
         for (var datatypeId in userApp.datatypes){
             var datatypeName = userApp.datatypes[datatypeId].meta.name;
@@ -78,7 +75,7 @@ $(function(){
         }
     }
 
-    dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
+    dataWorkSurface.loadBondingData(null, null, currentZoom);
     //autoSave5Mins();
 
     basicWidgets = $('#basic-components').html();

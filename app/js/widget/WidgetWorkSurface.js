@@ -412,6 +412,10 @@ var WidgetWorkSurface = function(){
      */
     var disableWidgetDOMElements = function(widgetId){
         var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
+        if (workSurface.hasClass('hidden-component')){
+            return;
+        }
+
         $(workSurface).addClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -436,6 +440,9 @@ var WidgetWorkSurface = function(){
 
     var enableWidgetDOMElements = function(widgetId){
         var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
+        if (!workSurface.hasClass('hidden-component')){
+            return;
+        }
         $(workSurface).removeClass('hidden-component');
 
         $(workSurface).find('*').each(function() {
@@ -463,43 +470,9 @@ var WidgetWorkSurface = function(){
                 enableWidgetDOMElements(widgetId);
                 return;
             }
-            if ($('#'+WIDGET_WS_REF+'_'+widgetId).hasClass('hidden-component')){
-                return;
-            }
             disableWidgetDOMElements(widgetId);
         });
     };
-
-    // var enableSpecificComponentDomElements = function(componentToEnableId){
-    //     // first check that the table has been made (otherwise the reset will happen automatically,
-    //     // but more importantly, the table-grid-container won't exist yet
-    //     var workSurfaceToEnable = $('#work-surface'+'_'+componentToEnableId);
-    //     if (!(workSurfaceToEnable.length>0)) {
-    //         createOrResetTableGridContainer(componentToEnableId);
-    //         var state = {
-    //             zoom: 1,
-    //             lock:{
-    //                 width: false,
-    //                 height: false
-    //             }
-    //         };
-    //         $('#work-surface'+'_'+componentToEnableId).data('state', state);
-    //     }
-    //
-    //     var componentToEnable = selectedProject.cliches[componentToEnableId];
-    //
-    //     // enable first (toggle needs the id's and classes to be enabled)
-    //     if (workSurfaceToEnable.hasClass('hidden-component')){
-    //         enableWidgetDOMElements(componentToEnableId);
-    //     }
-    //
-    //     zoomElt.updateZoomFromState(componentToEnable);
-    //
-    //     setWidgetOptions(componentToEnable);
-    //
-    // }
-
-
 
     Object.freeze(that);
     return that

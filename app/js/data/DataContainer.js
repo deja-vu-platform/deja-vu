@@ -12,27 +12,27 @@ var DataContainer = function(){
         return DATA_CONT_REF;
     };
 
-    var makeContainerResizable = function(clicheId, datatypeId, container, isOverall){
+    var makeContainerResizable = function(clicheId, objectId, container, isOverall){
 
         var dragHandle_se = $('<span></span>');
         dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
         dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
-        dragHandle_se.attr('id', 'drag-handle-se' + '_' + datatypeId);
+        dragHandle_se.attr('id', 'drag-handle-se' + '_' + objectId);
 
         var dragHandle_sw = $('<span></span>');
         dragHandle_sw.html('<img src="images/drag_handle_sw_icon.png" width="15px" height="15px">');
         dragHandle_sw.addClass('ui-resizable-handle ui-resizable-sw drag-handle');
-        dragHandle_sw.attr('id', 'drag-handle-sw' + '_' + datatypeId);
+        dragHandle_sw.attr('id', 'drag-handle-sw' + '_' + objectId);
 
         var dragHandle_ne = $('<span></span>');
         dragHandle_ne.html('<img src="images/drag_handle_ne_icon.png" width="15px" height="15px">');
         dragHandle_ne.addClass('ui-resizable-handle ui-resizable-ne drag-handle');
-        dragHandle_ne.attr('id', 'drag-handle-se' + '_' + datatypeId);
+        dragHandle_ne.attr('id', 'drag-handle-se' + '_' + objectId);
 
         var dragHandle_nw = $('<span></span>');
         dragHandle_nw.html('<img src="images/drag_handle_nw_icon.png" width="15px" height="15px">');
         dragHandle_nw.addClass('ui-resizable-handle ui-resizable-nw drag-handle');
-        dragHandle_nw.attr('id', 'drag-handle-nw' + '_' + datatypeId);
+        dragHandle_nw.attr('id', 'drag-handle-nw' + '_' + objectId);
 
         container.append(dragHandle_se);
         container.append(dragHandle_sw);
@@ -58,9 +58,9 @@ var DataContainer = function(){
 
                 // widget.properties.dimensions = newDimensions;
                 if (isOverall){
-                    selectedProject.bondDisplays[clicheId].dataBondDisplays[datatypeId].displayProperties.dimensions = newDimensions;
+                    selectedProject.bondDisplays[clicheId].dataBondDisplays[objectId].displayProperties.dimensions = newDimensions;
                 } else {
-                    selectedProject.cliches[clicheId].dataBondDisplays[datatypeId].displayProperties.dimensions = newDimensions;
+                    selectedProject.cliches[clicheId].dataBondDisplays[objectId].displayProperties.dimensions = newDimensions;
                 }
 
             },
@@ -68,10 +68,10 @@ var DataContainer = function(){
                 var newPosition = {left:  ui.position.left/currentZoom, top: ui.position.top/currentZoom};
 
                 if (isOverall){
-                    selectedProject.bondDisplays[clicheId].dataBondDisplays[datatypeId].displayProperties.position = newPosition;
+                    selectedProject.bondDisplays[clicheId].dataBondDisplays[objectId].displayProperties.position = newPosition;
 
                 } else {
-                    selectedProject.cliches[clicheId].dataBondDisplays[datatypeId].displayProperties.position = newPosition;
+                    selectedProject.cliches[clicheId].dataBondDisplays[objectId].displayProperties.position = newPosition;
                 }
                 // not super important to update as you resize so just do it at the end
                 //dataMiniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
@@ -159,10 +159,10 @@ var DataContainer = function(){
         return container;
     };
 
-    that.createResizableDatatypeContainer = function(clicheId, datatypeId, datatypeDisplayProps, zoom, isOverall) {
-        var container = that.createBasicDatatypeContainer(clicheId, datatypeId, datatypeDisplayProps, zoom);
-        makeContainerResizable(clicheId, datatypeId, container, isOverall);
-        container.append(createEditOptions(datatypeId, container));
+    that.createResizableDatatypeContainer = function(clicheId, objectId, datatypeDisplayProps, zoom, isOverall) {
+        var container = that.createBasicDatatypeContainer(clicheId, objectId, datatypeDisplayProps, zoom);
+        makeContainerResizable(clicheId, objectId, container, isOverall);
+        container.append(createEditOptions(objectId, container));
         return container;
     };
 
