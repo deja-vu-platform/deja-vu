@@ -19,10 +19,16 @@ $('.components').on('click', '.component-name-container', function () {
     var workSurfaceRef = dataWorkSurface.getWorkSurfaceRef();
     $('#'+workSurfaceRef+'_'+userApp.meta.id).data('state', oldState);
 
-    var widgetId = $(this).parent().data('componentid');
+    var clicheId = $(this).parent().data('clicheid');
+    var cliche = selectedProject.cliches[clicheId];
+    var datatypeId = $(this).parent().data('componentid');
+    var datatype;
+    if (datatypeId){
+        datatype = cliche.datatypes[datatypeId];
+    }
     $('.selected').removeClass('selected');
     $(this).parent().addClass('selected');
-    dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
+    dataWorkSurface.loadBondingData(cliche, datatype, currentZoom);
     $('#outer-container').scrollTop(0); // TODO DRY
     $('#outer-container').scrollLeft(0);
 });
@@ -133,19 +139,21 @@ function displayNewClicheInList(cliche){
     +'</button>': "";
 
     var newClicheElt = $(
-        '<div class="user-components page-component-toggle-drop">'+
-        '<div>'+
-        '<span class="dropdown-trigger dropdown-open" data-dropdownid="'+dropdownId+'">'+
-        '<span class="glyphicon glyphicon-triangle-bottom"></span>'+
-        cliche.meta.name+
-        '</span>'+
-        newDTButton+
-        '</div>'+
-        '<div class="content  dropdown-target"  data-dropdownid="'+dropdownId+'">'+
-        '<ul id="'+dropdownId+'-list">'+
-        '</ul>'+
-        '</div>'+
-        '</div>');
+        '<div class="user-components page-component-toggle-drop">'
+            +'<span class="dropdown-trigger dropdown-open" data-dropdownid="'+ dropdownId +'" data-clicheid=' + cliche.meta.id + '>'
+                +'<span class="glyphicon glyphicon-triangle-bottom"></span>'
+                + '<div class="component-name-container" >'
+                    + '<span class="component-name">' + cliche.meta.name + '</span>'
+                    + '<span class="submit-rename not-displayed">'
+                        + '<input type="text" class="new-name-input form-control" autofocus>'
+                    + '</span>'
+                + '</div>'
+            +'</span>'
+            +newDTButton
+            +'<div class="content dropdown-target"  data-dropdownid="'+dropdownId+'">'
+                +'<ul id="'+dropdownId+'-list"></ul>'
+            +'</div>'
+        +'</div>');
     $('#user-components-list').append(newClicheElt);
     // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
@@ -198,12 +206,13 @@ function displayNewClicheInList(cliche){
                     }
 
                     userApp.addDatatype(datatype, datatypeDisplayProps);
-                    selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id, datatypeDisplayProps);
+
+                    selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id, JSON.parse(JSON.stringify(datatypeDisplayProps)));
                     displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
                     // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
                     // TODO add to overall and to userApp display
                     resetMenuOptions();
-                    dataWorkSurface.loadCliche(userApp, currentZoom, isOverall);
+                    dataWorkSurface.loadBondingData(selectedCliche, selectedDatatype, currentZoom);
                 });
         });
     }
@@ -222,10 +231,10 @@ function displayNewDatatypeInUserDatatypeList(name, id, clicheId){
     var newDatatypeElt = $(
         '<li data-type="'+'user'+'" class="datatype" data-componentid="' + id + '" data-clicheid=' + clicheId + '>'
         + '<div class="component-name-container">'
-        + '<span class="component-name">' + name + '</span>'
-        + '<span class="submit-rename not-displayed">'
-        + '<input type="text" class="new-name-input form-control" autofocus>'
-        + '</span>'
+            + '<span class="component-name">' + name + '</span>'
+            + '<span class="submit-rename not-displayed">'
+                + '<input type="text" class="new-name-input form-control" autofocus>'
+            + '</span>'
         + '</div>'
         + '</li>');
     $('#'+dropdownId).append(newDatatypeElt);
@@ -243,12 +252,12 @@ function displayNewDatatypeInUserDatatypeList(name, id, clicheId){
  * Adds a component to the list of main pages
  * @param newComponent
  */
-function displayOverallDatatypesInList(name, id){
+function displayOverallDatatypesInList(){
     // TODO changes in style
     var newWidgetElt =
-        '<li data-componentid=' + id + '>'
+        '<li>'
         + '<div class="component-name-container">'
-        + '<div class="component-name">' + name + '</div>'
+        + '<div class="component-name"> Overall </div>'
         + '<div class="submit-rename not-displayed">'
         + '<input type="text" class="new-name-input form-control" autofocus>'
         + '</div>'
@@ -257,10 +266,10 @@ function displayOverallDatatypesInList(name, id){
     $('#main-pages-list').append(newWidgetElt);
 }
 
-function displayOverallDatatypesInListAndSelect(name, id){
+function displayOverallDatatypesInListAndSelect(){
     $('.selected').removeClass("selected");
-    displayOverallDatatypesInList(name,id);
-    $("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
+    displayOverallDatatypesInList();
+    //$("#main-pages-list").find("[data-componentid='" + id + "']").addClass('selected');
 }
 
 
