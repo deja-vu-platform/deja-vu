@@ -74,7 +74,13 @@ $(function(){
             displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId, userAppId);
         }
     }
-
+    var fakeCliche = ClicheWithDisplay.fromObject(getFakeCliches()[0]);
+    var fakeClicheId = fakeCliche.meta.id;
+    selectedProject.addCliche(fakeCliche);
+    selectedProject.bondDisplays[fakeClicheId].dataBondDisplays[fakeClicheId] = fakeCliche.dataBondDisplays[fakeClicheId];
+    for (var fakeClicheDatatypeId in fakeCliche.datatypes){
+        selectedProject.bondDisplays[fakeClicheId].dataBondDisplays[fakeClicheDatatypeId] = fakeCliche.dataBondDisplays[fakeClicheDatatypeId];
+    }
     dataWorkSurface.loadBondingData(null, null, currentZoom);
     //autoSave5Mins();
 

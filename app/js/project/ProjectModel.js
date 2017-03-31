@@ -145,3 +145,12 @@ UserProject.fromObject = function(object){
     }
     return project
 };
+
+UserProject.prototype.getAllCliches = function(){
+    var cliches = [];
+    var project = this;
+    for (var clicheId in project.cliches){
+        cliches.push(project.cliches[clicheId])
+    }
+    return cliches
+};

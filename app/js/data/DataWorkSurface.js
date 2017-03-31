@@ -89,7 +89,8 @@ var DataWorkSurface = function(){
             dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
         }
 
-        canvas.drawClicheDataLines(cliche);
+
+
     };
 
 
@@ -119,7 +120,12 @@ var DataWorkSurface = function(){
                 dragHandle, currentZoom, isOverall);
             workSurface.append(container);
 
-            canvas.drawClicheDataLines(droppedObjectCliche);
+            if (isOverall){
+                canvas.drawClicheDataLines(selectedProject.getAllCliches());
+            } else {
+                canvas.drawClicheDataLines([droppedObjectCliche]);
+            }
+
         };
 
         var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(cliche, onDropFinished);
@@ -137,13 +143,19 @@ var DataWorkSurface = function(){
         //var workSurface = $('#'+DATA_WS_ID+'_'+componentId);
         currentZoom = 1;
         var workSurface = createOrResetWorkSurface(cliche, zoom);
-        if (cliche){
+        var isOverall = cliche? false: true;
+        if (!isOverall){
             loadClicheToWorkSurface(workSurface, cliche, datatype, false, currentZoom);
         } else { // overall
             for (var clicheId in selectedProject.cliches){
                 var cliche = selectedProject.cliches[clicheId];
                 loadClicheToWorkSurface(workSurface, cliche, null, true, currentZoom);
             }
+        }
+        if (isOverall){
+            canvas.drawClicheDataLines(selectedProject.getAllCliches());
+        } else {
+            canvas.drawClicheDataLines([cliche]);
         }
     };
 

@@ -140,19 +140,19 @@ function displayNewClicheInList(cliche){
 
     var newClicheElt = $(
         '<div class="user-components page-component-toggle-drop">'
-            +'<span class="dropdown-trigger dropdown-open" data-dropdownid="'+ dropdownId +'" data-clicheid=' + cliche.meta.id + '>'
-                +'<span class="glyphicon glyphicon-triangle-bottom"></span>'
-                + '<div class="component-name-container" >'
-                    + '<span class="component-name">' + cliche.meta.name + '</span>'
-                    + '<span class="submit-rename not-displayed">'
-                        + '<input type="text" class="new-name-input form-control" autofocus>'
-                    + '</span>'
-                + '</div>'
-            +'</span>'
-            +newDTButton
-            +'<div class="content dropdown-target"  data-dropdownid="'+dropdownId+'">'
-                +'<ul id="'+dropdownId+'-list"></ul>'
-            +'</div>'
+        +   '<span class="dropdown-trigger dropdown-open" data-dropdownid="'+ dropdownId +'" data-clicheid=' + cliche.meta.id + '>'
+        +       '<span class="glyphicon glyphicon-triangle-bottom"></span>'
+        +       '<div class="component-name-container" >'
+        +           '<span class="component-name">' + cliche.meta.name + '</span>'
+        +           '<span class="submit-rename not-displayed">'
+        +               '<input type="text" class="new-name-input form-control" autofocus>'
+        +           '</span>'
+        +       '</div>'
+        +   '</span>'
+        +   newDTButton
+        +   '<div class="content dropdown-target"  data-dropdownid="'+dropdownId+'">'
+        +       '<ul id="'+dropdownId+'-list"></ul>'
+        +   '</div>'
         +'</div>');
     $('#user-components-list').append(newClicheElt);
     // addDeleteUserDatatypeButton(id);
@@ -209,8 +209,6 @@ function displayNewClicheInList(cliche){
 
                     selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id, JSON.parse(JSON.stringify(datatypeDisplayProps)));
                     displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
-                    // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
-                    // TODO add to overall and to userApp display
                     resetMenuOptions();
                     dataWorkSurface.loadBondingData(selectedCliche, selectedDatatype, currentZoom);
                 });
