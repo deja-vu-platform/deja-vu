@@ -73,17 +73,6 @@ var WidgetDragAndDropController = function () {
                 // after it has been added
                 widgetEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'layout', newLayout, true);
 
-                // TODO dry!!!
-                // update all widgets using this widget
-                userApp.getAllOuterWidgetIds().forEach(function(widgetId){
-                    var widget = userApp.getWidget(widgetId);
-                    var path = widget.getPath(widgetId);
-                    path.forEach(function(pathWidgetId){ // note this includes the selectedWidgetId
-                        var pathWidget = userApp.getWidget(pathWidgetId);
-                        widgetEditsManager.refreshPropertyValues(pathWidget);
-                    });
-                });
-
                 miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
 
                 dropFinished(dragHandle, widget);

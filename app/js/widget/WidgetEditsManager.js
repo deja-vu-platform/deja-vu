@@ -49,6 +49,8 @@ var WidgetEditsManager = function(){
         }
 
         that.refreshPropertyValues(outermostWidget);
+        that.updateAllWidgetsUsing(targetId);
+
     };
 
 
@@ -261,7 +263,6 @@ var WidgetEditsManager = function(){
 
         var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
             var fromTemplate = (innerWidget.meta.id != sourceInnerWidget.meta.id);
-
             if (fromTemplate){
                 if (innerWidget.type == 'user'){
                     var idMappings = getMappings(innerWidget.innerWidgets);
@@ -370,6 +371,18 @@ var WidgetEditsManager = function(){
         applyPropertyChangesAtAllLevelsBelow(outerWidget);
 
         return outerWidget
+    };
+
+    that.updateAllWidgetsUsing = function(changingWidgetId){
+        userApp.getAllOuterWidgetIds().forEach(function(widgetId){
+            var widget = userApp.getWidget(widgetId);
+            var path = widget.getPath(changingWidgetId);
+            path.forEach(function(pathWidgetId){ // note this includes the selectedWidgetId
+                var pathWidget = userApp.getWidget(pathWidgetId);
+                widgetEditsManager.refreshPropertyValues(pathWidget);
+            });
+        });
+
     };
 
 

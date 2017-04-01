@@ -58,6 +58,7 @@ var WidgetContainer = function(){
 
                 widgetEditsManager.updateCustomProperties(outermostWidget, widget.meta.id, 'dimensions', newDimensions);
                 refreshContainerDisplay(false, container, currentZoom);
+
             },
             stop: function(e, ui){
                 var newPosition = {left:  ui.position.left/currentZoom, top: ui.position.top/currentZoom};

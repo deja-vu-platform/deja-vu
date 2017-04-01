@@ -31,7 +31,7 @@ var WidgetWorkSurface = function(){
         var widgetId = outerWidget.meta.id;
         var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         if (workSurface.length===0){
-            workSurface = that.setUpEmptyWorkSurface(outerWidget, zoom, editable);
+            workSurface = setUpEmptyWorkSurface(outerWidget, zoom, editable);
         } else {
             resetWorkSurface(workSurface);
         }
@@ -384,7 +384,7 @@ var WidgetWorkSurface = function(){
      * @param userWidget
      * @param zoom
      */
-    that.setUpEmptyWorkSurface = function(userWidget, zoom, editable){
+    var setUpEmptyWorkSurface = function(userWidget, zoom, editable){
         currentZoom = zoom; // set zoom value 100%
         var widgetId = userWidget.meta.id;
         disableAllWidgetDomElementsExcept(widgetId);

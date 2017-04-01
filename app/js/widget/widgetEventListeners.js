@@ -11,7 +11,7 @@ $('#new-user-component-btn').click(function(){
             selectedUserWidget = initUserWidget(false, false);
             userApp.addWidget(selectedUserWidget);
             listDisplay.refresh();
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            workSurface.loadUserWidget(selectedUserWidget);
             style.setUpStyleColors(selectedUserWidget);
 
             resetMenuOptions();
@@ -24,7 +24,7 @@ $('#new-main-component-btn').click(function(){
             selectedUserWidget = initUserWidget(false, true);
             userApp.addPage(selectedUserWidget);
             listDisplay.refresh();
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            workSurface.loadUserWidget(selectedUserWidget);
             style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
     });
@@ -36,7 +36,7 @@ $('#new-widget-template-btn').click(function(){
             selectedUserWidget = initUserWidget(false, false);
             userApp.addTemplate(selectedUserWidget);
             listDisplay.refresh();
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            workSurface.loadUserWidget(selectedUserWidget);
             style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
         });
