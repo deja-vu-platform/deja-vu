@@ -27,11 +27,11 @@ var WidgetWorkSurface = function(){
         return workSurface;
     };
 
-    var createOrResetWorkSurface = function(outerWidget, zoom){
+    var createOrResetWorkSurface = function(outerWidget, zoom, editable){
         var widgetId = outerWidget.meta.id;
         var workSurface = $('#'+WIDGET_WS_REF+'_'+widgetId);
         if (workSurface.length===0){
-            workSurface = that.setUpEmptyWorkSurface(outerWidget, zoom);
+            workSurface = that.setUpEmptyWorkSurface(outerWidget, zoom, editable);
         } else {
             resetWorkSurface(workSurface);
         }
@@ -47,11 +47,11 @@ var WidgetWorkSurface = function(){
         workSurface.find('.'+containerRef).remove();
     };
 
-    that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, dragHandle,
+    that.makeRecursiveWidgetContainersAndDisplay = function(innerWidget, outerWidget, isThisEditable, isThisDraggable, dragHandle,
                                                             outerWidgetContainer, overallStyles, zoom, associated,
                                                             hackityHack){
         var container = makeRecursiveWidgetContainers(
-            innerWidget, outerWidget, isThisEditable, dragHandle,
+            innerWidget, outerWidget, isThisEditable, isThisDraggable, dragHandle,
             zoom, associated, outerWidget, hackityHack);
         if (outerWidgetContainer){
             outerWidgetContainer.append(container);
@@ -64,9 +64,10 @@ var WidgetWorkSurface = function(){
     };
 
     // isEditable == component is the selected user component and all its contents are editable
-    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, dragHandle, zoom, associated, outermostWidget, hackityHack){ //FIXME!
+    var makeRecursiveWidgetContainers = function(innerWidget, outerWidget, isThisEditable, isThisDraggable, dragHandle, zoom, associated, outermostWidget, hackityHack){ //FIXME!
         var type = innerWidget.type;
         var widgetId = innerWidget.meta.id;
+        var editable = isThisEditable && !innerWidget.meta.templateCorrespondingId;
 
         // first create a container for this component
         var widgetContainer;
@@ -80,13 +81,17 @@ var WidgetWorkSurface = function(){
                 dragHandle.addClass('associated').data('componentid', widgetId).data('clicheid', userApp.meta.id); // TODO is this always userApp?
             }
 
-            if (isThisEditable){
+            if (editable){
                 widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
                 dragAndDrop.registerWidgetDragHandleDraggable(dragHandle);
             } else {
                 widgetContainer = widgetContainerMaker.createMinimallyEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
-                dragHandle.addClass('not-draggable');
-                dragHandle.notDraggable = true;
+                if (isThisDraggable){
+                    dragAndDrop.registerWidgetDragHandleDraggable(dragHandle);
+                } else {
+                    dragHandle.addClass('not-draggable');
+                    dragHandle.notDraggable = true;
+                }
             }
 
             widgetContainerMaker.setUpContainer(widgetContainer, dragHandle, innerWidget, associated, outermostWidget);
@@ -118,16 +123,10 @@ var WidgetWorkSurface = function(){
         if (type === 'user'){ // do the recursion
             innerWidget.properties.layout.stackOrder.forEach(function(innerInnerWidgetId){
                 var innerInnerWidget = innerWidget.innerWidgets[innerInnerWidgetId];
-
-                var diff = innerWidget.properties.layout.stackOrder.length - Object.keys(innerWidget.innerWidgets).length;
-                if (diff != 0){
-                    console.log('in make recursive containers')
-                    console.log(innerWidget.properties.layout.stackOrder);
-                    console.log(Object.keys(innerWidget.innerWidgets));
-                    console.log(innerInnerWidget);
-                }
+                var childEditable = editable && !innerInnerWidget.meta.templateCorrespondingId;
+                var childDraggable = editable;
                 var innerInnerWidgetContainer = makeRecursiveWidgetContainers(
-                    innerInnerWidget, innerWidget, false, null, zoom,
+                    innerInnerWidget, innerWidget, childEditable, childDraggable, null, zoom,
                     associated, outermostWidget, hackityHack);
                 widgetContainer.append(innerInnerWidgetContainer);
             });
@@ -142,23 +141,21 @@ var WidgetWorkSurface = function(){
      * @param zoom
      */
     var loadUserWidgetIntoWorkSurface = function(userWidget, zoom){
-        var workSurface = createOrResetWorkSurface(userWidget, zoom);
-
-        var diff = userWidget.properties.layout.stackOrder.length - Object.keys(userWidget.innerWidgets).length;
-        if (diff != 0){
-            console.log('in load user widget into worksurface');
-            console.log(userWidget.properties.layout.stackOrder);
-            console.log(Object.keys(userWidget.innerWidgets));
-            console.log(userWidget);
-        }
+        var overallEditable = userWidget.meta.templateCorrespondingId? false: true;
+        var workSurface = createOrResetWorkSurface(userWidget, zoom, overallEditable);
 
         widgetEditsManager.refreshPropertyValues(userWidget);
         userWidget.properties.styles = widgetEditsManager.getMostRelevantOverallCustomChanges(userWidget, userWidget);
+
         userWidget.properties.layout.stackOrder.forEach(function(innerWidgetId){
             var innerWidget = userWidget.innerWidgets[innerWidgetId];
+            var isEditable = overallEditable && innerWidget.meta.templateCorrespondingId? false: true;
+            var isDraggable = overallEditable && true;
             var overallStyles = widgetEditsManager.getMostRelevantOverallCustomChanges(userWidget, innerWidgetId);
-            that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, true, null, workSurface, overallStyles, zoom, true);
+            that.makeRecursiveWidgetContainersAndDisplay(innerWidget, userWidget, isEditable, isDraggable, null, workSurface, overallStyles, zoom, true);
         });
+        miniNav.setUpMiniNavElementAndInnerWidgetSizes(userWidget);
+
     };
 
     var makeWorkSurfaceResizable = function(workSurface, userWidget){
@@ -219,6 +216,8 @@ var WidgetWorkSurface = function(){
             if (!firstInnerWidgetId){
                 console.log('something went wrong in onDropFinished');
             }
+
+
 
             var firstInnerWidget = outermostWidget.getInnerWidget(firstInnerWidgetId);
 
@@ -385,7 +384,7 @@ var WidgetWorkSurface = function(){
      * @param userWidget
      * @param zoom
      */
-    that.setUpEmptyWorkSurface = function(userWidget, zoom){
+    that.setUpEmptyWorkSurface = function(userWidget, zoom, editable){
         currentZoom = zoom; // set zoom value 100%
         var widgetId = userWidget.meta.id;
         disableAllWidgetDomElementsExcept(widgetId);
@@ -395,7 +394,9 @@ var WidgetWorkSurface = function(){
 
         resetWorkSurface(workSurface);
 
-        makeWorkSurfaceResizable(workSurface, userWidget); // TODO experimentation
+        if (editable){
+            makeWorkSurfaceResizable(workSurface, userWidget); // TODO experimentation
+        }
         makeWorkSurfaceDroppableToWidgets(workSurface, userWidget);
         zoomElement.updateZoomFromState(userWidget);
 

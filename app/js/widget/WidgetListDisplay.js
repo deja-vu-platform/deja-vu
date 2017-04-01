@@ -198,8 +198,8 @@ var WidgetListDisplay = function(){
         userApp.getAllOuterWidgetIds().forEach(function(widgetId){
             var widget = userApp.getWidget(widgetId);
             var path = widget.getPath(selectedWidget.meta.id);
-            path.forEach(function(pathWidgteId){ // note this includes the selectedWidgetId
-                var dragHandle = $('.components').find('[data-componentid='+pathWidgteId+']');
+            path.forEach(function(pathWidgetId){ // note this includes the selectedWidgetId
+                var dragHandle = $('.components').find('[data-componentid='+pathWidgetId+']');
                 if (dragHandle.data('uiDraggable')){
                     dragHandle.draggable('disable');
                 }

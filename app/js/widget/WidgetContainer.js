@@ -85,7 +85,7 @@ var WidgetContainer = function(){
     };
 
 
-    var createEditOptions = function(widget, outerWidget, container, outermostWidget){
+    var createEditOptions = function(widget, outerWidget, container, outermostWidget, basic){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -163,12 +163,16 @@ var WidgetContainer = function(){
             .append(buttonStyle)
             .append('<li class="divider"></li>')
             .append(buttonCreateTemplate)
-            .append('<li class="divider"></li>')
-            .append(buttonUnlink)
-            .append(buttonTrash)
-            .append('<li class="divider"></li>')
-            .append(buttonMoveUp)
-            .append(buttonMoveDown);
+
+        if (!basic){
+            optionsDropdown.find('.dropdown-menu')
+                .append('<li class="divider"></li>')
+                .append(buttonUnlink)
+                .append(buttonTrash)
+                .append('<li class="divider"></li>')
+                .append(buttonMoveUp)
+                .append(buttonMoveDown);
+        }
 
         // behaviour
 
@@ -236,7 +240,7 @@ var WidgetContainer = function(){
 
     that.createMinimallyEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget) {
         var container = that.createBasicWidgetContainer(widget, zoom);
-        container.append(createEditOptions(widget, outerWidget, container, outermostWidget));
+        container.append(createEditOptions(widget, outerWidget, container, outermostWidget, true));
         return container;
     };
 

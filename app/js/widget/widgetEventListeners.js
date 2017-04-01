@@ -657,7 +657,9 @@ var recursiveReIding = function(widget, sourceWidget, isTemplate){
     if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
         var thisWidgetNewId;
         if (isTemplate){
-            widget.meta.templateCorrespondingId = widget.meta.id;
+            if (widget.meta.templateCorrespondingId != widget.meta.id){
+                widget.meta.templateCorrespondingId = widget.meta.id;
+            }
         }
 
         if (sourceWidget){

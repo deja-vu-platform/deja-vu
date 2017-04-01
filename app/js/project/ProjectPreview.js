@@ -43,7 +43,7 @@ function loadTablePreview(widgetToShow) {
         var widgetContainer = $('<div></div>');
         if (innerWidget.type == 'user'){
             widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(
-                innerWidget, widgetToShow, false, dragHandle,
+                innerWidget, widgetToShow, false, false, dragHandle,
                 null, widgetToShow.properties.styles.custom, scale, true, true);
         }
 

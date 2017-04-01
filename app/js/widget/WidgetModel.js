@@ -165,11 +165,13 @@ UserWidget.prototype.getAllInnerWidgetsIds = function(keepStructure) {
     var innerWidgetsInfoListLinearlized = [];
     var getInnerWidgetInfo = function(widget){
         var outerRecursiveChildrenIds= [];
-        for (var innerWidgetId in widget.innerWidgets){
-            var innerWidget = widget.innerWidgets[innerWidgetId];
-            innerWidgetsInfoListLinearlized.push(innerWidgetId);
-            var recursiveChildrenIds = getInnerWidgetInfo(innerWidget);
-            outerRecursiveChildrenIds.push([innerWidgetId, recursiveChildrenIds]);
+        if (widget.type == 'user'){
+            for (var innerWidgetId in widget.innerWidgets){
+                var innerWidget = widget.innerWidgets[innerWidgetId];
+                innerWidgetsInfoListLinearlized.push(innerWidgetId);
+                var recursiveChildrenIds = getInnerWidgetInfo(innerWidget);
+                outerRecursiveChildrenIds.push([innerWidgetId, recursiveChildrenIds]);
+            }
         }
         return outerRecursiveChildrenIds
     };

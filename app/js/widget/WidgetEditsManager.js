@@ -14,7 +14,9 @@ var WidgetEditsManager = function(){
             targetId = path[path.length - 2];
         }
         var targetWidget = userApp.getWidget(targetId);
-        targetWidget.overrideProperties = {};
+        if (!targetWidget.overrideProperties){
+            targetWidget.overrideProperties = {};
+        }
         if (typeString == 'styles.custom'){
             if (!targetWidget.overrideProperties.styles){
                 targetWidget.overrideProperties.styles = {};
@@ -97,20 +99,6 @@ var WidgetEditsManager = function(){
         // if path is just the outer widget's id, will just return outerWidget.properties
         var change = {};
         var updateChange = function(widget){
-            //if (widget.properties.styles.custom) {
-            //    for (var style in widget.properties.styles.custom) {
-            //        change[style] = widget.properties.styles.custom[style];
-            //    }
-            //}
-            //if (widget.overrideProperties) {
-            //    if (widget.overrideProperties.styles) {
-            //        if (widget.overrideProperties.styles.custom) {
-            //            for (var style in widget.overrideProperties.styles.custom) {
-            //                change[style] = widget.overrideProperties.styles.custom[style];
-            //            }
-            //        }
-            //    }
-            //}
             change = $.extend(change, widget.properties.styles);
 
             if (widget.overrideProperties) {
@@ -125,7 +113,7 @@ var WidgetEditsManager = function(){
 
         var path = outermostWidget.getPath(targetId);
         // else go down and find the correct one
-        for (var pathValueIdx = 1; pathValueIdx<path.length-1; pathValueIdx++){
+        for (var pathValueIdx = 0; pathValueIdx<path.length-1; pathValueIdx++){
             var outerWidget = outermostWidget.getInnerWidget(path[pathValueIdx]);
             // moving down so that the inner styles override the outer styles
             updateChange(outerWidget);
@@ -164,6 +152,7 @@ var WidgetEditsManager = function(){
     var applyPropertyChangesAtAllLevelsBelow = function(outermostWidget){
         var recursiveApplyPropertyChangesHelper = function(widgetToModify){
             if (widgetToModify.type == 'user') {
+
                 var templateVersionCopy;
                 var templateInfo = isFromTemplate(widgetToModify);
                 if (templateInfo.fromTemplate){
@@ -172,6 +161,7 @@ var WidgetEditsManager = function(){
                             selectedProject.cliches[templateInfo.clicheId].widgets.templates[templateInfo.widgetId]
                         )
                     );
+
                 } else {
                     templateVersionCopy = widgetToModify;
                 }
@@ -195,6 +185,18 @@ var WidgetEditsManager = function(){
 
     };
 
+
+    var getMappings = function(widgets){
+        var widgetToTemplate = {};
+        var templateToWidget = {};
+        for (var id in widgets){
+            widgetToTemplate[id] = widgets[id].meta.templateCorrespondingId;
+            templateToWidget[widgets[id].meta.templateCorrespondingId] = id;
+        }
+
+        return {wTT: widgetToTemplate, tTW: templateToWidget}
+
+    };
     /**
      * Gets the changes made at the level of the outer widget and
      * puts them in the properties of the involved inner widget
@@ -256,17 +258,6 @@ var WidgetEditsManager = function(){
 
         };
 
-        var getMappings = function(widgets){
-            var widgetToTemplate = {};
-            var templateToWidget = {};
-            for (var id in widgets){
-                widgetToTemplate[id] = widgets[id].meta.templateCorrespondingId;
-                templateToWidget[widgets[id].meta.templateCorrespondingId] = id;
-            }
-
-            return {wTT: widgetToTemplate, tTW: templateToWidget}
-
-        };
 
         var applyPropertyChangesHelper = function(innerWidget, sourceInnerWidget){
             var fromTemplate = (innerWidget.meta.id != sourceInnerWidget.meta.id);
@@ -293,10 +284,10 @@ var WidgetEditsManager = function(){
                 var updatedIdMappings = getMappings(innerWidget.innerWidgets);
 
                 // get source properties
-                var sourceProperties = sourceWidget.overrideProperties; //getPropertyChanges(sourceWidget, path);
+                var sourceProperties = sourceInnerWidget.overrideProperties;
                 insertPropertiesIntoWidget(innerWidget, sourceProperties, updatedIdMappings);
                 // get changed properties
-                var properties = innerWidget.overrideProperties; //getPropertyChanges(sourceWidget, path);
+                var properties = innerWidget.overrideProperties;
                 insertPropertiesIntoWidget(innerWidget, properties);
 
                 if (innerWidget.type == 'user'){
@@ -310,8 +301,16 @@ var WidgetEditsManager = function(){
                         if (innerInnerSourceWidget){
                             applyPropertyChangesHelper(innerInnerWidget, innerInnerSourceWidget);
                         } else if (innerInnerSourceWidgetId) {
-                            // ie, it's deleted
-                            innerWidget.deleteInnerWidget(innerInnerWidgetId);
+                            if (innerInnerWidget.meta.templateId){
+                                var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(innerInnerWidget.meta.templateId);
+                                var templateClicheId = clicheAndWidgetId.clicheId;
+                                var templateWidgetId = clicheAndWidgetId.widgetId;
+                                if (templateWidgetId == innerInnerSourceWidget){
+                                    // ie, it's deleted
+                                    innerWidget.deleteInnerWidget(innerInnerWidgetId);
+                                }
+                            }
+
                         }
 
                     });
