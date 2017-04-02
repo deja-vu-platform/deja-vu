@@ -153,6 +153,15 @@ var WidgetEditsManager = function(){
      */
     var applyPropertyChangesAtAllLevelsBelow = function(outermostWidget){
         var recursiveApplyPropertyChangesHelper = function(widgetToModify){
+            if (widgetToModify.type == 'user') {
+                widgetToModify.properties.layout.stackOrder.forEach(function (innerWidgetId) {
+                    var innerWidget = widgetToModify.innerWidgets[innerWidgetId];
+                    recursiveApplyPropertyChangesHelper(innerWidget);
+                });
+
+            }
+
+
             var templateVersionCopy;
             var templateInfo = isFromTemplate(widgetToModify);
             if (templateInfo.fromTemplate){
@@ -166,13 +175,7 @@ var WidgetEditsManager = function(){
                 templateVersionCopy = widgetToModify;
             }
 
-            if (widgetToModify.type == 'user') {
-                widgetToModify.properties.layout.stackOrder.forEach(function (innerWidgetId) {
-                    var innerWidget = widgetToModify.innerWidgets[innerWidgetId];
-                    recursiveApplyPropertyChangesHelper(innerWidget);
-                });
 
-            }
 
             // apply changes after calling the recursion so that higher levels override
             // lower level changes
@@ -271,7 +274,7 @@ var WidgetEditsManager = function(){
                 if (innerWidget.type == 'user'){
                     var idMappings = getMappings(innerWidget.innerWidgets);
                     // get any new additions
-                    Object.keys(sourceInnerWidget.innerWidgets).forEach(function (innerInnerSourceWidgetId, idx) {
+                    Object.keys(sourceInnerWidget.innerWidgets).forEach(function (innerInnerSourceWidgetId) {
                         var innerInnerSourceWidget = sourceInnerWidget.innerWidgets[innerInnerSourceWidgetId];
 
                         var innerInnerWidgetId = idMappings.tTW[innerInnerSourceWidgetId];
@@ -326,7 +329,7 @@ var WidgetEditsManager = function(){
             } else {
                 // get changed properties
                 var properties = innerWidget.overrideProperties;
-                var thisFromTemplate = innerWidget.templateCorrespondingId? true: false;
+                var thisFromTemplate = innerWidget.meta.templateCorrespondingId? true: false;
                 insertPropertiesIntoWidget(innerWidget, properties, thisFromTemplate);
 
 
@@ -339,7 +342,6 @@ var WidgetEditsManager = function(){
                 }
 
             }
-
         };
 
         if (!sourceWidget){ // if this is a new added component?
@@ -422,7 +424,7 @@ var WidgetEditsManager = function(){
                         var widget = userApp.getWidget(widgetId);
                         if (widgetUsesTemplate(widget, templateId)){
                             widgetEditsManager.refreshPropertyValues(widget);
-                            recursivelyUpdateWidgetsUsingTemplate(allOuterWidgetIds, widget);
+                            recursivelyUpdateWidgetsUsingTemplate(allOuterWidgetIds, widgetId);
                         }
                     });
                 }
@@ -430,8 +432,6 @@ var WidgetEditsManager = function(){
 
         };
 
-
-        console.log('template changed ', changingWidgetId);
         var allOuterWidgetIds = userApp.getAllOuterWidgetIds();
         recursivelyUpdateWidgetsUsingTemplate(allOuterWidgetIds, changingWidgetId)
     };

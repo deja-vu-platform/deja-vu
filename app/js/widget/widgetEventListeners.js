@@ -659,6 +659,7 @@ var recursiveReIding = function(widget, sourceWidget, isTemplate){
         if (isTemplate){
             if (widget.meta.templateCorrespondingId != widget.meta.id){
                 widget.meta.templateCorrespondingId = widget.meta.id;
+                widget.overrideProperties = {}; // get rid of these, will read from the template instead
             }
         }
 
