@@ -188,8 +188,10 @@ var WidgetWorkSurface = function(){
                 //$(this).resizable('option', 'minHeight', minHeight);
             },
             resize: function(e, ui){
-                userWidget.properties.dimensions.height = ui.size.height/currentZoom;
-                userWidget.properties.dimensions.width = ui.size.width/currentZoom;
+                // TODO need to DRY this up and/or combine with the widget container methods
+                var newDimensions = {height: ui.size.height/currentZoom, width: ui.size.width/currentZoom};
+                widgetEditsManager.updateCustomProperties(userWidget, userWidget.meta.id, 'dimensions', newDimensions);
+
             },
             stop: function(e, ui){
                 // not super important to update as you resize so just do it at the end

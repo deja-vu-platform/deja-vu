@@ -49,7 +49,7 @@ var WidgetEditsManager = function(){
         }
 
         that.refreshPropertyValues(outermostWidget);
-        that.updateAllWidgetsUsing(targetId);
+        that.updateAllWidgetsUsingTemplate(targetId);
 
     };
 
@@ -153,33 +153,31 @@ var WidgetEditsManager = function(){
      */
     var applyPropertyChangesAtAllLevelsBelow = function(outermostWidget){
         var recursiveApplyPropertyChangesHelper = function(widgetToModify){
+            var templateVersionCopy;
+            var templateInfo = isFromTemplate(widgetToModify);
+            if (templateInfo.fromTemplate){
+                templateVersionCopy = UserWidget.fromString(
+                    JSON.stringify(
+                        selectedProject.cliches[templateInfo.clicheId].widgets.templates[templateInfo.widgetId]
+                    )
+                );
+
+            } else {
+                templateVersionCopy = widgetToModify;
+            }
+
             if (widgetToModify.type == 'user') {
-
-                var templateVersionCopy;
-                var templateInfo = isFromTemplate(widgetToModify);
-                if (templateInfo.fromTemplate){
-                    templateVersionCopy = UserWidget.fromString(
-                        JSON.stringify(
-                            selectedProject.cliches[templateInfo.clicheId].widgets.templates[templateInfo.widgetId]
-                        )
-                    );
-
-                } else {
-                    templateVersionCopy = widgetToModify;
-                }
-
                 widgetToModify.properties.layout.stackOrder.forEach(function (innerWidgetId) {
                     var innerWidget = widgetToModify.innerWidgets[innerWidgetId];
                     recursiveApplyPropertyChangesHelper(innerWidget);
                 });
 
-                // apply changes after calling the recursion so that higher levels override
-                // lower level changes
-                applyPropertyChanges(widgetToModify, templateVersionCopy);
-            } else {
-                // else it's a base component, so we'll just take it as is from the component we are reading from
-                applyPropertyChanges(widgetToModify);
             }
+
+            // apply changes after calling the recursion so that higher levels override
+            // lower level changes
+            applyPropertyChanges(widgetToModify, templateVersionCopy);
+
             return widgetToModify
         };
 
@@ -210,7 +208,7 @@ var WidgetEditsManager = function(){
      */
     var applyPropertyChanges = function(outerWidget, sourceWidget){
 
-        var insertPropertiesIntoWidget = function(widget, overrideProperties, mappings){
+        var insertPropertiesIntoWidget = function(widget, overrideProperties, fromTemplate, mappings){
             // if there is a change, override the old one
             if (overrideProperties){
                 if (overrideProperties.styles){
@@ -234,23 +232,29 @@ var WidgetEditsManager = function(){
                     }
                 }
 
-                if (overrideProperties.dimensions) {
-                    widget.properties.dimensions = overrideProperties.dimensions;
-                }
+                // don't do the following if reading from a template, but this is not the corresponding widget
+                // (i.e., the properties are from the widget itself
+                if (!(fromTemplate && !mappings)){
+                    if (overrideProperties.dimensions) {
+                        widget.properties.dimensions = overrideProperties.dimensions;
+                    }
 
-                if (overrideProperties.layout) {
-                    if (mappings){ // only do this if reading from a template
+                    if (overrideProperties.layout) {
                         for (var id in overrideProperties.layout){
-                            var mappedId = mappings.tTW[id];
+                            var mappedId = mappings? mappings.tTW[id]: id;
                             if (id != 'stackOrder'){
                                 widget.properties.layout[mappedId] = overrideProperties.layout[id];
+                            } else {
+                                // since you can only add (and not delete or move) widgets to the used template,
+                                // the lower elements in the stack order are the original components
+                                // and the others are the new components which we don't change
+                                overrideProperties.layout.stackOrder.forEach(function(id, i){
+                                    var mappedId = mappings? mappings.tTW[id]: id;
+                                    widget.properties.layout.stackOrder[i] = mappedId;
+                                });
                             }
                         }
                     }
-                    //else {
-                    //    widget.properties.layout = overrideProperties.layout;
-                    //}
-
                 }
 
                 if (overrideProperties.value){
@@ -286,10 +290,10 @@ var WidgetEditsManager = function(){
 
                 // get source properties
                 var sourceProperties = sourceInnerWidget.overrideProperties;
-                insertPropertiesIntoWidget(innerWidget, sourceProperties, updatedIdMappings);
+                insertPropertiesIntoWidget(innerWidget, sourceProperties, fromTemplate, updatedIdMappings);
                 // get changed properties
                 var properties = innerWidget.overrideProperties;
-                insertPropertiesIntoWidget(innerWidget, properties);
+                insertPropertiesIntoWidget(innerWidget, properties, fromTemplate);
 
                 if (innerWidget.type == 'user'){
                     // then recurse down
@@ -302,12 +306,13 @@ var WidgetEditsManager = function(){
                         if (innerInnerSourceWidget){
                             applyPropertyChangesHelper(innerInnerWidget, innerInnerSourceWidget);
                         } else if (innerInnerSourceWidgetId) {
-                            if (innerInnerWidget.meta.templateId){
-                                var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(innerInnerWidget.meta.templateId);
-                                var templateClicheId = clicheAndWidgetId.clicheId;
+                            // check if it's deleted
+                            if (outerWidget.meta.templateId){
+                                var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(outerWidget.meta.templateId);
                                 var templateWidgetId = clicheAndWidgetId.widgetId;
-                                if (templateWidgetId == innerInnerSourceWidget){
-                                    // ie, it's deleted
+                                // check if the outermost widget we are updating using is the actual template
+                                // this is to protect against un-updated copies of the template
+                                if (templateWidgetId == sourceWidget.meta.id){
                                     innerWidget.deleteInnerWidget(innerInnerWidgetId);
                                 }
                             }
@@ -320,8 +325,9 @@ var WidgetEditsManager = function(){
 
             } else {
                 // get changed properties
-                var properties = innerWidget.overrideProperties; //getPropertyChanges(sourceWidget, path);
-                insertPropertiesIntoWidget(innerWidget, properties);
+                var properties = innerWidget.overrideProperties;
+                var thisFromTemplate = innerWidget.templateCorrespondingId? true: false;
+                insertPropertiesIntoWidget(innerWidget, properties, thisFromTemplate);
 
 
                 if (innerWidget.type == 'user'){
@@ -373,23 +379,62 @@ var WidgetEditsManager = function(){
         return outerWidget
     };
 
-    that.updateAllWidgetsUsing = function(changingWidgetId){
-        userApp.getAllOuterWidgetIds().forEach(function(widgetId){
-            var widget = userApp.getWidget(widgetId);
-            var path = widget.getPath(changingWidgetId);
-            path.forEach(function(pathWidgetId){ // note this includes the selectedWidgetId
-                var pathWidget = userApp.getWidget(pathWidgetId);
-                widgetEditsManager.refreshPropertyValues(pathWidget);
-            });
-        });
+    var widgetUsesTemplate = function(widget, templateId){
+        if (widget.meta.templateId){
+            var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(widget.meta.templateId);
+            var templateWidgetId = clicheAndWidgetId.widgetId;
+            return (templateWidgetId == templateId);
+        } else {
+            var does = false;
+            if (widget.type == 'user'){
+                for (var innerWidgetId in widget.innerWidgets){
+                    var innerWidget = widget.innerWidgets[innerWidgetId];
+                    does = does || widgetUsesTemplate(innerWidget, templateId);
+                }
 
+            }
+            return does;
+        }
     };
 
 
+    that.updateAllWidgetsUsingTemplate = function(changingWidgetId){
+        //var template = userApp.findUsedWidget(changingWidgetId)[1];
+        //if (template){
+        //    if (template.isTemplate){
+        //        userApp.getAllOuterWidgetIds().forEach(function(widgetId){
+        //            var widget = userApp.getWidget(widgetId);
+        //            var path = widget.getPath(template.meta.id);
+        //            path.forEach(function(pathWidgetId){ // note this includes the selectedWidgetId
+        //                var pathWidget = userApp.getWidget(pathWidgetId);
+        //                widgetEditsManager.refreshPropertyValues(pathWidget);
+        //            });
+        //        });
+        //    }
+        //}
+
+        var recursivelyUpdateWidgetsUsingTemplate = function(allOuterWidgetIds, changingWidgetId) {
+            var templateId = userApp.findUsedWidget(changingWidgetId)[1];
+            if (templateId){
+                var template = userApp.getWidget(templateId);
+                if (template && template.isTemplate){
+                    allOuterWidgetIds.forEach(function(widgetId){
+                        var widget = userApp.getWidget(widgetId);
+                        if (widgetUsesTemplate(widget, templateId)){
+                            widgetEditsManager.refreshPropertyValues(widget);
+                            recursivelyUpdateWidgetsUsingTemplate(allOuterWidgetIds, widget);
+                        }
+                    });
+                }
+            }
+
+        };
 
 
-
-
+        console.log('template changed ', changingWidgetId);
+        var allOuterWidgetIds = userApp.getAllOuterWidgetIds();
+        recursivelyUpdateWidgetsUsingTemplate(allOuterWidgetIds, changingWidgetId)
+    };
 
     Object.freeze(that);
     return that;
