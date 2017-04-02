@@ -20,7 +20,11 @@ $('.components').on('click', '.component-name-container', function () {
     $('#'+workSurfaceRef+'_'+userApp.meta.id).data('state', oldState);
 
     var clicheId = $(this).parent().data('clicheid');
-    var cliche = selectedProject.cliches[clicheId];
+    var cliche;
+    if (clicheId){
+        cliche = selectedProject.cliches[clicheId];
+        selectedCliche = cliche;
+    }
     var datatypeId = $(this).parent().data('componentid');
     var datatype;
     if (datatypeId){
@@ -132,29 +136,34 @@ function displayNewClicheInList(cliche){
     // TODO changes in style
     var clicheId = cliche.meta.id;
     var dropdownId = clicheId+'_datatypes';
-    var isUserApp = (clicheId == userApp.meta.id);
+    var isUserApp = (clicheId == selectedProject.userApp);
 
     var newDTButton = isUserApp? '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-component" id="new-user-datatype-btn">'
     +'<span class="glyphicon glyphicon-plus"></span>'
     +'</button>': "";
 
     var newClicheElt = $(
-        '<div class="user-components page-component-toggle-drop">'
-            +'<span class="dropdown-trigger dropdown-open" data-dropdownid="'+ dropdownId +'" data-clicheid=' + cliche.meta.id + '>'
-                +'<span class="glyphicon glyphicon-triangle-bottom"></span>'
-                + '<div class="component-name-container" >'
-                    + '<span class="component-name">' + cliche.meta.name + '</span>'
-                    + '<span class="submit-rename not-displayed">'
-                        + '<input type="text" class="new-name-input form-control" autofocus>'
-                    + '</span>'
-                + '</div>'
-            +'</span>'
-            +newDTButton
-            +'<div class="content dropdown-target"  data-dropdownid="'+dropdownId+'">'
-                +'<ul id="'+dropdownId+'-list"></ul>'
-            +'</div>'
+        '<div class="user-components dropdown-encapsulatorp">'
+        +   '<span class="dropdown-trigger dropdown-open" data-dropdownid="'+ dropdownId +'" data-clicheid=' + cliche.meta.id + '>'
+        +       '<span class="glyphicon glyphicon-triangle-bottom"></span>'
+        +       '<div class="component-name-container" >'
+        +           '<span class="component-name">' + cliche.meta.name + '</span>'
+        +           '<span class="submit-rename not-displayed">'
+        +               '<input type="text" class="new-name-input form-control" autofocus>'
+        +           '</span>'
+        +       '</div>'
+        +   '</span>'
+        +   newDTButton
+        +   '<div class="content dropdown-target"  data-dropdownid="'+dropdownId+'">'
+        +       '<ul id="'+dropdownId+'-list"></ul>'
+        +   '</div>'
         +'</div>');
     $('#user-components-list').append(newClicheElt);
+
+    for (var datatypeId in cliche.datatypes){
+        var datatypeName = cliche.datatypes[datatypeId].meta.name;
+        displayNewDatatypeInUserDatatypeList(datatypeName, datatypeId, clicheId);
+    }
     // addDeleteUserDatatypeButton(id);
     // registerUserWidgetAsDraggableForMainPages(id);
     // dataDragAndDrop.registerDataDragHandleDraggable(newClicheElt);
@@ -209,8 +218,6 @@ function displayNewClicheInList(cliche){
 
                     selectedProject.addDataBondDisplay(userApp.meta.id, datatype.meta.id, JSON.parse(JSON.stringify(datatypeDisplayProps)));
                     displayNewDatatypeInUserDatatypeList(datatype.meta.name, datatype.meta.id, userApp.meta.id);
-                    // dataWorkSurface.setUpEmptyWorkSurface(datatype, 1);
-                    // TODO add to overall and to userApp display
                     resetMenuOptions();
                     dataWorkSurface.loadBondingData(selectedCliche, selectedDatatype, currentZoom);
                 });
@@ -391,44 +398,6 @@ function registerTooltipBtnHandlers() {
 }
 
 
-
-/** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
-function enableDropdownTrigger(){
-    $(".dropdown-trigger").unbind().click(function(ev) {
-        var dropdownid = $(this).data('dropdownid');
-
-        if ($(this).hasClass('dropdown-open')){
-            // close it
-            $(this).removeClass('dropdown-open').addClass('dropdown-closed');
-            $(this).find('.glyphicon').remove();
-            $(this).prepend('<span class="glyphicon glyphicon-triangle-right"></span>');
-
-            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-                if ($(this).hasClass('dropdown-target')){
-                    $(this).css({
-                        display: 'none',
-                    });
-                }
-            });
-
-        } else {
-            // open it
-            $(this).removeClass('dropdown-closed').addClass('dropdown-open');
-            $(this).find('.glyphicon').remove();
-            $(this).prepend('<span class="glyphicon glyphicon-triangle-bottom"></span>');
-
-            $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-                if ($(this).hasClass('dropdown-target')){
-                    $(this).css({
-                        display: 'block',
-                    });
-                }
-            });
-
-        }
-    });
-
-}
 
 enableDropdownTrigger();
 

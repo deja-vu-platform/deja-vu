@@ -55,41 +55,31 @@ var DataWorkSurface = function(){
     };
 
     var loadClicheToWorkSurface = function(workSurface, cliche, focusDatatype, isOverall, zoom){
-        var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
-        dragHandle.text(cliche.meta.name);
-        dragHandle.css('display', 'block');
 
-        var displayPropObj;
-        // TODO dry
-        if (isOverall){
-            displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[cliche.meta.id];
+        var createContainerAndAppend = function(obj, cliche, isOverall){
+            var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
+            dragHandle.text(obj.meta.name);
+            dragHandle.css('display', 'block');
+            var objId = obj.meta.id;
+            var clicheId = cliche.meta.id;
 
-        } else {
-            displayPropObj = cliche.dataBondDisplays[cliche.meta.id];
-        }
-        var container = that.makeContainer(cliche.meta.id, cliche.meta.id, displayPropObj, dragHandle, zoom, isOverall);
-        workSurface.append(container);
-        dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
+            if (isOverall){
+                var displayPropObj = selectedProject.bondDisplays[clicheId].dataBondDisplays[objId];
+
+            } else {
+                var displayPropObj = cliche.dataBondDisplays[objId];
+            }
+            var container = that.makeContainer(clicheId, objId, displayPropObj, dragHandle, zoom, isOverall);
+            workSurface.append(container);
+            dataDragAndDrop.registerDataDragHandleDraggable(dragHandle, isOverall);
+        };
+
+        createContainerAndAppend(cliche, cliche, isOverall);
 
         for (var datatypeId in cliche.datatypes){
             var datatype = cliche.datatypes[datatypeId];
-
-            var dragHandle = $('#basic-components .draggable[data-type=' + 'user' + ']').clone();
-            dragHandle.text(datatype.meta.name);
-            dragHandle.css('display', 'block');
-
-            if (isOverall){
-                var displayPropObj = selectedProject.bondDisplays[cliche.meta.id].dataBondDisplays[datatypeId];
-
-            } else {
-                var displayPropObj = cliche.dataBondDisplays[datatypeId];
-            }
-            var container = that.makeContainer(cliche.meta.id, datatypeId, displayPropObj, dragHandle, zoom, isOverall);
-            workSurface.append(container);
-            dataDragAndDrop.registerDataDragHandleDraggable(dragHandle);
+            createContainerAndAppend(datatype, cliche, isOverall);
         }
-
-        canvas.drawClicheDataLines(cliche);
     };
 
 
@@ -105,12 +95,10 @@ var DataWorkSurface = function(){
         return container;
     };
 
-    var makeWorkSurfaceDroppable = function(workSurface, cliche){
-        var isOverall = cliche? false: true;
-
+    var makeWorkSurfaceDroppable = function(workSurface, isOverall){
         var onDropFinished = function(dragHandle, droppedObjectCliche, droppedObject){
             var droppedObjId = droppedObject.meta.id;
-            if (!cliche){
+            if (isOverall){
                 var displayPropObj = selectedProject.bondDisplays[droppedObjectCliche.meta.id].dataBondDisplays[droppedObjId];
             } else {
                 var displayPropObj = droppedObjectCliche.dataBondDisplays[droppedObjId];
@@ -119,10 +107,15 @@ var DataWorkSurface = function(){
                 dragHandle, currentZoom, isOverall);
             workSurface.append(container);
 
-            canvas.drawClicheDataLines(droppedObjectCliche);
+            if (isOverall){
+                canvas.drawClicheDataLines(selectedProject.getAllCliches());
+            } else {
+                canvas.drawClicheDataLines([droppedObjectCliche]);
+            }
+
         };
 
-        var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(cliche, onDropFinished);
+        var dropSettings = dataDragAndDrop.dataToWorkSurfaceDropSettings(isOverall, onDropFinished);
 
         workSurface.droppable(dropSettings);
     };
@@ -137,13 +130,19 @@ var DataWorkSurface = function(){
         //var workSurface = $('#'+DATA_WS_ID+'_'+componentId);
         currentZoom = 1;
         var workSurface = createOrResetWorkSurface(cliche, zoom);
-        if (cliche){
+        var isOverall = cliche? false: true;
+        if (!isOverall){
             loadClicheToWorkSurface(workSurface, cliche, datatype, false, currentZoom);
         } else { // overall
             for (var clicheId in selectedProject.cliches){
                 var cliche = selectedProject.cliches[clicheId];
                 loadClicheToWorkSurface(workSurface, cliche, null, true, currentZoom);
             }
+        }
+        if (isOverall){
+            canvas.drawClicheDataLines(selectedProject.getAllCliches());
+        } else {
+            canvas.drawClicheDataLines([cliche]);
         }
     };
 
@@ -156,6 +155,7 @@ var DataWorkSurface = function(){
      */
     that.setUpEmptyWorkSurface = function(cliche, zoom){
         currentZoom = zoom; // set zoom value 100%
+        var isOverall = cliche? false: true;
         var wsId = getWorkSurfaceId(cliche);
 
         disableAllDataDomElementsExcept(wsId);
@@ -165,7 +165,7 @@ var DataWorkSurface = function(){
 
         resetWorkSurface(workSurface);
 
-        makeWorkSurfaceDroppable(workSurface, cliche);
+        makeWorkSurfaceDroppable(workSurface, isOverall);
         //dataZoomElement.updateZoomFromState(datatype);
 
         // setDatatypeOptions(selectedProject.cliches[datatypeId]);

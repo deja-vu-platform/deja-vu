@@ -11,7 +11,7 @@ body{
 
 }
 
-.components, .layout, .style {
+.components, .style {
     margin-top: 75px;
     float: left;
     /*border: #d5d5d5 1px solid;*/
@@ -21,25 +21,8 @@ body{
     height: 475px; /*TODO shouldn't be fixed*/
 }
 
-.layout, .style {
+.style {
     display: none;
-}
-
-.layout-group{
-    border: #D5D5D5 1px solid;
-    /*margin: 5px;*/
-}
-.layout-group-header{
-    display: block;
-    font-weight: 200;
-    padding: 10px;
-    background: #F0F1FC;
-}
-
-.layout-group .btn, .layout-group input{
-    /*float: right;*/
-    display: block;
-    margin: 5px auto;
 }
 
 .header {
@@ -75,7 +58,7 @@ body{
 }
 
 .component-options .component-name-container{
-    width: 175px;
+    /*width: 175px;*/
     border-radius: 5px;
     background-color: #E0E0E0;
 }
@@ -90,15 +73,9 @@ body{
     text-align: left;
 }
 
-.components .content{
-    min-height: 120px;
-}
-
-.layout .content input[type='text']{
-    width: 60px;
-    border: 1px grey solid;
-    text-align: right;
-}
+/*.components .content{*/
+    /*min-height: 120px;*/
+/*}*/
 
 input[type='text']{
     min-width: 60px;
@@ -107,16 +84,6 @@ input[type='text']{
     vertical-align: baseline;
 }
 
-
-.layout .layout-label, .layout .layout-input{
-    display: inline-block;
-    width: 49%;
-    text-align: center;
-}
-
-/*.add-remove-inputs div{*/
-    /*padding: 10px;*/
-/*}*/
 
 .dropdown-trigger {
     cursor: pointer;
@@ -130,9 +97,6 @@ a{
     padding: 6px 12px;
 }
 
-.components .component-name-container{
-    width: 95%;
-}
 .component-name-container{
     display: inline-block;
     cursor: pointer;
@@ -178,7 +142,8 @@ li.selected {
     border: 1px #888888 solid;
     border-radius: 5px;
     height: 20px;
-    width: 5%;
+    width: 10px;
+    margin: 5px;
     display: inline-block;
     float: right;
     cursor: pointer;

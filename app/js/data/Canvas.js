@@ -26,12 +26,15 @@ var Canvas = function(){
         container.append(canvasElt);
     };
 
-    that.drawClicheDataLines = function(cliche){
-        var list = [{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}];
+    that.drawClicheDataLines = function(cliches){
         that.clear();
-        list.forEach(function (thing) {
-            drawSingleClicheDataLines(thing.clicheId, thing.dataIds);
+        cliches.forEach(function(cliche){
+            var list = [{clicheId:cliche.meta.id, dataIds: Object.keys(cliche.datatypes)}];
+            list.forEach(function (thing) {
+                drawSingleClicheDataLines(thing.clicheId, thing.dataIds);
+            });
         });
+
     };
 
 

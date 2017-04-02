@@ -72,7 +72,6 @@ var WidgetDragAndDropController = function () {
                 newLayout[widgetId] = newPosition;
                 // after it has been added
                 widgetEditsManager.updateCustomProperties(selectedUserWidget, widgetId, 'layout', newLayout, true);
-                // outerWidget.properties.layout[widgetId] = newLayout;
 
                 miniNav.updateMiniNavInnerWidgetSizes(outerWidget, currentZoom);
 
@@ -105,7 +104,6 @@ var WidgetDragAndDropController = function () {
                 var widgetContainer;
                 if (dragHandle.hasClass('associated')) {
                     draggingWidget = selectedUserWidget.getInnerWidget(widgetId);
-                    //draggingWidget = selectedUserWidget.innerWidgets[widgetId];
                     // keep the old one for now, for guidance and all
                     var oldContainerId = containerRef+'_' + widgetId;
                     var widgetContainerOld = $('#' + oldContainerId);
@@ -125,8 +123,7 @@ var WidgetDragAndDropController = function () {
                         if (widgetId in cliche.widgets.templates){
                             widget = UserWidget.fromString(JSON.stringify(cliche.widgets.templates[widgetId]));
                             widget.meta.templateId = clicheId + '_' + widgetId;
-                            widget = createUserWidgetCopy(widget);
-                            delete widget.isTemplate;
+                            widget = createUserWidgetCopy(widget, null, widget.isTemplate);
                         } else { // it is unused
                             widget = userApp.widgets.unused[widgetId];
                         }
@@ -138,8 +135,8 @@ var WidgetDragAndDropController = function () {
                     }
                     draggingWidget = widget;
 
-                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, false,
-                        dragHandle, null, {}, currentZoom, false);
+                    widgetContainer = workSurface.makeRecursiveWidgetContainersAndDisplay(widget, selectedUserWidget, true,
+                        true, dragHandle, null, {}, currentZoom, false);
 
                     $('#basic-components').html(basicWidgets);
                     that.registerWidgetDragHandleDraggable();

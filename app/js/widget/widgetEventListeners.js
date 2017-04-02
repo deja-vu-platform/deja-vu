@@ -11,7 +11,7 @@ $('#new-user-component-btn').click(function(){
             selectedUserWidget = initUserWidget(false, false);
             userApp.addWidget(selectedUserWidget);
             listDisplay.refresh();
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            workSurface.loadUserWidget(selectedUserWidget);
             style.setUpStyleColors(selectedUserWidget);
 
             resetMenuOptions();
@@ -24,7 +24,7 @@ $('#new-main-component-btn').click(function(){
             selectedUserWidget = initUserWidget(false, true);
             userApp.addPage(selectedUserWidget);
             listDisplay.refresh();
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            workSurface.loadUserWidget(selectedUserWidget);
             style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
     });
@@ -36,7 +36,7 @@ $('#new-widget-template-btn').click(function(){
             selectedUserWidget = initUserWidget(false, false);
             userApp.addTemplate(selectedUserWidget);
             listDisplay.refresh();
-            workSurface.setUpEmptyWorkSurface(selectedUserWidget, 1);
+            workSurface.loadUserWidget(selectedUserWidget);
             style.setUpStyleColors(selectedUserWidget);
             resetMenuOptions();
         });
@@ -54,10 +54,8 @@ $('.components').on('click', '.component-name-container', function () {
     var workSurfaceRef = workSurface.getWorkSurfaceRef();
     $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
     dragAndDrop.registerWidgetDragHandleDraggable();
-    var widgetId = $(this).parent().data('componentid');
+    var widgetId = $(this).closest('.widget').data('componentid');
     listDisplay.select(widgetId);
-    //$('.selected').removeClass('selected');
-    //$(this).parent().addClass('selected');
     selectedUserWidget = userApp.getWidget(widgetId);
     listDisplay.updateDraggables(selectedUserWidget);
     workSurface.loadUserWidget(selectedUserWidget);
@@ -80,9 +78,10 @@ $('.components').on('dblclick', '.component-name', function (e) {
 $('.components').on('keypress', '.new-name-input', function (event) {
     if (event.which == 13) {
         event.preventDefault();
-        var widgetId = $(this).parent().parent().parent().data('componentid');
-        var widgetNameElt = $($(this).parent().parent().find('.component-name'));
-        var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
+        var widgetListElt = $(this).closest('.widget');
+        var widgetId = widgetListElt.data('componentid');
+        var widgetNameElt = widgetListElt.find('.component-name');
+        var submitRenameElt = widgetListElt.closest('.widget').find('.submit-rename');
 
         widgetNameElt.removeClass('not-displayed');
         submitRenameElt.addClass('not-displayed');
@@ -93,7 +92,8 @@ $('.components').on('keypress', '.new-name-input', function (event) {
         widgetNameElt.text(newName);
         $('.component-options .component-name').text(newName);
 
-        userApp.getWidget(widgetId).meta.name = newName;
+        var widget = userApp.getWidget(widgetId);
+        widget.meta.name = newName;
     }
 });
 
@@ -105,6 +105,7 @@ function setWidgetOptions(outerWidget){
         .text(outerWidget.meta.name)
         .unbind()
         .on('dblclick', function () {
+
             var newNameInputElt = $($(this).parent().find('.new-name-input'));
             var submitRenameElt = $($(this).parent().find('.submit-rename'));
             newNameInputElt.val($(this).text());
@@ -119,6 +120,7 @@ function setWidgetOptions(outerWidget){
         .on('keypress' , function (event) {
             if (event.which == 13) {
                 event.preventDefault();
+                // TODO DRY
                 var widgetNameElt = $($(this).parent().parent().find('.component-name'));
                 var submitRenameElt = $($(this).parent().parent().find('.submit-rename'));
 
@@ -131,9 +133,10 @@ function setWidgetOptions(outerWidget){
                 }
                 $('.components').find('[data-componentid='+outerWidget.meta.id+']').find('.component-name').text(newName);
 
-                widgetNameElt.text($(this).val());
+                var newName = $(this).val();
+                widgetNameElt.text(newName);
 
-                outerWidget.meta.name = $(this).val();
+                outerWidget.meta.name = newName;
             }
         });
 
@@ -601,48 +604,16 @@ function registerUserWidgetAsDraggableForMainPages(widgetId) {
     });
 }
 
-/** ** ** ** ** ** ** ** Dropdown Implementation ** ** ** ** ** ** ** ** ** **/
-$(".dropdown-trigger").click(function(ev) {
-    var dropdownid = $(this).data('dropdownid');
-
-    if ($(this).hasClass('dropdown-open')){
-        // close it
-        $(this).removeClass('dropdown-open').addClass('dropdown-closed');
-        $(this).find('.glyphicon').remove();
-        $(this).append('<span class="glyphicon glyphicon-triangle-right"></span>');
-
-        $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-            if ($(this).hasClass('dropdown-target')){
-                $(this).css({
-                    display: 'none',
-                });
-            }
-        });
-
-    } else {
-        // open it
-        $(this).removeClass('dropdown-closed').addClass('dropdown-open');
-        $(this).find('.glyphicon').remove();
-        $(this).append('<span class="glyphicon glyphicon-triangle-bottom"></span>');
-
-        $("html").find("[data-dropdownid='" + dropdownid + "']").each(function(){
-            if ($(this).hasClass('dropdown-target')){
-                $(this).css({
-                    display: 'block',
-                });
-            }
-        });
-
-    }
-});
+enableDropdownTrigger();
 
 $('.components').on('click', '.index-page-toggle', function(){
-    var turnOn = !($(this).parent().hasClass('selected-index-page'));
+    var widgetListElt = $(this).closest('.widget');
+    var turnOn = !(widgetListElt.hasClass('selected-index-page'));
     $('.components .selected-index-page').removeClass('selected-index-page');
-    var widgetId = $(this).parent().data('componentid');
+    var widgetId = widgetListElt.data('componentid');
     if (turnOn){
         userApp.widgets.indexId = widgetId;
-        $(this).parent().addClass('selected-index-page');
+        widgetListElt.addClass('selected-index-page');
     } else {
         userApp.widgets.indexId = null;
     }
@@ -682,9 +653,16 @@ function refreshContainerDisplay(fresh, container, zoom){
  * @param sourceWidget
  * @returns {*}
  */
-function recursiveReIding(widget, sourceWidget){
+var recursiveReIding = function(widget, sourceWidget, isTemplate){
     if (widget.meta){ // ie, it's not the totally inner component // TODO make this more robust
         var thisWidgetNewId;
+        if (isTemplate){
+            if (widget.meta.templateCorrespondingId != widget.meta.id){
+                widget.meta.templateCorrespondingId = widget.meta.id;
+                widget.overrideProperties = {}; // get rid of these, will read from the template instead
+            }
+        }
+
         if (sourceWidget){
             thisWidgetNewId = sourceWidget.meta.id;
         } else {
@@ -692,15 +670,16 @@ function recursiveReIding(widget, sourceWidget){
         }
         // (new Date()).getTime();  // FIXME gaaah, getTime() does not produce unique ids!
         widget.meta.id = thisWidgetNewId;
+
         if (widget.type == 'user'){
             for (var idx = 0; idx< widget.properties.layout.stackOrder.length; idx++){
                 var innerWidgetOldId = widget.properties.layout.stackOrder[idx];
                 var result;
                 if (sourceWidget){
                     var oldSourceId = sourceWidget.properties.layout.stackOrder[idx];
-                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], sourceWidget.innerWidgets[oldSourceId]);
+                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], sourceWidget.innerWidgets[oldSourceId],isTemplate);
                 } else {
-                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId]);
+                    result = recursiveReIding(widget.innerWidgets[innerWidgetOldId], null, isTemplate);
                 }
                 if (result.success){
                     if (result.newId != innerWidgetOldId){ // or else the delete will delete the things!
@@ -709,6 +688,7 @@ function recursiveReIding(widget, sourceWidget){
                         delete widget.innerWidgets[innerWidgetOldId];
                         widget.properties.layout[result.newId] = widget.properties.layout[innerWidgetOldId];
                         delete widget.properties.layout[innerWidgetOldId];
+                        widget.overrideProperties.layout = widget.properties.layout;
                     }
                 }
             }
@@ -716,12 +696,16 @@ function recursiveReIding(widget, sourceWidget){
         return {success: true, newId: thisWidgetNewId};
     }
     return {success: false}
-}
+};
 
-function createUserWidgetCopy (outerWidget, sourceOuterWidget){
+function createUserWidgetCopy (outerWidget, sourceOuterWidget, fromTemplate){
     var widget = UserWidget.fromString(JSON.stringify(outerWidget));
 
-    recursiveReIding(widget, sourceOuterWidget);
+
+    recursiveReIding(widget, sourceOuterWidget, fromTemplate);
+    if (fromTemplate){
+        delete widget.isTemplate;
+    }
     return widget;
 }
 
@@ -729,16 +713,6 @@ function createUserWidgetCopy (outerWidget, sourceOuterWidget){
 
 
 /************************************************************/
-function testSaveHTML(){
-    var html = '';
-    $('.component-container').each(function(){
-        var displayWidget = $(this).find('.display-component');
-        if (displayWidget.get(0)){
-            html = html + displayWidget.get(0).outerHTML+'/n';
-        }
-    });
-    return html;
-}
 
 function createDownloadPreview(){
     // from http://stackoverflow.com/questions/754607/can-jquery-get-all-css-styles-associated-with-an-element
@@ -936,16 +910,10 @@ function addDeleteUserWidgetButton(userWidgetId, listElt){
     listElt.find('.delete-button-container').append(buttonDeleteUserWidget);
     listElt.hover(
         function(){
-            $(this).find('.component-name-container').css({
-                width: '70%'
-            });
             $(this).find('.delete-button-container').css({
                 display: 'inline-block',
             });
         }, function(){
-            $(this).find('.component-name-container').css({
-                width: '95%'
-            });
             $(this).find('.delete-button-container').css({
                 display: 'none',
 

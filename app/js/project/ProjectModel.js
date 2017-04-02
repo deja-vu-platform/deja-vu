@@ -136,12 +136,16 @@ UserProject.fromObject = function(object){
 
     for (var clicheId in object.cliches) {
         var cliche = object.cliches[clicheId];
-        if (cliche.meta.id == object.userApp){
-            project.cliches[clicheId] = ClicheWithDisplay.fromObject(cliche);
-        } else {
-            project.cliches[clicheId] = Cliche.fromObject(cliche);
-        }
-
+        project.cliches[clicheId] = ClicheWithDisplay.fromObject(cliche);
     }
     return project
+};
+
+UserProject.prototype.getAllCliches = function(){
+    var cliches = [];
+    var project = this;
+    for (var clicheId in project.cliches){
+        cliches.push(project.cliches[clicheId])
+    }
+    return cliches
 };
