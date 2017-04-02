@@ -85,7 +85,7 @@ var WidgetWorkSurface = function(){
                 widgetContainer = widgetContainerMaker.createEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
                 dragAndDrop.registerWidgetDragHandleDraggable(dragHandle);
             } else {
-                widgetContainer = widgetContainerMaker.createMinimallyEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget);
+                widgetContainer = widgetContainerMaker.createMinimallyEditableWidgetContainer(innerWidget, outerWidget, zoom, outermostWidget, !isThisDraggable);
                 if (isThisDraggable){
                     dragAndDrop.registerWidgetDragHandleDraggable(dragHandle);
                 } else {

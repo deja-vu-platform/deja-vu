@@ -86,7 +86,7 @@ var WidgetContainer = function(){
     };
 
 
-    var createEditOptions = function(widget, outerWidget, container, outermostWidget, basic){
+    var createEditOptions = function(widget, outerWidget, container, outermostWidget, basic, notDeletable){
         var optionsDropdown = $('<div class="dropdown inner-component-options-small">'+
             '<button class="btn btn-default dropdown-toggle btn-xs inner-component-options-dropdown" type="button"  data-toggle="dropdown">'+
             '<span class="glyphicon glyphicon-option-vertical"></span></button>'+
@@ -158,22 +158,29 @@ var WidgetContainer = function(){
 
         buttonTrash.attr('id', 'inner-component-trash' + '_' + widget.meta.id);
 
-        optionsDropdown.find('.dropdown-menu')
+        var dropdownMenu = optionsDropdown.find('.dropdown-menu');
+
+        dropdownMenu
             .append(buttonEdit)
             .append('<li class="divider"></li>')
             .append(buttonStyle)
             .append('<li class="divider"></li>')
-            .append(buttonCreateTemplate)
+            .append(buttonCreateTemplate);
 
         if (!basic){
-            optionsDropdown.find('.dropdown-menu')
-                .append('<li class="divider"></li>')
-                .append(buttonUnlink)
-                .append(buttonTrash)
+            dropdownMenu
                 .append('<li class="divider"></li>')
                 .append(buttonMoveUp)
                 .append(buttonMoveDown);
         }
+
+        if (!notDeletable){
+            dropdownMenu
+                .append('<li class="divider"></li>')
+                .append(buttonUnlink)
+                .append(buttonTrash);
+        }
+
 
         // behaviour
 
@@ -208,10 +215,13 @@ var WidgetContainer = function(){
         });
 
         buttonTrash.click(function(){
+            console.log('clicked delete');
             deleteWidgetFromUserWidgetAndFromView(widget.meta.id)
         });
 
         buttonUnlink.click(function(){
+            console.log('clicked unlink');
+
             unlinkWidgetAndRemoveFromView(widget.meta.id)
         });
 
@@ -239,9 +249,9 @@ var WidgetContainer = function(){
         return container;
     };
 
-    that.createMinimallyEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget) {
+    that.createMinimallyEditableWidgetContainer = function(widget, outerWidget, zoom, outermostWidget, notDeletable) {
         var container = that.createBasicWidgetContainer(widget, zoom);
-        container.append(createEditOptions(widget, outerWidget, container, outermostWidget, true));
+        container.append(createEditOptions(widget, outerWidget, container, outermostWidget, true, notDeletable));
         return container;
     };
 
