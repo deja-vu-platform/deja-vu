@@ -4,7 +4,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 @Widget({
-  fqelement: "dv-messaging-post",
+  fqelement: "Post",
   ng2_providers: [GraphQlService]
 })
 export class EditPostComponent {

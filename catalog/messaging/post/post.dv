@@ -32,4 +32,8 @@ cliche Post {
   widget Posts {
     author: User
   }
+
+  widget EditPost {
+    post: Post
+  }
 }

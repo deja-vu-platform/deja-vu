@@ -92,7 +92,6 @@ const schema = grafo
       content: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {atom_id, content}) => {
-      console.log(atom_id, content)
       return Validation.post_exists(atom_id).then(() => {
         return Promise.all([
           mean.db.collection("posts").updateOne({atom_id}, {$set: {content}}),
