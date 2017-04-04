@@ -10,13 +10,13 @@ import {Widget} from "client-bus";
 export class EditPostComponent {
   username: Username;
   editedContent: string;
-  fields: {post: Post};
+  post: Post = null;
   isEditing = false;
 
   constructor(private _graphQlService: GraphQlService) {}
 
   dvAfterInit() {
-    this.editedContent = this.fields.post.content;
+    this.editedContent = this.post.content;
   }
 
   startEditing() {
@@ -31,12 +31,12 @@ export class EditPostComponent {
     this._graphQlService
       .post(`
         editPost(
-          atom_id: "${this.fields.post.atom_id}",
+          atom_id: "${this.post.atom_id}",
           content: "${this.editedContent}"
         ) { atom_id }
       `).subscribe(() => {
         this.isEditing = false;
-        this.fields.post.content = this.editedContent;
+        this.post.content = this.editedContent;
       });
   }
 }
