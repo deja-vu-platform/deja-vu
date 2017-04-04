@@ -4,16 +4,16 @@
      [fields]="fields" [hosts]="hosts">
     </dv-widget>
   </h4>
+  <div class="list-group-item-text">
+    <dv-widget name="EditPost" of="MessagingPost"
+     [fields]="fields" [hosts]="hosts">
+    </dv-widget>
+  </div>
   <p class="list-group-item-text">
     {{post.content}}
   </p>
   <div class="list-group-item-text">
     <dv-widget name="ShowLabels" of="Label"
-     [fields]="fields" [hosts]="hosts">
-    </dv-widget>
-  </div>
-  <div class="list-group-item-text">
-    <dv-widget name="EditPost" of="MessagingPost"
      [fields]="fields" [hosts]="hosts">
     </dv-widget>
   </div>
