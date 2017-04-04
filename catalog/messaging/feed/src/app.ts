@@ -72,23 +72,22 @@ Helpers.serve_schema(mean.ws, schema);
 grafo.init().then(_ => {
   if (mean.debug) {
     mean.db.collection("subscribers").insertMany([
-      {name: "Ben", subscriptions: [
-        "Software Engineering News", "Things Ben Bitdiddle Says"]},
-      {name: "Alyssa", subscriptions: []}
+      {atom_id: "Ben", name: "Ben", subscriptions: [
+        {atom_id: 1}, {atom_id: 2}]},
+      {atom_id: "Alyssa", name: "Alyssa", subscriptions: []}
     ], (err, res) => { if (err) throw err; });
 
-    // Pubs
     mean.db.collection("publishers").insertMany([
-      {name: "Software Engineering News", messages: [
-        "Node v0.0.1 released!"]},
-      {name: "Things Ben Bitdiddle Says", messages: ["Hi"]},
-      {name: "U.S News", messages: []},
-      {name: "World News", messages: []},
-      {name: "New Books about Zombies", messages: []}
-    ], (err, res) => {
-      if (err) throw err;
-      console.log(`Inserted ${res.insertedCount} pubs for debug`);
-    });
+      {atom_id: 1, name: "Software Engineering News", messages: [
+        {atom_id: "node"}]},
+      {atom_id: 2, name: "Things Ben Bitdiddle Says", messages: [
+        {atom_id: "hi"}]},
+    ], (err, res) => { if (err) throw err; });
+
+    mean.db.collection("messages").insertMany([
+      {atom_id: "hi", name: "hi", content: "hi"},
+      {atom_id: "node", name: "node", content: "Node v0.0.1 released!"}
+    ], (err, res) => { if (err) throw err; });
   }
 
   mean.start();

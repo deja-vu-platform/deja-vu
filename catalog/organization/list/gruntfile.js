@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
-  require("mean-loader").GruntTask.task(
+  require("mean-loader").GruntTask.cliche_task(
       grunt,
-      "dv-organization-list",
-      [{name: "NewList"}, {name: "EditList"}, {name: "ShowList"}, {name: "ShowItem"}, {name: "AddItem"}]);
+      "List",
+      ["NewList", "EditList", "ShowList", "ShowItem",  "AddItem"]);
 }

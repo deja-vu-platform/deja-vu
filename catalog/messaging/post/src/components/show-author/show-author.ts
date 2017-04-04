@@ -4,7 +4,7 @@ import {GraphQlService} from "gql";
 
 
 @Widget({
-  fqelement: "dv-messaging-post",
+  fqelement: "Post",
   ng2_providers: [GraphQlService],
   template: `{{post?.author?.username}}`
 })

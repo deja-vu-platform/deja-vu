@@ -3,7 +3,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({fqelement: "dv-messaging-comment", ng2_providers: [GraphQlService]})
+@Widget({fqelement: "Comment", ng2_providers: [GraphQlService]})
 export class NewCommentComponent {
   author = {name: "", atom_id: ""};
   comment = {atom_id: "", content: ""};

@@ -3,10 +3,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({
-  fqelement: "dv-organization-list",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "List", ng2_providers: [GraphQlService]})
 export class AddItemComponent {
   item = {atom_id: "", name: ""};
   list = {atom_id: ""};

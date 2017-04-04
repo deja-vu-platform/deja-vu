@@ -4,10 +4,7 @@ import {Widget} from "client-bus";
 
 
 
-@Widget({
-  fqelement: "dv-organization-list",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "List", ng2_providers: [GraphQlService]})
 export class NewListComponent {
   list = {atom_id: "", name: ""};
 

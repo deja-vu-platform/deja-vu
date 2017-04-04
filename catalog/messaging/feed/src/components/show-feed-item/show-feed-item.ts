@@ -1,7 +1,7 @@
 import {Widget} from "client-bus";
 
 @Widget({
-  fqelement: "dv-messaging-feed",
+  fqelement: "Feed",
   template: `
     <div class="row">
       <message [msg]="msg"></message>

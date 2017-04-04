@@ -5,10 +5,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({
-  fqelement: "dv-organization-label",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
 export class SearchComponent {
   query: string;
   @Output() matching_items = new EventEmitter();

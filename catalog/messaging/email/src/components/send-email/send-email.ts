@@ -4,7 +4,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  fqelement: "dv-messaging-email",
+  fqelement: "Email",
   ng2_providers: [GraphQlService],
   styles: [``]
 })
