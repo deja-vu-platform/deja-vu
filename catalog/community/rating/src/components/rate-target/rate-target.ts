@@ -2,10 +2,7 @@ import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
 
-@Widget({
-  fqelement: "dv-community-rating",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "Rating", ng2_providers: [GraphQlService]})
 export class RateTargetComponent {
   target = { atom_id: undefined, on_change: _ => undefined };
   source = { atom_id: undefined, on_change: _ => undefined };

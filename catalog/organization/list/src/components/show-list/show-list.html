@@ -1,0 +1,9 @@
+<ul *ngIf="list && list.items && list.items.length > 0" class="list-group">
+  <li *ngFor="let item of list.items" class="list-group-item">
+    <dv-widget name="ShowItem" [fields]="item" [hosts]="hosts">
+    </dv-widget>
+  </li>
+</ul>
+<div *ngIf="!list || !list.items || list.items.length == 0">
+  No items
+</div>

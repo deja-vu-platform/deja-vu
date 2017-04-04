@@ -1,0 +1,32 @@
+App <: Cliche {
+  construct := "app"
+
+  Paragraph
+    += ClicheUsesDecl -- uses
+    | AssignmentDecl -- assignment
+
+  ClicheUsesDecl = "use" usedClicheName ParamsDecl? AsDecl*
+  AsDecl = "as" name
+  usedClicheName = alnum* "/" name
+
+  ParamsDecl = "[" ParamDecl ("," ParamDecl)* "]"
+  ParamDecl
+    = Type ":" name -- data
+    | name "replaces" name "in" name -- replaces
+
+  WidgetDecl := "main"? "widget" name "{" FieldBody? "}"
+
+  // Assignments
+  AssignmentDecl = name ":" Type "=" Obj
+  Obj = "{" ObjBody ("," ObjBody)* "}"
+  ObjBody = name ":" Value
+  Value
+    = number -- number
+    | Obj -- obj
+    | "\"" (~"\"" any)* "\"" -- text
+    | "[" ArrayDecl? "]" -- array
+    | (~"\"" name) -- ref
+
+  number = digit+
+  ArrayDecl = Value ("," Value)*
+}

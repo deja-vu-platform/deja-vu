@@ -22,10 +22,7 @@ export interface Comment {
 }
 
 
-@Widget({
-  fqelement: "dv-messaging-comment",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "Comment", ng2_providers: [GraphQlService]})
 export class CommentsComponent {
   comments: any[];
   fetched = false;

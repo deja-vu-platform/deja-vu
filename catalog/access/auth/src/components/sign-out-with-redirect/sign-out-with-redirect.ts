@@ -3,7 +3,7 @@ import {Router} from "@angular/router";
 
 
 @Widget({
-  fqelement: "dv-access-auth",
+  fqelement: "Auth",
   template: `
     <button class="btn btn-default navbar-btn" (click)="signOut()">
       Sign Out

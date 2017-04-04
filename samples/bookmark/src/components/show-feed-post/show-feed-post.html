@@ -1,6 +1,6 @@
 <div class="list-group">
   <h4 class="list-group-item-heading">
-    <dv-widget name="ShowAuthor" fqelement="dv-messaging-post"
+    <dv-widget name="ShowAuthor" of="MessagingPost"
      [fields]="fields" [hosts]="hosts">
     </dv-widget>
   </h4>
@@ -8,12 +8,12 @@
     {{post.content}}
   </p>
   <div class="list-group-item-text">
-    <dv-widget name="ShowLabels" fqelement="dv-organization-label"
+    <dv-widget name="ShowLabels" of="Label"
      [fields]="fields" [hosts]="hosts">
     </dv-widget>
   </div>
   <div class="list-group-item-text">
-    <dv-widget name="CommentsWithComment" fqelement="dv-messaging-comment"
+    <dv-widget name="CommentsWithComment" of="Comment"
      [fields]="fields" [hosts]="hosts">
     </dv-widget>
   </div>

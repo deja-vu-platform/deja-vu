@@ -7,7 +7,7 @@ import {Router} from "@angular/router";
 
 
 @Widget({
-   fqelement: "dv-access-auth",
+   fqelement: "Auth",
    ng2_providers: [GraphQlService],
    ng2_directives: [NgClass]
 })

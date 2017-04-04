@@ -19,10 +19,7 @@ export interface FeedItem {
 }
 
 
-@Widget({
-  fqelement: "dv-messaging-feed",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "Feed", ng2_providers: [GraphQlService]})
 export class ShowFeedComponent {
   feed: FeedItem[];
   sub = {name: "", on_change: _ => undefined};

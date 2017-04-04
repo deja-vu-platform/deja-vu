@@ -1,0 +1,32 @@
+cliche List {
+  data List {
+    name: Text,
+    items: Item
+  }
+
+  data Item {
+    name: Text
+  }
+
+  widget NewList {
+  }
+
+  widget EditList uses ShowList, AddItem{
+    list: List
+  }
+
+  widget ShowList {
+    list: List
+  }
+
+  widget ShowItem {
+    item: Item
+  }
+
+  widget AddItem {
+    item: Item,
+    list: List,
+    submit_ok: Boolean
+  }
+  
+}

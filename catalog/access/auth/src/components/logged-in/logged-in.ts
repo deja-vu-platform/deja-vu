@@ -1,7 +1,7 @@
 import {Widget} from "client-bus";
 
 
-@Widget({fqelement: "dv-access-auth", template: ""})
+@Widget({fqelement: "Auth", template: ""})
 export class LoggedInComponent {
   user = {username: "", password: "", read: [], write: []};
 

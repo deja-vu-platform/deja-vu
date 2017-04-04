@@ -1,16 +1,16 @@
 <div class="row">
   <div class="col-md-4">
-    <dv-widget name="ShowEvent" fqelement="dv-organization-event"
+    <dv-widget name="ShowEvent" of="Event"
      [fields]="fields" [hosts]="hosts">
     </dv-widget>
   </div>
   <div class="col-md-4">
-    <dv-widget name="EditConsumer" fqelement="dv-organization-allocator"
+    <dv-widget name="EditConsumer" of="Allocator"
      [fields]="fields" [hosts]="hosts">
     </dv-widget>
   </div>
   <div class="col-md-4">
-    <dv-widget name="SendEmail" fqelement="dv-messaging-email"
+    <dv-widget name="SendEmail" of="Email"
      [fields]="fields" [hosts]="hosts">
     </dv-widget>
   </div>

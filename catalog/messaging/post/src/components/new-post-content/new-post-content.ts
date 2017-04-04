@@ -3,7 +3,7 @@ import {Post} from "../../shared/data";
 import {Widget} from "client-bus";
 
 
-@Widget({fqelement: "dv-messaging-post"})
+@Widget({fqelement: "Post"})
 export class NewPostContentComponent {
   post: Post = {content: ""};
   submit_ok = {value: false, on_after_change: _ => undefined};

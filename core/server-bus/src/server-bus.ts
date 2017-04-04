@@ -264,7 +264,7 @@ class Dispatcher {
 
     console.log(
         "Dispatch table for " + this._fqelement + ":" +
-        JSON.stringify(this._dispatch_table));
+        JSON.stringify(this._dispatch_table, null, 2));
   }
 
   private _process(op: string, transform_fn: any) {

@@ -1,6 +1,6 @@
 module.exports = function(grunt) {
   require("mean-loader").GruntTask.cliche_task(
       grunt,
-      "dv-messaging-comment",
+      "Comment",
       ["NewComment", "Comments", "CommentsWithComment", "ShowComment"]);
 }

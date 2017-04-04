@@ -9,10 +9,8 @@ cliche Feed {
     subscriptions: Publisher
   }
 
-  data Content {}
-
   data Message {
-    content: Content
+    content: Text
   }
 
   widget ShowFeed uses ShowFeedItem {
@@ -21,7 +19,7 @@ cliche Feed {
 
   widget ShowFeedItem {
     sub: Subscriber,
-    msg: Message,
-    pub: Publisher
+    message: Message,
+    publisher: Publisher
   }
 }

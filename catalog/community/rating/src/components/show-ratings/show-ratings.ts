@@ -3,7 +3,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 @Widget({
-  fqelement: "dv-community-rating",
+  fqelement: "Rating",
   ng2_providers: [GraphQlService],
   styles: [``]
 })

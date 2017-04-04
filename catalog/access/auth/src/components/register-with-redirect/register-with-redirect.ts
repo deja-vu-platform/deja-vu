@@ -4,7 +4,7 @@ import {Widget} from "client-bus";
 import {Router} from "@angular/router";
 
 
-@Widget({fqelement: "dv-access-auth", ng2_providers: [GraphQlService]})
+@Widget({fqelement: "Auth", ng2_providers: [GraphQlService]})
 export class RegisterWithRedirectComponent {
   user: User = {username: "", password: ""};
   reenter_password = "";
