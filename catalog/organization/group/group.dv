@@ -1,0 +1,25 @@
+cliche Group {
+    // Member of a Group
+    data Member {
+        name: Text
+    }
+
+    // Named collection of group members
+    data Group {
+        name: Text,
+        members: [Member]
+    }
+
+    // Displays the members of a group
+    widget ShowList {
+        group: Group
+    }
+
+    // Displays a member of a group
+    widget ShowMember {
+        member: Member
+    }
+
+    // Create a new group
+    widget NewGroup {}
+}
