@@ -93,7 +93,10 @@ const schema = grafo
           throw new Error("Incorrect password");
         }
         const token = jwt.sign(username, "ultra-secret-key");
-        return token;
+        return JSON.stringify({
+          token: token,
+          user: user
+        });
       });
     }
   })

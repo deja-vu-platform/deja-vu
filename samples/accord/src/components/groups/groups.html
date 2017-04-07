@@ -109,21 +109,6 @@ div {
 	margin-left: 5px;
 }
 
-fieldset label.sr-only {
-  display: block !important;
-  position: static !important;
-  width: auto !important;
-  height: auto !important;
-  padding: initial !important;
-  margin: initial !important;
-  overflow: auto !important;
-  clip: unset !important;
-}
-
-fieldset {
-  display: block !important;
-}
-
 </style>
 
 <nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
@@ -144,11 +129,11 @@ fieldset {
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li><a href="/landing">Login</a></li>
+        <li><a href="/groups">Dashboard</a></li>
         <li><a href="/about">About</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">Not Logged In</a></li>
+        <li><a href="#">Logged In</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
@@ -156,13 +141,15 @@ fieldset {
 <div class="container page-content">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
-      <h1 class="text-center">Sign In</h1>
-      <dv-widget name="SignInWithRedirect" of="Auth"
-        [fields]="fields"></dv-widget>
-      <br>
-      <div class="text-center">
-        <a href="/register">Not a member? Register.</a>
+      <h1>My Groups</h1>
+      <a href="/groups/create/" class="btn btn-default">Create Group</a>
+
+      <div>
+        <dv-widget name="ShowGroupsByMember" of="Group"
+          [fields]="fields" [hosts]="hosts">
+        </dv-widget>
       </div>
+
     </div>
   </div>
 </div>

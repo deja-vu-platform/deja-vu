@@ -45,6 +45,24 @@ const schema = grafo
       members: {"type": "[Member]"}
     }
   })
+  .add_query({
+    name: "groupsByMember",
+    type: "[Group]",
+    args: {
+      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {atom_id}) => {
+      return mean.db.collection("groups")
+        .find({
+          members: {
+            $in: [{
+              atom_id: atom_id
+            }]
+          }
+        })
+        .toArray();
+    }
+  })
   .add_mutation({
     name: "newGroup",
     type: "Group",
@@ -54,13 +72,55 @@ const schema = grafo
     resolve: (_, {name}) => {
       let newObject = {
         atom_id: uuid.v4(),
-        name: name
+        name: name,
+        members: []
       };
 
       return mean.db.collection("groups")
         .insertOne(newObject)
         .then(_ => bus.create_atom("Group", newObject.atom_id, newObject))
         .then(_ => newObject)
+    }
+  })
+  .add_mutation({
+    name: "newGroupWithInitialMember",
+    type: "Group",
+    args: {
+      name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      initialMember: {
+        "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+      }
+    },
+    resolve: (_, {name}) => {
+      let newObject = {
+        atom_id: uuid.v4(),
+        name: name,
+        members: []
+      };
+
+      let updateOperation = {
+        $addToSet: {
+          members: {
+            atom_id: newObject.atom_id
+          }
+        }
+      };
+
+      // Create a new group
+      return mean.db.collection("groups")
+        .insertOne(newObject)
+        .then(_ => bus.create_atom("Group", newObject.atom_id, newObject))
+        .then(_ => newObject)
+        .then(_ => {
+          // Add the initial member to the group
+          return mean.db.collection("groups")
+            .updateOne({
+              atom_id: newObject.atom_id
+            }, updateOperation)
+            .then(_ =>
+              bus.update_atom("Group", newObject.atom_id, updateOperation))
+            .then(_ => newObject);
+        });
     }
   })
   .schema();

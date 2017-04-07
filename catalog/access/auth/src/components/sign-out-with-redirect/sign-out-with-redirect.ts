@@ -18,6 +18,7 @@ export class SignOutWithRedirectComponent {
   signOut() {
     localStorage.removeItem("id_token");
     localStorage.removeItem("username");
+    localStorage.removeItem("atom_id");
     this._router.navigate([this.signout_ok_redirect_route.value]);
   }
 }

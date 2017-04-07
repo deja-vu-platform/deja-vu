@@ -6,7 +6,7 @@ import {Router} from "@angular/router";
 
 @Widget({fqelement: "Auth", ng2_providers: [GraphQlService]})
 export class RegisterWithRedirectComponent {
-  user: User = {username: "", password: ""};
+  user: User = {username: "", password: "", atom_id: ""};
   reenter_password = "";
   username_error = false;
   register_ok_redirect_route = {value: "/"};
@@ -32,10 +32,14 @@ export class RegisterWithRedirectComponent {
                 username: "${this.user.username}",
                 password: "${this.user.password}")
             `)
+            .map(data => JSON.parse(data.signIn))
             .subscribe(
               token => {
-                localStorage.setItem("id_token", token);
+                let authToken = token.token,
+                  authUser = token.user;
+                localStorage.setItem("id_token", authToken);
                 localStorage.setItem("username", this.user.username);
+                localStorage.setItem("atom_id", authUser.atom_id);
                 this._router.navigate([this.register_ok_redirect_route.value]);
               });
         },

@@ -11,7 +11,12 @@ cliche Group {
     }
 
     // Displays the members of a group
-    widget ShowList {
+    widget ShowGroup {
+        group: Group
+    }
+
+    // Displays an overview of a group, like a light version of ShowGroup
+    widget ShowGroupOverview {
         group: Group
     }
 
@@ -20,6 +25,17 @@ cliche Group {
         member: Member
     }
 
+    // Shows which groups a Member belongs to, to illustrate
+    // a many-to-many relationship
+    widget ShowGroupsByMember {
+        member: Member
+    }
+
     // Create a new group
     widget NewGroup {}
+
+    // Create a new group with some initial member
+    widget NewGroupWithInitialMember {
+        initialMember: Member
+    }
 }

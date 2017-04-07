@@ -12,7 +12,7 @@ import {Router} from "@angular/router";
    ng2_directives: [NgClass]
 })
 export class SignInWithRedirectComponent {
-  user: User = {username: "", password: ""};
+  user: User = {username: "", password: "", atom_id: ""};
   signin_ok_redirect_route = {value: "/"};
   error = false;
 
@@ -25,11 +25,15 @@ export class SignInWithRedirectComponent {
         signIn(
           username: "${this.user.username}", password: "${this.user.password}")
       `)
+      .map(data => JSON.parse(data.signIn))
       .subscribe(
         token => {
+          let authToken = token.token,
+            authUser = token.user;
           console.log("setting username " + this.user.username);
-          localStorage.setItem("id_token", token);
+          localStorage.setItem("id_token", authToken);
           localStorage.setItem("username", this.user.username);
+          localStorage.setItem("atom_id", authUser.atom_id);
           this._router.navigate([this.signin_ok_redirect_route.value]);
         },
         err => {

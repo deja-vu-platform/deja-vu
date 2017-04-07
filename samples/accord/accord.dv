@@ -1,19 +1,38 @@
-app Accord uses
-  access/Auth {
+app Accord {
+
+  use access/Auth[User: User]
+  use organization/Group[User: Member]
+
+  data User {
+    username: Text
+  }
 
   // The landing page gives the user the option to sign in or register
   main widget Landing {
-    user_ok_redirect_route: Text =
-      Auth.SignInWithRedirect.signin_ok_redirect_route
+    user_ok_redirect_route: Text
   }
 
+  // The about page lets the user see an explanation of the project
   widget About {
   }
 
+  // The Register page lets the user create a new account
   widget Register {
-    user_ok_redirect_route: Text =
-      Auth.RegisterWithRedirect.register_ok_redirect_route
+    user_ok_redirect_route: Text
   }
+
+  // Allows a user to view existing groups and go to the CreateGroup page
+  widget Groups {
+    user: User
+  }
+
+  // Create a new group
+  widget CreateGroup {
+    initialMember: User
+  }
+
+  u1: User = {username:"john", password:"123"}
+  g1: Group = {name:"John's Group", members:[u1]}
 
   l: Landing = {user_ok_redirect_route: "/app/home"}
   reg: Register = {user_ok_redirect_route: "/groups"}
@@ -21,4 +40,6 @@ app Accord uses
   landing_route: Route = {path: "landing", widget: Landing}
   about: Route = {path: "about", widget: About}
   register: Route = {path: "register", widget: Register}
+  groups: Route = {path: "groups", widget: Groups}
+  create_group: Route = {path: "groups/create", widget: CreateGroup}
 }
