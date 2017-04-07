@@ -5,7 +5,7 @@ import {Widget} from "client-bus";
 // import * as _u from "underscore";
 
 @Widget({
-  fqelement: "dv-organization-group",
+  fqelement: "Group",
   ng2_providers: [GraphQlService]
 })
 export class NewGroupComponent {

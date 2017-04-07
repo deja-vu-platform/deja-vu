@@ -1,7 +1,7 @@
 import {Widget} from "client-bus";
 
 @Widget({
-  fqelement: "dv-organization-group",
+  fqelement: "Group",
   template: `{{member.name}}`
 })
 export class ShowMemberComponent {

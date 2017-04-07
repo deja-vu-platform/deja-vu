@@ -28,8 +28,11 @@ app Accord {
 
   // Create a new group
   widget CreateGroup {
-    initialMember: User
+    initialMember: User,
+    groupCreatedRedirectRoute: Text
   }
+
+  create_group_page: CreateGroup = {groupCreatedRedirectRoute: "/groups"}
 
   u1: User = {username:"john", password:"123"}
   g1: Group = {name:"John's Group", members:[u1]}

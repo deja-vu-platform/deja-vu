@@ -91,36 +91,22 @@ const schema = grafo
         "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
       }
     },
-    resolve: (_, {name}) => {
+    resolve: (_, {name, initialMember}) => {
       let newObject = {
         atom_id: uuid.v4(),
         name: name,
-        members: []
-      };
-
-      let updateOperation = {
-        $addToSet: {
-          members: {
-            atom_id: newObject.atom_id
+        members: [
+          {
+            atom_id: initialMember
           }
-        }
+        ]
       };
 
-      // Create a new group
+      // Create a new group with the member already in it
       return mean.db.collection("groups")
         .insertOne(newObject)
         .then(_ => bus.create_atom("Group", newObject.atom_id, newObject))
-        .then(_ => newObject)
-        .then(_ => {
-          // Add the initial member to the group
-          return mean.db.collection("groups")
-            .updateOne({
-              atom_id: newObject.atom_id
-            }, updateOperation)
-            .then(_ =>
-              bus.update_atom("Group", newObject.atom_id, updateOperation))
-            .then(_ => newObject);
-        });
+        .then(_ => newObject);
     }
   })
   .schema();

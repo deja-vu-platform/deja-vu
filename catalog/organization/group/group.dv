@@ -27,7 +27,7 @@ cliche Group {
 
     // Shows which groups a Member belongs to, to illustrate
     // a many-to-many relationship
-    widget ShowGroupsByMember {
+    widget ShowGroupsByMember uses ShowGroupOverview {
         member: Member
     }
 
@@ -36,6 +36,7 @@ cliche Group {
 
     // Create a new group with some initial member
     widget NewGroupWithInitialMember {
-        initialMember: Member
+        initialMember: Member,
+        groupCreatedRedirectRoute: Text
     }
 }
