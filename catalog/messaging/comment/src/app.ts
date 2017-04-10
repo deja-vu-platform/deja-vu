@@ -89,6 +89,20 @@ const schema = grafo
       }
     }
   })
+  .add_mutation({
+    name: "editComment",
+    type: "Comment",
+    args: {
+      atom_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      content: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {atom_id, content}) => {
+      return Promise.all([
+        mean.db.collection("comments").updateOne({atom_id}, {$set: {content}}),
+        bus.update_atom("Comment", atom_id, {$set: {content}})
+      ]).then(() => mean.db.collection("comments").findOne({atom_id}));
+    }
+  })
   .schema();
 
 

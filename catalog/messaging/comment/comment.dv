@@ -13,7 +13,7 @@ cliche Comment {
     name: Text
   }
 
-  widget Comments uses ShowComment {
+  widget Comments uses ShowComment, EditComment {
     target: Target
   }
 
@@ -26,9 +26,13 @@ cliche Comment {
     target: Target
   }
 
+  widget EditComment {
+    comment: Comment
+  }
+
   widget CommentsWithComment uses Comments, NewComment {
     target: Target,
     author: Author
   }
-  
+
 }
