@@ -19,7 +19,7 @@ export interface Member {
   ng2_providers: [GraphQlService]
 })
 export class ShowGroupComponent {
-  group = {atom_id: "1", members: [], name: "", on_change: _ => undefined};
+  group = {atom_id: "", members: [], name: "", on_change: _ => undefined};
   fields = {};
 
   constructor(
@@ -27,6 +27,9 @@ export class ShowGroupComponent {
 
   dvAfterInit() {
     const updateGroup = () => {
+      console.log(
+        "group on change! show-group"
+      );
       let query = this._graphQlService
         .get(`
           group_by_id(atom_id: "${this.group.atom_id}") {
@@ -60,6 +63,6 @@ export class ShowGroupComponent {
         });
     };
     updateGroup();
-    this.group.on_change(updateGroup);
+    // this.group.on_change(updateGroup);
   }
 }

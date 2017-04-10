@@ -102,6 +102,8 @@ const schema = grafo
         ]
       };
 
+      console.log("CREATE OBJECT", newObject);
+
       // Create a new group with the member already in it
       return mean.db.collection("groups")
         .insertOne(newObject)

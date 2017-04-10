@@ -5,15 +5,15 @@
   margin-top: 56px !important;
 }
 #nav {
-	margin-bottom: 100px;
+    margin-bottom: 100px;
 }
 
 #page-content {
-	margin-top: 50px;
+    margin-top: 50px;
 }
 
 .proposal {
-	margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 .col-centered {
@@ -27,56 +27,56 @@ p {
 }
 
 a {
-	color: #28bdb1;
+    color: #28bdb1;
 }
 
 a:hover {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 h1 {
-	font-family: 'Raleway', sans-serif;
-	font-weight: bold;
-	color: #28bdb1;
+    font-family: 'Raleway', sans-serif;
+    font-weight: bold;
+    color: #28bdb1;
 }
 
 h2 {
-	font-family: 'Raleway', sans-serif;
-	font-weight: bold;
-	color: #28bdb1;
+    font-family: 'Raleway', sans-serif;
+    font-weight: bold;
+    color: #28bdb1;
 }
 
 h3 {
-	font-family: 'Raleway', sans-serif;
+    font-family: 'Raleway', sans-serif;
 }
 
 div {
-	font-family: 'Raleway', sans-serif;
+    font-family: 'Raleway', sans-serif;
 }
 
 .btn-default {
-	font-family: 'Raleway', sans-serif;
+    font-family: 'Raleway', sans-serif;
 }
 
 .btn-default.view {
-	color: black;
-	background-color: white;
+    color: black;
+    background-color: white;
 }
 
 #main-navbar {
-	background-color: #28bdb1;
+    background-color: #28bdb1;
 }
 
 .navbar-header {
-	width: 150px;
-	height: 50px;
-	margin-top: 5px;
+    width: 150px;
+    height: 50px;
+    margin-top: 5px;
 }
 
 .navbar-brand {
-	color: white !important;
-	font-size: 35px;
-	font-family: 'Raleway', sans-serif;
+    color: white !important;
+    font-size: 35px;
+    font-family: 'Raleway', sans-serif;
 }
 
 .navbar-default .navbar-nav > li > a {
@@ -88,7 +88,7 @@ div {
 }
 
 .navbar-text {
-	cursor: default;
+    cursor: default;
 }
 
 .alert-footer {
@@ -98,15 +98,15 @@ div {
 }
 
 .mt-5 {
-	margin-top: 5px;
+    margin-top: 5px;
 }
 
 .mt-10 {
-	margin-top: 10px;
+    margin-top: 10px;
 }
 
 .ml-5 {
-	margin-left: 5px;
+    margin-left: 5px;
 }
 
 </style>
@@ -141,18 +141,33 @@ div {
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
+
+<!-- Load the group from the route param -->
+<dv-widget name="GroupFromRoute" of="Group" [fields]="fields">
+</dv-widget>
+
 <div class="container page-content">
   <div class="row">
-    <div class="col-md-12">
-      <h1>My Groups</h1>
-      <a href="/groups/create/" class="btn btn-default">Create Group</a>
-
-      <div>
-        <dv-widget name="ShowGroupsByMember" of="Group"
-          [fields]="fields" [hosts]="hosts">
+    <div class="col-md-3">
+      <h2>
+        <dv-widget name="ShowGroupOverview" of="Group"
+          [fields]="fields">
         </dv-widget>
-      </div>
+      </h2>
+      <a href="/setlists/create" class="btn btn-default">
+        Add Setlist
+      </a>
+    </div>
+    <div class="col-md-9">
+        <h1>
+          <dv-widget name="ShowGroupOverview" of="Group"
+            [fields]="fields">
+          </dv-widget>
+        </h1>
 
+        <h2>Members</h2>
+        <dv-widget name="ShowGroup" of="Group"
+          [fields]="fields"></dv-widget>
     </div>
   </div>
 </div>

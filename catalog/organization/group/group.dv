@@ -7,12 +7,23 @@ cliche Group {
     // Named collection of group members
     data Group {
         name: Text,
-        members: [Member]
+        members: Member
+    }
+
+    // Gets the current group from a route parameter
+    widget GroupFromRoute {
+        group: Group
     }
 
     // Displays the members of a group
     widget ShowGroup {
         group: Group
+    }
+
+    // Button that allows a user to open a group
+    widget RedirectToGroup {
+        group: Group,
+        prefix: Text
     }
 
     // Displays an overview of a group, like a light version of ShowGroup

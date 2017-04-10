@@ -14,6 +14,7 @@
     "client-bus": "file:../../core/client-bus",
     "dv-access-auth": "file:../../catalog/access/auth",
     "dv-organization-group": "file:../../catalog/organization/group",
+    "dv-organization-list": "file:../../catalog/organization/list",
     "dv-community-rating": "file:../../catalog/community/rating",
     "mean-loader": "file:../../core/mean-loader",
     "dv-lang": "file:../../core/lang",

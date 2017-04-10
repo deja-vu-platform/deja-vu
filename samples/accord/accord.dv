@@ -1,10 +1,36 @@
 app Accord {
 
   use access/Auth[User: User]
-  use organization/Group[User: Member]
+  use organization/Group[
+    User: Member,
+    SongGroup: Group,
+    LinkToGroup replaces ShowGroupOverview in ShowGroupsByMember
+  ]
+  use organization/List[
+    Setlist: Item
+  ] as SetlistList
+  use organization/List[
+    Song: Item,
+    Setlist: List
+  ] as SongList
 
   data User {
     username: Text
+  }
+
+  data SongGroup {
+    name: Text,
+    members: [User]
+  }
+
+
+  data Setlist {
+    name: Text,
+    songs: [Song]
+  }
+
+  data Song {
+    name: Text
   }
 
   // The landing page gives the user the option to sign in or register
@@ -32,10 +58,31 @@ app Accord {
     groupCreatedRedirectRoute: Text
   }
 
-  create_group_page: CreateGroup = {groupCreatedRedirectRoute: "/groups"}
+  // View the information about a group
+  widget ViewGroup {
+    group: SongGroup
+  }
 
-  u1: User = {username:"john", password:"123"}
-  g1: Group = {name:"John's Group", members:[u1]}
+  // Links to a group on the Groups view page
+  widget LinkToGroup {
+    group: SongGroup,
+    prefix: Text
+  }
+
+  widget CreateSetlist {
+    list: Setlist
+  }
+
+  all_setlists: List = {atom_id: "all_setlists"}
+
+  create_group_page: CreateGroup = {groupCreatedRedirectRoute: "/groups"}
+  ltg: LinkToGroup = {prefix: "/groups"}
+
+  // Bind the global list of setlists to the create setlist page
+  //create_setlist_page: CreateSetlist = {list: {atom_id: "all_setlists"}}
+
+  // u1: User = {username:"john", password:"123"}
+  // g1: Group = {name:"John's Group", members:[u1]}
 
   l: Landing = {user_ok_redirect_route: "/app/home"}
   reg: Register = {user_ok_redirect_route: "/groups"}
@@ -45,4 +92,7 @@ app Accord {
   register: Route = {path: "register", widget: Register}
   groups: Route = {path: "groups", widget: Groups}
   create_group: Route = {path: "groups/create", widget: CreateGroup}
+  view_group: Route = {path: "groups/:group_id", widget: ViewGroup}
+
+  create_setlists: Route = {path: "setlists/create", widget: CreateSetlist}
 }
