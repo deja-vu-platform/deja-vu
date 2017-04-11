@@ -42,7 +42,53 @@ const schema = grafo
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
-      members: {"type": "[Member]"}
+      members: {"type": "[Member]"},
+      addMember: {
+        type: "Member",
+        args: {
+          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (group, {name}) => {
+          const member = {
+            atom_id: uuid.v4(),
+            name: name
+          };
+
+          return Promise
+            .all([
+              mean.db.collection("members").insertOne(member),
+              mean.db.collection("groups")
+                .updateOne(
+                  {atom_id: group.atom_id},
+                  {$addToSet: {members: {atom_id: member.atom_id}}}
+                ),
+              bus.update_atom("Group", group.atom_id,
+                {$addToSet: {members: {atom_id: member.atom_id}}}),
+              bus.create_atom("Member", member.atom_id, member)
+            ])
+            .then(_ => member)
+        }
+      },
+      addExistingMember: {
+        type: "Group",
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (group, {atom_id}) => {
+          return Promise
+            .all([
+              mean.db.collection("groups")
+                .updateOne(
+                  {atom_id: group.atom_id},
+                  {$addToSet: {members: {atom_id: atom_id}}}
+                ),
+              bus.update_atom("Group", group.atom_id,
+                {$addToSet: {members: {atom_id: atom_id}}})
+            ])
+            .then(_ =>
+              mean.db.collection("groups").findOne({ atom_id: group.atom_id }));
+        }
+      }
     }
   })
   .add_query({
@@ -80,35 +126,6 @@ const schema = grafo
         .insertOne(newObject)
         .then(_ => bus.create_atom("Group", newObject.atom_id, newObject))
         .then(_ => newObject)
-    }
-  })
-  .add_mutation({
-    name: "newGroupWithInitialMember",
-    type: "Group",
-    args: {
-      name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      initialMember: {
-        "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
-      }
-    },
-    resolve: (_, {name, initialMember}) => {
-      let newObject = {
-        atom_id: uuid.v4(),
-        name: name,
-        members: [
-          {
-            atom_id: initialMember
-          }
-        ]
-      };
-
-      console.log("CREATE OBJECT", newObject);
-
-      // Create a new group with the member already in it
-      return mean.db.collection("groups")
-        .insertOne(newObject)
-        .then(_ => bus.create_atom("Group", newObject.atom_id, newObject))
-        .then(_ => newObject);
     }
   })
   .schema();

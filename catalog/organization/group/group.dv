@@ -7,7 +7,7 @@ cliche Group {
     // Named collection of group members
     data Group {
         name: Text,
-        members: Member
+        members: [Member]
     }
 
     // Gets the current group from a route parameter

@@ -17,20 +17,52 @@ export class NewGroupWithInitialMemberComponent {
     private _router: Router) {}
 
   onSubmit() {
-    this._graphQlService
-      .post(`
-        newGroupWithInitialMember(name: "${this.group.name}",
-          initialMember: "${this.initialMember.atom_id}") {
+    let addMember = () => {
+      this._graphQlService
+        .get(`
+          group_by_id(atom_id: "${this.group.atom_id}") {
+            addExistingMember(atom_id: "${this.initialMember.atom_id}") {
+              atom_id
+            }
+          }
+        `)
+        .map(data => data.group_by_id.addExistingMember.atom_id)
+        .subscribe(atom_id => {
+          if (this.groupCreatedRedirectRoute
+            && this.groupCreatedRedirectRoute.value.length > 0) {
+              this._router.navigate([this.groupCreatedRedirectRoute.value]);
+          }
+        });
+    };
+    let createGroup = () => {
+      this._graphQlService
+        .post(`
+          newGroup(name: "${this.group.name}") {
             atom_id
-        }
-      `)
-      .map(data => data.newGroupWithInitialMember.atom_id)
-      .subscribe(atom_id => {
-        this.group.atom_id = atom_id;
-        if (this.groupCreatedRedirectRoute
-          && this.groupCreatedRedirectRoute.value.length > 0) {
-            this._router.navigate([this.groupCreatedRedirectRoute.value]);
-        }
-      });
+          }
+        `)
+        .map(data => data.newGroup.atom_id)
+        .subscribe(atom_id => {
+          this.group.atom_id = atom_id;
+          addMember();
+        });
+    };
+
+    createGroup();
+    // this._graphQlService
+    //   .post(`
+    //     newGroupWithInitialMember(name: "${this.group.name}",
+    //       initialMember: "${this.initialMember.atom_id}") {
+    //         atom_id
+    //     }
+    //   `)
+    //   .map(data => data.newGroupWithInitialMember.atom_id)
+    //   .subscribe(atom_id => {
+    //     this.group.atom_id = atom_id;
+    //     if (this.groupCreatedRedirectRoute
+    //       && this.groupCreatedRedirectRoute.value.length > 0) {
+    //         this._router.navigate([this.groupCreatedRedirectRoute.value]);
+    //     }
+    //   });
   }
 }

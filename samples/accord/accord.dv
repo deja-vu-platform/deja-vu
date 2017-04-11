@@ -1,14 +1,18 @@
 app Accord {
 
   use access/Auth[User: User]
+
   use organization/Group[
     User: Member,
     SongGroup: Group,
     LinkToGroup replaces ShowGroupOverview in ShowGroupsByMember
   ]
+
   use organization/List[
-    Setlist: Item
+    Setlist: Item,
+    SetlistCollection: List
   ] as SetlistList
+
   use organization/List[
     Song: Item,
     Setlist: List
@@ -23,14 +27,18 @@ app Accord {
     members: [User]
   }
 
+  data Song {
+    name: Text
+  }
 
   data Setlist {
     name: Text,
     songs: [Song]
   }
 
-  data Song {
-    name: Text
+  data SetlistCollection {
+    name: Text,
+    members: [Setlist]
   }
 
   // The landing page gives the user the option to sign in or register
@@ -69,17 +77,17 @@ app Accord {
     prefix: Text
   }
 
+  // Create a new setlist
   widget CreateSetlist {
-    list: Setlist
+    name: Text // Name of the global setlist object
   }
-
-  all_setlists: List = {atom_id: "all_setlists"}
 
   create_group_page: CreateGroup = {groupCreatedRedirectRoute: "/groups"}
   ltg: LinkToGroup = {prefix: "/groups"}
 
   // Bind the global list of setlists to the create setlist page
-  //create_setlist_page: CreateSetlist = {list: {atom_id: "all_setlists"}}
+  all_setlists: SetlistCollection = {name: "all_setlists", atom_id: "all_setlists"}
+  create_setlist_page: CreateSetlist = {name: "all_setlists"}
 
   // u1: User = {username:"john", password:"123"}
   // g1: Group = {name:"John's Group", members:[u1]}
@@ -93,6 +101,6 @@ app Accord {
   groups: Route = {path: "groups", widget: Groups}
   create_group: Route = {path: "groups/create", widget: CreateGroup}
   view_group: Route = {path: "groups/:group_id", widget: ViewGroup}
-
   create_setlists: Route = {path: "setlists/create", widget: CreateSetlist}
+
 }
