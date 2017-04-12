@@ -16,7 +16,7 @@ cliche Group {
     }
 
     // Displays the members of a group
-    widget ShowGroup {
+    widget ShowGroup uses ShowMember {
         group: Group
     }
 

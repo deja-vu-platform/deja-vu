@@ -41,6 +41,8 @@ export class ShowGroupComponent {
           }
         `);
 
+      this.group.members = [];
+
       // TODO: Can we avoid hitting the server twice here?
       query
         .map(data => data.group_by_id.name)

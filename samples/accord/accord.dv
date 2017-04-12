@@ -16,8 +16,14 @@ app Accord {
 
   use organization/List[
     Song: Item,
-    Setlist: List
+    Setlist: List,
+    ShowSong replaces ShowItem in ShowList
   ] as SongList
+
+  use community/Rating[
+    User: Source,
+    Song: Target
+  ]
 
   data User {
     username: Text
@@ -78,6 +84,11 @@ app Accord {
   widget ViewSetlist {
     list: Setlist,
     prefix: Text
+  }
+
+  // Show a song on the view setlist page
+  widget ShowSong {
+    item: Song
   }
 
   // Links to a group on the Groups view page

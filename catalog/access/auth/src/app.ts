@@ -73,7 +73,7 @@ const schema = grafo
             }
 
             // report
-            bus.create_atom("User", username, user);
+            bus.create_atom("User", user.atom_id, user);
             return true;
           });
       });
