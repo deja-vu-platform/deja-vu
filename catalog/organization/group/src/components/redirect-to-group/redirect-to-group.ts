@@ -16,7 +16,6 @@ export class RedirectToGroupComponent {
     private _router: Router) {}
 
   navigate() {
-    console.log("navigate to", this.prefix.value + "/" + this.group.atom_id);
     this._router.navigate([this.prefix.value + "/" + this.group.atom_id]);
   }
 }

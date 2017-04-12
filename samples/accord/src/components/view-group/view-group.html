@@ -154,12 +154,15 @@ div {
           [fields]="fields">
         </dv-widget>
       </h2>
-      <a href="/setlists/create" class="btn btn-default">
-        Add Setlist
-      </a>
+
+      <!-- Links to the add setlist page -->
+      <dv-widget name="RedirectToGroup" of="Group"
+        [fields]="fields"></dv-widget>
+
       <p>Setlists:</p>
       <dv-widget name="ShowList" of="SetlistList"
-        [fields]="fields"></dv-widget>
+        [fields]="fields" [hosts]="hosts"></dv-widget>
+
     </div>
     <div class="col-md-9">
         <h1>

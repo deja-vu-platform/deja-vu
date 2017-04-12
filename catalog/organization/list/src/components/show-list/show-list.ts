@@ -53,7 +53,8 @@ export class ShowListComponent {
     };
 
     update_list();
-    this.list.on_change(update_list);
+    // This seems to cause an infinite loop
+    // this.list.on_change(update_list);
   }
 
 
