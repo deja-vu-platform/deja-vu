@@ -5,15 +5,15 @@
   margin-top: 56px !important;
 }
 #nav {
-    margin-bottom: 100px;
+	margin-bottom: 100px;
 }
 
 #page-content {
-    margin-top: 50px;
+	margin-top: 50px;
 }
 
 .proposal {
-    margin-bottom: 20px;
+	margin-bottom: 20px;
 }
 
 .col-centered {
@@ -27,56 +27,56 @@ p {
 }
 
 a {
-    color: #28bdb1;
+	color: #28bdb1;
 }
 
 a:hover {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 h1 {
-    font-family: 'Raleway', sans-serif;
-    font-weight: bold;
-    color: #28bdb1;
+	font-family: 'Raleway', sans-serif;
+	font-weight: bold;
+	color: #28bdb1;
 }
 
 h2 {
-    font-family: 'Raleway', sans-serif;
-    font-weight: bold;
-    color: #28bdb1;
+	font-family: 'Raleway', sans-serif;
+	font-weight: bold;
+	color: #28bdb1;
 }
 
 h3 {
-    font-family: 'Raleway', sans-serif;
+	font-family: 'Raleway', sans-serif;
 }
 
 div {
-    font-family: 'Raleway', sans-serif;
+	font-family: 'Raleway', sans-serif;
 }
 
 .btn-default {
-    font-family: 'Raleway', sans-serif;
+	font-family: 'Raleway', sans-serif;
 }
 
 .btn-default.view {
-    color: black;
-    background-color: white;
+	color: black;
+	background-color: white;
 }
 
 #main-navbar {
-    background-color: #28bdb1;
+	background-color: #28bdb1;
 }
 
 .navbar-header {
-    width: 150px;
-    height: 50px;
-    margin-top: 5px;
+	width: 150px;
+	height: 50px;
+	margin-top: 5px;
 }
 
 .navbar-brand {
-    color: white !important;
-    font-size: 35px;
-    font-family: 'Raleway', sans-serif;
+	color: white !important;
+	font-size: 35px;
+	font-family: 'Raleway', sans-serif;
 }
 
 .navbar-default .navbar-nav > li > a {
@@ -88,7 +88,7 @@ div {
 }
 
 .navbar-text {
-    cursor: default;
+	cursor: default;
 }
 
 .alert-footer {
@@ -98,15 +98,15 @@ div {
 }
 
 .mt-5 {
-    margin-top: 5px;
+	margin-top: 5px;
 }
 
 .mt-10 {
-    margin-top: 10px;
+	margin-top: 10px;
 }
 
 .ml-5 {
-    margin-left: 5px;
+	margin-left: 5px;
 }
 
 </style>
@@ -136,32 +136,28 @@ div {
         <li><a href="/about">About</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#">Logged In</a></li>
+        <li>
+          <a href="#">Logged In</a>
+        </li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
 
-<!-- Load the group from the route param -->
 <dv-widget name="ListFromRoute" of="SongList" [fields]="fields">
 </dv-widget>
 
 <div class="container page-content">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
-        <h1>
-            Setlist
-        </h1>
+      <h1>Create Proposal</h1>
 
-        <div>
-            Want to add a proposal?
-        </div>
-        <dv-widget name="RedirectToList" of="SongList" [fields]="fields">
+      <div>
+        <dv-widget name="AddItem" of="SongList"
+          [fields]="fields">
         </dv-widget>
+      </div>
 
-        <dv-widget name="ShowList" of="SongList" [fields]="fields"></dv-widget>
-
-        Songs gonna go here...
     </div>
   </div>
 </div>

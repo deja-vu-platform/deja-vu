@@ -76,7 +76,8 @@ app Accord {
 
   // View a setlist
   widget ViewSetlist {
-    list: Setlist
+    list: Setlist,
+    prefix: Text
   }
 
   // Links to a group on the Groups view page
@@ -96,10 +97,16 @@ app Accord {
     list: SongGroup
   }
 
+  // Create a new proposal
+  widget CreateProposal {
+    list: Setlist
+  }
+
   create_group_page: CreateGroup = {groupCreatedRedirectRoute: "/groups"}
   ltg: LinkToGroup = {prefix: "/groups"}
   lts: LinkToSetlist = {prefix: "/groups/setlists"}
   view_group_page: ViewGroup = {prefix: "/groups/create-setlist"}
+  view_setlist_page: ViewSetlist = {prefix: "/groups/setlists/create-proposal/"}
 
   // u1: User = {username:"john", password:"123"}
   // g1: Group = {name:"John's Group", members:[u1]}
@@ -115,4 +122,5 @@ app Accord {
   view_group: Route = {path: "groups/:group_id", widget: ViewGroup}
   create_setlists: Route = {path: "groups/create-setlist/:group_id", widget: CreateSetlist}
   view_setlist: Route = {path: "groups/setlists/:list_id", widget: ViewSetlist}
+  create_proposal: Route = {path: "groups/setlists/create-proposal/:list_id", widget: CreateProposal}
 }

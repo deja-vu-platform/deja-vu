@@ -23,6 +23,11 @@ cliche List {
     item: Item
   }
 
+  widget RedirectToList {
+    list: List,
+    prefix: Text
+  }
+
   widget RedirectToItem {
     item: Item,
     prefix: Text
