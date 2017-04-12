@@ -10,7 +10,8 @@ app Accord {
 
   use organization/List[
     Setlist: Item,
-    SongGroup: List
+    SongGroup: List,
+    LinkToSetlist replaces ShowItem in ShowList
   ] as SetlistList
 
   use organization/List[
@@ -73,9 +74,20 @@ app Accord {
     prefix: Text
   }
 
+  // View a setlist
+  widget ViewSetlist {
+    list: Setlist
+  }
+
   // Links to a group on the Groups view page
   widget LinkToGroup {
     group: SongGroup,
+    prefix: Text
+  }
+
+  // Links to a setlist on the Group view page
+  widget LinkToSetlist {
+    setlist: Setlist,
     prefix: Text
   }
 
@@ -86,11 +98,8 @@ app Accord {
 
   create_group_page: CreateGroup = {groupCreatedRedirectRoute: "/groups"}
   ltg: LinkToGroup = {prefix: "/groups"}
+  lts: LinkToSetlist = {prefix: "/groups/setlists"}
   view_group_page: ViewGroup = {prefix: "/groups/create-setlist"}
-
-  // Bind the global list of setlists to the create setlist page
-//  all_setlists: SetlistCollection = {name: "all_setlists", atom_id: "all_setlists"}
-//  create_setlist_page: CreateSetlist = {name: "all_setlists"}
 
   // u1: User = {username:"john", password:"123"}
   // g1: Group = {name:"John's Group", members:[u1]}
@@ -105,5 +114,5 @@ app Accord {
   create_group: Route = {path: "groups/create", widget: CreateGroup}
   view_group: Route = {path: "groups/:group_id", widget: ViewGroup}
   create_setlists: Route = {path: "groups/create-setlist/:group_id", widget: CreateSetlist}
-
+  view_setlist: Route = {path: "groups/setlists/:list_id", widget: ViewSetlist}
 }
