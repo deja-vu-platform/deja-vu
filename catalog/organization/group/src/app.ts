@@ -75,18 +75,20 @@ const schema = grafo
           atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
         },
         resolve: (group, {atom_id}) => {
-          return Promise
-            .all([
-              mean.db.collection("groups")
-                .updateOne(
-                  {atom_id: group.atom_id},
-                  {$addToSet: {members: {atom_id: atom_id}}}
-                ),
-              bus.update_atom("Group", group.atom_id,
-                {$addToSet: {members: {atom_id: atom_id}}})
-            ])
-            .then(_ =>
-              mean.db.collection("groups").findOne({ atom_id: group.atom_id }));
+          return Validation.memberExists(atom_id).then(_ => {
+            return Promise
+              .all([
+                mean.db.collection("groups")
+                  .updateOne(
+                    {atom_id: group.atom_id},
+                    {$addToSet: {members: {atom_id: atom_id}}}
+                  ),
+                bus.update_atom("Group", group.atom_id,
+                  {$addToSet: {members: {atom_id: atom_id}}})
+              ])
+              .then(_ =>
+                mean.db.collection("groups").findOne({ atom_id: group.atom_id }));
+          });
         }
       }
     }
@@ -131,6 +133,17 @@ const schema = grafo
   .schema();
 
 Helpers.serve_schema(mean.ws, schema);
+
+namespace Validation {
+  export function memberExists(atom_id) {
+    return mean.db.collection("members")
+      .findOne({atom_id: atom_id})
+      .then(member => {
+        if (!member) throw new Error(`Member with ID ${member} not found.`);
+        return member;
+      });
+  }
+}
 
 grafo.init().then(_ => {
   if (mean.debug) {
