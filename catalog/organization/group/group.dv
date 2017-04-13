@@ -50,4 +50,11 @@ cliche Group {
         initialMember: Member,
         groupCreatedRedirectRoute: Text
     }
+
+    // Add an existing member by ID
+    widget AddExistingMember {
+        member: Member,
+        group: Group,
+        submit_ok: Boolean
+    }
 }

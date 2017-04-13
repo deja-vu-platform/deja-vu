@@ -74,6 +74,11 @@ app Accord {
     groupCreatedRedirectRoute: Text
   }
 
+  // Add a member to the group
+  widget AddMember {
+    group: SongGroup
+  }
+
   // View the information about a group
   widget ViewGroup {
     group: SongGroup,
@@ -119,7 +124,7 @@ app Accord {
   view_group_page: ViewGroup = {prefix: "/groups/create-setlist"}
   view_setlist_page: ViewSetlist = {prefix: "/groups/setlists/create-proposal/"}
 
-  // u1: User = {username:"john", password:"123"}
+  john: User = {username:"john"}
   // g1: Group = {name:"John's Group", members:[u1]}
 
   l: Landing = {user_ok_redirect_route: "/app/home"}
@@ -130,6 +135,7 @@ app Accord {
   register: Route = {path: "register", widget: Register}
   groups: Route = {path: "groups", widget: Groups}
   create_group: Route = {path: "groups/create", widget: CreateGroup}
+  add_member: Route = {path: "groups/add-member/:group_id", widget: AddMember}
   view_group: Route = {path: "groups/:group_id", widget: ViewGroup}
   create_setlists: Route = {path: "groups/create-setlist/:group_id", widget: CreateSetlist}
   view_setlist: Route = {path: "groups/setlists/:list_id", widget: ViewSetlist}

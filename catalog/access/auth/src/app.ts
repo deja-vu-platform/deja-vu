@@ -64,7 +64,9 @@ const schema = grafo
         // TODO: promisify
         const hash = bcrypt.hashSync(password, 10);
         const user = {
-          username: username, password: hash, atom_id: uuid.v4()};
+          // Note: We use username as atom ID. Guaranteed to be unique
+          // by Validation.userIsNew
+          username: username, password: hash, atom_id: username};
         return mean.db.collection("users")
           .insertOne(user)
           .then(write_res => {
