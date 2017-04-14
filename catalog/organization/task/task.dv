@@ -1,0 +1,28 @@
+cliche Task {
+  data Task {
+    name: Text,
+    assigner: Assigner,
+    assignee: Assignee,
+    expiration_date: Date,
+    completed: Boolean,
+    approved: Boolean
+  }
+
+  data Assigner {
+    name: Text
+  }
+
+  data Assignee {
+    name: Text
+  }
+
+  widget CreateTask {
+    assigner: Assigner
+  }
+
+  // see your uncompleted tasks and your completed tasks
+  widget ShowTasks{
+    assignee: Assignee
+  }
+  
+}

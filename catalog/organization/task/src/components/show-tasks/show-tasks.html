@@ -1,0 +1,17 @@
+<h1> Uncompleted Tasks </h1>
+<ul *ngIf="uncompletedTasks && uncompletedTasks.length > 0" class="list-group">
+  <li *ngFor="let task of uncompletedTasks" class="list-group-item">
+    <div class="row">
+      {{task.name}}
+    </div>
+  </li>
+</ul>
+
+<h1> Completed Tasks </h1>
+<ul *ngIf="completedTasks && completedTasks.length > 0" class="list-group">
+  <li *ngFor="let task of completedTasks" class="list-group-item">
+    <div class="row">
+      {{task.name}}
+    </div>
+  </li>
+</ul>
