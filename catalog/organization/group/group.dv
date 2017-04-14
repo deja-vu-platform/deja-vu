@@ -1,0 +1,60 @@
+cliche Group {
+    // Member of a Group
+    data Member {
+        name: Text
+    }
+
+    // Named collection of group members
+    data Group {
+        name: Text,
+        members: [Member]
+    }
+
+    // Gets the current group from a route parameter
+    widget GroupFromRoute {
+        group: Group
+    }
+
+    // Displays the members of a group
+    widget ShowGroup uses ShowMember {
+        group: Group
+    }
+
+    // Button that allows a user to open a group
+    widget RedirectToGroup {
+        group: Group,
+        prefix: Text
+    }
+
+    // Displays an overview of a group, like a light version of ShowGroup
+    widget ShowGroupOverview {
+        group: Group
+    }
+
+    // Displays a member of a group
+    widget ShowMember {
+        member: Member
+    }
+
+    // Shows which groups a Member belongs to, to illustrate
+    // a many-to-many relationship
+    widget ShowGroupsByMember uses ShowGroupOverview {
+        member: Member
+    }
+
+    // Create a new group
+    widget NewGroup {}
+
+    // Create a new group with some initial member
+    widget NewGroupWithInitialMember {
+        initialMember: Member,
+        groupCreatedRedirectRoute: Text
+    }
+
+    // Add an existing member by ID
+    widget AddExistingMember {
+        member: Member,
+        group: Group,
+        submit_ok: Boolean
+    }
+}

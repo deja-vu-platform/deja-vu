@@ -15,6 +15,7 @@ export class SignOutComponent {
   signOut() {
     localStorage.removeItem("id_token");
     localStorage.removeItem("username");
+    localStorage.removeItem("atom_id");
     this.signout_ok.value = true;
   }
 }

@@ -15,7 +15,7 @@ cliche List {
     list: List
   }
 
-  widget ShowList {
+  widget ShowList uses ShowItem {
     list: List
   }
 
@@ -23,10 +23,27 @@ cliche List {
     item: Item
   }
 
+  widget RedirectToList {
+    list: List,
+    prefix: Text
+  }
+
+  widget RedirectToItem {
+    item: Item,
+    prefix: Text
+  }
+
+  widget ListFromRoute {
+    list: List
+  }
+
+  widget ShowListOverview {
+    list: List
+  }
+
   widget AddItem {
     item: Item,
     list: List,
     submit_ok: Boolean
   }
-  
 }

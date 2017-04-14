@@ -1,0 +1,143 @@
+app Accord {
+
+  use access/Auth[User: User]
+
+  use organization/Group[
+    User: Member,
+    SongGroup: Group,
+    LinkToGroup replaces ShowGroupOverview in ShowGroupsByMember
+  ]
+
+  use organization/List[
+    Setlist: Item,
+    SongGroup: List,
+    LinkToSetlist replaces ShowItem in ShowList
+  ] as SetlistList
+
+  use organization/List[
+    Song: Item,
+    Setlist: List,
+    ShowSong replaces ShowItem in ShowList
+  ] as SongList
+
+  use community/Rating[
+    User: Source,
+    Song: Target
+  ]
+
+  data User {
+    username: Text
+  }
+
+  data SongGroup {
+    name: Text,
+    members: [User],
+    items: [Setlist]
+  }
+
+  data Song {
+    name: Text
+  }
+
+  data Setlist {
+    name: Text,
+    songs: [Song]
+  }
+
+  data SetlistCollection {
+    name: Text,
+    members: [Setlist]
+  }
+
+  // The landing page gives the user the option to sign in or register
+  main widget Landing {
+    user_ok_redirect_route: Text
+  }
+
+  // The about page lets the user see an explanation of the project
+  widget About {
+  }
+
+  // The Register page lets the user create a new account
+  widget Register {
+    user_ok_redirect_route: Text
+  }
+
+  // Allows a user to view existing groups and go to the CreateGroup page
+  widget Groups {
+    user: User
+  }
+
+  // Create a new group
+  widget CreateGroup {
+    initialMember: User,
+    groupCreatedRedirectRoute: Text
+  }
+
+  // Add a member to the group
+  widget AddMember {
+    group: SongGroup
+  }
+
+  // View the information about a group
+  widget ViewGroup {
+    group: SongGroup,
+    prefix: Text
+  }
+
+  // View a setlist
+  widget ViewSetlist {
+    list: Setlist,
+    prefix: Text
+  }
+
+  // Show a song on the view setlist page
+  widget ShowSong {
+    item: Song
+  }
+
+  // Links to a group on the Groups view page
+  widget LinkToGroup {
+    group: SongGroup,
+    prefix: Text
+  }
+
+  // Links to a setlist on the Group view page
+  widget LinkToSetlist {
+    setlist: Setlist,
+    prefix: Text
+  }
+
+  // Create a new setlist
+  widget CreateSetlist {
+    list: SongGroup
+  }
+
+  // Create a new proposal
+  widget CreateProposal {
+    list: Setlist
+  }
+
+  create_group_page: CreateGroup = {groupCreatedRedirectRoute: "/groups"}
+  ltg: LinkToGroup = {prefix: "/groups"}
+  lts: LinkToSetlist = {prefix: "/groups/setlists"}
+  view_group_page: ViewGroup = {prefix: "/groups/create-setlist"}
+  view_setlist_page: ViewSetlist = {prefix: "/groups/setlists/create-proposal/"}
+
+  john: User = {username:"john"}
+  // g1: Group = {name:"John's Group", members:[u1]}
+
+  l: Landing = {user_ok_redirect_route: "/app/home"}
+  reg: Register = {user_ok_redirect_route: "/groups"}
+
+  landing_route: Route = {path: "landing", widget: Landing}
+  about: Route = {path: "about", widget: About}
+  register: Route = {path: "register", widget: Register}
+  groups: Route = {path: "groups", widget: Groups}
+  create_group: Route = {path: "groups/create", widget: CreateGroup}
+  add_member: Route = {path: "groups/add-member/:group_id", widget: AddMember}
+  view_group: Route = {path: "groups/:group_id", widget: ViewGroup}
+  create_setlists: Route = {path: "groups/create-setlist/:group_id", widget: CreateSetlist}
+  view_setlist: Route = {path: "groups/setlists/:list_id", widget: ViewSetlist}
+  create_proposal: Route = {path: "groups/setlists/create-proposal/:list_id", widget: CreateProposal}
+}
