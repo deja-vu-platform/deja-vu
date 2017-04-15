@@ -1,0 +1,39 @@
+cliche Market {
+  data Party {
+    balance: Number
+  }
+
+  data Good {
+    name: Text,
+    offer_price: Number,
+    transaction_price: Number,
+    seller: Party,
+    buyer: Party
+  }
+
+  // show goods classified into whether you can afford them or not
+  widget AffordTable {
+    buyer: Party
+  }
+
+  // good.transaction_price = good.offer_price * fraction
+  widget BuyGoodAtFractionOfPrice {
+    good: Good,
+    fraction: Number,
+    buyer: Party
+  }
+
+  // textbox to input price
+  widget CreateGood {
+    seller: Party
+  }
+
+  widget ShowBalance {
+    party: Party
+  }
+
+  // textbox to enter a number
+  widget AddAmount {
+    party: Party
+  }
+}
