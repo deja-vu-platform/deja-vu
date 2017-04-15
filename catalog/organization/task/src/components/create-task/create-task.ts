@@ -21,6 +21,19 @@ export class CreateTaskComponent {
       private _graphQlService: GraphQlService,
       private _elementRef: ElementRef) {}
 
+  dvAfterInit() {
+    this._graphQlService
+      .get(`
+        assignee_all {
+          atom_id,
+          name
+        }
+      `)
+      .subscribe(data => {
+        this.assignee_options = data.assignee_all;
+      });
+  }
+
   onSubmit() {
     let expirationDateText: Element =
       document.getElementById("expiration-date-text");

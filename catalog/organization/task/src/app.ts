@@ -82,12 +82,12 @@ const schema = grafo
   })
   .add_query({
     name: "tasks",
-    "type": "Task",
+    type: "[Task]",
     args: {
       assignee_id: {"type": graphql.GraphQLString}
     },
     resolve: (root, {assignee_id}) => {
-      return mean.db.collection("tasks").find({"assignee.id": assignee_id});
+      return mean.db.collection("tasks").find({"assignee.atom_id": assignee_id}).toArray();
     }
   })
   .schema();
@@ -97,15 +97,20 @@ Helpers.serve_schema(mean.ws, schema);
 
 grafo.init().then(_ => {
   if (mean.debug) {
-    mean.db.collection("tasks").insertOne(
-      {atom_id: "1", name: "Finish homework",
-      assigner: {atom_id: "2"}, assignee: {atom_id: "3"},
-      completed: false, approved: false},
+    mean.db.collection("tasks").insertMany([
+      {atom_id: "1", name: "Finish homework", completed: false,
+      assigner: {atom_id: "3"}, assignee: {atom_id: "4"}},
+      {atom_id: "2", name: "Do laundry", completed: true,
+      assigner: {atom_id: "3"}, assignee: {atom_id: "4"}}],
       (err, res) => { if (err) throw err; });
 
-    mean.db.collection("users").insertMany([
-      {name: "Bob", atom_id: "2"},
-      {name: "Joe", atom_id: "3"}],
+    mean.db.collection("assigners").insertOne(
+      {name: "Bob", atom_id: "3"},
+      (err, res) => { if (err) throw err; });
+
+    mean.db.collection("assignees").insertMany([
+      {name: "Joe", atom_id: "4"},
+      {name: "Mark", atom_id: "5"}],
       (err, res) => { if (err) throw err; });
 
   }

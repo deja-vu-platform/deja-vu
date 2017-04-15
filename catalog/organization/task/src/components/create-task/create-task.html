@@ -6,7 +6,7 @@
   </fieldset>
   <fieldset class="form-group">
     <label class="sr-only" for="task-assignee">Assigned To</label>
-    <select id="task-assignee" [(ngModel)]="assignee.atom_id" name="task-assignee">
+    <select required id="task-assignee" [(ngModel)]="assignee.atom_id" name="task-assignee">
       <option *ngFor="let assignee of assignee_options" value="assignee.atom_id">{{assignee.name}}</option>
     </select>
   </fieldset>
@@ -22,6 +22,6 @@
   </fieldset>
   <div class="form-group">
     <button type="submit" class="btn btn-default btn-sm pull-right"
-     [disabled]="!createTaskForm.valid">Create Task</button>
+     >Create Task</button>
   </div>
 </form>
