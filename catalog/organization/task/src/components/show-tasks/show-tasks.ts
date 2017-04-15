@@ -9,8 +9,8 @@ import {Widget} from "client-bus";
 })
 export class ShowTasksComponent {
   assignee = {atom_id: undefined};
-  uncompleted_tasks = [];
-  completed_tasks = [];
+  uncompletedTasks = [];
+  completedTasks = [];
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -19,16 +19,17 @@ export class ShowTasksComponent {
 
     this._graphQlService
     .get(`
-      tasks(assignee_id: "${this.assignee.atom_id}") {
-        name
+      tasks(assignee_id: "${this.assignee.atom_id}"){
+        name,
+        completed
       }
     `)
-    .subscribe(tasks => {
-      for (let task of tasks) {
+    .subscribe(data => {
+      for (let task of data.tasks) {
         if (task.completed) {
-           this.completed_tasks.push(task);
+           this.completedTasks.push(task);
         } else {
-           this.uncompleted_tasks.push(task);
+           this.uncompletedTasks.push(task);
         }
       }
     });
