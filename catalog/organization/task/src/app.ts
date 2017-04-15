@@ -53,7 +53,7 @@ const schema = grafo
     }
   })
  .add_mutation({
-    name: "CreateTask",
+    name: "createTask",
     "type": "Task",
     args: {
       name: {"type": graphql.GraphQLString},

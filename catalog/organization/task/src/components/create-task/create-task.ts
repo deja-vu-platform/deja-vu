@@ -43,14 +43,13 @@ export class CreateTaskComponent {
       .post(`
         createTask(
           name: "${this.task.name}",
-          assigner: "${this.assigner.atom_id}"
-          assignee: "${this.assignee.atom_id}",
+          assigner_id: "${this.assigner.atom_id}"
+          assignee_id: "${this.assignee.atom_id}",
           expires_on: "${this.expiration_date}") {
           atom_id
         }
       `)
-      .subscribe(atom_id => {
-        this.task.atom_id = atom_id;
+      .subscribe(res => {
         expirationDateText["value"] = "";
         this.expiration_date = "";
       });
