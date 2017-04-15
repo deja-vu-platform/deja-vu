@@ -1,0 +1,16 @@
+<form (ngSubmit)="onSubmit()" #createGoodForm="ngForm" class="form-horizontal">
+  <fieldset class="form-group">
+    <label class="sr-only" for="good-name">Good Name</label>
+    <input required id="good-name" class="form-control" name="good-name" type="text"
+      [(ngModel)]="good.name"placeholder="Good Name" />
+  </fieldset>
+  <fieldset class="form-group">
+    <label class="sr-only" for="price">Price</label>
+    <input required id="price" class="form-control" name="price" type="number" min="0"
+      [(ngModel)]="good.offer_price"/>
+  </fieldset>
+  <div class="form-group">
+    <button type="submit" class="btn btn-default btn-sm pull-right"
+     [disabled]="!createGoodForm.valid">Create Good</button>
+  </div>
+</form>
