@@ -19,6 +19,6 @@ export class ShowEventComponent {
       hour: "numeric", minute: "numeric"
     };
     const d = new Date(date);
-    return d.toLocaleDateString(String(d.getTimezoneOffset()), opts);
+    return d.toLocaleDateString("en-US", opts);
   }
 }
