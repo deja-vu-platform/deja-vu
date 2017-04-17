@@ -5,7 +5,7 @@ h1, h2, h4 {
 	text-align: center;
 }
 
-body {
+.body {
 	/*background: radial-gradient(white, #b7d1e5);*/
 	background: #b7d1e5;
 	font-family: 'Roboto', sans-serif;
@@ -103,50 +103,49 @@ div.scroll {
     color: black;
 }
 </style>
-<div id="parent-homepage-container">
-  <nav class="navbar navbar-default navbar-fixed-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="#">ChoreStar</a>
+<div class="body">
+  <div id="parent-homepage-container">
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">ChoreStar</a>
+        </div>
+        <dv-widget name="SignOutWithRedirect" of="ParentAuth" [fields]="fields">
+        </dv-widget>
       </div>
-      <dv-widget name="SignOutWithRedirect" of="ParentAuth" [fields]="fields">
-      </dv-widget>
-    </div>
-  </nav>
-
-  <div id="create-things-admin">
-    <div id="new-chore"></div>
-
-    <h2>Add a New Reward</h2>
-    <!-- Button to trigger new reward modal -->
-    <button type="button" class="btn btn-default btn-lg" data-toggle="modal" data-target="#new-reward-modal">Add New Reward</button>
-
-    <!-- New reward modal -->
-    <div class="modal fade" id="new-reward-modal" role="dialog">
-      <div class="modal-dialog">
-        <!-- Modal Content -->
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Add a New Reward</h4>
+    </nav>
+  
+    <div class="row">
+      <div class="col-md-offset-2 col-md-7">
+        <div id="create-things-admin">
+          <div class="row">
+            <h2>Add a New Chore</h2>
+            <dv-widget name="CreateTask" of="Task" [fields]="fields">
+            </dv-widget>
           </div>
-          <div class="modal-body blue-background">
-            <div id="new-reward"></div>
+          <div class="row">
+            <h2>Add a New Reward</h2>
+            <dv-widget name="CreateGood" of="Market" [fields]="fields">
+            </dv-widget>
+          </div>
+          <div class="row">
+            <h2>Add a New Child</h2>
+            <dv-widget name="RegisterWithRedirect" of="ChildAuth" [fields]="fields">
+            </dv-widget>
+          </div>
+          <div class="row">
+            <h2>Chores to Approve</h2>
+            Tasks pending approval
+          </div>
+          <div class="row">
+            <h2>Rewards to Approve</h2>
+          </div>
+          <div class="row">
+            <h2>Offered Rewards</h2>
+            Goods Offered
           </div>
         </div>
       </div>
     </div>
-
-    <div id="new-child"></div>
-
   </div>
-  <div id="chores-to-approve">
-  </div>
-  <div id="rewards-to-approve">
-  </div>
-  <div id="assigned-chores">
-  </div>
-  <div id="offered-rewards">
-  </div>
-
 </div>

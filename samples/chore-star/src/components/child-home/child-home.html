@@ -5,7 +5,7 @@ h1, h2, h4 {
 	text-align: center;
 }
 
-body {
+.body {
 	/*background: radial-gradient(white, #b7d1e5);*/
 	background: #b7d1e5;
 	font-family: 'Roboto', sans-serif;
@@ -103,18 +103,53 @@ div.scroll {
     color: black;
 }
 </style>
-
-<nav class="navbar navbar-default navbar-fixed-top">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">ChoreStar</a>
+<div class="body">
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">ChoreStar</a>
+      </div>
+      <dv-widget name="SignOutWithRedirect" of="ChildAuth" [fields]="fields">
+      </dv-widget>
     </div>
-    <dv-widget name="SignOutWithRedirect" of="ChildAuth" [fields]="fields">
-    </dv-widget>
+  </nav>
+  <div id="child-homepage-container">
+    <div id="child-heading">
+      <h1> Hi ShowUsername </h1>
+      <div class="container-fluid" id="child-heading-container">
+          <div class="col-xs-2 col-xs-offset-4"><h4> StarBank Total: </h4></div> 
+          <div class="col-xs-2 glyphicon glyphicon-star icon-size">
+            <dv-widget name="ShowBalance" of="Market" [fields]="fields"></dv-widget>
+          </div>
+      </div>
+    </div>
+    <div class="container-fluid" id="child-data-container">
+      <div id="child-chores" class="col-md-6"> 
+        <div class="blue-background tall" id="child-chores-table">
+          <h2>Chores</h2>
+          <h4>Uncompleted Chores</h4>
+          <div class="row left-align-row">
+             Show uncompleted tasks
+          </div>
+          <h4>Chores Pending Approval</h4>
+          <div class="row left-align-row">
+             Show unapproved tasks
+          </div>
+          <h4>Completed and Approved Chores</h4>
+          <div class="row left-align-row">
+             Show completed and approved tasks 
+          </div>
+        </div>
+      </div>
+
+      <div id="child-rewards" class="col-md-6"> 
+        <div class="blue-background">
+          <h2>Rewards</h2>
+             Show goods
+          <h4>Afford Reward</h4>
+             Afford table
+        </div>
+      </div>
+    </div>
   </div>
-</nav>
-<!--
-<div id="child-homepage-container" data-userid="{{userId}}">
-  <div class="container-fluid" id="child-data-container"></div>
 </div>
--->

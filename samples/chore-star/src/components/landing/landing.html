@@ -5,7 +5,7 @@ h1, h2, h4 {
 	text-align: center;
 }
 
-body {
+.body {
 	/*background: radial-gradient(white, #b7d1e5);*/
 	background: #b7d1e5;
 	font-family: 'Roboto', sans-serif;
@@ -103,27 +103,32 @@ div.scroll {
     color: black;
 }
 </style>
-<div id="index-forms">
-  <div class="container-fluid">
-    <div class="col-md-5 col-md-offset-1 tall">
-        <div class="blue-background" id="login">
-          <h2>Parent Login</h2>
-          <dv-widget name="SignInWithRedirect" of="ParentAuth"
-           [fields]="fields"></dv-widget>
+<div class="body">
+  <div id="index-container">
+    <h1>Welcome to <span class="logo">ChoreStar</span></h1>
+    <div id="index-forms">
+      <div class="container-fluid">
+        <div class="col-md-5 col-md-offset-1 tall">
+            <div class="blue-background" id="login">
+              <h2>Parent Login</h2>
+              <dv-widget name="SignInWithRedirect" of="ParentAuth"
+               [fields]="fields"></dv-widget>
+            </div>
+            <div class="blue-background" id="register">
+              <h2>Parent Registration</h2>
+              <dv-widget name="RegisterWithRedirect" of="ParentAuth"
+               [fields]="fields"></dv-widget>
+            </div>
         </div>
-        <div class="blue-background" id="register">
-          <h2>Parent Registration</h2>
-          <dv-widget name="RegisterWithRedirect" of="ParentAuth"
-           [fields]="fields"></dv-widget>
+    
+        <div class="col-md-5">
+            <div class="margin blue-background" id="login-child">
+              <h2>Child Login</h2>
+              <dv-widget name="SignInWithRedirect" of="ChildAuth"
+               [fields]="fields"></dv-widget>
+            </div>
         </div>
-    </div>
-
-    <div class="col-md-5">
-        <div class="margin blue-background" id="login-child">
-          <h2>Child Login</h2>
-          <dv-widget name="SignInWithRedirect" of="ChildAuth"
-           [fields]="fields"></dv-widget>
-        </div>
+      </div>
     </div>
   </div>
 </div>

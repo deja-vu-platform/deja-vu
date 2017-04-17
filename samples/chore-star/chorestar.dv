@@ -1,6 +1,8 @@
 app ChoreStar {
   use access/Auth as ParentAuth
   use access/Auth as ChildAuth
+  use community/Task
+  use community/Market
 
   main widget Landing {
     parent_ok_redirect: Text,
@@ -14,7 +16,9 @@ app ChoreStar {
   }
 
   l: Landing = {
-    parent_ok_redirect: "/parent-home", child_ok_redirect: "/child-home"
+    // need to be able to put bindings in widgets
+    child_ok_redirect: "/child-home",
+    parent_ok_redirect: "/parent-home"
   }
 
   ph: ParentHome = {signout_redirect: "/landing"}
