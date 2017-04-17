@@ -1,0 +1,26 @@
+app ChoreStar {
+  use access/Auth as ParentAuth
+  use access/Auth as ChildAuth
+
+  main widget Landing {
+    parent_ok_redirect: Text,
+    child_ok_redirect: Text
+  }
+  widget ParentHome {
+    signout_redirect: Text
+  }
+  widget ChildHome {
+    signout_redirect: Text
+  }
+
+  l: Landing = {
+    parent_ok_redirect: "/parent-home", child_ok_redirect: "/child-home"
+  }
+
+  ph: ParentHome = {signout_redirect: "/landing"}
+  ch: ChildHome = {signout_redirect: "/landing"}
+
+  landing_route: Route = {path: "landing", widget: Landing}
+  parent_home_route: Route = {path: "parent-home", widget: ParentHome}
+  child_home_route: Route = {path: "child-home", widget: ChildHome}
+}
