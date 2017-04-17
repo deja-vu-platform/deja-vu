@@ -1,8 +1,13 @@
 app ChoreStar {
-  use access/Auth as ParentAuth
-  use access/Auth as ChildAuth
-  use community/Task
-  use community/Market
+  use access/Auth[Parent: User] as ParentAuth
+  use access/Auth[Child: User] as ChildAuth
+  use community/Task[Chore: Task, Parent: Assigner, Child: Assignee]
+  use community/Market[Parent: Party, Child: Party]
+  use community/Rating[Chore: Target]
+
+  data Parent { name: text }
+  data Child { name: text }
+  data Chore {}
 
   main widget Landing {
     parent_ok_redirect: Text,
