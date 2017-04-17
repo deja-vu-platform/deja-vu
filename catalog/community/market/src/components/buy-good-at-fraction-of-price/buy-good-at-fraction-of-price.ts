@@ -3,10 +3,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({
-  fqelement: "dv-organization-market",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
 export class BuyGoodAtFractionOfPriceComponent {
   good = {atom_id: undefined};
   fraction: number;

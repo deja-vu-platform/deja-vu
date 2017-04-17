@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
-  require("mean-loader").GruntTask.task(
+  require("mean-loader").GruntTask.cliche_task(
       grunt,
-      "dv-organization-market",
-      [{name: "AffordTable"}, {name: "CreateGood"}, {name: "AddAmount"}, 
-        {name: "ShowBalance"}, {name: "BuyGoodAtFractionOfPrice"}]);
+      "Market",
+      ["AffordTable", "CreateGood", "AddAmount", 
+       "ShowBalance", "BuyGoodAtFractionOfPrice"]);
 }
