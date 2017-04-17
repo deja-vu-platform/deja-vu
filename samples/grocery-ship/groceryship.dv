@@ -1,0 +1,7 @@
+app GroceryShip {
+  use access/Auth
+  use community/Task
+  use community/Market
+  use community/Rating
+  use organization/List
+}
