@@ -1,42 +1,7 @@
 app Morg {
-  use organization/Allocator[
-    WeeklyGroupMeeting: Allocation, GroupMeeting: Resource,
-    Member: Consumer]
-  use organization/Event[
-    WeeklyGroupMeeting: WeeklyEvent, GroupMeeting: Event, Member: Guest,
-    ShowGroupMeeting replaces ShowEvent in ChooseAndShowWeeklyEvent]
-  use messaging/Email[GroupMeeting: Content]
+  use organization/Event
 
-  data WeeklyGroupMeeting {
-    meetings: GroupMeeting,
-    guests: Member
-  }
-
-  data GroupMeeting {
-    champion: Member
-  }
-
-  data Member {
-    name: Text
-  }
-
-  m1: Member = {name: "Alyssa"}
-  m2: Member = {name: "Ben"}
-
-  data GroupEmailAddress {}
-
-  // Shows a form to create a new weekly group meeting and lets the user choose
-  // from a dropdown and display a weekly group meeting
   main widget Home {}
 
-  // Shows the date of the event, the name of the champion, and a button to
-  // send an email to the group with information regarding the event
-  widget ShowGroupMeeting {
-    weekly_group_meeting: WeeklyGroupMeeting,
-    group_meeting: GroupMeeting,
-    email: Text
-  }
-
-  s: ShowGroupMeeting = {email: "deja-vu@mit.edu"}
   home_route: Route = {path: "home", widget: Home}
 }
