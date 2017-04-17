@@ -39,7 +39,6 @@ const schema = grafo
     name: "Allocation",
     fields: {
       atom_id: {"type": graphql.GraphQLString},
-      consumers: {"type": "[Consumer]"},
       resources: {"type": "[Resource]"}
     }
   })
@@ -54,42 +53,42 @@ const schema = grafo
     name: "Resource",
     fields: {
       atom_id: {"type": graphql.GraphQLString},
-      consumed_by: {
+      assigned_to: {
         "type": "Consumer",
         resolve: (resource) => {
-          if (resource.consumed_by === undefined) {
+          if (resource.assigned_to === undefined) {
             // todo: need to lock until this is done
             // Trigger round-robin allocation
             return mean.db.collection("allocations")
               .findOne({resources: {atom_id: resource.atom_id}})
-              .then(allocation => {
-                if (_u.isEmpty(allocation.consumers)) {
-                  throw new Error("There are no consumers");
-                }
+              .then(allocation => mean.db.collection("consumers")
+                .find()
+                .toArray()
+                .then(consumers => {
+                  let assigned_to = "";
+                  const updates = [];
 
-                let consumed_by = "";
-                const updates = [];
-
-                let current_consumer_index = 0;
-                _u.each(allocation.resources, (r: any) => {
-                  const c = allocation.consumers[current_consumer_index];
-                  console.log(`Allocating ${r.atom_id} to ${c.atom_id}`)
-                  if (r.atom_id === resource.atom_id) {
-                    consumed_by = c.atom_id;
-                  }
-                  updates.push(
-                    mean.db.collection("resources")
-                      .updateOne({atom_id: r.atom_id},
-                                 {$set: {consumed_by: {atom_id: c.atom_id}}}));
-                  current_consumer_index = (current_consumer_index + 1) % allocation.consumers.length;
-                });
+                  let current_consumer_index = 0;
+                  _u.each(allocation.resources, (r: any) => {
+                    const c = consumers[current_consumer_index];
+                    console.log(`Allocating ${r.atom_id} to ${c.atom_id}`)
+                    if (r.atom_id === resource.atom_id) {
+                      assigned_to = c.atom_id;
+                    }
+                    updates.push(
+                      mean.db.collection("resources")
+                        .updateOne({atom_id: r.atom_id},
+                                   {$set: {assigned_to: {atom_id: c.atom_id}}}));
+                    current_consumer_index = (
+                      current_consumer_index + 1) % consumers.length;
+                  });
                 return Promise.all(updates)
                   .then(_ => mean.db.collection("consumers")
-                      .findOne({atom_id: consumed_by}));
-              })
+                      .findOne({atom_id: assigned_to}));
+              }));
           } else {
             return mean.db.collection("consumers")
-              .findOne({atom_id: resource.consumed_by.atom_id});
+              .findOne({atom_id: resource.assigned_to.atom_id});
           }
         }
       }
@@ -108,7 +107,7 @@ const schema = grafo
         Validation.consumerExists(champion_atom_id)
       ])
       .then(consumer => {
-        let updateOp = { $set: { "consumed_by.atom_id": champion_atom_id } };
+        let updateOp = { $set: { "assigned_to.atom_id": champion_atom_id } };
         return mean.db.collection("resources")
           .updateOne(
             { atom_id: resource_atom_id },
