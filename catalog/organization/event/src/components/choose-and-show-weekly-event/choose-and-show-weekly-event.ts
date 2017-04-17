@@ -81,7 +81,11 @@ export class ChooseAndShowWeeklyEventComponent {
         }
       `)
       .map(data => data.weeklyevent_by_id.events)
-      .flatMap((events: Event[], unused_ix) => Observable.from(events))
+      .flatMap((events: Event[], unused_ix) => Observable
+        .from(events.sort((e1, e2) => {
+          return new Date(e1.start_date).getTime() -
+                 new Date(e2.start_date).getTime();
+        })))
       .map(e => _u.extendOwn(this._clientBus.new_atom("Event"), e))
       .map(e => ({event: e}))
       .map(e_field => _u.extendOwn(e_field, this.fields))
