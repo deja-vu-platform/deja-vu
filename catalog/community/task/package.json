@@ -1,11 +1,9 @@
 {
-  "name": "dv-organization-task",
+  "name": "dv-community-task",
   "version": "0.0.1",
   "scripts": {
     "lib": "grunt dv-mean:lib",
-    "build.dev": "grunt dv-mean:build",
-    "serve.dev": "grunt dv-mean:serve",
-    "start": "grunt dv-mean:serve"
+    "start": "grunt dv-mean:dev"
   },
   "license": "MIT",
   "dependencies": {
