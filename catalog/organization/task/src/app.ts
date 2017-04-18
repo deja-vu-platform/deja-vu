@@ -80,14 +80,92 @@ const schema = grafo
         .then(_ => task)
       } 
   })
+ .add_mutation({
+    name: "completeTask",
+    "type": graphql.GraphQLBoolean,
+    args: {
+      task_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (_, {task_id}) => {
+      const update_op = {$set: {completed: true}};
+      return mean.db.collection("tasks")
+        .updateOne({atom_id: task_id}, update_op)
+        .then(_ => bus.update_atom("Task", task_id, update_op))
+        .then(_ => true);
+      }
+  })
+ .add_mutation({
+    name: "approveTask",
+    "type": graphql.GraphQLBoolean,
+    args: {
+      task_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (_, {task_id}) => {
+      const update_op = {$set: {approved: true}};
+      return mean.db.collection("tasks")
+        .updateOne({atom_id: task_id}, update_op)
+        .then(_ => bus.update_atom("Task", task_id, update_op))
+        .then(_ => true);
+      }
+  })
   .add_query({
-    name: "tasks",
+    name: "uncompletedTasks",
     type: "[Task]",
     args: {
       assignee_id: {"type": graphql.GraphQLString}
     },
     resolve: (root, {assignee_id}) => {
-      return mean.db.collection("tasks").find({"assignee.atom_id": assignee_id}).toArray();
+      return mean.db.collection("tasks").find({ $and: 
+        [{"assignee.atom_id": assignee_id}, {completed: false}] })
+        .toArray();
+    }
+  })
+  .add_query({
+    name: "unapprovedTasks",
+    type: "[Task]",
+    args: {
+      assignee_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {assignee_id}) => {
+      return mean.db.collection("tasks").find({ $and: 
+        [{"assignee.atom_id": assignee_id}, {completed: true},
+        {approved: false}] }).toArray();
+    }
+  })
+  .add_query({
+    name: "approvedTasks",
+    type: "[Task]",
+    args: {
+      assignee_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {assignee_id}) => {
+      return mean.db.collection("tasks").find({ $and: 
+        [{"assignee.atom_id": assignee_id}, {approved: true}] })
+        .toArray();
+    }
+  })
+  .add_query({
+    name: "assignedTasks",
+    type: "[Task]",
+    args: {
+      assigner_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {assigner_id}) => {
+      return mean.db.collection("tasks").find({ $and: 
+        [{"assigner.atom_id": assigner_id}, 
+        {completed: false}] }).toArray();
+    }
+  })
+  .add_query({
+    name: "pendingApprovalTasks",
+    type: "[Task]",
+    args: {
+      assigner_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {assigner_id}) => {
+      return mean.db.collection("tasks").find({ $and: 
+        [{"assigner.atom_id": assigner_id}, {completed: true},
+        {approved: false}] }).toArray();
     }
   })
   .schema();
@@ -98,19 +176,20 @@ Helpers.serve_schema(mean.ws, schema);
 grafo.init().then(_ => {
   if (mean.debug) {
     mean.db.collection("tasks").insertMany([
-      {atom_id: "1", name: "Finish homework", completed: false,
-      assigner: {atom_id: "3"}, assignee: {atom_id: "4"}},
-      {atom_id: "2", name: "Do laundry", completed: true,
-      assigner: {atom_id: "3"}, assignee: {atom_id: "4"}}],
+      {atom_id: "1", name: "Eat", completed: false, approved: false,
+      assigner: {atom_id: "10"}, assignee: {atom_id: "11"}},
+      {atom_id: "2", name: "Sleep", completed: true, approved: false,
+      assigner: {atom_id: "10"}, assignee: {atom_id: "11"}},
+      {atom_id: "3", name: "Work", completed: true, approved: true,
+      assigner: {atom_id: "10"}, assignee: {atom_id: "11"}}],
       (err, res) => { if (err) throw err; });
 
     mean.db.collection("assigners").insertOne(
-      {name: "Bob", atom_id: "3"},
+      {name: "Bob", atom_id: "10"},
       (err, res) => { if (err) throw err; });
 
-    mean.db.collection("assignees").insertMany([
-      {name: "Joe", atom_id: "4"},
-      {name: "Mark", atom_id: "5"}],
+    mean.db.collection("assignees").insertOne(
+      {name: "Joe", atom_id: "11"},
       (err, res) => { if (err) throw err; });
 
   }
