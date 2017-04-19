@@ -1,27 +1,18 @@
 app Morg {
   use organization/Event[
     GroupMeeting: Event,
-    WeeklyGroupMeeting: WeeklyEvent, 
     ShowGroupMeeting replaces ShowEvent in
       ChooseAndShowWeeklyEvent]
-  use messaging/Email[
-    GroupMeeting: Content]
-  use organization/Allocator[
-    GroupMeeting: Resource, WeeklyGroupMeeting: Allocation, 
-    Member: Consumer]
+  use messaging/Email[GroupMeeting: Content]
 
   data GroupMeeting {}
-  data WeeklyGroupMeeting { group_meetings: GroupMeeting }
-  data Member { name: Text }
-
-  alyssa: Member = {name: "Alyssa"}
-  ben: Member = {name: "Ben"}
 
   main widget Home {}
   widget ShowGroupMeeting {
     email: Text,
     group_meeting: GroupMeeting
   }
+
   widget EmailReminder { group_meeting: GroupMeeting }
 
   s: ShowGroupMeeting = {email: "deja-vu@mit.edu"}
