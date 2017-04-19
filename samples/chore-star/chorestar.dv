@@ -1,22 +1,55 @@
 app ChoreStar {
   use access/Auth[Parent: User] as ParentAuth
   use access/Auth[Child: User] as ChildAuth
-  use community/Task[Chore: Task, Parent: Assigner, Child: Assignee]
-  use community/Market[Parent: Party, Child: Party]
-  use community/Rating[Chore: Target]
+  use community/Task[
+    Chore: Task, Parent: Assigner, Child: Assignee,
+    ShowApproveWithRating replaces ShowTask in
+      ShowPendingApprovalTasks]
+  use community/Market[
+    Chore: Good, Reward: Good, Parent: Party, Child: Party]
+  use community/Rating[Parent: Source, Chore: Target]
 
   data Parent { name: text }
   data Child { name: text }
   data Chore {}
+  data Reward {}
 
+  // SignInWithRedirect,
+  // RegisterWithRedirect of ParentAuth,
+  // SignInWithRedirect of ChildAuth
   main widget Landing {
     parent_ok_redirect: Text,
     child_ok_redirect: Text
   }
+  // LoggedIn of ParentAuth,
+  // CreateTask of Task,
+  // CreateGood of Market,
+  // Register of ChildAuth,
+  // ShowPendingApprovalTasks of Task,
+  // ShowAssignedTasks of Task,
+  // ShowGoodsToBuy of Market,
+  // ShowMyGoods of Market
   widget ParentHome {
+    parent: Parent,
     signout_redirect: Text
   }
+  // ShowTask of Task
+  // ApproveTask of Task
+  // RateTarget of Rating
+  // BuyGoodAtFractionOfPrice of Market
+  widget ShowApproveWithRating {
+    parent: Parent, chore: Chore,
+    do_buy_on_approve: boolean,
+    fractional_rating: number
+  }
+  // LoggedIn of ChildAuth
+  // ShowBalance of Market
+  // ShowUncompletedTasks of Task
+  // ShowUnnaprovedTasks of Task
+  // ShowCompletedAndApprovedTasks of Task
+  // ShowGoodsToBuy of Market
   widget ChildHome {
+    child: Child,
     signout_redirect: Text
   }
 
