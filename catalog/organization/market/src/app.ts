@@ -149,6 +149,17 @@ const schema = grafo
         });
       } 
   })
+  .add_query({
+    name: "GoodsFromSeller",
+    "type": "[Good]",
+    args: {
+      seller_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {seller_id}) => {
+      return mean.db.collection("goods")
+        .find({ "seller.atom_id": seller_id}).toArray();
+      } 
+  })
   .schema();
 
 Helpers.serve_schema(mean.ws, schema);
