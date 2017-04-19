@@ -3,5 +3,6 @@ module.exports = function(grunt) {
       grunt,
       "dv-organization-market",
       [{name: "AffordTable"}, {name: "CreateGood"}, {name: "AddAmount"}, 
-        {name: "ShowBalance"}, {name: "BuyGoodAtFractionOfPrice"}]);
+        {name: "ShowBalance"}, {name: "BuyGood"}, {name: "BuyGoodAtFractionOfPrice"},
+        {name: "ShowMyGoods"}, {name: "ShowGoodsToBuy"}]);
 }
