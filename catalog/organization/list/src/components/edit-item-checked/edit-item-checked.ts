@@ -12,6 +12,10 @@ export class EditItemCheckedComponent {
   constructor(
       private _graphQlService: GraphQlService) {}
 
+  dvAfterInit() {
+    this.item.checked = false;
+  }
+
   toggleChecked() {
     console.log("editItemChecked", this.item.atom_id);
 
