@@ -6,7 +6,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  fqelement: "dv-organization-task",
+  fqelement: "Task",
   ng2_providers: [GraphQlService],
   styles: [``]
 })
