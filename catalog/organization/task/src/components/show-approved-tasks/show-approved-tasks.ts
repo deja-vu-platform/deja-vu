@@ -3,10 +3,7 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({
-  fqelement: "dv-organization-task",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "Task", ng2_providers: [GraphQlService]})
 export class ShowApprovedTasksComponent {
   assignee = {atom_id: undefined};
   approvedTasks = [];
