@@ -9,7 +9,9 @@ export class RateTargetComponent {
   rating = { value: 0 };
   radioName = "";
 
-  _rating: 0; // Internal rating value to pass along
+  _rating = 0; // Internal rating value to pass along
+  _lastSourceAtomId = null;
+  _lastTargetAtomId = null;
 
   constructor(private _graphQlService: GraphQlService) {
     // This creates a presumably unique name for our radio buttons
@@ -42,6 +44,14 @@ export class RateTargetComponent {
    * Load a rating from the server (if any), and set the value of the widget.
    */
   loadRating() {
+    // Only make a change if one of the atom IDs changed
+    if (this.source.atom_id === this._lastSourceAtomId
+      && this.target.atom_id === this._lastTargetAtomId) {
+        return;
+      }
+    this._lastSourceAtomId = this.source.atom_id;
+    this._lastTargetAtomId = this.target.atom_id;
+
     this._graphQlService
       .get(`
         ratingBySourceTarget(source: "${this.source.atom_id}",
@@ -60,7 +70,7 @@ export class RateTargetComponent {
 
   dvAfterInit() {
     this.loadRating();
-    this.target.on_change(this.loadRating);
-    this.source.on_change(this.loadRating);
+    this.target.on_change(this.loadRating.bind(this));
+    this.source.on_change(this.loadRating.bind(this));
   }
 }

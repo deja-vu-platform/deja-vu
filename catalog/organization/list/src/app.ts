@@ -69,6 +69,7 @@ const schema = grafo
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
+      checked: {"type": graphql.GraphQLBoolean}
     }
   })
  .add_mutation({
@@ -88,7 +89,28 @@ const schema = grafo
           bus.create_atom("List", list.atom_id, list)
           ])
         .then(_ => list)
-      } 
+      }
+  })
+  .add_mutation({
+    name: "setItemChecked", // Set the state of item.checked to the given value for some item
+    type: graphql.GraphQLBoolean,
+    args: {
+      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      checked: {"type": new graphql.GraphQLNonNull(graphql.GraphQLBoolean)}
+    },
+    resolve: (_, {atom_id, checked}) => {
+      const updateOp = {
+        $set: {
+          checked: checked
+        }
+      };
+      return mean.db.collection("items")
+        .updateOne({
+          atom_id: atom_id
+        }, updateOp)
+        .then(_ => bus.update_atom("Item", atom_id, updateOp))
+        .then(_ => true);
+    }
   })
   .schema();
 
@@ -103,8 +125,8 @@ grafo.init().then(_ => {
       (err, res) => { if (err) throw err; });
 
     mean.db.collection("items").insertMany([
-      {name: "Walk the dog", atom_id: "2"},
-      {name: "Buy groceries", atom_id: "3"}], 
+      {name: "Walk the dog", checked: false, atom_id: "2"},
+      {name: "Buy groceries", checked: true, atom_id: "3"}],
       (err, res) => { if (err) throw err; });
   }
 
