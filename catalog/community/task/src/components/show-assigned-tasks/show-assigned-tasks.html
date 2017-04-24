@@ -1,0 +1,5 @@
+<ul *ngIf="assignedTasks && assignedTasks.length > 0" class="list-group">
+  <li *ngFor="let task of assignedTasks" class="list-group-item">
+    {{task.name}}
+  </li>
+</ul>

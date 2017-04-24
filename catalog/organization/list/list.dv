@@ -1,7 +1,8 @@
 cliche List {
   data List {
     name: Text,
-    items: Item
+    items: Item,
+    selected: Boolean
   }
 
   data Item {
@@ -20,6 +21,14 @@ cliche List {
   }
 
   widget ShowItem {
+    item: Item
+  }
+
+  widget ShowItemChecked {
+    item: Item
+  }
+
+  widget EditItemChecked {
     item: Item
   }
 

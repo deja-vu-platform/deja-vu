@@ -1,0 +1,32 @@
+{
+  "name": "dv-samples-morg",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node node_modules/dv-lang/lib/dv.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@angular/common": "~2.4.0",
+    "@angular/core": "~2.4.0",
+    "@angular/forms": "~2.4.0",
+    "@angular/http": "~2.4.0",
+    "core-js": "^2.4.1",
+    "client-bus": "file:../../core/client-bus",
+    "dv-messaging-email": "file:../../catalog/messaging/email",
+    "dv-organization-event": "file:../../catalog/organization/event",
+    "dv-organization-allocator": "file:../../catalog/organization/allocator",
+    "mean-loader": "file:../../core/mean-loader",
+    "dv-lang": "file:../../core/lang",
+    "reflect-metadata": "^0.1.9",
+    "rxjs": "5.0.1",
+    "server-bus": "file:../../core/server-bus",
+    "systemjs": "0.19.40",
+    "underscore": "^1.8.3",
+    "zone.js": "^0.7.4"
+  },
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "tslint": "^3.9.0",
+    "typescript": "^2.0.10"
+  }
+}

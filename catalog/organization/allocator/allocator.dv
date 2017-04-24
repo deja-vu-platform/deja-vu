@@ -1,28 +1,15 @@
-// Only one allocation per instance of the cliche
-// The allocation is triggered when the consumed_by field is first accessed. Once
-// allocated, the modification of consumers or resources will throw an error
+// Distribute resources among consumers
 cliche Allocator {
-  data Allocation {
-    consumers: Consumer,
-    resources: Resource
-  }
-  data Consumer {
-    name: Text
-  }
-  data Resource {
-    name: Text,
-    consumed_by: Consumer
-  }
+  // A resource belongs to at most one allocation
+  data Resource { name: Text, assigned_to: Consumer }
+  data Consumer { name: Text }
+  // The allocation is triggered when the assigned_to
+  // field of one of its resources is first accessed.
+  data Allocation { resources: Resource }
 
-  // Shows the name of the consumer of the given resource
-  widget ShowConsumer {
-    allocation: Allocation,
-    resource: Resource
-  }
+  // Shows the name of the consumer of the resource
+  widget ShowConsumer { resource: Resource }
 
-  // Edits the name of the consumer of the given resource
-  widget EditConsumer {
-    allocation: Allocation,
-    resource: Resource
-  }
+  // Lets the user edit the consumer of a resource
+  widget EditConsumer { resource: Resource }
 }

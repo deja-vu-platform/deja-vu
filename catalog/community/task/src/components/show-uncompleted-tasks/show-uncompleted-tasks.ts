@@ -4,10 +4,9 @@ import {Widget} from "client-bus";
 
 
 @Widget({fqelement: "Task", ng2_providers: [GraphQlService]})
-export class ShowTasksComponent {
+export class ShowUncompletedTasksComponent {
   assignee = {atom_id: undefined};
   uncompletedTasks = [];
-  completedTasks = [];
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -16,19 +15,21 @@ export class ShowTasksComponent {
 
     this._graphQlService
     .get(`
-      tasks(assignee_id: "${this.assignee.atom_id}"){
+      uncompletedTasks(assignee_id: "${this.assignee.atom_id}"){
         name,
-        completed
+        atom_id
       }
     `)
     .subscribe(data => {
-      for (let task of data.tasks) {
-        if (task.completed) {
-           this.completedTasks.push(task);
-        } else {
-           this.uncompletedTasks.push(task);
-        }
-      }
+      this.uncompletedTasks = data.uncompletedTasks;
     });
+  }
+
+  markCompleted(task) {
+    this._graphQlService
+      .post(`
+        completeTask(task_id: "${task.atom_id}")
+      `)
+      .subscribe(res => undefined);
   }
 }

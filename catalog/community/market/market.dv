@@ -11,9 +11,8 @@ cliche Market {
     buyer: Party
   }
 
-  // show goods classified into whether you can afford them or not
-  widget AffordTable {
-    buyer: Party
+  widget BuyGood { 
+    good: Good, buyer: Party 
   }
 
   // good.transaction_price = good.offer_price * fraction
@@ -28,6 +27,18 @@ cliche Market {
     seller: Party
   }
 
+  widget ShowMyGoods {
+    seller: Party
+  }
+
+  widget ShowGoodsToBuy {
+  }
+
+  // show goods classified into whether you can afford them or not
+  widget AffordTable {
+    buyer: Party
+  }
+
   widget ShowBalance {
     party: Party
   }
@@ -36,4 +47,3 @@ cliche Market {
   widget AddAmount {
     party: Party
   }
-}
