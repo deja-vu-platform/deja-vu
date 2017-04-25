@@ -14,7 +14,15 @@ const handlers = {
   task: {
     create: Helpers.resolve_create(mean.db, "task"),
     update: Helpers.resolve_update(mean.db, "task")
-  }
+  },
+  assignee: {
+    create: Helpers.resolve_create(mean.db, "assignee"),
+    update: Helpers.resolve_update(mean.db, "assignee")
+  },
+  assginer: {
+    create: Helpers.resolve_create(mean.db, "assigner"),
+    update: Helpers.resolve_update(mean.db, "assigner")
+  },
 };
 
 const bus = new ServerBus(
