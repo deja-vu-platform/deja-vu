@@ -9,8 +9,8 @@ app ChoreStar {
     Chore: Good, Reward: Good, Parent: Party, Child: Party]
   use community/Rating[Parent: Source, Chore: Target]
 
-  data Parent { name: text }
-  data Child { name: text }
+  data Parent { name: Text }
+  data Child { name: Text }
   data Chore {}
   data Reward {}
 
@@ -40,8 +40,8 @@ app ChoreStar {
   /*
   widget ShowApproveWithRating {
     parent: Parent, chore: Chore,
-    do_buy_on_approve: boolean,
-    fractional_rating: number
+    do_buy_on_approve: Boolean,
+    fractional_rating: Number
   }*/
   // LoggedIn of ChildAuth
   // ShowBalance of Market
