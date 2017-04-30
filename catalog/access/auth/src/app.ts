@@ -21,6 +21,9 @@ const handlers = {
           return user;
         }),
     update: Helpers.resolve_update(mean.db, "user")
+  },
+  resource: {
+    create: Helpers.resolve_create(mean.db, "resource")
   }
 };
 
