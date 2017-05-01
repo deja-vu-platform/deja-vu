@@ -1,9 +1,9 @@
 app Morg {
-  use organization/Event[
-    GroupMeeting: Event,
-    ShowGroupMeeting replaces ShowEvent in
+  include organization/Event[
+    GroupMeeting for Event,
+    ShowGroupMeeting replacing ShowEvent in
       ChooseAndShowWeeklyEvent]
-  use messaging/Email[GroupMeeting: Content]
+  include messaging/Email[GroupMeeting for Content]
 
   data GroupMeeting {}
 

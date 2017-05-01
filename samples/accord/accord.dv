@@ -1,28 +1,28 @@
 app Accord {
 
-  use access/Auth[User: User]
+  include access/Auth[User for User]
 
-  use organization/Group[
-    User: Member,
-    SongGroup: Group,
-    LinkToGroup replaces ShowGroupOverview in ShowGroupsByMember
+  include organization/Group[
+    User for Member,
+    SongGroug for Group,
+    LinkToGroup replacing ShowGroupOverview in ShowGroupsByMember
   ]
 
-  use organization/List[
-    Setlist: Item,
-    SongGroup: List,
-    LinkToSetlist replaces ShowItem in ShowList
+  include organization/List[
+    Setlist for Item,
+    SongGroup for List,
+    LinkToSetlist replacing ShowItem in ShowList
   ] as SetlistList
 
-  use organization/List[
-    Song: Item,
-    Setlist: List,
-    ShowSong replaces ShowItem in ShowList
+  include organization/List[
+    Song for Item,
+    Setlist for List,
+    ShowSong replacing ShowItem in ShowList
   ] as SongList
 
-  use community/Rating[
-    User: Source,
-    Song: Target
+  include community/Rating[
+    User for Source,
+    Song for Target
   ]
 
   data User {

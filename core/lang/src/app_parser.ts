@@ -61,7 +61,7 @@ export class AppParser {
       })
       // A map of id -> {type, attr}
       .extendOperation("symbolTable", {
-        ClicheUsesDecl: (use, cliche, params, asDecl) => {
+        IncludeDecl: (use, cliche, params, asDecl) => {
           const st = cliche.symbolTable();
           const alias = asDecl.symbolTable()[0];
           return {
@@ -71,7 +71,7 @@ export class AppParser {
           };
         },
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (category, slash, name) => ({
+        clicheName: (category, slash, name) => ({
           name: name.sourceString,
           category: category.sourceString,
           st: this
@@ -167,7 +167,7 @@ export class AppParser {
           .value(),
         Paragraph_widget: decl => [], Paragraph_data: decl => [],
         Paragraph_uses: decl => decl.tbonds(), Paragraph_assignment: decl => [],
-        ClicheUsesDecl: (uses, cliche, params, asDecl) => _u
+        IncludeDecl: (uses, cliche, params, asDecl) => _u
           .chain(params.tbonds())
           .flatten()
           .reject(_u.isEmpty)
@@ -178,10 +178,10 @@ export class AppParser {
           })
           .value(),
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (cat, slash, name) => name.sourceString,
+        clicheName: (cat, slash, name) => name.sourceString,
         ParamsDecl: (br1, param, comma, params, br2) => []
           .concat(param.tbonds()).concat(params.tbonds()),
-        ParamDecl_data: (t, colon, name) => {
+        ParamDecl_data: (t, for_keyword, name) => {
           const ret = [];
           const tinfo = t.tbonds();
           if (_u.isArray(tinfo)) {
@@ -258,7 +258,7 @@ export class AppParser {
         Paragraph_data: decl => "", Paragraph_widget: decl => decl.main(),
         Paragraph_uses: decl => "", Paragraph_assignment: decl => "",
         // ohm-js bug (?)
-        ClicheUsesDecl: (use, name, params, asDecl) => "",
+        IncludeDecl: (use, name, params, asDecl) => "",
         WidgetDecl: (m, w, n1, k1, fields, k2) => m.
           sourceString ? n1.sourceString : ""
       })
@@ -273,7 +273,7 @@ export class AppParser {
         Paragraph_data: decl => "", Paragraph_widget: decl => "",
         Paragraph_uses: decl => decl.usedCliches(),
         Paragraph_assignment: decl => "",
-        ClicheUsesDecl: (uses, name, params, asDecl) => {
+        IncludeDecl: (uses, name, params, asDecl) => {
           const alias = asDecl.usedCliches()[0];
           const cliche = name.usedCliches();
           return {
@@ -282,7 +282,7 @@ export class AppParser {
           };
         },
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (category, slash, name) => ({
+        clicheName: (category, slash, name) => ({
           category: category.sourceString, name: name.sourceString
         })
       })
@@ -304,7 +304,7 @@ export class AppParser {
         Paragraph_widget: decl => [], Paragraph_data: decl => [],
         Paragraph_assignment: decl => [],
         Paragraph_uses: decl => decl.replaceMap(),
-        ClicheUsesDecl: (uses, cliche, params, asDecl) => {
+        IncludeDecl: (uses, cliche, params, asDecl) => {
           const rmap = _u
             .chain(params.replaceMap())
             .flatten()
@@ -324,10 +324,10 @@ export class AppParser {
           return ret;
         },
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (category, slash, name) => name.sourceString,
+        clicheName: (category, slash, name) => name.sourceString,
         ParamsDecl: (br1, param, comma, params, br2) => []
           .concat(param.replaceMap()).concat(params.replaceMap()),
-        ParamDecl_data: (t, colon, name) => [],
+        ParamDecl_data: (t, for_keyword, name) => [],
         ParamDecl_replaces: (n1, replaces, n2, inKeyword, n3) => ({
           widget: n2.sourceString,
           in_widget: n3.sourceString,
@@ -343,7 +343,7 @@ export class AppParser {
         Paragraph_data: decl => ({}), Paragraph_widget: decl => ({}),
         Paragraph_uses: decl => decl.replaceList(),
         Paragraph_assignment: decl => ({}),
-        ClicheUsesDecl: (uses, name, params, asDecl) => _u
+        IncludeDecl: (uses, name, params, asDecl) => _u
           .chain(params.replaceList())
           .flatten()
           .reject(_u.isEmpty)
@@ -352,10 +352,10 @@ export class AppParser {
             return r;
           })
           .value(),
-        usedClicheName: (cat, slash, name) => name.sourceString,
+        clicheName: (cat, slash, name) => name.sourceString,
         ParamsDecl: (br1, param, comma, params, br2) => []
           .concat(param.replaceList()).concat(params.replaceList()),
-        ParamDecl_data: (t, colon, name) => "",
+        ParamDecl_data: (t, for_keyword, name) => "",
         ParamDecl_replaces: (n1, replaces, n2, inKeyword, n3) => ({
           name: n2.sourceString
         })

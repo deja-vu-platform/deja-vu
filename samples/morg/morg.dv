@@ -1,14 +1,14 @@
 app Morg {
-  use organization/Event[
-    GroupMeeting: Event,
-    WeeklyGroupMeeting: WeeklyEvent, 
-    ShowGroupMeeting replaces ShowEvent in
+  include organization/Event[
+    GroupMeeting for Event,
+    WeeklyGroupMeeting for WeeklyEvent, 
+    ShowGroupMeeting replacing ShowEvent in
       ChooseAndShowWeeklyEvent]
-  use messaging/Email[
-    GroupMeeting: Content]
-  use organization/Allocator[
-    GroupMeeting: Resource, WeeklyGroupMeeting: Allocation, 
-    Member: Consumer]
+  include messaging/Email[
+    GroupMeeting for Content]
+  include organization/Allocator[
+    GroupMeeting for Resource, WeeklyGroupMeeting for Allocation, 
+    Member for Consumer]
 
   data GroupMeeting {}
   data WeeklyGroupMeeting { group_meetings: GroupMeeting }

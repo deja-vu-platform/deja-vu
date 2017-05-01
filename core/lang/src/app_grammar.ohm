@@ -2,17 +2,17 @@ App <: Cliche {
   construct := "app"
 
   Paragraph
-    += ClicheUsesDecl -- uses
+    += IncludeDecl -- uses
     | AssignmentDecl -- assignment
 
-  ClicheUsesDecl = "use" usedClicheName ParamsDecl? AsDecl*
+  IncludeDecl = "include" clicheName ParamsDecl? AsDecl*
   AsDecl = "as" name
-  usedClicheName = alnum* "/" name
+  clicheName = alnum* "/" name
 
   ParamsDecl = "[" ParamDecl ("," ParamDecl)* "]"
   ParamDecl
-    = Type ":" name -- data
-    | name "replaces" name "in" name -- replaces
+    = Type "for" name -- data
+    | name "replacing" name "in" name -- replaces
 
   WidgetDecl := "main"? "widget" name "{" FieldBody? "}"
 
