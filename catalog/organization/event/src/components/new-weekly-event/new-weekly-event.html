@@ -4,7 +4,8 @@
     <label class="sr-only" for="starts-on">Starts On</label>
     <div id="starts-on" class="input-group date" data-provide="datepicker"
      data-today-higlight="true" data-autoclose="true">
-      <input id="starts-on-text" type="text" class="form-control">
+      <input id="starts-on-text" type="text" class="form-control"
+       placeholder="Starts on (mm/dd/yy)">
       <div class="input-group-addon">
           <span class="glyphicon glyphicon-th"></span>
       </div>
@@ -14,7 +15,8 @@
     <label class="sr-only" for="ends-on">Ends On</label>
     <div id="ends-on" class="input-group date" data-provide="datepicker"
      data-today-higlight="true" data-autoclose="true">
-      <input id="ends-on-text" type="text" class="form-control">
+      <input id="ends-on-text" type="text" class="form-control"
+       placeholder="Ends on (mm/dd/yy)">
       <div class="input-group-addon">
           <span class="glyphicon glyphicon-th"></span>
       </div>
@@ -24,7 +26,8 @@
     <label class="sr-only" for="start-time">Start Time</label>
     <div id="start-time" class="input-group bootstrap-timepicker timepicker">
       <input id="start-time-text" class="form-control" type="text"
-       data-provide="timepicker" (click)="timeClickHandler($event)"/>
+       data-provide="timepicker" (click)="timeClickHandler($event)"
+       placeholder="Start time (hh:mm)"/>
       <div class="input-group-addon">
         <span class="glyphicon glyphicon-time"></span>
       </div>
@@ -34,7 +37,9 @@
     <label class="sr-only" for="start-time">End Time</label>
     <div id="end-time" class="input-group bootstrap-timepicker timepicker">
       <input id="end-time-text" type="text" class="form-control"
-       data-provide="timepicker" (click)="timeClickHandler($event)"/>
+       data-provide="timepicker" (click)="timeClickHandler($event)"
+       placeholder="End time (hh:mm)"
+      />
       <div class="input-group-addon">
         <span class="glyphicon glyphicon-time"></span>
       </div>

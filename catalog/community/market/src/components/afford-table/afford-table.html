@@ -1,0 +1,23 @@
+<h3> Affordable Goods </h3>
+<table *ngIf="affordableGoods && affordableGoods.length > 0" class="table">
+  <tr>
+    <th>Good</th>
+    <th>Price</th>
+  </tr>
+  <tr *ngFor="let good of affordableGoods">
+    <td>{{good.name}}</td>
+    <td>{{good.offer_price}}</td>
+  </tr>
+</table>
+
+<h3> Unaffordable Goods </h3>
+<table *ngIf="unaffordableGoods && unaffordableGoods.length > 0" class="table">
+  <tr>
+    <th>Good</th>
+    <th>Price</th>
+  </tr>
+  <tr *ngFor="let good of unaffordableGoods">
+    <td>{{good.name}}</td>
+    <td>{{good.offer_price}}</td>
+  </tr>
+</table>

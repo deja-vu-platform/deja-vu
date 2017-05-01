@@ -2,16 +2,22 @@ cliche Auth {
   data User {
     username: Text
   }
- 
+
+  data Resource {
+    // TODO: allow multiple users to own a resource
+    owner: User,
+    viewers: [ User ]
+  }
+
   // Will also sign in the user
   widget RegisterWithRedirect {
     register_ok_redirect_route: Text
   }
   widget SignInWithRedirect {
-    signin_ok_redirect_route: Text 
+    signin_ok_redirect_route: Text
   }
   widget SignOutWithRedirect {
-    signout_ok_redirect_route: Text 
+    signout_ok_redirect_route: Text
   }
   widget LoggedIn {
     user: User

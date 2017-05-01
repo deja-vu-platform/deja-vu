@@ -5,7 +5,7 @@ import {Widget} from "client-bus";
 
 @Widget({fqelement: "Auth", ng2_providers: [GraphQlService]})
 export class RegisterComponent {
-  user: User = {username: "", password: ""};
+  user: User = {username: "", password: "", atom_id: ""};
   reenter_password = "";
   register_ok = {value: false};
   username_error = false;

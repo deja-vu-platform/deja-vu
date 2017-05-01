@@ -55,7 +55,7 @@ export class AppParser {
         });
     this._semantics = this._grammar
       .extendSemantics(this._cliche_parser.semantics)
-      .addOperation("fqelement", {
+      .extendOperation("fqelement", {
         Decl: (app, name, key1, para, key2) => name.fqelement(),
         name: name => name.sourceString
       })

@@ -1,0 +1,23 @@
+<div class="row">
+  <div class="col-sm-8">
+    <h3 style="color: #333">
+      <dv-widget name="ShowItem" of="SongList"
+        [fields]="fields"></dv-widget>
+    </h3>
+    <div>
+      Selected?
+      <dv-widget name="EditItemChecked" of="SongList"
+        [fields]="fields"></dv-widget>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <div>
+      <dv-widget name="RateTarget" of="Rating"
+        [fields]="fields"></dv-widget>
+    </div>
+    <div>
+      <dv-widget name="ShowRatings" of="Rating"
+        [fields]="fields"></dv-widget>
+    </div>
+  </div>
+</div>

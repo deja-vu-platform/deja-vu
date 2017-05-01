@@ -6,7 +6,7 @@ import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
 import {Grafo} from "grafo";
 
-const uuid = require("uuid");
+const uuid: { v4: () => string } = require("uuid");
 
 
 const mean = new Mean();
@@ -82,18 +82,42 @@ const schema = grafo
           bus.create_atom("Post", post.atom_id, post)
           ])
         .then(_ => post))
-   
+
     })
+  .add_mutation({
+    name: "editPost",
+    type: "Post",
+    args: {
+      atom_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      content: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {atom_id, content}) => {
+      return Validation.post_exists(atom_id).then(() => {
+        return Promise.all([
+          mean.db.collection("posts").updateOne({atom_id}, {$set: {content}}),
+          bus.update_atom("Post", atom_id, {$set: {content}})
+        ]).then(() => mean.db.collection("posts").findOne({atom_id}));
+      });
+    }
+  })
   .schema();
 
 
 namespace Validation {
-  export function user_exists(username) {
+  export function user_exists(username: string): Promise<any> {
     return mean.db.collection("users")
       .findOne({username: username}, {atom_id: 1})
       .then(user => {
         if (!user) throw new Error(`user ${username} not found`);
         return user;
+      });
+  }
+  export function post_exists(atom_id: string): Promise<any> {
+    return mean.db.collection("posts")
+      .findOne({atom_id})
+      .then(post => {
+        if (!post) throw new Error(`post ${post} not found`);
+        return post;
       });
   }
 }

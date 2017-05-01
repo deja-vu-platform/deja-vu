@@ -13,6 +13,7 @@ import * as _u from "underscore";
 export interface Item {
   atom_id: string;
   name: string;
+  checked: boolean;
 }
 
 
@@ -34,7 +35,8 @@ export class ShowListComponent {
           list_by_id(atom_id: "${this.list.atom_id}") {
             items {
               atom_id,
-              name
+              name,
+              checked
             }
           }
         `)
@@ -44,6 +46,7 @@ export class ShowListComponent {
           const item_atom: Item = this._clientBus.new_atom("Item");
           item_atom.atom_id = item.atom_id;
           item_atom.name = item.name;
+          item_atom.checked = item.checked;
           return {item: item_atom};
         })
         .map(item => _u.extend(item, this.fields))
@@ -53,7 +56,8 @@ export class ShowListComponent {
     };
 
     update_list();
-    this.list.on_change(update_list);
+    // This seems to cause an infinite loop
+    // this.list.on_change(update_list);
   }
 
 

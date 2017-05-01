@@ -9,10 +9,8 @@ cliche Feed {
     subscriptions: Publisher
   }
 
-  data Content {}
-
   data Message {
-    content: Content
+    content: Text
   }
 
   widget ShowFeed uses ShowFeedItem {

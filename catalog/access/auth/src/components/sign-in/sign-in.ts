@@ -11,7 +11,7 @@ import {Widget} from "client-bus";
    ng2_directives: [NgClass]
 })
 export class SignInComponent {
-  user: User = {username: "", password: ""};
+  user: User = {username: "", password: "", atom_id: ""};
   signin_ok = {value: false};
   error = false;
 
@@ -23,11 +23,15 @@ export class SignInComponent {
         signIn(
           username: "${this.user.username}", password: "${this.user.password}")
       `)
+      .map(data => JSON.parse(data.signIn))
       .subscribe(
         token => {
+          let authToken = token.token,
+            authUser = token.user;
           console.log("setting username " + this.user.username);
-          localStorage.setItem("id_token", token);
+          localStorage.setItem("id_token", authToken);
           localStorage.setItem("username", this.user.username);
+          localStorage.setItem("atom_id", authUser.atom_id);
           this.signin_ok.value = true;
         },
         err => {
