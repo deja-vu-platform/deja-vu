@@ -5,7 +5,7 @@ app Bookmark {
 
   use community/Follow[User: Source, User: Target] as FollowUsers
   use community/Follow[User: Source, Topic: Target] as FollowTopics
-  use access/Auth[User: User]
+  use access/Auth[User: User, Post: Resource]
   use messaging/Feed[
     User: Subscriber, User | Topic: Publisher, Post: Message,
     ShowFeedPost replaces ShowFeedItem in ShowFeed
