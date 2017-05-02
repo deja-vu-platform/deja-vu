@@ -57,20 +57,20 @@ export class ClicheParser {
             .chain(fields)
             .flatten().reject(_u.isEmpty)
             .reduce((memo, ft) => {
-              if (memo[ft.name] !== undefined) {
-                throw new Error("Duplicate field" + ft.name);
+              if (memo[ft.id] !== undefined) {
+                throw new Error("Duplicate field" + ft.id);
               }
-              memo[ft.name] = ft.t;
+              memo[ft.id] = ft;
               return memo;
             }, {})
             .value();
         },
-        WidgetUsesDecl: (u, used_widget, comma, used_widgets) => []
+        Uses: (u, used_widget, comma, used_widgets) => []
           .concat(used_widget.symbolTable())
           .concat(used_widgets.symbolTable()),
         name: (name) => name.sourceString,
-        FieldDecl: (name, colon, t) => ({
-          name: name.sourceString, t: t.sourceString
+        FieldDecl: (name, colon, t_name) => ({
+          id: name.sourceString, type: t_name.sourceString
         })
       });
   }

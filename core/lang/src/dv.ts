@@ -34,6 +34,10 @@ function main() {
   let p;
   if (opts.file.includes("catalog")) {
     p = new ClicheParser();
+
+    if (opts.debug) {
+      p.debug_match(opts.file);
+    }
   } else {
     p = new AppParser();
 

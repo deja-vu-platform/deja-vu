@@ -2,24 +2,21 @@ App <: Cliche {
   construct := "app"
 
   Paragraph
-    += IncludeDecl -- uses
-    | AssignmentDecl -- assignment
+    += IncludeDecl -- include
+    | FieldDecl -- field
 
-  IncludeDecl = "include" clicheName ParamsDecl? AsDecl*
+  IncludeDecl = "include" clicheName Params? AsDecl*
   AsDecl = "as" name
   clicheName = alnum* "/" name
 
-  ParamsDecl = "[" ParamDecl ("," ParamDecl)* "]"
-  ParamDecl
+  Params = "[" Param ("," Param)* "]"
+  Param
     = Type "for" name -- data
     | name "replacing" name "in" name -- replaces
 
   WidgetDecl := "main"? "widget" name "{" FieldBody? "}"
+  FieldDecl := name ":" Type ("=" Value)?
 
-  // Assignments
-  AssignmentDecl = name ":" Type "=" Obj
-  Obj = "{" ObjBody ("," ObjBody)* "}"
-  ObjBody = name ":" Value
   Value
     = number -- number
     | Obj -- obj
@@ -27,6 +24,8 @@ App <: Cliche {
     | "[" ArrayDecl? "]" -- array
     | (~"\"" name) -- ref
 
+  Obj = "{" ObjBody ("," ObjBody)* "}"
+  ObjBody = name ":" Value
   number = digit+
   ArrayDecl = Value ("," Value)*
 }

@@ -7,9 +7,8 @@ Cliche {
     | WidgetDecl -- widget
 
   DataDecl = "data" name "{" FieldBody? "}"
-  WidgetDecl = "widget" name WidgetUsesDecl? "{" FieldBody? "}"
-
-  WidgetUsesDecl = "uses" name ("," name)*
+  WidgetDecl = "widget" name Uses? "{" FieldBody? "}"
+  Uses = "uses" name ("," name)*
 
   FieldBody = FieldDecl ("," FieldDecl)*
   FieldDecl = name ":" Type
