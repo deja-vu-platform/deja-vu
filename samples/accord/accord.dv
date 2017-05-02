@@ -4,7 +4,7 @@ app Accord {
 
   include organization/Group[
     User for Member,
-    SongGroug for Group,
+    SongGroup for Group,
     LinkToGroup replacing ShowGroupOverview in ShowGroupsByMember
   ]
 
@@ -26,32 +26,32 @@ app Accord {
   ]
 
   data User {
-    username: Text
+    username: text
   }
 
   data SongGroup {
-    name: Text,
+    name: text,
     members: [User],
     items: [Setlist]
   }
 
   data Song {
-    name: Text
+    name: text
   }
 
   data Setlist {
-    name: Text,
+    name: text,
     songs: [Song]
   }
 
   data SetlistCollection {
-    name: Text,
+    name: text,
     members: [Setlist]
   }
 
   // The landing page gives the user the option to sign in or register
   main widget Landing {
-    user_ok_redirect_route: Text
+    user_ok_redirect_route: text
   }
 
   // The about page lets the user see an explanation of the project
@@ -60,7 +60,7 @@ app Accord {
 
   // The Register page lets the user create a new account
   widget Register {
-    user_ok_redirect_route: Text
+    user_ok_redirect_route: text
   }
 
   // Allows a user to view existing groups and go to the CreateGroup page
@@ -71,7 +71,7 @@ app Accord {
   // Create a new group
   widget CreateGroup {
     initialMember: User,
-    groupCreatedRedirectRoute: Text
+    groupCreatedRedirectRoute: text
   }
 
   // Add a member to the group
@@ -82,13 +82,13 @@ app Accord {
   // View the information about a group
   widget ViewGroup {
     group: SongGroup,
-    prefix: Text
+    prefix: text
   }
 
   // View a setlist
   widget ViewSetlist {
     list: Setlist,
-    prefix: Text
+    prefix: text
   }
 
   // Show a song on the view setlist page
@@ -99,13 +99,13 @@ app Accord {
   // Links to a group on the Groups view page
   widget LinkToGroup {
     group: SongGroup,
-    prefix: Text
+    prefix: text
   }
 
   // Links to a setlist on the Group view page
   widget LinkToSetlist {
     setlist: Setlist,
-    prefix: Text
+    prefix: text
   }
 
   // Create a new setlist

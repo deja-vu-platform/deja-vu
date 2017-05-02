@@ -12,14 +12,14 @@ app Morg {
 
   data GroupMeeting {}
   data WeeklyGroupMeeting { group_meetings: GroupMeeting }
-  data Member { name: Text }
+  data Member { name: text }
 
   alyssa: Member = {name: "Alyssa"}
   ben: Member = {name: "Ben"}
 
   main widget Home {}
   widget ShowGroupMeeting {
-    email: Text,
+    email: text,
     group_meeting: GroupMeeting
   }
   widget EmailReminder { group_meeting: GroupMeeting }

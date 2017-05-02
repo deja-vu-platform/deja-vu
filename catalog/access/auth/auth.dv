@@ -1,6 +1,6 @@
 cliche Auth {
   data User {
-    username: Text
+    username: text
   }
 
   data Resource {
@@ -11,13 +11,13 @@ cliche Auth {
 
   // Will also sign in the user
   widget RegisterWithRedirect {
-    register_ok_redirect_route: Text
+    register_ok_redirect_route: text
   }
   widget SignInWithRedirect {
-    signin_ok_redirect_route: Text
+    signin_ok_redirect_route: text
   }
   widget SignOutWithRedirect {
-    signout_ok_redirect_route: Text
+    signout_ok_redirect_route: text
   }
   widget LoggedIn {
     user: User

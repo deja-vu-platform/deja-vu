@@ -9,14 +9,14 @@ cliche Rating {
   data Rating {
     source: Source,
     target: Target,
-    rating: Number
+    rating: number
   }
 
   // Shows stars and allows a source to rate a target
   widget RateTarget {
     source: Source,
     target: Target,
-    rating: Number
+    rating: number
   }
 
   // Shows aggregate rating info for a target

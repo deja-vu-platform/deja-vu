@@ -1,12 +1,12 @@
 cliche Group {
     // Member of a Group
     data Member {
-        name: Text
+        name: text
     }
 
     // Named collection of group members
     data Group {
-        name: Text,
+        name: text,
         members: [Member]
     }
 
@@ -23,7 +23,7 @@ cliche Group {
     // Button that allows a user to open a group
     widget RedirectToGroup {
         group: Group,
-        prefix: Text
+        prefix: text
     }
 
     // Displays an overview of a group, like a light version of ShowGroup
@@ -48,13 +48,13 @@ cliche Group {
     // Create a new group with some initial member
     widget NewGroupWithInitialMember {
         initialMember: Member,
-        groupCreatedRedirectRoute: Text
+        groupCreatedRedirectRoute: text
     }
 
     // Add an existing member by ID
     widget AddExistingMember {
         member: Member,
         group: Group,
-        submit_ok: Boolean
+        submit_ok: boolean
     }
 }

@@ -470,9 +470,9 @@ export namespace GruntTask {
       .filter(f => f.data)
       .map(f => {
         let ret = "";
-        if (f.type.name === "Text") {
+        if (f.type.name === "text") {
           ret = `this.${f.name}.value = "${f.data}"`;
-        } else if (f.type.name === "Boolean") {
+        } else if (f.type.name === "boolean") {
           ret = `this.${f.name}.value = ${f.data}$`;
         } else {
           throw new Error("to be implemented");

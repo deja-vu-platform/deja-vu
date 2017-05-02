@@ -9,7 +9,7 @@ app Morg {
 
   main widget Home {}
   widget ShowGroupMeeting {
-    email: Text,
+    email: text,
     group_meeting: GroupMeeting
   }
 

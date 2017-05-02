@@ -38,7 +38,7 @@ export interface App {
 
 
 export class AppParser {
-  BASIC_TYPES = ["Text", "Boolean", "Date", "Datetime", "Number"];
+  PRIMITIVE_TYPES = ["text", "boolean", "number", "date", "datetime", "time"];
   private _grammar;
   private _semantics;
   private _cliche_parser;
@@ -446,7 +446,7 @@ export class AppParser {
   // type one that matches t
   _match(t: string, matcht, tbonds, fqelement: string) {
     const is_subtype = (t1: string, t2: {name: string, fqelement: string}) => (
-      (this.BASIC_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
+      (this.PRIMITIVE_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
       !!_u.find(tbonds[t1], b => b.name === t2.name &&
                 b.fqelement === t2.fqelement)
     );

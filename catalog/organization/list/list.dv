@@ -1,18 +1,18 @@
 cliche List {
   data List {
-    name: Text,
+    name: text,
     items: Item,
-    selected: Boolean
+    selected: boolean
   }
 
   data Item {
-    name: Text
+    name: text
   }
 
   widget NewList {
   }
 
-  widget EditList uses ShowList, AddItem{
+  widget EditList uses ShowList, AddItem {
     list: List
   }
 
@@ -34,12 +34,12 @@ cliche List {
 
   widget RedirectToList {
     list: List,
-    prefix: Text
+    prefix: text
   }
 
   widget RedirectToItem {
     item: Item,
-    prefix: Text
+    prefix: text
   }
 
   widget ListFromRoute {
@@ -53,6 +53,6 @@ cliche List {
   widget AddItem {
     item: Item,
     list: List,
-    submit_ok: Boolean
+    submit_ok: boolean
   }
 }

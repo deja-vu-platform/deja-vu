@@ -1,22 +1,22 @@
 cliche Label {
   data Item {
-    name: Text,
+    name: text,
     labels: Label
   }
   
   data Label {
-    name: Text,
+    name: text,
     items: Item
   }
 
   data LabelsText {
     item: Item,
-    submit_ok: Boolean
+    submit_ok: boolean
   }
 
   widget AttachLabels {
     item: Item,
-    submit_ok: Boolean
+    submit_ok: boolean
   }
 
   widget ShowLabels {

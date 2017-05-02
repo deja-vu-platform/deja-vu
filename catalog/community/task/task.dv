@@ -1,19 +1,19 @@
 cliche Task {
   data Task {
-    name: Text,
+    name: text,
     assigner: Assigner,
     assignee: Assignee,
-    expiration_date: Date,
-    completed: Boolean,
-    approved: Boolean
+    expiration_date: date,
+    completed: boolean,
+    approved: boolean
   }
 
   data Assigner {
-    name: Text
+    name: text
   }
 
   data Assignee {
-    name: Text
+    name: text
   }
 
   widget CreateTask {

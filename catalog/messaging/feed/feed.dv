@@ -1,16 +1,16 @@
 cliche Feed {
   data Publisher {
-    name: Text,
+    name: text,
     messages: Message
   }
 
   data Subscriber {
-    name: Text,
+    name: text,
     subscriptions: Publisher
   }
 
   data Message {
-    content: Text
+    content: text
   }
 
   widget ShowFeed uses ShowFeedItem {

@@ -1,23 +1,23 @@
 cliche Post {
   data Post {
-    content: Text,
+    content: text,
     author: User
   }
 
   data User {
-    username: Text,
+    username: text,
     posts: Post
   }
 
   widget NewPostButton {
     post: Post,
     author: User,
-    submit_ok: Boolean
+    submit_ok: boolean
   }
 
   widget NewPostContent {
     post: Post,
-    submit_ok: Boolean
+    submit_ok: boolean
   }
 
   widget ShowAuthor {

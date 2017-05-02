@@ -18,7 +18,7 @@ app Bookmark {
    *  Data definitions
    */
   data User {
-    username: Text,
+    username: text,
     posts: Post,
     follows: User | Topic
   }
@@ -27,7 +27,7 @@ app Bookmark {
   u2: User = {username: "alyssaphacker", posts: [p2]}
 
   data Post {
-    content: Text,
+    content: text,
     topics: Topic,
     author: User
   }
@@ -36,7 +36,7 @@ app Bookmark {
   p2: Post = {content: "hello, I'm Alyssa", author: u2, topics: [t1]}
 
   data Topic {
-    name: Text,
+    name: text,
     posts: Post
   }
 
@@ -47,14 +47,14 @@ app Bookmark {
    */
   // The landing page gives the user the option to sign in or register
   main widget Landing {
-    user_ok_redirect_route: Text
+    user_ok_redirect_route: text
   }
 
   l: Landing = {user_ok_redirect_route: "/app/home"}
 
 
   widget App {
-    signout_ok_redirect_route: Text
+    signout_ok_redirect_route: text
   }
 
   a: App = {signout_ok_redirect_route: "/landing"}
@@ -73,7 +73,7 @@ app Bookmark {
   widget CreatePost {
     author: User,
     post: Post,
-    submit_ok: Boolean
+    submit_ok: boolean
   }
 
   // Displays the list of topics and lets the logged in user follow or unfollow
