@@ -9,11 +9,6 @@ cliche Label {
     items: Item
   }
 
-  data LabelsText {
-    item: Item,
-    submit_ok: boolean
-  }
-
   widget AttachLabels {
     item: Item,
     submit_ok: boolean

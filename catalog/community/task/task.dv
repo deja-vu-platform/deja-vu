@@ -45,3 +45,4 @@ cliche Task {
   widget ShowApprovedTasks uses ShowTasks { 
     assignee: Assignee 
   }
+}

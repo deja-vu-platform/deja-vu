@@ -124,10 +124,10 @@ app Accord {
   view_group_page: ViewGroup = {prefix: "/groups/create-setlist"}
   view_setlist_page: ViewSetlist = {prefix: "/groups/setlists/create-proposal/"}
 
-  john: User = {username:"john"}
-  // g1: Group = {name:"John's Group", members:[u1]}
+  john: User = {username: "john"}
+  // g1: Group = {name:"John's Group", members: [u1]}
 
-  l: Landing = {user_ok_redirect_route: "/app/home"}
+  l: Landing = {user_ok_redirect_route: "/groups"}
   reg: Register = {user_ok_redirect_route: "/groups"}
 
   landing_route: Route = {path: "landing", widget: Landing}
