@@ -28,7 +28,7 @@ export namespace Helpers {
 
   export function resolve_create(
       db: any, item_name: string, col_name?: string,
-      transform_fn?: (atom: any) => any) {
+      transform_fn?: (atom: any) => any): (...args) => Promise<boolean> {
     if (col_name === undefined) col_name = item_name + "s";
 
     return args => {
@@ -47,7 +47,10 @@ export namespace Helpers {
   }
 
   export function resolve_update(
-      db: any, item_name: string, col_name?: string) {
+      db: any,
+      item_name: string,
+      col_name?: string
+  ): (...args) => Promise<boolean> {
     if (col_name === undefined) col_name = item_name + "s";
 
     return args => {
@@ -60,6 +63,13 @@ export namespace Helpers {
       return db.collection(col_name)
         .updateOne({atom_id: atom_id}, update_obj)
         .then(res => res.matchedCount === 1 && res.modifiedCount === 1);
+    };
+  }
+
+  export function on_read(
+    bus: {read_atom: (t_name: string, atom_id: string) => Promise<boolean>}) {
+    return (result: {atom_id: string}, t_name: string) => {
+      return bus.read_atom(t_name, result.atom_id);
     };
   }
 }
