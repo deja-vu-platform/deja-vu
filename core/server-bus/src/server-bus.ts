@@ -337,20 +337,18 @@ class Dispatcher {
   }
 
   private _post(loc, query) {
-    const query_str = query.replace(/ /g, "");
-
     const options = {
       uri: loc + BUS_PATH,
       method: "post",
       body: {
-        query: "mutation " + query_str
+        query: "mutation " + query
       },
       json: true
     };
 
     console.log(
       "using options " + JSON.stringify(options) +
-      " for query <" + query_str + ">");
+      " for query <" + query + ">");
 
     let attempt = 1;
     const req = () => rp(options)
@@ -366,7 +364,7 @@ class Dispatcher {
           return new Promise(r => setTimeout(r, delay * 1000)).then(_ => req());
         } else {
           console.log(
-            `For ${loc} q ${query_str} got error: ` +
+            `For ${loc} q ${query} got error: ` +
             `${JSON.stringify(reason.error)}`);
         }
         return Promise.resolve("");
