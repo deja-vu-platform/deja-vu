@@ -20,29 +20,25 @@ cliche Task {
     assigner: Assigner
   }
 
-  widget ShowTask {
-    task: Task
-  }
-
-  widget ShowAssignedTasks uses ShowTask {
+  widget ShowAssignedTasks {
     assigner: Assigner 
   }
 
   // also lets assigner mark task as approved
-  widget ShowPendingApprovalTasks uses ShowTask { 
+  widget ShowPendingApprovalTasks { 
     assigner: Assigner 
   }
 
   // also lets assignee mark task as completed
-  widget ShowUncompletedTasks uses ShowTask { 
+  widget ShowUncompletedTasks { 
     assignee: Assignee 
   }
 
-  widget ShowUnapprovedTasks uses ShowTask { 
+  widget ShowUnapprovedTasks { 
     assignee: Assignee 
   }
 
-  widget ShowApprovedTasks uses ShowTasks { 
+  widget ShowApprovedTasks { 
     assignee: Assignee 
   }
 }
