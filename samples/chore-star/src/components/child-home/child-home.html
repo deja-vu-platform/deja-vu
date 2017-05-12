@@ -129,15 +129,15 @@ div.scroll {
           <h2>Chores</h2>
           <h4>Uncompleted Chores</h4>
           <div class="row left-align-row">
-             Show uncompleted tasks
+             <dv-widget name="ShowUncompletedTasks" of="Task" [fields]="fields"></dv-widget>
           </div>
           <h4>Chores Pending Approval</h4>
           <div class="row left-align-row">
-             Show unapproved tasks
+             <dv-widget name="ShowUnapprovedTasks" of="Task" [fields]="fields"></dv-widget>
           </div>
           <h4>Completed and Approved Chores</h4>
           <div class="row left-align-row">
-             Show completed and approved tasks 
+             <dv-widget name="ShowApprovedTasks" of="Task" [fields]="fields"></dv-widget> 
           </div>
         </div>
       </div>
@@ -145,9 +145,7 @@ div.scroll {
       <div id="child-rewards" class="col-md-6"> 
         <div class="blue-background">
           <h2>Rewards</h2>
-             Show goods
-          <h4>Afford Reward</h4>
-             Afford table
+             <dv-widget name="AffordTable" of="Market" [fields]="fields"></dv-widget>
         </div>
       </div>
     </div>

@@ -21,6 +21,8 @@ app ChoreStar {
     parent_ok_redirect: Text,
     child_ok_redirect: Text
   }
+
+
   // LoggedIn of ParentAuth,
   // CreateTask of Task,
   // CreateGood of Market,
@@ -43,11 +45,13 @@ app ChoreStar {
     do_buy_on_approve: Boolean,
     fractional_rating: Number
   }*/
+
+
   // LoggedIn of ChildAuth
   // ShowBalance of Market
   // ShowUncompletedTasks of Task
-  // ShowUnnaprovedTasks of Task
-  // ShowCompletedAndApprovedTasks of Task
+  // ShowUnapprovedTasks of Task
+  // ShowApprovedTasks of Task
   // ShowGoodsToBuy of Market
   widget ChildHome {
     child: Child,

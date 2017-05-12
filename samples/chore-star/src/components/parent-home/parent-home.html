@@ -135,14 +135,11 @@ div.scroll {
           </div>
           <div class="row">
             <h2>Chores to Approve</h2>
-            Tasks pending approval
-          </div>
-          <div class="row">
-            <h2>Rewards to Approve</h2>
+            <dv-widget name="ShowPendingApprovalTasks" of="Task" [fields]="fields"></dv-widget>
           </div>
           <div class="row">
             <h2>Offered Rewards</h2>
-            Goods Offered
+            <dv-widget name="ShowMyGoods" of="Market" [fields]="fields"></dv-widget>
           </div>
         </div>
       </div>
