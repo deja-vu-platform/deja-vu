@@ -54,7 +54,16 @@ export class ServerBus {
   constructor(
       fqelement: string,
       private _ws: express.Express,
-      private _handlers: any, comp_info: CompInfo, locs: any) {
+      private _handlers: {
+        [key: string]: {
+          read?: (...args) => Promise<boolean>,
+          create?: (...args) => Promise<boolean>,
+          update?: (...args) => Promise<boolean>
+        }
+      },
+      comp_info: CompInfo,
+      locs: any
+  ) {
     if (comp_info !== undefined) {
       this._dispatcher = new Dispatcher(fqelement, comp_info, locs);
     }
@@ -67,7 +76,7 @@ export class ServerBus {
         }
         return (_, args) => handler(_u.omit(args, "forward"))
           .then(_ => {
-            if (args.forward !== undefined || args.forward) {
+            if (args.forward !== undefined) {
               if (args.create !== undefined) {
                 console.log(
                   `Forward requested for create(${t}, ${args.atom_id}, ` +
@@ -83,6 +92,11 @@ export class ServerBus {
               } else {
                 console.log("rm");
               }
+            } else if (args.read !== undefined) {
+              console.log(
+                `Forward requested for read(${t}, ${args.atom_id}, ` +
+                `${args.update}) of ${fqelement}`);
+              return this.read_atom(t, args.atom_id);
             }
             return Promise.resolve(true);
           });
@@ -103,6 +117,7 @@ export class ServerBus {
     const mut = {};
     for (let t of Object.keys(_handlers)) {
       mut["create_" + t] = build_field("create", t, _handlers);
+      mut["read_" + t] = build_field("read", t, _handlers);
       mut["update_" + t] = build_field("update", t, _handlers);
       // mut["delete_" + t] = build_field("delete", t, _handlers);
     }
@@ -150,6 +165,17 @@ export class ServerBus {
     return this._dispatcher.create_atom(
         _ustr.capitalize(t_name), atom_id, create);
   }
+
+
+  read_atom(t_name: string, atom_id: string): Promise<boolean> {
+    console.log("reading atom");
+    if (this._dispatcher === undefined) {
+      return Promise.resolve(true);
+    }
+    return this._dispatcher.read_atom(_ustr.capitalize(t_name), atom_id);
+  }
+
+
   /**
    * Report the update of an existing atom
    *
@@ -199,6 +225,8 @@ export class ServerBus {
 class Dispatcher {
   create_atom: (t_name: string, atom_id: string, create: any) =>
     Promise<boolean>;
+  read_atom: (t_name: string, atom_id: string, _?: any) =>
+    Promise<boolean>;
   update_atom: (t_name: string, atom_id: string, update: string) =>
     Promise<boolean>;
   remove_atom: (t_name: string, atom_id: string) => Promise<boolean>;
@@ -208,6 +236,7 @@ class Dispatcher {
 
   constructor(private _fqelement: string, comp_info: CompInfo, private _locs) {
     this.create_atom = this._process("create", this._transform_create);
+    this.read_atom = this._process("read", this._transform_read);
     this.update_atom = this._process("update", this._transform_update);
 
     this._str_t = t => JSON.stringify(t);
@@ -285,6 +314,16 @@ class Dispatcher {
                     atom_id: "${atom_id}", ${op}: "${info_str}")
               }`);
             }))).then(_ => true);
+  }
+
+  private _transform_read(atom: any, field_map: string) {
+    return _u.reduce(_u.keys(atom), (memo, field: string) => {
+        const target_field = field_map[field];
+        if (target_field !== undefined) {
+          memo[target_field] = atom[field];
+        }
+        return memo;
+    }, {});
   }
 
   private _transform_create(atom: any, field_map: string) {

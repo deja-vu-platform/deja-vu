@@ -3,14 +3,14 @@ const graphql = require("graphql");
 
 import * as _u from "underscore";
 
-type Mutation = {
+export type Mutation = {
   name: string
   type: string
   args: {}
-  resolve: () => Promise<any>
+  resolve: (...args) => Promise<any>
 }
 
-type Type = {
+export type Type = {
   name: string
   fields: {}
 }
@@ -21,7 +21,11 @@ export class Grafo {
   user_queries: any = {};
   mutations: { [name: string]: Mutation } = {};
 
-  constructor(private db) {}
+  constructor(
+    private db,
+    private onRead: (atom: {atom_id: string},t_name: string) => Promise<boolean>
+      = () => Promise.resolve(true)
+  ) {}
 
   init(): Promise<void> {
     return this.db.open()
@@ -54,6 +58,15 @@ export class Grafo {
     return this;
   }
 
+  forward_read(result, t_name: string) {
+    return this.onRead(result, t_name).then(isAllowed => {
+      if (isAllowed) {
+        return result;
+      }
+      throw new Error("access denied");
+    });
+  }
+
   schema() {
     // Process types
     this.types = _u.mapObject(this.types, (t, unused_t_name) => {
@@ -77,8 +90,16 @@ export class Grafo {
       if (queries[query_all] === undefined) {
         queries[query_all] = {
           "type": "[" + t_name + "]",
-          resolve: (root) => this.db
-            .collection(this._col_name(t_name)).find().toArray()
+          resolve: root => {
+            return this.db.collection(this._col_name(t_name))
+              .find()
+              .toArray()
+              .then(results => {
+                return Promise.all(
+                  results.map(result => this.forward_read(result, t_name))
+                );
+              });
+          }
         };
       }
     });
@@ -142,6 +163,7 @@ export class Grafo {
       },
       resolve: (root, {atom_id}) => this.db
         .collection(this._col_name(t_name)).findOne({atom_id: atom_id})
+        .then(result => this.forward_read(result, t_name))
     };
   }
 
@@ -190,14 +212,20 @@ export class Grafo {
             if (target === undefined || _u.isEmpty(target)) return [];
             return collection
               .find({atom_id: {$in: target.map(t => t.atom_id)}})
-              .toArray();
+              .toArray()
+              .then(results => {
+                return Promise.all(
+                  results.map(result => this.forward_read(result, t_name))
+                );
+              });
           };
         }
       } else {
         const t_name: string = f.type;
         if (f.resolve === undefined) {
           f.resolve = src => this.db.collection(this._col_name(t_name))
-            .findOne({atom_id: src[f_name].atom_id});
+            .findOne({atom_id: src[f_name].atom_id})
+            .then(result => this.forward_read(result, t_name));
         }
       }
     });

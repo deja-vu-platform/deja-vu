@@ -1,4 +1,3 @@
-import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
 import {Mean} from "mean-loader";
@@ -13,10 +12,15 @@ const mean = new Mean();
 
 const handlers = {
   user: {
+    read: (...args) => Promise.resolve(true),
     create: Helpers.resolve_create(mean.db, "user"),
     update: Helpers.resolve_update(mean.db, "user")
   },
   post: {
+    read: () => {
+      console.log("reading post");
+      return Promise.resolve(true);
+    },
     create: Helpers.resolve_create(mean.db, "post"),
     update: Helpers.resolve_update(mean.db, "post")
   }
@@ -28,7 +32,7 @@ const bus = new ServerBus(
 
 //////////////////////////////////////////////////
 
-const grafo = new Grafo(mean.db);
+const grafo = new Grafo(mean.db, Helpers.on_read(bus));
 
 const schema = grafo
   .add_type({
