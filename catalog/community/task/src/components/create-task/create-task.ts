@@ -38,6 +38,8 @@ export class CreateTaskComponent {
     let expirationDateText: Element =
       document.getElementById("expiration-date-text");
     this.expiration_date = expirationDateText["value"];
+    let assigneeText: Element =
+      document.getElementById("task-assignee");
 
     this._graphQlService
       .post(`
@@ -52,6 +54,9 @@ export class CreateTaskComponent {
       .subscribe(res => {
         expirationDateText["value"] = "";
         this.expiration_date = "";
+        this.task.name = "";
+        assigneeText["value"] = "";
+        this.assignee.name = "";
       });
   }
 

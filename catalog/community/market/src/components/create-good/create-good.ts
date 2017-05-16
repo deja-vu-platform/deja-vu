@@ -24,7 +24,7 @@ export class CreateGoodComponent {
       .subscribe(_ => {
         this.good.atom_id = "";
         this.good.name = "";
-        this.good.offer_price = 0;
+        this.good.offer_price = "";
       });
   }
 }
