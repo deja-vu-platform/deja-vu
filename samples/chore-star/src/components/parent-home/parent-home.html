@@ -135,6 +135,10 @@ div.scroll {
             </dv-widget>
           </div>
           <div class="row">
+            <h2>Assigned Chores</h2>
+            <dv-widget name="ShowAssignedTasks" of="Task" [fields]="fields"></dv-widget>
+          </div>
+          <div class="row">
             <h2>Chores to Approve</h2>
             <dv-widget name="ShowPendingApprovalTasks" of="Task" [fields]="fields"></dv-widget>
           </div>

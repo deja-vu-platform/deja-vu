@@ -30,12 +30,12 @@ app ChoreStar {
   // Register of ChildAuth,
   // ShowPendingApprovalTasks of Task,
   // ShowAssignedTasks of Task,
-  // ShowGoodsToBuy of Market,
   // ShowMyGoods of Market
   widget ParentHome {
     parent: Parent,
     signout_redirect: Text
   }
+  
   // ShowTask of Task
   // ApproveTask of Task
   // RateTarget of Rating
