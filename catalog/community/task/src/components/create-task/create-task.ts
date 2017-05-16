@@ -13,7 +13,7 @@ import {Widget} from "client-bus";
 export class CreateTaskComponent {
   task = {atom_id: undefined, name: ""};
   assigner = {atom_id: undefined, name: ""};
-  assignee = {atom_id: undefined};
+  assignee = {atom_id: undefined, name: ""};
   expiration_date: string = "";
   assignee_options = [];
 
@@ -43,7 +43,7 @@ export class CreateTaskComponent {
       .post(`
         createTask(
           name: "${this.task.name}",
-          assigner_id: "${this.assigner.atom_id}"
+          assigner_id: "${this.assigner.atom_id}",
           assignee_id: "${this.assignee.atom_id}",
           expires_on: "${this.expiration_date}") {
           atom_id

@@ -14,6 +14,7 @@ app ChoreStar {
   data Chore {}
   data Reward {}
 
+
   // SignInWithRedirect,
   // RegisterWithRedirect of ParentAuth,
   // SignInWithRedirect of ChildAuth

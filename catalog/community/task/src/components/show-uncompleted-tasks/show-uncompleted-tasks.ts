@@ -11,8 +11,15 @@ export class ShowUncompletedTasksComponent {
   constructor(private _graphQlService: GraphQlService) {}
 
   dvAfterInit() {
+
+    console.log ("dv after init");
+    console.log(this.assignee);
+
     const update_tasks = () => {
+      console.log("updating");
+      console.log(this.assignee);
       if (this.assignee.atom_id === undefined) return;
+      console.log("updating");
 
       return this._graphQlService
       .get(`
