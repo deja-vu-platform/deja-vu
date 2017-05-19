@@ -2,7 +2,7 @@ module.exports = function(grunt) {
   require("mean-loader").GruntTask.cliche_task(
       grunt,
       "Task",
-      ["CreateTask", "ShowUncompletedTasks",
+      ["ShowTask", "CreateTask", "ShowUncompletedTasks",
        "ShowUnapprovedTasks", "ShowApprovedTasks", 
        "ShowAssignedTasks", "ShowPendingApprovalTasks"]);
 }
