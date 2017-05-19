@@ -21,7 +21,6 @@ export class ShowAssignedTasksComponent {
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
 
   dvAfterInit() {
-    const update_tasks = () => {
       if (this.assigner.atom_id === undefined) return;
 
       this._graphQlService
@@ -42,9 +41,5 @@ export class ShowAssignedTasksComponent {
       .subscribe(task => {
         this.assignedTasks.push(task);
       });
-    };
-
-    update_tasks();
-    this.assigner.on_change(update_tasks);
   }
 }

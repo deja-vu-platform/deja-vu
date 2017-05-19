@@ -23,15 +23,9 @@ export class ShowUncompletedTasksComponent {
 
   dvAfterInit() {
 
-    console.log ("dv after init");
+    if (this.assignee.atom_id === undefined) return;
 
-    const update_tasks = () => {
-      console.log("updating");
-      console.log(this.assignee);
-      if (this.assignee.atom_id === undefined) return;
-      console.log("updating");
-
-      return this._graphQlService
+    this._graphQlService
       .get(`
         uncompletedTasks(assignee_id: "${this.assignee.atom_id}"){
           name,
@@ -50,17 +44,6 @@ export class ShowUncompletedTasksComponent {
       .subscribe(task => {
         this.uncompletedTasks.push(task);
       });
-    };
 
-    update_tasks();
-    this.assignee.on_change(update_tasks);
-  }
-
-  markCompleted(task) {
-    this._graphQlService
-      .post(`
-        completeTask(task_id: "${task.atom_id}")
-      `)
-      .subscribe(res => undefined);
   }
 }

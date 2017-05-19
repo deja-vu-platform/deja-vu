@@ -1,8 +1,6 @@
 <ul *ngIf="uncompletedTasks && uncompletedTasks.length > 0" class="list-group">
   <li *ngFor="let task of uncompletedTasks" class="list-group-item">
-    <dv-widget name="ShowTask"
-      [fields]="task" [hosts]="hosts"></dv-widget>
-      <button (click)="markCompleted(task)"
-       class="btn btn-default btn-sm pull-right">Complete</button>
+    <dv-widget name="ShowTask" [fields]="task" [hosts]="hosts"></dv-widget>
+    <dv-widget name="CompleteTask" [fields]="task" [hosts]="hosts"></dv-widget>
   </li>
 </ul>

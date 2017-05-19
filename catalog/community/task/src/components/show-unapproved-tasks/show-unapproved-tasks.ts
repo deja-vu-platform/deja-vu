@@ -21,7 +21,6 @@ export class ShowUnapprovedTasksComponent {
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
 
   dvAfterInit() {
-    const update_tasks = () => {
       if (this.assignee.atom_id === undefined) return;
 
       this._graphQlService
@@ -42,9 +41,6 @@ export class ShowUnapprovedTasksComponent {
       .subscribe(task => {
         this.unapprovedTasks.push(task);
       });
-    };
 
-    update_tasks();
-    this.assignee.on_change(update_tasks);
   }
 }

@@ -29,12 +29,12 @@ cliche Task {
   }
 
   // also lets assigner mark task as approved
-  widget ShowPendingApprovalTasks uses ShowTask {
+  widget ShowPendingApprovalTasks uses ShowTask, ApproveTask {
     assigner: Assigner 
   }
 
   // also lets assignee mark task as completed
-  widget ShowUncompletedTasks uses ShowTask {
+  widget ShowUncompletedTasks uses ShowTask, CompleteTask {
     assignee: Assignee 
   }
 

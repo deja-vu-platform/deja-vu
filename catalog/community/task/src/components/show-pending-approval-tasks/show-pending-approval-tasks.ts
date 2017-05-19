@@ -22,7 +22,6 @@ export class ShowPendingApprovalTasksComponent {
 
 
   dvAfterInit() {
-    const update_tasks = () => {
       if (this.assigner.atom_id === undefined) return;
 
       this._graphQlService
@@ -44,17 +43,5 @@ export class ShowPendingApprovalTasksComponent {
       .subscribe(task => {
         this.pendingApprovalTasks.push(task);
       });
-    };
-
-    update_tasks();
-    this.assigner.on_change(update_tasks);
-  }
-
-  markApproved(task) {
-    this._graphQlService
-      .post(`
-        approveTask(task_id: "${task.atom_id}")
-      `)
-      .subscribe(res => undefined);
   }
 }
