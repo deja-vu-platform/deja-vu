@@ -2,7 +2,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({
-  fqelement: "dv-organization-task",
+  fqelement: "Task",
   template: `{{task.name}}`
   })
 export class ShowTaskComponent {
