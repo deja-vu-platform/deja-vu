@@ -1,7 +1,7 @@
 <ul *ngIf="pendingApprovalTasks && pendingApprovalTasks.length > 0" class="list-group">
   <li *ngFor="let task of pendingApprovalTasks" class="list-group-item">
-    {{task.name}}
-    <button (click)="markApproved(task)"
-    class="btn btn-default btn-sm pull-right">Approve</button>
+    <dv-widget name="ShowTask"
+      [fields]="task" [hosts]="hosts"></dv-widget>
+    <dv-widget name="ApproveTask" [fields]="task" [hosts]="hosts"></dv-widget>
   </li>
 </ul>

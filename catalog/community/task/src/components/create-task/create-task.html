@@ -7,7 +7,7 @@
   <fieldset class="form-group">
     <label class="sr-only" for="task-assignee">Assigned To</label>
     <select required id="task-assignee" [(ngModel)]="assignee.atom_id" name="task-assignee">
-      <option *ngFor="let assignee of assignee_options" value="assignee.atom_id">{{assignee.name}}</option>
+      <option *ngFor="let assignee of assignee_options" [ngValue]="assignee.atom_id">{{assignee.name}}</option>
     </select>
   </fieldset>
   <fieldset class="form-group">
