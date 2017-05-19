@@ -24,6 +24,14 @@ cliche Task {
     assigner: Assigner
   }
 
+  widget ApproveTask {
+    task: Task
+  }
+
+  widget CompleteTask {
+    task: Task
+  }
+
   widget ShowAssignedTasks uses ShowTask {
     assigner: Assigner 
   }
