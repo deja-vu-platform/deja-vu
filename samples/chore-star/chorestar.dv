@@ -2,9 +2,8 @@ app ChoreStar {
   use access/Auth[Parent: User] as ParentAuth
   use access/Auth[Child: User] as ChildAuth
   use community/Task[
-    Chore: Task, Parent: Assigner, Child: Assignee]
-//    ShowApproveWithRating replaces ShowTask in
-//      ShowPendingApprovalTasks]
+    Chore: Task, Parent: Assigner, Child: Assignee,
+    ApproveAndRateTask replaces ApproveTask in ShowPendingApprovalTasks]
   use community/Market[
     Chore: Good, Reward: Good, Parent: Party, Child: Party]
   use community/Rating[Parent: Source, Chore: Target]
@@ -36,16 +35,16 @@ app ChoreStar {
     signout_redirect: Text
   }
   
-  // ShowTask of Task
+
   // ApproveTask of Task
   // RateTarget of Rating
   // BuyGoodAtFractionOfPrice of Market
-  /*
-  widget ShowApproveWithRating {
-    parent: Parent, chore: Chore,
+  widget ApproveAndRateTask {
+    parent: Parent, 
+    chore: Chore,
     do_buy_on_approve: Boolean,
     fractional_rating: Number
-  }*/
+  }
 
 
   // LoggedIn of ChildAuth
