@@ -19,7 +19,7 @@ const handlers = {
     create: Helpers.resolve_create(mean.db, "assignee"),
     update: Helpers.resolve_update(mean.db, "assignee")
   },
-  assginer: {
+  assigner: {
     create: Helpers.resolve_create(mean.db, "assigner"),
     update: Helpers.resolve_update(mean.db, "assigner")
   },
