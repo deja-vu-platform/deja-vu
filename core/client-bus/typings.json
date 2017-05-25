@@ -1,8 +1,0 @@
-{
-  "name": "client-bus",
-  "globalDependencies": {
-    "underscore": "github:DefinitelyTyped/DefinitelyTyped/underscore/underscore.d.ts#c75674c0a04b3cde7e1eee862bb20420ee404309",
-    "UUID": "github:DefinitelyTyped/DefinitelyTyped/uuid/UUID.d.ts#26a1f8c44f5fe76168df717020bfb93839b63db3",
-    "underscore.string": "github:DefinitelyTyped/DefinitelyTyped/underscore.string/underscore.string.d.ts#b980d52078e719cbfebe7dd60de6db7be76982e3"
-  }
-}
