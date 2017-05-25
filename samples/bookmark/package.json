@@ -6,30 +6,12 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@angular/common": "~2.4.0",
-    "@angular/core": "~2.4.0",
-    "@angular/forms": "~2.4.0",
-    "@angular/http": "~2.4.0",
-    "core-js": "^2.4.1",
-    "client-bus": "file:../../core/client-bus",
-    "mean-loader": "file:../../core/mean-loader",
-    "dv-lang": "file:../../core/lang",
-    "reflect-metadata": "^0.1.9",
-    "rxjs": "5.0.1",
-    "server-bus": "file:../../core/server-bus",
-    "systemjs": "0.19.40",
-    "underscore": "^1.8.3",
-    "zone.js": "^0.7.4",
     "dv-access-auth": "file:../../catalog/access/auth",
     "dv-community-follow": "file:../../catalog/community/follow",
     "dv-messaging-feed": "file:../../catalog/messaging/feed",
     "dv-messaging-post": "file:../../catalog/messaging/post",
     "dv-messaging-comment": "file:../../catalog/messaging/comment",
-    "dv-organization-label": "file:../../catalog/organization/label"
-  },
-  "devDependencies": {
-    "grunt": "^0.4.5",
-    "tslint": "^3.9.0",
-    "typescript": "^2.0.10"
+    "dv-organization-label": "file:../../catalog/organization/label",
+    "dv-lang": "file:../../core/lang"
   }
 }
