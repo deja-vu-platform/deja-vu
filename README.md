@@ -23,6 +23,5 @@ cliché is run it shows a "development" page that displays all widgets.
 
 You can install and build all packages in this repo using `node install-all.js`.
 
-To run a sample do `npm start`. You also need to start the mongo daemon before
-running any cliché, to do so run `mongod`. To check the running app visit
+To run a sample do `npm start`. To check the running app visit
 `http://localhost:3000`

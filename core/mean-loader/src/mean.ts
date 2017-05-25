@@ -130,6 +130,7 @@ export namespace GruntTask {
     grunt.loadNpmTasks("grunt-express-server");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-replace");
+    grunt.loadNpmTasks("grunt-shell-spawn");
 
     grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
       if (action === "dev") {
@@ -182,7 +183,7 @@ export namespace GruntTask {
         grunt.task.run(["replace:dev"]);
         grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
         grunt.task.run(["copy:dev"]);
-        grunt.task.run(["express", "watch"]);
+        grunt.task.run(["shell:mongod", "express", "watch"]);
       } else if (action === "lib") {
         grunt.log.writeln(name + " lib");
         grunt.task.run(["clean:lib"]);
@@ -215,6 +216,7 @@ export namespace GruntTask {
     grunt.loadNpmTasks("grunt-express-server");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-replace");
+    grunt.loadNpmTasks("grunt-shell-spawn");
 
     grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
       if (action === "dev" || action === "test") {
@@ -280,7 +282,7 @@ export namespace GruntTask {
         grunt.task.run(["replace:dev"]);
         grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
         grunt.task.run(["copy:dev"]);
-        grunt.task.run(["express", "watch"]);
+        grunt.task.run(["shell:mongod", "express", "watch"]);
       } else if (action === "lib") {
         grunt.log.writeln(name + " lib");
         grunt.task.run(["clean:lib"]);
@@ -688,6 +690,15 @@ export namespace GruntTask {
               dest: "src/dv-dev"
             }
           ]
+        }
+      },
+
+      shell: {
+        mongod: {
+          command: "mongod",
+          options: {
+            async: true, stdout: true, stderr: true, failOnError: true
+          }
         }
       }
     };
