@@ -56,9 +56,9 @@ export class ServerBus {
       private _ws: express.Express,
       private _handlers: {
         [key: string]: {
-          read?: (...args) => Promise<boolean>,
-          create?: (...args) => Promise<boolean>,
-          update?: (...args) => Promise<boolean>
+          read?: (args: {atom_id: string}) => Promise<boolean>,
+          create?: (args: {atom_id: string, create: any}) => Promise<boolean>,
+          update?: (args: {atom_id: string, update: any}) => Promise<boolean>
         }
       },
       comp_info: CompInfo,
@@ -69,51 +69,28 @@ export class ServerBus {
     }
 
     const build_field = (action, t, handlers) => {
-      const forward_wrap = handler => {
-        if (handler === undefined) {
-          console.log("WARNING: no handler provided for " + action + " " + t);
-          handler = _ => Promise.resolve(true);
-        }
-        return (_, args) => handler(_u.omit(args, "forward"))
-          .then(_ => {
-            if (args.forward !== undefined) {
-              if (args.create !== undefined) {
-                console.log(
-                  `Forward requested for create(${t}, ${args.atom_id}, ` +
-                  `${args.create}) of ${fqelement}`);
-                return this.create_atom(
-                  t, args.atom_id, JSON.parse(args.create));
-              } else if (args.update !== undefined) {
-                console.log(
-                  `Forward requested for update(${t}, ${args.atom_id}, ` +
-                  `${args.update}) of ${fqelement}`);
-                return this.update_atom(
-                  t, args.atom_id, JSON.parse(args.update));
-              } else {
-                console.log("rm");
-              }
-            } else if (args.read !== undefined) {
-              console.log(
-                `Forward requested for read(${t}, ${args.atom_id}, ` +
-                `${args.update}) of ${fqelement}`);
-              return this.read_atom(t, args.atom_id);
-            }
-            return Promise.resolve(true);
-          });
-      };
+      let handler = handlers[t][action];
+      if (handler === undefined) {
+        console.log("WARNING: no handler provided for " + action + " " + t);
+        handler = (unused_root, unused_args) => Promise.resolve(true);
+      }
+
       const ret = {
         "type": graphql.GraphQLBoolean,
         args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          forward: {"type": graphql.GraphQLBoolean}
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: forward_wrap(handlers[t][action])
+        resolve: (unused_root, args) => handler(args)
       };
-      ret.args[action] = {
-        "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
-      };
+      if (action !== "read") {
+        ret.args[action] = {
+          "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+        };
+      }
       return ret;
     };
+
+
     const mut = {};
     for (let t of Object.keys(_handlers)) {
       mut["create_" + t] = build_field("create", t, _handlers);
@@ -165,7 +142,6 @@ export class ServerBus {
     return this._dispatcher.create_atom(
         _ustr.capitalize(t_name), atom_id, create);
   }
-
 
   read_atom(t_name: string, atom_id: string): Promise<boolean> {
     console.log("reading atom");
@@ -225,8 +201,6 @@ export class ServerBus {
 class Dispatcher {
   create_atom: (t_name: string, atom_id: string, create: any) =>
     Promise<boolean>;
-  read_atom: (t_name: string, atom_id: string, _?: any) =>
-    Promise<boolean>;
   update_atom: (t_name: string, atom_id: string, update: string) =>
     Promise<boolean>;
   remove_atom: (t_name: string, atom_id: string) => Promise<boolean>;
@@ -236,7 +210,6 @@ class Dispatcher {
 
   constructor(private _fqelement: string, comp_info: CompInfo, private _locs) {
     this.create_atom = this._process("create", this._transform_create);
-    this.read_atom = this._process("read", this._transform_read);
     this.update_atom = this._process("update", this._transform_update);
 
     this._str_t = t => JSON.stringify(t);
@@ -296,6 +269,16 @@ class Dispatcher {
         JSON.stringify(this._dispatch_table, null, 2));
   }
 
+  read_atom(t_name: string, atom_id: string): Promise<boolean> {
+    return Promise.all(
+      _u.map(_u.keys(this._dispatch_table[t_name]), target_str => {
+        const target = JSON.parse(target_str);
+        return this._post(this._locs[target.fqelement], `{
+            read_${target.name.toLowerCase()}(atom_id: "${atom_id}")
+        }`);
+      })).then(_ => true);
+  }
+
   private _process(op: string, transform_fn: any) {
     return (t_name: string, atom_id: string, info: any) => Promise.all(
         _u.values(_u.mapObject(
@@ -314,16 +297,6 @@ class Dispatcher {
                     atom_id: "${atom_id}", ${op}: "${info_str}")
               }`);
             }))).then(_ => true);
-  }
-
-  private _transform_read(atom: any, field_map: string) {
-    return _u.reduce(_u.keys(atom), (memo, field: string) => {
-        const target_field = field_map[field];
-        if (target_field !== undefined) {
-          memo[target_field] = atom[field];
-        }
-        return memo;
-    }, {});
   }
 
   private _transform_create(atom: any, field_map: string) {
