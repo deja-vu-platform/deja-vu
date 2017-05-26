@@ -147,7 +147,7 @@ export interface WCompInfo {
 @Component({
   selector: "dv-widget",
   template:  "<div #widget></div>",
-  inputs: ["of", "name", "fields", "hosts"]
+  inputs: ["of", "name", "fields"]
 })
 export class WidgetLoader {
   @ViewChild("widget", {read: ViewContainerRef})
@@ -158,8 +158,6 @@ export class WidgetLoader {
   of: string;
   name: string;
   fields;
-  hosts;
-  c_hosts;
 
   constructor(
       private _resolver: ComponentFactoryResolver,
@@ -175,22 +173,21 @@ export class WidgetLoader {
     if (this._host_wname === undefined) {
       throw new Error("Host widget name is required");
     }
+
+    // host_widget_t is the widget that contains the widget being loaded
     const host_widget_t = {
       name: this._host_wname,
       fqelement: this._host_fqelement
     };
-    this.c_hosts = [];
-    if (this.hosts !== undefined) {
-      this.c_hosts = this.c_hosts.concat(this.hosts);
-    }
-    this.c_hosts.push(host_widget_t);
+    // widget_t is the widget we are loading
     const widget_t = {name: this.name, fqelement: this.of};
     if (widget_t.fqelement === undefined) {
       widget_t.fqelement = this._host_fqelement;
     }
     const ret = _u.chain(this._wcomp_info.wbonds)
-      .filter(wbond => _u
-          .findWhere(this.c_hosts, wbond.subfield.of) !== undefined)
+      // We just look at the wbonds that involve the host...
+      .filter(wbond => _u.isEqual(host_widget_t, wbond.subfield.of))
+      // ...and the widget we are loading
       .filter(wbond => !_u.chain(wbond.fields).pluck("of")
           .where(widget_t).isEmpty().value())
       .map((wbond: FieldBond) => {
@@ -281,13 +278,12 @@ export class WidgetLoader {
         return component._component;
       })
       .then(c => {
-        c.hosts = this.c_hosts;
         if (c.fields === undefined) {
           c.fields = {};
         }
         c.fields = _u.extend(c.fields, this.fields);
         _u.each(_u.keys(c), f => {
-          if (f === "fields" || f === "hosts") return;
+          if (f === "fields") return;
           const replace_field_info = replace_field_map[f];
           const adapt_info = adapt_table[f];
 

@@ -1,7 +1,7 @@
 <!-- Feed(Name) -->
 <ul *ngIf="feed && feed.length > 0" class="list-group">
   <li *ngFor="let feedItem of feed" class="list-group-item">
-    <dv-widget name="ShowFeedItem" [fields]="feedItem" [hosts]="hosts">
+    <dv-widget name="ShowFeedItem" [fields]="feedItem">
     </dv-widget>
   </li>
 </ul>

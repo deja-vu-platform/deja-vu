@@ -7,12 +7,12 @@ import {Widget, ClientBus, field} from "client-bus";
     <div class="list-group">
       <div class="list-group-item-text">
         <dv-widget name="Comments" fqelement="dv-messaging-comment"
-         [fields]="fields" [hosts]="hosts">
+         [fields]="fields">
         </dv-widget>
       </div>
       <div class="list-group-item-text">
         <dv-widget name="NewComment" fqelement="dv-messaging-comment"
-         [fields]="fields" [hosts]="hosts">
+         [fields]="fields">
         </dv-widget>
       </div>
     </div>

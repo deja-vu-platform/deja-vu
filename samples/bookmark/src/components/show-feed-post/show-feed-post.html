@@ -1,25 +1,21 @@
 <div class="list-group">
   <h4 class="list-group-item-heading">
-    <dv-widget name="ShowAuthor" of="MessagingPost"
-     [fields]="fields" [hosts]="hosts">
+    <dv-widget name="ShowAuthor" of="MessagingPost" [fields]="fields">
     </dv-widget>
   </h4>
   <div class="list-group-item-text">
-    <dv-widget name="EditPost" of="MessagingPost"
-     [fields]="fields" [hosts]="hosts">
+    <dv-widget name="EditPost" of="MessagingPost" [fields]="fields">
     </dv-widget>
   </div>
   <p class="list-group-item-text">
     {{post.content}}
   </p>
   <div class="list-group-item-text">
-    <dv-widget name="ShowLabels" of="Label"
-     [fields]="fields" [hosts]="hosts">
+    <dv-widget name="ShowLabels" of="Label" [fields]="fields">
     </dv-widget>
   </div>
   <div class="list-group-item-text">
-    <dv-widget name="CommentsWithComment" of="Comment"
-     [fields]="fields" [hosts]="hosts">
+    <dv-widget name="CommentsWithComment" of="Comment" [fields]="fields">
     </dv-widget>
   </div>
 </div>
