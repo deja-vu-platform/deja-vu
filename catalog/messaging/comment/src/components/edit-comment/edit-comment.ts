@@ -12,7 +12,7 @@ export class EditCommentComponent {
   comment: Comment = null;
   isEditing = false;
 
-  constructor(private _graphQlService: GraphQlService) {debugger;}
+  constructor(private _graphQlService: GraphQlService) {}
 
   dvAfterInit() {
     this.editedContent = this.comment.content;
