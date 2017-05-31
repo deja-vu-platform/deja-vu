@@ -109,24 +109,21 @@ div.scroll {
     <div id="index-forms">
       <div class="container-fluid">
         <div class="col-md-5 col-md-offset-1 tall">
-            <div class="blue-background" id="login">
-              <h2>Parent Login</h2>
-              <dv-widget name="SignInWithRedirect" of="ParentAuth"
-               [fields]="fields"></dv-widget>
-            </div>
-            <div class="blue-background" id="register">
-              <h2>Parent Registration</h2>
-              <dv-widget name="RegisterWithRedirect" of="ParentAuth"
-               [fields]="fields"></dv-widget>
-            </div>
+          <div class="blue-background" id="login">
+            <h2>Parent Login</h2>
+            <dv-widget name="SignInWithRedirect" of="ParentAuth"></dv-widget>
+          </div>
+          <div class="blue-background" id="register">
+            <h2>Parent Registration</h2>
+            <dv-widget name="RegisterWithRedirect" of="ParentAuth"></dv-widget>
+          </div>
         </div>
     
         <div class="col-md-5">
-            <div class="margin blue-background" id="login-child">
-              <h2>Child Login</h2>
-              <dv-widget name="SignInWithRedirect" of="ChildAuth"
-               [fields]="fields"></dv-widget>
-            </div>
+          <div class="margin blue-background" id="login-child">
+            <h2>Child Login</h2>
+            <dv-widget name="SignInWithRedirect" of="ChildAuth"></dv-widget>
+          </div>
         </div>
       </div>
     </div>

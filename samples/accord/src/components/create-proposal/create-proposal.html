@@ -111,8 +111,7 @@ div {
 
 </style>
 
-<dv-widget name="LoggedIn" of="Auth"
-  [fields]="fields"></dv-widget>
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
 
 <nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
   <div class="container">
@@ -144,20 +143,15 @@ div {
   </div><!-- /.container-fluid -->
 </nav>
 
-<dv-widget name="ListFromRoute" of="SongList" [fields]="fields">
-</dv-widget>
+<dv-widget name="ListFromRoute" of="SongList"></dv-widget>
 
 <div class="container page-content">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <h1>Create Proposal</h1>
-
       <div>
-        <dv-widget name="AddItem" of="SongList"
-          [fields]="fields">
-        </dv-widget>
+        <dv-widget name="AddItem" of="SongList"></dv-widget>
       </div>
-
     </div>
   </div>
 </div>

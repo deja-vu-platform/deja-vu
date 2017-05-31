@@ -104,14 +104,14 @@ div.scroll {
 }
 </style>
 <div class="body">
-  <dv-widget name="LoggedIn" of="ParentAuth" [fields]="fields"></dv-widget>
+  <dv-widget name="LoggedIn" of="ParentAuth"></dv-widget>
   <div id="parent-homepage-container">
     <nav class="navbar navbar-default navbar-fixed-top">
       <div class="container-fluid">
         <div class="navbar-header">
           <a class="navbar-brand" href="#">ChoreStar</a>
         </div>
-        <dv-widget name="SignOutWithRedirect" of="ParentAuth" [fields]="fields">
+        <dv-widget name="SignOutWithRedirect" of="ParentAuth">
         </dv-widget>
       </div>
     </nav>
@@ -121,30 +121,27 @@ div.scroll {
         <div id="create-things-admin">
           <div class="row">
             <h2>Add a New Chore</h2>
-            <dv-widget name="CreateTask" of="Task" [fields]="fields">
-            </dv-widget>
+            <dv-widget name="CreateTask" of="Task"></dv-widget>
           </div>
           <div class="row">
             <h2>Add a New Reward</h2>
-            <dv-widget name="CreateGood" of="Market" [fields]="fields">
-            </dv-widget>
+            <dv-widget name="CreateGood" of="Market"></dv-widget>
           </div>
           <div class="row">
             <h2>Add a New Child</h2>
-            <dv-widget name="RegisterWithRedirect" of="ChildAuth" [fields]="fields">
-            </dv-widget>
+            <dv-widget name="RegisterWithRedirect" of="ChildAuth"></dv-widget>
           </div>
           <div class="row">
             <h2>Assigned Chores</h2>
-            <dv-widget name="ShowAssignedTasks" of="Task" [fields]="fields"></dv-widget>
+            <dv-widget name="ShowAssignedTasks" of="Task"></dv-widget>
           </div>
           <div class="row">
             <h2>Chores to Approve</h2>
-            <dv-widget name="ShowPendingApprovalTasks" of="Task" [fields]="fields"></dv-widget>
+            <dv-widget name="ShowPendingApprovalTasks" of="Task"></dv-widget>
           </div>
           <div class="row">
             <h2>Offered Rewards</h2>
-            <dv-widget name="ShowMyGoods" of="Market" [fields]="fields"></dv-widget>
+            <dv-widget name="ShowMyGoods" of="Market"></dv-widget>
           </div>
         </div>
       </div>

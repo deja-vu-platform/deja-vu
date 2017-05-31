@@ -104,13 +104,13 @@ div.scroll {
 }
 </style>
 <div class="body">
-  <dv-widget name="LoggedIn" of="ChildAuth" [fields]="fields"></dv-widget>
+  <dv-widget name="LoggedIn" of="ChildAuth"></dv-widget>
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">ChoreStar</a>
       </div>
-      <dv-widget name="SignOutWithRedirect" of="ChildAuth" [fields]="fields">
+      <dv-widget name="SignOutWithRedirect" of="ChildAuth">
       </dv-widget>
     </div>
   </nav>
@@ -120,7 +120,7 @@ div.scroll {
       <div class="container-fluid" id="child-heading-container">
           <div class="col-xs-2 col-xs-offset-4"><h4> StarBank Total: </h4></div> 
           <div class="col-xs-2 glyphicon glyphicon-star icon-size">
-            <dv-widget name="ShowBalance" of="Market" [fields]="fields"></dv-widget>
+            <dv-widget name="ShowBalance" of="Market"></dv-widget>
           </div>
       </div>
     </div>
@@ -130,15 +130,15 @@ div.scroll {
           <h2>Chores</h2>
           <h4>Uncompleted Chores</h4>
           <div class="row left-align-row">
-             <dv-widget name="ShowUncompletedTasks" of="Task" [fields]="fields"></dv-widget>
+             <dv-widget name="ShowUncompletedTasks" of="Task"></dv-widget>
           </div>
           <h4>Chores Pending Approval</h4>
           <div class="row left-align-row">
-             <dv-widget name="ShowUnapprovedTasks" of="Task" [fields]="fields"></dv-widget>
+             <dv-widget name="ShowUnapprovedTasks" of="Task"></dv-widget>
           </div>
           <h4>Completed and Approved Chores</h4>
           <div class="row left-align-row">
-             <dv-widget name="ShowApprovedTasks" of="Task" [fields]="fields"></dv-widget> 
+             <dv-widget name="ShowApprovedTasks" of="Task"></dv-widget> 
           </div>
         </div>
       </div>
@@ -146,7 +146,7 @@ div.scroll {
       <div id="child-rewards" class="col-md-6"> 
         <div class="blue-background">
           <h2>Rewards</h2>
-             <dv-widget name="AffordTable" of="Market" [fields]="fields"></dv-widget>
+             <dv-widget name="AffordTable" of="Market"></dv-widget>
         </div>
       </div>
     </div>

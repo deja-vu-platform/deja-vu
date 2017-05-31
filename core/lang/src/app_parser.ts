@@ -67,17 +67,23 @@ export class AppParser {
           return {
             id: alias ? alias : st.name,
             type: "cliche",
-            attr: {symbol_table: st.st, name: st.name, category: st.category}
+            attr: {
+              symbol_table: st.st, name: st.name, category: st.category,
+              wfbonds: st.wfbonds
+            }
           };
         },
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (category, slash, name) => ({
-          name: name.sourceString,
-          category: category.sourceString,
-          st: this
-            ._cliche_parser.parse(category.sourceString, name.sourceString)
-            .symbol_table
-        }),
+        usedClicheName: (category, slash, name) => {
+          const cliche = this
+            ._cliche_parser.parse(category.sourceString, name.sourceString);
+          return {
+            name: name.sourceString,
+            category: category.sourceString,
+            st: cliche.symbol_table,
+            wfbonds: cliche.wfbonds
+          };
+        },
         //
         Paragraph_data: decl => decl.symbolTable(),
         Paragraph_widget: decl => decl.symbolTable(),
@@ -371,6 +377,7 @@ export class AppParser {
     }
     const s = this._semantics(r);
     this._symbol_table = s.symbolTable();
+    console.log(JSON.stringify(this._symbol_table, null, 2));
     const app_widget_symbols = _u
       .filter(_u.values(this._symbol_table), s => s.type === "widget");
     const tbonds = s.tbonds();
@@ -384,9 +391,30 @@ export class AppParser {
       replace_map: this._fmaps(s.replaceMap(), tbonds, fqelement),
       tbonds: this._tbonds(tbonds, fqelement),
       dfbonds: this._dfbonds(tbonds, fqelement),
-      wfbonds: this._wfbonds(tbonds, fqelement),
+      wfbonds: this._wfbonds(tbonds, fqelement).concat(this._cliche_wfbonds()),
       data: s.data()
     };
+  }
+
+  _cliche_wfbonds() {
+    return _u
+      .chain(_u.values(this._symbol_table))
+      .filter(s => s.type === "cliche")
+      .reject(s => _u.isEmpty(s.attr.wfbonds))
+      .map(cliche => _u.map(cliche.attr.wfbonds, wfbond => {
+        wfbond.subfield.of.fqelement = cliche.id;
+        wfbond.subfield.type.fqelement = cliche.id;
+        const mapped_fields = _u.map(wfbond.fields, f => {
+          f.of.fqelement = cliche.id;
+          f.of.type = cliche.id;
+          delete f.of.type;
+          return f;
+        });
+        wfbond.fields = mapped_fields;
+        return wfbond;
+      }))
+      .flatten()
+      .value();
   }
 
   _tbonds(tbonds, fqelement: string) {
@@ -532,6 +560,9 @@ export class AppParser {
             .flatten()
             .value());
         };
+        if (this._symbol_table[cw.fqelement] === undefined) {
+            throw new Error(`Can't find cliche ${cw.fqelement}`);
+        }
         cw.cliche = this._symbol_table[cw.fqelement].attr.name;
         return [cw]
           .concat(_u

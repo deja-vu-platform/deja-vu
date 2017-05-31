@@ -7,8 +7,6 @@ import "rxjs/add/operator/mergeMap";
 
 import {Widget, ClientBus} from "client-bus";
 
-import * as _u from "underscore";
-
 
 export interface Item {
   atom_id: string;
@@ -20,7 +18,6 @@ export interface Item {
 @Widget({fqelement: "List", ng2_providers: [GraphQlService]})
 export class ShowListComponent {
   list = {atom_id: "", items: [], on_change: _ => undefined};
-  fields = {};
 
   constructor(
       private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
@@ -49,7 +46,6 @@ export class ShowListComponent {
           item_atom.checked = item.checked;
           return {item: item_atom};
         })
-        .map(item => _u.extend(item, this.fields))
         .subscribe(item => {
           this.list.items.push(item);
         });

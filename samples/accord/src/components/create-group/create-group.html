@@ -111,8 +111,7 @@ div {
 
 </style>
 
-<dv-widget name="LoggedIn" of="Auth"
-  [fields]="fields"></dv-widget>
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
 
 <nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
   <div class="container">
@@ -147,13 +146,9 @@ div {
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <h1>Create Group</h1>
-
       <div>
-        <dv-widget name="NewGroupWithInitialMember" of="Group"
-          [fields]="fields">
-        </dv-widget>
+        <dv-widget name="NewGroupWithInitialMember" of="Group"></dv-widget>
       </div>
-
     </div>
   </div>
 </div>

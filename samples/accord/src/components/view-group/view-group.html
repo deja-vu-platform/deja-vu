@@ -111,8 +111,7 @@ div {
 
 </style>
 
-<dv-widget name="LoggedIn" of="Auth"
-  [fields]="fields"></dv-widget>
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
 
 <nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
   <div class="container">
@@ -143,37 +142,29 @@ div {
 </nav>
 
 <!-- Load the group from the route param -->
-<dv-widget name="GroupFromRoute" of="Group" [fields]="fields">
+<dv-widget name="GroupFromRoute" of="Group">
 </dv-widget>
 
 <div class="container page-content">
   <div class="row">
     <div class="col-md-3">
       <h2>
-        <dv-widget name="ShowGroupOverview" of="Group"
-          [fields]="fields">
-        </dv-widget>
+        <dv-widget name="ShowGroupOverview" of="Group"></dv-widget>
       </h2>
 
       <!-- Links to the add setlist page -->
-      <dv-widget name="RedirectToGroup" of="Group"
-        [fields]="fields"></dv-widget>
+      <dv-widget name="RedirectToGroup" of="Group"></dv-widget>
 
       <p>Setlists:</p>
-      <dv-widget name="ShowList" of="SetlistList" [fields]="fields">
-      </dv-widget>
-
+      <dv-widget name="ShowList" of="SetlistList"></dv-widget>
     </div>
     <div class="col-md-9">
-        <h1>
-          <dv-widget name="ShowGroupOverview" of="Group"
-            [fields]="fields">
-          </dv-widget>
-        </h1>
+      <h1>
+        <dv-widget name="ShowGroupOverview" of="Group"></dv-widget>
+      </h1>
 
-        <h2>Members</h2>
-        <dv-widget name="ShowGroup" of="Group"
-          [fields]="fields"></dv-widget>
+      <h2>Members</h2>
+      <dv-widget name="ShowGroup" of="Group"></dv-widget>
     </div>
   </div>
 </div>

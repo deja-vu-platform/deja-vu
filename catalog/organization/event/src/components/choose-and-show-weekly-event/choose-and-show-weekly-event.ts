@@ -41,7 +41,6 @@ export class ChooseAndShowWeeklyEventComponent {
   selected_weekly_event: WeeklyEvent = {
     atom_id: undefined, starts_on: undefined, ends_on: undefined
   };
-  fields = {};
 
   constructor(
       private _graphQlService: GraphQlService,
@@ -87,12 +86,7 @@ export class ChooseAndShowWeeklyEventComponent {
                  new Date(e2.start_date).getTime();
         })))
       .map(e => _u.extendOwn(this._clientBus.new_atom("Event"), e))
-      .map(e => ({event: e}))
-      .map(e_field => _u.extendOwn(e_field, this.fields))
-      .map(e_field => _u
-          .extendOwn(
-            e_field, {selected_weekly_event: this.selected_weekly_event}))
-      .subscribe(e_field => this.events.push(e_field));
+      .subscribe(e => this.events.push(e));
   }
 
   ngAfterViewInit() {

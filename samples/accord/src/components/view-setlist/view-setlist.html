@@ -111,8 +111,7 @@ div {
 
 </style>
 
-<dv-widget name="LoggedIn" of="Auth"
-  [fields]="fields"></dv-widget>
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
 
 <nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
   <div class="container">
@@ -143,23 +142,17 @@ div {
 </nav>
 
 <!-- Load the group from the route param -->
-<dv-widget name="ListFromRoute" of="SongList" [fields]="fields">
-</dv-widget>
+<dv-widget name="ListFromRoute" of="SongList"></dv-widget>
 
 <div class="container page-content">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
-        <h1>
-            Setlist
-        </h1>
+      <h1>Setlist</h1>
 
-        <div>
-            Want to add a proposal?
-        </div>
-        <dv-widget name="RedirectToList" of="SongList" [fields]="fields">
-        </dv-widget>
+      <div>Want to add a proposal?</div>
+      <dv-widget name="RedirectToList" of="SongList"></dv-widget>
 
-        <dv-widget name="ShowList" of="SongList" [fields]="fields"></dv-widget>
+      <dv-widget name="ShowList" of="SongList"></dv-widget>
     </div>
   </div>
 </div>

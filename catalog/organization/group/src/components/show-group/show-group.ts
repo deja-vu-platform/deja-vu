@@ -7,7 +7,6 @@ import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-import * as _u from "underscore";
 
 export interface Member {
   atom_id: string;
@@ -20,7 +19,6 @@ export interface Member {
 })
 export class ShowGroupComponent {
   group = {atom_id: "", members: [], name: "", on_change: _ => undefined};
-  fields = {};
 
   constructor(
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
@@ -55,11 +53,8 @@ export class ShowGroupComponent {
           const memberAtom: Member = this._clientBus.new_atom("Member");
           memberAtom.atom_id = member.atom_id;
           memberAtom.name = member.name;
-          return {
-            member: memberAtom
-          };
+          return memberAtom;
         })
-        .map(member => _u.extend(member, this.fields))
         .subscribe(member => {
           this.group.members.push(member);
         });

@@ -9,28 +9,28 @@ import * as _ustring from "underscore.string";
 declare const System: any;
 
 
-export interface Type {
+export type Type = {
   name: string;
   fqelement: string;
 }
 
-export interface Field {
+export type Field = {
   name: string;
   "type": Type;
   "of"?: Type;
 }
 
-export interface TypeBond {
+export type TypeBond = {
   types: Type[];
   subtype: Type;
 }
 
-export interface FieldBond {
+export type FieldBond = {
   fields: Field[];
   subfield: Field;
 }
 
-export interface CompInfo {
+export type CompInfo = {
   tbonds: TypeBond[];
   fbonds: FieldBond[];
 }
@@ -130,24 +130,55 @@ export class ClientBus {
   // won't get called so all initialization needs to happen in the constructor
   // todo: ditch ng2's routing system and do it ourselves
   init(w, fields) {
-    w.fields = {};
     for (const f of fields) {
       w[f.name] = this.new_atom(f.t);
-      w.fields[f.name] = w[f.name];
     }
   }
 }
 
 
-export interface WCompInfo {
+export type WCompInfo = {
   wbonds: FieldBond[];
+}
+
+type AdaptTable = {
+  [target_fname: string]: {
+    ftype: Type; host_fname: string; host_tname: string
+  }
+}
+
+export type ReplaceMap = {
+  [cliche: string]: {
+    [parent_widget: string]: {
+      [replaced_widget: string]: {
+        replaced_by: Type; // the widget that replaces
+        map: FieldReplaceMap
+      }
+    }
+  }
+}
+
+// from replacing to replaced
+export type FieldReplaceMap = {
+  [replacing_f: string]: {
+    type: Type; // type of the replacing field
+    maps_to: string; // replaced field
+  }
+}
+
+// from replaced to replacing
+export type FieldReplacingMap = {
+  [replaced_f: string]: {
+    replacing_field_type: Type; // type of the replacing field
+    replacing_field: string; // replacing field
+  }
 }
 
 
 @Component({
   selector: "dv-widget",
   template:  "<div #widget></div>",
-  inputs: ["of", "name", "fields"]
+  inputs: ["of", "name", "init"]
 })
 export class WidgetLoader {
   @ViewChild("widget", {read: ViewContainerRef})
@@ -157,18 +188,86 @@ export class WidgetLoader {
 
   of: string;
   name: string;
-  fields;
+  init: any; // optional values to initialize the widget fields
 
   constructor(
       private _resolver: ComponentFactoryResolver,
       @Inject("WCompInfo") private _wcomp_info: WCompInfo,
-      @Inject("ReplaceMap") private _replace_map,
+      @Inject("ReplaceMap") private _replace_map: ReplaceMap,
       private _client_bus: ClientBus,
       @Inject("wname") @Optional() private _host_wname,
       @Inject("fqelement") @Optional() private _host_fqelement,
-      @Inject("app") private _app) {}
+      @Inject("app") private _app,
+      private _vc_ref: ViewContainerRef) {}
 
-  _adapt_table() {
+  ngOnInit() {
+    if (this.called) return;
+    this.called = true;
+
+    if (this.of === undefined) {
+      this.of = this._host_fqelement;
+    }
+
+    let adapt_table: AdaptTable = this._adapt_table();
+
+    console.log(this._replace_map);
+
+    let field_replacing_map: FieldReplacingMap = {};
+    let init_fields = this.init;
+    if (this._replace_map[this.of] !== undefined &&
+        this._replace_map[this.of][this._host_wname]) {
+      const replace_widget = this
+        ._replace_map[this.of][this._host_wname][this.name];
+      if (replace_widget !== undefined) {
+        console.log(
+            `Replacing ${this.name} with ${replace_widget.replaced_by.name} ` +
+            `of ${replace_widget.replaced_by.fqelement}`);
+        this.name = replace_widget.replaced_by.name;
+        this.of = replace_widget.replaced_by.fqelement;
+
+        _u.each(replace_widget.map, (rinfo, f) => {
+          field_replacing_map[rinfo.maps_to] = {
+            replacing_field: f, replacing_field_type: rinfo.type
+          };
+        });
+
+        // map the init values
+        const modified_init_fields = {};
+        _u.each(this.init, (val, key) => {
+          let new_key_info = field_replacing_map[key];
+          if (new_key_info !== undefined) {
+            modified_init_fields[new_key_info.replacing_field] = val
+              .adapt(new_key_info.replacing_field_type);
+          } else {
+            console
+              .log(`A value for field ${key} was provided but it is not ` +
+                  "used in the replaced widget");
+          }
+        });
+        init_fields = modified_init_fields;
+
+        // Not all fields will appear in the replace map. The widget being
+        // replace could have fields that have no matched field in the replacing
+        // widget
+        const modified_adapt_table = {};
+        _u.each(adapt_table, (finfo, target_fname) => {
+          const rinfo = field_replacing_map[target_fname];
+          if (rinfo !== undefined) {
+            modified_adapt_table[rinfo.replacing_field] = {
+              ftype: rinfo.replacing_field_type,
+              host_fname: finfo.host_fname,
+              host_tname: finfo.host_tname
+            };
+          }
+        });
+        adapt_table = modified_adapt_table;
+      }
+    }
+
+    return this._load_widget(this.name, this.of, adapt_table, init_fields);
+  }
+
+  private _adapt_table(): AdaptTable {
     if (this.name === undefined) throw new Error("Widget name is required");
     if (this._host_wname === undefined) {
       throw new Error("Host widget name is required");
@@ -215,40 +314,9 @@ export class WidgetLoader {
     return ret;
   }
 
-  ngOnInit() {
-    if (this.called) return;
-    this.called = true;
-
-    if (this.of === undefined) {
-      this.of = this._host_fqelement;
-    }
-
-    const adapt_table = this._adapt_table();
-
-    console.log(this._replace_map);
-
-    let replace_field_map = {};
-    if (this._replace_map[this.of] !== undefined &&
-        this._replace_map[this.of][this._host_wname]) {
-      const replace_widget = this.
-        _replace_map[this.of][this._host_wname][this.name];
-      if (replace_widget !== undefined) {
-        console.log(
-            `Replacing ${this.name} with ${replace_widget.replaced_by.name} ` +
-            `of ${replace_widget.replaced_by.fqelement}`);
-        this.name = replace_widget.replaced_by.name;
-        this.of = replace_widget.replaced_by.fqelement;
-        replace_field_map = replace_widget.map;
-      }
-    }
-
-
-    return this._load_widget(
-        this.name, this.of, adapt_table, replace_field_map);
-  }
 
   private _load_widget(
-      name: string, fqelement: string, adapt_table, replace_field_map) {
+      name: string, fqelement: string, adapt_table: AdaptTable, init_fields) {
     let imp = "";
     if (fqelement === this._app) {
       imp = this._app;
@@ -257,7 +325,9 @@ export class WidgetLoader {
       imp = fqelement + `/lib/components/${d_name}/${d_name}`;
     }
 
-    console.log(`Loading ${name} of ${fqelement}`);
+    console.log(
+      `Loading ${name} of ${fqelement} with adapt table ` +
+      `${JSON.stringify(adapt_table, null, 2)} and init fields ${init_fields}`);
     return System
       .import(imp)
       .then(mod => mod[name + "Component"])
@@ -278,31 +348,41 @@ export class WidgetLoader {
         return component._component;
       })
       .then(c => {
-        if (c.fields === undefined) {
-          c.fields = {};
-        }
-        c.fields = _u.extend(c.fields, this.fields);
         _u.each(_u.keys(c), f => {
-          if (f === "fields") return;
-          const replace_field_info = replace_field_map[f];
           const adapt_info = adapt_table[f];
-
-          if (replace_field_info !== undefined) {
-            c[f] = this.fields[replace_field_info.maps_to]
-              .adapt(replace_field_info.type);
-            c.fields[f] = c[f];
-          } else if (adapt_info !== undefined) {
+          if (adapt_info !== undefined) {
+            // https://github.com/angular/angular/issues/10448
+            // https://stackoverflow.com/questions/40025761
+            const parent_component = (<any> this._vc_ref)
+              ._element.parentView.context;
             const host_fname = adapt_info.host_fname;
-            if (this.fields[host_fname] === undefined) {
-              throw new Error(`Expected field ${host_fname} is undefined`);
+            if (parent_component[host_fname] !== undefined) {
+              c[f] = parent_component[host_fname].adapt(adapt_info.ftype);
             }
-            c[f] = this.fields[host_fname].adapt(adapt_info.ftype);
-            c.fields[f] = c[f];
-          } else if ( // let cliches pass info directly to their widgets
-            fqelement === this._host_fqelement && c.fields[f] !== undefined) {
-            c[f] = c.fields[f];
+
+            // todo: this is not necessarily an error unless we enforce that
+            // all widgets need to initialize the fields they defined
+            if (parent_component[host_fname] === undefined &&
+                (init_fields === undefined || init_fields[f] === undefined)) {
+              throw new Error(
+                `Expected field ${host_fname} is undefined in ` +
+                `${this._host_wname} of ${this._host_fqelement} and an ` +
+                `initialization value has not been provided for it. Field is ` +
+                `needed to initialize ${f} in ${name} of ${fqelement}`);
+            }
           }
         });
+        return c;
+      })
+      .then(c => { // initialize fields with init values
+        if (init_fields !== undefined) {
+          _u.each(_u.keys(c), f => {
+            const init_value = init_fields[f];
+            if (init_value !== undefined) {
+              c[f] = init_value;
+            }
+          });
+        }
         return c;
       })
       .then(c => { /* hack */

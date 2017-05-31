@@ -8,14 +8,11 @@ import "rxjs/add/operator/mergeMap";
 import {Widget, ClientBus} from "client-bus";
 import {Task} from "../../shared/data";
 
-import * as _u from "underscore";
-
 
 @Widget({fqelement: "Task", ng2_providers: [GraphQlService]})
 export class ShowAssignedTasksComponent {
   assigner = {atom_id: undefined, on_change: _ => undefined};
   assignedTasks = [];
-  fields = {};
 
   constructor(
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
@@ -37,7 +34,6 @@ export class ShowAssignedTasksComponent {
         task_atom.name = task.name;
         return {task: task_atom};
       })
-      .map(task => _u.extend(task, this.fields))
       .subscribe(task => {
         this.assignedTasks.push(task);
       });

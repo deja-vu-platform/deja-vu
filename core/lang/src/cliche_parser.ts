@@ -18,12 +18,15 @@ export interface Cliche {
   fqelement: string;
   widgets: string[];
   symbol_table: SymbolTable;
+  wfbonds: any[];
 }
 
 
 export class ClicheParser {
   grammar;
   semantics;
+
+  private _symbol_table: SymbolTable;
 
   constructor() {
     const grammar_path = path.join(__dirname, "cliche_grammar.ohm");
@@ -86,15 +89,17 @@ export class ClicheParser {
       throw new Error(r.message);
     }
     const s = this.semantics(r);
-    const symbol_table = s.symbolTable();
+    this._symbol_table = s.symbolTable();
+    const fqelement = s.fqelement();
     return {
       fqelement: s.fqelement(),
       widgets: _u
-        .chain(_u.values(symbol_table))
+        .chain(_u.values(this._symbol_table))
         .filter(s => s.type === "widget")
         .pluck("id")
         .value(),
-      symbol_table: symbol_table
+      symbol_table: this._symbol_table,
+      wfbonds: this._wfbonds(fqelement)
     };
   }
 
@@ -104,5 +109,42 @@ export class ClicheParser {
 
     console.log("//////////Widgets//////////");
     console.log(debug(p.widgets));
+  }
+
+  _match(ftname: string, matcht: string, fqelement: string) {
+    let ret = {};
+
+    const t_st = this._symbol_table[matcht];
+    if (t_st === undefined) throw new Error(`Can't find type ${matcht}`);
+
+    const fname = _u.findKey(t_st.attr.fields, ft => ft === ftname);
+    if (fname !== undefined) {
+      ret = {
+        name: fname, of: {name: matcht, fqelement: fqelement},
+        type: {name: t_st.attr.fields[fname], fqelement: fqelement}
+      };
+    }
+    return ret;
+  }
+
+  _wfbonds(fqelement) {
+    return _u
+      .chain(_u.values(this._symbol_table))
+      .filter(s => s.type === "widget")
+      .map(data => _u
+        .map(data.attr.fields, (subftype, subfname) => _u
+          .map(subftype.split("|"), subft => ({
+            subfield: {
+              name: subfname, of: {name: data.id, fqelement: fqelement},
+              type: {name: subftype, fqelement: fqelement}},
+            fields: _u
+              .reject(_u
+                .map(this._symbol_table[data.id].attr.uses,
+                     matcht => this._match(subft.trim(), matcht, fqelement)),
+                _u.isEmpty)
+          }))))
+      .flatten()
+      .reject(b => _u.isEmpty(b.fields))
+      .value();
   }
 }

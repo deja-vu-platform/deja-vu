@@ -111,8 +111,7 @@ div {
 
 </style>
 
-<dv-widget name="LoggedIn" of="Auth"
-  [fields]="fields"></dv-widget>
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
 
 <nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
   <div class="container">
@@ -145,20 +144,16 @@ div {
 </nav>
 
 <!-- Load the group from the route param -->
-<dv-widget name="GroupFromRoute" of="Group" [fields]="fields">
-</dv-widget>
+<dv-widget name="GroupFromRoute" of="Group"></dv-widget>
 
 <div class="container page-content">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <h1>Create Setlist</h1>
-
       <div>
-        <dv-widget name="AddItem" of="SetlistList"
-          [fields]="fields">
+        <dv-widget name="AddItem" of="SetlistList">
         </dv-widget>
       </div>
-
     </div>
   </div>
 </div>
