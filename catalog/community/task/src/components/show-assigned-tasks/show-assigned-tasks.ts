@@ -32,7 +32,7 @@ export class ShowAssignedTasksComponent {
         const task_atom = this._clientBus.new_atom("Task");
         task_atom.atom_id = task.atom_id;
         task_atom.name = task.name;
-        return {task: task_atom};
+        return task;
       })
       .subscribe(task => {
         this.assignedTasks.push(task);

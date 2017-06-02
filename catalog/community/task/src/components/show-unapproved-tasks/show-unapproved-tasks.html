@@ -1,5 +1,5 @@
 <ul *ngIf="unapprovedTasks && unapprovedTasks.length > 0" class="list-group">
   <li *ngFor="let task of unapprovedTasks" class="list-group-item">
-    <dv-widget name="ShowTask" [fields]="task"></dv-widget>
+  <dv-widget name="ShowTask" [init]="{task: task}"></dv-widget>
   </li>
 </ul>
