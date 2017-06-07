@@ -3,13 +3,13 @@
     <span class="navbar-brand">Bookmark</span>
     <ul class="nav navbar-nav">
       <li [routerLinkActive]="['active']">
-        <a [routerLink]="['home']">Home</a>
+        <a [routerLink]="['/home']">Home</a>
       </li>
       <li [routerLinkActive]="['active']">
-        <a [routerLink]="['topics']">Topics</a>
+        <a [routerLink]="['/topics']">Topics</a>
       </li>
       <li [routerLinkActive]="['active']">
-        <a [routerLink]="['users']">Users</a>
+        <a [routerLink]="['/users']">Users</a>
       </li>
     </ul>
     <ul class="nav navbar-nav navbar-right" style="padding-top: 10px">
@@ -17,6 +17,3 @@
     </ul>
   </div>
 </nav>
-<div class="container">
-  <router-outlet></router-outlet>
-</div>

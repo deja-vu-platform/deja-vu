@@ -52,6 +52,7 @@ function main() {
         pObj.replace_map,
         {"tbonds": pObj.tbonds, "fbonds": pObj.dfbonds},
         {"wbonds": pObj.wfbonds},
+        {"nfbonds": pObj.nfbonds},
         pObj.data);
       grunt.tasks(["dv-mean:test"]);
     }

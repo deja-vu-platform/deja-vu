@@ -1,7 +1,11 @@
-import {Injectable, Inject, Component, Optional} from "@angular/core";
+import {
+  Injectable, Inject, Component, Optional, OnChanges, SimpleChanges
+} from "@angular/core";
+import {Location} from "@angular/common";
 import {
   ViewContainerRef, ViewChild, ReflectiveInjector, ComponentFactoryResolver
 } from "@angular/core";
+import {Router, ActivatedRoute} from "@angular/router";
 
 import * as _u from "underscore";
 import * as _ustring from "underscore.string";
@@ -111,16 +115,57 @@ export function field(name: string, t: string) {
   return {name: name, t: t};
 }
 
+export type WidgetNavigation = {
+  name: string; this_widget_name: string; this_widget: any
+};
 
 @Injectable()
 export class ClientBus {
   constructor(
       @Inject("fqelement") private _fqelement: string,
-      @Inject("CompInfo") private _comp_info: CompInfo) {}
+      @Inject("CompInfo") private _comp_info: CompInfo,
+      @Inject("WCompInfo") private _wcomp_info: WCompInfo,
+      @Inject("NCompInfo") private _ncomp_info: NCompInfo,
+      @Inject("RouteConfig") private _route_config,
+      @Inject("app") private _app: string,
+      private _router: Router) {}
 
   new_atom(t: string): any {
     return new Atom(this._comp_info)
       .adapt({name: t, fqelement: this._fqelement});
+  }
+
+  navigate(to_widget_info: WidgetNavigation): Promise<boolean> {
+    const from_widget = {
+      name: to_widget_info.this_widget_name,
+      fqelement: this._app
+    };
+    const to_widget = {name: to_widget_info.name, fqelement: this._app};
+    const adapt_table = build_adapt_table(
+      from_widget, to_widget, this._ncomp_info.nfbonds);
+
+    const route = this._route_config.widgets[to_widget_info.name];
+    const query_params = {};
+    _u.each(_u.keys(adapt_table), target_fname => {
+      const finfo = adapt_table[target_fname];
+      const fvalue = to_widget_info.this_widget[finfo.host_fname];
+      const ftype = finfo.ftype.name;
+      if (fvalue.atom_id !== undefined) {
+        query_params[target_fname] = [fvalue.atom_id, ftype];
+      } else if (ftype === "Widget") {
+        console.log("to be implemented");
+      } else {
+        query_params[target_fname] = [fvalue.value, ftype];
+      }
+    });
+    return this._router.navigate(["/" + route], {queryParams: query_params})
+      .catch(reason => {
+        console.log(`Navigation to ${route} failed: ${reason}`);
+      })
+      .then(res => {
+        if (!res) console.log(`Navigation to ${route} failed`);
+        return res;
+      });
   }
 
   // This method is only necessary for those widgets that are loaded from a
@@ -136,6 +181,10 @@ export class ClientBus {
   }
 }
 
+
+export type NCompInfo = {
+  nfbonds: FieldBond[];
+}
 
 export type WCompInfo = {
   wbonds: FieldBond[];
@@ -175,16 +224,52 @@ export type FieldReplacingMap = {
 }
 
 
+@Component({template: `<dv-widget [name]="name" [init]="init"></dv-widget>`})
+export class RouteLoader {
+  BASIC_TYPES = ["Text", "Boolean", "Date", "Datetime", "Number"];
+  name: string; init: any;
+
+  constructor(
+    @Inject("RouteConfig") private _route_config,
+    private _activated_route: ActivatedRoute,
+    private _loc: Location, private _client_bus: ClientBus) {}
+
+  ngOnInit() {
+    this._activated_route.url.subscribe(url_segments => {
+      const path = _u.pluck(url_segments, "path").join("/");
+      let widget = this._route_config.routes[path];
+      if (widget === undefined) { // Redirect to the main widget
+        this._loc.replaceState("/");
+        this.name = this._route_config.routes[""];
+        this.init = {};
+      } else {
+        this.name = widget;
+      }
+    });
+
+    this._activated_route.queryParams.subscribe(query_params => {
+      this.init = _u.mapObject(query_params, (value, field) => {
+        let [fvalue, ftype] = value.split(",");
+        const ret = this._client_bus.new_atom(ftype);
+        if (this.BASIC_TYPES.indexOf(ftype) > -1) {
+          ret.value = fvalue;
+        } else {
+          ret.atom_id = fvalue;
+        }
+        return ret;
+      });
+    });
+  }
+}
+
 @Component({
   selector: "dv-widget",
   template:  "<div #widget></div>",
   inputs: ["of", "name", "init"]
 })
-export class WidgetLoader {
+export class WidgetLoader implements OnChanges {
   @ViewChild("widget", {read: ViewContainerRef})
   widgetContainer: ViewContainerRef;
-
-  called: boolean;
 
   of: string;
   name: string;
@@ -200,15 +285,27 @@ export class WidgetLoader {
       @Inject("app") private _app,
       private _vc_ref: ViewContainerRef) {}
 
-  ngOnInit() {
-    if (this.called) return;
-    this.called = true;
+  ngOnChanges(unused_changes: SimpleChanges) {
+    if (this.name === undefined) throw new Error("Widget name is required");
+    if (this._host_wname === undefined) {
+      throw new Error("Host widget name is required");
+    }
 
     if (this.of === undefined) {
       this.of = this._host_fqelement;
     }
-
-    let adapt_table: AdaptTable = this._adapt_table();
+    // host_widget_t is the widget that contains the widget being loaded
+    const host_widget_t = {
+      name: this._host_wname,
+      fqelement: this._host_fqelement
+    };
+    // widget_t is the widget we are loading
+    const widget_t = {name: this.name, fqelement: this.of};
+    if (widget_t.fqelement === undefined) {
+      widget_t.fqelement = this._host_fqelement;
+    }
+    let adapt_table: AdaptTable = build_adapt_table(
+      host_widget_t, widget_t, this._wcomp_info.wbonds);
 
     console.log(this._replace_map);
 
@@ -247,8 +344,8 @@ export class WidgetLoader {
         init_fields = modified_init_fields;
 
         // Not all fields will appear in the replace map. The widget being
-        // replace could have fields that have no matched field in the replacing
-        // widget
+        // replaced could have fields that have no matched field in the
+        // replacing widget
         const modified_adapt_table = {};
         _u.each(adapt_table, (finfo, target_fname) => {
           const rinfo = field_replacing_map[target_fname];
@@ -267,54 +364,6 @@ export class WidgetLoader {
     return this._load_widget(this.name, this.of, adapt_table, init_fields);
   }
 
-  private _adapt_table(): AdaptTable {
-    if (this.name === undefined) throw new Error("Widget name is required");
-    if (this._host_wname === undefined) {
-      throw new Error("Host widget name is required");
-    }
-
-    // host_widget_t is the widget that contains the widget being loaded
-    const host_widget_t = {
-      name: this._host_wname,
-      fqelement: this._host_fqelement
-    };
-    // widget_t is the widget we are loading
-    const widget_t = {name: this.name, fqelement: this.of};
-    if (widget_t.fqelement === undefined) {
-      widget_t.fqelement = this._host_fqelement;
-    }
-    const ret = _u.chain(this._wcomp_info.wbonds)
-      // We just look at the wbonds that involve the host...
-      .filter(wbond => _u.isEqual(host_widget_t, wbond.subfield.of))
-      // ...and the widget we are loading
-      .filter(wbond => !_u.chain(wbond.fields).pluck("of")
-          .where(widget_t).isEmpty().value())
-      .map((wbond: FieldBond) => {
-        const wfield: Field = _u.chain(wbond.fields)
-          .filter(f => t_equals(f.of, widget_t)).value()[0];
-        return {
-          fname: wfield.name,
-          info: {
-            ftype: wfield.type,
-            host_fname: wbond.subfield.name,
-            host_tname: wbond.subfield.type.name
-          }
-        };
-      })
-      .reduce((memo, finfo) => {
-        memo[finfo.fname] = finfo.info;
-        return memo;
-      }, {})
-      .value();
-
-    console.log(
-        "Adapt table for " + JSON.stringify(host_widget_t) + " to " +
-        JSON.stringify(widget_t) + " :" +
-        JSON.stringify(ret));
-    return ret;
-  }
-
-
   private _load_widget(
       name: string, fqelement: string, adapt_table: AdaptTable, init_fields) {
     let imp = "";
@@ -327,7 +376,8 @@ export class WidgetLoader {
 
     console.log(
       `Loading ${name} of ${fqelement} with adapt table ` +
-      `${JSON.stringify(adapt_table, null, 2)} and init fields ${init_fields}`);
+      `${JSON.stringify(adapt_table, null, 2)} and init fields ` +
+      _u.isEmpty(init_fields));
     return System
       .import(imp)
       .then(mod => mod[name + "Component"])
@@ -344,6 +394,7 @@ export class WidgetLoader {
               [{provide: "fqelement", useValue: fqelement}],
               this.widgetContainer.parentInjector);
         const component = factory.create(injector);
+        this.widgetContainer.clear();
         this.widgetContainer.insert(component.hostView);
         return component._component;
       })
@@ -399,6 +450,39 @@ export class WidgetLoader {
       });
   }
 }
+
+function build_adapt_table(
+  from_widget: Type, to_widget: Type, fbonds: FieldBond[]): AdaptTable {
+  const ret = _u.chain(fbonds)
+    // We just look at the wbonds that involve the host...
+    .filter(wbond => _u.isEqual(from_widget, wbond.subfield.of))
+    // ...and the widget we are loading
+    .filter(wbond => !_u.chain(wbond.fields).pluck("of")
+        .where(to_widget).isEmpty().value())
+    .map((wbond: FieldBond) => {
+      const wfield: Field = _u.chain(wbond.fields)
+        .filter(f => t_equals(f.of, to_widget)).value()[0];
+      return {
+        fname: wfield.name,
+        info: {
+          ftype: wfield.type,
+          host_fname: wbond.subfield.name,
+          host_tname: wbond.subfield.type.name
+        }
+      };
+    })
+    .reduce((memo, finfo) => {
+      memo[finfo.fname] = finfo.info;
+      return memo;
+    }, {})
+    .value();
+
+  console.log(
+      "Adapt table for " + JSON.stringify(from_widget) + " to " +
+      JSON.stringify(to_widget) + " :" + JSON.stringify(ret));
+  return ret;
+}
+
 
 
 export interface WidgetMetadata {

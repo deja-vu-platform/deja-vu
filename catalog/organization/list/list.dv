@@ -34,16 +34,12 @@ cliche List {
 
   widget RedirectToList {
     list: List,
-    prefix: Text
+    on_redirect: Widget
   }
 
   widget RedirectToItem {
     item: Item,
-    prefix: Text
-  }
-
-  widget ListFromRoute {
-    list: List
+    on_redirect: Widget
   }
 
   widget ShowListOverview {

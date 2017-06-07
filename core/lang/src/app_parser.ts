@@ -3,7 +3,7 @@ const ohm = require("ohm-js");
 import * as fs from "fs";
 import * as path from "path";
 
-import {ClicheParser, SymbolTable} from "./cliche_parser";
+import {ClicheParser, SymbolTable, StEntry} from "./cliche_parser";
 import * as _u from "underscore";
 import * as _ustring from "underscore.string";
 
@@ -33,12 +33,13 @@ export interface App {
   tbonds: any[];
   dfbonds: any[];
   wfbonds: any[];
+  nfbonds: any[];
   data: any;
 }
 
 
 export class AppParser {
-  BASIC_TYPES = ["Text", "Boolean", "Date", "Datetime", "Number"];
+  BASIC_TYPES = ["Text", "Boolean", "Date", "Datetime", "Number", "Widget"];
   private _grammar;
   private _semantics;
   private _cliche_parser;
@@ -377,7 +378,6 @@ export class AppParser {
     }
     const s = this._semantics(r);
     this._symbol_table = s.symbolTable();
-    console.log(JSON.stringify(this._symbol_table, null, 2));
     const app_widget_symbols = _u
       .filter(_u.values(this._symbol_table), s => s.type === "widget");
     const tbonds = s.tbonds();
@@ -392,6 +392,7 @@ export class AppParser {
       tbonds: this._tbonds(tbonds, fqelement),
       dfbonds: this._dfbonds(tbonds, fqelement),
       wfbonds: this._wfbonds(tbonds, fqelement).concat(this._cliche_wfbonds()),
+      nfbonds: this._nfbonds(tbonds, fqelement),
       data: s.data()
     };
   }
@@ -460,18 +461,41 @@ export class AppParser {
   }
 
   _dfbonds(tbonds, fqelement) {
-    return this._fbonds("data", subfof => tbonds[subfof], tbonds, fqelement);
+    return this._fbonds(
+      ste => ste.type === "data",
+      subfof => tbonds[subfof], tbonds, fqelement);
   }
 
   _wfbonds(tbonds, fqelement) {
     return this._fbonds(
-      "widget", subfof => this
-        ._symbol_table[subfof].attr.uses, tbonds, fqelement);
+      ste => ste.type === "widget",
+      subfof => this._symbol_table[subfof].attr.uses,
+      tbonds,
+      fqelement);
   }
 
-  // t is the type of the field
-  // matchts is a list record types to use to look for a field that has as a
-  // type one that matches t
+  _nfbonds(tbonds, fqelement) {
+    return this._fbonds(
+      // Only look at widget entries that have a field of type widget (since
+      // they are the only widgets that can cause a navigation)
+      ste => ste.type === "widget" &&
+             _u.contains(_u.values(ste.attr.fields), "Widget"),
+      // Match the original widget with the target widget (that is determined
+      // by the value of the field of type widget)
+      subfof => {
+        const to_widget_fname = _u
+          .findKey(this._symbol_table[subfof].attr.fields, t => t === "Widget");
+        const w = _u.findWhere(_u.values(this._symbol_table), {type: subfof});
+        const ret = w.attr.value[to_widget_fname];
+        if (ret === undefined) {
+          throw new Error(`No widget provided for navigation in ${subfof}`);
+        }
+        return [ret];
+      },
+      tbonds,
+      fqelement);
+  }
+
   _match(t: string, matcht, tbonds, fqelement: string) {
     const is_subtype = (t1: string, t2: {name: string, fqelement: string}) => (
       (this.BASIC_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
@@ -509,24 +533,27 @@ export class AppParser {
     return ret;
   }
 
-  _fbonds(t, matchts_fn, tbonds, fqelement) {
+  _fbonds(ste_filter: (s: StEntry) => boolean, matchts_fn, tbonds, fqelement) {
     return _u
       .chain(_u.values(this._symbol_table))
-      .filter(s => s.type === t)
-      .map(data => _u
-        .map(data.attr.fields, (subftype, subfname) => _u
-          .map(subftype.split("|"), subft => ({
-            subfield: {
-              name: subfname, of: {name: data.id, fqelement: fqelement},
-              type: {name: subftype, fqelement: fqelement}},
-            fields: _u
-              .reject(_u
-                .map(matchts_fn(data.id),
-                     matcht => this
+      .filter(ste_filter)
+      .map(data => {
+        const matchts = matchts_fn(data.id);
+        return _u
+          .map(data.attr.fields, (subftype, subfname) => _u
+            .map(subftype.split("|"), subft => ({
+              subfield: {
+                name: subfname, of: {name: data.id, fqelement: fqelement},
+                type: {name: subftype, fqelement: fqelement}},
+              fields: _u
+                .reject(_u
+                  .map(matchts, matcht => this
                        ._match(subft.trim(), matcht, tbonds, fqelement)),
-                _u.isEmpty)
-          }))))
+                  _u.isEmpty)
+            })));
+      })
       .flatten()
+      .reject(b => _u.isEmpty(b.fields))
       .value();
   }
 
@@ -605,6 +632,8 @@ export class AppParser {
     console.log(debug(p.dfbonds));
     console.log("//////////wfbonds//////////");
     console.log(debug(p.wfbonds));
+    console.log("//////////nfbonds//////////");
+    console.log(debug(p.nfbonds));
     console.log("//////////data//////////");
     console.log(debug(p.data));
   }

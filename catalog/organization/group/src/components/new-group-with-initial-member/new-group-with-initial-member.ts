@@ -1,8 +1,7 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, ClientBus} from "client-bus";
 
-import {Router} from "@angular/router";
 
 @Widget({
   fqelement: "Group",
@@ -11,10 +10,10 @@ import {Router} from "@angular/router";
 export class NewGroupWithInitialMemberComponent {
   group = {atom_id: "", name: ""};
   initialMember = {atom_id: "", name: ""};
-  groupCreatedRedirectRoute = {value: ""};
+  onGroupCreate = {value: undefined};
 
-  constructor(private _graphQlService: GraphQlService,
-    private _router: Router) {}
+  constructor(
+    private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
 
   onSubmit() {
     let addMember = () => {
@@ -28,9 +27,8 @@ export class NewGroupWithInitialMemberComponent {
         `)
         .map(data => data.group_by_id.addExistingMember.atom_id)
         .subscribe(atom_id => {
-          if (this.groupCreatedRedirectRoute
-            && this.groupCreatedRedirectRoute.value.length > 0) {
-              this._router.navigate([this.groupCreatedRedirectRoute.value]);
+          if (this.onGroupCreate.value) {
+            this._clientBus.navigate(this.onGroupCreate.value);
           }
         });
     };
@@ -49,20 +47,5 @@ export class NewGroupWithInitialMemberComponent {
     };
 
     createGroup();
-    // this._graphQlService
-    //   .post(`
-    //     newGroupWithInitialMember(name: "${this.group.name}",
-    //       initialMember: "${this.initialMember.atom_id}") {
-    //         atom_id
-    //     }
-    //   `)
-    //   .map(data => data.newGroupWithInitialMember.atom_id)
-    //   .subscribe(atom_id => {
-    //     this.group.atom_id = atom_id;
-    //     if (this.groupCreatedRedirectRoute
-    //       && this.groupCreatedRedirectRoute.value.length > 0) {
-    //         this._router.navigate([this.groupCreatedRedirectRoute.value]);
-    //     }
-    //   });
   }
 }

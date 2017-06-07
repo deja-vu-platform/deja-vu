@@ -18,13 +18,15 @@ export interface Item {
 @Widget({fqelement: "List", ng2_providers: [GraphQlService]})
 export class ShowListComponent {
   list = {atom_id: "", items: [], on_change: _ => undefined};
+  private _fetched = undefined;
 
   constructor(
       private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
 
   dvAfterInit() {
     const update_list = () => {
-      if (!this.list.atom_id) return;
+      if (!this.list.atom_id || this.list.atom_id === this._fetched) return;
+      this._fetched = this.list.atom_id;
 
       this.list.items = [];
       return this._graphQlService
@@ -44,7 +46,7 @@ export class ShowListComponent {
           item_atom.atom_id = item.atom_id;
           item_atom.name = item.name;
           item_atom.checked = item.checked;
-          return {item: item_atom};
+          return item_atom;
         })
         .subscribe(item => {
           this.list.items.push(item);
@@ -52,9 +54,6 @@ export class ShowListComponent {
     };
 
     update_list();
-    // This seems to cause an infinite loop
-    // this.list.on_change(update_list);
+    this.list.on_change(update_list);
   }
-
-
 }

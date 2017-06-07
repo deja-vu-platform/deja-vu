@@ -1,21 +1,14 @@
-import {GraphQlService} from "gql";
+import {Widget, ClientBus} from "client-bus";
 
-import {Widget} from "client-bus";
 
-import {Router} from "@angular/router";
-
-@Widget({
-  fqelement: "List",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "List"})
 export class RedirectToListComponent {
   list = {atom_id: "", name: ""};
-  prefix = {value: ""};
+  on_redirect = {value: undefined};
 
-  constructor(private _graphQlService: GraphQlService,
-    private _router: Router) {}
+  constructor(private _clientBus: ClientBus) {}
 
   navigate() {
-    this._router.navigate([this.prefix.value + "/" + this.list.atom_id]);
+    this._clientBus.navigate(this.on_redirect.value);
   }
 }

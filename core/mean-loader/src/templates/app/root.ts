@@ -4,7 +4,7 @@ import {RouterModule, Routes} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 
-import {WidgetLoader, ClientBus, Widget, field} from "client-bus";
+import {WidgetLoader, RouteLoader, ClientBus, Widget, field} from "client-bus";
 
 import * as _ustring from "underscore.string";
 
@@ -27,7 +27,6 @@ export function AppWidget() {
 @@wid_definitions
 
 const MODE: string = "@@mode";
-const appRoutes: Routes = @@route_config;
 
 
 let template;
@@ -49,19 +48,22 @@ if (MODE === "dev") {
     {provide: "fqelement", useValue: "@@name"},
     {provide: "CompInfo", useValue: @@comp_info},
     {provide: "WCompInfo", useValue: @@wcomp_info},
+    {provide: "NCompInfo", useValue: @@ncomp_info},
     {provide: "ReplaceMap", useValue: @@replace_map},
     {provide: "locs", useValue: @@locs},
     {provide: "app", useValue: "@@name"},
+    {provide: "RouteConfig", useValue: @@route_config},
     ClientBus]
 })
 class RootComponent {}
 
-let declarations: any[] = [RootComponent, WidgetLoader];
+let declarations: any[] = [RootComponent, WidgetLoader, RouteLoader];
 declarations = declarations.concat(@@wid_classes);
 
 @NgModule({
   imports: [
-    BrowserModule, RouterModule.forRoot(appRoutes), FormsModule, HttpModule],
+    BrowserModule, RouterModule.forRoot([{path: '**', component: RouteLoader}]),
+    FormsModule, HttpModule],
   declarations: declarations,
   bootstrap: [RootComponent],
   entryComponents: @@wid_classes
