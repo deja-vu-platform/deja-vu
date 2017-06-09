@@ -404,8 +404,12 @@ export class WidgetLoader implements OnChanges {
           if (adapt_info !== undefined) {
             // https://github.com/angular/angular/issues/10448
             // https://stackoverflow.com/questions/40025761
-            const parent_component = (<any> this._vc_ref)
-              ._element.parentView.context;
+            const parent_view = (<any> this._vc_ref)._element.parentView;
+            let parent_component = parent_view.context;
+            if (_u.isEmpty(parent_component)) {
+              // it's a ng2 directive (e.g., *ngIf)
+              parent_component = parent_view.parentView.context;
+            }
             const host_fname = adapt_info.host_fname;
             if (parent_component[host_fname] !== undefined) {
               c[f] = parent_component[host_fname].adapt(adapt_info.ftype);
