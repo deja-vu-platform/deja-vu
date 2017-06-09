@@ -605,6 +605,11 @@ export namespace GruntTask {
               cwd: "src/dv-dev",
               src: ["**/*.{html,css,js}"],
               dest: "dist/public/dv-dev"
+            },
+            { // the global sytle
+              expand: true,
+              src: ["style.css"],
+              dest: "dist/public/dv-dev"
             }
           ]
         },
