@@ -49,6 +49,11 @@ app Accord {
     members: [Setlist]
   }
 
+  widget NavBar {
+    user: User
+    // on_signout: Widget
+  }
+
   // The landing page gives the user the option to sign in or register
   main widget Landing {
     on_user_ok: Widget
@@ -122,6 +127,7 @@ app Accord {
     list: Setlist
   }
 
+  nb: NavBar = {on_signout: Landing}
   create_group_page: CreateGroup = {onGroupCreate: Groups}
   ltg: LinkToGroup = {on_redirect: ViewGroup}
   lts: LinkToSetlist = {on_redirect: ViewSetlist}
