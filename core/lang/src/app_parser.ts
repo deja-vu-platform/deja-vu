@@ -40,7 +40,7 @@ export interface App {
 
 export class AppParser {
   PRIMITIVE_TYPES = [
-    "text", "boolean", "number", "date", "datetime", "time", "widget"];
+    "text", "boolean", "number", "date", "datetime", "time", "Widget"];
   private _grammar;
   private _semantics;
   private _cliche_parser;
