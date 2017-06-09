@@ -125,10 +125,10 @@ export class ClientBus {
       @Inject("fqelement") private _fqelement: string,
       @Inject("CompInfo") private _comp_info: CompInfo,
       @Inject("WCompInfo") private _wcomp_info: WCompInfo,
-      @Inject("NCompInfo") private _ncomp_info: NCompInfo,
-      @Inject("RouteConfig") private _route_config,
+      @Inject("NCompInfo") @Optional() private _ncomp_info: NCompInfo,
+      @Inject("RouteConfig") @Optional() private _route_config,
       @Inject("app") private _app: string,
-      private _router: Router) {}
+      @Optional() private _router: Router) {}
 
   new_atom(t: string): any {
     return new Atom(this._comp_info)

@@ -22,9 +22,11 @@ import {platformBrowserDynamic} from "@angular/platform-browser-dynamic";
     {provide: "fqelement", useValue: "@@name"},
     {provide: "CompInfo", useValue: {}},
     {provide: "WCompInfo", useValue: {}},
+    {provide: "NCompInfo", useValue: {}},
     {provide: "ReplaceMap", useValue: {}},
     {provide: "locs", useValue: @@locs},
     {provide: "app", useValue: ""},
+    {provide: "RouteConfig", useValue: {}},
     ClientBus]
 })
 class RootComponent {}
