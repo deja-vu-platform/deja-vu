@@ -528,7 +528,7 @@ export class AppParser {
   _fbonds(ste_filter: (s: StEntry) => boolean, matchts_fn, tbonds, fqelement) {
     return _u
       .chain(_u.values(this._symbol_table))
-      .filter(s => s.type === t)
+      .filter(ste_filter)
       .map(data => {
         const matchts = matchts_fn(data.id);
         return _u
