@@ -1,10 +1,13 @@
-  <dv-widget name="LoggedIn" of="Auth" [fields]="fields"></dv-widget>
+<dv-widget name="NavBar"></dv-widget>
+<div class="container">
+  <dv-widget name="LoggedIn" of="Auth"></dv-widget>
   <div class="row">
-    <dv-widget name="CreatePost" [fields]="fields"></dv-widget>
+    <dv-widget name="CreatePost"></dv-widget>
   </div>
   <div class="row">
     <div class="col-md-5">
       <h1>Feed</h1>
-      <dv-widget name="ShowFeed" of="Feed" [fields]="fields"></dv-widget>
+      <dv-widget name="ShowFeed" of="Feed"></dv-widget>
     </div>
   </div>
+</div>

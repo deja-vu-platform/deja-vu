@@ -54,55 +54,47 @@ export class ServerBus {
   constructor(
       fqelement: string,
       private _ws: express.Express,
-      private _handlers: any, comp_info: CompInfo, locs: any) {
+      private _handlers: {
+        [key: string]: {
+          read?: (args: {atom_id: string}) => Promise<boolean>,
+          create?: (args: {atom_id: string, create: any}) => Promise<boolean>,
+          update?: (args: {atom_id: string, update: any}) => Promise<boolean>
+        }
+      },
+      comp_info: CompInfo,
+      locs: any
+  ) {
     if (comp_info !== undefined) {
       this._dispatcher = new Dispatcher(fqelement, comp_info, locs);
     }
 
     const build_field = (action, t, handlers) => {
-      const forward_wrap = handler => {
-        if (handler === undefined) {
-          console.log("WARNING: no handler provided for " + action + " " + t);
-          handler = _ => Promise.resolve(true);
-        }
-        return (_, args) => handler(_u.omit(args, "forward"))
-          .then(_ => {
-            if (args.forward !== undefined || args.forward) {
-              if (args.create !== undefined) {
-                console.log(
-                  `Forward requested for create(${t}, ${args.atom_id}, ` +
-                  `${args.create}) of ${fqelement}`);
-                return this.create_atom(
-                  t, args.atom_id, JSON.parse(args.create));
-              } else if (args.update !== undefined) {
-                console.log(
-                  `Forward requested for update(${t}, ${args.atom_id}, ` +
-                  `${args.update}) of ${fqelement}`);
-                return this.update_atom(
-                  t, args.atom_id, JSON.parse(args.update));
-              } else {
-                console.log("rm");
-              }
-            }
-            return Promise.resolve(true);
-          });
-      };
+      let handler = handlers[t][action];
+      if (handler === undefined) {
+        console.log("WARNING: no handler provided for " + action + " " + t);
+        handler = (unused_root, unused_args) => Promise.resolve(true);
+      }
+
       const ret = {
         "type": graphql.GraphQLBoolean,
         args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-          forward: {"type": graphql.GraphQLBoolean}
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
         },
-        resolve: forward_wrap(handlers[t][action])
+        resolve: (unused_root, args) => handler(args)
       };
-      ret.args[action] = {
-        "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
-      };
+      if (action !== "read") {
+        ret.args[action] = {
+          "type": new graphql.GraphQLNonNull(graphql.GraphQLString)
+        };
+      }
       return ret;
     };
+
+
     const mut = {};
     for (let t of Object.keys(_handlers)) {
       mut["create_" + t] = build_field("create", t, _handlers);
+      mut["read_" + t] = build_field("read", t, _handlers);
       mut["update_" + t] = build_field("update", t, _handlers);
       // mut["delete_" + t] = build_field("delete", t, _handlers);
     }
@@ -150,6 +142,16 @@ export class ServerBus {
     return this._dispatcher.create_atom(
         _ustr.capitalize(t_name), atom_id, create);
   }
+
+  read_atom(t_name: string, atom_id: string): Promise<boolean> {
+    console.log("reading atom");
+    if (this._dispatcher === undefined) {
+      return Promise.resolve(true);
+    }
+    return this._dispatcher.read_atom(_ustr.capitalize(t_name), atom_id);
+  }
+
+
   /**
    * Report the update of an existing atom
    *
@@ -267,6 +269,16 @@ class Dispatcher {
         JSON.stringify(this._dispatch_table, null, 2));
   }
 
+  read_atom(t_name: string, atom_id: string): Promise<boolean> {
+    return Promise.all(
+      _u.map(_u.keys(this._dispatch_table[t_name]), target_str => {
+        const target = JSON.parse(target_str);
+        return this._post(this._locs[target.fqelement], `{
+            read_${target.name.toLowerCase()}(atom_id: "${atom_id}")
+        }`);
+      })).then(_ => true);
+  }
+
   private _process(op: string, transform_fn: any) {
     return (t_name: string, atom_id: string, info: any) => Promise.all(
         _u.values(_u.mapObject(
@@ -337,20 +349,18 @@ class Dispatcher {
   }
 
   private _post(loc, query) {
-    const query_str = query.replace(/ /g, "");
-
     const options = {
       uri: loc + BUS_PATH,
       method: "post",
       body: {
-        query: "mutation " + query_str
+        query: "mutation " + query
       },
       json: true
     };
 
     console.log(
       "using options " + JSON.stringify(options) +
-      " for query <" + query_str + ">");
+      " for query <" + query + ">");
 
     let attempt = 1;
     const req = () => rp(options)
@@ -366,7 +376,7 @@ class Dispatcher {
           return new Promise(r => setTimeout(r, delay * 1000)).then(_ => req());
         } else {
           console.log(
-            `For ${loc} q ${query_str} got error: ` +
+            `For ${loc} q ${query} got error: ` +
             `${JSON.stringify(reason.error)}`);
         }
         return Promise.resolve("");

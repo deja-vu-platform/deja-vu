@@ -3,7 +3,7 @@ import {Widget} from "client-bus";
 
 @Widget({fqelement: "Auth", template: ""})
 export class LoggedInComponent {
-  user = {atom_id: "", username: "", password: "", read: [], write: []};
+  user = {atom_id: "", username: "", password: ""};
 
   dvAfterInit() {
     console.log(localStorage.getItem("username"));

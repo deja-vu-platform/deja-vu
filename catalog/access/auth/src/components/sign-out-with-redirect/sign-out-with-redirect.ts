@@ -1,5 +1,4 @@
-import {Widget} from "client-bus";
-import {Router} from "@angular/router";
+import {Widget, ClientBus} from "client-bus";
 
 
 @Widget({
@@ -11,14 +10,14 @@ import {Router} from "@angular/router";
   `
 })
 export class SignOutWithRedirectComponent {
-  signout_ok_redirect_route = {value: "/"};
+  on_signout_ok = {value: undefined};
 
-  constructor(private _router: Router) {}
+  constructor(private _client_bus: ClientBus) {}
 
   signOut() {
     localStorage.removeItem("id_token");
     localStorage.removeItem("username");
     localStorage.removeItem("atom_id");
-    this._router.navigate([this.signout_ok_redirect_route.value]);
+    this._client_bus.navigate(this.on_signout_ok.value);
   }
 }

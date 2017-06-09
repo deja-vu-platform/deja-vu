@@ -13,7 +13,7 @@ import {Widget} from "client-bus";
 export class CreateTaskComponent {
   task = {atom_id: undefined, name: ""};
   assigner = {atom_id: undefined, name: ""};
-  assignee = {atom_id: undefined};
+  assignee = {atom_id: undefined, name: ""};
   expiration_date: string = "";
   assignee_options = [];
 
@@ -38,12 +38,14 @@ export class CreateTaskComponent {
     let expirationDateText: Element =
       document.getElementById("expiration-date-text");
     this.expiration_date = expirationDateText["value"];
+    let assigneeText: Element =
+      document.getElementById("task-assignee");
 
     this._graphQlService
       .post(`
         createTask(
           name: "${this.task.name}",
-          assigner_id: "${this.assigner.atom_id}"
+          assigner_id: "${this.assigner.atom_id}",
           assignee_id: "${this.assignee.atom_id}",
           expires_on: "${this.expiration_date}") {
           atom_id
@@ -52,6 +54,9 @@ export class CreateTaskComponent {
       .subscribe(res => {
         expirationDateText["value"] = "";
         this.expiration_date = "";
+        this.task.name = "";
+        assigneeText["value"] = "";
+        this.assignee.name = "";
       });
   }
 
@@ -64,7 +69,7 @@ export class CreateTaskComponent {
   _loadScript(src: string) {
     const s = document.createElement("script");
     s.type = "text/javascript";
-    s.src = "node_modules/dv-organization-task/lib/components/" +
+    s.src = "node_modules/dv-community-task/lib/components/" +
       "create-task/vendor/" + src;
     this._elementRef.nativeElement.appendChild(s);
   }
@@ -73,7 +78,7 @@ export class CreateTaskComponent {
     const s = document.createElement("link");
     s.type = "text/css";
     s.rel = "stylesheet";
-    s.href = "node_modules/dv-organization-task/lib/components/" +
+    s.href = "node_modules/dv-community-task/lib/components/" +
       "create-task/vendor/" + href;
     this._elementRef.nativeElement.appendChild(s);
   }

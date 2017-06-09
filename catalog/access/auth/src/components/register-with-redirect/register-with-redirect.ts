@@ -1,7 +1,6 @@
 import {User} from "../../shared/data";
 import {GraphQlService} from "gql";
-import {Widget} from "client-bus";
-import {Router} from "@angular/router";
+import {Widget, ClientBus} from "client-bus";
 
 
 @Widget({fqelement: "Auth", ng2_providers: [GraphQlService]})
@@ -9,11 +8,12 @@ export class RegisterWithRedirectComponent {
   user: User = {username: "", password: "", atom_id: ""};
   reenter_password = "";
   username_error = false;
-  register_ok_redirect_route = {value: "/"};
+  on_register_ok = {value: undefined};
   reenter_password_error = false;
 
   constructor(
-    private _graphQlService: GraphQlService, private _router: Router) {}
+    private _graphQlService: GraphQlService,
+    private _client_bus: ClientBus) {}
 
   onSubmit() {
     this.reenter_password_error = this.reenter_password !== this.user.password;
@@ -35,12 +35,12 @@ export class RegisterWithRedirectComponent {
             .map(data => JSON.parse(data.signIn))
             .subscribe(
               token => {
-                let authToken = token.token,
-                  authUser = token.user;
+                let authToken = token.token;
+                let authUser = token.user;
                 localStorage.setItem("id_token", authToken);
                 localStorage.setItem("username", this.user.username);
                 localStorage.setItem("atom_id", authUser.atom_id);
-                this._router.navigate([this.register_ok_redirect_route.value]);
+                this._client_bus.navigate(this.on_register_ok.value);
               });
         },
         err => {

@@ -2,8 +2,7 @@ import {NgClass} from "@angular/common";
 
 import {User} from "../../shared/data";
 import {GraphQlService} from "gql";
-import {Widget} from "client-bus";
-import {Router} from "@angular/router";
+import {Widget, ClientBus} from "client-bus";
 
 
 @Widget({
@@ -13,11 +12,12 @@ import {Router} from "@angular/router";
 })
 export class SignInWithRedirectComponent {
   user: User = {username: "", password: "", atom_id: ""};
-  signin_ok_redirect_route = {value: "/"};
+  on_signin_ok = {value: undefined};
   error = false;
 
   constructor(
-    private _graphQlService: GraphQlService, private _router: Router) {}
+    private _graphQlService: GraphQlService,
+    private _client_bus: ClientBus) {}
 
   onSubmit() {
     this._graphQlService
@@ -34,7 +34,7 @@ export class SignInWithRedirectComponent {
           localStorage.setItem("id_token", authToken);
           localStorage.setItem("username", this.user.username);
           localStorage.setItem("atom_id", authUser.atom_id);
-          this._router.navigate([this.signin_ok_redirect_route.value]);
+          this._client_bus.navigate(this.on_signin_ok.value);
         },
         err => {
           this.error = true;

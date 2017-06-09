@@ -1,0 +1,154 @@
+<link href="https://fonts.googleapis.com/css?family=Fruktur|Roboto"
+ rel="stylesheet">
+<style>
+h1, h2, h4 {
+	text-align: center;
+}
+
+.body {
+	/*background: radial-gradient(white, #b7d1e5);*/
+	background: #b7d1e5;
+	font-family: 'Roboto', sans-serif;
+	padding-top: 50px;
+}
+
+.blue-background {
+	/*background-color: #99b0c1;*/
+	background-color: white;
+	padding: 10px;
+	border-radius: 25px;
+	margin-bottom: 10px;
+}
+
+.tall {
+	height: 100%;
+}
+
+#create-things-admin {
+	text-align: center;
+}
+
+.modal-content {
+	width: 700px;
+}
+
+.modal-body {
+	text-align: left;
+}
+
+.modal-footer {
+	text-align: right;
+}
+
+.left-align-row {
+	text-align: left;
+}
+
+.center-btns {
+	text-align: center;
+}
+
+#logout-form {
+	margin-top: 8px;
+	float: right;
+}
+
+.navbar-brand {
+	font-size: 30pt;
+	font-family: 'Fruktur', sans-serif;
+}
+
+.logo {
+	font-family: 'Fruktur', sans-serif;
+}
+
+.rating-xxs {
+    font-size: 1.4em;
+}
+
+.input-star {
+	display: inline-block;
+}
+
+#child-chores-table > .row , #child-rewards > .row {
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+div.scroll {
+    height: 200px;
+    overflow: scroll;
+}
+
+.icon-size {
+    font-size:60px;
+    color: yellow;
+}
+
+#child-heading {
+	position: center;
+}
+
+#child-heading-container > div {
+	display: inline-block;
+}
+
+.icon-size > span {
+	position:absolute;
+    left:34px; /** you can make changes here to change position **/
+    top:18px;
+    font-size: 16pt;
+    z-index: 3;
+    font-family: 'Roboto', sans-serif;
+    color: black;
+}
+</style>
+<div class="body">
+  <dv-widget name="LoggedIn" of="ChildAuth"></dv-widget>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">ChoreStar</a>
+      </div>
+      <dv-widget name="SignOutWithRedirect" of="ChildAuth">
+      </dv-widget>
+    </div>
+  </nav>
+  <div id="child-homepage-container">
+    <div id="child-heading">
+      <h1> Hi ShowUsername </h1>
+      <div class="container-fluid" id="child-heading-container">
+          <div class="col-xs-2 col-xs-offset-4"><h4> StarBank Total: </h4></div> 
+          <div class="col-xs-2 glyphicon glyphicon-star icon-size">
+            <dv-widget name="ShowBalance" of="Market"></dv-widget>
+          </div>
+      </div>
+    </div>
+    <div class="container-fluid" id="child-data-container">
+      <div id="child-chores" class="col-md-6"> 
+        <div class="blue-background tall" id="child-chores-table">
+          <h2>Chores</h2>
+          <h4>Uncompleted Chores</h4>
+          <div class="row left-align-row">
+             <dv-widget name="ShowUncompletedTasks" of="Task"></dv-widget>
+          </div>
+          <h4>Chores Pending Approval</h4>
+          <div class="row left-align-row">
+             <dv-widget name="ShowUnapprovedTasks" of="Task"></dv-widget>
+          </div>
+          <h4>Completed and Approved Chores</h4>
+          <div class="row left-align-row">
+             <dv-widget name="ShowApprovedTasks" of="Task"></dv-widget> 
+          </div>
+        </div>
+      </div>
+
+      <div id="child-rewards" class="col-md-6"> 
+        <div class="blue-background">
+          <h2>Rewards</h2>
+             <dv-widget name="AffordTable" of="Market"></dv-widget>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

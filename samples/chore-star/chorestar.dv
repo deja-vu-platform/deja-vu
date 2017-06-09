@@ -1,0 +1,72 @@
+app ChoreStar {
+  use access/Auth[Parent: User] as ParentAuth
+  use access/Auth[Child: User] as ChildAuth
+  use community/Task[
+    Chore: Task, Parent: Assigner, Child: Assignee,
+    ApproveAndRateTask replaces ApproveTask in ShowPendingApprovalTasks]
+  use community/Market[
+    Chore: Good, Reward: Good, Parent: Party, Child: Party]
+  use community/Rating[Parent: Source, Chore: Target]
+
+  data Parent { name: Text }
+  data Child { name: Text }
+  data Chore {}
+  data Reward {}
+
+
+  // SignInWithRedirect,
+  // RegisterWithRedirect of ParentAuth,
+  // SignInWithRedirect of ChildAuth
+  main widget Landing {
+    on_parent_ok: Widget,
+    on_child_ok: Widget 
+  }
+
+
+  // LoggedIn of ParentAuth,
+  // CreateTask of Task,
+  // CreateGood of Market,
+  // Register of ChildAuth,
+  // ShowPendingApprovalTasks of Task,
+  // ShowAssignedTasks of Task,
+  // ShowMyGoods of Market
+  widget ParentHome {
+    parent: Parent,
+    on_signout: Widget 
+  }
+  
+
+  // ApproveTask of Task
+  // RateTarget of Rating
+  // BuyGoodAtFractionOfPrice of Market
+  widget ApproveAndRateTask {
+    parent: Parent, 
+    chore: Chore,
+    do_buy_on_approve: Boolean,
+    fractional_rating: Number
+  }
+
+
+  // LoggedIn of ChildAuth
+  // ShowBalance of Market
+  // ShowUncompletedTasks of Task
+  // ShowUnapprovedTasks of Task
+  // ShowApprovedTasks of Task
+  // ShowGoodsToBuy of Market
+  widget ChildHome {
+    child: Child,
+    on_signout: Widget
+  }
+
+  l: Landing = {
+    // need to be able to put bindings in widgets
+    on_child_ok: ChildHome,
+    on_parent_ok: ParentHome
+  }
+
+  ph: ParentHome = {on_signout: Landing}
+  ch: ChildHome = {on_signout: Landing}
+
+  parent_home_route: Route = {path: "parent-home", widget: ParentHome}
+  child_home_route: Route = {path: "child-home", widget: ChildHome}
+}

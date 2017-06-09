@@ -10,11 +10,6 @@ cliche Group {
         members: [Member]
     }
 
-    // Gets the current group from a route parameter
-    widget GroupFromRoute {
-        group: Group
-    }
-
     // Displays the members of a group
     widget ShowGroup uses ShowMember {
         group: Group
@@ -23,7 +18,7 @@ cliche Group {
     // Button that allows a user to open a group
     widget RedirectToGroup {
         group: Group,
-        prefix: text
+        on_redirect: Widget
     }
 
     // Displays an overview of a group, like a light version of ShowGroup
@@ -48,7 +43,7 @@ cliche Group {
     // Create a new group with some initial member
     widget NewGroupWithInitialMember {
         initialMember: Member,
-        groupCreatedRedirectRoute: text
+        onGroupCreate: Widget
     }
 
     // Add an existing member by ID

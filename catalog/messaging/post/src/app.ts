@@ -1,4 +1,3 @@
-import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
 import {Mean} from "mean-loader";
@@ -28,7 +27,7 @@ const bus = new ServerBus(
 
 //////////////////////////////////////////////////
 
-const grafo = new Grafo(mean.db);
+const grafo = new Grafo(mean.db, Helpers.on_read(bus));
 
 const schema = grafo
   .add_type({

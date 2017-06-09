@@ -7,7 +7,6 @@ import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-import * as _u from "underscore";
 
 export interface Group {
   atom_id: string;
@@ -21,13 +20,16 @@ export interface Group {
 export class ShowGroupsByMemberComponent {
   member = {atom_id: "", name: "", on_change: _ => undefined};
   groups = [];
-  fields = {};
+  private _fetched = undefined;
 
   constructor(
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
 
   dvAfterInit() {
     const retrieveGroups = () => {
+      if (!this.member.atom_id || this.member.atom_id === this._fetched) return;
+      this._fetched = this.member.atom_id;
+
       this.groups = [];
       this._graphQlService
         .get(`
@@ -42,9 +44,8 @@ export class ShowGroupsByMemberComponent {
           const group_atom: Group = this._clientBus.new_atom("Group");
           group_atom.atom_id = group.atom_id;
           group_atom.name = group.name;
-          return {group:group_atom};
+          return group_atom;
         })
-        .map(group => _u.extend(group, this.fields))
         .subscribe(group => this.groups.push(group));
     };
     this.member.on_change(retrieveGroups);

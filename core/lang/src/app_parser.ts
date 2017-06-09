@@ -3,7 +3,7 @@ const ohm = require("ohm-js");
 import * as fs from "fs";
 import * as path from "path";
 
-import {ClicheParser, SymbolTable} from "./cliche_parser";
+import {ClicheParser, SymbolTable, StEntry} from "./cliche_parser";
 import * as _u from "underscore";
 import * as _ustring from "underscore.string";
 
@@ -33,12 +33,14 @@ export interface App {
   tbonds: any[];
   dfbonds: any[];
   wfbonds: any[];
+  nfbonds: any[];
   data: any;
 }
 
 
 export class AppParser {
-  PRIMITIVE_TYPES = ["text", "boolean", "number", "date", "datetime", "time"];
+  PRIMITIVE_TYPES = [
+    "text", "boolean", "number", "date", "datetime", "time", "widget"];
   private _grammar;
   private _semantics;
   private _cliche_parser;
@@ -67,17 +69,23 @@ export class AppParser {
           return {
             id: alias ? alias : st.name,
             type: "cliche",
-            attr: {symbol_table: st.st, name: st.name, category: st.category}
+            attr: {
+              symbol_table: st.st, name: st.name, category: st.category,
+              wfbonds: st.wfbonds
+            }
           };
         },
         AsDecl: (as_keyword, name) => name.sourceString,
-        clicheName: (category, slash, name) => ({
-          name: name.sourceString,
-          category: category.sourceString,
-          st: this
-            ._cliche_parser.parse(category.sourceString, name.sourceString)
-            .symbol_table
-        }),
+        clicheName: (category, slash, name) => {
+          const cliche = this
+            ._cliche_parser.parse(category.sourceString, name.sourceString);
+          return {
+            name: name.sourceString,
+            category: category.sourceString,
+            st: cliche.symbol_table,
+            wfbonds: cliche.wfbonds
+          };
+        },
         //
         Paragraph_data: decl => decl.symbolTable(),
         Paragraph_widget: decl => decl.symbolTable(),
@@ -373,9 +381,31 @@ export class AppParser {
       replace_map: this._fmaps(s.replaceMap(), tbonds, fqelement),
       tbonds: this._tbonds(tbonds, fqelement),
       dfbonds: this._dfbonds(tbonds, fqelement),
-      wfbonds: this._wfbonds(tbonds, fqelement),
+      wfbonds: this._wfbonds(tbonds, fqelement).concat(this._cliche_wfbonds()),
+      nfbonds: this._nfbonds(tbonds, fqelement),
       data: s.data()
     };
+  }
+
+  _cliche_wfbonds() {
+    return _u
+      .chain(_u.values(this._symbol_table))
+      .filter(s => s.type === "cliche")
+      .reject(s => _u.isEmpty(s.attr.wfbonds))
+      .map(cliche => _u.map(cliche.attr.wfbonds, wfbond => {
+        wfbond.subfield.of.fqelement = cliche.id;
+        wfbond.subfield.type.fqelement = cliche.id;
+        const mapped_fields = _u.map(wfbond.fields, f => {
+          f.of.fqelement = cliche.id;
+          f.of.type = cliche.id;
+          delete f.of.type;
+          return f;
+        });
+        wfbond.fields = mapped_fields;
+        return wfbond;
+      }))
+      .flatten()
+      .value();
   }
 
   _tbonds(tbonds, fqelement: string) {
@@ -421,18 +451,41 @@ export class AppParser {
   }
 
   _dfbonds(tbonds, fqelement) {
-    return this._fbonds("data", subfof => tbonds[subfof], tbonds, fqelement);
+    return this._fbonds(
+      ste => ste.type === "data",
+      subfof => tbonds[subfof], tbonds, fqelement);
   }
 
   _wfbonds(tbonds, fqelement) {
     return this._fbonds(
-      "widget", subfof => this
-        ._symbol_table[subfof].attr.uses, tbonds, fqelement);
+      ste => ste.type === "widget",
+      subfof => this._symbol_table[subfof].attr.uses,
+      tbonds,
+      fqelement);
   }
 
-  // t is the type of the field
-  // matchts is a list record types to use to look for a field that has as a
-  // type one that matches t
+  _nfbonds(tbonds, fqelement) {
+    return this._fbonds(
+      // Only look at widget entries that have a field of type widget (since
+      // they are the only widgets that can cause a navigation)
+      ste => ste.type === "widget" &&
+             _u.contains(_u.values(ste.attr.fields), "Widget"),
+      // Match the original widget with the target widget (that is determined
+      // by the value of the field of type widget)
+      subfof => {
+        const to_widget_fname = _u
+          .findKey(this._symbol_table[subfof].attr.fields, t => t === "Widget");
+        const w = _u.findWhere(_u.values(this._symbol_table), {type: subfof});
+        const ret = w.attr.value[to_widget_fname];
+        if (ret === undefined) {
+          throw new Error(`No widget provided for navigation in ${subfof}`);
+        }
+        return [ret];
+      },
+      tbonds,
+      fqelement);
+  }
+
   _match(t: string, matcht, tbonds, fqelement: string) {
     const is_subtype = (t1: string, t2: {name: string, fqelement: string}) => (
       (this.PRIMITIVE_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
@@ -472,24 +525,27 @@ export class AppParser {
     return ret;
   }
 
-  _fbonds(t, matchts_fn, tbonds, fqelement) {
+  _fbonds(ste_filter: (s: StEntry) => boolean, matchts_fn, tbonds, fqelement) {
     return _u
       .chain(_u.values(this._symbol_table))
       .filter(s => s.type === t)
-      .map(data => _u
-        .map(data.attr.fields, (subf, subfname) => _u
-          .map(subf.type.split("|"), subft => ({
-            subfield: {
-              name: subfname, of: {name: data.id, fqelement: fqelement},
-              type: {name: subf.type, fqelement: fqelement}},
-            fields: _u
-              .reject(_u
-                .map(matchts_fn(data.id),
-                     matcht => this
+      .map(data => {
+        const matchts = matchts_fn(data.id);
+        return _u
+          .map(data.attr.fields, (subftype, subfname) => _u
+            .map(subftype.split("|"), subft => ({
+              subfield: {
+                name: subfname, of: {name: data.id, fqelement: fqelement},
+                type: {name: subftype, fqelement: fqelement}},
+              fields: _u
+                .reject(_u
+                  .map(matchts, matcht => this
                        ._match(subft.trim(), matcht, tbonds, fqelement)),
-                _u.isEmpty)
-          }))))
+                  _u.isEmpty)
+            })));
+      })
       .flatten()
+      .reject(b => _u.isEmpty(b.fields))
       .value();
   }
 
@@ -523,6 +579,9 @@ export class AppParser {
             .flatten()
             .value());
         };
+        if (this._symbol_table[cw.fqelement] === undefined) {
+            throw new Error(`Can't find cliche ${cw.fqelement}`);
+        }
         cw.cliche = this._symbol_table[cw.fqelement].attr.name;
         return [cw]
           .concat(_u
@@ -565,6 +624,8 @@ export class AppParser {
     console.log(debug(p.dfbonds));
     console.log("//////////wfbonds//////////");
     console.log(debug(p.wfbonds));
+    console.log("//////////nfbonds//////////");
+    console.log(debug(p.nfbonds));
     console.log("//////////data//////////");
     console.log(debug(p.data));
   }

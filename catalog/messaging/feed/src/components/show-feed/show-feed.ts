@@ -3,14 +3,10 @@ import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-
 import {Message, Publisher} from "../../shared/data";
 import {GraphQlService} from "gql";
 
-
 import {Widget, ClientBus} from "client-bus";
-
-import * as _u from "underscore";
 
 
 export interface FeedItem {
@@ -23,7 +19,6 @@ export interface FeedItem {
 export class ShowFeedComponent {
   feed: FeedItem[];
   sub = {name: "", on_change: _ => undefined};
-  fields = {};
 
   constructor(
       private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
@@ -64,7 +59,6 @@ export class ShowFeedComponent {
           publisher.name = feedItem.publisher.name;
           return {message: message, publisher: publisher, sub: this.sub};
         })
-        .map(feedItem => _u.extend(feedItem, this.fields))
         .subscribe(feedItem => {
           this.feed.push(feedItem);
         });

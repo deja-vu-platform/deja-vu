@@ -1,6 +1,0 @@
-cliche Friend
-
-data User {
-  username: Text (one),
-  friends: set User
-}

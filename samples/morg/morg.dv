@@ -25,6 +25,5 @@ app Morg {
   widget EmailReminder { group_meeting: GroupMeeting }
 
   s: ShowGroupMeeting = {email: "deja-vu@mit.edu"}
-  home_route: Route = {path: "home", widget: Home}
   email_route: Route = {path: "email", widget: EmailReminder}
 }

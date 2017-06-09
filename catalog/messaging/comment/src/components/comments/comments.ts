@@ -7,8 +7,6 @@ import "rxjs/add/operator/mergeMap";
 
 import {Widget, ClientBus} from "client-bus";
 
-import * as _u from "underscore";
-
 
 export interface Author {
   atom_id: string;
@@ -26,7 +24,6 @@ export interface Comment {
 export class CommentsComponent {
   comments: any[];
   fetched = false;
-  fields = {};
   target = {name: "", atom_id: "", on_change: _ => undefined};
 
   constructor(
@@ -61,11 +58,10 @@ export class CommentsComponent {
           comment_atom.author = this._clientBus.new_atom("Author");
           comment_atom.author.atom_id = comment.author.atom_id;
           comment_atom.author.name = comment.author.name;
-          return {comment: comment_atom};
+          return comment_atom;
         })
-        .map(comment_item => _u.extend(comment_item, this.fields))
-        .subscribe(comment_item => {
-          this.comments.push(comment_item);
+        .subscribe(comment_atom => {
+          this.comments.push(comment_atom);
         });
     };
 

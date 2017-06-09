@@ -2,6 +2,4 @@ app Morg {
   include organization/Event
 
   main widget Home {}
-
-  home_route: Route = {path: "home", widget: Home}
 }

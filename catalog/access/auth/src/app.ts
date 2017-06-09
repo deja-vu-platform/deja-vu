@@ -23,6 +23,10 @@ const handlers = {
     update: Helpers.resolve_update(mean.db, "user")
   },
   resource: {
+    read: args => {
+      console.log("someone read resource of id " + args.atom_id);
+      return Promise.resolve(true);
+    },
     create: Helpers.resolve_create(mean.db, "resource")
   }
 };

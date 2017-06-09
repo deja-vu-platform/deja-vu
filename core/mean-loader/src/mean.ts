@@ -130,6 +130,7 @@ export namespace GruntTask {
     grunt.loadNpmTasks("grunt-express-server");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-replace");
+    grunt.loadNpmTasks("grunt-shell-spawn");
 
     grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
       if (action === "dev") {
@@ -182,7 +183,7 @@ export namespace GruntTask {
         grunt.task.run(["replace:dev"]);
         grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
         grunt.task.run(["copy:dev"]);
-        grunt.task.run(["express", "watch"]);
+        grunt.task.run(["shell:mongod", "express", "watch"]);
       } else if (action === "lib") {
         grunt.log.writeln(name + " lib");
         grunt.task.run(["clean:lib"]);
@@ -201,7 +202,7 @@ export namespace GruntTask {
   export function app_task(
       grunt, name: string, widgets: string[] = [], main?: string,
       cliches = {}, used_widgets: UsedWidget[] = [], replace_map = {},
-      comp_info = {}, wcomp_info = {}, data = {}) {
+      comp_info = {}, wcomp_info = {}, ncomp_info = {}, data = {}) {
     const cliches_src = _u.uniq(_u.values(cliches))
         .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
                   "*.{js,html,css}");
@@ -215,6 +216,7 @@ export namespace GruntTask {
     grunt.loadNpmTasks("grunt-express-server");
     grunt.loadNpmTasks("grunt-contrib-watch");
     grunt.loadNpmTasks("grunt-replace");
+    grunt.loadNpmTasks("grunt-shell-spawn");
 
     grunt.registerTask("dv-mean", "Dv a mean cliche", action => {
       if (action === "dev" || action === "test") {
@@ -239,8 +241,7 @@ export namespace GruntTask {
 
         let route_config_str = "[]";
         if (action === "test") {
-          route_config_str = JSON.stringify(route_config(data, main))
-            .replace(/\"component\":\"([^"\""]*)\"/g, "component: $1");
+          route_config_str = JSON.stringify(route_config(data, main));
         }
 
         const replace_patterns = [
@@ -250,6 +251,7 @@ export namespace GruntTask {
           {match: "cliches", replacement: cliches},
           {match: "comp_info", replacement: comp_info},
           {match: "wcomp_info", replacement: wcomp_info},
+          {match: "ncomp_info", replacement: ncomp_info},
           {match: "mode", replacement: action},
 
           {match: "wid_names", replacement: _u.pluck(app_widgets_js, "name")},
@@ -280,7 +282,7 @@ export namespace GruntTask {
         grunt.task.run(["replace:dev"]);
         grunt.task.run(["tslint", "ts:dev_client", "ts:dev_server"]);
         grunt.task.run(["copy:dev"]);
-        grunt.task.run(["express", "watch"]);
+        grunt.task.run(["shell:mongod", "express", "watch"]);
       } else if (action === "lib") {
         grunt.log.writeln(name + " lib");
         grunt.task.run(["clean:lib"]);
@@ -373,29 +375,21 @@ export namespace GruntTask {
       .value();
   }
 
-  interface Route {
+  type Route = {
     path: string;
-    component?: string;
-    children?: Route[];
-    redirectTo?: string;
-    pathMatch?: string;
+    widget: string;
   }
 
   function route_config(data, main: string): Route[] {
-    let default_path: string;
-    const process_route = r => {
-      if (main === r.widget) {
-        default_path = r.path;
-      }
-      const ret: Route = {path: r.path, component: component(r.widget)};
-      if (r.children !== undefined) {
-        ret.children = _u.map(r.children, process_route);
-      }
+    let all_routes = [{path: "", widget: main}];
+    if (data["Route"] !== undefined) {
+      all_routes = all_routes.concat(data["Route"]);
+    }
+    return _u.reduce(all_routes, (ret, route) => {
+      ret.routes[route.path] = route.widget;
+      ret.widgets[route.widget] = route.path;
       return ret;
-    };
-    return _u
-      .map(data["Route"], process_route)
-      .concat([{path: "", redirectTo: default_path, pathMatch: "full"}]);
+    }, {routes: {}, widgets: {}});
   }
 
   interface ClicheServer {
@@ -474,6 +468,12 @@ export namespace GruntTask {
           ret = `this.${f.name}.value = "${f.data}"`;
         } else if (f.type.name === "boolean") {
           ret = `this.${f.name}.value = ${f.data}$`;
+        } else if (f.type.name === "Widget") {
+          ret = `this.${f.name}.value = {
+            name: "${f.data}",
+            this_widget_name: "${w.name}",
+            this_widget: this
+          }`;
         } else {
           throw new Error("to be implemented");
         }
@@ -605,6 +605,11 @@ export namespace GruntTask {
               cwd: "src/dv-dev",
               src: ["**/*.{html,css,js}"],
               dest: "dist/public/dv-dev"
+            },
+            { // the global sytle
+              expand: true,
+              src: ["style.css"],
+              dest: "dist/public/dv-dev"
             }
           ]
         },
@@ -688,6 +693,15 @@ export namespace GruntTask {
               dest: "src/dv-dev"
             }
           ]
+        }
+      },
+
+      shell: {
+        mongod: {
+          command: "mongod",
+          options: {
+            async: true, stdout: true, stderr: true, failOnError: true
+          }
         }
       }
     };

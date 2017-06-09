@@ -47,3 +47,4 @@ cliche Market {
   widget AddAmount {
     party: Party
   }
+}

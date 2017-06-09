@@ -17,6 +17,7 @@
   "typings": "./lib/dv",
   "main": "./lib/dv",
   "dependencies": {
+    "@types/node": "^7.0.22",
     "command-line-args": "^2.1.6",
     "grunt": "^0.4.5",
     "mean-loader": "file:..//mean-loader",

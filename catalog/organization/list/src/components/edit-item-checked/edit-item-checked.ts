@@ -9,16 +9,9 @@ import {Widget} from "client-bus";
 export class EditItemCheckedComponent {
   item = {atom_id: "", name: "", checked: false};
 
-  constructor(
-      private _graphQlService: GraphQlService) {}
-
-  dvAfterInit() {
-    this.item.checked = false;
-  }
+  constructor(private _graphQlService: GraphQlService) {}
 
   toggleChecked() {
-    console.log("editItemChecked", this.item.atom_id);
-
     let checkState = !this.item.checked;
     this.item.checked = checkState;
 

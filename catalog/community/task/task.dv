@@ -16,11 +16,19 @@ cliche Task {
     name: text
   }
 
+  widget ShowTask {
+    task: Task
+  }
+
   widget CreateTask {
     assigner: Assigner
   }
 
-  widget ShowTask {
+  widget ApproveTask {
+    task: Task
+  }
+
+  widget CompleteTask {
     task: Task
   }
 
@@ -29,20 +37,20 @@ cliche Task {
   }
 
   // also lets assigner mark task as approved
-  widget ShowPendingApprovalTasks uses ShowTask { 
+  widget ShowPendingApprovalTasks uses ShowTask, ApproveTask {
     assigner: Assigner 
   }
 
   // also lets assignee mark task as completed
-  widget ShowUncompletedTasks uses ShowTask { 
+  widget ShowUncompletedTasks uses ShowTask, CompleteTask {
     assignee: Assignee 
   }
 
-  widget ShowUnapprovedTasks uses ShowTask { 
+  widget ShowUnapprovedTasks uses ShowTask {
     assignee: Assignee 
   }
 
-  widget ShowApprovedTasks uses ShowTasks { 
+  widget ShowApprovedTasks uses ShowTask {
     assignee: Assignee 
   }
 }
