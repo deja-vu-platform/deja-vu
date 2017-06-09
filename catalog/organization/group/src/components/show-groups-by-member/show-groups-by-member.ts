@@ -20,12 +20,16 @@ export interface Group {
 export class ShowGroupsByMemberComponent {
   member = {atom_id: "", name: "", on_change: _ => undefined};
   groups = [];
+  private _fetched = undefined;
 
   constructor(
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
 
   dvAfterInit() {
     const retrieveGroups = () => {
+      if (!this.member.atom_id || this.member.atom_id === this._fetched) return;
+      this._fetched = this.member.atom_id;
+
       this.groups = [];
       this._graphQlService
         .get(`
