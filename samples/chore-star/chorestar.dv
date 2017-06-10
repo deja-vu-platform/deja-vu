@@ -1,15 +1,15 @@
 app ChoreStar {
-  use access/Auth[Parent: User] as ParentAuth
-  use access/Auth[Child: User] as ChildAuth
-  use community/Task[
-    Chore: Task, Parent: Assigner, Child: Assignee,
-    ApproveAndRateTask replaces ApproveTask in ShowPendingApprovalTasks]
-  use community/Market[
-    Chore: Good, Reward: Good, Parent: Party, Child: Party]
-  use community/Rating[Parent: Source, Chore: Target]
+  include access/Auth[Parent for User] as ParentAuth
+  include access/Auth[Child for User] as ChildAuth
+  include community/Task[
+    Chore for Task, Parent for Assigner, Child for Assignee,
+    ApproveAndRateTask replacing ApproveTask in ShowPendingApprovalTasks]
+  include community/Market[
+    Chore for Good, Reward for Good, Parent for Party, Child for Party]
+  include community/Rating[Parent for Source, Chore for Target]
 
-  data Parent { name: Text }
-  data Child { name: Text }
+  data Parent { name: text }
+  data Child { name: text }
   data Chore {}
   data Reward {}
 
@@ -32,7 +32,7 @@ app ChoreStar {
   // ShowMyGoods of Market
   widget ParentHome {
     parent: Parent,
-    on_signout: Widget 
+    on_signout: Widget = Landing
   }
   
 
@@ -42,8 +42,8 @@ app ChoreStar {
   widget ApproveAndRateTask {
     parent: Parent, 
     chore: Chore,
-    do_buy_on_approve: Boolean,
-    fractional_rating: Number
+    do_buy_on_approve: boolean,
+    fractional_rating: number
   }
 
 
@@ -55,7 +55,7 @@ app ChoreStar {
   // ShowGoodsToBuy of Market
   widget ChildHome {
     child: Child,
-    on_signout: Widget
+    on_signout: Widget = Landing
   }
 
   l: Landing = {
@@ -64,9 +64,6 @@ app ChoreStar {
     on_parent_ok: ParentHome
   }
 
-  ph: ParentHome = {on_signout: Landing}
-  ch: ChildHome = {on_signout: Landing}
-
-  parent_home_route: Route = {path: "parent-home", widget: ParentHome}
-  child_home_route: Route = {path: "child-home", widget: ChildHome}
+  parent_home_route: route = {path: "parent-home", widget: ParentHome}
+  child_home_route: route = {path: "child-home", widget: ChildHome}
 }

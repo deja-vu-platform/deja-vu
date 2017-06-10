@@ -47,17 +47,13 @@ app Bookmark {
    */
   // The landing page gives the user the option to sign in or register
   main widget Landing {
-    on_user_ok: Widget
+    on_user_ok: Widget = Home
   }
-
-  l: Landing = {on_user_ok: Home}
 
 
   widget NavBar {
-    on_signout_ok: Widget
+    on_signout_ok: Widget = Landing
   }
-
-  nb: NavBar = {on_signout_ok: Landing}
 
   widget Home {
     user: User
@@ -88,8 +84,8 @@ app Bookmark {
     user: User
   }
 
-  landing_route: Route = {path: "landing", widget: Landing}
-  home_route: Route = {path: "home", widget: Home}
-  users_route: Route = {path: "users", widget: Users}
-  topics_route: Route = {path: "topics", widget: Topics}
+  landing_route: route = {path: "landing", widget: Landing}
+  home_route: route = {path: "home", widget: Home}
+  users_route: route = {path: "users", widget: Users}
+  topics_route: route = {path: "topics", widget: Topics}
 }

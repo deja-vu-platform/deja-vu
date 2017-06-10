@@ -40,7 +40,7 @@ export interface App {
 
 export class AppParser {
   PRIMITIVE_TYPES = [
-    "text", "boolean", "number", "date", "datetime", "time", "Widget"];
+    "text", "boolean", "number", "date", "datetime", "time", "route", "Widget"];
   private _grammar;
   private _semantics;
   private _cliche_parser;
@@ -120,8 +120,8 @@ export class AppParser {
             });
           return ret;
         },
-        FieldDecl: (name, colon, t_name, assign, value) => ({
-          id: name.sourceString, type: t_name.sourceString, attr: {
+        FieldDecl: (name, colon, tname, assign, value) => ({
+          id: name.sourceString, type: tname.sourceString, attr: {
                 value: value.symbolTable()[0]
               }}),
         //
@@ -204,19 +204,36 @@ export class AppParser {
           .chain(para.data())
           .flatten().reject(_u.isEmpty)
           .reduce((memo, e) => {
-            if (memo[e.t_name] === undefined) memo[e.t_name] = [];
-            memo[e.t_name] = memo[e.t_name].concat(e.value);
+            if (e.of !== undefined) {
+              if (memo[e.of] === undefined) memo[e.of] = [];
+              const obj = {};
+              obj[e.fname] = e.value;
+              memo[e.of] = memo[e.of].concat(obj);
+            } else {
+              if (memo[e.tname] === undefined) memo[e.tname] = [];
+              memo[e.tname] = memo[e.tname].concat(e.value);
+            }
             return memo;
           }, {})
           .value(),
-        Paragraph_data: decl => ({}), Paragraph_widget: decl => ({}),
+        Paragraph_data: decl => ({}), Paragraph_widget: decl => decl.data(),
         Paragraph_include: decl => ({}), Paragraph_field: decl => decl.data(),
-        FieldDecl: (name, colon, t_name, assign, value) => {
+        WidgetDecl: (main, widget, name, k1, fields, k2) => _u
+          .map(fields.data()[0], f => _u.extendOwn(f, {of: name.sourceString})),
+        FieldBody: (field_decl, comma, field_decls) => _u
+          .reject([field_decl.data()].concat(field_decls.data()[0]),
+                  _u.isEmpty),
+        FieldDecl: (name, colon, tname, assign, value) => {
           let value_data = value.data()[0];
-          if (t_name.sourceString !== "Route") {
+          if (_u.isEmpty(value_data)) return {};
+
+          if (this.PRIMITIVE_TYPES.indexOf(tname.sourceString) === -1) {
             value_data = _u.extendOwn({atom_id: name.sourceString}, value_data);
           }
-          return {t_name: t_name.sourceString, value: value_data};
+          return {
+            tname: tname.sourceString, value: value_data,
+            fname: name.sourceString
+          };
         },
 
         Value_number: (num) => Number(num.sourceString),
@@ -469,14 +486,22 @@ export class AppParser {
       // Only look at widget entries that have a field of type widget (since
       // they are the only widgets that can cause a navigation)
       ste => ste.type === "widget" &&
-             _u.contains(_u.values(ste.attr.fields), "Widget"),
+             _u.contains(_u.pluck(_u.values(ste.attr.fields), "type"),
+                         "Widget"),
       // Match the original widget with the target widget (that is determined
       // by the value of the field of type widget)
       subfof => {
         const to_widget_fname = _u
-          .findKey(this._symbol_table[subfof].attr.fields, t => t === "Widget");
+          .findKey(this._symbol_table[subfof].attr.fields,
+                   f => f.type === "Widget");
         const w = _u.findWhere(_u.values(this._symbol_table), {type: subfof});
-        const ret = w.attr.value[to_widget_fname];
+        let ret;
+        if (w === undefined) {
+          ret = this._symbol_table[subfof].attr.fields[to_widget_fname]
+            .attr.value;
+        } else {
+          ret = w.attr.value[to_widget_fname];
+        }
         if (ret === undefined) {
           throw new Error(`No widget provided for navigation in ${subfof}`);
         }
@@ -532,11 +557,12 @@ export class AppParser {
       .map(data => {
         const matchts = matchts_fn(data.id);
         return _u
-          .map(data.attr.fields, (subftype, subfname) => _u
-            .map(subftype.split("|"), subft => ({
+          .map(data.attr.fields, (subf, subfname) => _u
+            .map(subf.type.split("|"), subft => ({
               subfield: {
                 name: subfname, of: {name: data.id, fqelement: fqelement},
-                type: {name: subftype, fqelement: fqelement}},
+                type: {name: subf.type, fqelement: fqelement}
+              },
               fields: _u
                 .reject(_u
                   .map(matchts, matcht => this

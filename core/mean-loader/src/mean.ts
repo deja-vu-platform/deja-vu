@@ -382,8 +382,8 @@ export namespace GruntTask {
 
   function route_config(data, main: string): Route[] {
     let all_routes = [{path: "", widget: main}];
-    if (data["Route"] !== undefined) {
-      all_routes = all_routes.concat(data["Route"]);
+    if (data["route"] !== undefined) {
+      all_routes = all_routes.concat(data["route"]);
     }
     return _u.reduce(all_routes, (ret, route) => {
       ret.routes[route.path] = route.widget;
