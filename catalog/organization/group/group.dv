@@ -1,12 +1,12 @@
 cliche Group {
     // Member of a Group
     data Member {
-        name: Text
+        name: text
     }
 
     // Named collection of group members
     data Group {
-        name: Text,
+        name: text,
         members: [Member]
     }
 
@@ -50,6 +50,6 @@ cliche Group {
     widget AddExistingMember {
         member: Member,
         group: Group,
-        submit_ok: Boolean
+        submit_ok: boolean
     }
 }

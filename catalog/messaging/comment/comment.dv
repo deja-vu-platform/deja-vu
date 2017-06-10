@@ -2,15 +2,15 @@ cliche Comment {
   data Comment {
     author: Author,
     target: Target,
-    content: Text
+    content: text
   }
 
   data Author {
-    name: Text
+    name: text
   }
 
   data Target {
-    name: Text
+    name: text
   }
 
   widget Comments uses ShowComment, EditComment {

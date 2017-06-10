@@ -1,6 +1,6 @@
 cliche Auth {
   data User {
-    username: Text
+    username: text
   }
 
   data Resource {

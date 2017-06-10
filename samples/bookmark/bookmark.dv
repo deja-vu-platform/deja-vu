@@ -3,22 +3,22 @@
 // topics and users they follow.
 app Bookmark {
 
-  use community/Follow[User: Source, User: Target] as FollowUsers
-  use community/Follow[User: Source, Topic: Target] as FollowTopics
-  use access/Auth[User: User, Post: Resource]
-  use messaging/Feed[
-    User: Subscriber, User | Topic: Publisher, Post: Message,
-    ShowFeedPost replaces ShowFeedItem in ShowFeed
+  include community/Follow[User for Source, User for Target] as FollowUsers
+  include community/Follow[User for Source, Topic for Target] as FollowTopics
+  include access/Auth[User for User, Post for Resource]
+  include messaging/Feed[
+    User for Subscriber, User | Topic for Publisher, Post for Message,
+    ShowFeedPost replacing ShowFeedItem in ShowFeed
   ]
-  use organization/Label[Post: Item, Topic: Label]
-  use messaging/Post[User: User, Post: Post] as MessagingPost
-  use messaging/Comment[User: Author, Post: Target]
+  include organization/Label[Post for Item, Topic for Label]
+  include messaging/Post[User for User, Post for Post] as MessagingPost
+  include messaging/Comment[User for Author, Post for Target]
 
   /**
    *  Data definitions
    */
   data User {
-    username: Text,
+    username: text,
     posts: Post,
     follows: User | Topic
   }
@@ -27,7 +27,7 @@ app Bookmark {
   u2: User = {username: "alyssaphacker", posts: [p2]}
 
   data Post {
-    content: Text,
+    content: text,
     topics: Topic,
     author: User
   }
@@ -36,7 +36,7 @@ app Bookmark {
   p2: Post = {content: "hello, I'm Alyssa", author: u2, topics: [t1]}
 
   data Topic {
-    name: Text,
+    name: text,
     posts: Post
   }
 
@@ -47,17 +47,13 @@ app Bookmark {
    */
   // The landing page gives the user the option to sign in or register
   main widget Landing {
-    on_user_ok: Widget
+    on_user_ok: Widget = Home
   }
-
-  l: Landing = {on_user_ok: Home}
 
 
   widget NavBar {
-    on_signout_ok: Widget
+    on_signout_ok: Widget = Landing
   }
-
-  nb: NavBar = {on_signout_ok: Landing}
 
   widget Home {
     user: User
@@ -73,7 +69,7 @@ app Bookmark {
   widget CreatePost {
     author: User,
     post: Post,
-    submit_ok: Boolean
+    submit_ok: boolean
   }
 
   // Displays the list of topics and lets the logged in user follow or unfollow
@@ -88,8 +84,8 @@ app Bookmark {
     user: User
   }
 
-  landing_route: Route = {path: "landing", widget: Landing}
-  home_route: Route = {path: "home", widget: Home}
-  users_route: Route = {path: "users", widget: Users}
-  topics_route: Route = {path: "topics", widget: Topics}
+  landing_route: route = {path: "landing", widget: Landing}
+  home_route: route = {path: "home", widget: Home}
+  users_route: route = {path: "users", widget: Users}
+  topics_route: route = {path: "topics", widget: Topics}
 }

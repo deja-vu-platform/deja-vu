@@ -39,7 +39,8 @@ export interface App {
 
 
 export class AppParser {
-  BASIC_TYPES = ["Text", "Boolean", "Date", "Datetime", "Number", "Widget"];
+  PRIMITIVE_TYPES = [
+    "text", "boolean", "number", "date", "datetime", "time", "route", "Widget"];
   private _grammar;
   private _semantics;
   private _cliche_parser;
@@ -62,7 +63,7 @@ export class AppParser {
       })
       // A map of id -> {type, attr}
       .extendOperation("symbolTable", {
-        ClicheUsesDecl: (use, cliche, params, asDecl) => {
+        IncludeDecl: (use, cliche, params, asDecl) => {
           const st = cliche.symbolTable();
           const alias = asDecl.symbolTable()[0];
           return {
@@ -75,7 +76,7 @@ export class AppParser {
           };
         },
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (category, slash, name) => {
+        clicheName: (category, slash, name) => {
           const cliche = this
             ._cliche_parser.parse(category.sourceString, name.sourceString);
           return {
@@ -88,7 +89,7 @@ export class AppParser {
         //
         Paragraph_data: decl => decl.symbolTable(),
         Paragraph_widget: decl => decl.symbolTable(),
-        Paragraph_assignment: decl => decl.symbolTable(),
+        Paragraph_field: decl => decl.symbolTable(),
         WidgetDecl: (main, widget, name, k1, fields, k2) => {
           const ret = {
             id: name.sourceString, type: "widget", attr: {
@@ -119,26 +120,18 @@ export class AppParser {
             });
           return ret;
         },
-        AssignmentDecl: (name, colon, t_name, assign, obj) => ({
-          id: name.sourceString, type: t_name.sourceString, attr: {
-                value: obj.symbolTable()
+        FieldDecl: (name, colon, tname, assign, value) => ({
+          id: name.sourceString, type: tname.sourceString, attr: {
+                value: value.symbolTable()[0]
               }}),
-        FieldBody: (field_decl, comma, field_decls) => {
-          const fields = [].concat(field_decl.symbolTable())
-            .concat(_u.flatten(field_decls.symbolTable()));
-          return _u
-            .chain(fields)
-            .flatten().reject(_u.isEmpty)
-            .reduce((memo, ft) => {
-              if (memo[ft.name] !== undefined) {
-                throw new Error("Duplicate field" + ft.name);
-              }
-              memo[ft.name] = ft.t;
-              return memo;
-            }, {})
-            .value();
-        },
         //
+        Value_number: num => Number(num.sourceString),
+        Value_obj: obj => obj.symbolTable(),
+        Value_text: (quote1, text, quote2) => text.sourceString,
+        Value_array: (sqbracket1, arr_decl, sqbracket2) => arr_decl
+          .symbolTable()[0],
+        Value_ref: name => name.sourceString,
+
         Obj: (cbrace1, obj_body, comma, more_obj_body, cbrace2) => _u
           .extendOwn(obj_body.symbolTable(), _u
             .chain(more_obj_body.symbolTable())
@@ -150,13 +143,8 @@ export class AppParser {
           ret[name.sourceString] = value.symbolTable();
           return ret;
         },
-        Value_number: (num) => Number(num.sourceString),
-        Value_text: (quote1, text, quote2) => text.sourceString,
-        Value_array: (sqbracket1, arr_decl, sqbracket2) => arr_decl
-          .symbolTable()[0],
         ArrayDecl: (val, comma, more_val) => []
-          .concat(val.symbolTable()).concat(more_val.symbolTable()),
-        Value_ref: (name) => name.sourceString
+          .concat(val.symbolTable()).concat(more_val.symbolTable())
       })
       .addOperation("tbonds", {
         Decl: (app, name, key1, para, key2) => _u
@@ -173,8 +161,8 @@ export class AppParser {
           }, {})
           .value(),
         Paragraph_widget: decl => [], Paragraph_data: decl => [],
-        Paragraph_uses: decl => decl.tbonds(), Paragraph_assignment: decl => [],
-        ClicheUsesDecl: (uses, cliche, params, asDecl) => _u
+        Paragraph_include: decl => decl.tbonds(), Paragraph_field: decl => [],
+        IncludeDecl: (uses, cliche, params, asDecl) => _u
           .chain(params.tbonds())
           .flatten()
           .reject(_u.isEmpty)
@@ -185,10 +173,10 @@ export class AppParser {
           })
           .value(),
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (cat, slash, name) => name.sourceString,
-        ParamsDecl: (br1, param, comma, params, br2) => []
+        clicheName: (cat, slash, name) => name.sourceString,
+        Params: (br1, param, comma, params, br2) => []
           .concat(param.tbonds()).concat(params.tbonds()),
-        ParamDecl_data: (t, colon, name) => {
+        Param_data: (t, for_keyword, name) => {
           const ret = [];
           const tinfo = t.tbonds();
           if (_u.isArray(tinfo)) {
@@ -204,7 +192,7 @@ export class AppParser {
           }
           return ret;
         },
-        ParamDecl_replaces: (n1, replaces, n2, inKeyword, n3) => [],
+        Param_replaces: (n1, replaces, n2, inKeyword, n3) => [],
         Type_union: decl => decl.tbonds(), Type_array: decl => decl.tbonds(),
         Type_name: name => name.sourceString,
         UnionType: (t, bar, ts) => [t.tbonds()].concat(ts.tbonds()),
@@ -216,36 +204,41 @@ export class AppParser {
           .chain(para.data())
           .flatten().reject(_u.isEmpty)
           .reduce((memo, e) => {
-            if (memo[e.t_name] === undefined) memo[e.t_name] = [];
-            memo[e.t_name] = memo[e.t_name].concat(e.obj);
+            if (e.of !== undefined) {
+              if (memo[e.of] === undefined) memo[e.of] = [];
+              const obj = {};
+              obj[e.fname] = e.value;
+              memo[e.of] = memo[e.of].concat(obj);
+            } else {
+              if (memo[e.tname] === undefined) memo[e.tname] = [];
+              memo[e.tname] = memo[e.tname].concat(e.value);
+            }
             return memo;
           }, {})
           .value(),
-        Paragraph_data: decl => ({}), Paragraph_widget: decl => ({}),
-        Paragraph_uses: decl => ({}), Paragraph_assignment: decl => decl.data(),
-        AssignmentDecl: (name, colon, t_name, assign, obj) => {
-          let obj_data = obj.data();
-          if (t_name.sourceString !== "Route") {
-            obj_data = _u.extendOwn({atom_id: name.sourceString}, obj_data);
+        Paragraph_data: decl => ({}), Paragraph_widget: decl => decl.data(),
+        Paragraph_include: decl => ({}), Paragraph_field: decl => decl.data(),
+        WidgetDecl: (main, widget, name, k1, fields, k2) => _u
+          .map(fields.data()[0], f => _u.extendOwn(f, {of: name.sourceString})),
+        FieldBody: (field_decl, comma, field_decls) => _u
+          .reject([field_decl.data()].concat(field_decls.data()[0]),
+                  _u.isEmpty),
+        FieldDecl: (name, colon, tname, assign, value) => {
+          let value_data = value.data()[0];
+          if (_u.isEmpty(value_data)) return {};
+
+          if (this.PRIMITIVE_TYPES.indexOf(tname.sourceString) === -1) {
+            value_data = _u.extendOwn({atom_id: name.sourceString}, value_data);
           }
-          return {t_name: t_name.sourceString, obj: obj_data};
+          return {
+            tname: tname.sourceString, value: value_data,
+            fname: name.sourceString
+          };
         },
-        Obj: (cbrace1, obj_body, comma, more_obj_body, cbrace2) => _u
-          .extendOwn(obj_body.data(), _u
-            .chain(more_obj_body.data())
-            // for some strange reason .reduce(_u.extendOwn) doesn't work
-            .reduce((memo, e) => _u.extendOwn(memo, e))
-            .value()),
-        ObjBody: (name, colon, value) => {
-          const ret = {};
-          ret[name.sourceString] = value.data();
-          return ret;
-        },
+
         Value_number: (num) => Number(num.sourceString),
         Value_text: (quote1, text, quote2) => text.sourceString,
         Value_array: (sqbracket1, arr_decl, sqbracket2) => arr_decl.data()[0],
-        ArrayDecl: (val, comma, more_val) => []
-          .concat(val.data()).concat(more_val.data()),
         Value_ref: (name) => {
           const ref = name.sourceString;
           const s = this._symbol_table[ref];
@@ -257,15 +250,29 @@ export class AppParser {
           } else {
             return {atom_id: ref};
           }
-        }
+        },
+
+        Obj: (cbrace1, obj_body, comma, more_obj_body, cbrace2) => _u
+          .extendOwn(obj_body.data(), _u
+            .chain(more_obj_body.data())
+            // for some strange reason .reduce(_u.extendOwn) doesn't work
+            .reduce((memo, e) => _u.extendOwn(memo, e))
+            .value()),
+        ObjBody: (name, colon, value) => {
+          const ret = {};
+          ret[name.sourceString] = value.data();
+          return ret;
+        },
+        ArrayDecl: (val, comma, more_val) => []
+          .concat(val.data()).concat(more_val.data())
       })
       .addOperation("main", {
         Decl: (app, name, key1, para, key2) => _u
           .find(para.main(), m => m),
         Paragraph_data: decl => "", Paragraph_widget: decl => decl.main(),
-        Paragraph_uses: decl => "", Paragraph_assignment: decl => "",
+        Paragraph_include: decl => "", Paragraph_field: decl => "",
         // ohm-js bug (?)
-        ClicheUsesDecl: (use, name, params, asDecl) => "",
+        IncludeDecl: (use, name, params, asDecl) => "",
         WidgetDecl: (m, w, n1, k1, fields, k2) => m.
           sourceString ? n1.sourceString : ""
       })
@@ -278,9 +285,9 @@ export class AppParser {
                     return memo;
                   }, {}),
         Paragraph_data: decl => "", Paragraph_widget: decl => "",
-        Paragraph_uses: decl => decl.usedCliches(),
-        Paragraph_assignment: decl => "",
-        ClicheUsesDecl: (uses, name, params, asDecl) => {
+        Paragraph_include: decl => decl.usedCliches(),
+        Paragraph_field: decl => "",
+        IncludeDecl: (uses, name, params, asDecl) => {
           const alias = asDecl.usedCliches()[0];
           const cliche = name.usedCliches();
           return {
@@ -289,7 +296,7 @@ export class AppParser {
           };
         },
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (category, slash, name) => ({
+        clicheName: (category, slash, name) => ({
           category: category.sourceString, name: name.sourceString
         })
       })
@@ -309,9 +316,9 @@ export class AppParser {
                 })));
         },
         Paragraph_widget: decl => [], Paragraph_data: decl => [],
-        Paragraph_assignment: decl => [],
-        Paragraph_uses: decl => decl.replaceMap(),
-        ClicheUsesDecl: (uses, cliche, params, asDecl) => {
+        Paragraph_field: decl => [],
+        Paragraph_include: decl => decl.replaceMap(),
+        IncludeDecl: (uses, cliche, params, asDecl) => {
           const rmap = _u
             .chain(params.replaceMap())
             .flatten()
@@ -331,11 +338,11 @@ export class AppParser {
           return ret;
         },
         AsDecl: (as_keyword, name) => name.sourceString,
-        usedClicheName: (category, slash, name) => name.sourceString,
-        ParamsDecl: (br1, param, comma, params, br2) => []
+        clicheName: (category, slash, name) => name.sourceString,
+        Params: (br1, param, comma, params, br2) => []
           .concat(param.replaceMap()).concat(params.replaceMap()),
-        ParamDecl_data: (t, colon, name) => [],
-        ParamDecl_replaces: (n1, replaces, n2, inKeyword, n3) => ({
+        Param_data: (t, for_keyword, name) => [],
+        Param_replaces: (n1, replaces, n2, inKeyword, n3) => ({
           widget: n2.sourceString,
           in_widget: n3.sourceString,
           replaced_by: {name: n1.sourceString}
@@ -348,9 +355,9 @@ export class AppParser {
           .reject(_u.isEmpty)
           .value(),
         Paragraph_data: decl => ({}), Paragraph_widget: decl => ({}),
-        Paragraph_uses: decl => decl.replaceList(),
-        Paragraph_assignment: decl => ({}),
-        ClicheUsesDecl: (uses, name, params, asDecl) => _u
+        Paragraph_include: decl => decl.replaceList(),
+        Paragraph_field: decl => ({}),
+        IncludeDecl: (uses, name, params, asDecl) => _u
           .chain(params.replaceList())
           .flatten()
           .reject(_u.isEmpty)
@@ -359,11 +366,11 @@ export class AppParser {
             return r;
           })
           .value(),
-        usedClicheName: (cat, slash, name) => name.sourceString,
-        ParamsDecl: (br1, param, comma, params, br2) => []
+        clicheName: (cat, slash, name) => name.sourceString,
+        Params: (br1, param, comma, params, br2) => []
           .concat(param.replaceList()).concat(params.replaceList()),
-        ParamDecl_data: (t, colon, name) => "",
-        ParamDecl_replaces: (n1, replaces, n2, inKeyword, n3) => ({
+        Param_data: (t, for_keyword, name) => "",
+        Param_replaces: (n1, replaces, n2, inKeyword, n3) => ({
           name: n2.sourceString
         })
       });
@@ -431,9 +438,9 @@ export class AppParser {
           .mapObject(widget, (rinfo, widget) => {
             rinfo.map = _u
               .chain(this._symbol_table[rinfo.replaced_by.name].attr.fields)
-              .map((subftype, subfname) => {
+              .map((subf, subfname) => {
                 const finfo = _u.reject(_u
-                  .map(subftype.split("|"), subft => this
+                  .map(subf.type.split("|"), subft => this
                     ._match(
                       subft.trim(), {name: widget, fqelement: cliche}, tbonds,
                       fqelement)),
@@ -444,7 +451,7 @@ export class AppParser {
                 } else if (finfo.length === 1) {
                   ret = {
                     name: subfname,
-                    type: {name: subftype, fqelement: fqelement},
+                    type: {name: subf.type, fqelement: fqelement},
                     maps_to: finfo[0].name
                   };
                 }
@@ -479,14 +486,22 @@ export class AppParser {
       // Only look at widget entries that have a field of type widget (since
       // they are the only widgets that can cause a navigation)
       ste => ste.type === "widget" &&
-             _u.contains(_u.values(ste.attr.fields), "Widget"),
+             _u.contains(_u.pluck(_u.values(ste.attr.fields), "type"),
+                         "Widget"),
       // Match the original widget with the target widget (that is determined
       // by the value of the field of type widget)
       subfof => {
         const to_widget_fname = _u
-          .findKey(this._symbol_table[subfof].attr.fields, t => t === "Widget");
+          .findKey(this._symbol_table[subfof].attr.fields,
+                   f => f.type === "Widget");
         const w = _u.findWhere(_u.values(this._symbol_table), {type: subfof});
-        const ret = w.attr.value[to_widget_fname];
+        let ret;
+        if (w === undefined) {
+          ret = this._symbol_table[subfof].attr.fields[to_widget_fname]
+            .attr.value;
+        } else {
+          ret = w.attr.value[to_widget_fname];
+        }
         if (ret === undefined) {
           throw new Error(`No widget provided for navigation in ${subfof}`);
         }
@@ -498,7 +513,7 @@ export class AppParser {
 
   _match(t: string, matcht, tbonds, fqelement: string) {
     const is_subtype = (t1: string, t2: {name: string, fqelement: string}) => (
-      (this.BASIC_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
+      (this.PRIMITIVE_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
       !!_u.find(tbonds[t1], b => b.name === t2.name &&
                 b.fqelement === t2.fqelement)
     );
@@ -506,11 +521,11 @@ export class AppParser {
     if (matcht.fqelement === undefined) {  // is an app t
       const t_st = this._symbol_table[matcht];
       if (t_st === undefined) throw new Error(`Can't find type ${matcht}`);
-      const fname =  _u.findKey(t_st.attr.fields, ft => ft === t);
+      const fname =  _u.findKey(t_st.attr.fields, f => f.type === t);
       if (fname !== undefined) {
         ret = {
           name: fname, of: {name: matcht, fqelement: fqelement},
-          type: {name: t_st.attr.fields[fname], fqelement: fqelement}
+          type: {name: t_st.attr.fields[fname].type, fqelement: fqelement}
         };
       }
     } else {
@@ -522,11 +537,13 @@ export class AppParser {
       }
       const fname =  _u
         .findKey(t_st.attr.fields,
-                 ft => is_subtype(t, {name: ft, fqelement: matcht.fqelement}));
+                 f => is_subtype(t,
+                   {name: f.type, fqelement: matcht.fqelement}));
       if (fname !== undefined) {
         ret = {
           name: fname, of: {name: matcht.name, fqelement: matcht.fqelement},
-          type: {name: t_st.attr.fields[fname], fqelement: matcht.fqelement}
+          type: {
+            name: t_st.attr.fields[fname].type, fqelement: matcht.fqelement}
         };
       }
     }
@@ -540,11 +557,12 @@ export class AppParser {
       .map(data => {
         const matchts = matchts_fn(data.id);
         return _u
-          .map(data.attr.fields, (subftype, subfname) => _u
-            .map(subftype.split("|"), subft => ({
+          .map(data.attr.fields, (subf, subfname) => _u
+            .map(subf.type.split("|"), subft => ({
               subfield: {
                 name: subfname, of: {name: data.id, fqelement: fqelement},
-                type: {name: subftype, fqelement: fqelement}},
+                type: {name: subf.type, fqelement: fqelement}
+              },
               fields: _u
                 .reject(_u
                   .map(matchts, matcht => this

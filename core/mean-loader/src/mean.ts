@@ -382,8 +382,8 @@ export namespace GruntTask {
 
   function route_config(data, main: string): Route[] {
     let all_routes = [{path: "", widget: main}];
-    if (data["Route"] !== undefined) {
-      all_routes = all_routes.concat(data["Route"]);
+    if (data["route"] !== undefined) {
+      all_routes = all_routes.concat(data["route"]);
     }
     return _u.reduce(all_routes, (ret, route) => {
       ret.routes[route.path] = route.widget;
@@ -464,9 +464,9 @@ export namespace GruntTask {
       .filter(f => f.data)
       .map(f => {
         let ret = "";
-        if (f.type.name === "Text") {
+        if (f.type.name === "text") {
           ret = `this.${f.name}.value = "${f.data}"`;
-        } else if (f.type.name === "Boolean") {
+        } else if (f.type.name === "boolean") {
           ret = `this.${f.name}.value = ${f.data}$`;
         } else if (f.type.name === "Widget") {
           ret = `this.${f.name}.value = {

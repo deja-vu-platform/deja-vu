@@ -1,12 +1,12 @@
 cliche Market {
   data Party {
-    balance: Number
+    balance: number
   }
 
   data Good {
-    name: Text,
-    offer_price: Number,
-    transaction_price: Number,
+    name: text,
+    offer_price: number,
+    transaction_price: number,
     seller: Party,
     buyer: Party
   }
@@ -18,7 +18,7 @@ cliche Market {
   // good.transaction_price = good.offer_price * fraction
   widget BuyGoodAtFractionOfPrice {
     good: Good,
-    fraction: Number,
+    fraction: number,
     buyer: Party
   }
 

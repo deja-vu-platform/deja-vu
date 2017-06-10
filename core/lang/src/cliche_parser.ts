@@ -60,20 +60,20 @@ export class ClicheParser {
             .chain(fields)
             .flatten().reject(_u.isEmpty)
             .reduce((memo, ft) => {
-              if (memo[ft.name] !== undefined) {
-                throw new Error("Duplicate field" + ft.name);
+              if (memo[ft.id] !== undefined) {
+                throw new Error("Duplicate field" + ft.id);
               }
-              memo[ft.name] = ft.t;
+              memo[ft.id] = ft;
               return memo;
             }, {})
             .value();
         },
-        WidgetUsesDecl: (u, used_widget, comma, used_widgets) => []
+        Uses: (u, used_widget, comma, used_widgets) => []
           .concat(used_widget.symbolTable())
           .concat(used_widgets.symbolTable()),
         name: (name) => name.sourceString,
-        FieldDecl: (name, colon, t) => ({
-          name: name.sourceString, t: t.sourceString
+        FieldDecl: (name, colon, t_name) => ({
+          id: name.sourceString, type: t_name.sourceString
         })
       });
   }
@@ -117,11 +117,11 @@ export class ClicheParser {
     const t_st = this._symbol_table[matcht];
     if (t_st === undefined) throw new Error(`Can't find type ${matcht}`);
 
-    const fname = _u.findKey(t_st.attr.fields, ft => ft === ftname);
+    const fname = _u.findKey(t_st.attr.fields, f => f.type === ftname);
     if (fname !== undefined) {
       ret = {
         name: fname, of: {name: matcht, fqelement: fqelement},
-        type: {name: t_st.attr.fields[fname], fqelement: fqelement}
+        type: {name: t_st.attr.fields[fname].type, fqelement: fqelement}
       };
     }
     return ret;
@@ -132,11 +132,12 @@ export class ClicheParser {
       .chain(_u.values(this._symbol_table))
       .filter(s => s.type === "widget")
       .map(data => _u
-        .map(data.attr.fields, (subftype, subfname) => _u
-          .map(subftype.split("|"), subft => ({
+        .map(data.attr.fields, (subf, subfname) => _u
+          .map(subf.type.split("|"), subft => ({
             subfield: {
               name: subfname, of: {name: data.id, fqelement: fqelement},
-              type: {name: subftype, fqelement: fqelement}},
+              type: {name: subf.type, fqelement: fqelement}
+            },
             fields: _u
               .reject(_u
                 .map(this._symbol_table[data.id].attr.uses,

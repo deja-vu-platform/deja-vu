@@ -1,7 +1,7 @@
 app GroceryShip {
-  use access/Auth
-  use community/Task
-  use community/Market
-  use community/Rating
-  use organization/List
+  include access/Auth
+  include community/Task
+  include community/Market
+  include community/Rating
+  include organization/List
 }

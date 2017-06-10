@@ -1,16 +1,16 @@
 cliche Event {
   data Event {
-    start_date: Datetime,
-    end_date: Datetime,
+    start_date: datetime,
+    end_date: datetime,
     description: Description
   }
 
   data WeeklyEvent {
     events: Event,
-    starts_on: Date,  // the date of the first occurrence of the weekly event
-    ends_on: Date,  // the date of the last occurrence of the weekly event
-    start_time: Time,
-    end_time: Time,
+    starts_on: date,  // the date of the first occurrence of the weekly event
+    ends_on: date,  // the date of the last occurrence of the weekly event
+    start_time: time,
+    end_time: time,
     description: Description,
     guests: Guest
   }
@@ -18,7 +18,7 @@ cliche Event {
   data Description {}
 
   data Guest {
-    name: Text
+    name: text
   }
 
   widget NewWeeklyEvent {}

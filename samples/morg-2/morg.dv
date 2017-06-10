@@ -1,20 +1,19 @@
 app Morg {
-  use organization/Event[
-    GroupMeeting: Event,
-    ShowGroupMeeting replaces ShowEvent in
+  include organization/Event[
+    GroupMeeting for Event,
+    ShowGroupMeeting replacing ShowEvent in
       ChooseAndShowWeeklyEvent]
-  use messaging/Email[GroupMeeting: Content]
+  include messaging/Email[GroupMeeting for Content]
 
   data GroupMeeting {}
 
   main widget Home {}
   widget ShowGroupMeeting {
-    email: Text,
+    email: text = "deja-vu@mit.edu",
     group_meeting: GroupMeeting
   }
 
   widget EmailReminder { group_meeting: GroupMeeting }
 
-  s: ShowGroupMeeting = {email: "deja-vu@mit.edu"}
-  email_route: Route = {path: "email", widget: EmailReminder}
+  email_route: route = {path: "email", widget: EmailReminder}
 }
