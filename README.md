@@ -16,6 +16,8 @@ The Deja Vu code is organized in the following way:
 Building and running
 --------------------
 
+You need to be running npm v3 and node v6.
+
 Each cliché and sample is its own node project. Like any other node project, you
 need to run `npm install` to install dependencies. To build a library or a
 cliché do `npm run lib`. To run a cliché or an app do `npm start`. When a
