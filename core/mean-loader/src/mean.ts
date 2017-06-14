@@ -375,17 +375,15 @@ export namespace GruntTask {
       .value();
   }
 
-  type Route = {
-    path: string;
-    widget: string;
-  }
+  type RouteConfig = { routes: any; widgets: any; }
+  type Route = { path: string; widget: string; }
 
-  function route_config(data, main: string): Route[] {
-    let all_routes = [{path: "", widget: main}];
+  function route_config(data, main: string): RouteConfig {
+    let all_routes: Route[] = [{path: "", widget: main}];
     if (data["route"] !== undefined) {
       all_routes = all_routes.concat(data["route"]);
     }
-    return _u.reduce(all_routes, (ret, route) => {
+    return _u.reduce(all_routes, (ret, route: Route) => {
       ret.routes[route.path] = route.widget;
       ret.widgets[route.widget] = route.path;
       return ret;
@@ -482,29 +480,7 @@ export namespace GruntTask {
       .value()
       .join(";");
 
-    const wids_from_route = r => {
-      const ret = [].concat(r.widget);
-      if (r.children !== undefined) {
-        ret.concat(_u.map(r.children, wids_from_route));
-      }
-      return ret;
-    };
-    const wid_with_paths: string[] = _u
-      .chain(data["Route"])
-      .map(wids_from_route)
-      .flatten()
-      .value();
-    const template_route_widget = w => `
-      @AppWidget()
-      export class ${w.class_name} {
-        ${field_defs(w)};
-        constructor(client_bus: ClientBus) {
-          client_bus.init(this, [${field_init(w)}]);
-          ${field_assignments(w)};
-        }
-      }
-    `;
-    const template_inner_widget = w => `
+    const template = w => `
       @AppWidget()
       export class ${w.class_name} {
         ${field_defs(w)};
@@ -517,10 +493,6 @@ export namespace GruntTask {
       }
     `;
     return _u.map(widgets, (w: WidgetJs) => {
-      let template = template_inner_widget;
-      if (_u.contains(wid_with_paths, w.name)) {
-        template = template_route_widget;
-      }
       w.definition = template(w);
       return w;
     });
