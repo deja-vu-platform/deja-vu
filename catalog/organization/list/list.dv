@@ -1,12 +1,12 @@
 cliche List {
   data List {
     name: text,
-    items: Item,
-    selected: boolean
+    items: Item
   }
 
   data Item {
-    name: text
+    name: text,
+    selected: boolean
   }
 
   widget NewList {

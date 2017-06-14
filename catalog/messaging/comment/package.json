@@ -11,6 +11,7 @@
     "@angular/core": "~2.4.0",
     "@angular/forms": "~2.4.0",
     "@angular/http": "~2.4.0",
+    "@types/node": "^6.0.78",
     "client-bus": "file:../../../core/client-bus",
     "core-js": "^2.4.1",
     "gql": "file:../../../gql",
@@ -23,8 +24,8 @@
     "rxjs": "5.0.1",
     "server-bus": "file:../../../core/server-bus",
     "systemjs": "0.19.40",
-    "zone.js": "^0.7.4",
-    "uuid": "^2.0.3"
+    "uuid": "^2.0.3",
+    "zone.js": "^0.7.4"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

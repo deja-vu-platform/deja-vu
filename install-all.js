@@ -28,7 +28,6 @@ function installAll(directory) {
   if (fs.existsSync(path.join(directory, 'package.json'))) {
     return spawn('rm', ['-rf', 'node_modules'], { cwd: directory })
       .then(() => spawn('npm', ['install'], { cwd: directory }))
-      .then(() => spawn('typings', ['install'], { cwd: directory }))
       .then(() => {
         if (require(path.join(directory, 'package.json')).scripts.lib) {
           return spawn('npm', ['run', 'lib'], { cwd: directory });
