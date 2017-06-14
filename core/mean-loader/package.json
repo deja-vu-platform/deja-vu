@@ -17,7 +17,7 @@
   "typings": "./lib/mean",
   "main": "./lib/mean",
   "dependencies": {
-    "@types/node": "^7.0.22",
+    "@types/node": "^6.0.78",
     "command-line-args": "^2.1.6",
     "express": "^4.13.3",
     "express-graphql": "^0.4.9",
