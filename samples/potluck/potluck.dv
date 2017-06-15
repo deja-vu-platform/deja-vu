@@ -19,7 +19,5 @@ app Potluck {
     on_user_ok: Widget = Home
   }
 
-  main widget Landing {}
-
   home: route = {path: "home", widget: Home}
 }
