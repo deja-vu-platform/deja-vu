@@ -1,0 +1,16 @@
+{
+  "name": "dv-samples-potluck",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node node_modules/dv-lang/lib/dv.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "dv-access-auth": "file:../../catalog/access/auth",
+    "dv-community-market": "file:../../catalog/community/market",
+    "dv-lang": "file:../../core/lang",
+    "dv-organization-event": "file:../../catalog/organization/event",
+    "dv-organization-group": "file:../../catalog/organization/group",
+    "tslint": "^5.4.3"
+  }
+}
