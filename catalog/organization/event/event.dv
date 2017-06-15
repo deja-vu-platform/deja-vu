@@ -21,6 +21,8 @@ cliche Event {
     name: text
   }
 
+  widget NewEvent {}
+
   widget NewWeeklyEvent {}
 
   // Shows the start and end date of the event
@@ -28,6 +30,8 @@ cliche Event {
     event: Event,
     selected_weekly_event: WeeklyEvent
   }
+
+  widget ShowEvents {}
 
   // Lets the user choose a weekly event from a dropdown and displays the
   // selected weekly event by showing a list of all the events using
