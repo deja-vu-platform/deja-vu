@@ -1,12 +1,41 @@
 app Potluck {
   include access/Auth[User for User]
-  include organization/Event
+  include organization/Event[
+    Party for Event
+  ]
+
+  include organization/Group[
+    User for Member,
+    Party for Group,
+    ShowParty replacing ShowGroupOverview in ShowGroupsByMember
+  ]
+
+  include community/Market
 
   data User {
     username: text
   }
 
-  widget Home {
+  data Party {
+    // for event
+    start_date: datetime,
+    end_date: datetime,
+    // for group
+    name: text,
+    members: [User]
+  }
+
+  widget NewParty {
+    user: User,
+    submit_ok: boolean
+  }
+
+  widget Parties {
+    user: User
+  }
+
+  widget ShowParty {
+    event: Party
   }
 
   widget NavBar {
@@ -16,8 +45,9 @@ app Potluck {
 
   // The landing page gives the user the option to sign in or register
   main widget Landing {
-    on_user_ok: Widget = Home
+    on_user_ok: Widget = Parties
   }
 
-  home: route = {path: "home", widget: Home}
+  parties: route = {path: "parties", widget: Parties}
+  new_party: route = {path: "new-party", widget: NewParty}
 }

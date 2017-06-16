@@ -2,20 +2,6 @@
 
 <dv-widget name="NavBar"></dv-widget>
 
-<!--
-<div class="col-md-offset-2 col-md-6">
-	<h1>Group meeting organizer</h1>
-	<h2>Create new group meeting series</h2>
-	<div class="row">
-		<dv-widget name="NewWeeklyEvent" of="Event"></dv-widget>
-	</div>
-	<h2>Show a group meeting series</h2>
-	<div class="row">
-		<dv-widget name="ChooseAndShowWeeklyEvent" of="Event"></dv-widget>
-	</div>
-</div>
--->
-
 <div class='container' id='homepage-container'>
 	<div class='col-md-3' id='namebox'>
 		<h1>Your Parties</h1>
@@ -25,16 +11,6 @@
 	</div>
 
 	<div class='col-md-9'>
-
-		<!--
-		<PartyList parties={this.state.parties} currentUser={this.props.user}
-			addItem={this.addItem} claimItem={this.claimItem} addCost={this.addCost}
-			clearPayments={this.clearPayments} closeOutParty={this.closeOutParty}
-			rsvp={this.rsvp} addGuest={this.addGuest} deleteGuest={this.deleteGuest}
-			removeItem={this.removeItem}/>
-		-->
-		<!--TODO: Party List-->
-		<dv-widget name="ShowEvents" of="Event"></dv-widget>
-
+		<dv-widget name="ShowGroupsByMember" of="Group"></dv-widget>
 	</div>
 </div>
