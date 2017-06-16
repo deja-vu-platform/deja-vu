@@ -7,7 +7,7 @@ import "rxjs/add/operator/mergeMap";
 
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus, field} from "client-bus";
+import {Widget, ClientBus} from "client-bus";
 
 import * as _u from "underscore";
 
