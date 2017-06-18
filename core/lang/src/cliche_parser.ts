@@ -39,6 +39,9 @@ export class ClicheParser {
       .addOperation("symbolTable", {
         Decl: (cliche, name, key1, para, key2) => _u
           .reduce(para.symbolTable(), (memo, s) => {
+            if (memo[s.id] !== undefined) {
+              throw new Error(`Duplicate symbol ${s.id}`);
+            }
             memo[s.id] = s;
             return memo;
           }, {}),
