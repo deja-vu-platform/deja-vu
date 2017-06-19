@@ -35,7 +35,7 @@ app Potluck {
   }
 
   widget ShowParty {
-    event: Party
+    party: Party
   }
 
   widget NavBar {
