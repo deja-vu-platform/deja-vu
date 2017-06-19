@@ -24,39 +24,40 @@ export class NewEventContentComponent {
 
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {
-    	console.log("i heard a submit");
-	    let startsOnText: Element = document.getElementById("starts-on-text");
-	    let endsOnText: Element = document.getElementById("ends-on-text");
-	    let startTimeText: Element = document.getElementById("start-time-text");
-	    let endTimeText: Element = document.getElementById("end-time-text");
+      if (this.submit_ok.value === true) {
+  	    let startsOnText: Element = document.getElementById("starts-on-text");
+  	    let endsOnText: Element = document.getElementById("ends-on-text");
+  	    let startTimeText: Element = document.getElementById("start-time-text");
+  	    let endTimeText: Element = document.getElementById("end-time-text");
 
-	    this.starts_on = startsOnText["value"];
-	    this.ends_on = endsOnText["value"];
-	    this.start_time = startTimeText["value"];
-	    this.end_time = endTimeText["value"];
+  	    this.starts_on = startsOnText["value"];
+  	    this.ends_on = endsOnText["value"];
+  	    this.start_time = startTimeText["value"];
+  	    this.end_time = endTimeText["value"];
 
-	    this._graphQlService
-	      .post(`
-	        newPublicEvent(
-	          starts_on: "${this.starts_on}", ends_on: "${this.ends_on}",
-	          start_time: "${this.start_time}", end_time: "${this.end_time}") {
-	          atom_id
-	        }
-	      `)
-	      .subscribe(atom_id => {
-	        this.event.atom_id = atom_id;
+  	    this._graphQlService
+  	      .post(`
+  	        newPublicEvent(
+  	          starts_on: "${this.starts_on}", ends_on: "${this.ends_on}",
+  	          start_time: "${this.start_time}", end_time: "${this.end_time}") {
+  	          atom_id
+  	        }
+  	      `)
+  	      .subscribe(atom_id => {
+  	        this.event.atom_id = atom_id;
 
-	        // Clear out the fields on success
-	        startsOnText["value"] = "";
-	        endsOnText["value"] = "";
-	        startTimeText["value"] = "";
-	        endTimeText["value"] = "";
+  	        // Clear out the fields on success
+  	        startsOnText["value"] = "";
+  	        endsOnText["value"] = "";
+  	        startTimeText["value"] = "";
+  	        endTimeText["value"] = "";
 
-	        this.starts_on = "";
-	        this.ends_on = "";
-	        this.start_time = "";
-	        this.end_time = "";
-	      });
+  	        this.starts_on = "";
+  	        this.ends_on = "";
+  	        this.start_time = "";
+  	        this.end_time = "";
+  	      });
+        }
     });
   }
 

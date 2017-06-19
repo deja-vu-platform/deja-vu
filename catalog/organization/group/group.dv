@@ -46,6 +46,15 @@ cliche Group {
         onGroupCreate: Widget
     }
 
+    widget NewGroupContent {
+        initialMember: Member,
+        submit_ok: boolean
+    }
+
+    widget NewGroupButton {
+        submit_ok: boolean
+    }
+
     // Add an existing member by ID
     widget AddExistingMember {
         member: Member,

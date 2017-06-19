@@ -19,7 +19,6 @@ export class NewEventButtonComponent {
 
   submit() {
     this.submit_ok.value = true;
-    console.log("you pressed the submit button");
   }
 
   valid() {
