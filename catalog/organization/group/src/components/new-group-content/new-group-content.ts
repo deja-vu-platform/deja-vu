@@ -27,7 +27,8 @@ export class NewGroupContentComponent {
                 }
               }
             `)
-            .map(data => data.group_by_id.addExistingMember.atom_id);
+            .map(data => data.group_by_id.addExistingMember.atom_id)
+            .subscribe(_ => undefined);
         };
         let createGroup = () => {
           this._graphQlService
