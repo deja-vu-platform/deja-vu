@@ -120,31 +120,61 @@ export class AppParser {
             });
           return ret;
         },
-        FieldDecl: (name, colon, tname, assign, value) => ({
+        FieldDecl: (name, colon, tname, assign, expr) => ({
           id: name.sourceString, type: tname.sourceString, attr: {
-                value: value.symbolTable()[0]
-              }}),
-        //
-        Value_number: num => Number(num.sourceString),
-        Value_obj: obj => obj.symbolTable(),
-        Value_text: (quote1, text, quote2) => text.sourceString,
-        Value_array: (sqbracket1, arr_decl, sqbracket2) => arr_decl
-          .symbolTable()[0],
-        Value_ref: name => name.sourceString,
+            expr_node: expr
+          }
+        })
+      })
+      .addOperation("eval", {
+        // Unary Expressions
+        Expr_un: unExpr => unExpr.eval(),
+        UnExpr_not: (not, expr) => !expr.eval(),
 
-        Obj: (cbrace1, obj_body, comma, more_obj_body, cbrace2) => _u
-          .extendOwn(obj_body.symbolTable(), _u
-            .chain(more_obj_body.symbolTable())
-            // for some strange reason .reduce(_u.extendOwn) doesn't work
-            .reduce((memo, e) => _u.extendOwn(memo, e))
-            .value()),
-        ObjBody: (name, colon, value) => {
+        // Binary Expressions
+        Expr_bin: binExpr => binExpr.eval(),
+        BinExpr_plus: (expr1, plus, expr2) => expr1.eval() + expr2.eval(),
+        BinExpr_minus: (expr1, minus, expr2) => expr1.eval() - expr2.eval(),
+        BinExpr_and: (expr1, and, expr2) => expr1.eval() && expr2.eval(),
+        BinExpr_or: (expr1, or, expr2) => expr1.eval() || expr2.eval(),
+        BinExpr_is: (expr1, is, expr2) => expr1.eval() === expr2.eval(),
+
+        // Literals
+        Expr_literal: lit => lit.eval(),
+        Literal_number: num => Number(num.sourceString),
+        Literal_text: (quote1, text, quote2) => String(text.sourceString),
+        Literal_true: t => true, Literal_false: f => false,
+        Literal_obj: (cbraces1, props, cbraces2) => _u
+          // for some reason using _u.extendOwn only doesn't work
+          .reduce(props.eval(), (memo, e) => _u.extendOwn(memo, e), {}),
+        Literal_array: (sqbracket1, exprs, sqbracket2) => exprs.eval(),
+        NonemptyListOf: (elem, sep, elems) => [elem.eval()]
+          .concat(elems.eval()),
+        PropAssignment: (name, colon, expr) => {
           const ret = {};
-          ret[name.sourceString] = value.symbolTable();
+          ret[name.sourceString] = expr.eval();
           return ret;
         },
-        ArrayDecl: (val, comma, more_val) => []
-          .concat(val.symbolTable()).concat(more_val.symbolTable())
+
+        // Refs
+        Expr_ref: name => {
+          const ref = name.sourceString;
+          const s = this._symbol_table[ref];
+          if (s === undefined) {
+            throw new Error(`Symbol ${ref} is undefined`);
+          }
+          if (s.attr.value === undefined) { // we eval the symbol
+             if (s.type === "widget") {
+               s.attr.value = ref;
+             } else if (this._is_primitive_t(s.type)) {
+               s.attr.value = s.attr.expr_node.eval()[0];
+             } else {
+               s.attr.value = {atom_id: ref};
+             }
+             delete s.attr.expr_node;
+          }
+          return s.attr.value;
+        }
       })
       .addOperation("tbonds", {
         Decl: (app, name, key1, para, key2) => _u
@@ -204,12 +234,11 @@ export class AppParser {
           .chain(para.data())
           .flatten().reject(_u.isEmpty)
           .reduce((memo, e) => {
-            if (e.of !== undefined) {
-              if (memo[e.of] === undefined) memo[e.of] = [];
-              const obj = {};
-              obj[e.fname] = e.value;
-              memo[e.of] = memo[e.of].concat(obj);
-            } else {
+            if (e.of !== undefined) { // it comes from a widget
+              // tmp hack
+              if (memo[e.of] === undefined) memo[e.of] = [{}];
+              memo[e.of][0][e.fname] = e.value;
+            } else if (e.tname === "route" || !this._is_primitive_t(e.tname)) {
               if (memo[e.tname] === undefined) memo[e.tname] = [];
               memo[e.tname] = memo[e.tname].concat(e.value);
             }
@@ -223,48 +252,18 @@ export class AppParser {
         FieldBody: (field_decl, comma, field_decls) => _u
           .reject([field_decl.data()].concat(field_decls.data()[0]),
                   _u.isEmpty),
-        FieldDecl: (name, colon, tname, assign, value) => {
-          let value_data = value.data()[0];
+        FieldDecl: (name, colon, tname, assign, expr) => {
+          let value_data = expr.eval()[0];
           if (_u.isEmpty(value_data)) return {};
 
-          if (this.PRIMITIVE_TYPES.indexOf(tname.sourceString) === -1) {
+          if (!this._is_primitive_t(tname.sourceString)) {
             value_data = _u.extendOwn({atom_id: name.sourceString}, value_data);
           }
           return {
             tname: tname.sourceString, value: value_data,
             fname: name.sourceString
           };
-        },
-
-        Value_number: (num) => Number(num.sourceString),
-        Value_text: (quote1, text, quote2) => text.sourceString,
-        Value_array: (sqbracket1, arr_decl, sqbracket2) => arr_decl.data()[0],
-        Value_ref: (name) => {
-          const ref = name.sourceString;
-          const s = this._symbol_table[ref];
-          if (s === undefined) {
-            throw new Error("Unknown identifier " + ref);
-          }
-          if (s.type === "widget") {
-            return ref;
-          } else {
-            return {atom_id: ref};
-          }
-        },
-
-        Obj: (cbrace1, obj_body, comma, more_obj_body, cbrace2) => _u
-          .extendOwn(obj_body.data(), _u
-            .chain(more_obj_body.data())
-            // for some strange reason .reduce(_u.extendOwn) doesn't work
-            .reduce((memo, e) => _u.extendOwn(memo, e))
-            .value()),
-        ObjBody: (name, colon, value) => {
-          const ret = {};
-          ret[name.sourceString] = value.data();
-          return ret;
-        },
-        ArrayDecl: (val, comma, more_val) => []
-          .concat(val.data()).concat(more_val.data())
+        }
       })
       .addOperation("main", {
         Decl: (app, name, key1, para, key2) => _u
@@ -404,6 +403,10 @@ export class AppParser {
     };
   }
 
+  _is_primitive_t(t: string) {
+    return this.PRIMITIVE_TYPES.indexOf(t) > -1;
+  }
+
   _cliche_wfbonds() {
     return _u
       .chain(_u.values(this._symbol_table))
@@ -494,14 +497,13 @@ export class AppParser {
         const to_widget_fname = _u
           .findKey(this._symbol_table[subfof].attr.fields,
                    f => f.type === "Widget");
-        const w = _u.findWhere(_u.values(this._symbol_table), {type: subfof});
-        let ret;
-        if (w === undefined) {
-          ret = this._symbol_table[subfof].attr.fields[to_widget_fname]
-            .attr.value;
-        } else {
-          ret = w.attr.value[to_widget_fname];
+
+        const s = this._symbol_table[subfof].attr.fields[to_widget_fname];
+        if (s.attr.value === undefined) {
+          s.attr.value = s.attr.expr_node.eval()[0];
+          delete s.attr.expr_node;
         }
+        const ret = s.attr.value;
         if (ret === undefined) {
           throw new Error(`No widget provided for navigation in ${subfof}`);
         }
@@ -513,7 +515,7 @@ export class AppParser {
 
   _match(t: string, matcht, tbonds, fqelement: string) {
     const is_subtype = (t1: string, t2: {name: string, fqelement: string}) => (
-      (this.PRIMITIVE_TYPES.indexOf(t1) > -1 && t2.name === t1) ||
+      (this._is_primitive_t(t1) && t2.name === t1) ||
       !!_u.find(tbonds[t1], b => b.name === t2.name &&
                 b.fqelement === t2.fqelement)
     );
