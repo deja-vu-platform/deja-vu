@@ -15,17 +15,30 @@ App <: Cliche {
     | name "replacing" name "in" name -- replaces
 
   WidgetDecl := "main"? "widget" name "{" FieldBody? "}"
-  FieldDecl := name ":" Type ("=" Value)?
+  FieldDecl := name ":" Type ("=" Expr)?
 
-  Value
-    = number -- number
-    | Obj -- obj
-    | "\"" (~"\"" any)* "\"" -- text
-    | "[" ArrayDecl? "]" -- array
+  Expr
+    = UnExpr -- un
+    | BinExpr -- bin
+    | Literal -- literal
     | (~"\"" name) -- ref
 
-  Obj = "{" ObjBody ("," ObjBody)* "}"
-  ObjBody = name ":" Value
-  number = digit+
-  ArrayDecl = Value ("," Value)*
+  BinExpr
+    = Expr "+" Expr -- plus
+    | Expr "-" Expr -- minus
+    | Expr "and" Expr -- and
+    | Expr "or" Expr -- or
+    | Expr "is" Expr -- is
+  UnExpr
+    = "not" Expr -- not
+
+  Literal 
+    = number -- number
+    | "\"" (~"\"" any)* "\"" -- text
+    | "true" -- true
+    | "false"  -- false
+    | "{" ListOf<PropAssignment, ","> "}" -- obj
+    | "[" ListOf<Expr, ","> "]" -- array
+  PropAssignment = name ":" Expr
+  number = "-"? digit+
 }
