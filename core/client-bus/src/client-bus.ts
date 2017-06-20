@@ -1,5 +1,6 @@
 import {
-  Injectable, Inject, Component, Optional, OnChanges, SimpleChanges
+  Injectable, Inject, Input, Component, Optional, OnChanges, OnInit,
+  SimpleChanges
 } from "@angular/core";
 import {Location} from "@angular/common";
 import {
@@ -225,8 +226,8 @@ export type FieldReplacingMap = {
 
 
 @Component({template: `<dv-widget [name]="name" [init]="init"></dv-widget>`})
-export class RouteLoader {
-  BASIC_TYPES = ["Text", "Boolean", "Date", "Datetime", "Number"];
+export class RouteLoader implements OnInit {
+  PRIMITIVE_TYPES = ["text", "boolean", "date", "datetime", "number"];
   name: string; init: any;
 
   constructor(
@@ -251,7 +252,7 @@ export class RouteLoader {
       this.init = _u.mapObject(query_params, (value, field) => {
         let [fvalue, ftype] = value.split(",");
         const ret = this._client_bus.new_atom(ftype);
-        if (this.BASIC_TYPES.indexOf(ftype) > -1) {
+        if (this.PRIMITIVE_TYPES.indexOf(ftype) > -1) {
           ret.value = fvalue;
         } else {
           ret.atom_id = fvalue;
@@ -262,18 +263,14 @@ export class RouteLoader {
   }
 }
 
-@Component({
-  selector: "dv-widget",
-  template:  "<div #widget></div>",
-  inputs: ["of", "name", "init"]
-})
+@Component({selector: "dv-widget", template: "<div #widget></div>"})
 export class WidgetLoader implements OnChanges {
   @ViewChild("widget", {read: ViewContainerRef})
   widgetContainer: ViewContainerRef;
 
-  of: string;
-  name: string;
-  init: any; // optional values to initialize the widget fields
+  @Input() name: string;
+  @Input() of: string;
+  @Input() init: any; // optional values to initialize the widget fields
 
   constructor(
       private _resolver: ComponentFactoryResolver,
