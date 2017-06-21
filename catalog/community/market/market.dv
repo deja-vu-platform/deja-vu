@@ -11,6 +11,10 @@ cliche Market {
     buyer: Party
   }
 
+  data Market {
+    goods: [Good]
+  }
+
   widget BuyGood { 
     good: Good, buyer: Party 
   }
@@ -24,7 +28,8 @@ cliche Market {
 
   // textbox to input price
   widget CreateGood {
-    seller: Party
+    seller: Party,
+    market: Market
   }
 
   widget ShowMyGoods {

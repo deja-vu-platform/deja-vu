@@ -10,7 +10,10 @@ app Potluck {
     ShowParty replacing ShowGroupOverview in ShowGroupsByMember
   ]
 
-  include community/Market
+  include community/Market[
+    User for Party,
+    Party for Market
+  ]
 
   data User {
     username: text
@@ -30,7 +33,8 @@ app Potluck {
   }
 
   widget ShowParty {
-    party: Party
+    party: Party,
+    user: User
   }
 
   widget NavBar {

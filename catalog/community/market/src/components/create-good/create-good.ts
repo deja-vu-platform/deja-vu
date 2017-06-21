@@ -7,17 +7,23 @@ import {Widget} from "client-bus";
 export class CreateGoodComponent {
   seller = {atom_id: undefined};
   good = {atom_id: undefined, name: "", offer_price: undefined};
+  market = {atom_id: undefined}
 
   constructor(private _graphQlService: GraphQlService) {}
 
   onSubmit() {
-    if (!this.seller.atom_id) return;
+    if (!this.seller.atom_id) {
+      console.log("Seller ID is false.");
+      return;
+    }
 
     this._graphQlService
       .post(`
         CreateGood(name: "${this.good.name}", 
-          offer_price: ${this.good.offer_price}, 
-          seller_id: "${this.seller.atom_id}") {
+          offer_price: ${this.good.offer_price},
+          seller_id: "${this.seller.atom_id}",
+          market_id: "${this.market.atom_id}"
+          ) {
             atom_id
           }
       `)

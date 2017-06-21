@@ -18,6 +18,10 @@ const handlers = {
   good: {
     create: Helpers.resolve_create(mean.db, "good"),
     update: Helpers.resolve_update(mean.db, "good")
+  },
+  market: {
+    create: Helpers.resolve_create(mean.db, "market"),
+    update: Helpers.resolve_update(mean.db, "market")
   }
 };
 
@@ -48,31 +52,43 @@ const schema = grafo
       buyer: {"type": "Party"}
     }
   })
- .add_mutation({
+  .add_type({
+    name: "Market",
+    fields: {
+      atom_id: {"type": graphql.GraphQLString},
+      goods: {"type": "[Good]"}
+    }
+  })
+  .add_mutation({
     name: "CreateGood",
     "type": "Good",
     args: {
       name: {"type": graphql.GraphQLString},
       offer_price: {"type": graphql.GraphQLFloat},
-      seller_id: {"type": graphql.GraphQLString}
+      seller_id: {"type": graphql.GraphQLString},
+      market_id: {"type": graphql.GraphQLString}
     },
-    resolve: (_, {name, offer_price, seller_id}) => {
+    resolve: (_, {name, offer_price, seller_id, market_id}) => {
       const good = {
         atom_id: uuid.v4(),
         name: name,
         offer_price: offer_price,
         seller: {atom_id: seller_id}
       };
+      const update_op = {$addToSet: {goods: {atom_id: good.atom_id}}};
       return Promise
         .all([
           mean.db.collection("goods").insertOne(good),
-          bus.create_atom("Good", good.atom_id, good)
+          bus.create_atom("Good", good.atom_id, good),
+          mean.db.collection("markets").updateOne({atom_id: market_id},
+            update_op),
+          bus.create_atom("Market", market_id, update_op)
           ])
         .then(_ => good)
       ;
     } 
   })
- .add_mutation({
+  .add_mutation({
     name: "BuyGood",
     "type": graphql.GraphQLBoolean,
     args: {
@@ -105,7 +121,7 @@ const schema = grafo
         });
     }
   })
- .add_mutation({
+  .add_mutation({
     name: "AddAmount",
     "type": graphql.GraphQLBoolean,
     args: {
