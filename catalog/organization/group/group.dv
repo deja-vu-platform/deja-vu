@@ -48,10 +48,12 @@ cliche Group {
 
     widget NewGroupContent {
         initialMember: Member,
+        group: Group,
         submit_ok: boolean
     }
 
     widget NewGroupButton {
+        group: Group,
         submit_ok: boolean
     }
 

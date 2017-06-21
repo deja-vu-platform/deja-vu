@@ -43,6 +43,18 @@ const schema = grafo
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
       members: {"type": "[Member]"},
+      renameGroup: {
+        type: "Group",
+        args: {
+          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+        },
+        resolve: (group, {name}) => {
+          return mean.db.collection("groups")
+            .update({atom_id: group.atom_id}, {$set: {name: name}})
+            .then(_ => bus.update_atom("Group", group.atom_id, {$set: {name: name}}))
+          ;
+        }
+      },
       addMember: {
         type: "Member",
         args: {

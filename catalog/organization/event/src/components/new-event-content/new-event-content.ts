@@ -11,10 +11,10 @@ import {Widget} from "client-bus";
   styles: [``]
 })
 export class NewEventContentComponent {
-  starts_on: string = "";
-  ends_on: string = "";
-  start_time: string = "";
-  end_time: string = "";
+  startsOnText: Element;
+  endsOnText: Element;
+  startTimeText: Element;
+  endTimeText: Element;
   event = {atom_id: undefined};
   submit_ok = {value: false, on_after_change: _ => undefined};
 
@@ -23,41 +23,32 @@ export class NewEventContentComponent {
       private _elementRef: ElementRef) {}
 
   dvAfterInit() {
+    this.startsOnText = document.getElementById("starts-on-text");
+    this.endsOnText = document.getElementById("ends-on-text");
+    this.startTimeText = document.getElementById("start-time-text");
+    this.endTimeText = document.getElementById("end-time-text");
+
     this.submit_ok.on_after_change(() => {
-      if (this.submit_ok.value === true) {
-  	    let startsOnText: Element = document.getElementById("starts-on-text");
-  	    let endsOnText: Element = document.getElementById("ends-on-text");
-  	    let startTimeText: Element = document.getElementById("start-time-text");
-  	    let endTimeText: Element = document.getElementById("end-time-text");
-
-  	    this.starts_on = startsOnText["value"];
-  	    this.ends_on = endsOnText["value"];
-  	    this.start_time = startTimeText["value"];
-  	    this.end_time = endTimeText["value"];
-
-  	    this._graphQlService
-  	      .post(`
-  	        newPublicEvent(
-  	          starts_on: "${this.starts_on}", ends_on: "${this.ends_on}",
-  	          start_time: "${this.start_time}", end_time: "${this.end_time}") {
-  	          atom_id
-  	        }
-  	      `)
-  	      .subscribe(atom_id => {
-  	        this.event.atom_id = atom_id;
-
-  	        // Clear out the fields on success
-  	        startsOnText["value"] = "";
-  	        endsOnText["value"] = "";
-  	        startTimeText["value"] = "";
-  	        endTimeText["value"] = "";
-
-  	        this.starts_on = "";
-  	        this.ends_on = "";
-  	        this.start_time = "";
-  	        this.end_time = "";
-  	      });
-        }
+	    this._graphQlService
+        .get(`
+          event_by_id(atom_id: "${this.event.atom_id}") {
+            updateEvent(
+            starts_on: "${this.startsOnText["value"]}",
+            ends_on: "${this.endsOnText["value"]}",
+            start_time: "${this.startTimeText["value"]}",
+            end_time: "${this.endTimeText["value"]}") {
+              atom_id
+            }
+          }
+        `)
+        .subscribe(atom_id => {
+	        // Clear out the fields on success
+	        this.startsOnText["value"] = "";
+	        this.endsOnText["value"] = "";
+	        this.startTimeText["value"] = "";
+	        this.endTimeText["value"] = "";
+	      })
+      ;
     });
   }
 

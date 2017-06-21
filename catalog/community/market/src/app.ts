@@ -53,7 +53,7 @@ const schema = grafo
     "type": "Good",
     args: {
       name: {"type": graphql.GraphQLString},
-      offer_price: {"type": graphql.GraphQLFloat} ,
+      offer_price: {"type": graphql.GraphQLFloat},
       seller_id: {"type": graphql.GraphQLString}
     },
     resolve: (_, {name, offer_price, seller_id}) => {
@@ -68,8 +68,9 @@ const schema = grafo
           mean.db.collection("goods").insertOne(good),
           bus.create_atom("Good", good.atom_id, good)
           ])
-        .then(_ => good);
-      } 
+        .then(_ => good)
+      ;
+    } 
   })
  .add_mutation({
     name: "BuyGood",

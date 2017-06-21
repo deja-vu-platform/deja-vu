@@ -17,36 +17,20 @@ export class NewGroupContentComponent {
 
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {
-      if (this.submit_ok.value === true) {
-        let addMember = () => {
-          this._graphQlService
-            .get(`
-              group_by_id(atom_id: "${this.group.atom_id}") {
-                addExistingMember(atom_id: "${this.initialMember.atom_id}") {
-                  atom_id
-                }
-              }
-            `)
-            .map(data => data.group_by_id.addExistingMember.atom_id)
-            .subscribe(_ => undefined);
-        };
-        let createGroup = () => {
-          this._graphQlService
-            .post(`
-              newGroup(name: "${this.group.name}") {
-                atom_id
-              }
-            `)
-            .map(data => data.newGroup.atom_id)
-            .subscribe(atom_id => {
-              this.group.atom_id = atom_id;
-              if (this.initialMember.name) {
-                addMember();
-              }
-            });
-        };
-        createGroup();
-      }
+      this._graphQlService
+        .get(`
+          group_by_id(atom_id: "${this.group.atom_id}") {
+            addExistingMember(atom_id: "${this.initialMember.atom_id}") {
+              atom_id
+            },
+            renameGroup(name: "${this.group.name}") {
+              atom_id
+            }
+          }
+        `)
+        .subscribe(_ => undefined)
+      ;
+      this.group.name = "";
     });
   }
 }
