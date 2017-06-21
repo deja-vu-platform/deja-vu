@@ -15,12 +15,12 @@ cliche Event {
   }
 
   widget NewEventButton {
+    event: Event,
     submit_ok: boolean
   }
 
   widget NewEventContent {
-    start_date: datetime,
-    end_date: datetime,
+    event: Event,
     submit_ok: boolean
   }
 

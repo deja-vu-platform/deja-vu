@@ -42,8 +42,8 @@ export class NewEventButtonComponent {
           atom_id
         }
       `)
-      .subscribe(atom_id => {
-        this.event.atom_id = atom_id;
+      .subscribe(obj => {
+        this.event.atom_id = obj.newPublicEvent.atom_id;
         this.submit_ok.value = !this.submit_ok.value;
       })
     ;

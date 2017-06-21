@@ -17,12 +17,6 @@ app Potluck {
   }
 
   data Party {
-    // for event
-    start_date: datetime,
-    end_date: datetime,
-    // for group
-    name: text,
-    members: [User]
   }
 
   widget NewParty {

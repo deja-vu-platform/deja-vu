@@ -116,17 +116,14 @@ const schema = grafo
       for (
         let event_date = starts_on_date; event_date <= ends_on_date;
         event_date.setDate(event_date.getDate() + 7)) {
-        console.log(event_date.toString());
 
         const start_date = new Date(event_date.getTime());
         const start_hh_mm = get_hh_mm(start_time)
         start_date.setHours(start_hh_mm[0], start_hh_mm[1])
-        console.log(start_date.toString());
 
         const end_date = new Date(event_date.getTime());
         const end_hh_mm = get_hh_mm(end_time)
         end_date.setHours(end_hh_mm[0], end_hh_mm[1])
-        console.log(end_date.toString());
 
         const eid = uuid.v4();
         event_ids.push(eid);
@@ -188,8 +185,9 @@ const schema = grafo
       };
       return mean.db.collection("events")
         .insertOne(e)
-        .then(_ => bus.create_atom("Event", eid, e));
-        // returns a promise
+        .then(_ => bus.create_atom("Event", eid, e))
+        .then(_ => e)
+      ;
     }
   })
   .add_type({

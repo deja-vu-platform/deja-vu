@@ -41,7 +41,7 @@ export class NewEventContentComponent {
             }
           }
         `)
-        .subscribe(atom_id => {
+        .subscribe(_ => {
 	        // Clear out the fields on success
 	        this.startsOnText["value"] = "";
 	        this.endsOnText["value"] = "";
