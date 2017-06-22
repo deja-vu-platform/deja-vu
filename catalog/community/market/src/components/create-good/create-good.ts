@@ -7,7 +7,7 @@ import {Widget} from "client-bus";
 export class CreateGoodComponent {
   seller = {atom_id: undefined};
   good = {atom_id: undefined, name: "", offer_price: undefined};
-  market = {atom_id: undefined}
+  market = {atom_id: undefined};
 
   constructor(private _graphQlService: GraphQlService) {}
 
