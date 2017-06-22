@@ -12,13 +12,13 @@ export class CreateGoodComponent {
   constructor(private _graphQlService: GraphQlService) {}
 
   onSubmit() {
-    if (!this.seller.atom_id) {
+    if (!this.seller.atom_id || !this.market.atom_id) {
       return;
     }
 
     this._graphQlService
       .post(`
-        CreateGood(name: "${this.good.name}", 
+        CreateGood(name: "${this.good.name}",
           offer_price: ${this.good.offer_price},
           seller_id: "${this.seller.atom_id}",
           market_id: "${this.market.atom_id}"

@@ -86,7 +86,7 @@ const schema = grafo
           ])
         .then(_ => good)
       ;
-    } 
+    }
   })
   .add_mutation({
     name: "BuyGood",
@@ -134,48 +134,96 @@ const schema = grafo
         .updateOne({atom_id: party_id}, update_op)
         .then(_ => bus.update_atom("Party", party_id, update_op))
         .then(_ => true);
-      } 
+      }
   })
   .add_query({
     name: "AffordableGoods",
     "type": "[Good]",
     args: {
+      market_id: {"type": graphql.GraphQLString},
       buyer_id: {"type": graphql.GraphQLString}
     },
-    resolve: (root, {buyer_id}) => { 
-      return mean.db.collection("partys")
-        .findOne({atom_id: buyer_id})
-        .then(buyer => {
-          return mean.db.collection("goods")
-            .find({ offer_price: { $lte: buyer.balance } }).toArray();
-        });
-      }
+    resolve: (root, {market_id, buyer_id}) => {
+      return mean.db.collection("markets")
+        .findOne({atom_id: market_id})
+        .then(market => {
+          const good_ids = market.goods.map(good => good.atom_id);
+          return mean.db.collection("partys")
+            .findOne({atom_id: buyer_id})
+            .then(buyer => {
+              return mean.db.collection("goods")
+                .find({
+                  atom_id: {
+                    $in: good_ids
+                  },
+                  offer_price: {
+                    $lte: buyer.balance
+                  }
+                })
+                .toArray()
+              ;
+            })
+          ;
+        })
+      ;
+    }
   })
   .add_query({
     name: "UnaffordableGoods",
     "type": "[Good]",
     args: {
+      market_id: {"type": graphql.GraphQLString},
       buyer_id: {"type": graphql.GraphQLString}
     },
-    resolve: (root, {buyer_id}) => {
-      return mean.db.collection("partys")
-        .findOne({atom_id: buyer_id})
-        .then(buyer => {
-          return mean.db.collection("goods")
-            .find({ offer_price: { $gt: buyer.balance } }).toArray();
-        });
-      } 
+    resolve: (root, {market_id, buyer_id}) => {
+      return mean.db.collection("markets")
+        .findOne({atom_id: market_id})
+        .then(market => {
+          const good_ids = market.goods.map(good => good.atom_id);
+          return mean.db.collection("partys")
+            .findOne({atom_id: buyer_id})
+            .then(buyer => {
+              return mean.db.collection("goods")
+                .find({
+                  atom_id: {
+                    $in: good_ids
+                  },
+                  offer_price: {
+                    $gt: buyer.balance
+                  }
+                })
+                .toArray()
+              ;
+            })
+          ;
+        })
+      ;
+    }
   })
   .add_query({
     name: "GoodsFromSeller",
     "type": "[Good]",
     args: {
-      seller_id: {"type": graphql.GraphQLString}
+      seller_id: {"type": graphql.GraphQLString},
+      market_id: {"type": graphql.GraphQLString}
     },
-    resolve: (root, {seller_id}) => {
-      return mean.db.collection("goods")
-        .find({ "seller.atom_id": seller_id}).toArray();
-      } 
+    resolve: (root, {seller_id, market_id}) => {
+      return mean.db.collection("markets")
+        .findOne({atom_id: market_id})
+        .then(market => {
+          const good_ids = market.goods.map(good => good.atom_id);
+          return mean.db.collection("goods")
+            .find({
+              "seller.atom_id": seller_id,
+              "atom_id": {
+                $in: good_ids
+              }
+            })
+            .toArray()
+          ;
+        })
+      ;
+    }
   })
   .schema();
 
