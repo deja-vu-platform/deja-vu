@@ -37,6 +37,7 @@ cliche Market {
   }
 
   widget ShowGoodsToBuy {
+    market: Market
   }
 
   // show goods classified into whether you can afford them or not

@@ -1,9 +1,9 @@
-<table *ngIf="goods && goods.length > 0" class="table">
+<table *ngIf="market.goods && market.goods.length > 0" class="table">
   <tr>
     <th>Good</th>
     <th>Price</th>
   </tr>
-  <tr *ngFor="let good of goods">
+  <tr *ngFor="let good of market.goods">
     <td>{{good.name}}</td>
     <td>{{good.offer_price}}</td>
   </tr>
