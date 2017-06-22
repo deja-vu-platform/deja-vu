@@ -13,7 +13,6 @@ export class CreateGoodComponent {
 
   onSubmit() {
     if (!this.seller.atom_id) {
-      console.log("Seller ID is false.");
       return;
     }
 

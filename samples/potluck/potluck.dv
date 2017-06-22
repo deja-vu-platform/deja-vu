@@ -47,6 +47,6 @@ app Potluck {
     on_user_ok: Widget = Parties
   }
 
-  parties: route = {path: "parties", widget: Parties}
-  new_party: route = {path: "new-party", widget: NewParty}
+  parties_route: route = {path: "parties", widget: Parties}
+  new_party_route: route = {path: "new-party", widget: NewParty}
 }
