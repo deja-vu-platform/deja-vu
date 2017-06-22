@@ -7,7 +7,7 @@ app Potluck {
   include organization/Group[
     User for Member,
     Party for Group,
-    ShowParty replacing ShowGroupOverview in ShowGroupsByMember
+    ShowParty replacing ShowGroupName in ShowGroupsByMember
   ]
 
   include community/Market[

@@ -7,9 +7,10 @@
   "license": "MIT",
   "dependencies": {
     "dv-access-auth": "file:../../catalog/access/auth",
+    "dv-community-rating": "file:../../catalog/community/rating",
+    "dv-lang": "file:../../core/lang",
     "dv-organization-group": "file:../../catalog/organization/group",
     "dv-organization-list": "file:../../catalog/organization/list",
-    "dv-community-rating": "file:../../catalog/community/rating",
-    "dv-lang": "file:../../core/lang"
+    "tslint": "^5.4.3"
   }
 }
