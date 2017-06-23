@@ -225,6 +225,31 @@ const schema = grafo
       ;
     }
   })
+  .add_query({
+    name: "GoodsFromBuyer",
+    "type": "[Good]",
+    args: {
+      buyer_id: {"type": graphql.GraphQLString},
+      market_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {buyer_id, market_id}) => {
+      return mean.db.collection("markets")
+        .findOne({atom_id: market_id})
+        .then(market => {
+          const good_ids = market.goods.map(good => good.atom_id);
+          return mean.db.collection("goods")
+            .find({
+              "buyer.atom_id": buyer_id,
+              "atom_id": {
+                $in: good_ids
+              }
+            })
+            .toArray()
+          ;
+        })
+      ;
+    }
+  })
   .schema();
 
 Helpers.serve_schema(mean.ws, schema);

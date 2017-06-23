@@ -15,8 +15,8 @@ cliche Market {
     goods: [Good]
   }
 
-  widget BuyGood { 
-    good: Good, buyer: Party 
+  widget BuyGood {
+    good: Good, buyer: Party
   }
 
   // good.transaction_price = good.offer_price * fraction
@@ -32,8 +32,12 @@ cliche Market {
     market: Market
   }
 
-  widget ShowMyGoods {
+  widget ShowMyGoodsForSale {
     seller: Party
+  }
+
+  widget ShowMyPurchasedGoods {
+    buyer: Party
   }
 
   widget ShowGoodsToBuy {

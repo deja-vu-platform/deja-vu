@@ -4,7 +4,7 @@ import {Widget} from "client-bus";
 
 
 @Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
-export class ShowMyGoodsComponent {
+export class ShowMyGoodsForSaleComponent {
   seller = {atom_id: undefined};
   market = {atom_id: undefined}
   goods = [];
