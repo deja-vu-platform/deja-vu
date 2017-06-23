@@ -38,4 +38,3 @@ tscommand-*.txt
 dv-dev
 
 *.DS_Store
-tsconfig.json
