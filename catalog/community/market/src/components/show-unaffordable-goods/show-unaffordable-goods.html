@@ -1,0 +1,5 @@
+<div *ngIf="unaffordableGoods && unaffordableGoods.length > 0">
+  <div *ngFor="let good of unaffordableGoods">
+    <dv-widget name="ShowGood" [init]="{good: good}"></dv-widget>
+  </div>
+</div>

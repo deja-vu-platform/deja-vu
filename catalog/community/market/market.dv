@@ -32,21 +32,32 @@ cliche Market {
     market: Market
   }
 
-  widget ShowMyGoodsForSale {
-    seller: Party
+  widget ShowGood {
+    good: Good
   }
 
-  widget ShowMyPurchasedGoods {
-    buyer: Party
-  }
-
-  widget ShowGoodsToBuy {
+  widget ShowMyGoodsForSale uses ShowGood {
+    seller: Party,
     market: Market
   }
 
-  // show goods classified into whether you can afford them or not
-  widget AffordTable {
-    buyer: Party
+  widget ShowMyPurchasedGoods uses ShowGood {
+    buyer: Party,
+    market: Market
+  }
+
+  widget ShowAffordableGoods uses ShowGood {
+    buyer: Party,
+    market: Market
+  }
+
+  widget ShowUnaffordableGoods uses ShowGood {
+    buyer: Party,
+    market: Market
+  }
+
+  widget ShowAllGoods uses ShowGood {
+    market: Market
   }
 
   widget ShowBalance {

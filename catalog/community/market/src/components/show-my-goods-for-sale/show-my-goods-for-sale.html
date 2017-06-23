@@ -1,10 +1,5 @@
-<table *ngIf="goods && goods.length > 0" class="table">
-  <tr>
-    <th>Good</th>
-    <th>Price</th>
-  </tr>
-  <tr *ngFor="let good of goods">
-    <td>{{good.name}}</td>
-    <td>{{good.offer_price}}</td>
-  </tr>
-</table>
+<div *ngIf="goods && goods.length > 0">
+  <div *ngFor="let good of goods">
+    <dv-widget name="ShowGood" [init]="{good: good}"></dv-widget>
+  </div>
+</div>

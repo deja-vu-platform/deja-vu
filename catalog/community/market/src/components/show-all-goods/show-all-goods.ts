@@ -13,8 +13,11 @@ export interface Good {
   offer_price: number;
 }
 
-@Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
-export class ShowGoodsToBuyComponent {
+@Widget({
+  fqelement: "Market",
+  ng2_providers: [GraphQlService]
+})
+export class ShowAllGoodsComponent {
   market = {atom_id: "", goods: [], on_change: _ => undefined};
   private _fetched = undefined;
 
