@@ -1,0 +1,15 @@
+<!-- needed to get the buyer since ShowAllGoods doesn't take one -->
+<div style="display:none">
+	<dv-widget name="LoggedIn" of="Auth"></dv-widget>
+</div>
+
+
+<div class="col-xs-4">
+  {{good.name}}
+</div>
+<div class="col-xs-4">
+  {{good.offer_price}}
+</div>
+<div class="col-xs-4">
+  <dv-widget name="BuyGood" of="Market"></dv-widget>
+</div>

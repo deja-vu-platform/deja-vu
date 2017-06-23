@@ -3,7 +3,10 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "Market",
+  ng2_providers: [GraphQlService]
+})
 export class ShowMyPurchasedGoodsComponent {
   buyer = {atom_id: undefined};
   market = {atom_id: undefined}

@@ -16,7 +16,8 @@ cliche Market {
   }
 
   widget BuyGood {
-    good: Good, buyer: Party
+    good: Good,
+    buyer: Party
   }
 
   // good.transaction_price = good.offer_price * fraction

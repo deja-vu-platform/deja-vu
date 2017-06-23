@@ -1,5 +1,3 @@
-<div *ngIf="market.goods && market.goods.length > 0">
-  <div *ngFor="let good of market.goods">
-    <dv-widget name="ShowGood" [init]="{good: good}"></dv-widget>
-  </div>
+<div *ngFor="let good of market.goods" class="row">
+  <dv-widget name="ShowGood" [init]="{good: good}"></dv-widget>
 </div>

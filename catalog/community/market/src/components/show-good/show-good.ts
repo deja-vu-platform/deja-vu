@@ -6,6 +6,7 @@ import "rxjs/add/operator/map";
 
 @Widget({
 	fqelement: "Market",
+	template: `{{good.name}} (Price: {{good.offer_price}})`,
 	ng2_providers: [GraphQlService]
 })
 export class ShowGoodComponent {
@@ -17,8 +18,6 @@ export class ShowGoodComponent {
   ) {}
 
   dvAfterInit() {
-    console.log("good");
-    console.log(this.good);
     if (!this.good.atom_id || this.good.name) {
       return;
     }

@@ -147,7 +147,10 @@ const schema = grafo
       return mean.db.collection("markets")
         .findOne({atom_id: market_id})
         .then(market => {
-          const good_ids = market.goods.map(good => good.atom_id);
+          const good_ids = (market.goods ?
+            market.goods.map(good => good.atom_id) :
+            []
+          );
           return mean.db.collection("partys")
             .findOne({atom_id: buyer_id})
             .then(buyer => {
@@ -179,7 +182,10 @@ const schema = grafo
       return mean.db.collection("markets")
         .findOne({atom_id: market_id})
         .then(market => {
-          const good_ids = market.goods.map(good => good.atom_id);
+          const good_ids = (market.goods ?
+            market.goods.map(good => good.atom_id) :
+            []
+          );
           return mean.db.collection("partys")
             .findOne({atom_id: buyer_id})
             .then(buyer => {
@@ -211,7 +217,10 @@ const schema = grafo
       return mean.db.collection("markets")
         .findOne({atom_id: market_id})
         .then(market => {
-          const good_ids = market.goods.map(good => good.atom_id);
+          const good_ids = (market.goods ?
+            market.goods.map(good => good.atom_id) :
+            []
+          );
           return mean.db.collection("goods")
             .find({
               "seller.atom_id": seller_id,
@@ -236,7 +245,10 @@ const schema = grafo
       return mean.db.collection("markets")
         .findOne({atom_id: market_id})
         .then(market => {
-          const good_ids = market.goods.map(good => good.atom_id);
+          const good_ids = (market.goods ?
+            market.goods.map(good => good.atom_id) :
+            []
+          );
           return mean.db.collection("goods")
             .find({
               "buyer.atom_id": buyer_id,

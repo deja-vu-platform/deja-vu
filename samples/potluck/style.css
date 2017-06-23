@@ -308,6 +308,14 @@ th {
 .button-margin {
   margin-bottom: 3px;
 }
+
 caption {
   color: #000000;
+}
+
+.row-bordered:after {
+  content: "";
+  display: block;
+  border-bottom: 1px solid #ccc;
+  margin: 0 15px;
 }
