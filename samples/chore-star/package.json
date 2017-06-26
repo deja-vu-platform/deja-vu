@@ -7,10 +7,11 @@
   "license": "MIT",
   "dependencies": {
     "dv-access-auth": "file:../../catalog/access/auth",
-    "dv-organization-list": "file:../../catalog/organization/list",
     "dv-community-market": "file:../../catalog/community/market",
     "dv-community-rating": "file:../../catalog/community/rating",
     "dv-community-task": "file:../../catalog/community/task",
-    "dv-lang": "file:../../core/lang"
+    "dv-lang": "file:../../core/lang",
+    "dv-organization-list": "file:../../catalog/organization/list",
+    "tslint": "^5.4.3"
   }
 }

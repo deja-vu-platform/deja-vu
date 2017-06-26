@@ -5,7 +5,8 @@ app ChoreStar {
     Chore for Task, Parent for Assigner, Child for Assignee,
     ApproveAndRateTask replacing ApproveTask in ShowPendingApprovalTasks]
   include community/Market[
-    Chore for Good, Reward for Good, Parent for Party, Child for Party]
+    Chore for Good, Reward for Good, Parent for Party, Child for Party,
+    Parent for Market]
   include community/Rating[Parent for Source, Chore for Target]
 
   data Parent { name: text }
@@ -19,7 +20,7 @@ app ChoreStar {
   // SignInWithRedirect of ChildAuth
   main widget Landing {
     on_parent_ok: Widget,
-    on_child_ok: Widget 
+    on_child_ok: Widget
   }
 
 
@@ -34,13 +35,13 @@ app ChoreStar {
     parent: Parent,
     on_signout: Widget = Landing
   }
-  
+
 
   // ApproveTask of Task
   // RateTarget of Rating
   // BuyGoodAtFractionOfPrice of Market
   widget ApproveAndRateTask {
-    parent: Parent, 
+    parent: Parent,
     chore: Chore,
     do_buy_on_approve: boolean,
     fractional_rating: number
