@@ -14,8 +14,7 @@ app Potluck {
     User for Party,
     Party for Market,
     Good for Good,
-    ShowSupplyRequest replacing ShowGood in ShowAllGoods,
-    ShowSupplyBringing replacing ShowGood in ShowMyPurchasedGoods
+    ShowSupplyRequest replacing ShowGood in ShowAllGoods
   ]
 
   data User {
@@ -27,7 +26,8 @@ app Potluck {
 
   data Good {
     name: text,
-    offer_price: number
+    offer_price: number,
+    buyer: text
   }
 
   widget NewParty {
@@ -48,10 +48,6 @@ app Potluck {
   widget ShowSupplyRequest {
     good: Good,
     user: User
-  }
-
-  widget ShowSupplyBringing {
-    good: Good
   }
 
   widget NavBar {

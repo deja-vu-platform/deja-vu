@@ -73,7 +73,9 @@ const schema = grafo
         atom_id: uuid.v4(),
         name: name,
         offer_price: offer_price,
-        seller: {atom_id: seller_id}
+        transaction_price: undefined,
+        seller: {atom_id: seller_id},
+        buyer: {atom_id: undefined}
       };
       const update_op = {$addToSet: {goods: {atom_id: good.atom_id}}};
       return Promise
