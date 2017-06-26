@@ -22,10 +22,6 @@ const handlers = {
     create: Helpers.resolve_create(mean.db, "weeklyevent"),
     update: Helpers.resolve_update(mean.db, "weeklyevent")
   },
-  description: {
-    create: Helpers.resolve_create(mean.db, "description"),
-    update: Helpers.resolve_update(mean.db, "description")
-  },
   guest: {
     create: Helpers.resolve_create(mean.db, "guest"),
     update: Helpers.resolve_update(mean.db, "guest")
