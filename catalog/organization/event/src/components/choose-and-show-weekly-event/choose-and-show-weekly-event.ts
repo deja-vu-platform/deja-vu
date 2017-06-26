@@ -69,6 +69,7 @@ export class ChooseAndShowWeeklyEventComponent {
   updateEvents(atom_id) {
     this.selected_weekly_event = _u
       .findWhere(this.weekly_events, {atom_id: atom_id}); // tmp hack
+    this.events = [];
     this._graphQlService
       .get(`
         weeklyevent_by_id(atom_id: "${atom_id}") {
