@@ -1,8 +1,19 @@
 module.exports = function(grunt) {
   require("mean-loader").GruntTask.cliche_task(
-      grunt,
-      "Market",
-      ["AffordTable", "CreateGood", "AddAmount",
-       "ShowBalance", "BuyGood", "BuyGoodAtFractionOfPrice",
-       "ShowMyGoods", "ShowGoodsToBuy"]);
+    grunt,
+    "Market",
+    [
+      "AddAmount",
+      "BuyGood",
+      "BuyGoodAtFractionOfPrice",
+      "CreateGood",
+      "ShowAffordableGoods",
+      "ShowAllGoods",
+      "ShowBalance",
+      "ShowGood",
+      "ShowMyGoodsForSale",
+      "ShowMyPurchasedGoods",
+      "ShowUnaffordableGoods"
+    ]
+  );
 }

@@ -3,7 +3,10 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "Market",
+  ng2_providers: [GraphQlService]
+})
 export class ShowBalanceComponent {
   party = {atom_id: undefined, balance: undefined};
 
@@ -21,6 +24,7 @@ export class ShowBalanceComponent {
       `)
       .subscribe(data => {
         this.party.balance = data.party_by_id.balance;
-      });
+      })
+    ;
   }
 }

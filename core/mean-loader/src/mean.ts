@@ -459,6 +459,7 @@ export namespace GruntTask {
     const field_init = w => _u
       .map(w.fields, (f: FieldInfo) => `field("${f.name}", "${f.type.name}")`)
       .join();
+      debugger;
     const field_assignments = w => _u
       .chain(w.fields)
       .filter(f => f.data)

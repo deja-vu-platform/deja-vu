@@ -3,7 +3,10 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "Market",
+  ng2_providers: [GraphQlService]
+})
 export class AddAmountComponent {
   party = {atom_id: undefined};
   amount: number;
@@ -19,6 +22,7 @@ export class AddAmountComponent {
       `)
       .subscribe(_ => {
         this.amount = 0;
-      });
+      })
+    ;
   }
 }

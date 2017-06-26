@@ -3,7 +3,10 @@ import {GraphQlService} from "gql";
 import {Widget} from "client-bus";
 
 
-@Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "Market",
+  ng2_providers: [GraphQlService]
+})
 export class BuyGoodComponent {
   good = {atom_id: undefined};
   buyer = {atom_id: undefined};
@@ -18,6 +21,7 @@ export class BuyGoodComponent {
         BuyGood(good_id: "${this.good.atom_id}", fraction: 1,
           buyer_id: "${this.buyer.atom_id}")
       `)
-      .subscribe(res => undefined);
+      .subscribe(res => undefined)
+    ;
   }
 }

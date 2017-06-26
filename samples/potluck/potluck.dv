@@ -14,8 +14,8 @@ app Potluck {
     User for Party,
     Party for Market,
     Good for Good,
-    ShowSupplyBringing replacing ShowGood in ShowMyPurchasedGoods,
-    ShowSupplyRequest replacing ShowGood in ShowAllGoods
+    ShowSupplyRequest replacing ShowGood in ShowAllGoods,
+    ShowSupplyBringing replacing ShowGood in ShowMyPurchasedGoods
   ]
 
   data User {
