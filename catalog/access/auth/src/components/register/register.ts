@@ -1,13 +1,14 @@
-import {User} from "../../shared/data";
+import {UserAtom} from "../shared/data";
 import {GraphQlService} from "gql";
-import {Widget} from "client-bus";
+import {Widget, PrimitiveAtom, Field} from "client-bus";
 
 
 @Widget({fqelement: "Auth", ng2_providers: [GraphQlService]})
 export class RegisterComponent {
-  user: User = {username: "", password: "", atom_id: ""};
+  @Field("User") user: UserAtom;
+  @Field("boolean") register_ok: PrimitiveAtom<boolean>;
+
   reenter_password = "";
-  register_ok = {value: false};
   username_error = false;
   reenter_password_error = false;
 

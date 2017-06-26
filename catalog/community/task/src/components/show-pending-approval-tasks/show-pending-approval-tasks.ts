@@ -5,13 +5,13 @@ import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-import {Widget, ClientBus} from "client-bus";
-import {Task} from "../../shared/data";
+import {Widget, ClientBus, Field, Atom, AfterInit} from "client-bus";
+import {NamedAtom} from "../shared/data";
 
 
 @Widget({fqelement: "Task", ng2_providers: [GraphQlService]})
-export class ShowPendingApprovalTasksComponent {
-  assigner = {atom_id: undefined, on_change: _ => undefined};
+export class ShowPendingApprovalTasksComponent implements AfterInit {
+  @Field("Assigner") assigner: Atom;
   pendingApprovalTasks = [];
 
   constructor(
@@ -30,8 +30,8 @@ export class ShowPendingApprovalTasksComponent {
       `)
       .map(data => data.pendingApprovalTasks)
       .flatMap((tasks, unused_ix) => Observable.from(tasks))
-      .map((task: Task) => {
-        const task_atom = this._clientBus.new_atom("Task");
+      .map((task: NamedAtom) => {
+        const task_atom = this._clientBus.new_atom<NamedAtom>("Task");
         task_atom.atom_id = task.atom_id;
         task_atom.name = task.name;
         return task_atom;

@@ -1,17 +1,18 @@
-import {Widget} from "client-bus";
+import {Widget, Field} from "client-bus";
 
 @Widget({
   fqelement: "Feed",
   template: `
     <div class="row">
-      <message [msg]="msg"></message>
+      <message [msg]="message"></message>
     </div>
     <div class="row">
-      by <publisher [pub]="pub"></publisher>
+      by <publisher [pub]="publisher"></publisher>
     </div>
   `
 })
 export class ShowFeedItemComponent {
-  msg = {};
-  pub = {};
+  @Field("Message") message;
+  @Field("Publisher") publisher;
+  @Field("Subscriber") subscriber;
 }

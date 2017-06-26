@@ -449,14 +449,8 @@ export namespace GruntTask {
 
   function widget_definitions(widgets: WidgetJs[], data): WidgetJs[] {
     const field_defs = w => _u
-      .chain(w.fields)
-      .filter(f => f.data)
-      .pluck("name")
-      .value()
+      .map(w.fields, (f: FieldInfo) => `@Field("${f.type.name}") ${f.name}`)
       .join(";");
-    const field_init = w => _u
-      .map(w.fields, (f: FieldInfo) => `field("${f.name}", "${f.type.name}")`)
-      .join();
     const field_assignments = w => _u
       .chain(w.fields)
       .filter(f => f.data)
@@ -484,9 +478,6 @@ export namespace GruntTask {
       @AppWidget()
       export class ${w.class_name} {
         ${field_defs(w)};
-        constructor(client_bus: ClientBus) {
-          client_bus.init(this, [${field_init(w)}]);
-        }
         dvAfterInit() {
           ${field_assignments(w)};
         }

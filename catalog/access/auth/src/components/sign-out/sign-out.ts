@@ -1,4 +1,4 @@
-import {Widget} from "client-bus";
+import {Widget, PrimitiveAtom, Field} from "client-bus";
 
 
 @Widget({
@@ -10,7 +10,7 @@ import {Widget} from "client-bus";
   `
 })
 export class SignOutComponent {
-  signout_ok = {value: false};
+  @Field("boolean") signout_ok: PrimitiveAtom<boolean>;
 
   signOut() {
     localStorage.removeItem("id_token");

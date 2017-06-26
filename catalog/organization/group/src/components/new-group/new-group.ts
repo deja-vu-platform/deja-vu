@@ -1,15 +1,12 @@
 import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
+import {Group} from "../shared/data";
 
-// import * as _u from "underscore";
 
-@Widget({
-  fqelement: "Group",
-  ng2_providers: [GraphQlService]
-})
+@Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
 export class NewGroupComponent {
-  group = {atom_id: "", name: ""};
+  group: Group;
 
   constructor(private _graphQlService: GraphQlService) {}
 

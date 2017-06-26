@@ -1,12 +1,12 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, Atom} from "client-bus";
 
 
 @Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
 export class BuyGoodComponent {
-  good = {atom_id: undefined};
-  buyer = {atom_id: undefined};
+  @Field("Good") good: Atom;
+  @Field("Party") buyer: Atom;
 
   constructor(private _graphQlService: GraphQlService) {}
 

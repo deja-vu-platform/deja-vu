@@ -1,23 +1,20 @@
-import {OnInit} from "@angular/core";
-
-import {Post, Username} from "../../shared/data";
+import {UserAtom, Post} from "../shared/data";
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, AfterInit} from "client-bus";
 
 
 @Widget({fqelement: "Post", ng2_providers: [GraphQlService]})
-export class PostsComponent implements OnInit {
-  username: Username;
+export class PostsComponent implements AfterInit {
+  @Field("User") author: UserAtom;
   posts: Post[];
 
   constructor(private _graphQlService: GraphQlService) {}
 
-  ngOnInit() {
-    console.log("got as input " + this.username);
+  dvAfterInit() {
     this._graphQlService
       .get(`
-        user(username: "${this.username}") {
+        user(username: "${this.author.username}") {
           posts {
             content
           }

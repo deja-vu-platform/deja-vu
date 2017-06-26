@@ -1,31 +1,30 @@
-import {Target, Name} from "../../shared/data";
+import "rxjs/add/operator/toPromise";
+
+import {Target} from "../../shared/data";
+import {SourceAtom} from "../shared/data";
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, AfterInit, Field} from "client-bus";
 
 
-export interface SourceFollowInfo {
-  name: Name;
-  followed_by: boolean;
-}
+export interface SourceFollowInfo { name: string; followed_by: boolean; }
 
 @Widget({fqelement: "Follow", ng2_providers: [GraphQlService]})
-export class EditFollowComponent {
+export class EditFollowComponent implements AfterInit {
+  @Field("Source") source: SourceAtom;
+
   targets: SourceFollowInfo[];
-  source = {name: "", on_change: (x) => undefined};
-  private _name: Name;
+  private _name: string;
 
   constructor(private _graphQlService: GraphQlService) {}
 
   follow(target: Target) {
-    console.log(`following ${target.name}`);
     this._graphQlService
       .post(`follow(source: "${this._name}", target: "${target.name}")`)
       .subscribe(res => undefined);
   }
 
   unfollow(target: Target) {
-    console.log(`unfollowing ${target.name}`);
     this._graphQlService
       .post(`unfollow(source: "${this._name}", target: "${target.name}")`)
       .subscribe(res => undefined);
@@ -35,17 +34,17 @@ export class EditFollowComponent {
     const update_targets = () => {
       const name = this.source.name;
       if (!name) return;
-      console.log("got name " + name);
       this._name = name;
-      this._graphQlService
+      return this._graphQlService
         .get(`
           targets {
             name,
             followed_by(name: "${this._name}")
           }
         `)
-        .map(data => data.targets.filter(u => u.name !== this._name))
-        .subscribe(targets => this.targets = targets);
+        .toPromise()
+        .then(data => data.targets.filter(u => u.name !== this._name))
+        .then(targets => this.targets = targets);
     };
 
     update_targets();

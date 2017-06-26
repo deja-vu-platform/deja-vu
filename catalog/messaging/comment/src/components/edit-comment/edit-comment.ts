@@ -1,15 +1,16 @@
-import {Comment} from "../comments/comments";
 import {GraphQlService} from "gql";
+import {Widget, Field} from "client-bus";
 
-import {Widget} from "client-bus";
+import {CommentAtom} from "../shared/data";
+
 
 @Widget({
   fqelement: "Comment",
   ng2_providers: [GraphQlService]
 })
 export class EditCommentComponent {
+  @Field("Comment") comment: CommentAtom;
   editedContent: string;
-  comment: Comment = null;
   isEditing = false;
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -33,7 +34,8 @@ export class EditCommentComponent {
           atom_id: "${this.comment.atom_id}",
           content: "${this.editedContent}"
         ) { atom_id }
-      `).subscribe(() => {
+      `)
+      .subscribe(() => {
         this.isEditing = false;
         this.comment.content = this.editedContent;
       });

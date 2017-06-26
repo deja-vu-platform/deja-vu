@@ -5,19 +5,13 @@ import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-import {Widget, ClientBus} from "client-bus";
-
-
-export interface Item {
-  atom_id: string;
-  name: string;
-  checked: boolean;
-}
+import {Widget, ClientBus, Field, AfterInit} from "client-bus";
+import {Item, ItemAtom, ListAtom} from "../shared/data";
 
 
 @Widget({fqelement: "List", ng2_providers: [GraphQlService]})
-export class ShowListComponent {
-  list = {atom_id: "", items: [], on_change: _ => undefined};
+export class ShowListComponent implements AfterInit {
+  @Field("List") list: ListAtom;
   private _fetched = undefined;
 
   constructor(
@@ -29,7 +23,7 @@ export class ShowListComponent {
       this._fetched = this.list.atom_id;
 
       this.list.items = [];
-      return this._graphQlService
+      this._graphQlService
         .get(`
           list_by_id(atom_id: "${this.list.atom_id}") {
             items {
@@ -42,7 +36,7 @@ export class ShowListComponent {
         .map(data => data.list_by_id.items)
         .flatMap((items, unused_ix) => Observable.from(items))
         .map((item: Item) => {
-          const item_atom: Item = this._clientBus.new_atom("Item");
+          const item_atom = this._clientBus.new_atom<ItemAtom>("Item");
           item_atom.atom_id = item.atom_id;
           item_atom.name = item.name;
           item_atom.checked = item.checked;

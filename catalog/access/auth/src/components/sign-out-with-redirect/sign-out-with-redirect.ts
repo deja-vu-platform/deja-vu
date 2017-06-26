@@ -1,4 +1,4 @@
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, PrimitiveAtom, Field, WidgetValue} from "client-bus";
 
 
 @Widget({
@@ -10,7 +10,7 @@ import {Widget, ClientBus} from "client-bus";
   `
 })
 export class SignOutWithRedirectComponent {
-  on_signout_ok = {value: undefined};
+  @Field("Widget") on_signout_ok: PrimitiveAtom<WidgetValue>;
 
   constructor(private _client_bus: ClientBus) {}
 

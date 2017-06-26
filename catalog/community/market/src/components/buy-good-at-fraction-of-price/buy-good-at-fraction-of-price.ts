@@ -1,13 +1,13 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, Atom, PrimitiveAtom} from "client-bus";
 
 
 @Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
 export class BuyGoodAtFractionOfPriceComponent {
-  good = {atom_id: undefined};
-  fraction: number;
-  buyer = {atom_id: undefined};
+  @Field("Good") good: Atom;
+  @Field("number") fraction: PrimitiveAtom<number>;
+  @Field("Party") buyer: Atom;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -16,7 +16,8 @@ export class BuyGoodAtFractionOfPriceComponent {
 
     this._graphQlService
       .post(`
-        BuyGood(good_id: "${this.good.atom_id}", fraction: ${this.fraction}, 
+        BuyGood(
+          good_id: "${this.good.atom_id}", fraction: ${this.fraction.value}, 
           buyer_id: "${this.buyer.atom_id}")
       `)
       .subscribe(res => undefined);

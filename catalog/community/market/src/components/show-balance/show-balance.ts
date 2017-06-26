@@ -1,11 +1,13 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Atom, Field} from "client-bus";
 
+
+export interface PartyAtom extends Atom { balance: number; }
 
 @Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
 export class ShowBalanceComponent {
-  party = {atom_id: undefined, balance: undefined};
+  @Field("Party") party: PartyAtom;
 
   constructor(private _graphQlService: GraphQlService) {}
 

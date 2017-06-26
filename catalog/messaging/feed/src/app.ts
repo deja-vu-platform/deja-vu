@@ -54,7 +54,7 @@ const schema = grafo
     }
   })
   .add_query({
-    name: "sub",
+    name: "subscriber",
     "type": "Subscriber",
     args: {
       name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},

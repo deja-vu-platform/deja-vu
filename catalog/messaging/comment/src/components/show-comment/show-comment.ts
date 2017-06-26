@@ -1,9 +1,12 @@
-import {Widget} from "client-bus";
+import {Widget, Field} from "client-bus";
+
+import {CommentAtom} from "../shared/data";
+
 
 @Widget({
   fqelement: "Comment",
   template: `{{comment.content}} by {{comment.author.name}}`,
 })
 export class ShowCommentComponent {
-  comment = {content: "", author: {name: ""}};
+  @Field("Comment") comment: CommentAtom;
 }

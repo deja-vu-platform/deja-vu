@@ -1,14 +1,14 @@
-import {Post, User} from "../../shared/data";
+import {PostAtom, UserAtom} from "../shared/data";
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 
 
 @Widget({fqelement: "Post", ng2_providers: [GraphQlService]})
 export class NewPostButtonComponent {
-  submit_ok = {value: false};
-  post: Post = {content: ""};
-  author: User = {username: "", posts: []};
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+  @Field("Post") post: PostAtom;
+  @Field("User") author: UserAtom;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -17,8 +17,6 @@ export class NewPostButtonComponent {
   }
 
   create() {
-    console.log(
-        "at new-post-button on save, got post " + this.post.content);
     this._graphQlService
       .post(`
         newPost(
@@ -27,7 +25,7 @@ export class NewPostButtonComponent {
         }
       `)
       .subscribe(data => {
-        this.post["atom_id"] = data.newPost.atom_id;
+        this.post.atom_id = data.newPost.atom_id;
         this.submit_ok.value = true;
       });
   }

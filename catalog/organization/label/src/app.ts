@@ -4,7 +4,6 @@ const graphql = require("graphql");
 import {Mean} from "mean-loader";
 import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
-import {Label} from "./shared/label";
 import {Grafo} from "grafo";
 
 import * as _u from "underscore";
