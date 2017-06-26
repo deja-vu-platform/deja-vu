@@ -223,7 +223,7 @@ export namespace GruntTask {
         grunt.log.writeln(name + " " + action);
 
         const app_widgets_js: WidgetJs[] = widget_definitions(
-          app_widgets(widgets, wcomp_info, data), data);
+          app_widgets(widgets, wcomp_info, data, replace_map), data);
         const cliche_widgets_js: WidgetJs[] = cliche_widgets(
           used_widgets, cliches);
         const all_widgets_js: WidgetJs[] = app_widgets_js
@@ -318,15 +318,34 @@ export namespace GruntTask {
     definition?: string;
   }
 
-  function app_widgets(app_widgets: string[], wcomp_info, data): WidgetJs[] {
-    const all_widgets_fields = _u.pluck(wcomp_info.wbonds, "subfield");
+  function app_widgets(
+      app_widgets: string[], wcomp_info, data, replace_map): WidgetJs[] {
+    const fields_from_replace_map = _u
+      .chain(_u.values(replace_map))
+      .map(_u.values).flatten()
+      .map(_u.values).flatten()
+      .map(rinfo => _u.map(
+        _u.values(_u.mapObject(rinfo.map, (val, key) => ({
+          name: key, type: val.type
+        }))),
+        f => {
+          f.of = rinfo.replaced_by;
+          return f;
+        }))
+      .flatten()
+      .value();
+    const fields_from_wbonds = _u.pluck(wcomp_info.wbonds, "subfield");
+    const all_widget_fields = _u
+      .uniq(fields_from_replace_map.concat(fields_from_wbonds), false,
+            f => f.name + f.of.name + f.of.fqelement + f.type.name +
+                 f.type.fqelement);
     return _u.map(app_widgets, w => ({
       import_stmt: imp(w, ".."),
       class_name: component(w),
       name: w,
       selector: `<dv-widget name="${w}"></dv-widget>`,
       fields: _u
-        .chain(all_widgets_fields)
+        .chain(all_widget_fields)
         .filter(f => f.of.name === w)
         .map(f => {
           if (data[w] !== undefined) {
