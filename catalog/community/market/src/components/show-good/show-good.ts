@@ -10,7 +10,11 @@ import "rxjs/add/operator/map";
 	ng2_providers: [GraphQlService]
 })
 export class ShowGoodComponent {
-  good = {atom_id: "", name: undefined, offer_price: undefined};
+  good = {
+		atom_id: "",
+		name: undefined,
+		offer_price: undefined
+	};
 
   constructor(
     private _graphQlService: GraphQlService,
