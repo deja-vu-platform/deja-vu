@@ -4,8 +4,8 @@ module.exports = function(grunt) {
     "Market",
     [
       "AddAmount",
-      "BuyGood",
-      "BuyGoodAtFractionOfPrice",
+      "BuyGoodButton",
+      "BuyGoodQuantity",
       "CreateGood",
       "ShowAffordableGoods",
       "ShowAllGoods",

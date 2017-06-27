@@ -47,7 +47,8 @@ app Potluck {
 
   widget ShowSupply {
     good: Good,
-    user: User
+    user: User,
+    quantity: number
   }
 
   widget NavBar {

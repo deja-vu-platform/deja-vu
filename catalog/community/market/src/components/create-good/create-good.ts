@@ -9,7 +9,12 @@ import {Widget} from "client-bus";
 })
 export class CreateGoodComponent {
   seller = {atom_id: undefined};
-  good = {atom_id: undefined, name: "", offer_price: undefined};
+  good = {
+    atom_id: undefined,
+    name: "",
+    offer_price: undefined,
+    amount_available: undefined
+  };
   market = {atom_id: undefined};
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -21,8 +26,10 @@ export class CreateGoodComponent {
 
     this._graphQlService
       .post(`
-        CreateGood(name: "${this.good.name}",
+        CreateGood(
+          name: "${this.good.name}",
           offer_price: ${this.good.offer_price},
+          amount_available: ${this.good.amount_available},
           seller_id: "${this.seller.atom_id}",
           market_id: "${this.market.atom_id}"
           ) {
@@ -33,6 +40,7 @@ export class CreateGoodComponent {
         this.good.atom_id = "";
         this.good.name = "";
         this.good.offer_price = "";
+        this.good.amount_available = "";
       })
     ;
   }

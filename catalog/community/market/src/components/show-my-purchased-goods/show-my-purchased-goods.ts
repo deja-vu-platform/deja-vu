@@ -7,7 +7,6 @@ import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-
 export interface Party {
   atom_id: string;
 }
@@ -16,9 +15,8 @@ export interface Good {
   atom_id: string;
   name: string;
   offer_price: number;
-  transaction_price: number;
   seller: Party;
-  buyer: Party;
+  amount_available: number;
 }
 
 @Widget({
@@ -49,13 +47,10 @@ export class ShowMyPurchasedGoodsComponent {
           atom_id,
           name,
           offer_price,
-          transaction_price,
           seller {
             atom_id
           },
-          buyer {
-            atom_id
-          }
+          amount_available
         }
       `)
       .map(data => data.GoodsFromBuyer)
@@ -67,15 +62,9 @@ export class ShowMyPurchasedGoodsComponent {
         good_atom.atom_id = good.atom_id;
         good_atom.name = good.name;
         good_atom.offer_price = good.offer_price;
-        good_atom.transaction_price = good.transaction_price;
+        good_atom.amount_available = good.amount_available;
         seller_atom.atom_id = good.seller.atom_id;
         good_atom.seller = seller_atom;
-        if (good.buyer) {
-          buyer_atom.atom_id = good.buyer.atom_id;
-          good_atom.buyer = buyer_atom;
-        } else {
-          good_atom.buyer = null;
-        }
         return good_atom;
       })
       .subscribe(good => {

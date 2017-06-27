@@ -15,16 +15,14 @@ cliche Market {
     goods: [Good]
   }
 
-  widget BuyGood {
+  widget BuyGoodButton {
     good: Good,
-    buyer: Party
+    buyer: Party,
+    quantity: number,
+    fraction: number
   }
 
-  // good.transaction_price = good.offer_price * fraction
-  widget BuyGoodAtFractionOfPrice {
-    good: Good,
-    fraction: number,
-    buyer: Party
+  widget BuyGoodQuantity {
   }
 
   // textbox to input price
