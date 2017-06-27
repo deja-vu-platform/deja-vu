@@ -13,7 +13,7 @@ export class CreateGoodComponent {
     atom_id: undefined,
     name: "",
     offer_price: undefined,
-    amount_available: undefined
+    quantity: undefined
   };
   market = {atom_id: undefined};
 
@@ -29,7 +29,7 @@ export class CreateGoodComponent {
         CreateGood(
           name: "${this.good.name}",
           offer_price: ${this.good.offer_price},
-          amount_available: ${this.good.amount_available},
+          quantity: ${this.good.quantity},
           seller_id: "${this.seller.atom_id}",
           market_id: "${this.market.atom_id}"
           ) {
@@ -40,7 +40,7 @@ export class CreateGoodComponent {
         this.good.atom_id = "";
         this.good.name = "";
         this.good.offer_price = "";
-        this.good.amount_available = "";
+        this.good.quantity = "";
       })
     ;
   }

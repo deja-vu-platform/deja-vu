@@ -13,8 +13,10 @@ app Potluck {
   include community/Market[
     User for Party,
     Party for Market,
-    Good for Good,
-    ShowSupply replacing ShowGood in ShowAllGoods
+    Supply for Good,
+    Supply for Transaction,
+    ShowSupplyRequest replacing ShowGood in ShowAllGoods,
+    ShowSupplyBring replacing ShowTransaction in ShowAllTransactions
   ]
 
   data User {
@@ -24,10 +26,11 @@ app Potluck {
   data Party {
   }
 
-  data Good {
+  data Supply {
     name: text,
-    offer_price: number,
-    buyer: User
+    quantity: number,
+    buyer: User,
+    good: Supply
   }
 
   widget NewParty {
@@ -45,10 +48,13 @@ app Potluck {
     user: User
   }
 
-  widget ShowSupply {
-    good: Good,
-    user: User,
-    quantity: number
+  widget ShowSupplyRequest {
+    good: Supply,
+    user: User
+  }
+
+  widget ShowSupplyBring {
+    transaction: Supply
   }
 
   widget NavBar {

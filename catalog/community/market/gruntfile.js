@@ -9,10 +9,12 @@ module.exports = function(grunt) {
       "CreateGood",
       "ShowAffordableGoods",
       "ShowAllGoods",
+      "ShowAllTransactions",
       "ShowBalance",
       "ShowGood",
       "ShowMyGoodsForSale",
-      "ShowMyPurchasedGoods",
+      "ShowMyPurchases",
+      "ShowTransaction",
       "ShowUnaffordableGoods"
     ]
   );

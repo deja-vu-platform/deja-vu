@@ -50,7 +50,7 @@ const schema = grafo
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
-      amount_available: {"type": graphql.GraphQLInt},
+      quantity: {"type": graphql.GraphQLInt},
       offer_price: {"type": graphql.GraphQLFloat},
       seller: {"type": "Party"},
       market: {"type": "Market"}
@@ -65,11 +65,13 @@ const schema = grafo
   .add_type({
     name: "Transaction",
     fields: {
+      atom_id: {"type": graphql.GraphQLString},
       good: {"type": "Good"},
       seller: {"type": "Party"},
       buyer: {"type": "Party"},
       unit_price: {"type": graphql.GraphQLFloat},
-      quantity: {"type": graphql.GraphQLInt}
+      quantity: {"type": graphql.GraphQLInt},
+      market: {"type": "Market"}
     }
   })
   .add_mutation({
@@ -78,18 +80,18 @@ const schema = grafo
     args: {
       name: {"type": graphql.GraphQLString},
       offer_price: {"type": graphql.GraphQLFloat},
-      amount_available: {"type": graphql.GraphQLInt},
+      quantity: {"type": graphql.GraphQLInt},
       seller_id: {"type": graphql.GraphQLString},
       market_id: {"type": graphql.GraphQLString}
     },
     resolve: (_,
-      {name, offer_price, amount_available, seller_id, market_id}
+      {name, offer_price, quantity, seller_id, market_id}
     ) => {
       const good = {
         atom_id: uuid.v4(),
         name: name,
         offer_price: offer_price,
-        amount_available: amount_available,
+        quantity: quantity,
         seller: {atom_id: seller_id},
         market: {atom_id: market_id}
       };
@@ -115,7 +117,7 @@ const schema = grafo
       return mean.db.collection("goods")
         .findOne({atom_id: good_id})
         .then(good => {
-          quantity = Math.min(quantity, good.amount_available);
+          quantity = Math.min(quantity, good.quantity);
           if (quantity === 0) {
             return false;
           }
@@ -126,7 +128,8 @@ const schema = grafo
             seller: {atom_id: good.seller.atom_id},
             buyer: {atom_id: buyer_id},
             unit_price: transaction_price,
-            quantity: quantity
+            quantity: quantity,
+            market: {atom_id: good.market.atom_id}
           }
           return mean.db.collection("transactions")
             .insertOne(transaction)
@@ -134,7 +137,7 @@ const schema = grafo
               const seller_id = good.seller.atom_id;
               const u1 = {$inc: {balance: -transaction_price}};
               const u2 = {$inc: {balance: transaction_price}};
-              const u3 = {$inc: {amount_available: -quantity}};
+              const u3 = {$inc: {quantity: -quantity}};
               return Promise.all([
                 bus.update_atom("Transaction", transaction.atom_id,
                   transaction),
@@ -248,24 +251,34 @@ const schema = grafo
     }
   })
   .add_query({
-    name: "GoodsFromBuyer",
-    "type": "[Good]",
+    name: "TransactionsByMarket",
+    "type": "[Transaction]",
     args: {
-      buyer_id: {"type": graphql.GraphQLString},
       market_id: {"type": graphql.GraphQLString}
     },
-    resolve: (root, {buyer_id, market_id}) => {
+    resolve: (root, {market_id}) => {
       return mean.db.collection("transactions")
         .find({
-          "buyer.atom_id": buyer_id,
-          "good.market.atom_id": market_id
-        },
-        {
-          "good": 1,
-          "_id": 0
+          "market.atom_id": market_id
         })
         .toArray()
-        .map(tx => tx.good)
+      ;
+    }
+  })
+  .add_query({
+    name: "TransactionsByBuyer",
+    "type": "[Transaction]",
+    args: {
+      market_id: {"type": graphql.GraphQLString},
+      buyer_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {market_id, buyer_id}) => {
+      return mean.db.collection("transactions")
+        .find({
+          "market.atom_id": market_id,
+          "buyer.atom_id": buyer_id
+        })
+        .toArray()
       ;
     }
   })

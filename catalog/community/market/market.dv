@@ -6,13 +6,20 @@ cliche Market {
   data Good {
     name: text,
     offer_price: number,
-    transaction_price: number,
     seller: Party,
-    buyer: Party
+    quantity: number,
+    market: Market
+  }
+
+  data Transaction {
+    good: Good,
+    buyer: Party,
+    seller: Party,
+    unit_price: number,
+    quantity: number
   }
 
   data Market {
-    goods: [Good]
   }
 
   widget BuyGoodButton {
@@ -40,11 +47,6 @@ cliche Market {
     market: Market
   }
 
-  widget ShowMyPurchasedGoods uses ShowGood {
-    buyer: Party,
-    market: Market
-  }
-
   widget ShowAffordableGoods uses ShowGood {
     buyer: Party,
     market: Market
@@ -56,6 +58,19 @@ cliche Market {
   }
 
   widget ShowAllGoods uses ShowGood {
+    market: Market
+  }
+
+  widget ShowTransaction {
+    transaction: Transaction
+  }
+
+  widget ShowAllTransactions uses ShowTransaction {
+    market: Market
+  }
+
+  widget ShowMyPurchases uses ShowTransaction {
+    buyer: Party,
     market: Market
   }
 

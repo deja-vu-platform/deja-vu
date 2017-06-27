@@ -16,7 +16,7 @@ export interface Good {
   name: string;
   offer_price: number;
   seller: Party;
-  amount_available: number;
+  quantity: number;
 }
 
 @Widget({
@@ -50,7 +50,7 @@ export class ShowUnaffordableGoodsComponent {
           seller {
             atom_id
           },
-          amount_available
+          quantity
         }
       `)
       .map(data => data.UnaffordableGoods)
@@ -62,7 +62,7 @@ export class ShowUnaffordableGoodsComponent {
         good_atom.atom_id = good.atom_id;
         good_atom.name = good.name;
         good_atom.offer_price = good.offer_price;
-        good_atom.amount_available = good.amount_available;
+        good_atom.quantity = good.quantity;
         seller_atom.atom_id = good.seller.atom_id;
         good_atom.seller = seller_atom;
         return good_atom;
