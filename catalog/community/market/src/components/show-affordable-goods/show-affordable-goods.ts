@@ -14,7 +14,7 @@ export interface Party {
 export interface Good {
   atom_id: string;
   name: string;
-  offer_price: number;
+  price: number;
   seller: Party;
   quantity: number;
 }
@@ -46,7 +46,7 @@ export class ShowAffordableGoodsComponent {
         ) {
           atom_id,
           name,
-          offer_price,
+          price,
           seller {
             atom_id
           },
@@ -61,7 +61,7 @@ export class ShowAffordableGoodsComponent {
         const buyer_atom: Party = this._clientBus.new_atom("Party");
         good_atom.atom_id = good.atom_id;
         good_atom.name = good.name;
-        good_atom.offer_price = good.offer_price;
+        good_atom.price = good.price;
         good_atom.quantity = good.quantity;
         seller_atom.atom_id = good.seller.atom_id;
         good_atom.seller = seller_atom;

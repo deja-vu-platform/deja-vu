@@ -7,19 +7,19 @@ import {Widget} from "client-bus";
   fqelement: "Market",
   ng2_providers: [GraphQlService]
 })
-export class CreateGoodComponent {
+export class CreateGoodButtonComponent {
   seller = {atom_id: undefined};
   good = {
-    atom_id: undefined,
+    atom_id: "",
     name: "",
-    price: undefined,
-    quantity: undefined
+    price: 0,
+    quantity: 1
   };
   market = {atom_id: undefined};
 
   constructor(private _graphQlService: GraphQlService) {}
 
-  onSubmit() {
+  createGood() {
     if (!this.seller.atom_id || !this.market.atom_id) {
       return;
     }
@@ -39,9 +39,13 @@ export class CreateGoodComponent {
       .subscribe(_ => {
         this.good.atom_id = "";
         this.good.name = "";
-        this.good.price = "";
-        this.good.quantity = "";
+        this.good.price = 0;
+        this.good.quantity = 1;
       })
     ;
+  }
+
+  valid() {
+    return (this.seller.atom_id && this.market.atom_id);
   }
 }

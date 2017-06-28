@@ -14,7 +14,7 @@ export interface Party {
 export interface Good {
   atom_id: string;
   name: string;
-  offer_price: number;
+  price: number;
   seller: Party;
   quantity: number;
 }

@@ -48,6 +48,17 @@ app Potluck {
     user: User
   }
 
+  widget ShowSupplies {
+    party: Party,
+    user: User
+  }
+
+  widget RequestSupply {
+    party: Party,
+    user: User,
+    good: Supply
+  }
+
   widget ShowSupplyRequest {
     good: Supply,
     user: User,

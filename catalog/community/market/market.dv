@@ -5,7 +5,7 @@ cliche Market {
 
   data Good {
     name: text,
-    offer_price: number,
+    price: number,
     seller: Party,
     quantity: number,
     market: Market
@@ -41,6 +41,24 @@ cliche Market {
   widget CreateGood {
     seller: Party,
     market: Market
+  }
+
+  widget CreateGoodButton {
+    seller: Party,
+    market: Market,
+    good: Good
+  }
+
+  widget CreateGoodName {
+    good: Good
+  }
+
+  widget CreateGoodPrice {
+    good: Good
+  }
+
+  widget CreateGoodQuantity {
+    good: Good
   }
 
   widget ShowGood {

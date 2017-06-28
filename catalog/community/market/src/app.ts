@@ -51,7 +51,7 @@ const schema = grafo
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
       quantity: {"type": graphql.GraphQLInt},
-      offer_price: {"type": graphql.GraphQLFloat},
+      price: {"type": graphql.GraphQLFloat},
       seller: {"type": "Party"},
       market: {"type": "Market"}
     }
@@ -79,18 +79,18 @@ const schema = grafo
     "type": "Good",
     args: {
       name: {"type": graphql.GraphQLString},
-      offer_price: {"type": graphql.GraphQLFloat},
+      price: {"type": graphql.GraphQLFloat},
       quantity: {"type": graphql.GraphQLInt},
       seller_id: {"type": graphql.GraphQLString},
       market_id: {"type": graphql.GraphQLString}
     },
     resolve: (_,
-      {name, offer_price, quantity, seller_id, market_id}
+      {name, price, quantity, seller_id, market_id}
     ) => {
       const good = {
         atom_id: uuid.v4(),
         name: name,
-        offer_price: offer_price,
+        price: price,
         quantity: quantity,
         seller: {atom_id: seller_id},
         market: {atom_id: market_id}
@@ -121,7 +121,7 @@ const schema = grafo
           if (quantity === 0) {
             return false;
           }
-          const transaction_price = good.offer_price * fraction;
+          const transaction_price = good.price * fraction;
           const transaction = {
             atom_id: uuid.v4(),
             good: {atom_id: good.atom_id},
@@ -199,7 +199,7 @@ const schema = grafo
           return mean.db.collection("goods")
             .find({
               "market.atom_id": market_id,
-              offer_price: {
+              price: {
                 $lte: buyer.balance
               }
             })
@@ -223,7 +223,7 @@ const schema = grafo
           return mean.db.collection("goods")
             .find({
               "market.atom_id": market_id,
-              offer_price: {
+              price: {
                 $gt: buyer.balance
               }
             })
@@ -289,9 +289,9 @@ Helpers.serve_schema(mean.ws, schema);
 grafo.init().then(_ => {
   if (mean.debug) {
     mean.db.collection("goods").insertMany([
-        {atom_id: "1", name: "ramen", offer_price: 5,
+        {atom_id: "1", name: "ramen", price: 5,
           seller: {atom_id: "3"}},
-        {atom_id: "2", name: "sushi", offer_price: 10,
+        {atom_id: "2", name: "sushi", price: 10,
           seller: {atom_id: "3"}}
       ], (err, res) => {
         if (err) throw err;
