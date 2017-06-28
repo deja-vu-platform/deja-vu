@@ -319,3 +319,8 @@ caption {
   border-bottom: 1px solid #ccc;
   margin: 0 15px;
 }
+
+span.sized, div.inline {
+  display: inline-block;
+  overflow: hidden;
+}

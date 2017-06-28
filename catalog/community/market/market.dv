@@ -30,6 +30,7 @@ cliche Market {
   }
 
   widget BuyGoodQuantity {
+    quantity: number
   }
 
   // textbox to input price

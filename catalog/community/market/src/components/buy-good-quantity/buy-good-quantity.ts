@@ -4,5 +4,6 @@ import {Widget} from "client-bus";
   fqelement: "Market"
 })
 export class BuyGoodQuantityComponent {
+  quantity = {value: 1};
   constructor() {}
 }

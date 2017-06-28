@@ -50,7 +50,8 @@ app Potluck {
 
   widget ShowSupplyRequest {
     good: Supply,
-    user: User
+    user: User,
+    quantity: number
   }
 
   widget ShowSupplyBring {

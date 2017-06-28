@@ -10,37 +10,35 @@ import {Widget} from "client-bus";
 export class BuyGoodButtonComponent {
   good = {atom_id: undefined};
   buyer = {atom_id: undefined};
-  quantityText: Element;
-  fractionText: Element;
+  quantity = {value: 1};
+  fraction = {value: 1};
 
   constructor(private _graphQlService: GraphQlService) {}
 
-  dvAfterInit() {
-    this.quantityText = document.getElementById("quantity-text");
-    this.fractionText = document.getElementById("fraction-text");
-  }
-
   buyGood() {
+    console.log(this.quantity);
     if (!this.good.atom_id || !this.buyer.atom_id) return;
 
-    let quantity: number;
-    if (this.quantityText) {
-      quantity = parseInt(this.quantityText["value"]);
-      if (isNaN(quantity)) {
-        quantity = 1;
-      }
-    } else {
-      quantity = 1;
-    }
-    let fraction: number;
-    if (this.fractionText) {
-      fraction = parseInt(this.fractionText["value"]);
-      if (isNaN(quantity)) {
-        fraction = 1;
-      }
-    } else {
-      fraction = 1;
-    }
+    // let quantity: number;
+    // if (this.quantity) {
+    //   quantity = parseInt(this.quantity);
+    //   if (isNaN(quantity)) {
+    //     quantity = 1;
+    //   }
+    // } else {
+    //   quantity = 1;
+    // }
+    // let fraction: number;
+    // if (this.fraction) {
+    //   fraction = parseInt(this.fraction);
+    //   if (isNaN(fraction)) {
+    //     fraction = 1;
+    //   }
+    // } else {
+    //   fraction = 1;
+    // }
+    const quantity = this.quantity.value;
+    const fraction = this.fraction.value;
     this._graphQlService
       .post(`
         BuyGood(
@@ -52,5 +50,9 @@ export class BuyGoodButtonComponent {
       `)
       .subscribe(res => undefined)
     ;
+  }
+
+  valid() {
+    return (this.good.atom_id && this.buyer.atom_id);
   }
 }

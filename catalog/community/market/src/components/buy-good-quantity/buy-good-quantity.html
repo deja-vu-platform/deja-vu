@@ -1,2 +1,14 @@
-<input id="quantity-text" class="form-control" name="quantity" type="number"
-  min="0" step="1" pattern="\d+" placeholder="Quantity"/>
+<fieldset class="form-group">
+  <label class="sr-only" for="quantity">Quantity</label>
+  <input
+    id="quantity-text"
+    class="form-control"
+    name="quantity"
+    type="number"
+    min="0"
+    step="1"
+    pattern="\d+"
+    placeholder="Quantity"
+    [(ngModel)]="quantity.value"
+  />
+</fieldset>
