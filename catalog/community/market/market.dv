@@ -33,6 +33,10 @@ cliche Market {
     quantity: number
   }
 
+  widget BuyGoodFraction {
+    fraction: number
+  }
+
   // textbox to input price
   widget CreateGood {
     seller: Party,
