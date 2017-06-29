@@ -28,8 +28,7 @@ export class NewGroupContentComponent {
             }
           }
         `)
-        .subscribe(_ => undefined)
-      ;
+        .subscribe(_ => undefined);
       this.group.name = "";
     });
   }

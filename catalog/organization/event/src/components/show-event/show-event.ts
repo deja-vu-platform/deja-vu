@@ -28,8 +28,7 @@ export class ShowEventComponent {
           const end_date = obj.event_by_id.end_date;
           this.event.start_date = this.formatDateStr(start_date);
           this.event.end_date = this.formatDateStr(end_date);
-        })
-      ;
+        });
     }
   }
 

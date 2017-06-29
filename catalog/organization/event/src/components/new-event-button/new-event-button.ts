@@ -45,8 +45,7 @@ export class NewEventButtonComponent {
       .subscribe(obj => {
         this.event.atom_id = obj.newPublicEvent.atom_id;
         this.submit_ok.value = !this.submit_ok.value;
-      })
-    ;
+      });
   }
 
   valid() {

@@ -3,14 +3,14 @@
 <dv-widget name="NavBar"></dv-widget>
 
 <div class='container' id='homepage-container'>
-	<div class='col-md-6 col-md-offset-3' id='namebox'>
-		<form class="form-horizontal">
-			<dv-widget name="NewEventContent" of="Event"></dv-widget>
-			<dv-widget name="NewGroupContent" of="Group"></dv-widget>
-			<dv-widget name="NewEventButton" of="Event"></dv-widget>
-		</form>
-		<a [routerLink]="['/parties']" class="btn btn-primary">
-			Return to Your Parties
-		</a>
-	</div>
+  <div class='col-md-6 col-md-offset-3' id='namebox'>
+    <form class="form-horizontal">
+      <dv-widget name="NewEventContent" of="Event"></dv-widget>
+      <dv-widget name="NewGroupContent" of="Group"></dv-widget>
+      <dv-widget name="NewEventButton" of="Event"></dv-widget>
+    </form>
+    <a [routerLink]="['/parties']" class="btn btn-primary">
+      Return to Your Parties
+    </a>
+  </div>
 </div>

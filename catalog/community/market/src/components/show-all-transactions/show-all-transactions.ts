@@ -87,7 +87,6 @@ export class ShowAllTransactionsComponent {
       })
       .subscribe(transaction => {
         this.allTransactions.push(transaction);
-      })
-    ;
+      });
   }
 }

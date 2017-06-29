@@ -19,8 +19,8 @@ app ChoreStar {
   // RegisterWithRedirect of ParentAuth,
   // SignInWithRedirect of ChildAuth
   main widget Landing {
-    on_parent_ok: Widget = ChildHome,
-    on_child_ok: Widget = ParentHome
+    on_parent_ok: Widget = ParentHome,
+    on_child_ok: Widget = ChildHome
   }
 
 

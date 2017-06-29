@@ -47,8 +47,7 @@ export class NewEventContentComponent {
 	        this.endsOnText["value"] = "";
 	        this.startTimeText["value"] = "";
 	        this.endTimeText["value"] = "";
-	      })
-      ;
+	      });
     });
   }
 

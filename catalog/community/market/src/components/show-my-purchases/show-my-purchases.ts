@@ -89,7 +89,6 @@ export class ShowMyPurchasesComponent {
       })
       .subscribe(transaction => {
         this.myPurchases.push(transaction);
-      })
-    ;
+      });
   }
 }

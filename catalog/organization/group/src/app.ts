@@ -51,8 +51,8 @@ const schema = grafo
         resolve: (group, {name}) => {
           return mean.db.collection("groups")
             .update({atom_id: group.atom_id}, {$set: {name: name}})
-            .then(_ => bus.update_atom("Group", group.atom_id, {$set: {name: name}}))
-          ;
+            .then(_ => bus.update_atom("Group", group.atom_id,
+              {$set: {name: name}}));
         }
       },
       addMember: {
@@ -139,7 +139,7 @@ const schema = grafo
       return mean.db.collection("groups")
         .insertOne(newObject)
         .then(_ => bus.create_atom("Group", newObject.atom_id, newObject))
-        .then(_ => newObject)
+        .then(_ => newObject);
     }
   })
   .schema();

@@ -26,8 +26,7 @@ export class NewGroupButtonComponent {
           }
         `)
         .map(data => data.group_by_id.addExistingMember.atom_id)
-        .subscribe(_ => undefined)
-      ;
+        .subscribe(_ => undefined);
     };
     let createGroup = () => {
       this._graphQlService
@@ -43,8 +42,7 @@ export class NewGroupButtonComponent {
             addMember();
           }
           this.submit_ok.value = !this.submit_ok.value;
-        })
-      ;
+        });
     };
     createGroup();
   }

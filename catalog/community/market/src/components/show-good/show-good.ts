@@ -5,15 +5,15 @@ import {Widget, ClientBus} from "client-bus";
 import "rxjs/add/operator/map";
 
 @Widget({
-	fqelement: "Market",
-	template: `{{good.name}}`,
-	ng2_providers: [GraphQlService]
+  fqelement: "Market",
+  template: `{{good.name}}`,
+  ng2_providers: [GraphQlService]
 })
 export class ShowGoodComponent {
   good = {
-		atom_id: "",
-		name: undefined
-	};
+    atom_id: "",
+    name: undefined
+  };
 
   constructor(
     private _graphQlService: GraphQlService,

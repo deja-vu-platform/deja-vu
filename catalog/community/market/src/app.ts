@@ -100,8 +100,7 @@ const schema = grafo
           mean.db.collection("goods").insertOne(good),
           bus.create_atom("Good", good.atom_id, good),
           ])
-        .then(_ => good)
-      ;
+        .then(_ => good);
     }
   })
   .add_mutation({
@@ -149,10 +148,8 @@ const schema = grafo
                   .then(_ => bus.update_atom("Good", good.atom_id, u3))
               ])
               .then(_ => true);
-            })
-          ;
-        })
-      ;
+            });
+        });
     }
   })
   .add_mutation({
@@ -181,8 +178,7 @@ const schema = grafo
         .find({
           "market.atom_id": market_id
         })
-        .toArray()
-      ;
+        .toArray();
     }
   })
   .add_query({
@@ -203,10 +199,8 @@ const schema = grafo
                 $lte: buyer.balance
               }
             })
-            .toArray()
-          ;
-        })
-      ;
+            .toArray();
+        });
     }
   })
   .add_query({
@@ -227,10 +221,8 @@ const schema = grafo
                 $gt: buyer.balance
               }
             })
-            .toArray()
-          ;
-        })
-      ;
+            .toArray();
+        });
     }
   })
   .add_query({
@@ -246,8 +238,7 @@ const schema = grafo
           "market.atom_id": market_id,
           "seller.atom_id": seller_id,
         })
-        .toArray()
-      ;
+        .toArray();
     }
   })
   .add_query({
@@ -261,8 +252,7 @@ const schema = grafo
         .find({
           "market.atom_id": market_id
         })
-        .toArray()
-      ;
+        .toArray();
     }
   })
   .add_query({
@@ -278,8 +268,7 @@ const schema = grafo
           "market.atom_id": market_id,
           "buyer.atom_id": buyer_id
         })
-        .toArray()
-      ;
+        .toArray();
     }
   })
   .schema();

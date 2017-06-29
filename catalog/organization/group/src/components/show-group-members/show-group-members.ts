@@ -47,8 +47,7 @@ export class ShowGroupMembersComponent {
         })
         .subscribe(member => {
           this.group.members.push(member);
-        })
-      ;
+        });
     };
 
     updateGroup();

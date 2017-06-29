@@ -69,7 +69,6 @@ export class ShowAffordableGoodsComponent {
       })
       .subscribe(good => {
         this.affordableGoods.push(good);
-      })
-    ;
+      });
   }
 }
