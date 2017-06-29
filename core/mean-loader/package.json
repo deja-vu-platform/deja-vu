@@ -17,8 +17,7 @@
   "typings": "./lib/mean",
   "main": "./lib/mean",
   "dependencies": {
-    "@types/node": "^7.0.22",
-    "colors": "^1.1.2",
+    "@types/node": "^6.0.78",
     "command-line-args": "^2.1.6",
     "eventemitter2": "^4.1.0",
     "exit": "^0.1.2",
