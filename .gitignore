@@ -36,5 +36,3 @@ dist
 lib
 tscommand-*.txt
 dv-dev
-
-*.DS_Store
