@@ -5,9 +5,9 @@ import {Widget, ClientBus} from "client-bus";
 import "rxjs/add/operator/map";
 
 @Widget({
-	fqelement: "Group",
-	template: `{{group.name}}`,
-	ng2_providers: [GraphQlService]
+  fqelement: "Group",
+  template: `{{group.name}}`,
+  ng2_providers: [GraphQlService]
 })
 export class ShowGroupNameComponent {
   group = {atom_id: "", name: ""};

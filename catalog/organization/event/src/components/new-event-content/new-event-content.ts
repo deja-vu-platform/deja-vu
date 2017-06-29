@@ -29,7 +29,7 @@ export class NewEventContentComponent {
     this.endTimeText = document.getElementById("end-time-text");
 
     this.submit_ok.on_after_change(() => {
-	    this._graphQlService
+      this._graphQlService
         .get(`
           event_by_id(atom_id: "${this.event.atom_id}") {
             updateEvent(
@@ -42,12 +42,12 @@ export class NewEventContentComponent {
           }
         `)
         .subscribe(_ => {
-	        // Clear out the fields on success
-	        this.startsOnText["value"] = "";
-	        this.endsOnText["value"] = "";
-	        this.startTimeText["value"] = "";
-	        this.endTimeText["value"] = "";
-	      });
+          // Clear out the fields on success
+          this.startsOnText["value"] = "";
+          this.endsOnText["value"] = "";
+          this.startTimeText["value"] = "";
+          this.endTimeText["value"] = "";
+        });
     });
   }
 
