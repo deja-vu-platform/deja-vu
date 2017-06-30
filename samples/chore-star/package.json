@@ -11,7 +11,6 @@
     "dv-community-rating": "file:../../catalog/community/rating",
     "dv-community-task": "file:../../catalog/community/task",
     "dv-lang": "file:../../core/lang",
-    "dv-organization-list": "file:../../catalog/organization/list",
-    "tslint": "^5.4.3"
+    "dv-organization-list": "file:../../catalog/organization/list"
   }
 }

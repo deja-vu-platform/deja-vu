@@ -10,7 +10,6 @@
     "dv-community-market": "file:../../catalog/community/market",
     "dv-lang": "file:../../core/lang",
     "dv-organization-event": "file:../../catalog/organization/event",
-    "dv-organization-group": "file:../../catalog/organization/group",
-    "tslint": "^5.4.3"
+    "dv-organization-group": "file:../../catalog/organization/group"
   }
 }
