@@ -98,7 +98,7 @@ const schema = grafo
       return Promise
         .all([
           mean.db.collection("goods").insertOne(good),
-          bus.create_atom("Good", good.atom_id, good),
+          bus.create_atom("Good", good.atom_id, good)
           ])
         .then(_ => good);
     }
