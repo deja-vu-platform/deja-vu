@@ -2,7 +2,10 @@ import {ElementRef} from "@angular/core";
 
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field} from "client-bus";
+
+import {EventAtom} from "../../shared/data";
+
 
 
 @Widget({
@@ -15,8 +18,7 @@ export class NewEventComponent {
   ends_on: string = "";
   start_time: string = "";
   end_time: string = "";
-  description: string = "";
-  event = {atom_id: undefined};
+  @Field("Event") event: EventAtom;
 
   constructor(
       private _graphQlService: GraphQlService,
@@ -27,13 +29,11 @@ export class NewEventComponent {
     let endsOnText: Element = document.getElementById("ends-on-text");
     let startTimeText: Element = document.getElementById("start-time-text");
     let endTimeText: Element = document.getElementById("end-time-text");
-    let descriptionText: Element = document.getElementById("description-text");
 
     this.starts_on = startsOnText["value"];
     this.ends_on = endsOnText["value"];
     this.start_time = startTimeText["value"];
     this.end_time = endTimeText["value"];
-    this.description = descriptionText["value"];
 
     this._graphQlService
       .post(`
@@ -51,13 +51,11 @@ export class NewEventComponent {
         endsOnText["value"] = "";
         startTimeText["value"] = "";
         endTimeText["value"] = "";
-        descriptionText["value"] = "";
 
         this.starts_on = "";
         this.ends_on = "";
         this.start_time = "";
         this.end_time = "";
-        this.description = "";
       });
   }
 

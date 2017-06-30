@@ -1,7 +1,7 @@
 import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
-import {Group} from "../shared/data";
+import {Group} from "../../shared/data";
 
 
 @Widget({fqelement: "Group", ng2_providers: [GraphQlService]})

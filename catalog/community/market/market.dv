@@ -15,7 +15,7 @@ cliche Market {
     good: Good,
     buyer: Party,
     seller: Party,
-    unit_price: number,
+    price: number,
     quantity: number
   }
 
@@ -35,12 +35,6 @@ cliche Market {
 
   widget BuyGoodFraction {
     fraction: number
-  }
-
-  // textbox to input price
-  widget CreateGood {
-    seller: Party,
-    market: Market
   }
 
   widget CreateGoodButton {

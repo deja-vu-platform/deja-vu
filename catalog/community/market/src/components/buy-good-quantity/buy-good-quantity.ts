@@ -1,9 +1,9 @@
-import {Widget} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 
 @Widget({
   fqelement: "Market"
 })
 export class BuyGoodQuantityComponent {
-  quantity = {value: 1};
-  constructor() {}
+  @Field("number") quantity: PrimitiveAtom<number>;
+  //constructor() {}
 }

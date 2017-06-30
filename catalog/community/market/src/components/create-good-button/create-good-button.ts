@@ -1,27 +1,29 @@
 import {GraphQlService} from "gql";
-
-import {Widget} from "client-bus";
-
+import {Widget, Field} from "client-bus";
+import {MarketAtom, PartyAtom, GoodAtom} from "../../shared/data";
 
 @Widget({
   fqelement: "Market",
   ng2_providers: [GraphQlService]
 })
 export class CreateGoodButtonComponent {
-  seller = {atom_id: undefined};
-  good = {
-    atom_id: "",
-    name: "",
-    price: 0,
-    quantity: 1
-  };
-  market = {atom_id: undefined};
+  @Field("Good") good: GoodAtom;
+  @Field("Party") seller: PartyAtom;
+  @Field("Market") market: MarketAtom;
 
   constructor(private _graphQlService: GraphQlService) {}
 
   createGood() {
     if (!this.seller.atom_id || !this.market.atom_id) {
       return;
+    }
+
+    // default values for quantity and price
+    if (!this.good.quantity && this.good.quantity !== 0) {
+      this.good.quantity = 1;
+    }
+    if (!this.good.price && this.good.price !== 0) {
+      this.good.price = 0;
     }
 
     this._graphQlService
@@ -39,8 +41,8 @@ export class CreateGoodButtonComponent {
       .subscribe(_ => {
         this.good.atom_id = "";
         this.good.name = "";
-        this.good.price = 0;
-        this.good.quantity = 1;
+        this.good.price = undefined;
+        this.good.quantity = undefined;
       })
     ;
   }

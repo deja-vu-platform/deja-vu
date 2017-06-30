@@ -1,6 +1,8 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field, PrimitiveAtom} from "client-bus";
+
+import {MemberAtom, GroupAtom} from "../../shared/data";
 
 
 @Widget({
@@ -8,9 +10,9 @@ import {Widget, ClientBus} from "client-bus";
   ng2_providers: [GraphQlService]
 })
 export class NewGroupButtonComponent {
-  group = {atom_id: "", name: ""};
-  initialMember = {atom_id: "", name: ""};
-  submit_ok = {value: false};
+  @Field("Group") group: GroupAtom;
+  @Field("Member") initialMember: MemberAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}

@@ -7,7 +7,7 @@ import "rxjs/add/operator/map";
 @Widget({
   fqelement: "Market",
   template: `x{{transaction.quantity}} {{transaction.good.name}} ` +
-  `@{{transaction.unit_price}}`,
+  `@{{transaction.price}}`,
   ng2_providers: [GraphQlService]
 })
 export class ShowTransactionComponent {
@@ -16,7 +16,7 @@ export class ShowTransactionComponent {
     good: {
       name: ""
     },
-    unit_price: 0,
+    price: 0,
     quantity: 0
   };
 
@@ -36,7 +36,7 @@ export class ShowTransactionComponent {
           good {
             name
           },
-          unit_price,
+          price,
           quantity
         }
       `)
@@ -53,7 +53,7 @@ export class ShowTransactionComponent {
           .map(data => data.good_by_id.name)
           .subscribe(name => {
             this.transaction.good.name = name;
-            this.transaction.unit_price = transaction_by_id.unit_price;
+            this.transaction.price = transaction_by_id.price;
             this.transaction.quantity = transaction_by_id.quantity;
           });
       });

@@ -1,23 +1,29 @@
 import {GraphQlService} from "gql";
-
-import {Widget} from "client-bus";
-
+import {Widget, Field, PrimitiveAtom} from "client-bus";
+import {PartyAtom, GoodAtom} from "../../shared/data";
 
 @Widget({
   fqelement: "Market",
   ng2_providers: [GraphQlService]
 })
 export class BuyGoodButtonComponent {
-  good = {atom_id: undefined};
-  buyer = {atom_id: undefined};
-  quantity = {value: 1};
-  fraction = {value: 1};
+  @Field("Good") good: GoodAtom;
+  @Field("Party") buyer: PartyAtom;
+  @Field("number") quantity: PrimitiveAtom<number>;
+  @Field("number") fraction: PrimitiveAtom<number>;
 
   constructor(private _graphQlService: GraphQlService) {}
 
   buyGood() {
-    console.log(this.quantity);
     if (!this.good.atom_id || !this.buyer.atom_id) return;
+
+    // default values for quantity and fraction
+    if (!this.quantity.value && this.quantity.value !== 0) {
+      this.quantity.value = 1;
+    }
+    if (!this.fraction.value && this.fraction.value !== 0) {
+      this.fraction.value = 1;
+    }
 
     this._graphQlService
       .post(`
@@ -28,8 +34,10 @@ export class BuyGoodButtonComponent {
           fraction: ${this.fraction.value}
         )
       `)
-      .subscribe(res => undefined)
-    ;
+      .subscribe(_ => {
+        this.quantity.value = undefined;
+        this.fraction.value = undefined;
+      });
   }
 
   valid() {

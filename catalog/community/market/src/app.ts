@@ -69,7 +69,7 @@ const schema = grafo
       good: {"type": "Good"},
       seller: {"type": "Party"},
       buyer: {"type": "Party"},
-      unit_price: {"type": graphql.GraphQLFloat},
+      price: {"type": graphql.GraphQLFloat},
       quantity: {"type": graphql.GraphQLInt},
       market: {"type": "Market"}
     }
@@ -126,7 +126,7 @@ const schema = grafo
             good: {atom_id: good.atom_id},
             seller: {atom_id: good.seller.atom_id},
             buyer: {atom_id: buyer_id},
-            unit_price: transaction_price,
+            price: transaction_price,
             quantity: quantity,
             market: {atom_id: good.market.atom_id}
           }

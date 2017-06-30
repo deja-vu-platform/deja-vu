@@ -7,7 +7,7 @@ import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-import {GroupAtom, Member, MemberAtom} from "../shared/data";
+import {GroupAtom, Member, MemberAtom} from "../../shared/data";
 
 
 @Widget({fqelement: "Group", ng2_providers: [GraphQlService]})

@@ -1,6 +1,8 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field} from "client-bus";
+
+import {GoodAtom} from "../../shared/data";
 
 import "rxjs/add/operator/map";
 
@@ -10,10 +12,7 @@ import "rxjs/add/operator/map";
   ng2_providers: [GraphQlService]
 })
 export class ShowGoodComponent {
-  good = {
-    atom_id: "",
-    name: undefined
-  };
+  @Field("Good") good: GoodAtom;
 
   constructor(
     private _graphQlService: GraphQlService,

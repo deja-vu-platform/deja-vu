@@ -1,14 +1,10 @@
-import {Widget} from "client-bus";
+import {Widget, Field} from "client-bus";
+import {GoodAtom} from "../../shared/data";
 
 @Widget({
   fqelement: "Market"
 })
 export class CreateGoodPriceComponent {
-  good = {
-    atom_id: "",
-    name: "",
-    price: 0,
-    quantity: 1
-  };
-  constructor() {}
+  @Field("Good") good: GoodAtom;
+  //constructor() {}
 }

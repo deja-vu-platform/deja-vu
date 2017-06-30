@@ -2,8 +2,9 @@ import {ElementRef} from "@angular/core";
 
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 
+import {EventAtom} from "../../shared/data";
 
 @Widget({
   fqelement: "Event",
@@ -15,8 +16,8 @@ export class NewEventContentComponent {
   endsOnText: Element;
   startTimeText: Element;
   endTimeText: Element;
-  event = {atom_id: undefined};
-  submit_ok = {value: false, on_after_change: _ => undefined};
+  @Field("Event") event: EventAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(
       private _graphQlService: GraphQlService,

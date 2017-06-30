@@ -1,15 +1,15 @@
 import {GraphQlService} from "gql";
 
 import {Widget, ClientBus, Field, PrimitiveAtom, WidgetValue} from "client-bus";
-import {MemberAtom, Group} from "../shared/data";
+import {MemberAtom, GroupAtom} from "../../shared/data";
 
 
 @Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
 export class NewGroupWithInitialMemberComponent {
+  @Field("Group") group: GroupAtom;
   @Field("Member") initialMember: MemberAtom;
   @Field("Widget") onGroupCreate: PrimitiveAtom<WidgetValue>;
 
-  group: Group = {atom_id: "", name: ""};
 
   constructor(
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}

@@ -1,39 +1,23 @@
 import {GraphQlService} from "gql";
-
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field} from "client-bus";
+import {
+  MarketAtom,
+  PartyAtom,
+  GoodAtom,
+  TransactionAtom
+} from "../../shared/data";
 
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-export interface Party {
-  atom_id: string;
-}
-
-export interface Good {
-  atom_id: string;
-  name: string;
-  price: number;
-  seller: Party;
-  quantity: number;
-}
-
-export interface Transaction {
-  atom_id: string;
-  good: Good;
-  buyer: Party;
-  seller: Party;
-  unit_price: number;
-  quantity: number;
-}
-
 @Widget({
   fqelement: "Market",
   ng2_providers: [GraphQlService]
 })
 export class ShowAllTransactionsComponent {
-  market = {atom_id: ""};
+  @Field("Market") market: MarketAtom;
   allTransactions = [];
 
   constructor(
@@ -62,17 +46,18 @@ export class ShowAllTransactionsComponent {
           seller {
             atom_id
           },
-          unit_price,
+          price,
           quantity
         }
       `)
       .map(data => data.TransactionsByMarket)
       .flatMap((transactions, unused_ix) => Observable.from(transactions))
-      .map((transaction: Transaction) => {
-        const transaction_atom = this._clientBus.new_atom("Transaction");
-        const good_atom: Good = this._clientBus.new_atom("Good");
-        const seller_atom: Party = this._clientBus.new_atom("Party");
-        const buyer_atom: Party = this._clientBus.new_atom("Party");
+      .map((transaction: TransactionAtom) => {
+        const transaction_atom = this.
+          _clientBus.new_atom<TransactionAtom>("Transaction");
+        const good_atom = this._clientBus.new_atom<GoodAtom>("Good");
+        const seller_atom = this._clientBus.new_atom<PartyAtom>("Party");
+        const buyer_atom = this._clientBus.new_atom<PartyAtom>("Party");
         good_atom.atom_id = transaction.good.atom_id;
         good_atom.name = transaction.good.name;
         buyer_atom.atom_id = transaction.buyer.atom_id;
@@ -80,8 +65,8 @@ export class ShowAllTransactionsComponent {
         transaction_atom.atom_id = transaction.atom_id;
         transaction_atom.good = good_atom;
         transaction_atom.buyer = buyer_atom;
-        transaction_atom.seller = seller_atom
-        transaction_atom.unit_price = transaction.unit_price;
+        transaction_atom.seller = seller_atom;
+        transaction_atom.price = transaction.price;
         transaction_atom.quantity = transaction.quantity;
         return transaction_atom;
       })

@@ -1,21 +1,17 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field} from "client-bus";
 
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-
-export interface Member {
-  atom_id: string;
-  name: string;
-}
+import {MemberAtom, GroupAtom} from "../../shared/data";
 
 @Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
 export class ShowGroupMembersComponent {
-  group = {atom_id: "", members: [], on_change: _ => undefined};
+  @Field("Group") group: GroupAtom;
   private _fetched = undefined;
 
   constructor(
@@ -28,7 +24,7 @@ export class ShowGroupMembersComponent {
       this._fetched = this.group.atom_id;
       this.group.members = [];
 
-      return this._graphQlService
+      this._graphQlService
         .get(`
           group_by_id(atom_id: "${this.group.atom_id}") {
             members {
@@ -39,8 +35,8 @@ export class ShowGroupMembersComponent {
         `)
         .map(data => data.group_by_id.members)
         .flatMap((members, unused_ix) => Observable.from(members))
-        .map((member: Member) => {
-          const memberAtom: Member = this._clientBus.new_atom("Member");
+        .map((member: MemberAtom) => {
+          const memberAtom = this._clientBus.new_atom<MemberAtom>("Member");
           memberAtom.atom_id = member.atom_id;
           memberAtom.name = member.name;
           return memberAtom;

@@ -1,6 +1,8 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field} from "client-bus";
+
+import {GroupAtom} from "../../shared/data";
 
 import "rxjs/add/operator/map";
 
@@ -10,7 +12,7 @@ import "rxjs/add/operator/map";
   ng2_providers: [GraphQlService]
 })
 export class ShowGroupNameComponent {
-  group = {atom_id: "", name: ""};
+  @Field("Group") group: GroupAtom;
 
   constructor(
     private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}

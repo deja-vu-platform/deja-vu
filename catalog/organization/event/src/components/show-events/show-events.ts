@@ -11,14 +11,7 @@ import {Widget, ClientBus} from "client-bus";
 
 import * as _u from "underscore";
 
-export interface Event {
-  start_date: Date;
-  end_date: Date;
-}
-
-export interface EventItem {
-  event: Event;
-}
+import {EventAtom} from "../../shared/data";
 
 @Widget({
   fqelement: "Event",
@@ -29,7 +22,7 @@ export interface EventItem {
   ]
 })
 export class ShowEventsComponent {
-  events: EventItem[] = [];
+  events: EventAtom[] = [];
 
   constructor(
       private _graphQlService: GraphQlService,
@@ -47,10 +40,10 @@ export class ShowEventsComponent {
         }
       `)
       .map(data => data.event_all)
-      .flatMap((events: Event[], unused_ix) => Observable
+      .flatMap((events: EventAtom[], unused_ix) => Observable
           .from(events))
       .map(event => _u
-          .extendOwn(this._clientBus.new_atom("Event"), event))
+          .extendOwn(this._clientBus.new_atom<EventAtom>("Event"), event))
       .subscribe(event => this.events.push(event));
   }
 

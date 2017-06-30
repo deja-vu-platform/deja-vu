@@ -1,31 +1,19 @@
 import {GraphQlService} from "gql";
-
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field} from "client-bus";
+import {MarketAtom, PartyAtom, GoodAtom} from "../../shared/data";
 
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-export interface Party {
-  atom_id: string;
-}
-
-export interface Good {
-  atom_id: string;
-  name: string;
-  price: number;
-  seller: Party;
-  quantity;
-}
-
 @Widget({
   fqelement: "Market",
   ng2_providers: [GraphQlService]
 })
 export class ShowMyGoodsForSaleComponent {
-  seller = {atom_id: undefined};
-  market = {atom_id: undefined}
+  @Field("Party") seller: PartyAtom;
+  @Field("Market") market: MarketAtom;
   forSaleGoods = [];
 
   constructor(
@@ -55,10 +43,9 @@ export class ShowMyGoodsForSaleComponent {
       `)
       .map(data => data.GoodsFromSeller)
       .flatMap((goods, unused_ix) => Observable.from(goods))
-      .map((good: Good) => {
-        const good_atom: Good = this._clientBus.new_atom("Good");
-        const seller_atom: Party = this._clientBus.new_atom("Party");
-        const buyer_atom: Party = this._clientBus.new_atom("Party");
+      .map((good: GoodAtom) => {
+        const good_atom = this._clientBus.new_atom<GoodAtom>("Good");
+        const seller_atom = this._clientBus.new_atom<PartyAtom>("Party");
         good_atom.atom_id = good.atom_id;
         good_atom.name = good.name;
         good_atom.price = good.price;
@@ -69,7 +56,6 @@ export class ShowMyGoodsForSaleComponent {
       })
       .subscribe(good => {
         this.forSaleGoods.push(good);
-      })
-    ;
+      });
   }
 }
