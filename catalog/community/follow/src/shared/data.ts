@@ -1,10 +1,8 @@
-export type Name = string;
-
 export interface Source {
-  name: Name;
+  name: string;
   follows: Target[];
 }
 
 export interface Target {
-  name: Name;
+  name: string;
 }

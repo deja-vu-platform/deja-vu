@@ -1,16 +1,19 @@
-import {Widget} from "client-bus";
+import {Widget, Field, AfterInit} from "client-bus";
+import {EventAtom} from "../shared/data";
 
 
 @Widget({
   fqelement: "Event",
-  template: `{{event.start_date}} - {{event.end_date}}`
+  template: `{{_event.start_date}} - {{_event.end_date}}`
 })
-export class ShowEventComponent {
-  event = {start_date: "", end_date: ""};
+export class ShowEventComponent implements AfterInit {
+  @Field("Event") event: EventAtom;
+
+  _event = {start_date: "", end_date: ""};
 
   dvAfterInit() {
-    this.event.start_date = this.formatDateStr(this.event.start_date);
-    this.event.end_date = this.formatDateStr(this.event.end_date);
+    this._event.start_date = this.formatDateStr(this.event.start_date);
+    this._event.end_date = this.formatDateStr(this.event.end_date);
   }
 
   formatDateStr(date: string): string {

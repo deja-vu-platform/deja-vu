@@ -1,8 +1,8 @@
 import {NgClass} from "@angular/common";
 
-import {User} from "../../shared/data";
+import {UserAtom} from "../shared/data";
 import {GraphQlService} from "gql";
-import {Widget} from "client-bus";
+import {Widget, PrimitiveAtom, Field} from "client-bus";
 
 
 @Widget({
@@ -11,8 +11,8 @@ import {Widget} from "client-bus";
    ng2_directives: [NgClass]
 })
 export class SignInComponent {
-  user: User = {username: "", password: "", atom_id: ""};
-  signin_ok = {value: false};
+  @Field("User") user: UserAtom;
+  @Field("boolean") signin_ok: PrimitiveAtom<boolean>;
   error = false;
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -26,9 +26,8 @@ export class SignInComponent {
       .map(data => JSON.parse(data.signIn))
       .subscribe(
         token => {
-          let authToken = token.token,
-            authUser = token.user;
-          console.log("setting username " + this.user.username);
+          const authToken = token.token;
+          const authUser = token.user;
           localStorage.setItem("id_token", authToken);
           localStorage.setItem("username", this.user.username);
           localStorage.setItem("atom_id", authUser.atom_id);

@@ -1,13 +1,14 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
+import {ItemAtom, ListAtom} from "../shared/data";
 
 
 @Widget({fqelement: "List", ng2_providers: [GraphQlService]})
 export class AddItemComponent {
-  item = {atom_id: "", name: ""};
-  list = {atom_id: ""};
-  submit_ok = {value: false};
+  @Field("Item") item: ItemAtom;
+  @Field("List") list: ListAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(private _graphQlService: GraphQlService) {}
 

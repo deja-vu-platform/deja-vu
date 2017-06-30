@@ -2,18 +2,21 @@ import {ElementRef} from "@angular/core";
 
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, Atom, AfterInit} from "client-bus";
 
+
+export interface NamedAtom extends Atom { name: string; }
 
 @Widget({
   fqelement: "Task",
   ng2_providers: [GraphQlService],
   styles: [``]
 })
-export class CreateTaskComponent {
-  task = {atom_id: undefined, name: ""};
-  assigner = {atom_id: undefined, name: ""};
-  assignee = {atom_id: undefined, name: ""};
+export class CreateTaskComponent implements AfterInit {
+  @Field("Task") task: NamedAtom;
+  @Field("Assigner") assigner: NamedAtom;
+  @Field("Assignee") assignee: NamedAtom;
+
   expiration_date: string = "";
   assignee_options = [];
 

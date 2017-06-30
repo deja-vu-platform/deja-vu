@@ -1,23 +1,19 @@
-import {Label} from "../../shared/label";
 import {GraphQlService} from "gql";
 
 import "rxjs/add/operator/toPromise";
 
 import * as _u from "underscore";
 
-import {Widget} from "client-bus";
+import {Widget, Field, PrimitiveAtom, AfterInit} from "client-bus";
+import {ItemAtom, Label} from "../shared/data";
 
 
-@Widget({
-  fqelement: "Label",
-  ng2_providers: [GraphQlService]
-})
-export class AttachLabelsComponent {
-  item = {labels: [], atom_id: undefined};
+@Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
+export class AttachLabelsComponent implements AfterInit {
+  @Field("Item") item: ItemAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+
   labels_text: string = "";
-  submit_ok = {
-    value: false, on_change: _ => undefined, on_after_change: _ => undefined
-  };
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -26,7 +22,6 @@ export class AttachLabelsComponent {
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === false) return;
 
-      console.log("On submit at attach-labels");
       return Promise.all<Label>(
           _u.chain(this.labels_text.split(","))
             .map(l => l.trim())

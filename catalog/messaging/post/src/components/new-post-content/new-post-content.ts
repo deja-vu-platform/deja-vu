@@ -1,12 +1,12 @@
-import {Post} from "../../shared/data";
+import {PostAtom} from "../shared/data";
 
-import {Widget} from "client-bus";
+import {Widget, Field, PrimitiveAtom, AfterInit} from "client-bus";
 
 
 @Widget({fqelement: "Post"})
-export class NewPostContentComponent {
-  post: Post = {content: ""};
-  submit_ok = {value: false, on_after_change: _ => undefined};
+export class NewPostContentComponent implements AfterInit {
+  @Field("Post") post: PostAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {

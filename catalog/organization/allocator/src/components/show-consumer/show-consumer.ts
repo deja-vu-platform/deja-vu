@@ -1,5 +1,9 @@
-import {Widget} from "client-bus";
+import "rxjs/add/operator/toPromise";
+
+import {Widget, Field, AfterInit} from "client-bus";
 import {GraphQlService} from "gql";
+
+import {ResourceAtom, Consumer} from "../shared/data";
 
 
 @Widget({
@@ -7,9 +11,9 @@ import {GraphQlService} from "gql";
   template: `{{consumer.name}}`,
   ng2_providers: [GraphQlService]
 })
-export class ShowConsumerComponent {
-  resource = {atom_id: undefined, on_change: _ => undefined};
-  consumer = {atom_id: "", name: ""};
+export class ShowConsumerComponent implements AfterInit {
+  @Field("Resource") resource: ResourceAtom;
+  consumer: Consumer;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -21,15 +25,16 @@ export class ShowConsumerComponent {
      */
     const update_consumer = (consumer_atom_id) => {
       if (!consumer_atom_id) return;
-      this._graphQlService
+      return this._graphQlService
         .get(`
           consumer_by_id(atom_id: "${consumer_atom_id}") {
             name,
             atom_id
           }
         `)
-        .map(data => data.consumer_by_id)
-        .subscribe(consumer => this.consumer = consumer);
+        .toPromise()
+        .then(data => data.consumer_by_id)
+        .then(consumer => this.consumer = consumer);
     };
 
     /**
@@ -37,7 +42,7 @@ export class ShowConsumerComponent {
      */
     const update_resource = () => {
       if (!this.resource.atom_id) return;
-      this._graphQlService
+      return this._graphQlService
         .get(`
           resource_by_id(atom_id: "${this.resource.atom_id}") {
             assigned_to {
@@ -45,8 +50,9 @@ export class ShowConsumerComponent {
             }
           }
         `)
-        .map(data => data.resource_by_id.assigned_to.atom_id)
-        .subscribe(consumer_atom_id => update_consumer(consumer_atom_id));
+        .toPromise()
+        .then(data => data.resource_by_id.assigned_to.atom_id)
+        .then(consumer_atom_id => update_consumer(consumer_atom_id));
     };
 
     update_resource();

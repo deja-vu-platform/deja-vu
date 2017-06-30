@@ -4,7 +4,7 @@ import {RouterModule, Routes} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 
-import {WidgetLoader, RouteLoader, ClientBus, Widget, field} from "client-bus";
+import {WidgetLoader, RouteLoader, ClientBus, Widget, Field} from "client-bus";
 
 import * as _ustring from "underscore.string";
 

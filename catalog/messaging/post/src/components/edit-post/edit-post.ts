@@ -1,16 +1,14 @@
-import {Post, Username} from "../../shared/data";
+import {PostAtom} from "../shared/data";
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, AfterInit} from "client-bus";
 
-@Widget({
-  fqelement: "Post",
-  ng2_providers: [GraphQlService]
-})
-export class EditPostComponent {
-  username: Username;
+
+@Widget({fqelement: "Post", ng2_providers: [GraphQlService]})
+export class EditPostComponent implements AfterInit {
+  @Field("Post") post: PostAtom;
+  username: string;
   editedContent: string;
-  post: Post = null;
   isEditing = false;
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -34,7 +32,8 @@ export class EditPostComponent {
           atom_id: "${this.post.atom_id}",
           content: "${this.editedContent}"
         ) { atom_id }
-      `).subscribe(() => {
+      `)
+      .subscribe(() => {
         this.isEditing = false;
         this.post.content = this.editedContent;
       });

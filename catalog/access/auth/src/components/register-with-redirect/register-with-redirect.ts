@@ -1,14 +1,15 @@
-import {User} from "../../shared/data";
 import {GraphQlService} from "gql";
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field, PrimitiveAtom, WidgetValue} from "client-bus";
+import {UserAtom} from "../shared/data";
 
 
 @Widget({fqelement: "Auth", ng2_providers: [GraphQlService]})
 export class RegisterWithRedirectComponent {
-  user: User = {username: "", password: "", atom_id: ""};
+  @Field("User") user: UserAtom;
+  @Field("Widget") on_register_ok: PrimitiveAtom<WidgetValue>;
+
   reenter_password = "";
   username_error = false;
-  on_register_ok = {value: undefined};
   reenter_password_error = false;
 
   constructor(

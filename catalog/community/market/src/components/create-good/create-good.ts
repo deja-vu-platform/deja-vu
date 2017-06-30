@@ -1,12 +1,14 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, Atom} from "client-bus";
+
+export interface GoodAtom extends Atom { name: string; offer_price: number; }
 
 
 @Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
 export class CreateGoodComponent {
-  seller = {atom_id: undefined};
-  good = {atom_id: undefined, name: "", offer_price: undefined};
+  @Field("Party") seller: Atom;
+  @Field("Good") good: GoodAtom;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -24,7 +26,7 @@ export class CreateGoodComponent {
       .subscribe(_ => {
         this.good.atom_id = "";
         this.good.name = "";
-        this.good.offer_price = "";
+        this.good.offer_price = undefined;
       });
   }
 }

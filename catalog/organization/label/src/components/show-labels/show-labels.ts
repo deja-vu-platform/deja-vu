@@ -1,4 +1,6 @@
-import {Widget} from "client-bus";
+import "rxjs/add/operator/toPromise";
+import {Widget, Field, AfterInit} from "client-bus";
+import {ItemAtom} from "../shared/data";
 
 import {GraphQlService} from "gql";
 
@@ -15,9 +17,10 @@ import {GraphQlService} from "gql";
     </ul>
   `
 })
-export class ShowLabelsComponent {
-  item = {on_change: _ => undefined, atom_id: undefined, labels: undefined};
+export class ShowLabelsComponent implements AfterInit {
+  @Field("Item") item: ItemAtom;
   fetched = false;
+
   constructor(private _graphQlService: GraphQlService) {}
 
   dvAfterInit() {
@@ -25,7 +28,6 @@ export class ShowLabelsComponent {
       if (this.item.atom_id === undefined || this.fetched) return;
       this.fetched = true;
 
-      console.log("Fetching labels");
       return this._graphQlService
         .get(`
           item_by_id(atom_id: "${this.item.atom_id}") {
@@ -34,8 +36,9 @@ export class ShowLabelsComponent {
             }
           }
         `)
-        .map(data => data.item_by_id)
-        .subscribe(item => {
+        .toPromise()
+        .then(data => data.item_by_id)
+        .then(item => {
           this.item.labels = item.labels;
         });
     };

@@ -1,13 +1,12 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, AfterInit} from "client-bus";
+import {ListAtom} from "../shared/data";
 
-@Widget({
-  fqelement: "List",
-  template: `{{list.name}}`
-})
-export class ShowListOverviewComponent {
-  list = { name: "", atom_id: "", items: [] };
+
+@Widget({fqelement: "List", template: `{{list.name}}`})
+export class ShowListOverviewComponent implements AfterInit {
+  @Field("List") list: ListAtom;
 
   constructor(private _graphQlService: GraphQlService) {}
 

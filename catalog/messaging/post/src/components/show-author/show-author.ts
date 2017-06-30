@@ -1,4 +1,7 @@
-import {Widget, ClientBus} from "client-bus";
+import "rxjs/add/operator/toPromise";
+
+import {Widget, ClientBus, Field, AfterInit} from "client-bus";
+import {PostAtom, UserAtom} from "../shared/data";
 
 import {GraphQlService} from "gql";
 
@@ -8,8 +11,8 @@ import {GraphQlService} from "gql";
   ng2_providers: [GraphQlService],
   template: `{{post?.author?.username}}`
 })
-export class ShowAuthorComponent {
-  post = {on_change: undefined, atom_id: undefined, author: undefined};
+export class ShowAuthorComponent implements AfterInit {
+  @Field("Post") post: PostAtom;
   private fetched = false;
 
   constructor(
@@ -20,7 +23,6 @@ export class ShowAuthorComponent {
       if (!this.post.atom_id || this.fetched) return;
       this.fetched = true;
 
-      console.log("Fetching author");
       return this._graphQlService
         .get(`
           post_by_id(atom_id: "${this.post.atom_id}") {
@@ -30,10 +32,11 @@ export class ShowAuthorComponent {
             }
           }
         `)
-        .map(data => data.post_by_id)
-        .subscribe(post => {
+        .toPromise()
+        .then(data => data.post_by_id)
+        .then(post => {
           if (this.post.author === undefined) {
-            this.post.author = this._clientBus.new_atom("Author");
+            this.post.author = this._clientBus.new_atom<UserAtom>("Author");
           }
           this.post.author.atom_id = post.author.atom_id;
           this.post.author.username = post.author.username;

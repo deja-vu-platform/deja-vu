@@ -1,4 +1,4 @@
-import {Widget} from "client-bus";
+import {Widget, Field, Atom} from "client-bus";
 
 
 @Widget({
@@ -6,5 +6,5 @@ import {Widget} from "client-bus";
   template: `{{task.name}}`
   })
 export class ShowTaskComponent {
-  task = {name: ""};
+  @Field("Task") task: Atom;
 }

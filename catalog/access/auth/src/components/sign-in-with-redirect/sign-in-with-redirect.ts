@@ -1,8 +1,8 @@
 import {NgClass} from "@angular/common";
 
-import {User} from "../../shared/data";
+import {UserAtom} from "../shared/data";
 import {GraphQlService} from "gql";
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field, PrimitiveAtom, WidgetValue} from "client-bus";
 
 
 @Widget({
@@ -11,8 +11,8 @@ import {Widget, ClientBus} from "client-bus";
    ng2_directives: [NgClass]
 })
 export class SignInWithRedirectComponent {
-  user: User = {username: "", password: "", atom_id: ""};
-  on_signin_ok = {value: undefined};
+  @Field("User") user: UserAtom;
+  @Field("Widget") on_signin_ok: PrimitiveAtom<WidgetValue>;
   error = false;
 
   constructor(
@@ -28,9 +28,8 @@ export class SignInWithRedirectComponent {
       .map(data => JSON.parse(data.signIn))
       .subscribe(
         token => {
-          let authToken = token.token,
-            authUser = token.user;
-          console.log("setting username " + this.user.username);
+          const authToken = token.token;
+          const authUser = token.user;
           localStorage.setItem("id_token", authToken);
           localStorage.setItem("username", this.user.username);
           localStorage.setItem("atom_id", authUser.atom_id);

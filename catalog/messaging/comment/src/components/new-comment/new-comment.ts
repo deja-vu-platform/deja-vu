@@ -1,14 +1,15 @@
 import {GraphQlService} from "gql";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 
-import {Widget} from "client-bus";
+import {AuthorAtom, CommentAtom, TargetAtom} from "../shared/data";
 
 
 @Widget({fqelement: "Comment", ng2_providers: [GraphQlService]})
 export class NewCommentComponent {
-  author = {name: "", atom_id: ""};
-  comment = {atom_id: "", content: ""};
-  target = {name: "", atom_id: ""};
-  submit_ok = {value: false};
+  @Field("Author") author: AuthorAtom;
+  @Field("Comment") comment: CommentAtom;
+  @Field("Target") target: TargetAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(private _graphQlService: GraphQlService) {}
 

@@ -6,7 +6,7 @@ cliche List {
 
   data Item {
     name: text,
-    selected: boolean
+    checked: boolean
   }
 
   widget NewList {
