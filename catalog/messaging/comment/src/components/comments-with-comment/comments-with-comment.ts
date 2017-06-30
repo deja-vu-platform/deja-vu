@@ -1,4 +1,4 @@
-import {Widget, ClientBus, field} from "client-bus";
+import {Widget, Field} from "client-bus";
 
 
 @Widget({
@@ -15,12 +15,6 @@ import {Widget, ClientBus, field} from "client-bus";
   `
 })
 export class CommentsWithCommentComponent {
-  author = {name: ""};
-  target = {name: ""};
-
-  constructor(client_bus: ClientBus) {
-    client_bus.init(this, [
-        field("author", "Author"),
-        field("target", "Target")]);
-  }
+  @Field("Author") author;
+  @Field("Target") target;
 }

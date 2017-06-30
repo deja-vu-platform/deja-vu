@@ -1,12 +1,12 @@
 import {GraphQlService} from "gql";
 
 import {Widget} from "client-bus";
-
+import {List} from "../shared/data";
 
 
 @Widget({fqelement: "List", ng2_providers: [GraphQlService]})
 export class NewListComponent {
-  list = {atom_id: "", name: ""};
+  list: List;
 
   constructor(private _graphQlService: GraphQlService) {}
 

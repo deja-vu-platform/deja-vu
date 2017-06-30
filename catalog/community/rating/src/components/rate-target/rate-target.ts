@@ -1,12 +1,14 @@
+import "rxjs/add/operator/toPromise";
+
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, Atom, PrimitiveAtom, AfterInit} from "client-bus";
 
 @Widget({fqelement: "Rating", ng2_providers: [GraphQlService]})
-export class RateTargetComponent {
-  target = { atom_id: undefined, on_change: _ => undefined };
-  source = { atom_id: undefined, on_change: _ => undefined };
-  rating = { value: 0 };
+export class RateTargetComponent implements AfterInit {
+  @Field("Target") target: Atom;
+  @Field("Source") source: Atom;
+  @Field("number") rating: PrimitiveAtom<number>;
   radioName = "";
 
   _rating = 0; // Internal rating value to pass along
@@ -52,14 +54,15 @@ export class RateTargetComponent {
     this._lastSourceAtomId = this.source.atom_id;
     this._lastTargetAtomId = this.target.atom_id;
 
-    this._graphQlService
+    return this._graphQlService
       .get(`
         ratingBySourceTarget(source: "${this.source.atom_id}",
           target: "${this.target.atom_id}") {
             rating
           }
       `)
-      .subscribe(res => {
+      .toPromise()
+      .then(res => {
         // If a rating already exists, then we pre-populate the value
         if (res.ratingBySourceTarget) {
           this._rating = res.ratingBySourceTarget.rating;

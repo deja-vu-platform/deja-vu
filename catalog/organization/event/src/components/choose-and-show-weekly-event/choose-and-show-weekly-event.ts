@@ -7,25 +7,15 @@ import "rxjs/add/operator/mergeMap";
 
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus, field} from "client-bus";
+import {Widget, ClientBus, Field, AfterInit} from "client-bus";
+
+import {WeeklyEvent, WeeklyEventAtom, Event} from "../shared/data";
 
 import * as _u from "underscore";
 
 
-export interface WeeklyEvent {
-  atom_id: string;
-  starts_on: Date;
-  ends_on: Date;
-}
+export type EventItem = { event: Event; }
 
-export interface Event {
-  start_date: Date;
-  end_date: Date;
-}
-
-export interface EventItem {
-  event: Event;
-}
 
 @Widget({
   fqelement: "Event",
@@ -35,19 +25,15 @@ export interface EventItem {
     `bootstrap-select.min.css`
   ]
 })
-export class ChooseAndShowWeeklyEventComponent {
+export class ChooseAndShowWeeklyEventComponent implements AfterInit {
+  @Field("WeeklyEvent") selected_weekly_event: WeeklyEventAtom;
   weekly_events: WeeklyEvent[] = [];
   events: EventItem[] = [];
-  selected_weekly_event: WeeklyEvent = {
-    atom_id: undefined, starts_on: undefined, ends_on: undefined
-  };
 
   constructor(
       private _graphQlService: GraphQlService,
       private _elementRef: ElementRef,
-      private _clientBus: ClientBus) {
-    _clientBus.init(this, [field("selected_weekly_event", "WeeklyEvent")]);
-  }
+      private _clientBus: ClientBus) {}
 
   dvAfterInit() {
     this._graphQlService
@@ -69,6 +55,7 @@ export class ChooseAndShowWeeklyEventComponent {
   updateEvents(atom_id) {
     this.selected_weekly_event = _u
       .findWhere(this.weekly_events, {atom_id: atom_id}); // tmp hack
+    this.events = [];
     this._graphQlService
       .get(`
         weeklyevent_by_id(atom_id: "${atom_id}") {

@@ -1,14 +1,15 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, Atom, AfterInit} from "client-bus";
+
 
 @Widget({
   fqelement: "Rating",
   ng2_providers: [GraphQlService],
   styles: [``]
 })
-export class ShowRatingsComponent {
-  target = {atom_id: undefined, on_change: _ => undefined };
+export class ShowRatingsComponent implements AfterInit {
+  @Field("Target") target: Atom;
   average = 0;
   ratingCount = 0;
 
@@ -24,12 +25,13 @@ export class ShowRatingsComponent {
     const DECIMAL_PLACES = 2;
     const ROUNDING_MULTIPLE = Math.pow(BASE, DECIMAL_PLACES);
 
-    this._graphQlService
+    return this._graphQlService
       .get(`
         averageRatingForTarget(target: "${this.target.atom_id}")
       `)
-      .map(res => res.averageRatingForTarget)
-      .subscribe(res => {
+      .toPromise()
+      .then(res => res.averageRatingForTarget)
+      .then(res => {
         this.average = Math.round(res * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
       });
   }
@@ -38,20 +40,22 @@ export class ShowRatingsComponent {
    * Download the number of ratings for the target from the server.
    */
   loadRatingCount() {
-    this._graphQlService
+    return this._graphQlService
       .get(`
         ratingCountForTarget(target: "${this.target.atom_id}")
       `)
-      .map(res => res.ratingCountForTarget)
-      .subscribe(res => this.ratingCount = res);
+      .toPromise()
+      .then(res => res.ratingCountForTarget)
+      .then(res => {
+        this.ratingCount = res;
+      });
   }
 
   dvAfterInit() {
     this.loadRatingAverage();
     this.loadRatingCount();
-    this.target.on_change(() => {
-      this.loadRatingAverage();
-      this.loadRatingCount();
-    });
+    this.target.on_change(() => Promise
+      .all([this.loadRatingAverage(), this.loadRatingCount()])
+      .then(_ => undefined));
   }
 }

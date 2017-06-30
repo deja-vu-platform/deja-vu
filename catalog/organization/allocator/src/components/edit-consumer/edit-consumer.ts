@@ -1,10 +1,15 @@
-import {Widget} from "client-bus";
+import "rxjs/add/operator/toPromise";
+
+import {Widget, Field, AfterInit} from "client-bus";
 import {GraphQlService} from "gql";
 
+import {ResourceAtom} from "../shared/data";
+
+
 @Widget({fqelement: "Allocator", ng2_providers: [GraphQlService]})
-export class EditConsumerComponent {
+export class EditConsumerComponent implements AfterInit {
+  @Field("Resource") resource: ResourceAtom;
   consumer_atom_id = "";
-  resource = {atom_id: undefined, on_change: _ => undefined};
   consumers = [];
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -45,7 +50,7 @@ export class EditConsumerComponent {
      */
     const update_resource = () => {
       if (!this.resource.atom_id) return;
-      this._graphQlService
+      return this._graphQlService
         .get(`
           resource_by_id(atom_id: "${this.resource.atom_id}") {
             assigned_to {
@@ -53,8 +58,9 @@ export class EditConsumerComponent {
             }
           }
         `)
-        .map(data => data.resource_by_id.assigned_to.atom_id)
-        .subscribe(consumer_atom_id =>
+        .toPromise()
+        .then(data => data.resource_by_id.assigned_to.atom_id)
+        .then(consumer_atom_id =>
           this.consumer_atom_id = consumer_atom_id);
     };
 

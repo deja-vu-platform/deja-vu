@@ -3,35 +3,38 @@ import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
-import {Message, Publisher} from "../../shared/data";
+import {
+  Message, Publisher, Subscriber, SubscriberAtom, MessageAtom,
+  PublisherAtom
+} from "../shared/data";
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field, AfterInit} from "client-bus";
 
 
 export interface FeedItem {
   message: Message;
   publisher: Publisher;
+  subscriber: Subscriber;
 }
 
 
 @Widget({fqelement: "Feed", ng2_providers: [GraphQlService]})
-export class ShowFeedComponent {
+export class ShowFeedComponent implements AfterInit {
+  @Field("Subscriber") subscriber: SubscriberAtom;
   feed: FeedItem[];
-  sub = {name: "", on_change: _ => undefined};
 
   constructor(
       private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
 
   dvAfterInit() {
     const update_feed = () => {
-      if (!this.sub.name) return;
-      console.log("got new sub" + this.sub.name);
+      if (!this.subscriber.name) return;
 
       this.feed = [];
       this._graphQlService
         .get(`
-          sub(name: "${this.sub.name}") {
+          subscriber(name: "${this.subscriber.name}") {
             subscriptions {
               name,
               messages {
@@ -41,7 +44,7 @@ export class ShowFeedComponent {
             }
           }
         `)
-        .map(data => data.sub.subscriptions)
+        .map(data => data.subscriber.subscriptions)
         .flatMap((pubs: Publisher[], unused_ix) => Observable.from(pubs))
         .flatMap(
             (pub: Publisher, unused_ix: number) => {
@@ -52,12 +55,17 @@ export class ShowFeedComponent {
               return {message: message, publisher: pub};
             })
         .map(feedItem => {
-          const message = this._clientBus.new_atom("Message");
+          const message = this._clientBus.new_atom<MessageAtom>("Message");
           message.content = feedItem.message.content;
           message.atom_id = feedItem.message.atom_id;
-          const publisher = this._clientBus.new_atom("Publisher");
+          const publisher = this._clientBus
+            .new_atom<PublisherAtom>("Publisher");
           publisher.name = feedItem.publisher.name;
-          return {message: message, publisher: publisher, sub: this.sub};
+          return {
+            message: message,
+            publisher: publisher,
+            subscriber: this.subscriber
+          };
         })
         .subscribe(feedItem => {
           this.feed.push(feedItem);
@@ -65,6 +73,6 @@ export class ShowFeedComponent {
     };
 
     update_feed();
-    this.sub.on_change(update_feed);
+    this.subscriber.on_change(update_feed);
   }
 }

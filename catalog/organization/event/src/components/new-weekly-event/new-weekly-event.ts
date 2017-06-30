@@ -15,7 +15,6 @@ export class NewWeeklyEventComponent {
   ends_on: string = "";
   start_time: string = "";
   end_time: string = "";
-  weeklyEvent = {atom_id: undefined};
 
   constructor(
       private _graphQlService: GraphQlService,
@@ -41,8 +40,6 @@ export class NewWeeklyEventComponent {
         }
       `)
       .subscribe(atom_id => {
-        this.weeklyEvent.atom_id = atom_id;
-
         // Clear out the fields on success
         startsOnText["value"] = "";
         endsOnText["value"] = "";

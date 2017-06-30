@@ -1,10 +1,11 @@
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field, WidgetValue, PrimitiveAtom} from "client-bus";
+import {ItemAtom} from "../shared/data";
 
 
 @Widget({fqelement: "List"})
 export class RedirectToItemComponent {
-  item = {atom_id: "", name: ""};
-  on_redirect = {value: undefined};
+  @Field("Item") item: ItemAtom;
+  @Field("Widget") on_redirect: PrimitiveAtom<WidgetValue>;
 
   constructor(private _clientBus: ClientBus) {}
 

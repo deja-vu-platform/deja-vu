@@ -1,4 +1,4 @@
-import {Widget, ClientBus, field} from "client-bus";
+import {Widget, Field} from "client-bus";
 
 
 @Widget({
@@ -15,9 +15,5 @@ import {Widget, ClientBus, field} from "client-bus";
   `
 })
 export class EditListComponent {
-  list = {atom_id: ""};
-
-  constructor(client_bus: ClientBus) {
-    client_bus.init(this, [field("list", "List")]);
-  }
+  @Field("List") list;
 }

@@ -1,6 +1,6 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, Atom, PrimitiveAtom} from "client-bus";
 
 
 @Widget({
@@ -9,8 +9,8 @@ import {Widget} from "client-bus";
   styles: [``]
 })
 export class SendEmailComponent {
-  to = {value: ""};
-  content = {atom_id: ""};
+  @Field("string") to: PrimitiveAtom<string>;
+  @Field("Content") content: Atom;
 
   constructor(private _graphQlService: GraphQlService) {}
 

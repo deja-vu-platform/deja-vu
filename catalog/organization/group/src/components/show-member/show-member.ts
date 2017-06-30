@@ -1,9 +1,9 @@
-import {Widget} from "client-bus";
+import {Widget, Field} from "client-bus";
 
-@Widget({
-  fqelement: "Group",
-  template: `{{member.name}}`
-})
+import {MemberAtom} from "../shared/data";
+
+
+@Widget({fqelement: "Group", template: `{{member.name}}`})
 export class ShowMemberComponent {
-  member = { name: "", atom_id: "" };
+  @Field("Member") member: MemberAtom;
 }

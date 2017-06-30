@@ -59,10 +59,8 @@ app ChoreStar {
     on_signout: Widget = Landing
   }
 
-  l: Landing = {
-    // need to be able to put bindings in widgets
-    on_child_ok: ChildHome,
-    on_parent_ok: ParentHome
+  widget CreateGood {
+    good: Reward
   }
 
   parent_home_route: route = {path: "parent-home", widget: ParentHome}

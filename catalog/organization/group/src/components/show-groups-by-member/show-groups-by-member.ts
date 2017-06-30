@@ -1,24 +1,18 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus} from "client-bus";
+import {Widget, ClientBus, Field, AfterInit} from "client-bus";
 
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
 
+import {MemberAtom, Group, GroupAtom} from "../shared/data";
 
-export interface Group {
-  atom_id: string;
-  name: string;
-}
 
-@Widget({
-  fqelement: "Group",
-  ng2_providers: [GraphQlService]
-})
-export class ShowGroupsByMemberComponent {
-  member = {atom_id: "", name: "", on_change: _ => undefined};
+@Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
+export class ShowGroupsByMemberComponent implements AfterInit {
+  @Field("Member") member: MemberAtom;
   groups = [];
   private _fetched = undefined;
 
@@ -41,12 +35,14 @@ export class ShowGroupsByMemberComponent {
         .map(data => data.groupsByMember)
         .flatMap((groups, unused_ix) => Observable.from(groups))
         .map((group: Group) => {
-          const group_atom: Group = this._clientBus.new_atom("Group");
+          const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
           group_atom.atom_id = group.atom_id;
           group_atom.name = group.name;
           return group_atom;
         })
-        .subscribe(group => this.groups.push(group));
+        .subscribe(group => {
+          this.groups.push(group);
+        });
     };
     this.member.on_change(retrieveGroups);
     retrieveGroups();

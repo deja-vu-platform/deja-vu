@@ -1,12 +1,12 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, Atom} from "client-bus";
 
 
 
 @Widget({fqelement: "Task", ng2_providers: [GraphQlService]})
 export class CompleteTaskComponent {
-  task = {atom_id: undefined};
+  @Field("Task") task: Atom;
 
   constructor(
     private _graphQlService: GraphQlService) {}

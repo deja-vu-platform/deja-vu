@@ -1,5 +1,6 @@
 import {
-  Injectable, Inject, Component, Optional, OnChanges, SimpleChanges
+  Injectable, Inject, Input, Component, Optional, OnChanges, OnInit,
+  SimpleChanges
 } from "@angular/core";
 import {Location} from "@angular/common";
 import {
@@ -39,11 +40,28 @@ export type CompInfo = {
   fbonds: FieldBond[];
 }
 
-export class Atom {
-  private _forwards = {};
-  private _on_change_listeners: (() => Promise<Boolean>)[] = [];
-  private _on_after_change_listeners: (() => Promise<Boolean>)[] = [];
-  private _core;
+export type Handler = () => Promise<void> | void;
+export interface OnChange {
+  on_change: (handler: Handler) => void;
+  on_after_change: (handler: Handler) => void;
+}
+
+export interface Atom extends OnChange { atom_id: string; }
+
+export interface Time { hour: number; minute: number; second: number; }
+export interface Datetime extends Date, Time {}
+export interface WidgetValue {
+  name: string; this_widget_name: string; this_widget: any;
+}
+
+// T should be one of string, boolean, number, Date, Datetime, Time, WidgetValue
+export interface PrimitiveAtom<T> extends OnChange { value: T; }
+
+class AdaptableAtom {
+  private readonly _forwards = {};
+  private readonly _on_change_listeners: Handler[] = [];
+  private readonly _on_after_change_listeners: Handler[] = [];
+  private readonly _core;
 
   constructor(private _comp_info: CompInfo) {
     this._core = this;
@@ -77,11 +95,11 @@ export class Atom {
     });
   }
 
-  on_change(handler: () => Promise<Boolean>) {
+  on_change(handler: Handler): void {
     this._on_change_listeners.push(handler);
   }
 
-  on_after_change(handler: () => Promise<Boolean>) {
+  on_after_change(handler: Handler): void {
     this._on_after_change_listeners.push(handler);
   }
 
@@ -111,13 +129,9 @@ function t_equals(t1: Type, t2: Type) {
 }
 
 
-export function field(name: string, t: string) {
-  return {name: name, t: t};
-}
+export type PrimitiveType = "string" | "boolean" | "number" |
+  "date" | "datetime" | "time" | "Widget";
 
-export type WidgetNavigation = {
-  name: string; this_widget_name: string; this_widget: any
-};
 
 @Injectable()
 export class ClientBus {
@@ -130,12 +144,15 @@ export class ClientBus {
       @Inject("app") private _app: string,
       @Optional() private _router: Router) {}
 
-  new_atom(t: string): any {
-    return new Atom(this._comp_info)
-      .adapt({name: t, fqelement: this._fqelement});
+  new_atom<T extends Atom>(t: string): T {
+    return this._create_atom(t);
   }
 
-  navigate(to_widget_info: WidgetNavigation): Promise<boolean> {
+  new_primitive_atom<T>(t: PrimitiveType): PrimitiveAtom<T> {
+    return this._create_atom(t);
+  }
+
+  navigate(to_widget_info: WidgetValue): Promise<boolean> {
     const from_widget = {
       name: to_widget_info.this_widget_name,
       fqelement: this._app
@@ -168,16 +185,9 @@ export class ClientBus {
       });
   }
 
-  // This method is only necessary for those widgets that are loaded from a
-  // route. Since they are loaded via ng2's component system, the dv fields
-  // are not initialized automatically and it thus needs to be done explicitly.
-  // Note also that when a widget is loaded from a route, the dvAfterInit method
-  // won't get called so all initialization needs to happen in the constructor
-  // todo: ditch ng2's routing system and do it ourselves
-  init(w, fields) {
-    for (const f of fields) {
-      w[f.name] = this.new_atom(f.t);
-    }
+  private _create_atom(t: string) {
+    return new AdaptableAtom(this._comp_info)
+      .adapt({name: t, fqelement: this._fqelement});
   }
 }
 
@@ -225,8 +235,8 @@ export type FieldReplacingMap = {
 
 
 @Component({template: `<dv-widget [name]="name" [init]="init"></dv-widget>`})
-export class RouteLoader {
-  BASIC_TYPES = ["Text", "Boolean", "Date", "Datetime", "Number"];
+export class RouteLoader implements OnInit {
+  PRIMITIVE_TYPES = ["text", "boolean", "date", "datetime", "number"];
   name: string; init: any;
 
   constructor(
@@ -250,10 +260,12 @@ export class RouteLoader {
     this._activated_route.queryParams.subscribe(query_params => {
       this.init = _u.mapObject(query_params, (value, field) => {
         let [fvalue, ftype] = value.split(",");
-        const ret = this._client_bus.new_atom(ftype);
-        if (this.BASIC_TYPES.indexOf(ftype) > -1) {
+        let ret;
+        if (this.PRIMITIVE_TYPES.indexOf(ftype) > -1) {
+          ret = this._client_bus.new_primitive_atom(ftype);
           ret.value = fvalue;
         } else {
+          ret = this._client_bus.new_atom(ftype);
           ret.atom_id = fvalue;
         }
         return ret;
@@ -262,18 +274,14 @@ export class RouteLoader {
   }
 }
 
-@Component({
-  selector: "dv-widget",
-  template:  "<div #widget></div>",
-  inputs: ["of", "name", "init"]
-})
+@Component({selector: "dv-widget", template: "<div #widget></div>"})
 export class WidgetLoader implements OnChanges {
   @ViewChild("widget", {read: ViewContainerRef})
   widgetContainer: ViewContainerRef;
 
-  of: string;
-  name: string;
-  init: any; // optional values to initialize the widget fields
+  @Input() name: string;
+  @Input() of: string;
+  @Input() init: any; // optional values to initialize the widget fields
 
   constructor(
       private _resolver: ComponentFactoryResolver,
@@ -399,31 +407,43 @@ export class WidgetLoader implements OnChanges {
         return component._component;
       })
       .then(c => {
+        if (c._dv_fields !== undefined) {
+          for (const f of c._dv_fields) {
+            if (c[f.name] !== undefined) {
+              throw new Error("To be implemented");
+            }
+
+            const comp_info = this.widgetContainer.injector.get("CompInfo");
+            c[f.name] = new AdaptableAtom(comp_info)
+              .adapt({name: f.tname, fqelement: fqelement});
+          }
+        }
+        return c;
+      })
+      .then(c => {
         _u.each(_u.keys(c), f => {
           const adapt_info = adapt_table[f];
           if (adapt_info !== undefined) {
+            const host_fname = adapt_info.host_fname;
+
             // https://github.com/angular/angular/issues/10448
             // https://stackoverflow.com/questions/40025761
             const parent_view = (<any> this._vc_ref)._element.parentView;
-            let parent_component = parent_view.context;
-            if (_u.isEmpty(parent_component)) {
-              // it's a ng2 directive (e.g., *ngIf)
-              parent_component = parent_view.parentView.context;
-            }
-            const host_fname = adapt_info.host_fname;
-            if (parent_component[host_fname] !== undefined) {
-              c[f] = parent_component[host_fname].adapt(adapt_info.ftype);
+
+            let parent_widget = parent_view.context;
+            if (parent_widget.constructor.name === "NgForRow") {
+              parent_widget = parent_view.parentView.parentView.context;
+            } else if (_u.isEmpty(parent_widget)) { // ngIf
+              parent_widget = parent_view.parentView.context;
             }
 
-            // todo: this is not necessarily an error unless we enforce that
-            // all widgets need to initialize the fields they defined
-            if (parent_component[host_fname] === undefined &&
-                (init_fields === undefined || init_fields[f] === undefined)) {
+            if (parent_widget[host_fname] !== undefined) {
+              c[f] = parent_widget[host_fname].adapt(adapt_info.ftype);
+            } else {
               throw new Error(
                 `Expected field ${host_fname} is undefined in ` +
-                `${this._host_wname} of ${this._host_fqelement} and an ` +
-                `initialization value has not been provided for it. Field is ` +
-                `needed to initialize ${f} in ${name} of ${fqelement}`);
+                `${this._host_wname} of ${this._host_fqelement}. All Deja Vu ` +
+                `fields need to be marked with @Field()`);
             }
           }
         });
@@ -488,18 +508,27 @@ function build_adapt_table(
 }
 
 
+/**
+ * Lifecycle hook that is called after all Deja Vu fields are initialized
+ **/
+export interface AfterInit { dvAfterInit: () => void; }
 
-export interface WidgetMetadata {
+
+export type WidgetMetadata = {
   fqelement: string;
-  ng2_directives?: any[];
-  ng2_providers?: any[];
   template?: string;
   styles?: string[];
   external_styles?: string[];
+
+  ng2_directives?: any[];
+  ng2_providers?: any[];
 }
 
+/**
+ * Marks a class as a Deja Vu widget and collects configuration metadata
+ **/
 export function Widget(options: WidgetMetadata) {
-  return (target: Function): any => {
+  return (target: Function) => {
     const dname = _ustring.dasherize(target.name).slice(1, -10);
     const metadata = {selector: dname};
 
@@ -547,5 +576,18 @@ export function Widget(options: WidgetMetadata) {
     }
 
     return Component(metadata)(target);
+  };
+}
+
+/**
+ * Marks an instance member of a class as a Deja Vu field
+ *
+ * After the widget loads, Deja Vu will initialize the field with a valid
+ * Atom of the given type
+ **/
+export function Field(tname: string) {
+  return (target, fname: string) => {
+    if (target._dv_fields === undefined) target._dv_fields = [];
+    target._dv_fields.push({name: fname, tname: tname});
   };
 }

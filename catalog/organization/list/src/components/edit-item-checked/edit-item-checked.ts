@@ -1,13 +1,12 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field} from "client-bus";
+import {ItemAtom} from "../shared/data";
 
-@Widget({
-  fqelement: "List",
-  ng2_providers: [GraphQlService]
-})
+
+@Widget({fqelement: "List", ng2_providers: [GraphQlService]})
 export class EditItemCheckedComponent {
-  item = {atom_id: "", name: "", checked: false};
+  @Field("Item") item: ItemAtom;
 
   constructor(private _graphQlService: GraphQlService) {}
 
