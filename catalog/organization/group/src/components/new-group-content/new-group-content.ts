@@ -1,6 +1,6 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus} from "client-bus";
+import {Widget} from "client-bus";
 
 
 @Widget({
@@ -12,8 +12,7 @@ export class NewGroupContentComponent {
   initialMember = {atom_id: "", name: ""};
   submit_ok = {value: false, on_after_change: _ => undefined};
 
-  constructor(
-    private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {

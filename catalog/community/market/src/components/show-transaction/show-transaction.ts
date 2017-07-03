@@ -1,6 +1,8 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus} from "client-bus";
+import {Widget, Field} from "client-bus";
+
+import {TransactionAtom} from "../../shared/data";
 
 import "rxjs/add/operator/map";
 
@@ -11,18 +13,10 @@ import "rxjs/add/operator/map";
   ng2_providers: [GraphQlService]
 })
 export class ShowTransactionComponent {
-  transaction = {
-  atom_id: "",
-    good: {
-      name: ""
-    },
-    price: 0,
-    quantity: 0
-  };
+  @Field("Transaction") transaction: TransactionAtom;
 
   constructor(
-    private _graphQlService: GraphQlService,
-    private _clientBus: ClientBus
+    private _graphQlService: GraphQlService
   ) {}
 
   dvAfterInit() {

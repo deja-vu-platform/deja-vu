@@ -5,5 +5,4 @@ import {Widget, Field, PrimitiveAtom} from "client-bus";
 })
 export class BuyGoodQuantityComponent {
   @Field("number") quantity: PrimitiveAtom<number>;
-  //constructor() {}
 }

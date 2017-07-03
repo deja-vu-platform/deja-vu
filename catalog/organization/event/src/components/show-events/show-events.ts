@@ -46,12 +46,4 @@ export class ShowEventsComponent {
           .extendOwn(this._clientBus.new_atom<EventAtom>("Event"), event))
       .subscribe(event => this.events.push(event));
   }
-
-  ngAfterViewInit() {
-    const s = document.createElement("script");
-    s.type = "text/javascript";
-    s.src = `https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/` +
-      `1.12.1/js/bootstrap-select.min.js`;
-    this._elementRef.nativeElement.appendChild(s);
-  }
 }

@@ -1,6 +1,6 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus, Field} from "client-bus";
+import {Widget, Field} from "client-bus";
 
 import {GoodAtom} from "../../shared/data";
 
@@ -15,8 +15,7 @@ export class ShowGoodComponent {
   @Field("Good") good: GoodAtom;
 
   constructor(
-    private _graphQlService: GraphQlService,
-    private _clientBus: ClientBus
+    private _graphQlService: GraphQlService
   ) {}
 
   dvAfterInit() {

@@ -58,21 +58,4 @@ export class NewEventButtonComponent {
       this.endTimeText["value"]
     );
   }
-
-  _loadScript(src: string) {
-    const s = document.createElement("script");
-    s.type = "text/javascript";
-    s.src = "node_modules/dv-organization-event/lib/components/" +
-      "new-event/vendor/" + src;
-    this._elementRef.nativeElement.appendChild(s);
-  }
-
-  _loadStyle(href: string) {
-    const s = document.createElement("link");
-    s.type = "text/css";
-    s.rel = "stylesheet";
-    s.href = "node_modules/dv-organization-event/lib/components/" +
-      "new-event/vendor/" + href;
-    this._elementRef.nativeElement.appendChild(s);
-  }
 }

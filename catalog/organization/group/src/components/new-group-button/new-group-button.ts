@@ -1,6 +1,6 @@
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus, Field, PrimitiveAtom} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 
 import {MemberAtom, GroupAtom} from "../../shared/data";
 
@@ -14,8 +14,7 @@ export class NewGroupButtonComponent {
   @Field("Member") initialMember: MemberAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  constructor(
-    private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   submit() {
     let addMember = () => {

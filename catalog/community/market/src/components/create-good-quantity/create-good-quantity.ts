@@ -6,5 +6,4 @@ import {GoodAtom} from "../../shared/data";
 })
 export class CreateGoodQuantityComponent {
   @Field("Good") good: GoodAtom;
-  //constructor() {}
 }

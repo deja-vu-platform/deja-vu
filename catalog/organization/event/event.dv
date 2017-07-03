@@ -23,13 +23,15 @@ cliche Event {
     submit_ok: boolean
   }
 
+  widget NewEvent uses NewEventButton, NewEventContent {
+    event: Event
+  }
+
   data Description {}
 
   data Guest {
     name: text
   }
-
-  widget NewEvent {}
 
   widget NewWeeklyEvent {}
 

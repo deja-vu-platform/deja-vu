@@ -5,5 +5,4 @@ import {Widget, Field, PrimitiveAtom} from "client-bus";
 })
 export class BuyGoodFractionComponent {
   @Field("number") fraction: PrimitiveAtom<number>;
-  //constructor() {}
 }
