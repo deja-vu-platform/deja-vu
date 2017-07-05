@@ -15,11 +15,7 @@ import {EventAtom} from "../../shared/data";
 
 @Widget({
   fqelement: "Event",
-  ng2_providers: [GraphQlService],
-  external_styles: [
-    `https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.1/css/` +
-    `bootstrap-select.min.css`
-  ]
+  ng2_providers: [GraphQlService]
 })
 export class ShowEventsComponent {
   events: EventAtom[] = [];

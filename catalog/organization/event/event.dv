@@ -24,7 +24,8 @@ cliche Event {
   }
 
   widget NewEvent uses NewEventButton, NewEventContent {
-    event: Event
+    event: Event,
+    submit_ok: boolean
   }
 
   data Description {}

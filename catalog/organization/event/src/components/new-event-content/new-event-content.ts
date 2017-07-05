@@ -65,7 +65,7 @@ export class NewEventContentComponent {
     const s = document.createElement("script");
     s.type = "text/javascript";
     s.src = "node_modules/dv-organization-event/lib/components/" +
-      "new-event/vendor/" + src;
+      "new-event-content/vendor/" + src;
     this._elementRef.nativeElement.appendChild(s);
   }
 
@@ -74,7 +74,7 @@ export class NewEventContentComponent {
     s.type = "text/css";
     s.rel = "stylesheet";
     s.href = "node_modules/dv-organization-event/lib/components/" +
-      "new-event/vendor/" + href;
+      "new-event-content/vendor/" + href;
     this._elementRef.nativeElement.appendChild(s);
   }
 

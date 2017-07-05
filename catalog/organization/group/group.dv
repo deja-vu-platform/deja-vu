@@ -43,12 +43,10 @@ cliche Group {
     }
 
     // Create a new group
-    widget NewGroup {}
-
-    // Create a new group with some initial member
-    widget NewGroupWithInitialMember {
+    widget NewGroup uses NewGroupContent, NewGroupButton {
         initialMember: Member,
-        onGroupCreate: Widget
+        group: Group,
+        submit_ok: boolean
     }
 
     widget NewGroupContent {
@@ -58,6 +56,7 @@ cliche Group {
     }
 
     widget NewGroupButton {
+        initialMember: Member,
         group: Group,
         submit_ok: boolean
     }

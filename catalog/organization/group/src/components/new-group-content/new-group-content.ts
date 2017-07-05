@@ -1,6 +1,8 @@
 import {GraphQlService} from "gql";
 
-import {Widget} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
+
+import {MemberAtom, GroupAtom} from "../../shared/data";
 
 
 @Widget({
@@ -8,9 +10,9 @@ import {Widget} from "client-bus";
   ng2_providers: [GraphQlService]
 })
 export class NewGroupContentComponent {
-  group = {atom_id: "", name: ""};
-  initialMember = {atom_id: "", name: ""};
-  submit_ok = {value: false, on_after_change: _ => undefined};
+  @Field("Group") group : GroupAtom;
+  @Field("Member") initialMember: MemberAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(private _graphQlService: GraphQlService) {}
 
