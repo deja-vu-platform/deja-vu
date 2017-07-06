@@ -29,7 +29,7 @@ export class ShowGoodComponent {
           name,
         }
       `)
-      .map(data => data.group_by_id)
+      .map(data => data.good_by_id)
       .subscribe(good_by_id => {
         this.good.name = good_by_id.name;
       });
