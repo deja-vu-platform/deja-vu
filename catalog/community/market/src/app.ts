@@ -50,7 +50,7 @@ const schema = grafo
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
-      quantity: {"type": graphql.GraphQLInt},
+      supply: {"type": graphql.GraphQLInt},
       price: {"type": graphql.GraphQLFloat},
       seller: {"type": "Party"},
       market: {"type": "Market"}
@@ -80,18 +80,18 @@ const schema = grafo
     args: {
       name: {"type": graphql.GraphQLString},
       price: {"type": graphql.GraphQLFloat},
-      quantity: {"type": graphql.GraphQLInt},
+      supply: {"type": graphql.GraphQLInt},
       seller_id: {"type": graphql.GraphQLString},
       market_id: {"type": graphql.GraphQLString}
     },
     resolve: (_,
-      {name, price, quantity, seller_id, market_id}
+      {name, price, supply, seller_id, market_id}
     ) => {
       const good = {
         atom_id: uuid.v4(),
         name: name,
         price: price,
-        quantity: quantity,
+        supply: supply,
         seller: {atom_id: seller_id},
         market: {atom_id: market_id}
       };
@@ -136,7 +136,7 @@ const schema = grafo
               const seller_id = good.seller.atom_id;
               const u1 = {$inc: {balance: -transaction_price}};
               const u2 = {$inc: {balance: transaction_price}};
-              const u3 = {$inc: {quantity: -quantity}};
+              const u3 = {$inc: {supply: -quantity}};
               return Promise.all([
                 bus.update_atom("Transaction", transaction.atom_id,
                   transaction),
