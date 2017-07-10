@@ -34,7 +34,7 @@ cliche Market {
     good: Good,
     buyer: Party,
     quantity: number,
-    fraction: number
+    fraction: number // fraction of offer price
   }
 
   widget BuyGoodQuantity {
@@ -42,7 +42,7 @@ cliche Market {
   }
 
   widget BuyGoodFraction {
-    fraction: number
+    fraction: number // fraction of offer price
   }
 
   widget CreateGoodButton {

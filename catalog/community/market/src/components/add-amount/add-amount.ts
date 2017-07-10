@@ -22,7 +22,6 @@ export class AddAmountComponent {
       `)
       .subscribe(_ => {
         this.amount = 0;
-      })
-    ;
+      });
   }
 }

@@ -15,9 +15,7 @@ import "rxjs/add/operator/map";
 export class ShowTransactionComponent {
   @Field("Transaction") transaction: TransactionAtom;
 
-  constructor(
-    private _graphQlService: GraphQlService
-  ) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   dvAfterInit() {
     if (!this.transaction.atom_id || this.transaction.good.name) {
