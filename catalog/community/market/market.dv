@@ -11,7 +11,7 @@ cliche Market {
     name: text,
     price: number,
     seller: Party,
-    quantity: number,
+    supply: number,
     market: Market
   }
 
@@ -59,7 +59,7 @@ cliche Market {
     good: Good
   }
 
-  widget CreateGoodQuantity {
+  widget CreateGoodSupply {
     good: Good
   }
 

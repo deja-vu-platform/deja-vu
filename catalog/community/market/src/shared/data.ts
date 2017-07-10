@@ -14,7 +14,7 @@ export interface Good {
   name: string;
   seller: PartyAtom;
   price: number;
-  quantity: number;
+  supply: number;
   market: MarketAtom;
 }
 

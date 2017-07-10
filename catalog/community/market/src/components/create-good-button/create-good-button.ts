@@ -18,9 +18,9 @@ export class CreateGoodButtonComponent {
       return;
     }
 
-    // default values for quantity and price
-    if (!this.good.quantity && this.good.quantity !== 0) {
-      this.good.quantity = 1;
+    // default values for supply and price
+    if (!this.good.supply && this.good.supply !== 0) {
+      this.good.supply = 1;
     }
     if (!this.good.price && this.good.price !== 0) {
       this.good.price = 0;
@@ -31,7 +31,7 @@ export class CreateGoodButtonComponent {
         CreateGood(
           name: "${this.good.name}",
           price: ${this.good.price},
-          quantity: ${this.good.quantity},
+          supply: ${this.good.supply},
           seller_id: "${this.seller.atom_id}",
           market_id: "${this.market.atom_id}"
           ) {
@@ -42,7 +42,7 @@ export class CreateGoodButtonComponent {
         this.good.atom_id = "";
         this.good.name = "";
         this.good.price = undefined;
-        this.good.quantity = undefined;
+        this.good.supply = undefined;
       })
     ;
   }

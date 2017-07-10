@@ -4,6 +4,6 @@ import {GoodAtom} from "../../shared/data";
 @Widget({
   fqelement: "Market"
 })
-export class CreateGoodQuantityComponent {
+export class CreateGoodSupplyComponent {
   @Field("Good") good: GoodAtom;
 }

@@ -38,7 +38,7 @@ export class ShowMyGoodsForSaleComponent {
           seller {
             atom_id
           },
-          quantity
+          supply
         }
       `)
       .map(data => data.GoodsFromSeller)
@@ -49,7 +49,7 @@ export class ShowMyGoodsForSaleComponent {
         good_atom.atom_id = good.atom_id;
         good_atom.name = good.name;
         good_atom.price = good.price;
-        good_atom.quantity = good.quantity;
+        good_atom.supply = good.supply;
         seller_atom.atom_id = good.seller.atom_id;
         good_atom.seller = seller_atom;
         return good_atom;
