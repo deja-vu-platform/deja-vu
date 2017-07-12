@@ -431,7 +431,7 @@ export class WidgetLoader implements OnChanges {
             let parent_view = (<any> this._vc_ref)._element.parentView;
 
             const skips = ["NgForRow", "Object"]; // ngIf shows up as "Object"
-            while(skips.indexOf(parent_view.context.constructor.name) >= 0) {
+            while (skips.indexOf(parent_view.context.constructor.name) >= 0) {
               parent_view = parent_view.parentView;
             }
             const parent_widget = parent_view.context;
