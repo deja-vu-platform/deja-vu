@@ -1,0 +1,84 @@
+app Potluck {
+  include access/Auth[User for User]
+  include organization/Event[
+    Party for Event
+  ]
+
+  include organization/Group[
+    User for Member,
+    Party for Group,
+    ShowParty replacing ShowGroupName in ShowGroupsByMember
+  ]
+
+  include community/Market[
+    User for Party,
+    Party for Market,
+    Supply for Good,
+    Supply for Transaction,
+    ShowSupplyRequest replacing ShowGood in ShowAllGoods,
+    ShowSupplyBring replacing ShowTransaction in ShowAllTransactions
+  ]
+
+  data User {
+    username: text
+  }
+
+  data Party {
+  }
+
+  data Supply {
+    name: text,
+    quantity: number,
+    buyer: User,
+    good: Supply
+  }
+
+  widget NewParty {
+    party: Party,
+    user: User,
+    submit_ok: boolean
+  }
+
+  widget Parties {
+    user: User
+  }
+
+  widget ShowParty {
+    party: Party,
+    user: User
+  }
+
+  widget ShowSupplies {
+    party: Party,
+    user: User
+  }
+
+  widget RequestSupply {
+    party: Party,
+    user: User,
+    good: Supply
+  }
+
+  widget ShowSupplyRequest {
+    good: Supply,
+    user: User,
+    quantity: number
+  }
+
+  widget ShowSupplyBring {
+    transaction: Supply
+  }
+
+  widget NavBar {
+    user: User
+    // on_signout: Widget = Landing
+  }
+
+  // The landing page gives the user the option to sign in or register
+  main widget Landing {
+    on_user_ok: Widget = Parties
+  }
+
+  parties_route: route = {path: "parties", widget: Parties}
+  new_party_route: route = {path: "new-party", widget: NewParty}
+}

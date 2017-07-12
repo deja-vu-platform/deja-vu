@@ -10,8 +10,18 @@ cliche Group {
         members: [Member]
     }
 
+    // Displays the name and members of a group
+    widget ShowGroup uses ShowGroupName, ShowGroupMembers {
+        group: Group
+    }
+
+    // Displays the name of a group
+    widget ShowGroupName {
+        group: Group
+    }
+
     // Displays the members of a group
-    widget ShowGroup uses ShowMember {
+    widget ShowGroupMembers uses ShowMember {
         group: Group
     }
 
@@ -21,11 +31,6 @@ cliche Group {
         on_redirect: Widget
     }
 
-    // Displays an overview of a group, like a light version of ShowGroup
-    widget ShowGroupOverview {
-        group: Group
-    }
-
     // Displays a member of a group
     widget ShowMember {
         member: Member
@@ -33,17 +38,27 @@ cliche Group {
 
     // Shows which groups a Member belongs to, to illustrate
     // a many-to-many relationship
-    widget ShowGroupsByMember uses ShowGroupOverview {
+    widget ShowGroupsByMember uses ShowGroupName {
         member: Member
     }
 
     // Create a new group
-    widget NewGroup {}
-
-    // Create a new group with some initial member
-    widget NewGroupWithInitialMember {
+    widget NewGroup uses NewGroupContent, NewGroupButton {
         initialMember: Member,
-        onGroupCreate: Widget
+        group: Group,
+        submit_ok: boolean
+    }
+
+    widget NewGroupContent {
+        initialMember: Member,
+        group: Group,
+        submit_ok: boolean
+    }
+
+    widget NewGroupButton {
+        initialMember: Member,
+        group: Group,
+        submit_ok: boolean
     }
 
     // Add an existing member by ID

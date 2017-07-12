@@ -1,6 +1,6 @@
 import {Widget, Field} from "client-bus";
 
-import {MemberAtom} from "../shared/data";
+import {MemberAtom} from "../../shared/data";
 
 
 @Widget({fqelement: "Group", template: `{{member.name}}`})

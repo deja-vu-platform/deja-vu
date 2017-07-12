@@ -9,7 +9,7 @@ import {GraphQlService} from "gql";
 
 import {Widget, ClientBus, Field, AfterInit} from "client-bus";
 
-import {WeeklyEvent, WeeklyEventAtom, Event} from "../shared/data";
+import {WeeklyEvent, WeeklyEventAtom, Event} from "../../shared/data";
 
 import * as _u from "underscore";
 

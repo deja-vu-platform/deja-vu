@@ -1,9 +1,2 @@
-<h1 class="member-list-heading">{{group.name}}</h1>
-<ul *ngIf="group.members && group.members.length > 0" class="list-group member-list">
-  <li *ngFor="let member of group.members" class="list-group-item member-list-item">
-    <dv-widget name="ShowMember" [init]="{member: member}"></dv-widget>
-  </li>
-</ul>
-<div *ngIf="!group.members || group.members.length === 0">
-  No members in this group
-</div>
+<dv-widget name="ShowGroupName" [init]="{group: group}"></dv-widget>
+<dv-widget name="ShowGroupMembers" [init]="{group: group}"></dv-widget>

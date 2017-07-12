@@ -5,7 +5,7 @@ app Accord {
   include organization/Group[
     User for Member,
     SongGroup for Group,
-    LinkToGroup replacing ShowGroupOverview in ShowGroupsByMember
+    LinkToGroup replacing ShowGroupName in ShowGroupsByMember
   ]
 
   include organization/List[
@@ -75,8 +75,7 @@ app Accord {
 
   // Create a new group
   widget CreateGroup {
-    initialMember: User,
-    onGroupCreate: Widget = Groups
+    initialMember: User
   }
 
   // Add a member to the group

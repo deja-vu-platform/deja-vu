@@ -3,7 +3,10 @@ import {GraphQlService} from "gql";
 import {Widget, Field} from "client-bus";
 
 
-@Widget({fqelement: "Market", ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "Market",
+  ng2_providers: [GraphQlService]
+})
 export class AddAmountComponent {
   @Field("Party") party;
   amount: number;

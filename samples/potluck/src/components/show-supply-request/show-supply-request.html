@@ -1,0 +1,21 @@
+<!-- needed to get the buyer since ShowAllGoods doesn't take one -->
+<div style="display:none">
+  <dv-widget name="LoggedIn" of="Auth"></dv-widget>
+</div>
+
+<div class="col-xs-4" *ngIf="good.quantity">
+  {{good.name}}
+</div>
+<div class="col-xs-2" *ngIf="good.quantity">
+  {{good.quantity}}
+</div>
+<div class="col-xs-6" *ngIf="good.quantity">
+  <div class="row">
+    <div class="col-xs-12 col-sm-5 col-md-12 col-lg-5">
+    	<dv-widget name="BuyGoodButton" of="Market" ></dv-widget>
+    </div>
+    <div class="col-xs-12 col-sm-7 col-md-12 col-lg-7">
+      <dv-widget name="BuyGoodQuantity" of="Market"></dv-widget>
+    </div>
+  </div>
+</div>
