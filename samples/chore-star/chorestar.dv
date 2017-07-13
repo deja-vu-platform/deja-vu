@@ -3,7 +3,7 @@ app ChoreStar {
   include access/Auth[Child for User] as ChildAuth
   include community/Task[
     Chore for Task, Parent for Assigner, Child for Assignee,
-    ApproveAndRateTask replacing ApproveTask in ShowPendingApprovalTasks]
+    ApproveAndRateChore replacing ApproveTask in ShowPendingApprovalTasks]
   include community/Market[
     Chore for Good, Reward for Good, Parent for Party, Child for Party,
     Parent for Market]
@@ -15,52 +15,38 @@ app ChoreStar {
   data Reward {}
 
 
-  // SignInWithRedirect,
-  // RegisterWithRedirect of ParentAuth,
-  // SignInWithRedirect of ChildAuth
+  // Displays forms for parents to register or log in and for children to log in
   main widget Landing {
     on_parent_ok: Widget = ParentHome,
     on_child_ok: Widget = ChildHome
   }
 
-
-  // LoggedIn of ParentAuth,
-  // CreateTask of Task,
-  // CreateGood of Market,
-  // Register of ChildAuth,
-  // ShowPendingApprovalTasks of Task,
-  // ShowAssignedTasks of Task,
-  // ShowMyGoods of Market
+  // Lets parents add chores, rewards, and children. It also shows assigned
+  // chores, chores to approve, and offered rewards
   widget ParentHome {
     parent: Parent,
     on_signout: Widget = Landing
   }
 
-
-  // ApproveTask of Task
-  // RateTarget of Rating
-  // BuyGoodAtFractionOfPrice of Market
-  widget ApproveAndRateTask {
+  widget ApproveAndRateChore {
     parent: Parent,
     chore: Chore,
     do_buy_on_approve: boolean,
     fractional_rating: number
   }
 
-
-  // LoggedIn of ChildAuth
-  // ShowBalance of Market
-  // ShowUncompletedTasks of Task
-  // ShowUnapprovedTasks of Task
-  // ShowApprovedTasks of Task
-  // ShowGoodsToBuy of Market
+  // Children can see their star balance, mark chores as completed, and
+  // buy rewards
   widget ChildHome {
     child: Child,
     on_signout: Widget = Landing
   }
 
-  widget CreateGood {
-    good: Reward
+  widget CreateReward {
+    reward: Reward,
+    // need to be able to override wfbonds for this to work correctly because
+    // parent is both the market and seller
+    parent: Parent
   }
 
   parent_home_route: route = {path: "parent-home", widget: ParentHome}
