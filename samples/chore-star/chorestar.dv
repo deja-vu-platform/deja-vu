@@ -3,7 +3,7 @@ app ChoreStar {
   include access/Auth[Child for User] as ChildAuth
   include community/Task[
     Chore for Task, Parent for Assigner, Child for Assignee,
-    ApproveAndRateTask replacing ApproveTask in ShowPendingApprovalTasks]
+    ApproveAndRateChore replacing ApproveTask in ShowPendingApprovalTasks]
   include community/Market[
     Chore for Good, Reward for Good, Parent for Party, Child for Party,
     Parent for Market]
@@ -28,7 +28,7 @@ app ChoreStar {
     on_signout: Widget = Landing
   }
 
-  widget ApproveAndRateTask {
+  widget ApproveAndRateChore {
     parent: Parent,
     chore: Chore,
     do_buy_on_approve: boolean,
@@ -42,8 +42,11 @@ app ChoreStar {
     on_signout: Widget = Landing
   }
 
-  widget CreateGood {
-    good: Reward
+  widget CreateReward {
+    reward: Reward,
+    // need to be able to override wfbonds for this to work correctly because
+    // parent is both the market and seller
+    parent: Parent
   }
 
   parent_home_route: route = {path: "parent-home", widget: ParentHome}
