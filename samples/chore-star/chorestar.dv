@@ -15,31 +15,19 @@ app ChoreStar {
   data Reward {}
 
 
-  // SignInWithRedirect,
-  // RegisterWithRedirect of ParentAuth,
-  // SignInWithRedirect of ChildAuth
+  // Displays forms for parents to register or log in and for children to log in
   main widget Landing {
     on_parent_ok: Widget = ParentHome,
     on_child_ok: Widget = ChildHome
   }
 
-
-  // LoggedIn of ParentAuth,
-  // CreateTask of Task,
-  // CreateGood of Market,
-  // Register of ChildAuth,
-  // ShowPendingApprovalTasks of Task,
-  // ShowAssignedTasks of Task,
-  // ShowMyGoods of Market
+  // Lets parents add chores, rewards, and children. It also shows assigned
+  // chores, chores to approve, and offered rewards
   widget ParentHome {
     parent: Parent,
     on_signout: Widget = Landing
   }
 
-
-  // ApproveTask of Task
-  // RateTarget of Rating
-  // BuyGoodAtFractionOfPrice of Market
   widget ApproveAndRateTask {
     parent: Parent,
     chore: Chore,
@@ -47,13 +35,8 @@ app ChoreStar {
     fractional_rating: number
   }
 
-
-  // LoggedIn of ChildAuth
-  // ShowBalance of Market
-  // ShowUncompletedTasks of Task
-  // ShowUnapprovedTasks of Task
-  // ShowApprovedTasks of Task
-  // ShowGoodsToBuy of Market
+  // Children can see their star balance, mark chores as completed, and
+  // buy rewards
   widget ChildHome {
     child: Child,
     on_signout: Widget = Landing
