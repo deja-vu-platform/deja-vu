@@ -590,6 +590,7 @@ export namespace GruntTask {
             },
             { // the global sytle
               expand: true,
+              cwd: "src/components",
               src: ["style.css"],
               dest: "dist/public/dv-dev"
             }
