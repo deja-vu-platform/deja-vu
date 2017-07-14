@@ -1,0 +1,36 @@
+<!--
+Necessary since ShowParty replaces ShowGroupOverview.
+ShowParty needs a user field.
+ShowGroupOverview does not have one.
+Deja Vu should be updated to not require this at some point.
+-->
+<div style="display:none">
+  <dv-widget name="LoggedIn" of="Auth"></dv-widget>
+</div>
+
+<div class="party">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <h3 class="party-title">
+        <dv-widget name="ShowGroupName" of="Group"></dv-widget>
+      </h3>
+      <div class="col-md-12" style="text-align:center">
+        <dv-widget name="ShowEvent" of="Event"></dv-widget>
+        <div style="height:20px"></div>
+      </div>
+      <div class="col-md-4">
+        <h4>Invited List</h4>
+        <dv-widget name="ShowGroupMembers" of="Group"></dv-widget>
+        <h4>Invite a User</h4>
+        <dv-widget name="AddExistingMember" of="Group"></dv-widget>
+      </div>
+      <div class="col-md-1"></div>
+      <div class="col-md-7">
+        <h4>What's Needed</h4>
+        <dv-widget name="ShowSupplies"></dv-widget>
+        <h4>Request Supplies</h4>
+        <dv-widget name="RequestSupply"></dv-widget>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,7 +2,7 @@ import {GraphQlService} from "gql";
 
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 
-import {MemberAtom, GroupAtom} from "../shared/data";
+import {MemberAtom, GroupAtom} from "../../shared/data";
 
 
 @Widget({fqelement: "Group", ng2_providers: [GraphQlService]})

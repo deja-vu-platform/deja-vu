@@ -13,6 +13,21 @@ cliche Event {
     guests: Guest
   }
 
+  widget NewEventButton {
+    event: Event,
+    submit_ok: boolean
+  }
+
+  widget NewEventContent {
+    event: Event,
+    submit_ok: boolean
+  }
+
+  widget NewEvent uses NewEventButton, NewEventContent {
+    event: Event,
+    submit_ok: boolean
+  }
+
   data Description {}
 
   data Guest {
@@ -26,6 +41,8 @@ cliche Event {
     event: Event,
     selected_weekly_event: WeeklyEvent
   }
+
+  widget ShowEvents uses ShowEvent {}
 
   // Lets the user choose a weekly event from a dropdown and displays the
   // selected weekly event by showing a list of all the events using

@@ -18,6 +18,14 @@ const handlers = {
   good: {
     create: Helpers.resolve_create(mean.db, "good"),
     update: Helpers.resolve_update(mean.db, "good")
+  },
+  market: {
+    create: Helpers.resolve_create(mean.db, "market"),
+    update: Helpers.resolve_update(mean.db, "market")
+  },
+  transaction: {
+    create: Helpers.resolve_create(mean.db, "transaction"),
+    update: Helpers.resolve_update(mean.db, "transaction")
   }
 };
 
@@ -42,26 +50,50 @@ const schema = grafo
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
-      offer_price: {"type": graphql.GraphQLFloat},
-      transaction_price: {"type": graphql.GraphQLFloat},
+      supply: {"type": graphql.GraphQLInt},
+      price: {"type": graphql.GraphQLFloat},
       seller: {"type": "Party"},
-      buyer: {"type": "Party"}
+      market: {"type": "Market"}
     }
   })
- .add_mutation({
+  .add_type({
+    name: "Market",
+    fields: {
+      atom_id: {"type": graphql.GraphQLString}
+    }
+  })
+  .add_type({
+    name: "Transaction",
+    fields: {
+      atom_id: {"type": graphql.GraphQLString},
+      good: {"type": "Good"},
+      seller: {"type": "Party"},
+      buyer: {"type": "Party"},
+      price: {"type": graphql.GraphQLFloat},
+      quantity: {"type": graphql.GraphQLInt},
+      market: {"type": "Market"}
+    }
+  })
+  .add_mutation({
     name: "CreateGood",
     "type": "Good",
     args: {
       name: {"type": graphql.GraphQLString},
-      offer_price: {"type": graphql.GraphQLFloat} ,
-      seller_id: {"type": graphql.GraphQLString}
+      price: {"type": graphql.GraphQLFloat},
+      supply: {"type": graphql.GraphQLInt},
+      seller_id: {"type": graphql.GraphQLString},
+      market_id: {"type": graphql.GraphQLString}
     },
-    resolve: (_, {name, offer_price, seller_id}) => {
+    resolve: (_,
+      {name, price, supply, seller_id, market_id}
+    ) => {
       const good = {
         atom_id: uuid.v4(),
         name: name,
-        offer_price: offer_price,
-        seller: {atom_id: seller_id}
+        price: price,
+        supply: supply,
+        seller: {atom_id: seller_id},
+        market: {atom_id: market_id}
       };
       return Promise
         .all([
@@ -69,42 +101,58 @@ const schema = grafo
           bus.create_atom("Good", good.atom_id, good)
           ])
         .then(_ => good);
-      } 
+    }
   })
- .add_mutation({
+  .add_mutation({
     name: "BuyGood",
     "type": graphql.GraphQLBoolean,
     args: {
       good_id: {"type": graphql.GraphQLString},
-      fraction: {"type": graphql.GraphQLFloat} ,
-      buyer_id: {"type": graphql.GraphQLString}
+      buyer_id: {"type": graphql.GraphQLString},
+      quantity: {"type": graphql.GraphQLInt},
+      fraction: {"type": graphql.GraphQLFloat}
     },
-    resolve: (_, {good_id, fraction, buyer_id}) => {
+    resolve: (_, {good_id, buyer_id, quantity, fraction,}) => {
       return mean.db.collection("goods")
         .findOne({atom_id: good_id})
         .then(good => {
-          const transaction_price = good.offer_price * fraction;
-          return mean.db.collection("goods")
-            .updateOne({atom_id: good_id}, { $set: {
-                transaction_price: transaction_price,
-                buyer: {atom_id: buyer_id}
-              } })
+          quantity = Math.min(quantity, good.quantity);
+          if (quantity === 0) {
+            return false;
+          }
+          const transaction_price = good.price * fraction;
+          const transaction = {
+            atom_id: uuid.v4(),
+            good: {atom_id: good.atom_id},
+            seller: {atom_id: good.seller.atom_id},
+            buyer: {atom_id: buyer_id},
+            price: transaction_price,
+            quantity: quantity,
+            market: {atom_id: good.market.atom_id}
+          }
+          return mean.db.collection("transactions")
+            .insertOne(transaction)
             .then(_ => {
               const seller_id = good.seller.atom_id;
               const u1 = {$inc: {balance: -transaction_price}};
               const u2 = {$inc: {balance: transaction_price}};
+              const u3 = {$inc: {supply: -quantity}};
               return Promise.all([
+                bus.update_atom("Transaction", transaction.atom_id,
+                  transaction),
                 mean.db.collection("partys").updateOne({atom_id: buyer_id}, u1)
-                    .then(_ => bus.update_atom("Party", buyer_id, u1)),
+                  .then(_ => bus.update_atom("Party", buyer_id, u1)),
                 mean.db.collection("partys").updateOne({atom_id: seller_id}, u2)
-                    .then(_ => bus.update_atom("Party", seller_id, u2))
+                  .then(_ => bus.update_atom("Party", seller_id, u2)),
+                mean.db.collection("goods").updateOne({atom_id:good.atom_id},u3)
+                  .then(_ => bus.update_atom("Good", good.atom_id, u3))
               ])
               .then(_ => true);
             });
         });
     }
   })
- .add_mutation({
+  .add_mutation({
     name: "AddAmount",
     "type": graphql.GraphQLBoolean,
     args: {
@@ -117,48 +165,111 @@ const schema = grafo
         .updateOne({atom_id: party_id}, update_op)
         .then(_ => bus.update_atom("Party", party_id, update_op))
         .then(_ => true);
-      } 
+      }
+  })
+  .add_query({
+    name: "GoodsByMarket",
+    "type": "[Good]",
+    args: {
+      market_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {market_id}) => {
+      return mean.db.collection("goods")
+        .find({
+          "market.atom_id": market_id
+        })
+        .toArray();
+    }
   })
   .add_query({
     name: "AffordableGoods",
     "type": "[Good]",
     args: {
+      market_id: {"type": graphql.GraphQLString},
       buyer_id: {"type": graphql.GraphQLString}
     },
-    resolve: (root, {buyer_id}) => { 
+    resolve: (root, {market_id, buyer_id}) => {
       return mean.db.collection("partys")
         .findOne({atom_id: buyer_id})
         .then(buyer => {
           return mean.db.collection("goods")
-            .find({ offer_price: { $lte: buyer.balance } }).toArray();
+            .find({
+              "market.atom_id": market_id,
+              price: {
+                $lte: buyer.balance
+              }
+            })
+            .toArray();
         });
-      }
+    }
   })
   .add_query({
     name: "UnaffordableGoods",
     "type": "[Good]",
     args: {
+      market_id: {"type": graphql.GraphQLString},
       buyer_id: {"type": graphql.GraphQLString}
     },
-    resolve: (root, {buyer_id}) => {
+    resolve: (root, {market_id, buyer_id}) => {
       return mean.db.collection("partys")
         .findOne({atom_id: buyer_id})
         .then(buyer => {
           return mean.db.collection("goods")
-            .find({ offer_price: { $gt: buyer.balance } }).toArray();
+            .find({
+              "market.atom_id": market_id,
+              price: {
+                $gt: buyer.balance
+              }
+            })
+            .toArray();
         });
-      } 
+    }
   })
   .add_query({
     name: "GoodsFromSeller",
     "type": "[Good]",
     args: {
-      seller_id: {"type": graphql.GraphQLString}
+      seller_id: {"type": graphql.GraphQLString},
+      market_id: {"type": graphql.GraphQLString}
     },
-    resolve: (root, {seller_id}) => {
+    resolve: (root, {seller_id, market_id}) => {
       return mean.db.collection("goods")
-        .find({ "seller.atom_id": seller_id}).toArray();
-      } 
+        .find({
+          "market.atom_id": market_id,
+          "seller.atom_id": seller_id,
+        })
+        .toArray();
+    }
+  })
+  .add_query({
+    name: "TransactionsByMarket",
+    "type": "[Transaction]",
+    args: {
+      market_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {market_id}) => {
+      return mean.db.collection("transactions")
+        .find({
+          "market.atom_id": market_id
+        })
+        .toArray();
+    }
+  })
+  .add_query({
+    name: "TransactionsByBuyer",
+    "type": "[Transaction]",
+    args: {
+      market_id: {"type": graphql.GraphQLString},
+      buyer_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {market_id, buyer_id}) => {
+      return mean.db.collection("transactions")
+        .find({
+          "market.atom_id": market_id,
+          "buyer.atom_id": buyer_id
+        })
+        .toArray();
+    }
   })
   .schema();
 
@@ -167,9 +278,9 @@ Helpers.serve_schema(mean.ws, schema);
 grafo.init().then(_ => {
   if (mean.debug) {
     mean.db.collection("goods").insertMany([
-        {atom_id: "1", name: "ramen", offer_price: 5,
+        {atom_id: "1", name: "ramen", price: 5,
           seller: {atom_id: "3"}},
-        {atom_id: "2", name: "sushi", offer_price: 10,
+        {atom_id: "2", name: "sushi", price: 10,
           seller: {atom_id: "3"}}
       ], (err, res) => {
         if (err) throw err;

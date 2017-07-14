@@ -1,42 +1,102 @@
 cliche Market {
+  // a buyer or seller that participates in markets
+  // balances are global (not tied to one market)
   data Party {
     balance: number
   }
 
+  // each good is tied to a single seller and market
+  // TODO: allow multiple sellers for the same good
   data Good {
     name: text,
-    offer_price: number,
-    transaction_price: number,
+    price: number,
     seller: Party,
-    buyer: Party
+    supply: number,
+    market: Market
   }
 
-  widget BuyGood { 
-    good: Good, buyer: Party 
-  }
-
-  // good.transaction_price = good.offer_price * fraction
-  widget BuyGoodAtFractionOfPrice {
+  // a record of a purchase/sale in the marketplace
+  // [buyer] bought [quantity] [good]s from [seller] for $[price] each
+  data Transaction {
     good: Good,
-    fraction: number,
-    buyer: Party
+    buyer: Party,
+    seller: Party,
+    price: number,
+    quantity: number,
+    market: Market
   }
 
-  // textbox to input price
-  widget CreateGood {
-    seller: Party
+  // multiple markets may exist
+  data Market {
   }
 
-  widget ShowMyGoods {
-    seller: Party
+  widget BuyGoodButton {
+    good: Good,
+    buyer: Party,
+    quantity: number,
+    fraction: number // fraction of offer price
   }
 
-  widget ShowGoodsToBuy {
+  widget BuyGoodQuantity {
+    quantity: number
   }
 
-  // show goods classified into whether you can afford them or not
-  widget AffordTable {
-    buyer: Party
+  widget BuyGoodFraction {
+    fraction: number // fraction of offer price
+  }
+
+  widget CreateGoodButton {
+    seller: Party,
+    market: Market,
+    good: Good
+  }
+
+  widget CreateGoodName {
+    good: Good
+  }
+
+  widget CreateGoodPrice {
+    good: Good
+  }
+
+  widget CreateGoodSupply {
+    good: Good
+  }
+
+  widget ShowGood {
+    good: Good
+  }
+
+  widget ShowMyGoodsForSale uses ShowGood {
+    seller: Party,
+    market: Market
+  }
+
+  widget ShowAffordableGoods uses ShowGood {
+    buyer: Party,
+    market: Market
+  }
+
+  widget ShowUnaffordableGoods uses ShowGood {
+    buyer: Party,
+    market: Market
+  }
+
+  widget ShowAllGoods uses ShowGood {
+    market: Market
+  }
+
+  widget ShowTransaction {
+    transaction: Transaction
+  }
+
+  widget ShowAllTransactions uses ShowTransaction {
+    market: Market
+  }
+
+  widget ShowMyPurchases uses ShowTransaction {
+    buyer: Party,
+    market: Market
   }
 
   widget ShowBalance {

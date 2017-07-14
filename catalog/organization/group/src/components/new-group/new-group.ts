@@ -1,23 +1,11 @@
-import {GraphQlService} from "gql";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 
-import {Widget} from "client-bus";
-import {Group} from "../shared/data";
+import {MemberAtom, GroupAtom} from "../../shared/data";
 
 
-@Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
+@Widget({fqelement: "Group"})
 export class NewGroupComponent {
-  group: Group;
-
-  constructor(private _graphQlService: GraphQlService) {}
-
-  onSubmit() {
-    this._graphQlService
-      .post(`
-        newGroup(name: "${this.group.name}") {
-          atom_id
-        }
-      `)
-      .map(data => data.newGroup.atom_id)
-      .subscribe(atom_id => this.group.atom_id = atom_id);
-  }
+  @Field("Group") group: GroupAtom;
+  @Field("Member") initialMember: MemberAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 }

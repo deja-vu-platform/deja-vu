@@ -118,14 +118,14 @@ div.scroll {
     <div id="child-heading">
       <h1> Hi ShowUsername </h1>
       <div class="container-fluid" id="child-heading-container">
-          <div class="col-xs-2 col-xs-offset-4"><h4> StarBank Total: </h4></div> 
+          <div class="col-xs-2 col-xs-offset-4"><h4> StarBank Total: </h4></div>
           <div class="col-xs-2 glyphicon glyphicon-star icon-size">
             <dv-widget name="ShowBalance" of="Market"></dv-widget>
           </div>
       </div>
     </div>
     <div class="container-fluid" id="child-data-container">
-      <div id="child-chores" class="col-md-6"> 
+      <div id="child-chores" class="col-md-6">
         <div class="blue-background tall" id="child-chores-table">
           <h2>Chores</h2>
           <h4>Uncompleted Chores</h4>
@@ -138,15 +138,18 @@ div.scroll {
           </div>
           <h4>Completed and Approved Chores</h4>
           <div class="row left-align-row">
-             <dv-widget name="ShowApprovedTasks" of="Task"></dv-widget> 
+             <dv-widget name="ShowApprovedTasks" of="Task"></dv-widget>
           </div>
         </div>
       </div>
 
-      <div id="child-rewards" class="col-md-6"> 
+      <div id="child-rewards" class="col-md-6">
         <div class="blue-background">
           <h2>Rewards</h2>
-             <dv-widget name="AffordTable" of="Market"></dv-widget>
+            <h3>Rewards You Can Afford</h3>
+            <dv-widget name="ShowAffordableGoods" of="Market"></dv-widget>
+            <h3>Rewards You Cannot Afford Yet</h3>
+            <dv-widget name="ShowUnaffordableGoods" of="Market"></dv-widget>
         </div>
       </div>
     </div>
