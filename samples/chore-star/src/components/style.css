@@ -1,0 +1,26 @@
+h1, h2, h4 {
+  text-align: center;
+}
+
+body {
+  background: #b7d1e5;
+  font-family: 'Roboto', sans-serif;
+  padding-top: 50px;
+}
+
+.white-box {
+  background-color: white;
+  padding: 10px;
+  border-radius: 25px;
+  margin-bottom: 10px;
+}
+
+.navbar-brand {
+  font-size: 30pt;
+  font-family: 'Fruktur', sans-serif;
+}
+
+div.scroll {
+  height: 200px;
+  overflow: scroll;
+}

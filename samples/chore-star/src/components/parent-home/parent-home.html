@@ -1,148 +1,48 @@
 <link href="https://fonts.googleapis.com/css?family=Fruktur|Roboto"
  rel="stylesheet">
 <style>
-h1, h2, h4 {
-	text-align: center;
-}
-
-.body {
-	/*background: radial-gradient(white, #b7d1e5);*/
-	background: #b7d1e5;
-	font-family: 'Roboto', sans-serif;
-	padding-top: 50px;
-}
-
-.blue-background {
-	/*background-color: #99b0c1;*/
-	background-color: white;
-	padding: 10px;
-	border-radius: 25px;
-	margin-bottom: 10px;
-}
-
-.tall {
-	height: 100%;
-}
-
 #create-things-admin {
-	text-align: center;
-}
-
-.modal-content {
-	width: 700px;
-}
-
-.modal-body {
-	text-align: left;
-}
-
-.modal-footer {
-	text-align: right;
-}
-
-.left-align-row {
-	text-align: left;
-}
-
-.center-btns {
-	text-align: center;
-}
-
-#logout-form {
-	margin-top: 8px;
-	float: right;
-}
-
-.navbar-brand {
-	font-size: 30pt;
-	font-family: 'Fruktur', sans-serif;
-}
-
-.logo {
-	font-family: 'Fruktur', sans-serif;
-}
-
-.rating-xxs {
-    font-size: 1.4em;
-}
-
-.input-star {
-	display: inline-block;
-}
-
-#child-chores-table > .row , #child-rewards > .row {
-	margin-top: 2px;
-	margin-bottom: 2px;
-}
-
-div.scroll {
-    height: 200px;
-    overflow: scroll;
-}
-
-.icon-size {
-    font-size:60px;
-    color: yellow;
-}
-
-#child-heading {
-	position: center;
-}
-
-#child-heading-container > div {
-	display: inline-block;
-}
-
-.icon-size > span {
-	position:absolute;
-    left:34px; /** you can make changes here to change position **/
-    top:18px;
-    font-size: 16pt;
-    z-index: 3;
-    font-family: 'Roboto', sans-serif;
-    color: black;
+  text-align: center;
 }
 </style>
 <div class="body">
   <dv-widget name="LoggedIn" of="ParentAuth"></dv-widget>
-  <div id="parent-homepage-container">
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container-fluid">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">ChoreStar</a>
-        </div>
-        <dv-widget name="SignOutWithRedirect" of="ParentAuth">
-        </dv-widget>
+  <nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">ChoreStar</a>
       </div>
-    </nav>
+      <dv-widget name="SignOutWithRedirect" of="ParentAuth">
+      </dv-widget>
+    </div>
+  </nav>
 
-    <div class="row">
-      <div class="col-md-offset-2 col-md-7">
-        <div id="create-things-admin">
-          <div class="row">
-            <h2>Add a New Chore</h2>
-            <dv-widget name="CreateTask" of="Task"></dv-widget>
-          </div>
-          <div class="row">
-            <h2>Add a New Reward</h2>
-            <dv-widget name="CreateReward"></dv-widget>
-          </div>
-          <div class="row">
-            <h2>Add a New Child</h2>
-            <dv-widget name="RegisterWithRedirect" of="ChildAuth"></dv-widget>
-          </div>
-          <div class="row">
-            <h2>Assigned Chores</h2>
-            <dv-widget name="ShowAssignedTasks" of="Task"></dv-widget>
-          </div>
-          <div class="row">
-            <h2>Chores to Approve</h2>
-            <dv-widget name="ShowPendingApprovalTasks" of="Task"></dv-widget>
-          </div>
-          <div class="row">
-            <h2>Offered Rewards</h2>
-            <dv-widget name="ShowMyGoodsForSale" of="Market"></dv-widget>
-          </div>
+  <div class="row">
+    <div class="col-md-offset-2 col-md-7">
+      <div id="create-things-admin">
+        <div class="row">
+          <h2>Add a New Chore</h2>
+          <dv-widget name="CreateTask" of="Task"></dv-widget>
+        </div>
+        <div class="row">
+          <h2>Add a New Reward</h2>
+          <dv-widget name="CreateReward"></dv-widget>
+        </div>
+        <div class="row">
+          <h2>Add a New Child</h2>
+          <dv-widget name="RegisterWithRedirect" of="ChildAuth"></dv-widget>
+        </div>
+        <div class="row">
+          <h2>Assigned Chores</h2>
+          <dv-widget name="ShowAssignedTasks" of="Task"></dv-widget>
+        </div>
+        <div class="row">
+          <h2>Chores to Approve</h2>
+          <dv-widget name="ShowPendingApprovalTasks" of="Task"></dv-widget>
+        </div>
+        <div class="row">
+          <h2>Offered Rewards</h2>
+          <dv-widget name="ShowMyGoodsForSale" of="Market"></dv-widget>
         </div>
       </div>
     </div>
