@@ -25,12 +25,6 @@ cliche Group {
         group: Group
     }
 
-    // Button that allows a user to open a group
-    widget RedirectToGroup {
-        group: Group,
-        on_redirect: Widget
-    }
-
     // Displays a member of a group
     widget ShowMember {
         member: Member
