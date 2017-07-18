@@ -32,16 +32,6 @@ cliche List {
     item: Item
   }
 
-  widget RedirectToList {
-    list: List,
-    on_redirect: Widget
-  }
-
-  widget RedirectToItem {
-    item: Item,
-    on_redirect: Widget
-  }
-
   widget ShowListOverview {
     list: List
   }
