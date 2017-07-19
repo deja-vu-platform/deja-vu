@@ -1,0 +1,63 @@
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
+<nav id="nav-bar" class="navbar navbar-default">
+  <div class="container-fluid">
+
+    <div class="navbar-header">
+      <a class="sweet-spots-heading navbar-brand" href="/">
+        Sweet Spots
+      </a>
+    </div>
+
+    <!-- TODO: Make search work -->
+    <div role="search" class="navbar-form navbar-left">
+      <!--
+      <div class="form-group">
+        <input type="text" placeholder="Find (Dummy Query)" id="find-entry"
+          class="form-control">
+      </div>
+      <button id="search-button" type="submit" class="btn btn-default"
+        (click)="search = true">
+        Search
+      </button>
+      -->
+      <dv-widget name="Search" of="Label"></dv-widget>
+    </div>
+
+    <div class="navbar-form navbar-right">
+
+      <div role="toolbar" class="btn-toolbar" *ngIf="user.username">
+        <dv-widget name="SignOutWithRedirect" of="Auth"></dv-widget>
+        <!--
+        <button id="logout-button" type="button" class="btn btn-danger">
+          Logout
+        </button>
+        -->
+        &nbsp;
+        <a [dvLink]="to_profile" id="profile-button" type="button"
+          class="btn btn-info">
+          Profile
+        </a>
+      </div>
+
+      <div role="toolbar" class="btn-toolbar" *ngIf="!user.username">
+        <a [dvLink]="to_login" id="login-button" type="button"
+          class="btn btn-primary">
+          Login
+        </a>
+        &nbsp;
+        <a [dvLink]="to_register" id="register-button" type="button"
+          class="btn btn-info">
+          Register
+        </a>
+      </div>
+
+    </div>
+    <p class="navbar-text navbar-right" *ngIf="user.username">
+      Hello, {{user.username}}
+    </p>
+  </div>
+</nav>
+
+<!-- HACK: Remove once default fields are populated always -->
+<dv-widget name="SignOutWithRedirect" of="Auth" style="display:none!important">
+</dv-widget>
