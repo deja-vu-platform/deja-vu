@@ -27,7 +27,7 @@ export class ShowAverageRatingComponent implements AfterInit {
 
     return this._graphQlService
       .get(`
-        averageRatingForTarget(target: "${this.target.atom_id}")
+        averageRatingForTarget(target_id: "${this.target.atom_id}")
       `)
       .toPromise()
       .then(res => res.averageRatingForTarget)
@@ -42,7 +42,7 @@ export class ShowAverageRatingComponent implements AfterInit {
   loadRatingCount() {
     return this._graphQlService
       .get(`
-        ratingCountForTarget(target: "${this.target.atom_id}")
+        ratingCountForTarget(target_id: "${this.target.atom_id}")
       `)
       .toPromise()
       .then(res => res.ratingCountForTarget)

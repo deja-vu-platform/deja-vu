@@ -48,30 +48,31 @@ const schema = grafo
     fields: {
       source: {"type": "Source"},
       target: {"type": "Target"},
-      rating: {"type": graphql.GraphQLInt}
+      rating: {"type": graphql.GraphQLInt},
+      atom_id: {"type": graphql.GraphQLString}
     }
   })
   .add_query({
     name: "ratingBySourceTarget", // Get rating info by source and target
     type: "Rating",
     args: {
-      source: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      source_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      target_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     },
-    resolve: (_, {source, target}) => {
+    resolve: (_, {source_id, target_id}) => {
       return mean.db.collection("ratings")
-        .findOne({ source: source, target: target });
+        .findOne({ "source.atom_id": source_id, "target.atom_id": target_id });
     }
   })
   .add_query({
     name: "averageRatingForTarget", // Get average rating for a certain target
     type: graphql.GraphQLFloat,
     args: {
-      target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      target_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     },
-    resolve: (_, {target}) => {
+    resolve: (_, {target_id}) => {
       return mean.db.collection("ratings")
-        .find({ target: target })
+        .find({ "target.atom_id": target_id })
         .toArray()
         .then(res => res.reduce(
           // Sum over all the values, adjusting each for the number of results
@@ -84,12 +85,36 @@ const schema = grafo
     name: "ratingCountForTarget", // Number of times target has been rated
     type: graphql.GraphQLInt,
     args: {
-      target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      target_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     },
-    resolve: (_, {target}) => {
+    resolve: (_, {target_id}) => {
       return mean.db.collection("ratings")
-        .find({ target: target })
+        .find({ "target.atom_id": target_id })
         .count();
+    }
+  })
+  .add_query({
+    name: "ratingsByTarget",
+    type: "[Rating]",
+    args: {
+      target_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    },
+    resolve: (_, {target_id}) => {
+      return mean.db.collection("ratings")
+        .find({"target.atom_id": target_id})
+        .toArray();
+    }
+  })
+  .add_query({
+    name: "ratingsBySource",
+    type: "[Rating]",
+    args: {
+      source_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+    },
+    resolve: (_, {source_id}) => {
+      return mean.db.collection("ratings")
+        .find({"source.atom_id": source_id})
+        .toArray();
     }
   })
   .add_mutation({
@@ -97,23 +122,23 @@ const schema = grafo
     type: "Rating",
     args: {
       // These are both atom IDs
-      source: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      target: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      source_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      target_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       rating: {"type": graphql.GraphQLInt}
     },
-    resolve: (_, {source, target, rating}) => {
+    resolve: (_, {source_id, target_id, rating}) => {
       return mean.db.collection("ratings")
-        .find({ source: source, target: target })
+        .find({ "source.atom_id": source_id, "target.atom_id": target_id })
         .toArray()
         .then(res => {
           // If no rating already exists w/ the specified source and target,
           // then we need to make one
           if (res.length === 0) {
             let ratingObject = {
-              source: source,
-              target: target,
+              source: {atom_id: source_id},
+              target: {atom_id: target_id},
               rating: rating,
-              atom_id: uuid.v4(),
+              atom_id: uuid.v4()
             };
             return mean.db.collection("ratings")
               .insertOne(ratingObject)
@@ -126,15 +151,16 @@ const schema = grafo
             };
             return mean.db.collection("ratings")
               .updateOne({
-                source: source,
-                target: target
+                "source.atom_id": source_id,
+                "target.atom_id": target_id
               }, {
                 $set: {
                   rating: rating
                 }
               })
               .then(updated => ratingObject = updated)
-              .then(_ => bus.update_atom("Rating", ratingObject.atom_id, ratingObject))
+              .then(_ => bus.update_atom("Rating", ratingObject.atom_id,
+                ratingObject))
               .then(_ => ratingObject);
           }
         });
