@@ -1,0 +1,52 @@
+cliche Map {
+
+  data Map {}
+
+  // coordinate pair
+  data Marker {
+    lat: number,
+    lng: number,
+    map: Map,
+    title: text
+  }
+
+  // displays a google map, centered at position
+  // map can be clicked to set position
+  widget DisplayMap {
+    map: Map
+  }
+
+  // allows user to type in coordinates for marker
+  widget CreateMarkerPosition {
+    map: Map,
+    marker: Marker,
+    submit_ok: boolean
+  }
+
+  // allows user to type in a title for marker
+  widget CreateMarkerTitle {
+    marker: Marker,
+    submit_ok: boolean
+  }
+
+  // creates a marker in the database, sets submit_ok
+  widget CreateMarkerButton {
+    map: Map,
+    marker: Marker,
+    submit_ok: boolean
+  }
+
+  widget OverlayMarkers uses OverlayMarker {
+    map: Map
+  }
+
+  widget OverlayMarker uses MarkerInfoWindow {
+    map: Map,
+    marker: Marker,
+    widget: Widget
+  }
+
+  widget MarkerInfoWindow {
+    marker: Marker
+  }
+}

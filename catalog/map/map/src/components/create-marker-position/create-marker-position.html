@@ -1,0 +1,12 @@
+<div class="form-group">
+  <label class="sr-only" for="lat">Latitude</label>
+  <input required id="lat-number" class="form-control" type="number"
+    max="90" min="-90" step="any" placeholder="Latitude"
+    [(ngModel)]="marker.lat" name="lat">
+</div>
+<div class="form-group">
+  <label class="sr-only" for="lng">Longitude</label>
+  <input required id="lng-number" class="form-control" type="number"
+    max="180" min="-180" step="any" placeholder="Longitude"
+    [(ngModel)]="marker.lng" name="lng">
+</div>
