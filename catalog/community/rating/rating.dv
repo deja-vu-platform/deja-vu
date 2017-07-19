@@ -21,7 +21,12 @@ cliche Rating {
   }
 
   // Shows aggregate rating info for a target
-  widget ShowRatings {
+  widget ShowAverageRating {
+    target: Target
+  }
+
+  widget ShowRating {
+    source: Source,
     target: Target
   }
 }

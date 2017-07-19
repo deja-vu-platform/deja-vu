@@ -8,7 +8,7 @@ import {Widget, Field, Atom, AfterInit} from "client-bus";
   ng2_providers: [GraphQlService],
   styles: [``]
 })
-export class ShowRatingsComponent implements AfterInit {
+export class ShowAverageRatingComponent implements AfterInit {
   @Field("Target") target: Atom;
   average = 0;
   ratingCount = 0;
