@@ -4,11 +4,14 @@ import {GraphQlService} from "gql";
 
 import {Widget, Field, Atom, PrimitiveAtom, AfterInit} from "client-bus";
 
+import {RatingAtom} from "../../shared/data";
+
+
 @Widget({fqelement: "Rating", ng2_providers: [GraphQlService]})
 export class RateTargetComponent implements AfterInit {
   @Field("Target") target: Atom;
   @Field("Source") source: Atom;
-  @Field("number") rating: PrimitiveAtom<number>;
+  @Field("Rating") rating: RatingAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
   radioName = "";
 
@@ -32,14 +35,16 @@ export class RateTargetComponent implements AfterInit {
     if (this.target.atom_id) {
       this._graphQlService
         .post(`
-          updateRating(source: "${this.source.atom_id}",
-            target: "${this.target.atom_id}",
-            rating: ${this._rating}) {
-              rating
-            }
+          updateRating(
+            source_id: "${this.source.atom_id}",
+            target_id: "${this.target.atom_id}",
+            rating: ${this._rating}
+          ) {
+            rating
+          }
         `)
         .subscribe(res => {
-          this.rating.value = this._rating;
+          this.rating.rating = this._rating;
         });
     }
   }
@@ -58,17 +63,19 @@ export class RateTargetComponent implements AfterInit {
 
     return this._graphQlService
       .get(`
-        ratingBySourceTarget(source: "${this.source.atom_id}",
-          target: "${this.target.atom_id}") {
-            rating
-          }
+        ratingBySourceTarget(
+          source_id: "${this.source.atom_id}",
+          target_id: "${this.target.atom_id}"
+        ) {
+          rating
+        }
       `)
       .toPromise()
       .then(res => {
         // If a rating already exists, then we pre-populate the value
         if (res.ratingBySourceTarget) {
           this._rating = res.ratingBySourceTarget.rating;
-          this.rating.value = this._rating;
+          this.rating.rating = this._rating;
         }
       });
   }
