@@ -36,10 +36,7 @@ app SweetSpots {
 
   widget NavBar {
     user: User,
-    search_results: SpotArr,
-    to_profile: Widget = Profile,
-    to_login: Widget = Login,
-    to_register: Widget = Register
+    search_results: SpotArr
   }
 
   widget Login {

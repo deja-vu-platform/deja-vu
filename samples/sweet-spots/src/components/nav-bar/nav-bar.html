@@ -33,19 +33,19 @@
         </button>
         -->
         &nbsp;
-        <a [dvLink]="to_profile" id="profile-button" type="button"
+        <a routerLink="/profile" id="profile-button" type="button"
           class="btn btn-info">
           Profile
         </a>
       </div>
 
       <div role="toolbar" class="btn-toolbar" *ngIf="!user.username">
-        <a [dvLink]="to_login" id="login-button" type="button"
+        <a routerLink="/login" id="login-button" type="button"
           class="btn btn-primary">
           Login
         </a>
         &nbsp;
-        <a [dvLink]="to_register" id="register-button" type="button"
+        <a routerLink="/register" id="register-button" type="button"
           class="btn btn-info">
           Register
         </a>
