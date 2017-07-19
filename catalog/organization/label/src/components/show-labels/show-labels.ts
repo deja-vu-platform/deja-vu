@@ -1,21 +1,13 @@
 import "rxjs/add/operator/toPromise";
 import {Widget, Field, AfterInit} from "client-bus";
-import {ItemAtom} from "../shared/data";
+import {ItemAtom} from "../../shared/data";
 
 import {GraphQlService} from "gql";
 
 
 @Widget({
   fqelement: "Label",
-  ng2_providers: [GraphQlService],
-  template: `
-    <ul *ngIf="item.labels && item.labels.length > 0" class="row"
-     style="list-style-type: none; padding-top: 10px; padding-bottom: 10px;">
-      <li *ngFor="let label of item.labels" class="label label-primary">
-        {{label.name}}
-      </li>
-    </ul>
-  `
+  ng2_providers: [GraphQlService]
 })
 export class ShowLabelsComponent implements AfterInit {
   @Field("Item") item: ItemAtom;

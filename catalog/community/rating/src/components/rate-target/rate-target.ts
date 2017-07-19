@@ -9,6 +9,7 @@ export class RateTargetComponent implements AfterInit {
   @Field("Target") target: Atom;
   @Field("Source") source: Atom;
   @Field("number") rating: PrimitiveAtom<number>;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
   radioName = "";
 
   _rating = 0; // Internal rating value to pass along
@@ -28,18 +29,19 @@ export class RateTargetComponent implements AfterInit {
    */
   syncRating(newRating) {
     this._rating = newRating;
-
-    this._graphQlService
-      .post(`
-        updateRating(source: "${this.source.atom_id}",
-          target: "${this.target.atom_id}",
-          rating: ${this._rating}) {
-            rating
-          }
-      `)
-      .subscribe(res => {
-        this.rating.value = this._rating;
-      });
+    if (this.target.atom_id) {
+      this._graphQlService
+        .post(`
+          updateRating(source: "${this.source.atom_id}",
+            target: "${this.target.atom_id}",
+            rating: ${this._rating}) {
+              rating
+            }
+        `)
+        .subscribe(res => {
+          this.rating.value = this._rating;
+        });
+    }
   }
 
   /**
@@ -75,5 +77,10 @@ export class RateTargetComponent implements AfterInit {
     this.loadRating();
     this.target.on_change(this.loadRating.bind(this));
     this.source.on_change(this.loadRating.bind(this));
+    this.submit_ok.on_change(() => {
+      if (this._rating) {
+        this.syncRating(this._rating);
+      }
+    });
   }
 }

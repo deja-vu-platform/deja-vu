@@ -3,7 +3,12 @@ cliche Label {
     name: text,
     labels: Label
   }
-  
+
+  // TODO: Change once arrays work
+  data ItemArr {
+    arr: [Item]
+  }
+
   data Label {
     name: text,
     items: Item
@@ -16,5 +21,9 @@ cliche Label {
 
   widget ShowLabels {
     item: Item
+  }
+
+  widget Search {
+    items: ItemArr
   }
 }

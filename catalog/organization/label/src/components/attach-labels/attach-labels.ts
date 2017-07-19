@@ -5,7 +5,7 @@ import "rxjs/add/operator/toPromise";
 import * as _u from "underscore";
 
 import {Widget, Field, PrimitiveAtom, AfterInit} from "client-bus";
-import {ItemAtom, Label} from "../shared/data";
+import {ItemAtom, Label} from "../../shared/data";
 
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})

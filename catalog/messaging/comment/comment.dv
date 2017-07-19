@@ -13,26 +13,36 @@ cliche Comment {
     name: text
   }
 
-  widget Comments uses ShowComment, EditComment {
-    target: Target
-  }
-
   widget ShowComment {
     comment: Comment
   }
 
-  widget NewComment {
-    author: Author,
+  widget ShowComments uses ShowComment {
     target: Target
+  }
+
+  widget NewComment uses NewCommentText, NewCommentButton {
+    author: Author,
+    target: Target,
+    comment: Comment
+  }
+
+  widget NewCommentText {
+    author: Author,
+    target: Target,
+    comment: Comment,
+    submit_ok: boolean
+  }
+
+  widget NewCommentButton {
+    author: Author,
+    target: Target,
+    comment: Comment,
+    submit_ok: boolean
   }
 
   widget EditComment {
     comment: Comment
-  }
-
-  widget CommentsWithComment uses Comments, NewComment {
-    target: Target,
-    author: Author
   }
 
 }

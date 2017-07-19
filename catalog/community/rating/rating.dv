@@ -16,7 +16,8 @@ cliche Rating {
   widget RateTarget {
     source: Source,
     target: Target,
-    rating: number
+    rating: number,
+    submit_ok: boolean
   }
 
   // Shows aggregate rating info for a target

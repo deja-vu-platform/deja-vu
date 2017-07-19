@@ -1,8 +1,5 @@
-<!-- Search() -> [Item] -->
-<div>
-  <form (ngSubmit)="onSubmit()" #searchForm="ngForm">
-    <input type="text" required
-      [(ngModel)]="query" ngControl="query">
-    <button type="submit" [disabled]="!searchForm.form.valid">Search</button>
-  </form>
-</div>
+<form (ngSubmit)="onSubmit()" #searchForm="ngForm">
+  <input type="text" required [(ngModel)]="label" ngControl="label"
+    name="label">
+  <button type="submit" [disabled]="!searchForm.form.valid">Search</button>
+</form>

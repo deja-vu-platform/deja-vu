@@ -1,6 +1,6 @@
 import {Widget, Field} from "client-bus";
 
-import {CommentAtom} from "../shared/data";
+import {CommentAtom} from "../../shared/data";
 
 
 @Widget({
