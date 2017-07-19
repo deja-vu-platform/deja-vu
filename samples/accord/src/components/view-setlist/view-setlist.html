@@ -6,9 +6,13 @@
       <h1>Setlist</h1>
 
       <div>Want to add a proposal?</div>
-      <a [dvLink]="on_redirect">Add Proposal</a>
+      <a [dvLink]="on_redirect" class="btn btn-default">Add Proposal</a>
 
       <dv-widget name="ShowList" of="SongList"></dv-widget>
     </div>
   </div>
 </div>
+
+<!-- HACK: remove once fields with default values are always included -->
+<dv-widget name="SignInWithRedirect" of="Auth" style="display:none">
+</dv-widget>
