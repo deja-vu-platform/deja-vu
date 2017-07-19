@@ -1,0 +1,230 @@
+@import url('https://fonts.googleapis.com/css?family=Mogra');
+
+/* @author Nishchal Bhandari */
+.resultPanel:hover {
+  box-shadow: 0px 0px 10px;
+}
+
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#back-to-login {
+  text-align: center;
+  margin:auto;
+}
+
+.map {
+  height: 100% !important;
+  margin: 0px;
+  padding: 0px;
+  height: calc(100vh - 105px) !important;
+  width: calc(100% - 415px);
+  position: relative;
+  overflow: hidden;
+}
+
+.sweet-spots-heading {
+  font-family: 'Mogra', cursive !important;
+  font-size: 32px !important;
+  color: #FFFFFF !important;
+}
+
+.sweet-spots-heading:visited {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+
+p.navbar-text {
+  color: #FFFFFF !important;
+}
+
+.sweet-spots-heading:link {
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+.sweet-spots-heading:hover {
+  color: #FFFFFF !important;
+  text-decoration: none;
+}
+
+.sweet-spots-heading:active {
+  color: #FFFFFF !important;
+  text-decoration: none !important;
+}
+
+#nav-bar {
+  /* background-color: #E91E63; */
+  background-color: #f62459 !important;
+}
+
+.btn-primary {
+  background-color: #A52C4B !important;
+  border-color: #A52C4B !important;
+  color: #FFFFFF !important;
+}
+
+.btn-primary:hover {
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-default {
+  background-color: #B31B41 !important;
+  border-color: #B31B41 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-default:hover {
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-danger {
+  background-color: #A52C4B !important;
+  border-color: #A52C4B !important;
+  color: #FFFFFF !important;
+}
+
+.btn-danger:hover {
+  background-color: #721129 !important;
+  border-color: #721129 !important;
+  color: #FFFFFF !important;
+}
+
+.btn-info {
+  background-color: #00D9C0 !important;
+  border-color: #00D9C0 !important;
+  color: #FFFFFF !important;
+}
+
+html, body, main {
+  height:100%;
+  margin:0;
+  padding:0;
+  background-color: #FFFCF9 !important;
+}
+
+#navBarSearchForm input[type=text] {
+  width:430px !important;
+}
+#left-main-div {
+  width: 400px;
+  float: left;
+  padding: 15px 15px 15px 15px;
+}
+.rating {
+    overflow: hidden;
+    display: inline-block;
+    font-size: 0;
+    position: relative;
+}
+.rating-input {
+    float: right;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0 0 0 -16px !important;
+    opacity: 0;
+}
+.rating:hover .rating-star:hover,
+.rating:hover .rating-star:hover ~ .rating-star,
+.rating-input:checked ~ .rating-star {
+    background-position: 0 0;
+}
+.rating-star,
+.rating:hover .rating-star {
+    position: relative;
+    float: right;
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: url('http://kubyshkin.ru/samples/star-rating/star.png') 0 -16px;
+}
+
+#location-pin-text {
+    text-align: center;
+    width: 350px;
+}
+
+#location-pin {
+  cursor:pointer;
+  cursor: hand;
+}
+
+#add-a-spot {
+    text-align: center;
+}
+
+body {
+  padding-bottom: 40px;
+  background-color: #FFFFFF;
+}
+
+.form-signin {
+  max-width: 330px;
+  padding: 15px;
+  margin: 0 auto;
+}
+.form-signin .form-signin-heading,
+.form-signin .checkbox {
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.form-signin-heading {
+  font-family: 'Mogra', cursive !important;
+  color: #f62459;
+}
+.form-signin .checkbox {
+  font-weight: normal;
+}
+.form-signin .form-control {
+  position: relative;
+  height: auto;
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 10px;
+  font-size: 16px;
+}
+.form-signin .form-control:focus {
+  z-index: 2;
+}
+.form-signin input[type="email"] {
+  margin-bottom: -1px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.form-signin input[type="password"] {
+  margin-bottom: 10px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.post-button {
+  width: 100%;
+}
+
+.navbar-btn {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.form-horizontal .form-group {
+  margin-right: 0;
+  margin-left: 0;
+}

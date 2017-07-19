@@ -1,0 +1,27 @@
+<dv-widget name="NavBar"></dv-widget>
+
+<div class="col-md-6">
+  <h1>{{spot.title}}</h1>
+  <div style="height:400px;width:400px;border:5px solid black">
+    <h3>Coming Soon: A close-up static map of your spot.</h3>
+  </div>
+  <button class="btn btn-danger" name="delete-spot">
+    Coming Soon: Delete Spot
+  </button>
+  <dv-widget name="ShowRatings" of="Rating"></dv-widget>
+  <dv-widget name="ShowLabels" of="Label"></dv-widget>
+  <button class="btn btn-success" name="delete-spot">
+    Coming Soon: Favorite
+  </button>
+  <button class="btn btn-danger" name="delete-spot">
+    Coming Soon: Report
+  </button>
+  <h6>Coming Soon: Coordinates of spots.</h6>
+</div>
+
+<div class="col-md-6">
+  <h2>Reviews</h2>
+  <dv-widget name="ShowComments" of="Comment"></dv-widget>
+  <dv-widget name="NewComment" of="Comment"></dv-widget>
+  <h6>Coming Soon: Vote on comments</h6>
+</div>
