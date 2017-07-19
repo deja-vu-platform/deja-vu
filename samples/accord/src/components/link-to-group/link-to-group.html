@@ -1,4 +1,8 @@
 <div>
   <dv-widget name="ShowGroupName" of="Group"></dv-widget>
-  <a [dvLink]="on_redirect">View Group</a>
+  <a [dvLink]="on_redirect" class="btn btn-default">View Group</a>
 </div>
+
+<!-- HACK: remove once fields with default values are always included -->
+<dv-widget name="SignInWithRedirect" of="Auth" style="display:none">
+</dv-widget>
