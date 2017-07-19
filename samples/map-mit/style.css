@@ -1,0 +1,428 @@
+#map {
+	z-index: 0;
+    width: 100%;
+    height: 500px;
+}
+
+body {
+	/*font-family: 'Libre Franklin', sans-serif;*/
+	font-family: 'Raleway', sans-serif;
+	background-color: #f5f8fa;
+}
+
+#homepage-left {
+	display: inline-block;
+	width: 24%;
+	vertical-align: top;
+	padding-right: 1%;
+}
+
+#homepage-right {
+	display: inline-block;
+	width: 74%;
+	vertical-align: top;
+	padding-left: 1%;
+}
+
+.my-groups-column {
+	display: inline-block;
+	width: 49%;
+	vertical-align: top;
+}
+
+#my-groups-column-left {
+	padding-right: 1%;
+}
+
+#my-groups-column-right {
+	padding-left: 1%;
+}
+
+.table {
+	margin-bottom: 0;
+}
+
+.react-bs-table {
+	margin-top: 20px;
+}
+
+.navbar .container ul li {
+	display: inline;
+	float: left;
+	padding: 20px;
+}
+
+.group-i-own, .group-im-in {
+	margin-left: 15px;
+}
+
+.group-members-section, .add-group-member-section, .group-members-list {
+	margin-left: 15px;
+}
+
+.create-group-name-input, .add-member-input {
+	margin-left: 15px;
+	width: 200px;
+	display: inline-block;
+}
+
+.create-group-btn, .add-member-btn {
+	margin-left: 5px;
+	display: inline-block;
+}
+
+.remove-from-group-btn {
+	margin-left: 10px;
+	display: inline-block;
+}
+
+.group-im-in-name {
+	display: inline-block;
+}
+
+.create-event-input-label, .create-event-input-option {
+	display: inline-block;
+}
+
+.create-event-input {
+	margin-bottom: 10px;
+}
+
+.create-event-input-label {
+	width: 22%;
+	font-weight: 500;
+    padding-left: 5px;
+    vertical-align: top;
+    text-align: right;
+    padding-right: 15px;
+}
+
+.create-event-input-option {
+	width: 78%;
+}
+
+#homepage-container, #my-groups-column-container {
+	margin-left: 30px;
+	margin-right: 30px;
+}
+
+.popup-event-name {
+	font-weight: bold;
+	font-style: italic;
+}
+
+.logo-img {
+	width: 80%;
+	margin-bottom: 10px;
+}
+
+.login-signup-btn, .login-signup-btn:hover {
+	background-color: #1FB8CC;
+    color: white;
+    border-color: white;
+    width: 80%;
+    margin-bottom: 5px;
+	margin-top: 10px;
+}
+
+.btn-blue, .btn-blue:hover {
+	background-color: #1FB8CC;
+    color: white;
+    border-color: white;
+}
+
+.login-signup-btn:hover, .btn-blue:hover {
+	background-color: #06A3B9;
+}
+
+.login-signup-container {
+	text-align: center;
+	padding-top: 100px;
+}
+
+.login-register-input {
+	text-align: center;
+}
+
+.username-password-container {
+	width: 80%;
+	margin-bottom: 5px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.blue-background {
+	width: 100%;
+	height: 100%;
+	padding-top: 70px;
+	background-color: #75C7CE;
+}
+
+.login-register-panel {
+	width: 40%;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	background-color: #f5f8fa;
+}
+
+.switch-login-register {
+	color: #808080;
+}
+
+.navbar-item {
+	display: inline-block;
+	padding-left: 10px;
+	padding-right: 10px;
+	color: white;
+	font-size: 18px;
+}
+
+.navbar-item a {
+	color: white;
+}
+
+.navbar-logo-img {
+	width: 170px;
+}
+
+.navbar {
+	background-color: #1FB8CC;
+    border-bottom: 2px solid grey;
+    padding-top: 6px;
+    min-height: 55px;
+    margin-bottom: 15px;
+    /*text-align: center;*/
+    border-radius: 0;
+	/*font-family: 'Libre Franklin', sans-serif;*/
+	font-family: 'Raleway', sans-serif;
+	font-weight: 300;
+}
+
+.right-bar {
+	border-right: 1px solid white;
+}
+
+#navbar-left {
+	float: left;
+	display: inline-block;
+	margin-top: 8px;
+	width: 33.33%;
+	text-align: left;
+	padding-left: 10px;
+}
+
+#navbar-right {
+	float: right;
+	display: inline-block;
+	margin-top: 8px;
+	width: 33.33%;
+	text-align: right;
+	padding-right: 10px;
+}
+
+#navbar-center {
+	display: inline-block;
+	margin-left: auto;
+	margin-right: auto;
+	width: 33.33%;
+	text-align: center;
+}
+
+.datepicker {
+	width: 200px;
+	font-size: 12px;
+}
+
+h2 {
+	margin-top: 0;
+}
+
+.panel-default > .panel-heading {
+	background-color: #f5f8fa;
+}
+
+.members-header {
+	margin-top: 0;
+}
+
+.groups-panel-body {
+	margin-bottom: 10px;
+}
+
+.panel-group {
+	margin-bottom: 0;
+}
+
+.events-panel {
+	width: 70%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.my-events-header {
+	display: inline-block;
+}
+
+.create-event-btn {
+	display: inline-block;
+	float: right;
+}
+
+.time-row-span {
+	display: inline-block;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.event-datetimepicker {
+	font-size: 14px;
+	width: auto;
+}
+
+.form-horizontal .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.event-btn-container {
+	float: right;
+}
+
+.event-btn-container > .btn {
+	margin-left: 10px;
+}
+
+input.checkbox-btn, input.radio-btn {
+	margin-right: 5px;
+}
+
+input.checkbox-btn {
+	margin-left: 20px;
+}
+
+.event-name {
+	width: 30%;
+}
+
+.host-dropdown {
+	width: 175px;
+}
+
+.room-option {
+	width: 15%;
+}
+
+.create-event-header {
+	margin-bottom: 20px;
+}
+
+.vertical-align-top {
+	vertical-align: top;
+}
+
+.float-right {
+	float: right;
+}
+
+.col-md-6 {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.validation-message {
+	color: red;
+}
+
+.italic {
+	font-style: italic;
+}
+
+.edit-cancel-event-btn-container {
+	display: inline-block;
+	float: right;
+	margin-top: -6px;
+}
+
+.edit-event-btn {
+	margin-right: 10px;
+}
+
+.bigger-text {
+	font-size: 16px;
+}
+
+.panel-group .my-event-panel {
+	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.normal-weight {
+	font-weight: normal;
+}
+
+.filtering-datetimepicker {
+	margin-left: 20px;
+}
+
+#homepage-left .panel .panel-body {
+	min-height: 430px;
+}
+
+#filter-header {
+	margin-bottom: 13px;
+}
+
+.event-card-row .panel {
+	margin-top: 10px;
+	margin-bottom: 0;
+}
+
+.col-md-6:nth-child(2n+1) {
+    clear: both;
+}
+
+.group-im-in-container {
+	display: inline-block;
+	min-width: 150px;
+}
+
+.group-add-member-error-msg {
+	color: red;
+	padding-left: 10px;
+}
+
+.red {
+	color: red;
+}
+
+/* override logout button to look like link */
+.logout-link .navbar-btn {
+	cursor: pointer;
+	padding: 0;
+	border: 0;
+	margin: 0;
+	background: none;
+	color: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	font-weight: 300; /*lighter than normal*/
+}
+.logout-link .navbar-btn:hover {
+	text-decoration: underline;
+}
+.logout-link .navbar-btn:focus {
+	outline: none;
+}
+.logout-link .navbar-btn:active {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	background: none;
+	color: inherit;
+}
