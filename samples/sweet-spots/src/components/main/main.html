@@ -20,20 +20,33 @@
   <!-- TODO: put this into a widget once params can be passed through -->
   <!-- HACK: change once array fields are supported -->
   <div *ngIf="search_results.arr">
-    <div *ngFor="let result of search_results.arr">
-      <h4>{{result.name}}</h4>
-      <dv-widget name="ShowLabels" of="Label" [init]="{item: result}">
-      </dv-widget>
-      <dv-widget name="ShowAverageRating" of="Rating" [init]="{target: result}">
-      </dv-widget>
-      <dv-widget name="ShowComments" of="Comment" [init]="{target: result}">
-      </dv-widget>
-      <dv-widget name="OverlayMarker" of="Map"
-        [init]="{marker: result}">
-      </dv-widget>
+    <div
+      *ngFor="let result of search_results.arr"
+      class="panel panel-default resultPanel"
+    >
+      <div class="panel-heading">
+        <h4>
+          <!-- HACK: need separate widget to use dvLink -->
+          <a
+            [routerLink]="['/spots']"
+            [queryParams]="{spot: result.atom_id+',Spot'}"
+          >
+            {{result.name}}
+          </a>
+        </h4>
+      </div>
+      <div class="panel-body">
+        <dv-widget name="ShowLabels" of="Label" [init]="{item: result}">
+        </dv-widget>
+        <dv-widget name="ShowAverageRating" of="Rating"
+          [init]="{target: result}">
+        </dv-widget>
+        <dv-widget name="OverlayMarker" of="Map"
+          [init]="{marker: result}">
+        </dv-widget>
+      </div>
     </div>
   </div>
-
 </div>
 
 <div id="map-div">
