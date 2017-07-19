@@ -4,7 +4,8 @@ import {RouterModule, Routes} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {HttpModule} from "@angular/http";
 
-import {WidgetLoader, RouteLoader, ClientBus, Widget, Field} from "client-bus";
+import {WidgetLoader, RouteLoader, ClientBus, Widget, Field,
+  DvLink} from "client-bus";
 
 import * as _ustring from "underscore.string";
 
@@ -32,7 +33,7 @@ const MODE: string = "@@mode";
 let template;
 if (MODE === "dev") {
   template = `
-     This is the development page, widgets: @@wid_names 
+     This is the development page, widgets: @@wid_names
      <div class="container">
        @@wid_selectors
      </div>
@@ -57,7 +58,7 @@ if (MODE === "dev") {
 })
 class RootComponent {}
 
-let declarations: any[] = [RootComponent, WidgetLoader, RouteLoader];
+let declarations: any[] = [RootComponent, WidgetLoader, RouteLoader, DvLink];
 declarations = declarations.concat(@@wid_classes);
 
 @NgModule({

@@ -7,8 +7,7 @@
         <dv-widget name="ShowGroupName" of="Group"></dv-widget>
       </h2>
 
-      <!-- Links to the add setlist page -->
-      <dv-widget name="RedirectToGroup" of="Group"></dv-widget>
+      <a [dvLink]="on_redirect">Create Setlist</a>
 
       <p>Setlists:</p>
       <dv-widget name="ShowList" of="SetlistList"></dv-widget>
