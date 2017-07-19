@@ -1,0 +1,32 @@
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
+<nav class="navbar">
+  <div id="navbar-left">
+    <div id="home-link" class="navbar-item right-bar">
+      <a href="/home" class="homepage">Home</a>
+    </div>
+    <div id="user-events" class="navbar-item right-bar">
+      <a href="/my-events" class="myevents">My Events</a>
+    </div>
+    <div id="user-groups" class="navbar-item">
+      <a href="/my-groups" class="mygroups">My Groups</a>
+    </div>
+  </div>
+
+  <div id="navbar-right">
+    <div id="welcome-user" class="navbar-item">
+      <span>Logged in as: {{user.username}}</span>
+    </div>
+    <div id="logout" class="navbar-item">
+      <dv-widget name="SignOutWithRedirect" of="Auth" class="logout-link">
+      </dv-widget>
+    </div>
+  </div>
+  <div id="navbar-center">
+    <div class="navbar-item">
+      <a href="/" class = "homepage">
+        <img class="navbar-logo-img"
+          src='https://s3.amazonaws.com/mapmit/logo_white.png'/>
+      </a>
+    </div>
+  </div>
+</nav>
