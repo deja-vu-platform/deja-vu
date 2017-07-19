@@ -33,7 +33,8 @@ const schema = grafo
   .add_type({
     name: "Item",
     fields: {
-      name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      name: {"type": graphql.GraphQLString},
       labels: {
         "type": "[Label]",
         resolve: item => {
@@ -76,7 +77,6 @@ const schema = grafo
       name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     },
     resolve: (root, {name}) => {
-      console.log(`getting ${name}`);
       return mean.db.collection("labels").findOne({name: name});
     }
   })
@@ -87,19 +87,22 @@ const schema = grafo
       name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     },
     resolve: (root, {name}) => {
-      console.log(`getting ${name}`);
       return mean.db.collection("items").findOne({name: name});
     }
   })
   .add_query({
-    name: "items",
+    name: "itemsByLabel",
     "type": "[Item]",
     args: {
-      query: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      label_name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
     },
-    resolve: (root, {query}) => {
-      console.log(`getting items with query ` + query);
-      return mean.db.collection("items").find().toArray();
+    resolve: (_, {label_name}) => {
+      return mean.db.collection("labels")
+        .findOne({name: label_name})
+        .then(label => mean.db.collection("items")
+          .find({labels: {$elemMatch: {atom_id: label.atom_id}}})
+          .toArray()
+        );
     }
   })
   .add_mutation({

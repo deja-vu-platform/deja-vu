@@ -12,7 +12,12 @@ app Bookmark {
   ]
   include organization/Label[Post for Item, Topic for Label]
   include messaging/Post[User for User, Post for Post] as MessagingPost
-  include messaging/Comment[User for Author, Post for Target]
+  include messaging/Comment[
+    User for Author,
+    Post for Target,
+    CommentData for Comment,
+    ShowPostComment replacing ShowComment in ShowComments
+  ]
 
   /**
    *  Data definitions
@@ -41,6 +46,8 @@ app Bookmark {
   }
 
   t1: Topic = {name: "hello", posts: [p1, p2]}
+
+  data CommentData {}
 
   /**
    * Widgets
@@ -82,6 +89,10 @@ app Bookmark {
   // them
   widget Users {
     user: User
+  }
+
+  widget ShowPostComment {
+    comment: CommentData
   }
 
   landing_route: route = {path: "landing", widget: Landing}

@@ -1,29 +1,36 @@
-import {Output, EventEmitter} from "@angular/core";
-
 import {GraphQlService} from "gql";
+import {Widget, Field, ClientBus} from "client-bus";
 
-import {Widget} from "client-bus";
+import {ItemAtom, ItemArrAtom} from "../../shared/data";
 
+import "rxjs/add/operator/map";
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
 export class SearchComponent {
-  query: string;
-  @Output() matching_items = new EventEmitter();
+  @Field("[Item]") items : ItemArrAtom; // TODO: Change once arrays work
 
-  constructor(private _graphQlService: GraphQlService) {}
+  label: string;
+
+  constructor(
+    private _graphQlService: GraphQlService,
+    private _clientBus: ClientBus,
+  ) {}
 
   onSubmit() {
-    if (!this.query) return;
-    console.log("got query " + this.query);
-    this._search(this.query).subscribe(
-        matching_items => this.matching_items.emit(matching_items));
-  }
-
-  private _search(query: string) {
-    return this._graphQlService.get(`{
-      items(query: "${query}") {
-        name
-      }
-    }`).map(data => data.items);
+    this.items.arr = [];
+    this._graphQlService
+      .get(`
+        itemsByLabel(label_name: "${this.label}") {
+          atom_id,
+          name
+        }
+      `)
+      .map(data => data.itemsByLabel)
+      .subscribe(items => items.forEach(item => {
+        const item_atom = this._clientBus.new_atom<ItemAtom>("Item");
+        item_atom.atom_id = item.atom_id;
+        item_atom.name = item.name;
+        this.items.arr.push(item_atom);
+      }));
   }
 }
