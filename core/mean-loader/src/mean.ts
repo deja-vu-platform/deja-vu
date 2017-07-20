@@ -509,7 +509,7 @@ export namespace GruntTask {
               case "symbol":
               default:
                 console.log("set field " + f.name + " with type " + f.type.name +
-                  " of widget " + w.name+ " to " + f.data);
+                  " of widget " + w.name + " to " + f.data);
                 throw new Error("Setting a field to an object containing a " +
                   "non-null object, function, or symbol is currently" +
                   "unsupported");
