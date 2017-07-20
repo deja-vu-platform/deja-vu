@@ -19,7 +19,8 @@ app SweetSpots {
   ]
   include organization/Label[
     Spot for Item,
-    SpotArr for ItemArr
+    SpotArr for ItemArr,
+    SpotPanel replacing ShowItem in ShowSearchResults
   ]
 
   data User {
@@ -91,6 +92,11 @@ app SweetSpots {
   widget Review {
     comment: CommentData,
     spot: Spot
+  }
+
+  widget SpotPanel {
+    spot: Spot,
+    to_spot_details: Widget = SpotDetails
   }
 
   login: route = {path: "login", widget: Login}
