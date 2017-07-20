@@ -1,5 +1,5 @@
 import * as express from "express";
-import morgan = require("morgan");
+const morgan = require("morgan");
 
 // the mongodb tsd typings are wrong and we can't use them with promises
 const mongodb = require("mongodb");
@@ -485,8 +485,37 @@ export namespace GruntTask {
             this_widget_name: "${w.name}",
             this_widget: this
           }`;
-        } else {
-          throw new Error("to be implemented");
+        } else { // object was provided
+          const ret_arr: string[] = [];
+          // for every user-def key, check type + create appropriate statement
+          _u.keys(f.data).map(key => {
+            const base_str = `this.${f.name}.${key} = `;
+            switch (typeof f.data[key]) {
+              case "undefined":
+                break;
+              case "number":
+              case "boolean":
+                ret_arr.push(base_str + f.data[key]);
+                break;
+              case "string":
+                ret_arr.push(base_str + f.data[key]);
+                break;
+              case "object":
+                if (f.data[key] === null) {
+                  ret_arr.push(base_str + "null");
+                  break;
+                }
+              case "function":
+              case "symbol":
+              default:
+                console.log("set field " + f.name + " with type " + f.type.name +
+                  " of widget " + w.name + " to " + f.data);
+                throw new Error("Setting a field to an object containing a " +
+                  "non-null object, function, or symbol is currently" +
+                  "unsupported");
+            }
+          });
+          ret = ret_arr.join(";"); // last semicolon is added by join below
         }
         return ret;
       })
