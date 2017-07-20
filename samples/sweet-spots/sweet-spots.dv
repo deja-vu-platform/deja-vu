@@ -1,13 +1,26 @@
 app SweetSpots {
-  include access/Auth[User for User]
+  include access/Auth[
+    User for User
+  ]
   include map/Map[
     Spot for Marker,
     MapData for Map,
     SpotInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
-  include community/Rating[User for Source, Spot for Target]
-  include messaging/Comment[User for Author, Spot for Target]
-  include organization/Label[Spot for Item, SpotArr for ItemArr]
+  include community/Rating[
+    User for Source,
+    Spot for Target
+  ]
+  include messaging/Comment[
+    User for Author,
+    Spot for Target,
+    CommentData for Comment,
+    Review replacing ShowComment in ShowComments
+  ]
+  include organization/Label[
+    Spot for Item,
+    SpotArr for ItemArr
+  ]
 
   data User {
     username: text
@@ -25,6 +38,8 @@ app SweetSpots {
   data MapData {}
 
   global_map: MapData
+
+  data CommentData {}
 
   main widget Main {
     map: MapData = global_map,
@@ -71,6 +86,11 @@ app SweetSpots {
 
   widget Profile {
     user: User
+  }
+
+  widget Review {
+    comment: CommentData,
+    spot: Spot
   }
 
   login: route = {path: "login", widget: Login}

@@ -23,7 +23,7 @@ export class ShowRatingComponent implements AfterInit {
       .get(`
         ratingBySourceTarget(
           source_id: "${this.source.atom_id}",
-          target: "${this.target.atom_id}"
+          target_id: "${this.target.atom_id}"
         ) {
           atom_id,
           rating
