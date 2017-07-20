@@ -1,0 +1,16 @@
+<div class="panel panel-default resultPanel" [dvLink]="to_spot_details">
+  <div class="panel-heading">
+    <h4>
+      <dv-widget name="ShowItem" of="Label"></dv-widget>
+    </h4>
+  </div>
+  <div class="panel-body">
+    <dv-widget name="ShowLabels" of="Label"></dv-widget>
+    <dv-widget name="ShowAverageRating" of="Rating"></dv-widget>
+    <dv-widget name="OverlayMarker" of="Map"></dv-widget>
+  </div>
+</div>
+
+<!-- HACK: Remove once default fields are populated always -->
+<dv-widget name="SignOutWithRedirect" of="Auth" style="display:none!important">
+</dv-widget>
