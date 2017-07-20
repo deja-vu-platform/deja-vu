@@ -48,6 +48,7 @@ export class ShowCommentsComponent implements AfterInit {
           comment_atom.author = this._clientBus.new_atom<AuthorAtom>("Author");
           comment_atom.author.atom_id = comment.author.atom_id;
           comment_atom.author.name = comment.author.name;
+          comment_atom.target = this.target;
           return comment_atom;
         })
         .subscribe(comment_atom => {
