@@ -1,28 +1,33 @@
 <dv-widget name="NavBar"></dv-widget>
 
-<div class="row">
-  <div class="col-sm-12 text-center">
-    <h1>{{user.username}}'s Profile</h1>
-    <h6>Coming Soon: User reputation</h6>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-4">
-    <div class="text-center">
-      <h3>Posted Spots</h3>
+<div class="container">
+  <div class="row">
+    <div class="col-sm-12 text-center">
+      <h1>{{user.username}}'s Profile</h1>
+      <h6>Coming Soon: User reputation</h6>
     </div>
-    <h6>Coming Soon: A list of your spots</h6>
   </div>
-  <div class="col-md-4">
-    <div class="text-center">
-      <h3>Your Reviews</h3>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="text-center">
+        <h3>Posted Spots</h3>
+      </div>
+      <h6>Coming Soon: A list of your spots</h6>
     </div>
-    <h6>Coming Soon: A list of your reviews</h6>
-  </div>
-  <div class="col-md-4">
-    <div class="text-center">
-      <h3>Favorite Spots</h3>
+    <div class="col-md-4">
+      <div class="text-center">
+        <h3>Your Reviews</h3>
+      </div>
+      <h6>Coming Soon: A list of your reviews</h6>
     </div>
-    <h6>Coming Soon: A list of your favorite spots</h6>
+    <div class="col-md-4">
+      <div class="text-center">
+        <h3>Favorite Spots</h3>
+      </div>
+      <dv-widget name="ShowFollowing" of="Follow"></dv-widget>
+      <h6 *ngIf="user.follows && !user.follows.length">
+        You don't have any favorite spots.
+      </h6>
+    </div>
   </div>
 </div>

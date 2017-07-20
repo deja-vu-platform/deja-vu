@@ -228,3 +228,15 @@ body {
   margin-right: 0;
   margin-left: 0;
 }
+
+/* override follow button css */
+follow-unfollow button.btn {
+  float: none!important;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  color: #fff !important;
+  background-color: #5cb85c !important;
+  border-color: #4cae4c !important;
+}

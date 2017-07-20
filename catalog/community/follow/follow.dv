@@ -1,14 +1,26 @@
 cliche Follow {
   data Source {
-    name: text,
-    follows: Target
+    follows: [Target]
   }
-  
+
   data Target {
     name: text
   }
 
-  widget EditFollow {
+  widget EditFollow uses FollowUnfollow, ShowTarget {
+    source: Source
+  }
+
+  widget FollowUnfollow {
+    source: Source,
+    target: Target
+  }
+
+  widget ShowTarget {
+    target: Target
+  }
+
+  widget ShowFollowing uses ShowTarget {
     source: Source
   }
 }
