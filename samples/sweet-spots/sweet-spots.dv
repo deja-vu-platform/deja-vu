@@ -22,6 +22,11 @@ app SweetSpots {
     SpotArr for ItemArr,
     SpotPanel replacing ShowItem in ShowSearchResults
   ]
+  include community/Follow[
+    User for Source,
+    Spot for Target,
+    SpotPanel replacing ShowTarget in ShowFollowing
+  ]
 
   data User {
     username: text
