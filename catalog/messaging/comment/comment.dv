@@ -9,16 +9,15 @@ cliche Comment {
     name: text
   }
 
-  data Target {
-    name: text
-  }
+  data Target {}
 
   widget ShowComment {
     comment: Comment
   }
 
   widget ShowComments uses ShowComment {
-    target: Target
+    target: Target,
+    author: Author
   }
 
   widget NewComment uses NewCommentText, NewCommentButton {

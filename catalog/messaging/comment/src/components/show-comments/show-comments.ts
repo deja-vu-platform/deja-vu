@@ -13,6 +13,7 @@ import {TargetAtom, AuthorAtom, CommentAtom, Comment} from "../../shared/data";
 @Widget({fqelement: "Comment", ng2_providers: [GraphQlService]})
 export class ShowCommentsComponent implements AfterInit {
   @Field("Target") target: TargetAtom;
+  @Field("Author") author: AuthorAtom;
 
   comments: any[];
   fetched = false;
@@ -22,24 +23,27 @@ export class ShowCommentsComponent implements AfterInit {
 
   dvAfterInit() {
     const update_comments = () => {
-      if (!this.target.atom_id || this.fetched) return;
+      if (this.fetched) return;
       this.fetched = true;
+      const author_id = this.author.atom_id ? this.author.atom_id : "";
+      const target_id = this.target.atom_id ? this.target.atom_id : "";
 
       this.comments = [];
       this._graphQlService
         .get(`
-          target_by_id(atom_id: "${this.target.atom_id}") {
-            comments {
+          getComments(
+            author_id: "${author_id}",
+            target_id: "${target_id}"
+          ) {
+            atom_id,
+            content,
+            author {
               atom_id,
-              content,
-              author {
-                atom_id,
-                name
-              }
+              name
             }
           }
         `)
-        .map(data => data.target_by_id.comments)
+        .map(data => data.getComments)
         .flatMap((comments, unused_ix) => Observable.from(comments))
         .map((comment: Comment) => {
           const comment_atom = this._clientBus.new_atom<CommentAtom>("Comment");
