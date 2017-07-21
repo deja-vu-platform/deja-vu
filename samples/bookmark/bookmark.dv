@@ -25,7 +25,7 @@ app Bookmark {
   data User {
     username: text,
     posts: Post,
-    follows: [User | Topic]
+    follows: User | Topic // array
   }
 
   u1: User = {username: "benbitdiddle", posts: [p1]}

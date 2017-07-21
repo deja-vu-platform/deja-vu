@@ -1,6 +1,6 @@
 cliche Follow {
   data Source {
-    follows: [Target]
+    follows: Target // array
   }
 
   data Target {

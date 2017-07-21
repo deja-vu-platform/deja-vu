@@ -6,7 +6,7 @@ cliche Feed {
 
   data Subscriber {
     name: text,
-    subscriptions: Publisher
+    subscriptions: Publisher // array
   }
 
   data Message {
