@@ -1,7 +1,7 @@
 import {ElementRef} from "@angular/core";
 import {Widget, Field} from "client-bus";
 import {MapAtom} from "../../shared/data";
-import {initGoogleMapsAPI, newMapObject, uuidv4} from "../../shared/map_utils";
+import {initGoogleMapsAPI, newMapObject, uuidv4} from "../../shared/utils";
 
 @Widget({fqelement: "Map"})
 export class DisplayMapComponent {
