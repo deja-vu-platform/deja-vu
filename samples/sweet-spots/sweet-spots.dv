@@ -60,6 +60,10 @@ app SweetSpots {
     search_results: SpotArr
   }
 
+  widget NavBarWithoutSearch {
+    user: User
+  }
+
   widget Login {
     on_login_ok: Widget = Main
   }
