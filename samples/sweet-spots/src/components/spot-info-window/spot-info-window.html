@@ -1,6 +1,9 @@
-<a [dvLink]="to_spot_details">
-  {{spot.name || spot.title}}
-</a>
+<div class="mapInfoWindow">
+  <h3><a [dvLink]="to_spot_details">{{spot.name || spot.title}}</a></h3>
+  <hr/>
+  <dv-widget name="ShowLabels" of="Label"></dv-widget>
+  <dv-widget name="ShowAverageRating" of="Rating"></dv-widget>
+</div>
 
 <!-- HACK: Remove once default fields are populated always -->
 <dv-widget name="SignOutWithRedirect" of="Auth" style="display:none!important">

@@ -231,6 +231,14 @@ follow-unfollow button.btn {
   border-color: #4cae4c !important;
 }
 
+/* correctly limits height of map on main page */
 #map-div {
   height: calc(100vh - 105px);
+}
+
+/* prevent scroll bars in info windows */
+.mapInfoWindow {
+  line-height: 1.35;
+  overflow: hidden;
+  white-space: nowrap;
 }
