@@ -1,7 +1,7 @@
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 import {MarkerAtom, MapAtom} from "../../shared/data";
-import {getGoogleMapsAPI, getMapObject} from "../../shared/map_utils";
+import {getGoogleMapsAPI, getMapObject} from "../../shared/utils";
 import {NgZone} from "@angular/core";
 
 import "rxjs/add/operator/map";

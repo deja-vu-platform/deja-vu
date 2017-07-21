@@ -6,8 +6,9 @@ import {
   getMapObject,
   getGoogleMapsAPI,
   waitFor,
-  uuidv4
-} from "../../shared/map_utils";
+  uuidv4,
+  overlayMarker
+} from "../../shared/utils";
 
 import {GraphQlService} from "gql";
 
@@ -68,12 +69,10 @@ export class OverlayMarkerComponent {
   }
 
   overlayMarker() {
-    const marker = new this.gmapsAPI.Marker({
-      position: {lat: this.marker.lat, lng: this.marker.lng},
-      map: this.mapObj
-    });
+    const marker = overlayMarker(this.gmapsAPI, this.mapObj, this.marker);
 
     if (this.marker.title) {
+      marker.setTitle(this.marker.title);
       const infoWindow = new this.gmapsAPI.InfoWindow({
         content: document.getElementById(this.infowindow_id).children[0]
       });
