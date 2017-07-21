@@ -24,16 +24,6 @@
   margin:auto;
 }
 
-.map {
-  height: 100% !important;
-  margin: 0px;
-  padding: 0px;
-  height: calc(100vh - 105px) !important;
-  width: calc(100% - 415px);
-  position: relative;
-  overflow: hidden;
-}
-
 .sweet-spots-heading {
   font-family: 'Mogra', cursive !important;
   font-size: 32px !important;
@@ -239,4 +229,8 @@ follow-unfollow button.btn {
   color: #fff !important;
   background-color: #5cb85c !important;
   border-color: #4cae4c !important;
+}
+
+#map-div {
+  height: calc(100vh - 105px);
 }

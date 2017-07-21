@@ -1,9 +1,10 @@
 <dv-widget name="NavBar"></dv-widget>
 
 <div class="col-md-6">
-  <h1>{{spot.title}}</h1>
-  <div style="height:400px;width:400px;border:5px solid black">
-    <h3>Coming Soon: A close-up static map of your spot.</h3>
+  <h1>{{spot.name}}</h1>
+  <div style="height:400px;width:400px;">
+    <dv-widget name="DisplayMap" of="Map"></dv-widget>
+    <dv-widget name="OverlayMarker" of="Map"></dv-widget>
   </div>
   <button class="btn btn-danger" name="delete-spot">
     Coming Soon: Delete Spot
@@ -20,7 +21,7 @@
 <div class="col-md-6">
   <h2>Reviews</h2>
   <dv-widget name="ShowComments" of="Comment"></dv-widget>
-  <!-- TODO: New Review -->
+  <!-- TODO: New Review (can't do just comment/rating) -->
   <dv-widget name="RateTarget" of="Rating"></dv-widget>
   <dv-widget name="NewComment" of="Comment"></dv-widget>
   <h6>Coming Soon: Vote reviews up or down.</h6>
