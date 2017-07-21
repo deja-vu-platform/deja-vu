@@ -1,12 +1,9 @@
 import {Atom} from "client-bus";
 
-export interface Target {
-  name: string;
-}
+export interface Target {}
 export interface TargetAtom extends Target, Atom {}
 
 export interface Author {
-  atom_id: string;
   name: string;
 }
 export interface AuthorAtom extends Author, Atom {}

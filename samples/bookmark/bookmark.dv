@@ -95,6 +95,10 @@ app Bookmark {
     comment: CommentData
   }
 
+  widget ShowPostComments {
+    post: Post
+  }
+
   landing_route: route = {path: "landing", widget: Landing}
   home_route: route = {path: "home", widget: Home}
   users_route: route = {path: "users", widget: Users}

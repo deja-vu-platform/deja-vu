@@ -15,14 +15,13 @@ export class NewCommentButtonComponent {
 
   addComment() {
     this._graphQlService
-      .get(`
-        target_by_id(atom_id: "${this.target.atom_id}") {
-          newComment(
-            author: "${this.author.name}",
-            content: "${this.comment.content}"
-          ) {
-            atom_id
-          }
+      .post(`
+        newComment(
+          author_id: "${this.author.atom_id}",
+          target_id: "${this.target.atom_id}",
+          content: "${this.comment.content}"
+        ) {
+          atom_id
         }
       `)
       .subscribe(atom_id => {
