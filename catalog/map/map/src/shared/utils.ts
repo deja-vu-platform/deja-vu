@@ -16,8 +16,10 @@ export function initGoogleMapsAPI() {
     "&callback=" + callback;
 
   // Google map scripts need to be loaded this way
-  insertScript(init_script);
-  loadRemoteScript(gmap_script);
+  if (!window["gmapsAPI"]) {
+    insertScript(init_script);
+    loadRemoteScript(gmap_script);
+  }
   return getGoogleMapsAPI();
 }
 
@@ -30,15 +32,18 @@ export function getGoogleMapsAPI(dt=10, maxt=5000) {
 
 // creates a map object, installing it in an element with given id
 // returns a promise containing the element
-export function newMapObject(gmaps: any, map_id: string, dt=10, maxt=5000) {
+export function newMapObject(gmaps, map_id: string, dt=10, maxt=5000) {
   const mapElement = document.getElementById(map_id);
   if (mapElement) {
     const mit = {lat: 42.35920, lng: -71.09315};
     const mapObj = new gmaps.Map(mapElement, {
       zoom: 16,
       center: mit,
-      streetViewControl: false
+      streetViewControl: false,
+      maxZoom: 20,
+      minZoom: 3
     });
+    mapObj["myBounds"] = new gmaps.LatLngBounds();
     window["mapObj-"+map_id] = mapObj;
     return Promise.resolve(mapObj);
   } else if (maxt > 0) {
@@ -62,6 +67,26 @@ export function getMapObject(map_id: string, dt=10, maxt=5000) {
   }
 }
 
+// creates a marker, overlaying it on the map
+// adjusts map center and bounds to fit all markers
+// returns the new marker object
+export function overlayMarker(gmaps, map, pos: {lat: number, lng: number}) {
+  const myLatLng = new gmaps.LatLng(pos.lat, pos.lng);
+  const marker = new gmaps.Marker({
+    position: myLatLng,
+    map: map
+  });
+  map["myBounds"].extend(myLatLng);
+  map.setCenter(map["myBounds"].getCenter());
+  // don't zoom in on a single point
+  if (map["myBounds"].getNorthEast().equals(map["myBounds"].getSouthWest())) {
+    map.setZoom(18);
+  } else {
+    map.fitBounds(map["myBounds"]);
+  }
+  return marker;
+}
+
 // returns a promise which resolves after delay
 function timeout(delay: number) {
   return new Promise(function(resolve, reject) {
@@ -71,8 +96,7 @@ function timeout(delay: number) {
 
 // waits for a field of an object to be truthy
 // returns a promise which resolves once the field is truthy, returning ret
-export
-function waitFor(obj: object, fld: string, ret?: any, dt=10, maxt=5000) {
+export function waitFor(obj: object, fld: string, ret?, dt=10, maxt=5000) {
   if (obj[fld]) {
     return Promise.resolve(ret);
   }
