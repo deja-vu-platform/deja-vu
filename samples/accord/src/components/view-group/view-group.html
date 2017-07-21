@@ -7,8 +7,7 @@
         <dv-widget name="ShowGroupName" of="Group"></dv-widget>
       </h2>
 
-      <!-- Links to the add setlist page -->
-      <dv-widget name="RedirectToGroup" of="Group"></dv-widget>
+      <a [dvLink]="on_redirect" class="btn btn-default">Create Setlist</a>
 
       <p>Setlists:</p>
       <dv-widget name="ShowList" of="SetlistList"></dv-widget>
@@ -23,3 +22,7 @@
     </div>
   </div>
 </div>
+
+<!-- HACK: remove once fields with default values are always included -->
+<dv-widget name="SignInWithRedirect" of="Auth" style="display:none">
+</dv-widget>

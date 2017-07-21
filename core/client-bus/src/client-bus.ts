@@ -1,6 +1,6 @@
 import {
   Injectable, Inject, Input, Component, Optional, OnChanges, OnInit,
-  SimpleChanges
+  SimpleChanges, Directive, HostListener
 } from "@angular/core";
 import {Location} from "@angular/common";
 import {
@@ -576,6 +576,35 @@ export function Widget(options: WidgetMetadata) {
 
     return Component(metadata)(target);
   };
+}
+
+/**
+ * Use to create a link to another widget
+ *
+ * <a dvLink={{my_widget}}>Link</a>
+ * Shared fields are propagated via query string
+ * TODO: Take name of widget instead of widget object
+ **/
+@Directive({selector: "[dvLink]"})
+export class DvLink {
+  private widget: WidgetValue;
+
+  constructor(private _clientBus: ClientBus) {}
+
+  @Input()
+  set dvLink(widget: WidgetValue | PrimitiveAtom<WidgetValue>) {
+    if ((<WidgetValue> widget).name) {
+      this.widget = (<WidgetValue> widget);
+    } else {
+      this.widget = (<PrimitiveAtom<WidgetValue>> widget).value;
+    }
+  }
+
+  @HostListener("click")
+  onClick(): boolean {
+    this._clientBus.navigate(this.widget);
+    return true;
+  }
 }
 
 /**
