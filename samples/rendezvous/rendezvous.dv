@@ -1,0 +1,22 @@
+app MapMit {
+  include access/Auth[User for User]
+  include map/Map
+
+  data User {}
+
+  main widget Login {
+    on_login_ok: Widget = Main
+  }
+
+  widget Register {
+    on_register_ok: Widget = Main
+  }
+
+  widget Main {
+    user: User
+  }
+
+  login: route = {path: "login", widget: Login}
+  register: route = {path: "register", widget: Register}
+  main: route = {path: "main", widget: Main}
+}
