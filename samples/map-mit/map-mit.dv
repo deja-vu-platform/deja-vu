@@ -1,6 +1,10 @@
 app MapMit {
   include access/Auth[User for User]
-  include map/Map[EventData for Marker, MapData for Map]
+  include map/Map[
+    EventData for Marker,
+    MapData for Map,
+    EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
+  ]
   include organization/Event[
     EventData for Event,
     DisplayEvent replacing ShowEvent in ShowEvents
@@ -17,7 +21,9 @@ app MapMit {
 
   data MapData {}
 
-  data EventData {}
+  data EventData {
+    name: text
+  }
 
   data GroupData {}
 
@@ -43,13 +49,12 @@ app MapMit {
 
   widget CreateEvent {
     event: EventData,
-    map: MapData = global_map,
     submit_ok: boolean
   }
 
   widget DisplayEvent {
-    event: EventData,
-    map: MapData = global_map
+    map: MapData = global_map,
+    event: EventData
   }
 
   widget DisplayGroup {
@@ -58,6 +63,10 @@ app MapMit {
 
   widget MyGroups {
     user: User
+  }
+
+  widget EventInfoWindow {
+    event: EventData
   }
 
   login: route = {path: "login", widget: Login}
