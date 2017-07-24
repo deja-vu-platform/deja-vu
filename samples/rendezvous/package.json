@@ -1,0 +1,17 @@
+{
+  "name": "dv-samples-rendezvous",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node node_modules/dv-lang/lib/dv.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "dv-lang": "file:../../core/lang",
+    "dv-access-auth": "file:../../catalog/access/auth",
+    "dv-map-map": "file:../../catalog/map/map"
+  },
+  "devDependencies": {
+    "tslint": "3.15.1",
+    "typescript": "2.3.4"
+  }
+}
