@@ -1,4 +1,3 @@
-import {ElementRef} from "@angular/core";
 import {Widget, Field} from "client-bus";
 import {MapAtom} from "../../shared/data";
 import {initGoogleMapsAPI, newMapObject, uuidv4} from "../../shared/utils";
@@ -6,8 +5,6 @@ import {initGoogleMapsAPI, newMapObject, uuidv4} from "../../shared/utils";
 @Widget({fqelement: "Map"})
 export class DisplayMapComponent {
   @Field("Map") map: MapAtom;
-
-  constructor(private _elementRef: ElementRef) {}
 
   dvAfterInit() {
     if (!this.map.atom_id) this.map.atom_id = uuidv4();
