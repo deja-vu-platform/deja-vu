@@ -7,7 +7,8 @@ import {
   getGoogleMapsAPI,
   waitFor,
   uuidv4,
-  overlayMarker
+  overlayMarker,
+  removeMarker
 } from "../../shared/utils";
 
 import {GraphQlService} from "gql";
@@ -24,6 +25,7 @@ export class OverlayMarkerComponent {
   gmapsAPI: any;
   mapObj: any;
   infowindow_id = uuidv4();
+  markerObj: any;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -42,11 +44,18 @@ export class OverlayMarkerComponent {
   ngAfterViewInit() {
     getGoogleMapsAPI()
       .then(gmapsAPI => this.gmapsAPI = gmapsAPI)
+      .then(_ => waitFor(this.map, "atom_id"))
       .then(_ => getMapObject(this.map.atom_id))
       .then(mapObj => this.mapObj = mapObj)
       .then(_ => waitFor(this.marker, "lat"))
       .then(_ => waitFor(this.marker, "lng"))
       .then(_ => this.overlayMarker());
+  }
+
+  ngOnDestroy() {
+    if (this.gmapsAPI && this.markerObj) {
+      removeMarker(this.gmapsAPI, this.markerObj);
+    }
   }
 
   getMarker() {
@@ -69,14 +78,16 @@ export class OverlayMarkerComponent {
   }
 
   overlayMarker() {
-    const marker = overlayMarker(this.gmapsAPI, this.mapObj, this.marker);
+    this.markerObj = overlayMarker(this.gmapsAPI, this.mapObj, this.marker);
 
     if (this.marker.title) {
-      marker.setTitle(this.marker.title);
+      this.markerObj.setTitle(this.marker.title);
       const infoWindow = new this.gmapsAPI.InfoWindow({
         content: document.getElementById(this.infowindow_id).children[0]
       });
-      marker.addListener("click", () => infoWindow.open(this.mapObj, marker));
+      this.markerObj.addListener("click", () =>
+        infoWindow.open(this.mapObj, this.markerObj)
+      );
     }
   }
 }
