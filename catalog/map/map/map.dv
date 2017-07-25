@@ -2,7 +2,7 @@ cliche Map {
 
   data Map {}
 
-  // coordinate pair
+  // Identifies a location on a map
   data Marker {
     lat: number,
     lng: number,
@@ -10,8 +10,7 @@ cliche Map {
     title: text
   }
 
-  // displays a google map, centered at position
-  // map can be clicked to set position
+  // displays a google map
   widget DisplayMap {
     map: Map
   }
@@ -36,16 +35,21 @@ cliche Map {
     submit_ok: boolean
   }
 
+  // gets all markers for a map and overlays them on the map
+  // will do nothing without DisplayMap or replacing OverlayMarker
   widget OverlayMarkers uses OverlayMarker {
     map: Map
   }
 
+  // adds a marker to a map
+  // does nothing without DisplayMap
   widget OverlayMarker uses MarkerInfoWindow {
     map: Map,
     marker: Marker,
     widget: Widget
   }
 
+  // the popup displayed when clicking on an overlayed marker
   widget MarkerInfoWindow {
     marker: Marker
   }
