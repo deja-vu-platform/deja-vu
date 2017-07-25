@@ -448,3 +448,8 @@ select {
   border: 1px solid #CC9088;
   margin-bottom: 20px;
 }
+
+#welcome {
+  position: absolute;
+  right: 0;
+  z-index: 99;
