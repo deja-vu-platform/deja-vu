@@ -2,7 +2,7 @@ cliche Map {
 
   data Map {}
 
-  // coordinate pair
+  // Identifies a location on a map
   data Marker {
     lat: number,
     lng: number,
