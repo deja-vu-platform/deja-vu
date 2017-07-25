@@ -27,6 +27,12 @@ app MapMit {
     user: User
   }
 
+  widget EventPanel {
+    map: MapData = global_map,
+    to_event_details: Widget = EventDetails,
+    event: EventData
+  }
+
   widget NewEvent {
     map: MapData = global_map,
     user: User,
@@ -34,8 +40,7 @@ app MapMit {
     new_event_ok: boolean
   }
 
-  widget EventPanel {
-    map: MapData = global_map,
+  widget EventDetails {
     event: EventData
   }
 
@@ -43,4 +48,5 @@ app MapMit {
   register: route = {path: "register", widget: Register}
   main: route = {path: "main", widget: Main}
   new_event: route = {path: "new-event", widget: NewEvent}
+  event_details: route = {path: "event", widget: EventDetails}
 }
