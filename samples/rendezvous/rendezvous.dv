@@ -24,6 +24,7 @@ app MapMit {
 
   widget Main {
     map: MapData = global_map,
+    to_user_profile: Widget = UserProfile,
     user: User
   }
 
@@ -44,9 +45,14 @@ app MapMit {
     event: EventData
   }
 
+  widget UserProfile {
+    user: User
+  }
+
   login: route = {path: "login", widget: Login}
   register: route = {path: "register", widget: Register}
   main: route = {path: "main", widget: Main}
   new_event: route = {path: "new-event", widget: NewEvent}
   event_details: route = {path: "event", widget: EventDetails}
+  user_profile: route = {path: "user", widget: UserProfile}
 }
