@@ -1,0 +1,64 @@
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
+<div class="index">
+  <div id="returnToMain">R E N D E Z V O U S</div>
+  <div class="new_event">
+    <div class="panel panel-default">
+      <div style="background-color: #ffa599;" class="panel-heading">
+        <dv-widget name="CreateMarkerTitle" of="Map"></dv-widget>
+      </div>
+      <div style="padding: 15px;" class="panel-body">
+        <div style="float: left; margin-top: 4px;">
+          <button type="button" class="displayButtons btn btn-info">
+            Hosted By
+            <span style="color: black; margin-left: 5px;" class="badge">
+              {{user.username}}
+            </span>
+          </button>
+        </div>
+        <table id="event_info" class="table">
+          <tr>
+            <td rowspan="2" style="width: 30%">
+              <div class="form-group">
+                <label for="event_location">Location</label>
+                <p>Coming soon: Search for a place</p>
+                <!-- Lets user click map to set position-->
+                <dv-widget name="CreateMarkerPosition" of="Map"
+                  style="display:none">
+                </dv-widget>
+                <div id="map_new_event">
+                  <dv-widget name="DisplayMap" of="Map"></dv-widget>
+                </div>
+                <div style="margin-top: 3px; width: 100%; text-align: center"
+                  class="guidelines">
+                  (must be within 50 miles of current location)
+                </div>
+              </div>
+            </td>
+            <td style="width: 100%">
+              <dv-widget name="NewEventContent" of="Event"></dv-widget>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <label>Tags</label>
+              <br>
+              <div style="padding-top: 0px;" class="btn-group">
+                <p>Coming soon: Relevant Interests</p>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <p>Coming soon: Event details</p>
+        <div style="float: right" id="create" *ngIf="!new_event_ok.value">
+          <dv-widget name="NewEventButton" of="Event"></dv-widget>
+        </div>
+        <div style="float: right">
+          <a id="back" style="margin-top: 10px; width: 80px;" routerLink="/main"
+            class="btn button btn-info">
+            {{new_event_ok.value ? "Return" : "Cancel"}}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
