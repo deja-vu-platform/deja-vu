@@ -442,3 +442,9 @@ select {
   background: none;
   border: none;
 }
+
+.event-info-table {
+  background-color: #FFEFEE;
+  border: 1px solid #CC9088;
+  margin-bottom: 20px;
+}
