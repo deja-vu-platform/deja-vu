@@ -1,8 +1,18 @@
 app MapMit {
   include access/Auth[User for User]
-  include map/Map
+  include map/Map[MapData for Map, EventData for Marker]
+  include organization/Event[
+    EventData for Event,
+    EventPanel replacing ShowEvent in ShowEvents
+  ]
 
   data User {}
+
+  data MapData {}
+
+  data EventData {}
+
+  global_map: MapData
 
   main widget Login {
     on_login_ok: Widget = Main
@@ -13,10 +23,24 @@ app MapMit {
   }
 
   widget Main {
+    map: MapData = global_map,
     user: User
+  }
+
+  widget NewEvent {
+    map: MapData = global_map,
+    user: User,
+    new_event: EventData,
+    new_event_ok: boolean
+  }
+
+  widget EventPanel {
+    map: MapData = global_map,
+    event: EventData
   }
 
   login: route = {path: "login", widget: Login}
   register: route = {path: "register", widget: Register}
   main: route = {path: "main", widget: Main}
+  new_event: route = {path: "new-event", widget: NewEvent}
 }

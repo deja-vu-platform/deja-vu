@@ -18,7 +18,7 @@ div.index {
   background-repeat: no-repeat;
   background-size: cover;
   height: 100%;
-  padding-top: 15%;
+  overflow: auto;
 }
 
 h3 {
@@ -153,7 +153,7 @@ select {
   text-align: center;
 }
 
-.button{
+.button, #create button{
   border: 0;
   background-color: #ffd0cc;
   color: black;
@@ -244,6 +244,7 @@ select {
   width: 400px;
   margin: 0 auto;
   text-align: center;
+  margin-top: 200px;
 }
 
 #userLogin {
@@ -297,28 +298,24 @@ select {
   margin-right: 10px;
 }
 
-#userMenu:hover{
-  border: 1px solid #B3594D;
-}
-
 #back{
   background-color: #ffd0cc;
   color: black;
   margin-right: 10px;
 }
 
-#back:hover{
-  border: 1px solid #B3594D;
-}
-
-#create{
+#create button{
   background-color: #ffd0cc;
   color: black;
   margin-right: 10px;
-}
-
-#create:hover{
-  border: 1px solid #B3594D;
+  float: none!important;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  margin-top: 10px;
+  margin-left: 10px;
+  width: 80px;
 }
 
 #dismissError{
@@ -327,18 +324,10 @@ select {
   margin-right: 10px;
 }
 
-#dismissError:hover{
-  border: 1px solid #B3594D;
-}
-
 #update{
   background-color: #ffd0cc;
   color: black;
   margin-right: 10px;
-}
-
-#update:hover{
-  border: 1px solid #B3594D;
 }
 
 #attendees{
@@ -346,10 +335,6 @@ select {
   background-color: #E18B7F;
   color: black;
   margin-right: 10px;
-}
-
-#attendees:hover{
-  border: 1px solid #B3594D;
 }
 
 #back_button{
@@ -451,4 +436,9 @@ select {
 .form-horizontal .form-group {
     margin-right: 0px;
     margin-left:  0px;
+}
+
+.list-group-item {
+  background: none;
+  border: none;
 }
