@@ -58,7 +58,7 @@ const schema = grafo
           title: {type: graphql.GraphQLString}
         },
         resolve: (marker, {lat, lng, map_id, title}) => {
-          let setObj = {};
+          const setObj = {};
           if (lat || lat === 0) setObj["lat"] = lat;
           if (lng || lng === 0) setObj["lng"] = lng;
           if (map_id) setObj["map.atom_id"] = map_id;
