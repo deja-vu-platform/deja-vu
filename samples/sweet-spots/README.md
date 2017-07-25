@@ -6,7 +6,7 @@
 Allows users to mark points of interest on a map and review spots added by others.
 
 ## Design Credit
-Team No REST for the Wicket
+Team No REST for the Wicked
 - Maryam Archie
 - Nishchal Bhandari
 - Bob Liang
