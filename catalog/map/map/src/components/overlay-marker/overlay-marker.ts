@@ -24,7 +24,7 @@ export class OverlayMarkerComponent {
 
   gmapsAPI: any;
   mapObj: any;
-  infowindow_id = uuidv4();
+  infoWindowId = uuidv4();
   markerObj: any;
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -83,7 +83,7 @@ export class OverlayMarkerComponent {
     if (this.marker.title) {
       this.markerObj.setTitle(this.marker.title);
       const infoWindow = new this.gmapsAPI.InfoWindow({
-        content: document.getElementById(this.infowindow_id).children[0]
+        content: document.getElementById(this.infoWindowId).children[0]
       });
       this.markerObj.addListener("click", () =>
         infoWindow.open(this.mapObj, this.markerObj)
