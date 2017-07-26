@@ -9,7 +9,8 @@
     "dv-lang": "file:../../core/lang",
     "dv-access-auth": "file:../../catalog/access/auth",
     "dv-map-map": "file:../../catalog/map/map",
-    "dv-organization-event": "file:../../catalog/organization/event"
+    "dv-organization-event": "file:../../catalog/organization/event",
+    "dv-messaging-comment": "file:../../catalog/messaging/comment"
   },
   "devDependencies": {
     "tslint": "3.15.1",

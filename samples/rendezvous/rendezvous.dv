@@ -1,16 +1,23 @@
 app MapMit {
-  include access/Auth[User for User]
+  include access/Auth[UserData for User]
   include map/Map[MapData for Map, EventData for Marker]
   include organization/Event[
     EventData for Event,
     EventPanel replacing ShowEvent in ShowEvents
   ]
+  include messaging/Comment[
+    CommentData for Comment,
+    UserData for Author,
+    EventData for Target
+  ]
 
-  data User {}
+  data UserData {}
 
   data MapData {}
 
   data EventData {}
+
+  data CommentData {}
 
   global_map: MapData
 
@@ -25,7 +32,7 @@ app MapMit {
   widget Main {
     map: MapData = global_map,
     to_user_profile: Widget = UserProfile,
-    user: User
+    user: UserData
   }
 
   widget EventPanel {
@@ -36,7 +43,7 @@ app MapMit {
 
   widget NewEvent {
     map: MapData = global_map,
-    user: User,
+    user: UserData,
     new_event: EventData,
     new_event_ok: boolean
   }
@@ -46,7 +53,14 @@ app MapMit {
   }
 
   widget UserProfile {
-    user: User
+    user: UserData
+  }
+
+  widget AddComment {
+    event: EventData,
+    user: UserData,
+    comment: CommentData,
+    submit_ok: boolean
   }
 
   login: route = {path: "login", widget: Login}
