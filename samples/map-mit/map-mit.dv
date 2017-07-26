@@ -1,0 +1,78 @@
+app MapMit {
+  include access/Auth[User for User]
+  include map/Map[
+    EventData for Marker,
+    MapData for Map,
+    EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
+  ]
+  include organization/Event[
+    EventData for Event,
+    DisplayEvent replacing ShowEvent in ShowEvents
+  ]
+  include organization/Group[
+    User for Member,
+    GroupData for Group,
+    DisplayGroup replacing ShowGroupName in ShowGroupsByMember
+  ]
+
+  data User {
+    username: text
+  }
+
+  data MapData {}
+
+  data EventData {
+    name: text
+  }
+
+  data GroupData {}
+
+  global_map: MapData
+
+  main widget Login {
+    on_signin_ok: Widget = Home
+  }
+
+  widget Signup {
+    on_register_ok: Widget = Home
+  }
+
+  widget NavBar {
+    user: User
+  }
+
+  widget Home {
+    map: MapData = global_map
+  }
+
+  widget MyEvents {}
+
+  widget CreateEvent {
+    event: EventData,
+    submit_ok: boolean
+  }
+
+  widget DisplayEvent {
+    map: MapData = global_map,
+    event: EventData
+  }
+
+  widget DisplayGroup {
+    group: GroupData
+  }
+
+  widget MyGroups {
+    user: User
+  }
+
+  widget EventInfoWindow {
+    event: EventData
+  }
+
+  login: route = {path: "login", widget: Login}
+  signup: route = {path: "signup", widget: Signup}
+  home: route = {path: "home", widget: Home}
+  my_events: route = {path: "my-events", widget: MyEvents}
+  create_event: route = {path: "create-event", widget: CreateEvent}
+  my_groups: route = {path: "my-groups", widget: MyGroups}
+}
