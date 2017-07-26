@@ -8,19 +8,17 @@
   </div>
   <div class="reset_password">
     <div style="width: 500px;" class="panel panel-default messagePanel">
-      <div style="background-color: #ffa599;" class="panel-heading">
+      <div style="background-color:#ffa599;display:flex;" class="panel-heading">
         <!-- TODO: only show if your profile -->
-        <div class="alignleft">
-          <dv-widget name="SignOutWithRedirect" of="Auth" id="sign-out-btn">
-          </dv-widget>
-        </div>
+        <dv-widget name="SignOutWithRedirect" of="Auth" id="sign-out-btn">
+        </dv-widget>
         <!-- TODO: get actual name of user whose profile it is -->
-        <div class="aligncenter">
-          <h4 style="text-align: center;">Coming Soon: Name</h4>
+        <div style="flex-grow:1;">
+          <h4 style="margin-top:15px;">Coming Soon: Name</h4>
         </div>
         <!-- TODO: only show if your profile -->
-        <div class="alignright">
-          <!--TODO: dvLink-->
+        <!--TODO: dvLink-->
+        <div style="margin-top:10px;">
           <a routerLink="/edit-profile" class="btn button" id="edit-prof-btn">
             Edit Profile
           </a>

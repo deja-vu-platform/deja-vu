@@ -454,32 +454,17 @@ select {
   z-index: 99;
 }
 
-.alignleft {
-    float: left;
-    text-align:left;
-    width:33.33333%;
-}
-.aligncenter {
-    float: left;
-    text-align:center;
-    width:33.33333%;
-}
-.alignright {
-    float: left;
-    text-align:right;
-    width:33.33333%;
-}
-
 .panel-heading {
   overflow: auto;
-}
-
-#edit-prof-btn {
-  margin-top: 10px;
 }
 
 #sign-out-btn button {
   background-color: #ffd0cc;
   margin-top: 10px;
   border: 1px solid #b3594d;
+}
+
+#edit-prof-btn {
+  margin-left:0;
+  margin-top:0;
 }
