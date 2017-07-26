@@ -9,11 +9,18 @@
   <div class="reset_password">
     <div style="width: 500px;" class="panel panel-default messagePanel">
       <div style="background-color: #ffa599;" class="panel-heading">
-        <h4 style="text-align: center;">Coming Soon: Name</h4>
-        <div style="text-align: right; margin-top: -55px; margin-bottom: 5px;">
-          <button id="editProfile" type="submit" class="btn button">
-            Coming Soon: Edit Profile
-          </button>
+        <div class="alignleft">
+          <dv-widget name="SignOutWithRedirect" of="Auth" id="sign-out-btn">
+          </dv-widget>
+        </div>
+        <div class="aligncenter">
+          <h4 style="text-align: center;">Coming Soon: Name</h4>
+        </div>
+        <div class="alignright">
+          <!--TODO: dvLink-->
+          <a routerLink="/edit-profile" class="btn button" id="edit-prof-btn">
+            Edit Profile
+          </a>
         </div>
       </div>
       <div style="padding: 15px; text-align: center" class="panel-body">

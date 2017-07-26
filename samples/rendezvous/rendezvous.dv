@@ -57,8 +57,12 @@ app Rendezvous {
   }
 
   widget UserProfile {
+    on_signout_ok: Widget = Login,
+    // to_edit_profile: Widget = EditProfile,
     user: UserData
   }
+
+  widget EditProfile {}
 
   widget AddComment {
     event: EventData,
@@ -77,5 +81,6 @@ app Rendezvous {
   main: route = {path: "main", widget: Main}
   new_event: route = {path: "new-event", widget: NewEvent}
   event_details: route = {path: "event", widget: EventDetails}
-  user_profile: route = {path: "user", widget: UserProfile}
+  user_profile: route = {path: "profile", widget: UserProfile}
+  edit_profile: route = {path: "edit-profile", widget: EditProfile}
 }
