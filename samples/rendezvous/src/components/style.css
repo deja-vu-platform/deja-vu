@@ -468,3 +468,25 @@ select {
   margin-left:0;
   margin-top:0;
 }
+
+/* makes labels show as a plain comma-separated list */
+#rlvnt-intrsts ul {
+  padding: 0 !important;
+  margin: 0;
+}
+#rlvnt-intrsts li {
+  background: none;
+  color: black;
+  font-size: 12;
+  top: 0;
+  margin-left: 1px;
+  margin-right: 2px;
+  padding: 0;
+}
+#rlvnt-intrsts li:after {
+  content: ",";
+  margin-left: -3px;
+}
+#rlvnt-intrsts li:last-child:after {
+  content: "";
+}

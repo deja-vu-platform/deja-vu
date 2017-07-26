@@ -14,6 +14,10 @@ app Rendezvous {
     UserData for Author,
     EventData for Target
   ]
+  include organization/Label[
+    EventData for Item,
+    EventDataArr for ItemArr
+  ]
 
   data UserData {}
 
@@ -22,6 +26,10 @@ app Rendezvous {
   data EventData {}
 
   data CommentData {}
+
+  data EventDataArr {
+    arr: [EventData]
+  }
 
   global_map: MapData
 
