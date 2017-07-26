@@ -1,4 +1,5 @@
 <dv-widget name="LoggedIn" of="Auth"></dv-widget>
+
 <div class="index">
   <div id="returnToMain" routerLink="/main">R E N D E Z V O U S</div>
   <!-- TODO: profile button -->
@@ -6,6 +7,9 @@
     class="btn button btn-info" routerLink="/main">
     <span class="glyphicon glyphicon-arrow-left"></span>
   </a>
+  <div style="float:right;">
+    <dv-widget name="UserProfileButton"></dv-widget>
+  </div>
   <div class="new_event">
     <div class="panel panel-default">
       <div style="background-color: #ffa599;" class="panel-heading">
@@ -54,14 +58,8 @@
           </tr>
         </table>
         <p>Coming soon: Event details</p>
-        <div style="float: right" id="create" *ngIf="!new_event_ok.value">
+        <div style="float: right" id="create">
           <dv-widget name="NewEventButton" of="Event"></dv-widget>
-        </div>
-        <div style="float: right">
-          <a id="back" style="margin-top: 10px; width: 80px;" routerLink="/main"
-            class="btn button btn-info">
-            {{new_event_ok.value ? "Return" : "Cancel"}}
-          </a>
         </div>
       </div>
     </div>

@@ -35,7 +35,6 @@ app Rendezvous {
 
   widget Main {
     map: MapData = global_map,
-    to_user_profile: Widget = UserProfile,
     user: UserData
   }
 
@@ -75,6 +74,12 @@ app Rendezvous {
     to_event_details: Widget = EventDetails,
     event: EventData
   }
+
+  widget UserProfileButton {
+    to_user_profile: Widget = UserProfile,
+    user: UserData
+  }
+
 
   login: route = {path: "login", widget: Login}
   register: route = {path: "register", widget: Register}

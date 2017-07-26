@@ -1,5 +1,3 @@
-<dv-widget name="LoggedIn" of="Auth"></dv-widget>
-
 <div class="wrapper clearfix">
   <div class="col-1-3">
     <h1 class="inline">EVENTS</h1>
@@ -23,13 +21,7 @@
     -->
     <!-- TODO: dropdown with links to profile and logout if possible -->
     <div id="welcome">
-      <div class="inline" style="float:right;">
-        <a class="btn button btn-info" id="userMenu"
-          style="margin-right:30px;text-align:center;"
-          [dvLink]="to_user_profile">
-          <span class="glyphicon glyphicon-user"></span>
-        </a>
-      </div>
+      <dv-widget name="UserProfileButton"></dv-widget>
     </div>
     <div id="map_all_events" style="height:100%;">
       <dv-widget name="DisplayMap" of="Map"></dv-widget>
