@@ -486,7 +486,7 @@ export namespace GruntTask {
             this_widget: this
           }`;
         } else { // object was provided
-          const ret_arr : string[] = [];
+          const ret_arr: string[] = [];
           // for every user-def key, check type + create appropriate statement
           _u.keys(f.data).map(key => {
             const base_str = `this.${f.name}.${key} = `;
@@ -495,24 +495,24 @@ export namespace GruntTask {
                 break;
               case "number":
               case "boolean":
-                ret_arr.push(base_str+`${f.data[key]}`);
+                ret_arr.push(base_str + f.data[key]);
                 break;
               case "string":
-                ret_arr.push(base_str+`"${f.data[key]}"`);
+                ret_arr.push(base_str + f.data[key]);
                 break;
               case "object":
                 if (f.data[key] === null) {
-                  ret_arr.push(base_str+`null`);
+                  ret_arr.push(base_str + "null");
                   break;
                 }
               case "function":
               case "symbol":
               default:
-                console.log("set field "+f.name+" with type "+f.type.name+
-                  " of widget "+w.name+" to "+f.data);
-                throw new Error("Setting a field to an object containing a "+
-                  "non-null object, function, or symbol is currently"+
-                  "unsupported.");
+                console.log("set field " + f.name + " with type " + f.type.name +
+                  " of widget " + w.name + " to " + f.data);
+                throw new Error("Setting a field to an object containing a " +
+                  "non-null object, function, or symbol is currently" +
+                  "unsupported");
             }
           });
           ret = ret_arr.join(";"); // last semicolon is added by join below

@@ -593,10 +593,10 @@ export class DvLink {
 
   @Input()
   set dvLink(widget: WidgetValue | PrimitiveAtom<WidgetValue>) {
-    if ((<WidgetValue>widget).name) {
-      this.widget = (<WidgetValue>widget);
+    if ((<WidgetValue> widget).name) {
+      this.widget = (<WidgetValue> widget);
     } else {
-      this.widget = (<PrimitiveAtom<WidgetValue>>widget).value;
+      this.widget = (<PrimitiveAtom<WidgetValue>> widget).value;
     }
   }
 
