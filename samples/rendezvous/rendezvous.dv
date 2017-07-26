@@ -1,6 +1,10 @@
-app MapMit {
+app Rendezvous {
   include access/Auth[UserData for User]
-  include map/Map[MapData for Map, EventData for Marker]
+  include map/Map[
+    MapData for Map,
+    EventData for Marker,
+    EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
+  ]
   include organization/Event[
     EventData for Event,
     EventPanel replacing ShowEvent in ShowEvents
@@ -61,6 +65,11 @@ app MapMit {
     user: UserData,
     comment: CommentData,
     submit_ok: boolean
+  }
+
+  widget EventInfoWindow {
+    to_event_details: Widget = EventDetails,
+    event: EventData
   }
 
   login: route = {path: "login", widget: Login}
