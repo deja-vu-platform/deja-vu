@@ -53,4 +53,10 @@ cliche Map {
   widget MarkerInfoWindow {
     marker: Marker
   }
+
+  // search box allowing you to search for real-life places
+  // adds markers to the map identifying their locations
+  widget SearchForPlace uses OverlayMarker {
+    map: Map
+  }
 }

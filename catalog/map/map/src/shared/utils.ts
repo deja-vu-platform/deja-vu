@@ -27,7 +27,7 @@ export function initGoogleMapsAPI() {
   const key = GOOGLE_MAPS_API_KEY; // TODO: Not hardcoded key
   const callback = "afterInitGoogleMapsAPI";
   const gmap_script = "https://maps.googleapis.com/maps/api/js?key=" + key +
-    "&callback=" + callback;
+    "&libraries=places&callback=" + callback;
 
   // Google map scripts need to be loaded this way
   if (!window["gmapsAPI"]) {

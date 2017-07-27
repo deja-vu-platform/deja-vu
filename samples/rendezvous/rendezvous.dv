@@ -5,6 +5,10 @@ app Rendezvous {
     EventData for Marker,
     EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
+  include map/Map[
+    MapData for Map,
+    EventData for Marker
+  ] as SearchMap
   include organization/Event[
     EventData for Event,
     EventPanel replacing ShowEvent in ShowEvents
@@ -87,7 +91,6 @@ app Rendezvous {
     to_profile: Widget = Profile,
     user: UserData
   }
-
 
   login: route = {path: "login", widget: Login}
   register: route = {path: "register", widget: Register}
