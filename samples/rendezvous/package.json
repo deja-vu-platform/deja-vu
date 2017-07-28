@@ -11,7 +11,8 @@
     "dv-map-map": "file:../../catalog/map/map",
     "dv-organization-event": "file:../../catalog/organization/event",
     "dv-messaging-comment": "file:../../catalog/messaging/comment",
-    "dv-organization-label": "file:../../catalog/organization/label"
+    "dv-organization-label": "file:../../catalog/organization/label",
+    "dv-messaging-post": "file:../../catalog/messaging/post"
   },
   "devDependencies": {
     "tslint": "3.15.1",

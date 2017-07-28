@@ -22,6 +22,11 @@ app Rendezvous {
     EventData for Item,
     EventDataArr for ItemArr
   ]
+  include messaging/Post[
+    EventData for Post,
+    UserData for User,
+    EventPanel replacing ShowPost in Posts
+  ]
 
   data UserData {}
 
@@ -31,6 +36,7 @@ app Rendezvous {
 
   data CommentData {}
 
+  // TODO: remove once array fields work
   data EventDataArr {
     arr: [EventData]
   }
@@ -46,8 +52,7 @@ app Rendezvous {
   }
 
   widget Main {
-    map: MapData = global_map,
-    user: UserData
+    map: MapData = global_map
   }
 
   widget EventPanel {
@@ -89,6 +94,10 @@ app Rendezvous {
 
   widget UserMenu {
     to_profile: Widget = Profile,
+    user: UserData
+  }
+
+  widget EventsByUser {
     user: UserData
   }
 

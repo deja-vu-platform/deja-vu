@@ -20,7 +20,9 @@ export class NewPostButtonComponent {
     this._graphQlService
       .post(`
         newPost(
-          author: "${this.author.username}", content: "${this.post.content}") {
+          author_id: "${this.author.atom_id}",
+          content: "${this.post.content}"
+        ) {
           atom_id
         }
       `)

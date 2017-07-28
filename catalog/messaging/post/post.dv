@@ -17,6 +17,7 @@ cliche Post {
 
   widget NewPostContent {
     post: Post,
+    author: User,
     submit_ok: boolean
   }
 
@@ -24,16 +25,20 @@ cliche Post {
    post: Post
   }
 
-  widget NewPost {
+  widget NewPost uses NewPostContent, NewPostButton {
     post: Post,
     author: User
   }
 
-  widget Posts {
+  widget Posts uses ShowPost {
     author: User
   }
 
   widget EditPost {
+    post: Post
+  }
+
+  widget ShowPost {
     post: Post
   }
 }

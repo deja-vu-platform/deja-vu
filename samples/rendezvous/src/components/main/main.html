@@ -4,22 +4,16 @@
     <div style="text-align:right;">
       <a routerLink="/new-event" class="btn button">Create an Event</a>
     </div>
-    <div>Coming Soon: Filter by all events, events I'm hosting,
-      or events I'm attending.</div>
+    <!-- TODO: Dropdown or something to show only one set of results -->
     <h4 style="text-align:center;">All Events</h4>
-    <dv-widget name="ShowEvents" of="Event"></dv-widget>
+    <dv-widget name="ShowEvents" of="Event" id="all-evnts"></dv-widget>
+    <h4 style="text-align:center;">Events You're Hosting</h4>
+    <dv-widget name="EventsByUser" id="evnts-by-usr"></dv-widget>
+    <h4 style="text-align:center;">Events You're Attending</h4>
+    <div>Coming Soon</div>
   </div>
   <div class="col-2-3">
-    <!-- TODO: Recenter Button
-    <div id="recenter" style="margin-top:0px;font-family:'Raleway',sans-serif;">
-      <div class="inline" style="float:left;">
-        <button class="btn button btn-info" id="userMenu" type="button">
-          <span>Recenter (Dummy Button)</span>
-        </button>
-      </div>
-    </div>
-    -->
-    <!-- TODO: dropdown with links to profile and logout if possible -->
+    <!-- TODO: Recenter Button-->
     <div id="welcome">
       <dv-widget name="UserMenu"></dv-widget>
     </div>

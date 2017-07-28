@@ -1,13 +1,8 @@
 <!-- Posts(User) -->
 <div class="container">
   <ul *ngIf="posts && posts.length > 0" class="row">
-    <li *ngFor="#post of posts">
-      <div class="row">
-        {{post.content}}
-      </div>
-      <div class="row">
-        by {{username}}
-      </div>
+    <li *ngFor="let post of posts">
+      <dv-widget name="ShowPost" [init]="{post: post}"></dv-widget>
     </li>
   </ul>
   <div *ngIf="!posts || posts.length == 0">

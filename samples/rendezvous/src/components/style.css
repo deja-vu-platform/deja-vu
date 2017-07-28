@@ -522,3 +522,24 @@ select {
   padding: 0;
   display: block;
 }
+
+#all-evnts .row {
+  margin: 0;
+}
+
+#all-evnts li {
+  padding: 0;
+  margin: 10 0 10 0;
+}
+
+#evnts-by-usr ul {
+  padding-left: 0;
+  list-style: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+#evnts-by-usr .container {
+  width: 100%;
+  padding: 0;
+}

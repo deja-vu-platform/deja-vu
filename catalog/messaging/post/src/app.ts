@@ -33,93 +33,71 @@ const schema = grafo
   .add_type({
     name: "Post",
     fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      content: {"type": graphql.GraphQLString},
       author: {"type": "User"}
     }
   })
   .add_type({
     name: "User",
     fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      posts: {"type": "[Post]"}
+      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      username: {"type": graphql.GraphQLString}
     }
   })
   .add_query({
-    name: "user",
-    "type": "User",
+    name: "postsByAuthor",
+    type: "[Post]",
     args: {
-      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      author_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
-    resolve: (root, {username}) => mean.db.collection("users")
-      .findOne({username: username})
+    resolve: (_, {author_id}) => {
+      return mean.db.collection("posts")
+        .find({"author.atom_id": author_id})
+        .toArray();
+    }
   })
   .add_mutation({
     name: "newPost",
     "type": "Post",
     args: {
-      author: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      content: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      author_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      content: {"type": graphql.GraphQLString}
     },
-    resolve: (_, {author, content}) => Validation.user_exists(author)
-      .then(user => ({
+    resolve: (_, {author_id, content}) => {
+      const post = {
         atom_id: uuid.v4(),
         content: content,
-        author: {atom_id: user.atom_id}
-      }))
-      .then(post => Promise
-        .all([
-          mean.db.collection("posts").insertOne(post),
-          mean.db.collection("users")
-            .updateOne(
-              {atom_id: post.author.atom_id},
-              {$addToSet: {posts: {atom_id: post.atom_id}}}),
-          bus.update_atom(
-            "User", post.author.atom_id,
-            {$addToSet: {posts: {atom_id: post.atom_id}}}),
-          bus.create_atom("Post", post.atom_id, post)
-          ])
-        .then(_ => post))
-
-    })
+        author: {atom_id: author_id}
+      };
+      return mean.db.collection("posts").insertOne(post)
+        .then(_ => bus.create_atom("Post", post.atom_id, post))
+        .then(_ => post);
+    }
+  })
   .add_mutation({
     name: "editPost",
     type: "Post",
     args: {
       atom_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      content: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      author_id: {type: graphql.GraphQLString},
+      content: {type: graphql.GraphQLString}
     },
-    resolve: (_, {atom_id, content}) => {
-      return Validation.post_exists(atom_id).then(() => {
-        return Promise.all([
-          mean.db.collection("posts").updateOne({atom_id}, {$set: {content}}),
-          bus.update_atom("Post", atom_id, {$set: {content}})
-        ]).then(() => mean.db.collection("posts").findOne({atom_id}));
-      });
+    resolve: (_, {atom_id, author_id, content}) => {
+      const updateObj = {content: content};
+      if (author_id) updateObj["author.atom_id"] = author_id;
+      return Promise
+        .all([
+          mean.db.collection("posts").updateOne(
+            {atom_id: atom_id}, {$set: updateObj}
+          ),
+          bus.update_atom("Post", atom_id, {$set: updateObj})
+        ])
+        .then(() => mean.db.collection("posts").findOne({atom_id}))
     }
   })
   .schema();
 
-
-namespace Validation {
-  export function user_exists(username: string): Promise<any> {
-    return mean.db.collection("users")
-      .findOne({username: username}, {atom_id: 1})
-      .then(user => {
-        if (!user) throw new Error(`user ${username} not found`);
-        return user;
-      });
-  }
-  export function post_exists(atom_id: string): Promise<any> {
-    return mean.db.collection("posts")
-      .findOne({atom_id})
-      .then(post => {
-        if (!post) throw new Error(`post ${post} not found`);
-        return post;
-      });
-  }
-}
 
 Helpers.serve_schema(mean.ws, schema);
 
