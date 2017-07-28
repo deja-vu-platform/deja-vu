@@ -1,13 +1,32 @@
 app SweetSpots {
-  include access/Auth[User for User]
+  include access/Auth[
+    User for User
+  ]
   include map/Map[
     Spot for Marker,
     MapData for Map,
     SpotInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
-  include community/Rating[User for Source, Spot for Target]
-  include messaging/Comment[User for Author, Spot for Target]
-  include organization/Label[Spot for Item, SpotArr for ItemArr]
+  include community/Rating[
+    User for Source,
+    Spot for Target
+  ]
+  include messaging/Comment[
+    User for Author,
+    Spot for Target,
+    CommentData for Comment,
+    Review replacing ShowComment in ShowComments
+  ]
+  include organization/Label[
+    Spot for Item,
+    SpotArr for ItemArr,
+    SpotPanelWithMarker replacing ShowItem in ShowSearchResults
+  ]
+  include community/Follow[
+    User for Source,
+    Spot for Target,
+    SpotPanel replacing ShowTarget in ShowFollowing
+  ]
 
   data User {
     username: text
@@ -26,6 +45,8 @@ app SweetSpots {
 
   global_map: MapData
 
+  data CommentData {}
+
   main widget Main {
     map: MapData = global_map,
     new_spot: Spot,
@@ -35,6 +56,11 @@ app SweetSpots {
   }
 
   widget NavBar {
+    user: User,
+    search_results: SpotArr
+  }
+
+  widget NavBarWithoutSearch {
     user: User,
     search_results: SpotArr,
     to_profile: Widget = Profile,
@@ -68,12 +94,29 @@ app SweetSpots {
   }
 
   widget SpotDetails {
+    map: MapData = global_map,
     spot: Spot,
     user: User
   }
 
   widget Profile {
     user: User
+  }
+
+  widget Review {
+    comment: CommentData,
+    spot: Spot
+  }
+
+  widget SpotPanel {
+    spot: Spot,
+    to_spot_details: Widget = SpotDetails
+  }
+
+  widget SpotPanelWithMarker {
+    map: MapData = global_map,
+    spot: Spot,
+    to_spot_details: Widget = SpotDetails
   }
 
   login: route = {path: "login", widget: Login}

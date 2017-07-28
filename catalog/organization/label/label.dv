@@ -26,4 +26,12 @@ cliche Label {
   widget Search {
     items: ItemArr
   }
+
+  widget ShowSearchResults uses ShowItem {
+    items: ItemArr
+  }
+
+  widget ShowItem {
+    item: Item
+  }
 }

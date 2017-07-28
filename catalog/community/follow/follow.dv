@@ -1,14 +1,33 @@
 cliche Follow {
+  // The thing doing the following
   data Source {
-    name: text,
-    follows: Target
+    follows: Target // array
   }
-  
+
+  // The thing being followed
   data Target {
     name: text
   }
 
-  widget EditFollow {
+  // A button to toggle a following relationship
+  widget FollowUnfollow {
+    source: Source,
+    target: Target
+  }
+
+  // Displays the name of a target
+  widget ShowTarget {
+    target: Target
+  }
+
+  // Lists the targets followed by a source
+  widget ShowFollowing uses ShowTarget {
+    source: Source
+  }
+  
+  // Displays all targets in a grid
+  // Allows follow relationships from source to be toggled
+  widget EditFollow uses FollowUnfollow, ShowTarget {
     source: Source
   }
 }

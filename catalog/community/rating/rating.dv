@@ -16,12 +16,22 @@ cliche Rating {
   widget RateTarget {
     source: Source,
     target: Target,
-    rating: number,
+    rating: Rating,
     submit_ok: boolean
   }
 
   // Shows aggregate rating info for a target
-  widget ShowRatings {
+  widget ShowAverageRating {
+    target: Target
+  }
+
+  widget ShowRating {
+    source: Source,
+    target: Target,
+    rating: Rating
+  }
+
+  widget ShowRatingsByTarget uses ShowRating {
     target: Target
   }
 }

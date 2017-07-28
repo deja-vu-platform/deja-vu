@@ -1,11 +1,8 @@
 <div class="container">
   <ul class="row" style="list-style-type: none">
     <li *ngFor="let target of targets" class="col-md-4">
-      {{target.name}}
-      <button *ngIf="!target.followed_by" (click)="follow(target)"
-       class="btn btn-default btn-sm pull-right">Follow</button>
-     <button *ngIf="target.followed_by" (click)="unfollow(target)"
-       class="btn btn-default btn-sm pull-right">Unfollow</button>
+      <dv-widget name="ShowTarget" [init]="{target: target}"></dv-widget>
+      <dv-widget name="FollowUnfollow" [init]="{target: target}"></dv-widget>
     </li>
   </ul>
 </div>
