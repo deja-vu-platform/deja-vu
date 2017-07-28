@@ -1,6 +1,6 @@
 import {Widget, Field} from "client-bus";
 import {MapAtom} from "../../shared/data";
-import {initGoogleMapsAPI, newMapObject, uuidv4} from "../../shared/utils";
+import {getGoogleMapsAPI, newMapObject, uuidv4} from "../../shared/utils";
 
 @Widget({fqelement: "Map"})
 export class DisplayMapComponent {
@@ -11,7 +11,8 @@ export class DisplayMapComponent {
   }
 
   ngAfterViewInit() {
-    initGoogleMapsAPI()
-      .then(gmapsAPI => newMapObject(gmapsAPI, this.map.atom_id));
+    getGoogleMapsAPI()
+      .then(gmapsAPI => newMapObject(gmapsAPI, this.map.atom_id))
+      .then(mapObj => this.map.obj = mapObj);
   }
 }

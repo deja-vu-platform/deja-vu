@@ -1,10 +1,16 @@
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 import {MarkerAtom, MapAtom} from "../../shared/data";
-import {getGoogleMapsAPI, getMapObject} from "../../shared/utils";
+import {
+  getGoogleMapsAPI,
+  waitFor,
+  getMapObject,
+  MARKER_ICONS
+} from "../../shared/utils";
 import {NgZone} from "@angular/core";
 
 import "rxjs/add/operator/map";
+
 
 @Widget({
   fqelement: "Map",
@@ -16,68 +22,58 @@ export class CreateMarkerButtonComponent {
   @Field("Map") map: MapAtom;
 
   gmapsAPI: any;
-  mapObj: any;
-  tempMarkerObj: any;
 
   constructor(private _graphQlService: GraphQlService, private zone: NgZone) {}
 
   ngAfterViewInit() {
     getGoogleMapsAPI()
       .then(gmapsAPI => this.gmapsAPI = gmapsAPI)
+      .then(_ => waitFor(this.map, "atom_id"))
       .then(_ => getMapObject(this.map.atom_id))
-      .then(mapObj => this.mapObj = mapObj)
+      .then(mapObj => this.map.obj = mapObj)
+      .then(_ => this.createMarker())
       .then(_ => this.addListeners());
   }
 
-  // called by button, create marker in db
+  // creates the marker, putting it on the map
+  // at first, marker is invisible and map is unchanged
   createMarker() {
-    this._graphQlService
-      .post(`
-        createMarker(
-          lat: ${this.marker.lat},
-          lng: ${this.marker.lng},
-          map_id: "${this.map.atom_id}"
-        ) {
-          atom_id
-        }
-      `)
-      .map(data => data.createMarker)
-      .subscribe(marker => {
-        this.marker.atom_id = marker.atom_id;
-        this.submit_ok.value = true;
+    if (!this.marker.obj) {
+      const center = this.map.obj.getCenter();
+      const position = {lat: center.lat(), lng: center.lng()};
+      this.marker.obj = new this.gmapsAPI.Marker({
+        position: position,
+        map: this.map.obj,
+        icon: MARKER_ICONS.BLUE,
+        visible: false
       });
+    }
   }
 
-  // make map update position on click
+  // watch for map clicks and changes in position form
   addListeners() {
-    // function to update the position marker on the map
-    let updatePosition = (position) => {
-      if (!this.tempMarkerObj) {
-        const blue = "http://maps.google.com/mapfiles/ms/icons/blue.png";
-        this.tempMarkerObj = new this.gmapsAPI.Marker({
-          position: position,
-          map: this.mapObj,
-          icon: blue
-        });
-      } else {
-        this.tempMarkerObj.setPosition(position);
-      }
-      this.mapObj.panTo(position);
-    };
-    // call update position when position field changes
-    this.marker.on_change(() => {
-      if (this.marker.lat !== undefined && this.marker.lng !== undefined) {
-        updatePosition(this.marker);
-      }
-    });
-    // modify position field when map is clicked (triggers updatePosition)
-    this.mapObj.addListener("click", (e) => {
-      // update must be done this way for form to reflect new position on screen
+    // on map click: update marker position
+    this.map.obj.addListener("click", (e) => {
+      // update must be done this way to get to form
       this.zone.run(() => {
         this.marker.lat = e.latLng.lat();
         this.marker.lng = e.latLng.lng();
       });
     });
+
+    // on change to marker: move the marker on the map
+    this.marker.on_change(() => {
+      if (this.marker.lat !== undefined && this.marker.lng !== undefined) {
+        this.updatePosition(this.marker);
+      }
+    });
+  }
+
+  // update the marker's position on the map
+  updatePosition(position) {
+    this.marker.obj.setVisible(true);
+    this.marker.obj.setPosition(position);
+    this.map.obj.panTo(position);
   }
 
   valid() {
