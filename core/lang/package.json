@@ -12,7 +12,7 @@
     "grunt-ts": "^5.3.2",
     "grunt-tslint": "^3.0.2",
     "tslint": "^3.3.0",
-    "typescript": "^2.0.10"
+    "typescript": "2.3.4"
   },
   "typings": "./lib/dv",
   "main": "./lib/dv",
