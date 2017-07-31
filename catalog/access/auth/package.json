@@ -30,7 +30,7 @@
   "devDependencies": {
     "grunt": "^0.4.5",
     "tslint": "^3.15.1",
-    "typescript": "^2.0.10"
+    "typescript": "2.3.4"
   },
   "main": "./lib",
   "typings": "./lib",
