@@ -150,6 +150,7 @@ export class AppParser {
         Literal_array: (sqbracket1, exprs, sqbracket2) => exprs.eval(),
         NonemptyListOf: (elem, sep, elems) => [elem.eval()]
           .concat(elems.eval()),
+        EmptyListOf: () => [],
         PropAssignment: (name, colon, expr) => {
           const ret = {};
           ret[name.sourceString] = expr.eval();
