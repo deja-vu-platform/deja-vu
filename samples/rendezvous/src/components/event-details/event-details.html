@@ -1,3 +1,5 @@
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
+
 <div class="index">
   <div id="returnToMain" routerLink="/main">R E N D E Z V O U S</div>
   <!-- TODO: profile button -->
@@ -8,7 +10,7 @@
   <div class="new_event">
     <div class="panel panel-default">
       <div style="background-color: #ffa599;" class="panel-heading eventName">
-        Coming Soon: Event Name
+        {{event?.title}}
       </div>
       <div style="padding: 15px;" class="panel-body">
         <div style="overflow: auto; margin-bottom: 15px">
@@ -66,10 +68,13 @@
           class="inline btn-group form-group">
           <button class="btn button">Coming Soon: Edit Event</button>
         </div>
+        <div class="button" id="jn-lv-grp">
+          <dv-widget name="JoinLeaveGroup" of="Group"></dv-widget>
+        </div>
         <div>
           <label style="margin-top: 80px;">Comments</label>
         </div>
-        <dv-widget name="ShowComments" of="Comment"></dv-widget>
+        <dv-widget name="EventComments"></dv-widget>
         <dv-widget name="AddComment"></dv-widget>
       </div>
     </div>

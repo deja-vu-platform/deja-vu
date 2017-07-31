@@ -42,7 +42,11 @@ export class ShowGroupMembersComponent {
           return memberAtom;
         })
         .subscribe(member => {
-          this.group.members.push(member);
+          if (this.group.members.findIndex(m => {
+            return m.atom_id === member.atom_id;
+          }) === -1) {
+            this.group.members.push(member);
+          }
         });
     };
 

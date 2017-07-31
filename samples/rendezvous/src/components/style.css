@@ -532,14 +532,14 @@ select {
   margin: 10 0 10 0;
 }
 
-#evnts-by-usr ul {
+#evnts-by-hst ul {
   padding-left: 0;
   list-style: none;
   margin-left: 0;
   margin-right: 0;
 }
 
-#evnts-by-usr .container {
+#evnts-by-hst .container {
   width: 100%;
   padding: 0;
 }
@@ -574,4 +574,24 @@ select {
 #shw-pst .row {
   margin-left: 0;
   margin-right: 0;
+}
+
+#evnts-by-attnd .list-group-item {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#jn-lv-grp {
+  float: left;
+  margin-top: 30px;
+  margin-left: 0px;
+}
+
+#jn-lv-grp button {
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  border-radius: 4px;
+  border: none;
+  background: #ffd0cc;
 }

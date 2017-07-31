@@ -29,7 +29,8 @@ app Rendezvous {
   ]
   include organization/Group[
     EventData for Group,
-    UserData for Member
+    UserData for Member,
+    EventPanel replacing ShowGroupName in ShowGroupsByMember
   ]
 
   data UserData {
@@ -75,7 +76,8 @@ app Rendezvous {
   }
 
   widget EventDetails {
-    event: EventData
+    event: EventData,
+    user: UserData
   }
 
   widget Profile {
@@ -103,8 +105,16 @@ app Rendezvous {
     user: UserData
   }
 
-  widget EventsByUser {
+  widget EventsByHost {
     user: UserData
+  }
+
+  widget EventsByAttendee {
+    user: UserData
+  }
+
+  widget EventComments {
+    event: EventData
   }
 
   login: route = {path: "login", widget: Login}
