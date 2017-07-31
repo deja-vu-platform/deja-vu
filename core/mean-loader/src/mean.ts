@@ -498,7 +498,7 @@ export namespace GruntTask {
                 ret_arr.push(base_str + f.data[key]);
                 break;
               case "string":
-                ret_arr.push(base_str + f.data[key]);
+                ret_arr.push(base_str + `"${f.data[key]}"`);
                 break;
               case "object":
                 if (f.data[key] === null) {
@@ -508,8 +508,8 @@ export namespace GruntTask {
               case "function":
               case "symbol":
               default:
-                console.log("set field " + f.name + " with type " + f.type.name +
-                  " of widget " + w.name + " to " + f.data);
+                console.log("set field " + f.name + " with type " +
+                  f.type.name + " of widget " + w.name + " to " + f.data);
                 throw new Error("Setting a field to an object containing a " +
                   "non-null object, function, or symbol is currently" +
                   "unsupported");
