@@ -60,4 +60,9 @@ cliche Map {
     map: Map,
     marker: Marker
   }
+
+  // Displays a text location of a marker.
+  widget ShowMarkerLocation {
+    marker: Marker
+  }
 }

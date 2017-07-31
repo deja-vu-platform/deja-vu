@@ -20,7 +20,7 @@
               Hosted By
               <span style="color: black; margin-left: 5px;"
                 class="badge userBadge">
-                Coming Soon!
+                {{event?.author?.username}}
               </span>
             </button>
           </div>
@@ -54,7 +54,7 @@
         <div class="event-info-table">
           <label> Event Details</label>
           <dv-widget name="ShowEvent" of="Event"></dv-widget>
-          <p>Coming Soon: Event Location</p>
+          <dv-widget name="ShowMarkerLocation" of="Map"></dv-widget>
         </div>
         <div class="event_details">
           <label> Event Description</label>

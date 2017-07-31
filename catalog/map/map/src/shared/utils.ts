@@ -25,7 +25,7 @@ export const MARKER_ICONS = {
 
 // If needed, loads Google Maps API scripts
 // Returns a promise containing the api
-export function getGoogleMapsAPI() {
+export function getGoogleMapsAPI(): Promise<any> {
   // see if google maps api needs to be loaded on the page
   // flag is used rather than checking for api to avoid async issues
   if (!window["didLoadGoogleMapsAPI"]) {
@@ -40,7 +40,7 @@ export function getGoogleMapsAPI() {
 
 // creates a map object, installing it in an element with given id
 // returns a promise containing the element
-export function newMapObject(gmaps, map_id: string) {
+export function newMapObject(gmaps: any, map_id: string): Promise<any> {
   return waitFor(window, map_id)
     .then(_ => {
       const mapElement = document.getElementById(map_id);
@@ -62,7 +62,7 @@ export function newMapObject(gmaps, map_id: string) {
 }
 
 // Returns a promise containing the map object with map_id
-export function getMapObject(map_id: string) {
+export function getMapObject(map_id: string): Promise<any> {
   return waitFor(window, "mapObj-"+map_id)
     .then(_ => Promise.resolve(window["mapObj-"+map_id]))
     .catch(_ => Promise.reject("Unable to retrieve map with id " + map_id));
@@ -72,8 +72,8 @@ export function getMapObject(map_id: string) {
 // adjusts map center and bounds to fit all markers
 // returns the new marker object
 export function overlayMarker(
-  gmaps, map, pos: {lat: number, lng: number}, title?: string
-) {
+  gmaps: any, map: any, pos: {lat: number, lng: number}, title?: string
+): any {
   const latlng = new gmaps.LatLng(pos.lat, pos.lng);
   const marker = new gmaps.Marker({
     position: latlng,
@@ -89,7 +89,7 @@ export function overlayMarker(
 
 // removes an overlayed marker from the map
 // correctly adjusts center and bounds of map
-export function removeMarker(gmaps, marker) {
+export function removeMarker(gmaps: any, marker: any): void {
   const map = marker.getMap();
   marker.setMap(null);
   map["dvMarkers"].delete(marker);
@@ -100,8 +100,30 @@ export function removeMarker(gmaps, marker) {
   fitToBounds(map, map["dvBounds"]);
 }
 
-export function getInfoWindow(map) {
+export function getInfoWindow(map: any): any {
   return map["dvInfoWindow"];
+}
+
+// Returns a string with the closest address to the given point
+// Returns "" if no result can be found
+//   (e.g. if the point is in the middle of the ocean)
+export function doReverseGeocode(
+  gmaps: any, pos: {lat: number, lng: number}
+): Promise<string> {
+  let geocoder = new gmaps.Geocoder;
+  return new Promise((resolve, reject) => {
+    geocoder.geocode({"location": pos}, (results, status) => {
+      if (status === "OK") {
+        if (results) {
+          resolve(results[0].formatted_address);
+        } else {
+          resolve("");
+        }
+      } else {
+        reject("Geocoder failed due to: " + status);
+      }
+    });
+  });
 }
 
 // waits for a field of an object `obj[fld]` to be truthy
@@ -112,9 +134,9 @@ export function getInfoWindow(map) {
 // dvec is a vector of derivatives
 //   [0] = number of msec to wait between tries
 //   [i] = amount to increase [i-1] by after each try, i > 0
-export function waitFor(
-  obj: object, fld: string, ret?, maxt=DEF_MAXT, dvec=DEF_DVEC
-) {
+export function waitFor<T>(
+  obj: object, fld: string, ret?: T, maxt=DEF_MAXT, dvec=DEF_DVEC
+) : Promise<T> {
   if (obj[fld]) {
     return Promise.resolve(ret);
   }
@@ -131,7 +153,7 @@ export function waitFor(
 
 // UUID version 4 string generator (useful for making a map_id)
 // source: https://gist.github.com/kaizhu256/4482069
-export function uuidv4() {
+export function uuidv4(): string {
   var uuid = "", ii;
   for (ii = 0; ii < 32; ii += 1) {
     switch (ii) {
@@ -159,7 +181,7 @@ export function uuidv4() {
 // HELPER FUNCTIONS
 
 // loads the google maps api onto the page, so we can get it here
-function initGoogleMapsAPI() {
+function initGoogleMapsAPI(): void {
   // Script to allow us to access google maps api in this file
   const init_script = `
     function afterInitGoogleMapsAPI() {
@@ -179,7 +201,7 @@ function initGoogleMapsAPI() {
 }
 
 // fits a map to its bounds, handling special cases
-function fitToBounds(map, bounds) {
+function fitToBounds(map: any, bounds: any): void {
   if (!bounds.isEmpty()) {
     map.setCenter(bounds.getCenter());
     map.fitBounds(bounds);
@@ -190,14 +212,14 @@ function fitToBounds(map, bounds) {
 }
 
 // returns a promise which resolves after delay
-function timeout(delay: number) {
+function timeout(delay: number): Promise<{}> {
   return new Promise(function(resolve, reject) {
     setTimeout(resolve, delay);
   });
 }
 
 // inserts a script tag containing a script literal
-function insertScript(scriptLiteral: string) {
+function insertScript(scriptLiteral: string): void {
   const s = document.createElement("script");
   s.type = "text/javascript";
   s.innerHTML = scriptLiteral;
@@ -205,7 +227,7 @@ function insertScript(scriptLiteral: string) {
 }
 
 // inserts a script tag that loads a remote script
-function loadRemoteScript(src: string) {
+function loadRemoteScript(src: string): void {
   const s = document.createElement("script");
   s.type = "text/javascript";
   s.src = src;
