@@ -27,8 +27,14 @@ app Rendezvous {
     UserData for User,
     EventPanel replacing ShowPost in Posts
   ]
+  include organization/Group[
+    EventData for Group,
+    UserData for Member
+  ]
 
-  data UserData {}
+  data UserData {
+    username: text
+  }
 
   data MapData {}
 

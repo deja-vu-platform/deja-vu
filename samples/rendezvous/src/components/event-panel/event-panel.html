@@ -3,7 +3,15 @@
     {{event.title}}
   </div>
   <div class="panel-body">
-    <p>Coming soon: attendees</p>
+    <dv-widget name="ShowGroupMembers" of="Group" style="display:none">
+    </dv-widget>
+    <button type="button" style="width: 100%;"
+      class="displayButtons btn btn-info">
+      Attendees
+      <span style="color: black; margin-left: 5px;" class="badge">
+        {{event?.members?.length}}
+      </span>
+    </button>
     <p>Coming soon: location</p>
     <dv-widget name="ShowEvent" of="Event"></dv-widget>
   </div>

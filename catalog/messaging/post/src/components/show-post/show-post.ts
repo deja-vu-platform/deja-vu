@@ -8,8 +8,7 @@ import {GraphQlService} from "gql";
 
 @Widget({
   fqelement: "Post",
-  ng2_providers: [GraphQlService],
-  template: `{{post?.author?.username}}`
+  ng2_providers: [GraphQlService]
 })
 export class ShowPostComponent implements AfterInit {
   @Field("Post") post: PostAtom;
@@ -27,9 +26,9 @@ export class ShowPostComponent implements AfterInit {
         .get(`
           post_by_id(atom_id: "${this.post.atom_id}") {
             author {
-              atom_id,
-              username
-            }
+              atom_id
+            },
+            content
           }
         `)
         .toPromise()
@@ -38,8 +37,21 @@ export class ShowPostComponent implements AfterInit {
           if (this.post.author === undefined) {
             this.post.author = this._clientBus.new_atom<UserAtom>("Author");
           }
-          this.post.author.atom_id = post.author.atom_id;
-          this.post.author.username = post.author.username;
+          if (!this.post.author.atom_id) {
+            this.post.author.atom_id = post.author.atom_id;
+          }
+          if (!this.post.author.username) {
+            this._graphQlService
+              .get(`
+                user_by_id(atom_id: "${post.author.atom_id}") {
+                  username
+                }
+              `)
+              .toPromise()
+              .then(data => data.user_by_id.username)
+              .then(username => this.post.author.username = username);
+          }
+          this.post.content = post.content;
         });
     };
     update_post();

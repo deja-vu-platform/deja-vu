@@ -543,3 +543,35 @@ select {
   width: 100%;
   padding: 0;
 }
+
+#attendeesDiv ul {
+  margin: 0;
+}
+
+#attendeesDiv li {
+  display: inline-block;
+  padding: 0;
+  margin-right: 10px;
+}
+
+#attendeesDiv show-member {
+  color: black;
+  margin-left: 5px;
+  background-color: white;
+  border: 1px solid #B3594D;
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: 10px;
+}
+
+#shw-pst .row {
+  margin-left: 0;
+  margin-right: 0;
+}

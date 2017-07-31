@@ -26,10 +26,10 @@
           </div>
           <div style="float: left; margin-top: 4px;">
             <button id="attendees" type="button" style="cursor: pointer;"
-              class="btn btn-info">
+              class="displayButtons btn btn-info">
               Attendees
               <span style="color: black; margin-left: 5px;" class="badge">
-                Coming Soon!
+                {{event?.members?.length}}
               </span>
             </button>
           </div>
@@ -42,16 +42,24 @@
               </span>
             </button>
           </div>
+          <div id="attendeesDiv"
+            style="display: block; margin-top: 50px;">
+            <label>Attendees</label>
+            <div style="background-color: #FFEFEE; border: 1px solid #CC9088"
+              class="panel-body">
+              <dv-widget name="ShowGroupMembers" of="Group"></dv-widget>
+            </div>
+          </div>
         </div>
         <div class="event-info-table">
-          <!-- TODO: Show attendees when button is pressed -->
+          <label> Event Details</label>
           <dv-widget name="ShowEvent" of="Event"></dv-widget>
           <p>Coming Soon: Event Location</p>
         </div>
         <div class="event_details">
-          <label> Event Details</label>
+          <label> Event Description</label>
           <div style="background-color: #FFEFEE; border: 1px solid #CC9088">
-            Coming Soon: Event Details
+            <dv-widget name="ShowPost" of="Post" id="shw-pst"></dv-widget>
           </div>
         </div>
         <div style="float: right; margin-top: 10px;"
