@@ -1,12 +1,15 @@
+// Allows members of the MIT community to plan events on campus
 app MapMit {
+  // Restrict access to the application to only registered users
   include access/Auth[User for User]
+  // Campus events are displayed on a map
   include map/Map[
-    EventData for Marker,
-    MapData for Map,
+    CampusEvent for Marker,
+    CampusMap for Map,
     EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
   include organization/Event[
-    EventData for Event,
+    CampusEvent for Event,
     DisplayEvent replacing ShowEvent in ShowEvents
   ]
   include organization/Group[
@@ -19,15 +22,15 @@ app MapMit {
     username: text
   }
 
-  data MapData {}
+  data CampusMap {}
 
-  data EventData {
+  data CampusEvent {
     name: text
   }
 
   data GroupData {}
 
-  global_map: MapData
+  global_map: CampusMap = {}
 
   main widget Login {
     on_signin_ok: Widget = Home
@@ -42,19 +45,19 @@ app MapMit {
   }
 
   widget Home {
-    map: MapData = global_map
+    map: CampusMap = global_map
   }
 
   widget MyEvents {}
 
   widget CreateEvent {
-    event: EventData,
+    event: CampusEvent,
     submit_ok: boolean
   }
 
   widget DisplayEvent {
-    map: MapData = global_map,
-    event: EventData
+    map: CampusMap = global_map,
+    event: CampusEvent
   }
 
   widget DisplayGroup {
@@ -66,7 +69,7 @@ app MapMit {
   }
 
   widget EventInfoWindow {
-    event: EventData
+    event: CampusEvent
   }
 
   login: route = {path: "login", widget: Login}

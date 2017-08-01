@@ -26,7 +26,7 @@
     "grunt-ts": "^5.5.1",
     "grunt-tslint": "^3.0.2",
     "tslint": "^3.3.0",
-    "typescript": "^2.0.10"
+    "typescript": "2.3.4"
   },
   "typings": "./lib/client-bus",
   "main": "./lib/client-bus",
