@@ -60,13 +60,13 @@ export class CreateMarkerPositionComponent {
       .then(_ => waitFor(this.map, "atom_id"))
       .then(_ => getMapObject(this.map.atom_id))
       .then(mapObj => this.map.obj = mapObj)
-      .then(_ => this.createMarker())
+      .then(_ => this.initMarker())
       .then(_ => this.addListeners());
   }
 
   // creates the marker, putting it on the map
   // at first, marker is invisible and map is unchanged
-  createMarker() {
+  initMarker() {
     if (!this.marker.obj) {
       const center = this.map.obj.getCenter();
       const position = {lat: center.lat(), lng: center.lng()};
