@@ -5,7 +5,7 @@ cliche Event {
   }
 
   data WeeklyEvent {
-    events: Event,
+    events: [Event],
     starts_on: date,  // the date of the first occurrence of the weekly event
     ends_on: date,  // the date of the last occurrence of the weekly event
     start_time: time,

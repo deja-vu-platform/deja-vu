@@ -1,7 +1,7 @@
 cliche Label {
   data Item {
     name: text,
-    labels: Label
+    labels: [Label]
   }
 
   // TODO: Change once arrays work
@@ -11,7 +11,7 @@ cliche Label {
 
   data Label {
     name: text,
-    items: Item
+    items: [Item]
   }
 
   widget AttachLabels {

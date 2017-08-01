@@ -1,12 +1,12 @@
 cliche Feed {
   data Publisher {
     name: text,
-    messages: Message
+    messages: [Message]
   }
 
   data Subscriber {
     name: text,
-    subscriptions: Publisher // array
+    subscriptions: [Publisher]
   }
 
   data Message {

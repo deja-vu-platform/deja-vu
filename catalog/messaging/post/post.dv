@@ -6,7 +6,7 @@ cliche Post {
 
   data User {
     username: text,
-    posts: Post
+    posts: [Post]
   }
 
   widget NewPostButton {
@@ -22,7 +22,7 @@ cliche Post {
   }
 
   widget ShowAuthor {
-   post: Post
+    post: Post
   }
 
   widget NewPost uses NewPostContent, NewPostButton {
