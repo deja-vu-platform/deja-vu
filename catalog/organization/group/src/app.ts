@@ -99,10 +99,32 @@ const schema = grafo
                   {$addToSet: {members: {atom_id: atom_id}}})
               ])
               .then(_ =>
-                mean.db.collection("groups").findOne({ atom_id: group.atom_id }));
+                mean.db.collection("groups").findOne({atom_id: group.atom_id}));
           });
         }
-      }
+      },
+      removeMember: {
+        type: "Group",
+        args: {
+          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+        },
+        resolve: (group, {atom_id}) => {
+          return Validation.memberExists(atom_id).then(_ => {
+            return Promise
+              .all([
+                mean.db.collection("groups")
+                  .updateOne(
+                    {atom_id: group.atom_id},
+                    {$pull: {members: {atom_id: atom_id}}}
+                  ),
+                bus.update_atom("Group", group.atom_id,
+                  {$pull: {members: {atom_id: atom_id}}})
+              ])
+              .then(_ =>
+                mean.db.collection("groups").findOne({atom_id: group.atom_id}));
+          });
+        }
+      },
     }
   })
   .add_query({

@@ -1,0 +1,62 @@
+<div class="index">
+  <div id="returnToMain" routerLink="/main">R E N D E Z V O U S</div>
+  <div style="float: left;" class="inline">
+    <a id="back" type="button" style="margin-right: 50px;"
+      class="btn button btn-info" routerLink="/main">
+      <span class="glyphicon glyphicon-arrow-left"></span>
+    </a>
+  </div>
+  <div class="reset_password">
+    <div style="width: 500px;" class="panel panel-default messagePanel">
+      <div style="background-color:#ffa599;display:flex;" class="panel-heading">
+        <!-- TODO: only show if your profile -->
+        <dv-widget name="SignOutWithRedirect" of="Auth" id="sign-out-btn">
+        </dv-widget>
+        <!-- TODO: get actual name of user whose profile it is -->
+        <div style="flex-grow:1;">
+          <h4 style="margin-top:15px;">Coming Soon: Name</h4>
+        </div>
+        <!-- TODO: only show if your profile -->
+        <!--TODO: dvLink-->
+        <div style="margin-top:10px;">
+          <a routerLink="/edit-profile" class="btn button" id="edit-prof-btn">
+            Edit Profile
+          </a>
+        </div>
+      </div>
+      <div style="padding: 15px; text-align: center" class="panel-body">
+        <table style="margin-top: 10px; margin-bottom: 0px;"
+          class="event_info event_display table">
+          <tr>
+            <th style="border-color: #CC9088; border-bottom: none;">Email</th>
+            <td style="border-color: #CC9088;">Coming Soon: Email</td>
+          </tr>
+          <tr>
+            <th
+              style="border-color:#CC9088;border-bottom:none;border-top:none;">
+              Phone
+            </th>
+            <td>Coming Soon: Phone Number</td>
+          </tr>
+          <tr style="text-align: center;">
+            <th
+              style="border-color:#CC9088;border-bottom:none;border-top:none;">
+              Majors
+            </th>
+            <td>
+              <p style="margin-bottom:0px;">
+                Coming Soon: Majors
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <th style="border-color: #CC9088; border-top: none;">
+              Location
+            </th>
+            <td>Coming Soon: Zip Code</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,14 +1,6 @@
 <div class="container">
-  <form (ngSubmit)="onSubmit()" #postForm="ngForm" class="form-horizontal">
-    <div class="form-group">
-      <label class="sr-only" for="content">Content</label>
-      <textarea required id="content"
-        [(ngModel)]="post.content" ngControl="content"
-        placeholder="Write something..."></textarea>
-    </div>
-    <div class="form-group">
-      <button type="submit" class="btn btn-default btn-sm"
-       [disabled]="!postForm.form.valid">Create Post</button>
-    </div>
+  <form class="form-horizontal">
+    <dv-widget name="NewPostContent"></dv-widget>
+    <dv-widget name="NewPostButton"></dv-widget>
   </form>
 </div>

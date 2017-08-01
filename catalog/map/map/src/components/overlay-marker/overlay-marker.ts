@@ -3,12 +3,13 @@ import {Widget, Field, PrimitiveAtom, WidgetValue} from "client-bus";
 import {MarkerAtom, MapAtom} from "../../shared/data";
 
 import {
-  getMapObject,
   getGoogleMapsAPI,
   waitFor,
   uuidv4,
   overlayMarker,
-  removeMarker
+  removeMarker,
+  getMapObject,
+  getInfoWindow
 } from "../../shared/utils";
 
 import {GraphQlService} from "gql";
@@ -23,9 +24,7 @@ export class OverlayMarkerComponent {
   @Field("Widget") widget: PrimitiveAtom<WidgetValue>;
 
   gmapsAPI: any;
-  mapObj: any;
   infoWindowId = uuidv4();
-  markerObj: any;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -46,15 +45,15 @@ export class OverlayMarkerComponent {
       .then(gmapsAPI => this.gmapsAPI = gmapsAPI)
       .then(_ => waitFor(this.map, "atom_id"))
       .then(_ => getMapObject(this.map.atom_id))
-      .then(mapObj => this.mapObj = mapObj)
+      .then(mapObj => this.map.obj = mapObj)
       .then(_ => waitFor(this.marker, "lat"))
       .then(_ => waitFor(this.marker, "lng"))
       .then(_ => this.overlayMarker());
   }
 
   ngOnDestroy() {
-    if (this.gmapsAPI && this.markerObj) {
-      removeMarker(this.gmapsAPI, this.markerObj);
+    if (this.gmapsAPI && this.marker.obj) {
+      removeMarker(this.gmapsAPI, this.marker.obj);
     }
   }
 
@@ -78,16 +77,17 @@ export class OverlayMarkerComponent {
   }
 
   overlayMarker() {
-    this.markerObj = overlayMarker(this.gmapsAPI, this.mapObj, this.marker);
+    this.marker.obj = overlayMarker(
+      this.gmapsAPI, this.map.obj, this.marker, this.marker.title
+    );
 
     if (this.marker.title) {
-      this.markerObj.setTitle(this.marker.title);
-      const infoWindow = new this.gmapsAPI.InfoWindow({
-        content: document.getElementById(this.infoWindowId).children[0]
+      const infoWindow = getInfoWindow(this.map.obj);
+      const content = document.getElementById(this.infoWindowId).children[0];
+      this.marker.obj.addListener("click", () => {
+        infoWindow.setContent(content);
+        infoWindow.open(this.map.obj, this.marker.obj);
       });
-      this.markerObj.addListener("click", () =>
-        infoWindow.open(this.mapObj, this.markerObj)
-      );
     }
   }
 }
