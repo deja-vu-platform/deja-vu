@@ -1,4 +1,4 @@
-// Organize members into groups
+// Organize members into groups so that they can be handled in aggregate
 cliche Group {
   // Member of a Group
   data Member {

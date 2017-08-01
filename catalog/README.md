@@ -33,7 +33,7 @@ Cliché Catalog
 | Event | Schedule events |
 | Allocator | Distribute resources among consumers |
 | Label | Label items so that they can be found later |
-| Group | Organize members into groups |
+| Group | Organize members into groups so that they can be handled in aggregate |
 
 How to write clichés
 --------------------
