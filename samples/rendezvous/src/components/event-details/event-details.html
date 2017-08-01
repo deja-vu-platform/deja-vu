@@ -72,10 +72,18 @@
           <dv-widget name="JoinLeaveGroup" of="Group"></dv-widget>
         </div>
         <div>
-          <label style="margin-top: 80px;">Comments</label>
+          <label style="margin-top: 80px;display:flex;">Comments</label>
         </div>
-        <dv-widget name="EventComments"></dv-widget>
-        <dv-widget name="AddComment"></dv-widget>
+        <table id="comment-table" class="event_info event_display table">
+          <tbody>
+            <tr id="add-comment-row">
+              <th id="add-comment">
+                <dv-widget name="AddComment"></dv-widget>
+              </th>
+            </tr>
+            <dv-widget name="EventComments"></dv-widget>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

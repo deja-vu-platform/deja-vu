@@ -144,7 +144,10 @@ select {
 }
 
 .event_display td {
-  border: 1px solid #CC9088;
+  border-top: 1px solid #CC9088;
+}
+.event_display td:first-child {
+  border-top: none;
 }
 
 .event_display th {
@@ -594,4 +597,43 @@ select {
   border-radius: 4px;
   border: none;
   background: #ffd0cc;
+}
+
+#add-comment {
+  border-color: #CC9088;
+  background-color: #F0F0F0;
+  padding: 15px;
+}
+
+.show-comment {
+  background-color: #FFEFEE;
+  padding: 15px;
+}
+
+#comment-table {
+  text-align: left;
+  border: 1px solid #CC9088;
+  margin-top: 0px;
+}
+
+#comment-table li {
+  width: 100%;
+  padding: 0;
+}
+
+#comment-table ul {
+  padding: 0;
+  margin: 0;
+}
+
+#comment-table tr {
+  display: block;
+}
+
+#add-comment-row {
+  display: table-row !important;
+}
+
+#comment-table td {
+  display: block;
 }

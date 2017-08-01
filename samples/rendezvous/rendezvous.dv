@@ -16,7 +16,8 @@ app Rendezvous {
   include messaging/Comment[
     CommentData for Comment,
     UserData for Author,
-    EventData for Target
+    EventData for Target,
+    EventComment replacing ShowComment in ShowComments
   ]
   include organization/Label[
     EventData for Item,
@@ -115,6 +116,10 @@ app Rendezvous {
 
   widget EventComments {
     event: EventData
+  }
+
+  widget EventComment {
+    comment: CommentData
   }
 
   login: route = {path: "login", widget: Login}

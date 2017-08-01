@@ -4,8 +4,9 @@ import {CommentAtom} from "../../shared/data";
 
 
 @Widget({
-  fqelement: "Comment"
+  fqelement: "Comment",
+  template: `{{comment.content}}`,
 })
-export class ShowCommentComponent {
+export class ShowCommentTextComponent {
   @Field("Comment") comment: CommentAtom;
 }
