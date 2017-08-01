@@ -1,24 +1,33 @@
+// Control access to resources
 cliche Auth {
   data User {
     username: text
   }
 
   data Resource {
-    // TODO: allow multiple users to own a resource
     owner: User,
-    viewers: [ User ]
+    viewers: [User]
   }
 
-  // Will also sign in the user
+  // Shows a register form. After the new user is persisted the user is
+  // redirected to the given widget. The user will also be signed in.
   widget RegisterWithRedirect {
     on_register_ok: Widget
   }
+
+  // Shows a sign in form. After a successful sign in, the user is redirected
+  // to the given widget
   widget SignInWithRedirect {
     on_signin_ok: Widget
   }
+
   widget SignOutWithRedirect {
     on_signout_ok: Widget
   }
+
+  // The user field will be updated with the logged in user if there is one.
+  // This widget has no template and nothing will show up on the screen when
+  // included.
   widget LoggedIn {
     user: User
   }

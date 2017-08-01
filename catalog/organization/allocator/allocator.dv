@@ -1,8 +1,14 @@
 // Distribute resources among consumers
+// Resources are distributed among consumers in a round-robin fashion
 cliche Allocator {
   // A resource belongs to at most one allocation
-  data Resource { name: text, assigned_to: Consumer }
+  data Resource {
+    name: text,
+    assigned_to: Consumer
+  }
+
   data Consumer { name: text }
+
   // The allocation is triggered when the assigned_to
   // field of one of its resources is first accessed.
   data Allocation { resources: Resource }

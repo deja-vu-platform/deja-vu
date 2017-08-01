@@ -1,3 +1,4 @@
+// Broadcast messages
 cliche Post {
   data Post {
     content: text,

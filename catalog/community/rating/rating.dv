@@ -1,18 +1,21 @@
+// Crowdsource evaluation of items
+// Ratings range from 1 to 5 stars
 cliche Rating {
-  // The target of something being rated
+  // The item being rated
   data Target {}
 
-  // An actor who has rated a target
+  // The actor doing the rating
   data Source {}
 
-  // A rating object in the database
   data Rating {
     source: Source,
     target: Target,
     rating: number
   }
 
-  // Shows stars and allows a source to rate a target
+  // Shows the current rating given to the target by source (or 0 if the target
+  // has not yet been rated by source) and lets source update the rating
+  // When submit_ok flips to true, the updated rating is persisted
   widget RateTarget {
     source: Source,
     target: Target,
@@ -20,17 +23,21 @@ cliche Rating {
     submit_ok: boolean
   }
 
-  // Shows aggregate rating info for a target
+  // Shows the average rating of a target and the number of ratings received
+  // (e.g, "3.4/5 average rating with 200 votes")
   widget ShowAverageRating {
     target: Target
   }
 
+  // Shows the rating given by the source to the target (e.g, "Rating: 3").
+  // If no rating exists then it shows "Rating: N/A"
   widget ShowRating {
     source: Source,
     target: Target,
     rating: Rating
   }
 
+  // Shows a list of all ratings given to target
   widget ShowRatingsByTarget uses ShowRating {
     target: Target
   }

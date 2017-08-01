@@ -1,3 +1,4 @@
+// Receive updates from sources
 cliche Follow {
   // The thing doing the following
   data Source {

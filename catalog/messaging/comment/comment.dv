@@ -1,3 +1,4 @@
+// Express an opinion or reaction in writing
 cliche Comment {
   data Comment {
     author: Author,
@@ -51,5 +52,4 @@ cliche Comment {
   widget EditComment {
     comment: Comment
   }
-
 }
