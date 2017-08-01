@@ -31,13 +31,33 @@ export class CreateMarkerButtonComponent {
       .then(_ => waitFor(this.map, "atom_id"))
       .then(_ => getMapObject(this.map.atom_id))
       .then(mapObj => this.map.obj = mapObj)
-      .then(_ => this.createMarker())
+      .then(_ => this.initMarker())
       .then(_ => this.addListeners());
   }
 
-  // creates the marker, putting it on the map
-  // at first, marker is invisible and map is unchanged
+  // adds a marker to the db
   createMarker() {
+    this._graphQlService
+      .post(`
+        createMarker(
+          lat: ${this.marker.lat},
+          lng: ${this.marker.lng},
+          title: "${this.marker.title}"
+          map_id: "${this.map.atom_id}"
+        ) {
+          atom_id
+        }
+      `)
+      .map(data => data.createMarker.atom_id)
+      .subscribe(atom_id => {
+        this.marker.atom_id = atom_id;
+        this.submit_ok.value = true;
+      });
+  }
+
+  // puts marker on the map
+  // at first, marker is invisible and map is unchanged
+  initMarker() {
     if (!this.marker.obj) {
       const center = this.map.obj.getCenter();
       const position = {lat: center.lat(), lng: center.lng()};
