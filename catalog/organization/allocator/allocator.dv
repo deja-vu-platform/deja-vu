@@ -1,4 +1,5 @@
 // Distribute resources among consumers
+// Resources are distributed among consumers in a round-robin fashion
 cliche Allocator {
   // A resource belongs to at most one allocation
   data Resource {
