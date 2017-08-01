@@ -4,8 +4,11 @@
     <div class="panel-body events-panel-body">
       <dv-widget name="CreateMarkerTitle" of="Map"></dv-widget>
       <dv-widget name="NewEventContent" of="Event"></dv-widget>
-      <dv-widget name="CreateMarkerPosition" of="Map"></dv-widget>
-      <dv-widget name="NewEventButton" of="Event"></dv-widget>
+      <dv-widget name="SearchForPlace" of="CreateEventMap"></dv-widget>
+      <div id="create-event-map">
+        <dv-widget name="DisplayMap" of="CreateEventMap"></dv-widget>
+      </div>
+      <dv-widget name="CreateMarkerButton" of="Map"></dv-widget>
       <!--TODO: add missing fields beyond basic event-->
     </div>
   </div>

@@ -33,10 +33,11 @@ export class SearchForPlaceComponent {
       .then(_ => waitFor(this.map, "atom_id"))
       .then(_ => getMapObject(this.map.atom_id))
       .then(mapObj => this.map.obj = mapObj)
+      .then(_ => this.initMarker())
       .then(_ => this.createSearchBox());
   }
 
-  createMarker() {
+  initMarker() {
     if (!this.marker.obj) {
       const center = this.map.obj.getCenter();
       const position = {lat: center.lat(), lng: center.lng()};
