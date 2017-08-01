@@ -1,3 +1,4 @@
+// Receive frequently updated content
 cliche Feed {
   data Publisher {
     name: text,

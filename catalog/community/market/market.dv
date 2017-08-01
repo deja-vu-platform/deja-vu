@@ -1,11 +1,12 @@
+// Exchange goods for money
 cliche Market {
-  // a buyer or seller that participates in markets
+  // A buyer or seller that participates in markets
   // balances are global (not tied to one market)
   data Party {
     balance: number
   }
 
-  // each good is tied to a single seller and market
+  // Each good is tied to a single seller and market
   // TODO: allow multiple sellers for the same good
   data Good {
     name: text,
@@ -15,7 +16,7 @@ cliche Market {
     market: Market
   }
 
-  // a record of a purchase/sale in the marketplace
+  // A record of a purchase/sale in the marketplace
   // [buyer] bought [quantity] [good]s from [seller] for $[price] each
   data Transaction {
     good: Good,
@@ -26,9 +27,7 @@ cliche Market {
     market: Market
   }
 
-  // multiple markets may exist
-  data Market {
-  }
+  data Market {}
 
   widget BuyGoodButton {
     good: Good,

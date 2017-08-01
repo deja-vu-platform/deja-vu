@@ -1,3 +1,4 @@
+// Schedule events
 cliche Event {
   data Event {
     start_date: datetime,

@@ -1,3 +1,4 @@
+// Send messages via email
 cliche Email {
   data Content {}
 

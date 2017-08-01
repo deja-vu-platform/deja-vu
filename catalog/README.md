@@ -12,8 +12,10 @@ Cliché Catalog
 
 | Cliché | Purpose |
 | ------ | ------- |
-| Friend | Mediate communications by preapproved relationships |
 | Follow | Receive updates from sources |
+| Market | Exchange goods for money |
+| Rating | Crowdsource evaluation of items |
+| Task | Keep track of pieces of work to be done |
 
 *Messaging*
 
@@ -22,7 +24,7 @@ Cliché Catalog
 | Feed | Receive frequently updated content |
 | Post | Broadcast messages |
 | Email | Share messages via email |
-| Comment | Express a reaction |
+| Comment | Express an opinion or reaction in writing |
 
 *Organization*
 
@@ -31,6 +33,7 @@ Cliché Catalog
 | Event | Schedule events |
 | Allocator | Distribute resources among consumers |
 | Label | Label items so that they can be found later |
+| Group | Organize members into groups |
 
 How to write clichés
 --------------------
