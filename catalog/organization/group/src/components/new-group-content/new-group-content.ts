@@ -19,18 +19,28 @@ export class NewGroupContentComponent {
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {
       this._graphQlService
-        .get(`
-          group_by_id(atom_id: "${this.group.atom_id}") {
-            addExistingMember(atom_id: "${this.initialMember.atom_id}") {
-              atom_id
-            },
-            renameGroup(name: "${this.group.name}") {
-              atom_id
-            }
-          }
+        .post(`
+          addExistingMember(
+            group_id: "${this.group.atom_id}",
+            member_id: "${this.initialMember.atom_id}"
+          )
         `)
         .subscribe(_ => undefined);
-      this.group.name = "";
+
+      this._graphQlService
+        .post(`
+          renameGroup(
+            group_id: "${this.group.atom_id}",
+            name: "${this.group.name}"
+          )
+        `)
+        .map(data => data.renameGroup)
+        .subscribe(success => {
+          if (success) {
+            this.group.name = "";
+          }
+        });
+
     });
   }
 }

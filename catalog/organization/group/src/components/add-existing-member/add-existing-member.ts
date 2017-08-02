@@ -2,41 +2,68 @@ import {GraphQlService} from "gql";
 
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 
-import {GroupAtom} from "../../shared/data";
+import {MemberAtom, GroupAtom} from "../../shared/data";
+import {
+  addTypeahead,
+  uuidv4,
+  getTypeaheadVal,
+  setTypeaheadVal
+} from "../../shared/utils";
 
 
 @Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
 export class AddExistingMemberComponent {
   @Field("Group") group: GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+
   failed = false; // Shows failure message on not found
-  member = {atom_id: ""};
+  wrapId = uuidv4();
+  options: MemberAtom[] = []; // all non-members
+  typeahead: any;
 
   constructor(private _graphQlService: GraphQlService) {}
 
-  onSubmit() {
-    if (!this.group.atom_id) {
-      return;
-    }
-
-    this.failed = false;
-
+  dvAfterInit() {
     this._graphQlService
       .get(`
-        group_by_id(atom_id: "${this.group.atom_id}") {
-          addExistingMember(atom_id: "${this.member.atom_id}") {
-            atom_id
-          }
+        nonMembers(group_id: "${this.group.atom_id}") {
+          atom_id,
+          name
         }
       `)
-      .subscribe(data => {
-        if (data.group_by_id && data.group_by_id.addExistingMember
-          && data.group_by_id.addExistingMember.atom_id) {
-            this.submit_ok.value = true;
-            this.member.atom_id = "";
-          } else {
-            this.failed = true;
-          }
+      .map(data => data.nonMembers)
+      .subscribe(nonMembers => {
+        this.options = nonMembers;
+        this.typeahead = addTypeahead(this.wrapId, this.options.map(m => {
+          return m.name;
+        }));
       });
+  }
+
+  onSubmit() {
+    if (this.group.atom_id) {
+      this.failed = false;
+      const name = getTypeaheadVal(this.wrapId);
+      const member = this.options.find((m => m.name === name));
+      if (member === undefined) {
+        this.failed = true;
+      } else {
+        this._graphQlService
+          .post(`
+            addExistingMember(
+              group_id: "${this.group.atom_id}",
+              member_id: "${member.atom_id}"
+            )
+          `)
+          .map(data => data.addExistingMember)
+          .subscribe(success => {
+            if (success) {
+              this.submit_ok.value = true;
+              setTypeaheadVal(this.wrapId, "");
+            }
+            this.failed = !success;
+          });
+      }
+    }
   }
 }
