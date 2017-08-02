@@ -27,7 +27,7 @@ export class ShowGroupsByMemberComponent implements AfterInit {
       this.groups = [];
       this._graphQlService
         .get(`
-          groupsByMember(atom_id: "${this.member.atom_id}") {
+          groupsByMember(member_id: "${this.member.atom_id}") {
             atom_id,
             name
           }

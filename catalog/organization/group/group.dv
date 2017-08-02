@@ -57,7 +57,6 @@ cliche Group {
 
     // Add an existing member by ID
     widget AddExistingMember {
-        member: Member,
         group: Group,
         submit_ok: boolean
     }

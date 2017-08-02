@@ -33,123 +33,23 @@ const schema = grafo
   .add_type({
     name: "Member",
     fields: {
-      atom_id: {"type": graphql.GraphQLString},
+      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       name: {"type": graphql.GraphQLString}
     }
   })
   .add_type({
     name: "Group",
     fields: {
-      atom_id: {"type": graphql.GraphQLString},
+      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       name: {"type": graphql.GraphQLString},
-      members: {"type": "[Member]"},
-      renameGroup: {
-        type: "Group",
-        args: {
-          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-        },
-        resolve: (group, {name}) => {
-          return mean.db.collection("groups")
-            .update({atom_id: group.atom_id}, {$set: {name: name}})
-            .then(_ => bus.update_atom("Group", group.atom_id,
-              {$set: {name: name}}));
-        }
-      },
-      addMember: {
-        type: "Member",
-        args: {
-          name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: (group, {name}) => {
-          const member = {
-            atom_id: uuid.v4(),
-            name: name
-          };
-
-          return Promise
-            .all([
-              mean.db.collection("members").insertOne(member),
-              mean.db.collection("groups")
-                .updateOne(
-                  {atom_id: group.atom_id},
-                  {$addToSet: {members: {atom_id: member.atom_id}}}
-                ),
-              bus.update_atom("Group", group.atom_id,
-                {$addToSet: {members: {atom_id: member.atom_id}}}),
-              bus.create_atom("Member", member.atom_id, member)
-            ])
-            .then(_ => member)
-        }
-      },
-      addExistingMember: {
-        type: "Group",
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: (group, {atom_id}) => {
-          return Validation.memberExists(atom_id).then(_ => {
-            return Promise
-              .all([
-                mean.db.collection("groups")
-                  .updateOne(
-                    {atom_id: group.atom_id},
-                    {$addToSet: {members: {atom_id: atom_id}}}
-                  ),
-                bus.update_atom("Group", group.atom_id,
-                  {$addToSet: {members: {atom_id: atom_id}}})
-              ])
-              .then(_ =>
-                mean.db.collection("groups").findOne({atom_id: group.atom_id}));
-          });
-        }
-      },
-      removeMember: {
-        type: "Group",
-        args: {
-          atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-        },
-        resolve: (group, {atom_id}) => {
-          return Validation.memberExists(atom_id).then(_ => {
-            return Promise
-              .all([
-                mean.db.collection("groups")
-                  .updateOne(
-                    {atom_id: group.atom_id},
-                    {$pull: {members: {atom_id: atom_id}}}
-                  ),
-                bus.update_atom("Group", group.atom_id,
-                  {$pull: {members: {atom_id: atom_id}}})
-              ])
-              .then(_ =>
-                mean.db.collection("groups").findOne({atom_id: group.atom_id}));
-          });
-        }
-      },
-    }
-  })
-  .add_query({
-    name: "groupsByMember",
-    type: "[Group]",
-    args: {
-      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-    },
-    resolve: (_, {atom_id}) => {
-      return mean.db.collection("groups")
-        .find({
-          members: {
-            $in: [{
-              atom_id: atom_id
-            }]
-          }
-        })
-        .toArray();
+      members: {"type": "[Member]"}
     }
   })
   .add_mutation({
     name: "newGroup",
     type: "Group",
     args: {
-      name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      name: {"type": graphql.GraphQLString}
     },
     resolve: (_, {name}) => {
       let newObject = {
@@ -162,6 +62,99 @@ const schema = grafo
         .insertOne(newObject)
         .then(_ => bus.create_atom("Group", newObject.atom_id, newObject))
         .then(_ => newObject);
+    }
+  })
+  .add_mutation({
+    name: "renameGroup",
+    type: graphql.GraphQLBoolean,
+    args: {
+      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      name: {"type": graphql.GraphQLString}
+    },
+    resolve: (_, {group_id, name}) => {
+      const updateObj = {$set: {name: name}};
+      return mean.db.collection("groups")
+        .update({atom_id: group_id}, updateObj)
+        .then(wRes => !!wRes.nModified);
+    }
+  })
+  .add_mutation({
+    name: "addExistingMember",
+    type: graphql.GraphQLBoolean,
+    args: {
+      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {group_id, member_id}) => {
+      return Validation.memberExists(member_id).then(_ => {
+        return Promise
+          .all([
+            mean.db.collection("groups")
+              .updateOne(
+                {atom_id: group_id},
+                {$addToSet: {members: {atom_id: member_id}}}
+              ),
+            bus.update_atom("Group", group_id,
+              {$addToSet: {members: {atom_id: member_id}}})
+          ])
+          .then(arr  => arr[0].modifiedCount && arr[1]);
+      });
+    }
+  })
+  .add_mutation({
+    name: "removeMember",
+    type: graphql.GraphQLBoolean,
+    args: {
+      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {group_id, member_id}) => {
+      return Promise
+        .all([
+          mean.db.collection("groups")
+            .updateOne(
+              {atom_id: group_id},
+              {$pull: {members: {atom_id: member_id}}}
+            ),
+          bus.update_atom("Group", group_id,
+            {$pull: {members: {atom_id: member_id}}})
+        ])
+        .then(arr  => arr[0].modifiedCount && arr[1]);
+    }
+  })
+  .add_query({
+    name: "groupsByMember",
+    type: "[Group]",
+    args: {
+      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {member_id}) => {
+      return mean.db.collection("groups")
+        .find({
+          members: {
+            $in: [{
+              atom_id: member_id
+            }]
+          }
+        })
+        .toArray();
+    }
+  })
+  .add_query({
+    name: "nonMembers",
+    type: "[Member]",
+    args: {
+      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {group_id}) => {
+      return mean.db.collection("groups")
+        .findOne({atom_id: group_id})
+        .then(group => {
+          const ids = group.members ? group.members.map(m => m.atom_id) : [];
+          return mean.db.collection("members")
+            .find({atom_id: {$nin: ids}})
+            .toArray();
+        })
     }
   })
   .schema();

@@ -19,16 +19,15 @@ export class NewGroupButtonComponent {
   submit() {
     let addMember = () => {
       this._graphQlService
-        .get(`
-          group_by_id(atom_id: "${this.group.atom_id}") {
-            addExistingMember(atom_id: "${this.initialMember.atom_id}") {
-              atom_id
-            }
-          }
+        .post(`
+          addExistingMember(
+            group_id: "${this.group.atom_id}",
+            member_id: "${this.initialMember.atom_id}"
+          )
         `)
-        .map(data => data.group_by_id.addExistingMember.atom_id)
         .subscribe(_ => undefined);
     };
+
     let createGroup = () => {
       this._graphQlService
         .post(`
@@ -45,6 +44,7 @@ export class NewGroupButtonComponent {
           this.submit_ok.value = !this.submit_ok.value;
         });
     };
+
     createGroup();
   }
 

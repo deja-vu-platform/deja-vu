@@ -1,8 +1,8 @@
 <form (ngSubmit)="onSubmit()" #addMemberForm="ngForm" class="form-horizontal">
-  <fieldset class="form-group">
-    <label class="sr-only" for="item-name">Member ID</label>
-    <input required id="member-id" class="form-control" name="member-id" type="text"
-      [(ngModel)]="member.atom_id"placeholder="Write something..." />
+  <fieldset class="form-group" id="{{wrapId}}">
+    <label class="sr-only" for="name">Member Name</label>
+    <input required class="form-control typeahead" name="name"
+      type="text" autocomplete="off" placeholder="Member Name"/>
   </fieldset>
   <div class="form-group">
     <button type="submit" class="btn btn-default btn-sm pull-right"

@@ -6,6 +6,7 @@ import {Observable} from "rxjs/Observable";
 import "rxjs/add/operator/toPromise";
 
 import {MemberAtom, GroupAtom} from "../../shared/data";
+import {filterInPlace} from "../../shared/utils";
 
 
 @Widget({
@@ -62,42 +63,39 @@ export class JoinLeaveGroupComponent implements AfterInit {
 
   joinGroup() {
     this._graphQlService
-      .get(`
-        group_by_id(atom_id: "${this.group.atom_id}") {
-          addExistingMember(atom_id: "${this.member.atom_id}") {
-            atom_id
-          }
-        }
+      .post(`
+        addExistingMember(
+          group_id: "${this.group.atom_id}",
+          member_id: "${this.member.atom_id}"
+        )
       `)
-      .subscribe(_ => this.group.members.push(this.member));
+      .map(data => data.addExistingMember)
+      .subscribe(success => {
+        if (success) {
+          this.group.members.push(this.member);
+        }
+      });
   }
 
   leaveGroup() {
     this._graphQlService
-      .get(`
-        group_by_id(atom_id: "${this.group.atom_id}") {
-          removeMember(atom_id: "${this.member.atom_id}") {
-            atom_id
-          }
-        }
+      .post(`
+        removeMember(
+          group_id: "${this.group.atom_id}",
+          member_id: "${this.member.atom_id}"
+        )
       `)
-      .subscribe(_ => filterInPlace(this.group.members, m =>
-        m.atom_id !== this.member.atom_id
-      ));
+      .map(data => data.addExistingMember)
+      .subscribe(success => {
+        if (success) {
+          filterInPlace(this.group.members, m => {
+            return m.atom_id !== this.member.atom_id;
+          });
+        }
+      });
   }
 
   inGroup(member: MemberAtom, group: GroupAtom): boolean {
     return group.members.findIndex(m => m.atom_id === member.atom_id) >= 0;
   }
-}
-
-function filterInPlace<T>(arr: T[], f: (elm: T) => boolean): T[] {
-  let out = 0;
-  for (let i = 0; i < arr.length; i++) {
-    if (f(arr[i])) {
-      arr[out++] = arr[i];
-    }
-  }
-  arr.length = out;
-  return arr;
 }
