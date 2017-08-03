@@ -1,21 +1,26 @@
-import {GraphQlService} from "gql";
-
-import {Widget, ClientBus, Field} from "client-bus";
-
-import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/mergeMap";
+import {Observable} from "rxjs/Observable";
+
+import {Widget, ClientBus, Field} from "client-bus";
+import {GraphQlService} from "gql";
 
 import {MemberAtom, GroupAtom} from "../../shared/data";
 
-@Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
+
+@Widget({
+  fqelement: "Group",
+  ng2_providers: [GraphQlService]
+})
 export class ShowGroupMembersComponent {
   @Field("Group") group: GroupAtom;
   private _fetched = undefined;
 
   constructor(
-    private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
+    private _graphQlService: GraphQlService,
+    private _clientBus: ClientBus
+  ) {}
 
   dvAfterInit() {
     const updateGroup = () => {

@@ -10,5 +10,6 @@ export interface Group {
   atom_id: string;
   name: string;
   members?: Member[];
+  subgroups?: Group[];
 }
 export interface GroupAtom extends Group, Atom {}
