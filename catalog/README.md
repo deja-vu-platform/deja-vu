@@ -1,23 +1,28 @@
 Cliché Catalog
---------------
+==============
 
-
-*Access*
+Access
+------
+Clichés for mediating access to resources
 
 | Cliché | Purpose |
 | ------ | ------- |
 | Auth | Control access to resources |
 
-*Community*
+Community
+---------
+Clichés for supporting the interaction of social units
 
 | Cliché | Purpose |
 | ------ | ------- |
-| Follow | Receive updates from sources |
 | Market | Exchange goods for money |
 | Rating | Crowdsource evaluation of items |
+| Follow | Receive updates from sources |
 | Task | Keep track of pieces of work to be done |
 
-*Messaging*
+Messaging
+---------
+Clichés for sending and receiving discrete units of communication
 
 | Cliché | Purpose |
 | ------ | ------- |
@@ -26,7 +31,9 @@ Cliché Catalog
 | Email | Share messages via email |
 | Comment | Express an opinion or reaction in writing |
 
-*Organization*
+Organization
+------------
+Clichés for arranging things
 
 | Cliché | Purpose |
 | ------ | ------- |
@@ -36,6 +43,6 @@ Cliché Catalog
 | Group | Organize members into groups so that they can be handled in aggregate |
 
 How to write clichés
---------------------
+====================
 
 todo
