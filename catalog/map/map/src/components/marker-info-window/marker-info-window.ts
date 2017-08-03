@@ -7,8 +7,4 @@ import {MarkerAtom} from "../../shared/data";
 })
 export class MarkerInfoWindowComponent {
   @Field("Marker") marker: MarkerAtom;
-
-  dvAfterInit() {
-    console.log("marker", this.marker);
-  }
 }
