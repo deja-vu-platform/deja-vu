@@ -30,6 +30,9 @@ cliche Group {
         member: Member
     }
 
+    // Shows the names of all groups
+    widget ShowGroups uses ShowGroupName {}
+
     // Shows which groups a Member belongs to, to illustrate
     // a many-to-many relationship
     widget ShowGroupsByMember uses ShowGroupName {
