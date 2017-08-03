@@ -32,10 +32,12 @@ body {
 
 #my-groups-column-left {
   padding-right: 1%;
+  width: 33%;
 }
 
 #my-groups-column-right {
   padding-left: 1%;
+  width: 65%;
 }
 
 .table {

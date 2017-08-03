@@ -1,6 +1,5 @@
 // Organize members into groups so that they can be handled in aggregate
 cliche Group {
-  /** Entities **/
   // Member of a Group
   data Member {
     name: text
@@ -9,10 +8,10 @@ cliche Group {
   // Named collection of group members
   data Group {
     name: text,
-    members: [Member]
+    members: [Member],
+    subgroups: [Group]
   }
 
-  /** Widgets **/
   // Displays the name and members of a group
   widget ShowGroup uses ShowGroupName, ShowGroupMembers {
     group: Group
@@ -33,16 +32,20 @@ cliche Group {
     member: Member
   }
 
-  // Shows which groups a member belongs to
-  widget ShowGroupsByMember uses ShowGroup {
-    member: Member
-  }
-
   // Create a new group
   widget NewGroup uses NewGroupContent, NewGroupButton {
     initialMember: Member,
     group: Group,
     submit_ok: boolean
+  }
+
+  // Shows the names of all groups
+  widget ShowGroups uses ShowGroupName {}
+
+  // Shows which groups a Member belongs to, to illustrate
+  // a many-to-many relationship
+  widget ShowGroupsByMember uses ShowGroupName {
+    member: Member
   }
 
   widget NewGroupContent {
@@ -57,13 +60,21 @@ cliche Group {
     submit_ok: boolean
   }
 
-  // Add an existing member by ID
+  // Add an existing member by name
   widget AddExistingMember {
     group: Group,
     submit_ok: boolean
   }
 
-  // button allowing a member to leave/join group
+  // Add existing members by name
+  // Shows a list of members queued for addition
+  // Adds them once submit_ok is true
+  widget AddExistingMembers {
+    group: Group,
+    submit_ok: boolean
+  }
+
+  // button allowing a member to leave / join group
   widget JoinLeaveGroup {
     member: Member,
     group: Group

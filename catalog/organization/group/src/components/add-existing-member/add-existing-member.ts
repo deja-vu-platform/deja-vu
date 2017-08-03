@@ -1,8 +1,7 @@
 import {ElementRef} from "@angular/core";
 
-import {GraphQlService} from "gql";
-
 import {Widget, Field, PrimitiveAtom} from "client-bus";
+import {GraphQlService} from "gql";
 
 import {MemberAtom, GroupAtom} from "../../shared/data";
 import {
@@ -24,7 +23,6 @@ export class AddExistingMemberComponent {
   failed = false; // Shows failure message on not found
   wrapId = uuidv4();
   options: MemberAtom[] = []; // all non-members
-  typeahead: any;
 
   constructor(
     private _graphQlService: GraphQlService,
@@ -42,7 +40,7 @@ export class AddExistingMemberComponent {
       .map(data => data.nonMembers)
       .subscribe(nonMembers => {
         this.options = nonMembers;
-        this.typeahead = addTypeahead(this.wrapId, this.options.map(m => {
+        addTypeahead(this.wrapId, this.options.map(m => {
           return m.name;
         }));
       });
@@ -54,7 +52,6 @@ export class AddExistingMemberComponent {
 
   onSubmit() {
     if (this.group.atom_id) {
-      this.failed = false;
       const name = getTypeaheadVal(this.wrapId);
       const member = this.options.find((m => m.name === name));
       if (member === undefined) {
@@ -76,6 +73,8 @@ export class AddExistingMemberComponent {
             this.failed = !success;
           });
       }
+    } else {
+      this.failed = true;
     }
   }
 
