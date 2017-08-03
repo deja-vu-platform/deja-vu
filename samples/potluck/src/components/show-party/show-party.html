@@ -1,13 +1,3 @@
-<!--
-Necessary since ShowParty replaces ShowGroupOverview.
-ShowParty needs a user field.
-ShowGroupOverview does not have one.
-Deja Vu should be updated to not require this at some point.
--->
-<div style="display:none">
-  <dv-widget name="LoggedIn" of="Auth"></dv-widget>
-</div>
-
 <div class="party">
   <div class="panel panel-default">
     <div class="panel-body">
@@ -34,3 +24,11 @@ Deja Vu should be updated to not require this at some point.
     </div>
   </div>
 </div>
+
+<!--
+Necessary since ShowParty replaces ShowGroupOverview.
+ShowParty needs a user field.
+ShowGroupOverview does not have one.
+Deja Vu should be updated to not require this at some point.
+-->
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>

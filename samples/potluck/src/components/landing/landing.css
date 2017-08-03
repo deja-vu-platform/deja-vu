@@ -1,0 +1,27 @@
+.white-text {
+  color: white;
+}
+
+#background-signin {
+  background-color: #4d4d4d;
+}
+
+#signin-container {
+  padding-top: 100px;
+}
+
+#description {
+  margin-top: 50px;
+  text-align: center;
+  vertical-align: middle;
+  height: 180px;
+  font-size: 20px;
+  background-color: #CFDBC5;
+  color: #4d4d4d;
+  padding: 50px 200px 50px 200px;
+}
+
+#food-pic {
+  height: 850px;
+  background: url("http://i.imgur.com/WR3qLkH.jpg");
+}

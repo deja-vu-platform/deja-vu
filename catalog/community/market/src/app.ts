@@ -116,7 +116,7 @@ const schema = grafo
       return mean.db.collection("goods")
         .findOne({atom_id: good_id})
         .then(good => {
-          quantity = Math.min(quantity, good.quantity);
+          quantity = Math.min(quantity, good.supply);
           if (quantity === 0) {
             return false;
           }

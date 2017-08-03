@@ -1,13 +1,17 @@
 <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
 <dv-widget name="LoggedIn" of="Auth"></dv-widget>
-<nav class='navbar navbar-default navbar-fixed-top' id='main-navbar'>
-  <div class='container'>
-    <div class='navbar-header'>
-      <a class='navbar-brand' [routerLink]="['/']">Potluck</a>
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand" [routerLink]="['/']">Potluck</a>
     </div>
-    <ul class='nav navbar-nav navbar-right'>
-      <li *ngIf="user.username"><dv-widget name="SignOutWithRedirect" of="Auth"></dv-widget></li>
+    <ul class="nav navbar-nav navbar-right">
+      <li *ngIf="user.username">
+        <dv-widget name="SignOutWithRedirect" of="Auth">
+        </dv-widget>
+      </li>
     </ul>
   </div>
 </nav>
