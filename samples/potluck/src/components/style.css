@@ -91,7 +91,7 @@ th {
 }
 
 .attending-list {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 #blurb {
@@ -132,21 +132,12 @@ th {
   width: 380px;
 }
 
-#login {
-  margin: auto;
-  width: 380px;
-}
-
-#loginUsername, #loginPassword {
-  width: 154px;
-}
-
 #logout {
   display: inline-block;
   float: right;
 }
 
-#namebox {
+#box {
   border: 1px solid #ccc;
   border-radius: 3px;
   padding-top: 25px;
@@ -182,57 +173,14 @@ th {
   text-align: center;
 }
 
-
-#username {
-  text-align: center;
-}
-
-#world {
-  float: right;
-  padding-right: 10px;
-}
-
-#main-navbar{
-  margin-bottom: 100px;
-}
-
 #page-content{
   margin-top : 50px;
   /*background-color: #CFDBC5;*/
 }
 
-#food-pic {
-  height: 850px;
-  background: url("http://i.imgur.com/WR3qLkH.jpg");
-}
-
-#description {
-  margin-top: 50px;
-  text-align: center;
-  vertical-align: middle;
-  height: 180px;
-  font-size: 20px;
-  background-color: #CFDBC5;
-  color: #4d4d4d;
-  padding: 50px 200px 50px 200px;
-}
-
-#background-signin {
-  background-color: #4d4d4d;
-}
-
-#signin-container {
-  padding-top: 100px;
-}
-
 #homepage-container {
   padding-top: 64px;
 }
-
-#white-text {
-  color: white;
-}
-
 
 #party-form {
   background-color: #CFDBC5;

@@ -1,8 +1,6 @@
 app Potluck {
   include access/Auth[User for User]
-  include organization/Event[
-    Party for Event
-  ]
+  include organization/Event[Party for Event]
 
   include organization/Group[
     User for Member,
@@ -19,12 +17,12 @@ app Potluck {
     ShowSupplyBring replacing ShowTransaction in ShowAllTransactions
   ]
 
+  /* Entities */
   data User {
     username: text
   }
 
-  data Party {
-  }
+  data Party {}
 
   data Supply {
     name: text,
@@ -33,14 +31,24 @@ app Potluck {
     good: Supply
   }
 
+  /* Widgets */
+  // The landing page gives the user the option to sign in or register
+  main widget Landing {
+    on_user_ok: Widget = Parties
+  }
+  // The main home page. Lists all the parties the user is invited to
+  widget Parties {
+    user: User
+  }
+  // Shows the Potluck logo and a sign out button if the user is logged in
+  widget NavBar {
+    user: User
+  }
+
   widget NewParty {
     party: Party,
     user: User,
     submit_ok: boolean
-  }
-
-  widget Parties {
-    user: User
   }
 
   widget ShowParty {
@@ -69,16 +77,7 @@ app Potluck {
     transaction: Supply
   }
 
-  widget NavBar {
-    user: User
-    // on_signout: Widget = Landing
-  }
-
-  // The landing page gives the user the option to sign in or register
-  main widget Landing {
-    on_user_ok: Widget = Parties
-  }
-
+  /* Routes */
   parties_route: route = {path: "parties", widget: Parties}
   new_party_route: route = {path: "new-party", widget: NewParty}
 }
