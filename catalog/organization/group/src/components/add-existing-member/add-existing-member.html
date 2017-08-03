@@ -3,11 +3,11 @@
     <label class="sr-only" for="item-name">Member ID</label>
     <input required id="member-id" class="form-control" name="member-id"
      type="text" [(ngModel)]="member.atom_id"
-     placeholder="Write something..." />
+     placeholder="Name" />
   </fieldset>
   <div class="form-group">
     <button type="submit" class="btn btn-default btn-sm pull-right"
      [disabled]="!addMemberForm.valid">Add Member</button>
   </div>
-  <div class="alert alert-danger" *ngIf="failed">Member not found.</div>
+  <div class="alert alert-danger" *ngIf="failed">Member not found</div>
 </form>

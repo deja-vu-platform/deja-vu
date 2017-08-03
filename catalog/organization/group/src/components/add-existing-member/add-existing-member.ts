@@ -2,15 +2,15 @@ import {GraphQlService} from "gql";
 
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 
-import {MemberAtom, GroupAtom} from "../../shared/data";
+import {GroupAtom} from "../../shared/data";
 
 
 @Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
 export class AddExistingMemberComponent {
-  @Field("Member") member: MemberAtom;
   @Field("Group") group: GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
   failed = false; // Shows failure message on not found
+  member = {atom_id: ""};
 
   constructor(private _graphQlService: GraphQlService) {}
 
