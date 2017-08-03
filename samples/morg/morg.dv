@@ -11,7 +11,7 @@ app Morg {
     Member for Consumer]
 
   data GroupMeeting {}
-  data WeeklyGroupMeeting { group_meetings: GroupMeeting }
+  data WeeklyGroupMeeting { group_meetings: [GroupMeeting] }
   data Member { name: text }
 
   alyssa: Member = {name: "Alyssa"}

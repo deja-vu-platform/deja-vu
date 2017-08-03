@@ -3,12 +3,12 @@ cliche Label {
   // The thing being labeled
   data Item {
     name: text,
-    labels: Label
+    labels: [Label]
   }
 
   data Label {
     name: text,
-    items: Item
+    items: [Item]
   }
 
   // Lets the user input a comma-separated list of labels to attach to the item

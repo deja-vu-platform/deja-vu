@@ -24,8 +24,8 @@ app Bookmark {
    */
   data User {
     username: text,
-    posts: Post,
-    follows: User | Topic // array
+    posts: [Post],
+    follows: [User] | [Topic] // actually means [User | Topic]
   }
 
   u1: User = {username: "benbitdiddle", posts: [p1]}
@@ -33,7 +33,7 @@ app Bookmark {
 
   data Post {
     content: text,
-    topics: Topic,
+    topics: [Topic],
     author: User
   }
 
@@ -42,7 +42,7 @@ app Bookmark {
 
   data Topic {
     name: text,
-    posts: Post
+    posts: [Post]
   }
 
   t1: Topic = {name: "hello", posts: [p1, p2]}

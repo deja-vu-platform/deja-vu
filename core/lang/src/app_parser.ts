@@ -515,11 +515,27 @@ export class AppParser {
   }
 
   _match(t: string, matcht, tbonds, fqelement: string) {
-    const is_subtype = (t1: string, t2: {name: string, fqelement: string}) => (
-      (this._is_primitive_t(t1) && t2.name === t1) ||
-      !!_u.find(tbonds[t1], b => b.name === t2.name &&
-                b.fqelement === t2.fqelement)
-    );
+    const is_subtype = (t1: string, t2: {name: string, fqelement: string}) => {
+      const t1_matches = t1.match(/\[(.*)\]/);
+      const t2_matches = t2.name.match(/\[(.*)\]/);
+      const t1_is_list = !_u.isEmpty(t1_matches);
+      const t2_is_list = !_u.isEmpty(t2_matches);
+      // fail if one is a list and the other one isn't
+      if (t1_is_list ? !t2_is_list : t2_is_list) { // xor
+        return false;
+      }
+      let t2_name = t2.name;
+      // remove brackets around types if both are lists
+      if (t1_is_list) {
+        t1 = t1_matches[1].trim();
+        t2_name = t2_matches[1].trim();
+      }
+      return (
+        (this._is_primitive_t(t1) && t2_name === t1) ||
+        !!_u.find(tbonds[t1], b => b.name === t2_name &&
+                                   b.fqelement === t2.fqelement)
+      );
+    };
     let ret = {};
     if (matcht.fqelement === undefined) {  // is an app t
       const t_st = this._symbol_table[matcht];

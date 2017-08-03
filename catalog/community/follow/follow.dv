@@ -2,7 +2,7 @@
 cliche Follow {
   // The thing doing the following
   data Source {
-    follows: Target // array
+    follows: [Target]
   }
 
   // The thing being followed
