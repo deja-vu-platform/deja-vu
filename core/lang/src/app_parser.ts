@@ -520,11 +520,13 @@ export class AppParser {
       const t2_matches = t2.name.match(/\[(.*)\]/);
       const t1_is_list = !_u.isEmpty(t1_matches);
       const t2_is_list = !_u.isEmpty(t2_matches);
+      // fail if one is a list and the other one isn't
       if (t1_is_list ? !t2_is_list : t2_is_list) { // xor
-        return false; // one is a list and the other one isn't
+        return false;
       }
       let t2_name = t2.name;
-      if (!_u.isEmpty(t1_matches)) { // both are lists
+      // remove brackets around types if both are lists
+      if (t1_is_list) {
         t1 = t1_matches[1].trim();
         t2_name = t2_matches[1].trim();
       }
