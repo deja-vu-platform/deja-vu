@@ -1,3 +1,5 @@
+import {ElementRef} from "@angular/core";
+
 import {GraphQlService} from "gql";
 
 import {Widget, Field, PrimitiveAtom} from "client-bus";
@@ -11,7 +13,10 @@ import {
 } from "../../shared/utils";
 
 
-@Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "Group",
+  ng2_providers: [GraphQlService]
+})
 export class AddExistingMemberComponent {
   @Field("Group") group: GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
@@ -21,7 +26,10 @@ export class AddExistingMemberComponent {
   options: MemberAtom[] = []; // all non-members
   typeahead: any;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(
+    private _graphQlService: GraphQlService,
+    private _elementRef: ElementRef
+  ) {}
 
   dvAfterInit() {
     this._graphQlService
@@ -38,6 +46,10 @@ export class AddExistingMemberComponent {
           return m.name;
         }));
       });
+  }
+
+  ngAfterViewInit() {
+    this._loadStyle();
   }
 
   onSubmit() {
@@ -65,5 +77,14 @@ export class AddExistingMemberComponent {
           });
       }
     }
+  }
+
+  _loadStyle() {
+    const s = document.createElement("link");
+    s.type = "text/css";
+    s.rel = "stylesheet";
+    s.href = "node_modules/dv-organization-group/lib/components/" +
+      "add-existing-member/add-existing-member.css";
+    this._elementRef.nativeElement.appendChild(s);
   }
 }
