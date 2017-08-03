@@ -18,28 +18,32 @@ export class NewGroupContentComponent {
 
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {
-      this._graphQlService
-        .post(`
-          addExistingMember(
-            group_id: "${this.group.atom_id}",
-            member_id: "${this.initialMember.atom_id}"
-          )
-        `)
-        .subscribe(_ => undefined);
+      if (this.initialMember.atom_id) {
+        this._graphQlService
+          .post(`
+            addExistingMember(
+              group_id: "${this.group.atom_id}",
+              member_id: "${this.initialMember.atom_id}"
+            )
+          `)
+          .subscribe(_ => undefined);
+      }
 
-      this._graphQlService
-        .post(`
-          renameGroup(
-            group_id: "${this.group.atom_id}",
-            name: "${this.group.name}"
-          )
-        `)
-        .map(data => data.renameGroup)
-        .subscribe(success => {
-          if (success) {
-            this.group.name = "";
-          }
-        });
+      if (this.group.name) {
+        this._graphQlService
+          .post(`
+            renameGroup(
+              group_id: "${this.group.atom_id}",
+              name: "${this.group.name}"
+            )
+          `)
+          .map(data => data.renameGroup)
+          .subscribe(success => {
+            if (success) {
+              this.group.name = "";
+            }
+          });
+      }
 
     });
   }

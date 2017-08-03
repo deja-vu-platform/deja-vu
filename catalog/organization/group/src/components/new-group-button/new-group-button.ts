@@ -38,7 +38,7 @@ export class NewGroupButtonComponent {
         .map(data => data.newGroup.atom_id)
         .subscribe(atom_id => {
           this.group.atom_id = atom_id;
-          if (this.initialMember) {
+          if (this.initialMember.atom_id) {
             addMember();
           }
           this.submit_ok.value = !this.submit_ok.value;
