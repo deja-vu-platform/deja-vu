@@ -3,26 +3,27 @@ import {ElementRef} from "@angular/core";
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {MemberAtom, GroupAtom} from "../../shared/data";
+import {Named, ParentAtom} from "../../shared/data";
 import {
   addTypeahead,
   uuidv4,
   getTypeaheadVal,
   setTypeaheadVal
 } from "../../shared/utils";
+import {getNonMembersByParent, addMemberToParent} from "../../shared/services";
 
 
 @Widget({
   fqelement: "Group",
   ng2_providers: [GraphQlService]
 })
-export class AddExistingMemberComponent {
-  @Field("Group") group: GroupAtom;
+export class AddMemberComponent {
+  @Field("Group | Subgroup") parent: ParentAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   failed = false; // Shows failure message on not found
   wrapId = uuidv4();
-  options: MemberAtom[] = []; // all non-members
+  options: Named[] = []; // all non-members
 
   constructor(
     private _graphQlService: GraphQlService,
@@ -30,20 +31,15 @@ export class AddExistingMemberComponent {
   ) {}
 
   dvAfterInit() {
-    this._graphQlService
-      .get(`
-        nonMembers(group_id: "${this.group.atom_id}") {
-          atom_id,
-          name
-        }
-      `)
-      .map(data => data.nonMembers)
-      .subscribe(nonMembers => {
-        this.options = nonMembers;
-        addTypeahead(this.wrapId, this.options.map(m => {
-          return m.name;
-        }));
-      });
+    if (this.parent.atom_id) {
+      getNonMembersByParent(this._graphQlService, this.parent.atom_id)
+        .then(nonMembers => {
+          this.options = nonMembers;
+          addTypeahead(this.wrapId, this.options.map(m => {
+            return m.name;
+          }));
+        });
+    }
   }
 
   ngAfterViewInit() {
@@ -51,26 +47,19 @@ export class AddExistingMemberComponent {
   }
 
   onSubmit() {
-    if (this.group.atom_id) {
+    if (this.parent.atom_id) {
       const name = getTypeaheadVal(this.wrapId);
       const member = this.options.find((m => m.name === name));
       if (member === undefined) {
         this.failed = true;
       } else {
-        this._graphQlService
-          .post(`
-            addExistingMember(
-              group_id: "${this.group.atom_id}",
-              member_id: "${member.atom_id}"
-            )
-          `)
-          .map(data => data.addExistingMember)
-          .subscribe(success => {
-            if (success) {
-              this.submit_ok.value = true;
-              setTypeaheadVal(this.wrapId, "");
-            }
-            this.failed = !success;
+        addMemberToParent(
+          this._graphQlService,
+          this.parent.atom_id,
+          member.atom_id
+        )
+          .then(success => {
+            if (success) setTypeaheadVal(this.wrapId, "");
           });
       }
     } else {
