@@ -86,6 +86,27 @@ export function uuidv4(): string {
   return uuid;
 }
 
+// TODO: spec
+export function getOrDefault<T>(objct: object, flds: string[], dflt: T): T {
+  let broke = false;
+  let obj: any = objct;
+  flds.forEach((fld) => {
+    if (isNonNullObject(obj)) {
+      obj = obj[fld];
+    } else {
+      broke = true;
+    }
+  });
+  return (broke ? dflt : obj);
+}
+
+// checks if there is exactly one true in an array of booleans
+export function oneTrue(arr: boolean[]) {
+  return arr.reduce((tot, success) => {
+    return tot + (success ? 1 : 0);
+  }, 0) === 1;
+}
+
 
 // HELPER FUNCTIONS
 
@@ -119,6 +140,11 @@ function timeout(delay: number): Promise<{}> {
   return new Promise(function(resolve, reject) {
     setTimeout(resolve, delay);
   });
+}
+
+// checks if a variable is a non-null object
+function isNonNullObject(x: any) {
+  return typeof(x) === "object" && x !== null;
 }
 
 // inserts a script tag that loads a remote script

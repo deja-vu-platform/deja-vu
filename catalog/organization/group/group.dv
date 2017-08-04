@@ -1,81 +1,113 @@
 cliche Group {
-  // Member of a Group
-  data Member {
-    name: text
-  }
-
-  // Named collection of group members
+  // Highest-level collection of subgroups and/or members
   data Group {
     name: text,
     members: [Member],
     subgroups: [Group]
   }
 
-  // Displays the name and members of a group
-  widget ShowGroup uses ShowGroupName, ShowGroupMembers {
-    group: Group
+  // Intermediate-level collection of subgroups and/or members
+  data Subgroup {
+    name: text,
+    members: [Member],
+    subgroups: [Subgroup]
   }
 
-  // Displays the name of a group
-  widget ShowGroupName {
-    group: Group
+  // Lowest-level, contains nothing
+  data Member {
+    name: text
   }
 
-  // Displays the members of a group
-  widget ShowGroupMembers uses ShowMember {
-    group: Group
+  // Shows the name of a group, subgroup, or member
+  widget ShowName {
+    named: Group | Subgroup | Member
   }
 
-  // Displays a member of a group
-  widget ShowMember {
-    member: Member
+  // Shows all members in the database
+  widget ShowMembers uses ShowName {}
+
+  // Shows all subgroups in the database
+  widget ShowSubgroups uses ShowName {}
+
+  // Shows all subgroups in the database
+  widget ShowGroups uses ShowName {}
+
+  // Shows all members of a group or subgroup
+  // TODO: ShowSubgroupsByParent once fields can have the same type
+  widget ShowMembersByParent uses ShowName {
+    parent: Group | Subgroup
   }
 
-  // Shows the names of all groups
-  widget ShowGroups uses ShowGroupName {}
-
-  // Shows which groups a Member belongs to, to illustrate
-  // a many-to-many relationship
-  widget ShowGroupsByMember uses ShowGroupName {
-    member: Member
+  // Shows all groups containing a given subgroup or member
+  // Containment can be direct or indirect
+  // TODO: ShowSubgroupsByChild once fields can have the same type
+  widget ShowGroupsByChild {
+    child: Subgroup | Member
   }
 
-  // Create a new group
-  widget NewGroup uses NewGroupContent, NewGroupButton {
-    initialMember: Member,
+  // Button allowing for the creation of a group
+  widget NewGroup {
     group: Group,
     submit_ok: boolean
   }
 
-  widget NewGroupContent {
-    initialMember: Member,
-    group: Group,
+  // Button allowing for the creation of a subgroup
+  widget NewButton {
+    subgroup: Subgroup,
     submit_ok: boolean
   }
 
-  widget NewGroupButton {
-    initialMember: Member,
-    group: Group,
-    submit_ok: boolean
-  }
-
-  // Add an existing member by name
-  widget AddExistingMember {
-    group: Group,
-    submit_ok: boolean
-  }
-
-  // Add existing members by name
-  // Shows a list of members queued for addition
-  // Adds them once submit_ok is true
-  widget AddExistingMembers {
-    group: Group,
-    submit_ok: boolean
-  }
-
-  // button allowing a member to leave / join group
-  widget JoinLeaveGroup {
+  // Button allowing for the creation of a member
+  widget NewButton {
     member: Member,
-    group: Group
+    submit_ok: boolean
+  }
+
+  // Text box allowing groups, subgroups, and members to be created with names
+  // When submit_ok flips to true, "named" is given the name in the text box
+  widget WithName {
+    named: Group | Subgroup | Member,
+    submit_ok: boolean
+  }
+
+  // Allows groups and subgroups to be created with an initial member
+  // When submit_ok flips to true, member is added to parent
+  // TODO: WithInitialSubgroup once fields can have the same type
+  widget WithInitialMember {
+    parent: Group | Subgroup,
+    member: Member,
+    submit_ok: boolean
+  }
+
+  // Allows groups and subgroups to be created with initial subgroups/members
+  // The user is presented with a text box to enter subgroup/member names
+  // Names entered appear on the screen
+  // When submit_ok flips to true,
+  //     all subgroups/members are added to the group or subgroup
+  widget WithInitialMembers {
+    parent: Group | Subgroup,
+    submit_ok: boolean
+  }
+  // TODO
+  widget WithInitialSubgroups {
+    parent: Group | Subgroup,
+    submit_ok: boolean
+  }
+
+  // Allows a subgroup/member to be added to the group or subgroup
+  // The user must enter the subgroup/member name into a text box
+  widget AddMember {
+    parent: Group | Subgroup
+  }
+  // TODO
+  widget AddSubgroup {
+    parent: Group | Subgroup
+  }
+
+  // Button allowing a member to join or leave a group or subgroup
+  // TODO: Make one for subgroup once fields can have the same type
+  widget JoinLeave {
+    parent: Group | Subgroup,
+    member: Member
   }
 }
