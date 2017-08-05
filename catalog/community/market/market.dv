@@ -1,5 +1,8 @@
 // Exchange goods for money
+// The current version of this cliché doesn't allow multiple sellers for the
+// same good
 cliche Market {
+  /** Entities **/
   // A buyer or seller that participates in markets
   // balances are global (not tied to one market)
   data Party {
@@ -7,7 +10,6 @@ cliche Market {
   }
 
   // Each good is tied to a single seller and market
-  // TODO: allow multiple sellers for the same good
   data Good {
     name: text,
     price: number,
@@ -29,6 +31,7 @@ cliche Market {
 
   data Market {}
 
+  /** Widgets **/
   widget BuyGoodButton {
     good: Good,
     buyer: Party,
