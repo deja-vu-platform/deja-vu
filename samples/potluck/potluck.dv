@@ -63,14 +63,15 @@ app Potluck {
     user: User
   }
 
+  // used in ShowParty
   widget ShowSupplies {
-    party: Party,
-    user: User
+    party: Party
   }
 
+  // used in ShowParty
   widget RequestSupply {
     party: Party,
-    user: User,
+    user: User, // the seller
     good: Supply
   }
 
