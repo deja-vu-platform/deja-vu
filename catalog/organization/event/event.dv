@@ -3,8 +3,7 @@ cliche Event {
   /** Entities **/
   data Event {
     start_date: datetime,
-    end_date: datetime,
-    guests: [Guest]
+    end_date: datetime
   }
 
   // A weekly recurring event
@@ -14,12 +13,7 @@ cliche Event {
     starts_on: date,  // the date of the first occurrence of the weekly event
     ends_on: date,  // the date of the last occurrence of the weekly event
     start_time: time,
-    end_time: time,
-    guests: [Guest]
-  }
-
-  data Guest {
-    name: text
+    end_time: time
   }
 
   /** Widgets **/
