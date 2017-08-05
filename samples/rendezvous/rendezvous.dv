@@ -31,7 +31,7 @@ app Rendezvous {
   include organization/Group[
     EventData for Group,
     UserData for Member,
-    EventPanel replacing ShowGroupName in ShowGroupsByMember
+    EventPanel replacing ShowGroup in ShowGroupsByMember
   ]
 
   data UserData {

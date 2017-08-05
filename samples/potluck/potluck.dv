@@ -13,7 +13,7 @@ app Potluck {
     User for Member, Party for Group,
 
     /** Widget replacements **/
-    ShowParty replacing ShowGroupName in ShowGroupsByMember
+    ShowParty replacing ShowGroup in ShowGroupsByMember
   ]
 
   // Coordinate bringing supplies
