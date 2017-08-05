@@ -1,23 +1,33 @@
 // Help people plan parties
-// Users can set a date for a party, invite guests, and coordinate bringing
-// supplies
+// Users can create parties, invite guests, and coordinate bringing
+// supplies (e.g., food, drinks). Guests can create supply requests
+// (e.g., "2 cakes") and can commit to bringing requests.
 app Potluck {
   include access/Auth[User for User]
+  // Create parties
   include organization/Event[Party for Event]
 
+  // Invite guests to parties
   include organization/Group[
-    User for Member,
-    Party for Group,
+    /** Entity bindings **/
+    User for Member, Party for Group,
+
+    /** Widget replacements **/
     ShowParty replacing ShowGroupName in ShowGroupsByMember
   ]
 
+  // Coordinate bringing supplies
   include community/Market[
-    User for Party,
-    Party for Market,
-    Supply for Good,
-    Supply for Transaction,
+    /** Entity bindings **/
+    // Each party is a market in which party guests trade supply requests
+    Party for Market, User for Party,
+    // A guest can create a supply request (create a new good she's selling) and
+    // other guests can commit to bringing the supply (buy goods)
+    SupplyRequest for Good, Commitment for Transaction,
+
+    /** Widget replacements **/
     ShowSupplyRequest replacing ShowGood in ShowAllGoods,
-    ShowSupplyBring replacing ShowTransaction in ShowAllTransactions
+    ShowCommitment replacing ShowTransaction in ShowAllTransactions
   ]
 
   /* Entities */
@@ -27,11 +37,21 @@ app Potluck {
 
   data Party {}
 
-  data Supply {
+  // A request to bring a certain amount of items to the party
+  data SupplyRequest {
     name: text,
-    quantity: number,
-    buyer: User,
-    good: Supply
+    party: Party,
+    quantity: number, // the amount of items needed
+    user: User  // the user that created the supply request
+  }
+
+  // A commitment done by a user to bring a certain amount of items to a party
+  data Commitment {
+    supply: SupplyRequest,
+    provider: User,
+    party: Party,
+    // this quantity could be less than the total amount of items requested
+    quantity: number 
   }
 
   /* Widgets */
@@ -64,25 +84,33 @@ app Potluck {
   }
 
   // used in ShowParty
+  // Shows all commitments and supply requests and lets the user commit to
+  // bring supplies
   widget ShowSupplies {
     party: Party
   }
 
   // used in ShowParty
+  // Creates a new supply request
   widget RequestSupply {
     party: Party,
-    user: User, // the seller
-    good: Supply
+    // the user making the request
+    user: User,
+    // the request supply being created
+    new_supply_request: SupplyRequest
   }
 
+  // Show a supply request and lets the logged in user commit to bringing some
+  // (or all) of the items requested
   widget ShowSupplyRequest {
-    good: Supply,
-    user: User,
+    supply_request: SupplyRequest,
+
+    logged_in_user: User,
     quantity: number
   }
 
-  widget ShowSupplyBring {
-    transaction: Supply
+  widget ShowCommitment {
+    commitment: Commitment
   }
 
 
