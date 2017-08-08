@@ -7,6 +7,8 @@ import {Grafo} from "grafo";
 
 import * as _u from "underscore";
 
+import {Named} from "./shared/data";
+
 const uuid = require("uuid");
 
 const mean = new Mean();
@@ -111,6 +113,41 @@ const schema = grafo
     }
   })
 
+  .add_query({
+    name: "getName",
+    type: graphql.GraphQLString,
+    args: {
+      named_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {named_id}) => {
+      const findGroup = mean.db.collection("groups")
+        .findOne({atom_id: named_id})
+
+      const findSubgroup = mean.db.collection("subgroups")
+        .findOne({atom_id: named_id})
+
+      const findMember = mean.db.collection("members")
+        .findOne({atom_id: named_id})
+
+      return Promise
+        .all([findGroup, findSubgroup, findMember])
+        .then(arr => {
+          const named = arr.find(n => !!n);
+          return named === undefined ? "" : named.name;
+        });
+    }
+  })
+
+  // get all members directly in a group or subgroup
+  .add_query({
+    name: "membersByParent",
+    type: "[Member]",
+    args: {
+      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {parent_id}) => childrenByParent(parent_id, "members")
+  })
+
   // get all members not directly in a group or subgroup
   .add_query({
     name: "nonMembersByParent",
@@ -118,74 +155,17 @@ const schema = grafo
     args: {
       parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
-    resolve: (_, {parent_id}) => {
-      const byGroup = mean.db.collection("groups")
-        .findOne({atom_id: parent_id})
-        .then(group => {
-          const memberIDs = group.members ? group.members.map(m => {
-            return m.atom_id
-          }) : [];
-          return mean.db.collection("members")
-            .find({atom_id: {$nin: memberIDs}})
-            .toArray();
-        });
-
-      const bySubgroup = mean.db.collection("subgroups")
-        .findOne({atom_id: parent_id})
-        .then(subgroup => {
-          const memberIDs = subgroup.members ? subgroup.members.map(m => {
-            return m.atom_id
-          }) : [];
-          return mean.db.collection("members")
-            .find({atom_id: {$nin: memberIDs}})
-            .toArray();
-        });
-
-      return Promise.all([byGroup, bySubgroup])
-        .then(arr => {
-          const nonMembers = arr.find(a => !!a.length);
-          return nonMembers === undefined ? [] : nonMembers;
-        });
-    }
+    resolve: (_, {parent_id}) => childrenByParent(parent_id, "members", true)
   })
 
-  // get all members not directly in a group or subgroup
+  // get all subgroups not directly in a group or subgroup
   .add_query({
     name: "nonSubgroupsByParent",
     type: "[Subgroup]",
     args: {
       parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
-    resolve: (_, {parent_id}) => {
-      const byGroup = mean.db.collection("groups")
-        .findOne({atom_id: parent_id})
-        .then(group => {
-          const subgroupIDs = group.subgroups ? group.subgroups.map(s => {
-            return s.atom_id
-          }) : [];
-          return mean.db.collection("subgroups")
-            .find({atom_id: {$nin: subgroupIDs}})
-            .toArray();
-        });
-
-      const bySubgroup = mean.db.collection("subgroups")
-        .findOne({atom_id: parent_id})
-        .then(subgroup => {
-          const subgroupIDs = subgroup.subgroups ? subgroup.subgroups.map(s => {
-            return s.atom_id
-          }) : [];
-          subgroupIDs.push(parent_id);
-          return mean.db.collection("subgroups")
-            .find({atom_id: {$nin: subgroupIDs}})
-            .toArray();
-        });
-
-      return Promise.all([byGroup, bySubgroup])
-        .then(arr => {
-          const nonSubgroups = arr.find(a => !!a.length);
-          return nonSubgroups === undefined ? [] : nonSubgroups;
-        });
-    }
+    resolve: (_, {parent_id}) => childrenByParent(parent_id, "subgroups", true)
   })
 
   // get all groups directly or indirectly containing a subgroup or member
@@ -250,7 +230,7 @@ const schema = grafo
 
   // rename a group, subgroup, or member
   .add_mutation({
-    name: "renameNamed",
+    name: "rename",
     type: graphql.GraphQLBoolean,
     args: {
       named_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
@@ -378,6 +358,70 @@ const schema = grafo
     }
   })
   .schema();
+
+function childrenByParent(
+  parent_id: string,
+  children: string,
+  negate=false,
+): Promise<Named[]> {
+  if (children !== "members" && children !== "subgroups") {
+    return Promise.resolve([]);
+  }
+
+  const queryOp = negate ? "$nin" : "$in";
+  const parentsTypes = ["groups", "subgroups"]
+
+  const cset: Named[] = [];
+  const sgset: Named[] = [];
+
+  const directChildrenByParentObj = (pObj: Named,
+    collName: string, set: Named[]
+  ): Promise<Named[]> => {
+    const IDs = pObj[children] ? pObj[children].map(c => c.atom_id) : [];
+    IDs.push(pObj.atom_id);
+    const queryObj = {atom_id: {}};
+    queryObj.atom_id[queryOp] = IDs;
+
+    return mean.db.collection(collName)
+      .find(queryObj)
+      .toArray()
+      .then(res => res.filter(res_c => set.find(set_c => {
+        return set_c.atom_id === res_c;
+      }) === undefined)) // skip all chilren already found
+      .then(res => res.forEach(c => set.push(c)));
+  }
+
+  const allChildrenRecursive = (p_id: string,
+    parents: string
+  ): Promise<Named[]> => {
+    return mean.db.collection(parents)
+      .findOne({atom_id: p_id})
+      .then(p => {
+        const findDirect = directChildrenByParentObj(p, children, cset);
+
+        const findIndirect = directChildrenByParentObj(p, "subgroups", sgset)
+          .then(res => res.map(sg => {
+            return allChildrenRecursive(sg.atom_id, "subgroups");
+          }))
+          .then(promises => Promise
+            .all(promises)
+            .then(arr => [].concat(...arr)) // flatten results
+          );
+
+        return Promise
+          .all([findDirect, findIndirect])
+          .then(arr => arr[0].concat(arr[1]));
+      });
+  }
+
+  return Promise.all(parentsTypes.map(parents => {
+    return allChildrenRecursive(parent_id, parents);
+  }))
+    .then(arr => {
+      const children = arr.find(a => !!a.length);
+      return children === undefined ? [] : children;
+    });
+}
 
 Helpers.serve_schema(mean.ws, schema);
 

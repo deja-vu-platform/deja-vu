@@ -2,18 +2,21 @@ import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {NamedAtom} from "../../shared/data";
-import {createMember} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class NewMemberComponent {
   @Field("Member") member: NamedAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {
@@ -25,7 +28,7 @@ export class NewMemberComponent {
   }
 
   submit() {
-    createMember(this._graphQlService)
+    this._groupService.createMember()
       .then(atom_id => {
         if (atom_id) {
           this.member.atom_id = atom_id;

@@ -1,7 +1,7 @@
 import {ElementRef} from "@angular/core";
+import {GraphQlService} from "gql";
 
 import {Widget, Field, PrimitiveAtom} from "client-bus";
-import {GraphQlService} from "gql";
 
 import {Named, ParentAtom} from "../../shared/data";
 import {
@@ -10,15 +10,15 @@ import {
   getTypeaheadVal,
   setTypeaheadVal
 } from "../../shared/utils";
-import {
-  getNonSubgroupsByParent,
-  addSubgroupToParent
-} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class WithInitialSubgroupsComponent {
   @Field("Group | Subgroup") parent: ParentAtom;
@@ -30,13 +30,13 @@ export class WithInitialSubgroupsComponent {
   subgroupsToAdd: Named[] = []; // subgroups we want to add to the group
 
   constructor(
-    private _graphQlService: GraphQlService,
+    private _groupService: GroupService,
     private _elementRef: ElementRef
   ) {}
 
   dvAfterInit() {
     if (this.parent.atom_id) {
-      getNonSubgroupsByParent(this._graphQlService, this.parent.atom_id)
+      this._groupService.getNonSubgroupsByParent(this.parent.atom_id)
         .then(nonSubgroups => {
           this.options = nonSubgroups;
           addTypeahead(this.wrapId, this.options.map(m => {
@@ -67,8 +67,7 @@ export class WithInitialSubgroupsComponent {
   addSubgroups() {
     Promise
       .all(this.subgroupsToAdd.map(m => {
-        return addSubgroupToParent(
-          this._graphQlService,
+        return this._groupService.addSubgroupToParent(
           this.parent.atom_id,
           m.atom_id
         );

@@ -52,13 +52,13 @@ cliche Group {
   }
 
   // Button allowing for the creation of a subgroup
-  widget NewButton {
+  widget NewSubgroup {
     subgroup: Subgroup,
     submit_ok: boolean
   }
 
   // Button allowing for the creation of a member
-  widget NewButton {
+  widget NewMember {
     member: Member,
     submit_ok: boolean
   }

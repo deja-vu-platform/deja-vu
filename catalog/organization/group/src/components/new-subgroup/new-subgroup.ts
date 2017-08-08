@@ -2,18 +2,21 @@ import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {ParentAtom} from "../../shared/data";
-import {createSubgroup} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class NewSubgroupComponent {
   @Field("Subroup") subgroup: ParentAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
     this.submit_ok.on_after_change(() => {
@@ -25,7 +28,7 @@ export class NewSubgroupComponent {
   }
 
   submit() {
-    createSubgroup(this._graphQlService)
+    this._groupService.createSubgroup()
       .then(atom_id => {
         if (atom_id) {
           this.subgroup.atom_id = atom_id;

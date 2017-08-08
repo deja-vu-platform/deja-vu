@@ -2,12 +2,15 @@ import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {NamedAtom, ParentAtom} from "../../shared/data";
-import {addMemberToParent} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService],
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ],
   template: ``
 })
 export class WithInitialMemberComponent {
@@ -17,7 +20,7 @@ export class WithInitialMemberComponent {
 
   req: Promise<boolean> = null;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
     this.submit_ok.on_change(() => {
@@ -26,8 +29,7 @@ export class WithInitialMemberComponent {
         this.parent.atom_id &&
         this.member.atom_id
       ) {
-        this.req = addMemberToParent(
-          this._graphQlService,
+        this.req = this._groupService.addMemberToParent(
           this.parent.atom_id,
           this.member.atom_id
         );
