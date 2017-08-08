@@ -1,14 +1,15 @@
 <dv-widget name="NavBar"></dv-widget>
 
-<div class='container' id='homepage-container'>
-  <div class='col-md-3' id="box">
+<div class="container" id="homepage-container">
+  <div class="col-md-3" id="box">
   <h1>Your Parties</h1>
   <a [routerLink]="['/new-party']" class="btn btn-primary">
-    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span> Create a New Party
+    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+    Create a New Party
   </a>
   </div>
 
-  <div class='col-md-9'>
+  <div class="col-md-9">
     <dv-widget name="ShowGroupsByMember" of="Group"></dv-widget>
   </div>
 </div>

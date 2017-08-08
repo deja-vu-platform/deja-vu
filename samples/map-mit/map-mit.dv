@@ -15,7 +15,7 @@ app MapMit {
   include organization/Group[
     User for Member,
     GroupData for Group,
-    DisplayGroup replacing ShowGroupName in ShowGroupsByMember
+    DisplayGroup replacing ShowGroup in ShowGroupsByMember
   ]
 
   data User {

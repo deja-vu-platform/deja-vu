@@ -1,21 +1,25 @@
-<!-- needed to get the buyer since ShowAllGoods doesn't take one -->
-<div style="display:none">
-  <dv-widget name="LoggedIn" of="Auth"></dv-widget>
-</div>
+<!-- Necessary since ShowSupplyRequest replaces ShowGood -->
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
 
-<div class="col-xs-4" *ngIf="good.supply">
-  {{good.name}}
+<div class="col-xs-4" *ngIf="supply_request.name">
+  {{supply_request.name}}
 </div>
-<div class="col-xs-2" *ngIf="good.supply">
-  {{good.supply}}
+<!--
+<div class="col-xs-2" *ngIf="supply_request.quantity">
+  {{supply_request.quantity}}
 </div>
-<div class="col-xs-6" *ngIf="good.supply">
+-->
+<div class="col-xs-2" *ngIf="supply_request.supply">
+  {{supply_request.supply}}
+</div>
+<!-- <div class="col-xs-6" *ngIf="supply_request.quantity"> -->
+<div class="col-xs-6" *ngIf="supply_request.supply">
   <div class="row">
-    <div class="col-xs-12 col-sm-5 col-md-12 col-lg-5">
-    	<dv-widget name="BuyGoodButton" of="Market" ></dv-widget>
-    </div>
-    <div class="col-xs-12 col-sm-7 col-md-12 col-lg-7">
+    <div class="col-xs-7" style="padding-right: 0">
       <dv-widget name="BuyGoodQuantity" of="Market"></dv-widget>
+    </div>
+    <div class="col-xs-5">
+      <dv-widget name="BuyGoodButton" of="Market"></dv-widget>
     </div>
   </div>
 </div>

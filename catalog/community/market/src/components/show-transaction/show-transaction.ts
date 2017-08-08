@@ -8,7 +8,7 @@ import "rxjs/add/operator/map";
 
 @Widget({
   fqelement: "Market",
-  template: `x{{transaction.quantity}} {{transaction.good.name}} ` +
+  template: `x{{transaction.quantity}} {{transaction.good?.name}} ` +
   `@{{transaction.price}}`,
   ng2_providers: [GraphQlService]
 })
@@ -18,7 +18,7 @@ export class ShowTransactionComponent {
   constructor(private _graphQlService: GraphQlService) {}
 
   dvAfterInit() {
-    if (!this.transaction.atom_id || this.transaction.good.name) {
+    if (!this.transaction.atom_id || !this.transaction.good) {
       return;
     }
 

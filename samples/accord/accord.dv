@@ -5,7 +5,7 @@ app Accord {
   include organization/Group[
     User for Member,
     SongGroup for Group,
-    LinkToGroup replacing ShowGroupName in ShowGroupsByMember
+    LinkToGroup replacing ShowGroup in ShowGroupsByMember
   ]
 
   include organization/List[

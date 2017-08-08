@@ -176,7 +176,8 @@ const schema = grafo
     resolve: (root, {market_id}) => {
       return mean.db.collection("goods")
         .find({
-          "market.atom_id": market_id
+          "market.atom_id": market_id,
+          supply: { $gt: 0 }
         })
         .toArray();
     }
