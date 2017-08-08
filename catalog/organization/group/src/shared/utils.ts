@@ -1,15 +1,21 @@
 //const jQuerySrc = "http://code.jquery.com/jquery-3.2.1.min.js";
 
-const typeaheadSrc = "https://cdnjs.cloudflare.com/ajax/libs"+
+const typeaheadScriptSrc = "https://cdnjs.cloudflare.com/ajax/libs"+
   "/corejs-typeahead/1.1.1/typeahead.bundle.min.js";
+const typeaheadStylePath = "node_modules/dv-organization-group/lib/"+
+  "shared/typeahead.css";
 
 
 // EXPORTED FUNCTIONS
 
 export function addTypeahead(wrapId: string, options: string[]): Promise<void> {
-  // insert script tags to load APIs from CDNs
-  //loadRemoteScript(jQuerySrc);
-  loadRemoteScript(typeaheadSrc);
+  // insert script tags to load API from CDN
+  if (!window["jQuery"].fn.typeahead && !window["Bloodhound"]) {
+    loadRemoteScript(typeaheadScriptSrc);
+  }
+  if (!window["myTypeaheadStyles"]) {
+    loadLocalStylesheet(typeaheadStylePath);
+  }
 
   // wait for APIs to load, then use them
   return waitFor(window, "jQuery")
@@ -154,5 +160,15 @@ function loadRemoteScript(src: string): void {
   s.src = src;
   //s.async = true;
   //s.defer = true;
+  document.getElementsByTagName("body")[0].appendChild(s);
+}
+
+// inserts a style tag that loads a local stylesheet
+export function loadLocalStylesheet(path: string): void {
+  const s = document.createElement("link");
+  s.type = "text/css";
+  s.rel = "stylesheet";
+  s.href = path;
+  s.id="myTypeaheadStyles";
   document.getElementsByTagName("body")[0].appendChild(s);
 }

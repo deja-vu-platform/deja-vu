@@ -89,7 +89,6 @@ cliche Group {
     parent: Group | Subgroup,
     submit_ok: boolean
   }
-  // TODO
   widget WithInitialSubgroups {
     parent: Group | Subgroup,
     submit_ok: boolean
@@ -100,7 +99,6 @@ cliche Group {
   widget AddMember {
     parent: Group | Subgroup
   }
-  // TODO
   widget AddSubgroup {
     parent: Group | Subgroup
   }
