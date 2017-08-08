@@ -8,15 +8,12 @@ import "rxjs/add/operator/map";
 
 @Widget({
   fqelement: "Market",
-  template: `x{{transaction.quantity}} {{good_name}} ` +
+  template: `x{{transaction.quantity}} {{transaction.good?.name}} ` +
   `@{{transaction.price}}`,
   ng2_providers: [GraphQlService]
 })
 export class ShowTransactionComponent {
   @Field("Transaction") transaction: TransactionAtom;
-  // Use good_name in template instead of transaction.good.name so that it
-  // doesn't crash if good is undefined
-  good_name = "";
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -48,7 +45,6 @@ export class ShowTransactionComponent {
           .map(data => data.good_by_id.name)
           .subscribe(name => {
             this.transaction.good.name = name;
-            this.good_name = name;
             this.transaction.price = transaction_by_id.price;
             this.transaction.quantity = transaction_by_id.quantity;
           });
