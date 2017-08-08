@@ -10,21 +10,24 @@ import {
   getTypeaheadVal,
   setTypeaheadVal
 } from "../../shared/utils";
-import {getNonMembersByParent, addMemberToParent} from "../../shared/services";
+import {
+  getNonSubgroupsByParent,
+  addSubgroupToParent
+} from "../../shared/services";
 
 
 @Widget({
   fqelement: "Group",
   ng2_providers: [GraphQlService]
 })
-export class WithInitialMembersComponent {
+export class WithInitialSubgroupsComponent {
   @Field("Group | Subgroup") parent: ParentAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   failed = false; // Shows failure message on not found
   wrapId = uuidv4(); // Lets us find input in which to install typeahead
-  options: Named[] = []; // all non-members not in the group
-  membersToAdd: Named[] = []; // members we want to add to the group
+  options: Named[] = []; // all non-subgroups not in the group
+  subgroupsToAdd: Named[] = []; // subgroups we want to add to the group
 
   constructor(
     private _graphQlService: GraphQlService,
@@ -33,26 +36,26 @@ export class WithInitialMembersComponent {
 
   dvAfterInit() {
     if (this.parent.atom_id) {
-      getNonMembersByParent(this._graphQlService, this.parent.atom_id)
-        .then(nonMembers => {
-          this.options = nonMembers;
+      getNonSubgroupsByParent(this._graphQlService, this.parent.atom_id)
+        .then(nonSubgroups => {
+          this.options = nonSubgroups;
           addTypeahead(this.wrapId, this.options.map(m => {
             return m.name;
           }));
         });
     }
 
-    this.submit_ok.on_change(() => this.addMembers());
+    this.submit_ok.on_change(() => this.addSubgroups());
   }
 
-  // queues a member for adding once submit_ok is true
-  queueMemberAdd(): void {
+  // queues a subgroup for adding once submit_ok is true
+  queueSubgroupAdd(): void {
     const name = getTypeaheadVal(this.wrapId);
-    const memberIdx = this.options.findIndex((m => m.name === name));
-    const member = this.options[memberIdx];
-    if (memberIdx >= 0) {
-      this.options.splice(memberIdx, 1); // remove
-      this.membersToAdd.push(member);
+    const subgroupIdx = this.options.findIndex((m => m.name === name));
+    const subgroup = this.options[subgroupIdx];
+    if (subgroupIdx >= 0) {
+      this.options.splice(subgroupIdx, 1); // remove
+      this.subgroupsToAdd.push(subgroup);
       setTypeaheadVal(this.wrapId, "");
       this.failed = false;
     } else {
@@ -60,16 +63,16 @@ export class WithInitialMembersComponent {
     }
   }
 
-  // adds all members in membersToAdd (pushes to backend)
-  addMembers() {
+  // adds all subgroups in subgroupsToAdd (pushes to backend)
+  addSubgroups() {
     Promise
-      .all(this.membersToAdd.map(m => {
-        return addMemberToParent(
+      .all(this.subgroupsToAdd.map(m => {
+        return addSubgroupToParent(
           this._graphQlService,
           this.parent.atom_id,
           m.atom_id
         );
       }))
-      .then(_ => this.membersToAdd = []);
+      .then(_ => this.subgroupsToAdd = []);
   }
 }

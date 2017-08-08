@@ -149,6 +149,45 @@ const schema = grafo
     }
   })
 
+  // get all members not directly in a group or subgroup
+  .add_query({
+    name: "nonSubgroupsByParent",
+    type: "[Subgroup]",
+    args: {
+      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {parent_id}) => {
+      const byGroup = mean.db.collection("groups")
+        .findOne({atom_id: parent_id})
+        .then(group => {
+          const subgroupIDs = group.subgroups ? group.subgroups.map(s => {
+            return s.atom_id
+          }) : [];
+          return mean.db.collection("subgroups")
+            .find({atom_id: {$nin: subgroupIDs}})
+            .toArray();
+        });
+
+      const bySubgroup = mean.db.collection("subgroups")
+        .findOne({atom_id: parent_id})
+        .then(subgroup => {
+          const subgroupIDs = subgroup.subgroups ? subgroup.subgroups.map(s => {
+            return s.atom_id
+          }) : [];
+          subgroupIDs.push(parent_id);
+          return mean.db.collection("subgroups")
+            .find({atom_id: {$nin: subgroupIDs}})
+            .toArray();
+        });
+
+      return Promise.all([byGroup, bySubgroup])
+        .then(arr => {
+          const nonSubgroups = arr.find(a => !!a.length);
+          return nonSubgroups === undefined ? [] : nonSubgroups;
+        });
+    }
+  })
+
   // get all groups directly or indirectly containing a subgroup or member
   .add_query({
     name: "groupsByChild",
@@ -258,9 +297,43 @@ const schema = grafo
 
       const addToSubgroup = Promise
         .all([
+          mean.db.collection("subgroups")
+            .updateOne({atom_id: parent_id}, updateObj),
+          bus.update_atom("Subgroup", parent_id, updateObj)
+        ])
+        .then(arr  => arr[0].modifiedCount && arr[1]);
+
+      return Promise.all([addToGroup, addToSubgroup])
+        .then(arr => arr.reduce((numSuccesses, success) => {
+          return numSuccesses + (success ? 1 : 0);
+        }, 0) === 1);
+    }
+  })
+
+  // add a subgroup to a group or subgroup
+  .add_mutation({
+    name: "addSubgroupToParent",
+    type: graphql.GraphQLBoolean,
+    args: {
+      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {parent_id, subgroup_id}) => {
+      const updateObj = {$addToSet: {subgroups: {atom_id: subgroup_id}}};
+
+      const addToGroup = Promise
+        .all([
           mean.db.collection("groups")
             .updateOne({atom_id: parent_id}, updateObj),
           bus.update_atom("Group", parent_id, updateObj)
+        ])
+        .then(arr  => arr[0].modifiedCount && arr[1]);
+
+      const addToSubgroup = Promise
+        .all([
+          mean.db.collection("subgroups")
+            .updateOne({atom_id: parent_id}, updateObj),
+          bus.update_atom("Subgroup", parent_id, updateObj)
         ])
         .then(arr  => arr[0].modifiedCount && arr[1]);
 

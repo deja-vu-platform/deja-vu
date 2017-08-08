@@ -42,10 +42,6 @@ export class AddMemberComponent {
     }
   }
 
-  ngAfterViewInit() {
-    this._loadStyle();
-  }
-
   onSubmit() {
     if (this.parent.atom_id) {
       const name = getTypeaheadVal(this.wrapId);
@@ -65,14 +61,5 @@ export class AddMemberComponent {
     } else {
       this.failed = true;
     }
-  }
-
-  _loadStyle() {
-    const s = document.createElement("link");
-    s.type = "text/css";
-    s.rel = "stylesheet";
-    s.href = "node_modules/dv-organization-group/lib/components/" +
-      "add-existing-member/add-existing-member.css";
-    this._elementRef.nativeElement.appendChild(s);
   }
 }

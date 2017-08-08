@@ -91,6 +91,24 @@ export function getNonMembersByParent(
     .toPromise();
 }
 
+// gets all subgroups not directly or indirectly in a group or subgroup
+export function getNonSubgroupsByParent(
+  gqls,
+  parent_id: string
+): Promise<Named[]> {
+  return gqls
+    .get(`
+      nonSubgroupsByParent(
+        parent_id: "${parent_id}"
+      ) {
+        atom_id,
+        name
+      }
+    `)
+    .map(data => getOrDefault(data, ["nonSubgroupsByParent"], []))
+    .toPromise();
+}
+
 // gets all groups containing the given subgroup or member
 export function getGroupsByChild(gqls, child_id: string): Promise<Named[]> {
   return gqls
@@ -169,6 +187,23 @@ export function addMemberToParent(
       )
     `)
     .map(data => getOrDefault(data, ["addMemberToParent"], false))
+    .toPromise();
+}
+
+// adds a subgroup to a group or subgroup
+export function addSubgroupToParent(
+  gqls,
+  parent_id: string,
+  subgroup_id: string
+): Promise<boolean> {
+  return gqls
+    .post(`
+      addSubgroupToParent(
+        parent_id: "${parent_id}",
+        subgroup_id: "${subgroup_id}"
+      )
+    `)
+    .map(data => getOrDefault(data, ["addSubgroupToParent"], false))
     .toPromise();
 }
 
