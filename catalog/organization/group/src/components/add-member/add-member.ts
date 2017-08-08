@@ -1,7 +1,7 @@
 import {ElementRef} from "@angular/core";
+import {GraphQlService} from "gql";
 
 import {Widget, Field, PrimitiveAtom} from "client-bus";
-import {GraphQlService} from "gql";
 
 import {Named, ParentAtom} from "../../shared/data";
 import {
@@ -10,12 +10,15 @@ import {
   getTypeaheadVal,
   setTypeaheadVal
 } from "../../shared/utils";
-import {getNonMembersByParent, addMemberToParent} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class AddMemberComponent {
   @Field("Group | Subgroup") parent: ParentAtom;
@@ -26,13 +29,13 @@ export class AddMemberComponent {
   options: Named[] = []; // all non-members
 
   constructor(
-    private _graphQlService: GraphQlService,
+    private _groupService: GroupService,
     private _elementRef: ElementRef
   ) {}
 
   dvAfterInit() {
     if (this.parent.atom_id) {
-      getNonMembersByParent(this._graphQlService, this.parent.atom_id)
+      this._groupService.getNonMembersByParent(this.parent.atom_id)
         .then(nonMembers => {
           this.options = nonMembers;
           addTypeahead(this.wrapId, this.options.map(m => {
@@ -49,8 +52,7 @@ export class AddMemberComponent {
       if (member === undefined) {
         this.failed = true;
       } else {
-        addMemberToParent(
-          this._graphQlService,
+        this._groupService.addMemberToParent(
           this.parent.atom_id,
           member.atom_id
         )

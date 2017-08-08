@@ -2,12 +2,15 @@ import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {NamedAtom} from "../../shared/data";
-import {updateName} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class WithNameComponent {
   @Field("Group | Subgroup | Member") named: NamedAtom;
@@ -15,7 +18,7 @@ export class WithNameComponent {
 
   req: Promise<boolean> = null;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
     this.submit_ok.on_change(() => {
@@ -24,8 +27,7 @@ export class WithNameComponent {
         this.named.atom_id &&
         this.named.name
       ) {
-        this.req = updateName(
-          this._graphQlService,
+        this.req = this._groupService.updateName(
           this.named.atom_id,
           this.named.name
         );

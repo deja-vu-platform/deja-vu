@@ -2,21 +2,27 @@ import {Widget, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {Named, ParentAtom} from "../../shared/data";
-import {getSubgroups} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
-@Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
+@Widget({
+  fqelement: "Group",
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
+})
 export class ShowSubroupsComponent {
   subgroups = [];
 
   constructor(
-    private _graphQlService: GraphQlService,
+    private _groupService: GroupService,
     private _clientBus: ClientBus
   ) {}
 
   dvAfterInit() {
     this.subgroups = [];
-    getSubgroups(this._graphQlService)
+    this._groupService.getSubgroups()
       .then(subgroups => subgroups.map((subgroup: Named) => {
         const subgroup_atom = this._clientBus.new_atom<ParentAtom>("Subgroup");
         subgroup_atom.atom_id = subgroup.atom_id;

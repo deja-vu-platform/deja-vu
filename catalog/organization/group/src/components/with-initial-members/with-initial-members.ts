@@ -10,12 +10,15 @@ import {
   getTypeaheadVal,
   setTypeaheadVal
 } from "../../shared/utils";
-import {getNonMembersByParent, addMemberToParent} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class WithInitialMembersComponent {
   @Field("Group | Subgroup") parent: ParentAtom;
@@ -27,13 +30,13 @@ export class WithInitialMembersComponent {
   membersToAdd: Named[] = []; // members we want to add to the group
 
   constructor(
-    private _graphQlService: GraphQlService,
+    private _groupService: GroupService,
     private _elementRef: ElementRef
   ) {}
 
   dvAfterInit() {
     if (this.parent.atom_id) {
-      getNonMembersByParent(this._graphQlService, this.parent.atom_id)
+      this._groupService.getNonMembersByParent(this.parent.atom_id)
         .then(nonMembers => {
           this.options = nonMembers;
           addTypeahead(this.wrapId, this.options.map(m => {
@@ -64,8 +67,7 @@ export class WithInitialMembersComponent {
   addMembers() {
     Promise
       .all(this.membersToAdd.map(m => {
-        return addMemberToParent(
-          this._graphQlService,
+        return this._groupService.addMemberToParent(
           this.parent.atom_id,
           m.atom_id
         );

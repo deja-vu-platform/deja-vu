@@ -2,18 +2,21 @@ import {Widget, ClientBus, Field} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {NamedAtom, ParentAtom} from "../../shared/data";
-import {getMembersByParent} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class ShowMembersByParentComponent {
   @Field("Group | Subgroup") parent: ParentAtom;
 
   constructor(
-    private _graphQlService: GraphQlService,
+    private _groupService: GroupService,
     private _clientBus: ClientBus
   ) {}
 
@@ -22,7 +25,7 @@ export class ShowMembersByParentComponent {
       this.parent.atom_id &&
       (!this.parent.members || !this.parent.members.length)
     ) {
-      getMembersByParent(this._graphQlService, this.parent.atom_id)
+      this._groupService.getMembersByParent(this.parent.atom_id)
         .then(members => members.map((m) => {
           const member_atom = this._clientBus.new_atom<NamedAtom>("Member");
           member_atom.atom_id = m.atom_id;

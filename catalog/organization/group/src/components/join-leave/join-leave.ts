@@ -3,29 +3,28 @@ import {GraphQlService} from "gql";
 
 import {Named, NamedAtom, ParentAtom} from "../../shared/data";
 import {filterInPlace} from "../../shared/utils";
-import {
-  getMembersByParent,
-  addMemberToParent,
-  removeMemberFromParent
-} from "../../shared/services";
+import GroupService from "../../shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class JoinLeaveComponent implements AfterInit {
   @Field("Member") member: NamedAtom;
   @Field("Group | Subgroup") parent: ParentAtom;
 
   constructor(
-    private _graphQlService: GraphQlService,
+    private _groupService: GroupService,
     private _clientBus: ClientBus
   ) {}
 
   dvAfterInit() {
     this.parent.members = [];
-    getMembersByParent(this._graphQlService, this.parent.atom_id)
+    this._groupService.getMembersByParent(this.parent.atom_id)
       .then(members => members.forEach((member: Named) => {
         const memberAtom = this._clientBus.new_atom<NamedAtom>("Member");
         memberAtom.atom_id = member.atom_id;
@@ -35,8 +34,7 @@ export class JoinLeaveComponent implements AfterInit {
   }
 
   joinGroup() {
-    addMemberToParent(
-      this._graphQlService,
+    this._groupService.addMemberToParent(
       this.parent.atom_id,
       this.member.atom_id
     )
@@ -48,8 +46,7 @@ export class JoinLeaveComponent implements AfterInit {
   }
 
   leaveGroup() {
-    removeMemberFromParent(
-      this._graphQlService,
+    this._groupService.removeMemberFromParent(
       this.parent.atom_id,
       this.member.atom_id
     )
