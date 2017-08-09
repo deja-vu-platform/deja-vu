@@ -1,8 +1,8 @@
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {NamedAtom} from "../../shared/data";
-import GroupService from "../../shared/group.service";
+import {MemberAtom} from "../_shared/data";
+import GroupService from "../_shared/group.service";
 
 
 @Widget({
@@ -12,8 +12,8 @@ import GroupService from "../../shared/group.service";
     GroupService
   ]
 })
-export class WithNameComponent {
-  @Field("Group | Subgroup | Member") named: NamedAtom;
+export class EditNameOfMemberComponent {
+  @Field("Member") member: MemberAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   req: Promise<boolean> = null;
@@ -21,22 +21,28 @@ export class WithNameComponent {
   constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
+    if (this.member.atom_id && !this.member.name) {
+      this._groupService
+        .getNameOfGroup(this.member.atom_id)
+        .then(name => this.member.name = name);
+    }
+
     this.submit_ok.on_change(() => {
       if (
         this.submit_ok.value === true &&
-        this.named.atom_id &&
-        this.named.name
+        this.member.atom_id &&
+        this.member.name
       ) {
-        this.req = this._groupService.updateName(
-          this.named.atom_id,
-          this.named.name
+        this.req = this._groupService.updateNameOfMember(
+          this.member.atom_id,
+          this.member.name
         );
       }
     });
 
     this.submit_ok.on_after_change(() => {
       if (this.req) this.req.then(success => {
-        this.named.name = "";
+        this.member.name = "";
         this.req = null;
       });
     });
