@@ -1,12 +1,14 @@
 <h4>Members to Add</h4>
-<ul *ngIf="membersToAdd && membersToAdd.length > 0"
+<ul *ngIf="stagedMembers && stagedMembers.length > 0"
   class="list-group member-list">
-  <li *ngFor="let member of membersToAdd"
+  <li *ngFor="let member of stagedMembers"
     class="list-group-item member-list-item">
-    <dv-widget name="ShowName" [init]="{named: member}"></dv-widget>
+    <dv-widget name="ShowNameOfMember" [init]="{member: member}"></dv-widget>
+    <button class="btn btn-danger pull-right"
+      (onClick)="unstageMember(member.atom_id)">X</button>
   </li>
 </ul>
-<form (ngSubmit)="queueMemberAdd()" #addMembersForm="ngForm"
+<form (ngSubmit)="stageMember()" #addMembersForm="ngForm"
   class="form-horizontal">
   <fieldset class="form-group" id="{{wrapId}}">
     <label class="sr-only" for="name">Member Name</label>
@@ -17,5 +19,5 @@
     <button type="submit" class="btn btn-default btn-sm pull-right"
      [disabled]="!addMembersForm.valid">Add Member</button>
   </div>
-  <div class="alert alert-danger" *ngIf="failed">Member not found.</div>
+  <div class="alert alert-danger" *ngIf="failMsg">{{failMsg}}</div>
 </form>

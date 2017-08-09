@@ -7,7 +7,7 @@ import {Grafo} from "grafo";
 
 import * as _u from "underscore";
 
-import {Named} from "./shared/data";
+import {Member, Group} from "./_shared/data";
 
 const uuid = require("uuid");
 
@@ -17,10 +17,6 @@ const handlers = {
   group: {
     create: Helpers.resolve_create(mean.db, "group"),
     update: Helpers.resolve_update(mean.db, "group")
-  },
-  subgroup: {
-    create: Helpers.resolve_create(mean.db, "subgroup"),
-    update: Helpers.resolve_update(mean.db, "subgroup")
   },
   member: {
     create: Helpers.resolve_create(mean.db, "member"),
@@ -44,25 +40,16 @@ const schema = grafo
     }
   })
   .add_type({
-    name: "Subgroup",
-    fields: {
-      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      name: {"type": graphql.GraphQLString},
-      members: {"type": "[Member]"},
-      subgroups: {"type": "[Subgroup]"}
-    }
-  })
-  .add_type({
     name: "Group",
     fields: {
       atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       name: {"type": graphql.GraphQLString},
       members: {"type": "[Member]"},
-      subgroups: {"type": "[Subgroup]"}
+      subgroups: {"type": "[Group]"}
     }
   })
 
-  // create handlers
+  // create a group
   .add_mutation({
     name: "createGroup",
     type: graphql.GraphQLString,
@@ -80,23 +67,8 @@ const schema = grafo
         .then(success => success ? newObject.atom_id : "");
     }
   })
-  .add_mutation({
-    name: "createSubgroup",
-    type: graphql.GraphQLString,
-    args: {},
-    resolve: (_, {}) => {
-      let newObject = {
-        atom_id: uuid.v4(),
-        name: "",
-        members: [],
-        subgroups: []
-      };
-      return mean.db.collection("subgroups")
-        .insertOne(newObject)
-        .then(_ => bus.create_atom("Subgroup", newObject.atom_id, newObject))
-        .then(success => success ? newObject.atom_id : "");
-    }
-  })
+
+  // create a member
   .add_mutation({
     name: "createMember",
     type: graphql.GraphQLString,
@@ -113,315 +85,167 @@ const schema = grafo
     }
   })
 
+  // get all members directly or indirectly in a group
   .add_query({
-    name: "getName",
-    type: graphql.GraphQLString,
+    name: "membersByGroup",
+    type: "[Member]",
     args: {
-      named_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
-    resolve: (_, {named_id}) => {
-      const findGroup = mean.db.collection("groups")
-        .findOne({atom_id: named_id})
+    resolve: (_, {group_id}) => {
+      const mset: Set<string> = new Set(); // found members
+      const gset: Set<string> = new Set(); // explored groups
 
-      const findSubgroup = mean.db.collection("subgroups")
-        .findOne({atom_id: named_id})
+      const recurse = (g_id: string): Promise<void> => {
+        return mean.db.collection("groups")
+          .findOne({atom_id: g_id})
+          .then(group => {
+            group.members.forEach(m => mset.add(m.atom_id));
+            const recursiveCalls: Promise<void>[] = [];
+            group.subgroups.forEach(g => {
+              if (!gset.has(g)) {
+                gset.add(g.atom_id)
+                recursiveCalls.push(recurse(g.atom_id));
+              }
+            });
+            return Promise.all(recursiveCalls);
+          });
+      }
 
-      const findMember = mean.db.collection("members")
-        .findOne({atom_id: named_id})
-
-      return Promise
-        .all([findGroup, findSubgroup, findMember])
-        .then(arr => {
-          const named = arr.find(n => !!n);
-          return named === undefined ? "" : named.name;
-        });
+      gset.add(group_id);
+      return recurse(group_id).then(() => {
+        const IDs = Array.from(mset);
+        return mean.db.collection("members")
+          .find({atom_id: {$in: IDs}});
+      });
     }
-  })
-
-  // get all members directly in a group or subgroup
-  .add_query({
-    name: "membersByParent",
-    type: "[Member]",
-    args: {
-      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-    },
-    resolve: (_, {parent_id}) => childrenByParent(parent_id, "members")
-  })
-
-  // get all members not directly in a group or subgroup
-  .add_query({
-    name: "nonMembersByParent",
-    type: "[Member]",
-    args: {
-      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-    },
-    resolve: (_, {parent_id}) => childrenByParent(parent_id, "members", true)
-  })
-
-  // get all subgroups not directly in a group or subgroup
-  .add_query({
-    name: "nonSubgroupsByParent",
-    type: "[Subgroup]",
-    args: {
-      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-    },
-    resolve: (_, {parent_id}) => childrenByParent(parent_id, "subgroups", true)
   })
 
   // get all groups directly or indirectly containing a subgroup or member
   .add_query({
-    name: "groupsByChild",
+    name: "groupsByMember",
     type: "[Group]",
     args: {
-      child_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
-    resolve: (_, {child_id}) => {
-      const gset = [];
-      const sgset = [];
+    resolve: (_, {member_id}) => {
+      const gset: Set<string> = new Set(); // explored groups
+      const outputArr: Group[] = [];
 
-      // finds all groups containing member or subgroup
-      // adds the new ones to the array
-      const groupsByChild = (mID) => {
+      const getGroupsByMember = (m_id: string): Promise<Group[]> => {
         return mean.db.collection("groups")
-          .find({$or: [
-            {members: {atom_id: mID}},
-            {subgroups: {atom_id: mID}}
-          ]})
+          .find({members: {atom_id: m_id}})
           .toArray()
-          .then(groups => {
-            groups.forEach(newG => {
-              if (!gset.find((oldG) => oldG.atom_id === newG.atom_id)) {
-                gset.push(newG);
-              }
-            });
-          });
       }
 
-      // finds all subgroups containing member or subgroup
-      // recursively finds all subgroups and groups containing each new one
-      const subgroupsByChild = (mID) => {
-        return mean.db.collection("subgroups")
-          .find({$or: [
-            {members: {atom_id: mID}},
-            {subgroups: {atom_id: mID}}
-          ]})
+      const getGroupsBySubgroup = (sg_id: string): Promise<Group[]> => {
+        return mean.db.collection("groups")
+          .find({subgroups: {atom_id: sg_id}})
           .toArray()
-          .then(subgroups => {
-            const promises = [];
-            subgroups.forEach(newSG => {
-              if (!sgset.find((oldSG) => oldSG.atom_id === newSG.atom_id)) {
-                sgset.push(newSG);
-                promises.push(groupsByChild(newSG.atom_id));
-                promises.push(subgroupsByChild(newSG.atom_id));
-              }
-            });
-            return Promise.all(promises);
-          });
       }
 
-      return Promise
-        .all([
-          groupsByChild(child_id),
-          subgroupsByChild(child_id)
-        ])
-        .then(_ => gset);
+      const recurseOnGroups = (groups: Group[]): Promise<void> => {
+        const recursiveCalls: Promise<void>[] = [];
+        groups.forEach(group => {
+          if (!gset.has(group.atom_id)) {
+            gset.add(group.atom_id);
+            outputArr.push(group);
+            const call = getGroupsBySubgroup(group.atom_id)
+              .then(groups => recurseOnGroups(groups));
+            recursiveCalls.push(call);
+          }
+        });
+        return Promise.all(recursiveCalls).then(() => {});
+      }
+
+      return getGroupsByMember(member_id)
+        .then(groups => recurseOnGroups(groups))
+        .then(() => outputArr);
     }
   })
 
-  // rename a group, subgroup, or member
+  // update the name of a group
   .add_mutation({
-    name: "rename",
+    name: "renameGroup",
     type: graphql.GraphQLBoolean,
     args: {
-      named_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       name: {"type": graphql.GraphQLString}
     },
-    resolve: (_, {named_id, name}) => {
+    resolve: (_, {group_id, name}) => {
+      const queryObj = {atom_id: group_id};
       const updateObj = {$set: {name: name}};
-
-      const rnGroup = mean.db.collection("groups")
-        .updateOne({atom_id: named_id}, updateObj)
-
-      const rnSubgroup = mean.db.collection("subgroups")
-        .updateOne({atom_id: named_id}, updateObj)
-
-      const rnMember = mean.db.collection("members")
-        .updateOne({atom_id: named_id}, updateObj)
-
       return Promise
-        .all([rnGroup, rnSubgroup, rnMember])
-        .then(arr => arr.reduce((tot, wRes) => {
-          return tot + wRes.modifiedCount;
-        }, 0) === 1);
+        .all([
+          mean.db.collection("groups").updateOne(queryObj, updateObj),
+          bus.update_atom("Group", group_id, updateObj)
+        ])
+        .then(arr => arr[0].modifiedCount === 1 && arr[1]);
     }
   })
 
-  // add a member to a group or subgroup
+  // update the name of a member
   .add_mutation({
-    name: "addMemberToParent",
+    name: "renameMember",
     type: graphql.GraphQLBoolean,
     args: {
-      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      name: {"type": graphql.GraphQLString}
+    },
+    resolve: (_, {member_id, name}) => {
+      const queryObj = {atom_id: member_id};
+      const updateObj = {$set: {name: name}};
+      return Promise
+        .all([
+          mean.db.collection("members").updateOne(queryObj, updateObj),
+          bus.update_atom("Member", member_id, updateObj)
+        ])
+        .then(arr => arr[0].modifiedCount === 1 && arr[1]);
+    }
+  })
+
+  // add a member to a group
+  .add_mutation({
+    name: "addMemberToGroup",
+    type: graphql.GraphQLBoolean,
+    args: {
+      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
-    resolve: (_, {parent_id, member_id}) => {
+    resolve: (_, {group_id, member_id}) => {
+      const queryObj = {atom_id: group_id};
       const updateObj = {$addToSet: {members: {atom_id: member_id}}};
 
-      const addToGroup = Promise
+      return Promise
         .all([
-          mean.db.collection("groups")
-            .updateOne({atom_id: parent_id}, updateObj),
-          bus.update_atom("Group", parent_id, updateObj)
+          mean.db.collection("groups").updateOne(queryObj, updateObj),
+          bus.update_atom("Group", group_id, updateObj)
         ])
         .then(arr  => arr[0].modifiedCount && arr[1]);
-
-      const addToSubgroup = Promise
-        .all([
-          mean.db.collection("subgroups")
-            .updateOne({atom_id: parent_id}, updateObj),
-          bus.update_atom("Subgroup", parent_id, updateObj)
-        ])
-        .then(arr  => arr[0].modifiedCount && arr[1]);
-
-      return Promise.all([addToGroup, addToSubgroup])
-        .then(arr => arr.reduce((numSuccesses, success) => {
-          return numSuccesses + (success ? 1 : 0);
-        }, 0) === 1);
     }
   })
 
-  // add a subgroup to a group or subgroup
+  // remove a member from a group
   .add_mutation({
-    name: "addSubgroupToParent",
+    name: "removeMemberFromGroup",
     type: graphql.GraphQLBoolean,
     args: {
-      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-    },
-    resolve: (_, {parent_id, subgroup_id}) => {
-      const updateObj = {$addToSet: {subgroups: {atom_id: subgroup_id}}};
-
-      const addToGroup = Promise
-        .all([
-          mean.db.collection("groups")
-            .updateOne({atom_id: parent_id}, updateObj),
-          bus.update_atom("Group", parent_id, updateObj)
-        ])
-        .then(arr  => arr[0].modifiedCount && arr[1]);
-
-      const addToSubgroup = Promise
-        .all([
-          mean.db.collection("subgroups")
-            .updateOne({atom_id: parent_id}, updateObj),
-          bus.update_atom("Subgroup", parent_id, updateObj)
-        ])
-        .then(arr  => arr[0].modifiedCount && arr[1]);
-
-      return Promise.all([addToGroup, addToSubgroup])
-        .then(arr => arr.reduce((numSuccesses, success) => {
-          return numSuccesses + (success ? 1 : 0);
-        }, 0) === 1);
-    }
-  })
-
-  // add a member to a group or subgroup
-  .add_mutation({
-    name: "removeMemberFromParent",
-    type: graphql.GraphQLBoolean,
-    args: {
-      parent_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
-    resolve: (_, {parent_id, member_id}) => {
+    resolve: (_, {group_id, member_id}) => {
+      const queryObj = {atom_id: group_id};
       const updateObj = {$pull: {members: {atom_id: member_id}}};
 
-      const removeFromGroup = Promise
+      return Promise
         .all([
-          mean.db.collection("groups")
-            .updateOne({atom_id: parent_id}, updateObj),
-          bus.update_atom("Group", parent_id, updateObj)
+          mean.db.collection("groups").updateOne(queryObj, updateObj),
+          bus.update_atom("Group", group_id, updateObj)
         ])
         .then(arr  => arr[0].modifiedCount && arr[1]);
-
-      const removeFromSubgroup = Promise
-        .all([
-          mean.db.collection("groups")
-            .updateOne({atom_id: parent_id}, updateObj),
-          bus.update_atom("Group", parent_id, updateObj)
-        ])
-        .then(arr  => arr[0].modifiedCount && arr[1]);
-
-      return Promise.all([removeFromGroup, removeFromSubgroup])
-        .then(arr => arr.reduce((numSuccesses, success) => {
-          return numSuccesses + (success ? 1 : 0);
-        }, 0) === 1);
     }
   })
   .schema();
-
-function childrenByParent(
-  parent_id: string,
-  children: string,
-  negate=false,
-): Promise<Named[]> {
-  if (children !== "members" && children !== "subgroups") {
-    return Promise.resolve([]);
-  }
-
-  const queryOp = negate ? "$nin" : "$in";
-  const parentsTypes = ["groups", "subgroups"]
-
-  const cset: Named[] = [];
-  const sgset: Named[] = [];
-
-  const directChildrenByParentObj = (pObj: Named,
-    collName: string, set: Named[]
-  ): Promise<Named[]> => {
-    const IDs = pObj[children] ? pObj[children].map(c => c.atom_id) : [];
-    IDs.push(pObj.atom_id);
-    const queryObj = {atom_id: {}};
-    queryObj.atom_id[queryOp] = IDs;
-
-    return mean.db.collection(collName)
-      .find(queryObj)
-      .toArray()
-      .then(res => res.filter(res_c => set.find(set_c => {
-        return set_c.atom_id === res_c;
-      }) === undefined)) // skip all chilren already found
-      .then(res => res.forEach(c => set.push(c)));
-  }
-
-  const allChildrenRecursive = (p_id: string,
-    parents: string
-  ): Promise<Named[]> => {
-    return mean.db.collection(parents)
-      .findOne({atom_id: p_id})
-      .then(p => {
-        const findDirect = directChildrenByParentObj(p, children, cset);
-
-        const findIndirect = directChildrenByParentObj(p, "subgroups", sgset)
-          .then(res => res.map(sg => {
-            return allChildrenRecursive(sg.atom_id, "subgroups");
-          }))
-          .then(promises => Promise
-            .all(promises)
-            .then(arr => [].concat(...arr)) // flatten results
-          );
-
-        return Promise
-          .all([findDirect, findIndirect])
-          .then(arr => arr[0].concat(arr[1]));
-      });
-  }
-
-  return Promise.all(parentsTypes.map(parents => {
-    return allChildrenRecursive(parent_id, parents);
-  }))
-    .then(arr => {
-      const children = arr.find(a => !!a.length);
-      return children === undefined ? [] : children;
-    });
-}
 
 Helpers.serve_schema(mean.ws, schema);
 

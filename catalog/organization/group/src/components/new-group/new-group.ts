@@ -1,8 +1,8 @@
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {ParentAtom} from "../../shared/data";
-import GroupService from "../../shared/group.service";
+import {GroupAtom} from "../_shared/data";
+import GroupService from "../_shared/group.service";
 
 
 @Widget({
@@ -13,7 +13,7 @@ import GroupService from "../../shared/group.service";
   ]
 })
 export class NewGroupComponent {
-  @Field("Group") group : ParentAtom;
+  @Field("Group") group : GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(private _groupService: GroupService) {}

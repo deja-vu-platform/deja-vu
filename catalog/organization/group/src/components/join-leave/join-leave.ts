@@ -1,9 +1,9 @@
 import {Widget, Field, AfterInit, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {Named, NamedAtom, ParentAtom} from "../../shared/data";
-import {filterInPlace} from "../../shared/utils";
-import GroupService from "../../shared/group.service";
+import {Member, Group, MemberAtom, GroupAtom} from "../_shared/data";
+import {filterInPlace} from "../_shared/utils";
+import GroupService from "../_shared/group.service";
 
 
 @Widget({
@@ -14,8 +14,8 @@ import GroupService from "../../shared/group.service";
   ]
 })
 export class JoinLeaveComponent implements AfterInit {
-  @Field("Member") member: NamedAtom;
-  @Field("Group | Subgroup") parent: ParentAtom;
+  @Field("Member") member: MemberAtom;
+  @Field("Group") group: GroupAtom;
 
   constructor(
     private _groupService: GroupService,
@@ -23,36 +23,37 @@ export class JoinLeaveComponent implements AfterInit {
   ) {}
 
   dvAfterInit() {
-    this.parent.members = [];
-    this._groupService.getMembersByParent(this.parent.atom_id)
-      .then(members => members.forEach((member: Named) => {
-        const memberAtom = this._clientBus.new_atom<NamedAtom>("Member");
-        memberAtom.atom_id = member.atom_id;
-        memberAtom.name = member.name;
-        this.parent.members.push(memberAtom);
-      }));
+    this._groupService.getMembersByGroup(this.group.atom_id)
+      .then(members => {
+        this.group.members = members.map(member => {
+          const member_atom = this._clientBus.new_atom<MemberAtom>("Member");
+          member_atom.atom_id = member.atom_id;
+          member_atom.name = member.name;
+          return member_atom;
+        });
+      });
   }
 
   joinGroup() {
-    this._groupService.addMemberToParent(
-      this.parent.atom_id,
+    this._groupService.addMemberToGroup(
+      this.group.atom_id,
       this.member.atom_id
     )
       .then(success => {
         if (success) {
-          this.parent.members.push(this.member);
+          this.group.members.push(this.member);
         }
       });
   }
 
   leaveGroup() {
-    this._groupService.removeMemberFromParent(
-      this.parent.atom_id,
+    this._groupService.removeMemberFromGroup(
+      this.group.atom_id,
       this.member.atom_id
     )
       .then(success => {
         if (success) {
-          filterInPlace(this.parent.members, m => {
+          filterInPlace(this.group.members, m => {
             return m.atom_id !== this.member.atom_id;
           });
         }
@@ -60,7 +61,7 @@ export class JoinLeaveComponent implements AfterInit {
   }
 
   // called from template to update button text
-  inGroup(member: NamedAtom, group: ParentAtom): boolean {
+  inGroup(member: Member, group: Group): boolean {
     return group.members.findIndex(m => m.atom_id === member.atom_id) >= 0;
   }
 }

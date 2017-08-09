@@ -1,111 +1,86 @@
 cliche Group {
-  // Highest-level collection of subgroups and/or members
+  // Collection of subgroups and/or members
   data Group {
     name: text,
     members: [Member],
     subgroups: [Group]
   }
 
-  // Intermediate-level collection of subgroups and/or members
-  data Subgroup {
-    name: text,
-    members: [Member],
-    subgroups: [Subgroup]
-  }
-
-  // Lowest-level, contains nothing
+  // Lowest-level named entity, contains nothing
   data Member {
     name: text
   }
 
-  // Shows the name of a group, subgroup, or member
-  widget ShowName {
-    named: Group | Subgroup | Member
-  }
-
-  // Shows all members in the database
-  widget ShowMembers uses ShowName {}
-
-  // Shows all subgroups in the database
-  widget ShowSubgroups uses ShowName {}
-
-  // Shows all subgroups in the database
-  widget ShowGroups uses ShowName {}
-
-  // Shows all members of a group or subgroup
-  // TODO: ShowSubgroupsByParent once fields can have the same type
-  widget ShowMembersByParent uses ShowName {
-    parent: Group | Subgroup
-  }
-
-  // Shows all groups containing a given subgroup or member
-  // Containment can be direct or indirect
-  // TODO: ShowSubgroupsByChild once fields can have the same type
-  widget ShowGroupsByChild {
-    child: Subgroup | Member
-  }
-
-  // Button allowing for the creation of a group
+  // Button allowing for the creation of a group/member
   widget NewGroup {
     group: Group,
     submit_ok: boolean
   }
-
-  // Button allowing for the creation of a subgroup
-  widget NewSubgroup {
-    subgroup: Subgroup,
-    submit_ok: boolean
-  }
-
-  // Button allowing for the creation of a member
   widget NewMember {
     member: Member,
     submit_ok: boolean
   }
 
-  // Text box allowing groups, subgroups, and members to be created with names
-  // When submit_ok flips to true, "named" is given the name in the text box
-  widget WithName {
-    named: Group | Subgroup | Member,
-    submit_ok: boolean
+  // Shows the name of a group or member
+  widget ShowNameOfGroup {
+    group: Group
+  }
+  widget ShowNameOfMember {
+    named: Member
   }
 
-  // Allows groups and subgroups to be created with an initial member
-  // When submit_ok flips to true, member is added to parent
-  // TODO: WithInitialSubgroup once fields can have the same type
-  widget WithInitialMember {
-    parent: Group | Subgroup,
+  // Shows all groups/members in the database
+  widget ShowGroups uses ShowNameOfGroup {}
+  widget ShowMembers uses ShowNameOfMember {}
+
+  // Shows all (direct or indirect) groups containing the given member
+  widget ShowGroupsByMember uses ShowNameOfGroup {
+    member: Member
+  }
+  // Shows all (direct or indirect) members in the given group
+  widget ShowMembersByGroup uses ShowNameOfMember {
+    group: Group
+  }
+
+
+  // Text box to edit group/member name
+  // When submit_ok flips to true, the name is updated
+  widget EditNameOfGroup {
+    group: Group,
+    submit_ok: boolean
+  }
+  widget EditNameOfMember {
     member: Member,
     submit_ok: boolean
   }
 
-  // Allows groups and subgroups to be created with initial subgroups/members
-  // The user is presented with a text box to enter subgroup/member names
+  // The user is presented with a text box to enter member names
   // Names entered appear on the screen
-  // When submit_ok flips to true,
-  //     all subgroups/members are added to the group or subgroup
-  widget WithInitialMembers {
-    parent: Group | Subgroup,
+  // When submit_ok flips to true, all members are added
+  widget EditMembersOfGroup {
+    group: Group,
     submit_ok: boolean
   }
-  widget WithInitialSubgroups {
-    parent: Group | Subgroup,
+  // TODO: Edit Subgroups of Group
+
+  // Allows a member to be added to the group
+  // The user must enter the member name into a text box
+  widget AddMemberToGroup {
+    group: Group
+  }
+
+  // Allows groups to be created with an initial member
+  // When submit_ok flips to true, member is added to group
+  widget WithInitialMember {
+    group: Group,
+    member: Member,
     submit_ok: boolean
   }
+  // TODO: WithInitialSubgroup once fields can have the same type
 
-  // Allows a subgroup/member to be added to the group or subgroup
-  // The user must enter the subgroup/member name into a text box
-  widget AddMember {
-    parent: Group | Subgroup
-  }
-  widget AddSubgroup {
-    parent: Group | Subgroup
-  }
-
-  // Button allowing a member to join or leave a group or subgroup
-  // TODO: Make one for subgroup once fields can have the same type
+  // Button allowing a member to join or leave a group
   widget JoinLeave {
-    parent: Group | Subgroup,
+    group: Group,
     member: Member
   }
 }
