@@ -1,15 +1,14 @@
+import {Widget, Field, PrimitiveAtom, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {Widget, Field, PrimitiveAtom, ClientBus} from "client-bus";
-
 import {Member, MemberAtom, GroupAtom} from "../_shared/data";
+import GroupService from "../_shared/group.service";
 import {
   addTypeahead,
   uuidv4,
   getTypeaheadVal,
   setTypeaheadVal
 } from "../_shared/utils";
-import GroupService from "../_shared/group.service";
 
 
 @Widget({

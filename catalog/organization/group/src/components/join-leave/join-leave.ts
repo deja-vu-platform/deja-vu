@@ -2,8 +2,8 @@ import {Widget, Field, AfterInit, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {Member, Group, MemberAtom, GroupAtom} from "../_shared/data";
-import {filterInPlace} from "../_shared/utils";
 import GroupService from "../_shared/group.service";
+import {filterInPlace} from "../_shared/utils";
 
 
 @Widget({
