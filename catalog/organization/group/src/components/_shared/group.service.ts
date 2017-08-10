@@ -107,6 +107,38 @@ export default class GroupService {
       .toPromise();
   }
 
+  // gets all groups which are a direct subgroup of the given group
+  getSubgroupsOfGroup(group_id: string): Promise<Member[]> {
+    return this._graphQlService
+      .get(`
+        group_by_id(
+          atom_id: "${group_id}"
+        ) {
+          subgroups {
+            atom_id,
+            name
+          }
+        }
+      `)
+      .map(data => getOrDefault(data, ["group_by_id", "subgroups"], []))
+      .toPromise();
+  }
+
+  // gets all groups directly or indreictly contained within a group
+  getSubgroupsByGroup(group_id: string): Promise<Group[]> {
+    return this._graphQlService
+      .get(`
+        subgroupsByGroup(
+          group_id: "${group_id}"
+        ) {
+          atom_id,
+          name
+        }
+      `)
+      .map(data => getOrDefault(data, ["subgroupsByGroup"], []))
+      .toPromise();
+  }
+
   // gets all members directly or indirectly in a group
   getMembersByGroup(group_id: string): Promise<Member[]> {
     return this._graphQlService
@@ -134,6 +166,21 @@ export default class GroupService {
         }
       `)
       .map(data => getOrDefault(data, ["groupsByMember"], []))
+      .toPromise();
+  }
+
+  // gets all groups directly or indrectly containing the subgroup
+  getGroupsBySubgroup(subgroup_id: string): Promise<Group[]> {
+    return this._graphQlService
+      .get(`
+        groupsBySubgroup(
+          subgroup_id: "${subgroup_id}"
+        ) {
+          atom_id,
+          name
+        }
+      `)
+      .map(data => getOrDefault(data, ["groupsBySubgroup"], []))
       .toPromise();
   }
 
@@ -186,6 +233,35 @@ export default class GroupService {
         )
       `)
       .map(data => getOrDefault(data, ["removeMemberFromGroup"], false))
+      .toPromise();
+  }
+
+  // adds a subgroup to a group
+  addSubgroupToGroup(group_id: string, subgroup_id: string): Promise<boolean> {
+    return this._graphQlService
+      .post(`
+        addSubgroupToGroup(
+          group_id: "${group_id}",
+          subgroup_id: "${subgroup_id}"
+        )
+      `)
+      .map(data => getOrDefault(data, ["addSubgroupToGroup"], false))
+      .toPromise();
+  }
+
+  // removes a subgroup from a group
+  removeSubgroupFromGroup(
+    group_id: string,
+    subgroup_id: string
+  ): Promise<boolean> {
+    return this._graphQlService
+      .post(`
+        removeSubgroupFromGroup(
+          group_id: "${group_id}",
+          subgroup_id: "${subgroup_id}"
+        )
+      `)
+      .map(data => getOrDefault(data, ["removeSubgroupFromGroup"], false))
       .toPromise();
   }
 }

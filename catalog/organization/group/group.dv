@@ -28,6 +28,8 @@ cliche Group {
     submit_ok: boolean
   }
 
+  // TODO: NewGroupWithInitialSubgroup once fields w/ same type are possible
+
   // Shows the name of a group
   widget ShowNameOfGroup {
     group: Group
@@ -54,6 +56,15 @@ cliche Group {
     group: Group
   }
 
+  // Shows all (direct or indirect) groups containing the given group
+  widget ShowGroupsBySubgroup uses ShowNameOfGroup {
+    member: Member
+  }
+
+  // Shows all (direct or indirect) subgroups in the given group
+  widget ShowSubgroupsByGroup uses ShowNameOfGroup {
+    group: Group
+  }
 
   // Text box to edit group/member name
   // When submit_ok flips to true, the name is updated
@@ -66,17 +77,33 @@ cliche Group {
     submit_ok: boolean
   }
 
-  // The user is presented with a text box to enter member names
-  // Names entered appear on the screen
-  // When submit_ok flips to true, all members are added
-  widget EditMembersOfGroup {
+  // Allows editing of a group's members
+  // All of the group's members are listed
+  // The user can click a button to remove a member
+  // The user can enter an existing members's name in a box to add it
+  // When submit_ok flips to true, all edits are comitted
+  widget EditMembersOfGroup uses ShowNameOfMember {
     group: Group,
     submit_ok: boolean
   }
-  // TODO: Edit Subgroups of Group
+
+  // Allows editing of a group's subgroups
+  // All of the group's subgroups are listed
+  // The user can click a button to remove a subgroup
+  // The user can enter an existing group's name in a box to add it
+  // When submit_ok flips to true, all edits are comitted
+  widget EditSubgroupsOfGroup uses ShowNameOfGroup {
+    group: Group,
+    submit_ok: boolean
+  }
 
   // Allows an existing member to be added by name to the group
   widget AddMemberToGroup {
+    group: Group
+  }
+
+  // Allows an existing group to be added by name as a subgroup to the group
+  widget AddSubgroupToGroup {
     group: Group
   }
 
@@ -86,6 +113,8 @@ cliche Group {
     member: Member,
     submit_ok: boolean
   }
+
+  // TODO: AddNewSubgroupToGroup once fields w/ same type are possible
 
   // Button allowing a member to join or leave a group
   widget JoinLeave {
