@@ -5,7 +5,7 @@
     class="list-group-item member-list-item">
     <dv-widget name="ShowNameOfMember" [init]="{member: member}"></dv-widget>
     <button class="btn btn-danger pull-right"
-      (onClick)="unstageMember(member.atom_id)">X</button>
+      (click)="unstageMember(member.atom_id)">X</button>
   </li>
 </ul>
 <form (ngSubmit)="stageMember()" #addMembersForm="ngForm"

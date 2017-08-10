@@ -3,7 +3,7 @@
 const typeaheadScriptSrc = "https://cdnjs.cloudflare.com/ajax/libs"+
   "/corejs-typeahead/1.1.1/typeahead.bundle.min.js";
 const typeaheadStylePath = "node_modules/dv-organization-group/lib/"+
-  "shared/typeahead.css";
+  "components/_shared/typeahead.css";
 
 
 // EXPORTED FUNCTIONS
