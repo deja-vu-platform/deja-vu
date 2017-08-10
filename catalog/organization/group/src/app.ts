@@ -116,7 +116,8 @@ const schema = grafo
       return recurse(group_id).then(() => {
         const IDs = Array.from(mset);
         return mean.db.collection("members")
-          .find({atom_id: {$in: IDs}});
+          .find({atom_id: {$in: IDs}})
+          .toArray();
       });
     }
   })
