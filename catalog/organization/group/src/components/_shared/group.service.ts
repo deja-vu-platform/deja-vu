@@ -67,8 +67,8 @@ export default class GroupService {
     return this._graphQlService
       .get(`
         group_by_id(
-          atom_id: ${group_id}
-        } {
+          atom_id: "${group_id}"
+        ) {
           name
         }
       `)
@@ -81,8 +81,8 @@ export default class GroupService {
     return this._graphQlService
       .get(`
         member_by_id(
-          atom_id: ${member_id}
-        } {
+          atom_id: "${member_id}""
+        ) {
           name
         }
       `)
