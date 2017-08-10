@@ -21,22 +21,34 @@ cliche Group {
     submit_ok: boolean
   }
 
-  // Shows the name of a group or member
+  // Like NewGroup, but also adds member upon creation
+  widget NewGroupWithInitialMember uses NewGroup {
+    group: Group,
+    member: Member,
+    submit_ok: boolean
+  }
+
+  // Shows the name of a group
   widget ShowNameOfGroup {
     group: Group
   }
+
+  // Shows the name of a member
   widget ShowNameOfMember {
     named: Member
   }
 
-  // Shows all groups/members in the database
+  // Shows all groups in the database
   widget ShowGroups uses ShowNameOfGroup {}
+
+  // Shows all members in the database
   widget ShowMembers uses ShowNameOfMember {}
 
   // Shows all (direct or indirect) groups containing the given member
   widget ShowGroupsByMember uses ShowNameOfGroup {
     member: Member
   }
+
   // Shows all (direct or indirect) members in the given group
   widget ShowMembersByGroup uses ShowNameOfMember {
     group: Group
@@ -63,20 +75,17 @@ cliche Group {
   }
   // TODO: Edit Subgroups of Group
 
-  // Allows a member to be added to the group
-  // The user must enter the member name into a text box
+  // Allows an existing member to be added by name to the group
   widget AddMemberToGroup {
     group: Group
   }
 
-  // Allows groups to be created with an initial member
-  // When submit_ok flips to true, member is added to group
-  widget WithInitialMember {
+  // Allows a member to be simultaneously created and added to a group
+  widget AddNewMemberToGroup uses NewMember, EditNameOfMember {
     group: Group,
     member: Member,
     submit_ok: boolean
   }
-  // TODO: WithInitialSubgroup once fields can have the same type
 
   // Button allowing a member to join or leave a group
   widget JoinLeave {
