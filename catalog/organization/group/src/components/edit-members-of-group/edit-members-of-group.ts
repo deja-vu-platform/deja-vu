@@ -27,6 +27,7 @@ export class EditMembersOfGroupComponent {
   wrapId = uuidv4(); // Lets us find input in which to install typeahead
   nonMembers: Member[] = []; // all members not in the group
   stagedMembers: MemberAtom[] = []; // members we want to have in the group
+  req: Promise<boolean> = null;
 
   constructor(
     private _groupService: GroupService,
@@ -34,20 +35,32 @@ export class EditMembersOfGroupComponent {
   ) {}
 
   dvAfterInit() {
-    if (this.group.atom_id) {
-      Promise
-        .all([
-          this.getGroupMembers(),
-          this._groupService.getMembers()
-        ])
-        .then(arr => this.determineNonMembers(arr[1], arr[0]))
-        .then(nonMembers => {
-          this.nonMembers = nonMembers;
-          addTypeahead(this.wrapId, nonMembers.map(m => m.name));
-        });
-    }
+    Promise
+      .all([
+        this.getGroupMembers(),
+        this._groupService.getMembers()
+      ])
+      .then(arr => this.determineNonMembers(arr[1], arr[0]))
+      .then(nonMembers => {
+        this.nonMembers = nonMembers;
+        addTypeahead(this.wrapId, nonMembers.map(m => m.name));
+      });
 
-    this.submit_ok.on_change(() => this.updateMembers());
+    this.submit_ok.on_change(() => {
+      if (this.submit_ok.value === true && this.group.atom_id) {
+        this.req = this.updateMembers();
+      }
+    });
+
+    this.submit_ok.on_after_change(() => {
+      if (this.req) {
+        this.req.then(success => {
+          // TODO: reset for next add
+          this.failMsg = success ? "" : "Error when editing members.";
+          this.req = null;
+        });
+      }
+    });
   }
 
   // queues a member for adding once submit_ok is true
@@ -81,15 +94,15 @@ export class EditMembersOfGroupComponent {
   }
 
   // adds all members in membersToAdd (pushes to backend)
-  updateMembers(): void {
+  updateMembers(): Promise<boolean> {
     // add all members in stagedMembers but not group.members
     const adds = this.stagedMembers.filter(stagedM =>
       this.group.members.find(groupM =>
         groupM.atom_id === stagedM.atom_id
       ) === undefined
     )
-    .map(addM =>
-      this._groupService.addMemberToGroup(this.group.atom_id, addM.atom_id)
+    .map(addM => this._groupService
+      .addMemberToGroup(this.group.atom_id, addM.atom_id)
     );
 
     // remove all members in group.members but not stagedMembers
@@ -98,26 +111,21 @@ export class EditMembersOfGroupComponent {
         stagedM.atom_id === groupM.atom_id
       ) === undefined
     )
-    .map(removeM =>
-      this._groupService
-        .removeMemberFromGroup(this.group.atom_id, removeM.atom_id)
+    .map(removeM => this._groupService
+      .removeMemberFromGroup(this.group.atom_id, removeM.atom_id)
     );
 
-    Promise
-      .all(adds.concat(...removes))
-      .then(arr => {
-        if (arr.indexOf(false) >= 0) {
-          this.failMsg = "Error when editing members.";
-        } else {
-          this.failMsg = "";
-        }
-      });
+    return Promise.all(adds.concat(...removes))
+      .then(arr => arr.indexOf(false) === -1);
   }
 
   // load group members if this.group.members is not populated
   // all members in this.group.members get staged
   private getGroupMembers(): Promise<MemberAtom[]> {
-    if (!this.group.members || !this.group.members.length) {
+    if (!this.group.members) {
+      this.group.members = [];
+    }
+    if (this.group.atom_id && this.group.members.length === 0) {
       return this._groupService
         .getMembersOfGroup(this.group.atom_id)
         .then(members => {

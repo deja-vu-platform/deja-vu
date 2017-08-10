@@ -69,9 +69,11 @@ export class AddMemberToGroupComponent {
   }
 
   // load group members if this.group.members is not populated
-  // all members in this.group.members get staged
   private getGroupMembers(): Promise<MemberAtom[]> {
-    if (!this.group.members || !this.group.members.length) {
+    if (!this.group.members) {
+      this.group.members = [];
+    }
+    if (this.group.atom_id && this.group.members.length === 0) {
       return this._groupService
         .getMembersOfGroup(this.group.atom_id)
         .then(members => {
