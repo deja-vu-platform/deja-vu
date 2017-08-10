@@ -156,6 +156,34 @@ const schema = grafo
     }
   })
 
+  // get all groups directly containing a member
+  .add_query({
+    name: "groupsByDirectMember",
+    type: "[Group]",
+    args: {
+      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {member_id}) => {
+      return mean.db.collection("groups")
+        .find({members: {atom_id: member_id}})
+        .toArray();
+    }
+  })
+
+  // get all groups directly containing a subgroup
+  .add_query({
+    name: "groupsByDirectSubgroup",
+    type: "[Group]",
+    args: {
+      subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {subgroup_id}) => {
+      return mean.db.collection("groups")
+        .find({subgroups: {atom_id: subgroup_id}})
+        .toArray();
+    }
+  })
+
   // get all groups directly or indirectly containing a member
   .add_query({
     name: "groupsByMember",

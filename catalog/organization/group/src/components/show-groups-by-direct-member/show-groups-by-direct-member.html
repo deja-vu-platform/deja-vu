@@ -1,0 +1,8 @@
+<ul *ngIf="groups && groups.length > 0" class="list-group member-list">
+  <li *ngFor="let group of groups" class="list-group-item member-list-item">
+    <dv-widget name="ShowNameOfGroup" [init]="{group: group}"></dv-widget>
+  </li>
+</ul>
+<div *ngIf="!groups || groups.length === 0">
+  No groups
+</div>

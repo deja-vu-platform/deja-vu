@@ -1,7 +1,7 @@
 import {Widget, ClientBus, Field} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {GroupAtom} from "../_shared/data";
+import {MemberAtom, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
 
 
@@ -12,8 +12,8 @@ import GroupService from "../_shared/group.service";
     GroupService
   ]
 })
-export class ShowGroupsBySubgroupComponent {
-  @Field("Group") group: GroupAtom;
+export class ShowGroupsByDirectMemberComponent {
+  @Field("Member") member: MemberAtom;
   groups: GroupAtom[] = [];
 
   constructor(
@@ -23,8 +23,8 @@ export class ShowGroupsBySubgroupComponent {
 
   dvAfterInit() {
     this.groups = [];
-    if (this.group.atom_id) {
-      this._groupService.getGroupsBySubgroup(this.group.atom_id)
+    if (this.member.atom_id) {
+      this._groupService.getGroupsByDirectMember(this.member.atom_id)
         .then(groups => {
           this.groups = groups.map((group: GroupAtom) => {
             const group_atom = this._clientBus.new_atom<GroupAtom>("Group");

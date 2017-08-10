@@ -12,9 +12,8 @@ import GroupService from "../_shared/group.service";
     GroupService
   ]
 })
-export class ShowGroupsBySubgroupComponent {
+export class ShowSubgroupsOfGroupComponent {
   @Field("Group") group: GroupAtom;
-  groups: GroupAtom[] = [];
 
   constructor(
     private _groupService: GroupService,
@@ -22,14 +21,13 @@ export class ShowGroupsBySubgroupComponent {
   ) {}
 
   dvAfterInit() {
-    this.groups = [];
     if (this.group.atom_id) {
-      this._groupService.getGroupsBySubgroup(this.group.atom_id)
-        .then(groups => {
-          this.groups = groups.map((group: GroupAtom) => {
+      this._groupService.getSubgroupsOfGroup(this.group.atom_id)
+        .then(subgroups => {
+          this.group.subgroups = subgroups.map((g) => {
             const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
-            group_atom.atom_id = group.atom_id;
-            group_atom.name = group.name;
+            group_atom.atom_id = g.atom_id;
+            group_atom.name = g.name;
             return group_atom;
           });
         });

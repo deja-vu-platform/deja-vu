@@ -12,11 +12,13 @@ cliche Group {
     name: text
   }
 
-  // Button allowing for the creation of a group/member
+  // Button allowing for the creation of a group
   widget NewGroup {
     group: Group,
     submit_ok: boolean
   }
+
+  // Button allowing for the creation of a member
   widget NewMember {
     member: Member,
     submit_ok: boolean
@@ -41,6 +43,16 @@ cliche Group {
     named: Member
   }
 
+  // Lists the direct members of a group
+  widget ShowMembersOfGroup uses ShowNameOfMember {
+    group: Group
+  }
+
+  // Lists the direct subgroups of a group
+  widget ShowSubgroupsOfGroup uses ShowNameOfMember {
+    group: Group
+  }
+
   // Shows all groups in the database
   widget ShowGroups uses ShowNameOfGroup {}
 
@@ -52,14 +64,24 @@ cliche Group {
     member: Member
   }
 
-  // Shows all (direct or indirect) members in the given group
-  widget ShowMembersByGroup uses ShowNameOfMember {
+  // Shows all (direct or indirect) groups containing the given group
+  widget ShowGroupsBySubgroup uses ShowNameOfGroup {
     group: Group
   }
 
-  // Shows all (direct or indirect) groups containing the given group
-  widget ShowGroupsBySubgroup uses ShowNameOfGroup {
+  // Shows all groups directly containing the given member
+  widget ShowGroupsByDirectMember uses ShowNameOfGroup {
     member: Member
+  }
+
+  // Shows all groups directly containing the given group
+  widget ShowGroupsByDirectSubgroup uses ShowNameOfGroup {
+    group: Group
+  }
+
+  // Shows all (direct or indirect) members in the given group
+  widget ShowMembersByGroup uses ShowNameOfMember {
+    group: Group
   }
 
   // Shows all (direct or indirect) subgroups in the given group
@@ -67,12 +89,15 @@ cliche Group {
     group: Group
   }
 
-  // Text box to edit group/member name
+  // Text box to edit group name
   // When submit_ok flips to true, the name is updated
   widget EditNameOfGroup {
     group: Group,
     submit_ok: boolean
   }
+
+  // Text box to edit member name
+  // When submit_ok flips to true, the name is updated
   widget EditNameOfMember {
     member: Member,
     submit_ok: boolean

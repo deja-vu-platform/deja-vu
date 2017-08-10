@@ -154,6 +154,36 @@ export default class GroupService {
       .toPromise();
   }
 
+  // gets all groups directly containing the member
+  getGroupsByDirectMember(member_id: string): Promise<Group[]> {
+    return this._graphQlService
+      .get(`
+        groupsByDirectMember(
+          member_id: "${member_id}"
+        ) {
+          atom_id,
+          name
+        }
+      `)
+      .map(data => getOrDefault(data, ["groupsByDirectMember"], []))
+      .toPromise();
+  }
+
+  // gets all groups directly containing the subgroup
+  getGroupsByDirectSubgroup(subgroup_id: string): Promise<Group[]> {
+    return this._graphQlService
+      .get(`
+        groupsByDirectSubgroup(
+          subgroup_id: "${subgroup_id}"
+        ) {
+          atom_id,
+          name
+        }
+      `)
+      .map(data => getOrDefault(data, ["groupsByDirectSubgroup"], []))
+      .toPromise();
+  }
+
   // gets all groups directly or indrectly containing the member
   getGroupsByMember(member_id: string): Promise<Group[]> {
     return this._graphQlService

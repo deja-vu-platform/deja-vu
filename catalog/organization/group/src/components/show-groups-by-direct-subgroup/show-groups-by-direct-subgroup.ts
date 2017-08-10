@@ -12,7 +12,7 @@ import GroupService from "../_shared/group.service";
     GroupService
   ]
 })
-export class ShowGroupsBySubgroupComponent {
+export class ShowGroupsByDirectSubgroupComponent {
   @Field("Group") group: GroupAtom;
   groups: GroupAtom[] = [];
 
@@ -24,7 +24,7 @@ export class ShowGroupsBySubgroupComponent {
   dvAfterInit() {
     this.groups = [];
     if (this.group.atom_id) {
-      this._groupService.getGroupsBySubgroup(this.group.atom_id)
+      this._groupService.getGroupsByDirectSubgroup(this.group.atom_id)
         .then(groups => {
           this.groups = groups.map((group: GroupAtom) => {
             const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
