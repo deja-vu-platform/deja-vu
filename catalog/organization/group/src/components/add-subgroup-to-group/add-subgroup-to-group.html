@@ -1,0 +1,12 @@
+<form (ngSubmit)="onSubmit()" #addSubgroupForm="ngForm" class="form-horizontal">
+  <fieldset class="form-group" id="{{wrapId}}">
+    <label class="sr-only" for="name">Group Name</label>
+    <input required class="form-control typeahead" name="name"
+      type="text" autocomplete="off" placeholder="Group Name"/>
+  </fieldset>
+  <div class="form-group">
+    <button type="submit" class="btn btn-default btn-sm pull-right"
+     [disabled]="!addSubgroupForm.valid">Add Subgroup</button>
+  </div>
+  <div class="alert alert-danger" *ngIf="failed">Group not found.</div>
+</form>

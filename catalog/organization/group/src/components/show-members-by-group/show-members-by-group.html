@@ -1,10 +1,10 @@
-<ul *ngIf="group.members && group.members.length > 0"
+<ul *ngIf="members && members.length > 0"
     class="list-group member-list">
-  <li *ngFor="let member of group.members"
+  <li *ngFor="let member of members"
     class="list-group-item member-list-item">
     <dv-widget name="ShowNameOfMember" [init]="{member: member}"></dv-widget>
   </li>
 </ul>
-<div *ngIf="!group.members || group.members.length === 0">
+<div *ngIf="members || members.length === 0">
   No members in this group
 </div>

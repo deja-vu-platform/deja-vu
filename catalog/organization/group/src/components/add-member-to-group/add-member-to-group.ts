@@ -41,7 +41,7 @@ export class AddMemberToGroupComponent {
         .then(arr => this.determineNonMembers(arr[1], arr[0]))
         .then(nonMembers => {
           this.nonMembers = nonMembers;
-          addTypeahead(this.wrapId, nonMembers.map(m =>m.name));
+          addTypeahead(this.wrapId, nonMembers.map(m => m.name));
         });
     }
   }
