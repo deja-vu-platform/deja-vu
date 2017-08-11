@@ -1,4 +1,4 @@
-import {Widget, Field, PrimitiveAtom, ClientBus} from "client-bus";
+import {Widget, Field, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {Group, GroupAtom} from "../_shared/data";
@@ -7,7 +7,8 @@ import {
   addTypeahead,
   uuidv4,
   getTypeaheadVal,
-  setTypeaheadVal
+  setTypeaheadVal,
+  updateTypeaheadOptions
 } from "../_shared/utils";
 
 
@@ -20,30 +21,30 @@ import {
 })
 export class AddSubgroupToGroupComponent {
   @Field("Group") group: GroupAtom;
-  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   failed = false; // Shows failure message on not found
   wrapId = uuidv4();
-  nonSubgroups: Group[] = []; // all non-subgroups
+
+  private allGroups: Group[] = [];
+  private nonSubgroups: Group[] = [];
+  private fetched: string;
+
 
   constructor(
     private _groupService: GroupService,
     private _clientBus: ClientBus
   ) {}
 
-  dvAfterInit() {
-    if (this.group.atom_id) {
-      Promise
-        .all([
-          this.getGroupSubgroups(),
-          this._groupService.getGroups()
-        ])
-        .then(arr => this.determineNonSubgroups(arr[1], arr[0]))
-        .then(nonSubgroups => {
-          this.nonSubgroups = nonSubgroups;
-          addTypeahead(this.wrapId, nonSubgroups.map(g => g.name));
-        });
-    }
+  ngAfterViewInit() {
+    addTypeahead(this.wrapId, [])
+      .then(() => this._groupService.getGroups())
+      .then(groups => {
+        this.allGroups = groups;
+        this.nonSubgroups = groups.slice();
+        this.updateTypeahead();
+        this.fetch();
+        this.group.on_change(() => this.fetch());
+      });
   }
 
   onSubmit() {
@@ -64,6 +65,24 @@ export class AddSubgroupToGroupComponent {
       }
     } else {
       this.failed = true;
+    }
+  }
+
+  private fetch() {
+    if (this.fetched !== this.group.atom_id) {
+      this.fetched = this.group.atom_id;
+      this.group.subgroups = [];
+      if (this.group.atom_id) {
+        this.getGroupSubgroups()
+          .then(_ => this.determineNonSubgroups())
+          .then(nonSubgroups => {
+            this.nonSubgroups = nonSubgroups;
+            this.updateTypeahead();
+          });
+      } else {
+        this.nonSubgroups = this.allGroups.slice();
+        this.updateTypeahead();
+      }
     }
   }
 
@@ -89,15 +108,16 @@ export class AddSubgroupToGroupComponent {
     }
   }
 
-  // return array of all subgroups in allGroups and not in groupSubgroups
-  private determineNonSubgroups(
-    allGroups: Group[],
-    groupSubgroups: Group[]
-  ): Group[] {
-    return allGroups.filter(anyG =>
-      groupSubgroups.find(groupG =>
+  // return array of all subgroups in all goups and not in group subgroups
+  private determineNonSubgroups(): Group[] {
+    return this.allGroups.filter(anyG =>
+      this.group.subgroups.find(groupG =>
         groupG.atom_id === anyG.atom_id
       ) === undefined
     );
+  }
+
+  private updateTypeahead() {
+    updateTypeaheadOptions(this.wrapId, this.nonSubgroups.map(g => g.name));
   }
 }

@@ -16,16 +16,19 @@ export class EditNameOfGroupComponent {
   @Field("Group") group: GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  req: Promise<boolean> = null;
+  private req: Promise<boolean> = null;
+  private fetched: string;
 
   constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
     if (this.group.atom_id && !this.group.name) {
-      this._groupService
-        .getNameOfGroup(this.group.atom_id)
-        .then(name => this.group.name = name);
+      this.fetch();
+    } else {
+      this.fetched = this.group.atom_id;
     }
+
+    this.group.on_change(() => this.fetch());
 
     this.submit_ok.on_change(() => {
       if (
@@ -46,5 +49,22 @@ export class EditNameOfGroupComponent {
         this.req = null;
       });
     });
+  }
+
+  private fetch() {
+    if (this.fetched !== this.group.atom_id) {
+      this.fetched = this.group.atom_id;
+      if (this.group.atom_id) {
+        this.getName();
+      } else {
+        this.group.name = "";
+      }
+    }
+  }
+
+  private getName() {
+    this._groupService
+      .getNameOfGroup(this.group.atom_id)
+      .then(name => this.group.name = name);
   }
 }

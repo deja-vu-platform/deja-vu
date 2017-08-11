@@ -17,22 +17,38 @@ export class ShowSubgroupsByGroupComponent {
 
   subgroups: GroupAtom[] = [];
 
+  private fetched: string;
+
   constructor(
     private _groupService: GroupService,
     private _clientBus: ClientBus
   ) {}
 
   dvAfterInit() {
-    if (this.group.atom_id) {
-      this._groupService.getSubgroupsByGroup(this.group.atom_id)
-        .then(subgroups => {
-          this.subgroups = subgroups.map((g) => {
-            const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
-            group_atom.atom_id = g.atom_id;
-            group_atom.name = g.name;
-            return group_atom;
-          });
-        });
+    this.fetch();
+    this.group.on_change(() => this.fetch());
+  }
+
+  private fetch() {
+    if (this.fetched !== this.group.atom_id) {
+      this.fetched = this.group.atom_id;
+      if (this.group.atom_id) {
+        this.getSubgroups();
+      } else {
+        this.subgroups = [];
+      }
     }
+  }
+
+  private getSubgroups() {
+    this._groupService.getSubgroupsByGroup(this.group.atom_id)
+      .then(subgroups => {
+        this.subgroups = subgroups.map((g) => {
+          const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
+          group_atom.atom_id = g.atom_id;
+          group_atom.name = g.name;
+          return group_atom;
+        });
+      });
   }
 }

@@ -17,21 +17,16 @@ export class JoinLeaveComponent implements AfterInit {
   @Field("Member") member: MemberAtom;
   @Field("Group") group: GroupAtom;
 
+  private fetched: string;
+
   constructor(
     private _groupService: GroupService,
     private _clientBus: ClientBus
   ) {}
 
   dvAfterInit() {
-    this._groupService.getMembersByGroup(this.group.atom_id)
-      .then(members => {
-        this.group.members = members.map(member => {
-          const member_atom = this._clientBus.new_atom<MemberAtom>("Member");
-          member_atom.atom_id = member.atom_id;
-          member_atom.name = member.name;
-          return member_atom;
-        });
-      });
+    this.fetch();
+    this.group.on_change(() => this.fetch());
   }
 
   joinGroup() {
@@ -63,5 +58,28 @@ export class JoinLeaveComponent implements AfterInit {
   // called from template to update button text
   inGroup(member: Member, group: Group): boolean {
     return group.members.findIndex(m => m.atom_id === member.atom_id) >= 0;
+  }
+
+  private fetch() {
+    if (this.fetched !== this.group.atom_id) {
+      this.fetched = this.group.atom_id;
+      if (this.group.atom_id) {
+        this.getMembers();
+      } else {
+        this.group.members = [];
+      }
+    }
+  }
+
+  private getMembers() {
+    this._groupService.getMembersByGroup(this.group.atom_id)
+      .then(members => {
+        this.group.members = members.map(member => {
+          const member_atom = this._clientBus.new_atom<MemberAtom>("Member");
+          member_atom.atom_id = member.atom_id;
+          member_atom.name = member.name;
+          return member_atom;
+        });
+      });
   }
 }

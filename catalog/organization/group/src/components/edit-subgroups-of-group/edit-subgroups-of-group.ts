@@ -7,7 +7,8 @@ import {
   addTypeahead,
   uuidv4,
   getTypeaheadVal,
-  setTypeaheadVal
+  setTypeaheadVal,
+  updateTypeaheadOptions
 } from "../_shared/utils";
 
 
@@ -23,11 +24,14 @@ export class EditSubgroupsOfGroupComponent {
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   failMsg = "";
-
   wrapId = uuidv4(); // Lets us find input in which to install typeahead
-  nonSubgroups: Group[] = []; // all groups which are not a group subgroup
   stagedGroups: GroupAtom[] = []; // groups we want to have as a subgroup
-  req: Promise<boolean> = null;
+
+  private allGroups: Group[] = [];
+  private nonSubgroups: Group[] = [];
+  private req: Promise<boolean> = null;
+  private fetched: string;
+
 
   constructor(
     private _groupService: GroupService,
@@ -35,17 +39,6 @@ export class EditSubgroupsOfGroupComponent {
   ) {}
 
   dvAfterInit() {
-    Promise
-      .all([
-        this.getGroupSubgroups(),
-        this._groupService.getGroups()
-      ])
-      .then(arr => this.determineNonSubgroups(arr[1], arr[0]))
-      .then(nonSubgroups => {
-        this.nonSubgroups = nonSubgroups;
-        addTypeahead(this.wrapId, nonSubgroups.map(g => g.name));
-      });
-
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === true && this.group.atom_id) {
         this.req = this.updateSubgroups();
@@ -55,12 +48,23 @@ export class EditSubgroupsOfGroupComponent {
     this.submit_ok.on_after_change(() => {
       if (this.req) {
         this.req.then(success => {
-          // TODO: reset for next add
           this.failMsg = success ? "" : "Error when editing subgroups.";
           this.req = null;
         });
       }
     });
+  }
+
+  ngAfterViewInit() {
+    addTypeahead(this.wrapId, [])
+      .then(() => this._groupService.getGroups())
+      .then(groups => {
+        this.allGroups = groups;
+        this.nonSubgroups = groups.slice();
+        this.updateTypeahead();
+        this.fetch();
+        this.group.on_change(() => this.fetch());
+      });
   }
 
   // queues a group for adding once submit_ok is true
@@ -93,8 +97,26 @@ export class EditSubgroupsOfGroupComponent {
     }
   }
 
+  private fetch() {
+    if (this.fetched !== this.group.atom_id) {
+      this.fetched = this.group.atom_id;
+      this.group.subgroups = [];
+      if (this.group.atom_id) {
+        this.getGroupSubgroups()
+          .then(_ => this.determineNonSubgroups())
+          .then(nonSubgroups => {
+            this.nonSubgroups = nonSubgroups;
+            this.updateTypeahead();
+          });
+      } else {
+        this.stagedGroups = [];
+        this.updateTypeahead();
+      }
+    }
+  }
+
   // does the necessary adds and removals
-  updateSubgroups(): Promise<boolean> {
+  private updateSubgroups(): Promise<boolean> {
     // add all groups in stagedGroups but not group.subgroups
     const adds = this.stagedGroups.filter(stagedG =>
       this.group.subgroups.find(groupG =>
@@ -143,15 +165,16 @@ export class EditSubgroupsOfGroupComponent {
     }
   }
 
-  // return array of all subgroups in allGroups and not in groupSubgroups
-  private determineNonSubgroups(
-    allGroups: Group[],
-    groupSubgroups: Group[]
-  ): Group[] {
-    return allGroups.filter(anyG =>
-      groupSubgroups.find(groupG =>
+  // return array of all subgroups in all goups and not in group subgroups
+  private determineNonSubgroups(): Group[] {
+    return this.allGroups.filter(anyG =>
+      this.group.subgroups.find(groupG =>
         groupG.atom_id === anyG.atom_id
       ) === undefined
     );
+  }
+
+  private updateTypeahead() {
+    updateTypeaheadOptions(this.wrapId, this.nonSubgroups.map(g => g.name));
   }
 }

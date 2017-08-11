@@ -14,7 +14,11 @@ import GroupService from "../_shared/group.service";
 })
 export class ShowGroupsBySubgroupComponent {
   @Field("Group") group: GroupAtom;
+
   groups: GroupAtom[] = [];
+
+  private fetched: string;
+
 
   constructor(
     private _groupService: GroupService,
@@ -22,7 +26,22 @@ export class ShowGroupsBySubgroupComponent {
   ) {}
 
   dvAfterInit() {
-    this.groups = [];
+    this.fetch();
+    this.group.on_change(() => this.fetch());
+  }
+
+  private fetch() {
+    if (this.fetched !== this.group.atom_id) {
+      this.fetched = this.group.atom_id;
+      if (this.group.atom_id) {
+        this.getGroups();
+      } else {
+        this.groups = [];
+      }
+    }
+  }
+
+  private getGroups() {
     if (this.group.atom_id) {
       this._groupService.getGroupsBySubgroup(this.group.atom_id)
         .then(groups => {
