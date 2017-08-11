@@ -4,13 +4,13 @@ app Accord {
 
   include organization/Group[
     User for Member,
-    SongGroup for Group,
-    LinkToGroup replacing ShowGroup in ShowGroupsByMember
+    Band for Group,
+    LinkToGroup replacing ShowNameOfGroup in ShowGroupsByMember
   ]
 
   include organization/List[
     Setlist for Item,
-    SongGroup for List,
+    Band for List,
     LinkToSetlist replacing ShowItem in ShowList
   ] as SetlistList
 
@@ -29,7 +29,7 @@ app Accord {
     username: text
   }
 
-  data SongGroup {
+  data Band {
     name: text,
     members: [User],
     items: [Setlist]
@@ -75,18 +75,20 @@ app Accord {
 
   // Create a new group
   widget CreateGroup {
-    initialMember: User
+    group: Band,
+    initialMember: User,
+    submit_ok: boolean
   }
 
   // Add a member to the group
   widget AddMember {
-    group: SongGroup
+    group: Band
   }
 
   // View the information about a group
   // Has a button for adding new setlists
   widget ViewGroup {
-    group: SongGroup,
+    group: Band,
     on_redirect: Widget = CreateSetlist
   }
 
@@ -104,7 +106,7 @@ app Accord {
   // Show the group name next to a button that if clicked redirects
   // to the the ShowGroup page
   widget LinkToGroup {
-    group: SongGroup,
+    group: Band,
     on_redirect: Widget = ViewGroup
   }
 
@@ -118,7 +120,7 @@ app Accord {
   // need an add-item-with-redirect and redirect to
   // ViewSetlist?
   widget CreateSetlist {
-    list: SongGroup
+    list: Band
   }
 
   // Create a new proposal
