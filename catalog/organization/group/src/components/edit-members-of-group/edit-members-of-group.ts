@@ -7,7 +7,8 @@ import {
   addTypeahead,
   uuidv4,
   getTypeaheadVal,
-  setTypeaheadVal
+  setTypeaheadVal,
+  updateTypeaheadOptions
 } from "../_shared/utils";
 
 
@@ -23,11 +24,13 @@ export class EditMembersOfGroupComponent {
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   failMsg = "";
-
   wrapId = uuidv4(); // Lets us find input in which to install typeahead
-  nonMembers: Member[] = []; // all members not in the group
   stagedMembers: MemberAtom[] = []; // members we want to have in the group
-  req: Promise<boolean> = null;
+
+  private allMembers: Member[] = [];
+  private nonMembers: Member[] = [];
+  private req: Promise<boolean> = null;
+  private fetched: string;
 
   constructor(
     private _groupService: GroupService,
@@ -35,17 +38,6 @@ export class EditMembersOfGroupComponent {
   ) {}
 
   dvAfterInit() {
-    Promise
-      .all([
-        this.getGroupMembers(),
-        this._groupService.getMembers()
-      ])
-      .then(arr => this.determineNonMembers(arr[1], arr[0]))
-      .then(nonMembers => {
-        this.nonMembers = nonMembers;
-        addTypeahead(this.wrapId, nonMembers.map(m => m.name));
-      });
-
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === true && this.group.atom_id) {
         this.req = this.updateMembers();
@@ -55,12 +47,23 @@ export class EditMembersOfGroupComponent {
     this.submit_ok.on_after_change(() => {
       if (this.req) {
         this.req.then(success => {
-          // TODO: reset for next add
           this.failMsg = success ? "" : "Error when editing members.";
           this.req = null;
         });
       }
     });
+  }
+
+  ngAfterViewInit() {
+    addTypeahead(this.wrapId, [])
+      .then(() => this._groupService.getMembers())
+      .then(members => {
+        this.allMembers = members;
+        this.nonMembers = members.slice();
+        this.updateTypeahead();
+        this.fetch();
+        this.group.on_change(() => this.fetch());
+      });
   }
 
   // queues a member for adding once submit_ok is true
@@ -93,8 +96,25 @@ export class EditMembersOfGroupComponent {
     }
   }
 
+  private fetch() {
+    if (this.fetched !== this.group.atom_id) {
+      this.fetched = this.group.atom_id;
+      this.group.members = [];
+      if (this.group.atom_id) {
+        this.getGroupMembers()
+          .then(_ => this.determineNonMembers())
+          .then(nonMembers => this.nonMembers = nonMembers)
+          .then(_ => this.updateTypeahead());
+      } else {
+        this.stagedMembers = [];
+        this.nonMembers = this.allMembers.slice();
+        this.updateTypeahead();
+      }
+    }
+  }
+
   // adds all members in membersToAdd (pushes to backend)
-  updateMembers(): Promise<boolean> {
+  private updateMembers(): Promise<boolean> {
     // add all members in stagedMembers but not group.members
     const adds = this.stagedMembers.filter(stagedM =>
       this.group.members.find(groupM =>
@@ -143,15 +163,16 @@ export class EditMembersOfGroupComponent {
     }
   }
 
-  // return array of all members in allMembers and not in groupMembers
-  private determineNonMembers(
-    allMembers: Member[],
-    groupMembers: Member[]
-  ): Member[] {
-    return allMembers.filter(anyM =>
-      groupMembers.find(groupM =>
+  // return array of all members in all goups and not in group subgroups
+  private determineNonMembers(): Member[] {
+    return this.allMembers.filter(anyM =>
+      this.group.members.find(groupM =>
         groupM.atom_id === anyM.atom_id
       ) === undefined
     );
+  }
+
+  private updateTypeahead() {
+    updateTypeaheadOptions(this.wrapId, this.nonMembers.map(m => m.name));
   }
 }

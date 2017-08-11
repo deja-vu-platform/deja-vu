@@ -5,6 +5,6 @@
     <dv-widget name="ShowNameOfMember" [init]="{member: member}"></dv-widget>
   </li>
 </ul>
-<div *ngIf="members || members.length === 0">
+<div *ngIf="!members || members.length === 0">
   No members in this group
 </div>

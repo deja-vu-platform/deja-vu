@@ -1,4 +1,4 @@
-import {Widget, Field, PrimitiveAtom, ClientBus} from "client-bus";
+import {Widget, Field, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {Member, MemberAtom, GroupAtom} from "../_shared/data";
@@ -7,7 +7,8 @@ import {
   addTypeahead,
   uuidv4,
   getTypeaheadVal,
-  setTypeaheadVal
+  setTypeaheadVal,
+  updateTypeaheadOptions
 } from "../_shared/utils";
 
 
@@ -20,30 +21,29 @@ import {
 })
 export class AddMemberToGroupComponent {
   @Field("Group") group: GroupAtom;
-  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   failed = false; // Shows failure message on not found
   wrapId = uuidv4();
-  nonMembers: Member[] = []; // all non-members
+
+  private allMembers: Member[] = [];
+  private nonMembers: Member[] = [];
+  private fetched: string;
 
   constructor(
     private _groupService: GroupService,
     private _clientBus: ClientBus
   ) {}
 
-  dvAfterInit() {
-    if (this.group.atom_id) {
-      Promise
-        .all([
-          this.getGroupMembers(),
-          this._groupService.getMembers()
-        ])
-        .then(arr => this.determineNonMembers(arr[1], arr[0]))
-        .then(nonMembers => {
-          this.nonMembers = nonMembers;
-          addTypeahead(this.wrapId, nonMembers.map(m => m.name));
-        });
-    }
+  ngAfterViewInit() {
+    addTypeahead(this.wrapId, [])
+      .then(() => this._groupService.getMembers())
+      .then(members => {
+        this.allMembers = members;
+        this.nonMembers = members.slice();
+        this.updateTypeahead();
+        this.fetch();
+        this.group.on_change(() => this.fetch());
+      });
   }
 
   onSubmit() {
@@ -64,6 +64,24 @@ export class AddMemberToGroupComponent {
       }
     } else {
       this.failed = true;
+    }
+  }
+
+  private fetch() {
+    if (this.fetched !== this.group.atom_id) {
+      this.fetched = this.group.atom_id;
+      this.group.members = [];
+      if (this.group.atom_id) {
+        this.getGroupMembers()
+          .then(_ => this.determineNonMembers())
+          .then(nonMembers => {
+            this.nonMembers = nonMembers;
+            this.updateTypeahead();
+          });
+      } else {
+        this.nonMembers = this.allMembers.slice();
+        this.updateTypeahead();
+      }
     }
   }
 
@@ -89,15 +107,16 @@ export class AddMemberToGroupComponent {
     }
   }
 
-  // return array of all members in allMembers and not in groupMembers
-  private determineNonMembers(
-    allMembers: Member[],
-    groupMembers: Member[]
-  ): Member[] {
-    return allMembers.filter(anyM =>
-      groupMembers.find(groupM =>
+  // return array of all members in all goups and not in group subgroups
+  private determineNonMembers(): Member[] {
+    return this.allMembers.filter(anyM =>
+      this.group.members.find(groupM =>
         groupM.atom_id === anyM.atom_id
       ) === undefined
     );
+  }
+
+  private updateTypeahead() {
+    updateTypeaheadOptions(this.wrapId, this.nonMembers.map(m => m.name));
   }
 }

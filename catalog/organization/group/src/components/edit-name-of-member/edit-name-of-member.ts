@@ -16,16 +16,19 @@ export class EditNameOfMemberComponent {
   @Field("Member") member: MemberAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  req: Promise<boolean> = null;
+  private req: Promise<boolean> = null;
+  private fetched: string;
 
   constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
     if (this.member.atom_id && !this.member.name) {
-      this._groupService
-        .getNameOfGroup(this.member.atom_id)
-        .then(name => this.member.name = name);
+      this.fetch();
+    } else {
+      this.fetched = this.member.atom_id;
     }
+
+    this.member.on_change(() => this.fetch());
 
     this.submit_ok.on_change(() => {
       if (
@@ -46,5 +49,22 @@ export class EditNameOfMemberComponent {
         this.req = null;
       });
     });
+  }
+
+  private fetch() {
+    if (this.fetched !== this.member.atom_id) {
+      this.fetched = this.member.atom_id;
+      if (this.member.atom_id) {
+        this.getName();
+      } else {
+        this.member.name = "";
+      }
+    }
+  }
+
+  private getName() {
+    this._groupService
+      .getNameOfGroup(this.member.atom_id)
+      .then(name => this.member.name = name);
   }
 }

@@ -14,6 +14,8 @@ import GroupService from "../_shared/group.service";
 })
 export class ShowGroupsByMemberComponent {
   @Field("Member") member: MemberAtom;
+
+  fetched: string;
   groups: GroupAtom[] = [];
 
   constructor(
@@ -22,17 +24,30 @@ export class ShowGroupsByMemberComponent {
   ) {}
 
   dvAfterInit() {
-    this.groups = [];
-    if (this.member.atom_id) {
-      this._groupService.getGroupsByMember(this.member.atom_id)
-        .then(groups => {
-          this.groups = groups.map((group: GroupAtom) => {
-            const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
-            group_atom.atom_id = group.atom_id;
-            group_atom.name = group.name;
-            return group_atom;
-          });
-        });
+    this.fetch();
+    this.member.on_change(() => this.fetch());
+  }
+
+  fetch() {
+    if (this.fetched !== this.member.atom_id) {
+      this.fetched = this.member.atom_id;
+      if (this.member.atom_id) {
+        this.getGroups();
+      } else {
+        this.groups = [];
+      }
     }
+  }
+
+  getGroups() {
+    this._groupService.getGroupsByMember(this.member.atom_id)
+      .then(groups => {
+        this.groups = groups.map((group: GroupAtom) => {
+          const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
+          group_atom.atom_id = group.atom_id;
+          group_atom.name = group.name;
+          return group_atom;
+        });
+      });
   }
 }

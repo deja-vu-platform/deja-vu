@@ -31,6 +31,7 @@ export function addTypeahead(wrapId: string, options: string[]): Promise<void> {
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         local: options
       });
+      window[`bhOptions_${wrapId}`] = bhOptions;
 
       // installs typeahead in DOM element
       $(`#${wrapId} .typeahead`).typeahead({
@@ -51,8 +52,14 @@ export function getTypeaheadVal(wrapId: string): string {
 }
 
 // sets the value of a typeahead
-export function setTypeaheadVal(wrapId: string, val: string): void {
-  return window["jQuery"](`#${wrapId} .tt-input`).typeahead("val", val);
+export function setTypeaheadVal(wrapId: string, val: string) {
+  window["jQuery"](`#${wrapId} .tt-input`).typeahead("val", val);
+}
+
+// gets the current value of a typeahead
+export function updateTypeaheadOptions(wrapId: string, options: string[]) {
+  window[`bhOptions_${wrapId}`].clear();
+  window[`bhOptions_${wrapId}`].add(options);
 }
 
 // Does an in-place filter
