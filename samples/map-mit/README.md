@@ -1,6 +1,6 @@
 # mapMIT
 
-*Sample Application*
+*A clone of a 6.170 project built with Deja Vu.*
 
 ## Overview
 Allows members of the MIT community to plan events on campus, with a map showing where they will be held.
