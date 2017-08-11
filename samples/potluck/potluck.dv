@@ -9,11 +9,9 @@ app Potluck {
 
   // Invite guests to parties
   include organization/Group[
-    /** Entity bindings **/
-    User for Member, Party for Group,
-
-    /** Widget replacements **/
-    ShowParty replacing ShowGroup in ShowGroupsByMember
+    User for Member,
+    Party for Group,
+    ShowParty replacing ShowNameOfGroup in ShowGroupsByMember
   ]
 
   // Coordinate bringing supplies
