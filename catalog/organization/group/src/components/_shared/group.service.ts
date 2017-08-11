@@ -20,9 +20,6 @@ export default class GroupService {
         createGroup
       `)
       .map(data => getOrDefault(data, ["createGroup"], ""))
-      .map(atom_id => {
-        return atom_id;
-      })
       .toPromise();
   }
 

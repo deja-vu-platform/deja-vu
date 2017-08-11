@@ -32,7 +32,7 @@ export class EditNameOfGroupComponent {
 
     this.submit_ok.on_change(() => {
       if (
-        this.submit_ok.value === true &&
+        this.submit_ok.value &&
         this.group.atom_id &&
         this.group.name
       ) {
