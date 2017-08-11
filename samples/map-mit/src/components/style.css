@@ -425,3 +425,7 @@ input.checkbox-btn {
   background: none;
   color: inherit;
 }
+
+#create-event-map {
+  height: 300px;
+}

@@ -45,8 +45,7 @@ cliche Map {
   // does nothing without DisplayMap
   widget OverlayMarker uses MarkerInfoWindow {
     map: Map,
-    marker: Marker,
-    widget: Widget
+    marker: Marker
   }
 
   // the popup displayed when clicking on an overlayed marker

@@ -1,17 +1,27 @@
 // Allows members of the MIT community to plan events on campus
 app MapMit {
+
   // Restrict access to the application to only registered users
   include access/Auth[User for User]
-  // Campus events are displayed on a map
+
+  // One map shows the locations of events
   include map/Map[
     CampusEvent for Marker,
     CampusMap for Map,
     EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
+
+  // Another map allows the user to search for places to set event location
+  include map/Map[
+    CampusEvent for Marker,
+    CampusMap for Map
+  ] as CreateEventMap
+
   include organization/Event[
     CampusEvent for Event,
     DisplayEvent replacing ShowEvent in ShowEvents
   ]
+
   include organization/Group[
     User for Member,
     GroupData for Group,
@@ -51,6 +61,7 @@ app MapMit {
   widget MyEvents {}
 
   widget CreateEvent {
+    map: CampusMap = global_map,
     event: CampusEvent,
     submit_ok: boolean
   }
