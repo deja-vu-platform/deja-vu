@@ -25,7 +25,16 @@ export class JoinLeaveComponent implements AfterInit {
   ) {}
 
   dvAfterInit() {
-    this.fetch();
+    if (
+      this.group.atom_id &&
+      (!this.group.members || this.group.members.length === 0)
+    ) {
+      this.group.members = [];
+      this.fetch();
+    } else {
+      this.fetched = this.group.atom_id;
+    }
+
     this.group.on_change(() => this.fetch());
   }
 
