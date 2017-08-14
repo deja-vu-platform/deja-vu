@@ -109,9 +109,9 @@ export class AddMemberToGroupComponent {
 
   // return array of all members in all goups and not in group subgroups
   private determineNonMembers(): Member[] {
-    return this.allMembers.filter(anyM =>
-      this.group.members.find(groupM =>
-        groupM.atom_id === anyM.atom_id
+    return this.allMembers.filter(anyMember =>
+      this.group.members.find(groupMember =>
+        groupMember.atom_id === anyMember.atom_id
       ) === undefined
     );
   }

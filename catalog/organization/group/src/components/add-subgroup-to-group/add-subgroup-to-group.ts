@@ -110,9 +110,9 @@ export class AddSubgroupToGroupComponent {
 
   // return array of all subgroups in all goups and not in group subgroups
   private determineNonSubgroups(): Group[] {
-    return this.allGroups.filter(anyG =>
-      this.group.subgroups.find(groupG =>
-        groupG.atom_id === anyG.atom_id
+    return this.allGroups.filter(anyGroup =>
+      this.group.subgroups.find(groupSubgroup =>
+        groupSubgroup.atom_id === anyGroup.atom_id
       ) === undefined
     );
   }

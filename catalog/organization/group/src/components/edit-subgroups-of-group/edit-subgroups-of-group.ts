@@ -118,9 +118,9 @@ export class EditSubgroupsOfGroupComponent {
   // does the necessary adds and removals
   private updateSubgroups(): Promise<boolean> {
     // add all groups in stagedGroups but not group.subgroups
-    const adds = this.stagedGroups.filter(stagedG =>
-      this.group.subgroups.find(groupG =>
-        groupG.atom_id === stagedG.atom_id
+    const adds = this.stagedGroups.filter(stagedGroup =>
+      this.group.subgroups.find(groupSubgroup =>
+        groupSubgroup.atom_id === stagedGroup.atom_id
       ) === undefined
     )
     .map(addG => this._groupService
@@ -128,9 +128,9 @@ export class EditSubgroupsOfGroupComponent {
     );
 
     // remove all groups in group.subgroups but not stagedGroups
-    const removes = this.group.subgroups.filter(groupG =>
-      this.stagedGroups.find(stagedG =>
-        stagedG.atom_id === groupG.atom_id
+    const removes = this.group.subgroups.filter(groupSubgroup =>
+      this.stagedGroups.find(stagedGroup =>
+        stagedGroup.atom_id === groupSubgroup.atom_id
       ) === undefined
     )
     .map(removeG => this._groupService
@@ -167,9 +167,9 @@ export class EditSubgroupsOfGroupComponent {
 
   // return array of all subgroups in all goups and not in group subgroups
   private determineNonSubgroups(): Group[] {
-    return this.allGroups.filter(anyG =>
-      this.group.subgroups.find(groupG =>
-        groupG.atom_id === anyG.atom_id
+    return this.allGroups.filter(anyGroup =>
+      this.group.subgroups.find(groupSubgroup =>
+        groupSubgroup.atom_id === anyGroup.atom_id
       ) === undefined
     );
   }

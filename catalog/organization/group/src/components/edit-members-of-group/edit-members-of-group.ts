@@ -116,9 +116,9 @@ export class EditMembersOfGroupComponent {
   // adds all members in membersToAdd (pushes to backend)
   private updateMembers(): Promise<boolean> {
     // add all members in stagedMembers but not group.members
-    const adds = this.stagedMembers.filter(stagedM =>
-      this.group.members.find(groupM =>
-        groupM.atom_id === stagedM.atom_id
+    const adds = this.stagedMembers.filter(stagedMember =>
+      this.group.members.find(groupMember =>
+        groupMember.atom_id === stagedMember.atom_id
       ) === undefined
     )
     .map(addM => this._groupService
@@ -126,9 +126,9 @@ export class EditMembersOfGroupComponent {
     );
 
     // remove all members in group.members but not stagedMembers
-    const removes = this.group.members.filter(groupM =>
-      this.stagedMembers.find(stagedM =>
-        stagedM.atom_id === groupM.atom_id
+    const removes = this.group.members.filter(groupMember =>
+      this.stagedMembers.find(stagedMember =>
+        stagedMember.atom_id === groupMember.atom_id
       ) === undefined
     )
     .map(removeM => this._groupService
@@ -165,9 +165,9 @@ export class EditMembersOfGroupComponent {
 
   // return array of all members in all goups and not in group subgroups
   private determineNonMembers(): Member[] {
-    return this.allMembers.filter(anyM =>
-      this.group.members.find(groupM =>
-        groupM.atom_id === anyM.atom_id
+    return this.allMembers.filter(anyMember =>
+      this.group.members.find(groupMember =>
+        groupMember.atom_id === anyMember.atom_id
       ) === undefined
     );
   }

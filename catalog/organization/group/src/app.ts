@@ -93,32 +93,19 @@ const schema = grafo
       group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {group_id}) => {
-      const mset: Set<string> = new Set(); // found members
-      const gset: Set<string> = new Set(); // explored groups
+      const found_members: Set<string> = new Set();
 
-      const recurse = (g_id: string): Promise<void> => {
-        return mean.db.collection("groups")
-          .findOne({atom_id: g_id})
-          .then(group => {
-            group.members.forEach(m => mset.add(m.atom_id));
-            const recursiveCalls: Promise<void>[] = [];
-            group.subgroups.forEach(g => {
-              if (!gset.has(g)) {
-                gset.add(g.atom_id)
-                recursiveCalls.push(recurse(g.atom_id));
-              }
-            });
-            return Promise.all(recursiveCalls);
-          });
-      }
-
-      gset.add(group_id);
-      return recurse(group_id).then(() => {
-        const IDs = Array.from(mset);
-        return mean.db.collection("members")
-          .find({atom_id: {$in: IDs}})
-          .toArray();
-      });
+      return forEachSubgroup(group_id, (group: Group) => {
+        group.members.forEach((member: Member) => {
+          found_members.add(member.atom_id);
+        });
+      })
+        .then(() => {
+          const IDs = Array.from(found_members);
+          return mean.db.collection("members")
+            .find({atom_id: {$in: IDs}})
+            .toArray();
+        });
     }
   })
 
@@ -130,29 +117,14 @@ const schema = grafo
       group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {group_id}) => {
-      const gset: Set<string> = new Set(); // explored groups
       const outputArr: Group[] = [];
 
-      const recurse = (g_id: string): Promise<void> => {
-        return mean.db.collection("groups")
-          .findOne({atom_id: g_id})
-          .then(group => {
-            const recursiveCalls: Promise<void>[] = [];
-            group.subgroups.forEach(g => {
-              if (!gset.has(g)) {
-                gset.add(g.atom_id)
-                outputArr.push(g);
-                recursiveCalls.push(recurse(g.atom_id));
-              }
-            });
-            return Promise.all(recursiveCalls);
-          });
-      }
-
-      gset.add(group_id);
-      return recurse(group_id).then(() => {
-        return outputArr;
-      });
+      return forEachSubgroup(group_id, (group: Group) => {
+        if (group.atom_id !== group_id) {
+          outputArr.push(group);
+        }
+      })
+        .then(() => outputArr);
     }
   })
 
@@ -164,9 +136,7 @@ const schema = grafo
       member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {member_id}) => {
-      return mean.db.collection("groups")
-        .find({members: {atom_id: member_id}})
-        .toArray();
+      return getGroupsByDirectMember(member_id);
     }
   })
 
@@ -178,9 +148,7 @@ const schema = grafo
       subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {subgroup_id}) => {
-      return mean.db.collection("groups")
-        .find({subgroups: {atom_id: subgroup_id}})
-        .toArray();
+      return getGroupsByDirectSubgroup(subgroup_id);
     }
   })
 
@@ -192,37 +160,23 @@ const schema = grafo
       member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {member_id}) => {
-      const gset: Set<string> = new Set(); // explored groups
+      const visited_groups: Set<string> = new Set();
       const outputArr: Group[] = [];
 
-      const getGroupsByMember = (m_id: string): Promise<Group[]> => {
-        return mean.db.collection("groups")
-          .find({members: {atom_id: m_id}})
-          .toArray()
-      }
-
-      const getGroupsBySubgroup = (sg_id: string): Promise<Group[]> => {
-        return mean.db.collection("groups")
-          .find({subgroups: {atom_id: sg_id}})
-          .toArray()
-      }
-
-      const recurseOnGroups = (groups: Group[]): Promise<void> => {
-        const recursiveCalls: Promise<void>[] = [];
-        groups.forEach(group => {
-          if (!gset.has(group.atom_id)) {
-            gset.add(group.atom_id);
+      return getGroupsByDirectMember(member_id)
+        .then(groups => {
+          groups.forEach(group => {
+            visited_groups.add(group.atom_id);
             outputArr.push(group);
-            const call = getGroupsBySubgroup(group.atom_id)
-              .then(groups => recurseOnGroups(groups));
-            recursiveCalls.push(call);
-          }
-        });
-        return Promise.all(recursiveCalls).then(() => {});
-      }
-
-      return getGroupsByMember(member_id)
-        .then(groups => recurseOnGroups(groups))
+          });
+          return groups;
+        })
+        .then(subgroups => Promise.all(subgroups.map(subgroup => 
+            forEachContainingGroup(subgroup.atom_id, (group: Group) => {
+              outputArr.push(group);
+            }, visited_groups)
+          ))
+        )
         .then(() => outputArr);
     }
   })
@@ -235,32 +189,11 @@ const schema = grafo
       subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {subgroup_id}) => {
-      const gset: Set<string> = new Set(); // explored groups
       const outputArr: Group[] = [];
 
-      const getGroupsBySubgroup = (sg_id: string): Promise<Group[]> => {
-        return mean.db.collection("groups")
-          .find({subgroups: {atom_id: sg_id}})
-          .toArray()
-      }
-
-      const recurseOnGroups = (groups: Group[]): Promise<void> => {
-        const recursiveCalls: Promise<void>[] = [];
-        groups.forEach(group => {
-          if (!gset.has(group.atom_id)) {
-            gset.add(group.atom_id);
-            outputArr.push(group);
-            const call = getGroupsBySubgroup(group.atom_id)
-              .then(groups => recurseOnGroups(groups));
-            recursiveCalls.push(call);
-          }
-        });
-        return Promise.all(recursiveCalls).then(() => {});
-      }
-
-      gset.add(subgroup_id);
-      return getGroupsBySubgroup(subgroup_id)
-        .then(groups => recurseOnGroups(groups))
+      return forEachContainingGroup(subgroup_id, (group: Group) => {
+        outputArr.push(group);
+      })
         .then(() => outputArr);
     }
   })
@@ -274,14 +207,7 @@ const schema = grafo
       name: {"type": graphql.GraphQLString}
     },
     resolve: (_, {group_id, name}) => {
-      const queryObj = {atom_id: group_id};
-      const updateObj = {$set: {name: name}};
-      return Promise
-        .all([
-          mean.db.collection("groups").updateOne(queryObj, updateObj),
-          bus.update_atom("Group", group_id, updateObj)
-        ])
-        .then(arr => arr[0].modifiedCount === 1 && arr[1]);
+      return renameMemberOrGroup(group_id, name, "Group");
     }
   })
 
@@ -294,14 +220,7 @@ const schema = grafo
       name: {"type": graphql.GraphQLString}
     },
     resolve: (_, {member_id, name}) => {
-      const queryObj = {atom_id: member_id};
-      const updateObj = {$set: {name: name}};
-      return Promise
-        .all([
-          mean.db.collection("members").updateOne(queryObj, updateObj),
-          bus.update_atom("Member", member_id, updateObj)
-        ])
-        .then(arr => arr[0].modifiedCount === 1 && arr[1]);
+      return renameMemberOrGroup(member_id, name, "Member");
     }
   })
 
@@ -314,15 +233,9 @@ const schema = grafo
       member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {group_id, member_id}) => {
-      const queryObj = {atom_id: group_id};
-      const updateObj = {$addToSet: {members: {atom_id: member_id}}};
-
-      return Promise
-        .all([
-          mean.db.collection("groups").updateOne(queryObj, updateObj),
-          bus.update_atom("Group", group_id, updateObj)
-        ])
-        .then(arr  => arr[0].modifiedCount && arr[1]);
+      return addOrRemoveMemberOrSubgroup(
+        group_id, member_id, "members", "$addToSet"
+      );
     }
   })
 
@@ -335,15 +248,9 @@ const schema = grafo
       member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {group_id, member_id}) => {
-      const queryObj = {atom_id: group_id};
-      const updateObj = {$pull: {members: {atom_id: member_id}}};
-
-      return Promise
-        .all([
-          mean.db.collection("groups").updateOne(queryObj, updateObj),
-          bus.update_atom("Group", group_id, updateObj)
-        ])
-        .then(arr  => arr[0].modifiedCount && arr[1]);
+      return addOrRemoveMemberOrSubgroup(
+        group_id, member_id, "members", "$pull"
+      );
     }
   })
 
@@ -356,15 +263,9 @@ const schema = grafo
       subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {group_id, subgroup_id}) => {
-      const queryObj = {atom_id: group_id};
-      const updateObj = {$addToSet: {subgroups: {atom_id: subgroup_id}}};
-
-      return Promise
-        .all([
-          mean.db.collection("groups").updateOne(queryObj, updateObj),
-          bus.update_atom("Group", group_id, updateObj)
-        ])
-        .then(arr  => arr[0].modifiedCount && arr[1]);
+      return addOrRemoveMemberOrSubgroup(
+        group_id, subgroup_id, "subgroups", "$addToSet"
+      );
     }
   })
 
@@ -377,18 +278,120 @@ const schema = grafo
       subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {group_id, subgroup_id}) => {
-      const queryObj = {atom_id: group_id};
-      const updateObj = {$pull: {subgroups: {atom_id: subgroup_id}}};
-
-      return Promise
-        .all([
-          mean.db.collection("groups").updateOne(queryObj, updateObj),
-          bus.update_atom("Group", group_id, updateObj)
-        ])
-        .then(arr  => arr[0].modifiedCount && arr[1]);
+      return addOrRemoveMemberOrSubgroup(
+        group_id, subgroup_id, "subgroups", "$pull"
+      );
     }
   })
   .schema();
+
+
+// gets all groups directly containing the member with given atom_id
+const getGroupsByDirectMember = (member_id: string): Promise<Group[]> => {
+  return mean.db.collection("groups")
+    .find({members: {atom_id: member_id}})
+    .toArray();
+}
+
+// gets all groups directly containing the subgroup with given atom_id
+const getGroupsByDirectSubgroup = (subgroup_id: string): Promise<Group[]> => {
+  return mean.db.collection("groups")
+    .find({subgroups: {atom_id: subgroup_id}})
+    .toArray();
+}
+
+// recursively explores subgroups of a group with given atom_id
+// does callback on each subgroup
+// populates visited_groups with the atom_id of every visited group
+// the root parent group does get visited
+const forEachSubgroup = (group_id: string,
+  callback: (group: Group) => void,
+  visited_groups: Set<string> = new Set([group_id]),
+): Promise<void> => {
+  return mean.db.collection("groups")
+    .findOne({atom_id: group_id})
+    .then(group => {
+      callback(group);
+      const recursiveCalls: Promise<void>[] = [];
+      group.subgroups.forEach(group => {
+        if (!visited_groups.has(group)) {
+          visited_groups.add(group.atom_id);
+          recursiveCalls.push(
+            forEachSubgroup(group.atom_id, callback, visited_groups)
+          );
+        }
+      });
+      return Promise.all(recursiveCalls).then(() => {});
+    });
+};
+
+// recursively explores groups where the group with given atom_id is a subgroup
+// does callback on each group
+// populates visited_groups with the atom_id of every visited group
+// the root child subgroup is visited but not operated on
+const forEachContainingGroup = (group_id: string,
+  callback: (group: Group) => void,
+  visited_groups: Set<string> = new Set([group_id]),
+): Promise<void> => {
+  return mean.db.collection("groups")
+    .find({subgroups: {atom_id: group_id}})
+    .toArray()
+    .then(groups => {
+      const recursiveCalls: Promise<void>[] = [];
+      groups.forEach(group => {
+        if (!visited_groups.has(group.atom_id)) {
+          visited_groups.add(group.atom_id);
+          callback(group);
+          recursiveCalls.push(
+            forEachContainingGroup(group.atom_id, callback, visited_groups)
+          );
+        }
+      });
+      return Promise.all(recursiveCalls).then(() => {});
+    });
+};
+
+// does an update to add/remove a member/subgroup from a group
+// use group_field = "members" or "subgroups"
+// use operation = "$addToSet" to add, "$pull" to remove
+const addOrRemoveMemberOrSubgroup = (group_id: string,
+  child_id: string,
+  group_field: string,
+  operation: string
+): Promise<boolean> => {
+  const queryObj = {atom_id: group_id};
+  const updateObj = {[operation]: {[group_field]: {atom_id: child_id}}};
+
+  return Promise
+    .all([
+      mean.db.collection("groups").updateOne(queryObj, updateObj),
+      bus.update_atom("Group", group_id, updateObj)
+    ])
+    .then(arr  => arr[0].modifiedCount && arr[1]);
+}
+
+// renames entitiy with atom_id to name
+// type is type of entity, "Group" or "Member"
+const renameMemberOrGroup = (atom_id: string,
+  name: string,
+  type: string
+): Promise<boolean> => {
+  const queryObj = {atom_id: atom_id};
+  const updateObj = {$set: {name: name}};
+
+  const typeCollectionMap = {
+    Member: "members",
+    Group: "groups"
+  };
+  return Promise
+    .all([
+      mean.db.collection(typeCollectionMap[type])
+        .updateOne(queryObj, updateObj),
+      bus.update_atom(type, atom_id, updateObj)
+    ])
+    .then(arr => arr[0].modifiedCount === 1 && arr[1]);
+}
+
 
 Helpers.serve_schema(mean.ws, schema);
 

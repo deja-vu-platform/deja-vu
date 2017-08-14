@@ -40,7 +40,7 @@ cliche Group {
 
   // Shows the name of a member
   widget ShowNameOfMember {
-    named: Member
+    member: Member
   }
 
   // Lists the direct members of a group
@@ -49,14 +49,14 @@ cliche Group {
   }
 
   // Lists the direct subgroups of a group
-  widget ShowSubgroupsOfGroup uses ShowNameOfMember {
+  widget ShowSubgroupsOfGroup uses ShowNameOfGroup {
     group: Group
   }
 
-  // Shows all groups in the database
+  // Shows all groups that exist
   widget ShowGroups uses ShowNameOfGroup {}
 
-  // Shows all members in the database
+  // Shows all members that exist
   widget ShowMembers uses ShowNameOfMember {}
 
   // Shows all (direct or indirect) groups containing the given member
@@ -147,3 +147,4 @@ cliche Group {
     group: Group,
     member: Member
   }
+}
