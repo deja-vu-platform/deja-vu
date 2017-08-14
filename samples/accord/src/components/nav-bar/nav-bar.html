@@ -11,7 +11,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="logo" [routerLink]="['/']">
+      <a class="logo" routerLink="/">
         <img src="http://i.imgur.com/O3k7YpU.png" alt="Accord" style="width:100%; height:120%">
       </a>
     </div>
@@ -20,15 +20,14 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <!-- TODO -->
-        <li *ngIf="!user.username"><a [routerLink]="['/landing']">Login</a></li>
-        <li *ngIf="user.username"><a [routerLink]="['/groups']">Dashboard</a></li>
-        <li><a [routerLink]="['/about']">About</a></li>
+        <li *ngIf="!user.username"><a routerLink="/landing">Login</a></li>
+        <li *ngIf="user.username"><a routerLink="/bands">Dashboard</a></li>
+        <li><a routerLink="/about">About</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li *ngIf="!user.username"><a [routerLink]="['/']">Not Logged In</a></li>
+        <li *ngIf="!user.username"><a routerLink="/">Not Logged In</a></li>
         <li *ngIf="user.username"><dv-widget name="SignOutWithRedirect" of="Auth"></dv-widget></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
-

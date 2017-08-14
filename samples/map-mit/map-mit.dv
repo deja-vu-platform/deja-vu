@@ -76,10 +76,6 @@ app MapMit {
   }
 
   widget MyGroups {
-    user: User
-  }
-
-  widget CreateGroup {
     user: User,
     group: GroupData,
     submit_ok: boolean
