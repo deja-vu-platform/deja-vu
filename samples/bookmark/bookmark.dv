@@ -59,7 +59,8 @@ app Bookmark {
 
 
   widget NavBar {
-    on_signout_ok: Widget = Landing
+    on_signout_ok: Widget = Landing,
+    user: User
   }
 
   widget Home {

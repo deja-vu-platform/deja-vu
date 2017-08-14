@@ -10,19 +10,10 @@
   margin-bottom: 2px;
 }
 
-.icon-size {
+.star-balance {
   font-size: 60px;
   color: yellow;
-}
-
-.icon-size > span {
-  position: absolute;
-  left: 34px; /** you can make changes here to change position **/
-  top: 18px;
-  font-size: 16pt;
-  z-index: 3;
-  font-family: 'Roboto', sans-serif;
-  color: black;
+  text-align: center;
 }
 
 #child-heading {
@@ -34,7 +25,6 @@
 }
 </style>
 <div class="body">
-  <dv-widget name="LoggedIn" of="ChildAuth"></dv-widget>
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
@@ -46,11 +36,16 @@
   </nav>
   <div id="child-homepage-container">
     <div id="child-heading">
-      <h1> Hi ShowUsername </h1>
+      <h1> Hi,
+        <dv-widget name="LoggedIn" of="ChildAuth" class="hide-first-child">
+        </dv-widget>
+      </h1>
       <div class="container-fluid" id="child-heading-container">
-          <div class="col-xs-2 col-xs-offset-4"><h4> StarBank Total: </h4></div>
-          <div class="col-xs-2 glyphicon glyphicon-star icon-size">
-            <dv-widget name="ShowBalance" of="Market"></dv-widget>
+          <div class="col-xs-12 star-balance">
+            <span class="glyphicon glyphicon-star"></span>
+            <dv-widget name="ShowBalance" of="Market"
+                class="hide-first-child grandchild-div-display-inline">
+            </dv-widget>
           </div>
       </div>
     </div>

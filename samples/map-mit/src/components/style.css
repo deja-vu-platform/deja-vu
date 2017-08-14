@@ -429,3 +429,7 @@ input.checkbox-btn {
 #create-event-map {
   height: 300px;
 }
+
+.hide-first-child > *:first-child {
+  display: none;
+}

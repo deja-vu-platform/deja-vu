@@ -32,8 +32,7 @@ cliche Auth {
   }
 
   // The user field will be updated with the logged in user if there is one.
-  // This widget has no template and nothing will show up on the screen when
-  // included.
+  // Displays the logged in user's username
   widget LoggedIn {
     user: User
   }

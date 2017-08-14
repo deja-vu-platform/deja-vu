@@ -272,3 +272,8 @@ span.sized, div.inline {
   display: inline-block;
   overflow: hidden;
 }
+
+.username {
+  padding-top: 14px;
+  padding-right: 10px;
+}

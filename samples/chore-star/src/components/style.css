@@ -24,3 +24,11 @@ div.scroll {
   height: 200px;
   overflow: scroll;
 }
+
+.hide-first-child > *:first-child {
+  display: none
+}
+
+.grandchild-div-display-inline > * > div {
+  display: inline;
+}
