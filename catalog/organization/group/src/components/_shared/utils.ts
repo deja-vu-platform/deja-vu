@@ -99,12 +99,14 @@ export function uuidv4(): string {
   return uuid;
 }
 
-// TODO: spec
+// allows references like `foo.bar.baz` to be done without fear of error
+// returns objct[flds[0]][flds[1]]...
+// or dflt if a field access is attempted on null or undefined
 export function getOrDefault<T>(objct: object, flds: string[], dflt: T): T {
   let broke = false;
   let obj: any = objct;
   flds.forEach((fld) => {
-    if (isNonNullObject(obj)) {
+    if (obj !== null && obj !== undefined) {
       obj = obj[fld];
     } else {
       broke = true;
@@ -153,11 +155,6 @@ function timeout(delay: number): Promise<{}> {
   return new Promise(function(resolve, reject) {
     setTimeout(resolve, delay);
   });
-}
-
-// checks if a variable is a non-null object
-function isNonNullObject(x: any) {
-  return typeof(x) === "object" && x !== null;
 }
 
 // inserts a script tag that loads a remote script
