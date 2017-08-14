@@ -4,24 +4,18 @@ app MapMit {
   // Restrict access to the application to only registered users
   include access/Auth[User for User]
 
-  // Campus events are displayed on a map
+  // One map shows the locations of events
   include map/Map[
     CampusEvent for Marker,
     CampusMap for Map,
     EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
 
+  // Another map allows the user to search for places to set event location
   include map/Map[
     CampusEvent for Marker,
     CampusMap for Map
   ] as CreateEventMap
-
-  // Campus events are displayed on a map
-  include map/Map[
-    CampusEvent for Marker,
-    CampusMap for Map,
-    EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
-  ] as SearchMap
 
   include organization/Event[
     CampusEvent for Event,
