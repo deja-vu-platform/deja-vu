@@ -242,3 +242,7 @@ follow-unfollow button.btn {
   overflow: hidden;
   white-space: nowrap;
 }
+
+.hide-first-child > *:first-child {
+  display: none;
+}

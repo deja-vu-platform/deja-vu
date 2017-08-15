@@ -13,7 +13,12 @@
       </li>
     </ul>
     <ul class="nav navbar-nav navbar-right" style="padding-top: 10px">
-      <dv-widget name="SignOutWithRedirect" of="Auth"></dv-widget>
+      <li style="padding-top:10px;">
+        <dv-widget name="LoggedIn" of="Auth"></dv-widget>
+      </li>
+      <li style="padding-left:10px;">
+        <dv-widget name="SignOutWithRedirect" of="Auth"></dv-widget>
+      </li>
     </ul>
   </div>
 </nav>
