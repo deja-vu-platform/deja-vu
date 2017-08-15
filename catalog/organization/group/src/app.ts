@@ -304,10 +304,11 @@ const getGroupsByDirectSubgroup = (subgroup_id: string): Promise<Group[]> => {
 // does callback on each subgroup
 // populates visited_groups with the atom_id of every visited group
 // the root parent group does get visited
-const forEachSubgroup = (group_id: string,
+function forEachSubgroup(
+  group_id: string,
   callback: (group: Group) => void,
   visited_groups: Set<string> = new Set([group_id]),
-): Promise<void> => {
+): Promise<void> {
   return mean.db.collection("groups")
     .findOne({atom_id: group_id})
     .then(group => {
@@ -329,10 +330,11 @@ const forEachSubgroup = (group_id: string,
 // does callback on each group
 // populates visited_groups with the atom_id of every visited group
 // the root child subgroup is visited but not operated on
-const forEachContainingGroup = (group_id: string,
+function forEachContainingGroup(
+  group_id: string,
   callback: (group: Group) => void,
   visited_groups: Set<string> = new Set([group_id]),
-): Promise<void> => {
+): Promise<void> {
   return mean.db.collection("groups")
     .find({subgroups: {atom_id: group_id}})
     .toArray()
@@ -354,11 +356,12 @@ const forEachContainingGroup = (group_id: string,
 // does an update to add/remove a member/subgroup from a group
 // use group_field = "members" or "subgroups"
 // use operation = "$addToSet" to add, "$pull" to remove
-const addOrRemoveMemberOrSubgroup = (group_id: string,
+function addOrRemoveMemberOrSubgroup(
+  group_id: string,
   child_id: string,
   group_field: string,
   operation: string
-): Promise<boolean> => {
+): Promise<boolean> {
   const queryObj = {atom_id: group_id};
   const updateObj = {[operation]: {[group_field]: {atom_id: child_id}}};
 
@@ -372,10 +375,11 @@ const addOrRemoveMemberOrSubgroup = (group_id: string,
 
 // renames entitiy with atom_id to name
 // type is type of entity, "Group" or "Member"
-const renameMemberOrGroup = (atom_id: string,
+function renameMemberOrGroup(
+  atom_id: string,
   name: string,
   type: string
-): Promise<boolean> => {
+): Promise<boolean> {
   const queryObj = {atom_id: atom_id};
   const updateObj = {$set: {name: name}};
 

@@ -107,7 +107,7 @@ cliche Group {
   // All of the group's members are listed
   // The user can click a button to remove a member
   // The user can enter an existing members's name in a box to add it
-  // When submit_ok flips to true, all edits are comitted
+  // When submit_ok flips to true, all edits are saved
   widget EditMembersOfGroup uses ShowNameOfMember {
     group: Group,
     submit_ok: boolean
@@ -117,7 +117,7 @@ cliche Group {
   // All of the group's subgroups are listed
   // The user can click a button to remove a subgroup
   // The user can enter an existing group's name in a box to add it
-  // When submit_ok flips to true, all edits are comitted
+  // When submit_ok flips to true, all edits are saved
   widget EditSubgroupsOfGroup uses ShowNameOfGroup {
     group: Group,
     submit_ok: boolean

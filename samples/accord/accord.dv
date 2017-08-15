@@ -120,7 +120,7 @@ app Accord {
   // need an add-item-with-redirect and redirect to
   // ViewSetlist?
   widget CreateSetlist {
-    list: Band
+    band: Band
   }
 
   // Create a new proposal
