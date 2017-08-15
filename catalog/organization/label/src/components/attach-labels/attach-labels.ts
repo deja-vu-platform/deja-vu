@@ -6,6 +6,12 @@ import * as _u from "underscore";
 
 import {Widget, Field, PrimitiveAtom, AfterInit} from "client-bus";
 import {ItemAtom, Label} from "../../shared/data";
+import {
+  addTypeahead,
+  uuidv4,
+  getTypeaheadVal,
+  setTypeaheadVal
+} from "../shared/utils";
 
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
@@ -13,17 +19,27 @@ export class AttachLabelsComponent implements AfterInit {
   @Field("Item") item: ItemAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  labels_text: string = "";
+  selectID = uuidv4();
 
   constructor(private _graphQlService: GraphQlService) {}
 
   // On submit will attach labels to the item
   dvAfterInit() {
+    this._graphQlService
+      .get(`
+        label_all {
+          name
+        }
+      `)
+      .subscribe(data => {
+        addTypeahead(this.selectID, data.label_all.map(label => label.name));
+      });
+
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === false) return;
 
       return Promise.all<Label>(
-          _u.chain(this.labels_text.split(","))
+          _u.chain(getTypeaheadVal(this.selectID))
             .map(l => l.trim())
             .uniq()
             .map(l => this._graphQlService
@@ -54,7 +70,7 @@ export class AttachLabelsComponent implements AfterInit {
     this.submit_ok.on_after_change(() => {
       this.item.atom_id = undefined;
       this.item.labels = [];
-      this.labels_text = "";
+      setTypeaheadVal(this.selectID, null);
     });
   }
 }
