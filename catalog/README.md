@@ -18,7 +18,7 @@ Clichés for supporting the interaction of social units
 | Market | Exchange goods for money |
 | Rating | Crowdsource evaluation of items |
 | Follow | Receive updates from sources |
-| Task | Keep track of pieces of work to be done |
+
 
 Messaging
 ---------
@@ -41,6 +41,7 @@ Clichés for arranging things
 | Allocator | Distribute resources among consumers |
 | Label | Label items so that they can be found later |
 | Group | Organize members into groups so that they can be handled in aggregate |
+| Task | Keep track of pieces of work to be done |
 
 How to write clichés
 ====================
