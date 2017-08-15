@@ -1,34 +1,108 @@
 // Receive updates from sources
 cliche Follow {
   // The thing doing the following
-  data Source {
-    follows: [Target]
+  data Follower {
+    name: text,
+    follows: [Publisher]
   }
 
   // The thing being followed
-  data Target {
+  data Publisher {
     name: text
+  }
+
+  // Something said by a publisher
+  data Message {
+    author: Publisher
+    content: text
+  }
+
+  // Button allowing the creation of a Follower
+  widget NewFollower {
+    follower: Follower
+    submit_ok: boolean
+  }
+
+  // Button allowing the creation of a Publisher
+  widget NewPublisher {
+    publisher: Publisher
+    submit_ok: boolean
+  }
+
+  // Button allowing the creation of a Message
+  // Must be used in a scope where publisher is defined
+  widget NewMessage {
+    message: Message,
+    publisher: Publisher,
+    submit_ok: boolean
+  }
+
+  // Displays the name of a follower
+  widget ShowNameOfFollower {
+    follower: Follower
+  }
+
+  // Displays the name of a publisher
+  widget ShowNameOfPublisher {
+    publisher: Publisher
+  }
+
+  // Displays the content of a message
+  widget ShowContentOfMessage {
+    publisher: Message
+  }
+
+  // Display the name of the author of the message
+  widget ShowAuthorOfMessage uses ShowNameOfPublisher {
+    message: Message
+  }
+
+  // Lists the publishers followed by a follower
+  widget ShowPublishersByFollower uses ShowNameOfPublisher {
+    publisher: Publisher
+  }
+
+  // Displays all messages authored by publishers the follower follows
+  widget ShowMessagesByFollower uses ShowMessage {
+    follower: Follower
+  }
+
+  // Displays the names of all followers of a publisher
+  widget ShowFollowersByPublisher uses ShowNameOfFollower {
+    publisher: Publisher
+  }
+
+  // Displays all messages which are authored by the publisher
+  widget ShowMessagesByPublisher uses ShowMessage {
+    follower: Follower
+  }
+
+  // Text box to allow follower name to be edited
+  widget EditNameOfFollower {
+    follower: Follower,
+    submit_ok: boolean
+  }
+
+  // Displays all targets in a grid, allowing following to be toggled
+  widget EditFollowsOfFollower uses FollowUnfollow, ShowNameOfPublisher {
+    follower: Follower
+  }
+
+  // Text box to allow publisher name to be edited
+  widget EditNameOfPublisher {
+    publisher: Publisher,
+    submit_ok: boolean
+  }
+
+  // Text box to allow message content to be edited
+  widget EditContentOfMessage {
+    message: Message,
+    submit_ok: boolean
   }
 
   // A button to toggle a following relationship
   widget FollowUnfollow {
-    source: Source,
-    target: Target
-  }
-
-  // Displays the name of a target
-  widget ShowTarget {
-    target: Target
-  }
-
-  // Lists the targets followed by a source
-  widget ShowFollowing uses ShowTarget {
-    source: Source
-  }
-  
-  // Displays all targets in a grid
-  // Allows follow relationships from source to be toggled
-  widget EditFollow uses FollowUnfollow, ShowTarget {
-    source: Source
+    follower: Follower,
+    publisher: Publisher
   }
 }
