@@ -8,8 +8,8 @@
   "dependencies": {
     "dv-access-auth": "file:../../catalog/access/auth",
     "dv-community-rating": "file:../../catalog/community/rating",
-    "dv-community-task": "file:../../catalog/community/task",
     "dv-community-market": "file:../../catalog/community/market",
+    "dv-organization-task": "file:../../catalog/organization/task",
     "dv-organization-list": "file:../../catalog/organization/list",
     "dv-lang": "file:../../core/lang"
   }

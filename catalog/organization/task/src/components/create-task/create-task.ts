@@ -72,7 +72,7 @@ export class CreateTaskComponent implements AfterInit {
   _loadScript(src: string) {
     const s = document.createElement("script");
     s.type = "text/javascript";
-    s.src = "node_modules/dv-community-task/lib/components/" +
+    s.src = "node_modules/dv-organization-task/lib/components/" +
       "create-task/vendor/" + src;
     this._elementRef.nativeElement.appendChild(s);
   }
@@ -81,7 +81,7 @@ export class CreateTaskComponent implements AfterInit {
     const s = document.createElement("link");
     s.type = "text/css";
     s.rel = "stylesheet";
-    s.href = "node_modules/dv-community-task/lib/components/" +
+    s.href = "node_modules/dv-organization-task/lib/components/" +
       "create-task/vendor/" + href;
     this._elementRef.nativeElement.appendChild(s);
   }
