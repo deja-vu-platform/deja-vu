@@ -1,10 +1,9 @@
-import {GraphQlService} from "gql";
-
 import "rxjs/add/operator/toPromise";
-
 import * as _u from "underscore";
 
 import {Widget, Field, PrimitiveAtom, AfterInit} from "client-bus";
+import {GraphQlService} from "gql";
+
 import {ItemAtom, Label} from "../../shared/data";
 import {
   addTypeahead,
@@ -32,7 +31,15 @@ export class AttachLabelsComponent implements AfterInit {
         }
       `)
       .subscribe(data => {
-        addTypeahead(this.selectID, data.label_all.map(label => label.name));
+        const labels = data.label_all.map((label, idx) => {
+          return {id: idx.toString(), text: label.name};
+        });
+        const options = {
+          data: labels,
+          tags: true,
+          tokenSeparators: [","]
+        };
+        addTypeahead(this.selectID, options);
       });
 
     this.submit_ok.on_change(() => {

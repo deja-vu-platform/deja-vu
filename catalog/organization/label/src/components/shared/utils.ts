@@ -6,7 +6,7 @@ const stylePath = "https://cdn.jsdelivr.net/select2/4.0.3/css/select2.min.css";
 
 export function addTypeahead(
   selectID: string,
-  options: string[]
+  options: object
 ): Promise<void> {
   // insert tags to load API and styles from CDN
   if (!window[scriptSrc] && !window["jQuery"].fn.select2) {
@@ -21,16 +21,9 @@ export function addTypeahead(
     .then(_ => waitFor(window["jQuery"].fn, "select2"))
     .then(_ => {
       const $ = window["jQuery"];
-      const data = options.map((option, idx) => {
-        return {id: idx, text: option};
-      });
 
       // installs typeahead in DOM element
-      $(`#${selectID}`).select2({
-        data: data,
-        tags: true,
-        tokenSeparators: [","]
-      });
+      $(`#${selectID}`).select2(options);
     });
 }
 
