@@ -1,6 +1,7 @@
-import {Widget, ClientBus, Field} from "client-bus";
+import {Widget, Field} from "client-bus";
 import {GraphQlService} from "gql";
 
+import Atomize from "../_shared/atomize";
 import {GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
 
@@ -9,7 +10,8 @@ import GroupService from "../_shared/group.service";
   fqelement: "Group",
   ng2_providers: [
     GraphQlService,
-    GroupService
+    GroupService,
+    Atomize
   ]
 })
 export class ShowSubgroupsOfGroupComponent {
@@ -19,7 +21,7 @@ export class ShowSubgroupsOfGroupComponent {
 
   constructor(
     private _groupService: GroupService,
-    private _clientBus: ClientBus
+    private _atomize: Atomize
   ) {}
 
   dvAfterInit() {
@@ -49,11 +51,8 @@ export class ShowSubgroupsOfGroupComponent {
   private getSubgroups() {
     this._groupService.getSubgroupsOfGroup(this.group.atom_id)
       .then(subgroups => {
-        this.group.subgroups = subgroups.map((g) => {
-          const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
-          group_atom.atom_id = g.atom_id;
-          group_atom.name = g.name;
-          return group_atom;
+        this.group.subgroups = subgroups.map((group) => {
+          return this._atomize.atomizeGroup(group);
         });
       });
   }

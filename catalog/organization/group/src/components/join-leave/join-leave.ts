@@ -1,6 +1,7 @@
-import {Widget, Field, AfterInit, ClientBus} from "client-bus";
+import {Widget, Field, AfterInit} from "client-bus";
 import {GraphQlService} from "gql";
 
+import Atomize from "../_shared/atomize";
 import {Member, Group, MemberAtom, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
 import {filterInPlace} from "../_shared/utils";
@@ -10,7 +11,8 @@ import {filterInPlace} from "../_shared/utils";
   fqelement: "Group",
   ng2_providers: [
     GraphQlService,
-    GroupService
+    GroupService,
+    Atomize
   ]
 })
 export class JoinLeaveComponent implements AfterInit {
@@ -21,7 +23,7 @@ export class JoinLeaveComponent implements AfterInit {
 
   constructor(
     private _groupService: GroupService,
-    private _clientBus: ClientBus
+    private _atomize: Atomize
   ) {}
 
   dvAfterInit() {
@@ -84,10 +86,7 @@ export class JoinLeaveComponent implements AfterInit {
     this._groupService.getMembersByGroup(this.group.atom_id)
       .then(members => {
         this.group.members = members.map(member => {
-          const member_atom = this._clientBus.new_atom<MemberAtom>("Member");
-          member_atom.atom_id = member.atom_id;
-          member_atom.name = member.name;
-          return member_atom;
+          return this._atomize.atomizeMember(member);
         });
       });
   }

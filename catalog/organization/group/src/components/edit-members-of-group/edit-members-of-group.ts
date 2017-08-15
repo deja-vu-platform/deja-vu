@@ -1,6 +1,7 @@
-import {Widget, Field, PrimitiveAtom, ClientBus} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
+import Atomize from "../_shared/atomize";
 import {Member, MemberAtom, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
 import {
@@ -16,7 +17,8 @@ import {
   fqelement: "Group",
   ng2_providers: [
     GraphQlService,
-    GroupService
+    GroupService,
+    Atomize
   ]
 })
 export class EditMembersOfGroupComponent {
@@ -34,7 +36,7 @@ export class EditMembersOfGroupComponent {
 
   constructor(
     private _groupService: GroupService,
-    private _clientBus: ClientBus
+    private _atomize: Atomize
   ) {}
 
   dvAfterInit() {
@@ -72,11 +74,8 @@ export class EditMembersOfGroupComponent {
     const memberIdx = this.nonMembers.findIndex((m => m.name === name));
     if (memberIdx >= 0) {
       const member = this.nonMembers[memberIdx];
-      this.nonMembers.splice(memberIdx, 1); // remove
-      const m_atom = this._clientBus.new_atom<MemberAtom>("Member");
-      m_atom.atom_id = member.atom_id;
-      m_atom.name = member.name;
-      this.stagedMembers.push(m_atom);
+      this.nonMembers.splice(memberIdx, 1); // remove element
+      this.stagedMembers.push(this._atomize.atomizeMember(member));
       setTypeaheadVal(this.wrapId, "");
       this.failMsg = "";
     } else {
@@ -91,7 +90,7 @@ export class EditMembersOfGroupComponent {
     ));
     if (memberIdx >= 0) {
       const member = this.nonMembers[memberIdx];
-      this.stagedMembers.splice(memberIdx, 1); // remove
+      this.stagedMembers.splice(memberIdx, 1); // remove element
       this.nonMembers.push(member);
     }
   }
@@ -150,12 +149,11 @@ export class EditMembersOfGroupComponent {
         .getMembersOfGroup(this.group.atom_id)
         .then(members => {
           this.group.members = members.map(member => {
-            const m_atom = this._clientBus.new_atom<MemberAtom>("Member");
-            m_atom.atom_id = member.atom_id;
-            m_atom.name = member.name;
-            return m_atom;
+            return this._atomize.atomizeMember(member);
           });
-          this.group.members.forEach(m => this.stagedMembers.push(m));
+          this.group.members.forEach(member => {
+            this.stagedMembers.push(member);
+          });
           return this.group.members;
         });
     } else {

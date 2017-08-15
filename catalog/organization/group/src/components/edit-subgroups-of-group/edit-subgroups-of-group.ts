@@ -1,6 +1,7 @@
-import {Widget, Field, PrimitiveAtom, ClientBus} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
+import Atomize from "../_shared/atomize";
 import {Group, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
 import {
@@ -16,7 +17,8 @@ import {
   fqelement: "Group",
   ng2_providers: [
     GraphQlService,
-    GroupService
+    GroupService,
+    Atomize
   ]
 })
 export class EditSubgroupsOfGroupComponent {
@@ -35,7 +37,7 @@ export class EditSubgroupsOfGroupComponent {
 
   constructor(
     private _groupService: GroupService,
-    private _clientBus: ClientBus
+    private _atomize: Atomize
   ) {}
 
   dvAfterInit() {
@@ -73,11 +75,8 @@ export class EditSubgroupsOfGroupComponent {
     const groupIdx = this.nonSubgroups.findIndex((m => m.name === name));
     if (groupIdx >= 0) {
       const group = this.nonSubgroups[groupIdx];
-      this.nonSubgroups.splice(groupIdx, 1); // remove
-      const g_atom = this._clientBus.new_atom<GroupAtom>("Group");
-      g_atom.atom_id = group.atom_id;
-      g_atom.name = group.name;
-      this.stagedGroups.push(g_atom);
+      this.nonSubgroups.splice(groupIdx, 1); // remove element
+      this.stagedGroups.push(this._atomize.atomizeGroup(group));
       setTypeaheadVal(this.wrapId, "");
       this.failMsg = "";
     } else {
@@ -92,7 +91,7 @@ export class EditSubgroupsOfGroupComponent {
     ));
     if (groupIdx >= 0) {
       const group = this.nonSubgroups[groupIdx];
-      this.stagedGroups.splice(groupIdx, 1); // remove
+      this.stagedGroups.splice(groupIdx, 1); // remove element
       this.nonSubgroups.push(group);
     }
   }
@@ -152,12 +151,11 @@ export class EditSubgroupsOfGroupComponent {
         .getSubgroupsOfGroup(this.group.atom_id)
         .then(subgroups => {
           this.group.subgroups = subgroups.map(subgroup => {
-            const g_atom = this._clientBus.new_atom<GroupAtom>("Group");
-            g_atom.atom_id = subgroup.atom_id;
-            g_atom.name = subgroup.name;
-            return g_atom;
+            return this._atomize.atomizeGroup(subgroup);
           });
-          this.group.subgroups.forEach(g => this.stagedGroups.push(g));
+          this.group.subgroups.forEach(subgroup => {
+            this.stagedGroups.push(subgroup);
+          });
           return this.group.subgroups;
         });
     } else {

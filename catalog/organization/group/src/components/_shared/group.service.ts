@@ -105,7 +105,7 @@ export default class GroupService {
   }
 
   // gets all groups which are a direct subgroup of the given group
-  getSubgroupsOfGroup(group_id: string): Promise<Member[]> {
+  getSubgroupsOfGroup(group_id: string): Promise<Group[]> {
     return this._graphQlService
       .get(`
         group_by_id(
