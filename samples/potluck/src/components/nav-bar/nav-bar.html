@@ -9,6 +9,11 @@
     </div>
     <ul class="nav navbar-nav navbar-right">
       <li *ngIf="user.username">
+        <a>
+          {{user.username}}
+        </a>
+      </li>
+      <li *ngIf="user.username">
         <dv-widget name="SignOutWithRedirect" of="Auth">
         </dv-widget>
       </li>

@@ -126,6 +126,11 @@ app Accord {
     list: Setlist
   }
 
+  // Edit account (TODO)
+  widget Account {
+    user: User
+  }
+
   john: User = {username: "john"}
   // g1: Group = {name:"John's Group", members: [u1]}
 
@@ -138,4 +143,5 @@ app Accord {
   create_setlists: route = {path: "groups/create-setlist", widget: CreateSetlist}
   view_setlist: route = {path: "groups/setlists", widget: ViewSetlist}
   create_proposal: route = {path: "groups/setlists/create-proposal", widget: CreateProposal}
+  account: route = {path: "account", widget: Account}
 }

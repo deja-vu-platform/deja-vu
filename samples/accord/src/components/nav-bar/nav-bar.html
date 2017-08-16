@@ -26,6 +26,11 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li *ngIf="!user.username"><a [routerLink]="['/']">Not Logged In</a></li>
+        <li *ngIf="user.username">
+          <a [routerLink]="['/account']">
+            {{user.username}}
+          </a>
+        </li>
         <li *ngIf="user.username"><dv-widget name="SignOutWithRedirect" of="Auth"></dv-widget></li>
       </ul>
     </div><!-- /.navbar-collapse -->
