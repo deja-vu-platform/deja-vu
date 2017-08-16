@@ -1,3 +1,4 @@
+import {ElementRef, ViewChild} from "@angular/core";
 import "rxjs/add/operator/toPromise";
 import * as _u from "underscore";
 
@@ -6,18 +7,22 @@ import {GraphQlService} from "gql";
 
 import {ItemAtom, Label} from "../../shared/data";
 import Select2 from "../shared/Select2";
-import {uuidv4} from "../shared/utils";
-
+import {waitFor} from "../shared/utils";
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
 export class AttachLabelsComponent implements AfterInit {
   @Field("Item") item: ItemAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  selectID = uuidv4();
-  selectLabels: Select2;
+  @ViewChild("select") select: ElementRef;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  select2: Select2;
+  // prevent race conditions since submit has two async steps
+  didSubmit: boolean = false;
+
+  constructor(
+    private _graphQlService: GraphQlService
+  ) {}
 
   // On submit will attach labels to the item
   dvAfterInit() {
@@ -38,15 +43,15 @@ export class AttachLabelsComponent implements AfterInit {
         };
         Select2.loadAPI()
           .then(() => {
-            this.selectLabels = new Select2(this.selectID, options);
+            this.select2 = new Select2(this.select, options);
           });
       });
 
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === false) return;
 
-      return Promise.all<Label>(
-          _u.chain(this.selectLabels.getValues())
+      Promise.all<Label>(
+          _u.chain(this.select2.getValues())
             .map(l => l.trim())
             .uniq()
             .map(l => this._graphQlService
@@ -71,13 +76,19 @@ export class AttachLabelsComponent implements AfterInit {
                 }
               `)
               .toPromise();
+          })
+          .then(() => {
+            this.didSubmit = true;
           });
     });
 
     this.submit_ok.on_after_change(() => {
-      this.item.atom_id = undefined;
-      this.item.labels = [];
-      this.selectLabels.setValues(null);
+      waitFor(this, "didSubmit").then(() => {
+        this.item.atom_id = undefined;
+        this.item.labels = [];
+        this.select2.setValues(null);
+        this.didSubmit = false;
+      });
     });
   }
 }

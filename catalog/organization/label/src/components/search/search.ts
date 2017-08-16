@@ -1,3 +1,4 @@
+import {ElementRef, ViewChild} from "@angular/core";
 import "rxjs/add/operator/map";
 
 import {Widget, Field, ClientBus} from "client-bus";
@@ -5,15 +6,15 @@ import {GraphQlService} from "gql";
 
 import {ItemAtom, ItemArrAtom} from "../../shared/data";
 import Select2 from "../shared/Select2";
-import {uuidv4} from "../shared/utils";
 
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
 export class SearchComponent {
   @Field("[Item]") items : ItemArrAtom; // TODO: Change once arrays work
 
-  selectID = uuidv4();
-  selectLabel: Select2;
+  @ViewChild("select") select: ElementRef;
+
+  select2: Select2;
 
   constructor(
     private _graphQlService: GraphQlService,
@@ -38,14 +39,14 @@ export class SearchComponent {
           minimumResultsForSearch: 7
         };
         Select2.loadAPI().then(() => {
-          this.selectLabel = new Select2(this.selectID, options);
+          this.select2 = new Select2(this.select, options);
         });
       });
   }
 
   onSubmit() {
     this.items.arr = [];
-    const label = this.selectLabel.getValues()[0];
+    const label = this.select2.getValues()[0];
     this._graphQlService
       .get(`
         itemsByLabel(label_name: "${label}") {
