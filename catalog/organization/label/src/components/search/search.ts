@@ -4,11 +4,8 @@ import {Widget, Field, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {ItemAtom, ItemArrAtom} from "../../shared/data";
-import {
-  addTypeahead,
-  uuidv4,
-  getTypeaheadVal
-} from "../shared/utils";
+import Select2 from "../shared/Select2";
+import {uuidv4} from "../shared/utils";
 
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
@@ -16,6 +13,7 @@ export class SearchComponent {
   @Field("[Item]") items : ItemArrAtom; // TODO: Change once arrays work
 
   selectID = uuidv4();
+  selectLabel: Select2;
 
   constructor(
     private _graphQlService: GraphQlService,
@@ -39,13 +37,15 @@ export class SearchComponent {
           tokenSeparators: [","],
           minimumResultsForSearch: 7
         };
-        addTypeahead(this.selectID, options);
+        Select2.loadAPI().then(() => {
+          this.selectLabel = new Select2(this.selectID, options);
+        });
       });
   }
 
   onSubmit() {
     this.items.arr = [];
-    const label = getTypeaheadVal(this.selectID)[0];
+    const label = this.selectLabel.getValues()[0];
     this._graphQlService
       .get(`
         itemsByLabel(label_name: "${label}") {

@@ -5,12 +5,8 @@ import {Widget, Field, PrimitiveAtom, AfterInit} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {ItemAtom, Label} from "../../shared/data";
-import {
-  addTypeahead,
-  uuidv4,
-  getTypeaheadVal,
-  setTypeaheadVal
-} from "../shared/utils";
+import Select2 from "../shared/Select2";
+import {uuidv4} from "../shared/utils";
 
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
@@ -19,6 +15,7 @@ export class AttachLabelsComponent implements AfterInit {
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   selectID = uuidv4();
+  selectLabels: Select2;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -39,14 +36,17 @@ export class AttachLabelsComponent implements AfterInit {
           tags: true,
           tokenSeparators: [","]
         };
-        addTypeahead(this.selectID, options);
+        Select2.loadAPI()
+          .then(() => {
+            this.selectLabels = new Select2(this.selectID, options);
+          });
       });
 
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === false) return;
 
       return Promise.all<Label>(
-          _u.chain(getTypeaheadVal(this.selectID))
+          _u.chain(this.selectLabels.getValues())
             .map(l => l.trim())
             .uniq()
             .map(l => this._graphQlService
@@ -77,7 +77,7 @@ export class AttachLabelsComponent implements AfterInit {
     this.submit_ok.on_after_change(() => {
       this.item.atom_id = undefined;
       this.item.labels = [];
-      setTypeaheadVal(this.selectID, null);
+      this.selectLabels.setValues(null);
     });
   }
 }

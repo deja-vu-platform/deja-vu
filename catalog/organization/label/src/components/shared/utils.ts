@@ -1,43 +1,4 @@
-const scriptSrc = "https://cdn.jsdelivr.net/select2/4.0.3/js/select2.min.js";
-const stylePath = "https://cdn.jsdelivr.net/select2/4.0.3/css/select2.min.css";
-
-
 // EXPORTED FUNCTIONS
-
-export function addTypeahead(
-  selectID: string,
-  options: object
-): Promise<void> {
-  // insert tags to load API and styles from CDN
-  if (!window[scriptSrc] && !window["jQuery"].fn.select2) {
-    loadScript(scriptSrc);
-  }
-  if (!window[stylePath]) {
-    loadStylesheet(stylePath);
-  }
-
-  // wait for APIs to load, then use them
-  return waitFor(window, "jQuery")
-    .then(_ => waitFor(window["jQuery"].fn, "select2"))
-    .then(_ => {
-      const $ = window["jQuery"];
-
-      // installs typeahead in DOM element
-      $(`#${selectID}`).select2(options);
-    });
-}
-
-// gets the current value of a typeahead
-export function getTypeaheadVal(selectID: string): string[] {
-  return window["jQuery"](`#${selectID}`)
-    .select2("data")
-    .map(datum => datum.text);
-}
-
-// sets the value of a typeahead
-export function setTypeaheadVal(selectID: string, val: string[] | null) {
-  window["jQuery"](`#${selectID}`).val(val).trigger("change");
-}
 
 // UUID version 4 string generator
 // source: https://gist.github.com/kaizhu256/4482069
@@ -92,7 +53,7 @@ export function getOrDefault<T>(objct: object, flds: string[], dflt: T): T {
 // dvec is a vector of derivatives
 //   [0] = number of msec to wait between tries
 //   [i] = amount to increase [i-1] by after each try, i > 0
-function waitFor<T>(
+export function waitFor<T>(
   obj: object, fld: string, ret?: T, maxt=Infinity, dvec=[10,1,1]
 ) : Promise<T> {
   if (obj[fld]) {
@@ -109,15 +70,8 @@ function waitFor<T>(
   }
 }
 
-// returns a promise which resolves after delay
-function timeout(delay: number): Promise<{}> {
-  return new Promise(function(resolve, reject) {
-    setTimeout(resolve, delay);
-  });
-}
-
-// inserts a script tag that loads a remote script
-function loadScript(src: string): void {
+// inserts a script tag that loads a script
+export function loadScript(src: string): void {
   const s = document.createElement("script");
   s.type = "text/javascript";
   s.src = src;
@@ -125,7 +79,7 @@ function loadScript(src: string): void {
   document.getElementsByTagName("body")[0].appendChild(s);
 }
 
-// inserts a style tag that loads a local stylesheet
+// inserts a style tag that loads a stylesheet
 export function loadStylesheet(path: string): void {
   const s = document.createElement("link");
   s.type = "text/css";
@@ -133,4 +87,14 @@ export function loadStylesheet(path: string): void {
   s.href = path;
   s.id = path;
   document.getElementsByTagName("body")[0].appendChild(s);
+}
+
+
+// HELPER FUNCTIONS
+
+// returns a promise which resolves after delay
+function timeout(delay: number): Promise<{}> {
+  return new Promise(function(resolve, reject) {
+    setTimeout(resolve, delay);
+  });
 }
