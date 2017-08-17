@@ -1,18 +1,10 @@
+import {ElementRef, ViewChild} from "@angular/core";
+
 import {Widget, Field} from "client-bus";
-
-import {MarkerAtom, MapAtom} from "../../shared/data";
-
-import {
-  getGoogleMapsAPI,
-  waitFor,
-  uuidv4,
-  overlayMarker,
-  removeMarker,
-  getMapObject,
-  getInfoWindow
-} from "../../shared/utils";
-
 import {GraphQlService} from "gql";
+
+import {MarkerAtom, MapAtom} from "../_shared/data";
+import {waitFor} from "../_shared/utils";
 
 @Widget({
   fqelement: "Map",
@@ -22,8 +14,9 @@ export class OverlayMarkerComponent {
   @Field("Marker") marker: MarkerAtom;
   @Field("Map") map: MapAtom;
 
-  gmapsAPI: any;
-  infoWindowId = uuidv4();
+  @ViewChild("infoWindow") infoWindow: ElementRef;
+
+  markerObj: google.maps.Marker;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -40,19 +33,15 @@ export class OverlayMarkerComponent {
   }
 
   ngAfterViewInit() {
-    getGoogleMapsAPI()
-      .then(gmapsAPI => this.gmapsAPI = gmapsAPI)
-      .then(_ => waitFor(this.map, "atom_id"))
-      .then(_ => getMapObject(this.map.atom_id))
-      .then(mapObj => this.map.obj = mapObj)
+    waitFor(this.map, "gmap")
       .then(_ => waitFor(this.marker, "lat"))
       .then(_ => waitFor(this.marker, "lng"))
       .then(_ => this.overlayMarker());
   }
 
   ngOnDestroy() {
-    if (this.gmapsAPI && this.marker.obj) {
-      removeMarker(this.gmapsAPI, this.marker.obj);
+    if (this.markerObj) {
+      this.map.gmap.removeMarker(this.markerObj);
     }
   }
 
@@ -76,27 +65,20 @@ export class OverlayMarkerComponent {
   }
 
   overlayMarker() {
-    this.marker.obj = overlayMarker(
-      this.gmapsAPI, this.map.obj, this.marker, this.marker.title
-    );
-
-    const infoWindow = getInfoWindow(this.map.obj);
-
     // invisible wrapper into which infoWindow is loaded
-    const invisWrap = document.getElementById(this.infoWindowId).children[0];
+    const invisWrap = this.infoWindow.nativeElement;
 
     // wait for info window to be loaded
     waitFor(invisWrap.children, "1")
       .then(_ => waitFor(invisWrap.children[1].children, "0"))
       .then(_ => {
-        const content = invisWrap.children[1].children[0];
-        // only show infowindow if title is present or widget was replaced
-        if (this.marker.title || content.children) {
-          this.marker.obj.addListener("click", () => {
-            infoWindow.setContent(content);
-            infoWindow.open(this.map.obj, this.marker.obj);
-          });
+        let content: string | Node;
+        if (invisWrap.children[1].children[0].children) {
+          content = invisWrap.children[1].children[0];
+        } else if (this.marker.title) {
+          content = this.marker.title;
         }
+        this.markerObj = this.map.gmap.overlayMarker(this.marker, content);
       });
   }
 }

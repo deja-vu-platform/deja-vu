@@ -1,13 +1,13 @@
-import {Widget, ClientBus, Field} from "client-bus";
-import {GraphQlService} from "gql";
-import {MarkerAtom, MapAtom} from "../../shared/data";
-
-import {Observable} from "rxjs/Observable";
-import "rxjs/add/operator/map";
 import "rxjs/add/observable/from";
 import "rxjs/add/operator/mergeMap";
-
+import "rxjs/add/operator/map";
+import {Observable} from "rxjs/Observable";
 import * as _u from "underscore";
+
+import {Widget, ClientBus, Field} from "client-bus";
+import {GraphQlService} from "gql";
+
+import {MarkerAtom, MapAtom} from "../_shared/data";
 
 @Widget({
   fqelement: "Map",

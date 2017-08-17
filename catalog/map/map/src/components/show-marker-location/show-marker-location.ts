@@ -1,15 +1,9 @@
 import {Widget, Field} from "client-bus";
-
-import {MarkerAtom} from "../../shared/data";
-
-import {
-  getGoogleMapsAPI,
-  doReverseGeocode,
-  waitFor,
-  uuidv4
-} from "../../shared/utils";
-
 import {GraphQlService} from "gql";
+
+import {MarkerAtom} from "../_shared/data";
+import GoogleMap from "../_shared/GoogleMap";
+import {waitFor} from "../_shared/utils";
 
 @Widget({
   fqelement: "Map",
@@ -19,8 +13,6 @@ import {GraphQlService} from "gql";
 export class ShowMarkerLocationComponent {
   @Field("Marker") marker: MarkerAtom;
 
-  gmapsAPI: any;
-  infoWindowId = uuidv4();
   location: string;
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -38,11 +30,12 @@ export class ShowMarkerLocationComponent {
   }
 
   ngAfterViewInit() {
-    getGoogleMapsAPI()
-      .then(gmapsAPI => this.gmapsAPI = gmapsAPI)
-      .then(_ => waitFor(this.marker, "lat"))
-      .then(_ => waitFor(this.marker, "lng"))
-      .then(_ => doReverseGeocode(this.gmapsAPI, this.marker))
+    GoogleMap.loadAPI()
+      .then(() => Promise.all([
+        waitFor(this.marker, "lat"),
+        waitFor(this.marker, "lng")
+      ]))
+      .then(_ => GoogleMap.doReverseGeocode(this.marker))
       .then(location => this.location = location);
   }
 

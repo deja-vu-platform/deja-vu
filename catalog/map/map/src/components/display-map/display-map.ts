@@ -1,18 +1,22 @@
+import {ElementRef, ViewChild} from "@angular/core";
+
 import {Widget, Field} from "client-bus";
-import {MapAtom} from "../../shared/data";
-import {getGoogleMapsAPI, newMapObject, uuidv4} from "../../shared/utils";
+
+import {MapAtom} from "../_shared/data";
+import GoogleMap from "../_shared/GoogleMap";
 
 @Widget({fqelement: "Map"})
 export class DisplayMapComponent {
   @Field("Map") map: MapAtom;
 
-  dvAfterInit() {
-    if (!this.map.atom_id) this.map.atom_id = uuidv4();
-  }
+  @ViewChild("mapDiv") mapDiv: ElementRef;
 
   ngAfterViewInit() {
-    getGoogleMapsAPI()
-      .then(gmapsAPI => newMapObject(gmapsAPI, this.map.atom_id))
-      .then(mapObj => this.map.obj = mapObj);
+    if (!this.map.gmap) {
+      GoogleMap.loadAPI()
+        .then(_ => {
+          this.map.gmap = new GoogleMap(this.mapDiv);
+        });
+    }
   }
 }

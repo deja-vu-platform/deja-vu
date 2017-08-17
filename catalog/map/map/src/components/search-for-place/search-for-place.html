@@ -1,4 +1,4 @@
-<input id="{{searchBoxId}}" type="text" placeholder="Search For Place" />
+<input #input type="text" placeholder="Search For Place" />
 
 <div *ngFor="let marker of placeMarkers">
   <dv-widget name="OverlayMarker" [init]="{marker: marker}"></dv-widget>
