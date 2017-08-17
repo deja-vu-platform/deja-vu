@@ -25,7 +25,7 @@ cliche Group {
   }
 
   // Like NewGroup, but also adds member upon creation
-  widget NewGroupWithInitialMemberButton uses NewGroup {
+  widget NewGroupWithInitialMemberButton uses NewGroupButton {
     group: Group,
     member: Member,
     submit_ok: boolean

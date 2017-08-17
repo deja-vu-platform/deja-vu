@@ -95,7 +95,7 @@ const schema = grafo
     resolve: (_, {group_id}) => {
       const found_members: Set<string> = new Set();
 
-      return forEachSubgroup(group_id, (group: Group) => {
+      return forEachGroupInGroup(group_id, (group: Group) => {
         group.members.forEach((member: Member) => {
           found_members.add(member.atom_id);
         });
@@ -119,7 +119,7 @@ const schema = grafo
     resolve: (_, {group_id}) => {
       const outputArr: Group[] = [];
 
-      return forEachSubgroup(group_id, (group: Group) => {
+      return forEachGroupInGroup(group_id, (group: Group) => {
         if (group.atom_id !== group_id) {
           outputArr.push(group);
         }
@@ -160,23 +160,11 @@ const schema = grafo
       member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {member_id}) => {
-      const visited_groups: Set<string> = new Set();
       const outputArr: Group[] = [];
 
-      return getGroupsByDirectMember(member_id)
-        .then(groups => {
-          groups.forEach(group => {
-            visited_groups.add(group.atom_id);
-            outputArr.push(group);
-          });
-          return groups;
-        })
-        .then(subgroups => Promise.all(subgroups.map(subgroup => 
-            forEachContainingGroup(subgroup.atom_id, (group: Group) => {
-              outputArr.push(group);
-            }, visited_groups)
-          ))
-        )
+      return forEachGroupContainingMember(member_id, (group: Group) => {
+        outputArr.push(group);
+      })
         .then(() => outputArr);
     }
   })
@@ -191,7 +179,7 @@ const schema = grafo
     resolve: (_, {subgroup_id}) => {
       const outputArr: Group[] = [];
 
-      return forEachContainingGroup(subgroup_id, (group: Group) => {
+      return forEachGroupContainingGroup(subgroup_id, (group: Group) => {
         outputArr.push(group);
       })
         .then(() => outputArr);
@@ -302,38 +290,41 @@ const getGroupsByDirectSubgroup = (subgroup_id: string): Promise<Group[]> => {
 
 // recursively explores subgroups of a group with given atom_id
 // does groupVisitFn on each subgroup
-// populates visitedGroups with the atom_id of every visited group
 // the root parent group does get visited
-function forEachSubgroup(
+function forEachGroupInGroup(
   group_id: string,
-  groupVisitFn: (group: Group) => void,
-  visitedGroups: Set<string> = new Set([group_id]),
+  groupVisitFn: (group: Group) => void
 ): Promise<void> {
-  return mean.db.collection("groups")
-    .findOne({atom_id: group_id})
-    .then(group => {
-      groupVisitFn(group);
-      const recursiveCalls: Promise<void>[] = [];
-      group.subgroups.forEach(group => {
-        if (!visitedGroups.has(group)) {
-          visitedGroups.add(group.atom_id);
-          recursiveCalls.push(
-            forEachSubgroup(group.atom_id, groupVisitFn, visitedGroups)
-          );
-        }
+  const recurse = function(
+    group_id: string,
+    groupVisitFn: (group: Group) => void,
+    visitedGroups: Set<string> = new Set([group_id])
+  ) {
+    return mean.db.collection("groups")
+      .findOne({atom_id: group_id})
+      .then(group => {
+        groupVisitFn(group);
+        const recursiveCalls: Promise<void>[] = [];
+        group.subgroups.forEach(group => {
+          if (!visitedGroups.has(group)) {
+            visitedGroups.add(group.atom_id);
+            recursiveCalls.push(
+              recurse(group.atom_id, groupVisitFn, visitedGroups)
+            );
+          }
+        });
+        return Promise.all(recursiveCalls).then(() => {});
       });
-      return Promise.all(recursiveCalls).then(() => {});
-    });
+  }
+  return recurse(group_id, groupVisitFn, new Set([group_id]));
 };
 
-// recursively explores groups where the group with given atom_id is a subgroup
-// does groupVisitFn on each group
-// populates visitedGroups with the atom_id of every visited group
-// the root child subgroup is visited but not operated on
-function forEachContainingGroup(
+// Recursive step for forEachGroupContaining... functions
+// Not intended to be used on its own
+function _groupContainingRecurse(
   group_id: string,
   groupVisitFn: (group: Group) => void,
-  visitedGroups: Set<string> = new Set([group_id]),
+  visitedGroups: Set<string>
 ): Promise<void> {
   return mean.db.collection("groups")
     .find({subgroups: {atom_id: group_id}})
@@ -345,12 +336,44 @@ function forEachContainingGroup(
           visitedGroups.add(group.atom_id);
           groupVisitFn(group);
           recursiveCalls.push(
-            forEachContainingGroup(group.atom_id, groupVisitFn, visitedGroups)
+            _groupContainingRecurse(group.atom_id, groupVisitFn, visitedGroups)
           );
         }
       });
       return Promise.all(recursiveCalls).then(() => {});
     });
+}
+
+// recursively explores groups where the group with given atom_id is a subgroup
+// does groupVisitFn on each group
+// the root child subgroup is not visited
+function forEachGroupContainingGroup(
+  group_id: string,
+  groupVisitFn: (group: Group) => void
+): Promise<void> {
+  return _groupContainingRecurse(group_id, groupVisitFn, new Set([group_id]));
+};
+
+// recursively explores groups where the group with given atom_id is a subgroup
+// does groupVisitFn on each group
+// the root child subgroup is not visited
+function forEachGroupContainingMember(
+  member_id: string,
+  groupVisitFn: (group: Group) => void
+): Promise<void> {
+  const visitedGroups: Set<string> = new Set([])
+
+  return getGroupsByDirectMember(member_id)
+    .then(groups => {
+      groups.forEach(group => {
+        visitedGroups.add(group.atom_id);
+        groupVisitFn(group);
+      });
+      return Promise.all(groups.map(group =>
+        _groupContainingRecurse(group.atom_id, groupVisitFn, visitedGroups)
+      ));
+    })
+    .then(_ => {});
 };
 
 // does an update to add/remove a member/subgroup from a group
