@@ -47,7 +47,7 @@ export function loadStylesheet(path: string): void {
 
 // HELPER FUNCTIONS
 
-// returns a promise which resolves after delay
+// returns a promise which resolves after delay msec
 function timeout(delay: number): Promise<{}> {
   return new Promise(function(resolve, reject) {
     setTimeout(resolve, delay);

@@ -1,4 +1,5 @@
 import {ElementRef} from "@angular/core";
+import {} from "@types/select2";
 
 import {loadScript, loadStylesheet, waitFor} from "./utils";
 
@@ -24,7 +25,7 @@ export default class Select2 {
       });
   }
 
-  constructor(select: ElementRef, options: object) {
+  constructor(select: ElementRef, options: Select2Options) {
     this.$select = window["jQuery"](select.nativeElement);
     this.$select.select2(options);
   }
@@ -33,7 +34,7 @@ export default class Select2 {
     return this.$select.select2("data").map(datum => datum.text);
   }
 
-  setValues(vals: string[] | null): void {
+  setValues(vals: string[]): void {
     this.$select.val(vals).trigger("change");
   }
 }

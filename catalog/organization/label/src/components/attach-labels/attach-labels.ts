@@ -86,7 +86,7 @@ export class AttachLabelsComponent implements AfterInit {
       waitFor(this, "didSubmit").then(() => {
         this.item.atom_id = undefined;
         this.item.labels = [];
-        this.select2.setValues(null);
+        this.select2.setValues([]);
         this.didSubmit = false;
       });
     });
