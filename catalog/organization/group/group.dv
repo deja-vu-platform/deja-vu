@@ -134,7 +134,7 @@ cliche Group {
   }
 
   // Allows a member to be simultaneously created and added to a group
-  widget AddNewMemberToGroup uses NewMember, EditNameOfMember {
+  widget AddNewMemberToGroup uses NewMemberButton, EditNameOfMember {
     group: Group,
     member: Member,
     submit_ok: boolean
