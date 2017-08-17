@@ -13,19 +13,19 @@ cliche Group {
   }
 
   // Button allowing for the creation of a group
-  widget NewGroup {
+  widget NewGroupButton {
     group: Group,
     submit_ok: boolean
   }
 
   // Button allowing for the creation of a member
-  widget NewMember {
+  widget NewMemberButton {
     member: Member,
     submit_ok: boolean
   }
 
   // Like NewGroup, but also adds member upon creation
-  widget NewGroupWithInitialMember uses NewGroup {
+  widget NewGroupWithInitialMemberButton uses NewGroup {
     group: Group,
     member: Member,
     submit_ok: boolean

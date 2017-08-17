@@ -1,7 +1,7 @@
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {GroupAtom} from "../_shared/data";
+import {MemberAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
 
 
@@ -12,8 +12,8 @@ import GroupService from "../_shared/group.service";
     GroupService
   ]
 })
-export class NewGroupComponent {
-  @Field("Group") group : GroupAtom;
+export class NewMemberButtonComponent {
+  @Field("Member") member: MemberAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(private _groupService: GroupService) {}
@@ -22,16 +22,16 @@ export class NewGroupComponent {
     this.submit_ok.on_after_change(() => {
       if (this.submit_ok.value) {
         this.submit_ok.value = false;
-        this.group.atom_id = "";
+        this.member.atom_id = "";
       }
     });
   }
 
   submit() {
-    this._groupService.createGroup()
+    this._groupService.createMember()
       .then(atom_id => {
         if (atom_id) {
-          this.group.atom_id = atom_id;
+          this.member.atom_id = atom_id;
           this.submit_ok.value = true;
         }
       });
