@@ -87,15 +87,15 @@ app Accord {
 
   // View the information about a band
   // Has a button for adding new setlists
-  widget ViewBand {
+  widget ShowBand {
     band: Band,
     on_redirect: Widget = CreateSetlist
   }
 
   // View a setlist
-  widget ViewSetlist {
+  widget ShowSetlist {
     list: Setlist,
-    on_redirect: Widget = CreateProposal
+    on_redirect: Widget = CreateSong
   }
 
   // Show a song on the view setlist page
@@ -107,24 +107,24 @@ app Accord {
   // to the the ShowBand page
   widget LinkToBand {
     band: Band,
-    on_redirect: Widget = ViewBand
+    on_redirect: Widget = ShowBand
   }
 
   // Links to a setlist on the Band view page
   widget LinkToSetlist {
     setlist: Setlist,
-    on_redirect: Widget = ViewSetlist
+    on_redirect: Widget = ShowSetlist
   }
 
   // Create a new setlist
   // need an add-item-with-redirect and redirect to
-  // ViewSetlist?
+  // ShowSetlist?
   widget CreateSetlist {
     band: Band
   }
 
-  // Create a new proposal
-  widget CreateProposal {
+  // Create a new song
+  widget CreateSong {
     list: Setlist
   }
 
@@ -136,8 +136,8 @@ app Accord {
   bands: route = {path: "bands", widget: Bands}
   create_band: route = {path: "create-band", widget: CreateBand}
   add_member: route = {path: "add-member", widget: AddMember}
-  view_band: route = {path: "view-band", widget: ViewBand}
+  show_band: route = {path: "show-band", widget: ShowBand}
   create_setlists: route = {path: "create-setlist", widget: CreateSetlist}
-  view_setlist: route = {path: "view-setlist", widget: ViewSetlist}
-  create_proposal: route = {path: "create-proposal", widget: CreateProposal}
+  show_setlist: route = {path: "show-setlist", widget: ShowSetlist}
+  create_song: route = {path: "create-song", widget: CreateSong}
 }

@@ -1,5 +1,3 @@
-//const jQuerySrc = "http://code.jquery.com/jquery-3.2.1.min.js";
-
 const typeaheadScriptSrc = "https://cdnjs.cloudflare.com/ajax/libs"+
   "/corejs-typeahead/1.1.1/typeahead.bundle.min.js";
 const typeaheadStylePath = "node_modules/dv-organization-group/lib/"+

@@ -55,16 +55,16 @@ const schema = grafo
     type: graphql.GraphQLString,
     args: {},
     resolve: (_, {}) => {
-      let newObject = {
+      let newGroup = {
         atom_id: uuid.v4(),
         name: "",
         members: [],
         subgroups: []
       };
       return mean.db.collection("groups")
-        .insertOne(newObject)
-        .then(_ => bus.create_atom("Group", newObject.atom_id, newObject))
-        .then(success => success ? newObject.atom_id : "");
+        .insertOne(newGroup)
+        .then(_ => bus.create_atom("Group", newGroup.atom_id, newGroup))
+        .then(success => success ? newGroup.atom_id : "");
     }
   })
 
@@ -74,14 +74,14 @@ const schema = grafo
     type: graphql.GraphQLString,
     args: {},
     resolve: (_, {}) => {
-      let newObject = {
+      let newMember = {
         atom_id: uuid.v4(),
         name: ""
       };
       return mean.db.collection("members")
-        .insertOne(newObject)
-        .then(_ => bus.create_atom("Member", newObject.atom_id, newObject))
-        .then(success => success ? newObject.atom_id : "");
+        .insertOne(newMember)
+        .then(_ => bus.create_atom("Member", newMember.atom_id, newMember))
+        .then(success => success ? newMember.atom_id : "");
     }
   })
 
@@ -301,24 +301,24 @@ const getGroupsByDirectSubgroup = (subgroup_id: string): Promise<Group[]> => {
 }
 
 // recursively explores subgroups of a group with given atom_id
-// does callback on each subgroup
-// populates visited_groups with the atom_id of every visited group
+// does groupVisitFn on each subgroup
+// populates visitedGroups with the atom_id of every visited group
 // the root parent group does get visited
 function forEachSubgroup(
   group_id: string,
-  callback: (group: Group) => void,
-  visited_groups: Set<string> = new Set([group_id]),
+  groupVisitFn: (group: Group) => void,
+  visitedGroups: Set<string> = new Set([group_id]),
 ): Promise<void> {
   return mean.db.collection("groups")
     .findOne({atom_id: group_id})
     .then(group => {
-      callback(group);
+      groupVisitFn(group);
       const recursiveCalls: Promise<void>[] = [];
       group.subgroups.forEach(group => {
-        if (!visited_groups.has(group)) {
-          visited_groups.add(group.atom_id);
+        if (!visitedGroups.has(group)) {
+          visitedGroups.add(group.atom_id);
           recursiveCalls.push(
-            forEachSubgroup(group.atom_id, callback, visited_groups)
+            forEachSubgroup(group.atom_id, groupVisitFn, visitedGroups)
           );
         }
       });
@@ -327,13 +327,13 @@ function forEachSubgroup(
 };
 
 // recursively explores groups where the group with given atom_id is a subgroup
-// does callback on each group
-// populates visited_groups with the atom_id of every visited group
+// does groupVisitFn on each group
+// populates visitedGroups with the atom_id of every visited group
 // the root child subgroup is visited but not operated on
 function forEachContainingGroup(
   group_id: string,
-  callback: (group: Group) => void,
-  visited_groups: Set<string> = new Set([group_id]),
+  groupVisitFn: (group: Group) => void,
+  visitedGroups: Set<string> = new Set([group_id]),
 ): Promise<void> {
   return mean.db.collection("groups")
     .find({subgroups: {atom_id: group_id}})
@@ -341,11 +341,11 @@ function forEachContainingGroup(
     .then(groups => {
       const recursiveCalls: Promise<void>[] = [];
       groups.forEach(group => {
-        if (!visited_groups.has(group.atom_id)) {
-          visited_groups.add(group.atom_id);
-          callback(group);
+        if (!visitedGroups.has(group.atom_id)) {
+          visitedGroups.add(group.atom_id);
+          groupVisitFn(group);
           recursiveCalls.push(
-            forEachContainingGroup(group.atom_id, callback, visited_groups)
+            forEachContainingGroup(group.atom_id, groupVisitFn, visitedGroups)
           );
         }
       });
