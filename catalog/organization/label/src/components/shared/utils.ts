@@ -1,25 +1,29 @@
 // EXPORTED FUNCTIONS
 
-// waits for a field of an object `obj[fld]` to be truthy
-// returns a promise
-//   the promise resolves once the field is truthy
-//     the single value given to the promise's callback is `ret`
-//   the promise rejects after `maxt` msec
-// dvec is a vector of derivatives
-//   [0] = number of msec to wait between tries
-//   [i] = amount to increase [i-1] by after each try, i > 0
-export function waitFor<T>(
-  obj: object, fld: string, ret?: T, maxt=Infinity, dvec=[10,1,1]
-) : Promise<T> {
-  if (obj[fld]) {
-    return Promise.resolve(ret);
+// waits for a field of an object `obj[fld]` to be defined and non-null
+// returns a promise which
+//   resolves with `obj[fld]` once available
+//   rejects after `maxt` msec
+// if `truthy` is true, resolution requires `obj[fld]` to also be truthy
+// `dvec` is a vector of derivatives where
+//   `dvec[i]` = number of msec to wait between tries, i = 0
+//             = amount to increase `dvec[i-1]` by after each try, i > 0
+export function waitFor(
+  obj: object,
+  fld: string,
+  truthy=false,
+  maxt=Infinity,
+  dvec=[10,1,1]
+) : Promise<any> {
+  if (obj[fld] !== undefined && obj[fld] !== null && (!truthy || obj[fld])) {
+    return Promise.resolve(obj[fld]);
   }
   if (maxt > 0) {
     maxt -= dvec[0];
-    for (let i = 0; i++; i < dvec.length-1) {
+    for (let i = 0; i < dvec.length-1; i += 1) {
       dvec[i] += dvec[i+1];
     }
-    return timeout(dvec[0]).then(_ => waitFor(obj, fld, ret, maxt, dvec));
+    return timeout(dvec[0]).then(_ => waitFor(obj, fld, truthy, maxt, dvec));
   } else {
     return Promise.reject("Timeout waiting for field " + fld + " in object.");
   }
