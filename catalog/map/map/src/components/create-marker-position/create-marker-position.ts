@@ -4,6 +4,7 @@ import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {MarkerAtom, MapAtom} from "../_shared/data";
+import GoogleMap from "../_shared/GoogleMap";
 import {waitFor} from "../_shared/utils";
 
 
@@ -52,16 +53,17 @@ export class CreateMarkerPositionComponent {
   }
 
   ngAfterViewInit() {
-    waitFor(this.map, "gmap")
-      .then(_ => this.addListeners());
+    waitFor(this.map, "atom_id")
+      .then((map_id: string): Promise<GoogleMap> => waitFor(window, map_id))
+      .then((gmap: GoogleMap) => this.addListeners(gmap));
   }
 
   // watch for map clicks and changes in position form
-  addListeners() {
-    this.map.gmap.addClickMarker();
+  addListeners(gmap: GoogleMap) {
+    gmap.addClickMarker();
 
     // on map click: update marker field
-    this.map.gmap.map.addListener("click", (e) => {
+    gmap.map.addListener("click", (e) => {
       // update must be done this way to get to form
       this.zone.run(() => {
         this.marker.lat = e.latLng.lat();
@@ -72,7 +74,7 @@ export class CreateMarkerPositionComponent {
     // on change to marker field: move the marker on the map
     this.marker.on_change(() => {
       if (this.marker.lat !== undefined && this.marker.lng !== undefined) {
-        this.map.gmap.moveClickMarker(this.marker);
+        gmap.moveClickMarker(this.marker);
       }
     });
   }

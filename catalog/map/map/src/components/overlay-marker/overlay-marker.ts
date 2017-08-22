@@ -4,6 +4,7 @@ import {Widget, Field} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {MarkerAtom, MapAtom} from "../_shared/data";
+import GoogleMap from "../_shared/GoogleMap";
 import {waitFor} from "../_shared/utils";
 
 @Widget({
@@ -16,6 +17,7 @@ export class OverlayMarkerComponent {
 
   @ViewChild("infoWindow") infoWindow: ElementRef;
 
+  gmap: GoogleMap;
   markerObj: google.maps.Marker;
 
   constructor(private _graphQlService: GraphQlService) {}
@@ -33,15 +35,19 @@ export class OverlayMarkerComponent {
   }
 
   ngAfterViewInit() {
-    waitFor(this.map, "gmap")
-      .then(_ => waitFor(this.marker, "lat"))
+    waitFor(this.marker, "lat")
       .then(_ => waitFor(this.marker, "lng"))
-      .then(_ => this.overlayMarker());
+      .then(_ => waitFor(this.map, "atom_id"))
+      .then((map_id: string): Promise<GoogleMap> => waitFor(window, map_id))
+      .then((gmap: GoogleMap) => {
+        this.gmap = gmap;
+        this.overlayMarker();
+      });
   }
 
   ngOnDestroy() {
     if (this.markerObj) {
-      this.map.gmap.removeMarker(this.markerObj);
+      this.gmap.removeMarker(this.markerObj);
     }
   }
 
@@ -69,16 +75,16 @@ export class OverlayMarkerComponent {
     const invisWrap = this.infoWindow.nativeElement;
 
     // wait for info window to be loaded
-    waitFor(invisWrap.children, "1")
-      .then(_ => waitFor(invisWrap.children[1].children, "0"))
+    waitFor(invisWrap.children, "0")
+      .then(_ => waitFor(invisWrap.children[0].children, "1"))
       .then(_ => {
         let content: string | Node;
-        if (invisWrap.children[1].children[0].children) {
-          content = invisWrap.children[1].children[0];
+        if (invisWrap.children[0].children[1].children) {
+          content = invisWrap.children[0].children[1];
         } else if (this.marker.title) {
           content = this.marker.title;
         }
-        this.markerObj = this.map.gmap.overlayMarker(this.marker, content);
+        this.markerObj = this.gmap.overlayMarker(this.marker, content);
       });
   }
 }

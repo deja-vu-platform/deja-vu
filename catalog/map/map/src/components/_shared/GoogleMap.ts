@@ -3,7 +3,6 @@ import {} from "@types/googlemaps";
 
 import {insertTag, waitFor, getOrDefault} from "./utils";
 
-
 const init_script = `
   function afterInitGoogleMapsAPI() {
     console.log("The google maps API is loaded.");
@@ -77,7 +76,7 @@ export default class GoogleMap {
       .then(_ => waitFor(window["google"], "maps"))
       .then(_ => {
         GoogleMap.api = window["google"]["maps"];
-        GoogleMap.geocoder = GoogleMap.api.Geocoder();
+        GoogleMap.geocoder = new GoogleMap.api.Geocoder();
       });
   }
 
@@ -104,7 +103,10 @@ export default class GoogleMap {
     });
   }
 
-  constructor(element: ElementRef, options: GoogleMapOptions = defaultOptions) {
+  constructor(
+    element: ElementRef,
+    options: GoogleMapOptions = defaultOptions
+  ) {
     this.map = new GoogleMap.api.Map(
       element.nativeElement,
       options
@@ -131,7 +133,8 @@ export default class GoogleMap {
       this.clickMarker = new GoogleMap.api.Marker({
         position,
         map: this.map,
-        visible: false
+        visible: false,
+        icon: blue
       });
       this.map.addListener("click", (e) => {
         this.moveClickMarker(e.latLng);

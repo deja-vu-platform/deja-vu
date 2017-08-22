@@ -4,6 +4,7 @@ import {Widget, Field} from "client-bus";
 
 import {MapAtom} from "../_shared/data";
 import GoogleMap from "../_shared/GoogleMap";
+import {waitFor} from "../_shared/utils";
 
 @Widget({fqelement: "Map"})
 export class DisplayMapComponent {
@@ -12,11 +13,8 @@ export class DisplayMapComponent {
   @ViewChild("mapDiv") mapDiv: ElementRef;
 
   ngAfterViewInit() {
-    if (!this.map.gmap) {
-      GoogleMap.loadAPI()
-        .then(_ => {
-          this.map.gmap = new GoogleMap(this.mapDiv);
-        });
-    }
+    GoogleMap.loadAPI()
+      .then((): Promise<string> => waitFor(this.map, "atom_id"))
+      .then((map_id: string) => window[map_id] = new GoogleMap(this.mapDiv));
   }
 }
