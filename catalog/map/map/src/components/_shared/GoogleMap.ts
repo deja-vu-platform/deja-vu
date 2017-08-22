@@ -52,7 +52,7 @@ export default class GoogleMap {
   infoWindow: google.maps.InfoWindow;
   searchBox: google.maps.places.SearchBox;
   searchMarkers: google.maps.Marker[];
-  autoFitMarkers: number;
+  autoFitMarkers: boolean;
   maxZoomAfterFitBounds: number;
 
   // Loads the API, returning a promise which resolves when it is loaded
@@ -111,6 +111,7 @@ export default class GoogleMap {
       element.nativeElement,
       options
     );
+    this.autoFitMarkers = options.autoFitMarkers;
     this.maxZoomAfterFitBounds = options.maxZoomAfterFitBounds;
     this.bounds = new GoogleMap.api.LatLngBounds();
     this.markers = new Set();
