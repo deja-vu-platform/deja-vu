@@ -46,7 +46,7 @@ export default class Typeahead {
       });
   }
 
-  constructor(input: ElementRef, data: string[]) {
+  constructor(wrapper: ElementRef, data: string[]) {
     const $ = window["jQuery"];
     const Bloodhound = window["Bloodhound"];
 
@@ -68,8 +68,9 @@ export default class Typeahead {
       name: "data",
       source: this.bloodhound
     };
-    this.$typeahead = $(input.nativeElement);
-    this.$typeahead.typeahead(typeaheadOptions, dataset);
+    const $wrapper = $(wrapper.nativeElement);
+    $wrapper.children("input").typeahead(typeaheadOptions, dataset);
+    this.$typeahead = $wrapper.children(".tt-input");
   }
 
   getValue(): string {
