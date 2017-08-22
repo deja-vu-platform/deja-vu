@@ -17,9 +17,6 @@ export class CreateMarkerPositionComponent {
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
   @Field("Map") map: MapAtom;
 
-  gmapsAPI: any;
-  lastLat = null;
-  lastLng = null;
 
   constructor(private _graphQlService: GraphQlService, private zone: NgZone) {}
 
@@ -60,21 +57,17 @@ export class CreateMarkerPositionComponent {
 
   // watch for map clicks and changes in position form
   addListeners(gmap: GoogleMap) {
-    gmap.addClickMarker();
-
-    // on map click: update marker field
-    gmap.map.addListener("click", (e) => {
-      // update must be done this way to get to form
+    gmap.addClickMarker((latLng: google.maps.LatLngLiteral) => {
       this.zone.run(() => {
-        this.marker.lat = e.latLng.lat();
-        this.marker.lng = e.latLng.lng();
+        this.marker.lat = latLng.lat;
+        this.marker.lng = latLng.lng;
       });
     });
 
     // on change to marker field: move the marker on the map
     this.marker.on_change(() => {
       if (this.marker.lat !== undefined && this.marker.lng !== undefined) {
-        gmap.moveClickMarker(this.marker);
+        gmap.moveClickMarker(this.marker, true);
       }
     });
   }

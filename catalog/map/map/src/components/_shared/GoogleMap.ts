@@ -127,8 +127,8 @@ export default class GoogleMap {
   // Clicking it again will move the marker
   // Listner is called with the position of the marker when it changes
   addClickMarker(
-    position: google.maps.LatLng | google.maps.LatLngLiteral = mit,
-    listner?: (pos: google.maps.LatLngLiteral) => void
+    listner?: (pos: google.maps.LatLngLiteral) => void,
+    position: google.maps.LatLng | google.maps.LatLngLiteral = mit
   ) {
     if (!this.clickMarker) {
       this.clickMarker = new GoogleMap.api.Marker({
@@ -138,6 +138,7 @@ export default class GoogleMap {
         icon: blue
       });
       this.map.addListener("click", (e) => {
+        this.clickMarker.setVisible(true);
         this.moveClickMarker(e.latLng);
       });
       this.clickListner = listner;
@@ -145,16 +146,19 @@ export default class GoogleMap {
   }
 
   // Programatically move the click marker
-  moveClickMarker(position: google.maps.LatLng | google.maps.LatLngLiteral) {
-    if (this.clickMarker) {
-      this.clickMarker.setVisible(true);
+  // Use silent to not call clickListner
+  moveClickMarker(
+    position: google.maps.LatLng | google.maps.LatLngLiteral,
+    silent = false
+  ) {
+    if (this.clickMarker && this.clickMarker.getVisible()) {
       this.clickMarker.setPosition(position);
       this.map.panTo(position);
       this.markers.forEach(marker => {
         marker.setIcon(red);
       });
       this.infoWindow.close();
-      if (this.clickListner) {
+      if (this.clickListner && !silent) {
         this.clickListner(this.forceLatLngLiteral(position));
       }
     }
@@ -188,7 +192,8 @@ export default class GoogleMap {
   ): google.maps.Marker {
     const marker: google.maps.Marker = new GoogleMap.api.Marker({
       position,
-      map: this.map
+      map: this.map,
+      icon: red
     });
     marker.addListener("click", _ => {
       if (content) {
