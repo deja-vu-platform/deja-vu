@@ -1,16 +1,12 @@
+import {ViewChild, ElementRef} from "@angular/core";
+
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
 import Atomize from "../_shared/atomize";
 import {Group, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
-import {
-  addTypeahead,
-  uuidv4,
-  getTypeaheadVal,
-  setTypeaheadVal,
-  updateTypeaheadOptions
-} from "../_shared/utils";
+import Typeahead from "../_shared/Typeahead";
 
 
 @Widget({
@@ -25,8 +21,10 @@ export class EditSubgroupsOfGroupComponent {
   @Field("Group") group: GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
+  @ViewChild("typeaheadWrapper") typeaheadWrapper: ElementRef;
+
   failMsg = "";
-  wrapId = uuidv4(); // Lets us find input in which to install typeahead
+  typeahead: Typeahead;
   stagedGroups: GroupAtom[] = []; // groups we want to have as a subgroup
 
   private allGroups: Group[] = [];
@@ -58,9 +56,10 @@ export class EditSubgroupsOfGroupComponent {
   }
 
   ngAfterViewInit() {
-    addTypeahead(this.wrapId, [])
+    Typeahead.loadAPI()
+      .then(() => this.typeahead = new Typeahead(this.typeaheadWrapper, []))
       .then(() => this._groupService.getGroups())
-      .then(groups => {
+      .then((groups: Group[]) => {
         this.allGroups = groups;
         this.nonSubgroups = groups.slice();
         this.updateTypeahead();
@@ -71,13 +70,13 @@ export class EditSubgroupsOfGroupComponent {
 
   // queues a group for adding once submit_ok is true
   stageGroup(): void {
-    const name = getTypeaheadVal(this.wrapId);
+    const name = this.typeahead.getValue();
     const groupIdx = this.nonSubgroups.findIndex((m => m.name === name));
     if (groupIdx >= 0) {
       const group = this.nonSubgroups[groupIdx];
       this.nonSubgroups.splice(groupIdx, 1); // remove element
       this.stagedGroups.push(this._atomize.atomizeGroup(group));
-      setTypeaheadVal(this.wrapId, "");
+      this.typeahead.setValue("");
       this.failMsg = "";
     } else {
       this.failMsg = "Group not found.";
@@ -173,6 +172,8 @@ export class EditSubgroupsOfGroupComponent {
   }
 
   private updateTypeahead() {
-    updateTypeaheadOptions(this.wrapId, this.nonSubgroups.map(g => g.name));
+    this.typeahead.updateData(this.nonSubgroups.map(group => {
+      return group.name;
+    }));
   }
 }

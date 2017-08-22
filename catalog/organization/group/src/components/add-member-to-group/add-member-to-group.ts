@@ -1,16 +1,12 @@
+import {ViewChild, ElementRef} from "@angular/core";
+
 import {Widget, Field} from "client-bus";
 import {GraphQlService} from "gql";
 
 import Atomize from "../_shared/atomize";
 import {Member, MemberAtom, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
-import {
-  addTypeahead,
-  uuidv4,
-  getTypeaheadVal,
-  setTypeaheadVal,
-  updateTypeaheadOptions
-} from "../_shared/utils";
+import Typeahead from "../_shared/Typeahead";
 
 
 @Widget({
@@ -24,12 +20,15 @@ import {
 export class AddMemberToGroupComponent {
   @Field("Group") group: GroupAtom;
 
+  @ViewChild("typeaheadWrapper") typeaheadWrapper: ElementRef;
+
   failed = false; // Shows failure message on not found
-  wrapId = uuidv4();
+  typeahead: Typeahead;
 
   private allMembers: Member[] = [];
   private nonMembers: Member[] = [];
   private fetched: string;
+
 
   constructor(
     private _groupService: GroupService,
@@ -37,9 +36,10 @@ export class AddMemberToGroupComponent {
   ) {}
 
   ngAfterViewInit() {
-    addTypeahead(this.wrapId, [])
+    Typeahead.loadAPI()
+      .then(() => this.typeahead = new Typeahead(this.typeaheadWrapper, []))
       .then(() => this._groupService.getMembers())
-      .then(members => {
+      .then((members: Member[]) => {
         this.allMembers = members;
         this.nonMembers = members.slice();
         this.updateTypeahead();
@@ -50,7 +50,7 @@ export class AddMemberToGroupComponent {
 
   onSubmit() {
     if (this.group.atom_id) {
-      const name = getTypeaheadVal(this.wrapId);
+      const name = this.typeahead.getValue();
       const member = this.nonMembers.find((m => m.name === name));
       if (member === undefined) {
         this.failed = true;
@@ -61,7 +61,7 @@ export class AddMemberToGroupComponent {
             member.atom_id
           )
           .then(success => {
-            if (success) setTypeaheadVal(this.wrapId, "");
+            if (success) this.typeahead.setValue("");
           });
       }
     } else {
@@ -116,6 +116,8 @@ export class AddMemberToGroupComponent {
   }
 
   private updateTypeahead() {
-    updateTypeaheadOptions(this.wrapId, this.nonMembers.map(m => m.name));
+    this.typeahead.updateData(this.nonMembers.map(member => {
+      return member.name;
+    }));
   }
 }

@@ -1,16 +1,12 @@
+import {ViewChild, ElementRef} from "@angular/core";
+
 import {Widget, Field} from "client-bus";
 import {GraphQlService} from "gql";
 
 import Atomize from "../_shared/atomize";
 import {Group, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
-import {
-  addTypeahead,
-  uuidv4,
-  getTypeaheadVal,
-  setTypeaheadVal,
-  updateTypeaheadOptions
-} from "../_shared/utils";
+import Typeahead from "../_shared/Typeahead";
 
 
 @Widget({
@@ -24,8 +20,10 @@ import {
 export class AddSubgroupToGroupComponent {
   @Field("Group") group: GroupAtom;
 
+  @ViewChild("typeaheadWrapper") typeaheadWrapper: ElementRef;
+
   failed = false; // Shows failure message on not found
-  wrapId = uuidv4();
+  typeahead: Typeahead;
 
   private allGroups: Group[] = [];
   private nonSubgroups: Group[] = [];
@@ -38,9 +36,10 @@ export class AddSubgroupToGroupComponent {
   ) {}
 
   ngAfterViewInit() {
-    addTypeahead(this.wrapId, [])
+    Typeahead.loadAPI()
+      .then(() => this.typeahead = new Typeahead(this.typeaheadWrapper, []))
       .then(() => this._groupService.getGroups())
-      .then(groups => {
+      .then((groups: Group[]) => {
         this.allGroups = groups;
         this.nonSubgroups = groups.slice();
         this.updateTypeahead();
@@ -51,7 +50,7 @@ export class AddSubgroupToGroupComponent {
 
   onSubmit() {
     if (this.group.atom_id) {
-      const name = getTypeaheadVal(this.wrapId);
+      const name = this.typeahead.getValue();
       const group = this.nonSubgroups.find((g => g.name === name));
       if (group === undefined) {
         this.failed = true;
@@ -62,7 +61,7 @@ export class AddSubgroupToGroupComponent {
             group.atom_id
           )
           .then(success => {
-            if (success) setTypeaheadVal(this.wrapId, "");
+            if (success) this.typeahead.setValue("");
           });
       }
     } else {
@@ -117,6 +116,8 @@ export class AddSubgroupToGroupComponent {
   }
 
   private updateTypeahead() {
-    updateTypeaheadOptions(this.wrapId, this.nonSubgroups.map(g => g.name));
+    this.typeahead.updateData(this.nonSubgroups.map(group => {
+      return group.name;
+    }));
   }
 }

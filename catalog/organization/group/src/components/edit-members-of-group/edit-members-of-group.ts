@@ -1,16 +1,12 @@
+import {ViewChild, ElementRef} from "@angular/core";
+
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
 import Atomize from "../_shared/atomize";
 import {Member, MemberAtom, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
-import {
-  addTypeahead,
-  uuidv4,
-  getTypeaheadVal,
-  setTypeaheadVal,
-  updateTypeaheadOptions
-} from "../_shared/utils";
+import Typeahead from "../_shared/Typeahead";
 
 
 @Widget({
@@ -25,8 +21,10 @@ export class EditMembersOfGroupComponent {
   @Field("Group") group: GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
+  @ViewChild("typeaheadWrapper") typeaheadWrapper: ElementRef;
+
   failMsg = "";
-  wrapId = uuidv4(); // Lets us find input in which to install typeahead
+  typeahead: Typeahead;
   stagedMembers: MemberAtom[] = []; // members we want to have in the group
 
   private allMembers: Member[] = [];
@@ -57,9 +55,10 @@ export class EditMembersOfGroupComponent {
   }
 
   ngAfterViewInit() {
-    addTypeahead(this.wrapId, [])
+    Typeahead.loadAPI()
+      .then(() => this.typeahead = new Typeahead(this.typeaheadWrapper, []))
       .then(() => this._groupService.getMembers())
-      .then(members => {
+      .then((members: Member[]) => {
         this.allMembers = members;
         this.nonMembers = members.slice();
         this.updateTypeahead();
@@ -70,13 +69,13 @@ export class EditMembersOfGroupComponent {
 
   // queues a member for adding once submit_ok is true
   stageMember(): void {
-    const name = getTypeaheadVal(this.wrapId);
+    const name = this.typeahead.getValue();
     const memberIdx = this.nonMembers.findIndex((m => m.name === name));
     if (memberIdx >= 0) {
       const member = this.nonMembers[memberIdx];
       this.nonMembers.splice(memberIdx, 1); // remove element
       this.stagedMembers.push(this._atomize.atomizeMember(member));
-      setTypeaheadVal(this.wrapId, "");
+      this.typeahead.setValue("");
       this.failMsg = "";
     } else {
       this.failMsg = "Member not found.";
@@ -171,6 +170,8 @@ export class EditMembersOfGroupComponent {
   }
 
   private updateTypeahead() {
-    updateTypeaheadOptions(this.wrapId, this.nonMembers.map(m => m.name));
+    this.typeahead.updateData(this.nonMembers.map(member => {
+      return member.name;
+    }));
   }
 }

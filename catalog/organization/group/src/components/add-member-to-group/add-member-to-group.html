@@ -1,5 +1,5 @@
 <form (ngSubmit)="onSubmit()" #addMemberForm="ngForm" class="form-horizontal">
-  <fieldset class="form-group" id="{{wrapId}}">
+  <fieldset #typeaheadWrapper class="form-group">
     <label class="sr-only" for="name">Member Name</label>
     <input required class="form-control typeahead" name="name"
       type="text" autocomplete="off" placeholder="Member Name"/>
