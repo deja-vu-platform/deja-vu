@@ -111,13 +111,11 @@ const schema = grafo
         .find({name: {$in: label_names}})
         .toArray()
         .then((labels: Label[]): string[] => {
-          // No results if searched for nonexistant label
+          // No results if searched for non-existent label
           if (labels.length < label_names.length) return [];
           // Get ids of items matching each label
           const item_ids_by_label = labels.map(label => {
-            const item_ids = label.items.map(item => {
-              return item.atom_id;
-            });
+            const item_ids = label.items.map(item => item.atom_id);
             return new Set(item_ids);
           });
           // Return the ids of items that matched all labels
