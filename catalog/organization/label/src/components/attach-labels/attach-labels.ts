@@ -2,10 +2,10 @@ import {ElementRef, ViewChild} from "@angular/core";
 import "rxjs/add/operator/toPromise";
 import * as _u from "underscore";
 
-import {Widget, Field, PrimitiveAtom, AfterInit} from "client-bus";
+import {Widget, Field, PrimitiveAtom, AfterInit, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {ItemAtom, Label} from "../../shared/data";
+import {ItemAtom, Label, LabelAtom} from "../_shared/data";
 import Select2 from "../_shared/select2";
 import {waitFor} from "../_shared/utils";
 
@@ -21,6 +21,7 @@ export class AttachLabelsComponent implements AfterInit {
   didSubmit: boolean = false;
 
   constructor(
+    private _clientBus: ClientBus,
     private _graphQlService: GraphQlService
   ) {}
 
@@ -48,6 +49,7 @@ export class AttachLabelsComponent implements AfterInit {
       });
 
     this.submit_ok.on_change(() => {
+      const item_id = this.item.atom_id;
       if (this.submit_ok.value === false) return;
 
       Promise.all<Label>(
@@ -66,12 +68,17 @@ export class AttachLabelsComponent implements AfterInit {
             .value()
           )
           .then((labels: Label[]) => {
-            this.item.labels = labels;
+            this.item.labels = labels.map(label => {
+              const label_atom = this._clientBus.new_atom<LabelAtom>("Label");
+              label_atom.atom_id = label.atom_id;
+              label_atom.name = label.name;
+              return label_atom;
+            });
             const attach_labels_str = this._graphQlService
                 .list(_u.map(labels, l => l.name));
             return this._graphQlService
               .get(`
-                item_by_id(atom_id: "${this.item.atom_id}") {
+                item_by_id(atom_id: "${item_id}") {
                   attach_labels(labels: ${attach_labels_str})
                 }
               `)

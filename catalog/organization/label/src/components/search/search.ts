@@ -4,7 +4,7 @@ import "rxjs/add/operator/map";
 import {Widget, Field, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {ItemAtom, ItemArrAtom} from "../../shared/data";
+import {ItemAtom, ItemArrAtom} from "../_shared/data";
 import Select2 from "../_shared/select2";
 
 
@@ -35,8 +35,7 @@ export class SearchComponent {
         const options = {
           data: labels,
           tags: true,
-          tokenSeparators: [","],
-          minimumResultsForSearch: 7
+          tokenSeparators: [","]
         };
         Select2.loadAPI().then(() => {
           this.select2 = new Select2(this.select, options);
@@ -46,15 +45,16 @@ export class SearchComponent {
 
   onSubmit() {
     this.items.arr = [];
-    const label = this.select2.getValues()[0];
+    const labels = this.select2.getValues();
+    const label_names_string = this._graphQlService.list(labels);
     this._graphQlService
       .get(`
-        itemsByLabel(label_name: "${label}") {
+        itemsByLabels(label_names: ${label_names_string}) {
           atom_id,
           name
         }
       `)
-      .map(data => data.itemsByLabel)
+      .map(data => data.itemsByLabels)
       .subscribe(items => items.forEach(item => {
         const item_atom = this._clientBus.new_atom<ItemAtom>("Item");
         item_atom.atom_id = item.atom_id;
