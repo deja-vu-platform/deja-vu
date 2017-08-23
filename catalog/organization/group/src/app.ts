@@ -275,14 +275,14 @@ const schema = grafo
 
 
 // gets all groups directly containing the member with given atom_id
-const getGroupsByDirectMember = (member_id: string): Promise<Group[]> => {
+function getGroupsByDirectMember(member_id: string): Promise<Group[]> {
   return mean.db.collection("groups")
     .find({members: {atom_id: member_id}})
     .toArray();
 }
 
 // gets all groups directly containing the subgroup with given atom_id
-const getGroupsByDirectSubgroup = (subgroup_id: string): Promise<Group[]> => {
+function getGroupsByDirectSubgroup(subgroup_id: string): Promise<Group[]> {
   return mean.db.collection("groups")
     .find({subgroups: {atom_id: subgroup_id}})
     .toArray();

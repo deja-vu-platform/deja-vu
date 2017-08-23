@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 
-import {ClientBus} from "client-bus";
+import {ClientBus, isAtom} from "client-bus";
 
 import {Member, MemberAtom, Group, GroupAtom} from "./data";
 
@@ -22,10 +22,10 @@ export default class Atomize {
     group_atom.name = group.name;
     if (group.members) {
       group_atom.members = group.members.map(member => {
-        if (member["on_change"] && member["on_after_change"]) {
-          return this.atomizeMember(member);
-        } else {
+        if (isAtom(member)) {
           return member as MemberAtom;
+        } else {
+          return this.atomizeMember(member);
         }
       });
     } else {
@@ -33,10 +33,10 @@ export default class Atomize {
     }
     if (group.subgroups) {
       group_atom.subgroups = group.subgroups.map(group => {
-        if (group["on_change"] && group["on_after_change"]) {
-          return this.atomizeGroup(group);
-        } else {
+        if (isAtom(group)) {
           return group as GroupAtom;
+        } else {
+          return this.atomizeGroup(group);
         }
       });
     } else {
