@@ -70,7 +70,7 @@ export default class Typeahead {
     };
     const $wrapper = $(wrapper.nativeElement);
     $wrapper.children("input").typeahead(typeaheadOptions, dataset);
-    this.$typeahead = $wrapper.children(".tt-input");
+    this.$typeahead = $wrapper.find(".tt-input");
   }
 
   getValue(): string {
