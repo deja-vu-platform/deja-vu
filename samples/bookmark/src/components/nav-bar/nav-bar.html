@@ -1,3 +1,4 @@
+<dv-widget name="LoggedIn" of="Auth"></dv-widget>
 <nav class="navbar navbar-default navbar-static-top">
   <div class="container navbar-header">
     <span class="navbar-brand">Bookmark</span>
@@ -12,8 +13,13 @@
         <a [routerLink]="['/users']">Users</a>
       </li>
     </ul>
-    <ul class="nav navbar-nav navbar-right" style="padding-top: 10px">
-      <dv-widget name="SignOutWithRedirect" of="Auth"></dv-widget>
+    <ul class="nav navbar-nav navbar-right">
+      <li>
+        <a>{{user.username}}</a>
+      </li>
+      <li>
+        <dv-widget name="SignOutWithRedirect" of="Auth"></dv-widget>
+      </li>
     </ul>
   </div>
 </nav>
