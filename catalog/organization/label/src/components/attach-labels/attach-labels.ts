@@ -33,8 +33,8 @@ export class AttachLabelsComponent implements AfterInit {
         }
       `)
       .subscribe(data => {
-        const labels = data.label_all.map((label, idx) => {
-          return {id: idx.toString(), text: label.name};
+        const labels = data.label_all.map((label, index) => {
+          return {id: index.toString(), text: label.name};
         });
         const options = {
           data: labels,

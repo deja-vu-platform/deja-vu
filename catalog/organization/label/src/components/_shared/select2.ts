@@ -7,6 +7,7 @@ const scriptSrc = "https://cdn.jsdelivr.net/select2/4.0.3/js/select2.min.js";
 const stylePath = "https://cdn.jsdelivr.net/select2/4.0.3/css/select2.min.css";
 
 // Instance of a Select2 box
+// (jQuery replacement for select box -- https://select2.github.io/)
 // Warning: make sure Select2.loadAPI() has resolved before instantiating
 export default class Select2 {
   $select: any; // jQuery object
@@ -34,7 +35,7 @@ export default class Select2 {
     return this.$select.select2("data").map(datum => datum.text);
   }
 
-  setValues(vals: string[]): void {
-    this.$select.val(vals).trigger("change");
+  setValues(values: string[]): void {
+    this.$select.val(values).trigger("change");
   }
 }
