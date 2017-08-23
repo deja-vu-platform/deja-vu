@@ -1,5 +1,7 @@
 // EXPORTED FUNCTIONS
 
+// TODO: Refactor all of these into catalog-level utils.
+
 // waits for a field of an object `obj[fld]` to be defined and non-null
 // returns a promise which
 //   resolves with `obj[fld]` once available
