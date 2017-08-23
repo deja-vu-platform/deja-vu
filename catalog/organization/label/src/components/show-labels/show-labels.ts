@@ -1,6 +1,6 @@
 import "rxjs/add/operator/toPromise";
 import {Widget, Field, AfterInit} from "client-bus";
-import {ItemAtom} from "../../shared/data";
+import {ItemAtom} from "../_shared/data";
 
 import {GraphQlService} from "gql";
 

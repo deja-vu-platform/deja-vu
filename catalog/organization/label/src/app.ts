@@ -8,6 +8,8 @@ import {Grafo} from "grafo";
 
 import * as _u from "underscore";
 
+import {Label, Item} from "./_shared/data";
+
 const uuid = require("uuid");
 
 
@@ -58,14 +60,22 @@ const schema = grafo
                 return mean.db.collection("items")
                   .updateOne({atom_id: item.atom_id}, up_op)
                   .then(_ => Promise.all([
-                      bus.update_atom("Item", item.atom_id, up_op),
-                      Promise.all(
-                        label_objs.map(l => bus
-                          .update_atom(
+                    bus.update_atom("Item", item.atom_id, up_op),
+                    Promise.all(
+                      label_objs.map(l => 
+                        mean.db.collection("labels")
+                          .updateOne(
+                            {atom_id: l.atom_id},
+                            {$addToSet: {items: {atom_id: item.atom_id}}}
+                          )
+                          .then(_ => bus.update_atom(
                             "Label", l.atom_id,
-                            {$addToSet: {items: {atom_id: item.atom_id}}})))
-                      ]));
-                    })
+                            {$addToSet: {items: {atom_id: item.atom_id}}}
+                          ))
+                      )
+                    )
+                  ]));
+              })
               .then(_ => true)
       }
     }
@@ -91,18 +101,34 @@ const schema = grafo
     }
   })
   .add_query({
-    name: "itemsByLabel",
+    name: "itemsByLabels",
     "type": "[Item]",
     args: {
-      label_name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      label_names: {"type": new graphql.GraphQLList(graphql.GraphQLString)},
     },
-    resolve: (_, {label_name}) => {
+    resolve: (_, {label_names}): Item[] => {
       return mean.db.collection("labels")
-        .findOne({name: label_name})
-        .then(label => mean.db.collection("items")
-          .find({labels: {$elemMatch: {atom_id: label.atom_id}}})
-          .toArray()
-        );
+        .find({name: {$in: label_names}})
+        .toArray()
+        .then((labels: Label[]): string[] => {
+          // No results if searched for non-existent label
+          if (labels.length < label_names.length) return [];
+          // Get ids of items matching each label
+          const item_ids_by_label = labels.map(label => {
+            const item_ids = label.items.map(item => item.atom_id);
+            return new Set(item_ids);
+          });
+          // Return the ids of items that matched all labels
+          const item_ids_intersection = Array.from(item_ids_by_label.reduce(
+            (inAllSoFar, nextLabel) => intersection(inAllSoFar, nextLabel)
+          ));
+          return item_ids_intersection;
+        })
+        .then((item_ids: string[]): Item[] => {
+          return mean.db.collection("items")
+            .find({atom_id: {$in: item_ids}})
+            .toArray()
+        });
     }
   })
   .add_mutation({
@@ -245,5 +271,17 @@ const handlers = {
 
 bus = new ServerBus(
     mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
+
+// Get the intersection of two sets.
+// Why is this not built in???
+function intersection<T>(set1: Set<T>, set2: Set<T>) {
+  const output = new Set();
+  set2.forEach(element => {
+    if (set1.has(element)) {
+      output.add(element);
+    }
+  });
+  return output;
+}
 
 grafo.init().then(_ => mean.start());
