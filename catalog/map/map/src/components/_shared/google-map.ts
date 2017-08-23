@@ -4,7 +4,7 @@ import {} from "@types/googlemaps";
 import {insertTag, waitFor, getOrDefault} from "./utils";
 
 // This class uses legacy modules which cannot be imported
-// Re-do with agm package once this is possible
+// Re-do with agm package (angular google maps) once this is possible
 
 const init_script = `
   function afterInitGoogleMapsAPI() {
