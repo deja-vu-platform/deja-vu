@@ -1,38 +1,31 @@
+import {NgZone} from "@angular/core";
+import "rxjs/add/operator/map";
+
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
-import {MarkerAtom, MapAtom} from "../../shared/data";
-import {
-  getGoogleMapsAPI,
-  waitFor,
-  getMapObject,
-  MARKER_ICONS
-} from "../../shared/utils";
-import {NgZone} from "@angular/core";
 
-import "rxjs/add/operator/map";
+import {MarkerAtom, MapAtom} from "../_shared/data";
+import GoogleMap from "../_shared/google-map";
+import {waitFor} from "../_shared/utils";
 
 
 @Widget({
   fqelement: "Map",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService
+  ]
 })
 export class CreateMarkerButtonComponent {
+  @Field("Map") map: MapAtom;
   @Field("Marker") marker: MarkerAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
-  @Field("Map") map: MapAtom;
-
-  gmapsAPI: any;
 
   constructor(private _graphQlService: GraphQlService, private zone: NgZone) {}
 
   ngAfterViewInit() {
-    getGoogleMapsAPI()
-      .then(gmapsAPI => this.gmapsAPI = gmapsAPI)
-      .then(_ => waitFor(this.map, "atom_id"))
-      .then(_ => getMapObject(this.map.atom_id))
-      .then(mapObj => this.map.obj = mapObj)
-      .then(_ => this.initMarker())
-      .then(_ => this.addListeners());
+    waitFor(this.map, "atom_id")
+      .then((map_id: string): Promise<GoogleMap> => waitFor(window, map_id))
+      .then((gmap: GoogleMap) => this.addListeners(gmap));
   }
 
   // adds a marker to the db
@@ -55,45 +48,22 @@ export class CreateMarkerButtonComponent {
       });
   }
 
-  // puts marker on the map
-  // at first, marker is invisible and map is unchanged
-  initMarker() {
-    if (!this.marker.obj) {
-      const center = this.map.obj.getCenter();
-      const position = {lat: center.lat(), lng: center.lng()};
-      this.marker.obj = new this.gmapsAPI.Marker({
-        position: position,
-        map: this.map.obj,
-        icon: MARKER_ICONS.BLUE,
-        visible: false
-      });
-    }
-  }
-
   // watch for map clicks and changes in position form
-  addListeners() {
-    // on map click: update marker position
-    this.map.obj.addListener("click", (e) => {
-      // update must be done this way to get to form
+  addListeners(gmap: GoogleMap) {
+    gmap.addClickMarker((latLng: google.maps.LatLngLiteral) => {
+      // need to use zone so that angular realizes that there are changes
       this.zone.run(() => {
-        this.marker.lat = e.latLng.lat();
-        this.marker.lng = e.latLng.lng();
+        this.marker.lat = latLng.lat;
+        this.marker.lng = latLng.lng;
       });
     });
 
-    // on change to marker: move the marker on the map
+    // on change to marker field: move the marker on the map
     this.marker.on_change(() => {
       if (this.marker.lat !== undefined && this.marker.lng !== undefined) {
-        this.updatePosition(this.marker);
+        gmap.moveClickMarker(this.marker, true);
       }
     });
-  }
-
-  // update the marker's position on the map
-  updatePosition(position) {
-    this.marker.obj.setVisible(true);
-    this.marker.obj.setPosition(position);
-    this.map.obj.panTo(position);
   }
 
   valid() {

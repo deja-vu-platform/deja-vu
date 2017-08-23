@@ -1,6 +1,7 @@
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
-import {MarkerAtom} from "../../shared/data";
+
+import {MarkerAtom} from "../_shared/data";
 
 @Widget({
   fqelement: "Map",
