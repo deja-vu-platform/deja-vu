@@ -51,7 +51,7 @@ export default class GoogleMap {
   bounds: google.maps.LatLngBounds;
   markers: Set<google.maps.Marker>;
   clickMarker: google.maps.Marker;
-  clickListner: (pos: google.maps.LatLngLiteral) => void;
+  clickListener: (pos: google.maps.LatLngLiteral) => void;
   infoWindow: google.maps.InfoWindow;
   searchBox: google.maps.places.SearchBox;
   searchMarkers: google.maps.Marker[];
@@ -128,9 +128,9 @@ export default class GoogleMap {
 
   // After calling this method, clicking the map will drop a blue marker
   // Clicking it again will move the marker
-  // Listner is called with the position of the marker when it changes
+  // Listener is called with the position of the marker when it changes
   addClickMarker(
-    listner?: (pos: google.maps.LatLngLiteral) => void,
+    listener?: (pos: google.maps.LatLngLiteral) => void,
     position: google.maps.LatLng | google.maps.LatLngLiteral = mit
   ) {
     if (!this.clickMarker) {
@@ -144,12 +144,12 @@ export default class GoogleMap {
         this.clickMarker.setVisible(true);
         this.moveClickMarker(e.latLng);
       });
-      this.clickListner = listner;
+      this.clickListener = listener;
     }
   }
 
   // Programatically move the click marker
-  // Use silent to not call clickListner
+  // Use silent to not call clickListener
   moveClickMarker(
     position: google.maps.LatLng | google.maps.LatLngLiteral,
     silent = false
@@ -161,8 +161,8 @@ export default class GoogleMap {
         marker.setIcon(red);
       });
       this.infoWindow.close();
-      if (this.clickListner && !silent) {
-        this.clickListner(this.forceLatLngLiteral(position));
+      if (this.clickListener && !silent) {
+        this.clickListener(this.forceLatLngLiteral(position));
       }
     }
   }
@@ -207,8 +207,8 @@ export default class GoogleMap {
         this.clickMarker.setVisible(false);
         marker.setIcon(blue);
       }
-      if (this.clickListner) {
-        this.clickListner(this.forceLatLngLiteral(marker.getPosition()));
+      if (this.clickListener) {
+        this.clickListener(this.forceLatLngLiteral(marker.getPosition()));
       }
     });
     this.markers.add(marker);
