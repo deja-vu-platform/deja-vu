@@ -51,6 +51,7 @@ export class CreateMarkerButtonComponent {
   // watch for map clicks and changes in position form
   addListeners(gmap: GoogleMap) {
     gmap.addClickMarker((latLng: google.maps.LatLngLiteral) => {
+      // need to use zone so that angular realizes that there are changes
       this.zone.run(() => {
         this.marker.lat = latLng.lat;
         this.marker.lng = latLng.lng;
