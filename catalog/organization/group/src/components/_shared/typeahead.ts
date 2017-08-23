@@ -3,15 +3,17 @@ import {} from "@types/typeahead";
 
 import {insertTag, waitFor} from "./utils";
 
-const scriptSrc = "https://cdnjs.cloudflare.com/ajax/libs/corejs-typeahead/"+
-  "1.1.1/typeahead.bundle.min.js";
-const stylePath = "node_modules/dv-organization-group/lib/"+
-  "components/_shared/typeahead.css";
-
+// This class uses legacy packages which cannot be imported
+// Re-do with an angular package once this is possible
 
 // Instance of a Twitter Typeahead using a single string dataset
 // Warning: make sure Typeahead.loadAPI() has resolved before instantiating
 export default class Typeahead {
+  private static scriptSrc = "https://cdnjs.cloudflare.com/ajax/libs/"+
+    "corejs-typeahead/1.1.1/typeahead.bundle.min.js";
+  private static stylePath = "node_modules/dv-organization-group/lib/"+
+    "components/_shared/typeahead.css";
+
   $typeahead: any; // jQuery object
   bloodhound: Bloodhound<string>;
 
@@ -20,23 +22,23 @@ export default class Typeahead {
       .then(_ => {
         // insert tags to load API and styles from CDN
         if (
-          !window[scriptSrc] &&
+          !window[Typeahead.scriptSrc] &&
           !window["jQuery"].fn.typeahead &&
           !window["Bloodhound"]
         ) {
           insertTag("script", {
-            src: scriptSrc,
-            id: scriptSrc,
+            src: Typeahead.scriptSrc,
+            id: Typeahead.scriptSrc,
             async: true,
             defer: true
           });
         }
-        if (!window[stylePath]) {
+        if (!window[Typeahead.stylePath]) {
           insertTag("link", {
             type: "text/css",
             rel: "stylesheet",
-            href: stylePath,
-            id: stylePath
+            href: Typeahead.stylePath,
+            id: Typeahead.stylePath
           });
         }
         return Promise.all([
