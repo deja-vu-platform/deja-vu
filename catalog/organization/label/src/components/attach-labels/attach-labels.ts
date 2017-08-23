@@ -6,8 +6,8 @@ import {Widget, Field, PrimitiveAtom, AfterInit} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {ItemAtom, Label} from "../../shared/data";
-import Select2 from "../shared/Select2";
-import {waitFor} from "../shared/utils";
+import Select2 from "../_shared/select2";
+import {waitFor} from "../_shared/utils";
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
 export class AttachLabelsComponent implements AfterInit {

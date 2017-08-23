@@ -1,6 +1,6 @@
 import {Widget, Field} from "client-bus";
 
-import {ItemAtom} from "../../shared/data";
+import {ItemAtom} from "../_shared/data";
 
 @Widget({
   fqelement: "Label",

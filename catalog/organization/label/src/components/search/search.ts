@@ -5,7 +5,7 @@ import {Widget, Field, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {ItemAtom, ItemArrAtom} from "../../shared/data";
-import Select2 from "../shared/Select2";
+import Select2 from "../_shared/select2";
 
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
