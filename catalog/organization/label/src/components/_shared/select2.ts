@@ -10,7 +10,7 @@ import {loadScript, loadStylesheet, waitFor} from "./utils";
 // (jQuery replacement for select box -- https://select2.github.io/)
 // Warning: make sure Select2.loadAPI() has resolved before instantiating
 export default class Select2 {
-  private static scriptSrc = 
+  private static scriptSrc =
     "https://cdn.jsdelivr.net/select2/4.0.3/js/select2.min.js";
   private static stylePath =
     "https://cdn.jsdelivr.net/select2/4.0.3/css/select2.min.css";

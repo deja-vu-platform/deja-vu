@@ -7,7 +7,6 @@ import {GraphQlService} from "gql";
 
 import {ItemAtom, Label, LabelAtom} from "../_shared/data";
 import Select2 from "../_shared/select2";
-import {waitFor} from "../_shared/utils";
 
 @Widget({fqelement: "Label", ng2_providers: [GraphQlService]})
 export class AttachLabelsComponent implements AfterInit {
@@ -52,7 +51,7 @@ export class AttachLabelsComponent implements AfterInit {
       const item_id = this.item.atom_id;
       if (this.submit_ok.value === false) return;
 
-      Promise.all<Label>(
+      return Promise.all<Label>(
           _u.chain(this.select2.getValues())
             .map(l => l.trim())
             .uniq()
@@ -90,12 +89,9 @@ export class AttachLabelsComponent implements AfterInit {
     });
 
     this.submit_ok.on_after_change(() => {
-      waitFor(this, "didSubmit").then(() => {
-        this.item.atom_id = undefined;
-        this.item.labels = [];
-        this.select2.setValues([]);
-        this.didSubmit = false;
-      });
+      this.item.atom_id = undefined;
+      this.item.labels = [];
+      this.select2.setValues([]);
     });
   }
 }
