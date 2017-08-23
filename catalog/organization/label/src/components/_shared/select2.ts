@@ -1,7 +1,7 @@
 import {ElementRef} from "@angular/core";
 import {} from "@types/select2";
 
-import {loadScript, loadStylesheet, waitFor} from "./utils";
+import {insertTag, waitFor} from "./utils";
 
 // Note: Using legacy modules which cannot be imported
 // Re-do with angular packages once this is possible
@@ -22,10 +22,20 @@ export default class Select2 {
       .then(_ => {
         // insert tags to load API and styles from CDN
         if (!window[Select2.scriptSrc] && !window["jQuery"].fn.select2) {
-          loadScript(Select2.scriptSrc);
+          insertTag("script", {
+            src:Select2.scriptSrc,
+            id: Select2.scriptSrc,
+            async: true,
+            defer: true
+          });
         }
         if (!window[Select2.stylePath]) {
-          loadStylesheet(Select2.stylePath);
+          insertTag("link", {
+            type: "text/css",
+            rel: "stylesheet",
+            href: Select2.stylePath,
+            id: Select2.stylePath
+          });
         }
         return waitFor(window["jQuery"].fn, "select2");
       });
