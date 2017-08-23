@@ -3,7 +3,7 @@ import {ElementRef, ViewChild, NgZone} from "@angular/core";
 import {Widget, Field, ClientBus} from "client-bus";
 
 import {MapAtom} from "../_shared/data";
-import GoogleMap from "../_shared/GoogleMap";
+import GoogleMap from "../_shared/google-map";
 import {waitFor} from "../_shared/utils";
 
 

@@ -3,7 +3,7 @@ import {ElementRef, ViewChild} from "@angular/core";
 import {Widget, Field} from "client-bus";
 
 import {MapAtom} from "../_shared/data";
-import GoogleMap from "../_shared/GoogleMap";
+import GoogleMap from "../_shared/google-map";
 import {waitFor} from "../_shared/utils";
 
 @Widget({fqelement: "Map"})

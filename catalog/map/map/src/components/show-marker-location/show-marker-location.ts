@@ -2,7 +2,7 @@ import {Widget, Field} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {MarkerAtom} from "../_shared/data";
-import GoogleMap from "../_shared/GoogleMap";
+import GoogleMap from "../_shared/google-map";
 import {waitFor} from "../_shared/utils";
 
 @Widget({
