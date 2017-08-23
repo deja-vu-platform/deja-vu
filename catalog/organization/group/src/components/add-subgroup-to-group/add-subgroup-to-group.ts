@@ -6,7 +6,7 @@ import {GraphQlService} from "gql";
 import Atomize from "../_shared/atomize";
 import {Group, GroupAtom} from "../_shared/data";
 import GroupService from "../_shared/group.service";
-import Typeahead from "../_shared/Typeahead";
+import Typeahead from "../_shared/typeahead";
 
 
 @Widget({
