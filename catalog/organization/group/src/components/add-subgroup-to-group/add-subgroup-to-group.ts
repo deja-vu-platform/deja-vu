@@ -51,7 +51,7 @@ export class AddSubgroupToGroupComponent {
   onSubmit() {
     if (this.group.atom_id) {
       const name = this.typeahead.getValue();
-      const group = this.nonSubgroups.find((g => g.name === name));
+      const group = this.nonSubgroups.find(g => g.name === name);
       if (group === undefined) {
         this.failed = true;
       } else {
