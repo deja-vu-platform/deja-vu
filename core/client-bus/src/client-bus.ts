@@ -623,7 +623,7 @@ export function Field(tname: string) {
 /**
  * Checks if an object satisfies the Atom interface.
  **/
-export function isAtom(maybeAtom: object): boolean {
+export function isAtom(maybeAtom: object): maybeAtom is Atom {
   return (
     _u.isString(maybeAtom["atom_id"]) &&
     _u.isFunction(maybeAtom["on_change"]) &&
