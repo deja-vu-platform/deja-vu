@@ -16,7 +16,7 @@ export class EditNameOfMemberComponent {
   @Field("Member") member: MemberAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  private req: Promise<boolean> = null;
+  failMsg: string;
   private fetched: string;
 
   constructor(private _groupService: GroupService) {}
@@ -36,18 +36,19 @@ export class EditNameOfMemberComponent {
         this.member.atom_id &&
         this.member.name
       ) {
-        this.req = this._groupService.updateNameOfMember(
-          this.member.atom_id,
-          this.member.name
-        );
+        return this._groupService
+          .updateNameOfMember(
+            this.member.atom_id,
+            this.member.name
+          )
+          .then(success => {
+            this.failMsg = success ? "" : "Failed to update member name.";
+          });
       }
     });
 
     this.submit_ok.on_after_change(() => {
-      if (this.req) this.req.then(success => {
-        this.member.name = "";
-        this.req = null;
-      });
+      this.member.name = "";
     });
   }
 

@@ -16,7 +16,7 @@ export class EditNameOfGroupComponent {
   @Field("Group") group: GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  private req: Promise<boolean> = null;
+  failMsg: string;
   private fetched: string;
 
   constructor(private _groupService: GroupService) {}
@@ -36,18 +36,19 @@ export class EditNameOfGroupComponent {
         this.group.atom_id &&
         this.group.name
       ) {
-        this.req = this._groupService.updateNameOfGroup(
-          this.group.atom_id,
-          this.group.name
-        );
+        return this._groupService
+          .updateNameOfGroup(
+            this.group.atom_id,
+            this.group.name
+          )
+          .then(success => {
+            this.failMsg = success ? "" : "Failed to update group name.";
+          });
       }
     });
 
     this.submit_ok.on_after_change(() => {
-      if (this.req) this.req.then(success => {
-        this.group.name = "";
-        this.req = null;
-      });
+      this.group.name = "";
     });
   }
 

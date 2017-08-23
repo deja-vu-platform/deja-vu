@@ -29,7 +29,6 @@ export class EditSubgroupsOfGroupComponent {
 
   private allGroups: Group[] = [];
   private nonSubgroups: Group[] = [];
-  private req: Promise<boolean> = null;
   private fetched: string;
 
 
@@ -41,16 +40,10 @@ export class EditSubgroupsOfGroupComponent {
   dvAfterInit() {
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === true && this.group.atom_id) {
-        this.req = this.updateSubgroups();
-      }
-    });
-
-    this.submit_ok.on_after_change(() => {
-      if (this.req) {
-        this.req.then(success => {
-          this.failMsg = success ? "" : "Error when editing subgroups.";
-          this.req = null;
-        });
+        return this.updateSubgroups()
+          .then(success => {
+            this.failMsg = success ? "" : "Error when editing subgroups.";
+          });
       }
     });
   }

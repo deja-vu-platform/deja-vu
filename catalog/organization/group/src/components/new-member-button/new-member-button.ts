@@ -16,6 +16,8 @@ export class NewMemberButtonComponent {
   @Field("Member") member: MemberAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
+  failMsg: string;
+
   constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
@@ -33,6 +35,9 @@ export class NewMemberButtonComponent {
         if (atom_id) {
           this.member.atom_id = atom_id;
           this.submit_ok.value = true;
+          this.failMsg = "";
+        } else {
+          this.failMsg = "Failed to create member.";
         }
       });
   }

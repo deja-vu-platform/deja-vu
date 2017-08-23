@@ -16,6 +16,8 @@ export class NewGroupButtonComponent {
   @Field("Group") group : GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
+  failMsg: string;
+
   constructor(private _groupService: GroupService) {}
 
   dvAfterInit() {
@@ -33,6 +35,9 @@ export class NewGroupButtonComponent {
         if (atom_id) {
           this.group.atom_id = atom_id;
           this.submit_ok.value = true;
+          this.failMsg = "";
+        } else {
+          this.failMsg = "Failed to create group.";
         }
       });
   }

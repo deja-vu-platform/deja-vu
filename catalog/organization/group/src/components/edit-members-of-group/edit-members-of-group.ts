@@ -29,7 +29,6 @@ export class EditMembersOfGroupComponent {
 
   private allMembers: Member[] = [];
   private nonMembers: Member[] = [];
-  private req: Promise<boolean> = null;
   private fetched: string;
 
   constructor(
@@ -40,16 +39,10 @@ export class EditMembersOfGroupComponent {
   dvAfterInit() {
     this.submit_ok.on_change(() => {
       if (this.submit_ok.value === true && this.group.atom_id) {
-        this.req = this.updateMembers();
-      }
-    });
-
-    this.submit_ok.on_after_change(() => {
-      if (this.req) {
-        this.req.then(success => {
-          this.failMsg = success ? "" : "Error when editing members.";
-          this.req = null;
-        });
+        return this.updateMembers()
+          .then(success => {
+            this.failMsg = success ? "" : "Error when editing members.";
+          });
       }
     });
   }
