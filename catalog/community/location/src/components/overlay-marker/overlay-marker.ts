@@ -8,7 +8,7 @@ import GoogleMap from "../_shared/google-map";
 import {waitFor} from "../_shared/utils";
 
 @Widget({
-  fqelement: "Map",
+  fqelement: "Location",
   ng2_providers: [GraphQlService]
 })
 export class OverlayMarkerComponent {

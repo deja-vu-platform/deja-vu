@@ -2,7 +2,7 @@ app SweetSpots {
   include access/Auth[
     User for User
   ]
-  include map/Map[
+  include community/Location[
     Spot for Marker,
     MapData for Map,
     SpotInfoWindow replacing MarkerInfoWindow in OverlayMarker

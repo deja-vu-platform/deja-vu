@@ -10,7 +10,7 @@ import {GraphQlService} from "gql";
 import {MarkerAtom, MapAtom} from "../_shared/data";
 
 @Widget({
-  fqelement: "Map",
+  fqelement: "Location",
   ng2_providers: [GraphQlService]
 })
 export class OverlayMarkersComponent {

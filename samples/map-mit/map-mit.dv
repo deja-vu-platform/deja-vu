@@ -5,17 +5,17 @@ app MapMit {
   include access/Auth[User for User]
 
   // One map shows the locations of events
-  include map/Map[
+  include community/Location[
     CampusEvent for Marker,
     CampusMap for Map,
     EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
 
   // Another map allows the user to search for places to set event location
-  include map/Map[
+  include community/Location[
     CampusEvent for Marker,
     CampusMap for Map
-  ] as CreateEventMap
+  ] as CreateEventLocation
 
   include organization/Event[
     CampusEvent for Event,
@@ -40,7 +40,9 @@ app MapMit {
 
   data GroupData {}
 
-  global_map: CampusMap = {}
+  events_map: CampusMap = {}
+
+  search_map: CampusMap = {}
 
   main widget Login {
     on_signin_ok: Widget = Home
@@ -55,19 +57,19 @@ app MapMit {
   }
 
   widget Home {
-    map: CampusMap = global_map
+    map: CampusMap = events_map
   }
 
   widget MyEvents {}
 
   widget CreateEvent {
-    map: CampusMap = global_map,
+    map: CampusMap = search_map,
     event: CampusEvent,
     submit_ok: boolean
   }
 
   widget DisplayEvent {
-    map: CampusMap = global_map,
+    map: CampusMap = events_map,
     event: CampusEvent
   }
 
