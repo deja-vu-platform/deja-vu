@@ -18,20 +18,20 @@ cliche Follow {
   }
 
   // Button allowing the creation of a Follower
-  widget NewFollower {
+  widget NewFollowerButton {
     follower: Follower
     submit_ok: boolean
   }
 
   // Button allowing the creation of a Publisher
-  widget NewPublisher {
+  widget NewPublisherButton {
     publisher: Publisher
     submit_ok: boolean
   }
 
   // Button allowing the creation of a Message
   // Must be used in a scope where publisher is defined
-  widget NewMessage {
+  widget NewMessageButton {
     message: Message,
     publisher: Publisher,
     submit_ok: boolean
