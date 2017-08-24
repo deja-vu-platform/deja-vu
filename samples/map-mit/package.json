@@ -8,7 +8,7 @@
   "dependencies": {
     "dv-lang": "file:../../core/lang",
     "dv-access-auth": "file:../../catalog/access/auth",
-    "dv-map-map": "file:../../catalog/map/map",
+    "dv-community-location": "file:../../catalog/community/location",
     "dv-organization-event": "file:../../catalog/organization/event",
     "dv-organization-group": "file:../../catalog/organization/group"
   },
