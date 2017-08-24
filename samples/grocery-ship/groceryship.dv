@@ -2,6 +2,6 @@ app GroceryShip {
   include access/Auth
   include community/Market
   include community/Rating
-  include organization/List
+  include organization/Checklist
   include organization/Task
 }
