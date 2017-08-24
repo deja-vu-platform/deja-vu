@@ -1,7 +1,7 @@
 import {Widget, Field, AfterInit, ClientBus} from "client-bus";
-
 import {GraphQlService} from "gql";
 import "rxjs/add/operator/toPromise";
+import * as _ from "lodash";
 
 import {TargetAtom, SourceAtom} from "../../shared/data";
 import {doesFollow} from "../../shared/utils";
@@ -82,8 +82,8 @@ export class FollowUnfollowComponent implements AfterInit {
       `)
       .subscribe(res => {
         if (res) {
-          filterInPlace(this.source.follows, (t) => {
-             return t.atom_id !== this.target.atom_id;
+          _.remove(this.source.follows, (target) => {
+             return target.atom_id !== this.target.atom_id;
           });
         }
       });
@@ -92,15 +92,4 @@ export class FollowUnfollowComponent implements AfterInit {
   doesFollow(source: SourceAtom, target: TargetAtom): boolean {
     return doesFollow(source, target);
   }
-}
-
-function filterInPlace<T>(arr: T[], f: (elm: T) => boolean): T[] {
-  let out = 0;
-  for (let i = 0; i < arr.length; i++) {
-    if (f(arr[i])) {
-      arr[out++] = arr[i];
-    }
-  }
-  arr.length = out;
-  return arr;
 }

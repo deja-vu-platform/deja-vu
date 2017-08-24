@@ -8,7 +8,7 @@ import {
 } from "@angular/core";
 import {Router, ActivatedRoute} from "@angular/router";
 
-import * as _u from "underscore";
+import * as _ from "lodash";
 import * as _ustring from "underscore.string";
 
 declare const System: any;
@@ -57,7 +57,7 @@ export interface WidgetValue {
 // T should be one of string, boolean, number, Date, Datetime, Time, WidgetValue
 export interface PrimitiveAtom<T> extends OnChange { value: T; }
 
-class AdaptableAtom {
+export class AdaptableAtom {
   private readonly _forwards = {};
   private readonly _on_change_listeners: Handler[] = [];
   private readonly _on_after_change_listeners: Handler[] = [];
@@ -163,7 +163,7 @@ export class ClientBus {
 
     const route = this._route_config.widgets[to_widget_info.name];
     const query_params = {};
-    _u.each(_u.keys(adapt_table), target_fname => {
+    _.each(_.keys(adapt_table), target_fname => {
       const finfo = adapt_table[target_fname];
       const fvalue = to_widget_info.this_widget[finfo.host_fname];
       const ftype = finfo.ftype.name;
@@ -237,7 +237,8 @@ export type FieldReplacingMap = {
 @Component({template: `<dv-widget [name]="name" [init]="init"></dv-widget>`})
 export class RouteLoader implements OnInit {
   PRIMITIVE_TYPES = ["text", "boolean", "date", "datetime", "number"];
-  name: string; init: any;
+  name: string;
+  init: {[key: string]: OnChange};
 
   constructor(
     @Inject("RouteConfig") private _route_config,
@@ -246,7 +247,7 @@ export class RouteLoader implements OnInit {
 
   ngOnInit() {
     this._activated_route.url.subscribe(url_segments => {
-      const path = _u.pluck(url_segments, "path").join("/");
+      const path = _.map(url_segments, "path").join("/");
       let widget = this._route_config.routes[path];
       if (widget === undefined) { // Redirect to the main widget
         this._loc.replaceState("/");
@@ -258,15 +259,15 @@ export class RouteLoader implements OnInit {
     });
 
     this._activated_route.queryParams.subscribe(query_params => {
-      this.init = _u.mapObject(query_params, (value, field) => {
+      this.init = _.mapValues(query_params, (value, field) => {
         let [fvalue, ftype] = value.split(",");
-        let ret;
+        let ret: OnChange;
         if (this.PRIMITIVE_TYPES.indexOf(ftype) > -1) {
           ret = this._client_bus.new_primitive_atom(ftype);
-          ret.value = fvalue;
+          (<PrimitiveAtom<any>>ret).value = fvalue;
         } else {
           ret = this._client_bus.new_atom(ftype);
-          ret.atom_id = fvalue;
+          (<Atom>ret).atom_id = fvalue;
         }
         return ret;
       });
@@ -281,7 +282,8 @@ export class WidgetLoader implements OnChanges {
 
   @Input() name: string;
   @Input() of: string;
-  @Input() init: any; // optional values to initialize the widget fields
+  // optional values to initialize the widget fields
+  @Input() init: {[key: string]: AdaptableAtom};
 
   constructor(
       private _resolver: ComponentFactoryResolver,
@@ -330,7 +332,7 @@ export class WidgetLoader implements OnChanges {
         this.name = replace_widget.replaced_by.name;
         this.of = replace_widget.replaced_by.fqelement;
 
-        _u.each(replace_widget.map, (rinfo, f) => {
+        _.each(replace_widget.map, (rinfo, f) => {
           field_replacing_map[rinfo.maps_to] = {
             replacing_field: f, replacing_field_type: rinfo.type
           };
@@ -338,7 +340,7 @@ export class WidgetLoader implements OnChanges {
 
         // map the init values
         const modified_init_fields = {};
-        _u.each(this.init, (val, key) => {
+        _.each(this.init, (val, key) => {
           let new_key_info = field_replacing_map[key];
           if (new_key_info !== undefined) {
             modified_init_fields[new_key_info.replacing_field] = val
@@ -355,7 +357,7 @@ export class WidgetLoader implements OnChanges {
         // replaced could have fields that have no matched field in the
         // replacing widget
         const modified_adapt_table = {};
-        _u.each(adapt_table, (finfo, target_fname) => {
+        _.each(adapt_table, (finfo, target_fname) => {
           const rinfo = field_replacing_map[target_fname];
           if (rinfo !== undefined) {
             modified_adapt_table[rinfo.replacing_field] = {
@@ -385,7 +387,7 @@ export class WidgetLoader implements OnChanges {
     console.log(
       `Loading ${name} of ${fqelement} with adapt table ` +
       `${JSON.stringify(adapt_table, null, 2)} and init fields ` +
-      _u.isEmpty(init_fields));
+      _.isEmpty(init_fields));
     return System
       .import(imp)
       .then(mod => mod[name + "Component"])
@@ -421,7 +423,7 @@ export class WidgetLoader implements OnChanges {
         return c;
       })
       .then(c => {
-        _u.each(_u.keys(c), f => {
+        _.each(_.keys(c), f => {
           const adapt_info = adapt_table[f];
           if (adapt_info !== undefined) {
             const host_fname = adapt_info.host_fname;
@@ -450,7 +452,7 @@ export class WidgetLoader implements OnChanges {
       })
       .then(c => { // initialize fields with init values
         if (init_fields !== undefined) {
-          _u.each(_u.keys(c), f => {
+          _.each(_.keys(c), f => {
             const init_value = init_fields[f];
             if (init_value !== undefined) {
               c[f] = init_value;
@@ -476,14 +478,13 @@ export class WidgetLoader implements OnChanges {
 
 function build_adapt_table(
   from_widget: Type, to_widget: Type, fbonds: FieldBond[]): AdaptTable {
-  const ret = _u.chain(fbonds)
+  const ret = _(fbonds)
     // We just look at the wbonds that involve the host...
-    .filter(wbond => _u.isEqual(from_widget, wbond.subfield.of))
+    .filter(wbond => _.isEqual(from_widget, wbond.subfield.of))
     // ...and the widget we are loading
-    .filter(wbond => !_u.chain(wbond.fields).pluck("of")
-        .where(to_widget).isEmpty().value())
+    .filter(wbond => !_(wbond.fields).map("of").filter(to_widget).isEmpty())
     .map((wbond: FieldBond) => {
-      const wfield: Field = _u.chain(wbond.fields)
+      const wfield: Field = _(wbond.fields)
         .filter(f => t_equals(f.of, to_widget)).value()[0];
       return {
         fname: wfield.name,
@@ -497,8 +498,7 @@ function build_adapt_table(
     .reduce((memo, finfo) => {
       memo[finfo.fname] = finfo.info;
       return memo;
-    }, {})
-    .value();
+    }, {});
 
   console.log(
       "Adapt table for " + JSON.stringify(from_widget) + " to " +

@@ -1,0 +1,9 @@
+<ul *ngIf="checklist && checklist.items && checklist.items.length > 0"
+  class="list-group">
+  <li *ngFor="let item of checklist.items" class="list-group-item">
+    <dv-widget name="ShowItem" [init]="{item: item}"></dv-widget>
+  </li>
+</ul>
+<div *ngIf="!checklist || !checklist.items || checklist.items.length == 0">
+  No items
+</div>
