@@ -1,7 +1,5 @@
 import {Widget, Field, AfterInit, ClientBus} from "client-bus";
-
 import {GraphQlService} from "gql";
-
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/operator/toPromise";
 
@@ -81,7 +79,7 @@ export class JoinLeaveGroupComponent implements AfterInit {
           }
         }
       `)
-      .subscribe(_ => filterInPlace(this.group.members, m =>
+      .subscribe(_ => _.remove(this.group.members, m =>
         m.atom_id !== this.member.atom_id
       ));
   }
@@ -89,15 +87,4 @@ export class JoinLeaveGroupComponent implements AfterInit {
   inGroup(member: MemberAtom, group: GroupAtom): boolean {
     return group.members.findIndex(m => m.atom_id === member.atom_id) >= 0;
   }
-}
-
-function filterInPlace<T>(arr: T[], f: (elm: T) => boolean): T[] {
-  let out = 0;
-  for (let i = 0; i < arr.length; i++) {
-    if (f(arr[i])) {
-      arr[out++] = arr[i];
-    }
-  }
-  arr.length = out;
-  return arr;
 }

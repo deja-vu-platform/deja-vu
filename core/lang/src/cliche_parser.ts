@@ -3,7 +3,7 @@ const ohm = require("ohm-js");
 import * as fs from "fs";
 import * as path from "path";
 
-import * as _u from "underscore";
+import * as _ from "lodash";
 
 
 export interface SymbolTable {
@@ -37,8 +37,8 @@ export class ClicheParser {
       })
       // A map of id -> {type, attr}
       .addOperation("symbolTable", {
-        Decl: (cliche, name, key1, para, key2) => _u
-          .reduce(para.symbolTable(), (memo, s) => {
+        Decl: (cliche, name, key1, para, key2) => _.
+          reduce(para.symbolTable(), (memo, s: {id: string}) => {
             if (memo[s.id] !== undefined) {
               throw new Error(`Duplicate symbol ${s.id}`);
             }
@@ -58,10 +58,9 @@ export class ClicheParser {
               }}),
         FieldBody: (field_decl, comma, field_decls) => {
           const fields = [].concat(field_decl.symbolTable())
-            .concat(_u.flatten(field_decls.symbolTable()));
-          return _u
-            .chain(fields)
-            .flatten().reject(_u.isEmpty)
+            .concat(_.flatten(field_decls.symbolTable()));
+          return _(fields)
+            .flatten().reject(_.isEmpty)
             .reduce((memo, ft) => {
               if (memo[ft.id] !== undefined) {
                 throw new Error("Duplicate field" + ft.id);

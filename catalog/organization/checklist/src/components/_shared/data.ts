@@ -1,11 +1,11 @@
 import {Atom} from "client-bus";
 
-export interface List {
+export interface Checklist {
   atom_id: string;
   name: string;
   items: Item[];
 }
-export interface ListAtom extends List, Atom {}
+export interface ChecklistAtom extends Checklist, Atom {}
 
 export interface Item {
   atom_id: string;

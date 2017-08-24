@@ -10,7 +10,7 @@
     "dv-community-rating": "file:../../catalog/community/rating",
     "dv-community-market": "file:../../catalog/community/market",
     "dv-organization-task": "file:../../catalog/organization/task",
-    "dv-organization-list": "file:../../catalog/organization/list",
+    "dv-organization-checklist": "file:../../catalog/organization/checklist",
     "dv-lang": "file:../../core/lang"
   }
 }
