@@ -17,4 +17,8 @@ export class DisplayMapComponent {
       .then((): Promise<string> => waitFor(this.map, "atom_id"))
       .then((map_id: string) => window[map_id] = new GoogleMap(this.mapDiv));
   }
+
+  ngOnDestroy() {
+    window[this.map.atom_id] = undefined; // not automatically cleared
+  }
 }
