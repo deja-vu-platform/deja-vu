@@ -17,7 +17,7 @@ Team Allegro
 ## Cliches Used
 - Auth
 - Group
-- List
+- Checklist
 - Rating
 
 ## Missing Features
