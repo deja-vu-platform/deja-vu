@@ -31,7 +31,7 @@ const grafo = new Grafo(mean.db);
 
 const schema = grafo
   .add_type({
-    name: "Checkist",
+    name: "Checklist",
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
@@ -73,7 +73,7 @@ const schema = grafo
     }
   })
  .add_mutation({
-    name: "newList",
+    name: "newChecklist",
     "type": "Checklist",
     args: {
       name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
