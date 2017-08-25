@@ -110,7 +110,7 @@ const schema = grafo
   })
   // getPublishersByFollower -- just use follower_by_id
   .add_query({
-    name: "getMessagesByFollower",
+    name: "messagesByFollower",
     type: "[Messages]",
     args: {
       follower_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -127,7 +127,7 @@ const schema = grafo
     }
   })
   .add_query({
-    name: "getFollowersByPublisher",
+    name: "followersByPublisher",
     type: "[Follower]",
     args: {
       publisher_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -139,7 +139,7 @@ const schema = grafo
     }
   })
   .add_query({
-    name: "getMessagesByPublisher",
+    name: "messagesByPublisher",
     type: "[Message]",
     args: {
       publisher_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -151,7 +151,7 @@ const schema = grafo
     }
   })
   .add_mutation({
-    name: "updateNameOfFollower",
+    name: "renameFollower",
     type: graphql.GraphQLBoolean,
     args: {
       follower_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
@@ -162,7 +162,7 @@ const schema = grafo
     }
   })
   .add_mutation({
-    name: "updateNameOfPublisher",
+    name: "renamePublisher",
     type: graphql.GraphQLBoolean,
     args: {
       publisher_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
@@ -173,14 +173,15 @@ const schema = grafo
     }
   })
   .add_mutation({
-    name: "updateNameOfMessage",
+    name: "editContentOfMessage",
     type: graphql.GraphQLBoolean,
     args: {
       message_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      name: graphql.GraphQLString
+      content: graphql.GraphQLString
     },
-    resolve: (_, {message_id, name}): Promise<boolean> => {
-      return rename(message_id, name, "Message", "messages");
+    resolve: (_, {message_id, content}): Promise<boolean> => {
+      const updateObj = {$set: {content: content}};
+      return updateOne(message_id, updateObj, "Message", "messages");
     }
   })
   .add_mutation({

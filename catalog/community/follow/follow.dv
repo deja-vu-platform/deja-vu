@@ -37,6 +37,15 @@ cliche Follow {
     submit_ok: boolean
   }
 
+  // Shows all followers that exist
+  widget ShowFollowers {}
+
+  // Shows all publishers that exist
+  widget ShowPublishers {}
+
+  // Shows all messages that exist
+  widget ShowMessages {}
+
   // Displays the name of a follower
   widget ShowNameOfFollower {
     follower: Follower
