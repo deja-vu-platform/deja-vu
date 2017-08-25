@@ -49,7 +49,17 @@ cliche Follow {
 
   // Displays the content of a message
   widget ShowContentOfMessage {
-    publisher: Message
+    message: Message
+  }
+
+  // Display the name of the author of the message
+  widget ShowAuthorOfMessage uses ShowNameOfPublisher {
+    message: Message
+  }
+
+  // Display the content and author of a message
+  widget ShowMessage uses ShowContentOfMessage, ShowAuthorOfMessage {
+    message: Message
   }
 
   // Shows all followers that exist
@@ -59,12 +69,7 @@ cliche Follow {
   widget ShowPublishers uses ShowNameOfPublisher {}
 
   // Shows all messages that exist
-  widget ShowMessages uses ShowContentOfMessage, ShowAuthorOfMessage {}
-
-  // Display the name of the author of the message
-  widget ShowAuthorOfMessage uses ShowNameOfPublisher {
-    message: Message
-  }
+  widget ShowMessages uses ShowMessage {}
 
   // Lists the publishers followed by a follower
   widget ShowPublishersByFollower uses ShowNameOfPublisher {

@@ -18,13 +18,13 @@ export class ShowFollowersComponent {
   followers: FollowerAtom[] = [];
 
   constructor(
-    private _groupService: FollowService,
+    private _followService: FollowService,
     private _atomize: Atomize
   ) {}
 
   dvAfterInit() {
     this.followers = [];
-    this._groupService.getFollowers()
+    this._followService.getFollowers()
       .then(followers => {
         this.followers = followers.map(follower => {
           return this._atomize.atomizeFollower(follower);

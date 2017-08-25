@@ -18,16 +18,16 @@ export class ShowPublishersComponent {
   publishers: PublisherAtom[] = [];
 
   constructor(
-    private _groupService: FollowService,
+    private _followService: FollowService,
     private _atomize: Atomize
   ) {}
 
   dvAfterInit() {
     this.publishers = [];
-    this._groupService.getPublishers()
+    this._followService.getPublishers()
       .then(publishers => {
         this.publishers = publishers.map(publisher => {
-          return this._atomize.atomizeFollower(publisher);
+          return this._atomize.atomizePublisher(publisher);
         });
       });
   }
