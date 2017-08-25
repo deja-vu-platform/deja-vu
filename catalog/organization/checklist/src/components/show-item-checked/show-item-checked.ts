@@ -1,7 +1,7 @@
 import {Widget, Field} from "client-bus";
 
 
-@Widget({fqelement: "List"})
+@Widget({fqelement: "Checklist"})
 export class ShowItemCheckedComponent {
   @Field("Item") item;
 }

@@ -4,7 +4,7 @@ import {Widget, Field} from "client-bus";
 import {ItemAtom} from "../shared/data";
 
 
-@Widget({fqelement: "List", ng2_providers: [GraphQlService]})
+@Widget({fqelement: "Checklist", ng2_providers: [GraphQlService]})
 export class EditItemCheckedComponent {
   @Field("Item") item: ItemAtom;
 

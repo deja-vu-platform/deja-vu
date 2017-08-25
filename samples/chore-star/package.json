@@ -9,7 +9,6 @@
     "dv-access-auth": "file:../../catalog/access/auth",
     "dv-community-market": "file:../../catalog/community/market",
     "dv-community-rating": "file:../../catalog/community/rating",
-    "dv-organization-list": "file:../../catalog/organization/list",
     "dv-organization-task": "file:../../catalog/organization/task",
     "dv-lang": "file:../../core/lang"
 

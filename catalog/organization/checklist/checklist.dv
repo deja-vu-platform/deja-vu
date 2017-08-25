@@ -1,5 +1,5 @@
-cliche List {
-  data List {
+cliche Checklist {
+  data Checklist {
     name: text,
     items: Item
   }
@@ -9,15 +9,15 @@ cliche List {
     checked: boolean
   }
 
-  widget NewList {
+  widget NewChecklist {
   }
 
-  widget EditList uses ShowList, AddItem {
-    list: List
+  widget EditChecklist uses ShowChecklist, AddItem {
+    checklist: List
   }
 
-  widget ShowList uses ShowItem {
-    list: List
+  widget ShowChecklist uses ShowItem {
+    checklist: Checklist
   }
 
   widget ShowItem {
@@ -33,12 +33,12 @@ cliche List {
   }
 
   widget ShowListOverview {
-    list: List
+    checklist: Checklist
   }
 
   widget AddItem {
     item: Item,
-    list: List,
+    checklist: Checklist,
     submit_ok: boolean
   }
 }

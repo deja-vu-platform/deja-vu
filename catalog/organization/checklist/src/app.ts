@@ -11,9 +11,9 @@ const uuid = require("uuid");
 const mean = new Mean();
 
 const handlers = {
-  list: {
-    create: Helpers.resolve_create(mean.db, "list"),
-    update: Helpers.resolve_update(mean.db, "list")
+  checklist: {
+    create: Helpers.resolve_create(mean.db, "checklist"),
+    update: Helpers.resolve_update(mean.db, "checklist")
   },
   item: {
     create: Helpers.resolve_create(mean.db, "item"),
@@ -31,7 +31,7 @@ const grafo = new Grafo(mean.db);
 
 const schema = grafo
   .add_type({
-    name: "List",
+    name: "Checklist",
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       name: {"type": graphql.GraphQLString},
@@ -41,7 +41,7 @@ const schema = grafo
         args: {
           name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}, 
         },
-        resolve: (list, {name}) => {
+        resolve: (checklist, {name}) => {
           const item = {
             atom_id: uuid.v4(),
             name: name
@@ -49,12 +49,12 @@ const schema = grafo
           return Promise
             .all([
               mean.db.collection("items").insertOne(item),
-              mean.db.collection("lists")
+              mean.db.collection("checklists")
                 .updateOne(
-                  {atom_id: list.atom_id},
+                  {atom_id: checklist.atom_id},
                   {$addToSet: {items: {atom_id: item.atom_id}}}),
               bus.update_atom(
-                "List", list.atom_id,
+                "Checklist", checklist.atom_id,
                 {$addToSet: {items: {atom_id: item.atom_id}}}),
               bus.create_atom("Item", item.atom_id, item)
               ])
@@ -73,22 +73,22 @@ const schema = grafo
     }
   })
  .add_mutation({
-    name: "newList",
-    "type": "List",
+    name: "newChecklist",
+    "type": "Checklist",
     args: {
       name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {name}) => {
-      const list = {
+      const checklist = {
         atom_id: uuid.v4(),
         name: name
       };
       return Promise
         .all([
-          mean.db.collection("lists").insertOne(list),
-          bus.create_atom("List", list.atom_id, list)
+          mean.db.collection("checklists").insertOne(checklist),
+          bus.create_atom("Checklist", checklist.atom_id, checklist)
           ])
-        .then(_ => list)
+        .then(_ => checklist)
       }
   })
   .add_mutation({
@@ -119,7 +119,7 @@ Helpers.serve_schema(mean.ws, schema);
 
 grafo.init().then(_ => {
   if (mean.debug) {
-    mean.db.collection("lists").insertOne(
+    mean.db.collection("checklists").insertOne(
       {name: "Errands", atom_id: "1",
       items: [{atom_id: "2"}, {atom_id: "3"}]},
       (err, res) => { if (err) throw err; });
