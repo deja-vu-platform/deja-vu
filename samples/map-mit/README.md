@@ -17,7 +17,7 @@ Team RECD
 
 ## Cliches Used
 - Auth
-- Map
+- Geolocation
 - Event
 - Group
 

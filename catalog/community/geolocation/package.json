@@ -1,5 +1,5 @@
 {
-  "name": "dv-map-map",
+  "name": "dv-community-geolocation",
   "version": "0.0.1",
   "scripts": {
     "lib": "grunt dv-mean:lib",

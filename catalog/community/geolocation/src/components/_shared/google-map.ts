@@ -145,6 +145,12 @@ export default class GoogleMap {
         this.moveClickMarker(e.latLng);
       });
       this.clickListener = listener;
+    } else {
+      const oldListener = this.clickListener;
+      this.clickListener = (pos: google.maps.LatLngLiteral): void => {
+        if (oldListener) oldListener(pos);
+        listener(pos);
+      };
     }
   }
 

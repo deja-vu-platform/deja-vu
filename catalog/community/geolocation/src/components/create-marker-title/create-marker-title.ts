@@ -4,7 +4,7 @@ import {GraphQlService} from "gql";
 import {MarkerAtom} from "../_shared/data";
 
 @Widget({
-  fqelement: "Map",
+  fqelement: "Geolocation",
   ng2_providers: [GraphQlService]
 })
 export class CreateMarkerTitleComponent {

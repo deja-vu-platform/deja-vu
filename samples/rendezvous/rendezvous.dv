@@ -1,14 +1,14 @@
 app Rendezvous {
   include access/Auth[UserData for User]
-  include map/Map[
+  include community/Geolocation[
     MapData for Map,
     EventData for Marker,
     EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
-  include map/Map[
+  include community/Geolocation[
     MapData for Map,
     EventData for Marker
-  ] as SearchMap
+  ] as SearchGeolocation
   include organization/Event[
     EventData for Event,
     EventPanel replacing ShowEvent in ShowEvents

@@ -17,7 +17,7 @@ Team Winner Winner Chicken Dinner
 
 ## Cliches Used
 - Auth
-- Map
+- Geolocation 
 - Post
 - Event
 - Group
