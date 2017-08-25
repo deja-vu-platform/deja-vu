@@ -12,7 +12,7 @@ import FollowService from "../_shared/follow.service";
     FollowService
   ]
 })
-export class NewFollowerButtonComponent {
+export class NewMessageButtonComponent {
   @Field("Message") message : MessageAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
@@ -30,7 +30,7 @@ export class NewFollowerButtonComponent {
   }
 
   submit() {
-    this._followService.createFollower()
+    this._followService.createMessage()
       .then(atom_id => {
         if (atom_id) {
           this.message.atom_id = atom_id;
