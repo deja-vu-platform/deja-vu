@@ -1,50 +1,52 @@
+import {Widget, Field} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {Widget, ClientBus, Field, AfterInit} from "client-bus";
-
-import {Observable} from "rxjs/Observable";
-import "rxjs/add/observable/from";
-import "rxjs/add/operator/map";
-import "rxjs/add/operator/mergeMap";
-
-import {MemberAtom, Group, GroupAtom} from "../../shared/data";
+import Atomize from "../_shared/atomize";
+import {MemberAtom, GroupAtom} from "../_shared/data";
+import GroupService from "../_shared/group.service";
 
 
-@Widget({fqelement: "Group", ng2_providers: [GraphQlService]})
-export class ShowGroupsByMemberComponent implements AfterInit {
+@Widget({
+  fqelement: "Group",
+  ng2_providers: [
+    GraphQlService,
+    GroupService,
+    Atomize
+  ]
+})
+export class ShowGroupsByMemberComponent {
   @Field("Member") member: MemberAtom;
-  groups = [];
-  private _fetched = undefined;
+
+  fetched: string;
+  groups: GroupAtom[] = [];
 
   constructor(
-    private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
+    private _groupService: GroupService,
+    private _atomize: Atomize
+  ) {}
 
   dvAfterInit() {
-    const retrieveGroups = () => {
-      if (!this.member.atom_id || this.member.atom_id === this._fetched) return;
-      this._fetched = this.member.atom_id;
+    this.fetch();
+    this.member.on_change(() => this.fetch());
+  }
 
-      this.groups = [];
-      this._graphQlService
-        .get(`
-          groupsByMember(atom_id: "${this.member.atom_id}") {
-            atom_id,
-            name
-          }
-        `)
-        .map(data => data.groupsByMember)
-        .flatMap((groups, unused_ix) => Observable.from(groups))
-        .map((group: Group) => {
-          const group_atom = this._clientBus.new_atom<GroupAtom>("Group");
-          group_atom.atom_id = group.atom_id;
-          group_atom.name = group.name;
-          return group_atom;
-        })
-        .subscribe(group => {
-          this.groups.push(group);
+  fetch() {
+    if (this.fetched !== this.member.atom_id) {
+      this.fetched = this.member.atom_id;
+      if (this.member.atom_id) {
+        this.getGroups();
+      } else {
+        this.groups = [];
+      }
+    }
+  }
+
+  getGroups() {
+    this._groupService.getGroupsByMember(this.member.atom_id)
+      .then(groups => {
+        this.groups = groups.map((group: GroupAtom) => {
+          return this._atomize.atomizeGroup(group);
         });
-    };
-    this.member.on_change(retrieveGroups);
-    retrieveGroups();
+      });
   }
 }

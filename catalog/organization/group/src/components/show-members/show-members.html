@@ -1,0 +1,8 @@
+<ul *ngIf="members && members.length > 0" class="list-member member-list">
+  <li *ngFor="let member of members" class="list-member-item member-list-item">
+    <dv-widget name="ShowNameOfMember" [init]="{member: member}"></dv-widget>
+  </li>
+</ul>
+<div *ngIf="!members || members.length === 0">
+  No members
+</div>

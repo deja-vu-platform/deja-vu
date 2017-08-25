@@ -1,0 +1,44 @@
+import {Widget, Field, PrimitiveAtom} from "client-bus";
+import {GraphQlService} from "gql";
+
+import {MemberAtom} from "../_shared/data";
+import GroupService from "../_shared/group.service";
+
+
+@Widget({
+  fqelement: "Group",
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
+})
+export class NewMemberButtonComponent {
+  @Field("Member") member: MemberAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+
+  failMsg: string;
+
+  constructor(private _groupService: GroupService) {}
+
+  dvAfterInit() {
+    this.submit_ok.on_after_change(() => {
+      if (this.submit_ok.value) {
+        this.submit_ok.value = false;
+        this.member.atom_id = "";
+      }
+    });
+  }
+
+  submit() {
+    this._groupService.createMember()
+      .then(atom_id => {
+        if (atom_id) {
+          this.member.atom_id = atom_id;
+          this.submit_ok.value = true;
+          this.failMsg = "";
+        } else {
+          this.failMsg = "Failed to create member.";
+        }
+      });
+  }
+}

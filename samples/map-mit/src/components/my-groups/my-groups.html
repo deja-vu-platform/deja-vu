@@ -3,15 +3,9 @@
   <div class="my-groups-column" id="my-groups-column-left">
     <div class="panel panel-default">
       <div class="panel-body groups-panel-body">
-        <h2>Groups I Own</h2>
-        <dv-widget name="ShowGroupsByMember" of="Group"></dv-widget>
-        <!--TODO: By Owner-->
-      </div>
-    </div>
-    <div class="panel panel-default">
-      <div class="panel-body groups-panel-body">
         <h2>Create a Group</h2>
-        <dv-widget name="NewGroup" of="Group"></dv-widget>
+        <dv-widget name="EditNameOfGroup" of="Group"></dv-widget>
+        <dv-widget name="NewGroupWithInitialMember" of="Group"></dv-widget>
       </div>
     </div>
   </div>
@@ -19,8 +13,7 @@
     <div class="panel panel-default">
       <div class="panel-body groups-panel-body">
         <h2>Groups I'm In</h2>
-        <dv-widget name="ShowGroupsByMember" of="Group"></dv-widget>
-        <!--TODO: And not owner-->
+        <dv-widget name="ShowGroupsByMemberButton" of="Group"></dv-widget>
       </div>
     </div>
   </div>

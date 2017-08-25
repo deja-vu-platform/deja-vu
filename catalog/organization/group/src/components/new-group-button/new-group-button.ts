@@ -1,54 +1,44 @@
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {Widget, Field, PrimitiveAtom} from "client-bus";
-
-import {MemberAtom, GroupAtom} from "../../shared/data";
+import {GroupAtom} from "../_shared/data";
+import GroupService from "../_shared/group.service";
 
 
 @Widget({
   fqelement: "Group",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    GroupService
+  ]
 })
 export class NewGroupButtonComponent {
-  @Field("Group") group: GroupAtom;
-  @Field("Member") initialMember: MemberAtom;
+  @Field("Group") group : GroupAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  failMsg: string;
 
-  submit() {
-    let addMember = () => {
-      this._graphQlService
-        .get(`
-          group_by_id(atom_id: "${this.group.atom_id}") {
-            addExistingMember(atom_id: "${this.initialMember.atom_id}") {
-              atom_id
-            }
-          }
-        `)
-        .map(data => data.group_by_id.addExistingMember.atom_id)
-        .subscribe(_ => undefined);
-    };
-    let createGroup = () => {
-      this._graphQlService
-        .post(`
-          newGroup(name: "${this.group.name}") {
-            atom_id
-          }
-        `)
-        .map(data => data.newGroup.atom_id)
-        .subscribe(atom_id => {
-          this.group.atom_id = atom_id;
-          if (this.initialMember) {
-            addMember();
-          }
-          this.submit_ok.value = !this.submit_ok.value;
-        });
-    };
-    createGroup();
+  constructor(private _groupService: GroupService) {}
+
+  dvAfterInit() {
+    this.submit_ok.on_after_change(() => {
+      if (this.submit_ok.value) {
+        this.submit_ok.value = false;
+        this.group.atom_id = "";
+      }
+    });
   }
 
-  valid() {
-    return (this.group.name ? true : false);
+  submit() {
+    this._groupService.createGroup()
+      .then(atom_id => {
+        if (atom_id) {
+          this.group.atom_id = atom_id;
+          this.submit_ok.value = true;
+          this.failMsg = "";
+        } else {
+          this.failMsg = "Failed to create group.";
+        }
+      });
   }
 }

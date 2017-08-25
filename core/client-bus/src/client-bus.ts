@@ -619,3 +619,14 @@ export function Field(tname: string) {
     target._dv_fields.push({name: fname, tname: tname});
   };
 }
+
+/**
+ * Checks if an object satisfies the Atom interface.
+ **/
+export function isAtom(maybeAtom: object): maybeAtom is Atom {
+  return (
+    _u.isString(maybeAtom["atom_id"]) &&
+    _u.isFunction(maybeAtom["on_change"]) &&
+    _u.isFunction(maybeAtom["on_after_change"])
+  );
+}

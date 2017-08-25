@@ -25,7 +25,7 @@ app MapMit {
   include organization/Group[
     User for Member,
     GroupData for Group,
-    DisplayGroup replacing ShowGroup in ShowGroupsByMember
+    DisplayGroup replacing ShowNameOfGroup in ShowGroupsByMember
   ]
 
   data User {
@@ -78,7 +78,9 @@ app MapMit {
   }
 
   widget MyGroups {
-    user: User
+    user: User,
+    group: GroupData,
+    submit_ok: boolean
   }
 
   widget EventInfoWindow {

@@ -1,0 +1,28 @@
+<link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+<dv-widget name="NavBar"></dv-widget>
+<div class="container page-content">
+  <div class="row">
+    <div class="col-md-3">
+      <h2>
+        <dv-widget name="ShowNameOfGroup" of="Group"></dv-widget>
+      </h2>
+
+      <a [dvLink]="on_redirect" class="btn btn-default">Create Setlist</a>
+
+      <p>Setlists:</p>
+      <dv-widget name="ShowChecklist" of="SetlistList"></dv-widget>
+    </div>
+    <div class="col-md-9">
+      <h1>
+        <dv-widget name="ShowNameOfGroup" of="Group"></dv-widget>
+      </h1>
+
+      <h2>Members</h2>
+      <dv-widget name="ShowMembersOfGroup" of="Group"></dv-widget>
+    </div>
+  </div>
+</div>
+
+<!-- HACK: remove once fields with default values are always included -->
+<dv-widget name="SignInWithRedirect" of="Auth" style="display:none">
+</dv-widget>

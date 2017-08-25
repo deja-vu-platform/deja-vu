@@ -13,16 +13,6 @@
     <div class="panel panel-default">
       <div style="background-color: #ffa599;" class="panel-heading">
         <dv-widget name="CreateMarkerTitle" of="Geolocation"></dv-widget>
-        <!--
-          We cannot bind the group name to the marker name (event name)
-          without also binding to the post content (event description).
-          Doing this works on a technicality (read: HACK) since the group
-          name will be "undefined" rather than undefined.
-          TODO: Change once more selective binding is possible.
-        -->
-        <dv-widget name="NewGroupContent" of="Group" style="display:none;">
-        </dv-widget>
-
       </div>
       <div style="padding: 15px;" class="panel-body">
         <div style="float: left; margin-top: 4px;">
@@ -71,7 +61,7 @@
         </table>
         <dv-widget name="NewPostContent" of="Post"></dv-widget>
         <div style="float: right" id="create">
-          <dv-widget name="NewEventButton" of="Event"></dv-widget>
+          <dv-widget name="NewGroupWithInitialMemberButton" of="Group"></dv-widget>
         </div>
       </div>
     </div>

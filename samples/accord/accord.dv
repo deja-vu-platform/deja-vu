@@ -4,13 +4,13 @@ app Accord {
 
   include organization/Group[
     User for Member,
-    SongGroup for Group,
-    LinkToGroup replacing ShowGroup in ShowGroupsByMember
+    Band for Group,
+    LinkToBand replacing ShowNameOfGroup in ShowGroupsByMember
   ]
 
   include organization/Checklist[
     Setlist for Item,
-    SongGroup for Checklist,
+    Band for Checklist,
     LinkToSetlist replacing ShowItem in ShowChecklist
   ] as SetlistList
 
@@ -29,10 +29,10 @@ app Accord {
     username: text
   }
 
-  data SongGroup {
+  data Band {
     name: text,
     members: [User],
-    items: [Setlist]
+    setlists: [Setlist]
   }
 
   data Song {
@@ -56,7 +56,7 @@ app Accord {
 
   // The landing page gives the user the option to sign in or register
   main widget Landing {
-    on_user_ok: Widget = Groups
+    on_user_ok: Widget = Bands
   }
 
   // The about page lets the user see an explanation of the project
@@ -65,35 +65,37 @@ app Accord {
 
   // The Register page lets the user create a new account
   widget Register {
-    on_user_ok: Widget = Groups
+    on_user_ok: Widget = Bands
   }
 
-  // Allows a user to view existing groups and go to the CreateGroup page
-  widget Groups {
+  // Allows a user to view existing bands and go to the CreateBand page
+  widget Bands {
     user: User
   }
 
-  // Create a new group
-  widget CreateGroup {
-    initialMember: User
+  // Create a new band
+  widget CreateBand {
+    band: Band,
+    initialMember: User,
+    submit_ok: boolean
   }
 
-  // Add a member to the group
+  // Add a member to the band
   widget AddMember {
-    group: SongGroup
+    band: Band
   }
 
-  // View the information about a group
+  // View the information about a band
   // Has a button for adding new setlists
-  widget ViewGroup {
-    group: SongGroup,
+  widget ShowBand {
+    band: Band,
     on_redirect: Widget = CreateSetlist
   }
 
   // View a setlist
-  widget ViewSetlist {
+  widget ShowSetlist {
     list: Setlist,
-    on_redirect: Widget = CreateProposal
+    on_redirect: Widget = CreateSong
   }
 
   // Show a song on the view setlist page
@@ -101,28 +103,28 @@ app Accord {
     item: Song
   }
 
-  // Show the group name next to a button that if clicked redirects
-  // to the the ShowGroup page
-  widget LinkToGroup {
-    group: SongGroup,
-    on_redirect: Widget = ViewGroup
+  // Show the band name next to a button that if clicked redirects
+  // to the the ShowBand page
+  widget LinkToBand {
+    band: Band,
+    on_redirect: Widget = ShowBand
   }
 
-  // Links to a setlist on the Group view page
+  // Links to a setlist on the Band view page
   widget LinkToSetlist {
     setlist: Setlist,
-    on_redirect: Widget = ViewSetlist
+    on_redirect: Widget = ShowSetlist
   }
 
   // Create a new setlist
   // need an add-item-with-redirect and redirect to
-  // ViewSetlist?
+  // ShowSetlist?
   widget CreateSetlist {
-    list: SongGroup
+    band: Band
   }
 
-  // Create a new proposal
-  widget CreateProposal {
+  // Create a new song
+  widget CreateSong {
     list: Setlist
   }
 
@@ -132,16 +134,16 @@ app Accord {
   }
 
   john: User = {username: "john"}
-  // g1: Group = {name:"John's Group", members: [u1]}
+  // g1: Band = {name:"John's Band", members: [u1]}
 
   about: route = {path: "about", widget: About}
   register: route = {path: "register", widget: Register}
-  groups: route = {path: "groups", widget: Groups}
-  create_group: route = {path: "groups/create", widget: CreateGroup}
-  add_member: route = {path: "groups/add-member", widget: AddMember}
-  view_group: route = {path: "groups/view", widget: ViewGroup}
-  create_setlists: route = {path: "groups/create-setlist", widget: CreateSetlist}
-  view_setlist: route = {path: "groups/setlists", widget: ViewSetlist}
-  create_proposal: route = {path: "groups/setlists/create-proposal", widget: CreateProposal}
+  bands: route = {path: "bands", widget: Bands}
+  create_band: route = {path: "create-band", widget: CreateBand}
+  add_member: route = {path: "add-member", widget: AddMember}
+  show_band: route = {path: "show-band", widget: ShowBand}
+  create_setlists: route = {path: "create-setlist", widget: CreateSetlist}
+  show_setlist: route = {path: "show-setlist", widget: ShowSetlist}
+  create_song: route = {path: "create-song", widget: CreateSong}
   account: route = {path: "account", widget: Account}
 }

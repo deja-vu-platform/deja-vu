@@ -1,71 +1,150 @@
 // Organize members into groups so that they can be handled in aggregate
 cliche Group {
-  /** Entities **/
-  // Member of a Group
+  // Collection of subgroups and/or members
+  data Group {
+    name: text,
+    members: [Member],
+    subgroups: [Group]
+  }
+
+  // Lowest-level named entity, contains nothing
   data Member {
     name: text
   }
 
-  // Named collection of group members
-  data Group {
-    name: text,
-    members: [Member]
-  }
-
-  /** Widgets **/
-  // Displays the name and members of a group
-  widget ShowGroup uses ShowGroupName, ShowGroupMembers {
-    group: Group
-  }
-
-  // Displays the name of a group
-  widget ShowGroupName {
-    group: Group
-  }
-
-  // Displays the members of a group
-  widget ShowGroupMembers uses ShowMember {
-    group: Group
-  }
-
-  // Displays a member of a group
-  widget ShowMember {
-    member: Member
-  }
-
-  // Shows which groups a member belongs to
-  widget ShowGroupsByMember uses ShowGroup {
-    member: Member
-  }
-
-  // Create a new group
-  widget NewGroup uses NewGroupContent, NewGroupButton {
-    initialMember: Member,
-    group: Group,
-    submit_ok: boolean
-  }
-
-  widget NewGroupContent {
-    initialMember: Member,
-    group: Group,
-    submit_ok: boolean
-  }
-
+  // Button allowing for the creation of a group
   widget NewGroupButton {
-    initialMember: Member,
     group: Group,
     submit_ok: boolean
   }
 
-  // Add an existing member by ID
-  widget AddExistingMember {
-    group: Group,
-    submit_ok: boolean
-  }
-
-  // button allowing a member to leave/join group
-  widget JoinLeaveGroup {
+  // Button allowing for the creation of a member
+  widget NewMemberButton {
     member: Member,
+    submit_ok: boolean
+  }
+
+  // Like NewGroupButton, but also adds member upon creation
+  widget NewGroupWithInitialMemberButton uses NewGroupButton {
+    group: Group,
+    member: Member,
+    submit_ok: boolean
+  }
+
+  // TODO: NewGroupWithInitialSubgroup once fields w/ same type are possible
+
+  // Shows the name of a group
+  widget ShowNameOfGroup {
     group: Group
+  }
+
+  // Shows the name of a member
+  widget ShowNameOfMember {
+    member: Member
+  }
+
+  // Lists the direct members of a group
+  widget ShowMembersOfGroup uses ShowNameOfMember {
+    group: Group
+  }
+
+  // Lists the direct subgroups of a group
+  widget ShowSubgroupsOfGroup uses ShowNameOfGroup {
+    group: Group
+  }
+
+  // Shows all groups that exist
+  widget ShowGroups uses ShowNameOfGroup {}
+
+  // Shows all members that exist
+  widget ShowMembers uses ShowNameOfMember {}
+
+  // Shows all (direct or indirect) groups containing the given member
+  widget ShowGroupsByMember uses ShowNameOfGroup {
+    member: Member
+  }
+
+  // Shows all (direct or indirect) groups containing the given group
+  widget ShowGroupsBySubgroup uses ShowNameOfGroup {
+    group: Group
+  }
+
+  // Shows all groups directly containing the given member
+  widget ShowGroupsByDirectMember uses ShowNameOfGroup {
+    member: Member
+  }
+
+  // Shows all groups directly containing the given group
+  widget ShowGroupsByDirectSubgroup uses ShowNameOfGroup {
+    group: Group
+  }
+
+  // Shows all (direct or indirect) members in the given group
+  widget ShowMembersByGroup uses ShowNameOfMember {
+    group: Group
+  }
+
+  // Shows all (direct or indirect) subgroups in the given group
+  widget ShowSubgroupsByGroup uses ShowNameOfGroup {
+    group: Group
+  }
+
+  // Text box to edit group name
+  // When submit_ok flips to true, the name is updated
+  widget EditNameOfGroup {
+    group: Group,
+    submit_ok: boolean
+  }
+
+  // Text box to edit member name
+  // When submit_ok flips to true, the name is updated
+  widget EditNameOfMember {
+    member: Member,
+    submit_ok: boolean
+  }
+
+  // Allows editing of a group's members
+  // All of the group's members are listed
+  // The user can click a button to remove a member
+  // The user can enter an existing members's name in a box to add it
+  // When submit_ok flips to true, all edits are saved
+  widget EditMembersOfGroup uses ShowNameOfMember {
+    group: Group,
+    submit_ok: boolean
+  }
+
+  // Allows editing of a group's subgroups
+  // All of the group's subgroups are listed
+  // The user can click a button to remove a subgroup
+  // The user can enter an existing group's name in a box to add it
+  // When submit_ok flips to true, all edits are saved
+  widget EditSubgroupsOfGroup uses ShowNameOfGroup {
+    group: Group,
+    submit_ok: boolean
+  }
+
+  // Allows an existing member to be added by name to the group
+  widget AddMemberToGroup {
+    group: Group
+  }
+
+  // Allows an existing group to be added by name as a subgroup to the group
+  widget AddSubgroupToGroup {
+    group: Group
+  }
+
+  // Allows a member to be simultaneously created and added to a group
+  widget AddNewMemberToGroup uses NewMemberButton, EditNameOfMember {
+    group: Group,
+    member: Member,
+    submit_ok: boolean
+  }
+
+  // TODO: AddNewSubgroupToGroup once fields w/ same type are possible
+
+  // Button allowing a member to join or leave a group
+  widget JoinLeave {
+    group: Group,
+    member: Member
   }
 }

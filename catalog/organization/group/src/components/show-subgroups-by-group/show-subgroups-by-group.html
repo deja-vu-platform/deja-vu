@@ -1,0 +1,10 @@
+<ul *ngIf="subgroups && subgroups.length > 0"
+    class="list-group member-list">
+  <li *ngFor="let subgroup of subgroups"
+    class="list-group-item member-list-item">
+    <dv-widget name="ShowNameOfGroup" [init]="{group: subgroup}"></dv-widget>
+  </li>
+</ul>
+<div *ngIf="!subgroups || subgroups.length === 0">
+  No subgroups in this group
+</div>

@@ -1,0 +1,12 @@
+<form (ngSubmit)="onSubmit()" #addMemberForm="ngForm" class="form-horizontal">
+  <fieldset #typeaheadWrapper class="form-group">
+    <label class="sr-only" for="name">Member Name</label>
+    <input required class="form-control typeahead" name="name"
+      type="text" autocomplete="off" placeholder="Member Name"/>
+  </fieldset>
+  <div class="form-group">
+    <button type="submit" class="btn btn-default btn-sm pull-right"
+     [disabled]="!addMemberForm.valid">Add Member</button>
+  </div>
+  <div class="alert alert-danger" *ngIf="failed">Member not found</div>
+</form>
