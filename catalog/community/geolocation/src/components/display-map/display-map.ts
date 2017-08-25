@@ -6,7 +6,7 @@ import {MapAtom} from "../_shared/data";
 import GoogleMap from "../_shared/google-map";
 import {waitFor} from "../_shared/utils";
 
-@Widget({fqelement: "Location"})
+@Widget({fqelement: "Geolocation"})
 export class DisplayMapComponent {
   @Field("Map") map: MapAtom;
 

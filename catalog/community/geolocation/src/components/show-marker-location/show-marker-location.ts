@@ -6,7 +6,7 @@ import GoogleMap from "../_shared/google-map";
 import {waitFor} from "../_shared/utils";
 
 @Widget({
-  fqelement: "Location",
+  fqelement: "Geolocation",
   ng2_providers: [GraphQlService],
   template: `{{location}}`
 })

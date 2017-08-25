@@ -8,7 +8,7 @@ import {waitFor} from "../_shared/utils";
 
 
 @Widget({
-  fqelement: "Location"
+  fqelement: "Geolocation"
 })
 export class SearchForPlaceComponent {
   @Field("Map") map: MapAtom;

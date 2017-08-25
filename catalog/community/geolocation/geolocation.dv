@@ -1,4 +1,4 @@
-cliche Location {
+cliche Geolocation {
 
   data Map {}
 

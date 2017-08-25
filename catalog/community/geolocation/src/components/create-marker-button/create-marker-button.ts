@@ -1,4 +1,5 @@
 import {NgZone} from "@angular/core";
+import "rxjs/add/operator/map";
 
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
@@ -9,45 +10,17 @@ import {waitFor} from "../_shared/utils";
 
 
 @Widget({
-  fqelement: "Location",
-  ng2_providers: [GraphQlService]
+  fqelement: "Geolocation",
+  ng2_providers: [
+    GraphQlService
+  ]
 })
-export class CreateMarkerPositionComponent {
+export class CreateMarkerButtonComponent {
+  @Field("Map") map: MapAtom;
   @Field("Marker") marker: MarkerAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
-  @Field("Map") map: MapAtom;
-
 
   constructor(private _graphQlService: GraphQlService, private zone: NgZone) {}
-
-  dvAfterInit() {
-    this.submit_ok.on_change(() => {
-      if (
-        this.marker.atom_id &&
-        this.marker.lat !== undefined &&
-        this.marker.lng !== undefined
-      ) {
-        this._graphQlService
-          .get(`
-            marker_by_id(
-              atom_id: "${this.marker.atom_id}"
-            ) {
-              update(
-                lat: ${this.marker.lat},
-                lng: ${this.marker.lng},
-                map_id: "${this.map.atom_id}"
-              ) {
-                atom_id
-              }
-            }
-          `)
-          .subscribe(_ => {
-            this.marker.lat = undefined;
-            this.marker.lng = undefined;
-          });
-      }
-    });
-  }
 
   ngAfterViewInit() {
     waitFor(this.map, "atom_id")
@@ -55,9 +28,30 @@ export class CreateMarkerPositionComponent {
       .then((gmap: GoogleMap) => this.addListeners(gmap));
   }
 
+  // adds a marker to the db
+  createMarker() {
+    this._graphQlService
+      .post(`
+        createMarker(
+          lat: ${this.marker.lat},
+          lng: ${this.marker.lng},
+          title: "${this.marker.title}"
+          map_id: "${this.map.atom_id}"
+        ) {
+          atom_id
+        }
+      `)
+      .map(data => data.createMarker.atom_id)
+      .subscribe(atom_id => {
+        this.marker.atom_id = atom_id;
+        this.submit_ok.value = true;
+      });
+  }
+
   // watch for map clicks and changes in position form
   addListeners(gmap: GoogleMap) {
     gmap.addClickMarker((latLng: google.maps.LatLngLiteral) => {
+      // need to use zone so that angular realizes that there are changes
       this.zone.run(() => {
         this.marker.lat = latLng.lat;
         this.marker.lng = latLng.lng;
@@ -70,5 +64,9 @@ export class CreateMarkerPositionComponent {
         gmap.moveClickMarker(this.marker, true);
       }
     });
+  }
+
+  valid() {
+    return (this.marker.lat !== undefined && this.marker.lng !== undefined);
   }
 }
