@@ -1,0 +1,11 @@
+<form (ngSubmit)="onSubmit()" #addItemForm="ngForm" class="form-horizontal">
+  <fieldset class="form-group">
+    <label class="sr-only" for="item-name">Item Name</label>
+    <input required id="item-name" class="form-control" name="item-name" type="text"
+      [(ngModel)]="item.name"placeholder="Write something..." />
+  </fieldset>
+  <div class="form-group">
+    <button type="submit" class="btn btn-default btn-sm pull-right"
+     [disabled]="!addItemForm.valid">Add Item</button>
+  </div>
+</form>
