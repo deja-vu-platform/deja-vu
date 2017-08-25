@@ -8,7 +8,7 @@
   "dependencies": {
     "dv-lang": "file:../../core/lang",
     "dv-access-auth": "file:../../catalog/access/auth",
-    "dv-community-location": "file:../../catalog/community/location",
+    "dv-community-geolocation": "file:../../catalog/community/geolocation",
     "dv-messaging-comment": "file:../../catalog/messaging/comment",
     "dv-messaging-post": "file:../../catalog/messaging/post",
     "dv-organization-event": "file:../../catalog/organization/event",
