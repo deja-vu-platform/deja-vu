@@ -1,0 +1,44 @@
+cliche Checklist {
+  data Checklist {
+    name: text,
+    items: Item
+  }
+
+  data Item {
+    name: text,
+    checked: boolean
+  }
+
+  widget NewChecklist {
+  }
+
+  widget EditChecklist uses ShowChecklist, AddItem {
+    checklist: List
+  }
+
+  widget ShowChecklist uses ShowItem {
+    checklist: Checklist
+  }
+
+  widget ShowItem {
+    item: Item
+  }
+
+  widget ShowItemChecked {
+    item: Item
+  }
+
+  widget EditItemChecked {
+    item: Item
+  }
+
+  widget ShowListOverview {
+    checklist: Checklist
+  }
+
+  widget AddItem {
+    item: Item,
+    checklist: Checklist,
+    submit_ok: boolean
+  }
+}
