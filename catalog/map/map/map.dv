@@ -56,8 +56,7 @@ cliche Map {
   // search box allowing you to search for real-life places
   // adds markers to the map identifying their locations
   widget SearchForPlace uses OverlayMarker {
-    map: Map,
-    marker: Marker
+    map: Map
   }
 
   // Displays a text location of a marker.

@@ -1,6 +1,6 @@
 import {Widget, Field} from "client-bus";
 
-import {ItemArrAtom} from "../../shared/data";
+import {ItemArrAtom} from "../_shared/data";
 
 @Widget({fqelement: "Label"})
 export class ShowSearchResultsComponent {

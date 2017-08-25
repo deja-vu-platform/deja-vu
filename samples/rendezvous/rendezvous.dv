@@ -49,7 +49,9 @@ app Rendezvous {
     arr: [EventData]
   }
 
-  global_map: MapData
+  events_map: MapData
+
+  search_map: MapData
 
   main widget Login {
     on_login_ok: Widget = Main
@@ -60,17 +62,17 @@ app Rendezvous {
   }
 
   widget Main {
-    map: MapData = global_map
+    map: MapData = events_map
   }
 
   widget EventPanel {
-    map: MapData = global_map,
+    map: MapData = events_map,
     to_event_details: Widget = EventDetails,
     event: EventData
   }
 
   widget NewEvent {
-    map: MapData = global_map,
+    map: MapData = search_map,
     user: UserData,
     new_event: EventData,
     new_event_ok: boolean
