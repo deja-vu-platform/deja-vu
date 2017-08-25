@@ -1,4 +1,4 @@
-cliche Checkist {
+cliche Checklist {
   data Checklist {
     name: text,
     items: Item
