@@ -1,0 +1,12 @@
+<form (ngSubmit)="onSubmit()" #newChecklistForm="ngForm" class="form-horizontal">
+  <fieldset class="form-group">
+    <label class="sr-only" for="checklist-name">Checklist Name</label>
+    <input required id="checklist-name" class="form-control"
+      name="checklist-name" type="text" [(ngModel)]="checklist.name"
+      placeholder="Checklist Name" />
+  </fieldset>
+  <div class="form-group">
+    <button type="submit" class="btn btn-default btn-sm pull-right"
+     [disabled]="!newChecklistForm.valid">Create New Checklist</button>
+  </div>
+</form>

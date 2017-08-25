@@ -1,6 +1,31 @@
 module.exports = function(grunt) {
   require("mean-loader").GruntTask.cliche_task(
-      grunt,
-      "dv-organization-group",
-      ["ShowNameOfMember", "ShowNameOfGroup", "NewGroup"]);
+    grunt,
+    "dv-organization-group",
+    [
+      "NewGroupButton",
+      "NewMemberButton",
+      "NewGroupWithInitialMemberButton",
+      "ShowNameOfGroup",
+      "ShowNameOfMember",
+      "ShowMembersOfGroup",
+      "ShowSubgroupsOfGroup",
+      "ShowGroups",
+      "ShowMembers",
+      "ShowGroupsByMember",
+      "ShowGroupsBySubgroup",
+      "ShowGroupsByDirectMember",
+      "ShowGroupsByDirectSubgroup",
+      "ShowMembersByGroup",
+      "ShowSubgroupsByGroup",
+      "EditNameOfGroup",
+      "EditNameOfMember",
+      "EditMembersOfGroup",
+      "EditSubgroupsOfGroup",
+      "AddMemberToGroup",
+      "AddSubgroupToGroup",
+      "AddNewMemberToGroup",
+      "JoinLeave"
+    ]
+  );
 }

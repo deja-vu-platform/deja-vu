@@ -8,16 +8,16 @@ app Accord {
     LinkToBand replacing ShowNameOfGroup in ShowGroupsByMember
   ]
 
-  include organization/List[
+  include organization/Checklist[
     Setlist for Item,
-    Band for List,
-    LinkToSetlist replacing ShowItem in ShowList
+    Band for Checklist,
+    LinkToSetlist replacing ShowItem in ShowChecklist
   ] as SetlistList
 
-  include organization/List[
+  include organization/Checklist[
     Song for Item,
-    Setlist for List,
-    ShowSong replacing ShowItem in ShowList
+    Setlist for Checklist,
+    ShowSong replacing ShowItem in ShowChecklist
   ] as SongList
 
   include community/Rating[

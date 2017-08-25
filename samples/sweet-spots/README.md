@@ -16,7 +16,7 @@ Team No REST for the Wicked
 
 ## Cliches Used
 - Auth
-- Map
+- Geolocation
 - Rating
 - Comment
 - Label

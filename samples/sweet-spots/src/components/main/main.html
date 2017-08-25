@@ -25,7 +25,7 @@
 </div>
 
 <div id="map-div">
-  <dv-widget name="DisplayMap" of="Map"></dv-widget>
-  <dv-widget name="OverlayMarkers" of="Map" *ngIf="!search_results.arr">
+  <dv-widget name="DisplayMap" of="Geolocation"></dv-widget>
+  <dv-widget name="OverlayMarkers" of="Geolocation" *ngIf="!search_results.arr">
   </dv-widget>
 </div>
