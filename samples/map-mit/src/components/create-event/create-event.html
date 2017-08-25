@@ -2,13 +2,13 @@
 <div class="events-container">
   <div class="events-panel panel panel-default">
     <div class="panel-body events-panel-body">
-      <dv-widget name="CreateMarkerTitle" of="Location"></dv-widget>
+      <dv-widget name="CreateMarkerTitle" of="Geolocation"></dv-widget>
       <dv-widget name="NewEventContent" of="Event"></dv-widget>
-      <dv-widget name="SearchForPlace" of="CreateEventLocation"></dv-widget>
+      <dv-widget name="SearchForPlace" of="SearchGeolocation"></dv-widget>
       <div id="create-event-map">
-        <dv-widget name="DisplayMap" of="CreateEventLocation"></dv-widget>
+        <dv-widget name="DisplayMap" of="SearchGeolocation"></dv-widget>
       </div>
-      <dv-widget name="CreateMarkerButton" of="Location"></dv-widget>
+      <dv-widget name="CreateMarkerButton" of="Geolocation"></dv-widget>
       <!--TODO: add missing fields beyond basic event-->
     </div>
   </div>

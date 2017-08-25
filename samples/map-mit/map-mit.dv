@@ -5,17 +5,17 @@ app MapMit {
   include access/Auth[User for User]
 
   // One map shows the locations of events
-  include community/Location[
+  include community/Geolocation[
     CampusEvent for Marker,
     CampusMap for Map,
     EventInfoWindow replacing MarkerInfoWindow in OverlayMarker
   ]
 
   // Another map allows the user to search for places to set event location
-  include community/Location[
+  include community/Geolocation[
     CampusEvent for Marker,
     CampusMap for Map
-  ] as CreateEventLocation
+  ] as SearchGeolocation
 
   include organization/Event[
     CampusEvent for Event,
