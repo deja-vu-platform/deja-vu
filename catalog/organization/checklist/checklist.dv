@@ -1,3 +1,4 @@
+// Keep track of items required
 cliche Checklist {
   data Checklist {
     name: text,
