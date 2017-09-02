@@ -1,3 +1,4 @@
+// Locate points of interest
 cliche Geolocation {
 
   data Map {}
