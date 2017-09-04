@@ -4,7 +4,7 @@ Déjà Vu
 Code
 ----
 
-The Deja Vu code is organized in the following way:
+The Déjà Vu code is organized as follows:
 
 - `catalog/` contains all the clichés organized by category
 - `core/` contains the core platform libraries
