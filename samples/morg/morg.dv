@@ -1,3 +1,4 @@
+// Organize group meetings where each group meeting has a champion
 app Morg {
   include organization/Event[
     GroupMeeting for Event,

@@ -1,4 +1,5 @@
-// Help people plan parties
+// Help people plan parties where guests bring supplies
+
 // Users can create parties, invite guests, and coordinate bringing
 // supplies (e.g., food, drinks). Guests can create supply requests
 // (e.g., "2 cakes") and can commit to bringing requests.

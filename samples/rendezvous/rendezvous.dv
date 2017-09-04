@@ -1,3 +1,4 @@
+// Plan public events on campus
 app Rendezvous {
   include access/Auth[UserData for User]
   include community/Geolocation[

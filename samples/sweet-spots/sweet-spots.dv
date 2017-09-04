@@ -1,3 +1,4 @@
+// Mark spots on a map and review spots added by others
 app SweetSpots {
   include access/Auth[
     User for User

@@ -1,3 +1,4 @@
+// Facilitate peer grocery delivery between students
 app GroceryShip {
   include access/Auth
   include community/Market

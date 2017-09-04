@@ -1,3 +1,4 @@
+// Make it easy for parents to assign chores to children
 app ChoreStar {
   include access/Auth[Parent for User] as ParentAuth
   include access/Auth[Child for User] as ChildAuth
