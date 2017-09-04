@@ -1,5 +1,0 @@
-app Morg {
-  include organization/Event
-
-  main widget Home {}
-}
