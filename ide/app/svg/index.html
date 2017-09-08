@@ -1,0 +1,130 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>svg test</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+
+        .green {
+            background-color: #bab8ba;
+            border: 1px solid black;
+            height: 200px;
+            text-align: center;
+        }
+
+        .axis line {
+            fill: none;
+            stroke: #ddd;
+            shape-rendering: crispEdges;
+            vector-effect: non-scaling-stroke;
+        }
+
+    </style>
+</head>
+<body>
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script>
+
+    var margin = {top: -5, right: -5, bottom: -5, left: -5},
+            width = 1000 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
+
+    var zoom = d3.behavior.zoom()
+            .scaleExtent([0.1, 10])
+            .on("zoom", zoomed);
+
+    var drag = d3.behavior.drag()
+            .origin(function(d) { return d; })
+            .on("dragstart", dragstarted)
+            .on("drag", dragged)
+            .on("dragend", dragended);
+
+    var svg = d3.select("body").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .attr("border", "1px solid black")
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.right + ")")
+            .call(zoom);
+
+    var rect = svg.append("rect")
+            .attr("width", width)
+            .attr("height", height)
+            .style("fill", "none")
+            .style("pointer-events", "all");
+
+    svg.append('foreignObject')
+            .attr({ 'x': 80, 'y': 50, 'width': 400 })
+            .append('xhtml:div')
+            .attr({'class': 'green'})
+            .append('p')
+            .html('Component 1');
+    svg.append('foreignObject')
+            .attr({ 'x': 540, 'y': 50, 'width': 400 })
+            .append('xhtml:div')
+            .attr({'class': 'green'})
+            .append('p')
+            .html('Component 2');
+    svg.append('foreignObject')
+            .attr({ 'x': 80, 'y': 320, 'width': 400 })
+            .append('xhtml:div')
+            .attr({'class': 'green'})
+            .append('p')
+            .html('Component <a href="#">asdf</a> 3 <div>title<div>content</div></div>');
+    svg.append('foreignObject')
+            .attr({ 'x': 540, 'y': 320, 'width': 400 })
+            .append('xhtml:div')
+            .attr({'class': 'green'})
+            .append('p')
+            .html('Component 4');
+
+
+//
+//    d3.tsv("dots.tsv", dottype, function(error, dots) {
+//        dot = container.append("g")
+//                .attr("class", "dot")
+//                .selectAll("circle")
+//                .data(dots)
+//                .enter().append("circle")
+//                .attr("r", 5)
+//                .attr("cx", function(d) { return d.x; })
+//                .attr("cy", function(d) { return d.y; })
+//                .call(drag);
+//    });
+
+
+
+    function dottype(d) {
+        d.x = +d.x;
+        d.y = +d.y;
+        return d;
+    }
+
+    function zoomed() {
+        svg.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+    }
+
+    function dragstarted(d) {
+        d3.event.sourceEvent.stopPropagation();
+        d3.select(this).classed("dragging", true);
+    }
+
+    function dragged(d) {
+        d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+    }
+
+    function dragended(d) {
+        d3.select(this).classed("dragging", false);
+    }
+</script>
+
+
+</body>
+
+</html>

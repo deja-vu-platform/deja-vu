@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+    <title>Deja Vu UI builder</title>
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/css/dropzone.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/clichePage.css">
+</head>
+
+<div class="menubar">
+    <div class="menubar-inner">
+
+        <div class="menu-item logo">Déjà Vu UI builder</div>
+
+        <div class="menu-item">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-file"></span> Help
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Report an issue</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="navigation">  Navigate to:
+            <div  id="back-to-current-project">
+                <a href="index.html">Current project</a>
+            </div>
+            <a href="#">Data Page</a>
+        </div>
+
+    </div>
+</div>
+
+
+<div class="components">
+    <div class="project-name">
+        <div class="header"></div>
+    </div>
+
+    <div class="cliche-components">
+        <div class="header">Cliché components</div>
+        <div class="content">
+            <ul>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+
+<div id="all-cliche-container">
+    <span>Cliché Components</span>
+    <div>
+        <ul class="nav nav-tabs">
+            <li class="active" id="all-cliches-radio"><a href="#">All Clichés</a></li>
+            <li id="selected-cliches-radio"><a href="#">Selected Clichés</a></li>
+        </ul>
+        <!--<input type="radio" name="all-selected-toggle" id="all-cliches-radio" checked> All-->
+        <!--<input type="radio" name="all-selected-toggle" id="selected-cliches-radio"> Selected-->
+    </div>
+    <div id="all-cliches"></div>
+    <div id="pagination-holder"></div>
+</div>
+
+
+<!--MODALS-->
+
+<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
+<script src="js/external/jquery.min.js"></script>
+
+<script src="js/external/jquery-ui.min.js"></script>
+<script src="js/external/bootstrap.min.js"></script>
+<script src="js/external/parse.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/cliche/ClicheController.js"></script>
+<script src="js/utils/Utility.js"></script>
+<script src="js/external/zoomooz.min.js"></script>
+
+</body>
+</html>

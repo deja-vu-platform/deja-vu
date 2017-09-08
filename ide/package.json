@@ -1,0 +1,14 @@
+{
+  "name"    : "DejaVu",
+  "version": "0.0.3",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron main.js"
+  },
+  "author": "Eric",
+  "devDependencies": {
+    "electron-prebuilt": "1.1.1"
+  },
+  "license": "MIT"
+}

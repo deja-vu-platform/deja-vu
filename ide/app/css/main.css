@@ -1,0 +1,640 @@
+body{
+    scroll: auto;
+}
+
+/*===================================================
+                  COMPONENTS
+===================================================*/
+.project-options-container{
+    position: absolute;
+    height: 550px;
+
+}
+
+.components, .style {
+    margin-top: 75px;
+    float: left;
+    /*border: #d5d5d5 1px solid;*/
+    width: 250px;
+    position: absolute;
+    overflow-y: auto;
+    height: 475px; /*TODO shouldn't be fixed*/
+}
+
+.style {
+    display: none;
+}
+
+.header {
+    border-top: solid 5px #D5D5D5;
+    text-align: center;
+    line-height: 250%;
+    background-color: #EBEBEB;
+}
+
+.project-name .header{
+    border: none;
+    background-color: white;
+    font-weight: bold;
+}
+
+.project-options{
+    float: left;
+    width: 250px;
+    height: 75px;
+}
+
+
+#back-to-projects{
+    display: inline-block;
+    text-align: center;
+}
+
+
+.component-options, .inner-component-options{
+    margin-left: 267px;
+    padding: 5px 20px;
+    width: 500px;
+}
+
+.component-options .component-name-container{
+    /*width: 175px;*/
+    border-radius: 5px;
+    background-color: #E0E0E0;
+}
+
+.component-options #delete-options, #inner-component-delete-options{
+    display: inline-block;
+    float: right;
+
+}
+
+.content {
+    text-align: left;
+}
+
+/*.components .content{*/
+    /*min-height: 120px;*/
+/*}*/
+
+input[type='text']{
+    min-width: 60px;
+    border: 1px grey solid;
+    padding: 5px 10px;
+    vertical-align: baseline;
+}
+
+
+.dropdown-trigger {
+    cursor: pointer;
+}
+
+a{
+    cursor: pointer;
+}
+
+.component-name{
+    padding: 6px 12px;
+}
+
+.component-name-container{
+    display: inline-block;
+    cursor: pointer;
+}
+
+.components .delete-button-container{
+    display: none;
+    vertical-align: top;
+
+}
+
+.btn-delete-component{
+    cursor: pointer;
+}
+
+.content {
+    border: 1px #F0F1F2 solid;
+}
+
+.content li {
+    margin: 10px 10px 0px 0px;
+    padding: 5px;
+}
+.content ul {
+    padding-left: 15px;
+    padding-right: 5px;
+}
+.components .content li:hover {
+    background-color: #E0E0E0;
+}
+
+li.selected {
+    background-color: #E0E0E0;
+}
+
+.components .content img {
+    width: 20px;
+    height: 20px;
+    margin: 0px 15px 0px 5px;
+}
+
+.components .index-page-toggle{
+    border: 1px #888888 solid;
+    border-radius: 5px;
+    height: 20px;
+    width: 10px;
+    margin: 5px;
+    display: inline-block;
+    float: right;
+    cursor: pointer;
+}
+
+.components .selected-index-page .index-page-toggle{
+    background: green;
+}
+
+/*===================================================
+                  MAIN TABLE
+===================================================*/
+
+/*.main-table::after {*/
+    /*content: 'Component name: ';*/
+    /*display: block;*/
+    /*position: absolute;*/
+    /*left: 20px;*/
+    /*bottom: 100%;*/
+    /*width: 200px;*/
+    /*height: 20px;*/
+    /*border-bottom: 20px solid white;*/
+    /*-webkit-box-shadow: 0 -3px 3px rgba(0,0,0,0.1);*/
+    /*padding: 2px 2px 4px 10px;*/
+/*}*/
+
+
+.droppable:hover {
+    background-color: rgba(55, 131, 198, 0.2);
+}
+
+#outer-container {
+    width: 670px;
+    height: 550px;
+    border: 1px solid #dddddd;
+    margin-left: 267px;
+    position: relative;
+    background: grey;
+    overflow: auto;
+}
+
+#selected-screen-size{
+    width: 2000px;
+    height: 1600px;
+    position: absolute;
+    float: left;
+    background: white;
+}
+
+.drag-handle{
+    z-index: 50;
+    /*display: none;*/
+}
+
+#drag-handle-containers-container{
+    position: absolute;
+}
+
+.hidden-component{
+    display: none;
+}
+
+.widget:not(.not-draggable):hover, .datatype:not(.not-draggable):hover {
+    cursor: -webkit-grab;
+    cursor: grab;
+    background-color: #E0E0E0;
+
+}
+
+.work-surface{
+    background-color: lightblue;
+    position: relative;
+}
+
+
+.highlight {
+    /*background-color: rgba(55, 131, 198, 0.2);*/
+    background-color: lightcoral;
+}
+
+
+.dropped {
+    background-color: #F9F9F9;
+    text-align: center;
+
+}
+
+.edit-btn {
+    /*display: none;*/
+    /*position: absolute;*/
+    /*top: 2px;*/
+    /*right: 2px;*/
+    /*font-size: 15px;*/
+}
+
+.inner-component-options-small{
+    /*display: none;*/
+    position: absolute;
+    top: 0px;
+    right: -25px;
+    /*font-size: 15px;*/
+}
+
+.config-btns {
+    /*display: none;*/
+    display: inline-block;
+    position: absolute;
+    top: -25px;
+    left: 3px;
+    width: 600px;
+}
+
+/*.dropped:hover .edit-btn{*/
+    /*display: inline-block;*/
+/*}*/
+
+.dropped:hover .inner-component-options-small{
+    display: inline-block;
+}
+
+/*.dropped:hover .config-btns{*/
+    /*display: inline-block;*/
+/*}*/
+
+#inner-component-focus:hover .config-btns{
+    display: inline-block;
+}
+
+#btn-add-row, #btn-remove-row{
+    position: absolute;
+    bottom: -33px;
+    left: 0;
+}
+
+#btn-remove-row{
+    left: 40px;
+}
+
+#btn-add-col, #btn-remove-col{
+    position: absolute;
+    top: 0;
+    right: -40px;
+}
+
+#btn-remove-col{
+    top: 33px;
+}
+
+.form-lbl {
+    text-align: right;
+    height: 35px;
+    line-height: 35px;
+    vertical-align: middle;
+    padding-right: 0px;
+}
+
+.form-lbl-header {
+    text-align: center;
+    font-weight: bold;
+}
+
+.dropped .widget, .dropped .datatype{
+    position: absolute;
+    bottom: -25px;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    border: 1px solid #e1e1e1;
+    line-height: 20px;
+    color: #6f6f6f;
+    /*display: none;*/
+    display: block;
+
+}
+
+/*.dropped:hover .widget  {*/
+    /*display: block;*/
+/*}*/
+
+.nav {
+    margin-bottom: 10px;
+}
+
+
+.label-container {
+    position: absolute;
+    top: 0;
+    /*background: #fff;*/
+    border: #e0e0e0 solid 1px;
+    display: block;
+}
+
+.label {
+    white-space: initial;
+}
+
+
+@media (max-width: 1050px) {
+    /*#grid-container { width: 650px; }*/
+}
+
+
+.ui-resizable-se{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.ui-resizable-ne{
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.ui-resizable-sw{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+}
+
+.ui-resizable-nw{
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/*===================================================
+                  TOOLTIP POPUPS
+===================================================*/
+.not-displayed {
+    display: none;
+}
+
+.close-btn {
+    position: absolute; !important
+    opacity: 1;
+    top: 5px;
+    right: 9px;
+}
+
+.tooltip {
+    display: none;
+    left: -60px;
+    width: 350px;
+    opacity: 1; /*overriding*/
+    visibility: hidden;
+}
+
+.dropped .tooltip {
+    background: #fff;
+    border: #d5d5d5 solid 1px;
+    border-radius: 4px;
+    display: inline-block;
+    visibility: hidden;
+    padding: 0;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+    z-index: -1;
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 30px;
+}
+
+
+.dropped .tooltip.open {
+    visibility: visible;
+    z-index: 100;
+}
+
+/* Triangle */
+.dropped .tooltip:after {
+    border-left: solid transparent 10px;
+    border-right: solid transparent 10px;
+    border-top: solid #fff 10px;
+    bottom: -10px;
+    content: " ";
+    height: 0;
+    left: 50%;
+    margin-left: -13px;
+    position: absolute;
+    width: 0;
+}
+
+.apply {
+    padding-left: 10px;
+}
+
+.tooltip > .panel {
+    margin-bottom: 0px;
+    border-width: 0px;
+}
+
+
+.tabs .col-sm-4 {
+    padding-right: 0px;
+}
+.tabs .col-sm-5 {
+    padding-right: 0px;
+}
+
+/* Image popup */
+/* layout.css Style */
+.upload-drop-zone {
+    height: 50px;
+    border-width: 2px;
+    margin-bottom: 0px;
+}
+
+/* skin.css Style*/
+.upload-drop-zone {
+    color: #2d2d2d;
+    border-style: dashed;
+    border-color: #ccc;
+    line-height: 50px;
+    text-align: center
+}
+.upload-drop-zone.hover {
+    border-color: #9ecaed;
+    box-shadow: 0 0 10px #9ecaed;
+}
+
+.upload-drop-zone.drop {
+    color: #222;
+    border-color: #222;
+}
+
+.image-preview-input {
+    position: relative;
+    overflow: hidden;
+    margin: 0px;
+    color: #333;
+    background-color: #fff;
+    border-color: #ccc;
+}
+.image-preview-input input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+.image-preview-input-title {
+    margin-left:2px;
+}
+
+
+
+/*===================================================
+                  TRASH CAN and ZOOM
+===================================================*/
+#trash {
+    position: fixed;
+    bottom: 20px;
+    left: 295px;
+    font-size: 60px;
+}
+
+#zoom-control {
+    position: fixed;
+    bottom: 20px;
+    right: 15px;
+    border-radius: 4px;
+}
+
+#zoom-slider-and-value {
+    display: inline-block;
+    vertical-align: middle;
+    text-align: center;
+}
+#zoom-slider{
+    width: 160px;
+}
+
+.zoom-control-button {font-size: 20px;
+    background-color: rgba(0, 60, 136, 0.5);
+    padding: 5px;
+    border-radius: 5px;
+    color: white;
+    border: white solid 1px;
+    font-family: 'Lucida Grande';
+    line-height: 90%;
+    vertical-align: middle;
+}
+
+.zoom-control-button:hover {
+    background-color: rgba(0, 60, 136, 0.8);
+}
+
+#zoom-in {
+    border-radius: 6px;
+}
+#zoom-out {
+    border-radius: 6px;
+}
+
+#mini-nav-container{
+    position: fixed;
+    left: 300px;
+    bottom: 20px;
+    height: 120px;
+    width: 180px;
+    pointer-events: none;
+    z-index: 1000;
+}
+#mini-nav{
+    position: absolute;
+    background: grey;
+    overflow: scroll;
+    height: 100%;
+    width: 100%;
+    pointer-events: auto;
+    border: 1px black solid;
+}
+
+#mini-nav-minimize-btn{
+    position: absolute;
+    top: 0px;
+    right: -19px;
+    pointer-events: auto;
+    z-index: 100;
+}
+
+#mini-nav-container .minimized{ /* the minimize button */
+    top: auto;
+    left: 0;
+    right: auto;
+    bottom: 0;
+}
+
+#mini-nav-component-sizes{
+    background: #D5D5D5;
+    position: absolute;
+}
+
+/*===================================================
+                   COMPONENTS
+===================================================*/
+.display-component {
+    white-space: initial;
+    font-weight: 400;
+    margin: 0;
+}
+
+.lbl-small, .btn-size-xs {
+    font-size: 64%;
+}
+.lbl-default, .btn-size-df {
+    font-size: 14px ;
+}
+.lbl-large {
+    font-size: 150%;
+}
+.lbl-heading, .btn-size-lg {
+    font-size: 200%;
+}
+.btn-group-vertical>.btn:first-child:not(:last-child):not(.dropdown-toggle) {
+    border-top-right-radius: 4px !important;
+}
+
+/* DOWNLOAD STUFF*/
+
+#download-preview-area-container{
+    display: none;
+    position: absolute;
+}
+
+
+.color-input{
+    width: 80px;
+}
+
+.overall-color-input{
+    align: right;
+}
+
+.text-input{
+    width: 120px;
+}
+
+#basic-components .widget[data-type="user"], #basic-components .datatype[data-type="user"]{
+    display: none;
+}
+
+.palette-elt, .current-colors-elt{
+    height: 16px;
+    width: 16px;
+    display: inline-block;
+    border: 1px black solid
+}
+

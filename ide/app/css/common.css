@@ -1,0 +1,123 @@
+
+/*
+ Colors:
+ - body light gray: #F0F1F2
+ - light header:    #EBEBEB
+ - body selected:   #E0E0E0
+ - dark gray:       #D5D5D5
+ - td selected:     #4F9FCF
+ */
+
+/*===================================================
+                   BASE STYLES
+===================================================*/
+html {
+    color: #222;
+    font-size: 1em;
+    font-weight: 300;
+    margin: 0px;
+    line-height: 1.4;
+}
+body { margin: 0px; min-width:600px; }
+ul { list-style-type: none; }
+li { list-style-type: none; }
+/*
+ * Remove the gap between audio, canvas, iframes,
+ * images, videos and the bottom of their containers:
+ */
+audio, canvas, iframe, img, svg, video { vertical-align: middle; }
+/* Remove default fieldset styles. */
+fieldset { border: 0; margin: 0; padding: 0; }
+.clearfix:before, .clearfix:after {
+    content: " "; /* 1 */
+    display: table; /* 2 */
+}
+.clearfix:after { clear: both; }
+
+
+
+
+/*===================================================
+                   MENUBAR
+===================================================*/
+.menubar {
+    width: 1000px;
+    display: block;
+    height: 55px;
+    background-color: #F0F1F2;
+    /*overflow-x: scroll;*/
+    z-index: 600;
+}
+
+.menubar-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 55px;
+    background-color: #F0F1F2;
+
+}
+
+.menu-item {
+    display: inline-block;
+    float: right;
+    margin: 15px 5px 15px 5px;
+}
+
+
+.navigation{
+    display: inline-block;
+    padding: 6px;
+    margin: 15px 5px 15px 5px;
+    font-size: medium;
+}
+
+.menu-item.logo {
+    float: left;
+    width: 250px;
+    color: #555555;
+    font-weight: bold;
+    font-size: 23px;
+    text-align: center;;
+    font-family: "Adobe Garamond";
+}
+
+
+/*===================================================
+                   LOADER
+===================================================*/
+.loader-container{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+}
+
+.loader {
+    display: inline-block;
+    border: 8px solid #f3f3f3; /* Light grey */
+    border-top: 8px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 2s infinite;
+    -webkit-animation: spin 2s infinite;
+    -webkit-transform-origin: 50% 50%;
+}
+
+.loader-words{
+    display: inline-block;
+    padding-bottom: 30px;
+    font-size: 18px;
+}
+
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+

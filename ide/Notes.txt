@@ -1,0 +1,281 @@
+11/20/2016 test notes
+
+things that I'd really like:
+	a box (empty box component) so that I can set add sorts of background colors
+	grouping and moving together
+	changing text size significantly
+	feedback on image loading or is name is not acceptable
+
+things I did not like:
+	working while zoomed then coming back results in incorrect placement of components
+	grids seems to not be functioning correctly, adding components may not correctly update the grid
+	menu and dragging handle may get hidden under other components
+
+11/30/2016 issues
+x color change does not penetrate the recursive components
+link between components not remembered
+	this is working but implem is skecthy and needs work
+	only remembered to one level: needs to be fully recursive
+	needs to be refreshed for changes to show
+x background color is not remembered
+x zoom does not work very well (ratios not zoomed)
+x list component disappears
+x need to consolidate the code into smaller chunks
+x need to update view to work with components (maybe view should be moved into component containers?)
+x resizing upwards does not change the top, left position, just the size!!
+x at a lot of places, using selected user component as opposed to a given component might cause problems
+x need ui components for moving up and down the stack order.
+how to allow copies of the same component in multiple places (same id)?
+	this is currently working, but implem is sketchy and needs work
+
+/** IGNORE THIS!	
+**1/10/2017 issues
+**x made "main" a property for the template object that the user can make instances of, but the implementation
+**is a bit sketchy because they are both "UserComponent"s. Might be actually better to seperate them into 
+**UserComponentTemplate and UserComponentInstance or something...
+**Here's the idea:
+**	Have two classes Template and Instance (or some other names)
+**	Instance has parentId and custom changes including styles and resize (maybe)
+**	Then in DISPLAY (which is already recursive), if it is of type instance, we read from the project
+**		(side note, if the user is deleting some UserComponentTemplate, we warn them that all uses of it will be deleted,
+**		and delete them as we find them (ie, can't find it in the Project))
+**	
+**	So, the allowed structure is
+**	
+**	BaseComponent (is like a base case)
+**	UserComponentTemplate: 
+**		BaseComponent + UserComponentInstance (ie, just a reference)
+**	UserComponentInstance: ref back to UserComponentTemplate + Custom changes
+**	
+**	1/16/2017 question: how to save custom changes in instance of a base component, eg a link or a label to particular values?
+**		So what are things that can change? 
+**			For UserWidgetTemplate:
+**				(saved in main?)
+**				font size, text color, background color
+**				values for base widgets
+**			For UserWidgetInstance:
+**				(saved in custom?)
+**				font size, text color, background color
+**				values for base widgets
+**				
+**				
+**		customChanges = {
+**			parentId (UserWidget that is the immediate parent of the component):{
+**				baseWidgetType/Id:{
+**					changes/values
+**				}
+**				UserWidgetChanges?
+**			} 
+**		}
+**		
+**		So in display we will do:
+**			Look up parent Id (the UserWidgetTemplate) and get the info from main, and display those
+**			then look up the info from custom and display those and override
+**			
+**		BUT! For base widgets, their particular values are stored in the objects themselves, should we move them to their containing
+**		widget? Or do we just keep it as is? Probably keep it as is, so we can just reuse the method for displaying that we have currently.
+**		
+**/		
+		
+		
+ALSO, change userCOMPONENT to userWidget
+	underway
+	mostly done, still have the css class names left
+
+AND change WIDGET to DRAG-HANDLE
+	done
+
+1/16/2017 notes
+	to allow changes in userInstance widgets such as a inner link or an inner label? Probably. In that case,
+	the relevant function, registerTooltipBtnHandlers, needs to be updated.
+
+	Restructuring notes:
+		Details in OneNote
+		
+		Main Ideas: 
+			*Layers* of trees (*levels*) of changes
+			Templates and Instances will have the same structure, only difference is a template is a child of the project and 
+			a Instance is a child of a UserWidget
+			Now, the tree is structured like this
+				
+				Template Widget
+					id (which is to be used as the parentId)
+					immidiate children ids (TemplateWidget)
+					TREE of changes
+				
+
+				Instance Widget
+					id
+					parentId (Template Widget)
+					TREE of changes
+					
+				
+				TREE of changes 
+					if any descendant is changed at this level, save
+					path to child, and then the change
+					widgetInstanceId:{ (= top level Id of the current widget)
+						changes : changes, 
+						widgetInstanceId:{
+							changes : changes,
+							widgetInstanceId:{
+								...
+							}
+						},
+						widgetInstanceId:{
+							changes : changes,
+							widgetInstanceId:{
+								...
+							}
+						},
+						...
+					}
+
+// Tree of Changes
+// widgetInstanceId:{ (= top level Id of the current widget)
+//     properties : {
+//        layout : {
+//              stackOrder: []
+//        },
+//        styles : {
+//              custom: {}, bsClasses: {}
+//        }
+//     },
+//     children:{
+//          widgetInstanceId:{
+//                properties : changes,
+//                  children: {
+//                    widgetInstanceId:{
+//                      ...
+//                    },
+//                     widgetInstanceId:{
+//                       ...
+//                     }
+//              }, 
+// 		...
+//      }
+//
+// },
+// 
+
+				
+				// we use InstanceIds because at the point this is used, we don't care about the template,
+				// but we DO care about the unique path to this widget!				
+
+				the changes at any *level* is the default and overrides any unspecified values at *levels* below it
+				but any changes at the same *level* at a higher *layer* can override this change.
+				
+				higher level overrides unspecifieds at lower level
+				higher layer but same level overrides specified (and unspecified) changes at that level, and unspecified changes
+					below that level (will behave like a new default at that level)
+				
+				
+		
+1/31:
+made the layered diff structure work; 
+next is to use it for other things such as 
+	location, 
+	and enable editing lower levels, 
+
+also need to deal with deleted components'
+	
+2/2:
+made it so that ids once set stay the same 
+	this enabled the editing to be fully recursive, >1 levels deep
+enabled changes at deeper levels
+still need to make it work for other things
+	location, size, order, etc
+
+bug: 
+	on deleting a project, changing tabs makes it look like it was not deleted: needs to be updated
+
+
+2/3:
+fixed problem with specific styles moving up levels and overall styles moving down layers which was causing issues with delete
+Have to figure out: 
+	What does it mean to "resize" a userWidget: would the inner things scale accordingly? Probs no.
+	Adding and deleting (mostly adding) a component to the inner userWidget?
+	How much stuff in the inner widget should be allowed to change? Color seems ok, position, maybe? Size (also refer
+		to related question above), maybe? 
+
+2/5:
+(Mostly) implemented inner inner widget resizing;
+Repositioning inner inner widgets is hard 
+However, since it does not make a lot of sense to do either of these (see 2/3 notes), resizing and reposition
+is currently disabled. The colors, however, can be changed.
+
+Need to clean up and condense a lot of things. Also think about the resizing aspect of user widgets which are allowed right now. 
+
+2/7:
+Need to think of how to get the change in ids when a new widget is instantiated from a project. Right now it uses
+the stackOrder, but that doesn't work if the stackOrder changes or if components are deleted or added.
+Perhaps when a new widget is made we can have an id table that tracks which id went where so that we can get it back 
+{newId: oldId} so that we can get the old id back from the new?
+
+Adding inner component: perhaps when someone moves a new widget onto another widget we can ask if we add it to the outermost
+widget or the inner widget (or have a keyboard shortcut).
+
+Also right now we are disallowing the widget to be smaller than the total bounding box of the inner components. This is not 
+necessarily the correct behaviour: what if they want an option that is outside the component's border? 
+Maybe the worksurface needs to become a container and there needs to be a work surface that we can move around in, but doens't
+actually have a meaning in terms of the components/widgets. 
+
+2/8:
+
+Figure out and write test srsly. !!!!
+
+color palette
+timeline
+fix html generator
+make worksurface itself moveable?
+small: make the files have a last opened + last modified
+
+2/14
+The DENIM paper might be a good reference for me! : Broaden the UI builder to a web app builder in the sense that it should be 
+a whole experience, from conceptualizing the website to building and iterating on it
+	Interesting ideas:
+		overview for all the pages and how they connect (links?)
+		some sort of sketching mechanism?
+		Perhaps the display of the different levels of widgets can take inspiration from this
+		Also possibly take inspiration for user testing
+		Look at the papers citing this paper, also what happened to it recently?
+
+
+2/15
+Do the grouping
+Do the grouping -> new widget
+Do the grabby grabby navigation thing
+fix: upon changing to a new widget view reset scroll
+
+2/20:
+For undo/redo
+find everywhere where a widget is editted; make a function that moves the editing function add an image to the undo/redo queue
+
+2/21
+Copy widget code and strip it down to barebones for data
+	after making it work, we can combine the two to minimize the copied code
+	
+Data does not container other data, they are just bonded to them.
+There can be a whole bunch of data that are bonded but they are at the same level
+So similar to the Widgets, we would have to go back to the source to figure out what the things are bonded to 
+and if things changed. 
+So a data object can be immediately bonded to other data (which can be secretly bonded to other things?) but we 
+don't wanna show the implicitly bonded data objects, we still want to have a layered structure.
+When are figuring out everything that's connected, we can follow the links (or maybe santiago's platform can do that)
+but we don't want to do that prematurely, since they user would probably want that layered structure.
+
+3/28 plan:
+For datatypes:
+	Fix up some displays:
+		zoom, navigation
+		naming
+		visuals (cliche looks different)
+	Make fake cliches
+	Work on bonding
+
+For widgets:
+	make googlemap thing, but very low priority
+	x fix list displays
+	
+3/30:
+	on datatype focused, don't allow any movements, it's just a change in visuals
+	implement group moving!

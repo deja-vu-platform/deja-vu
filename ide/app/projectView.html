@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Projects</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/3.8.4/css/dropzone.css">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/projectView.css">
+    <link rel="stylesheet" href="css/projectPreview.css">
+</head>
+<body>
+<div class="menubar">
+    <div class="menubar-inner">
+
+        <div class="menu-item logo">Déjà Vu UI builder</div>
+
+
+        <div class="menu-item">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#new-project">
+                <span class="glyphicon glyphicon-plus"></span> New project
+            </button>
+        </div>
+
+        <div class="menu-item">
+            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#load-project">
+                <span class="glyphicon glyphicon-file"></span> Import...
+            </button>
+        </div>
+
+        <div class="menu-item">
+            <div class="btn-group">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="glyphicon glyphicon-file"></span> Help
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Tutorials</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#">Report an issue</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="projects">
+    <div class="recent-projects">
+        <div class="header">
+            <ul class="nav nav-tabs">
+                <li class="active" id="recent-selector"><a href="#">Recent Projects</a></li>
+                <li id="all-selector"><a href="#">All Projects</a></li>
+            </ul>
+        </div>
+        <div class="content">
+            <ul id="recent-projects-list">
+            </ul>
+        </div>
+    </div>
+
+    <div class="current-and-preview-container">
+        <div class="current-project">
+            <div class="header">Current project</div>
+            <div class="content">
+            </div>
+        </div>
+
+        <div class="project-preview">
+            <div id="project-name-preview" class="header"></div>
+            <div id="preview-prev-page">
+                <span class="glyphicon glyphicon-chevron-left" id="preview-prev-page-icon"></span>
+            </div>
+            <div id="page-preview"></div>
+            <div id="preview-next-page">
+                <span class="glyphicon glyphicon-chevron-right" id="preview-next-page-icon"></span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="basic-components">
+    <div class="header">Basic components</div>
+    <div class="content">
+        <ul id="basic-components">
+            <li name="label" class="draggable widget"><img src="images/label_icon.png" width="15px" height="15px"> Text</li>
+            <li name="link" class="draggable widget"><img src="images/link_icon.png" width="15px" height="15px"> Link</li>
+            <li name="image" class="draggable widget"><img src="images/image_icon.png" width="15px" height="15px"> Media</li>
+            <li name="tab-viewer" class="draggable widget"><img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs</li>
+            <li name="menu" class="draggable widget"><img src="images/menu_icon.png" width="15px" height="15px"> Menu</li>
+            <li name="panel" class="draggable widget"><img src="images/panel_icon.png" width="15px" height="15px"> Panel</li>
+
+        </ul>
+    </div>
+</div>
+
+<!--MODALS-->
+<div class="modal fade" id="new-project">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">New project</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Project name: </div>
+                    <div class="col-sm-7"><input id="new-project-name" type="text" class="form-control" required autofocus placeholder="e.g. My new project"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Version: </div>
+                    <div class="col-sm-7"><input id="project-version" type="text" class="form-control" required placeholder="e.g.: 0.1.0"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+                <div class="row">
+                    <div class="col-sm-1"></div>
+                    <div class="col-sm-3 form-lbl">Author: </div>
+                    <div class="col-sm-7"><input id="project-author" type="text" class="form-control" required placeholder="e.g.: Dijkstra"/></div>
+                    <div class="col-sm-1"></div>
+                </div><br/>
+            </div>
+            <div class="modal-footer">
+                <p><button id="create-project" data-dismiss="modal" class="btn btn-primary">Create</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="load-project">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">Load project</h4>
+            </div>
+            <div class="modal-body">
+                <div>Paste JSON here:</div>
+                <div><textarea id="project-json" rows="10" class="form-control" required></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button id="load-project-btn" data-dismiss="modal" class="btn btn-primary">Load</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<div class="modal fade" id="confirm-delete-project">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">x</button>
+                <h4 class="modal-title">Confirm Delete?</h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    You are about to delete your project named <div style="display: inline" id="delete-project-name"></div>. Continue?
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="delete-project-btn" data-dismiss="modal" class="btn btn-primary" data-deleteProjectId="">Yes</button>
+                <button id="delete-project-cancel-btn" data-dismiss="modal" class="btn btn-primary">No</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!--------------Loader-------------->
+<div class="loader-container">
+    <div class="loader"></div>
+    <div class="loader-words">Loading, please wait...</div>
+</div>
+
+<script>window.$ = window.jQuery = require('./js/external/jquery.min.js');</script>
+<script src="js/external/jquery.min.js"></script>
+<script src="js/external/jquery-ui.min.js"></script>
+<script src="js/external/bootstrap.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/utils/Utility.js"></script>
+<script src="js/widget/WidgetDisplay.js"></script>
+<script src="js/widget/WidgetContainer.js"></script>
+<script src="js/widget/WidgetWorkSurface.js"></script>
+
+<script src="js/project/ProjectPreview.js"></script>
+<script src="js/project/ProjectModel.js"></script>
+<script src="js/project/ProjectController.js"></script>
+
+</body>
+</html>
