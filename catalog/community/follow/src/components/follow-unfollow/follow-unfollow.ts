@@ -32,11 +32,11 @@ export class FollowUnfollowComponent implements AfterInit {
     const getFollows = () => {
       this._followService.getPublishersByFollower(this.follower.atom_id)
         .then(publishers => {
-          this.follower.follows = publishers.map(publisher => 
+          this.follower.follows = publishers.map(publisher =>
             this._atomize.atomizePublisher(publisher)
-          )
+          );
         });
-    }
+    };
 
     if (!this.follower.follows) {
       this.follower.follows = [];

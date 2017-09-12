@@ -15,7 +15,7 @@ import FollowService from "../_shared/follow.service";
   ]
 })
 export class ShowMessagesByFollowerComponent {
-  @Field("Follower") follower: FollowerAtom
+  @Field("Follower") follower: FollowerAtom;
 
   fetched: string;
   messages: MessageAtom[] = [];

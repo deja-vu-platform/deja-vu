@@ -15,7 +15,7 @@ import FollowService from "../_shared/follow.service";
   ]
 })
 export class ShowFollowersByPublisherComponent {
-  @Field("Publisher") publisher: PublisherAtom
+  @Field("Publisher") publisher: PublisherAtom;
 
   fetched: string;
   followers: FollowerAtom[] = [];
@@ -42,7 +42,7 @@ export class ShowFollowersByPublisherComponent {
   }
 
   getPublishers() {
-    this._followService.getPublishersByFollower(this.publisher.atom_id)
+    this._followService.getFollowersByPublisher(this.publisher.atom_id)
       .then(followers => {
         this.followers = followers.map(follower => {
           return this._atomize.atomizeFollower(follower);

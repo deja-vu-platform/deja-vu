@@ -9,7 +9,7 @@ export interface FollowerAtom extends Follower, Atom {
   follows: PublisherAtom[];
 }
 
-export interface PublisherAtom extends Publisher, Atom{
+export interface PublisherAtom extends Publisher, Atom {
   atom_id: string;
   name: string;
 }

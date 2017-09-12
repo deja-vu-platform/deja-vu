@@ -28,16 +28,16 @@ export class EditFollowsOfFollowerComponent implements AfterInit {
   dvAfterInit() {
     this._followService.getPublishersByFollower(this.follower.atom_id)
       .then(publishers => {
-        this.follower.follows = publishers.map(publisher => 
+        this.follower.follows = publishers.map(publisher =>
           this._atomize.atomizePublisher(publisher)
-        )
+        );
       });
-    
+
     this._followService.getPublishers()
       .then(publishers => {
-        this.publishers = publishers.map(publisher => 
+        this.publishers = publishers.map(publisher =>
           this._atomize.atomizePublisher(publisher)
-        )
+        );
       });
   }
 }
