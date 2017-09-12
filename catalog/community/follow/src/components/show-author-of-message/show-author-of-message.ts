@@ -25,7 +25,11 @@ export class ShowAuthorOfMessageComponent {
   ) {}
 
   dvAfterInit() {
-    if (this.message.atom_id && !this.message.author) {
+    if (
+      this.message.atom_id && (
+        !this.message.author || !this.message.author.name
+      )
+    ) {
       this.fetch();
     } else {
       this.fetched = this.message.atom_id;

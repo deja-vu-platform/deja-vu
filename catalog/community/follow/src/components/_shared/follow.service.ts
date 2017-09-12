@@ -78,7 +78,10 @@ export default class FollowService {
       .get(`
         message_all {
           atom_id,
-          content
+          content,
+          author {
+            atom_id
+          }
         }
       `)
       .map(data => getOrDefault(data, ["message_all"], []))
@@ -135,7 +138,8 @@ export default class FollowService {
           atom_id: "${message_id}"
         ) {
           author {
-            atom_id
+            atom_id,
+            name
           }
         }
       `)
@@ -167,7 +171,10 @@ export default class FollowService {
           follower_id: "${follower_id}"
         ) {
           atom_id,
-          content
+          content,
+          author {
+            atom_id
+          }
         }
       `)
       .map(data => getOrDefault(data, ["messagesByFollower"], []))
@@ -200,7 +207,10 @@ export default class FollowService {
           publisher_id: "${publisher_id}"
         ) {
           atom_id,
-          content
+          content,
+          author {
+            atom_id
+          }
         }
       `)
       .map(data => getOrDefault(data, ["messagesByPublisher"], []))

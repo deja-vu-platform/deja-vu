@@ -49,7 +49,10 @@ const schema = grafo
       follows: {
         type: "[Publisher]",
         resolve: (follower: Follower, {}) => {
-          const ids = follower.follows.map(publisher => publisher.atom_id);
+          let ids = [];
+          if (follower.follows) {
+            ids = follower.follows.map(publisher => publisher.atom_id);
+          }
           return mean.db.collection("publishers")
             .find({atom_id: {$in: ids}})
             .toArray();
@@ -68,7 +71,8 @@ const schema = grafo
     name: "Message",
     fields: {
       atom_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      content: {type: graphql.GraphQLString}
+      content: {type: graphql.GraphQLString},
+      author: {type: "Publisher"}
     }
   })
   .add_mutation({
@@ -119,9 +123,12 @@ const schema = grafo
       return mean.db.collection("followers")
         .findOne({atom_id: follower_id})
         .then((follower: Follower) => {
-          const ids = follower.follows.map(publisher => publisher.atom_id);
+          let ids = [];
+          if (follower.follows) {
+            ids = follower.follows.map(publisher => publisher.atom_id);
+          }
           return mean.db.collection("messages")
-            .find({author: {atom_id: {$in: ids}}})
+            .find({"author.atom_id": {$in: ids}})
             .toArray();
         })
     }
