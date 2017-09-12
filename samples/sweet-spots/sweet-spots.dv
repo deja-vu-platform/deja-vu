@@ -23,9 +23,9 @@ app SweetSpots {
     SpotPanelWithMarker replacing ShowItem in ShowSearchResults
   ]
   include community/Follow[
-    User for Source,
-    Spot for Target,
-    SpotPanel replacing ShowTarget in ShowFollowing
+    User for Follower,
+    Spot for Publisher,
+    SpotPanel replacing ShowNameOfPublisher in ShowPublishersByFollower
   ]
 
   data User {

@@ -12,7 +12,7 @@ import FollowService from "../_shared/follow.service";
     FollowService
   ]
 })
-export class EditcontentOfMessageComponent {
+export class EditContentOfMessageComponent {
   @Field("Message") message: MessageAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 

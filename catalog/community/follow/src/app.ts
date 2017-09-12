@@ -111,7 +111,7 @@ const schema = grafo
   // getPublishersByFollower -- just use follower_by_id
   .add_query({
     name: "messagesByFollower",
-    type: "[Messages]",
+    type: "[Message]",
     args: {
       follower_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
@@ -155,7 +155,7 @@ const schema = grafo
     type: graphql.GraphQLBoolean,
     args: {
       follower_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      name: graphql.GraphQLString
+      name: {type: graphql.GraphQLString}
     },
     resolve: (_, {follower_id, name}): Promise<boolean> => {
       return rename(follower_id, name, "Follower", "followers");
@@ -166,7 +166,7 @@ const schema = grafo
     type: graphql.GraphQLBoolean,
     args: {
       publisher_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      name: graphql.GraphQLString
+      name: {type: graphql.GraphQLString}
     },
     resolve: (_, {publisher_id, name}): Promise<boolean> => {
       return rename(publisher_id, name, "Publisher", "publishers");
@@ -177,7 +177,7 @@ const schema = grafo
     type: graphql.GraphQLBoolean,
     args: {
       message_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      content: graphql.GraphQLString
+      content: {type: graphql.GraphQLString}
     },
     resolve: (_, {message_id, content}): Promise<boolean> => {
       const updateObj = {$set: {content: content}};

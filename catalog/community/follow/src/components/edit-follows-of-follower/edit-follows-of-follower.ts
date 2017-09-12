@@ -12,7 +12,8 @@ import FollowService from "../_shared/follow.service";
   fqelement: "Follow",
   ng2_providers: [
     GraphQlService,
-    FollowService
+    FollowService,
+    Atomize
   ]
 })
 export class EditFollowsOfFollowerComponent implements AfterInit {

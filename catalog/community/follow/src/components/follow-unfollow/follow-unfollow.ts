@@ -13,7 +13,8 @@ import {doesFollow} from "../_shared/utils";
   fqelement: "Follow",
   ng2_providers: [
     GraphQlService,
-    FollowService
+    FollowService,
+    Atomize
   ]
 })
 export class FollowUnfollowComponent implements AfterInit {

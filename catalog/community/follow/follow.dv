@@ -13,19 +13,19 @@ cliche Follow {
 
   // Something said by a publisher
   data Message {
-    author: Publisher
+    author: Publisher,
     content: text
   }
 
   // Button allowing the creation of a Follower
   widget NewFollowerButton {
-    follower: Follower
+    follower: Follower,
     submit_ok: boolean
   }
 
   // Button allowing the creation of a Publisher
   widget NewPublisherButton {
-    publisher: Publisher
+    publisher: Publisher,
     submit_ok: boolean
   }
 
@@ -73,7 +73,7 @@ cliche Follow {
 
   // Lists the publishers followed by a follower
   widget ShowPublishersByFollower uses ShowNameOfPublisher {
-    publisher: Publisher
+    follower: Follower
   }
 
   // Displays all messages authored by publishers the follower follows
