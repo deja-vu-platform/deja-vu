@@ -6,7 +6,8 @@ app Bookmark {
   include community/Follow[
     User for Follower,
     User | Topic for Publisher,
-    Post for Message
+    Post for Message,
+    ShowFeedPost replacing ShowContentOfMessage in ShowMessagesByFollower
   ] as Follow
   include community/Follow[
     User for Follower,
