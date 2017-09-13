@@ -69,7 +69,7 @@ export class FollowUnfollowComponent implements AfterInit {
       .then(success => {
         if (success) {
           filterInPlace(this.follower.follows, (followed) => {
-             return followed.atom_id !== this.publisher.atom_id;
+            return followed.atom_id !== this.publisher.atom_id;
           });
         }
       });

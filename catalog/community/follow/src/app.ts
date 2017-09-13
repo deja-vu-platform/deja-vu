@@ -267,11 +267,11 @@ function create(
   type: string,
   collection: string
 ): Promise<string> {
-  return mean.db.collection("followers")
+  return mean.db.collection(collection)
     .insertOne(newObject)
     .then(res => {
-      if (res.insertedID) {
-        return bus.create_atom(collection, newObject.atom_id, newObject);
+      if (res.insertedId) {
+        return bus.create_atom(type, newObject.atom_id, newObject);
       }
       return false;
     })

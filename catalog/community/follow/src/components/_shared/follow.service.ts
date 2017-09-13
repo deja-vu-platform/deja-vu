@@ -270,7 +270,7 @@ export default class FollowService {
           publisher_id: "${publisher_id}"
         )
       `)
-      .map(data => getOrDefault(data, ["follow"], false))
+      .map(data => getOrDefault(data, ["unfollow"], false))
       .toPromise();
   }
 }
