@@ -9,7 +9,6 @@ module.exports = function(grunt) {
       "ShowNameOfFollower",
       "ShowNameOfPublisher",
       "ShowContentOfMessage",
-      "ShowAuthorOfMessage",
       "ShowPublishersByFollower",
       "ShowMessagesByFollower",
       "ShowFollowersByPublisher",

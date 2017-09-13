@@ -8,12 +8,12 @@ cliche Follow {
 
   // The thing being followed
   data Publisher {
-    name: text
+    name: text,
+    messages: [Message]
   }
 
   // Something said by a publisher
   data Message {
-    author: Publisher,
     content: text
   }
 
@@ -52,16 +52,6 @@ cliche Follow {
     message: Message
   }
 
-  // Display the name of the author of the message
-  widget ShowAuthorOfMessage uses ShowNameOfPublisher {
-    message: Message
-  }
-
-  // Display the content and author of a message
-  widget ShowMessage uses ShowContentOfMessage, ShowAuthorOfMessage {
-    message: Message
-  }
-
   // Shows all followers that exist
   widget ShowFollowers uses ShowNameOfFollower {}
 
@@ -69,7 +59,7 @@ cliche Follow {
   widget ShowPublishers uses ShowNameOfPublisher {}
 
   // Shows all messages that exist
-  widget ShowMessages uses ShowMessage {}
+  widget ShowMessages uses ShowContentOfMessage {}
 
   // Lists the publishers followed by a follower
   widget ShowPublishersByFollower uses ShowNameOfPublisher {
@@ -77,7 +67,7 @@ cliche Follow {
   }
 
   // Displays all messages authored by publishers the follower follows
-  widget ShowMessagesByFollower uses ShowMessage {
+  widget ShowMessagesByFollower uses ShowContentOfMessage {
     follower: Follower
   }
 
@@ -87,7 +77,7 @@ cliche Follow {
   }
 
   // Displays all messages which are authored by the publisher
-  widget ShowMessagesByPublisher uses ShowMessage {
+  widget ShowMessagesByPublisher uses ShowContentOfMessage {
     follower: Follower
   }
 
@@ -109,8 +99,10 @@ cliche Follow {
   }
 
   // Text box to allow message content to be edited
+  // Also assigns message to publisher
   widget EditContentOfMessage {
     message: Message,
+    publisher: Publisher,
     submit_ok: boolean
   }
 

@@ -78,10 +78,7 @@ export default class FollowService {
       .get(`
         message_all {
           atom_id,
-          content,
-          author {
-            atom_id
-          }
+          content
         }
       `)
       .map(data => getOrDefault(data, ["message_all"], []))
@@ -130,23 +127,6 @@ export default class FollowService {
       .toPromise();
   }
 
-  // gets the author (publisher with only atom_id defined) of a message
-  getAuthorOfMessage(message_id: string): Promise<Publisher> {
-    return this._graphQlService
-      .get(`
-        message_by_id(
-          atom_id: "${message_id}"
-        ) {
-          author {
-            atom_id,
-            name
-          }
-        }
-      `)
-      .map(data => getOrDefault(data, ["message_by_id", "author"], null))
-      .toPromise();
-  }
-
   // gets all publishers which are followed by a follower
   getPublishersByFollower(follower_id: string): Promise<Publisher[]> {
     return this._graphQlService
@@ -171,10 +151,7 @@ export default class FollowService {
           follower_id: "${follower_id}"
         ) {
           atom_id,
-          content,
-          author {
-            atom_id
-          }
+          content
         }
       `)
       .map(data => getOrDefault(data, ["messagesByFollower"], []))
@@ -207,10 +184,7 @@ export default class FollowService {
           publisher_id: "${publisher_id}"
         ) {
           atom_id,
-          content,
-          author {
-            atom_id
-          }
+          content
         }
       `)
       .map(data => getOrDefault(data, ["messagesByPublisher"], []))
@@ -256,6 +230,21 @@ export default class FollowService {
         )
       `)
       .map(data => getOrDefault(data, ["editContentOfMessage"], false))
+      .toPromise();
+  }
+
+  addMessageToPublisher(
+    publisher_id: string,
+    message_id: string
+  ): Promise<boolean> {
+    return this._graphQlService
+      .post(`
+        addMessageToPublisher(
+          publisher_id: "${publisher_id}",
+          message_id: "${message_id}"
+        )
+      `)
+      .map(data => getOrDefault(data, ["addMessageToPublisher"], false))
       .toPromise();
   }
 

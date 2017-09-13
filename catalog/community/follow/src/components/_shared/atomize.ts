@@ -36,19 +36,21 @@ export default class Atomize {
     const publisher_atom = this._clientBus.new_atom<PublisherAtom>("Publisher");
     publisher_atom.atom_id = publisher.atom_id;
     publisher_atom.name = publisher.name;
+    if (publisher.messages) {
+      publisher_atom.messages = publisher.messages.map(message => {
+        if (isAtom(message)) {
+          return message as MessageAtom;
+        } else {
+          return this.atomizeMessage(message);
+        }
+      });
+    }
     return publisher_atom;
   }
 
   atomizeMessage(message: Message): MessageAtom {
     const message_atom = this._clientBus.new_atom<MessageAtom>("Message");
     message_atom.atom_id = message.atom_id;
-    let author: PublisherAtom;
-    if (isAtom(message.author)) {
-      author = message.author as PublisherAtom;
-    } else {
-      author = this.atomizePublisher(message.author);
-    }
-    message_atom.author = author;
     message_atom.content = message.content;
     return message_atom;
   }

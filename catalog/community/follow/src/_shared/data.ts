@@ -7,10 +7,10 @@ export interface Follower {
 export interface Publisher {
   atom_id: string;
   name: string;
+  messages: Message[];
 }
 
 export interface Message {
   atom_id: string;
-  author: Publisher;
   content: string;
 }

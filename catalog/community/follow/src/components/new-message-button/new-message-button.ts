@@ -1,7 +1,7 @@
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {MessageAtom} from "../_shared/data";
+import {MessageAtom, PublisherAtom} from "../_shared/data";
 import FollowService from "../_shared/follow.service";
 
 
@@ -14,6 +14,7 @@ import FollowService from "../_shared/follow.service";
 })
 export class NewMessageButtonComponent {
   @Field("Message") message : MessageAtom;
+  @Field("Publisher") publisher: PublisherAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   failMsg: string;
@@ -34,8 +35,19 @@ export class NewMessageButtonComponent {
       .then(atom_id => {
         if (atom_id) {
           this.message.atom_id = atom_id;
-          this.submit_ok.value = true;
-          this.failMsg = "";
+          if (this.publisher && this.publisher.atom_id) {
+            this._followService.addMessageToPublisher(
+              this.publisher.atom_id,
+              this.message.atom_id
+            ).then(success => {
+              if (success) {
+                this.submit_ok.value = true;
+                this.failMsg = "";
+              } else {
+                this.failMsg = "Failed to set message publisher.";
+              }
+            });
+          }
         } else {
           this.failMsg = "Failed to create message.";
         }

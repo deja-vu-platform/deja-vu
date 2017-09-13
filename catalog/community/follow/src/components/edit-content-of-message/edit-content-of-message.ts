@@ -1,7 +1,7 @@
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
-import {MessageAtom} from "../_shared/data";
+import {MessageAtom, PublisherAtom} from "../_shared/data";
 import FollowService from "../_shared/follow.service";
 
 
@@ -14,6 +14,7 @@ import FollowService from "../_shared/follow.service";
 })
 export class EditContentOfMessageComponent {
   @Field("Message") message: MessageAtom;
+  @Field("Publisher") publisher: PublisherAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   failMsg: string;
@@ -36,12 +37,20 @@ export class EditContentOfMessageComponent {
         this.message.atom_id &&
         this.message.content
       ) {
-        return this._followService
-          .updateContentOfMessage(
-            this.message.atom_id,
-            this.message.content
-          )
-          .then(success => {
+        return Promise.all([
+          this._followService
+            .updateContentOfMessage(
+              this.message.atom_id,
+              this.message.content
+            ),
+          this.publisher && this.publisher.atom_id ? this._followService
+            .addMessageToPublisher(
+              this.publisher.atom_id,
+              this.message.atom_id
+            ) : Promise.resolve(true)
+          ])
+          .then(res => {
+            const success = res.reduce((prev, curr) => prev && curr);
             this.failMsg = success ? "" : "Failed to update message content.";
           });
       }

@@ -10,10 +10,7 @@ export interface FollowerAtom extends Follower, Atom {
 }
 
 export interface PublisherAtom extends Publisher, Atom {
-  atom_id: string;
-  name: string;
+  messages: MessageAtom[];
 }
 
-export interface MessageAtom extends Message, Atom {
-  author: PublisherAtom;
-}
+export interface MessageAtom extends Message, Atom {}
