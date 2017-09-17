@@ -180,14 +180,16 @@ export default class FollowService {
   getMessagesByPublisher(publisher_id: string): Promise<Message[]> {
     return this._graphQlService
       .get(`
-        messagesByPublisher(
-          publisher_id: "${publisher_id}"
+        publisher_by_id(
+          atom_id: "${publisher_id}"
         ) {
-          atom_id,
-          content
+          messages {
+            atom_id,
+            content
+          }
         }
       `)
-      .map(data => getOrDefault(data, ["messagesByPublisher"], []))
+      .map(data => getOrDefault(data, ["publisher_by_id", "messages"], []))
       .toPromise();
   }
 

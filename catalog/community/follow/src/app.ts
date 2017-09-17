@@ -169,23 +169,6 @@ const schema = grafo
         .toArray();
     }
   })
-  .add_query({
-    name: "messagesByPublisher",
-    type: "[Message]",
-    args: {
-      publisher_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
-    },
-    resolve: (_, {publisher_id}) => {
-      return mean.db.collection("publishers")
-        .findOne({atom_id: publisher_id})
-        .then((publisher: Publisher) => {
-          let msg_ids = publisher.messages.map(message => message.atom_id);
-          return mean.db.collection("messages")
-            .find({atom_id: {$in: msg_ids}})
-            .toArray();
-        });
-    }
-  })
   .add_mutation({
     name: "renameFollower",
     type: graphql.GraphQLBoolean,
@@ -240,7 +223,8 @@ const schema = grafo
       publisher_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {follower_id, publisher_id}): Promise<boolean> => {
-      return updateFollow(follower_id, publisher_id, false);
+      const updateObj = {$addToSet: {follows: {atom_id: publisher_id}}};
+      return updateOne(follower_id, updateObj, "Follower", "followers");
     }
   })
   .add_mutation({
@@ -251,7 +235,8 @@ const schema = grafo
       publisher_id: {type: new graphql.GraphQLNonNull(graphql.GraphQLString)}
     },
     resolve: (_, {follower_id, publisher_id}): Promise<boolean> => {
-      return updateFollow(follower_id, publisher_id, true);
+      const updateObj = {$pull: {follows: {atom_id: publisher_id}}};
+      return updateOne(follower_id, updateObj, "Follower", "followers");
     }
   })
   .schema();
@@ -304,16 +289,4 @@ function updateOne(
       }
       return !!res.matchedCount;
     });
-}
-
-// do a follow or unfollow
-function updateFollow(
-  follower_id: string,
-  publisher_id: string,
-  un: boolean
-): Promise<boolean> {
-  const updateObj = {
-    [un ? "$pull": "$addToSet"]: {follows: {atom_id: publisher_id}}
-  };
-  return updateOne(follower_id, updateObj, "Follower", "followers");
 }
