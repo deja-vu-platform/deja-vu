@@ -36,6 +36,13 @@ cliche Geolocation {
     submit_ok: boolean
   }
 
+  // Deletes a marker in the database, sets on_delete_ok. After successfully deleting the marker,
+  // No redirect happens if `on_delete_ok` is undefined. 
+  widget DeleteMarker {
+    marker: Marker,
+    on_delete_ok: Widget
+  }
+
   // gets all markers for a map and overlays them on the map
   // will do nothing without DisplayMap or replacing OverlayMarker
   widget OverlayMarkers uses OverlayMarker {

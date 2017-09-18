@@ -94,6 +94,19 @@ const schema = grafo
         .then(_ => marker);
     }
   })
+  .add_mutation({
+    name: "deleteMarker",
+    type: "Marker",
+    args: {
+      marker_id: {type: graphql.GraphQLString}
+    },
+    // marker_id == marker.atom_id
+    resolve: (_, {marker_id}) => {
+      return mean.db.collection("markers")
+        .deleteOne({"atom_id": marker_id})
+        .then(_ => bus.remove_atom("Marker", marker_id))    
+    }
+  })
   .add_query({
     name: "getMarkersByMap",
     type: "[Marker]",
