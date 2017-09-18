@@ -100,7 +100,6 @@ const schema = grafo
     args: {
       marker_id: {type: graphql.GraphQLString}
     },
-    // marker_id == marker.atom_id
     resolve: (_, {marker_id}) => {
       return mean.db.collection("markers")
         .deleteOne({"atom_id": marker_id})

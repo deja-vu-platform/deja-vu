@@ -36,8 +36,7 @@ cliche Geolocation {
     submit_ok: boolean
   }
 
-  // Deletes a marker in the database, sets on_delete_ok. After successfully deleting the marker,
-  // No redirect happens if `on_delete_ok` is undefined. 
+  // Deletes a marker in the database, sets delete_ok. 
   widget DeleteMarker {
     marker: Marker,
     delete_ok: boolean
