@@ -98,7 +98,7 @@ app SweetSpots {
     map: MapData = global_map,
     spot: Spot,
     user: User,
-    on_delete_ok: Widget = Main
+    delete_ok: boolean
   }
 
   widget Profile {

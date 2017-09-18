@@ -1,4 +1,4 @@
-import {Widget, Field, PrimitiveAtom, ClientBus, WidgetValue} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {GraphQlService} from "gql";
 
 import {MarkerAtom} from "../_shared/data";
@@ -10,15 +10,16 @@ import {MarkerAtom} from "../_shared/data";
   })
 export class DeleteMarkerComponent {
     @Field("Marker") marker: MarkerAtom;
-    @Field("Widget") on_delete_ok: PrimitiveAtom<WidgetValue>;
+    @Field("boolean") delete_ok: PrimitiveAtom<boolean>;
 
 
-    constructor(private _graphQlService: GraphQlService,
-                private _client_bus: ClientBus) {}
+    constructor(private _graphQlService: GraphQlService) {}
 
+    /**
+     * Deletes a marker.
+     * N.B. Must have a subsection in the post request and must subscribe to it.
+     */
     deleteMarker() {
-        // Trigger delete action if button is clicked.
-        // N.B. For post requests, it is necessary to have a subsection.
         this._graphQlService
             .post(`
                 deleteMarker (
@@ -27,11 +28,10 @@ export class DeleteMarkerComponent {
                     atom_id
                 }
             `)
-            // TODO: Redirect after deleting the marker.
-            // .subscribe(
-            //     atom_id => {
-            //         this._client_bus.navigate(this.on_delete_ok.value);
-            //     }
-            // );
+            .subscribe(
+                atom_id => {
+                    this.delete_ok.value = true;
+                }
+            );
     }
 }

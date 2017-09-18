@@ -40,7 +40,7 @@ cliche Geolocation {
   // No redirect happens if `on_delete_ok` is undefined. 
   widget DeleteMarker {
     marker: Marker,
-    on_delete_ok: Widget
+    delete_ok: boolean
   }
 
   // gets all markers for a map and overlays them on the map
