@@ -16,7 +16,8 @@ The Déjà Vu code is organized as follows:
 Building and running
 --------------------
 
-You need to be running npm v3 and node v6.
+You need to be running npm v3 and node v6. Also, you need to have `grunt-cli` installed so that you
+can run grunt from the command line.
 
 Each cliché and sample is its own node project. Like any other node project, you
 need to run `npm install` to install dependencies. To build a library or a
