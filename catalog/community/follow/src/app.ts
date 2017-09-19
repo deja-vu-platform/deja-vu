@@ -263,7 +263,7 @@ function create(
     .then(success => success ? newObject.atom_id : "");
 }
 
-// renames entitiy with atom_id to name
+// renames entity with atom_id to name
 function rename(
   atom_id: string,
   name: string,
