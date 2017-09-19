@@ -33,4 +33,4 @@ Team No REST for the Wicked
 - Click review author username to see profile (refactor ShowComment widget, or way to override its template)
 - Show spots by creator (could bind with post, but that’s a bit hacky, seems like ownership is a general issue)
 - Only one review per user (need to think about this more)
-- Report spots (it's unclear what this did, if anything, in the original)
+- Report spots (If a spot has been reported 10 more than the number of reviews it has (i.e. num(reports) > 10 + num(reviews)), the spot will automatically be deleted.)
