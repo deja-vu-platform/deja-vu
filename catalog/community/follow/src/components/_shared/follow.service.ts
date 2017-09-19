@@ -65,7 +65,10 @@ export default class FollowService {
       .get(`
         publisher_all {
           atom_id,
-          name
+          name,
+          messages {
+            atom_id
+          }
         }
       `)
       .map(data => getOrDefault(data, ["publisher_all"], []))

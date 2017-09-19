@@ -3,6 +3,9 @@
 // topics and users they follow.
 app Bookmark {
 
+  // First follow allows us to show messages for users & topics followed
+  // Second follow allows us to have a follow users page
+  // Third follow allows us to have a follow topics page
   include community/Follow[
     User for Follower,
     User | Topic for Publisher,
