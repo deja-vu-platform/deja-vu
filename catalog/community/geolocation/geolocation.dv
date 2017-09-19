@@ -36,10 +36,9 @@ cliche Geolocation {
     submit_ok: boolean
   }
 
-  // Deletes a marker in the database, sets delete_ok. 
+  // Deletes a marker in the database. 
   widget DeleteMarker {
-    marker: Marker,
-    delete_ok: boolean
+    marker: Marker
   }
 
   // gets all markers for a map and overlays them on the map
