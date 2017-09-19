@@ -17,7 +17,7 @@ Building and running
 --------------------
 
 You need to be running npm v3 and node v6. Also, you need to have `grunt-cli` installed so that you
-can run grunt from the command line.
+can run grunt from the command line and the directory containing `mongod` has to be in your path.
 
 Each cliché and sample is its own node project. Like any other node project, you
 need to run `npm install` to install dependencies. To build a library or a
