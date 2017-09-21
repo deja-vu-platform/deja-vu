@@ -1,0 +1,6 @@
+<fieldset class="form-group">
+  <label class="sr-only" for="content">Content</label>
+  <input required class="form-control" name="content" type="text"
+    placeholder="Content" [(ngModel)]="message.content" />
+  <div class="alert alert-danger" *ngIf="failMsg">{{failMsg}}</div>
+</fieldset>
