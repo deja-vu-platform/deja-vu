@@ -56,7 +56,7 @@ Social
 | Post       |    X     |        |     X      |            |         |               |
 | Email      |          |        |            |            |         |               |
 | Comment    |    X     |        |     X      |    X       |         |               |
-| Event      |          |   X    |            |            |         |               |
+| Event      |          |   X    |     X      |            |    X    |               |
 | Allocator  |          |        |            |            |         |               |
 | Label      |    X     |        |     X      |    X       |         |               |
 | Group      |          |   X    |     X      |            |    X    |               |
