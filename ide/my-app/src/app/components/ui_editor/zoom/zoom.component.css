@@ -1,0 +1,38 @@
+#zoom-control {
+  position: fixed;
+  bottom: 20px;
+  right: 15px;
+  border-radius: 4px;
+}
+
+#zoom-slider-and-value {
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+}
+#zoom-slider{
+  width: 160px;
+}
+
+.zoom-control-button {font-size: 20px;
+  background-color: rgba(0, 60, 136, 0.5);
+  padding: 5px;
+  border-radius: 5px;
+  color: white;
+  border: white solid 1px;
+  font-family: 'Lucida Grande';
+  line-height: 90%;
+  vertical-align: middle;
+}
+
+.zoom-control-button:hover {
+  background-color: rgba(0, 60, 136, 0.8);
+}
+
+#zoom-in {
+  border-radius: 6px;
+}
+#zoom-out {
+  border-radius: 6px;
+}
+

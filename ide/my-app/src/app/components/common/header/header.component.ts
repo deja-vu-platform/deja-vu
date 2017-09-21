@@ -24,7 +24,7 @@ const pages: pageInfo[] = [{
 export class HeaderComponent implements OnInit{
   @Input() readonly pageTitle: string;
   isClichePage: boolean;  
-  readonly dejavu = 'Déjà Vu UI builder';
+  readonly dejavu = 'Déjà Vu';
   otherPages: pageInfo[];
 
   ngOnInit(){

@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppComponent } from './app.component';
 import { HeaderModule } from './components/common/header/header.module';
+import { ZoomModule } from './components/ui_editor/zoom/zoom.module';
 
 @NgModule({
   declarations: [
@@ -10,7 +11,8 @@ import { HeaderModule } from './components/common/header/header.module';
   ],
   imports: [
     BrowserModule,
-    HeaderModule
+    HeaderModule,
+    ZoomModule
   ],
   providers: [],
   bootstrap: [AppComponent]
