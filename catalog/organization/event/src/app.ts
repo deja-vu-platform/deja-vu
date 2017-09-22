@@ -208,8 +208,6 @@ const schema = grafo
             "WeeklyEvent", weekly_event_id, updated_weekly_event)));
       }
 
-      console.log(eid);
-      console.log(weekly_event_id);
       return Promise.all(related_deletes)
         .then(_ => mean.db.collection("events")
           .deleteOne({"atom_id": eid})

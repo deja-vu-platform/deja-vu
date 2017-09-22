@@ -25,8 +25,6 @@ export class DeleteEventComponent {
           atom_id
         }
       `)
-      .subscribe(atom_id => {
-        console.log(atom_id);
-      });
+      .subscribe(atom_id => undefined);
   }
 }
