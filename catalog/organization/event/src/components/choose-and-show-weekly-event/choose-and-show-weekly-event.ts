@@ -62,7 +62,8 @@ export class ChooseAndShowWeeklyEventComponent implements AfterInit {
           events {
             atom_id,
             start_date,
-            end_date
+            end_date,
+            weekly_event_id
           }
         }
       `)
