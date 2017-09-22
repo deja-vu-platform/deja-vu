@@ -203,7 +203,6 @@ class Dispatcher {
     Promise<boolean>;
   update_atom: (t_name: string, atom_id: string, update: string) =>
     Promise<boolean>;
-  remove_atom: (t_name: string, atom_id: string) => Promise<boolean>;
 
   private _dispatch_table;
   private _str_t;
@@ -275,6 +274,16 @@ class Dispatcher {
         const target = JSON.parse(target_str);
         return this._post(this._locs[target.fqelement], `{
             read_${target.name.toLowerCase()}(atom_id: "${atom_id}")
+        }`);
+      })).then(_ => true);
+  }
+
+  remove_atom(t_name: string, atom_id: string): Promise<boolean> {
+    return Promise.all(
+      _u.map(_u.keys(this._dispatch_table[t_name]), target_str => {
+        const target = JSON.parse(target_str);
+        return this._post(this._locs[target.fqelement], `{
+            remove_${target.name.toLowerCase()}(atom_id: "${atom_id}")
         }`);
       })).then(_ => true);
   }
