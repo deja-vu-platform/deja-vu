@@ -194,24 +194,22 @@ const schema = grafo
       weekly_event_id: {"type": graphql.GraphQLString}
     },
     resolve: (_, {eid, weekly_event_id}) =>  {
-      const related_deletes = [];
-      if (weekly_event_id) {
+      return Promise.resolve(_ => {
+       if (weekly_event_id) {
         const updated_weekly_event = {
           $pull: {
             events: {atom_id: eid}
           }
         };
-        related_deletes.push(
-          mean.db.collection("weeklyevents")
+        return mean.db.collection("weeklyevents")
           .update({atom_id: weekly_event_id}, updated_weekly_event)
           .then(_ => bus.update_atom(
-            "WeeklyEvent", weekly_event_id, updated_weekly_event)));
-      }
-
-      return Promise.all(related_deletes)
-        .then(_ => mean.db.collection("events")
-          .deleteOne({"atom_id": eid})
-          .then(_ => bus.remove_atom("Event", eid)));
+            "WeeklyEvent", weekly_event_id, updated_weekly_event));
+        }
+      })
+      .then(_ => mean.db.collection("events")
+        .deleteOne({"atom_id": eid})
+        .then(_ => bus.remove_atom("Event", eid)));
     }
   })
   .add_type({
