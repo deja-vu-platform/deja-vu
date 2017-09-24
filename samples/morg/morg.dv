@@ -2,7 +2,7 @@
 app Morg {
   include organization/Event[
     GroupMeeting for Event,
-    WeeklyGroupMeeting for WeeklyEvent, 
+    WeeklyGroupMeeting for WeeklyEvent,
     ShowGroupMeeting replacing ShowEvent in
       ChooseAndShowWeeklyEvent]
   include messaging/Email[

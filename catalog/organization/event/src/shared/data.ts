@@ -4,6 +4,7 @@ export interface Event {
   atom_id: string;
   start_date: string; // Datetime;
   end_date: string; // Datetime;
+  weekly_event_id?: string;
 }
 export interface EventAtom extends Event, Atom {}
 
