@@ -1,8 +1,96 @@
 // Facilitate peer grocery delivery between students
 app GroceryShip {
-  include access/Auth
-  include community/Market
-  include community/Rating
-  include organization/Checklist
-  include organization/Task
+  include access/Auth[
+    User for User
+  ]
+  include access/Profile
+  include community/Market[
+    User for Party,
+    Request for Good
+  ]
+  include community/Rating[
+    User for Source,
+    User for Target
+  ]
+  include organization/Event[
+    Request for Event
+  ]
+  include organization/Label[
+    Request for Item
+  ]
+  include organization/Task[
+    User for Assigner,
+    User for Assignee
+  ]
+
+  data User {
+    username: text,
+    first_name: text,
+    last_name: text
+  }
+
+  data Request {
+    name: text
+  }
+
+  main widget Login {
+    on_signin_ok: Widget = Dashboard
+  }
+
+  widget Dashboard {}
+
+  widget Notifications {
+    user: User
+  }
+
+  widget PayAndRate {
+    request: Request
+  }
+
+  widget DeliverAndRate {
+    request: Request
+  }
+
+  widget YourRequests {
+    user: User
+  }
+
+  widget ToDeliver {
+    user: User
+  }
+
+  widget SetDeliveryTime {
+    request: Request
+  }
+
+  widget CreateRequest {
+    user: User
+  }
+
+  widget Deliver {
+    user: User
+  }
+
+  widget Profile {
+    user: User
+  }
+
+  widget NavBar {
+    user: User,
+    on_signout: Widget = Login
+  }
+
+  widget ShowUserRating {
+    user: User
+  }
+
+  widget ShowUserRatingAndContact {
+    user: User
+  }
+
+  login: route = {path: "login", widget: Login}
+  dashboard: route = {path: "dashboard", widget: Dashboard}
+  request: route = {path: "request", widget: CreateRequest}
+  deliver: route = {path: "deliver", widget: Deliver}
+  profile: route = {path: "profile", widget: Profile}
 }
