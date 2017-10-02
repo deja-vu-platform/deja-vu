@@ -1,13 +1,9 @@
-// Control access to resources
+// Verifies the user's identity with a username and password.
+
 cliche Auth {
   /** Entities **/
   data User {
     username: text
-  }
-
-  data Resource {
-    owner: User,
-    viewers: [User]
   }
 
   /** Widgets **/
