@@ -1,6 +1,6 @@
 // Verifies the user's identity with a username and password.
 
-cliche Auth {
+cliche StandardAuthentication {
   /** Entities **/
   data User {
     username: text
