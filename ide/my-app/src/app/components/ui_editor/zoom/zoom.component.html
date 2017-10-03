@@ -1,24 +1,46 @@
 <div id="zoom-control">
-  <button id="zoom-control-minimize-btn" class="btn btn-default">
-      <span class="glyphicon glyphicon-chevron-right"></span>
+  <button id="zoom-control-minimize-btn" 
+          class="btn btn-default"
+          (click)="minimize()">
+      <span [class]="chevron"></span>
   </button>
-  <button id="zoom-actual" class="btn btn-default">
+  <button id="zoom-actual" 
+          class="btn btn-default"
+          [hidden]="minimized"
+          (click)="zoomButtonClick(ZoomType.ACTUAL)">
       Actual
   </button>
-  <button id="zoom-fit" class="btn btn-default">
+  <button id="zoom-fit" 
+          class="btn btn-default"
+          [hidden]="minimized"
+          (click)="zoomButtonClick(ZoomType.FIT)">
       Fit
   </button>
-  <button id="zoom-full" class="btn btn-default">
+  <button id="zoom-full" 
+          class="btn btn-default"
+          [hidden]="minimized"
+          (click)="zoomButtonClick(ZoomType.FULL)">
       Full
   </button>
-  <button id="zoom-out" class="zoom-control-button">
+  <button id="zoom-out" 
+          class="btn zoom-control-button" 
+          (click)="zoomClick($event, true)">
       <span class="glyphicon glyphicon-zoom-out"></span>
   </button>
-  <div id="zoom-slider-and-value">
-      <input id="zoom-slider" type="range" min="-300" max="300" value="0"/>
-      <div id="zoom-control-value"></div>
+  <div id="zoom-slider-and-value"
+       [hidden]="minimized">
+    <input id="zoom-slider" #slider
+           type="range" 
+           [min]="sliderMinVal" 
+           [max]="sliderMaxVal" 
+           [(value)]="sliderVal" 
+           (input)="zoomSliderInput(slider.value)"
+           (change)="zoomSliderChange()" />
+    <div id="zoom-control-value">{{zoomControlText}}</div>
   </div>
-  <button id="zoom-in" class="zoom-control-button">
+  <button id="zoom-in" 
+          class="btn zoom-control-button" 
+          (click)="zoomClick($event, false)">
       <span class="glyphicon glyphicon-zoom-in"></span>
   </button>
 </div>

@@ -2,27 +2,34 @@
   position: fixed;
   bottom: 20px;
   right: 15px;
-  border-radius: 4px;
+  height: 60px;
+  display: flex;
 }
 
 #zoom-slider-and-value {
-  display: inline-block;
   vertical-align: middle;
   text-align: center;
 }
+
+#zoom-slider-and-value[hidden] {
+  display: none;
+}
+
 #zoom-slider{
+  height: 40px;
+  width: 160px;
+}
+
+#zoom-control-value {
+  height: 20px;
   width: 160px;
 }
 
 .zoom-control-button {font-size: 20px;
   background-color: rgba(0, 60, 136, 0.5);
-  padding: 5px;
-  border-radius: 5px;
   color: white;
   border: white solid 1px;
-  font-family: 'Lucida Grande';
   line-height: 90%;
-  vertical-align: middle;
 }
 
 .zoom-control-button:hover {
@@ -36,3 +43,12 @@
   border-radius: 6px;
 }
 
+.btn {
+  margin: 0 3px;
+  height: 40px;
+  border-radius: 5px;
+}
+
+.btn[hidden] {
+  display: none;
+}

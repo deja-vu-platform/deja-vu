@@ -1,5 +1,6 @@
 import { TestBed, async } from '@angular/core/testing';
 import { ZoomComponent } from './zoom.component';
+
 describe('ZoomComponent', () => {
   let fixture;
   let zoom;
