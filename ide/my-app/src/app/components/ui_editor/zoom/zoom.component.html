@@ -7,24 +7,24 @@
   <button id="zoom-actual" 
           class="btn btn-default"
           [hidden]="minimized"
-          (click)="zoomButtonClick(ZoomType.ACTUAL)">
+          (click)="zoomTypeButtonClick(ZoomType.ACTUAL)">
       Actual
   </button>
   <button id="zoom-fit" 
           class="btn btn-default"
           [hidden]="minimized"
-          (click)="zoomButtonClick(ZoomType.FIT)">
+          (click)="zoomTypeButtonClick(ZoomType.FIT)">
       Fit
   </button>
   <button id="zoom-full" 
           class="btn btn-default"
           [hidden]="minimized"
-          (click)="zoomButtonClick(ZoomType.FULL)">
+          (click)="zoomTypeButtonClick(ZoomType.FULL)">
       Full
   </button>
   <button id="zoom-out" 
           class="btn zoom-control-button" 
-          (click)="zoomClick($event, true)">
+          (click)="zoomButtonClick($event, true)">
       <span class="glyphicon glyphicon-zoom-out"></span>
   </button>
   <div id="zoom-slider-and-value"
@@ -34,13 +34,12 @@
            [min]="sliderMinVal" 
            [max]="sliderMaxVal" 
            [(value)]="sliderVal" 
-           (input)="zoomSliderInput(slider.value)"
-           (change)="zoomSliderChange()" />
+           (input)="zoomSliderInput(slider.value)"/>
     <div id="zoom-control-value">{{zoomControlText}}</div>
   </div>
   <button id="zoom-in" 
           class="btn zoom-control-button" 
-          (click)="zoomClick($event, false)">
+          (click)="zoomButtonClick($event, false)">
       <span class="glyphicon glyphicon-zoom-in"></span>
   </button>
 </div>

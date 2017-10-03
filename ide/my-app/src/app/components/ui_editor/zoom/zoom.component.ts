@@ -1,12 +1,9 @@
 import { Component, Input, Output, EventEmitter} from '@angular/core';
 
+import {Dimensions} from '../../common/utility/utility';
+
 enum ZoomType {
   SLIDER, FIT, FULL, ACTUAL
-}
-
-export interface Dimensions {
-    width: number;
-    height: number;
 }
 
 const CHEVRON = {
@@ -20,18 +17,9 @@ const CHEVRON = {
   styleUrls: ['./zoom.component.css']
 })
 export class ZoomComponent {
-  @Input() outerContainerDimensions: Dimensions = {
-    width: 10,
-    height: 20
-  };
-  @Input() widgetDimensions: Dimensions = {
-    width: 10,
-    height: 20
-  };
-  @Input() screenDimensions: Dimensions = {
-    width: 10,
-    height: 20
-  };
+  @Input() outerContainerDimensions: Dimensions;
+  @Input() widgetDimensions: Dimensions;
+  @Input() screenDimensions: Dimensions;
 
   @Output() updatedZoom = new EventEmitter<number>();
 
@@ -45,46 +33,30 @@ export class ZoomComponent {
 
   private currentZoom: number;
 
-  private getSliderValFromZoom(zoom: number): number {
-    let val: number;
-    if (zoom === 1) {
-        val = 0;
-    } else if ( zoom > 1 ) {
-        val = (zoom - 1) * 100;
-    } else {
-        val = (zoom - 1) * (this.sliderMinVal + 100);
-    }
-    // rounding for extremes
-    val = Math.max(Math.min(val, this.sliderMaxVal), this.sliderMinVal);
-    return Math.round(val);
+  zoomTypeButtonClick(type: ZoomType) {
+    this.changeZoomViaZoomControl(type);
+    this.sliderVal = this.getSliderValFromZoom(this.currentZoom);
+    this.zoomChanged();
   }
 
-  private getZoomFromSliderVal(): number {
-    const val = this.sliderVal / 100;
-    let zoom;
-
-    if (val === 0) {
-        zoom = 1;
-    } else if (val > 0) {
-        zoom = (val + 1);
-    } else {
-        zoom = 1 + val / (this.sliderMaxVal / 100 + 1);
-    }
-    console.log(zoom);
-    return zoom;
+  zoomButtonClick(e: MouseEvent, out: boolean) {
+    e.preventDefault();
+    const diff = out ? -100 : 100;
+    this.sliderVal = Math.round(this.sliderVal / 100) * 100 + diff;
+    this.changeZoomViaZoomControl(ZoomType.SLIDER);
+    this.zoomChanged();
   }
 
-  private makeZoomText(zoom: number): string {
-    return Math.round(zoom * 100) + '%';
+  zoomSliderInput(newVal: number) {
+    this.sliderVal = newVal;
+    this.changeZoomViaZoomControl(ZoomType.SLIDER);
+    this.zoomChanged();
   }
 
-  changeZoomViaZoomControl(type: ZoomType) {
+  private changeZoomViaZoomControl(type: ZoomType) {
     switch (type) {
     case ZoomType.SLIDER:
-        // TODO make this better
-        const zoom = this.getZoomFromSliderVal();
-        this.zoomControlText = this.makeZoomText(zoom);
-        this.currentZoom = zoom;
+        this.currentZoom = this.getZoomFromSliderVal();
         break;
     case ZoomType.FIT:
         const zoomHeight = this.outerContainerDimensions.height /
@@ -102,61 +74,54 @@ export class ZoomComponent {
         break;
     case ZoomType.ACTUAL:
         this.sliderVal = 0;
-        this.changeZoomViaZoomControl(ZoomType.SLIDER);
+        this.currentZoom = 1;
         break;
     }
-    this.changeZoomDisplays();
+
+    // clip for extremes
+    this.currentZoom = Math.max(Math.min(this.currentZoom, 4), .25);
   }
 
-
-
-  /**
-   * Changes the displays related to zoom
-   *
-   * @param zoom
-   */
-  private changeZoomDisplays() {
-    this.zoomControlText = this.makeZoomText(this.currentZoom);
-    this.sliderVal = this.getSliderValFromZoom(this.currentZoom);
-
-    // // update zoom nav displays
-    // $('#selected-screen-size').css({
-    //     height: selectedScreenSizeHeight*currentZoom + 'px',
-    //     width: selectedScreenSizeWidth*currentZoom + 'px',
-    // });
-    // $('#zoom-selected-screen-size').css({
-    //     height: selectedScreenSizeHeight*currentZoom*miniNav.getNavZoom() + 'px',
-    //     width: selectedScreenSizeWidth*currentZoom*miniNav.getNavZoom() + 'px',
-    // });
-    // $('.'+workSurfaceRef).css({
-    //     width: outerWidget.properties.dimensions.width*zoom + 'px',
-    //     height: outerWidget.properties.dimensions.height*zoom + 'px',
-    // });
+  private getSliderValFromZoom(zoom: number): number {
+    // TODO make this better? Currently < 0 is a linear scale
+    // whereas > 0 is exp scale
+    let val: number;
+    if (zoom === 1) {
+        val = 0;
+    } else if ( zoom > 1 ) {
+        val = (zoom - 1) * 100;
+    } else {
+        val = (zoom - 1) * (this.sliderMaxVal + 100);
+    }
+    return Math.round(val);
   }
 
-  zoomButtonClick(type: ZoomType) {
-    this.changeZoomViaZoomControl(type);
+  private getZoomFromSliderVal(): number {
+    // TODO make this better? Currently < 0 is a linear scale
+    // whereas > 0 is exp scale
+    const val = this.sliderVal;
+    let zoom: number;
+
+    if (val === 0) {
+        zoom = 1;
+    } else if (val > 0) {
+        zoom = (val + 100) / 100;
+    } else {
+        zoom = 1 + val / (this.sliderMaxVal + 100);
+    }
+    return zoom;
   }
 
-  zoomClick(e: MouseEvent, out: boolean) {
-    e.preventDefault();
-    const diff = out ? -100 : 100;
-    this.sliderVal = Math.round(this.sliderVal / 100) * 100 + diff;
-    this.changeZoomViaZoomControl(ZoomType.SLIDER);
+  private makeZoomText(zoom: number): string {
+    return Math.round(zoom * 100) + '%';
   }
 
-  zoomSliderInput(newVal: number) {
-    this.sliderVal = newVal;
-    this.changeZoomViaZoomControl(ZoomType.SLIDER);
-}
-
-  zoomSliderChange() {
+  private zoomChanged() {
     this.updatedZoom.emit(this.currentZoom);
     this.zoomControlText = this.makeZoomText(this.getZoomFromSliderVal());
   }
 
-
-  minimize() {
+  private minimize() {
     if (this.minimized) {
         this.minimized = false;
         this.chevron = CHEVRON.RIGHT;
@@ -165,11 +130,4 @@ export class ZoomComponent {
         this.chevron = CHEVRON.LEFT;
     }
   }
-
-//   registerZoom() {
-//     $('#zoom-slider').unbind().on('change', function(){
-//         this.changeZoomViaZoomControl('slider');
-//     });
-//   }
-
 }
