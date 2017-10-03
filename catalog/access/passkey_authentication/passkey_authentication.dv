@@ -1,4 +1,5 @@
-// Verifies the user's identity with a passkey.
+// Verifies the user's identity with a passkey (e.g. access code, PIN).
+// A user cannot create their own passkey. It is created by another for them.
 
 cliche PasskeyAuthentication {
     /** Entities **/

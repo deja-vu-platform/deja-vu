@@ -3,7 +3,7 @@
 cliche Authorization {
     /** Entities **/
     data User {
-        id: text
+        username: text
     }
 
     data Resource {
