@@ -3,94 +3,80 @@ import {Widget, Field, AfterInit, ClientBus} from "client-bus";
 import {GraphQlService} from "gql";
 import "rxjs/add/operator/toPromise";
 
-import {TargetAtom, SourceAtom} from "../../shared/data";
-import {doesFollow} from "../../shared/utils";
+import Atomize from "../_shared/atomize";
+import {FollowerAtom, PublisherAtom} from "../_shared/data";
+import FollowService from "../_shared/follow.service";
+import {doesFollow} from "../_shared/utils";
 
 
 @Widget({
   fqelement: "Follow",
-  ng2_providers: [GraphQlService]
+  ng2_providers: [
+    GraphQlService,
+    FollowService,
+    Atomize
+  ]
 })
 export class FollowUnfollowComponent implements AfterInit {
-  @Field("Target") target: TargetAtom;
-  @Field("Source") source: SourceAtom;
+  @Field("Publisher") publisher: PublisherAtom;
+  @Field("Follower") follower: FollowerAtom;
 
   _lastID: string = "";
 
   constructor(
-    private _graphQlService: GraphQlService,
-    private _clientBus: ClientBus
+    private _atomize: Atomize,
+    private _clientBus: ClientBus,
+    private _followService: FollowService
   ) {}
 
   dvAfterInit() {
-    const getFollows = () => this._graphQlService
-      .get(`
-        source_by_id(atom_id: "${this.source.atom_id}") {
-          follows {
-            atom_id
-          }
-        }
-      `)
-      .toPromise()
-      .then(res => {
-        res.source_by_id.follows.forEach(t => {
-          const t_atom = this._clientBus.new_atom<TargetAtom>("Target");
-          t_atom.atom_id = t.atom_id;
-          this.source.follows.push(t_atom);
+    const getFollows = () => {
+      this._followService.getPublishersByFollower(this.follower.atom_id)
+        .then(publishers => {
+          this.follower.follows = publishers.map(publisher =>
+            this._atomize.atomizePublisher(publisher)
+          );
         });
-      });
+    };
 
-    if (!this.source.follows) {
-      this.source.follows = [];
+    if (!this.follower.follows) {
+      this.follower.follows = [];
     }
-    if (this.source.follows.length === 0 && this.source.atom_id) {
+    if (this.follower.follows.length === 0 && this.follower.atom_id) {
       getFollows();
     }
-    if (this.source.atom_id) {
-      this._lastID = this.source.atom_id;
+    if (this.follower.atom_id) {
+      this._lastID = this.follower.atom_id;
     }
-    this.source.on_change(() => {
-      if (this._lastID !== this.source.atom_id) {
-        this._lastID = this.source.atom_id;
+    this.follower.on_change(() => {
+      if (this._lastID !== this.follower.atom_id) {
+        this._lastID = this.follower.atom_id;
         return getFollows();
       }
     });
   }
 
   follow() {
-    this._graphQlService
-      .post(`
-        follow(
-          source_id: "${this.source.atom_id}",
-          target_id: "${this.target.atom_id}"
-        )
-      `)
-      .subscribe(res => {
-        if (res) {
-          this.source.follows.push(this.target);
-        }
+    this._followService.addFollow(this.follower.atom_id, this.publisher.atom_id)
+      .then(success => {
+        if (success) this.follower.follows.push(this.publisher);
       });
   }
 
   unfollow() {
-    this._graphQlService
-      .post(`
-        unfollow(
-          source_id: "${this.source.atom_id}",
-          target_id: "${this.target.atom_id}"
-        )
-      `)
-      .subscribe(res => {
-        if (res) {
-          filterInPlace(this.source.follows, (t) => {
-             return t.atom_id !== this.target.atom_id;
+    this._followService
+      .removeFollow(this.follower.atom_id, this.publisher.atom_id)
+      .then(success => {
+        if (success) {
+          filterInPlace(this.follower.follows, (followed) => {
+            return followed.atom_id !== this.publisher.atom_id;
           });
         }
       });
   }
 
-  doesFollow(source: SourceAtom, target: TargetAtom): boolean {
-    return doesFollow(source, target);
+  doesFollow(follower: FollowerAtom, publisher: PublisherAtom): boolean {
+    return doesFollow(follower, publisher);
   }
 }
 

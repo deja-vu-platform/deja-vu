@@ -3,15 +3,37 @@
 // topics and users they follow.
 app Bookmark {
 
-  include community/Follow[User for Source, User for Target] as FollowUsers
-  include community/Follow[User for Source, Topic for Target] as FollowTopics
-  include access/Auth[User for User, Post for Resource]
-  include messaging/Feed[
-    User for Subscriber, User | Topic for Publisher, Post for Message,
-    ShowFeedPost replacing ShowFeedItem in ShowFeed
+  // First follow allows us to show messages for users & topics followed
+  // Second follow allows us to have a follow users page
+  // Third follow allows us to have a follow topics page
+  include community/Follow[
+    User for Follower,
+    User | Topic for Publisher,
+    Post for Message,
+    ShowFeedPost replacing ShowContentOfMessage in ShowMessagesByFollower
+  ] as Follow
+  include community/Follow[
+    User for Follower,
+    User for Publisher,
+    Post for Message
+  ] as FollowUsers
+  include community/Follow[
+    User for Follower,
+    Topic for Publisher,
+    Post for Message
+  ] as FollowTopics
+  include access/Auth[
+    User for User,
+    Post for Resource
   ]
-  include organization/Label[Post for Item, Topic for Label]
-  include messaging/Post[User for User, Post for Post] as MessagingPost
+  include organization/Label[
+    Post for Item,
+    Topic for Label
+  ]
+  include messaging/Post[
+    User for User,
+    Post for Post
+  ] as MessagingPost
   include messaging/Comment[
     User for Author,
     Post for Target,

@@ -1,6 +1,23 @@
 module.exports = function(grunt) {
   require("mean-loader").GruntTask.cliche_task(
-      grunt,
-      "Follow",
-      ["Follow", "EditFollow"]);
+    grunt,
+    "Follow",
+    [
+      "NewFollowerButton",
+      "NewPublisherButton",
+      "NewMessageButton",
+      "ShowNameOfFollower",
+      "ShowNameOfPublisher",
+      "ShowContentOfMessage",
+      "ShowPublishersByFollower",
+      "ShowMessagesByFollower",
+      "ShowFollowersByPublisher",
+      "ShowMessagesByPublisher",
+      "EditNameOfFollower",
+      "EditFollowsOfFollower",
+      "EditNameOfPublisher",
+      "EditContentOfMessage",
+      "FollowUnfollow"
+    ]
+  );
 }

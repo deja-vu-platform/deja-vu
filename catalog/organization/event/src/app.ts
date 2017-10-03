@@ -52,6 +52,7 @@ const schema = grafo
       // TODO: grafo should allow weak types
       start_date: {"type": graphql.GraphQLString},
       end_date: {"type": graphql.GraphQLString},
+      weekly_event_id: {"type": graphql.GraphQLString},
       updateEvent: {
         type: "Event",
         args: {
@@ -108,6 +109,7 @@ const schema = grafo
 
       const inserts = [];
       const event_ids = [];
+      const weid = uuid.v4();
       for (
         let event_date = starts_on_date; event_date <= ends_on_date;
         event_date.setDate(event_date.getDate() + 7)) {
@@ -125,14 +127,14 @@ const schema = grafo
         const e = {
           atom_id: eid,
           start_date: start_date.toString(),
-          end_date: end_date.toString()
+          end_date: end_date.toString(),
+          weekly_event_id: weid
         };
         inserts.push(
             mean.db.collection("events")
               .insertOne(e)
               .then(_ => bus.create_atom("Event", eid, e)));
       }
-      const weid = uuid.v4();
       return Promise.all(inserts)
         .then(_ => mean.db.collection("guests")
           .find({}).project({atom_id: 1}).toArray()
@@ -182,6 +184,32 @@ const schema = grafo
         .insertOne(e)
         .then(_ => bus.create_atom("Event", eid, e))
         .then(_ => e);
+    }
+  })
+  .add_mutation({
+    name: "deleteEvent",
+    "type": "WeeklyEvent",
+    args: {
+      eid: {"type": graphql.GraphQLString},
+      weekly_event_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (_, {eid, weekly_event_id}) =>  {
+      return Promise.resolve(_ => {
+       if (weekly_event_id) {
+        const updated_weekly_event = {
+          $pull: {
+            events: {atom_id: eid}
+          }
+        };
+        return mean.db.collection("weeklyevents")
+          .update({atom_id: weekly_event_id}, updated_weekly_event)
+          .then(_ => bus.update_atom(
+            "WeeklyEvent", weekly_event_id, updated_weekly_event));
+        }
+      })
+      .then(_ => mean.db.collection("events")
+        .deleteOne({"atom_id": eid})
+        .then(_ => bus.remove_atom("Event", eid)));
     }
   })
   .add_type({

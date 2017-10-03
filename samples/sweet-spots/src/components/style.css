@@ -242,3 +242,8 @@ follow-unfollow button.btn {
   overflow: hidden;
   white-space: nowrap;
 }
+
+ul {
+  list-style: none;
+}
+

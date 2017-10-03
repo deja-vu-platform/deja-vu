@@ -1,8 +1,0 @@
-<ul *ngIf="feed && feed.length > 0" class="list-group">
-  <li *ngFor="let feedItem of feed" class="list-group-item">
-    <dv-widget name="ShowFeedItem" [init]="feedItem"></dv-widget>
-  </li>
-</ul>
-<div *ngIf="!feed || feed.length == 0">
-  No content to show
-</div>
