@@ -1,0 +1,71 @@
+// Enables climbers to log their climbs and for others to view the 
+// results in real-time.
+app LiveScorecard {
+    /** Neccessary Cliches **/
+    // Grants access to content based on permissions.
+    include access/Authorization [
+        User for User
+    ]
+
+    // Only a host can create an account and login the traditional way,
+    // i.e. using a username and password. 
+    include access/StandardAuthentication [
+        Host for User
+    ] as HostAuthentication
+
+    // A climber can access his/her account using a climber code and
+    // competition code.
+    include access/PasskeyAuthetication [
+        Climber for User
+    ] as ClimberAuthentication
+
+    // A spectator can view the live leaderboard using a competition code.
+    include access/PasskeyAuthetication [
+        Spectator for User
+    ] as SpectatorAuthentication
+
+    // Competitions are created by a host. Climbers participate in them and
+    // spectators view its results.
+    include organization/Event [
+        Competition for Event
+    ]
+
+    // Climbers have to complete climbs of various difficulties to score points.
+    include organization/Task [
+        Climb as Task,
+        Host for Assigner,
+        Climber for Assignee
+    ]
+
+    // For every competition, there is a set of climbers.
+    // TODO: Need to create ShowClimbers widget
+    include organization/Group [
+        Climber for Member,
+        Competition for Group,
+        ShowClimbers replacing ShowNameOfGroup in ShowGroupsByMember
+    ]
+
+
+    /** Entities **/
+    data User {
+        username: text
+    }
+
+    data Host {
+        name: text,
+        username: text
+    }
+
+    data Climber {
+        name: text,
+        username: text
+    }
+
+    data Spectator {
+        username: text
+    }
+
+    data Competition { }
+
+    data Climb { }
+}
