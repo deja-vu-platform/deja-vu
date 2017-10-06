@@ -38,13 +38,18 @@ app LiveScorecard {
     ]
 
     // For every competition, there is a set of climbers.
-    // TODO: Need to create ShowClimbers widget
     include organization/Group [
         Climber for Member,
         Competition for Group,
         ShowClimbers replacing ShowNameOfGroup in ShowGroupsByMember
-    ]
+    ] as CompetitionClimbers
 
+    // For every competition, there is a set of hosts.
+    include organization/Group [
+        Host for Member,
+        Competition for Group,
+        ShowHosts replacing ShowNameOfGroup in ShowGroupsByMember
+    ] as CompetitionHosts
 
     /** Entities **/
     data User {
@@ -56,16 +61,103 @@ app LiveScorecard {
         username: text
     }
 
+    // Climbers can be filtered by sex and experience level.
     data Climber {
         name: text,
-        username: text
+        username: text,
+        sex: text,
+        level: text
     }
 
     data Spectator {
         username: text
     }
 
-    data Competition { }
+    data Competition { 
+        code: text,
+        hosts: [Host] 
+    }
 
-    data Climb { }
+    // Climbs can be sorted by id and number of points, and
+    // filtered by level of difficulty.
+    data Climb {
+        id: number,
+        difficulty: text,
+        points: number,
+        falls: number
+    }
+
+    /** Widgets **/
+    // Displays login/register forms for hosts and 
+    // login forms for climbers and spectators.
+    main widget Landing {
+        on_host_ok: Widget = HostHome,
+        on_climber_ok: Widget = ClimberHome,
+        on_spectator_ok: Widget = SpectatorHome
+    }
+
+    // Allows hosts to add competitions, climbers and other hosts.
+    // Also, allows hosts to view the leaderboard.
+    widget HostHome {
+        host: Host,
+        to_leaderboard: Widget = ShowClimbers,
+        on_signout: Widget = Landing
+    }
+
+    // Allows climbers to view available climbs, log climbs and view the 
+    // leaderboard.
+    // Also, allows other climbers to use the buddy log.
+    widget ClimberHome {
+        climber: Climber,
+        on_buddy_log_ok: Widget = BuddyHome,
+        to_leaderboard: Widget = ShowClimbers,
+        on_signout: Widget = Landing
+    }
+    
+    // Allows climbers to view available climbs, log climbs and view the 
+    // leaderboard.
+    // Signing out returns it to the original climber's account.
+    widget BuddyHome {
+        buddy: Climber,
+        on_signout: ClimberHome
+    }
+
+    // Allows spectators to view the leaderboard.
+    widget SpectatorHome {
+        spectator: Spectator,
+        to_leaderboard: Widget = ShowClimbers,
+        on_signout: Widget = Landing
+    }
+
+    // A host can add other individuals to co-host the competition.
+    // The email must be associated with a host account.
+    widget AddHost { 
+        email: text
+    }
+    
+    // A climber can only complete a climb after receiving approval by
+    // another climber, NOT a host or the climber him/herself.
+    widget LogClimb {
+        climb: Climb,
+        approver: Climber
+    }
+
+    // Can also be used for the leaderboard.
+    widget ShowClimbers {
+        competition: Competition,
+        climber: Climber
+    }
+
+    // Can also be used for the leaderboard
+    widget ShowHosts {
+        competition: Competition,
+        host: Host
+    }
+
+    /** Routes **/
+    host_home_route: route = {path: "host-home", widget: HostHome}
+    climber_home_route: route = {path: "climber-home", widget: ClimberHome}
+    buddy_home_route: route = {path: "buddy-home", widget: BuddyHome}
+    spectator_home_route: route = {path: "spectator-home", widget: SpectatorHome}
+    leaderboard: route = {path: "leaderboard", widget: Leaderboard}
 }
