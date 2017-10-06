@@ -3,22 +3,35 @@ app GroceryShip {
   include access/Auth[
     User for User
   ]
-  include access/Profile
+
   include community/Market[
     User for Party,
     Request for Good
   ]
+
+  include community/Profile[
+    User for Profile
+  ]
+
   include community/Rating[
     User for Source,
     User for Target
   ]
+
+  // Buyers set a delivery time for a Request
+  // Event will be used to schedule this
   include organization/Event[
     Request for Event
   ]
+
+  // Label a Request by its associated Store and Pickup Location,
+  // allows them to be filtered by those fields
   include organization/Label[
     Request for Item
   ]
+
   include organization/Task[
+    Request for Task,
     User for Assigner,
     User for Assignee
   ]
@@ -29,44 +42,57 @@ app GroceryShip {
     last_name: text
   }
 
-  data Request {
-    name: text
-  }
+  data Request {}
 
   main widget Login {
     on_signin_ok: Widget = Dashboard
   }
 
+  // Page that contains Notifications, Your Requests and To Deliver
   widget Dashboard {}
 
+  // Shows Requests where user is assigned (buyer) or user is the assigner (requester),
+  // and delivery time has been set
+  // Allows user to take action on each Request to either PayAndRate or DeliverAndRate
   widget Notifications {
     user: User
   }
 
+  // Shows the dialog where requesters can mark the Request as approved,
+  // and pay and rate the buyer
   widget PayAndRate {
     request: Request
   }
 
+  // Shows the dialog where buyers can mark the Request as completed
+  // and rate the requester
   widget DeliverAndRate {
     request: Request
   }
 
+  // Shows Requests where the user is the assigner
+  // and the Request hasn't been completed and approved
   widget YourRequests {
     user: User
   }
 
+  // Shows Requests where the user is the assignee
+  // and the Request hasn't been completed and approved
   widget ToDeliver {
     user: User
   }
 
+  // Allows the buyer to set the delivery time of a Request
   widget SetDeliveryTime {
     request: Request
   }
 
+  // Shows the page where users can create a Request
   widget CreateRequest {
     user: User
   }
 
+  // Shows the page where users can claim Requests for them to deliver
   widget Deliver {
     user: User
   }
@@ -80,10 +106,13 @@ app GroceryShip {
     on_signout: Widget = Login
   }
 
+  // Shows the username and rating of a user
+  // We don't want to show contact info until Request has been claimed
   widget ShowUserRating {
     user: User
   }
 
+  // Shows the username, rating, and contact info of a user
   widget ShowUserRatingAndContact {
     user: User
   }
