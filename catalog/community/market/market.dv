@@ -29,6 +29,12 @@ cliche Market {
     market: Market
   }
 
+  // A record of multiple related transactions
+  // that happened at the same time
+  data CompoundTransaction {
+    transactions: [Transaction]
+  }
+
   data Market {}
 
   /** Widgets **/
