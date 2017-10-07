@@ -24,12 +24,6 @@ app GroceryShip {
     Request for Event
   ]
 
-  // Label a Request by its associated Store and Pickup Location,
-  // allows them to be filtered by those fields
-  include organization/Label[
-    Request for Item
-  ]
-
   include organization/Task[
     Request for Task,
     User for Assigner,
