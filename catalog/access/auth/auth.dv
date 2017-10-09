@@ -37,4 +37,11 @@ cliche Auth {
   widget LoggedIn {
     user: User
   }
+
+  // Shows a form to change a user's password.
+  // `submit_ok` becomes true and a success message is displayed if successful
+  widget ChangePassword {
+    user: User,
+    submit_ok: boolean
+  }
 }
