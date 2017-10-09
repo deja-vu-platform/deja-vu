@@ -20,11 +20,7 @@ export class ChangePasswordComponent {
   confirm_new_password_error = false;
 
   constructor(private _graphQlService: GraphQlService) {}
-
-  dvAfterInit() {
-    this.user.username = localStorage.getItem("username");
-  }
-
+  
   onSubmit() {
     this.clearErrors();
     this.confirm_new_password_error =
