@@ -78,13 +78,12 @@ app LiveScorecard {
         hosts: [Host] 
     }
 
-    // Climbs can be sorted by id and number of points, and
+    // Climbs can be sorted by climb number and number of points, and
     // filtered by level of difficulty.
     data Climb {
-        id: number,
+        climb_number: number,
         difficulty: text,
-        points: number,
-        falls: number
+        points: number
     }
 
     /** Widgets **/
@@ -137,8 +136,10 @@ app LiveScorecard {
     
     // A climber can only complete a climb after receiving approval by
     // another climber, NOT a host or the climber him/herself.
+    // The climber must log the number of times he/she fell during the climb.
     widget LogClimb {
         climb: Climb,
+        falls: number,
         approver: Climber
     }
 
