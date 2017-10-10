@@ -78,6 +78,10 @@ app LiveScorecard {
         hosts: [Host] 
     }
 
+    // A climb is a task that is assigned by a host to all climbers
+    // in the competition.
+    // The climb number is a label set by hosts to make it easier for
+    // climbers to log their climbs.
     // Climbs can be sorted by climb number and number of points, and
     // filtered by level of difficulty.
     data Climb {
