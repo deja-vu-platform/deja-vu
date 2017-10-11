@@ -109,6 +109,37 @@ const schema = grafo
       });
     }
   })
+  .add_mutation({
+    name: "changePassword",
+    "type": graphql.GraphQLBoolean,
+    args: {
+      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      oldPassword: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      newPassword: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+    },
+    resolve: (_, {username, oldPassword, newPassword}) => {
+      return Validation.userExists(username).then(user => {
+        if (!bcrypt.compareSync(oldPassword, user.password)) {
+          throw new Error("Incorrect password");
+        }
+
+        const newPasswordHash = bcrypt.hashSync(newPassword, 10);
+        const updateOperation = {$set: {password: newPasswordHash}};
+
+        return mean.db.collection("users")
+          .updateOne({username: username}, updateOperation)
+          .then(write_res => {
+            if (write_res.modifiedCount !== 1) {
+              throw new Error("Couldn't save new password");
+            }
+
+            // report
+            bus.update_atom("User", user.atom_id, updateOperation);
+            return true;
+          });
+      });
+    }
+  })
  .schema();
 
 
