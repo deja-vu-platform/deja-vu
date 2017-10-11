@@ -6,6 +6,11 @@ export interface Dimensions {
   height: number;
 }
 
+export interface Position {
+  top: number;
+  left: number;
+}
+
 
 // special characters not allowed in inputs
 const regex = /[^\w\s\-]/gi;
