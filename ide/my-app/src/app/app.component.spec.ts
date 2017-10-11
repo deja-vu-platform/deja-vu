@@ -10,7 +10,7 @@ describe('AppComponent', () => {
         AppComponent
       ],
       imports: [
-      ] 
+      ]
     }).compileComponents();
   }));
   it('should create the app', async(() => {
