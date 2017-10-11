@@ -22,7 +22,8 @@ export interface Properties {
 
 interface Meta {
     name: string;
-    id: number;
+    id: string; // id of the form 'clicheid_widgetid'
+    templateid?: string;
     version?: string;
     author?: string;
 }
@@ -47,8 +48,25 @@ export class Widget {
         return UserWidget.fromObject(object);
     }
 
-    getId(): number {
+    protected encodeid(clicheid: string, widgetid: string) {
+        return clicheid + '_' + widgetid;
+    }
+
+    protected decodeid(idstr: string) {
+        return idstr
+            .split('_');
+    }
+
+    getId(): string {
         return this.meta.id;
+    }
+
+    getClicheId(): string {
+        return this.decodeid(this.meta.id)[0];
+    }
+
+    getTemplayeId(): string {
+        return this.meta.templateid;
     }
 
     getWidgetType(): WidgetType {
@@ -71,7 +89,7 @@ export class BaseWidget extends Widget {
         if (object.widgetType  !== WidgetType.BASE_WIDGET) {
             return null;
         }
-        const widget = new BaseWidget(null, null, null, null);
+        const widget = new BaseWidget(null, null, null, null, null);
         widget.type = object.type;
         widget.value = object.value;
         widget.meta = object.meta;
@@ -79,12 +97,18 @@ export class BaseWidget extends Widget {
         return widget;
     }
 
-    constructor(name: string, dimensions: Dimensions, type: string,
-        value: string) {
+    constructor(
+        name: string,
+        dimensions: Dimensions,
+        type: string,
+        value: string,
+        clicheid: string,
+        templateid: string = null) {
         super();
         this.meta = {
             name: name,
-            id: generateId(),
+            id: clicheid + '_' + generateId(),
+            templateid: templateid,
             version: '',
             author: ''
         };
@@ -114,28 +138,29 @@ export class BaseWidget extends Widget {
  */
 export class UserWidget extends Widget {
     protected widgetType  = WidgetType.USER_WIDGET;
-    private innerWidgetIds: number[] = []; // Widget ids
+    private innerWidgetIds: string[] = []; // Widget ids
 
     static fromObject(object: any): UserWidget {
         if (object.widgetType  !== WidgetType.USER_WIDGET) {
             return null;
         }
-        const widget = new UserWidget(null, null);
+        const widget = new UserWidget(null, null, null);
         widget.innerWidgetIds = object.innerWidgetIds;
         widget.meta = object.meta;
         widget.properties = object.properties;
         return widget;
     }
 
-    constructor(name: string, dimensions: Dimensions) {
-        // id
-        // children = instances
-        // properties // tree of changes
-        //
+    constructor(
+        name: string,
+        dimensions: Dimensions,
+        clicheid: string,
+        templateid: string = null) {
         super();
         this.meta = {
             name: name,
-            id: generateId(),
+            id:  clicheid + '_' + generateId(),
+            templateid: templateid,
             version: '',
             author: ''
         };
@@ -143,15 +168,15 @@ export class UserWidget extends Widget {
         this.properties.layout = new Map<number, Position>();
     }
 
-    addInnerWidget(widgetId: number) {
+    addInnerWidget(id: string) {
         // Now the inner widgets list is the stack order
-        this.innerWidgetIds.push(widgetId);
-        this.properties.layout[widgetId] = { top: 0, left: 0 };
+        this.innerWidgetIds.push(id);
+        this.properties.layout[id] = { top: 0, left: 0 };
     }
 
-    removeInnerWidget(widgetId) {
-        delete this.properties.layout[widgetId];
-        const index = this.innerWidgetIds.indexOf(widgetId);
+    removeInnerWidget(id: string) {
+        delete this.properties.layout[id];
+        const index = this.innerWidgetIds.indexOf(id);
         this.innerWidgetIds.splice(index, 1);
     }
 
@@ -159,8 +184,11 @@ export class UserWidget extends Widget {
         return this.innerWidgetIds.slice();
     }
 
-    private getPathHelper(allWidgets: Map<number, Widget>,
-        widget: Widget, targetId: number): number[] | null {
+    private getPathHelper(
+        allWidgets: Map<string, Map<string, Widget>>,
+        widget: Widget,
+        targetId: string):
+    string[] | null {
         // returns path starting from this id to the wanted widget id
         // null if no path exists
 
@@ -175,8 +203,9 @@ export class UserWidget extends Widget {
         }
         // Recursive case, look through all the inner widgets
         for (const id of (<UserWidget>widget).innerWidgetIds) {
+            const clicheid = this.decodeid(id)[0];
             const path = this.getPathHelper(allWidgets,
-                allWidgets[id], targetId);
+                allWidgets[clicheid][id], targetId);
             if (path === null) {
                 continue;
             }
@@ -187,15 +216,20 @@ export class UserWidget extends Widget {
         return null;
     }
 
-    getPath(allWidgets: Map<number, Widget>, widgetId: number):
-    number[] | null {
+    getPath(
+        allWidgets: Map<string, Map<string, Widget>>,
+        widgetId: string):
+    string[] | null {
         // returns path starting from this id to the wanted widget id
         // null if no path exists
         return this.getPathHelper(allWidgets, this, widgetId);
     }
 
-    getInnerWidget(allWidgets: Map<number, Widget>, targetId: number,
-        forParent = false): Widget {
+    getInnerWidget(
+        allWidgets: Map<string, Map<string, Widget>>,
+        targetId: string,
+        forParent = false):
+    Widget {
         const path = this.getPath(allWidgets, targetId);
         if (path === null) { // it's not actually a child
             return null;
@@ -203,15 +237,19 @@ export class UserWidget extends Widget {
         if (forParent) {
             targetId = path[path.length - 2];
         }
-        return allWidgets[targetId];
+        const targetClicheId = this.decodeid(targetId)[0];
+        return allWidgets[targetClicheId][targetId];
     }
 
-    private getInnerWidgetInfo(allWidgets: Map<number, Widget>, widget: Widget,
+    private getInnerWidgetInfo(
+        allWidgets: Map<string, Map<string, Widget>>,
+        widget: Widget,
         infoListLinearlized) {
         const outerRecursiveChildrenIds = [];
         if (widget.getWidgetType() === WidgetType.USER_WIDGET) {
             for (const innerWidgetId of (<UserWidget>widget).innerWidgetIds) {
-                const innerWidget: Widget = allWidgets[innerWidgetId];
+                const innerWidgetClicheId = this.decodeid(innerWidgetId)[0];
+                const innerWidget: Widget = allWidgets[innerWidgetClicheId][innerWidgetId];
                 infoListLinearlized.push(innerWidgetId);
                 const recursiveChildrenIds = this.getInnerWidgetInfo(allWidgets,
                     innerWidget, infoListLinearlized);
@@ -227,7 +265,8 @@ export class UserWidget extends Widget {
     // recursive structure [widgetId, [recursive structure of children]]
     // expanded structure: [[id1, []], [id2, []], [id3, [recursive ids of
     // children of id3]], [id4,[recursive children of ld4]]]
-    getAllInnerWidgetsIds(allWidgets: Map<number, Widget>,
+    getAllInnerWidgetsIds(
+        allWidgets: Map<string, Map<string, Widget>>,
         keepStructure: boolean) {
         const infoListLinearlized = [];
         const infoListStructured = this.getInnerWidgetInfo(allWidgets,

@@ -78,9 +78,10 @@ export function projectNameToFilename(projectName) {
   return projectName + '.json';
 }
 
-export function generateId() {
+export function generateId(): string {
   // use the full number!
-  return Math.floor(Math.random() * 1000 * 1000 * 1000 * 1000 * 1000);
+  return Math.floor(Math.random() * 1000 * 1000 * 1000 * 1000 * 1000)
+    .toString();
 }
 
 

@@ -1,20 +1,27 @@
 import { WidgetType, Widget, BaseWidget, UserWidget } from './widget';
 
 describe('UserWidget', () => {
-  let allWidgets: Map<number, Widget>;
+  const clicheid = '1234';
+  let allWidgetsInCliche: Map<string, Widget>;
+  let allWidgets: Map<string, Map<string, Widget>>;
   let widget1: BaseWidget;
   let widget2: UserWidget;
   let widget3: UserWidget;
+  let widget4: UserWidget;
 
   beforeEach(() => {
-    allWidgets = new Map<number, Widget>();
-    widget1 = new BaseWidget('widget1', {width: 10, height: 10}, 'img', '/');
-    widget2 = new UserWidget('widget2', {width: 20, height: 20});
-    widget3 = new UserWidget('widget3', {width: 20, height: 20});
+    allWidgetsInCliche = new Map<string, Widget>();
+    allWidgets = new Map<string, Map<string, Widget>>();
+    widget1 = new BaseWidget('widget1', {width: 10, height: 10}, 'img', '/', clicheid);
+    widget2 = new UserWidget('widget2', {width: 20, height: 20}, clicheid);
+    widget3 = new UserWidget('widget3', {width: 20, height: 20}, clicheid);
 
-    allWidgets[widget1.getId()] = widget1;
-    allWidgets[widget2.getId()] = widget2;
-    allWidgets[widget3.getId()] = widget3;
+    widget4 = new UserWidget('widget3', {width: 20, height: 20}, '123123');
+    allWidgetsInCliche[widget1.getId()] = widget1;
+    allWidgetsInCliche[widget2.getId()] = widget2;
+    allWidgetsInCliche[widget3.getId()] = widget3;
+
+    allWidgets[clicheid] = allWidgetsInCliche;
   });
 
   it('add and delete', () => {
@@ -45,6 +52,9 @@ describe('UserWidget', () => {
     .toEqual([widget3.getId(), widget2.getId()]);
     expect(widget3.getPath(allWidgets, widget1.getId()))
     .toEqual([widget3.getId(), widget2.getId(), widget1.getId()]);
+
+    expect(widget3.getPath(allWidgets, widget4.getId()))
+    .toBeNull();
   });
 
   it ('getInnerWidget', () => {
@@ -61,12 +71,15 @@ describe('UserWidget', () => {
     .toBe(widget2);
     expect(widget3.getInnerWidget(allWidgets, widget1.getId()))
     .toBe(widget1);
+
+    expect(widget3.getInnerWidget(allWidgets, widget4.getId()))
+    .toBeNull();
   });
 
   it ('fromObject', () => {
-    const widget4 = Widget.fromObject(JSON.parse(JSON.stringify(widget2)));
+    const widget2Copy = Widget.fromObject(JSON.parse(JSON.stringify(widget2)));
 
-    expect(widget4.getId()).toEqual(widget2.getId());
-    expect(widget4.getWidgetType()).toEqual(WidgetType.USER_WIDGET);
+    expect(widget2Copy.getId()).toEqual(widget2.getId());
+    expect(widget2Copy.getWidgetType()).toEqual(WidgetType.USER_WIDGET);
   });
 });
