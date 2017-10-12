@@ -18,13 +18,15 @@ describe('UserWidget', () => {
 
     widget4 = new UserWidget('widget4', {width: 20, height: 20}, '123123');
 
-    widget5 = new BaseWidget('widget5', {width: 10, height: 10}, 'img', '/', clicheid);
-    widget6 = new UserWidget('widget6', {width: 10, height: 10}, clicheid);
+    widget5 = new BaseWidget('widget5', {width: 10, height: 10}, 'img', '/', clicheid, null, null, true);
+    widget6 = new UserWidget('widget6', {width: 10, height: 10}, clicheid, null, null, true);
 
     Widget.addWidgetToAllWidgets(allWidgets, widget1);
     Widget.addWidgetToAllWidgets(allWidgets, widget2);
     Widget.addWidgetToAllWidgets(allWidgets, widget3);
     Widget.addWidgetToAllWidgets(allWidgets, widget4);
+    Widget.addWidgetToAllWidgets(allWidgets, widget5);
+    Widget.addWidgetToAllWidgets(allWidgets, widget6);
   });
 
   describe('add and delete', () => {
@@ -121,8 +123,95 @@ describe('UserWidget', () => {
 
       expect(widget3copies.length).toBe(3);
       expect(widget3copies[0].getName()).toEqual('widget3');
+      expect(widget3copies[0].getClicheId()).toEqual(widget3.getClicheId());
       expect(widget3copies[1].getName()).toEqual('widget2');
+      expect(widget3copies[1].getClicheId()).toEqual(widget2.getClicheId());
       expect(widget3copies[2].getName()).toEqual('widget1');
+      expect(widget3copies[2].getClicheId()).toEqual(widget1.getClicheId());
     });
+
+    it ('from template of a non-template does nothing', () => {
+      const widget3copies = widget3.makeCopy(allWidgets, true);
+      const widget3copy = widget3copies[0];
+
+      expect(widget3copy.getTemplateId()).toBeNull();
+      expect(widget3copy.getIsTemplate()).toBe(false);
+    });
+
+    it ('not from template of a template creates another template', () => {
+      widget6.addInnerWidget(widget5.getId());
+      const widget6copies = widget6.makeCopy(allWidgets);
+
+      expect(widget6copies[0].getTemplateId()).toBeNull();
+      expect(widget6copies[0].getIsTemplate()).toBe(true);
+      expect(widget6copies[1].getTemplateId()).toBeNull();
+      expect(widget6copies[1].getIsTemplate()).toBe(true);
+    });
+
+    it ('from template of a template creates a normal widget', () => {
+      widget6.addInnerWidget(widget5.getId());
+      const widget6copies = widget6.makeCopy(allWidgets, true);
+
+      expect(widget6copies[0].getTemplateId()).toEqual(widget6.getId());
+      expect(widget6copies[0].getIsTemplate()).toBe(false);
+      expect(widget6copies[1].getTemplateId()).toEqual(widget5.getId());
+      expect(widget6copies[1].getIsTemplate()).toBe(false);
+    });
+  });
+
+  describe('layout', () => {
+    it('properly updates the layout', () => {
+      widget2.addInnerWidget(widget1.getId());
+      const newPosition = {top: 5, left: 6};
+      widget2.updateInnerWidgetLayout(widget1.getId(), newPosition);
+
+      expect(widget2.getInnerWidgetLayouts()[widget1.getId()])
+      .toEqual(newPosition);
+    });
+
+    it('copying properly copies over the layout', () => {
+      widget2.addInnerWidget(widget1.getId());
+      const newPosition = {top: 5, left: 6};
+      widget2.updateInnerWidgetLayout(widget1.getId(), newPosition);
+
+      const widget2Copies = widget2.makeCopy(allWidgets);
+      const widget2Copy = <UserWidget>widget2Copies[0];
+      const widget1Copy = widget2Copies[1];
+      expect(widget2Copy.getInnerWidgetLayouts()[widget1Copy.getId()]).toEqual(newPosition);
+    });
+  });
+
+  describe('custom styles', () => {
+    it('adds and removes styles', () => {
+      widget1.updateCustomStyle('background-color', 'red');
+      let styles = widget1.getCustomStyles();
+      expect(styles['background-color']).toEqual('red');
+
+      widget1.removeCustomStyle('background-color');
+      styles = widget1.getCustomStyles();
+
+      expect(styles).toEqual({});
+      expect(styles['background-color']).toBe(undefined);
+    });
+
+    it('getCustomStylesWithInherits without templates just gets' +
+    ' the same styles', () => {
+      widget1.updateCustomStyle('background-color', 'red');
+      const styles = widget1.getCustomStyles();
+
+      expect(widget1.getCustomStylesWithInherits(allWidgets)).toEqual(styles);
+    });
+
+    it('getCustomStylesWithInherits with template gets no style of its own',
+    () => {
+      widget6.updateCustomStyle('background-color', 'red');
+      const widget6Styles = widget6.getCustomStyles();
+      const widget6copy = widget6.makeCopy(allWidgets, true)[0];
+      const widget6copyStyles = widget6copy.getCustomStyles();
+
+      expect(widget6copyStyles).toEqual({});
+      expect(widget6copy.getCustomStylesWithInherits(allWidgets)).toEqual(widget6Styles);
+    });
+
   });
 });

@@ -32,9 +32,13 @@ export class Widget {
     protected widgetType: WidgetType;
     protected properties: Properties = {
         dimensions: null,
-        styles: {}
+        styles: {
+            custom: {},
+            bsClasses: {}
+        }
     };
     protected meta: Meta;
+    protected isTemplate = false;
 
     static addWidgetToAllWidgets(
         allWidgets: Map<string, Map<string, Widget>>,
@@ -100,6 +104,35 @@ export class Widget {
     getWidgetType(): WidgetType {
         return this.widgetType ;
     }
+
+    getIsTemplate(): boolean {
+        return this.isTemplate;
+    }
+
+    getCustomStyles() {
+        return JSON.parse(JSON.stringify(this.properties.styles.custom));
+    }
+
+    updateCustomStyle(styleName: string, value) {
+        this.properties.styles.custom[styleName] = value;
+    }
+
+    removeCustomStyle(styleName: string) {
+        delete this.properties.styles.custom[styleName];
+    }
+
+    getCustomStylesWithInherits(allWidgets: Map<string, Map<string, Widget>>) {
+        let templateCustomStylesWithInherits = {};
+        if (this.getTemplateId()) {
+            templateCustomStylesWithInherits = Widget.getWidget(allWidgets, this.getTemplateId()).getCustomStylesWithInherits();
+        }
+        // this widgets styles win!
+        for (const style of Object.keys(this.properties.styles.custom)){
+            templateCustomStylesWithInherits[style] = this.properties.styles.custom[style];
+        }
+
+        return templateCustomStylesWithInherits;
+    }
 }
 
 /**
@@ -125,7 +158,8 @@ export class BaseWidget extends Widget {
             object.value,
             clicheId,
             object.meta.id,
-            object.meta.templateid);
+            object.meta.templateid,
+            object.isTemplate);
     }
 
     constructor(
@@ -135,7 +169,8 @@ export class BaseWidget extends Widget {
         value: string,
         clicheid: string,
         id: string = null,
-        templateid: string = null) {
+        templateid: string = null,
+        isTemplate = false) {
         super();
         this.meta = {
             name: name,
@@ -147,6 +182,7 @@ export class BaseWidget extends Widget {
         this.type = type;
         this.value = value;
         this.properties.dimensions = dimensions;
+        this.isTemplate = isTemplate;
     }
 
     setProperty(property, value) {
@@ -157,14 +193,26 @@ export class BaseWidget extends Widget {
         this.value = value;
     }
 
-    makeCopy(allWidgets: Map<string, Map<string, Widget>>): Widget[] {
+    makeCopy(
+        allWidgets: Map<string, Map<string, Widget>>,
+        fromTemplate = false):
+    Widget[] {
+        let templateId = this.getTemplateId();
+        let isTemplate = this.isTemplate;
+        if (fromTemplate && this.isTemplate) {
+            // If you're making a tempate copy, you only make non-templates
+            templateId = this.getId();
+            isTemplate = false;
+        }
         return [new BaseWidget(
             this.getName(),
             this.getDimensions(),
             this.type,
             this.value,
-            null,
-            this.getTemplateId())];
+            this.getClicheId(),
+            null, // generate a new id!
+            templateId,
+            isTemplate)];
     }
 }
 
@@ -193,7 +241,8 @@ export class UserWidget extends Widget {
             object.properties.dimensions,
             clicheId,
             object.meta.id,
-            object.meta.templateId);
+            object.meta.templateId,
+            object.isTemplate);
         object.innerWidgetIds.forEach((id) => {
             widget.addInnerWidget(id);
         });
@@ -206,8 +255,10 @@ export class UserWidget extends Widget {
         dimensions: Dimensions,
         clicheid: string,
         id: string = null,
-        templateid: string = null) {
+        templateid: string = null,
+        isTemplate = false) {
         super();
+
         this.meta = {
             name: name,
             id: id ? id : clicheid + '_' + generateId(),
@@ -217,12 +268,17 @@ export class UserWidget extends Widget {
         };
         this.properties.dimensions = dimensions;
         this.properties.layout = new Map<number, Position>();
+        this.isTemplate = isTemplate;
     }
 
-    addInnerWidget(id: string) {
+    updateDimensions(newDimensions: Dimensions) {
+        this.properties.dimensions = newDimensions;
+    }
+
+    addInnerWidget(id: string, position?: Position) {
         // Now the inner widgets list is the stack order
         this.innerWidgetIds.push(id);
-        this.properties.layout[id] = { top: 0, left: 0 };
+        this.properties.layout[id] = position ? position : { top: 0, left: 0 };
     }
 
     removeInnerWidget(id: string) {
@@ -235,7 +291,19 @@ export class UserWidget extends Widget {
         return this.innerWidgetIds.slice();
     }
 
-    private getPathHelper(allWidgets: Map<string, Map<string, Widget>>, widget: Widget, targetId: string): string[] | null {
+    updateInnerWidgetLayout(widgetId: string, newLayout: Position) {
+        this.properties.layout[widgetId] = newLayout;
+    }
+
+    getInnerWidgetLayouts() {
+        return JSON.parse(JSON.stringify(this.properties.layout));
+    }
+
+    private getPathHelper(
+        allWidgets: Map<string, Map<string, Widget>>,
+        widget: Widget,
+        targetId: string):
+    string[] | null {
         // returns path starting from this id to the wanted widget id
         // null if no path exists
 
@@ -262,13 +330,19 @@ export class UserWidget extends Widget {
         return null;
     }
 
-    getPath(allWidgets: Map<string, Map<string, Widget>>, widgetId: string): string[] | null {
+    getPath(
+        allWidgets: Map<string, Map<string, Widget>>,
+        widgetId: string):
+    string[] | null {
         // returns path starting from this id to the wanted widget id
         // null if no path exists
         return this.getPathHelper(allWidgets, this, widgetId);
     }
 
-    getInnerWidget(allWidgets: Map<string, Map<string, Widget>>, targetId: string, forParent = false):
+    getInnerWidget(
+        allWidgets: Map<string, Map<string, Widget>>,
+        targetId: string,
+        forParent = false):
     Widget {
         const path = this.getPath(allWidgets, targetId);
         if (path === null) { // it's not actually a child
@@ -317,17 +391,36 @@ export class UserWidget extends Widget {
         }
     }
 
-    makeCopy(allWidgets: Map<string, Map<string, Widget>>): Widget[] {
+    /**
+     *
+     * @param allWidgets
+     * @param fromTemplate if this widget is not a template, this value is
+     * ignored
+     */
+    makeCopy(
+        allWidgets: Map<string, Map<string, Widget>>,
+        fromTemplate = false):
+    Widget[] {
+        let templateId = this.getTemplateId();
+        let isTemplate = this.isTemplate;
+        if (fromTemplate && this.isTemplate) {
+            // If you're making a tempate copy, you only make non-templates
+            templateId = this.getId();
+            isTemplate = false;
+        }
         const copyWidget = new UserWidget(
             this.getName(),
             this.getDimensions(),
             this.getClicheId(),
-            null,
-            this.getTemplateId());
+            null, // generate a new id!
+            templateId,
+            isTemplate);
         let copyWidgets = [copyWidget];
         for (const id of this.innerWidgetIds) {
-            const copyInnerWidgets = Widget.getWidget(allWidgets, id).makeCopy(allWidgets);
-            copyWidget.addInnerWidget(copyInnerWidgets[0].getId());
+            const copyInnerWidgets = Widget.getWidget(allWidgets, id).makeCopy(allWidgets, fromTemplate);
+            const innerWidgetCopy = copyInnerWidgets[0];
+            const position = this.properties.layout[id];
+            copyWidget.addInnerWidget(innerWidgetCopy.getId(), position);
             copyWidgets = copyWidgets.concat(copyInnerWidgets);
         }
         return copyWidgets;
@@ -525,17 +618,6 @@ export class UserWidget extends Widget {
 
     // };
 
-
-    // var getMappings = function(widgets){
-    //     var widgetToTemplate = {};
-    //     var templateToWidget = {};
-    //     for (var id in widgets){
-    //         widgetToTemplate[id] = widgets[id].meta.templateCorrespondingId;
-    //         templateToWidget[widgets[id].meta.templateCorrespondingId] = id;
-    //     }
-
-    //     return {wTT: widgetToTemplate, tTW: templateToWidget}
-
     // };
     // /**
     //  * Gets the changes made at the level of the outer widget and
@@ -690,13 +772,6 @@ export class UserWidget extends Widget {
 
     // };
 
-    // var getClicheAndWidgetIdFromTemplateId = function(templateId){
-    //     var clicheAndWidgetId = templateId.split('_');
-    //     var clicheId = clicheAndWidgetId[clicheAndWidgetId.length - 2];
-    //     var widgetId = clicheAndWidgetId[clicheAndWidgetId.length - 1];
-    //     return {clicheId:clicheId,widgetId:widgetId}
-    // };
-
     // var resetStyleValues = function(outerWidget){
     //     var templateInfo = isFromTemplate(outerWidget);
     //     if (templateInfo.fromTemplate){
@@ -710,53 +785,4 @@ export class UserWidget extends Widget {
     //     }
 
     // };
-
-    // that.refreshPropertyValues = function(outerWidget){
-    //     resetStyleValues(outerWidget);
-    //     applyPropertyChangesAtAllLevelsBelow(outerWidget);
-
-    //     return outerWidget
-    // };
-
-    // var widgetUsesTemplate = function(widget, templateId){
-    //     if (widget.meta.templateId){
-    //         var clicheAndWidgetId = getClicheAndWidgetIdFromTemplateId(widget.meta.templateId);
-    //         var templateWidgetId = clicheAndWidgetId.widgetId;
-    //         return (templateWidgetId == templateId);
-    //     } else {
-    //         var does = false;
-    //         if (widget.type == 'user'){
-    //             for (var innerWidgetId in widget.innerWidgets){
-    //                 var innerWidget = widget.innerWidgets[innerWidgetId];
-    //                 does = does || widgetUsesTemplate(innerWidget, templateId);
-    //             }
-
-    //         }
-    //         return does;
-    //     }
-    // };
-
-
-    // that.updateAllWidgetsUsingTemplate = function(changingWidgetId){
-    //     var recursivelyUpdateWidgetsUsingTemplate = function(allOuterWidgetIds, changingWidgetId) {
-    //         var templateId = userApp.findUsedWidget(changingWidgetId)[1];
-    //         if (templateId){
-    //             var template = userApp.getWidget(templateId);
-    //             if (template && template.isTemplate){
-    //                 allOuterWidgetIds.forEach(function(widgetId){
-    //                     var widget = userApp.getWidget(widgetId);
-    //                     if (widgetUsesTemplate(widget, templateId)){
-    //                         widgetEditsManager.refreshPropertyValues(widget);
-    //                         recursivelyUpdateWidgetsUsingTemplate(allOuterWidgetIds, widgetId);
-    //                     }
-    //                 });
-    //             }
-    //         }
-
-    //     };
-
-    //     var allOuterWidgetIds = userApp.getAllOuterWidgetIds();
-    //     recursivelyUpdateWidgetsUsingTemplate(allOuterWidgetIds, changingWidgetId)
-    // };
-
 }
