@@ -29,7 +29,32 @@ describe('UserWidget', () => {
     Widget.addWidgetToAllWidgets(allWidgets, widget6);
   });
 
-  describe('add and delete', () => {
+  describe('delete', () => {
+    it('removes itself from all widgets', () => {
+      widget1.delete(allWidgets);
+      expect(Widget.getWidget(allWidgets, widget1.getId())).toBe(undefined);
+    });
+
+    it ('does not delete inner widget', () => {
+      widget2.addInnerWidget(widget1.getId());
+      widget2.delete(allWidgets);
+
+      expect(Widget.getWidget(allWidgets, widget2.getId())).toBe(undefined);
+      expect(Widget.getWidget(allWidgets, widget1.getId())).toBe(widget1);
+    });
+
+    it ('removes itself from its template list', () => {
+      const widget6copy = widget6.makeCopy(allWidgets, true)[0];
+
+      expect(widget6.getIsTemplateCopy(widget6copy.getId())).toBe(true);
+
+      widget6copy.delete(allWidgets);
+
+      expect(widget6.getIsTemplateCopy(widget6copy.getId())).toBe(false);
+    });
+  });
+
+  describe('add and remove inner widgets', () => {
     it('adds the id of the added and removes the ids removed', () => {
       widget2.addInnerWidget(widget1.getId());
       expect(widget2.getInnerWidgets()).toEqual([widget1.getId()]);
@@ -184,34 +209,59 @@ describe('UserWidget', () => {
   describe('custom styles', () => {
     it('adds and removes styles', () => {
       widget1.updateCustomStyle('background-color', 'red');
-      let styles = widget1.getCustomStyles();
+      let styles = widget1.getLocalCustomStyles();
       expect(styles['background-color']).toEqual('red');
 
       widget1.removeCustomStyle('background-color');
-      styles = widget1.getCustomStyles();
+      styles = widget1.getLocalCustomStyles();
 
       expect(styles).toEqual({});
       expect(styles['background-color']).toBe(undefined);
     });
 
-    it('getCustomStylesWithInherits without templates just gets' +
-    ' the same styles', () => {
+    it('getCustomStylesToShow without templates just gets ' +
+    'the same styles', () => {
       widget1.updateCustomStyle('background-color', 'red');
-      const styles = widget1.getCustomStyles();
+      const styles = widget1.getLocalCustomStyles();
 
-      expect(widget1.getCustomStylesWithInherits(allWidgets)).toEqual(styles);
+      expect(widget1.getCustomStylesToShow(allWidgets)).toEqual(styles);
     });
 
-    it('getCustomStylesWithInherits with template gets no style of its own',
-    () => {
+    it('getCustomStylesToShow with template gets template styles ' +
+    'but local styles are empty', () => {
       widget6.updateCustomStyle('background-color', 'red');
-      const widget6Styles = widget6.getCustomStyles();
+      const widget6Styles = widget6.getLocalCustomStyles();
       const widget6copy = widget6.makeCopy(allWidgets, true)[0];
-      const widget6copyStyles = widget6copy.getCustomStyles();
+      const widget6copyStyles = widget6copy.getLocalCustomStyles();
 
       expect(widget6copyStyles).toEqual({});
-      expect(widget6copy.getCustomStylesWithInherits(allWidgets)).toEqual(widget6Styles);
+      expect(widget6copy.getCustomStylesToShow(allWidgets)).toEqual(widget6Styles);
     });
 
+    it('getCustomStylesToShow inheritence is parent < template < self',
+    () => {
+      widget6.updateCustomStyle('background-color', 'red');
+      widget6.updateCustomStyle('color', 'red');
+      const widget6copy = widget6.makeCopy(allWidgets, true)[0];
+      widget6copy.updateCustomStyle('color', 'blue');
+      widget6copy.updateCustomStyle('font-weight', 'bold');
+      const parentStyles = {
+        'text-size': '16px',
+        'color': 'black',
+        'background-color': 'purple'
+      };
+
+      const expectedStyles = {
+        'text-size': '16px',
+        'color': 'blue',
+        'background-color': 'red',
+        'font-weight': 'bold'
+      };
+
+      const styles = widget6copy
+                      .getCustomStylesToShow(allWidgets, parentStyles);
+
+      expect(styles).toEqual(expectedStyles);
+    });
   });
 });
