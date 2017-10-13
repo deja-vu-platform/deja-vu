@@ -44,6 +44,9 @@ export class MapComponent implements OnChanges {
 
     this.mapScale = Math.min(widthScale, heightScale);
 
+    console.log(this.allWidgets);
+    console.log(this.widget.getDimensions());
+
     const mapScale = this.mapScale;
     const allWidgets = this.allWidgets;
     const mapWidgetSizes = [];
@@ -76,10 +79,6 @@ export class MapComponent implements OnChanges {
 
     this.mapPosition.top = this.scrollPosition.top;
     this.mapPosition.left = this.scrollPosition.left;
-  }
-
-  initialize() {
-    this.showMiniNavPosition();
   }
 
   // $('#outer-container').on('scroll', function(){

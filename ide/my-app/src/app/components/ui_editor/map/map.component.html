@@ -1,10 +1,11 @@
-<div id="map-container">
+<div id="map-container"
+    [style.height]="dimensions.height+'px'"
+    [style.width]="dimensions.width+'px'">
   <button id="map-minimize-btn" 
-          class="btn btn-default btn-xs"
+          class="btn btn-default"
           [ngClass]="{'minimized': minimized}"
-          [style.height]="dimensions.height+'px'"
-          [style.width]="dimensions.width+'px'">
-    <ng-container *ngIf="minimized"; else minimizer>
+          (click)="minimizeButtonClick()">
+    <ng-container *ngIf="minimized; else minimizer">
       Map
     </ng-container>
     <ng-template #minimizer>
@@ -20,10 +21,11 @@
             [style.height]="screenDimensions.height*mapScale+'px'"
             [style.width]="screenDimensions.width*mapScale+'px'"></div>
       <div id="zoom-selected-screen-size"></div>
-      <div id="map-component-sizes"
+      <div *ngIf="widget"
+          id="map-component-sizes"
           [style.zoom]="zoom"
-          [style.height]="widget.getDimensions().height * this.mapScale + 'px'"
-          [style.width]="widget.getDimensions().width * this.mapScale + 'px'">
+          [style.height]="(widget.getDimensions().height * this.mapScale) + 'px'"
+          [style.width]="(widget.getDimensions().width * this.mapScale) + 'px'">
         <div *ngFor="let size of mapWidgetSizes"
         class="map-inner-component-size">
 
@@ -33,7 +35,7 @@
       <div id="map-position"
           [style.top]="top+'px'"
           [style.left]="left+'px'"
-          [style.height]="(containerDimensions.height * mapScale)+'px'"
-          [style.width]="(containerDimensions.width * mapScale)+'px'"></div>
+          [style.height]="(outerContainerDimensions.height * mapScale)+'px'"
+          [style.width]="(outerContainerDimensions.width * mapScale)+'px'"></div>
   </div>
 </div>
