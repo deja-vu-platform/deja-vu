@@ -2,7 +2,7 @@ import {Widget, ClientBus, PrimitiveAtom, Field, WidgetValue} from "client-bus";
 
 
 @Widget({
-  fqelement: "Auth",
+  fqelement: "StandardAuthentication",
   template: `
     <button class="btn btn-default navbar-btn" (click)="signOut()">
       Sign Out

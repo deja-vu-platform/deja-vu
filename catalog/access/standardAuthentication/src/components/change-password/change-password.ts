@@ -6,7 +6,7 @@ import {Widget, PrimitiveAtom, Field} from "client-bus";
 
 
 @Widget({
-   fqelement: "Auth",
+   fqelement: "StandardAuthentication",
    ng2_providers: [GraphQlService],
    ng2_directives: [NgClass]
 })
@@ -20,7 +20,7 @@ export class ChangePasswordComponent {
   confirm_new_password_error = false;
 
   constructor(private _graphQlService: GraphQlService) {}
-  
+
   onSubmit() {
     this.clearErrors();
     this.confirm_new_password_error =

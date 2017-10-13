@@ -2,22 +2,20 @@ import {NgClass} from "@angular/common";
 
 import {UserAtom} from "../shared/data";
 import {GraphQlService} from "gql";
-import {Widget, ClientBus, Field, PrimitiveAtom, WidgetValue} from "client-bus";
+import {Widget, PrimitiveAtom, Field} from "client-bus";
 
 
 @Widget({
-   fqelement: "Auth",
+   fqelement: "StandardAuthentication",
    ng2_providers: [GraphQlService],
    ng2_directives: [NgClass]
 })
-export class SignInWithRedirectComponent {
+export class SignInComponent {
   @Field("User") user: UserAtom;
-  @Field("Widget") on_signin_ok: PrimitiveAtom<WidgetValue>;
+  @Field("boolean") signin_ok: PrimitiveAtom<boolean>;
   error = false;
 
-  constructor(
-    private _graphQlService: GraphQlService,
-    private _client_bus: ClientBus) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   onSubmit() {
     this._graphQlService
@@ -33,7 +31,7 @@ export class SignInWithRedirectComponent {
           localStorage.setItem("id_token", authToken);
           localStorage.setItem("username", this.user.username);
           localStorage.setItem("atom_id", authUser.atom_id);
-          this._client_bus.navigate(this.on_signin_ok.value);
+          this.signin_ok.value = true;
         },
         err => {
           this.error = true;
