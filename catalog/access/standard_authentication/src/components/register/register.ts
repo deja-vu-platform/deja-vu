@@ -3,7 +3,7 @@ import {GraphQlService} from "gql";
 import {Widget, PrimitiveAtom, Field} from "client-bus";
 
 
-@Widget({fqelement: "Auth", ng2_providers: [GraphQlService]})
+@Widget({fqelement: "StandardAuthentication", ng2_providers: [GraphQlService]})
 export class RegisterComponent {
   @Field("User") user: UserAtom;
   @Field("boolean") register_ok: PrimitiveAtom<boolean>;

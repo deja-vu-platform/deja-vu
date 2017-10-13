@@ -3,7 +3,7 @@ import {Widget, ClientBus, Field, PrimitiveAtom, WidgetValue} from "client-bus";
 import {UserAtom} from "../shared/data";
 
 
-@Widget({fqelement: "Auth", ng2_providers: [GraphQlService]})
+@Widget({fqelement: "StandardAuthentication", ng2_providers: [GraphQlService]})
 export class RegisterWithRedirectComponent {
   @Field("User") user: UserAtom;
   @Field("Widget") on_register_ok: PrimitiveAtom<WidgetValue>;
