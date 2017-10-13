@@ -20,7 +20,7 @@
 #map-minimize-btn{
   position: absolute;
   top: 0px;
-  right: -19px;
+  right: -40px;
   pointer-events: auto;
   z-index: 100;
 }
@@ -50,7 +50,7 @@
   background: white;
 }
 
-#map-inner-component-size {
+.map-inner-component-size {
   position: absolute;
   background: black;
 }

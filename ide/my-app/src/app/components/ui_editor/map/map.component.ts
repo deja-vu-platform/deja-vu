@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges} from '@angular/core';
+import { Component, Input, Output, EventEmitter} from '@angular/core';
 
 import {Widget, UserWidget, WidgetType} from '../../../models/widget/widget';
 import {Dimensions, Position} from '../../common/utility/utility';
@@ -10,7 +10,7 @@ import {Dimensions, Position} from '../../common/utility/utility';
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements OnChanges {
+export class MapComponent {
   @Input() containerScroll: Position = {
     top: 0,
     left: 0
@@ -19,39 +19,23 @@ export class MapComponent implements OnChanges {
     height: 1,
     width: 1
   };
-  @Input() screenDimensions: Dimensions;
+  @Input() set screenDimensions(value: Dimensions) {
+    this._screenDimensions = value;
+    const widthScale = this.dimensions.width / this._screenDimensions.width;
+    const heightScale = this.dimensions.height / this._screenDimensions.height;
+
+    this.mapScale = Math.min(widthScale, heightScale);
+  }
   @Input() allWidgets: Map<string, Map<string, Widget>>;
   @Input() zoom = 1;
 
-  @Input() widget: Widget;
-
-  mapScale = .1;
-  navDragging = false;
-  scrollPosition: Position;
-  mapPosition: Position;
-
-  dimensions: Dimensions = {
-    height: 120,
-    width: 180
-  };
-
-  minimized = false;
-  mapWidgetSizes: Dimensions[] = [];
-
-  ngOnChanges(changes: SimpleChanges) {
-    const widthScale = this.dimensions.width / this.screenDimensions.width;
-    const heightScale = this.dimensions.height / this.screenDimensions.height;
-
-    this.mapScale = Math.min(widthScale, heightScale);
-
-    console.log(this.allWidgets);
-    console.log(this.widget.getDimensions());
-
+  @Input() set selectedWidget(value: Widget) {
+    this._selectedWidget = value;
     const mapScale = this.mapScale;
     const allWidgets = this.allWidgets;
     const mapWidgetSizes = [];
-    if (this.widget.getWidgetType() === WidgetType.USER_WIDGET) {
-      const widget = <UserWidget> this.widget;
+    if (value.getWidgetType() === WidgetType.USER_WIDGET) {
+      const widget = <UserWidget> value;
       const layouts = widget.getInnerWidgetLayouts();
       widget.getInnerWidgetIds().forEach(function (innerWidgetId) {
         const innerWidget = widget
@@ -68,10 +52,20 @@ export class MapComponent implements OnChanges {
     this.mapWidgetSizes = mapWidgetSizes;
   }
 
+  _selectedWidget: Widget;
+  mapScale = .1;
+  navDragging = false;
+  scrollPosition: Position;
+  mapPosition: Position;
 
-  getMapScale = function () {
-    return this.mapScale;
+  _screenDimensions: Dimensions;
+  dimensions: Dimensions = {
+    height: 120,
+    width: 180
   };
+
+  minimized = false;
+  mapWidgetSizes: Dimensions[] = [];
 
   private showMiniNavPosition() {
     this.scrollPosition.top = this.containerScroll.top * this.mapScale;

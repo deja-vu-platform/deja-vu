@@ -176,6 +176,10 @@ export class Widget {
         }
         delete allWidgets[this.getClicheId()][this.getId()];
     }
+
+    addWidgetToAllWidgets(allWidgets: Map<string, Map<string, Widget>>) {
+        Widget.addWidgetToAllWidgets(allWidgets, this);
+    }
 }
 
 /**
