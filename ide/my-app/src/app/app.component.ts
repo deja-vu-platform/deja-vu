@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Dimensions } from './components/common/utility/utility';
+import { Dimensions, Position } from './components/common/utility/utility';
 import { BaseWidget, Widget, UserWidget } from './models/widget/widget';
 
 @Component({
@@ -17,8 +17,13 @@ export class AppComponent implements OnInit {
   };
 
   screenDimensions: Dimensions = {
-    width: 400,
-    height: 200
+    width: 800,
+    height: 700
+  };
+
+  outerContainerScroll: Position = {
+    top: 0,
+    left: 0
   };
 
   selectedWidget = new UserWidget('test', { height: 150, width: 250 }, '1234');
@@ -29,7 +34,13 @@ export class AppComponent implements OnInit {
     const innerWidget = new BaseWidget('test inner', { height: 50, width: 75 }, 'img', '/', '1234');
     innerWidget.addWidgetToAllWidgets(this.allWidgets);
     this.selectedWidget.addInnerWidget(innerWidget.getId());
-    this.selectedWidget.updateInnerWidgetLayout(innerWidget.getId(),
-      { top: 20, left: 30 });
+    innerWidget.updatePosition({ top: 20, left: 30 });
+
+    setTimeout(()=> {
+      this.outerContainerScroll = {
+        top: 100,
+        left: 100
+      };
+    }, 1000);
   }
 }

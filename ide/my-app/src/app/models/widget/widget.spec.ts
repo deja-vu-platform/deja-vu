@@ -185,24 +185,14 @@ describe('UserWidget', () => {
   });
 
   describe('layout', () => {
-    it('properly updates the layout', () => {
-      widget2.addInnerWidget(widget1.getId());
-      const newPosition = {top: 5, left: 6};
-      widget2.updateInnerWidgetLayout(widget1.getId(), newPosition);
-
-      expect(widget2.getInnerWidgetLayouts()[widget1.getId()])
-      .toEqual(newPosition);
-    });
-
     it('copying properly copies over the layout', () => {
       widget2.addInnerWidget(widget1.getId());
-      const newPosition = {top: 5, left: 6};
-      widget2.updateInnerWidgetLayout(widget1.getId(), newPosition);
+      widget1.updatePosition({top: 5, left: 6});
 
       const widget2Copies = widget2.makeCopy(allWidgets);
       const widget2Copy = <UserWidget>widget2Copies[0];
       const widget1Copy = widget2Copies[1];
-      expect(widget2Copy.getInnerWidgetLayouts()[widget1Copy.getId()]).toEqual(newPosition);
+      expect(widget1Copy.getPosition()).toEqual(widget1.getPosition());
     });
   });
 

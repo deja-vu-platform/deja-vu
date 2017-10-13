@@ -9,7 +9,7 @@
 
 #map{
   position: absolute;
-  background: grey;
+  background: white;
   overflow: scroll;
   height: 100%;
   width: 100%;
@@ -46,8 +46,7 @@
 
 #zoom-selected-screen-size {
   position: absolute;
-  border: 1px black solid;
-  background: white;
+  background: lightblue;
 }
 
 .map-inner-component-size {

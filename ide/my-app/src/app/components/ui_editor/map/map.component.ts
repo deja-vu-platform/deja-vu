@@ -1,20 +1,26 @@
-import { Component, Input, Output, EventEmitter} from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
 
 import {Widget, UserWidget, WidgetType} from '../../../models/widget/widget';
 import {Dimensions, Position} from '../../common/utility/utility';
 
-// declare var $: any;
+import 'jquery';
+import 'jquery-ui-dist/jquery-ui';
+
+declare var $: any;
 
 @Component({
   selector: 'dv-map',
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent {
-  @Input() containerScroll: Position = {
-    top: 0,
-    left: 0
-  };
+export class MapComponent implements AfterViewInit {
+  @Input() set outerContainerScroll(value: Position) {
+    this.scrollPosition.top = value.top * this.mapScale;
+    this.scrollPosition.left = value.left * this.mapScale;
+
+    this.mapPosition.top = this.scrollPosition.top;
+    this.mapPosition.left = this.scrollPosition.left;
+  }
   @Input() outerContainerDimensions: Dimensions = {
     height: 1,
     width: 1
@@ -36,14 +42,14 @@ export class MapComponent {
     const mapWidgetSizes = [];
     if (value.getWidgetType() === WidgetType.USER_WIDGET) {
       const widget = <UserWidget> value;
-      const layouts = widget.getInnerWidgetLayouts();
       widget.getInnerWidgetIds().forEach(function (innerWidgetId) {
         const innerWidget = widget
                               .getInnerWidget(allWidgets, innerWidgetId);
         const innerWidgetDimensions = innerWidget.getDimensions();
+        const innerWidgetPosition = innerWidget.getPosition();
         mapWidgetSizes.push({
-          left: layouts[innerWidgetId].left * mapScale,
-          top: layouts[innerWidgetId].top * mapScale,
+          left: innerWidgetPosition.left * mapScale,
+          top: innerWidgetPosition.top * mapScale,
           width: innerWidgetDimensions.width * mapScale,
           height: innerWidgetDimensions.height * mapScale,
         });
@@ -52,11 +58,19 @@ export class MapComponent {
     this.mapWidgetSizes = mapWidgetSizes;
   }
 
+  @Output() newScrollPosition: EventEmitter<Position>;
+
   _selectedWidget: Widget;
   mapScale = .1;
   navDragging = false;
-  scrollPosition: Position;
-  mapPosition: Position;
+  scrollPosition: Position = {
+    top: 0,
+    left: 0
+  };
+  mapPosition: Position = {
+    top: 0,
+    left: 0
+  };
 
   _screenDimensions: Dimensions;
   dimensions: Dimensions = {
@@ -67,52 +81,41 @@ export class MapComponent {
   minimized = false;
   mapWidgetSizes: Dimensions[] = [];
 
-  private showMiniNavPosition() {
-    this.scrollPosition.top = this.containerScroll.top * this.mapScale;
-    this.scrollPosition.left = this.containerScroll.left * this.mapScale;
-
-    this.mapPosition.top = this.scrollPosition.top;
-    this.mapPosition.left = this.scrollPosition.left;
-  }
-
-  // $('#outer-container').on('scroll', function(){
-  //     if (!navDragging) {
-  //         showMiniNavPosition();
-  //     }
-  // })
-
   minimizeButtonClick() {
     this.minimized = !this.minimized;
   }
 
   mapClick(e: MouseEvent) {
-    // const posX = e.pageX - $('#map').offset().left + $('#map').scrollLeft();
-    // const posY = e.pageY - $('#map').offset().top + $('#map').scrollTop();
-    // $('#outer-container').scrollTop(posY / this.mapScale);
-    // $('#outer-container').scrollLeft(posX / this.mapScale);
+    const posX = e.pageX - $('#map').offset().left + $('#map').scrollLeft();
+    const posY = e.pageY - $('#map').offset().top + $('#map').scrollTop();
 
-    // this.mapPosition = {
-    //   top: Math.min(posY, $('#map-full-area').height() - $('#map-position').height()),
-    //   left: Math.min(posX, $('#map-full-area').width() - $('#map-position').width()),
-    // };
+    this.newScrollPosition.emit({
+      top: posY / this.mapScale,
+      left: posX / this.mapScale
+    });
+
+    this.mapPosition = {
+      top: Math.max(0, Math.min(posY, $('#map-full-area').height() - $('#map-position').height())),
+      left: Math.max(0, Math.min(posX, $('#map-full-area').width() - $('#map-position').width())),
+    };
   }
 
-  // $('#map-position').draggable({
-  //     containment: '#map-full-area',
-  //     start: function(){
-  //         navDragging = true;
-  //     },
-  //     drag: function(e, ui){
-  //         const posX = ui.position.left;
-  //         const posY = ui.position.top;
-  //         $('#outer-container').scrollTop(posY / this.mapScale);
-  //         $('#outer-container').scrollLeft(posX / this.mapScale);
-  //         showMiniNavPosition();
-  //     },
-  //     stop: function(){
-  //         navDragging = false;
-  //     },
-  // });
+  ngAfterViewInit() {
+    ($('#map-position')).draggable({
+      containment: '#map-full-area',
+      start: function(){
+          this.navDragging = true;
+      },
+      stop: function(e, ui){
+          this.navDragging = false;
+
+          this.newScrollPosition.emit({
+            top: ui.position.top / this.mapScale,
+            left: ui.position.left / this.mapScale
+          });
+      },
+    });
+  }
 }
 
 

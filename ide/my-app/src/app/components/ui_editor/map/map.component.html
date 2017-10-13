@@ -14,13 +14,15 @@
   </button>
   <div id="map" 
       [hidden]="minimized"
-      [scrollTop]="scrollTop"
-      [scrollLeft]="scrollLeft"
+      [scrollTop]="scrollPosition.top"
+      [scrollLeft]="scrollPosition.left"
       (click)="mapClick($event)">
       <div id="map-full-area"
-            [style.height]="_screenDimensions.height*mapScale+'px'"
-            [style.width]="_screenDimensions.width*mapScale+'px'"></div>
-      <div id="zoom-selected-screen-size"></div>
+      [style.height]="_screenDimensions.height*mapScale+'px'"
+      [style.width]="_screenDimensions.width*mapScale+'px'"></div>
+      <div id="zoom-selected-screen-size"
+      [style.height]="_screenDimensions.height*mapScale+'px'"
+      [style.width]="_screenDimensions.width*mapScale+'px'"></div>
       <div *ngIf="_selectedWidget"
           id="map-component-sizes"
           [style.zoom]="zoom"
@@ -37,8 +39,8 @@
       </div>
       <!-- Map position is the little thing you drag to move your map -->
       <div id="map-position"
-          [style.top]="top+'px'"
-          [style.left]="left+'px'"
+          [style.top]="mapPosition.top+'px'"
+          [style.left]="mapPosition.left+'px'"
           [style.height]="(outerContainerDimensions.height * mapScale)+'px'"
           [style.width]="(outerContainerDimensions.width * mapScale)+'px'"></div>
   </div>

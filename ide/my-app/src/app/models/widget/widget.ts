@@ -17,7 +17,6 @@ export interface Properties {
         custom?: {};
         bsClasses?: {};
     };
-    layout?: Map<number, Position>;
 }
 
 interface Meta {
@@ -36,6 +35,10 @@ export class Widget {
             custom: {},
             bsClasses: {}
         }
+    };
+    protected position: Position = {
+        top: 0,
+        left: 0
     };
     protected meta: Meta;
     protected isTemplate = false;
@@ -122,6 +125,14 @@ export class Widget {
 
     getLocalCustomStyles() {
         return JSON.parse(JSON.stringify(this.properties.styles.custom));
+    }
+
+    getPosition(): Position {
+        return JSON.parse(JSON.stringify(this.position));
+    }
+
+    updatePosition(newPosition: Position) {
+        this.position = JSON.parse(JSON.stringify(newPosition));
     }
 
     updateCustomStyle(styleName: string, value) {
@@ -258,6 +269,7 @@ export class BaseWidget extends Widget {
             null, // generate a new id!
             templateId,
             isTemplate);
+        copyWidget.updatePosition(this.getPosition());
         if (isTemplateCopy) {
             // If you're making a tempate copy, add to template copies
             this.templateCopies.add(copyWidget.getId());
@@ -317,7 +329,6 @@ export class UserWidget extends Widget {
             author: ''
         };
         this.properties.dimensions = dimensions;
-        this.properties.layout = new Map<number, Position>();
         this.isTemplate = isTemplate;
     }
 
@@ -325,28 +336,18 @@ export class UserWidget extends Widget {
         this.properties.dimensions = newDimensions;
     }
 
-    addInnerWidget(id: string, position?: Position) {
+    addInnerWidget(id: string) {
         // Now the inner widgets list is the stack order
         this.innerWidgetIds.push(id);
-        this.properties.layout[id] = position ? position : { top: 0, left: 0 };
     }
 
     removeInnerWidget(id: string) {
-        delete this.properties.layout[id];
         const index = this.innerWidgetIds.indexOf(id);
         this.innerWidgetIds.splice(index, 1);
     }
 
     getInnerWidgetIds() {
         return this.innerWidgetIds.slice();
-    }
-
-    updateInnerWidgetLayout(widgetId: string, newLayout: Position) {
-        this.properties.layout[widgetId] = newLayout;
-    }
-
-    getInnerWidgetLayouts() {
-        return JSON.parse(JSON.stringify(this.properties.layout));
     }
 
     private getPathHelper(
@@ -429,6 +430,7 @@ export class UserWidget extends Widget {
             null, // generate a new id!
             templateId,
             isTemplate);
+        copyWidget.updatePosition(this.getPosition());
         if (isTemplateCopy) {
             // If you're making a tempate copy, add it to template copy list
             this.templateCopies.add(copyWidget.getId());
@@ -438,8 +440,7 @@ export class UserWidget extends Widget {
         for (const id of this.innerWidgetIds) {
             const copyInnerWidgets = Widget.getWidget(allWidgets, id).makeCopy(allWidgets, fromTemplate);
             const innerWidgetCopy = copyInnerWidgets[0];
-            const position = this.properties.layout[id];
-            copyWidget.addInnerWidget(innerWidgetCopy.getId(), position);
+            copyWidget.addInnerWidget(innerWidgetCopy.getId());
             copyWidgets = copyWidgets.concat(copyInnerWidgets);
         }
         return copyWidgets;

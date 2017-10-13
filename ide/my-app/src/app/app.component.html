@@ -2,9 +2,14 @@
 
 <dv-zoom [outerContainerDimensions]="outerContainerDimensions"
          [widgetDimensions]="selectedWidget.getDimensions()"
-         [screenDimensions]="screenDimensions"></dv-zoom>
+         [screenDimensions]="screenDimensions">
+</dv-zoom>
 
 <dv-map [outerContainerDimensions]="outerContainerDimensions"
+        [outerContainerScroll]="outerContainerScroll"
         [screenDimensions]="screenDimensions"
         [selectedWidget] = "selectedWidget"
-        [allWidgets] = "allWidgets"></dv-map>
+        [allWidgets] = "allWidgets">
+</dv-map>
+
+                
