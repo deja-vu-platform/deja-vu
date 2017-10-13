@@ -31,5 +31,5 @@ If you follow these steps in order then everything should work:
   1. `npm i` and `npm run lib` in `core/server-bus`, `core/client-bus`, and `core/mean-loader`
   2. `npm i` and `npm run lib` in `core/lang`
   3. `npm i` and `npm run lib` in `gql`, `grafo`, `helpers`
-  4. `npm i` and `npm run lib` in each cliché under `catalog` (e.g., `npm i` and `npm run lib` in `catalog/access/auth`)
+  4. `npm i` and `npm run lib` in each cliché under `catalog` (e.g., `npm i` and `npm run lib` in `catalog/access/standard_authentication`)
   5. `npm i` in each sample under `samples` (e.g., `npm i` in `samples/morg`)
