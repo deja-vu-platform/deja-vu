@@ -16,7 +16,7 @@ Team RECD
 [Original App](http://mapmit.herokuapp.com/)
 
 ## Cliches Used
-- Auth
+- StandardAuthentication
 - Geolocation
 - Event
 - Group

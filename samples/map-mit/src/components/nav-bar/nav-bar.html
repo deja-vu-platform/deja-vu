@@ -1,4 +1,4 @@
-<dv-widget name="LoggedIn" of="Auth"></dv-widget>
+<dv-widget name="LoggedIn" of="StandardAuthentication"></dv-widget>
 <nav class="navbar">
   <div id="navbar-left">
     <div id="home-link" class="navbar-item right-bar">
@@ -17,7 +17,7 @@
       <span>Logged in as: {{user.username}}</span>
     </div>
     <div id="logout" class="navbar-item">
-      <dv-widget name="SignOutWithRedirect" of="Auth" class="logout-link">
+      <dv-widget name="SignOutWithRedirect" of="StandardAuthentication" class="logout-link">
       </dv-widget>
     </div>
   </div>
