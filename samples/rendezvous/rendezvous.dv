@@ -1,6 +1,6 @@
 // Plan public events on campus
 app Rendezvous {
-  include access/Auth[UserData for User]
+  include access/StandardAuthentication[UserData for User]
   include community/Geolocation[
     MapData for Map,
     EventData for Marker,
