@@ -15,7 +15,7 @@ Team No REST for the Wicked
 [Original App](https://sweet-spots.herokuapp.com/)
 
 ## Cliches Used
-- Auth
+- StandardAuthentication
 - Geolocation
 - Rating
 - Comment
