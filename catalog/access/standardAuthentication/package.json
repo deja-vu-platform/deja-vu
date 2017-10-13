@@ -1,5 +1,5 @@
 {
-  "name": "dv-access-standard-authentication",
+  "name": "dv-access-standardauthentication",
   "version": "0.0.1",
   "scripts": {
     "lib": "grunt dv-mean:lib",
