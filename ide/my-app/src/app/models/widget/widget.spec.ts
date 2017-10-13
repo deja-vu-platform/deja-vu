@@ -57,16 +57,16 @@ describe('UserWidget', () => {
   describe('add and remove inner widgets', () => {
     it('adds the id of the added and removes the ids removed', () => {
       widget2.addInnerWidget(widget1.getId());
-      expect(widget2.getInnerWidgets()).toEqual([widget1.getId()]);
+      expect(widget2.getInnerWidgetIds()).toEqual([widget1.getId()]);
 
       widget3.addInnerWidget(widget2.getId());
-      expect(widget3.getInnerWidgets()).toEqual([widget2.getId()]);
+      expect(widget3.getInnerWidgetIds()).toEqual([widget2.getId()]);
 
       widget2.removeInnerWidget(widget1.getId());
-      expect(widget2.getInnerWidgets()).toEqual([]);
+      expect(widget2.getInnerWidgetIds()).toEqual([]);
 
       widget3.removeInnerWidget(widget2.getId());
-      expect(widget3.getInnerWidgets()).toEqual([]);
+      expect(widget3.getInnerWidgetIds()).toEqual([]);
     });
 
     it ('does not delete removed items', () => {

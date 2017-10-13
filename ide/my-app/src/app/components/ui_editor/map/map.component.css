@@ -1,0 +1,60 @@
+
+#map-container{
+  position: fixed;
+  left: 300px;
+  bottom: 20px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+#map{
+  position: absolute;
+  background: grey;
+  overflow: scroll;
+  height: 100%;
+  width: 100%;
+  pointer-events: auto;
+  border: 1px black solid;
+}
+
+#map-minimize-btn{
+  position: absolute;
+  top: 0px;
+  right: -19px;
+  pointer-events: auto;
+  z-index: 100;
+}
+
+#map-container .minimized{ /* the minimize button */
+  top: auto;
+  left: 0;
+  right: auto;
+  bottom: 0;
+}
+
+#map-component-sizes{
+  background: #D5D5D5;
+  position: absolute;
+}
+
+#map-position {
+  position: absolute;
+  border: 1px black solid;
+  background: blue;
+  opacity: 0.5;
+}
+
+#zoom-selected-screen-size {
+  position: absolute;
+  border: 1px black solid;
+  background: white;
+}
+
+#map-inner-component-size {
+  position: absolute;
+  background: black;
+}
+
+#map-full-area {
+  position: absolute;
+}

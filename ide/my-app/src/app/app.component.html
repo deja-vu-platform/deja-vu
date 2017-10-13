@@ -1,6 +1,10 @@
 <dv-header pageTitle="moops"></dv-header>
 
 <dv-zoom [outerContainerDimensions]="outerContainerDimensions"
-         [widgetDimensions]="widgetDimensions"
-         [screenDimensions]="screenDimensions"
-></dv-zoom>
+         [widgetDimensions]="selectedWidget.getDimensions()"
+         [screenDimensions]="screenDimensions"></dv-zoom>
+
+<dv-map [outerContainerDimensions]="outerContainerDimensions"
+        [screenDimensions]="screenDimensions"
+        [widget] = "selectedWidget"
+        [allWidgets] = "allWidgets"></dv-map>

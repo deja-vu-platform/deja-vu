@@ -333,7 +333,7 @@ export class UserWidget extends Widget {
         this.innerWidgetIds.splice(index, 1);
     }
 
-    getInnerWidgets() {
+    getInnerWidgetIds() {
         return this.innerWidgetIds.slice();
     }
 
@@ -388,13 +388,13 @@ export class UserWidget extends Widget {
     getInnerWidget(
         allWidgets: Map<string, Map<string, Widget>>,
         targetId: string,
-        forParent = false
+        getParent = false
     ): Widget {
         const path = this.getPath(allWidgets, targetId);
         if (path === null) { // it's not actually a child
             return null;
         }
-        if (forParent) {
+        if (getParent) {
             targetId = path[path.length - 2];
         }
         return Widget.getWidget(allWidgets, targetId);
@@ -475,7 +475,8 @@ export class UserWidget extends Widget {
         keepStructure: boolean
     ) {
         const infoListLinearlized = [];
-        const infoListStructured = this.getInnerWidgetInfo(allWidgets, this, infoListLinearlized);
+        const infoListStructured = this
+                    .getInnerWidgetInfo(allWidgets, this, infoListLinearlized);
 
         if (keepStructure) {
             return infoListStructured;
