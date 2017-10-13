@@ -1,0 +1,33 @@
+// Verifies the user's identity with a passkey (e.g. access code, PIN).
+// A user cannot create their own passkey. It is created by another for them.
+
+cliche PasskeyAuthentication {
+    /** Entities **/
+    data User {}
+
+    /** Widgets**/
+    // Creates a passkey for a user.
+    widget CreatePasskey {
+        user: User
+    }
+
+    // Displays a sign in form, only with a passkey field.
+    // If `on_validate_ok` is defined, redirect user to the given widget.
+    // Otherwise, remain in the current widget.
+    widget ValidatePasskeyWithRedirect {
+        on_validate_ok: Widget
+    }
+
+    // Displays a sign out button. 
+    // If `on_signout_ok` is defined, redirect user to the given widget.
+    // Otherwise, remain in the current widget.
+    widget SignOutwithRedirect {
+        on_signout_ok: Widget
+    }
+
+    // A user's session persists until logging out.
+    // There is no template for this.
+    widget LoggedIn {
+        user: User
+    }
+}
