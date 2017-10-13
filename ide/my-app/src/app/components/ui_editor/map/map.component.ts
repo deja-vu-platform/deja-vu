@@ -3,10 +3,10 @@ import { Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/c
 import {Widget, UserWidget, WidgetType} from '../../../models/widget/widget';
 import {Dimensions, Position} from '../../common/utility/utility';
 
-import 'jquery';
+import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 
-declare var $: any;
+const $ = <any>jQuery;
 
 @Component({
   selector: 'dv-map',
@@ -18,8 +18,8 @@ export class MapComponent implements AfterViewInit {
     this.scrollPosition.top = value.top * this.mapScale;
     this.scrollPosition.left = value.left * this.mapScale;
 
-    this.mapPosition.top = this.scrollPosition.top;
-    this.mapPosition.left = this.scrollPosition.left;
+    this.mapWindowPosition.top = this.scrollPosition.top;
+    this.mapWindowPosition.left = this.scrollPosition.left;
   }
   @Input() outerContainerDimensions: Dimensions = {
     height: 1,
@@ -58,7 +58,7 @@ export class MapComponent implements AfterViewInit {
     this.mapWidgetSizes = mapWidgetSizes;
   }
 
-  @Output() newScrollPosition: EventEmitter<Position>;
+  @Output() newScrollPosition = new EventEmitter<Position>();
 
   _selectedWidget: Widget;
   mapScale = .1;
@@ -67,7 +67,7 @@ export class MapComponent implements AfterViewInit {
     top: 0,
     left: 0
   };
-  mapPosition: Position = {
+  mapWindowPosition: Position = {
     top: 0,
     left: 0
   };
@@ -88,37 +88,33 @@ export class MapComponent implements AfterViewInit {
   mapClick(e: MouseEvent) {
     const posX = e.pageX - $('#map').offset().left + $('#map').scrollLeft();
     const posY = e.pageY - $('#map').offset().top + $('#map').scrollTop();
-
+    console.log(this.newScrollPosition);
     this.newScrollPosition.emit({
       top: posY / this.mapScale,
       left: posX / this.mapScale
     });
 
-    this.mapPosition = {
-      top: Math.max(0, Math.min(posY, $('#map-full-area').height() - $('#map-position').height())),
-      left: Math.max(0, Math.min(posX, $('#map-full-area').width() - $('#map-position').width())),
+    this.mapWindowPosition = {
+      top: Math.max(0, Math.min(posY, this.dimensions.height - this.outerContainerDimensions.height * this.mapScale)),
+      left: Math.max(0, Math.min(posX, this.dimensions.height - this.outerContainerDimensions.width * this.mapScale))
     };
   }
 
   ngAfterViewInit() {
-    ($('#map-position')).draggable({
+    const _this = this;
+    $('#map-window').draggable({
       containment: '#map-full-area',
       start: function(){
-          this.navDragging = true;
+        _this.navDragging = true;
       },
       stop: function(e, ui){
-          this.navDragging = false;
-
-          this.newScrollPosition.emit({
-            top: ui.position.top / this.mapScale,
-            left: ui.position.left / this.mapScale
-          });
+        _this.navDragging = false;
+        console.log(_this.newScrollPosition);
+        _this.newScrollPosition.emit({
+          top: ui.position.top / this.mapScale,
+          left: ui.position.left / this.mapScale
+        });
       },
     });
   }
 }
-
-
-
-
-

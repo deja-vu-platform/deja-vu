@@ -18,11 +18,11 @@
       [scrollLeft]="scrollPosition.left"
       (click)="mapClick($event)">
       <div id="map-full-area"
-      [style.height]="_screenDimensions.height*mapScale+'px'"
-      [style.width]="_screenDimensions.width*mapScale+'px'"></div>
+        [style.height]="dimensions.height+'px'"
+        [style.width]="dimensions.width+'px'"></div>
       <div id="zoom-selected-screen-size"
-      [style.height]="_screenDimensions.height*mapScale+'px'"
-      [style.width]="_screenDimensions.width*mapScale+'px'"></div>
+        [style.height]="_screenDimensions.height*mapScale+'px'"
+        [style.width]="_screenDimensions.width*mapScale+'px'"></div>
       <div *ngIf="_selectedWidget"
           id="map-component-sizes"
           [style.zoom]="zoom"
@@ -37,11 +37,11 @@
               [style.top]= "(size.top * this.mapScale) + 'px'"
               [style.left]= "(size.left * this.mapScale) + 'px'"></div>
       </div>
-      <!-- Map position is the little thing you drag to move your map -->
-      <div id="map-position"
-          [style.top]="mapPosition.top+'px'"
-          [style.left]="mapPosition.left+'px'"
-          [style.height]="(outerContainerDimensions.height * mapScale)+'px'"
-          [style.width]="(outerContainerDimensions.width * mapScale)+'px'"></div>
+      <!-- Map window is the little thing you drag to move your map -->
+      <div id="map-window"
+          [style.top]="mapWindowPosition.top+'px'"
+          [style.left]="mapWindowPosition.left+'px'"
+          [style.height]="(outerContainerDimensions.height*mapScale)+'px'"
+          [style.width]="(outerContainerDimensions.width*mapScale)+'px'"></div>
   </div>
 </div>

@@ -36,11 +36,11 @@ export class AppComponent implements OnInit {
     this.selectedWidget.addInnerWidget(innerWidget.getId());
     innerWidget.updatePosition({ top: 20, left: 30 });
 
-    setTimeout(()=> {
-      this.outerContainerScroll = {
-        top: 100,
-        left: 100
-      };
-    }, 1000);
+    // setTimeout(() => {
+    //   this.outerContainerScroll = {
+    //     top: 100,
+    //     left: 100
+    //   };
+    // }, 1000);
   }
 }

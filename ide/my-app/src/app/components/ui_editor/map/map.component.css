@@ -37,7 +37,7 @@
   position: absolute;
 }
 
-#map-position {
+#map-window {
   position: absolute;
   border: 1px black solid;
   background: blue;
