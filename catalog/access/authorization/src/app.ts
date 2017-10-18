@@ -1,6 +1,4 @@
 const graphql = require("graphql");
-// typings don't have the call with no callback
-const bcrypt = require("bcryptjs");
 
 import { Mean } from "mean-loader";
 import { Helpers } from "helpers";
@@ -11,11 +9,7 @@ const mean = new Mean();
 
 const handlers = {
     user: {
-        create: Helpers.resolve_create(mean.db, "user", "users", user => {
-            user["password"] = bcrypt.hashSync(user.username, 10);
-            return user;
-        }),
-        update: Helpers.resolve_update(mean.db, "user")
+        create: Helpers.resolve_create(mean.db, "user")
     },
     resource: {
         read: args => {
