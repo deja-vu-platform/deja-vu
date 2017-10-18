@@ -1,0 +1,13 @@
+// Controls a user's access to resources.
+
+cliche Authorization {
+    /** Entities **/
+    data User {
+        username: text
+    }
+
+    data Resource {
+        owner: User,
+        viewers: [User]
+    }
+}
