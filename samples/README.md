@@ -15,7 +15,7 @@ Productivity
 
 | Cliché/App | Accord | ChoreStar | Morg | Listify (TBD) |
 | ---------- | ------ | --------- | ---- | -------       |
-| Auth       |   X    |    XX     |      |               |
+| StandardAuthentication |   X    |    XX     |      |               |
 | Market     |        |     X     |      |               |
 | Rating     |   X    |     X     |      |               |
 | Follow     |        |           |      |               |
@@ -47,7 +47,7 @@ Social
 
 | Cliché/App | Bookmark | MapMit | Rendezvous | SweetSpots | Potluck | Phoenix (TBD) |
 | ---------- | -------- | ------ | ---------- | ---------- | ------- | -------       |
-| Auth       |    X     |   X    |     X      |    X       |   X     |               |
+| StandardAuthentication |    X     |   X    |     X      |    X       |   X     |               |
 | Market     |          |        |            |            |   X     |               |
 | Rating     |          |        |            |    X       |         |               |
 | Follow     |    XX    |        |            |    X       |         |               |
@@ -75,7 +75,7 @@ Education
 
 | Cliché/App | EasyPick (TBD) | Lingua (TBD) |
 | ---------- | --------       | ------       |
-| Auth       |                |              |
+| StandardAuthentication |                |              |
 | Market     |                |              |
 | Rating     |                |              |
 | Follow     |                |              |
@@ -102,7 +102,7 @@ Sports
 
 | Cliché/App | LiveScorecard (TBD) |
 | ---------- | -------------       |
-| Auth       |                     |
+| StandardAuthentication |                     |
 | Market     |                     |
 | Rating     |                     |
 | Follow     |                     |
@@ -129,7 +129,7 @@ Food
 
 | Cliché/App | GroceryShip (TBD) |
 | ---------- | -----------       |
-| Auth       |                   |
+| StandardAuthentication |                   |
 | Market     |                   |
 | Rating     |                   |
 | Follow     |                   |

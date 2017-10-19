@@ -15,7 +15,7 @@ Team Allegro
 [Original App](https://allegro-accord.herokuapp.com)
 
 ## Cliches Used
-- Auth
+- StandardAuthentication
 - Group
 - Checklist
 - Rating

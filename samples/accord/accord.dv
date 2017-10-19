@@ -1,7 +1,7 @@
 // Support musical bands in the selection of setlists
 app Accord {
 
-  include access/Auth[User for User]
+  include access/StandardAuthentication[User for User]
 
   include organization/Group[
     User for Member,

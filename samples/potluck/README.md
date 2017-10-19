@@ -15,7 +15,7 @@ Team ARMR
 [Original App](http://potluck-armr.herokuapp.com/)
 
 ## Cliches Used
-- Auth
+- StandardAuthentication
 - Event
 - Group
 - Market
