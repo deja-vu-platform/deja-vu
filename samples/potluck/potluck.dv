@@ -5,6 +5,8 @@
 // (e.g., "2 cakes") and can commit to bringing requests.
 app Potluck {
   include access/StandardAuthentication[User for User]
+  include access/Authorization[User for User]
+
   // Create parties
   include organization/Event[Party for Event]
 
