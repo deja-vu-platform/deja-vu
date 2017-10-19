@@ -53,6 +53,16 @@ export class ZoomComponent {
     this.zoomChanged();
   }
 
+  minimize() {
+    if (this.minimized) {
+        this.minimized = false;
+        this.chevron = CHEVRON.RIGHT;
+    } else {
+        this.minimized = true;
+        this.chevron = CHEVRON.LEFT;
+    }
+  }
+
   private changeZoomViaZoomControl(type: ZoomType) {
     switch (type) {
     case ZoomType.SLIDER:
@@ -119,15 +129,5 @@ export class ZoomComponent {
   private zoomChanged() {
     this.updatedZoom.emit(this.currentZoom);
     this.zoomControlText = this.makeZoomText(this.getZoomFromSliderVal());
-  }
-
-  private minimize() {
-    if (this.minimized) {
-        this.minimized = false;
-        this.chevron = CHEVRON.RIGHT;
-    } else {
-        this.minimized = true;
-        this.chevron = CHEVRON.LEFT;
-    }
   }
 }

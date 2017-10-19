@@ -1,14 +1,17 @@
 {
-  "name": "app",
+  "name": "dejavuide",
   "version": "0.0.0",
   "license": "MIT",
+  "main": "main.js", 
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "electron": "electron .",
+    "electron-build": "ng build --prod && electron ."
   },
   "private": true,
   "dependencies": {
@@ -49,6 +52,7 @@
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "~5.3.2",
-    "typescript": "~2.3.3"
+    "typescript": "~2.3.3",
+    "electron-prebuilt": "1.1.1"
   }
 }

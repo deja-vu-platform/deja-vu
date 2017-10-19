@@ -88,7 +88,6 @@ export class MapComponent implements AfterViewInit {
   mapClick(e: MouseEvent) {
     const posX = e.pageX - $('#map').offset().left + $('#map').scrollLeft();
     const posY = e.pageY - $('#map').offset().top + $('#map').scrollTop();
-    console.log(this.newScrollPosition);
     this.newScrollPosition.emit({
       top: posY / this.mapScale,
       left: posX / this.mapScale
@@ -109,7 +108,6 @@ export class MapComponent implements AfterViewInit {
       },
       stop: function(e, ui){
         _this.navDragging = false;
-        console.log(_this.newScrollPosition);
         _this.newScrollPosition.emit({
           top: ui.position.top / this.mapScale,
           left: ui.position.left / this.mapScale
