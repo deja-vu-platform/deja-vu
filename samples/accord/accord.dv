@@ -2,6 +2,7 @@
 app Accord {
 
   include access/StandardAuthentication[User for User]
+  include access/Authorization[User for User]
 
   include organization/Group[
     User for Member,
