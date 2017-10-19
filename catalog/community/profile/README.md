@@ -1,3 +1,3 @@
 Profile
 ====
-Save basic user information
+Share personal information
