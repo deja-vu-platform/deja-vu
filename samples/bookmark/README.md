@@ -7,6 +7,7 @@ and attach topics to them. Users can follow other users or topics.
 ## Cliches Used
 - Follow
 - StandardAuthentication
+- Authorization
 - Feed
 - Label
 - Post
