@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Dimensions, Position } from './components/common/utility/utility';
 import { BaseWidget, Widget, UserWidget } from './models/widget/widget';
+import { MapComponent } from './components/ui_editor/map/map.component';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +10,9 @@ import { BaseWidget, Widget, UserWidget } from './models/widget/widget';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
+  @ViewChild(MapComponent)
+  private map: MapComponent;
+
   title = 'app';
 
   outerContainerDimensions: Dimensions = {
@@ -28,6 +32,10 @@ export class AppComponent implements OnInit {
 
   selectedWidget = new UserWidget('test', { height: 600, width: 800 }, '1234');
   allWidgets = new Map<string, Map<string, Widget>>();
+
+  handleWidgetChange() {
+    this.map.updateView();
+  }
 
   ngOnInit() {
     this.selectedWidget.updatePosition({ top: 100, left: 300 });

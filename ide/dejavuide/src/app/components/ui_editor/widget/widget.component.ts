@@ -18,6 +18,8 @@ export class WidgetComponent implements AfterViewInit {
   @Input() isSelected = false;
   @Input() isMovable = false;
 
+  @Output() onChange = new EventEmitter<boolean>();
+
   widgetType = WidgetType;
   Widget = Widget;
 
@@ -33,17 +35,18 @@ export class WidgetComponent implements AfterViewInit {
     this.el.style.position = 'absolute';
 
     if (this.isSelected || this.isMovable) {
-      console.log(this.widget.getName());
-      console.log(this.isMovable);
-      console.log(this.isSelected);
       const _this = this;
       $(this.el).draggable({
         containment: '.work-surface',
         stop: function(e, ui){
           _this.widget.updatePosition(ui.position);
+          _this.onChange.emit(true);
         },
       });
     }
+  }
 
+  handleChange() {
+    this.onChange.emit(true);
   }
 }

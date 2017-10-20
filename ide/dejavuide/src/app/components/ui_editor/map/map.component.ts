@@ -37,25 +37,7 @@ export class MapComponent implements AfterViewInit {
 
   @Input() set selectedWidget(value: Widget) {
     this._selectedWidget = value;
-    const mapScale = this.mapScale;
-    const allWidgets = this.allWidgets;
-    const mapWidgetSizes = [];
-    if (value.getWidgetType() === WidgetType.USER_WIDGET) {
-      const widget = <UserWidget> value;
-      widget.getInnerWidgetIds().forEach(function (innerWidgetId) {
-        const innerWidget = widget
-                              .getInnerWidget(allWidgets, innerWidgetId);
-        const innerWidgetDimensions = innerWidget.getDimensions();
-        const innerWidgetPosition = innerWidget.getPosition();
-        mapWidgetSizes.push({
-          left: innerWidgetPosition.left,
-          top: innerWidgetPosition.top,
-          width: innerWidgetDimensions.width,
-          height: innerWidgetDimensions.height,
-        });
-      });
-    }
-    this.mapWidgetSizes = mapWidgetSizes;
+    this.updateView();
   }
 
   @Output() newScrollPosition = new EventEmitter<Position>();
@@ -114,5 +96,30 @@ export class MapComponent implements AfterViewInit {
         });
       },
     });
+  }
+
+  updateView() {
+    const mapScale = this.mapScale;
+    const allWidgets = this.allWidgets;
+    const selectedWidget = this._selectedWidget;
+    const mapWidgetSizes = [];
+    if (selectedWidget) {
+      if (selectedWidget.getWidgetType() === WidgetType.USER_WIDGET) {
+        const widget = <UserWidget> selectedWidget;
+        widget.getInnerWidgetIds().forEach(function (innerWidgetId) {
+          const innerWidget = widget
+                                .getInnerWidget(allWidgets, innerWidgetId);
+          const innerWidgetDimensions = innerWidget.getDimensions();
+          const innerWidgetPosition = innerWidget.getPosition();
+          mapWidgetSizes.push({
+            left: innerWidgetPosition.left,
+            top: innerWidgetPosition.top,
+            width: innerWidgetDimensions.width,
+            height: innerWidgetDimensions.height,
+          });
+        });
+      }
+    }
+    this.mapWidgetSizes = mapWidgetSizes;
   }
 }

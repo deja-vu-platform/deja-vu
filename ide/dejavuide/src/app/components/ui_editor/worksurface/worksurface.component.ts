@@ -15,9 +15,15 @@ export class WorkSurfaceComponent {
     this._widget = val;
   }
 
+  @Output() onChange = new EventEmitter<boolean>();
+
   _widget: Widget;
   height = 1000;
   width = 2000;
+
+  handleChange() {
+    this.onChange.emit(true);
+  }
 
   // private (innerWidget, outerWidget,
   //   isThisEditable, isThisDraggable, dragHandle, outerWidgetContainer,

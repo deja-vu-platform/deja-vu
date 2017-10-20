@@ -9,7 +9,8 @@
       <dv-widget [widget]="Widget.getWidget(allWidgets, innerWidgetId)"
                   [allWidgets]="allWidgets"
                   [isSelected]="false"
-                  [isMovable]="isSelected">
+                  [isMovable]="isSelected"
+                  (onChange)="handleChange()">
       </dv-widget>
     </ng-container>
     

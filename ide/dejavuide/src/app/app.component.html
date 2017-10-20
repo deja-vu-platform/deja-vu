@@ -1,7 +1,8 @@
-<dv-header pageTitle="moops"></dv-header>
+<dv-header pageTitle="Test"></dv-header>
 
 <dv-worksurface [widget]="selectedWidget"
-                [allWidgets]="allWidgets"></dv-worksurface>
+                [allWidgets]="allWidgets"
+                (onChange)="handleWidgetChange()"></dv-worksurface>
 
 <dv-zoom [outerContainerDimensions]="outerContainerDimensions"
          [widgetDimensions]="selectedWidget.getDimensions()"
@@ -11,8 +12,8 @@
 <dv-map [outerContainerDimensions]="outerContainerDimensions"
         [outerContainerScroll]="outerContainerScroll"
         [screenDimensions]="screenDimensions"
-        [selectedWidget] = "selectedWidget"
-        [allWidgets] = "allWidgets">
+        [selectedWidget]="selectedWidget"
+        [allWidgets]="allWidgets">
 </dv-map>
 
                 
