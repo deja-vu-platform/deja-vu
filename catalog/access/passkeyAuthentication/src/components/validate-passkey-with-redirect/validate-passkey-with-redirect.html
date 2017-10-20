@@ -1,0 +1,14 @@
+<!-- ValidatePasskey -->
+<form (ngSubmit)="onSubmit()" #validatePasskeyForm="ngForm" class="form-horizontal"
+    [ngClass]="{'has-error': error}">
+    <fieldset class="form-group">
+    <label class="sr-only" for="validate-passkey">Passkey</label>
+    <input type="text" required class="form-control" name="passkey"
+    [(ngModel)]="user.passkey" ngControl="passkey" placeholder="Passkey"/>
+    </fieldset>
+    <button type="submit" class="btn btn-default btn-sm pull-right"
+    [disabled]="!validatePasskeyForm.form.valid">Sign In</button>
+    <div id="validate-status" class="alert alert-danger" [hidden]="!error">
+    Wrong passkey
+    </div>
+</form>
