@@ -91,9 +91,12 @@ namespace Validation {
             });
     }
 
-    export function userIsNew(passkey) {
+    // Both username and passkey should be unique.
+    export function userIsNew(username, passkey) {
         return mean.db.collection("users")
-            .findOne({ passkey: passkey }, { _id: 1 })
+            .findOne({
+                $or: [{ username: username }, { passkey: passkey }]
+            }, { _id: 1 })
             .then(user => {
                 if (user) throw new Error(`${passkey} exists`);
                 return user;
