@@ -17,9 +17,8 @@
       [scrollTop]="scrollPosition.top"
       [scrollLeft]="scrollPosition.left"
       (click)="mapClick($event)">
-      <div id="map-full-area"
-        [style.height]="dimensions.height+'px'"
-        [style.width]="dimensions.width+'px'"></div>
+      <!-- the full area isn't useful right now -->
+      <div id="map-full-area"></div>
       <div id="zoom-selected-screen-size"
         [style.height]="_screenDimensions.height*mapScale+'px'"
         [style.width]="_screenDimensions.width*mapScale+'px'"></div>

@@ -1,19 +1,27 @@
 <dv-header pageTitle="Test"></dv-header>
 
-<dv-worksurface [widget]="selectedWidget"
-                [allWidgets]="allWidgets"
-                (onChange)="handleWidgetChange()"></dv-worksurface>
-
-<dv-zoom [outerContainerDimensions]="outerContainerDimensions"
-         [widgetDimensions]="selectedWidget.getDimensions()"
-         [screenDimensions]="screenDimensions">
+<div class="outer-container">
+  <dv-worksurface 
+    [widget]="selectedWidget"
+    [allWidgets]="allWidgets"
+    [dimensions]="screenDimensions"
+    (onChange)="handleWidgetChange()">
+  </dv-worksurface>
+</div>
+        
+<dv-zoom 
+  [outerContainerDimensions]="outerContainerDimensions"
+  [widgetDimensions]="selectedWidget.getDimensions()"
+  [screenDimensions]="screenDimensions">
 </dv-zoom>
 
-<dv-map [outerContainerDimensions]="outerContainerDimensions"
-        [outerContainerScroll]="outerContainerScroll"
-        [screenDimensions]="screenDimensions"
-        [selectedWidget]="selectedWidget"
-        [allWidgets]="allWidgets">
+<dv-map 
+  [outerContainerDimensions]="outerContainerDimensions"
+  [outerContainerScroll]="outerContainerScroll"
+  [screenDimensions]="screenDimensions"
+  [selectedWidget]="selectedWidget"
+  [allWidgets]="allWidgets"
+  (newScreenPosition)="console.log($event)">
 </dv-map>
 
                 

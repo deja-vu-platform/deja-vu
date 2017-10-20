@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import { Widget } from '../../../models/widget/widget';
+import { Dimensions, Position } from '../../common/utility/utility';
 
 @Component({
   selector: 'dv-worksurface',
@@ -15,11 +16,11 @@ export class WorkSurfaceComponent {
     this._widget = val;
   }
 
+  @Input() dimensions: Dimensions;
+
   @Output() onChange = new EventEmitter<boolean>();
 
   _widget: Widget;
-  height = 1000;
-  width = 2000;
 
   handleChange() {
     this.onChange.emit(true);

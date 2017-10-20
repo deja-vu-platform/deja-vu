@@ -75,25 +75,37 @@ export class MapComponent implements AfterViewInit {
       left: posX / this.mapScale
     });
 
+    const top =  Math.max(0, Math.min(posY, (this._screenDimensions.height - this.outerContainerDimensions.height) * this.mapScale));
+    const left =  Math.max(0, Math.min(posX, (this._screenDimensions.width - this.outerContainerDimensions.width) * this.mapScale));
+    console.log(top, left);
+    // for now TODO remove later
+    this.updateContainerScroll(top, left);
+
     this.mapWindowPosition = {
-      top: Math.max(0, Math.min(posY, this.dimensions.height - this.outerContainerDimensions.height * this.mapScale)),
-      left: Math.max(0, Math.min(posX, this.dimensions.height - this.outerContainerDimensions.width * this.mapScale))
+      top: top,
+      left: left
     };
   }
 
   ngAfterViewInit() {
     const _this = this;
     $('#map-window').draggable({
-      containment: '#map-full-area',
+      containment: '#zoom-selected-screen-size',
       start: function(){
         _this.navDragging = true;
+      },
+      drag: function(e, ui) {
+        _this.updateContainerScroll(ui.position.top, ui.position.left);
       },
       stop: function(e, ui){
         _this.navDragging = false;
         _this.newScrollPosition.emit({
-          top: ui.position.top / this.mapScale,
-          left: ui.position.left / this.mapScale
+          top: ui.position.top / _this.mapScale,
+          left: ui.position.left / _this.mapScale
         });
+
+        // for now TODO remove later
+        _this.updateContainerScroll(ui.position.top, ui.position.left);
       },
     });
   }
@@ -121,5 +133,10 @@ export class MapComponent implements AfterViewInit {
       }
     }
     this.mapWidgetSizes = mapWidgetSizes;
+  }
+
+  private updateContainerScroll(top, left) {
+    $('.outer-container').scrollTop(top / this.mapScale);
+    $('.outer-container').scrollLeft(left / this.mapScale);
   }
 }

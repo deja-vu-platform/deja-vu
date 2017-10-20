@@ -16,13 +16,13 @@ export class AppComponent implements OnInit {
   title = 'app';
 
   outerContainerDimensions: Dimensions = {
-    width: 300,
-    height: 200
+    width: 800,
+    height: 500
   };
 
   screenDimensions: Dimensions = {
-    width: 800,
-    height: 700
+    width: 2000,
+    height: 1000
   };
 
   outerContainerScroll: Position = {
