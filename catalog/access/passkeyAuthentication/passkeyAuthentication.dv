@@ -3,7 +3,11 @@
 
 cliche PasskeyAuthentication {
     /** Entities **/
-    data User {}
+    // A user does not use their username to log in.
+    // Their username is defined by someone else and is used as an id.
+    data User {
+        username: text
+    }
 
     /** Widgets**/
     // Creates a passkey for a user.
