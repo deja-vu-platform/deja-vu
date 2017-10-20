@@ -1,8 +1,10 @@
 <div class="work-surface widget-work-surface"
      id="widget-work-surface_{{widgetId}}"
-     [style.height] ="height"
-     [style.width]="width">
+     [style.height] ="height + 'px'"
+     [style.width]="width + 'px'">
   <dv-widget [widget]="_widget"
-              [allWidgets]="allWidgets">
+              [allWidgets]="allWidgets"
+              [isSelected]="true"
+              [isMovable]="true">
   </dv-widget>
 </div>

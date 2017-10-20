@@ -1,18 +1,13 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 
 import { Widget } from '../../../models/widget/widget';
-
-import * as jQuery from 'jquery';
-import 'jquery-ui-dist/jquery-ui';
-
-const $ = <any>jQuery;
 
 @Component({
   selector: 'dv-worksurface',
   templateUrl: './worksurface.component.html',
   styleUrls: ['./worksurface.component.css']
 })
-export class WorkSurfaceComponent implements AfterViewInit {
+export class WorkSurfaceComponent {
   @Input() currentZoom: number;
   @Input() allWidgets:  Map<string, Map<string, Widget>>;
   @Input() set widget(val: Widget) {
@@ -23,16 +18,6 @@ export class WorkSurfaceComponent implements AfterViewInit {
   _widget: Widget;
   height = 1000;
   width = 2000;
-
-  ngAfterViewInit() {
-    const _this = this;
-    $('dv-widget').draggable({
-      containment: '.worksurface',
-      stop: function(e, ui){
-        _this._widget.updatePosition(ui.position);
-      },
-    });
-  }
 
   // private (innerWidget, outerWidget,
   //   isThisEditable, isThisDraggable, dragHandle, outerWidgetContainer,

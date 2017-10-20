@@ -1,15 +1,22 @@
-import { Component, Input, Output, EventEmitter, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 
 import { Widget, WidgetType } from '../../../models/widget/widget';
+
+import * as jQuery from 'jquery';
+import 'jquery-ui-dist/jquery-ui';
+
+const $ = <any>jQuery;
 
 @Component({
   selector: 'dv-widget',
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class WidgetComponent implements OnInit, AfterViewInit {
+export class WidgetComponent implements AfterViewInit {
   @Input() allWidgets:  Map<string, Map<string, Widget>>;
   @Input() widget: Widget;
+  @Input() isSelected = false;
+  @Input() isMovable = false;
 
   widgetType = WidgetType;
   Widget = Widget;
@@ -20,12 +27,23 @@ export class WidgetComponent implements OnInit, AfterViewInit {
       this.el = el.nativeElement;
   }
 
-  ngOnInit() {
-    console.log(this.widget.getDimensions().height);
-  }
   ngAfterViewInit() {
     this.el.style.top = this.widget.getPosition().top + 'px';
     this.el.style.left = this.widget.getPosition().left + 'px';
     this.el.style.position = 'absolute';
+
+    if (this.isSelected || this.isMovable) {
+      console.log(this.widget.getName());
+      console.log(this.isMovable);
+      console.log(this.isSelected);
+      const _this = this;
+      $(this.el).draggable({
+        containment: '.work-surface',
+        stop: function(e, ui){
+          _this.widget.updatePosition(ui.position);
+        },
+      });
+    }
+
   }
 }
