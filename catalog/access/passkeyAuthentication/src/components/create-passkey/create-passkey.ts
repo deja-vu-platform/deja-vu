@@ -11,7 +11,7 @@ export class ValidatePasskeyComponent {
 
     constructor(private _graphQlService: GraphQlService) { }
 
-    onsubmit() {
+    onSubmit() {
         this._graphQlService
             .post(`
                 createPasskey(
