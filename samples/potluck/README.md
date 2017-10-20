@@ -16,6 +16,7 @@ Team ARMR
 
 ## Cliches Used
 - StandardAuthentication
+- Authorization
 - Event
 - Group
 - Market

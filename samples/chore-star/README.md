@@ -16,6 +16,7 @@ Team Star
 
 ## Cliches Used
 - StandardAuthentication
+- Authorization
 - Group
 - List
 - Rating

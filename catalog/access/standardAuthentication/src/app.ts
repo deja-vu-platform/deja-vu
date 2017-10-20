@@ -8,11 +8,7 @@ import {Helpers} from "helpers";
 import {ServerBus} from "server-bus";
 import {Grafo} from "grafo";
 
-const uuid = require("uuid");
-
-
 const mean = new Mean();
-
 
 const handlers = {
   user: {
@@ -21,20 +17,11 @@ const handlers = {
           return user;
         }),
     update: Helpers.resolve_update(mean.db, "user")
-  },
-  resource: {
-    read: args => {
-      console.log("someone read resource of id " + args.atom_id);
-      return Promise.resolve(true);
-    },
-    create: Helpers.resolve_create(mean.db, "resource")
   }
 };
 
-
 const bus = new ServerBus(
     mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
-
 
 //////////////////////////////////////////////////
 

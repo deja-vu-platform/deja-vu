@@ -16,6 +16,7 @@ Team Allegro
 
 ## Cliches Used
 - StandardAuthentication
+- Authorization
 - Group
 - Checklist
 - Rating
