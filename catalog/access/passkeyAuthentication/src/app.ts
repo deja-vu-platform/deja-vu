@@ -98,8 +98,10 @@ namespace Validation {
                 $or: [{ username: username }, { passkey: passkey }]
             }, { _id: 1 })
             .then(user => {
-                if (user) throw new Error(`${passkey} exists`);
+                if (user) throw new Error(`username ${username} or passkey ${passkey} exists`);
                 return user;
             });
     }
+
+    // OR separate the errors?
 }
