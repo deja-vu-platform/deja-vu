@@ -10,7 +10,7 @@ import {NamedAtom} from "../shared/data";
 
 
 @Widget({fqelement: "Task", ng2_providers: [GraphQlService]})
-export class ShowCLaimableTasksComponent implements AfterInit {
+export class ShowClaimableTasksComponent implements AfterInit {
   @Field("Assigner") assigner: Atom;
   claimableTasks = [];
 
