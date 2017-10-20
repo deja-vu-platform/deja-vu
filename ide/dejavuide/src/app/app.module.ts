@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { HeaderModule } from './components/common/header/header.module';
 import { ZoomModule } from './components/ui_editor/zoom/zoom.module';
 import { MapModule } from './components/ui_editor/map/map.module';
+import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurface.module';
 
 
 @NgModule({
@@ -15,7 +16,8 @@ import { MapModule } from './components/ui_editor/map/map.module';
     BrowserModule,
     HeaderModule,
     ZoomModule,
-    MapModule
+    MapModule,
+    WorkSurfaceModule
   ],
   providers: [],
   bootstrap: [AppComponent]

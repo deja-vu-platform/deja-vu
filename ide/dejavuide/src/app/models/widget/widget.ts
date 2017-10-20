@@ -96,7 +96,7 @@ export class Widget {
     }
 
     getDimensions(): Dimensions {
-        return this.properties.dimensions;
+        return JSON.parse(JSON.stringify(this.properties.dimensions));
     }
 
     updateDimensions(newDimensions: Dimensions) {

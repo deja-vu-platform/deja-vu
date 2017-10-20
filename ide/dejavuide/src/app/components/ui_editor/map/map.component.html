@@ -26,6 +26,10 @@
       <div *ngIf="_selectedWidget"
           id="map-component-sizes"
           [style.zoom]="zoom"
+          [style.top]=
+          "(_selectedWidget.getPosition().top * this.mapScale) + 'px'"
+          [style.left]=
+          "(_selectedWidget.getPosition().left * this.mapScale) + 'px'"
           [style.height]=
           "(_selectedWidget.getDimensions().height * this.mapScale) + 'px'"
           [style.width]=

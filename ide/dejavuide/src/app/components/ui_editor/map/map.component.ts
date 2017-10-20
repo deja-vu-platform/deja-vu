@@ -48,10 +48,10 @@ export class MapComponent implements AfterViewInit {
         const innerWidgetDimensions = innerWidget.getDimensions();
         const innerWidgetPosition = innerWidget.getPosition();
         mapWidgetSizes.push({
-          left: innerWidgetPosition.left * mapScale,
-          top: innerWidgetPosition.top * mapScale,
-          width: innerWidgetDimensions.width * mapScale,
-          height: innerWidgetDimensions.height * mapScale,
+          left: innerWidgetPosition.left,
+          top: innerWidgetPosition.top,
+          width: innerWidgetDimensions.width,
+          height: innerWidgetDimensions.height,
         });
       });
     }

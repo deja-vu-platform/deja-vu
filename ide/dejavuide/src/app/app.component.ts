@@ -26,15 +26,16 @@ export class AppComponent implements OnInit {
     left: 0
   };
 
-  selectedWidget = new UserWidget('test', { height: 150, width: 250 }, '1234');
+  selectedWidget = new UserWidget('test', { height: 300, width: 400 }, '1234');
   allWidgets = new Map<string, Map<string, Widget>>();
 
   ngOnInit() {
+    this.selectedWidget.updatePosition({ top: 100, left: 300 });
     Widget.addWidgetToAllWidgets(this.allWidgets, this.selectedWidget);
-    const innerWidget = new BaseWidget('test inner', { height: 50, width: 75 }, 'img', '/', '1234');
+    const innerWidget = new BaseWidget('test inner', { height: 100, width: 200 }, 'img', '/', '1234');
     innerWidget.addWidgetToAllWidgets(this.allWidgets);
     this.selectedWidget.addInnerWidget(innerWidget.getId());
-    innerWidget.updatePosition({ top: 20, left: 30 });
+    innerWidget.updatePosition({ top: 50, left: 100 });
 
     // setTimeout(() => {
     //   this.outerContainerScroll = {

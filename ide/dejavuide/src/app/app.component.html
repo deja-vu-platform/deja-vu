@@ -1,5 +1,8 @@
 <dv-header pageTitle="moops"></dv-header>
 
+<dv-worksurface [widget]="selectedWidget"
+                [allWidgets]="allWidgets"></dv-worksurface>
+
 <dv-zoom [outerContainerDimensions]="outerContainerDimensions"
          [widgetDimensions]="selectedWidget.getDimensions()"
          [screenDimensions]="screenDimensions">

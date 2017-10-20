@@ -1,0 +1,14 @@
+<div class="widget-component"
+      *ngIf="widget"
+      [style.height]="widget.getDimensions().height+'px'"
+      [style.width]="widget.getDimensions().width+'px'">
+  <span>I am a widget</span>
+  <ng-container *ngIf="widget.getWidgetType() === widgetType.USER_WIDGET">
+    <ng-container *ngFor="let innerWidgetId of widget.getInnerWidgetIds()">
+      <dv-widget [widget]="Widget.getWidget(allWidgets, innerWidgetId)"
+                  [allWidgets]="allWidgets">
+      </dv-widget>
+    </ng-container>
+    
+  </ng-container>
+</div>
