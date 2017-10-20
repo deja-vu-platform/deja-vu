@@ -1,4 +1,5 @@
-import { Widget, ClientBus, PrimitiveAtom, Field, WidgetValue } from "client-bus";
+import { Widget, ClientBus, PrimitiveAtom,
+        Field, WidgetValue } from "client-bus";
 
 @Widget({
     fqelement: "PasskeyAuthentication",

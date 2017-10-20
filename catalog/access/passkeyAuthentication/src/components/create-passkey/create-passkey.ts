@@ -20,7 +20,7 @@ export class ValidatePasskeyComponent {
                 )
             `)
             .subscribe(
-                _ => { this.create_passkey_ok = true; },
+                _ => { this.create_passkey_ok.value = true; },
                 err => {
                     this.error = true;
                 }

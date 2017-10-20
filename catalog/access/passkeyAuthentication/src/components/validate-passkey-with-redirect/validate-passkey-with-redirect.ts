@@ -2,7 +2,8 @@ import { NgClass } from "@angular/common";
 
 import { UserAtom } from "../shared/data";
 import { GraphQlService } from "gql";
-import { Widget, ClientBus, Field, PrimitiveAtom, WidgetValue } from "client-bus";
+import { Widget, ClientBus, Field,
+        PrimitiveAtom, WidgetValue } from "client-bus";
 
 @Widget({
     fqelement: "Authorization",
@@ -31,7 +32,8 @@ export class ValidatePasskeyWithRedirectComponent {
                     const authenticationToken = token.token;
                     const authenticatedUser = token.user;
                     localStorage.setItem("id_token", authenticationToken);
-                    localStorage.setItem("username", authenticatedUser.username);
+                    localStorage.setItem("username",
+                                         authenticatedUser.username);
                     localStorage.setItem("atom_id", authenticatedUser.atom_id);
                     this._client_bus.navigate(this.on_validate_ok.value);
                 },

@@ -42,7 +42,7 @@ const schema = grafo
             passkey: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
         resolve: (_, { username, passkey }) => {
-            return Validation.userIsNew(passkey).then(_ => {
+            return Validation.userIsNew(username, passkey).then(_ => {
                 // Both username and passkey should be unique, but we use passkey
                 // as the atom id because unlike passwords in Standard Authentication, 
                 // a passkey is unique to each user.
