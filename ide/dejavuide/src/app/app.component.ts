@@ -26,16 +26,26 @@ export class AppComponent implements OnInit {
     left: 0
   };
 
-  selectedWidget = new UserWidget('test', { height: 300, width: 400 }, '1234');
+  selectedWidget = new UserWidget('test', { height: 600, width: 800 }, '1234');
   allWidgets = new Map<string, Map<string, Widget>>();
 
   ngOnInit() {
     this.selectedWidget.updatePosition({ top: 100, left: 300 });
     Widget.addWidgetToAllWidgets(this.allWidgets, this.selectedWidget);
-    const innerWidget = new BaseWidget('test inner', { height: 100, width: 200 }, 'img', '/', '1234');
-    innerWidget.addWidgetToAllWidgets(this.allWidgets);
-    this.selectedWidget.addInnerWidget(innerWidget.getId());
-    innerWidget.updatePosition({ top: 50, left: 100 });
+    const innerWidget1 = new BaseWidget('test inner1', { height: 100, width: 200 }, 'img', '/', '1234');
+    innerWidget1.addWidgetToAllWidgets(this.allWidgets);
+    this.selectedWidget.addInnerWidget(innerWidget1.getId());
+    innerWidget1.updatePosition({ top: 50, left: 100 });
+
+    const innerWidget2 = new UserWidget('test inner2', { height: 200, width: 400 }, '1234');
+    innerWidget2.addWidgetToAllWidgets(this.allWidgets);
+    this.selectedWidget.addInnerWidget(innerWidget2.getId());
+    innerWidget2.updatePosition({ top: 200, left: 200 });
+
+    const innerWidget21 = new UserWidget('test inner21', { height: 100, width: 100 }, '1234');
+    innerWidget21.addWidgetToAllWidgets(this.allWidgets);
+    innerWidget2.addInnerWidget(innerWidget21.getId());
+    innerWidget21.updatePosition({ top: 50, left: 100 });
 
     // setTimeout(() => {
     //   this.outerContainerScroll = {
