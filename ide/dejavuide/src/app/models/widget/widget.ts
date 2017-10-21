@@ -27,7 +27,7 @@ interface Meta {
     author?: string;
 }
 
-export class Widget {
+export abstract class Widget {
     protected widgetType: WidgetType;
     protected properties: Properties = {
         dimensions: null,
@@ -57,7 +57,7 @@ export class Widget {
     static getWidget(
         allWidgets: Map<string, Map<string, Widget>>,
         widgetId: string
-    ) {
+    ): Widget {
         const clicheid = Widget.decodeid(widgetId)[0];
         return allWidgets[clicheid][widgetId];
     }
@@ -81,6 +81,11 @@ export class Widget {
     static decodeid(id: string) {
         return id.split('_');
     }
+
+    abstract makeCopy(
+        allWidgets: Map<string, Map<string, Widget>>,
+        fromTemplate: boolean
+    ): Widget[];
 
     protected newIdFromId(id: string) {
         const clicheid = Widget.decodeid(id)[0];
@@ -161,8 +166,7 @@ export class Widget {
 
         let inheritedStyles = {};
         if (this.getTemplateId()) {
-            inheritedStyles =
-                Widget.getWidget(allWidgets, this.getTemplateId()).getCustomStylesToShow();
+            inheritedStyles = Widget.getWidget(allWidgets, this.getTemplateId()).getCustomStylesToShow(allWidgets); // no parent styles for template
         }
 
         for (const style of Object.keys(inheritedStyles)){
@@ -290,7 +294,7 @@ export class BaseWidget extends Widget {
  */
 export class UserWidget extends Widget {
     protected widgetType  = WidgetType.USER_WIDGET;
-    private innerWidgetIds: string[] = []; // Widget ids
+    private innerWidgetIds: string[] = []; // Widget ids // earlier in list == lower in z axis
 
     static fromObject(object: any): UserWidget {
         if (object.widgetType !== WidgetType.USER_WIDGET) {
@@ -438,12 +442,118 @@ export class UserWidget extends Widget {
 
         let copyWidgets = [copyWidget];
         for (const id of this.innerWidgetIds) {
-            const copyInnerWidgets = Widget.getWidget(allWidgets, id).makeCopy(allWidgets, fromTemplate);
+            const copyInnerWidgets = <UserWidget[]> Widget.getWidget(allWidgets, id).makeCopy(allWidgets, fromTemplate);
             const innerWidgetCopy = copyInnerWidgets[0];
             copyWidget.addInnerWidget(innerWidgetCopy.getId());
             copyWidgets = copyWidgets.concat(copyInnerWidgets);
         }
         return copyWidgets;
+    }
+
+    putInnerWidgetOnTop(widgetId: string) {
+        const topWidgetId = this.innerWidgetIds[this.innerWidgetIds.length - 1];
+        this.changeInnerWidgetOrderByOne(widgetId, new Set([topWidgetId]));
+    }
+
+    /**
+     * Given the widgets one inner widget overlaps with, it swaps it with the 
+     * closest next widget
+     * @param widgetId 
+     * @param overlappingWidgetIds 
+     * @param isUp 
+     */
+    changeInnerWidgetOrderByOne(
+        widgetId: string, overlappingWidgetIds: Set<string>, isUp = true) {
+
+        const stackOrder = this.innerWidgetIds;
+        let idxThisWidget;
+        let idxNextWidget;
+        
+        if (!isUp) {
+            stackOrder.reverse();
+        }
+
+        for (let i = 0; i < stackOrder.length; i++) {
+            const id = stackOrder[i];
+            if (id === widgetId) {
+                idxThisWidget = i;
+            }
+            if (idxThisWidget !== undefined) { 
+                // if we found our first component,
+                // find the next component that overlaps after this.
+                // that is the one we swap with.
+                if (overlappingWidgetIds.has(id)) {
+                    idxNextWidget = i;
+                    break;
+                }
+            }
+        }
+
+        // if there is something to move
+        if (idxThisWidget !== undefined && idxNextWidget !== undefined) { 
+            let idxToSwap = idxThisWidget;
+            // from the component after this to the next
+            for (let i = idxThisWidget + 1; i < idxNextWidget + 1; i++) {
+                const id = stackOrder[i];
+                stackOrder[idxToSwap] = id;
+                idxToSwap = i;
+            }
+            stackOrder[idxNextWidget] = widgetId;
+        }
+        
+        if (!isUp) {
+            stackOrder.reverse();
+        }
+    }
+
+    private coordInBox(x, y, boxTop, boxRight, boxBottom, boxLeft) {
+        return (boxLeft <= x && x <= boxRight) && (boxTop <= y && y <= boxBottom);
+    }
+
+    /**
+     * 
+     * @param targetId 
+     * @param otherId 
+     */
+    findWidgetsToShift(targetId: string, allWidgets: Map<string, Map<string, Widget>>) {
+        const overlappingWidgets = new Set();
+        const targetWidget = Widget.getWidget(allWidgets, targetId);
+        const targetTop = targetWidget.getPosition().top;
+        const targetLeft = targetWidget.getPosition().left;
+        const targetRight = targetLeft + targetWidget.getDimensions().width;
+        const targetBottom = targetTop + targetWidget.getDimensions().height;
+        
+        const that = this;
+
+        this.innerWidgetIds.forEach((widgetId) => {
+            if (widgetId === targetId) {
+                return;
+            }
+            const widget = Widget.getWidget(allWidgets, widgetId);
+            const top = widget.getPosition().top;
+            const left = widget.getPosition().left;
+            const right = left + widget.getDimensions().width;
+            const bottom = top + widget.getDimensions().height;
+            
+            let overlap = false;
+
+            [targetLeft, targetRight].forEach(function (x) {
+                [targetTop, targetBottom].forEach(function (y) {
+                    overlap = overlap ||  that.coordInBox(x, y, top, right, bottom, left);     
+                });
+            });
+                        
+            [left, right].forEach(function (x) {
+                [top, bottom].forEach(function (y) {
+                    overlap = overlap ||  that.coordInBox(x, y, targetTop, targetRight, targetBottom, targetLeft);
+                });
+            });
+
+            if (overlap) {
+                overlappingWidgets.add(widgetId);
+            }
+        });
+        return overlappingWidgets;
     }
 
 }

@@ -12,14 +12,14 @@ describe('UserWidget', () => {
 
   beforeEach(() => {
     allWidgets = new Map<string, Map<string, Widget>>();
-    widget1 = new BaseWidget('widget1', {width: 10, height: 10}, 'img', '/', clicheid);
-    widget2 = new UserWidget('widget2', {width: 20, height: 20}, clicheid);
-    widget3 = new UserWidget('widget3', {width: 20, height: 20}, clicheid);
+    widget1 = new BaseWidget('widget1', {width: 1, height: 1}, 'img', '/', clicheid);
+    widget2 = new UserWidget('widget2', {width: 1, height: 1}, clicheid);
+    widget3 = new UserWidget('widget3', {width: 1, height: 1}, clicheid);
 
-    widget4 = new UserWidget('widget4', {width: 20, height: 20}, '123123');
+    widget4 = new UserWidget('widget4', {width: 1, height: 1}, '123123');
 
-    widget5 = new BaseWidget('widget5', {width: 10, height: 10}, 'img', '/', clicheid, null, null, true);
-    widget6 = new UserWidget('widget6', {width: 10, height: 10}, clicheid, null, null, true);
+    widget5 = new BaseWidget('widget5', {width: 1, height: 1}, 'img', '/', clicheid, null, null, true);
+    widget6 = new UserWidget('widget6', {width: 1, height: 1}, clicheid, null, null, true);
 
     Widget.addWidgetToAllWidgets(allWidgets, widget1);
     Widget.addWidgetToAllWidgets(allWidgets, widget2);
@@ -252,6 +252,121 @@ describe('UserWidget', () => {
                       .getCustomStylesToShow(allWidgets, parentStyles);
 
       expect(styles).toEqual(expectedStyles);
+    });
+  });
+
+  describe('inner widget order switching', () => {
+    it('putInnerWidgetOnTop puts the widget on top', () => {
+      const widgetIdsInOrder = [
+        widget1.getId(),
+        widget2.getId(),
+        widget3.getId(),
+        widget4.getId(),
+        widget5.getId()
+      ];
+      widgetIdsInOrder.forEach((id)=> {
+        widget6.addInnerWidget(id);
+      });
+      
+      expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
+
+      widget6.putInnerWidgetOnTop(widget3.getId());
+      let expectedOrder = [
+        widget1.getId(),
+        widget2.getId(),
+        widget4.getId(),
+        widget5.getId(),
+        widget3.getId()
+      ];
+
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);      
+
+      widget6.putInnerWidgetOnTop(widget1.getId());
+      expectedOrder = [
+        widget2.getId(),
+        widget4.getId(),
+        widget5.getId(),
+        widget3.getId(),
+        widget1.getId()
+      ];
+
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);      
+
+      widget6.putInnerWidgetOnTop(widget1.getId());
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);            
+    });
+
+    it('changeInnerWidgetOrderByOne switches the very first widget', () => {
+      const widgetIdsInOrder = [
+        widget1.getId(),
+        widget2.getId(),
+        widget3.getId(),
+        widget4.getId(),
+        widget5.getId()
+      ];
+      widgetIdsInOrder.forEach((id)=> {
+        widget6.addInnerWidget(id);
+      });
+
+      expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
+
+      let overlap = new Set([widget3.getId(), widget4.getId()]);
+      widget6.changeInnerWidgetOrderByOne(widget1.getId(), overlap);
+      let expectedOrder = [
+        widget2.getId(),
+        widget3.getId(),
+        widget1.getId(),
+        widget4.getId(),
+        widget5.getId()
+      ];
+
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);      
+
+
+      widget6.changeInnerWidgetOrderByOne(widget1.getId(), overlap, false);
+      expectedOrder = [
+        widget2.getId(),
+        widget1.getId(),
+        widget3.getId(),
+        widget4.getId(),
+        widget5.getId()
+      ];
+
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);      
+    });
+
+    it ('findWidgetsToShift finds overlaping elements and doesn\'t find'+
+    'non-overlapping ones', () => {
+      const widgetIdsInOrder = [
+        widget1.getId(),
+        widget2.getId(),
+        widget3.getId(),
+        widget4.getId(),
+        widget5.getId()
+      ];
+      widgetIdsInOrder.forEach((id)=> {
+        widget6.addInnerWidget(id);
+      });
+
+      // 1 and 2 have normal overlap
+      widget1.updatePosition({top: 10, left: 10});
+      widget1.updateDimensions({height: 20, width: 30});      
+      widget2.updatePosition({top: 15, left: 15});
+      widget2.updateDimensions({height: 20, width: 30});
+      
+      // 4 eats up 3 and 5. 3 and 5 only see 4 but not each other.
+      widget3.updatePosition({top: 98, left: 98})
+      widget4.updatePosition({top: 95, left: 95})
+      widget4.updateDimensions({height: 10, width: 10});
+      widget5.updatePosition({top: 102, left: 102})
+      
+      expect(widget6.findWidgetsToShift(widget1.getId(), allWidgets)).toEqual(new Set([widget2.getId()]));
+      expect(widget6.findWidgetsToShift(widget2.getId(), allWidgets)).toEqual(new Set([widget1.getId()]));
+
+      
+      expect(widget6.findWidgetsToShift(widget4.getId(), allWidgets)).toEqual(new Set([widget3.getId(), widget5.getId()]));
+      expect(widget6.findWidgetsToShift(widget3.getId(), allWidgets)).toEqual(new Set([widget4.getId()]));
+      expect(widget6.findWidgetsToShift(widget5.getId(), allWidgets)).toEqual(new Set([widget4.getId()]));
     });
   });
 });

@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 
+import {allElementsFromPoint} from '../../common/utility/utility';
 import { Widget, WidgetType } from '../../../models/widget/widget';
 
 import * as jQuery from 'jquery';
@@ -49,4 +50,65 @@ export class WidgetComponent implements AfterViewInit {
   handleChange() {
     this.onChange.emit(true);
   }
+
+
+  // private makeWorkSurfaceResizable(workSurface, userWidget) {
+  //   const widgetId = userWidget.meta.id;
+
+  //   const dragHandle_se = $('<span></span>');
+  //   dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
+  //   dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
+  //   dragHandle_se.attr('id', 'drag-handle-se' + '_' + widgetId);
+
+  //   workSurface.append(dragHandle_se);
+
+
+  //   $(workSurface).resizable({
+  //     handles: {
+  //       'se': dragHandle_se,
+  //     },
+  //     minHeight: 0,
+  //     minWidth: 0,
+  //     resize: function (e, ui) {
+  //       // TODO need to DRY this up and/or combine with the widget container methods
+  //       const newDimensions = { height: ui.size.height / currentZoom, width: ui.size.width / currentZoom };
+  //       widgetEditsManager.updateCustomProperties(userWidget, userWidget.meta.id, 'dimensions', newDimensions);
+
+  //     },
+  //     stop: function (e, ui) {
+  //       // not super important to update as you resize so just do it at the end
+  //       miniNav.updateMiniNavInnerWidgetSizes(userWidget, currentZoom);
+  //       grid.setUpGrid();
+  //     }
+  //   });
+  // }
+
+  
+  onDropFinished(dragHandle, widget) {
+    const widgetId = widget.meta.id;
+
+    if (dragHandle.associated) {
+      const parent = outermostWidget.getInnerWidget(widgetId, true);
+      if (parent.meta.id === outermostWidget.meta.id) { // fixme SUPERHACK :'(
+        shiftOrder(widgetId, outermostWidget);
+      }
+    }
+    const firstInnerWidgetId = outermostWidget.getPath(widgetId)[1]; // this should always exist
+    if (!firstInnerWidgetId) {
+      console.log('something went wrong in onDropFinished');
+    }
+
+    const firstInnerWidget = outermostWidget.getInnerWidget(firstInnerWidgetId);
+
+    const overallStyles = widgetEditsManager
+      .getMostRelevantOverallCustomChanges(
+      outermostWidget, widgetId);
+
+    this.loadUserWidgetIntoWorkSurface(outermostWidget, currentZoom);
+    grid.setUpGrid();
+  }
+
+
+
+
 }
