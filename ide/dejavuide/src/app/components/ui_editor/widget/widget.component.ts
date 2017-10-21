@@ -85,27 +85,9 @@ export class WidgetComponent implements AfterViewInit {
 
   
   onDropFinished(dragHandle, widget) {
-    const widgetId = widget.meta.id;
-
-    if (dragHandle.associated) {
-      const parent = outermostWidget.getInnerWidget(widgetId, true);
-      if (parent.meta.id === outermostWidget.meta.id) { // fixme SUPERHACK :'(
-        shiftOrder(widgetId, outermostWidget);
-      }
-    }
-    const firstInnerWidgetId = outermostWidget.getPath(widgetId)[1]; // this should always exist
-    if (!firstInnerWidgetId) {
-      console.log('something went wrong in onDropFinished');
-    }
-
-    const firstInnerWidget = outermostWidget.getInnerWidget(firstInnerWidgetId);
-
-    const overallStyles = widgetEditsManager
-      .getMostRelevantOverallCustomChanges(
-      outermostWidget, widgetId);
-
-    this.loadUserWidgetIntoWorkSurface(outermostWidget, currentZoom);
-    grid.setUpGrid();
+    // if new widget, add to the selected widget
+    // else, put it at the top
+    // grid.setUpGrid();
   }
 
 

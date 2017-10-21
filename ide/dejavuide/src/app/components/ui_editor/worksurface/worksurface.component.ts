@@ -31,7 +31,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
     this.onChange.emit(true);
   }
 
-  onAfterViewInit() {
+  ngAfterViewInit() {
     $('.work-surface').droppable({
       accept: "dv-widget",
       hoverClass: "highlight",
