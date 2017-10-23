@@ -13,7 +13,7 @@ import { Widget, ClientBus, Field,
 export class ValidatePasskeyWithRedirectComponent {
     @Field("Passkey") passkey: PasskeyAtom;
     @Field("Widget") on_validate_ok: PrimitiveAtom<WidgetValue>;
-    
+
     error = false;
 
     constructor(
@@ -33,7 +33,8 @@ export class ValidatePasskeyWithRedirectComponent {
                     const authenticationToken = token.token;
                     const authenticatedPasskey = token.passkey;
                     localStorage.setItem("id_token", authenticationToken);
-                    localStorage.setItem("atom_id", authenticatedPasskey.atom_id);
+                    localStorage.setItem("atom_id",
+                                         authenticatedPasskey.atom_id);
                     this._client_bus.navigate(this.on_validate_ok.value);
                 },
                 err => {
