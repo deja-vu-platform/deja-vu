@@ -1,13 +1,12 @@
 import { Widget, Field, AfterInit } from "client-bus";
 
-import { UserAtom } from "../shared/data";
+import { PasskeyAtom } from "../shared/data";
 
 @Widget({ fqelement: "PasskeyAuthentication", template: "" })
 export class LoggedInComponent implements AfterInit {
-    @Field("User") user: UserAtom;
+    @Field("Passkey") passkey: PasskeyAtom;
 
     dvAfterInit() {
-        this.user.username = localStorage.getItem("username");
-        this.user.atom_id = localStorage.getItem("atom_id");
+        this.passkey.atom_id = localStorage.getItem("atom_id");
     }
 }
