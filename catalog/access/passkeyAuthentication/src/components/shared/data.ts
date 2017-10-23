@@ -4,7 +4,7 @@ import { User } from "../../shared/data";
 export interface UserAtom extends User, Atom { }
 
 // 87789 words
-var WORDS = [
+export const WORDS = [
     "aahed", "aahing", "aalii", "aaliis", "aargh", "aaron", "aaronic",
     "aarrgh", "aarrghh", "ababdeh", "ababua", "abaca", "abacay", "abacas",
     "abacate", "abacaxi", "abaci", "abacist", "aback", "abacli", "abacot",
@@ -12548,5 +12548,3 @@ var WORDS = [
     "zulus", "zumatic", "zunian", "zunyite", "zunis", "zurich", "zurlite",
     "zutugil", "zwitter"
 ];
-
-module.exports = { Words: WORDS };

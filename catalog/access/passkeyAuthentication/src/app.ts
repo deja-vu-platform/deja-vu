@@ -1,4 +1,5 @@
 const graphql = require("graphql");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 import { Mean } from "mean-loader";
@@ -6,18 +7,21 @@ import { Helpers } from "helpers";
 import { ServerBus } from "server-bus";
 import { Grafo } from "grafo";
 
+import { WORDS } from "./components/shared/data";
+
 const mean = new Mean();
 
 const SALT_WORK_FACTOR = 10;
 const SECRET_KEY = "ultra-secret-key";
+const WORDS_SIZE = WORDS.length;
 
 const handlers = {
-    users: {
-        create: Helpers.resolve_create(mean.db, "user", "users", user => {
-            user["passkey"] = user.passkey;
-            return user;
+    passkey: {
+        create: Helpers.resolve_create(mean.db, "passkey", "passkeys", passkey => {
+            passkey["code"] = bcrypt.hashSync(passkey.code, SALT_WORK_FACTOR);
+            return passkey;
         }),
-        update: Helpers.resolve_update(mean.db, "user")
+        update: Helpers.resolve_update(mean.db, "passkey")
     }
 }
 
@@ -29,35 +33,52 @@ const grafo = new Grafo(mean.db);
 
 const schema = grafo
     .add_type({
-        name: "User",
+        name: "Passkey",
         fields: {
-            username: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
+            code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         }
     })
     .add_mutation({
-        name: "createPasskey",
+        name: "createCustomPasskey",
         "type": graphql.GraphQLBoolean,
         args: {
-            username: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
-            passkey: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
+            code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
-        resolve: (_, { username, passkey }) => {
-            return Validation.userIsNew(username, passkey).then(_ => {
-                // Both username and passkey should be unique, but we use passkey
-                // as the atom id because unlike passwords in Standard Authentication, 
-                // a passkey is unique to each user.
-                const user = {
-                    username: username,
-                    passkey: passkey,
-                    atom_id: passkey
+        resolve: (_, { code }) => {
+            return Validation.passkeyIsNew(code).then(_ => {
+                const passkey = {
+                    "code": bcrypt.hashSync(code, SALT_WORK_FACTOR),
+                    "atom_id": code
                 };
-                return mean.db.collection("users")
-                    .insertOne(user)
+                return mean.db.collection("passkeys")
+                    .insertOne(passkey)
                     .then(write_res => {
                         if (write_res.insertedCount !== 1) {
-                            throw new Error("Couldn't save new user");
+                            throw new Error("Couldn't save new passkey");
                         }
-                        bus.create_atom("User", user.atom_id, user);
+                        bus.create_atom("Passkey", passkey.atom_id, passkey);
+                        return true;
+                    });
+            });
+        }
+    })
+    .add_mutation({
+        name: "createRandomPasskey",
+        "type": graphql.GraphQLBoolean,
+        args: {},
+        resolve: (_, { }) => {
+            return Validation.getRandomPasskey().then(code => {
+                const passkey = {
+                    "code": bcrypt.hashSync(code, SALT_WORK_FACTOR),
+                    "atom_id": code
+                };
+                return mean.db.collection("passkeys")
+                    .insertOne(passkey)
+                    .then(write_res => {
+                        if (write_res.insertedCount !== 1) {
+                            throw new Error("Couldn't save new passkey");
+                        }
+                        bus.create_atom("Passkey", passkey.atom_id, passkey);
                         return true;
                     });
             });
@@ -67,14 +88,17 @@ const schema = grafo
         name: "validatePasskey",
         "type": graphql.GraphQLBoolean,
         args: {
-            passkey: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
+            code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
-        resolve: (_, { passkey }) => {
-            return Validation.userExists(passkey).then(user => {
-                const token = jwt.sign(passkey, SECRET_KEY);
+        resolve: (_, { code }) => {
+            return Validation.passkeyExists(code).then(passkey => {
+                if (!bcrypt.compareSync(code, passkey.code)) {
+                    throw new Error("Incorrect code");
+                }
+                const token = jwt.sign(code, SECRET_KEY);
                 return JSON.stringify({
                     token: token,
-                    user: user
+                    passkey: passkey
                 });
             });
         }
@@ -82,26 +106,32 @@ const schema = grafo
     .schema();
 
 namespace Validation {
-    export function userExists(passkey) {
-        return mean.db.collection("users")
-            .findOne({ passkey: passkey })
-            .then(user => {
-                if (!user) throw new Error(`user with passkey ${passkey} doesn't exist`);
-                return user;
+    export function passkeyExists(code) {
+        return mean.db.collection("passkeys")
+            .findOne({ atom_id: code })
+            .then(passkey => {
+                if (!passkey) throw new Error(`passkey with code ${passkey.atom_id} doesn't exist`);
+                return passkey;
             });
     }
 
-    // Both username and passkey should be unique.
-    export function userIsNew(username, passkey) {
-        return mean.db.collection("users")
-            .findOne({
-                $or: [{ username: username }, { passkey: passkey }]
-            }, { _id: 1 })
-            .then(user => {
-                if (user) throw new Error(`username ${username} or passkey ${passkey} exists`);
-                return user;
+    export function passkeyIsNew(code) {
+        return mean.db.collection("passkeys")
+            .findOne({ atom_id: code }, { _id: 1 })
+            .then(passkey => {
+                if (passkey) throw new Error(`passkey with code ${passkey.atom_id} already exists`);
+                return passkey;
             });
     }
 
-    // OR separate the errors?
+    export function getRandomPasskey() {
+        var randomIndex = Math.floor(Math.random() * WORDS_SIZE);
+        var code = WORDS[randomIndex];
+        return mean.db.collection("passkeys")
+            .findOne({ atom_id: code }, { _id: 1 })
+            .then(passkey => {
+                if (!passkey) return code;
+                return getRandomPasskey();
+            })
+    }
 }
