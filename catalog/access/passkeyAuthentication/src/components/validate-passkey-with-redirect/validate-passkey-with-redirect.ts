@@ -1,6 +1,6 @@
 import { NgClass } from "@angular/common";
 
-import { UserAtom } from "../shared/data";
+import { PasskeyAtom } from "../shared/data";
 import { GraphQlService } from "gql";
 import { Widget, ClientBus, Field,
         PrimitiveAtom, WidgetValue } from "client-bus";
@@ -11,7 +11,7 @@ import { Widget, ClientBus, Field,
     ng2_directives: [NgClass]
 })
 export class ValidatePasskeyWithRedirectComponent {
-    @Field("User") user: UserAtom;
+    @Field("Passkey") passkey: PasskeyAtom;
     @Field("Widget") on_validate_ok: PrimitiveAtom<WidgetValue>;
     error = false;
 
@@ -23,18 +23,16 @@ export class ValidatePasskeyWithRedirectComponent {
         this._graphQlService
             .post(`
                 validatePasskey(
-                    passkey: "${this.user.passkey}"
+                    code: "${this.passkey.code}"
                 )
             `)
             .map(data => JSON.parse(data.validatePasskey))
             .subscribe(
                 token => {
                     const authenticationToken = token.token;
-                    const authenticatedUser = token.user;
+                    const authenticatedPasskey = token.passkey;
                     localStorage.setItem("id_token", authenticationToken);
-                    localStorage.setItem("username",
-                                         authenticatedUser.username);
-                    localStorage.setItem("atom_id", authenticatedUser.atom_id);
+                    localStorage.setItem("atom_id", authenticatedPasskey.atom_id);
                     this._client_bus.navigate(this.on_validate_ok.value);
                 },
                 err => {
