@@ -7,7 +7,7 @@ import { Helpers } from "helpers";
 import { ServerBus } from "server-bus";
 import { Grafo } from "grafo";
 
-import { WORDS } from "./components/shared/data";
+import { WORDS } from "./shared/data";
 
 const mean = new Mean();
 
