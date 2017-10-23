@@ -1,21 +1,16 @@
-<!-- CreatePasskey --> 
+<!-- CreateCustomPasskey --> 
 <form (ngSubmit)="onSubmit()" #createPasskeyForm="ngForm" class="form-horizontal">
     <fieldset class="form-group">
-      <label class="sr-only" for="username">Username</label>
-      <input type="text" required class="form-control" name="username"
-      [(ngModel)]="user.username" ngControl="username" placeholder="Username"/>
-    </fieldset>
-    <fieldset class="form-group">
-      <label class="sr-only" for="password">Passkey</label>
+      <label class="sr-only" for="passkey">Passkey</label>
       <input type="text" required class="form-control" name="passkey"
-       [(ngModel)]="user.password" ngControl="password" placeholder="Passkey"/>
+       [(ngModel)]="passkey.code" ngControl="passkey" placeholder="Passkey"/>
     </fieldset>
     <fieldset class="form-group" [ngClass]="{ 'has-error': error }">
       <button type="submit" class="btn btn-default btn-sm pull-right"
        [disabled]="!createPasskeyForm.form.valid">Create Passkey</button>
        <div id="create-passkey-status" class="alert alert-danger"
        [hidden]="!error">
-       Username or passkey already exists.
+       Passkey already exists.
     </div>
     </fieldset>
   </form>

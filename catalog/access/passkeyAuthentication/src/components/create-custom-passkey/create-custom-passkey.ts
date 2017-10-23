@@ -1,10 +1,10 @@
-import { UserAtom } from "../shared/data";
+import { PasskeyAtom } from "../shared/data";
 import { GraphQlService } from "gql";
 import { Widget, PrimitiveAtom, Field } from "client-bus";
 
 @Widget({ fqelement: "PasskeyAuthorization", ng2_providers: [GraphQlService] })
 export class ValidatePasskeyComponent {
-    @Field("User") user: UserAtom;
+    @Field("Passkey") passkey: PasskeyAtom;
     @Field("boolean") create_passkey_ok: PrimitiveAtom<boolean>;
 
     error = false;
@@ -14,9 +14,8 @@ export class ValidatePasskeyComponent {
     onSubmit() {
         this._graphQlService
             .post(`
-                createPasskey(
-                    username: "${this.user.username}",
-                    passkey: "${this.user.passkey}"
+                createCustomPasskey(
+                    code: "${this.passkey.code}"
                 )
             `)
             .subscribe(

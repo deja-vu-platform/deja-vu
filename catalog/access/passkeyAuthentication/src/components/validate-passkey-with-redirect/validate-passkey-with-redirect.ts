@@ -13,6 +13,7 @@ import { Widget, ClientBus, Field,
 export class ValidatePasskeyWithRedirectComponent {
     @Field("Passkey") passkey: PasskeyAtom;
     @Field("Widget") on_validate_ok: PrimitiveAtom<WidgetValue>;
+    
     error = false;
 
     constructor(
