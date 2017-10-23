@@ -3,6 +3,9 @@ app SweetSpots {
   include access/StandardAuthentication[
     User for User
   ]
+  include access/Authorization[
+    User for User
+  ]
   include community/Geolocation[
     Spot for Marker,
     MapData for Map,

@@ -6,13 +6,13 @@
 }
 </style>
 <div class="body">
-  <dv-widget name="LoggedIn" of="ParentAuth"></dv-widget>
+  <dv-widget name="LoggedIn" of="ParentAuthentication"></dv-widget>
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">ChoreStar</a>
       </div>
-      <dv-widget name="SignOutWithRedirect" of="ParentAuth">
+      <dv-widget name="SignOutWithRedirect" of="ParentAuthentication">
       </dv-widget>
     </div>
   </nav>
@@ -33,7 +33,7 @@
         </div>
         <div class="row">
           <h2>Add a New Child</h2>
-          <dv-widget name="RegisterWithRedirect" of="ChildAuth"></dv-widget>
+          <dv-widget name="RegisterWithRedirect" of="ChildAuthentication"></dv-widget>
         </div>
         <div class="row">
           <h2>Assigned Chores</h2>

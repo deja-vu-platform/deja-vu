@@ -16,6 +16,7 @@ Productivity
 | Cliché/App | Accord | ChoreStar | Morg | Listify (TBD) |
 | ---------- | ------ | --------- | ---- | -------       |
 | StandardAuthentication |   X    |    XX     |      |               |
+| Authorization | X   |    XX     |      |               |
 | Market     |        |     X     |      |               |
 | Rating     |   X    |     X     |      |               |
 | Follow     |        |           |      |               |
@@ -48,6 +49,7 @@ Social
 | Cliché/App | Bookmark | MapMit | Rendezvous | SweetSpots | Potluck | Phoenix (TBD) |
 | ---------- | -------- | ------ | ---------- | ---------- | ------- | -------       |
 | StandardAuthentication |    X     |   X    |     X      |    X       |   X     |               |
+| Authorization | X     |   X    |     X      |    X       |   X     |               |
 | Market     |          |        |            |            |   X     |               |
 | Rating     |          |        |            |    X       |         |               |
 | Follow     |    XX    |        |            |    X       |         |               |
@@ -75,7 +77,8 @@ Education
 
 | Cliché/App | EasyPick (TBD) | Lingua (TBD) |
 | ---------- | --------       | ------       |
-| StandardAuthentication |                |              |
+| StandardAuthentication |    |              |
+| Authorization |             |              |
 | Market     |                |              |
 | Rating     |                |              |
 | Follow     |                |              |
@@ -102,7 +105,8 @@ Sports
 
 | Cliché/App | LiveScorecard (TBD) |
 | ---------- | -------------       |
-| StandardAuthentication |                     |
+| StandardAuthentication |         |
+| Authorization |                  |
 | Market     |                     |
 | Rating     |                     |
 | Follow     |                     |
@@ -129,7 +133,8 @@ Food
 
 | Cliché/App | GroceryShip (TBD) |
 | ---------- | -----------       |
-| StandardAuthentication |                   |
+| StandardAuthentication |       |
+| Authorization |                |
 | Market     |                   |
 | Rating     |                   |
 | Follow     |                   |
