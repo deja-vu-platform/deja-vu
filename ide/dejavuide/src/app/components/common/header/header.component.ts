@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-interface pageInfo {
+interface PageInfo {
   title: string;
   url: string;
 }
 
-const pages: pageInfo[] = [{
+const pages: PageInfo[] = [{
   title: 'Cliches',
   url: '#'
 }, {
@@ -21,23 +21,22 @@ const pages: pageInfo[] = [{
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit{
+export class HeaderComponent implements OnInit {
   @Input() readonly pageTitle: string;
-  isClichePage: boolean;  
+  isClichePage: boolean;
   readonly dejavu = 'Déjà Vu';
-  otherPages: pageInfo[];
+  otherPages: PageInfo[];
 
-  ngOnInit(){
-    this.otherPages = pages.filter(page => 
-      page.title != this.pageTitle
-    );
-    this.isClichePage = (this.pageTitle == "Cliches");  
+  ngOnInit() {
+    this.otherPages = pages.filter(page => page.title !== this.pageTitle);
+    this.isClichePage = (this.pageTitle === 'Cliches');
   }
-  
-  handleBackToAllProjects(){
-    console.log(this.pageTitle);
-    console.log(this.isClichePage);
-    console.log(this.otherPages);
+
+  /**
+   * Handles what happens when the user goes back to the projects page. 
+   */
+  handleBackToAllProjects() {
+    // TODO
     return;
   }
 }

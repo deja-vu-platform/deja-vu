@@ -4,11 +4,15 @@
 
 To run with build:
 
-  npm run electron-build
+```
+npm run electron-build
+```
 
 To run without build:
 
-  npm run electron
+```
+npm run electron
+```
 
 ## Development server
 

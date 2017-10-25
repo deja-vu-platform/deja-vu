@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 
-import {allElementsFromPoint} from '../../common/utility/utility';
+import {allElementsFromPoint} from '../../../utility/utility';
 import { Widget, WidgetType } from '../../../models/widget/widget';
 
+// Widgets are drag-and-droppable
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 
@@ -31,10 +32,13 @@ export class WidgetComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    // Change the position of the widget in view. This is the best way to do
+    // it without removing view encapsulation.
     this.el.style.top = this.widget.getPosition().top + 'px';
     this.el.style.left = this.widget.getPosition().left + 'px';
     this.el.style.position = 'absolute';
 
+    // Initiate draggable based on certain things
     if (this.isSelected || this.isMovable) {
       const _this = this;
       $(this.el).draggable({
@@ -44,6 +48,8 @@ export class WidgetComponent implements AfterViewInit {
           _this.onChange.emit(true);
         },
       });
+
+      this.makeWidgetResizable();
     }
   }
 
@@ -51,9 +57,10 @@ export class WidgetComponent implements AfterViewInit {
     this.onChange.emit(true);
   }
 
+  private makeWidgetResizable() {
+  // TODO Resizable code
 
-  // private makeWorkSurfaceResizable(workSurface, userWidget) {
-  //   const widgetId = userWidget.meta.id;
+  //   const widgetId = _widget.getId();
 
   //   const dragHandle_se = $('<span></span>');
   //   dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
@@ -81,13 +88,14 @@ export class WidgetComponent implements AfterViewInit {
   //       grid.setUpGrid();
   //     }
   //   });
-  // }
+  }
 
-  
-  onDropFinished(dragHandle, widget) {
-    // if new widget, add to the selected widget
-    // else, put it at the top
-    // grid.setUpGrid();
+  /**
+   * On drop finished, pass on this event to the outermost container
+   * (work surface), which can handle what to do with it.
+   */
+  onDropFinished() {
+    // TODO
   }
 
 

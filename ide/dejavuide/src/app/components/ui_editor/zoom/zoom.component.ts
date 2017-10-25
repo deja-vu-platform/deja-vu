@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter} from '@angular/core';
 
-import {Dimensions} from '../../common/utility/utility';
+import {Dimensions} from '../../../utility/utility';
 
 enum ZoomType {
   SLIDER, FIT, FULL, ACTUAL

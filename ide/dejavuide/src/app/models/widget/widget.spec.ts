@@ -264,10 +264,10 @@ describe('UserWidget', () => {
         widget4.getId(),
         widget5.getId()
       ];
-      widgetIdsInOrder.forEach((id)=> {
+      widgetIdsInOrder.forEach((id) => {
         widget6.addInnerWidget(id);
       });
-      
+
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
       widget6.putInnerWidgetOnTop(widget3.getId());
@@ -279,7 +279,7 @@ describe('UserWidget', () => {
         widget3.getId()
       ];
 
-      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);      
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
       widget6.putInnerWidgetOnTop(widget1.getId());
       expectedOrder = [
@@ -290,10 +290,10 @@ describe('UserWidget', () => {
         widget1.getId()
       ];
 
-      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);      
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
       widget6.putInnerWidgetOnTop(widget1.getId());
-      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);            
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
     });
 
     it('changeInnerWidgetOrderByOne switches the very first widget', () => {
@@ -304,13 +304,13 @@ describe('UserWidget', () => {
         widget4.getId(),
         widget5.getId()
       ];
-      widgetIdsInOrder.forEach((id)=> {
+      widgetIdsInOrder.forEach((id) => {
         widget6.addInnerWidget(id);
       });
 
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
-      let overlap = new Set([widget3.getId(), widget4.getId()]);
+      const overlap = new Set([widget3.getId(), widget4.getId()]);
       widget6.changeInnerWidgetOrderByOne(widget1.getId(), overlap);
       let expectedOrder = [
         widget2.getId(),
@@ -320,7 +320,7 @@ describe('UserWidget', () => {
         widget5.getId()
       ];
 
-      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);      
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
 
       widget6.changeInnerWidgetOrderByOne(widget1.getId(), overlap, false);
@@ -332,10 +332,10 @@ describe('UserWidget', () => {
         widget5.getId()
       ];
 
-      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);      
+      expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
     });
 
-    it ('findWidgetsToShift finds overlaping elements and doesn\'t find'+
+    it ('findWidgetsToShift finds overlaping elements and doesn\'t find' +
     'non-overlapping ones', () => {
       const widgetIdsInOrder = [
         widget1.getId(),
@@ -344,29 +344,33 @@ describe('UserWidget', () => {
         widget4.getId(),
         widget5.getId()
       ];
-      widgetIdsInOrder.forEach((id)=> {
+      widgetIdsInOrder.forEach((id) => {
         widget6.addInnerWidget(id);
       });
 
       // 1 and 2 have normal overlap
       widget1.updatePosition({top: 10, left: 10});
-      widget1.updateDimensions({height: 20, width: 30});      
+      widget1.updateDimensions({height: 20, width: 30});
       widget2.updatePosition({top: 15, left: 15});
       widget2.updateDimensions({height: 20, width: 30});
-      
-      // 4 eats up 3 and 5. 3 and 5 only see 4 but not each other.
-      widget3.updatePosition({top: 98, left: 98})
-      widget4.updatePosition({top: 95, left: 95})
-      widget4.updateDimensions({height: 10, width: 10});
-      widget5.updatePosition({top: 102, left: 102})
-      
-      expect(widget6.findWidgetsToShift(widget1.getId(), allWidgets)).toEqual(new Set([widget2.getId()]));
-      expect(widget6.findWidgetsToShift(widget2.getId(), allWidgets)).toEqual(new Set([widget1.getId()]));
 
-      
-      expect(widget6.findWidgetsToShift(widget4.getId(), allWidgets)).toEqual(new Set([widget3.getId(), widget5.getId()]));
-      expect(widget6.findWidgetsToShift(widget3.getId(), allWidgets)).toEqual(new Set([widget4.getId()]));
-      expect(widget6.findWidgetsToShift(widget5.getId(), allWidgets)).toEqual(new Set([widget4.getId()]));
+      // 4 eats up 3 and 5. 3 and 5 only see 4 but not each other.
+      widget3.updatePosition({top: 98, left: 98});
+      widget4.updatePosition({top: 95, left: 95});
+      widget4.updateDimensions({height: 10, width: 10});
+      widget5.updatePosition({top: 102, left: 102});
+
+      expect(widget6.findOverlappingWidgets(allWidgets, widget1))
+        .toEqual(new Set([widget2.getId()]));
+      expect(widget6.findOverlappingWidgets(allWidgets, widget2))
+        .toEqual(new Set([widget1.getId()]));
+
+      expect(widget6.findOverlappingWidgets(allWidgets, widget4))
+        .toEqual(new Set([widget3.getId(), widget5.getId()]));
+      expect(widget6.findOverlappingWidgets(allWidgets, widget3))
+        .toEqual(new Set([widget4.getId()]));
+      expect(widget6.findOverlappingWidgets(allWidgets, widget5))
+        .toEqual(new Set([widget4.getId()]));
     });
   });
 });

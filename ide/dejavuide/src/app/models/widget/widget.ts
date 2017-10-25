@@ -1,11 +1,4 @@
-import { generateId, Dimensions, Position } from '../../components/common/utility/utility';
-
-/** ** ** ** Constants ** ** ** **/
-const DEFAULT_SCREEN_WIDTH = 2500;
-const DEFAULT_SCREEN_HEIGHT = 1000;
-
-const DEFAULT_WIDGET_NAME = 'New Widget';
-/** ** ** ** ** ** ** ** ** ** **/
+import { generateId, Dimensions, Position } from '../../utility/utility';
 
 export enum WidgetType {
     BASE_WIDGET, USER_WIDGET, CLICHE_WIDGET
@@ -42,9 +35,15 @@ export abstract class Widget {
     };
     protected meta: Meta;
     protected isTemplate = false;
-    // if this is a template, keep a reference to all is copies
+    // If this is a template, keep a reference to all is copies.
+    // If the template is changed, propagate the changes to the template copies.
     protected templateCopies: Set<string> = new Set();
 
+    /**
+     * Given a map of clicheIds to all their widgets, adds a widget to that map.
+     * @param allWidgets a map of clicheids to all their widgets
+     * @param widget widget to add
+     */
     static addWidgetToAllWidgets(
         allWidgets: Map<string, Map<string, Widget>>,
         widget: Widget) {
@@ -54,6 +53,11 @@ export abstract class Widget {
         allWidgets[widget.getClicheId()][widget.getId()] = widget;
     }
 
+    /**
+     * Given a widgetId, gets the widget object from the map of all widgets
+     * @param allWidgets a map of all widgets
+     * @param widgetId id of widget to find
+     */
     static getWidget(
         allWidgets: Map<string, Map<string, Widget>>,
         widgetId: string
@@ -62,6 +66,10 @@ export abstract class Widget {
         return allWidgets[clicheid][widgetId];
     }
 
+    /**
+     * Converts a JSON object to a Widget object
+     * @param object object to convert
+     */
     static fromObject(object: any): BaseWidget | UserWidget {
         const notCorrectObjectError = 'notCorrectObjectError: ' +
         'object object is not an instance of a Widget';
@@ -74,14 +82,21 @@ export abstract class Widget {
         return UserWidget.fromObject(object);
     }
 
-    static encodeid(clicheid: string, widgetid: string) {
+    static encodeid(clicheid: string, widgetid: string): string {
         return clicheid + '_' + widgetid;
     }
 
-    static decodeid(id: string) {
+    static decodeid(id: string): string[] {
         return id.split('_');
     }
 
+    /**
+     * Makes a copy of the widget and returns a list of copies of this widget
+     * and all inner widgets
+     * @param allWidgets map containing all widgets
+     * @param fromTemplate Whether of not we are doing a "template" copy as
+     *  opposed to a normal copy
+     */
     abstract makeCopy(
         allWidgets: Map<string, Map<string, Widget>>,
         fromTemplate: boolean
@@ -149,9 +164,12 @@ export abstract class Widget {
     }
 
     /**
+     * "Inherits" the styles of parent widgets and template widgets and returns
+     * the styles that apply to this widget.
      * Order of preference: parent < template < own
-     * @param allWidgets
-     * @param parentStyles
+     *
+     * @param allWidgets a map of all widgets
+     * @param parentStyles any styles to inherit from the ancestors
      */
     getCustomStylesToShow(
         allWidgets: Map<string, Map<string, Widget>>,
@@ -161,12 +179,13 @@ export abstract class Widget {
         // that is read when rendering, and updated whenever a template is
         // updated. If the field is there, just read from it, if not recursively
         // create it.
-        const styles =
-            JSON.parse(JSON.stringify(parentStyles));
+        const styles = JSON.parse(JSON.stringify(parentStyles));
 
         let inheritedStyles = {};
         if (this.getTemplateId()) {
-            inheritedStyles = Widget.getWidget(allWidgets, this.getTemplateId()).getCustomStylesToShow(allWidgets); // no parent styles for template
+            inheritedStyles = Widget
+                .getWidget(allWidgets, this.getTemplateId())
+                .getCustomStylesToShow(allWidgets); // no parent styles for template
         }
 
         for (const style of Object.keys(inheritedStyles)){
@@ -184,6 +203,8 @@ export abstract class Widget {
     /**
      * Just deletes from the all widgets table and the template reference if
      * it has one. Doesn't touch inner widgets if any.
+     *
+     * @param allWidgets a map of all widgets
      */
     delete(allWidgets: Map<string, Map<string, Widget>>) {
         if (this.getTemplateId()) {
@@ -192,6 +213,10 @@ export abstract class Widget {
         delete allWidgets[this.getClicheId()][this.getId()];
     }
 
+    /**
+     * Adds this widget to the map of all widgets.
+     * @param allWidgets the map of all widgets
+     */
     addWidgetToAllWidgets(allWidgets: Map<string, Map<string, Widget>>) {
         Widget.addWidgetToAllWidgets(allWidgets, this);
     }
@@ -354,14 +379,19 @@ export class UserWidget extends Widget {
         return this.innerWidgetIds.slice();
     }
 
+    /**
+     * Returns path starting from this id to the wanted widget id
+     *  null if no path exists
+     *
+     * @param allWidgets map of all widgets
+     * @param widget widget we are currently looking at
+     * @param targetId widget id of widget to find
+     */
     private getPathHelper(
         allWidgets: Map<string, Map<string, Widget>>,
         widget: Widget,
         targetId: string
     ): string[] | null {
-        // returns path starting from this id to the wanted widget id
-        // null if no path exists
-
         const widgetId = widget.getId();
         // Base case 1: found it
         if (widgetId === targetId) {
@@ -385,15 +415,27 @@ export class UserWidget extends Widget {
         return null;
     }
 
+    /**
+     * Returns path starting from this id to the wanted widget id
+     *  null if no path exists
+     *
+     * @param allWidgets map of all widgets
+     * @param widgetId widget id of widget to find
+     */
     getPath(
         allWidgets: Map<string, Map<string, Widget>>,
         widgetId: string
     ): string[] | null {
-        // returns path starting from this id to the wanted widget id
-        // null if no path exists
         return this.getPathHelper(allWidgets, this, widgetId);
     }
 
+    /**
+     * Returns the wanted widget if it is a child of this widget, else null
+     *
+     * @param allWidgets map of all widgets
+     * @param targetId id of widget to find
+     * @param getParent whether to actually only get the parent of the widget
+     */
     getInnerWidget(
         allWidgets: Map<string, Map<string, Widget>>,
         targetId: string,
@@ -456,11 +498,11 @@ export class UserWidget extends Widget {
     }
 
     /**
-     * Given the widgets one inner widget overlaps with, it swaps it with the 
+     * Given the widgets one inner widget overlaps with, it swaps it with the
      * closest next widget
-     * @param widgetId 
-     * @param overlappingWidgetIds 
-     * @param isUp 
+     * @param widgetId widget to shift
+     * @param overlappingWidgetIds widget it overlaps with
+     * @param isUp whether to move up or down
      */
     changeInnerWidgetOrderByOne(
         widgetId: string, overlappingWidgetIds: Set<string>, isUp = true) {
@@ -468,7 +510,7 @@ export class UserWidget extends Widget {
         const stackOrder = this.innerWidgetIds;
         let idxThisWidget;
         let idxNextWidget;
-        
+
         if (!isUp) {
             stackOrder.reverse();
         }
@@ -478,7 +520,7 @@ export class UserWidget extends Widget {
             if (id === widgetId) {
                 idxThisWidget = i;
             }
-            if (idxThisWidget !== undefined) { 
+            if (idxThisWidget !== undefined) {
                 // if we found our first component,
                 // find the next component that overlaps after this.
                 // that is the one we swap with.
@@ -490,7 +532,7 @@ export class UserWidget extends Widget {
         }
 
         // if there is something to move
-        if (idxThisWidget !== undefined && idxNextWidget !== undefined) { 
+        if (idxThisWidget !== undefined && idxNextWidget !== undefined) {
             let idxToSwap = idxThisWidget;
             // from the component after this to the next
             for (let i = idxThisWidget + 1; i < idxNextWidget + 1; i++) {
@@ -500,33 +542,45 @@ export class UserWidget extends Widget {
             }
             stackOrder[idxNextWidget] = widgetId;
         }
-        
+
         if (!isUp) {
             stackOrder.reverse();
         }
     }
 
+    /**
+     * Decides if the given x,y coordinate is in the box specified by
+     *  the remaining coordinates.
+     * @param x
+     * @param y
+     * @param boxTop
+     * @param boxRight
+     * @param boxBottom
+     * @param boxLeft
+     */
     private coordInBox(x, y, boxTop, boxRight, boxBottom, boxLeft) {
         return (boxLeft <= x && x <= boxRight) && (boxTop <= y && y <= boxBottom);
     }
 
     /**
-     * 
-     * @param targetId 
-     * @param otherId 
+     * Finds widgets that are overlapping with the given widget
+     * @param allWidgets map of widgets
+     * @param targetWidget widget we are looking at
      */
-    findWidgetsToShift(targetId: string, allWidgets: Map<string, Map<string, Widget>>) {
+    findOverlappingWidgets(
+        allWidgets: Map<string, Map<string, Widget>>,
+        targetWidget: Widget
+    ): Set<string> {
         const overlappingWidgets = new Set();
-        const targetWidget = Widget.getWidget(allWidgets, targetId);
         const targetTop = targetWidget.getPosition().top;
         const targetLeft = targetWidget.getPosition().left;
         const targetRight = targetLeft + targetWidget.getDimensions().width;
         const targetBottom = targetTop + targetWidget.getDimensions().height;
-        
+
         const that = this;
 
         this.innerWidgetIds.forEach((widgetId) => {
-            if (widgetId === targetId) {
+            if (widgetId === targetWidget.getId()) {
                 return;
             }
             const widget = Widget.getWidget(allWidgets, widgetId);
@@ -534,15 +588,15 @@ export class UserWidget extends Widget {
             const left = widget.getPosition().left;
             const right = left + widget.getDimensions().width;
             const bottom = top + widget.getDimensions().height;
-            
+
             let overlap = false;
 
             [targetLeft, targetRight].forEach(function (x) {
                 [targetTop, targetBottom].forEach(function (y) {
-                    overlap = overlap ||  that.coordInBox(x, y, top, right, bottom, left);     
+                    overlap = overlap ||  that.coordInBox(x, y, top, right, bottom, left);
                 });
             });
-                        
+
             [left, right].forEach(function (x) {
                 [top, bottom].forEach(function (y) {
                     overlap = overlap ||  that.coordInBox(x, y, targetTop, targetRight, targetBottom, targetLeft);
@@ -557,46 +611,3 @@ export class UserWidget extends Widget {
     }
 
 }
-
-/**
-     * Don't think this will be needed
-    private getInnerWidgetInfo(
-        allWidgets: Map<string, Map<string, Widget>>,
-        widget: Widget,
-        infoListLinearlized
-    ) {
-        const outerRecursiveChildrenIds = [];
-        if (widget.getWidgetType() === WidgetType.USER_WIDGET) {
-            for (const innerWidgetId of (<UserWidget>widget).innerWidgetIds) {
-                const innerWidget: Widget = Widget.getWidget(allWidgets, innerWidgetId);
-                infoListLinearlized.push(innerWidgetId);
-                const recursiveChildrenIds = this.getInnerWidgetInfo(
-                    allWidgets,
-                    innerWidget, infoListLinearlized);
-                outerRecursiveChildrenIds
-                    .push([innerWidgetId, recursiveChildrenIds]);
-            }
-        }
-        return outerRecursiveChildrenIds;
-    }
-
-    // keepStructure: Returns a nested list structure representing the
-    // structure of usage
-    // recursive structure [widgetId, [recursive structure of children]]
-    // expanded structure: [[id1, []], [id2, []], [id3, [recursive ids of
-    // children of id3]], [id4,[recursive children of ld4]]]
-    getAllInnerWidgetsIds(
-        allWidgets: Map<string, Map<string, Widget>>,
-        keepStructure: boolean
-    ) {
-        const infoListLinearlized = [];
-        const infoListStructured = this
-                    .getInnerWidgetInfo(allWidgets, this, infoListLinearlized);
-
-        if (keepStructure) {
-            return infoListStructured;
-        } else {
-            return infoListLinearlized;
-        }
-    }
-    */

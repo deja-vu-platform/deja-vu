@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 
 import { Widget } from '../../../models/widget/widget';
-import { Dimensions, Position } from '../../common/utility/utility';
+import { Dimensions, Position } from '../../../utility/utility';
 
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
@@ -19,6 +19,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
   @Input() set widget(val: Widget) {
     // set up things
     this._widget = val;
+    // TODO probably will have to do other things
   }
 
   @Input() dimensions: Dimensions;
@@ -32,23 +33,20 @@ export class WorkSurfaceComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    const _this = this;
     $('.work-surface').droppable({
-      accept: "dv-widget",
-      hoverClass: "highlight",
-      tolerance: "fit",
+      accept: 'dv-widget',
+      hoverClass: 'highlight',
+      tolerance: 'fit',
       drop: function (event, ui) {
-          console.log('dropped');
+          _this.onDropFinished();
       }
     });
   }
 
-  /**
-   * enables it if its elements have already been created,
-   * otherwise loads the elements into the DOM
-   * @param userWidget
-   * @param zoom
-   */
-  loadUserWidget(userWidget) {
-    // grid.setUpGrid();
+  onDropFinished(/** TODO */) {
+    // If new widget, add to the selected widget
+    // else, put it at the top
+    console.log('dropped');
   }
 }

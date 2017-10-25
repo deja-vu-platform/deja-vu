@@ -41,19 +41,6 @@ export function allElementsFromPoint(x, y) {
   return elements;
 }
 
-/**
- * Saves the file and the sets a timer to save the file every 5 minutes
- */
-// that.autoSave5Mins = function () { // every 5 minutes
-//   console.log('saving!');
-//   // update the session stored project too
-//   window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-//   that.saveProject(selectedProject);
-//   setTimeout(function () {
-//     autoSave5Mins();
-//   }, 300000);
-// };
-
 function saveObjectToFile(dirname, filename, object) {
   // Asynch
   const pathName = path.join(dirname, filename);

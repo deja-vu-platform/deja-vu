@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
 
 import {Widget, UserWidget, WidgetType} from '../../../models/widget/widget';
-import {Dimensions, Position} from '../../common/utility/utility';
+import {Dimensions, Position} from '../../../utility/utility';
 
+// Maps needs drag-and-drop
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
 
@@ -67,6 +68,11 @@ export class MapComponent implements AfterViewInit {
     this.minimized = !this.minimized;
   }
 
+  /**
+   * Updates the position of the little screen element to start at the place
+   * that was clicked, and also changes the window's scroll to match.
+   * @param e
+   */
   mapClick(e: MouseEvent) {
     const posX = e.pageX - $('#map').offset().left + $('#map').scrollLeft();
     const posY = e.pageY - $('#map').offset().top + $('#map').scrollTop();
@@ -77,8 +83,8 @@ export class MapComponent implements AfterViewInit {
 
     const top =  Math.max(0, Math.min(posY, (this._screenDimensions.height - this.outerContainerDimensions.height) * this.mapScale));
     const left =  Math.max(0, Math.min(posX, (this._screenDimensions.width - this.outerContainerDimensions.width) * this.mapScale));
-    console.log(top, left);
-    // for now TODO remove later
+
+    // TODO remove later
     this.updateContainerScroll(top, left);
 
     this.mapWindowPosition = {
@@ -89,6 +95,7 @@ export class MapComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     const _this = this;
+    // Initiate draggable
     $('#map-window').draggable({
       containment: '#zoom-selected-screen-size',
       start: function(){
@@ -104,12 +111,15 @@ export class MapComponent implements AfterViewInit {
           left: ui.position.left / _this.mapScale
         });
 
-        // for now TODO remove later
+        // TODO remove later
         _this.updateContainerScroll(ui.position.top, ui.position.left);
       },
     });
   }
 
+  /**
+   * Update the view of the map fresh from the info of the given widget.
+   */
   updateView() {
     const mapScale = this.mapScale;
     const allWidgets = this.allWidgets;
@@ -135,6 +145,13 @@ export class MapComponent implements AfterViewInit {
     this.mapWidgetSizes = mapWidgetSizes;
   }
 
+  /**
+   * Reaches out to outside the map component and updates the scroll of a
+   * containing div.
+   * TODO remove and pass it up to the correct component.
+   * @param top
+   * @param left
+   */
   private updateContainerScroll(top, left) {
     $('.outer-container').scrollTop(top / this.mapScale);
     $('.outer-container').scrollLeft(left / this.mapScale);
