@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { Dimensions, Position } from './components/common/utility/utility';
+import { Dimensions, Position } from './utility/utility';
 import { BaseWidget, Widget, UserWidget } from './models/widget/widget';
 import { MapComponent } from './components/ui_editor/map/map.component';
 
@@ -60,5 +60,9 @@ export class AppComponent implements OnInit {
     innerWidget21.addWidgetToAllWidgets(this.allWidgets);
     innerWidget2.addInnerWidget(innerWidget21.getId());
     innerWidget21.updatePosition({ top: 50, left: 100 });
+  }
+
+  handleMapScroll(e) {
+    console.log(e);
   }
 }
