@@ -2,12 +2,10 @@
 
 cliche Authorization {
     /** Entities **/
-    data User {
-        username: text
-    }
+    data Principal { }
 
     data Resource {
-        owner: User,
-        viewers: [User]
+        owner: Principal,
+        viewers: [Principal]
     }
 }
