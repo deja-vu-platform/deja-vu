@@ -6,11 +6,6 @@ cliche StandardAuthentication {
     username: text
   }
 
-  data Resource {
-    owner: User,
-    viewers: [User]
-  }
-
   /** Widgets **/
   // Shows a register form. After the new user is saved the user is logged in
   // and redirected to the given widget. No redirect happens if `on_register_ok`
