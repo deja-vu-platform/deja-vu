@@ -8,8 +8,8 @@ import { Grafo } from "grafo";
 const mean = new Mean();
 
 const handlers = {
-    user: {
-        create: Helpers.resolve_create(mean.db, "user")
+    principal: {
+        create: Helpers.resolve_create(mean.db, "principal")
     },
     resource: {
         read: args => {
@@ -29,16 +29,14 @@ const grafo = new Grafo(mean.db);
 
 const schema = grafo
     .add_type({
-        name: "User",
-        fields: {
-            username: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
-        }
+        name: "Principal",
+        fields: { }
     })
     .add_type({
         name: "Resource",
         fields: {
-            owner: { "type": "User" },
-            viewers: { "type": "[User]" }
+            owner: { "type": "Principal" },
+            viewers: { "type": "[Principal]" }
         }
     })
     .schema();
