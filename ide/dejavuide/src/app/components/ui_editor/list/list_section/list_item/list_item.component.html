@@ -1,0 +1,26 @@
+<div>
+  <div class="content dropdown-target"  data-dropdownid="'+dropdownId+'"></div>
+  <div class="name-container">
+      <span class="name"> {{widget.getName()}} </span>
+      <div class="submit-rename not-displayed">
+          <input type="text" class="new-name-input form-control" autofocus>
+      </div>
+  </div>
+  <div *ngIf="isDeletable"
+        class="delete-button-container">
+    <button type="button"
+             class="btn btn-default btn-delete-component"
+             onclick="handleDelete()">
+      <span class="glyphicon glyphicon-trash"></span>
+    </button>
+  </div>
+  <ng-container *ngIf="widget.getType() == WidgetType.USER_WIDGET">
+    <ng-container *ngFor="let id of widget.getInnerWidgetIds()">
+      <dv-list-item [allWidgets]="allWidgets"
+                    [widget]="widget.getInnerWidget(allWidgets, id)"
+                    [isDraggable]="false"
+                    [isDeletable]="true">
+      </dv-list-item>
+    </ng-container>
+  </ng-container>
+</div>
