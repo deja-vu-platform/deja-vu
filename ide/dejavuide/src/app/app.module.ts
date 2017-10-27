@@ -6,6 +6,8 @@ import { HeaderModule } from './components/common/header/header.module';
 import { ZoomModule } from './components/ui_editor/zoom/zoom.module';
 import { MapModule } from './components/ui_editor/map/map.module';
 import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurface.module';
+import { ListItemModule } from './components/ui_editor/list/list_section/list_item/list_item.module';
+
 
 
 @NgModule({
@@ -17,7 +19,8 @@ import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurfac
     HeaderModule,
     ZoomModule,
     MapModule,
-    WorkSurfaceModule
+    WorkSurfaceModule,
+    ListItemModule
   ],
   providers: [],
   bootstrap: [AppComponent]

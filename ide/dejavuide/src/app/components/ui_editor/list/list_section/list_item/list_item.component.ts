@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import {MatDialog, MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
+import {MatDialog} from '@angular/material';
 
 import {Widget, BaseWidget, UserWidget, WidgetType} from '../../../../../models/widget/widget';
 import {DeleteDialogComponent} from './delete_dialog.component';
@@ -25,7 +25,9 @@ export class ListItemComponent {
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      if (result) {
         this.deleteUserWidget();
+      }
     });
   }
 

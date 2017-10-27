@@ -24,4 +24,8 @@
   (newScreenPosition)="handleMapScroll($event)">
 </dv-map>
 
-                
+<dv-list-item [allWidgets]="allWidgets"
+              [widget]="selectedWidget"
+              [isDraggable]="false"
+              [isDeletable]="true">
+</dv-list-item>
