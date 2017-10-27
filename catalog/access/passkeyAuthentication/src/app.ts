@@ -12,7 +12,10 @@ import { WORDS } from "./shared/data";
 const mean = new Mean();
 
 const SALT_WORK_FACTOR = 10;
+
+// IMPORTANT: Change before deploying
 const SECRET_KEY = "ultra-secret-key";
+
 const WORDS_SIZE = WORDS.length;
 
 const handlers = {
