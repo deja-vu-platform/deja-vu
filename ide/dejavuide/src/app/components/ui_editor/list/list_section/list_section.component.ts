@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+
+import {Widget, BaseWidget, UserWidget, WidgetType} from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-list-section',
@@ -6,5 +8,6 @@ import { Component } from '@angular/core';
   styleUrls: ['./list_section.component.css']
 })
 export class ListSectionComponent {
- 
+  @Input() widgets: Widget[];
+  @Input() allWidgets: Map<string, Map<string, Widget>>;
 }

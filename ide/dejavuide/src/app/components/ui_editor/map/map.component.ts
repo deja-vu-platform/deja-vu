@@ -84,9 +84,6 @@ export class MapComponent implements AfterViewInit {
     const top =  Math.max(0, Math.min(posY, (this._screenDimensions.height - this.outerContainerDimensions.height) * this.mapScale));
     const left =  Math.max(0, Math.min(posX, (this._screenDimensions.width - this.outerContainerDimensions.width) * this.mapScale));
 
-    // TODO remove later
-    this.updateContainerScroll(top, left);
-
     this.mapWindowPosition = {
       top: top,
       left: left
@@ -102,7 +99,10 @@ export class MapComponent implements AfterViewInit {
         _this.navDragging = true;
       },
       drag: function(e, ui) {
-        _this.updateContainerScroll(ui.position.top, ui.position.left);
+        _this.newScrollPosition.emit({
+          top: ui.position.top / _this.mapScale,
+          left: ui.position.left / _this.mapScale
+        });
       },
       stop: function(e, ui){
         _this.navDragging = false;
@@ -110,9 +110,6 @@ export class MapComponent implements AfterViewInit {
           top: ui.position.top / _this.mapScale,
           left: ui.position.left / _this.mapScale
         });
-
-        // TODO remove later
-        _this.updateContainerScroll(ui.position.top, ui.position.left);
       },
     });
   }
@@ -143,17 +140,5 @@ export class MapComponent implements AfterViewInit {
       }
     }
     this.mapWidgetSizes = mapWidgetSizes;
-  }
-
-  /**
-   * Reaches out to outside the map component and updates the scroll of a
-   * containing div.
-   * TODO remove and pass it up to the correct component.
-   * @param top
-   * @param left
-   */
-  private updateContainerScroll(top, left) {
-    $('.outer-container').scrollTop(top / this.mapScale);
-    $('.outer-container').scrollLeft(left / this.mapScale);
   }
 }

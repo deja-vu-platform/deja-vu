@@ -6,7 +6,7 @@ import { HeaderModule } from './components/common/header/header.module';
 import { ZoomModule } from './components/ui_editor/zoom/zoom.module';
 import { MapModule } from './components/ui_editor/map/map.module';
 import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurface.module';
-import { ListItemModule } from './components/ui_editor/list/list_section/list_item/list_item.module';
+import { ListModule } from './components/ui_editor/list/list.module';
 
 
 
@@ -20,7 +20,7 @@ import { ListItemModule } from './components/ui_editor/list/list_section/list_it
     ZoomModule,
     MapModule,
     WorkSurfaceModule,
-    ListItemModule
+    ListModule
   ],
   providers: [],
   bootstrap: [AppComponent]

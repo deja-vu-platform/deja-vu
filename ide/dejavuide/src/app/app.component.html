@@ -12,7 +12,8 @@
 <dv-zoom 
   [outerContainerDimensions]="outerContainerDimensions"
   [widgetDimensions]="selectedWidget.getDimensions()"
-  [screenDimensions]="screenDimensions">
+  [screenDimensions]="screenDimensions"
+  (updatedZoom)="handleZoomChange($event)">
 </dv-zoom>
 
 <dv-map 
@@ -21,11 +22,9 @@
   [screenDimensions]="screenDimensions"
   [selectedWidget]="selectedWidget"
   [allWidgets]="allWidgets"
-  (newScreenPosition)="handleMapScroll($event)">
+  (newScrollPosition)="handleMapScroll($event)">
 </dv-map>
 
-<dv-list-item [allWidgets]="allWidgets"
-              [widget]="selectedWidget"
-              [isDraggable]="false"
-              [isDeletable]="true">
-</dv-list-item>
+<dv-list [allWidgets]="allWidgets"
+          [userApp]="userApp">
+</dv-list>
