@@ -1,4 +1,4 @@
-// Verifies a user's identity with a passkey (e.g. access code).
+// Verifies a principal's identity with a passkey (e.g. access code).
 // Best paired with the Label cliche to add descriptions, such as name.
 
 cliche PasskeyAuthentication {
@@ -8,12 +8,12 @@ cliche PasskeyAuthentication {
     }
 
     /** Widgets**/
-    // An administrator creates a passkey by defining the code him/herself.
+    // A principal creates a passkey by defining the code him/herself.
     widget CreateCustomPasskey {
         passkey: Passkey
     }
 
-    // An administrator creates a passkey with a randomly chosen 5-7 letter english word.
+    // A principal creates a passkey with a randomly chosen 5-7 letter english word.
     widget CreateRandomPasskey {
         passkey: Passkey
     }
