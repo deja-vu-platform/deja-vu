@@ -17,6 +17,8 @@ export class ListItemComponent {
 
   WidgetType = WidgetType;
 
+  innerShown = false;
+
   constructor(public dialog: MatDialog) {}
 
   handleDelete(): void {
@@ -29,6 +31,10 @@ export class ListItemComponent {
         this.deleteUserWidget();
       }
     });
+  }
+
+  toggleShow() {
+    this.innerShown = !this.innerShown;
   }
 
   deleteUserWidget() {

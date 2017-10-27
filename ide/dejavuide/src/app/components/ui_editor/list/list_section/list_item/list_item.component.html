@@ -15,11 +15,16 @@
     </button>
   </div>
   <ng-container *ngIf="widget.getWidgetType() == WidgetType.USER_WIDGET">
+    <button *ngIf="widget.getInnerWidgetIds().length > 0"
+            (click)="toggleShow()">
+      toggle show
+    </button>  
     <ng-container *ngFor="let id of widget.getInnerWidgetIds()">
       <dv-list-item [allWidgets]="allWidgets"
                     [widget]="widget.getInnerWidget(allWidgets, id)"
                     [isDraggable]="false"
-                    [isDeletable]="true">
+                    [isDeletable]="true"
+                    [hidden]="!innerShown">
       </dv-list-item>
     </ng-container>
   </ng-container>
