@@ -29,14 +29,44 @@ cliche Market {
     market: Market
   }
 
+  data CompoundTransaction {
+    transactions: [Transaction],
+    buyer: Party,
+    paid: boolean
+  }
+
   data Market {}
 
   /** Widgets **/
   widget BuyGoodButton {
     good: Good,
-    buyer: Party,
     quantity: number,
-    fraction: number // fraction of offer price
+    fraction: number, // fraction of offer price
+    buyer: Party
+  }
+
+  widget CreateCompoundTransactionButton {
+    transactions: [Transaction],
+    buyer: Party
+    // TODO: do we want a single buyer and/or seller for the entire compound transaction? 
+    it's also a little redundant since each transaction also has a buyer and a seller
+  }
+
+  widget AddTransactionButton {
+    transaction: Transaction,
+    compound_transaction: CompoundTransaction
+  }
+
+  widget PayForCompoundTransactionButton {
+    compound_transaction: CompoundTransaction
+  }
+
+  widget CancelCompoundTransactionButton {
+    compound_transaction: CompoundTransaction
+  }
+
+  widget ShowCompoundTransaction uses ShowAllTransactions {
+    compound_transaction: CompoundTransaction
   }
 
   widget BuyGoodQuantity {
