@@ -70,7 +70,7 @@ const schema = grafo
         "type": graphql.GraphQLBoolean,
         args: {},
         resolve: (_, { }) => {
-            return getRandomPassocde().then(code => {
+            return getRandomPasscode().then(code => {
                 const passkey = {
                     "code": bcrypt.hashSync(code, SALT_WORK_FACTOR),
                     "atom_id": code
@@ -132,13 +132,13 @@ namespace Validation {
  * Generates a random code. 
  * @returns{string} A unique 5-7 letter english word not found in the database.
  */
-export function getRandomPassocde() {
+export function getRandomPasscode() {
     var randomIndex = Math.floor(Math.random() * WORDS_SIZE);
     var code = WORDS[randomIndex];
     return mean.db.collection("passkeys")
         .findOne({ atom_id: code }, { _id: 1 })
         .then(passkey => {
             if (!passkey) return code;
-            return getRandomPassocde();
+            return getRandomPasscode();
         })
 }
