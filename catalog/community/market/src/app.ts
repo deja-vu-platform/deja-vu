@@ -102,7 +102,6 @@ const schema = grafo
                 return false;
               }
               // use good price as default if no price is given
-              // FIXME: is transaction_price total or for each quantity bought?
               const transaction_price = (price === undefined) ? price : good.price;
               const transaction_id = uuid.v4();
               const transaction = {
@@ -180,7 +179,7 @@ const schema = grafo
       good_id: {"type": graphql.GraphQLString},
       buyer_id: {"type": graphql.GraphQLString},
       quantity: {"type": graphql.GraphQLInt},
-      fraction: {"type": graphql.GraphQLFloat}
+      fraction: {"type": graphql.GraphQLFloat} // fraction of good.price each good will be bought for
     },
     resolve: (_, {good_id, buyer_id, quantity, fraction,}) => {
       return mean.db.collection("goods")
@@ -190,7 +189,7 @@ const schema = grafo
           if (quantity === 0) {
             return false;
           }
-          const transaction_price = good.price * fraction;
+          const transaction_price = good.price * fraction; // price for each good
           const transaction = {
             atom_id: uuid.v4(),
             good: {atom_id: good.atom_id},
@@ -204,8 +203,8 @@ const schema = grafo
             .insertOne(transaction)
             .then(_ => {
               const seller_id = good.seller.atom_id;
-              const u1 = {$inc: {balance: -transaction_price}};
-              const u2 = {$inc: {balance: transaction_price}};
+              const u1 = {$inc: {balance: -transaction_price * quantity}};
+              const u2 = {$inc: {balance: transaction_price * quantity}};
               const u3 = {$inc: {supply: -quantity}};
               return Promise.all([
                 bus.update_atom("Transaction", transaction.atom_id,
@@ -227,13 +226,13 @@ const schema = grafo
     "type": "CompoundTransaction",
     args: {
       transactions: {"type": new graphql.GraphQLList("Transaction")},
-      paid: {"type": graphql.GraphQLBoolean}
+      status: {"type": graphql.GraphQLString}
     },
     resolve: (_, {transactions, paid}) => {
       const compoundTransaction = {
         atom_id: uuid.v4(),
         transactions,
-        paid
+        status
       };
       return mean.db.collection("compoundtransactions")
         .insertOne(compoundTransaction)
@@ -266,22 +265,24 @@ const schema = grafo
               mean.db.collection("transactions")
                 .findOne({atom_id: tid})
                 .then(transaction => {
-                  const price = transaction.transaction_price;
-                  const bid = transaction.buyer.atom_id;
-                  if (buyer_to_expenditure[bid] === undefined) buyer_to_expenditure[bid] = 0;
-                  buyer_to_expenditure[bid] += price;
+                  const price_per_good = transaction.transaction_price;
                   return mean.db.collection("goods")
                     .findOne({atom_id: transaction.good.atom_id})
                     .then(good => {
+                      const total_price = good.price * price_per_good;
                       // no need to update quantities because they were updated when the transaction was made
+                      const bid = transaction.buyer.atom_id;
+                      if (buyer_to_expenditure[bid] === undefined) buyer_to_expenditure[bid] = 0;
+                      buyer_to_expenditure[bid] += total_price;
+
                       const sid = good.seller.atom_id;
                       if (seller_to_earnings[sid] === undefined) seller_to_earnings[sid] = 0;
-                      seller_to_earnings[sid] += price;
+                      seller_to_earnings[sid] += total_price;
                     });
                 })
             );
           });
-          // TODO: check whether buyer has enough money?
+          // TODO: check whether buyer has enough money next time
           return Promise.all(transactions_to_process)
             .then(_ => {
               const payments = [];
@@ -302,11 +303,12 @@ const schema = grafo
               return Promise.all(payments);
             })
             .then(_ => {
-              const update_op = {$set: {paid: true}};
+              const update_op = {$set: {status: "paid"}};
               return mean.db.collection("compoundtransactions")
                 .updateOne({atom_id: compound_transaction_id}, update_op)
                 .then(_ => bus.update_atom("CompoundTransaction", compound_transaction_id, update_op));
-            });
+            })
+            .then(_ => true);
         });
     }
   })
@@ -345,7 +347,8 @@ const schema = grafo
                 .updateOne({atom_id: compound_transaction_id}, update_op)
                 .then(_ => bus.update_atom(
                   "CompoundTransaction", compound_transaction_id, update_op));
-            });
+            })
+            .then(_ => true);
         });
     }
   })

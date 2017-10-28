@@ -34,7 +34,7 @@ cliche Market {
   // Its status can be:
   //    unpaid   - where each good is reserved for the buyer
   //    paid     - where each good has been paid for
-  //    canceled - where each good is neither reserved and paid for
+  //    canceled - where each good is neither reserved nor paid for
   data CompoundTransaction {
     transactions: [Transaction],
     status: text // either unpaid, paid, or canceled
@@ -48,7 +48,7 @@ cliche Market {
     good: Good,
     buyer: Party,
     quantity: number,
-    fraction: number // fraction of offer price
+    fraction: number // fraction of good.price each good will be bought for
   }
 
   widget CreateCompoundTransactionButton {
@@ -78,7 +78,7 @@ cliche Market {
   }
 
   widget BuyGoodFraction {
-    fraction: number // fraction of offer price
+    fraction: number // fraction of good.price each good will be bought for
   }
 
   widget CreateGoodButton {
