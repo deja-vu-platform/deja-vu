@@ -36,12 +36,13 @@ export class ShowCompoundTransactionComponent {
             price,
             quantity
           },
-          paid
+          status
         }
       `)
       .map(data => data.compoundtransaction_by_id)
       .subscribe(compound_transaction => {
-        this.compoundTransaction.paid = compound_transaction.paid;
+        this.compoundTransaction.status = compound_transaction.status;
+
         compound_transaction.transactions
           .flatMap((transactions, unused_ix) => Observable.from(transactions))
           .map((transaction: TransactionAtom) => {

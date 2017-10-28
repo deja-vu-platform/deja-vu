@@ -12,7 +12,9 @@ export class PayForCompoundTransactionButtonComponent {
   constructor(private _graphQlService: GraphQlService) {}
 
   pay() {
-    if (!this.compoundTransaction.atom_id) return;
+    const paidStatus = "paid";
+    if (!this.compoundTransaction.atom_id
+      || this.compoundTransaction.status === paidStatus) return;
 
     this._graphQlService
       .post(`
@@ -21,7 +23,7 @@ export class PayForCompoundTransactionButtonComponent {
         )
       `)
       .subscribe(_ => {
-        this.compoundTransaction.paid = true;
+        this.compoundTransaction.status = paidStatus;
       });
   }
 }

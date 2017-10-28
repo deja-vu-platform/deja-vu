@@ -1,13 +1,6 @@
 import {GraphQlService} from "gql";
-import {Widget, Field} from "client-bus";
-import {
-  CompoundTransactionAtom,
-  Transaction
-} from "../../shared/data";
-
-import "rxjs/add/operator/map";
-import "rxjs/add/operator/toPromise";
-import * as _u from "underscore";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
+import {CompoundTransactionAtom} from "../../shared/data";
 
 
 @Widget({
@@ -16,43 +9,25 @@ import * as _u from "underscore";
 })
 export class CreateCompoundTransactionButtonComponent {
   @Field("CompoundTransaction") compoundTransaction: CompoundTransactionAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(private _graphQlService: GraphQlService) {}
 
   createCompoundTransaction() {
-    if (! this.valid()) return;
+    const defaultStatus = "unpaid";
+    const status = this.compoundTransaction.status === undefined ?
+      defaultStatus : this.compoundTransaction.status;
 
     this._graphQlService
       .post(`
         CreateCompoundTransaction(
-          buyer_id: "${this.compoundTransaction.buyer.atom_id}")
-          { atom_id }
+          transactions: "${this.compoundTransaction.transactions}",
+          status: "${status}"
+        ) { atom_id }
       `)
       .subscribe(atom_id => {
-        Promise.all(
-          _u.map(this.compoundTransaction.transactions,
-            (transaction: Transaction) => {
-              return this._graphQlService
-                .post(`
-                  addTransaction(
-                    "${atom_id}",
-                    good_id: "${transaction.good.atom_id}",
-                    buyer_id: "${transaction.buyer.atom_id}",
-                    quantity: "${transaction.quantity}",
-                    price: "${transaction.price}"
-                  )
-                `)
-                .toPromise();
-            })
-        )
-        .then(_ => {
-          this.compoundTransaction.atom_id = "";
-          this.compoundTransaction.transactions = [];
-        });
+          this.compoundTransaction.atom_id = atom_id;
+          this.submit_ok.value = true;
       });
-  }
-
-  valid() {
-    return this.compoundTransaction.buyer.atom_id;
   }
 }

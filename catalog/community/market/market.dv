@@ -29,10 +29,16 @@ cliche Market {
     market: Market
   }
 
+  // A record of multiple goods bought/to be bought
+  // in a single purchase/sale
+  // Its status can be:
+  //    unpaid   - where each good is reserved for the buyer
+  //    paid     - where each good has been paid for
+  //    canceled - where each good is neither reserved and paid for
   data CompoundTransaction {
     transactions: [Transaction],
-    buyer: Party,
-    paid: boolean
+    status: text // either unpaid, paid, or canceled
+    // TODO: change this to enum once it's supported
   }
 
   data Market {}
@@ -40,16 +46,14 @@ cliche Market {
   /** Widgets **/
   widget BuyGoodButton {
     good: Good,
+    buyer: Party,
     quantity: number,
-    fraction: number, // fraction of offer price
-    buyer: Party
+    fraction: number // fraction of offer price
   }
 
   widget CreateCompoundTransactionButton {
-    transactions: [Transaction],
-    buyer: Party
-    // TODO: do we want a single buyer and/or seller for the entire compound transaction? 
-    it's also a little redundant since each transaction also has a buyer and a seller
+    compound_transaction: CompoundTransaction,
+    submit_ok: boolean
   }
 
   widget AddTransactionButton {

@@ -12,7 +12,9 @@ export class CancelCompoundTransactionButtonComponent {
   constructor(private _graphQlService: GraphQlService) {}
 
   cancelCompoundTransaction() {
-    if (!this.compoundTransaction.atom_id) return;
+    const canceledStatus = "canceled";
+    if (!this.compoundTransaction.atom_id
+      || this.compoundTransaction.status === canceledStatus) return;
 
     this._graphQlService
       .post(`
@@ -21,7 +23,7 @@ export class CancelCompoundTransactionButtonComponent {
         )
       `)
       .subscribe(_ => {
-        this.compoundTransaction = undefined;
+        this.compoundTransaction.status = canceledStatus;
       });
   }
 }

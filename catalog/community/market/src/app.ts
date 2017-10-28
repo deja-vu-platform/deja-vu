@@ -28,6 +28,10 @@ const handlers = {
   transaction: {
     create: Helpers.resolve_create(mean.db, "transaction"),
     update: Helpers.resolve_update(mean.db, "transaction")
+  },
+  compoundtransaction: {
+    create: Helpers.resolve_create(mean.db, "compoundtransaction"),
+    update: Helpers.resolve_update(mean.db, "compoundtransaction")
   }
 };
 
@@ -80,7 +84,7 @@ const schema = grafo
     name: "CompoundTransaction",
     fields: {
       transactions: {"type": "[Transaction]"},
-      paid: {"type": graphql.GraphQLBoolean},
+      status: {"type": graphql.GraphQLString},
       addTransaction: {
         "type": "Transaction",
         args: {
@@ -222,14 +226,14 @@ const schema = grafo
     name: "CreateCompoundTransaction",
     "type": "CompoundTransaction",
     args: {
-      buyer_id: {"type": graphql.GraphQLString}
+      transactions: {"type": new graphql.GraphQLList("Transaction")},
+      paid: {"type": graphql.GraphQLBoolean}
     },
-    resolve: (_, {buyer_id}) => {
+    resolve: (_, {transactions, paid}) => {
       const compoundTransaction = {
         atom_id: uuid.v4(),
-        transactions: [],
-        paid: false,
-        buyer_id
+        transactions,
+        paid
       };
       return mean.db.collection("compoundtransactions")
         .insertOne(compoundTransaction)
@@ -247,7 +251,7 @@ const schema = grafo
       compound_transaction_id: {"type": graphql.GraphQLString},
     },
     resolve: (_, {compound_transaction_id}) => {
-      const update_op = {$set: {paid: true}};
+      const update_op = {$set: {status: "paid"}};
       return mean.db.collection("compoundtransactions")
         .findOne({atom_id: compound_transaction_id})
         .then(compound_transaction => {
@@ -313,7 +317,6 @@ const schema = grafo
       compound_transaction_id: {"type": graphql.GraphQLString},
     },
     resolve: (_, {compound_transaction_id}) => {
-      const update_op = {$set: {paid: true}};
       return mean.db.collection("compoundtransactions")
         .findOne({atom_id: compound_transaction_id})
         .then(compound_transaction => {
@@ -328,23 +331,20 @@ const schema = grafo
                   // no need to update balance of parties because no payments were made
                   const update_op = {$inc: {supply: transaction.quantity}};
                   return mean.db.collection("goods")
-                    .updateOne({atom_id: transaction.good.atom_id}, update_op);
+                    .updateOne({atom_id: transaction.good.atom_id}, update_op)
+                    .then(_ => bus.update_atom(
+                      "Good", transaction.good.atom_id, update_op));
                 })
             );
           });
-          // TODO: do we delete the transactions and compound transaction or set some field to canceled?
+
           return Promise.all(transactions_to_process)
             .then(_ => {
-              return mean.db.collection("transactions")
-                .remove({atom_id: {$in: transaction_ids}})
-                .then(_ => {
-                  _u.each(transaction_ids, tid => bus.remove_atom("Transaction", tid));
-                });
-            })
-            .then(_ => {
+              const update_op = {$set: {status: "canceled"}};
               return mean.db.collection("compoundtransactions")
-                .deletOne({atom_id: compound_transaction_id})
-                .then(_ => bus.remove_atom("CompoundTransaction", compound_transaction_id));
+                .updateOne({atom_id: compound_transaction_id}, update_op)
+                .then(_ => bus.update_atom(
+                  "CompoundTransaction", compound_transaction_id, update_op));
             });
         });
     }

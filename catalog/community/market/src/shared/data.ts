@@ -33,8 +33,7 @@ export interface TransactionAtom extends Transaction, Atom {}
 
 export interface CompoundTransaction {
   transactions: Transaction[];
-  buyer: PartyAtom;
-  paid: boolean;
+  status: string;
 }
 
 export interface CompoundTransactionAtom extends CompoundTransaction, Atom {}

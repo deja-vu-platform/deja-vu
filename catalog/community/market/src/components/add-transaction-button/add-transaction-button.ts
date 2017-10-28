@@ -34,7 +34,6 @@ export class AddTransactionButtonComponent {
       `)
       .subscribe(transaction => {
         this.transaction.atom_id = transaction.atom_id;
-        this.compoundTransaction.paid = true;
       });
   }
 
