@@ -228,7 +228,7 @@ const schema = grafo
       transactions: {"type": "[Transaction]"},
       status: {"type": graphql.GraphQLString}
     },
-    resolve: (_, {transactions, paid}) => {
+    resolve: (_, {transactions, status}) => {
       const compoundTransaction = {
         atom_id: uuid.v4(),
         transactions,
