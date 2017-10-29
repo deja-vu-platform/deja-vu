@@ -69,7 +69,7 @@ cliche Market {
     compound_transaction: CompoundTransaction
   }
 
-  widget ShowCompoundTransaction uses ShowAllTransactions {
+  widget ShowCompoundTransaction uses ShowTransaction {
     compound_transaction: CompoundTransaction
   }
 

@@ -1,2 +1,5 @@
-<dv-widget name="ShowAllTransactions" [init]="{allTransactions: compoundTransaction.transactions}"></dv-widget>
+<div *ngFor="let transaction of compoundTransaction.transactions" class="row">
+  <dv-widget name="ShowTransaction" [init]="{transaction: transaction}">
+  </dv-widget>
+</div>
 <div><span>Status: {{compoundTransaction.status}}</span></div>

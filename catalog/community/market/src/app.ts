@@ -113,7 +113,7 @@ const schema = grafo
                 quantity: quantity,
                 market: {atom_id: good.market.atom_id}
               }
-              const compound_transction_update_op = {
+              const compound_transaction_update_op = {
                 $push: {transactions: transaction_id}
               };
               const good_update_op = {$inc: {supply: -quantity}};
@@ -122,11 +122,11 @@ const schema = grafo
                 mean.db.collection("compoundtransactions")
                   .updateOne(
                     {atom_id: compound_transaction.atom_id},
-                    compound_transction_update_op)
+                    compound_transaction_update_op)
                   .then(_ => bus.update_atom(
                     "CompoundTransaction",
                     compound_transaction.atom_id,
-                    compound_transction_update_op)),
+                    compound_transaction_update_op)),
 
                 mean.db.collection("transactions")
                   .insertOne(transaction)
