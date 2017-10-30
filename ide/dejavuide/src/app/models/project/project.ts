@@ -57,4 +57,11 @@ export class Project {
     return this.userApp;
   }
 
+  updateAccess() {
+    this.lastAccessed = (new Date()).getTime();
+  }
+
+  getLastAccessed() {
+    return this.lastAccessed;
+  }
 }

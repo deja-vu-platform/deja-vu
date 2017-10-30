@@ -7,9 +7,10 @@ export enum ClicheType {
 }
 
 export abstract class Cliche {
+  // A cliche contains the actual widget objects
   protected objectType = 'Cliche';
   protected meta: Meta;
-  protected widgets: Map<string, Set<string>>;
+  protected widgets: Map<string, Map<string, Widget>>;
   protected clicheType: ClicheType;
 
   /**
@@ -35,13 +36,13 @@ export class UserCliche extends Cliche {
     }
     const uc = new UserCliche(object.meta.name);
     for (const widgetId of Object.keys(object.widgets.pages)){
-      uc.addPage(widgetId);
+      uc.addPage(Widget.fromObject(object.widgets.pages[widgetId]));
     }
     for (const widgetId of Object.keys(object.widgets.unused)){
-      uc.addUnusedWidget(widgetId);
+      uc.addUnusedWidget(Widget.fromObject(object.widgets.pages[widgetId]));
     }
     for (const widgetId of Object.keys(object.widgets.templates)){
-      uc.addTemplate(widgetId);
+      uc.addTemplate(Widget.fromObject(object.widgets.pages[widgetId]));
     }
     return uc;
   }
@@ -55,10 +56,10 @@ export class UserCliche extends Cliche {
       version: '',
       author: ''
     };
-    this.widgets = new Map<string, Set<string>>();
-    this.widgets.set('pages', new Set<string>());
-    this.widgets.set('unused', new Set<string>());
-    this.widgets.set('templates', new Set<string>());
+    this.widgets = new Map<string, Map<string, Widget>>();
+    this.widgets.set('pages', new Map<string, Widget>());
+    this.widgets.set('unused', new Map<string, Widget>());
+    this.widgets.set('templates', new Map<string, Widget>());
   }
 
   getId (): string {
@@ -66,11 +67,11 @@ export class UserCliche extends Cliche {
   }
 
   isPage (widgetId: string): boolean {
-    return widgetId in this.widgets['pages'];
+    return widgetId in this.widgets.get('pages');
   }
 
-  addPage (widgetId: string) {
-    this.widgets.get('pages').add(widgetId);
+  addPage (widget: Widget) {
+    this.widgets.get('pages').set(widget.getId(), widget);
   }
 
   /**
@@ -85,8 +86,8 @@ export class UserCliche extends Cliche {
     return  Array.from(this.widgets.get('pages').keys());
   }
 
-  addTemplate (widgetId) {
-    this.widgets.get('templates').add(widgetId);
+  addTemplate (widget: Widget) {
+    this.widgets.get('templates').set(widget.getId(), widget);
   }
 
   removeTemplate = function(widgetId){
@@ -101,8 +102,8 @@ export class UserCliche extends Cliche {
   * makes a new unused widget
   * @param widget
   */
-  addUnusedWidget (widgetId) {
-    this.widgets.get('unused').add(widgetId);
+  addUnusedWidget (widget: Widget) {
+    this.widgets.get('unused').set(widget.getId(), widget);
   }
 
   removeUnusedWidget = function(widgetId){
@@ -119,7 +120,7 @@ export class DvCliche extends Cliche {
   constructor () {
     super();
     this.clicheType = ClicheType.DV_CLICHE;
-    this.widgets = new Map<string, Set<string>>();
-    this.widgets.set('templates', new Set<string>());
+    this.widgets = new Map<string, Map<string, Widget>>();
+    this.widgets.set('templates', new Map<string, Widget>());
   }
 }
