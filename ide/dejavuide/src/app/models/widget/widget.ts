@@ -1,5 +1,5 @@
 import { generateId, Dimensions, Position } from '../../utility/utility';
-
+import { Cliche, UserCliche } from '../cliche/cliche';
 import { Meta } from '../project/project';
 
 export enum WidgetType {
@@ -36,29 +36,29 @@ export abstract class Widget {
 
     /**
      * Given a map of clicheIds to all their widgets, adds a widget to that map.
-     * @param allWidgets a map of clicheids to all their widgets
+     * @param allCliches a map of clicheids to cliches
      * @param widget widget to add
      */
-    static addWidgetToAllWidgets(
-        allWidgets: Map<string, Map<string, Widget>>,
+    static addWidgetToCliche(
+        allCliches: Map<string, Cliche>,
         widget: Widget) {
-        if (!allWidgets[widget.getClicheId()]) {
-            allWidgets[widget.getClicheId()] = new Map<string, Widget>();
+        if (!allCliches[widget.getClicheId()]) {
+            throw Error('Cliche not found');
         }
-        allWidgets[widget.getClicheId()][widget.getId()] = widget;
+        (<UserCliche>allCliches.get(widget.getClicheId())).addUnusedWidget(widget);
     }
 
     /**
      * Given a widgetId, gets the widget object from the map of all widgets
-     * @param allWidgets a map of all widgets
+     * @param allCliches a map of all widgets
      * @param widgetId id of widget to find
      */
     static getWidget(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         widgetId: string
     ): Widget {
         const clicheid = Widget.decodeid(widgetId)[0];
-        return allWidgets[clicheid][widgetId];
+        return allCliches[clicheid].getWidget(widgetId);
     }
 
     /**
@@ -87,12 +87,12 @@ export abstract class Widget {
     /**
      * Makes a copy of the widget and returns a list of copies of this widget
      * and all inner widgets
-     * @param allWidgets map containing all widgets
+     * @param allCliches map containing all cliches
      * @param fromTemplate Whether of not we are doing a "template" copy as
      *  opposed to a normal copy
      */
     abstract makeCopy(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         fromTemplate: boolean
     ): Widget[];
 
@@ -118,11 +118,11 @@ export abstract class Widget {
     }
 
     getClicheId(): string {
-        return Widget.decodeid(this.meta.id)[0];
+        return this.meta.clicheId;
     }
 
     getTemplateId(): string {
-        return this.meta.templateid;
+        return this.meta.templateId;
     }
 
     getWidgetType(): WidgetType {
@@ -162,11 +162,11 @@ export abstract class Widget {
      * the styles that apply to this widget.
      * Order of preference: parent < template < own
      *
-     * @param allWidgets a map of all widgets
+     * @param allCliches a map of all cliches
      * @param parentStyles any styles to inherit from the ancestors
      */
     getCustomStylesToShow(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         parentStyles = {}
     ) {
         // TODO: later on, use this to update a "stylesToShow" field
@@ -178,8 +178,8 @@ export abstract class Widget {
         let inheritedStyles = {};
         if (this.getTemplateId()) {
             inheritedStyles = Widget
-                .getWidget(allWidgets, this.getTemplateId())
-                .getCustomStylesToShow(allWidgets); // no parent styles for template
+                .getWidget(allCliches, this.getTemplateId())
+                .getCustomStylesToShow(allCliches); // no parent styles for template
         }
 
         for (const style of Object.keys(inheritedStyles)){
@@ -198,21 +198,21 @@ export abstract class Widget {
      * Just deletes from the all widgets table and the template reference if
      * it has one. Doesn't touch inner widgets if any.
      *
-     * @param allWidgets a map of all widgets
+     * @param allCliches a map of all widgets
      */
-    delete(allWidgets: Map<string, Map<string, Widget>>) {
+    remove(allCliches: Map<string, Cliche>) {
         if (this.getTemplateId()) {
-            Widget.getWidget(allWidgets, this.getTemplateId()).templateCopies.delete(this.getId());
+            Widget.getWidget(allCliches, this.getTemplateId()).templateCopies.delete(this.getId());
         }
-        delete allWidgets[this.getClicheId()][this.getId()];
+        (<UserCliche>allCliches.get(this.getClicheId())).removeWidget(this.getId());
     }
 
     /**
      * Adds this widget to the map of all widgets.
-     * @param allWidgets the map of all widgets
+     * @param allCliches the map of all cliches
      */
-    addWidgetToAllWidgets(allWidgets: Map<string, Map<string, Widget>>) {
-        Widget.addWidgetToAllWidgets(allWidgets, this);
+    addWidgetToCliche(allCliches: Map<string, Cliche>) {
+        Widget.addWidgetToCliche(allCliches, this);
     }
 }
 
@@ -256,8 +256,9 @@ export class BaseWidget extends Widget {
         super();
         this.meta = {
             name: name,
+            clicheId: clicheid,
             id: id ? id : clicheid + '_' + generateId(),
-            templateid: templateid,
+            templateId: templateid,
             version: '',
             author: ''
         };
@@ -272,7 +273,7 @@ export class BaseWidget extends Widget {
     }
 
     makeCopy(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         fromTemplate = false
     ): Widget[] {
         let templateId = this.getTemplateId();
@@ -347,7 +348,7 @@ export class UserWidget extends Widget {
         this.meta = {
             name: name,
             id: id ? id : clicheid + '_' + generateId(),
-            templateid: templateid,
+            templateId: templateid,
             version: '',
             author: ''
         };
@@ -377,12 +378,12 @@ export class UserWidget extends Widget {
      * Returns path starting from this id to the wanted widget id
      *  null if no path exists
      *
-     * @param allWidgets map of all widgets
+     * @param allCliches map of all cliches
      * @param widget widget we are currently looking at
      * @param targetId widget id of widget to find
      */
     private getPathHelper(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         widget: Widget,
         targetId: string
     ): string[] | null {
@@ -397,8 +398,8 @@ export class UserWidget extends Widget {
         }
         // Recursive case, look through all the inner widgets
         for (const id of (<UserWidget>widget).innerWidgetIds) {
-            const path = this.getPathHelper(allWidgets,
-                Widget.getWidget(allWidgets, id), targetId);
+            const path = this.getPathHelper(allCliches,
+                Widget.getWidget(allCliches, id), targetId);
             if (path === null) {
                 continue;
             }
@@ -413,46 +414,46 @@ export class UserWidget extends Widget {
      * Returns path starting from this id to the wanted widget id
      *  null if no path exists
      *
-     * @param allWidgets map of all widgets
+     * @param allCliches map of all widgets
      * @param widgetId widget id of widget to find
      */
     getPath(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         widgetId: string
     ): string[] | null {
-        return this.getPathHelper(allWidgets, this, widgetId);
+        return this.getPathHelper(allCliches, this, widgetId);
     }
 
     /**
      * Returns the wanted widget if it is a child of this widget, else null
      *
-     * @param allWidgets map of all widgets
+     * @param allCliches map of all widgets
      * @param targetId id of widget to find
      * @param getParent whether to actually only get the parent of the widget
      */
     getInnerWidget(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         targetId: string,
         getParent = false
     ): Widget {
-        const path = this.getPath(allWidgets, targetId);
+        const path = this.getPath(allCliches, targetId);
         if (path === null) { // it's not actually a child
             return null;
         }
         if (getParent) {
             targetId = path[path.length - 2];
         }
-        return Widget.getWidget(allWidgets, targetId);
+        return Widget.getWidget(allCliches, targetId);
     }
 
     /**
      *
-     * @param allWidgets
+     * @param allCliches
      * @param fromTemplate if this widget is not a template, this value is
      * ignored
      */
     makeCopy(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         fromTemplate = false
     ): Widget[] {
         let templateId = this.getTemplateId();
@@ -478,7 +479,7 @@ export class UserWidget extends Widget {
 
         let copyWidgets = [copyWidget];
         for (const id of this.innerWidgetIds) {
-            const copyInnerWidgets = <UserWidget[]> Widget.getWidget(allWidgets, id).makeCopy(allWidgets, fromTemplate);
+            const copyInnerWidgets = <UserWidget[]> Widget.getWidget(allCliches, id).makeCopy(allCliches, fromTemplate);
             const innerWidgetCopy = copyInnerWidgets[0];
             copyWidget.addInnerWidget(innerWidgetCopy.getId());
             copyWidgets = copyWidgets.concat(copyInnerWidgets);
@@ -558,11 +559,11 @@ export class UserWidget extends Widget {
 
     /**
      * Finds widgets that are overlapping with the given widget
-     * @param allWidgets map of widgets
+     * @param allCliches map of widgets
      * @param targetWidget widget we are looking at
      */
     findOverlappingWidgets(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allCliches: Map<string, Cliche>,
         targetWidget: Widget
     ): Set<string> {
         const overlappingWidgets = new Set();
@@ -577,7 +578,7 @@ export class UserWidget extends Widget {
             if (widgetId === targetWidget.getId()) {
                 return;
             }
-            const widget = Widget.getWidget(allWidgets, widgetId);
+            const widget = Widget.getWidget(allCliches, widgetId);
             const top = widget.getPosition().top;
             const left = widget.getPosition().left;
             const right = left + widget.getDimensions().width;

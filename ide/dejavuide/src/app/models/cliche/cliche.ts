@@ -6,11 +6,15 @@ export enum ClicheType {
   USER_CLICHE, DV_CLICHE
 }
 
+enum WidgetGroup {
+  PAGE, TEMPLATE, USED, UNUSED
+}
+
 export abstract class Cliche {
   // A cliche contains the actual widget objects
   protected objectType = 'Cliche';
   protected meta: Meta;
-  protected widgets: Map<string, Map<string, Widget>>;
+  protected widgets: Map<WidgetGroup, Map<string, Widget>>;
   protected clicheType: ClicheType;
 
   /**
@@ -35,18 +39,23 @@ export class UserCliche extends Cliche {
       return null;
     }
     const uc = new UserCliche(object.meta.name);
-    for (const widgetId of Object.keys(object.widgets.pages)){
-      uc.addPage(Widget.fromObject(object.widgets.pages[widgetId]));
-    }
-    for (const widgetId of Object.keys(object.widgets.used)){
-      uc.addUsedWidget(Widget.fromObject(object.widgets.used[widgetId]));
-    }
-    for (const widgetId of Object.keys(object.widgets.unused)){
-      uc.addUnusedWidget(Widget.fromObject(object.widgets.unused[widgetId]));
-    }
-    for (const widgetId of Object.keys(object.widgets.templates)){
-      uc.addTemplate(Widget.fromObject(object.widgets.templates[widgetId]));
-    }
+    const toAdds: Function[] = [
+      uc.addPage,
+      uc.addUsedWidget,
+      uc.addUnusedWidget,
+      uc.addTemplate];
+
+    const orderedGroups: WidgetGroup[] = [
+      WidgetGroup.PAGE,
+      WidgetGroup.USED,
+      WidgetGroup.UNUSED,
+      WidgetGroup.TEMPLATE];
+
+    orderedGroups.forEach((group, i) => {
+      for (const widgetId of Object.keys(object.widgets[group])){
+        toAdds[i](Widget.fromObject(object.widgets[group][widgetId]));
+      }
+    });
     return uc;
   }
 
@@ -59,11 +68,11 @@ export class UserCliche extends Cliche {
       version: '',
       author: ''
     };
-    this.widgets = new Map<string, Map<string, Widget>>();
-    this.widgets.set('pages', new Map<string, Widget>());
-    this.widgets.set('used', new Map<string, Widget>());
-    this.widgets.set('unused', new Map<string, Widget>());
-    this.widgets.set('templates', new Map<string, Widget>());
+    this.widgets = new Map<WidgetGroup, Map<string, Widget>>();
+    this.widgets.set(WidgetGroup.PAGE, new Map<string, Widget>());
+    this.widgets.set(WidgetGroup.USED, new Map<string, Widget>());
+    this.widgets.set(WidgetGroup.UNUSED, new Map<string, Widget>());
+    this.widgets.set(WidgetGroup.TEMPLATE, new Map<string, Widget>());
   }
 
   getId (): string {
@@ -71,59 +80,112 @@ export class UserCliche extends Cliche {
   }
 
   isPage (widgetId: string): boolean {
-    return widgetId in this.widgets.get('pages');
+    return widgetId in this.widgets.get(WidgetGroup.PAGE);
   }
 
   addPage (widget: Widget) {
-    this.widgets.get('pages').set(widget.getId(), widget);
+    this.widgets.get(WidgetGroup.PAGE).set(widget.getId(), widget);
   }
 
   /**
    * Just removes the page from the cliche object, does not delete the widget
    * object itself.
    */
-  removePage (widgetId) {
-    this.widgets.get('pages').delete(widgetId);
+  removePage (widgetId: string) {
+    this.widgets.get(WidgetGroup.PAGE).delete(widgetId);
+  }
+
+  getPage (widgetId: string): Widget {
+    return this.widgets.get(WidgetGroup.PAGE).get(widgetId);
   }
 
   getPageIds (): string[] {
-    return  Array.from(this.widgets.get('pages').keys());
+    return  Array.from(this.widgets.get(WidgetGroup.PAGE).keys());
   }
 
   addTemplate (widget: Widget) {
-    this.widgets.get('templates').set(widget.getId(), widget);
+    this.widgets.get(WidgetGroup.TEMPLATE).set(widget.getId(), widget);
   }
 
-  removeTemplate = function(widgetId){
-    this.widgets.get('templates').delete(widgetId);
-  };
+  removeTemplate (widgetId: string) {
+    this.widgets.get(WidgetGroup.TEMPLATE).delete(widgetId);
+  }
+
+  getTemplate (widgetId: string): Widget {
+    return this.widgets.get(WidgetGroup.TEMPLATE).get(widgetId);
+  }
 
   getTemplateIds (): string[] {
-    return Array.from(this.widgets.get('templates').keys());
+    return Array.from(this.widgets.get(WidgetGroup.TEMPLATE).keys());
   }
 
   addUnusedWidget (widget: Widget) {
-    this.widgets.get('unused').set(widget.getId(), widget);
+    this.widgets.get(WidgetGroup.UNUSED).set(widget.getId(), widget);
   }
 
-  removeUnusedWidget = function(widgetId){
-    this.widgets.get('unused').delete(widgetId);
-  };
+  removeUnusedWidget(widgetId: string) {
+    this.widgets.get(WidgetGroup.UNUSED).delete(widgetId);
+  }
+
+  getUnusedWidget (widgetId: string): Widget {
+    return this.widgets.get(WidgetGroup.UNUSED).get(widgetId);
+  }
 
   getUnusedWidgetIds (): string[] {
-    return  Array.from(this.widgets.get('used').keys());
+    return  Array.from(this.widgets.get(WidgetGroup.UNUSED).keys());
   }
 
   addUsedWidget (widget: Widget) {
-    this.widgets.get('used').set(widget.getId(), widget);
+    this.widgets.get(WidgetGroup.USED).set(widget.getId(), widget);
   }
 
-  removeUsedWidget = function(widgetId){
-    this.widgets.get('used').delete(widgetId);
-  };
+  removeUsedWidget (widgetId: string) {
+    this.widgets.get(WidgetGroup.USED).delete(widgetId);
+  }
+
+  getUsedWidget (widgetId: string): Widget {
+    return this.widgets.get(WidgetGroup.USED).get(widgetId);
+  }
 
   getUsedWidgetIds (): string[] {
-    return  Array.from(this.widgets.get('used').keys());
+    return  Array.from(this.widgets.get(WidgetGroup.USED).keys());
+  }
+
+  getWidget(widgetId: string): Widget {
+    if (widgetId in this.widgets.get(WidgetGroup.PAGE)) {
+      return this.getPage(widgetId);
+    }
+
+    if (widgetId in this.widgets.get(WidgetGroup.USED)) {
+      return this.getUsedWidget(widgetId);
+    }
+
+    if (widgetId in this.widgets.get(WidgetGroup.UNUSED)) {
+      return this.getUnusedWidget(widgetId);
+    }
+
+    if (widgetId in this.widgets.get(WidgetGroup.TEMPLATE)) {
+      return this.getTemplate(widgetId);
+    }
+    return undefined;
+  }
+
+  removeWidget(widgetId: string) {
+    if (widgetId in this.widgets.get(WidgetGroup.PAGE)) {
+      this.removePage(widgetId);
+    }
+
+    if (widgetId in this.widgets.get(WidgetGroup.USED)) {
+      return this.removeUsedWidget(widgetId);
+    }
+
+    if (widgetId in this.widgets.get(WidgetGroup.UNUSED)) {
+      return this.removeUnusedWidget(widgetId);
+    }
+
+    if (widgetId in this.widgets.get(WidgetGroup.TEMPLATE)) {
+      return this.removeTemplate(widgetId);
+    }
   }
 }
 
@@ -132,7 +194,7 @@ export class DvCliche extends Cliche {
   constructor () {
     super();
     this.clicheType = ClicheType.DV_CLICHE;
-    this.widgets = new Map<string, Map<string, Widget>>();
-    this.widgets.set('templates', new Map<string, Widget>());
+    this.widgets = new Map<WidgetGroup, Map<string, Widget>>();
+    this.widgets.set(WidgetGroup.TEMPLATE, new Map<string, Widget>());
   }
 }

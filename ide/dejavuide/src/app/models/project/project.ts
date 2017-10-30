@@ -7,6 +7,8 @@ export interface Meta {
   id: string;
   version?: string;
   author?: string;
+  templateId?: string;
+  clicheId?: string;
 }
 
 export class Project {
