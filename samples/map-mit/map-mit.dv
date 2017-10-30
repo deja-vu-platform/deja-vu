@@ -2,7 +2,8 @@
 app MapMit {
 
   // Restrict access to the application to only registered users
-  include access/Auth[User for User]
+  include access/StandardAuthentication[User for User]
+  include access/Authorization[User for User]
 
   // One map shows the locations of events
   include community/Geolocation[

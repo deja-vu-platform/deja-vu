@@ -6,7 +6,8 @@
   },
   "license": "MIT",
   "dependencies": {
-    "dv-access-auth": "file:../../catalog/access/auth",
+    "dv-access-authorization":"file:../../catalog/access/authorization",
+    "dv-access-standardauthentication": "file:../../catalog/access/standardAuthentication",
     "dv-community-follow": "file:../../catalog/community/follow",
     "dv-messaging-post": "file:../../catalog/messaging/post",
     "dv-messaging-comment": "file:../../catalog/messaging/comment",

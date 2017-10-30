@@ -7,7 +7,8 @@ Clichés for mediating access to resources
 
 | Cliché | Purpose |
 | ------ | ------- |
-| Auth | Control access to resources |
+| StandardAuthentication | Verifies the user's identity with a username/ email and password |
+| Authorization | Controls a user's access to resources |
 
 Community
 ---------

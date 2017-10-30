@@ -16,7 +16,8 @@ Team Winner Winner Chicken Dinner
 [Original App](http://rendezvous-6170.herokuapp.com/)
 
 ## Cliches Used
-- Auth
+- StandardAuthentication
+- Authentication
 - Geolocation 
 - Post
 - Event

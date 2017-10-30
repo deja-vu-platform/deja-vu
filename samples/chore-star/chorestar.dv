@@ -1,7 +1,9 @@
 // Make it easy for parents to assign chores to children
 app ChoreStar {
-  include access/Auth[Parent for User] as ParentAuth
-  include access/Auth[Child for User] as ChildAuth
+  include access/StandardAuthentication[Parent for User] as ParentAuthentication
+  include access/StandardAuthentication[Child for User] as ChildAuthentication
+  include access/Authorization[Parent for User] as ParentAuthorization
+  include access/Authorization[Child for User] as ChildAuthorization
   include organization/Task[
     Chore for Task, Parent for Assigner, Child for Assignee,
     ApproveAndRateChore replacing ApproveTask in ShowPendingApprovalTasks]

@@ -103,6 +103,21 @@ const schema = grafo
       }
   })
  .add_mutation({
+    name: "claimTask",
+    "type": graphql.GraphQLBoolean,
+    args: {
+      task_id: {"type": graphql.GraphQLString},
+      assignee_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (_, {task_id, assignee_id}) => {
+      const update_op = {$set: {"assignee.atom_id": assignee_id}};
+      return mean.db.collection("tasks")
+        .updateOne({atom_id: task_id}, update_op)
+        .then(_ => bus.update_atom("Task", task_id, update_op))
+        .then(_ => true);
+      }
+  })
+ .add_mutation({
     name: "approveTask",
     "type": graphql.GraphQLBoolean,
     args: {
@@ -162,6 +177,19 @@ const schema = grafo
       return mean.db.collection("tasks").find({ $and: 
         [{"assigner.atom_id": assigner_id}, 
         {completed: false}] }).toArray();
+    }
+  })
+  .add_query({
+    name: "claimableTasks",
+    type: "[Task]",
+    args: {
+      assigner_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {assigner_id}) => {
+      return mean.db.collection("tasks").find({ 
+        "assigner.atom_id": {$ne: assigner_id},
+        $and: [{"assignee.atom_id": null}, {completed: false}] 
+      }).toArray();
     }
   })
   .add_query({

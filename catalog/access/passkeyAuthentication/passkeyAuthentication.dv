@@ -1,0 +1,40 @@
+// Verifies a principal's identity with a passkey (e.g. access code).
+// Best paired with the Label cliche to add descriptions, such as name.
+
+cliche PasskeyAuthentication {
+    /** Entities **/
+    data Passkey {
+        code: text
+    }
+
+    /** Widgets**/
+    // A principal creates a passkey by defining the code him/herself.
+    widget CreateCustomPasskey {
+        passkey: Passkey
+    }
+
+    // A principal creates a passkey with a randomly chosen 5-7 letter english word.
+    widget CreateRandomPasskey {
+        passkey: Passkey
+    }
+
+    // Displays a sign in form, only with a passkey field.
+    // If `on_validate_ok` is defined, redirect user to the given widget.
+    // Otherwise, remain in the current widget.
+    widget ValidatePasskeyWithRedirect {
+        on_validate_ok: Widget
+    }
+
+    // Displays a sign out button. 
+    // If `on_signout_ok` is defined, redirect user to the given widget.
+    // Otherwise, remain in the current widget.
+    widget SignOutwithRedirect {
+        on_signout_ok: Widget
+    }
+
+    // A user's session persists until logging out.
+    // There is no template for this.
+    widget LoggedIn {
+        passkey: Passkey
+    }
+}

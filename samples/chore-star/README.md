@@ -15,7 +15,8 @@ Team Star
 [Original App](https://chorestar.herokuapp.com)
 
 ## Cliches Used
-- Auth
+- StandardAuthentication
+- Authorization
 - Group
 - List
 - Rating

@@ -22,7 +22,10 @@ app Bookmark {
     Topic for Publisher,
     Post for Message
   ] as FollowTopics
-  include access/Auth[
+  include access/StandardAuthentication[
+    User for User
+  ]
+  include access/Authorization[
     User for User,
     Post for Resource
   ]

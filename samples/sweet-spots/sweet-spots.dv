@@ -1,6 +1,9 @@
 // Mark spots on a map and review spots added by others
 app SweetSpots {
-  include access/Auth[
+  include access/StandardAuthentication[
+    User for User
+  ]
+  include access/Authorization[
     User for User
   ]
   include community/Geolocation[

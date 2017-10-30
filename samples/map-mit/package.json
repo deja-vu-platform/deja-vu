@@ -7,7 +7,8 @@
   "license": "MIT",
   "dependencies": {
     "dv-lang": "file:../../core/lang",
-    "dv-access-auth": "file:../../catalog/access/auth",
+    "dv-access-authorization":"file:../../catalog/access/authorization",
+    "dv-access-standardauthentication": "file:../../catalog/access/standardAuthentication",
     "dv-community-geolocation": "file:../../catalog/community/geolocation",
     "dv-organization-event": "file:../../catalog/organization/event",
     "dv-organization-group": "file:../../catalog/organization/group"
