@@ -1,31 +1,25 @@
 import { generateId } from '../../utility/utility';
 import { Widget } from '../widget/widget';
+import { Meta } from '../project/project';
 
 export enum ClicheType {
   USER_CLICHE, DV_CLICHE
 }
 
-interface Meta {
-  name: string;
-  id: string; // id of the form 'clicheid'
-  version?: string;
-  author?: string;
-}
-
 export abstract class Cliche {
+  protected objectType = 'Cliche';
   protected meta: Meta;
   protected widgets: Map<string, Set<string>>;
   protected clicheType: ClicheType;
 
-    /**
+  /**
    * Converts a JSON object to a Widget object
    * @param object object to convert
    */
   static fromObject(object: any): UserCliche | DvCliche {
-    const notCorrectObjectError = 'notCorrectObjectError: ' +
-    'object object is not an instance of a Cliche';
+    const notCorrectObject = 'Object is not an instance of a Cliche';
     if (object.clicheType === undefined || object.clicheType === null) {
-        throw notCorrectObjectError;
+        throw Error(notCorrectObject);
     }
     if (object.clicheType === ClicheType.USER_CLICHE) {
         return UserCliche.fromObject(object);

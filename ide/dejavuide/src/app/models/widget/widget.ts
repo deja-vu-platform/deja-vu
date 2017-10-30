@@ -1,5 +1,7 @@
 import { generateId, Dimensions, Position } from '../../utility/utility';
 
+import { Meta } from '../project/project';
+
 export enum WidgetType {
     BASE_WIDGET, USER_WIDGET, CLICHE_WIDGET
 }
@@ -12,15 +14,8 @@ export interface Properties {
     };
 }
 
-interface Meta {
-    name: string;
-    id: string; // id of the form 'clicheid_widgetid'
-    templateid?: string;
-    version?: string;
-    author?: string;
-}
-
 export abstract class Widget {
+    protected objectType = 'Widget';
     protected widgetType: WidgetType;
     protected properties: Properties = {
         dimensions: null,
@@ -33,7 +28,7 @@ export abstract class Widget {
         top: 0,
         left: 0
     };
-    protected meta: Meta;
+    protected meta: Meta; // id of the form 'clicheid_widgetid'
     protected isTemplate = false;
     // If this is a template, keep a reference to all is copies.
     // If the template is changed, propagate the changes to the template copies.
@@ -71,10 +66,9 @@ export abstract class Widget {
      * @param object object to convert
      */
     static fromObject(object: any): BaseWidget | UserWidget {
-        const notCorrectObjectError = 'notCorrectObjectError: ' +
-        'object object is not an instance of a Widget';
+        const notCorrectObject = 'Object is not an instance of a Widget';
         if (object.widgetType === undefined || object.widgetType === null) {
-            throw notCorrectObjectError;
+            throw Error(notCorrectObject);
         }
         if (object.widgetType === WidgetType.BASE_WIDGET) {
             return BaseWidget.fromObject(object);
