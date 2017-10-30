@@ -34,15 +34,13 @@ export class ShowCompoundTransactionComponent {
             atom_id,
             good { name },
             price,
-            quantity
-          },
-          status
+            quantity,
+            status
+          }
         }
       `)
       .map(data => data.compoundtransaction_by_id)
       .subscribe(compound_transaction => {
-        this.compoundTransaction.status = compound_transaction.status;
-
         compound_transaction.transactions
           .flatMap((transactions, unused_ix) => Observable.from(transactions))
           .map((transaction: TransactionAtom) => {
@@ -61,6 +59,7 @@ export class ShowCompoundTransactionComponent {
             transaction_atom.seller = seller_atom;
             transaction_atom.price = transaction.price;
             transaction_atom.quantity = transaction.quantity;
+            transaction_atom.status = transaction.status;
             return transaction_atom;
           })
           .subscribe(transaction => {

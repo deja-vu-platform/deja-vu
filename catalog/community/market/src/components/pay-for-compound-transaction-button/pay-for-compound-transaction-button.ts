@@ -12,9 +12,7 @@ export class PayForCompoundTransactionButtonComponent {
   constructor(private _graphQlService: GraphQlService) {}
 
   pay() {
-    const paidStatus = "paid";
-    if (!this.compoundTransaction.atom_id
-      || this.compoundTransaction.status === paidStatus) return;
+    if (!this.compoundTransaction.atom_id) return;
 
     this._graphQlService
       .post(`
@@ -23,7 +21,9 @@ export class PayForCompoundTransactionButtonComponent {
         )
       `)
       .subscribe(_ => {
-        this.compoundTransaction.status = paidStatus;
+        this.compoundTransaction.transactions.forEach(transaction => {
+          transaction.status = "paid";
+        });
       });
   }
 }

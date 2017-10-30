@@ -10,9 +10,13 @@ export class AddTransactionButtonComponent {
   @Field("CompoundTransaction") compoundTransaction: CompoundTransactionAtom;
   @Field("Transaction") transaction: TransactionAtom;
 
+  error = false;
+
   constructor(private _graphQlService: GraphQlService) {}
 
   addTransaction() {
+    // clear past errors
+    this.error = false;
     if (!this.valid()) return;
 
     // set default value for quantity if none
@@ -28,13 +32,17 @@ export class AddTransactionButtonComponent {
             good_id: "${this.transaction.good.atom_id}",
             buyer_id: "${this.transaction.buyer.atom_id}",
             quantity: "${this.transaction.quantity}",
-            price: "${this.transaction.price}"
+            price: "${this.transaction.price}",
+            status: "${this.transaction.status}"
           )
         }
       `)
-      .subscribe(transaction => {
-        this.transaction.atom_id = transaction.atom_id;
-      });
+      .subscribe(
+        transaction => this.transaction.atom_id = transaction.atom_id,
+        // error likely caused if transaction does not have the same status 
+        // as the ones in the compound transaction
+        err => this.error = true
+      );
   }
 
   valid() {

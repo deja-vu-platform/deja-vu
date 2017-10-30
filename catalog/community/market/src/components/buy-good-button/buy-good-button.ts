@@ -31,7 +31,7 @@ export class BuyGoodButtonComponent {
           good_id: "${this.good.atom_id}",
           buyer_id: "${this.buyer.atom_id}",
           quantity: ${this.quantity.value},
-          fraction: ${this.fraction.value}
+          fraction: ${this.fraction.value},
         )
       `)
       .subscribe(_ => {

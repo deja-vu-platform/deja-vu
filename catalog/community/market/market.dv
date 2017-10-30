@@ -20,25 +20,25 @@ cliche Market {
 
   // A record of a purchase/sale in the marketplace
   // [buyer] bought [quantity] [good]s from [seller] for $[price] each
+  // Its status can be:
+  //    unpaid   - where each good is reserved for the buyer
+  //    paid     - where each good has been paid for
+  //    canceled - where each good is neither reserved nor paid for
   data Transaction {
     good: Good,
     buyer: Party,
     seller: Party,
     price: number,
     quantity: number,
-    market: Market
-  }
-
-  // A record of multiple goods bought/to be bought
-  // in a single purchase/sale
-  // Its status can be:
-  //    unpaid   - where each good is reserved for the buyer
-  //    paid     - where each good has been paid for
-  //    canceled - where each good is neither reserved nor paid for
-  data CompoundTransaction {
-    transactions: [Transaction],
+    market: Market,
     status: text // either unpaid, paid, or canceled
     // TODO: change this to enum once it's supported
+  }
+
+  // A record of multiple goods bought/to be bought in a single purchase/sale
+  // Each Transaction in [transactions] must have the same [buyer] and [status]
+  data CompoundTransaction {
+    transactions: [Transaction]
   }
 
   data Market {}
