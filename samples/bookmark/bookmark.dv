@@ -26,7 +26,7 @@ app Bookmark {
     User for User
   ]
   include access/Authorization[
-    User for User,
+    User for Principal,
     Post for Resource
   ]
   include organization/Label[

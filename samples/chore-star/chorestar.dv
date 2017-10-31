@@ -2,8 +2,8 @@
 app ChoreStar {
   include access/StandardAuthentication[Parent for User] as ParentAuthentication
   include access/StandardAuthentication[Child for User] as ChildAuthentication
-  include access/Authorization[Parent for User] as ParentAuthorization
-  include access/Authorization[Child for User] as ChildAuthorization
+  include access/Authorization[Parent for Principal] as ParentAuthorization
+  include access/Authorization[Child for Principal] as ChildAuthorization
   include organization/Task[
     Chore for Task, Parent for Assigner, Child for Assignee,
     ApproveAndRateChore replacing ApproveTask in ShowPendingApprovalTasks]
