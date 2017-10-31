@@ -4,8 +4,16 @@ app LiveScorecard {
     /** Neccessary Cliches **/
     // Grants access to content based on permissions.
     include access/Authorization [
-        User for User
-    ]
+        Host for Principal
+    ] as HostAuthorization
+
+    include access/Authorization [
+        Climber for Principal
+    ] as ClimberAuthorization
+
+    include access/Authorization [
+        Spectator for Principal
+    ] as SpectatorAuthorization
 
     // Only a host can create an account and login the traditional way,
     // i.e. using a username and password. 
@@ -15,14 +23,22 @@ app LiveScorecard {
 
     // A climber can access his/her account using a climber code and
     // competition code.
-    include access/PasskeyAuthetication [
-        Climber for User
+    include access/PasskeyAuthentication [
+        Climber for Passkey
     ] as ClimberAuthentication
 
     // A spectator can view the live leaderboard using a competition code.
-    include access/PasskeyAuthetication [
-        Spectator for User
+    // TODO: Since a competition has only one code, should we consider 
+    // Competition to be the passkey?
+    include access/PasskeyAuthentication [
+        Spectator for Passkey
     ] as SpectatorAuthentication
+
+    // A host can add a descriptor, e.g. name, to identify a Climber.
+    include organization/Label [
+        Climber for Item,
+        Climber for Label
+    ]
 
     // Competitions are created by a host. Climbers participate in them and
     // spectators view its results.
@@ -52,10 +68,6 @@ app LiveScorecard {
     ] as CompetitionHosts
 
     /** Entities **/
-    data User {
-        username: text
-    }
-
     data Host {
         name: text,
         username: text
@@ -64,13 +76,13 @@ app LiveScorecard {
     // Climbers can be filtered by sex and experience level.
     data Climber {
         name: text,
-        username: text,
+        code: text,
         sex: text,
         level: text
     }
 
     data Spectator {
-        username: text
+        code: text
     }
 
     data Competition { 
@@ -136,9 +148,10 @@ app LiveScorecard {
     }
 
     // A host can add other individuals to co-host the competition.
-    // The email must be associated with a host account.
+    // The username must be associated with a host account.
+    // TODO: Use AddMemberToGroup widget instead
     widget AddHost { 
-        email: text
+        username: text
     }
     
     // A climber can only complete a climb after receiving approval by
@@ -156,7 +169,6 @@ app LiveScorecard {
         climber: Climber
     }
 
-    // Can also be used for the leaderboard
     widget ShowHosts {
         competition: Competition,
         host: Host
@@ -167,5 +179,5 @@ app LiveScorecard {
     climber_home_route: route = {path: "climber-home", widget: ClimberHome}
     buddy_home_route: route = {path: "buddy-home", widget: BuddyHome}
     spectator_home_route: route = {path: "spectator-home", widget: SpectatorHome}
-    leaderboard: route = {path: "leaderboard", widget: Leaderboard}
+    leaderboard: route = {path: "leaderboard", widget: ShowClimbers}
 }
