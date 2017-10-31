@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 
 import { Widget } from '../../../models/widget/widget';
+import { Cliche } from '../../../models/cliche/cliche';
 import { Dimensions, Position } from '../../../utility/utility';
 
 import * as jQuery from 'jquery';
@@ -15,7 +16,7 @@ const $ = <any>jQuery;
 })
 export class WorkSurfaceComponent implements AfterViewInit {
   @Input() currentZoom: number;
-  @Input() allWidgets:  Map<string, Map<string, Widget>>;
+  @Input() allCliches: Map<string, Cliche>;
   @Input() set widget(val: Widget) {
     // set up things
     this._widget = val;

@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } fro
 
 import {allElementsFromPoint} from '../../../utility/utility';
 import { Widget, WidgetType } from '../../../models/widget/widget';
+import { Cliche } from '../../../models/cliche/cliche';
 
 // Widgets are drag-and-droppable
 import * as jQuery from 'jquery';
@@ -15,7 +16,7 @@ const $ = <any>jQuery;
   styleUrls: ['./widget.component.css'],
 })
 export class WidgetComponent implements AfterViewInit {
-  @Input() allWidgets:  Map<string, Map<string, Widget>>;
+  @Input() allCliches:  Map<string, Cliche>;
   @Input() widget: Widget;
   @Input() isSelected = false;
   @Input() isMovable = false;

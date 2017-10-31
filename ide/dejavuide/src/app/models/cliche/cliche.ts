@@ -31,6 +31,8 @@ export abstract class Cliche {
     }
     return DvCliche.fromObject(object);
   }
+
+  abstract getWidget(widgetId: string): Widget;
 }
 
 export class UserCliche extends Cliche {
@@ -152,40 +154,29 @@ export class UserCliche extends Cliche {
   }
 
   getWidget(widgetId: string): Widget {
-    if (widgetId in this.widgets.get(WidgetGroup.PAGE)) {
+    if (this.getPage(widgetId)) {
       return this.getPage(widgetId);
     }
 
-    if (widgetId in this.widgets.get(WidgetGroup.USED)) {
+    if (this.getUsedWidget(widgetId)) {
       return this.getUsedWidget(widgetId);
     }
 
-    if (widgetId in this.widgets.get(WidgetGroup.UNUSED)) {
+    if (this.getUnusedWidget(widgetId)) {
       return this.getUnusedWidget(widgetId);
     }
 
-    if (widgetId in this.widgets.get(WidgetGroup.TEMPLATE)) {
+    if (this.getTemplate(widgetId)) {
       return this.getTemplate(widgetId);
     }
     return undefined;
   }
 
   removeWidget(widgetId: string) {
-    if (widgetId in this.widgets.get(WidgetGroup.PAGE)) {
       this.removePage(widgetId);
-    }
-
-    if (widgetId in this.widgets.get(WidgetGroup.USED)) {
-      return this.removeUsedWidget(widgetId);
-    }
-
-    if (widgetId in this.widgets.get(WidgetGroup.UNUSED)) {
-      return this.removeUnusedWidget(widgetId);
-    }
-
-    if (widgetId in this.widgets.get(WidgetGroup.TEMPLATE)) {
-      return this.removeTemplate(widgetId);
-    }
+      this.removeUsedWidget(widgetId);
+      this.removeUnusedWidget(widgetId);
+      this.removeTemplate(widgetId);
   }
 }
 
@@ -196,5 +187,9 @@ export class DvCliche extends Cliche {
     this.clicheType = ClicheType.DV_CLICHE;
     this.widgets = new Map<WidgetGroup, Map<string, Widget>>();
     this.widgets.set(WidgetGroup.TEMPLATE, new Map<string, Widget>());
+  }
+
+  getWidget(widgetId: string): Widget {
+    return this.widgets.get(WidgetGroup.TEMPLATE).get(widgetId);
   }
 }

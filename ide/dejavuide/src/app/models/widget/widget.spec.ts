@@ -2,12 +2,12 @@ import { WidgetType, Widget, BaseWidget, UserWidget } from './widget';
 import { Cliche, UserCliche} from '../cliche/cliche';
 
 describe('UserWidget', () => {
-  const cliche1 = new UserCliche('name1');
-  const cliche1id = cliche1.getId();
-  
-  const cliche2 = new UserCliche('name2');
-  const cliche2id = cliche2.getId();
-  
+  let cliche1: UserCliche;
+  let cliche1id: string;
+
+  let cliche2: UserCliche;
+  let cliche2id: string;
+
   let allCliches: Map<string, Cliche>;
   let widget1: BaseWidget;
   let widget2: UserWidget;
@@ -17,7 +17,16 @@ describe('UserWidget', () => {
   let widget6: UserWidget;
 
   beforeEach(() => {
+    cliche1 = new UserCliche('name1');
+    cliche1id = cliche1.getId();
+
+    cliche2 = new UserCliche('name2');
+    cliche2id = cliche2.getId();
+
+
     allCliches = new Map<string, Cliche>();
+    allCliches.set(cliche1id, cliche1);
+    allCliches.set(cliche2id, cliche2);
     widget1 = new BaseWidget('widget1', {width: 1, height: 1}, 'img', '/', cliche1id);
     widget2 = new UserWidget('widget2', {width: 1, height: 1}, cliche1id);
     widget3 = new UserWidget('widget3', {width: 1, height: 1}, cliche1id);
@@ -35,7 +44,7 @@ describe('UserWidget', () => {
     Widget.addWidgetToCliche(allCliches, widget6);
   });
 
-  describe('delete', () => {
+  describe('remove', () => {
     it('removes itself from all widgets', () => {
       widget1.remove(allCliches);
       expect(Widget.getWidget(allCliches, widget1.getId())).toBe(undefined);

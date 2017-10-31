@@ -1,6 +1,8 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
 
 import {Widget, UserWidget, WidgetType} from '../../../models/widget/widget';
+import { Cliche } from '../../../models/cliche/cliche';
+
 import {Dimensions, Position} from '../../../utility/utility';
 
 // Maps needs drag-and-drop
@@ -33,7 +35,7 @@ export class MapComponent implements AfterViewInit {
 
     this.mapScale = Math.min(widthScale, heightScale);
   }
-  @Input() allWidgets: Map<string, Map<string, Widget>>;
+  @Input() allCliches: Map<string, Cliche>;
   @Input() zoom = 1;
 
   @Input() set selectedWidget(value: Widget) {
@@ -119,7 +121,7 @@ export class MapComponent implements AfterViewInit {
    */
   updateView() {
     const mapScale = this.mapScale;
-    const allWidgets = this.allWidgets;
+    const allCliches = this.allCliches;
     const selectedWidget = this._selectedWidget;
     const mapWidgetSizes = [];
     if (selectedWidget) {
@@ -127,7 +129,7 @@ export class MapComponent implements AfterViewInit {
         const widget = <UserWidget> selectedWidget;
         widget.getInnerWidgetIds().forEach(function (innerWidgetId) {
           const innerWidget = widget
-                                .getInnerWidget(allWidgets, innerWidgetId);
+                                .getInnerWidget(allCliches, innerWidgetId);
           const innerWidgetDimensions = innerWidget.getDimensions();
           const innerWidgetPosition = innerWidget.getPosition();
           mapWidgetSizes.push({

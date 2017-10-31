@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
                                   { height: 600, width: 800 },
                                   this.appId
                                 );
-  allWidgets = new Map<string, Map<string, Widget>>();
+  allCliches = new Map<string, Cliche>();
 
   /**
    * Handles when any of the widgets in the app changes (i.e., resize
@@ -53,22 +53,22 @@ export class AppComponent implements OnInit {
     // Currently for testing
     // We create a main widget, give it some nester (inner) widgets
     // and give them some interesting sizes and positions.
-    this.userApp.addPage(this.selectedWidget.getId());
+    this.userApp.addPage(this.selectedWidget);
 
     this.selectedWidget.updatePosition({ top: 100, left: 300 });
-    Widget.addWidgetToCliche(this.allWidgets, this.selectedWidget);
+    Widget.addWidgetToCliche(this.allCliches, this.selectedWidget);
     const innerWidget1 = new BaseWidget('test inner1', { height: 100, width: 200 }, 'img', '/', this.appId);
-    innerWidget1.addWidgetToCliche(this.allWidgets);
+    innerWidget1.addWidgetToCliche(this.allCliches);
     this.selectedWidget.addInnerWidget(innerWidget1.getId());
     innerWidget1.updatePosition({ top: 50, left: 100 });
 
     const innerWidget2 = new UserWidget('test inner2', { height: 200, width: 400 }, this.appId);
-    innerWidget2.addWidgetToCliche(this.allWidgets);
+    innerWidget2.addWidgetToCliche(this.allCliches);
     this.selectedWidget.addInnerWidget(innerWidget2.getId());
     innerWidget2.updatePosition({ top: 200, left: 200 });
 
     const innerWidget21 = new UserWidget('test inner21', { height: 100, width: 100 }, this.appId);
-    innerWidget21.addWidgetToCliche(this.allWidgets);
+    innerWidget21.addWidgetToCliche(this.allCliches);
     innerWidget2.addInnerWidget(innerWidget21.getId());
     innerWidget21.updatePosition({ top: 50, left: 100 });
   }

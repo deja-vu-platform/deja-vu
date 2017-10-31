@@ -3,7 +3,7 @@
 <div class="outer-container">
   <dv-worksurface 
     [widget]="selectedWidget"
-    [allWidgets]="allWidgets"
+    [allCliches]="allCliches"
     [dimensions]="screenDimensions"
     (onChange)="handleWidgetChange()">
   </dv-worksurface>
@@ -21,10 +21,10 @@
   [outerContainerScroll]="outerContainerScroll"
   [screenDimensions]="screenDimensions"
   [selectedWidget]="selectedWidget"
-  [allWidgets]="allWidgets"
+  [allCliches]="allCliches"
   (newScrollPosition)="handleMapScroll($event)">
 </dv-map>
 
-<dv-list [allWidgets]="allWidgets"
+<dv-list [allCliches]="allCliches"
           [userApp]="userApp">
 </dv-list>

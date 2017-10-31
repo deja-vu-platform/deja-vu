@@ -42,10 +42,10 @@ export abstract class Widget {
     static addWidgetToCliche(
         allCliches: Map<string, Cliche>,
         widget: Widget) {
-        if (!allCliches[widget.getClicheId()]) {
+        if (!allCliches.get(widget.getClicheId())) {
             throw Error('Cliche not found');
         }
-        (<UserCliche>allCliches.get(widget.getClicheId())).addUnusedWidget(widget);
+        ((allCliches.get(widget.getClicheId())) as UserCliche).addUnusedWidget(widget);
     }
 
     /**
@@ -58,7 +58,7 @@ export abstract class Widget {
         widgetId: string
     ): Widget {
         const clicheid = Widget.decodeid(widgetId)[0];
-        return allCliches[clicheid].getWidget(widgetId);
+        return allCliches.get(clicheid).getWidget(widgetId);
     }
 
     /**
@@ -204,7 +204,7 @@ export abstract class Widget {
         if (this.getTemplateId()) {
             Widget.getWidget(allCliches, this.getTemplateId()).templateCopies.delete(this.getId());
         }
-        (<UserCliche>allCliches.get(this.getClicheId())).removeWidget(this.getId());
+        (allCliches.get(this.getClicheId()) as UserCliche).removeWidget(this.getId());
     }
 
     /**
@@ -348,6 +348,7 @@ export class UserWidget extends Widget {
         this.meta = {
             name: name,
             id: id ? id : clicheid + '_' + generateId(),
+            clicheId: clicheid,
             templateId: templateid,
             version: '',
             author: ''
