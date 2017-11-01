@@ -32,7 +32,7 @@ cliche Market {
     quantity: number,
     market: Market,
     status: text // either unpaid, paid, or canceled
-    // TODO: change this to enum once it's supported
+    // TODO: change this to enum once is supported
   }
 
   // A record of multiple goods bought/to be bought in a single purchase/sale
