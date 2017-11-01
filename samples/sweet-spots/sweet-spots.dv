@@ -4,7 +4,7 @@ app SweetSpots {
     User for User
   ]
   include access/Authorization[
-    User for User
+    User for Principal
   ]
   include community/Geolocation[
     Spot for Marker,
