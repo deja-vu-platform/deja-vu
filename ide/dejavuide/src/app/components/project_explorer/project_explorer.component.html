@@ -18,27 +18,27 @@
     <div class="content">
       <ul id="projects-list">
         <ng-container *ngFor="let project of projectsToShow">
-        <li [ngClass]="{'highlighted': project.isSelectedProject}">
-          <div class="project-filename">
-            <div class="project-name">{{project.name}}</div>
-            <div class="last-access-time">
-              Last Accessed: {{project.readableDate}}
-                at {{project.readableTime}}
+          <li [ngClass]="{'highlighted': project.isSelectedProject}">
+            <div class="project-filename">
+              <div class="project-name">{{project.name}}</div>
+              <div class="last-access-time">
+                Last Accessed: {{project.readableDate}}
+                  at {{project.readableTime}}
+              </div>
             </div>
-          </div>
-          <button type="button" 
-                  class="btn btn-default btn-load-project"
-                  (click)="loadClicked(project.name)">
-            <span>Load Project</span>
-          </button>
-          <button type="button" 
-                  class="btn btn-default btn-delete-project"
-                  (click)="deleteClicked(project.name)">
-            <span>Delete User Component </span>
-            <span class="glyphicon glyphicon-trash"></span>
-          </button>
-        </li>
-        <ng-container>            
+            <button type="button" 
+                    class="btn btn-default btn-load-project"
+                    (click)="loadClicked(project.name)">
+              <span>Load Project</span>
+            </button>
+            <button type="button" 
+                    class="btn btn-default btn-delete-project"
+                    (click)="deleteClicked(project.name)">
+              <span>Delete User Component </span>
+              <span class="glyphicon glyphicon-trash"></span>
+            </button>
+          </li>
+        </ng-container>            
       </ul>
     </div>
   </div>

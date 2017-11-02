@@ -53,6 +53,7 @@ export class AppComponent implements OnInit {
     // Currently for testing
     // We create a main widget, give it some nester (inner) widgets
     // and give them some interesting sizes and positions.
+    this.allCliches.set(this.userApp.getId(), this.userApp);
     this.userApp.addPage(this.selectedWidget);
 
     this.selectedWidget.updatePosition({ top: 100, left: 300 });

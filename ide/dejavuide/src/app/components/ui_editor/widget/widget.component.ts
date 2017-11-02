@@ -1,6 +1,5 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 
-import {allElementsFromPoint} from '../../../utility/utility';
 import { Widget, WidgetType } from '../../../models/widget/widget';
 import { Cliche } from '../../../models/cliche/cliche';
 
