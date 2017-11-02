@@ -2,7 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 import { Component, Input, OnInit } from '@angular/core';
+import {MatDialog} from '@angular/material';
 
+import {ProjectDeleteDialogComponent} from './project_delete_dialog.component';
 import {projectsSavePath, projectNameToFilename, filenameToProjectName, isCopyOfFile} from '../../utility/utility';
 
 interface DisplayProject {
@@ -21,9 +23,7 @@ export class ProjectExplorerComponent implements OnInit {
   @Input() currentProject;
 
   private selectedProject;
-  availableProjectsByFilename = {};
-  availableProjectsByAccessTime = {};
-  recentProjectsByAccessTime = {};
+  projectsByName = {};
 
   loaderVisible = true;
   recentSelected = true;
@@ -32,35 +32,24 @@ export class ProjectExplorerComponent implements OnInit {
 
   componentToShow;
 
+  constructor(public dialog: MatDialog) {}
+
   ngOnInit() {
+    const that = this;
     this.readFiles(projectsSavePath, function(filename, content) {
       // TODO add a loading projects sign
       // Check the types to only add projects
       content = JSON.parse(content);
       if (content.objectType && (content.objectType === 'UserProject')) {
-        this.availableProjectsByFilename[filename] = content;
-
-        // TODO for now, recent is one week
-        const lastAccessed = content.lastAccessed;
-        const now = (new Date()).getTime();
-        this.availableProjectsByAccessTime[lastAccessed] = {
-          content: content,
-          filename: filename
-        };
-
-        if ((now - lastAccessed) < 604800000) { // two weeks is 1209600000
-          this.recentProjectsByAccessTime[lastAccessed] = {
-            content: content,
-            filename: filename
-          };
-        }
+        const projectName = filenameToProjectName(filename);
+        that.projectsByName[projectName] = content;
       }
     }, function(err) {
         if (err) {
           throw err;
         }
-        displayRecentProjects();
-        this.loaderVisible = false;
+        that.updateDisplayProjectList();
+        that.loaderVisible = false;
     });
   }
 
@@ -68,29 +57,69 @@ export class ProjectExplorerComponent implements OnInit {
     // TODO
   }
 
-  recentClicked() {
-    this.recentSelected = true;
-    //  displayRecentProjects();
-  }
-
-  allClicked() {
+  loadProjectList() {
     this.recentSelected = false;
-    //  displayAllProjects();
+    this.updateDisplayProjectList();
   }
 
   loadClicked(projectName) {
     // TODO
   }
 
-  deleteClicked(projectName) {
-    // TODO
-    this.openDeleteProjectConfirmDialogue(dirname, filename, id);
+  handleDelete(projectName): void {
+    const dialogRef = this.dialog.open(ProjectDeleteDialogComponent, {
+      width: '250px',
+    });
+
+    const that = this;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        that.loaderVisible = true;
+        that.deleteProject(projectName, () => {
+          delete that.projectsByName[projectName];
+          that.updateDisplayProjectList();
+          // TODO deal with if the project is your selected project
+        });
+      }
+    });
   }
 
-  private fileToDisplayProject(filename, id, lastAccessed): DisplayProject {
+  private deleteProject(projectName, onFinish) {
+    const filename = projectNameToFilename(projectName);
+    const pathName = path.join(projectsSavePath, filename);
+    fs.stat(pathName, function (err1, stats) {
+        if (err1) {
+          console.error(err1);
+          return;
+        }
+        fs.unlink(pathName, (err2) => {
+            if (err2) {
+              console.log(err2);
+              return;
+            }
+            onFinish();
+        });
+    });
+  }
+
+  private updateDisplayProjectList() {
+    this.projectsToShow = [];
+    const WEEK_IN_SEC = 604800000;
+    const now = (new Date()).getTime();
+    const that = this;
+    Object.keys(this.projectsByName).forEach((projectName: string) => {
+      const content = this.projectsByName[projectName];
+      const time = parseInt(content.accessTime, 10);
+      if (!that.recentSelected || (now - time) < WEEK_IN_SEC) {
+        that.projectsToShow.push(that.fileToDisplayProject(projectName, content.meta.id, time));
+      }
+    });
+  }
+
+  private fileToDisplayProject(projectName, id, lastAccessed): DisplayProject {
     const lastAccessDate = new Date(lastAccessed);
     return {
-      name: filenameToProjectName(filename),
+      name: projectName,
       isSelectedProject:
         (this.currentProject ? (id === this.currentProject.getId()) : false),
       readableDate: lastAccessDate.toLocaleDateString(),
@@ -128,43 +157,32 @@ export class ProjectExplorerComponent implements OnInit {
   }
 }
 
-// TODO on project name input *check* for special chars
-// TODO something about rewriting existing files?
-// TODO on project name input *check* for name being reused
 
-$('#create-project').on('click', function () {
-    selectedProject = initNewProject();
-    resetMenuOptions();
-    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
+// /**
+//  * Creates a new Project based on user inputs
+//  * @param isDefault
+//  * @constructor
+//  */
+// function initNewProject() {
+//     var projectName = sanitizeStringOfSpecialChars($('#new-project-name').val());
+//     var version = $('#project-version').val();
+//     var author = $('#project-author').val();
 
-    window.location = 'index.html';
-});
-
-/**
- * Creates a new Project based on user inputs
- * @param isDefault
- * @constructor
- */
-function initNewProject() {
-    var projectName = sanitizeStringOfSpecialChars($('#new-project-name').val());
-    var version = $('#project-version').val();
-    var author = $('#project-author').val();
-
-    // create a copy instead
-    var copyName = projectName;
-    var copyNum = 0;
-    // TODO should give user warning or options
-    while(isCopyOfFile(projectsSavePath, copyName+'.json')){
-        if (copyNum == 0){
-            copyName = projectName + ' - Copy';
-        } else {
-            copyName = projectName + ' - Copy ' + copyNum;
-        }
-        copyNum++;
-    }
-    var newProject = new UserProject(copyName);
-    return newProject;
-}
+//     // create a copy instead
+//     var copyName = projectName;
+//     var copyNum = 0;
+//     // TODO should give user warning or options
+//     while(isCopyOfFile(projectsSavePath, copyName+'.json')){
+//         if (copyNum == 0){
+//             copyName = projectName + ' - Copy';
+//         } else {
+//             copyName = projectName + ' - Copy ' + copyNum;
+//         }
+//         copyNum++;
+//     }
+//     var newProject = new UserProject(copyName);
+//     return newProject;
+// }
 
 /**
  * Resets the menu options to their default values
@@ -177,93 +195,28 @@ function resetMenuOptions() {
     $('#project-json').val('');
 }
 
+// function deleteFileAndDisplay(dirname, filename, id){
+//     deleteFile(dirname, filename);
+//     $(".recent-projects").find("[data-filename='" + filename + "']").parent().remove();
 
-function deleteFile(dirname, filename){
-    var pathName = path.join(dirname, filename);
-    fs.stat(pathName, function (err, stats) {
-        if (err) {
-            return console.error(err);
-        }
-        fs.unlink(pathName,function(err){
-            if(err) return console.log(err);
-        });
-    });
-}
+//     // todo refresh lists
 
+//     if (currentProject){
+//         if (currentProject.meta.id === id){
+//             currentProject = null;
+//             window.sessionStorage.removeItem('selectedProject');
+//             $('.current-project .content').html('')
+//             $('.current-project').css('display', 'none');
+//             $('#page-preview').html('');
+//             $('#project-name-preview').text('Project Preview')
+//         }
+//     }
+// }
 
-function deleteFileAndDisplay(dirname, filename, id){
-    deleteFile(dirname, filename);
-    $(".recent-projects").find("[data-filename='" + filename + "']").parent().remove();
+// $('#create-project').on('click', function () {
+//     selectedProject = initNewProject();
+//     resetMenuOptions();
+//     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
 
-    // todo refresh lists
-
-    if (currentProject){
-        if (currentProject.meta.id === id){
-            currentProject = null;
-            window.sessionStorage.removeItem('selectedProject');
-            $('.current-project .content').html('')
-            $('.current-project').css('display', 'none');
-            $('#page-preview').html('');
-            $('#project-name-preview').text('Project Preview')
-        }
-    }
-}
-
-function openDeleteProjectConfirmDialogue(dirname, filename, id){
-    $('#confirm-delete-project').modal('show');
-
-    var projectName = utils.filenameToProjectName(filename);
-    $('#delete-project-name').text(projectName);
-
-    $('#delete-project-btn').unbind();
-    $('#delete-project-btn').click(function(){
-        deleteFileAndDisplay(dirname, filename, id);
-
-        $('#delete-project-name').text('');
-        $('#confirm-delete-project').modal('hide');
-
-    });
-
-    $('#delete-project-cancel-btn').click(function(){
-        $('#delete-project-name').text('');
-        $('#confirm-delete-project').modal('hide');
-
-    });
-
-    $('#confirm-delete-project .close').click(function(event){
-        event.preventDefault();
-
-        $('#delete-project-name').text('');
-        $('#confirm-delete-project').modal('hide');
-    });
-
-}
-
-function displayRecentProjects(){
-    $('#recent-projects-list').html('');
-    var lastAccessedTimes = Object.keys(recentProjectsByAccessTime);
-    lastAccessedTimes.sort().reverse();
-    for (var i = 0; i<lastAccessedTimes.length; i++){
-        var lastAccessed = parseInt(lastAccessedTimes[i]);
-        var filename = recentProjectsByAccessTime[lastAccessed].filename;
-        var content = recentProjectsByAccessTime[lastAccessed].content;
-        showProjectInList(filename, content.meta.id, lastAccessed);
-        addLoadProjectButton(filename);
-        addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
-    }
-}
-
-
-function displayAllProjects(){
-    $('#recent-projects-list').html('');
-    var lastAccessedTimes = Object.keys(availableProjectsByAccessTime);
-    lastAccessedTimes.sort().reverse();
-    for (var i = 0; i<lastAccessedTimes.length; i++){
-        var lastAccessed = parseInt(lastAccessedTimes[i]);
-        var filename = availableProjectsByAccessTime[lastAccessed].filename;
-        var content = availableProjectsByAccessTime[lastAccessed].content;
-        showProjectInList(filename, content.meta.id, lastAccessed);
-        addLoadProjectButton(filename);
-        addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
-    }
-}
+//     window.location = 'index.html';
+// });

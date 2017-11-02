@@ -5,18 +5,18 @@
       <ul class="nav nav-tabs">
         <li [ngClass]="{'active': recentSelected}"
             id="recent-selector"
-            (click)="recentClicked()">
+            (click)="loadProjectList()">
           <a href="#">Recent Projects</a>
         </li>
         <li id="all-selector"
             [ngClass]="{'active': !recentSelected}"
-            click="allClicked()">
+            (click)="loadProjectList()">
           <a href="#">All Projects</a>
         </li>
       </ul>
     </div>
     <div class="content">
-      <ul id="recent-projects-list">
+      <ul id="projects-list">
         <ng-container *ngFor="let project of projectsToShow">
         <li [ngClass]="{'highlighted': project.isSelectedProject}">
           <div class="project-filename">
