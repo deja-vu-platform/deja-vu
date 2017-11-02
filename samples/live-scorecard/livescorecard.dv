@@ -48,7 +48,7 @@ app LiveScorecard {
 
     // Climbers have to complete climbs of various difficulties to score points.
     include organization/Task [
-        Climb as Task,
+        Climb for Task,
         Host for Assigner,
         Climber for Assignee
     ]
