@@ -16,7 +16,7 @@ export interface Position {
 const regex = /[^\w\s\-]/gi;
 
 // TODO get path emitted by main
-const projectsSavePath = path.join(__dirname, 'projects');
+export const projectsSavePath = path.join(__dirname, 'projects');
 
 
 // from http://stackoverflow.com/questions/8813051/determine-which-element-the-mouse-pointer-is-on-top-of-in-javascript
@@ -99,7 +99,7 @@ function downloadObject(filename, obj) {
   element.click();
 }
 
-function isCopyOfFile(dirname, filename) {
+export function isCopyOfFile(dirname, filename) {
   const pathName = path.join(dirname, filename);
   try {
     const stats = fs.statSync(pathName);

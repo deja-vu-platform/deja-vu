@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import {UserCliche, DvCliche} from '../../../models/cliche/cliche';
+import {Cliche, UserCliche, DvCliche} from '../../../models/cliche/cliche';
 import {Widget, BaseWidget, UserWidget, WidgetType} from '../../../models/widget/widget';
 
 @Component({
@@ -11,7 +11,7 @@ import {Widget, BaseWidget, UserWidget, WidgetType} from '../../../models/widget
 export class ListComponent implements OnInit {
   @Input() userApp: UserCliche;
   @Input() importedCliches: DvCliche[];
-  @Input() allWidgets: Map<string, Map<string, Widget>>;
+  @Input() allCliches: Map<string, Cliche>;
 
   pages: UserWidget[] = [];
   unusedWidget: Widget[] = [];
@@ -19,17 +19,17 @@ export class ListComponent implements OnInit {
 
   ngOnInit() {
     console.log(this.userApp);
-    
+
     this.userApp.getPageIds().forEach((pageId) => {
-      this.pages.push(<UserWidget>Widget.getWidget(this.allWidgets, pageId));
+      this.pages.push(<UserWidget>Widget.getWidget(this.allCliches, pageId));
     });
 
     this.userApp.getTemplateIds().forEach((pageId) => {
-      this.templates.push(Widget.getWidget(this.allWidgets, pageId));
+      this.templates.push(Widget.getWidget(this.allCliches, pageId));
     });
 
     this.userApp.getUnusedWidgetIds().forEach((pageId) => {
-      this.unusedWidget.push(Widget.getWidget(this.allWidgets, pageId));
+      this.unusedWidget.push(Widget.getWidget(this.allCliches, pageId));
     });
   }
 }

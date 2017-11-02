@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import {MatDialog} from '@angular/material';
 
+import { Cliche } from '../../../../../models/cliche/cliche';
 import {Widget, BaseWidget, UserWidget, WidgetType} from '../../../../../models/widget/widget';
 import {DeleteDialogComponent} from './delete_dialog.component';
 
@@ -10,7 +11,7 @@ import {DeleteDialogComponent} from './delete_dialog.component';
   styleUrls: ['./list_item.component.css']
 })
 export class ListItemComponent {
-  @Input() allWidgets: Map<string, Map<string, Widget>>;
+  @Input() allCliches: Map<string, Cliche>;
   @Input() isDraggable = false;
   @Input() isDeletable = true;
   @Input() widget: Widget;
