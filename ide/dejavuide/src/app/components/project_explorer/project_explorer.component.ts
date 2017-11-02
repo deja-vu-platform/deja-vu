@@ -3,7 +3,14 @@ const path = require('path');
 
 import { Component, Input, OnInit } from '@angular/core';
 
-import {projectsSavePath, sanitizeStringOfSpecialChars, projectNameToFilename, isCopyOfFile} from '../../utility/utility';
+import {projectsSavePath, projectNameToFilename, filenameToProjectName, isCopyOfFile} from '../../utility/utility';
+
+interface DisplayProject {
+  name: string;
+  isSelectedProject: boolean;
+  readableDate: string;
+  readableTime: string;
+}
 
 @Component({
   selector: 'dv-project-explorer',
@@ -11,14 +18,17 @@ import {projectsSavePath, sanitizeStringOfSpecialChars, projectNameToFilename, i
   styleUrls: ['./project_explorer.component.css']
 })
 export class ProjectExplorerComponent implements OnInit {
+  @Input() currentProject;
+
   private selectedProject;
   availableProjectsByFilename = {};
   availableProjectsByAccessTime = {};
   recentProjectsByAccessTime = {};
 
   loaderVisible = true;
+  recentSelected = true;
 
-  @Input() currentProject;
+  projectsToShow: DisplayProject[] = [];
 
   componentToShow;
 
@@ -56,6 +66,36 @@ export class ProjectExplorerComponent implements OnInit {
 
   currentProjectClicked() {
     // TODO
+  }
+
+  recentClicked() {
+    this.recentSelected = true;
+    //  displayRecentProjects();
+  }
+
+  allClicked() {
+    this.recentSelected = false;
+    //  displayAllProjects();
+  }
+
+  loadClicked(projectName) {
+    // TODO
+  }
+
+  deleteClicked(projectName) {
+    // TODO
+    this.openDeleteProjectConfirmDialogue(dirname, filename, id);
+  }
+
+  private fileToDisplayProject(filename, id, lastAccessed): DisplayProject {
+    const lastAccessDate = new Date(lastAccessed);
+    return {
+      name: filenameToProjectName(filename),
+      isSelectedProject:
+        (this.currentProject ? (id === this.currentProject.getId()) : false),
+      readableDate: lastAccessDate.toLocaleDateString(),
+      readableTime: lastAccessDate.toLocaleTimeString()
+    };
   }
 
   // from http://stackoverflow.com/questions/10049557/reading-all-files-in-a-directory-store-them-in-objects-and-send-the-object
@@ -99,105 +139,6 @@ $('#create-project').on('click', function () {
 
     window.location = 'index.html';
 });
-
-$('.recent-projects').on('click', '.project-name', function(){
-    var filename = $(this).parent().data('filename');
-    selectedProject = availableProjectsByFilename[filename];
-    $('.highlighted').removeClass('highlighted');
-    $(this).parent().parent().addClass('highlighted');
-    displayProjectPreview(selectedProject);
-});
-
-function addLoadProjectButton(filename){
-    var spLoad = document.createElement('span');
-    spLoad.innerHTML = '<button type="button" class="btn btn-default btn-load-project">' +
-        '<span>Load Project</span>' +
-        '</button>';
-
-    var buttonLoadProject = spLoad.firstChild;
-
-    $(buttonLoadProject).on("click", function () {
-        selectedProject = availableProjectsByFilename[filename];
-        selectedProject.lastAccessed = new Date();
-        window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-        window.location = 'index.html';
-    });
-
-    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonLoadProject).parent().hover(
-        function(){
-            $(this).find('.project-name').css({
-                width: '50%'
-            });
-            $(this).find('.btn-load-project').css({
-                display: 'inline-block',
-                'vertical-align': 'top',
-            });
-            $(this).find('.last-access-time').css({
-                display: 'none',
-            })
-
-        }, function(){
-            $(this).find('.project-name').css({
-                width: '100%'
-            });
-            $(this).find('.btn-load-project').css({
-                display: 'none',
-            });
-
-            $(this).find('.last-access-time').css({
-                display: 'block',
-            })
-        }
-    );
-
-}
-
-
-function displayProjectPreview(project){
-    // TODO make it select the main component
-    // TODO Also, have a way to click to change to another view?
-    $('#page-preview').data('projectfilename', projectNameToFilename(project.meta.name));
-    $('#project-name-preview').text('Project Preview: '+project.meta.name);
-    $('#preview-prev-page').unbind();
-    $('#preview-next-page').unbind();
-
-    var userApp = project.cliches[project.userApp];
-    var hasPages = (!$.isEmptyObject(userApp)) && (!$.isEmptyObject(userApp.widgets.pages));
-    if (hasPages){
-        var componentToShowId = Object.keys(userApp.widgets.pages)[0];
-        var numMainPages = Object.keys(userApp.widgets.pages).length;
-        if (numMainPages > 1) {
-            $('#page-preview').css('width', '790px');
-            $('#preview-prev-page').css('display', 'inline-block');
-            $('#preview-next-page').css('display', 'inline-block');
-        } else {
-            $('#page-preview').css('width', '850px');
-            $('#preview-prev-page').css('display', 'none');
-            $('#preview-next-page').css('display', 'none');
-        }
-
-        componentToShow = userApp.widgets.pages[componentToShowId];
-        loadTablePreview(componentToShow);
-
-        $('#page-preview').data('pagenum', 0);
-
-        $('#preview-prev-page').click(function () {
-            var pageNum = $('#page-preview').data('pagenum');
-            showPrevMainPage(project, pageNum);
-        });
-
-        $('#preview-next-page').click(function () {
-            var pageNum = $('#page-preview').data('pagenum');
-            showNextMainPage(project, pageNum);
-        });
-
-    } else {
-        $('#preview-prev-page').css('display', 'none');
-        $('#preview-next-page').css('display', 'none');
-        $('#page-preview').css('width', '850px').text("This project does not have a main page yet...");
-    }
-
-}
 
 /**
  * Creates a new Project based on user inputs
@@ -268,54 +209,6 @@ function deleteFileAndDisplay(dirname, filename, id){
     }
 }
 
-
-function addDeleteProjectButton(dirname, filename, id){
-    var spDelete = document.createElement('span');
-    spDelete.innerHTML = '<button type="button" class="btn btn-default btn-delete-project">' +
-            //'<span>Delete User Component </span>' +
-        '<span class="glyphicon glyphicon-trash"></span>' +
-        '</button>';
-
-    var buttonDeletProject = spDelete.firstChild;
-    buttonDeletProject.id = 'btn-delete-project_'+id;
-
-    $(buttonDeletProject).on("click", function (e) {
-        // todo add safety
-        openDeleteProjectConfirmDialogue(dirname, filename, id);
-    });
-
-
-
-    $(".recent-projects").find("[data-filename='" + filename + "']").append(buttonDeletProject).parent().hover(
-        function(){
-            $(this).find('.project-name').css({
-                width: '50%'
-            });
-            $(this).find('.btn-delete-project').css({
-                display: 'inline-block',
-                'vertical-align': 'top',
-            });
-
-            $(this).find('.last-access-time').css({
-                display: 'none',
-            })
-        }, function(){
-            $(this).find('.project-name').css({
-                width: '100%'
-            });
-            $(this).find('.btn-delete-project').css({
-                display: 'none',
-
-            });
-
-            $(this).find('.last-access-time').css({
-                display: 'block',
-            })
-        }
-    );
-
-}
-
 function openDeleteProjectConfirmDialogue(dirname, filename, id){
     $('#confirm-delete-project').modal('show');
 
@@ -374,45 +267,3 @@ function displayAllProjects(){
         addDeleteProjectButton(projectsSavePath, filename, content.meta.id);
     }
 }
-
-function showProjectInList(filename, id, lastAccessed){
-    // TODO sanitise filename!
-    var projectLink = document.createElement('li');
-    projectLink.innerHTML = '<div class="project-filename" data-filename="'+filename+'">' +
-        // sanitizing display because that's where the injections can play
-        '<div class="project-name">'+utils.sanitizeStringOfSpecialChars(utils.filenameToProjectName(filename))+'</div>' +
-        '<div class="last-access-time">' +
-            'Last Accessed: '+(new Date(lastAccessed)).toLocaleDateString() +
-            ' at '+(new Date(lastAccessed)).toLocaleTimeString()+
-        '</div>'+
-        '</div>';
-    $('#recent-projects-list').append(projectLink);
-
-    if (currentProject){
-        if (id == currentProject.meta.id){
-            $(projectLink).addClass('highlighted');
-        }
-    }
-}
-
-
-
-$('#recent-selector').click(function(){
-    if ($(this).hasClass('active')){
-        return;
-    }
-
-    $(this).parent().find('.active').removeClass('active');
-    $(this).addClass('active');
-    displayRecentProjects();
-});
-
-$('#all-selector').click(function(){
-    if ($(this).hasClass('active')){
-        return;
-    }
-
-    $(this).parent().find('.active').removeClass('active');
-    $(this).addClass('active');
-    displayAllProjects();
-});

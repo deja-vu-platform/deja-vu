@@ -98,3 +98,51 @@ function showPrevMainPage(project, currentPageNumber){
     loadTablePreview(componentToShow);
     $('#page-preview').data('pagenum', prevPageNum);
 }
+
+
+
+function displayProjectPreview(project){
+    // TODO make it select the main component
+    // TODO Also, have a way to click to change to another view?
+    $('#page-preview').data('projectfilename', projectNameToFilename(project.meta.name));
+    $('#project-name-preview').text('Project Preview: '+project.meta.name);
+    $('#preview-prev-page').unbind();
+    $('#preview-next-page').unbind();
+
+    var userApp = project.cliches[project.userApp];
+    var hasPages = (!$.isEmptyObject(userApp)) && (!$.isEmptyObject(userApp.widgets.pages));
+    if (hasPages){
+        var componentToShowId = Object.keys(userApp.widgets.pages)[0];
+        var numMainPages = Object.keys(userApp.widgets.pages).length;
+        if (numMainPages > 1) {
+            $('#page-preview').css('width', '790px');
+            $('#preview-prev-page').css('display', 'inline-block');
+            $('#preview-next-page').css('display', 'inline-block');
+        } else {
+            $('#page-preview').css('width', '850px');
+            $('#preview-prev-page').css('display', 'none');
+            $('#preview-next-page').css('display', 'none');
+        }
+
+        componentToShow = userApp.widgets.pages[componentToShowId];
+        loadTablePreview(componentToShow);
+
+        $('#page-preview').data('pagenum', 0);
+
+        $('#preview-prev-page').click(function () {
+            var pageNum = $('#page-preview').data('pagenum');
+            showPrevMainPage(project, pageNum);
+        });
+
+        $('#preview-next-page').click(function () {
+            var pageNum = $('#page-preview').data('pagenum');
+            showNextMainPage(project, pageNum);
+        });
+
+    } else {
+        $('#preview-prev-page').css('display', 'none');
+        $('#preview-next-page').css('display', 'none');
+        $('#page-preview').css('width', '850px').text("This project does not have a main page yet...");
+    }
+
+}
