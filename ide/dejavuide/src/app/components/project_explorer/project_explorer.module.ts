@@ -5,6 +5,7 @@ import {MatDialogModule } from '@angular/material';
 
 import { ProjectExplorerComponent } from './project_explorer.component';
 import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
+import { NewProjectDialogComponent } from './new_project_dialog.component'
 
 import { ProjectPreviewModule } from './project_preview/project_preview.module';
 
@@ -20,7 +21,8 @@ import { ProjectPreviewModule } from './project_preview/project_preview.module';
     ProjectPreviewModule
   ],
   entryComponents: [
-    ProjectDeleteDialogComponent
+    ProjectDeleteDialogComponent,
+    NewProjectDialogComponent
   ],
   providers: [],
   exports: [

@@ -8,6 +8,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import {MatDialog} from '@angular/material';
 
 import {ProjectDeleteDialogComponent} from './project_delete_dialog.component';
+import { NewProjectDialogComponent } from './new_project_dialog.component'
 
 interface DisplayProject {
   name: string;
@@ -67,6 +68,20 @@ export class ProjectExplorerComponent implements OnInit {
     });
 
     ipcRenderer.send('load');
+  }
+
+  handleNewProject() {
+    console.log('new clicked');
+    const dialogRef = this.dialog.open(NewProjectDialogComponent, {
+      width: '250px',
+    });
+
+    const that = this;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        
+      }
+    });
   }
 
   currentProjectClicked() {
