@@ -5,12 +5,12 @@
       <li [ngClass]="{'active': recentSelected}"
           id="recent-selector"
           (click)="loadProjectList()">
-        Recent Projects
+        <a>Recent Projects</a>
       </li>
       <li id="all-selector"
           [ngClass]="{'active': !recentSelected}"
           (click)="loadProjectList(false)">
-        All Projects
+        <a>All Projects</a>
       </li>
     </ul>
   </div>
@@ -33,8 +33,7 @@
         </button>
         <button type="button" 
                 class="btn btn-default btn-delete-project"
-                (click)="deleteClicked(project.name)">
-          <span>Delete User Component </span>
+                (click)="handleDelete(project.name)">
           <span class="glyphicon glyphicon-trash"></span>
         </button>
       </li>

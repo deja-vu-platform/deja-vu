@@ -28,7 +28,7 @@ export class ProjectExplorerComponent implements OnInit {
   projects = {};
 
   loaderVisible = true;
-  recentSelected = false;
+  recentSelected = true;
 
   projectsToShow: DisplayProject[] = [];
 
@@ -80,9 +80,11 @@ export class ProjectExplorerComponent implements OnInit {
 
   loadClicked(projectName) {
     // TODO
+    console.log('load clicked');
   }
 
   handleDelete(projectName): void {
+    console.log('delete clicked');
     const dialogRef = this.dialog.open(ProjectDeleteDialogComponent, {
       width: '250px',
     });

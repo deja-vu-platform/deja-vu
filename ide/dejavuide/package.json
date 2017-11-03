@@ -12,7 +12,7 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "electron": "electron .",
-    "electron-build": "ng build --watch && electron .",
+    "electron-build": "ng build && electron .",
     "electorn-build-prod": "ng build --prod && electron ."
   },
   "private": true,
