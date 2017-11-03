@@ -598,7 +598,7 @@ export namespace GruntTask {
             {
               expand: true,
               cwd: "src",
-              src: ["components/**/*.{html,css,js}"],
+              src: ["components/**/*.{html,css,js,png}"],
               dest: "dist/public"
             },
             {
@@ -614,7 +614,7 @@ export namespace GruntTask {
             {
               expand: true,
               cwd: "src/dv-dev",
-              src: ["**/*.{html,css,js}"],
+              src: ["**/*.{html,css,js,png}"],
               dest: "dist/public/dv-dev"
             },
             { // the global sytle
@@ -630,7 +630,7 @@ export namespace GruntTask {
             {
               expand: true,
               cwd: "src",
-              src: ["components/**/*.{html,css,js}"],
+              src: ["components/**/*.{html,css,js,png}"],
               dest: "lib"
             }
           ]

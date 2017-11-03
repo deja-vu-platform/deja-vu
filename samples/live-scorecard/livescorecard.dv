@@ -175,9 +175,9 @@ app LiveScorecard {
     }
 
     /** Routes **/
-    host_home_route: route = {path: "host-home", widget: HostHome}
-    climber_home_route: route = {path: "climber-home", widget: ClimberHome}
-    buddy_home_route: route = {path: "buddy-home", widget: BuddyHome}
-    spectator_home_route: route = {path: "spectator-home", widget: SpectatorHome}
+    host_home_route: route = {path: "host", widget: HostHome}
+    climber_home_route: route = {path: "climber", widget: ClimberHome}
+    buddy_home_route: route = {path: "buddy", widget: BuddyHome}
+    spectator_home_route: route = {path: "spectator", widget: SpectatorHome}
     leaderboard: route = {path: "leaderboard", widget: ShowClimbers}
 }
