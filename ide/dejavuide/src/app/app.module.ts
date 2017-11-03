@@ -7,7 +7,7 @@ import { ZoomModule } from './components/ui_editor/zoom/zoom.module';
 import { MapModule } from './components/ui_editor/map/map.module';
 import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurface.module';
 import { ListModule } from './components/ui_editor/list/list.module';
-
+import { ProjectExplorerModule } from './components/project_explorer/project_explorer.module';
 
 
 @NgModule({
@@ -20,7 +20,8 @@ import { ListModule } from './components/ui_editor/list/list.module';
     ZoomModule,
     MapModule,
     WorkSurfaceModule,
-    ListModule
+    ListModule,
+    ProjectExplorerModule
   ],
   providers: [],
   bootstrap: [AppComponent]

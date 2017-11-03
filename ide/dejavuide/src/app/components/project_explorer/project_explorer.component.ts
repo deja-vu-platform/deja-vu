@@ -1,11 +1,13 @@
-const fs = require('fs');
-const path = require('path');
+// import * as fs from 'fs';
+// const path = require('path');
+// import { ipcRenderer } from 'electron';
+declare const electron: any;
+const ipcRenderer = electron.ipcRenderer;
 
 import { Component, Input, OnInit } from '@angular/core';
 import {MatDialog} from '@angular/material';
 
 import {ProjectDeleteDialogComponent} from './project_delete_dialog.component';
-import {projectsSavePath, projectNameToFilename, filenameToProjectName, isCopyOfFile} from '../../utility/utility';
 
 interface DisplayProject {
   name: string;
@@ -23,7 +25,7 @@ export class ProjectExplorerComponent implements OnInit {
   @Input() currentProject;
 
   private selectedProject;
-  projectsByName = {};
+  projects = {};
 
   loaderVisible = true;
   recentSelected = true;
@@ -35,22 +37,36 @@ export class ProjectExplorerComponent implements OnInit {
   constructor(public dialog: MatDialog) {}
 
   ngOnInit() {
+    console.log(electron);
+    console.log(electron.ipcRenderer);
     const that = this;
-    this.readFiles(projectsSavePath, function(filename, content) {
-      // TODO add a loading projects sign
-      // Check the types to only add projects
-      content = JSON.parse(content);
-      if (content.objectType && (content.objectType === 'UserProject')) {
-        const projectName = filenameToProjectName(filename);
-        that.projectsByName[projectName] = content;
-      }
-    }, function(err) {
-        if (err) {
-          throw err;
+    ipcRenderer.on('projects', function(event, data) {
+      console.log(data.files);
+      data.projects.forEach((projectInfo) => {
+        const projectName = projectInfo[0];
+        const content = JSON.parse(projectInfo[1]);
+        if (content.objectType && (content.objectType === 'UserProject')) {
+          that.projects[projectName] = content;
         }
-        that.updateDisplayProjectList();
-        that.loaderVisible = false;
+      });
+
+      that.updateDisplayProjectList();
+      that.loaderVisible = false;
     });
+
+    ipcRenderer.on('delete-success', function(event) {
+      // TODO
+      that.updateDisplayProjectList();
+      that.loaderVisible = false;
+    });
+
+    ipcRenderer.on('save-success', function(event) {
+      // TODO
+      that.updateDisplayProjectList();
+      that.loaderVisible = false;
+    });
+
+    ipcRenderer.send('load');
   }
 
   currentProjectClicked() {
@@ -76,7 +92,7 @@ export class ProjectExplorerComponent implements OnInit {
       if (result) {
         that.loaderVisible = true;
         that.deleteProject(projectName, () => {
-          delete that.projectsByName[projectName];
+          delete that.projects[projectName];
           that.updateDisplayProjectList();
           // TODO deal with if the project is your selected project
         });
@@ -85,21 +101,7 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   private deleteProject(projectName, onFinish) {
-    const filename = projectNameToFilename(projectName);
-    const pathName = path.join(projectsSavePath, filename);
-    fs.stat(pathName, function (err1, stats) {
-        if (err1) {
-          console.error(err1);
-          return;
-        }
-        fs.unlink(pathName, (err2) => {
-            if (err2) {
-              console.log(err2);
-              return;
-            }
-            onFinish();
-        });
-    });
+    ipcRenderer.send('delete', {projectName: projectName});
   }
 
   private updateDisplayProjectList() {
@@ -107,8 +109,8 @@ export class ProjectExplorerComponent implements OnInit {
     const WEEK_IN_SEC = 604800000;
     const now = (new Date()).getTime();
     const that = this;
-    Object.keys(this.projectsByName).forEach((projectName: string) => {
-      const content = this.projectsByName[projectName];
+    Object.keys(this.projects).forEach((projectName: string) => {
+      const content = this.projects[projectName];
       const time = parseInt(content.accessTime, 10);
       if (!that.recentSelected || (now - time) < WEEK_IN_SEC) {
         that.projectsToShow.push(that.fileToDisplayProject(projectName, content.meta.id, time));
@@ -125,35 +127,6 @@ export class ProjectExplorerComponent implements OnInit {
       readableDate: lastAccessDate.toLocaleDateString(),
       readableTime: lastAccessDate.toLocaleTimeString()
     };
-  }
-
-  // from http://stackoverflow.com/questions/10049557/reading-all-files-in-a-directory-store-them-in-objects-and-send-the-object
-  private readFiles(dirname, onFileContent, onFinish) {
-    fs.readdir(
-      dirname,
-      (err1, filenames) => {
-        if (err1) {
-            onFinish(err1);
-            return;
-        }
-        let numFilesProcessed = 0;
-        filenames.forEach((filename) => {
-            fs.readFile(
-              path.join(dirname, filename),
-              'utf-8',
-              (err2, content) => {
-                if (err2) {
-                    onFinish(err2);
-                    return;
-                }
-                onFileContent(filename, content);
-                numFilesProcessed++;
-                if (numFilesProcessed === filenames.length) {
-                    onFinish(null);
-                }
-            });
-        });
-    });
   }
 }
 
