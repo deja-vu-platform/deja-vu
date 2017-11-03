@@ -41,7 +41,7 @@ export class ProjectExplorerComponent implements OnInit {
     console.log(electron.ipcRenderer);
     const that = this;
     ipcRenderer.on('projects', function(event, data) {
-      console.log(data.files);
+      console.log(data.projects);
       data.projects.forEach((projectInfo) => {
         const projectName = projectInfo[0];
         const content = JSON.parse(projectInfo[1]);
