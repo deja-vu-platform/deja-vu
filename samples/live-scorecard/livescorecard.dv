@@ -17,9 +17,10 @@ app LiveScorecard {
 
     // Only a host can create an account and login the traditional way,
     // i.e. using a username and password. 
+    //TODO: Why isn't as HostAuthentication not working?
     include access/StandardAuthentication [
         Host for User
-    ] as HostAuthentication
+    ]
 
     // A climber can access his/her account using a climber code and
     // competition code.
@@ -109,10 +110,17 @@ app LiveScorecard {
     // Displays login/register forms for hosts and 
     // login forms for climbers and spectators.
     main widget Landing {
-        on_host_ok: Widget = HostHome,
         on_climber_ok: Widget = ClimberHome,
         on_spectator_ok: Widget = SpectatorHome
     }
+
+    widget HostLogin {
+        on_host_ok: Widget = HostHome
+    }
+
+    widget HostRegister {
+        on_host_ok: Widget = HostHome
+    }    
 
     // Allows hosts to add competitions, climbers and other hosts.
     // Also, allows hosts to view the leaderboard.
@@ -175,6 +183,8 @@ app LiveScorecard {
     }
 
     /** Routes **/
+    host_login_route: route = {path: "host-login", widget: HostLogin}
+    host_register_route: route = {path: "host-register", widget: HostRegister}
     host_home_route: route = {path: "host", widget: HostHome}
     climber_home_route: route = {path: "climber", widget: ClimberHome}
     buddy_home_route: route = {path: "buddy", widget: BuddyHome}

@@ -1,6 +1,53 @@
-#choose-use-form {
+html, body {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+body {
+	background-color: #4FB5C3;
+	color: white;
+}
+
+.white-back {
 	background-color: white;
 	color: black;
 	flex: 1;
 	height: 100%;
+}
+
+.background {
+	margin:0;
+	padding:0;
+	border: 0;
+	width: 100%;
+	min-height: 10em;
+}
+
+@media screen and (min-width: 495px) {
+	.head{
+		margin-top: -1.5em;
+		color: white;
+	}
+}
+
+@media screen and (max-width: 495px) {
+	.head{
+		margin-top: -2.5em;
+		color: white;
+	}
+}
+
+.choice {
+	margin: .3em;
+}
+
+.link {
+	cursor:pointer;
+	color: #218290;
+}
+
+.link:hover {
+	color: #218290;
+	font-weight: bold;
 }
