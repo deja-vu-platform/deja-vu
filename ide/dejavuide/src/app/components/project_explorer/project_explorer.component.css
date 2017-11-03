@@ -1,11 +1,11 @@
-.recent-projects {
+.projects {
   border: #d5d5d5 1px solid;
   width: 400px;
   display: inline-block;
 
 }
 
-.recent-projects .content{
+.projects .content{
   height: 500px;
 }
 
@@ -37,7 +37,7 @@
 
 }
 
-a{
+a {
   cursor: pointer;
 }
 

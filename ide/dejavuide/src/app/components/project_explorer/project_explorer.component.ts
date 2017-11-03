@@ -28,7 +28,7 @@ export class ProjectExplorerComponent implements OnInit {
   projects = {};
 
   loaderVisible = true;
-  recentSelected = true;
+  recentSelected = false;
 
   projectsToShow: DisplayProject[] = [];
 
@@ -73,8 +73,8 @@ export class ProjectExplorerComponent implements OnInit {
     // TODO
   }
 
-  loadProjectList() {
-    this.recentSelected = false;
+  loadProjectList(recentSelected = true) {
+    this.recentSelected = recentSelected;
     this.updateDisplayProjectList();
   }
 
