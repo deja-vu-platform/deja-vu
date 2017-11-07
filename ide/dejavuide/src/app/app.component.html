@@ -1,6 +1,6 @@
-<dv-header pageTitle="Test"
+<dv-header [pageType]="selectedPage"
           (selectedPage)="selectPage($event)"></dv-header>
-<dv-project-explorer *ngIf="selectedPage === PageTypes.PROJECT_EXPLORER">
+<dv-project-explorer *ngIf="selectedPage === PageType.PROJECT_EXPLORER">
 </dv-project-explorer>
-<dv-ui-editor *ngIf="selectedPage === PageTypes.UI_EDITOR">
+<dv-ui-editor *ngIf="selectedPage === PageType.UI_EDITOR">
 </dv-ui-editor>

@@ -3,7 +3,7 @@
     <div class="menu-item navigation"> 
         Navigate to:
         <ng-container *ngFor="let otherPage of otherPages">
-            <a (click)="handleRedirectClick(otherPage.title)">
+            <a (click)="handleRedirectClick(otherPage.type)">
                 {{otherPage.title}}
             </a>
         </ng-container>

@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-export enum PageTypes {
+export enum PageType {
   PROJECT_EXPLORER, UI_EDITOR
 }
 
@@ -11,10 +11,10 @@ export enum PageTypes {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  PageTypes = PageTypes;
-  selectedPage = PageTypes.PROJECT_EXPLORER;
+  PageType = PageType;
+  selectedPage = PageType.PROJECT_EXPLORER;
 
-  selectPage(pageType: PageTypes) {
+  selectPage(pageType: PageType) {
     this.selectedPage = pageType;
   }
 }

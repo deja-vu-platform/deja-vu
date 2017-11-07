@@ -1,15 +1,15 @@
-import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
-import { PageTypes } from '../../../app.component';
+import { Component, Input, Output, OnChanges, EventEmitter } from '@angular/core';
+import { PageType } from '../../../app.component';
 
 interface PageInfo {
   title: string;
-  type: PageTypes | null;
+  type: PageType | null;
 }
 
 const pages: PageInfo[] = [
   {
     title: 'Projects',
-    type: PageTypes.PROJECT_EXPLORER
+    type: PageType.PROJECT_EXPLORER
   },
   {
     title: 'Cliches',
@@ -17,7 +17,7 @@ const pages: PageInfo[] = [
   },
   {
     title: 'Widgets',
-    type: PageTypes.UI_EDITOR
+    type: PageType.UI_EDITOR
   },
   {
     title: 'Data',
@@ -29,25 +29,21 @@ const pages: PageInfo[] = [
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
-  @Input() readonly pageTitle: string;
-  @Output() selectedPage = new EventEmitter<PageTypes>();
+export class HeaderComponent implements OnChanges {
+  @Input() readonly pageType: PageType;
+  @Output() selectedPage = new EventEmitter<PageType>();
   isSavable: boolean;
   readonly dejavu = 'Déjà Vu';
   otherPages: PageInfo[];
 
-  ngOnInit() {
-    this.otherPages = pages.filter(page => page.title !== this.pageTitle);
-    this.isSavable = (this.pageTitle === 'Widgets'
-      || this.pageTitle === 'Data' );
+  ngOnChanges() {
+    console.log(this.pageType);
+    this.otherPages = pages.filter(page => page.type !== this.pageType);
+    this.isSavable = (this.pageType === PageType.UI_EDITOR);
   }
 
-  handleRedirectClick(title) {
+  handleRedirectClick(type) {
     const that = this;
-    pages.forEach((pageInfo) => {
-      if (pageInfo.title === title) {
-        that.selectedPage.emit(pageInfo.type);
-      }
-    });
+    that.selectedPage.emit(type);
   }
 }
