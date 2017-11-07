@@ -1,20 +1,28 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
+import { PageTypes } from '../../../app.component';
 
 interface PageInfo {
   title: string;
-  url: string;
+  type: PageTypes | null;
 }
 
-const pages: PageInfo[] = [{
-  title: 'Cliches',
-  url: '#'
-}, {
-  title: 'Widgets',
-  url: '#'
-}, {
-  title: 'Data',
-  url: '#'
-}];
+const pages: PageInfo[] = [
+  {
+    title: 'Projects',
+    type: PageTypes.PROJECT_EXPLORER
+  },
+  {
+    title: 'Cliches',
+    type: null
+  },
+  {
+    title: 'Widgets',
+    type: PageTypes.UI_EDITOR
+  },
+  {
+    title: 'Data',
+    type: null
+  }];
 
 @Component({
   selector: 'dv-header',
@@ -23,20 +31,23 @@ const pages: PageInfo[] = [{
 })
 export class HeaderComponent implements OnInit {
   @Input() readonly pageTitle: string;
-  isClichePage: boolean;
+  @Output() selectedPage = new EventEmitter<PageTypes>();
+  isSavable: boolean;
   readonly dejavu = 'Déjà Vu';
   otherPages: PageInfo[];
 
   ngOnInit() {
     this.otherPages = pages.filter(page => page.title !== this.pageTitle);
-    this.isClichePage = (this.pageTitle === 'Cliches');
+    this.isSavable = (this.pageTitle === 'Widgets'
+      || this.pageTitle === 'Data' );
   }
 
-  /**
-   * Handles what happens when the user goes back to the projects page. 
-   */
-  handleBackToAllProjects() {
-    // TODO
-    return;
+  handleRedirectClick(title) {
+    const that = this;
+    pages.forEach((pageInfo) => {
+      if (pageInfo.title === title) {
+        that.selectedPage.emit(pageInfo.type);
+      }
+    });
   }
 }

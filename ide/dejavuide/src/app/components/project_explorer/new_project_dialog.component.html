@@ -2,10 +2,10 @@
 <mat-dialog-content>
   Project Name: 
   <input type="text" 
-        [(value)]="name" 
-        (onChange)="onChange()">
+        [value]="result.name" 
+        (input)="onInput($event.target.value)">
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button [mat-dialog-close]="result">Yes</button>
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-button (click)="onCreate()">Create</button>
 </mat-dialog-actions>

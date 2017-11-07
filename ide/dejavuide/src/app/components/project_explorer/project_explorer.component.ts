@@ -79,7 +79,7 @@ export class ProjectExplorerComponent implements OnInit {
     const that = this;
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        
+        console.log(result);
       }
     });
   }

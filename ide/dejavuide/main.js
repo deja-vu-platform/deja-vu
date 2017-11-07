@@ -1,5 +1,4 @@
 'use strict';
-
 var fs = require('fs');
 var path = require('path');
 
@@ -7,6 +6,14 @@ var electron = require('electron');
 var app = electron.app;  // Module to control application life.
 var BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 var ipcMain = electron.ipcMain;
+
+// Angular and electron help from https://scotch.io/tutorials/build-a-music-player-with-angular-2-electron-i-setup-basics-concepts
+require('dotenv').config();
+
+require('electron-reload')(__dirname, {
+    electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
+});
+
 
 // from http://electron.atom.io/docs/tutorial/quick-start/
 
@@ -25,11 +32,14 @@ function createWindow() {
         // icon: `file://${__dirname}/dist/assets/logo.png`
     });
 
-    // and load the index.html of the app.
-    mainWindow.loadURL(`file://${__dirname}/dist/index.html`);
-
-    // Open the DevTools.
-    mainWindow.webContents.openDevTools();
+    if (process.env.PACKAGE === 'true'){
+        mainWindow.loadURL(`file://${__dirname}/dist/index.html`);
+    } else {
+        // and load the index.html of the app from where angular serves it.
+        mainWindow.loadURL(process.env.HOST);
+        // Open the DevTools.
+        mainWindow.webContents.openDevTools();
+    }
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function() {

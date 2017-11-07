@@ -1,0 +1,28 @@
+<div class="outer-container">
+  <dv-worksurface 
+    [widget]="selectedWidget"
+    [allCliches]="allCliches"
+    [dimensions]="screenDimensions"
+    (onChange)="handleWidgetChange()">
+  </dv-worksurface>
+</div>
+        
+<dv-zoom 
+  [outerContainerDimensions]="outerContainerDimensions"
+  [widgetDimensions]="selectedWidget.getDimensions()"
+  [screenDimensions]="screenDimensions"
+  (updatedZoom)="handleZoomChange($event)">
+</dv-zoom>
+
+<dv-map 
+  [outerContainerDimensions]="outerContainerDimensions"
+  [outerContainerScroll]="outerContainerScroll"
+  [screenDimensions]="screenDimensions"
+  [selectedWidget]="selectedWidget"
+  [allCliches]="allCliches"
+  (newScrollPosition)="handleMapScroll($event)">
+</dv-map>
+
+<dv-list [allCliches]="allCliches"
+          [userApp]="userApp">
+</dv-list>

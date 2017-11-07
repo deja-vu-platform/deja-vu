@@ -1,34 +1,6 @@
-<dv-header pageTitle="Test"></dv-header>
-<dv-project-explorer>
+<dv-header pageTitle="Test"
+          (selectedPage)="selectPage($event)"></dv-header>
+<dv-project-explorer *ngIf="selectedPage === PageTypes.PROJECT_EXPLORER">
 </dv-project-explorer>
-
-<div [hidden]="true">
-  <div class="outer-container">
-    <dv-worksurface 
-      [widget]="selectedWidget"
-      [allCliches]="allCliches"
-      [dimensions]="screenDimensions"
-      (onChange)="handleWidgetChange()">
-    </dv-worksurface>
-  </div>
-          
-  <dv-zoom 
-    [outerContainerDimensions]="outerContainerDimensions"
-    [widgetDimensions]="selectedWidget.getDimensions()"
-    [screenDimensions]="screenDimensions"
-    (updatedZoom)="handleZoomChange($event)">
-  </dv-zoom>
-
-  <dv-map 
-    [outerContainerDimensions]="outerContainerDimensions"
-    [outerContainerScroll]="outerContainerScroll"
-    [screenDimensions]="screenDimensions"
-    [selectedWidget]="selectedWidget"
-    [allCliches]="allCliches"
-    (newScrollPosition)="handleMapScroll($event)">
-  </dv-map>
-
-  <dv-list [allCliches]="allCliches"
-            [userApp]="userApp">
-  </dv-list>
-</div>
+<dv-ui-editor *ngIf="selectedPage === PageTypes.UI_EDITOR">
+</dv-ui-editor>
