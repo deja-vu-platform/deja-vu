@@ -130,6 +130,10 @@ app LiveScorecard {
         on_signout: Widget = Landing
     }
 
+    widget ClimberLogin {
+        on_climber_ok: Widget = ClimberHome
+    }
+
     // Allows climbers to view available climbs, log climbs and view the 
     // leaderboard.
     // Also, allows other climbers to use the buddy log.
@@ -146,6 +150,10 @@ app LiveScorecard {
     widget BuddyHome {
         buddy: Climber,
         on_signout: ClimberHome
+    }
+
+    widget SpectatorLogin {
+        on_spectator_ok: Widget = SpectatorHome
     }
 
     // Allows spectators to view the leaderboard.
@@ -186,8 +194,10 @@ app LiveScorecard {
     host_login_route: route = {path: "host-login", widget: HostLogin}
     host_register_route: route = {path: "host-register", widget: HostRegister}
     host_home_route: route = {path: "host", widget: HostHome}
+    climber_login_route: route = {path: "climber-login", widget: ClimberLogin}
     climber_home_route: route = {path: "climber", widget: ClimberHome}
     buddy_home_route: route = {path: "buddy", widget: BuddyHome}
+    spectator_login_route: route = {path: "spectator-login", widget: SpectatorLogin}
     spectator_home_route: route = {path: "spectator", widget: SpectatorHome}
     leaderboard: route = {path: "leaderboard", widget: ShowClimbers}
 }

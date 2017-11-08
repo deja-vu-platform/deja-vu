@@ -6,10 +6,10 @@
 
         <div class="row">
             <div class="col-lg-4 col-lg-offset-4 text-center">
-                <a routerLink="/host-login" type="button" class="btn btn-default choice active">
+                <a routerLink="/host-login" type="button" class="btn btn-default choice">
                     Host
                 </a>
-                <a routerLink="/climber-login" type="button" class="btn btn-default choice">
+                <a routerLink="/climber-login" type="button" class="btn btn-default choice active">
                     Climber
                 </a>
                 <a routerLink="/spectator-login" type="button" class="btn btn-default choice">
@@ -20,10 +20,7 @@
 
         <div class="row">
             <div class="col-lg-4 col-lg-offset-4 text-center">
-                <dv-widget name="SignInWithRedirect" of="StandardAuthentication"></dv-widget>
-                <p>Don't have an account? Sign up
-                    <a routerLink="/host-register" class="link">here</a>
-                </p>
+                <dv-widget name="ValidatePasskeyWithRedirect" of="ClimberAuthentication"></dv-widget>
             </div>
         </div>
     </div>
