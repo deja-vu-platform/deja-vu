@@ -24,6 +24,16 @@ const pages: PageInfo[] = [
     type: null
   }];
 
+function getTitle(pageType: PageType): string {
+  let title = 'Invalid Page';
+  pages.forEach((page) => {
+    if (page.type === pageType) {
+      title = page.title;
+    }
+  });
+  return title;
+}
+
 @Component({
   selector: 'dv-header',
   templateUrl: './header.component.html',
@@ -32,17 +42,23 @@ const pages: PageInfo[] = [
 export class HeaderComponent implements OnChanges {
   @Input() readonly pageType: PageType;
   @Output() selectedPage = new EventEmitter<PageType>();
+  @Output() saveClicked = new EventEmitter<boolean>();
   isSavable: boolean;
   readonly dejavu = 'Déjà Vu';
   otherPages: PageInfo[];
+  pageTitle: string;
 
   ngOnChanges() {
     this.otherPages = pages.filter(page => page.type !== this.pageType);
     this.isSavable = (this.pageType === PageType.UI_EDITOR);
+    this.pageTitle = getTitle(this.pageType);
   }
 
   handleRedirectClick(type) {
-    const that = this;
-    that.selectedPage.emit(type);
+    this.selectedPage.emit(type);
+  }
+
+  handleSaveClicked() {
+    this.saveClicked.emit(true);
   }
 }

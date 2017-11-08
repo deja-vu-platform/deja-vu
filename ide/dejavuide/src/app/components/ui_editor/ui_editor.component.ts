@@ -1,12 +1,14 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
 
 import { Dimensions, Position } from '../../utility/utility';
 import { BaseWidget, Widget, UserWidget } from '../../models/widget/widget';
 import { Cliche, UserCliche } from '../../models/cliche/cliche';
+import { Project } from '../../models/project/project';
+
 import { MapComponent } from './map/map.component';
 
-import * as jQ from 'jquery';
-const $ = <any>jQ;
+import * as jQuery from 'jquery';
+const $ = <any>jQuery;
 
 @Component({
   selector: 'dv-ui-editor',
@@ -16,6 +18,8 @@ const $ = <any>jQ;
 export class UiEditorComponent implements OnInit {
   @ViewChild(MapComponent)
   private map: MapComponent;
+
+  @Input() selectedProject: Project;
 
   outerContainerDimensions: Dimensions = {
     width: 800,
@@ -32,12 +36,8 @@ export class UiEditorComponent implements OnInit {
     left: 0
   };
 
-  userApp = new UserCliche('app');
-  appId = this.userApp.getId();
-  selectedWidget = new UserWidget('test',
-                                  { height: 600, width: 800 },
-                                  this.appId
-                                );
+  userApp: UserCliche;
+  selectedWidget: UserWidget;
   allCliches = new Map<string, Cliche>();
 
   /**
@@ -50,6 +50,17 @@ export class UiEditorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.userApp = this.selectedProject.getUserApp();
+    if (!this.userApp) {
+      this.userApp = this.selectedProject.newUserApp();
+      this.selectedWidget = new UserWidget('test',
+        { height: 600, width: 800 },
+        this.userApp.getId());
+    }
+
+    const appId = this.userApp.getId();
+    console.log(this.userApp.getName());
+
     // Currently for testing
     // We create a main widget, give it some nester (inner) widgets
     // and give them some interesting sizes and positions.
@@ -58,17 +69,17 @@ export class UiEditorComponent implements OnInit {
 
     this.selectedWidget.updatePosition({ top: 100, left: 300 });
     Widget.addWidgetToCliche(this.allCliches, this.selectedWidget);
-    const innerWidget1 = new BaseWidget('test inner1', { height: 100, width: 200 }, 'img', '/', this.appId);
+    const innerWidget1 = new BaseWidget('test inner1', { height: 100, width: 200 }, 'img', '/', appId);
     innerWidget1.addWidgetToCliche(this.allCliches);
     this.selectedWidget.addInnerWidget(innerWidget1.getId());
     innerWidget1.updatePosition({ top: 50, left: 100 });
 
-    const innerWidget2 = new UserWidget('test inner2', { height: 200, width: 400 }, this.appId);
+    const innerWidget2 = new UserWidget('test inner2', { height: 200, width: 400 }, appId);
     innerWidget2.addWidgetToCliche(this.allCliches);
     this.selectedWidget.addInnerWidget(innerWidget2.getId());
     innerWidget2.updatePosition({ top: 200, left: 200 });
 
-    const innerWidget21 = new UserWidget('test inner21', { height: 100, width: 100 }, this.appId);
+    const innerWidget21 = new UserWidget('test inner21', { height: 100, width: 100 }, appId);
     innerWidget21.addWidgetToCliche(this.allCliches);
     innerWidget2.addInnerWidget(innerWidget21.getId());
     innerWidget21.updatePosition({ top: 50, left: 100 });

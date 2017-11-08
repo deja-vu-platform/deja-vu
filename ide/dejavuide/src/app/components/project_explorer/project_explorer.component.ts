@@ -1,13 +1,12 @@
-// import * as fs from 'fs';
-// const path = require('path');
-// import { ipcRenderer } from 'electron';
 declare const electron: any;
 const ipcRenderer = electron.ipcRenderer;
 
-import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
 import { NewProjectDialogComponent } from './new_project_dialog.component';
+
+import { Project } from '../../models/project/project';
 
 interface DisplayProject {
   name: string;
@@ -23,7 +22,7 @@ interface DisplayProject {
 })
 export class ProjectExplorerComponent implements OnInit {
   @Input() currentProject;
-
+  @Output() projectChosen = new EventEmitter<Project>();
   private selectedProject;
   projects = {};
 
@@ -61,18 +60,10 @@ export class ProjectExplorerComponent implements OnInit {
       that.ref.detectChanges();
     });
 
-    ipcRenderer.on('save-success', function(event) {
-      // TODO
-      that.updateDisplayProjectList();
-      that.loaderVisible = false;
-      that.ref.detectChanges();
-    });
-
     ipcRenderer.send('load');
   }
 
   handleNewProject() {
-    console.log('new clicked');
     const dialogRef = this.dialog.open(NewProjectDialogComponent, {
       width: '250px',
     });
@@ -80,7 +71,8 @@ export class ProjectExplorerComponent implements OnInit {
     const that = this;
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log(result);
+        const newProject = new Project(result.name);
+        that.projectChosen.emit(newProject);
       }
     });
   }
@@ -95,8 +87,8 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   loadClicked(projectName) {
-    // TODO
-    console.log('load clicked');
+    const newProject = Project.fromObject(this.projects[projectName]);
+    this.projectChosen.emit(newProject);
   }
 
   handleDelete(projectName): void {

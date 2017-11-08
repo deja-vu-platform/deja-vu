@@ -33,6 +33,14 @@ export abstract class Cliche {
   }
 
   abstract getWidget(widgetId: string): Widget;
+
+  getName(): string {
+    return this.meta.name;
+  }
+
+  getId(): string {
+    return this.meta.id;
+  }
 }
 
 export class UserCliche extends Cliche {
@@ -75,10 +83,6 @@ export class UserCliche extends Cliche {
     this.widgets.set(WidgetGroup.USED, new Map<string, Widget>());
     this.widgets.set(WidgetGroup.UNUSED, new Map<string, Widget>());
     this.widgets.set(WidgetGroup.TEMPLATE, new Map<string, Widget>());
-  }
-
-  getId (): string {
-    return this.meta.id;
   }
 
   isPage (widgetId: string): boolean {

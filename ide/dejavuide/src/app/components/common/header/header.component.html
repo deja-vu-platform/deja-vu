@@ -10,7 +10,10 @@
     </div>
     <div *ngIf="isSavable"
         class="menu-item">
-        <button type="button" class="btn btn-default"  id="save-project">
+        <button type="button" 
+                class="btn btn-default"
+                id="save-project"
+                (click)="handleSaveClicked()">
             <span class="glyphicon glyphicon-save"></span> 
             Save Project
         </button>

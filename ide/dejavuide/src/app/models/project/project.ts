@@ -43,6 +43,10 @@ export class Project {
     this.lastAccessed = (new Date()).getTime();
   }
 
+  getName(): string {
+    return this.meta.name;
+  }
+
   importCliche (clicheId) {
     this.importedCliches.add(clicheId);
   }
@@ -56,6 +60,10 @@ export class Project {
       throw new Error('There is already a user app associated with this project');
     }
     this.userApp = new UserCliche(this.meta.name);
+    return this.userApp;
+  }
+
+  getUserApp () {
     return this.userApp;
   }
 
