@@ -22,7 +22,7 @@
     </ul>
   </div>
   <div class="content">
-    <ul *ngIf="projectsToShow.length > 0"
+    <ul [hidden]="projectsToShow.length === 0"
         id="projects-list">
       <li *ngFor="let project of projectsToShow"
           [ngClass]="{'highlighted': project.isSelectedProject}">

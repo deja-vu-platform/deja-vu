@@ -24,7 +24,9 @@ export class Project {
       throw Error(notCorrectObject);
     }
     const project = new Project(object.meta.name);
-    project.userApp = UserCliche.fromObject(object.userApp);
+    if (object.userApp) {
+      project.userApp = UserCliche.fromObject(object.userApp);
+    }
 
     for (const clicheId of Object.keys(object.importedCliches)) {
         project.importCliche(clicheId);

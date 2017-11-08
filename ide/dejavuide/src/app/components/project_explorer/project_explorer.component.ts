@@ -1,7 +1,7 @@
 declare const electron: any;
 const ipcRenderer = electron.ipcRenderer;
 
-import { Component, Input, OnInit, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef, EventEmitter, Output, NgZone } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
 import { NewProjectDialogComponent } from './new_project_dialog.component';
@@ -35,12 +35,12 @@ export class ProjectExplorerComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private ref: ChangeDetectorRef,
-    private routerService: RouterService) {}
+    private routerService: RouterService,
+    private zone: NgZone) {}
 
   ngOnInit() {
     const that = this;
     this.loaderVisible = true;
-    console.log(this.ref);
     ipcRenderer.on('projects', function(event, data) {
       data.projects.forEach((projectInfo) => {
         const projectName = projectInfo[0];
@@ -52,7 +52,6 @@ export class ProjectExplorerComponent implements OnInit {
 
       that.updateDisplayProjectList();
       that.loaderVisible = false;
-      console.log(that.ref);
       if (!that.ref['destroyed']) { // Hack to prevent view destroyed errors
         that.ref.detectChanges();
       }
@@ -83,6 +82,10 @@ export class ProjectExplorerComponent implements OnInit {
         that.routerService.navigateTo(PageType.UI_EDITOR);
       }
     });
+
+    // const newProject = new Project('result.name');
+    // this.routerService.updateProject(newProject);
+    // this.routerService.navigateTo(PageType.UI_EDITOR);
   }
 
   currentProjectClicked() {
@@ -96,9 +99,10 @@ export class ProjectExplorerComponent implements OnInit {
 
   loadClicked(projectName) {
     const newProject = Project.fromObject(this.projects[projectName]);
-    // this.projectChosen.emit(newProject);
     this.routerService.updateProject(newProject);
-    this.routerService.navigateTo(PageType.UI_EDITOR);
+    this.zone.run(() => {
+      this.routerService.navigateTo(PageType.UI_EDITOR);
+    });
   }
 
   handleDelete(projectName): void {
@@ -150,67 +154,3 @@ export class ProjectExplorerComponent implements OnInit {
     };
   }
 }
-
-
-// /**
-//  * Creates a new Project based on user inputs
-//  * @param isDefault
-//  * @constructor
-//  */
-// function initNewProject() {
-//     var projectName = sanitizeStringOfSpecialChars($('#new-project-name').val());
-//     var version = $('#project-version').val();
-//     var author = $('#project-author').val();
-
-//     // create a copy instead
-//     var copyName = projectName;
-//     var copyNum = 0;
-//     // TODO should give user warning or options
-//     while(isCopyOfFile(projectsSavePath, copyName+'.json')){
-//         if (copyNum == 0){
-//             copyName = projectName + ' - Copy';
-//         } else {
-//             copyName = projectName + ' - Copy ' + copyNum;
-//         }
-//         copyNum++;
-//     }
-//     var newProject = new UserProject(copyName);
-//     return newProject;
-// }
-
-/**
- * Resets the menu options to their default values
- */
-function resetMenuOptions() {
-    $('#new-project-name').val('');
-    $('#project-version').val('');
-    $('#project-author').val('');
-
-    $('#project-json').val('');
-}
-
-// function deleteFileAndDisplay(dirname, filename, id){
-//     deleteFile(dirname, filename);
-//     $(".recent-projects").find("[data-filename='" + filename + "']").parent().remove();
-
-//     // todo refresh lists
-
-//     if (currentProject){
-//         if (currentProject.meta.id === id){
-//             currentProject = null;
-//             window.sessionStorage.removeItem('selectedProject');
-//             $('.current-project .content').html('')
-//             $('.current-project').css('display', 'none');
-//             $('#page-preview').html('');
-//             $('#project-name-preview').text('Project Preview')
-//         }
-//     }
-// }
-
-// $('#create-project').on('click', function () {
-//     selectedProject = initNewProject();
-//     resetMenuOptions();
-//     window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-
-//     window.location = 'index.html';
-// });

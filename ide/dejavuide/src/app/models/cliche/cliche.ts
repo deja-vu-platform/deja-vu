@@ -62,8 +62,10 @@ export class UserCliche extends Cliche {
       WidgetGroup.TEMPLATE];
 
     orderedGroups.forEach((group, i) => {
-      for (const widgetId of Object.keys(object.widgets[group])){
-        toAdds[i](Widget.fromObject(object.widgets[group][widgetId]));
+      if (object.widgets[group]) {
+        for (const widgetId of Object.keys(object.widgets[group])){
+          toAdds[i](Widget.fromObject(object.widgets[group][widgetId]));
+        }
       }
     });
     return uc;
@@ -78,11 +80,12 @@ export class UserCliche extends Cliche {
       version: '',
       author: ''
     };
-    this.widgets = new Map<WidgetGroup, Map<string, Widget>>();
-    this.widgets.set(WidgetGroup.PAGE, new Map<string, Widget>());
-    this.widgets.set(WidgetGroup.USED, new Map<string, Widget>());
-    this.widgets.set(WidgetGroup.UNUSED, new Map<string, Widget>());
-    this.widgets.set(WidgetGroup.TEMPLATE, new Map<string, Widget>());
+    this.widgets = new Map([
+      [WidgetGroup.PAGE, new Map<string, Widget>()],
+      [WidgetGroup.USED, new Map<string, Widget>()],
+      [WidgetGroup.UNUSED, new Map<string, Widget>()],
+      [WidgetGroup.TEMPLATE, new Map<string, Widget>()]
+    ]);
   }
 
   isPage (widgetId: string): boolean {

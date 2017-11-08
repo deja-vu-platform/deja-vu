@@ -40,7 +40,7 @@ export class UiEditorComponent implements OnInit {
   selectedWidget: UserWidget;
   allCliches = new Map<string, Cliche>();
 
-  constructor (private pcs: RouterService) {}
+  constructor (private routerService: RouterService) {}
 
   /**
    * Handles when any of the widgets in the app changes (i.e., resize
@@ -52,17 +52,18 @@ export class UiEditorComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.selectedProject = this.pcs.getProject();
+    console.log(this.routerService.getProject());
+    this.selectedProject = this.routerService.getProject();
     this.userApp = this.selectedProject.getUserApp();
     if (!this.userApp) {
       this.userApp = this.selectedProject.newUserApp();
-      this.selectedWidget = new UserWidget('test',
-        { height: 600, width: 800 },
-        this.userApp.getId());
     }
-
     const appId = this.userApp.getId();
     console.log(this.userApp.getName());
+
+    this.selectedWidget = new UserWidget('test',
+      { height: 600, width: 800 },
+      appId);
 
     // Currently for testing
     // We create a main widget, give it some nester (inner) widgets

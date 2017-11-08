@@ -28,7 +28,7 @@ const appRoutes: Routes = [
     ProjectExplorerModule,
     RouterModule.forRoot(
       appRoutes,
-      { enableTracing: true } // <-- debugging purposes only
+      // { enableTracing: true } // <-- debugging purposes only
     )
   ],
   providers: [RouterService],

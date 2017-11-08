@@ -65,14 +65,12 @@ export class HeaderComponent implements OnInit {
   }
 
   handleRedirectClick(type: PageType) {
-    if (this.routerService.canNavigateTo(type)) {
-      this.updateHeaderData(type);
-      this.routerService.navigateTo(type);
-    }
-  }
-
-  handleSaveClicked() {
-    this.save();
+    const that = this;
+    this.routerService.navigateTo(type).then((success) => {
+      if (success) {
+        that.updateHeaderData(type);
+      }
+    });
   }
 
   private updateHeaderData(type: PageType) {
@@ -82,7 +80,7 @@ export class HeaderComponent implements OnInit {
     this.pageTitle = getTitle(this.pageType);
   }
 
-  private save() {
+  save() {
     const selectedProject = this.routerService.getProject();
     if (selectedProject) {
       ipcRenderer.send('save', {

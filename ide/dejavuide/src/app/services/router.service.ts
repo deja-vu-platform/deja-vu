@@ -16,11 +16,10 @@ const pageToUrl: Map<PageType, string> = new Map([
 @Injectable()
 export class RouterService {
   private selectedProject: Project;
-  private selectedPageType = PageType.PROJECT_EXPLORER;
+  private selectedPageType: PageType;
   newPageType = new ReplaySubject<PageType>(1);
 
   constructor(private router: Router) {
-    this.newPageType.next(this.selectedPageType);
   }
 
   public updateProject(project: Project) {
@@ -35,19 +34,20 @@ export class RouterService {
     this.selectedProject = undefined;
   }
 
-  public navigateTo(pageType: PageType) {
+  public navigateTo(pageType: PageType): Promise<boolean> {
     if (this.canNavigateTo(pageType)) {
       this.selectedPageType = pageType;
       this.newPageType.next(this.selectedPageType);
-      this.router.navigate([pageToUrl.get(pageType)]);
+      return this.router.navigate([pageToUrl.get(pageType)]);
     }
+    return new Promise<boolean>(() => false);
   }
 
   public getSelectedPageType(): PageType {
     return this.selectedPageType;
   }
 
-  public canNavigateTo(pageType: PageType): boolean {
+  private canNavigateTo(pageType: PageType): boolean {
     if (pageType === PageType.UI_EDITOR) {
       if (!this.selectedProject) {
         return false;
