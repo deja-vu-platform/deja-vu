@@ -1,11 +1,21 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { RouterModule, Routes }    from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { HeaderModule } from './components/common/header/header.module';
 import { UiEditorModule } from './components/ui_editor/ui_editor.module';
-import { ProjectExplorerModule } from './components/project_explorer/project_explorer.module';
+import { UiEditorComponent } from './components/ui_editor/ui_editor.component';
 
+import { ProjectExplorerModule } from './components/project_explorer/project_explorer.module';
+import { ProjectExplorerComponent } from './components/project_explorer/project_explorer.component';
+
+import { ProjectCommunicatorService } from './services/project_communicator.service';
+
+const appRoutes: Routes = [
+  { path: 'projects', component: ProjectExplorerComponent},
+  { path: 'ui_editor', component: UiEditorComponent }
+];
 
 @NgModule({
   declarations: [
@@ -15,9 +25,13 @@ import { ProjectExplorerModule } from './components/project_explorer/project_exp
     BrowserModule,
     HeaderModule,
     UiEditorModule,
-    ProjectExplorerModule
+    ProjectExplorerModule,
+    RouterModule.forRoot(
+      appRoutes,
+      { enableTracing: true } // <-- debugging purposes only
+    )
   ],
-  providers: [],
+  providers: [ProjectCommunicatorService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

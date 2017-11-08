@@ -1,11 +1,11 @@
 declare const electron: any;
 const ipcRenderer = electron.ipcRenderer;
 
-import { Component, Input, OnInit, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
 import { NewProjectDialogComponent } from './new_project_dialog.component';
-
+import { ProjectCommunicatorService } from '../../services/project_communicator.service';
 import { Project } from '../../models/project/project';
 
 interface DisplayProject {
@@ -22,7 +22,7 @@ interface DisplayProject {
 })
 export class ProjectExplorerComponent implements OnInit {
   @Input() currentProject;
-  @Output() projectChosen = new EventEmitter<Project>();
+  // @Output() projectChosen = new EventEmitter<Project>();
   private selectedProject;
   projects = {};
 
@@ -33,7 +33,10 @@ export class ProjectExplorerComponent implements OnInit {
 
   componentToShow;
 
-  constructor(public dialog: MatDialog, private ref: ChangeDetectorRef) {}
+  constructor(
+    public dialog: MatDialog,
+    private ref: ChangeDetectorRef,
+    private pcs: ProjectCommunicatorService) {}
 
   ngOnInit() {
     const that = this;
@@ -72,7 +75,8 @@ export class ProjectExplorerComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const newProject = new Project(result.name);
-        that.projectChosen.emit(newProject);
+        // that.projectChosen.emit(newProject);
+        that.pcs.updateProject(newProject);
       }
     });
   }
@@ -88,7 +92,8 @@ export class ProjectExplorerComponent implements OnInit {
 
   loadClicked(projectName) {
     const newProject = Project.fromObject(this.projects[projectName]);
-    this.projectChosen.emit(newProject);
+    // this.projectChosen.emit(newProject);
+    this.pcs.updateProject(newProject);
   }
 
   handleDelete(projectName): void {

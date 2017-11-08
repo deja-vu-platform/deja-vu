@@ -1,13 +1,10 @@
 <dv-header [pageType]="selectedPage"
           (selectedPage)="selectPage($event)"
           (saveClicked)="save()"></dv-header>
-<ng-container *ngIf="selectedPage === PageType.PROJECT_EXPLORER">
-  <dv-project-explorer 
-    (projectChosen)="handleProjectChosen($event)">
-  </dv-project-explorer>
-</ng-container>
-<ng-container *ngIf="selectedPage === PageType.UI_EDITOR">
-  <dv-ui-editor 
-    [selectedProject]="selectedProject">
-  </dv-ui-editor>
-</ng-container>
+<router-outlet (projectChosen)="handleProjectChosen($event)"></router-outlet>
+<!-- <dv-project-explorer 
+  (projectChosen)="handleProjectChosen($event)">
+</dv-project-explorer>
+<dv-ui-editor 
+  [selectedProject]="selectedProject">
+</dv-ui-editor> -->

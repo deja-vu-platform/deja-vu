@@ -2,6 +2,7 @@ declare const electron: any;
 const ipcRenderer = electron.ipcRenderer;
 
 import { Component, OnInit } from '@angular/core';
+import { Router }                 from '@angular/router';
 
 import { Project } from './models/project/project';
 
@@ -20,10 +21,12 @@ export class AppComponent implements OnInit {
   selectedPage = PageType.PROJECT_EXPLORER;
   selectedProject: Project;
 
+  constructor(private router: Router) {}
   ngOnInit() {
     ipcRenderer.on('save-success', function(event) {
       console.log(event);
     });
+    this.router.navigate(['/projects']);
   }
 
   selectPage(pageType: PageType) {
@@ -39,6 +42,7 @@ export class AppComponent implements OnInit {
   handleProjectChosen(project: Project) {
     this.selectedProject = project;
     this.selectedPage = PageType.UI_EDITOR;
+    this.router.navigate(['/ui_editor']);
   }
 
   save() {

@@ -4,7 +4,7 @@ import { Dimensions, Position } from '../../utility/utility';
 import { BaseWidget, Widget, UserWidget } from '../../models/widget/widget';
 import { Cliche, UserCliche } from '../../models/cliche/cliche';
 import { Project } from '../../models/project/project';
-
+import { ProjectCommunicatorService } from '../../services/project_communicator.service';
 import { MapComponent } from './map/map.component';
 
 import * as jQuery from 'jquery';
@@ -19,7 +19,7 @@ export class UiEditorComponent implements OnInit {
   @ViewChild(MapComponent)
   private map: MapComponent;
 
-  @Input() selectedProject: Project;
+  selectedProject: Project;
 
   outerContainerDimensions: Dimensions = {
     width: 800,
@@ -40,6 +40,8 @@ export class UiEditorComponent implements OnInit {
   selectedWidget: UserWidget;
   allCliches = new Map<string, Cliche>();
 
+  constructor (private pcs: ProjectCommunicatorService) {}
+
   /**
    * Handles when any of the widgets in the app changes (i.e., resize
    * or changing positions).
@@ -50,6 +52,7 @@ export class UiEditorComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.selectedProject = this.pcs.getProject();
     this.userApp = this.selectedProject.getUserApp();
     if (!this.userApp) {
       this.userApp = this.selectedProject.newUserApp();
