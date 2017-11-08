@@ -45,7 +45,7 @@ export class ProjectExplorerComponent implements OnInit {
       data.projects.forEach((projectInfo) => {
         const projectName = projectInfo[0];
         const content = JSON.parse(projectInfo[1]);
-        if (content.objectType && (content.objectType === 'UserProject')) {
+        if (content.objectType && (content.objectType === 'Project')) {
           that.projects[projectName] = content;
         }
       });
@@ -131,7 +131,7 @@ export class ProjectExplorerComponent implements OnInit {
     const that = this;
     Object.keys(this.projects).forEach((projectName: string) => {
       const content = this.projects[projectName];
-      const time = parseInt(content.accessTime, 10);
+      const time = content.lastAccessed;
       if (!that.recentSelected || (now - time) < WEEK_IN_SEC) {
         projectsToShow.push(that.fileToDisplayProject(projectName, content.meta.id, time));
       }
