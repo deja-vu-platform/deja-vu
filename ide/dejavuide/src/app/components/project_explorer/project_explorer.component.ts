@@ -59,11 +59,13 @@ export class ProjectExplorerComponent implements OnInit {
 
     ipcRenderer.on('delete-success', function(event) {
       // TODO
+      delete that.projects[event.projectName];
       that.updateDisplayProjectList();
       that.loaderVisible = false;
       if (!that.ref['destroyed']) {
         that.ref.detectChanges();
       }
+      // TODO deal with if the project is your selected project
     });
 
     ipcRenderer.send('load');
@@ -106,25 +108,23 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   handleDelete(projectName): void {
-    console.log('delete clicked');
-    const dialogRef = this.dialog.open(ProjectDeleteDialogComponent, {
-      width: '250px',
-    });
-
     const that = this;
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        that.loaderVisible = true;
-        that.deleteProject(projectName, () => {
-          delete that.projects[projectName];
-          that.updateDisplayProjectList();
-          // TODO deal with if the project is your selected project
-        });
-      }
+
+    this.zone.run(() => {
+      const dialogRef = that.dialog.open(ProjectDeleteDialogComponent, {
+        width: '250px',
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          that.loaderVisible = true;
+          that.deleteProject(projectName);
+        }
+      });
     });
   }
 
-  private deleteProject(projectName, onFinish) {
+  private deleteProject(projectName) {
     ipcRenderer.send('delete', {projectName: projectName});
   }
 
