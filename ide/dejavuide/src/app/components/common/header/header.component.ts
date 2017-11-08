@@ -37,7 +37,6 @@ export class HeaderComponent implements OnChanges {
   otherPages: PageInfo[];
 
   ngOnChanges() {
-    console.log(this.pageType);
     this.otherPages = pages.filter(page => page.type !== this.pageType);
     this.isSavable = (this.pageType === PageType.UI_EDITOR);
   }

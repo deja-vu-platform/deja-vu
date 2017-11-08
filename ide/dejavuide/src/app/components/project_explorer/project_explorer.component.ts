@@ -4,11 +4,10 @@
 declare const electron: any;
 const ipcRenderer = electron.ipcRenderer;
 
-import { Component, Input, OnInit } from '@angular/core';
-import {MatDialog} from '@angular/material';
-
-import {ProjectDeleteDialogComponent} from './project_delete_dialog.component';
-import { NewProjectDialogComponent } from './new_project_dialog.component'
+import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import { MatDialog } from '@angular/material';
+import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
+import { NewProjectDialogComponent } from './new_project_dialog.component';
 
 interface DisplayProject {
   name: string;
@@ -28,21 +27,20 @@ export class ProjectExplorerComponent implements OnInit {
   private selectedProject;
   projects = {};
 
-  loaderVisible = true;
+  loaderVisible = false;
   recentSelected = true;
 
   projectsToShow: DisplayProject[] = [];
 
   componentToShow;
 
-  constructor(public dialog: MatDialog) {}
+  constructor(public dialog: MatDialog, private ref: ChangeDetectorRef) {}
 
   ngOnInit() {
-    console.log(electron);
-    console.log(electron.ipcRenderer);
     const that = this;
+    this.loaderVisible = true;
+
     ipcRenderer.on('projects', function(event, data) {
-      console.log(data.projects);
       data.projects.forEach((projectInfo) => {
         const projectName = projectInfo[0];
         const content = JSON.parse(projectInfo[1]);
@@ -53,18 +51,21 @@ export class ProjectExplorerComponent implements OnInit {
 
       that.updateDisplayProjectList();
       that.loaderVisible = false;
+      that.ref.detectChanges();
     });
 
     ipcRenderer.on('delete-success', function(event) {
       // TODO
       that.updateDisplayProjectList();
       that.loaderVisible = false;
+      that.ref.detectChanges();
     });
 
     ipcRenderer.on('save-success', function(event) {
       // TODO
       that.updateDisplayProjectList();
       that.loaderVisible = false;
+      that.ref.detectChanges();
     });
 
     ipcRenderer.send('load');
@@ -122,7 +123,7 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   private updateDisplayProjectList() {
-    this.projectsToShow = [];
+    const projectsToShow = [];
     const WEEK_IN_SEC = 604800000;
     const now = (new Date()).getTime();
     const that = this;
@@ -130,9 +131,10 @@ export class ProjectExplorerComponent implements OnInit {
       const content = this.projects[projectName];
       const time = parseInt(content.accessTime, 10);
       if (!that.recentSelected || (now - time) < WEEK_IN_SEC) {
-        that.projectsToShow.push(that.fileToDisplayProject(projectName, content.meta.id, time));
+        projectsToShow.push(that.fileToDisplayProject(projectName, content.meta.id, time));
       }
     });
+    this.projectsToShow = projectsToShow;
   }
 
   private fileToDisplayProject(projectName, id, lastAccessed): DisplayProject {
