@@ -1,5 +1,8 @@
-import { Component, Input, Output, OnChanges, EventEmitter } from '@angular/core';
-import { PageType } from '../../../app.component';
+declare const electron: any;
+const ipcRenderer = electron.ipcRenderer;
+
+import { Component, Input, Output, OnInit} from '@angular/core';
+import { RouterService, PageType } from '../../../services/router.service';
 
 interface PageInfo {
   title: string;
@@ -39,26 +42,53 @@ function getTitle(pageType: PageType): string {
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnChanges {
-  @Input() readonly pageType: PageType;
-  @Output() selectedPage = new EventEmitter<PageType>();
-  @Output() saveClicked = new EventEmitter<boolean>();
+export class HeaderComponent implements OnInit {
   isSavable: boolean;
   readonly dejavu = 'Déjà Vu';
   otherPages: PageInfo[];
+  pageType = PageType.PROJECT_EXPLORER;
   pageTitle: string;
 
-  ngOnChanges() {
+  constructor (private routerService: RouterService) {
+  }
+
+  ngOnInit() {
+    ipcRenderer.on('save-success', function(event) {
+      console.log(event);
+    });
+
+    this.routerService.newPageType.subscribe((pageType) => {
+      this.updateHeaderData(pageType);
+    });
+
+    this.handleRedirectClick(this.pageType);
+  }
+
+  handleRedirectClick(type: PageType) {
+    if (this.routerService.canNavigateTo(type)) {
+      this.updateHeaderData(type);
+      this.routerService.navigateTo(type);
+    }
+  }
+
+  handleSaveClicked() {
+    this.save();
+  }
+
+  private updateHeaderData(type: PageType) {
+    this.pageType = type;
     this.otherPages = pages.filter(page => page.type !== this.pageType);
     this.isSavable = (this.pageType === PageType.UI_EDITOR);
     this.pageTitle = getTitle(this.pageType);
   }
 
-  handleRedirectClick(type) {
-    this.selectedPage.emit(type);
-  }
-
-  handleSaveClicked() {
-    this.saveClicked.emit(true);
+  private save() {
+    const selectedProject = this.routerService.getProject();
+    if (selectedProject) {
+      ipcRenderer.send('save', {
+        projectName: selectedProject.getName(),
+        projectContents: JSON.parse(JSON.stringify(selectedProject))
+      });
+    }
   }
 }

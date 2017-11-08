@@ -1,11 +1,11 @@
 declare const electron: any;
 const ipcRenderer = electron.ipcRenderer;
 
-import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef, EventEmitter, Output } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
 import { NewProjectDialogComponent } from './new_project_dialog.component';
-import { ProjectCommunicatorService } from '../../services/project_communicator.service';
+import { RouterService, PageType } from '../../services/router.service';
 import { Project } from '../../models/project/project';
 
 interface DisplayProject {
@@ -22,7 +22,6 @@ interface DisplayProject {
 })
 export class ProjectExplorerComponent implements OnInit {
   @Input() currentProject;
-  // @Output() projectChosen = new EventEmitter<Project>();
   private selectedProject;
   projects = {};
 
@@ -36,12 +35,12 @@ export class ProjectExplorerComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     private ref: ChangeDetectorRef,
-    private pcs: ProjectCommunicatorService) {}
+    private routerService: RouterService) {}
 
   ngOnInit() {
     const that = this;
     this.loaderVisible = true;
-
+    console.log(this.ref);
     ipcRenderer.on('projects', function(event, data) {
       data.projects.forEach((projectInfo) => {
         const projectName = projectInfo[0];
@@ -53,14 +52,19 @@ export class ProjectExplorerComponent implements OnInit {
 
       that.updateDisplayProjectList();
       that.loaderVisible = false;
-      that.ref.detectChanges();
+      console.log(that.ref);
+      if (!that.ref['destroyed']) { // Hack to prevent view destroyed errors
+        that.ref.detectChanges();
+      }
     });
 
     ipcRenderer.on('delete-success', function(event) {
       // TODO
       that.updateDisplayProjectList();
       that.loaderVisible = false;
-      that.ref.detectChanges();
+      if (!that.ref['destroyed']) {
+        that.ref.detectChanges();
+      }
     });
 
     ipcRenderer.send('load');
@@ -75,8 +79,8 @@ export class ProjectExplorerComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const newProject = new Project(result.name);
-        // that.projectChosen.emit(newProject);
-        that.pcs.updateProject(newProject);
+        that.routerService.updateProject(newProject);
+        that.routerService.navigateTo(PageType.UI_EDITOR);
       }
     });
   }
@@ -93,7 +97,8 @@ export class ProjectExplorerComponent implements OnInit {
   loadClicked(projectName) {
     const newProject = Project.fromObject(this.projects[projectName]);
     // this.projectChosen.emit(newProject);
-    this.pcs.updateProject(newProject);
+    this.routerService.updateProject(newProject);
+    this.routerService.navigateTo(PageType.UI_EDITOR);
   }
 
   handleDelete(projectName): void {

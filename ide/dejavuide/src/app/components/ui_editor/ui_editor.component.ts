@@ -4,7 +4,7 @@ import { Dimensions, Position } from '../../utility/utility';
 import { BaseWidget, Widget, UserWidget } from '../../models/widget/widget';
 import { Cliche, UserCliche } from '../../models/cliche/cliche';
 import { Project } from '../../models/project/project';
-import { ProjectCommunicatorService } from '../../services/project_communicator.service';
+import { RouterService } from '../../services/router.service';
 import { MapComponent } from './map/map.component';
 
 import * as jQuery from 'jquery';
@@ -40,7 +40,7 @@ export class UiEditorComponent implements OnInit {
   selectedWidget: UserWidget;
   allCliches = new Map<string, Cliche>();
 
-  constructor (private pcs: ProjectCommunicatorService) {}
+  constructor (private pcs: RouterService) {}
 
   /**
    * Handles when any of the widgets in the app changes (i.e., resize
