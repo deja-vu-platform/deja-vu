@@ -25,15 +25,14 @@ export class MapComponent implements AfterViewInit {
   allWidgets: WidgetMap;
   @Input() zoom = 1;
 
-  private selectedWidget: Widget;
+  selectedWidget: Widget;
   mapScale = .1;
-  private navDragging = false;
   mapVisibleWindowPosition: Position = {
     top: 0,
     left: 0
   };
 
-  private screenDimensions: Dimensions;
+  screenDimensions: Dimensions;
   mapComponentDimensions: Dimensions = {
     height: 120,
     width: 180
@@ -110,9 +109,6 @@ export class MapComponent implements AfterViewInit {
         this.screenDimensions.width * this.mapScale -
           this.mapVisibleWindowDimensions.width));
 
-    // TODO remove later
-    this.updateContainerScroll(top, left);
-
     this.mapVisibleWindowPosition = {
       top: top,
       left: left
@@ -124,27 +120,18 @@ export class MapComponent implements AfterViewInit {
     // Initiate draggable
     $('#map-window').draggable({
       containment: '#zoom-selected-screen-size',
-      start: function(){
-        that.navDragging = true;
-      },
       drag: function(e, ui) {
-        that.updateContainerScroll(ui.position.top, ui.position.left);
-      },
-      stop: function(e, ui){
-        that.navDragging = false;
         that.stateService.updateVisibleWindowScrollPosition({
           top: ui.position.top / that.mapScale,
           left: ui.position.left / that.mapScale
         });
-
-        // TODO remove later
-        that.updateContainerScroll(ui.position.top, ui.position.left);
       },
-    });
-
-    $('.visible-window').scroll(function(event: Event) {
-      that.mapVisibleWindowPosition.top = $(this).scrollTop() * that.mapScale;
-      that.mapVisibleWindowPosition.left = $(this).scrollLeft() * that.mapScale;
+      stop: function(e, ui){
+        that.stateService.updateVisibleWindowScrollPosition({
+          top: ui.position.top / that.mapScale,
+          left: ui.position.left / that.mapScale
+        });
+      },
     });
   }
 
@@ -174,17 +161,5 @@ export class MapComponent implements AfterViewInit {
       }
     }
     this.mapWidgetSizes = mapWidgetSizes;
-  }
-
-  /**
-   * Reaches out to outside the map component and updates the scroll of a
-   * visible window of the work surface.
-   * TODO remove and pass it up to the correct component.
-   * @param top
-   * @param left
-   */
-  private updateContainerScroll(top, left) {
-    $('.visible-window').scrollTop(top / this.mapScale);
-    $('.visible-window').scrollLeft(left / this.mapScale);
   }
 }

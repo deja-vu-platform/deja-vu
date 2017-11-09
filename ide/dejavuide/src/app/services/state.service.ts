@@ -36,6 +36,7 @@ export class StateService {
   }
 
   updateVisibleWindowScrollPosition(newPos: Position) {
+    console.log('updating');
     this.visibleWindowScrollPosition.next(newPos);
   }
 

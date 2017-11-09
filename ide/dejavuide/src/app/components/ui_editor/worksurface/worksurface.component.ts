@@ -20,6 +20,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
   allWidgets: WidgetMap;
 
   selectedScreenDimensions: Dimensions;
+  visibleWindowScroll: Position;
 
   selectedWidget: Widget;
 
@@ -30,6 +31,13 @@ export class WorkSurfaceComponent implements AfterViewInit {
     stateService.selectedScreenDimensions
       .subscribe((newSelectedScreenDimensions) => {
         this.selectedScreenDimensions = newSelectedScreenDimensions;
+      });
+
+    stateService.visibleWindowScrollPosition
+      .subscribe((newScrollPosition) => {
+        this.visibleWindowScroll = newScrollPosition;
+        $('.visible-window').scrollTop(newScrollPosition.top);
+        $('.visible-window').scrollLeft(newScrollPosition.left);
       });
 
     projectService.allWidgets.subscribe((updatedAllWidgets) => {
@@ -54,6 +62,14 @@ export class WorkSurfaceComponent implements AfterViewInit {
       drop: function (event, ui) {
           that.onDropFinished();
       }
+    });
+
+    $('.visible-window').scroll((event: Event) => {
+      const jqo = $('.visible-window');
+      this.stateService.updateVisibleWindowScrollPosition({
+        top: jqo.scrollTop(),
+        left: jqo.scrollLeft()
+      });
     });
   }
 
