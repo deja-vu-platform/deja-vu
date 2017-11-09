@@ -1,7 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Dimensions, Position } from '../utility/utility';
+export interface Dimensions {
+  width: number;
+  height: number;
+}
+
+export interface Position {
+  top: number;
+  left: number;
+}
 
 @Injectable()
 export class StateService {
@@ -31,16 +39,21 @@ export class StateService {
     height: 1000
   });
 
+  zoom = new BehaviorSubject<number>(1);
+
   updateVisibleWindowDimensions(newDims: Dimensions) {
     this.visibleWindowDimensions.next(newDims);
   }
 
   updateVisibleWindowScrollPosition(newPos: Position) {
-    console.log('updating');
     this.visibleWindowScrollPosition.next(newPos);
   }
 
   updateSelectedScreenDimensions(newDims: Dimensions) {
     this.selectedScreenDimensions.next(newDims);
+  }
+
+  updateZoom(newVal: number) {
+    this.zoom.next(newVal);
   }
 }

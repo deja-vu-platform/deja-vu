@@ -17,18 +17,18 @@ const $ = <any>jQuery;
   styleUrls: ['./widget.component.css'],
 })
 export class WidgetComponent implements AfterViewInit {
-  allWidgets: WidgetMap;
   @Input() widget: Widget;
   @Input() isSelected = false;
   @Input() isMovable = false;
 
   @Output() onChange = new EventEmitter<boolean>();
 
-  widgetType = WidgetType;
-  Widget = Widget;
+  readonly WidgetType = WidgetType;
+  readonly Widget = Widget;
 
   private el: HTMLElement;
-
+  private allWidgets: WidgetMap;
+  
   constructor(
     el: ElementRef,
     private projectService: ProjectService

@@ -4,7 +4,7 @@
       [style.width]="widget.getDimensions().width+'px'">
   <span>I am a widget</span>
   <span>Name: {{widget.getName()}}</span>
-  <ng-container *ngIf="widget.getWidgetType() === widgetType.USER_WIDGET">
+  <ng-container *ngIf="widget.getWidgetType() === WidgetType.USER_WIDGET">
     <ng-container *ngFor="let innerWidgetId of widget.getInnerWidgetIds()">
       <dv-widget [widget]="Widget.getWidget(allWidgets, innerWidgetId)"
                   [isSelected]="false"

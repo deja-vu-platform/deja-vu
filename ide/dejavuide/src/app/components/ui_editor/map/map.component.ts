@@ -1,8 +1,7 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 
 import { Widget, UserWidget, WidgetType, WidgetMap } from '../../../models/widget/widget';
-import { Dimensions, Position } from '../../../utility/utility';
-import { StateService } from '../../../services/state.service';
+import { StateService, Dimensions, Position } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 
 // Maps needs drag-and-drop
@@ -22,9 +21,6 @@ export class MapComponent implements AfterViewInit {
     width: 1
   };
 
-  allWidgets: WidgetMap;
-  @Input() zoom = 1;
-
   selectedWidget: Widget;
   mapScale = .1;
   mapVisibleWindowPosition: Position = {
@@ -41,10 +37,17 @@ export class MapComponent implements AfterViewInit {
   minimized = false;
   mapWidgetSizes: Dimensions[] = [];
 
+  private allWidgets: WidgetMap;
+  private zoom = 1;
+
   constructor(
     private stateService: StateService,
     private projectService: ProjectService
   ) {
+    stateService.zoom.subscribe((newZoom) => {
+      this.zoom = newZoom;
+    });
+
     stateService.selectedScreenDimensions
       .subscribe((newSelectedScreenDimensions) => {
         this.screenDimensions = newSelectedScreenDimensions;

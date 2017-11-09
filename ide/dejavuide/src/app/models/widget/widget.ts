@@ -1,4 +1,5 @@
-import { generateId, Dimensions, Position } from '../../utility/utility';
+import { generateId } from '../../utility/utility';
+import { Dimensions, Position } from '../../services/state.service';
 
 /**
  * Currently a map from clicheIds to all the widgets it contains (widgetId

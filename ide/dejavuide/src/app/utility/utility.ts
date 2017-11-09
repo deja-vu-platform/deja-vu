@@ -1,16 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-export interface Dimensions {
-  width: number;
-  height: number;
-}
-
-export interface Position {
-  top: number;
-  left: number;
-}
-
 
 // special characters not allowed in inputs
 const regex = /[^\w\s\-]/gi;

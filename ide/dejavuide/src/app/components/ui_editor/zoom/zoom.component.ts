@@ -1,7 +1,6 @@
-import { Component, Output, EventEmitter} from '@angular/core';
+import { Component } from '@angular/core';
 
-import { Dimensions } from '../../../utility/utility';
-import { StateService } from '../../../services/state.service';
+import { Dimensions, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 
 enum ZoomType {
@@ -19,21 +18,19 @@ const CHEVRON = {
   styleUrls: ['./zoom.component.css']
 })
 export class ZoomComponent {
-  visibleWindowDimensions: Dimensions;
-  widgetDimensions: Dimensions;
-  screenDimensions: Dimensions;
-
-  @Output() updatedZoom = new EventEmitter<number>();
-
   readonly sliderMinVal = -300;
   readonly sliderMaxVal = 300;
+  readonly ZoomType = ZoomType;
+
   zoomControlText = '100%';
   sliderVal = 0;
   minimized = false;
   chevron = CHEVRON.RIGHT;
-  ZoomType = ZoomType;
-
+  
   private currentZoom: number;
+  private visibleWindowDimensions: Dimensions;
+  private widgetDimensions: Dimensions;
+  private screenDimensions: Dimensions;
 
   constructor(
     private stateService: StateService,
@@ -148,7 +145,7 @@ export class ZoomComponent {
   }
 
   private zoomChanged() {
-    this.updatedZoom.emit(this.currentZoom);
+    this.stateService.updateZoom(this.currentZoom);
     this.zoomControlText = this.makeZoomText(this.getZoomFromSliderVal());
   }
 }

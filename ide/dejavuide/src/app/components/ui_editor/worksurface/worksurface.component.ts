@@ -1,8 +1,7 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 
 import { Widget, WidgetMap } from '../../../models/widget/widget';
-import { Dimensions, Position } from '../../../utility/utility';
-import { StateService } from '../../../services/state.service';
+import { Dimensions, Position, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 
 import * as jQuery from 'jquery';
@@ -16,18 +15,21 @@ const $ = <any>jQuery;
   styleUrls: ['./worksurface.component.css']
 })
 export class WorkSurfaceComponent implements AfterViewInit {
-  @Input() currentZoom = 1;
-  allWidgets: WidgetMap;
-
   selectedScreenDimensions: Dimensions;
-  visibleWindowScroll: Position;
-
   selectedWidget: Widget;
+
+  private currentZoom = 1;
+  private allWidgets: WidgetMap;
+  private visibleWindowScroll: Position;
 
   constructor(
     private stateService: StateService,
     private projectService: ProjectService
   ) {
+    stateService.zoom.subscribe((newZoom) => {
+      this.currentZoom = newZoom;
+    });
+
     stateService.selectedScreenDimensions
       .subscribe((newSelectedScreenDimensions) => {
         this.selectedScreenDimensions = newSelectedScreenDimensions;
