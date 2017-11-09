@@ -20,8 +20,7 @@
       toggle show
     </button>  
     <ng-container *ngFor="let id of widget.getInnerWidgetIds()">
-      <dv-list-item [allCliches]="allCliches"
-                    [widget]="widget.getInnerWidget(allCliches, id)"
+      <dv-list-item [widget]="widget.getInnerWidget(allCliches, id)"
                     [isDraggable]="false"
                     [isDeletable]="true"
                     [hidden]="!innerShown">

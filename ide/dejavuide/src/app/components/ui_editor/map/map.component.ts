@@ -1,10 +1,9 @@
 import { Component, AfterViewInit } from '@angular/core';
 
-import { Widget, UserWidget, WidgetType, ClicheMap } from '../../../models/widget/widget';
+import { Widget, UserWidget, WidgetType } from '../../../models/widget/widget';
+import { Cliche, ClicheMap } from '../../../models/cliche/cliche';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
-import { Cliche } from '../../../models/cliche/cliche';
-
 
 // Maps needs drag-and-drop
 import * as jQuery from 'jquery';

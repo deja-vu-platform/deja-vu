@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import {Cliche, UserCliche, DvCliche} from '../../../models/cliche/cliche';
-import {Widget, BaseWidget, UserWidget, WidgetType, ClicheMap} from '../../../models/widget/widget';
+import { Cliche, UserCliche, DvCliche, ClicheMap } from '../../../models/cliche/cliche';
+import { Widget, BaseWidget, UserWidget, WidgetType } from '../../../models/widget/widget';
 import { ProjectService } from '../../../services/project.service';
 
 @Component({
@@ -25,8 +25,6 @@ export class ListComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.userApp);
-
     this.userApp.getPageIds().forEach((pageId) => {
       this.pages.push(<UserWidget>Widget.getWidget(this.allCliches, pageId));
     });

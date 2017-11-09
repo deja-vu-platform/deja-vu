@@ -10,5 +10,4 @@ import { Widget, BaseWidget, UserWidget, WidgetType } from '../../../../models/w
 })
 export class ListSectionComponent {
   @Input() widgets: Widget[];
-  @Input() allCliches: Map<string, Cliche>;
 }

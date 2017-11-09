@@ -1,14 +1,7 @@
 import { generateId } from '../../utility/utility';
 import { Dimensions, Position } from '../../services/state.service';
-import { Cliche, UserCliche } from '../cliche/cliche';
+import { Cliche, UserCliche, ClicheMap } from '../cliche/cliche';
 import { Meta } from '../project/project';
-
-/**
- * Currently a map from clicheIds to all the widgets it contains (widgetId
- * to widget). Will in the next pull request become a map from clicheIds to
- * cliche objects.
- */
-export type ClicheMap = Map<string, Cliche>;
 
 export enum WidgetType {
     BASE_WIDGET, USER_WIDGET, CLICHE_WIDGET

@@ -1,8 +1,10 @@
-<dv-worksurface></dv-worksurface>
+<ng-container *ngIf="selectedProject">
+  <dv-worksurface></dv-worksurface>
 
-<dv-zoom></dv-zoom>
+  <dv-zoom></dv-zoom>
 
-<dv-map></dv-map>
+  <dv-map></dv-map>
 
-<dv-list [userApp]="userApp">
-</dv-list>
+  <dv-list [userApp]="userApp">
+  </dv-list>
+</ng-container>

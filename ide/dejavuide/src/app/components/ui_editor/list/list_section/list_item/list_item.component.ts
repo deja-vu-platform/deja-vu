@@ -1,9 +1,10 @@
 import { Component, Input } from '@angular/core';
-import {MatDialog} from '@angular/material';
+import { MatDialog } from '@angular/material';
 
-import { Cliche } from '../../../../../models/cliche/cliche';
-import {Widget, BaseWidget, UserWidget, WidgetType} from '../../../../../models/widget/widget';
-import {DeleteDialogComponent} from './delete_dialog.component';
+import { Cliche, ClicheMap } from '../../../../../models/cliche/cliche';
+import { Widget, BaseWidget, UserWidget, WidgetType } from '../../../../../models/widget/widget';
+import { DeleteDialogComponent } from './delete_dialog.component';
+import { ProjectService } from '../../../../../services/project.service';
 
 @Component({
   selector: 'dv-list-item',
@@ -11,16 +12,23 @@ import {DeleteDialogComponent} from './delete_dialog.component';
   styleUrls: ['./list_item.component.css']
 })
 export class ListItemComponent {
-  @Input() allCliches: Map<string, Cliche>;
   @Input() isDraggable = false;
   @Input() isDeletable = true;
   @Input() widget: Widget;
 
-  WidgetType = WidgetType;
+  readonly WidgetType = WidgetType;
 
   innerShown = false;
-
-  constructor(public dialog: MatDialog) {}
+  allCliches: ClicheMap;
+  
+  constructor(
+    public dialog: MatDialog,
+    private projectService: ProjectService
+  ) {
+    projectService.allCliches.subscribe((updatedAllCliches) => {
+      this.allCliches = updatedAllCliches;
+    });
+  }
 
   handleDelete(): void {
     const dialogRef = this.dialog.open(DeleteDialogComponent, {

@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 
 import { ProjectService } from '../../../services/project.service';
-import { Widget, WidgetType, ClicheMap } from '../../../models/widget/widget';
-import { Cliche } from '../../../models/cliche/cliche';
+import { Widget, WidgetType } from '../../../models/widget/widget';
+import { Cliche, ClicheMap } from '../../../models/cliche/cliche';
 
 // Widgets are drag-and-droppable
 import * as jQuery from 'jquery';
@@ -34,7 +34,6 @@ export class WidgetComponent implements AfterViewInit {
   ) {
       this.el = el.nativeElement;
       projectService.allCliches.subscribe((updatedAllCliches) => {
-        console.log('got my cliches');
         this.allCliches = updatedAllCliches;
       });
   }
