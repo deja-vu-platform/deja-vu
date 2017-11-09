@@ -1,6 +1,6 @@
 <dv-header pageTitle="Test"></dv-header>
 
-<div class="outer-container">
+<div class="visible-window">
   <dv-worksurface 
     [widget]="selectedWidget"
     [allWidgets]="allWidgets"
@@ -10,14 +10,14 @@
 </div>
         
 <dv-zoom 
-  [outerContainerDimensions]="outerContainerDimensions"
+  [visibleWindowDimensions]="visibleWindowDimensions"
   [widgetDimensions]="selectedWidget.getDimensions()"
   [screenDimensions]="screenDimensions">
 </dv-zoom>
 
 <dv-map 
-  [outerContainerDimensions]="outerContainerDimensions"
-  [outerContainerScroll]="outerContainerScroll"
+  [visibleWindowDimensions]="visibleWindowDimensions"
+  [visibleWindowScrollPosition]="visibleWindowScrollPosition"
   [screenDimensions]="screenDimensions"
   [selectedWidget]="selectedWidget"
   [allWidgets]="allWidgets"

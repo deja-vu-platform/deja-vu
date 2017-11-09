@@ -13,20 +13,32 @@ export class AppComponent implements OnInit {
   @ViewChild(MapComponent)
   private map: MapComponent;
 
-  outerContainerDimensions: Dimensions = {
+  /**
+   * This is the visible part of the worksurface.
+   */
+  visibleWindowDimensions: Dimensions = {
     width: 800,
     height: 500
   };
 
+  /**
+   * Related to the visible part of the worksurface, it is its current
+   * scroll position.
+   */
+  visibleWindowScrollPosition: Position = {
+    top: 0,
+    left: 0
+  };
+
+  /**
+   * This is the screen size the user is making an app for. This currently does
+   * not play a big role in this app.
+   */
   screenDimensions: Dimensions = {
     width: 2000,
     height: 1000
   };
 
-  outerContainerScroll: Position = {
-    top: 0,
-    left: 0
-  };
 
   selectedWidget = new UserWidget('test', { height: 600, width: 800 }, '1234');
   allWidgets = new Map<string, Map<string, Widget>>();

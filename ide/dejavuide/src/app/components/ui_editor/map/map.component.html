@@ -20,19 +20,19 @@
       <!-- the full area isn't useful right now -->
       <div id="map-full-area"></div>
       <div id="zoom-selected-screen-size"
-        [style.height]="_screenDimensions.height*mapScale+'px'"
-        [style.width]="_screenDimensions.width*mapScale+'px'"></div>
-      <div *ngIf="_selectedWidget"
+        [style.height]="screenDimensions.height*mapScale+'px'"
+        [style.width]="screenDimensions.width*mapScale+'px'"></div>
+      <div *ngIf="selectedWidget"
           id="map-component-sizes"
           [style.zoom]="zoom"
           [style.top]=
-          "(_selectedWidget.getPosition().top * this.mapScale) + 'px'"
+          "(selectedWidget.getPosition().top * this.mapScale) + 'px'"
           [style.left]=
-          "(_selectedWidget.getPosition().left * this.mapScale) + 'px'"
+          "(selectedWidget.getPosition().left * this.mapScale) + 'px'"
           [style.height]=
-          "(_selectedWidget.getDimensions().height * this.mapScale) + 'px'"
+          "(selectedWidget.getDimensions().height * this.mapScale) + 'px'"
           [style.width]=
-          "(_selectedWidget.getDimensions().width * this.mapScale) + 'px'">
+          "(selectedWidget.getDimensions().width * this.mapScale) + 'px'">
         <div *ngFor="let size of mapWidgetSizes"
               class="map-inner-component-size"
               [style.height]= "(size.height * this.mapScale) + 'px'"
@@ -42,9 +42,9 @@
       </div>
       <!-- Map window is the little thing you drag to move your map -->
       <div id="map-window"
-          [style.top]="mapWindowPosition.top+'px'"
-          [style.left]="mapWindowPosition.left+'px'"
-          [style.height]="(outerContainerDimensions.height*mapScale)+'px'"
-          [style.width]="(outerContainerDimensions.width*mapScale)+'px'"></div>
+          [style.top]="mapVisibleWindowPosition.top+'px'"
+          [style.left]="mapVisibleWindowPosition.left+'px'"
+          [style.height]="(visibleWindowDimensions.height*mapScale)+'px'"
+          [style.width]="(visibleWindowDimensions.width*mapScale)+'px'"></div>
   </div>
 </div>

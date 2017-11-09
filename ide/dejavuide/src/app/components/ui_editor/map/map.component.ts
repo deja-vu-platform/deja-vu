@@ -15,17 +15,19 @@ const $ = <any>jQuery;
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements AfterViewInit {
-  @Input() set outerContainerScroll(value: Position) {
+  @Input() set visibleWindowScrollPosition(value: Position) {
     this.scrollPosition.top = value.top * this.mapScale;
     this.scrollPosition.left = value.left * this.mapScale;
 
-    this.mapWindowPosition.top = this.scrollPosition.top;
-    this.mapWindowPosition.left = this.scrollPosition.left;
+    this.mapVisibleWindowPosition.top = this.scrollPosition.top;
+    this.mapVisibleWindowPosition.left = this.scrollPosition.left;
   }
-  @Input() outerContainerDimensions: Dimensions = {
+
+  @Input() visibleWindowDimensions: Dimensions = {
     height: 1,
     width: 1
   };
+
   @Input() set screenDimensions(value: Dimensions) {
     this._screenDimensions = value;
     const widthScale = this.dimensions.width / this._screenDimensions.width;
@@ -33,6 +35,11 @@ export class MapComponent implements AfterViewInit {
 
     this.mapScale = Math.min(widthScale, heightScale);
   }
+
+  get screenDimensions() {
+    return this._screenDimensions;
+  }
+
   @Input() allWidgets: WidgetMap;
   @Input() zoom = 1;
 
@@ -41,21 +48,25 @@ export class MapComponent implements AfterViewInit {
     this.updateView();
   }
 
+  get selectedWidget() {
+    return this._selectedWidget;
+  }
+
   @Output() newScrollPosition = new EventEmitter<Position>();
 
-  _selectedWidget: Widget;
+  private _selectedWidget: Widget;
   mapScale = .1;
-  navDragging = false;
+  private navDragging = false;
   scrollPosition: Position = {
     top: 0,
     left: 0
   };
-  mapWindowPosition: Position = {
+  mapVisibleWindowPosition: Position = {
     top: 0,
     left: 0
   };
 
-  _screenDimensions: Dimensions;
+  private _screenDimensions: Dimensions;
   dimensions: Dimensions = {
     height: 120,
     width: 180
@@ -81,39 +92,44 @@ export class MapComponent implements AfterViewInit {
       left: posX / this.mapScale
     });
 
-    const top =  Math.max(0, Math.min(posY, (this._screenDimensions.height - this.outerContainerDimensions.height) * this.mapScale));
-    const left =  Math.max(0, Math.min(posX, (this._screenDimensions.width - this.outerContainerDimensions.width) * this.mapScale));
+    const top =  Math.max(0, Math.min(posY, (this._screenDimensions.height - this.visibleWindowDimensions.height) * this.mapScale));
+    const left =  Math.max(0, Math.min(posX, (this._screenDimensions.width - this.visibleWindowDimensions.width) * this.mapScale));
 
     // TODO remove later
     this.updateContainerScroll(top, left);
 
-    this.mapWindowPosition = {
+    this.mapVisibleWindowPosition = {
       top: top,
       left: left
     };
   }
 
   ngAfterViewInit() {
-    const _this = this;
+    const that = this;
     // Initiate draggable
     $('#map-window').draggable({
       containment: '#zoom-selected-screen-size',
       start: function(){
-        _this.navDragging = true;
+        that.navDragging = true;
       },
       drag: function(e, ui) {
-        _this.updateContainerScroll(ui.position.top, ui.position.left);
+        that.updateContainerScroll(ui.position.top, ui.position.left);
       },
       stop: function(e, ui){
-        _this.navDragging = false;
-        _this.newScrollPosition.emit({
-          top: ui.position.top / _this.mapScale,
-          left: ui.position.left / _this.mapScale
+        that.navDragging = false;
+        that.newScrollPosition.emit({
+          top: ui.position.top / that.mapScale,
+          left: ui.position.left / that.mapScale
         });
 
         // TODO remove later
-        _this.updateContainerScroll(ui.position.top, ui.position.left);
+        that.updateContainerScroll(ui.position.top, ui.position.left);
       },
+    });
+
+    $('.visible-window').scroll(function(event: Event) {
+      that.mapVisibleWindowPosition.top = $(this).scrollTop() * that.mapScale;
+      that.mapVisibleWindowPosition.left = $(this).scrollLeft() * that.mapScale;
     });
   }
 
@@ -147,13 +163,13 @@ export class MapComponent implements AfterViewInit {
 
   /**
    * Reaches out to outside the map component and updates the scroll of a
-   * containing div.
+   * visible window of the work surface.
    * TODO remove and pass it up to the correct component.
    * @param top
    * @param left
    */
   private updateContainerScroll(top, left) {
-    $('.outer-container').scrollTop(top / this.mapScale);
-    $('.outer-container').scrollLeft(left / this.mapScale);
+    $('.visible-window').scrollTop(top / this.mapScale);
+    $('.visible-window').scrollLeft(left / this.mapScale);
   }
 }

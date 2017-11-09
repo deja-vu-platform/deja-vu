@@ -120,7 +120,7 @@ export abstract class Widget {
     }
 
     getDimensions(): Dimensions {
-        return JSON.parse(JSON.stringify(this.properties.dimensions));
+        return Object.assign({}, this.properties.dimensions);
     }
 
     updateDimensions(newDimensions: Dimensions) {
@@ -148,15 +148,15 @@ export abstract class Widget {
     }
 
     getLocalCustomStyles() {
-        return JSON.parse(JSON.stringify(this.properties.styles.custom));
+        return Object.assign({}, this.properties.styles.custom);
     }
 
     getPosition(): Position {
-        return JSON.parse(JSON.stringify(this.position));
+        return Object.assign({}, this.position);
     }
 
     updatePosition(newPosition: Position) {
-        this.position = JSON.parse(JSON.stringify(newPosition));
+        this.position = Object.assign({}, newPosition);
     }
 
     updateCustomStyle(styleName: string, value) {
@@ -180,7 +180,7 @@ export abstract class Widget {
         // that is read when rendering, and updated whenever a template is
         // updated. If the field is there, just read from it, if not recursively
         // create it.
-        const styles = JSON.parse(JSON.stringify(parentStyles));
+        const styles = Object.assign({}, parentStyles);
 
         let inheritedStyles = {};
         if (this.getTemplateId()) {

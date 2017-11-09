@@ -17,7 +17,7 @@ const CHEVRON = {
   styleUrls: ['./zoom.component.css']
 })
 export class ZoomComponent {
-  @Input() outerContainerDimensions: Dimensions;
+  @Input() visibleWindowDimensions: Dimensions;
   @Input() widgetDimensions: Dimensions;
   @Input() screenDimensions: Dimensions;
 
@@ -69,16 +69,16 @@ export class ZoomComponent {
         this.currentZoom = this.getZoomFromSliderVal();
         break;
     case ZoomType.FIT:
-        const zoomHeight = this.outerContainerDimensions.height /
+        const zoomHeight = this.visibleWindowDimensions.height /
                                 this.widgetDimensions.height;
-        const zoomWidth = this.outerContainerDimensions.width /
+        const zoomWidth = this.visibleWindowDimensions.width /
                                 this.widgetDimensions.width;
         this.currentZoom = Math.min(zoomWidth, zoomHeight);
         break;
     case ZoomType.FULL:
-        const widthScale =  this.outerContainerDimensions.width /
+        const widthScale =  this.visibleWindowDimensions.width /
                                 this.screenDimensions.width;
-        const heightScale = this.outerContainerDimensions.height /
+        const heightScale = this.visibleWindowDimensions.height /
                                 this.screenDimensions.height;
         this.currentZoom = Math.min(widthScale, heightScale);
         break;
