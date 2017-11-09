@@ -1,8 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { Dimensions, Position } from './utility/utility';
 import { BaseWidget, Widget, UserWidget } from './models/widget/widget';
-import { MapComponent } from './components/ui_editor/map/map.component';
+import { ProjectService } from './services/project.service';
 
 @Component({
   selector: 'app-root',
@@ -10,47 +9,10 @@ import { MapComponent } from './components/ui_editor/map/map.component';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  @ViewChild(MapComponent)
-  private map: MapComponent;
+  private selectedWidget = new UserWidget('test', { height: 600, width: 800 }, '1234');
+  private allWidgets = new Map<string, Map<string, Widget>>();
 
-  /**
-   * This is the visible part of the worksurface.
-   */
-  visibleWindowDimensions: Dimensions = {
-    width: 800,
-    height: 500
-  };
-
-  /**
-   * Related to the visible part of the worksurface, it is its current
-   * scroll position.
-   */
-  visibleWindowScrollPosition: Position = {
-    top: 0,
-    left: 0
-  };
-
-  /**
-   * This is the screen size the user is making an app for. This currently does
-   * not play a big role in this app.
-   */
-  screenDimensions: Dimensions = {
-    width: 2000,
-    height: 1000
-  };
-
-
-  selectedWidget = new UserWidget('test', { height: 600, width: 800 }, '1234');
-  allWidgets = new Map<string, Map<string, Widget>>();
-
-  /**
-   * Handles when any of the widgets in the app changes (i.e., resize
-   * or changing positions).
-   */
-  handleWidgetChange() {
-    // Currently just updates the map vies
-    this.map.updateView();
-  }
+  constructor(private projectService: ProjectService) {}
 
   ngOnInit() {
     // Currently for testing
@@ -72,9 +34,8 @@ export class AppComponent implements OnInit {
     innerWidget21.addWidgetToAllWidgets(this.allWidgets);
     innerWidget2.addInnerWidget(innerWidget21.getId());
     innerWidget21.updatePosition({ top: 50, left: 100 });
-  }
 
-  handleMapScroll(e) {
-    console.log(e);
+    this.projectService.updateAllWidgets(this.allWidgets);
+    this.projectService.updateSelectedWidget(this.selectedWidget);
   }
 }

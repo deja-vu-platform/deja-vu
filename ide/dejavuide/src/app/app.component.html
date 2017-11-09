@@ -1,27 +1,9 @@
 <dv-header pageTitle="Test"></dv-header>
 
-<div class="visible-window">
-  <dv-worksurface 
-    [widget]="selectedWidget"
-    [allWidgets]="allWidgets"
-    [dimensions]="screenDimensions"
-    (onChange)="handleWidgetChange()">
-  </dv-worksurface>
-</div>
-        
-<dv-zoom 
-  [visibleWindowDimensions]="visibleWindowDimensions"
-  [widgetDimensions]="selectedWidget.getDimensions()"
-  [screenDimensions]="screenDimensions">
-</dv-zoom>
+<dv-worksurface></dv-worksurface>
 
-<dv-map 
-  [visibleWindowDimensions]="visibleWindowDimensions"
-  [visibleWindowScrollPosition]="visibleWindowScrollPosition"
-  [screenDimensions]="screenDimensions"
-  [selectedWidget]="selectedWidget"
-  [allWidgets]="allWidgets"
-  (newScreenPosition)="handleMapScroll($event)">
-</dv-map>
+<dv-zoom></dv-zoom>
+
+<dv-map></dv-map>
 
                 

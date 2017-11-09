@@ -2,6 +2,8 @@ import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/
 
 import { Widget, WidgetMap } from '../../../models/widget/widget';
 import { Dimensions, Position } from '../../../utility/utility';
+import { StateService } from '../../../services/state.service';
+import { ProjectService } from '../../../services/project.service';
 
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
@@ -14,32 +16,43 @@ const $ = <any>jQuery;
   styleUrls: ['./worksurface.component.css']
 })
 export class WorkSurfaceComponent implements AfterViewInit {
-  @Input() currentZoom: number;
-  @Input() allWidgets:  WidgetMap;
-  @Input() set widget(val: Widget) {
-    // set up things
-    this._widget = val;
-    // TODO probably will have to do other things
+  @Input() currentZoom = 1;
+  allWidgets: WidgetMap;
+
+  selectedScreenDimensions: Dimensions;
+
+  selectedWidget: Widget;
+
+  constructor(
+    private stateService: StateService,
+    private projectService: ProjectService
+  ) {
+    stateService.selectedScreenDimensions
+      .subscribe((newSelectedScreenDimensions) => {
+        this.selectedScreenDimensions = newSelectedScreenDimensions;
+      });
+
+    projectService.allWidgets.subscribe((updatedAllWidgets) => {
+      this.allWidgets = updatedAllWidgets;
+    });
+
+    projectService.selectedWidget.subscribe((newSelectedWidget) => {
+      this.selectedWidget = newSelectedWidget;
+    });
   }
 
-  @Input() dimensions: Dimensions;
-
-  @Output() onChange = new EventEmitter<boolean>();
-
-  _widget: Widget;
-
   handleChange() {
-    this.onChange.emit(true);
+    this.projectService.updateSelectedWidget(this.selectedWidget);
   }
 
   ngAfterViewInit() {
-    const _this = this;
+    const that = this;
     $('.work-surface').droppable({
       accept: 'dv-widget',
       hoverClass: 'highlight',
       tolerance: 'fit',
       drop: function (event, ui) {
-          _this.onDropFinished();
+          that.onDropFinished();
       }
     });
   }

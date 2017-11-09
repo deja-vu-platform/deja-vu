@@ -7,7 +7,6 @@
   <ng-container *ngIf="widget.getWidgetType() === widgetType.USER_WIDGET">
     <ng-container *ngFor="let innerWidgetId of widget.getInnerWidgetIds()">
       <dv-widget [widget]="Widget.getWidget(allWidgets, innerWidgetId)"
-                  [allWidgets]="allWidgets"
                   [isSelected]="false"
                   [isMovable]="isSelected"
                   (onChange)="handleChange()">

@@ -1,6 +1,6 @@
 <div id="map-container"
-    [style.height]="dimensions.height+'px'"
-    [style.width]="dimensions.width+'px'">
+    [style.height]="mapComponentDimensions.height+'px'"
+    [style.width]="mapComponentDimensions.width+'px'">
   <button id="map-minimize-btn" 
           class="btn btn-default"
           [ngClass]="{'minimized': minimized}"
@@ -14,8 +14,6 @@
   </button>
   <div id="map" 
       [hidden]="minimized"
-      [scrollTop]="scrollPosition.top"
-      [scrollLeft]="scrollPosition.left"
       (click)="mapClick($event)">
       <!-- the full area isn't useful right now -->
       <div id="map-full-area"></div>
@@ -44,7 +42,7 @@
       <div id="map-window"
           [style.top]="mapVisibleWindowPosition.top+'px'"
           [style.left]="mapVisibleWindowPosition.left+'px'"
-          [style.height]="(visibleWindowDimensions.height*mapScale)+'px'"
-          [style.width]="(visibleWindowDimensions.width*mapScale)+'px'"></div>
+          [style.height]="mapVisibleWindowDimensions.height+'px'"
+          [style.width]="mapVisibleWindowDimensions.width+'px'"></div>
   </div>
 </div>

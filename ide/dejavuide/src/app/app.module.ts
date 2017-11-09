@@ -6,7 +6,8 @@ import { HeaderModule } from './components/common/header/header.module';
 import { ZoomModule } from './components/ui_editor/zoom/zoom.module';
 import { MapModule } from './components/ui_editor/map/map.module';
 import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurface.module';
-
+import { StateService } from './services/state.service';
+import { ProjectService } from './services/project.service';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,7 @@ import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurfac
     MapModule,
     WorkSurfaceModule
   ],
-  providers: [],
+  providers: [StateService, ProjectService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

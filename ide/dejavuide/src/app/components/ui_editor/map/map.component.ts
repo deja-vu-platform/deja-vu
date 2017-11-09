@@ -1,7 +1,9 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
+import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
 
-import {Widget, UserWidget, WidgetType, WidgetMap} from '../../../models/widget/widget';
-import {Dimensions, Position} from '../../../utility/utility';
+import { Widget, UserWidget, WidgetType, WidgetMap } from '../../../models/widget/widget';
+import { Dimensions, Position } from '../../../utility/utility';
+import { StateService } from '../../../services/state.service';
+import { ProjectService } from '../../../services/project.service';
 
 // Maps needs drag-and-drop
 import * as jQuery from 'jquery';
@@ -15,65 +17,72 @@ const $ = <any>jQuery;
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements AfterViewInit {
-  @Input() set visibleWindowScrollPosition(value: Position) {
-    this.scrollPosition.top = value.top * this.mapScale;
-    this.scrollPosition.left = value.left * this.mapScale;
-
-    this.mapVisibleWindowPosition.top = this.scrollPosition.top;
-    this.mapVisibleWindowPosition.left = this.scrollPosition.left;
-  }
-
-  @Input() visibleWindowDimensions: Dimensions = {
+  mapVisibleWindowDimensions: Dimensions = {
     height: 1,
     width: 1
   };
 
-  @Input() set screenDimensions(value: Dimensions) {
-    this._screenDimensions = value;
-    const widthScale = this.dimensions.width / this._screenDimensions.width;
-    const heightScale = this.dimensions.height / this._screenDimensions.height;
-
-    this.mapScale = Math.min(widthScale, heightScale);
-  }
-
-  get screenDimensions() {
-    return this._screenDimensions;
-  }
-
-  @Input() allWidgets: WidgetMap;
+  allWidgets: WidgetMap;
   @Input() zoom = 1;
 
-  @Input() set selectedWidget(value: Widget) {
-    this._selectedWidget = value;
-    this.updateView();
-  }
-
-  get selectedWidget() {
-    return this._selectedWidget;
-  }
-
-  @Output() newScrollPosition = new EventEmitter<Position>();
-
-  private _selectedWidget: Widget;
+  private selectedWidget: Widget;
   mapScale = .1;
   private navDragging = false;
-  scrollPosition: Position = {
-    top: 0,
-    left: 0
-  };
   mapVisibleWindowPosition: Position = {
     top: 0,
     left: 0
   };
 
-  private _screenDimensions: Dimensions;
-  dimensions: Dimensions = {
+  private screenDimensions: Dimensions;
+  mapComponentDimensions: Dimensions = {
     height: 120,
     width: 180
   };
 
   minimized = false;
   mapWidgetSizes: Dimensions[] = [];
+
+  constructor(
+    private stateService: StateService,
+    private projectService: ProjectService
+  ) {
+    stateService.selectedScreenDimensions
+      .subscribe((newSelectedScreenDimensions) => {
+        this.screenDimensions = newSelectedScreenDimensions;
+        const widthScale =
+          this.mapComponentDimensions.width / this.screenDimensions.width;
+        const heightScale =
+          this.mapComponentDimensions.height / this.screenDimensions.height;
+
+        this.mapScale = Math.min(widthScale, heightScale);
+      });
+
+    stateService.visibleWindowDimensions
+      .subscribe((newVisibleWindowDimensions) => {
+        this.mapVisibleWindowDimensions.height =
+          newVisibleWindowDimensions.height * this.mapScale;
+        this.mapVisibleWindowDimensions.width =
+          newVisibleWindowDimensions.width * this.mapScale;
+      });
+
+    stateService.visibleWindowScrollPosition
+      .subscribe((newVisibleWindowScrollPosition) => {
+        this.mapVisibleWindowPosition.top =
+          newVisibleWindowScrollPosition.top * this.mapScale;
+        this.mapVisibleWindowPosition.left =
+          newVisibleWindowScrollPosition.left * this.mapScale;
+      });
+
+    projectService.allWidgets.subscribe((updatedAllWidgets) => {
+      this.allWidgets = updatedAllWidgets;
+    });
+
+    projectService.selectedWidget.subscribe((newSelectedWidget) => {
+      this.selectedWidget = newSelectedWidget;
+      this.updateView();
+    });
+  }
+
 
   minimizeButtonClick() {
     this.minimized = !this.minimized;
@@ -87,13 +96,19 @@ export class MapComponent implements AfterViewInit {
   mapClick(e: MouseEvent) {
     const posX = e.pageX - $('#map').offset().left + $('#map').scrollLeft();
     const posY = e.pageY - $('#map').offset().top + $('#map').scrollTop();
-    this.newScrollPosition.emit({
+    this.stateService.updateVisibleWindowScrollPosition({
       top: posY / this.mapScale,
       left: posX / this.mapScale
     });
 
-    const top =  Math.max(0, Math.min(posY, (this._screenDimensions.height - this.visibleWindowDimensions.height) * this.mapScale));
-    const left =  Math.max(0, Math.min(posX, (this._screenDimensions.width - this.visibleWindowDimensions.width) * this.mapScale));
+    const top =  Math.max(0,
+      Math.min(posY,
+        this.screenDimensions.height * this.mapScale -
+          this.mapVisibleWindowDimensions.height));
+    const left =  Math.max(0,
+      Math.min(posX,
+        this.screenDimensions.width * this.mapScale -
+          this.mapVisibleWindowDimensions.width));
 
     // TODO remove later
     this.updateContainerScroll(top, left);
@@ -117,7 +132,7 @@ export class MapComponent implements AfterViewInit {
       },
       stop: function(e, ui){
         that.navDragging = false;
-        that.newScrollPosition.emit({
+        that.stateService.updateVisibleWindowScrollPosition({
           top: ui.position.top / that.mapScale,
           left: ui.position.left / that.mapScale
         });
@@ -139,7 +154,7 @@ export class MapComponent implements AfterViewInit {
   updateView() {
     const mapScale = this.mapScale;
     const allWidgets = this.allWidgets;
-    const selectedWidget = this._selectedWidget;
+    const selectedWidget = this.selectedWidget;
     const mapWidgetSizes = [];
     if (selectedWidget) {
       if (selectedWidget.getWidgetType() === WidgetType.USER_WIDGET) {

@@ -3,6 +3,8 @@ import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } fro
 import {allElementsFromPoint} from '../../../utility/utility';
 import { Widget, WidgetType, WidgetMap } from '../../../models/widget/widget';
 
+import { ProjectService } from '../../../services/project.service';
+
 // Widgets are drag-and-droppable
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
@@ -15,7 +17,7 @@ const $ = <any>jQuery;
   styleUrls: ['./widget.component.css'],
 })
 export class WidgetComponent implements AfterViewInit {
-  @Input() allWidgets: WidgetMap;
+  allWidgets: WidgetMap;
   @Input() widget: Widget;
   @Input() isSelected = false;
   @Input() isMovable = false;
@@ -27,8 +29,14 @@ export class WidgetComponent implements AfterViewInit {
 
   private el: HTMLElement;
 
-  constructor(el: ElementRef) {
+  constructor(
+    el: ElementRef,
+    private projectService: ProjectService
+  ) {
       this.el = el.nativeElement;
+      projectService.allWidgets.subscribe((updatedAllWidgets) => {
+        this.allWidgets = updatedAllWidgets;
+      });
   }
 
   ngAfterViewInit() {
@@ -40,12 +48,12 @@ export class WidgetComponent implements AfterViewInit {
 
     // Initiate draggable based on certain things
     if (this.isSelected || this.isMovable) {
-      const _this = this;
+      const that = this;
       $(this.el).draggable({
         containment: '.work-surface',
         stop: function(e, ui){
-          _this.widget.updatePosition(ui.position);
-          _this.onChange.emit(true);
+          that.widget.updatePosition(ui.position);
+          that.onChange.emit(true);
         },
       });
 
