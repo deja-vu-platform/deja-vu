@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit} from '@angular/core';
 
-import {Widget, UserWidget, WidgetType} from '../../../models/widget/widget';
+import {Widget, UserWidget, WidgetType, WidgetMap} from '../../../models/widget/widget';
 import {Dimensions, Position} from '../../../utility/utility';
 
 // Maps needs drag-and-drop
@@ -33,7 +33,7 @@ export class MapComponent implements AfterViewInit {
 
     this.mapScale = Math.min(widthScale, heightScale);
   }
-  @Input() allWidgets: Map<string, Map<string, Widget>>;
+  @Input() allWidgets: WidgetMap;
   @Input() zoom = 1;
 
   @Input() set selectedWidget(value: Widget) {

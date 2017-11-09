@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
 
 import {allElementsFromPoint} from '../../../utility/utility';
-import { Widget, WidgetType } from '../../../models/widget/widget';
+import { Widget, WidgetType, WidgetMap } from '../../../models/widget/widget';
 
 // Widgets are drag-and-droppable
 import * as jQuery from 'jquery';
@@ -15,7 +15,7 @@ const $ = <any>jQuery;
   styleUrls: ['./widget.component.css'],
 })
 export class WidgetComponent implements AfterViewInit {
-  @Input() allWidgets:  Map<string, Map<string, Widget>>;
+  @Input() allWidgets: WidgetMap;
   @Input() widget: Widget;
   @Input() isSelected = false;
   @Input() isMovable = false;

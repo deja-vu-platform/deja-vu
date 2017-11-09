@@ -1,5 +1,12 @@
 import { generateId, Dimensions, Position } from '../../utility/utility';
 
+/**
+ * Currently a map from clicheIds to all the widgets it contains (widgetId
+ * to widget). Will in the next pull request become a map from clicheIds to 
+ * cliche objects.
+ */
+export type WidgetMap = Map<string, Map<string, Widget>>;
+
 export enum WidgetType {
     BASE_WIDGET, USER_WIDGET, CLICHE_WIDGET
 }
@@ -45,7 +52,7 @@ export abstract class Widget {
      * @param widget widget to add
      */
     static addWidgetToAllWidgets(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allWidgets: WidgetMap,
         widget: Widget) {
         if (!allWidgets[widget.getClicheId()]) {
             allWidgets[widget.getClicheId()] = new Map<string, Widget>();
@@ -59,7 +66,7 @@ export abstract class Widget {
      * @param widgetId id of widget to find
      */
     static getWidget(
-        allWidgets: Map<string, Map<string, Widget>>,
+        allWidgets: WidgetMap,
         widgetId: string
     ): Widget {
         const clicheid = Widget.decodeid(widgetId)[0];
@@ -97,10 +104,7 @@ export abstract class Widget {
      * @param fromTemplate Whether of not we are doing a "template" copy as
      *  opposed to a normal copy
      */
-    abstract makeCopy(
-        allWidgets: Map<string, Map<string, Widget>>,
-        fromTemplate: boolean
-    ): Widget[];
+    abstract makeCopy(allWidgets: WidgetMap, fromTemplate: boolean): Widget[];
 
     protected newIdFromId(id: string) {
         const clicheid = Widget.decodeid(id)[0];
@@ -171,10 +175,7 @@ export abstract class Widget {
      * @param allWidgets a map of all widgets
      * @param parentStyles any styles to inherit from the ancestors
      */
-    getCustomStylesToShow(
-        allWidgets: Map<string, Map<string, Widget>>,
-        parentStyles = {}
-    ) {
+    getCustomStylesToShow(allWidgets: WidgetMap, parentStyles = {}) {
         // TODO: later on, use this to update a "stylesToShow" field
         // that is read when rendering, and updated whenever a template is
         // updated. If the field is there, just read from it, if not recursively
@@ -206,7 +207,7 @@ export abstract class Widget {
      *
      * @param allWidgets a map of all widgets
      */
-    delete(allWidgets: Map<string, Map<string, Widget>>) {
+    delete(allWidgets: WidgetMap) {
         if (this.getTemplateId()) {
             Widget.getWidget(allWidgets, this.getTemplateId()).templateCopies.delete(this.getId());
         }
@@ -217,7 +218,7 @@ export abstract class Widget {
      * Adds this widget to the map of all widgets.
      * @param allWidgets the map of all widgets
      */
-    addWidgetToAllWidgets(allWidgets: Map<string, Map<string, Widget>>) {
+    addWidgetToAllWidgets(allWidgets: WidgetMap) {
         Widget.addWidgetToAllWidgets(allWidgets, this);
     }
 }
@@ -277,10 +278,7 @@ export class BaseWidget extends Widget {
         this.value = value;
     }
 
-    makeCopy(
-        allWidgets: Map<string, Map<string, Widget>>,
-        fromTemplate = false
-    ): Widget[] {
+    makeCopy(allWidgets: WidgetMap, fromTemplate = false): Widget[] {
         let templateId = this.getTemplateId();
         const isTemplateCopy = fromTemplate && this.isTemplate;
         let isTemplate = this.isTemplate;
@@ -388,9 +386,7 @@ export class UserWidget extends Widget {
      * @param targetId widget id of widget to find
      */
     private getPathHelper(
-        allWidgets: Map<string, Map<string, Widget>>,
-        widget: Widget,
-        targetId: string
+        allWidgets: WidgetMap, widget: Widget, targetId: string
     ): string[] | null {
         const widgetId = widget.getId();
         // Base case 1: found it
@@ -422,10 +418,7 @@ export class UserWidget extends Widget {
      * @param allWidgets map of all widgets
      * @param widgetId widget id of widget to find
      */
-    getPath(
-        allWidgets: Map<string, Map<string, Widget>>,
-        widgetId: string
-    ): string[] | null {
+    getPath(allWidgets: WidgetMap, widgetId: string): string[] | null {
         return this.getPathHelper(allWidgets, this, widgetId);
     }
 
@@ -437,9 +430,7 @@ export class UserWidget extends Widget {
      * @param getParent whether to actually only get the parent of the widget
      */
     getInnerWidget(
-        allWidgets: Map<string, Map<string, Widget>>,
-        targetId: string,
-        getParent = false
+        allWidgets: WidgetMap, targetId: string, getParent = false
     ): Widget {
         const path = this.getPath(allWidgets, targetId);
         if (path === null) { // it's not actually a child
@@ -457,10 +448,7 @@ export class UserWidget extends Widget {
      * @param fromTemplate if this widget is not a template, this value is
      * ignored
      */
-    makeCopy(
-        allWidgets: Map<string, Map<string, Widget>>,
-        fromTemplate = false
-    ): Widget[] {
+    makeCopy(allWidgets: WidgetMap, fromTemplate = false): Widget[] {
         let templateId = this.getTemplateId();
         let isTemplate = this.isTemplate;
         const isTemplateCopy = fromTemplate && this.isTemplate;
@@ -568,8 +556,7 @@ export class UserWidget extends Widget {
      * @param targetWidget widget we are looking at
      */
     findOverlappingWidgets(
-        allWidgets: Map<string, Map<string, Widget>>,
-        targetWidget: Widget
+        allWidgets: WidgetMap, targetWidget: Widget
     ): Set<string> {
         const overlappingWidgets = new Set();
         const targetTop = targetWidget.getPosition().top;

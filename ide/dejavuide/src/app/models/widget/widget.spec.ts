@@ -1,8 +1,8 @@
-import { WidgetType, Widget, BaseWidget, UserWidget } from './widget';
+import { WidgetType, Widget, BaseWidget, UserWidget, WidgetMap } from './widget';
 
 describe('UserWidget', () => {
   const clicheid = '1234';
-  let allWidgets: Map<string, Map<string, Widget>>;
+  let allWidgets: WidgetMap;
   let widget1: BaseWidget;
   let widget2: UserWidget;
   let widget3: UserWidget;
