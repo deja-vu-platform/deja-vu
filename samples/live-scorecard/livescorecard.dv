@@ -20,7 +20,7 @@ app LiveScorecard {
     //TODO: Why isn't as HostAuthentication not working?
     include access/StandardAuthentication [
         Host for User
-    ]
+    ] as HostAuthentication
 
     // A climber can access his/her account using a climber code and
     // competition code.
