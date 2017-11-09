@@ -1,6 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 
-import { Widget, WidgetMap } from '../../../models/widget/widget';
+import { Widget, ClicheMap } from '../../../models/widget/widget';
+import { Cliche } from '../../../models/cliche/cliche';
 import { Dimensions, Position, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 
@@ -19,7 +20,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
   selectedWidget: Widget;
 
   private currentZoom = 1;
-  private allWidgets: WidgetMap;
+  private allWidgets: ClicheMap;
   private visibleWindowScroll: Position;
 
   constructor(
@@ -42,7 +43,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
         $('.visible-window').scrollLeft(newScrollPosition.left);
       });
 
-    projectService.allWidgets.subscribe((updatedAllWidgets) => {
+    projectService.allCliches.subscribe((updatedAllWidgets) => {
       this.allWidgets = updatedAllWidgets;
     });
 

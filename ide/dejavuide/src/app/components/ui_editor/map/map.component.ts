@@ -1,8 +1,10 @@
 import { Component, AfterViewInit } from '@angular/core';
 
-import { Widget, UserWidget, WidgetType, WidgetMap } from '../../../models/widget/widget';
+import { Widget, UserWidget, WidgetType, ClicheMap } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
+import { Cliche } from '../../../models/cliche/cliche';
+
 
 // Maps needs drag-and-drop
 import * as jQuery from 'jquery';
@@ -37,7 +39,7 @@ export class MapComponent implements AfterViewInit {
   minimized = false;
   mapWidgetSizes: Dimensions[] = [];
 
-  private allWidgets: WidgetMap;
+  private allCliches: ClicheMap;
   private zoom = 1;
 
   constructor(
@@ -75,8 +77,8 @@ export class MapComponent implements AfterViewInit {
           newVisibleWindowScrollPosition.left * this.mapScale;
       });
 
-    projectService.allWidgets.subscribe((updatedAllWidgets) => {
-      this.allWidgets = updatedAllWidgets;
+    projectService.allCliches.subscribe((updatedAllWidgets) => {
+      this.allCliches = updatedAllWidgets;
     });
 
     projectService.selectedWidget.subscribe((newSelectedWidget) => {
@@ -143,7 +145,7 @@ export class MapComponent implements AfterViewInit {
    */
   updateView() {
     const mapScale = this.mapScale;
-    const allWidgets = this.allWidgets;
+    const allCliches = this.allCliches;
     const selectedWidget = this.selectedWidget;
     const mapWidgetSizes = [];
     if (selectedWidget) {
@@ -151,7 +153,7 @@ export class MapComponent implements AfterViewInit {
         const widget = <UserWidget> selectedWidget;
         widget.getInnerWidgetIds().forEach(function (innerWidgetId) {
           const innerWidget = widget
-                                .getInnerWidget(allWidgets, innerWidgetId);
+                                .getInnerWidget(allCliches, innerWidgetId);
           const innerWidgetDimensions = innerWidget.getDimensions();
           const innerWidgetPosition = innerWidget.getPosition();
           mapWidgetSizes.push({

@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 
-import { Widget, WidgetMap } from '../models/widget/widget';
+import { Widget, ClicheMap } from '../models/widget/widget';
 
 @Injectable()
 export class ProjectService {
-  allWidgets = new ReplaySubject<WidgetMap>(1);
+  allCliches = new ReplaySubject<ClicheMap>(1);
   selectedWidget = new ReplaySubject<Widget>(1);
 
-  updateAllWidgets(updatedAllWidgets: WidgetMap) {
-    this.allWidgets.next(updatedAllWidgets);
+  updateClicheMap(updatedClicheMap: ClicheMap) {
+    this.allCliches.next(updatedClicheMap);
   }
 
   updateSelectedWidget(newSelectedWidget: Widget) {

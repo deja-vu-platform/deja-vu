@@ -2,14 +2,18 @@
     <div class="menu-item logo">{{dejavu}}: {{pageTitle}}</div>
     <div class="menu-item navigation"> 
         Navigate to:
-        <a (click)="handleBackToAllProjects()">All Projects</a>
         <ng-container *ngFor="let otherPage of otherPages">
-            <a [href]="otherPage.url">{{otherPage.title}}</a>
+            <a (click)="handleRedirectClick(otherPage.type)">
+                {{otherPage.title}}
+            </a>
         </ng-container>
     </div>
-    <div *ngIf="isClichePage"
+    <div *ngIf="isSavable"
         class="menu-item">
-        <button type="button" class="btn btn-default"  id="save-project">
+        <button type="button" 
+                class="btn btn-default"
+                id="save-project"
+                (click)="save()">
             <span class="glyphicon glyphicon-save"></span> 
             Save Project
         </button>

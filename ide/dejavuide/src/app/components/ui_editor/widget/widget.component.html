@@ -6,7 +6,7 @@
   <span>Name: {{widget.getName()}}</span>
   <ng-container *ngIf="widget.getWidgetType() === WidgetType.USER_WIDGET">
     <ng-container *ngFor="let innerWidgetId of widget.getInnerWidgetIds()">
-      <dv-widget [widget]="Widget.getWidget(allWidgets, innerWidgetId)"
+      <dv-widget [widget]="Widget.getWidget(allCliches, innerWidgetId)"
                   [isSelected]="false"
                   [isMovable]="isSelected"
                   (onChange)="handleChange()">
