@@ -2,9 +2,10 @@
   <div class="content dropdown-target"  data-dropdownid="'+dropdownId+'"></div>
   <div class="name-container">
       <span class="name"> {{widget.getName()}} </span>
-      <!-- <div class="submit-rename not-displayed"> -->
-          <!-- <input type="text" class="new-name-input form-control" autofocus> -->
-      <!-- </div> -->
+      <div class="submit-rename"
+            [hidden]="true">
+          <input type="text" class="new-name-input form-control" autofocus>
+      </div>
   </div>
   <div *ngIf="isDeletable"
         class="delete-button-container">
@@ -17,7 +18,8 @@
   <ng-container *ngIf="widget.getWidgetType() == WidgetType.USER_WIDGET">
     <button *ngIf="widget.getInnerWidgetIds().length > 0"
             (click)="toggleShow()">
-      toggle show
+      <span [hidden]="innerShown"> > </span>
+      <span [hidden]="!innerShown"> v </span>
     </button>  
     <ng-container *ngFor="let id of widget.getInnerWidgetIds()">
       <dv-list-item [widget]="widget.getInnerWidget(allCliches, id)"
