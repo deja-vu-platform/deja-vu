@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
 import { Cliche, ClicheMap } from '../../../../../models/cliche/cliche';
@@ -11,7 +11,7 @@ import { ProjectService } from '../../../../../services/project.service';
   templateUrl: './list_item.component.html',
   styleUrls: ['./list_item.component.css']
 })
-export class ListItemComponent {
+export class ListItemComponent implements OnInit {
   @Input() isDraggable = false;
   @Input() isDeletable = true;
   @Input() widget: Widget;
@@ -20,7 +20,8 @@ export class ListItemComponent {
 
   innerShown = false;
   allCliches: ClicheMap;
-  
+  isUserWidget = false;
+
   constructor(
     public dialog: MatDialog,
     private projectService: ProjectService
@@ -28,6 +29,10 @@ export class ListItemComponent {
     projectService.allCliches.subscribe((updatedAllCliches) => {
       this.allCliches = updatedAllCliches;
     });
+  }
+
+  ngOnInit () {
+    this.isUserWidget = (<UserWidget>this.widget).getWidgetType() === WidgetType.USER_WIDGET;
   }
 
   handleDelete(): void {
