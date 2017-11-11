@@ -543,9 +543,10 @@ export function Widget(options: WidgetMetadata) {
     }
     metadata["directives"] = directives;
     const system_map = System.getConfig().map;
-    let module_id = system_map[options.fqelement];
+    const fqelement = options.fqelement.toLowerCase();
+    let module_id = system_map[fqelement];
     if (module_id === undefined) {
-      module_id = system_map[options.fqelement + "/lib"];
+      module_id = system_map[fqelement + "/lib"];
     } else {
       module_id = module_id + "/lib";
     }
