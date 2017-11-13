@@ -190,6 +190,8 @@ app LiveScorecard {
         host: Host
     }
 
+    widget HostNavBar { }
+
     /** Routes **/
     host_login_route: route = {path: "host-login", widget: HostLogin}
     host_register_route: route = {path: "host-register", widget: HostRegister}
