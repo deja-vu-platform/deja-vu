@@ -4,12 +4,11 @@
       [style.width]="widget.getDimensions().width+'px'">
   <span>I am a widget</span>
   <span>Name: {{widget.getName()}}</span>
-  <ng-container *ngIf="widget.getWidgetType() === WidgetType.USER_WIDGET">
-    <ng-container *ngFor="let innerWidgetId of widget.getInnerWidgetIds()">
-      <dv-widget [widget]="Widget.getWidget(allWidgets, innerWidgetId)"
+  <ng-container *ngIf="widget.isUserType()">
+    <ng-container *ngFor="let innerWidget of innerWidgets">
+      <dv-widget [widget]="innerWidget"
                   [isSelected]="false"
-                  [isMovable]="isSelected"
-                  (onChange)="handleChange()">
+                  [isMovable]="isSelected">
       </dv-widget>
     </ng-container>
   </ng-container>

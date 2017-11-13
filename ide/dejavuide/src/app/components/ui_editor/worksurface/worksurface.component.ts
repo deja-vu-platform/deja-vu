@@ -19,7 +19,6 @@ export class WorkSurfaceComponent implements AfterViewInit {
   selectedWidget: Widget;
 
   private currentZoom = 1;
-  private allWidgets: WidgetMap;
   private visibleWindowScroll: Position;
 
   constructor(
@@ -42,18 +41,11 @@ export class WorkSurfaceComponent implements AfterViewInit {
         $('.visible-window').scrollLeft(newScrollPosition.left);
       });
 
-    projectService.allWidgets.subscribe((updatedAllWidgets) => {
-      this.allWidgets = updatedAllWidgets;
-    });
-
     projectService.selectedWidget.subscribe((newSelectedWidget) => {
       this.selectedWidget = newSelectedWidget;
     });
   }
 
-  handleChange() {
-    this.projectService.updateSelectedWidget(this.selectedWidget);
-  }
 
   ngAfterViewInit() {
     const that = this;

@@ -1,6 +1,6 @@
 import { Component, AfterViewInit } from '@angular/core';
 
-import { Widget, UserWidget, WidgetType, WidgetMap } from '../../../models/widget/widget';
+import { Widget, UserWidget, WidgetMap } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 
@@ -16,6 +16,10 @@ const $ = <any>jQuery;
   styleUrls: ['./map.component.css']
 })
 export class MapComponent implements AfterViewInit {
+  /**
+   * This is a box corresponding to the visible window of the user's
+   * work surface to show where the user is.
+   */
   mapVisibleWindowDimensions: Dimensions = {
     height: 1,
     width: 1
@@ -37,7 +41,6 @@ export class MapComponent implements AfterViewInit {
   minimized = false;
   mapWidgetSizes: Dimensions[] = [];
 
-  private allWidgets: WidgetMap;
   private zoom = 1;
 
   constructor(
@@ -75,12 +78,12 @@ export class MapComponent implements AfterViewInit {
           newVisibleWindowScrollPosition.left * this.mapScale;
       });
 
-    projectService.allWidgets.subscribe((updatedAllWidgets) => {
-      this.allWidgets = updatedAllWidgets;
-    });
-
     projectService.selectedWidget.subscribe((newSelectedWidget) => {
       this.selectedWidget = newSelectedWidget;
+      this.updateView();
+    });
+
+    projectService.widgetUpdateListener.subscribe(() => {
       this.updateView();
     });
   }
@@ -143,15 +146,13 @@ export class MapComponent implements AfterViewInit {
    */
   updateView() {
     const mapScale = this.mapScale;
-    const allWidgets = this.allWidgets;
     const selectedWidget = this.selectedWidget;
     const mapWidgetSizes = [];
     if (selectedWidget) {
-      if (selectedWidget.getWidgetType() === WidgetType.USER_WIDGET) {
-        const widget = <UserWidget> selectedWidget;
-        widget.getInnerWidgetIds().forEach(function (innerWidgetId) {
-          const innerWidget = widget
-                                .getInnerWidget(allWidgets, innerWidgetId);
+      if (selectedWidget.isUserType()) {
+        selectedWidget.getInnerWidgetIds().forEach(function (innerWidgetId) {
+          const innerWidget = selectedWidget
+                                .getInnerWidget(innerWidgetId);
           const innerWidgetDimensions = innerWidget.getDimensions();
           const innerWidgetPosition = innerWidget.getPosition();
           mapWidgetSizes.push({

@@ -1,7 +1,7 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 
 import {allElementsFromPoint} from '../../../utility/utility';
-import { Widget, WidgetType, WidgetMap } from '../../../models/widget/widget';
+import { Widget, UserWidget, WidgetMap } from '../../../models/widget/widget';
 
 import { ProjectService } from '../../../services/project.service';
 
@@ -16,27 +16,35 @@ const $ = <any>jQuery;
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class WidgetComponent implements AfterViewInit {
+export class WidgetComponent implements AfterViewInit, OnInit {
   @Input() widget: Widget;
   @Input() isSelected = false;
+  /**
+   * Only the direct children of a widget are movable when a widget is selected.
+   * So any grandchildren and so on are not movable in this view.
+   */
   @Input() isMovable = false;
 
-  @Output() onChange = new EventEmitter<boolean>();
-
-  readonly WidgetType = WidgetType;
   readonly Widget = Widget;
+  innerWidgets: Widget[] = [];
 
   private el: HTMLElement;
-  private allWidgets: WidgetMap;
-  
+
   constructor(
     el: ElementRef,
     private projectService: ProjectService
   ) {
       this.el = el.nativeElement;
-      projectService.allWidgets.subscribe((updatedAllWidgets) => {
-        this.allWidgets = updatedAllWidgets;
-      });
+  }
+
+
+  ngOnInit() {
+    // get inner widgets
+    if (this.widget.isUserType()) {
+      for (const innerWidgetId of this.widget.getInnerWidgetIds()) {
+        this.innerWidgets.push(Widget.getWidget(this.widget.getWidgetMap(), innerWidgetId));
+      }
+    }
   }
 
   ngAfterViewInit() {
@@ -53,16 +61,12 @@ export class WidgetComponent implements AfterViewInit {
         containment: '.work-surface',
         stop: function(e, ui){
           that.widget.updatePosition(ui.position);
-          that.onChange.emit(true);
+          that.projectService.widgetUpdated();
         },
       });
 
       this.makeWidgetResizable();
     }
-  }
-
-  handleChange() {
-    this.onChange.emit(true);
   }
 
   private makeWidgetResizable() {

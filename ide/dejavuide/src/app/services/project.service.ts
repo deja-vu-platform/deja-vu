@@ -7,6 +7,7 @@ import { Widget, WidgetMap } from '../models/widget/widget';
 export class ProjectService {
   allWidgets = new ReplaySubject<WidgetMap>(1);
   selectedWidget = new ReplaySubject<Widget>(1);
+  widgetUpdateListener = new ReplaySubject<boolean>(1);
 
   updateAllWidgets(updatedAllWidgets: WidgetMap) {
     this.allWidgets.next(updatedAllWidgets);
@@ -14,5 +15,9 @@ export class ProjectService {
 
   updateSelectedWidget(newSelectedWidget: Widget) {
     this.selectedWidget.next(newSelectedWidget);
+  }
+
+  widgetUpdated() {
+    this.widgetUpdateListener.next(true);
   }
 }
