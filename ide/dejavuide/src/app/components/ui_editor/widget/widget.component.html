@@ -1,7 +1,7 @@
 <div class="widget-component"
       *ngIf="widget"
-      [style.height]="widget.getDimensions().height+'px'"
-      [style.width]="widget.getDimensions().width+'px'">
+      [style.height.px]="widget.getDimensions().height"
+      [style.width.px]="widget.getDimensions().width">
   <span>I am a widget</span>
   <span>Name: {{widget.getName()}}</span>
   <ng-container *ngIf="widget.isUserType()">

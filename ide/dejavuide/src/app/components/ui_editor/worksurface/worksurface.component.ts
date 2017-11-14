@@ -15,6 +15,9 @@ const $ = <any>jQuery;
   styleUrls: ['./worksurface.component.css']
 })
 export class WorkSurfaceComponent implements AfterViewInit {
+  /**
+   * Dimensions of the screen the user is building an app for.
+   */
   selectedScreenDimensions: Dimensions;
   selectedWidget: Widget;
 

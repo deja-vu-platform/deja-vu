@@ -1,12 +1,4 @@
 
-#map-container {
-  position: fixed;
-  left: 300px;
-  bottom: 20px;
-  pointer-events: none;
-  z-index: 1000;
-}
-
 #map {
   position: absolute;
   background: white;

@@ -63,13 +63,14 @@ app.on('activate', function(){
 var fs = require('fs');
 const path = require('path');
 
-// TODO have a settings file to store preferred pathname
-
+// The projects are currently stored at the root of the app.
+// TODO have an option to allow users to put in where they want
+// their projects saved. 
 var projectsSavePath = path.join(__dirname, 'projects');
 
 try {
     fs.accessSync(projectsSavePath, fs.F_OK);
 } catch (e) {
-    // It isn't accessible
+    // The folder hasn't been created yet.
     fs.mkdir(projectsSavePath);
 }

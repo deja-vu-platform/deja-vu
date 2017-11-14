@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, ElementRef} from '@angular/core';
 
 import { Widget, UserWidget, WidgetMap } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
@@ -20,9 +20,9 @@ export class MapComponent implements AfterViewInit {
    * This is a box corresponding to the visible window of the user's
    * work surface to show where the user is.
    */
-  mapVisibleWindowDimensions: Dimensions = {
-    height: 1,
-    width: 1
+  visibleWindowDimensions: Dimensions = {
+    height: 0,
+    width: 0
   };
 
   selectedWidget: Widget;
@@ -34,8 +34,8 @@ export class MapComponent implements AfterViewInit {
 
   screenDimensions: Dimensions;
   mapComponentDimensions: Dimensions = {
-    height: 120,
-    width: 180
+    height: 0,
+    width: 0
   };
 
   minimized = false;
@@ -54,20 +54,15 @@ export class MapComponent implements AfterViewInit {
     stateService.selectedScreenDimensions
       .subscribe((newSelectedScreenDimensions) => {
         this.screenDimensions = newSelectedScreenDimensions;
-        const widthScale =
-          this.mapComponentDimensions.width / this.screenDimensions.width;
-        const heightScale =
-          this.mapComponentDimensions.height / this.screenDimensions.height;
-
-        this.mapScale = Math.min(widthScale, heightScale);
+        this.updateMapScale();
       });
 
     stateService.visibleWindowDimensions
       .subscribe((newVisibleWindowDimensions) => {
-        this.mapVisibleWindowDimensions.height =
-          newVisibleWindowDimensions.height * this.mapScale;
-        this.mapVisibleWindowDimensions.width =
-          newVisibleWindowDimensions.width * this.mapScale;
+        this.visibleWindowDimensions.height =
+          newVisibleWindowDimensions.height;
+        this.visibleWindowDimensions.width =
+          newVisibleWindowDimensions.width;
       });
 
     stateService.visibleWindowScrollPosition
@@ -88,6 +83,31 @@ export class MapComponent implements AfterViewInit {
     });
   }
 
+  ngAfterViewInit() {
+    // I can't get it from el.nativeElement.style
+    this.mapComponentDimensions.height = $('dv-map').height();
+    this.mapComponentDimensions.width = $('dv-map').width();
+    this.updateMapScale();
+    this.updateView();
+
+    const that = this;
+    // Initiate draggable
+    $('#map-window').draggable({
+      containment: '#zoom-selected-screen-size',
+      drag: function(e, ui) {
+        that.stateService.updateVisibleWindowScrollPosition({
+          top: ui.position.top / that.mapScale,
+          left: ui.position.left / that.mapScale
+        });
+      },
+      stop: function(e, ui){
+        that.stateService.updateVisibleWindowScrollPosition({
+          top: ui.position.top / that.mapScale,
+          left: ui.position.left / that.mapScale
+        });
+      },
+    });
+  }
 
   minimizeButtonClick() {
     this.minimized = !this.minimized;
@@ -108,12 +128,12 @@ export class MapComponent implements AfterViewInit {
 
     const top =  Math.max(0,
       Math.min(posY,
-        this.screenDimensions.height * this.mapScale -
-          this.mapVisibleWindowDimensions.height));
+        (this.screenDimensions.height -
+          this.visibleWindowDimensions.height) * this.mapScale));
     const left =  Math.max(0,
       Math.min(posX,
-        this.screenDimensions.width * this.mapScale -
-          this.mapVisibleWindowDimensions.width));
+        (this.screenDimensions.width -
+          this.visibleWindowDimensions.width) * this.mapScale));
 
     this.mapVisibleWindowPosition = {
       top: top,
@@ -121,30 +141,10 @@ export class MapComponent implements AfterViewInit {
     };
   }
 
-  ngAfterViewInit() {
-    const that = this;
-    // Initiate draggable
-    $('#map-window').draggable({
-      containment: '#zoom-selected-screen-size',
-      drag: function(e, ui) {
-        that.stateService.updateVisibleWindowScrollPosition({
-          top: ui.position.top / that.mapScale,
-          left: ui.position.left / that.mapScale
-        });
-      },
-      stop: function(e, ui){
-        that.stateService.updateVisibleWindowScrollPosition({
-          top: ui.position.top / that.mapScale,
-          left: ui.position.left / that.mapScale
-        });
-      },
-    });
-  }
-
   /**
    * Update the view of the map fresh from the info of the given widget.
    */
-  updateView() {
+  private updateView() {
     const mapScale = this.mapScale;
     const selectedWidget = this.selectedWidget;
     const mapWidgetSizes = [];
@@ -165,5 +165,14 @@ export class MapComponent implements AfterViewInit {
       }
     }
     this.mapWidgetSizes = mapWidgetSizes;
+  }
+
+  updateMapScale() {
+    const widthScale =
+    this.mapComponentDimensions.width / this.screenDimensions.width;
+    const heightScale =
+      this.mapComponentDimensions.height / this.screenDimensions.height;
+
+    this.mapScale = Math.min(widthScale, heightScale);
   }
 }
