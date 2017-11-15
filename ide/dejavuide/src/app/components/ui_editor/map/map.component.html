@@ -15,8 +15,8 @@
     <!-- the full area isn't useful right now -->
     <div id="map-full-area"></div>
     <div id="zoom-selected-screen-size"
-      [style.height.px]="screenDimensions.height*mapScale"
-      [style.width.px]="screenDimensions.width*mapScale"></div>
+      [style.height.px]="screenDimensions.height * mapScale"
+      [style.width.px]="screenDimensions.width * mapScale"></div>
     <div *ngIf="selectedWidget"
         id="map-component-sizes"
         [style.zoom]="zoom"
@@ -30,10 +30,10 @@
         "selectedWidget.getDimensions().width * this.mapScale">
       <div *ngFor="let size of mapWidgetSizes"
             class="map-inner-component-size"
-            [style.height.px]= "(size.height * this.mapScale)"
-            [style.width.px]= "(size.width * this.mapScale)"
-            [style.top.px]= "(size.top * this.mapScale)"
-            [style.left.px]= "(size.left * this.mapScale)"></div>
+            [style.height.px]= "size.height * this.mapScale"
+            [style.width.px]= "size.width * this.mapScale"
+            [style.top.px]= "size.top * this.mapScale"
+            [style.left.px]= "size.left * this.mapScale"></div>
     </div>
     <!-- Map window is the little thing you drag to move your map -->
     <div id="map-window"
