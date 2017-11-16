@@ -44,7 +44,7 @@ export abstract class Widget {
         left: 0
     };
     protected meta: Meta;
-    protected isTemplate = false;
+    protected _isTemplate = false;
     // If this is a template, keep a reference to all is copies.
     // If the template is changed, propagate the changes to the template copies.
     protected templateCopies: Set<string> = new Set();
@@ -151,12 +151,17 @@ export abstract class Widget {
         return this.meta.templateid;
     }
 
-    getIsTemplate(): boolean {
-        return this.isTemplate;
+    isTemplate(): boolean {
+        return this._isTemplate;
     }
 
-    getIsTemplateCopy(widgetId: string) {
-        return this.isTemplate && this.templateCopies.has(widgetId);
+    /**
+     * Checks if the given widget (id) was derived from this widget
+     * as a template.
+     * @param widgetId widget to check.
+     */
+    isDerivedFromTemplate(widgetId: string) {
+        return this._isTemplate && this.templateCopies.has(widgetId);
     }
 
     getLocalCustomStyles() {
@@ -280,7 +285,7 @@ export class BaseWidget extends Widget {
         this.type = type;
         this.value = value;
         this.properties.dimensions = dimensions;
-        this.isTemplate = isTemplate;
+        this._isTemplate = isTemplate;
     }
 
     setValue(value) {
@@ -289,8 +294,8 @@ export class BaseWidget extends Widget {
 
     makeCopy(fromTemplate = false): Widget[] {
         let templateId = this.getTemplateId();
-        const isTemplateCopy = fromTemplate && this.isTemplate;
-        let isTemplate = this.isTemplate;
+        const isTemplateCopy = fromTemplate && this._isTemplate;
+        let isTemplate = this._isTemplate;
         if (isTemplateCopy) {
             // If you're making a tempate copy, you only make non-templates
             templateId = this.getId();
@@ -365,7 +370,7 @@ export class UserWidget extends Widget {
             author: ''
         };
         this.properties.dimensions = dimensions;
-        this.isTemplate = isTemplate;
+        this._isTemplate = isTemplate;
     }
 
     updateDimensions(newDimensions: Dimensions) {
@@ -451,8 +456,8 @@ export class UserWidget extends Widget {
      */
     makeCopy(fromTemplate = false): Widget[] {
         let templateId = this.getTemplateId();
-        let isTemplate = this.isTemplate;
-        const isTemplateCopy = fromTemplate && this.isTemplate;
+        let isTemplate = this._isTemplate;
+        const isTemplateCopy = fromTemplate && this._isTemplate;
         if (isTemplateCopy) {
             // If you're making a tempate copy, you only make non-templates
             templateId = this.getId();

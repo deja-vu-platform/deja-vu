@@ -26,7 +26,7 @@ export class ZoomComponent {
   sliderVal = 0;
   minimized = false;
   chevron = CHEVRON.RIGHT;
-  
+
   private currentZoom: number;
   private visibleWindowDimensions: Dimensions;
   private widgetDimensions: Dimensions;

@@ -1,6 +1,6 @@
 import { Widget, BaseWidget, UserWidget, WidgetMap } from './widget';
 
-fdescribe('UserWidget', () => {
+describe('UserWidget', () => {
   const clicheid = '1234';
   let allWidgets: WidgetMap;
   let widget1: BaseWidget;
@@ -52,11 +52,11 @@ fdescribe('UserWidget', () => {
     it ('removes itself from its template list', () => {
       const widget6copy = widget6.makeCopy(true)[0];
       widget6copy.updateWidgetMap(allWidgets);
-      expect(widget6.getIsTemplateCopy(widget6copy.getId())).toBe(true);
+      expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(true);
 
       widget6copy.delete();
 
-      expect(widget6.getIsTemplateCopy(widget6copy.getId())).toBe(false);
+      expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(false);
     });
   });
 
@@ -169,7 +169,7 @@ fdescribe('UserWidget', () => {
       widget3copy.updateWidgetMap(allWidgets);
 
       expect(widget3copy.getTemplateId()).toBeNull();
-      expect(widget3copy.getIsTemplate()).toBe(false);
+      expect(widget3copy.isTemplate()).toBe(false);
     });
 
     it ('not from template of a template creates another template', () => {
@@ -177,9 +177,9 @@ fdescribe('UserWidget', () => {
       const widget6copies = widget6.makeCopy();
 
       expect(widget6copies[0].getTemplateId()).toBeNull();
-      expect(widget6copies[0].getIsTemplate()).toBe(true);
+      expect(widget6copies[0].isTemplate()).toBe(true);
       expect(widget6copies[1].getTemplateId()).toBeNull();
-      expect(widget6copies[1].getIsTemplate()).toBe(true);
+      expect(widget6copies[1].isTemplate()).toBe(true);
     });
 
     it ('from template of a template creates a normal widget', () => {
@@ -187,9 +187,9 @@ fdescribe('UserWidget', () => {
       const widget6copies = widget6.makeCopy(true);
 
       expect(widget6copies[0].getTemplateId()).toEqual(widget6.getId());
-      expect(widget6copies[0].getIsTemplate()).toBe(false);
+      expect(widget6copies[0].isTemplate()).toBe(false);
       expect(widget6copies[1].getTemplateId()).toEqual(widget5.getId());
-      expect(widget6copies[1].getIsTemplate()).toBe(false);
+      expect(widget6copies[1].isTemplate()).toBe(false);
     });
   });
 

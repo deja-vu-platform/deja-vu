@@ -51,13 +51,12 @@ export class WorkSurfaceComponent implements AfterViewInit {
 
 
   ngAfterViewInit() {
-    const that = this;
     $('.work-surface').droppable({
       accept: 'dv-widget',
       hoverClass: 'highlight',
       tolerance: 'fit',
-      drop: function (event, ui) {
-          that.onDropFinished();
+      drop: (event, ui) => {
+          this.onDropFinished();
       }
     });
 

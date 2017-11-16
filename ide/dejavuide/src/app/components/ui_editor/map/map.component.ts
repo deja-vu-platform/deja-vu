@@ -90,20 +90,19 @@ export class MapComponent implements AfterViewInit {
     this.updateMapScale();
     this.updateView();
 
-    const that = this;
     // Initiate draggable
     $('#map-window').draggable({
       containment: '#zoom-selected-screen-size',
-      drag: function(e, ui) {
-        that.stateService.updateVisibleWindowScrollPosition({
-          top: ui.position.top / that.mapScale,
-          left: ui.position.left / that.mapScale
+      drag: (e, ui) => {
+        this.stateService.updateVisibleWindowScrollPosition({
+          top: ui.position.top / this.mapScale,
+          left: ui.position.left / this.mapScale
         });
       },
-      stop: function(e, ui){
-        that.stateService.updateVisibleWindowScrollPosition({
-          top: ui.position.top / that.mapScale,
-          left: ui.position.left / that.mapScale
+      stop: (e, ui) => {
+        this.stateService.updateVisibleWindowScrollPosition({
+          top: ui.position.top / this.mapScale,
+          left: ui.position.left / this.mapScale
         });
       },
     });

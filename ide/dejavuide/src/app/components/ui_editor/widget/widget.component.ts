@@ -55,13 +55,14 @@ export class WidgetComponent implements AfterViewInit, OnInit {
     this.el.style.position = 'absolute';
 
     // Initiate draggable based on certain things
+    // If it's the selected widget, it is always movable
+    // Otherwise make it movable based on the flag.
     if (this.isSelected || this.isMovable) {
-      const that = this;
       $(this.el).draggable({
         containment: '.work-surface',
-        stop: function(e, ui){
-          that.widget.updatePosition(ui.position);
-          that.projectService.widgetUpdated();
+        stop: (e, ui) => {
+          this.widget.updatePosition(ui.position);
+          this.projectService.widgetUpdated();
         },
       });
 
