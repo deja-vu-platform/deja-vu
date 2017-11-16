@@ -1,4 +1,5 @@
-import { WidgetType, Widget, BaseWidget, UserWidget } from './widget';
+import { Widget, BaseWidget, UserWidget, ClicheMap } from './widget';
+
 import { Cliche, UserCliche} from '../cliche/cliche';
 
 describe('UserWidget', () => {
@@ -8,7 +9,7 @@ describe('UserWidget', () => {
   let cliche2: UserCliche;
   let cliche2id: string;
 
-  let allCliches: Map<string, Cliche>;
+  let allCliches: ClicheMap;
   let widget1: BaseWidget;
   let widget2: UserWidget;
   let widget3: UserWidget;
@@ -42,30 +43,43 @@ describe('UserWidget', () => {
     Widget.addWidgetToCliche(allCliches, widget4);
     Widget.addWidgetToCliche(allCliches, widget5);
     Widget.addWidgetToCliche(allCliches, widget6);
+
+    Widget.addWidgetToCliche(allCliches, widget1);
+    widget1.updateClicheMap(allCliches);
+    Widget.addWidgetToCliche(allCliches, widget2);
+    widget2.updateClicheMap(allCliches);
+    Widget.addWidgetToCliche(allCliches, widget3);
+    widget3.updateClicheMap(allCliches);
+    Widget.addWidgetToCliche(allCliches, widget4);
+    widget4.updateClicheMap(allCliches);
+    Widget.addWidgetToCliche(allCliches, widget5);
+    widget5.updateClicheMap(allCliches);
+    Widget.addWidgetToCliche(allCliches, widget6);
+    widget6.updateClicheMap(allCliches);
   });
 
   describe('remove', () => {
     it('removes itself from all widgets', () => {
-      widget1.remove(allCliches);
+      widget1.remove();
       expect(Widget.getWidget(allCliches, widget1.getId())).toBe(undefined);
     });
 
     it ('does not delete inner widget', () => {
       widget2.addInnerWidget(widget1.getId());
-      widget2.remove(allCliches);
+      widget2.remove();
 
       expect(Widget.getWidget(allCliches, widget2.getId())).toBe(undefined);
       expect(Widget.getWidget(allCliches, widget1.getId())).toBe(widget1);
     });
 
     it ('removes itself from its template list', () => {
-      const widget6copy = widget6.makeCopy(allCliches, true)[0];
+      const widget6copy = widget6.makeCopy(true)[0];
+      widget6copy.updateClicheMap(allCliches);
+      expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(true);
 
-      expect(widget6.getIsTemplateCopy(widget6copy.getId())).toBe(true);
+      widget6copy.remove();
 
-      widget6copy.remove(allCliches);
-
-      expect(widget6.getIsTemplateCopy(widget6copy.getId())).toBe(false);
+      expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(false);
     });
   });
 
@@ -97,20 +111,20 @@ describe('UserWidget', () => {
       widget2.addInnerWidget(widget1.getId());
       widget3.addInnerWidget(widget2.getId());
 
-      expect(widget2.getPath(allCliches, widget2.getId()))
+      expect(widget2.getPath(widget2.getId()))
       .toEqual([widget2.getId()]);
-      expect(widget2.getPath(allCliches, widget1.getId()))
+      expect(widget2.getPath(widget1.getId()))
       .toEqual([widget2.getId(), widget1.getId()]);
-      expect(widget3.getPath(allCliches, widget3.getId()))
+      expect(widget3.getPath(widget3.getId()))
       .toEqual([widget3.getId()]);
-      expect(widget3.getPath(allCliches, widget2.getId()))
+      expect(widget3.getPath(widget2.getId()))
       .toEqual([widget3.getId(), widget2.getId()]);
-      expect(widget3.getPath(allCliches, widget1.getId()))
+      expect(widget3.getPath(widget1.getId()))
       .toEqual([widget3.getId(), widget2.getId(), widget1.getId()]);
     });
 
     it ('returns null if there is no path', () => {
-      expect(widget3.getPath(allCliches, widget4.getId()))
+      expect(widget3.getPath(widget4.getId()))
       .toBeNull();
     });
   });
@@ -120,20 +134,20 @@ describe('UserWidget', () => {
       widget2.addInnerWidget(widget1.getId());
       widget3.addInnerWidget(widget2.getId());
 
-      expect(widget2.getInnerWidget(allCliches, widget2.getId()))
+      expect(widget2.getInnerWidget(widget2.getId()))
       .toBe(widget2);
-      expect(widget2.getInnerWidget(allCliches, widget1.getId()))
+      expect(widget2.getInnerWidget(widget1.getId()))
       .toBe(widget1);
-      expect(widget3.getInnerWidget(allCliches, widget3.getId()))
+      expect(widget3.getInnerWidget(widget3.getId()))
       .toBe(widget3);
-      expect(widget3.getInnerWidget(allCliches, widget2.getId()))
+      expect(widget3.getInnerWidget(widget2.getId()))
       .toBe(widget2);
-      expect(widget3.getInnerWidget(allCliches, widget1.getId()))
+      expect(widget3.getInnerWidget(widget1.getId()))
       .toBe(widget1);
     });
 
     it ('returns null if there is no path', () => {
-      expect(widget3.getInnerWidget(allCliches, widget4.getId()))
+      expect(widget3.getInnerWidget(widget4.getId()))
       .toBeNull();
     });
   });
@@ -141,16 +155,18 @@ describe('UserWidget', () => {
   describe('fromObject', () => {
     it ('it creates a real widget from BaseWidgets', () => {
       const widget5Copy = Widget.fromObject(JSON.parse(JSON.stringify(widget5)));
+      widget5Copy.updateWidgetMap(allCliches);
 
       expect(widget5Copy.getId()).toEqual(widget5.getId());
-      expect(widget5Copy.getWidgetType()).toEqual(WidgetType.BASE_WIDGET);
+      expect(widget5Copy.isBaseType()).toBe(true);
     });
 
     it ('it creates a real widget from UserWidgets', () => {
       const widget6Copy = Widget.fromObject(JSON.parse(JSON.stringify(widget6)));
+      widget6Copy.updateWidgetMap(allCliches);
 
       expect(widget6Copy.getId()).toEqual(widget6.getId());
-      expect(widget6Copy.getWidgetType()).toEqual(WidgetType.USER_WIDGET);
+      expect(widget6Copy.isUserType()).toBe(true);
     });
   });
 
@@ -159,7 +175,7 @@ describe('UserWidget', () => {
     it ('returns all the copied inner widgets', () => {
       widget2.addInnerWidget(widget1.getId());
       widget3.addInnerWidget(widget2.getId());
-      const widget3copies = widget3.makeCopy(allCliches);
+      const widget3copies = widget3.makeCopy();
 
       expect(widget3copies.length).toBe(3);
       expect(widget3copies[0].getName()).toEqual('widget3');
@@ -171,31 +187,32 @@ describe('UserWidget', () => {
     });
 
     it ('from template of a non-template does nothing', () => {
-      const widget3copies = widget3.makeCopy(allCliches, true);
+      const widget3copies = widget3.makeCopy(true);
       const widget3copy = widget3copies[0];
+      widget3copy.updateClicheMap(allCliches);
 
       expect(widget3copy.getTemplateId()).toBeNull();
-      expect(widget3copy.getIsTemplate()).toBe(false);
+      expect(widget3copy.isTemplate()).toBe(false);
     });
 
     it ('not from template of a template creates another template', () => {
       widget6.addInnerWidget(widget5.getId());
-      const widget6copies = widget6.makeCopy(allCliches);
+      const widget6copies = widget6.makeCopy();
 
       expect(widget6copies[0].getTemplateId()).toBeNull();
-      expect(widget6copies[0].getIsTemplate()).toBe(true);
+      expect(widget6copies[0].isTemplate()).toBe(true);
       expect(widget6copies[1].getTemplateId()).toBeNull();
-      expect(widget6copies[1].getIsTemplate()).toBe(true);
+      expect(widget6copies[1].isTemplate()).toBe(true);
     });
 
     it ('from template of a template creates a normal widget', () => {
       widget6.addInnerWidget(widget5.getId());
-      const widget6copies = widget6.makeCopy(allCliches, true);
+      const widget6copies = widget6.makeCopy(true);
 
       expect(widget6copies[0].getTemplateId()).toEqual(widget6.getId());
-      expect(widget6copies[0].getIsTemplate()).toBe(false);
+      expect(widget6copies[0].isTemplate()).toBe(false);
       expect(widget6copies[1].getTemplateId()).toEqual(widget5.getId());
-      expect(widget6copies[1].getIsTemplate()).toBe(false);
+      expect(widget6copies[1].isTemplate()).toBe(false);
     });
   });
 
@@ -204,9 +221,11 @@ describe('UserWidget', () => {
       widget2.addInnerWidget(widget1.getId());
       widget1.updatePosition({top: 5, left: 6});
 
-      const widget2Copies = widget2.makeCopy(allCliches);
+      const widget2Copies = widget2.makeCopy();
       const widget2Copy = <UserWidget>widget2Copies[0];
       const widget1Copy = widget2Copies[1];
+      widget2Copy.updateClicheMap(allCliches);
+      widget1Copy.updateClicheMap(allCliches);
       expect(widget1Copy.getPosition()).toEqual(widget1.getPosition());
     });
   });
@@ -229,25 +248,28 @@ describe('UserWidget', () => {
       widget1.updateCustomStyle('background-color', 'red');
       const styles = widget1.getLocalCustomStyles();
 
-      expect(widget1.getCustomStylesToShow(allCliches)).toEqual(styles);
+      expect(widget1.getCustomStylesToShow()).toEqual(styles);
     });
 
     it('getCustomStylesToShow with template gets template styles ' +
     'but local styles are empty', () => {
       widget6.updateCustomStyle('background-color', 'red');
       const widget6Styles = widget6.getLocalCustomStyles();
-      const widget6copy = widget6.makeCopy(allCliches, true)[0];
+      const widget6copy = widget6.makeCopy(true)[0];
+      widget6copy.updateClicheMap(allCliches);
       const widget6copyStyles = widget6copy.getLocalCustomStyles();
 
       expect(widget6copyStyles).toEqual({});
-      expect(widget6copy.getCustomStylesToShow(allCliches)).toEqual(widget6Styles);
+      expect(widget6copy.getCustomStylesToShow()).toEqual(widget6Styles);
     });
 
     it('getCustomStylesToShow inheritence is parent < template < self',
     () => {
       widget6.updateCustomStyle('background-color', 'red');
       widget6.updateCustomStyle('color', 'red');
-      const widget6copy = widget6.makeCopy(allCliches, true)[0];
+      const widget6copy = widget6.makeCopy(true)[0];
+      widget6copy.updateClicheMap(allCliches);
+
       widget6copy.updateCustomStyle('color', 'blue');
       widget6copy.updateCustomStyle('font-weight', 'bold');
       const parentStyles = {
@@ -263,8 +285,7 @@ describe('UserWidget', () => {
         'font-weight': 'bold'
       };
 
-      const styles = widget6copy
-                      .getCustomStylesToShow(allCliches, parentStyles);
+      const styles = widget6copy.getCustomStylesToShow(parentStyles);
 
       expect(styles).toEqual(expectedStyles);
     });
@@ -375,16 +396,16 @@ describe('UserWidget', () => {
       widget4.updateDimensions({height: 10, width: 10});
       widget5.updatePosition({top: 102, left: 102});
 
-      expect(widget6.findOverlappingWidgets(allCliches, widget1))
+      expect(widget6.findOverlappingWidgets(widget1))
         .toEqual(new Set([widget2.getId()]));
-      expect(widget6.findOverlappingWidgets(allCliches, widget2))
+      expect(widget6.findOverlappingWidgets(widget2))
         .toEqual(new Set([widget1.getId()]));
 
-      expect(widget6.findOverlappingWidgets(allCliches, widget4))
+      expect(widget6.findOverlappingWidgets(widget4))
         .toEqual(new Set([widget3.getId(), widget5.getId()]));
-      expect(widget6.findOverlappingWidgets(allCliches, widget3))
+      expect(widget6.findOverlappingWidgets(widget3))
         .toEqual(new Set([widget4.getId()]));
-      expect(widget6.findOverlappingWidgets(allCliches, widget5))
+      expect(widget6.findOverlappingWidgets(widget5))
         .toEqual(new Set([widget4.getId()]));
     });
   });

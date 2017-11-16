@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter} from '@angular/core';
+import { Component } from '@angular/core';
 
-import {Dimensions} from '../../../utility/utility';
+import { Dimensions, StateService } from '../../../services/state.service';
+import { ProjectService } from '../../../services/project.service';
 
 enum ZoomType {
   SLIDER, FIT, FULL, ACTUAL
@@ -17,21 +18,34 @@ const CHEVRON = {
   styleUrls: ['./zoom.component.css']
 })
 export class ZoomComponent {
-  @Input() outerContainerDimensions: Dimensions;
-  @Input() widgetDimensions: Dimensions;
-  @Input() screenDimensions: Dimensions;
-
-  @Output() updatedZoom = new EventEmitter<number>();
-
   readonly sliderMinVal = -300;
   readonly sliderMaxVal = 300;
+  readonly ZoomType = ZoomType;
+
   zoomControlText = '100%';
   sliderVal = 0;
   minimized = false;
   chevron = CHEVRON.RIGHT;
-  ZoomType = ZoomType;
 
   private currentZoom: number;
+  private visibleWindowDimensions: Dimensions;
+  private widgetDimensions: Dimensions;
+  private screenDimensions: Dimensions;
+
+  constructor(
+    private stateService: StateService,
+    private projectService: ProjectService
+  ) {
+    stateService.visibleWindowDimensions
+      .subscribe((newVisibleWindowDimensions) => {
+        this.visibleWindowDimensions = newVisibleWindowDimensions;
+      });
+
+    projectService.selectedWidget.subscribe((newWidget) => {
+      this.widgetDimensions = newWidget.getDimensions();
+    });
+  }
+
 
   zoomTypeButtonClick(type: ZoomType) {
     this.changeZoomViaZoomControl(type);
@@ -41,14 +55,18 @@ export class ZoomComponent {
 
   zoomButtonClick(e: MouseEvent, out: boolean) {
     e.preventDefault();
+    if (this.sliderVal >= this.sliderMaxVal
+      || this.sliderVal <= this.sliderMinVal) {
+      return;
+    }
     const diff = out ? -100 : 100;
     this.sliderVal = Math.round(this.sliderVal / 100) * 100 + diff;
     this.changeZoomViaZoomControl(ZoomType.SLIDER);
     this.zoomChanged();
   }
 
-  zoomSliderInput(newVal: number) {
-    this.sliderVal = newVal;
+  zoomSliderInput(newVal: string) {
+    this.sliderVal = parseFloat(newVal);
     this.changeZoomViaZoomControl(ZoomType.SLIDER);
     this.zoomChanged();
   }
@@ -69,16 +87,16 @@ export class ZoomComponent {
         this.currentZoom = this.getZoomFromSliderVal();
         break;
     case ZoomType.FIT:
-        const zoomHeight = this.outerContainerDimensions.height /
+        const zoomHeight = this.visibleWindowDimensions.height /
                                 this.widgetDimensions.height;
-        const zoomWidth = this.outerContainerDimensions.width /
+        const zoomWidth = this.visibleWindowDimensions.width /
                                 this.widgetDimensions.width;
         this.currentZoom = Math.min(zoomWidth, zoomHeight);
         break;
     case ZoomType.FULL:
-        const widthScale =  this.outerContainerDimensions.width /
+        const widthScale =  this.visibleWindowDimensions.width /
                                 this.screenDimensions.width;
-        const heightScale = this.outerContainerDimensions.height /
+        const heightScale = this.visibleWindowDimensions.height /
                                 this.screenDimensions.height;
         this.currentZoom = Math.min(widthScale, heightScale);
         break;
@@ -127,7 +145,7 @@ export class ZoomComponent {
   }
 
   private zoomChanged() {
-    this.updatedZoom.emit(this.currentZoom);
+    this.stateService.updateZoom(this.currentZoom);
     this.zoomControlText = this.makeZoomText(this.getZoomFromSliderVal());
   }
 }

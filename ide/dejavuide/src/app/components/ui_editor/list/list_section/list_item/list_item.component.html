@@ -1,5 +1,5 @@
 <div>
-  <div class="content dropdown-target"  data-dropdownid="'+dropdownId+'"></div>
+  <div class="content dropdown-target"></div>
   <div class="name-container">
       <span class="name"> {{widget.getName()}} </span>
       <!-- <div class="submit-rename not-displayed"> -->
@@ -14,14 +14,13 @@
       <span class="glyphicon glyphicon-trash"></span>
     </button>
   </div>
-  <ng-container *ngIf="widget.getWidgetType() == WidgetType.USER_WIDGET">
+  <ng-container *ngIf="widget.isUserType()">
     <button *ngIf="widget.getInnerWidgetIds().length > 0"
             (click)="toggleShow()">
       toggle show
     </button>  
     <ng-container *ngFor="let id of widget.getInnerWidgetIds()">
-      <dv-list-item [allCliches]="allCliches"
-                    [widget]="widget.getInnerWidget(allCliches, id)"
+      <dv-list-item [widget]="widget.getInnerWidget(id)"
                     [isDraggable]="false"
                     [isDeletable]="true"
                     [hidden]="!innerShown">

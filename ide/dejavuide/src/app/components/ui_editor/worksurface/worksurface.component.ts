@@ -1,8 +1,8 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 
 import { Widget } from '../../../models/widget/widget';
-import { Cliche } from '../../../models/cliche/cliche';
-import { Dimensions, Position } from '../../../utility/utility';
+import { Dimensions, Position, StateService } from '../../../services/state.service';
+import { ProjectService } from '../../../services/project.service';
 
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
@@ -15,33 +15,57 @@ const $ = <any>jQuery;
   styleUrls: ['./worksurface.component.css']
 })
 export class WorkSurfaceComponent implements AfterViewInit {
-  @Input() currentZoom: number;
-  @Input() allCliches: Map<string, Cliche>;
-  @Input() set widget(val: Widget) {
-    // set up things
-    this._widget = val;
-    // TODO probably will have to do other things
+  /**
+   * Dimensions of the screen the user is building an app for.
+   */
+  selectedScreenDimensions: Dimensions;
+  selectedWidget: Widget;
+
+  private currentZoom = 1;
+  private visibleWindowScroll: Position;
+
+  constructor(
+    private stateService: StateService,
+    private projectService: ProjectService
+  ) {
+    stateService.zoom.subscribe((newZoom) => {
+      this.currentZoom = newZoom;
+    });
+
+    stateService.selectedScreenDimensions
+      .subscribe((newSelectedScreenDimensions) => {
+        this.selectedScreenDimensions = newSelectedScreenDimensions;
+      });
+
+    stateService.visibleWindowScrollPosition
+      .subscribe((newScrollPosition) => {
+        this.visibleWindowScroll = newScrollPosition;
+        $('.visible-window').scrollTop(newScrollPosition.top);
+        $('.visible-window').scrollLeft(newScrollPosition.left);
+      });
+
+    projectService.selectedWidget.subscribe((newSelectedWidget) => {
+      this.selectedWidget = newSelectedWidget;
+    });
   }
 
-  @Input() dimensions: Dimensions;
-
-  @Output() onChange = new EventEmitter<boolean>();
-
-  _widget: Widget;
-
-  handleChange() {
-    this.onChange.emit(true);
-  }
 
   ngAfterViewInit() {
-    const _this = this;
     $('.work-surface').droppable({
       accept: 'dv-widget',
       hoverClass: 'highlight',
       tolerance: 'fit',
-      drop: function (event, ui) {
-          _this.onDropFinished();
+      drop: (event, ui) => {
+          this.onDropFinished();
       }
+    });
+
+    $('.visible-window').scroll((event: Event) => {
+      const jqo = $('.visible-window');
+      this.stateService.updateVisibleWindowScrollPosition({
+        top: jqo.scrollTop(),
+        left: jqo.scrollLeft()
+      });
     });
   }
 

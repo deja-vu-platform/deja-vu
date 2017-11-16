@@ -1,7 +1,8 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import {Cliche, UserCliche, DvCliche} from '../../../models/cliche/cliche';
-import {Widget, BaseWidget, UserWidget, WidgetType} from '../../../models/widget/widget';
+import {Widget, BaseWidget, UserWidget, ClicheMap} from '../../../models/widget/widget';
+import { ProjectService } from '../../../services/project.service';
 
 @Component({
   selector: 'dv-list',
@@ -11,14 +12,21 @@ import {Widget, BaseWidget, UserWidget, WidgetType} from '../../../models/widget
 export class ListComponent implements OnInit {
   @Input() userApp: UserCliche;
   @Input() importedCliches: DvCliche[];
-  @Input() allCliches: Map<string, Cliche>;
 
   pages: UserWidget[] = [];
   unusedWidget: Widget[] = [];
   templates: Widget[] = [];
+  allCliches: ClicheMap;
+
+  constructor(private projectService: ProjectService) {
+    this.projectService.allCliches.subscribe((allCliches) => {
+      this.allCliches = allCliches;
+    });
+  }
 
   ngOnInit() {
     console.log(this.userApp);
+    console.log(this.allCliches);
 
     this.userApp.getPageIds().forEach((pageId) => {
       this.pages.push(<UserWidget>Widget.getWidget(this.allCliches, pageId));

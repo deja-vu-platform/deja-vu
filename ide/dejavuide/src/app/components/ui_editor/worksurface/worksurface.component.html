@@ -1,10 +1,11 @@
-<div class="work-surface widget-work-surface"
-     [style.height] ="dimensions.height + 'px'"
-     [style.width]="dimensions.width + 'px'">
-  <dv-widget [widget]="_widget"
-              [allCliches]="allCliches"
-              [isSelected]="true"
-              [isMovable]="true"
-              (onChange)="handleChange()">
-  </dv-widget>
+<div class="visible-window">
+  <div class="work-surface widget-work-surface"
+      [style.height.px] ="selectedScreenDimensions.height"
+      [style.width.px]="selectedScreenDimensions.width">
+    <dv-widget *ngIf="selectedWidget"
+                [widget]="selectedWidget"
+                [isSelected]="true"
+                [isMovable]="true">
+    </dv-widget>
+  </div>
 </div>

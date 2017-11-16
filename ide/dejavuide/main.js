@@ -10,9 +10,9 @@ var ipcMain = electron.ipcMain;
 // Angular and electron help from https://scotch.io/tutorials/build-a-music-player-with-angular-2-electron-i-setup-basics-concepts
 require('dotenv').config();
 
-require('electron-reload')(__dirname, {
-    electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
-});
+// require('electron-reload')(__dirname, {
+//     electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
+// });
 
 
 // from http://electron.atom.io/docs/tutorial/quick-start/
@@ -72,14 +72,16 @@ app.on('activate', function(){
     }
 });
 
-// TODO have a settings file to store preferred pathname
 
+// The projects are currently stored at the root of the app.
+// TODO have an option to allow users to put in where they want
+// their projects saved. 
 var projectsSavePath = path.join(__dirname, 'projects');
 
 try {
     fs.accessSync(projectsSavePath, fs.F_OK);
 } catch (e) {
-    // It isn't accessible
+    // The folder hasn't been created yet.
     fs.mkdir(projectsSavePath);
 }
 

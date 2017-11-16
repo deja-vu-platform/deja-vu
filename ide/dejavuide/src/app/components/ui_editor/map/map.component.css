@@ -1,13 +1,5 @@
 
-#map-container{
-  position: fixed;
-  left: 300px;
-  bottom: 20px;
-  pointer-events: none;
-  z-index: 1000;
-}
-
-#map{
+#map {
   position: absolute;
   background: white;
   overflow: scroll;
@@ -17,7 +9,7 @@
   border: 1px black solid;
 }
 
-#map-minimize-btn{
+#map-minimize-btn {
   position: absolute;
   top: 0px;
   right: -40px;
@@ -25,14 +17,14 @@
   z-index: 100;
 }
 
-#map-container .minimized{ /* the minimize button */
+#map-container .minimized { /* the minimize button */
   top: auto;
   left: 0;
   right: auto;
   bottom: 0;
 }
 
-#map-component-sizes{
+#map-component-sizes {
   background: #D5D5D5;
   position: absolute;
 }

@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 
-import { Widget, WidgetType } from '../../../models/widget/widget';
 import { Cliche } from '../../../models/cliche/cliche';
+import { Widget, UserWidget } from '../../../models/widget/widget';
+import { ProjectService } from '../../../services/project.service';
 
 // Widgets are drag-and-droppable
 import * as jQuery from 'jquery';
@@ -14,21 +15,35 @@ const $ = <any>jQuery;
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class WidgetComponent implements AfterViewInit {
-  @Input() allCliches:  Map<string, Cliche>;
+export class WidgetComponent implements AfterViewInit, OnInit {
   @Input() widget: Widget;
   @Input() isSelected = false;
+  /**
+   * Only the direct children of a widget are movable when a widget is selected.
+   * So any grandchildren and so on are not movable in this view.
+   */
   @Input() isMovable = false;
 
-  @Output() onChange = new EventEmitter<boolean>();
-
-  widgetType = WidgetType;
-  Widget = Widget;
+  readonly Widget = Widget;
+  innerWidgets: Widget[] = [];
 
   private el: HTMLElement;
 
-  constructor(el: ElementRef) {
+  constructor(
+    el: ElementRef,
+    private projectService: ProjectService
+  ) {
       this.el = el.nativeElement;
+  }
+
+
+  ngOnInit() {
+    // get inner widgets
+    if (this.widget.isUserType()) {
+      for (const innerWidgetId of this.widget.getInnerWidgetIds()) {
+        this.innerWidgets.push(Widget.getWidget(this.widget.getClicheMap(), innerWidgetId));
+      }
+    }
   }
 
   ngAfterViewInit() {
@@ -39,22 +54,19 @@ export class WidgetComponent implements AfterViewInit {
     this.el.style.position = 'absolute';
 
     // Initiate draggable based on certain things
+    // If it's the selected widget, it is always movable
+    // Otherwise make it movable based on the flag.
     if (this.isSelected || this.isMovable) {
-      const _this = this;
       $(this.el).draggable({
         containment: '.work-surface',
-        stop: function(e, ui){
-          _this.widget.updatePosition(ui.position);
-          _this.onChange.emit(true);
+        stop: (e, ui) => {
+          this.widget.updatePosition(ui.position);
+          this.projectService.widgetUpdated();
         },
       });
 
       this.makeWidgetResizable();
     }
-  }
-
-  handleChange() {
-    this.onChange.emit(true);
   }
 
   private makeWidgetResizable() {

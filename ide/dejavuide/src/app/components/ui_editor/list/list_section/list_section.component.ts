@@ -1,7 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { Cliche } from '../../../../models/cliche/cliche';
-import { Widget, BaseWidget, UserWidget, WidgetType } from '../../../../models/widget/widget';
+import { Widget } from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-list-section',
@@ -10,5 +9,4 @@ import { Widget, BaseWidget, UserWidget, WidgetType } from '../../../../models/w
 })
 export class ListSectionComponent {
   @Input() widgets: Widget[];
-  @Input() allCliches: Map<string, Cliche>;
 }

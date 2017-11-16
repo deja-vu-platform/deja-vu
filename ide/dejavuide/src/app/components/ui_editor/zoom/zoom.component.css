@@ -1,11 +1,3 @@
-#zoom-control {
-  position: fixed;
-  bottom: 20px;
-  right: 15px;
-  height: 60px;
-  display: flex;
-}
-
 #zoom-slider-and-value {
   vertical-align: middle;
   text-align: center;
@@ -15,7 +7,7 @@
   display: none;
 }
 
-#zoom-slider{
+#zoom-slider {
   height: 40px;
   width: 160px;
 }
@@ -25,7 +17,8 @@
   width: 160px;
 }
 
-.zoom-control-button {font-size: 20px;
+.zoom-control-button {
+  font-size: 20px;
   background-color: rgba(0, 60, 136, 0.5);
   color: white;
   border: white solid 1px;
