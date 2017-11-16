@@ -1,0 +1,43 @@
+<button id="zoom-control-minimize-btn" 
+        class="btn btn-default"
+        (click)="minimize()">
+    <span [class]="chevron"></span>
+</button>
+<button id="zoom-actual" 
+        class="btn btn-default"
+        [hidden]="minimized"
+        (click)="zoomTypeButtonClick(ZoomType.ACTUAL)">
+    Actual
+</button>
+<button id="zoom-fit" 
+        class="btn btn-default"
+        [hidden]="minimized"
+        (click)="zoomTypeButtonClick(ZoomType.FIT)">
+    Fit
+</button>
+<button id="zoom-full" 
+        class="btn btn-default"
+        [hidden]="minimized"
+        (click)="zoomTypeButtonClick(ZoomType.FULL)">
+    Full
+</button>
+<button id="zoom-out" 
+        class="btn zoom-control-button" 
+        (click)="zoomButtonClick($event, true)">
+    <span class="glyphicon glyphicon-zoom-out"></span>
+</button>
+<div id="zoom-slider-and-value"
+    [hidden]="minimized">
+<input id="zoom-slider" #slider
+        type="range" 
+        [min]="sliderMinVal" 
+        [max]="sliderMaxVal" 
+        [(value)]="sliderVal" 
+        (input)="zoomSliderInput(slider.value)"/>
+<div id="zoom-control-value">{{zoomControlText}}</div>
+</div>
+<button id="zoom-in" 
+        class="btn zoom-control-button" 
+        (click)="zoomButtonClick($event, false)">
+    <span class="glyphicon glyphicon-zoom-in"></span>
+</button>

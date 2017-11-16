@@ -1,0 +1,10 @@
+.work-surface {
+  position: relative;
+  background: palevioletred;
+}
+
+.visible-window {
+  width: 800px;
+  height: 500px;
+  overflow: scroll;
+}

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "electron main.js"
   },
-  "author": "Eric",
+  "author": "Eric and Shinjini Saha",
   "devDependencies": {
     "electron-prebuilt": "1.1.1"
   },

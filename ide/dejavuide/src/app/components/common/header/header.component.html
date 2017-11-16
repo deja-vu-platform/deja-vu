@@ -1,0 +1,31 @@
+<div class="menubar">
+    <div class="menu-item logo">{{dejavu}}: {{pageTitle}}</div>
+    <div class="menu-item navigation"> 
+        Navigate to:
+        <a (click)="handleBackToAllProjects()">All Projects</a>
+        <ng-container *ngFor="let otherPage of otherPages">
+            <a [href]="otherPage.url">{{otherPage.title}}</a>
+        </ng-container>
+    </div>
+    <div *ngIf="isClichePage"
+        class="menu-item">
+        <button type="button" class="btn btn-default"  id="save-project">
+            <span class="glyphicon glyphicon-save"></span> 
+            Save Project
+        </button>
+    </div>
+    <div class="menu-item btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-file"></span> 
+            Help
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a href="#">About</a></li>
+            <li><a href="#">Tutorials</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="#">Report an issue</a></li>
+        </ul>
+    </div>
+</div>
+
