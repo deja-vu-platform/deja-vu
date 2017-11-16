@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <dv-worksurface>
 </dv-worksurface>
         
@@ -11,3 +12,33 @@
   <dv-list [userApp]="userApp">
   </dv-list>
 </ng-container>
+=======
+<ng-container *ngIf="selectedProject">
+  <div class="edit">
+    <div class="project-options-container">
+      <div class="project-options">
+          <div class="project-name">
+            <div class="header">{{selectedProject.getName()}}</div>
+          </div>
+          <ul class="nav nav-tabs">
+              <li class="active" id="build-mode"><a href="#">Build</a></li>
+              <li id="style-mode"><a href="#">Style</a></li>
+          </ul>
+      </div>
+      <div class="components">
+        <dv-list [userApp]="userApp">
+        </dv-list>
+      </div>
+      <div class="style">
+        <!-- Style component -->
+      </div>
+    </div>
+
+    <dv-worksurface></dv-worksurface>
+  </div>
+  
+  <dv-zoom></dv-zoom>
+
+  <dv-map></dv-map>
+</ng-container>
+>>>>>>> 7b0b57b86363049aee602e5f90346efa90de77f1

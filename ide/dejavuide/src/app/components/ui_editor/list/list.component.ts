@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import {Cliche, UserCliche, DvCliche} from '../../../models/cliche/cliche';
-import {Widget, BaseWidget, UserWidget, ClicheMap} from '../../../models/widget/widget';
+import { Cliche, UserCliche, DvCliche, ClicheMap } from '../../../models/cliche/cliche';
+import { Widget, BaseWidget, UserWidget } from '../../../models/widget/widget';
 import { ProjectService } from '../../../services/project.service';
 
 @Component({
@@ -19,15 +19,12 @@ export class ListComponent implements OnInit {
   allCliches: ClicheMap;
 
   constructor(private projectService: ProjectService) {
-    this.projectService.allCliches.subscribe((allCliches) => {
+    projectService.allCliches.subscribe((allCliches) => {
       this.allCliches = allCliches;
     });
   }
 
   ngOnInit() {
-    console.log(this.userApp);
-    console.log(this.allCliches);
-
     this.userApp.getPageIds().forEach((pageId) => {
       this.pages.push(<UserWidget>Widget.getWidget(this.allCliches, pageId));
     });

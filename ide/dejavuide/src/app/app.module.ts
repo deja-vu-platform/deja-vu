@@ -4,6 +4,14 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { HeaderModule } from './components/common/header/header.module';
+<<<<<<< HEAD
+=======
+import { ZoomModule } from './components/ui_editor/zoom/zoom.module';
+import { MapModule } from './components/ui_editor/map/map.module';
+import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurface.module';
+import { StateService } from './services/state.service';
+import { ProjectService } from './services/project.service';
+>>>>>>> 7b0b57b86363049aee602e5f90346efa90de77f1
 import { UiEditorModule } from './components/ui_editor/ui_editor.module';
 import { UiEditorComponent } from './components/ui_editor/ui_editor.component';
 import { ProjectExplorerModule } from './components/project_explorer/project_explorer.module';

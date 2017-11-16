@@ -3,6 +3,7 @@ const ipcRenderer = electron.ipcRenderer;
 
 import { Component, Input, Output, OnInit} from '@angular/core';
 import { RouterService, PageType } from '../../../services/router.service';
+import { ProjectService } from '../../../services/project.service';
 
 interface PageInfo {
   title: string;
@@ -49,7 +50,9 @@ export class HeaderComponent implements OnInit {
   pageType = PageType.PROJECT_EXPLORER;
   pageTitle: string;
 
-  constructor (private routerService: RouterService) {
+  constructor (
+    private projectService: ProjectService,
+    private routerService: RouterService) {
   }
 
   ngOnInit() {
@@ -81,7 +84,7 @@ export class HeaderComponent implements OnInit {
   }
 
   save() {
-    const selectedProject = this.routerService.getProject();
+    const selectedProject = this.projectService.getProject();
     if (selectedProject) {
       ipcRenderer.send('save', {
         projectName: selectedProject.getName(),

@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material';
 import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
 import { NewProjectDialogComponent } from './new_project_dialog.component';
 import { RouterService, PageType } from '../../services/router.service';
+import { ProjectService } from '../../services/project.service';
 import { Project } from '../../models/project/project';
 
 interface DisplayProject {
@@ -36,6 +37,7 @@ export class ProjectExplorerComponent implements OnInit {
     public dialog: MatDialog,
     private ref: ChangeDetectorRef,
     private routerService: RouterService,
+    private projectService: ProjectService,
     private zone: NgZone) {}
 
   ngOnInit() {
@@ -80,7 +82,7 @@ export class ProjectExplorerComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const newProject = new Project(result.name);
-        that.routerService.updateProject(newProject);
+        that.projectService.updateProject(newProject);
         that.routerService.navigateTo(PageType.UI_EDITOR);
       }
     });
@@ -101,7 +103,7 @@ export class ProjectExplorerComponent implements OnInit {
 
   loadClicked(projectName) {
     const newProject = Project.fromObject(this.projects[projectName]);
-    this.routerService.updateProject(newProject);
+    this.projectService.updateProject(newProject);
     this.zone.run(() => {
       this.routerService.navigateTo(PageType.UI_EDITOR);
     });

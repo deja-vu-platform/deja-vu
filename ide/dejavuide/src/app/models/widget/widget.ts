@@ -1,13 +1,7 @@
-import { generateId, Dimensions, Position } from '../../utility/utility';
-import { Cliche, UserCliche } from '../cliche/cliche';
+import { generateId } from '../../utility/utility';
+import { Dimensions, Position } from '../../services/state.service';
+import { Cliche, UserCliche, ClicheMap } from '../cliche/cliche';
 import { Meta } from '../project/project';
-
-/**
- * Currently a map from clicheIds to all the widgets it contains (widgetId
- * to widget). Will in the next pull request become a map from clicheIds to
- * cliche objects.
- */
-export type ClicheMap = Map<string, Cliche>;
 
 enum WidgetType {
     BASE_WIDGET, USER_WIDGET, CLICHE_WIDGET
@@ -49,7 +43,7 @@ export abstract class Widget {
      * @param widget widget to add
      */
     static addWidgetToCliche(
-        allCliches: Map<string, Cliche>,
+        allCliches: ClicheMap,
         widget: Widget) {
         if (!allCliches.get(widget.getClicheId())) {
             throw Error('Cliche not found');
@@ -63,7 +57,7 @@ export abstract class Widget {
      * @param widgetId id of widget to find
      */
     static getWidget(
-        allCliches: Map<string, Cliche>,
+        allCliches: ClicheMap,
         widgetId: string
     ): Widget {
         const clicheid = Widget.decodeid(widgetId)[0];

@@ -1,23 +1,37 @@
-import { Component, Input } from '@angular/core';
-import {MatDialog} from '@angular/material';
+import { Component, Input, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material';
 
-import { Cliche } from '../../../../../models/cliche/cliche';
-import {Widget, BaseWidget, UserWidget} from '../../../../../models/widget/widget';
-import {DeleteDialogComponent} from './delete_dialog.component';
+import { Cliche, ClicheMap } from '../../../../../models/cliche/cliche';
+import { Widget, BaseWidget, UserWidget } from '../../../../../models/widget/widget';
+import { DeleteDialogComponent } from './delete_dialog.component';
+import { ProjectService } from '../../../../../services/project.service';
 
 @Component({
   selector: 'dv-list-item',
   templateUrl: './list_item.component.html',
   styleUrls: ['./list_item.component.css']
 })
-export class ListItemComponent {
+export class ListItemComponent implements OnInit {
   @Input() isDraggable = false;
   @Input() isDeletable = true;
   @Input() widget: Widget;
 
   innerShown = false;
+  allCliches: ClicheMap;
+  isUserWidget = false;
 
-  constructor(public dialog: MatDialog) {}
+  constructor(
+    public dialog: MatDialog,
+    private projectService: ProjectService
+  ) {
+    projectService.allCliches.subscribe((updatedAllCliches) => {
+      this.allCliches = updatedAllCliches;
+    });
+  }
+
+  ngOnInit () {
+    this.isUserWidget = (<UserWidget>this.widget).getWidgetType() === WidgetType.USER_WIDGET;
+  }
 
   handleDelete(): void {
     const dialogRef = this.dialog.open(DeleteDialogComponent, {

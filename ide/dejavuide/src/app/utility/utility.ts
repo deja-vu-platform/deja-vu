@@ -1,15 +1,3 @@
-export interface Dimensions {
-  width: number;
-  height: number;
-}
-
-export interface Position {
-  top: number;
-  left: number;
-}
-
-
-
 export function generateId(): string {
   // use the full number!
   return Math.floor(Math.random() * 1000 * 1000 * 1000 * 1000 * 1000)

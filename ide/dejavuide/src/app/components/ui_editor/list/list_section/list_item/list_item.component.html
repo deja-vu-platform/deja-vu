@@ -1,30 +1,30 @@
-<div>
-  <div class="content dropdown-target"></div>
+<div class="tab"></div>
+<div class="content">
   <div class="name-container">
       <span class="name"> {{widget.getName()}} </span>
-      <!-- <div class="submit-rename not-displayed"> -->
-          <!-- <input type="text" class="new-name-input form-control" autofocus> -->
-      <!-- </div> -->
+      <div class="submit-rename"
+            [hidden]="true">
+          <input type="text" class="new-name-input form-control" autofocus>
+      </div>
   </div>
-  <div *ngIf="isDeletable"
-        class="delete-button-container">
-    <button type="button"
-             class="btn btn-default btn-delete-component"
-             (click)="handleDelete()">
-      <span class="glyphicon glyphicon-trash"></span>
-    </button>
-  </div>
+  <button *ngIf="isDeletable"
+          type="button"
+          class="btn btn-default btn-delete"
+          (click)="handleDelete()">
+    <span class="glyphicon glyphicon-trash"></span>
+  </button>
   <ng-container *ngIf="widget.isUserType()">
     <button *ngIf="widget.getInnerWidgetIds().length > 0"
             (click)="toggleShow()">
-      toggle show
-    </button>  
-    <ng-container *ngFor="let id of widget.getInnerWidgetIds()">
+      <span [hidden]="innerShown"> > </span>
+      <span [hidden]="!innerShown"> v </span>
+    </button>
+    <div *ngFor="let id of widget.getInnerWidgetIds()">
       <dv-list-item [widget]="widget.getInnerWidget(id)"
                     [isDraggable]="false"
                     [isDeletable]="true"
                     [hidden]="!innerShown">
       </dv-list-item>
-    </ng-container>
+    </div>
   </ng-container>
-</div>
+</div> 

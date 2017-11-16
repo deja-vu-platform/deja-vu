@@ -1,10 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { Dimensions, Position } from '../../utility/utility';
 import { BaseWidget, Widget, UserWidget } from '../../models/widget/widget';
 import { Cliche, UserCliche } from '../../models/cliche/cliche';
 import { Project } from '../../models/project/project';
-import { RouterService } from '../../services/router.service';
+import { RouterService, PageType } from '../../services/router.service';
 import { ProjectService } from '../../services/project.service';
 
 import * as jQuery from 'jquery';
@@ -20,18 +19,21 @@ export class UiEditorComponent implements OnInit {
   userApp: UserCliche;
   selectedWidget: UserWidget;
   allCliches = new Map<string, Cliche>();
-
-  constructor (private routerService: RouterService, private projectService: ProjectService) {}
+  constructor (
+    private projectService: ProjectService,
+    private routerService: RouterService) {}
 
   ngOnInit() {
-    console.log(this.routerService.getProject());
-    this.selectedProject = this.routerService.getProject();
+    this.selectedProject = this.projectService.getProject();
+    if (!this.selectedProject) {
+      this.routerService.navigateTo(PageType.PROJECT_EXPLORER);
+      return;
+    }
     this.userApp = this.selectedProject.getUserApp();
     if (!this.userApp) {
       this.userApp = this.selectedProject.newUserApp();
     }
     const appId = this.userApp.getId();
-    console.log(this.userApp.getName());
 
     this.selectedWidget = new UserWidget('test',
       { height: 600, width: 800 },

@@ -2,6 +2,11 @@ import { generateId } from '../../utility/utility';
 import { Widget } from '../widget/widget';
 import { Meta } from '../project/project';
 
+/**
+ * A map from clicheIds to all cliches
+ */
+export type ClicheMap = Map<string, Cliche>;
+
 export enum ClicheType {
   USER_CLICHE, DV_CLICHE
 }

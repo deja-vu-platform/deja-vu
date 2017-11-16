@@ -1,6 +1,5 @@
-import { Widget, BaseWidget, UserWidget, ClicheMap } from './widget';
-
-import { Cliche, UserCliche} from '../cliche/cliche';
+import { Widget, BaseWidget, UserWidget,  } from './widget';
+import { Cliche, UserCliche, ClicheMap} from '../cliche/cliche';
 
 describe('UserWidget', () => {
   let cliche1: UserCliche;
@@ -8,7 +7,6 @@ describe('UserWidget', () => {
 
   let cliche2: UserCliche;
   let cliche2id: string;
-
   let allCliches: ClicheMap;
   let widget1: BaseWidget;
   let widget2: UserWidget;
@@ -155,7 +153,7 @@ describe('UserWidget', () => {
   describe('fromObject', () => {
     it ('it creates a real widget from BaseWidgets', () => {
       const widget5Copy = Widget.fromObject(JSON.parse(JSON.stringify(widget5)));
-      widget5Copy.updateWidgetMap(allCliches);
+      widget5Copy.updateClicheMap(allCliches);
 
       expect(widget5Copy.getId()).toEqual(widget5.getId());
       expect(widget5Copy.isBaseType()).toBe(true);
@@ -163,7 +161,7 @@ describe('UserWidget', () => {
 
     it ('it creates a real widget from UserWidgets', () => {
       const widget6Copy = Widget.fromObject(JSON.parse(JSON.stringify(widget6)));
-      widget6Copy.updateWidgetMap(allCliches);
+      widget6Copy.updateClicheMap(allCliches);
 
       expect(widget6Copy.getId()).toEqual(widget6.getId());
       expect(widget6Copy.isUserType()).toBe(true);
