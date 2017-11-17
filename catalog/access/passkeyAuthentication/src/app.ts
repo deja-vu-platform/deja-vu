@@ -53,6 +53,7 @@ const schema = grafo
                     "code": bcrypt.hashSync(code, SALT_WORK_FACTOR),
                     "atom_id": code
                 };
+                console.log(JSON.stringify(passkey));
                 return mean.db.collection("passkeys")
                     .insertOne(passkey)
                     .then(write_res => {
