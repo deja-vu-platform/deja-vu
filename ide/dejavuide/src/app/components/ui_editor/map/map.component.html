@@ -1,0 +1,44 @@
+<button id="map-minimize-btn" 
+        class="btn btn-default"
+        [ngClass]="{'minimized': minimized}"
+        (click)="minimizeButtonClick()">
+  <ng-container *ngIf="minimized; else minimizer">
+    Map
+  </ng-container>
+  <ng-template #minimizer>
+    <span class="glyphicon glyphicon-minus"></span>
+  </ng-template>
+</button>
+<div id="map" 
+    [hidden]="minimized"
+    (click)="mapClick($event)">
+    <!-- the full area isn't useful right now -->
+    <div id="map-full-area"></div>
+    <div id="zoom-selected-screen-size"
+      [style.height.px]="screenDimensions.height * mapScale"
+      [style.width.px]="screenDimensions.width * mapScale"></div>
+    <div *ngIf="selectedWidget"
+        id="map-component-sizes"
+        [style.zoom]="zoom"
+        [style.top.px]=
+        "selectedWidget.getPosition().top * this.mapScale"
+        [style.left.px]=
+        "selectedWidget.getPosition().left * this.mapScale"
+        [style.height.px]=
+        "selectedWidget.getDimensions().height * this.mapScale"
+        [style.width.px]=
+        "selectedWidget.getDimensions().width * this.mapScale">
+      <div *ngFor="let size of mapWidgetSizes"
+            class="map-inner-component-size"
+            [style.height.px]= "size.height * this.mapScale"
+            [style.width.px]= "size.width * this.mapScale"
+            [style.top.px]= "size.top * this.mapScale"
+            [style.left.px]= "size.left * this.mapScale"></div>
+    </div>
+    <!-- Map window is the little thing you drag to move your map -->
+    <div id="map-window"
+        [style.top.px]="mapVisibleWindowPosition.top"
+        [style.left.px]="mapVisibleWindowPosition.left"
+        [style.height.px]="visibleWindowDimensions.height * mapScale"
+        [style.width.px]="visibleWindowDimensions.width * mapScale"></div>
+</div>
