@@ -41,8 +41,9 @@ export class WorkSurfaceComponent implements AfterViewInit {
     stateService.visibleWindowScrollPosition
       .subscribe((newScrollPosition) => {
         this.visibleWindowScroll = newScrollPosition;
-        $('.visible-window').scrollTop(newScrollPosition.top);
-        $('.visible-window').scrollLeft(newScrollPosition.left);
+        const jqo = $('dv-worksurface');
+        jqo.scrollTop(newScrollPosition.top);
+        jqo.scrollLeft(newScrollPosition.left);
       });
 
     projectService.selectedWidget.subscribe((newSelectedWidget) => {
@@ -61,8 +62,8 @@ export class WorkSurfaceComponent implements AfterViewInit {
       }
     });
 
-    $('.visible-window').scroll((event: Event) => {
-      const jqo = $('.visible-window');
+    $('dv-worksurface').scroll((event: Event) => {
+      const jqo = $('dv-worksurface');
       this.stateService.updateVisibleWindowScrollPosition({
         top: jqo.scrollTop(),
         left: jqo.scrollLeft()

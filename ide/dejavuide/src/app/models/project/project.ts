@@ -15,7 +15,7 @@ export class Project {
   objectType = 'Project';
   meta: Meta;
   userApp = null;
-  importedCliches = new Set<string>();
+  importedCliches = new Map<string, DvCliche>();
   lastAccessed = -Infinity;
 
   static fromObject (object: any): Project {
@@ -50,7 +50,8 @@ export class Project {
   }
 
   importCliche (clicheId) {
-    this.importedCliches.add(clicheId);
+    // TODO figure out how importing works
+    this.importedCliches.set(clicheId, null);
   }
 
   removeImportedCliche (clicheId) {

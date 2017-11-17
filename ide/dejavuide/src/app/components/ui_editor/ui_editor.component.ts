@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 
 import { BaseWidget, Widget, UserWidget } from '../../models/widget/widget';
 import { Cliche, UserCliche } from '../../models/cliche/cliche';
 import { Project } from '../../models/project/project';
+import { Dimensions } from '../../services/state.service';
 import { RouterService, PageType } from '../../services/router.service';
 import { ProjectService } from '../../services/project.service';
 
@@ -14,17 +15,38 @@ const $ = <any>jQuery;
   templateUrl: './ui_editor.component.html',
   styleUrls: ['./ui_editor.component.css']
 })
-export class UiEditorComponent implements OnInit {
-  selectedProject: Project;
+export class UiEditorComponent implements OnInit, AfterViewInit {
+  @ViewChild('worksurface', {read: ElementRef}) private worksurfaceElt: ElementRef;
+  private windowSize: Dimensions;
+
+  private selectedProject: Project;
   userApp: UserCliche;
-  selectedWidget: UserWidget;
-  allCliches = new Map<string, Cliche>();
+  private selectedWidget: UserWidget;
+  private allCliches = new Map<string, Cliche>();
+
   constructor (
     private projectService: ProjectService,
-    private routerService: RouterService) {}
+    private routerService: RouterService) {
+  }
+
+  private updateWorksurfaceDimensions() {
+    this.windowSize = {
+      height: window.innerHeight,
+      width: window.innerHeight
+    };
+    this.worksurfaceElt.nativeElement.style.height =
+      (this.windowSize.height - 100) + 'px';
+    this.worksurfaceElt.nativeElement.style.width =
+      (this.windowSize.width - 250) + 'px';
+  }
+
+  ngAfterViewInit() {
+    this.updateWorksurfaceDimensions();
+  }
 
   ngOnInit() {
-    this.selectedProject = this.projectService.getProject();
+    this.selectedProject = new Project('New Test Proj');
+    // this.projectService.getProject();
     if (!this.selectedProject) {
       this.routerService.navigateTo(PageType.PROJECT_EXPLORER);
       return;

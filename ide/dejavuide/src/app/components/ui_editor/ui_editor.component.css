@@ -16,23 +16,19 @@ dv-zoom {
   display: flex;
 }
 
-.outer-container {
-  width: 800px;
-  height: 500px;
-  overflow: scroll;
-}
-
 .edit {
+  width: 100%;
   display: flex;
 } 
 
 .project-options-container{
-  flex-grow: 1;
   background: paleturquoise;
 }
 
 dv-worksurface {
   flex-grow: 4;
+  min-width: 250px;
+  overflow: scroll;
 }
 
 .style {

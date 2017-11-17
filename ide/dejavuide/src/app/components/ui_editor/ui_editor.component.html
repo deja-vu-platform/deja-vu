@@ -1,4 +1,5 @@
 <ng-container *ngIf="selectedProject">
+  <div (window:resize)="updateWorksurfaceDimensions()"></div>
   <div class="edit">
     <div class="project-options-container">
       <div class="project-options">
@@ -19,7 +20,7 @@
       </div>
     </div>
 
-    <dv-worksurface></dv-worksurface>
+    <dv-worksurface #worksurface></dv-worksurface>
   </div>
   
   <dv-zoom></dv-zoom>

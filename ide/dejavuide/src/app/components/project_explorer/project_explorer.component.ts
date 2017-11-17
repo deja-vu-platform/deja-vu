@@ -82,31 +82,18 @@ export class ProjectExplorerComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const newProject = new Project(result.name);
-        that.projectService.updateProject(newProject);
-        that.routerService.navigateTo(PageType.UI_EDITOR);
+        this.loadProject(newProject);
       }
     });
-
-    // const newProject = new Project('result.name');
-    // this.routerService.updateProject(newProject);
-    // this.routerService.navigateTo(PageType.UI_EDITOR);
   }
 
   currentProjectClicked() {
     // TODO
   }
 
-  loadProjectList(recentSelected = true) {
-    this.recentSelected = recentSelected;
-    this.updateDisplayProjectList();
-  }
-
   loadClicked(projectName) {
     const newProject = Project.fromObject(this.projects[projectName]);
-    this.projectService.updateProject(newProject);
-    this.zone.run(() => {
-      this.routerService.navigateTo(PageType.UI_EDITOR);
-    });
+    this.loadProject(newProject);
   }
 
   handleDelete(projectName): void {
@@ -124,6 +111,19 @@ export class ProjectExplorerComponent implements OnInit {
         }
       });
     });
+  }
+
+  private loadProject(project: Project) {
+    project.updateAccess();
+    this.projectService.updateProject(project);
+    this.zone.run(() => {
+      this.routerService.navigateTo(PageType.UI_EDITOR);
+    });
+  }
+
+  private loadProjectList(recentSelected = true) {
+    this.recentSelected = recentSelected;
+    this.updateDisplayProjectList();
   }
 
   private deleteProject(projectName) {
