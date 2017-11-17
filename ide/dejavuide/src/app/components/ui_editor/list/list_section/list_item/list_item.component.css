@@ -30,13 +30,9 @@ a {
   cursor: pointer;
 }
 
-.tab {
-  display: inline-block;
-  width: 10px;
-}
-
 .content {
-  display: inline-block;
+  margin-left: 20px;
+  padding: 10px;
   border: 1px #F0F1F2 solid;
 }
 
