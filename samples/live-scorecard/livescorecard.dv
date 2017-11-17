@@ -1,8 +1,5 @@
 // Enables climbers to log their climbs and for others to view the 
 // results in real-time.
-
-// No more leaderboard
-
 app LiveScorecard {
     /** Neccessary Cliches **/
     // Grants access to content based on permissions.
@@ -37,37 +34,32 @@ app LiveScorecard {
         Spectator for Passkey
     ] as SpectatorAuthentication
 
-    // A host can add a descriptor, e.g. name, to identify a Climber.
-    include organization/Label [
-        Climber for Item,
-        Climber for Label
-    ]
-
     // Competitions are created by a host. Climbers participate in them and
     // spectators view its results.
     include organization/Event [
-        Competition for Event
+        Competition for Event,
+        ShowAndEditCompetition replacing ShowEvent in ShowEvents
     ]
 
     // Climbers have to complete climbs of various difficulties to score points.
     include organization/Task [
         Climb for Task,
         Host for Assigner,
-        Climber for Assignee
+        Climber for Assignee,
+        ShowAndEditClimb replacing ShowTask in ShowUncompletedTasks,
+        ShowAndEditClimb replacing ShowTask in ShowApprovedTasks
     ]
 
     // For every competition, there is a set of climbers.
     include organization/Group [
         Climber for Member,
-        Competition for Group,
-        ShowClimbers replacing ShowNameOfGroup in ShowGroupsByMember
+        Competition for Group
     ] as CompetitionClimbers
 
     // For every competition, there is a set of hosts.
     include organization/Group [
         Host for Member,
-        Competition for Group,
-        ShowHosts replacing ShowNameOfGroup in ShowGroupsByMember
+        Competition for Group
     ] as CompetitionHosts
 
     /** Entities **/
@@ -191,8 +183,8 @@ app LiveScorecard {
         newHost: Host
     }
 
-    // A host can add, view and edit climbers to/of the competition.
-    widget ShowandEditClimbers {
+    // A host can add, view and edit climbers to or of the competition.
+    widget ShowAndEditClimbers {
         competition: Competition,
         new_climber: Climber
     }
@@ -204,8 +196,8 @@ app LiveScorecard {
         submit_ok: boolean
     }
 
-    // A host can add, view and edit climbs to/of a competition.
-    widget ShowAndEditClimbs {
+    // A host can add, view and edit climbs to or of a competition.
+    widget ShowAndEditClimb {
         new_climb: Climb, 
         host: Host,
         climber: Climber
@@ -214,6 +206,10 @@ app LiveScorecard {
     // A host can add a climb to a competition.
     widget AddClimb {
         host: Host
+    }
+
+    widget ShowAndEditCompetition {
+        competition: Competition
     }
 
     /** Routes **/
