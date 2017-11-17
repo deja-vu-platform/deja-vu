@@ -1,5 +1,8 @@
 // Enables climbers to log their climbs and for others to view the 
 // results in real-time.
+
+// No more leaderboard
+
 app LiveScorecard {
     /** Neccessary Cliches **/
     // Grants access to content based on permissions.
@@ -17,8 +20,7 @@ app LiveScorecard {
 
     // Only a host can create an account and login the traditional way,
     // i.e. using a username and password. 
-    //TODO: Why isn't as HostAuthentication not working?
-    include access/StandardAuthentication [
+   include access/StandardAuthentication [
         Host for User
     ] as HostAuthentication
 
@@ -74,12 +76,9 @@ app LiveScorecard {
         username: text
     }
 
-    // Climbers can be filtered by sex and experience level.
     data Climber {
         name: text,
-        code: text,
-        sex: text,
-        level: text
+        code: text
     }
 
     data Spectator {
@@ -87,37 +86,29 @@ app LiveScorecard {
     }
 
     data Competition { 
+        name: text,
         code: text,
         hosts: [Host] 
     }
 
     // A climb is a task that is assigned by a host to all climbers
     // in the competition.
-    // The climb number is a label set by hosts to make it easier for
-    // climbers to log their climbs.
-    // falls represents the number of times a climber has fallen during
-    // a climb, not the total number of falls of all climbers for that climb.
-    // Climbs can be sorted by climb number and number of points, and
-    // filtered by level of difficulty.
+    // The name is the climb number set by hosts to make it easier for
+    // climbers to identify and log their climbs.
     data Climb {
-        climb_number: number,
-        difficulty: text,
-        points: number,
-        falls: number
+        name: text
     }
 
     /** Widgets **/
-    // Displays login/register forms for hosts and 
-    // login forms for climbers and spectators.
-    main widget Landing {
-        on_climber_ok: Widget = ClimberHome,
-        on_spectator_ok: Widget = SpectatorHome
-    }
+    // Displays buttons to choose appropriate form.
+    main widget Landing { }
 
+    // The login form for the hosts
     widget HostLogin {
         on_host_ok: Widget = HostHome
     }
 
+    // The register form for the hosts
     widget HostRegister {
         on_host_ok: Widget = HostHome
     }    
@@ -126,10 +117,16 @@ app LiveScorecard {
     // Also, allows hosts to view the leaderboard.
     widget HostHome {
         host: Host,
-        to_leaderboard: Widget = ShowClimbers,
-        on_signout: Widget = Landing
+        new_competition: Competition,
+        new_spectator: Spectator
     }
 
+    // The navigation bar for the hosts' view
+    widget HostNavBar { 
+        on_signout_ok: Widget = Landing
+    }
+
+    // The login form for the climbers
     widget ClimberLogin {
         on_climber_ok: Widget = ClimberHome
     }
@@ -139,9 +136,13 @@ app LiveScorecard {
     // Also, allows other climbers to use the buddy log.
     widget ClimberHome {
         climber: Climber,
-        on_buddy_log_ok: Widget = BuddyHome,
-        to_leaderboard: Widget = ShowClimbers,
-        on_signout: Widget = Landing
+        climb: Climb
+    }
+
+    // The navigation bar for the climber's view.
+    widget ClimberNavBar {
+        climber: Climber,
+        on_signout_ok: Widget = Landing
     }
     
     // Allows climbers to view available climbs, log climbs and view the 
@@ -149,9 +150,16 @@ app LiveScorecard {
     // Signing out returns it to the original climber's account.
     widget BuddyHome {
         buddy: Climber,
-        on_signout: ClimberHome
+        climb: Climb,
+        on_signout_ok: Widget = ClimberHome
     }
 
+    widget BuddyLogin {
+        climber: Climber,
+        on_login_ok: Widget = BuddyHome
+    }
+
+    // The login form for spectators
     widget SpectatorLogin {
         on_spectator_ok: Widget = SpectatorHome
     }
@@ -159,38 +167,54 @@ app LiveScorecard {
     // Allows spectators to view the leaderboard.
     widget SpectatorHome {
         spectator: Spectator,
-        to_leaderboard: Widget = ShowClimbers,
-        on_signout: Widget = Landing
-    }
-
-    // A host can add other individuals to co-host the competition.
-    // The username must be associated with a host account.
-    // TODO: Use AddMemberToGroup widget instead
-    widget AddHost { 
-        username: text
+        on_signout_ok: Widget = Landing
     }
     
     // A climber can only complete a climb after receiving approval by
     // another climber, NOT a host or the climber him/herself.
-    // The climber must log the number of times he/she fell during the climb.
-    widget LogClimb {
-        climb: Climb,
-        falls: number,
-        approver: Climber
+    widget ShowAndLogClimb {
+        climb: Climb
     }
 
-    // Can also be used for the leaderboard.
-    widget ShowClimbers {
+    // Allows the host to create a competition
+    widget AddCompetitionForm {
+        newCompetition: competition,
+        newSpectator: Spectator,
+        host: Host,
+        submit_ok: boolean
+    }
+
+    // A host can add other individuals to co-host the competition.
+    // The host can also view the other co-hosts for the competition.
+    widget ShowAndEditHosts {
         competition: Competition,
+        newHost: Host
+    }
+
+    // A host can add, view and edit climbers to/of the competition.
+    widget ShowandEditClimbers {
+        competition: Competition,
+        new_climber: Climber
+    }
+
+    // A host can add a climber to the competition.
+    widget AddClimber {
+        new_climber: Climber,        
+        competition: Competition,
+        submit_ok: boolean
+    }
+
+    // A host can add, view and edit climbs to/of a competition.
+    widget ShowAndEditClimbs {
+        new_climb: Climb, 
+        host: Host,
         climber: Climber
     }
 
-    widget ShowHosts {
-        competition: Competition,
+    // A host can add a climb to a competition.
+    widget AddClimb {
         host: Host
     }
-
-    widget HostNavBar { }
 
     /** Routes **/
     host_login_route: route = {path: "host-login", widget: HostLogin}
@@ -201,5 +225,4 @@ app LiveScorecard {
     buddy_home_route: route = {path: "buddy", widget: BuddyHome}
     spectator_login_route: route = {path: "spectator-login", widget: SpectatorLogin}
     spectator_home_route: route = {path: "spectator", widget: SpectatorHome}
-    leaderboard: route = {path: "leaderboard", widget: ShowClimbers}
 }
