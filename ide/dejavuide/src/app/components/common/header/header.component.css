@@ -5,10 +5,9 @@
   width: 100%;
   display: flex;
   background-color: #F0F1F2;
-  /*overflow-x: scroll;*/
   z-index: 600;
   padding: 0 10px;
-  height: 100px;
+  height: 60px;
 }
  
 .menu-item {

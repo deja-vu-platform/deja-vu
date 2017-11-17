@@ -35,7 +35,7 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
       width: window.innerHeight
     };
     this.worksurfaceElt.nativeElement.style.height =
-      (this.windowSize.height - 100) + 'px';
+      (this.windowSize.height - 60) + 'px';
     this.worksurfaceElt.nativeElement.style.width =
       (this.windowSize.width - 250) + 'px';
   }

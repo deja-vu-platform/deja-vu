@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { ListComponent } from './list.component';
-import { ListSectionModule } from './list_section/list_section.module'
+import { ListItemModule } from './list_item/list_item.module';
 
 @NgModule({
   declarations: [
@@ -10,7 +10,7 @@ import { ListSectionModule } from './list_section/list_section.module'
   ],
   imports: [
     BrowserModule,
-    ListSectionModule
+    ListItemModule
   ],
   providers: [],
   exports: [

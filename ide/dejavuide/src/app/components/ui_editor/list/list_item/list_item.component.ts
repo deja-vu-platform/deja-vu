@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
-import { Cliche, ClicheMap } from '../../../../../models/cliche/cliche';
-import { Widget, BaseWidget, UserWidget } from '../../../../../models/widget/widget';
+import { Cliche, ClicheMap } from '../../../../models/cliche/cliche';
+import { Widget, BaseWidget, UserWidget } from '../../../../models/widget/widget';
 import { DeleteDialogComponent } from './delete_dialog.component';
-import { ProjectService } from '../../../../../services/project.service';
+import { ProjectService } from '../../../../services/project.service';
 
 @Component({
   selector: 'dv-list-item',

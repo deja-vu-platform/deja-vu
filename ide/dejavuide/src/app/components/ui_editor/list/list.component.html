@@ -1,15 +1,14 @@
 <div>
   <!-- for the user app -->
   <ng-container *ngIf="userApp">
-    <dv-list-section 
-      [widgets]="pages">
-    </dv-list-section>
-    <dv-list-section>
-  
-    </dv-list-section>
-    <dv-list-section>
-      
-    </dv-list-section>
+    <div>
+      <ng-container *ngFor="let widget of pages">
+        <dv-list-item [widget]="widget"
+                      [isDraggable]="false"
+                      [isDeletable]="true">
+        </dv-list-item>
+      </ng-container>
+    </div>
   </ng-container>  
 </div>
 <div>
