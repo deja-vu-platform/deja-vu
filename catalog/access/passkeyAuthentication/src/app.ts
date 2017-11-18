@@ -83,8 +83,6 @@ const schema = grafo
         },
         resolve: (_, { dummyValue }) => {
             return getRandomPasscode().then(code => {
-                // TODO: Only for testing purposes
-                console.log('this is my code: ' + code);
                 const passkey = {
                     code: bcrypt.hashSync(code, SALT_WORK_FACTOR),
                     atom_id: code
@@ -108,7 +106,6 @@ const schema = grafo
             code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
         resolve: (_, { code }) => {
-            console.log('this is the code: ' + code)
             return Validation.passkeyExists(code).then(passkey => {
                 if (!bcrypt.compareSync(code, passkey.code)) {
                     throw new Error("Incorrect code");
@@ -128,7 +125,6 @@ namespace Validation {
         return mean.db.collection("passkeys")
             .findOne({ atom_id: code })
             .then(passkey => {
-                console.log('here is the keyL' + JSON.stringify(passkey));
                 if (!passkey) throw new Error(`passkey with code ${passkey.atom_id} doesn't exist`);
                 return passkey;
             });
