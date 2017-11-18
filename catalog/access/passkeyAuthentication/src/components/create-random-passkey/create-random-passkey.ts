@@ -2,13 +2,9 @@ import { Widget, PrimitiveAtom, Field} from "client-bus";
 import { GraphQlService } from "gql";
 
 @Widget({
-    fqelement: "PasskeyAuthentication",
-    template: `
-  <button class="btn btn-default navbar-btn" (click)="generatePasskey()">
-    Generate Passkey
-  </button>
-`
+    fqelement: "PasskeyAuthentication", ng2_providers: [GraphQlService]
 })
+
 export class CreateRandomPasskeyComponent {
     @Field("boolean") create_passkey_ok: PrimitiveAtom<boolean>;
 
@@ -17,7 +13,9 @@ export class CreateRandomPasskeyComponent {
     generatePasskey() {
         this._graphQlService
             .post(`
-                createRandomPasskey()
+                createRandomPasskey(
+                    dummyValue: true
+                )
             `)
             .subscribe(
                 _ => { this.create_passkey_ok.value = true; }

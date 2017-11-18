@@ -21,6 +21,8 @@ export class CreateCustomPasskeyComponent {
             .subscribe(
                 _ => { this.create_passkey_ok.value = true; },
                 err => {
+                    console.log(`${this.passkey.code}`);
+                    console.log(err);
                     this.error = true;
                 }
             );
