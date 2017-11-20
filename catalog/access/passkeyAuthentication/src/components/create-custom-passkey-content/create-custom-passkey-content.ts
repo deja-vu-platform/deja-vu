@@ -3,15 +3,22 @@ import { GraphQlService } from "gql";
 import { Widget, PrimitiveAtom, Field } from "client-bus";
 
 @Widget({ fqelement: "PasskeyAuthentication", ng2_providers: [GraphQlService] })
-export class CreateCustomPasskeyComponent {
+export class CreateCustomPasskeyContentComponent {
     @Field("Passkey") passkey: PasskeyAtom;
-    @Field("boolean") create_passkey_ok: PrimitiveAtom<boolean>;
+    @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
     error = false;
 
     constructor(private _graphQlService: GraphQlService) { }
 
-    onSubmit() {
+    dvAfterInit() {
+        this.submit_ok.on_change(() => {
+            console.log("i'm doing the thing");
+            this._createPasskey();
+        });
+    }
+
+    _createPasskey() {
         this._graphQlService
             .post(`
                 createCustomPasskey(
@@ -19,7 +26,7 @@ export class CreateCustomPasskeyComponent {
                 )
             `)
             .subscribe(
-                _ => { this.create_passkey_ok.value = true; },
+                _ => { this.passkey.code = ""; },
                 err => {
                     this.error = true;
                 }

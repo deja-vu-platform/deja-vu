@@ -18,24 +18,28 @@ export class ValidatePasskeyContentComponent implements AfterInit {
 
     dvAfterInit() {
         this.submit_ok.on_change(() => {
-            this._graphQlService
-            .post(`
-                validatePasskey(
-                    code: "${this.passkey.code}"
-                )
-            `)
-            .map(data => JSON.parse(data.validatePasskey))
-            .subscribe(
-                token => {
-                    const authenticationToken = token.token;
-                    const authenticatedPasskey = token.passkey;
-                    localStorage.setItem("id_token", authenticationToken);
-                    localStorage.setItem("atom_id",
-                                         authenticatedPasskey.atom_id);
-                },
-                err => {
-                    this.error = true;
-                });
+            this._validatePasskey();
         });
+    }
+
+    _validatePasskey() {
+        this._graphQlService
+        .post(`
+            validatePasskey(
+                code: "${this.passkey.code}"
+            )
+        `)
+        .map(data => JSON.parse(data.validatePasskey))
+        .subscribe(
+            token => {
+                const authenticationToken = token.token;
+                const authenticatedPasskey = token.passkey;
+                localStorage.setItem("id_token", authenticationToken);
+                localStorage.setItem("atom_id",
+                                     authenticatedPasskey.atom_id);
+            },
+            err => {
+                this.error = true;
+            });
     }
 }
