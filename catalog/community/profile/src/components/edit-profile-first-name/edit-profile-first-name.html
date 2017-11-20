@@ -1,0 +1,9 @@
+<fieldset class="form-group">
+  <label class="sr-only" for="first-name">First Name</label>
+  <input id="first-name" type="text" required class="form-control" name="first-name" 
+  ngControl="first-name" placeholder="First Name"/>
+  <div id="edit-profile-first-name-status" class="alert alert-danger"
+   [hidden]="!edit_first_name_error">
+    Update failed.
+  </div>
+</fieldset>
