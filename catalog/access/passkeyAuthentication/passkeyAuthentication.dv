@@ -8,6 +8,16 @@ cliche PasskeyAuthentication {
     }
 
     /** Widgets**/
+    widget ValidatePasskeyContent {
+        passkey: Passkey,
+        submit_ok: boolean
+    }
+
+    widget ValidatePasskeyButton {
+        submit_ok: boolean,
+        on_validate_ok: Widget
+    }
+
     // A principal creates a passkey by defining the code him/herself.
     widget CreateCustomPasskey {
         passkey: Passkey
