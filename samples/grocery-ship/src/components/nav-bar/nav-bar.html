@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css" integrity="sha384-ObE+ehRshGuMJ3N47RvNz2kEAWkHvWdZvPtU8pn/MoY9AXPhwksQiaVjB17fWwqn" crossorigin="anonymous">
+<style>
+a {
+  color: #00B7FF;
+}
+
+.navbar-logo {
+    width: 30px;
+    display: inline !important;
+    margin-top: -5px;
+    margin-right: 5px;
+}
+
+#main-content {
+    margin-top: 100px;
+    margin-left: 40px;
+}
+</style>
+
+<dv-widget name="LoggedIn" of="StandardAuthentication"></dv-widget>
+<div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+        <div *ngIf="user.username">
+        <!-- for when the navbar collapses when the window is small -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <!-- the icon that appears (3 bars) -->
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        </div>
+        <a [routerLink]="['/']" class="navbar-brand"><img class="navbar-logo" src="./icon.png"/>GroceryShip</a>
+    </div>
+    <div class="navbar-collapse collapse">
+      <div *ngIf="user.username">
+        <ul class="nav navbar-nav navbar-right">
+          <li id='navbar-dashboard'><a [routerLink]="['/dashboard']">Dashboard</a></li>
+          <li id='navbar-request'><a [routerLink]="['/request']">Request</a></li>
+          <li id='navbar-deliver'><a [routerLink]="['/deliver']">Deliver</a></li>
+          <li id='navbar-faq'><a [routerLink]="['/faq']">FAQ</a></li>
+          <li id='navbar-user' class="dropdown">
+            <a hred="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="username" name="username">{{user.atom_id}}</span>   <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a [routerLink]="['/profile']">Your Profile</a></li>
+              <li class="divider"></li>
+              <!-- <li><a class="logout-button">Logout</a></li> -->
+              <li><dv-widget name="SignOutWithRedirect" of="StandardAuthentication">
+        </dv-widget></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,105 @@
+<style type="text/css">
+h1 {
+    font-size: 40px;
+}
+
+h2 {
+    font-size: 35px;
+}
+
+h3 {
+    font-size: 30px;
+}
+
+.instructions > p {
+    font-size: 15px;
+    max-width: 60em;
+    text-align: justify;
+    margin-bottom: 30px;
+}
+
+#main-content {
+    margin: 100px 40px;
+}
+
+</style>
+<dv-widget name="NavBar"></dv-widget>
+
+<div id='main-content'>
+  <h1>Make a Request</h1>
+  <div class='instructions'>
+    <p>Fill out the request form to get goods delivered to somewhere nearby! Please be as specific as possible by specifying the unit for quantity (pounds, kg, litre etc.) and providing detailed descriptions, so that the deliverer will not deliver the wrong good.</p>
+  </div>
+  <div id='request-form'>
+    <div id="request-form-container">
+    <table class="table" style="table-layout: fixed">
+        <tr>
+          <th>Item Name</th>
+          <td><dv-widget name="CreateGoodName" of="Market"></dv-widget></td>
+        </tr>
+        <tr>
+          <th>Quantity</th>
+          <td><input type='string' name='item-qty' placeholder="6 17oz. cans, 20 gallons, 18 of the largest boxes" class="form-control" required/></td>
+        </tr>
+        <tr>
+          <th>Estimated Price</th>
+          <td>
+            <div class="input-group">
+              <span class="input-group-addon">$</span>
+              <input type="text" name='item-price-estimate' class="price form-control" required>
+            </div>
+          </td>
+        <tr>
+          <th>Stores</th>
+          <td>
+            <select multiple name='item-stores' class="selectpicker" data-none-selected-text="Select store(s)" data-width="100%">
+              <option>Star Market (more locations soon)</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>Deadline</th>
+          <td><dv-widget name="EditTaskDeadlineAndAssigner" of="Task"></dv-widget></td>
+        </tr>
+        <tr>
+          <th>Pickup Location</th>
+          <td>
+            <select name='item-pickup' class="form-control selectpicker">
+              <!-- {{#each allPickupLocations}} -->
+              <option>Baker (more locations soon)</option>
+              <!-- {{/each}} -->
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>Tip</th>
+          <td>
+            <div class="input-group">
+              <span class="input-group-addon">$</span>
+              <dv-widget name="CreateGoodPrice" of="Market"></dv-widget>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>Minimum Shopper Rating</th>
+          <td>
+            <select name='minimum-shopper-rating' class="form-control selectpicker">
+              <option value='1' selected>None</option>
+              <option value='5'>5</option>
+              <option value='4'>4</option>
+              <option value='3'>3</option>
+              <option value='2'>2</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <th>More Info</th>
+          <td><input type='text' name='item-description' class="form-control" placeholder="(optional)" /></td>
+        </tr>
+    </table>
+    <dv-widget name="StartCompoundTransactionButton" of="Market"></dv-widget>
+  <!--   <button type='submit' id='make-request' class='btn btn-primary btn-lg' style='float: right'>Make Request</button> -->
+  </div>
+
+  </div>
+</div>

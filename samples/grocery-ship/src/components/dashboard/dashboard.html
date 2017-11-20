@@ -1,0 +1,111 @@
+<style type="text/css">
+h1 {
+    font-size: 40px;
+}
+
+h2 {
+    font-size: 35px;
+}
+
+h3 {
+    font-size: 30px;
+}
+
+#main-content {
+    margin-top: 100px;
+    margin-left: 40px;
+}
+
+.badge {
+    margin-bottom: 23px;
+}
+
+#dashboard-notifications, #dashboard-requests {
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.title-toggle:hover {
+    color: #1abc9c;
+}
+
+.title-toggle .glyphicon {
+    font-size: 80%;
+}
+
+#set-pickup-modal .pickup-time {
+    /* make input box big enough for whole date */
+    width: 190px;
+}
+
+#set-pickup-modal th.price {
+    /* temporary fix for price column size so that it's not too small */
+    width: 100px;
+}
+
+.cost-summary, .card-input {
+    padding-left: 8%;
+}
+
+.card-input .form-group {
+    margin-bottom: 10px;
+}
+
+.card-input .col-expiry-month {
+    padding-right: 0;
+}
+
+.fa-star-o, .fa-star {
+    font-size: 150% !important;
+    color:  #FFD700;
+}
+
+#deliver-items {
+    margin-top: 20px;
+}
+
+</style>
+<dv-widget name="NavBar"></dv-widget>
+
+<!-- <dv-widget name="ChangePassword" of="StandardAuthentication"></dv-widget> -->
+<div id='main-content'>
+  <div id='notifications'>
+    <span class='title-toggle' id='notifications-toggle' data-toggle="collapse" data-target="#dashboard-notifications">
+      <h3>Notifications <span class="badge hide notifs-count">0</span> <span class="glyphicon glyphicon-chevron-down" id="requests-chevron-toggle"></span>
+      </h3>
+    </span>
+    <div id='dashboard-notifications' class='collapse in'>
+      <dv-widget name="ShowUnapprovedTasks" of="Task"></dv-widget>
+      <!-- Show requests that:
+      -> I need to approve and pay and rate, reject
+      -> I need to deliver and rate (or close and rate)
+      -> are mine and expired -->
+  <!-- {{> notifications}}
+    {{> accept}}
+    {{> reject}}
+    {{> close}} -->
+    </div>
+  </div>
+  <div id='request'>
+    <span class='title-toggle' id='requests-toggle' data-toggle="collapse" data-target="#dashboard-requests">
+      <h3>Your Requests <span class="badge requests-count">0</span><span class="glyphicon glyphicon-chevron-right" id="requests-chevron-toggle"></span>
+      </h3>
+    </span>
+    <div id='dashboard-requests' class='collapse'>
+      <dv-widget name="ShowUncompletedTasks" of="Task"></dv-widget>
+      <!-- {{> requests own=true}} -->
+    </div>
+  </div>
+  <div id='deliver'>
+    <span class='title-toggle' id='deliver-toggle' data-toggle="collapse" data-target="#dashboard-deliver">
+      <h3>To Deliver <span class="badge deliveries-count">0</span> <span class="glyphicon glyphicon-chevron-right" id="requests-chevron-toggle"></span>
+      </h3>
+    </span>
+    <div id='dashboard-deliver' class='collapse'>
+      <p>Remember to contact the requester first to set a pickup time!</p>
+      <dv-widget name="ShowAssignedTasks" of="Task"></dv-widget>
+      <!-- {{> deliveries_table}} -->
+    </div>
+  </div>
+</div>

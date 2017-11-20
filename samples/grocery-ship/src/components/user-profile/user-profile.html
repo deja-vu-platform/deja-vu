@@ -1,0 +1,81 @@
+<style type="text/css">
+h1 {
+    font-size: 40px;
+}
+
+h2 {
+    font-size: 35px;
+}
+
+h3 {
+    font-size: 30px;
+}
+
+#main-content {
+    margin-top: 100px;
+    margin-left: 40px;
+}
+
+#profile-content {
+  max-width: 400px;
+}
+
+.modal-body {
+    margin: 20px;
+}
+</style>
+
+<dv-widget name="NavBar"></dv-widget>
+
+<div id="main-content">
+  <h1>Your Profile</h1>
+  <div id="profile-content">
+    <dv-widget name="ShowProfile" of="Profile"></dv-widget>
+  </div>
+
+  <input type="button" class="btn btn-primary" data-toggle="modal" data-target="#profile-edit-modal" value="Edit Profile">
+  <input type="button" class="btn btn-primary" data-toggle="modal" data-target="#change-password-modal" value="Change Password">
+</div>
+
+<div id="profile-edit-modal" class="modal fade" role="dialog">
+  <div class="modal-messages"></div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Edit Profile</h4>
+      </div>
+      <div class="modal-body">
+        <dv-widget name="UpdateProfile" of="Profile"></dv-widget>
+        <div class="form-group">
+          <label class="col-sm-3 control-label"><b>Phone Number</b></label>
+          <div class="col-sm-9">
+            <div class="row">
+              <div class="col-xs-6">
+              </div>
+                <input id='phone-number-register-box' class='form-control edit-profile-input' type='text' name='newPhoneNumber' placeholder='phone number' required value="617-253-1212"><br>
+            </div>
+          </div>
+          <label class="col-sm-3 control-label"><b>Dorm coming</b></label>
+        </div>
+        <div class='row'>
+          <button type="submit" id='edit-confirm-button' class='btn btn-primary btn-sm pull-right'>Confirm Changes</button>
+        </div>
+      </div>     
+    </div>
+  </div>
+</div>
+<div id="change-password-modal" class="modal fade" role="dialog">
+  <div class="modal-messages"></div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Change Password</h4>
+      </div>
+      <div class="modal-body">
+        <dv-widget name="ChangePassword" of="StandardAuthentication"></dv-widget>
+      </div>     
+    </div>
+  </div>
+</div>

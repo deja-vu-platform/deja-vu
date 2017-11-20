@@ -1,0 +1,46 @@
+<link rel="stylesheet" href="/stylesheets/deliver.css">
+<style type="text/css">
+h1 {
+    font-size: 40px;
+}
+
+h2 {
+    font-size: 35px;
+}
+
+h3 {
+    font-size: 30px;
+}
+
+.instructions > p {
+    font-size: 15px;
+    max-width: 60em;
+    text-align: justify;
+    margin-bottom: 30px;
+}
+
+#main-content {
+    margin-top: 100px;
+    margin-left: 40px;
+}
+</style>
+<dv-widget name="NavBar"></dv-widget>
+
+<div id="main-content">
+<h1>Claim Requests</h1>
+<div class="instructions">
+  <p>Help others to deliver grocery by claiming their requests! Note that you CANNOT unclaim a request after clicking 'Claim'.</p>
+</div>
+<div id="request-filters">
+  Request filters not available (yet)
+</div>
+<div id="request-feed">
+<!-- TODO: make another widget for this. replacing ShowTask -->
+  <dv-widget name="ShowClaimableTasks" of="Task"></dv-widget>
+  <dv-widget name="ShowAverageRating" of="Rating"></dv-widget>
+</div>
+</div>
+
+<!-- {{#each requestItems}}
+  {{> contact_information user=requester}}
+{{/each}} -->

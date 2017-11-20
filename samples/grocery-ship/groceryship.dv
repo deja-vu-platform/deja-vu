@@ -1,8 +1,85 @@
 // Facilitate peer grocery delivery between students
 app GroceryShip {
-  include access/StandardAuthentication
-  include community/Market
-  include community/Rating
-  include organization/Checklist
-  include organization/Task
+  include access/StandardAuthentication [
+    User for User
+  ]
+
+  include community/Market[
+    User for Party,
+    Request for Good,
+    GroceryShip for Market
+  ]
+
+  include community/Profile[
+    User for Profile
+  ]
+
+  include community/Rating[
+    User for Source,
+    User for Target
+  ]
+
+  // Buyers set a delivery time for a Request
+  // Event will be used to schedule this
+  include organization/Event[
+    Request for Event
+  ]
+
+  include organization/Task[
+    Request for Task,
+    User for Assigner,
+    User for Assignee
+  ]
+
+  data User {
+    username: text
+  }
+
+  data GroceryShip {}
+
+  data Request {}
+
+  groceryship: GroceryShip = {}
+
+  // Page that contains Notifications, Your Requests and To Deliver
+  widget Dashboard {
+    user: User
+  }
+
+  main widget Login {
+    user: User,
+    //on_user_ok: Widget = Dashboard,
+    submit_ok: boolean
+  }
+
+  // Shows the page where users can create a Request
+  widget CreateRequest {
+    buyer: User,
+    market: GroceryShip = groceryship,
+    request: Request,
+    submit_ok: boolean
+  }
+
+  widget NavBar {
+    user: User,
+    on_signout_ok: Widget = Login
+  }
+
+  // Shows the page where users can claim Requests for them to deliver
+  widget Deliver {
+    assigner: User
+  }
+
+  widget Faq {}
+
+  widget UserProfile {
+    profile: User
+  }
+
+  login: route = {path: "login", widget: Login}
+  dashboard: route = {path: "dashboard", widget: Dashboard}
+  request: route = {path: "request", widget: CreateRequest}
+  deliver: route = {path: "deliver", widget: Deliver}
+  faq: route = {path: "faq", widget: Faq}
+  profile: route = {path: "profile", widget: UserProfile}
 }

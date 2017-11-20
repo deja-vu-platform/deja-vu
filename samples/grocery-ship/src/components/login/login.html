@@ -1,0 +1,93 @@
+<style>
+.welcome-container {
+    padding-top: 5%;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+/* for the listed features */
+.feature {
+    float: left;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.feature img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+    float: left;
+}
+
+.feature-img-text {
+    margin-top: 20px;
+    margin-left: 90px;
+    display: block;
+}
+
+/* login */
+#login-content {
+    float: right;
+}
+
+.login-column {
+    margin-top: 20px;
+}
+
+.modal-body {
+    margin: 20px;
+}
+
+#signup-text {
+  font-size: 15px;
+  margin-right: 5px;
+}
+</style>
+<dv-widget name="NavBar"></dv-widget>
+
+<div class="welcome-container">
+  <h1>Welcome to GroceryShip</h1><br>
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-sm-7 col-md-5 col-lg-4" id='about'>
+        <div class='feature'>
+          <img src="cart.png"><span class="feature-img-text">Request for a peer grocery delivery</span>
+        </div>
+        <div class='feature'>
+          <img src="checklist.png"><span class="feature-img-text">Deliver for others and earn pocket money</span>
+        </div>
+        <div class='feature'>
+          <img src="wallet.png"><span class="feature-img-text">Pay using Stripe (coming soon?)</span>
+        </div>
+      </div>
+
+      <div class="col-xs-10 col-sm-4 col-md-3 col-lg-3 col-md-offset-1 login-column">
+        <dv-widget name="SignInWithRedirect" of="StandardAuthentication"></dv-widget>
+        <br>
+        <br>
+        <span id="signup-text">Don't have an account?</span><input type="button" class="btn btn-xs btn-primary" data-toggle="modal" data-target="#register-modal" value="Sign Up">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="register-modal" class="modal fade" role="dialog">
+  <div class="modal-messages"></div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Sign Up</h4>
+      </div>
+      <div class="modal-body">
+        <dv-widget name="EditProfileBirthday" of="Profile"></dv-widget>
+        <dv-widget name="EditProfileEmail" of="Profile"></dv-widget>
+        <dv-widget name="EditProfileFirstName" of="Profile"></dv-widget>
+        <dv-widget name="EditProfileLastName" of="Profile"></dv-widget>
+        <dv-widget name="RegisterWithRedirect" of="StandardAuthentication"></dv-widget>
+      </div>     
+    </div>
+  </div>
+</div>
