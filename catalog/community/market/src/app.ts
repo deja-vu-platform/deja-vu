@@ -84,6 +84,7 @@ const schema = grafo
   .add_type({
     name: "CompoundTransaction",
     fields: {
+      atom_id: {"type": graphql.GraphQLString},
       transactions: {"type": "[Transaction]"},
       addTransaction: {
         "type": "Transaction",
@@ -174,9 +175,13 @@ const schema = grafo
         name: name,
         price: price,
         supply: supply,
-        seller: {atom_id: seller_id},
         market: {atom_id: market_id}
       };
+      // seller_id can not be present in the scenario
+      // where there is a buyer looking for a seller to buy this good from
+      if (seller_id) {
+         good["seller"] = {atom_id: seller_id};
+      }
       return Promise
         .all([
           mean.db.collection("goods").insertOne(good),
@@ -257,12 +262,16 @@ const schema = grafo
           const transaction = {
             atom_id: uuid.v4(),
             good: {atom_id: good.atom_id},
-            seller: {atom_id: good.seller.atom_id},
             buyer: {atom_id: buyer_id},
             price: transaction_price,
             quantity: quantity,
             market: {atom_id: good.market.atom_id},
             status: "unpaid"
+          }
+          // seller can not be present in the scenario
+          // where there is a buyer looking for a seller to buy this good from
+          if (good.seller) {
+            transaction["seller"] = {atom_id: good.seller.atom_id}
           }
           return mean.db.collection("transactions")
             .insertOne(transaction)
@@ -276,7 +285,7 @@ const schema = grafo
                   .updateOne({atom_id:good.atom_id}, update_op)
                   .then(_ => bus.update_atom("Good", good.atom_id, update_op))
               ])
-              .then(_ => true);
+              .then(_ => transaction);
             });
         });
     }
@@ -285,14 +294,17 @@ const schema = grafo
     name: "CreateCompoundTransaction",
     "type": "CompoundTransaction",
     args: {
-      transactions: {"type": "[Transaction]"},
+      transactions: {"type": new graphql.GraphQLList(graphql.GraphQLString) },
     },
     resolve: (_, {transactions}) => {
       // transactions must have already been created
       // and checked that they all have the same status
+      const transaction_ids = transactions.map((atom_id) => {
+        return {atom_id};
+      });
       const compoundTransaction = {
         atom_id: uuid.v4(),
-        transactions
+        transactions: transaction_ids
       };
       return mean.db.collection("compoundtransactions")
         .insertOne(compoundTransaction)

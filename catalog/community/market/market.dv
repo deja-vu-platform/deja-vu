@@ -56,6 +56,17 @@ cliche Market {
     submit_ok: boolean
   }
 
+  // Start a CompoundTransaction with a [good] to be bought
+  // in a Transaction that has status unpaid
+  widget StartCompoundTransactionButton {
+    compound_transaction: CompoundTransaction,
+    good: Good,
+    buyer: Party,
+    market: Market,
+    quantity: number,
+    submit_ok: boolean
+  }
+
   widget AddTransactionButton {
     transaction: Transaction,
     compound_transaction: CompoundTransaction
