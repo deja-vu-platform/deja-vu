@@ -170,7 +170,7 @@ app LiveScorecard {
 
     // Allows the host to create a competition
     widget AddCompetitionForm {
-        newCompetition: competition,
+        newCompetition: Competition,
         newSpectator: Spectator,
         host: Host,
         submit_ok: boolean
@@ -192,8 +192,7 @@ app LiveScorecard {
     // A host can add a climber to the competition.
     widget AddClimber {
         new_climber: Climber,        
-        competition: Competition,
-        submit_ok: boolean
+        competition: Competition
     }
 
     // A host can add, view and edit climbs to or of a competition.

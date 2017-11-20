@@ -6,6 +6,9 @@ html, body {
 
 body {
 	background-color: #4FB5C3;
+}
+
+.head {
 	color: white;
 }
 
@@ -52,6 +55,6 @@ body {
 	font-weight: bold;
 }
 
-.competition-form {
+.below-navbar {
 	margin-top: 75px;
 }
