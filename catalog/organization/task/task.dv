@@ -25,6 +25,12 @@ cliche Task {
     assigner: Assigner
   }
 
+  widget EditTaskDeadlineAndAssigner {
+    task: Task,
+    assigner: Assigner,
+    submit_ok: boolean
+  }
+
   widget ApproveTask {
     task: Task
   }

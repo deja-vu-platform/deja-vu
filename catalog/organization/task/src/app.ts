@@ -44,6 +44,32 @@ const schema = grafo
       expiration_date: {"type": graphql.GraphQLString},
       completed: {"type": graphql.GraphQLBoolean},
       approved: {"type": graphql.GraphQLBoolean},
+      updateTask: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          assigner_id: {"type": graphql.GraphQLString},
+          expiration_date: {"type": graphql.GraphQLString}
+          // TODO: add more fields that can be updated next time
+        },
+        resolve: (task, {assigner_id, expiration_date}) => {
+          const updatedTask = {};
+          if (assigner_id) {
+            updatedTask["assigner"] = {atom_id: assigner_id}
+          }
+          if (expiration_date) {
+            updatedTask["expiration_date"] = expiration_date;
+          }
+          const setOp = {$set: updatedTask};
+          return mean.db.collection("tasks")
+            .updateOne({atom_id: task.atom_id}, setOp)
+            .then(write_res => {
+              if (write_res.modifiedCount !== 1) {
+                throw new Error("Couldn't update task");
+              }
+              return bus.update_atom("Task", task.atom_id, setOp);
+            }).then(_ => true);
+        }
+      }
     }
   })
   .add_type({
