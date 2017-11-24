@@ -17,6 +17,7 @@ Team RECD
 
 ## Cliches Used
 - StandardAuthentication
+- Authorization
 - Geolocation
 - Event
 - Group

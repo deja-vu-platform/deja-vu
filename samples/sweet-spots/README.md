@@ -16,6 +16,7 @@ Team No REST for the Wicked
 
 ## Cliches Used
 - StandardAuthentication
+- Authorization
 - Geolocation
 - Rating
 - Comment

@@ -27,6 +27,13 @@ export interface Transaction {
   price: number;
   quantity: number;
   market: MarketAtom;
+  status: string;
 }
 
 export interface TransactionAtom extends Transaction, Atom {}
+
+export interface CompoundTransaction {
+  transactions: Transaction[];
+}
+
+export interface CompoundTransactionAtom extends CompoundTransaction, Atom {}

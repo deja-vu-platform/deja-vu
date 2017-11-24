@@ -47,7 +47,8 @@ export class ShowAllTransactionsComponent {
             atom_id
           },
           price,
-          quantity
+          quantity,
+          status
         }
       `)
       .map(data => data.TransactionsByMarket)
@@ -68,6 +69,7 @@ export class ShowAllTransactionsComponent {
         transaction_atom.seller = seller_atom;
         transaction_atom.price = transaction.price;
         transaction_atom.quantity = transaction.quantity;
+        transaction_atom.status = transaction.status;
         return transaction_atom;
       })
       .subscribe(transaction => {

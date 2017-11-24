@@ -23,7 +23,10 @@ app Bookmark {
     Post for Message
   ] as FollowTopics
   include access/StandardAuthentication[
-    User for User,
+    User for User
+  ]
+  include access/Authorization[
+    User for Principal,
     Post for Resource
   ]
   include organization/Label[

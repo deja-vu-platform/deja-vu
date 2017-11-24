@@ -33,8 +33,22 @@ cliche Task {
     task: Task
   }
 
+  widget ClaimTask {
+    task: Task,
+    assignee: Assignee
+  }
+
   widget ShowAssignedTasks uses ShowTask {
     assigner: Assigner 
+  }
+
+  // Shows claimable tasks,
+  // where claimable means the task has a different assigner
+  // than the one given in assigner field,
+  // there is no assignee, and it isn't past the expiration date
+  // Also lets the tasks be claimed
+  widget ShowClaimableTasks uses ShowTask {
+    assigner: Assigner
   }
 
   // also lets assigner mark task as approved

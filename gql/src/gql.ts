@@ -25,21 +25,19 @@ export class GraphQlService {
   post(query): Observable<any> {
     const headers = new Headers();
     headers.append("Content-type", "application/json");
-    const query_str = query.replace(/ /g, "");
 
     return this._gql_map(this._http
       .post(
           this._api + "/graphql",
-          JSON.stringify({query: "mutation {" + query_str + "}"}),
+          JSON.stringify({"query": "mutation {" + query + "}"}),
           {headers: headers}));
      // .let(this._gql_map);
 
   }
 
   get(query): Observable<any> {
-    const query_str = query.replace(/ /g, "");
     return this._gql_map(this._http
-      .get(this._api + `/graphql?query=query+{${query_str}}`));
+      .get(this._api + `/graphql?query=query+{${query}}`));
       // .let(this._gql_map);
   }
 

@@ -13,23 +13,25 @@ Productivity
 
 ### Catalog usage
 
-| Cliché/App | Accord | ChoreStar | Morg | Listify (TBD) |
-| ---------- | ------ | --------- | ---- | -------       |
+| Cliché/App             | Accord | ChoreStar | Morg | Listify (TBD) |
+| ---------------------- | ------ | --------- | ---- | -------       |
 | StandardAuthentication |   X    |    XX     |      |               |
-| Market     |        |     X     |      |               |
-| Rating     |   X    |     X     |      |               |
-| Follow     |        |           |      |               |
-| Geolocation|        |           |      |               |
-| Feed       |        |           |      |               |
-| Post       |        |           |      |               |
-| Email      |        |           |  X   |               |
-| Comment    |        |           |      |               |
-| Event      |        |           |  X   |               |
-| Allocator  |        |           |  X   |               |
-| Label      |        |           |      |               |
-| Group      |   X    |           |      |               |
-| Task       |        |     X     |      |               |
-| Checklist  |   XX   |           |      |               |
+| Authorization          |   X    |    XX     |      |               |
+| PasskeyAuthentication  |        |           |      |               |
+| Market                 |        |     X     |      |               |
+| Rating                 |   X    |     X     |      |               |
+| Follow                 |        |           |      |               |
+| Geolocation            |        |           |      |               |
+| Feed                   |        |           |      |               |
+| Post                   |        |           |      |               |
+| Email                  |        |           |  X   |               |
+| Comment                |        |           |      |               |
+| Event                  |        |           |  X   |               |
+| Allocator              |        |           |  X   |               |
+| Label                  |        |           |      |               |
+| Group                  |   X    |           |      |               |
+| Task                   |        |     X     |      |               |
+| Checklist              |   XX   |           |      |               |
 
 Social
 ------
@@ -45,23 +47,25 @@ Social
 
 ### Catalog usage
 
-| Cliché/App | Bookmark | MapMit | Rendezvous | SweetSpots | Potluck | Phoenix (TBD) |
-| ---------- | -------- | ------ | ---------- | ---------- | ------- | -------       |
+| Cliché/App             | Bookmark | MapMit | Rendezvous | SweetSpots | Potluck | Phoenix (TBD) |
+| ---------------------- | -------- | ------ | ---------- | ---------- | ------- | -------       |
 | StandardAuthentication |    X     |   X    |     X      |    X       |   X     |               |
-| Market     |          |        |            |            |   X     |               |
-| Rating     |          |        |            |    X       |         |               |
-| Follow     |    XX    |        |            |    X       |         |               |
-| Geolocation|          |   XX   |     XX     |    X       |         |               |
-| Feed       |    X     |        |            |            |         |               |
-| Post       |    X     |        |     X      |            |         |               |
-| Email      |          |        |            |            |         |               |
-| Comment    |    X     |        |     X      |    X       |         |               |
-| Event      |          |   X    |     X      |            |    X    |               |
-| Allocator  |          |        |            |            |         |               |
-| Label      |    X     |        |     X      |    X       |         |               |
-| Group      |          |   X    |     X      |            |    X    |               |
-| Task       |          |        |            |            |         |               |
-| Checklist  |          |        |            |            |         |               |
+| Authorization          |    X     |   X    |     X      |    X       |   X     |               |
+| PasskeyAuthentication  |          |        |            |            |         |               |
+| Market                 |          |        |            |            |   X     |               |
+| Rating                 |          |        |            |    X       |         |               |
+| Follow                 |    XX    |        |            |    X       |         |               |
+| Geolocation            |          |   XX   |     XX     |    X       |         |               |
+| Feed                   |    X     |        |            |            |         |               |
+| Post                   |    X     |        |     X      |            |         |               |
+| Email                  |          |        |            |            |         |               |
+| Comment                |    X     |        |     X      |    X       |         |               |
+| Event                  |          |   X    |     X      |            |    X    |               |
+| Allocator              |          |        |            |            |         |               |
+| Label                  |    X     |        |     X      |    X       |         |               |
+| Group                  |          |   X    |     X      |            |    X    |               |
+| Task                   |          |        |            |            |         |               |
+| Checklist              |          |        |            |            |         |               |
 
 Education
 ---------
@@ -73,50 +77,54 @@ Education
 
 ### Catalog usage
 
-| Cliché/App | EasyPick (TBD) | Lingua (TBD) |
-| ---------- | --------       | ------       |
+| Cliché/App             | EasyPick (TBD) | Lingua (TBD) |
+| ---------------------- | --------       | ------       |
 | StandardAuthentication |                |              |
-| Market     |                |              |
-| Rating     |                |              |
-| Follow     |                |              |
-| Geolocation|                |              |
-| Feed       |                |              |
-| Post       |                |              |
-| Email      |                |              |
-| Comment    |                |              |
-| Event      |                |              |
-| Allocator  |                |              |
-| Label      |                |              |
-| Group      |                |              |
-| Task       |                |              |
-| Checklist  |                |              |
+| Authorization          |                |              |
+| PasskeyAuthentication  |                |              |
+| Market                 |                |              |
+| Rating                 |                |              |
+| Follow                 |                |              |
+| Geolocation            |                |              |
+| Feed                   |                |              |
+| Post                   |                |              |
+| Email                  |                |              |
+| Comment                |                |              |
+| Event                  |                |              |
+| Allocator              |                |              |
+| Label                  |                |              |
+| Group                  |                |              |
+| Task                   |                |              |
+| Checklist              |                |              |
 
 Sports
 -------
 
 | App | Purpose |
 | ------ | ------- |
-| LiveScorecard (TBD) | Provide a live leaderboard for redpoint-format climbing competitions |
+| LiveScorecard | Provide a live leaderboard for redpoint-format climbing competitions |
 
 ### Catalog usage
 
-| Cliché/App | LiveScorecard (TBD) |
-| ---------- | -------------       |
-| StandardAuthentication |                     |
-| Market     |                     |
-| Rating     |                     |
-| Follow     |                     |
-| Geolocation|                     |
-| Feed       |                     |
-| Post       |                     |
-| Email      |                     |
-| Comment    |                     |
-| Event      |                     |
-| Allocator  |                     |
-| Label      |                     |
-| Group      |                     |
-| Task       |                     |
-| Checklist  |                     |
+| Cliché/App             | LiveScorecard |
+| ---------------------- | ------------- |
+| StandardAuthentication |       X       |
+| Authorization          |       X       |
+| PasskeyAuthentication  |       XX      |
+| Market                 |               |
+| Rating                 |               |
+| Follow                 |               |
+| Geolocation            |               |
+| Feed                   |               |
+| Post                   |               |
+| Email                  |               |
+| Comment                |               |
+| Event                  |       X       |
+| Allocator              |               |
+| Label                  |       X       |
+| Group                  |       XX      |
+| Task                   |       X       |
+| Checklist              |               |
 
 Food
 ----
@@ -127,20 +135,22 @@ Food
 
 ### Catalog usage
 
-| Cliché/App | GroceryShip (TBD) |
-| ---------- | -----------       |
+| Cliché/App             | GroceryShip (TBD) |
+| ---------------------- | -----------       |
 | StandardAuthentication |                   |
-| Market     |                   |
-| Rating     |                   |
-| Follow     |                   |
-| Geolocation|                   |
-| Feed       |                   |
-| Post       |                   |
-| Email      |                   |
-| Comment    |                   |
-| Event      |                   |
-| Allocator  |                   |
-| Label      |                   |
-| Group      |                   |
-| Task       |                   |
-| Checklist  |                   |
+| Authorization          |                   |
+| PasskeyAuthentication  |                   |
+| Market                 |                   |
+| Rating                 |                   |
+| Follow                 |                   |
+| Geolocation            |                   |
+| Feed                   |                   |
+| Post                   |                   |
+| Email                  |                   |
+| Comment                |                   |
+| Event                  |                   |
+| Allocator              |                   |
+| Label                  |                   |
+| Group                  |                   |
+| Task                   |                   |
+| Checklist              |                   |
