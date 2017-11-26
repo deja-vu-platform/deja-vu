@@ -82,9 +82,8 @@ export class Project {
    */
   addAppWidget(widget: Widget) {
     if (widget.getClicheId() !== this.userApp.getId()) {
-      throw Error('Not a user application widget!');
+      throw new Error('Not a user application widget!');
     }
-    // TODO add checks in userapp so that we aren't adding duplicate widgets
     this.userApp.addUnusedWidget(widget);
   }
 
@@ -95,11 +94,11 @@ export class Project {
   getAppWidget(widgetId: string): Widget {
     const clicheid = Widget.decodeid(widgetId)[0];
     if (clicheid !== this.userApp.getId()) {
-      throw Error('Not a user application widget!');
+      throw new Error('Not a user application widget!');
     }
     const widget = this.userApp.getWidget(widgetId);
     if (!widget) {
-      throw Error('Widget not found in widgetId');
+      throw new Error('Widget not found in user app');
     }
     return widget;
   }
@@ -114,5 +113,14 @@ export class Project {
           this.getAppWidget(templateId).removeTemplateCopy(widgetId);
       }
       this.userApp.removeWidget(widgetId);
+  }
+
+  getSaveableJson() {
+    const json: Project = Object.assign({}, this);
+    json.userApp = this.userApp.getSaveableJson();
+    json.importedCliches.forEach((cliche, clicheId) => {
+      // TODO
+    });
+    return json;
   }
 }

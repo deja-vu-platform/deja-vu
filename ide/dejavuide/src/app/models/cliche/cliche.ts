@@ -10,7 +10,13 @@ enum WidgetGroup {
   PAGE, TEMPLATE, USED, UNUSED
 }
 
-export abstract class Cliche {
+const orderedGroups: WidgetGroup[] = [
+  WidgetGroup.PAGE,
+  WidgetGroup.USED,
+  WidgetGroup.UNUSED,
+  WidgetGroup.TEMPLATE];
+
+  export abstract class Cliche {
   // A cliche contains the actual widget objects
   protected objectType = 'Cliche';
   protected meta: Meta;
@@ -59,12 +65,6 @@ export class UserCliche extends Cliche {
       uc.addUsedWidget,
       uc.addUnusedWidget,
       uc.addTemplate];
-
-    const orderedGroups: WidgetGroup[] = [
-      WidgetGroup.PAGE,
-      WidgetGroup.USED,
-      WidgetGroup.UNUSED,
-      WidgetGroup.TEMPLATE];
 
     orderedGroups.forEach((group, i) => {
       if (object.widgets[group]) {
@@ -179,6 +179,21 @@ export class UserCliche extends Cliche {
       this.removeUsedWidget(widgetId);
       this.removeUnusedWidget(widgetId);
       this.removeTemplate(widgetId);
+  }
+
+  getSaveableJson() {
+    const json: UserCliche = Object.assign({}, this);
+    delete json.project;
+
+    orderedGroups.forEach((group, i) => {
+      const widgetMap = this.widgets.get(group);
+      if (widgetMap) {
+        widgetMap.forEach((widget, widgetId) => {
+          widgetMap.set(widgetId, widget.getSaveableJson());
+        });
+      }
+    });
+    return json;
   }
 }
 

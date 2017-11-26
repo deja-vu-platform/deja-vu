@@ -204,13 +204,19 @@ export abstract class Widget {
      * @param allCliches a map of all widgets
      */
     remove() {
-        this.project.removeWidget(this.getId());
+        this.project.removeWidget(this.getId(), this.getTemplateId());
     }
 
     removeTemplateCopy(widgetId: string) {
         if (this.isTemplate) {
             this.templateCopies.delete(widgetId);
         }
+    }
+
+    getSaveableJson() {
+        const json: Widget = Object.assign({}, this);
+        delete json.project;
+        return json;
     }
 }
 

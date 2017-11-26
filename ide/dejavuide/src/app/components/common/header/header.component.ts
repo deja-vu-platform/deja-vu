@@ -1,10 +1,10 @@
-// declare const electron: any;
-const electron = {
-  ipcRenderer: {
-    on: null,
-    send: null
-  }
-};
+declare const electron: any;
+// const electron = {
+//   ipcRenderer: {
+//     on: null,
+//     send: null
+//   }
+// };
 const ipcRenderer = electron.ipcRenderer;
 
 import { Component, Input, Output, OnInit} from '@angular/core';
@@ -94,7 +94,7 @@ export class HeaderComponent implements OnInit {
     if (selectedProject) {
       ipcRenderer.send('save', {
         projectName: selectedProject.getName(),
-        projectContents: JSON.parse(JSON.stringify(selectedProject))
+        projectContents: selectedProject.getSaveableJson()
       });
     }
   }

@@ -4,11 +4,9 @@ import { Project } from '../project/project';
 
 fdescribe('UserWidget', () => {
   let project: Project;
-  let cliche1: UserCliche;
-  let cliche1id: string;
+  let userApp: UserCliche;
+  let userAppId: string;
 
-  let cliche2: UserCliche;
-  let cliche2id: string;
   let widget1: BaseWidget;
   let widget2: UserWidget;
   let widget3: UserWidget;
@@ -18,33 +16,30 @@ fdescribe('UserWidget', () => {
 
   beforeEach(() => {
     project = new Project('test');
-    cliche1 = new UserCliche(project, 'name1');
-    cliche1id = cliche1.getId();
+    userApp = project.userApp;
+    userAppId = userApp.getId();
 
-    cliche2 = new UserCliche(project, 'name2');
-    cliche2id = cliche2.getId();
+    widget1 = new BaseWidget(project, 'widget1', {width: 1, height: 1}, 'img', '/', userAppId);
+    widget2 = new UserWidget(project, 'widget2', {width: 1, height: 1}, userAppId);
+    widget3 = new UserWidget(project, 'widget3', {width: 1, height: 1}, userAppId);
 
-    widget1 = new BaseWidget(project, 'widget1', {width: 1, height: 1}, 'img', '/', cliche1id);
-    widget2 = new UserWidget(project, 'widget2', {width: 1, height: 1}, cliche1id);
-    widget3 = new UserWidget(project, 'widget3', {width: 1, height: 1}, cliche1id);
+    widget4 = new UserWidget(project, 'widget4', {width: 1, height: 1}, userAppId);
 
-    widget4 = new UserWidget(project, 'widget4', {width: 1, height: 1}, cliche2id);
-
-    widget5 = new BaseWidget(project, 'widget5', {width: 1, height: 1}, 'img', '/', cliche1id, null, null, true);
-    widget6 = new UserWidget(project, 'widget6', {width: 1, height: 1}, cliche1id, null, null, true);
+    widget5 = new BaseWidget(project, 'widget5', {width: 1, height: 1}, 'img', '/', userAppId, null, null, true);
+    widget6 = new UserWidget(project, 'widget6', {width: 1, height: 1}, userAppId, null, null, true);
   });
 
   describe('remove', () => {
     it('removes itself from all widgets', () => {
       widget1.remove();
-      expect(project.getAppWidget(widget1.getId())).toThrowError();
+      expect(() => project.getAppWidget(widget1.getId())).toThrowError();
     });
 
     it ('does not delete inner widget', () => {
       widget2.addInnerWidget(widget1);
       widget2.remove();
 
-      expect(project.getAppWidget(widget2.getId())).toThrowError();
+      expect(() => project.getAppWidget(widget2.getId())).toThrowError();
       expect(project.getAppWidget(widget1.getId())).toBe(widget1);
     });
 
@@ -129,20 +124,19 @@ fdescribe('UserWidget', () => {
 
   describe('fromObject', () => {
     it ('it creates a real widget from BaseWidgets', () => {
-      const widget5Copy = Widget.fromObject(project, JSON.parse(JSON.stringify(widget5)));
+      const widget5Copy = Widget.fromObject(project, widget5.getSaveableJson());
 
       expect(widget5Copy.getId()).toEqual(widget5.getId());
       expect(widget5Copy.isBaseType()).toBe(true);
     });
 
     it ('it creates a real widget from UserWidgets', () => {
-      const widget6Copy = Widget.fromObject(project, JSON.parse(JSON.stringify(widget6)));
+      const widget6Copy = Widget.fromObject(project, widget6.getSaveableJson());
 
       expect(widget6Copy.getId()).toEqual(widget6.getId());
       expect(widget6Copy.isUserType()).toBe(true);
     });
   });
-
 
   describe('makecopy', () => {
     it ('returns all the copied inner widgets', () => {
