@@ -1,0 +1,35 @@
+<div class="row show-and-edit-competition">
+    <div class="col-lg-10">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="col-xs-3">
+                    <dv-widget name="ShowNameOfGroup" of="CompetitionHosts"></dv-widget>
+                </div>
+                <div class="col-xs-2">{{competition.end_date}}</div>
+                <div class="col-xs-2">
+                    <!-- Should we show the code? -->
+                </div>
+                <div class="col-xs-1">
+                    <a routerLink="/participants">
+                        <!-- TODO: Show number of climbers -->
+                        <img src="./components/show-and-edit-competition/sent.png" class="competition-entry">
+                    </a>
+                </div>
+                <div class="col-xs-1">
+                    <a routerLink="/climbs">
+                        <!-- TODO: Show number of climbs -->
+                        <img src="./components/show-and-edit-competition/mountainsgray.png" class="competition-entry">
+                    </a>
+                </div>
+                <div class="col-xs-1">
+                    <!-- TODO: Add leaderboard functionality -->
+                    <img src="./components/show-and-edit-competition/leaderboardgray.png" class="trophy">
+                </div>
+                <div class="col-xs-2">
+                    <!-- TODO: Allow editing of competitions -->
+                    <img src="./components/show-and-edit-competition/edit.png" class="edit">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
