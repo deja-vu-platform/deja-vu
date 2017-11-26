@@ -29,7 +29,6 @@ export class ListComponent {
       this.userApp.getUnusedWidgetIds().forEach((pageId) => {
         this.unusedWidgets.push(this.userApp.getWidget(pageId));
       });
-      console.log(this.unusedWidgets);
     });
   }
 }

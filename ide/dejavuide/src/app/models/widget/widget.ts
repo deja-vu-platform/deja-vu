@@ -200,8 +200,6 @@ export abstract class Widget {
     /**
      * Just deletes from the all widgets table and the template reference if
      * it has one. Doesn't touch inner widgets if any.
-     *
-     * @param allCliches a map of all widgets
      */
     remove() {
         this.project.removeWidget(this.getId(), this.getTemplateId());
@@ -214,9 +212,12 @@ export abstract class Widget {
     }
 
     getSaveableJson() {
+        // TODO add test
+        // NOTE: maps (and possibly sets) are not copied properly by
+        // JSON.parse(JSON.stringify(...))
         const json: Widget = Object.assign({}, this);
         delete json.project;
-        return json;
+        return JSON.parse(JSON.stringify(json));
     }
 }
 

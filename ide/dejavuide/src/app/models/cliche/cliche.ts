@@ -182,18 +182,25 @@ export class UserCliche extends Cliche {
   }
 
   getSaveableJson() {
+    // assign only does a shallow copy, so we have to be careful not to 
+    // overwrite things.
     const json: UserCliche = Object.assign({}, this);
     delete json.project;
-
+    delete json.widgets;
+    const jsonCopy = json as any;
+    const widgetMapsCopy = {};
     orderedGroups.forEach((group, i) => {
       const widgetMap = this.widgets.get(group);
       if (widgetMap) {
+        const widgetMapCopy = {};
+        widgetMapsCopy[group] = widgetMapCopy;
         widgetMap.forEach((widget, widgetId) => {
-          widgetMap.set(widgetId, widget.getSaveableJson());
+          widgetMapCopy[widgetId] = widget.getSaveableJson();
         });
       }
     });
-    return json;
+    jsonCopy.widgets = widgetMapsCopy;
+    return JSON.parse(JSON.stringify(json));
   }
 }
 

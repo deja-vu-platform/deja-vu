@@ -120,7 +120,8 @@ export class Project {
     json.userApp = this.userApp.getSaveableJson();
     json.importedCliches.forEach((cliche, clicheId) => {
       // TODO
+      // make sure to create a copy and not overwrite anything in this
     });
-    return json;
+    return JSON.parse(JSON.stringify(json));
   }
 }

@@ -13,4 +13,3 @@ function downloadObject(filename, obj) {
 
   element.click();
 }
-
