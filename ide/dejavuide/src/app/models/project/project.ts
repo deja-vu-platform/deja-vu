@@ -18,7 +18,7 @@ export interface Meta {
 export class Project {
   objectType = 'Project';
   meta: Meta;
-  userApp = null;
+  userApp: UserCliche = null;
   importedCliches = new Map<string, DvCliche>();
   lastAccessed = -Infinity;
 
@@ -27,10 +27,8 @@ export class Project {
     if (object.objectType !== 'Project') {
       throw Error(notCorrectObject);
     }
-    const project = new Project(object.meta.name);
-    if (object.userApp) {
-      project.userApp = UserCliche.fromObject(project, object.userApp);
-    }
+    const project = new Project(object.meta.name, true);
+    project.userApp = UserCliche.fromObject(project, object.userApp);
 
     for (const clicheId of Object.keys(object.importedCliches)) {
         project.importCliche(clicheId);
@@ -38,7 +36,7 @@ export class Project {
     return project;
   }
 
-  constructor (name) {
+  constructor (name, fromObject = false) {
     this.meta = {
       name: name,
       id: generateId(),
@@ -47,6 +45,9 @@ export class Project {
     };
 
     this.lastAccessed = (new Date()).getTime();
+    if (!fromObject) {
+      this.userApp = new UserCliche(this, this.meta.name);
+    }
   }
 
   getName(): string {
@@ -60,14 +61,6 @@ export class Project {
 
   removeImportedCliche (clicheId) {
       this.importedCliches.delete(clicheId);
-  }
-
-  newUserApp () {
-    if (this.userApp != null) {
-      throw new Error('There is already a user app associated with this project');
-    }
-    this.userApp = new UserCliche(this, this.meta.name);
-    return this.userApp;
   }
 
   getUserApp () {

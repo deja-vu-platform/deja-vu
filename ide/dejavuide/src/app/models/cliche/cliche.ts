@@ -168,22 +168,10 @@ export class UserCliche extends Cliche {
   }
 
   getWidget(widgetId: string): Widget {
-    if (this.getPage(widgetId)) {
-      return this.getPage(widgetId);
-    }
-
-    if (this.getUsedWidget(widgetId)) {
-      return this.getUsedWidget(widgetId);
-    }
-
-    if (this.getUnusedWidget(widgetId)) {
-      return this.getUnusedWidget(widgetId);
-    }
-
-    if (this.getTemplate(widgetId)) {
-      return this.getTemplate(widgetId);
-    }
-    return undefined;
+    return this.getPage(widgetId) ||
+      this.getUsedWidget(widgetId) ||
+        this.getUnusedWidget(widgetId) ||
+          this.getTemplate(widgetId);
   }
 
   removeWidget(widgetId: string) {

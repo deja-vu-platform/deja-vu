@@ -340,9 +340,12 @@ export class UserWidget extends Widget {
         this.properties.dimensions = newDimensions;
     }
 
-    addInnerWidget(id: string) {
+    addInnerWidget(widget: Widget) {
+        const id = widget.getId();
         // Now the inner widgets list is the stack order
         this.innerWidgetIds.push(id);
+        this.project.userApp.removeUnusedWidget(id);
+        this.project.userApp.addUsedWidget(widget);
     }
 
     removeInnerWidget(id: string) {
@@ -444,7 +447,7 @@ export class UserWidget extends Widget {
         for (const id of this.innerWidgetIds) {
             const copyInnerWidgets = this.project.getAppWidget(id).makeCopy(fromTemplate);
             const innerWidgetCopy = copyInnerWidgets[0];
-            copyWidget.addInnerWidget(innerWidgetCopy.getId());
+            copyWidget.addInnerWidget(innerWidgetCopy);
             copyWidgets = copyWidgets.concat(copyInnerWidgets);
         }
         return copyWidgets;
