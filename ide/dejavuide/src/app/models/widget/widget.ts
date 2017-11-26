@@ -42,7 +42,7 @@ export abstract class Widget {
     static fromObject(project: Project, object: any): BaseWidget | UserWidget {
         const notCorrectObject = 'Object is not an instance of a Widget';
         if (object.widgetType === undefined || object.widgetType === null) {
-            throw Error(notCorrectObject);
+            throw new Error(notCorrectObject);
         }
         if (object.widgetType === WidgetType.BASE_WIDGET) {
             return BaseWidget.fromObject(project, object);

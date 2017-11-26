@@ -31,7 +31,7 @@ const orderedGroups: WidgetGroup[] = [
   static fromObject(project: Project, object: any): UserCliche | DvCliche {
     const notCorrectObject = 'Object is not an instance of a Cliche';
     if (object.clicheType === undefined || object.clicheType === null) {
-        throw Error(notCorrectObject);
+        throw new Error(notCorrectObject);
     }
     if (object.clicheType === ClicheType.USER_CLICHE) {
         return UserCliche.fromObject(project, object);
@@ -182,7 +182,7 @@ export class UserCliche extends Cliche {
   }
 
   getSaveableJson() {
-    // assign only does a shallow copy, so we have to be careful not to 
+    // assign only does a shallow copy, so we have to be careful not to
     // overwrite things.
     const json: UserCliche = Object.assign({}, this);
     delete json.project;
