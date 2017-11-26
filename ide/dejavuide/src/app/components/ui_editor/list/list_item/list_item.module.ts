@@ -5,6 +5,7 @@ import {MatDialogModule } from '@angular/material';
 
 import { ListItemComponent } from './list_item.component';
 import { DeleteDialogComponent } from './delete_dialog.component';
+import { WidgetModule } from '../../widget/widget.module';
 
 @NgModule({
   declarations: [
@@ -14,7 +15,8 @@ import { DeleteDialogComponent } from './delete_dialog.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    MatDialogModule
+    MatDialogModule,
+    WidgetModule
   ],
   entryComponents: [
     DeleteDialogComponent
