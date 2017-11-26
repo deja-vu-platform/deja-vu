@@ -1,4 +1,10 @@
-declare const electron: any;
+// declare const electron: any;
+const electron = {
+  ipcRenderer: {
+    on: null,
+    send: null
+  }
+};
 const ipcRenderer = electron.ipcRenderer;
 
 import { Component, Input, Output, OnInit} from '@angular/core';
