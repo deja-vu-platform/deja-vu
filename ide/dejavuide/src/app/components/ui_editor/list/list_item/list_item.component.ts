@@ -2,7 +2,7 @@
 import { Component, Input, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
 import { MatDialog } from '@angular/material';
 
-import { Cliche, ClicheMap } from '../../../../models/cliche/cliche';
+import { Cliche } from '../../../../models/cliche/cliche';
 import { Widget, BaseWidget, UserWidget } from '../../../../models/widget/widget';
 import { DeleteDialogComponent } from './delete_dialog.component';
 import { ProjectService } from '../../../../services/project.service';
@@ -27,7 +27,6 @@ export class ListItemComponent implements AfterViewInit {
   @ViewChild('ghost', {read: ElementRef}) ghost: ElementRef;
   dragging = false;
   innerShown = false;
-  allCliches: ClicheMap;
   el: HTMLElement;
 
   constructor(
@@ -36,9 +35,6 @@ export class ListItemComponent implements AfterViewInit {
     private projectService: ProjectService
   ) {
     this.el = el.nativeElement;
-    projectService.allCliches.subscribe((updatedAllCliches) => {
-      this.allCliches = updatedAllCliches;
-    });
   }
 
   ngAfterViewInit() {

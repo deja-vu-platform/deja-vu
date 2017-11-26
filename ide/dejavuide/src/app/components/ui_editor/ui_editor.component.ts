@@ -19,10 +19,9 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
   @ViewChild('worksurface', {read: ElementRef}) private worksurfaceElt: ElementRef;
   private windowSize: Dimensions;
 
-  private selectedProject: Project;
-  userApp: UserCliche;
+  selectedProject: Project;
+  private userApp: UserCliche;
   private selectedWidget: UserWidget;
-  private allCliches = new Map<string, Cliche>();
 
   constructor (
     private projectService: ProjectService,
@@ -46,6 +45,7 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.selectedProject = new Project('New Test Proj');
+    this.projectService.updateProject(this.selectedProject);
     // this.projectService.getProject();
     if (!this.selectedProject) {
       this.routerService.navigateTo(PageType.PROJECT_EXPLORER);
@@ -57,40 +57,29 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     }
     const appId = this.userApp.getId();
 
-    this.selectedWidget = new UserWidget('test',
-      { height: 600, width: 800 },
-      appId);
-
     // Currently for testing
     // We create a main widget, give it some nester (inner) widgets
     // and give them some interesting sizes and positions.
-    this.allCliches.set(this.userApp.getId(), this.userApp);
-    this.userApp.addPage(this.selectedWidget);
 
-    // Note for later: .updateWidgetMap for widget needs to happen
-    // before doing .addWidgetToAllWidgets()
-    this.selectedWidget.updateClicheMap(this.allCliches);
+    this.selectedWidget = new UserWidget(this.selectedProject, 'test',
+      { height: 600, width: 800 },
+      appId);
+
     this.selectedWidget.updatePosition({ top: 100, left: 300 });
-    Widget.addWidgetToCliche(this.allCliches, this.selectedWidget);
-    const innerWidget1 = new BaseWidget('test inner1', { height: 100, width: 200 }, 'img', '/', appId);
-    innerWidget1.updateClicheMap(this.allCliches);
-    innerWidget1.addWidgetToCliche();
+    const innerWidget1 = new BaseWidget(this.selectedProject, 'test inner1', { height: 100, width: 200 }, 'img', '/', appId);
     this.selectedWidget.addInnerWidget(innerWidget1.getId());
     innerWidget1.updatePosition({ top: 50, left: 100 });
 
-    const innerWidget2 = new UserWidget('test inner2', { height: 200, width: 400 }, appId);
-    innerWidget2.updateClicheMap(this.allCliches);
-    innerWidget2.addWidgetToCliche();
+    const innerWidget2 = new UserWidget(this.selectedProject, 'test inner2', { height: 200, width: 400 }, appId);
     this.selectedWidget.addInnerWidget(innerWidget2.getId());
     innerWidget2.updatePosition({ top: 200, left: 200 });
 
-    const innerWidget21 = new UserWidget('test inner21', { height: 100, width: 100 }, appId);
-    innerWidget21.updateClicheMap(this.allCliches);
-    innerWidget21.addWidgetToCliche();
+    const innerWidget21 = new UserWidget(this.selectedProject, 'test inner21', { height: 100, width: 100 }, appId);
     innerWidget2.addInnerWidget(innerWidget21.getId());
     innerWidget21.updatePosition({ top: 50, left: 100 });
 
-    this.projectService.updateClicheMap(this.allCliches);
+    this.userApp.addPage(this.selectedWidget);
+    this.projectService.projectUpdated();
     this.projectService.updateSelectedWidget(this.selectedWidget);
   }
 }

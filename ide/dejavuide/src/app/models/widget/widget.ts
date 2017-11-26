@@ -1,6 +1,7 @@
 import { generateId } from '../../utility/utility';
 import { Dimensions, Position } from '../../services/state.service';
-import { Cliche, UserCliche, ClicheMap } from '../cliche/cliche';
+import { Cliche, UserCliche } from '../cliche/cliche';
+import { Project } from '../project/project';
 import { Meta } from '../project/project';
 
 enum WidgetType {
@@ -16,10 +17,7 @@ export interface Properties {
 
 export abstract class Widget {
     protected objectType = 'Widget';
-    /**
-     * The map of all cliches used in the app.
-     */
-    protected allCliches: ClicheMap;
+    protected project: Project;
     protected widgetType: WidgetType;
     protected properties: Properties = {
         dimensions: null,
@@ -38,45 +36,18 @@ export abstract class Widget {
     protected templateCopies: Set<string> = new Set();
 
     /**
-     * Given a map of clicheIds to all their widgets, adds a widget to that map.
-     * @param allCliches a map of clicheids to cliches
-     * @param widget widget to add
-     */
-    static addWidgetToCliche(
-        allCliches: ClicheMap,
-        widget: Widget) {
-        if (!allCliches.get(widget.getClicheId())) {
-            throw Error('Cliche not found');
-        }
-        ((allCliches.get(widget.getClicheId())) as UserCliche).addUnusedWidget(widget);
-    }
-
-    /**
-     * Given a widgetId, gets the widget object from the map of all widgets
-     * @param allCliches a map of all widgets
-     * @param widgetId id of widget to find
-     */
-    static getWidget(
-        allCliches: ClicheMap,
-        widgetId: string
-    ): Widget {
-        const clicheid = Widget.decodeid(widgetId)[0];
-        return allCliches.get(clicheid).getWidget(widgetId);
-    }
-
-    /**
      * Converts a JSON object to a Widget object
      * @param object object to convert
      */
-    static fromObject(object: any): BaseWidget | UserWidget {
+    static fromObject(project: Project, object: any): BaseWidget | UserWidget {
         const notCorrectObject = 'Object is not an instance of a Widget';
         if (object.widgetType === undefined || object.widgetType === null) {
             throw Error(notCorrectObject);
         }
         if (object.widgetType === WidgetType.BASE_WIDGET) {
-            return BaseWidget.fromObject(object);
+            return BaseWidget.fromObject(project, object);
         }
-        return UserWidget.fromObject(object);
+        return UserWidget.fromObject(project, object);
     }
 
     static encodeid(clicheid: string, widgetid: string): string {
@@ -99,6 +70,31 @@ export abstract class Widget {
         return clicheid + '_' + generateId();
     }
 
+    constructor(
+        project: Project,
+        name: string,
+        dimensions: Dimensions,
+        clicheid: string,
+        id: string = null,
+        templateid: string = null,
+        isTemplate = false
+        ) {
+        this.project = project;
+        this.meta = {
+            name: name,
+            id: id ? id : clicheid + '_' + generateId(),
+            clicheId: clicheid,
+            templateId: templateid,
+            version: '',
+            author: ''
+        };
+        this.properties.dimensions = dimensions;
+        this._isTemplate = isTemplate;
+
+        // Order matters! Add this after the meta information is set.
+        this.project.addAppWidget(this);
+    }
+
     isUserType(): this is UserWidget {
         return this.widgetType === WidgetType.USER_WIDGET;
     }
@@ -107,12 +103,8 @@ export abstract class Widget {
         return this.widgetType === WidgetType.BASE_WIDGET;
     }
 
-    getClicheMap(): ClicheMap {
-        return this.allCliches;
-    }
-
-    updateClicheMap(updatedMap: ClicheMap) {
-        this.allCliches = updatedMap;
+    getProject(): Project {
+        return this.project;
     }
 
     getId(): string {
@@ -188,8 +180,8 @@ export abstract class Widget {
 
         let inheritedStyles = {};
         if (this.getTemplateId()) {
-            inheritedStyles = Widget
-                .getWidget(this.allCliches, this.getTemplateId())
+            inheritedStyles = this.project
+                .getAppWidget(this.getTemplateId())
                 .getCustomStylesToShow(); // no parent styles for template
         }
 
@@ -212,17 +204,13 @@ export abstract class Widget {
      * @param allCliches a map of all widgets
      */
     remove() {
-        if (this.getTemplateId()) {
-            Widget.getWidget(this.allCliches, this.getTemplateId()).templateCopies.delete(this.getId());
-        }
-        (this.allCliches.get(this.getClicheId()) as UserCliche).removeWidget(this.getId());
+        this.project.removeWidget(this.getId());
     }
 
-    /**
-     * Adds this widget to the map of all widgets.
-     */
-    addWidgetToCliche() {
-        Widget.addWidgetToCliche(this.allCliches, this);
+    removeTemplateCopy(widgetId: string) {
+        if (this.isTemplate) {
+            this.templateCopies.delete(widgetId);
+        }
     }
 }
 
@@ -237,12 +225,13 @@ export class BaseWidget extends Widget {
     private type: string;
     private value: string;
 
-    static fromObject(object: any): BaseWidget {
+    static fromObject(project: Project, object: any): BaseWidget {
         if (object.widgetType !== WidgetType.BASE_WIDGET) {
             return null;
         }
         const clicheId = Widget.decodeid(object.meta.id)[0];
         return new BaseWidget(
+            project,
             object.meta.name,
             object.properties.dimensions,
             object.type,
@@ -254,6 +243,7 @@ export class BaseWidget extends Widget {
     }
 
     constructor(
+        project: Project,
         name: string,
         dimensions: Dimensions,
         type: string,
@@ -263,19 +253,9 @@ export class BaseWidget extends Widget {
         templateid: string = null,
         isTemplate = false
     ) {
-        super();
-        this.meta = {
-            name: name,
-            clicheId: clicheid,
-            id: id ? id : clicheid + '_' + generateId(),
-            templateId: templateid,
-            version: '',
-            author: ''
-        };
+        super(project, name, dimensions, clicheid, id, templateid, isTemplate);
         this.type = type;
         this.value = value;
-        this.properties.dimensions = dimensions;
-        this._isTemplate = isTemplate;
     }
 
     setValue(value) {
@@ -292,6 +272,7 @@ export class BaseWidget extends Widget {
             isTemplate = false;
         }
         const copyWidget = new BaseWidget(
+            this.project,
             this.getName(),
             this.getDimensions(),
             this.type,
@@ -323,12 +304,13 @@ export class UserWidget extends Widget {
     protected widgetType  = WidgetType.USER_WIDGET;
     private innerWidgetIds: string[] = []; // Widget ids // earlier in list == lower in z axis
 
-    static fromObject(object: any): UserWidget {
+    static fromObject(project: Project, object: any): UserWidget {
         if (object.widgetType !== WidgetType.USER_WIDGET) {
             return null;
         }
         const clicheId = Widget.decodeid(object.meta.id)[0];
         const widget = new UserWidget(
+            project,
             object.meta.name,
             object.properties.dimensions,
             clicheId,
@@ -343,6 +325,7 @@ export class UserWidget extends Widget {
     }
 
     constructor(
+        project: Project,
         name: string,
         dimensions: Dimensions,
         clicheid: string,
@@ -350,18 +333,7 @@ export class UserWidget extends Widget {
         templateid: string = null,
         isTemplate = false
     ) {
-        super();
-
-        this.meta = {
-            name: name,
-            id: id ? id : clicheid + '_' + generateId(),
-            clicheId: clicheid,
-            templateId: templateid,
-            version: '',
-            author: ''
-        };
-        this.properties.dimensions = dimensions;
-        this._isTemplate = isTemplate;
+        super(project, name, dimensions, clicheid, id, templateid, isTemplate);
     }
 
     updateDimensions(newDimensions: Dimensions) {
@@ -402,7 +374,7 @@ export class UserWidget extends Widget {
         // Recursive case, look through all the inner widgets
         for (const id of (<UserWidget>widget).innerWidgetIds) {
             const path = this.getPathHelper(
-                Widget.getWidget(this.allCliches, id), targetId);
+                this.project.getAppWidget(id), targetId);
             if (path === null) {
                 continue;
             }
@@ -437,7 +409,7 @@ export class UserWidget extends Widget {
         if (getParent) {
             targetId = path[path.length - 2];
         }
-        return Widget.getWidget(this.allCliches, targetId);
+        return this.project.getAppWidget(targetId);
     }
 
     /**
@@ -455,6 +427,7 @@ export class UserWidget extends Widget {
             isTemplate = false;
         }
         const copyWidget = new UserWidget(
+            this.project,
             this.getName(),
             this.getDimensions(),
             this.getClicheId(),
@@ -467,9 +440,9 @@ export class UserWidget extends Widget {
             this.templateCopies.add(copyWidget.getId());
         }
 
-        let copyWidgets = [copyWidget];
+        let copyWidgets: Widget[] = [copyWidget];
         for (const id of this.innerWidgetIds) {
-            const copyInnerWidgets = <UserWidget[]> Widget.getWidget(this.allCliches, id).makeCopy(fromTemplate);
+            const copyInnerWidgets = this.project.getAppWidget(id).makeCopy(fromTemplate);
             const innerWidgetCopy = copyInnerWidgets[0];
             copyWidget.addInnerWidget(innerWidgetCopy.getId());
             copyWidgets = copyWidgets.concat(copyInnerWidgets);
@@ -564,7 +537,7 @@ export class UserWidget extends Widget {
             if (widgetId === targetWidget.getId()) {
                 return;
             }
-            const widget = Widget.getWidget(this.allCliches, widgetId);
+            const widget = this.project.getAppWidget(widgetId);
             const top = widget.getPosition().top;
             const left = widget.getPosition().left;
             const right = left + widget.getDimensions().width;

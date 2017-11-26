@@ -1,7 +1,7 @@
 import { Component, AfterViewInit } from '@angular/core';
 
 import { Widget } from '../../../models/widget/widget';
-import { Cliche, ClicheMap } from '../../../models/cliche/cliche';
+import { Cliche } from '../../../models/cliche/cliche';
 import { Dimensions, Position, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 

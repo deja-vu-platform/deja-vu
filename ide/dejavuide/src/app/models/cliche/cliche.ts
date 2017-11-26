@@ -1,11 +1,6 @@
 import { generateId } from '../../utility/utility';
 import { Widget } from '../widget/widget';
-import { Meta } from '../project/project';
-
-/**
- * A map from clicheIds to all cliches
- */
-export type ClicheMap = Map<string, Cliche>;
+import { Project, Meta } from '../project/project';
 
 export enum ClicheType {
   USER_CLICHE, DV_CLICHE
@@ -21,20 +16,25 @@ export abstract class Cliche {
   protected meta: Meta;
   protected widgets: Map<WidgetGroup, Map<string, Widget>>;
   protected clicheType: ClicheType;
+  protected project: Project;
 
   /**
    * Converts a JSON object to a Widget object
    * @param object object to convert
    */
-  static fromObject(object: any): UserCliche | DvCliche {
+  static fromObject(project: Project, object: any): UserCliche | DvCliche {
     const notCorrectObject = 'Object is not an instance of a Cliche';
     if (object.clicheType === undefined || object.clicheType === null) {
         throw Error(notCorrectObject);
     }
     if (object.clicheType === ClicheType.USER_CLICHE) {
-        return UserCliche.fromObject(object);
+        return UserCliche.fromObject(project, object);
     }
-    return DvCliche.fromObject(object);
+    return DvCliche.fromObject(project, object);
+  }
+
+  constructor (project: Project) {
+    this.project = project;
   }
 
   abstract getWidget(widgetId: string): Widget;
@@ -49,11 +49,11 @@ export abstract class Cliche {
 }
 
 export class UserCliche extends Cliche {
-  static fromObject(object: any) {
+  static fromObject(project: Project, object: any) {
     if (object.clicheType !== ClicheType.USER_CLICHE) {
       return null;
     }
-    const uc = new UserCliche(object.meta.name);
+    const uc = new UserCliche(project, object.meta.name);
     const toAdds: Function[] = [
       uc.addPage,
       uc.addUsedWidget,
@@ -69,15 +69,15 @@ export class UserCliche extends Cliche {
     orderedGroups.forEach((group, i) => {
       if (object.widgets[group]) {
         for (const widgetId of Object.keys(object.widgets[group])){
-          toAdds[i](Widget.fromObject(object.widgets[group][widgetId]));
+          toAdds[i](Widget.fromObject(project, object.widgets[group][widgetId]));
         }
       }
     });
     return uc;
   }
 
-  constructor (name) {
-    super();
+  constructor (project: Project, name) {
+    super(project);
     this.clicheType = ClicheType.USER_CLICHE;
     this.meta = {
       name: name,
@@ -99,6 +99,8 @@ export class UserCliche extends Cliche {
 
   addPage (widget: Widget) {
     this.widgets.get(WidgetGroup.PAGE).set(widget.getId(), widget);
+    this.widgets.get(WidgetGroup.UNUSED).delete(widget.getId());
+    // TODO add inner widgets as used widgets
   }
 
   /**
@@ -194,8 +196,8 @@ export class UserCliche extends Cliche {
 
 export class DvCliche extends Cliche {
 
-  constructor () {
-    super();
+  constructor (project: Project) {
+    super(project);
     this.clicheType = ClicheType.DV_CLICHE;
     this.widgets = new Map<WidgetGroup, Map<string, Widget>>();
     this.widgets.set(WidgetGroup.TEMPLATE, new Map<string, Widget>());

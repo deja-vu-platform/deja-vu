@@ -41,7 +41,7 @@ export class WidgetComponent implements AfterViewInit, OnInit {
     // get inner widgets
     if (this.widget.isUserType()) {
       for (const innerWidgetId of this.widget.getInnerWidgetIds()) {
-        this.innerWidgets.push(Widget.getWidget(this.widget.getClicheMap(), innerWidgetId));
+        this.innerWidgets.push(this.widget.getInnerWidget(innerWidgetId));
       }
     }
   }

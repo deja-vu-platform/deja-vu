@@ -41,31 +41,30 @@ export class ProjectExplorerComponent implements OnInit {
     private zone: NgZone) {}
 
   ngOnInit() {
-    const that = this;
     this.loaderVisible = true;
-    ipcRenderer.on('projects', function(event, data) {
+    ipcRenderer.on('projects', (event, data) => {
       data.projects.forEach((projectInfo) => {
         const projectName = projectInfo[0];
         const content = JSON.parse(projectInfo[1]);
         if (content.objectType && (content.objectType === 'Project')) {
-          that.projects[projectName] = content;
+          this.projects[projectName] = content;
         }
       });
 
-      that.updateDisplayProjectList();
-      that.loaderVisible = false;
-      if (!that.ref['destroyed']) { // Hack to prevent view destroyed errors
-        that.ref.detectChanges();
+      this.updateDisplayProjectList();
+      this.loaderVisible = false;
+      if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
+        this.ref.detectChanges();
       }
     });
 
-    ipcRenderer.on('delete-success', function(event) {
+    ipcRenderer.on('delete-success', (event) => {
       // TODO
-      delete that.projects[event.projectName];
-      that.updateDisplayProjectList();
-      that.loaderVisible = false;
-      if (!that.ref['destroyed']) {
-        that.ref.detectChanges();
+      delete this.projects[event.projectName];
+      this.updateDisplayProjectList();
+      this.loaderVisible = false;
+      if (!this.ref['destroyed']) {
+        this.ref.detectChanges();
       }
       // TODO deal with if the project is your selected project
     });
@@ -78,7 +77,6 @@ export class ProjectExplorerComponent implements OnInit {
       width: '250px',
     });
 
-    const that = this;
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         const newProject = new Project(result.name);
@@ -97,17 +95,15 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   handleDelete(projectName): void {
-    const that = this;
-
     this.zone.run(() => {
-      const dialogRef = that.dialog.open(ProjectDeleteDialogComponent, {
+      const dialogRef = this.dialog.open(ProjectDeleteDialogComponent, {
         width: '250px',
       });
 
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
-          that.loaderVisible = true;
-          that.deleteProject(projectName);
+          this.loaderVisible = true;
+          this.deleteProject(projectName);
         }
       });
     });
@@ -134,12 +130,11 @@ export class ProjectExplorerComponent implements OnInit {
     const projectsToShow = [];
     const WEEK_IN_SEC = 604800000;
     const now = (new Date()).getTime();
-    const that = this;
     Object.keys(this.projects).forEach((projectName: string) => {
       const content = this.projects[projectName];
       const time = content.lastAccessed;
-      if (!that.recentSelected || (now - time) < WEEK_IN_SEC) {
-        projectsToShow.push(that.fileToDisplayProject(projectName, content.meta.id, time));
+      if (!this.recentSelected || (now - time) < WEEK_IN_SEC) {
+        projectsToShow.push(this.fileToDisplayProject(projectName, content.meta.id, time));
       }
     });
     this.projectsToShow = projectsToShow;

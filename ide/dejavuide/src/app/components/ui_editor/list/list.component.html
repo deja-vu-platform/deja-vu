@@ -1,15 +1,13 @@
 <div>
   <!-- for the user app -->
-  <ng-container *ngIf="userApp">
-    <div>
-      <ng-container *ngFor="let widget of pages">
-        <dv-list-item [widget]="widget"
-                      [isDraggable]="true"
-                      [isDeletable]="true">
-        </dv-list-item>
-      </ng-container>
-    </div>
-  </ng-container>  
+  <div *ngIf="userApp">
+    <ng-container *ngFor="let widget of pages">
+      <dv-list-item [widget]="widget"
+                    [isDraggable]="true"
+                    [isDeletable]="true">
+      </dv-list-item>
+    </ng-container>
+  </div>
 </div>
 <div>
   <!-- for imported cliches -->
