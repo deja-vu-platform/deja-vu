@@ -5,6 +5,6 @@ module.exports = function (grunt) {
         ["CreateCustomPasskey",
             "CreateRandomPasskey",
             "ValidatePasskeyWithRedirect",
-            "SignOutWithRedirect",
+            "PasskeySignOutWithRedirect",
             "LoggedIn"]);
 }

@@ -10,7 +10,7 @@ import { Widget, ClientBus, PrimitiveAtom,
     `
 })
 
-export class SignOutWithRedirectComponent {
+export class PasskeySignOutWithRedirectComponent {
     @Field("Widget") on_signout_ok: PrimitiveAtom<WidgetValue>;
 
     constructor(private _client_bus: ClientBus) { }

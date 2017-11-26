@@ -43,7 +43,7 @@ cliche PasskeyAuthentication {
     // Displays a sign out button. 
     // If `on_signout_ok` is defined, redirect user to the given widget.
     // Otherwise, remain in the current widget.
-    widget SignOutwithRedirect {
+    widget PasskeySignOutWithRedirect {
         on_signout_ok: Widget
     }
 
