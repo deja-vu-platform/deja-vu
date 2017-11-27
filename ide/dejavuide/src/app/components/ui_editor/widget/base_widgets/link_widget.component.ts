@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 
 import { Cliche } from '../../../../models/cliche/cliche';
 import { Widget, BaseWidget } from '../../../../models/widget/widget';
@@ -8,22 +8,26 @@ import { ProjectService } from '../../../../services/project.service';
   selector: 'dv-link-widget',
   templateUrl: './link_widget.component.html',
 })
-export class LinkWidgetComponent {
+export class LinkWidgetComponent implements OnInit {
   @Input() widget: BaseWidget;
 
-  tooltipHidden = true;
+  tooltipHidden = false;
+  // TODO defaults should be made in the widget itself
   value = {
     text: 'Link',
-    target: undefined
+    target: '#'
   };
 
-  updateLinkText(text) {
-    this.value.text = text;
-    this.widget.setValue(this.value);
+  ngOnInit() {
+    this.value = this.widget.getValue();
   }
 
-  updateLinkTarget(target) {
-    this.value.target = target;
+  updateLinkText(event) {
+    this.value.text = event.target.value;
+  }
+
+  updateLinkTarget(event) {
+    this.value.target = event.target.value;
   }
 
   applyChanges() {

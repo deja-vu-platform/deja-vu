@@ -14,7 +14,7 @@
       <div class="row">
         <div class="col-sm-2 form-lbl">Text: </div>
         <div class="col-sm-7">
-          <input type="text" class="form-control" required autofocus (onchange)="updateLinkText($event)" value="value.text" />
+          <input type="text" class="form-control" required autofocus (change)="updateLinkText($event)" [value]="value.text" />
         </div>
         <div class="col-sm-4"></div>
       </div>
@@ -22,7 +22,7 @@
       <div class="row">
         <div class="col-sm-2 form-lbl">Target: </div>
         <div class="col-sm-7">
-          <input type="text" class="form-control" required (onchange)="updateLinkTarget($event)" value="value.target"/>
+          <input type="text" class="form-control" required (change)="updateLinkTarget($event)" [value]="value.target"/>
         </div>
         <div class="col-sm-2 apply">
           <button class="btn btn-primary" (click)="applyChanges()">

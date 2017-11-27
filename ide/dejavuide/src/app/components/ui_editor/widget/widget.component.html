@@ -2,7 +2,6 @@
       *ngIf="widget"
       [style.height.px]="widget.getDimensions().height"
       [style.width.px]="widget.getDimensions().width">
-  <span>I am a widget</span>
   <span>Name: {{widget.getName()}}</span>
   <ng-container *ngIf="widget.isUserType()">
     <ng-container *ngFor="let innerWidget of innerWidgets">

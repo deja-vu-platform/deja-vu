@@ -2,3 +2,8 @@
   background: paleturquoise;
   border: 1px black solid;
 }
+
+
+.widget-component .tooltip {
+  opacity: 1;
+}

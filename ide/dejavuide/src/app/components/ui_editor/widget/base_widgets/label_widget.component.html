@@ -14,7 +14,7 @@
       <div class="panel-body">
         <div class="row">
           <div class="col-sm-12">
-            <textarea class="form-control" rows="2" (onchange)="updateText($event)">{{value}}</textarea>
+            <textarea class="form-control" rows="2" (change)="updateText($event)">{{value}}</textarea>
           </div>
         </div><br/>
         <button class="apply btn btn-primary pull-right" (click)="applyChanges()">Apply</button>
