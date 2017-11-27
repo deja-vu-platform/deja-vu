@@ -27,7 +27,8 @@
     </div>
   </ng-container>
 </div> 
-<dv-widget #ghost 
+<dv-widget *ngIf="isDraggable"
+            #ghost 
             [hidden]="true"
             [widget]="widget"
             [isSelected]="false"

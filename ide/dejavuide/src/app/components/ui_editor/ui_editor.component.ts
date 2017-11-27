@@ -63,7 +63,11 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
       appId);
 
     this.selectedWidget.updatePosition({ top: 100, left: 300 });
-    const innerWidget1 = new BaseWidget(this.selectedProject, 'test inner1', { height: 100, width: 200 }, 'img', '/', appId);
+    const innerWidget1 = new BaseWidget(
+      this.selectedProject,
+      'test inner1',
+      { height: 100, width: 200 },
+      'label', 'hello I am test', appId);
     this.selectedWidget.addInnerWidget(innerWidget1);
     innerWidget1.updatePosition({ top: 50, left: 100 });
 
@@ -71,9 +75,16 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     this.selectedWidget.addInnerWidget(innerWidget2);
     innerWidget2.updatePosition({ top: 200, left: 200 });
 
-    const innerWidget21 = new UserWidget(this.selectedProject, 'test inner21', { height: 100, width: 100 }, appId);
+    const innerWidget21 = new UserWidget(this.selectedProject, 'test inner21', { height: 400, width: 200 }, appId);
     innerWidget2.addInnerWidget(innerWidget21);
     innerWidget21.updatePosition({ top: 50, left: 100 });
+
+    const innerWidget211 = new BaseWidget(
+      this.selectedProject, 'inner211',
+      { height: 200, width: 150 }, 'link',
+      {text: '100100', target: undefined}, appId);
+
+    innerWidget21.addInnerWidget(innerWidget211);
 
     this.userApp.addPage(this.selectedWidget);
     this.projectService.projectUpdated();

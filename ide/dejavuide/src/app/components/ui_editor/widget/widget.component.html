@@ -12,4 +12,11 @@
       </dv-widget>
     </ng-container>
   </ng-container>
+  <ng-container *ngIf="widget.isBaseType()">
+    <dv-label-widget *ngIf="widget.getBaseWidgetType() === 'label'"
+      [widget]="widget"></dv-label-widget>
+    <dv-link-widget *ngIf="widget.getBaseWidgetType() === 'link'"
+      [widget]="widget"></dv-link-widget>
+  </ng-container>
 </div>
+

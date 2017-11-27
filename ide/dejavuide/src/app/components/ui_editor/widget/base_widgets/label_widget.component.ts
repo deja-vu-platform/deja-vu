@@ -5,9 +5,8 @@ import { Widget, BaseWidget } from '../../../../models/widget/widget';
 import { ProjectService } from '../../../../services/project.service';
 
 @Component({
-  selector: 'dv-lable-widget',
-  templateUrl: './widget.component.html',
-  styleUrls: ['./widget.component.css'],
+  selector: 'dv-label-widget',
+  templateUrl: './label_widget.component.html',
 })
 export class LabelWidgetComponent {
   @Input() widget: BaseWidget;

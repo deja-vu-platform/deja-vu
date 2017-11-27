@@ -254,7 +254,7 @@ export class BaseWidget extends Widget {
         name: string,
         dimensions: Dimensions,
         type: string,
-        value: string,
+        value: any,
         clicheid: string,
         id: string = null,
         templateid: string = null,
@@ -263,6 +263,11 @@ export class BaseWidget extends Widget {
         super(project, name, dimensions, clicheid, id, templateid, isTemplate);
         this.type = type;
         this.value = value;
+    }
+
+    // TODO update to make more robust
+    getBaseWidgetType() {
+      return this.type;
     }
 
     setValue(value) {

@@ -6,8 +6,7 @@ import { ProjectService } from '../../../../services/project.service';
 
 @Component({
   selector: 'dv-link-widget',
-  templateUrl: './widget.component.html',
-  styleUrls: ['./widget.component.css'],
+  templateUrl: './link_widget.component.html',
 })
 export class LinkWidgetComponent {
   @Input() widget: BaseWidget;
