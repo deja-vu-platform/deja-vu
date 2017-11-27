@@ -1,40 +1,87 @@
+<a class="btn btn-link" [href]="widget.getValue().target">
+    {{widget.getValue().link_text}}
+</a>
 
-<!-- 'link' -->
-  <!-- if (!value) { -->
-    <a class="btn btn-link display-component">Link</a>';
-    <a class="btn btn-link display-component" [href]="value.target"> {{value.link_text}}</a>
-    
-    
-
-
-
-<div class="tooltip">
+<div [hidden]='tooltipHidden' class="tooltip">
     <div class="panel panel-default">
-        <div class="panel-heading"><strong>Link</strong>
-            <button type="button" class="close close-btn"><small>x</small></button>
+        <div class="panel-heading">
+            <strong>Link</strong>
+            <button type="button" class="close close-btn">
+                <small>x</small>
+            </button>
         </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-sm-2 form-lbl">Text: </div>
                 <div class="col-sm-7">
-                    <input type="text" 
-                            class="form-control" 
-                            required 
-                            autofocus
-                            (onchange)="updateLinkText($event)"/>
+                    <input type="text" class="form-control" required autofocus (onchange)="updateLinkText($event)" value="value.text" />
                 </div>
                 <div class="col-sm-4"></div>
-            </div><br/>
+            </div>
+            <br/>
             <div class="row">
                 <div class="col-sm-2 form-lbl">Target: </div>
                 <div class="col-sm-7">
-                    <input type="text" 
-                            class="form-control" 
-                            required 
-                            (onchange)="updateLinkTarget($event)"/>
+                    <input type="text" class="form-control" required (onchange)="updateLinkTarget($event)" value="value.target"/>
                 </div>
-                <div class="col-sm-2 apply"><button class="btn btn-primary">Apply</button></div>
+                <div class="col-sm-2 apply">
+                    <button class="btn btn-primary" (click)="applyChanges()">
+                        Apply</button>
+                </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="config-btns">
+    <div>
+        <!-- class="btn-group-vertical btn-group-xs">-->
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-tint"></span> Style
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a href="#" class="premade-style btn-style-link">Link</a>
+            </li>
+            <li role="separator" class="divider"></li>
+            <li class="dropdown-header">Button</li>
+            <li>
+                <a href="#" class="premade-style btn-style-default">Default</a>
+            </li>
+            <li>
+                <a href="#" class="premade-style btn-style-primary">Primary</a>
+            </li>
+            <li>
+                <a href="#" class="premade-style btn-style-success">Success</a>
+            </li>
+            <li>
+                <a href="#" class="premade-style btn-style-info">Info</a>
+            </li>
+            <li>
+                <a href="#" class="premade-style btn-style-warning">Warning</a>
+            </li>
+            <li>
+                <a href="#" class="premade-style btn-style-danger">Danger</a>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <!-- class="btn-group-vertical btn-group-xs">-->
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <span class="glyphicon glyphicon-text-size"></span> Size
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a href="#" class="premade-style btn-size-xs">Small</a>
+            </li>
+            <li>
+                <a href="#" class="premade-style btn-size-df">Default</a>
+            </li>
+            <li>
+                <a href="#" class="premade-style btn-size-lg">Large</a>
+            </li>
+        </ul>
     </div>
 </div>

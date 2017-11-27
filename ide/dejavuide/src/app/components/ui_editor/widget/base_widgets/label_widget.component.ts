@@ -5,26 +5,18 @@ import { Widget, BaseWidget } from '../../../../models/widget/widget';
 import { ProjectService } from '../../../../services/project.service';
 
 @Component({
-  selector: 'dv-link-widget',
+  selector: 'dv-lable-widget',
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class LinkWidgetComponent {
+export class LabelWidgetComponent {
   @Input() widget: BaseWidget;
 
   tooltipHidden = true;
-  value = {
-    text: 'Link',
-    target: undefined
-  };
+  value = 'Type text here...';
 
-  updateLinkText(text) {
-    this.value.text = text;
-    this.widget.setValue(this.value);
-  }
-
-  updateLinkTarget(target) {
-    this.value.target = target;
+  updateText(text) {
+    this.value = text;
   }
 
   applyChanges() {

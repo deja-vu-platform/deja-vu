@@ -269,6 +269,10 @@ export class BaseWidget extends Widget {
         this.value = value;
     }
 
+    getValue() {
+        return JSON.parse(JSON.stringify(this.value));
+    }
+
     makeCopy(fromTemplate = false): Widget[] {
         let templateId = this.getTemplateId();
         const isTemplateCopy = fromTemplate && this._isTemplate;
