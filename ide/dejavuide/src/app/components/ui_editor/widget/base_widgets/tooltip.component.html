@@ -1,3 +1,90 @@
+<!-- 'label' -->
+  <!-- if (!value) { -->
+      <!-- value = "Type text here..."; -->
+  <!-- } -->
+<div class="label-container">
+  <p contenteditable="true" class="display-component">{{value}}</p>
+</div>
+
+<!-- 'tab-viewer' -->
+  <!-- if (!value) { -->
+<ul class="nav nav-pills nav-stacked display-component">
+  <li role="presentation" class="active">
+    <a data-toggle="tab">Tab 1</a>
+  </li>
+  <li role="presentation">
+    <a data-toggle="tab">Tab 2</a>
+  </li>
+  <li role="presentation">
+    <a data-toggle="tab">Tab 3</a>
+  </li>
+</ul>
+
+<ul class="nav nav-pills nav-stacked display-component">
+  <li role="presentation" class="active">
+    <a href="#1a" data-toggle="tab">{{value.tab1.text}}</a>
+  </li>
+  <li role="presentation">
+    <a href="#2a" data-toggle="tab">{{value.tab2.text}}</a>
+  </li>
+  <li role="presentation">
+    <a href="#3a" data-toggle="tab">{{value.tab3.text}}</a>
+  </li>
+  <!--//TODO: tab target -->
+</ul>
+
+<!-- 'menu' -->
+  <!-- if (!value) { -->
+<div class="btn-group display-component" role="group">
+  <a type="button" class="btn btn-default" role="button">Item 1</a>
+  <a type="button" class="btn btn-default" role="button">Item 2</a>
+  <a type="button" class="btn btn-default" role="button">Item 3</a>
+</div>
+
+<div class="btn-group display-component" role="group">
+  <a type="button" 
+    class="btn btn-default" 
+    role="button" 
+    [href]="value.menu_item1.value">
+    {{value.menu_item1.text}}
+  </a>
+  <a type="button" 
+    class="btn btn-default" 
+    role="button" 
+    [href]="value.menu_item2.value">
+    {{value.menu_item2.text]]
+  </a>
+  <a type="button" 
+    class="btn btn-default" 
+    role="button" 
+    [href]="value.menu_item3.value">
+    {{value.menu_item3.text}}
+  </a>
+</div>
+
+<!-- 'image' -->
+  <!-- if (!value) { -->
+<img class="display-component" src="images/image_icon.png" width="15px" height="15px">
+<img [src]="value.img_src" class="display-component">
+
+<!-- 'panel' -->
+  <!-- if (!value) { -->
+      <!-- value = {heading: "Type heading...", content: "Type content..."}; -->
+  <!-- } -->
+<div class="panel panel-default display-component">
+  <div class="panel-heading">
+    <h3 contenteditable="true" class="panel-title">{{value.heading}}</h3>
+  </div>
+  <div contenteditable="true" class="panel-body">{{value.content}}</div>
+</div>
+
+<!-- 'blank' -->
+<div class="blank display-component"></div>
+
+<!-- 'user' -->
+<div class="blank display-component"></div>
+
+
 
 <!--EDIT PROPERTIES POPUPS-->
  
