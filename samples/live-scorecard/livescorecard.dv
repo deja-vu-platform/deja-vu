@@ -123,6 +123,7 @@ app LiveScorecard {
 
     // The navigation bar for the hosts' view
     widget HostNavBar { 
+        loggedInHost: Host,
         on_signout_ok: Widget = Landing
     }
 
