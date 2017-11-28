@@ -147,6 +147,7 @@ namespace Validation {
 export function getRandomPasscode() {
     var randomIndex = Math.floor(Math.random() * WORDS_SIZE);
     var code = WORDS[randomIndex];
+    console.log("this is the code " + code);
     return mean.db.collection("passkeys")
         .findOne({ atom_id: code }, { _id: 1 })
         .then(passkey => {

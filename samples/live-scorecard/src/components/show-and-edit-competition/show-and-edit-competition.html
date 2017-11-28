@@ -6,8 +6,14 @@
                     <dv-widget name="ShowNameOfGroup" of="CompetitionHosts"></dv-widget>
                 </div>
                 <div class="col-xs-2">{{competition.end_date}}</div>
-                <div class="col-xs-2">
-                    <!-- Should we show the code? -->
+                <!-- TODO: Show code -->
+                <div class="col-xs-1">
+                    <!-- TODO: Should only show when edit clicked -->
+                    <a [dvLink]="linkToHosts">Hosts</a>
+                </div>
+                <div class="col-xs-1">
+                    <!-- TODO: Should only show when edit clicked -->
+                    <a routerLink="/rules">Rules</a>
                 </div>
                 <div class="col-xs-1">
                     <a routerLink="/participants">
@@ -25,11 +31,16 @@
                     <!-- TODO: Add leaderboard functionality -->
                     <img src="./components/show-and-edit-competition/leaderboardgray.png" class="trophy">
                 </div>
-                <div class="col-xs-2">
+                <div class="col-xs-1">
                     <!-- TODO: Allow editing of competitions -->
                     <img src="./components/show-and-edit-competition/edit.png" class="edit">
+                </div>
+                <div class="col-xs-1">
+                    <!-- TODO: Should only show when edit clicked -->
+                    <dv-widget name="DeleteEvent" of="Event"></dv-widget>
                 </div>
             </div>
         </div>
     </div>
+    <div class="col-lg-2 col-xs-12 center"></div>
 </div>

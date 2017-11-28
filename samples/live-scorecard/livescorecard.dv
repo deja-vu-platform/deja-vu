@@ -53,7 +53,8 @@ app LiveScorecard {
     // For every competition, there is a set of climbers.
     include organization/Group [
         Climber for Member,
-        Competition for Group
+        CompetitionParticipants for Group,
+        ShowClimber replacing ShowNameOfMember in ShowMembersOfGroup
     ] as CompetitionClimbers
 
     // For every competition, there is a set of hosts.
@@ -77,10 +78,17 @@ app LiveScorecard {
         code: text
     }
 
+    // added members to see if it would help
     data Competition { 
         name: text,
         code: text,
-        hosts: [Host] 
+        members: [Host] 
+    }
+
+    // added this to see if it would help
+    data CompetitionParticipants { 
+        name: text,
+        members: [Climber] 
     }
 
     // A climb is a task that is assigned by a host to all climbers
@@ -170,8 +178,9 @@ app LiveScorecard {
 
     // Allows the host to create a competition
     widget AddCompetitionForm {
-        newCompetition: Competition,
-        newSpectator: Spectator,
+        new_competition: Competition,
+        new_climber_group: CompetitionParticipants,
+        new_spectator: Spectator,
         host: Host,
         submit_ok: boolean
     }
@@ -186,7 +195,13 @@ app LiveScorecard {
     // A host can add, view and edit climbers to or of the competition.
     widget ShowAndEditClimbers {
         competition: Competition,
+        participants: CompetitionParticipants,
         new_climber: Climber
+    }
+
+    widget ShowClimber {
+        competition: Competition,
+        climber: Climber
     }
 
     // A host can add a climber to the competition.
@@ -208,13 +223,17 @@ app LiveScorecard {
     }
 
     widget ShowAndEditCompetition {
-        competition: Competition
+        competition: Competition,
+        host: Host,
+        linkToHosts: Widget = ShowAndEditHosts
     }
 
     /** Routes **/
     host_login_route: route = {path: "host-login", widget: HostLogin}
     host_register_route: route = {path: "host-register", widget: HostRegister}
     host_home_route: route = {path: "host", widget: HostHome}
+    show_hosts_route: route = {path: "competition-hosts", widget: ShowAndEditHosts}
+    show_participants_route: route = {path: "participants", widget: ShowAndEditClimbers}
     climber_login_route: route = {path: "climber-login", widget: ClimberLogin}
     climber_home_route: route = {path: "climber", widget: ClimberHome}
     buddy_home_route: route = {path: "buddy", widget: BuddyHome}

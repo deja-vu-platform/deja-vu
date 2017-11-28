@@ -196,3 +196,12 @@ input[type=radio]checked:after {
 .trophy {
 	height: 1.1em;
 }
+
+.inv-border{
+	border: 1px;
+}
+
+.left {
+	text-align: left;
+	margin-top: 3em;
+}

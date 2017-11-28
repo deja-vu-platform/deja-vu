@@ -1,16 +1,23 @@
-import { Widget, PrimitiveAtom, Field} from "client-bus";
+import { Widget, PrimitiveAtom, Field } from "client-bus";
 import { GraphQlService } from "gql";
 
 @Widget({
-    fqelement: "PasskeyAuthentication", ng2_providers: [GraphQlService]
+    fqelement: "PasskeyAuthentication", ng2_providers: [GraphQlService],
+    template: ""
 })
 
 export class CreateRandomPasskeyComponent {
-    @Field("boolean") create_passkey_ok: PrimitiveAtom<boolean>;
+    @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
     constructor(private _graphQlService: GraphQlService) { }
 
-    generatePasskey() {
+    dvAfterInit() {
+        this.submit_ok.on_change(() => {
+            this._generatePasskey();
+        });
+    }
+
+    _generatePasskey() {
         this._graphQlService
             .post(`
                 createRandomPasskey(
@@ -18,7 +25,7 @@ export class CreateRandomPasskeyComponent {
                 )
             `)
             .subscribe(
-                _ => { this.create_passkey_ok.value = true; }
+            _ => { console.log("something happen please"); }
             );
     }
 }

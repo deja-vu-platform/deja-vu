@@ -13,7 +13,6 @@ export class CreateCustomPasskeyContentComponent {
 
     dvAfterInit() {
         this.submit_ok.on_change(() => {
-            console.log("i'm doing the thing");
             this._createPasskey();
         });
     }

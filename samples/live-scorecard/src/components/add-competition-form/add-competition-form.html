@@ -1,3 +1,4 @@
+<!-- TODO: Add styling -->
 <form class="add-competition-form">
     <dv-widget name="EditNameOfGroup" of="CompetitionHosts"></dv-widget>
     <dv-widget name="NewEventContent" of="Event"></dv-widget>
@@ -6,5 +7,8 @@
                 despite it being different. However, it still works, i.e. the
                 competition is created and a spectator can log in. -->
     <dv-widget name="CreateCustomPasskeyContent" of="SpectatorAuthentication"></dv-widget>
+    <!-- FIXME: Decouple competition as group -->
+    <dv-widget name="NewGroupWithoutButton" of="CompetitionClimbers"></dv-widget>
+    <!-- FIXME: This is not working... -->
     <dv-widget name="NewGroupWithInitialMemberButton" of="CompetitionHosts"></dv-widget>
 </form>

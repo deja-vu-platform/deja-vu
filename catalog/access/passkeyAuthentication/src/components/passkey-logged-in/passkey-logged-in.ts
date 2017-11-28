@@ -3,7 +3,7 @@ import { Widget, Field, AfterInit } from "client-bus";
 import { PasskeyAtom } from "../shared/data";
 
 @Widget({ fqelement: "PasskeyAuthentication", template: "" })
-export class LoggedInComponent implements AfterInit {
+export class PasskeyLoggedInComponent implements AfterInit {
     @Field("Passkey") passkey: PasskeyAtom;
 
     dvAfterInit() {

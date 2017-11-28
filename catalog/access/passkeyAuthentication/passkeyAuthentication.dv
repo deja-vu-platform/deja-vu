@@ -29,8 +29,14 @@ cliche PasskeyAuthentication {
     }
 
     // A principal creates a passkey with a randomly chosen 5-7 letter english word.
+    widget CreateRandomPasskeyButton {
+        submit_ok: boolean
+    }
+
+    // A 5-7 letter english word is randomly generated when `submit_ok` is true.
+    // There is no template for this.
     widget CreateRandomPasskey {
-        passkey: Passkey
+        submit_ok: boolean
     }
 
     // Displays a sign in form, only with a passkey field.
@@ -49,7 +55,7 @@ cliche PasskeyAuthentication {
 
     // A user's session persists until logging out.
     // There is no template for this.
-    widget LoggedIn {
+    widget PasskeyLoggedIn {
         passkey: Passkey
     }
 }
