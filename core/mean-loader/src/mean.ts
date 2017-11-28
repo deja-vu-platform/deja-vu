@@ -335,6 +335,12 @@ export namespace GruntTask {
       .flatten()
       .value();
     const fields_from_wbonds = _u.pluck(wcomp_info.wbonds, "subfield");
+    // This won't include fields that have a default value but that are not part
+    // of any bonds. If you want to define a field with a default value
+    // that is only used in the HTML of the widget, you can use that value
+    // directly, or, if that's not possible, the workaround is to include a
+    // widget with display: none that will give you the bond
+    // (this is a temporary hack)
     const all_widget_fields = _u
       .uniq(fields_from_replace_map.concat(fields_from_wbonds), false,
             f => f.name + f.of.name + f.of.fqelement + f.type.name +
