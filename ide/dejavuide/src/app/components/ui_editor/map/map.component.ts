@@ -1,4 +1,5 @@
 import { Component, AfterViewInit, OnInit, ElementRef} from '@angular/core';
+import { Observable } from 'rxjs/Observable';
 
 import { Widget, UserWidget } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
@@ -19,6 +20,9 @@ export class MapComponent implements AfterViewInit, OnInit {
   /**
    * This is a box corresponding to the visible window of the user's
    * work surface to show where the user is.
+   *
+   * Not saving a scaled version because the map scale might not be correct
+   * when this is set.
    */
   visibleWindowDimensions: Dimensions = {
     height: 0,
@@ -41,6 +45,8 @@ export class MapComponent implements AfterViewInit, OnInit {
   minimized = false;
   mapWidgetSizes: Dimensions[] = [];
 
+  private viewInit = false;
+
   private zoom = 1;
   private el: HTMLElement;
 
@@ -59,14 +65,6 @@ export class MapComponent implements AfterViewInit, OnInit {
         this.screenDimensions = newSelectedScreenDimensions;
         this.updateMapScale();
         this.updateView();
-      });
-
-    stateService.visibleWindowDimensions
-      .subscribe((newVisibleWindowDimensions) => {
-        this.visibleWindowDimensions.height =
-          newVisibleWindowDimensions.height;
-        this.visibleWindowDimensions.width =
-          newVisibleWindowDimensions.width;
       });
 
     stateService.visibleWindowScrollPosition
@@ -92,9 +90,18 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.mapComponentDimensions.width = this.el.offsetWidth;
     this.updateMapScale();
     this.updateView();
+
   }
 
   ngAfterViewInit() {
+    this.viewInit = true;
+    this.stateService.visibleWindowDimensions.subscribe((newVisibleWindowDimensions) => {
+      console.log('hhhhhiiiiiii');
+      if (this.viewInit) {
+        this.visibleWindowDimensions = newVisibleWindowDimensions;
+      }
+    });
+
     // Initiate draggable
     $('#map-window').draggable({
       containment: '#zoom-selected-screen-size',

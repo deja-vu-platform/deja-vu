@@ -1,15 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { Cliche } from '../../../../models/cliche/cliche';
-import { Widget, BaseWidget } from '../../../../models/widget/widget';
-import { ProjectService } from '../../../../services/project.service';
+import { LinkBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-link-widget',
   templateUrl: './link_widget.component.html',
 })
 export class LinkWidgetComponent implements OnInit {
-  @Input() widget: BaseWidget;
+  @Input() widget: LinkBaseWidget;
 
   tooltipHidden = false;
   // TODO defaults should be made in the widget itself

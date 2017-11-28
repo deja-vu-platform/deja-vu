@@ -1,10 +1,11 @@
 import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 
-import { BaseWidget, Widget, UserWidget } from '../../models/widget/widget';
+import { LabelBaseWidget, LinkBaseWidget, UserWidget } from '../../models/widget/widget';
 import { Cliche, UserCliche } from '../../models/cliche/cliche';
 import { Project } from '../../models/project/project';
 import { Dimensions } from '../../services/state.service';
 import { RouterService, PageType } from '../../services/router.service';
+import { StateService } from '../../services/state.service';
 import { ProjectService } from '../../services/project.service';
 
 import * as jQuery from 'jquery';
@@ -25,6 +26,7 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
 
   constructor (
     private projectService: ProjectService,
+    private stateService: StateService,
     private routerService: RouterService) {
   }
 
@@ -33,10 +35,18 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
       height: window.innerHeight,
       width: window.innerHeight
     };
+    const newSize = {
+      height: this.windowSize.height - 60,
+      width: this.windowSize.width - 250
+    };
+
     this.worksurfaceElt.nativeElement.style.height =
-      (this.windowSize.height - 60) + 'px';
+      newSize.height + 'px';
     this.worksurfaceElt.nativeElement.style.width =
-      (this.windowSize.width - 250) + 'px';
+      newSize.width + 'px';
+
+    // Causes a ExpressionChangedAfterItHasBeenCheckedError
+    // this.stateService.updateVisibleWindowDimensions(newSize);
   }
 
   ngAfterViewInit() {
@@ -63,11 +73,10 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
       appId);
 
     this.selectedWidget.updatePosition({ top: 100, left: 300 });
-    const innerWidget1 = new BaseWidget(
+    const innerWidget1 = new LabelBaseWidget(
       this.selectedProject,
       'test inner1',
-      { height: 100, width: 200 },
-      'label', 'hello I am test', appId);
+      { height: 100, width: 200 }, 'hello I am test', appId);
     this.selectedWidget.addInnerWidget(innerWidget1);
     innerWidget1.updatePosition({ top: 50, left: 100 });
 
@@ -79,9 +88,9 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     innerWidget2.addInnerWidget(innerWidget21);
     innerWidget21.updatePosition({ top: 50, left: 100 });
 
-    const innerWidget211 = new BaseWidget(
+    const innerWidget211 = new LinkBaseWidget(
       this.selectedProject, 'inner211',
-      { height: 200, width: 150 }, 'link',
+      { height: 200, width: 150 },
       {text: '100100', target: undefined}, appId);
 
     innerWidget21.addInnerWidget(innerWidget211);

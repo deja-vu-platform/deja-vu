@@ -229,8 +229,8 @@ export abstract class Widget {
  */
 export class BaseWidget extends Widget {
     protected widgetType = WidgetType.BASE_WIDGET;
-    private type: string;
-    private value: string;
+    protected value: any;
+    private type: BaseType;
 
     static fromObject(project: Project, object: any): BaseWidget {
         if (object.widgetType !== WidgetType.BASE_WIDGET) {
@@ -253,7 +253,7 @@ export class BaseWidget extends Widget {
         project: Project,
         name: string,
         dimensions: Dimensions,
-        type: string,
+        type: BaseType,
         value: any,
         clicheid: string,
         id: string = null,
@@ -265,17 +265,12 @@ export class BaseWidget extends Widget {
         this.value = value;
     }
 
-    // TODO update to make more robust
-    getBaseWidgetType() {
-      return this.type;
+    isLink(): this is LinkBaseWidget  {
+      return this.type === BaseType.LINK;
     }
 
-    setValue(value) {
-        this.value = value;
-    }
-
-    getValue() {
-        return JSON.parse(JSON.stringify(this.value));
+    isLabel(): this is LabelBaseWidget  {
+        return this.type === BaseType.LABEL;
     }
 
     makeCopy(fromTemplate = false): Widget[] {
@@ -303,6 +298,65 @@ export class BaseWidget extends Widget {
             this.templateCopies.add(copyWidget.getId());
         }
         return [copyWidget];
+    }
+}
+
+enum BaseType {
+    LINK, LABEL
+}
+
+interface LinkValue {
+    text: string;
+    target: string;
+}
+
+export class LinkBaseWidget extends BaseWidget {
+    protected value: LinkValue;
+
+    constructor(
+        project: Project,
+        name: string,
+        dimensions: Dimensions,
+        value: any,
+        clicheid: string,
+        id: string = null,
+        templateid: string = null,
+        isTemplate = false
+    ) {
+        super(project, name, dimensions, BaseType.LINK, value, clicheid, id, templateid, isTemplate);
+    }
+
+    setValue(value: LinkValue) {
+        this.value = value;
+    }
+
+    getValue(): LinkValue {
+        return Object.assign({}, this.value);
+    }
+}
+
+export class LabelBaseWidget extends BaseWidget {
+    protected value: string;
+
+    constructor(
+        project: Project,
+        name: string,
+        dimensions: Dimensions,
+        value: any,
+        clicheid: string,
+        id: string = null,
+        templateid: string = null,
+        isTemplate = false
+    ) {
+        super(project, name, dimensions, BaseType.LABEL, value, clicheid, id, templateid, isTemplate);
+    }
+
+    setValue(value: string) {
+        this.value = value;
+    }
+
+    getValue(): string {
+        return this.value;
     }
 }
 
