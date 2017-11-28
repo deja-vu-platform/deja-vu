@@ -563,7 +563,6 @@ export namespace GruntTask {
     const ts_client_opts = _u.extend({module: "system"}, ts_base_opts);
     const ts_server_opts = _u.extend({module: "commonjs"}, ts_base_opts);
 
-    const typings = "typings/index.d.ts";
     const components = "src/components/**/*.ts";
     const shared = "src/shared/**/*.ts";
     const server = "src/*.ts";
@@ -571,22 +570,22 @@ export namespace GruntTask {
     return {
       ts: {
         dev_client: {
-          src: [typings, shared, components, "src/dv-dev/!(app).ts"],
+          src: [shared, components, "src/dv-dev/!(app).ts"],
           outDir: ["dist/public"],
           options: ts_client_opts
         },
         dev_server: {
-          src: [typings, shared, server, "src/dv-dev/app.ts"],
+          src: [shared, server, "src/dv-dev/app.ts"],
           outDir: ["dist"],
           options: ts_server_opts
         },
         lib_client: {
-          src: [typings, shared, components],
+          src: [shared, components],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_client_opts)
         },
         lib_server: {
-          src: [typings, shared, server],
+          src: [shared, server],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_server_opts)
         }
