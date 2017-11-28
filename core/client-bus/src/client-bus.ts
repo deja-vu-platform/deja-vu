@@ -167,7 +167,11 @@ export class ClientBus {
       const finfo = adapt_table[target_fname];
       const fvalue = to_widget_info.this_widget[finfo.host_fname];
       const ftype = finfo.ftype.name;
-      if (fvalue.atom_id !== undefined) {
+      if (fvalue === undefined) {
+        console.log(
+          "The value of field " + finfo.host_fname + " is undefined, " +
+          "it won't be included in the query parameters");
+      } else if (fvalue.atom_id !== undefined) {
         query_params[target_fname] = [fvalue.atom_id, ftype];
       } else if (ftype === "Widget") {
         console.log("to be implemented");
