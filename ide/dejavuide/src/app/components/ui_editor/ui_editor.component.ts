@@ -30,10 +30,12 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     private routerService: RouterService) {
   }
 
-  private updateWorksurfaceDimensions() {
+  private handleWindowResize() {
+    const windowjq = $(window);
+
     this.windowSize = {
-      height: window.innerHeight,
-      width: window.innerHeight
+      height: windowjq.height(),
+      width: windowjq.width()
     };
     const newSize = {
       height: this.windowSize.height - 60,
@@ -45,12 +47,15 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     this.worksurfaceElt.nativeElement.style.width =
       newSize.width + 'px';
 
-    // Causes a ExpressionChangedAfterItHasBeenCheckedError
-    // this.stateService.updateVisibleWindowDimensions(newSize);
+    // Without setTimeout causes an
+    // ExpressionChangedAfterItHasBeenCheckedError
+    setTimeout(() => {
+      this.stateService.updateVisibleWindowDimensions(newSize);
+    }, 0);
   }
 
   ngAfterViewInit() {
-    this.updateWorksurfaceDimensions();
+    this.handleWindowResize();
   }
 
   ngOnInit() {

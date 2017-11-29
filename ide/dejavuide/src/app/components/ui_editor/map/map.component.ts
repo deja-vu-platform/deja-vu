@@ -45,8 +45,6 @@ export class MapComponent implements AfterViewInit, OnInit {
   minimized = false;
   mapWidgetSizes: Dimensions[] = [];
 
-  private viewInit = false;
-
   private zoom = 1;
   private el: HTMLElement;
 
@@ -83,6 +81,11 @@ export class MapComponent implements AfterViewInit, OnInit {
     projectService.widgetUpdateListener.subscribe(() => {
       this.updateView();
     });
+
+    this.stateService.visibleWindowDimensions.subscribe(
+      (newVisibleWindowDimensions) => {
+          this.visibleWindowDimensions = newVisibleWindowDimensions;
+      });
   }
 
   ngOnInit() {
@@ -90,18 +93,9 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.mapComponentDimensions.width = this.el.offsetWidth;
     this.updateMapScale();
     this.updateView();
-
   }
 
   ngAfterViewInit() {
-    this.viewInit = true;
-    this.stateService.visibleWindowDimensions.subscribe((newVisibleWindowDimensions) => {
-      console.log('hhhhhiiiiiii');
-      if (this.viewInit) {
-        this.visibleWindowDimensions = newVisibleWindowDimensions;
-      }
-    });
-
     // Initiate draggable
     $('#map-window').draggable({
       containment: '#zoom-selected-screen-size',
