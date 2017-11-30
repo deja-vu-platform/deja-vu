@@ -1,17 +1,3 @@
-dv-map {
-  position: fixed;
-  left: 300px;
-  bottom: 20px;
-  pointer-events: none;
-  z-index: 1000;
-  height: 120px;
-  width: 180px;
-}
-
-dv-zoom {
-  position: fixed;
-  bottom: 20px;
-  right: 15px;
-  height: 60px;
-  display: flex;
+.main {
+  min-width: 800px;
 }

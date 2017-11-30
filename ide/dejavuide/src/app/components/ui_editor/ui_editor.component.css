@@ -1,0 +1,54 @@
+dv-map {
+  position: fixed;
+  left: 300px;
+  bottom: 20px;
+  pointer-events: none;
+  z-index: 1000;
+  height: 120px;
+  width: 180px;
+}
+
+dv-zoom {
+  position: fixed;
+  bottom: 20px;
+  right: 15px;
+  height: 60px;
+  display: flex;
+}
+
+.edit {
+  width: 100%;
+  display: flex;
+} 
+
+.project-options-container{
+  background: paleturquoise;
+}
+
+dv-worksurface {
+  flex-grow: 4;
+  min-width: 250px;
+  overflow: scroll;
+}
+
+.style {
+  display: none;
+}
+
+.header {
+  border-top: solid 5px #D5D5D5;
+  text-align: center;
+  line-height: 250%;
+  background-color: #EBEBEB;
+}
+
+.project-name .header{
+  border: none;
+  background-color: white;
+  font-weight: bold;
+}
+
+.project-options {
+  width: 250px;
+  height: 75px;
+}

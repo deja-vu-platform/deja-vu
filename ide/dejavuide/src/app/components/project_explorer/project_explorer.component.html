@@ -1,0 +1,75 @@
+<div>
+  <button type="button" 
+          class="btn btn-default"
+          (click)="handleNewProject()">
+      <span class="glyphicon glyphicon-plus"></span> New project
+  </button>
+</div>
+
+<div class="projects">
+<div class="header">
+  <ul class="nav nav-tabs">
+    <li [ngClass]="{'active': recentSelected}"
+        id="recent-selector"
+        (click)="loadProjectList()">
+      <a>Recent Projects</a>
+    </li>
+    <li id="all-selector"
+        [ngClass]="{'active': !recentSelected}"
+        (click)="loadProjectList(false)">
+      <a>All Projects</a>
+    </li>
+  </ul>
+</div>
+<div class="content">
+  <ul [hidden]="projectsToShow.length === 0"
+      id="projects-list">
+    <li *ngFor="let project of projectsToShow"
+        [ngClass]="{'highlighted': project.isSelectedProject}">
+      <div class="project-filename">
+        <div class="project-name">{{project.name}}</div>
+        <div class="last-access-time">
+          Last Accessed: {{project.readableDate}}
+            at {{project.readableTime}}
+        </div>
+      </div>
+      <button type="button" 
+              class="btn btn-default btn-load-project"
+              (click)="loadClicked(project.name)">
+        <span>Load Project</span>
+      </button>
+      <button type="button" 
+              class="btn btn-default btn-delete-project"
+              (click)="handleDelete(project.name)">
+        <span class="glyphicon glyphicon-trash"></span>
+      </button>
+    </li>
+  </ul>
+</div>
+</div>
+
+<div class="current-and-preview-container">
+<div *ngIf="currentProject"
+      class="current-project">
+  <div class="header">Current project</div>
+  <div class="content"
+        (click)="currentProjectClicked()">
+    {{currentProject.getName()}}
+  </div>
+</div>
+
+<div class="project-preview">
+  <div id="project-name-preview" class="header">
+    Project Preview
+  </div>
+  <div id="preview-prev-page">
+    <span class="glyphicon glyphicon-chevron-left" id="preview-prev-page-icon"></span>
+  </div>
+  <div id="page-preview"></div>
+  <div id="preview-next-page">
+    <span class="glyphicon glyphicon-chevron-right" id="preview-next-page-icon"></span>
+  </div>
+</div>
+</div>
+
+<dv-loader [show]="loaderVisible"></dv-loader>
