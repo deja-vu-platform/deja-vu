@@ -27,6 +27,13 @@ fdescribe('UserWidget', () => {
 
     widget5 = new LinkBaseWidget(project, 'widget5', {width: 1, height: 1}, '/', userAppId, null, null, true);
     widget6 = new UserWidget(project, 'widget6', {width: 1, height: 1}, userAppId, null, null, true);
+
+    project.addAppWidget(widget1);
+    project.addAppWidget(widget2);
+    project.addAppWidget(widget3);
+    project.addAppWidget(widget4);
+    project.addAppWidget(widget5);
+    project.addAppWidget(widget6);
   });
 
   describe('remove', () => {

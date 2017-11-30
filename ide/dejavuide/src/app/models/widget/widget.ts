@@ -90,9 +90,6 @@ export abstract class Widget {
         };
         this.properties.dimensions = dimensions;
         this._isTemplate = isTemplate;
-
-        // Order matters! Add this after the meta information is set.
-        this.project.addAppWidget(this);
     }
 
     isUserType(): this is UserWidget {
@@ -237,7 +234,7 @@ export class BaseWidget extends Widget {
             return null;
         }
         const clicheId = Widget.decodeid(object.meta.id)[0];
-        return new BaseWidget(
+        const bw = new BaseWidget(
             project,
             object.meta.name,
             object.properties.dimensions,
@@ -247,6 +244,11 @@ export class BaseWidget extends Widget {
             object.meta.id,
             object.meta.templateid,
             object.isTemplate);
+
+        // Properties
+        bw.updatePosition(object.position);
+ 
+        return bw;
     }
 
     constructor(
@@ -387,11 +389,11 @@ export class UserWidget extends Widget {
             object.meta.templateId,
             object.isTemplate);
         object.innerWidgetIds.forEach((id: string) => {
-            // TODO this will not (and does not) work
-            // Since the project might not have loaded that
-            // widget yet.
-            widget.addInnerWidget(project.getAppWidget(id));
+            widget.innerWidgetIds.push(id);
         });
+
+        // Properties
+        widget.updatePosition(object.position);
 
         return widget;
     }
@@ -493,6 +495,9 @@ export class UserWidget extends Widget {
      * ignored
      */
     makeCopy(fromTemplate = false): Widget[] {
+        // TODO find a way to merge this and the fromObject code since
+        // they are very similar
+
         let templateId = this.getTemplateId();
         let isTemplate = this._isTemplate;
         const isTemplateCopy = fromTemplate && this._isTemplate;
