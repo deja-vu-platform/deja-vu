@@ -56,7 +56,7 @@ export class HeaderComponent implements OnInit {
   isSavable: boolean;
   readonly dejavu = 'Déjà Vu';
   otherPages: PageInfo[];
-  pageType = PageType.UI_EDITOR;
+  pageType = PageType.PROJECT_EXPLORER;
   pageTitle: string;
 
   constructor (

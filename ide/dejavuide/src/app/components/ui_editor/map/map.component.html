@@ -30,10 +30,10 @@
         "selectedWidget.getDimensions().width * this.mapScale">
       <div *ngFor="let size of mapWidgetSizes"
             class="map-inner-component-size"
-            [style.height.px]= "size.height * this.mapScale"
-            [style.width.px]= "size.width * this.mapScale"
-            [style.top.px]= "size.top * this.mapScale"
-            [style.left.px]= "size.left * this.mapScale"></div>
+            [style.height.px]= "size.height"
+            [style.width.px]= "size.width"
+            [style.top.px]= "size.top"
+            [style.left.px]= "size.left"></div>
     </div>
     <!-- Map window is the little thing you drag to move your map -->
     <div id="map-window"

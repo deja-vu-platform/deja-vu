@@ -1,8 +1,7 @@
 import { Component, Input, OnInit, AfterViewInit, ElementRef } from '@angular/core';
 
-import {allElementsFromPoint} from '../../../utility/utility';
-import { Widget, UserWidget, WidgetMap } from '../../../models/widget/widget';
-
+import { Cliche } from '../../../models/cliche/cliche';
+import { Widget, UserWidget } from '../../../models/widget/widget';
 import { ProjectService } from '../../../services/project.service';
 
 // Widgets are drag-and-droppable
@@ -42,7 +41,7 @@ export class WidgetComponent implements AfterViewInit, OnInit {
     // get inner widgets
     if (this.widget.isUserType()) {
       for (const innerWidgetId of this.widget.getInnerWidgetIds()) {
-        this.innerWidgets.push(Widget.getWidget(this.widget.getWidgetMap(), innerWidgetId));
+        this.innerWidgets.push(this.widget.getInnerWidget(innerWidgetId));
       }
     }
   }
@@ -72,16 +71,12 @@ export class WidgetComponent implements AfterViewInit, OnInit {
 
   private makeWidgetResizable() {
   // TODO Resizable code
-
   //   const widgetId = _widget.getId();
-
   //   const dragHandle_se = $('<span></span>');
   //   dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
   //   dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
   //   dragHandle_se.attr('id', 'drag-handle-se' + '_' + widgetId);
-
   //   workSurface.append(dragHandle_se);
-
 
   //   $(workSurface).resizable({
   //     handles: {
@@ -93,7 +88,6 @@ export class WidgetComponent implements AfterViewInit, OnInit {
   //       // TODO need to DRY this up and/or combine with the widget container methods
   //       const newDimensions = { height: ui.size.height / currentZoom, width: ui.size.width / currentZoom };
   //       widgetEditsManager.updateCustomProperties(userWidget, userWidget.meta.id, 'dimensions', newDimensions);
-
   //     },
   //     stop: function (e, ui) {
   //       // not super important to update as you resize so just do it at the end
@@ -110,8 +104,4 @@ export class WidgetComponent implements AfterViewInit, OnInit {
   onDropFinished() {
     // TODO
   }
-
-
-
-
 }

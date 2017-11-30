@@ -39,7 +39,7 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     };
     const newSize = {
       height: this.windowSize.height - 60,
-      width: this.windowSize.width - 250
+      width: this.windowSize.width
     };
 
     this.worksurfaceElt.nativeElement.style.height =
@@ -59,13 +59,12 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.selectedProject = new Project('New Test Proj');
-    this.projectService.updateProject(this.selectedProject);
-    // this.projectService.getProject();
+    this.selectedProject = this.projectService.getProject();
     if (!this.selectedProject) {
       this.routerService.navigateTo(PageType.PROJECT_EXPLORER);
       return;
     }
+    this.projectService.updateProject(this.selectedProject);
     this.userApp = this.selectedProject.getUserApp();
     const appId = this.userApp.getId();
 

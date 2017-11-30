@@ -1,5 +1,8 @@
 <ng-container *ngIf="selectedProject">
-  <dv-worksurface></dv-worksurface>
+  <div (window:resize)="handleWindowResize()"></div>
+  <div class="edit">
+    <dv-worksurface #worksurface></dv-worksurface>
+  </div>
   <dv-zoom></dv-zoom>
   <dv-map></dv-map>
 </ng-container>
