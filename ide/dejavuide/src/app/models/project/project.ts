@@ -28,6 +28,7 @@ export class Project {
       throw Error(notCorrectObject);
     }
     const project = new Project(object.meta.name, true);
+    project.meta.id = object.meta.id;
     project.userApp = UserCliche.fromObject(project, object.userApp);
 
     for (const clicheId of Object.keys(object.importedCliches)) {
@@ -102,7 +103,6 @@ export class Project {
     }
     return widget;
   }
-
 
   /**
      * Just deletes from the user application and the template reference if

@@ -77,7 +77,7 @@ export abstract class Widget {
         clicheid: string,
         id: string = null,
         templateid: string = null,
-        isTemplate = false
+        isTemplate = false,
         ) {
         this.project = project;
         this.meta = {
@@ -258,7 +258,7 @@ export class BaseWidget extends Widget {
         clicheid: string,
         id: string = null,
         templateid: string = null,
-        isTemplate = false
+        isTemplate = false,
     ) {
         super(project, name, dimensions, clicheid, id, templateid, isTemplate);
         this.type = type;
@@ -386,8 +386,11 @@ export class UserWidget extends Widget {
             object.meta.id,
             object.meta.templateId,
             object.isTemplate);
-        object.innerWidgetIds.forEach((id) => {
-            widget.addInnerWidget(id);
+        object.innerWidgetIds.forEach((id: string) => {
+            // TODO this will not (and does not) work
+            // Since the project might not have loaded that
+            // widget yet.
+            widget.addInnerWidget(project.getAppWidget(id));
         });
 
         return widget;
@@ -400,7 +403,7 @@ export class UserWidget extends Widget {
         clicheid: string,
         id: string = null,
         templateid: string = null,
-        isTemplate = false
+        isTemplate = false,
     ) {
         super(project, name, dimensions, clicheid, id, templateid, isTemplate);
     }

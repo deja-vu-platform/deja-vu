@@ -120,6 +120,10 @@ function readFiles(dirname, onFinish) {
                 onFinish(err1);
                 return;
             }
+            if (filenames.length === 0) {
+                onFinish(null, files);
+            }
+
             var numFilesProcessed = 0;
             filenames.forEach(function (filename) {
                 fs.readFile(
