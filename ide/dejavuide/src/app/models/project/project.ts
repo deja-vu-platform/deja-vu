@@ -23,6 +23,9 @@ export class Project {
   lastAccessed = -Infinity;
 
   static fromObject (object: any): Project {
+    // TODO (https://github.com/spderosso/dejavu/issues/117)
+    // loading is broken due to circular dependencies
+
     const notCorrectObject = 'Object is not an instance of a Project';
     if (object.objectType !== 'Project') {
       throw Error(notCorrectObject);
