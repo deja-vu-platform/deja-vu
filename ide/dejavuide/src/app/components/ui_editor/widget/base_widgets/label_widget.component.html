@@ -2,7 +2,7 @@
   <p contenteditable="true" class="display-component">{{widget.getValue()}}</p>
 </div>
 
-<div [hidden]='tooltipHidden'
+<div [hidden]='true'
      class="tooltip">
   <div class="panel panel-default">
       <div class="panel-heading">
@@ -22,7 +22,8 @@
   </div>
 </div>
 
-<div class="config-btns">
+<div [hidden]="true" 
+    class="config-btns">
     <div><!-- class="btn-group-vertical btn-group-xs">-->
         <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-indent-left"></span> Align

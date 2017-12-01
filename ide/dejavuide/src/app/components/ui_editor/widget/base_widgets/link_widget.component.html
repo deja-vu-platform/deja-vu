@@ -2,7 +2,7 @@
   {{widget.getValue().text}}
 </a>
 
-<div [hidden]='tooltipHidden' class="tooltip">
+<div [hidden]='true' class="tooltip">
   <div class="panel panel-default">
     <div class="panel-heading">
       <strong>Link</strong>
@@ -34,7 +34,8 @@
   </div>
 </div>
 
-<div class="config-btns">
+<div [hidden]="true"
+    class="config-btns">
   <div>
     <!-- class="btn-group-vertical btn-group-xs">-->
     <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

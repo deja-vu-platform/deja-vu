@@ -76,10 +76,13 @@ export class WidgetComponent implements AfterViewInit, OnInit {
       // handles: {
       //   'se': dragHandle_se,
       // },
+      handles: 'n, e, s, w, ne, nw, se, sw',
       // minHeight: 0,
       // minWidth: 0,
       resize: (e, ui) => {
         const newDimensions = { height: ui.size.height, width: ui.size.width};
+        const newPosition = {top: ui.position.top, left: ui.position.left};
+        this.widget.updatePosition(newPosition);
         this.widget.updateDimensions(newDimensions);
       },
       stop: (e, ui) => {
