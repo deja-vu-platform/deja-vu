@@ -81,8 +81,7 @@ app LiveScorecard {
     // added members to see if it would help
     data Competition { 
         name: text,
-        code: text,
-        members: [Host] 
+        code: text 
     }
 
     // added this to see if it would help
