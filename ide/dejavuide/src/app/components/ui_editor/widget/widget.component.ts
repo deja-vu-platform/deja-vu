@@ -70,31 +70,23 @@ export class WidgetComponent implements AfterViewInit, OnInit {
   }
 
   private makeWidgetResizable() {
-  // TODO Resizable code
-  //   const widgetId = _widget.getId();
-  //   const dragHandle_se = $('<span></span>');
-  //   dragHandle_se.html('<img src="images/drag_handle_se_icon.png" width="15px" height="15px">');
-  //   dragHandle_se.addClass('ui-resizable-handle ui-resizable-se drag-handle');
-  //   dragHandle_se.attr('id', 'drag-handle-se' + '_' + widgetId);
-  //   workSurface.append(dragHandle_se);
+    const dragHandle_se = $('.drag-handle');
 
-  //   $(workSurface).resizable({
-  //     handles: {
-  //       'se': dragHandle_se,
-  //     },
-  //     minHeight: 0,
-  //     minWidth: 0,
-  //     resize: function (e, ui) {
-  //       // TODO need to DRY this up and/or combine with the widget container methods
-  //       const newDimensions = { height: ui.size.height / currentZoom, width: ui.size.width / currentZoom };
-  //       widgetEditsManager.updateCustomProperties(userWidget, userWidget.meta.id, 'dimensions', newDimensions);
-  //     },
-  //     stop: function (e, ui) {
-  //       // not super important to update as you resize so just do it at the end
-  //       miniNav.updateMiniNavInnerWidgetSizes(userWidget, currentZoom);
-  //       grid.setUpGrid();
-  //     }
-  //   });
+    $(this.el).resizable({
+      // handles: {
+      //   'se': dragHandle_se,
+      // },
+      // minHeight: 0,
+      // minWidth: 0,
+      resize: (e, ui) => {
+        const newDimensions = { height: ui.size.height, width: ui.size.width};
+        this.widget.updateDimensions(newDimensions);
+      },
+      stop: (e, ui) => {
+        // not super important to update as you resize so just do it at the end
+        this.projectService.widgetUpdated();
+      }
+    });
   }
 
   /**
