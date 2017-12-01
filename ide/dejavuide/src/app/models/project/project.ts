@@ -27,7 +27,7 @@ export class Project {
     if (object.objectType !== 'Project') {
       throw Error(notCorrectObject);
     }
-    const project = new Project(object.meta.name, true);
+    const project = new Project(object.meta.name, object.meta.id, true);
     project.userApp = UserCliche.fromObject(project, object.userApp);
 
     for (const clicheId of Object.keys(object.importedCliches)) {
@@ -36,10 +36,10 @@ export class Project {
     return project;
   }
 
-  constructor (name, fromObject = false) {
+  constructor (name, id?: string, fromObject = false) {
     this.meta = {
       name: name,
-      id: generateId(),
+      id: id || generateId(),
       version: '',
       author: ''
     };
@@ -102,7 +102,6 @@ export class Project {
     }
     return widget;
   }
-
 
   /**
      * Just deletes from the user application and the template reference if

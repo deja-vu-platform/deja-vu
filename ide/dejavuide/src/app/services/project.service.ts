@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 import { Project } from '../models/project/project';
-// import { ClicheMap } from '../models/cliche/cliche';
 import { Widget } from '../models/widget/widget';
 
 @Injectable()
@@ -12,7 +11,6 @@ export class ProjectService {
   // TODO perhaps project and widget update listeners can be merged
   projectUpdateListener = new ReplaySubject<boolean>(1);
 
-  // allCliches = new ReplaySubject<ClicheMap>(1);
   selectedWidget = new ReplaySubject<Widget>(1);
   widgetUpdateListener = new ReplaySubject<boolean>(1);
 
@@ -27,10 +25,6 @@ export class ProjectService {
   public deleteProject() {
     this.selectedProject = undefined;
   }
-
-  // updateClicheMap(updatedClicheMap: ClicheMap) {
-  //   this.allCliches.next(updatedClicheMap);
-  // }
 
   updateSelectedWidget(newSelectedWidget: Widget) {
     this.selectedWidget.next(newSelectedWidget);

@@ -15,5 +15,4 @@ export class ProjectDeleteDialogComponent {
   onDone(result: boolean): void {
     this.dialogRef.close(result);
   }
-
 }

@@ -26,5 +26,4 @@ export class NewProjectDialogComponent {
   onInput(newName: string) {
     this.result.name = newName;
   }
-
 }

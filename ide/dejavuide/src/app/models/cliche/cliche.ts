@@ -59,29 +59,29 @@ export class UserCliche extends Cliche {
     if (object.clicheType !== ClicheType.USER_CLICHE) {
       return null;
     }
-    const uc = new UserCliche(project, object.meta.name);
-    const toAdds: Function[] = [
-      uc.addPage,
-      uc.addUsedWidget,
-      uc.addUnusedWidget,
-      uc.addTemplate];
+    const uc = new UserCliche(project, object.meta.name, object.meta.id);
+    const toAdds: string[] = [
+      'addPage',
+      'addUsedWidget',
+      'addUnusedWidget',
+      'addTemplate'];
 
     orderedGroups.forEach((group, i) => {
       if (object.widgets[group]) {
         for (const widgetId of Object.keys(object.widgets[group])){
-          toAdds[i](Widget.fromObject(project, object.widgets[group][widgetId]));
+          uc[toAdds[i]](Widget.fromObject(project, object.widgets[group][widgetId]));
         }
       }
     });
     return uc;
   }
 
-  constructor (project: Project, name) {
+  constructor (project: Project, name, id?: string) {
     super(project);
     this.clicheType = ClicheType.USER_CLICHE;
     this.meta = {
       name: name,
-      id: generateId(),
+      id: id || generateId(),
       version: '',
       author: ''
     };
@@ -95,6 +95,10 @@ export class UserCliche extends Cliche {
 
   isPage (widgetId: string): boolean {
     return widgetId in this.widgets.get(WidgetGroup.PAGE);
+  }
+
+  numPages(): number {
+    return this.widgets.get(WidgetGroup.PAGE).size;
   }
 
   addPage (widget: Widget) {

@@ -1,5 +1,4 @@
 import { Component, AfterViewInit, OnInit, ElementRef} from '@angular/core';
-import { Observable } from 'rxjs/Observable';
 
 import { Widget, UserWidget } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';

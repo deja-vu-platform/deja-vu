@@ -1,4 +1,4 @@
-import { Widget, BaseWidget, UserWidget } from './widget';
+import { Widget, LinkBaseWidget, UserWidget } from './widget';
 import { Cliche, UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
 
@@ -7,11 +7,11 @@ fdescribe('UserWidget', () => {
   let userApp: UserCliche;
   let userAppId: string;
 
-  let widget1: BaseWidget;
+  let widget1: LinkBaseWidget;
   let widget2: UserWidget;
   let widget3: UserWidget;
   let widget4: UserWidget;
-  let widget5: BaseWidget;
+  let widget5: LinkBaseWidget;
   let widget6: UserWidget;
 
   beforeEach(() => {
@@ -19,14 +19,21 @@ fdescribe('UserWidget', () => {
     userApp = project.userApp;
     userAppId = userApp.getId();
 
-    widget1 = new BaseWidget(project, 'widget1', {width: 1, height: 1}, 'img', '/', userAppId);
+    widget1 = new LinkBaseWidget(project, 'widget1', {width: 1, height: 1}, '/', userAppId);
     widget2 = new UserWidget(project, 'widget2', {width: 1, height: 1}, userAppId);
     widget3 = new UserWidget(project, 'widget3', {width: 1, height: 1}, userAppId);
 
     widget4 = new UserWidget(project, 'widget4', {width: 1, height: 1}, userAppId);
 
-    widget5 = new BaseWidget(project, 'widget5', {width: 1, height: 1}, 'img', '/', userAppId, null, null, true);
+    widget5 = new LinkBaseWidget(project, 'widget5', {width: 1, height: 1}, '/', userAppId, null, null, true);
     widget6 = new UserWidget(project, 'widget6', {width: 1, height: 1}, userAppId, null, null, true);
+
+    project.addAppWidget(widget1);
+    project.addAppWidget(widget2);
+    project.addAppWidget(widget3);
+    project.addAppWidget(widget4);
+    project.addAppWidget(widget5);
+    project.addAppWidget(widget6);
   });
 
   describe('remove', () => {

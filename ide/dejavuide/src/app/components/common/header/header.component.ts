@@ -1,4 +1,7 @@
 declare const electron: any;
+/**
+ * Needs to be commented out when running tests
+ */
 // const electron = {
 //   ipcRenderer: {
 //     on: null,

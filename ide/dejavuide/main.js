@@ -9,11 +9,14 @@ var ipcMain = electron.ipcMain;
 
 // Angular and electron help from https://scotch.io/tutorials/build-a-music-player-with-angular-2-electron-i-setup-basics-concepts
 require('dotenv').config();
+<<<<<<< HEAD
 
 // require('electron-reload')(__dirname, {
 //     electron: path.join(__dirname, 'node_modules', '.bin', 'electron')
 // });
 
+=======
+>>>>>>> ui-project-support
 
 // from http://electron.atom.io/docs/tutorial/quick-start/
 
@@ -125,6 +128,10 @@ function readFiles(dirname, onFinish) {
                 onFinish(err1);
                 return;
             }
+            if (filenames.length === 0) {
+                onFinish(null, files);
+            }
+
             var numFilesProcessed = 0;
             filenames.forEach(function (filename) {
                 fs.readFile(
