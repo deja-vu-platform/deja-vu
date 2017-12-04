@@ -2,7 +2,9 @@
 
 cliche Authorization {
     /** Entities **/
-    data Principal { }
+    data Principal {
+        dummy: text
+     }
 
     data Resource {
         owner: Principal,

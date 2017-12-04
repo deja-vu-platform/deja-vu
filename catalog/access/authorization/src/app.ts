@@ -5,6 +5,8 @@ import { Helpers } from "helpers";
 import { ServerBus } from "server-bus";
 import { Grafo } from "grafo";
 
+import { Resource } from "./_shared/data";
+
 const mean = new Mean();
 
 const handlers = {
@@ -30,13 +32,26 @@ const grafo = new Grafo(mean.db);
 const schema = grafo
     .add_type({
         name: "Principal",
-        fields: { }
+        fields: {
+            dummy: { "type": graphql.GraphQLString }
+        }
     })
     .add_type({
         name: "Resource",
         fields: {
-            owner: { "type": "Principal" },
-            viewers: { "type": "[Principal]" }
+            owner: { type: "Principal" },
+            viewers: {
+                type: "[Principal]",
+                resolve: (resource: Resource, { }) => {
+                    let ids = [];
+                    if (resource.viewers) {
+                        ids = resource.viewers.map(viewer => viewer.atom_id);
+                    }
+                    return mean.db.collection("viewers")
+                        .find({ atom_id: { $in: ids } })
+                        .toArray();
+                }
+            }
         }
     })
     .schema();
