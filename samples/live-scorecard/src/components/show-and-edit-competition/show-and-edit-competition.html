@@ -9,23 +9,17 @@
                 <!-- TODO: Show code -->
                 <div class="col-xs-1">
                     <!-- TODO: Should only show when edit clicked -->
-                    <a [dvLink]="linkToHosts">Hosts</a>
+                    <dv-widget name="LinkToHosts"></dv-widget>
                 </div>
                 <div class="col-xs-1">
                     <!-- TODO: Should only show when edit clicked -->
                     <a routerLink="/rules">Rules</a>
                 </div>
                 <div class="col-xs-1">
-                    <a routerLink="/participants">
-                        <!-- TODO: Show number of climbers -->
-                        <img src="./components/show-and-edit-competition/sent.png" class="competition-entry">
-                    </a>
+                    <dv-widget name="LinkToClimbers"></dv-widget>
                 </div>
                 <div class="col-xs-1">
-                    <a routerLink="/climbs">
-                        <!-- TODO: Show number of climbs -->
-                        <img src="./components/show-and-edit-competition/mountainsgray.png" class="competition-entry">
-                    </a>
+                    <dv-widget name="LinkToClimbs"></dv-widget>
                 </div>
                 <div class="col-xs-1">
                     <!-- TODO: Add leaderboard functionality -->

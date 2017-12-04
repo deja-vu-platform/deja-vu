@@ -7,8 +7,9 @@
                 despite it being different. However, it still works, i.e. the
                 competition is created and a spectator can log in. -->
     <dv-widget name="CreateCustomPasskeyContent" of="SpectatorAuthentication"></dv-widget>
-    <!-- FIXME: Decouple competition as group -->
-    <dv-widget name="NewGroupWithoutButton" of="CompetitionClimbers"></dv-widget>
-    <!-- FIXME: This is not working... -->
-    <dv-widget name="NewGroupWithInitialMemberButton" of="CompetitionHosts"></dv-widget>
+   <dv-widget name="NewGroupWithInitialMemberButton" of="CompetitionHosts"></dv-widget>
 </form>
+
+<!-- HACK: remove once fields with default values are always included -->
+<dv-widget name="SignInWithRedirect" of="HostAuthentication" style="display:none">
+</dv-widget>
