@@ -1,4 +1,3 @@
-import {ElementRef} from "@angular/core";
 import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {ProfileAtom} from "../shared/data";
 import {GraphQlService} from "gql";
@@ -9,21 +8,15 @@ import "rxjs/add/operator/map";
   ng2_providers: [ GraphQlService ]
 })
 export class EditProfileFirstNameComponent {
-  firstName: Element;
   @Field("Profile") profile: ProfileAtom;
   @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   edit_first_name_error = false;
 
-  constructor(
-      private _graphQlService: GraphQlService,
-      private _elementRef: ElementRef) {}
+  constructor(private _graphQlService: GraphQlService) {}
 
   dvAfterInit() {
-    this.firstName = document.getElementById("first-name");
-
     if (this.profile.atom_id) {
-      console.log("fetching");
       this.fetch();
     }
 
@@ -33,13 +26,13 @@ export class EditProfileFirstNameComponent {
       if (
         this.submit_ok.value &&
         this.profile.atom_id &&
-        this.firstName
+        this.profile.first_name
       ) {
         this._graphQlService
           .post(`
             updateProfile(
               username: "${this.profile.atom_id}",
-              first_name: "${this.firstName}")
+              first_name: "${this.profile.first_name}")
           `)
           .subscribe(success => {
             this.edit_first_name_error = !success;

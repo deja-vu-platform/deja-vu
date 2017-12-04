@@ -90,7 +90,7 @@ const schema = grafo
           .updateOne({atom_id: profile.atom_id}, updateOperation)
           .then(write_res => {
               if (write_res.modifiedCount !== 1) {
-                throw new Error("Couldn't save updated profile");
+                throw new Error("Couldn't save updated profile or there were no changes to be saved");
               }
               bus.update_atom("Profile", profile.atom_id, updateOperation);
               return true;
@@ -123,5 +123,9 @@ namespace Validation {
 Helpers.serve_schema(mean.ws, schema);
 
 grafo.init().then(_ => {
+  mean.db.collection("profiles").insertMany([
+      {atom_id: "ben", username: "ben", first_name: "ben", last_name: "bit"},
+      {atom_id: "aph", username: "aph", first_name: "alyssa", last_name: "hacker"}],
+      (err, res) => { if (err) throw err; });
   mean.start();
 });
