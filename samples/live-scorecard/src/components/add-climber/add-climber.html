@@ -1,0 +1,33 @@
+<div class="row add-climber-form">
+    <div class="col-lg-10">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <form class="add-climber">
+                    <!-- if this doesn't work, replace with createcustompasskey to move on -->
+                    <!-- <dv-widget name="CreateRandomPasskey" of="ClimberAuthentication"></dv-widget> -->
+
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-3">
+                        <dv-widget name="EditNameOfMember" of="CompetitionClimbers"></dv-widget>
+                    </div>
+                    <div class="col-xs-2">coming soon</div>
+                    <div class="col-xs-1 right">
+                        <!-- Temporary until things actually work -->
+                        <!-- Problem with atom_id with group but climber is created -->
+                        <dv-widget name="CreateCustomPasskeyContent" of="ClimberAuthentication"></dv-widget>
+                    </div>
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-2">coming soon</div>
+                    <div class="col-xs-2">
+                        <dv-widget name="AddNewMemberToGroupButton" of="CompetitionClimbers"></dv-widget>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-2"></div>
+</div>
+
+<!-- HACK: remove once fields with default values are always included -->
+<dv-widget name="SignInWithRedirect" of="HostAuthentication" style="display:none">
+</dv-widget>
