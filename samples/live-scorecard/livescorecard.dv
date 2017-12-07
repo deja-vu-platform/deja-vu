@@ -45,9 +45,7 @@ app LiveScorecard {
     include organization/Task [
         Climb for Task,
         Host for Assigner,
-        Climber for Assignee,
-        ShowAndEditClimb replacing ShowTask in ShowUncompletedTasks,
-        ShowAndEditClimb replacing ShowTask in ShowApprovedTasks
+        Climber for Assignee
     ]
 
     // For every competition, there is a set of climbers.
@@ -201,18 +199,20 @@ app LiveScorecard {
     // A host can add a climber to the competition.
     widget AddClimber {
         new_climber: Climber,        
-        competition: Competition
+        competition: Competition,
+        host: Host
     }
 
     // A host can add, view and edit climbs to or of a competition.
-    widget ShowAndEditClimb {
-        new_climb: Climb, 
+    widget ShowAndEditClimbs {
         host: Host,
-        climber: Climber
+        competition: Competition,
+        new_climbs: [Climb]
     }
 
     // A host can add a climb to a competition.
     widget AddClimb {
+        new_climbs: [Climb],
         host: Host,
         competition: Competition
     }
@@ -231,7 +231,7 @@ app LiveScorecard {
     widget LinkToClimbs {
         host: Host,
         competition: Competition,
-        on_redirect: Widget = ShowAndEditClimbers
+        on_redirect: Widget = ShowAndEditClimbs
     }
 
     // Fun fact: cannot have more than one widget ref in another widget
@@ -247,7 +247,7 @@ app LiveScorecard {
     host_home: route = {path: "host", widget: HostHome}
     show_hosts: route = {path: "competition-hosts", widget: ShowAndEditHosts}
     show_participants: route = {path: "participants", widget: ShowAndEditClimbers}
-    add_climb: route = {path: "climbs", widget: AddClimb}
+    show_climbs: route = {path: "climbs", widget: ShowAndEditClimbs}
     climber_login: route = {path: "climber-login", widget: ClimberLogin}
     climber_home: route = {path: "climber", widget: ClimberHome}
     buddy_home: route = {path: "buddy", widget: BuddyHome}
