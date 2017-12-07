@@ -8,16 +8,19 @@ cliche PasskeyAuthentication {
     }
 
     /** Widgets**/
+    // A text box to enter the passkey to be validated.
     widget ValidatePasskeyContent {
         passkey: Passkey,
         submit_ok: boolean
     }
 
+    // A button to validate the passkey(s).
     widget ValidatePasskeyButton {
         submit_ok: boolean,
         on_validate_ok: Widget
     }
 
+    // A text box to enter the code for the passkey a principal wants to create.
     widget CreateCustomPasskeyContent {
         passkey: Passkey,
         submit_ok: boolean
