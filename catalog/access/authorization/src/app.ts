@@ -33,7 +33,7 @@ const schema = grafo
     .add_type({
         name: "Principal",
         fields: {
-            dummy: { "type": graphql.GraphQLString }
+            _: { "type": graphql.GraphQLString }
         }
     })
     .add_type({
