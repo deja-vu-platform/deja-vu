@@ -34,6 +34,7 @@ Team Reach
 - Sort climbers in alphabetical order
 - Define points and category to a climb (persistent fields)
 - Edit a climb
+- Show the number of climbs and climbers
 
 **Climber**
 - Record number of falls per climb

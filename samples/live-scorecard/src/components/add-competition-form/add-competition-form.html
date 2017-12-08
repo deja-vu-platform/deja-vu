@@ -1,13 +1,8 @@
-<!-- TODO: Add styling -->
 <form class="add-competition-form">
     <dv-widget name="EditNameOfGroup" of="CompetitionHosts"></dv-widget>
     <dv-widget name="NewEventContent" of="Event"></dv-widget>
-    <!-- FIXME: If a competition has already been created and the host wants to 
-                create a new one, the form complains that the passkey is already taken
-                despite it being different. However, it still works, i.e. the
-                competition is created and a spectator can log in. -->
     <dv-widget name="CreateCustomPasskeyContent" of="SpectatorAuthentication"></dv-widget>
-   <dv-widget name="NewGroupWithInitialMemberButton" of="CompetitionHosts"></dv-widget>
+    <dv-widget name="NewGroupWithInitialMemberButton" of="CompetitionHosts"></dv-widget>
 </form>
 
 <!-- HACK: remove once fields with default values are always included -->
