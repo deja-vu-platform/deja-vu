@@ -51,9 +51,6 @@ export class AddMemberToGroupComponent {
   onSubmit() {
     if (this.group.atom_id) {
       const name = this.typeahead.getValue();
-      console.log("this is the name " + name);
-      console.log("these are the nonmembers " +
-                  JSON.stringify(this.nonMembers));
       const member = this.nonMembers.find((m => m.name === name));
       if (member === undefined) {
         this.failed = true;
