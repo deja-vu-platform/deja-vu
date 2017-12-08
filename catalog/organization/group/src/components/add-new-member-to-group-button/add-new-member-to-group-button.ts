@@ -1,4 +1,4 @@
-import { Widget, Field, PrimitiveAtom} from "client-bus";
+import { Widget, Field, PrimitiveAtom } from "client-bus";
 import { GraphQlService } from "gql";
 
 import { MemberAtom, GroupAtom } from "../_shared/data";
