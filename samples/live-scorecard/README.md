@@ -15,5 +15,32 @@ Team Reach
 [Original App](http://livescorecard.herokuapp.com)
 
 ## Cliches Used
+- Authorization
+- StandardAuthentication
+- PasskeyAuthentication
+- Event
+- Task
+- Group
 
 ## Missing Features
+- It's not pretty yet
+- Leaderboard
+
+**Host**
+- Edit competitions
+- Define the sex and category of a climber when creating one (persistent fields)
+- Reveal code when looking at the climbers
+- Edit climbers
+- Sort climbers in alphabetical order
+- Define points and category to a climb (persistent fields)
+- Edit a climb
+
+**Climber**
+- Record number of falls per climb
+- Sort climbs by name/ points
+- Leaderboard
+- BuddyLog
+- Complete climb with approval from witness
+
+**Spectator**
+- Leaderboard
