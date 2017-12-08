@@ -1,4 +1,4 @@
-import { Widget, PrimitiveAtom, Field} from "client-bus";
+import { Widget, PrimitiveAtom, Field } from "client-bus";
 import { GraphQlService } from "gql";
 
 @Widget({
