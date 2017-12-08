@@ -139,12 +139,9 @@ const schema = grafo
       expires_on: { "type": graphql.GraphQLString }
     },
     resolve: (_, { name, assigner_id, expires_on }) => {
-      console.log("i'm creating things as " + assigner_id);
       return mean.db.collection("assignees").find({})
         .toArray()
         .then(assignee_all => {
-          console.log("all the assignees")
-          console.log(assignee_all);
           const tasks = assignee_all.map((assignee) => {
             return {
               atom_id: uuid.v4(),
@@ -159,7 +156,6 @@ const schema = grafo
           return tasks;
         })
         .then(tasks => {
-          console.log("i'm going to add the tasks now");
           return mean.db.collection("tasks").insert(tasks)
             .then(_ => {
               tasks.forEach(task => {
@@ -218,7 +214,6 @@ const schema = grafo
       assigner_id: { "type": graphql.GraphQLString }
     },
     resolve: (root, { assigner_id }) => {
-      console.log("here's the assigned tasks");
       return mean.db.collection("tasks").find({
         $and:
           [{ "assigner.atom_id": assigner_id },
