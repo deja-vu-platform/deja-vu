@@ -12,12 +12,6 @@ cliche Group {
     name: text
   }
 
-  // HACK: There is no template for this.
-  widget NewGroupWithoutButton {
-    group: Group,
-    submit_ok: boolean
-  }
-
   // Button allowing for the creation of a group
   widget NewGroupButton {
     group: Group,
