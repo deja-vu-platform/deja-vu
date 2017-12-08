@@ -36,12 +36,6 @@ cliche PasskeyAuthentication {
         submit_ok: boolean
     }
 
-    // A 5-7 letter english word is randomly generated when `submit_ok` is true.
-    // There is no template for this.
-    widget CreateRandomPasskey {
-        submit_ok: boolean
-    }
-
     // Displays a sign in form, only with a passkey field.
     // If `on_validate_ok` is defined, redirect user to the given widget.
     // Otherwise, remain in the current widget.
