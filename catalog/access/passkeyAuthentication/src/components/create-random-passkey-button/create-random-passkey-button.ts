@@ -13,9 +13,7 @@ export class CreateRandomPasskeyButtonComponent {
     generatePasskey() {
         this._graphQlService
             .post(`
-                createRandomPasskey(
-                    dummyValue: true
-                )
+                createRandomPasskey
             `)
             .subscribe(
                 _ => { this.submit_ok.value = true; }

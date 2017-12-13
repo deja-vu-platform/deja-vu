@@ -78,11 +78,10 @@ const schema = grafo
     .add_mutation({
         name: "createRandomPasskey",
         "type": graphql.GraphQLBoolean,
-        args: {
-            dummyValue: { "type": new graphql.GraphQLNonNull(graphql.GraphQLBoolean) }
-        },
-        resolve: (_, { dummyValue }) => {
+        args: {},
+        resolve: (_, { }) => {
             return getRandomPasscode().then(code => {
+                console.log("here is the code: " + code);
                 const passkey = {
                     code: bcrypt.hashSync(code, SALT_WORK_FACTOR),
                     atom_id: code
