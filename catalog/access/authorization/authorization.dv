@@ -4,9 +4,7 @@ cliche Authorization {
     /** Entities **/
 
     // Dummy field to surpress schema errors
-    data Principal {
-        _: text
-     }
+    data Principal { }
 
     data Resource {
         owner: Principal,

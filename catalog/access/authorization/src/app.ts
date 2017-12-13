@@ -33,7 +33,7 @@ const schema = grafo
     .add_type({
         name: "Principal",
         fields: {
-            _: { "type": graphql.GraphQLString }
+            atom_id: { "type": graphql.GraphQLString }
         }
     })
     .add_type({
