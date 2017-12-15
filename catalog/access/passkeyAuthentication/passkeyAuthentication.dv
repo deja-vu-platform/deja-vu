@@ -8,14 +8,32 @@ cliche PasskeyAuthentication {
     }
 
     /** Widgets**/
+    // A text box to enter the passkey to be validated.
+    widget ValidatePasskeyContent {
+        passkey: Passkey,
+        submit_ok: boolean
+    }
+
+    // A button to validate the passkey(s).
+    widget ValidatePasskeyButton {
+        submit_ok: boolean,
+        on_validate_ok: Widget
+    }
+
+    // A text box to enter the code for the passkey a principal wants to create.
+    widget CreateCustomPasskeyContent {
+        passkey: Passkey,
+        submit_ok: boolean
+    }
+
     // A principal creates a passkey by defining the code him/herself.
     widget CreateCustomPasskey {
         passkey: Passkey
     }
 
     // A principal creates a passkey with a randomly chosen 5-7 letter english word.
-    widget CreateRandomPasskey {
-        passkey: Passkey
+    widget CreateRandomPasskeyButton {
+        submit_ok: boolean
     }
 
     // Displays a sign in form, only with a passkey field.
@@ -28,13 +46,13 @@ cliche PasskeyAuthentication {
     // Displays a sign out button. 
     // If `on_signout_ok` is defined, redirect user to the given widget.
     // Otherwise, remain in the current widget.
-    widget SignOutwithRedirect {
+    widget PasskeySignOutWithRedirect {
         on_signout_ok: Widget
     }
 
     // A user's session persists until logging out.
     // There is no template for this.
-    widget LoggedIn {
+    widget PasskeyLoggedIn {
         passkey: Passkey
     }
 }

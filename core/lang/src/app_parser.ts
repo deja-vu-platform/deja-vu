@@ -251,7 +251,7 @@ export class AppParser {
         WidgetDecl: (main, widget, name, k1, fields, k2) => _u
           .map(fields.data()[0], f => _u.extendOwn(f, {of: name.sourceString})),
         FieldBody: (field_decl, comma, field_decls) => _u
-          .reject([field_decl.data()].concat(field_decls.data()[0]),
+          .reject([field_decl.data()].concat(field_decls.data()),
                   _u.isEmpty),
         FieldDecl: (name, colon, tname, assign, expr) => {
           let value_data = expr.eval()[0];

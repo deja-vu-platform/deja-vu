@@ -25,6 +25,10 @@ cliche Task {
     assigner: Assigner
   }
 
+  widget CreateTaskForAllAssignees {
+    assigner: Assigner
+  }
+
   widget ApproveTask {
     task: Task
   }

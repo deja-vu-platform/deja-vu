@@ -30,7 +30,7 @@ export class NewMemberButtonComponent {
   }
 
   submit() {
-    this._groupService.createMember()
+    this._groupService.createMember(this.member.name)
       .then(atom_id => {
         if (atom_id) {
           this.member.atom_id = atom_id;

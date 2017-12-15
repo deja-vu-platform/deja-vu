@@ -41,6 +41,16 @@ const schema = grafo
             code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         }
     })
+    .add_query({
+        name: "passkey",
+        "type": "Passkey",
+        args: {
+            code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
+        },
+        resolve: (root, { code }) => {
+            return mean.db.collection("passkeys").findOne({ atom_id: code });
+        }
+    })
     .add_mutation({
         name: "createCustomPasskey",
         "type": graphql.GraphQLBoolean,
@@ -50,8 +60,8 @@ const schema = grafo
         resolve: (_, { code }) => {
             return Validation.passkeyIsNew(code).then(_ => {
                 const passkey = {
-                    "code": bcrypt.hashSync(code, SALT_WORK_FACTOR),
-                    "atom_id": code
+                    code: bcrypt.hashSync(code, SALT_WORK_FACTOR),
+                    atom_id: code
                 };
                 return mean.db.collection("passkeys")
                     .insertOne(passkey)
@@ -71,9 +81,10 @@ const schema = grafo
         args: {},
         resolve: (_, { }) => {
             return getRandomPasscode().then(code => {
+                console.log("here is the code: " + code);
                 const passkey = {
-                    "code": bcrypt.hashSync(code, SALT_WORK_FACTOR),
-                    "atom_id": code
+                    code: bcrypt.hashSync(code, SALT_WORK_FACTOR),
+                    atom_id: code
                 };
                 return mean.db.collection("passkeys")
                     .insertOne(passkey)
@@ -89,7 +100,7 @@ const schema = grafo
     })
     .add_mutation({
         name: "validatePasskey",
-        "type": graphql.GraphQLBoolean,
+        "type": graphql.GraphQLString,
         args: {
             code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
@@ -142,3 +153,7 @@ export function getRandomPasscode() {
             return getRandomPasscode();
         })
 }
+
+Helpers.serve_schema(mean.ws, schema);
+
+grafo.init().then(_ => mean.start());

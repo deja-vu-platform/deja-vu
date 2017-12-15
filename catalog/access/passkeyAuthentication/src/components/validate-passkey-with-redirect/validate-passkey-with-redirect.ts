@@ -6,7 +6,7 @@ import { Widget, ClientBus, Field,
         PrimitiveAtom, WidgetValue } from "client-bus";
 
 @Widget({
-    fqelement: "Authorization",
+    fqelement: "PasskeyAuthentication",
     ng2_providers: [GraphQlService],
     ng2_directives: [NgClass]
 })

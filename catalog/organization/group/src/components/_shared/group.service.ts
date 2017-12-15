@@ -1,17 +1,17 @@
-import {Injectable} from "@angular/core";
+import { Injectable } from "@angular/core";
 
-import {GraphQlService} from "gql";
+import { GraphQlService } from "gql";
 
 import "rxjs/add/operator/map";
 import "rxjs/add/operator/toPromise";
 
-import {Member, Group} from "./data";
-import {getOrDefault} from "./utils";
+import { Member, Group } from "./data";
+import { getOrDefault } from "./utils";
 
 
 @Injectable()
 export default class GroupService {
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(private _graphQlService: GraphQlService) { }
 
   // creates a group, result is its atom_id
   createGroup(): Promise<string> {
@@ -24,10 +24,12 @@ export default class GroupService {
   }
 
   // creates a member, result is its atom_id
-  createMember(): Promise<string> {
+  createMember(name: string): Promise<string> {
     return this._graphQlService
       .post(`
-        createMember
+        createMember (
+          name: "${name}"
+        )
       `)
       .map(data => getOrDefault(data, ["createMember"], ""))
       .toPromise();
@@ -78,7 +80,7 @@ export default class GroupService {
     return this._graphQlService
       .get(`
         member_by_id(
-          atom_id: "${member_id}""
+          atom_id: "${member_id}"
         ) {
           name
         }
