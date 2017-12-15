@@ -2,8 +2,6 @@
 
 cliche Authorization {
     /** Entities **/
-
-    // Dummy field to surpress schema errors
     data Principal { }
 
     data Resource {
