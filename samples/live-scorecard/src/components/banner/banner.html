@@ -1,18 +1,50 @@
+<style>
+    .head {
+        color: white;
+    }
+
+    .background {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        width: 100%;
+        min-height: 10em;
+    }
+
+    .choice {
+        margin: .3em;
+    }
+
+    @media screen and (min-width: 495px) {
+        .head {
+            margin-top: -1.5em;
+            color: white;
+        }
+    }
+
+    @media screen and (max-width: 495px) {
+        .head {
+            margin-top: -2.5em;
+            color: white;
+        }
+    }
+</style>
+
 <div class="banner">
-    <img src="./components/banner/banner.png" class="background"/>
+    <img src="./components/banner/banner.png" class="background" />
     <div class="container text-center">
         <h1 class="head">Welcome to Live Scorecard</h1>
         <h3>I am a &hellip;</h3>
 
         <div class="row">
             <div class="col-lg-4 col-lg-offset-4 text-center">
-                <a routerLink="/host-login" type="button" class="host-button btn btn-default">
+                <a routerLink="/host-login" type="button" class="host-button btn btn-default choice">
                     Host
                 </a>
-                <a routerLink="/climber-login" type="button" class="climber-button btn btn-default">
+                <a routerLink="/climber-login" type="button" class="climber-button btn btn-default choice">
                     Climber
                 </a>
-                <a routerLink="/spectator-login" type="button" class="specatator-button btn btn-default">
+                <a routerLink="/spectator-login" type="button" class="spectator-button btn btn-default choice">
                     Spectator
                 </a>
             </div>

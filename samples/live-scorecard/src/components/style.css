@@ -8,23 +8,11 @@ body {
 	background-color: #4FB5C3;
 }
 
-.head {
-	color: white;
-}
-
 .white-back {
 	background-color: white;
 	color: black;
 	flex: 1;
 	height: 100%;
-}
-
-.background {
-	margin:0;
-	padding:0;
-	border: 0;
-	width: 100%;
-	min-height: 10em;
 }
 
 .btn-success {
@@ -47,24 +35,6 @@ body {
 	border: none;
 }
 
-@media screen and (min-width: 495px) {
-	.head{
-		margin-top: -1.5em;
-		color: white;
-	}
-}
-
-@media screen and (max-width: 495px) {
-	.head{
-		margin-top: -2.5em;
-		color: white;
-	}
-}
-
-.choice {
-	margin: .3em;
-}
-
 .link {
 	cursor:pointer;
 	color: #218290;
@@ -82,10 +52,6 @@ body {
 .panel-default {
 	border-color: white;
 	color: black;
-}
-
-.center{
-	text-align: center;
 }
 
 .edit {
@@ -106,34 +72,6 @@ body {
 	}
 }
 
-/* Popup container - can be anything you want */
-.popup {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-/* The actual popup */
-.popup .popuptext {
-    display: none;
-    width: 160px;
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 8px 0;
-    z-index: 1;
-}
-
-/* Toggle this class - hide and show the popup */
-.popup .view {
-    display: inline-block;
-}
-
 .mycode {
 	display: inline-block !important;
 }
@@ -152,14 +90,6 @@ body {
 	text-align: right;
 }
 
-input[disabled] {
-	background-color: #bdc3c7;
-}
-
-input {
-	color: black;
-}
-
 a{
     cursor: pointer;
     text-decoration: none;
@@ -169,39 +99,6 @@ a:hover {
 	text-decoration: none;
 }
 
-input[type=text] {
-	width: 100%;
-	padding: .2em;
-	border-color: #F5F5F5;
-}
-
-input[type=radio]:after {
-	cursor: pointer;
-	width: 1em;
-	height: 1em;
-	top: 0;
-	border: 1px solid white;
-	border-radius: 50%;
-	background-color: white;
-}
-
-input[type=radio]checked:after {
-	width: .5em;
-	height: .5em;
-	border: 1px solid white;
-	border-radius: 50%;
-	background-color: #218290;
-}
-
-.trophy {
-	height: 1.1em;
-}
-
 .inv-border{
 	border: 1px;
-}
-
-.left {
-	text-align: left;
-	margin-top: 3em;
 }
