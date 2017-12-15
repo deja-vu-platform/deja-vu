@@ -1,23 +1,6 @@
-<div class="white-back">
-    <img src="./components/landing/banner.png" class="background" />
+<div class="spectator-login white-back">
+    <dv-widget name="Banner"></dv-widget>
     <div class="container text-center">
-        <h1 class="head">Welcome to Live Scorecard</h1>
-        <h3>I am a &hellip;</h3>
-
-        <div class="row">
-            <div class="col-lg-4 col-lg-offset-4 text-center">
-                <a routerLink="/host-login" type="button" class="btn btn-default choice">
-                    Host
-                </a>
-                <a routerLink="/climber-login" type="button" class="btn btn-default choice">
-                    Climber
-                </a>
-                <a routerLink="/spectator-login" type="button" class="btn btn-default choice active">
-                    Spectator
-                </a>
-            </div>
-        </div>
-
         <div class="row">
             <div class="col-lg-4 col-lg-offset-4 text-center">
                 <dv-widget name="ValidatePasskeyWithRedirect" of="SpectatorAuthentication"></dv-widget>

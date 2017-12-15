@@ -92,18 +92,18 @@ app LiveScorecard {
     }
 
     /** Widgets **/
-    // Displays buttons to choose appropriate form.
-    main widget Landing { }
-
     // The login form for the hosts
-    widget HostLogin {
+    main widget HostLogin {
         on_host_ok: Widget = HostHome
     }
 
     // The register form for the hosts
     widget HostRegister {
         on_host_ok: Widget = HostHome
-    }    
+    }  
+
+    // Displays buttons to choose appropriate form.
+    widget Banner { }  
 
     // Allows hosts to add competitions, climbers and other hosts.
     // Also, allows hosts to view the leaderboard.
@@ -116,7 +116,7 @@ app LiveScorecard {
     // The navigation bar for the hosts' view
     widget HostNavBar { 
         loggedInHost: Host,
-        on_signout_ok: Widget = Landing
+        on_signout_ok: Widget = HostLogin
     }
 
     // The login form for the climbers
@@ -135,7 +135,7 @@ app LiveScorecard {
     // The navigation bar for the climber's view.
     widget ClimberNavBar {
         climber: Climber,
-        on_signout_ok: Widget = Landing
+        on_signout_ok: Widget = ClimberLogin
     }
     
     // Allows climbers to view available climbs, log climbs and view the 
@@ -160,7 +160,7 @@ app LiveScorecard {
     // Allows spectators to view the leaderboard.
     widget SpectatorHome {
         spectator: Spectator,
-        on_signout_ok: Widget = Landing
+        on_signout_ok: Widget = SpectatorLogin
     }
     
     // A climber can only complete a climb after receiving approval by
