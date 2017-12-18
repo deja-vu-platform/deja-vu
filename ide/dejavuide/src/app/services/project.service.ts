@@ -16,6 +16,7 @@ export class ProjectService {
 
   public updateProject(project: Project) {
     this.selectedProject = project;
+    this.projectUpdateListener.next(true);
   }
 
   public getProject(): Project {

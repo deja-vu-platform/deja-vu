@@ -316,11 +316,11 @@ export class LinkBaseWidget extends BaseWidget {
     protected value: LinkValue;
 
     constructor(
-        project: Project,
-        name: string,
-        dimensions: Dimensions,
-        value: any,
-        clicheid: string,
+        project: Project = null,
+        name: string = 'Link Widget',
+        dimensions: Dimensions = {width: 100, height: 50},
+        value: any = '',
+        clicheid: string = '',
         id: string = null,
         templateid: string = null,
         isTemplate = false
@@ -341,11 +341,11 @@ export class LabelBaseWidget extends BaseWidget {
     protected value: string;
 
     constructor(
-        project: Project,
-        name: string,
-        dimensions: Dimensions,
-        value: any,
-        clicheid: string,
+        project: Project = null,
+        name: string = 'Label Widget',
+        dimensions: Dimensions = {width: 100, height: 50},
+        value: any = 'Write your label here...',
+        clicheid: string = '',
         id: string = null,
         templateid: string = null,
         isTemplate = false

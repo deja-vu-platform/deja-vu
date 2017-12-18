@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 
 import { Cliche, UserCliche, DvCliche } from '../../../models/cliche/cliche';
-import { Widget, BaseWidget, UserWidget } from '../../../models/widget/widget';
+import { Widget, BaseWidget, UserWidget, LinkBaseWidget, LabelBaseWidget } from '../../../models/widget/widget';
 import { ProjectService } from '../../../services/project.service';
 
 @Component({
@@ -15,6 +15,11 @@ export class ListComponent {
   pages: UserWidget[] = [];
   unusedWidgets: Widget[] = [];
   templates: Widget[] = [];
+
+  baseWidgets: Widget[] = [
+    new LinkBaseWidget(),
+    new LabelBaseWidget(),
+  ];
 
   constructor(private projectService: ProjectService) {
     projectService.projectUpdateListener.subscribe(() => {

@@ -1,14 +1,23 @@
-<div>
+<div *ngIf="userApp">
   <!-- for the user app -->
-  <div *ngIf="userApp">
-    <ng-container *ngFor="let widget of pages">
+  <div> {{userApp.getName()}} </div>
+  <ng-container *ngFor="let widget of pages">
+    <dv-list-item [widget]="widget"
+                  [isDraggable]="true"
+                  [isDeletable]="true">
+    </dv-list-item>
+  </ng-container>
+</div>
+<div>
+  <!-- Base widgets -->
+  <div> Base Widgets </div>
+  <ng-container *ngFor="let widget of baseWidgets">
       <dv-list-item [widget]="widget"
                     [isDraggable]="true"
-                    [isDeletable]="true">
+                    [isDeletable]="false">
       </dv-list-item>
     </ng-container>
   </div>
-</div>
 <div>
   <!-- for imported cliches -->
 </div>

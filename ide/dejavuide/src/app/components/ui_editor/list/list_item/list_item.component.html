@@ -1,10 +1,25 @@
 <div class="content">
-  <div class="name-container">
-      <span class="name"> {{widget.getName()}} </span>
-      <div class="submit-rename"
-            [hidden]="true">
-          <input type="text" class="new-name-input form-control" autofocus>
-      </div>
+  <div class="name-container" >
+    <div *ngIf="widget.isBaseType()">
+      <ng-container *ngIf="widget.type === 0">
+        <img src="assets/link_icon.png" width="15px" height="15px">
+      </ng-container>
+      <ng-container *ngIf="widget.type === 1">
+        <img src="assets/label_icon.png" width="15px" height="15px">
+      </ng-container>
+      <ng-container *ngIf="widget.type === -1">
+          <img src="images/image_icon.png" width="15px" height="15px"> Media
+          <img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs
+          <img src="images/menu_icon.png" width="15px" height="15px"> Menu
+          <img src="images/panel_icon.png" width="15px" height="15px"> Panel
+          <img src="images/empty_icon.png" width="15px" height="15px"> Blank
+      </ng-container>
+    </div>
+    <span class="name"> {{widget.getName()}} </span>
+    <div class="submit-rename" *ngIf="widget.isUserType()"
+          [hidden]="true">
+        <input type="text" class="new-name-input form-control" autofocus>
+    </div>
   </div>
   <button *ngIf="isDeletable"
           type="button"
@@ -27,6 +42,7 @@
     </div>
   </ng-container>
 </div> 
+
 <dv-widget *ngIf="isDraggable"
             #ghost 
             [hidden]="true"
