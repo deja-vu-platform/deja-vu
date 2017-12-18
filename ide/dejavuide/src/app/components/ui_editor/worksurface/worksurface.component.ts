@@ -1,6 +1,6 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 
-import { Widget } from '../../../models/widget/widget';
+import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
 import { Cliche } from '../../../models/cliche/cliche';
 import { Dimensions, Position, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
@@ -27,7 +27,8 @@ export class WorkSurfaceComponent implements AfterViewInit {
 
   constructor(
     private stateService: StateService,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private ref: ChangeDetectorRef
   ) {
     stateService.zoom.subscribe((newZoom) => {
       this.currentZoom = newZoom;
@@ -51,16 +52,35 @@ export class WorkSurfaceComponent implements AfterViewInit {
     });
   }
 
-
   ngAfterViewInit() {
-    $('.work-surface').droppable({
-      accept: 'dv-widget',
-      hoverClass: 'highlight',
-      tolerance: 'fit',
-      drop: (event, ui) => {
-          this.onDropFinished();
-      }
-    });
+    if (this.selectedWidget.isUserType()) {
+      $('.work-surface').droppable({
+        accept: 'dv-widget, dv-list-item',
+        hoverClass: 'highlight',
+        tolerance: 'fit',
+        drop: (event, ui) => {
+          let newWidget: Widget = ui.helper.dvWidget;
+          if (newWidget && newWidget.isBaseType()
+                && this.selectedWidget.isUserType()) {
+            const project = this.projectService.getProject();
+            const userApp = project.getUserApp();
+            newWidget.setClicheId(userApp.getId());
+            newWidget = newWidget.makeCopy()[0];
+            newWidget.setProject(project);
+            const offset = this.selectedWidget.getPosition();
+            newWidget.updatePosition({
+              top: ui.position.top - offset.top,
+              left: ui.position.left - offset.left
+            });
+            userApp.addUsedWidget(newWidget);
+            this.selectedWidget.addInnerWidget(newWidget);
+            this.projectService.widgetUpdated();
+            this.ref.detectChanges();
+          }
+          // this.onDropFinished();
+        }
+      });
+    }
 
     $('dv-worksurface').scroll((event: Event) => {
       const jqo = $('dv-worksurface');
@@ -71,9 +91,9 @@ export class WorkSurfaceComponent implements AfterViewInit {
     });
   }
 
-  onDropFinished(/** TODO */) {
-    // If new widget, add to the selected widget
-    // else, put it at the top
-    console.log('dropped');
-  }
+  // onDropFinished(/** TODO */) {
+  //   // If new widget, add to the selected widget
+  //   // else, put it at the top
+  //   console.log('dropped');
+  // }
 }

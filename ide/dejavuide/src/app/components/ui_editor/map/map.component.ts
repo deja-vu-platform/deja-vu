@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit, ElementRef} from '@angular/core';
+import { Component, AfterViewInit, OnInit, ElementRef, ChangeDetectorRef} from '@angular/core';
 
 import { Widget, UserWidget } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
@@ -50,7 +50,8 @@ export class MapComponent implements AfterViewInit, OnInit {
   constructor(
     el: ElementRef,
     private stateService: StateService,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private ref: ChangeDetectorRef
   ) {
     this.el = el.nativeElement;
     stateService.zoom.subscribe((newZoom) => {
@@ -63,28 +64,6 @@ export class MapComponent implements AfterViewInit, OnInit {
         this.updateMapScale();
         this.updateView();
       });
-
-    stateService.visibleWindowScrollPosition
-      .subscribe((newVisibleWindowScrollPosition) => {
-        this.mapVisibleWindowPosition.top =
-          newVisibleWindowScrollPosition.top * this.mapScale;
-        this.mapVisibleWindowPosition.left =
-          newVisibleWindowScrollPosition.left * this.mapScale;
-      });
-
-    projectService.selectedWidget.subscribe((newSelectedWidget) => {
-      this.selectedWidget = newSelectedWidget;
-      this.updateView();
-    });
-
-    projectService.widgetUpdateListener.subscribe(() => {
-      this.updateView();
-    });
-
-    this.stateService.visibleWindowDimensions.subscribe(
-      (newVisibleWindowDimensions) => {
-          this.visibleWindowDimensions = newVisibleWindowDimensions;
-      });
   }
 
   ngOnInit() {
@@ -92,6 +71,29 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.mapComponentDimensions.width = this.el.offsetWidth;
     this.updateMapScale();
     this.updateView();
+
+    this.stateService.visibleWindowScrollPosition
+    .subscribe((newVisibleWindowScrollPosition) => {
+      this.mapVisibleWindowPosition.top =
+        newVisibleWindowScrollPosition.top * this.mapScale;
+      this.mapVisibleWindowPosition.left =
+        newVisibleWindowScrollPosition.left * this.mapScale;
+    });
+
+    this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
+    this.selectedWidget = newSelectedWidget;
+    this.updateView();
+  });
+
+  this.projectService.widgetUpdateListener.subscribe(() => {
+    this.updateView();
+    this.ref.detectChanges();
+  });
+
+  this.stateService.visibleWindowDimensions.subscribe(
+    (newVisibleWindowDimensions) => {
+        this.visibleWindowDimensions = newVisibleWindowDimensions;
+    });
   }
 
   ngAfterViewInit() {

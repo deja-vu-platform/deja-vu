@@ -34,16 +34,16 @@ export class WidgetComponent implements AfterViewInit, OnInit {
     private projectService: ProjectService
   ) {
       this.el = el.nativeElement;
+
+      projectService.widgetUpdateListener.subscribe(() => {
+        this.getInnerWidgets();
+      });
   }
 
 
   ngOnInit() {
     // get inner widgets
-    if (this.widget.isUserType()) {
-      for (const innerWidgetId of this.widget.getInnerWidgetIds()) {
-        this.innerWidgets.push(this.widget.getInnerWidget(innerWidgetId));
-      }
-    }
+    this.getInnerWidgets();
   }
 
   ngAfterViewInit() {
@@ -57,16 +57,19 @@ export class WidgetComponent implements AfterViewInit, OnInit {
     // If it's the selected widget, it is always movable
     // Otherwise make it movable based on the flag.
     if (this.isSelected || this.isMovable) {
-      $(this.el).draggable({
-        containment: '.work-surface',
-        stop: (e, ui) => {
-          this.widget.updatePosition(ui.position);
-          this.projectService.widgetUpdated();
-        },
-      });
-
+      this.makeWidgetDraggable();
       this.makeWidgetResizable();
     }
+  }
+
+  private makeWidgetDraggable() {
+    $(this.el).draggable({
+      containment: '.work-surface',
+      stop: (e, ui) => {
+        this.widget.updatePosition(ui.position);
+        this.projectService.widgetUpdated();
+      },
+    });
   }
 
   private makeWidgetResizable() {
@@ -98,5 +101,14 @@ export class WidgetComponent implements AfterViewInit, OnInit {
    */
   onDropFinished() {
     // TODO
+  }
+
+  private getInnerWidgets() {
+    this.innerWidgets = [];
+    if (this.widget && this.widget.isUserType()) {
+      for (const innerWidgetId of this.widget.getInnerWidgetIds()) {
+        this.innerWidgets.push(this.widget.getInnerWidget(innerWidgetId));
+      }
+    }
   }
 }

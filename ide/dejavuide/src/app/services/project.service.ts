@@ -16,7 +16,7 @@ export class ProjectService {
 
   public updateProject(project: Project) {
     this.selectedProject = project;
-    this.projectUpdateListener.next(true);
+    this.projectUpdated();
   }
 
   public getProject(): Project {
@@ -29,6 +29,7 @@ export class ProjectService {
 
   updateSelectedWidget(newSelectedWidget: Widget) {
     this.selectedWidget.next(newSelectedWidget);
+    this.widgetUpdated();
   }
 
   widgetUpdated() {

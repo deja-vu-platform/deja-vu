@@ -1,13 +1,14 @@
 <div class="content">
   <div class="name-container" >
     <div *ngIf="widget.isBaseType()">
-      <ng-container *ngIf="widget.type === 0">
+      <ng-container *ngIf="widget.isLink()">
         <img src="assets/link_icon.png" width="15px" height="15px">
       </ng-container>
-      <ng-container *ngIf="widget.type === 1">
+      <ng-container *ngIf="widget.isLabel()">
         <img src="assets/label_icon.png" width="15px" height="15px">
       </ng-container>
-      <ng-container *ngIf="widget.type === -1">
+      <!-- TODO -->
+      <ng-container *ngIf="false">
           <img src="images/image_icon.png" width="15px" height="15px"> Media
           <img src="images/tabs_icon.png" width="15px" height="15px"> Nav tabs
           <img src="images/menu_icon.png" width="15px" height="15px"> Menu
@@ -44,6 +45,7 @@
 </div> 
 
 <dv-widget *ngIf="isDraggable"
+            class="drop-widget"
             #ghost 
             [hidden]="true"
             [widget]="widget"

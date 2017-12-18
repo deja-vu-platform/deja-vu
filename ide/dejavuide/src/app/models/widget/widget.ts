@@ -104,6 +104,10 @@ export abstract class Widget {
         return this.project;
     }
 
+    setProject(project: Project) {
+      this.project = project;
+    }
+
     getId(): string {
         return this.meta.id;
     }
@@ -122,6 +126,10 @@ export abstract class Widget {
 
     getClicheId(): string {
         return this.meta.clicheId;
+    }
+
+    setClicheId(cid: string) {
+      this.meta.clicheId = cid;
     }
 
     getTemplateId(): string {
@@ -247,7 +255,6 @@ export class BaseWidget extends Widget {
 
         // Properties
         bw.updatePosition(object.position);
-
         return bw;
     }
 
@@ -284,16 +291,32 @@ export class BaseWidget extends Widget {
             templateId = this.getId();
             isTemplate = false;
         }
-        const copyWidget = new BaseWidget(
-            this.project,
+        let copyWidget;
+        const project = this.project;
+        const value = this.value;
+        // TODO make this more DRY
+        if (this.isLabel()) {
+          copyWidget = new LabelBaseWidget(
+            project,
             this.getName(),
             this.getDimensions(),
-            this.type,
-            this.value,
+            value,
             this.getClicheId(),
             null, // generate a new id!
             templateId,
             isTemplate);
+        }
+        if (this.isLink()) {
+          copyWidget = new LinkBaseWidget(
+            project,
+            this.getName(),
+            this.getDimensions(),
+            value,
+            this.getClicheId(),
+            null, // generate a new id!
+            templateId,
+            isTemplate);
+        }
         copyWidget.updatePosition(this.getPosition());
         if (isTemplateCopy) {
             // If you're making a tempate copy, add to template copies

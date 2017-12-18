@@ -51,18 +51,19 @@ export class ListItemComponent implements AfterViewInit {
               });
               return widgetContainer;
           },
-          appendTo: '.edit',
+          appendTo: '.work-surface',
           cursor: '-webkit-grabbing',
           scroll: true,
           snap: '.grid-cell, .grid-x, .grid-y',
           snapTolerance: 10,
-          start: () => {
+          start: (e, ui) => {
               // $('.grid').css({
               //     visibility: 'visible'
               // });
               // $('.grid-line').css({
               //     visibility: 'hidden'
               // });
+              ui.helper.dvWidget = this.widget;
               this.dragging = true;
           },
           drag: (event, ui) => {

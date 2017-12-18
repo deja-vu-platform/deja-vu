@@ -79,29 +79,29 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
 
       this.selectedProject.addAppWidget(testWidget);
       testWidget.updatePosition({ top: 100, left: 300 });
-      const innerWidget1 = new LabelBaseWidget(
-        this.selectedProject,
-        'test inner1',
-        { height: 100, width: 200 }, 'hello I am test', appId);
-      testWidget.addInnerWidget(innerWidget1);
-      innerWidget1.updatePosition({ top: 50, left: 100 });
+      // const innerWidget1 = new LabelBaseWidget(
+      //   this.selectedProject,
+      //   'test inner1',
+      //   { height: 100, width: 200 }, 'hello I am test', appId);
+      // testWidget.addInnerWidget(innerWidget1);
+      // innerWidget1.updatePosition({ top: 50, left: 100 });
 
-      const innerWidget2 = new UserWidget(this.selectedProject, 'test inner2', { height: 200, width: 400 }, appId);
-      this.selectedProject.addAppWidget(innerWidget2);
-      testWidget.addInnerWidget(innerWidget2);
-      innerWidget2.updatePosition({ top: 200, left: 200 });
+      // const innerWidget2 = new UserWidget(this.selectedProject, 'test inner2', { height: 200, width: 400 }, appId);
+      // this.selectedProject.addAppWidget(innerWidget2);
+      // testWidget.addInnerWidget(innerWidget2);
+      // innerWidget2.updatePosition({ top: 200, left: 200 });
 
-      const innerWidget21 = new UserWidget(this.selectedProject, 'test inner21', { height: 400, width: 200 }, appId);
-      this.selectedProject.addAppWidget(innerWidget21);
-      innerWidget2.addInnerWidget(innerWidget21);
-      innerWidget21.updatePosition({ top: 50, left: 100 });
+      // const innerWidget21 = new UserWidget(this.selectedProject, 'test inner21', { height: 400, width: 200 }, appId);
+      // this.selectedProject.addAppWidget(innerWidget21);
+      // innerWidget2.addInnerWidget(innerWidget21);
+      // innerWidget21.updatePosition({ top: 50, left: 100 });
 
-      const innerWidget211 = new LinkBaseWidget(
-        this.selectedProject, 'inner211',
-        { height: 200, width: 150 },
-        {text: '100100', target: undefined}, appId);
-      this.selectedProject.addAppWidget(innerWidget211);
-      innerWidget21.addInnerWidget(innerWidget211);
+      // const innerWidget211 = new LinkBaseWidget(
+      //   this.selectedProject, 'inner211',
+      //   { height: 200, width: 150 },
+      //   {text: '100100', target: undefined}, appId);
+      // this.selectedProject.addAppWidget(innerWidget211);
+      // innerWidget21.addInnerWidget(innerWidget211);
 
       this.userApp.addPage(testWidget);
       this.selectedWidget = testWidget;
