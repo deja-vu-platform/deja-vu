@@ -366,7 +366,7 @@ export class LabelBaseWidget extends BaseWidget {
     constructor(
         project: Project = null,
         name: string = 'Label Widget',
-        dimensions: Dimensions = {width: 100, height: 50},
+        dimensions: Dimensions = {width: 200, height: 100},
         value: any = 'Write your label here...',
         clicheid: string = '',
         id: string = null,

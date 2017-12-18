@@ -1,8 +1,13 @@
 <div class="label-container">
-  <p contenteditable="true" class="display-component">{{widget.getValue()}}</p>
+  <p #edit
+    contenteditable="true" 
+    class="display-component"
+    (input)="updateText($event)">
+    {{widget.getValue()}}
+  </p>
 </div>
 
-<div [hidden]='true'
+<!-- <div [hidden]='true'
      class="tooltip">
   <div class="panel panel-default">
       <div class="panel-heading">
@@ -20,7 +25,7 @@
         <button class="apply btn btn-primary pull-right" (click)="applyChanges()">Apply</button>
       </div>
   </div>
-</div>
+</div> -->
 
 <div [hidden]="true" 
     class="config-btns">
