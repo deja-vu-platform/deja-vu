@@ -79,12 +79,20 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
 
       this.selectedProject.addAppWidget(testWidget);
       testWidget.updatePosition({ top: 100, left: 300 });
-      // const innerWidget1 = new LabelBaseWidget(
-      //   this.selectedProject,
-      //   'test inner1',
-      //   { height: 100, width: 200 }, 'hello I am test', appId);
-      // testWidget.addInnerWidget(innerWidget1);
-      // innerWidget1.updatePosition({ top: 50, left: 100 });
+
+      const innerWidget1 = new LabelBaseWidget(
+        this.selectedProject,
+        'test inner1',
+        { height: 100, width: 200 }, 'hello I am test', appId);
+      testWidget.addInnerWidget(innerWidget1);
+      innerWidget1.updatePosition({ top: 50, left: 100 });
+
+      const innerWidget7 = new LinkBaseWidget(
+        this.selectedProject,
+        'test inner7',
+        { height: 100, width: 200 }, null, appId);
+      testWidget.addInnerWidget(innerWidget7);
+      innerWidget7.updatePosition({ top: 450, left: 100 });
 
       // const innerWidget2 = new UserWidget(this.selectedProject, 'test inner2', { height: 200, width: 400 }, appId);
       // this.selectedProject.addAppWidget(innerWidget2);

@@ -48,6 +48,7 @@
     "@types/jqueryui": "^1.11.37",
     "@types/node": "^6.0.89",
     "codelyzer": "~3.1.1",
+    "electron-prebuilt": "1.1.1",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",
     "karma": "~1.7.0",
@@ -56,10 +57,10 @@
     "karma-coverage-istanbul-reporter": "^1.2.1",
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
+    "node-sass": "^4.7.2",
     "protractor": "~5.1.2",
     "ts-node": "~3.2.0",
     "tslint": "~5.3.2",
-    "typescript": "~2.3.3",
-    "electron-prebuilt": "1.1.1"
+    "typescript": "~2.3.3"
   }
 }

@@ -342,7 +342,7 @@ export class LinkBaseWidget extends BaseWidget {
         project: Project = null,
         name: string = 'Link Widget',
         dimensions: Dimensions = {width: 100, height: 50},
-        value: any = '',
+        value: LinkValue = {text: '', target: ''},
         clicheid: string = '',
         id: string = null,
         templateid: string = null,

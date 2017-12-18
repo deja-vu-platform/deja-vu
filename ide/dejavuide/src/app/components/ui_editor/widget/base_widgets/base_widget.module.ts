@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { MatMenuModule } from '@angular/material';
 
 import { LabelWidgetComponent } from './label_widget.component';
 import { LinkWidgetComponent } from './link_widget.component';
@@ -10,7 +11,8 @@ import { LinkWidgetComponent } from './link_widget.component';
     LinkWidgetComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    MatMenuModule
   ],
   providers: [],
   exports: [
