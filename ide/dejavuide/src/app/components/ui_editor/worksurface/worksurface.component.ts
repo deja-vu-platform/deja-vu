@@ -53,36 +53,46 @@ export class WorkSurfaceComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (this.selectedWidget.isUserType()) {
-      $('.work-surface').droppable({
-        accept: 'dv-widget, dv-list-item',
-        hoverClass: 'highlight',
-        tolerance: 'fit',
-        drop: (event, ui) => {
-          let newWidget: Widget = ui.helper.dvWidget;
-          if (newWidget && newWidget.isBaseType()
-                && this.selectedWidget.isUserType()) {
+    $('.work-surface').droppable({
+      accept: 'dv-widget, dv-list-item',
+      hoverClass: 'highlight',
+      tolerance: 'fit',
+      drop: (event, ui) => {
+        if (!this.selectedWidget.isUserType()) {
+          // non-user widgets can't be added to.
+          return;
+        }
+        // Check if it's a new widget
+        let newWidget: Widget = ui.helper.dvWidget;
+        const isNew = ui.helper.new;
+        console.log(ui);
+        // if the new widget is a base type, create a new
+        // widget object.
+        if (newWidget && isNew) {
+          if (newWidget.isBaseType()) {
             const project = this.projectService.getProject();
             const userApp = project.getUserApp();
+            // Set the cliche id of the dummy widget to this
+            // app id, so that the widget's id is set properly
+            // when copying.
             newWidget.setClicheId(userApp.getId());
             newWidget = newWidget.makeCopy()[0];
             newWidget.setProject(project);
+
             const offset = this.selectedWidget.getPosition();
             newWidget.updatePosition({
               top: ui.position.top - offset.top,
               left: ui.position.left - offset.left
             });
+
             userApp.addUsedWidget(newWidget);
             this.selectedWidget.addInnerWidget(newWidget);
             this.projectService.widgetUpdated();
-            if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
-              this.ref.detectChanges();
-            }
           }
-          // this.onDropFinished();
         }
-      });
-    }
+        this.onDropFinished(newWidget.getId());
+      }
+    });
 
     $('dv-worksurface').scroll((event: Event) => {
       const jqo = $('dv-worksurface');
@@ -93,9 +103,12 @@ export class WorkSurfaceComponent implements AfterViewInit {
     });
   }
 
-  // onDropFinished(/** TODO */) {
-  //   // If new widget, add to the selected widget
-  //   // else, put it at the top
-  //   console.log('dropped');
-  // }
+  onDropFinished(id/** TODO */) {
+    if (this.selectedWidget.isUserType()) {
+      this.selectedWidget.putInnerWidgetOnTop(id);
+      if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
+        this.ref.detectChanges();
+      }
+    }
+  }
 }

@@ -65,9 +65,25 @@ export class WidgetComponent implements AfterViewInit, OnInit {
   private makeWidgetDraggable() {
     $(this.el).draggable({
       containment: '.work-surface',
+      start: (e, ui) => {
+        ui.helper.dvWidget = this.widget;
+        console.log(ui.draggable);
+        console.log(ui.helper);
+        ui.helper.css({
+          'z-index': 9999
+        });
+    },
       stop: (e, ui) => {
         this.widget.updatePosition(ui.position);
+
+        const parent = this.projectService.getProject().getUserApp().getWidget(this.widget.getId());
+        // projectService.widgetUpdated() is called in the worksurface,
+        // but important to do so here because drop() is called *before*
+        // dragging stops.
         this.projectService.widgetUpdated();
+        ui.helper.css({
+          'z-index': 'auto'
+        });
       },
     });
   }
@@ -93,14 +109,6 @@ export class WidgetComponent implements AfterViewInit, OnInit {
         this.projectService.widgetUpdated();
       }
     });
-  }
-
-  /**
-   * On drop finished, pass on this event to the outermost container
-   * (work surface), which can handle what to do with it.
-   */
-  onDropFinished() {
-    // TODO
   }
 
   private getInnerWidgets() {

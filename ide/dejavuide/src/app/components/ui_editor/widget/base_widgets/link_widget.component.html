@@ -34,56 +34,47 @@
   </div>
 </div>
 
-<div [hidden]="true"
-    class="config-btns">
-  <div>
-    <!-- class="btn-group-vertical btn-group-xs">-->
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <span class="glyphicon glyphicon-tint"></span> Style
-      <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu">
-      <li>
-        <a class="premade-style btn-style-link">Link</a>
-      </li>
-      <li role="separator" class="divider"></li>
-      <li class="dropdown-header">Button</li>
-      <li>
-        <a class="premade-style btn-style-default">Default</a>
-      </li>
-      <li>
-        <a class="premade-style btn-style-primary">Primary</a>
-      </li>
-      <li>
-        <a class="premade-style btn-style-success">Success</a>
-      </li>
-      <li>
-        <a class="premade-style btn-style-info">Info</a>
-      </li>
-      <li>
-        <a class="premade-style btn-style-warning">Warning</a>
-      </li>
-      <li>
-        <a class="premade-style btn-style-danger">Danger</a>
-      </li>
-    </ul>
-  </div>
-  <div>
-    <!-- class="btn-group-vertical btn-group-xs">-->
-    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      <span class="glyphicon glyphicon-text-size"></span> Size
-      <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu">
-      <li>
-        <a class="premade-style btn-size-xs">Small</a>
-      </li>
-      <li>
-        <a class="premade-style btn-size-df">Default</a>
-      </li>
-      <li>
-        <a class="premade-style btn-size-lg">Large</a>
-      </li>
-    </ul>
-  </div>
-</div>
+<button class="btn btn-default btn-xs options"
+        type="button"
+        [matMenuTriggerFor]="options">
+  <span class="glyphicon glyphicon-option-vertical"></span>
+</button>
+
+<mat-menu #options="matMenu">
+  <button mat-menu-item>
+    <span class="glyphicon glyphicon-pencil"></span>
+  </button>
+  <button mat-menu-item [matMenuTriggerFor]="style">Style</button>
+  <!-- TODO divider -->
+  <button mat-menu-item>
+    <span class="glyphicon glyphicon-trash"></span>
+  </button>
+</mat-menu>
+
+<mat-menu #style="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
+  <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>
+  <!-- TODO divider -->
+  <button mat-menu-item>Clear Styles</button>
+</mat-menu>
+
+<mat-menu #styleStyle="matMenu">
+  <button mat-menu-item class="btn-style-link">Link</button>
+  <!-- TODO divider -->
+  <button mat-menu-item [matMenuTriggerFor]="styleStyleButton">Button</button>
+</mat-menu>
+
+<mat-menu #styleStyleButton="matMenu">
+  <button mat-menu-item  class="btn-style-default">Default</button>
+  <button mat-menu-item  class="btn-style-primary">Primary</button>
+  <button mat-menu-item  class="btn-style-success">Success</button>
+  <button mat-menu-item  class="btn-style-info">Info</button>
+  <button mat-menu-item  class="btn-style-warning">Warning</button>
+  <button mat-menu-item  class="btn-style-danger">Danger</button>
+</mat-menu>
+
+<mat-menu #styleSize="matMenu">
+  <button mat-menu-item class="btn-size-xs">Small</button>
+  <button mat-menu-item class="btn-size-df">Default</button>
+  <button mat-menu-item class="btn-size-lg">Large</button>
+</mat-menu>

@@ -12,15 +12,11 @@ export class LabelWidgetComponent implements AfterViewInit {
   @Input() widget: LabelBaseWidget;
 
   tooltipHidden = false;
-  optionsHidden = true;
 
   updateText(event) {
     this.widget.setValue(event.target.innerText);
   }
 
-  toggleOptions() {
-    this.optionsHidden = !this.optionsHidden;
-  }
   // applyChanges() {
   //   this.widget.setValue(this.value);
   // }
