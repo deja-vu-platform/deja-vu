@@ -75,7 +75,9 @@ export class WorkSurfaceComponent implements AfterViewInit {
             userApp.addUsedWidget(newWidget);
             this.selectedWidget.addInnerWidget(newWidget);
             this.projectService.widgetUpdated();
-            this.ref.detectChanges();
+            if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
+              this.ref.detectChanges();
+            }
           }
           // this.onDropFinished();
         }

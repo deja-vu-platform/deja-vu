@@ -242,16 +242,41 @@ export class BaseWidget extends Widget {
             return null;
         }
         const clicheId = Widget.decodeid(object.meta.id)[0];
-        const bw = new BaseWidget(
+        let bw;
+        // const bw = new BaseWidget(
+        //     project,
+        //     object.meta.name,
+        //     object.properties.dimensions,
+        //     object.type,
+        //     object.value,
+        //     clicheId,
+        //     object.meta.id,
+        //     object.meta.templateid,
+        //     object.isTemplate);
+
+        // TODO make this more DRY
+        if (object.type === BaseType.LABEL) {
+          bw = new LabelBaseWidget(
             project,
             object.meta.name,
             object.properties.dimensions,
-            object.type,
             object.value,
             clicheId,
             object.meta.id,
             object.meta.templateid,
             object.isTemplate);
+        }
+        if (object.type === BaseType.LINK) {
+          bw = new LinkBaseWidget(
+            project,
+            object.meta.name,
+            object.properties.dimensions,
+            object.value,
+            clicheId,
+            object.meta.id,
+            object.meta.templateid,
+            object.isTemplate);
+        }
 
         // Properties
         bw.updatePosition(object.position);

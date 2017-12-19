@@ -59,9 +59,9 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.selectedProject = new Project('New Test Proj');
-    this.projectService.updateProject(this.selectedProject);
-    // this.selectedProject = this.projectService.getProject();
+    // this.selectedProject = new Project('New Test Proj');
+    // this.projectService.updateProject(this.selectedProject);
+    this.selectedProject = this.projectService.getProject();
     if (!this.selectedProject) {
       this.routerService.navigateTo(PageType.PROJECT_EXPLORER);
       return;

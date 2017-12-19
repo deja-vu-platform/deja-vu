@@ -87,7 +87,9 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   this.projectService.widgetUpdateListener.subscribe(() => {
     this.updateView();
-    this.ref.detectChanges();
+    if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
+      this.ref.detectChanges();
+    }
   });
 
   this.stateService.visibleWindowDimensions.subscribe(
