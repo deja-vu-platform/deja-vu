@@ -10,115 +10,49 @@
 <button 
   class="btn btn-default btn-xs options"
   type="button"
-  (click)="toggleOptions()">
+  [matMenuTriggerFor]="options">
   <span class="glyphicon glyphicon-option-vertical"></span>
 </button>
 
-<div [hidden]="optionsHidden" 
-    class="config-btns">
-    <button type="button" class="btn btn-default edit-btn">
-        <span class="glyphicon glyphicon-pencil"></span>
-    </button>
-    
-    <div>
-      <li class="dropdown-submenu">
-        <a tabindex="-1" href="#" class="inner-component-style">Style</a>
-        <ul class="dropdown-menu inner-component-style-dropdown">
-          <li class="dropdown-submenu">
-              <div><!-- class="btn-group-vertical btn-group-xs">-->
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="glyphicon glyphicon-indent-left"></span> Align
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#" class="premade-style align-center">Center</a></li>
-                    <li><a href="#" class="premade-style align-right">Right</a></li>
-                    <li><a href="#" class="premade-style align-left">Left</a></li>
-                    <li><a href="#" class="premade-style align-justify">Justify</a></li>
-                </ul>
-            </div>
-            <div><!-- class="btn-group-vertical btn-group-xs">-->
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="glyphicon glyphicon-text-size"></span> Size
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#" class="premade-style lbl-small">Small</a></li>
-                    <li><a href="#" class="premade-style lbl-default">Default</a></li>
-                    <li><a href="#" class="premade-style lbl-large">Large</a></li>
-                    <li><a href="#" class="premade-style lbl-heading">H1</a></li>
-                </ul>
-            </div>
-            <div><!-- class="btn-group-vertical btn-group-xs">-->
-                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="glyphicon glyphicon-text-color"></span> Color
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li><a href="#" class="premade-style lbl-text-default">Default</a></li>
-                    <li><a href="#" class="premade-style lbl-text-muted">Muted</a></li>
-                    <li><a href="#" class="premade-style lbl-text-primary">Primary</a></li>
-                    <li><a href="#" class="premade-style lbl-text-success">Success</a></li>
-                    <li><a href="#" class="premade-style lbl-text-info">Info</a></li>
-                    <li><a href="#" class="premade-style lbl-text-warning">Warning</a></li>
-                    <li><a href="#" class="premade-style lbl-text-danger">Danger</a></li>
-                </ul>
-            </div>
-          <li class="divider"></li>
-          <li> 
-            <a tabindex="-1" href="#" class="inner-component-delete-style">Clear Styles</a>
-          </li>
-        </ul>
-      </li>
-    </div>
-</div>
-
-
-
-<button mat-button [matMenuTriggerFor]="animals">Animal index</button>
-
-<mat-menu #animals="matMenu">
-  <button mat-menu-item [matMenuTriggerFor]="vertebrates">Vertebrates</button>
-  <button mat-menu-item [matMenuTriggerFor]="invertebrates">Invertebrates</button>
+<mat-menu #options="matMenu">
+  <button mat-menu-item disabled>
+    <span class="glyphicon glyphicon-pencil"></span>
+  </button>
+  <button mat-menu-item [matMenuTriggerFor]="style">Style</button>
+  <!-- TODO divider -->
+  <button mat-menu-item>
+    <span class="glyphicon glyphicon-trash"></span>
+  </button>
 </mat-menu>
 
-<mat-menu #vertebrates="matMenu">
-  <button mat-menu-item [matMenuTriggerFor]="fish">Fishes</button>
-  <button mat-menu-item [matMenuTriggerFor]="amphibians">Amphibians</button>
-  <button mat-menu-item [matMenuTriggerFor]="reptiles">Reptiles</button>
-  <button mat-menu-item>Birds</button>
-  <button mat-menu-item>Mammals</button>
+<mat-menu #style="matMenu">
+  <button mat-menu-item [matMenuTriggerFor]="styleAlign">Align</button>
+  <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>
+  <button mat-menu-item [matMenuTriggerFor]="styleColor">Color</button>
+  <!-- TODO divider -->
+  <button mat-menu-item>Clear Styles</button>
 </mat-menu>
 
-<mat-menu #invertebrates="matMenu">
-  <button mat-menu-item>Insects</button>
-  <button mat-menu-item>Molluscs</button>
-  <button mat-menu-item>Crustaceans</button>
-  <button mat-menu-item>Corals</button>
-  <button mat-menu-item>Arachnids</button>
-  <button mat-menu-item>Velvet worms</button>
-  <button mat-menu-item>Horseshoe crabs</button>
+<mat-menu #styleAlign="matMenu">
+    <button mat-menu-item class="align-center">Center</button>
+    <button mat-menu-item class="align-right">Right</button>
+    <button mat-menu-item class="align-left">Left</button>
+    <button mat-menu-item class="align-justify">Justify</button>
 </mat-menu>
 
-<mat-menu #fish="matMenu">
-  <button mat-menu-item>Baikal oilfish</button>
-  <button mat-menu-item>Bala shark</button>
-  <button mat-menu-item>Ballan wrasse</button>
-  <button mat-menu-item>Bamboo shark</button>
-  <button mat-menu-item>Banded killifish</button>
+<mat-menu #styleSize="matMenu">
+    <button mat-menu-item class="lbl-small">Small</button>
+    <button mat-menu-item class="lbl-default">Default</button>
+    <button mat-menu-item class="lbl-large">Large</button>
+    <button mat-menu-item class="lbl-heading">H1</button>
 </mat-menu>
 
-<mat-menu #amphibians="matMenu">
-  <button mat-menu-item>Sonoran desert toad</button>
-  <button mat-menu-item>Western toad</button>
-  <button mat-menu-item>Arroyo toad</button>
-  <button mat-menu-item>Yosemite toad</button>
-</mat-menu>
-
-<mat-menu #reptiles="matMenu">
-  <button mat-menu-item>Banded Day Gecko</button>
-  <button mat-menu-item>Banded Gila Monster</button>
-  <button mat-menu-item>Black Tree Monitor</button>
-  <button mat-menu-item>Blue Spiny Lizard</button>
-  <button mat-menu-item disabled>Velociraptor</button>
+<mat-menu #styleColor="matMenu">
+  <button mat-menu-item class="lbl-text-default">Default</button>
+  <button mat-menu-item class="lbl-text-muted">Muted</button>
+  <button mat-menu-item class="lbl-text-primary">Primary</button>
+  <button mat-menu-item class="lbl-text-success">Success</button>
+  <button mat-menu-item class="lbl-text-info">Info</button>
+  <button mat-menu-item class="lbl-text-warning">Warning</button>
+  <button mat-menu-item class="lbl-text-danger">Danger</button>
 </mat-menu>
