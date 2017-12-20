@@ -99,6 +99,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
             widget.setProject(project);
             // reset the dummy widget
             dummyWidget.setClicheId(undefined);
+            widget.updatePosition(this.newWidgetNewPosition(ui));
 
             userApp.addUnusedWidget(widget);
             this.selectedWidget.addInnerWidget(widget);
@@ -107,15 +108,13 @@ export class WorkSurfaceComponent implements AfterViewInit {
           // it must be an unused widget or an already added widget
           const alreadyAdded = (this.selectedWidget.getInnerWidgetIds().indexOf(widget.getId()) >= 0);
 
-          if (!alreadyAdded) {
+          if (alreadyAdded) {
+            widget.updatePosition(this.oldWidgetNewPosition(ui));
+          } else {
             this.selectedWidget.addInnerWidget(widget);
+            widget.updatePosition(this.newWidgetNewPosition(ui));
           }
         }
-        const offset = this.selectedWidget.getPosition();
-        widget.updatePosition({
-          top: ui.position.top - offset.top,
-          left: ui.position.left - offset.left
-        });
 
         this.selectedWidget.putInnerWidgetOnTop(widget.getId());
         this.projectService.widgetUpdated();
@@ -126,4 +125,17 @@ export class WorkSurfaceComponent implements AfterViewInit {
       }
     });
   }
+
+  private newWidgetNewPosition(ui): Position {
+    const offset = this.selectedWidget.getPosition();
+    return {
+      top: ui.position.top - offset.top,
+      left: ui.position.left - offset.left
+    };
+  }
+
+  private oldWidgetNewPosition(ui): Position {
+    return ui.position;
+  }
+
 }

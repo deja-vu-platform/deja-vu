@@ -72,11 +72,11 @@ export class WidgetComponent implements AfterViewInit, OnInit {
         });
     },
       stop: (e, ui) => {
-        this.widget.updatePosition(ui.position);
-        // projectService.widgetUpdated() is called in the worksurface,
-        // but important to do so here because drop() is called *before*
-        // dragging stops.
-        this.projectService.widgetUpdated();
+        // this.widget.updatePosition(ui.position);
+        // // projectService.widgetUpdated() is called in the worksurface,
+        // // but important to do so here because drop() is called *before*
+        // // dragging stops.
+        // this.projectService.widgetUpdated();
         ui.helper.css({
           'z-index': 'auto'
         });

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import { Cliche, UserCliche, DvCliche } from '../../../models/cliche/cliche';
 import { Widget, BaseWidget, UserWidget, LinkBaseWidget, LabelBaseWidget } from '../../../models/widget/widget';
@@ -9,7 +9,7 @@ import { ProjectService } from '../../../services/project.service';
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.css']
 })
-export class ListComponent {
+export class ListComponent implements OnInit {
   @Input() importedCliches: DvCliche[];
   userApp: UserCliche;
   pages: UserWidget[] = [];
@@ -21,11 +21,14 @@ export class ListComponent {
     new LabelBaseWidget(),
   ];
 
-  constructor(private projectService: ProjectService) {
-    projectService.projectUpdateListener.subscribe(() => {
+  constructor(private ref: ChangeDetectorRef,
+    private projectService: ProjectService) {}
+
+  ngOnInit() {
+    this.projectService.projectUpdateListener.subscribe(() => {
       this.refreshList();
     });
-    projectService.widgetUpdateListener.subscribe(() => {
+    this.projectService.widgetUpdateListener.subscribe(() => {
       this.refreshList();
     });
   }
@@ -45,5 +48,8 @@ export class ListComponent {
     this.userApp.getUnusedWidgetIds().forEach((pageId) => {
       this.unusedWidgets.push(this.userApp.getWidget(pageId));
     });
+    if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
+      this.ref.detectChanges();
+    }
   }
 }
