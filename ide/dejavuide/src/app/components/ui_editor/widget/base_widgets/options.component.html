@@ -1,0 +1,25 @@
+<button class="btn btn-default btn-xs options"
+        type="button"
+        [matMenuTriggerFor]="options">
+  <span class="glyphicon glyphicon-option-vertical"></span>
+</button>
+
+<mat-menu #options="matMenu">
+  <!-- <button mat-menu-item [disabled]="editDisabled"> -->
+  <button mat-menu-item *ngIf="!editDisabled">
+    <span class="glyphicon glyphicon-pencil"></span>
+  </button>
+  <button mat-menu-item [matMenuTriggerFor]="style">Style</button>
+  <!-- TODO divider -->
+  <button mat-menu-item>
+    <span class="glyphicon glyphicon-trash"></span>
+  </button>
+</mat-menu>
+
+<mat-menu #style="matMenu">
+  <ng-content select="[items]"></ng-content>
+  <!-- TODO divider -->
+  <button mat-menu-item>Clear Styles</button>
+</mat-menu>
+
+<ng-content select="[menus]"></ng-content>

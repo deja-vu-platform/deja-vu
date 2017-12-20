@@ -34,47 +34,31 @@
   </div>
 </div>
 
-<button class="btn btn-default btn-xs options"
-        type="button"
-        [matMenuTriggerFor]="options">
-  <span class="glyphicon glyphicon-option-vertical"></span>
-</button>
-
-<mat-menu #options="matMenu">
-  <button mat-menu-item>
-    <span class="glyphicon glyphicon-pencil"></span>
-  </button>
-  <button mat-menu-item [matMenuTriggerFor]="style">Style</button>
-  <!-- TODO divider -->
-  <button mat-menu-item>
-    <span class="glyphicon glyphicon-trash"></span>
-  </button>
-</mat-menu>
-
-<mat-menu #style="matMenu">
-  <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
-  <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>
-  <!-- TODO divider -->
-  <button mat-menu-item>Clear Styles</button>
-</mat-menu>
-
-<mat-menu #styleStyle="matMenu">
-  <button mat-menu-item class="btn-style-link">Link</button>
-  <!-- TODO divider -->
-  <button mat-menu-item [matMenuTriggerFor]="styleStyleButton">Button</button>
-</mat-menu>
-
-<mat-menu #styleStyleButton="matMenu">
-  <button mat-menu-item  class="btn-style-default">Default</button>
-  <button mat-menu-item  class="btn-style-primary">Primary</button>
-  <button mat-menu-item  class="btn-style-success">Success</button>
-  <button mat-menu-item  class="btn-style-info">Info</button>
-  <button mat-menu-item  class="btn-style-warning">Warning</button>
-  <button mat-menu-item  class="btn-style-danger">Danger</button>
-</mat-menu>
-
-<mat-menu #styleSize="matMenu">
-  <button mat-menu-item class="btn-size-xs">Small</button>
-  <button mat-menu-item class="btn-size-df">Default</button>
-  <button mat-menu-item class="btn-size-lg">Large</button>
-</mat-menu>
+<dv-widget-options>
+  <div items>
+    <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
+    <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>    
+  </div>
+  <div menus>
+    <mat-menu #styleStyle="matMenu">
+      <button mat-menu-item class="btn-style-link">Link</button>
+      <!-- TODO divider -->
+      <button mat-menu-item [matMenuTriggerFor]="styleStyleButton">Button</button>
+    </mat-menu>
+    
+    <mat-menu #styleStyleButton="matMenu">
+      <button mat-menu-item  class="btn-style-default">Default</button>
+      <button mat-menu-item  class="btn-style-primary">Primary</button>
+      <button mat-menu-item  class="btn-style-success">Success</button>
+      <button mat-menu-item  class="btn-style-info">Info</button>
+      <button mat-menu-item  class="btn-style-warning">Warning</button>
+      <button mat-menu-item  class="btn-style-danger">Danger</button>
+    </mat-menu>
+    
+    <mat-menu #styleSize="matMenu">
+      <button mat-menu-item class="btn-size-xs">Small</button>
+      <button mat-menu-item class="btn-size-df">Default</button>
+      <button mat-menu-item class="btn-size-lg">Large</button>
+    </mat-menu>
+  </div>  
+</dv-widget-options>

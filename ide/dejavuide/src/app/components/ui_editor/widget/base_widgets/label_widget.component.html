@@ -7,52 +7,35 @@
   </p>
 </div>
 
-<button 
-  class="btn btn-default btn-xs options"
-  type="button"
-  [matMenuTriggerFor]="options">
-  <span class="glyphicon glyphicon-option-vertical"></span>
-</button>
-
-<mat-menu #options="matMenu">
-  <button mat-menu-item disabled>
-    <span class="glyphicon glyphicon-pencil"></span>
-  </button>
-  <button mat-menu-item [matMenuTriggerFor]="style">Style</button>
-  <!-- TODO divider -->
-  <button mat-menu-item>
-    <span class="glyphicon glyphicon-trash"></span>
-  </button>
-</mat-menu>
-
-<mat-menu #style="matMenu">
-  <button mat-menu-item [matMenuTriggerFor]="styleAlign">Align</button>
-  <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>
-  <button mat-menu-item [matMenuTriggerFor]="styleColor">Color</button>
-  <!-- TODO divider -->
-  <button mat-menu-item>Clear Styles</button>
-</mat-menu>
-
-<mat-menu #styleAlign="matMenu">
-    <button mat-menu-item class="align-center">Center</button>
-    <button mat-menu-item class="align-right">Right</button>
-    <button mat-menu-item class="align-left">Left</button>
-    <button mat-menu-item class="align-justify">Justify</button>
-</mat-menu>
-
-<mat-menu #styleSize="matMenu">
-    <button mat-menu-item class="lbl-small">Small</button>
-    <button mat-menu-item class="lbl-default">Default</button>
-    <button mat-menu-item class="lbl-large">Large</button>
-    <button mat-menu-item class="lbl-heading">H1</button>
-</mat-menu>
-
-<mat-menu #styleColor="matMenu">
-  <button mat-menu-item class="lbl-text-default">Default</button>
-  <button mat-menu-item class="lbl-text-muted">Muted</button>
-  <button mat-menu-item class="lbl-text-primary">Primary</button>
-  <button mat-menu-item class="lbl-text-success">Success</button>
-  <button mat-menu-item class="lbl-text-info">Info</button>
-  <button mat-menu-item class="lbl-text-warning">Warning</button>
-  <button mat-menu-item class="lbl-text-danger">Danger</button>
-</mat-menu>
+<dv-widget-options [editDisabled]="true">
+  <div items>
+    <button mat-menu-item [matMenuTriggerFor]="styleAlign">Align</button>
+    <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>
+    <button mat-menu-item [matMenuTriggerFor]="styleColor">Color</button>
+  </div>
+  <div menus>
+    <mat-menu #styleAlign="matMenu">
+      <button mat-menu-item class="align-center">Center</button>
+      <button mat-menu-item class="align-right">Right</button>
+      <button mat-menu-item class="align-left">Left</button>
+      <button mat-menu-item class="align-justify">Justify</button>
+    </mat-menu>
+    
+    <mat-menu #styleSize="matMenu">
+      <button mat-menu-item class="lbl-small">Small</button>
+      <button mat-menu-item class="lbl-default">Default</button>
+      <button mat-menu-item class="lbl-large">Large</button>
+      <button mat-menu-item class="lbl-heading">H1</button>
+    </mat-menu>
+    
+    <mat-menu #styleColor="matMenu">
+      <button mat-menu-item class="lbl-text-default">Default</button>
+      <button mat-menu-item class="lbl-text-muted">Muted</button>
+      <button mat-menu-item class="lbl-text-primary">Primary</button>
+      <button mat-menu-item class="lbl-text-success">Success</button>
+      <button mat-menu-item class="lbl-text-info">Info</button>
+      <button mat-menu-item class="lbl-text-warning">Warning</button>
+      <button mat-menu-item class="lbl-text-danger">Danger</button>
+    </mat-menu>
+  </div>  
+</dv-widget-options>
