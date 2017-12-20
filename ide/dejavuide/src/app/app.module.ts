@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import { RouterModule, Routes, RouteReuseStrategy } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { HeaderModule } from './components/common/header/header.module';
@@ -14,6 +14,7 @@ import { UiEditorComponent } from './components/ui_editor/ui_editor.component';
 import { ProjectExplorerModule } from './components/project_explorer/project_explorer.module';
 import { ProjectExplorerComponent } from './components/project_explorer/project_explorer.component';
 import { RouterService } from './services/router.service';
+import { CustomRouteReuseStrategy } from './services/CustomRouteReuseStrategy';
 
 const appRoutes: Routes = [
   { path: 'projects', component: ProjectExplorerComponent},
@@ -34,7 +35,11 @@ const appRoutes: Routes = [
       // { enableTracing: true } // <-- debugging purposes only
     )
   ],
-  providers: [RouterService, StateService, ProjectService],
+  providers: [
+    RouterService,
+    StateService,
+    ProjectService,
+    {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

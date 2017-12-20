@@ -25,9 +25,6 @@ export class ListComponent implements OnInit {
     private projectService: ProjectService) {}
 
   ngOnInit() {
-    this.projectService.projectUpdateListener.subscribe(() => {
-      this.refreshList();
-    });
     this.projectService.widgetUpdateListener.subscribe(() => {
       this.refreshList();
     });
@@ -48,8 +45,6 @@ export class ListComponent implements OnInit {
     this.userApp.getUnusedWidgetIds().forEach((pageId) => {
       this.unusedWidgets.push(this.userApp.getWidget(pageId));
     });
-    if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
-      this.ref.detectChanges();
-    }
+    this.ref.detectChanges();
   }
 }

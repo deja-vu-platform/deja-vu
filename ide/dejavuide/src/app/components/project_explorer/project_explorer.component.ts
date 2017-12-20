@@ -62,9 +62,7 @@ export class ProjectExplorerComponent implements OnInit {
 
       this.updateDisplayProjectList();
       this.loaderVisible = false;
-      if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
-        this.ref.detectChanges();
-      }
+      this.ref.detectChanges();
     });
 
     ipcRenderer.on('delete-success', (event) => {
@@ -72,9 +70,7 @@ export class ProjectExplorerComponent implements OnInit {
       delete this.projects[event.projectName];
       this.updateDisplayProjectList();
       this.loaderVisible = false;
-      if (!this.ref['destroyed']) {
-        this.ref.detectChanges();
-      }
+      this.ref.detectChanges();
       // TODO deal with if the project is your selected project
     });
 

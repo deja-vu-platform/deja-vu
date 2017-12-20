@@ -30,14 +30,13 @@ export class WidgetOptionsComponent {
   }
 
   delete() {
-    console.log('delete clicked');
     this.unlinkWidgetFromParent();
     const userApp = this.projectService.getProject().getUserApp();
     userApp.removeUnusedWidget(this.widget.getId());
+    this.projectService.widgetUpdated();
   }
 
   unlink() {
-    console.log('unlink clicked');
     this.unlinkWidgetFromParent();
     this.projectService.widgetUpdated();
   }

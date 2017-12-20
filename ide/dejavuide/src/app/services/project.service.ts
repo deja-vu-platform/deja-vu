@@ -8,15 +8,11 @@ import { Widget } from '../models/widget/widget';
 export class ProjectService {
   private selectedProject: Project;
 
-  // TODO perhaps project and widget update listeners can be merged
-  projectUpdateListener = new ReplaySubject<boolean>(1);
-
   selectedWidget = new ReplaySubject<Widget>(1);
   widgetUpdateListener = new ReplaySubject<boolean>(1);
 
   public updateProject(project: Project) {
     this.selectedProject = project;
-    this.projectUpdated();
   }
 
   public getProject(): Project {
@@ -34,9 +30,5 @@ export class ProjectService {
 
   widgetUpdated() {
     this.widgetUpdateListener.next(true);
-  }
-
-  projectUpdated() {
-    this.projectUpdateListener.next(true);
   }
 }

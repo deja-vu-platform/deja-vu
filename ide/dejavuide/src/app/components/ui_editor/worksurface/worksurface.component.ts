@@ -119,9 +119,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
         this.selectedWidget.putInnerWidgetOnTop(widget.getId());
         this.projectService.widgetUpdated();
 
-        if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
-          this.ref.detectChanges();
-        }
+        this.ref.detectChanges();
       }
     });
   }
