@@ -19,13 +19,13 @@ fdescribe('UserWidget', () => {
     userApp = project.userApp;
     userAppId = userApp.getId();
 
-    widget1 = new LinkBaseWidget(project, 'widget1', {width: 1, height: 1}, '/', userAppId);
+    widget1 = new LinkBaseWidget(project, 'widget1', {width: 1, height: 1}, {text: '', target: ''}, userAppId);
     widget2 = new UserWidget(project, 'widget2', {width: 1, height: 1}, userAppId);
     widget3 = new UserWidget(project, 'widget3', {width: 1, height: 1}, userAppId);
 
     widget4 = new UserWidget(project, 'widget4', {width: 1, height: 1}, userAppId);
 
-    widget5 = new LinkBaseWidget(project, 'widget5', {width: 1, height: 1}, '/', userAppId, null, null, true);
+    widget5 = new LinkBaseWidget(project, 'widget5', {width: 1, height: 1}, {text: '', target: ''}, userAppId, null, null, true);
     widget6 = new UserWidget(project, 'widget6', {width: 1, height: 1}, userAppId, null, null, true);
 
     project.addAppWidget(widget1);
@@ -51,7 +51,7 @@ fdescribe('UserWidget', () => {
     });
 
     it ('removes itself from its template list', () => {
-      const widget6copy = widget6.makeCopy(true)[0];
+      const widget6copy = widget6.makeCopy(undefined, true)[0];
       expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(true);
 
       widget6copy.remove();
@@ -161,7 +161,7 @@ fdescribe('UserWidget', () => {
     });
 
     it ('from template of a non-template does nothing', () => {
-      const widget3copies = widget3.makeCopy(true);
+      const widget3copies = widget3.makeCopy(undefined, true);
       const widget3copy = widget3copies[0];
 
       expect(widget3copy.getTemplateId()).toBeNull();
@@ -180,7 +180,7 @@ fdescribe('UserWidget', () => {
 
     it ('from template of a template creates a normal widget', () => {
       widget6.addInnerWidget(widget5);
-      const widget6copies = widget6.makeCopy(true);
+      const widget6copies = widget6.makeCopy(undefined, true);
 
       expect(widget6copies[0].getTemplateId()).toEqual(widget6.getId());
       expect(widget6copies[0].isTemplate()).toBe(false);
@@ -226,7 +226,7 @@ fdescribe('UserWidget', () => {
     'but local styles are empty', () => {
       widget6.updateCustomStyle('background-color', 'red');
       const widget6Styles = widget6.getLocalCustomStyles();
-      const widget6copy = widget6.makeCopy(true)[0];
+      const widget6copy = widget6.makeCopy(undefined, true)[0];
       const widget6copyStyles = widget6copy.getLocalCustomStyles();
 
       expect(widget6copyStyles).toEqual({});
@@ -237,7 +237,7 @@ fdescribe('UserWidget', () => {
     () => {
       widget6.updateCustomStyle('background-color', 'red');
       widget6.updateCustomStyle('color', 'red');
-      const widget6copy = widget6.makeCopy(true)[0];
+      const widget6copy = widget6.makeCopy(undefined, true)[0];
 
       widget6copy.updateCustomStyle('color', 'blue');
       widget6copy.updateCustomStyle('font-weight', 'bold');

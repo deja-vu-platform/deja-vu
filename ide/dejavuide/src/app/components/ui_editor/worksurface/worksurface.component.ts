@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, ElementRef } from '@angular/core';
 
 import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
 import { Cliche } from '../../../models/cliche/cliche';
@@ -22,14 +22,18 @@ export class WorkSurfaceComponent implements AfterViewInit {
   selectedScreenDimensions: Dimensions;
   selectedWidget: Widget;
 
+  private elt: HTMLElement;
   private currentZoom = 1;
   private visibleWindowScroll: Position;
 
   constructor(
+    elt: ElementRef,
     private stateService: StateService,
     private projectService: ProjectService,
     private ref: ChangeDetectorRef
   ) {
+    this.elt = elt.nativeElement;
+
     stateService.zoom.subscribe((newZoom) => {
       this.currentZoom = newZoom;
     });
@@ -53,7 +57,19 @@ export class WorkSurfaceComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    $('.work-surface').droppable({
+    this.makeWorksurfaceDroppable();
+
+    $(this.elt).scroll((event: Event) => {
+      const elt = $(this.elt);
+      this.stateService.updateVisibleWindowScrollPosition({
+        top: elt.scrollTop(),
+        left: elt.scrollLeft()
+      });
+    });
+  }
+
+  private makeWorksurfaceDroppable() {
+    $(this.elt).droppable({
       accept: 'dv-widget, dv-list-item',
       hoverClass: 'highlight',
       tolerance: 'fit',
@@ -63,52 +79,51 @@ export class WorkSurfaceComponent implements AfterViewInit {
           return;
         }
         // Check if it's a new widget
-        let newWidget: Widget = ui.helper.dvWidget;
+        let widget: Widget = ui.helper.dvWidget;
+        if (!widget) {
+          return;
+        }
         const isNew = ui.helper.new;
-        console.log(ui);
         // if the new widget is a base type, create a new
         // widget object.
-        if (newWidget && isNew) {
-          if (newWidget.isBaseType()) {
+        if (isNew) {
+          if (widget.isBaseType()) {
             const project = this.projectService.getProject();
             const userApp = project.getUserApp();
             // Set the cliche id of the dummy widget to this
             // app id, so that the widget's id is set properly
             // when copying.
-            newWidget.setClicheId(userApp.getId());
-            newWidget = newWidget.makeCopy()[0];
-            newWidget.setProject(project);
+            const dummyWidget = widget;
+            dummyWidget.setClicheId(userApp.getId());
+            widget = widget.makeCopy()[0];
+            widget.setProject(project);
+            // reset the dummy widget
+            dummyWidget.setClicheId(undefined);
 
-            const offset = this.selectedWidget.getPosition();
-            newWidget.updatePosition({
-              top: ui.position.top - offset.top,
-              left: ui.position.left - offset.left
-            });
+            userApp.addUnusedWidget(widget);
+            this.selectedWidget.addInnerWidget(widget);
+          }
+        } else {
+          // it must be an unused widget or an already added widget
+          const alreadyAdded = (this.selectedWidget.getInnerWidgetIds().indexOf(widget.getId()) >= 0);
 
-            userApp.addUsedWidget(newWidget);
-            this.selectedWidget.addInnerWidget(newWidget);
-            this.projectService.widgetUpdated();
+          if (!alreadyAdded) {
+            this.selectedWidget.addInnerWidget(widget);
           }
         }
-        this.onDropFinished(newWidget.getId());
+        const offset = this.selectedWidget.getPosition();
+        widget.updatePosition({
+          top: ui.position.top - offset.top,
+          left: ui.position.left - offset.left
+        });
+
+        this.selectedWidget.putInnerWidgetOnTop(widget.getId());
+        this.projectService.widgetUpdated();
+
+        if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
+          this.ref.detectChanges();
+        }
       }
     });
-
-    $('dv-worksurface').scroll((event: Event) => {
-      const jqo = $('dv-worksurface');
-      this.stateService.updateVisibleWindowScrollPosition({
-        top: jqo.scrollTop(),
-        left: jqo.scrollLeft()
-      });
-    });
-  }
-
-  onDropFinished(id/** TODO */) {
-    if (this.selectedWidget.isUserType()) {
-      this.selectedWidget.putInnerWidgetOnTop(id);
-      if (!this.ref['destroyed']) { // Hack to prevent view destroyed errors
-        this.ref.detectChanges();
-      }
-    }
   }
 }

@@ -23,17 +23,27 @@ export class ListComponent {
 
   constructor(private projectService: ProjectService) {
     projectService.projectUpdateListener.subscribe(() => {
-      const project = projectService.getProject();
-      this.userApp = project.getUserApp();
-      this.userApp.getPageIds().forEach((pageId) => {
-        this.pages.push(this.userApp.getWidget(pageId) as UserWidget);
-      });
-      this.userApp.getTemplateIds().forEach((pageId) => {
-        this.templates.push(this.userApp.getWidget(pageId));
-      });
-      this.userApp.getUnusedWidgetIds().forEach((pageId) => {
-        this.unusedWidgets.push(this.userApp.getWidget(pageId));
-      });
+      this.refreshList();
+    });
+    projectService.widgetUpdateListener.subscribe(() => {
+      this.refreshList();
+    });
+  }
+
+  private refreshList() {
+    this.pages = [];
+    this.unusedWidgets = [];
+    this.templates = [];
+    const project = this.projectService.getProject();
+    this.userApp = project.getUserApp();
+    this.userApp.getPageIds().forEach((pageId) => {
+      this.pages.push(this.userApp.getWidget(pageId) as UserWidget);
+    });
+    this.userApp.getTemplateIds().forEach((pageId) => {
+      this.templates.push(this.userApp.getWidget(pageId));
+    });
+    this.userApp.getUnusedWidgetIds().forEach((pageId) => {
+      this.unusedWidgets.push(this.userApp.getWidget(pageId));
     });
   }
 }

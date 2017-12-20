@@ -64,7 +64,7 @@ export class ListItemComponent implements AfterViewInit {
               //     visibility: 'hidden'
               // });
               ui.helper.dvWidget = this.widget;
-              ui.helper.new = true;
+              ui.helper.new = !this.widget.getProject();
               this.dragging = true;
           },
           drag: (event, ui) => {

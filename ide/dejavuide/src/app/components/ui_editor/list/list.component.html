@@ -1,12 +1,22 @@
 <div *ngIf="userApp">
   <!-- for the user app -->
   <div> {{userApp.getName()}} </div>
-  <ng-container *ngFor="let widget of pages">
-    <dv-list-item [widget]="widget"
-                  [isDraggable]="true"
-                  [isDeletable]="true">
-    </dv-list-item>
-  </ng-container>
+  <div> Pages
+    <ng-container *ngFor="let widget of pages">
+      <dv-list-item [widget]="widget"
+                    [isDraggable]="false"
+                    [isDeletable]="true">
+      </dv-list-item>
+    </ng-container>
+  </div>
+  <div> Unused Widgets
+    <ng-container *ngFor="let widget of unusedWidgets">
+      <dv-list-item [widget]="widget"
+                    [isDraggable]="true"
+                    [isDeletable]="true">
+      </dv-list-item>
+    </ng-container>
+  </div>
 </div>
 <div>
   <!-- Base widgets -->

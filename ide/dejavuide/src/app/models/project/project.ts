@@ -13,6 +13,7 @@ export interface Meta {
   author?: string;
   templateId?: string;
   clicheId?: string;
+  parentId?: string;
 }
 
 export class Project {

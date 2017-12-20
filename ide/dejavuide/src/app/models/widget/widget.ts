@@ -29,7 +29,7 @@ export abstract class Widget {
     top: 0,
     left: 0
   };
-  protected meta: Meta; // id of the form 'clicheid_widgetid'
+  protected meta: Meta; // id is of the form 'clicheid_widgetid'
   protected _isTemplate = false;
   // If this is a template, keep a reference to all is copies.
   // If the template is changed, propagate the changes to the template copies.
@@ -64,7 +64,7 @@ export abstract class Widget {
    * @param fromTemplate Whether of not we are doing a "template" copy as
    *  opposed to a normal copy
    */
-  abstract makeCopy(fromTemplate: boolean): Widget[];
+  abstract makeCopy(parentId: string, fromTemplate: boolean): Widget[];
   protected newIdFromId(id: string) {
     const clicheid = Widget.decodeid(id)[0];
     return clicheid + '_' + generateId();
@@ -130,6 +130,14 @@ export abstract class Widget {
 
   setClicheId(cid: string) {
     this.meta.clicheId = cid;
+  }
+
+  getParentId(): string {
+    return this.meta.parentId;
+  }
+
+  setParentId(id: string) {
+    this.meta.parentId = id;
   }
 
   getTemplateId(): string {
@@ -278,6 +286,7 @@ export class BaseWidget extends Widget {
         object.isTemplate);
     }
 
+    bw.setParentId(object.meta.parentId);
     // Properties
     bw.updatePosition(object.position);
     return bw;
@@ -307,7 +316,7 @@ export class BaseWidget extends Widget {
     return this.type === BaseType.LABEL;
   }
 
-  makeCopy(fromTemplate = false): Widget[] {
+  makeCopy(parentId?: string, fromTemplate = false): Widget[] {
     let templateId = this.getTemplateId();
     const isTemplateCopy = fromTemplate && this._isTemplate;
     let isTemplate = this._isTemplate;
@@ -341,6 +350,9 @@ export class BaseWidget extends Widget {
         null, // generate a new id!
         templateId,
         isTemplate);
+    }
+    if (parentId) {
+      copyWidget.setParentId(parentId);
     }
     copyWidget.updatePosition(this.getPosition());
     if (isTemplateCopy) {
@@ -440,6 +452,8 @@ export class UserWidget extends Widget {
       widget.innerWidgetIds.push(id);
     });
 
+    widget.setParentId(object.meta.parentId);
+
     // Properties
     widget.updatePosition(object.position);
 
@@ -466,6 +480,7 @@ export class UserWidget extends Widget {
     const id = widget.getId();
     // Now the inner widgets list is the stack order
     this.innerWidgetIds.push(id);
+    widget.setParentId(this.getId());
     this.project.userApp.removeUnusedWidget(id);
     this.project.userApp.addUsedWidget(widget);
   }
@@ -473,6 +488,11 @@ export class UserWidget extends Widget {
   removeInnerWidget(id: string) {
     const index = this.innerWidgetIds.indexOf(id);
     this.innerWidgetIds.splice(index, 1);
+
+    const widget = this.project.getUserApp().getWidget(id);
+    widget.setParentId(undefined);
+    this.project.userApp.removeUsedWidget(id);
+    this.project.userApp.addUnusedWidget(widget);
   }
 
   getInnerWidgetIds() {
@@ -542,7 +562,7 @@ export class UserWidget extends Widget {
    * @param fromTemplate if this widget is not a template, this value is
    * ignored
    */
-  makeCopy(fromTemplate = false): Widget[] {
+  makeCopy(parentId?: string, fromTemplate = false): Widget[] {
     // TODO find a way to merge this and the fromObject code since
     // they are very similar
 
@@ -562,6 +582,9 @@ export class UserWidget extends Widget {
       null, // generate a new id!
       templateId,
       isTemplate);
+    if (parentId) {
+      copyWidget.setParentId(parentId);
+    }
     copyWidget.updatePosition(this.getPosition());
     if (isTemplateCopy) {
       // If you're making a tempate copy, add it to template copy list
@@ -570,7 +593,7 @@ export class UserWidget extends Widget {
 
     let copyWidgets: Widget[] = [copyWidget];
     for (const id of this.innerWidgetIds) {
-      const copyInnerWidgets = this.project.getAppWidget(id).makeCopy(fromTemplate);
+      const copyInnerWidgets = this.project.getAppWidget(id).makeCopy(copyWidget.getId(), fromTemplate);
       const innerWidgetCopy = copyInnerWidgets[0];
       copyWidget.addInnerWidget(innerWidgetCopy);
       copyWidgets = copyWidgets.concat(copyInnerWidgets);
