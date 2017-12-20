@@ -116,7 +116,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
           }
         }
 
-        this.selectedWidget.putInnerWidgetOnTop(widget.getId());
+        this.selectedWidget.putInnerWidgetOnTop(widget);
         this.projectService.widgetUpdated();
 
         this.ref.detectChanges();

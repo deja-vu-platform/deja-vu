@@ -601,9 +601,9 @@ export class UserWidget extends Widget {
     return copyWidgets;
   }
 
-  putInnerWidgetOnTop(widgetId: string) {
+  putInnerWidgetOnTop(widget: Widget) {
     const topWidgetId = this.innerWidgetIds[this.innerWidgetIds.length - 1];
-    this.changeInnerWidgetOrderByOne(widgetId, new Set([topWidgetId]));
+    this.changeInnerWidgetOrderByOne(widget, true, new Set([topWidgetId]));
   }
 
   /**
@@ -614,8 +614,12 @@ export class UserWidget extends Widget {
    * @param isUp whether to move up or down
    */
   changeInnerWidgetOrderByOne(
-    widgetId: string, overlappingWidgetIds: Set<string>, isUp = true) {
+    widget: Widget, isUp: boolean, overlappingWidgetIds?: Set<string>) {
 
+    const widgetId = widget.getId();
+    if (!overlappingWidgetIds) {
+      overlappingWidgetIds = this.findOverlappingWidgets(widget);
+    }
     const stackOrder = this.innerWidgetIds;
     let idxThisWidget;
     let idxNextWidget;

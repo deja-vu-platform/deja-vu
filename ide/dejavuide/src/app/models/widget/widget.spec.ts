@@ -278,7 +278,7 @@ fdescribe('UserWidget', () => {
 
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
-      widget6.putInnerWidgetOnTop(widget3.getId());
+      widget6.putInnerWidgetOnTop(widget3);
       let expectedOrder = [
         widget1.getId(),
         widget2.getId(),
@@ -289,7 +289,7 @@ fdescribe('UserWidget', () => {
 
       expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
-      widget6.putInnerWidgetOnTop(widget1.getId());
+      widget6.putInnerWidgetOnTop(widget1);
       expectedOrder = [
         widget2.getId(),
         widget4.getId(),
@@ -300,7 +300,7 @@ fdescribe('UserWidget', () => {
 
       expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
-      widget6.putInnerWidgetOnTop(widget1.getId());
+      widget6.putInnerWidgetOnTop(widget1);
       expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
     });
 
@@ -322,7 +322,7 @@ fdescribe('UserWidget', () => {
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
       const overlap = new Set([widget3.getId(), widget4.getId()]);
-      widget6.changeInnerWidgetOrderByOne(widget1.getId(), overlap);
+      widget6.changeInnerWidgetOrderByOne(widget1, true, overlap);
       let expectedOrder = [
         widget2.getId(),
         widget3.getId(),
@@ -334,7 +334,7 @@ fdescribe('UserWidget', () => {
       expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
 
-      widget6.changeInnerWidgetOrderByOne(widget1.getId(), overlap, false);
+      widget6.changeInnerWidgetOrderByOne(widget1, false, overlap);
       expectedOrder = [
         widget2.getId(),
         widget1.getId(),

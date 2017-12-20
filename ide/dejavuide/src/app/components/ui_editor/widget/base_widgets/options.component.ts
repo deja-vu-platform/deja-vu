@@ -42,19 +42,26 @@ export class WidgetOptionsComponent {
   }
 
   moveUp() {
-    console.log('move down clicked');
-    console.log(this.widget.getParentId());
+    const parent = this.getParentWidget();
+    parent.changeInnerWidgetOrderByOne(this.widget, true);
+    this.projectService.widgetUpdated();
   }
 
   moveDown() {
-    console.log('move down clicked');
+    const parent = this.getParentWidget();
+    parent.changeInnerWidgetOrderByOne(this.widget, false);
+    this.projectService.widgetUpdated();
   }
 
   private unlinkWidgetFromParent() {
+    const parent = this.getParentWidget();
+    parent.removeInnerWidget(this.widget.getId());
+  }
+
+  private getParentWidget(): UserWidget {
     const parentId = this.widget.getParentId();
     const userApp = this.projectService.getProject().getUserApp();
-    const parent = userApp.getWidget(parentId) as UserWidget;
-    parent.removeInnerWidget(this.widget.getId());
+    return userApp.getWidget(parentId) as UserWidget;
   }
 
 }
