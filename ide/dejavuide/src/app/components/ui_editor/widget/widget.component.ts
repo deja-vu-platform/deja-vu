@@ -35,15 +35,21 @@ export class WidgetComponent implements AfterViewInit, OnInit {
   ) {
       this.el = el.nativeElement;
 
-      projectService.widgetUpdateListener.subscribe(() => {
-        this.getInnerWidgets();
-      });
   }
-
 
   ngOnInit() {
     // get inner widgets
     this.getInnerWidgets();
+
+    this.projectService.widgetUpdateListener.subscribe(() => {
+      this.getInnerWidgets();
+      const localStyles = this.widget.getLocalCustomStyles();
+      console.log(localStyles);
+      Object.keys(localStyles).forEach((name) => {
+        this.el.style[name] = localStyles[name];
+      });
+    });
+
   }
 
   ngAfterViewInit() {
@@ -52,6 +58,12 @@ export class WidgetComponent implements AfterViewInit, OnInit {
     this.el.style.top = this.widget.getPosition().top + 'px';
     this.el.style.left = this.widget.getPosition().left + 'px';
     this.el.style.position = 'absolute';
+
+    // const localStyles = this.widget.getLocalCustomStyles();
+    // console.log(localStyles);
+    // Object.keys(localStyles).forEach((name) => {
+    //   this.el.style[name] = localStyles[name];
+    // });
 
     // Initiate draggable based on certain things
     // If it's the selected widget, it is always movable

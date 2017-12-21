@@ -289,6 +289,9 @@ export class BaseWidget extends Widget {
     bw.setParentId(object.meta.parentId);
     // Properties
     bw.updatePosition(object.position);
+    Object.keys(object.properties.styles.custom).forEach((name) => {
+      bw.updateCustomStyle(name, object.properties.styles.custom[name]);
+    });
     return bw;
   }
 

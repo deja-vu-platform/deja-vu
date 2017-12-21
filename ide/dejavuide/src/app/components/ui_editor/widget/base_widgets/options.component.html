@@ -37,6 +37,18 @@
 </mat-menu>
 
 <mat-menu #style="matMenu">
+  <div mat-menu-item (click)="openBgPicker($event)">
+    Background Color:
+    <input #bgInput 
+            class="color-input bg-color"
+            (change)="bgColorChange($event)">
+  </div>
+  <div mat-menu-item (click)="openTextPicker($event)">
+      Text Color:
+      <input #textInput 
+              class="color-input bg-color"
+              (change)="textColorChange($event)">
+    </div>
   <ng-content select="[items]"></ng-content>
   <!-- TODO divider -->
   <button mat-menu-item
