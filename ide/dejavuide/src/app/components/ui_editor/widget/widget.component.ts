@@ -23,9 +23,11 @@ export class WidgetComponent implements AfterViewInit, OnInit {
    * So any grandchildren and so on are not movable in this view.
    */
   @Input() isMovable = false;
+  @Input() inheritedStyles;
 
   readonly Widget = Widget;
   innerWidgets: Widget[] = [];
+  stylesToShow;
 
   private el: HTMLElement;
 
@@ -34,7 +36,6 @@ export class WidgetComponent implements AfterViewInit, OnInit {
     private projectService: ProjectService
   ) {
       this.el = el.nativeElement;
-
   }
 
   ngOnInit() {
@@ -43,10 +44,11 @@ export class WidgetComponent implements AfterViewInit, OnInit {
 
     this.projectService.widgetUpdateListener.subscribe(() => {
       this.getInnerWidgets();
-      const localStyles = this.widget.getLocalCustomStyles();
-      console.log(localStyles);
-      Object.keys(localStyles).forEach((name) => {
-        this.el.style[name] = localStyles[name];
+      // const localStyles = this.widget.getLocalCustomStyles();
+      this.stylesToShow = this.widget.getCustomStylesToShow(this.inheritedStyles);
+      console.log(this.stylesToShow);
+      Object.keys(this.stylesToShow).forEach((name) => {
+        this.el.style[name] = this.stylesToShow[name];
       });
     });
 
@@ -58,12 +60,6 @@ export class WidgetComponent implements AfterViewInit, OnInit {
     this.el.style.top = this.widget.getPosition().top + 'px';
     this.el.style.left = this.widget.getPosition().left + 'px';
     this.el.style.position = 'absolute';
-
-    // const localStyles = this.widget.getLocalCustomStyles();
-    // console.log(localStyles);
-    // Object.keys(localStyles).forEach((name) => {
-    //   this.el.style[name] = localStyles[name];
-    // });
 
     // Initiate draggable based on certain things
     // If it's the selected widget, it is always movable

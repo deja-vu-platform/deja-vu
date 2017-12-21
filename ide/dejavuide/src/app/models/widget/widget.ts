@@ -173,8 +173,12 @@ export abstract class Widget {
     this.properties.styles.custom[styleName] = value;
   }
 
-  removeCustomStyle(styleName: string) {
-    delete this.properties.styles.custom[styleName];
+  removeCustomStyle(styleName?: string) {
+    if (styleName) {
+      delete this.properties.styles.custom[styleName];
+    } else {
+      this.properties.styles.custom = {};
+    }
   }
 
   /**
@@ -358,6 +362,9 @@ export class BaseWidget extends Widget {
       copyWidget.setParentId(parentId);
     }
     copyWidget.updatePosition(this.getPosition());
+    Object.keys(this.properties.styles.custom).forEach((name) => {
+      copyWidget.updateCustomStyle(name, this.properties.styles.custom[name]);
+    });
     if (isTemplateCopy) {
       // If you're making a tempate copy, add to template copies
       this.templateCopies.add(copyWidget.getId());
@@ -459,6 +466,9 @@ export class UserWidget extends Widget {
 
     // Properties
     widget.updatePosition(object.position);
+    Object.keys(object.properties.styles.custom).forEach((name) => {
+      widget.updateCustomStyle(name, object.properties.styles.custom[name]);
+    });
 
     return widget;
   }
@@ -593,6 +603,9 @@ export class UserWidget extends Widget {
       // If you're making a tempate copy, add it to template copy list
       this.templateCopies.add(copyWidget.getId());
     }
+    Object.keys(this.properties.styles.custom).forEach((name) => {
+      copyWidget.updateCustomStyle(name, this.properties.styles.custom[name]);
+    });
 
     let copyWidgets: Widget[] = [copyWidget];
     for (const id of this.innerWidgetIds) {

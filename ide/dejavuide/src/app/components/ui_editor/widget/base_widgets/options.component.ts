@@ -14,6 +14,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   @ViewChild('bgInput', {read: ElementRef}) private bgInputElt: ElementRef;
   @Input() editDisabled = false;
   @Input() widget: Widget;
+
   pickerText;
   pickerBg;
 
@@ -32,7 +33,8 @@ export class WidgetOptionsComponent implements AfterViewInit {
   }
 
   clearStyles() {
-    console.log('clear styles clicked');
+    this.widget.removeCustomStyle();
+    this.projectService.widgetUpdated();
   }
 
   showTooltip() {

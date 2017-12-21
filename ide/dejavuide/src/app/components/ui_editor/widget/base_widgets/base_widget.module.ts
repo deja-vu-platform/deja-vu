@@ -20,7 +20,8 @@ import { WidgetOptionsComponent } from './options.component';
   providers: [],
   exports: [
     LabelWidgetComponent,
-    LinkWidgetComponent
+    LinkWidgetComponent,
+    WidgetOptionsComponent
   ]
 })
 export class BaseWidgetModule { }
