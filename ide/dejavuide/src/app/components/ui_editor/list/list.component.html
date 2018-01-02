@@ -19,6 +19,15 @@
       </dv-list-item>
     </ng-container>
   </div>
+  <div> Templates
+    <ng-container *ngFor="let widget of templates">
+      <dv-list-item [widget]="widget"
+                    [isDraggable]="true"
+                    [isDeletable]="true"
+                    [isTemplate]="true">
+      </dv-list-item>
+    </ng-container>
+  </div>
 </div>
 <div>
   <!-- Base widgets -->
@@ -26,7 +35,8 @@
   <ng-container *ngFor="let widget of baseWidgets">
       <dv-list-item [widget]="widget"
                     [isDraggable]="true"
-                    [isDeletable]="false">
+                    [isDeletable]="false"
+                    [createNew]="true">
       </dv-list-item>
     </ng-container>
   </div>

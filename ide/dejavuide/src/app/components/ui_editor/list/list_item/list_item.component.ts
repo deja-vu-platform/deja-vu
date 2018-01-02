@@ -23,6 +23,8 @@ const $ = <any>jQuery;
 export class ListItemComponent implements AfterViewInit {
   @Input() isDraggable = false;
   @Input() isDeletable = true;
+  @Input() createNew = false;
+  @Input() isTemplate = false;
   @Input() widget: Widget;
   @ViewChild('ghost', {read: ElementRef}) ghost: ElementRef;
   dragging = false;
@@ -64,7 +66,8 @@ export class ListItemComponent implements AfterViewInit {
               //     visibility: 'hidden'
               // });
               ui.helper.dvWidget = this.widget;
-              ui.helper.new = !this.widget.getProject();
+              ui.helper.new = this.createNew;
+              ui.helper.template = this.isTemplate;
               this.dragging = true;
           },
           drag: (event, ui) => {

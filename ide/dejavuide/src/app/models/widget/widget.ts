@@ -64,7 +64,7 @@ export abstract class Widget {
    * @param fromTemplate Whether of not we are doing a "template" copy as
    *  opposed to a normal copy
    */
-  abstract makeCopy(parentId: string, fromTemplate: boolean): Widget[];
+  abstract makeCopy(parentId?: string, fromTemplate?: boolean): Widget[];
   protected newIdFromId(id: string) {
     const clicheid = Widget.decodeid(id)[0];
     return clicheid + '_' + generateId();

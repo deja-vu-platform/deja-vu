@@ -127,6 +127,15 @@ export class UserCliche extends Cliche {
     this.widgets.get(WidgetGroup.TEMPLATE).set(widget.getId(), widget);
   }
 
+  addTemplateAndInner (widgets: Widget[]) {
+    this.addTemplate(widgets[0]);
+    widgets.forEach((innerWidget, index) => {
+      if (index !== 0) {
+        this.addUsedWidget(innerWidget);
+      }
+    });
+  }
+
   removeTemplate (widgetId: string) {
     this.widgets.get(WidgetGroup.TEMPLATE).delete(widgetId);
   }
@@ -157,6 +166,12 @@ export class UserCliche extends Cliche {
 
   addUsedWidget (widget: Widget) {
     this.widgets.get(WidgetGroup.USED).set(widget.getId(), widget);
+  }
+
+  addUsedWidgetAndInner (widgets: Widget[]) {
+    widgets.forEach(widget => {
+      this.addUsedWidget(widget);
+    });
   }
 
   removeUsedWidget (widgetId: string) {

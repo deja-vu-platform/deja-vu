@@ -93,34 +93,38 @@ export class WorkSurfaceComponent implements AfterViewInit {
           // non-user widgets can't be added to.
           return;
         } else {
+          const isTemplate = ui.helper.template;
           // Check if it's a new widget
           const isNew = ui.helper.new;
-          // if the new widget is a base type, create a new
-          // widget object.
-          console.log(isNew);
-          if (isNew) {
-            if (widget.isBaseType()) {
-              const project = this.projectService.getProject();
-              const userApp = project.getUserApp();
+          if (isNew || isTemplate) {
+            // create a new widget object.
+            const project = this.projectService.getProject();
+            const userApp = project.getUserApp();
+            let innerWidgets: Widget[];
+            if (isNew) {
               // Set the cliche id of the dummy widget to this
               // app id, so that the widget's id is set properly
               // when copying.
               const dummyWidget = widget;
               dummyWidget.setClicheId(userApp.getId());
-              widget = widget.makeCopy()[0];
+              innerWidgets = widget.makeCopy();
+              widget = innerWidgets[0];
               widget.setProject(project);
               // reset the dummy widget
               dummyWidget.setClicheId(undefined);
-              widget.updatePosition(this.newWidgetNewPosition(ui));
-
-              userApp.addUnusedWidget(widget);
-              this.selectedWidget.addInnerWidget(widget);
+            } else {
+              innerWidgets = widget.makeCopy(undefined, true);
+              widget = innerWidgets[0];
             }
+
+            widget.updatePosition(this.newWidgetNewPosition(ui));
+
+            userApp.addUsedWidgetAndInner(innerWidgets);
+            this.selectedWidget.addInnerWidget(widget);
           } else {
             // it must be an unused widget or an already added widget
             const alreadyAdded = (this.selectedWidget.getInnerWidgetIds().indexOf(widget.getId()) >= 0);
 
-            console.log(alreadyAdded);
             if (alreadyAdded) {
               widget.updatePosition(this.oldWidgetNewPosition(ui));
             } else {

@@ -82,11 +82,8 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
         ui.helper.css({
           'z-index': 9999
         });
-
-        console.log('start drag');
     },
       stop: (e, ui) => {
-        console.log('stop drag');
         ui.helper.css({
           'z-index': 'auto'
         });

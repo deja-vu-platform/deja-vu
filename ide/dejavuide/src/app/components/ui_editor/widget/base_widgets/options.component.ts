@@ -44,9 +44,11 @@ export class WidgetOptionsComponent implements AfterViewInit {
 
   createTemplate() {
     console.log('create template clicked');
-    // var copy = createUserWidgetCopy(widget);
-    // userApp.addTemplate(copy);
-    // listDisplay.refresh();
+    const copies = this.widget.makeCopy();
+    const userApp = this.projectService.getProject().getUserApp();
+
+    userApp.addTemplateAndInner(copies);
+    this.projectService.widgetUpdated();
   }
 
   delete() {
