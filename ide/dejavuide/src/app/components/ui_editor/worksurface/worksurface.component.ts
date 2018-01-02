@@ -21,6 +21,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
    */
   selectedScreenDimensions: Dimensions;
   selectedWidget: Widget;
+  newFlag = false;
 
   private elt: HTMLElement;
   private currentZoom = 1;
@@ -50,13 +51,15 @@ export class WorkSurfaceComponent implements AfterViewInit {
         jqo.scrollTop(newScrollPosition.top);
         jqo.scrollLeft(newScrollPosition.left);
       });
-
-    projectService.selectedWidget.subscribe((newSelectedWidget) => {
-      this.selectedWidget = newSelectedWidget;
-    });
   }
 
   ngAfterViewInit() {
+    this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
+      console.log('work surface widget change listener');
+      this.selectedWidget = newSelectedWidget;
+      this.reinitChildComponent();
+    });
+
     this.makeWorksurfaceDroppable();
 
     $(this.elt).scroll((event: Event) => {
@@ -66,6 +69,13 @@ export class WorkSurfaceComponent implements AfterViewInit {
         left: elt.scrollLeft()
       });
     });
+  }
+
+  reinitChildComponent() {
+    this.newFlag = false;
+    this.ref.detectChanges();
+    this.newFlag = true;
+    this.ref.detectChanges();
   }
 
   private makeWorksurfaceDroppable() {

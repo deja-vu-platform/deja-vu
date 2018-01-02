@@ -1,5 +1,5 @@
 <div class="content">
-  <div class="name-container" >
+  <div class="name-container" (click)="widgetSelected()">
     <div *ngIf="widget.isBaseType()">
       <ng-container *ngIf="widget.isLink()">
         <img src="assets/link_icon.png" width="15px" height="15px">

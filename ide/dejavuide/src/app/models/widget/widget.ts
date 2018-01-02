@@ -177,7 +177,9 @@ export abstract class Widget {
     if (styleName) {
       delete this.properties.styles.custom[styleName];
     } else {
-      this.properties.styles.custom = {};
+      Object.keys(this.properties.styles.custom).forEach(name => {
+        this.properties.styles.custom[name] = 'unset';
+      });
     }
   }
 

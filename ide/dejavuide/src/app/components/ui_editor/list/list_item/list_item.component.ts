@@ -118,6 +118,11 @@ export class ListItemComponent implements AfterViewInit {
     this.innerShown = !this.innerShown;
   }
 
+  widgetSelected() {
+    console.log('widget clicked');
+    this.projectService.updateSelectedWidget(this.widget);
+  }
+
   private deleteUserWidget() {
     console.log('clicked delete');
     // if (userApp.getNumWidgets() == 1){

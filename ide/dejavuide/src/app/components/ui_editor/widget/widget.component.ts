@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ElementRef, OnChanges } from '@angular/core';
 
 import { Cliche } from '../../../models/cliche/cliche';
 import { Widget, UserWidget } from '../../../models/widget/widget';
@@ -15,7 +15,7 @@ const $ = <any>jQuery;
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class WidgetComponent implements AfterViewInit, OnInit {
+export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
   @Input() widget: Widget;
   @Input() isSelected = false;
   /**
@@ -38,18 +38,22 @@ export class WidgetComponent implements AfterViewInit, OnInit {
       this.el = el.nativeElement;
   }
 
-  ngOnInit() {
+  ngOnChanges() {
+    this.el.style.top = this.widget.getPosition().top + 'px';
+    this.el.style.left = this.widget.getPosition().left + 'px';
+    this.el.style.position = 'absolute';
+
     // get inner widgets
     this.getInnerWidgets();
 
+    this.updateStylesToShow();
+  }
+
+  ngOnInit() {
     this.projectService.widgetUpdateListener.subscribe(() => {
       this.getInnerWidgets();
       // const localStyles = this.widget.getLocalCustomStyles();
-      this.stylesToShow = this.widget.getCustomStylesToShow(this.inheritedStyles);
-      console.log(this.stylesToShow);
-      Object.keys(this.stylesToShow).forEach((name) => {
-        this.el.style[name] = this.stylesToShow[name];
-      });
+      this.updateStylesToShow();
     });
 
   }
@@ -57,9 +61,11 @@ export class WidgetComponent implements AfterViewInit, OnInit {
   ngAfterViewInit() {
     // Change the position of the widget in view. This is the best way to do
     // it without removing view encapsulation.
-    this.el.style.top = this.widget.getPosition().top + 'px';
-    this.el.style.left = this.widget.getPosition().left + 'px';
-    this.el.style.position = 'absolute';
+    // this.el.style.top = this.widget.getPosition().top + 'px';
+    // this.el.style.left = this.widget.getPosition().left + 'px';
+    // this.el.style.position = 'absolute';
+
+    // console.log(this.el.style.top, this.el.style.left);
 
     // Initiate draggable based on certain things
     // If it's the selected widget, it is always movable
@@ -122,5 +128,13 @@ export class WidgetComponent implements AfterViewInit, OnInit {
         this.innerWidgets.push(this.widget.getInnerWidget(innerWidgetId));
       }
     }
+  }
+
+  private updateStylesToShow() {
+    this.stylesToShow = this.widget.getCustomStylesToShow();
+    console.log(this.stylesToShow);
+    Object.keys(this.stylesToShow).forEach((name) => {
+      this.el.style[name] = this.stylesToShow[name];
+    });
   }
 }
