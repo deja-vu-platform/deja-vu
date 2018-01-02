@@ -117,6 +117,7 @@ export class ProjectExplorerComponent implements OnInit {
   private loadProject(project: Project) {
     project.updateAccess();
     this.projectService.updateProject(project);
+    localStorage.setItem('project', JSON.stringify(project.getSaveableJson()));
     this.zone.run(() => {
       this.routerService.navigateTo(PageType.UI_EDITOR);
     });

@@ -13,6 +13,7 @@ const ipcRenderer = electron.ipcRenderer;
 import { Component, Input, Output, OnInit} from '@angular/core';
 import { RouterService, PageType } from '../../../services/router.service';
 import { ProjectService } from '../../../services/project.service';
+import { Project } from '../../../models/project/project';
 
 interface PageInfo {
   title: string;
@@ -68,6 +69,16 @@ export class HeaderComponent implements OnInit {
     ipcRenderer.on('save-success', function(event) {
       console.log(event);
     });
+    // localStorage.setItem('project', '');
+    const project = localStorage.getItem('project');
+    if (project) {
+      if (!this.projectService.getProject()) {
+        this.projectService.updateProject(Project.fromObject(JSON.parse(project)));
+      }
+      this.pageType = PageType.UI_EDITOR;
+    } else {
+      this.pageType = PageType.PROJECT_EXPLORER;
+    }
 
     this.routerService.newPageType.subscribe((pageType) => {
       this.updateHeaderData(pageType);
@@ -95,7 +106,8 @@ export class HeaderComponent implements OnInit {
   save() {
     const selectedProject = this.projectService.getProject();
     if (selectedProject) {
-      ipcRenderer.send('save', {
+        localStorage.setItem('project', JSON.stringify(selectedProject.getSaveableJson()));
+        ipcRenderer.send('save', {
         projectName: selectedProject.getName(),
         projectContents: selectedProject.getSaveableJson()
       });
