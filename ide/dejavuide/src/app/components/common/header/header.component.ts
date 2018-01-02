@@ -69,7 +69,6 @@ export class HeaderComponent implements OnInit {
     ipcRenderer.on('save-success', function(event) {
       console.log(event);
     });
-    // localStorage.setItem('project', '');
     const project = localStorage.getItem('project');
     if (project) {
       if (!this.projectService.getProject()) {
@@ -106,6 +105,7 @@ export class HeaderComponent implements OnInit {
   save() {
     const selectedProject = this.projectService.getProject();
     if (selectedProject) {
+        // TODO code repeated in project_explorer too
         localStorage.setItem('project', JSON.stringify(selectedProject.getSaveableJson()));
         ipcRenderer.send('save', {
         projectName: selectedProject.getName(),
