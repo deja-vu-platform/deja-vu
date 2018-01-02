@@ -7,7 +7,6 @@
       <dv-widget-options [widget]="widget"></dv-widget-options>
       <ng-container *ngFor="let innerWidget of innerWidgets">
       <dv-widget [widget]="innerWidget"
-                  [inheritedStyles]="stylesToShow"
                   [isSelected]="false"
                   [isMovable]="isSelected">
       </dv-widget>

@@ -1,4 +1,8 @@
 .work-surface {
   position: relative;
-  background: palevioletred;
+  /* background: palevioletred; */
+}
+
+.highlight {
+  background: lightblue;
 }

@@ -23,11 +23,9 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
    * So any grandchildren and so on are not movable in this view.
    */
   @Input() isMovable = false;
-  @Input() inheritedStyles;
 
   readonly Widget = Widget;
   innerWidgets: Widget[] = [];
-  stylesToShow;
 
   private el: HTMLElement;
 
@@ -84,13 +82,11 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
         ui.helper.css({
           'z-index': 9999
         });
+
+        console.log('start drag');
     },
       stop: (e, ui) => {
-        // this.widget.updatePosition(ui.position);
-        // // projectService.widgetUpdated() is called in the worksurface,
-        // // but important to do so here because drop() is called *before*
-        // // dragging stops.
-        // this.projectService.widgetUpdated();
+        console.log('stop drag');
         ui.helper.css({
           'z-index': 'auto'
         });
@@ -131,10 +127,9 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
   }
 
   private updateStylesToShow() {
-    this.stylesToShow = this.widget.getCustomStylesToShow();
-    console.log(this.stylesToShow);
-    Object.keys(this.stylesToShow).forEach((name) => {
-      this.el.style[name] = this.stylesToShow[name];
+    const stylesToShow = this.widget.getCustomStylesToShow();
+    Object.keys(stylesToShow).forEach((name) => {
+      this.el.style[name] = stylesToShow[name];
     });
   }
 }

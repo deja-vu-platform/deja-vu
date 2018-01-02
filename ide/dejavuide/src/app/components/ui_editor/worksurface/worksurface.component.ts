@@ -55,7 +55,6 @@ export class WorkSurfaceComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
-      console.log('work surface widget change listener');
       this.selectedWidget = newSelectedWidget;
       this.reinitChildComponent();
     });
@@ -80,55 +79,59 @@ export class WorkSurfaceComponent implements AfterViewInit {
 
   private makeWorksurfaceDroppable() {
     $(this.elt).droppable({
-      accept: 'dv-widget, dv-list-item',
+      accept: 'dv-widget, .widget-component, dv-list-item',
       hoverClass: 'highlight',
-      tolerance: 'fit',
+      tolerance: 'touch',
       drop: (event, ui) => {
-        if (!this.selectedWidget.isUserType()) {
-          // non-user widgets can't be added to.
-          return;
-        }
-        // Check if it's a new widget
         let widget: Widget = ui.helper.dvWidget;
         if (!widget) {
           return;
         }
-        const isNew = ui.helper.new;
-        // if the new widget is a base type, create a new
-        // widget object.
-        if (isNew) {
-          if (widget.isBaseType()) {
-            const project = this.projectService.getProject();
-            const userApp = project.getUserApp();
-            // Set the cliche id of the dummy widget to this
-            // app id, so that the widget's id is set properly
-            // when copying.
-            const dummyWidget = widget;
-            dummyWidget.setClicheId(userApp.getId());
-            widget = widget.makeCopy()[0];
-            widget.setProject(project);
-            // reset the dummy widget
-            dummyWidget.setClicheId(undefined);
-            widget.updatePosition(this.newWidgetNewPosition(ui));
-
-            userApp.addUnusedWidget(widget);
-            this.selectedWidget.addInnerWidget(widget);
-          }
+        if (widget === this.selectedWidget) {
+          widget.updatePosition(this.oldWidgetNewPosition(ui));
+        } else if (!this.selectedWidget.isUserType()) {
+          // non-user widgets can't be added to.
+          return;
         } else {
-          // it must be an unused widget or an already added widget
-          const alreadyAdded = (this.selectedWidget.getInnerWidgetIds().indexOf(widget.getId()) >= 0);
+          // Check if it's a new widget
+          const isNew = ui.helper.new;
+          // if the new widget is a base type, create a new
+          // widget object.
+          console.log(isNew);
+          if (isNew) {
+            if (widget.isBaseType()) {
+              const project = this.projectService.getProject();
+              const userApp = project.getUserApp();
+              // Set the cliche id of the dummy widget to this
+              // app id, so that the widget's id is set properly
+              // when copying.
+              const dummyWidget = widget;
+              dummyWidget.setClicheId(userApp.getId());
+              widget = widget.makeCopy()[0];
+              widget.setProject(project);
+              // reset the dummy widget
+              dummyWidget.setClicheId(undefined);
+              widget.updatePosition(this.newWidgetNewPosition(ui));
 
-          if (alreadyAdded) {
-            widget.updatePosition(this.oldWidgetNewPosition(ui));
+              userApp.addUnusedWidget(widget);
+              this.selectedWidget.addInnerWidget(widget);
+            }
           } else {
-            this.selectedWidget.addInnerWidget(widget);
-            widget.updatePosition(this.newWidgetNewPosition(ui));
+            // it must be an unused widget or an already added widget
+            const alreadyAdded = (this.selectedWidget.getInnerWidgetIds().indexOf(widget.getId()) >= 0);
+
+            console.log(alreadyAdded);
+            if (alreadyAdded) {
+              widget.updatePosition(this.oldWidgetNewPosition(ui));
+            } else {
+              this.selectedWidget.addInnerWidget(widget);
+              widget.updatePosition(this.newWidgetNewPosition(ui));
+            }
           }
+          this.selectedWidget.putInnerWidgetOnTop(widget);
         }
 
-        this.selectedWidget.putInnerWidgetOnTop(widget);
         this.projectService.widgetUpdated();
-
         this.ref.detectChanges();
       }
     });

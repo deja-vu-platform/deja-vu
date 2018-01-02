@@ -31,11 +31,11 @@ export class ListComponent implements OnInit {
   }
 
   private refreshList() {
+    const project = this.projectService.getProject();
+    this.userApp = project.getUserApp();
     this.pages = [];
     this.unusedWidgets = [];
     this.templates = [];
-    const project = this.projectService.getProject();
-    this.userApp = project.getUserApp();
     this.userApp.getPageIds().forEach((pageId) => {
       this.pages.push(this.userApp.getWidget(pageId) as UserWidget);
     });
@@ -46,5 +46,23 @@ export class ListComponent implements OnInit {
       this.unusedWidgets.push(this.userApp.getWidget(pageId));
     });
     this.ref.detectChanges();
+  }
+
+  newPage() {
+    const project = this.projectService.getProject();
+    const newWidget = new UserWidget(project, 'new page', {
+      height: 500, width: 500
+    }, this.userApp.getId());
+    this.userApp.addPage(newWidget);
+    this.refreshList();
+  }
+
+  newWidget() {
+    const project = this.projectService.getProject();
+    const newWidget = new UserWidget(project, 'new widget', {
+      height: 100, width: 100
+    }, this.userApp.getId());
+    this.userApp.addUnusedWidget(newWidget);
+    this.refreshList();
   }
 }
