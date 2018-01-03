@@ -124,6 +124,7 @@ export class UserCliche extends Cliche {
   }
 
   addTemplate (widget: Widget) {
+    widget.setAsTemplate();
     this.widgets.get(WidgetGroup.TEMPLATE).set(widget.getId(), widget);
   }
 

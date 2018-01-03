@@ -148,6 +148,10 @@ export abstract class Widget {
     return this._isTemplate;
   }
 
+  setAsTemplate() {
+    this._isTemplate = true;
+  }
+
   /**
    * Checks if the given widget (id) was derived from this widget
    * as a template.
@@ -198,9 +202,11 @@ export abstract class Widget {
     const styles = Object.assign({}, parentStyles);
 
     let inheritedStyles = {};
-    if (this.getTemplateId()) {
+    const templateId = this.getTemplateId();
+    console.log(templateId);
+    if (templateId) {
       inheritedStyles = this.project
-        .getAppWidget(this.getTemplateId())
+        .getAppWidget(templateId)
         .getCustomStylesToShow(); // no parent styles for template
     }
 
