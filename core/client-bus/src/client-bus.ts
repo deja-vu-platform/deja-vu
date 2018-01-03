@@ -167,11 +167,7 @@ export class ClientBus {
       const finfo = adapt_table[target_fname];
       const fvalue = to_widget_info.this_widget[finfo.host_fname];
       const ftype = finfo.ftype.name;
-      if (fvalue === undefined) {
-        console.log(
-          "The value of field " + finfo.host_fname + " is undefined, " +
-          "it won't be included in the query parameters");
-      } else if (fvalue.atom_id !== undefined) {
+      if (fvalue.atom_id !== undefined) {
         query_params[target_fname] = [fvalue.atom_id, ftype];
       } else if (ftype === "Widget") {
         console.log("to be implemented");
@@ -528,59 +524,64 @@ export type WidgetMetadata = {
 }
 
 /**
- * Marks a class as a Deja Vu widget and collects configuration metadata
+ * Creates a document from an Angular component
  **/
-export function Widget(options: WidgetMetadata) {
-  return (target: Function) => {
-    const dname = _ustring.dasherize(target.name).slice(1, -10);
-    const metadata = {selector: dname};
+export function Doc(options: WidgetMetadata | Function): t => _Doc | _Doc {
+  if (typeof options === WidgetMetadata) {
+    return (target: Function) => {
+      const dname = _ustring.dasherize(target.name).slice(1, -10);
+      const metadata = {selector: dname};
 
-    let providers = [{provide: "wname", useValue: target.name.slice(0, -9)}];
-    if (options.ng2_providers !== undefined) {
-      providers = providers.concat(options.ng2_providers);
-    }
-    metadata["providers"] = providers;
-
-    let directives = [];
-    if (options.ng2_directives !== undefined) {
-      directives = directives.concat(options.ng2_directives);
-    }
-    metadata["directives"] = directives;
-    const system_map = System.getConfig().map;
-    const fqelement = options.fqelement.toLowerCase();
-    let module_id = system_map[fqelement];
-    if (module_id === undefined) {
-      module_id = system_map[fqelement + "/lib"];
-    } else {
-      module_id = module_id + "/lib";
-    }
-    if (options.template !== undefined) {
-      metadata["template"] = options.template;
-    } else {
-      metadata["templateUrl"] = `${module_id}/components/` +
-        `${dname}/${dname}.html`;
-    }
-
-    if (options.styles !== undefined) {
-      metadata["styles"] = options.styles;
-    } else {
-      let style_url = `${module_id}/components/${dname}/${dname}.css`;
-      // https://github.com/angular/angular/issues/4974
-      if (module_id === "") {
-        style_url = `components/${dname}/${dname}.css`;
+      let providers = [{provide: "wname", useValue: target.name.slice(0, -9)}];
+      if (options.ng2_providers !== undefined) {
+        providers = providers.concat(options.ng2_providers);
       }
-      metadata["styleUrls"] = [style_url];
-    }
-    if (options.external_styles !== undefined) {
-      if (metadata["styleUrls"] === undefined) {
-        metadata["styleUrls"] = [];
-      }
-      metadata["styleUrls"] = metadata["styleUrls"]
-        .concat(options.external_styles);
-    }
+      metadata["providers"] = providers;
 
-    return Component(metadata)(target);
-  };
+      let directives = [];
+      if (options.ng2_directives !== undefined) {
+        directives = directives.concat(options.ng2_directives);
+      }
+      metadata["directives"] = directives;
+      const system_map = System.getConfig().map;
+      let module_id = system_map[options.fqelement];
+      if (module_id === undefined) {
+        module_id = system_map[options.fqelement + "/lib"];
+      } else {
+        module_id = module_id + "/lib";
+      }
+      if (options.template !== undefined) {
+        metadata["template"] = options.template;
+      } else {
+        metadata["templateUrl"] = `${module_id}/components/` +
+          `${dname}/${dname}.html`;
+      }
+
+      if (options.styles !== undefined) {
+        metadata["styles"] = options.styles;
+      } else {
+        let style_url = `${module_id}/components/${dname}/${dname}.css`;
+        // https://github.com/angular/angular/issues/4974
+        if (module_id === "") {
+          style_url = `components/${dname}/${dname}.css`;
+        }
+        metadata["styleUrls"] = [style_url];
+      }
+      if (options.external_styles !== undefined) {
+        if (metadata["styleUrls"] === undefined) {
+          metadata["styleUrls"] = [];
+        }
+        metadata["styleUrls"] = metadata["styleUrls"]
+          .concat(options.external_styles);
+      }
+
+      ret = new _Doc();
+      ret.content = Component(metadata)(target);
+      return ret;
+    };
+  } else {
+    ret = new _Doc()
+  }
 }
 
 /**

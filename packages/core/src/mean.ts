@@ -24,12 +24,10 @@ const cli = command_line_args([
 ]);
 
 
-export class Mean {
+class _ServerDoc {
   fqelement: string;
   db; //: mongodb.Db;
   ws; //: express.Express;
-  comp: any;
-  locs: any;
   debug: boolean;
   private _opts: {
     fqelement: string,
@@ -43,20 +41,20 @@ export class Mean {
   constructor() {
     this._opts = cli.parse();
     this.fqelement = this._opts.fqelement;
-
+  
     console.log(
         `Starting MEAN ${this.fqelement} at ${this.port}`);
-
+  
     const server = new mongodb.Server(
       this._opts.dbhost, this._opts.dbport,
       {socketOptions: {autoReconnect: true}});
     this.db = new mongodb.Db(`${this.fqelement}-db`, server, {w: 1});
-
+  
     this.debug = this._opts.mode === "dev" && this._opts.main;
     this.ws = express();
     this.ws.use(morgan("dev"));
   }
-
+  
   start() {
     if (this._opts.main) {
       console.log(`Serving public folder for main MEAN ${this.fqelement}`);
@@ -66,12 +64,30 @@ export class Mean {
         res.sendFile("/public/dv-dev/index.html", {root: dist_dir});
       });
     }
-
+  
     this.ws.listen(this.port, () => {
       console.log(`Listening with opts ${JSON.stringify(this._opts, null, 2)}`);
     });
   }
 }
+
+
+class _ReactiveValue {
+}
+
+class _Context {
+  // any access we get for any prop we return its corresponding reactive value
+}
+
+class _Doc {
+  // content is going to be an angular component (wrapped with @Widget)
+}
+
+
+export function ServerDoc(d: _Context => any): _ServerDoc {
+}
+
+
 
 export interface UsedWidget {
   name: string;
@@ -329,12 +345,6 @@ export namespace GruntTask {
       .flatten()
       .value();
     const fields_from_wbonds = _u.pluck(wcomp_info.wbonds, "subfield");
-    // This won't include fields that have a default value but that are not part
-    // of any bonds. If you want to define a field with a default value
-    // that is only used in the HTML of the widget, you can use that value
-    // directly, or, if that's not possible, the workaround is to include a
-    // widget with display: none that will give you the bond
-    // (this is a temporary hack)
     const all_widget_fields = _u
       .uniq(fields_from_replace_map.concat(fields_from_wbonds), false,
             f => f.name + f.of.name + f.of.fqelement + f.type.name +
@@ -563,6 +573,7 @@ export namespace GruntTask {
     const ts_client_opts = _u.extend({module: "system"}, ts_base_opts);
     const ts_server_opts = _u.extend({module: "commonjs"}, ts_base_opts);
 
+    const typings = "typings/index.d.ts";
     const components = "src/components/**/*.ts";
     const shared = "src/shared/**/*.ts";
     const server = "src/*.ts";
@@ -570,22 +581,22 @@ export namespace GruntTask {
     return {
       ts: {
         dev_client: {
-          src: [shared, components, "src/dv-dev/!(app).ts"],
+          src: [typings, shared, components, "src/dv-dev/!(app).ts"],
           outDir: ["dist/public"],
           options: ts_client_opts
         },
         dev_server: {
-          src: [shared, server, "src/dv-dev/app.ts"],
+          src: [typings, shared, server, "src/dv-dev/app.ts"],
           outDir: ["dist"],
           options: ts_server_opts
         },
         lib_client: {
-          src: [shared, components],
+          src: [typings, shared, components],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_client_opts)
         },
         lib_server: {
-          src: [shared, server],
+          src: [typings, shared, server],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_server_opts)
         }

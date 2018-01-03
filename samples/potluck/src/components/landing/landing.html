@@ -1,14 +1,19 @@
-<dv-widget name="NavBar"></dv-widget>
 
 <div id="background-signin">
   <div class="container" id="signin-container">
     <div class="col-md-4 col-md-push-1">
       <h1 class="white-text">Sign In</h1>
-      <dv-widget name="SignInWithRedirect" of="StandardAuthentication"></dv-widget>   
+      <with-button-redirect label="Sign In" redirectsTo="parties">
+        <sign-in of="Auth"></sign-in>
+      </with-button-redirect>
+      {{ if user.username }}
+
     </div>
     <div class="col-md-4 col-md-push-2">
       <h1 class="white-text">Register</h1>
-      <dv-widget name="RegisterWithRedirect" of="StandardAuthentication"></dv-widget>
+      <with-button-redirect label="Register" redirectsTo="parties">
+        <register of="Auth"></register>
+      </with-button-redirect>
     </div>
   </div>
   <div id="description">

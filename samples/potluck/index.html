@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <title>Potluck</title>
+
+    <base href="/">
+    <link rel="stylesheet"
+     href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+     integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7"
+     crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="dv-dev/style.css">
+
+    <script src="node_modules/jquery/dist/jquery.min.js"></script>
+
+    <script src="node_modules/zone.js/dist/zone.js"></script>
+    <script src="node_modules/reflect-metadata/Reflect.js"></script>
+    <script src="node_modules/systemjs/dist/system.src.js"></script>
+
+    <script>
+      const cliches = @@cliches;
+
+      const map_obj = @@module_map; 
+
+      const regjs = {defaultExtension: "js"};
+
+      const packages_obj = {};
+      for (const fqelement of Object.keys(cliches)) {
+        const pkg = cliches[fqelement]
+        map_obj[fqelement] = "node_modules/" + pkg;
+        packages_obj[fqelement] = regjs;
+
+        const cliche_name_split = pkg.split("-")[2];
+        const cliche_name = cliche_name_split.charAt(0).toUpperCase() +
+          cliche_name_split.slice(1).toLowerCase();
+
+        map_obj[cliche_name] = "node_modules/" + pkg;
+        packages_obj[cliche_name] = regjs;
+
+        map_obj[pkg] = "node_modules/" + pkg;
+        packages_obj[pkg] = regjs;
+      }
+
+      packages_obj["dv-dev"] = {main: "./main.js", defaultExtension: "js"};
+      packages_obj["components"] = regjs;  // AppWidget uses this
+      packages_obj["shared"] = regjs;
+      packages_obj["rxjs"] = regjs;
+      map_obj["@@name"] = "dv-dev/root.js";
+
+      System.config({
+        map: map_obj
+        packages: packages_obj
+      });
+      System.import('dv-dev')
+        .catch(function(err) { console.error(err); });
+    </script>
+
+  </head>
+
+  <body>
+    <root></root>
+  </body>
+</html>
