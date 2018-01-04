@@ -4,6 +4,7 @@ import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/
 import { Cliche } from '../../../models/cliche/cliche';
 import { Dimensions, Position, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
+import { inArray } from '../../../utility/utility';
 
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
@@ -123,7 +124,8 @@ export class WorkSurfaceComponent implements AfterViewInit {
             this.selectedWidget.addInnerWidget(widget);
           } else {
             // it must be an unused widget or an already added widget
-            const alreadyAdded = (this.selectedWidget.getInnerWidgetIds().indexOf(widget.getId()) >= 0);
+            const alreadyAdded =
+              inArray(widget.getId(), this.selectedWidget.getInnerWidgetIds());
 
             if (alreadyAdded) {
               widget.updatePosition(this.oldWidgetNewPosition(ui));

@@ -19,14 +19,44 @@ fdescribe('UserWidget', () => {
     userApp = project.userApp;
     userAppId = userApp.getId();
 
-    widget1 = new LinkBaseWidget(project, 'widget1', {width: 1, height: 1}, {text: '', target: ''}, userAppId);
-    widget2 = new UserWidget(project, 'widget2', {width: 1, height: 1}, userAppId);
-    widget3 = new UserWidget(project, 'widget3', {width: 1, height: 1}, userAppId);
+    widget1 = new LinkBaseWidget(
+      {name: 'widget1',
+      dimensions: {width: 1, height: 1},
+      value: {text: '', target: ''},
+      clicheId: userAppId},
+      project);
 
-    widget4 = new UserWidget(project, 'widget4', {width: 1, height: 1}, userAppId);
+    widget2 = new UserWidget(
+      {name: 'widget2',
+      dimensions: {width: 1, height: 1},
+      clicheId: userAppId},
+      project);
 
-    widget5 = new LinkBaseWidget(project, 'widget5', {width: 1, height: 1}, {text: '', target: ''}, userAppId, null, null, true);
-    widget6 = new UserWidget(project, 'widget6', {width: 1, height: 1}, userAppId, null, null, true);
+    widget3 = new UserWidget(
+      {name: 'widget3',
+      dimensions: {width: 1, height: 1},
+      clicheId: userAppId},
+      project);
+
+    widget4 = new UserWidget(
+      {name: 'widget4',
+      dimensions: {width: 1, height: 1},
+      clicheId: userAppId},
+    project);
+
+    widget5 = new LinkBaseWidget(
+      {name: 'widget5',
+      dimensions: {width: 1, height: 1},
+      value: {text: '', target: ''},
+      clicheId: userAppId,
+      isTemplate: true},
+      project);
+    widget6 = new UserWidget(
+      {name: 'widget6',
+      dimensions: {width: 1, height: 1},
+      clicheId: userAppId,
+      isTemplate: true},
+      project);
 
     project.addAppWidget(widget1);
     project.addAppWidget(widget2);
@@ -131,14 +161,14 @@ fdescribe('UserWidget', () => {
 
   describe('fromObject', () => {
     it ('it creates a real widget from BaseWidgets', () => {
-      const widget5Copy = Widget.fromObject(project, widget5.getSaveableJson());
+      const widget5Copy = Widget.fromJSON(project, Widget.toJSON(widget5));
 
       expect(widget5Copy.getId()).toEqual(widget5.getId());
       expect(widget5Copy.isBaseType()).toBe(true);
     });
 
     it ('it creates a real widget from UserWidgets', () => {
-      const widget6Copy = Widget.fromObject(project, widget6.getSaveableJson());
+      const widget6Copy = Widget.fromJSON(project, Widget.toJSON(widget6));
 
       expect(widget6Copy.getId()).toEqual(widget6.getId());
       expect(widget6Copy.isUserType()).toBe(true);

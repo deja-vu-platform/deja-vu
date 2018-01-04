@@ -77,19 +77,25 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
       // Currently for testing
       // We create a main widget, give it some nester (inner) widgets
       // and give them some interesting sizes and positions.
-      const testWidget = new UserWidget(this.selectedProject, 'test',
-      { height: 600, width: 800 },
-      appId);
+      const testWidget = new UserWidget(
+        {name: 'test',
+        dimensions: { height: 600, width: 800 },
+        position: { top: 100, left: 300 },
+        clicheId: appId},
+        this.selectedProject);
 
       this.selectedProject.addAppWidget(testWidget);
-      testWidget.updatePosition({ top: 100, left: 300 });
 
       const innerWidget1 = new LabelBaseWidget(
+        {name: 'test inner1',
+        dimensions: { height: 100, width: 200 },
+        position: { top: 50, left: 100 },
+        value: 'hello I am test',
+        clicheId: appId},
         this.selectedProject,
-        'test inner1',
-        { height: 100, width: 200 }, 'hello I am test', appId);
+      );
+      this.selectedProject.addAppWidget(innerWidget1);
       testWidget.addInnerWidget(innerWidget1);
-      innerWidget1.updatePosition({ top: 50, left: 100 });
 
       // const innerWidget7 = new LinkBaseWidget(
       //   this.selectedProject,
@@ -98,20 +104,31 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
       // testWidget.addInnerWidget(innerWidget7);
       // innerWidget7.updatePosition({ top: 450, left: 100 });
 
-      const innerWidget2 = new UserWidget(this.selectedProject, 'test inner2', { height: 200, width: 400 }, appId);
+      const innerWidget2 = new UserWidget(
+        {name: 'test inner2',
+        dimensions: { height: 200, width: 400 },
+        position: { top: 200, left: 200 },
+        clicheId: appId},
+        this.selectedProject);
+
       this.selectedProject.addAppWidget(innerWidget2);
       testWidget.addInnerWidget(innerWidget2);
-      innerWidget2.updatePosition({ top: 200, left: 200 });
 
-      const innerWidget21 = new UserWidget(this.selectedProject, 'test inner21', { height: 400, width: 200 }, appId);
+      const innerWidget21 = new UserWidget(
+        {name: 'test inner21',
+        dimensions: { height: 400, width: 200 },
+        position: { top: 50, left: 100 },
+        clicheId: appId},
+        this.selectedProject);
       this.selectedProject.addAppWidget(innerWidget21);
       innerWidget2.addInnerWidget(innerWidget21);
-      innerWidget21.updatePosition({ top: 50, left: 100 });
 
       const innerWidget211 = new LinkBaseWidget(
-        this.selectedProject, 'inner211',
-        { height: 200, width: 150 },
-        {text: '100100', target: undefined}, appId);
+        {name: 'inner211',
+        dimensions: { height: 200, width: 150 },
+        value: {text: '100100', target: undefined},
+        clicheId: appId},
+        this.selectedProject);
       this.selectedProject.addAppWidget(innerWidget211);
       innerWidget21.addInnerWidget(innerWidget211);
 

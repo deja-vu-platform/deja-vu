@@ -93,10 +93,6 @@ export class Project {
      * @param widgetId id of widget to find
      */
   getAppWidget(widgetId: string): Widget {
-    const clicheid = Widget.decodeid(widgetId)[0];
-    if (clicheid !== this.userApp.getId()) {
-      throw new Error('Not a user application widget!');
-    }
     const widget = this.userApp.getWidget(widgetId);
     if (!widget) {
       throw new Error('Widget not found in user app');

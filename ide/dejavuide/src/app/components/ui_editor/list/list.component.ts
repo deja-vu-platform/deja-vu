@@ -17,8 +17,8 @@ export class ListComponent implements OnInit {
   templates: Widget[] = [];
 
   baseWidgets: Widget[] = [
-    new LinkBaseWidget(),
-    new LabelBaseWidget(),
+    new LinkBaseWidget({}),
+    new LabelBaseWidget({}),
   ];
 
   constructor(private ref: ChangeDetectorRef,
@@ -50,18 +50,22 @@ export class ListComponent implements OnInit {
 
   newPage() {
     const project = this.projectService.getProject();
-    const newWidget = new UserWidget(project, 'new page', {
-      height: 500, width: 500
-    }, this.userApp.getId());
+    const newWidget = new UserWidget(
+      {name: 'new page',
+      dimensions: {height: 500, width: 500},
+      clicheId: this.userApp.getId()},
+      project);
     this.userApp.addPage(newWidget);
     this.refreshList();
   }
 
   newWidget() {
     const project = this.projectService.getProject();
-    const newWidget = new UserWidget(project, 'new widget', {
-      height: 100, width: 100
-    }, this.userApp.getId());
+    const newWidget = new UserWidget(
+      {name: 'new widget',
+      dimensions: {height: 100, width: 100},
+      clicheId: this.userApp.getId()},
+      project);
     this.userApp.addUnusedWidget(newWidget);
     this.refreshList();
   }

@@ -1,61 +1,101 @@
-import { generateId } from '../../utility/utility';
+import { generateId, shallowCopy, inArray } from '../../utility/utility';
 import { Dimensions, Position } from '../../services/state.service';
 import { Cliche, UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
-import { Meta } from '../project/project';
 
 enum WidgetType {
   BASE_WIDGET, USER_WIDGET, CLICHE_WIDGET
 }
 
-export interface Properties {
-  dimensions: Dimensions;
-  styles: {
-    custom?: {};
+enum BaseWidgetType {
+  LINK, LABEL
+}
+
+interface LinkValue {
+  text: string;
+  target: string;
+}
+
+interface WidgetFields {
+  widgetType?: WidgetType;
+
+  id?: string;
+  templateId?: string;
+  clicheId?: string;
+  parentId?: string;
+
+  name?: string;
+  author?: string;
+  version?: string;
+
+  dimensions?: Dimensions;
+  position?: Position;
+
+  styles?: {
+    css?: any;
   };
+
+  isTemplate?: boolean;
+  // If this is a template, keep a reference to all is copies.
+  // If the template is changed, propagate the changes to the template copies.
+  templateCopies?: string[];
+}
+
+interface BaseWidgetFields extends WidgetFields {
+  type?: BaseWidgetType;
+  value?: any;
+}
+
+interface LinkBaseWidgetFields extends BaseWidgetFields {
+  value?: LinkValue;
+}
+
+interface LabelBaseWidgetFields extends BaseWidgetFields {
+  value?: string;
+}
+
+interface UserWidgetFields extends WidgetFields {
+  innerWidgetIds?: string[]; // earlier in list == lower in z axis
 }
 
 export abstract class Widget {
-  protected objectType = 'Widget';
+  protected fields: WidgetFields;
   protected project: Project;
-  protected widgetType: WidgetType;
-  protected properties: Properties = {
-    dimensions: null,
-    styles: {
-      custom: {},
-    }
-  };
-  protected position: Position = {
-    top: 0,
-    left: 0
-  };
-  protected meta: Meta; // id is of the form 'clicheid_widgetid'
-  protected _isTemplate = false;
-  // If this is a template, keep a reference to all is copies.
-  // If the template is changed, propagate the changes to the template copies.
-  protected templateCopies: Set<string> = new Set();
 
   /**
-   * Converts a JSON object to a Widget object
-   * @param object object to convert
+   * Converts a JSON object to a Widget object.
+   * Copies inner objects so that references are not shared.
+   * @param fields object to convert
    */
-  static fromObject(project: Project, object: any): BaseWidget | UserWidget {
+  static fromJSON(project: Project, fields: WidgetFields): BaseWidget | UserWidget {
     const notCorrectObject = 'Object is not an instance of a Widget';
-    if (object.widgetType === undefined || object.widgetType === null) {
+    if (fields.widgetType === undefined || fields.widgetType === null) {
       throw new Error(notCorrectObject);
     }
-    if (object.widgetType === WidgetType.BASE_WIDGET) {
-      return BaseWidget.fromObject(project, object);
+    if (fields.widgetType === WidgetType.BASE_WIDGET) {
+      return BaseWidget.fromJSON(project, fields);
+    } else {
+      return UserWidget.fromJSON(project, fields);
     }
-    return UserWidget.fromObject(project, object);
   }
 
-  static encodeid(clicheid: string, widgetid: string): string {
-    return clicheid + '_' + widgetid;
+  static toJSON(widget: Widget) {
+    return Widget.copyFields(widget.fields);
   }
 
-  static decodeid(id: string): string[] {
-    return id.split('_');
+  static copyFields(fields: WidgetFields): WidgetFields {
+    const copyfields = shallowCopy(fields);
+    // Copy the deeper items
+    copyfields.dimensions = shallowCopy(fields.dimensions);
+    copyfields.position = shallowCopy(fields.position);
+    if (fields.styles) {
+      copyfields.styles.css = shallowCopy(fields.styles.css);
+    }
+    if (fields.templateCopies) {
+      copyfields.templateCopies = fields.templateCopies.slice();
+    }
+
+    return copyfields;
   }
 
   /**
@@ -65,39 +105,44 @@ export abstract class Widget {
    *  opposed to a normal copy
    */
   abstract makeCopy(parentId?: string, fromTemplate?: boolean): Widget[];
-  protected newIdFromId(id: string) {
-    const clicheid = Widget.decodeid(id)[0];
-    return clicheid + '_' + generateId();
-  }
 
   constructor(
-    project: Project,
-    name: string,
-    dimensions: Dimensions,
-    clicheid: string,
-    id: string = null,
-    templateid: string = null,
-    isTemplate = false
+    fields: WidgetFields,
+    project?: Project
   ) {
     this.project = project;
-    this.meta = {
-      name: name,
-      id: id ? id : clicheid + '_' + generateId(),
-      clicheId: clicheid,
-      templateId: templateid,
-      version: '',
-      author: ''
+
+    this.fields = Widget.copyFields(fields);
+
+    // asign default values;
+    this.fields.id = this.fields.id ? this.fields.id : generateId();
+
+    this.fields.name = this.fields.name || 'New Widget';
+    this.fields.version = this.fields.version || '0.0.0';
+    this.fields.author = this.fields.author || 'anonymous';
+
+    this.fields.dimensions = this.fields.dimensions || {
+      height: 0,
+      width: 0
     };
-    this.properties.dimensions = dimensions;
-    this._isTemplate = isTemplate;
+    this.fields.position = this.fields.position || {
+      top: 0,
+      left: 0
+    };
+
+    this.fields.styles = this.fields.styles || {
+      css: {}
+    };
+
+    this.fields.templateCopies = this.fields.templateCopies || [];
   }
 
   isUserType(): this is UserWidget {
-    return this.widgetType === WidgetType.USER_WIDGET;
+    return this.fields.widgetType === WidgetType.USER_WIDGET;
   }
 
   isBaseType(): this is BaseWidget {
-    return this.widgetType === WidgetType.BASE_WIDGET;
+    return this.fields.widgetType === WidgetType.BASE_WIDGET;
   }
 
   getProject(): Project {
@@ -109,47 +154,47 @@ export abstract class Widget {
   }
 
   getId(): string {
-    return this.meta.id;
+    return this.fields.id;
   }
 
   getName(): string {
-    return this.meta.name;
+    return this.fields.name;
   }
 
   getDimensions(): Dimensions {
-    return Object.assign({}, this.properties.dimensions);
+    return shallowCopy(this.fields.dimensions);
   }
 
   updateDimensions(newDimensions: Dimensions) {
-    this.properties.dimensions = newDimensions;
+    this.fields.dimensions = shallowCopy(newDimensions);
   }
 
   getClicheId(): string {
-    return this.meta.clicheId;
+    return this.fields.clicheId;
   }
 
   setClicheId(cid: string) {
-    this.meta.clicheId = cid;
+    this.fields.clicheId = cid;
   }
 
   getParentId(): string {
-    return this.meta.parentId;
+    return this.fields.parentId;
   }
 
   setParentId(id: string) {
-    this.meta.parentId = id;
+    this.fields.parentId = id;
   }
 
   getTemplateId(): string {
-    return this.meta.templateId;
+    return this.fields.templateId;
   }
 
   isTemplate(): boolean {
-    return this._isTemplate;
+    return this.fields.isTemplate;
   }
 
   setAsTemplate() {
-    this._isTemplate = true;
+    this.fields.isTemplate = true;
   }
 
   /**
@@ -158,31 +203,31 @@ export abstract class Widget {
    * @param widgetId widget to check.
    */
   isDerivedFromTemplate(widgetId: string) {
-    return this._isTemplate && this.templateCopies.has(widgetId);
+    return this.fields.isTemplate && inArray(widgetId, this.fields.templateCopies);
   }
 
   getLocalCustomStyles() {
-    return Object.assign({}, this.properties.styles.custom);
+    return shallowCopy(this.fields.styles.css);
   }
 
   getPosition(): Position {
-    return Object.assign({}, this.position);
+    return shallowCopy(this.fields.position);
   }
 
   updatePosition(newPosition: Position) {
-    this.position = Object.assign({}, newPosition);
+    this.fields.position = shallowCopy(newPosition);
   }
 
   updateCustomStyle(styleName: string, value) {
-    this.properties.styles.custom[styleName] = value;
+    this.fields.styles.css[styleName] = value;
   }
 
   removeCustomStyle(styleName?: string) {
     if (styleName) {
-      delete this.properties.styles.custom[styleName];
+      delete this.fields.styles.css[styleName];
     } else {
-      Object.keys(this.properties.styles.custom).forEach(name => {
-        this.properties.styles.custom[name] = 'unset';
+      Object.keys(this.fields.styles.css).forEach(name => {
+        this.fields.styles.css[name] = 'unset';
       });
     }
   }
@@ -199,11 +244,10 @@ export abstract class Widget {
     // that is read when rendering, and updated whenever a template is
     // updated. If the field is there, just read from it, if not recursively
     // create it.
-    const styles = Object.assign({}, parentStyles);
+    const styles = shallowCopy(parentStyles);
 
     let inheritedStyles = {};
     const templateId = this.getTemplateId();
-    console.log(templateId);
     if (templateId) {
       inheritedStyles = this.project
         .getAppWidget(templateId)
@@ -215,8 +259,8 @@ export abstract class Widget {
     }
 
     // this widgets styles win!
-    for (const style of Object.keys(this.properties.styles.custom)) {
-      styles[style] = this.properties.styles.custom[style];
+    for (const style of Object.keys(this.fields.styles.css)) {
+      styles[style] = this.fields.styles.css[style];
     }
 
     return styles;
@@ -231,18 +275,10 @@ export abstract class Widget {
   }
 
   removeTemplateCopy(widgetId: string) {
-    if (this.isTemplate) {
-      this.templateCopies.delete(widgetId);
+    if (this.fields.isTemplate) {
+      const index = this.fields.templateCopies.indexOf(widgetId);
+      this.fields.templateCopies.splice( index, 1 );
     }
-  }
-
-  getSaveableJson() {
-    // TODO add test
-    // NOTE: maps (and possibly sets) are not copied properly by
-    // JSON.parse(JSON.stringify(...))
-    const json: Widget = Object.assign({}, this);
-    delete json.project;
-    return JSON.parse(JSON.stringify(json));
   }
 }
 
@@ -253,190 +289,131 @@ export abstract class Widget {
  * @constructor
  */
 export class BaseWidget extends Widget {
-  protected widgetType = WidgetType.BASE_WIDGET;
-  protected value: any;
-  private type: BaseType;
+  protected fields: BaseWidgetFields;
 
-  static fromObject(project: Project, object: any): BaseWidget {
-    if (object.widgetType !== WidgetType.BASE_WIDGET) {
+  static fromJSON(project: Project, fields: BaseWidgetFields): BaseWidget {
+    if (fields.widgetType !== WidgetType.BASE_WIDGET) {
       return null;
-    }
-    const clicheId = Widget.decodeid(object.meta.id)[0];
-    let bw;
-    // const bw = new BaseWidget(
-    //     project,
-    //     object.meta.name,
-    //     object.properties.dimensions,
-    //     object.type,
-    //     object.value,
-    //     clicheId,
-    //     object.meta.id,
-    //     object.meta.templateid,
-    //     object.isTemplate);
-
-    // TODO make this more DRY
-    if (object.type === BaseType.LABEL) {
-      bw = new LabelBaseWidget(
-        project,
-        object.meta.name,
-        object.properties.dimensions,
-        object.value,
-        clicheId,
-        object.meta.id,
-        object.meta.templateid,
-        object.isTemplate);
-    }
-    if (object.type === BaseType.LINK) {
-      bw = new LinkBaseWidget(
-        project,
-        object.meta.name,
-        object.properties.dimensions,
-        object.value,
-        clicheId,
-        object.meta.id,
-        object.meta.templateid,
-        object.isTemplate);
+      // TODO throw error
     }
 
-    bw.setParentId(object.meta.parentId);
-    // Properties
-    bw.updatePosition(object.position);
-    Object.keys(object.properties.styles.custom).forEach((name) => {
-      bw.updateCustomStyle(name, object.properties.styles.custom[name]);
-    });
-    return bw;
+    if (fields.type === BaseWidgetType.LINK) {
+      return new LinkBaseWidget(fields, project);
+    }
+    if (fields.type === BaseWidgetType.LABEL) {
+      return new LabelBaseWidget(fields, project);
+    }
+
+    // TODO throw error
+    return null;
   }
 
   constructor(
-    project: Project,
-    name: string,
-    dimensions: Dimensions,
-    type: BaseType,
-    value: any,
-    clicheid: string,
-    id: string = null,
-    templateid: string = null,
-    isTemplate = false,
+    fields: BaseWidgetFields,
+    project?: Project
   ) {
-    super(project, name, dimensions, clicheid, id, templateid, isTemplate);
-    this.type = type;
-    this.value = value;
+    super(fields, project);
+
+    this.fields.widgetType = WidgetType.BASE_WIDGET;
   }
 
   isLink(): this is LinkBaseWidget {
-    return this.type === BaseType.LINK;
+    return this.fields.type === BaseWidgetType.LINK;
   }
 
   isLabel(): this is LabelBaseWidget {
-    return this.type === BaseType.LABEL;
+    return this.fields.type === BaseWidgetType.LABEL;
   }
 
   makeCopy(parentId?: string, fromTemplate = false): Widget[] {
     let templateId = this.getTemplateId();
-    const isTemplateCopy = fromTemplate && this._isTemplate;
-    let isTemplate = this._isTemplate;
+    let isTemplate = this.fields.isTemplate;
+    const isTemplateCopy = fromTemplate && isTemplate;
+
     if (isTemplateCopy) {
       // If you're making a tempate copy, you only make non-templates
       templateId = this.getId();
       isTemplate = false;
     }
-    let copyWidget;
+    let copyWidget: BaseWidget;
     const project = this.project;
-    const value = this.value;
-    // TODO make this more DRY
+    const fields = this.fields;
+    const value = this.fields.value;
+
     if (this.isLabel()) {
-      copyWidget = new LabelBaseWidget(
-        project,
-        this.getName(),
-        this.getDimensions(),
-        value,
-        this.getClicheId(),
-        null, // generate a new id!
-        templateId,
-        isTemplate);
+      copyWidget = new LabelBaseWidget(fields, project);
     }
     if (this.isLink()) {
-      copyWidget = new LinkBaseWidget(
-        project,
-        this.getName(),
-        this.getDimensions(),
-        value,
-        this.getClicheId(),
-        null, // generate a new id!
-        templateId,
-        isTemplate);
+      copyWidget = new LinkBaseWidget(fields, project);
     }
+
+    copyWidget.fields.id = generateId();
+
     if (parentId) {
       copyWidget.setParentId(parentId);
     }
-    copyWidget.updatePosition(this.getPosition());
-    Object.keys(this.properties.styles.custom).forEach((name) => {
-      copyWidget.updateCustomStyle(name, this.properties.styles.custom[name]);
-    });
+
     if (isTemplateCopy) {
       // If you're making a tempate copy, add to template copies
-      this.templateCopies.add(copyWidget.getId());
+      this.fields.templateCopies.push(copyWidget.getId());
+
+      // TODO dry
+      // reset fields to to be copies over
+      copyWidget.fields.templateId = this.getId();
+      copyWidget.fields.isTemplate = false;
+      copyWidget.fields.styles = {
+        css: {}
+      };
     }
+
     return [copyWidget];
   }
 }
 
-enum BaseType {
-  LINK, LABEL
-}
-
-interface LinkValue {
-  text: string;
-  target: string;
-}
-
 export class LinkBaseWidget extends BaseWidget {
-  protected value: LinkValue;
+  protected fields: LinkBaseWidgetFields;
 
   constructor(
-    project: Project = null,
-    name: string = 'Link Widget',
-    dimensions: Dimensions = { width: 100, height: 50 },
-    value: LinkValue = { text: '', target: '' },
-    clicheid: string = '',
-    id: string = null,
-    templateid: string = null,
-    isTemplate = false
+    fields: LinkBaseWidgetFields,
+    project?: Project,
   ) {
-    super(project, name, dimensions, BaseType.LINK, value, clicheid, id, templateid, isTemplate);
+    super(fields, project);
+    this.fields.type = BaseWidgetType.LINK;
+    this.fields.value = this.fields.value || { text: '', target: '' };
+
+    this.fields.name = this.fields.name || 'Link Widget';
+    this.fields.dimensions = this.fields.dimensions || { width: 100, height: 50 };
   }
 
   setValue(value: LinkValue) {
-    this.value = value;
+    this.fields.value = shallowCopy(value);
   }
 
   getValue(): LinkValue {
-    return Object.assign({}, this.value);
+    return shallowCopy(this.fields.value);
   }
 }
 
 export class LabelBaseWidget extends BaseWidget {
-  protected value: string;
+  protected fields: LabelBaseWidgetFields;
 
   constructor(
-    project: Project = null,
-    name: string = 'Label Widget',
-    dimensions: Dimensions = { width: 200, height: 100 },
-    value: any = 'Write your label here...',
-    clicheid: string = '',
-    id: string = null,
-    templateid: string = null,
-    isTemplate = false
+    fields: LabelBaseWidgetFields,
+    project?: Project,
   ) {
-    super(project, name, dimensions, BaseType.LABEL, value, clicheid, id, templateid, isTemplate);
-  }
+    super(fields, project);
+    this.fields.type = BaseWidgetType.LABEL;
+    this.fields.value = this.fields.value || 'Write your label here...';
 
+    this.fields.name = this.fields.name || 'Label Widget';
+    this.fields.dimensions = this.fields.dimensions || { width: 400, height: 200 };
+  }
   setValue(value: string) {
-    this.value = value;
+    this.fields.value = value;
   }
 
   getValue(): string {
-    return this.value;
+    return this.fields.value;
   }
 }
 
@@ -451,64 +428,39 @@ export class LabelBaseWidget extends BaseWidget {
  * @constructor
  */
 export class UserWidget extends Widget {
-  protected widgetType = WidgetType.USER_WIDGET;
-  private innerWidgetIds: string[] = []; // Widget ids // earlier in list == lower in z axis
-  static fromObject(project: Project, object: any): UserWidget {
-    if (object.widgetType !== WidgetType.USER_WIDGET) {
+  protected fields: UserWidgetFields;
+  // TODO switch order
+  static fromJSON(project: Project, fields: UserWidgetFields): UserWidget {
+    if (fields.widgetType !== WidgetType.USER_WIDGET) {
       return null;
+      // TODO throw error
     }
-    const clicheId = Widget.decodeid(object.meta.id)[0];
-    const widget = new UserWidget(
-      project,
-      object.meta.name,
-      object.properties.dimensions,
-      clicheId,
-      object.meta.id,
-      object.meta.templateId,
-      object.isTemplate);
-    object.innerWidgetIds.forEach((id: string) => {
-      widget.innerWidgetIds.push(id);
-    });
-
-    widget.setParentId(object.meta.parentId);
-
-    // Properties
-    widget.updatePosition(object.position);
-    Object.keys(object.properties.styles.custom).forEach((name) => {
-      widget.updateCustomStyle(name, object.properties.styles.custom[name]);
-    });
-
-    return widget;
+    return new UserWidget(fields, project);
   }
 
   constructor(
-    project: Project,
-    name: string,
-    dimensions: Dimensions,
-    clicheid: string,
-    id: string = null,
-    templateid: string = null,
-    isTemplate = false,
+    fields: UserWidgetFields,
+    project?: Project,
   ) {
-    super(project, name, dimensions, clicheid, id, templateid, isTemplate);
-  }
+    super(fields, project);
 
-  updateDimensions(newDimensions: Dimensions) {
-    this.properties.dimensions = newDimensions;
+    this.fields.widgetType = WidgetType.USER_WIDGET;
+    this.fields.innerWidgetIds =
+      fields.innerWidgetIds ? fields.innerWidgetIds.slice() : [];
   }
 
   addInnerWidget(widget: Widget) {
     const id = widget.getId();
     // Now the inner widgets list is the stack order
-    this.innerWidgetIds.push(id);
+    this.fields.innerWidgetIds.push(id);
     widget.setParentId(this.getId());
     this.project.userApp.removeUnusedWidget(id);
     this.project.userApp.addUsedWidget(widget);
   }
 
   removeInnerWidget(id: string) {
-    const index = this.innerWidgetIds.indexOf(id);
-    this.innerWidgetIds.splice(index, 1);
+    const index = this.fields.innerWidgetIds.indexOf(id);
+    this.fields.innerWidgetIds.splice(index, 1);
 
     const widget = this.project.getUserApp().getWidget(id);
     widget.setParentId(undefined);
@@ -517,7 +469,7 @@ export class UserWidget extends Widget {
   }
 
   getInnerWidgetIds() {
-    return this.innerWidgetIds.slice();
+    return this.fields.innerWidgetIds.slice();
   }
 
   /**
@@ -538,7 +490,7 @@ export class UserWidget extends Widget {
       return null;
     }
     // Recursive case, look through all the inner widgets
-    for (const id of (<UserWidget>widget).innerWidgetIds) {
+    for (const id of (<UserWidget>widget).fields.innerWidgetIds) {
       const path = this.getPathHelper(
         this.project.getAppWidget(id), targetId);
       if (path === null) {
@@ -588,35 +540,36 @@ export class UserWidget extends Widget {
     // they are very similar
 
     let templateId = this.getTemplateId();
-    let isTemplate = this._isTemplate;
-    const isTemplateCopy = fromTemplate && this._isTemplate;
+    let isTemplate = this.fields.isTemplate;
+    const isTemplateCopy = fromTemplate && this.fields.isTemplate;
     if (isTemplateCopy) {
       // If you're making a tempate copy, you only make non-templates
       templateId = this.getId();
       isTemplate = false;
     }
-    const copyWidget = new UserWidget(
-      this.project,
-      this.getName(),
-      this.getDimensions(),
-      this.getClicheId(),
-      null, // generate a new id!
-      templateId,
-      isTemplate);
+    const copyWidget = new UserWidget(this.fields,
+      this.project);
+
+    copyWidget.fields.id = generateId();
+
     if (parentId) {
       copyWidget.setParentId(parentId);
     }
-    copyWidget.updatePosition(this.getPosition());
+
     if (isTemplateCopy) {
       // If you're making a tempate copy, add it to template copy list
-      this.templateCopies.add(copyWidget.getId());
+      this.fields.templateCopies.push(copyWidget.getId());
+
+      // TODO dry
+      copyWidget.fields.templateId = this.getId();
+      copyWidget.fields.isTemplate = false;
+      copyWidget.fields.styles = {
+        css: {}
+      };
     }
-    Object.keys(this.properties.styles.custom).forEach((name) => {
-      copyWidget.updateCustomStyle(name, this.properties.styles.custom[name]);
-    });
 
     let copyWidgets: Widget[] = [copyWidget];
-    for (const id of this.innerWidgetIds) {
+    for (const id of this.fields.innerWidgetIds) {
       const copyInnerWidgets = this.project.getAppWidget(id).makeCopy(copyWidget.getId(), fromTemplate);
       const innerWidgetCopy = copyInnerWidgets[0];
       copyWidget.addInnerWidget(innerWidgetCopy);
@@ -626,7 +579,7 @@ export class UserWidget extends Widget {
   }
 
   putInnerWidgetOnTop(widget: Widget) {
-    const topWidgetId = this.innerWidgetIds[this.innerWidgetIds.length - 1];
+    const topWidgetId = this.fields.innerWidgetIds[this.fields.innerWidgetIds.length - 1];
     this.changeInnerWidgetOrderByOne(widget, true, new Set([topWidgetId]));
   }
 
@@ -644,7 +597,7 @@ export class UserWidget extends Widget {
     if (!overlappingWidgetIds) {
       overlappingWidgetIds = this.findOverlappingWidgets(widget);
     }
-    const stackOrder = this.innerWidgetIds;
+    const stackOrder = this.fields.innerWidgetIds;
     let idxThisWidget;
     let idxNextWidget;
 
@@ -712,7 +665,7 @@ export class UserWidget extends Widget {
 
     const that = this;
 
-    this.innerWidgetIds.forEach((widgetId) => {
+    this.fields.innerWidgetIds.forEach((widgetId) => {
       if (widgetId === targetWidget.getId()) {
         return;
       }
