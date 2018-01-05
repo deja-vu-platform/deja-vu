@@ -9,6 +9,7 @@ import { MapModule } from './components/ui_editor/map/map.module';
 import { WorkSurfaceModule } from './components/ui_editor/worksurface/worksurface.module';
 import { StateService } from './services/state.service';
 import { ProjectService } from './services/project.service';
+import { CommunicatorService } from './services/communicator.service';
 import { UiEditorModule } from './components/ui_editor/ui_editor.module';
 import { UiEditorComponent } from './components/ui_editor/ui_editor.component';
 import { ProjectExplorerModule } from './components/project_explorer/project_explorer.module';
@@ -39,6 +40,7 @@ const appRoutes: Routes = [
     RouterService,
     StateService,
     ProjectService,
+    CommunicatorService,
     {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy}],
   bootstrap: [AppComponent]
 })

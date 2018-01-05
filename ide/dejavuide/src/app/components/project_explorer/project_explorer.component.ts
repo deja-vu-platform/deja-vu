@@ -1,21 +1,10 @@
-declare const electron: any;
-/**
- * Needs to be commented out when running tests
- */
-// const electron = {
-//   ipcRenderer: {
-//     on: null,
-//     send: null
-//   }
-// };
-const ipcRenderer = electron.ipcRenderer;
-
 import { Component, Input, OnInit, ChangeDetectorRef, EventEmitter, Output, NgZone } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
 import { NewProjectDialogComponent } from './new_project_dialog.component';
 import { RouterService, PageType } from '../../services/router.service';
 import { ProjectService } from '../../services/project.service';
+import { CommunicatorService } from '../../services/communicator.service';
 import { Project } from '../../models/project/project';
 
 interface DisplayProject {
@@ -47,11 +36,12 @@ export class ProjectExplorerComponent implements OnInit {
     private ref: ChangeDetectorRef,
     private routerService: RouterService,
     private projectService: ProjectService,
+    private communicatorService: CommunicatorService,
     private zone: NgZone) {}
 
   ngOnInit() {
     this.loaderVisible = true;
-    ipcRenderer.on('projects', (event, data) => {
+    this.communicatorService.onLoadProjects((event, data) => {
       data.projects.forEach((projectInfo) => {
         const projectName = projectInfo[0];
         const content = JSON.parse(projectInfo[1]);
@@ -65,7 +55,7 @@ export class ProjectExplorerComponent implements OnInit {
       this.ref.detectChanges();
     });
 
-    ipcRenderer.on('delete-success', (event) => {
+    this.communicatorService.onDeleteSuccess((event) => {
       // TODO
       delete this.projects[event.projectName];
       this.updateDisplayProjectList();
@@ -74,7 +64,7 @@ export class ProjectExplorerComponent implements OnInit {
       // TODO deal with if the project is your selected project
     });
 
-    ipcRenderer.send('load');
+    this.communicatorService.loadProjects();
   }
 
   handleNewProject() {
@@ -117,7 +107,7 @@ export class ProjectExplorerComponent implements OnInit {
   private loadProject(project: Project) {
     project.updateAccess();
     this.projectService.updateProject(project);
-    localStorage.setItem('project', JSON.stringify(project.getSaveableJson()));
+    this.communicatorService.saveToLocalStorage(project);
     this.zone.run(() => {
       this.routerService.navigateTo(PageType.UI_EDITOR);
     });
@@ -129,7 +119,7 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   private deleteProject(projectName) {
-    ipcRenderer.send('delete', {projectName: projectName});
+    this.communicatorService.delete({projectName: projectName});
   }
 
   private updateDisplayProjectList() {

@@ -1,19 +1,8 @@
-declare const electron: any;
-/**
- * Needs to be commented out when running tests
- */
-// const electron = {
-//   ipcRenderer: {
-//     on: null,
-//     send: null
-//   }
-// };
-const ipcRenderer = electron.ipcRenderer;
-
 import { Component, Input, Output, OnInit} from '@angular/core';
 import { RouterService, PageType } from '../../../services/router.service';
 import { ProjectService } from '../../../services/project.service';
 import { Project } from '../../../models/project/project';
+import { CommunicatorService } from '../../../services/communicator.service';
 
 interface PageInfo {
   title: string;
@@ -62,13 +51,15 @@ export class HeaderComponent implements OnInit {
 
   constructor (
     private projectService: ProjectService,
-    private routerService: RouterService) {
+    private routerService: RouterService,
+    private communicatorService: CommunicatorService) {
   }
 
   ngOnInit() {
-    ipcRenderer.on('save-success', function(event) {
+    this.communicatorService.onSaveSuccess((event, data) => {
       console.log(event);
     });
+
     const project = localStorage.getItem('project');
     if (project) {
       if (!this.projectService.getProject()) {
@@ -105,12 +96,7 @@ export class HeaderComponent implements OnInit {
   save() {
     const selectedProject = this.projectService.getProject();
     if (selectedProject) {
-        // TODO code repeated in project_explorer too
-        localStorage.setItem('project', JSON.stringify(selectedProject.getSaveableJson()));
-        ipcRenderer.send('save', {
-        projectName: selectedProject.getName(),
-        projectContents: selectedProject.getSaveableJson()
-      });
+      this.communicatorService.save(selectedProject);
     }
   }
 }

@@ -190,7 +190,7 @@ export abstract class Widget {
   }
 
   isTemplate(): boolean {
-    return this.fields.isTemplate;
+    return !!this.fields.isTemplate;
   }
 
   setAsTemplate() {

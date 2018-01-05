@@ -1,4 +1,6 @@
-import { Widget, LinkBaseWidget, UserWidget } from './widget';
+import { Widget } from './widget';
+import { UserWidget } from './userwidget';
+import { LinkBaseWidget } from './basewidget';
 import { Cliche, UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
 
@@ -194,7 +196,7 @@ fdescribe('UserWidget', () => {
       const widget3copies = widget3.makeCopy(undefined, true);
       const widget3copy = widget3copies[0];
 
-      expect(widget3copy.getTemplateId()).toBeNull();
+      expect(widget3copy.getTemplateId()).toBeUndefined();
       expect(widget3copy.isTemplate()).toBe(false);
     });
 
@@ -202,9 +204,9 @@ fdescribe('UserWidget', () => {
       widget6.addInnerWidget(widget5);
       const widget6copies = widget6.makeCopy();
 
-      expect(widget6copies[0].getTemplateId()).toBeNull();
+      expect(widget6copies[0].getTemplateId()).toBeUndefined();
       expect(widget6copies[0].isTemplate()).toBe(true);
-      expect(widget6copies[1].getTemplateId()).toBeNull();
+      expect(widget6copies[1].getTemplateId()).toBeUndefined();
       expect(widget6copies[1].isTemplate()).toBe(true);
     });
 
