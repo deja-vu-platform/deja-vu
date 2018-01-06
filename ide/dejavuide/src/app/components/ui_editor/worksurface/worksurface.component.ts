@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef, ElementRef, Input } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, ElementRef, Input, OnDestroy } from '@angular/core';
 
 import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
 import { Cliche } from '../../../models/cliche/cliche';
@@ -16,7 +16,7 @@ const $ = <any>jQuery;
   templateUrl: './worksurface.component.html',
   styleUrls: ['./worksurface.component.css']
 })
-export class WorkSurfaceComponent implements AfterViewInit {
+export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
   /**
    * Dimensions of the screen the user is building an app for.
    */
@@ -26,6 +26,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
   private elt: HTMLElement;
   private currentZoom = 1;
   private visibleWindowScroll: Position;
+  private subscriptions = [];
 
   constructor(
     elt: ElementRef,
@@ -35,22 +36,22 @@ export class WorkSurfaceComponent implements AfterViewInit {
   ) {
     this.elt = elt.nativeElement;
 
-    stateService.zoom.subscribe((newZoom) => {
+    this.subscriptions.push(stateService.zoom.subscribe((newZoom) => {
       this.currentZoom = newZoom;
-    });
+    }));
 
-    stateService.selectedScreenDimensions
+    this.subscriptions.push(stateService.selectedScreenDimensions
       .subscribe((newSelectedScreenDimensions) => {
         this.selectedScreenDimensions = newSelectedScreenDimensions;
-      });
+      }));
 
-    stateService.visibleWindowScrollPosition
+    this.subscriptions.push(stateService.visibleWindowScrollPosition
       .subscribe((newScrollPosition) => {
         this.visibleWindowScroll = newScrollPosition;
         const jqo = $('dv-worksurface');
         jqo.scrollTop(newScrollPosition.top);
         jqo.scrollLeft(newScrollPosition.left);
-      });
+      }));
   }
 
   ngAfterViewInit() {
@@ -143,4 +144,10 @@ export class WorkSurfaceComponent implements AfterViewInit {
     return ui.position;
   }
 
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
+    console.log('destroyed');
+  }
 }

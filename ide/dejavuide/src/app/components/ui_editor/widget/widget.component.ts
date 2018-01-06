@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit, ElementRef, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ElementRef, OnChanges, OnDestroy } from '@angular/core';
 
 import { Cliche } from '../../../models/cliche/cliche';
 import { Widget, UserWidget } from '../../../models/widget/widget';
@@ -15,7 +15,7 @@ const $ = <any>jQuery;
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
+export class WidgetComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
   @Input() widget: Widget;
   @Input() isSelected = false;
   /**
@@ -28,6 +28,7 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
   innerWidgets: Widget[] = [];
 
   private el: HTMLElement;
+  private subscriptions = [];
 
   constructor(
     el: ElementRef,
@@ -48,11 +49,12 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
   }
 
   ngOnInit() {
+    this.subscriptions.push(
     this.projectService.widgetUpdateListener.subscribe(() => {
       this.getInnerWidgets();
       // const localStyles = this.widget.getLocalCustomStyles();
       this.updateStylesToShow();
-    });
+    }));
 
   }
 
@@ -128,5 +130,12 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges {
     Object.keys(stylesToShow).forEach((name) => {
       this.el.style[name] = stylesToShow[name];
     });
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
+    console.log('destroyed');
   }
 }

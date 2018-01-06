@@ -252,7 +252,7 @@ fdescribe('UserWidget', () => {
       styles = widget1.getLocalCustomStyles();
 
       expect(styles).toEqual({});
-      expect(styles['background-color']).toBe(undefined);
+      expect(styles['background-color']).toBeUndefined();
     });
 
     it('getCustomStylesToShow without templates just gets ' +

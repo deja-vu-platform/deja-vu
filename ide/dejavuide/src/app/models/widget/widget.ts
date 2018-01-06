@@ -326,15 +326,6 @@ export class BaseWidget extends Widget {
   }
 
   makeCopy(parentId?: string, fromTemplate = false): Widget[] {
-    let templateId = this.getTemplateId();
-    let isTemplate = this.fields.isTemplate;
-    const isTemplateCopy = fromTemplate && isTemplate;
-
-    if (isTemplateCopy) {
-      // If you're making a tempate copy, you only make non-templates
-      templateId = this.getId();
-      isTemplate = false;
-    }
     let copyWidget: BaseWidget;
     const project = this.project;
     const fields = this.fields;
@@ -353,7 +344,7 @@ export class BaseWidget extends Widget {
       copyWidget.setParentId(parentId);
     }
 
-    if (isTemplateCopy) {
+    if (fromTemplate) {
       // If you're making a tempate copy, add to template copies
       this.fields.templateCopies.push(copyWidget.getId());
 
@@ -539,14 +530,6 @@ export class UserWidget extends Widget {
     // TODO find a way to merge this and the fromObject code since
     // they are very similar
 
-    let templateId = this.getTemplateId();
-    let isTemplate = this.fields.isTemplate;
-    const isTemplateCopy = fromTemplate && this.fields.isTemplate;
-    if (isTemplateCopy) {
-      // If you're making a tempate copy, you only make non-templates
-      templateId = this.getId();
-      isTemplate = false;
-    }
     const copyWidget = new UserWidget(this.fields,
       this.project);
 
@@ -557,7 +540,7 @@ export class UserWidget extends Widget {
       copyWidget.setParentId(parentId);
     }
 
-    if (isTemplateCopy) {
+    if (fromTemplate) {
       // If you're making a tempate copy, add it to template copy list
       this.fields.templateCopies.push(copyWidget.getId());
 
