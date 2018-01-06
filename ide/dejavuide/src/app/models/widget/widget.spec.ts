@@ -201,14 +201,6 @@ fdescribe('UserWidget', () => {
       expect(widget3copies[3].getClicheId()).toEqual(widget1.getClicheId());expect(widget3copies[3].getId()).not.toEqual(widget1.getId());
     });
 
-    it ('from template of a non-template does nothing', () => {
-      const widget3copies = widget3.makeCopy(undefined, true);
-      const widget3copy = widget3copies[0];
-
-      expect(widget3copy.getTemplateId()).toBeUndefined();
-      expect(widget3copy.isTemplate()).toBe(false);
-    });
-
     it ('not from template of a template creates another template', () => {
       widget6.addInnerWidget(widget5);
       const widget6copies = widget6.makeCopy();
@@ -263,15 +255,31 @@ fdescribe('UserWidget', () => {
       expect(widget1.getCustomStylesToShow()).toEqual(styles);
     });
 
-    it('getCustomStylesToShow with template gets template styles ' +
+    fit('getCustomStylesToShow with template gets template styles ' +
     'but local styles are empty', () => {
+      widget6.addInnerWidget(widget5);
       widget6.updateCustomStyle('background-color', 'red');
       const widget6Styles = widget6.getLocalCustomStyles();
-      const widget6copy = widget6.makeCopy(undefined, true)[0];
+      const widgetCopies = widget6.makeCopy(undefined, true);
+      const widget6copy = widgetCopies[0];
       const widget6copyStyles = widget6copy.getLocalCustomStyles();
 
       expect(widget6copyStyles).toEqual({});
       expect(widget6copy.getCustomStylesToShow()).toEqual(widget6Styles);
+
+      const widget5Styles1 = widget5.getLocalCustomStyles();
+      const widget5copy = widgetCopies[1];
+      const widget5copyStyles1 = widget5copy.getLocalCustomStyles();
+
+      expect(widget5copyStyles1).toEqual({});
+      expect(widget5copy.getCustomStylesToShow()).toEqual(widget5Styles1);
+
+      widget5.updateCustomStyle('background-color', 'blue');
+      const widget5Styles2 = widget5.getLocalCustomStyles();
+      const widget5copyStyles2 = widget5copy.getLocalCustomStyles();
+
+      expect(widget5copyStyles2).toEqual({});
+      expect(widget5copy.getCustomStylesToShow()).toEqual(widget5Styles2);
     });
 
     it('getCustomStylesToShow inheritence is parent < template < self',
