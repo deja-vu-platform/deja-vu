@@ -29,6 +29,7 @@ export class ListItemComponent implements AfterViewInit {
   @ViewChild('ghost', {read: ElementRef}) ghost: ElementRef;
   dragging = false;
   innerShown = false;
+  renameVisible = false;
   el: HTMLElement;
 
   constructor(
@@ -124,6 +125,11 @@ export class ListItemComponent implements AfterViewInit {
   widgetSelected() {
     console.log('widget clicked');
     this.projectService.updateSelectedWidget(this.widget);
+  }
+
+  rename(event) {
+    this.widget.setName(event.target.value);
+    this.projectService.widgetUpdated();
   }
 
   private deleteUserWidget() {

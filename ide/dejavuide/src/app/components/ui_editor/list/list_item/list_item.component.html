@@ -16,10 +16,18 @@
           <img src="images/empty_icon.png" width="15px" height="15px"> Blank
       </ng-container>
     </div>
-    <span class="name"> {{widget.getName()}} </span>
-    <div class="submit-rename" *ngIf="widget.isUserType()"
-          [hidden]="true">
-        <input type="text" class="new-name-input form-control" autofocus>
+    <!-- TODO make it is not a new widget creator -->
+    <span class="name" (click)="renameVisible = !createNew"
+      [hidden]="renameVisible"> {{widget.getName()}} </span>
+    <div class="submit-rename"
+        *ngIf="!createNew"
+          [hidden]="!renameVisible">
+      <input type="text" 
+              class="new-name-input form-control" 
+              autofocus
+              (input)="rename($event)"
+              (keyup.enter)="renameVisible = false"
+              (blur)="renameVisible = false" [value]="widget.getName()">
     </div>
   </div>
   <button *ngIf="isDeletable"

@@ -161,6 +161,10 @@ export abstract class Widget {
     return this.fields.name;
   }
 
+  setName(newName: string) {
+    this.fields.name = newName;
+  }
+
   getDimensions(): Dimensions {
     return shallowCopy(this.fields.dimensions);
   }
