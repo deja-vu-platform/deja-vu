@@ -2,7 +2,7 @@
   <div class="work-surface widget-work-surface"
       [style.height.px] ="selectedScreenDimensions.height"
       [style.width.px]="selectedScreenDimensions.width">
-    <dv-widget *ngIf="newFlag"
+    <dv-widget *ngIf="selectedWidget"
                 [widget]="selectedWidget"
                 [isSelected]="true"
                 [isMovable]="true">

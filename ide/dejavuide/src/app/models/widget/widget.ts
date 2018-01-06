@@ -115,11 +115,11 @@ export abstract class Widget {
     this.fields = Widget.copyFields(fields);
 
     // asign default values;
-    this.fields.id = this.fields.id ? this.fields.id : generateId();
+    this.fields.id = fields.id ? this.fields.id : generateId();
 
-    this.fields.name = this.fields.name || 'New Widget';
-    this.fields.version = this.fields.version || '0.0.0';
-    this.fields.author = this.fields.author || 'anonymous';
+    this.fields.name = fields.name || 'New Widget';
+    this.fields.version = fields.version || '0.0.0';
+    this.fields.author = fields.author || 'anonymous';
 
     this.fields.dimensions = this.fields.dimensions || {
       height: 0,
@@ -381,8 +381,8 @@ export class LinkBaseWidget extends BaseWidget {
     this.fields.type = BaseWidgetType.LINK;
     this.fields.value = this.fields.value || { text: '', target: '' };
 
-    this.fields.name = this.fields.name || 'Link Widget';
-    this.fields.dimensions = this.fields.dimensions || { width: 100, height: 50 };
+    this.fields.name = fields.name || 'Link Widget';
+    this.fields.dimensions = fields.dimensions ? this.fields.dimensions : { width: 100, height: 50 };
   }
 
   setValue(value: LinkValue) {
@@ -405,8 +405,8 @@ export class LabelBaseWidget extends BaseWidget {
     this.fields.type = BaseWidgetType.LABEL;
     this.fields.value = this.fields.value || 'Write your label here...';
 
-    this.fields.name = this.fields.name || 'Label Widget';
-    this.fields.dimensions = this.fields.dimensions || { width: 400, height: 200 };
+    this.fields.name = fields.name || 'Label Widget';
+    this.fields.dimensions = fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 };
   }
   setValue(value: string) {
     this.fields.value = value;
@@ -551,6 +551,7 @@ export class UserWidget extends Widget {
       this.project);
 
     copyWidget.fields.id = generateId();
+    copyWidget.fields.innerWidgetIds = [];
 
     if (parentId) {
       copyWidget.setParentId(parentId);

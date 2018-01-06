@@ -1,6 +1,4 @@
-import { Widget } from './widget';
-import { UserWidget } from './userwidget';
-import { LinkBaseWidget } from './basewidget';
+import { Widget, LinkBaseWidget, UserWidget } from './widget';
 import { Cliche, UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
 
@@ -53,12 +51,15 @@ fdescribe('UserWidget', () => {
       clicheId: userAppId,
       isTemplate: true},
       project);
+
     widget6 = new UserWidget(
       {name: 'widget6',
       dimensions: {width: 1, height: 1},
       clicheId: userAppId,
       isTemplate: true},
       project);
+
+    widget3.addInnerWidget(widget6);
 
     project.addAppWidget(widget1);
     project.addAppWidget(widget2);
@@ -98,13 +99,13 @@ fdescribe('UserWidget', () => {
       expect(widget2.getInnerWidgetIds()).toEqual([widget1.getId()]);
 
       widget3.addInnerWidget(widget2);
-      expect(widget3.getInnerWidgetIds()).toEqual([widget2.getId()]);
+      expect(widget3.getInnerWidgetIds()).toEqual([widget6.getId(), widget2.getId()]);
 
       widget2.removeInnerWidget(widget1.getId());
       expect(widget2.getInnerWidgetIds()).toEqual([]);
 
       widget3.removeInnerWidget(widget2.getId());
-      expect(widget3.getInnerWidgetIds()).toEqual([]);
+      expect(widget3.getInnerWidgetIds()).toEqual([widget6.getId()]);
     });
 
     it ('does not delete removed items', () => {
@@ -183,13 +184,21 @@ fdescribe('UserWidget', () => {
       widget3.addInnerWidget(widget2);
       const widget3copies = widget3.makeCopy();
 
-      expect(widget3copies.length).toBe(3);
+      expect(widget3copies.length).toBe(4);
       expect(widget3copies[0].getName()).toEqual('widget3');
       expect(widget3copies[0].getClicheId()).toEqual(widget3.getClicheId());
-      expect(widget3copies[1].getName()).toEqual('widget2');
-      expect(widget3copies[1].getClicheId()).toEqual(widget2.getClicheId());
-      expect(widget3copies[2].getName()).toEqual('widget1');
-      expect(widget3copies[2].getClicheId()).toEqual(widget1.getClicheId());
+      expect(widget3copies[0].getId()).not.toEqual(widget3.getId());
+
+      expect(widget3copies[1].getName()).toEqual('widget6');
+      expect(widget3copies[1].getClicheId()).toEqual(widget6.getClicheId());
+      expect(widget3copies[1].getId()).not.toEqual(widget6.getId());
+
+      expect(widget3copies[2].getName()).toEqual('widget2');
+      expect(widget3copies[2].getClicheId()).toEqual(widget2.getClicheId());
+      expect(widget3copies[2].getId()).not.toEqual(widget2.getId());
+
+      expect(widget3copies[3].getName()).toEqual('widget1');
+      expect(widget3copies[3].getClicheId()).toEqual(widget1.getClicheId());expect(widget3copies[3].getId()).not.toEqual(widget1.getId());
     });
 
     it ('from template of a non-template does nothing', () => {

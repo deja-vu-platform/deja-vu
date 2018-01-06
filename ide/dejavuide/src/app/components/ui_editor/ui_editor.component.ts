@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
 
 import { LabelBaseWidget, LinkBaseWidget, Widget, UserWidget } from '../../models/widget/widget';
 import { Cliche, UserCliche } from '../../models/cliche/cliche';
@@ -22,12 +22,13 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
 
   selectedProject: Project;
   private userApp: UserCliche;
-  private selectedWidget: Widget;
+  selectedWidget: Widget;
 
   constructor (
     private projectService: ProjectService,
     private stateService: StateService,
-    private routerService: RouterService) {
+    private routerService: RouterService,
+    private ref: ChangeDetectorRef) {
   }
 
   private handleWindowResize() {
@@ -59,6 +60,13 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
+    this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
+      if (this.selectedWidget !== newSelectedWidget) {
+        this.refreshWorkSurface(newSelectedWidget);
+      }
+      // console.log('new selected widget');
+    });
+
     // Since state service is shared
     this.stateService.updateVisibleWindowScrollPosition({
       top: 0, left: 0
@@ -140,5 +148,12 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     }
 
     this.projectService.updateSelectedWidget(this.selectedWidget);
+  }
+
+  refreshWorkSurface(widget: Widget) {
+    this.selectedWidget = null;
+    this.ref.detectChanges();
+    this.selectedWidget = widget;
+    this.ref.detectChanges();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, ChangeDetectorRef, ElementRef, Input } from '@angular/core';
 
 import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
 import { Cliche } from '../../../models/cliche/cliche';
@@ -21,8 +21,7 @@ export class WorkSurfaceComponent implements AfterViewInit {
    * Dimensions of the screen the user is building an app for.
    */
   selectedScreenDimensions: Dimensions;
-  selectedWidget: Widget;
-  newFlag = false;
+  @Input() selectedWidget: Widget;
 
   private elt: HTMLElement;
   private currentZoom = 1;
@@ -55,13 +54,8 @@ export class WorkSurfaceComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
-      this.selectedWidget = newSelectedWidget;
-      this.reinitChildComponent();
-    });
-
     this.makeWorksurfaceDroppable();
-
+    console.log(this.selectedWidget);
     $(this.elt).scroll((event: Event) => {
       const elt = $(this.elt);
       this.stateService.updateVisibleWindowScrollPosition({
@@ -71,12 +65,6 @@ export class WorkSurfaceComponent implements AfterViewInit {
     });
   }
 
-  reinitChildComponent() {
-    this.newFlag = false;
-    this.ref.detectChanges();
-    this.newFlag = true;
-    this.ref.detectChanges();
-  }
 
   private makeWorksurfaceDroppable() {
     $(this.elt).droppable({

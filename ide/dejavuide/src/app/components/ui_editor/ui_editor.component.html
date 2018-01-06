@@ -20,7 +20,10 @@
       </div>
     </div>
 
-    <dv-worksurface #worksurface></dv-worksurface>
+    <dv-worksurface #worksurface 
+      *ngIf="selectedWidget"
+      [selectedWidget]="selectedWidget">
+    </dv-worksurface>
   </div>
   
   <dv-zoom></dv-zoom>

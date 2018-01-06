@@ -2,7 +2,10 @@
   <!-- for the user app -->
   <div> {{userApp.getName()}} </div>
   <div> Pages 
-    <button (click)="newPage()">New page</button>
+    <button class="btn btn-default btn-delete"
+            (click)="newPage()">
+      <span class="glyphicon glyphicon-plus"></span>
+    </button>
     <ng-container *ngFor="let widget of pages">
       <dv-list-item [widget]="widget"
                     [isDraggable]="false"
@@ -11,7 +14,10 @@
     </ng-container>
   </div>
   <div> Unused Widgets
-    <button (click)="newWidget()">New Widget</button>
+    <button class="btn btn-default btn-delete"
+            (click)="newWidget()">
+      <span class="glyphicon glyphicon-plus"></span>
+    </button>
     <ng-container *ngFor="let widget of unusedWidgets">
       <dv-list-item [widget]="widget"
                     [isDraggable]="true"
