@@ -1,20 +1,20 @@
-import {Widget, Field, AfterInit} from "client-bus";
-import {EventAtom} from "../../shared/data";
+import {Component, Input} from "@angular/core";
+import {Event} from "../../shared/data";
 import {GraphQlService} from "gql";
 
 
-@Widget({
-  fqelement: "Event",
-  ng2_providers: [GraphQlService],
+@Component({
+  selector: "show-event",
+  providers: [GraphQlService],
   template: `{{event.start_date}} - {{event.end_date}}`
 })
-export class ShowEventComponent implements AfterInit {
+export class ShowEventComponent {
   _event = {start_date: "", end_date: ""};
 
   constructor(private _graphQlService: GraphQlService) {}
 
   @Input()
-  set event(e: EventAtom) {
+  set event(e: Event) {
     if (e.start_date && e.end_date) {
       this._event.start_date = this.formatDateStr(e.start_date);
       this._event.end_date = this.formatDateStr(e.end_date);
@@ -26,7 +26,7 @@ export class ShowEventComponent implements AfterInit {
             end_date
           }
         `)
-        .subscribe(obj => {
+        .subscribe((obj: any) => {
           const start_date = obj.event_by_id.start_date;
           const end_date = obj.event_by_id.end_date;
           this._event.start_date = this.formatDateStr(start_date);
@@ -35,7 +35,7 @@ export class ShowEventComponent implements AfterInit {
     }
   }
 
-  get event(): EventAtom { return this._event; }
+  get event(): Event { return this._event; }
 
   private formatDateStr(date: string): string {
     const opts = {

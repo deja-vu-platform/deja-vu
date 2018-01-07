@@ -1,0 +1,21 @@
+<div class="row">
+  <select (change)="updateEvents($event.target.value)" class="selectpicker">
+    <option value="" disabled selected>Choose Weekly Event</option>
+    <option *ngFor="let weekly_event of weekly_events"
+     [value]="weekly_event.atom_id">
+        {{weekly_event.name}}
+        {{weekly_event.starts_on}} - {{weekly_event.ends_on}}
+    </option>
+  </select>
+</div>
+
+<div class="row">
+  <ul *ngIf="events && events.length > 0" class="list-group">
+    <li *ngFor="let event of events" class="list-group-item">
+     <dv-widget name="ShowEvent" [init]="{event: event}"></dv-widget>
+    </li>
+  </ul>
+  <div *ngIf="!events || events.length == 0">
+    No weekly event to show
+  </div>
+</div>

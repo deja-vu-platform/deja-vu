@@ -1,53 +1,58 @@
-import {Component, Input, ElementRef} from "@angular/core";
+import {Component, ElementRef} from "@angular/core";
 
 import {GraphQlService} from "gql";
 
-import {Event} from "../../shared/data";
-
 
 @Component({
-  selector: "new-event",
-  templateUrl: "./new-event.html",
+  selector: "new-weekly-event",
+  templateUrl: "./new-weekly-event.html",
   providers: [GraphQlService]
 })
-export class NewEventComponent {
-  @Input() id;
-
-  startsOnText: Element;
-  endsOnText: Element;
-  startTimeText: Element;
-  endTimeText: Element;
+export class NewWeeklyEventComponent {
+  starts_on: string = "";
+  ends_on: string = "";
+  start_time: string = "";
+  end_time: string = "";
 
   constructor(
       private _graphQlService: GraphQlService,
       private _elementRef: ElementRef) {}
 
+  onSubmit() {
+    let startsOnText: Element = document.getElementById("starts-on-text");
+    let endsOnText: Element = document.getElementById("ends-on-text");
+    let startTimeText: Element = document.getElementById("start-time-text");
+    let endTimeText: Element = document.getElementById("end-time-text");
 
-  commit(): any {
-    return this._graphQlService
-      .post<Event>(`
-        newPublicEvent(
-          atom_id: "${this.id}",
-          starts_on: "${this.startsOnText["value"]}",
-          ends_on: "${this.endsOnText["value"]}",
-          start_time: "${this.startTimeText["value"]}",
-          end_time: "${this.endTimeText["value"]}") {
-            atom_id,
-            starts_on,
-            ends_on,
-            start_time,
-            end_time
-          }
+    this.starts_on = startsOnText["value"];
+    this.ends_on = endsOnText["value"];
+    this.start_time = startTimeText["value"];
+    this.end_time = endTimeText["value"];
+
+    this._graphQlService
+      .post(`
+        newWeeklyPublicEvent(
+          starts_on: "${this.starts_on}", ends_on: "${this.ends_on}",
+          start_time: "${this.start_time}", end_time: "${this.end_time}") {
+          atom_id
         }
-      `);
+      `)
+      .subscribe(atom_id => {
+        // Clear out the fields on success
+        startsOnText["value"] = "";
+        endsOnText["value"] = "";
+        startTimeText["value"] = "";
+        endTimeText["value"] = "";
+
+        this.starts_on = "";
+        this.ends_on = "";
+        this.start_time = "";
+        this.end_time = "";
+      });
   }
 
-  onCommitSuccess() {
-    // Clear out the fields on success
-    this.startsOnText["value"] = "";
-    this.endsOnText["value"] = "";
-    this.startTimeText["value"] = "";
-    this.endTimeText["value"] = "";
+  update(e) {
+    console.log(e);
   }
 
   ngAfterViewInit() {
@@ -57,18 +62,13 @@ export class NewEventComponent {
 
     this._loadScript("bootstrap-timepicker/bootstrap-timepicker.min.js");
     this._loadStyle("bootstrap-timepicker/bootstrap-timepicker.css");
-
-    this.startsOnText = document.getElementById("starts-on-text");
-    this.endsOnText = document.getElementById("ends-on-text");
-    this.startTimeText = document.getElementById("start-time-text");
-    this.endTimeText = document.getElementById("end-time-text");
   }
 
   _loadScript(src: string) {
     const s = document.createElement("script");
     s.type = "text/javascript";
     s.src = "node_modules/dv-organization-event/lib/components/" +
-      "new-event-content/vendor/" + src;
+      "new-weekly-event/vendor/" + src;
     this._elementRef.nativeElement.appendChild(s);
   }
 
@@ -77,7 +77,7 @@ export class NewEventComponent {
     s.type = "text/css";
     s.rel = "stylesheet";
     s.href = "node_modules/dv-organization-event/lib/components/" +
-      "new-event-content/vendor/" + href;
+      "new-weekly-event/vendor/" + href;
     this._elementRef.nativeElement.appendChild(s);
   }
 
@@ -87,7 +87,7 @@ export class NewEventComponent {
    * control for the first time, the current (rounded) time appears.
    * Subsequently, after the time is cleared, this doesn't happen anymore.
    */
-  timeClickHandler(event) {
+  timeClickHandler(event: Event) {
     const MINUTE_ROUNDING_FACTOR = 15;
     const FIRST_PM_HOUR = 12;
 

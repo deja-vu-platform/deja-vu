@@ -1,8 +1,7 @@
 import {Promise} from "es6-promise";
 const graphql = require("graphql");
 
-import {Mean} from "mean-loader";
-import {Helpers} from "helpers";
+import {Mean} from "dv-mean";
 import {Grafo} from "grafo";
 
 import * as _u from "underscore";
@@ -200,6 +199,6 @@ const schema = grafo
   })
   .schema();
 
-Helpers.serve_schema(mean.ws, schema);
+mean.serve_schema(schema);
 
 grafo.init().then(_ => mean.start());
