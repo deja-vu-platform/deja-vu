@@ -16,6 +16,13 @@ export class ProjectService {
   }
 
   public getProject(): Project {
+    if (this.selectedProject) {
+      return this.selectedProject;
+    }
+    const project = localStorage.getItem('project');
+    if (project) {
+      this.updateProject(Project.fromObject(JSON.parse(project)));
+    }
     return this.selectedProject;
   }
 

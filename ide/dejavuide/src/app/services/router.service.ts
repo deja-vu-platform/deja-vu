@@ -8,6 +8,29 @@ export enum PageType {
   PROJECT_EXPLORER, UI_EDITOR
 }
 
+export interface PageInfo {
+  title: string;
+  type: PageType | null;
+}
+
+const pages: PageInfo[] = [
+  {
+    title: 'Projects',
+    type: PageType.PROJECT_EXPLORER
+  },
+  {
+    title: 'Cliches',
+    type: null
+  },
+  {
+    title: 'Widgets',
+    type: PageType.UI_EDITOR
+  },
+  {
+    title: 'Data',
+    type: null
+  }];
+
 const pageToUrl: Map<PageType, string> = new Map([
   [PageType.PROJECT_EXPLORER, '/projects'],
   [PageType.UI_EDITOR, '/ui_editor']
@@ -18,17 +41,45 @@ export class RouterService {
   private selectedPageType: PageType;
   newPageType = new ReplaySubject<PageType>(1);
 
-  constructor(private router: Router) {
-  }
-
+  constructor(private router: Router) {}
 
   public navigateTo(pageType: PageType): Promise<boolean> {
     this.selectedPageType = pageType;
+    this.setLocalStoragePageType();
     this.newPageType.next(this.selectedPageType);
     return this.router.navigate([pageToUrl.get(pageType)]);
   }
 
-  public getSelectedPageType(): PageType {
-    return this.selectedPageType;
+  public getSelectedPage(): PageInfo {
+    if (!this.selectedPageType) {
+      this.selectedPageType = parseInt(localStorage.getItem('pageType'), 10);
+      if (!this.selectedPageType) {
+        this.selectedPageType = PageType.PROJECT_EXPLORER;
+        this.setLocalStoragePageType();
+      }
+    }
+    return this.getPageInfo(this.selectedPageType);
+  }
+
+  public getPageInfo(type: PageType) {
+    let pageInfo = null;
+    pages.forEach((page) => {
+      if (page.type === type) {
+        pageInfo = page;
+      }
+    });
+    return pageInfo;
+  }
+
+  public getOtherPages(type: PageType) {
+    return pages.filter(page => page.type !== type);
+  }
+
+  public isSaveable(type: PageType) {
+    return type === PageType.UI_EDITOR;
+  }
+
+  private setLocalStoragePageType() {
+    localStorage.setItem('pageType', JSON.stringify(this.selectedPageType));
   }
 }
