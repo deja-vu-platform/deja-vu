@@ -85,34 +85,19 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.updateView();
   });
 
-  this.projectService.widgetUpdateListener.subscribe(() => {
-    this.updateView();
-    this.ref.detectChanges();
-  });
+    this.projectService.widgetUpdateListener.subscribe(() => {
+      this.updateView();
+      this.ref.detectChanges();
+    });
 
-  this.stateService.visibleWindowDimensions.subscribe(
-    (newVisibleWindowDimensions) => {
-        this.visibleWindowDimensions = newVisibleWindowDimensions;
+    this.stateService.visibleWindowDimensions.subscribe(
+      (newVisibleWindowDimensions) => {
+          this.visibleWindowDimensions = newVisibleWindowDimensions;
     });
   }
 
   ngAfterViewInit() {
-    // Initiate draggable
-    $('#map-window').draggable({
-      containment: '#zoom-selected-screen-size',
-      drag: (e, ui) => {
-        this.stateService.updateVisibleWindowScrollPosition({
-          top: ui.position.top / this.mapScale,
-          left: ui.position.left / this.mapScale
-        });
-      },
-      stop: (e, ui) => {
-        this.stateService.updateVisibleWindowScrollPosition({
-          top: ui.position.top / this.mapScale,
-          left: ui.position.left / this.mapScale
-        });
-      },
-    });
+    this.makeMapDraggable();
   }
 
   minimizeButtonClick() {
@@ -172,12 +157,34 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.mapWidgetSizes = mapWidgetSizes;
   }
 
-  updateMapScale() {
+  /**
+   * Updates the scale of the map so that the ratio of the <TODO>
+   * @param e
+   */
+  private updateMapScale() {
     const widthScale =
     this.mapComponentDimensions.width / this.screenDimensions.width;
     const heightScale =
       this.mapComponentDimensions.height / this.screenDimensions.height;
 
     this.mapScale = Math.min(widthScale, heightScale);
+  }
+
+  private makeMapDraggable() {
+    $('#map-window').draggable({
+      containment: '#zoom-selected-screen-size',
+      drag: (e, ui) => {
+        this.stateService.updateVisibleWindowScrollPosition({
+          top: ui.position.top / this.mapScale,
+          left: ui.position.left / this.mapScale
+        });
+      },
+      stop: (e, ui) => {
+        this.stateService.updateVisibleWindowScrollPosition({
+          top: ui.position.top / this.mapScale,
+          left: ui.position.left / this.mapScale
+        });
+      },
+    });
   }
 }

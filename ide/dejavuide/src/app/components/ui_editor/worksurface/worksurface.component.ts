@@ -56,7 +56,6 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.makeWorksurfaceDroppable();
-    console.log(this.selectedWidget);
     $(this.elt).scroll((event: Event) => {
       const elt = $(this.elt);
       this.stateService.updateVisibleWindowScrollPosition({
