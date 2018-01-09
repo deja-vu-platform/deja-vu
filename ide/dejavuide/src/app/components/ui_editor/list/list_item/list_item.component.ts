@@ -127,6 +127,10 @@ export class ListItemComponent implements AfterViewInit {
     this.projectService.updateSelectedWidget(this.widget);
   }
 
+  renameStart(event) {
+    this.renameVisible = !this.createNew;
+  }
+
   rename(event) {
     this.widget.setName(event.target.value);
     this.projectService.widgetUpdated();
