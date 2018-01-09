@@ -18,14 +18,10 @@
     <div *ngIf="selectedWidget"
         id="map-component-sizes"
         [style.zoom]="zoom"
-        [style.top.px]=
-        "selectedWidget.getPosition().top * this.mapScale"
-        [style.left.px]=
-        "selectedWidget.getPosition().left * this.mapScale"
-        [style.height.px]=
-        "selectedWidget.getDimensions().height * this.mapScale"
-        [style.width.px]=
-        "selectedWidget.getDimensions().width * this.mapScale">
+        [style.top.px]="mapSelectedWidgetPosition.top"
+        [style.left.px]="mapSelectedWidgetPosition.left"
+        [style.height.px]="mapSelectedWidgetSize.height"
+        [style.width.px]="mapSelectedWidgetSize.width">
       <div *ngFor="let size of mapWidgetSizes"
             class="map-inner-component-size"
             [style.height.px]= "size.height"

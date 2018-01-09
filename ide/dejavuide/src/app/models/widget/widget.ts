@@ -86,8 +86,13 @@ export abstract class Widget {
   static copyFields(fields: WidgetFields): WidgetFields {
     const copyfields = shallowCopy(fields);
     // Copy the deeper items
-    copyfields.dimensions = shallowCopy(fields.dimensions);
-    copyfields.position = shallowCopy(fields.position);
+    // But don't set things that are not already set!
+    if (fields.dimensions) {
+      copyfields.dimensions = shallowCopy(fields.dimensions);
+    }
+    if (fields.position) {
+      copyfields.position = shallowCopy(fields.position);
+    }
     if (fields.styles) {
       copyfields.styles.css = shallowCopy(fields.styles.css);
     }

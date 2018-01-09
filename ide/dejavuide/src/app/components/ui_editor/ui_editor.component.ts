@@ -66,10 +66,6 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
       // console.log('new selected widget');
     });
 
-    // Since state service is shared
-    this.stateService.updateVisibleWindowScrollPosition({
-      top: 0, left: 0
-    });
     // this.selectedProject = new Project('New Test Proj');
     // this.projectService.updateProject(this.selectedProject);
     this.selectedProject = this.projectService.getProject();

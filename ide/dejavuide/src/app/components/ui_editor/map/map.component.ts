@@ -42,6 +42,8 @@ export class MapComponent implements AfterViewInit, OnInit {
   };
 
   minimized = false;
+  mapSelectedWidgetSize: Dimensions;
+  mapSelectedWidgetPosition: Position;
   mapWidgetSizes: Dimensions[] = [];
 
   private zoom = 1;
@@ -137,8 +139,18 @@ export class MapComponent implements AfterViewInit, OnInit {
    */
   private updateView() {
     const selectedWidget = this.selectedWidget;
-    const mapWidgetSizes = [];
+
     if (selectedWidget) {
+      this.mapSelectedWidgetSize = {
+        height: selectedWidget.getDimensions().height * this.mapScale,
+        width: selectedWidget.getDimensions().width * this.mapScale
+      };
+      this.mapSelectedWidgetPosition = {
+        top: selectedWidget.getPosition().top * this.mapScale,
+        left: selectedWidget.getPosition().left * this.mapScale
+      };
+
+      const mapWidgetSizes = [];
       if (selectedWidget.isUserType()) {
         selectedWidget.getInnerWidgetIds().forEach((innerWidgetId) => {
           const innerWidget = selectedWidget
@@ -153,8 +165,9 @@ export class MapComponent implements AfterViewInit, OnInit {
           });
         });
       }
+
+      this.mapWidgetSizes = mapWidgetSizes;
     }
-    this.mapWidgetSizes = mapWidgetSizes;
   }
 
   /**
