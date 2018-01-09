@@ -69,7 +69,7 @@ export class UserCliche extends Cliche {
     orderedGroups.forEach((group, i) => {
       if (object.widgets[group]) {
         for (const widgetId of Object.keys(object.widgets[group])){
-          uc[toAdds[i]](Widget.fromJSON(project, object.widgets[group][widgetId]));
+          uc[toAdds[i]](Widget.fromJSON(object.widgets[group][widgetId], project));
         }
       }
     });

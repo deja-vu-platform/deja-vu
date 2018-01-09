@@ -3,6 +3,8 @@ import { Dimensions, Position } from '../../services/state.service';
 import { Cliche, UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
 
+const INCORRECT_TYPE = 'The object is not the correct type for this operation';
+
 enum WidgetType {
   BASE_WIDGET, USER_WIDGET, CLICHE_WIDGET
 }
@@ -67,15 +69,14 @@ export abstract class Widget {
    * Copies inner objects so that references are not shared.
    * @param fields object to convert
    */
-  static fromJSON(project: Project, fields: WidgetFields): BaseWidget | UserWidget {
-    const notCorrectObject = 'Object is not an instance of a Widget';
+  static fromJSON(fields: WidgetFields, project: Project): BaseWidget | UserWidget {
     if (fields.widgetType === undefined || fields.widgetType === null) {
-      throw new Error(notCorrectObject);
+      throw new Error(INCORRECT_TYPE);
     }
     if (fields.widgetType === WidgetType.BASE_WIDGET) {
-      return BaseWidget.fromJSON(project, fields);
+      return BaseWidget.fromJSON(fields, project);
     } else {
-      return UserWidget.fromJSON(project, fields);
+      return UserWidget.fromJSON(fields, project);
     }
   }
 
@@ -289,6 +290,14 @@ export abstract class Widget {
       this.fields.templateCopies.splice( index, 1 );
     }
   }
+
+  protected clearTemplateCopyFields(templateId: string) {
+    this.fields.templateId = templateId;
+    this.fields.isTemplate = false;
+    this.fields.styles = {
+      css: {}
+    };
+  }
 }
 
 /**
@@ -300,10 +309,9 @@ export abstract class Widget {
 export class BaseWidget extends Widget {
   protected fields: BaseWidgetFields;
 
-  static fromJSON(project: Project, fields: BaseWidgetFields): BaseWidget {
+  static fromJSON(fields: BaseWidgetFields, project: Project): BaseWidget {
     if (fields.widgetType !== WidgetType.BASE_WIDGET) {
-      return null;
-      // TODO throw error
+      throw new Error(INCORRECT_TYPE);
     }
 
     if (fields.type === BaseWidgetType.LINK) {
@@ -313,8 +321,7 @@ export class BaseWidget extends Widget {
       return new LabelBaseWidget(fields, project);
     }
 
-    // TODO throw error
-    return null;
+    throw new Error(INCORRECT_TYPE);
   }
 
   constructor(
@@ -357,13 +364,8 @@ export class BaseWidget extends Widget {
       // If you're making a tempate copy, add to template copies
       this.fields.templateCopies.push(copyWidget.getId());
 
-      // TODO dry
       // reset fields to to be copies over
-      copyWidget.fields.templateId = this.getId();
-      copyWidget.fields.isTemplate = false;
-      copyWidget.fields.styles = {
-        css: {}
-      };
+      copyWidget.clearTemplateCopyFields(this.getId());
     }
 
     return [copyWidget];
@@ -429,11 +431,9 @@ export class LabelBaseWidget extends BaseWidget {
  */
 export class UserWidget extends Widget {
   protected fields: UserWidgetFields;
-  // TODO switch order
-  static fromJSON(project: Project, fields: UserWidgetFields): UserWidget {
+  static fromJSON(fields: UserWidgetFields, project: Project): UserWidget {
     if (fields.widgetType !== WidgetType.USER_WIDGET) {
-      return null;
-      // TODO throw error
+      throw new Error(INCORRECT_TYPE);
     }
     return new UserWidget(fields, project);
   }
@@ -536,9 +536,6 @@ export class UserWidget extends Widget {
    * ignored
    */
   makeCopy(parentId?: string, fromTemplate = false): Widget[] {
-    // TODO find a way to merge this and the fromObject code since
-    // they are very similar
-
     const copyWidget = new UserWidget(this.fields,
       this.project);
 
@@ -553,12 +550,7 @@ export class UserWidget extends Widget {
       // If you're making a tempate copy, add it to template copy list
       this.fields.templateCopies.push(copyWidget.getId());
 
-      // TODO dry
-      copyWidget.fields.templateId = this.getId();
-      copyWidget.fields.isTemplate = false;
-      copyWidget.fields.styles = {
-        css: {}
-      };
+      copyWidget.clearTemplateCopyFields(this.getId());
     }
 
     let copyWidgets: Widget[] = [copyWidget];

@@ -164,14 +164,14 @@ fdescribe('UserWidget', () => {
 
   describe('fromObject', () => {
     it ('it creates a real widget from BaseWidgets', () => {
-      const widget5Copy = Widget.fromJSON(project, Widget.toJSON(widget5));
+      const widget5Copy = Widget.fromJSON(Widget.toJSON(widget5), project);
 
       expect(widget5Copy.getId()).toEqual(widget5.getId());
       expect(widget5Copy.isBaseType()).toBe(true);
     });
 
     it ('it creates a real widget from UserWidgets', () => {
-      const widget6Copy = Widget.fromJSON(project, Widget.toJSON(widget6));
+      const widget6Copy = Widget.fromJSON(Widget.toJSON(widget6), project);
 
       expect(widget6Copy.getId()).toEqual(widget6.getId());
       expect(widget6Copy.isUserType()).toBe(true);
@@ -198,7 +198,8 @@ fdescribe('UserWidget', () => {
       expect(widget3copies[2].getId()).not.toEqual(widget2.getId());
 
       expect(widget3copies[3].getName()).toEqual('widget1');
-      expect(widget3copies[3].getClicheId()).toEqual(widget1.getClicheId());expect(widget3copies[3].getId()).not.toEqual(widget1.getId());
+      expect(widget3copies[3].getClicheId()).toEqual(widget1.getClicheId());
+      expect(widget3copies[3].getId()).not.toEqual(widget1.getId());
     });
 
     it ('not from template of a template creates another template', () => {

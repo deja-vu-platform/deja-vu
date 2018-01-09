@@ -29,21 +29,25 @@ function createWindow() {
   
   var ses = mainWindow.webContents.session;
   
-  if (process.env.PACKAGE === 'true') {
-    mainWindow.loadURL(`file://${__dirname}/dist/index.html`);
-  } else {
-    // and load the index.html of the app from where angular serves it.
-    mainWindow.loadURL(process.env.HOST);
-    // Open the DevTools.
-    mainWindow.webContents.openDevTools();
-  }
+  // start out with clean local storage
+  ses.clearStorageData({storages: 'localstorage'}, function () {
+    if (process.env.PACKAGE === 'true') {
+      mainWindow.loadURL(`file://${__dirname}/dist/index.html`);
+    } else {
+      // and load the index.html of the app from where angular serves it.
+      mainWindow.loadURL(process.env.HOST);
+      // Open the DevTools.
+      mainWindow.webContents.openDevTools();
+    }
+  });
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
+    // clean out any local data
     ses.clearStorageData({storages: 'localstorage'}, function () {
+      // Dereference the window object, usually you would store windows
+      // in an array if your app supports multi windows, this is the time
+      // when you should delete the corresponding element.
         mainWindow = null;
       });
   });
