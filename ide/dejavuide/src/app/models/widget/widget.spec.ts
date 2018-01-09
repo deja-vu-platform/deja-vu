@@ -59,28 +59,28 @@ fdescribe('UserWidget', () => {
       isTemplate: true},
       project);
 
-    widget3.addInnerWidget(widget6);
+    widget3.setAsInnerWidget(widget6);
 
-    project.addAppWidget(widget1);
-    project.addAppWidget(widget2);
-    project.addAppWidget(widget3);
-    project.addAppWidget(widget4);
-    project.addAppWidget(widget5);
-    project.addAppWidget(widget6);
+    userApp.addWidget(widget1);
+    userApp.addWidget(widget2);
+    userApp.addWidget(widget3);
+    userApp.addWidget(widget4);
+    userApp.addWidget(widget5);
+    userApp.addWidget(widget6);
   });
 
   describe('remove', () => {
     it('removes itself from all widgets', () => {
       widget1.remove();
-      expect(() => project.getAppWidget(widget1.getId())).toThrowError();
+      expect(() => userApp.getWidget(widget1.getId())).toThrowError();
     });
 
     it ('does not delete inner widget', () => {
-      widget2.addInnerWidget(widget1);
+      widget2.setAsInnerWidget(widget1);
       widget2.remove();
 
-      expect(() => project.getAppWidget(widget2.getId())).toThrowError();
-      expect(project.getAppWidget(widget1.getId())).toBe(widget1);
+      expect(() => userApp.getWidget(widget2.getId())).toThrowError();
+      expect(userApp.getWidget(widget1.getId())).toBe(widget1);
     });
 
     it ('removes itself from its template list', () => {
@@ -95,10 +95,10 @@ fdescribe('UserWidget', () => {
 
   describe('add and remove inner widgets', () => {
     it('adds the id of the added and removes the ids removed', () => {
-      widget2.addInnerWidget(widget1);
+      widget2.setAsInnerWidget(widget1);
       expect(widget2.getInnerWidgetIds()).toEqual([widget1.getId()]);
 
-      widget3.addInnerWidget(widget2);
+      widget3.setAsInnerWidget(widget2);
       expect(widget3.getInnerWidgetIds()).toEqual([widget6.getId(), widget2.getId()]);
 
       widget2.removeInnerWidget(widget1.getId());
@@ -109,17 +109,17 @@ fdescribe('UserWidget', () => {
     });
 
     it ('does not delete removed items', () => {
-      widget2.addInnerWidget(widget1);
+      widget2.setAsInnerWidget(widget1);
       widget2.removeInnerWidget(widget1.getId());
 
-      expect(project.getAppWidget(widget1.getId())).toBe(widget1);
+      expect(userApp.getWidget(widget1.getId())).toBe(widget1);
     });
   });
 
   describe('getPath', () => {
     it('gets all the inner widget ids including the first', () => {
-      widget2.addInnerWidget(widget1);
-      widget3.addInnerWidget(widget2);
+      widget2.setAsInnerWidget(widget1);
+      widget3.setAsInnerWidget(widget2);
 
       expect(widget2.getPath(widget2.getId()))
       .toEqual([widget2.getId()]);
@@ -141,8 +141,8 @@ fdescribe('UserWidget', () => {
 
   describe('getInnerWidget', () => {
     it ('gets the inner widget', () => {
-      widget2.addInnerWidget(widget1);
-      widget3.addInnerWidget(widget2);
+      widget2.setAsInnerWidget(widget1);
+      widget3.setAsInnerWidget(widget2);
 
       expect(widget2.getInnerWidget(widget2.getId()))
       .toBe(widget2);
@@ -180,8 +180,8 @@ fdescribe('UserWidget', () => {
 
   describe('makecopy', () => {
     it ('returns all the copied inner widgets', () => {
-      widget2.addInnerWidget(widget1);
-      widget3.addInnerWidget(widget2);
+      widget2.setAsInnerWidget(widget1);
+      widget3.setAsInnerWidget(widget2);
       const widget3copies = widget3.makeCopy();
 
       expect(widget3copies.length).toBe(4);
@@ -203,7 +203,7 @@ fdescribe('UserWidget', () => {
     });
 
     it ('not from template of a template creates another template', () => {
-      widget6.addInnerWidget(widget5);
+      widget6.setAsInnerWidget(widget5);
       const widget6copies = widget6.makeCopy();
 
       expect(widget6copies[0].getTemplateId()).toBeUndefined();
@@ -213,7 +213,7 @@ fdescribe('UserWidget', () => {
     });
 
     it ('from template of a template creates a normal widget', () => {
-      widget6.addInnerWidget(widget5);
+      widget6.setAsInnerWidget(widget5);
       const widget6copies = widget6.makeCopy(undefined, true);
 
       expect(widget6copies[0].getTemplateId()).toEqual(widget6.getId());
@@ -225,7 +225,7 @@ fdescribe('UserWidget', () => {
 
   describe('layout', () => {
     it('copying properly copies over the layout', () => {
-      widget2.addInnerWidget(widget1);
+      widget2.setAsInnerWidget(widget1);
       widget1.updatePosition({top: 5, left: 6});
 
       const widget2Copies = widget2.makeCopy();
@@ -258,7 +258,7 @@ fdescribe('UserWidget', () => {
 
     fit('getCustomStylesToShow with template gets template styles ' +
     'but local styles are empty', () => {
-      widget6.addInnerWidget(widget5);
+      widget6.setAsInnerWidget(widget5);
       widget6.updateCustomStyle('background-color', 'red');
       const widget6Styles = widget6.getLocalCustomStyles();
       const widgetCopies = widget6.makeCopy(undefined, true);
@@ -320,11 +320,11 @@ fdescribe('UserWidget', () => {
         widget5.getId()
       ];
 
-      widget6.addInnerWidget(widget1);
-      widget6.addInnerWidget(widget2);
-      widget6.addInnerWidget(widget3);
-      widget6.addInnerWidget(widget4);
-      widget6.addInnerWidget(widget5);
+      widget6.setAsInnerWidget(widget1);
+      widget6.setAsInnerWidget(widget2);
+      widget6.setAsInnerWidget(widget3);
+      widget6.setAsInnerWidget(widget4);
+      widget6.setAsInnerWidget(widget5);
 
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
@@ -363,11 +363,11 @@ fdescribe('UserWidget', () => {
         widget5.getId()
       ];
 
-      widget6.addInnerWidget(widget1);
-      widget6.addInnerWidget(widget2);
-      widget6.addInnerWidget(widget3);
-      widget6.addInnerWidget(widget4);
-      widget6.addInnerWidget(widget5);
+      widget6.setAsInnerWidget(widget1);
+      widget6.setAsInnerWidget(widget2);
+      widget6.setAsInnerWidget(widget3);
+      widget6.setAsInnerWidget(widget4);
+      widget6.setAsInnerWidget(widget5);
 
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
@@ -406,7 +406,7 @@ fdescribe('UserWidget', () => {
         widget5
       ];
       widgetsInOrder.forEach((widget) => {
-        widget6.addInnerWidget(widget);
+        widget6.setAsInnerWidget(widget);
       });
 
       // 1 and 2 have normal overlap

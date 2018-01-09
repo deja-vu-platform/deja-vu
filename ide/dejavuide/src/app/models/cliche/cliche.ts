@@ -1,239 +1,223 @@
-import { generateId } from '../../utility/utility';
+import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
 import { Widget } from '../widget/widget';
-import { Project, Meta } from '../project/project';
+import { Project } from '../project/project';
 
 export enum ClicheType {
   USER_CLICHE, DV_CLICHE
 }
 
-enum WidgetGroup {
-  PAGE, TEMPLATE, USED, UNUSED
+interface ClicheFields {
+  clicheType?: ClicheType;
+  id?: string;
+
+  name?: string;
+  author?: string;
+  version?: string;
+
+  widgets?: any;
 }
 
-const orderedGroups: WidgetGroup[] = [
-  WidgetGroup.PAGE,
-  WidgetGroup.USED,
-  WidgetGroup.UNUSED,
-  WidgetGroup.TEMPLATE];
+interface UserClicheFields extends ClicheFields {
+  pageIds?: string[];
+  innerWidgetIds?: string[];
+  unusedWidgetIds?: string[];
+  templateIds?: string[];
+}
 
-  export abstract class Cliche {
+export abstract class Cliche {
   // A cliche contains the actual widget objects
-  protected objectType = 'Cliche';
-  protected meta: Meta;
-  protected widgets: Map<WidgetGroup, Map<string, Widget>>;
-  protected clicheType: ClicheType;
+  protected fields: ClicheFields;
   protected project: Project;
 
   /**
    * Converts a JSON object to a Widget object
    * @param object object to convert
    */
-  static fromObject(project: Project, object: any): UserCliche | DvCliche {
+  static fromJSON(object: ClicheFields, project: Project): UserCliche | DvCliche {
     const notCorrectObject = 'Object is not an instance of a Cliche';
     if (object.clicheType === undefined || object.clicheType === null) {
         throw new Error(notCorrectObject);
     }
     if (object.clicheType === ClicheType.USER_CLICHE) {
-        return UserCliche.fromObject(project, object);
+        return UserCliche.fromJSON(object, project);
     }
-    return DvCliche.fromObject(project, object);
+    return DvCliche.fromJSON(object, project);
   }
 
-  constructor (project: Project) {
+  static toJSON(cliche: Cliche) {
+    const json = Cliche.copyFields(cliche.fields);
+    json.widgets = {};
+    Object.keys(cliche.fields.widgets).forEach(widgetId => {
+      json.widgets[widgetId] =
+        Widget.toJSON(cliche.fields.widgets[widgetId]);
+    });
+
+    return json;
+  }
+
+
+  static copyFields(fields: ClicheFields): ClicheFields {
+    let copyfields = {...fields};
+
+    delete copyfields.widgets;
+    copyfields = shallowCopy(copyfields);
+
+    // For the uses of this function, we don't actually want to copy the widget
+    // objects.
+    copyfields.widgets = fields.widgets;
+
+    return copyfields;
+  }
+
+  constructor (fields: ClicheFields, project: Project) {
     this.project = project;
+
+    this.fields = Cliche.copyFields(fields);
+    // asign default values;
+    this.fields.id = fields.id ? this.fields.id : generateId();
+
+    this.fields.name = fields.name || 'New Cliche';
+    this.fields.version = fields.version || '0.0.0';
+    this.fields.author = fields.author || 'anonymous';
+    // TODO
+    this.fields.widgets = this.fields.widgets || {};
   }
 
-  abstract getWidget(widgetId: string): Widget;
+  getWidget(widgetId: string): Widget {
+    return this.fields.widgets[widgetId];
+  }
 
   getName(): string {
-    return this.meta.name;
+    return this.fields.name;
   }
 
   getId(): string {
-    return this.meta.id;
+    return this.fields.id;
   }
 }
 
 export class UserCliche extends Cliche {
-  static fromObject(project: Project, object: any) {
-    if (object.clicheType !== ClicheType.USER_CLICHE) {
-      return null;
+  protected fields: UserClicheFields;
+
+  static fromJSON(fields: UserClicheFields, project: Project) {
+    if (fields.clicheType !== ClicheType.USER_CLICHE) {
+      throw new Error('TODO');
     }
-    const uc = new UserCliche(project, object.meta.name, object.meta.id);
-    const toAdds: string[] = [
-      'addPage',
-      'addUsedWidget',
-      'addUnusedWidget',
-      'addTemplate'];
+    const cliche = new UserCliche(fields, project);
 
-    orderedGroups.forEach((group, i) => {
-      if (object.widgets[group]) {
-        for (const widgetId of Object.keys(object.widgets[group])){
-          uc[toAdds[i]](Widget.fromJSON(object.widgets[group][widgetId], project));
-        }
-      }
+    Object.keys(fields.widgets).forEach(widgetId => {
+      cliche.fields.widgets[widgetId] =
+        Widget.fromJSON(fields.widgets[widgetId], project);
     });
-    return uc;
+
+    return cliche;
   }
 
-  constructor (project: Project, name, id?: string) {
-    super(project);
-    this.clicheType = ClicheType.USER_CLICHE;
-    this.meta = {
-      name: name,
-      id: id || generateId(),
-      version: '',
-      author: ''
-    };
-    this.widgets = new Map([
-      [WidgetGroup.PAGE, new Map<string, Widget>()],
-      [WidgetGroup.USED, new Map<string, Widget>()],
-      [WidgetGroup.UNUSED, new Map<string, Widget>()],
-      [WidgetGroup.TEMPLATE, new Map<string, Widget>()]
-    ]);
+
+  constructor (fields: UserClicheFields, project: Project) {
+    super(fields, project);
+    this.fields.clicheType = ClicheType.USER_CLICHE;
+
+    this.fields.pageIds = fields.pageIds ? fields.pageIds.slice() : [];
+    this.fields.templateIds = fields.templateIds ?
+      fields.templateIds.slice() : [];
+    this.fields.innerWidgetIds = fields.innerWidgetIds ?
+      fields.innerWidgetIds.slice() : [];
+    this.fields.unusedWidgetIds = fields.unusedWidgetIds ?
+      fields.unusedWidgetIds.slice() : [];
   }
 
-  isPage (widgetId: string): boolean {
-    return widgetId in this.widgets.get(WidgetGroup.PAGE);
-  }
-
-  numPages(): number {
-    return this.widgets.get(WidgetGroup.PAGE).size;
-  }
-
-  addPage (widget: Widget) {
-    this.widgets.get(WidgetGroup.PAGE).set(widget.getId(), widget);
-    this.widgets.get(WidgetGroup.UNUSED).delete(widget.getId());
-    // TODO add inner widgets as used widgets
+  private cleanAssociations(widgetId: string) {
+    removeFirstFromArray(widgetId, this.fields.pageIds);
+    removeFirstFromArray(widgetId, this.fields.templateIds);
+    removeFirstFromArray(widgetId, this.fields.innerWidgetIds);
+    removeFirstFromArray(widgetId, this.fields.unusedWidgetIds);
   }
 
   /**
-   * Just removes the page from the cliche object, does not delete the widget
-   * object itself.
+   * Adds a widget. It is initially set as unused.
+   * @param widget
    */
-  removePage (widgetId: string) {
-    this.widgets.get(WidgetGroup.PAGE).delete(widgetId);
-  }
-
-  getPage (widgetId: string): Widget {
-    return this.widgets.get(WidgetGroup.PAGE).get(widgetId);
-  }
-
-  getPageIds (): string[] {
-    return  Array.from(this.widgets.get(WidgetGroup.PAGE).keys());
-  }
-
-  addTemplate (widget: Widget) {
-    widget.setAsTemplate();
-    this.widgets.get(WidgetGroup.TEMPLATE).set(widget.getId(), widget);
-  }
-
-  addTemplateAndInner (widgets: Widget[]) {
-    this.addTemplate(widgets[0]);
-    widgets.forEach((innerWidget, index) => {
-      if (index !== 0) {
-        this.addUsedWidget(innerWidget);
-      }
-    });
-  }
-
-  removeTemplate (widgetId: string) {
-    this.widgets.get(WidgetGroup.TEMPLATE).delete(widgetId);
-  }
-
-  getTemplate (widgetId: string): Widget {
-    return this.widgets.get(WidgetGroup.TEMPLATE).get(widgetId);
-  }
-
-  getTemplateIds (): string[] {
-    return Array.from(this.widgets.get(WidgetGroup.TEMPLATE).keys());
-  }
-
-  addUnusedWidget (widget: Widget) {
-    this.widgets.get(WidgetGroup.UNUSED).set(widget.getId(), widget);
-  }
-
-  removeUnusedWidget(widgetId: string) {
-    this.widgets.get(WidgetGroup.UNUSED).delete(widgetId);
-  }
-
-  getUnusedWidget (widgetId: string): Widget {
-    return this.widgets.get(WidgetGroup.UNUSED).get(widgetId);
-  }
-
-  getUnusedWidgetIds (): string[] {
-    return  Array.from(this.widgets.get(WidgetGroup.UNUSED).keys());
-  }
-
-  addUsedWidget (widget: Widget) {
-    this.widgets.get(WidgetGroup.USED).set(widget.getId(), widget);
-  }
-
-  addUsedWidgetAndInner (widgets: Widget[]) {
-    widgets.forEach(widget => {
-      this.addUsedWidget(widget);
-    });
-  }
-
-  removeUsedWidget (widgetId: string) {
-    this.widgets.get(WidgetGroup.USED).delete(widgetId);
-  }
-
-  getUsedWidget (widgetId: string): Widget {
-    return this.widgets.get(WidgetGroup.USED).get(widgetId);
-  }
-
-  getUsedWidgetIds (): string[] {
-    return  Array.from(this.widgets.get(WidgetGroup.USED).keys());
-  }
-
-  getWidget(widgetId: string): Widget {
-    return this.getPage(widgetId) ||
-      this.getUsedWidget(widgetId) ||
-        this.getUnusedWidget(widgetId) ||
-          this.getTemplate(widgetId);
+  addWidget(widget: Widget) {
+    if (widget.getClicheId() !== this.getId()) {
+      throw new Error('Not a user application widget!');
+    }
+    this.fields.widgets[widget.getId()] = widget;
+    this.fields.unusedWidgetIds.push(widget.getId());
   }
 
   removeWidget(widgetId: string) {
-      this.removePage(widgetId);
-      this.removeUsedWidget(widgetId);
-      this.removeUnusedWidget(widgetId);
-      this.removeTemplate(widgetId);
+    delete this.fields.widgets[widgetId];
+    this.cleanAssociations(widgetId);
   }
 
-  getSaveableJson() {
-    // assign only does a shallow copy, so we have to be careful not to
-    // overwrite things.
-    const json: UserCliche = Object.assign({}, this);
-    delete json.project;
-    delete json.widgets;
-    const jsonCopy = json as any;
-    const widgetMapsCopy = {};
-    orderedGroups.forEach((group, i) => {
-      const widgetMap = this.widgets.get(group);
-      if (widgetMap) {
-        const widgetMapCopy = {};
-        widgetMapsCopy[group] = widgetMapCopy;
-        widgetMap.forEach((widget, widgetId) => {
-          widgetMapCopy[widgetId] = Widget.toJSON(widget);
-        });
+  isPage (widgetId: string): boolean {
+    return inArray(widgetId, this.fields.pageIds);
+  }
+
+  numPages(): number {
+    return this.fields.pageIds.length;
+  }
+
+  setAsPage (widget: Widget) {
+    this.cleanAssociations(widget.getId());
+    this.fields.pageIds.push(widget.getId());
+    // TODO add inner widgets as used widgets
+  }
+
+  getPageIds (): string[] {
+    return this.fields.pageIds.slice();
+  }
+
+  setAsTemplate (widget: Widget) {
+    widget.setAsTemplate();
+    this.cleanAssociations(widget.getId());
+    this.fields.templateIds.push(widget.getId());
+  }
+
+  addTemplateAndInner (widgets: Widget[]) {
+    this.setAsTemplate(widgets[0]);
+    widgets.forEach((widget, index) => {
+      this.addWidget(widget);
+      if (index !== 0) {
+        this.setAsInnerWidget(widget);
       }
     });
-    jsonCopy.widgets = widgetMapsCopy;
-    return JSON.parse(JSON.stringify(json));
+  }
+
+  getTemplateIds (): string[] {
+    return this.fields.templateIds.slice();
+  }
+
+  setAsUnused (widget: Widget) {
+    this.cleanAssociations(widget.getId());
+    this.fields.unusedWidgetIds.push(widget.getId());
+  }
+
+  getUnusedWidgetIds (): string[] {
+    return this.fields.unusedWidgetIds.slice();
+  }
+
+  setAsInnerWidget (widget: Widget) {
+    this.cleanAssociations(widget.getId());
+    this.fields.innerWidgetIds.push(widget.getId());
+  }
+
+  addWidgetsAsUsed (widgets: Widget[]) {
+    widgets.forEach(widget => {
+      this.addWidget(widget);
+      this.setAsInnerWidget(widget);
+    });
+  }
+
+  getInnerWidgetIds (): string[] {
+    return this.fields.innerWidgetIds.slice();
   }
 }
 
 export class DvCliche extends Cliche {
-
-  constructor (project: Project) {
-    super(project);
-    this.clicheType = ClicheType.DV_CLICHE;
-    this.widgets = new Map<WidgetGroup, Map<string, Widget>>();
-    this.widgets.set(WidgetGroup.TEMPLATE, new Map<string, Widget>());
-  }
-
-  getWidget(widgetId: string): Widget {
-    return this.widgets.get(WidgetGroup.TEMPLATE).get(widgetId);
+  constructor (fields: ClicheFields, project: Project) {
+    super(fields, project);
+    this.fields.clicheType = ClicheType.DV_CLICHE;
   }
 }

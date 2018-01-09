@@ -86,7 +86,8 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
         clicheId: appId},
         this.selectedProject);
 
-      this.selectedProject.addAppWidget(testWidget);
+      this.userApp.addWidget(testWidget);
+      this.userApp.setAsPage(testWidget);
 
       const innerWidget1 = new LabelBaseWidget(
         {name: 'test inner1',
@@ -96,8 +97,8 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
         clicheId: appId},
         this.selectedProject,
       );
-      this.selectedProject.addAppWidget(innerWidget1);
-      testWidget.addInnerWidget(innerWidget1);
+      this.userApp.addWidget(innerWidget1);
+      testWidget.setAsInnerWidget(innerWidget1);
 
       // const innerWidget7 = new LinkBaseWidget(
       //   this.selectedProject,
@@ -112,9 +113,8 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
         position: { top: 200, left: 200 },
         clicheId: appId},
         this.selectedProject);
-
-      this.selectedProject.addAppWidget(innerWidget2);
-      testWidget.addInnerWidget(innerWidget2);
+      this.userApp.addWidget(innerWidget2);
+      testWidget.setAsInnerWidget(innerWidget2);
 
       const innerWidget21 = new UserWidget(
         {name: 'test inner21',
@@ -122,8 +122,8 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
         position: { top: 50, left: 100 },
         clicheId: appId},
         this.selectedProject);
-      this.selectedProject.addAppWidget(innerWidget21);
-      innerWidget2.addInnerWidget(innerWidget21);
+      this.userApp.addWidget(innerWidget21);
+      innerWidget2.setAsInnerWidget(innerWidget21);
 
       const innerWidget211 = new LinkBaseWidget(
         {name: 'inner211',
@@ -131,14 +131,13 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
         value: {text: '100100', target: undefined},
         clicheId: appId},
         this.selectedProject);
-      this.selectedProject.addAppWidget(innerWidget211);
-      innerWidget21.addInnerWidget(innerWidget211);
+      this.userApp.addWidget(innerWidget211);
+      innerWidget21.setAsInnerWidget(innerWidget211);
 
-      this.userApp.addPage(testWidget);
       this.selectedWidget = testWidget;
     } else {
       const pageId = this.userApp.getPageIds()[0];
-      this.selectedWidget = this.userApp.getPage(pageId);
+      this.selectedWidget = this.userApp.getWidget(pageId);
     }
 
     this.projectService.updateSelectedWidget(this.selectedWidget);
@@ -149,7 +148,7 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     this.ref.detectChanges();
     this.selectedWidget = widget;
     this.ref.detectChanges();
-    
+
     this.handleWindowResize();
   }
 }

@@ -13,6 +13,13 @@ export function inArray(val, arr) {
   return (arr.indexOf(val) >= 0);
 }
 
+export function removeFirstFromArray(val, arr) {
+  const index = arr.indexOf(val);
+  if (index >= 0) {
+    arr.splice( index, 1 );
+  }
+}
+
 function downloadObject(filename, obj) {
   const element = document.createElement('a');
   const data = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(obj));

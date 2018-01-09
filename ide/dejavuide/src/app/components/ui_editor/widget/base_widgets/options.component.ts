@@ -63,7 +63,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   delete() {
     this.unlinkWidgetFromParent();
     const userApp = this.projectService.getProject().getUserApp();
-    userApp.removeUnusedWidget(this.widget.getId());
+    userApp.removeWidget(this.widget.getId());
     this.projectService.widgetUpdated();
   }
 

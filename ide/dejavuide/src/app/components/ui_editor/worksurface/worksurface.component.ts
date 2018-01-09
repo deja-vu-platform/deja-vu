@@ -114,8 +114,8 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
 
             widget.updatePosition(this.newWidgetNewPosition(ui));
 
-            userApp.addUsedWidgetAndInner(innerWidgets);
-            this.selectedWidget.addInnerWidget(widget);
+            userApp.addWidgetsAsUsed(innerWidgets);
+            this.selectedWidget.setAsInnerWidget(widget);
           } else {
             // it must be an unused widget or an already added widget
             const alreadyAdded =
@@ -124,7 +124,7 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
             if (alreadyAdded) {
               widget.updatePosition(this.oldWidgetNewPosition(ui));
             } else {
-              this.selectedWidget.addInnerWidget(widget);
+              this.selectedWidget.setAsInnerWidget(widget);
               widget.updatePosition(this.newWidgetNewPosition(ui));
             }
           }

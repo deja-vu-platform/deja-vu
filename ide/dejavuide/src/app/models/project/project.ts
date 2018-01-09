@@ -1,6 +1,6 @@
 import { generateId } from '../../utility/utility';
 import { Cliche, UserCliche, DvCliche} from '../cliche/cliche';
-import { Widget } from '../widget/widget';
+
 /**
  * A map from clicheIds to all cliches
  */
@@ -29,7 +29,7 @@ export class Project {
       throw Error(notCorrectObject);
     }
     const project = new Project(object.meta.name, object.meta.id, true);
-    project.userApp = UserCliche.fromObject(project, object.userApp);
+    project.userApp = UserCliche.fromJSON(object.userApp, project);
 
     for (const clicheId of Object.keys(object.importedCliches)) {
         project.importCliche(clicheId);
@@ -47,7 +47,7 @@ export class Project {
 
     this.lastAccessed = (new Date()).getTime();
     if (!fromObject) {
-      this.userApp = new UserCliche(this, this.meta.name);
+      this.userApp = new UserCliche({name: this.meta.name}, this);
     }
   }
 
@@ -76,44 +76,10 @@ export class Project {
     return this.lastAccessed;
   }
 
-  /**
-   * Given a map of clicheIds to all their widgets, adds a widget to that map.
-   * @param allCliches a map of clicheids to cliches
-   * @param widget widget to add
-   */
-  addAppWidget(widget: Widget) {
-    if (widget.getClicheId() !== this.userApp.getId()) {
-      throw new Error('Not a user application widget!');
-    }
-    this.userApp.addUnusedWidget(widget);
-  }
-
-  /**
-     * Given a widgetId, gets the widget object from the user application
-     * @param widgetId id of widget to find
-     */
-  getAppWidget(widgetId: string): Widget {
-    const widget = this.userApp.getWidget(widgetId);
-    if (!widget) {
-      throw new Error('Widget not found in user app');
-    }
-    return widget;
-  }
-
-  /**
-     * Just deletes from the user application and the template reference if
-     * it has one. Doesn't touch inner widgets if any.
-     */
-  removeWidget(widgetId: string, templateId?: string) {
-      if (templateId) {
-          this.getAppWidget(templateId).removeTemplateCopy(widgetId);
-      }
-      this.userApp.removeWidget(widgetId);
-  }
-
   getSaveableJson() {
     const json: Project = Object.assign({}, this);
-    json.userApp = this.userApp.getSaveableJson();
+    // TODO fix this
+    json.userApp = (Cliche.toJSON(this.userApp) as UserCliche);
     json.importedCliches.forEach((cliche, clicheId) => {
       // TODO
       // make sure to create a copy and not overwrite anything in this

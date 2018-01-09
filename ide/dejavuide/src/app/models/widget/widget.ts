@@ -1,4 +1,4 @@
-import { generateId, shallowCopy, inArray } from '../../utility/utility';
+import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
 import { Dimensions, Position } from '../../services/state.service';
 import { Cliche, UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
@@ -259,8 +259,7 @@ export abstract class Widget {
     let inheritedStyles = {};
     const templateId = this.getTemplateId();
     if (templateId) {
-      inheritedStyles = this.project
-        .getAppWidget(templateId)
+      inheritedStyles = this.project.getUserApp().getWidget(templateId)
         .getCustomStylesToShow(); // no parent styles for template
     }
 
@@ -281,13 +280,18 @@ export abstract class Widget {
    * it has one. Doesn't touch inner widgets if any.
    */
   remove() {
-    this.project.removeWidget(this.getId(), this.getTemplateId());
+    const userApp = this.project.getUserApp();
+    const id = this.getId();
+    const templateId = this.getTemplateId();
+    if (templateId) {
+      userApp.getWidget(templateId).removeTemplateCopy(id);
+    }
+    userApp.removeWidget(id);
   }
 
   removeTemplateCopy(widgetId: string) {
     if (this.fields.isTemplate) {
-      const index = this.fields.templateCopies.indexOf(widgetId);
-      this.fields.templateCopies.splice( index, 1 );
+      removeFirstFromArray(widgetId, this.fields.templateCopies);
     }
   }
 
@@ -449,23 +453,20 @@ export class UserWidget extends Widget {
       fields.innerWidgetIds ? fields.innerWidgetIds.slice() : [];
   }
 
-  addInnerWidget(widget: Widget) {
+  setAsInnerWidget(widget: Widget) {
     const id = widget.getId();
     // Now the inner widgets list is the stack order
     this.fields.innerWidgetIds.push(id);
     widget.setParentId(this.getId());
-    this.project.userApp.removeUnusedWidget(id);
-    this.project.userApp.addUsedWidget(widget);
+    this.project.userApp.setAsInnerWidget(widget);
   }
 
   removeInnerWidget(id: string) {
-    const index = this.fields.innerWidgetIds.indexOf(id);
-    this.fields.innerWidgetIds.splice(index, 1);
+    removeFirstFromArray(id, this.fields.innerWidgetIds);
 
     const widget = this.project.getUserApp().getWidget(id);
     widget.setParentId(undefined);
-    this.project.userApp.removeUsedWidget(id);
-    this.project.userApp.addUnusedWidget(widget);
+    this.project.userApp.setAsUnused(widget);
   }
 
   getInnerWidgetIds() {
@@ -492,7 +493,7 @@ export class UserWidget extends Widget {
     // Recursive case, look through all the inner widgets
     for (const id of (<UserWidget>widget).fields.innerWidgetIds) {
       const path = this.getPathHelper(
-        this.project.getAppWidget(id), targetId);
+        this.project.getUserApp().getWidget(id), targetId);
       if (path === null) {
         continue;
       }
@@ -527,7 +528,7 @@ export class UserWidget extends Widget {
     if (getParent) {
       targetId = path[path.length - 2];
     }
-    return this.project.getAppWidget(targetId);
+    return this.project.getUserApp().getWidget(targetId);
   }
 
   /**
@@ -555,9 +556,9 @@ export class UserWidget extends Widget {
 
     let copyWidgets: Widget[] = [copyWidget];
     for (const id of this.fields.innerWidgetIds) {
-      const copyInnerWidgets = this.project.getAppWidget(id).makeCopy(copyWidget.getId(), fromTemplate);
+      const copyInnerWidgets = this.project.getUserApp().getWidget(id).makeCopy(copyWidget.getId(), fromTemplate);
       const innerWidgetCopy = copyInnerWidgets[0];
-      copyWidget.addInnerWidget(innerWidgetCopy);
+      copyWidget.setAsInnerWidget(innerWidgetCopy);
       copyWidgets = copyWidgets.concat(copyInnerWidgets);
     }
     return copyWidgets;
@@ -654,7 +655,7 @@ export class UserWidget extends Widget {
       if (widgetId === targetWidget.getId()) {
         return;
       }
-      const widget = this.project.getAppWidget(widgetId);
+      const widget = this.project.getUserApp().getWidget(widgetId);
       const top = widget.getPosition().top;
       const left = widget.getPosition().left;
       const right = left + widget.getDimensions().width;
