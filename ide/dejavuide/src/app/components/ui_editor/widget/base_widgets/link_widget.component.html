@@ -2,37 +2,6 @@
   {{widget.getValue().text}}
 </a>
 
-<div [hidden]='true' class="tooltip">
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <strong>Link</strong>
-      <button type="button" class="close close-btn">
-        <small>x</small>
-      </button>
-    </div>
-    <div class="panel-body">
-      <div class="row">
-        <div class="col-sm-2 form-lbl">Text: </div>
-        <div class="col-sm-7">
-          <input type="text" class="form-control" required autofocus (change)="updateLinkText($event)" [value]="value.text" />
-        </div>
-        <div class="col-sm-4"></div>
-      </div>
-      <br/>
-      <div class="row">
-        <div class="col-sm-2 form-lbl">Target: </div>
-        <div class="col-sm-7">
-          <input type="text" class="form-control" required (change)="updateLinkTarget($event)" [value]="value.target"/>
-        </div>
-        <div class="col-sm-2 apply">
-          <button class="btn btn-primary" (click)="applyChanges()">
-            Apply
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <dv-widget-options [widget]="widget">
   <div items>
@@ -61,4 +30,27 @@
       <button mat-menu-item class="btn-size-lg">Large</button>
     </mat-menu>
   </div>  
+
+  <div tooltip>
+    <!-- TODO make this better -->
+    <div class="row">
+      <div class="col-sm-2 form-lbl">Text: </div>
+      <div class="col-sm-7">
+        <input type="text" class="form-control" required autofocus (change)="updateLinkText($event)" [value]="value.text" />
+      </div>
+      <div class="col-sm-4"></div>
+    </div>
+    <br/>
+    <div class="row">
+      <div class="col-sm-2 form-lbl">Target: </div>
+      <div class="col-sm-7">
+        <input type="text" class="form-control" required (change)="updateLinkTarget($event)" [value]="value.target"/>
+      </div>
+      <div class="col-sm-2 apply">
+        <button class="btn btn-primary" (click)="applyChanges()">
+          Apply
+        </button>
+      </div>
+    </div>
+  </div>
 </dv-widget-options>

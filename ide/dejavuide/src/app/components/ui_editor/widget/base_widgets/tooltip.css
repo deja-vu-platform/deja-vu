@@ -1,0 +1,8 @@
+.tooltip {
+  opacity: 1;
+  display: none;
+}
+
+.tooltip-visible {
+  display: block;
+}

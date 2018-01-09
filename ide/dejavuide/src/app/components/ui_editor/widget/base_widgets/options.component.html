@@ -56,3 +56,17 @@
 </mat-menu>
 
 <ng-content select="[menus]"></ng-content>
+
+<div [ngClass]="{'tooltip': true, 'tooltip-visible':tooltipVisible}">  
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <strong>{{widget.getName()}}</strong>
+      <button type="button" class="close close-btn">
+        <small (click)="tooltipClose()">x</small>
+      </button>
+    </div>
+    <div class="panel-body">
+        <ng-content select="[tooltip]"></ng-content>
+    </div>
+  </div>
+</div>

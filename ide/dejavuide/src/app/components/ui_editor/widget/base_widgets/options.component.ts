@@ -8,12 +8,15 @@ declare const jscolor: any;
 @Component({
   selector: 'dv-widget-options',
   templateUrl: './options.component.html',
+  styleUrls: ['./tooltip.css']
 })
 export class WidgetOptionsComponent implements AfterViewInit {
   @ViewChild('textInput', {read: ElementRef}) private textInputElt: ElementRef;
   @ViewChild('bgInput', {read: ElementRef}) private bgInputElt: ElementRef;
   @Input() editDisabled = false;
   @Input() widget: Widget;
+
+  tooltipVisible = false;
 
   pickerText;
   pickerBg;
@@ -39,7 +42,11 @@ export class WidgetOptionsComponent implements AfterViewInit {
 
   showTooltip() {
     console.log('show tooltip clicked');
-    // container.find('.tooltip').addClass('open');
+    this.tooltipVisible = true;
+  }
+
+  tooltipClose() {
+    this.tooltipVisible = false;
   }
 
   createTemplate() {
