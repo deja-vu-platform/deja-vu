@@ -5,6 +5,9 @@ import { ProjectService } from '../../../../services/project.service';
 
 declare const jscolor: any;
 
+const COLOR = 'color';
+const BACKGROUND = 'background';
+
 @Component({
   selector: 'dv-widget-options',
   templateUrl: './options.component.html',
@@ -24,15 +27,17 @@ export class WidgetOptionsComponent implements AfterViewInit {
   constructor (private projectService: ProjectService) {}
 
   ngAfterViewInit () {
+    const localStyles = this.widget.getLocalCustomStyles();
+
     this.pickerText = new jscolor(this.textInputElt.nativeElement);
     this.pickerText.closable = true;
     this.pickerText.closeText = 'X';
-    this.pickerText.fromString('000000');
+    this.pickerText.fromString(localStyles[COLOR] || '000000');
 
     this.pickerBg = new jscolor(this.bgInputElt.nativeElement);
     this.pickerBg.closable = true;
     this.pickerBg.closeText = 'X';
-    this.pickerBg.fromString('FFFFFF');
+    this.pickerBg.fromString(localStyles[BACKGROUND] || 'FFFFFF');
   }
 
   clearStyles() {
@@ -41,7 +46,6 @@ export class WidgetOptionsComponent implements AfterViewInit {
   }
 
   showTooltip() {
-    console.log('show tooltip clicked');
     this.tooltipVisible = true;
   }
 
@@ -50,10 +54,8 @@ export class WidgetOptionsComponent implements AfterViewInit {
   }
 
   createTemplate() {
-    console.log('create template clicked');
     const copies = this.widget.makeCopy();
     const userApp = this.projectService.getProject().getUserApp();
-    console.log(copies);
     userApp.addTemplateAndInner(copies);
     this.projectService.widgetUpdated();
   }
@@ -101,7 +103,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   textColorChange(event) {
     event.stopPropagation();
     const color = this.pickerText.toHEXString();
-    this.widget.updateCustomStyle('color', color);
+    this.widget.updateCustomStyle(COLOR, color);
     this.projectService.widgetUpdated();
   }
 
@@ -113,7 +115,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   bgColorChange(event) {
     event.stopPropagation();
     const color = this.pickerBg.toHEXString();
-    this.widget.updateCustomStyle('background', color);
+    this.widget.updateCustomStyle(BACKGROUND, color);
     this.projectService.widgetUpdated();
   }
 }

@@ -4,7 +4,9 @@
       [style.width.px]="widget.getDimensions().width">
   <span>Name: {{widget.getName()}}</span>
   <ng-container *ngIf="widget.isUserType()">
-      <dv-widget-options [widget]="widget"></dv-widget-options>
+      <dv-widget-options [widget]="widget"
+                         [editDisabled]="true">
+      </dv-widget-options>
       <ng-container *ngFor="let innerWidget of innerWidgets">
       <dv-widget [widget]="innerWidget"
                   [isSelected]="false"

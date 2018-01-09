@@ -56,16 +56,15 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.handleWindowResize();
-  }
-
-  ngOnInit() {
     this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
       if (this.selectedWidget !== newSelectedWidget) {
         this.refreshWorkSurface(newSelectedWidget);
       }
       // console.log('new selected widget');
     });
+  }
 
+  ngOnInit() {
     // this.selectedProject = new Project('New Test Proj');
     // this.projectService.updateProject(this.selectedProject);
     this.selectedProject = this.projectService.getProject();
@@ -150,5 +149,7 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     this.ref.detectChanges();
     this.selectedWidget = widget;
     this.ref.detectChanges();
+    
+    this.handleWindowResize();
   }
 }
