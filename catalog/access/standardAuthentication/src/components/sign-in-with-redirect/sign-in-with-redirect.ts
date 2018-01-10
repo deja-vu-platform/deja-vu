@@ -33,7 +33,8 @@ export class SignInWithRedirectComponent {
           localStorage.setItem("id_token", authToken);
           localStorage.setItem("username", this.user.username);
           localStorage.setItem("atom_id", authUser.atom_id);
-          this._client_bus.navigate(this.on_signin_ok.value);
+          if (this.on_signin_ok.value)
+            this._client_bus.navigate(this.on_signin_ok.value);
         },
         err => {
           this.error = true;
