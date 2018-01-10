@@ -7,6 +7,8 @@ var app = electron.app;  // Module to control application life.
 var BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 var ipcMain = electron.ipcMain;
 
+var DV_EXT = 'dvp';
+
 // Angular and electron help from https://scotch.io/tutorials/build-a-music-player-with-angular-2-electron-i-setup-basics-concepts
 require('dotenv').config();
 
@@ -142,7 +144,9 @@ function readFiles(dirname, onFinish) {
               onFinish(err2);
               return;
             }
-            files.push([filenameToProjectName(filename), content]);
+            if (getExtension(filename) === DV_EXT) {
+              files.push([filenameToProjectName(filename), content]);  
+            }
             numFilesProcessed += 1;
             if (numFilesProcessed === filenames.length) {
               onFinish(null, files);
@@ -163,8 +167,16 @@ function filenameToProjectName(filename) {
   return filename.split('.').slice(0, -1).join('.');
 }
 
+function getExtension(filename){
+  const lastIndex = filename.lastIndexOf('.');
+  if (lastIndex<0) {
+    return '';
+  }
+  return filename.substr(lastIndex + 1);
+}
+
 function projectNameToFilename(projectName) {
-  return projectName + '.json';
+  return projectName + '.' + DV_EXT;
 }
 
 function isCopyOfFile(dirname, filename) {

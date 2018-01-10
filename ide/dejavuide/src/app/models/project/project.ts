@@ -1,58 +1,68 @@
-import { generateId } from '../../utility/utility';
+import { generateId, shallowCopy } from '../../utility/utility';
 import { Cliche, UserCliche, DvCliche} from '../cliche/cliche';
 
-/**
- * A map from clicheIds to all cliches
- */
-type ClicheMap = Map<string, Cliche>;
+interface ProjectFields {
+  id?: string;
 
-export interface Meta {
-  name: string;
-  id: string;
-  version?: string;
+  name?: string;
   author?: string;
-  templateId?: string;
-  clicheId?: string;
-  parentId?: string;
+  version?: string;
+
+  userAppFields?: any;
+  lastAccessed?: number;
 }
 
 export class Project {
-  objectType = 'Project';
-  meta: Meta;
+  fields: ProjectFields;
   userApp: UserCliche = null;
   importedCliches = new Map<string, DvCliche>();
-  lastAccessed = -Infinity;
 
-  static fromObject (object: any): Project {
-    const notCorrectObject = 'Object is not an instance of a Project';
-    if (object.objectType !== 'Project') {
-      throw Error(notCorrectObject);
-    }
-    const project = new Project(object.meta.name, object.meta.id, true);
-    project.userApp = UserCliche.fromJSON(object.userApp, project);
+  static fromJSON (fields: ProjectFields): Project {
+    const project = new Project(fields);
+    project.userApp = UserCliche.fromJSON(fields.userAppFields, project);
 
-    for (const clicheId of Object.keys(object.importedCliches)) {
-        project.importCliche(clicheId);
-    }
+    // TODO
+    // for (const clicheId of Object.keys(fields.importedCliches)) {
+    //     project.importCliche(clicheId);
+    // }
     return project;
   }
 
-  constructor (name, id?: string, fromObject = false) {
-    this.meta = {
-      name: name,
-      id: id || generateId(),
-      version: '',
-      author: ''
-    };
+  static toJSON (project: Project) {
+    const json = Project.copyFields(project.fields);
+    json.userAppFields = Cliche.toJSON(project.userApp);
+    // json.importedCliches.forEach((cliche, clicheId) => {
+    //   // TODO
+    //   // make sure to create a copy and not overwrite anything in this
+    // });
+    return json;
+  }
 
-    this.lastAccessed = (new Date()).getTime();
-    if (!fromObject) {
-      this.userApp = new UserCliche({name: this.meta.name}, this);
+  static copyFields(fields: ProjectFields): ProjectFields {
+    const copyfields = shallowCopy(fields);
+    return copyfields;
+  }
+
+
+  constructor (fields: ProjectFields) {
+    this.fields = Project.copyFields(fields);
+    // asign default values;
+    this.fields.id = fields.id ? this.fields.id : generateId();
+
+    this.fields.name = fields.name || 'New Project';
+    this.fields.version = fields.version || '0.0.0';
+    this.fields.author = fields.author || 'anonymous';
+
+    this.fields.lastAccessed = (new Date()).getTime();
+    if (this.fields.userAppFields) {
+      this.userApp = new UserCliche(this.fields.userAppFields, this);
+    } else {
+      this.userApp = new UserCliche({name: this.fields.name}, this);
     }
   }
 
   getName(): string {
-    return this.meta.name;
+    return this.fields.name;
   }
 
   importCliche (clicheId) {
@@ -69,21 +79,10 @@ export class Project {
   }
 
   updateAccess() {
-    this.lastAccessed = (new Date()).getTime();
+    this.fields.lastAccessed = (new Date()).getTime();
   }
 
   getLastAccessed() {
-    return this.lastAccessed;
-  }
-
-  getSaveableJson() {
-    const json: Project = Object.assign({}, this);
-    // TODO fix this
-    json.userApp = (Cliche.toJSON(this.userApp) as UserCliche);
-    json.importedCliches.forEach((cliche, clicheId) => {
-      // TODO
-      // make sure to create a copy and not overwrite anything in this
-    });
-    return JSON.parse(JSON.stringify(json));
+    return this.fields.lastAccessed;
   }
 }

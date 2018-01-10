@@ -23,12 +23,12 @@ export class CommunicatorService {
   }
 
   saveToLocalStorage(project: Project) {
-    const JSONObject = project.getSaveableJson();
+    const JSONObject = Project.toJSON(project);
     localStorage.setItem('project', JSON.stringify(JSONObject));
   }
 
   save(project: Project) {
-    const JSONObject = project.getSaveableJson();
+    const JSONObject = Project.toJSON(project);
     this.saveToLocalStorage(project);
     this.ipcRenderer.send('save', {
       projectName: project.getName(),

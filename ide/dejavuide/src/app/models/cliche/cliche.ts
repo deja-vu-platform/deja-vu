@@ -14,7 +14,7 @@ interface ClicheFields {
   author?: string;
   version?: string;
 
-  widgets?: any;
+  widgetFields?: any;
 }
 
 interface UserClicheFields extends ClicheFields {
@@ -28,6 +28,7 @@ export abstract class Cliche {
   // A cliche contains the actual widget objects
   protected fields: ClicheFields;
   protected project: Project;
+  protected widgets: Map<string, Widget>;
 
   /**
    * Converts a JSON object to a Widget object
@@ -46,25 +47,19 @@ export abstract class Cliche {
 
   static toJSON(cliche: Cliche) {
     const json = Cliche.copyFields(cliche.fields);
-    json.widgets = {};
-    Object.keys(cliche.fields.widgets).forEach(widgetId => {
-      json.widgets[widgetId] =
-        Widget.toJSON(cliche.fields.widgets[widgetId]);
+
+    // Update to the freshest copy of widgets
+    json.widgetFields = {};
+    cliche.widgets.forEach((widget, widgetId) => {
+      json.widgetFields[widgetId] =
+        Widget.toJSON(widget);
     });
 
     return json;
   }
 
-
   static copyFields(fields: ClicheFields): ClicheFields {
-    let copyfields = {...fields};
-
-    delete copyfields.widgets;
-    copyfields = shallowCopy(copyfields);
-
-    // For the uses of this function, we don't actually want to copy the widget
-    // objects.
-    copyfields.widgets = fields.widgets;
+    const copyfields = shallowCopy(fields);
 
     return copyfields;
   }
@@ -79,12 +74,19 @@ export abstract class Cliche {
     this.fields.name = fields.name || 'New Cliche';
     this.fields.version = fields.version || '0.0.0';
     this.fields.author = fields.author || 'anonymous';
-    // TODO
-    this.fields.widgets = this.fields.widgets || {};
+
+    // initialize widget map
+    this.widgets = new Map<string, Widget>();
+    if (fields.widgetFields) {
+      Object.keys(fields.widgetFields).forEach(widgetId => {
+        this.widgets.set(widgetId,
+          Widget.fromJSON(fields.widgetFields[widgetId], project));
+      });
+    }
   }
 
   getWidget(widgetId: string): Widget {
-    return this.fields.widgets[widgetId];
+    return this.widgets.get(widgetId);
   }
 
   getName(): string {
@@ -104,11 +106,6 @@ export class UserCliche extends Cliche {
       throw new Error('TODO');
     }
     const cliche = new UserCliche(fields, project);
-
-    Object.keys(fields.widgets).forEach(widgetId => {
-      cliche.fields.widgets[widgetId] =
-        Widget.fromJSON(fields.widgets[widgetId], project);
-    });
 
     return cliche;
   }
@@ -142,12 +139,12 @@ export class UserCliche extends Cliche {
     if (widget.getClicheId() !== this.getId()) {
       throw new Error('Not a user application widget!');
     }
-    this.fields.widgets[widget.getId()] = widget;
+    this.widgets.set(widget.getId(), widget);
     this.fields.unusedWidgetIds.push(widget.getId());
   }
 
   removeWidget(widgetId: string) {
-    delete this.fields.widgets[widgetId];
+    this.widgets.delete(widgetId);
     this.cleanAssociations(widgetId);
   }
 

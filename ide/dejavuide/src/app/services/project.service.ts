@@ -21,7 +21,7 @@ export class ProjectService {
     }
     const project = localStorage.getItem('project');
     if (project) {
-      this.updateProject(Project.fromObject(JSON.parse(project)));
+      this.updateProject(Project.fromJSON(JSON.parse(project)));
     }
     return this.selectedProject;
   }

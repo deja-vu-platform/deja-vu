@@ -45,9 +45,7 @@ export class ProjectExplorerComponent implements OnInit {
       data.projects.forEach((projectInfo) => {
         const projectName = projectInfo[0];
         const content = JSON.parse(projectInfo[1]);
-        if (content.objectType && (content.objectType === 'Project')) {
-          this.projects[projectName] = content;
-        }
+        this.projects[projectName] = content;
       });
 
       this.updateDisplayProjectList();
@@ -74,7 +72,7 @@ export class ProjectExplorerComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        const newProject = new Project(result.name);
+        const newProject = new Project({name: result.name});
         this.loadProject(newProject);
       }
     });
@@ -85,7 +83,7 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   loadClicked(projectName) {
-    const newProject = Project.fromObject(this.projects[projectName]);
+    const newProject = Project.fromJSON(this.projects[projectName]);
     this.loadProject(newProject);
   }
 
@@ -130,7 +128,8 @@ export class ProjectExplorerComponent implements OnInit {
       const content = this.projects[projectName];
       const time = content.lastAccessed;
       if (!this.recentSelected || (now - time) < WEEK_IN_SEC) {
-        projectsToShow.push(this.fileToDisplayProject(projectName, content.meta.id, time));
+        // TODO this file shouldn't need to know the format of the content file
+        projectsToShow.push(this.fileToDisplayProject(projectName, content.id, time));
       }
     });
     this.projectsToShow = projectsToShow;
