@@ -1,17 +1,17 @@
-<navbar output="user"></navbar>
-
-<div class="container" id="homepage-container">
-  <div class="col-md-6 col-md-offset-3" id="namebox">
-    <form class="form-horizontal" dvTransaction next="dv:redirect"> <!-- could also have dvTransactionRedirect -->
-    <!-- <form class="form-horizontal" dvTransaction next="dv:redirect"> -->
-      <!-- all mutations inside will be executed in a transaction --->
-      <event:new-event event="p"></event:new-event>
-      <group:new-group-with-initial-member group="p" member="user"></group:new-group-with-initial-member>
-      <button>Create Party</button>
-    </form>
-    <a [dvLink]="parties" class="btn btn-primary">
-      <!-- <a click="dv:redirect to=parties"> -->
-      Return to Your Parties
-    </a>
+<dv:def-action name="new-party" inputs="user" output="party" alloc="party">
+  <div class="container" id="homepage-container">
+    <div class="col-md-6 col-md-offset-3" id="namebox">
+      <form class="form-horizontal" dvTransaction next="dv:navigate">
+        <!-- all actions inside the element marked with dvTransaction
+             will be executed in a transaction --->
+        <event:new-event event="party"></event:new-event>
+        <group:new-group-with-initial-member group="party" member="user">
+        </group:new-group-with-initial-member>
+        <dv:button>Create Party</dv:button>
+      </form>
+      <a click="dv:navigate to=parties">
+        Return to Your Parties
+      </a>
+    </div>
   </div>
-</div>
+</dv:def-action>
