@@ -1,7 +1,9 @@
+<!-- outputs="user" -->
 <link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
-<dv-widget name="LoggedIn" of="StandardAuthentication"></dv-widget>
+<standard-authentication:logged-in (user)="user">
+</standard-authentication:logged-in>
 <nav class="navbar navbar-default navbar-fixed-top">
   <div class="container">
     <div class="navbar-header">
@@ -14,8 +16,8 @@
         </a>
       </li>
       <li *ngIf="user.username">
-        <dv-widget name="SignOutWithRedirect" of="StandardAuthentication">
-        </dv-widget>
+        <standard-authentication:sign-out next="landing">
+        </standard-authentication:sign-out>
       </li>
     </ul>
   </div>

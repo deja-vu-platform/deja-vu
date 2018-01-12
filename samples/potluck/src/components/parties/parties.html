@@ -1,17 +1,18 @@
-<navbar (output)="user"></navbar>
+<navbar (user)="user"></navbar>
 
 <div class="container" id="homepage-container">
   <div class="col-md-3" id="box">
     <h1>Your Parties</h1>
-    <a [routerLink]="['/new-party']" class="btn btn-primary">
+    <dv:a next="new-party" class="btn btn-primary">
       <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
       Create a New Party
-    </a>
+    </dv:a>
   </div>
 
   <div class="col-md-9">
-    <show-groups-by-member of="Group" [member]="user">
-      <show-party party="party" [user]="user"></show-party>
-    </show-groups-by-member>
+    <group:show-groups-by-member [member]="user"
+      [showGroup]="show-party"
+      [showGroupInputs]="{'user': user, 'party': !group}">
+    </group:show-groups-by-member>
   </div>
 </div>

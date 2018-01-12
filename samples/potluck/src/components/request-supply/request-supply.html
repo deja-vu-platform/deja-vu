@@ -1,3 +1,6 @@
-<dv-widget name="CreateGoodName" of="Market"></dv-widget>
-<dv-widget name="CreateGoodSupply" of="Market"></dv-widget>
-<dv-widget name="CreateGoodButton" of="Market"></dv-widget>
+<!-- inputs="party, user" -->
+<market:create-good-name (name)="name"></market:create-good-name>
+<market:create-good-supply (supply)="supply"></market:create-good-supply>
+<market:create-good-button
+  [seller]="user" [name]="name" [supply]="supply" [market]="party">
+</market:create-good-button>

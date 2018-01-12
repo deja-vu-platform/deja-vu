@@ -1,17 +1,14 @@
+<!-- inputs="commitment" -->
 <div class="col-xs-4">
-  <!--  {{commitment.supply.name}} -->
-  {{commitment.good.name}}
+  <market:show-name-of-good [good]="market:show-good-of-transaction (good)">
+  </market:show-name-of-good>
 </div>
 <div class="col-xs-2">
-  {{commitment.quantity}}
+  <market:show-quantity-of-transaction [transaction]="commitment">
+  </market:show-quantity-of-transaction>
 </div>
 <div class="col-xs-6">
-  <!-- {{commitment.provider.atom_id}} -->
-  {{commitment.buyer.atom_id}}
-</div>
-
-<!-- done to get transaction to bind -->
-<!-- TODO remove once no longer needed -->
-<div style="display:none">
-  <dv-widget name="ShowTransaction" of="Market"></dv-widget>
+  <standard-authentication:username
+    [user]="market:show-buyer-of-transaction [transaction]='commitment' (buyer)">
+  </standard-authentication:username>
 </div>

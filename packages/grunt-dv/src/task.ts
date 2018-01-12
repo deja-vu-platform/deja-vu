@@ -1,108 +1,4 @@
-import * as express from "express";
-const express_graphql = require("express-graphql");
-const morgan = require("morgan");
-
-// the mongodb tsd typings are wrong and we can't use them with promises
-const mongodb = require("mongodb");
-const command_line_args = require("command-line-args");
-const path = require("path");
 import * as _u from "underscore";
-
-
-const cli = command_line_args([
-  {name: "fqelement", type: String},
-
-  {name: "dbhost", type: String, defaultValue: "localhost"},
-  {name: "dbport", type: Number, defaultValue: 27017},
-
-  {name: "port", type: String},
-
-  // Mode can be "dev" or "test".  In dev mode the development page is shown,
-  // in test mode the main widget is shown
-  {name: "mode", type: String, defaultValue: "dev"},
-  // True if this is the cliche being run by the user
-  {name: "main", type: Boolean}
-]);
-
-
-export class Mean {
-  fqelement: string;
-  db; //: mongodb.Db;
-  ws; //: express.Express;
-  comp: any;
-  locs: any;
-  debug: boolean;
-  private _opts: {
-    fqelement: string,
-    dbhost: string,
-    dbport: number,
-    comp: string,
-    locs: string,
-    mode: string,
-    main: boolean
-  };
-
-  constructor() {
-    this._opts = cli.parse();
-    if (this._opts.comp) {
-      this.comp = JSON.parse(this._opts.comp);
-    }
-    this.locs = JSON.parse(this._opts.locs);
-    this.fqelement = this._opts.fqelement;
-
-    console.log(
-        `Starting MEAN ${this.fqelement} at ${this.locs[this.fqelement]}`);
-
-    const server = new mongodb.Server(
-      this._opts.dbhost, this._opts.dbport,
-      {socketOptions: {autoReconnect: true}});
-    this.db = new mongodb.Db(`${this.fqelement}-db`, server, {w: 1});
-
-    this.debug = this._opts.mode === "dev" && this._opts.main;
-    this.ws = express();
-    this.ws.use(morgan("dev"));
-  }
-
-  start() {
-    if (this._opts.main) {
-      console.log(`Serving public folder for main MEAN ${this.fqelement}`);
-      this.ws.use(express.static("./dist/public"));
-      const dist_dir = path.resolve(__dirname + "/../../../dist");
-      this.ws.use("/*", (req, res) => {
-        res.sendFile("/public/dv-dev/index.html", {root: dist_dir});
-      });
-    }
-
-    this.ws.listen(this.locs[this.fqelement].split(":")[2], () => {
-      console.log(`Listening with opts ${JSON.stringify(this._opts, null, 2)}`);
-    });
-  }
-
-  serve_schema(graphql_schema) {
-    console.log(`Serving graphql schema for MEAN`);
-    const gql = express_graphql({
-      schema: graphql_schema,
-      pretty: true,
-      formatError: e => ({
-        message: e.message,
-        locations: e.locations,
-        stack: e.stack
-      })
-    });
-    this.ws.options("/graphql", this.cors);
-    this.ws.get("/graphql", this.cors, gql);
-    this.ws.post("/graphql", this.cors, gql);
-  }
-
-  private cors(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS");
-    res.header(
-        "Access-Control-Allow-Headers",
-        "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  }
-}
 
 
 export interface UsedWidget {
@@ -225,9 +121,8 @@ export namespace GruntTask {
   }
 
   export function app_task(
-      grunt, name: string, widgets: string[] = [], main?: string,
-      cliches = {}, used_widgets: UsedWidget[] = [], replace_map = {},
-      comp_info = {}, wcomp_info = {}, ncomp_info = {}, data = {}) {
+      grunt, name: string, main: string,
+      cliches = {}, used_widgets: UsedWidget[] = []) {
     const cliches_src = _u.uniq(_u.values(cliches))
         .map(p => `node_modules/${p}/lib/{components,shared}/**/` +
                   "*.{js,html,css}");

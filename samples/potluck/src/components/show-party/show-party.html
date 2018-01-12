@@ -1,29 +1,28 @@
+<!-- inputs="party, user" -->
 <div class="party">
   <div class="panel panel-default">
     <div class="panel-body">
       <h3 class="party-title">
-        <dv-widget name="ShowNameOfGroup" of="Group"></dv-widget>
+        <group:show-name-of-group [group]="party"></group:show-name-of-group>
       </h3>
       <div class="col-md-12" style="text-align:center">
-        <dv-widget name="ShowEvent" of="Event"></dv-widget>
+        <event:show-event [event]="party"></event:show-event>
         <div style="height:20px"></div>
       </div>
       <div class="col-md-4">
         <h4>Invited List</h4>
-        <dv-widget name="ShowMembersOfGroup" of="Group"></dv-widget>
+        <group:show-members-of-group [group]="party">
+        </group:show-members-of-group>
         <h4>Invite a User</h4>
-        <dv-widget name="AddMemberToGroup" of="Group"></dv-widget>
+        <group:add-member-to-group [group]="party"></group:add-member-to-group>
       </div>
       <div class="col-md-1"></div>
       <div class="col-md-7">
         <h4>What's Needed</h4>
-        <dv-widget name="ShowSupplies"></dv-widget>
+        <show-supplies [party]="party" [user]="user"></show-supplies>
         <h4>Request Supplies</h4>
-        <dv-widget name="RequestSupply"></dv-widget>
+        <request-supply [party]="party" [user]="user"></request-supply>
       </div>
     </div>
   </div>
 </div>
-
-<!-- Necessary since ShowParty replaces ShowGroupOverview -->
-<dv-widget name="LoggedIn" of="StandardAuthentication"></dv-widget>
