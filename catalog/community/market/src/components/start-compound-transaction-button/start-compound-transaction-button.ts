@@ -7,6 +7,7 @@ import {
   GoodAtom
 } from "../../shared/data";
 
+
 @Widget({
   fqelement: "Market",
   ng2_providers: [GraphQlService]
@@ -22,7 +23,7 @@ export class StartCompoundTransactionButtonComponent {
   constructor(private _graphQlService: GraphQlService) {}
 
   startCompoundTransaction() {
-    if (!this.buyer.atom_id || !this.market.atom_id) {
+    if (!this.valid()) {
       return;
     }
 
@@ -34,6 +35,7 @@ export class StartCompoundTransactionButtonComponent {
       this.good.price = 0;
     }
 
+    // TODO: create good with seller if given
     this._graphQlService
       .post(`
         CreateGood(
@@ -69,24 +71,26 @@ export class StartCompoundTransactionButtonComponent {
               .post(`
                 CreateCompoundTransaction(
                   transactions: ["${transaction.atom_id}"]
-                ) { atom_id }
+                ) { atom_id, total_price }
               `)
               .map(data => data.CreateCompoundTransaction)
               .subscribe(compound_transaction => {
                 this.compound_transaction.atom_id =
                   compound_transaction.atom_id;
-                this.good.name = "";
+                this.compound_transaction.total_price =
+                  compound_transaction.total_price;
                 this.good.price = undefined;
                 this.good.supply = undefined;
                 this.quantity.value = undefined;
-                this.submit_ok.value = true;
+
+                this.submit_ok.value = !this.submit_ok.value;
               });
           });
-      })
-    ;
+      });
   }
 
   valid() {
-    return (this.buyer.atom_id && this.market.atom_id);
+    return (this.buyer.atom_id &&
+      (this.market.atom_id || this.good.atom_id));
   }
 }

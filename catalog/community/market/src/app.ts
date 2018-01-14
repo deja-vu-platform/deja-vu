@@ -48,7 +48,7 @@ const schema = grafo
     name: "Party",
     fields: {
       atom_id: {"type": graphql.GraphQLString},
-      balance: {"type": graphql.GraphQLFloat}
+      balance: {"type": graphql.GraphQLFloat, defaultValue: 0}
     }
   })
   .add_type({
@@ -59,7 +59,36 @@ const schema = grafo
       supply: {"type": graphql.GraphQLInt},
       price: {"type": graphql.GraphQLFloat},
       seller: {"type": "Party"},
-      market: {"type": "Market"}
+      market: {"type": "Market"},
+      updateGood: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          name: {"type": graphql.GraphQLString},
+          supply: {"type": graphql.GraphQLInt},
+          price: {"type": graphql.GraphQLFloat},
+          seller_id: {"type": graphql.GraphQLString},
+          market_id: {"type": graphql.GraphQLString}
+        },
+        resolve: (good, {name, supply, price, seller_id, market_id}) => {
+          const updatedGood = {};
+          if (name)
+            updatedGood["name"] = name;
+          if (supply || supply === 0)
+            updatedGood["supply"] = supply;
+          if (price)
+            updatedGood["price"] = price;
+          if (seller_id)
+            updatedGood["seller"] = {atom_id: seller_id};
+          if (market_id)
+            updatedGood["market"] = {atom_id: market_id};
+
+          const setOp = {$set: updatedGood};
+          return mean.db.collection("goods")
+            .updateOne({atom_id: good.atom_id}, setOp)
+            .then(_ => bus.update_atom("Good", good.atom_id, setOp))
+            .then(_ => true);
+        }
+      }
     }
   })
   .add_type({
@@ -86,6 +115,7 @@ const schema = grafo
     fields: {
       atom_id: {"type": graphql.GraphQLString},
       transactions: {"type": "[Transaction]"},
+      total_price: {"type": graphql.GraphQLFloat},
       addTransaction: {
         "type": "Transaction",
         args: {
@@ -119,15 +149,19 @@ const schema = grafo
                   const transaction = {
                     atom_id: transaction_id,
                     good: {atom_id: good.atom_id},
-                    seller: {atom_id: good.seller.atom_id},
                     buyer: {atom_id: buyer_id},
                     price: transaction_price,
                     quantity: quantity,
                     market: {atom_id: good.market.atom_id},
                     status
+                  };
+                  // groceryship transactions start out with no seller
+                  if (good.seller) {
+                    transaction["seller"] = {atom_id: good.seller.atom_id};
                   }
                   const compound_transaction_update_op = {
-                    $push: {transactions: transaction_id}
+                    $push: {transactions: {atom_id: transaction_id}},
+                    $inc: {total_price: transaction.price}
                   };
                   const good_update_op = {$inc: {supply: -quantity}};
 
@@ -152,6 +186,59 @@ const schema = grafo
                   ])
                   .then(_ => transaction);
                 });
+            });
+        }
+      },
+      // update all the transactions (and the goods within them, if applicable)
+      // in a compound transaction
+      updateTransactions: {
+        "type": graphql.GraphQLBoolean,
+        args: {
+          seller_id: {"type": graphql.GraphQLString},
+          buyer_id: {"type": graphql.GraphQLString},
+          status: {"type": graphql.GraphQLString}
+        },
+        resolve: (compound_transaction, {seller_id, buyer_id, status}) => {
+          const updatedTransaction = {};
+          const updatedGood = {};
+          if (seller_id) {
+            updatedTransaction["seller"] = {atom_id: seller_id};
+            updatedGood["seller"] = {atom_id: seller_id};
+          }
+          if (buyer_id) {
+            updatedTransaction["buyer"] = {atom_id: buyer_id};
+            updatedGood["buyer"] = {atom_id: buyer_id};
+          }
+          if (status) {
+            updatedTransaction["status"] = status;
+          }
+
+          const transactionSetOp = {$set: updatedTransaction};
+          const goodSetOp = {$set: updatedGood};
+
+          return mean.db.collection("compoundtransactions")
+            .findOne({atom_id: compound_transaction.atom_id}, {transactions: 1})
+            .then(compound_transaction => {
+              const transactions = compound_transaction.transactions;
+
+              return Promise.all(transactions.map(transaction => {
+                return mean.db.collection("transactions")
+                  .findOneAndUpdate(transaction, transactionSetOp,
+                    {returnNewDocument: true, projection: {good: 1}})
+                  .then(result => {
+                    return Promise.all(
+                      [bus.update_atom(
+                        "Transaction", transaction, transactionSetOp),
+                      mean.db.collection("goods")
+                      .updateOne(result.value.good, goodSetOp)
+                      .then(_ => bus.update_atom(
+                        "Good", result.value.good, goodSetOp))]);
+                  })
+              }));
+            })
+            .then(_ => true, err => {
+              console.log(err);
+              throw err;
             });
         }
       }
@@ -302,17 +389,30 @@ const schema = grafo
       const transaction_ids = transactions.map((atom_id) => {
         return {atom_id};
       });
-      const compoundTransaction = {
-        atom_id: uuid.v4(),
-        transactions: transaction_ids
-      };
-      return mean.db.collection("compoundtransactions")
-        .insertOne(compoundTransaction)
-        .then(_ => {
-          bus.create_atom("CompoundTransaction", 
-            compoundTransaction.atom_id, compoundTransaction);
-        })
-        .then(_ => compoundTransaction);
+      const prices_promises = transactions.map((atom_id) => {
+        return mean.db.collection("transactions")
+          .findOne({atom_id: atom_id}, {price: 1}) //just return the price field
+          .then(transaction => transaction.price);
+      });
+      return Promise.all(prices_promises)
+        .then(prices => {
+          const total_price = prices.reduce((total: number, price: number) => {
+            return total + price;
+          }, 0);
+
+          const compoundTransaction = {
+            atom_id: uuid.v4(),
+            transactions: transaction_ids,
+            total_price
+          };
+          return mean.db.collection("compoundtransactions")
+            .insertOne(compoundTransaction)
+            .then(_ => {
+              bus.create_atom("CompoundTransaction", 
+                compoundTransaction.atom_id, compoundTransaction);
+            })
+            .then(_ => compoundTransaction);
+        });
     }
   })
   .add_mutation({
@@ -326,7 +426,8 @@ const schema = grafo
         .findOne({atom_id: compound_transaction_id})
         .then(compound_transaction => {
           // process each transaction in the compound transaction
-          const transaction_ids = compound_transaction.transactions;
+          const transaction_ids = compound_transaction.transactions
+            .map(transaction => transaction.atom_id);
           const seller_to_earnings = {};
           const buyer_to_expenditure = {};
           const transactions_to_process = [];
@@ -334,9 +435,8 @@ const schema = grafo
           // check that the transaction isn't canceled
           // we only check the first one because our operations
           // guarantee that all transactions have the same status
-          const reference_id = transaction_ids[0].atom_id;
           return mean.db.collection("transactions")
-            .findOne({atom_id: reference_id}, {status: 1})
+            .findOne({atom_id: transaction_ids[0]}, {status: 1})
             .then(transaction => {
               if (transaction.status == "canceled") {
                 throw new Error("Cannot pay for canceled transactions!");
@@ -350,7 +450,7 @@ const schema = grafo
                     .findOne({atom_id: tid})
                     .then(transaction => {
                       if (transaction.status == "paid") return;
-                      const total_price = transaction.transaction_price 
+                      const total_price = transaction.price 
                         * transaction.quantity;
                       const bid = transaction.buyer.atom_id;
                       if (buyer_to_expenditure[bid] === undefined) 
@@ -369,13 +469,14 @@ const schema = grafo
                         })
                         .then(_ => {
                           return mean.db.collection("transactions")
-                            .updateOne({atom: tid}, transaction_update_op)
+                            .updateOne({atom_id: tid}, transaction_update_op)
                             .then(_ => bus.update_atom(
                               "Transaction", tid, transaction_update_op));
                         });
                     })
                 );
               });
+
               // TODO: check whether buyer has enough money next time
               return Promise.all(transactions_to_process)
                 .then(_ => {
@@ -431,8 +532,9 @@ const schema = grafo
               _u.each(transaction_ids, tid => {
                 transactions_to_process.push(
                   mean.db.collection("transactions")
-                    .findOneAndUpdate({atom_id: tid}, transaction_update_op)
-                    .then(transaction => {
+                    .findOneAndUpdate(tid, transaction_update_op)
+                    .then(result => {
+                      const transaction = result.value;
                       if (transaction.status == "canceled") return;
                       // no need to update balance of parties because no payments were made
                       const update_op = {$inc: {supply: transaction.quantity}};
@@ -448,7 +550,11 @@ const schema = grafo
               });
 
               return Promise.all(transactions_to_process)
-                .then(_ => true);
+                .then(_ => true,
+                  err => {
+                    console.log(err);
+                    throw err;
+                  });
             });
         });
     }
