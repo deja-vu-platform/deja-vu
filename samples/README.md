@@ -129,9 +129,28 @@ Sports
 Food
 ----
 
-| App | Purpose |
-| ------ | ------- |
-| GroceryShip (TBD) | Facilitate peer grocery delivery between students |
+| App                    | Purpose                                           |
+| ---------------------- | ------------------------------------------------- |
+| GroceryShip            | Facilitate peer grocery delivery between students |
+| StandardAuthentication |                         X                         |
+| Authorization          |                                                   |
+| PasskeyAuthentication  |                                                   |
+| Market                 |                         X                         |
+| Profile                |                         X                         |
+| Rating                 |                         X                         |
+| Follow                 |                                                   |
+| Geolocation            |                                                   |
+| Feed                   |                                                   |
+| Post                   |                                                   |
+| Email                  |                                                   |
+| Comment                |                                                   |
+| Event                  |                         X                         |
+| Allocator              |                                                   |
+| Label                  |                                                   |
+| Group                  |                                                   |
+| Task                   |                         X                         |
+| Checklist              |                                                   |
+
 
 ### Catalog usage
 
