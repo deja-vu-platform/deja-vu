@@ -48,7 +48,7 @@ const schema = grafo
     name: "Party",
     fields: {
       atom_id: {"type": graphql.GraphQLString},
-      balance: {"type": graphql.GraphQLFloat, defaultValue: 0}
+      balance: {"type": graphql.GraphQLFloat}
     }
   })
   .add_type({
