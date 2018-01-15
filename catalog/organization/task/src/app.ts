@@ -47,17 +47,29 @@ const schema = grafo
       updateTask: {
         "type": graphql.GraphQLBoolean,
         args: {
+          name: {"type" : graphql.GraphQLString},
           assigner_id: {"type": graphql.GraphQLString},
           expiration_date: {"type": graphql.GraphQLString}
-          // TODO: add more fields that can be updated next time
+          // more fields that can be updated can be added next time
         },
-        resolve: (task, {assigner_id, expiration_date}) => {
+        resolve: (task, {name, assigner_id, expiration_date}) => {
           const updatedTask = {};
+          if (name) {
+            updatedTask["name"] = name;
+          }
           if (assigner_id) {
             updatedTask["assigner"] = {atom_id: assigner_id}
           }
           if (expiration_date) {
             updatedTask["expiration_date"] = expiration_date;
+          }
+          // if completed and/or approved fields are null,
+          // initialize them to false
+          if (!task.completed) {
+            updatedTask["completed"] = false;
+          }
+          if (!task.approved) {
+            updatedTask["approved"] = false;
           }
           const setOp = {$set: updatedTask};
           return mean.db.collection("tasks")
@@ -201,7 +213,19 @@ const schema = grafo
     },
     resolve: (root, {assigner_id}) => {
       return mean.db.collection("tasks").find({ $and: 
-        [{"assigner.atom_id": assigner_id}, 
+        [{"assigner.atom_id": assigner_id}, {"assignee": {$ne: null}},
+        {completed: false}] }).toArray();
+    }
+  })
+  .add_query({
+    name: "unassignedTasks",
+    type: "[Task]",
+    args: {
+      assigner_id: {"type": graphql.GraphQLString}
+    },
+    resolve: (root, {assigner_id}) => {
+      return mean.db.collection("tasks").find({ $and: 
+        [{"assigner.atom_id": assigner_id}, {"assignee": null},
         {completed: false}] }).toArray();
     }
   })
