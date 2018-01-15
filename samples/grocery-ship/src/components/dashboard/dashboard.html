@@ -1,111 +1,79 @@
 <style type="text/css">
-h1 {
-    font-size: 40px;
-}
-
-h2 {
-    font-size: 35px;
-}
-
-h3 {
-    font-size: 30px;
-}
-
-#main-content {
-    margin-top: 100px;
-    margin-left: 40px;
-}
-
 .badge {
-    margin-bottom: 23px;
+  margin-bottom: 23px;
 }
 
 #dashboard-notifications, #dashboard-requests {
-    max-height: 400px;
-    overflow-y: auto;
-    overflow-x: hidden;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .title-toggle:hover {
-    color: #1abc9c;
+  color: #1abc9c;
 }
 
 .title-toggle .glyphicon {
-    font-size: 80%;
+  font-size: 80%;
 }
 
-#set-pickup-modal .pickup-time {
-    /* make input box big enough for whole date */
-    width: 190px;
+/* Add request tile styling */
+.request-tile, .add-request-tile {
+  height: 150px;
 }
 
-#set-pickup-modal th.price {
-    /* temporary fix for price column size so that it's not too small */
-    width: 100px;
+#add-request-icon {
+  font-size: 55px;
 }
 
-.cost-summary, .card-input {
-    padding-left: 8%;
+.add-request-tile {
+  text-align: center;
+  vertical-align: middle;
 }
 
-.card-input .form-group {
-    margin-bottom: 10px;
+.tile:hover{
+  background-color: rgba(22, 160, 133,0.25);
 }
-
-.card-input .col-expiry-month {
-    padding-right: 0;
-}
-
-.fa-star-o, .fa-star {
-    font-size: 150% !important;
-    color:  #FFD700;
-}
-
-#deliver-items {
-    margin-top: 20px;
-}
-
 </style>
-<dv-widget name="NavBar"></dv-widget>
 
-<!-- <dv-widget name="ChangePassword" of="StandardAuthentication"></dv-widget> -->
-<div id='main-content'>
-  <div id='notifications'>
-    <span class='title-toggle' id='notifications-toggle' data-toggle="collapse" data-target="#dashboard-notifications">
+<dv-widget name="NavBarLoggedIn"></dv-widget>
+
+<div id="main-content">
+  <div id="notifications">
+    <span class="title-toggle" id="notifications-toggle" data-toggle="collapse" data-target="#dashboard-notifications">
       <h3>Notifications <span class="badge hide notifs-count">0</span> <span class="glyphicon glyphicon-chevron-down" id="requests-chevron-toggle"></span>
       </h3>
     </span>
-    <div id='dashboard-notifications' class='collapse in'>
+    <div id="dashboard-notifications" class="collapse in">
       <dv-widget name="ShowUnapprovedTasks" of="Task"></dv-widget>
-      <!-- Show requests that:
-      -> I need to approve and pay and rate, reject
-      -> I need to deliver and rate (or close and rate)
-      -> are mine and expired -->
-  <!-- {{> notifications}}
-    {{> accept}}
-    {{> reject}}
-    {{> close}} -->
+      <dv-widget name="ShowPendingApprovalTasks" of="Task"></dv-widget>
     </div>
   </div>
-  <div id='request'>
-    <span class='title-toggle' id='requests-toggle' data-toggle="collapse" data-target="#dashboard-requests">
+  <div id="request">
+    <span class="title-toggle" id="requests-toggle" data-toggle="collapse" data-target="#dashboard-requests">
       <h3>Your Requests <span class="badge requests-count">0</span><span class="glyphicon glyphicon-chevron-right" id="requests-chevron-toggle"></span>
       </h3>
     </span>
-    <div id='dashboard-requests' class='collapse'>
-      <dv-widget name="ShowUncompletedTasks" of="Task"></dv-widget>
-      <!-- {{> requests own=true}} -->
+    <div id="dashboard-requests" class="collapse">
+      <dv-widget name="ShowAssignedTasks" of="Task"></dv-widget>
+      <dv-widget name="ShowUnassignedTasks" of="Task"></dv-widget>
+      <dv-widget name="ShowPendingApprovalTasks" of="Task"></dv-widget>
+      
+      <div class="col-xs-12 col-ms-6 col-sm-4 col-md-3 col-lg-3">
+        <div class="tile add-request-tile">
+          <div [routerLink]="['/request']" class="glyphicon tile-image" id="add-request-icon">+</div>
+        </div>
+      </div>
     </div>
   </div>
-  <div id='deliver'>
-    <span class='title-toggle' id='deliver-toggle' data-toggle="collapse" data-target="#dashboard-deliver">
+  <div id="deliver">
+    <span class="title-toggle" id="deliver-toggle" data-toggle="collapse" data-target="#dashboard-deliver">
       <h3>To Deliver <span class="badge deliveries-count">0</span> <span class="glyphicon glyphicon-chevron-right" id="requests-chevron-toggle"></span>
       </h3>
     </span>
-    <div id='dashboard-deliver' class='collapse'>
+    <div id="dashboard-deliver" class="collapse">
       <p>Remember to contact the requester first to set a pickup time!</p>
-      <dv-widget name="ShowAssignedTasks" of="Task"></dv-widget>
-      <!-- {{> deliveries_table}} -->
+      <dv-widget name="ShowUncompletedTasks" of="Task"></dv-widget>
     </div>
   </div>
 </div>

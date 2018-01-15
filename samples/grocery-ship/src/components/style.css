@@ -1,0 +1,22 @@
+h1 {
+  font-size: 40px;
+}
+
+h2 {
+  font-size: 35px;
+}
+
+h3 {
+  font-size: 30px;
+}
+
+.instructions > p {
+  font-size: 15px;
+  max-width: 60em;
+  text-align: justify;
+  margin-bottom: 30px;
+}
+
+#main-content {
+  margin: 100px 40px;
+}
