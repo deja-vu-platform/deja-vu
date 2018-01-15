@@ -76,9 +76,7 @@ export class AddTransactionButtonComponent {
               this.good.price = undefined;
               this.good.supply = undefined;
               this.quantity.value = undefined;
-              console.log(this.submit_ok.value);
               this.submit_ok.value = !this.submit_ok.value;
-              console.log(this.submit_ok.value);
             },
             // could be caused if transaction doesn't have the same status 
             // as the ones in the compound transaction

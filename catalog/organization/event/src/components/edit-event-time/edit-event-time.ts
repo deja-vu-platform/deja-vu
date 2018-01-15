@@ -122,10 +122,10 @@ export class EditEventTimeComponent implements AfterInit {
 
   private initFields() {
     if (this.event.atom_id) {
-      console.log(`starts-on-text-${this.event.atom_id}`);
+      // include the event atom_id in the id so that this widget
+      // can be used multiple times in a single page
       this.startsOnText =
         document.getElementById(`starts-on-text-${this.event.atom_id}`);
-      console.log(this.startsOnText);
       this.endsOnText =
         document.getElementById(`ends-on-text-${this.event.atom_id}`);
       this.startTimeText =
