@@ -4,7 +4,7 @@ import {GraphQlService} from "gql";
 import "rxjs/add/operator/map";
 
 @Widget({fqelement: "Profile", ng2_providers: [GraphQlService]})
-export class ShowProfileComponent {
+export class ShowContactInformationComponent {
   @Field("Profile") profile: ProfileAtom;
 
   private fetched: string;
@@ -27,7 +27,7 @@ export class ShowProfileComponent {
           .get(`
             profile_by_id(atom_id: "${this.profile.atom_id}")
             {
-              username, first_name, last_name, email, phone, birthday
+              username, first_name, last_name, email, phone
             }
           `)
           .map(data => data.profile_by_id)
@@ -37,18 +37,8 @@ export class ShowProfileComponent {
             this.profile.last_name = profile.last_name;
             this.profile.email = profile.email;
             this.profile.phone = profile.phone;
-            this.profile.birthday = this.formatDateStr(profile.birthday);
           });
       }
     }
-  }
-
-  private formatDateStr(date: string): string {
-    const opts = {
-      day: "numeric", weekday: "short", month: "short", year: "numeric",
-      hour: "numeric", minute: "numeric"
-    };
-    const d = new Date(date);
-    return d.toLocaleDateString("en-US", opts);
   }
 }

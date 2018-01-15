@@ -23,11 +23,7 @@ export class EditProfilePhoneNumberComponent {
     this.submit_ok.on_change(() => {
       // reset error
       this.edit_phone_error = false;
-      if (
-        this.submit_ok.value &&
-        this.profile.atom_id &&
-        this.profile.phone
-      ) {
+      if (this.profile.atom_id && this.profile.phone) {
         this._graphQlService
           .post(`
             updateProfile(
@@ -36,6 +32,7 @@ export class EditProfilePhoneNumberComponent {
           `)
           .subscribe(success => {
             this.edit_phone_error = !success;
+            this.profile.phone = "";
           });
       }
     });
@@ -44,7 +41,9 @@ export class EditProfilePhoneNumberComponent {
   private fetch() {
     this._graphQlService
       .get(`
-        profile_by_id(atom_id: "${this.profile.atom_id}")
+        profile_by_id(atom_id: "${this.profile.atom_id}") {
+          phone
+        }
       `)
       .map(data => data.profile_by_id)
       .subscribe(profile => {

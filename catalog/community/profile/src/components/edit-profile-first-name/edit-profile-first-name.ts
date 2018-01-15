@@ -23,11 +23,7 @@ export class EditProfileFirstNameComponent {
     this.submit_ok.on_after_change(() => {
       // reset error
       this.edit_first_name_error = false;
-      if (
-        this.submit_ok.value &&
-        this.profile.atom_id &&
-        this.profile.first_name
-      ) {
+      if (this.profile.atom_id && this.profile.first_name) {
         this._graphQlService
           .post(`
             updateProfile(
@@ -36,6 +32,7 @@ export class EditProfileFirstNameComponent {
           `)
           .subscribe(success => {
             this.edit_first_name_error = !success;
+            this.profile.first_name = "";
           });
       }
     });
@@ -44,7 +41,9 @@ export class EditProfileFirstNameComponent {
   private fetch() {
     this._graphQlService
       .get(`
-        profile_by_id(atom_id: "${this.profile.atom_id}")
+        profile_by_id(atom_id: "${this.profile.atom_id}") {
+          first_name
+        }
       `)
       .map(data => data.profile_by_id)
       .subscribe(profile => {

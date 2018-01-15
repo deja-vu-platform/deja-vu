@@ -23,11 +23,7 @@ export class EditProfileBirthdayComponent {
     this.submit_ok.on_change(() => {
       // reset error
       this.edit_birthday_error = false;
-      if (
-        this.submit_ok.value &&
-        this.profile.atom_id &&
-        this.profile.birthday
-      ) {
+      if (this.profile.atom_id && this.profile.birthday) {
         this._graphQlService
           .post(`
             updateProfile(
@@ -36,6 +32,7 @@ export class EditProfileBirthdayComponent {
           `)
           .subscribe(success => {
             this.edit_birthday_error = !success;
+            this.profile.birthday = "";
           });
       }
     });
@@ -44,12 +41,22 @@ export class EditProfileBirthdayComponent {
   private fetch() {
     this._graphQlService
       .get(`
-        profile_by_id(atom_id: "${this.profile.atom_id}")
+        profile_by_id(atom_id: "${this.profile.atom_id}") {
+          birthday
+        }
       `)
       .map(data => data.profile_by_id)
       .subscribe(profile => {
-        this.profile.birthday = profile.birthday;
-        // TODO: format birthday?
+        this.profile.birthday = this.formatDateStr(profile.birthday);
       });
+  }
+
+  private formatDateStr(date: string): string {
+    const opts = {
+      day: "numeric", weekday: "short", month: "short", year: "numeric",
+      hour: "numeric", minute: "numeric"
+    };
+    const d = new Date(date);
+    return d.toLocaleDateString("en-US", opts);
   }
 }

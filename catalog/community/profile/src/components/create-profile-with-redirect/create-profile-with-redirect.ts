@@ -35,7 +35,8 @@ export class CreateProfileWithRedirectComponent {
       `)
       .subscribe(atom_id => {
         this.profile.atom_id = atom_id;
-        this._client_bus.navigate(this.on_create_ok.value);
+        if (this.on_create_ok.value)
+          this._client_bus.navigate(this.on_create_ok.value);
       },
       err => {
         this.username_error = true;

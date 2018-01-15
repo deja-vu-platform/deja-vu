@@ -23,11 +23,7 @@ export class EditProfileLastNameComponent {
     this.submit_ok.on_change(() => {
       // reset error
       this.edit_last_name_error = false;
-      if (
-        this.submit_ok.value &&
-        this.profile.atom_id &&
-        this.profile.last_name
-      ) {
+      if (this.profile.atom_id && this.profile.last_name) {
         this._graphQlService
           .post(`
             updateProfile(
@@ -36,6 +32,7 @@ export class EditProfileLastNameComponent {
           `)
           .subscribe(success => {
             this.edit_last_name_error = !success;
+            this.profile.last_name = "";
           });
       }
     });
@@ -44,7 +41,9 @@ export class EditProfileLastNameComponent {
   private fetch() {
     this._graphQlService
       .get(`
-        profile_by_id(atom_id: "${this.profile.atom_id}")
+        profile_by_id(atom_id: "${this.profile.atom_id}") {
+          last_name
+        }
       `)
       .map(data => data.profile_by_id)
       .subscribe(profile => {

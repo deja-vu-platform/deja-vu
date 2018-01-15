@@ -53,6 +53,12 @@ cliche Profile {
     profile: Profile
   }
 
+  // Shows the contact information of the user,
+  // which includes username, full name, email, and phone number
+  widget ShowContactInformation {
+    profile: Profile
+  }
+
   // Displays all the info contained in the Profile with a save button.
   // If the save button is clicked, the Profile is updated and
   // `submit_ok` becomes true if successful.
