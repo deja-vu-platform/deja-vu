@@ -1,0 +1,21 @@
+<form (ngSubmit)="onSubmit()" #createTaskForm="ngForm" class="form-horizontal">
+    <fieldset class="form-group">
+        <label class="sr-only" for="task-name">Task Name</label>
+        <input required id="task-name" class="form-control" name="task-name" 
+        type="text" [(ngModel)]="task.name" placeholder="Task Name"
+        />
+    </fieldset>
+    <fieldset class="form-group">
+        <label class="sr-only" for="expiration-date">Expiration Date</label>
+        <div id="expiration-date" class="input-group date" data-provide="datepicker" 
+        data-today-higlight="true" data-autoclose="true">
+            <input id="expiration-date-text" type="text" class="form-control">
+            <div class="input-group-addon">
+                <span class="glyphicon glyphicon-th"></span>
+            </div>
+        </div>
+    </fieldset>
+    <div class="form-group">
+        <button type="submit" class="btn btn-default btn-sm pull-right">Create Task</button>
+    </div>
+</form>

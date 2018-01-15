@@ -335,6 +335,12 @@ export namespace GruntTask {
       .flatten()
       .value();
     const fields_from_wbonds = _u.pluck(wcomp_info.wbonds, "subfield");
+    // This won't include fields that have a default value but that are not part
+    // of any bonds. If you want to define a field with a default value
+    // that is only used in the HTML of the widget, you can use that value
+    // directly, or, if that's not possible, the workaround is to include a
+    // widget with display: none that will give you the bond
+    // (this is a temporary hack)
     const all_widget_fields = _u
       .uniq(fields_from_replace_map.concat(fields_from_wbonds), false,
             f => f.name + f.of.name + f.of.fqelement + f.type.name +
@@ -563,7 +569,6 @@ export namespace GruntTask {
     const ts_client_opts = _u.extend({module: "system"}, ts_base_opts);
     const ts_server_opts = _u.extend({module: "commonjs"}, ts_base_opts);
 
-    const typings = "typings/index.d.ts";
     const components = "src/components/**/*.ts";
     const shared = "src/shared/**/*.ts";
     const server = "src/*.ts";
@@ -571,22 +576,22 @@ export namespace GruntTask {
     return {
       ts: {
         dev_client: {
-          src: [typings, shared, components, "src/dv-dev/!(app).ts"],
+          src: [shared, components, "src/dv-dev/!(app).ts"],
           outDir: ["dist/public"],
           options: ts_client_opts
         },
         dev_server: {
-          src: [typings, shared, server, "src/dv-dev/app.ts"],
+          src: [shared, server, "src/dv-dev/app.ts"],
           outDir: ["dist"],
           options: ts_server_opts
         },
         lib_client: {
-          src: [typings, shared, components],
+          src: [shared, components],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_client_opts)
         },
         lib_server: {
-          src: [typings, shared, server],
+          src: [shared, server],
           outDir: ["lib"],
           options: _u.extend({declaration: true}, ts_server_opts)
         }

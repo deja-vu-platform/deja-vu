@@ -30,8 +30,7 @@
         packages_obj[fqelement] = regjs;
 
         const cliche_name_split = pkg.split("-")[2];
-        const cliche_name = cliche_name_split.charAt(0).toUpperCase() +
-          cliche_name_split.slice(1).toLowerCase();
+        const cliche_name = cliche_name_split.toLowerCase();
 
         map_obj[cliche_name] = "node_modules/" + pkg;
         packages_obj[cliche_name] = regjs;

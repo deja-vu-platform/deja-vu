@@ -25,7 +25,7 @@ cliche Task {
     assigner: Assigner
   }
 
-  // Edits [task]'s name when [submi_ok] is changed
+  // Edits [task]'s name when [submit_ok] is changed
   widget EditTaskName {
     task: Task,
     submit_ok: boolean
@@ -37,6 +37,10 @@ cliche Task {
     task: Task,
     assigner: Assigner,
     submit_ok: boolean
+  }
+
+  widget CreateTaskForAllAssignees {
+    assigner: Assigner
   }
 
   widget ApproveTask {
