@@ -114,7 +114,6 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
 
             widget.updatePosition(this.newWidgetNewPosition(ui));
 
-            userApp.addWidgetsAsUsed(innerWidgets);
             this.selectedWidget.setAsInnerWidget(widget);
           } else {
             // it must be an unused widget or an already added widget

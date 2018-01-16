@@ -2,7 +2,7 @@ import { Widget, LinkBaseWidget, UserWidget } from './widget';
 import { Cliche, UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
 
-fdescribe('UserWidget', () => {
+fdescribe('Widget', () => {
   let project: Project;
   let userApp: UserCliche;
   let userAppId: string;
@@ -15,7 +15,7 @@ fdescribe('UserWidget', () => {
   let widget6: UserWidget;
 
   beforeEach(() => {
-    project = new Project('test');
+    project = new Project({name: 'test'});
     userApp = project.userApp;
     userAppId = userApp.getId();
 
@@ -25,24 +25,28 @@ fdescribe('UserWidget', () => {
       value: {text: '', target: ''},
       clicheId: userAppId},
       project);
+    userApp.addWidget(widget1);
 
     widget2 = new UserWidget(
       {name: 'widget2',
       dimensions: {width: 1, height: 1},
       clicheId: userAppId},
       project);
+    userApp.addWidget(widget2);
 
     widget3 = new UserWidget(
       {name: 'widget3',
       dimensions: {width: 1, height: 1},
       clicheId: userAppId},
       project);
+    userApp.addWidget(widget3);
 
     widget4 = new UserWidget(
       {name: 'widget4',
       dimensions: {width: 1, height: 1},
       clicheId: userAppId},
     project);
+    userApp.addWidget(widget4);
 
     widget5 = new LinkBaseWidget(
       {name: 'widget5',
@@ -51,6 +55,7 @@ fdescribe('UserWidget', () => {
       clicheId: userAppId,
       isTemplate: true},
       project);
+    userApp.addWidget(widget5);
 
     widget6 = new UserWidget(
       {name: 'widget6',
@@ -58,28 +63,22 @@ fdescribe('UserWidget', () => {
       clicheId: userAppId,
       isTemplate: true},
       project);
+    userApp.addWidget(widget6);
 
     widget3.setAsInnerWidget(widget6);
-
-    userApp.addWidget(widget1);
-    userApp.addWidget(widget2);
-    userApp.addWidget(widget3);
-    userApp.addWidget(widget4);
-    userApp.addWidget(widget5);
-    userApp.addWidget(widget6);
   });
 
   describe('remove', () => {
     it('removes itself from all widgets', () => {
       widget1.remove();
-      expect(() => userApp.getWidget(widget1.getId())).toThrowError();
+      expect(userApp.getWidget(widget1.getId())).toBeUndefined();
     });
 
     it ('does not delete inner widget', () => {
       widget2.setAsInnerWidget(widget1);
       widget2.remove();
 
-      expect(() => userApp.getWidget(widget2.getId())).toThrowError();
+      expect(userApp.getWidget(widget2.getId())).toBeUndefined();
       expect(userApp.getWidget(widget1.getId())).toBe(widget1);
     });
 
@@ -256,7 +255,7 @@ fdescribe('UserWidget', () => {
       expect(widget1.getCustomStylesToShow()).toEqual(styles);
     });
 
-    fit('getCustomStylesToShow with template gets template styles ' +
+    it('getCustomStylesToShow with template gets template styles ' +
     'but local styles are empty', () => {
       widget6.setAsInnerWidget(widget5);
       widget6.updateCustomStyle('background-color', 'red');

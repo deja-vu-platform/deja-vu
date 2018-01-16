@@ -372,6 +372,10 @@ export class BaseWidget extends Widget {
       copyWidget.clearTemplateCopyFields(this.getId());
     }
 
+    // Add it to the userApp
+    // TODO not sure if this should be done here or somewhere else
+    this.project.getUserApp().addWidget(copyWidget);
+
     return [copyWidget];
   }
 }
@@ -466,7 +470,7 @@ export class UserWidget extends Widget {
 
     const widget = this.project.getUserApp().getWidget(id);
     widget.setParentId(undefined);
-    this.project.userApp.setAsUnused(widget);
+    this.project.userApp.setAsFreeWidget(widget);
   }
 
   getInnerWidgetIds() {
@@ -553,6 +557,10 @@ export class UserWidget extends Widget {
 
       copyWidget.clearTemplateCopyFields(this.getId());
     }
+
+    // Add it to the userApp
+    // TODO not sure if this should be done here or somewhere else
+    this.project.getUserApp().addWidget(copyWidget);
 
     let copyWidgets: Widget[] = [copyWidget];
     for (const id of this.fields.innerWidgetIds) {

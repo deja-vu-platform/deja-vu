@@ -42,7 +42,7 @@ export class ListComponent implements OnInit {
     this.userApp.getTemplateIds().forEach((pageId) => {
       this.templates.push(this.userApp.getWidget(pageId));
     });
-    this.userApp.getUnusedWidgetIds().forEach((pageId) => {
+    this.userApp.getFreeWidgetIds().forEach((pageId) => {
       this.unusedWidgets.push(this.userApp.getWidget(pageId));
     });
     this.ref.detectChanges();

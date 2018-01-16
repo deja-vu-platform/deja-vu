@@ -20,7 +20,7 @@ interface ClicheFields {
 interface UserClicheFields extends ClicheFields {
   pageIds?: string[];
   innerWidgetIds?: string[];
-  unusedWidgetIds?: string[];
+  freeWidgetIds?: string[];
   templateIds?: string[];
 }
 
@@ -110,7 +110,6 @@ export class UserCliche extends Cliche {
     return cliche;
   }
 
-
   constructor (fields: UserClicheFields, project: Project) {
     super(fields, project);
     this.fields.clicheType = ClicheType.USER_CLICHE;
@@ -120,19 +119,19 @@ export class UserCliche extends Cliche {
       fields.templateIds.slice() : [];
     this.fields.innerWidgetIds = fields.innerWidgetIds ?
       fields.innerWidgetIds.slice() : [];
-    this.fields.unusedWidgetIds = fields.unusedWidgetIds ?
-      fields.unusedWidgetIds.slice() : [];
+    this.fields.freeWidgetIds = fields.freeWidgetIds ?
+      fields.freeWidgetIds.slice() : [];
   }
 
   private cleanAssociations(widgetId: string) {
     removeFirstFromArray(widgetId, this.fields.pageIds);
     removeFirstFromArray(widgetId, this.fields.templateIds);
     removeFirstFromArray(widgetId, this.fields.innerWidgetIds);
-    removeFirstFromArray(widgetId, this.fields.unusedWidgetIds);
+    removeFirstFromArray(widgetId, this.fields.freeWidgetIds);
   }
 
   /**
-   * Adds a widget. It is initially set as unused.
+   * Adds a widget. It is initially set as free (unused).
    * @param widget
    */
   addWidget(widget: Widget) {
@@ -140,7 +139,7 @@ export class UserCliche extends Cliche {
       throw new Error('Not a user application widget!');
     }
     this.widgets.set(widget.getId(), widget);
-    this.fields.unusedWidgetIds.push(widget.getId());
+    this.fields.freeWidgetIds.push(widget.getId());
   }
 
   removeWidget(widgetId: string) {
@@ -157,6 +156,7 @@ export class UserCliche extends Cliche {
   }
 
   setAsPage (widget: Widget) {
+    this.checkWidgetInCliche(widget);
     this.cleanAssociations(widget.getId());
     this.fields.pageIds.push(widget.getId());
     // TODO add inner widgets as used widgets
@@ -167,48 +167,40 @@ export class UserCliche extends Cliche {
   }
 
   setAsTemplate (widget: Widget) {
+    this.checkWidgetInCliche(widget);
     widget.setAsTemplate();
     this.cleanAssociations(widget.getId());
     this.fields.templateIds.push(widget.getId());
-  }
-
-  addTemplateAndInner (widgets: Widget[]) {
-    this.setAsTemplate(widgets[0]);
-    widgets.forEach((widget, index) => {
-      this.addWidget(widget);
-      if (index !== 0) {
-        this.setAsInnerWidget(widget);
-      }
-    });
   }
 
   getTemplateIds (): string[] {
     return this.fields.templateIds.slice();
   }
 
-  setAsUnused (widget: Widget) {
+  setAsFreeWidget (widget: Widget) {
+    this.checkWidgetInCliche(widget);
     this.cleanAssociations(widget.getId());
-    this.fields.unusedWidgetIds.push(widget.getId());
+    this.fields.freeWidgetIds.push(widget.getId());
   }
 
-  getUnusedWidgetIds (): string[] {
-    return this.fields.unusedWidgetIds.slice();
+  getFreeWidgetIds (): string[] {
+    return this.fields.freeWidgetIds.slice();
   }
 
   setAsInnerWidget (widget: Widget) {
+    this.checkWidgetInCliche(widget);
     this.cleanAssociations(widget.getId());
     this.fields.innerWidgetIds.push(widget.getId());
   }
 
-  addWidgetsAsUsed (widgets: Widget[]) {
-    widgets.forEach(widget => {
-      this.addWidget(widget);
-      this.setAsInnerWidget(widget);
-    });
-  }
-
   getInnerWidgetIds (): string[] {
     return this.fields.innerWidgetIds.slice();
+  }
+
+  private checkWidgetInCliche(widget: Widget) {
+    if (!this.getWidget(widget.getId())) {
+      throw new Error ('Widget not added to cliche!');
+    }
   }
 }
 

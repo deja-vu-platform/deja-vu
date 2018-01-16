@@ -56,7 +56,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   createTemplate() {
     const copies = this.widget.makeCopy();
     const userApp = this.projectService.getProject().getUserApp();
-    userApp.addTemplateAndInner(copies);
+    userApp.setAsTemplate(copies[0]);
     this.projectService.widgetUpdated();
   }
 

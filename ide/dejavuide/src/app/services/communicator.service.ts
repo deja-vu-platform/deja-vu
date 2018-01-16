@@ -9,14 +9,14 @@ export class CommunicatorService {
 
   constructor() {
     if (!electron) {
-      const electronProxy = {
+      const fakeElectron = {
         ipcRenderer: {
           on: null,
           send: null
         }
       };
 
-      this.ipcRenderer = electronProxy.ipcRenderer;
+      this.ipcRenderer = fakeElectron.ipcRenderer;
     } else {
       this.ipcRenderer = electron.ipcRenderer;
     }
