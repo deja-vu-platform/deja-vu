@@ -1,3 +1,4 @@
+<!-- fields="user" -->
 <link href="https://fonts.googleapis.com/css?family=Fruktur|Roboto"
  rel="stylesheet">
 <style>
@@ -6,14 +7,17 @@
 }
 </style>
 <div class="body">
-  <dv-widget name="LoggedIn" of="ParentAuthentication"></dv-widget>
+  <standard-authentication:logged-in (user)="user" 
+    of="ParentAuthentication">
+  </standard-authentication:logged-in>
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">ChoreStar</a>
       </div>
-      <dv-widget name="SignOutWithRedirect" of="ParentAuthentication">
-      </dv-widget>
+      <standard-authentication:sign-out of="ParentAuthentication"
+        next="landing">
+      </standard-authentication:sign-out>
     </div>
   </nav>
 
@@ -21,31 +25,43 @@
     <div class="col-md-offset-2 col-md-7">
       <div id="create-things-admin">
         <div class="row">
-          <h2>Hi, {{parent.name}}!</h2>
+          <h2>
+            Hi,
+            <standard-authentication:username 
+              of="ParentAuthentication">
+            </standard-authentication:username>!
+          </h2>
         </div>
         <div class="row">
           <h2>Add a New Chore</h2>
-          <dv-widget name="CreateTask" of="Task"></dv-widget>
+          <task:create-task [assigner]="user"></task:create-task>
         </div>
         <div class="row">
           <h2>Add a New Reward</h2>
-          <dv-widget name="CreateReward"></dv-widget>
+          <create-reward [user]="user"></create-reward>
         </div>
         <div class="row">
           <h2>Add a New Child</h2>
-          <dv-widget name="RegisterWithRedirect" of="ChildAuthentication"></dv-widget>
+          <!-- this really needs another cliche -->
+          <standard-authentication:register of="ChildAuthentication">
+          </standard-authentication:register>
         </div>
         <div class="row">
           <h2>Assigned Chores</h2>
-          <dv-widget name="ShowAssignedTasks" of="Task"></dv-widget>
+          <task:show-assigned-tasks [assigner]="user">
+          </task:show-assigned-tasks>
         </div>
         <div class="row">
           <h2>Chores to Approve</h2>
-          <dv-widget name="ShowPendingApprovalTasks" of="Task"></dv-widget>
+          <task:show-pending-approval-tasks [assigner]="user"
+            [approveTask]="approve-and-rate-chore"
+            [approveTaskInputs]="{'parent': user, 'chore': !task}">
+          </task:show-pending-approval-tasks>
         </div>
         <div class="row">
           <h2>Offered Rewards</h2>
-          <dv-widget name="ShowMyGoodsForSale" of="Market"></dv-widget>
+          <market:show-my-goods-for-sale [seller]="user" [market]="user">
+          </market:show-my-goods-for-sale>
         </div>
       </div>
     </div>

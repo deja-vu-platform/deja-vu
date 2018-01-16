@@ -11,18 +11,24 @@
     <div class="col-md-5 col-md-offset-1">
       <div class="white-box">
         <h2>Parent Login</h2>
-        <dv-widget name="SignInWithRedirect" of="ParentAuthentication"></dv-widget>
+        <standard-authentication:sign-in of="ParentAuthentication"
+          next="parent-home">
+        </standard-authentication:sign-in>
       </div>
       <div class="white-box">
         <h2>Parent Registration</h2>
-        <dv-widget name="RegisterWithRedirect" of="ParentAuthentication"></dv-widget>
+        <standard-authentication:register of="ParentAuthentication"
+          next="parent-home">
+        </standard-authentication:register>
       </div>
     </div>
   
     <div class="col-md-5">
       <div class="white-box">
         <h2>Child Login</h2>
-        <dv-widget name="SignInWithRedirect" of="ChildAuthentication"></dv-widget>
+        <standard-authentication:sign-in of="ChildAuthentication"
+          next="child-home">
+        </standard-authentication:sign-in>
       </div>
     </div>
   </div>

@@ -1,3 +1,4 @@
+<!-- fields="user" -->
 <link href="https://fonts.googleapis.com/css?family=Fruktur|Roboto"
  rel="stylesheet">
 <style>
@@ -34,23 +35,30 @@
 }
 </style>
 <div class="body">
-  <dv-widget name="LoggedIn" of="ChildAuthentication"></dv-widget>
+  <standard-authentication:logged-in (user)="user" 
+    of="ChildAuthentication">
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container-fluid">
       <div class="navbar-header">
         <a class="navbar-brand" href="#">ChoreStar</a>
       </div>
-      <dv-widget name="SignOutWithRedirect" of="ChildAuthentication">
-      </dv-widget>
+      <standard-authentication:sign-out of="ChildAuthentication"
+        next="landing">
+      </standard-authentication:sign-out>
     </div>
   </nav>
   <div id="child-homepage-container">
     <div id="child-heading">
-      <h1> Hi, {{child.name}}!</h1>
+      <h1>
+        Hi,
+        <standard-authentication:username 
+          of="ChildAuthentication">
+        </standard-authentication:username>!
+      </h1>
       <div class="container-fluid" id="child-heading-container">
           <div class="col-xs-2 col-xs-offset-4"><h4> StarBank Total: </h4></div>
           <div class="col-xs-2 glyphicon glyphicon-star icon-size">
-            <dv-widget name="ShowBalance" of="Market"></dv-widget>
+            <market:show-balance [party]="user"></market:show-balance>
           </div>
       </div>
     </div>
@@ -60,15 +68,18 @@
           <h2>Chores</h2>
           <h4>Uncompleted Chores</h4>
           <div class="row left-align-row">
-             <dv-widget name="ShowUncompletedTasks" of="Task"></dv-widget>
+            <task:show-uncompleted-tasks [assignee]="user">
+            </task:show-uncompleted-tasks>
           </div>
           <h4>Chores Pending Approval</h4>
           <div class="row left-align-row">
-             <dv-widget name="ShowUnapprovedTasks" of="Task"></dv-widget>
+            <task:show-unapproved-tasks [assignee]="user">
+            </task:show-unapproved-tasks>
           </div>
           <h4>Completed and Approved Chores</h4>
           <div class="row left-align-row">
-             <dv-widget name="ShowApprovedTasks" of="Task"></dv-widget>
+            <task:show-approved-tasks [assignee]="user">
+            </task:show-approved-tasks>
           </div>
         </div>
       </div>
@@ -76,10 +87,13 @@
       <div id="child-rewards" class="col-md-6">
         <div class="white-box">
           <h2>Rewards</h2>
-            <h3>Rewards You Can Afford</h3>
-            <dv-widget name="ShowAffordableGoods" of="Market"></dv-widget>
-            <h3>Rewards You Cannot Afford Yet</h3>
-            <dv-widget name="ShowUnaffordableGoods" of="Market"></dv-widget>
+          <h3>Rewards You Can Afford</h3>
+          <!-- need the parent here -->
+          <market:show-affordable-goods
+            [buyer]="user"></market:show-affordable-goods>
+          <h3>Rewards You Cannot Afford Yet</h3>
+          <market:show-unaffordable-goods
+            [buyer]="user"></market:show-unaffordable-goods>
         </div>
       </div>
     </div>
