@@ -1,10 +1,11 @@
-<dv-widget name="NavBar"></dv-widget>
+<!-- inputs="band" -->
+<nav-bar></nav-bar>
 <div class="container page-content">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <h1>Add Member</h1>
       <div>
-        <dv-widget name="AddMemberToGroup" of="Group"></dv-widget>
+        <group:add-member-to-group [group]="band"></group:add-member-to-group>
       </div>
     </div>
   </div>

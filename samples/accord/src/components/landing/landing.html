@@ -1,12 +1,13 @@
-<dv-widget name="NavBar"></dv-widget>
+<nav-bar></nav-bar>
 <div class="container page-content">
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <h1 class="text-center">Sign In</h1>
-      <dv-widget name="SignInWithRedirect" of="StandardAuthentication"></dv-widget>
+      <standard-authentication:sign-in next="bands">
+      </standard-authentication:sign-in>
       <br>
       <div class="text-center">
-        <a routerLink="/register">Not a member? Register.</a>
+        <dv:a next="register">Not a member? Register.</dv:a>
       </div>
     </div>
   </div>
