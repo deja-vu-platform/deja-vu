@@ -44,10 +44,6 @@ fdescribe('UserCliche', () => {
       project);
   });
 
-  // static fromJSON(fields: UserClicheFields, project: Project) {
-
-  // constructor (fields: UserClicheFields, project: Project) {
-
   describe('fromJSON and toJSON', () => {
     it ('can be used to create a copy of the cliche', () => {
       const widget4 = new LinkBaseWidget(

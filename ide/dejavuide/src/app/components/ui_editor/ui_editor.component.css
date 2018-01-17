@@ -23,6 +23,7 @@ dv-zoom {
 
 .project-options-container{
   background: paleturquoise;
+  width: 250px;
 }
 
 dv-worksurface {
@@ -35,20 +36,13 @@ dv-worksurface {
   display: none;
 }
 
-.header {
-  border-top: solid 5px #D5D5D5;
-  text-align: center;
-  line-height: 250%;
-  background-color: #EBEBEB;
-}
-
-.project-name .header{
-  border: none;
+.project-name {
   background-color: white;
   font-weight: bold;
+  padding: 10px 0;
+  text-align: center;
 }
 
 .project-options {
-  width: 250px;
-  height: 75px;
+  width: 100%;
 }
