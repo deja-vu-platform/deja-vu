@@ -25,25 +25,50 @@ cliche Task {
     assigner: Assigner
   }
 
+  // Edits [task]'s name when [submit_ok] is changed
+  widget EditTaskName {
+    task: Task,
+    submit_ok: boolean
+  }
+
+  // Edits [task]'s deadline and its assigner to [assigner]
+  // when [submit_ok] is changed
+  widget EditTaskDeadlineAndAssigner {
+    task: Task,
+    assigner: Assigner,
+    submit_ok: boolean
+  }
+
   widget CreateTaskForAllAssignees {
     assigner: Assigner
   }
 
   widget ApproveTask {
-    task: Task
+    task: Task,
+    submit_ok: boolean
   }
 
   widget CompleteTask {
-    task: Task
+    task: Task,
+    submit_ok: boolean
   }
 
   widget ClaimTask {
     task: Task,
-    assignee: Assignee
+    assignee: Assignee,
+    submit_ok: boolean
   }
 
+  // Shows tasks assigned by assigner
+  // which already have an assignee
   widget ShowAssignedTasks uses ShowTask {
     assigner: Assigner 
+  }
+
+  // Shows tasks assigned by assigner
+  // but have no assignee
+  widget ShowUnassignedTasks uses ShowTask {
+    assigner: Assigner
   }
 
   // Shows claimable tasks,
@@ -52,7 +77,8 @@ cliche Task {
   // there is no assignee, and it isn't past the expiration date
   // Also lets the tasks be claimed
   widget ShowClaimableTasks uses ShowTask {
-    assigner: Assigner
+    assigner: Assigner,
+    submit_ok: booelean
   }
 
   // also lets assigner mark task as approved
@@ -65,6 +91,7 @@ cliche Task {
     assignee: Assignee 
   }
 
+  // Shows unapproved but completed tasks assigned to [assignee]
   widget ShowUnapprovedTasks uses ShowTask {
     assignee: Assignee 
   }

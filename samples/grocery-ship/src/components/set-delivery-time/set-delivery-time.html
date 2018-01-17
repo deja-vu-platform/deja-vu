@@ -1,0 +1,44 @@
+<!-- Button and the corresponding modal that will pop up for the shopper to set the delivery time of the request under Deliver in the dashboard -->
+<input type="button" class="btn btn-xs btn-primary" data-toggle="modal" attr.data-target="#set-deliver-modal-{{task.atom_id}}" value="Deliver">`
+
+<div id="set-deliver-modal-{{task.atom_id}}" class="modal fade" role="dialog">
+  <div class="modal-messages"></div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Deliver Item</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <tbody>
+            <tr>
+              <th>Item</th>
+              <td class="item-name">{{task.name}}</td>
+            </tr>
+            <tr>
+              <th>Deadline</th>
+              <td>{{task.expiration_date}}</td>
+            </tr>
+            <tr>
+              <th>Pickup Location</th>
+              <td>MIT</td>
+            </tr>
+          </tbody>
+        </table>
+
+        Requester:
+        <dv-widget name="ShowContactInformation" of="Profile" [init]="{profile: task.assigner}"></dv-widget>
+
+        Set Delivery Time:
+        <dv-widget name="EditEventTime" of="Event" [init]="{event: task, submit_ok: submit_ok}"></dv-widget>
+
+        Item Price: <dv-widget name="CreateGoodPrice" of="Market" [init]="{good: good}"></dv-widget>
+
+        <dv-widget name="AddTransactionButton" of="Market" [init]="{compoundTransaction: task, seller: task.assignee, market: market, buyer: task.assigner, good: good, submit_ok: submit_ok}"></dv-widget>
+        <dv-widget name="CompleteTask" of="Task" [init]="{task: task, submit_ok: submit_ok}" style="display: none"></dv-widget>
+        <dv-widget name="EditGoodName" of="Market" [init]="{good: good, name: {value: task.name}, submit_ok: submit_ok}" style="display: none"></dv-widget>
+      </div>
+    </div>
+  </div>
+</div>

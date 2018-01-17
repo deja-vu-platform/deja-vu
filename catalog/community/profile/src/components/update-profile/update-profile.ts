@@ -15,7 +15,12 @@ export class UpdateProfileComponent {
     this._graphQlService
       .post(`
         updateProfile(
-          updatedProfile: "${this.profile}",
+          username: "${this.profile.username}",
+          first_name: "${this.profile.first_name}",
+          last_name: "${this.profile.last_name}",
+          email: "${this.profile.email}",
+          phone: "${this.profile.phone}",
+          birthday: "${this.profile.birthday}"
         )
       `)
       .subscribe(_ => {
