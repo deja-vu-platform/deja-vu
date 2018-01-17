@@ -1,0 +1,37 @@
+/* for the listed features */
+.feature {
+    float: left;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.feature img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+    float: left;
+}
+
+.feature-img-text {
+    margin-top: 20px;
+    margin-left: 90px;
+    display: block;
+}
+
+/* login */
+#login-content {
+    float: right;
+}
+
+.login-column {
+    margin-top: 20px;
+}
+
+.modal-body {
+    margin: 20px;
+}
+
+#signup-text {
+  font-size: 15px;
+  margin-right: 5px;
+}
