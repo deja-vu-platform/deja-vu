@@ -2,5 +2,8 @@
 <div>
   <group:show-name-of-group [group]="band">
   </group:show-name-of-group>
-  <dv:a next="show-band [band]='band'" class="btn btn-default">View Band</dv:a>
+  <dv:a [click]="show-band" [clickInputs]="{'band': band}"
+    class="btn btn-default">
+    View Band
+  </dv:a>
 </div>

@@ -2,5 +2,6 @@
 <div>
   <checklist:show-item of="SetlistList" [item]="setlist">
   </checklist:show-item>
-  <dv:a next="show-setlist" class="btn btn-default">View Setlist</dv:a>
+  <dv:a [click]="show-setlist" [clickInputs]="{'setlist': setlist}"
+    class="btn btn-default">View Setlist</dv:a>
 </div>

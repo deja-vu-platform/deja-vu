@@ -4,10 +4,12 @@
   <div class="row">
     <div class="col-md-6 col-md-offset-3">
       <h1>Create Setlist</h1>
-      <div>
-        <checklist:add-item of="SetlistList" [checklist]="band">
+      <div dvTransaction>
+        <checklist:add-item of="SetlistList" [checklist]="band"
+          (itemName)="name">
         </checklist:add-item>
-        </dv-widget>
+        <checklist:new-checklist of="SongList" [name]="name">
+        </checklist:new-checklist>
       </div>
     </div>
   </div>

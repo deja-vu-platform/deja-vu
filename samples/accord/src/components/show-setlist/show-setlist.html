@@ -7,7 +7,7 @@
       <h1>Setlist</h1>
 
       <div>Want to add a song?</div>
-      <dv:a next="create-song [setlist]='setlist'"
+      <dv:a [click]="create-song" [clickInputs]="{'setlist': setlist}"
         class="btn btn-default">
         Add Song
       </dv:a>

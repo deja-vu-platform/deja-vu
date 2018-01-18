@@ -1,14 +1,19 @@
-<!-- inputs="commitment" -->
+<!--dv inputs="commitment" fields="good, buyer" -->
 <div class="col-xs-4">
-  <market:show-name-of-good [good]="market:show-good-of-transaction (good)">
+  <market:show-name-of-good [good]="good">
   </market:show-name-of-good>
+  <market:show-good-of-transaction dvHidden [transaction]="commitment"
+    (good)="good">
+  </market:show-good-of-transaction>
 </div>
 <div class="col-xs-2">
   <market:show-quantity-of-transaction [transaction]="commitment">
   </market:show-quantity-of-transaction>
 </div>
 <div class="col-xs-6">
-  <standard-authentication:username
-    [user]="market:show-buyer-of-transaction [transaction]='commitment' (buyer)">
+  <standard-authentication:username [user]="buyer">
   </standard-authentication:username>
+  <market:show-buyer-of-transaction dvHidden [transaction]="commitment"
+    (buyer)="buyer">
+  </market:show-buyer-of-transaction>
 </div>

@@ -5,13 +5,20 @@
     <div class="col-xs-2">Quantity</div>
     <div class="col-xs-6">Contributor</div>
   </div>
+  <!--
+  showGood(good=g)
+  showTransaction(supplyRequest=g, user=user)
+  <market:show-all-goods
+    [showGood]="show-supply-request(supplyRequest=#good, user=user)"
+    [market]="#party"></market:show-all-goods>
+  -->
   <market:show-all-goods
     [showGood]="show-supply-request"
-    [showGoodInputs]="{'supplyRequest': !good, 'user': user}"
+    [showGoodInputs]="{'supplyRequest': good, 'user': user}"
     [market]="party"></market:show-all-goods>
   <market:show-all-transactions
     [showTransaction]="show-commitment"
-    [showTransactionInputs]="{'commitment': !transaction}"
+    [showTransactionInputs]="{'commitment': #transaction}"
     [market]="party"></market:show-all-transactions>
 </div>
 <br />
