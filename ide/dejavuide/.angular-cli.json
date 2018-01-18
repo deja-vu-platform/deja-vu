@@ -23,9 +23,9 @@
         "styles.scss"
       ],
       "scripts": [
-        "external/jscolor.min.js",
         "../node_modules/jquery/dist/jquery.js",
-        "../node_modules/jquery-ui-dist/jquery-ui.js"
+        "../node_modules/jquery-ui-dist/jquery-ui.js",
+        "external/jscolor.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {

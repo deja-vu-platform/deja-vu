@@ -6,6 +6,7 @@ import { ZoomModule } from './zoom/zoom.module';
 import { MapModule } from './map/map.module';
 import { WorkSurfaceModule } from './worksurface/worksurface.module';
 import { ListModule } from './list/list.module';
+import { PaletteModule } from './palette/palette.module';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { ListModule } from './list/list.module';
     MapModule,
     WorkSurfaceModule,
     ListModule,
+    PaletteModule
   ],
   exports: [
     UiEditorComponent

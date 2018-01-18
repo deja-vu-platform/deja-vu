@@ -13,6 +13,8 @@
   <app-root></app-root>
   <script>
     var electron = require('electron');
+    // gets rid of the issue with jqueryui not finding jquery
+    window.$ = window.jQuery = require('jquery');
   </script>
 </body>
 </html>

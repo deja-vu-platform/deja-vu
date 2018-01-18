@@ -1,0 +1,6 @@
+<input #colorInput 
+  class="element"
+  [readOnly]="!editable"
+  [style.background]="'#'+color"
+  (change)="colorChange($event)"
+  [value]="color">

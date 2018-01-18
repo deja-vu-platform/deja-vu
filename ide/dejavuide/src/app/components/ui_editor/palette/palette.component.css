@@ -1,0 +1,8 @@
+.selected {
+  border: 4px dotted black;
+}
+
+.element {
+  margin: 5px; 
+  display: inline-block;
+}
