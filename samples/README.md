@@ -131,26 +131,27 @@ Food
 
 | App | Purpose |
 | ------ | ------- |
-| GroceryShip (TBD) | Facilitate peer grocery delivery between students |
+| GroceryShip | Facilitate peer grocery delivery between students |
 
 ### Catalog usage
 
-| Cliché/App             | GroceryShip (TBD) |
-| ---------------------- | -----------       |
-| StandardAuthentication |                   |
-| Authorization          |                   |
-| PasskeyAuthentication  |                   |
-| Market                 |                   |
-| Rating                 |                   |
-| Follow                 |                   |
-| Geolocation            |                   |
-| Feed                   |                   |
-| Post                   |                   |
-| Email                  |                   |
-| Comment                |                   |
-| Event                  |                   |
-| Allocator              |                   |
-| Label                  |                   |
-| Group                  |                   |
-| Task                   |                   |
-| Checklist              |                   |
+| Cliché/App             | GroceryShip |
+| ---------------------- | ----------- |
+| StandardAuthentication |      X      |
+| Authorization          |             |
+| PasskeyAuthentication  |             |
+| Market                 |      X      |
+| Profile                |      X      |
+| Rating                 |      X      |
+| Follow                 |             |
+| Geolocation            |             |
+| Feed                   |             |
+| Post                   |             |
+| Email                  |             |
+| Comment                |             |
+| Event                  |      X      |
+| Allocator              |             |
+| Label                  |             |
+| Group                  |             |
+| Task                   |      X      |
+| Checklist              |             |

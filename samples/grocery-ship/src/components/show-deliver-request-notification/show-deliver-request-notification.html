@@ -1,0 +1,57 @@
+<!-- Request claimed by current user, and has already set a delivery time (i.e. completed but not approved). The user rates the requester here once he/she has delivered the request. -->
+<link rel="stylesheet" href="./components/show-deliver-request-notification/show-deliver-request-notification.css">
+
+<div class="col-xs-12 col-ms-6 col-sm-4 col-md-4 col-lg-3" id="notif-container-{{task.atom_id}}">
+  <div class="tile notification-tile" data-toggle="modal" attr.data-target="#notification-modal-{{task.atom_id}}">
+    <div class="tile-icon" style="float: left"><img src="./components/show-deliver-request-notification/cart.png"></div>
+
+    <h4 class="tile-title">{{task.name}}</h4>
+    <p class="tile-subtitle">Requester: {{task.assigner.atom_id}}</p>
+
+    <p class="tile-content">Deliver on:
+      <dv-widget name="ShowEvent" of="Event"></dv-widget>
+    </p>
+
+    <button class="close-notification-items btn btn-success btn-xs" data-toggle="modal" attr.data-target="#close-modal-{{task.atom_id}}">Close Delivery</button>
+  </div>
+</div>
+
+<!-- close delivery modal (shopper delivers item and rates requester) -->
+<div id="close-modal-{{task.atom_id}}" class="modal fade notif-action-modal accept-modal" role="dialog">
+  <div class="modal-messages"></div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Close Delivery</h3>
+      </div>
+      <div class="modal-body">
+        <p><span class="text-warning"><b>WARNING:</b></span> Make sure the requester pays before handing the good to him/her and closing this delivery.</p>
+
+        <div class="payment-summary">
+          <p>Below is a summary of your delivery for {{task.assigner.atom_id}}: </p>
+          <table>
+            <tr>
+              <dv-widget name="ShowCompoundTransaction" of="Market" [init]="{compoundTransaction: task}"></dv-widget>
+            </tr>
+          </table>
+        </div> <!-- end of payment-summary -->
+
+        <hr>
+        <p>Rate {{task.assigner.atom_id}}:</p>
+        <dv-widget name="RateTarget" of="Rating" [init]="{target: task.assigner, source: task.assignee, rating: rating, submit_ok: submit_ok}"></dv-widget>
+
+        <br class="hidden-ms hidden-sm hidden-md hidden-lg">
+        <div class="row">
+          <div class="col-xs-offset-8 col-xs-4">
+            <!-- small hack to change submit_ok for RateTarget (task should have already been completed so this has no effect on the task) -->
+            <dv-widget name="CompleteTask" of="Task" [init]="{task: task, submit_ok: submit_ok}" style="float: right"></dv-widget>
+          </div>
+        </div>
+
+      </div> <!-- end of modal-body -->  
+    </div>
+  </div>
+</div>
+
+<dv-widget name="NotificationItemModal" [init]="{task: task, user: task.assignee}"></dv-widget>

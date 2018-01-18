@@ -37,8 +37,10 @@ cliche Market {
 
   // A record of multiple goods bought/to be bought in a single purchase/sale
   // Each Transaction in [transactions] must have the same [buyer] and [status]
+  // [total_price] is the sum of all [price]s in [transactions]
   data CompoundTransaction {
-    transactions: [Transaction]
+    transactions: [Transaction],
+    total_price: number
   }
 
   data Market {}
@@ -56,17 +58,38 @@ cliche Market {
     submit_ok: boolean
   }
 
+  // Start a CompoundTransaction with a [good] to be bought
+  // in a Transaction that has status unpaid
+  widget StartCompoundTransactionButton {
+    compound_transaction: CompoundTransaction,
+    good: Good,
+    buyer: Party,
+    market: Market,
+    quantity: number,
+    submit_ok: boolean
+  }
+
+  // Add an unpaid Transaction with a [good] to be bought
+  // to an existing CompoundTransaction.
+  // Changes submit_ok when successful
   widget AddTransactionButton {
-    transaction: Transaction,
-    compound_transaction: CompoundTransaction
+    compound_transaction: CompoundTransaction,
+    good: Good,
+    seller: Party,
+    buyer: Party,
+    market: Market,
+    quantity: number,
+    submit_ok: boolean
   }
 
   widget PayForCompoundTransactionButton {
-    compound_transaction: CompoundTransaction
+    compound_transaction: CompoundTransaction,
+    submit_ok: boolean
   }
 
   widget CancelCompoundTransactionButton {
-    compound_transaction: CompoundTransaction
+    compound_transaction: CompoundTransaction,
+    submit_ok: boolean
   }
 
   widget ShowCompoundTransaction uses ShowTransaction {
@@ -84,7 +107,8 @@ cliche Market {
   widget CreateGoodButton {
     seller: Party,
     market: Market,
-    good: Good
+    good: Good,
+    submit_ok: boolean
   }
 
   widget CreateGoodName {
@@ -97,6 +121,27 @@ cliche Market {
 
   widget CreateGoodSupply {
     good: Good
+  }
+
+  widget EditGoodName {
+    good: Good,
+    name: string,
+    submit_ok: boolean
+  }
+
+  widget EditGoodSeller {
+    good: Good,
+    seller: Party,
+    submit_ok: boolean
+  }
+
+  // Updates the seller of each transaction and its associated good
+  // of [compound_transaction] to [seller]
+  // when [submit_ok] is changed
+  widget EditCompoundTransactionSeller {
+    compound_transaction: CompoundTransaction,
+    seller: Party,
+    submit_ok: boolean
   }
 
   widget ShowGood {
@@ -139,8 +184,12 @@ cliche Market {
     party: Party
   }
 
-  // textbox to enter a number
+  // textbox to enter a number and button to submit
+  // Adds [amount] to [party]'s balance
+  // when button is pressed or submit_ok is changed
   widget AddAmount {
-    party: Party
+    party: Party,
+    amount: number,
+    submit_ok: boolean
   }
 }

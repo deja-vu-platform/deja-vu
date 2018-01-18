@@ -4,6 +4,7 @@ import {CompoundTransactionAtom} from "../../shared/data";
 
 import * as _u from "underscore";
 
+
 @Widget({
   fqelement: "Market",
   ng2_providers: [GraphQlService]
@@ -51,7 +52,7 @@ export class CreateCompoundTransactionButtonComponent {
           `)
           .subscribe(atom_id => {
               this.compoundTransaction.atom_id = atom_id;
-              this.submit_ok.value = true;
+              this.submit_ok.value = !this.submit_ok.value;
           });
       });
   }

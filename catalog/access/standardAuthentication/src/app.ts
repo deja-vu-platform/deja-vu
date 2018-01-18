@@ -48,7 +48,7 @@ const schema = grafo
   })
   .add_mutation({
     name: "register",
-    "type": graphql.GraphQLBoolean,
+    "type": graphql.GraphQLString,
     args: {
       username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       password: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
@@ -67,11 +67,10 @@ const schema = grafo
             if (write_res.insertedCount !== 1) {
               throw new Error("Couldn't save new user");
             }
-
             // report
-            bus.create_atom("User", user.atom_id, user);
-            return true;
-          });
+            return bus.create_atom("User", user.atom_id, user);
+          })
+          .then(_ => user.atom_id);
       });
     }
   })
@@ -121,9 +120,9 @@ const schema = grafo
             }
 
             // report
-            bus.update_atom("User", user.atom_id, updateOperation);
-            return true;
-          });
+            return bus.update_atom("User", user.atom_id, updateOperation);
+          })
+          .then(_ => true);
       });
     }
   })

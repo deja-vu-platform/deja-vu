@@ -9,8 +9,10 @@
     "dv-access-standardauthentication": "file:../../catalog/access/standardauthentication",
     "dv-community-rating": "file:../../catalog/community/rating",
     "dv-community-market": "file:../../catalog/community/market",
+    "dv-community-profile": "file:../../catalog/community/profile",
     "dv-organization-task": "file:../../catalog/organization/task",
-    "dv-organization-checklist": "file:../../catalog/organization/list",
+    "dv-organization-checklist": "file:../../catalog/organization/checklist",
+    "dv-organization-event": "file:../../catalog/organization/event",
     "dv-lang": "file:../../core/lang"
   }
 }
