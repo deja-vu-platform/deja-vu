@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
 
 import { Cliche, UserCliche, DvCliche } from '../../../models/cliche/cliche';
-import { Widget, BaseWidget, UserWidget, LinkBaseWidget, LabelBaseWidget } from '../../../models/widget/widget';
+import { Widget, BaseWidget, UserWidget, LinkBaseWidget, LabelBaseWidget, ImageBaseWidget } from '../../../models/widget/widget';
 import { ProjectService } from '../../../services/project.service';
 
 @Component({
@@ -19,6 +19,7 @@ export class ListComponent implements OnInit {
   baseWidgets: Widget[] = [
     new LinkBaseWidget({}),
     new LabelBaseWidget({}),
+    new ImageBaseWidget({})
   ];
 
   constructor(private ref: ChangeDetectorRef,

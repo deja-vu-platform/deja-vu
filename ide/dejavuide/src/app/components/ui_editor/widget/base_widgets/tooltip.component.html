@@ -45,10 +45,6 @@
   </a>
 </div>
 
-<!-- 'image' -->
-<!-- if (!value) { -->
-<img class="display-component" src="images/image_icon.png" width="15px" height="15px">
-<img [src]="value.img_src" class="display-component">
 
 <!-- 'panel' -->
 <!-- if (!value) { -->
@@ -71,54 +67,6 @@
 
 <!--EDIT PROPERTIES POPUPS-->
 
-
-<div id="image-popup-holder">
-  <div id="img-popup" class="tooltip">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <strong>Upload image or video</strong>
-        <button type="button" class="close close-btn">
-          <small>x</small>
-        </button>
-      </div>
-      <div class="panel-body">
-        <div class="row">
-          <div class="col-sm-3 form-lbl">
-            <h6>Paste link:</h6>
-          </div>
-          <div class="col-sm-9">
-            <input type="text" class="form-control">
-          </div>
-        </div>
-        <br/>
-
-        <!-- Drop Zone -->
-        <div class="upload-drop-zone"> Or drop file here </div>
-        <br/>
-
-        <div class="input-group image-preview">
-          <input placeholder="Or browse" type="text" class="form-control image-preview-filename" disabled="disabled" id="image-name">
-          <span class="input-group-btn">
-            <!-- image-preview-clear button -->
-            <button type="button" class="btn btn-default image-preview-clear" style="display:none;">
-              <span class="glyphicon glyphicon-remove"></span> Clear </button>
-            <!-- image-preview-input -->
-            <div class="btn btn-default image-preview-input">
-              <span class="glyphicon glyphicon-folder-open"></span>
-              <span class="image-preview-input-title">Browse</span>
-              <input type="file" accept="image/*" name="input-file-preview" id="fileselect" />
-              <!-- rename it -->
-            </div>
-            <button type="button" class="apply btn btn-labeled btn-default">
-              <span class="btn-label">
-                <i class="glyphicon glyphicon-upload"></i>
-              </span>Upload</button>
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <div id="tab-viewer-popup-holder">
   <div id="tab-popup" class="tooltip">

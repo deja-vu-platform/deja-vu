@@ -10,7 +10,7 @@ enum WidgetType {
 }
 
 enum BaseWidgetType {
-  LINK, LABEL
+  LINK, LABEL, IMAGE
 }
 
 interface LinkValue {
@@ -53,6 +53,10 @@ interface LinkBaseWidgetFields extends BaseWidgetFields {
 }
 
 interface LabelBaseWidgetFields extends BaseWidgetFields {
+  value?: string;
+}
+
+interface ImageBaseWidgetFields extends BaseWidgetFields {
   value?: string;
 }
 
@@ -324,6 +328,9 @@ export class BaseWidget extends Widget {
     if (fields.type === BaseWidgetType.LABEL) {
       return new LabelBaseWidget(fields, project);
     }
+    if (fields.type === BaseWidgetType.IMAGE) {
+      return new ImageBaseWidget(fields, project);
+    }
 
     throw new Error(INCORRECT_TYPE);
   }
@@ -345,17 +352,25 @@ export class BaseWidget extends Widget {
     return this.fields.type === BaseWidgetType.LABEL;
   }
 
+  isImage(): this is ImageBaseWidget {
+    return this.fields.type === BaseWidgetType.IMAGE;
+  }
+
   makeCopy(parentId?: string, fromTemplate = false): Widget[] {
     let copyWidget: BaseWidget;
     const project = this.project;
     const fields = this.fields;
     const value = this.fields.value;
 
+    // TODO this is not dry
     if (this.isLabel()) {
       copyWidget = new LabelBaseWidget(fields, project);
     }
     if (this.isLink()) {
       copyWidget = new LinkBaseWidget(fields, project);
+    }
+    if (this.isImage()) {
+      copyWidget = new ImageBaseWidget(fields, project);
     }
 
     copyWidget.fields.id = generateId();
@@ -416,6 +431,31 @@ export class LabelBaseWidget extends BaseWidget {
     this.fields.value = this.fields.value || 'Write your label here...';
 
     this.fields.name = fields.name || 'Label Widget';
+    this.fields.dimensions = fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 };
+  }
+  setValue(value: string) {
+    this.fields.value = value;
+  }
+
+  getValue(): string {
+    return this.fields.value;
+  }
+}
+
+
+export class ImageBaseWidget extends BaseWidget {
+  protected fields: ImageBaseWidgetFields;
+
+  constructor(
+    fields: ImageBaseWidgetFields,
+    project?: Project,
+  ) {
+    super(fields, project);
+    this.fields.type = BaseWidgetType.IMAGE;
+    // TODO this default value is not robust
+    this.fields.value = this.fields.value || 'assets/image_icon.png';
+
+    this.fields.name = fields.name || 'Image Widget';
     this.fields.dimensions = fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 };
   }
   setValue(value: string) {

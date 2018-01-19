@@ -8,9 +8,11 @@
         <ng-container *ngIf="widget.isLabel()">
           <img src="assets/label_icon.png" width="15px" height="15px">
         </ng-container>
+        <ng-container *ngIf="widget.isImage()">
+          <img src="assets/image_icon.png" width="15px" height="15px">
+        </ng-container>
         <!-- TODO -->
         <ng-container *ngIf="false">
-          <img src="assets/image_icon.png" width="15px" height="15px"> Media
           <img src="assets/tabs_icon.png" width="15px" height="15px"> Nav tabs
           <img src="assets/menu_icon.png" width="15px" height="15px"> Menu
           <img src="assets/panel_icon.png" width="15px" height="15px"> Panel
