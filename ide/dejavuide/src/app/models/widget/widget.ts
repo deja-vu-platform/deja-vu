@@ -1,6 +1,6 @@
 import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
 import { Dimensions, Position } from '../../services/state.service';
-import { Cliche, UserCliche } from '../cliche/cliche';
+import { UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
 
 const INCORRECT_TYPE = 'The object is not the correct type for this operation';
@@ -204,6 +204,10 @@ export abstract class Widget {
    */
   isDerivedFromTemplate(widgetId: string) {
     return this.fields.isTemplate && inArray(widgetId, this.fields.templateCopies);
+  }
+
+  getInnerWidgetIds(): string[] {
+    return [];
   }
 
   getLocalCustomStyles() {
@@ -489,25 +493,21 @@ export class UserWidget extends Widget {
   }
 
   /**
-   * Returns path starting from this id to the wanted widget id
-   *  null if no path exists
-   *
-   * @param widget widget we are currently looking at
-   * @param targetId widget id of widget to find
-   */
-  private getPathHelper(userApp: UserCliche, widget: Widget, targetId: string): string[] | null {
-    const widgetId = widget.getId();
-    // Base case 1: found it
+    * Returns path starting from this id to the wanted widget id
+    *  null if no path exists
+    *
+    * @param widget widget we are currently looking at
+    * @param targetId widget id of widget to find
+    */
+  private getPathHelper(userApp: UserCliche, widgetId: string, targetId: string): string[] | null {
+    // Base case: found it
     if (widgetId === targetId) {
       return [widgetId];
     }
-    // Base case 2: reached a BaseWidget without finding it
-    if (widget.isBaseType()) {
-      return null;
-    }
     // Recursive case, look through all the inner widgets
-    for (const id of (<UserWidget>widget).fields.innerWidgetIds) {
-      const path = this.getPathHelper(userApp, userApp.getWidget(id), targetId);
+    const widget = userApp.getWidget(widgetId);
+    for (const id of widget.getInnerWidgetIds()) {
+      const path = this.getPathHelper(userApp, id, targetId);
       if (path === null) {
         continue;
       }
@@ -525,7 +525,7 @@ export class UserWidget extends Widget {
    * @param widgetId widget id of widget to find
    */
   getPath(userApp: UserCliche, widgetId: string): string[] | null {
-    return this.getPathHelper(userApp, this, widgetId);
+    return this.getPathHelper(userApp, this.getId(), widgetId);
   }
 
   // TODO this function should actually be in the cliche

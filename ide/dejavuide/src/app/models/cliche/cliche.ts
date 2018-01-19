@@ -29,16 +29,16 @@ export abstract class Cliche {
   protected widgets: Map<string, Widget>;
 
   /**
-   * Converts a JSON object to a Widget object
-   * @param object object to convert
-   */
+  * Converts a JSON object to a Widget object
+  * @param object object to convert
+  */
   static fromJSON(object: ClicheFields): UserCliche | DvCliche {
     const notCorrectObject = 'Object is not an instance of a Cliche';
     if (object.clicheType === undefined || object.clicheType === null) {
-        throw new Error(notCorrectObject);
+      throw new Error(notCorrectObject);
     }
     if (object.clicheType === ClicheType.USER_CLICHE) {
-        return UserCliche.fromJSON(object);
+      return UserCliche.fromJSON(object);
     }
     return DvCliche.fromJSON(object);
   }
@@ -62,7 +62,7 @@ export abstract class Cliche {
     return copyfields;
   }
 
-  constructor (fields: ClicheFields) {
+  constructor(fields: ClicheFields) {
     this.fields = Cliche.copyFields(fields);
     // asign default values;
     this.fields.id = fields.id ? this.fields.id : generateId();
@@ -106,7 +106,7 @@ export class UserCliche extends Cliche {
     return cliche;
   }
 
-  constructor (fields: UserClicheFields) {
+  constructor(fields: UserClicheFields) {
     super(fields);
     this.fields.clicheType = ClicheType.USER_CLICHE;
 
@@ -127,9 +127,9 @@ export class UserCliche extends Cliche {
   }
 
   /**
-   * Adds a widget. It is initially set as free (unused).
-   * @param widget
-   */
+  * Adds a widget. It is initially set as free (unused).
+  * @param widget
+  */
   addWidget(widget: Widget) {
     if (widget.getClicheId() !== this.getId()) {
       throw new Error('Not a user application widget!');
@@ -143,7 +143,7 @@ export class UserCliche extends Cliche {
     this.cleanAssociations(widgetId);
   }
 
-  isPage (widgetId: string): boolean {
+  isPage(widgetId: string): boolean {
     return inArray(widgetId, this.fields.pageIds);
   }
 
@@ -151,57 +151,60 @@ export class UserCliche extends Cliche {
     return this.fields.pageIds.length;
   }
 
-  setAsPage (widget: Widget) {
+  setAsPage(widget: Widget) {
     this.checkWidgetInCliche(widget);
     this.cleanAssociations(widget.getId());
     this.fields.pageIds.push(widget.getId());
     // TODO add inner widgets as used widgets
   }
 
-  getPageIds (): string[] {
+  getPageIds(): string[] {
     return this.fields.pageIds.slice();
   }
 
-  setAsTemplate (widget: Widget) {
+  setAsTemplate(widget: Widget) {
     this.checkWidgetInCliche(widget);
     widget.setAsTemplate();
     this.cleanAssociations(widget.getId());
     this.fields.templateIds.push(widget.getId());
   }
 
-  getTemplateIds (): string[] {
+  getTemplateIds(): string[] {
     return this.fields.templateIds.slice();
   }
 
-  setAsFreeWidget (widget: Widget) {
+  setAsFreeWidget(widget: Widget) {
     this.checkWidgetInCliche(widget);
     this.cleanAssociations(widget.getId());
     this.fields.freeWidgetIds.push(widget.getId());
   }
 
-  getFreeWidgetIds (): string[] {
+  getFreeWidgetIds(): string[] {
     return this.fields.freeWidgetIds.slice();
   }
 
-  setAsInnerWidget (widget: Widget) {
+  setAsInnerWidget(widget: Widget) {
     this.checkWidgetInCliche(widget);
     this.cleanAssociations(widget.getId());
     this.fields.innerWidgetIds.push(widget.getId());
   }
 
-  getInnerWidgetIds (): string[] {
+  getInnerWidgetIds(): string[] {
     return this.fields.innerWidgetIds.slice();
   }
 
+
+
+
   private checkWidgetInCliche(widget: Widget) {
     if (!this.getWidget(widget.getId())) {
-      throw new Error ('Widget not added to cliche!');
+      throw new Error('Widget not added to cliche!');
     }
   }
 }
 
 export class DvCliche extends Cliche {
-  constructor (fields: ClicheFields) {
+  constructor(fields: ClicheFields) {
     super(fields);
     this.fields.clicheType = ClicheType.DV_CLICHE;
   }

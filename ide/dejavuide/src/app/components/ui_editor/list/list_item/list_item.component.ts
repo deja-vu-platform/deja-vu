@@ -42,11 +42,9 @@ export class ListItemComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    if (this.widget.isUserType()) {
-      const userApp = this.projectService.getProject().getUserApp();
-      this.innerWidgets = this.widget.getInnerWidgetIds()
-        .map(id => userApp.getWidget(id));
-    }
+    const userApp = this.projectService.getProject().getUserApp();
+    this.innerWidgets = this.widget.getInnerWidgetIds()
+      .map(id => userApp.getWidget(id));
   }
 
   ngAfterViewInit() {

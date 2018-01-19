@@ -22,18 +22,18 @@ export class GridComponent {
     $('.grid').remove();
 
     const grid = { x: {}, y: {} };
-    this.selectedPage.getInnerWidgetIds().forEach(innerWidgetId => {
-      const innerWidget = this.selectedPage.getInnerWidget(innerWidgetId);
-      // existing components should also be in the work surface!
-      const top = 'container.position().top';
-      const left = 'container.position().left';
-      const right = 'left + container.width()';
-      const bottom = 'top + container.height()';
-      grid.x[left] = '';
-      grid.x[right] = '';
-      grid.y[top] = '';
-      grid.y[bottom] = '';
-    });
+    // this.selectedPage.getInnerWidgetIds().forEach(innerWidgetId => {
+    //   const innerWidget = this.selectedPage.getInnerWidget(innerWidgetId);
+    //   // existing components should also be in the work surface!
+    //   const top = 'container.position().top';
+    //   const left = 'container.position().left';
+    //   const right = 'left + container.width()';
+    //   const bottom = 'top + container.height()';
+    //   grid.x[left] = '';
+    //   grid.x[right] = '';
+    //   grid.y[top] = '';
+    //   grid.y[bottom] = '';
+    // });
 
     const workSurfaceTop = 0;
     const workSurfaceBottom = workSurfaceTop + workSurfaceElt.height();

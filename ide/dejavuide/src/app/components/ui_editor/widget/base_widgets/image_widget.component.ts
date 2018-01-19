@@ -3,10 +3,11 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ImageBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
-  selector: 'dv-link-widget',
-  templateUrl: './link_widget.component.html',
+  selector: 'dv-image-widget',
+  templateUrl: './image_widget.component.html',
+  styleUrls: ['./image_widget.component.css']
 })
-export class LinkWidgetComponent implements OnInit {
+export class ImageWidgetComponent implements OnInit {
   @Input() widget: ImageBaseWidget;
 
   value;

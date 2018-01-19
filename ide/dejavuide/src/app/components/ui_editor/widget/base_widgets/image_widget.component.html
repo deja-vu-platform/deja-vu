@@ -1,4 +1,6 @@
-<img [src]="value" class="display-component">
+<img [src]="value" class="display-component"
+      [style.width.px]="widget.getDimensions().width"
+      [style.height.px]="widget.getDimensions().height">
 
 <dv-widget-options [widget]="widget">
   <div tooltip>

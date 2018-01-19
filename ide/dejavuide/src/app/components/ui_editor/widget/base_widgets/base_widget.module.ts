@@ -4,12 +4,14 @@ import { MatMenuModule, MatListModule } from '@angular/material';
 
 import { LabelWidgetComponent } from './label_widget.component';
 import { LinkWidgetComponent } from './link_widget.component';
+import { ImageWidgetComponent } from './image_widget.component';
 import { WidgetOptionsComponent } from './options.component';
 
 @NgModule({
   declarations: [
     LabelWidgetComponent,
     LinkWidgetComponent,
+    ImageWidgetComponent,
     WidgetOptionsComponent
   ],
   imports: [
@@ -21,6 +23,7 @@ import { WidgetOptionsComponent } from './options.component';
   exports: [
     LabelWidgetComponent,
     LinkWidgetComponent,
+    ImageWidgetComponent,
     WidgetOptionsComponent
   ]
 })

@@ -151,20 +151,17 @@ export class MapComponent implements AfterViewInit, OnInit {
       };
 
       const mapWidgetSizes = [];
-      if (selectedWidget.isUserType()) {
-        selectedWidget.getInnerWidgetIds().forEach((innerWidgetId) => {
-          const innerWidget = selectedWidget
-                                .getInnerWidget(userApp, innerWidgetId);
-          const innerWidgetDimensions = innerWidget.getDimensions();
-          const innerWidgetPosition = innerWidget.getPosition();
-          mapWidgetSizes.push({
-            left: innerWidgetPosition.left * this.mapScale,
-            top: innerWidgetPosition.top * this.mapScale,
-            width: innerWidgetDimensions.width * this.mapScale,
-            height: innerWidgetDimensions.height * this.mapScale,
-          });
+      selectedWidget.getInnerWidgetIds().forEach((innerWidgetId) => {
+        const innerWidget = userApp.getWidget(innerWidgetId);
+        const innerWidgetDimensions = innerWidget.getDimensions();
+        const innerWidgetPosition = innerWidget.getPosition();
+        mapWidgetSizes.push({
+          left: innerWidgetPosition.left * this.mapScale,
+          top: innerWidgetPosition.top * this.mapScale,
+          width: innerWidgetDimensions.width * this.mapScale,
+          height: innerWidgetDimensions.height * this.mapScale,
         });
-      }
+      });
 
       this.mapWidgetSizes = mapWidgetSizes;
     }

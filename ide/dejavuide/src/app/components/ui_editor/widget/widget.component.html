@@ -15,10 +15,13 @@
     </ng-container>
   </ng-container>
   <ng-container *ngIf="widget.isBaseType()">
+    <!-- TODO is not DRY -->
     <dv-label-widget *ngIf="widget.isLabel()"
       [widget]="widget"></dv-label-widget>
     <dv-link-widget *ngIf="widget.isLink()"
       [widget]="widget"></dv-link-widget>
+    <dv-image-widget *ngIf="widget.isImage()"
+      [widget]="widget"></dv-image-widget>
   </ng-container>
 </div>
 
