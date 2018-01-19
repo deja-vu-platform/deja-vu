@@ -139,7 +139,7 @@ export class MapComponent implements AfterViewInit, OnInit {
    */
   private updateView() {
     const selectedWidget = this.selectedWidget;
-
+    const userApp = this.projectService.getProject().getUserApp();
     if (selectedWidget) {
       this.mapSelectedWidgetSize = {
         height: selectedWidget.getDimensions().height * this.mapScale,
@@ -154,7 +154,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       if (selectedWidget.isUserType()) {
         selectedWidget.getInnerWidgetIds().forEach((innerWidgetId) => {
           const innerWidget = selectedWidget
-                                .getInnerWidget(innerWidgetId);
+                                .getInnerWidget(userApp, innerWidgetId);
           const innerWidgetDimensions = innerWidget.getDimensions();
           const innerWidgetPosition = innerWidget.getPosition();
           mapWidgetSizes.push({

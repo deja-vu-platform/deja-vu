@@ -83,8 +83,7 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
         {name: 'test',
         dimensions: { height: 600, width: 800 },
         position: { top: 100, left: 300 },
-        clicheId: appId},
-        this.selectedProject);
+        clicheId: appId});
 
       this.userApp.addWidget(testWidget);
       this.userApp.setAsPage(testWidget);
@@ -94,11 +93,9 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
         dimensions: { height: 100, width: 200 },
         position: { top: 50, left: 100 },
         value: 'hello I am test',
-        clicheId: appId},
-        this.selectedProject,
-      );
+        clicheId: appId});
       this.userApp.addWidget(innerWidget1);
-      testWidget.setAsInnerWidget(innerWidget1);
+      testWidget.setAsInnerWidget(this.userApp, innerWidget1);
 
       // const innerWidget7 = new LinkBaseWidget(
       //   this.selectedProject,
@@ -111,28 +108,25 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
         {name: 'test inner2',
         dimensions: { height: 200, width: 400 },
         position: { top: 200, left: 200 },
-        clicheId: appId},
-        this.selectedProject);
+        clicheId: appId});
       this.userApp.addWidget(innerWidget2);
-      testWidget.setAsInnerWidget(innerWidget2);
+      testWidget.setAsInnerWidget(this.userApp, innerWidget2);
 
       const innerWidget21 = new UserWidget(
         {name: 'test inner21',
         dimensions: { height: 400, width: 200 },
         position: { top: 50, left: 100 },
-        clicheId: appId},
-        this.selectedProject);
+        clicheId: appId});
       this.userApp.addWidget(innerWidget21);
-      innerWidget2.setAsInnerWidget(innerWidget21);
+      innerWidget2.setAsInnerWidget(this.userApp, innerWidget21);
 
       const innerWidget211 = new LinkBaseWidget(
         {name: 'inner211',
         dimensions: { height: 200, width: 150 },
         value: {text: '100100', target: undefined},
-        clicheId: appId},
-        this.selectedProject);
+        clicheId: appId});
       this.userApp.addWidget(innerWidget211);
-      innerWidget21.setAsInnerWidget(innerWidget211);
+      innerWidget21.setAsInnerWidget(this.userApp, innerWidget211);
 
       this.selectedWidget = testWidget;
     } else {

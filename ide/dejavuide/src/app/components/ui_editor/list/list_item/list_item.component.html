@@ -44,14 +44,14 @@
     <span class="glyphicon glyphicon-trash"></span>
   </button>
   <ng-container *ngIf="widget.isUserType()">
-    <button *ngIf="widget.getInnerWidgetIds().length > 0"
+    <button *ngIf="innerWidgets.length > 0"
             class="btn btn-default"
             (click)="toggleShow()">
       <span [hidden]="innerShown"> > </span>
       <span [hidden]="!innerShown"> v </span>
     </button>
-    <div *ngFor="let id of widget.getInnerWidgetIds()">
-      <dv-list-item [widget]="widget.getInnerWidget(id)"
+    <div *ngFor="let innerWidget of innerWidgets">
+      <dv-list-item [widget]="innerWidget"
                     [isDraggable]="false"
                     [isDeletable]="true"
                     [hidden]="!innerShown">

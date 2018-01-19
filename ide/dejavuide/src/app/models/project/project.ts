@@ -19,7 +19,7 @@ export class Project {
 
   static fromJSON (fields: ProjectFields): Project {
     const project = new Project(fields);
-    project.userApp = UserCliche.fromJSON(fields.userAppFields, project);
+    project.userApp = UserCliche.fromJSON(fields.userAppFields);
 
     // TODO
     // for (const clicheId of Object.keys(fields.importedCliches)) {
@@ -55,9 +55,9 @@ export class Project {
 
     this.fields.lastAccessed = (new Date()).getTime();
     if (this.fields.userAppFields) {
-      this.userApp = new UserCliche(this.fields.userAppFields, this);
+      this.userApp = new UserCliche(this.fields.userAppFields);
     } else {
-      this.userApp = new UserCliche({name: this.fields.name}, this);
+      this.userApp = new UserCliche({name: this.fields.name});
     }
   }
 

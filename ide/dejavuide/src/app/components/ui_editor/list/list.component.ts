@@ -54,8 +54,7 @@ export class ListComponent implements OnInit {
     const newWidget = new UserWidget(
       {name: 'new page',
       dimensions: {height: 500, width: 500},
-      clicheId: this.userApp.getId()},
-      project);
+      clicheId: this.userApp.getId()});
     this.userApp.addWidget(newWidget);
     this.userApp.setAsPage(newWidget);
     this.refreshList();
@@ -66,8 +65,7 @@ export class ListComponent implements OnInit {
     const newWidget = new UserWidget(
       {name: 'new widget',
       dimensions: {height: 100, width: 100},
-      clicheId: this.userApp.getId()},
-      project);
+      clicheId: this.userApp.getId()});
     this.userApp.addWidget(newWidget);
     this.refreshList();
   }

@@ -1,6 +1,5 @@
 import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
 import { Widget } from '../widget/widget';
-import { Project } from '../project/project';
 
 export enum ClicheType {
   USER_CLICHE, DV_CLICHE
@@ -27,22 +26,21 @@ interface UserClicheFields extends ClicheFields {
 export abstract class Cliche {
   // A cliche contains the actual widget objects
   protected fields: ClicheFields;
-  protected project: Project;
   protected widgets: Map<string, Widget>;
 
   /**
    * Converts a JSON object to a Widget object
    * @param object object to convert
    */
-  static fromJSON(object: ClicheFields, project: Project): UserCliche | DvCliche {
+  static fromJSON(object: ClicheFields): UserCliche | DvCliche {
     const notCorrectObject = 'Object is not an instance of a Cliche';
     if (object.clicheType === undefined || object.clicheType === null) {
         throw new Error(notCorrectObject);
     }
     if (object.clicheType === ClicheType.USER_CLICHE) {
-        return UserCliche.fromJSON(object, project);
+        return UserCliche.fromJSON(object);
     }
-    return DvCliche.fromJSON(object, project);
+    return DvCliche.fromJSON(object);
   }
 
   static toJSON(cliche: Cliche) {
@@ -64,9 +62,7 @@ export abstract class Cliche {
     return copyfields;
   }
 
-  constructor (fields: ClicheFields, project: Project) {
-    this.project = project;
-
+  constructor (fields: ClicheFields) {
     this.fields = Cliche.copyFields(fields);
     // asign default values;
     this.fields.id = fields.id ? this.fields.id : generateId();
@@ -80,7 +76,7 @@ export abstract class Cliche {
     if (fields.widgetFields) {
       Object.keys(fields.widgetFields).forEach(widgetId => {
         this.widgets.set(widgetId,
-          Widget.fromJSON(fields.widgetFields[widgetId], project));
+          Widget.fromJSON(fields.widgetFields[widgetId]));
       });
     }
   }
@@ -101,17 +97,17 @@ export abstract class Cliche {
 export class UserCliche extends Cliche {
   protected fields: UserClicheFields;
 
-  static fromJSON(fields: UserClicheFields, project: Project) {
+  static fromJSON(fields: UserClicheFields) {
     if (fields.clicheType !== ClicheType.USER_CLICHE) {
       throw new Error('TODO');
     }
-    const cliche = new UserCliche(fields, project);
+    const cliche = new UserCliche(fields);
 
     return cliche;
   }
 
-  constructor (fields: UserClicheFields, project: Project) {
-    super(fields, project);
+  constructor (fields: UserClicheFields) {
+    super(fields);
     this.fields.clicheType = ClicheType.USER_CLICHE;
 
     this.fields.pageIds = fields.pageIds ? fields.pageIds.slice() : [];
@@ -205,8 +201,8 @@ export class UserCliche extends Cliche {
 }
 
 export class DvCliche extends Cliche {
-  constructor (fields: ClicheFields, project: Project) {
-    super(fields, project);
+  constructor (fields: ClicheFields) {
+    super(fields);
     this.fields.clicheType = ClicheType.DV_CLICHE;
   }
 }

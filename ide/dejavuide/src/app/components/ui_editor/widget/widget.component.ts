@@ -118,15 +118,17 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges, OnDest
 
   private getInnerWidgets() {
     this.innerWidgets = [];
+    const userApp = this.projectService.getProject().getUserApp();
     if (this.widget && this.widget.isUserType()) {
       for (const innerWidgetId of this.widget.getInnerWidgetIds()) {
-        this.innerWidgets.push(this.widget.getInnerWidget(innerWidgetId));
+        this.innerWidgets.push(this.widget.getInnerWidget(userApp, innerWidgetId));
       }
     }
   }
 
   private updateStylesToShow() {
-    const stylesToShow = this.widget.getCustomStylesToShow();
+    const userApp = this.projectService.getProject().getUserApp();
+    const stylesToShow = this.widget.getCustomStylesToShow(userApp);
     Object.keys(stylesToShow).forEach((name) => {
       this.el.style[name] = stylesToShow[name];
     });

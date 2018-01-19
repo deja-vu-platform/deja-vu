@@ -1,5 +1,5 @@
 
-import { Component, Input, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
 import { MatDialog } from '@angular/material';
 
 import { Cliche } from '../../../../models/cliche/cliche';
@@ -20,7 +20,7 @@ const $ = <any>jQuery;
   templateUrl: './list_item.component.html',
   styleUrls: ['./list_item.component.css']
 })
-export class ListItemComponent implements AfterViewInit {
+export class ListItemComponent implements OnInit, AfterViewInit {
   @Input() isDraggable = false;
   @Input() isDeletable = true;
   @Input() createNew = false;
@@ -32,12 +32,21 @@ export class ListItemComponent implements AfterViewInit {
   renameVisible = false;
   el: HTMLElement;
 
+  innerWidgets: Widget[];
   constructor(
     el: ElementRef,
     public dialog: MatDialog,
     private projectService: ProjectService
   ) {
     this.el = el.nativeElement;
+  }
+
+  ngOnInit() {
+    if (this.widget.isUserType()) {
+      const userApp = this.projectService.getProject().getUserApp();
+      this.innerWidgets = this.widget.getInnerWidgetIds()
+        .map(id => userApp.getWidget(id));
+    }
   }
 
   ngAfterViewInit() {

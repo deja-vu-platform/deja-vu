@@ -54,8 +54,8 @@ export class WidgetOptionsComponent implements AfterViewInit {
   }
 
   createTemplate() {
-    const copies = this.widget.makeCopy();
     const userApp = this.projectService.getProject().getUserApp();
+    const copies = this.widget.makeCopy(userApp);
     userApp.setAsTemplate(copies[0]);
     this.projectService.widgetUpdated();
   }
@@ -73,25 +73,27 @@ export class WidgetOptionsComponent implements AfterViewInit {
   }
 
   moveUp() {
-    const parent = this.getParentWidget();
-    parent.changeInnerWidgetOrderByOne(this.widget, true);
+    const userApp = this.projectService.getProject().getUserApp();
+    const parent = this.getParentWidget(userApp);
+    parent.changeInnerWidgetOrderByOne(userApp, this.widget, true);
     this.projectService.widgetUpdated();
   }
 
   moveDown() {
-    const parent = this.getParentWidget();
-    parent.changeInnerWidgetOrderByOne(this.widget, false);
+    const userApp = this.projectService.getProject().getUserApp();
+    const parent = this.getParentWidget(userApp);
+    parent.changeInnerWidgetOrderByOne(userApp, this.widget, false);
     this.projectService.widgetUpdated();
   }
 
   private unlinkWidgetFromParent() {
-    const parent = this.getParentWidget();
-    parent.removeInnerWidget(this.widget.getId());
+    const userApp = this.projectService.getProject().getUserApp();
+    const parent = this.getParentWidget(userApp);
+    parent.removeInnerWidget(userApp, this.widget.getId());
   }
 
-  private getParentWidget(): UserWidget {
+  private getParentWidget(userApp): UserWidget {
     const parentId = this.widget.getParentId();
-    const userApp = this.projectService.getProject().getUserApp();
     return userApp.getWidget(parentId) as UserWidget;
   }
 

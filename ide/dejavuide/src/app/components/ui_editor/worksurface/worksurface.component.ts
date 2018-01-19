@@ -91,10 +91,10 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
           const isTemplate = ui.helper.template;
           // Check if it's a new widget
           const isNew = ui.helper.new;
+          const project = this.projectService.getProject();
+          const userApp = project.getUserApp();
           if (isNew || isTemplate) {
             // create a new widget object.
-            const project = this.projectService.getProject();
-            const userApp = project.getUserApp();
             let innerWidgets: Widget[];
             if (isNew) {
               // Set the cliche id of the dummy widget to this
@@ -102,19 +102,18 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
               // when copying.
               const dummyWidget = widget;
               dummyWidget.setClicheId(userApp.getId());
-              innerWidgets = widget.makeCopy();
+              innerWidgets = widget.makeCopy(userApp);
               widget = innerWidgets[0];
-              widget.setProject(project);
               // reset the dummy widget
               dummyWidget.setClicheId(undefined);
             } else {
-              innerWidgets = widget.makeCopy(undefined, true);
+              innerWidgets = widget.makeCopy(userApp, undefined, true);
               widget = innerWidgets[0];
             }
 
             widget.updatePosition(this.newWidgetNewPosition(ui));
 
-            this.selectedWidget.setAsInnerWidget(widget);
+            this.selectedWidget.setAsInnerWidget(userApp, widget);
           } else {
             // it must be an unused widget or an already added widget
             const alreadyAdded =
@@ -123,11 +122,11 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
             if (alreadyAdded) {
               widget.updatePosition(this.oldWidgetNewPosition(ui));
             } else {
-              this.selectedWidget.setAsInnerWidget(widget);
+              this.selectedWidget.setAsInnerWidget(userApp, widget);
               widget.updatePosition(this.newWidgetNewPosition(ui));
             }
           }
-          this.selectedWidget.putInnerWidgetOnTop(widget);
+          this.selectedWidget.putInnerWidgetOnTop(userApp, widget);
         }
 
         this.projectService.widgetUpdated();

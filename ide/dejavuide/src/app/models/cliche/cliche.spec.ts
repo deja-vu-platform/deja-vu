@@ -21,27 +21,23 @@ fdescribe('UserCliche', () => {
       {name: 'widget1',
       dimensions: {width: 1, height: 1},
       value: {text: '', target: ''},
-      clicheId: userAppId},
-      project);
+      clicheId: userAppId});
 
     widget2 = new UserWidget(
       {name: 'widget2',
       dimensions: {width: 1, height: 1},
-      clicheId: userAppId},
-      project);
+      clicheId: userAppId});
 
     widget3 = new UserWidget(
       {name: 'widget3',
       dimensions: {width: 1, height: 1},
-      clicheId: userAppId},
-      project);
+      clicheId: userAppId});
 
     nonUserAppWidget = new UserWidget(
       {name: 'widget6',
       dimensions: {width: 1, height: 1},
       clicheId: 'notUserAppId',
-      isTemplate: true},
-      project);
+      isTemplate: true});
   });
 
   describe('fromJSON and toJSON', () => {
@@ -50,8 +46,7 @@ fdescribe('UserCliche', () => {
         {name: 'widget4',
         dimensions: {width: 1, height: 1},
         value: {text: '', target: ''},
-        clicheId: userAppId},
-        project);
+        clicheId: userAppId});
 
       userApp.addWidget(widget1);
       userApp.addWidget(widget2);
@@ -63,7 +58,7 @@ fdescribe('UserCliche', () => {
       userApp.setAsInnerWidget(widget3);
 
       const userAppJSON = Cliche.toJSON(userApp);
-      const userAppCopy = UserCliche.fromJSON(userAppJSON, project);
+      const userAppCopy = UserCliche.fromJSON(userAppJSON);
 
       expect(userAppCopy.getId()).toEqual(userApp.getId());
       expect(userAppCopy.getName()).toEqual(userApp.getName());
@@ -83,7 +78,7 @@ fdescribe('UserCliche', () => {
       userApp.addWidget(widget3);
 
       const userAppJSON = Cliche.toJSON(userApp);
-      const userAppCopy = UserCliche.fromJSON(userAppJSON, project);
+      const userAppCopy = UserCliche.fromJSON(userAppJSON);
 
       expect(userAppCopy).not.toBe(userApp);
       expect(userApp.getWidget(widget1.getId())).toBe(widget1);

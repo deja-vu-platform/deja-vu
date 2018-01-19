@@ -66,21 +66,20 @@ interface UserWidgetFields extends WidgetFields {
 
 export abstract class Widget {
   protected fields: WidgetFields;
-  protected project: Project;
 
   /**
    * Converts a JSON object to a Widget object.
    * Copies inner objects so that references are not shared.
    * @param fields object to convert
    */
-  static fromJSON(fields: WidgetFields, project: Project): BaseWidget | UserWidget {
+  static fromJSON(fields: WidgetFields): BaseWidget | UserWidget {
     if (fields.widgetType === undefined || fields.widgetType === null) {
       throw new Error(INCORRECT_TYPE);
     }
     if (fields.widgetType === WidgetType.BASE_WIDGET) {
-      return BaseWidget.fromJSON(fields, project);
+      return BaseWidget.fromJSON(fields);
     } else {
-      return UserWidget.fromJSON(fields, project);
+      return UserWidget.fromJSON(fields);
     }
   }
 
@@ -114,14 +113,9 @@ export abstract class Widget {
    * @param fromTemplate Whether of not we are doing a "template" copy as
    *  opposed to a normal copy
    */
-  abstract makeCopy(parentId?: string, fromTemplate?: boolean): Widget[];
+  abstract makeCopy(userApp: UserCliche, parentId?: string, fromTemplate?: boolean): Widget[];
 
-  constructor(
-    fields: WidgetFields,
-    project?: Project
-  ) {
-    this.project = project;
-
+  constructor(fields: WidgetFields) {
     this.fields = Widget.copyFields(fields);
 
     // asign default values;
@@ -153,14 +147,6 @@ export abstract class Widget {
 
   isBaseType(): this is BaseWidget {
     return this.fields.widgetType === WidgetType.BASE_WIDGET;
-  }
-
-  getProject(): Project {
-    return this.project;
-  }
-
-  setProject(project: Project) {
-    this.project = project;
   }
 
   getId(): string {
@@ -253,7 +239,7 @@ export abstract class Widget {
    *
    * @param parentStyles any styles to inherit from the ancestors
    */
-  getCustomStylesToShow(parentStyles = {}) {
+  getCustomStylesToShow(userApp: UserCliche, parentStyles = {}) {
     // TODO: later on, use this to update a "stylesToShow" field
     // that is read when rendering, and updated whenever a template is
     // updated. If the field is there, just read from it, if not recursively
@@ -263,8 +249,8 @@ export abstract class Widget {
     let inheritedStyles = {};
     const templateId = this.getTemplateId();
     if (templateId) {
-      inheritedStyles = this.project.getUserApp().getWidget(templateId)
-        .getCustomStylesToShow(); // no parent styles for template
+      inheritedStyles = userApp.getWidget(templateId)
+        .getCustomStylesToShow(userApp); // no parent styles for template
     }
 
     for (const style of Object.keys(inheritedStyles)) {
@@ -283,8 +269,7 @@ export abstract class Widget {
    * Just deletes from the all widgets table and the template reference if
    * it has one. Doesn't touch inner widgets if any.
    */
-  remove() {
-    const userApp = this.project.getUserApp();
+  remove(userApp: UserCliche) {
     const id = this.getId();
     const templateId = this.getTemplateId();
     if (templateId) {
@@ -317,29 +302,26 @@ export abstract class Widget {
 export class BaseWidget extends Widget {
   protected fields: BaseWidgetFields;
 
-  static fromJSON(fields: BaseWidgetFields, project: Project): BaseWidget {
+  static fromJSON(fields: BaseWidgetFields): BaseWidget {
     if (fields.widgetType !== WidgetType.BASE_WIDGET) {
       throw new Error(INCORRECT_TYPE);
     }
 
     if (fields.type === BaseWidgetType.LINK) {
-      return new LinkBaseWidget(fields, project);
+      return new LinkBaseWidget(fields);
     }
     if (fields.type === BaseWidgetType.LABEL) {
-      return new LabelBaseWidget(fields, project);
+      return new LabelBaseWidget(fields);
     }
     if (fields.type === BaseWidgetType.IMAGE) {
-      return new ImageBaseWidget(fields, project);
+      return new ImageBaseWidget(fields);
     }
 
     throw new Error(INCORRECT_TYPE);
   }
 
-  constructor(
-    fields: BaseWidgetFields,
-    project?: Project
-  ) {
-    super(fields, project);
+  constructor(fields: BaseWidgetFields) {
+    super(fields);
 
     this.fields.widgetType = WidgetType.BASE_WIDGET;
   }
@@ -356,21 +338,20 @@ export class BaseWidget extends Widget {
     return this.fields.type === BaseWidgetType.IMAGE;
   }
 
-  makeCopy(parentId?: string, fromTemplate = false): Widget[] {
+  makeCopy(userApp: UserCliche, parentId?: string, fromTemplate = false): Widget[] {
     let copyWidget: BaseWidget;
-    const project = this.project;
     const fields = this.fields;
     const value = this.fields.value;
 
     // TODO this is not dry
     if (this.isLabel()) {
-      copyWidget = new LabelBaseWidget(fields, project);
+      copyWidget = new LabelBaseWidget(fields);
     }
     if (this.isLink()) {
-      copyWidget = new LinkBaseWidget(fields, project);
+      copyWidget = new LinkBaseWidget(fields);
     }
     if (this.isImage()) {
-      copyWidget = new ImageBaseWidget(fields, project);
+      copyWidget = new ImageBaseWidget(fields);
     }
 
     copyWidget.fields.id = generateId();
@@ -389,7 +370,7 @@ export class BaseWidget extends Widget {
 
     // Add it to the userApp
     // TODO not sure if this should be done here or somewhere else
-    this.project.getUserApp().addWidget(copyWidget);
+    userApp.addWidget(copyWidget);
 
     return [copyWidget];
   }
@@ -398,11 +379,8 @@ export class BaseWidget extends Widget {
 export class LinkBaseWidget extends BaseWidget {
   protected fields: LinkBaseWidgetFields;
 
-  constructor(
-    fields: LinkBaseWidgetFields,
-    project?: Project,
-  ) {
-    super(fields, project);
+  constructor(fields: LinkBaseWidgetFields) {
+    super(fields);
     this.fields.type = BaseWidgetType.LINK;
     this.fields.value = this.fields.value || { text: '', target: '' };
 
@@ -422,11 +400,8 @@ export class LinkBaseWidget extends BaseWidget {
 export class LabelBaseWidget extends BaseWidget {
   protected fields: LabelBaseWidgetFields;
 
-  constructor(
-    fields: LabelBaseWidgetFields,
-    project?: Project,
-  ) {
-    super(fields, project);
+  constructor(fields: LabelBaseWidgetFields) {
+    super(fields);
     this.fields.type = BaseWidgetType.LABEL;
     this.fields.value = this.fields.value || 'Write your label here...';
 
@@ -446,11 +421,8 @@ export class LabelBaseWidget extends BaseWidget {
 export class ImageBaseWidget extends BaseWidget {
   protected fields: ImageBaseWidgetFields;
 
-  constructor(
-    fields: ImageBaseWidgetFields,
-    project?: Project,
-  ) {
-    super(fields, project);
+  constructor(fields: ImageBaseWidgetFields) {
+    super(fields);
     this.fields.type = BaseWidgetType.IMAGE;
     // TODO this default value is not robust
     this.fields.value = this.fields.value || 'assets/image_icon.png';
@@ -479,38 +451,37 @@ export class ImageBaseWidget extends BaseWidget {
  */
 export class UserWidget extends Widget {
   protected fields: UserWidgetFields;
-  static fromJSON(fields: UserWidgetFields, project: Project): UserWidget {
+  static fromJSON(fields: UserWidgetFields): UserWidget {
     if (fields.widgetType !== WidgetType.USER_WIDGET) {
       throw new Error(INCORRECT_TYPE);
     }
-    return new UserWidget(fields, project);
+    return new UserWidget(fields);
   }
 
-  constructor(
-    fields: UserWidgetFields,
-    project?: Project,
-  ) {
-    super(fields, project);
+  constructor(fields: UserWidgetFields) {
+    super(fields);
 
     this.fields.widgetType = WidgetType.USER_WIDGET;
     this.fields.innerWidgetIds =
       fields.innerWidgetIds ? fields.innerWidgetIds.slice() : [];
   }
 
-  setAsInnerWidget(widget: Widget) {
+  // TODO perhaps this should also be a cliche function
+  setAsInnerWidget(userApp: UserCliche, widget: Widget) {
     const id = widget.getId();
     // Now the inner widgets list is the stack order
     this.fields.innerWidgetIds.push(id);
     widget.setParentId(this.getId());
-    this.project.userApp.setAsInnerWidget(widget);
+    userApp.setAsInnerWidget(widget);
   }
 
-  removeInnerWidget(id: string) {
+  // TODO perhaps this should also be a cliche function
+  removeInnerWidget(userApp: UserCliche, id: string) {
     removeFirstFromArray(id, this.fields.innerWidgetIds);
 
-    const widget = this.project.getUserApp().getWidget(id);
+    const widget = userApp.getWidget(id);
     widget.setParentId(undefined);
-    this.project.userApp.setAsFreeWidget(widget);
+    userApp.setAsFreeWidget(widget);
   }
 
   getInnerWidgetIds() {
@@ -524,7 +495,7 @@ export class UserWidget extends Widget {
    * @param widget widget we are currently looking at
    * @param targetId widget id of widget to find
    */
-  private getPathHelper(widget: Widget, targetId: string): string[] | null {
+  private getPathHelper(userApp: UserCliche, widget: Widget, targetId: string): string[] | null {
     const widgetId = widget.getId();
     // Base case 1: found it
     if (widgetId === targetId) {
@@ -536,8 +507,7 @@ export class UserWidget extends Widget {
     }
     // Recursive case, look through all the inner widgets
     for (const id of (<UserWidget>widget).fields.innerWidgetIds) {
-      const path = this.getPathHelper(
-        this.project.getUserApp().getWidget(id), targetId);
+      const path = this.getPathHelper(userApp, userApp.getWidget(id), targetId);
       if (path === null) {
         continue;
       }
@@ -554,25 +524,26 @@ export class UserWidget extends Widget {
    *
    * @param widgetId widget id of widget to find
    */
-  getPath(widgetId: string): string[] | null {
-    return this.getPathHelper(this, widgetId);
+  getPath(userApp: UserCliche, widgetId: string): string[] | null {
+    return this.getPathHelper(userApp, this, widgetId);
   }
 
+  // TODO this function should actually be in the cliche
   /**
    * Returns the wanted widget if it is a child of this widget, else null
    *
    * @param targetId id of widget to find
    * @param getParent whether to actually only get the parent of the widget
    */
-  getInnerWidget(targetId: string, getParent = false): Widget {
-    const path = this.getPath(targetId);
+  getInnerWidget(userApp: UserCliche, targetId: string, getParent = false): Widget {
+    const path = this.getPath(userApp, targetId);
     if (path === null) { // it's not actually a child
       return null;
     }
     if (getParent) {
       targetId = path[path.length - 2];
     }
-    return this.project.getUserApp().getWidget(targetId);
+    return userApp.getWidget(targetId);
   }
 
   /**
@@ -580,9 +551,8 @@ export class UserWidget extends Widget {
    * @param fromTemplate if this widget is not a template, this value is
    * ignored
    */
-  makeCopy(parentId?: string, fromTemplate = false): Widget[] {
-    const copyWidget = new UserWidget(this.fields,
-      this.project);
+  makeCopy(userApp: UserCliche, parentId?: string, fromTemplate = false): Widget[] {
+    const copyWidget = new UserWidget(this.fields);
 
     copyWidget.fields.id = generateId();
     copyWidget.fields.innerWidgetIds = [];
@@ -600,21 +570,21 @@ export class UserWidget extends Widget {
 
     // Add it to the userApp
     // TODO not sure if this should be done here or somewhere else
-    this.project.getUserApp().addWidget(copyWidget);
+    userApp.addWidget(copyWidget);
 
     let copyWidgets: Widget[] = [copyWidget];
     for (const id of this.fields.innerWidgetIds) {
-      const copyInnerWidgets = this.project.getUserApp().getWidget(id).makeCopy(copyWidget.getId(), fromTemplate);
+      const copyInnerWidgets = userApp.getWidget(id).makeCopy(userApp, copyWidget.getId(), fromTemplate);
       const innerWidgetCopy = copyInnerWidgets[0];
-      copyWidget.setAsInnerWidget(innerWidgetCopy);
+      copyWidget.setAsInnerWidget(userApp, innerWidgetCopy);
       copyWidgets = copyWidgets.concat(copyInnerWidgets);
     }
     return copyWidgets;
   }
 
-  putInnerWidgetOnTop(widget: Widget) {
+  putInnerWidgetOnTop(userApp: UserCliche, widget: Widget) {
     const topWidgetId = this.fields.innerWidgetIds[this.fields.innerWidgetIds.length - 1];
-    this.changeInnerWidgetOrderByOne(widget, true, new Set([topWidgetId]));
+    this.changeInnerWidgetOrderByOne(userApp, widget, true, new Set([topWidgetId]));
   }
 
   /**
@@ -625,11 +595,14 @@ export class UserWidget extends Widget {
    * @param isUp whether to move up or down
    */
   changeInnerWidgetOrderByOne(
-    widget: Widget, isUp: boolean, overlappingWidgetIds?: Set<string>) {
+    userApp: UserCliche,
+    widget: Widget,
+    isUp: boolean,
+    overlappingWidgetIds?: Set<string>) {
 
     const widgetId = widget.getId();
     if (!overlappingWidgetIds) {
-      overlappingWidgetIds = this.findOverlappingWidgets(widget);
+      overlappingWidgetIds = this.findOverlappingWidgets(userApp, widget);
     }
     const stackOrder = this.fields.innerWidgetIds;
     let idxThisWidget;
@@ -690,7 +663,7 @@ export class UserWidget extends Widget {
    * Finds widgets that are overlapping with the given widget
    * @param targetWidget widget we are looking at
    */
-  findOverlappingWidgets(targetWidget: Widget): Set<string> {
+  findOverlappingWidgets(userApp: UserCliche, targetWidget: Widget): Set<string> {
     const overlappingWidgets = new Set();
     const targetTop = targetWidget.getPosition().top;
     const targetLeft = targetWidget.getPosition().left;
@@ -703,7 +676,7 @@ export class UserWidget extends Widget {
       if (widgetId === targetWidget.getId()) {
         return;
       }
-      const widget = this.project.getUserApp().getWidget(widgetId);
+      const widget = userApp.getWidget(widgetId);
       const top = widget.getPosition().top;
       const left = widget.getPosition().left;
       const right = left + widget.getDimensions().width;

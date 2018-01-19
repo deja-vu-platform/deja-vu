@@ -23,29 +23,25 @@ fdescribe('Widget', () => {
       {name: 'widget1',
       dimensions: {width: 1, height: 1},
       value: {text: '', target: ''},
-      clicheId: userAppId},
-      project);
+      clicheId: userAppId});
     userApp.addWidget(widget1);
 
     widget2 = new UserWidget(
       {name: 'widget2',
       dimensions: {width: 1, height: 1},
-      clicheId: userAppId},
-      project);
+      clicheId: userAppId});
     userApp.addWidget(widget2);
 
     widget3 = new UserWidget(
       {name: 'widget3',
       dimensions: {width: 1, height: 1},
-      clicheId: userAppId},
-      project);
+      clicheId: userAppId});
     userApp.addWidget(widget3);
 
     widget4 = new UserWidget(
       {name: 'widget4',
       dimensions: {width: 1, height: 1},
-      clicheId: userAppId},
-    project);
+      clicheId: userAppId});
     userApp.addWidget(widget4);
 
     widget5 = new LinkBaseWidget(
@@ -53,40 +49,38 @@ fdescribe('Widget', () => {
       dimensions: {width: 1, height: 1},
       value: {text: '', target: ''},
       clicheId: userAppId,
-      isTemplate: true},
-      project);
+      isTemplate: true});
     userApp.addWidget(widget5);
 
     widget6 = new UserWidget(
       {name: 'widget6',
       dimensions: {width: 1, height: 1},
       clicheId: userAppId,
-      isTemplate: true},
-      project);
+      isTemplate: true});
     userApp.addWidget(widget6);
 
-    widget3.setAsInnerWidget(widget6);
+    widget3.setAsInnerWidget(userApp, widget6);
   });
 
   describe('remove', () => {
     it('removes itself from all widgets', () => {
-      widget1.remove();
+      widget1.remove(userApp);
       expect(userApp.getWidget(widget1.getId())).toBeUndefined();
     });
 
     it ('does not delete inner widget', () => {
-      widget2.setAsInnerWidget(widget1);
-      widget2.remove();
+      widget2.setAsInnerWidget(userApp, widget1);
+      widget2.remove(userApp);
 
       expect(userApp.getWidget(widget2.getId())).toBeUndefined();
       expect(userApp.getWidget(widget1.getId())).toBe(widget1);
     });
 
     it ('removes itself from its template list', () => {
-      const widget6copy = widget6.makeCopy(undefined, true)[0];
+      const widget6copy = widget6.makeCopy(userApp, undefined, true)[0];
       expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(true);
 
-      widget6copy.remove();
+      widget6copy.remove(userApp);
 
       expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(false);
     });
@@ -94,22 +88,22 @@ fdescribe('Widget', () => {
 
   describe('add and remove inner widgets', () => {
     it('adds the id of the added and removes the ids removed', () => {
-      widget2.setAsInnerWidget(widget1);
+      widget2.setAsInnerWidget(userApp, widget1);
       expect(widget2.getInnerWidgetIds()).toEqual([widget1.getId()]);
 
-      widget3.setAsInnerWidget(widget2);
+      widget3.setAsInnerWidget(userApp, widget2);
       expect(widget3.getInnerWidgetIds()).toEqual([widget6.getId(), widget2.getId()]);
 
-      widget2.removeInnerWidget(widget1.getId());
+      widget2.removeInnerWidget(userApp, widget1.getId());
       expect(widget2.getInnerWidgetIds()).toEqual([]);
 
-      widget3.removeInnerWidget(widget2.getId());
+      widget3.removeInnerWidget(userApp, widget2.getId());
       expect(widget3.getInnerWidgetIds()).toEqual([widget6.getId()]);
     });
 
     it ('does not delete removed items', () => {
-      widget2.setAsInnerWidget(widget1);
-      widget2.removeInnerWidget(widget1.getId());
+      widget2.setAsInnerWidget(userApp, widget1);
+      widget2.removeInnerWidget(userApp, widget1.getId());
 
       expect(userApp.getWidget(widget1.getId())).toBe(widget1);
     });
@@ -117,60 +111,60 @@ fdescribe('Widget', () => {
 
   describe('getPath', () => {
     it('gets all the inner widget ids including the first', () => {
-      widget2.setAsInnerWidget(widget1);
-      widget3.setAsInnerWidget(widget2);
+      widget2.setAsInnerWidget(userApp, widget1);
+      widget3.setAsInnerWidget(userApp, widget2);
 
-      expect(widget2.getPath(widget2.getId()))
+      expect(widget2.getPath(userApp, widget2.getId()))
       .toEqual([widget2.getId()]);
-      expect(widget2.getPath(widget1.getId()))
+      expect(widget2.getPath(userApp, widget1.getId()))
       .toEqual([widget2.getId(), widget1.getId()]);
-      expect(widget3.getPath(widget3.getId()))
+      expect(widget3.getPath(userApp, widget3.getId()))
       .toEqual([widget3.getId()]);
-      expect(widget3.getPath(widget2.getId()))
+      expect(widget3.getPath(userApp, widget2.getId()))
       .toEqual([widget3.getId(), widget2.getId()]);
-      expect(widget3.getPath(widget1.getId()))
+      expect(widget3.getPath(userApp, widget1.getId()))
       .toEqual([widget3.getId(), widget2.getId(), widget1.getId()]);
     });
 
     it ('returns null if there is no path', () => {
-      expect(widget3.getPath(widget4.getId()))
+      expect(widget3.getPath(userApp, widget4.getId()))
       .toBeNull();
     });
   });
 
   describe('getInnerWidget', () => {
     it ('gets the inner widget', () => {
-      widget2.setAsInnerWidget(widget1);
-      widget3.setAsInnerWidget(widget2);
+      widget2.setAsInnerWidget(userApp, widget1);
+      widget3.setAsInnerWidget(userApp, widget2);
 
-      expect(widget2.getInnerWidget(widget2.getId()))
+      expect(widget2.getInnerWidget(userApp, widget2.getId()))
       .toBe(widget2);
-      expect(widget2.getInnerWidget(widget1.getId()))
+      expect(widget2.getInnerWidget(userApp, widget1.getId()))
       .toBe(widget1);
-      expect(widget3.getInnerWidget(widget3.getId()))
+      expect(widget3.getInnerWidget(userApp, widget3.getId()))
       .toBe(widget3);
-      expect(widget3.getInnerWidget(widget2.getId()))
+      expect(widget3.getInnerWidget(userApp, widget2.getId()))
       .toBe(widget2);
-      expect(widget3.getInnerWidget(widget1.getId()))
+      expect(widget3.getInnerWidget(userApp, widget1.getId()))
       .toBe(widget1);
     });
 
     it ('returns null if there is no path', () => {
-      expect(widget3.getInnerWidget(widget4.getId()))
+      expect(widget3.getInnerWidget(userApp, widget4.getId()))
       .toBeNull();
     });
   });
 
   describe('fromObject', () => {
     it ('it creates a real widget from BaseWidgets', () => {
-      const widget5Copy = Widget.fromJSON(Widget.toJSON(widget5), project);
+      const widget5Copy = Widget.fromJSON(Widget.toJSON(widget5));
 
       expect(widget5Copy.getId()).toEqual(widget5.getId());
       expect(widget5Copy.isBaseType()).toBe(true);
     });
 
     it ('it creates a real widget from UserWidgets', () => {
-      const widget6Copy = Widget.fromJSON(Widget.toJSON(widget6), project);
+      const widget6Copy = Widget.fromJSON(Widget.toJSON(widget6));
 
       expect(widget6Copy.getId()).toEqual(widget6.getId());
       expect(widget6Copy.isUserType()).toBe(true);
@@ -179,9 +173,9 @@ fdescribe('Widget', () => {
 
   describe('makecopy', () => {
     it ('returns all the copied inner widgets', () => {
-      widget2.setAsInnerWidget(widget1);
-      widget3.setAsInnerWidget(widget2);
-      const widget3copies = widget3.makeCopy();
+      widget2.setAsInnerWidget(userApp, widget1);
+      widget3.setAsInnerWidget(userApp, widget2);
+      const widget3copies = widget3.makeCopy(userApp);
 
       expect(widget3copies.length).toBe(4);
       expect(widget3copies[0].getName()).toEqual('widget3');
@@ -202,8 +196,8 @@ fdescribe('Widget', () => {
     });
 
     it ('not from template of a template creates another template', () => {
-      widget6.setAsInnerWidget(widget5);
-      const widget6copies = widget6.makeCopy();
+      widget6.setAsInnerWidget(userApp, widget5);
+      const widget6copies = widget6.makeCopy(userApp);
 
       expect(widget6copies[0].getTemplateId()).toBeUndefined();
       expect(widget6copies[0].isTemplate()).toBe(true);
@@ -212,8 +206,8 @@ fdescribe('Widget', () => {
     });
 
     it ('from template of a template creates a normal widget', () => {
-      widget6.setAsInnerWidget(widget5);
-      const widget6copies = widget6.makeCopy(undefined, true);
+      widget6.setAsInnerWidget(userApp, widget5);
+      const widget6copies = widget6.makeCopy(userApp, undefined, true);
 
       expect(widget6copies[0].getTemplateId()).toEqual(widget6.getId());
       expect(widget6copies[0].isTemplate()).toBe(false);
@@ -224,10 +218,10 @@ fdescribe('Widget', () => {
 
   describe('layout', () => {
     it('copying properly copies over the layout', () => {
-      widget2.setAsInnerWidget(widget1);
+      widget2.setAsInnerWidget(userApp, widget1);
       widget1.updatePosition({top: 5, left: 6});
 
-      const widget2Copies = widget2.makeCopy();
+      const widget2Copies = widget2.makeCopy(userApp);
       const widget2Copy = <UserWidget>widget2Copies[0];
       const widget1Copy = widget2Copies[1];
       expect(widget1Copy.getPosition()).toEqual(widget1.getPosition());
@@ -252,41 +246,41 @@ fdescribe('Widget', () => {
       widget1.updateCustomStyle('background-color', 'red');
       const styles = widget1.getLocalCustomStyles();
 
-      expect(widget1.getCustomStylesToShow()).toEqual(styles);
+      expect(widget1.getCustomStylesToShow(userApp)).toEqual(styles);
     });
 
     it('getCustomStylesToShow with template gets template styles ' +
     'but local styles are empty', () => {
-      widget6.setAsInnerWidget(widget5);
+      widget6.setAsInnerWidget(userApp, widget5);
       widget6.updateCustomStyle('background-color', 'red');
       const widget6Styles = widget6.getLocalCustomStyles();
-      const widgetCopies = widget6.makeCopy(undefined, true);
+      const widgetCopies = widget6.makeCopy(userApp, undefined, true);
       const widget6copy = widgetCopies[0];
       const widget6copyStyles = widget6copy.getLocalCustomStyles();
 
       expect(widget6copyStyles).toEqual({});
-      expect(widget6copy.getCustomStylesToShow()).toEqual(widget6Styles);
+      expect(widget6copy.getCustomStylesToShow(userApp)).toEqual(widget6Styles);
 
       const widget5Styles1 = widget5.getLocalCustomStyles();
       const widget5copy = widgetCopies[1];
       const widget5copyStyles1 = widget5copy.getLocalCustomStyles();
 
       expect(widget5copyStyles1).toEqual({});
-      expect(widget5copy.getCustomStylesToShow()).toEqual(widget5Styles1);
+      expect(widget5copy.getCustomStylesToShow(userApp)).toEqual(widget5Styles1);
 
       widget5.updateCustomStyle('background-color', 'blue');
       const widget5Styles2 = widget5.getLocalCustomStyles();
       const widget5copyStyles2 = widget5copy.getLocalCustomStyles();
 
       expect(widget5copyStyles2).toEqual({});
-      expect(widget5copy.getCustomStylesToShow()).toEqual(widget5Styles2);
+      expect(widget5copy.getCustomStylesToShow(userApp)).toEqual(widget5Styles2);
     });
 
     it('getCustomStylesToShow inheritence is parent < template < self',
     () => {
       widget6.updateCustomStyle('background-color', 'red');
       widget6.updateCustomStyle('color', 'red');
-      const widget6copy = widget6.makeCopy(undefined, true)[0];
+      const widget6copy = widget6.makeCopy(userApp, undefined, true)[0];
 
       widget6copy.updateCustomStyle('color', 'blue');
       widget6copy.updateCustomStyle('font-weight', 'bold');
@@ -303,7 +297,7 @@ fdescribe('Widget', () => {
         'font-weight': 'bold'
       };
 
-      const styles = widget6copy.getCustomStylesToShow(parentStyles);
+      const styles = widget6copy.getCustomStylesToShow(userApp, parentStyles);
 
       expect(styles).toEqual(expectedStyles);
     });
@@ -319,15 +313,15 @@ fdescribe('Widget', () => {
         widget5.getId()
       ];
 
-      widget6.setAsInnerWidget(widget1);
-      widget6.setAsInnerWidget(widget2);
-      widget6.setAsInnerWidget(widget3);
-      widget6.setAsInnerWidget(widget4);
-      widget6.setAsInnerWidget(widget5);
+      widget6.setAsInnerWidget(userApp, widget1);
+      widget6.setAsInnerWidget(userApp, widget2);
+      widget6.setAsInnerWidget(userApp, widget3);
+      widget6.setAsInnerWidget(userApp, widget4);
+      widget6.setAsInnerWidget(userApp, widget5);
 
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
-      widget6.putInnerWidgetOnTop(widget3);
+      widget6.putInnerWidgetOnTop(userApp, widget3);
       let expectedOrder = [
         widget1.getId(),
         widget2.getId(),
@@ -338,7 +332,7 @@ fdescribe('Widget', () => {
 
       expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
-      widget6.putInnerWidgetOnTop(widget1);
+      widget6.putInnerWidgetOnTop(userApp, widget1);
       expectedOrder = [
         widget2.getId(),
         widget4.getId(),
@@ -349,7 +343,7 @@ fdescribe('Widget', () => {
 
       expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
-      widget6.putInnerWidgetOnTop(widget1);
+      widget6.putInnerWidgetOnTop(userApp, widget1);
       expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
     });
 
@@ -362,16 +356,16 @@ fdescribe('Widget', () => {
         widget5.getId()
       ];
 
-      widget6.setAsInnerWidget(widget1);
-      widget6.setAsInnerWidget(widget2);
-      widget6.setAsInnerWidget(widget3);
-      widget6.setAsInnerWidget(widget4);
-      widget6.setAsInnerWidget(widget5);
+      widget6.setAsInnerWidget(userApp, widget1);
+      widget6.setAsInnerWidget(userApp, widget2);
+      widget6.setAsInnerWidget(userApp, widget3);
+      widget6.setAsInnerWidget(userApp, widget4);
+      widget6.setAsInnerWidget(userApp, widget5);
 
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
       const overlap = new Set([widget3.getId(), widget4.getId()]);
-      widget6.changeInnerWidgetOrderByOne(widget1, true, overlap);
+      widget6.changeInnerWidgetOrderByOne(userApp, widget1, true, overlap);
       let expectedOrder = [
         widget2.getId(),
         widget3.getId(),
@@ -383,7 +377,7 @@ fdescribe('Widget', () => {
       expect(widget6.getInnerWidgetIds()).toEqual(expectedOrder);
 
 
-      widget6.changeInnerWidgetOrderByOne(widget1, false, overlap);
+      widget6.changeInnerWidgetOrderByOne(userApp, widget1, false, overlap);
       expectedOrder = [
         widget2.getId(),
         widget1.getId(),
@@ -405,7 +399,7 @@ fdescribe('Widget', () => {
         widget5
       ];
       widgetsInOrder.forEach((widget) => {
-        widget6.setAsInnerWidget(widget);
+        widget6.setAsInnerWidget(userApp, widget);
       });
 
       // 1 and 2 have normal overlap
@@ -420,16 +414,16 @@ fdescribe('Widget', () => {
       widget4.updateDimensions({height: 10, width: 10});
       widget5.updatePosition({top: 102, left: 102});
 
-      expect(widget6.findOverlappingWidgets(widget1))
+      expect(widget6.findOverlappingWidgets(userApp, widget1))
         .toEqual(new Set([widget2.getId()]));
-      expect(widget6.findOverlappingWidgets(widget2))
+      expect(widget6.findOverlappingWidgets(userApp, widget2))
         .toEqual(new Set([widget1.getId()]));
 
-      expect(widget6.findOverlappingWidgets(widget4))
+      expect(widget6.findOverlappingWidgets(userApp, widget4))
         .toEqual(new Set([widget3.getId(), widget5.getId()]));
-      expect(widget6.findOverlappingWidgets(widget3))
+      expect(widget6.findOverlappingWidgets(userApp, widget3))
         .toEqual(new Set([widget4.getId()]));
-      expect(widget6.findOverlappingWidgets(widget5))
+      expect(widget6.findOverlappingWidgets(userApp, widget5))
         .toEqual(new Set([widget4.getId()]));
     });
   });
