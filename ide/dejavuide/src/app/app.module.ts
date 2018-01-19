@@ -16,6 +16,7 @@ import { ProjectExplorerModule } from './components/project_explorer/project_exp
 import { ProjectExplorerComponent } from './components/project_explorer/project_explorer.component';
 import { RouterService } from './services/router.service';
 import { CustomRouteReuseStrategy } from './services/CustomRouteReuseStrategy';
+import { PaletteService } from './services/palette.service';
 
 const appRoutes: Routes = [
   { path: 'projects', component: ProjectExplorerComponent},
@@ -41,6 +42,7 @@ const appRoutes: Routes = [
     StateService,
     ProjectService,
     CommunicatorService,
+    PaletteService,
     {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy}],
   bootstrap: [AppComponent]
 })

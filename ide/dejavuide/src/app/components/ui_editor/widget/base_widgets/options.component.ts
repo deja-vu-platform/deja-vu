@@ -2,6 +2,8 @@ import { Component, Input, AfterViewInit, ViewChild, ElementRef } from '@angular
 
 import { Widget, UserWidget } from '../../../../models/widget/widget';
 import { ProjectService } from '../../../../services/project.service';
+import { PaletteService } from '../../../../services/palette.service';
+
 
 declare const jscolor: any;
 
@@ -24,7 +26,10 @@ export class WidgetOptionsComponent implements AfterViewInit {
   pickerText;
   pickerBg;
 
-  constructor (private projectService: ProjectService) {}
+  constructor (
+    private projectService: ProjectService,
+    private paletteService: PaletteService) {
+  }
 
   ngAfterViewInit () {
     const localStyles = this.widget.getLocalCustomStyles();
@@ -32,12 +37,12 @@ export class WidgetOptionsComponent implements AfterViewInit {
     this.pickerText = new jscolor(this.textInputElt.nativeElement);
     this.pickerText.closable = true;
     this.pickerText.closeText = 'X';
-    this.pickerText.fromString(localStyles[COLOR] || '000000');
+    this.pickerText.fromString(localStyles[COLOR] || '#000000');
 
     this.pickerBg = new jscolor(this.bgInputElt.nativeElement);
     this.pickerBg.closable = true;
     this.pickerBg.closeText = 'X';
-    this.pickerBg.fromString(localStyles[BACKGROUND] || 'FFFFFF');
+    this.pickerBg.fromString(localStyles[BACKGROUND] || '#FFFFFF');
   }
 
   clearStyles() {
@@ -105,6 +110,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   textColorChange(event) {
     event.stopPropagation();
     const color = this.pickerText.toHEXString();
+    this.paletteService.newColor(color);
     this.widget.updateCustomStyle(COLOR, color);
     this.projectService.widgetUpdated();
   }
@@ -117,6 +123,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   bgColorChange(event) {
     event.stopPropagation();
     const color = this.pickerBg.toHEXString();
+    this.paletteService.newColor(color);
     this.widget.updateCustomStyle(BACKGROUND, color);
     this.projectService.widgetUpdated();
   }

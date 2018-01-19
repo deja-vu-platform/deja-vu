@@ -155,7 +155,6 @@ export class UserCliche extends Cliche {
     this.checkWidgetInCliche(widget);
     this.cleanAssociations(widget.getId());
     this.fields.pageIds.push(widget.getId());
-    // TODO add inner widgets as used widgets
   }
 
   getPageIds(): string[] {

@@ -1,4 +1,4 @@
-import { Component, Input,Output, ElementRef, EventEmitter, ViewChild, OnInit } from '@angular/core';
+import { Component, Input, Output, ElementRef, EventEmitter, ViewChild, OnInit } from '@angular/core';
 
 declare const jscolor: any;
 
@@ -19,7 +19,7 @@ export class PaletteCellComponent implements OnInit {
       this.picker = new jscolor(this.colorInputElt.nativeElement);
       this.picker.closable = true;
       this.picker.closeText = 'X';
-      this.picker.fromString(this.color || '000000');
+      this.picker.fromString(this.color || '#000000');
     }
   }
 

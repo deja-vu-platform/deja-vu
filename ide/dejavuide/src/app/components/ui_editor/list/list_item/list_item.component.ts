@@ -145,79 +145,12 @@ export class ListItemComponent implements OnInit, AfterViewInit {
 
   private deleteUserWidget() {
     console.log('clicked delete');
-    // if (userApp.getNumWidgets() == 1){
-    //     return; //don't delete the last one TODO is the the right way to go?
-    // }
-    // userApp.deleteWidget(userWidgetId);
-    // var workSurfaceRef = workSurface.getWorkSurfaceRef();
+    const userApp = this.projectService.getProject().getUserApp();
+    // TODO either disallow the selected widget to be deleted, or
+    // update the worksurface reference to null if it is deleted
 
-    // $('#'+workSurfaceRef+'_'+userWidgetId).remove();
-    // $('#disabled_'+userWidgetId+'_'+workSurfaceRef+'_'+userWidgetId).remove(); // also remove disabled ones
-
-    // if (userWidgetId == selectedUserWidget.meta.id){ // strings will also do
-    //     var otherIds = userApp.getAllWidgetIds();
-    //     selectedUserWidget = userApp.getWidget(otherIds[0]);
-    //     workSurface.loadUserWidget(selectedUserWidget, currentZoom);
-    // }
-    // if (userWidgetId == userApp.widgets.indexId){
-    //     userApp.widgets.indexId = null;
-    // }
-    // listDisplay.refresh();
+    userApp.removeWidget(this.widget.getId());
+    this.projectService.widgetUpdated();
   }
-
-  // that.select = function(id){
-  //     $('.selected').removeClass("selected");
-  //     $("[data-componentid='" + id + "']").addClass('selected');
-  // };
 }
-
-
-// $('.components').on('click', '.component-name-container', function () {
-//   // Save the current values
-//   var oldState = {zoom : currentZoom};
-//   var workSurfaceRef = workSurface.getWorkSurfaceRef();
-//   $('#'+workSurfaceRef+'_'+selectedUserWidget.meta.id).data('state', oldState);
-//   dragAndDrop.registerWidgetDragHandleDraggable();
-//   var widgetId = $(this).closest('.widget').data('componentid');
-//   listDisplay.select(widgetId);
-//   selectedUserWidget = userApp.getWidget(widgetId);
-//   listDisplay.updateDraggables(selectedUserWidget);
-//   workSurface.loadUserWidget(selectedUserWidget);
-//   style.setUpStyleColors(selectedUserWidget);
-//   $('#outer-container').scrollTop(0); // TODO DRY
-//   $('#outer-container').scrollLeft(0);
-
-// });
-
-// $('.components').on('dblclick', '.component-name', function (e) {
-//   var newNameInputElt = $($(this).parent().find('.new-name-input'));
-//   var submitRenameElt = $($(this).parent().find('.submit-rename'));
-//   newNameInputElt.val($(this).text());
-//   submitRenameElt.removeClass('not-displayed');
-//   $(this).addClass('not-displayed');
-//   newNameInputElt.focus();
-//   newNameInputElt.select();
-// });
-
-// $('.components').on('keypress', '.new-name-input', function (event) {
-//   if (event.which == 13) {
-//       event.preventDefault();
-//       var widgetListElt = $(this).closest('.widget');
-//       var widgetId = widgetListElt.data('componentid');
-//       var widgetNameElt = widgetListElt.find('.component-name');
-//       var submitRenameElt = widgetListElt.closest('.widget').find('.submit-rename');
-
-//       widgetNameElt.removeClass('not-displayed');
-//       submitRenameElt.addClass('not-displayed');
-//       var newName = $(this).val();
-//       if (newName.length === 0) { // empty string entered, don't change the name!
-//           return;
-//       }
-//       widgetNameElt.text(newName);
-//       $('.component-options .component-name').text(newName);
-
-//       var widget = userApp.getWidget(widgetId);
-//       widget.meta.name = newName;
-//   }
-// });
 

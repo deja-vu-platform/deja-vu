@@ -12,8 +12,7 @@ export class DeleteDialogComponent {
     public dialogRef: MatDialogRef<DeleteDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any) { }
 
-  onNoClick(): void {
-    this.dialogRef.close();
+  onDone(result: boolean): void {
+    this.dialogRef.close(result);
   }
-
 }

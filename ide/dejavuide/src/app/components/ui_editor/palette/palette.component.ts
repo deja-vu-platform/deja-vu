@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 import { UserWidget } from '../../../models/widget/widget';
+import { PaletteService } from '../../../services/palette.service';
 
 declare const jscolor: any;
 
@@ -27,9 +28,13 @@ export class PaletteComponent {
 
   selectedPaletteEltNum = -1;
 
-  constructor() {
-    // TODO load palette function input
+  constructor(private paletteService: PaletteService) {
+    // TODO get the palette to load
     this.loadPalette();
+
+    this.paletteService.newColorListener.subscribe(color => {
+      this.addNewColorToCurrentColors(color);
+    });
   }
 
   addNewColorToCurrentColors (color, idx?) {
@@ -48,8 +53,6 @@ export class PaletteComponent {
       }
     }
   }
-
-  // TODO function making palette and each cell a picker object
 
   currentColorClick(i: number) {
     if (this.selectedPaletteEltNum >= 0) {
@@ -79,10 +82,10 @@ export class PaletteComponent {
     }
     // TODO this is just for testing
     this.currentColors = [
-      '823110',
-      '334281',
-      '148352',
-      '357423'
+      '#823110',
+      '#334281',
+      '#148352',
+      '#357423'
     ];
   }
 

@@ -27,13 +27,11 @@ export class HeaderComponent implements OnInit {
       console.log(event);
     });
 
-    this.page = this.routerService.getSelectedPage();
-
     this.routerService.newPageType.subscribe((pageType) => {
       this.updateHeaderData(pageType);
     });
 
-    // TODO should this be somewhere else?
+    this.page = this.routerService.getSelectedPage();
     this.handleRedirectClick(this.page.type);
   }
 
