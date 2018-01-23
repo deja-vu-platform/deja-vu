@@ -4,7 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 
 @Component({
   selector: 'dv-new-project-dialog',
-  templateUrl: 'new_project_dialog.component.html',
+  templateUrl: 'new-project-dialog.component.html',
 })
 export class NewProjectDialogComponent {
   result = {

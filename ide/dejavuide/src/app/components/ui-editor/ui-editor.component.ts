@@ -13,8 +13,8 @@ const $ = <any>jQuery;
 
 @Component({
   selector: 'dv-ui-editor',
-  templateUrl: './ui_editor.component.html',
-  styleUrls: ['./ui_editor.component.css']
+  templateUrl: './ui-editor.component.html',
+  styleUrls: ['./ui-editor.component.css']
 })
 export class UiEditorComponent implements OnInit, AfterViewInit {
   @ViewChild('worksurface', {read: ElementRef}) private worksurfaceElt: ElementRef;

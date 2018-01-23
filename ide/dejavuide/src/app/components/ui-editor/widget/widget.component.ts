@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit, ElementRef, OnChanges, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
 
 import { Cliche } from '../../../models/cliche/cliche';
 import { Widget, UserWidget } from '../../../models/widget/widget';
@@ -15,7 +15,7 @@ const $ = <any>jQuery;
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class WidgetComponent implements AfterViewInit, OnInit, OnChanges, OnDestroy {
+export class WidgetComponent implements AfterViewInit, OnInit, OnDestroy {
   @Input() widget: Widget;
   @Input() isSelected = false;
   /**
@@ -37,7 +37,7 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges, OnDest
       this.el = el.nativeElement;
   }
 
-  ngOnChanges() {
+  ngOnInit() {
     this.el.style.top = this.widget.getPosition().top + 'px';
     this.el.style.left = this.widget.getPosition().left + 'px';
     this.el.style.position = 'absolute';
@@ -46,9 +46,6 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnChanges, OnDest
     this.getInnerWidgets();
 
     this.updateStylesToShow();
-  }
-
-  ngOnInit() {
     this.subscriptions.push(
     this.projectService.widgetUpdateListener.subscribe(() => {
       this.getInnerWidgets();

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, ChangeDetectorRef, EventEmitter, Output, NgZone } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { ProjectDeleteDialogComponent } from './project_delete_dialog.component';
-import { NewProjectDialogComponent } from './new_project_dialog.component';
+import { ProjectDeleteDialogComponent } from './project-delete-dialog.component';
+import { NewProjectDialogComponent } from './new-project-dialog.component';
 import { RouterService, PageType } from '../../services/router.service';
 import { ProjectService } from '../../services/project.service';
 import { CommunicatorService } from '../../services/communicator.service';
@@ -16,8 +16,8 @@ interface DisplayProject {
 
 @Component({
   selector: 'dv-project-explorer',
-  templateUrl: './project_explorer.component.html',
-  styleUrls: ['./project_explorer.component.css']
+  templateUrl: './project-explorer.component.html',
+  styleUrls: ['./project-explorer.component.css']
 })
 export class ProjectExplorerComponent implements OnInit {
   @Input() currentProject;

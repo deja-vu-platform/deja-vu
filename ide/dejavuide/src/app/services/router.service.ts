@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 export enum PageType {
-  PROJECT_EXPLORER, UI_EDITOR
+  PROJECT_EXPLORER, UI_EDITOR, CLICHES
 }
 
 export interface PageInfo {
@@ -20,20 +20,17 @@ const pages: PageInfo[] = [
   },
   {
     title: 'Cliches',
-    type: null
+    type: PageType.CLICHES
   },
   {
     title: 'Widgets',
     type: PageType.UI_EDITOR
-  },
-  {
-    title: 'Data',
-    type: null
   }];
 
 const pageToUrl: Map<PageType, string> = new Map([
   [PageType.PROJECT_EXPLORER, '/projects'],
-  [PageType.UI_EDITOR, '/ui_editor']
+  [PageType.UI_EDITOR, '/ui-editor'],
+  [PageType.CLICHES, '/cliche-list']
 ]);
 
 @Injectable()

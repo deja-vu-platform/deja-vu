@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
-import { ProjectPreviewComponent } from './project_preview.component';
+import { ProjectPreviewComponent } from './project-preview.component';
 
 @NgModule({
   declarations: [
