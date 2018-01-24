@@ -111,7 +111,7 @@ export class ProjectExplorerComponent implements OnInit {
     });
   }
 
-  private loadProjectList(recentSelected = true) {
+  loadProjectList(recentSelected = true) {
     this.recentSelected = recentSelected;
     this.updateDisplayProjectList();
   }

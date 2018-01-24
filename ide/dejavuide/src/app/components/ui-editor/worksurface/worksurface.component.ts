@@ -173,7 +173,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('destroyed');
   }
 
-  private handleWindowResize() {
+  handleWindowResize() {
     const windowjq = $(window);
 
     const windowSize = {
