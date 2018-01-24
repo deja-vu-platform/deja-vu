@@ -18,8 +18,6 @@ const $ = <any>jQuery;
 })
 export class UiEditorComponent implements OnInit, AfterViewInit {
   @ViewChild('worksurface', {read: ElementRef}) private worksurfaceElt: ElementRef;
-  private windowSize: Dimensions;
-
   selectedProject: Project;
   private userApp: UserCliche;
   selectedWidget: Widget;
@@ -31,37 +29,14 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     private ref: ChangeDetectorRef) {
   }
 
-  private handleWindowResize() {
-    const windowjq = $(window);
-
-    this.windowSize = {
-      height: windowjq.height(),
-      width: windowjq.width()
-    };
-    const newSize = {
-      height: this.windowSize.height - 60,
-      width: this.windowSize.width - 250
-    };
-    this.worksurfaceElt.nativeElement.style.height =
-      newSize.height + 'px';
-    this.worksurfaceElt.nativeElement.style.width =
-      newSize.width + 'px';
-
-    // Without setTimeout causes an
-    // ExpressionChangedAfterItHasBeenCheckedError
-    setTimeout(() => {
-      this.stateService.updateVisibleWindowDimensions(newSize);
-    }, 0);
-  }
-
   ngAfterViewInit() {
-    this.handleWindowResize();
-    this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
-      if (this.selectedWidget !== newSelectedWidget) {
-        this.refreshWorkSurface(newSelectedWidget);
-      }
-      // console.log('new selected widget');
-    });
+    // this.handleWindowResize();
+    // this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
+    //   if (this.selectedWidget !== newSelectedWidget) {
+    //     this.refreshWorkSurface(newSelectedWidget);
+    //   }
+    //   // console.log('new selected widget');
+    // });
   }
 
   ngOnInit() {
@@ -137,12 +112,12 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     this.projectService.updateSelectedWidget(this.selectedWidget);
   }
 
-  refreshWorkSurface(widget: Widget) {
-    this.selectedWidget = null;
-    this.ref.detectChanges();
-    this.selectedWidget = widget;
-    this.ref.detectChanges();
+  // refreshWorkSurface(widget: Widget) {
+  //   this.selectedWidget = null;
+  //   this.ref.detectChanges();
+  //   this.selectedWidget = widget;
+  //   this.ref.detectChanges();
 
-    this.handleWindowResize();
-  }
+  //   this.handleWindowResize();
+  // }
 }

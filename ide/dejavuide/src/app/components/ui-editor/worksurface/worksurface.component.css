@@ -1,8 +1,8 @@
-.work-surface {
-  position: relative;
-  /* background: palevioletred; */
-}
-
 .highlight {
   background: lightblue;
+}
+
+:host{
+  position: relative;
+  overflow: scroll;
 }

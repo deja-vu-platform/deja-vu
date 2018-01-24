@@ -1,9 +1,14 @@
+<div (window:resize)="handleWindowResize()"></div>
 <div class="work-surface widget-work-surface"
     [style.height.px] ="selectedScreenDimensions.height"
     [style.width.px]="selectedScreenDimensions.width">
-  <dv-widget *ngIf="selectedWidget$ | async as selectedWidget"
-              [widget]="selectedWidget"
-              [isSelected]="true"
-              [isMovable]="true">
-  </dv-widget>
+  <ng-container *ngIf="selectedWidget$ | async as selectedWidgets">
+    <!-- This is a hack. We want the dv-widget to be destroyed and re-created
+    when the selected widget changes. The ngFor lets us do this. -->
+    <dv-widget *ngFor="let selectedWidget of selectedWidgets"
+      [widget]="selectedWidget"
+      [isSelected]="true"
+      [isMovable]="true">
+    </dv-widget>  
+  </ng-container>
 </div>

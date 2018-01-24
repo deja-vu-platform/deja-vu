@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { UiEditorComponent } from './ui-editor.component';
 import { WorkSurfaceComponent } from './worksurface/worksurface.component';
+import { WidgetComponent } from './widget/widget.component';
 
 const widgetsRoutes: Routes = [
   { path: 'ui-editor',
@@ -23,4 +24,4 @@ const widgetsRoutes: Routes = [
     RouterModule
   ]
 })
-export class WidgetRoutingModule { }
+export class UiEditorRoutingModule { }

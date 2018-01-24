@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
 
 import { Cliche } from '../../../models/cliche/cliche';
 import { Widget, UserWidget } from '../../../models/widget/widget';
@@ -15,7 +15,7 @@ const $ = <any>jQuery;
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class WidgetComponent implements AfterViewInit, OnInit, OnDestroy {
+export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDestroy {
   @Input() widget: Widget;
   @Input() isSelected = false;
   /**
@@ -35,23 +35,45 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnDestroy {
     private projectService: ProjectService
   ) {
       this.el = el.nativeElement;
+      this.projectService.widgetUpdateListener.subscribe(() => {
+
+        this.getInnerWidgets();
+      });
   }
 
-  ngOnInit() {
+  ngOnChanges() {
+    console.log(this.widget.getName());
     this.el.style.top = this.widget.getPosition().top + 'px';
     this.el.style.left = this.widget.getPosition().left + 'px';
-    this.el.style.position = 'absolute';
+    this.el.style.height = this.widget.getDimensions().height + 'px';
+    this.el.style.width = this.widget.getDimensions().width + 'px';
 
     // get inner widgets
     this.getInnerWidgets();
 
     this.updateStylesToShow();
-    this.subscriptions.push(
-    this.projectService.widgetUpdateListener.subscribe(() => {
-      this.getInnerWidgets();
-      // const localStyles = this.widget.getLocalCustomStyles();
-      this.updateStylesToShow();
-    }));
+
+    if (this.isSelected || this.isMovable) {
+      this.makeWidgetDraggable();
+      this.makeWidgetResizable();
+    }
+  }
+
+  ngOnInit() {
+    // this.el.style.top = this.widget.getPosition().top + 'px';
+    // this.el.style.left = this.widget.getPosition().left + 'px';
+    // this.el.style.position = 'absolute';
+
+    // // get inner widgets
+    // this.getInnerWidgets();
+
+    // this.updateStylesToShow();
+    // this.subscriptions.push(
+    // this.projectService.widgetUpdateListener.subscribe(() => {
+    //   this.getInnerWidgets();
+    //   // const localStyles = this.widget.getLocalCustomStyles();
+    //   this.updateStylesToShow();
+    // }));
 
   }
 
@@ -67,10 +89,10 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnDestroy {
     // Initiate draggable based on certain things
     // If it's the selected widget, it is always movable
     // Otherwise make it movable based on the flag.
-    if (this.isSelected || this.isMovable) {
-      this.makeWidgetDraggable();
-      this.makeWidgetResizable();
-    }
+    // if (this.isSelected || this.isMovable) {
+    //   this.makeWidgetDraggable();
+    //   this.makeWidgetResizable();
+    // }
   }
 
   private makeWidgetDraggable() {
@@ -126,6 +148,7 @@ export class WidgetComponent implements AfterViewInit, OnInit, OnDestroy {
   private updateStylesToShow() {
     const userApp = this.projectService.getProject().getUserApp();
     const stylesToShow = this.widget.getCustomStylesToShow(userApp);
+
     Object.keys(stylesToShow).forEach((name) => {
       this.el.style[name] = stylesToShow[name];
     });

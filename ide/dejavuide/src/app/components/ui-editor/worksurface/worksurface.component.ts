@@ -26,10 +26,10 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
    * Dimensions of the screen the user is building an app for.
    */
   selectedScreenDimensions: Dimensions;
-  selectedWidget$: Observable<Widget>;
-  @Input() selectedWidget: Widget;
+  selectedWidget$: Observable<Widget[]>;
+  selectedWidget: Widget;
 
-  private elt: HTMLElement;
+  private el: HTMLElement;
   private currentZoom = 1;
   private visibleWindowScroll: Position;
   private subscriptions = [];
@@ -41,7 +41,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
     private projectService: ProjectService,
     private ref: ChangeDetectorRef
   ) {
-    this.elt = elt.nativeElement;
+    this.el = elt.nativeElement;
 
     this.subscriptions.push(stateService.zoom.subscribe((newZoom) => {
       this.currentZoom = newZoom;
@@ -63,40 +63,26 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit() {
     console.log('worksurface init');
-    console.log(this.route);
-    console.log(this.route.paramMap);
-    this.route.paramMap.subscribe((params: ParamMap) => {
-      console.log(params);
-    });
-    this.route.paramMap.map((params: ParamMap) => {
-      console.log(params);
-    });
-    this.route.paramMap.switchMap((params: ParamMap) => {
-      console.log(params);
-      const userApp = this.projectService.getProject().getUserApp();
-      const widget = userApp.getWidget(params.get('id'));
-      console.log(widget);
-      return Observable.create([]);
-    });
     this.selectedWidget$ = this.route.paramMap.map((params: ParamMap) => {
-      console.log(params);
       const userApp = this.projectService.getProject().getUserApp();
-      const widget = userApp.getWidget(params.get('id'));
-      console.log(widget);
-      return widget;
+      this.selectedWidget = userApp.getWidget(params.get('id'));
+
+      // Since state service is shared
+      this.stateService.updateVisibleWindowScrollPosition({
+        top: 0, left: 0
+      });
+      console.log(this.selectedWidget);
+      return [this.selectedWidget];
     });
   }
 
   ngAfterViewInit() {
+    this.handleWindowResize();
     this.makeWorksurfaceDroppable();
 
-    // Since state service is shared
-    this.stateService.updateVisibleWindowScrollPosition({
-      top: 0, left: 0
-    });
 
-    $(this.elt).scroll((event: Event) => {
-      const elt = $(this.elt);
+    $(this.el).scroll((event: Event) => {
+      const elt = $(this.el);
       this.stateService.updateVisibleWindowScrollPosition({
         top: elt.scrollTop(),
         left: elt.scrollLeft()
@@ -106,7 +92,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   private makeWorksurfaceDroppable() {
-    $(this.elt).droppable({
+    $(this.el).droppable({
       accept: 'dv-widget, .widget-component, dv-list-item',
       hoverClass: 'highlight',
       tolerance: 'touch',
@@ -185,5 +171,31 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
       sub.unsubscribe();
     });
     console.log('destroyed');
+  }
+
+  private handleWindowResize() {
+    const windowjq = $(window);
+
+    const windowSize = {
+      height: windowjq.height(),
+      width: windowjq.width()
+    };
+    const newSize = {
+      height: windowSize.height - 60,
+      width: windowSize.width - 250
+    };
+    this.el.style.height = newSize.height + 'px';
+    this.el.style.width = newSize.width + 'px';
+    console.log('resizing');
+    // Without setTimeout causes an
+    // ExpressionChangedAfterItHasBeenCheckedError
+    // setTimeout(() => {
+      this.stateService.updateVisibleWindowDimensions(newSize);
+    // }, 0);
+  }
+
+
+  private update(id?) {
+
   }
 }

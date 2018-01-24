@@ -1,4 +1,4 @@
-<div class="widget-component"
+<ng-container
       *ngIf="widget"
       [style.height.px]="widget.getDimensions().height"
       [style.width.px]="widget.getDimensions().width">
@@ -23,6 +23,6 @@
     <dv-image-widget *ngIf="widget.isImage()"
       [widget]="widget"></dv-image-widget>
   </ng-container>
-</div>
+</ng-container>
 
 

@@ -1,15 +1,18 @@
 <ng-container *ngIf="selectedProject">
-  <div (window:resize)="handleWindowResize()"></div>
   <div class="edit">
     <div class="project-options-container">
       <div class="project-options">
-          <div class="project-name">
-            <div>{{selectedProject.getName()}}</div>
-          </div>
-          <ul class="nav nav-tabs">
-              <li class="active" id="build-mode"><a>Build</a></li>
-              <li id="style-mode"><a>Style</a></li>
-          </ul>
+        <div class="project-name">
+          <div>{{selectedProject.getName()}}</div>
+        </div>
+        <ul class="nav nav-tabs">
+          <li class="active" id="build-mode">
+            <a>Build</a>
+          </li>
+          <li id="style-mode">
+            <a>Style</a>
+          </li>
+        </ul>
       </div>
       <div class="components">
         <dv-list>
@@ -20,14 +23,14 @@
         <dv-palette></dv-palette>
       </div>
     </div>
-<!-- 
+    <!-- 
     <dv-worksurface #worksurface 
       *ngIf="selectedWidget"
       [selectedWidget]="selectedWidget">
     </dv-worksurface> -->
-    <router-outlet #worksurface></router-outlet>
+    <router-outlet></router-outlet>
   </div>
-  
+
   <dv-zoom></dv-zoom>
 
   <dv-map></dv-map>
