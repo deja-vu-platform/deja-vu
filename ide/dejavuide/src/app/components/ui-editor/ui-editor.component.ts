@@ -112,13 +112,4 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     // worksurface
     this.projectService.updateSelectedWidget(this.selectedWidget);
   }
-
-  // refreshWorkSurface(widget: Widget) {
-  //   this.selectedWidget = null;
-  //   this.ref.detectChanges();
-  //   this.selectedWidget = widget;
-  //   this.ref.detectChanges();
-
-  //   this.handleWindowResize();
-  // }
 }

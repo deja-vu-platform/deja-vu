@@ -1,5 +1,5 @@
 
-import { Component, Input, OnInit, OnDestroy, ElementRef} from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, ElementRef} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
@@ -11,7 +11,7 @@ import { ProjectService } from '../../../services/project.service';
   templateUrl: './map-widget.component.html',
   styleUrls: ['./map-widget.component.css']
 })
-export class MapWidgetComponent implements OnInit, OnDestroy {
+export class MapWidgetComponent implements OnChanges, OnDestroy {
   @Input() widget: Widget;
   @Input() scale = 1;
   innerWidgets: Observable<Widget[]>;
@@ -27,7 +27,9 @@ export class MapWidgetComponent implements OnInit, OnDestroy {
     this.el = el.nativeElement;
   }
 
-  ngOnInit() {
+  ngOnChanges() {
+    this.unsubscribe();
+    
     // TODO this is very similar to the widgets, is there a way to generalize?
     this.subscriptions.push(
       this.widget.dimensions.subscribe(dimensions => {
@@ -49,9 +51,7 @@ export class MapWidgetComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.subscriptions.forEach(sub => {
-      sub.unsubscribe();
-    });
+    this.unsubscribe();
   }
 
   private getInnerWidgets(innerWidgetIds: string[]) {
@@ -61,5 +61,11 @@ export class MapWidgetComponent implements OnInit, OnDestroy {
       innerWidgets.push(userApp.getWidget(innerWidgetId));
     }
     return innerWidgets;
+  }
+
+  private unsubscribe() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }
