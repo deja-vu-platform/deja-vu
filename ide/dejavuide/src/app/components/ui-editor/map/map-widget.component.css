@@ -1,0 +1,9 @@
+:host {
+  background: #D5D5D5;
+  position: absolute;
+}
+
+.map-inner-component-size {
+  position: absolute;
+  background: black;
+}

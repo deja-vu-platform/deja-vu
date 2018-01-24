@@ -2,10 +2,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { MapComponent } from './map.component';
+import { MapWidgetComponent } from './map-widget.component';
 
 @NgModule({
   declarations: [
-    MapComponent
+    MapComponent,
+    MapWidgetComponent
   ],
   imports: [
     BrowserModule

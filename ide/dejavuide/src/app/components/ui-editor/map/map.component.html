@@ -10,14 +10,19 @@
   </ng-template>
 </button>
 <div id="map" 
+    [style.zoom]="zoom"
     [hidden]="minimized"
     (click)="mapClick($event)">
     <div id="zoom-selected-screen-size"
       [style.height.px]="screenDimensions.height * mapScale"
       [style.width.px]="screenDimensions.width * mapScale"></div>
-    <div *ngIf="selectedWidget"
+    <dv-map-widget 
+      *ngIf="projectService.selectedWidget | async as selectedWidget"
+      [widget]="selectedWidget"
+      [scale]="mapScale">
+    </dv-map-widget>
+    <!-- <div *ngIf="selectedWidget"
         id="map-component-sizes"
-        [style.zoom]="zoom"
         [style.top.px]="mapSelectedWidgetPosition.top"
         [style.left.px]="mapSelectedWidgetPosition.left"
         [style.height.px]="mapSelectedWidgetSize.height"
@@ -27,8 +32,8 @@
             [style.height.px]= "size.height"
             [style.width.px]= "size.width"
             [style.top.px]= "size.top"
-            [style.left.px]= "size.left"></div>
-    </div>
+            [style.left.px]= "size.left"></div> -->
+    <!-- </div> -->
     <!-- Map window is the little thing you drag to move your map -->
     <div id="map-window"
         [style.top.px]="mapVisibleWindowPosition.top"

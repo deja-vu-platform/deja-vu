@@ -64,6 +64,7 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
         this.el.style.width = dimensions.width + 'px';
       })
     );
+
     this.subscriptions.push(
       this.widget.position.subscribe(position => {
         this.el.style.top = position.top + 'px';

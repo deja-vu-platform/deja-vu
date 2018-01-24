@@ -1,0 +1,5 @@
+<dv-map-widget *ngFor="let innerWidget of (innerWidgets | async)"
+  class="map-inner-component-size"
+  [widget]="innerWidget"
+  [scale]="scale">
+</dv-map-widget>

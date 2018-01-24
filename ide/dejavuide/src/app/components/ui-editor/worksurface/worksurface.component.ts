@@ -2,7 +2,6 @@ import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, Input,
 import { Observable } from 'rxjs/Observable';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/switchMap';
 
 import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
 import { Cliche } from '../../../models/cliche/cliche';

@@ -1,6 +1,6 @@
 import { Component, AfterViewInit, OnInit, ElementRef, ChangeDetectorRef} from '@angular/core';
 
-import { Widget, UserWidget } from '../../../models/widget/widget';
+import { Widget } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 
@@ -64,7 +64,7 @@ export class MapComponent implements AfterViewInit, OnInit {
       .subscribe((newSelectedScreenDimensions) => {
         this.screenDimensions = newSelectedScreenDimensions;
         this.updateMapScale();
-        this.updateView();
+        // this.updateView();
       });
   }
 
@@ -72,7 +72,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     this.mapComponentDimensions.height = this.el.offsetHeight;
     this.mapComponentDimensions.width = this.el.offsetWidth;
     this.updateMapScale();
-    this.updateView();
+    // this.updateView();
 
     this.stateService.visibleWindowScrollPosition
     .subscribe((newVisibleWindowScrollPosition) => {
@@ -82,10 +82,11 @@ export class MapComponent implements AfterViewInit, OnInit {
         newVisibleWindowScrollPosition.left * this.mapScale;
     });
 
+    
     this.projectService.selectedWidget.subscribe(
       (newSelectedWidget) => {
         this.selectedWidget = newSelectedWidget;
-        this.updateView();
+        // this.updateView();
       });
 
     // this.projectService.widgetUpdateListener.subscribe(() => {
@@ -138,35 +139,35 @@ export class MapComponent implements AfterViewInit, OnInit {
   /**
    * Update the view of the map fresh from the info of the given widget.
    */
-  private updateView() {
-    const selectedWidget = this.selectedWidget;
-    const userApp = this.projectService.getProject().getUserApp();
-    if (selectedWidget) {
-      this.mapSelectedWidgetSize = {
-        height: selectedWidget.getDimensions().height * this.mapScale,
-        width: selectedWidget.getDimensions().width * this.mapScale
-      };
-      this.mapSelectedWidgetPosition = {
-        top: selectedWidget.getPosition().top * this.mapScale,
-        left: selectedWidget.getPosition().left * this.mapScale
-      };
+  // private updateView() {
+  //   const selectedWidget = this.selectedWidget;
+  //   const userApp = this.projectService.getProject().getUserApp();
+  //   if (selectedWidget) {
+  //     this.mapSelectedWidgetSize = {
+  //       height: selectedWidget.getDimensions().height * this.mapScale,
+  //       width: selectedWidget.getDimensions().width * this.mapScale
+  //     };
+  //     this.mapSelectedWidgetPosition = {
+  //       top: selectedWidget.getPosition().top * this.mapScale,
+  //       left: selectedWidget.getPosition().left * this.mapScale
+  //     };
 
-      const mapWidgetSizes = [];
-      selectedWidget.getInnerWidgetIds().forEach((innerWidgetId) => {
-        const innerWidget = userApp.getWidget(innerWidgetId);
-        const innerWidgetDimensions = innerWidget.getDimensions();
-        const innerWidgetPosition = innerWidget.getPosition();
-        mapWidgetSizes.push({
-          left: innerWidgetPosition.left * this.mapScale,
-          top: innerWidgetPosition.top * this.mapScale,
-          width: innerWidgetDimensions.width * this.mapScale,
-          height: innerWidgetDimensions.height * this.mapScale,
-        });
-      });
+  //     const mapWidgetSizes = [];
+  //     selectedWidget.getInnerWidgetIds().forEach((innerWidgetId) => {
+  //       const innerWidget = userApp.getWidget(innerWidgetId);
+  //       const innerWidgetDimensions = innerWidget.getDimensions();
+  //       const innerWidgetPosition = innerWidget.getPosition();
+  //       mapWidgetSizes.push({
+  //         left: innerWidgetPosition.left * this.mapScale,
+  //         top: innerWidgetPosition.top * this.mapScale,
+  //         width: innerWidgetDimensions.width * this.mapScale,
+  //         height: innerWidgetDimensions.height * this.mapScale,
+  //       });
+  //     });
 
-      this.mapWidgetSizes = mapWidgetSizes;
-    }
-  }
+  //     this.mapWidgetSizes = mapWidgetSizes;
+  //   }
+  // }
 
   /**
    * Updates the scale of the map so that the ratio of the <TODO>
