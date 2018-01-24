@@ -1,5 +1,8 @@
-import { Component, Input, OnInit, ChangeDetectorRef, EventEmitter, Output, NgZone } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output, NgZone} from '@angular/core';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import { MatDialog } from '@angular/material';
+
 import { ProjectDeleteDialogComponent } from './project-delete-dialog.component';
 import { NewProjectDialogComponent } from './new-project-dialog.component';
 import { RouterService, PageType } from '../../services/router.service';
@@ -33,7 +36,6 @@ export class ProjectExplorerComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private ref: ChangeDetectorRef,
     private routerService: RouterService,
     private projectService: ProjectService,
     private communicatorService: CommunicatorService,
@@ -42,23 +44,26 @@ export class ProjectExplorerComponent implements OnInit {
   ngOnInit() {
     this.loaderVisible = true;
     this.communicatorService.onLoadProjects((event, data) => {
-      data.projects.forEach((projectInfo) => {
-        const projectName = projectInfo[0];
-        const content = JSON.parse(projectInfo[1]);
-        this.projects[projectName] = content;
-      });
+      this.zone.run(() => {
+        data.projects.forEach((projectInfo) => {
+          const projectName = projectInfo[0];
+          const content = JSON.parse(projectInfo[1]);
+          this.projects[projectName] = content;
+        });
 
-      this.updateDisplayProjectList();
-      this.loaderVisible = false;
-      this.ref.detectChanges();
+        this.updateDisplayProjectList();
+        this.loaderVisible = false;
+      });
     });
 
-    this.communicatorService.onDeleteSuccess((event) => {
+    this.communicatorService.onDeleteSuccess((event, data) => {
       // TODO
-      delete this.projects[event.projectName];
-      this.updateDisplayProjectList();
-      this.loaderVisible = false;
-      this.ref.detectChanges();
+      this.zone.run(() => {
+        delete this.projects[data.projectName];
+
+        this.updateDisplayProjectList();
+        this.loaderVisible = false;
+      });
       // TODO deal with if the project is your selected project
     });
 
@@ -97,8 +102,10 @@ export class ProjectExplorerComponent implements OnInit {
 
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
-          this.loaderVisible = true;
-          this.deleteProject(projectName);
+          this.zone.run(() => {
+              this.loaderVisible = true;
+              this.deleteProject(projectName);
+          });
         }
       });
     });
