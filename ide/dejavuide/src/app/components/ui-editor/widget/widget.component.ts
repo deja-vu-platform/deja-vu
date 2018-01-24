@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, AfterViewInit, ElementRef, OnDestroy, ChangeDetectorRef } from '@angular/core';
 
 import { Cliche } from '../../../models/cliche/cliche';
 import { Widget, UserWidget } from '../../../models/widget/widget';
@@ -31,12 +31,13 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
 
   constructor(
     el: ElementRef,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private ref: ChangeDetectorRef
   ) {
       this.el = el.nativeElement;
-      this.projectService.widgetUpdateListener.subscribe(() => {
-        this.getInnerWidgets();
-      });
+      // this.projectService.widgetUpdateListener.subscribe(() => {
+      //   this.getInnerWidgets();
+      // });
   }
 
   ngOnChanges() {
@@ -73,6 +74,7 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
     this.subscriptions.push(
       this.widget.innerWidgetIds.subscribe(innerWidgetIds => {
         this.getInnerWidgets();
+        this.ref.detectChanges();
       })
     );
 
@@ -141,7 +143,7 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
       },
       stop: (e, ui) => {
         // not super important to update as you resize so just do it at the end
-        this.projectService.widgetUpdated();
+        // this.projectService.widgetUpdated();
       }
     });
   }

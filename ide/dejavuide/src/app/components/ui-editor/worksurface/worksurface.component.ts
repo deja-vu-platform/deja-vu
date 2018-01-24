@@ -65,19 +65,19 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('worksurface init');
     this.selectedWidget$ = this.route.paramMap.map((params: ParamMap) => {
       this.selectedWidgetId = params.get('id');
 
       const activeWidgetIds = this.activeWidgets.map(widget => widget.getId());
       const alreadyAdded = inArray(this.selectedWidgetId, activeWidgetIds);
 
+      const userApp = this.projectService.getProject().getUserApp();
+      const widget = userApp.getWidget(this.selectedWidgetId);
       if (!alreadyAdded) {
-        const userApp = this.projectService.getProject().getUserApp();
-        const widget = userApp.getWidget(this.selectedWidgetId);
         this.activeWidgets.push(widget);
       }
 
+      this.projectService.updateSelectedWidget(widget);
       // Since state service is shared
       this.stateService.updateVisibleWindowScrollPosition({
         top: 0, left: 0
@@ -161,7 +161,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
           selectedWidget.putInnerWidgetOnTop(userApp, widget);
         }
 
-        this.projectService.widgetUpdated();
+        this.projectService.userAppUpdated();
         this.ref.detectChanges();
       }
     });

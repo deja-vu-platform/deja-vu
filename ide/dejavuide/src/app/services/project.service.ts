@@ -9,7 +9,7 @@ export class ProjectService {
   private selectedProject: Project;
 
   selectedWidget = new ReplaySubject<Widget>(1);
-  widgetUpdateListener = new ReplaySubject<boolean>(1);
+  userAppUpdateListener = new ReplaySubject<boolean>(1);
 
   public updateProject(project: Project) {
     this.selectedProject = project;
@@ -32,10 +32,9 @@ export class ProjectService {
 
   updateSelectedWidget(newSelectedWidget: Widget) {
     this.selectedWidget.next(newSelectedWidget);
-    this.widgetUpdated();
   }
 
-  widgetUpdated() {
-    this.widgetUpdateListener.next(true);
+  userAppUpdated() {
+    this.userAppUpdateListener.next(true);
   }
 }

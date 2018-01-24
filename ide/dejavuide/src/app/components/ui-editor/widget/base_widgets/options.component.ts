@@ -47,7 +47,6 @@ export class WidgetOptionsComponent implements AfterViewInit {
 
   clearStyles() {
     this.widget.removeCustomStyle();
-    this.projectService.widgetUpdated();
   }
 
   showTooltip() {
@@ -62,33 +61,31 @@ export class WidgetOptionsComponent implements AfterViewInit {
     const userApp = this.projectService.getProject().getUserApp();
     const copies = this.widget.makeCopy(userApp);
     userApp.setAsTemplate(copies[0]);
-    this.projectService.widgetUpdated();
+    this.projectService.userAppUpdated();
   }
 
   delete() {
     this.unlinkWidgetFromParent();
     const userApp = this.projectService.getProject().getUserApp();
     userApp.removeWidget(this.widget.getId());
-    this.projectService.widgetUpdated();
+    this.projectService.userAppUpdated();
   }
 
   unlink() {
     this.unlinkWidgetFromParent();
-    this.projectService.widgetUpdated();
+    this.projectService.userAppUpdated();
   }
 
   moveUp() {
     const userApp = this.projectService.getProject().getUserApp();
     const parent = this.getParentWidget(userApp);
     parent.changeInnerWidgetOrderByOne(userApp, this.widget, true);
-    this.projectService.widgetUpdated();
   }
 
   moveDown() {
     const userApp = this.projectService.getProject().getUserApp();
     const parent = this.getParentWidget(userApp);
     parent.changeInnerWidgetOrderByOne(userApp, this.widget, false);
-    this.projectService.widgetUpdated();
   }
 
   private unlinkWidgetFromParent() {
@@ -112,7 +109,6 @@ export class WidgetOptionsComponent implements AfterViewInit {
     const color = this.pickerText.toHEXString();
     this.paletteService.newColor(color);
     this.widget.updateCustomStyle(COLOR, color);
-    this.projectService.widgetUpdated();
   }
 
   openBgPicker(event) {
@@ -125,7 +121,6 @@ export class WidgetOptionsComponent implements AfterViewInit {
     const color = this.pickerBg.toHEXString();
     this.paletteService.newColor(color);
     this.widget.updateCustomStyle(BACKGROUND, color);
-    this.projectService.widgetUpdated();
   }
 }
 

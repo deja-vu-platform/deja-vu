@@ -251,6 +251,7 @@ export abstract class Widget {
         this.fields.styles.css[name] = 'unset';
       });
     }
+    this.styles.next(this.fields.styles);
   }
 
   /**
@@ -664,6 +665,8 @@ export class UserWidget extends Widget {
     if (!isUp) {
       stackOrder.reverse();
     }
+
+    this.innerWidgetIds.next(this.fields.innerWidgetIds);
   }
 
   /**

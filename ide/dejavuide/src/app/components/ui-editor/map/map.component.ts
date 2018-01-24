@@ -82,15 +82,16 @@ export class MapComponent implements AfterViewInit, OnInit {
         newVisibleWindowScrollPosition.left * this.mapScale;
     });
 
-    this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
-    this.selectedWidget = newSelectedWidget;
-    this.updateView();
-  });
+    this.projectService.selectedWidget.subscribe(
+      (newSelectedWidget) => {
+        this.selectedWidget = newSelectedWidget;
+        this.updateView();
+      });
 
-    this.projectService.widgetUpdateListener.subscribe(() => {
-      this.updateView();
-      this.ref.detectChanges();
-    });
+    // this.projectService.widgetUpdateListener.subscribe(() => {
+    //   this.updateView();
+    //   this.ref.detectChanges();
+    // });
 
     this.stateService.visibleWindowDimensions.subscribe(
       (newVisibleWindowDimensions) => {

@@ -26,7 +26,8 @@ export class ListComponent implements OnInit {
     private projectService: ProjectService) {}
 
   ngOnInit() {
-    this.projectService.widgetUpdateListener.subscribe(() => {
+    this.refreshList();
+    this.projectService.userAppUpdateListener.subscribe(() => {
       this.refreshList();
     });
   }

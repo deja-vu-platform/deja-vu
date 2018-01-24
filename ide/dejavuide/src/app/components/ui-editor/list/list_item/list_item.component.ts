@@ -140,7 +140,7 @@ export class ListItemComponent implements OnInit, AfterViewInit {
 
   rename(event) {
     this.widget.setName(event.target.value);
-    this.projectService.widgetUpdated();
+    // this.projectService.widgetUpdated();
   }
 
   private deleteUserWidget() {
@@ -150,7 +150,7 @@ export class ListItemComponent implements OnInit, AfterViewInit {
     // update the worksurface reference to null if it is deleted
 
     userApp.removeWidget(this.widget.getId());
-    this.projectService.widgetUpdated();
+    this.projectService.userAppUpdated();
   }
 }
 
