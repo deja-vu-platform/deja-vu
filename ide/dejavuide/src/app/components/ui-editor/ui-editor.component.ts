@@ -108,7 +108,13 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
       const pageId = this.userApp.getPageIds()[0];
       this.selectedWidget = this.userApp.getWidget(pageId);
     }
-    // TODO this widget selecting process might be more appropriate for the 
+
+    // TODO
+    // This is currently needed to signal to the list that it is ready to read
+    // from the userapp
+    this.projectService.userAppUpdated();
+
+    // TODO this widget selecting process might be more appropriate for the
     // worksurface
     this.projectService.updateSelectedWidget(this.selectedWidget);
   }

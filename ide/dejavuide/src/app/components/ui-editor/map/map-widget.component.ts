@@ -29,7 +29,7 @@ export class MapWidgetComponent implements OnChanges, OnDestroy {
 
   ngOnChanges() {
     this.unsubscribe();
-    
+
     // TODO this is very similar to the widgets, is there a way to generalize?
     this.subscriptions.push(
       this.widget.dimensions.subscribe(dimensions => {
