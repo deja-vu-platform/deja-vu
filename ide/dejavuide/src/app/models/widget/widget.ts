@@ -1,3 +1,5 @@
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
 import { Dimensions, Position } from '../../services/state.service';
 import { UserCliche } from '../cliche/cliche';
@@ -66,6 +68,12 @@ interface UserWidgetFields extends WidgetFields {
 
 export abstract class Widget {
   protected fields: WidgetFields;
+
+  name: BehaviorSubject<string>;
+  dimensions: BehaviorSubject<Dimensions>;
+  position: BehaviorSubject<Position>;
+  styles: BehaviorSubject<any>;
+  innerWidgetIds: BehaviorSubject<string[]>;
 
   /**
    * Converts a JSON object to a Widget object.
@@ -139,6 +147,12 @@ export abstract class Widget {
     };
 
     this.fields.templateCopies = this.fields.templateCopies || [];
+
+    this.name = new BehaviorSubject<string>(this.fields.name);
+    this.dimensions = new BehaviorSubject<Dimensions>(this.fields.dimensions);
+    this.position = new BehaviorSubject<Position>(this.fields.position);
+    this.styles = new BehaviorSubject<any>(this.fields.styles);
+    this.innerWidgetIds = new BehaviorSubject<string[]>([]);
   }
 
   isUserType(): this is UserWidget {
@@ -167,6 +181,7 @@ export abstract class Widget {
 
   updateDimensions(newDimensions: Dimensions) {
     this.fields.dimensions = shallowCopy(newDimensions);
+    this.dimensions.next(this.fields.dimensions);
   }
 
   getClicheId(): string {
@@ -220,10 +235,12 @@ export abstract class Widget {
 
   updatePosition(newPosition: Position) {
     this.fields.position = shallowCopy(newPosition);
+    this.position.next(this.fields.position);
   }
 
   updateCustomStyle(styleName: string, value) {
     this.fields.styles.css[styleName] = value;
+    this.styles.next(this.fields.styles);
   }
 
   removeCustomStyle(styleName?: string) {
@@ -388,8 +405,8 @@ export class LinkBaseWidget extends BaseWidget {
     this.fields.type = BaseWidgetType.LINK;
     this.fields.value = this.fields.value || { text: '', target: '' };
 
-    this.fields.name = fields.name || 'Link Widget';
-    this.fields.dimensions = fields.dimensions ? this.fields.dimensions : { width: 100, height: 50 };
+    this.setName(fields.name || 'Link Widget');
+    this.updateDimensions(fields.dimensions || { width: 100, height: 50 });
   }
 
   setValue(value: LinkValue) {
@@ -409,8 +426,8 @@ export class LabelBaseWidget extends BaseWidget {
     this.fields.type = BaseWidgetType.LABEL;
     this.fields.value = this.fields.value || 'Write your label here...';
 
-    this.fields.name = fields.name || 'Label Widget';
-    this.fields.dimensions = fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 };
+    this.setName(fields.name || 'Label Widget');
+    this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
   }
   setValue(value: string) {
     this.fields.value = value;
@@ -431,8 +448,8 @@ export class ImageBaseWidget extends BaseWidget {
     // TODO this default value is not robust
     this.fields.value = this.fields.value || 'assets/image_icon.png';
 
-    this.fields.name = fields.name || 'Image Widget';
-    this.fields.dimensions = fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 };
+    this.setName(fields.name || 'Image Widget');
+    this.updateDimensions(fields.dimensions || { width: 400, height: 200 });
   }
   setValue(value: string) {
     this.fields.value = value;
@@ -468,6 +485,8 @@ export class UserWidget extends Widget {
     this.fields.widgetType = WidgetType.USER_WIDGET;
     this.fields.innerWidgetIds =
       fields.innerWidgetIds ? fields.innerWidgetIds.slice() : [];
+
+    this.innerWidgetIds.next(this.fields.innerWidgetIds);
   }
 
   // TODO perhaps this should also be a cliche function
@@ -477,6 +496,7 @@ export class UserWidget extends Widget {
     this.fields.innerWidgetIds.push(id);
     widget.setParentId(this.getId());
     userApp.setAsInnerWidget(widget);
+    this.innerWidgetIds.next(this.fields.innerWidgetIds);
   }
 
   // TODO perhaps this should also be a cliche function
@@ -486,6 +506,7 @@ export class UserWidget extends Widget {
     const widget = userApp.getWidget(id);
     widget.setParentId(undefined);
     userApp.setAsFreeWidget(widget);
+    this.innerWidgetIds.next(this.fields.innerWidgetIds);
   }
 
   getInnerWidgetIds() {

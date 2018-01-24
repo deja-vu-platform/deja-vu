@@ -40,21 +40,6 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
   }
 
   ngOnChanges() {
-    console.log(this.widget.getName());
-    this.el.style.top = this.widget.getPosition().top + 'px';
-    this.el.style.left = this.widget.getPosition().left + 'px';
-    this.el.style.height = this.widget.getDimensions().height + 'px';
-    this.el.style.width = this.widget.getDimensions().width + 'px';
-
-    // get inner widgets
-    this.getInnerWidgets();
-
-    this.updateStylesToShow();
-
-    if (this.isSelected || this.isMovable) {
-      this.makeWidgetDraggable();
-      this.makeWidgetResizable();
-    }
   }
 
   ngOnInit() {
@@ -72,7 +57,35 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
     //   // const localStyles = this.widget.getLocalCustomStyles();
     //   this.updateStylesToShow();
     // }));
+    this.subscriptions.push(
+      this.widget.dimensions.subscribe(dimensions => {
+        this.el.style.height = dimensions.height + 'px';
+        this.el.style.width = dimensions.width + 'px';
+      })
+    );
+    this.subscriptions.push(
+      this.widget.position.subscribe(position => {
+        this.el.style.top = position.top + 'px';
+        this.el.style.left = position.left + 'px';
+      })
+    );
 
+    this.subscriptions.push(
+      this.widget.innerWidgetIds.subscribe(innerWidgetIds => {
+        this.getInnerWidgets();
+      })
+    );
+
+    this.subscriptions.push(
+      this.widget.styles.subscribe(styles => {
+        this.updateStylesToShow();
+      })
+    );
+
+    if (this.isSelected || this.isMovable) {
+      this.makeWidgetDraggable();
+      this.makeWidgetResizable();
+    }
   }
 
   ngAfterViewInit() {
