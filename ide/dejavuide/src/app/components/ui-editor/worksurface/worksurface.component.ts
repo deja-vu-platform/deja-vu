@@ -1,9 +1,14 @@
-import { Component, AfterViewInit, ChangeDetectorRef, ElementRef, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, Input, OnDestroy } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/switchMap';
 
 import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
 import { Cliche } from '../../../models/cliche/cliche';
 import { Dimensions, Position, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
+
 import { inArray } from '../../../utility/utility';
 
 import * as jQuery from 'jquery';
@@ -16,11 +21,12 @@ const $ = <any>jQuery;
   templateUrl: './worksurface.component.html',
   styleUrls: ['./worksurface.component.css']
 })
-export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
+export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
   /**
    * Dimensions of the screen the user is building an app for.
    */
   selectedScreenDimensions: Dimensions;
+  selectedWidget$: Observable<Widget>;
   @Input() selectedWidget: Widget;
 
   private elt: HTMLElement;
@@ -29,6 +35,7 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
   private subscriptions = [];
 
   constructor(
+    private route: ActivatedRoute,
     elt: ElementRef,
     private stateService: StateService,
     private projectService: ProjectService,
@@ -52,6 +59,32 @@ export class WorkSurfaceComponent implements AfterViewInit, OnDestroy {
         jqo.scrollTop(newScrollPosition.top);
         jqo.scrollLeft(newScrollPosition.left);
       }));
+  }
+
+  ngOnInit() {
+    console.log('worksurface init');
+    console.log(this.route);
+    console.log(this.route.paramMap);
+    this.route.paramMap.subscribe((params: ParamMap) => {
+      console.log(params);
+    });
+    this.route.paramMap.map((params: ParamMap) => {
+      console.log(params);
+    });
+    this.route.paramMap.switchMap((params: ParamMap) => {
+      console.log(params);
+      const userApp = this.projectService.getProject().getUserApp();
+      const widget = userApp.getWidget(params.get('id'));
+      console.log(widget);
+      return Observable.create([]);
+    });
+    this.selectedWidget$ = this.route.paramMap.map((params: ParamMap) => {
+      console.log(params);
+      const userApp = this.projectService.getProject().getUserApp();
+      const widget = userApp.getWidget(params.get('id'));
+      console.log(widget);
+      return widget;
+    });
   }
 
   ngAfterViewInit() {

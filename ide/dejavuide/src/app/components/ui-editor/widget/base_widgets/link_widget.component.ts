@@ -15,14 +15,6 @@ export class LinkWidgetComponent implements OnInit {
     this.value = this.widget.getValue();
   }
 
-  updateLinkText(event) {
-    this.value.text = event.target.value;
-  }
-
-  updateLinkTarget(event) {
-    this.value.target = event.target.value;
-  }
-
   applyChanges() {
     this.widget.setValue(this.value);
   }

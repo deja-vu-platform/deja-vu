@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { MatMenuModule, MatListModule } from '@angular/material';
+import { FormsModule } from '@angular/forms';
 
 import { LabelWidgetComponent } from './label_widget.component';
 import { LinkWidgetComponent } from './link_widget.component';
@@ -16,6 +17,7 @@ import { WidgetOptionsComponent } from './options.component';
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     MatMenuModule,
     MatListModule
   ],

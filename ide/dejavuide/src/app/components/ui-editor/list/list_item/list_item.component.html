@@ -1,6 +1,7 @@
 <div class="content">
   <div class="name-container">
-    <div (click)="widgetSelected()">
+    <!--  (click)="widgetSelected()" -->
+    <button [routerLink]="['/ui-editor', widget.getId()]">
       <div *ngIf="widget.isBaseType(); else usertypeicon">
         <ng-container *ngIf="widget.isLink()">
           <img src="assets/link_icon.png" width="15px" height="15px">
@@ -22,7 +23,7 @@
       <ng-template #usertypeicon> 
         <img src="assets/user_icon.png" width="15px" height="15px">
       </ng-template>
-    </div>
+    </button>
     <span class="name" (dblclick)="renameStart($event)"
       [hidden]="renameVisible"> {{widget.getName()}} </span>
     <div class="submit-rename"

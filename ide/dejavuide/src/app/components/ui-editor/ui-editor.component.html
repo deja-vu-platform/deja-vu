@@ -20,11 +20,12 @@
         <dv-palette></dv-palette>
       </div>
     </div>
-
+<!-- 
     <dv-worksurface #worksurface 
       *ngIf="selectedWidget"
       [selectedWidget]="selectedWidget">
-    </dv-worksurface>
+    </dv-worksurface> -->
+    <router-outlet #worksurface></router-outlet>
   </div>
   
   <dv-zoom></dv-zoom>
