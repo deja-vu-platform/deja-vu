@@ -24,7 +24,6 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
    */
   @Input() isMovable = false;
 
-  readonly Widget = Widget;
   innerWidgets: Widget[] = [];
 
   private el: HTMLElement;
@@ -36,7 +35,6 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
   ) {
       this.el = el.nativeElement;
       this.projectService.widgetUpdateListener.subscribe(() => {
-
         this.getInnerWidgets();
       });
   }

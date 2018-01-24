@@ -26,8 +26,11 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
    * Dimensions of the screen the user is building an app for.
    */
   selectedScreenDimensions: Dimensions;
-  selectedWidget$: Observable<Widget[]>;
-  selectedWidget: Widget;
+  selectedWidget$: Observable<string>;
+
+  selectedWidgetId: string;
+
+  activeWidgets: Widget[] = [];
 
   private el: HTMLElement;
   private currentZoom = 1;
@@ -64,15 +67,22 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit() {
     console.log('worksurface init');
     this.selectedWidget$ = this.route.paramMap.map((params: ParamMap) => {
-      const userApp = this.projectService.getProject().getUserApp();
-      this.selectedWidget = userApp.getWidget(params.get('id'));
+      this.selectedWidgetId = params.get('id');
+
+      const activeWidgetIds = this.activeWidgets.map(widget => widget.getId());
+      const alreadyAdded = inArray(this.selectedWidgetId, activeWidgetIds);
+
+      if (!alreadyAdded) {
+        const userApp = this.projectService.getProject().getUserApp();
+        const widget = userApp.getWidget(this.selectedWidgetId);
+        this.activeWidgets.push(widget);
+      }
 
       // Since state service is shared
       this.stateService.updateVisibleWindowScrollPosition({
         top: 0, left: 0
       });
-      console.log(this.selectedWidget);
-      return [this.selectedWidget];
+      return this.selectedWidgetId;
     });
   }
 
@@ -98,20 +108,23 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
       tolerance: 'touch',
       drop: (event, ui) => {
         let widget: Widget = ui.helper.dvWidget;
+
+        const project = this.projectService.getProject();
+        const userApp = project.getUserApp();
+
+        const selectedWidget = userApp.getWidget(this.selectedWidgetId);
         if (!widget) {
           return;
         }
-        if (widget === this.selectedWidget) {
+        if (widget === selectedWidget) {
           widget.updatePosition(this.oldWidgetNewPosition(ui));
-        } else if (!this.selectedWidget.isUserType()) {
+        } else if (!selectedWidget.isUserType()) {
           // non-user widgets can't be added to.
           return;
         } else {
           const isTemplate = ui.helper.template;
           // Check if it's a new widget
           const isNew = ui.helper.new;
-          const project = this.projectService.getProject();
-          const userApp = project.getUserApp();
           if (isNew || isTemplate) {
             // create a new widget object.
             let innerWidgets: Widget[];
@@ -130,22 +143,22 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
               widget = innerWidgets[0];
             }
 
-            widget.updatePosition(this.newWidgetNewPosition(ui));
+            widget.updatePosition(this.newWidgetNewPosition(ui, selectedWidget));
 
-            this.selectedWidget.setAsInnerWidget(userApp, widget);
+            selectedWidget.setAsInnerWidget(userApp, widget);
           } else {
             // it must be an unused widget or an already added widget
             const alreadyAdded =
-              inArray(widget.getId(), this.selectedWidget.getInnerWidgetIds());
+              inArray(widget.getId(), selectedWidget.getInnerWidgetIds());
 
             if (alreadyAdded) {
               widget.updatePosition(this.oldWidgetNewPosition(ui));
             } else {
-              this.selectedWidget.setAsInnerWidget(userApp, widget);
-              widget.updatePosition(this.newWidgetNewPosition(ui));
+              selectedWidget.setAsInnerWidget(userApp, widget);
+              widget.updatePosition(this.newWidgetNewPosition(ui, selectedWidget));
             }
           }
-          this.selectedWidget.putInnerWidgetOnTop(userApp, widget);
+          selectedWidget.putInnerWidgetOnTop(userApp, widget);
         }
 
         this.projectService.widgetUpdated();
@@ -154,8 +167,8 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private newWidgetNewPosition(ui): Position {
-    const offset = this.selectedWidget.getPosition();
+  private newWidgetNewPosition(ui, selectedWidget: Widget): Position {
+    const offset = selectedWidget.getPosition();
     return {
       top: ui.position.top - offset.top,
       left: ui.position.left - offset.left

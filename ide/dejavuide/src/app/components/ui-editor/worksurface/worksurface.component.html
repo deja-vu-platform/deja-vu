@@ -2,11 +2,12 @@
 <div class="work-surface widget-work-surface"
     [style.height.px] ="selectedScreenDimensions.height"
     [style.width.px]="selectedScreenDimensions.width">
-  <ng-container *ngIf="selectedWidget$ | async as selectedWidgets">
+  <ng-container *ngIf="selectedWidget$ | async">
     <!-- This is a hack. We want the dv-widget to be destroyed and re-created
     when the selected widget changes. The ngFor lets us do this. -->
-    <dv-widget *ngFor="let selectedWidget of selectedWidgets"
-      [widget]="selectedWidget"
+    <dv-widget *ngFor="let widget of activeWidgets"
+      [ngClass]="{'hidden': widget.getId() !== this.selectedWidgetId}"
+      [widget]="widget"
       [isSelected]="true"
       [isMovable]="true">
     </dv-widget>  

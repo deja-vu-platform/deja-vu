@@ -6,3 +6,7 @@
   position: relative;
   overflow: scroll;
 }
+
+.hidden {
+  display: none;
+}
