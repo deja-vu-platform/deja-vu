@@ -47,7 +47,6 @@ export class ListComponent {
     this.userApp.getFreeWidgetIds().forEach((pageId) => {
       this.unusedWidgets.push(this.userApp.getWidget(pageId));
     });
-    // this.ref.detectChanges();
   }
 
   newPage() {

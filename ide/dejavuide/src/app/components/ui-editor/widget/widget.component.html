@@ -7,7 +7,7 @@
       <dv-widget-options [widget]="widget"
                          [editDisabled]="true">
       </dv-widget-options>
-      <ng-container *ngFor="let innerWidget of innerWidgets">
+      <ng-container *ngFor="let innerWidget of (innerWidgets | async)">
       <dv-widget [widget]="innerWidget"
                   [isSelected]="false"
                   [isMovable]="isSelected">

@@ -1,4 +1,7 @@
-import { Component, Input, OnChanges, OnInit, AfterViewInit, ElementRef, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 
 import { Cliche } from '../../../models/cliche/cliche';
 import { Widget, UserWidget } from '../../../models/widget/widget';
@@ -24,7 +27,7 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
    */
   @Input() isMovable = false;
 
-  innerWidgets: Widget[] = [];
+  innerWidgets: Observable<Widget[]>;
 
   private el: HTMLElement;
   private subscriptions = [];
@@ -32,7 +35,6 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
   constructor(
     el: ElementRef,
     private projectService: ProjectService,
-    private ref: ChangeDetectorRef
   ) {
       this.el = el.nativeElement;
       // this.projectService.widgetUpdateListener.subscribe(() => {
@@ -72,11 +74,8 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
       })
     );
 
-    this.subscriptions.push(
-      this.widget.innerWidgetIds.subscribe(innerWidgetIds => {
-        this.getInnerWidgets();
-        this.ref.detectChanges();
-      })
+    this.innerWidgets = this.widget.innerWidgetIds.map(
+      innerWidgetIds => this.getInnerWidgets(innerWidgetIds)
     );
 
     this.subscriptions.push(
@@ -149,14 +148,13 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
     });
   }
 
-  private getInnerWidgets() {
-    if (this.widget) {
-      this.innerWidgets = [];
-      const userApp = this.projectService.getProject().getUserApp();
-      for (const innerWidgetId of this.widget.getInnerWidgetIds()) {
-        this.innerWidgets.push(userApp.getWidget(innerWidgetId));
-      }
+  private getInnerWidgets(innerWidgetIds: string[]) {
+    const innerWidgets = [];
+    const userApp = this.projectService.getProject().getUserApp();
+    for (const innerWidgetId of innerWidgetIds) {
+      innerWidgets.push(userApp.getWidget(innerWidgetId));
     }
+    return innerWidgets;
   }
 
   private updateStylesToShow() {

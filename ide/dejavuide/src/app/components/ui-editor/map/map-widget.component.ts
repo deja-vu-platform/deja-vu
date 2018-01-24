@@ -54,6 +54,7 @@ export class MapWidgetComponent implements OnChanges, OnDestroy {
     this.unsubscribe();
   }
 
+  // TODO this is an exact copy of the widget.component version
   private getInnerWidgets(innerWidgetIds: string[]) {
     const innerWidgets = [];
     const userApp = this.projectService.getProject().getUserApp();

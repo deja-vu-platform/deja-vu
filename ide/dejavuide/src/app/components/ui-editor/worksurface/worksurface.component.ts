@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ChangeDetectorRef, ElementRef, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, Input, OnDestroy, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import 'rxjs/add/operator/map';
@@ -41,7 +41,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
     elt: ElementRef,
     private stateService: StateService,
     private projectService: ProjectService,
-    private ref: ChangeDetectorRef
+    private zone: NgZone
   ) {
     this.el = elt.nativeElement;
 
@@ -106,64 +106,71 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
       hoverClass: 'highlight',
       tolerance: 'touch',
       drop: (event, ui) => {
-        let widget: Widget = ui.helper.dvWidget;
-
-        const project = this.projectService.getProject();
-        const userApp = project.getUserApp();
-
-        const selectedWidget = userApp.getWidget(this.selectedWidgetId);
-        if (!widget) {
-          return;
-        }
-        if (widget === selectedWidget) {
-          widget.updatePosition(this.oldWidgetNewPosition(ui));
-        } else if (!selectedWidget.isUserType()) {
-          // non-user widgets can't be added to.
-          return;
-        } else {
-          const isTemplate = ui.helper.template;
-          // Check if it's a new widget
-          const isNew = ui.helper.new;
-          if (isNew || isTemplate) {
-            // create a new widget object.
-            let innerWidgets: Widget[];
-            if (isNew) {
-              // Set the cliche id of the dummy widget to this
-              // app id, so that the widget's id is set properly
-              // when copying.
-              const dummyWidget = widget;
-              dummyWidget.setClicheId(userApp.getId());
-              innerWidgets = widget.makeCopy(userApp);
-              widget = innerWidgets[0];
-              // reset the dummy widget
-              dummyWidget.setClicheId(undefined);
-            } else {
-              innerWidgets = widget.makeCopy(userApp, undefined, true);
-              widget = innerWidgets[0];
-            }
-
-            widget.updatePosition(this.newWidgetNewPosition(ui, selectedWidget));
-
-            selectedWidget.setAsInnerWidget(userApp, widget);
-          } else {
-            // it must be an unused widget or an already added widget
-            const alreadyAdded =
-              inArray(widget.getId(), selectedWidget.getInnerWidgetIds());
-
-            if (alreadyAdded) {
-              widget.updatePosition(this.oldWidgetNewPosition(ui));
-            } else {
-              selectedWidget.setAsInnerWidget(userApp, widget);
-              widget.updatePosition(this.newWidgetNewPosition(ui, selectedWidget));
-            }
-          }
-          selectedWidget.putInnerWidgetOnTop(userApp, widget);
-        }
-
-        this.projectService.userAppUpdated();
-        this.ref.detectChanges();
+        // The zone brings this piece of code back into angular's zone
+        // so that angular detects the changes properly
+        this.zone.run(() => {
+          this.onDrop(event, ui);
+        });
       }
     });
+  }
+
+  private onDrop(event, ui) {
+    let widget: Widget = ui.helper.dvWidget;
+
+    const project = this.projectService.getProject();
+    const userApp = project.getUserApp();
+
+    const selectedWidget = userApp.getWidget(this.selectedWidgetId);
+    if (!widget) {
+      return;
+    }
+    if (widget === selectedWidget) {
+      widget.updatePosition(this.oldWidgetNewPosition(ui));
+    } else if (!selectedWidget.isUserType()) {
+      // non-user widgets can't be added to.
+      return;
+    } else {
+      const isTemplate = ui.helper.template;
+      // Check if it's a new widget
+      const isNew = ui.helper.new;
+      if (isNew || isTemplate) {
+        // create a new widget object.
+        let innerWidgets: Widget[];
+        if (isNew) {
+          // Set the cliche id of the dummy widget to this
+          // app id, so that the widget's id is set properly
+          // when copying.
+          const dummyWidget = widget;
+          dummyWidget.setClicheId(userApp.getId());
+          innerWidgets = widget.makeCopy(userApp);
+          widget = innerWidgets[0];
+          // reset the dummy widget
+          dummyWidget.setClicheId(undefined);
+        } else {
+          innerWidgets = widget.makeCopy(userApp, undefined, true);
+          widget = innerWidgets[0];
+        }
+
+        widget.updatePosition(this.newWidgetNewPosition(ui, selectedWidget));
+
+        selectedWidget.setAsInnerWidget(userApp, widget);
+      } else {
+        // it must be an unused widget or an already added widget
+        const alreadyAdded =
+          inArray(widget.getId(), selectedWidget.getInnerWidgetIds());
+
+        if (alreadyAdded) {
+          widget.updatePosition(this.oldWidgetNewPosition(ui));
+        } else {
+          selectedWidget.setAsInnerWidget(userApp, widget);
+          widget.updatePosition(this.newWidgetNewPosition(ui, selectedWidget));
+        }
+      }
+      selectedWidget.putInnerWidgetOnTop(userApp, widget);
+    }
+
+    this.projectService.userAppUpdated();
   }
 
   private newWidgetNewPosition(ui, selectedWidget: Widget): Position {

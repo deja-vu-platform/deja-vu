@@ -88,6 +88,8 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   handleDelete(projectName): void {
+    // The zone brings this piece of code back into angular's zone
+    // so that angular detects the changes properly
     this.zone.run(() => {
       const dialogRef = this.dialog.open(ProjectDeleteDialogComponent, {
         width: '250px',
@@ -106,6 +108,8 @@ export class ProjectExplorerComponent implements OnInit {
     project.updateAccess();
     this.projectService.updateProject(project);
     this.communicatorService.saveToLocalStorage(project);
+    // The zone brings this piece of code back into angular's zone
+    // so that angular detects the changes properly
     this.zone.run(() => {
       this.routerService.navigateTo(PageType.UI_EDITOR);
     });
