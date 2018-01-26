@@ -1,16 +1,19 @@
 <ng-container
-      *ngIf="widget"
-      [style.height.px]="widget.getDimensions().height"
-      [style.width.px]="widget.getDimensions().width">
+  *ngIf="widget"
+  [style.height.px]="widget.getDimensions().height"
+  [style.width.px]="widget.getDimensions().width">
   <span>Name: {{widget.getName()}}</span>
   <ng-container *ngIf="widget.isUserType()">
-      <dv-widget-options [widget]="widget"
-                         [editDisabled]="true">
-      </dv-widget-options>
-      <ng-container *ngFor="let innerWidget of (innerWidgets | async)">
-      <dv-widget [widget]="innerWidget"
-                  [isSelected]="false"
-                  [isMovable]="isSelected">
+    <dv-widget-options 
+      [widget]="widget"
+      [editDisabled]="true">
+    </dv-widget-options>
+    <ng-container *ngFor="let innerWidget of (innerWidgets | async)">
+      <dv-widget  
+        [activated]="_activated"
+        [widget]="innerWidget"
+        [isSelected]="false"
+        [isMovable]="isSelected">
       </dv-widget>
     </ng-container>
   </ng-container>

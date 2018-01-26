@@ -19,6 +19,16 @@ const $ = <any>jQuery;
   styleUrls: ['./widget.component.css'],
 })
 export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDestroy {
+  _activated: boolean;
+  @Input()
+  set activated(isActivated: boolean) {
+    // make sure this component is fully loaded before running this code
+    if (this.widget && isActivated) {
+      // check for any changes that might have occured elsewhere
+      this.updateStylesToShow();
+    }
+  }
+
   @Input() widget: Widget;
   @Input() isSelected = false;
   /**
