@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { NgZone} from '@angular/core';
 declare const electron: any;
 
 import { Project } from '../models/project/project';
@@ -7,7 +8,9 @@ import { Project } from '../models/project/project';
 export class CommunicatorService {
   private ipcRenderer;
 
-  constructor() {
+  // The zone brings this piece of code back into angular's zone
+  // so that angular detects the changes properly
+  constructor(private zone: NgZone) {
     if (!electron) {
       const fakeElectron = {
         ipcRenderer: {
@@ -37,7 +40,11 @@ export class CommunicatorService {
   }
 
   onSaveSuccess(callback) {
-    this.ipcRenderer.on('save-success', callback);
+    this.ipcRenderer.on('save-success', (event, data) => {
+      this.zone.run(() => {
+        callback(event, data);
+      });
+    });
   }
 
   delete(data) {
@@ -45,7 +52,11 @@ export class CommunicatorService {
   }
 
   onDeleteSuccess(callback) {
-    this.ipcRenderer.on('delete-success', callback);
+    this.ipcRenderer.on('delete-success', (event, data) => {
+      this.zone.run(() => {
+        callback(event, data);
+      });
+    });
   }
 
   loadProjects() {
@@ -53,6 +64,10 @@ export class CommunicatorService {
   }
 
   onLoadProjects(callback) {
-    this.ipcRenderer.on('projects', callback);
+    this.ipcRenderer.on('projects', (event, data) => {
+      this.zone.run(() => {
+        callback(event, data);
+      });
+    });
   }
 }

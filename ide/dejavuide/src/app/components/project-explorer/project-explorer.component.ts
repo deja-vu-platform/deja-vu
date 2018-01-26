@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, EventEmitter, Output, NgZone} from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { MatDialog } from '@angular/material';
@@ -38,33 +38,27 @@ export class ProjectExplorerComponent implements OnInit {
     public dialog: MatDialog,
     private routerService: RouterService,
     private projectService: ProjectService,
-    private communicatorService: CommunicatorService,
-    private zone: NgZone) {}
+    private communicatorService: CommunicatorService) {}
 
   ngOnInit() {
     this.loaderVisible = true;
     this.communicatorService.onLoadProjects((event, data) => {
-      this.zone.run(() => {
-        data.projects.forEach((projectInfo) => {
-          const projectName = projectInfo[0];
-          const content = JSON.parse(projectInfo[1]);
-          this.projects[projectName] = content;
-        });
-
-        this.updateDisplayProjectList();
-        this.loaderVisible = false;
+      data.projects.forEach((projectInfo) => {
+        const projectName = projectInfo[0];
+        const content = JSON.parse(projectInfo[1]);
+        this.projects[projectName] = content;
       });
+
+      this.updateDisplayProjectList();
+      this.loaderVisible = false;
     });
 
     this.communicatorService.onDeleteSuccess((event, data) => {
-      // TODO
-      this.zone.run(() => {
-        delete this.projects[data.projectName];
-
-        this.updateDisplayProjectList();
-        this.loaderVisible = false;
-      });
       // TODO deal with if the project is your selected project
+      delete this.projects[data.projectName];
+
+      this.updateDisplayProjectList();
+      this.loaderVisible = false;
     });
 
     this.communicatorService.loadProjects();
@@ -93,21 +87,15 @@ export class ProjectExplorerComponent implements OnInit {
   }
 
   handleDelete(projectName): void {
-    // The zone brings this piece of code back into angular's zone
-    // so that angular detects the changes properly
-    this.zone.run(() => {
-      const dialogRef = this.dialog.open(ProjectDeleteDialogComponent, {
-        width: '250px',
-      });
+    const dialogRef = this.dialog.open(ProjectDeleteDialogComponent, {
+      width: '250px',
+    });
 
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.zone.run(() => {
-              this.loaderVisible = true;
-              this.deleteProject(projectName);
-          });
-        }
-      });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loaderVisible = true;
+        this.deleteProject(projectName);
+      }
     });
   }
 
@@ -115,11 +103,7 @@ export class ProjectExplorerComponent implements OnInit {
     project.updateAccess();
     this.projectService.updateProject(project);
     this.communicatorService.saveToLocalStorage(project);
-    // The zone brings this piece of code back into angular's zone
-    // so that angular detects the changes properly
-    this.zone.run(() => {
-      this.routerService.navigateTo(PageType.UI_EDITOR);
-    });
+    this.routerService.navigateTo(PageType.UI_EDITOR);
   }
 
   loadProjectList(recentSelected = true) {
