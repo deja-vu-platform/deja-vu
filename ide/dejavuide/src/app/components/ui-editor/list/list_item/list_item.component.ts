@@ -1,5 +1,7 @@
 
 import { Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
 import { MatDialog } from '@angular/material';
 
 import { Cliche } from '../../../../models/cliche/cliche';
@@ -30,9 +32,10 @@ export class ListItemComponent implements OnInit, AfterViewInit {
   dragging = false;
   innerShown = false;
   renameVisible = false;
+  selected: Observable<boolean>;
   el: HTMLElement;
 
-  innerWidgets: Widget[];
+  innerWidgets$: Observable<Widget[]>;
   constructor(
     el: ElementRef,
     public dialog: MatDialog,
@@ -43,8 +46,11 @@ export class ListItemComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const userApp = this.projectService.getProject().getUserApp();
-    this.innerWidgets = this.widget.getInnerWidgetIds()
-      .map(id => userApp.getWidget(id));
+    this.innerWidgets$ = this.widget.innerWidgetIds
+      .map(ids => ids.map(id => userApp.getWidget(id)));
+
+    this.selected = this.projectService.selectedWidget
+      .map(widget => widget.getId() === this.widget.getId());
   }
 
   ngAfterViewInit() {

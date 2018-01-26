@@ -2,6 +2,10 @@
   text-align: left;
 }
 
+.selected {
+  background: peru;
+}
+
 input[type='text']{
   min-width: 60px;
   border: 1px grey solid;

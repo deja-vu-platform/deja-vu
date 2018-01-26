@@ -1,4 +1,5 @@
-<div class="content">
+<div class="content" 
+      [ngClass]="{'selected': (selected | async)}">
   <div class="name-container">
     <!--  (click)="widgetSelected()" -->
     <button [routerLink]="['/ui-editor', widget.getId()]">
@@ -43,19 +44,21 @@
           (click)="handleDelete()">
     <span class="glyphicon glyphicon-trash"></span>
   </button>
-  <button *ngIf="innerWidgets.length > 0"
-          class="btn btn-default"
-          (click)="toggleShow()">
-    <span [hidden]="innerShown"> > </span>
-    <span [hidden]="!innerShown"> v </span>
-  </button>
-  <div *ngFor="let innerWidget of innerWidgets">
-    <dv-list-item [widget]="innerWidget"
-                  [isDraggable]="false"
-                  [isDeletable]="true"
-                  [hidden]="!innerShown">
-    </dv-list-item>
-  </div>
+  <ng-container *ngIf="innerWidgets$ | async as innerWidgets">  
+    <button *ngIf="innerWidgets.length > 0"
+            class="btn btn-default"
+            (click)="toggleShow()">
+      <span [hidden]="innerShown"> > </span>
+      <span [hidden]="!innerShown"> v </span>
+    </button>
+    <div *ngFor="let innerWidget of innerWidgets">
+      <dv-list-item [widget]="innerWidget"
+                    [isDraggable]="false"
+                    [isDeletable]="true"
+                    [hidden]="!innerShown">
+      </dv-list-item>
+    </div>
+  </ng-container>
 </div> 
 
 <dv-widget *ngIf="isDraggable"
