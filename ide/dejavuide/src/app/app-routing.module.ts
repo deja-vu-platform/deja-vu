@@ -8,6 +8,7 @@ import { PageNotFoundComponent } from './components/common/page-not-found/page-n
 
 const appRoutes: Routes = [
   { path: 'projects', component: ProjectExplorerComponent},
+  { path: 'ui-editor', component: UiEditorComponent},
   { path: '**', component: PageNotFoundComponent }
 ];
 

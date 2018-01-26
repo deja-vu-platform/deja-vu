@@ -8,8 +8,6 @@ import { WorkSurfaceModule } from './worksurface/worksurface.module';
 import { ListModule } from './list/list.module';
 import { PaletteModule } from './palette/palette.module';
 
-import { UiEditorRoutingModule } from './ui-editor-routing.module';
-
 @NgModule({
   declarations: [
     UiEditorComponent
@@ -20,8 +18,7 @@ import { UiEditorRoutingModule } from './ui-editor-routing.module';
     MapModule,
     WorkSurfaceModule,
     ListModule,
-    PaletteModule,
-    UiEditorRoutingModule
+    PaletteModule
   ],
   exports: [
     UiEditorComponent

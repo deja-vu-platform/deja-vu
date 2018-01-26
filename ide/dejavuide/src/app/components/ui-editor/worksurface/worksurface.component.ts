@@ -1,6 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, Input, OnDestroy, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { ActivatedRoute, ParamMap } from '@angular/router';
 import 'rxjs/add/operator/map';
 
 import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
@@ -37,7 +36,6 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscriptions = [];
 
   constructor(
-    private route: ActivatedRoute,
     elt: ElementRef,
     private stateService: StateService,
     private projectService: ProjectService,
@@ -64,19 +62,16 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.selectedWidget$ = this.route.paramMap.map((params: ParamMap) => {
-      this.selectedWidgetId = params.get('id');
+    this.selectedWidget$ = this.projectService.selectedWidget.map((selectedWidget: Widget) => {
+      this.selectedWidgetId = selectedWidget.getId();
 
       const activeWidgetIds = this.activeWidgets.map(widget => widget.getId());
       const alreadyAdded = inArray(this.selectedWidgetId, activeWidgetIds);
 
-      const userApp = this.projectService.getProject().getUserApp();
-      const widget = userApp.getWidget(this.selectedWidgetId);
       if (!alreadyAdded) {
-        this.activeWidgets.push(widget);
+        this.activeWidgets.push(selectedWidget);
       }
 
-      this.projectService.updateSelectedWidget(widget);
       // Since state service is shared
       this.stateService.updateVisibleWindowScrollPosition({
         top: 0, left: 0
@@ -208,9 +203,9 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('resizing');
     // Without setTimeout causes an
     // ExpressionChangedAfterItHasBeenCheckedError
-    // setTimeout(() => {
+    setTimeout(() => {
       this.stateService.updateVisibleWindowDimensions(newSize);
-    // }, 0);
+    }, 0);
   }
 
 

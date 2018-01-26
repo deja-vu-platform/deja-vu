@@ -1,4 +1,6 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { ActivatedRoute, ParamMap } from '@angular/router';
+import 'rxjs/add/operator/map';
 
 import { LabelBaseWidget, LinkBaseWidget, Widget, UserWidget } from '../../models/widget/widget';
 import { Cliche, UserCliche } from '../../models/cliche/cliche';
@@ -16,30 +18,24 @@ const $ = <any>jQuery;
   templateUrl: './ui-editor.component.html',
   styleUrls: ['./ui-editor.component.css']
 })
-export class UiEditorComponent implements OnInit, AfterViewInit {
-  @ViewChild('worksurface', {read: ElementRef}) private worksurfaceElt: ElementRef;
+export class UiEditorComponent implements OnInit, OnDestroy {
   selectedProject: Project;
   private userApp: UserCliche;
   selectedWidget: Widget;
+
+  subscriptions = [];
 
   constructor (
     private projectService: ProjectService,
     private stateService: StateService,
     private routerService: RouterService,
-    private ref: ChangeDetectorRef) {
+    private route: ActivatedRoute) {
   }
 
-  ngAfterViewInit() {
-    // this.handleWindowResize();
-    // this.projectService.selectedWidget.subscribe((newSelectedWidget) => {
-    //   if (this.selectedWidget !== newSelectedWidget) {
-    //     this.refreshWorkSurface(newSelectedWidget);
-    //   }
-    //   // console.log('new selected widget');
-    // });
-  }
 
   ngOnInit() {
+
+
     // this.selectedProject = new Project('New Test Proj');
     // this.projectService.updateProject(this.selectedProject);
     this.selectedProject = this.projectService.getProject();
@@ -117,5 +113,28 @@ export class UiEditorComponent implements OnInit, AfterViewInit {
     // TODO this widget selecting process might be more appropriate for the
     // worksurface
     this.projectService.updateSelectedWidget(this.selectedWidget);
+
+
+    this.subscriptions.push(
+      this.route.paramMap.subscribe((params: ParamMap) => {
+        const selectedWidgetId = params.get('id');
+        if (!selectedWidgetId) {
+          return;
+        }
+        if (this.selectedWidget) {
+          if (this.selectedWidget.getId() === selectedWidgetId) {
+            return;
+          }
+        }
+        this.selectedWidget = this.userApp.getWidget(selectedWidgetId);
+        this.projectService.updateSelectedWidget(this.selectedWidget);
+      })
+    );
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }
