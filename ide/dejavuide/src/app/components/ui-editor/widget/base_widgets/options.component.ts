@@ -58,7 +58,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   }
 
   createTemplate() {
-    const userApp = this.projectService.getProject().getUserApp();
+    const userApp = this.projectService.getUserApp();
     const copies = this.widget.makeCopy(userApp);
     userApp.setAsTemplate(copies[0]);
     this.projectService.userAppUpdated();
@@ -66,7 +66,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
 
   delete() {
     this.unlinkWidgetFromParent();
-    const userApp = this.projectService.getProject().getUserApp();
+    const userApp = this.projectService.getUserApp();
     userApp.removeWidget(this.widget.getId());
     this.projectService.userAppUpdated();
   }
@@ -77,19 +77,19 @@ export class WidgetOptionsComponent implements AfterViewInit {
   }
 
   moveUp() {
-    const userApp = this.projectService.getProject().getUserApp();
+    const userApp = this.projectService.getUserApp();
     const parent = this.getParentWidget(userApp);
     parent.changeInnerWidgetOrderByOne(userApp, this.widget, true);
   }
 
   moveDown() {
-    const userApp = this.projectService.getProject().getUserApp();
+    const userApp = this.projectService.getUserApp();
     const parent = this.getParentWidget(userApp);
     parent.changeInnerWidgetOrderByOne(userApp, this.widget, false);
   }
 
   private unlinkWidgetFromParent() {
-    const userApp = this.projectService.getProject().getUserApp();
+    const userApp = this.projectService.getUserApp();
     const parent = this.getParentWidget(userApp);
     parent.removeInnerWidget(userApp, this.widget.getId());
   }

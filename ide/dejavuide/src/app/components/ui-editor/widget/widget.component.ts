@@ -65,7 +65,7 @@ export class WidgetComponent implements OnInit, OnDestroy {
     );
 
     this.innerWidgets = this.widget.innerWidgetIds.map(
-      innerWidgetIds => this.getInnerWidgets(innerWidgetIds)
+      innerWidgetIds => this.projectService.getWidgets(innerWidgetIds)
     );
 
     this.subscriptions.push(
@@ -113,17 +113,8 @@ export class WidgetComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getInnerWidgets(innerWidgetIds: string[]) {
-    const innerWidgets = [];
-    const userApp = this.projectService.getProject().getUserApp();
-    for (const innerWidgetId of innerWidgetIds) {
-      innerWidgets.push(userApp.getWidget(innerWidgetId));
-    }
-    return innerWidgets;
-  }
-
   private updateStylesToShow() {
-    const userApp = this.projectService.getProject().getUserApp();
+    const userApp = this.projectService.getUserApp();
     const stylesToShow = this.widget.getCustomStylesToShow(userApp);
 
     Object.keys(stylesToShow).forEach((name) => {

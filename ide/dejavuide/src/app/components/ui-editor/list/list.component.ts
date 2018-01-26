@@ -33,8 +33,7 @@ export class ListComponent {
     }
 
   private refreshList() {
-    const project = this.projectService.getProject();
-    this.userApp = project.getUserApp();
+    this.userApp = this.projectService.getUserApp();
     this.pages = [];
     this.unusedWidgets = [];
     this.templates = [];

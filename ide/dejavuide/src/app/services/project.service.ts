@@ -37,4 +37,18 @@ export class ProjectService {
   userAppUpdated() {
     this.userAppUpdateListener.next(true);
   }
+
+  /** Convenience functions */
+
+  getUserApp() {
+    const project = this.getProject();
+    if (project) {
+      return project.getUserApp();
+    }
+  }
+
+  getWidgets(widgetIds: string[]) {
+    const userApp = this.getUserApp();
+    return widgetIds.map(widgetId => userApp.getWidget(widgetId));
+  }
 }

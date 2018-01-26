@@ -46,9 +46,8 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    const userApp = this.projectService.getProject().getUserApp();
     this.innerWidgets$ = this.widget.innerWidgetIds
-      .map(ids => ids.map(id => userApp.getWidget(id)));
+      .map(ids => this.projectService.getWidgets(ids));
 
     this.selected = this.projectService.selectedWidget
       .map(widget => widget.getId() === this.widget.getId());
@@ -147,7 +146,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private deleteUserWidget() {
     console.log('clicked delete');
-    const userApp = this.projectService.getProject().getUserApp();
+    const userApp = this.projectService.getUserApp();
     // TODO either disallow the selected widget to be deleted, or
     // update the worksurface reference to null if it is deleted
 

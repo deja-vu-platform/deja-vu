@@ -45,22 +45,12 @@ export class MapWidgetComponent implements OnChanges, OnDestroy {
     );
 
     this.innerWidgets = this.widget.innerWidgetIds.map(
-      innerWidgetIds => this.getInnerWidgets(innerWidgetIds)
+      innerWidgetIds => this.projectService.getWidgets(innerWidgetIds)
     );
   }
 
   ngOnDestroy() {
     this.unsubscribe();
-  }
-
-  // TODO this is an exact copy of the widget.component version
-  private getInnerWidgets(innerWidgetIds: string[]) {
-    const innerWidgets = [];
-    const userApp = this.projectService.getProject().getUserApp();
-    for (const innerWidgetId of innerWidgetIds) {
-      innerWidgets.push(userApp.getWidget(innerWidgetId));
-    }
-    return innerWidgets;
   }
 
   private unsubscribe() {
