@@ -94,16 +94,16 @@ fdescribe('Widget', () => {
       widget3.setAsInnerWidget(userApp, widget2);
       expect(widget3.getInnerWidgetIds()).toEqual([widget6.getId(), widget2.getId()]);
 
-      widget2.removeInnerWidget(userApp, widget1.getId());
+      widget2.unlinkInnerWidget(userApp, widget1.getId());
       expect(widget2.getInnerWidgetIds()).toEqual([]);
 
-      widget3.removeInnerWidget(userApp, widget2.getId());
+      widget3.unlinkInnerWidget(userApp, widget2.getId());
       expect(widget3.getInnerWidgetIds()).toEqual([widget6.getId()]);
     });
 
     it ('does not delete removed items', () => {
       widget2.setAsInnerWidget(userApp, widget1);
-      widget2.removeInnerWidget(userApp, widget1.getId());
+      widget2.unlinkInnerWidget(userApp, widget1.getId());
 
       expect(userApp.getWidget(widget1.getId())).toBe(widget1);
     });

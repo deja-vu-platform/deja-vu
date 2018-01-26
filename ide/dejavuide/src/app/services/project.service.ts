@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { ReplaySubject } from 'rxjs/ReplaySubject';
 
 import { Project } from '../models/project/project';
-import { Widget } from '../models/widget/widget';
+import { Widget, UserWidget } from '../models/widget/widget';
+import { UserCliche } from '../models/cliche/cliche';
 
 @Injectable()
 export class ProjectService {
@@ -40,7 +41,7 @@ export class ProjectService {
 
   /** Convenience functions */
 
-  getUserApp() {
+  getUserApp(): UserCliche {
     const project = this.getProject();
     if (project) {
       return project.getUserApp();
@@ -50,5 +51,26 @@ export class ProjectService {
   getWidgets(widgetIds: string[]) {
     const userApp = this.getUserApp();
     return widgetIds.map(widgetId => userApp.getWidget(widgetId));
+  }
+
+  deleteWidget(widget: Widget) {
+    const userApp = this.getUserApp();
+    this.unlinkWidget(widget);
+    userApp.removeWidget(widget.getId());
+  }
+
+  unlinkWidget(widget: Widget) {
+    const userApp = this.getUserApp();
+    const parent = this.getParentWidget(widget);
+    if (parent) {
+      parent.unlinkInnerWidget(userApp, widget.getId());
+    }
+  }
+
+  getParentWidget(widget: Widget): UserWidget {
+    const parentId = widget.getParentId();
+    if (parentId) {
+      return this.getUserApp().getWidget(parentId) as UserWidget;
+    }
   }
 }

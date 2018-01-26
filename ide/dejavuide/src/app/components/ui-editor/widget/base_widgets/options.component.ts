@@ -65,38 +65,25 @@ export class WidgetOptionsComponent implements AfterViewInit {
   }
 
   delete() {
-    this.unlinkWidgetFromParent();
-    const userApp = this.projectService.getUserApp();
-    userApp.removeWidget(this.widget.getId());
+    this.projectService.deleteWidget(this.widget);
     this.projectService.userAppUpdated();
   }
 
   unlink() {
-    this.unlinkWidgetFromParent();
+    this.projectService.unlinkWidget(this.widget);
     this.projectService.userAppUpdated();
   }
 
   moveUp() {
     const userApp = this.projectService.getUserApp();
-    const parent = this.getParentWidget(userApp);
+    const parent = this.projectService.getParentWidget(this.widget);
     parent.changeInnerWidgetOrderByOne(userApp, this.widget, true);
   }
 
   moveDown() {
     const userApp = this.projectService.getUserApp();
-    const parent = this.getParentWidget(userApp);
+    const parent = this.projectService.getParentWidget(this.widget);
     parent.changeInnerWidgetOrderByOne(userApp, this.widget, false);
-  }
-
-  private unlinkWidgetFromParent() {
-    const userApp = this.projectService.getUserApp();
-    const parent = this.getParentWidget(userApp);
-    parent.removeInnerWidget(userApp, this.widget.getId());
-  }
-
-  private getParentWidget(userApp): UserWidget {
-    const parentId = this.widget.getParentId();
-    return userApp.getWidget(parentId) as UserWidget;
   }
 
   openTextPicker(event) {

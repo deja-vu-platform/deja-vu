@@ -501,7 +501,7 @@ export class UserWidget extends Widget {
   }
 
   // TODO perhaps this should also be a cliche function
-  removeInnerWidget(userApp: UserCliche, id: string) {
+  unlinkInnerWidget(userApp: UserCliche, id: string) {
     removeFirstFromArray(id, this.fields.innerWidgetIds);
 
     const widget = userApp.getWidget(id);
