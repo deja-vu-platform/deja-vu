@@ -23,7 +23,7 @@ export class UiEditorComponent implements OnInit, OnDestroy {
   private userApp: UserCliche;
   selectedWidget: Widget;
 
-  subscriptions = [];
+  private subscriptions = [];
 
   constructor (
     private projectService: ProjectService,
@@ -34,10 +34,6 @@ export class UiEditorComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-
-
-    // this.selectedProject = new Project('New Test Proj');
-    // this.projectService.updateProject(this.selectedProject);
     this.selectedProject = this.projectService.getProject();
     if (!this.selectedProject) {
       this.routerService.navigateTo(PageType.PROJECT_EXPLORER);
@@ -67,13 +63,6 @@ export class UiEditorComponent implements OnInit, OnDestroy {
         clicheId: appId});
       this.userApp.addWidget(innerWidget1);
       testWidget.setAsInnerWidget(this.userApp, innerWidget1);
-
-      // const innerWidget7 = new LinkBaseWidget(
-      //   this.selectedProject,
-      //   'test inner7',
-      //   { height: 100, width: 200 }, null, appId);
-      // testWidget.addInnerWidget(innerWidget7);
-      // innerWidget7.updatePosition({ top: 450, left: 100 });
 
       const innerWidget2 = new UserWidget(
         {name: 'test inner2',
@@ -105,15 +94,10 @@ export class UiEditorComponent implements OnInit, OnDestroy {
       this.selectedWidget = this.userApp.getWidget(pageId);
     }
 
-    // TODO
-    // This is currently needed to signal to the list that it is ready to read
-    // from the userapp
+    // TODO This is currently needed to signal to the list that it is ready to // read from the userapp
     this.projectService.userAppUpdated();
 
-    // TODO this widget selecting process might be more appropriate for the
-    // worksurface
     this.projectService.updateSelectedWidget(this.selectedWidget);
-
 
     this.subscriptions.push(
       this.route.paramMap.subscribe((params: ParamMap) => {

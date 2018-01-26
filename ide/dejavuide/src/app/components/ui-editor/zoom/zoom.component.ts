@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 
 import { Dimensions, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
@@ -17,7 +17,7 @@ const CHEVRON = {
   templateUrl: './zoom.component.html',
   styleUrls: ['./zoom.component.css']
 })
-export class ZoomComponent {
+export class ZoomComponent implements OnDestroy {
   readonly sliderMinVal = -300;
   readonly sliderMaxVal = 300;
   readonly ZoomType = ZoomType;
@@ -26,6 +26,8 @@ export class ZoomComponent {
   sliderVal = 0;
   minimized = false;
   chevron = CHEVRON.RIGHT;
+
+  private subscriptions = [];
 
   private currentZoom: number;
   private visibleWindowDimensions: Dimensions;
@@ -36,19 +38,23 @@ export class ZoomComponent {
     private stateService: StateService,
     private projectService: ProjectService
   ) {
-    stateService.visibleWindowDimensions
-      .subscribe((newVisibleWindowDimensions) => {
-        this.visibleWindowDimensions = newVisibleWindowDimensions;
-      });
+    this.subscriptions.push(
+      stateService.visibleWindowDimensions.subscribe(
+        (newVisibleWindowDimensions) => {
+          this.visibleWindowDimensions = newVisibleWindowDimensions;
+        }));
 
-    stateService.selectedScreenDimensions.subscribe(
-      (newScreenDimensions) => {
-        this.screenDimensions = newScreenDimensions;
-      });
+    this.subscriptions.push(
+      stateService.selectedScreenDimensions.subscribe(
+        (newScreenDimensions) => {
+          this.screenDimensions = newScreenDimensions;
+        }));
 
-    projectService.selectedWidget.subscribe((newWidget) => {
-      this.widgetDimensions = newWidget.getDimensions();
-    });
+    this.subscriptions.push(
+      projectService.selectedWidget.subscribe(
+        (newWidget) => {
+          this.widgetDimensions = newWidget.getDimensions();
+        }));
   }
 
 
@@ -152,5 +158,11 @@ export class ZoomComponent {
   private zoomChanged() {
     this.stateService.updateZoom(this.currentZoom);
     this.zoomControlText = this.makeZoomText(this.getZoomFromSliderVal());
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }

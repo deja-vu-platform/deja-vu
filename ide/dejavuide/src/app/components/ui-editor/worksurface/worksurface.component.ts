@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef, Input, OnDestroy, NgZone } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ElementRef, OnDestroy, NgZone } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
@@ -36,29 +36,32 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
   private subscriptions = [];
 
   constructor(
-    elt: ElementRef,
+    el: ElementRef,
     private stateService: StateService,
     private projectService: ProjectService,
     private zone: NgZone
   ) {
-    this.el = elt.nativeElement;
+    this.el = el.nativeElement;
 
-    this.subscriptions.push(stateService.zoom.subscribe((newZoom) => {
-      this.currentZoom = newZoom;
-    }));
-
-    this.subscriptions.push(stateService.selectedScreenDimensions
-      .subscribe((newSelectedScreenDimensions) => {
-        this.selectedScreenDimensions = newSelectedScreenDimensions;
+    this.subscriptions.push(
+      stateService.zoom.subscribe((newZoom) => {
+        this.currentZoom = newZoom;
       }));
 
-    this.subscriptions.push(stateService.visibleWindowScrollPosition
-      .subscribe((newScrollPosition) => {
-        this.visibleWindowScroll = newScrollPosition;
-        const jqo = $('dv-worksurface');
-        jqo.scrollTop(newScrollPosition.top);
-        jqo.scrollLeft(newScrollPosition.left);
-      }));
+    this.subscriptions.push(
+      stateService.selectedScreenDimensions.subscribe(
+        (newSelectedScreenDimensions) => {
+          this.selectedScreenDimensions = newSelectedScreenDimensions;
+        }));
+
+    this.subscriptions.push(
+      stateService.visibleWindowScrollPosition.subscribe(
+        (newScrollPosition) => {
+          this.visibleWindowScroll = newScrollPosition;
+          const jqo = $('dv-worksurface');
+          jqo.scrollTop(newScrollPosition.top);
+          jqo.scrollLeft(newScrollPosition.left);
+        }));
   }
 
   ngOnInit() {
@@ -184,7 +187,6 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
     this.subscriptions.forEach(sub => {
       sub.unsubscribe();
     });
-    console.log('destroyed');
   }
 
   handleWindowResize() {
@@ -206,10 +208,5 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(() => {
       this.stateService.updateVisibleWindowDimensions(newSize);
     }, 0);
-  }
-
-
-  private update(id?) {
-
   }
 }

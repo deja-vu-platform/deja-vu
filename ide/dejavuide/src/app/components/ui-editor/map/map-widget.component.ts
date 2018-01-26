@@ -17,8 +17,7 @@ export class MapWidgetComponent implements OnChanges, OnDestroy {
   innerWidgets: Observable<Widget[]>;
   el: HTMLElement;
 
-  subscriptions = [];
-
+  private subscriptions = [];
 
   constructor(
     el: ElementRef,

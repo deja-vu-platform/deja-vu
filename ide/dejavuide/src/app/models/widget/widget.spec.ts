@@ -276,6 +276,21 @@ fdescribe('Widget', () => {
       expect(widget5copy.getCustomStylesToShow(userApp)).toEqual(widget5Styles2);
     });
 
+    it('getCustomStylesToShow double templates can still detech changes ' +
+    'in the farthest template', () => {
+      const widget5Copies = widget5.makeCopy(userApp, undefined, true);
+      const widget5Templatecopy = widget5Copies[0];
+
+      // Widget6 is a template that has a template copy
+      widget6.setAsInnerWidget(userApp, widget5Templatecopy);
+      const widget6Copies = widget6.makeCopy(userApp, undefined, true);
+      const widget5copy = widget6Copies[1];
+
+      widget5.updateCustomStyle('background-color', 'blue');
+      const widget5Styles = widget5.getLocalCustomStyles();
+      expect(widget5copy.getCustomStylesToShow(userApp)).toEqual(widget5Styles);
+    });
+
     it('getCustomStylesToShow inheritence is parent < template < self',
     () => {
       widget6.updateCustomStyle('background-color', 'red');

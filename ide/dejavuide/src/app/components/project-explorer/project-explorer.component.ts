@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, EventEmitter, Output} from '@angular/core';
+import { Component, OnInit, OnDestroy} from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { MatDialog } from '@angular/material';
@@ -22,8 +22,7 @@ interface DisplayProject {
   templateUrl: './project-explorer.component.html',
   styleUrls: ['./project-explorer.component.css']
 })
-export class ProjectExplorerComponent implements OnInit {
-  @Input() currentProject;
+export class ProjectExplorerComponent implements OnInit, OnDestroy {
   private selectedProject;
   projects = {};
 
@@ -33,6 +32,7 @@ export class ProjectExplorerComponent implements OnInit {
   projectsToShow: DisplayProject[] = [];
 
   componentToShow;
+  private subscriptions = [];
 
   constructor(
     public dialog: MatDialog,
@@ -69,12 +69,13 @@ export class ProjectExplorerComponent implements OnInit {
       width: '250px',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const newProject = new Project({name: result.name});
-        this.loadProject(newProject);
-      }
-    });
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          const newProject = new Project({name: result.name});
+          this.loadProject(newProject);
+        }
+      }));
   }
 
   currentProjectClicked() {
@@ -91,12 +92,13 @@ export class ProjectExplorerComponent implements OnInit {
       width: '250px',
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.loaderVisible = true;
-        this.deleteProject(projectName);
-      }
-    });
+    this.subscriptions.push(
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.loaderVisible = true;
+          this.deleteProject(projectName);
+        }
+      }));
   }
 
   private loadProject(project: Project) {
@@ -132,12 +134,19 @@ export class ProjectExplorerComponent implements OnInit {
 
   private fileToDisplayProject(projectName, id, lastAccessed): DisplayProject {
     const lastAccessDate = new Date(lastAccessed);
+    const currentProject = this.projectService.getProject();
     return {
       name: projectName,
       isSelectedProject:
-        (this.currentProject ? (id === this.currentProject.getId()) : false),
+        (currentProject ? (id === currentProject.getId()) : false),
       readableDate: lastAccessDate.toLocaleDateString(),
       readableTime: lastAccessDate.toLocaleTimeString()
     };
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }

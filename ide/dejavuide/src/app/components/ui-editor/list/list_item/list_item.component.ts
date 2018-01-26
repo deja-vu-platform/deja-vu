@@ -1,5 +1,5 @@
 
-import { Component, Input, OnInit, AfterViewInit, ElementRef, ViewChild} from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, OnDestroy, ElementRef, ViewChild} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { MatDialog } from '@angular/material';
@@ -8,7 +8,6 @@ import { Cliche } from '../../../../models/cliche/cliche';
 import { Widget, BaseWidget, UserWidget, LinkBaseWidget } from '../../../../models/widget/widget';
 import { DeleteDialogComponent } from './delete_dialog.component';
 import { ProjectService } from '../../../../services/project.service';
-// import { WidgetComponent } from '../../widget/widget.component';
 
 // List item needs drag-and-drop
 import * as jQuery from 'jquery';
@@ -22,7 +21,7 @@ const $ = <any>jQuery;
   templateUrl: './list_item.component.html',
   styleUrls: ['./list_item.component.css']
 })
-export class ListItemComponent implements OnInit, AfterViewInit {
+export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() isDraggable = false;
   @Input() isDeletable = true;
   @Input() createNew = false;
@@ -34,6 +33,8 @@ export class ListItemComponent implements OnInit, AfterViewInit {
   renameVisible = false;
   selected: Observable<boolean>;
   el: HTMLElement;
+
+  private subscriptions = [];
 
   innerWidgets$: Observable<Widget[]>;
   constructor(
@@ -123,21 +124,17 @@ export class ListItemComponent implements OnInit, AfterViewInit {
         width: '250px',
       });
 
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.deleteUserWidget();
-        }
-      });
+      this.subscriptions.push(
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            this.deleteUserWidget();
+          }
+        }));
     }
   }
 
   toggleShow() {
     this.innerShown = !this.innerShown;
-  }
-
-  widgetSelected() {
-    console.log('widget clicked');
-    this.projectService.updateSelectedWidget(this.widget);
   }
 
   renameStart(event) {
@@ -146,7 +143,6 @@ export class ListItemComponent implements OnInit, AfterViewInit {
 
   rename(event) {
     this.widget.setName(event.target.value);
-    // this.projectService.widgetUpdated();
   }
 
   private deleteUserWidget() {
@@ -157,6 +153,12 @@ export class ListItemComponent implements OnInit, AfterViewInit {
 
     userApp.removeWidget(this.widget.getId());
     this.projectService.userAppUpdated();
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }
 

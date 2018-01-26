@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, OnInit, ElementRef, ChangeDetectorRef} from '@angular/core';
+import { Component, AfterViewInit, OnInit, ElementRef } from '@angular/core';
 
 import { Widget } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
@@ -46,6 +46,8 @@ export class MapComponent implements AfterViewInit, OnInit {
   mapSelectedWidgetPosition: Position;
   mapWidgetSizes: Dimensions[] = [];
 
+  private subscriptions = [];
+
   private zoom = 1;
   private el: HTMLElement;
 
@@ -53,45 +55,47 @@ export class MapComponent implements AfterViewInit, OnInit {
     el: ElementRef,
     private stateService: StateService,
     private projectService: ProjectService,
-    private ref: ChangeDetectorRef
   ) {
     this.el = el.nativeElement;
-    stateService.zoom.subscribe((newZoom) => {
-      this.zoom = newZoom;
-    });
+    this.subscriptions.push(
+      stateService.zoom.subscribe(
+        (newZoom) => {
+          this.zoom = newZoom;
+        }));
 
-    stateService.selectedScreenDimensions
-      .subscribe((newSelectedScreenDimensions) => {
-        this.screenDimensions = newSelectedScreenDimensions;
-        this.updateMapScale();
-        // this.updateView();
-      });
+    this.subscriptions.push(
+      stateService.selectedScreenDimensions.subscribe(
+        (newSelectedScreenDimensions) => {
+          this.screenDimensions = newSelectedScreenDimensions;
+          this.updateMapScale();
+        }));
   }
 
   ngOnInit() {
     this.mapComponentDimensions.height = this.el.offsetHeight;
     this.mapComponentDimensions.width = this.el.offsetWidth;
     this.updateMapScale();
-    // this.updateView();
 
-    this.stateService.visibleWindowScrollPosition
-    .subscribe((newVisibleWindowScrollPosition) => {
-      this.mapVisibleWindowPosition.top =
-        newVisibleWindowScrollPosition.top * this.mapScale;
-      this.mapVisibleWindowPosition.left =
-        newVisibleWindowScrollPosition.left * this.mapScale;
-    });
+    this.subscriptions.push(
+      this.stateService.visibleWindowScrollPosition.subscribe(
+        (newVisibleWindowScrollPosition) => {
+          this.mapVisibleWindowPosition.top =
+            newVisibleWindowScrollPosition.top * this.mapScale;
+          this.mapVisibleWindowPosition.left =
+            newVisibleWindowScrollPosition.left * this.mapScale;
+        }));
 
+    this.subscriptions.push(
+      this.projectService.selectedWidget.subscribe(
+        (newSelectedWidget) => {
+          this.selectedWidget = newSelectedWidget;
+        }));
 
-    this.projectService.selectedWidget.subscribe(
-      (newSelectedWidget) => {
-        this.selectedWidget = newSelectedWidget;
-      });
-
-    this.stateService.visibleWindowDimensions.subscribe(
-      (newVisibleWindowDimensions) => {
+    this.subscriptions.push(
+      this.stateService.visibleWindowDimensions.subscribe(
+        (newVisibleWindowDimensions) => {
           this.visibleWindowDimensions = newVisibleWindowDimensions;
-    });
+        }));
   }
 
   ngAfterViewInit() {
@@ -129,39 +133,6 @@ export class MapComponent implements AfterViewInit, OnInit {
       left: left
     };
   }
-
-  /**
-   * Update the view of the map fresh from the info of the given widget.
-   */
-  // private updateView() {
-  //   const selectedWidget = this.selectedWidget;
-  //   const userApp = this.projectService.getProject().getUserApp();
-  //   if (selectedWidget) {
-  //     this.mapSelectedWidgetSize = {
-  //       height: selectedWidget.getDimensions().height * this.mapScale,
-  //       width: selectedWidget.getDimensions().width * this.mapScale
-  //     };
-  //     this.mapSelectedWidgetPosition = {
-  //       top: selectedWidget.getPosition().top * this.mapScale,
-  //       left: selectedWidget.getPosition().left * this.mapScale
-  //     };
-
-  //     const mapWidgetSizes = [];
-  //     selectedWidget.getInnerWidgetIds().forEach((innerWidgetId) => {
-  //       const innerWidget = userApp.getWidget(innerWidgetId);
-  //       const innerWidgetDimensions = innerWidget.getDimensions();
-  //       const innerWidgetPosition = innerWidget.getPosition();
-  //       mapWidgetSizes.push({
-  //         left: innerWidgetPosition.left * this.mapScale,
-  //         top: innerWidgetPosition.top * this.mapScale,
-  //         width: innerWidgetDimensions.width * this.mapScale,
-  //         height: innerWidgetDimensions.height * this.mapScale,
-  //       });
-  //     });
-
-  //     this.mapWidgetSizes = mapWidgetSizes;
-  //   }
-  // }
 
   /**
    * Updates the scale of the map so that the ratio of the <TODO>

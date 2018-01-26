@@ -17,7 +17,6 @@ import { UiEditorModule } from './components/ui-editor/ui-editor.module';
 import { ProjectExplorerModule } from './components/project-explorer/project-explorer.module';
 
 import { RouterService } from './services/router.service';
-import { CustomRouteReuseStrategy } from './services/CustomRouteReuseStrategy';
 import { PaletteService } from './services/palette.service';
 
 @NgModule({
@@ -40,7 +39,6 @@ import { PaletteService } from './services/palette.service';
     ProjectService,
     CommunicatorService,
     PaletteService,
-    // {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy}
   ],
   bootstrap: [AppComponent]
 })

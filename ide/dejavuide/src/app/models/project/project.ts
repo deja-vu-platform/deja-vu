@@ -61,6 +61,10 @@ export class Project {
     }
   }
 
+  getId(): string {
+    return this.fields.id;
+  }
+
   getName(): string {
     return this.fields.name;
   }

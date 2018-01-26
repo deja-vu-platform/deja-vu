@@ -1,7 +1,6 @@
 <div class="content" 
       [ngClass]="{'selected': (selected | async)}">
   <div class="name-container">
-    <!--  (click)="widgetSelected()" -->
     <button [routerLink]="['/ui-editor', {id: widget.getId()}]">
       <div *ngIf="widget.isBaseType(); else usertypeicon">
         <ng-container *ngIf="widget.isLink()">

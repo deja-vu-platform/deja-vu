@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, AfterViewInit, ElementRef, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, OnDestroy } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
@@ -18,7 +18,7 @@ const $ = <any>jQuery;
   templateUrl: './widget.component.html',
   styleUrls: ['./widget.component.css'],
 })
-export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDestroy {
+export class WidgetComponent implements OnInit, OnDestroy {
   _activated: boolean;
   @Input()
   set activated(isActivated: boolean) {
@@ -47,29 +47,9 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
     private projectService: ProjectService,
   ) {
       this.el = el.nativeElement;
-      // this.projectService.widgetUpdateListener.subscribe(() => {
-      //   this.getInnerWidgets();
-      // });
-  }
-
-  ngOnChanges() {
   }
 
   ngOnInit() {
-    // this.el.style.top = this.widget.getPosition().top + 'px';
-    // this.el.style.left = this.widget.getPosition().left + 'px';
-    // this.el.style.position = 'absolute';
-
-    // // get inner widgets
-    // this.getInnerWidgets();
-
-    // this.updateStylesToShow();
-    // this.subscriptions.push(
-    // this.projectService.widgetUpdateListener.subscribe(() => {
-    //   this.getInnerWidgets();
-    //   // const localStyles = this.widget.getLocalCustomStyles();
-    //   this.updateStylesToShow();
-    // }));
     this.subscriptions.push(
       this.widget.dimensions.subscribe(dimensions => {
         this.el.style.height = dimensions.height + 'px';
@@ -100,24 +80,6 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
     }
   }
 
-  ngAfterViewInit() {
-    // Change the position of the widget in view. This is the best way to do
-    // it without removing view encapsulation.
-    // this.el.style.top = this.widget.getPosition().top + 'px';
-    // this.el.style.left = this.widget.getPosition().left + 'px';
-    // this.el.style.position = 'absolute';
-
-    // console.log(this.el.style.top, this.el.style.left);
-
-    // Initiate draggable based on certain things
-    // If it's the selected widget, it is always movable
-    // Otherwise make it movable based on the flag.
-    // if (this.isSelected || this.isMovable) {
-    //   this.makeWidgetDraggable();
-    //   this.makeWidgetResizable();
-    // }
-  }
-
   private makeWidgetDraggable() {
     $(this.el).draggable({
       containment: '.work-surface',
@@ -139,9 +101,6 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
     const dragHandle_se = $('.drag-handle');
 
     $(this.el).resizable({
-      // handles: {
-      //   'se': dragHandle_se,
-      // },
       handles: 'n, e, s, w, ne, nw, se, sw',
       // minHeight: 0,
       // minWidth: 0,
@@ -150,10 +109,6 @@ export class WidgetComponent implements OnChanges, AfterViewInit, OnInit, OnDest
         const newPosition = {top: ui.position.top, left: ui.position.left};
         this.widget.updatePosition(newPosition);
         this.widget.updateDimensions(newDimensions);
-      },
-      stop: (e, ui) => {
-        // not super important to update as you resize so just do it at the end
-        // this.projectService.widgetUpdated();
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Component, Input, Output, OnInit} from '@angular/core';
+import { Component, OnInit, OnDestroy} from '@angular/core';
 import { RouterService, PageType, PageInfo } from '../../../services/router.service';
 import { ProjectService } from '../../../services/project.service';
 import { Project } from '../../../models/project/project';
@@ -10,11 +10,13 @@ import { CommunicatorService } from '../../../services/communicator.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   isSavable: boolean;
   readonly dejavu = 'Déjà Vu';
   otherPages: PageInfo[];
   page: PageInfo;
+
+  private subscriptions = [];
 
   constructor (
     private projectService: ProjectService,
@@ -27,9 +29,10 @@ export class HeaderComponent implements OnInit {
       console.log(event);
     });
 
-    this.routerService.newPageType.subscribe((pageType) => {
-      this.updateHeaderData(pageType);
-    });
+    this.subscriptions.push(
+      this.routerService.newPageType.subscribe((pageType) => {
+        this.updateHeaderData(pageType);
+      }));
 
     this.page = this.routerService.getSelectedPage();
     this.handleRedirectClick(this.page.type);
@@ -54,5 +57,11 @@ export class HeaderComponent implements OnInit {
     this.page = this.routerService.getPageInfo(type);
     this.otherPages = this.routerService.getOtherPages(type);
     this.isSavable = this.routerService.isSaveable(type);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }

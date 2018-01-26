@@ -1,6 +1,5 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 
-import { UserWidget } from '../../../models/widget/widget';
 import { PaletteService } from '../../../services/palette.service';
 
 declare const jscolor: any;
@@ -16,8 +15,7 @@ const PALETTE_SIZE = 4;
   templateUrl: './palette.component.html',
   styleUrls: ['./palette.component.css'],
 })
-export class PaletteComponent {
-  @Input() selectedPage: UserWidget;
+export class PaletteComponent implements OnDestroy {
   // possible sources http://jscolor.com/, http://www.w3schools.com/colors/colors_picker.asp
   // http://jscolor.com/examples/
 
@@ -27,14 +25,16 @@ export class PaletteComponent {
   currentColors = [];
 
   selectedPaletteEltNum = -1;
+  private subscriptions = [];
 
   constructor(private paletteService: PaletteService) {
     // TODO get the palette to load
     this.loadPalette();
 
-    this.paletteService.newColorListener.subscribe(color => {
-      this.addNewColorToCurrentColors(color);
-    });
+    this.subscriptions.push(
+      this.paletteService.newColorListener.subscribe(color => {
+        this.addNewColorToCurrentColors(color);
+      }));
   }
 
   addNewColorToCurrentColors (color, idx?) {
@@ -95,5 +95,11 @@ export class PaletteComponent {
 
   private savePalette() {
     // userApp.properties.palette = JSON.parse(JSON.stringify(this.palette));
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }
