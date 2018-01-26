@@ -10,6 +10,7 @@ import { ProjectService } from '../../../services/project.service';
 // Widgets are drag-and-droppable
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
+import { isAbsolute } from 'path';
 
 const $ = <any>jQuery;
 
@@ -22,6 +23,7 @@ export class WidgetComponent implements OnInit, OnDestroy {
   _activated: boolean;
   @Input()
   set activated(isActivated: boolean) {
+    this._activated = isActivated;
     // make sure this component is fully loaded before running this code
     if (this.widget && isActivated) {
       // check for any changes that might have occured elsewhere
