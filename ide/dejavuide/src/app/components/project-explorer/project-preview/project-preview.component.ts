@@ -1,33 +1,28 @@
 import { Component, Input, OnInit } from '@angular/core';
 
+import { UserCliche } from '../../../models/cliche/cliche';
+import { Widget } from '../../../models/widget/widget';
+
 @Component({
     selector: 'dv-project-preview',
     templateUrl: './project-preview.component.html',
     styleUrls: ['./project-preview.component.css']
   })
 export class ProjectPreviewComponent  {
-
+  @Input() selectedApp: UserCliche;
 }
 // var currentZoom = 1;
 
 // var gridHeight;
 // var gridWidth;
 
-// var view = WidgetDisplay();
-// var workSurface = WidgetWorkSurface();
-
 // function loadTablePreview(widgetToShow) {
 
 //     $('#page-preview').html('');
 
 //     var page = $('<div></div>');
-//     page.attr('id', 'page');
-
-//     $('#page-preview').append(page);
-//     $('<style>#page::after{content:"' + widgetToShow.meta.name + '"}</style>').appendTo('head');
 
 //     page.css({
-//         position: 'relative',
 //         'background-color': (widgetToShow.properties.styles.custom['background-color'] || '87CEFA')
 //     });
 
