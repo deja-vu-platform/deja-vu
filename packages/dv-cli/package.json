@@ -1,0 +1,30 @@
+{
+  "name": "dv-cli",
+  "version": "0.0.1",
+  "description": "CLI tool for Déjà Vu",
+  "main": "./dist/dv.js",
+  "bin": {
+    "dv": "./dist/dv.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "clean": "rm -rf ./dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spderosso/dejavu.git"
+  },
+  "author": "Santiago De Rosso",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "dependencies": {
+    "@types/lodash": "^4.14.96",
+    "@types/node": "^9.3.0",
+    "commander": "^2.13.0",
+    "lodash": "^4.17.4"
+  }
+}
