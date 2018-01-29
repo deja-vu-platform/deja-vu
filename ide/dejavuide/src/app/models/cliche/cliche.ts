@@ -85,6 +85,10 @@ export abstract class Cliche {
     return this.widgets.get(widgetId);
   }
 
+  getWidgets(widgetIds: string[]): Widget[] {
+    return widgetIds.map(widgetId => this.getWidget(widgetId));
+  }
+
   getName(): string {
     return this.fields.name;
   }

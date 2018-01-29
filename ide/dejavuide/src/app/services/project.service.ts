@@ -50,7 +50,7 @@ export class ProjectService {
 
   getWidgets(widgetIds: string[]) {
     const userApp = this.getUserApp();
-    return widgetIds.map(widgetId => userApp.getWidget(widgetId));
+    return userApp.getWidgets(widgetIds);
   }
 
   deleteWidget(widget: Widget) {

@@ -11,7 +11,9 @@ import { CommunicatorService } from '../../services/communicator.service';
 import { Project } from '../../models/project/project';
 
 interface DisplayProject {
+  filename: string;
   name: string;
+  id: string;
   isSelectedProject: boolean;
   readableDate: string;
   readableTime: string;
@@ -31,7 +33,6 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
 
   projectsToShow: DisplayProject[] = [];
 
-  componentToShow;
   private subscriptions = [];
 
   constructor(
@@ -44,9 +45,9 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
     this.loaderVisible = true;
     this.communicatorService.onLoadProjects((event, data) => {
       data.projects.forEach((projectInfo) => {
-        const projectName = projectInfo[0];
+        const filename = projectInfo[0];
         const content = JSON.parse(projectInfo[1]);
-        this.projects[projectName] = content;
+        this.projects[filename] = content;
       });
 
       this.updateDisplayProjectList();
@@ -55,7 +56,7 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
 
     this.communicatorService.onDeleteSuccess((event, data) => {
       // TODO deal with if the project is your selected project
-      delete this.projects[data.projectName];
+      delete this.projects[data.filename];
 
       this.updateDisplayProjectList();
       this.loaderVisible = false;
@@ -82,12 +83,12 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
     // TODO
   }
 
-  loadClicked(projectName) {
-    const newProject = Project.fromJSON(this.projects[projectName]);
+  loadClicked(filename: string) {
+    const newProject = Project.fromJSON(this.projects[filename]);
     this.loadProject(newProject);
   }
 
-  handleDelete(projectName): void {
+  handleDelete(filename: string): void {
     const dialogRef = this.dialog.open(ProjectDeleteDialogComponent, {
       width: '250px',
     });
@@ -96,7 +97,7 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
           this.loaderVisible = true;
-          this.deleteProject(projectName);
+          this.deleteProject(filename);
         }
       }));
   }
@@ -113,30 +114,33 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
     this.updateDisplayProjectList();
   }
 
-  private deleteProject(projectName) {
-    this.communicatorService.delete({projectName: projectName});
+  private deleteProject(filename) {
+    this.communicatorService.delete({filename: filename});
   }
 
   private updateDisplayProjectList() {
     const projectsToShow = [];
     const WEEK_IN_SEC = 604800000;
     const now = (new Date()).getTime();
-    Object.keys(this.projects).forEach((projectName: string) => {
-      const content = this.projects[projectName];
+    Object.keys(this.projects).forEach((filename: string) => {
+      const content = this.projects[filename];
       const time = content.lastAccessed;
       if (!this.recentSelected || (now - time) < WEEK_IN_SEC) {
-        // TODO this file shouldn't need to know the format of the content file
-        projectsToShow.push(this.fileToDisplayProject(projectName, content.id, time));
+        const name = Project.getName(content);
+        const id = Project.getId(content);
+        projectsToShow.push(this.fileToDisplayProject(filename, name, id, time));
       }
     });
     this.projectsToShow = projectsToShow;
   }
 
-  private fileToDisplayProject(projectName, id, lastAccessed): DisplayProject {
+  private fileToDisplayProject(filename, projectName, id, lastAccessed): DisplayProject {
     const lastAccessDate = new Date(lastAccessed);
     const currentProject = this.projectService.getProject();
     return {
+      filename: filename,
       name: projectName,
+      id: id,
       isSelectedProject:
         (currentProject ? (id === currentProject.getId()) : false),
       readableDate: lastAccessDate.toLocaleDateString(),
@@ -148,5 +152,9 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
     this.subscriptions.forEach(sub => {
       sub.unsubscribe();
     });
+  }
+
+  projectClicked(filename: string) {
+    this.selectedProject = Project.fromJSON(this.projects[filename]);
   }
 }

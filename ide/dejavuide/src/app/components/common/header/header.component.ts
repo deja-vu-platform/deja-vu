@@ -26,7 +26,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.communicatorService.onSaveSuccess((event, data) => {
-      console.log(event);
+      console.log(data);
     });
 
     this.subscriptions.push(

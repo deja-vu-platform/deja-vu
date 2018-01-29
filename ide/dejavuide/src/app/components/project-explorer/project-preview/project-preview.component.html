@@ -1,3 +1,25 @@
-<div id="page">
+<ng-container *ngIf="selectedApp">
+  <div>{{selectedApp.getName()}}</div>
+  <div id="page-preview">
+    <dv-project-preview-widget 
+      id="page"
+      *ngIf="!empty; else noPages"
+      [app]="selectedApp"
+      [widget]="pages[pageNumber]">
+    </dv-project-preview-widget>
+  </div>
+  <div 
+      id="preview-prev-page"
+      (click)="swipe(-1)">
+    <span class="glyphicon glyphicon-chevron-left" id="preview-prev-page-icon"></span>
+  </div>
+  <div 
+      id="preview-next-page"
+      (click)="swipe(1)">
+    <span class="glyphicon glyphicon-chevron-right" id="preview-next-page-icon"></span>
+  </div>
+</ng-container>
 
-</div>
+<ng-template #noPages>
+  This project has no pages
+</ng-template>

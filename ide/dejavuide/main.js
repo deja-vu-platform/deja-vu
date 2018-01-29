@@ -101,22 +101,23 @@ ipcMain.on('load', function (event, args) {
 });
 
 ipcMain.on('delete', function (event, args) {
-  deleteProject(args.projectName, function (err) {
+  deleteProject(args.filename, function (err) {
     if (err) {
       console.log(err);
       return;
     }
-    mainWindow.webContents.send('delete-success', { projectName: args.projectName });
+    mainWindow.webContents.send('delete-success', args);
   });
 });
 
 ipcMain.on('save', function (event, args) {
-  saveObjectToFile(projectsSavePath, projectNameToFilename(args.projectName), args.projectContents, function (err) {
+  var filename = projectNameToFilename(args.projectName);
+  saveObjectToFile(projectsSavePath, filename, args.projectContents, function (err) {
     if (err) {
       console.log(err);
       return;
     }
-    mainWindow.webContents.send('save-success', { projectName: args.projectName });
+    mainWindow.webContents.send('save-success', { filename: filename, projectId: args.projectId });
   });
 });
 
@@ -145,7 +146,7 @@ function readFiles(dirname, onFinish) {
               return;
             }
             if (getExtension(filename) === DV_EXT) {
-              files.push([filenameToProjectName(filename), content]);  
+              files.push([filename, content]);  
             }
             numFilesProcessed += 1;
             if (numFilesProcessed === filenames.length) {
@@ -161,10 +162,6 @@ function readFiles(dirname, onFinish) {
 function saveObjectToFile(dirname, filename, object, onFinish) {
   var pathName = path.join(dirname, filename);
   fs.writeFile(pathName, JSON.stringify(object), onFinish);
-}
-
-function filenameToProjectName(filename) {
-  return filename.split('.').slice(0, -1).join('.');
 }
 
 function getExtension(filename){
@@ -189,8 +186,7 @@ function isCopyOfFile(dirname, filename) {
   }
 }
 
-function deleteProject(projectName, onFinish) {
-  var filename = projectNameToFilename(projectName);
+function deleteProject(filename, onFinish) {
   var pathName = path.join(projectsSavePath, filename);
   fs.stat(pathName, function (err1, stats) {
     if (err1) {

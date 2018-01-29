@@ -41,47 +41,6 @@ a {
   cursor: pointer;
 }
 
-.project-preview{
-  text-align: center;
-  width: 850px;
-
-}
-
-#page-preview{
-  display: inline-block;
-
-  width: 850px;
-  height: 400px;
-
-  padding: 50px 30px;
-
-  /*pointer-events: none;*/
-}
-
-#preview-prev-page, #preview-next-page{
-  /*display: inline-block;*/
-  height: 400px;
-  width: 30px;
-  position: relative;
-  display: none;
-  cursor: pointer;
-}
-
-#preview-prev-page{
-  float: left;
-}
-
-#preview-next-page{
-  float: right;
-}
-
-#preview-prev-page-icon, #preview-next-page-icon{
-  position:absolute;
-  top:50%;
-  left:0;
-  width:100%;
-}
-
 .header {
   border-top: solid 5px #D5D5D5;
   text-align: center;

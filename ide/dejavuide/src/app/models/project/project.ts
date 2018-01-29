@@ -17,6 +17,14 @@ export class Project {
   userApp: UserCliche = null;
   importedCliches = new Map<string, DvCliche>();
 
+  static getName(fields: ProjectFields): string {
+    return fields.name;
+  }
+
+  static getId(fields: ProjectFields): string {
+    return fields.id;
+  }
+
   static fromJSON (fields: ProjectFields): Project {
     const project = new Project(fields);
     project.userApp = UserCliche.fromJSON(fields.userAppFields);

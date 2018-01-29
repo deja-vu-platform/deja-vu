@@ -24,23 +24,24 @@
   <div class="content">
     <ul [hidden]="projectsToShow.length === 0"
         id="projects-list">
-      <li *ngFor="let project of projectsToShow"
-          [ngClass]="{'highlighted': project.isSelectedProject}">
-        <div class="project-filename">
-          <div class="project-name">{{project.name}}</div>
+      <li *ngFor="let displayProjectInfo of projectsToShow"
+          [ngClass]="{'highlighted': displayProjectInfo.isSelectedProject}">
+        <div (click)="projectClicked(displayProjectInfo.filename)">
+          <div class="project-name">{{displayProjectInfo.filename}}</div>
+          <div class="project-name">{{displayProjectInfo.name}}</div>
           <div class="last-access-time">
-            Last Accessed: {{project.readableDate}}
-              at {{project.readableTime}}
+            Last Accessed: {{displayProjectInfo.readableDate}}
+              at {{displayProjectInfo.readableTime}}
           </div>
         </div>
         <button type="button" 
                 class="btn btn-default btn-load-project"
-                (click)="loadClicked(project.name)">
+                (click)="loadClicked(displayProjectInfo.filename)">
           <span>Load Project</span>
         </button>
         <button type="button" 
                 class="btn btn-default btn-delete-project"
-                (click)="handleDelete(project.name)">
+                (click)="handleDelete(displayProjectInfo.filename)">
           <span class="glyphicon glyphicon-trash"></span>
         </button>
       </li>
@@ -49,27 +50,16 @@
 </div>
 
 <div class="current-and-preview-container">
-  <div *ngIf="currentProject"
-        class="current-project">
+  <div class="current-project" *ngIf="currentProject">
     <div class="header">Current project</div>
     <div class="content"
           (click)="currentProjectClicked()">
       {{currentProject.getName()}}
     </div>
   </div>
-
-  <div class="project-preview">
-    <div id="project-name-preview" class="header">
-      Project Preview
-    </div>
-    <div id="preview-prev-page">
-      <span class="glyphicon glyphicon-chevron-left" id="preview-prev-page-icon"></span>
-    </div>
-    <div id="page-preview"></div>
-    <div id="preview-next-page">
-      <span class="glyphicon glyphicon-chevron-right" id="preview-next-page-icon"></span>
-    </div>
-  </div>
+  <dv-project-preview *ngIf="selectedProject"
+    [selectedProject]="selectedProject">
+  </dv-project-preview>
 </div>
 
 <dv-loader [show]="loaderVisible"></dv-loader>
