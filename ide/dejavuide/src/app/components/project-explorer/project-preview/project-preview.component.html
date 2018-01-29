@@ -2,6 +2,7 @@
   <div>{{selectedApp.getName()}}</div>
   <div id="page-preview">
     <dv-project-preview-widget 
+      (dblclick)="selectProject()"
       id="page"
       *ngIf="!empty; else noPages"
       [app]="selectedApp"

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, Output, OnInit, EventEmitter} from '@angular/core';
 
 import { Project } from '../../../models/project/project';
 import { UserCliche } from '../../../models/cliche/cliche';
@@ -10,12 +10,15 @@ import { Widget } from '../../../models/widget/widget';
     styleUrls: ['./project-preview.component.css']
   })
 export class ProjectPreviewComponent  {
+  _selectedProject: Project;
   selectedApp: UserCliche;
   pages: Widget[] = [];
   empty = false;
 
+  @Output() projectSelected = new EventEmitter<Project>();
   @Input()
   set selectedProject(project: Project) {
+    this._selectedProject = project;
     const app = project.getUserApp();
     this.selectedApp = app;
     this.pages = app.getPageIds().map(
@@ -48,16 +51,8 @@ export class ProjectPreviewComponent  {
 
     this.pageNumber = (this.pageNumber + direction + numPages) % (numPages);
   }
+
+  selectProject() {
+    this.projectSelected.next(this._selectedProject);
+  }
 }
-
-
-
-
-// $('#page-preview').on('dblclick', '#main-table-preview', function(){
-//     // this div's existance means there is some project showing
-
-//    selectedProject = availableProjectsByFilename[$('#page-preview').data('projectfilename')];
-//    selectedProject.lastAccessed = new Date();
-//    window.sessionStorage.setItem('selectedProject', JSON.stringify(selectedProject));
-//    window.location = 'index.html';
-// });

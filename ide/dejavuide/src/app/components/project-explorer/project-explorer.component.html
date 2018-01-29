@@ -58,7 +58,9 @@
     </div>
   </div>
   <dv-project-preview *ngIf="selectedProject"
-    [selectedProject]="selectedProject">
+    [selectedProject]="selectedProject"
+    (projectSelected)="loadProject($event)"
+    >
   </dv-project-preview>
 </div>
 
