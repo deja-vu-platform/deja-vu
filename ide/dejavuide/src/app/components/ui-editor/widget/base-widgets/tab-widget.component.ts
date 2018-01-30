@@ -10,19 +10,13 @@ export class TabWidgetComponent implements OnInit {
   @Input() widget: TabBaseWidget;
 
   value;
-  count = -1;
 
   ngOnInit() {
     this.value = this.widget.getValue();
   }
 
-  // TODO this might need to go in widget.ts
   add() {
-    this.value.push({
-      text: 'Tab 0',
-      target: 'tab-id-' + this.count
-    });
-    this.count = this.count + 1;
+    this.value.push(this.widget.getNew(this.value.length));
   }
 
   applyChanges(apply: boolean) {

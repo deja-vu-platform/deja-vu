@@ -526,6 +526,13 @@ export class MenuBaseWidget extends BaseWidget {
     this.fields.value = shallowCopy(value);
   }
 
+  getNew(count): LinkValue {
+    return {
+      text: 'Menu ' + count,
+      target: '???' + count
+    };
+  }
+
   getValue(): LinkValue[] {
     return shallowCopy(this.fields.value);
   }
@@ -566,6 +573,13 @@ export class TabBaseWidget extends BaseWidget {
   }
   setValue(value: LinkValue[]) {
     this.fields.value = shallowCopy(value);
+  }
+
+  getNew(count): LinkValue {
+    return {
+      text: 'Tab ' + count,
+      target: 'tab-id-' + count
+    };
   }
 
   getValue(): LinkValue[] {
