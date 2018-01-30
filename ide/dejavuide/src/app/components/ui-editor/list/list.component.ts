@@ -3,7 +3,8 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
 import { Cliche, UserCliche, DvCliche } from '../../../models/cliche/cliche';
-import { Widget, BaseWidget, UserWidget, LinkBaseWidget, LabelBaseWidget, ImageBaseWidget } from '../../../models/widget/widget';
+import { Widget, BaseWidget, UserWidget, LinkBaseWidget, LabelBaseWidget,
+  ImageBaseWidget, MenuBaseWidget, TabBaseWidget, PanelBaseWidget } from '../../../models/widget/widget';
 import { ProjectService } from '../../../services/project.service';
 
 @Component({
@@ -22,7 +23,10 @@ export class ListComponent {
   baseWidgets: Widget[] = [
     new LinkBaseWidget({}),
     new LabelBaseWidget({}),
-    new ImageBaseWidget({})
+    new ImageBaseWidget({}),
+    new MenuBaseWidget({}),
+    new TabBaseWidget({}),
+    new PanelBaseWidget({})
   ];
 
   constructor(private projectService: ProjectService) {

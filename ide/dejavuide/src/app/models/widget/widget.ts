@@ -12,12 +12,17 @@ enum WidgetType {
 }
 
 enum BaseWidgetType {
-  LINK, LABEL, IMAGE
+  LINK, LABEL, IMAGE, MENU, PANEL, TAB
 }
 
 interface LinkValue {
   text: string;
   target: string;
+}
+
+interface PanelValue {
+  heading: string;
+  content: string;
 }
 
 interface WidgetFields {
@@ -60,6 +65,18 @@ interface LabelBaseWidgetFields extends BaseWidgetFields {
 
 interface ImageBaseWidgetFields extends BaseWidgetFields {
   value?: string;
+}
+
+interface MenuBaseWidgetFields extends BaseWidgetFields {
+  value?: LinkValue[];
+}
+
+interface TabBaseWidgetFields extends BaseWidgetFields {
+  value?: LinkValue[];
+}
+
+interface PanelBaseWidgetFields extends BaseWidgetFields {
+  value?: PanelValue;
 }
 
 interface UserWidgetFields extends WidgetFields {
@@ -329,6 +346,7 @@ export class BaseWidget extends Widget {
       throw new Error(INCORRECT_TYPE);
     }
 
+    // TODO DRY???
     if (fields.type === BaseWidgetType.LINK) {
       return new LinkBaseWidget(fields);
     }
@@ -337,6 +355,15 @@ export class BaseWidget extends Widget {
     }
     if (fields.type === BaseWidgetType.IMAGE) {
       return new ImageBaseWidget(fields);
+    }
+    if (fields.type === BaseWidgetType.MENU) {
+      return new MenuBaseWidget(fields);
+    }
+    if (fields.type === BaseWidgetType.PANEL) {
+      return new PanelBaseWidget(fields);
+    }
+    if (fields.type === BaseWidgetType.TAB) {
+      return new TabBaseWidget(fields);
     }
 
     throw new Error(INCORRECT_TYPE);
@@ -348,6 +375,7 @@ export class BaseWidget extends Widget {
     this.fields.widgetType = WidgetType.BASE_WIDGET;
   }
 
+  // TODO DRY???
   isLink(): this is LinkBaseWidget {
     return this.fields.type === BaseWidgetType.LINK;
   }
@@ -360,12 +388,24 @@ export class BaseWidget extends Widget {
     return this.fields.type === BaseWidgetType.IMAGE;
   }
 
+  isMenu(): this is MenuBaseWidget {
+    return this.fields.type === BaseWidgetType.MENU;
+  }
+
+  isTab(): this is TabBaseWidget {
+    return this.fields.type === BaseWidgetType.TAB;
+  }
+
+  isPanel(): this is PanelBaseWidget {
+    return this.fields.type === BaseWidgetType.PANEL;
+  }
+
   makeCopy(userApp: UserCliche, parentId?: string, fromTemplate = false): Widget[] {
     let copyWidget: BaseWidget;
     const fields = this.fields;
     const value = this.fields.value;
 
-    // TODO this is not dry
+    // TODO this is not dry!!!
     if (this.isLabel()) {
       copyWidget = new LabelBaseWidget(fields);
     }
@@ -374,6 +414,15 @@ export class BaseWidget extends Widget {
     }
     if (this.isImage()) {
       copyWidget = new ImageBaseWidget(fields);
+    }
+    if (this.isMenu()) {
+      copyWidget = new MenuBaseWidget(fields);
+    }
+    if (this.isPanel()) {
+      copyWidget = new PanelBaseWidget(fields);
+    }
+    if (this.isTab()) {
+      copyWidget = new TabBaseWidget(fields);
     }
 
     copyWidget.fields.id = generateId();
@@ -458,6 +507,69 @@ export class ImageBaseWidget extends BaseWidget {
 
   getValue(): string {
     return this.fields.value;
+  }
+}
+
+
+export class MenuBaseWidget extends BaseWidget {
+  protected fields: MenuBaseWidgetFields;
+
+  constructor(fields: MenuBaseWidgetFields) {
+    super(fields);
+    this.fields.type = BaseWidgetType.MENU;
+    this.fields.value = this.fields.value || [];
+
+    this.setName(fields.name || 'Menu Widget');
+    this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
+  }
+  setValue(value: LinkValue[]) {
+    this.fields.value = shallowCopy(value);
+  }
+
+  getValue(): LinkValue[] {
+    return shallowCopy(this.fields.value);
+  }
+}
+
+
+export class PanelBaseWidget extends BaseWidget {
+  protected fields: PanelBaseWidgetFields;
+
+  constructor(fields: PanelBaseWidgetFields) {
+    super(fields);
+    this.fields.type = BaseWidgetType.PANEL;
+    this.fields.value = this.fields.value || {heading: 'Type heading...', content: 'Type content...'};
+
+    this.setName(fields.name || 'Panel Widget');
+    this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
+  }
+  setValue(value: PanelValue) {
+    this.fields.value = shallowCopy(value);
+  }
+
+  getValue(): PanelValue {
+    return shallowCopy(this.fields.value);
+  }
+}
+
+
+export class TabBaseWidget extends BaseWidget {
+  protected fields: TabBaseWidgetFields;
+
+  constructor(fields: TabBaseWidgetFields) {
+    super(fields);
+    this.fields.type = BaseWidgetType.TAB;
+    this.fields.value = this.fields.value || [];
+
+    this.setName(fields.name || 'Tab Widget');
+    this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
+  }
+  setValue(value: LinkValue[]) {
+    this.fields.value = shallowCopy(value);
+  }
+
+  getValue(): LinkValue[] {
+    return shallowCopy(this.fields.value);
   }
 }
 

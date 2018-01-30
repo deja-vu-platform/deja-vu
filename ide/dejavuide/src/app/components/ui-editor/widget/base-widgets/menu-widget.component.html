@@ -1,10 +1,9 @@
 <div class="btn-group display-component" role="group">
-  <a 
-    *ngFor="let menu_item of value"
-    type="button" 
-    class="btn btn-default" 
-    role="button" 
-    [href]="menu_item.value">
+  <a  *ngFor="let menu_item of value"
+      type="button" 
+      class="btn btn-default" 
+      role="button" 
+      [href]="menu_item.target">
     {{menu_item.text}}
   </a>
 </div>
@@ -27,23 +26,29 @@
   <div tooltip>
     <!-- TODO make this better -->
     <div class="row">
-        <div class="col-sm-2 form-lbl-header"> </div>
-        <div class="col-sm-4 form-lbl-header">Title </div>
-        <div class="col-sm-5 form-lbl-header">Target </div>
+      <div class="col-sm-2 form-lbl-header"> </div>
+      <div class="col-sm-4 form-lbl-header"> </div>
+      <div class="col-sm-5 form-lbl-header" (click)="add()">
+        <button>+</button>
       </div>
-      <br/>
-      <div class="row" 
-            *ngFor="let menu_item of value">
-        <div class="col-sm-2 form-lbl">Item 1 </div>
-        <div class="col-sm-4">
-          <input type="text" 
-          class="form-control" 
-          [(ngModel)]="menu_item.text"/>
-        </div>
-        <div class="col-sm-5">
-          <input type="text" class="form-control" 
-          [(ngModel)]="menu_item.target"/>
-        </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2 form-lbl-header"> </div>
+      <div class="col-sm-4 form-lbl-header">Title </div>
+      <div class="col-sm-5 form-lbl-header">Target </div>
+    </div>
+    <br/>
+    <div class="row" 
+          *ngFor="let menu_item of value">
+      <div class="col-sm-2 form-lbl">Item 1 </div>
+      <div class="col-sm-4">
+        <input type="text" 
+        class="form-control" 
+        [(ngModel)]="menu_item.text"/>
+      </div>
+      <div class="col-sm-5">
+        <input type="text" class="form-control" 
+        [(ngModel)]="menu_item.target"/>
       </div>
     </div>
   </div>

@@ -1,9 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-// import { MenuBaseWidget } from '../../../../models/widget/widget';
-
-// TODO
-declare type MenuBaseWidget = any;
+import { MenuBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-menu-widget',
@@ -13,9 +10,19 @@ export class MenuWidgetComponent implements OnInit {
   @Input() widget: MenuBaseWidget;
 
   value;
+  count = -1;
 
   ngOnInit() {
     this.value = this.widget.getValue();
+  }
+
+  // TODO this might need to go in widget.ts
+  add() {
+    this.value.push({
+      text: 'Menu 0',
+      target: '???' + this.count
+    });
+    this.count = this.count + 1;
   }
 
   applyChanges(apply: boolean) {

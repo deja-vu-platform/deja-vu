@@ -10,6 +10,12 @@
     [widget]="widget"></dv-link-widget>
   <dv-image-widget *ngIf="widget.isImage()"
     [widget]="widget"></dv-image-widget>
+  <dv-menu-widget *ngIf="widget.isMenu()"
+    [widget]="widget"></dv-menu-widget>
+  <dv-panel-widget *ngIf="widget.isPanel()"
+    [widget]="widget"></dv-panel-widget>
+  <dv-tab-widget *ngIf="widget.isTab()"
+    [widget]="widget"></dv-tab-widget>
 </ng-container>
 
 <dv-widget *ngFor="let innerWidget of (innerWidgets | async)"

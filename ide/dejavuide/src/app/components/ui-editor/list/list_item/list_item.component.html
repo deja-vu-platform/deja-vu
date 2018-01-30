@@ -12,12 +12,14 @@
         <ng-container *ngIf="widget.isImage()">
           <img src="assets/image_icon.png" width="15px" height="15px">
         </ng-container>
-        <!-- TODO -->
-        <ng-container *ngIf="false">
-          <img src="assets/tabs_icon.png" width="15px" height="15px"> Nav tabs
-          <img src="assets/menu_icon.png" width="15px" height="15px"> Menu
-          <img src="assets/panel_icon.png" width="15px" height="15px"> Panel
-          <img src="assets/empty_icon.png" width="15px" height="15px"> Blank
+        <ng-container *ngIf="widget.isMenu()">
+          <img src="assets/menu_icon.png" width="15px" height="15px">
+        </ng-container>
+        <ng-container *ngIf="widget.isPanel()">
+          <img src="assets/panel_icon.png" width="15px" height="15px">
+        </ng-container>
+        <ng-container *ngIf="widget.isTab()">
+          <img src="assets/tabs_icon.png" width="15px" height="15px">
         </ng-container>
       </div>
       <ng-template #usertypeicon> 

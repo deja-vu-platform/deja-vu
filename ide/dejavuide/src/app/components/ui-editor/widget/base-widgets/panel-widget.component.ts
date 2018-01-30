@@ -1,9 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-// import { PanelBaseWidget } from '../../../../models/widget/widget';
-
-// TODO
-declare type PanelBaseWidget = any;
+import { PanelBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-panel-widget',
