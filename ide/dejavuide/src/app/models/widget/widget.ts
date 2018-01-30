@@ -401,29 +401,10 @@ export class BaseWidget extends Widget {
   }
 
   makeCopy(userApp: UserCliche, parentId?: string, fromTemplate = false): Widget[] {
-    let copyWidget: BaseWidget;
     const fields = this.fields;
     const value = this.fields.value;
 
-    // TODO this is not dry!!!
-    if (this.isLabel()) {
-      copyWidget = new LabelBaseWidget(fields);
-    }
-    if (this.isLink()) {
-      copyWidget = new LinkBaseWidget(fields);
-    }
-    if (this.isImage()) {
-      copyWidget = new ImageBaseWidget(fields);
-    }
-    if (this.isMenu()) {
-      copyWidget = new MenuBaseWidget(fields);
-    }
-    if (this.isPanel()) {
-      copyWidget = new PanelBaseWidget(fields);
-    }
-    if (this.isTab()) {
-      copyWidget = new TabBaseWidget(fields);
-    }
+    const copyWidget = BaseWidget.fromJSON(fields);
 
     copyWidget.fields.id = generateId();
 
@@ -527,7 +508,7 @@ export class MenuBaseWidget extends BaseWidget {
   }
 
   getNew(count): LinkValue {
-    return {
+    return { // TODO
       text: 'Menu ' + count,
       target: '???' + count
     };
@@ -576,7 +557,7 @@ export class TabBaseWidget extends BaseWidget {
   }
 
   getNew(count): LinkValue {
-    return {
+    return { // TODO
       text: 'Tab ' + count,
       target: 'tab-id-' + count
     };
