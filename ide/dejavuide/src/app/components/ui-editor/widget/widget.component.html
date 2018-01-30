@@ -1,31 +1,22 @@
-<ng-container
-  *ngIf="widget"
-  [style.height.px]="widget.getDimensions().height"
-  [style.width.px]="widget.getDimensions().width">
-  <span>Name: {{widget.getName()}}</span>
-  <ng-container *ngIf="widget.isUserType()">
-    <dv-widget-options 
-      [widget]="widget"
-      [editDisabled]="true">
-    </dv-widget-options>
-    <ng-container *ngFor="let innerWidget of (innerWidgets | async)">
-      <dv-widget  
-        [activated]="_activated"
-        [widget]="innerWidget"
-        [isSelected]="false"
-        [isMovable]="isSelected">
-      </dv-widget>
-    </ng-container>
-  </ng-container>
-  <ng-container *ngIf="widget.isBaseType()">
-    <!-- TODO is not DRY -->
-    <dv-label-widget *ngIf="widget.isLabel()"
-      [widget]="widget"></dv-label-widget>
-    <dv-link-widget *ngIf="widget.isLink()"
-      [widget]="widget"></dv-link-widget>
-    <dv-image-widget *ngIf="widget.isImage()"
-      [widget]="widget"></dv-image-widget>
-  </ng-container>
+<span>Name: {{widget.getName()}}</span>
+<dv-user-widget *ngIf="widget.isUserType()"
+  [widget]="widget">
+</dv-user-widget>  
+<ng-container *ngIf="widget.isBaseType()">
+  <!-- TODO is not DRY -->
+  <dv-label-widget *ngIf="widget.isLabel()"
+    [widget]="widget"></dv-label-widget>
+  <dv-link-widget *ngIf="widget.isLink()"
+    [widget]="widget"></dv-link-widget>
+  <dv-image-widget *ngIf="widget.isImage()"
+    [widget]="widget"></dv-image-widget>
 </ng-container>
+
+<dv-widget *ngFor="let innerWidget of (innerWidgets | async)"
+  [activated]="_activated"
+  [widget]="innerWidget"
+  [isSelected]="false"
+  [isMovable]="isSelected">
+</dv-widget>
 
 

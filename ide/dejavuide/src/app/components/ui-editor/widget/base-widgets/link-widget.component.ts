@@ -4,7 +4,7 @@ import { LinkBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-link-widget',
-  templateUrl: './link_widget.component.html',
+  templateUrl: './link-widget.component.html',
 })
 export class LinkWidgetComponent implements OnInit {
   @Input() widget: LinkBaseWidget;

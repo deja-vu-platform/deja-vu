@@ -4,7 +4,7 @@ import * as $ from 'jquery';
 
 @Component({
   selector: 'dv-label-widget',
-  templateUrl: './label_widget.component.html',
+  templateUrl: './label-idget.component.html',
 })
 export class LabelWidgetComponent implements AfterViewInit {
   @ViewChild('edit', {read: ElementRef}) private editElt: ElementRef;

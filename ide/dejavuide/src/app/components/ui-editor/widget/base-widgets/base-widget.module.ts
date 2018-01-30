@@ -3,17 +3,21 @@ import { NgModule } from '@angular/core';
 import { MatMenuModule, MatListModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 
-import { LabelWidgetComponent } from './label_widget.component';
-import { LinkWidgetComponent } from './link_widget.component';
-import { ImageWidgetComponent } from './image_widget.component';
+import { LabelWidgetComponent } from './label-widget.component';
+import { LinkWidgetComponent } from './link-widget.component';
+import { ImageWidgetComponent } from './image-widget.component';
+
+import { UserWidgetComponent } from './user-widget.component';
 import { WidgetOptionsComponent } from './options.component';
+
 
 @NgModule({
   declarations: [
     LabelWidgetComponent,
     LinkWidgetComponent,
     ImageWidgetComponent,
-    WidgetOptionsComponent
+    WidgetOptionsComponent,
+    UserWidgetComponent
   ],
   imports: [
     BrowserModule,
@@ -26,7 +30,8 @@ import { WidgetOptionsComponent } from './options.component';
     LabelWidgetComponent,
     LinkWidgetComponent,
     ImageWidgetComponent,
-    WidgetOptionsComponent
+    WidgetOptionsComponent,
+    UserWidgetComponent
   ]
 })
 export class BaseWidgetModule { }

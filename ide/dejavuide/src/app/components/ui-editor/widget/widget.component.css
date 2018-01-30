@@ -2,8 +2,3 @@
   border: 1px black solid;
   position: absolute;
 }
-
-
-.widget-component .tooltip {
-  opacity: 1;
-}

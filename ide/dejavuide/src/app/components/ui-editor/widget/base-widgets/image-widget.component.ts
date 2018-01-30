@@ -4,8 +4,8 @@ import { ImageBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-image-widget',
-  templateUrl: './image_widget.component.html',
-  styleUrls: ['./image_widget.component.css']
+  templateUrl: './image-widget.component.html',
+  styleUrls: ['./image-widget.component.css']
 })
 export class ImageWidgetComponent implements OnInit {
   @Input() widget: ImageBaseWidget;
