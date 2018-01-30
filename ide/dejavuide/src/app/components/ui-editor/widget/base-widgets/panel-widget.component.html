@@ -13,23 +13,40 @@
 <dv-widget-options 
     [widget]="widget"
     (applyChanges)="applyChanges($event)">
+
   <div items>
-    <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
+    <button mat-menu-item [matMenuTriggerFor]="styleAlign">Align</button>
+    <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>
+    <button mat-menu-item [matMenuTriggerFor]="styleColor">Color</button>
   </div>
   <div menus>
-    <mat-menu #styleStyle="matMenu">
-      <button mat-menu-item>Default</button>
-      <button mat-menu-item>Primary</button>
-      <button mat-menu-item>Info</button>
-      <button mat-menu-item>Success</button>
-      <button mat-menu-item>Warning</button>
-      <button mat-menu-item>Danger</button>
+    <mat-menu #styleAlign="matMenu">
+      <button mat-menu-item class="align-center">Center</button>
+      <button mat-menu-item class="align-right">Right</button>
+      <button mat-menu-item class="align-left">Left</button>
+      <button mat-menu-item class="align-justify">Justify</button>
+    </mat-menu>
+    
+    <mat-menu #styleSize="matMenu">
+      <button mat-menu-item class="lbl-small">Small</button>
+      <button mat-menu-item class="lbl-default">Default</button>
+      <button mat-menu-item class="lbl-large">Large</button>
+      <button mat-menu-item class="lbl-heading">H1</button>
+    </mat-menu>
+    
+    <mat-menu #styleColor="matMenu">
+      <button mat-menu-item class="panel-text-default">Default</button>
+      <button mat-menu-item class="panel-text-muted">Muted</button>
+      <button mat-menu-item class="panel-text-primary">Primary</button>
+      <button mat-menu-item class="panel-text-success">Success</button>
+      <button mat-menu-item class="panel-text-info">Info</button>
+      <button mat-menu-item class="panel-text-warning">Warning</button>
+      <button mat-menu-item class="panel-text-danger">Danger</button>
     </mat-menu>
   </div>  
 
   <div tooltip>
     <!-- TODO make this better -->
-
     <div class="row">
       <div class="col-sm-2 form-lbl">Heading: </div>
       <div class="col-sm-7">
