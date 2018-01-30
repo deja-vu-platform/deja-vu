@@ -130,36 +130,6 @@
 // /** ** ** ** ** ** ** ** ** Table Cells Interaction and display Helpers ** ** ** ** ** ** ** ** **/
 
 
-// /**
-//  * Register listener for click on edit button
-//  * @param container
-//  * @param popup
-//  */
-// function triggerEdit(container, popup) {
-//     if (container.find('.tooltip').length === 0) {
-//         const type = container.find('.widget').data('type').toLowerCase();
-//         const editDialog = $('#' + type + '-popup-holder').clone();
-
-//         if (!(type === 'label')) {
-
-//             container.prepend(editDialog);
-
-//             $(Array.prototype.slice.call(
-//                 container.find('form-control'), 0)[0]).trigger('focus');
-
-//         }
-//     }
-//     if (popup) {
-//         setTimeout(function(){
-//             $(container.find('form-control')[0]).trigger('focus');
-//             editDialog.find('.tooltip').addClass('open');
-//         }, 1);
-//     }
-
-// }
-
-
-
 // function registerTooltipBtnHandlers() {
 //     $('.close').unbind().on('click', function() {
 //         setTimeout(function(){
@@ -243,39 +213,3 @@
 //     }
 // }
 
-
-// // TODO needs to be updated to use more relevant classes
-// function findContainingContainer(context) {
-//     let parent = $(context).parent();
-
-//     const containerRef = widgetContainerMaker.getContainerRef();
-
-//     while (!(parent.hasClass(containerRef))) {
-//         parent = $(parent).parent();
-//         if (parent.length === 0) { // TODO this is a check to see if anything went awry
-//             console.log('something went wrong');
-//             console.log(context);
-//             return null;
-//         }
-//     }
-//     return $(parent).attr('id');
-// }
-
-
-// /**
-//  */
-// function getContentEditableEdits() {
-//     $('[contenteditable=true]').unbind() // unbind to prevent this from firing multiple times
-//         .blur(function() {
-//             const containerId = findContainingContainer(this);
-//             updateBaseWidgetContentsAndDisplayAt(containerId);
-//         });
-// }
-
-
-// function selectText(container) {
-//     const range = document.createRange();
-//     range.selectNodeContents(container);
-//     window.getSelection().removeAllRanges();
-//     window.getSelection().addRange(range);
-// }

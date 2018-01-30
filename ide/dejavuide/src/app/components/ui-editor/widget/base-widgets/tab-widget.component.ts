@@ -1,13 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { LinkBaseWidget } from '../../../../models/widget/widget';
+// import { TabBaseWidget } from '../../../../models/widget/widget';
+
+// TODO
+declare type TabBaseWidget = any;
 
 @Component({
-  selector: 'dv-link-widget',
-  templateUrl: './link-widget.component.html',
+  selector: 'dv-tab-widget',
+  templateUrl: './tab-widget.component.html',
 })
-export class LinkWidgetComponent implements OnInit {
-  @Input() widget: LinkBaseWidget;
+export class TabWidgetComponent implements OnInit {
+  @Input() widget: TabBaseWidget;
 
   value;
 

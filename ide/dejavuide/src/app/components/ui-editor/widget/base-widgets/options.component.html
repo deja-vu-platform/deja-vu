@@ -62,11 +62,22 @@
     <div class="panel-heading">
       <strong>{{widget.getName()}}</strong>
       <button type="button" class="close close-btn">
-        <small (click)="tooltipClose()">x</small>
+        <small (click)="tooltipClose(false)">x</small>
       </button>
     </div>
     <div class="panel-body">
-        <ng-content select="[tooltip]"></ng-content>
+      <ng-content select="[tooltip]"></ng-content>
+      <div class="row">
+        <div class="col-sm-5 form-lbl"></div>
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2 apply">
+          <button 
+              (click)="tooltipClose(true)"
+              class="btn btn-primary">
+            Apply
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

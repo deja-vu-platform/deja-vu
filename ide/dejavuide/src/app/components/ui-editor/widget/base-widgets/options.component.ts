@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 
 import { Widget, UserWidget } from '../../../../models/widget/widget';
 import { ProjectService } from '../../../../services/project.service';
@@ -21,6 +21,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
   @Input() editDisabled = false;
   @Input() widget: Widget;
 
+  @Output() applyChanges = new EventEmitter<boolean>();
   tooltipVisible = false;
 
   pickerText;
@@ -53,8 +54,9 @@ export class WidgetOptionsComponent implements AfterViewInit {
     this.tooltipVisible = true;
   }
 
-  tooltipClose() {
+  tooltipClose(apply: boolean) {
     this.tooltipVisible = false;
+    this.applyChanges.emit(apply);
   }
 
   createTemplate() {

@@ -24,7 +24,11 @@ export class ImageWidgetComponent implements OnInit {
     this.value.target = event.target.value;
   }
 
-  applyChanges() {
-    this.widget.setValue(this.value);
+  applyChanges(apply: boolean) {
+    if (apply) {
+      this.widget.setValue(this.value);
+    } else {
+      this.value = this.widget.getValue();
+    }
   }
 }

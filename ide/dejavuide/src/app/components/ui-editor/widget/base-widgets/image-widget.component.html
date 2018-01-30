@@ -2,7 +2,9 @@
       [style.width.px]="widget.getDimensions().width"
       [style.height.px]="widget.getDimensions().height">
 
-<dv-widget-options [widget]="widget">
+<dv-widget-options 
+    [widget]="widget"
+    (applyChanges)="applyChanges($event)">
   <div tooltip>
     <!-- TODO make this better -->
     <div class="row">

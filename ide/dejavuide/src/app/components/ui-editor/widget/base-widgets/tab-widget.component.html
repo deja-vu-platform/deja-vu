@@ -1,0 +1,53 @@
+<ul class="nav nav-pills nav-stacked display-component">
+  <!-- <li role="presentation" class="active">
+    <a href="#1a" data-toggle="tab">{{value.tab1.text}}</a>
+  </li> -->
+  <li role="presentation" *ngFor="let tab of value">
+    <a [href]="'#'+tab.id" data-toggle="tab">{{tab.text}}</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <!-- <div class="tab-pane active" id="1a"></div> -->
+  <div *ngFor="let tab of value" class="tab-pane" [id]="tab.id">
+  </div>
+</div>
+
+<dv-widget-options 
+    [widget]="widget"
+    (applyChanges)="applyChanges($event)">
+  <div items>
+    <button mat-menu-item [matMenuTriggerFor]="styleAlignment">Alignment</button>
+    <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
+  </div>
+  <div menus>
+    <mat-menu #styleAlignment="matMenu">
+      <button mat-menu-item>Stacked</button>
+      <button mat-menu-item>Horizontal</button>
+    </mat-menu>
+    <mat-menu #styleStyle="matMenu">
+      <button mat-menu-item>Pills</button>
+      <button mat-menu-item>Tabs</button>
+    </mat-menu>
+  </div>
+
+  <div tooltip>
+    <!-- TODO make this better -->
+    <div class="row">
+      <div class="col-sm-2 form-lbl-header"> </div>
+      <div class="col-sm-4 form-lbl-header">Title </div>
+      <div class="col-sm-5 form-lbl-header">Target </div>
+
+    </div>
+    <br/>
+    <div class="row" *ngFor="let tab of value">
+      <div class="col-sm-2 form-lbl">Tab 1 </div>
+      <div class="col-sm-4">
+        <input type="text" class="form-control" [(ngModel)]="tab.text" />
+      </div>
+      <div class="col-sm-5">
+        <input type="text" class="form-control" [(ngModel)]="tab.target" />
+      </div>
+    </div>
+  </div>
+</dv-widget-options>

@@ -1,0 +1,54 @@
+
+<!-- 'panel' -->
+<!-- if (!value) { -->
+<!-- value = {heading: "Type heading...", content: "Type content..."}; -->
+<!-- } -->
+<div class="panel panel-default display-component">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{value.heading}}</h3>
+  </div>
+  <div class="panel-body">{{value.content}}</div>
+</div>
+
+<dv-widget-options 
+    [widget]="widget"
+    (applyChanges)="applyChanges($event)">
+  <div items>
+    <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
+  </div>
+  <div menus>
+    <mat-menu #styleStyle="matMenu">
+      <button mat-menu-item>Default</button>
+      <button mat-menu-item>Primary</button>
+      <button mat-menu-item>Info</button>
+      <button mat-menu-item>Success</button>
+      <button mat-menu-item>Warning</button>
+      <button mat-menu-item>Danger</button>
+    </mat-menu>
+  </div>  
+
+  <div tooltip>
+    <!-- TODO make this better -->
+
+    <div class="row">
+      <div class="col-sm-2 form-lbl">Heading: </div>
+      <div class="col-sm-7">
+        <input type="text" 
+            class="form-control" 
+            [(ngModel)]="value.text"
+            required autofocus/>
+      </div>
+      <div class="col-sm-4"></div>
+    </div>
+    <br/>
+    <div class="row">
+      <div class="col-sm-2 form-lbl">Content: </div>
+      <div class="col-sm-7">
+        <input type="text" 
+            class="form-control" 
+            [(ngModel)]="value.content"
+            required />
+      </div>
+    </div>
+  </div>
+</dv-widget-options>

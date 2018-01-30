@@ -1,9 +1,11 @@
-<a class="btn btn-link" [href]="widget.getValue().target">
-  {{widget.getValue().text}}
+<a class="btn btn-link" [href]="value.target">
+  {{value.text}}
 </a>
 
 
-<dv-widget-options [widget]="widget">
+<dv-widget-options 
+    [widget]="widget" 
+    (applyChanges)="applyChanges($event)">
   <div items>
     <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
     <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>    
@@ -47,11 +49,6 @@
       <div class="col-sm-7">
         <input type="text" class="form-control" required 
         [(ngModel)]="value.target"/>
-      </div>
-      <div class="col-sm-2 apply">
-        <button class="btn btn-primary" (click)="applyChanges()">
-          Apply
-        </button>
       </div>
     </div>
   </div>

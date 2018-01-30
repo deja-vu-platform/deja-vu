@@ -1,55 +1,47 @@
-<a class="btn btn-link" [href]="widget.getValue().target">
-  {{widget.getValue().text}}
-</a>
+<div class="btn-group display-component" role="group">
+  <a 
+    *ngFor="let menu_item of value"
+    type="button" 
+    class="btn btn-default" 
+    role="button" 
+    [href]="menu_item.value">
+    {{menu_item.text}}
+  </a>
+</div>
 
-
-<dv-widget-options [widget]="widget">
+<dv-widget-options 
+    [widget]="widget"
+    (applyChanges)="applyChanges($event)">
   <div items>
-    <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
-    <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>    
+    <button mat-menu-item [matMenuTriggerFor]="styleAlignment">Alignment</button>
   </div>
   <div menus>
-    <mat-menu #styleStyle="matMenu">
-      <button mat-menu-item class="btn-style-link">Link</button>
-      <!-- TODO divider -->
-      <button mat-menu-item [matMenuTriggerFor]="styleStyleButton">Button</button>
-    </mat-menu>
-    
-    <mat-menu #styleStyleButton="matMenu">
-      <button mat-menu-item  class="btn-style-default">Default</button>
-      <button mat-menu-item  class="btn-style-primary">Primary</button>
-      <button mat-menu-item  class="btn-style-success">Success</button>
-      <button mat-menu-item  class="btn-style-info">Info</button>
-      <button mat-menu-item  class="btn-style-warning">Warning</button>
-      <button mat-menu-item  class="btn-style-danger">Danger</button>
-    </mat-menu>
-    
-    <mat-menu #styleSize="matMenu">
-      <button mat-menu-item class="btn-size-xs">Small</button>
-      <button mat-menu-item class="btn-size-df">Default</button>
-      <button mat-menu-item class="btn-size-lg">Large</button>
+    <mat-menu #styleAlignment="matMenu">
+      <button mat-menu-item>Vertical</button>
+      <button mat-menu-item>Horizontal</button>
     </mat-menu>
   </div>  
 
   <div tooltip>
     <!-- TODO make this better -->
     <div class="row">
-      <div class="col-sm-2 form-lbl">Text: </div>
-      <div class="col-sm-7">
-        <input type="text" class="form-control" required autofocus (change)="updateLinkText($event)" [value]="value.text" />
+        <div class="col-sm-2 form-lbl-header"> </div>
+        <div class="col-sm-4 form-lbl-header">Title </div>
+        <div class="col-sm-5 form-lbl-header">Target </div>
       </div>
-      <div class="col-sm-4"></div>
-    </div>
-    <br/>
-    <div class="row">
-      <div class="col-sm-2 form-lbl">Target: </div>
-      <div class="col-sm-7">
-        <input type="text" class="form-control" required (change)="updateLinkTarget($event)" [value]="value.target"/>
-      </div>
-      <div class="col-sm-2 apply">
-        <button class="btn btn-primary" (click)="applyChanges()">
-          Apply
-        </button>
+      <br/>
+      <div class="row" 
+            *ngFor="let menu_item of value">
+        <div class="col-sm-2 form-lbl">Item 1 </div>
+        <div class="col-sm-4">
+          <input type="text" 
+          class="form-control" 
+          [(ngModel)]="menu_item.text"/>
+        </div>
+        <div class="col-sm-5">
+          <input type="text" class="form-control" 
+          [(ngModel)]="menu_item.target"/>
+        </div>
       </div>
     </div>
   </div>

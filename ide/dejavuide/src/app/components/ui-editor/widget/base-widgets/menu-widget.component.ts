@@ -1,13 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { LinkBaseWidget } from '../../../../models/widget/widget';
+// import { MenuBaseWidget } from '../../../../models/widget/widget';
+
+// TODO
+declare type MenuBaseWidget = any;
 
 @Component({
-  selector: 'dv-link-widget',
-  templateUrl: './link-widget.component.html',
+  selector: 'dv-menu-widget',
+  templateUrl: './menu-widget.component.html',
 })
-export class LinkWidgetComponent implements OnInit {
-  @Input() widget: LinkBaseWidget;
+export class MenuWidgetComponent implements OnInit {
+  @Input() widget: MenuBaseWidget;
 
   value;
 
