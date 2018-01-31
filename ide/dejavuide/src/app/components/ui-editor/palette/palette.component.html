@@ -3,9 +3,7 @@
   <dv-palette-cell *ngFor="let color of palette; let i = index"
     [color]="color"
     [editable]="true"
-    (colorPicked)="colorPicked($event)"
-    [ngClass]="{'selected': selectedPaletteEltNum === i}"
-    (dblclick)="paletteDblclick(i)"
+    (colorPicked)="colorPicked(i, $event)"
     class="element">
   </dv-palette-cell>
 </div>
@@ -13,7 +11,6 @@
   <div>Current Colors</div>
   <dv-palette-cell *ngFor="let color of currentColors; let i = index"
     [color]="color"
-    (click)="currentColorClick(i)"
     class="element">
 </dv-palette-cell>
 </div>

@@ -24,7 +24,6 @@ export class PaletteComponent implements OnDestroy {
   palette = [];
   currentColors = [];
 
-  selectedPaletteEltNum = -1;
   private subscriptions = [];
 
   constructor(private paletteService: PaletteService) {
@@ -54,22 +53,6 @@ export class PaletteComponent implements OnDestroy {
     }
   }
 
-  currentColorClick(i: number) {
-    if (this.selectedPaletteEltNum >= 0) {
-      this.palette[this.selectedPaletteEltNum] = this.currentColors[i];
-      this.savePalette(); // TODO fixme
-      this.selectedPaletteEltNum = -1;
-    }
-  }
-
-  paletteDblclick(i: number) {
-    if (this.selectedPaletteEltNum === i) {
-      this.selectedPaletteEltNum = -1;
-    } else {
-      this.selectedPaletteEltNum = i;
-    }
-  }
-
   loadPalette (palette?) {
     this.currentColors = [];
     this.palette = palette ? JSON.parse(JSON.stringify(palette)) : [];
@@ -89,8 +72,13 @@ export class PaletteComponent implements OnDestroy {
     ];
   }
 
-  colorPicked(event) {
-    console.log('color picked', event);
+  colorPicked(index, event) {
+    // TODO updating this.palette refreshes the cells, which unselects them
+    // this is probably not desired behavior
+
+    // console.log('color picked', event);
+    // this.palette[index] = event;
+    // this.savePalette(); // TODO fixme
   }
 
   private savePalette() {

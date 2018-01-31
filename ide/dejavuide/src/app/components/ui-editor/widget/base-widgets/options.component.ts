@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { Component, Input, AfterViewInit, ViewChild, ElementRef, Output, EventEmitter, OnDestroy } from '@angular/core';
 
 import { Widget, UserWidget } from '../../../../models/widget/widget';
 import { ProjectService } from '../../../../services/project.service';
@@ -15,7 +15,7 @@ const BACKGROUND = 'background';
   templateUrl: './options.component.html',
   styleUrls: ['./tooltip.css']
 })
-export class WidgetOptionsComponent implements AfterViewInit {
+export class WidgetOptionsComponent implements AfterViewInit, OnDestroy {
   @ViewChild('textInput', {read: ElementRef}) private textInputElt: ElementRef;
   @ViewChild('bgInput', {read: ElementRef}) private bgInputElt: ElementRef;
   @Input() editDisabled = false;
@@ -25,7 +25,11 @@ export class WidgetOptionsComponent implements AfterViewInit {
   tooltipVisible = false;
 
   pickerText;
+  textColorEditing = false;
   pickerBg;
+  bgColorEditing = false;
+
+  subscriptions = [];
 
   constructor (
     private projectService: ProjectService,
@@ -44,6 +48,21 @@ export class WidgetOptionsComponent implements AfterViewInit {
     this.pickerBg.closable = true;
     this.pickerBg.closeText = 'X';
     this.pickerBg.fromString(localStyles[BACKGROUND] || '#FFFFFF');
+
+    this.subscriptions.push(
+      this.paletteService.paletteColorListener.subscribe(color => {
+        if (this.textColorEditing) {
+          this.pickerText.fromString(color);
+          this.widget.updateCustomStyle(COLOR, color);
+          this.textColorEditing = false;
+        }
+        if (this.bgColorEditing) {
+          this.pickerBg.fromString(color);
+          this.widget.updateCustomStyle(BACKGROUND, color);
+          this.bgColorEditing = false;
+        }
+      })
+    );
   }
 
   clearStyles() {
@@ -90,6 +109,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
 
   openTextPicker(event) {
     event.stopPropagation();
+    this.textInputElt.nativeElement.focus();
     this.pickerText.show();
   }
 
@@ -102,6 +122,7 @@ export class WidgetOptionsComponent implements AfterViewInit {
 
   openBgPicker(event) {
     event.stopPropagation();
+    this.bgInputElt.nativeElement.focus();
     this.pickerBg.show();
   }
 
@@ -110,6 +131,12 @@ export class WidgetOptionsComponent implements AfterViewInit {
     const color = this.pickerBg.toHEXString();
     this.paletteService.newColor(color);
     this.widget.updateCustomStyle(BACKGROUND, color);
+  }
+
+  ngOnDestroy() {
+    this.subscriptions.forEach(sub => {
+      sub.unsubscribe();
+    });
   }
 }
 

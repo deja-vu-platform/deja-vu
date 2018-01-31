@@ -1,4 +1,10 @@
 .element {
   width: 30px;
   height: 30px;
+  
+  border: 4px solid transparent;
+}
+
+.selected.element {
+  border: 4px dotted black;
 }
