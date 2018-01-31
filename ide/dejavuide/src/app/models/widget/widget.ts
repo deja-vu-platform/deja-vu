@@ -15,6 +15,32 @@ enum BaseWidgetType {
   LINK, LABEL, IMAGE, MENU, PANEL, TAB
 }
 
+function getIconLocation(widget: Widget) {
+  if (widget.isUserType()) {
+    return 'assets/user_icon.png';
+  }
+  if (widget.isBaseType()) {
+    if (widget.isImage()) {
+      return 'assets/image_icon.png';
+    }
+    if (widget.isLabel()) {
+      return 'assets/label_icon.png';
+    }
+    if (widget.isLink()) {
+      return 'assets/link_icon.png';
+    }
+    if (widget.isTab()) {
+      return 'assets/tab_icon.png';
+    }
+    if (widget.isPanel()) {
+      return 'assets/panel_icon.png';
+    }
+    if (widget.isMenu()) {
+      return 'assets/menu_icon.png';
+    }
+  }
+}
+
 interface LinkValue {
   text: string;
   target: string;
@@ -178,6 +204,10 @@ export abstract class Widget {
 
   isBaseType(): this is BaseWidget {
     return this.fields.widgetType === WidgetType.BASE_WIDGET;
+  }
+
+  getIconLocation() {
+    return getIconLocation(this);
   }
 
   getId(): string {

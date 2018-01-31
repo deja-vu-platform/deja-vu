@@ -2,29 +2,7 @@
       [ngClass]="{'selected': (selected | async)}">
   <div class="name-container">
     <button [routerLink]="['/ui-editor', {id: widget.getId()}]">
-      <div *ngIf="widget.isBaseType(); else usertypeicon">
-        <ng-container *ngIf="widget.isLink()">
-          <img src="assets/link_icon.png" width="15px" height="15px">
-        </ng-container>
-        <ng-container *ngIf="widget.isLabel()">
-          <img src="assets/label_icon.png" width="15px" height="15px">
-        </ng-container>
-        <ng-container *ngIf="widget.isImage()">
-          <img src="assets/image_icon.png" width="15px" height="15px">
-        </ng-container>
-        <ng-container *ngIf="widget.isMenu()">
-          <img src="assets/menu_icon.png" width="15px" height="15px">
-        </ng-container>
-        <ng-container *ngIf="widget.isPanel()">
-          <img src="assets/panel_icon.png" width="15px" height="15px">
-        </ng-container>
-        <ng-container *ngIf="widget.isTab()">
-          <img src="assets/tabs_icon.png" width="15px" height="15px">
-        </ng-container>
-      </div>
-      <ng-template #usertypeicon> 
-        <img src="assets/user_icon.png" width="15px" height="15px">
-      </ng-template>
+      <img [src]="widget.getIconLocation()" width="15px" height="15px">
     </button>
     <span class="name" (dblclick)="renameStart($event)"
       [hidden]="renameVisible"> {{widget.getName()}} </span>
