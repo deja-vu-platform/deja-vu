@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+import { Subject } from 'rxjs/Subject';
 
 @Injectable()
 export class PaletteService {
-  newColorListener = new ReplaySubject<string>(1);
+  newColorListener = new Subject<string>();
   newColor(color: string) {
     this.newColorListener.next(color);
   }

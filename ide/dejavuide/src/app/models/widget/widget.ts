@@ -1,3 +1,5 @@
+// BehaviorSubject as opposed to Subject since we want an initial value right 
+// upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
@@ -376,7 +378,6 @@ export class BaseWidget extends Widget {
       throw new Error(INCORRECT_TYPE);
     }
 
-    // TODO DRY???
     if (fields.type === BaseWidgetType.LINK) {
       return new LinkBaseWidget(fields);
     }
@@ -405,7 +406,6 @@ export class BaseWidget extends Widget {
     this.fields.widgetType = WidgetType.BASE_WIDGET;
   }
 
-  // TODO DRY???
   isLink(): this is LinkBaseWidget {
     return this.fields.type === BaseWidgetType.LINK;
   }

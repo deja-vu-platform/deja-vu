@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 
 import { Project } from '../models/project/project';
 import { Router } from '@angular/router';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+// BehaviorSubject as opposed to Subject since we want an initial value right
+// upon subscription
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 export enum PageType {
   PROJECT_EXPLORER, UI_EDITOR, CLICHES
@@ -35,8 +37,8 @@ const pageToUrl: Map<PageType, string> = new Map([
 
 @Injectable()
 export class RouterService {
-  private selectedPageType: PageType;
-  newPageType = new ReplaySubject<PageType>(1);
+  private selectedPageType = PageType.PROJECT_EXPLORER;
+  newPageType = new BehaviorSubject<PageType>(this.selectedPageType);
 
   constructor(private router: Router) {}
 

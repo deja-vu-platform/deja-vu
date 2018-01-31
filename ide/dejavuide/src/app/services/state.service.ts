@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+// BehaviorSubject as opposed to Subject since we want an initial value right
+// upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 export interface Dimensions {

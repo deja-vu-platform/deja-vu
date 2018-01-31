@@ -3,7 +3,7 @@
   [widget]="widget">
 </dv-user-widget>  
 <ng-container *ngIf="widget.isBaseType()">
-  <!-- TODO is not DRY -->
+  <!-- TODO is not DRY. But this has to be done somewhere??? -->
   <dv-label-widget *ngIf="widget.isLabel()"
     [widget]="widget"></dv-label-widget>
   <dv-link-widget *ngIf="widget.isLink()"

@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject } from 'rxjs/ReplaySubject';
+// BehaviorSubject as opposed to Subject since we want an initial value right
+// upon subscription
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { Project } from '../models/project/project';
 import { Widget, UserWidget } from '../models/widget/widget';
@@ -9,8 +11,8 @@ import { UserCliche } from '../models/cliche/cliche';
 export class ProjectService {
   private selectedProject: Project;
 
-  selectedWidget = new ReplaySubject<Widget>(1);
-  userAppUpdateListener = new ReplaySubject<boolean>(1);
+  selectedWidget = new BehaviorSubject<Widget>(null);
+  userAppUpdateListener = new BehaviorSubject<boolean>(false);
 
   public updateProject(project: Project) {
     this.selectedProject = project;
