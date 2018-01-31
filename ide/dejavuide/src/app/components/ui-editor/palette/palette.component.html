@@ -2,15 +2,14 @@
   <div>Palette</div> 
   <dv-palette-cell *ngFor="let color of palette; let i = index"
     [color]="color"
-    [editable]="true"
     (colorPicked)="colorPicked(i, $event)"
     class="element">
   </dv-palette-cell>
 </div>
 <div> 
   <div>Current Colors</div>
-  <dv-palette-cell *ngFor="let color of currentColors; let i = index"
-    [color]="color"
-    class="element">
-</dv-palette-cell>
+  <dv-current-color-cell *ngFor="let color of currentColors"
+      [color]="color"
+      class="element">
+  </dv-current-color-cell>
 </div>

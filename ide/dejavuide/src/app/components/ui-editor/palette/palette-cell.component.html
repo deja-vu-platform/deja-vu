@@ -1,9 +1,6 @@
 <input #colorInput 
   class="element"
   [ngClass]="{'selected': selected}"
-  [readOnly]="!editable"
-  [style.background]="color"
   (change)="colorChange($event)"
   (dblclick)="select()"
-  (click)="colorClicked()"
-  [value]="color">
+  (click)="colorClicked()">
