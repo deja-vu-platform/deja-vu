@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ElementRef, OnDestroy } from '@angular/core';
+import { Component, Input, OnInit, ElementRef, OnDestroy, ViewChild } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
@@ -20,6 +20,8 @@ const $ = <any>jQuery;
   styleUrls: ['./widget.component.css'],
 })
 export class WidgetComponent implements OnInit, OnDestroy {
+  @ViewChild('display', {read: ElementRef}) private displayElt: ElementRef;
+
   @Input() activated: boolean;
 
   @Input() widget: Widget;
@@ -30,17 +32,16 @@ export class WidgetComponent implements OnInit, OnDestroy {
    */
   @Input() isMovable = false;
 
+  value;
+
   innerWidgets: Observable<Widget[]>;
   userApp;
 
-  private el: HTMLElement;
   private subscriptions = [];
 
   constructor(
-    el: ElementRef,
     private projectService: ProjectService,
   ) {
-      this.el = el.nativeElement;
       this.userApp = this.projectService.selectedProject.map(
         project => project.getUserApp());
   }
@@ -49,6 +50,7 @@ export class WidgetComponent implements OnInit, OnDestroy {
     this.innerWidgets = this.widget.innerWidgetIds.map(
       innerWidgetIds => this.projectService.getWidgets(innerWidgetIds)
     );
+    this.value = this.widget.getValue();
 
     if (this.isSelected || this.isMovable) {
       this.makeWidgetDraggable();
@@ -57,7 +59,7 @@ export class WidgetComponent implements OnInit, OnDestroy {
   }
 
   private makeWidgetDraggable() {
-    $(this.el).draggable({
+    $(this.displayElt.nativeElement).draggable({
       containment: '.work-surface',
       start: (e, ui) => {
         ui.helper.dvWidget = this.widget;
@@ -76,7 +78,7 @@ export class WidgetComponent implements OnInit, OnDestroy {
   private makeWidgetResizable() {
     const dragHandle_se = $('.drag-handle');
 
-    $(this.el).resizable({
+    $(this.displayElt.nativeElement).resizable({
       handles: 'n, e, s, w, ne, nw, se, sw',
       // minHeight: 0,
       // minWidth: 0,

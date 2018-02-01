@@ -1,3 +1,5 @@
-<a class="btn btn-link" [href]="value.target">
+<a class="btn btn-link" 
+  *ngIf="widget.getValue(); let value"
+  [href]="value.target">
   {{value.text}}
 </a>

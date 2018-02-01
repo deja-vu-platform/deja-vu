@@ -100,7 +100,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private makeWorksurfaceDroppable() {
     $(this.el).droppable({
-      accept: 'dv-widget, .widget-component, dv-list-item',
+      accept: 'dv-widget-display, dv-list-item',
       hoverClass: 'highlight',
       tolerance: 'touch',
       drop: (event, ui) => {

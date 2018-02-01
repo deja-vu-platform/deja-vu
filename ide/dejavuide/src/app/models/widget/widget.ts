@@ -1,4 +1,4 @@
-// BehaviorSubject as opposed to Subject since we want an initial value right 
+// BehaviorSubject as opposed to Subject since we want an initial value right
 // upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
@@ -76,11 +76,12 @@ interface WidgetFields {
   // If this is a template, keep a reference to all is copies.
   // If the template is changed, propagate the changes to the template copies.
   templateCopies?: string[];
+
+  value?: any;
 }
 
 interface BaseWidgetFields extends WidgetFields {
   type?: BaseWidgetType;
-  value?: any;
 }
 
 interface LinkBaseWidgetFields extends BaseWidgetFields {
@@ -214,6 +215,10 @@ export abstract class Widget {
 
   getId(): string {
     return this.fields.id;
+  }
+
+  getValue(): any {
+    return this.fields.value;
   }
 
   getName(): string {
@@ -432,7 +437,6 @@ export class BaseWidget extends Widget {
 
   makeCopy(userApp: UserCliche, parentId?: string, fromTemplate = false): Widget[] {
     const fields = this.fields;
-    const value = this.fields.value;
 
     const copyWidget = BaseWidget.fromJSON(fields);
 
@@ -464,7 +468,7 @@ export class LinkBaseWidget extends BaseWidget {
   constructor(fields: LinkBaseWidgetFields) {
     super(fields);
     this.fields.type = BaseWidgetType.LINK;
-    this.fields.value = this.fields.value || { text: '', target: '' };
+    this.setValue(this.fields.value || { text: '', target: '' });
 
     this.setName(fields.name || 'Link Widget');
     this.updateDimensions(fields.dimensions || { width: 100, height: 50 });
@@ -485,7 +489,7 @@ export class LabelBaseWidget extends BaseWidget {
   constructor(fields: LabelBaseWidgetFields) {
     super(fields);
     this.fields.type = BaseWidgetType.LABEL;
-    this.fields.value = this.fields.value || 'Write your label here...';
+    this.setValue(this.fields.value || 'Write your label here...');
 
     this.setName(fields.name || 'Label Widget');
     this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
@@ -507,7 +511,7 @@ export class ImageBaseWidget extends BaseWidget {
     super(fields);
     this.fields.type = BaseWidgetType.IMAGE;
     // TODO this default value is not robust
-    this.fields.value = this.fields.value || 'assets/image_icon.png';
+    this.setValue(this.fields.value || this.getIconLocation());
 
     this.setName(fields.name || 'Image Widget');
     this.updateDimensions(fields.dimensions || { width: 400, height: 200 });
@@ -528,7 +532,7 @@ export class MenuBaseWidget extends BaseWidget {
   constructor(fields: MenuBaseWidgetFields) {
     super(fields);
     this.fields.type = BaseWidgetType.MENU;
-    this.fields.value = this.fields.value || [];
+    this.setValue(this.fields.value || []);
 
     this.setName(fields.name || 'Menu Widget');
     this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
@@ -556,7 +560,7 @@ export class PanelBaseWidget extends BaseWidget {
   constructor(fields: PanelBaseWidgetFields) {
     super(fields);
     this.fields.type = BaseWidgetType.PANEL;
-    this.fields.value = this.fields.value || {heading: 'Type heading...', content: 'Type content...'};
+    this.setValue(this.fields.value || {heading: 'Type heading...', content: 'Type content...'});
 
     this.setName(fields.name || 'Panel Widget');
     this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
@@ -577,7 +581,7 @@ export class TabBaseWidget extends BaseWidget {
   constructor(fields: TabBaseWidgetFields) {
     super(fields);
     this.fields.type = BaseWidgetType.TAB;
-    this.fields.value = this.fields.value || [];
+    this.setValue(this.fields.value || []);
 
     this.setName(fields.name || 'Tab Widget');
     this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });

@@ -1,4 +1,5 @@
-<div class="panel panel-default display-component">
+<div class="panel panel-default display-component"
+  *ngIf="widget.getValue(); let value">
   <div class="panel-heading">
     <h3 class="panel-title">{{value.heading}}</h3>
   </div>

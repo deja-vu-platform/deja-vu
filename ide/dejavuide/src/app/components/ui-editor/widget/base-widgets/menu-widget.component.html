@@ -1,13 +1,3 @@
-<div class="btn-group display-component" role="group">
-  <a  *ngFor="let menu_item of value"
-      type="button" 
-      class="btn btn-default" 
-      role="button" 
-      [href]="menu_item.target">
-    {{menu_item.text}}
-  </a>
-</div>
-
 <dv-widget-options 
     [widget]="widget"
     (applyChanges)="applyChanges($event)">

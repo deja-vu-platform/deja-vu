@@ -1,4 +1,4 @@
-import { Component, Input, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { LabelBaseWidget } from '../../../../models/widget/widget';
 import * as $ from 'jquery';
 
@@ -6,20 +6,22 @@ import * as $ from 'jquery';
   selector: 'dv-label-widget',
   templateUrl: './label-widget.component.html',
 })
-export class LabelWidgetComponent implements AfterViewInit {
-  @ViewChild('edit', {read: ElementRef}) private editElt: ElementRef;
+export class LabelWidgetComponent implements OnInit {
+  // @ViewChild('edit', {read: ElementRef}) private editElt: ElementRef;
 
   @Input() widget: LabelBaseWidget;
 
-  updateText(event) {
-    this.widget.setValue(event.target.innerText);
+  value;
+
+  ngOnInit() {
+    this.value = this.widget.getValue();
   }
 
-  ngAfterViewInit() {
-    const elt = this.editElt.nativeElement;
-    $(elt).on('mousedown', (event) => {
-      event.stopPropagation();
-      $(elt).focus();
-    });
+  applyChanges(apply: boolean) {
+    if (apply) {
+      this.widget.setValue(this.value);
+    } else {
+      this.value = this.widget.getValue();
+    }
   }
 }
