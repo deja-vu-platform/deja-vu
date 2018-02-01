@@ -43,4 +43,4 @@ import { WidgetOptionsComponent } from './options.component';
     UserWidgetComponent
   ]
 })
-export class BaseWidgetModule { }
+export class WidgetOptionsModule { }

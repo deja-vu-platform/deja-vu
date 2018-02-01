@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { WidgetComponent } from './widget.component';
-import { BaseWidgetModule } from './base-widgets/base-widget.module';
+import { WidgetOptionsModule } from './widget-options/widget-options.module';
 import { WidgetDisplayModule } from '../../common/widget-display/widget-display.module';
 
 @NgModule({
@@ -11,7 +11,7 @@ import { WidgetDisplayModule } from '../../common/widget-display/widget-display.
   ],
   imports: [
     BrowserModule,
-    BaseWidgetModule,
+    WidgetOptionsModule,
     WidgetDisplayModule
   ],
   providers: [],
