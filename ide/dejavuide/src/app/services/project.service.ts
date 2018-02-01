@@ -9,28 +9,24 @@ import { UserCliche } from '../models/cliche/cliche';
 
 @Injectable()
 export class ProjectService {
-  private selectedProject: Project;
-
-  selectedWidget = new BehaviorSubject<Widget>(null);
-  userAppUpdateListener = new BehaviorSubject<boolean>(false);
-
-  public updateProject(project: Project) {
-    this.selectedProject = project;
-  }
-
-  public getProject(): Project {
-    if (this.selectedProject) {
-      return this.selectedProject;
-    }
+  constructor() {
     const project = localStorage.getItem('project');
     if (project) {
       this.updateProject(Project.fromJSON(JSON.parse(project)));
     }
-    return this.selectedProject;
   }
 
-  public deleteProject() {
-    this.selectedProject = undefined;
+  selectedProject = new BehaviorSubject<Project>(undefined);
+
+  selectedWidget = new BehaviorSubject<Widget>(undefined);
+  userAppUpdateListener = new BehaviorSubject<boolean>(false);
+
+  public updateProject(project: Project) {
+    this.selectedProject.next(project);
+  }
+
+  public getProject(): Project {
+    return this.selectedProject.getValue();
   }
 
   updateSelectedWidget(newSelectedWidget: Widget) {

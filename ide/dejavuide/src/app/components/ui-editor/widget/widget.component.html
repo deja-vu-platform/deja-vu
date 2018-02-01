@@ -1,4 +1,11 @@
-<span>Name: {{widget.getName()}}</span>
+<!-- Setting up display -->
+<dv-widget-display 
+    [widget]="widget"
+    [userApp]="userApp"
+    [value]="value"
+    [activated]="activated">
+</dv-widget-display>
+<!-- Setting up options -->
 <dv-user-widget *ngIf="widget.isUserType()"
   [widget]="widget">
 </dv-user-widget>  
