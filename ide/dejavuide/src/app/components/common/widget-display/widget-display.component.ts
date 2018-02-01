@@ -9,13 +9,12 @@ import { Widget, UserWidget } from '../../../models/widget/widget';
   styleUrls: ['./widget-display.component.css'],
 })
 export class WidgetDisplayComponent implements OnInit, OnDestroy {
-  @Input() value;
   @Input() userApp;
   @Input() widget: Widget;
   @Input()
   set activated(isActivated: boolean) {
     // make sure this component is fully loaded before running this code
-    if (this.widget && isActivated) {
+    if (this.widget && this.userApp && isActivated) {
       // check for any changes that might have occured elsewhere
       this.updateStylesToShow();
     }
@@ -60,6 +59,9 @@ export class WidgetDisplayComponent implements OnInit, OnDestroy {
   }
 
   private updateStylesToShow() {
+    if (!this.userApp) {
+      return;
+    }
     const stylesToShow = this.widget.getCustomStylesToShow(this.userApp);
 
     Object.keys(stylesToShow).forEach((name) => {

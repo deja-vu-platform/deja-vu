@@ -1,5 +1,8 @@
 import { Component, AfterViewInit, OnInit, ElementRef } from '@angular/core';
 
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+
 import { Widget } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
@@ -23,6 +26,7 @@ export class MapComponent implements AfterViewInit, OnInit {
    * Not saving a scaled version because the map scale might not be correct
    * when this is set.
    */
+  activated: Observable<boolean>;
   visibleWindowDimensions: Dimensions = {
     height: 0,
     width: 0
@@ -57,6 +61,7 @@ export class MapComponent implements AfterViewInit, OnInit {
     private projectService: ProjectService,
   ) {
     this.el = el.nativeElement;
+
     this.subscriptions.push(
       stateService.zoom.subscribe(
         (newZoom) => {
@@ -96,6 +101,8 @@ export class MapComponent implements AfterViewInit, OnInit {
         (newVisibleWindowDimensions) => {
           this.visibleWindowDimensions = newVisibleWindowDimensions;
         }));
+
+    this.activated = this.projectService.selectedWidget.map(() => true);
   }
 
   ngAfterViewInit() {

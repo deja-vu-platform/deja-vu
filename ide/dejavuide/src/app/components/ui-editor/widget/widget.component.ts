@@ -32,8 +32,6 @@ export class WidgetComponent implements OnInit, OnDestroy {
    */
   @Input() isMovable = false;
 
-  value;
-
   innerWidgets: Observable<Widget[]>;
   userApp;
 
@@ -50,7 +48,6 @@ export class WidgetComponent implements OnInit, OnDestroy {
     this.innerWidgets = this.widget.innerWidgetIds.map(
       innerWidgetIds => this.projectService.getWidgets(innerWidgetIds)
     );
-    this.value = this.widget.getValue();
 
     if (this.isSelected || this.isMovable) {
       this.makeWidgetDraggable();

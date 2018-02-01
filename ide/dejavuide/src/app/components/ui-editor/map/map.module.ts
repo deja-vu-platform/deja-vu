@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { MapComponent } from './map.component';
 import { MapWidgetComponent } from './map-widget.component';
+import { WidgetDisplayModule } from '../../common/widget-display/widget-display.module';
 
 @NgModule({
   declarations: [
@@ -10,7 +11,8 @@ import { MapWidgetComponent } from './map-widget.component';
     MapWidgetComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    WidgetDisplayModule
   ],
   providers: [],
   exports: [
