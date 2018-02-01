@@ -1,0 +1,14 @@
+<ul class="nav nav-pills nav-stacked display-component">
+  <!-- <li role="presentation" class="active">
+    <a href="#1a" data-toggle="tab">{{value.tab1.text}}</a>
+  </li> -->
+  <li role="presentation" *ngFor="let tab of value">
+    <a [href]="'#'+tab.target" data-toggle="tab">{{tab.text}}</a>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <!-- <div class="tab-pane active" id="1a"></div> -->
+  <div *ngFor="let tab of value" class="tab-pane" [id]="tab.target">
+  </div>
+</div>

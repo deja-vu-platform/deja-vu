@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { WidgetComponent } from './widget.component';
 import { BaseWidgetModule } from './base-widgets/base-widget.module';
+import { WidgetDisplayModule } from '../../common/widget-display/widget-display.module';
 
 @NgModule({
   declarations: [
@@ -10,7 +11,8 @@ import { BaseWidgetModule } from './base-widgets/base-widget.module';
   ],
   imports: [
     BrowserModule,
-    BaseWidgetModule
+    BaseWidgetModule,
+    WidgetDisplayModule
   ],
   providers: [],
   exports: [
