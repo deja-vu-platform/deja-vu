@@ -1,11 +1,9 @@
 <!-- Setting up display -->
 <dv-widget-display *ngIf="(userApp | async); let app"
     [widget]="widget"
-    [userApp]="app"
-    [activated]="activated">
+    [userApp]="app">
   <!-- Inner widgets -->
   <dv-map-widget *ngFor="let innerWidget of (innerWidgets | async)"
-    [widget]="innerWidget"
-    [scale]="scale">
+    [widget]="innerWidget">
   </dv-map-widget>
 </dv-widget-display>

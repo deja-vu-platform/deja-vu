@@ -21,9 +21,7 @@
     <dv-map-widget 
       *ngFor="let widget of [selectedWidget]"
       [style.zoom]="mapScale"
-      [widget]="widget"
-      [scale]="mapScale"
-      [activated]="activated | async">
+      [widget]="widget">
     </dv-map-widget>
     <!-- Map window is the little thing you drag to move your map -->
     <div id="map-window"

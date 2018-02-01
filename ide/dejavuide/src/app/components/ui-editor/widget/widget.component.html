@@ -26,7 +26,7 @@
 
   <!-- Inner widgets -->
   <dv-widget *ngFor="let innerWidget of (innerWidgets | async)"
-      [activated]="_activated"
+      [activated]="activated"
       [widget]="innerWidget"
       [isSelected]="false"
       [isMovable]="isSelected">

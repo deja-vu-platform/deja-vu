@@ -13,10 +13,8 @@ import { ProjectService } from '../../../services/project.service';
 })
 export class MapWidgetComponent implements OnInit {
   @Input() widget: Widget;
-  @Input() scale = 1;
   innerWidgets: Observable<Widget[]>;
   el: HTMLElement;
-  @Input() activated: boolean;
   private subscriptions = [];
 
   userApp;

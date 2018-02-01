@@ -26,7 +26,6 @@ export class MapComponent implements AfterViewInit, OnInit {
    * Not saving a scaled version because the map scale might not be correct
    * when this is set.
    */
-  activated: Observable<boolean>;
   visibleWindowDimensions: Dimensions = {
     height: 0,
     width: 0
@@ -101,8 +100,6 @@ export class MapComponent implements AfterViewInit, OnInit {
         (newVisibleWindowDimensions) => {
           this.visibleWindowDimensions = newVisibleWindowDimensions;
         }));
-
-    this.activated = this.projectService.selectedWidget.map(() => true);
   }
 
   ngAfterViewInit() {
