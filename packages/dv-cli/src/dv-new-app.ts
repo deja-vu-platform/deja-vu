@@ -1,5 +1,5 @@
 import * as program from 'commander';
-import { ng } from './dv';
+import { ng, installAndConfigureGateway } from './dv';
 
 program
   .version('0.0.1')
@@ -7,5 +7,6 @@ program
   .action(name => {
     console.log(`Creating new app ${name}`);
     ng(['new', name, '--prefix', name]);
+    installAndConfigureGateway(name);
   })
   .parse(process.argv);

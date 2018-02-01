@@ -1,14 +1,10 @@
 import * as program from 'commander';
 import {
   ng, npm, writeFileOrFail, readFileOrFail,
-  NG_PACKAGR, ENTRY_FILE_PATH, modulePath
+  NG_PACKAGR, ENTRY_FILE_PATH, modulePath,
+  JSON_SPACE, installAndConfigureGateway
 } from './dv';
 import * as path from 'path';
-
-
-// The number of space characters to use as whitespace when writing JSON
-const JSON_SPACE = 2;
-
 
 program
   .version('0.0.1')
@@ -19,7 +15,9 @@ program
 
     console.log(`Create module ${name}`);
     ng(['generate', 'module', name], name);
-  
+
+    installAndConfigureGateway(name);
+
     console.log('Install ng-packagr');
     npm(['install', 'ng-packagr', '--save-dev'], name);
   

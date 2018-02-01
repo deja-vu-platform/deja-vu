@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "tsc && copyfiles -f src/*.blueprint.* dist",
     "clean": "rm -rf ./dist"
   },
   "repository": {
@@ -26,5 +26,8 @@
     "@types/node": "^9.3.0",
     "commander": "^2.13.0",
     "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "copyfiles": "^1.2.0"
   }
 }

@@ -1,0 +1,55 @@
+import * as program from 'commander';
+import * as path from 'path';
+import { existsSync, mkdirSync } from 'fs';
+import {
+  npm, writeFileOrFail, readFileOrFail, SERVER_SRC_FOLDER,
+  updateDvConfig, updatePackage
+} from './dv';
+
+
+const SERVER_PATH = path.join(SERVER_SRC_FOLDER, 'server.ts');
+const SERVER_TSCONFIG_PATH = path.join(SERVER_SRC_FOLDER, 'tsconfig.json');
+const SERVER_BLUEPRINT: string = readFileOrFail(
+  path.join(__dirname, 'server.blueprint.ts'));
+const SERVER_TSCONFIG_BLUEPRINT: string = readFileOrFail(
+  path.join(__dirname, 'tsconfig.blueprint.json'));
+
+
+program
+  .version('0.0.1')
+  .command('action <name>', 'create a new action')
+  .command('server', 'create a new server')
+  .action(cmd => {
+    if (cmd == 'server') {
+      console.log('Installing packages');
+      npm([
+        'install', 'apollo-server-express', 'body-parser', 'express',
+        'graphql', 'graphql-tools', '@types/command-line-args',
+        '@types/mongodb', '--save'
+      ]);
+
+      console.log('Create server file');
+      if (!existsSync(SERVER_SRC_FOLDER)) {
+        mkdirSync(SERVER_SRC_FOLDER);
+      }
+      writeFileOrFail(SERVER_PATH, SERVER_BLUEPRINT);
+
+      console.log('Create server tsconfig');
+      writeFileOrFail(SERVER_TSCONFIG_PATH, SERVER_TSCONFIG_BLUEPRINT);
+
+      console.log('Update dvconfig.json');
+      updateDvConfig(dvConfig => {
+        dvConfig.config = { wsPort: 3001 };
+        dvConfig.startServer = true;
+        return dvConfig;
+      });
+
+      console.log('Add start and watch scripts to package.json');
+      updatePackage(pkg => {
+        pkg.scripts['dv-start'] = 'todo start w server';
+        pkg.scripts['dv-start-watch'] = 'todo start w server';
+        return pkg;
+      });
+    }
+  }) 
+  .parse(process.argv);
