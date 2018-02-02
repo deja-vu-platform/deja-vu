@@ -8,15 +8,15 @@ import * as path from 'path';
 
 program
   .version('0.0.1')
-  .arguments('<name>')
-  .action(name => {
+  .arguments('<name> <pathToGateway>')
+  .action((name, pathToGateway) => {
     console.log(`Creating new cliche ${name}`);
     ng(['new', name, '--prefix', name]);
 
     console.log(`Create module ${name}`);
     ng(['generate', 'module', name], name);
 
-    installAndConfigureGateway(name);
+    installAndConfigureGateway(name, pathToGateway);
 
     console.log('Install ng-packagr');
     npm(['install', 'ng-packagr', '--save-dev'], name);

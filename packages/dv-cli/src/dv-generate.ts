@@ -3,7 +3,8 @@ import * as path from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import {
   npm, writeFileOrFail, readFileOrFail, SERVER_SRC_FOLDER,
-  updateDvConfig, updatePackage
+  updateDvConfig, updatePackage, concurrentlyCmd, startServerCmd, buildFeCmd,
+  buildServerCmd, DVCONFIG_FILE_PATH, SERVER_DIST_FOLDER
 } from './dv';
 
 
@@ -45,9 +46,18 @@ program
       });
 
       console.log('Add start and watch scripts to package.json');
+      const name: string = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH)).name;
       updatePackage(pkg => {
-        pkg.scripts['dv-start'] = 'todo start w server';
-        pkg.scripts['dv-start-watch'] = 'todo start w server';
+        pkg.scripts[`dv-build-${name}`] = concurrentlyCmd(
+          buildFeCmd(false), buildServerCmd(false));
+        pkg.scripts[`dv-build-watch-${name}`] = concurrentlyCmd(
+          buildFeCmd(true), buildServerCmd(true));
+
+        pkg.scripts[`dv-start-${name}`] = startServerCmd(
+          false, SERVER_DIST_FOLDER, 'config');
+        pkg.scripts[`dv-start-watch-${name}`] = startServerCmd(
+          true, SERVER_DIST_FOLDER, 'config');
+
         return pkg;
       });
     }

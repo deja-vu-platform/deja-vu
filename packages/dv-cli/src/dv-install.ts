@@ -1,6 +1,9 @@
 import * as program from 'commander';
 import * as _ from 'lodash';
-import { npm, updateDvConfig, updatePackage } from './dv';
+import {
+  npm, updateDvConfig, updatePackage, concurrentlyCmd, buildFeCmd,
+  buildServerCmd, startServerCmd
+} from './dv';
 
 
 const APP_MODULE_PATH = 'src/app/app.module.ts';
@@ -43,10 +46,20 @@ program
 
     console.log('Add start and watch scripts to package.json');
     const alias = opts.as ? opts.as : name;
-    // Only do this if cliche has a server
+    const serverDistFolder = `node_modules/${name}/dist/server`;
+    // TODO: Only do this if cliche has a server
+    // u never want to hardcode the config in the cmd
     updatePackage(pkg => {
-      pkg.scripts[`dv-${alias}-start`] = 'todo start server';
-      pkg.scripts[`dv-${alias}-start-watch`] = 'todo start and watch server';
+      pkg.scripts[`dv-build-${alias}`] = concurrentlyCmd(
+        buildFeCmd(false, loc), buildServerCmd(false, loc));
+      pkg.scripts[`dv-build-watch-${alias}`] = concurrentlyCmd(
+        buildFeCmd(true, loc), buildServerCmd(true, loc));
+
+      pkg.scripts[`dv-start-${alias}`] = startServerCmd(
+        false, serverDistFolder, `usedCliches.${alias}.config`, opts.as);
+      pkg.scripts[`dv-start-watch-${alias}`] = startServerCmd(
+        true, serverDistFolder, `usedCliches.${alias}.config`, opts.as);
+
       return pkg;
     });
 

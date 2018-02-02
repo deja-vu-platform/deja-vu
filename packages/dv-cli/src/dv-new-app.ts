@@ -3,10 +3,10 @@ import { ng, installAndConfigureGateway } from './dv';
 
 program
   .version('0.0.1')
-  .arguments('<name>')
-  .action(name => {
+  .arguments('<name> <pathToGateway>')
+  .action((name, pathToGateway) => {
     console.log(`Creating new app ${name}`);
     ng(['new', name, '--prefix', name]);
-    installAndConfigureGateway(name);
+    installAndConfigureGateway(name, pathToGateway);
   })
   .parse(process.argv);

@@ -1,0 +1,32 @@
+{
+  "name": "dv-gateway",
+  "version": "0.0.1",
+  "description": "Gateway server for Déjà Vu",
+  "main": "./dist/gateway.js",
+  "bin": {
+    "dv": "./dist/gateway.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "clean": "rm -rf ./dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spderosso/dejavu.git"
+  },
+  "author": "Santiago De Rosso",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "dependencies": {
+    "@types/body-parser": "^1.16.8",
+    "@types/express": "^4.11.0",
+    "@types/minimist": "^1.2.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "minimist": "^1.2.0"
+  }
+}
