@@ -13,6 +13,7 @@ export class ProjectPreviewComponent  {
   _selectedProject: Project;
   selectedApp: UserCliche;
   pages: Widget[] = [];
+  selectedPage: Widget;
   empty = false;
 
   @Output() projectSelected = new EventEmitter<Project>();
@@ -26,10 +27,10 @@ export class ProjectPreviewComponent  {
     );
     if (this.pages.length === 0) {
       this.empty = true;
-      this.pageNumber = -1;
+      this.updatePageNumber(-1);
     } else {
       this.empty = false;
-      this.pageNumber = 0;
+      this.updatePageNumber(0);
     }
   }
 
@@ -40,19 +41,25 @@ export class ProjectPreviewComponent  {
 
   pageNumber = -1;
 
-
-
   swipe(direction: number) {
     const numPages = this.pages.length;
 
     if (numPages === 0) {
       return;
     }
-
-    this.pageNumber = (this.pageNumber + direction + numPages) % (numPages);
+    this.updatePageNumber((this.pageNumber + direction + numPages) % (numPages));
   }
 
   selectProject() {
     this.projectSelected.next(this._selectedProject);
+  }
+
+  private updatePageNumber(num: number) {
+    this.pageNumber = num;
+    if (num < 0) {
+      this.selectedPage = undefined;
+    } else {
+      this.selectedPage = this.pages[this.pageNumber];
+    }
   }
 }

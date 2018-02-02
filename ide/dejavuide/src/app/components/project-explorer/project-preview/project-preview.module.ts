@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { ProjectPreviewComponent } from './project-preview.component';
 import { ProjectPreviewWidgetComponent} from './project-preview-widget.component';
-
+import { WidgetDisplayModule } from '../../common/widget-display/widget-display.module';
 
 @NgModule({
   declarations: [
@@ -12,6 +12,7 @@ import { ProjectPreviewWidgetComponent} from './project-preview-widget.component
   ],
   imports: [
     BrowserModule,
+    WidgetDisplayModule
   ],
   entryComponents: [
   ],

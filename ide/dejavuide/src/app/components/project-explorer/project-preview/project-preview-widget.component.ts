@@ -1,5 +1,5 @@
 
-import { Component, Input, OnChanges, OnDestroy, ElementRef} from '@angular/core';
+import { Component, Input, OnInit} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
@@ -12,45 +12,13 @@ import { ProjectService } from '../../../services/project.service';
   templateUrl: './project-preview-widget.component.html',
   styleUrls: ['./project-preview-widget.component.css']
 })
-export class ProjectPreviewWidgetComponent implements OnChanges, OnDestroy {
+export class ProjectPreviewWidgetComponent implements OnInit {
   @Input() widget: Widget;
-  @Input() app: UserCliche;
-  @Input() scale = 1;
+  @Input() userApp: UserCliche;
   innerWidgets: Widget[];
-  el: HTMLElement;
 
-  private subscriptions = [];
-
-  constructor(
-    el: ElementRef,
-    private projectService: ProjectService,
-  ) {
-    this.el = el.nativeElement;
-  }
-
-  ngOnChanges() {
-    this.unsubscribe();
-
-    this.innerWidgets = this.app.getWidgets(this.widget.getInnerWidgetIds());
-
-    // TODO this is very similar to the widgets, is there a way to generalize?
-    const dimensions = this.widget.getDimensions();
-    this.el.style.height = this.scale * dimensions.height + 'px';
-    this.el.style.width = this.scale * dimensions.width + 'px';
-
-    const position = this.widget.getPosition();
-    this.el.style.top = this.scale * position.top + 'px';
-    this.el.style.left = this.scale * position.left + 'px';
-  }
-
-  ngOnDestroy() {
-    this.unsubscribe();
-  }
-
-  private unsubscribe() {
-    this.subscriptions.forEach(sub => {
-      sub.unsubscribe();
-    });
+  ngOnInit() {
+    this.innerWidgets = this.userApp.getWidgets(this.widget.getInnerWidgetIds());
   }
 }
 

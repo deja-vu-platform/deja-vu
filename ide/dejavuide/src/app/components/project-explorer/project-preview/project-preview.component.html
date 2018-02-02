@@ -1,12 +1,14 @@
 <ng-container *ngIf="selectedApp">
   <div>{{selectedApp.getName()}}</div>
-  <div id="page-preview">
-    <dv-project-preview-widget 
+  <div id="page-preview" *ngIf="!empty; else noPages">
+      <!-- putting it in a list ensures that the dv-project-preview-widget 
+        is refreshed everytime the selected widget changes  -->
+    <dv-project-preview-widget
+      *ngFor="let page of [selectedPage]"
       (dblclick)="selectProject()"
       id="page"
-      *ngIf="!empty; else noPages"
-      [app]="selectedApp"
-      [widget]="pages[pageNumber]">
+      [userApp]="selectedApp"
+      [widget]="page">
     </dv-project-preview-widget>
   </div>
   <div 
