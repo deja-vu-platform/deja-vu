@@ -4,6 +4,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
 import { Dimensions, Position } from '../../services/state.service';
+import { getDefaultDimensions, getIconLocation } from './widget.settings';
 import { UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
 
@@ -15,32 +16,6 @@ enum WidgetType {
 
 enum BaseWidgetType {
   LINK, LABEL, IMAGE, MENU, PANEL, TAB
-}
-
-function getIconLocation(widget: Widget) {
-  if (widget.isUserType()) {
-    return 'assets/user_icon.png';
-  }
-  if (widget.isBaseType()) {
-    if (widget.isImage()) {
-      return 'assets/image_icon.png';
-    }
-    if (widget.isLabel()) {
-      return 'assets/label_icon.png';
-    }
-    if (widget.isLink()) {
-      return 'assets/link_icon.png';
-    }
-    if (widget.isTab()) {
-      return 'assets/tab_icon.png';
-    }
-    if (widget.isPanel()) {
-      return 'assets/panel_icon.png';
-    }
-    if (widget.isMenu()) {
-      return 'assets/menu_icon.png';
-    }
-  }
 }
 
 interface LinkValue {
@@ -179,6 +154,8 @@ export abstract class Widget {
     this.fields.version = fields.version || '0.0.0';
     this.fields.author = fields.author || 'anonymous';
 
+    // don't use updateDimensions or updatePosition here since
+    // the behavior subjects aren't initialized yet.
     this.fields.dimensions = this.fields.dimensions || {
       height: 0,
       width: 0
@@ -233,6 +210,10 @@ export abstract class Widget {
     return shallowCopy(this.fields.dimensions);
   }
 
+  resetDimensions() {
+    this.updateDimensions(getDefaultDimensions(this));
+  }
+
   updateDimensions(newDimensions: Dimensions) {
     this.fields.dimensions = shallowCopy(newDimensions);
     this.dimensions.next(this.fields.dimensions);
@@ -285,6 +266,10 @@ export abstract class Widget {
 
   getPosition(): Position {
     return shallowCopy(this.fields.position);
+  }
+
+  resetPosition() {
+    this.updatePosition({top: 0, left: 0});
   }
 
   updatePosition(newPosition: Position) {
@@ -471,7 +456,7 @@ export class LinkBaseWidget extends BaseWidget {
     this.setValue(this.fields.value || { text: '', target: '' });
 
     this.setName(fields.name || 'Link Widget');
-    this.updateDimensions(fields.dimensions || { width: 100, height: 50 });
+    this.updateDimensions(fields.dimensions || getDefaultDimensions(this));
   }
 
   setValue(value: LinkValue) {
@@ -492,7 +477,7 @@ export class LabelBaseWidget extends BaseWidget {
     this.setValue(this.fields.value || 'Write your label here...');
 
     this.setName(fields.name || 'Label Widget');
-    this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
+    this.updateDimensions(fields.dimensions || getDefaultDimensions(this));
   }
   setValue(value: string) {
     this.fields.value = value;
@@ -514,7 +499,7 @@ export class ImageBaseWidget extends BaseWidget {
     this.setValue(this.fields.value || this.getIconLocation());
 
     this.setName(fields.name || 'Image Widget');
-    this.updateDimensions(fields.dimensions || { width: 400, height: 200 });
+    this.updateDimensions(fields.dimensions || getDefaultDimensions(this));
   }
   setValue(value: string) {
     this.fields.value = value;
@@ -535,7 +520,7 @@ export class MenuBaseWidget extends BaseWidget {
     this.setValue(this.fields.value || []);
 
     this.setName(fields.name || 'Menu Widget');
-    this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
+    this.updateDimensions(fields.dimensions || getDefaultDimensions(this));
   }
   setValue(value: LinkValue[]) {
     this.fields.value = shallowCopy(value);
@@ -563,7 +548,7 @@ export class PanelBaseWidget extends BaseWidget {
     this.setValue(this.fields.value || {heading: 'Type heading...', content: 'Type content...'});
 
     this.setName(fields.name || 'Panel Widget');
-    this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
+    this.updateDimensions(fields.dimensions ||  getDefaultDimensions(this));
   }
   setValue(value: PanelValue) {
     this.fields.value = shallowCopy(value);
@@ -584,7 +569,7 @@ export class TabBaseWidget extends BaseWidget {
     this.setValue(this.fields.value || []);
 
     this.setName(fields.name || 'Tab Widget');
-    this.updateDimensions(fields.dimensions ? this.fields.dimensions : { width: 400, height: 200 });
+    this.updateDimensions(fields.dimensions || getDefaultDimensions(this));
   }
   setValue(value: LinkValue[]) {
     this.fields.value = shallowCopy(value);

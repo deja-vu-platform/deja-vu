@@ -82,6 +82,10 @@ export class WidgetOptionsComponent implements AfterViewInit, OnDestroy {
     const userApp = this.projectService.getUserApp();
     const copies = this.widget.makeCopy(userApp);
     userApp.setAsTemplate(copies[0]);
+    // TODO this might not be the appropriate thing to do or the place to do it
+    // But it doesn't make sense for templates to have a position other
+    // than (0,0)
+    copies[0].resetPosition();
     this.projectService.userAppUpdated();
   }
 
