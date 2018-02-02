@@ -16,6 +16,9 @@ export class ProjectPreviewComponent  {
   selectedPage: Widget;
   empty = false;
 
+  // TODO set scale dynamically or allow users to choose.
+  scale = .25;
+
   @Output() projectSelected = new EventEmitter<Project>();
   @Input()
   set selectedProject(project: Project) {

@@ -1,5 +1,10 @@
 <ng-container *ngIf="selectedApp">
   <div>{{selectedApp.getName()}}</div>
+  <div 
+      id="preview-prev-page"
+      (click)="swipe(-1)">
+    <span class="glyphicon glyphicon-chevron-left" id="preview-prev-page-icon"></span>
+  </div>
   <div id="page-preview" *ngIf="!empty; else noPages">
       <!-- putting it in a list ensures that the dv-project-preview-widget 
         is refreshed everytime the selected widget changes  -->
@@ -8,13 +13,9 @@
       (dblclick)="selectProject()"
       id="page"
       [userApp]="selectedApp"
-      [widget]="page">
+      [widget]="page"
+      [style.zoom]="scale">
     </dv-project-preview-widget>
-  </div>
-  <div 
-      id="preview-prev-page"
-      (click)="swipe(-1)">
-    <span class="glyphicon glyphicon-chevron-left" id="preview-prev-page-icon"></span>
   </div>
   <div 
       id="preview-next-page"

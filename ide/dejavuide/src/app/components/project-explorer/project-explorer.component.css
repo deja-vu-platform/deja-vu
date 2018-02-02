@@ -1,12 +1,16 @@
+.project-container {
+  min-width: 1000px;
+}
+
 .projects {
   border: #d5d5d5 1px solid;
-  width: 400px;
+  width: 49%;
   display: inline-block;
 
 }
 
 .projects .content{
-  height: 500px;
+  height: 450px;
 }
 
 #projects-list{
@@ -23,8 +27,9 @@
 }
 
 .current-and-preview-container {
-  position: absolute;
   display: inline-block;
+  height: 500px;
+  width: 50%;
 }
 
 .current-project{
