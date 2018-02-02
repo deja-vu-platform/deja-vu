@@ -28,7 +28,6 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() isTemplate = false;
   @Input() widget: Widget;
   @ViewChild('ghost', {read: ElementRef}) ghost: ElementRef;
-  dragging = false;
   innerShown = false;
   renameVisible = false;
   selected: Observable<boolean>;
@@ -54,6 +53,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
+    // TODO grid interaction when dragging
     if (this.isDraggable) {
       $(this.el).draggable(
         { opacity: 1,
@@ -73,46 +73,10 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
           snap: '.grid-cell, .grid-x, .grid-y',
           snapTolerance: 10,
           start: (e, ui) => {
-              // $('.grid').css({
-              //     visibility: 'visible'
-              // });
-              // $('.grid-line').css({
-              //     visibility: 'hidden'
-              // });
               ui.helper.dvWidget = this.widget;
               ui.helper.new = this.createNew;
               ui.helper.template = this.isTemplate;
-              this.dragging = true;
           },
-          drag: (event, ui) => {
-              // grid.detectGridLines(ui.helper);
-          },
-          stop: (event, ui) => {
-              // $('.grid').css({
-              //     visibility: 'hidden'
-              // });
-              // $('.grid-line').css({
-              //     visibility: 'hidden'
-              // });
-              // var widgetId = draggingWidget.meta.id;
-              // var isNewWidget = $(ui.helper).data('newcomponent');
-              // if (!isNewWidget) {
-              //     var widgetContainerOld = $('#'+containerRef+'_' + widgetId + '_old');
-              //     if (!$(ui.helper).data('dropped')) {// not properly dropped!
-              //         widgetContainerOld.attr('id', containerRef+'_' + widgetId);
-              //         widgetContainerOld.css({
-              //             opacity: 1,
-              //         });
-              //     } else { // properly dropped
-              //         widgetContainerOld.remove();
-              //     }
-              // } else {
-              //     delete userApp.widgets.unused[widgetId];
-              //     $("#user-components-list").find("[data-componentid='" + widgetId + "']").remove();
-              // }
-              // listDisplay.refresh();
-              this.dragging = false;
-          }
       });
     }
   }
