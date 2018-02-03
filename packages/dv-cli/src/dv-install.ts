@@ -2,7 +2,7 @@ import * as program from 'commander';
 import * as _ from 'lodash';
 import {
   npm, updateDvConfig, updatePackage, concurrentlyCmd, buildFeCmd,
-  buildServerCmd, startServerCmd
+  buildServerCmd, startServerCmd, UsedCliche
 } from './dv';
 
 
@@ -17,12 +17,10 @@ program
   .action((name, loc, opts) => {
     console.log(opts);
     console.log(`Installing cliché ${name} from ${loc}`);
-    npm(['install', loc]);
+    npm(['install', loc + '/dist']);
 
     console.log('Update dvconfig.json');
-    const usedCliche: {
-      name: string, as?: string,
-      startServer: boolean, watch: boolean, config?: any} = {
+    const usedCliche: UsedCliche = {
       name: name,
       startServer: true,
       watch: true
@@ -50,8 +48,9 @@ program
     // TODO: Only do this if cliche has a server
     // u never want to hardcode the config in the cmd
     updatePackage(pkg => {
-      pkg.scripts[`dv-build-${alias}`] = concurrentlyCmd(
-        buildFeCmd(false, loc), buildServerCmd(false, loc));
+      // pkg.scripts[`dv-build-${alias}`] = concurrentlyCmd(
+      //   buildFeCmd(false, loc), buildServerCmd(false, loc));
+      pkg.scripts[`dv-build-${alias}`] = `(cd ${loc}; chokidar 'src/app/${name}' 'server') | (cd ${loc}; npm run dv-package) && npm run dv-build-thisone`
       pkg.scripts[`dv-build-watch-${alias}`] = concurrentlyCmd(
         buildFeCmd(true, loc), buildServerCmd(true, loc));
 

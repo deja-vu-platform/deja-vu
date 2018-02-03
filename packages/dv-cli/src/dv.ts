@@ -3,6 +3,7 @@ import * as program from 'commander';
 import { spawnSync } from 'child_process';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import * as path from 'path';
+import * as _ from 'lodash';
 
 
 /** Executes `ng` synchronously **/
@@ -163,10 +164,26 @@ export function installAndConfigureGateway(
     pkg.scripts[`dv-start-gateway`] = START_THIS_GATEWAY_CMD;
     pkg.scripts[`dv-build-${name}`] = buildFeCmd(false);
     pkg.scripts[`dv-build-watch-${name}`] = buildFeCmd(true);
+    pkg.scripts['concurrently'] = 'concurrently';
     return pkg;
   });
 }
 
+export interface DvConfig {
+  name: string;
+  startServer: boolean;
+  watch: boolean;
+  config?: any;
+  usedCliches: UsedCliche[];
+}
+
+export interface UsedCliche {
+  name: string;
+  as?: string;
+  startServer: boolean;
+  watch: boolean;
+  config?: any;
+}
 
 program
   .version('0.0.1')
@@ -179,8 +196,6 @@ program
   .command(
     'package', 'package the cliché so that it can be used in other projects')
   .action(cmd => {
-    const config = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
-
     // There seems to be something wrong with commander because if we do
     // `package` with a subcommand it doesn't work unless the user provides args
     if (cmd == 'package') {
@@ -189,14 +204,50 @@ program
       npm(['run', 'dv-build-cl']);
       console.log('Done');
     } else if (cmd == 'serve') {
+      const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
       console.log('Serving app');
       // for now, serve everything (including all dep cliches)
-      for (const c in config.usedCliches) {
-        // spawn npm run dv-build-watch-c
-        // spawn npm run dv-start-watch-c
-      }
-      // span dv-build-watch-name
-      // span dv-start-watch-name
+
+      const currentProject = _
+        .pick(config, ['name', 'startServer', 'watch', 'config']);
+      const projectsToWatch = _
+        .chain(config.usedCliches)
+        .concat(currentProject)
+        .filter('watch')
+        .map(usedCliche => usedCliche.as ? usedCliche.as : usedCliche.name)
+        .value();
+
+      console.log('Build everything');
+      const buildCmd = 'npm run concurrently -- ' + _
+        .chain(projectsToWatch)
+        .map(buildTask => `"npm run dv-build-${buildTask}"`)
+        .join()
+        .value();
+      // cmd(buildCmd, []);
+      console.log(buildCmd);
+
+      console.log('Start build and serve watchers');
+      const buildWatchCmds = _
+        .chain(projectsToWatch)
+        .map(buildTask => `"npm run dv-build-watch-${buildTask}"`)
+        .value();
+      const startServerCmds =  _
+        .chain(config.usedCliches)
+        .concat(currentProject)
+        .filter('startServer')
+        .map(project => {
+          const cmd = '"npm run dv-start' + (project.watch ? '-watch' : '');
+          return ` ${cmd} ${project.as ? project.as : project.name}"`;
+        })
+        .value();
+
+      const buildAndWatchCmd = 'npm run concurrently -- ' + _
+        .chain(buildWatchCmds)
+        .concat(startServerCmds)
+        .concat('"npm run dv-start-gateway"')
+        .join(' ');
+      console.log(buildAndWatchCmd);
+      // cmd(buildAndWatchCmd, []);
     } 
   }) 
   .parse(process.argv);
