@@ -10,6 +10,15 @@ export class LinkWidgetComponent implements OnInit {
   @Input() widget: LinkBaseWidget;
 
   value;
+  style;
+  bootstrapPrefix = 'btn';
+  bootstrapStyles = [
+    {class: 'default', name: 'Default'},
+    {class: 'primary', name: 'Primary'},
+    {class: 'success', name: 'Success'},
+    {class: 'info', name: 'Info'},
+    {class: 'warning', name: 'Warning'},
+    {class: 'danger', name: 'Danger'}];
 
   ngOnInit() {
     this.value = this.widget.getValue();
@@ -21,5 +30,10 @@ export class LinkWidgetComponent implements OnInit {
     } else {
       this.value = this.widget.getValue();
     }
+  }
+
+  setStyle(name) {
+    this.style = this.bootstrapPrefix + '-' + name;
+    console.log(this.style);
   }
 }

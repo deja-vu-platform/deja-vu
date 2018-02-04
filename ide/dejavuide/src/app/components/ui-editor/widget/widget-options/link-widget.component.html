@@ -13,12 +13,11 @@
     </mat-menu>
     
     <mat-menu #styleStyleButton="matMenu">
-      <button mat-menu-item  class="btn-style-default">Default</button>
-      <button mat-menu-item  class="btn-style-primary">Primary</button>
-      <button mat-menu-item  class="btn-style-success">Success</button>
-      <button mat-menu-item  class="btn-style-info">Info</button>
-      <button mat-menu-item  class="btn-style-warning">Warning</button>
-      <button mat-menu-item  class="btn-style-danger">Danger</button>
+      <button mat-menu-item 
+                *ngFor="let style of bootstrapStyles"
+                (click)="setStyle(style.class)">
+              {{style.name}}
+            </button>
     </mat-menu>
     
     <mat-menu #styleSize="matMenu">
