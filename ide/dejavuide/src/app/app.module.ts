@@ -7,9 +7,6 @@ import { AppRoutingModule } from './app-routing.module';
 
 import { HeaderModule } from './components/common/header/header.module';
 import { PageNotFoundModule } from './components/common/page-not-found/page-not-found.module';
-import { ZoomModule } from './components/ui-editor/zoom/zoom.module';
-import { MapModule } from './components/ui-editor/map/map.module';
-import { WorkSurfaceModule } from './components/ui-editor/worksurface/worksurface.module';
 import { StateService } from './services/state.service';
 import { ProjectService } from './services/project.service';
 import { CommunicatorService } from './services/communicator.service';

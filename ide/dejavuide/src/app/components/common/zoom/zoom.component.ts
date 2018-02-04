@@ -1,7 +1,6 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
-import { Dimensions, StateService } from '../../../services/state.service';
-import { ProjectService } from '../../../services/project.service';
+import {  Position, Dimensions } from '../../../services/state.service';
 
 enum ZoomType {
   SLIDER, FIT, FULL, ACTUAL
@@ -17,7 +16,24 @@ const CHEVRON = {
   templateUrl: './zoom.component.html',
   styleUrls: ['./zoom.component.css']
 })
-export class ZoomComponent implements OnDestroy {
+export class ZoomComponent implements OnInit {
+  /**
+   * The dimensions of the component in focus. Needed for FIT.
+   */
+  @Input() componentDimensions: Dimensions | null;
+  /**
+   * The dimensions of the visible part of this component. Needed for
+   * FIT and FULL.
+   */
+  @Input() visibleWindowDimensions: Dimensions | null;
+  /**
+   * The dimensions of the container containing the component. Needed for
+   * FULL.
+   */
+  @Input() containerDimensions: Dimensions | null;
+
+  @Output() zoom = new EventEmitter<number>();
+
   readonly sliderMinVal = -300;
   readonly sliderMaxVal = 300;
   readonly ZoomType = ZoomType;
@@ -27,36 +43,15 @@ export class ZoomComponent implements OnDestroy {
   minimized = false;
   chevron = CHEVRON.RIGHT;
 
-  private subscriptions = [];
-
   private currentZoom: number;
-  private visibleWindowDimensions: Dimensions;
-  private widgetDimensions: Dimensions;
-  private screenDimensions: Dimensions;
 
-  constructor(
-    private stateService: StateService,
-    private projectService: ProjectService
-  ) {
-    this.subscriptions.push(
-      stateService.visibleWindowDimensions.subscribe(
-        (newVisibleWindowDimensions) => {
-          this.visibleWindowDimensions = newVisibleWindowDimensions;
-        }));
+  full = false;
+  fit = false;
 
-    this.subscriptions.push(
-      stateService.selectedScreenDimensions.subscribe(
-        (newScreenDimensions) => {
-          this.screenDimensions = newScreenDimensions;
-        }));
-
-    this.subscriptions.push(
-      projectService.selectedWidget.subscribe(
-        (newWidget) => {
-          this.widgetDimensions = newWidget.getDimensions();
-        }));
+  ngOnInit() {
+    this.full = !!(this.visibleWindowDimensions && this.containerDimensions);
+    this.fit = !!(this.visibleWindowDimensions && this.componentDimensions);
   }
-
 
   zoomTypeButtonClick(type: ZoomType) {
     this.changeZoomViaZoomControl(type);
@@ -99,16 +94,16 @@ export class ZoomComponent implements OnDestroy {
         break;
     case ZoomType.FIT:
         const zoomHeight = this.visibleWindowDimensions.height /
-                                this.widgetDimensions.height;
+                                this.componentDimensions.height;
         const zoomWidth = this.visibleWindowDimensions.width /
-                                this.widgetDimensions.width;
+                                this.componentDimensions.width;
         this.currentZoom = Math.min(zoomWidth, zoomHeight);
         break;
     case ZoomType.FULL:
         const widthScale =  this.visibleWindowDimensions.width /
-                                this.screenDimensions.width;
+                                this.containerDimensions.width;
         const heightScale = this.visibleWindowDimensions.height /
-                                this.screenDimensions.height;
+                                this.containerDimensions.height;
         this.currentZoom = Math.min(widthScale, heightScale);
         break;
     case ZoomType.ACTUAL:
@@ -156,13 +151,7 @@ export class ZoomComponent implements OnDestroy {
   }
 
   private zoomChanged() {
-    this.stateService.updateZoom(this.currentZoom);
+    this.zoom.next(this.currentZoom);
     this.zoomControlText = this.makeZoomText(this.getZoomFromSliderVal());
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach(sub => {
-      sub.unsubscribe();
-    });
   }
 }
