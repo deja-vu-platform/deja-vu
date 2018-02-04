@@ -1,7 +1,8 @@
 <div (window:resize)="handleWindowResize()"></div>
 <div class="work-surface widget-work-surface"
     [style.height.px] ="selectedScreenDimensions.height"
-    [style.width.px]="selectedScreenDimensions.width">
+    [style.width.px]="selectedScreenDimensions.width"
+    [style.zoom]="zoom | async">
   <ng-container *ngIf="selectedWidget$ | async">
     <dv-widget 
       *ngFor="let widget of activeWidgets"

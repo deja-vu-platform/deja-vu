@@ -31,7 +31,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
   activeWidgets: Widget[] = [];
 
   private el: HTMLElement;
-  private currentZoom = 1;
+  private zoom;
   private visibleWindowScroll: Position;
   private subscriptions = [];
 
@@ -43,10 +43,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {
     this.el = el.nativeElement;
 
-    this.subscriptions.push(
-      stateService.zoom.subscribe((newZoom) => {
-        this.currentZoom = newZoom;
-      }));
+    this.zoom = stateService.zoom.map((newZoom) => newZoom);
 
     this.subscriptions.push(
       stateService.selectedScreenDimensions.subscribe(

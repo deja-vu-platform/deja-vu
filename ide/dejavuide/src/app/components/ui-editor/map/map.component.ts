@@ -51,7 +51,7 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   private subscriptions = [];
 
-  private zoom = 1;
+  private zoom;
   private el: HTMLElement;
 
   constructor(
@@ -61,11 +61,8 @@ export class MapComponent implements AfterViewInit, OnInit {
   ) {
     this.el = el.nativeElement;
 
-    this.subscriptions.push(
-      stateService.zoom.subscribe(
-        (newZoom) => {
-          this.zoom = newZoom;
-        }));
+    this.zoom = stateService.zoom.map(
+        (newZoom) =>  newZoom);
 
     this.subscriptions.push(
       stateService.selectedScreenDimensions.subscribe(

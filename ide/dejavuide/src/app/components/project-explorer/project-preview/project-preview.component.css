@@ -1,7 +1,3 @@
-:host {
-
-}
-
 #page-preview{
   display: inline-block;
   position: relative;
@@ -10,6 +6,8 @@
   height: 80%;
 
   overflow: scroll;
+
+  pointer-events: none;
 }
 
 #preview-prev-page, #preview-next-page{
