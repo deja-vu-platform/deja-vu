@@ -34,6 +34,7 @@ export class LinkWidgetComponent implements OnInit {
 
   setStyle(name) {
     this.style = this.bootstrapPrefix + '-' + name;
+    this.widget.setBootstrapClass(this.style);
     console.log(this.style);
   }
 }
