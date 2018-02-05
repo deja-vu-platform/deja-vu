@@ -1,8 +1,8 @@
 import {GraphQlService} from "gql";
 
-import {Widget, Field} from "client-bus";
+import {Widget, ClientBus, Field} from "client-bus";
 
-import {TransactionAtom} from "../../shared/data";
+import {GoodAtom, TransactionAtom} from "../../shared/data";
 
 import "rxjs/add/operator/map";
 
@@ -15,7 +15,9 @@ import "rxjs/add/operator/map";
 export class ShowTransactionComponent {
   @Field("Transaction") transaction: TransactionAtom;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(
+    private _graphQlService: GraphQlService,
+    private _clientBus: ClientBus) {}
 
   dvAfterInit() {
     if (!this.transaction.atom_id || !this.transaction.good) {
@@ -26,6 +28,7 @@ export class ShowTransactionComponent {
       .get(`
         transaction_by_id(atom_id: "${this.transaction.atom_id}") {
           good {
+            atom_id,
             name
           },
           price,
@@ -33,21 +36,13 @@ export class ShowTransactionComponent {
         }
       `)
       .map(data => data.transaction_by_id)
-      .subscribe(transaction_by_id => {
-        this._graphQlService
-          .get(`
-            good_by_id(
-              atom_id: "${transaction_by_id.good.atom_id}"
-            ) {
-              name
-            }
-          `)
-          .map(data => data.good_by_id.name)
-          .subscribe(name => {
-            this.transaction.good.name = name;
-            this.transaction.price = transaction_by_id.price;
-            this.transaction.quantity = transaction_by_id.quantity;
-          });
+      .subscribe(transaction => {
+        if (!this.transaction.good)
+          this.transaction.good = this._clientBus.new_atom<GoodAtom>("Good");
+        this.transaction.good.atom_id = transaction.good.atom_id;
+        this.transaction.good.name = transaction.good.name;
+        this.transaction.price = transaction.price;
+        this.transaction.quantity = transaction.quantity;
       });
   }
 }

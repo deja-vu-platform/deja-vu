@@ -1,5 +1,5 @@
 import {GraphQlService} from "gql";
-import {Widget, Field} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {MarketAtom, PartyAtom, GoodAtom} from "../../shared/data";
 
 @Widget({
@@ -10,6 +10,7 @@ export class CreateGoodButtonComponent {
   @Field("Good") good: GoodAtom;
   @Field("Party") seller: PartyAtom;
   @Field("Market") market: MarketAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -39,6 +40,7 @@ export class CreateGoodButtonComponent {
           }
       `)
       .subscribe(_ => {
+        this.submit_ok.value = true;
         this.good.atom_id = "";
         this.good.name = "";
         this.good.price = undefined;

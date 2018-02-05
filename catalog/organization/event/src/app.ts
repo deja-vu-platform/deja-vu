@@ -80,7 +80,8 @@ const schema = grafo
 
           return mean.db.collection("events")
             .update({atom_id: event.atom_id}, update_obj)
-            .then(_ => bus.update_atom("Event", event.atom_id, update_obj));
+            .then(_ => bus.update_atom("Event", event.atom_id, update_obj))
+            .then(_ => event);
         }
       }
     }

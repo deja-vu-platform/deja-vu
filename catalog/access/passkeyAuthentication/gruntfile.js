@@ -3,8 +3,7 @@ module.exports = function (grunt) {
         grunt,
         "PasskeyAuthentication",
         ["CreateCustomPasskey",
-            "CreateRandomPasskey",
             "ValidatePasskeyWithRedirect",
-            "SignOutWithRedirect",
+            "PasskeySignOutWithRedirect",
             "LoggedIn"]);
 }

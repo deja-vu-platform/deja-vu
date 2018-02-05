@@ -1,1 +1,1 @@
-<button (click)="createCompoundTransaction()" class="btn btn-default btn-sm">Create</button>
+<button (click)="createCompoundTransaction()" class="btn btn-default btn-sm" [disabled]="!isValid()">Create</button>

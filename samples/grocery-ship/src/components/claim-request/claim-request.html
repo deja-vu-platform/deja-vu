@@ -1,0 +1,4 @@
+<!-- Shows the claim task button to claim a request and edit the compound transaction seller at the same time. -->
+<dv-widget name="ShowDeliverRequest"></dv-widget> <!-- small hack to show the details of the request because only 1 child widget can be replaced at a time in a widget -->
+<dv-widget name="ClaimTask" of="Task"></dv-widget>
+<dv-widget name="EditCompoundTransactionSeller" of="Market" [init]="{compoundTransaction: task, seller: assignee, submit_ok: submit_ok}"></dv-widget>

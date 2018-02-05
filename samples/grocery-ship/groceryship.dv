@@ -1,8 +1,188 @@
 // Facilitate peer grocery delivery between students
 app GroceryShip {
-  include access/StandardAuthentication
-  include community/Market
-  include community/Rating
-  include organization/Checklist
-  include organization/Task
+  include access/StandardAuthentication [
+    User for User
+  ]
+
+  include community/Market[
+    User for Party,
+    RequestItem for Good,
+    RequestTransaction for Transaction,
+    Request for CompoundTransaction,
+    GroceryShip for Market,
+    ShowRequestItem replacing ShowTransaction in ShowCompoundTransaction
+  ]
+
+  include community/Profile[
+    User for Profile
+  ]
+
+  include community/Rating[
+    User for Source,
+    User for Target
+  ]
+
+  // Buyers set a delivery time for a Request
+  // Event will be used to schedule this
+  include organization/Event[
+    Request for Event
+  ]
+
+  include organization/Task[
+    Request for Task,
+    User for Assigner,
+    User for Assignee,
+
+    // dashboard > Notifications
+    ShowAcceptRequestNotification replacing ShowTask in ShowPendingApprovalTasks,
+    ShowDeliverRequestNotification replacing ShowTask in ShowUnapprovedTasks,
+
+    // Dashboard > My Requests
+    ShowMyRequest replacing ShowTask in ShowAssignedTasks,
+    ShowMyRequest replacing ShowTask in ShowUnassignedTasks,
+
+    // Dashboard > To Deliver
+    SetDeliveryTime replacing CompleteTask in ShowUncompletedTasks,
+
+    // Deliver
+    ShowDeliverRequest replacing ShowTask in ShowClaimableTasks,
+    ClaimRequest replacing ClaimTask in ShowClaimableTasks
+  ]
+
+  data User {
+    username: text
+  }
+
+  data GroceryShip {}
+
+  data Request {
+    name: text
+  }
+
+  data RequestItem {
+    name: text,
+    market: GroceryShip
+  }
+
+  data RequestTransaction {
+    price: number
+  }
+
+  groceryship: GroceryShip = {
+    // force this to be saved in the market db
+    unused: 1
+  }
+
+  main widget Login {
+    user: User,
+    on_user_ok: Widget = Dashboard,
+    submit_ok: boolean
+  }
+
+  // The NavBar that will be displayed if a user is not logged in,
+  // i.e. in the login page
+  // This is a small hack because on_signout_ok of the NavBarLoggedIn
+  // conflicts with on_user_ok of the Login page
+  widget NavBar {}
+
+  // The NavBar that will be displayed if a user is logged in
+  widget NavBarLoggedIn {
+    user: User,
+    on_signout_ok: Widget = Login
+  }
+
+  // Page that contains Notifications, Your Requests and To Deliver
+  widget Dashboard {
+    assignee: User,
+    assigner: User,
+    market: GroceryShip = groceryship
+  }
+
+  // Shows the page where users can create a Request
+  // A compound transaction is created with a transaction for [good] (the tip) with [buyer] in [market]
+  widget CreateRequest {
+    buyer: User,
+    market: GroceryShip = groceryship,
+    good: RequestItem,
+    request: Request,
+    submit_ok: boolean
+  }
+
+  // Shows the page where users can claim Requests for them to deliver
+  widget Deliver {
+    assigner: User,
+    submit_ok: boolean
+  }
+
+  widget Faq {}
+
+  widget UserProfile {
+    profile: User
+  }
+
+  // Shows a claimable request in the Deliver tab
+  widget ShowDeliverRequest {
+    task: Request,
+    assignee: User,
+    submit_ok: boolean
+  }
+
+  // Shows a button to claim a request from the request feed in the Deliver page
+  // The [task] is assigned to [assignee]
+  widget ClaimRequest {
+    task: Request,
+    assignee: User,
+    submit_ok: boolean
+  }
+
+  // Shows a request made by the current user under Notifications in Dashboard
+  // The user accepts/rejects the request/delivery and rates the shopper.
+  widget ShowAcceptRequestNotification {
+    task: Request,
+    rating: Rating,
+    submit_ok: boolean
+  }
+
+  // Shows a request claimed by the current user under Notifications in Dashboard
+  // The user delivers the request/delivery and rates the requester.
+  widget ShowDeliverRequestNotification {
+    task: Request
+  }
+
+  // Shows a request under My Requests in Dashboard
+  widget ShowMyRequest {
+    task: Request,
+    submit_ok: boolean
+  }
+
+  // Shows the button and the modal for the shopper to set the delivery time of a request under To Deliver in Dashboard
+  // Add a transaction to the request [task] with [good] and [buyer]
+  // Create an Event for the delivery
+  widget SetDeliveryTime {
+    market: GroceryShip = groceryship,
+    task: Request,
+    buyer: User,
+    good: RequestItem,
+    submit_ok: boolean
+  }
+
+  // Shows the good name and price of an item in the request [task]
+  widget ShowRequestItem {
+    transaction: RequestTransaction
+  }
+
+  // Shows a modal with all the details of the request [task]
+  // and the contact information of the shopper or requester,
+  // depending on who the current [user] is
+  widget NotificationItemModal {
+    task: Request,
+    user: User
+  }
+
+  login: route = {path: "login", widget: Login}
+  dashboard: route = {path: "dashboard", widget: Dashboard}
+  request: route = {path: "request", widget: CreateRequest}
+  deliver: route = {path: "deliver", widget: Deliver}
+  faq: route = {path: "faq", widget: Faq}
+  profile: route = {path: "profile", widget: UserProfile}
 }

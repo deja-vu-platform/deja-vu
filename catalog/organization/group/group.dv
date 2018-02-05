@@ -140,6 +140,13 @@ cliche Group {
     submit_ok: boolean
   }
 
+   // Button allowing a member to be simultaneously created and added to a group
+  widget AddNewMemberToGroupButton {
+    group: Group,
+    member: Member,
+    submit_ok: boolean
+  }
+
   // TODO: AddNewSubgroupToGroup once fields w/ same type are possible
 
   // Button allowing a member to join or leave a group

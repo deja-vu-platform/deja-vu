@@ -34,6 +34,7 @@ export interface TransactionAtom extends Transaction, Atom {}
 
 export interface CompoundTransaction {
   transactions: Transaction[];
+  total_price: number;
 }
 
 export interface CompoundTransactionAtom extends CompoundTransaction, Atom {}

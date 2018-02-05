@@ -1,6 +1,7 @@
 import {GraphQlService} from "gql";
-import {Widget, Field} from "client-bus";
+import {Widget, Field, PrimitiveAtom} from "client-bus";
 import {CompoundTransactionAtom} from "../../shared/data";
+
 
 @Widget({
   fqelement: "Market",
@@ -8,6 +9,7 @@ import {CompoundTransactionAtom} from "../../shared/data";
 })
 export class CancelCompoundTransactionButtonComponent {
   @Field("CompoundTransaction") compoundTransaction: CompoundTransactionAtom;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   constructor(private _graphQlService: GraphQlService) {}
 
@@ -16,14 +18,17 @@ export class CancelCompoundTransactionButtonComponent {
 
     this._graphQlService
       .post(`
-        CancelCompoundTransaction(
+        CancelUnpaidCompoundTransaction(
           compound_transaction_id: "${this.compoundTransaction.atom_id}"
         )
       `)
       .subscribe(_ => {
-        this.compoundTransaction.transactions.forEach(transaction => {
-          transaction.status = "canceled";
-        });
+        if (this.compoundTransaction.transactions) {
+          this.compoundTransaction.transactions.forEach(transaction => {
+            transaction.status = "canceled";
+          });
+        }
+        this.submit_ok.value = !this.submit_ok.value;
       });
   }
 }

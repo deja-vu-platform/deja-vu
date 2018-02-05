@@ -1,5 +1,5 @@
 import {GraphQlService} from "gql";
-import {Widget, ClientBus, Field} from "client-bus";
+import {Widget, ClientBus, Field, AfterInit} from "client-bus";
 import {
   CompoundTransactionAtom,
   GoodAtom,
@@ -7,15 +7,15 @@ import {
   TransactionAtom
 } from "../../shared/data";
 
-import {Observable} from "rxjs/Observable";
 import "rxjs/add/observable/from";
 import "rxjs/add/operator/map";
+
 
 @Widget({
   fqelement: "Market",
   ng2_providers: [GraphQlService]
 })
-export class ShowCompoundTransactionComponent {
+export class ShowCompoundTransactionComponent implements AfterInit {
   @Field("CompoundTransaction") compoundTransaction: CompoundTransactionAtom;
 
   constructor(
@@ -25,44 +25,55 @@ export class ShowCompoundTransactionComponent {
 
   dvAfterInit() {
     if (!this.compoundTransaction.atom_id) return;
-    this.compoundTransaction.transactions = [];
     this._graphQlService
       .get(`
         compoundtransaction_by_id(
           atom_id: "${this.compoundTransaction.atom_id}") {
+          total_price,
           transactions {
             atom_id,
-            good { name },
+            good { atom_id, name },
+            buyer { atom_id },
             price,
             quantity,
             status
           }
         }
       `)
+      // can't get seller {atom_id} in query above if seller does not exist
       .map(data => data.compoundtransaction_by_id)
-      .subscribe(compound_transaction => {
-        compound_transaction.transactions
-          .flatMap((transactions, unused_ix) => Observable.from(transactions))
+      .subscribe(compoundTransaction => {
+        this.compoundTransaction.total_price = compoundTransaction.total_price;
+
+        this.compoundTransaction.transactions = [];
+        compoundTransaction.transactions
           .map((transaction: TransactionAtom) => {
             const transaction_atom = this.
               _clientBus.new_atom<TransactionAtom>("Transaction");
-            const good_atom = this._clientBus.new_atom<GoodAtom>("Good");
-            const seller_atom = this._clientBus.new_atom<PartyAtom>("Party");
-            const buyer_atom = this._clientBus.new_atom<PartyAtom>("Party");
-            good_atom.atom_id = transaction.good.atom_id;
-            good_atom.name = transaction.good.name;
-            buyer_atom.atom_id = transaction.buyer.atom_id;
-            seller_atom.atom_id = transaction.seller.atom_id;
             transaction_atom.atom_id = transaction.atom_id;
-            transaction_atom.good = good_atom;
-            transaction_atom.buyer = buyer_atom;
-            transaction_atom.seller = seller_atom;
             transaction_atom.price = transaction.price;
             transaction_atom.quantity = transaction.quantity;
             transaction_atom.status = transaction.status;
+
+            const good_atom = this._clientBus.new_atom<GoodAtom>("Good");
+            good_atom.atom_id = transaction.good.atom_id;
+            good_atom.name = transaction.good.name;
+            transaction_atom.good = good_atom;
+
+            if (transaction.seller) {
+              const seller_atom = this._clientBus.new_atom<PartyAtom>("Party");
+              seller_atom.atom_id = transaction.seller.atom_id;
+              transaction_atom.seller = seller_atom;
+            }
+            if (transaction.buyer) {
+              const buyer_atom = this._clientBus.new_atom<PartyAtom>("Party");
+              buyer_atom.atom_id = transaction.buyer.atom_id;
+              transaction_atom.buyer = buyer_atom;
+            }
+
             return transaction_atom;
           })
-          .subscribe(transaction => {
+          .forEach(transaction => {
             this.compoundTransaction.transactions.push(transaction);
           });
       });

@@ -33,3 +33,6 @@ If you follow these steps in order then everything should work:
   3. `npm i` and `npm run lib` in `gql`, `grafo`, `helpers`
   4. `npm i` and `npm run lib` in each cliché under `catalog` (e.g., `npm i` and `npm run lib` in `catalog/community/market`)
   5. `npm i` in each sample under `samples` (e.g., `npm i` in `samples/morg`)
+
+If you ran into errors saying that `fs.realpath` is not found then do `npm i`
+twice (this seems to be caused by some strange npm bug).

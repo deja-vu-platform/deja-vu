@@ -1,0 +1,19 @@
+<tr>
+    <th>Item Name</th>
+    <td class="item-name">{{task.name}}</td>
+</tr>
+
+<tr>
+    <th>Deadline</th>
+    <td class="deadline">{{task.expiration_date}}</td>
+</tr>
+
+<tr>
+    <dv-widget name="ShowCompoundTransaction" of="Market" [init]="{compoundTransaction: task}"></dv-widget>
+</tr>
+
+<tr>
+    <th>Requester</th>
+    <td class="requester">{{task.assigner.atom_id}}</td>
+    <dv-widget name="ShowAverageRating"  of="Rating" [init]="{target: task.assigner}"></dv-widget>
+</tr>
