@@ -1,12 +1,8 @@
 import { generateId } from '../../utility/utility';
 import { Dimensions, Position } from '../../services/state.service';
-
-/**
- * Currently a map from clicheIds to all the widgets it contains (widgetId
- * to widget). Will in the next pull request become a map from clicheIds to
- * cliche objects.
- */
-export type WidgetMap = Map<string, Map<string, Widget>>;
+import { Cliche, UserCliche } from '../cliche/cliche';
+import { Project } from '../project/project';
+import { Meta } from '../project/project';
 
 enum WidgetType {
     BASE_WIDGET, USER_WIDGET, CLICHE_WIDGET
@@ -19,19 +15,9 @@ export interface Properties {
     };
 }
 
-interface Meta {
-    name: string;
-    id: string; // id of the form 'clicheid_widgetid'
-    templateid?: string;
-    version?: string;
-    author?: string;
-}
-
 export abstract class Widget {
-    /**
-     * The map of all widgets used in the app.
-     */
-    protected allWidgets: WidgetMap;
+    protected objectType = 'Widget';
+    protected project: Project;
     protected widgetType: WidgetType;
     protected properties: Properties = {
         dimensions: null,
@@ -43,52 +29,25 @@ export abstract class Widget {
         top: 0,
         left: 0
     };
-    protected meta: Meta;
+    protected meta: Meta; // id of the form 'clicheid_widgetid'
     protected _isTemplate = false;
     // If this is a template, keep a reference to all is copies.
     // If the template is changed, propagate the changes to the template copies.
     protected templateCopies: Set<string> = new Set();
 
     /**
-     * Given a map of clicheIds to all their widgets, adds a widget to that map.
-     *
-     * @param allWidgets map containing all widgets
-     * @param widget widget to add
-     */
-    static addWidgetToWidgetMap(
-        allWidgets: WidgetMap,
-        widget: Widget) {
-        if (!allWidgets.get(widget.getClicheId())) {
-            allWidgets.set(widget.getClicheId(), new Map<string, Widget>());
-        }
-        allWidgets.get(widget.getClicheId()).set(widget.getId(), widget);
-    }
-
-    /**
-     * Given a widgetId, gets the widget object from the map of all widgets
-     *
-     * @param allWidgets map containing all widgets
-     * @param widgetId id of widget to find
-     */
-    static getWidget(allWidgets: WidgetMap, widgetId: string): Widget {
-        const clicheid = Widget.decodeid(widgetId)[0];
-        return allWidgets.get(clicheid).get(widgetId);
-    }
-
-    /**
      * Converts a JSON object to a Widget object
      * @param object object to convert
      */
-    static fromObject(object: any): BaseWidget | UserWidget {
-        const notCorrectObjectError = 'notCorrectObjectError: ' +
-        'object object is not an instance of a Widget';
+    static fromObject(project: Project, object: any): BaseWidget | UserWidget {
+        const notCorrectObject = 'Object is not an instance of a Widget';
         if (object.widgetType === undefined || object.widgetType === null) {
-            throw notCorrectObjectError;
+            throw new Error(notCorrectObject);
         }
         if (object.widgetType === WidgetType.BASE_WIDGET) {
-            return BaseWidget.fromObject(object);
+            return BaseWidget.fromObject(project, object);
         }
-        return UserWidget.fromObject(object);
+        return UserWidget.fromObject(project, object);
     }
 
     static encodeid(clicheid: string, widgetid: string): string {
@@ -106,10 +65,31 @@ export abstract class Widget {
      *  opposed to a normal copy
      */
     abstract makeCopy(fromTemplate: boolean): Widget[];
-
     protected newIdFromId(id: string) {
         const clicheid = Widget.decodeid(id)[0];
         return clicheid + '_' + generateId();
+    }
+
+    constructor(
+        project: Project,
+        name: string,
+        dimensions: Dimensions,
+        clicheid: string,
+        id: string = null,
+        templateid: string = null,
+        isTemplate = false,
+        ) {
+        this.project = project;
+        this.meta = {
+            name: name,
+            id: id ? id : clicheid + '_' + generateId(),
+            clicheId: clicheid,
+            templateId: templateid,
+            version: '',
+            author: ''
+        };
+        this.properties.dimensions = dimensions;
+        this._isTemplate = isTemplate;
     }
 
     isUserType(): this is UserWidget {
@@ -120,11 +100,8 @@ export abstract class Widget {
         return this.widgetType === WidgetType.BASE_WIDGET;
     }
 
-    getWidgetMap(): WidgetMap {
-        return this.allWidgets;
-    }
-    updateWidgetMap(updatedMap: WidgetMap) {
-        this.allWidgets = updatedMap;
+    getProject(): Project {
+        return this.project;
     }
 
     getId(): string {
@@ -144,11 +121,11 @@ export abstract class Widget {
     }
 
     getClicheId(): string {
-        return Widget.decodeid(this.meta.id)[0];
+        return this.meta.clicheId;
     }
 
     getTemplateId(): string {
-        return this.meta.templateid;
+        return this.meta.templateId;
     }
 
     isTemplate(): boolean {
@@ -200,8 +177,8 @@ export abstract class Widget {
 
         let inheritedStyles = {};
         if (this.getTemplateId()) {
-            inheritedStyles = Widget
-                .getWidget(this.allWidgets, this.getTemplateId())
+            inheritedStyles = this.project
+                .getAppWidget(this.getTemplateId())
                 .getCustomStylesToShow(); // no parent styles for template
         }
 
@@ -220,20 +197,24 @@ export abstract class Widget {
     /**
      * Just deletes from the all widgets table and the template reference if
      * it has one. Doesn't touch inner widgets if any.
-     *
      */
-    delete() {
-        if (this.getTemplateId()) {
-            Widget.getWidget(this.allWidgets, this.getTemplateId()).templateCopies.delete(this.getId());
-        }
-        this.allWidgets.get(this.getClicheId()).delete(this.getId());
+    remove() {
+        this.project.removeWidget(this.getId(), this.getTemplateId());
     }
 
-    /**
-     * Adds this widget to the map of all widgets.
-     */
-    addWidgetToAllWidgets() {
-        Widget.addWidgetToWidgetMap(this.allWidgets, this);
+    removeTemplateCopy(widgetId: string) {
+        if (this.isTemplate) {
+            this.templateCopies.delete(widgetId);
+        }
+    }
+
+    getSaveableJson() {
+        // TODO add test
+        // NOTE: maps (and possibly sets) are not copied properly by
+        // JSON.parse(JSON.stringify(...))
+        const json: Widget = Object.assign({}, this);
+        delete json.project;
+        return JSON.parse(JSON.stringify(json));
     }
 }
 
@@ -245,15 +226,16 @@ export abstract class Widget {
  */
 export class BaseWidget extends Widget {
     protected widgetType = WidgetType.BASE_WIDGET;
-    private type: string;
-    private value: string;
+    protected value: any;
+    private type: BaseType;
 
-    static fromObject(object: any): BaseWidget {
+    static fromObject(project: Project, object: any): BaseWidget {
         if (object.widgetType !== WidgetType.BASE_WIDGET) {
             return null;
         }
         const clicheId = Widget.decodeid(object.meta.id)[0];
-        return new BaseWidget(
+        const bw = new BaseWidget(
+            project,
             object.meta.name,
             object.properties.dimensions,
             object.type,
@@ -262,34 +244,35 @@ export class BaseWidget extends Widget {
             object.meta.id,
             object.meta.templateid,
             object.isTemplate);
+
+        // Properties
+        bw.updatePosition(object.position);
+ 
+        return bw;
     }
 
     constructor(
+        project: Project,
         name: string,
         dimensions: Dimensions,
-        type: string,
-        value: string,
+        type: BaseType,
+        value: any,
         clicheid: string,
         id: string = null,
         templateid: string = null,
-        isTemplate = false
+        isTemplate = false,
     ) {
-        super();
-        this.meta = {
-            name: name,
-            id: id ? id : clicheid + '_' + generateId(),
-            templateid: templateid,
-            version: '',
-            author: ''
-        };
+        super(project, name, dimensions, clicheid, id, templateid, isTemplate);
         this.type = type;
         this.value = value;
-        this.properties.dimensions = dimensions;
-        this._isTemplate = isTemplate;
     }
 
-    setValue(value) {
-        this.value = value;
+    isLink(): this is LinkBaseWidget  {
+      return this.type === BaseType.LINK;
+    }
+
+    isLabel(): this is LabelBaseWidget  {
+        return this.type === BaseType.LABEL;
     }
 
     makeCopy(fromTemplate = false): Widget[] {
@@ -302,6 +285,7 @@ export class BaseWidget extends Widget {
             isTemplate = false;
         }
         const copyWidget = new BaseWidget(
+            this.project,
             this.getName(),
             this.getDimensions(),
             this.type,
@@ -319,6 +303,65 @@ export class BaseWidget extends Widget {
     }
 }
 
+enum BaseType {
+    LINK, LABEL
+}
+
+interface LinkValue {
+    text: string;
+    target: string;
+}
+
+export class LinkBaseWidget extends BaseWidget {
+    protected value: LinkValue;
+
+    constructor(
+        project: Project,
+        name: string,
+        dimensions: Dimensions,
+        value: any,
+        clicheid: string,
+        id: string = null,
+        templateid: string = null,
+        isTemplate = false
+    ) {
+        super(project, name, dimensions, BaseType.LINK, value, clicheid, id, templateid, isTemplate);
+    }
+
+    setValue(value: LinkValue) {
+        this.value = value;
+    }
+
+    getValue(): LinkValue {
+        return Object.assign({}, this.value);
+    }
+}
+
+export class LabelBaseWidget extends BaseWidget {
+    protected value: string;
+
+    constructor(
+        project: Project,
+        name: string,
+        dimensions: Dimensions,
+        value: any,
+        clicheid: string,
+        id: string = null,
+        templateid: string = null,
+        isTemplate = false
+    ) {
+        super(project, name, dimensions, BaseType.LABEL, value, clicheid, id, templateid, isTemplate);
+    }
+
+    setValue(value: string) {
+        this.value = value;
+    }
+
+    getValue(): string {
+        return this.value;
+    }
+}
+
 /**
  *
  * @param dimensions
@@ -332,54 +375,51 @@ export class BaseWidget extends Widget {
 export class UserWidget extends Widget {
     protected widgetType  = WidgetType.USER_WIDGET;
     private innerWidgetIds: string[] = []; // Widget ids // earlier in list == lower in z axis
-
-    static fromObject(object: any): UserWidget {
+    static fromObject(project: Project, object: any): UserWidget {
         if (object.widgetType !== WidgetType.USER_WIDGET) {
             return null;
         }
         const clicheId = Widget.decodeid(object.meta.id)[0];
         const widget = new UserWidget(
+            project,
             object.meta.name,
             object.properties.dimensions,
             clicheId,
             object.meta.id,
             object.meta.templateId,
             object.isTemplate);
-        object.innerWidgetIds.forEach((id) => {
-            widget.addInnerWidget(id);
+        object.innerWidgetIds.forEach((id: string) => {
+            widget.innerWidgetIds.push(id);
         });
+
+        // Properties
+        widget.updatePosition(object.position);
 
         return widget;
     }
 
     constructor(
+        project: Project,
         name: string,
         dimensions: Dimensions,
         clicheid: string,
         id: string = null,
         templateid: string = null,
-        isTemplate = false
+        isTemplate = false,
     ) {
-        super();
-
-        this.meta = {
-            name: name,
-            id: id ? id : clicheid + '_' + generateId(),
-            templateid: templateid,
-            version: '',
-            author: ''
-        };
-        this.properties.dimensions = dimensions;
-        this._isTemplate = isTemplate;
+        super(project, name, dimensions, clicheid, id, templateid, isTemplate);
     }
 
     updateDimensions(newDimensions: Dimensions) {
         this.properties.dimensions = newDimensions;
     }
 
-    addInnerWidget(id: string) {
+    addInnerWidget(widget: Widget) {
+        const id = widget.getId();
         // Now the inner widgets list is the stack order
         this.innerWidgetIds.push(id);
+        this.project.userApp.removeUnusedWidget(id);
+        this.project.userApp.addUsedWidget(widget);
     }
 
     removeInnerWidget(id: string) {
@@ -411,7 +451,7 @@ export class UserWidget extends Widget {
         // Recursive case, look through all the inner widgets
         for (const id of (<UserWidget>widget).innerWidgetIds) {
             const path = this.getPathHelper(
-                Widget.getWidget(this.allWidgets, id), targetId);
+                this.project.getAppWidget(id), targetId);
             if (path === null) {
                 continue;
             }
@@ -446,7 +486,7 @@ export class UserWidget extends Widget {
         if (getParent) {
             targetId = path[path.length - 2];
         }
-        return Widget.getWidget(this.allWidgets, targetId);
+        return this.project.getAppWidget(targetId);
     }
 
     /**
@@ -455,6 +495,9 @@ export class UserWidget extends Widget {
      * ignored
      */
     makeCopy(fromTemplate = false): Widget[] {
+        // TODO find a way to merge this and the fromObject code since
+        // they are very similar
+
         let templateId = this.getTemplateId();
         let isTemplate = this._isTemplate;
         const isTemplateCopy = fromTemplate && this._isTemplate;
@@ -464,6 +507,7 @@ export class UserWidget extends Widget {
             isTemplate = false;
         }
         const copyWidget = new UserWidget(
+            this.project,
             this.getName(),
             this.getDimensions(),
             this.getClicheId(),
@@ -476,11 +520,11 @@ export class UserWidget extends Widget {
             this.templateCopies.add(copyWidget.getId());
         }
 
-        let copyWidgets = [copyWidget];
+        let copyWidgets: Widget[] = [copyWidget];
         for (const id of this.innerWidgetIds) {
-            const copyInnerWidgets = <UserWidget[]> Widget.getWidget(this.allWidgets, id).makeCopy(fromTemplate);
+            const copyInnerWidgets = this.project.getAppWidget(id).makeCopy(fromTemplate);
             const innerWidgetCopy = copyInnerWidgets[0];
-            copyWidget.addInnerWidget(innerWidgetCopy.getId());
+            copyWidget.addInnerWidget(innerWidgetCopy);
             copyWidgets = copyWidgets.concat(copyInnerWidgets);
         }
         return copyWidgets;
@@ -573,7 +617,7 @@ export class UserWidget extends Widget {
             if (widgetId === targetWidget.getId()) {
                 return;
             }
-            const widget = Widget.getWidget(this.allWidgets, widgetId);
+            const widget = this.project.getAppWidget(widgetId);
             const top = widget.getPosition().top;
             const left = widget.getPosition().left;
             const right = left + widget.getDimensions().width;
@@ -599,5 +643,4 @@ export class UserWidget extends Widget {
         });
         return overlappingWidgets;
     }
-
 }

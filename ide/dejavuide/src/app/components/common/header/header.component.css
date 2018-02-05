@@ -5,9 +5,9 @@
   width: 100%;
   display: flex;
   background-color: #F0F1F2;
-  /*overflow-x: scroll;*/
   z-index: 600;
   padding: 0 10px;
+  height: 60px;
 }
  
 .menu-item {
@@ -24,4 +24,8 @@
   flex-grow: 2;
   padding: 6px;
   font-size: medium;
+}
+
+a {
+  cursor: pointer;
 }

@@ -41,6 +41,11 @@ export class ZoomComponent {
         this.visibleWindowDimensions = newVisibleWindowDimensions;
       });
 
+    stateService.selectedScreenDimensions.subscribe(
+      (newScreenDimensions) => {
+        this.screenDimensions = newScreenDimensions;
+      });
+
     projectService.selectedWidget.subscribe((newWidget) => {
       this.widgetDimensions = newWidget.getDimensions();
     });

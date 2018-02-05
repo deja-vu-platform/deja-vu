@@ -1,0 +1,10 @@
+<h2 mat-dialog-title>Delete Project</h2>
+<mat-dialog-content>
+  Deleting this widget will delete the selected Project.
+  <br>
+  Are you sure?
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onDone(false)">No</button>
+  <button mat-button (click)="onDone(true)">Yes</button>
+</mat-dialog-actions>

@@ -1,6 +1,6 @@
-import { Component, AfterViewInit, ElementRef} from '@angular/core';
+import { Component, AfterViewInit, OnInit, ElementRef} from '@angular/core';
 
-import { Widget, UserWidget, WidgetMap } from '../../../models/widget/widget';
+import { Widget, UserWidget } from '../../../models/widget/widget';
 import { StateService, Dimensions, Position } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 
@@ -15,10 +15,13 @@ const $ = <any>jQuery;
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css']
 })
-export class MapComponent implements AfterViewInit {
+export class MapComponent implements AfterViewInit, OnInit {
   /**
    * This is a box corresponding to the visible window of the user's
    * work surface to show where the user is.
+   *
+   * Not saving a scaled version because the map scale might not be correct
+   * when this is set.
    */
   visibleWindowDimensions: Dimensions = {
     height: 0,
@@ -26,7 +29,7 @@ export class MapComponent implements AfterViewInit {
   };
 
   selectedWidget: Widget;
-  mapScale = .1;
+  mapScale = 0.1;
   mapVisibleWindowPosition: Position = {
     top: 0,
     left: 0
@@ -34,19 +37,22 @@ export class MapComponent implements AfterViewInit {
 
   screenDimensions: Dimensions;
   mapComponentDimensions: Dimensions = {
-    height: 0,
-    width: 0
+    height: 100,
+    width: 100
   };
 
   minimized = false;
   mapWidgetSizes: Dimensions[] = [];
 
   private zoom = 1;
+  private el: HTMLElement;
 
   constructor(
+    el: ElementRef,
     private stateService: StateService,
     private projectService: ProjectService
   ) {
+    this.el = el.nativeElement;
     stateService.zoom.subscribe((newZoom) => {
       this.zoom = newZoom;
     });
@@ -55,14 +61,7 @@ export class MapComponent implements AfterViewInit {
       .subscribe((newSelectedScreenDimensions) => {
         this.screenDimensions = newSelectedScreenDimensions;
         this.updateMapScale();
-      });
-
-    stateService.visibleWindowDimensions
-      .subscribe((newVisibleWindowDimensions) => {
-        this.visibleWindowDimensions.height =
-          newVisibleWindowDimensions.height;
-        this.visibleWindowDimensions.width =
-          newVisibleWindowDimensions.width;
+        this.updateView();
       });
 
     stateService.visibleWindowScrollPosition
@@ -81,15 +80,21 @@ export class MapComponent implements AfterViewInit {
     projectService.widgetUpdateListener.subscribe(() => {
       this.updateView();
     });
+
+    this.stateService.visibleWindowDimensions.subscribe(
+      (newVisibleWindowDimensions) => {
+          this.visibleWindowDimensions = newVisibleWindowDimensions;
+      });
+  }
+
+  ngOnInit() {
+    this.mapComponentDimensions.height = this.el.offsetHeight;
+    this.mapComponentDimensions.width = this.el.offsetWidth;
+    this.updateMapScale();
+    this.updateView();
   }
 
   ngAfterViewInit() {
-    // I can't get it from el.nativeElement.style
-    this.mapComponentDimensions.height = $('dv-map').height();
-    this.mapComponentDimensions.width = $('dv-map').width();
-    this.updateMapScale();
-    this.updateView();
-
     // Initiate draggable
     $('#map-window').draggable({
       containment: '#zoom-selected-screen-size',
@@ -144,21 +149,20 @@ export class MapComponent implements AfterViewInit {
    * Update the view of the map fresh from the info of the given widget.
    */
   private updateView() {
-    const mapScale = this.mapScale;
     const selectedWidget = this.selectedWidget;
     const mapWidgetSizes = [];
     if (selectedWidget) {
       if (selectedWidget.isUserType()) {
-        selectedWidget.getInnerWidgetIds().forEach(function (innerWidgetId) {
+        selectedWidget.getInnerWidgetIds().forEach((innerWidgetId) => {
           const innerWidget = selectedWidget
                                 .getInnerWidget(innerWidgetId);
           const innerWidgetDimensions = innerWidget.getDimensions();
           const innerWidgetPosition = innerWidget.getPosition();
           mapWidgetSizes.push({
-            left: innerWidgetPosition.left,
-            top: innerWidgetPosition.top,
-            width: innerWidgetDimensions.width,
-            height: innerWidgetDimensions.height,
+            left: innerWidgetPosition.left * this.mapScale,
+            top: innerWidgetPosition.top * this.mapScale,
+            width: innerWidgetDimensions.width * this.mapScale,
+            height: innerWidgetDimensions.height * this.mapScale,
           });
         });
       }

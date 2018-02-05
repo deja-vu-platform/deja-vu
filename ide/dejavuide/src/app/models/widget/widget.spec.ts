@@ -1,60 +1,60 @@
-import { Widget, BaseWidget, UserWidget, WidgetMap } from './widget';
+import { Widget, LinkBaseWidget, UserWidget } from './widget';
+import { Cliche, UserCliche } from '../cliche/cliche';
+import { Project } from '../project/project';
 
-describe('UserWidget', () => {
-  const clicheid = '1234';
-  let allWidgets: WidgetMap;
-  let widget1: BaseWidget;
+fdescribe('UserWidget', () => {
+  let project: Project;
+  let userApp: UserCliche;
+  let userAppId: string;
+
+  let widget1: LinkBaseWidget;
   let widget2: UserWidget;
   let widget3: UserWidget;
   let widget4: UserWidget;
-  let widget5: BaseWidget;
+  let widget5: LinkBaseWidget;
   let widget6: UserWidget;
 
   beforeEach(() => {
-    allWidgets = new Map<string, Map<string, Widget>>();
-    widget1 = new BaseWidget('widget1', {width: 1, height: 1}, 'img', '/', clicheid);
-    widget2 = new UserWidget('widget2', {width: 1, height: 1}, clicheid);
-    widget3 = new UserWidget('widget3', {width: 1, height: 1}, clicheid);
+    project = new Project('test');
+    userApp = project.userApp;
+    userAppId = userApp.getId();
 
-    widget4 = new UserWidget('widget4', {width: 1, height: 1}, '123123');
+    widget1 = new LinkBaseWidget(project, 'widget1', {width: 1, height: 1}, '/', userAppId);
+    widget2 = new UserWidget(project, 'widget2', {width: 1, height: 1}, userAppId);
+    widget3 = new UserWidget(project, 'widget3', {width: 1, height: 1}, userAppId);
 
-    widget5 = new BaseWidget('widget5', {width: 1, height: 1}, 'img', '/', clicheid, null, null, true);
-    widget6 = new UserWidget('widget6', {width: 1, height: 1}, clicheid, null, null, true);
+    widget4 = new UserWidget(project, 'widget4', {width: 1, height: 1}, userAppId);
 
-    Widget.addWidgetToWidgetMap(allWidgets, widget1);
-    widget1.updateWidgetMap(allWidgets);
-    Widget.addWidgetToWidgetMap(allWidgets, widget2);
-    widget2.updateWidgetMap(allWidgets);
-    Widget.addWidgetToWidgetMap(allWidgets, widget3);
-    widget3.updateWidgetMap(allWidgets);
-    Widget.addWidgetToWidgetMap(allWidgets, widget4);
-    widget4.updateWidgetMap(allWidgets);
-    Widget.addWidgetToWidgetMap(allWidgets, widget5);
-    widget5.updateWidgetMap(allWidgets);
-    Widget.addWidgetToWidgetMap(allWidgets, widget6);
-    widget6.updateWidgetMap(allWidgets);
+    widget5 = new LinkBaseWidget(project, 'widget5', {width: 1, height: 1}, '/', userAppId, null, null, true);
+    widget6 = new UserWidget(project, 'widget6', {width: 1, height: 1}, userAppId, null, null, true);
+
+    project.addAppWidget(widget1);
+    project.addAppWidget(widget2);
+    project.addAppWidget(widget3);
+    project.addAppWidget(widget4);
+    project.addAppWidget(widget5);
+    project.addAppWidget(widget6);
   });
 
-  describe('delete', () => {
+  describe('remove', () => {
     it('removes itself from all widgets', () => {
-      widget1.delete();
-      expect(Widget.getWidget(allWidgets, widget1.getId())).toBe(undefined);
+      widget1.remove();
+      expect(() => project.getAppWidget(widget1.getId())).toThrowError();
     });
 
     it ('does not delete inner widget', () => {
-      widget2.addInnerWidget(widget1.getId());
-      widget2.delete();
+      widget2.addInnerWidget(widget1);
+      widget2.remove();
 
-      expect(Widget.getWidget(allWidgets, widget2.getId())).toBe(undefined);
-      expect(Widget.getWidget(allWidgets, widget1.getId())).toBe(widget1);
+      expect(() => project.getAppWidget(widget2.getId())).toThrowError();
+      expect(project.getAppWidget(widget1.getId())).toBe(widget1);
     });
 
     it ('removes itself from its template list', () => {
       const widget6copy = widget6.makeCopy(true)[0];
-      widget6copy.updateWidgetMap(allWidgets);
       expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(true);
 
-      widget6copy.delete();
+      widget6copy.remove();
 
       expect(widget6.isDerivedFromTemplate(widget6copy.getId())).toBe(false);
     });
@@ -62,10 +62,10 @@ describe('UserWidget', () => {
 
   describe('add and remove inner widgets', () => {
     it('adds the id of the added and removes the ids removed', () => {
-      widget2.addInnerWidget(widget1.getId());
+      widget2.addInnerWidget(widget1);
       expect(widget2.getInnerWidgetIds()).toEqual([widget1.getId()]);
 
-      widget3.addInnerWidget(widget2.getId());
+      widget3.addInnerWidget(widget2);
       expect(widget3.getInnerWidgetIds()).toEqual([widget2.getId()]);
 
       widget2.removeInnerWidget(widget1.getId());
@@ -76,17 +76,17 @@ describe('UserWidget', () => {
     });
 
     it ('does not delete removed items', () => {
-      widget2.addInnerWidget(widget1.getId());
+      widget2.addInnerWidget(widget1);
       widget2.removeInnerWidget(widget1.getId());
 
-      expect(Widget.getWidget(allWidgets, widget1.getId())).toBe(widget1);
+      expect(project.getAppWidget(widget1.getId())).toBe(widget1);
     });
   });
 
   describe('getPath', () => {
     it('gets all the inner widget ids including the first', () => {
-      widget2.addInnerWidget(widget1.getId());
-      widget3.addInnerWidget(widget2.getId());
+      widget2.addInnerWidget(widget1);
+      widget3.addInnerWidget(widget2);
 
       expect(widget2.getPath(widget2.getId()))
       .toEqual([widget2.getId()]);
@@ -108,8 +108,8 @@ describe('UserWidget', () => {
 
   describe('getInnerWidget', () => {
     it ('gets the inner widget', () => {
-      widget2.addInnerWidget(widget1.getId());
-      widget3.addInnerWidget(widget2.getId());
+      widget2.addInnerWidget(widget1);
+      widget3.addInnerWidget(widget2);
 
       expect(widget2.getInnerWidget(widget2.getId()))
       .toBe(widget2);
@@ -131,27 +131,24 @@ describe('UserWidget', () => {
 
   describe('fromObject', () => {
     it ('it creates a real widget from BaseWidgets', () => {
-      const widget5Copy = Widget.fromObject(JSON.parse(JSON.stringify(widget5)));
-      widget5Copy.updateWidgetMap(allWidgets);
+      const widget5Copy = Widget.fromObject(project, widget5.getSaveableJson());
 
       expect(widget5Copy.getId()).toEqual(widget5.getId());
       expect(widget5Copy.isBaseType()).toBe(true);
     });
 
     it ('it creates a real widget from UserWidgets', () => {
-      const widget6Copy = Widget.fromObject(JSON.parse(JSON.stringify(widget6)));
-      widget6Copy.updateWidgetMap(allWidgets);
+      const widget6Copy = Widget.fromObject(project, widget6.getSaveableJson());
 
       expect(widget6Copy.getId()).toEqual(widget6.getId());
       expect(widget6Copy.isUserType()).toBe(true);
     });
   });
 
-
   describe('makecopy', () => {
     it ('returns all the copied inner widgets', () => {
-      widget2.addInnerWidget(widget1.getId());
-      widget3.addInnerWidget(widget2.getId());
+      widget2.addInnerWidget(widget1);
+      widget3.addInnerWidget(widget2);
       const widget3copies = widget3.makeCopy();
 
       expect(widget3copies.length).toBe(3);
@@ -166,14 +163,13 @@ describe('UserWidget', () => {
     it ('from template of a non-template does nothing', () => {
       const widget3copies = widget3.makeCopy(true);
       const widget3copy = widget3copies[0];
-      widget3copy.updateWidgetMap(allWidgets);
 
       expect(widget3copy.getTemplateId()).toBeNull();
       expect(widget3copy.isTemplate()).toBe(false);
     });
 
     it ('not from template of a template creates another template', () => {
-      widget6.addInnerWidget(widget5.getId());
+      widget6.addInnerWidget(widget5);
       const widget6copies = widget6.makeCopy();
 
       expect(widget6copies[0].getTemplateId()).toBeNull();
@@ -183,7 +179,7 @@ describe('UserWidget', () => {
     });
 
     it ('from template of a template creates a normal widget', () => {
-      widget6.addInnerWidget(widget5.getId());
+      widget6.addInnerWidget(widget5);
       const widget6copies = widget6.makeCopy(true);
 
       expect(widget6copies[0].getTemplateId()).toEqual(widget6.getId());
@@ -195,14 +191,12 @@ describe('UserWidget', () => {
 
   describe('layout', () => {
     it('copying properly copies over the layout', () => {
-      widget2.addInnerWidget(widget1.getId());
+      widget2.addInnerWidget(widget1);
       widget1.updatePosition({top: 5, left: 6});
 
       const widget2Copies = widget2.makeCopy();
       const widget2Copy = <UserWidget>widget2Copies[0];
       const widget1Copy = widget2Copies[1];
-      widget2Copy.updateWidgetMap(allWidgets);
-      widget1Copy.updateWidgetMap(allWidgets);
       expect(widget1Copy.getPosition()).toEqual(widget1.getPosition());
     });
   });
@@ -233,7 +227,6 @@ describe('UserWidget', () => {
       widget6.updateCustomStyle('background-color', 'red');
       const widget6Styles = widget6.getLocalCustomStyles();
       const widget6copy = widget6.makeCopy(true)[0];
-      widget6copy.updateWidgetMap(allWidgets);
       const widget6copyStyles = widget6copy.getLocalCustomStyles();
 
       expect(widget6copyStyles).toEqual({});
@@ -245,7 +238,6 @@ describe('UserWidget', () => {
       widget6.updateCustomStyle('background-color', 'red');
       widget6.updateCustomStyle('color', 'red');
       const widget6copy = widget6.makeCopy(true)[0];
-      widget6copy.updateWidgetMap(allWidgets);
 
       widget6copy.updateCustomStyle('color', 'blue');
       widget6copy.updateCustomStyle('font-weight', 'bold');
@@ -277,9 +269,12 @@ describe('UserWidget', () => {
         widget4.getId(),
         widget5.getId()
       ];
-      widgetIdsInOrder.forEach((id) => {
-        widget6.addInnerWidget(id);
-      });
+
+      widget6.addInnerWidget(widget1);
+      widget6.addInnerWidget(widget2);
+      widget6.addInnerWidget(widget3);
+      widget6.addInnerWidget(widget4);
+      widget6.addInnerWidget(widget5);
 
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
@@ -317,9 +312,12 @@ describe('UserWidget', () => {
         widget4.getId(),
         widget5.getId()
       ];
-      widgetIdsInOrder.forEach((id) => {
-        widget6.addInnerWidget(id);
-      });
+
+      widget6.addInnerWidget(widget1);
+      widget6.addInnerWidget(widget2);
+      widget6.addInnerWidget(widget3);
+      widget6.addInnerWidget(widget4);
+      widget6.addInnerWidget(widget5);
 
       expect(widget6.getInnerWidgetIds()).toEqual(widgetIdsInOrder);
 
@@ -350,15 +348,15 @@ describe('UserWidget', () => {
 
     it ('findWidgetsToShift finds overlaping elements and doesn\'t find' +
     'non-overlapping ones', () => {
-      const widgetIdsInOrder = [
-        widget1.getId(),
-        widget2.getId(),
-        widget3.getId(),
-        widget4.getId(),
-        widget5.getId()
+      const widgetsInOrder = [
+        widget1,
+        widget2,
+        widget3,
+        widget4,
+        widget5
       ];
-      widgetIdsInOrder.forEach((id) => {
-        widget6.addInnerWidget(id);
+      widgetsInOrder.forEach((widget) => {
+        widget6.addInnerWidget(widget);
       });
 
       // 1 and 2 have normal overlap
