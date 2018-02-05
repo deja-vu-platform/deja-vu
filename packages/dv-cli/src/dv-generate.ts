@@ -24,9 +24,9 @@ program
     if (cmd == 'server') {
       console.log('Installing packages');
       npm([
-        'install', 'apollo-server-express', 'body-parser', 'express',
-        'graphql', 'graphql-tools', '@types/command-line-args',
-        '@types/mongodb', '--save'
+        'install', 'minimist', 'express', 'body-parser', 'mongodb',
+        'apollo-server-express', 'graphql-tools', '@types/minimist',
+        '@types/express', '@types/body-parser', '@types/mongodb', '--save'
       ]);
 
       console.log('Create server file');
@@ -49,9 +49,9 @@ program
       const name: string = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH)).name;
       updatePackage(pkg => {
         pkg.scripts[`dv-build-${name}`] = concurrentlyCmd(
-          buildFeCmd(false), buildServerCmd(false));
+          buildFeCmd(false), buildServerCmd(false, 'server'));
         pkg.scripts[`dv-build-watch-${name}`] = concurrentlyCmd(
-          buildFeCmd(true), buildServerCmd(true));
+          buildFeCmd(true), buildServerCmd(true, 'server'));
 
         pkg.scripts[`dv-start-${name}`] = startServerCmd(
           false, SERVER_DIST_FOLDER, 'config');

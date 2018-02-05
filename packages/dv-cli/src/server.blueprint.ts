@@ -1,4 +1,4 @@
-import * as commandLineArgs from 'command-line-args';
+import * as minimist from 'minimist'
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import * as mongodb from 'mongodb';
@@ -14,12 +14,9 @@ interface Config {
   dbName: string;
 }
 
-const opts = commandLineArgs([
-  {name: 'as', type: String},
-  {name: 'config', type: String}
-]);
+const argv = minimist(process.argv);
 
-const name = opts.as ? opts.as : 'this-cliche-name';
+const name = argv.as ? argv.as : 'this-cliche-name';
 
 const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
@@ -28,7 +25,7 @@ const DEFAULT_CONFIG: Config = {
   dbName: `${name}-db`
 };
 
-const config: Config = {...DEFAULT_CONFIG, ...JSON.parse(opts.config)};
+const config: Config = {...DEFAULT_CONFIG, ...JSON.parse(argv.config)};
 
 
 const server = new mongodb.Server(

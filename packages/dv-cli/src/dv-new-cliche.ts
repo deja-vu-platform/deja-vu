@@ -35,6 +35,10 @@ program
     const pkgJsonPath = path.join(name, 'package.json');
     const pkgJson = JSON.parse(readFileOrFail(pkgJsonPath));
     pkgJson.scripts[NG_PACKAGR.npmScriptKey] = NG_PACKAGR.npmScriptValue;
+    pkgJson.scripts[`dv-package-${name}`] = 'dv package';
+    pkgJson.scripts[`dv-package-watch-${name}`] = (
+      `chokidar 'src/app/${name}' 'server'` + ' | ' +
+      `npm run dv-package-${name}`);
     writeFileOrFail(
       pkgJsonPath, JSON.stringify(pkgJson, undefined, JSON_SPACE));
   })

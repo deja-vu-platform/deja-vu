@@ -4,7 +4,7 @@
   "description": "Gateway server for Déjà Vu",
   "main": "./dist/gateway.js",
   "bin": {
-    "dv": "./dist/gateway.js"
+    "dv-gateway": "./dist/gateway.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

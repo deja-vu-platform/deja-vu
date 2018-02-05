@@ -1,9 +1,11 @@
 import * as program from 'commander';
 import * as _ from 'lodash';
 import {
-  npm, updateDvConfig, updatePackage, concurrentlyCmd, buildFeCmd,
-  buildServerCmd, startServerCmd, UsedCliche
+  npm, updateDvConfig, updatePackage, startServerCmd, UsedCliche,
+  NG_PACKAGR
 } from './dv';
+
+import { existsSync } from 'fs';
 
 
 const APP_MODULE_PATH = 'src/app/app.module.ts';
@@ -15,9 +17,18 @@ program
   .option(
     '-a, --as [name]', 'use the specified name to refer to this cliché')
   .action((name, loc, opts) => {
+    if (!existsSync(loc)) {
+      throw new Error(`Path ${loc} doesn't exist`);
+    }
     console.log(opts);
     console.log(`Installing cliché ${name} from ${loc}`);
-    npm(['install', loc + '/dist']);
+    try {
+      npm(['run', `dv-package-${name}`], loc);
+    } catch (e) {
+      // expected because commander sucks
+    }
+    // link won't put the file in node modules
+    npm(['install', loc + '/' + NG_PACKAGR.configFileContents.dest, '--save']);
 
     console.log('Update dvconfig.json');
     const usedCliche: UsedCliche = {
@@ -44,20 +55,23 @@ program
 
     console.log('Add start and watch scripts to package.json');
     const alias = opts.as ? opts.as : name;
-    const serverDistFolder = `node_modules/${name}/dist/server`;
-    // TODO: Only do this if cliche has a server
-    // u never want to hardcode the config in the cmd
+    const cd = (cmd: string) => `(cd ${loc}; ${cmd})`;
+    const serverDistFolder = `node_modules/${name}/server`;
+    // TODO: this assumes cliche has a server
     updatePackage(pkg => {
-      // pkg.scripts[`dv-build-${alias}`] = concurrentlyCmd(
-      //   buildFeCmd(false, loc), buildServerCmd(false, loc));
-      pkg.scripts[`dv-build-${alias}`] = `(cd ${loc}; chokidar 'src/app/${name}' 'server') | (cd ${loc}; npm run dv-package) && npm run dv-build-thisone`
-      pkg.scripts[`dv-build-watch-${alias}`] = concurrentlyCmd(
-        buildFeCmd(true, loc), buildServerCmd(true, loc));
-
+      pkg.scripts[`dv-package-${alias}`] = cd(
+        `npm run dv-package-${name}`);
+      pkg.scripts[`dv-package-watch-${alias}`] = cd(
+        `npm run dv-package-watch-${name}`);
       pkg.scripts[`dv-start-${alias}`] = startServerCmd(
         false, serverDistFolder, `usedCliches.${alias}.config`, opts.as);
       pkg.scripts[`dv-start-watch-${alias}`] = startServerCmd(
         true, serverDistFolder, `usedCliches.${alias}.config`, opts.as);
+
+      pkg.scripts[`dv-reinstall-watch-${alias}`] = (
+        `chokidar ${loc}/${NG_PACKAGR.configFileContents.dest} | ` +
+        `rm -rf node_modules/${name} && npm i`
+      );
 
       return pkg;
     });
