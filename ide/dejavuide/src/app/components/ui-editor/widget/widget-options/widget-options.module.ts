@@ -3,27 +3,28 @@ import { NgModule } from '@angular/core';
 import { MatMenuModule, MatListModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 
-import { LabelWidgetComponent } from './label-widget.component';
-import { LinkWidgetComponent } from './link-widget.component';
-import { ImageWidgetComponent } from './image-widget.component';
-import { MenuWidgetComponent } from './menu-widget.component';
-import { PanelWidgetComponent } from './panel-widget.component';
-import { TabWidgetComponent } from './tab-widget.component';
+import { LabelWidgetOptionsComponent } from './label-widget-options.component';
+import { LinkWidgetOptionsComponent } from './link-widget-options.component';
+import { ImageWidgetOptionsComponent } from './image-widget-options.component';
+import { MenuWidgetOptionsComponent } from './menu-widget-options.component';
+import { PanelWidgetOptionsComponent } from './panel-widget-options.component';
+import { TabWidgetOptionsComponent } from './tab-widget-options.component';
 
-import { UserWidgetComponent } from './user-widget.component';
-import { WidgetOptionsComponent } from './options.component';
+import { UserWidgetOptionsComponent } from './user-widget-options.component';
+
+import { WidgetOptionsComponent } from './widget-options.component';
 
 
 @NgModule({
   declarations: [
-    LabelWidgetComponent,
-    LinkWidgetComponent,
-    ImageWidgetComponent,
+    LabelWidgetOptionsComponent,
+    LinkWidgetOptionsComponent,
+    ImageWidgetOptionsComponent,
     WidgetOptionsComponent,
-    MenuWidgetComponent,
-    PanelWidgetComponent,
-    TabWidgetComponent,
-    UserWidgetComponent
+    MenuWidgetOptionsComponent,
+    PanelWidgetOptionsComponent,
+    TabWidgetOptionsComponent,
+    UserWidgetOptionsComponent
   ],
   imports: [
     BrowserModule,
@@ -33,14 +34,14 @@ import { WidgetOptionsComponent } from './options.component';
   ],
   providers: [],
   exports: [
-    LabelWidgetComponent,
-    LinkWidgetComponent,
-    ImageWidgetComponent,
+    LabelWidgetOptionsComponent,
+    LinkWidgetOptionsComponent,
+    ImageWidgetOptionsComponent,
     WidgetOptionsComponent,
-    MenuWidgetComponent,
-    PanelWidgetComponent,
-    TabWidgetComponent,
-    UserWidgetComponent
+    MenuWidgetOptionsComponent,
+    PanelWidgetOptionsComponent,
+    TabWidgetOptionsComponent,
+    UserWidgetOptionsComponent
   ]
 })
 export class WidgetOptionsModule { }

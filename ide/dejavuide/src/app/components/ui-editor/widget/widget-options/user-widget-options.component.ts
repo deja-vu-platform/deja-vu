@@ -4,8 +4,8 @@ import { UserWidget } from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-user-widget',
-  templateUrl: './user-widget.component.html',
+  templateUrl: './user-widget-options.component.html',
 })
-export class UserWidgetComponent {
+export class UserWidgetOptionsComponent {
   @Input() widget: UserWidget;
 }

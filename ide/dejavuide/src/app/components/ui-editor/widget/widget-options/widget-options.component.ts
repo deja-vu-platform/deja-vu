@@ -12,7 +12,7 @@ const BACKGROUND = 'background';
 
 @Component({
   selector: 'dv-widget-options',
-  templateUrl: './options.component.html',
+  templateUrl: './widget-options.component.html',
   styleUrls: ['./tooltip.css']
 })
 export class WidgetOptionsComponent implements AfterViewInit, OnDestroy {
@@ -143,52 +143,3 @@ export class WidgetOptionsComponent implements AfterViewInit, OnDestroy {
     });
   }
 }
-
-
-
-// var setUpTextOptions = function(container, widget, outermostWidget){
-//   var customStyles = {};
-//   var targetId = widget.meta.id;
-//   if (outermostWidget){ // FIXME make more robust
-//       customStyles = getCustomStyles(widget);
-//   }
-
-//   var fontSizeOption = $('<li><div>Font Size: </div></li>');
-//   var fontWeightOption = $('<li><div>Font Weight: </div></li>');
-//   var fontSizeInput = $('<input class="font-size-input">');
-//   var fontWeightInput = $('<input class="font-weight-input">');
-//   var fontSizeSetButton = $('<button class="btn font-size-set-button">Set</button>');
-//   var fontWeightSetButton = $('<button class="btn font-size-set-button">Set</button>');
-
-//   var fontSize = customStyles['font-size'] || '14px'; // TODO
-//   fontSizeInput.val(fontSize);
-
-//   var fontWeight = customStyles['font-weight'] || '100'; // TODO
-//   fontWeightInput.val(fontWeight);
-
-
-//   fontSizeOption.append(fontSizeInput).append(fontSizeSetButton);
-//   fontWeightOption.append(fontWeightInput).append(fontWeightSetButton);
-//   container.find('.inner-component-custom-style-dropdown').append(fontSizeOption).append(fontWeightOption);
-
-
-//   fontSizeSetButton.click(function(){
-//       let value = fontSizeInput.val();
-//       if (!isNaN(parseInt(value))){
-//           updateCustomStyles(outermostWidget, targetId, {'font-size': value + 'px'});
-//           refreshContainerDisplay(false, container, currentZoom);
-
-//       }
-
-//   });
-
-//   fontWeightSetButton.click(function(){
-//       let value = fontWeightInput.val();
-//       if (!isNaN(parseInt(value))){
-//           updateCustomStyles(outermostWidget, targetId, {'font-weight': value});
-//           refreshContainerDisplay(false, container, currentZoom);
-
-//       }
-//   });
-
-// };

@@ -55,9 +55,9 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
       stateService.visibleWindowScrollPosition.subscribe(
         (newScrollPosition) => {
           this.visibleWindowScroll = newScrollPosition;
-          const jqo = $('dv-worksurface');
-          jqo.scrollTop(newScrollPosition.top);
-          jqo.scrollLeft(newScrollPosition.left);
+          const worksurfaceElt = $('dv-worksurface');
+          worksurfaceElt.scrollTop(newScrollPosition.top);
+          worksurfaceElt.scrollLeft(newScrollPosition.left);
         }));
   }
 

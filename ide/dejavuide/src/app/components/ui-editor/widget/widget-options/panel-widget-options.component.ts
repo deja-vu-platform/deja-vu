@@ -1,17 +1,17 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { LinkBaseWidget } from '../../../../models/widget/widget';
+import { PanelBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
-  selector: 'dv-link-widget',
-  templateUrl: './link-widget.component.html',
+  selector: 'dv-panel-widget',
+  templateUrl: './panel-widget-options.component.html',
 })
-export class LinkWidgetComponent implements OnInit {
-  @Input() widget: LinkBaseWidget;
+export class PanelWidgetOptionsComponent implements OnInit {
+  @Input() widget: PanelBaseWidget;
 
   value;
   style;
-  bootstrapPrefix = 'btn';
+  bootstrapPrefix = 'panel';
   bootstrapStyles = [
     {class: 'default', name: 'Default'},
     {class: 'primary', name: 'Primary'},

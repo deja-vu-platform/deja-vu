@@ -1,13 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { MenuBaseWidget } from '../../../../models/widget/widget';
+import { TabBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
-  selector: 'dv-menu-widget',
-  templateUrl: './menu-widget.component.html',
+  selector: 'dv-tab-widget',
+  templateUrl: './tab-widget-options.component.html',
 })
-export class MenuWidgetComponent implements OnInit {
-  @Input() widget: MenuBaseWidget;
+export class TabWidgetOptionsComponent implements OnInit {
+  @Input() widget: TabBaseWidget;
 
   value;
 

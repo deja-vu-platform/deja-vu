@@ -3,9 +3,9 @@ import { LabelBaseWidget } from '../../../../models/widget/widget';
 
 @Component({
   selector: 'dv-label-widget',
-  templateUrl: './label-widget.component.html',
+  templateUrl: './label-widget-options.component.html',
 })
-export class LabelWidgetComponent implements OnInit {
+export class LabelWidgetOptionsComponent implements OnInit {
   @Input() widget: LabelBaseWidget;
 
   value;
