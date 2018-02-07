@@ -1,14 +1,15 @@
 import * as program from 'commander';
 import * as _ from 'lodash';
 import {
-  npm, updateDvConfig, updatePackage, startServerCmd, UsedCliche,
+  npm, updateDvConfig, updatePackage, startServerCmd, UsedCliche, DvConfig,
   NG_PACKAGR
 } from './dv';
 
 import { existsSync } from 'fs';
+import * as path from 'path';
 
 
-const APP_MODULE_PATH = 'src/app/app.module.ts';
+const APP_MODULE_PATH = path.join('src', 'app', 'app.module.ts');
 
 program
   .version('0.0.1')
@@ -21,14 +22,12 @@ program
       throw new Error(`Path ${loc} doesn't exist`);
     }
     console.log(opts);
+    console.log(`Packaging cliché ${name} from ${loc}`);
+    npm(['run', `dv-package-${name}`], loc);
+    
     console.log(`Installing cliché ${name} from ${loc}`);
-    try {
-      npm(['run', `dv-package-${name}`], loc);
-    } catch (e) {
-      // expected because commander sucks
-    }
-    // link won't put the file in node modules
-    npm(['install', loc + '/' + NG_PACKAGR.configFileContents.dest, '--save']);
+    npm([
+      'install', path.join(loc, NG_PACKAGR.configFileContents.dest), '--save']);
 
     console.log('Update dvconfig.json');
     const usedCliche: UsedCliche = {
@@ -40,15 +39,15 @@ program
       usedCliche.as = opts.as;
     }
 
-    updateDvConfig(dvConfig => {
-      if (dvConfig.usedCliches == undefined) {
+    updateDvConfig((dvConfig: DvConfig) => {
+      if (_.isEmpty(dvConfig.usedCliches)) {
         usedCliche.config = { wsPort: 3002 };
         dvConfig.usedCliches = [ usedCliche ];
       } else {
         usedCliche.config = {
-          wsPort: dvConfig.usedCliche.slice(-1)[0].config.wsPort + 1
+          wsPort: dvConfig.usedCliches.slice(-1)[0].config.wsPort + 1
         };
-        dvConfig.usedCliches = dvConfig.usedCliches + usedCliche;
+        dvConfig.usedCliches.push(usedCliche);
       }
       return dvConfig;
     });
@@ -56,7 +55,7 @@ program
     console.log('Add start and watch scripts to package.json');
     const alias = opts.as ? opts.as : name;
     const cd = (cmd: string) => `(cd ${loc}; ${cmd})`;
-    const serverDistFolder = `node_modules/${name}/server`;
+    const serverDistFolder = path.join('node_modules', name, 'server');
     // TODO: this assumes cliche has a server
     updatePackage(pkg => {
       pkg.scripts[`dv-package-${alias}`] = cd(
@@ -69,8 +68,8 @@ program
         true, serverDistFolder, `usedCliches.${alias}.config`, opts.as);
 
       pkg.scripts[`dv-reinstall-watch-${alias}`] = (
-        `chokidar ${loc}/${NG_PACKAGR.configFileContents.dest} | ` +
-        `rm -rf node_modules/${name} && npm i`
+        `chokidar ${path.join(loc, NG_PACKAGR.configFileContents.dest)} -c "` +
+        `rm -rf node_modules/${name} && npm i"`
       );
 
       return pkg;

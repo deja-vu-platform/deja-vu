@@ -110,15 +110,20 @@ export function startGatewayCmd(configFilePath: string): string {
 export function startServerCmd(
   watch: boolean, serverDistFolder: string, configKey: string,
   asFlagValue?: string): string {
-  let cmd = watch ? `nodemon -w ${serverDistFolder}`: 'node';
-  return `${cmd} ${serverDistFolder}/server.js` +
+  const script = `${serverDistFolder}/server.js` +
     ` --config \`dv get ${configKey}\`` +
       (asFlagValue ? `--as ${asFlagValue}` : '');
+  if (watch) {
+    return `if [ -f ${serverDistFolder}/server.js ]; ` +
+      `then nodemon -w ${serverDistFolder} ${script}; fi;`
+  } else {
+    return `node ${script}`;
+  }
 }
 
 export function buildFeCmd(watch: boolean, projectFolder?: string): string {
   if (watch) {
-    return `chokidar src node_modules | ng build`;
+    return `chokidar src node_modules -c 'ng build'`;
   }
   return buildCmd(watch, 'ng build', projectFolder);
 }
@@ -234,11 +239,17 @@ program
         .value();
 
       console.log('Build everything');
-      const buildCmd = ('(npm run concurrently -- ' + _
+      const pkgCmds: string[] = _
         .chain(clichesToWatch)
         .map(clicheName => `"npm run dv-package-${clicheName}"`)
-        .join()
-        .value()) + `) && npm run dv-build-${config.name}`;
+        .value();
+      let buildCmd = '';
+      if (pkgCmds.length > 1) {
+        buildCmd = `(npm run concurrently -- ${pkgCmds.join(' ')}) && `;
+      } else if (pkgCmds.length == 1) {
+        buildCmd = `${pkgCmds[0].slice(1, -1)} && `;
+      }
+      buildCmd += `npm run dv-build-${config.name}`;
       // cmd(buildCmd, []);
       console.log(buildCmd);
 

@@ -32,7 +32,7 @@ Guide
 To create and serve a new app or cliché:
 
 ```
-dv new app my-app
+dv new app my-app path-to-gateway
 cd my-app
 dv serve
 ```
@@ -41,5 +41,24 @@ This will generate a bunch of files. If you know Angular and TypeScript they
 will make sense to you but if you don't then it doesn't matter since for
 most apps you'll only have to write HTML and CSS.
 
-Navigate to ()[http://localhost:4200/]. The app will automatically reload if you
+Navigate to ()[http://localhost:3000/]. The app will automatically reload if you
 change any of the source files.
+
+### Install a cliché
+
+Inside the app directory, do:
+
+```
+dv install cliche-name path-to-cliche
+```
+
+Development
+-----------
+
+If you are developing the cli and you want to test your changes you can build
+and reinstall it globally with:
+
+```
+npm run clean && npm run build && npm uninstall -g && npm install -g
+```
+
