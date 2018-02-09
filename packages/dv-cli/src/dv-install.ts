@@ -1,8 +1,7 @@
 import * as program from 'commander';
 import * as _ from 'lodash';
 import {
-  npm, updateDvConfig, updatePackage, startServerCmd, UsedCliche, DvConfig,
-  NG_PACKAGR
+  npm, updateDvConfig, updatePackage, startServerCmd, DvConfig, NG_PACKAGR
 } from './dv';
 
 import { existsSync } from 'fs';
@@ -30,24 +29,28 @@ program
       'install', path.join(loc, NG_PACKAGR.configFileContents.dest), '--save']);
 
     console.log('Update dvconfig.json');
-    const usedCliche: UsedCliche = {
+    const usedCliche: DvConfig = {
       name: name,
       startServer: true,
       watch: true
     };
-    if (opts.as) {
-      usedCliche.as = opts.as;
-    }
 
     updateDvConfig((dvConfig: DvConfig) => {
-      if (_.isEmpty(dvConfig.usedCliches)) {
+      if (dvConfig.usedCliches == undefined ||
+          _.isEmpty(dvConfig.usedCliches)) {
         usedCliche.config = { wsPort: 3002 };
-        dvConfig.usedCliches = [ usedCliche ];
+        dvConfig.usedCliches = { [usedCliche.name]: usedCliche };
       } else {
+        let maxPort = 3002;
+        for (const usedCliche of _.values(dvConfig.usedCliches)) {
+          if (usedCliche.config.wsPort > maxPort) {
+            maxPort = usedCliche.config.wsPort;
+          }
+        }
         usedCliche.config = {
-          wsPort: dvConfig.usedCliches.slice(-1)[0].config.wsPort + 1
+          wsPort: maxPort + 1
         };
-        dvConfig.usedCliches.push(usedCliche);
+        dvConfig.usedCliches[usedCliche.name] = usedCliche;
       }
       return dvConfig;
     });

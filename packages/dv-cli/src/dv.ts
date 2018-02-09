@@ -85,7 +85,8 @@ export const SERVER_DIST_FOLDER = path.join('dist', 'server');
 // The number of space characters to use as whitespace when writing JSON
 export const JSON_SPACE = 2;
 
-export function updateDvConfig(updateFn: (dvConfig: any) => any): void {
+export function updateDvConfig(
+  updateFn: (dvConfig: DvConfig) => DvConfig): void {
   updateJsonFile(DVCONFIG_FILE_PATH, updateFn);
 }
 
@@ -110,15 +111,11 @@ export function startGatewayCmd(configFilePath: string): string {
 export function startServerCmd(
   watch: boolean, serverDistFolder: string, configKey: string,
   asFlagValue?: string): string {
-  const script = `${serverDistFolder}/server.js` +
+  const cmd = watch ? `nodemon -w ${serverDistFolder}`: 'node';
+  const script = path.join(serverDistFolder, 'server.js');
+  return `if [ -f ${script} ]; then ${cmd} ${script}` +
     ` --config \`dv get ${configKey}\`` +
-      (asFlagValue ? `--as ${asFlagValue}` : '');
-  if (watch) {
-    return `if [ -f ${serverDistFolder}/server.js ]; ` +
-      `then nodemon -w ${serverDistFolder} ${script}; fi;`
-  } else {
-    return `node ${script}`;
-  }
+      (asFlagValue ? `--as ${asFlagValue}` : '') + '; fi;';
 }
 
 export function buildFeCmd(watch: boolean, projectFolder?: string): string {
@@ -161,13 +158,12 @@ export function installAndConfigureGateway(
   npm(['install', 'concurrently', 'chokidar-cli', 'nodemon', '--save-dev'], name);
 
   console.log('Initialize dvconfig file');
+  const initialConfig: DvConfig = {
+    name: name, watch: true, gatewayPort: GATEWAY_PORT
+  };
   writeFileOrFail(
     path.join(name, DVCONFIG_FILE_PATH),
-    JSON.stringify({
-      name: name,
-      watch: true,
-      gatewayPort: GATEWAY_PORT
-    }, undefined, JSON_SPACE)
+    JSON.stringify(initialConfig, undefined, JSON_SPACE)
   );
 
   console.log('Add npm script to serve');
@@ -183,18 +179,11 @@ export function installAndConfigureGateway(
 
 export interface DvConfig {
   name: string;
-  startServer: boolean;
-  watch: boolean;
+  startServer?: boolean;
+  watch?: boolean;
   config?: any;
-  usedCliches: UsedCliche[];
-}
-
-export interface UsedCliche {
-  name: string;
-  as?: string;
-  startServer: boolean;
-  watch: boolean;
-  config?: any;
+  gatewayPort?: number;
+  usedCliches?: {[as: string]: DvConfig};
 }
 
 program
@@ -208,10 +197,10 @@ program
   .command('serve', 'serve the app')
   .command(
     'package', 'package the cliché so that it can be used in other projects')
-  .action(cmd => {
+  .action(subcmd => {
     // There seems to be something wrong with commander because if we do
     // `package` with a subcommand it doesn't work unless the user provides args
-    if (cmd == 'package') {
+    if (subcmd == 'package') {
       console.log('Packaging cliche');
       npm(['run', 'packagr']);
       if (existsSync('server')) {
@@ -225,62 +214,66 @@ program
       }, NG_PACKAGR.configFileContents.dest);
       console.log('Done');
       process.exit(0); // commander sucks
-    } else if (cmd == 'serve') {
+    } else if (subcmd == 'serve') {
       const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
       console.log('Serving app');
       // for now, serve everything (including all dep cliches)
 
       const currentProject = _
         .pick(config, ['name', 'startServer', 'watch', 'config']);
-      const clichesToWatch = _
+      
+      const clichesToWatch: string[] = _
         .chain(config.usedCliches)
-        .filter('watch')
-        .map(usedCliche => usedCliche.as ? usedCliche.as : usedCliche.name)
+        .entries()
+        .filter(e => e[1].watch)
+        .map(e => e[0])
         .value();
 
       console.log('Build everything');
-      const pkgCmds: string[] = _
-        .chain(clichesToWatch)
-        .map(clicheName => `"npm run dv-package-${clicheName}"`)
-        .value();
-      let buildCmd = '';
-      if (pkgCmds.length > 1) {
-        buildCmd = `(npm run concurrently -- ${pkgCmds.join(' ')}) && `;
-      } else if (pkgCmds.length == 1) {
-        buildCmd = `${pkgCmds[0].slice(1, -1)} && `;
+      const pkgScripts: string[] = _.map(
+        clichesToWatch, clicheName => `dv-package-${clicheName}`);
+      if (pkgScripts.length > 1) {
+        cmd('npm', [
+          'run', 'concurrently', '--',
+          ..._.map(pkgScripts, pkgScript => `"npm run ${pkgScript}"`)]);
+      } else if (pkgScripts.length == 1) {
+        cmd('npm', ['run', pkgScripts[0]]);
       }
-      buildCmd += `npm run dv-build-${config.name}`;
-      // cmd(buildCmd, []);
-      console.log(buildCmd);
+      cmd('npm', ['run', `dv-build-${config.name}`]);
 
       console.log('Start build and serve watchers');
       const buildWatchCmds = _
         .chain(clichesToWatch)
-        .map(clicheName => `"npm run dv-package-watch-${clicheName}"`)
-        .concat(`"npm run dv-build-watch-${config.name}"`)
+        .map(clicheName => `npm run dv-package-watch-${clicheName}`)
+        .concat(`npm run dv-build-watch-${config.name}`)
         .value();
       const reinstallWatchCmds = _
         .chain(clichesToWatch)
-        .map(clicheName => `"npm run dv-reinstall-watch-${clicheName}"`)
-        .value();
-      const startServerCmds =  _
-        .chain(config.usedCliches)
-        .concat(currentProject)
-        .filter('startServer')
-        .map(project => {
-          const cmd = '"npm run dv-start' + (project.watch ? '-watch' : '');
-          return ` ${cmd}-${project.as ? project.as : project.name}"`;
-        })
+        .map(clicheName => `npm run dv-reinstall-watch-${clicheName}`)
         .value();
 
-      const buildAndWatchCmd = 'npm run concurrently -- ' + _
+      const buildStartServerCmd = (name: string, watch?: boolean) => {
+        return 'npm run dv-start' + (watch ? '-watch' : '') + `-${name}`;
+      };
+      const startServerOfCurrentProjectCmd = buildStartServerCmd(
+        currentProject.name, currentProject.watch);
+      const startServerCmds =  _
+        .chain(config.usedCliches)
+        .entries()
+        .filter(e => e[1].startServer)
+        .map(e => buildStartServerCmd(e[0], e[1].watch))
+        .concat(startServerOfCurrentProjectCmd)
+        .value();
+
+      const allBuildAndWatchCmds: string[] = _
         .chain(buildWatchCmds)
         .concat(reinstallWatchCmds)
         .concat(startServerCmds)
-        .concat('"npm run dv-start-gateway"')
-        .join(' ');
-      console.log(buildAndWatchCmd);
-      // cmd(buildAndWatchCmd, []);
+        .concat('npm run dv-start-gateway')
+        .map(cmd => `"${cmd}"`)
+        .value();
+      cmd('npm', ['run', 'concurrently', '--', ...allBuildAndWatchCmds]);
+
       process.exit(0); // commander sucks
     }
   }) 
