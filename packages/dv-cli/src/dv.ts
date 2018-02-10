@@ -34,6 +34,7 @@ export function readFileOrFail(file: string): string {
   return readFileSync(file, 'utf8');
 }
 
+export const APP_MODULE_PATH = path.join('src', 'app', 'app.module.ts');
 export const ENTRY_FILE_PATH = 'public_api.ts';
 
 /**
@@ -146,15 +147,22 @@ export function concurrentlyCmd(...cmds: string[]): string {
 }
 
 const GATEWAY_PORT = 3000;
+const GATEWAY_FOLDER = 'dv-gateway';
 export const START_THIS_GATEWAY_CMD = startGatewayCmd(DVCONFIG_FILE_PATH);
+
+const CORE_FOLDER = 'dv-core';
 
 // Assumes cwd is not the project root
 // All apps and clichés need a gateway even if there are no servers because it
 // is what serves the SPA
-export function installAndConfigureGateway(
-  name: string, pathToGateway: string) {
-  console.log('Install gateway');
-  npm(['install', '../' + pathToGateway, '--save'], name);
+export function installAndConfigureGateway(name: string, pathToDv: string) {
+  console.log('Install gateway and dv-core');
+  npm([
+    'install', path.join('..', pathToDv, GATEWAY_FOLDER),
+    path.join('..', pathToDv, CORE_FOLDER, NG_PACKAGR.configFileContents.dest),
+    '--save'
+  ], name);
+  console.log('Install build-related packages');
   npm(['install', 'concurrently', 'chokidar-cli', 'nodemon', '--save-dev'], name);
 
   console.log('Initialize dvconfig file');

@@ -22,7 +22,7 @@ program
   .command('server', 'create a new server')
   .action(cmd => {
     if (cmd == 'server') {
-      console.log('Installing packages');
+      console.log('Installing server packages');
       npm([
         'install', 'minimist', 'express', 'body-parser', 'mongodb',
         'apollo-server-express', 'graphql-tools', '@types/minimist',

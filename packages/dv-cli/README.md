@@ -32,10 +32,12 @@ Guide
 To create and serve a new app or cliché:
 
 ```
-dv new app my-app path-to-gateway
+dv new app my-app path-to-dv
 cd my-app
 dv serve
 ```
+
+`path-to-dv` is the path to the folder where the dv code is located (the repo).
 
 This will generate a bunch of files. If you know Angular and TypeScript they
 will make sense to you but if you don't then it doesn't matter since for

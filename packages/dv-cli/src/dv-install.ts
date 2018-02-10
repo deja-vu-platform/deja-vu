@@ -1,14 +1,12 @@
 import * as program from 'commander';
 import * as _ from 'lodash';
 import {
-  npm, updateDvConfig, updatePackage, startServerCmd, DvConfig, NG_PACKAGR
+  npm, updateDvConfig, updatePackage, startServerCmd, DvConfig, NG_PACKAGR, APP_MODULE_PATH
 } from './dv';
 
 import { existsSync } from 'fs';
 import * as path from 'path';
 
-
-const APP_MODULE_PATH = path.join('src', 'app', 'app.module.ts');
 
 program
   .version('0.0.1')

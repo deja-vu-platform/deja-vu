@@ -1,92 +1,74 @@
-import { ElementRef, Renderer2, Inject, Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { DV_CONFIG, DvConfig } from './dv.config';
-import {Observable} from 'rxjs/Rx';
+import {
+  ElementRef, Renderer2, InjectionToken, // Inject, Injectable
+} from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
 
 
 export type RequestOptions = {[field: string]: string};
+export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
+
 
 export class GatewayService {
-  to: string;
+  fromStr: string;
 
   constructor(
-    private gatewayUrl: string, projects: Set<string>,
-    private http: HttpClient, renderer: Renderer2,
+    private gatewayUrl: string, private http: HttpClient, renderer: Renderer2,
     private from: ElementRef) {
     let node = from.nativeElement;
-    let lastProjectSeen;
-    const seenProjects: string[] = [];
+    const seenNodes: string[] = [];
     while (node) {
       const name = node.nodeName.toLowerCase();
-      const project = name.split('-')[0];
-      if (projects.has(project) && lastProjectSeen != project) {
-        seenProjects.push(project);
-        lastProjectSeen = project;
-      }
+      seenNodes.push(name);
       node = renderer.parentNode(node);
     }
-    this.to = seenProjects.reverse().join('-');
+    this.fromStr = JSON.stringify(seenNodes);
   }
 
   get<T>(path?: string, options?: RequestOptions): Observable<T> {
-    console.log(`Sending get from ${this.from.nativeElement} to ${this.to}`);
+    console.log(
+      `Sending get from ${this.from.nativeElement.nodeName.toLowerCase()}`);
     return this.http.get<T>(
-      this.gatewayUrl, { params: this.buildParams(this.to, path, options) });
+      this.gatewayUrl, {
+        params: this.buildParams(path, options)
+      });
   }
 
   post<T>(
     path?: string, body?: string, options?: RequestOptions): Observable<T> {
-    console.log(`Sending post from ${this.from.nativeElement} to ${this.to}`);
+    console.log(`Sending post from ${this.from.nativeElement}`);
     return this.http.post<T>(
-      this.gatewayUrl, body,
-      { params: this.buildParams(this.to, path, options) });
-  }
+      this.gatewayUrl, body, {
+        params: this.buildParams(path, options)
+      });
+    }
 
-  private buildParams(to: string, path?: string, options?: RequestOptions)
-    : HttpParams {
-    const params = new HttpParams();
-    params.set('to', to);
+
+  private buildParams(path?: string, options?: RequestOptions)
+    : {[params: string]: string} {
+    const params = {from: this.fromStr};
     if (path) {
-      params.set('path', path);
+      params['path'] = path;
     }
     if (options) {
-      params.set('options', JSON.stringify(options));
+      params['options'] = JSON.stringify(options);
     }
-    return params;
+   return params;
   }
 }
 
+
+// For some reason we get an error saying that there's no provider for HttpClient
+// even if we import HttpModule in the dv app. Until we figure out what's going
+// on, clients will have to instantiate GatewayService directly
+/*
 @Injectable()
 export class GatewayServiceFactory {
-  gatewayUrl: string;
-  projects: Set<string>;
-
   constructor(
-    @Inject(DV_CONFIG) dvConfig: DvConfig, private http: HttpClient,
-    private renderer: Renderer2) {
-    this.gatewayUrl = dvConfig.gatewayUrl;
-    this.projects = this.setOfUsedCliches(dvConfig);
-    this.projects.add(dvConfig.name);
-  }
-
-  private setOfUsedCliches(dvConfig: DvConfig): Set<string>{
-    const ret = new Set<string>();
-    if (!dvConfig.usedCliches) {
-      return ret;
-    }
-
-    for (const usedClicheKey of Object.keys(dvConfig.usedCliches)) {
-      ret.add(usedClicheKey);
-      for (const usedUsedClicheKey of this.setOfUsedCliches(
-        dvConfig.usedCliches[usedClicheKey])) {
-        ret.add(usedUsedClicheKey);
-      }
-    }
-    return ret;
-  }
+    @Inject(GATEWAY_URL) private gatewayUrl: string, private http: HttpClient,
+    private renderer: Renderer2) {}
 
   for(from: ElementRef) {
-    return new GatewayService(
-      this.gatewayUrl, this.projects, this.http, this.renderer, from);
+    return new GatewayService(this.gatewayUrl, this.http, this.renderer, from);
   }
-}
+}*/
