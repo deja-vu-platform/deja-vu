@@ -3,6 +3,8 @@ import * as bodyParser from 'body-parser';
 import * as minimist from 'minimist';
 import { readFileSync } from 'fs';
 import * as path from 'path';
+import * as _ from 'lodash';
+import * as request from 'superagent';
 
 
 interface DvConfig {
@@ -18,6 +20,7 @@ interface DvConfig {
 const argv = minimist(process.argv);
 const configFilePath = argv.configFilePath;
 const dvConfig: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
+console.log(`Using dv config ${JSON.stringify(dvConfig, undefined, 2)}`);
 
 const app = express();
 
@@ -25,20 +28,62 @@ const app = express();
 const projects: Set<string> = setOfUsedCliches(dvConfig);
 projects.add(dvConfig.name);
 
+const dstTable = buildDstTable(dvConfig);
+console.log(`Using dst table ${JSON.stringify(dstTable)}`);
+
+type Dict = {[key: string]: string};
+
+interface RequestOptions {
+  params?: Dict;
+  headers?: Dict;
+}
+
+interface GatewayRequest {
+  from: string[];
+  path?: string;
+  options?: RequestOptions;
+}
+
 app.use('/api', bodyParser.json(), (req, res, next) => {
+  const gatewayRequest: GatewayRequest = {
+    from: JSON.parse(req.query.from),
+    path: req.query.path,
+    options: JSON.parse(req.query.options)
+  };
   if (!req.query.from) {
     res.status(500).send('No from specified');
     return next();
   }
-  try {
-    const to = getDst(JSON.parse(req.query.from), projects);
-    // reject invalid action or forward
-    console.log(`to:${to}`);
-    return next();
-  } catch(e) {
-    res.status(500).send(`Malformed 'from': ${e}`);
+  console.log(
+    `Req from ${gatewayRequest.from} projects is ` +
+    JSON.stringify(Array.from(projects.values())));
+  const to = getDst(gatewayRequest.from, projects);
+  if (!(to in dstTable)) {
+    res.status(500).send(`Invalid to: ${to}`);
     return next();
   }
+  console.log(`to:${to}, port: ${dstTable[to]}`);
+  let url = `http://localhost:${dstTable[to]}`;
+  if (gatewayRequest.path) {
+    url += gatewayRequest.path;
+  }
+  let clicheReq = request(req.method, url);
+  if (gatewayRequest.options) {
+    if (gatewayRequest.options.params) {
+      clicheReq = clicheReq.query(gatewayRequest.options.params);
+    }
+    if (gatewayRequest.options.headers) {
+      clicheReq = clicheReq.set(gatewayRequest.options.headers);
+    }
+  }
+  clicheReq.end((clicheErr, clicheRes) => {
+    if (clicheErr) {
+      res.send(clicheErr);
+    } else {
+      res.send(clicheRes);
+    }
+    next();
+  });
 });
 
 // Serve SPA
@@ -90,7 +135,15 @@ function setOfUsedCliches(dvConfig: DvConfig): Set<string>{
   return ret;
 }
 
-  /*
 function buildDstTable(dvConfig: DvConfig): {[dst: string]: string} {
-  return {};
-}*/
+  const ret = {};
+  if (dvConfig.config && dvConfig.config.wsPort) {
+    ret[dvConfig.name] = dvConfig.config.wsPort;
+  }
+  if (!dvConfig.usedCliches) {
+    return ret;
+  }
+  const usedClichesDstTable = _.mapKeys(
+    this.buildDstTable(dvConfig.usedCliches), k => `${dvConfig.name}-${k}`);
+  return _.assign(ret, usedClichesDstTable);
+}

@@ -25,7 +25,7 @@ program
       console.log('Installing server packages');
       npm([
         'install', 'minimist', 'express', 'body-parser', 'mongodb',
-        'apollo-server-express', 'graphql-tools', '@types/minimist',
+        'apollo-server-express', 'graphql-tools', '@types/minimist', 'graphql',
         '@types/express', '@types/body-parser', '@types/mongodb', '--save'
       ]);
 
@@ -48,8 +48,8 @@ program
       console.log('Add start and watch scripts to package.json');
       const name: string = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH)).name;
       updatePackage(pkg => {
-        pkg.scripts[`dv-build-${name}`] = concurrentlyCmd(
-          buildFeCmd(false), buildServerCmd(false, 'server'));
+        pkg.scripts[`dv-build-${name}`] = buildFeCmd(false) + ' && ' +
+          buildServerCmd(false, 'server');
         pkg.scripts[`dv-build-watch-${name}`] = concurrentlyCmd(
           buildFeCmd(true), buildServerCmd(true, 'server'));
 

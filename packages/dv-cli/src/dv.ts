@@ -115,8 +115,9 @@ export function startServerCmd(
   const cmd = watch ? `nodemon -w ${serverDistFolder}`: 'node';
   const script = path.join(serverDistFolder, 'server.js');
   return `if [ -f ${script} ]; then ${cmd} ${script}` +
-    ` --config \`dv get ${configKey}\`` +
-      (asFlagValue ? `--as ${asFlagValue}` : '') + '; fi;';
+    ` -- --config \\"\`dv get ${configKey}\`\\"` +
+      (asFlagValue ? `--as ${asFlagValue}` : '') + '; ' +
+      'else echo "No file"; fi;';
 }
 
 export function buildFeCmd(watch: boolean, projectFolder?: string): string {
@@ -146,11 +147,12 @@ export function concurrentlyCmd(...cmds: string[]): string {
   return `concurrently ${cmdStr}`;
 }
 
+const PKGS_FOLDER = 'packages';
 const GATEWAY_PORT = 3000;
-const GATEWAY_FOLDER = 'dv-gateway';
+const GATEWAY_FOLDER = path.join(PKGS_FOLDER, 'dv-gateway');
 export const START_THIS_GATEWAY_CMD = startGatewayCmd(DVCONFIG_FILE_PATH);
 
-const CORE_FOLDER = 'dv-core';
+const CORE_FOLDER = path.join(PKGS_FOLDER, 'dv-core');
 
 // Assumes cwd is not the project root
 // All apps and clichés need a gateway even if there are no servers because it

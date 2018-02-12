@@ -66,5 +66,5 @@ const app = express();
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 
 app.listen(config.wsPort, () => {
-    console.log(`Running ${name}`);
+  console.log(`Running ${name} with config ${JSON.stringify(config)}`);
 });

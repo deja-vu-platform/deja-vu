@@ -46,6 +46,12 @@ most apps you'll only have to write HTML and CSS.
 Navigate to ()[http://localhost:3000/]. The app will automatically reload if you
 change any of the source files.
 
+### Generate actions
+
+```
+dv generate action name
+```
+
 ### Install a cliché
 
 Inside the app directory, do:

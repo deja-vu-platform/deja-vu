@@ -5,7 +5,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
 
-export type RequestOptions = {[field: string]: string};
+export type Dict = {[field: string]: string};
+export interface RequestOptions {
+  params?: Dict;
+  headers?: Dict;
+}
 export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 
 

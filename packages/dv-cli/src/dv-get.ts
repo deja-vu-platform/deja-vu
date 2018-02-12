@@ -9,7 +9,7 @@ program
   .arguments('<key>')
   .action((key: string) => {
     const dvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
-    console.log(_.get(dvConfig, key));
+    console.log(JSON.stringify(_.get(dvConfig, key)));
   })
   .parse(process.argv);
  
