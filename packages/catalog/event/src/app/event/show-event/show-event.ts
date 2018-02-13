@@ -1,45 +1,48 @@
-import {Widget, Field, AfterInit} from "client-bus";
-import {EventAtom} from "../../shared/data";
-import {GraphQlService} from "gql";
+import { Component, OnChanges, ElementRef, Input } from '@angular/core';
+import { GatewayServiceFactory, GatewayService } from 'dv-core';
+import { WeeklyEvent, Event } from '../../../../shared/data';
 
-@Widget({
-  fqelement: "Event",
-  ng2_providers: [GraphQlService],
-  template: `{{event.start_date}} - {{event.end_date}}`
+
+@Component({
+  selector: 'event-show-event',
+  template: '{{event.startDate}} - {{event.endDate}}',
 })
-export class ShowEventComponent implements AfterInit {
-  @Field("Event") event: EventAtom;
-  _event = {start_date: "", end_date: ""};
+export class ShowEventComponent implements OnChanges {
+  @Input() event: Event;
+  formattedEvent: Event;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  gs: GatewayService;
 
-  dvAfterInit() {
-    if (this.event.start_date && this.event.end_date) {
-      this._event.start_date = this.formatDateStr(this.event.start_date);
-      this._event.end_date = this.formatDateStr(this.event.end_date);
-    } else if (this.event.atom_id) {
-      this._graphQlService
-        .get(`
-          event_by_id(atom_id: "${this.event.atom_id}") {
-            start_date,
-            end_date
+  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
+    this.gs = gsf.for(elem);
+  }
+
+  ngOnChanges() {
+    if (this.event.startDate && this.event.endDate) {
+      this.formattedEvent.startDate = this.formatDateStr(this.event.startDate);
+      this.formattedEvent.endDate = this.formatDateStr(this.event.endDate);
+    } else if (this.event.id) {
+      this.gs
+        .get<{event: Event}>(`
+          event(id: "${this.event.id}") {
+            startDate,
+            endDate
           }
         `)
         .subscribe(obj => {
-          const start_date = obj.event_by_id.start_date;
-          const end_date = obj.event_by_id.end_date;
-          this.event.start_date = this.formatDateStr(start_date);
-          this.event.end_date = this.formatDateStr(end_date);
+          const startDate = obj.event.startDate;
+          const endDate = obj.event.endDate;
+          this.formattedEvent.startDate = this.formatDateStr(startDate);
+          this.formattedEvent.endDate = this.formatDateStr(endDate);
         });
     }
   }
 
   formatDateStr(date: string): string {
     const opts = {
-      day: "numeric", weekday: "short", month: "short", year: "numeric",
-      hour: "numeric", minute: "numeric"
+      day: 'numeric', weekday: 'short', month: 'short', year: 'numeric',
+      hour: 'numeric', minute: 'numeric'
     };
-    const d = new Date(date);
-    return d.toLocaleDateString("en-US", opts);
+    return new Date(date).toLocaleDateString('en-US', opts);
   }
 }

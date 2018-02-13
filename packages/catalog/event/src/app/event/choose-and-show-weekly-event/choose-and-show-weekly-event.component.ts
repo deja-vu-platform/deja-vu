@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { from } from 'rxjs/observable/from';
 import { map, flatMap } from 'rxjs/operators';
 
-import {WeeklyEvent, Event} from '../../../../shared/data';
+import { WeeklyEvent, Event } from '../../../../shared/data';
 
 
 @Component({
