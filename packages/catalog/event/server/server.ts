@@ -1,232 +1,201 @@
-import {Promise} from "es6-promise";
-const graphql = require("graphql");
+import * as minimist from 'minimist';
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+import * as mongodb from 'mongodb';
+import { v4 as uuid } from 'uuid';
+import { readFileSync } from 'fs';
+import * as path from 'path';
+import * as _ from 'lodash';
 
-import {Mean} from "mean-loader";
-import {Helpers} from "helpers";
-import {ServerBus} from "server-bus";
-import {Grafo} from "grafo";
-
-import * as _u from "underscore";
-
-const uuid = require("uuid");
-
-const mean = new Mean();
+const { graphqlExpress } = require('apollo-server-express');
+const { makeExecutableSchema } = require('graphql-tools');
 
 
-const handlers = {
-  "event": {
-    create: Helpers.resolve_create(mean.db, "event"),
-    update: Helpers.resolve_update(mean.db, "event")
+interface EventDoc {
+  id: string;
+  startDate: string;
+  endDate: string;
+  weeklyEventId?: string;
+}
+
+interface WeeklyEventDoc {
+  id: string;
+  startsOn: string;
+  endsOn: string;
+  startTime: string;
+  endTime: string;
+  eventIds: string[];
+}
+
+
+interface CreateEventInput {
+  id: string;
+  startsOn: string;
+  endsOn: string;
+  startTime: string;
+  endTime: string;
+}
+
+interface UpdateEventInput {
+  id: string;
+  startsOn: string;
+  endsOn: string;
+  startTime: string;
+  endTime: string;
+}
+
+interface CreateWeeklyEventInput {
+  startsOn: string;
+  endsOn: string;
+  startTime: string;
+  endTime: string;
+}
+
+interface Config {
+  wsPort: number;
+  dbHost: string;
+  dbPort: number;
+  dbName: string;
+}
+
+const argv = minimist(process.argv);
+
+const name = argv.as ? argv.as : 'this-cliche-name';
+
+const DEFAULT_CONFIG: Config = {
+  dbHost: 'localhost',
+  dbPort: 27017,
+  wsPort: 3000,
+  dbName: `${name}-db`
+};
+
+const config: Config = {...DEFAULT_CONFIG, ...JSON.parse(argv.config)};
+
+const server = new mongodb.Server(
+  config.dbHost, config.dbPort,
+  {socketOptions: {autoReconnect: true}});
+const db = new mongodb.Db(config.dbName, server, {w: 1});
+
+const schema = readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8');
+const resolvers = {
+  RootQuery: {
+    events: () => db.collection('events').find(),
+    weeklyEvents: () => db.collection('weeklyevents').find(),
+    event: (id) => db.collection('events').find({ id: id }),
+    weeklyEvent: (id) => db.collection('weeklyevents').find({ id: id })
   },
-  "weeklyevent": {
-    create: Helpers.resolve_create(mean.db, "weeklyevent"),
-    update: Helpers.resolve_update(mean.db, "weeklyevent")
+  Event: {
+    id: (event: EventDoc) => event.id,
+    startDate: (event: EventDoc) => event.startDate,
+    endDate: (event: EventDoc) => event.endDate,
+    weeklyEvent: (event: EventDoc) => db.collection('weeklyevents')
+      .find({ id: event.weeklyEventId })
   },
-  guest: {
-    create: Helpers.resolve_create(mean.db, "guest"),
-    update: Helpers.resolve_update(mean.db, "guest")
+  WeeklyEvent: {
+    id: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.id,
+    startsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.startsOn,
+    endsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.endsOn,
+    events: (weeklyEvent: WeeklyEventDoc) => db.collection('events')
+      .find({ id: { $in: weeklyEvent.eventIds } })
+  },
+  RootMutation: {
+    createEvent: (input: CreateEventInput) => {
+      const {startDate, endDate} = getStartAndEndDates(input);
+      const eventId = uuid();
+      const e = { id: eventId, startDate: startDate, endDate: endDate };
+      return db.collection('events').insertOne(e).then(() => e);
+    },
+    updateEvent: (input: UpdateEventInput) => {
+      const {startDate, endDate} = getStartAndEndDates(input);
+      const updateObj = { $set: { startDate: startDate, endDate: endDate } };
+      return db.collection('events').update({id: input.id}, updateObj);
+    },
+    // If a weeklyEventId is given, the event is removed from that weekly event
+    deleteEvent: (eventId: string, weeklyEventId: string) => {
+      return Promise.resolve(() => {
+        if (weeklyEventId) {
+         const updatedWeeklyEvent = { $pull: { events: {id: eventId} } };
+         return db.collection('weeklyevents')
+           .update({id: weeklyEventId}, updatedWeeklyEvent);
+        }
+        return null;
+      })
+      .then(() => db.collection('events').deleteOne({id: eventId}));
+
+    },
+    createWeeklyEvent: (input: CreateWeeklyEventInput) => {
+      const startsOnDate = new Date(input.startsOn);
+      const endsOnDate = new Date(input.endsOn);
+
+      const inserts: Promise<any>[] = [];
+      const eventIds: string[] = [];
+      const weeklyEventId = uuid();
+
+      const startHhMm = getHhMm(input.startTime);
+      const endHhMm = getHhMm(input.endTime);
+      for (
+        const eventDate = startsOnDate; eventDate <= endsOnDate;
+        eventDate.setDate(eventDate.getDate() + 7)) {
+
+        const startDate = new Date(eventDate.getTime());
+        startDate.setHours(startHhMm.hh, startHhMm.mm);
+
+        const endDate = new Date(eventDate.getTime());
+        endDate.setHours(endHhMm.hh, endHhMm.mm);
+
+        const eventId = uuid();
+        eventIds.push(eventId);
+        const e = {
+          id: eventId,
+          startDate: startDate.toString(),
+          endDate: endDate.toString(),
+          weeklyEventId: weeklyEventId
+        };
+        inserts.push(db.collection('events').insertOne(e));
+      }
+
+      const weeklyEvent = {
+        id: weeklyEventId,
+        events: _.map(eventIds, eventId => ({id: eventId})),
+        startsOn: input.startsOn,
+        endsOn: input.endsOn
+      };
+      return Promise.all(inserts)
+        .then(() => db.collection('weeklyevents').insertOne(weeklyEvent));
+    }
   }
 };
 
-const bus = new ServerBus(
-    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
+function getStartAndEndDates(input: CreateEventInput | UpdateEventInput)
+  : {startDate: string, endDate: string} {
+  const startsOnDate = new Date(input.startsOn);
+  const endsOnDate = new Date(input.endsOn);
 
+  const startHhMm = getHhMm(input.startTime);
+  const endHhMm = getHhMm(input.endTime);
 
-//////////////////////////////////////////////////
-
-const grafo = new Grafo(mean.db);
-
-const get_hh_mm = hh_mm_time => {
-  const hh_mm = hh_mm_time.slice(0, -2).split(":");
-  if (hh_mm_time.slice(-2) === "PM") {
-    hh_mm[0] = Number(hh_mm[0]) + 12;
-  }
-  return hh_mm;
+  startsOnDate.setHours(startHhMm.hh, startHhMm.mm);
+  endsOnDate.setHours(endHhMm.hh, endHhMm.mm);
+  return { startDate: startsOnDate.toString(), endDate: endsOnDate.toString() };
 }
 
-const schema = grafo
-  .add_type({
-    name: "Event",
-    fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      // TODO: grafo should allow weak types
-      start_date: {"type": graphql.GraphQLString},
-      end_date: {"type": graphql.GraphQLString},
-      weekly_event_id: {"type": graphql.GraphQLString},
-      updateEvent: {
-        type: "Event",
-        args: {
-          starts_on: {"type": graphql.GraphQLString},
-          ends_on: {"type": graphql.GraphQLString},
-          start_time: {"type": graphql.GraphQLString},
-          end_time: {"type": graphql.GraphQLString}
-        },
-        resolve: (event, {starts_on, ends_on, start_time, end_time}) => {
-          const starts_on_date = new Date(starts_on);
-          const ends_on_date = new Date(ends_on);
+// Get the hours and minutes in 24-hour format from a time in 12-hr format
+// (hh:mm AM/PM)
+function getHhMm(hhMmTime: string): {hh: number, mm: number} {
+  const hhMm = hhMmTime.slice(0, -2).split(':');
+  const ret = {hh: Number(hhMm[0]), mm: Number(hhMm[1])};
+  if (hhMmTime.slice(-2) === 'PM') {
+    ret.hh = ret.hh + 12;
+  }
+  return ret;
+}
 
-          const start_hh_mm = get_hh_mm(start_time);
-          const end_hh_mm = get_hh_mm(end_time);
+const executableSchema = makeExecutableSchema({ schema, resolvers });
 
-          starts_on_date.setHours(start_hh_mm[0], start_hh_mm[1]);
-          ends_on_date.setHours(end_hh_mm[0], end_hh_mm[1]);
+const app = express();
 
-          const update_obj = {
-            $set: {
-              start_date: starts_on_date.toString(),
-              end_date: ends_on_date.toString()
-            }
-          };
+app.use('/graphql', bodyParser.json(), graphqlExpress({ executableSchema }));
 
-          return mean.db.collection("events")
-            .update({atom_id: event.atom_id}, update_obj)
-            .then(_ => bus.update_atom("Event", event.atom_id, update_obj));
-        }
-      }
-    }
-  })
-  .add_type({
-    name: "WeeklyEvent",
-    fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      events: {"type": "[Event]"},
-      starts_on: {"type": graphql.GraphQLString},
-      ends_on: {"type": graphql.GraphQLString}
-    }
-  })
-  .add_mutation({
-    name: "newWeeklyPublicEvent",
-    "type": "WeeklyEvent",
-    args: {
-      starts_on: {"type": graphql.GraphQLString},
-      ends_on: {"type": graphql.GraphQLString},
-      start_time: {"type": graphql.GraphQLString},
-      end_time: {"type": graphql.GraphQLString}
-    },
-    resolve: (_, {starts_on, ends_on, start_time, end_time}) => {
-      const starts_on_date = new Date(starts_on);
-      const ends_on_date = new Date(ends_on);
-
-      const inserts = [];
-      const event_ids = [];
-      const weid = uuid.v4();
-      for (
-        let event_date = starts_on_date; event_date <= ends_on_date;
-        event_date.setDate(event_date.getDate() + 7)) {
-
-        const start_date = new Date(event_date.getTime());
-        const start_hh_mm = get_hh_mm(start_time)
-        start_date.setHours(start_hh_mm[0], start_hh_mm[1])
-
-        const end_date = new Date(event_date.getTime());
-        const end_hh_mm = get_hh_mm(end_time)
-        end_date.setHours(end_hh_mm[0], end_hh_mm[1])
-
-        const eid = uuid.v4();
-        event_ids.push(eid);
-        const e = {
-          atom_id: eid,
-          start_date: start_date.toString(),
-          end_date: end_date.toString(),
-          weekly_event_id: weid
-        };
-        inserts.push(
-            mean.db.collection("events")
-              .insertOne(e)
-              .then(_ => bus.create_atom("Event", eid, e)));
-      }
-      return Promise.all(inserts)
-        .then(_ => mean.db.collection("guests")
-          .find({}).project({atom_id: 1}).toArray()
-          .then(guests => ({
-            atom_id: weid,
-            events: _u.map(event_ids, eid => ({atom_id: eid})),
-            starts_on: starts_on,
-            ends_on: ends_on,
-            guests: guests
-          })))
-        .then(weekly_event => mean.db.collection("weeklyevents")
-          .insertOne(weekly_event)
-          .then(_ => bus.create_atom("WeeklyEvent", weid, weekly_event))
-          .then(_ => weekly_event));
-    }
-  })
-  .add_mutation({
-    name: "newPublicEvent",
-    "type": "Event",
-    args: {
-      starts_on: {"type": graphql.GraphQLString},
-      ends_on: {"type": graphql.GraphQLString},
-      start_time: {"type": graphql.GraphQLString},
-      end_time: {"type": graphql.GraphQLString}
-    },
-    resolve: (_, {starts_on, ends_on, start_time, end_time}) => {
-      const starts_on_date = new Date(starts_on);
-      const ends_on_date = new Date(ends_on);
-
-      const inserts = [];
-      const event_ids = [];
-
-      const start_hh_mm = get_hh_mm(start_time)
-      starts_on_date.setHours(start_hh_mm[0], start_hh_mm[1])
-
-      const end_hh_mm = get_hh_mm(end_time)
-      ends_on_date.setHours(end_hh_mm[0], end_hh_mm[1])
-
-      const eid = uuid.v4();
-      event_ids.push(eid);
-      const e = {
-        atom_id: eid,
-        start_date: starts_on_date.toString(),
-        end_date: ends_on_date.toString()
-      };
-      return mean.db.collection("events")
-        .insertOne(e)
-        .then(_ => bus.create_atom("Event", eid, e))
-        .then(_ => e);
-    }
-  })
-  .add_mutation({
-    name: "deleteEvent",
-    "type": "WeeklyEvent",
-    args: {
-      eid: {"type": graphql.GraphQLString},
-      weekly_event_id: {"type": graphql.GraphQLString}
-    },
-    resolve: (_, {eid, weekly_event_id}) =>  {
-      return Promise.resolve(_ => {
-       if (weekly_event_id) {
-        const updated_weekly_event = {
-          $pull: {
-            events: {atom_id: eid}
-          }
-        };
-        return mean.db.collection("weeklyevents")
-          .update({atom_id: weekly_event_id}, updated_weekly_event)
-          .then(_ => bus.update_atom(
-            "WeeklyEvent", weekly_event_id, updated_weekly_event));
-        }
-      })
-      .then(_ => mean.db.collection("events")
-        .deleteOne({"atom_id": eid})
-        .then(_ => bus.remove_atom("Event", eid)));
-    }
-  })
-  .add_type({
-    name: "Description",
-    fields: {
-      atom_id: {"type": graphql.GraphQLString}
-    }
-  })
-  .add_type({
-    name: "Guest",
-    fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      name: {"type": graphql.GraphQLString}
-    }
-  })
-  .schema();
-
-Helpers.serve_schema(mean.ws, schema);
-
-grafo.init().then(_ => mean.start());
+app.listen(config.wsPort, () => {
+  console.log(`Running ${name} with config ${JSON.stringify(config)}`);
+});
