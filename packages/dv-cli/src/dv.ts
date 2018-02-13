@@ -186,8 +186,8 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
     return pkg;
   });
 
-  console.log(
-    'Set default.build.preserveSymlinks to true in .angular-cli.json');
+  // https://github.com/dherges/ng-packagr/issues/335
+  ng(['set', 'defaults.build.preserveSymlinks', 'true'], name);
 }
 
 export interface DvConfig {
