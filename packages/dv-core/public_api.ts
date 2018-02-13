@@ -1,3 +1,3 @@
 export * from './src/gateway.service';
-export * from './src/id.component';
-export * from './src/tx.component';
+export { FieldMap, ValueMap }  from './src/include.component';
+export * from './src/dv.module';

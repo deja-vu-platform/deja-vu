@@ -185,6 +185,9 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
     pkg.scripts['tsc'] = 'tsc';
     return pkg;
   });
+
+  console.log(
+    'Set default.build.preserveSymlinks to true in .angular-cli.json');
 }
 
 export interface DvConfig {

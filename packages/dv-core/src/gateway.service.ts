@@ -1,5 +1,5 @@
 import {
-  ElementRef, Renderer2, InjectionToken, // Inject, Injectable
+  ElementRef, Renderer2, RendererFactory2, InjectionToken, Inject, Injectable
 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
@@ -62,17 +62,22 @@ export class GatewayService {
 }
 
 
-// For some reason we get an error saying that there's no provider for HttpClient
-// even if we import HttpModule in the dv app. Until we figure out what's going
-// on, clients will have to instantiate GatewayService directly
-/*
 @Injectable()
 export class GatewayServiceFactory {
+  renderer: Renderer2;
   constructor(
     @Inject(GATEWAY_URL) private gatewayUrl: string, private http: HttpClient,
-    private renderer: Renderer2) {}
+    rendererFactory: RendererFactory2) {
+    // https://github.com/angular/angular/issues/17824
+    // It seems like while you can get Renderer2 injected in components it
+    // doesn't work for services. The workaround is to get the factory injected
+    // and use it to create a renderer.
+    // If you pass null null to `createRenderer` it returns the default renderer
+    // without creating a new one
+    this.renderer = rendererFactory.createRenderer(null, null);
+  }
 
   for(from: ElementRef) {
     return new GatewayService(this.gatewayUrl, this.http, this.renderer, from);
   }
-}*/
+}
