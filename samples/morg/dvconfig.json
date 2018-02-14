@@ -1,0 +1,5 @@
+{
+  "name": "morg",
+  "watch": true,
+  "gatewayPort": 3000
+}

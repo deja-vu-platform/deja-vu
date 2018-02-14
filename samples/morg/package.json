@@ -1,14 +1,59 @@
 {
-  "name": "dv-samples-morg",
-  "version": "0.0.1",
-  "scripts": {
-    "start": "node node_modules/dv-lang/lib/dv.js"
-  },
+  "name": "morg",
+  "version": "0.0.0",
   "license": "MIT",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build --prod",
+    "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e",
+    "dv-start-gateway": "node node_modules/dv-gateway/dist/gateway.js --configFilePath dvconfig.json",
+    "dv-build-morg": "ng build",
+    "dv-build-watch-morg": "chokidar src node_modules -c 'ng build'",
+    "concurrently": "concurrently",
+    "tsc": "tsc"
+  },
+  "private": true,
   "dependencies": {
-    "dv-messaging-email": "file:../../catalog/messaging/email",
-    "dv-organization-event": "file:../../catalog/organization/event",
-    "dv-organization-allocator": "file:../../catalog/organization/allocator",
-    "dv-lang": "file:../../core/lang"
+    "@angular/animations": "^5.2.0",
+    "@angular/common": "^5.2.0",
+    "@angular/compiler": "^5.2.0",
+    "@angular/core": "^5.2.0",
+    "@angular/forms": "^5.2.0",
+    "@angular/http": "^5.2.0",
+    "@angular/platform-browser": "^5.2.0",
+    "@angular/platform-browser-dynamic": "^5.2.0",
+    "@angular/router": "^5.2.0",
+    "core-js": "^2.4.1",
+    "dv-core": "file:../../packages/dv-core/pkg",
+    "dv-gateway": "file:../../packages/dv-gateway",
+    "rxjs": "^5.5.6",
+    "zone.js": "^0.8.19"
+  },
+  "devDependencies": {
+    "@angular/cli": "1.6.5",
+    "@angular/compiler-cli": "^5.2.0",
+    "@angular/language-service": "^5.2.0",
+    "@types/jasmine": "~2.8.3",
+    "@types/jasminewd2": "~2.0.2",
+    "@types/node": "~6.0.60",
+    "chokidar-cli": "^1.2.0",
+    "codelyzer": "^4.0.1",
+    "concurrently": "^3.5.1",
+    "jasmine-core": "~2.8.0",
+    "jasmine-spec-reporter": "~4.2.1",
+    "karma": "~2.0.0",
+    "karma-chrome-launcher": "~2.2.0",
+    "karma-cli": "~1.0.1",
+    "karma-coverage-istanbul-reporter": "^1.2.1",
+    "karma-jasmine": "~1.1.0",
+    "karma-jasmine-html-reporter": "^0.2.2",
+    "nodemon": "^1.14.12",
+    "protractor": "~5.1.2",
+    "ts-node": "~4.1.0",
+    "tslint": "~5.9.1",
+    "typescript": "~2.5.3"
   }
 }
