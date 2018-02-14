@@ -1,7 +1,7 @@
 import {
   ElementRef, Renderer2, RendererFactory2, InjectionToken, Inject, Injectable
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
 
@@ -43,7 +43,8 @@ export class GatewayService {
     console.log(`Sending post from ${this.from.nativeElement}`);
     return this.http.post<T>(
       this.gatewayUrl, body, {
-        params: this.buildParams(path, options)
+        params: this.buildParams(path, options),
+        headers: new HttpHeaders({'Content-type': 'application/json'})
       });
     }
 

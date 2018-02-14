@@ -19,15 +19,17 @@ export class NewWeeklyEventComponent {
   }
 
   onSubmit() {
-    debugger;
     this.gs
-      .post('/graphql', `
-        mutation createWeeklyEvent(
-          startsOn: "${this.startsOn}", ends_on: "${this.endsOn}",
-          startTime: "${this.startTime}", end_time: "${this.endTime}") {
-          id
-        }
-      `)
+      .post('/graphql', JSON.stringify({
+        query: `mutation {
+          createWeeklyEvent(input: {
+            startsOn: "${this.startsOn}", endsOn: "${this.endsOn}",
+            startTime: "${this.startTime}", endTime: "${this.endTime}"
+          }) {
+            id
+          }
+        }`
+      }))
       .subscribe(() => {
         // Clear out the fields on success
         this.startsOn = '';

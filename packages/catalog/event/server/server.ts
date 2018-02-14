@@ -95,8 +95,8 @@ const resolvers = {
   Query: {
     events: () => db.collection('events').find().toArray(),
     weeklyEvents: () => db.collection('weeklyevents').find().toArray(),
-    event: (id) => db.collection('events').findOne({ id: id }),
-    weeklyEvent: (id) => db.collection('weeklyevents').findOne({ id: id })
+    event: (root, id) => db.collection('events').findOne({ id: id }),
+    weeklyEvent: (root, id) => db.collection('weeklyevents').findOne({ id: id })
   },
   Event: {
     id: (event: EventDoc) => event.id,
@@ -113,19 +113,20 @@ const resolvers = {
       .find({ id: { $in: weeklyEvent.eventIds } }).toArray()
   },
   Mutation: {
-    createEvent: (input: CreateEventInput) => {
+    createEvent: (root, {input}: {input: CreateEventInput}) => {
       const {startDate, endDate} = getStartAndEndDates(input);
       const eventId = uuid();
       const e = { id: eventId, startDate: startDate, endDate: endDate };
       return db.collection('events').insertOne(e).then(() => e);
     },
-    updateEvent: (input: UpdateEventInput) => {
+    updateEvent: (root, {input}: {input: UpdateEventInput}) => {
       const {startDate, endDate} = getStartAndEndDates(input);
       const updateObj = { $set: { startDate: startDate, endDate: endDate } };
-      return db.collection('events').update({id: input.id}, updateObj);
+      return db.collection('events').updateOne({id: input.id}, updateObj)
+        .then(() => true);
     },
     // If a weeklyEventId is given, the event is removed from that weekly event
-    deleteEvent: (eventId: string, weeklyEventId: string) => {
+    deleteEvent: (root, {eventId, weeklyEventId}) => {
       return Promise.resolve(() => {
         if (weeklyEventId) {
          const updatedWeeklyEvent = { $pull: { events: {id: eventId} } };
@@ -134,10 +135,12 @@ const resolvers = {
         }
         return null;
       })
-      .then(() => db.collection('events').deleteOne({id: eventId}));
+      .then(() => db.collection('events').deleteOne({id: eventId}))
+      .then(() => true);
 
     },
-    createWeeklyEvent: (input: CreateWeeklyEventInput) => {
+    createWeeklyEvent: (
+      root, {input}: {input: CreateWeeklyEventInput}) => {
       const startsOnDate = new Date(input.startsOn);
       const endsOnDate = new Date(input.endsOn);
 
@@ -175,7 +178,8 @@ const resolvers = {
         endsOn: input.endsOn
       };
       return Promise.all(inserts)
-        .then(() => db.collection('weeklyevents').insertOne(weeklyEvent));
+        .then(() => db.collection('weeklyevents').insertOne(weeklyEvent))
+        .then(() => weeklyEvent);
     }
   }
 };
@@ -210,7 +214,9 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
+  extended: true
+}), graphqlExpress({ schema }));
 
 app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 

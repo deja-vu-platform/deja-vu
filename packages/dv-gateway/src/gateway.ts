@@ -48,7 +48,7 @@ app.use('/api', bodyParser.json(), (req, res, next) => {
   const gatewayRequest: GatewayRequest = {
     from: JSON.parse(req.query.from),
     path: req.query.path,
-    options: JSON.parse(req.query.options)
+    options: req.query.options ? JSON.parse(req.query.options) : undefined
   };
   if (!req.query.from) {
     res.status(500).send('No from specified');
@@ -76,11 +76,16 @@ app.use('/api', bodyParser.json(), (req, res, next) => {
       clicheReq = clicheReq.set(gatewayRequest.options.headers);
     }
   }
+  clicheReq.send(req.body);
   clicheReq.end((clicheErr, clicheRes) => {
     if (clicheErr) {
-      res.status(clicheErr.status).send(clicheErr.text);
+      console.log(`Got back ${JSON.stringify(clicheErr)}`);
+      const send = clicheErr.text ? clicheErr.text : clicheErr.response.text;
+      res.status(clicheErr.status).send(send);
     } else {
-      res.status(clicheRes.status).send(clicheRes.text);
+      console.log(`Got back ${JSON.stringify(clicheRes)}`);
+      const send = clicheRes.text ? clicheRes.text : clicheErr.response.text;
+      res.status(clicheRes.status).send(send);
     }
     next();
   });
