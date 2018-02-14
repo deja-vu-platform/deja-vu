@@ -19,8 +19,11 @@ export class ShowEventComponent implements OnChanges {
 
   ngOnChanges() {
     if (this.event.startDate && this.event.endDate) {
-      this.formattedEvent.startDate = this.formatDateStr(this.event.startDate);
-      this.formattedEvent.endDate = this.formatDateStr(this.event.endDate);
+      this.formattedEvent = {
+        id: this.event.id,
+        startDate: this.formatDateStr(this.event.startDate),
+        endDate: this.formatDateStr(this.event.endDate)
+      };
     } else if (this.event.id) {
       this.gs
         .get<{event: Event}>(`
@@ -32,8 +35,11 @@ export class ShowEventComponent implements OnChanges {
         .subscribe(obj => {
           const startDate = obj.event.startDate;
           const endDate = obj.event.endDate;
-          this.formattedEvent.startDate = this.formatDateStr(startDate);
-          this.formattedEvent.endDate = this.formatDateStr(endDate);
+          this.formattedEvent = {
+            id: this.event.id,
+            startDate: this.formatDateStr(startDate),
+            endDate: this.formatDateStr(endDate)
+          };
         });
     }
   }

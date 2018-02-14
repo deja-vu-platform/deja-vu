@@ -5,7 +5,6 @@ import * as mongodb from 'mongodb';
 import { v4 as uuid } from 'uuid';
 import { readFileSync } from 'fs';
 import * as path from 'path';
-import * as _ from 'lodash';
 
 const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
@@ -95,8 +94,8 @@ const resolvers = {
   Query: {
     events: () => db.collection('events').find().toArray(),
     weeklyEvents: () => db.collection('weeklyevents').find().toArray(),
-    event: (root, id) => db.collection('events').findOne({ id: id }),
-    weeklyEvent: (root, id) => db.collection('weeklyevents').findOne({ id: id })
+    event: (root, { id }) => db.collection('events').findOne({ id: id }),
+    weeklyEvent: (root, { id }) => db.collection('weeklyevents').findOne({ id: id })
   },
   Event: {
     id: (event: EventDoc) => event.id,
@@ -141,8 +140,8 @@ const resolvers = {
     },
     createWeeklyEvent: (
       root, {input}: {input: CreateWeeklyEventInput}) => {
-      const startsOnDate = new Date(input.startsOn);
-      const endsOnDate = new Date(input.endsOn);
+      const startsOnDate = new Date(Number(input.startsOn));
+      const endsOnDate = new Date(Number(input.endsOn));
 
       const inserts: Promise<any>[] = [];
       const eventIds: string[] = [];
@@ -162,7 +161,7 @@ const resolvers = {
 
         const eventId = uuid();
         eventIds.push(eventId);
-        const e = {
+        const e: EventDoc = {
           id: eventId,
           startDate: startDate.toString(),
           endDate: endDate.toString(),
@@ -171,11 +170,13 @@ const resolvers = {
         inserts.push(db.collection('events').insertOne(e));
       }
 
-      const weeklyEvent = {
+      const weeklyEvent: WeeklyEventDoc = {
         id: weeklyEventId,
-        events: _.map(eventIds, eventId => ({id: eventId})),
+        eventIds: eventIds,
         startsOn: input.startsOn,
-        endsOn: input.endsOn
+        endsOn: input.endsOn,
+        startTime: input.startTime,
+        endTime: input.endTime
       };
       return Promise.all(inserts)
         .then(() => db.collection('weeklyevents').insertOne(weeklyEvent))
