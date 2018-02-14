@@ -7,7 +7,7 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 import * as _ from 'lodash';
 
-const { graphqlExpress } = require('apollo-server-express');
+const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
 const { makeExecutableSchema } = require('graphql-tools');
 
 
@@ -60,7 +60,7 @@ interface Config {
 
 const argv = minimist(process.argv);
 
-const name = argv.as ? argv.as : 'this-cliche-name';
+const name = argv.as ? argv.as : 'event';
 
 const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
@@ -69,36 +69,50 @@ const DEFAULT_CONFIG: Config = {
   dbName: `${name}-db`
 };
 
-const config: Config = {...DEFAULT_CONFIG, ...JSON.parse(argv.config)};
+let configArg;
+try {
+  configArg = JSON.parse(argv.config);
+} catch (e) {
+  throw new Error(`Couldn't parse config ${argv.config}`);
+}
 
-const server = new mongodb.Server(
-  config.dbHost, config.dbPort,
-  {socketOptions: {autoReconnect: true}});
-const db = new mongodb.Db(config.dbName, server, {w: 1});
+const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
-const schema = readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8');
+console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
+let db;
+mongodb.MongoClient.connect(
+  `mongodb://${config.dbHost}:${config.dbPort}`, (err, client) => {
+    if (err) {
+      throw err;
+    }
+    db = client.db(config.dbName);
+  });
+
+
+const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
+
 const resolvers = {
-  RootQuery: {
-    events: () => db.collection('events').find(),
-    weeklyEvents: () => db.collection('weeklyevents').find(),
-    event: (id) => db.collection('events').find({ id: id }),
-    weeklyEvent: (id) => db.collection('weeklyevents').find({ id: id })
+  Query: {
+    events: () => db.collection('events').find().toArray(),
+    weeklyEvents: () => db.collection('weeklyevents').find().toArray(),
+    event: (id) => db.collection('events').findOne({ id: id }),
+    weeklyEvent: (id) => db.collection('weeklyevents').findOne({ id: id })
   },
   Event: {
     id: (event: EventDoc) => event.id,
     startDate: (event: EventDoc) => event.startDate,
     endDate: (event: EventDoc) => event.endDate,
     weeklyEvent: (event: EventDoc) => db.collection('weeklyevents')
-      .find({ id: event.weeklyEventId })
+      .findOne({ id: event.weeklyEventId })
   },
   WeeklyEvent: {
     id: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.id,
     startsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.startsOn,
     endsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.endsOn,
     events: (weeklyEvent: WeeklyEventDoc) => db.collection('events')
-      .find({ id: { $in: weeklyEvent.eventIds } })
+      .find({ id: { $in: weeklyEvent.eventIds } }).toArray()
   },
-  RootMutation: {
+  Mutation: {
     createEvent: (input: CreateEventInput) => {
       const {startDate, endDate} = getStartAndEndDates(input);
       const eventId = uuid();
@@ -190,11 +204,15 @@ function getHhMm(hhMmTime: string): {hh: number, mm: number} {
   return ret;
 }
 
-const executableSchema = makeExecutableSchema({ schema, resolvers });
+console.log(typeDefs);
+const schema = makeExecutableSchema({ typeDefs, resolvers });
+
 
 const app = express();
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ executableSchema }));
+app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+
+app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 app.listen(config.wsPort, () => {
   console.log(`Running ${name} with config ${JSON.stringify(config)}`);

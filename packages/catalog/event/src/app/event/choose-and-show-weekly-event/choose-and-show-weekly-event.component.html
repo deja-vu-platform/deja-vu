@@ -1,18 +1,19 @@
 <div class="row">
-  <select (change)="updateEvents($event.target.value)" class="selectpicker">
-    <option value="" disabled selected>Choose Weekly Event</option>
-    <option *ngFor="let weeklyEvent of weeklyEvents"
-     [value]="weeklyEvent.id">
-        {{weeklyEvent.name}}
-        {{weeklyEvent.startsOn}} - {{weeklyEvent.endsOn}}
-    </option>
-  </select>
+  <mat-form-field>
+    <mat-select placeholder="Choose Weekly Event" (change)="updateEvents($event.target.value)" class="selectpicker">
+      <mat-option *ngFor="let weeklyEvent of weeklyEvents"
+       [value]="weeklyEvent.id">
+          {{weeklyEvent.name}}
+          {{weeklyEvent.startsOn}} - {{weeklyEvent.endsOn}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 </div>
 
 <div class="row">
   <ul *ngIf="events && events.length > 0" class="list-group">
     <li *ngFor="let event of events" class="list-group-item">
-     <dv-widget name="ShowEvent" [init]="{event: event}"></dv-widget>
+     <event-show-event [event]="event"></event-show-event>
     </li>
   </ul>
   <div *ngIf="!events || events.length == 0">

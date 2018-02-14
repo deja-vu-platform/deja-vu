@@ -1,41 +1,41 @@
 type Event {
-  id: ID!,
-  startDate: String!,
-  endDate: String!,
-  weeklyEvent?: WeeklyEvent
+  id: ID!
+  startDate: String!
+  endDate: String!
+  weeklyEvent: WeeklyEvent
 }
 
 type WeeklyEvent {
-  id: ID!,
-  startsOn: String!,
-  endsOn: String!,
+  id: ID!
+  startsOn: String!
+  endsOn: String!
   events: [Event!]!
 }
 
-type CreateEventInput {
-  id: ID!,
-  startsOn: String!,
-  endsOn: String!,
-  startTime: String!,
+input CreateEventInput {
+  id: ID!
+  startsOn: String!
+  endsOn: String!
+  startTime: String!
   endTime: String!
 }
 
-type UpdateEventInput {
-  id: ID!,
-  startsOn: String,
-  endsOn: String,
-  startTime: String,
+input UpdateEventInput {
+  id: ID!
+  startsOn: String
+  endsOn: String
+  startTime: String
   endTime: String
 }
 
-type CreateWeeklyEventInput {
-  startsOn: String!,
-  endsOn: String!,
-  startTime: String!,
+input CreateWeeklyEventInput {
+  startsOn: String!
+  endsOn: String!
+  startTime: String!
   endTime: String!
 }
 
-type RootMutation {
+type Mutation {
   createEvent(input: CreateEventInput!): Event
   updateEvent(input: UpdateEventInput!): Event
   # If a weeklyEventId is given, the event is removed from that weekly event
@@ -43,11 +43,9 @@ type RootMutation {
   createWeeklyEvent(input: CreateWeeklyEventInput!): WeeklyEvent
 }
 
-type RootQuery {
-  events(): [Event!],
-  weeklyEventS(): [WeeklyEvent!],
+type Query {
+  events: [Event!]
+  weeklyEvents: [WeeklyEvent!]
   event(id: ID!): Event
   weeklyEvent(id: ID!): WeeklyEvent
 }
-
-schema { query: RootQuery, mutation: RootMutation }

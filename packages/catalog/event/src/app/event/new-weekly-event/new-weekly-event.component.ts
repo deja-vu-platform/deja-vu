@@ -6,7 +6,7 @@ import { GatewayServiceFactory, GatewayService } from 'dv-core';
   templateUrl: './new-weekly-event.component.html',
   styleUrls: ['./new-weekly-event.component.css']
 })
-export class NewWeeklyEventComponent implements AfterViewInit {
+export class NewWeeklyEventComponent {
   startsOn = '';
   endsOn = '';
   startTime = '';
@@ -19,66 +19,22 @@ export class NewWeeklyEventComponent implements AfterViewInit {
   }
 
   onSubmit() {
-    const startsOnText: Element = document.getElementById('starts-on-text');
-    const endsOnText: Element = document.getElementById('ends-on-text');
-    const startTimeText: Element = document.getElementById('start-time-text');
-    const endTimeText: Element = document.getElementById('end-time-text');
-
-    this.startsOn = startsOnText['value'];
-    this.endsOn = endsOnText['value'];
-    this.startTime = startTimeText['value'];
-    this.endTime = endTimeText['value'];
-
+    debugger;
     this.gs
-      .post(`
-        newWeeklyPublicEvent(
+      .post('/graphql', `
+        mutation createWeeklyEvent(
           startsOn: "${this.startsOn}", ends_on: "${this.endsOn}",
           startTime: "${this.startTime}", end_time: "${this.endTime}") {
-          atom_id
+          id
         }
       `)
-      .subscribe(atom_id => {
+      .subscribe(() => {
         // Clear out the fields on success
-        startsOnText['value'] = '';
-        endsOnText['value'] = '';
-        startTimeText['value'] = '';
-        endTimeText['value'] = '';
-
         this.startsOn = '';
         this.endsOn = '';
         this.startTime = '';
         this.endTime = '';
       });
-  }
-
-  update(e) {
-    console.log(e);
-  }
-
-  ngAfterViewInit() {
-    // Datepicker and timepicker scripts need to be loaded this way
-    this.loadScript('bootstrap-datepicker/bootstrap-datepicker.min.js');
-    this.loadStyle('bootstrap-datepicker/bootstrap-datepicker3.min.css');
-
-    this.loadScript('bootstrap-timepicker/bootstrap-timepicker.min.js');
-    this.loadStyle('bootstrap-timepicker/bootstrap-timepicker.css');
-  }
-
-  private loadScript(src: string) {
-    const s = document.createElement('script');
-    s.type = 'text/javascript';
-    s.src = 'node_modules/dv-organization-event/lib/components/' +
-      'new-weekly-event/vendor/' + src;
-    this.elem.nativeElement.appendChild(s);
-  }
-
-  private loadStyle(href: string) {
-    const s = document.createElement('link');
-    s.type = 'text/css';
-    s.rel = 'stylesheet';
-    s.href = 'node_modules/dv-organization-event/lib/components/' +
-      'new-weekly-event/vendor/' + href;
-    this.elem.nativeElement.appendChild(s);
   }
 
   /**

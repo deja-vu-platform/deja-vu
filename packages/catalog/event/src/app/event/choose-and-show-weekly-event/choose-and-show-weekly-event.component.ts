@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef } from '@angular/core';
 import { GatewayServiceFactory, GatewayService } from 'dv-core';
 import * as _ from 'lodash';
 
@@ -14,7 +14,7 @@ import { WeeklyEvent, Event } from '../../../../shared/data';
   templateUrl: './choose-and-show-weekly-event.component.html',
   styleUrls: ['./choose-and-show-weekly-event.component.css']
 })
-export class ChooseAndShowWeeklyEventComponent implements OnInit, AfterViewInit {
+export class ChooseAndShowWeeklyEventComponent implements OnInit {
   selectedWeeklyEvent: WeeklyEvent;
   weeklyEvents: WeeklyEvent[] = [];
   events: Event[] = [];
@@ -27,15 +27,21 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit, AfterViewInit 
 
   ngOnInit() {
     this.gs
-      .get<{allWeeklyEvents: WeeklyEvent[]}>(`
-        allWeeklyEvents {
-          Id,
-          startsOn,
-          endsOn
+      .get<{weeklyEvents: WeeklyEvent[]}>('/graphql', {
+        params: {
+          query: `
+            query {
+              weeklyEvents {
+                id,
+                startsOn,
+                  endsOn
+              }
+            }
+          `
         }
-      `)
+      })
       .pipe(
-        map(data => data.allWeeklyEvents),
+        map(data => data.weeklyEvents),
         flatMap((weeklyEvents: WeeklyEvent[], {}) => from(weeklyEvents)),
       )
       .subscribe(weeklyEvent => this.weeklyEvents.push(weeklyEvent));
@@ -64,13 +70,5 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit, AfterViewInit 
           })))
       )
       .subscribe(e => this.events.push(e));
-  }
-
-  ngAfterViewInit() {
-    const s = document.createElement('script');
-    s.type = 'text/javascript';
-    s.src = `https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/` +
-      `1.12.1/js/bootstrap-select.min.js`;
-    this.elem.nativeElement.appendChild(s);
   }
 }

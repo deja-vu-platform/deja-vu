@@ -78,9 +78,9 @@ app.use('/api', bodyParser.json(), (req, res, next) => {
   }
   clicheReq.end((clicheErr, clicheRes) => {
     if (clicheErr) {
-      res.send(clicheErr);
+      res.status(clicheErr.status).send(clicheErr.text);
     } else {
-      res.send(clicheRes);
+      res.status(clicheRes.status).send(clicheRes.text);
     }
     next();
   });
