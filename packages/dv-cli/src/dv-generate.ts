@@ -28,6 +28,10 @@ program
         'apollo-server-express', 'graphql-tools', '@types/minimist', 'graphql',
         '@types/express', '@types/body-parser', '@types/mongodb', '--save'
       ]);
+      npm([
+        'install', '@types/minimist', '@types/express', '@types/body-parser',
+        '@types/mongodb', '--save-dev'
+      ]);
 
       console.log('Create server file');
       if (!existsSync(SERVER_SRC_FOLDER)) {

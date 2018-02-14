@@ -28,7 +28,9 @@ const app = express();
 const projects: Set<string> = setOfUsedCliches(dvConfig);
 projects.add(dvConfig.name);
 
-const dstTable = buildDstTable(dvConfig);
+let dstTable = buildDstTable(dvConfig);
+dstTable = _.mapKeys(dstTable, (unusedValue, k) => `${dvConfig.name}-${k}`);
+
 console.log(`Using dst table ${JSON.stringify(dstTable)}`);
 
 type Dict = {[key: string]: string};
@@ -132,7 +134,7 @@ function setOfUsedCliches(dvConfig: DvConfig): Set<string>{
 
   for (const usedClicheKey of Object.keys(dvConfig.usedCliches)) {
     ret.add(usedClicheKey);
-    for (const usedUsedClicheKey of this.setOfUsedCliches(
+    for (const usedUsedClicheKey of setOfUsedCliches(
       dvConfig.usedCliches[usedClicheKey])) {
       ret.add(usedUsedClicheKey);
     }
@@ -142,13 +144,14 @@ function setOfUsedCliches(dvConfig: DvConfig): Set<string>{
 
 function buildDstTable(dvConfig: DvConfig): {[dst: string]: string} {
   const ret = {};
-  if (dvConfig.config && dvConfig.config.wsPort) {
-    ret[dvConfig.name] = dvConfig.config.wsPort;
-  }
   if (!dvConfig.usedCliches) {
     return ret;
   }
-  const usedClichesDstTable = _.mapKeys(
-    this.buildDstTable(dvConfig.usedCliches), k => `${dvConfig.name}-${k}`);
-  return _.assign(ret, usedClichesDstTable);
+  for (const usedClicheKey of Object.keys(dvConfig.usedCliches)) {
+    const usedCliche = dvConfig.usedCliches[usedClicheKey];
+    const usedClichesDstTable = _.mapKeys(
+      buildDstTable(usedCliche), (unusedValue, k) => `${usedClicheKey}-${k}`);
+    _.assign(ret, usedClichesDstTable, {[usedClicheKey]: usedCliche.config.wsPort});
+  }
+  return ret;
 }

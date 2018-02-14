@@ -6,6 +6,7 @@ import { GATEWAY_URL, DvModule } from 'dv-core';
 import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { ShowGroupMeetingComponent } from './show-group-meeting/show-group-meeting.component';
+import { EventModule } from 'event';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import { ShowGroupMeetingComponent } from './show-group-meeting/show-group-meeti
   ],
   imports: [
     BrowserModule,
-    DvModule
+    DvModule,
+    EventModule
   ],
   providers: [{
     provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'

@@ -221,8 +221,8 @@ program
       }
       
       updatePackage(pkg => {
-        pkg.dependencies['dv-gateway'] = 'file:' + 
-          path.join('..', pkg.dependencies['dv-gateway'].slice('file:'.length));
+        pkg.peerDependencies['dv-gateway'] = 'file:' + 
+          path.join('..', pkg.peerDependencies['dv-gateway'].slice('file:'.length));
         return pkg;
       }, NG_PACKAGR.configFileContents.dest);
       console.log('Done');
