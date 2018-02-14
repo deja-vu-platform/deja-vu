@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef } from '@angular/core';
+import { Component, OnInit, ElementRef, Input } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { GatewayServiceFactory, GatewayService } from 'dv-core';
 import * as _ from 'lodash';
@@ -7,6 +7,8 @@ import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
 import { WeeklyEvent, Event } from '../../../../shared/data';
+
+import { ShowEventComponent } from '../show-event/show-event.component';
 
 
 @Component({
@@ -21,9 +23,17 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
   events: Event[] = [];
   gs: GatewayService;
 
+  @Input() showEvent = ShowEventComponent;
+  @Input() showEventOf;
+  @Input() showEventInputMap;
+  @Input() showEventOutputMap;
+
+  chooseAndShowWeeklyEvent;
+
   constructor(
     private elem: ElementRef, gsf: GatewayServiceFactory) {
     this.gs = gsf.for(elem);
+    this.chooseAndShowWeeklyEvent = this;
   }
 
   ngOnInit() {

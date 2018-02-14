@@ -30,6 +30,9 @@ projects.add(dvConfig.name);
 
 let dstTable = buildDstTable(dvConfig);
 dstTable = _.mapKeys(dstTable, (unusedValue, k) => `${dvConfig.name}-${k}`);
+if (dvConfig.config && dvConfig.config.wsPort) {
+  dstTable[dvConfig.name] = dvConfig.config.wsPort;
+}
 
 console.log(`Using dst table ${JSON.stringify(dstTable)}`);
 

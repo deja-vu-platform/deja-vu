@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'morg-show-group-meeting',
@@ -6,6 +6,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./show-group-meeting.component.css']
 })
 export class ShowGroupMeetingComponent implements OnInit {
+  @Input() groupMeeting;
 
   constructor() { }
 

@@ -21,6 +21,7 @@ import { DvModule } from 'dv-core';
     MatMomentDateModule
   ],
   declarations: [NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent],
+  entryComponents: [ShowEventComponent],
   exports: [NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent]
 })
 export class EventModule { }

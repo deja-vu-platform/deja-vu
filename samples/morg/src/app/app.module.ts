@@ -20,6 +20,7 @@ import { EventModule } from 'event';
     DvModule,
     EventModule
   ],
+  entryComponents: [ShowGroupMeetingComponent],
   providers: [{
     provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'
   }],

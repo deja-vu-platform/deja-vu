@@ -117,7 +117,7 @@ export class IncludeComponent implements AfterViewInit {
     if (fieldMap === undefined) {
       return _.mapValues(valueMap, ({}, key) => key);
     }
-    return valueMap;
+    return fieldMap;
   }
 }
 
