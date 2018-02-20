@@ -9,6 +9,7 @@ import { NewWeeklyEventComponent } from './new-weekly-event/new-weekly-event.com
 import { ChooseAndShowWeeklyEventComponent } from './choose-and-show-weekly-event/choose-and-show-weekly-event.component';
 import { ShowEventComponent } from './show-event/show-event.component';
 import { DvModule } from 'dv-core';
+import { CreateEventComponent } from './create-event/create-event.component';
 
 @NgModule({
   imports: [
@@ -20,7 +21,7 @@ import { DvModule } from 'dv-core';
     MatButtonModule, MatDatepickerModule, MatInputModule, MatSelectModule, MatFormFieldModule,
     MatMomentDateModule
   ],
-  declarations: [NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent],
+  declarations: [NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent, CreateEventComponent],
   entryComponents: [ShowEventComponent],
   exports: [NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent]
 })
