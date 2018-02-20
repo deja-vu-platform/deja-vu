@@ -1,12 +1,18 @@
-import {Widget, Field, PrimitiveAtom} from "client-bus";
+import { Component, Input } from '@angular/core';
 
-import {EventAtom} from "../../shared/data";
+import { WeeklyEvent, Event } from '../../../../shared/data';
 
 
-@Widget({
-  fqelement: "Event"
+@Component({
+  selector: 'event-create-event',
+  templateUrl: './create-event.component.html',
+  styleUrls: ['./create-event.component.css']
 })
-export class NewEventComponent {
-  @Field("Event") event: EventAtom;
-  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+export class CreateEventComponent {
+  @Input() event: Event;
+  @Input() weeklyEvent: WeeklyEvent;
+
+  run(event: Event, weeklyEvent: WeeklyEvent) {
+    // todo
+  }
 }
