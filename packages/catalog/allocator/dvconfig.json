@@ -1,0 +1,5 @@
+{
+  "name": "allocator",
+  "watch": true,
+  "gatewayPort": 3000
+}
