@@ -23,8 +23,9 @@ app LiveScorecard {
 
     // A climber can access his/her account using a climber code and
     // competition code.
-    include access/PasskeyAuthentication [
-        Climber for Passkey
+    // Note: Changed to standard auth
+    include access/StandardAuthentication [
+        Climber for User
     ] as ClimberAuthentication
 
     // A spectator can view the live leaderboard using a competition code.
@@ -45,8 +46,9 @@ app LiveScorecard {
     include organization/Task [
         Climb for Task,
         Host for Assigner,
-        Climber for Assignee
-    ]
+        Climber for Assignee,
+        ShowAndLogClimb replacing ShowTask in ShowAllTasks
+    ] 
 
     // For every competition, there is a set of climbers.
     include organization/Group [
@@ -68,7 +70,7 @@ app LiveScorecard {
 
     data Climber {
         name: text,
-        code: text
+        username: text
     }
 
     data Spectator {
@@ -148,7 +150,7 @@ app LiveScorecard {
     }
 
     widget BuddyLogin {
-        climber: Climber,
+        buddy: Climber,
         on_login_ok: Widget = BuddyHome
     }
 
@@ -166,7 +168,7 @@ app LiveScorecard {
     // A climber can only complete a climb after receiving approval by
     // another climber, NOT a host or the climber him/herself.
     widget ShowAndLogClimb {
-        climb: Climb
+        task: Climb
     }
 
     // Allows the host to create a competition

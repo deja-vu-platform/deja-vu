@@ -90,7 +90,7 @@ body {
 	text-align: right;
 }
 
-a{
+a {
     cursor: pointer;
     text-decoration: none;
 }
@@ -99,6 +99,54 @@ a:hover {
 	text-decoration: none;
 }
 
-.inv-border{
+.inv-border {
 	border: 1px;
+}
+
+.left-space {
+	margin-left: 1em;
+}
+
+.labels {
+	opacity: .9;
+	color: black;
+}
+
+.red {
+	color: #871515;
+}
+
+.edit-status {
+	display: inline;
+}
+
+.others {
+	height: 1.3em;
+	margin-right: .2em;
+	display: inline-block;
+}
+
+.others:hover{
+	opacity:.5;
+	cursor:pointer;
+}
+
+.round-checkbox {
+	cursor: pointer;
+	width: 1.5em;
+	height: 1.5em;
+	top: 0;
+	border: 1px solid #bdc3c7;
+	border-radius: 50%;
+	background-color: white;
+}
+
+.check {
+	height: 2em;
+	margin-top: -1em;
+	margin-left: .2em;
+}
+
+.round-checkbox:hover {
+	background-color: #ecf0f1;
 }
