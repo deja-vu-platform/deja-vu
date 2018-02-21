@@ -1,148 +1,172 @@
-import {Promise} from "es6-promise";
-const graphql = require("graphql");
+import * as minimist from 'minimist';
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+import * as mongodb from 'mongodb';
+import { readFileSync } from 'fs';
+import * as path from 'path';
 
-import {Mean} from "mean-loader";
-import {Helpers} from "helpers";
-import {ServerBus} from "server-bus";
-import {Grafo} from "grafo";
-
-import * as _u from "underscore";
-
-const mean = new Mean();
+const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
+const { makeExecutableSchema } = require('graphql-tools');
 
 
-const handlers = {
-  allocation: {
-    create: Helpers.resolve_create(mean.db, "allocation"),
-    update: Helpers.resolve_update(mean.db, "allocation")
+interface AllocationDoc {
+  id: string;
+  resourceIds: string[];
+}
+
+interface ResourceDoc {
+  id: string;
+  assignedToId: string;
+}
+
+interface ConsumerDoc {
+  id: string;
+}
+
+
+interface Config {
+  wsPort: number;
+  dbHost: string;
+  dbPort: number;
+  dbName: string;
+}
+
+const argv = minimist(process.argv);
+
+const name = argv.as ? argv.as : 'event';
+
+const DEFAULT_CONFIG: Config = {
+  dbHost: 'localhost',
+  dbPort: 27017,
+  wsPort: 3000,
+  dbName: `${name}-db`
+};
+
+let configArg;
+try {
+  configArg = JSON.parse(argv.config);
+} catch (e) {
+  throw new Error(`Couldn't parse config ${argv.config}`);
+}
+
+const config: Config = {...DEFAULT_CONFIG, ...configArg};
+
+console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
+let db;
+mongodb.MongoClient.connect(
+  `mongodb://${config.dbHost}:${config.dbPort}`, (err, client) => {
+    if (err) {
+      throw err;
+    }
+    db = client.db(config.dbName);
+  });
+
+
+const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
+
+const resolvers = {
+  Query: {
+    allocation: (root, { id }) => db.collection('allocations').findOne({ id: id })
   },
-  consumer: {
-    create: Helpers.resolve_create(mean.db, "consumer"),
-    update: Helpers.resolve_update(mean.db, "consumer")
+  Allocation: {
+    id: (allocation: AllocationDoc) => allocation.id,
+    resources: (allocation: AllocationDoc) => db.collection('resources')
+      .find({ id: { $in: allocation.resourceIds } }).toArray()
   },
-  resource: {
-    create: Helpers.resolve_create(mean.db, "resource"),
-    update: Helpers.resolve_update(mean.db, "resource")
+  Resource: {
+    id: (resource: ResourceDoc) => resource.id,
+    assignedTo: (resource: ResourceDoc) => {
+      if (resource.assignedToId === undefined) {
+        // todo: need to lock until this is done
+        // Trigger round-robin allocation
+        return db.collection('allocations')
+          .findOne({resourceIds: resource.id})
+          .then((allocation: AllocationDoc) => db.collection('consumers')
+            .find()
+            .toArray()
+            .then((consumers: ConsumerDoc[]) => {
+              let assignedTo = '';
+              const updates: Promise<any>[] = [];
+
+              let currentConsumerIndex = 0;
+              for (const resourceId of allocation.resourceIds) {
+                const c = consumers[currentConsumerIndex];
+                console.log(`Allocating ${resourceId} to ${c.id}`);
+                if (resourceId === resource.id) {
+                  assignedTo = c.id;
+                }
+                updates.push(
+                  db.collection('resources')
+                    .updateOne({id: resourceId},
+                               {$set: {assignedToId: c.id}}));
+                currentConsumerIndex = (
+                  currentConsumerIndex + 1) % consumers.length;
+              }
+              return Promise.all(updates)
+                .then(_ => db.collection('consumers')
+                    .findOne({id: assignedTo}));
+            }));
+      } else {
+        return db.collection('consumers')
+          .findOne({id: resource.assignedToId});
+      }
+    }
+  },
+  Consumer: {
+    id: (consumer: ConsumerDoc) => consumer.id
+  },
+  Mutation: {
+    editConsumer: (root, {resourceId, newConsumerId}) => {
+      return Promise
+        .all([
+          Validation.resourceExists(resourceId),
+          Validation.consumerExists(newConsumerId)
+        ])
+        .then(unused => {
+          const updateOp = { $set: { 'assignedToId': newConsumerId } };
+          return db.collection('resources')
+            .updateOne({ id: resourceId }, updateOp)
+            .then(_ => true);
+      });
+    }
   }
 };
 
-const bus = new ServerBus(
-    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
-
-
-//////////////////////////////////////////////////
-
-const grafo = new Grafo(mean.db);
-
-const schema = grafo
-  .add_type({
-    name: "Allocation",
-    fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      resources: {"type": "[Resource]"}
-    }
-  })
-  .add_type({
-    name: "Consumer",
-    fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      name: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
-    }
-  })
-  .add_type({
-    name: "Resource",
-    fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      assigned_to: {
-        "type": "Consumer",
-        resolve: (resource) => {
-          if (resource.assigned_to === undefined) {
-            // todo: need to lock until this is done
-            // Trigger round-robin allocation
-            return mean.db.collection("allocations")
-              .findOne({resources: {atom_id: resource.atom_id}})
-              .then(allocation => mean.db.collection("consumers")
-                .find()
-                .toArray()
-                .then(consumers => {
-                  let assigned_to = "";
-                  const updates = [];
-
-                  let current_consumer_index = 0;
-                  _u.each(allocation.resources, (r: any) => {
-                    const c = consumers[current_consumer_index];
-                    console.log(`Allocating ${r.atom_id} to ${c.atom_id}`)
-                    if (r.atom_id === resource.atom_id) {
-                      assigned_to = c.atom_id;
-                    }
-                    updates.push(
-                      mean.db.collection("resources")
-                        .updateOne({atom_id: r.atom_id},
-                                   {$set: {assigned_to: {atom_id: c.atom_id}}}));
-                    current_consumer_index = (
-                      current_consumer_index + 1) % consumers.length;
-                  });
-                return Promise.all(updates)
-                  .then(_ => mean.db.collection("consumers")
-                      .findOne({atom_id: assigned_to}));
-              }));
-          } else {
-            return mean.db.collection("consumers")
-              .findOne({atom_id: resource.assigned_to.atom_id});
-          }
-        }
-      }
-    }
-  })
-  .add_mutation({
-    name: 'editChampion',
-    type: graphql.GraphQLBoolean,
-    args: {
-      resource_atom_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
-      champion_atom_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
-    },
-    resolve: (_, {resource_atom_id, champion_atom_id}) => Promise
-      .all([
-        Validation.resourceExists(resource_atom_id),
-        Validation.consumerExists(champion_atom_id)
-      ])
-      .then(consumer => {
-        let updateOp = { $set: { "assigned_to.atom_id": champion_atom_id } };
-        return mean.db.collection("resources")
-          .updateOne(
-            { atom_id: resource_atom_id },
-            updateOp,
-        )
-        .then(_ => bus.update_atom("Resource", resource_atom_id, updateOp))
-        .then(_ => true);
-    })
-  })
-  .schema();
-
 namespace Validation {
-  export function resourceExists(resource_atom_id) {
-    return mean.db.collection("resources")
-      .findOne({ atom_id: resource_atom_id })
-      .then(resource => {
+  export function resourceExists(resourceId: string) {
+    return db.collection('resources')
+      .findOne({ id: resourceId })
+      .then((resource: ResourceDoc) => {
         if (!resource) {
-          throw new Error(`Resource ${resource_atom_id} not found`);
+          throw new Error(`Resource ${resourceId} not found`);
         }
         return resource;
-      })
+      });
   }
 
-  export function consumerExists(champion_atom_id) {
-    return mean.db.collection("consumers")
-      .findOne({ atom_id: champion_atom_id })
-      .then(consumer => {
+  export function consumerExists(consumerId) {
+    return db.collection('consumers')
+      .findOne({ id: consumerId })
+      .then((consumer: ConsumerDoc) => {
         if (!consumer) {
-          throw new Error(`Consumer ${champion_atom_id} not found`);
+          throw new Error(`Consumer ${consumerId} not found`);
         }
         return consumer;
-      })
+      });
   }
 }
 
-Helpers.serve_schema(mean.ws, schema);
+const schema = makeExecutableSchema({ typeDefs, resolvers });
 
-grafo.init().then(_ => mean.start());
+
+const app = express();
+
+app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
+  extended: true
+}), graphqlExpress({ schema }));
+
+app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+
+app.listen(config.wsPort, () => {
+  console.log(`Running ${name} with config ${JSON.stringify(config)}`);
+});

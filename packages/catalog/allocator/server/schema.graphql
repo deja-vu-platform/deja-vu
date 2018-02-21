@@ -1,0 +1,21 @@
+type Allocation {
+  id: ID!
+  resources: [Resource]
+}
+
+type Resource {
+  id: ID!
+  assignedTo: Consumer
+}
+
+type Consumer {
+  id: ID!
+}
+
+type Query {
+  allocation(id: ID!): Allocation`
+}
+
+type Mutation {
+  editConsumer(resourceId: ID!, newConsumerId: ID!) : Boolean
+}
