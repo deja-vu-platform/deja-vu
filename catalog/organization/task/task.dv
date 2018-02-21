@@ -99,4 +99,10 @@ cliche Task {
   widget ShowApprovedTasks uses ShowTask {
     assignee: Assignee 
   }
+
+  // Shows all tasks assigned to an assignee, regardless of 
+  // completing or approval
+  widget ShowAllTasks uses ShowTask {
+    assignee: Assignee
+  }
 }
