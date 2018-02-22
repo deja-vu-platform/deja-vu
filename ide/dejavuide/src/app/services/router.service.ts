@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Project } from '../models/project/project';
+import { Project } from '../../models/project/project';
 import { Router } from '@angular/router';
 // BehaviorSubject as opposed to Subject since we want an initial value right
 // upon subscription

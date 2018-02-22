@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { NgZone} from '@angular/core';
 declare const electron: any;
 
-import { Project } from '../models/project/project';
+import { Project } from '../../models/project/project';
 
 @Injectable()
 export class CommunicatorService {

@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 // upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Project } from '../models/project/project';
-import { Widget, UserWidget } from '../models/widget/widget';
-import { UserCliche } from '../models/cliche/cliche';
+import { Project } from '../../models/project/project';
+import { Widget, UserWidget } from '../../models/widget/widget';
+import { UserCliche } from '../../models/cliche/cliche';
 
 @Injectable()
 export class ProjectService {
