@@ -1,4 +1,5 @@
-import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
+import { generateId, shallowCopy, removeFirstFromArray } from '../../utility/utility';
+import { some } from 'lodash/collection';
 import { Widget } from '../widget/widget';
 
 export enum ClicheType {
@@ -148,7 +149,7 @@ export class UserCliche extends Cliche {
   }
 
   isPage(widgetId: string): boolean {
-    return inArray(widgetId, this.fields.pageIds);
+    return some(this.fields.pageIds, widgetId);
   }
 
   numPages(): number {

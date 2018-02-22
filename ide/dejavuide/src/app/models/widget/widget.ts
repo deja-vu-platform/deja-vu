@@ -2,11 +2,13 @@
 // upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { generateId, shallowCopy, inArray, removeFirstFromArray } from '../../utility/utility';
+import { generateId, shallowCopy, removeFirstFromArray } from '../../utility/utility';
+
 import { Dimensions, Position } from '../../services/state.service';
 import { getDefaultDimensions, getIconLocation } from './widget.settings';
 import { UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
+import { some } from 'lodash/collection';
 
 const INCORRECT_TYPE = 'The object is not the correct type for this operation';
 
@@ -253,7 +255,7 @@ export abstract class Widget {
    * @param widgetId widget to check.
    */
   isDerivedFromTemplate(widgetId: string) {
-    return this.fields.isTemplate && inArray(widgetId, this.fields.templateCopies);
+    return this.fields.isTemplate && some(this.fields.templateCopies, widgetId);
   }
 
   getInnerWidgetIds(): string[] {

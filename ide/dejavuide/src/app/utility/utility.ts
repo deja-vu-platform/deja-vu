@@ -9,10 +9,6 @@ export function shallowCopy(obj: any): any {
   return JSON.parse(JSON.stringify(obj || {}));
 }
 
-export function inArray(val, arr) {
-  return (arr.indexOf(val) >= 0);
-}
-
 export function removeFirstFromArray(val, arr) {
   const index = arr.indexOf(val);
   if (index >= 0) {

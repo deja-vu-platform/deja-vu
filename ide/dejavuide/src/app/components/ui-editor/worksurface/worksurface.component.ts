@@ -7,7 +7,7 @@ import { Cliche } from '../../../models/cliche/cliche';
 import { Dimensions, Position, StateService } from '../../../services/state.service';
 import { ProjectService } from '../../../services/project.service';
 
-import { inArray } from '../../../utility/utility';
+import { some } from 'lodash/collection';
 
 import * as jQuery from 'jquery';
 import 'jquery-ui-dist/jquery-ui';
@@ -69,7 +69,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedWidgetId = selectedWidget.getId();
 
       const activeWidgetIds = this.activeWidgets.map(widget => widget.getId());
-      const alreadyAdded = inArray(this.selectedWidgetId, activeWidgetIds);
+      const alreadyAdded = some(activeWidgetIds, this.selectedWidgetId);
 
       if (!alreadyAdded) {
         this.activeWidgets.push(selectedWidget);
@@ -156,7 +156,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
       } else {
         // it must be an unused widget or an already added widget
         const alreadyAdded =
-          inArray(widget.getId(), selectedWidget.getInnerWidgetIds());
+          some(selectedWidget.getInnerWidgetIds(), widget.getId());
 
         if (alreadyAdded) {
           widget.updatePosition(this.oldWidgetNewPosition(ui));

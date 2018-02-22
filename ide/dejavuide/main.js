@@ -7,6 +7,7 @@ var app = electron.app;  // Module to control application life.
 var BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 var ipcMain = electron.ipcMain;
 
+// file extension to save projects
 var DV_EXT = 'dvp';
 
 // Angular and electron help from https://scotch.io/tutorials/build-a-music-player-with-angular-2-electron-i-setup-basics-concepts
@@ -33,9 +34,10 @@ function createWindow() {
   
   // start out with clean local storage
   ses.clearStorageData({storages: 'localstorage'}, function () {
+    // if it is the release environment
     if (process.env.PACKAGE === 'true') {
       mainWindow.loadURL(`file://${__dirname}/dist/index.html`);
-    } else {
+    } else { // if development environment
       // and load the index.html of the app from where angular serves it.
       mainWindow.loadURL(process.env.HOST);
       // Open the DevTools.
