@@ -1,4 +1,6 @@
-<div class="panel panel-default display-component"
+<!-- TODO this way there is no default currently; should be panel-default -->
+<div class="panel"
+  [ngClass]="class | async"
   *ngIf="widget.getValue(); let value">
   <div class="panel-heading">
     <h3 class="panel-title">{{value.heading}}</h3>

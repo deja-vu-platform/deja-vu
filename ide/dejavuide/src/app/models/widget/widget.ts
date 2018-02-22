@@ -48,6 +48,7 @@ interface WidgetFields {
 
   styles?: {
     css?: any;
+    class?: any;
   };
 
   isTemplate?: boolean;
@@ -278,6 +279,15 @@ export abstract class Widget {
   updatePosition(newPosition: Position) {
     this.fields.position = shallowCopy(newPosition);
     this.position.next(this.fields.position);
+  }
+
+  getBootstrapClass() {
+    return this.fields.styles.class;
+  }
+
+  setBootstrapClass(className: string) {
+    this.fields.styles.class = className;
+    this.styles.next(this.fields.styles);
   }
 
   updateCustomStyle(styleName: string, value) {

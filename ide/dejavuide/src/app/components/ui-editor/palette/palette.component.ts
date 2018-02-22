@@ -16,11 +16,6 @@ const PALETTE_SIZE = 4;
   styleUrls: ['./palette.component.css'],
 })
 export class PaletteComponent implements OnDestroy {
-  // possible sources http://jscolor.com/, http://www.w3schools.com/colors/colors_picker.asp
-  // http://jscolor.com/examples/
-
-
-  // pickerObject = new jscolor($('<div>')[0]); // Needs an object to bind to
   palette = [];
   currentColors = [];
 
@@ -37,18 +32,14 @@ export class PaletteComponent implements OnDestroy {
   }
 
   addNewColorToCurrentColors (color, idx?) {
-    // if real color;
-    // const realColor = this.pickerObject.fromString(color); // returns true if it's a real color string
-    if (true /*realColor*/) {
-      if (idx || idx === 0) { // index given
-        if (idx >= 0 && idx < this.currentColors.length) {
-          this.currentColors[idx] = color;
-        }
-      } else {
-        this.currentColors.push(color);
-        if (this.currentColors.length > PALETTE_SIZE) {
-          this.currentColors.shift(); // keeping a max size
-        }
+    if (idx || idx === 0) { // index given
+      if (idx >= 0 && idx < this.currentColors.length) {
+        this.currentColors[idx] = color;
+      }
+    } else {
+      this.currentColors.push(color);
+      if (this.currentColors.length > PALETTE_SIZE) {
+        this.currentColors.shift(); // keeping a max size
       }
     }
   }
@@ -75,14 +66,10 @@ export class PaletteComponent implements OnDestroy {
   colorPicked(index, event) {
     // TODO updating this.palette refreshes the cells, which unselects them
     // this is probably not desired behavior
-
-    // console.log('color picked', event);
-    // this.palette[index] = event;
-    // this.savePalette(); // TODO fixme
   }
 
   private savePalette() {
-    // userApp.properties.palette = JSON.parse(JSON.stringify(this.palette));
+    // TODO
   }
 
   ngOnDestroy() {

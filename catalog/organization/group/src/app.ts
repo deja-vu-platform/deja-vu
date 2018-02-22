@@ -1,13 +1,13 @@
 const graphql = require("graphql");
 
-import {Mean} from "mean-loader";
-import {Helpers} from "helpers";
-import {ServerBus} from "server-bus";
-import {Grafo} from "grafo";
+import { Mean } from "mean-loader";
+import { Helpers } from "helpers";
+import { ServerBus } from "server-bus";
+import { Grafo } from "grafo";
 
 import * as _u from "underscore";
 
-import {Member, Group} from "./_shared/data";
+import { Member, Group } from "./_shared/data";
 
 const uuid = require("uuid");
 
@@ -25,7 +25,7 @@ const handlers = {
 };
 
 const bus = new ServerBus(
-    mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
+  mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
 
 //////////////////////////////////////////////////
 
@@ -35,17 +35,17 @@ const schema = grafo
   .add_type({
     name: "Member",
     fields: {
-      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      name: {"type": graphql.GraphQLString}
+      atom_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      name: { "type": graphql.GraphQLString }
     }
   })
   .add_type({
     name: "Group",
     fields: {
-      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      name: {"type": graphql.GraphQLString},
-      members: {"type": "[Member]"},
-      subgroups: {"type": "[Group]"}
+      atom_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      name: { "type": graphql.GraphQLString },
+      members: { "type": "[Member]" },
+      subgroups: { "type": "[Group]" }
     }
   })
 
@@ -54,7 +54,7 @@ const schema = grafo
     name: "createGroup",
     type: graphql.GraphQLString,
     args: {},
-    resolve: (_, {}) => {
+    resolve: (_, { }) => {
       let newGroup = {
         atom_id: uuid.v4(),
         name: "",
@@ -72,11 +72,13 @@ const schema = grafo
   .add_mutation({
     name: "createMember",
     type: graphql.GraphQLString,
-    args: {},
-    resolve: (_, {}) => {
+    args: {
+      name: { "type": graphql.GraphQLString }
+    },
+    resolve: (_, { name }) => {
       let newMember = {
-        atom_id: uuid.v4(),
-        name: ""
+        "atom_id": uuid.v4(),
+        "name": name
       };
       return mean.db.collection("members")
         .insertOne(newMember)
@@ -90,9 +92,9 @@ const schema = grafo
     name: "membersByGroup",
     type: "[Member]",
     args: {
-      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      group_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {group_id}) => {
+    resolve: (_, { group_id }) => {
       const found_members: Set<string> = new Set();
 
       return forEachGroupInGroup(group_id, (group: Group) => {
@@ -103,7 +105,7 @@ const schema = grafo
         .then(() => {
           const IDs = Array.from(found_members);
           return mean.db.collection("members")
-            .find({atom_id: {$in: IDs}})
+            .find({ atom_id: { $in: IDs } })
             .toArray();
         });
     }
@@ -114,9 +116,9 @@ const schema = grafo
     name: "subgroupsByGroup",
     type: "[Group]",
     args: {
-      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      group_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {group_id}) => {
+    resolve: (_, { group_id }) => {
       const outputArr: Group[] = [];
 
       return forEachGroupInGroup(group_id, (group: Group) => {
@@ -133,9 +135,9 @@ const schema = grafo
     name: "groupsByDirectMember",
     type: "[Group]",
     args: {
-      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      member_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {member_id}) => {
+    resolve: (_, { member_id }) => {
       return getGroupsByDirectMember(member_id);
     }
   })
@@ -145,9 +147,9 @@ const schema = grafo
     name: "groupsByDirectSubgroup",
     type: "[Group]",
     args: {
-      subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      subgroup_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {subgroup_id}) => {
+    resolve: (_, { subgroup_id }) => {
       return getGroupsByDirectSubgroup(subgroup_id);
     }
   })
@@ -157,9 +159,9 @@ const schema = grafo
     name: "groupsByMember",
     type: "[Group]",
     args: {
-      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      member_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {member_id}) => {
+    resolve: (_, { member_id }) => {
       const outputArr: Group[] = [];
 
       return forEachGroupContainingMember(member_id, (group: Group) => {
@@ -174,9 +176,9 @@ const schema = grafo
     name: "groupsBySubgroup",
     type: "[Group]",
     args: {
-      subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      subgroup_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {subgroup_id}) => {
+    resolve: (_, { subgroup_id }) => {
       const outputArr: Group[] = [];
 
       return forEachGroupContainingGroup(subgroup_id, (group: Group) => {
@@ -191,10 +193,10 @@ const schema = grafo
     name: "renameGroup",
     type: graphql.GraphQLBoolean,
     args: {
-      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      name: {"type": graphql.GraphQLString}
+      group_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      name: { "type": graphql.GraphQLString }
     },
-    resolve: (_, {group_id, name}) => {
+    resolve: (_, { group_id, name }) => {
       return renameMemberOrGroup(group_id, name, "Group");
     }
   })
@@ -204,10 +206,10 @@ const schema = grafo
     name: "renameMember",
     type: graphql.GraphQLBoolean,
     args: {
-      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      name: {"type": graphql.GraphQLString}
+      member_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      name: { "type": graphql.GraphQLString }
     },
-    resolve: (_, {member_id, name}) => {
+    resolve: (_, { member_id, name }) => {
       return renameMemberOrGroup(member_id, name, "Member");
     }
   })
@@ -217,10 +219,10 @@ const schema = grafo
     name: "addMemberToGroup",
     type: graphql.GraphQLBoolean,
     args: {
-      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      group_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      member_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {group_id, member_id}) => {
+    resolve: (_, { group_id, member_id }) => {
       return addOrRemoveMemberOrSubgroup(
         group_id, member_id, "members", "$addToSet"
       );
@@ -232,10 +234,10 @@ const schema = grafo
     name: "removeMemberFromGroup",
     type: graphql.GraphQLBoolean,
     args: {
-      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      member_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      group_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      member_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {group_id, member_id}) => {
+    resolve: (_, { group_id, member_id }) => {
       return addOrRemoveMemberOrSubgroup(
         group_id, member_id, "members", "$pull"
       );
@@ -247,10 +249,10 @@ const schema = grafo
     name: "addSubgroupToGroup",
     type: graphql.GraphQLBoolean,
     args: {
-      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      group_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      subgroup_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {group_id, subgroup_id}) => {
+    resolve: (_, { group_id, subgroup_id }) => {
       return addOrRemoveMemberOrSubgroup(
         group_id, subgroup_id, "subgroups", "$addToSet"
       );
@@ -262,10 +264,10 @@ const schema = grafo
     name: "removeSubgroupFromGroup",
     type: graphql.GraphQLBoolean,
     args: {
-      group_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
-      subgroup_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)}
+      group_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) },
+      subgroup_id: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
     },
-    resolve: (_, {group_id, subgroup_id}) => {
+    resolve: (_, { group_id, subgroup_id }) => {
       return addOrRemoveMemberOrSubgroup(
         group_id, subgroup_id, "subgroups", "$pull"
       );
@@ -277,14 +279,14 @@ const schema = grafo
 // gets all groups directly containing the member with given atom_id
 function getGroupsByDirectMember(member_id: string): Promise<Group[]> {
   return mean.db.collection("groups")
-    .find({members: {atom_id: member_id}})
+    .find({ members: { atom_id: member_id } })
     .toArray();
 }
 
 // gets all groups directly containing the subgroup with given atom_id
 function getGroupsByDirectSubgroup(subgroup_id: string): Promise<Group[]> {
   return mean.db.collection("groups")
-    .find({subgroups: {atom_id: subgroup_id}})
+    .find({ subgroups: { atom_id: subgroup_id } })
     .toArray();
 }
 
@@ -295,13 +297,13 @@ function forEachGroupInGroup(
   group_id: string,
   groupVisitFn: (group: Group) => void
 ): Promise<void> {
-  const recurse = function(
+  const recurse = function (
     group_id: string,
     groupVisitFn: (group: Group) => void,
     visitedGroups: Set<string> = new Set([group_id])
   ) {
     return mean.db.collection("groups")
-      .findOne({atom_id: group_id})
+      .findOne({ atom_id: group_id })
       .then(group => {
         groupVisitFn(group);
         const recursiveCalls: Promise<void>[] = [];
@@ -313,7 +315,7 @@ function forEachGroupInGroup(
             );
           }
         });
-        return Promise.all(recursiveCalls).then(() => {});
+        return Promise.all(recursiveCalls).then(() => { });
       });
   }
   return recurse(group_id, groupVisitFn, new Set([group_id]));
@@ -327,7 +329,7 @@ function _groupContainingRecurse(
   visitedGroups: Set<string>
 ): Promise<void> {
   return mean.db.collection("groups")
-    .find({subgroups: {atom_id: group_id}})
+    .find({ subgroups: { atom_id: group_id } })
     .toArray()
     .then(groups => {
       const recursiveCalls: Promise<void>[] = [];
@@ -340,7 +342,7 @@ function _groupContainingRecurse(
           );
         }
       });
-      return Promise.all(recursiveCalls).then(() => {});
+      return Promise.all(recursiveCalls).then(() => { });
     });
 }
 
@@ -373,7 +375,7 @@ function forEachGroupContainingMember(
         _groupContainingRecurse(group.atom_id, groupVisitFn, visitedGroups)
       ));
     })
-    .then(_ => {});
+    .then(_ => { });
 };
 
 // does an update to add/remove a member/subgroup from a group
@@ -385,15 +387,15 @@ function addOrRemoveMemberOrSubgroup(
   group_field: string,
   operation: string
 ): Promise<boolean> {
-  const queryObj = {atom_id: group_id};
-  const updateObj = {[operation]: {[group_field]: {atom_id: child_id}}};
+  const queryObj = { atom_id: group_id };
+  const updateObj = { [operation]: { [group_field]: { atom_id: child_id } } };
 
   return Promise
     .all([
       mean.db.collection("groups").updateOne(queryObj, updateObj),
       bus.update_atom("Group", group_id, updateObj)
     ])
-    .then(arr  => arr[0].modifiedCount && arr[1]);
+    .then(arr => arr[0].modifiedCount && arr[1]);
 }
 
 // renames entitiy with atom_id to name
@@ -403,8 +405,8 @@ function renameMemberOrGroup(
   name: string,
   type: string
 ): Promise<boolean> {
-  const queryObj = {atom_id: atom_id};
-  const updateObj = {$set: {name: name}};
+  const queryObj = { atom_id: atom_id };
+  const updateObj = { $set: { name: name } };
 
   const typeCollectionMap = {
     Member: "members",
@@ -443,7 +445,7 @@ grafo.init().then(_ => {
       .insertMany([
         {
           atom_id: "1",
-          members: [{atom_id: "1"}, {atom_id: "2"}],
+          members: [{ atom_id: "1" }, { atom_id: "2" }],
           name: "SDG"
         }
       ], (err, res) => {

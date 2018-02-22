@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { UiEditorComponent } from './ui-editor.component';
-import { ZoomModule } from './zoom/zoom.module';
+import { UiEditorZoomModule } from './ui-editor-zoom/ui-editor-zoom.module';
 import { MapModule } from './map/map.module';
 import { WorkSurfaceModule } from './worksurface/worksurface.module';
 import { ListModule } from './list/list.module';
@@ -14,7 +14,7 @@ import { PaletteModule } from './palette/palette.module';
   ],
   imports: [
     BrowserModule,
-    ZoomModule,
+    UiEditorZoomModule,
     MapModule,
     WorkSurfaceModule,
     ListModule,

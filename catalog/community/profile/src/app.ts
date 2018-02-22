@@ -28,8 +28,8 @@ const schema = grafo
   .add_type({
     name: "Profile",
     fields: {
-      atom_id: {"type": graphql.GraphQLString},
-      username: {"type": graphql.GraphQLString},
+      atom_id: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
       first_name: {"type": graphql.GraphQLString},
       last_name: {"type": graphql.GraphQLString},
       email: {"type": graphql.GraphQLString},
@@ -68,21 +68,32 @@ const schema = grafo
   })
   .add_mutation({
     name: "updateProfile",
-    type: "Profile",
+    type: graphql.GraphQLBoolean,
     args: {
-      updatedProfile: {"type": "Profile"}
+      username: {"type": new graphql.GraphQLNonNull(graphql.GraphQLString)},
+      first_name: {"type": graphql.GraphQLString},
+      last_name: {"type": graphql.GraphQLString},
+      email: {"type": graphql.GraphQLString},
+      phone: {"type": graphql.GraphQLString},
+      birthday: {"type": graphql.GraphQLString}
     },
-    resolve: (_, {updatedProfile}) => {
-      return Validation.userExists(updatedProfile.username).then(profile => {
-        const updateOperation = {$set: updatedProfile};
+    resolve: (_, {username, first_name, last_name, email, phone, birthday}) => {
+      return Validation.userExists(username).then(profile => {
+        const setObj = {};
+        if (first_name || first_name === "") setObj["first_name"] = first_name;
+        if (last_name || last_name === "") setObj["last_name"] = last_name;
+        if (email || email === "") setObj["email"] = email;
+        if (phone || phone === "") setObj["phone"] = phone;
+        if (birthday || birthday === "") setObj["birthday"] = birthday;
+        const updateOperation = {$set: setObj};
         return mean.db.collection("profiles")
           .updateOne({atom_id: profile.atom_id}, updateOperation)
           .then(write_res => {
               if (write_res.modifiedCount !== 1) {
-                throw new Error("Couldn't save updated profile");
+                throw new Error("Couldn't save updated profile or there were no changes to be saved");
               }
-              bus.update_atom("Profile", updatedProfile.atom_id, updateOperation);
-              return updatedProfile;
+              bus.update_atom("Profile", profile.atom_id, updateOperation);
+              return true;
             });
       })
     }
@@ -112,5 +123,9 @@ namespace Validation {
 Helpers.serve_schema(mean.ws, schema);
 
 grafo.init().then(_ => {
+  mean.db.collection("profiles").insertMany([
+      {atom_id: "ben", username: "ben", first_name: "ben", last_name: "bit"},
+      {atom_id: "aph", username: "aph", first_name: "alyssa", last_name: "hacker"}],
+      (err, res) => { if (err) throw err; });
   mean.start();
 });

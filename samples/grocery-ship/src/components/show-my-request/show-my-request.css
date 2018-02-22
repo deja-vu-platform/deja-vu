@@ -1,0 +1,36 @@
+/* General tile styling */
+.tile-icon img {
+  height: 40px;
+  display: block;
+  margin: 0;
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+.tile p {
+  margin-bottom: 15px;
+  word-wrap: break-word;
+  line-height: 1.25;
+}
+
+.tile-title, .tile-subtitle, .request-tile-content {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.tile {
+  text-align: left;
+  height: 165px;
+  z-index: 200; /*high enough for each request to be above the previous request, but low enough to be darkened when there is an open modal*/
+}
+
+.tile-content {
+  line-height: 2.5ex;
+  height: 5ex;
+  vertical-align: center;
+}
+
+.tile:hover{
+  background-color: rgba(22, 160, 133,0.25);
+}

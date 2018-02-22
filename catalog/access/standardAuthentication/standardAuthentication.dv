@@ -11,7 +11,9 @@ cliche StandardAuthentication {
   // and redirected to the given widget. No redirect happens if `on_register_ok`
   // is undefined.
   widget RegisterWithRedirect {
-    on_register_ok: Widget
+    user: User,
+    on_register_ok: Widget,
+    submit_ok: boolean
   }
 
   // Shows a sign in form. After a successful sign in, the user is redirected

@@ -1,0 +1,9 @@
+<fieldset class="form-group">
+  <label class="sr-only" for="birthday">Birthday</label>
+  <input type="date" required class="form-control" name="birthday"
+   [(ngModel)]="profile.birthday" ngControl="birthday" placeholder="Birthday"/>
+  <div id="edit-profile-birthday-status" class="alert alert-danger"
+   [hidden]="!edit_birthday_error">
+    Update failed.
+  </div>
+</fieldset>

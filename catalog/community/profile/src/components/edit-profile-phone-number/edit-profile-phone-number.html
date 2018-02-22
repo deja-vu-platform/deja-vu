@@ -1,0 +1,9 @@
+<fieldset class="form-group">
+  <label class="sr-only" for="phone-number">Phone Number</label>
+  <input type="tel" required class="form-control" name="phone-number"
+   [(ngModel)]="profile.phone" ngControl="phone-number" placeholder="Phone Number"/>
+  <div id="edit-profile-phone-number-status" class="alert alert-danger"
+   [hidden]="!edit_phone_number_error">
+    Update failed.
+  </div>
+</fieldset>

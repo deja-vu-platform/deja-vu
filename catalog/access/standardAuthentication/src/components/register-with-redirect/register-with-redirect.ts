@@ -2,11 +2,11 @@ import {GraphQlService} from "gql";
 import {Widget, ClientBus, Field, PrimitiveAtom, WidgetValue} from "client-bus";
 import {UserAtom} from "../shared/data";
 
-
 @Widget({fqelement: "StandardAuthentication", ng2_providers: [GraphQlService]})
 export class RegisterWithRedirectComponent {
   @Field("User") user: UserAtom;
   @Field("Widget") on_register_ok: PrimitiveAtom<WidgetValue>;
+  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
 
   reenter_password = "";
   username_error = false;
@@ -25,8 +25,11 @@ export class RegisterWithRedirectComponent {
         register(
           username: "${this.user.username}", password: "${this.user.password}")
       `)
+      .map(data => data.register)
       .subscribe(
-        _ => {
+        atom_id => {
+          this.user.atom_id = atom_id;
+          this.submit_ok.value = true;
           return this._graphQlService
             .post(`
               signIn(
@@ -41,11 +44,13 @@ export class RegisterWithRedirectComponent {
                 localStorage.setItem("id_token", authToken);
                 localStorage.setItem("username", this.user.username);
                 localStorage.setItem("atom_id", authUser.atom_id);
-                this._client_bus.navigate(this.on_register_ok.value);
+                if (this.on_register_ok.value)
+                  this._client_bus.navigate(this.on_register_ok.value);
               });
-        },
-        err => {
+        }
+        ,err => {
           this.username_error = true;
-        });
+        }
+    );
   }
 }

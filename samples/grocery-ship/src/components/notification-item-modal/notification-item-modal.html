@@ -1,0 +1,45 @@
+<!-- modal to show more request details; should appear when the notification is clicked -->
+<!-- currently doesn't work well because the javascript needs to be modified so that this modal won't pop up with the accept or the reject or the deliver modal -->
+<div id="notification-modal-{{task.atom_id}}" class="notification-item-modal modal fade" role="dialog">
+  <div class="modal-messages"></div>
+  <div class="modal-dialog modal-xs">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 class="modal-title">Request Details</h3>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+          <tbody>
+            <tr>
+              <dv-widget name="ShowCompoundTransaction" of="Market" [init]="{compoundTransaction: task}"></dv-widget>
+            </tr>
+            <tr>
+              <th>Deadline</th>
+              <td>{{task.expiration_date}}</td>
+            </tr>
+            <tr>
+              <th>Pickup Location</th>
+              <td>MIT</td>
+            </tr>
+            <tr>
+              <th>Pickup Time</th>
+              <td><dv-widget name="ShowEvent" of="Event"></dv-widget></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="task.assigner.atom_id == user.atom_id">
+          Shopper:
+          <dv-widget name="ShowContactInformation" of="Profile" [init]="{profile: task.assignee}"></dv-widget>
+          <dv-widget name="ShowAverageRating" of="Rating" [init]="{target: task.assignee}"></dv-widget>
+        </div>
+        <div *ngIf="task.assigner.atom_id != user.atom_id">
+          Requester:
+          <dv-widget name="ShowContactInformation" of="Profile" [init]="{profile: task.assigner}"></dv-widget>
+          <dv-widget name="ShowAverageRating" of="Rating" [init]="{target: task.assigner}"></dv-widget>
+        </div>
+      </div>     
+    </div>
+  </div>
+</div>

@@ -8,7 +8,7 @@ dv-map {
   width: 180px;
 }
 
-dv-zoom {
+#dv-ui-editor-zoom {
   position: fixed;
   bottom: 20px;
   right: 15px;
