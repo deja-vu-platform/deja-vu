@@ -1,14 +1,14 @@
 'use strict';
-var fs = require('fs');
-var path = require('path');
+const fs = require('fs');
+const path = require('path');
 
-var electron = require('electron');
-var app = electron.app;  // Module to control application life.
-var BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
-var ipcMain = electron.ipcMain;
+const electron = require('electron');
+const app = electron.app;  // Module to control application life.
+const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
+const ipcMain = electron.ipcMain;
 
 // file extension to save projects
-var DV_EXT = 'dvp';
+const DV_EXT = 'dvp';
 
 // Angular and electron help from https://scotch.io/tutorials/build-a-music-player-with-angular-2-electron-i-setup-basics-concepts
 require('dotenv').config();
@@ -17,7 +17,7 @@ require('dotenv').config();
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var mainWindow = null;
+let mainWindow = null;
 
 function createWindow() {
   // Create the browser window.
@@ -30,7 +30,7 @@ function createWindow() {
     // icon: `file://${__dirname}/dist/assets/logo.png`
   });
   
-  var ses = mainWindow.webContents.session;
+  const ses = mainWindow.webContents.session;
   
   // start out with clean local storage
   ses.clearStorageData({storages: 'localstorage'}, function () {
@@ -83,7 +83,7 @@ app.on('activate', function () {
 // The projects are currently stored at the root of the app.
 // TODO have an option to allow users to put in where they want
 // their projects saved. 
-var projectsSavePath = path.join(__dirname, 'projects');
+const projectsSavePath = path.join(__dirname, 'projects');
 
 try {
   fs.accessSync(projectsSavePath, fs.F_OK);
@@ -113,7 +113,7 @@ ipcMain.on('delete', function (event, args) {
 });
 
 ipcMain.on('save', function (event, args) {
-  var filename = projectNameToFilename(args.projectName);
+  const filename = projectNameToFilename(args.projectName);
   saveObjectToFile(projectsSavePath, filename, args.projectContents, function (err) {
     if (err) {
       console.log(err);
@@ -125,7 +125,7 @@ ipcMain.on('save', function (event, args) {
 
 // from http://stackoverflow.com/questions/10049557/reading-all-files-in-a-directory-store-them-in-objects-and-send-the-object
 function readFiles(dirname, onFinish) {
-  var files = [];
+  const files = [];
   fs.readdir(
     dirname,
     function (err1, filenames) {
@@ -137,7 +137,7 @@ function readFiles(dirname, onFinish) {
         onFinish(null, files);
       }
 
-      var numFilesProcessed = 0;
+      let numFilesProcessed = 0;
       filenames.forEach(function (filename) {
         fs.readFile(
           path.join(dirname, filename),
@@ -162,7 +162,7 @@ function readFiles(dirname, onFinish) {
 }
 
 function saveObjectToFile(dirname, filename, object, onFinish) {
-  var pathName = path.join(dirname, filename);
+  const pathName = path.join(dirname, filename);
   fs.writeFile(pathName, JSON.stringify(object), onFinish);
 }
 
@@ -179,9 +179,9 @@ function projectNameToFilename(projectName) {
 }
 
 function isCopyOfFile(dirname, filename) {
-  var pathName = path.join(dirname, filename);
+  const pathName = path.join(dirname, filename);
   try {
-    var stats = fs.statSync(pathName);
+    const stats = fs.statSync(pathName);
     return true;
   } catch (err) {
     return false;
@@ -189,7 +189,7 @@ function isCopyOfFile(dirname, filename) {
 }
 
 function deleteProject(filename, onFinish) {
-  var pathName = path.join(projectsSavePath, filename);
+  const pathName = path.join(projectsSavePath, filename);
   fs.stat(pathName, function (err1, stats) {
     if (err1) {
       console.error(err1);
