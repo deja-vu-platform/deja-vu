@@ -2,13 +2,14 @@
 // upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { generateId, shallowCopy, removeFirstFromArray } from '../../utility/utility';
+import { generateId, shallowCopy } from '../../utility/utility';
 
 import { Dimensions, Position } from '../../services/state.service';
 import { getDefaultDimensions, getIconLocation } from './widget.settings';
 import { UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';
 import { some } from 'lodash/collection';
+import { pull } from 'lodash/array';
 
 const INCORRECT_TYPE = 'The object is not the correct type for this operation';
 
@@ -343,7 +344,7 @@ export abstract class Widget {
 
   removeTemplateCopy(widgetId: string) {
     if (this.fields.isTemplate) {
-      removeFirstFromArray(widgetId, this.fields.templateCopies);
+      pull(this.fields.templateCopies, widgetId);
     }
   }
 
@@ -630,11 +631,15 @@ export class UserWidget extends Widget {
 
   // TODO perhaps this should also be a cliche function
   unlinkInnerWidget(userApp: UserCliche, id: string) {
-    removeFirstFromArray(id, this.fields.innerWidgetIds);
+    pull(this.fields.innerWidgetIds, id);
 
+    // reset a couple of things for this widget
     const widget = userApp.getWidget(id);
+    widget.resetPosition();
     widget.setParentId(undefined);
     userApp.setAsFreeWidget(widget);
+
+    // remove this widget from parent's list
     this.innerWidgetIds.next(this.fields.innerWidgetIds);
   }
 

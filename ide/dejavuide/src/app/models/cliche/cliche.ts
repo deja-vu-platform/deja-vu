@@ -1,4 +1,5 @@
-import { generateId, shallowCopy, removeFirstFromArray } from '../../utility/utility';
+import { generateId, shallowCopy } from '../../utility/utility';
+import { pull } from 'lodash/array';
 import { some } from 'lodash/collection';
 import { Widget } from '../widget/widget';
 
@@ -125,10 +126,10 @@ export class UserCliche extends Cliche {
   }
 
   private cleanAssociations(widgetId: string) {
-    removeFirstFromArray(widgetId, this.fields.pageIds);
-    removeFirstFromArray(widgetId, this.fields.templateIds);
-    removeFirstFromArray(widgetId, this.fields.innerWidgetIds);
-    removeFirstFromArray(widgetId, this.fields.freeWidgetIds);
+    pull(this.fields.pageIds, widgetId);
+    pull(this.fields.templateIds, widgetId);
+    pull(this.fields.innerWidgetIds, widgetId);
+    pull(this.fields.freeWidgetIds, widgetId);
   }
 
   /**
