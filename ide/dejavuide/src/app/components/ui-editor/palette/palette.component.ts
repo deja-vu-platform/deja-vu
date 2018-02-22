@@ -2,6 +2,8 @@ import { Component, OnDestroy } from '@angular/core';
 
 import { PaletteService } from '../../../services/palette.service';
 
+// jscolor is a 3rd party package that lets gives you a color picker to select
+// colors from.
 declare const jscolor: any;
 
 // Some colors:

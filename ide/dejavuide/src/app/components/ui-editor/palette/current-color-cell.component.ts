@@ -2,6 +2,10 @@ import { Component, Input, Output, ElementRef, ViewChild, OnInit } from '@angula
 
 import { PaletteService } from '../../../services/palette.service';
 
+// TODO: consolidate the instances of jscolor so that it is called from one
+// angular component
+// jscolor is a 3rd party package that lets gives you a color picker to select
+// colors from.
 declare const jscolor: any;
 
 @Component({

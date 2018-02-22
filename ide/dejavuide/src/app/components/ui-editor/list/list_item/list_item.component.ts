@@ -35,7 +35,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private subscriptions = [];
 
-  innerWidgets$: Observable<Widget[]>;
+  innerWidgets: Observable<Widget[]>;
   constructor(
     el: ElementRef,
     public dialog: MatDialog,
@@ -45,7 +45,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.innerWidgets$ = this.widget.innerWidgetIds
+    this.innerWidgets = this.widget.innerWidgetIds
       .map(ids => this.projectService.getWidgets(ids));
 
     this.selected = this.projectService.selectedWidget

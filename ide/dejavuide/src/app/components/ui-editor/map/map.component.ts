@@ -51,7 +51,7 @@ export class MapComponent implements AfterViewInit, OnInit {
 
   private subscriptions = [];
 
-  private zoom;
+  private zoom: Observable<number>;
   private el: HTMLElement;
 
   constructor(

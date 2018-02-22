@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, ElementRef, OnDestroy, NgZone } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/map';
 
 import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
@@ -24,9 +24,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
    * Dimensions of the screen the user is building an app for.
    */
   selectedScreenDimensions: Dimensions;
-  selectedWidget$: Observable<string>;
-
-  selectedWidgetId: string;
+  selectedWidget: BehaviorSubject<Widget>;
 
   activeWidgets: Widget[] = [];
 
@@ -59,25 +57,27 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
           worksurfaceElt.scrollTop(newScrollPosition.top);
           worksurfaceElt.scrollLeft(newScrollPosition.left);
         }));
+
+    this.subscriptions.push(
+      this.projectService.selectedWidget.subscribe((selectedWidget: Widget) => {
+        const activeWidgetIds = this.activeWidgets.map(widget => widget.getId());
+        const id = selectedWidget.getId();
+        const alreadyAdded = some(activeWidgetIds, id);
+
+        if (!alreadyAdded) {
+          this.activeWidgets.push(selectedWidget);
+        }
+
+        // Since state service is shared
+        this.stateService.updateVisibleWindowScrollPosition({
+          top: 0, left: 0
+        });
+      })
+    );
   }
 
   ngOnInit() {
-    this.selectedWidget$ = this.projectService.selectedWidget.map((selectedWidget: Widget) => {
-      this.selectedWidgetId = selectedWidget.getId();
-
-      const activeWidgetIds = this.activeWidgets.map(widget => widget.getId());
-      const alreadyAdded = some(activeWidgetIds, this.selectedWidgetId);
-
-      if (!alreadyAdded) {
-        this.activeWidgets.push(selectedWidget);
-      }
-
-      // Since state service is shared
-      this.stateService.updateVisibleWindowScrollPosition({
-        top: 0, left: 0
-      });
-      return this.selectedWidgetId;
-    });
+    this.selectedWidget = this.projectService.selectedWidget;
   }
 
   ngAfterViewInit() {
@@ -116,7 +116,7 @@ export class WorkSurfaceComponent implements OnInit, AfterViewInit, OnDestroy {
     const project = this.projectService.getProject();
     const userApp = project.getUserApp();
 
-    const selectedWidget = userApp.getWidget(this.selectedWidgetId);
+    const selectedWidget = this.selectedWidget.getValue();
     if (!widget) {
       return;
     }

@@ -5,6 +5,7 @@ import 'rxjs/add/operator/map';
 
 import { Widget } from '../../../models/widget/widget';
 import { ProjectService } from '../../../services/project.service';
+import { UserCliche } from '../../../models/cliche/cliche';
 
 @Component({
   selector: 'dv-map-widget',
@@ -17,7 +18,7 @@ export class MapWidgetComponent implements OnInit {
   el: HTMLElement;
   private subscriptions = [];
 
-  userApp;
+  userApp: Observable<UserCliche>;
 
   constructor(
     private projectService: ProjectService,
