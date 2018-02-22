@@ -4,24 +4,27 @@ import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material';
 import { RouterModule } from '@angular/router';
 
-import { ListItemComponent } from './list_item.component';
-import { DeleteDialogComponent } from './delete_dialog.component';
+import { ListItemComponent } from './list-item.component';
+import { WidgetDeleteDialogComponent } from './widget-delete-dialog.component';
 import { WidgetModule } from '../../widget/widget.module';
+
+import { DeleteDialogModule } from '../../../common/delete-dialog/delete-dialog.module';
 
 @NgModule({
   declarations: [
     ListItemComponent,
-    DeleteDialogComponent
+    WidgetDeleteDialogComponent
   ],
   imports: [
     BrowserModule,
     RouterModule,
     BrowserAnimationsModule,
     MatDialogModule,
-    WidgetModule
+    WidgetModule,
+    DeleteDialogModule
   ],
   entryComponents: [
-    DeleteDialogComponent
+    WidgetDeleteDialogComponent
   ],
   providers: [],
   exports: [

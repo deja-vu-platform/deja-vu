@@ -10,6 +10,8 @@ import { NewProjectDialogComponent } from './new-project-dialog.component';
 import { ProjectPreviewModule } from './project-preview/project-preview.module';
 import { LoaderModule } from '../common/loader/loader.module';
 
+import { DeleteDialogModule } from '../common/delete-dialog/delete-dialog.module';
+
 @NgModule({
   declarations: [
     ProjectExplorerComponent,
@@ -21,7 +23,8 @@ import { LoaderModule } from '../common/loader/loader.module';
     BrowserAnimationsModule,
     MatDialogModule,
     ProjectPreviewModule,
-    LoaderModule
+    LoaderModule,
+    DeleteDialogModule
   ],
   entryComponents: [
     ProjectDeleteDialogComponent,

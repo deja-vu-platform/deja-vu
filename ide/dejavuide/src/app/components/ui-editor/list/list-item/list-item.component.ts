@@ -6,7 +6,7 @@ import { MatDialog } from '@angular/material';
 
 import { Cliche } from '../../../../models/cliche/cliche';
 import { Widget, BaseWidget, UserWidget, LinkBaseWidget } from '../../../../models/widget/widget';
-import { DeleteDialogComponent } from './delete_dialog.component';
+import { WidgetDeleteDialogComponent } from './widget-delete-dialog.component';
 import { ProjectService } from '../../../../services/project.service';
 
 // List item needs drag-and-drop
@@ -18,8 +18,8 @@ const $ = <any>jQuery;
 
 @Component({
   selector: 'dv-list-item',
-  templateUrl: './list_item.component.html',
-  styleUrls: ['./list_item.component.css']
+  templateUrl: './list-item.component.html',
+  styleUrls: ['./list-item.component.css']
 })
 export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() isDraggable = false;
@@ -83,7 +83,7 @@ export class ListItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
   handleDelete(): void {
     if (this.isDeletable) {
-      const dialogRef = this.dialog.open(DeleteDialogComponent, {
+      const dialogRef = this.dialog.open(WidgetDeleteDialogComponent, {
         width: '250px',
       });
 

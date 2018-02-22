@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>Delete Widget</h2>
+<h2 mat-dialog-title>
+  <ng-content select="[title]"></ng-content>
+</h2>
 <mat-dialog-content>
-  Deleting this widget will delete all widgets it contains.
-  <br>
-  Are you sure?
+  <ng-content select="[content]"></ng-content>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button (click)="onDone(false)">No</button>
