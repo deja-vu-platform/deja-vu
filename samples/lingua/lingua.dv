@@ -1,0 +1,103 @@
+// Practice using a new language by chatting with native speakers and receiving corrections
+app Lingua {
+  include access/StandardAuthentication [
+    User for User
+  ]
+
+  include community/Profile[
+    User for Profile
+  ]
+
+  include community/Rating[
+    User for Source,
+    User for Target
+  ]
+
+  include organization/Label[
+    User for Item,
+    Language for Label
+  ] as NativeLanguage
+
+  include organization/Label[
+    User for Item,
+    Language for Label
+  ] as ForeignLanguage
+
+  include messaging/Comment[
+    User for Author,
+    Chat for Target
+  ]
+
+  include messaging/Chat[
+    User for User
+  ]
+
+  include community/Scoring[
+    User for Target
+  ]
+
+  data User {
+    username: text
+  }
+
+  data Language {
+    name: text,
+    items: [User]
+  }
+
+  english: Language = {
+    name: text = "English",
+    items: []
+  }
+
+  french: Language = {
+    name: text = "French",
+    items: []
+  }
+
+  chatScore: Score = {
+    name: text = "StartChat",
+    score: number = -10
+  }
+
+  correctionScore = {
+    name: text = "MakeCorrection",
+    score: number = 1
+  }
+
+  main widget Login {
+    on_user_ok: Widget = UserProfile
+  }
+
+  widget Signup {
+    on_user_ok: Widget = UserProfile,
+    submit_ok: boolean
+  }
+
+  widget UserProfile {
+    profile: User
+  }
+
+  widget NavBar {
+    user: User,
+    on_signout_ok: Widget = Login
+  }
+
+  // Shows the existing chats of [user]
+  // A chat can be selected, then messages and corrections can be sent
+  widget Chats {
+    user: User
+  }
+
+  // Shows a list of other users in Lingua
+  // [user] can initiate/access a chat with another user from here
+  widget FindPenpals {
+    user: User
+  }
+
+  login: route = {path: "login", widget: Login}
+  signup: route = {path: "signup", widget: Signup}
+  chats: route = {path: "chats", widget: Chats}
+  profile: route = {path: "profile", widget: UserProfile}
+  findPenpals: route = {path: "find-penpals", widget: FindPenpals}
+}
