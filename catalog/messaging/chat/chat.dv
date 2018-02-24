@@ -1,0 +1,34 @@
+// Have conversations among groups of users
+cliche Chat {
+  data Chat {
+    users: [User],
+    messages: [Message]
+  }
+
+  data User {
+    username: text
+  }
+
+  data Message {
+    content: text
+  }
+
+  widget ShowChats {
+    user: User
+  }
+
+  widget ShowChat {
+    chat: Chat
+  }
+
+  widget StartChatButton {
+    user1: User,
+    user2: User
+  }
+
+  widget SendMessage {
+    user: User,
+    chat: Chat,
+    content: text
+  }
+}
