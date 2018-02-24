@@ -1,0 +1,26 @@
+// Keep track of scores
+cliche Scoring {
+  data Target {
+    name: text,
+    scores: [Score],
+    total: number // calculated from [scores] using a defined aggregate function
+  }
+
+  date Score {
+    name: text, // could be optional or another type next time
+    score: number
+  }
+
+  widget ShowScores {
+    target: Target
+  }
+
+  widget ShowTotal {
+    target: Target
+  }
+
+  widget AddScore {
+    target: Target
+    score: Score
+  }
+}
