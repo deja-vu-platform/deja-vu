@@ -16,6 +16,11 @@ cliche StandardAuthentication {
     submit_ok: boolean
   }
 
+  widget RegisterContent {
+    user: User,
+    submit_ok: boolean
+  }
+
   // Shows a sign in form. After a successful sign in, the user is redirected
   // to the given widget. No redirect happpens if `on_signin_ok` is undefined.
   widget SignInWithRedirect {
