@@ -1,7 +1,7 @@
 import { ElementRef } from "@angular/core";
 import { GraphQlService } from "gql";
 import { Widget, Field } from "client-bus";
-import { NamedAtom } from "../shared/data";
+import { TaskAtom, AssignerAtom } from "../shared/data";
 
 @Widget({
     fqelement: "Task",
@@ -9,8 +9,8 @@ import { NamedAtom } from "../shared/data";
     styles: [``]
 })
 export class CreateTaskForAllAssigneesComponent {
-    @Field("Task") task: NamedAtom;
-    @Field("Assigner") assigner: NamedAtom;
+    @Field("Task") task: TaskAtom;
+    @Field("Assigner") assigner: AssignerAtom;
 
     expiration_date: string = "";
 
