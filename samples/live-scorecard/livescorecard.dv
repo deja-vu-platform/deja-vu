@@ -136,8 +136,22 @@ app LiveScorecard {
 
     // The navigation bar for the climber's view.
     widget ClimberNavBar {
+        climber: Climber
+    }
+
+    widget ClimberLogOut {
         climber: Climber,
         on_signout_ok: Widget = ClimberLogin
+    }
+
+    widget BuddyLogin {
+        buddy: Climber,
+        on_buddy_ok: Widget = BuddyHome
+    }
+
+    widget BuddyNavBar {
+        buddy: Climber,
+        on_guest_signout_ok: Widget = ClimberHome
     }
     
     // Allows climbers to view available climbs, log climbs and view the 
@@ -145,13 +159,7 @@ app LiveScorecard {
     // Signing out returns it to the original climber's account.
     widget BuddyHome {
         buddy: Climber,
-        climb: Climb,
-        on_signout_ok: Widget = ClimberHome
-    }
-
-    widget BuddyLogin {
-        buddy: Climber,
-        on_login_ok: Widget = BuddyHome
+        climb: Climb
     }
 
     // The login form for spectators
@@ -244,15 +252,16 @@ app LiveScorecard {
     }
 
     /** Routes **/
+    buddy_home: route = {path: "buddy", widget: BuddyHome}
+    buddy_login: route = {path: "buddy-login", widget: BuddyLogin}
+    climber_login: route = {path: "climber-login", widget: ClimberLogin}
+    climber_home: route = {path: "climber", widget: ClimberHome}
     host_login: route = {path: "host-login", widget: HostLogin}
     host_register: route = {path: "host-register", widget: HostRegister}
     host_home: route = {path: "host", widget: HostHome}
     show_hosts: route = {path: "competition-hosts", widget: ShowAndEditHosts}
     show_participants: route = {path: "participants", widget: ShowAndEditClimbers}
-    show_climbs: route = {path: "climbs", widget: ShowAndEditClimbs}
-    climber_login: route = {path: "climber-login", widget: ClimberLogin}
-    climber_home: route = {path: "climber", widget: ClimberHome}
-    buddy_home: route = {path: "buddy", widget: BuddyHome}
+    show_climbs: route = {path: "climbs", widget: ShowAndEditClimbs}    
     spectator_login: route = {path: "spectator-login", widget: SpectatorLogin}
     spectator_home: route = {path: "spectator", widget: SpectatorHome}
 }

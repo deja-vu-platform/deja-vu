@@ -150,3 +150,20 @@ a:hover {
 .round-checkbox:hover {
 	background-color: #ecf0f1;
 }
+
+.buddy {
+	background-color: #F1C40F;
+}
+
+.tall {
+	height: 100%;
+	flex: 1;
+}
+
+.center{
+	text-align: center;
+}
+
+.teal {
+	color:#4FB5C3;
+}
