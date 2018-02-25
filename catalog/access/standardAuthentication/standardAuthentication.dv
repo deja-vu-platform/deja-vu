@@ -47,4 +47,16 @@ cliche StandardAuthentication {
     user: User,
     submit_ok: boolean
   }
+
+  widget GuestSignInWithRedirect {
+    on_guest_signin_ok: Widget
+  }
+
+  widget GuestLoggedIn {
+    user: User
+  }
+
+  widget GuestSignOutWithRedirect {
+    on_guest_signout_ok: Widget
+  }
 }
