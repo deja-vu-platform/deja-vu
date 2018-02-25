@@ -16,6 +16,7 @@ cliche StandardAuthentication {
     submit_ok: boolean
   }
 
+  // Shows the fields of a registration form. 
   widget RegisterContent {
     user: User,
     submit_ok: boolean
@@ -48,14 +49,25 @@ cliche StandardAuthentication {
     submit_ok: boolean
   }
 
+  // Shows a sign in form for a guest user. After a successful sign in, the user is redirected
+  // to the given widget. No redirect happpens if `on_signin_ok` is undefined.
+  // Note: The original user is still signed in.
   widget GuestSignInWithRedirect {
     on_guest_signin_ok: Widget
   }
 
+  // The user field will be updated with the logged in guest user if there is one.
+  // This widget has no template and nothing will show up on the screen when
+  // included.
+  // Note: The original user is still signed in.
   widget GuestLoggedIn {
     user: User
   }
 
+  // Displays a sign out button for the guest user. When clicked, the guest user is signed out and
+  // redirected to the given widget. No redirect happens if `on_signout_ok` is
+  // undefined.
+  // Note: The original user is still signed in.
   widget GuestSignOutWithRedirect {
     on_guest_signout_ok: Widget
   }
