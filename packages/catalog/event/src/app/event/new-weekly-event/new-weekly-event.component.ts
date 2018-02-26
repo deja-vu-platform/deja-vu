@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, ElementRef } from '@angular/core';
+import { Component, AfterViewInit, ElementRef, Input } from '@angular/core';
 import { GatewayServiceFactory, GatewayService } from 'dv-core';
 
 @Component({
@@ -7,14 +7,14 @@ import { GatewayServiceFactory, GatewayService } from 'dv-core';
   styleUrls: ['./new-weekly-event.component.css']
 })
 export class NewWeeklyEventComponent {
+  @Input() id = ''; // optional
   startsOn = '';
   endsOn = '';
   startTime = '';
   endTime = '';
   gs: GatewayService;
 
-  constructor(
-    private elem: ElementRef, gsf: GatewayServiceFactory) {
+  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
     this.gs = gsf.for(elem);
   }
 
@@ -23,6 +23,7 @@ export class NewWeeklyEventComponent {
       .post('/graphql', JSON.stringify({
         query: `mutation {
           createWeeklyEvent(input: {
+            id: "${this.id}",
             startsOn: "${this.startsOn}", endsOn: "${this.endsOn}",
             startTime: "${this.startTime}", endTime: "${this.endTime}"
           }) {

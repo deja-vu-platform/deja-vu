@@ -44,6 +44,7 @@ interface UpdateEventInput {
 }
 
 interface CreateWeeklyEventInput {
+  id?: string;
   startsOn: string;
   endsOn: string;
   startTime: string;
@@ -145,7 +146,7 @@ const resolvers = {
 
       const inserts: Promise<any>[] = [];
       const eventIds: string[] = [];
-      const weeklyEventId = uuid();
+      const weeklyEventId = input.id ? input.id : uuid();
 
       const startHhMm = getHhMm(input.startTime);
       const endHhMm = getHhMm(input.endTime);
