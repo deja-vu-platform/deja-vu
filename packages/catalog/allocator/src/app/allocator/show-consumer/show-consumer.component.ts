@@ -1,14 +1,10 @@
 import {
   Component, Input, ElementRef, Output, EventEmitter, OnChanges
 } from '@angular/core';
-import { GatewayServiceFactory, GatewayService } from 'dv-core';
+import {
+  AllocatorServiceFactory, AllocatorService
+} from '../shared/allocator.service';
 
-import { map } from 'rxjs/operators';
-
-
-interface ConsumerOfResourceRes {
-  data: {consumerOfResource: {id: string}};
-}
 
 @Component({
   selector: 'allocator-show-consumer',
@@ -19,29 +15,16 @@ export class ShowConsumerComponent implements OnChanges {
   @Input() allocationId: string;
   @Output() consumer = new EventEmitter();
   consumerObj = {id: ''};
-  gs: GatewayService;
+  allocator: AllocatorService;
 
-  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
-    this.gs = gsf.for(elem);
+  constructor(elem: ElementRef, asf: AllocatorServiceFactory) {
+    this.allocator = asf.for(elem);
   }
 
   ngOnChanges() {
     if (this.resourceId && this.allocationId) {
-      this.gs
-        .get<ConsumerOfResourceRes>('/graphql', {
-          params: {
-            query: `
-              query {
-                consumerOfResource(
-                  resourceId: "${this.resourceId}",
-                  allocationId: "${this.allocationId}") {
-                    id
-                }
-              }
-            `
-          }
-        })
-        .pipe(map(res => res.data.consumerOfResource))
+      this.allocator
+        .consumerOfResource(this.resourceId, this.allocationId)
         .subscribe(consumer => {
           this.consumer.emit(consumer);
           this.consumerObj = consumer;

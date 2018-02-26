@@ -1,14 +1,9 @@
 import {
   Component, Input, ElementRef, Output, EventEmitter
 } from '@angular/core';
-import { GatewayServiceFactory, GatewayService } from 'dv-core';
-
-import { map } from 'rxjs/operators';
-
-
-interface CreateResourceRes {
-  data: {createResource: {id: string}};
-}
+import {
+  AllocatorServiceFactory, AllocatorService
+} from '../shared/allocator.service';
 
 
 @Component({
@@ -18,23 +13,16 @@ interface CreateResourceRes {
 export class CreateResourceComponent {
   @Input() id: string;
   @Output() resource = new EventEmitter();
-  gs: GatewayService;
+  allocator: AllocatorService;
 
-  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
-    this.gs = gsf.for(elem);
+  constructor(elem: ElementRef, asf: AllocatorServiceFactory) {
+    this.allocator = asf.for(elem);
   }
 
   run() {
     console.log(`Saving resource ${this.id}`);
-    this.gs
-      .post<CreateResourceRes>('/graphql', JSON.stringify({
-        query: `mutation {
-          createResource(id: "${this.id}") {
-            id
-          }
-        }`
-      }))
-      .pipe(map(res => res.data.createResource))
+    this.allocator
+      .createResource(this.id)
       .subscribe(resource => {
         this.resource.emit({id: resource.id});
       });

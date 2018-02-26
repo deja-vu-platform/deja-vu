@@ -9,6 +9,8 @@ import {
 
 import { DvModule } from 'dv-core';
 
+import { AllocatorServiceFactory } from './shared/allocator.service';
+
 import { CreateResourceComponent } from './create-resource/create-resource.component';
 import { CreateAllocationComponent } from './create-allocation/create-allocation.component';
 import { ShowConsumerComponent } from './show-consumer/show-consumer.component';
@@ -28,6 +30,7 @@ const allComponents = [
     MatButtonModule, MatInputModule, MatFormFieldModule,
     MatSelectModule
   ],
+  providers: [AllocatorServiceFactory],
   declarations: allComponents,
   exports: allComponents,
 })

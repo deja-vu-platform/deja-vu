@@ -1,16 +1,12 @@
 import {
   Component, Input, ElementRef, Output, EventEmitter
 } from '@angular/core';
-import { GatewayServiceFactory, GatewayService } from 'dv-core';
-
-import { map } from 'rxjs/operators';
+import {
+  AllocatorServiceFactory, AllocatorService
+} from '../shared/allocator.service';
 
 import * as _ from 'lodash';
 
-
-interface CreateAllocationRes {
-  data: {createAllocation: {id: string}};
-}
 
 @Component({
   selector: 'allocator-create-allocation',
@@ -20,25 +16,17 @@ export class CreateAllocationComponent {
   @Input() id: string;
   @Input() resources: [{id: string}];
   @Output() allocation = new EventEmitter();
-  gs: GatewayService;
+  allocator: AllocatorService;
 
-  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
-    this.gs = gsf.for(elem);
+  constructor(elem: ElementRef, asf: AllocatorServiceFactory) {
+    this.allocator = asf.for(elem);
   }
 
   run() {
     console.log(`Create allocation with ${this.id}`);
     const resourceIds = _.map(this.resources, 'id');
-    this.gs
-      .post<CreateAllocationRes>('/graphql', JSON.stringify({
-        query: `mutation {
-          createAllocation(
-            id: "${this.id}", resourceIds: "${resourceIds}") {
-            id
-          }
-        }`
-      }))
-      .pipe(map(res => res.data.createAllocation))
+    this.allocator
+      .createAllocation(this.id, resourceIds)
       .subscribe(allocation => {
         this.allocation.emit({id: allocation.id});
       });

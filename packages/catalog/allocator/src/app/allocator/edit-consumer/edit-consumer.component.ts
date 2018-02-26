@@ -1,17 +1,10 @@
 import {
   Component, Input, ElementRef, Output, EventEmitter, OnChanges
 } from '@angular/core';
-import { GatewayServiceFactory, GatewayService } from 'dv-core';
+import {
+  AllocatorServiceFactory, AllocatorService
+} from '../shared/allocator.service';
 
-import { map } from 'rxjs/operators';
-
-interface ConsumerOfResourceRes {
-  data: {consumerOfResource: {id: string}};
-}
-
-interface AllocationRes {
-  data: {allocation: {consumers: {id: string}[]}};
-}
 
 @Component({
   selector: 'allocator-edit-consumer',
@@ -25,49 +18,23 @@ export class EditConsumerComponent implements OnChanges {
   selectedConsumerId: string;
   currentConsumerId: string;
   consumers = [];
-  gs: GatewayService;
+  allocator: AllocatorService;
 
-  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
-    this.gs = gsf.for(elem);
+  constructor(elem: ElementRef, asf: AllocatorServiceFactory) {
+    this.allocator = asf.for(elem);
   }
 
   ngOnChanges() {
     if (this.resourceId && this.allocationId) {
-      this.gs
-        .get<ConsumerOfResourceRes>('/graphql', {
-          params: {
-            query: `
-              query {
-                consumerOfResource(
-                  resourceId: "${this.resourceId}",
-                  allocationId: "${this.allocationId}") {
-                    id
-                }
-              }
-            `
-          }
-        })
-        .pipe(map(res => res.data.consumerOfResource))
+      this.allocator
+        .consumerOfResource(this.resourceId, this.allocationId)
         .subscribe(consumer => {
           this.currentConsumer.emit(consumer);
           this.selectedConsumerId = consumer.id;
           this.currentConsumerId = this.selectedConsumerId;
         });
-      this.gs
-        .get<AllocationRes>('/graphql', {
-          params: {
-            query: `
-              query {
-                allocation(id: "${this.allocationId}") {
-                  consumers {
-                    id
-                  }
-                }
-              }
-            `
-          }
-        })
-        .pipe(map(res => res.data.allocation.consumers))
+      this.allocator
+        .consumers(this.allocationId)
         .subscribe(consumers => {
           this.consumers = consumers;
         });
@@ -77,17 +44,10 @@ export class EditConsumerComponent implements OnChanges {
   run() {
     if (this.currentConsumerId !== this.selectedConsumerId) {
       console.log(`Updating consumer to ${this.selectedConsumerId}`);
-      this.gs
-        .post('/graphql', JSON.stringify({
-          query: `mutation {
-            editConsumerOfResource(
-              resourceId: "${this.resourceId}",
-              allocationId: "${this.allocationId}",
-              newConsumerId: "${this.selectedConsumerId}")
-          }`
-        }))
+      this.allocator
+        .editConsumerOfResource(
+          this.resourceId, this.allocationId, this.selectedConsumerId)
         .subscribe(unused => {});
     }
   }
-
 }
