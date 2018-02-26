@@ -26,15 +26,21 @@ export class ShowConsumerComponent implements OnChanges {
   }
 
   ngOnChanges() {
-    if (this.resourceId) {
+    if (this.resourceId && this.allocationId) {
       this.gs
-        .get<ConsumerOfResourceRes>(`
-          consumerOfResource(
-            resourceId: "${this.resourceId}",
-            allocationId: "${this.allocationId}") {
-              id
+        .get<ConsumerOfResourceRes>('/graphql', {
+          params: {
+            query: `
+              query {
+                consumerOfResource(
+                  resourceId: "${this.resourceId}",
+                  allocationId: "${this.allocationId}") {
+                    id
+                }
+              }
+            `
           }
-        `)
+        })
         .pipe(map(res => res.data.consumerOfResource))
         .subscribe(consumer => {
           this.consumer.emit(consumer);

@@ -1,71 +1,93 @@
-import "rxjs/add/operator/toPromise";
+import {
+  Component, Input, ElementRef, Output, EventEmitter, OnChanges
+} from '@angular/core';
+import { GatewayServiceFactory, GatewayService } from 'dv-core';
 
-import {Widget, Field, AfterInit} from "client-bus";
-import {GraphQlService} from "gql";
+import { map } from 'rxjs/operators';
 
-import {ResourceAtom} from "../shared/data";
+interface ConsumerOfResourceRes {
+  data: {consumerOfResource: {id: string}};
+}
 
+interface AllocationRes {
+  data: {allocation: {consumers: {id: string}[]}};
+}
 
-@Widget({fqelement: "Allocator", ng2_providers: [GraphQlService]})
-export class EditConsumerComponent implements AfterInit {
-  @Field("Resource") resource: ResourceAtom;
-  consumer_atom_id = "";
+@Component({
+  selector: 'allocator-edit-consumer',
+  templateUrl: './edit-consumer.component.html',
+  styleUrls: ['./edit-consumer.component.css']
+})
+export class EditConsumerComponent implements OnChanges {
+  @Input() resourceId: string;
+  @Input() allocationId: string;
+  @Output() currentConsumer = new EventEmitter();
+  selectedConsumerId: string;
+  currentConsumerId: string;
   consumers = [];
+  gs: GatewayService;
 
-  constructor(private _graphQlService: GraphQlService) {}
-
-  updateSelection(newSelection) {
-    this._graphQlService
-      .post(`
-        editChampion(
-          resource_atom_id: "${this.resource.atom_id}",
-          champion_atom_id: "${newSelection}")
-      `)
-      .subscribe(res => {
-        if (res) {
-          this.consumer_atom_id = newSelection;
-        }
-      });
+  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
+    this.gs = gsf.for(elem);
   }
 
-  dvAfterInit() {
-    /**
-     * Load all consumers from the remote server. These are shown to the user
-     * so they can decide who the champion is.
-     */
-    const load_consumers = () => {
-      this._graphQlService
-        .get(`
-          consumer_all {
-            name,
-            atom_id
+  ngOnChanges() {
+    if (this.resourceId && this.allocationId) {
+      this.gs
+        .get<ConsumerOfResourceRes>('/graphql', {
+          params: {
+            query: `
+              query {
+                consumerOfResource(
+                  resourceId: "${this.resourceId}",
+                  allocationId: "${this.allocationId}") {
+                    id
+                }
+              }
+            `
           }
-        `)
-        .map(data => data.consumer_all)
-        .subscribe(consumers => this.consumers = consumers);
-    };
-
-    /**
-     * Retrieve a resource object, triggering an update of the consumer object.
-     */
-    const update_resource = () => {
-      if (!this.resource.atom_id) return;
-      return this._graphQlService
-        .get(`
-          resource_by_id(atom_id: "${this.resource.atom_id}") {
-            assigned_to {
-              atom_id
-            }
+        })
+        .pipe(map(res => res.data.consumerOfResource))
+        .subscribe(consumer => {
+          this.currentConsumer.emit(consumer);
+          this.selectedConsumerId = consumer.id;
+          this.currentConsumerId = this.selectedConsumerId;
+        });
+      this.gs
+        .get<AllocationRes>('/graphql', {
+          params: {
+            query: `
+              query {
+                allocation(id: "${this.allocationId}") {
+                  consumers {
+                    id
+                  }
+                }
+              }
+            `
           }
-        `)
-        .toPromise()
-        .then(data => data.resource_by_id.assigned_to.atom_id)
-        .then(consumer_atom_id =>
-          this.consumer_atom_id = consumer_atom_id);
-    };
-
-    load_consumers();
-    update_resource();
-    this.resource.on_change(update_resource);
+        })
+        .pipe(map(res => res.data.allocation.consumers))
+        .subscribe(consumers => {
+          this.consumers = consumers;
+        });
+    }
   }
+
+  run() {
+    if (this.currentConsumerId !== this.selectedConsumerId) {
+      console.log(`Updating consumer to ${this.selectedConsumerId}`);
+      this.gs
+        .post('/graphql', JSON.stringify({
+          query: `mutation {
+            editConsumerOfResource(
+              resourceId: "${this.resourceId}",
+              allocationId: "${this.allocationId}",
+              newConsumerId: "${this.selectedConsumerId}")
+          }`
+        }))
+        .subscribe(unused => {});
+    }
+  }
+
 }

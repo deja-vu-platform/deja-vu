@@ -2,16 +2,21 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatInputModule, MatFormFieldModule } from '@angular/material';
+import {
+  MatButtonModule, MatInputModule, MatFormFieldModule,
+  MatSelectModule
+} from '@angular/material';
 
 import { DvModule } from 'dv-core';
 
 import { CreateResourceComponent } from './create-resource/create-resource.component';
 import { CreateAllocationComponent } from './create-allocation/create-allocation.component';
 import { ShowConsumerComponent } from './show-consumer/show-consumer.component';
+import { EditConsumerComponent } from './edit-consumer/edit-consumer.component';
 
 const allComponents = [
-  CreateResourceComponent, CreateAllocationComponent, ShowConsumerComponent
+  CreateResourceComponent, CreateAllocationComponent,
+  ShowConsumerComponent, EditConsumerComponent
 ];
 
 @NgModule({
@@ -20,7 +25,8 @@ const allComponents = [
     CommonModule,
     FormsModule,
     BrowserAnimationsModule,
-    MatButtonModule, MatInputModule, MatFormFieldModule
+    MatButtonModule, MatInputModule, MatFormFieldModule,
+    MatSelectModule
   ],
   declarations: allComponents,
   exports: allComponents,

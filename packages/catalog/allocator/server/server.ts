@@ -115,12 +115,13 @@ const resolvers = {
       root, {resourceId, allocationId, newConsumerId}) => {
         await Promise.all([
           Validation.resourceExists(resourceId),
-          Validation.consumerExists(newConsumerId)
+          Validation.consumerExists(newConsumerId),
+          Validation.allocationExists(allocationId)
         ]);
         const updateOp = {
           $set: { [`assignments.${resourceId}`]: newConsumerId }
         };
-        await resources.updateOne({ id: resourceId }, updateOp);
+        await allocations.updateOne({ id: allocationId }, updateOp);
         return true;
     },
     createAllocation: async (root, {id, resourceIds}) => {
@@ -164,12 +165,20 @@ namespace Validation {
     return resource;
   }
 
-  export async function consumerExists(consumerId) {
+  export async function consumerExists(consumerId: string) {
     const consumer: ConsumerDoc = await consumers.findOne({ id: consumerId });
     if (!consumer) {
       throw new Error(`Consumer ${consumerId} not found`);
     }
     return consumer;
+  }
+
+  export async function allocationExists(allocationId: string) {
+    const allocation: AllocationDoc = await allocations.findOne({ id: allocationId });
+    if (!allocation) {
+      throw new Error(`Consumer ${allocationId} not found`);
+    }
+    return allocation;
   }
 }
 
