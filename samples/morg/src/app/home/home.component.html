@@ -2,14 +2,18 @@
   <h1>Group meeting organizer</h1>
   <h2>Create new group meeting series</h2>
   <div class="row">
-    <!--
     <dv-tx>
       <dv-id (id)="groupMeetingId"></dv-id>
-      <event-new-weekly-event [id]="groupMeetingId"></event-new-weekly-event>
-      <allocator-create-allocation [id]="groupMeetingId"></allocator-create-allocation>
+      <event-new-weekly-event [id]="groupMeetingId"
+        [createEvent]="createGroupMeeting"
+        [createEventInputMap]="{
+          'event': 'groupMeeting',
+          'weeklyEvent': 'groupMeetingSeries'
+        }">
+      </event-new-weekly-event>
+      <allocator-create-allocation [id]="groupMeetingId">
+      </allocator-create-allocation>
     </dv-tx>
-    -->
-   <event-new-weekly-event></event-new-weekly-event>
   </div>
   <h2>Show a group meeting series</h2>
   <div class="row">

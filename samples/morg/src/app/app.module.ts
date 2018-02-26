@@ -7,13 +7,15 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { ShowGroupMeetingComponent } from './show-group-meeting/show-group-meeting.component';
 import { EventModule } from 'event';
+import { CreateGroupMeetingComponent } from './create-group-meeting/create-group-meeting.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
-    ShowGroupMeetingComponent
+    ShowGroupMeetingComponent,
+    CreateGroupMeetingComponent
   ],
   imports: [
     BrowserModule,
