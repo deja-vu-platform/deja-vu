@@ -13,7 +13,7 @@ interface CreateResourceRes {
 
 @Component({
   selector: 'allocator-create-resource',
-  template: ''
+  templateUrl: './create-resource.component.html'
 })
 export class CreateResourceComponent {
   @Input() id: string;
