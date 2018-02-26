@@ -41,7 +41,8 @@ app LiveScorecard {
         Climb for Task,
         Host for Assigner,
         Climber for Assignee,
-        ShowAndLogClimb replacing ShowTask in ShowAllTasks
+        ShowAndLogClimb replacing ShowTask in ShowAllTasks,
+        ShowClimb replacing ShowTask in ShowAssignedTasks
     ] 
 
     // For every competition, there is a set of climbers.
@@ -197,6 +198,8 @@ app LiveScorecard {
         new_climber: Climber
     }
 
+    
+
     // A host can add a climber to the competition.
     widget AddClimberForm {
         new_climber: Climber,        
@@ -209,6 +212,12 @@ app LiveScorecard {
         host: Host,
         competition: Competition,
         new_climbs: [Climb]
+    }
+
+    // Displays climb information.
+    widget ShowClimb {
+        host: Host,
+        climb: Climb
     }
 
     // A host can add a climb to a competition.
