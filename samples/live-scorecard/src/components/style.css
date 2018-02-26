@@ -8,6 +8,10 @@ body {
 	background-color: #4FB5C3;
 }
 
+.white {
+	color: white;
+}
+
 .white-back {
 	background-color: white;
 	color: black;
@@ -166,4 +170,61 @@ a:hover {
 
 .teal {
 	color:#4FB5C3;
+}
+
+input[disabled] {
+	background-color: #bdc3c7;
+}
+
+input {
+	color: black;
+}
+
+input[type=text] {
+	width: 100%;
+	padding: .2em;
+	border-color: #F5F5F5;
+}
+
+input[type=radio]:after {
+	cursor: pointer;
+	width: 1em;
+	height: 1em;
+	top: 0;
+	border: 1px solid white;
+	border-radius: 50%;
+	background-color: white;
+}
+
+input[type=radio]checked:after {
+	width: .5em;
+	height: .5em;
+	border: 1px solid white;
+	border-radius: 50%;
+	background-color: #218290;
+}
+
+input[type=text].authentication:not(.passkey-create){
+	width: 80%;
+	height: 3em;
+	text-align:center;
+	border: 1px solid #bdc3c7;
+	margin: 0em auto;
+}
+
+input[type=password].authentication {
+	width: 80%;
+	margin: 0em auto;
+	height: 3em;
+	text-align:center;
+	border: 1px solid #bdc3c7;
+}
+
+.user-form {
+	margin: 30px 0px;
+}
+
+.event-item, .task-item {
+	background-color: transparent;
+	border: none;
 }
