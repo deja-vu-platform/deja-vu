@@ -2,14 +2,14 @@
 <form (ngSubmit)="onSubmit()" #signInForm="ngForm" class="form-horizontal" [ngClass]="{'has-error': error}">
     <fieldset class="form-group">
         <label class="sr-only" for="signin-username">Username</label>
-        <input type="text" required class="form-control" name="username"
+        <input type="text" required class="form-control authentication" name="username"
             [(ngModel)]="user.username" ngControl="username" placeholder="Username"
         />
     </fieldset>
 
     <fieldset class="form-group">
         <label class="sr-only" for="signin-password">Password</label>
-        <input type="password" required class="form-control" name="password"
+        <input type="password" required class="form-control authentication" name="password"
             [(ngModel)]="user.password" ngControl="password" placeholder="Password"
         />
     </fieldset>

@@ -20,12 +20,6 @@ export class RegisterContentComponent {
         this.submit_ok.on_change(() => {
             this._registerUser();
         });
-
-        this.submit_ok.on_after_change(() => {
-            this.user.username = "";
-            this.user.password = "";
-            this.reenter_password = "";
-        });
     }
 
     _registerUser() {

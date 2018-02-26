@@ -1,7 +1,8 @@
 <!-- CreateCustomPasskeyContent -->
 <fieldset class="form-group">
     <label class="sr-only" for="code">Passkey Code</label>
-    <input type="text" required class="form-control" name="code" [(ngModel)]="passkey.code" ngControl="code" placeholder="Passkey Code"
+    <input type="text" required class="form-control authentication passkey-create" 
+        name="code" [(ngModel)]="passkey.code" ngControl="code" placeholder="Passkey Code"
     />
     <div id="create-passkey-status" class="alert alert-danger" [hidden]="!error">
         Passkey already exists.
