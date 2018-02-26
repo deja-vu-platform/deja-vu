@@ -62,23 +62,20 @@ const config: Config = {...DEFAULT_CONFIG, ...configArg};
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 let db, allocations, resources, consumers;
 mongodb.MongoClient.connect(
-  `mongodb://${config.dbHost}:${config.dbPort}`, (err, client) => {
+  `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
       throw err;
     }
     db = client.db(config.dbName);
     if (config.reinitDbOnStartup) {
-      db.dropDatabase().then(unused => {
-        console.log(`Reinitialized db ${config.dbName}`);
-        if (!_.isEmpty(config.initialConsumerIds)) {
-          return db.collection('consumers')
-            .insertMany(_.map(config.initialConsumerIds, id => ({id: id})))
-            .then(unusedResult => {
-              console.log(
-                `Initialized consumer set with ${config.initialConsumerIds}`);
-            });
-        }
-      });
+      await db.dropDatabase();
+      console.log(`Reinitialized db ${config.dbName}`);
+      if (!_.isEmpty(config.initialConsumerIds)) {
+        await db.collection('consumers')
+          .insertMany(_.map(config.initialConsumerIds, id => ({id: id})));
+        console.log(
+          `Initialized consumer set with ${config.initialConsumerIds}`);
+      }
     }
     allocations = db.collection('allocations');
     resources = db.collection('resources');
@@ -94,10 +91,11 @@ const resolvers = {
     allocation: (root, { id }) => allocations.findOne({ id: id }),
     resources: root => resources.find().toArray(),
     consumers: root => consumers.find().toArray(),
-    consumerOfResource: (root, { resourceId, allocationId }) => allocations
-      .findOne({ id: allocationId })
-      .then(allocation => consumers
-        .findOne({id: allocation.assignments[resourceId]}))
+    consumerOfResource: async (root, { resourceId, allocationId }) => {
+      const allocation: AllocationDoc = await allocations
+        .findOne({ id: allocationId });
+      return consumers.findOne({id: allocation.assignments[resourceId]});
+    }
   },
   Allocation: {
     id: (allocation: AllocationDoc) => allocation.id,
@@ -113,76 +111,65 @@ const resolvers = {
     id: (consumer: ConsumerDoc) => consumer.id
   },
   Mutation: {
-    editConsumerOfResource: (
+    editConsumerOfResource: async (
       root, {resourceId, allocationId, newConsumerId}) => {
-      return Promise
-        .all([
+        await Promise.all([
           Validation.resourceExists(resourceId),
           Validation.consumerExists(newConsumerId)
-        ])
-        .then(unused => {
-          const updateOp = {
-            $set: { [`assignments.${resourceId}`]: newConsumerId }
-          };
-          return resources
-            .updateOne({ id: resourceId }, updateOp)
-            .then(unusedUpdate => true);
-      });
+        ]);
+        const updateOp = {
+          $set: { [`assignments.${resourceId}`]: newConsumerId }
+        };
+        await resources.updateOne({ id: resourceId }, updateOp);
+        return true;
     },
-    createAllocation: (root, {id, resourceIds}) => {
-      return consumers.find().toArray()
-        .then(allConsumers => {
-          const consumerIds = _.map(allConsumers, 'id');
-          const assignments = {};
-          if (!_.isEmpty(consumerIds)) {
-            let currentConsumerIndex = 0;
-            for (const resourceId of resourceIds) {
-              const c = consumerIds[currentConsumerIndex];
-              console.log(`Allocating ${resourceId} to ${c}`);
-              assignments[resourceId] = c;
-              currentConsumerIndex = (
-                currentConsumerIndex + 1) % consumerIds.length;
-            }
-          }
-          const newAllocation: AllocationDoc = {
-            id: id ? id : uuid(),
-            resourceIds: resourceIds,
-            consumerIds: consumerIds,
-            assignments: assignments
-          };
-          return allocations.insertOne(newAllocation)
-            .then(unusedInsert => newAllocation);
-        });
+    createAllocation: async (root, {id, resourceIds}) => {
+      const allConsumers = await consumers.find().toArray();
+      const consumerIds = _.map(allConsumers, 'id');
+      const assignments = {};
+      if (!_.isEmpty(consumerIds)) {
+        let currentConsumerIndex = 0;
+        for (const resourceId of resourceIds) {
+          const c = consumerIds[currentConsumerIndex];
+          console.log(`Allocating ${resourceId} to ${c}`);
+          assignments[resourceId] = c;
+          currentConsumerIndex = (
+            currentConsumerIndex + 1) % consumerIds.length;
+        }
+      }
+      const newAllocation: AllocationDoc = {
+        id: id ? id : uuid(),
+        resourceIds: resourceIds,
+        consumerIds: consumerIds,
+        assignments: assignments
+      };
+      await allocations.insertOne(newAllocation);
+      return newAllocation;
     },
-    createResource: (root, {id}) => {
+    createResource: async (root, {id}) => {
       const resourceId = id ? id : uuid();
       const newResource: ResourceDoc = { id: resourceId };
-      return resources.insertOne(newResource).then(unused => newResource);
+      await resources.insertOne(newResource);
+      return newResource;
     },
   }
 };
 
 namespace Validation {
-  export function resourceExists(resourceId: string) {
-    return resources
-      .findOne({ id: resourceId })
-      .then((resource: ResourceDoc) => {
-        if (!resource) {
-          throw new Error(`Resource ${resourceId} not found`);
-        }
-        return resource;
-      });
+  export async function resourceExists(resourceId: string) {
+    const resource: ResourceDoc = await resources.findOne({ id: resourceId });
+    if (!resource) {
+      throw new Error(`Resource ${resourceId} not found`);
+    }
+    return resource;
   }
 
-  export function consumerExists(consumerId) {
-    return consumers
-      .findOne({ id: consumerId })
-      .then((consumer: ConsumerDoc) => {
-        if (!consumer) {
-          throw new Error(`Consumer ${consumerId} not found`);
-        }
-        return consumer;
-      });
+  export async function consumerExists(consumerId) {
+    const consumer: ConsumerDoc = await consumers.findOne({ id: consumerId });
+    if (!consumer) {
+      throw new Error(`Consumer ${consumerId} not found`);
+    }
+    return consumer;
   }
 }
 
