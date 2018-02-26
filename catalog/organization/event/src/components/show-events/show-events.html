@@ -1,6 +1,6 @@
 <div class="row">
   <ul *ngIf="events && events.length > 0" class="list-group">
-    <li *ngFor="let event of events" class="list-group-item">
+    <li *ngFor="let event of events" class="list-group-item event-item">
      <dv-widget name="ShowEvent" [init]="{event: event}"></dv-widget>
     </li>
   </ul>
