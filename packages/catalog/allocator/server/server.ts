@@ -39,7 +39,7 @@ interface Config {
 
 const argv = minimist(process.argv);
 
-const name = argv.as ? argv.as : 'event';
+const name = argv.as ? argv.as : 'allocator';
 
 const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
@@ -68,30 +68,21 @@ mongodb.MongoClient.connect(
     }
     db = client.db(config.dbName);
     if (config.reinitDbOnStartup) {
-      db.collections().then(collections => {
-        const drops: any[] = [];
-        for (const collection of collections) {
-          console.log(`Dropping ${collection.collectionName}`);
-          drops.push(db.dropCollection(collection.collectionName));
+      db.dropDatabase().then(unused => {
+        console.log(`Reinitialized db ${config.dbName}`);
+        if (!_.isEmpty(config.initialConsumerIds)) {
+          return db.collection('consumers')
+            .insertMany(_.map(config.initialConsumerIds, id => ({id: id})))
+            .then(unusedResult => {
+              console.log(
+                `Initialized consumer set with ${config.initialConsumerIds}`);
+            });
         }
-        return Promise.all(drops).then(unused => {
-          allocations = db.collection('allocations');
-          resources = db.collection('resources');
-          consumers = db.collection('consumers');
-          if (!_.isEmpty(config.initialConsumerIds)) {
-            return consumers.insertMany(_.map(config.initialConsumerIds, id => ({id: id})))
-              .then(unusedResult => {
-                console.log(
-                  `Initialized consumer set with ${config.initialConsumerIds}`);
-              });
-          }
-        });
       });
-    } else {
-      allocations = db.collection('allocations');
-      resources = db.collection('resources');
-      consumers = db.collection('consumers');
     }
+    allocations = db.collection('allocations');
+    resources = db.collection('resources');
+    consumers = db.collection('consumers');
   });
 
 
