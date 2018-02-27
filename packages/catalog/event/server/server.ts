@@ -113,33 +113,30 @@ const resolvers = {
       .find({ id: { $in: weeklyEvent.eventIds } }).toArray()
   },
   Mutation: {
-    createEvent: (root, {input}: {input: CreateEventInput}) => {
+    createEvent: async (root, {input}: {input: CreateEventInput}) => {
       const {startDate, endDate} = getStartAndEndDates(input);
       const eventId = uuid();
       const e = { id: eventId, startDate: startDate, endDate: endDate };
-      return db.collection('events').insertOne(e).then(() => e);
+      await db.collection('events').insertOne(e);
+      return e;
     },
-    updateEvent: (root, {input}: {input: UpdateEventInput}) => {
+    updateEvent: async (root, {input}: {input: UpdateEventInput}) => {
       const {startDate, endDate} = getStartAndEndDates(input);
       const updateObj = { $set: { startDate: startDate, endDate: endDate } };
-      return db.collection('events').updateOne({id: input.id}, updateObj)
-        .then(() => true);
+      await db.collection('events').updateOne({id: input.id}, updateObj);
+      return true;
     },
     // If a weeklyEventId is given, the event is removed from that weekly event
-    deleteEvent: (root, {eventId, weeklyEventId}) => {
-      return Promise.resolve(() => {
-        if (weeklyEventId) {
-         const updatedWeeklyEvent = { $pull: { events: {id: eventId} } };
-         return db.collection('weeklyevents')
-           .update({id: weeklyEventId}, updatedWeeklyEvent);
-        }
-        return null;
-      })
-      .then(() => db.collection('events').deleteOne({id: eventId}))
-      .then(() => true);
-
+    deleteEvent: async (root, {eventId, weeklyEventId}) => {
+      if (weeklyEventId) {
+       const updatedWeeklyEvent = { $pull: { events: {id: eventId} } };
+       await db.collection('weeklyevents')
+         .update({id: weeklyEventId}, updatedWeeklyEvent);
+      }
+      await db.collection('events').deleteOne({id: eventId});
+      return true;
     },
-    createWeeklyEvent: (
+    createWeeklyEvent: async (
       root, {input}: {input: CreateWeeklyEventInput}) => {
       const startsOnDate = new Date(Number(input.startsOn));
       const endsOnDate = new Date(Number(input.endsOn));
@@ -179,9 +176,9 @@ const resolvers = {
         startTime: input.startTime,
         endTime: input.endTime
       };
-      return Promise.all(inserts)
-        .then(() => db.collection('weeklyevents').insertOne(weeklyEvent))
-        .then(() => weeklyEvent);
+      await Promise.all(inserts);
+      await db.collection('weeklyevents').insertOne(weeklyEvent);
+      return weeklyEvent;
     }
   }
 };
