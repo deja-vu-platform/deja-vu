@@ -210,7 +210,6 @@ function getHhMm(hhMmTime: string): {hh: number, mm: number} {
   return ret;
 }
 
-console.log(typeDefs);
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 

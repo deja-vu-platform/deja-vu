@@ -11,6 +11,10 @@ import { ShowEventComponent } from './show-event/show-event.component';
 import { DvModule } from 'dv-core';
 import { CreateEventComponent } from './create-event/create-event.component';
 
+const allComponents = [
+  NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent, CreateEventComponent
+];
+
 @NgModule({
   imports: [
     CommonModule,
@@ -21,8 +25,8 @@ import { CreateEventComponent } from './create-event/create-event.component';
     MatButtonModule, MatDatepickerModule, MatInputModule, MatSelectModule, MatFormFieldModule,
     MatMomentDateModule
   ],
-  declarations: [NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent, CreateEventComponent],
+  declarations: allComponents,
   entryComponents: [ShowEventComponent],
-  exports: [NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent]
+  exports: allComponents
 })
 export class EventModule { }
