@@ -10,6 +10,14 @@
       "config": {
         "wsPort": 3002
       }
+    },
+    "allocator": {
+      "name": "allocator",
+      "startServer": true,
+      "watch": true,
+      "config": {
+        "wsPort": 3003
+      }
     }
   }
 }

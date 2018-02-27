@@ -4,15 +4,14 @@
   <div class="row">
     <dv-tx>
       <dv-id (id)="groupMeetingId"></dv-id>
-      <event-new-weekly-event [id]="groupMeetingId"
+      <event-new-weekly-event [id]="groupMeetingId">
+        <!--
         [createEvent]="createGroupMeeting"
         [createEventInputMap]="{
           'event': 'groupMeeting',
           'weeklyEvent': 'groupMeetingSeries'
-        }">
+          }">-->
       </event-new-weekly-event>
-      <allocator-create-allocation [id]="groupMeetingId">
-      </allocator-create-allocation>
     </dv-tx>
   </div>
   <h2>Show a group meeting series</h2>

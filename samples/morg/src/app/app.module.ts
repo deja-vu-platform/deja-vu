@@ -8,6 +8,7 @@ import { HomeComponent } from './home/home.component';
 import { ShowGroupMeetingComponent } from './show-group-meeting/show-group-meeting.component';
 import { EventModule } from 'event';
 import { CreateGroupMeetingComponent } from './create-group-meeting/create-group-meeting.component';
+import { AllocatorModule } from 'allocator';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { CreateGroupMeetingComponent } from './create-group-meeting/create-group
   imports: [
     BrowserModule,
     DvModule,
-    EventModule
+    EventModule,
+    AllocatorModule
   ],
   entryComponents: [ShowGroupMeetingComponent],
   providers: [{

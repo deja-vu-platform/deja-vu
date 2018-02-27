@@ -1,7 +1,6 @@
 <dv-tx>
-  <create-event [event]="groupMeeting" [weeklyEvent]="groupMeetingSeries">
-  </create-event>
-  <create-resource [id]="groupMeeting.id"
-   [allocation]="groupMeetingSeries">
-  </create-resource>
+  <event-create-event [event]="groupMeeting" [weeklyEvent]="groupMeetingSeries">
+  </event-create-event>
+  <allocator-create-resource [id]="groupMeeting.id">
+  </allocator-create-resource>
 </dv-tx>
