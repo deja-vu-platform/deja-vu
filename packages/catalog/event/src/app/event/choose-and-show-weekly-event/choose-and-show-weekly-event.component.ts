@@ -30,13 +30,12 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
 
   chooseAndShowWeeklyEvent;
 
-  constructor(
-    private elem: ElementRef, gsf: GatewayServiceFactory) {
-    this.gs = gsf.for(elem);
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {
     this.chooseAndShowWeeklyEvent = this;
   }
 
   ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
     this.gs
       .get<{data: {weeklyEvents: WeeklyEvent[]}}>('/graphql', {
         params: {

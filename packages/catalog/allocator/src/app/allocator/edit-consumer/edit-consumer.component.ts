@@ -1,5 +1,5 @@
 import {
-  Component, Input, ElementRef, Output, EventEmitter, OnChanges
+  Component, Input, ElementRef, Output, EventEmitter, OnChanges, OnInit
 } from '@angular/core';
 import {
   AllocatorServiceFactory, AllocatorService
@@ -11,7 +11,7 @@ import {
   templateUrl: './edit-consumer.component.html',
   styleUrls: ['./edit-consumer.component.css']
 })
-export class EditConsumerComponent implements OnChanges {
+export class EditConsumerComponent implements OnChanges, OnInit {
   @Input() resourceId: string;
   @Input() allocationId: string;
   @Output() currentConsumer = new EventEmitter();
@@ -20,11 +20,20 @@ export class EditConsumerComponent implements OnChanges {
   consumers = [];
   allocator: AllocatorService;
 
-  constructor(elem: ElementRef, asf: AllocatorServiceFactory) {
-    this.allocator = asf.for(elem);
+  constructor(
+    private elem: ElementRef,
+    private asf: AllocatorServiceFactory) {}
+
+  ngOnInit() {
+    this.allocator = this.asf.for(this.elem);
+    this.update();
   }
 
   ngOnChanges() {
+    this.update();
+  }
+
+  update() {
     if (this.resourceId && this.allocationId) {
       this.allocator
         .consumerOfResource(this.resourceId, this.allocationId)

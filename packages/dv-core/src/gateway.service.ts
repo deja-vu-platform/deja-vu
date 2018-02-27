@@ -78,6 +78,11 @@ export class GatewayServiceFactory {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
+  /** This method should be called onInit (or after) **/
+  // Calling `for` in before onInit can cause problems because the component
+  // might not be attached to the dom (thus making it impossible to find the
+  // parents of the from element).
+  // TODO: I think this is the problem but I should investigate more
   for(from: ElementRef) {
     return new GatewayService(this.gatewayUrl, this.http, this.renderer, from);
   }

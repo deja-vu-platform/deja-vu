@@ -1,4 +1,6 @@
-import { Component, OnChanges, ElementRef, Input } from '@angular/core';
+import {
+  Component, OnChanges, ElementRef, Input, OnInit
+} from '@angular/core';
 import { GatewayServiceFactory, GatewayService } from 'dv-core';
 import { WeeklyEvent, Event } from '../../../../shared/data';
 
@@ -7,14 +9,16 @@ import { WeeklyEvent, Event } from '../../../../shared/data';
   selector: 'event-show-event',
   template: '{{event.startDate}} - {{event.endDate}}',
 })
-export class ShowEventComponent implements OnChanges {
+export class ShowEventComponent implements OnChanges, OnInit {
   @Input() event: Event;
   formattedEvent: Event;
 
   gs: GatewayService;
 
-  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
-    this.gs = gsf.for(elem);
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
   }
 
   ngOnChanges() {

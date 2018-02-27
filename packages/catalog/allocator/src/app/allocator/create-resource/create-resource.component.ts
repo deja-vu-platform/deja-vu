@@ -1,5 +1,5 @@
 import {
-  Component, Input, ElementRef, Output, EventEmitter
+  Component, Input, ElementRef, Output, EventEmitter, OnInit
 } from '@angular/core';
 import {
   AllocatorServiceFactory, AllocatorService
@@ -10,13 +10,17 @@ import {
   selector: 'allocator-create-resource',
   templateUrl: './create-resource.component.html'
 })
-export class CreateResourceComponent {
+export class CreateResourceComponent implements OnInit {
   @Input() id: string;
   @Output() resource = new EventEmitter();
   allocator: AllocatorService;
 
-  constructor(elem: ElementRef, asf: AllocatorServiceFactory) {
-    this.allocator = asf.for(elem);
+  constructor(
+    private elem: ElementRef,
+    private asf: AllocatorServiceFactory) {}
+
+  ngOnInit() {
+    this.allocator = this.asf.for(this.elem);
   }
 
   run() {

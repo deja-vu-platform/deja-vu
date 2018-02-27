@@ -1,4 +1,6 @@
-import { Component, AfterViewInit, ElementRef, Input } from '@angular/core';
+import {
+  Component, AfterViewInit, ElementRef, Input, OnInit
+} from '@angular/core';
 import { GatewayServiceFactory, GatewayService } from 'dv-core';
 
 @Component({
@@ -6,7 +8,7 @@ import { GatewayServiceFactory, GatewayService } from 'dv-core';
   templateUrl: './new-weekly-event.component.html',
   styleUrls: ['./new-weekly-event.component.css']
 })
-export class NewWeeklyEventComponent {
+export class NewWeeklyEventComponent implements OnInit {
   @Input() id = ''; // optional
   startsOn = '';
   endsOn = '';
@@ -14,8 +16,10 @@ export class NewWeeklyEventComponent {
   endTime = '';
   gs: GatewayService;
 
-  constructor(elem: ElementRef, gsf: GatewayServiceFactory) {
-    this.gs = gsf.for(elem);
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
   }
 
   onSubmit() {
