@@ -215,10 +215,10 @@ program
     // `package` with a subcommand it doesn't work unless the user provides args
     if (subcmd == 'package') {
       console.log('Packaging cliche');
-      npm(['run', 'packagr']);
-      if (existsSync('server')) {
-        npm(['run', 'tsc', '--', '-p', 'server', '--outDir', './pkg/server']);
-      }
+      const clicheName: string = JSON
+        .parse(readFileOrFail(DVCONFIG_FILE_PATH)).name;
+      npm(['run', `dv-package-${clicheName}`]);
+      
       
       updatePackage(pkg => {
         pkg.peerDependencies['dv-gateway'] = 'file:' + 
