@@ -57,15 +57,17 @@ app.use('/api', bodyParser.json(), (req, res, next) => {
   };
   if (!req.query.from) {
     res.status(500).send('No from specified');
-    return next();
+    return;
   }
   console.log(
     `Req from ${gatewayRequest.from} projects is ` +
     JSON.stringify(Array.from(projects.values())));
   const to = getDst(gatewayRequest.from, projects);
   if (!(to in dstTable)) {
-    res.status(500).send(`Invalid to: ${to}`);
-    return next();
+    res.status(500).send(
+      `Invalid to: ${to}, my dstTable is ` +
+      JSON.stringify(dstTable, undefined, 2));
+    return;
   }
   console.log(`to:${to}, port: ${dstTable[to]}`);
   let url = `http://localhost:${dstTable[to]}`;
@@ -92,7 +94,6 @@ app.use('/api', bodyParser.json(), (req, res, next) => {
       const send = clicheRes.text ? clicheRes.text : clicheErr.response.text;
       res.status(clicheRes.status).send(send);
     }
-    next();
   });
 });
 
@@ -121,7 +122,7 @@ function getDst(from: string[], projects: Set<string>): string {
   for (const node of from) {
     const name = node.toLowerCase();
     const project = name.split('-')[0];
-    if (projects.has(project) && lastProjectSeen != project) {
+    if (projects.has(project) && lastProjectSeen !== project) {
       seenProjects.push(project);
       lastProjectSeen = project;
     }
