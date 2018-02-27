@@ -29,6 +29,7 @@ input UpdateEventInput {
 }
 
 input CreateWeeklyEventInput {
+  id: ID
   startsOn: String!
   endsOn: String!
   startTime: String!
