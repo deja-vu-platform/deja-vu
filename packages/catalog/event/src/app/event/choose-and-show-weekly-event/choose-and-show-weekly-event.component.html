@@ -12,15 +12,7 @@
 <div class="row">
   <ul *ngIf="events && events.length > 0" class="list-group">
     <li *ngFor="let event of events" class="list-group-item">
-      <!--
-      <event-show-event [event]="event"></event-show-event>
-      -->
-      <dv-include
-        [type]="showEvent" [of]="showEventOf"
-        [inputMap]="showEventInputMap"
-        [outputMap]="showEventOutputMap"
-
-        [inputs]="{'event': event}"
+      <dv-include [action]="showEvent" [inputs]="{'event': event}"
         [parent]="chooseAndShowWeeklyEvent">
       </dv-include>
     </li>

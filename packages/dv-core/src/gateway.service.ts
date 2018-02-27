@@ -40,7 +40,8 @@ export class GatewayService {
 
   post<T>(
     path?: string, body?: string, options?: RequestOptions): Observable<T> {
-    console.log(`Sending post from ${this.from.nativeElement}`);
+    console.log(
+      `Sending post from ${this.from.nativeElement.nodeName.toLowerCase()}`);
     return this.http.post<T>(
       this.gatewayUrl, body, {
         params: this.buildParams(path, options),

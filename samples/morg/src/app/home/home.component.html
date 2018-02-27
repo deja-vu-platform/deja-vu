@@ -17,8 +17,7 @@
   <h2>Show a group meeting series</h2>
   <div class="row">
     <event-choose-and-show-weekly-event
-      [showEvent]="showGroupMeeting"
-      [showEventInputMap]="{'event': 'groupMeeting'}">
+      [showEvent]="{type: showGroupMeeting, inputMap: {event: 'groupMeeting'}}">
     </event-choose-and-show-weekly-event>
   </div>
 </div>

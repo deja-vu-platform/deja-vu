@@ -1,6 +1,6 @@
-import { Component, OnInit, ElementRef, Input } from '@angular/core';
+import { Component, OnInit, ElementRef, Input, Type } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { GatewayServiceFactory, GatewayService } from 'dv-core';
+import { GatewayServiceFactory, GatewayService, Action } from 'dv-core';
 import * as _ from 'lodash';
 
 import { Observable } from 'rxjs/Observable';
@@ -23,10 +23,7 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
   events: Event[] = [];
   gs: GatewayService;
 
-  @Input() showEvent = ShowEventComponent;
-  @Input() showEventOf;
-  @Input() showEventInputMap;
-  @Input() showEventOutputMap;
+  @Input() showEvent: Action = {type: <Type<Component>> ShowEventComponent};
 
   chooseAndShowWeeklyEvent;
 
