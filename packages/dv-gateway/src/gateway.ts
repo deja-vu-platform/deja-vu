@@ -62,7 +62,7 @@ app.use('/api', bodyParser.json(), (req, res, next) => {
   console.log(
     `Req from ${gatewayRequest.from} projects is ` +
     JSON.stringify(Array.from(projects.values())));
-  const to = getDst(gatewayRequest.from, projects);
+  const to = getDst(dvConfig.name, gatewayRequest.from, projects);
   if (!(to in dstTable)) {
     res.status(500).send(
       `Invalid to: ${to}, my dstTable is ` +
@@ -116,11 +116,19 @@ app.listen(port, () => {
 // Utility functions
 
 // from: originatingAction-action-....-action
-function getDst(from: string[], projects: Set<string>): string {
+function getDst(thisProject: string, from: string[], projects: Set<string>)
+  : string {
   let lastProjectSeen;
   const seenProjects: string[] = [];
   for (const node of from) {
+    // if you see dv-include break
     const name = node.toLowerCase();
+    if (name === 'dv-include') {
+      if (lastProjectSeen !== thisProject) {
+        seenProjects.push(thisProject);
+      }
+      break;
+    }
     const project = name.split('-')[0];
     if (projects.has(project) && lastProjectSeen !== project) {
       seenProjects.push(project);
