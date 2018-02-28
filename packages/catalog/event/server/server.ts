@@ -127,13 +127,14 @@ const resolvers = {
       return true;
     },
     // If a weeklyEventId is given, the event is removed from that weekly event
-    deleteEvent: async (root, {eventId, weeklyEventId}) => {
-      if (weeklyEventId) {
-       const updatedWeeklyEvent = { $pull: { events: {id: eventId} } };
-       await db.collection('weeklyevents')
-         .update({id: weeklyEventId}, updatedWeeklyEvent);
+    deleteEvent: async (root, {id}) => {
+      const res = await db.collection('events').findOneAndDelete({id: id});
+      const deletedEvent = res.value;
+      if (deletedEvent.weeklyEventId) {
+        const updatedWeeklyEvent = { $pull: { events: {id: id} } };
+        await db.collection('weeklyevents')
+          .update({id: deletedEvent.weeklyEventId}, updatedWeeklyEvent);
       }
-      await db.collection('events').deleteOne({id: eventId});
       return true;
     },
     createWeeklyEvent: async (

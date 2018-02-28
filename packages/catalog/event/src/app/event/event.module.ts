@@ -10,9 +10,12 @@ import { ChooseAndShowWeeklyEventComponent } from './choose-and-show-weekly-even
 import { ShowEventComponent } from './show-event/show-event.component';
 import { DvModule } from 'dv-core';
 import { CreateEventComponent } from './create-event/create-event.component';
+import { DeleteEventComponent } from './delete-event/delete-event.component';
+
 
 const allComponents = [
-  NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent, ShowEventComponent, CreateEventComponent
+  NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent,
+  ShowEventComponent, CreateEventComponent, DeleteEventComponent
 ];
 
 @NgModule({

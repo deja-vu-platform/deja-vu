@@ -39,8 +39,7 @@ input CreateWeeklyEventInput {
 type Mutation {
   createEvent(input: CreateEventInput!): Event
   updateEvent(input: UpdateEventInput!): Boolean
-  # If a weeklyEventId is given, the event is removed from that weekly event
-  deleteEvent(eventId: ID!, weeklyEventId: ID!): Boolean
+  deleteEvent(id: ID!): Boolean
   createWeeklyEvent(input: CreateWeeklyEventInput!): WeeklyEvent
 }
 

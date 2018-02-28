@@ -1,30 +1,31 @@
-import {Widget, Field} from "client-bus";
-import {GraphQlService} from "gql";
+import {
+  Component, AfterViewInit, ElementRef, Input, OnInit
+} from '@angular/core';
+import { GatewayServiceFactory, GatewayService } from 'dv-core';
 
-import {EventAtom} from "../../shared/data";
 
-
-@Widget({
-  fqelement: "Event",
-  ng2_providers: [GraphQlService]
+@Component({
+  selector: 'event-delete-event',
+  templateUrl: './delete-event.component.html',
+  styleUrls: ['./delete-event.component.css']
 })
-export class DeleteEventComponent {
-  @Field("Event") event: EventAtom;
+export class DeleteEventComponent implements OnInit {
+  @Input() id;
+  gs: GatewayService;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+  }
 
   deleteEvent() {
-    this._graphQlService
-      .post(`
-        deleteEvent (
-          eid: "${this.event.atom_id}",
-          ${this.event.weekly_event_id ? 
-            `weekly_event_id: "${this.event.weekly_event_id}"`
-            : ""}
-        ) {
-          atom_id
-        }
-      `)
-      .subscribe(atom_id => undefined);
+    this.gs
+      .post('/graphql', JSON.stringify({
+        query: `mutation {
+          deleteEvent (id: "${this.id}")
+        }`
+      }))
+      .subscribe(() => undefined);
   }
 }
