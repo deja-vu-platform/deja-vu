@@ -1,23 +1,25 @@
-<div class="col-md-offset-2 col-md-6">
-  <h1>Group meeting organizer</h1>
-  <h2>Create new group meeting series</h2>
-  <div class="row">
-    <dv-tx>
-      <dv-id (id)="groupMeetingId"></dv-id>
-      <event-new-weekly-event [id]="groupMeetingId">
-        <!--
-        [createEvent]="createGroupMeeting"
-        [createEventInputMap]="{
-          'event': 'groupMeeting',
-          'weeklyEvent': 'groupMeetingSeries'
-          }">-->
-      </event-new-weekly-event>
-    </dv-tx>
-  </div>
-  <h2>Show a group meeting series</h2>
-  <div class="row">
-    <event-choose-and-show-weekly-event
-      [showEvent]="{type: showGroupMeeting, inputMap: {event: 'groupMeeting'}}">
-    </event-choose-and-show-weekly-event>
+<div class="row">
+  <div class="col-md-offset-2 col-md-6">
+    <h1>Group meeting organizer</h1>
+    <h2>Create new group meeting series</h2>
+    <div class="row">
+      <dv-tx>
+        <dv-id (id)="groupMeetingId"></dv-id>
+        <event-new-weekly-event [id]="groupMeetingId">
+          <!--
+          [createEvent]="createGroupMeeting"
+          [createEventInputMap]="{
+            'event': 'groupMeeting',
+            'weeklyEvent': 'groupMeetingSeries'
+            }">-->
+        </event-new-weekly-event>
+      </dv-tx>
+    </div>
+    <h2>Show a group meeting series</h2>
+    <div class="row">
+      <event-choose-and-show-weekly-event
+        [showEvent]="{type: showGroupMeeting, inputMap: {event: 'groupMeeting'}}">
+      </event-choose-and-show-weekly-event>
+    </div>
   </div>
 </div>

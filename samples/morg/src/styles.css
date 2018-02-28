@@ -1,1 +1,6 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
+md-icon {
+  font-family: 'Material Icons' !important;
+}
