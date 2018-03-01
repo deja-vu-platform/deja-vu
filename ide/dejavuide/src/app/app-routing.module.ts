@@ -4,7 +4,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProjectExplorerComponent } from './project-explorer/project-explorer.component';
 
 import { UiEditorComponent } from './ui-editor/ui-editor.component';
-import { PageNotFoundComponent } from './common/page-not-found/page-not-found.module';
+import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
 
 const appRoutes: Routes = [
   { path: 'projects', component: ProjectExplorerComponent},

@@ -1,9 +1,9 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { ProjectPreviewComponent } from './project-preview.component';
 import { ProjectPreviewWidgetComponent} from './project-preview-widget.component';
-import { WidgetDisplayModule } from '../../common/widget-display/widget-display.module';
+import { WidgetDisplayModule } from '../../shared/widget-display/widget-display.module';
 
 @NgModule({
   declarations: [
@@ -11,7 +11,7 @@ import { WidgetDisplayModule } from '../../common/widget-display/widget-display.
     ProjectPreviewWidgetComponent
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     WidgetDisplayModule
   ],
   entryComponents: [

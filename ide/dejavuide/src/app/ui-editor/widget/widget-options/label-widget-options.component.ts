@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { LabelBaseWidget } from '../../../../models/widget/widget';
+import { LabelBaseWidget } from '../../../core/models/widget/widget';
 
 @Component({
   selector: 'dv-label-widget',

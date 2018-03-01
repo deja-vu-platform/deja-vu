@@ -1,16 +1,16 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { WidgetComponent } from './widget.component';
 import { WidgetOptionsModule } from './widget-options/widget-options.module';
-import { WidgetDisplayModule } from '../../common/widget-display/widget-display.module';
+import { WidgetDisplayModule } from '../../shared/widget-display/widget-display.module';
 
 @NgModule({
   declarations: [
     WidgetComponent
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     WidgetOptionsModule,
     WidgetDisplayModule
   ],

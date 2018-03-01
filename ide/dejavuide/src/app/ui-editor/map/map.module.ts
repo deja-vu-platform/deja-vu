@@ -1,9 +1,9 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { MapComponent } from './map.component';
 import { MapWidgetComponent } from './map-widget.component';
-import { WidgetDisplayModule } from '../../common/widget-display/widget-display.module';
+import { WidgetDisplayModule } from '../../shared/widget-display/widget-display.module';
 
 @NgModule({
   declarations: [
@@ -11,7 +11,7 @@ import { WidgetDisplayModule } from '../../common/widget-display/widget-display.
     MapWidgetComponent
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     WidgetDisplayModule
   ],
   providers: [],

@@ -1,8 +1,8 @@
 import { Component, Input, Output, OnInit, EventEmitter} from '@angular/core';
 
-import { Project } from '../../../models/project/project';
-import { UserCliche } from '../../../models/cliche/cliche';
-import { Widget } from '../../../models/widget/widget';
+import { Project } from '../../core/models/project/project';
+import { UserCliche } from '../../core/models/cliche/cliche';
+import { Widget } from '../../core/models/widget/widget';
 
 @Component({
     selector: 'dv-project-preview',

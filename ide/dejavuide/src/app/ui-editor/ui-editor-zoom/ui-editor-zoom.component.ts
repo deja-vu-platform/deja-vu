@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 import { StateService } from '../services/state.service';
-import { ProjectService } from '../../services/project.service';
+import { ProjectService } from '../../core/services/project.service';
 
 @Component({
   selector: 'dv-ui-editor-zoom',

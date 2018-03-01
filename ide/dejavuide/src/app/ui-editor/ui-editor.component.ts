@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 import 'rxjs/add/operator/map';
 
-import { LabelBaseWidget, LinkBaseWidget, Widget, UserWidget } from '../../models/widget/widget';
-import { UserCliche } from '../../models/cliche/cliche';
-import { Project } from '../../models/project/project';
-import { RouterService, PageType } from '../services/router.service';
+import { LabelBaseWidget, LinkBaseWidget, Widget, UserWidget } from '../core/models/widget/widget';
+import { UserCliche } from '../core/models/cliche/cliche';
+import { Project } from '../core/models/project/project';
+import { RouterService, PageType } from '../core/services/router.service';
 import { StateService } from './services/state.service';
-import { ProjectService } from '../services/project.service';
+import { ProjectService } from '../core/services/project.service';
 
 import * as jQuery from 'jquery';
 const $ = <any>jQuery;

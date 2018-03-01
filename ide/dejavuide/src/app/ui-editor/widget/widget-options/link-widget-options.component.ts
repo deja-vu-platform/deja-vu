@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { LinkBaseWidget } from '../../../../models/widget/widget';
+import { LinkBaseWidget } from '../../../core/models/widget/widget';
 
 @Component({
   selector: 'dv-link-widget',

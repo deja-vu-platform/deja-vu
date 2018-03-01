@@ -4,10 +4,10 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { MatDialog } from '@angular/material';
 
-import { Cliche } from '../../../../models/cliche/cliche';
-import { Widget, BaseWidget, UserWidget, LinkBaseWidget } from '../../../../models/widget/widget';
-import { WidgetDeleteDialogComponent } from './widget-delete-dialog.component';
-import { ProjectService } from '../../../services/project.service';
+import { Cliche } from '../../../core/models/cliche/cliche';
+import { Widget, BaseWidget, UserWidget, LinkBaseWidget } from '../../../core/models/widget/widget';
+import { WidgetDeleteDialogComponent } from './widget-delete-dialog/widget-delete-dialog.component';
+import { ProjectService } from '../../../core/services/project.service';
 
 // List item needs drag-and-drop
 import * as jQuery from 'jquery';

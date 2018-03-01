@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { MatMenuModule, MatListModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
@@ -27,7 +27,7 @@ import { WidgetOptionsComponent } from './widget-options.component';
     UserWidgetOptionsComponent
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     FormsModule,
     MatMenuModule,
     MatListModule

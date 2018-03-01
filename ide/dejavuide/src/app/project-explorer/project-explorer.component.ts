@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy} from '@angular/core';
 
 import { MatDialog } from '@angular/material';
 
-import { ProjectDeleteDialogComponent } from './project-delete-dialog.component';
-import { NewProjectDialogComponent } from './new-project-dialog.component';
-import { RouterService, PageType } from '../services/router.service';
-import { ProjectService } from '../services/project.service';
-import { CommunicatorService } from '../services/communicator.service';
-import { Project } from '../../models/project/project';
+import { ProjectDeleteDialogComponent } from './project-delete-dialog/project-delete-dialog.component';
+import { NewProjectDialogComponent } from './new-project-dialog/new-project-dialog.component';
+import { RouterService, PageType } from '../core/services/router.service';
+import { ProjectService } from '../core/services/project.service';
+import { CommunicatorService } from '../core/services/communicator.service';
+import { Project } from '../core/models/project/project';
 
 interface DisplayProject {
   filename: string;

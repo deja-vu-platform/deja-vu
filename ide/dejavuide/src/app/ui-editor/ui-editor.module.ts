@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { UiEditorComponent } from './ui-editor.component';
@@ -8,17 +8,24 @@ import { WorkSurfaceModule } from './worksurface/worksurface.module';
 import { ListModule } from './list/list.module';
 import { PaletteModule } from './palette/palette.module';
 
+import { PaletteService } from './services/palette.service';
+import { StateService } from './services/state.service';
+
 @NgModule({
   declarations: [
     UiEditorComponent
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     UiEditorZoomModule,
     MapModule,
     WorkSurfaceModule,
     ListModule,
-    PaletteModule
+    PaletteModule,
+  ],
+  providers: [
+    StateService,
+    PaletteService,
   ],
   exports: [
     UiEditorComponent

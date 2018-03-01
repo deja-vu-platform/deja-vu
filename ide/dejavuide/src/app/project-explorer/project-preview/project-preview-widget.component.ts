@@ -3,9 +3,9 @@ import { Component, Input, OnInit} from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { UserCliche } from '../../../models/cliche/cliche';
-import { Widget } from '../../../models/widget/widget';
-import { ProjectService } from '../../services/project.service';
+import { UserCliche } from '../../core/models/cliche/cliche';
+import { Widget } from '../../core/models/widget/widget';
+import { ProjectService } from '../../core/services/project.service';
 
 @Component({
   selector: 'dv-project-preview-widget',

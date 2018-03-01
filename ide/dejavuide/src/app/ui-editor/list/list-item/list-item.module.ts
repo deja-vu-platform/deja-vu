@@ -1,14 +1,13 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import { MatDialogModule } from '@angular/material';
 import { RouterModule } from '@angular/router';
 
 import { ListItemComponent } from './list-item.component';
-import { WidgetDeleteDialogComponent } from './widget-delete-dialog.component';
+import { WidgetDeleteDialogComponent } from './widget-delete-dialog/widget-delete-dialog.component';
 import { WidgetModule } from '../../widget/widget.module';
 
-import { DeleteDialogModule } from '../../../common/delete-dialog/delete-dialog.module';
+import { DeleteDialogModule } from '../../../shared/delete-dialog/delete-dialog.module';
 
 @NgModule({
   declarations: [
@@ -16,9 +15,8 @@ import { DeleteDialogModule } from '../../../common/delete-dialog/delete-dialog.
     WidgetDeleteDialogComponent
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     RouterModule,
-    BrowserAnimationsModule,
     MatDialogModule,
     WidgetModule,
     DeleteDialogModule

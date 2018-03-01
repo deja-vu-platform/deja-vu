@@ -3,9 +3,9 @@ import { Component, Input, OnInit, ElementRef, OnDestroy, ViewChild } from '@ang
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { Cliche } from '../../../models/cliche/cliche';
-import { Widget, UserWidget } from '../../../models/widget/widget';
-import { ProjectService } from '../../services/project.service';
+import { Cliche } from '../../core/models/cliche/cliche';
+import { Widget, UserWidget } from '../../core/models/widget/widget';
+import { ProjectService } from '../../core/services/project.service';
 
 // Widgets are drag-and-droppable
 import * as jQuery from 'jquery';

@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { WidgetModule } from '../widget/widget.module';
@@ -10,7 +10,7 @@ import { WorkSurfaceComponent } from './worksurface.component';
   ],
   imports: [
     WidgetModule,
-    BrowserModule
+    CommonModule
   ],
   providers: [],
   exports: [

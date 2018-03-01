@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { PaletteComponent } from './palette.component';
@@ -12,7 +12,7 @@ import { CurrentColorCellComponent } from './current-color-cell.component';
     CurrentColorCellComponent
   ],
   imports: [
-    BrowserModule
+    CommonModule
   ],
   providers: [],
   exports: [

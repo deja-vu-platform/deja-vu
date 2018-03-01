@@ -3,11 +3,11 @@ import { Component, AfterViewInit, OnInit, ElementRef } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { Widget } from '../../../models/widget/widget';
+import { Widget } from '../../core/models/widget/widget';
 import { StateService } from '../services/state.service';
-import { ProjectService } from '../../services/project.service';
+import { ProjectService } from '../../core/services/project.service';
 
-import { Dimensions, Position } from '../../../utility/utility';
+import { Dimensions, Position } from '../../core/models/utility/utility';
 
 // Maps needs drag-and-drop
 import * as jQuery from 'jquery';

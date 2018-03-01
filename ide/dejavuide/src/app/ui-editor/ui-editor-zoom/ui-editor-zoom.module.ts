@@ -1,15 +1,15 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { UiEditorZoomComponent } from './ui-editor-zoom.component';
-import { ZoomModule } from '../../common/zoom/zoom.module';
+import { ZoomModule } from '../../shared/zoom/zoom.module';
 
 @NgModule({
   declarations: [
     UiEditorZoomComponent
   ],
   imports: [
-    BrowserModule,
+    CommonModule,
     ZoomModule
   ],
   providers: [],

@@ -2,12 +2,12 @@ import { Component, OnInit, AfterViewInit, ElementRef, OnDestroy, NgZone } from 
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/map';
 
-import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../../models/widget/widget';
-import { Cliche } from '../../../models/cliche/cliche';
+import { Widget, LabelBaseWidget, LinkBaseWidget } from '../../core/models/widget/widget';
+import { Cliche } from '../../core/models/cliche/cliche';
 import { StateService } from '../services/state.service';
-import { ProjectService } from '../../services/project.service';
+import { ProjectService } from '../../core/services/project.service';
 
-import { Dimensions, Position } from '../../../utility/utility';
+import { Dimensions, Position } from '../../core/models/utility/utility';
 import { some } from 'lodash/collection';
 
 import * as jQuery from 'jquery';

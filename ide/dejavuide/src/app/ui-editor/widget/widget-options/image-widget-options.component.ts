@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { ImageBaseWidget } from '../../../../models/widget/widget';
+import { ImageBaseWidget } from '../../../core/models/widget/widget';
 
 @Component({
   selector: 'dv-image-widget',

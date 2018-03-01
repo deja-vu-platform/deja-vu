@@ -3,9 +3,9 @@ import { Component, Input, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { Widget } from '../../../models/widget/widget';
-import { ProjectService } from '../../services/project.service';
-import { UserCliche } from '../../../models/cliche/cliche';
+import { Widget } from '../../core/models/widget/widget';
+import { ProjectService } from '../../core/services/project.service';
+import { UserCliche } from '../../core/models/cliche/cliche';
 
 @Component({
   selector: 'dv-map-widget',

@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { UserWidget } from '../../../../models/widget/widget';
+import { UserWidget } from '../../../core/models/widget/widget';
 
 @Component({
   selector: 'dv-user-widget',

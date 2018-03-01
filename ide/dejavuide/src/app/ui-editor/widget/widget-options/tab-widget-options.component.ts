@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { TabBaseWidget } from '../../../../models/widget/widget';
+import { TabBaseWidget } from '../../../core/models/widget/widget';
 
 @Component({
   selector: 'dv-tab-widget',

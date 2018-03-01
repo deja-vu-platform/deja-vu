@@ -2,10 +2,10 @@ import { Component, Input } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 
-import { Cliche, UserCliche, DvCliche } from '../../../models/cliche/cliche';
+import { Cliche, UserCliche, DvCliche } from '../../core/models/cliche/cliche';
 import { Widget, BaseWidget, UserWidget, LinkBaseWidget, LabelBaseWidget,
-  ImageBaseWidget, MenuBaseWidget, TabBaseWidget, PanelBaseWidget } from '../../../models/widget/widget';
-import { ProjectService } from '../../services/project.service';
+  ImageBaseWidget, MenuBaseWidget, TabBaseWidget, PanelBaseWidget } from '../../core/models/widget/widget';
+import { ProjectService } from '../../core/services/project.service';
 
 @Component({
   selector: 'dv-list',

@@ -1,4 +1,4 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { GridComponent } from './grid.component';
@@ -8,7 +8,7 @@ import { GridComponent } from './grid.component';
     GridComponent
   ],
   imports: [
-    BrowserModule
+    CommonModule
   ],
   providers: [],
   exports: [

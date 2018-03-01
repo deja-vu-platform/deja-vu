@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { MenuBaseWidget } from '../../../../models/widget/widget';
+import { MenuBaseWidget } from '../../../core/models/widget/widget';
 
 @Component({
   selector: 'dv-menu-widget',
