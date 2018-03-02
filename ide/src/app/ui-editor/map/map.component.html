@@ -1,0 +1,33 @@
+<button id="map-minimize-btn" 
+        class="btn btn-default"
+        [ngClass]="{'minimized': minimized}"
+        (click)="minimizeButtonClick()">
+  <ng-container *ngIf="minimized; else minimizer">
+    Map
+  </ng-container>
+  <ng-template #minimizer>
+    <span class="glyphicon glyphicon-minus"></span>
+  </ng-template>
+</button>
+<div id="map" 
+    [hidden]="minimized"
+    (click)="mapClick($event)">
+    <div [style.zoom]="zoom | async">
+      <div id="zoom-selected-screen-size"
+        [style.height.px]="screenDimensions.height * mapScale"
+        [style.width.px]="screenDimensions.width * mapScale"></div>
+      <!-- putting it in a list ensures that the dv-map-widget is refreshed
+        everytime the selected widget changes  -->
+      <dv-map-widget 
+        *ngFor="let widget of [selectedWidget]"
+        [style.zoom]="mapScale"
+        [widget]="widget">
+      </dv-map-widget>
+    </div>
+    <!-- Map window is the little thing you drag to move your map -->
+    <div id="map-window"
+        [style.top.px]="mapVisibleWindowPosition.top"
+        [style.left.px]="mapVisibleWindowPosition.left"
+        [style.height.px]="visibleWindowDimensions.height * mapScale"
+        [style.width.px]="visibleWindowDimensions.width * mapScale"></div>
+</div>

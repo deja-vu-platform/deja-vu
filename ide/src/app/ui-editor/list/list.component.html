@@ -1,0 +1,55 @@
+<ng-container *ngIf="listUpdated | async">
+  <!-- for the user app -->
+  <div>
+    <div class="header"> Pages 
+      <button class="btn btn-default btn-delete"
+              (click)="newPage()">
+        <span class="glyphicon glyphicon-plus"></span>
+      </button>
+    </div>
+    <div *ngFor="let widget of pages">
+      <dv-list-item [widget]="widget"
+                    [isDraggable]="false"
+                    [isDeletable]="true">
+      </dv-list-item>
+    </div>
+  </div>
+  <div>
+    <div class="header"> Unused Widgets
+      <button class="btn btn-default btn-delete"
+              (click)="newWidget()">
+        <span class="glyphicon glyphicon-plus"></span>
+      </button>
+    </div>
+    <div *ngFor="let widget of unusedWidgets">
+      <dv-list-item [widget]="widget"
+                    [isDraggable]="true"
+                    [isDeletable]="true">
+      </dv-list-item>
+    </div>
+  </div>
+  <div> 
+    <div class="header"> Templates </div>
+    <div *ngFor="let widget of templates">
+      <dv-list-item [widget]="widget"
+                    [isDraggable]="true"
+                    [isDeletable]="true"
+                    [isTemplate]="true">
+      </dv-list-item>
+    </div>
+  </div>
+</ng-container>
+<div>
+  <!-- Base widgets -->
+  <div class="header"> Base Widgets </div>
+  <ng-container *ngFor="let widget of baseWidgets">
+    <dv-list-item [widget]="widget"
+                  [isDraggable]="true"
+                  [isDeletable]="false"
+                  [createNew]="true">
+    </dv-list-item>
+  </ng-container>
+</div>
+<div>
+  <!-- for imported cliches -->
+</div>

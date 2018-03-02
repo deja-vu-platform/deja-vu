@@ -1,0 +1,10 @@
+<!-- Setting up display -->
+<dv-widget-display
+    [widget]="widget"
+    [userApp]="userApp">
+  <!-- Inner widgets -->
+  <dv-project-preview-widget *ngFor="let innerWidget of innerWidgets"
+      [widget]="innerWidget"
+      [userApp]="userApp">
+  </dv-project-preview-widget>
+</dv-widget-display>

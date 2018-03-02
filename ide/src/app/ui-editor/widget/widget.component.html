@@ -1,0 +1,34 @@
+<!-- Setting up display -->
+<dv-widget-display #display
+    [widget]="widget"
+    [userApp]="userApp | async"
+    [activated]="activated">
+
+  <!-- Setting up options -->
+  <dv-user-widget *ngIf="widget.isUserType()"
+    [widget]="widget">
+  </dv-user-widget>  
+  <ng-container *ngIf="widget.isBaseType()">
+    <!-- TODO is not DRY. But this has to be done somewhere??? -->
+    <dv-label-widget *ngIf="widget.isLabel()"
+      [widget]="widget"></dv-label-widget>
+    <dv-link-widget *ngIf="widget.isLink()"
+      [widget]="widget"></dv-link-widget>
+    <dv-image-widget *ngIf="widget.isImage()"
+      [widget]="widget"></dv-image-widget>
+    <dv-menu-widget *ngIf="widget.isMenu()"
+      [widget]="widget"></dv-menu-widget>
+    <dv-panel-widget *ngIf="widget.isPanel()"
+      [widget]="widget"></dv-panel-widget>
+    <dv-tab-widget *ngIf="widget.isTab()"
+      [widget]="widget"></dv-tab-widget>
+  </ng-container>
+
+  <!-- Inner widgets -->
+  <dv-widget *ngFor="let innerWidget of (innerWidgets | async)"
+      [activated]="activated"
+      [widget]="innerWidget"
+      [isSelected]="false"
+      [isMovable]="isSelected">
+  </dv-widget>
+</dv-widget-display>

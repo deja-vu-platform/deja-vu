@@ -1,0 +1,19 @@
+<span>Name: {{widget.getName()}}</span>
+<dv-user-widget-display *ngIf="widget.isUserType()"
+  [widget]="widget">
+</dv-user-widget-display>  
+<ng-container *ngIf="widget.isBaseType()">
+  <dv-label-widget-display *ngIf="widget.isLabel()"
+    [widget]="widget"></dv-label-widget-display>
+  <dv-link-widget-display *ngIf="widget.isLink()"
+    [widget]="widget"></dv-link-widget-display>
+  <dv-image-widget-display *ngIf="widget.isImage()"
+    [widget]="widget"></dv-image-widget-display>
+  <dv-menu-widget-display *ngIf="widget.isMenu()"
+    [widget]="widget"></dv-menu-widget-display>
+  <dv-panel-widget-display *ngIf="widget.isPanel()"
+    [widget]="widget"></dv-panel-widget-display>
+  <dv-tab-widget-display *ngIf="widget.isTab()"
+    [widget]="widget"></dv-tab-widget-display>
+</ng-container>
+<ng-content></ng-content>

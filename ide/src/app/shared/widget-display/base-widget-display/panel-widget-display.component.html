@@ -1,0 +1,9 @@
+<!-- TODO this way there is no default currently; should be panel-default -->
+<div class="panel"
+  [ngClass]="class | async"
+  *ngIf="widget.getValue(); let value">
+  <div class="panel-heading">
+    <h3 class="panel-title">{{value.heading}}</h3>
+  </div>
+  <div class="panel-body">{{value.content}}</div>
+</div>
