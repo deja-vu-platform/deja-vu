@@ -2,14 +2,12 @@ import { Injectable } from '@angular/core';
 import { NgZone} from '@angular/core';
 declare const electron: any;
 
-import { Project } from '../models/project/project';
-
 /**
  * Service for communicating with electron's main.js via ipcRenderer.
  * Reduces places where electron's ipc renderer has to be imported.
  */
 @Injectable()
-export class CommunicatorService {
+export class FileService {
   private ipcRenderer;
 
   // The zone brings this piece of code back into angular's zone
@@ -29,17 +27,10 @@ export class CommunicatorService {
     }
   }
 
-  saveToLocalStorage(project: Project) {
-    const JSONObject = Project.toJSON(project);
-    localStorage.setItem('project', JSON.stringify(JSONObject));
-  }
-
-  save(project: Project) {
-    const JSONObject = Project.toJSON(project);
-    this.saveToLocalStorage(project);
+  save(filename, content) {
     this.ipcRenderer.send('save', {
-      projectName: project.getName(),
-      projectContents: JSONObject
+      filename: filename,
+      content: content
     });
   }
 
@@ -63,11 +54,11 @@ export class CommunicatorService {
     });
   }
 
-  loadProjects() {
+  load() {
     this.ipcRenderer.send('load');
   }
 
-  onLoadProjects(callback) {
+  onLoad(callback) {
     this.ipcRenderer.on('projects', (event, data) => {
       this.zone.run(() => {
         callback(event, data);

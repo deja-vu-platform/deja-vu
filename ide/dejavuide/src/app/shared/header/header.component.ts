@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy} from '@angular/core';
 import { RouterService, PageType, PageInfo } from '../../core/services/router.service';
 import { ProjectService } from '../../core/services/project.service';
-import { CommunicatorService } from '../../core/services/communicator.service';
+import { FileService } from '../../core/services/file.service';
 
 
 @Component({
@@ -19,15 +19,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   constructor (
     private projectService: ProjectService,
-    private routerService: RouterService,
-    private communicatorService: CommunicatorService) {
+    private routerService: RouterService) {
   }
 
   ngOnInit() {
-    this.communicatorService.onSaveSuccess((event, data) => {
-      console.log(data);
-    });
-
     this.subscriptions.push(
       this.routerService.newPageType.subscribe((pageType) => {
         this.updateHeaderData(pageType);
@@ -46,10 +41,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   save() {
-    const selectedProject = this.projectService.getProject();
-    if (selectedProject) {
-      this.communicatorService.save(selectedProject);
-    }
+    this.projectService.saveProject();
   }
 
   private updateHeaderData(type: PageType) {

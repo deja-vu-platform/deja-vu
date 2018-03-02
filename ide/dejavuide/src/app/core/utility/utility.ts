@@ -19,3 +19,12 @@ export interface Position {
   top: number;
   left: number;
 }
+
+
+export function getExtension(filename) {
+  const lastIndex = filename.lastIndexOf('.');
+  if (lastIndex < 0) {
+    return '';
+  }
+  return filename.substr(lastIndex + 1);
+}

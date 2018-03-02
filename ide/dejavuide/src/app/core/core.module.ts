@@ -3,7 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { RouterService } from './services/router.service';
 import { ProjectService } from './services/project.service';
-import { CommunicatorService } from './services/communicator.service';
+import { FileService } from './services/file.service';
 
 @NgModule({
   imports: [
@@ -12,7 +12,7 @@ import { CommunicatorService } from './services/communicator.service';
   providers: [
     RouterService,
     ProjectService,
-    CommunicatorService,
+    FileService,
   ],
 })
 export class CoreModule { }

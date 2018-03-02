@@ -1,4 +1,4 @@
-import { generateId, shallowCopy } from '../utility/utility';
+import { generateId, shallowCopy } from '../../utility/utility';
 import { pull } from 'lodash/array';
 import { some } from 'lodash/collection';
 import { Widget } from '../widget/widget';

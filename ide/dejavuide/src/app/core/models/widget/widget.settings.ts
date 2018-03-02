@@ -1,6 +1,6 @@
 import { Widget } from './widget';
 
-import { Dimensions } from '../utility/utility';
+import { Dimensions } from '../../utility/utility';
 
 export function getDefaultDimensions(widget: Widget): Dimensions {
   if (widget.isUserType()) {

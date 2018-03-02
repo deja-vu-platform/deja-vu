@@ -7,9 +7,6 @@ const app = electron.app;  // Module to control application life.
 const BrowserWindow = electron.BrowserWindow;  // Module to create native browser window.
 const ipcMain = electron.ipcMain;
 
-// file extension to save projects
-const DV_EXT = 'dvp';
-
 // Angular and electron help from https://scotch.io/tutorials/build-a-music-player-with-angular-2-electron-i-setup-basics-concepts
 require('dotenv').config();
 
@@ -83,17 +80,17 @@ app.on('activate', function () {
 // The projects are currently stored at the root of the app.
 // TODO have an option to allow users to put in where they want
 // their projects saved. 
-const projectsSavePath = path.join(__dirname, 'projects');
+const SAVE_DIR = path.join(__dirname, 'projects');
 
 try {
-  fs.accessSync(projectsSavePath, fs.F_OK);
+  fs.accessSync(SAVE_DIR, fs.F_OK);
 } catch (e) {
   // The folder hasn't been created yet.
-  fs.mkdir(projectsSavePath);
+  fs.mkdir(SAVE_DIR);
 }
 
 ipcMain.on('load', function (event, args) {
-  readFiles(projectsSavePath, function (err, files) {
+  readFiles(SAVE_DIR, function (err, files) {
     if (err) {
       console.log(err);
       return;
@@ -103,7 +100,7 @@ ipcMain.on('load', function (event, args) {
 });
 
 ipcMain.on('delete', function (event, args) {
-  deleteProject(args.filename, function (err) {
+  deleteFile(args.filename, function (err) {
     if (err) {
       console.log(err);
       return;
@@ -113,13 +110,12 @@ ipcMain.on('delete', function (event, args) {
 });
 
 ipcMain.on('save', function (event, args) {
-  const filename = projectNameToFilename(args.projectName);
-  saveObjectToFile(projectsSavePath, filename, args.projectContents, function (err) {
+  saveObjectToFile(SAVE_DIR, args.filename, args.content, function (err) {
     if (err) {
       console.log(err);
       return;
     }
-    mainWindow.webContents.send('save-success', { filename: filename, projectId: args.projectId });
+    mainWindow.webContents.send('save-success', args);
   });
 });
 
@@ -147,9 +143,7 @@ function readFiles(dirname, onFinish) {
               onFinish(err2);
               return;
             }
-            if (getExtension(filename) === DV_EXT) {
-              files.push([filename, content]);  
-            }
+            files.push([filename, content]);  
             numFilesProcessed += 1;
             if (numFilesProcessed === filenames.length) {
               onFinish(null, files);
@@ -166,18 +160,6 @@ function saveObjectToFile(dirname, filename, object, onFinish) {
   fs.writeFile(pathName, JSON.stringify(object), onFinish);
 }
 
-function getExtension(filename){
-  const lastIndex = filename.lastIndexOf('.');
-  if (lastIndex<0) {
-    return '';
-  }
-  return filename.substr(lastIndex + 1);
-}
-
-function projectNameToFilename(projectName) {
-  return projectName + '.' + DV_EXT;
-}
-
 function isCopyOfFile(dirname, filename) {
   const pathName = path.join(dirname, filename);
   try {
@@ -188,8 +170,8 @@ function isCopyOfFile(dirname, filename) {
   }
 }
 
-function deleteProject(filename, onFinish) {
-  const pathName = path.join(projectsSavePath, filename);
+function deleteFile(filename, onFinish) {
+  const pathName = path.join(SAVE_DIR, filename);
   fs.stat(pathName, function (err1, stats) {
     if (err1) {
       console.error(err1);

@@ -3,13 +3,20 @@ import { Injectable } from '@angular/core';
 // upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Project } from '../models/project/project';
+import { Project, DV_EXT } from '../models/project/project';
 import { Widget, UserWidget } from '../models/widget/widget';
 import { UserCliche } from '../models/cliche/cliche';
 
+import { FileService } from './file.service';
+
+function projectNameToFilename(projectName) {
+  return projectName + '.' + DV_EXT;
+}
+
+
 @Injectable()
 export class ProjectService {
-  constructor() {
+  constructor(private fileservice: FileService) {
     const project = localStorage.getItem('project');
     if (project) {
       this.updateProject(Project.fromJSON(JSON.parse(project)));
@@ -21,8 +28,19 @@ export class ProjectService {
   selectedWidget = new BehaviorSubject<Widget>(undefined);
   userAppUpdateListener = new BehaviorSubject<boolean>(false);
 
+  public saveProject() {
+    const project = this.selectedProject.getValue();
+    if (!project) {
+      return;
+    }
+    const JSONObject = Project.toJSON(project);
+    this.saveToLocalStorage(project);
+    this.fileservice.save(projectNameToFilename(project.getName()), JSONObject);
+  }
+
   public updateProject(project: Project) {
     this.selectedProject.next(project);
+    this.saveToLocalStorage(project);
   }
 
   public getProject(): Project {
@@ -70,5 +88,10 @@ export class ProjectService {
     if (parentId) {
       return this.getUserApp().getWidget(parentId) as UserWidget;
     }
+  }
+
+  private saveToLocalStorage(project: Project) {
+    const JSONObject = Project.toJSON(project);
+    localStorage.setItem('project', JSON.stringify(JSONObject));
   }
 }

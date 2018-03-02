@@ -2,9 +2,8 @@
 // upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { generateId, shallowCopy } from '../utility/utility';
+import { generateId, shallowCopy, Dimensions, Position } from '../../utility/utility';
 
-import { Dimensions, Position } from '../utility/utility';
 import { getDefaultDimensions, getIconLocation } from './widget.settings';
 import { UserCliche } from '../cliche/cliche';
 import { Project } from '../project/project';

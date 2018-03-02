@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 // BehaviorSubject as opposed to Subject since we want an initial value right
 // upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Dimensions, Position } from '../../core/models/utility/utility';
+import { Dimensions, Position } from '../../core/utility/utility';
 
 @Injectable()
 export class StateService {

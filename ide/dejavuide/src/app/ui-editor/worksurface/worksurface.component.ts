@@ -7,7 +7,7 @@ import { Cliche } from '../../core/models/cliche/cliche';
 import { StateService } from '../services/state.service';
 import { ProjectService } from '../../core/services/project.service';
 
-import { Dimensions, Position } from '../../core/models/utility/utility';
+import { Dimensions, Position } from '../../core/utility/utility';
 import { some } from 'lodash/collection';
 
 import * as jQuery from 'jquery';

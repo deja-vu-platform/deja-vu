@@ -6,8 +6,10 @@ import { ProjectDeleteDialogComponent } from './project-delete-dialog/project-de
 import { NewProjectDialogComponent } from './new-project-dialog/new-project-dialog.component';
 import { RouterService, PageType } from '../core/services/router.service';
 import { ProjectService } from '../core/services/project.service';
-import { CommunicatorService } from '../core/services/communicator.service';
-import { Project } from '../core/models/project/project';
+import { FileService } from '../core/services/file.service';
+import { Project, DV_EXT } from '../core/models/project/project';
+
+import { getExtension } from '../core/utility/utility';
 
 interface DisplayProject {
   filename: string;
@@ -38,13 +40,16 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private routerService: RouterService,
     private projectService: ProjectService,
-    private communicatorService: CommunicatorService) {}
+    private fileService: FileService) {}
 
   ngOnInit() {
     this.loaderVisible = true;
-    this.communicatorService.onLoadProjects((event, data) => {
+    this.fileService.onLoad((event, data) => {
       data.projects.forEach((projectInfo) => {
         const filename = projectInfo[0];
+        if (getExtension(filename) !== DV_EXT) {
+          return;
+        }
         const content = JSON.parse(projectInfo[1]);
         this.projects[filename] = content;
       });
@@ -53,7 +58,7 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
       this.loaderVisible = false;
     });
 
-    this.communicatorService.onDeleteSuccess((event, data) => {
+    this.fileService.onDeleteSuccess((event, data) => {
       // TODO deal with if the project is your selected project
       delete this.projects[data.filename];
 
@@ -61,7 +66,7 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
       this.loaderVisible = false;
     });
 
-    this.communicatorService.loadProjects();
+    this.fileService.load();
   }
 
   handleNewProject() {
@@ -104,7 +109,6 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
   private loadProject(project: Project) {
     project.updateAccess();
     this.projectService.updateProject(project);
-    this.communicatorService.saveToLocalStorage(project);
     this.routerService.navigateTo(PageType.UI_EDITOR);
   }
 
@@ -114,7 +118,7 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
   }
 
   private deleteProject(filename) {
-    this.communicatorService.delete({filename: filename});
+    this.fileService.delete({filename: filename});
   }
 
   private updateDisplayProjectList() {
