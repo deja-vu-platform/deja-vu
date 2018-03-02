@@ -5,6 +5,7 @@ import { TxComponent } from './tx.component';
 import { IdComponent } from './id.component';
 import { IncludeComponent, IncludeDirective } from './include.component';
 import { GatewayServiceFactory } from './gateway.service';
+import { RunService } from './run.service';
 
 
 @NgModule({
@@ -13,7 +14,7 @@ import { GatewayServiceFactory } from './gateway.service';
     HttpClientModule
   ],
   declarations: [IdComponent, TxComponent, IncludeComponent, IncludeDirective],
-  providers: [ GatewayServiceFactory ],
+  providers: [ GatewayServiceFactory, RunService ],
   exports: [IdComponent, TxComponent, IncludeComponent, IncludeDirective]
 })
 export class DvModule { }

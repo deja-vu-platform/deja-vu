@@ -47,7 +47,7 @@ export class RunService {
     while (node && node.getAttribute) {
       debugger;
       const parentActionId = node.getAttribute(ACTION_ID_ATTR);
-      if (parentActionId !== undefined && node.nodeName === 'dv-compound') {
+      if (parentActionId !== undefined && node.nodeName === 'dv-tx') {
         targetAction = node;
       }
       node = this.renderer.parentNode(node);
@@ -58,7 +58,7 @@ export class RunService {
   private callDvOnRun(node, id: string): Promise<void> {
     const actionId = node.getAttribute(ACTION_ID_ATTR);
     const target = this.actionTable[actionId];
-    if (actionId === undefined || target.node.nodeName === 'dv-compound') {
+    if (actionId === undefined || target.node.nodeName === 'dv-tx') {
       return Promise.all(_.map(node.childNodes, n => this.callDvOnRun(n, id)))
         .then(unused => undefined);
     }
