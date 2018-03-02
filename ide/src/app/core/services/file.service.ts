@@ -3,8 +3,8 @@ import { NgZone} from '@angular/core';
 declare const electron: any;
 
 /**
- * Service for communicating with electron's main.js via ipcRenderer.
- * Reduces places where electron's ipc renderer has to be imported.
+ * Service for loading, storing and deleting files via ipcRenderer to
+ * communicate to electron's main.js.
  */
 @Injectable()
 export class FileService {
@@ -27,8 +27,9 @@ export class FileService {
     }
   }
 
-  save(filename, content) {
+  save(dir, filename, content) {
     this.ipcRenderer.send('save', {
+      dir: dir,
       filename: filename,
       content: content
     });
@@ -42,8 +43,11 @@ export class FileService {
     });
   }
 
-  delete(data) {
-    this.ipcRenderer.send('delete', data);
+  delete(dir, filename) {
+    this.ipcRenderer.send('delete', {
+      dir: dir,
+      filename: filename
+    });
   }
 
   onDeleteSuccess(callback) {
@@ -54,12 +58,12 @@ export class FileService {
     });
   }
 
-  load() {
-    this.ipcRenderer.send('load');
+  read(dir) {
+    this.ipcRenderer.send('read', {dir: dir});
   }
 
-  onLoad(callback) {
-    this.ipcRenderer.on('projects', (event, data) => {
+  onReadSuccess(callback) {
+    this.ipcRenderer.on('read-success', (event, data) => {
       this.zone.run(() => {
         callback(event, data);
       });

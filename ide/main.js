@@ -76,26 +76,32 @@ app.on('activate', function () {
   }
 });
 
+ipcMain.on('read', function (event, args) {
+  const send = function(files) {
+    mainWindow.webContents.send('read-success', { files: files });    
+  }
 
-// The projects are currently stored at the root of the app.
-// TODO have an option to allow users to put in where they want
-// their projects saved. 
-const SAVE_DIR = path.join(__dirname, 'projects');
+  const dir = getFullPath(args.dir);
 
-try {
-  fs.accessSync(SAVE_DIR, fs.F_OK);
-} catch (e) {
-  // The folder hasn't been created yet.
-  fs.mkdir(SAVE_DIR);
-}
+  try {
+    fs.accessSync(dir, fs.F_OK);
+  } catch (e) {
+    // The folder hasn't been created yet.
+    fs.mkdir(dir, function(err) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      send([]);  
+    });
+  }
 
-ipcMain.on('load', function (event, args) {
-  readFiles(SAVE_DIR, function (err, files) {
+  readFiles(dir, function (err, files) {
     if (err) {
       console.log(err);
       return;
     }
-    mainWindow.webContents.send('projects', { projects: files });
+    send(files);
   });
 });
 
@@ -110,7 +116,7 @@ ipcMain.on('delete', function (event, args) {
 });
 
 ipcMain.on('save', function (event, args) {
-  saveObjectToFile(SAVE_DIR, args.filename, args.content, function (err) {
+  saveObjectToFile(getFullPath(args.dir), args.filename, args.content, function (err) {
     if (err) {
       console.log(err);
       return;
@@ -171,7 +177,7 @@ function isCopyOfFile(dirname, filename) {
 }
 
 function deleteFile(filename, onFinish) {
-  const pathName = path.join(SAVE_DIR, filename);
+  const pathName = path.join(getFullPath(args.dir), filename);
   fs.stat(pathName, function (err1, stats) {
     if (err1) {
       console.error(err1);
@@ -185,4 +191,11 @@ function deleteFile(filename, onFinish) {
       onFinish();
     });
   });
+}
+
+function getFullPath(dir){
+  // The projects are currently stored at the root of the app.
+  // TODO have an option to allow users to put in where they want
+  // their projects saved. 
+  return path.join(__dirname, dir);
 }

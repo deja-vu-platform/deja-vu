@@ -1,9 +1,6 @@
 import { generateId, shallowCopy } from '../../utility/utility';
 import { Cliche, UserCliche, DvCliche} from '../cliche/cliche';
 
-// file extension to save projects
-export const DV_EXT = 'dvp';
-
 interface ProjectFields {
   id?: string;
 

@@ -6,8 +6,7 @@ import { ProjectDeleteDialogComponent } from './project-delete-dialog/project-de
 import { NewProjectDialogComponent } from './new-project-dialog/new-project-dialog.component';
 import { RouterService, PageType } from '../core/services/router.service';
 import { ProjectService } from '../core/services/project.service';
-import { FileService } from '../core/services/file.service';
-import { Project, DV_EXT } from '../core/models/project/project';
+import { Project } from '../core/models/project/project';
 
 import { getExtension } from '../core/utility/utility';
 
@@ -39,17 +38,14 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
   constructor(
     public dialog: MatDialog,
     private routerService: RouterService,
-    private projectService: ProjectService,
-    private fileService: FileService) {}
+    private projectService: ProjectService) {}
 
   ngOnInit() {
     this.loaderVisible = true;
-    this.fileService.onLoad((event, data) => {
-      data.projects.forEach((projectInfo) => {
+    this.projectService.onLoadProjectFiles((filedata) => {
+      console.log(filedata);
+      filedata.forEach((projectInfo) => {
         const filename = projectInfo[0];
-        if (getExtension(filename) !== DV_EXT) {
-          return;
-        }
         const content = JSON.parse(projectInfo[1]);
         this.projects[filename] = content;
       });
@@ -58,7 +54,7 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
       this.loaderVisible = false;
     });
 
-    this.fileService.onDeleteSuccess((event, data) => {
+    this.projectService.onDeleteProjectFile((event, data) => {
       // TODO deal with if the project is your selected project
       delete this.projects[data.filename];
 
@@ -66,7 +62,7 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
       this.loaderVisible = false;
     });
 
-    this.fileService.load();
+    this.projectService.loadProjectFiles();
   }
 
   handleNewProject() {
@@ -118,7 +114,7 @@ export class ProjectExplorerComponent implements OnInit, OnDestroy {
   }
 
   private deleteProject(filename) {
-    this.fileService.delete({filename: filename});
+    this.projectService.deleteProjectFile(filename);
   }
 
   private updateDisplayProjectList() {

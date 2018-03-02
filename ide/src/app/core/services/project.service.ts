@@ -3,20 +3,21 @@ import { Injectable } from '@angular/core';
 // upon subscription
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { Project, DV_EXT } from '../models/project/project';
+import { Project } from '../models/project/project';
 import { Widget, UserWidget } from '../models/widget/widget';
 import { UserCliche } from '../models/cliche/cliche';
 
 import { FileService } from './file.service';
 
-function projectNameToFilename(projectName) {
-  return projectName + '.' + DV_EXT;
-}
+import { getExtension } from '../utility/utility';
 
+// file extension to save projects
+const DV_EXT = 'dvp';
+const DIR = 'projects';
 
 @Injectable()
 export class ProjectService {
-  constructor(private fileservice: FileService) {
+  constructor(private fileService: FileService) {
     const project = localStorage.getItem('project');
     if (project) {
       this.updateProject(Project.fromJSON(JSON.parse(project)));
@@ -28,6 +29,28 @@ export class ProjectService {
   selectedWidget = new BehaviorSubject<Widget>(undefined);
   userAppUpdateListener = new BehaviorSubject<boolean>(false);
 
+  public loadProjectFiles() {
+    this.fileService.read(DIR);
+  }
+
+  // call this only once to set the listener
+  public onLoadProjectFiles(callback) {
+    this.fileService.onReadSuccess((event, data) => {
+      const files = data.files.filter(
+        filedata => getExtension(filedata[0]) === DV_EXT);
+      callback(files);
+    });
+  }
+
+  // call this only once to set the listener
+  public onDeleteProjectFile(callback) {
+    this.fileService.onDeleteSuccess(callback);
+  }
+
+  public deleteProjectFile(filename) {
+    this.fileService.delete('projects', filename);
+  }
+
   public saveProject() {
     const project = this.selectedProject.getValue();
     if (!project) {
@@ -35,7 +58,7 @@ export class ProjectService {
     }
     const JSONObject = Project.toJSON(project);
     this.saveToLocalStorage(project);
-    this.fileservice.save(projectNameToFilename(project.getName()), JSONObject);
+    this.fileService.save(DIR, this.projectNameToFilename(project.getName()), JSONObject);
   }
 
   public updateProject(project: Project) {
@@ -93,5 +116,9 @@ export class ProjectService {
   private saveToLocalStorage(project: Project) {
     const JSONObject = Project.toJSON(project);
     localStorage.setItem('project', JSON.stringify(JSONObject));
+  }
+
+  private projectNameToFilename(projectName) {
+    return projectName + '.' + DV_EXT;
   }
 }
