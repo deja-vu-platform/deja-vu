@@ -1,4 +1,5 @@
-<form (ngSubmit)="onSubmit()" #newWeeklyEventForm="ngForm"
+<form (ngSubmit)="onSubmit(); newWeeklyEventForm.resetForm()"
+  #newWeeklyEventForm="ngForm"
   class="form-horizontal">
   <div class="form-group">
     <mat-form-field>

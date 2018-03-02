@@ -66,7 +66,7 @@ export class GatewayService {
 
 @Injectable()
 export class GatewayServiceFactory {
-  renderer: Renderer2;
+  private renderer: Renderer2;
   constructor(
     @Inject(GATEWAY_URL) private gatewayUrl: string, private http: HttpClient,
     rendererFactory: RendererFactory2) {
