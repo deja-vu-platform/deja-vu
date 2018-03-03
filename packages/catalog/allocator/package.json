@@ -18,8 +18,9 @@
     "dv-package-allocator-server": "tsc -p server --outDir ./pkg/server && cp server/schema.graphql ./pkg/server",
     "dv-package-allocator": "npm run dv-package-allocator-client && npm run dv-package-allocator-server",
     "dv-package-watch-allocator": "chokidar src/app/allocator server -c 'npm run dv-package-allocator'",
-    "dv-start-allocator": "if [ -f dist/server/server.js ]; then node dist/server/server.js -- --config \"`dv get config`\"; else echo \"No file\"; fi;",
-    "dv-start-watch-allocator": "if [ -f dist/server/server.js ]; then nodemon -w dist/server dist/server/server.js -- --config \"`dv get config`\"; else echo \"No file\"; fi;"
+    "dv-start-allocator": "if [ -f dist/server/server.js ]; then node dist/server/server.js --config \"`dv get config`\"; else echo \"No file\"; fi;",
+    "dv-start-watch-allocator": "if [ -f dist/server/server.js ]; then nodemon -w dist/server dist/server/server.js -- --config \"`dv get config`\"; else echo \"No file\"; fi;",
+    "dv-start-all": "concurrently \"npm run dv-start-gateway\" \"npm run dv-start-allocator\""
   },
   "private": true,
   "peerDependencies": {
