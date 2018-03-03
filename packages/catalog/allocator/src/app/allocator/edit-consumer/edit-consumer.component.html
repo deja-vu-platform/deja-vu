@@ -2,7 +2,7 @@
   <div class="form-group">
     <mat-form-field>
       <mat-select [(value)]="selectedConsumerId"
-        (change)="run()">
+        (change)="updateConsumer()">
         <mat-option *ngFor="let c of consumers" [value]="c.id">
           {{c.id}}
         </mat-option>

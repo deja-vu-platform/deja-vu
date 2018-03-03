@@ -16,7 +16,8 @@
       "startServer": true,
       "watch": true,
       "config": {
-        "wsPort": 3003
+        "wsPort": 3003,
+        "initialConsumerIds": ["Ben", "Alyssa"]
       }
     }
   }

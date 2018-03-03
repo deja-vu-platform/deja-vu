@@ -4,6 +4,7 @@ import {
 import {
   AllocatorServiceFactory, AllocatorService
 } from '../shared/allocator.service';
+import { RunService, OnRun } from 'dv-core';
 
 
 @Component({
@@ -11,7 +12,7 @@ import {
   templateUrl: './edit-consumer.component.html',
   styleUrls: ['./edit-consumer.component.css']
 })
-export class EditConsumerComponent implements OnChanges, OnInit {
+export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
   @Input() resourceId: string;
   @Input() allocationId: string;
   @Output() currentConsumer = new EventEmitter();
@@ -21,11 +22,12 @@ export class EditConsumerComponent implements OnChanges, OnInit {
   allocator: AllocatorService;
 
   constructor(
-    private elem: ElementRef,
-    private asf: AllocatorServiceFactory) {}
+    private elem: ElementRef, private asf: AllocatorServiceFactory,
+    private rs: RunService) {}
 
   ngOnInit() {
     this.allocator = this.asf.for(this.elem);
+    this.rs.register(this.elem, this);
     this.update();
   }
 
@@ -50,7 +52,11 @@ export class EditConsumerComponent implements OnChanges, OnInit {
     }
   }
 
-  run() {
+  updateConsumer() {
+    this.rs.run(this.elem);
+  }
+
+  dvOnRun() {
     if (this.currentConsumerId !== this.selectedConsumerId) {
       console.log(`Updating consumer to ${this.selectedConsumerId}`);
       this.allocator

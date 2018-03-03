@@ -15,10 +15,12 @@ import { CreateResourceComponent } from './create-resource/create-resource.compo
 import { CreateAllocationComponent } from './create-allocation/create-allocation.component';
 import { ShowConsumerComponent } from './show-consumer/show-consumer.component';
 import { EditConsumerComponent } from './edit-consumer/edit-consumer.component';
+import { DeleteResourceComponent } from './delete-resource/delete-resource.component';
 
 const allComponents = [
   CreateResourceComponent, CreateAllocationComponent,
-  ShowConsumerComponent, EditConsumerComponent
+  ShowConsumerComponent, EditConsumerComponent,
+  DeleteResourceComponent
 ];
 
 @NgModule({

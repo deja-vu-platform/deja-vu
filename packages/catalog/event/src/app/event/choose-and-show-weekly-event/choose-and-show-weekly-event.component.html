@@ -1,6 +1,6 @@
 <div class="row">
   <mat-form-field>
-    <mat-select placeholder="Choose Weekly Event" (selectionChange)="updateEvents($event.value)" class="selectpicker">
+    <mat-select [placeholder]="chooseWeeklyEventSelectPlaceholder" (selectionChange)="updateEvents($event.value)" class="selectpicker">
       <mat-option *ngFor="let weeklyEvent of weeklyEvents"
        [value]="weeklyEvent.id">
           {{weeklyEvent.startsOn | date}} - {{weeklyEvent.endsOn | date}}
@@ -18,6 +18,6 @@
     </li>
   </ul>
   <div *ngIf="!events || events.length == 0">
-    No events to show
+    {{noEventsToShowText}}
   </div>
 </div>

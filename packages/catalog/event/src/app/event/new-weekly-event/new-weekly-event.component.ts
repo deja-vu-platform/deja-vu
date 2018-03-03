@@ -1,9 +1,15 @@
 import {
-  Component, AfterViewInit, ElementRef, Input, OnInit
+  Component, AfterViewInit, ElementRef, Input, OnInit, Output,
+  EventEmitter
 } from '@angular/core';
 import {
   GatewayServiceFactory, GatewayService, RunService, OnRun
 } from 'dv-core';
+
+import * as _ from 'lodash';
+
+import { Event } from '../../../../shared/data';
+
 
 @Component({
   selector: 'event-new-weekly-event',
@@ -12,10 +18,13 @@ import {
 })
 export class NewWeeklyEventComponent implements OnInit, OnRun {
   @Input() id = ''; // optional
+  @Input() buttonLabel = 'Create Weekly Event';
   startsOn = '';
   endsOn = '';
   startTime = '';
   endTime = '';
+  @Output() events = new EventEmitter<Event[]>();
+
   gs: GatewayService;
 
   constructor(
@@ -40,10 +49,24 @@ export class NewWeeklyEventComponent implements OnInit, OnRun {
             startsOn: "${this.startsOn}", endsOn: "${this.endsOn}",
             startTime: "${this.startTime}", endTime: "${this.endTime}"
           }) {
-            id
+            id,
+            events {
+              id,
+              startDate,
+              endDate,
+              weeklyEvent {
+                id
+              }
+            }
           }
         }`
       }))
-      .toPromise();
+      .toPromise()
+    .then((res: {data: any}) => {
+      this.events.emit(_.map(res.data.createWeeklyEvent.events, evt => {
+        evt.weeklyEventId = evt.weeklyEvent.id;
+        return evt;
+      }));
+    });
   }
 }

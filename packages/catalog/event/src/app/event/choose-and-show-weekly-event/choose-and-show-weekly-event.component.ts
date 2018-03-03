@@ -18,6 +18,8 @@ import { ShowEventComponent } from '../show-event/show-event.component';
   providers: [ DatePipe ]
 })
 export class ChooseAndShowWeeklyEventComponent implements OnInit {
+  @Input() noEventsToShowText = 'No events to show';
+  @Input() chooseWeeklyEventSelectPlaceholder = 'Choose Weekly Event';
   selectedWeeklyEvent: WeeklyEvent;
   weeklyEvents: WeeklyEvent[] = [];
   events: Event[] = [];
@@ -66,7 +68,10 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
                 events {
                   id,
                   startDate,
-                  endDate
+                  endDate,
+                  weeklyEvent {
+                    id
+                  }
                 }
               }
             }
@@ -79,7 +84,10 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
             return new Date(e1.startDate).getTime() -
                    new Date(e2.startDate).getTime();
         });
-        this.events = events;
+        this.events = _.map(events, evt => {
+          evt.weeklyEventId = evt.weeklyEvent.id;
+          return evt;
+        });
       });
   }
 }

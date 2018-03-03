@@ -17,6 +17,10 @@ interface CreateResourceRes {
   data: {createResource: {id: string}};
 }
 
+interface DeleteResourceRes {
+  data: {deleteResource: {id: string}};
+}
+
 interface CreateAllocationRes {
   data: {createAllocation: {id: string}};
 }
@@ -88,10 +92,21 @@ export class AllocatorService {
     .pipe(map(res => res.data.createResource));
   }
 
-  createAllocation(id: string, resourceIds: string[]) {
+  deleteResource(id: string): Observable<Resource> {
+    return this.post<DeleteResourceRes>(`
+      deleteResource(id: "${id}") {
+        id
+      }
+    `)
+    .pipe(map(res => res.data.deleteResource));
+  }
+
+  createAllocation(
+    id: string, resourceIds: string[], saveResources: boolean) {
     return this.post<CreateAllocationRes>(`
       createAllocation(
-        id: "${id}", resourceIds: "${resourceIds}") {
+        id: "${id}", resourceIds: ${JSON.stringify(resourceIds)},
+        saveResources: ${saveResources}) {
         id
       }
     `)

@@ -1,11 +1,11 @@
-<form (ngSubmit)="run()" class="form-horizontal">
+<form (ngSubmit)="onSubmit()" class="form-horizontal">
   <div class="form-group">
     <mat-form-field>
-      <mat-label>Id</mat-label>
+      <mat-label>{{inputLabel}}</mat-label>
       <input matInput [(ngModel)]="id" name="id">
     </mat-form-field>
   </div>
   <div class="form-group">
-    <button mat-button type="submit">Create Resource</button>
+    <button mat-button type="submit">{{buttonLabel}}</button>
   </div>
 </form>

@@ -4,6 +4,8 @@ import {
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs/Observable';
 
+import { RUN_ID_ATTR } from './run.service';
+
 
 export type Dict = {[field: string]: string};
 export interface RequestOptions {
@@ -52,7 +54,10 @@ export class GatewayService {
 
   private buildParams(path?: string, options?: RequestOptions)
     : {[params: string]: string} {
-    const params = {from: this.fromStr};
+    const params = {
+      from: this.fromStr,
+      runId: this.from.nativeElement.getAttribute(RUN_ID_ATTR)
+    };
     if (path) {
       params['path'] = path;
     }

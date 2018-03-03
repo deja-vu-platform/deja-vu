@@ -5,8 +5,10 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
 
+// put a new txId attribute and not force the user to wire the id along
 export interface OnRun {
-  dvOnRun: (id: string) => Promise<void>;
+  // To abort the run return a rejected promise
+  dvOnRun: (id: string) => Promise<any> | any;
 }
 
 interface ActionInfo {
@@ -15,6 +17,7 @@ interface ActionInfo {
 }
 
 const ACTION_ID_ATTR = '_dvActionId';
+export const RUN_ID_ATTR = '_dvRunId';
 
 
 @Injectable()
@@ -33,6 +36,10 @@ export class RunService {
     this.renderer = rendererFactory.createRenderer(null, null);
   }
 
+  /**
+   * Register a new action. Should be called on init. Only actions that can be
+   * run are required to be registered.
+   **/
   register(elem: ElementRef, action: any) {
     const actionId = uuid();
     const node = elem.nativeElement;
@@ -40,14 +47,15 @@ export class RunService {
     this.actionTable[actionId] = {action: action, node: node};
   }
 
+  /**
+   * Cause the action given by `elem` to run.
+   **/
   run(elem: ElementRef) {
     let node = elem.nativeElement;
     let targetAction = node;
     
-    while (node && node.getAttribute) {
-      debugger;
-      const parentActionId = node.getAttribute(ACTION_ID_ATTR);
-      if (parentActionId !== undefined && node.nodeName === 'dv-tx') {
+    while (node && node.getAttribute) { // 'document' doesn't have `getAttribute`
+      if (this.isDvTx(node)) {
         targetAction = node;
       }
       node = this.renderer.parentNode(node);
@@ -56,16 +64,23 @@ export class RunService {
   }
 
   private callDvOnRun(node, id: string): Promise<void> {
-    const actionId = node.getAttribute(ACTION_ID_ATTR);
-    const target = this.actionTable[actionId];
-    if (actionId === undefined || target.node.nodeName === 'dv-tx') {
+    const actionId = node.getAttribute ?
+      node.getAttribute(ACTION_ID_ATTR) : undefined;
+    if (!actionId) {
+      // node is not a dv-action (e.g., it's a <div>) or is dv-tx
       return Promise.all(_.map(node.childNodes, n => this.callDvOnRun(n, id)))
         .then(unused => undefined);
     }
 
+    const target = this.actionTable[actionId];
     if (target.action.dvOnRun) {
-      return target.action.dvOnRun(id);
+      target.node.setAttribute(RUN_ID_ATTR, id);
+      return target.action.dvOnRun();
     }
     return Promise.resolve();
+  }
+
+  private isDvTx(node) {
+    return node.nodeName.toLowerCase() === 'dv-tx';
   }
 }

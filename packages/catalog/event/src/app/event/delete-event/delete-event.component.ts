@@ -1,7 +1,9 @@
 import {
   Component, AfterViewInit, ElementRef, Input, OnInit
 } from '@angular/core';
-import { GatewayServiceFactory, GatewayService } from 'dv-core';
+import {
+  GatewayServiceFactory, GatewayService, OnRun, RunService
+} from 'dv-core';
 
 
 @Component({
@@ -9,23 +11,30 @@ import { GatewayServiceFactory, GatewayService } from 'dv-core';
   templateUrl: './delete-event.component.html',
   styleUrls: ['./delete-event.component.css']
 })
-export class DeleteEventComponent implements OnInit {
+export class DeleteEventComponent implements OnInit, OnRun {
   @Input() id;
   gs: GatewayService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
   }
 
-  deleteEvent() {
-    this.gs
+  dvOnRun(id: string): Promise<any> {
+    return this.gs
       .post('/graphql', JSON.stringify({
         query: `mutation {
           deleteEvent (id: "${this.id}")
         }`
       }))
-      .subscribe(() => undefined);
+      .toPromise();
+  }
+
+  deleteEvent() {
+    this.rs.run(this.elem);
   }
 }

@@ -124,7 +124,7 @@ const resolvers = {
         await allocations.updateOne({ id: allocationId }, updateOp);
         return true;
     },
-    createAllocation: async (root, {id, resourceIds}) => {
+    createAllocation: async (root, {id, resourceIds, saveResources}) => {
       const allConsumers = await consumers.find().toArray();
       const consumerIds = _.map(allConsumers, 'id');
       const assignments = {};
@@ -144,6 +144,10 @@ const resolvers = {
         consumerIds: consumerIds,
         assignments: assignments
       };
+      if (saveResources) {
+        await resources.insertMany(
+          _.map(resourceIds, resourceId => ({id: resourceId})));
+      }
       await allocations.insertOne(newAllocation);
       return newAllocation;
     },
@@ -152,6 +156,10 @@ const resolvers = {
       const newResource: ResourceDoc = { id: resourceId };
       await resources.insertOne(newResource);
       return newResource;
+    },
+    deleteResource: async (root, {id}) => {
+      await resources.deleteOne({id: id});
+      return {id: id};
     },
   }
 };
