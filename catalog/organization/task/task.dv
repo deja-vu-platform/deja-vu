@@ -101,7 +101,7 @@ cliche Task {
   }
 
   // Shows all tasks assigned to an assignee, regardless of 
-  // completing or approval
+  // completion or approval
   widget ShowAllTasks uses ShowTask {
     assignee: Assignee
   }
