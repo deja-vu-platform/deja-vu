@@ -10,7 +10,6 @@ export class IdComponent implements OnInit {
   @Output() id = new EventEmitter<string>();
 
   ngOnInit() {
-    debugger;
     this.id.emit(uuid());
   }
 }

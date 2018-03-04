@@ -1,8 +1,9 @@
 <div class="row">
-  <div class="col-md-offset-2 col-md-6">
-    <h1>Group meeting organizer</h1>
-    <h2>Create new group meeting series</h2>
+  <div class="col-md-12">
     <div class="row">
+      <h1>Group meeting organizer</h1>
+    </div>
+    <div class="row box">
       <dv-tx>
         <dv-id (id)="groupMeetingId=$event"></dv-id>
         <event-new-weekly-event
@@ -15,16 +16,17 @@
         </allocator-create-allocation>
       </dv-tx>
     </div>
-    <h2>Show a group meeting series</h2>
-    <div class="row">
-      <event-choose-and-show-weekly-event
-        [showEvent]="{
-          type: showGroupMeeting,
-          inputMap: {event: 'groupMeeting'}
-        }"
-        noEventsToShowText="No meetings to show"
-        chooseWeeklyEventSelectPlaceholder="Choose Meeting Series">
-      </event-choose-and-show-weekly-event>
+    <div class="row box">
+      <div class="col-md-12">
+        <event-choose-and-show-weekly-event
+          [showEvent]="{
+            type: showGroupMeeting,
+            inputMap: {event: 'groupMeeting'}
+          }"
+          noEventsToShowText="No meetings to show"
+          chooseWeeklyEventSelectPlaceholder="Choose Meeting Series">
+        </event-choose-and-show-weekly-event>
+      </div>
     </div>
   </div>
 </div>

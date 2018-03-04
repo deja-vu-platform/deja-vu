@@ -56,6 +56,7 @@ interface Config {
   dbHost: string;
   dbPort: number;
   dbName: string;
+  reinitDbOnStartup: boolean;
 }
 
 const argv = minimist(process.argv);
@@ -66,7 +67,8 @@ const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
   dbPort: 27017,
   wsPort: 3000,
-  dbName: `${name}-db`
+  dbName: `${name}-db`,
+  reinitDbOnStartup: true
 };
 
 let configArg;
@@ -79,13 +81,19 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db;
+let db, events, weeklyEvents;
 mongodb.MongoClient.connect(
-  `mongodb://${config.dbHost}:${config.dbPort}`, (err, client) => {
+  `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
       throw err;
     }
     db = client.db(config.dbName);
+    if (config.reinitDbOnStartup) {
+      await db.dropDatabase();
+      console.log(`Reinitialized db ${config.dbName}`);
+    }
+    events = db.collection('events');
+    weeklyEvents = db.collection('weeklyevents');
   });
 
 
@@ -93,23 +101,23 @@ const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 const resolvers = {
   Query: {
-    events: () => db.collection('events').find().toArray(),
-    weeklyEvents: () => db.collection('weeklyevents').find().toArray(),
-    event: (root, { id }) => db.collection('events').findOne({ id: id }),
-    weeklyEvent: (root, { id }) => db.collection('weeklyevents').findOne({ id: id })
+    events: () => events.find().toArray(),
+    weeklyEvents: () => weeklyEvents.find().toArray(),
+    event: (root, { id }) => events.findOne({ id: id }),
+    weeklyEvent: (root, { id }) => weeklyEvents.findOne({ id: id })
   },
   Event: {
     id: (event: EventDoc) => event.id,
     startDate: (event: EventDoc) => event.startDate,
     endDate: (event: EventDoc) => event.endDate,
-    weeklyEvent: (event: EventDoc) => db.collection('weeklyevents')
+    weeklyEvent: (event: EventDoc) => weeklyEvents
       .findOne({ id: event.weeklyEventId })
   },
   WeeklyEvent: {
     id: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.id,
     startsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.startsOn,
     endsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.endsOn,
-    events: (weeklyEvent: WeeklyEventDoc) => db.collection('events')
+    events: (weeklyEvent: WeeklyEventDoc) => events
       .find({ id: { $in: weeklyEvent.eventIds } }).toArray()
   },
   Mutation: {
@@ -117,22 +125,22 @@ const resolvers = {
       const {startDate, endDate} = getStartAndEndDates(input);
       const eventId = uuid();
       const e = { id: eventId, startDate: startDate, endDate: endDate };
-      await db.collection('events').insertOne(e);
+      await events.insertOne(e);
       return e;
     },
     updateEvent: async (root, {input}: {input: UpdateEventInput}) => {
       const {startDate, endDate} = getStartAndEndDates(input);
       const updateObj = { $set: { startDate: startDate, endDate: endDate } };
-      await db.collection('events').updateOne({id: input.id}, updateObj);
+      await events.updateOne({id: input.id}, updateObj);
       return true;
     },
     // If a weeklyEventId is given, the event is removed from that weekly event
     deleteEvent: async (root, {id}) => {
-      const res = await db.collection('events').findOneAndDelete({id: id});
+      const res = await events.findOneAndDelete({id: id});
       const deletedEvent = res.value;
       if (deletedEvent.weeklyEventId) {
         const updatedWeeklyEvent = { $pull: { events: {id: id} } };
-        await db.collection('weeklyevents')
+        await weeklyEvents
           .update({id: deletedEvent.weeklyEventId}, updatedWeeklyEvent);
       }
       return true;
@@ -166,7 +174,7 @@ const resolvers = {
           endDate: endDate.toString(),
           weeklyEventId: weeklyEventId
         };
-        inserts.push(db.collection('events').insertOne(e));
+        inserts.push(events.insertOne(e));
       }
 
       const weeklyEvent: WeeklyEventDoc = {
@@ -178,7 +186,7 @@ const resolvers = {
         endTime: input.endTime
       };
       await Promise.all(inserts);
-      await db.collection('weeklyevents').insertOne(weeklyEvent);
+      await weeklyEvents.insertOne(weeklyEvent);
       return weeklyEvent;
     }
   }

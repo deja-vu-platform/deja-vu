@@ -24,7 +24,7 @@ export class DeleteEventComponent implements OnInit, OnRun {
     this.rs.register(this.elem, this);
   }
 
-  dvOnRun(id: string): Promise<any> {
+  dvOnRun(): Promise<any> {
     return this.gs
       .post('/graphql', JSON.stringify({
         query: `mutation {

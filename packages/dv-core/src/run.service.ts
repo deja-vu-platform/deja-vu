@@ -5,15 +5,29 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
 
-// put a new txId attribute and not force the user to wire the id along
 export interface OnRun {
   // To abort the run return a rejected promise
-  dvOnRun: (id: string) => Promise<any> | any;
+  dvOnRun: () => Promise<any> | any;
+}
+
+export interface OnAfterCommit {
+  // res is the value the promise returned in `dvOnRun` resolved to
+  dvOnAfterCommit: (res?: any) => void
+}
+
+export interface OnAfterAbort {
+  // res is the value the promise returned in `dvOnRun` resolved to
+  // reason is the error that caused the abort
+  dvOnAfterAbort: (res: any, reason: any) => void
 }
 
 interface ActionInfo {
   action: any;
   node: any;
+}
+
+interface RunResultMap {
+  [actionId: string]: any
 }
 
 const ACTION_ID_ATTR = '_dvActionId';
@@ -50,7 +64,7 @@ export class RunService {
   /**
    * Cause the action given by `elem` to run.
    **/
-  run(elem: ElementRef) {
+  async run(elem: ElementRef) {
     let node = elem.nativeElement;
     let targetAction = node;
     
@@ -60,24 +74,70 @@ export class RunService {
       }
       node = this.renderer.parentNode(node);
     }
-    this.callDvOnRun(targetAction, uuid());
+    const runId = uuid();
+    let runResultMap: RunResultMap | undefined;
+    try {
+      runResultMap = await this.callDvOnRun(targetAction, runId);
+    } catch (error) {
+      console.log(`Got error on run ${runId}: ${error}`);
+      this.callDvOnAfterAbort(targetAction, error);
+    }
+    if (runResultMap) { // no error
+      this.callDvOnAfterCommit(targetAction, runResultMap);
+    }
   }
 
-  private callDvOnRun(node, id: string): Promise<void> {
+  /**
+   * Walks the dom starting from `node` calling `onAction` with the action info
+   * when an action is encountered. No child of actions are traversed.
+   **/
+  private walkActions(node, onAction: (ActionInfo, string?) => void): void {
     const actionId = node.getAttribute ?
       node.getAttribute(ACTION_ID_ATTR) : undefined;
     if (!actionId) {
       // node is not a dv-action (e.g., it's a <div>) or is dv-tx
-      return Promise.all(_.map(node.childNodes, n => this.callDvOnRun(n, id)))
-        .then(unused => undefined);
+      _.each(node.childNodes, n => this.walkActions(n, onAction));
+      return;
     }
-
     const target = this.actionTable[actionId];
-    if (target.action.dvOnRun) {
-      target.node.setAttribute(RUN_ID_ATTR, id);
-      return target.action.dvOnRun();
-    }
-    return Promise.resolve();
+    onAction(target, actionId);
+  }
+
+  private async callDvOnRun(node, id: string): Promise<RunResultMap> {
+    const runs: Promise<RunResultMap>[] = [];
+    this.walkActions(node, (actionInfo, actionId) => {
+      if (actionInfo.action.dvOnRun) {
+        actionInfo.node.setAttribute(RUN_ID_ATTR, id);
+        runs.push(
+          Promise
+            .resolve(actionInfo.action.dvOnRun())
+            .then(result => ({[actionId]: result})));
+      }
+    });
+    const resultMaps: RunResultMap[] = await Promise.all(runs);
+    return _.assign({}, ...resultMaps);
+  }
+
+  private callDvOnAfterCommit(node, runResultMap: RunResultMap): void {
+    this.walkActions(node, (actionInfo, actionId) => {
+      if (actionInfo.action.dvOnRun) {
+        actionInfo.node.removeAttribute(RUN_ID_ATTR);
+      }
+      if (actionInfo.action.dvOnAfterCommit) {
+        actionInfo.action.dvOnAfterCommit(runResultMap[actionId]);
+      }   
+    });
+  }
+
+  private callDvOnAfterAbort(node, reason): void {
+    this.walkActions(node, actionInfo => {
+      if (actionInfo.action.dvOnRun) {
+        actionInfo.node.removeAttribute(RUN_ID_ATTR);
+      }
+      if (actionInfo.action.dvOnAfterAbort) {
+        actionInfo.action.dvOnAfterAbort(reason);
+      }   
+    });
   }
 
   private isDvTx(node) {

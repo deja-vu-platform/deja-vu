@@ -1,17 +1,19 @@
 import {
   Component, OnChanges, ElementRef, Input, OnInit
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { GatewayServiceFactory, GatewayService } from 'dv-core';
 import { WeeklyEvent, Event } from '../../../../shared/data';
 
 
 @Component({
   selector: 'event-show-event',
-  template: '{{event.startDate}} - {{event.endDate}}',
+  templateUrl: './show-event.component.html',
+  providers: [ DatePipe ]
 })
 export class ShowEventComponent implements OnChanges, OnInit {
   @Input() event: Event;
-  formattedEvent: Event;
+  sameDayEvent = false;
 
   gs: GatewayService;
 
@@ -19,15 +21,12 @@ export class ShowEventComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.sameDayEvent = this.isSameDayEvent(this.event);
   }
 
   ngOnChanges() {
     if (this.event.startDate && this.event.endDate) {
-      this.formattedEvent = {
-        id: this.event.id,
-        startDate: this.formatDateStr(this.event.startDate),
-        endDate: this.formatDateStr(this.event.endDate)
-      };
+      this.sameDayEvent = this.isSameDayEvent(this.event);
     } else if (this.event.id) {
       this.gs
         .get<{event: Event}>(`
@@ -37,22 +36,20 @@ export class ShowEventComponent implements OnChanges, OnInit {
           }
         `)
         .subscribe(obj => {
-          const startDate = obj.event.startDate;
-          const endDate = obj.event.endDate;
-          this.formattedEvent = {
-            id: this.event.id,
-            startDate: this.formatDateStr(startDate),
-            endDate: this.formatDateStr(endDate)
-          };
+          this.event = obj.event;
+          this.sameDayEvent = this.isSameDayEvent(obj.event);
         });
     }
   }
 
-  formatDateStr(date: string): string {
-    const opts = {
-      day: 'numeric', weekday: 'short', month: 'short', year: 'numeric',
-      hour: 'numeric', minute: 'numeric'
-    };
-    return new Date(date).toLocaleDateString('en-US', opts);
+  private isSameDayEvent(event: Event) {
+    if (!(event.startDate && event.endDate)) {
+      return false;
+    }
+    const startDateObj = new Date(event.startDate);
+    const endDateObj = new Date(event.endDate);
+    return startDateObj.getFullYear() === endDateObj.getFullYear() &&
+      startDateObj.getMonth() === endDateObj.getMonth() &&
+      startDateObj.getDate() === endDateObj.getDate();
   }
 }
