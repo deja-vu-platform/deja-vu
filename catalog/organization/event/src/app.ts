@@ -65,11 +65,15 @@ const schema = grafo
           const starts_on_date = new Date(starts_on);
           const ends_on_date = new Date(ends_on);
 
-          const start_hh_mm = get_hh_mm(start_time);
-          const end_hh_mm = get_hh_mm(end_time);
+          if (start_time !== "") {
+            const start_hh_mm = get_hh_mm(start_time);
+            starts_on_date.setHours(start_hh_mm[0], start_hh_mm[1]);
+          }
 
-          starts_on_date.setHours(start_hh_mm[0], start_hh_mm[1]);
-          ends_on_date.setHours(end_hh_mm[0], end_hh_mm[1]);
+          if (end_time !== "") {
+            const end_hh_mm = get_hh_mm(end_time);
+            ends_on_date.setHours(end_hh_mm[0], end_hh_mm[1]);
+          }
 
           const update_obj = {
             $set: {
