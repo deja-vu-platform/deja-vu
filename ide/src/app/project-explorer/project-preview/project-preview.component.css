@@ -1,0 +1,26 @@
+#page-preview{
+  display: inline-block;
+  position: relative;
+
+  width: 80%;
+  height: 80%;
+
+  overflow: scroll;
+
+  pointer-events: none;
+}
+
+#preview-prev-page, #preview-next-page{
+  display: inline-block;
+  height: 100%;
+  width: 9%;
+  position: relative;
+  cursor: pointer;
+}
+
+#preview-prev-page-icon, #preview-next-page-icon{
+  position:absolute;
+  top:50%;
+  left:0;
+  width:100%;
+}

@@ -1,6 +1,0 @@
-.DS_Store
-.idea/*
-*.iml
-node_modules
-app/projects
-npm-debug.log

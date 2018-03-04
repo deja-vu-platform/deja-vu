@@ -1,0 +1,12 @@
+.highlight {
+  background: lightblue;
+}
+
+:host{
+  position: relative;
+  overflow: scroll;
+}
+
+.hidden {
+  display: none;
+}

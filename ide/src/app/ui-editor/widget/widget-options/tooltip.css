@@ -1,0 +1,9 @@
+.tooltip {
+  opacity: 1;
+  display: none;
+  min-width: 400px;
+}
+
+.tooltip-visible {
+  display: block;
+}
