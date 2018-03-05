@@ -1,31 +1,30 @@
-<div class="row">
-  <div class="col-md-12">
-    <div class="row">
-      <h1>Group meeting organizer</h1>
-    </div>
-    <div class="row box">
-      <dv-tx>
-        <dv-id (id)="groupMeetingId=$event"></dv-id>
-        <event-new-weekly-event
-          [id]="groupMeetingId" (events)="meetings=$event"
-          buttonLabel="Create Group Meeting Series">
-        </event-new-weekly-event>
-        <allocator-create-allocation [hidden]="true"
-          [id]="groupMeetingId"
-          [resources]="meetings" [saveResources]="true">
-        </allocator-create-allocation>
-      </dv-tx>
-    </div>
-    <div class="row box">
-      <div class="col-md-12">
-        <event-choose-and-show-weekly-event
-          [showEvent]="{
-            type: showGroupMeeting,
-            inputMap: {event: 'groupMeeting'}
-          }"
-          noEventsToShowText="No meetings to show"
-          chooseWeeklyEventSelectPlaceholder="Choose Meeting Series">
-        </event-choose-and-show-weekly-event>
+<div class="container main">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="row"><h1>Group meeting organizer</h1></div>
+      <div class="row box">
+        <dv-tx>
+          <dv-id (id)="groupMeetingId=$event"></dv-id>
+          <event-new-weekly-event
+            [id]="groupMeetingId" (events)="meetings=$event"
+            buttonLabel="Create Group Meeting Series">
+          </event-new-weekly-event>
+          <allocator-create-allocation [hidden]="true"
+            [id]="groupMeetingId" [resources]="meetings" [saveResources]="true">
+          </allocator-create-allocation>
+        </dv-tx>
+      </div>
+      <div class="row box">
+        <div class="col-md-12">
+          <event-choose-and-show-weekly-event
+            [showEvent]="{
+              type: showGroupMeeting,
+              inputMap: {event: 'groupMeeting', events: 'groupMeetings'}
+            }"
+            noEventsToShowText="No meetings to show"
+            chooseWeeklyEventSelectPlaceholder="Choose Meeting Series">
+          </event-choose-and-show-weekly-event>
+        </div>
       </div>
     </div>
   </div>

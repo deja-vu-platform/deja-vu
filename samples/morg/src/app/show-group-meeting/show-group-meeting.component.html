@@ -10,7 +10,8 @@
   </div>
   <div class="col-md-2">
     <dv-tx>
-      <event-delete-event [id]="groupMeeting.id"></event-delete-event>
+      <event-delete-event [id]="groupMeeting.id" [events]="groupMeetings">
+      </event-delete-event>
       <allocator-delete-resource [id]="groupMeeting.id" [hidden]="true">
       </allocator-delete-resource>
     </dv-tx>

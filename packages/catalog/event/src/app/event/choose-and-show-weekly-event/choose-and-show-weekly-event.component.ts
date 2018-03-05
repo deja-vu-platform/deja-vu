@@ -35,36 +35,44 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.gs
-      .get<{data: {weeklyEvents: WeeklyEvent[]}}>('/graphql', {
-        params: {
-          query: `
-            query {
-              weeklyEvents {
-                id,
-                startsOn,
-                endsOn
-              }
-            }
-          `
-        }
-      })
-      .pipe(map(res => res.data.weeklyEvents))
-      .subscribe((weeklyEvents: WeeklyEvent[]) => {
-        this.weeklyEvents = weeklyEvents;
-      });
   }
 
-  updateEvents(id: string) {
-     // tmp hack
-    this.selectedWeeklyEvent = _.find(this.weeklyEvents, {id: id});
+  // TODO: should instead make this reactive with Apollo
+  maybeFetchEvents(toggle: boolean) {
+    if (toggle) {
+      this.gs
+        .get<{data: {weeklyEvents: WeeklyEvent[]}}>('/graphql', {
+          params: {
+            query: `
+              query {
+                weeklyEvents {
+                  id,
+                  startsOn,
+                  endsOn
+                }
+              }
+            `
+          }
+        })
+        .pipe(map(res => res.data.weeklyEvents))
+        .subscribe((weeklyEvents: WeeklyEvent[]) => {
+          this.weeklyEvents = weeklyEvents;
+        });
+    }
+  }
+
+  updateEvents(selectedWeeklyEvent: WeeklyEvent) {
+    this.selectedWeeklyEvent = selectedWeeklyEvent;
     this.events = [];
+    if (!selectedWeeklyEvent) {
+      return;
+    }
     this.gs
       .get<{data: {weeklyEvent: {events: Event[]}}}>('/graphql/', {
         params: {
           query: `
             query {
-              weeklyEvent(id: "${id}") {
+              weeklyEvent(id: "${selectedWeeklyEvent.id}") {
                 events {
                   id,
                   startDate,
