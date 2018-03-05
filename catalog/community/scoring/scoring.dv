@@ -5,7 +5,7 @@ cliche Scoring {
     scores: [Score]
   }
 
-  date Score {
+  data Score {
     name: text,
     score: number
   }
@@ -36,9 +36,11 @@ cliche Scoring {
     name: text
   }
 
-  // Add [score] to the array of [target]'s scores field
+  // Create and add [score] to the array of [target]'s scores field
+  // when submit_ok changes
   widget UpdateScore {
-    target: Target
-    score: Score
+    target: Target,
+    score: Score,
+    submit_ok: boolean
   }
 }
