@@ -50,7 +50,7 @@ cliche StandardAuthentication {
   }
 
   // Shows a sign in form for a guest user. After a successful sign in, the user is redirected
-  // to the given widget. No redirect happpens if `on_signin_ok` is undefined.
+  // to the given widget. No redirect happpens if `on_guest_signin_ok` is undefined.
   // Note: The original user is still signed in.
   widget GuestSignInWithRedirect {
     on_guest_signin_ok: Widget
@@ -65,7 +65,7 @@ cliche StandardAuthentication {
   }
 
   // Displays a sign out button for the guest user. When clicked, the guest user is signed out and
-  // redirected to the given widget. No redirect happens if `on_signout_ok` is
+  // redirected to the given widget. No redirect happens if `on_guest_signout_ok` is
   // undefined.
   // Note: The original user is still signed in.
   widget GuestSignOutWithRedirect {
