@@ -1,0 +1,30 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-3 left-sidebar">
+      <ul *ngIf="chats && chats.length > 0" class="list-group">
+        <li *ngFor="let chat of chats" class="list-group-item">
+
+          <dv-widget name="ShowChatPreview" [init]="{chat: chat}" (click)="selectChat(chat)"></dv-widget>
+        </li>
+      </ul>
+    </div>
+    <div class="col-12 col-md-9">
+      <div *ngIf="selectedChat">
+        <div>
+          <dv-widget name="ShowChatUsers" [init]="{users: selectedChat.users}"></dv-widget>
+        </div>
+        <hr>
+        <div>
+          <ul *ngIf="selectedChat.messages.length > 0" class="list-group">
+            <li *ngFor="let message of selectedChat.messages" class="list-group-item">
+              <dv-widget name="ShowMessage" [init]="{message: message}"></dv-widget>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <input type="text" #message (keyup.enter)="sendMessage(selectedChat, message.value)" placeholder="Send a message..." required autofocus>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

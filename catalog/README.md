@@ -20,6 +20,7 @@ Clichés for supporting the interaction of social units
 | Rating | Crowdsource evaluation of items |
 | Follow | Receive updates from sources |
 | Geolocation | Locate points of interest |
+| Scoring | Keep track of scores |
 
 
 Messaging
@@ -32,6 +33,7 @@ Clichés for sending and receiving discrete units of communication
 | Post | Broadcast messages |
 | Email | Share messages via email |
 | Comment | Express an opinion or reaction in writing |
+| Chat | Have conversations among groups of users |
 
 Organization
 ------------

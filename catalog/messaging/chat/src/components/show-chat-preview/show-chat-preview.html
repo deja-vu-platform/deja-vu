@@ -1,0 +1,8 @@
+<div class="chat-preview-container">
+  <dv-widget name="ShowChatUsers" [init]="{users: chat.users}"></dv-widget>
+  <div class="message-preview">
+    <!-- TODO: truncate messsage preview and use ...  -->
+    <span *ngIf="chat && chat.messages.length >0" class="preview">{{chat.messages[-1].content}}</span>
+    <span *ngIf="chat && chat.messages.length == 0" class="preview">No messages yet.</span>
+  </div>
+</div>
