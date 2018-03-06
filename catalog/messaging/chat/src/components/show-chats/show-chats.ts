@@ -3,7 +3,7 @@ import {GraphQlService} from "gql";
 import {Observable} from "rxjs/Observable";
 import "rxjs/add/operator/map";
 
-import {Widget, ClientBus, Field, PrimitiveAtom, AfterInit} from "client-bus";
+import {Widget, ClientBus, Field, AfterInit} from "client-bus";
 import {ChatAtom, MessageAtom, UserAtom} from "../../shared/data";
 
 
@@ -59,7 +59,7 @@ export class ShowChatsComponent implements AfterInit {
         message_atom.timestamp = new Date(timestamp).toLocaleString();
 
         chat.messages.push(message_atom);
-      })
+      });
     }
   }
 
@@ -125,7 +125,7 @@ export class ShowChatsComponent implements AfterInit {
     message_atom.atom_id = message.atom_id;
     const author_atom = this._clientBus.new_atom<UserAtom>("User");
     author_atom.atom_id = message.author.atom_id;
-    author_atom.username = message.author.username
+    author_atom.username = message.author.username;
     message_atom.author = author_atom;
     message_atom.content = message.content;
     message_atom.timestamp = message.timestamp; // TODO: format timestamp

@@ -1,4 +1,4 @@
-import {Widget, Field, Atom} from "client-bus";
+import {Widget, Field} from "client-bus";
 
 import {UserAtom} from "../../shared/data";
 
