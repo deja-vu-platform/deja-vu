@@ -88,10 +88,6 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
       })
       .pipe(map(res => res.data.weeklyEvent.events))
       .subscribe((events: Event[]) => {
-        events.sort((e1, e2) => {
-            return new Date(e1.startDate).getTime() -
-                   new Date(e2.startDate).getTime();
-        });
         this.events = _.map(events, evt => {
           evt.weeklyEventId = evt.weeklyEvent.id;
           return evt;

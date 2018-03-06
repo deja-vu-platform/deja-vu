@@ -18,7 +18,7 @@ export interface OnAfterCommit {
 export interface OnAfterAbort {
   // res is the value the promise returned in `dvOnRun` resolved to
   // reason is the error that caused the abort
-  dvOnAfterAbort: (res: any, reason: any) => void
+  dvOnAfterAbort: (res: any, reason: Error) => void
 }
 
 interface ActionInfo {

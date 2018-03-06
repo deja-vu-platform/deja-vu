@@ -122,8 +122,8 @@ export class NewWeeklyEventComponent implements
     }
   }
 
-  dvOnAfterAbort(reason) {
-    this.newWeeklyEventError = reason;
+  dvOnAfterAbort(reason: Error) {
+    this.newWeeklyEventError = reason.message;
   }
 
   // Get the hours and minutes in 24-hour format from a time in 12-hr format

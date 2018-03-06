@@ -12,8 +12,8 @@ const { makeExecutableSchema } = require('graphql-tools');
 
 interface EventDoc {
   id: string;
-  startDate: string;
-  endDate: string;
+  startDate: Date;
+  endDate: Date;
   weeklyEventId?: string;
 }
 
@@ -118,7 +118,9 @@ const resolvers = {
     startsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.startsOn,
     endsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.endsOn,
     events: (weeklyEvent: WeeklyEventDoc) => events
-      .find({ id: { $in: weeklyEvent.eventIds } }).toArray()
+      .find({ id: { $in: weeklyEvent.eventIds } })
+      .sort({startDate: 1})
+      .toArray()
   },
   Mutation: {
     createEvent: async (root, {input}: {input: CreateEventInput}) => {
@@ -170,8 +172,8 @@ const resolvers = {
         eventIds.push(eventId);
         const e: EventDoc = {
           id: eventId,
-          startDate: startDate.toString(),
-          endDate: endDate.toString(),
+          startDate: startDate,
+          endDate: endDate,
           weeklyEventId: weeklyEventId
         };
         inserts.push(events.insertOne(e));
