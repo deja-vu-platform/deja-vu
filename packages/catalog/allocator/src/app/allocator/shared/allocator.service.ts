@@ -45,9 +45,7 @@ export class AllocatorService {
 
   post<T>(mutation: string): Observable<T> {
     return this.gs
-      .post(GRAPHQL_ENDPOINT, JSON.stringify({
-        query: `mutation { ${mutation} }`
-      }));
+      .post<T>(GRAPHQL_ENDPOINT, {query: `mutation { ${mutation} }`});
   }
 
   consumerOfResource(resourceId: string, allocationId: string)
@@ -103,13 +101,23 @@ export class AllocatorService {
 
   createAllocation(
     id: string, resourceIds: string[], saveResources: boolean) {
-    return this.post<CreateAllocationRes>(`
-      createAllocation(
-        id: "${id}", resourceIds: ${JSON.stringify(resourceIds)},
-        saveResources: ${saveResources}) {
-        id
+    return this.gs.post<CreateAllocationRes>(GRAPHQL_ENDPOINT, {
+      query: `
+        mutation CreateAllocation(
+          $id: ID!, $resourceIds: [ID], $saveResources: Boolean) {
+          createAllocation(
+            id: $id, resourceIds: $resourceIds,
+            saveResources: $saveResources) {
+            id
+          }
+        }
+      `,
+      variables: {
+        id: id,
+        resourceIds: resourceIds,
+        saveResources: saveResources
       }
-    `)
+    })
     .pipe(map(res => res.data.createAllocation));
   }
 }

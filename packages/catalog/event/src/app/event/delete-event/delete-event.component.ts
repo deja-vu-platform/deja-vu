@@ -29,11 +29,11 @@ export class DeleteEventComponent implements OnInit, OnRun, OnAfterCommit {
 
   dvOnRun() {
     this.gs
-      .post('/graphql', JSON.stringify({
+      .post('/graphql', {
         query: `mutation {
           deleteEvent (id: "${this.id}")
         }`
-      }))
+      })
       .toPromise();
   }
 

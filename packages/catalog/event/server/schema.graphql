@@ -30,8 +30,8 @@ input UpdateEventInput {
 
 input CreateWeeklyEventInput {
   id: ID
-  startsOn: String!
-  endsOn: String!
+  startsOn: String!  # unix time
+  endsOn: String!    # unix time
   startTime: String!
   endTime: String!
 }

@@ -82,15 +82,9 @@ export class NewWeeklyEventComponent implements
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs
-      .post<{data: any}>('/graphql', JSON.stringify({
-        query: `mutation {
-          createWeeklyEvent(input: {
-            ${this.id ? `id: "${this.id}",` : ''}
-            startsOn: "${this.startsOn.value}",
-            endsOn: "${this.endsOn.value}",
-            startTime: "${this.startTime.value}",
-            endTime: "${this.endTime.value}"
-          }) {
+      .post<{data: any}>('/graphql', {
+        query: `mutation CreateWeeklyEvent($input: CreateWeeklyEventInput!) {
+          createWeeklyEvent(input: $input) {
             id,
             events {
               id,
@@ -101,8 +95,17 @@ export class NewWeeklyEventComponent implements
               }
             }
           }
-        }`
-      }))
+        }`,
+        variables: {
+          input: {
+            id: this.id ? this.id : '',
+            startsOn: this.startsOn.value.valueOf(),
+            endsOn: this.endsOn.value.valueOf(),
+            startTime: this.startTime.value,
+            endTime: this.endTime.value
+          }
+        }
+      })
      .toPromise();
     this.events.emit(_.map(res.data.createWeeklyEvent.events, evt => {
       evt.weeklyEventId = evt.weeklyEvent.id;

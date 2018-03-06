@@ -40,10 +40,14 @@ export class GatewayService {
       });
   }
 
+  /** If the body is an Object it will be converted to JSON **/
   post<T>(
-    path?: string, body?: string, options?: RequestOptions): Observable<T> {
+    path?: string, body?: string | Object, options?: RequestOptions): Observable<T> {
     console.log(
       `Sending post from ${this.from.nativeElement.nodeName.toLowerCase()}`);
+    if (typeof body === 'object') {
+      body = JSON.stringify(body);
+    }
     return this.http.post<T>(
       this.gatewayUrl, body, {
         params: this.buildParams(path, options),
