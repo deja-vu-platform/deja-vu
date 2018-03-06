@@ -113,9 +113,10 @@ export function startServerCmd(
   watch: boolean, serverDistFolder: string, configKey: string,
   asFlagValue?: string): string {
   const cmd = watch ? `nodemon -w ${serverDistFolder}`: 'node';
+  const eoc = watch ? '--' : '';
   const script = path.join(serverDistFolder, 'server.js');
   return `if [ -f ${script} ]; then ${cmd} ${script}` +
-    ` -- --config \"\`dv get ${configKey}\`\"` +
+    ` ${eoc} --config \"\`dv get ${configKey}\`\"` +
       (asFlagValue ? `--as ${asFlagValue}` : '') + '; ' +
       'else echo "No file"; fi;';
 }
