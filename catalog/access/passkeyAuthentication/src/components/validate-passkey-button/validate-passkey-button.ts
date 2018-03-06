@@ -12,6 +12,9 @@ export class ValidatePasskeyButtonComponent {
 
     submit() {
         this.submit_ok.value = true;
-        this._client_bus.navigate(this.on_validate_ok.value);
+        // check to see if something in local storage
+        if (localStorage.length > 0) {
+            this._client_bus.navigate(this.on_validate_ok.value);
+        }
     }
 }
