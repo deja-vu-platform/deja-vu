@@ -87,5 +87,5 @@ program
 
 
 function moduleClassName(clicheName: string): string {
-  return _.chain(clicheName).camelCase().capitalize().value() + 'Module';
+  return _.chain(clicheName).camelCase().upperFirst().value() + 'Module';
 }

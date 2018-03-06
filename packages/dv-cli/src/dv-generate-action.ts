@@ -27,5 +27,5 @@ program
 
 
 function componentClassName(actionName: string): string {
-  return _.chain(actionName).camelCase().capitalize().value() + 'Component';
+  return _.chain(actionName).camelCase().upperFirst().value() + 'Component';
 }

@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && copyfiles -f src/*.blueprint.* dist",
-    "clean": "rm -rf ./dist"
+    "clean": "rm -rf ./dist",
+    "reinstall-globally": "npm run clean && npm run build && npm uninstall -g && npm install -g" 
   },
   "repository": {
     "type": "git",
