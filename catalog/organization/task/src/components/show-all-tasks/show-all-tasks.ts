@@ -29,22 +29,20 @@ export class ShowAllTasksComponent implements AfterInit {
     }
 
     private fetch() {
-        // suggestion: make a service because there is so much repitition
         if (this.fetched !== this.assignee.atom_id) {
             this.fetched = this.assignee.atom_id;
             this._graphQlService
                 .get(`
                     allTasks(assignee_id: "${this.assignee.atom_id}"){
-                    name,
-                    atom_id,
-                    assigner{atom_id},
-                    expiration_date
+                        name,
+                        atom_id,
+                        assigner{atom_id},
+                        expiration_date
                     }
                 `)
                 .map(data => data.allTasks)
                 .flatMap((tasks, unused_ix) => Observable.from(tasks))
                 .map((task: TaskAtom) => {
-                    console.log("the name", task.name);
                     const task_atom =
                         this._clientBus.new_atom<TaskAtom>("Task");
                     task_atom.atom_id = task.atom_id;
