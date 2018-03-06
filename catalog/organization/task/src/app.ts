@@ -299,6 +299,18 @@ const schema = grafo
       }).toArray();
     }
   })
+  .add_query({
+    name: "allTasks",
+    type: "[Task]",
+    args: {
+      assignee_id: { "type": graphql.GraphQLString }
+    },
+    resolve: (root, { assignee_id }) => {
+      return mean.db.collection("tasks")
+            .find({ "assignee.atom_id": assignee_id })
+            .toArray();
+    }
+  })
   .schema();
 
 Helpers.serve_schema(mean.ws, schema);

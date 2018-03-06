@@ -2,11 +2,17 @@
 
 <div class="show-and-edit-climbs">
     <div class="container below-navbar">
-        <div class="row table-header">
+        <div class="row">
             <div class="col-lg-10">
-                <dv-widget name="AddClimb"></dv-widget>
+                <div class="col-xs-2 center white">name</div>
+                <div class="col-xs-3 center white">points</div>
+                <div class="col-xs-5 white">category</div>
+                <div class="col-xs-2"></div>
             </div>
+            <div class="col-lg-2 col-xs-12 center"></div>
         </div>
+
+        <dv-widget name="AddClimbForm"></dv-widget>
 
         <div class="row">
             <dv-widget name="ShowAssignedTasks" of="Task"></dv-widget>

@@ -1,6 +1,7 @@
 // Schedule events
 cliche Event {
   /** Entities **/
+  // TODO: This should be more granular.
   data Event {
     start_date: datetime,
     end_date: datetime
@@ -27,6 +28,13 @@ cliche Event {
   // Lets the user choose the start and end datetime of event.
   // The event given in `event` will be mutated with the new values.
   widget NewEventContent {
+    event: Event,
+    submit_ok: boolean
+  }
+
+  // Lets the user choose the start datetime of event.
+  // The event given in `event` will be mutated with the new value.
+  widget NewEventStartDate {
     event: Event,
     submit_ok: boolean
   }

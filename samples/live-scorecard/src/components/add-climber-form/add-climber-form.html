@@ -1,5 +1,5 @@
 <div class="row add-climber-form">
-    <div class="col-lg-10 col-lg-offset-2">
+    <div class="col-lg-10">
         <div class="panel panel-default">
             <div class="panel-body">
                 <form class="add-climber">
@@ -7,12 +7,23 @@
                     <div class="col-xs-3">
                         <dv-widget name="EditNameOfMember" of="CompetitionClimbers"></dv-widget>
                     </div>
-                    <div class="col-xs-2">coming soon</div>
-                    <div class="col-xs-1 right">
+                    <div class="col-xs-2">
+                        <input type="radio" name="sex" value="female" checked>Female
+                        <br>
+                        <input type="radio" name="sex" value="male">Male
+                    </div>
+                    <div class="col-xs-2 right">
                         <dv-widget name="CreateCustomPasskeyContent" of="ClimberAuthentication"></dv-widget>
                     </div>
-                    <div class="col-xs-1"></div>
-                    <div class="col-xs-2">coming soon</div>
+                    <div class="col-xs-2">
+                        <input type="radio" name="category" value="beginner" checked>Beginner
+                        <br>
+                        <input type="radio" name="category" value="intermediate">Intermediate
+                        <br>
+                        <input type="radio" name="category" value="advanced">Advanced
+                        <br>
+                        <input type="radio" name="category" value="open">Open
+                    </div>
                     <div class="col-xs-2">
                         <dv-widget name="AddNewMemberToGroupButton" of="CompetitionClimbers"></dv-widget>
                     </div>
@@ -20,6 +31,7 @@
             </div>
         </div>
     </div>
+    <div class="col-lg-2 col-xs-12 center"></div>
 </div>
 
 <!-- HACK: remove once fields with default values are always included -->

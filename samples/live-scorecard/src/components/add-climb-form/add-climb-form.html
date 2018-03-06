@@ -1,0 +1,37 @@
+<div class="add-climb-form">
+    <div class="row">
+        <div class="col-lg-10">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <form class="add-climb-form">
+                        <div class="col-xs-2">
+                            <!-- TODO: Decouple CreateTaskForAllAssignees widget
+                                - create TaskContent and AddTaskButton widgets -->
+                            <dv-widget name="CreateTaskForAllAssignees" of="Task"></dv-widget>
+                        </div>
+                        <div class="col-xs-3">
+                            <input type="text" name="new-climb-score" class="center" placeholder="points" />
+                        </div>
+                        <div class="col-xs-5">
+                            <input type="radio" name="category" value="beginner" checked>Beginner
+                            <br>
+                            <input type="radio" name="category" value="intermediate">Intermediate
+                            <br>
+                            <input type="radio" name="category" value="advanced">Advanced
+                            <br>
+                            <input type="radio" name="category" value="open">Open
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="col-xs-2"></div>
+        </div>
+        <div class="col-lg-2 col-xs-12 center"></div>
+    </div>
+
+    <!-- HACK: remove once fields with default values are always included -->
+    <dv-widget name="SignInWithRedirect" of="HostAuthentication" style="display:none">
+    </dv-widget>
+    <dv-widget name="ShowNameOfGroup" of="CompetitionClimbers" style="display:none">
+    </dv-widget>
+</div>
