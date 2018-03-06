@@ -20,8 +20,8 @@ app LiveScorecard {
     ] as HostAuthentication
 
     // Allows climbers and their 'buddies' to view and log climbs.
-    include access/StandardAuthentication [
-        Climber for User
+    include access/PasskeyAuthentication [
+        Climber for Passkey
     ] as ClimberAuthentication
 
     // A spectator can view the live leaderboard using a competition code.
@@ -65,7 +65,7 @@ app LiveScorecard {
 
     data Climber {
         name: text,
-        username: text
+        code: text
     }
 
     data Spectator {
