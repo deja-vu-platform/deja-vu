@@ -7,7 +7,8 @@
           <dv-id (id)="groupMeetingId=$event"></dv-id>
           <event-new-weekly-event
             [id]="groupMeetingId" (events)="meetings=$event"
-            buttonLabel="Create Group Meeting Series">
+            buttonLabel="Create Group Meeting Series"
+            newWeeklyEventSavedText="New group meeting series created">
           </event-new-weekly-event>
           <allocator-create-allocation [hidden]="true"
             [id]="groupMeetingId" [resources]="meetings" [saveResources]="true">
