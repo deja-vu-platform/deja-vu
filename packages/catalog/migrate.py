@@ -35,7 +35,7 @@ def main():
     print("Migrating server")
     call_or_fail(["dv", "generate", "server"])
     os.replace(
-        os.path.join(src_dir, "app.ts"),
+        os.path.join(src_dir, "app", "app.ts"),
         os.path.join("server", "server.ts"))
 
     print("Migrating readme")
