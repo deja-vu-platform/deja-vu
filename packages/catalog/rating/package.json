@@ -4,8 +4,9 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build --prod",
+    "start": "npm run dv-start-all",
+    "build": "npm run dv-build-rating",
+    "package": "npm run dv-package-rating",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
