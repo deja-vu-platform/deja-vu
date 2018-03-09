@@ -4,7 +4,6 @@ import {
   ShowGroupMeetingComponent
 } from '../show-group-meeting/show-group-meeting.component';
 
-
 @Component({
   selector: 'morg-home',
   templateUrl: './home.component.html',
