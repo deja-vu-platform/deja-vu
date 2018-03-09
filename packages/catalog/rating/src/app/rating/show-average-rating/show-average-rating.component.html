@@ -1,4 +1,4 @@
-<div>
-  {{ average }}/5 average rating with {{ ratingCount }}
-  vote{{ ratingCount !== 1 ? 's' : '' }}
-</div>
+<star-rating-comp [showHalfStars]="true" [rating]="averageRatingValue"
+  [starType]="'svg'">
+</star-rating-comp>
+{{ ratingCountValue }} vote{{ ratingCountValue !== 1 ? 's' : '' }}

@@ -1,61 +1,53 @@
-import {GraphQlService} from "gql";
+import {
+  Component, AfterViewInit, ElementRef, Input, OnInit, Output,
+  EventEmitter, ViewChild, OnChanges, SimpleChanges
+} from '@angular/core';
+import { GatewayServiceFactory, GatewayService } from 'dv-core';
+import { RatingService, RatingServiceFactory } from '../shared/rating.service';
 
-import {Widget, Field, Atom, AfterInit} from "client-bus";
 
-
-@Widget({
-  fqelement: "Rating",
-  ng2_providers: [GraphQlService],
-  styles: [``]
+@Component({
+  selector: 'rating-show-average-rating',
+  templateUrl: './show-average-rating.component.html',
+  styleUrls: ['./show-average-rating.component.css']
 })
-export class ShowAverageRatingComponent implements AfterInit {
-  @Field("Target") target: Atom;
-  average = 0;
-  ratingCount = 0;
+export class ShowAverageRatingComponent implements OnInit, OnChanges {
+  @Input() targetId: string;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  @Output() averageRating = new EventEmitter<number>();
+  averageRatingValue: number;
+
+  @Output() ratingCount = new EventEmitter<number>();
+  ratingCountValue = 0;
+
+  ratingService: RatingService;
+
+  constructor(private elem: ElementRef, private rsf: RatingServiceFactory) {}
+
+  ngOnInit() {
+    this.ratingService = this.rsf.for(this.elem);
+    this.loadRatingAverage();
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.targetId || changes.newTargetId) {
+      this.loadRatingAverage();
+    }
+  }
 
   /**
    * Download ratings for the target from the server.
    */
-  loadRatingAverage() {
-    // We want to display rounded ratings to avoid horribly long ones. These
-    // parameters are used to configure rounding.
-    const BASE = 10;
-    const DECIMAL_PLACES = 2;
-    const ROUNDING_MULTIPLE = Math.pow(BASE, DECIMAL_PLACES);
+  async loadRatingAverage() {
+    if (!this.targetId || !this.ratingService) {
+      return;
+    }
+    const { rating, count } = await this.ratingService
+      .averageRatingForTarget(this.targetId);
+    this.averageRatingValue = rating;
+    this.averageRating.emit(this.averageRatingValue);
 
-    return this._graphQlService
-      .get(`
-        averageRatingForTarget(target_id: "${this.target.atom_id}")
-      `)
-      .toPromise()
-      .then(res => res.averageRatingForTarget)
-      .then(res => {
-        this.average = Math.round(res * ROUNDING_MULTIPLE) / ROUNDING_MULTIPLE;
-      });
-  }
-
-  /**
-   * Download the number of ratings for the target from the server.
-   */
-  loadRatingCount() {
-    return this._graphQlService
-      .get(`
-        ratingCountForTarget(target_id: "${this.target.atom_id}")
-      `)
-      .toPromise()
-      .then(res => res.ratingCountForTarget)
-      .then(res => {
-        this.ratingCount = res;
-      });
-  }
-
-  dvAfterInit() {
-    this.loadRatingAverage();
-    this.loadRatingCount();
-    this.target.on_change(() => Promise
-      .all([this.loadRatingAverage(), this.loadRatingCount()])
-      .then(_ => undefined));
+    this.ratingCountValue = count;
+    this.ratingCount.emit(this.ratingCountValue);
   }
 }

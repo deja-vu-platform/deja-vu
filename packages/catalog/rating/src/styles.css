@@ -1,1 +1,3 @@
-/* You can add global styles to this file, and also import other style files */
+/* @import "~angular-star-rating/assets/scss/star-rating";*/
+/* https://github.com/BioPhoton/angular-star-rating/issues/73 */
+@import "~css-star-rating/dist/css/star-rating.min.css";

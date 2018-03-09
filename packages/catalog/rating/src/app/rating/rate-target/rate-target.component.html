@@ -1,15 +1,4 @@
-<div class="target-rater">
-    <div class="target" *ngFor="let option of [1, 2, 3, 4, 5]">
-        <span class="target-radio">
-            <input type="radio"
-                [name]="radioName"
-                [value]="option"
-                [checked]="_rating===option"
-                (change)="syncRating(option)">
-        </span>
-        <br>
-        <span class="target-label">
-            {{option}}
-        </span>
-    </div>
-</div>
+<star-rating-comp [hoverEnabled]="true"
+  (onClick)="updateRating($event)" [rating]="ratingValue"
+  [starType]="'svg'">
+</star-rating-comp>

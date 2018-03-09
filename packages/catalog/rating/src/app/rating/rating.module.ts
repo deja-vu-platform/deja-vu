@@ -5,10 +5,26 @@ import { ShowAverageRatingComponent } from './show-average-rating/show-average-r
 import { ShowRatingComponent } from './show-rating/show-rating.component';
 import { ShowRatingsByTargetComponent } from './show-ratings-by-target/show-ratings-by-target.component';
 
+import { StarRatingModule } from 'angular-star-rating';
+import { RatingServiceFactory } from './shared/rating.service';
+import { DvModule } from 'dv-core';
+
+
+const allComponents = [
+  RateTargetComponent, ShowAverageRatingComponent,
+  ShowRatingComponent, ShowRatingsByTargetComponent
+];
+
+
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule,
+    DvModule,
+    StarRatingModule.forRoot()
   ],
-  declarations: [RateTargetComponent, ShowAverageRatingComponent, ShowRatingComponent, ShowRatingsByTargetComponent]
+  providers: [RatingServiceFactory],
+  declarations: allComponents,
+  entryComponents: allComponents,
+  exports: allComponents
 })
 export class RatingModule { }

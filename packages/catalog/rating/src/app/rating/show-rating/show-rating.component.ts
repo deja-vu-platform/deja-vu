@@ -1,81 +1,61 @@
-import "rxjs/add/operator/toPromise";
+import {
+  Component, AfterViewInit, ElementRef, Input, OnInit, Output,
+  EventEmitter, ViewChild, OnChanges, SimpleChanges
+} from '@angular/core';
+import {
+  GatewayServiceFactory, GatewayService
+} from 'dv-core';
+import { RatingService, RatingServiceFactory } from '../shared/rating.service';
 
-import {GraphQlService} from "gql";
+import { take } from 'rxjs/operators';
 
-import {Widget, Field, Atom, AfterInit, ClientBus} from "client-bus";
-
-import {RatingAtom} from "../../shared/data";
+import * as _ from 'lodash';
 
 
-@Widget({fqelement: "Rating", ng2_providers: [GraphQlService]})
-export class ShowRatingComponent implements AfterInit {
-  @Field("Target") target: Atom;
-  @Field("Source") source: Atom;
-  @Field("Rating") rating: RatingAtom;
+@Component({
+  selector: 'rating-show-rating',
+  templateUrl: './show-rating.component.html',
+  styleUrls: ['./show-rating.component.css']
+})
+export class ShowRatingComponent implements
+  OnInit, OnChanges {
+    // Either (`sourceId`, `targetId`) or `ratingIn` must be given. If
+    // `ratingIn` is given this rating is displayed
+  @Input() sourceId: string;
+  @Input() targetId: string;
 
-  constructor(
-    private _graphQlService: GraphQlService,
-    private _clientBus: ClientBus
-  ) {}
+  @Input() ratingIn: number;
 
-  loadRatingBySourceTarget() {
-    return this._graphQlService
-      .get(`
-        ratingBySourceTarget(
-          source_id: "${this.source.atom_id}",
-          target_id: "${this.target.atom_id}"
-        ) {
-          atom_id,
-          rating
-        }
-      `)
-      .toPromise()
-      .then(res => {
-        if (res.ratingBySourceTarget) {
-          this.rating.atom_id = res.ratingBySourceTarget.atom_id;
-          this.rating.rating = res.ratingBySourceTarget.rating;
-          this.rating.source = this.source;
-          this.rating.target = this.target;
-        }
-      });
+  @Output() rating = new EventEmitter<number>();
+
+  ratingValue: number;
+  private ratingService: RatingService;
+
+  constructor(private elem: ElementRef, private rsf: RatingServiceFactory) {}
+
+  ngOnInit() {
+    this.ratingService = this.rsf.for(this.elem);
+    this.loadRating();
   }
 
-  loadRatingById() {
-    return this._graphQlService
-      .get(`
-        rating_by_id(atom_id: "${this.source.atom_id}") {
-          atom_id,
-          rating,
-          source {
-            atom_id
-          },
-          target {
-            atom_id
-          }
-        }
-      `)
-      .toPromise()
-      .then(res => {
-        if (res.rating_by_id) {
-          this.rating.atom_id = res.rating_by_id.atom_id;
-          this.rating.rating = res.rating_by_id.rating;
-          const source_atom = this._clientBus.new_atom<Atom>("Source");
-          source_atom.atom_id = res.rating_by_id.source.atom_id;
-          this.rating.source = source_atom;
-          const target_atom = this._clientBus.new_atom<Atom>("Target");
-          target_atom.atom_id = res.rating_by_id.target.atom_id;
-          this.rating.target = target_atom;
-        }
-      });
+  ngOnChanges(changes: SimpleChanges) {
+    this.loadRating();
   }
 
-  dvAfterInit() {
-    if (!this.rating.rating) {
-      if (this.rating.atom_id) {
-        this.loadRatingById();
-      } else if (this.source.atom_id && this.target.atom_id) {
-        this.loadRatingBySourceTarget();
-      }
+  /**
+   * Load a rating from the server (if any), and set the value of the widget.
+   */
+  async loadRating() {
+    if (!this.ratingService) {
+      return;
+    }
+    if (this.ratingIn) {
+      this.ratingValue = this.ratingIn;
+      this.rating.emit(this.ratingValue);
+    } else if (this.sourceId && this.targetId) {
+      this.ratingValue = await this.ratingService
+        .ratingBySourceTarget(this.sourceId, this.targetId);
+      this.rating.emit(this.ratingValue);
     }
   }
 }

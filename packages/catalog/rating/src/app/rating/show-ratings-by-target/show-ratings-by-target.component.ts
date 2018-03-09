@@ -1,47 +1,56 @@
-import "rxjs/add/operator/toPromise";
+import {
+  Component, AfterViewInit, ElementRef, Input, OnInit, Output,
+  EventEmitter, ViewChild, OnChanges, SimpleChanges, Type
+} from '@angular/core';
+import { GatewayServiceFactory, GatewayService, Action } from 'dv-core';
+import { RatingService, RatingServiceFactory } from '../shared/rating.service';
+import { ShowRatingComponent } from '../show-rating/show-rating.component';
 
-import {GraphQlService} from "gql";
 
-import {Widget, Field, Atom, AfterInit, ClientBus} from "client-bus";
+@Component({
+  selector: 'rating-show-ratings-by-target',
+  templateUrl: './show-ratings-by-target.component.html',
+  styleUrls: ['./show-ratings-by-target.component.css']
+})
+export class ShowRatingsByTargetComponent implements OnInit, OnChanges {
+  @Input() targetId: string;
+  @Input() showRating: Action = {type: <Type<Component>> ShowRatingComponent};
 
-import {RatingAtom} from "../../shared/data";
+  @Input() noRatingsToShowText = 'No ratings to show';
+  ratings: {rating: number, sourceId: string}[] = [];
 
+  ratingService: RatingService;
+  showRatingsByTarget;
 
-@Widget({fqelement: "Rating", ng2_providers: [GraphQlService]})
-export class ShowRatingsByTargetComponent implements AfterInit {
-  @Field("Target") target: Atom;
-  ratings: RatingAtom[] = [];
+  constructor(private elem: ElementRef, private rsf: RatingServiceFactory) {
+    this.showRatingsByTarget = this;
+  }
 
-  constructor(
-    private _graphQlService: GraphQlService,
-    private _clientBus: ClientBus
-  ) {}
+  ngOnInit() {
+    this.ratingService = this.rsf.for(this.elem);
+    this.loadRatings();
+  }
 
-  loadRatings() {
-    return this._graphQlService
-      .get(`
-        ratingsByTarget(target_id: "${this.target.atom_id}") {
-          rating,
-          source {
-            atom_id
+  ngOnChanges(changes: SimpleChanges) {
+    this.loadRatings();
+  }
+
+  async loadRatings() {
+    if (!this.targetId || !this.ratingService) {
+      return;
+    }
+    const res = await this.ratingService
+      .get<{
+        data: {target: {ratings: {rating: number, sourceId: string}[]}}
+        }>(`
+        target(id: "${this.targetId}") {
+          ratings {
+            rating
+            sourceId
           }
         }
       `)
-      .toPromise()
-      .then(res => {
-        res.ratingsByTarget.forEach(res_elm => {
-          const source_atom = this._clientBus.new_atom<Atom>("Source");
-          source_atom.atom_id = res_elm.source.atom_id;
-          const rating_atom = this._clientBus.new_atom<RatingAtom>("Rating");
-          rating_atom.target = this.target;
-          rating_atom.source = source_atom;
-          rating_atom.rating = res_elm.rating;
-          this.ratings.push(rating_atom);
-        });
-      });
-  }
-
-  dvAfterInit() {
-    this.loadRatings();
+      .toPromise();
+    this.ratings = res.data.target.ratings;
   }
 }
