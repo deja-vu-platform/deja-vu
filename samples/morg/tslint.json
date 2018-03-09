@@ -69,7 +69,7 @@
     ],
     "no-conditional-assignment": true,
     "no-construct": true,
-    "no-consecutive-blank-lines": true,
+    "no-consecutive-blank-lines": [true, 2],
     "no-debugger": true,
     "no-duplicate-imports": true,
     "no-duplicate-super": true,
