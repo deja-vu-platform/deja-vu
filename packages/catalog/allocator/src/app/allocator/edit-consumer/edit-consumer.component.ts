@@ -1,10 +1,11 @@
 import {
-  Component, Input, ElementRef, Output, EventEmitter, OnChanges, OnInit
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  AllocatorServiceFactory, AllocatorService
+   AllocatorService, AllocatorServiceFactory
 } from '../shared/allocator.service';
-import { RunService, OnRun } from 'dv-core';
+
+import { OnRun, RunService } from 'dv-core';
 
 
 @Component({
@@ -39,14 +40,14 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
     if (this.resourceId && this.allocationId) {
       this.allocator
         .consumerOfResource(this.resourceId, this.allocationId)
-        .subscribe(consumer => {
+        .subscribe((consumer) => {
           this.currentConsumer.emit(consumer);
           this.selectedConsumerId = consumer.id;
           this.currentConsumerId = this.selectedConsumerId;
         });
       this.allocator
         .consumers(this.allocationId)
-        .subscribe(consumers => {
+        .subscribe((consumers) => {
           this.consumers = consumers;
         });
     }
@@ -62,7 +63,7 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
       this.allocator
         .editConsumerOfResource(
           this.resourceId, this.allocationId, this.selectedConsumerId)
-        .subscribe(unused => {});
+        .subscribe((unused) => {});
     }
   }
 }

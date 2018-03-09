@@ -20,6 +20,7 @@ describe('ShowAverageRatingComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

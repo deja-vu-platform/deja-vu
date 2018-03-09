@@ -1,10 +1,10 @@
 import {
-  Component, AfterViewInit, ElementRef, Input, OnInit, Output,
-  EventEmitter, ViewChild, OnChanges, SimpleChanges
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  GatewayServiceFactory, GatewayService, RunService, OnRun, OnAfterCommit,
-  OnAfterAbort
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
 } from 'dv-core';
 import { RatingService, RatingServiceFactory } from '../shared/rating.service';
 
@@ -62,10 +62,14 @@ export class RateTargetComponent implements
    */
   async dvOnRun() {
     if (this.sourceId === undefined) {
-      await this.sourceIdChange.asObservable().pipe(take(1)).toPromise();
+      await this.sourceIdChange.asObservable()
+        .pipe(take(1))
+        .toPromise();
     }
     if (this.targetId === undefined) {
-      await this.targetIdChange.asObservable().pipe(take(1)).toPromise();
+      await this.targetIdChange.asObservable()
+        .pipe(take(1))
+        .toPromise();
     }
     const res = await this.ratingService.post<{data: any}>(`
         updateRating(

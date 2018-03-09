@@ -1,9 +1,10 @@
 import {
-  Component, Input, ElementRef, Output, EventEmitter, OnInit
+  Component, ElementRef, EventEmitter, Input, OnInit, Output
 } from '@angular/core';
 import {
-  AllocatorServiceFactory, AllocatorService
+  AllocatorService, AllocatorServiceFactory
 } from '../shared/allocator.service';
+
 import { OnRun, RunService } from 'dv-core';
 
 
@@ -36,7 +37,7 @@ export class CreateResourceComponent implements OnInit, OnRun {
     console.log(`Saving resource ${this.id}`);
     this.allocator
       .createResource(this.id)
-      .subscribe(resource => {
+      .subscribe((resource) => {
         this.resource.emit({id: resource.id});
       });
   }

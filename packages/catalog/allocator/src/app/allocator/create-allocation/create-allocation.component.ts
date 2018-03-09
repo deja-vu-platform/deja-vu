@@ -1,10 +1,11 @@
 import {
-  Component, Input, ElementRef, Output, EventEmitter, OnInit, OnChanges,
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
   SimpleChanges
 } from '@angular/core';
 import {
-  AllocatorServiceFactory, AllocatorService
+  AllocatorService, AllocatorServiceFactory
 } from '../shared/allocator.service';
+
 import { OnRun, RunService } from 'dv-core';
 import { take } from 'rxjs/operators';
 
@@ -17,7 +18,7 @@ import * as _ from 'lodash';
 })
 export class CreateAllocationComponent implements OnInit, OnChanges {
   @Input() id: string;
-  @Input() resources: [{id: string}]; // required
+  @Input() resources: [{id: string}]; // Required
   @Input() saveResources = false;
 
   @Output() allocation = new EventEmitter();
@@ -43,13 +44,15 @@ export class CreateAllocationComponent implements OnInit, OnChanges {
 
   async dvOnRun() {
     if (this.resources === undefined) {
-      await this.resourcesChange.asObservable().pipe(take(1)).toPromise();
+      await this.resourcesChange.asObservable()
+        .pipe(take(1))
+        .toPromise();
     }
     console.log(`Create allocation with ${this.id}`);
     const resourceIds = _.map(this.resources, 'id');
     this.allocator
       .createAllocation(this.id, resourceIds, this.saveResources)
-      .subscribe(allocation => {
+      .subscribe((allocation) => {
         this.allocation.emit({id: allocation.id});
       });
   }

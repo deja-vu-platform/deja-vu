@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowRatingsByTargetComponent } from './show-ratings-by-target.component';
+import {
+  ShowRatingsByTargetComponent
+} from './show-ratings-by-target.component';
 
 describe('ShowRatingsByTargetComponent', () => {
   let component: ShowRatingsByTargetComponent;
@@ -20,6 +22,7 @@ describe('ShowRatingsByTargetComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

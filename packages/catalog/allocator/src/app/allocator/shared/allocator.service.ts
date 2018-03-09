@@ -1,5 +1,5 @@
-import { Injectable, ElementRef } from '@angular/core';
-import { GatewayServiceFactory, GatewayService } from 'dv-core';
+import { ElementRef, Injectable  } from '@angular/core';
+import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
@@ -56,7 +56,7 @@ export class AllocatorService {
           id
       }
     `)
-    .pipe(map(res => res.data.consumerOfResource));
+    .pipe(map((res) => res.data.consumerOfResource));
   }
 
   consumers(allocationId: string): Observable<Consumer[]>  {
@@ -67,7 +67,7 @@ export class AllocatorService {
         }
       }
     `)
-    .pipe(map(res => res.data.allocation.consumers));
+    .pipe(map((res) => res.data.allocation.consumers));
   }
 
   editConsumerOfResource(
@@ -87,7 +87,7 @@ export class AllocatorService {
         id
       }
     `)
-    .pipe(map(res => res.data.createResource));
+    .pipe(map((res) => res.data.createResource));
   }
 
   deleteResource(id: string): Observable<Resource> {
@@ -96,7 +96,7 @@ export class AllocatorService {
         id
       }
     `)
-    .pipe(map(res => res.data.deleteResource));
+    .pipe(map((res) => res.data.deleteResource));
   }
 
   createAllocation(
@@ -118,7 +118,7 @@ export class AllocatorService {
         saveResources: saveResources
       }
     })
-    .pipe(map(res => res.data.createAllocation));
+    .pipe(map((res) => res.data.createAllocation));
   }
 }
 

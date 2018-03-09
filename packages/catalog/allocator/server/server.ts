@@ -1,21 +1,22 @@
-import * as minimist from 'minimist';
-import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import * as mongodb from 'mongodb';
-import { v4 as uuid } from 'uuid';
+import * as express from 'express';
 import { readFileSync } from 'fs';
+import * as minimist from 'minimist';
+import * as mongodb from 'mongodb';
 import * as path from 'path';
+import { v4 as uuid } from 'uuid';
+
 import * as _ from 'lodash';
 
-const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
-const { makeExecutableSchema } = require('graphql-tools');
+import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
+import { makeExecutableSchema } from 'graphql-tools';
 
 
 interface AllocationDoc {
   id: string;
   resourceIds: string[];
   consumerIds: string[];
-  // resource -> consumer
+  // Map of resource -> consumer
   assignments: { [resourceId: string]: string };
 }
 
@@ -72,7 +73,7 @@ mongodb.MongoClient.connect(
       console.log(`Reinitialized db ${config.dbName}`);
       if (!_.isEmpty(config.initialConsumerIds)) {
         await db.collection('consumers')
-          .insertMany(_.map(config.initialConsumerIds, id => ({id: id})));
+          .insertMany(_.map(config.initialConsumerIds, (id) => ({id: id})));
         console.log(
           `Initialized consumer set with ${config.initialConsumerIds}`);
       }
@@ -85,24 +86,51 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+class Validation {
+  static async resourceExists(resourceId: string) {
+    return Validation.exists(resources, resourceId, 'Resource');
+  }
+
+  static async consumerExists(consumerId: string) {
+    return Validation.exists(consumers, consumerId, 'Consumer');
+  }
+
+  static async allocationExists(allocationId: string) {
+    return Validation.exists(allocations, allocationId, 'Allocation');
+  }
+
+  private static async exists(collection, id: string, type: string) {
+    const doc = await collection.findOne({ id: id });
+    if (!doc) {
+      throw new Error(`${type} ${id} not found`);
+    }
+
+    return doc;
+  }
+}
 
 const resolvers = {
   Query: {
     allocation: (root, { id }) => allocations.findOne({ id: id }),
-    resources: root => resources.find().toArray(),
-    consumers: root => consumers.find().toArray(),
+    resources: (root) => resources.find()
+      .toArray(),
+    consumers: (root) => consumers.find()
+      .toArray(),
     consumerOfResource: async (root, { resourceId, allocationId }) => {
       const allocation: AllocationDoc = await allocations
         .findOne({ id: allocationId });
+
       return consumers.findOne({id: allocation.assignments[resourceId]});
     }
   },
   Allocation: {
     id: (allocation: AllocationDoc) => allocation.id,
     resources: (allocation: AllocationDoc) => resources
-      .find({ id: { $in: allocation.resourceIds } }).toArray(),
+      .find({ id: { $in: allocation.resourceIds } })
+      .toArray(),
     consumers: (allocation: AllocationDoc) => consumers
-      .find({ id: { $in: allocation.consumerIds } }).toArray(),
+      .find({ id: { $in: allocation.consumerIds } })
+      .toArray()
   },
   Resource: {
     id: (resource: ResourceDoc) => resource.id
@@ -122,10 +150,12 @@ const resolvers = {
           $set: { [`assignments.${resourceId}`]: newConsumerId }
         };
         await allocations.updateOne({ id: allocationId }, updateOp);
+
         return true;
     },
     createAllocation: async (root, {id, resourceIds, saveResources}) => {
-      const allConsumers = await consumers.find().toArray();
+      const allConsumers = await consumers.find()
+        .toArray();
       const consumerIds = _.map(allConsumers, 'id');
       const assignments = {};
       if (!_.isEmpty(consumerIds)) {
@@ -146,48 +176,29 @@ const resolvers = {
       };
       if (saveResources) {
         await resources.insertMany(
-          _.map(resourceIds, resourceId => ({id: resourceId})));
+          _.map(resourceIds, (resourceId) => ({id: resourceId})));
       }
       await allocations.insertOne(newAllocation);
+
       return newAllocation;
     },
     createResource: async (root, {id}) => {
       const resourceId = id ? id : uuid();
       const newResource: ResourceDoc = { id: resourceId };
       await resources.insertOne(newResource);
+
       return newResource;
     },
     deleteResource: async (root, {id}) => {
       await resources.deleteOne({id: id});
+
       return {id: id};
-    },
+    }
   }
 };
 
-namespace Validation {
-  export async function resourceExists(resourceId: string) {
-    return exists(resources, resourceId, 'Resource');
-  }
-
-  export async function consumerExists(consumerId: string) {
-    return exists(consumers, consumerId, 'Consumer');
-  }
-
-  export async function allocationExists(allocationId: string) {
-    return exists(allocations, allocationId, 'Allocation');
-  }
-
-  async function exists(collection, id: string, type: string) {
-    const doc = await collection.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`${type} ${id} not found`);
-    }
-    return doc;
-  }
-}
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
-
 
 const app = express();
 

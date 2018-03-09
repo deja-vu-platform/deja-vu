@@ -8,7 +8,7 @@
     "build": "npm run dv-build-allocator",
     "package": "npm run dv-package-allocator",
     "test": "ng test",
-    "lint": "ng lint",
+    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/app/**/**/*.ts server/*.ts",
     "e2e": "ng e2e",
     "dv-start-gateway": "node node_modules/dv-gateway/dist/gateway.js --configFilePath dvconfig.json",
     "dv-build-allocator": "ng build && (cd server; tsc && cp schema.graphql ../dist/server)",

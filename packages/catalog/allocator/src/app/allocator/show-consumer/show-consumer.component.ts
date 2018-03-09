@@ -1,14 +1,14 @@
 import {
-  Component, Input, ElementRef, Output, EventEmitter, OnChanges, OnInit
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  AllocatorServiceFactory, AllocatorService
+   AllocatorService, AllocatorServiceFactory
 } from '../shared/allocator.service';
 
 
 @Component({
   selector: 'allocator-show-consumer',
-  template: '{{consumerObj.id}}',
+  template: '{{consumerObj.id}}'
 })
 export class ShowConsumerComponent implements OnChanges, OnInit {
   @Input() resourceId: string;
@@ -34,7 +34,7 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
     if (this.allocator && this.resourceId && this.allocationId) {
       this.allocator
         .consumerOfResource(this.resourceId, this.allocationId)
-        .subscribe(consumer => {
+        .subscribe((consumer) => {
           this.consumer.emit(consumer);
           this.consumerObj = consumer;
         });

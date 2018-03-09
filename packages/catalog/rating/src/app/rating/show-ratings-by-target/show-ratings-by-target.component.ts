@@ -1,8 +1,10 @@
 import {
-  Component, AfterViewInit, ElementRef, Input, OnInit, Output,
-  EventEmitter, ViewChild, OnChanges, SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  Output, SimpleChanges, Type
 } from '@angular/core';
-import { GatewayServiceFactory, GatewayService, Action } from 'dv-core';
+import {
+  Action, GatewayService, GatewayServiceFactory
+} from 'dv-core';
 import { RatingService, RatingServiceFactory } from '../shared/rating.service';
 import { ShowRatingComponent } from '../show-rating/show-rating.component';
 

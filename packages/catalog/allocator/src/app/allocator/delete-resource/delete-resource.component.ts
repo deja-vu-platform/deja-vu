@@ -1,10 +1,11 @@
 import {
-  Component, Input, ElementRef, Output, EventEmitter, OnInit, OnChanges,
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
   SimpleChanges
 } from '@angular/core';
 import {
-  AllocatorServiceFactory, AllocatorService
+   AllocatorService, AllocatorServiceFactory
 } from '../shared/allocator.service';
+
 import { OnRun, RunService } from 'dv-core';
 
 
@@ -37,9 +38,11 @@ export class DeleteResourceComponent implements OnInit, OnChanges {
 
   async dvOnRun(): Promise<any> {
     if (this.id === undefined) {
-      await this.idChange.asObservable().toPromise();
+      await this.idChange.asObservable()
+        .toPromise();
     }
     console.log(`Delete resource with ${this.id}`);
+
     return this.allocator
       .deleteResource(this.id)
       .toPromise();

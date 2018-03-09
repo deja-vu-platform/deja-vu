@@ -1,13 +1,13 @@
-import * as minimist from 'minimist';
-import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import * as mongodb from 'mongodb';
-import { v4 as uuid } from 'uuid';
+import * as express from 'express';
 import { readFileSync } from 'fs';
+import * as minimist from 'minimist';
+import * as mongodb from 'mongodb';
 import * as path from 'path';
+import { v4 as uuid } from 'uuid';
 
-const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
-const { makeExecutableSchema } = require('graphql-tools');
+import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
+import { makeExecutableSchema } from 'graphql-tools';
 
 
 interface SourceDoc {
@@ -67,43 +67,65 @@ mongodb.MongoClient.connect(
       console.log(`Reinitialized db ${config.dbName}`);
     }
     sources = db.collection('sources');
-    sources.createIndex({ 'id': 1 }, { unique: true, sparse: true });
+    sources.createIndex({ id: 1 }, { unique: true, sparse: true });
     targets = db.collection('targets');
-    targets.createIndex({ 'id': 1 }, { unique: true, sparse: true });
+    targets.createIndex({ id: 1 }, { unique: true, sparse: true });
     ratings = db.collection('ratings');
     ratings.createIndex(
-      { 'sourceId': 1, 'targetId': 1 }, { unique: true, sparse: true });
+      { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+class Validation {
+  static async sourceExists(sourceId: string) {
+    return Validation.exists(sources, sourceId, 'Source');
+  }
+
+  static async targetExists(targetId: string) {
+    return Validation.exists(targets, targetId, 'Target');
+  }
+
+  private static async exists(collection, id: string, type: string) {
+    const doc = await collection.findOne({ id: id });
+    if (!doc) {
+      throw new Error(`${type} ${id} not found`);
+    }
+
+    return doc;
+  }
+}
+
 const resolvers = {
   Query: {
-    source: (root, { id }) => sources.findOne({ 'id': id }),
-    target: (root, { id }) => targets.findOne({ 'id': id }),
+    source: (root, { id }) => sources.findOne({ id: id }),
+    target: (root, { id }) => targets.findOne({ id: id }),
     ratingBySourceTarget: (root, {sourceId, targetId}) => ratings
-      .findOne({ 'sourceId': sourceId, 'targetId': targetId }),
+      .findOne({ sourceId: sourceId, targetId: targetId }),
     averageRatingForTarget: async (root, {targetId}) => {
       const ratingsForTarget = await ratings
-        .find({ 'targetId': targetId })
+        .find({ targetId: targetId })
         .toArray();
       const count = ratingsForTarget.length;
       const average = ratingsForTarget.reduce(
         // Sum over all the values, adjusting each for the number of results
         (prev, current) => prev + (current.rating / count), 0);
+
       return { rating: average, count: count };
     }
   },
   Source: {
     id: (source: SourceDoc) => source.id,
     ratings: (source: SourceDoc) => ratings
-      .find({ 'sourceId': source.id }).toArray()
+      .find({ sourceId: source.id })
+      .toArray()
   },
   Target: {
     id: (target: TargetDoc) => target.id,
     ratings: (target: TargetDoc) => ratings
-      .find({ 'targetId': target.id }).toArray()
+      .find({ targetId: target.id })
+      .toArray()
   },
   Rating: {
     sourceId: (rating: RatingDoc) => rating.sourceId,
@@ -117,43 +139,28 @@ const resolvers = {
       ]);
       await ratings
         .update(
-          { 'sourceId': sourceId, 'targetId': targetId },
+          { sourceId: sourceId, targetId: targetId },
           { $set: { rating: newRating } },
           { upsert: true });
+
       return true;
     },
     createSource: (root, {sourceId}) => {
       if (!sourceId) {
         sourceId = uuid();
       }
+
       return sources.insertOne({id: sourceId});
     },
     createTarget: (root, {targetId}) => {
       if (!targetId) {
         targetId = uuid();
       }
+
       return targets.insertOne({id: targetId});
     }
   }
 };
-
-namespace Validation {
-  export async function sourceExists(sourceId: string) {
-    return exists(sources, sourceId, 'Source');
-  }
-
-  export async function targetExists(targetId: string) {
-    return exists(targets, targetId, 'Target');
-  }
-
-  async function exists(collection, id: string, type: string) {
-    const doc = await collection.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`${type} ${id} not found`);
-    }
-    return doc;
-  }
-}
 
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
