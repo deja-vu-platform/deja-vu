@@ -119,7 +119,6 @@
       true,
       "always"
     ],
-    "space-before-function-paren": true,
     "trailing-comma": [true, {"multiline": "never", "singleline": "never"}],
     "triple-equals": [
       true,
