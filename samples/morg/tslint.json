@@ -37,7 +37,7 @@
     "interface-over-type-literal": true,
     "jsdoc-format": true,
     "label-position": true,
-    "linebreak-style": [true, "CRLF"],
+    "linebreak-style": [true, "LF"],
     "max-line-length": [
       true,
       80
