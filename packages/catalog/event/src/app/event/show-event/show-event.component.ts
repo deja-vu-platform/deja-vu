@@ -1,9 +1,9 @@
-import {
-  Component, OnChanges, ElementRef, Input, OnInit
-} from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { GatewayServiceFactory, GatewayService } from 'dv-core';
-import { WeeklyEvent, Event } from '../../../../shared/data';
+import {
+  Component, ElementRef, Input, OnChanges, OnInit
+} from '@angular/core';
+import { GatewayService, GatewayServiceFactory  } from 'dv-core';
+import { Event, WeeklyEvent } from '../../../../shared/data';
 
 
 @Component({
@@ -35,7 +35,7 @@ export class ShowEventComponent implements OnChanges, OnInit {
             endDate
           }
         `)
-        .subscribe(obj => {
+        .subscribe((obj) => {
           this.event = obj.event;
           this.sameDayEvent = this.isSameDayEvent(obj.event);
         });
@@ -48,6 +48,7 @@ export class ShowEventComponent implements OnChanges, OnInit {
     }
     const startDateObj = new Date(event.startDate);
     const endDateObj = new Date(event.endDate);
+
     return startDateObj.getFullYear() === endDateObj.getFullYear() &&
       startDateObj.getMonth() === endDateObj.getMonth() &&
       startDateObj.getDate() === endDateObj.getDate();

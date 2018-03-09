@@ -1,11 +1,14 @@
 import {
-  Component, AfterViewInit, ElementRef, Input, OnInit, Output,
-  EventEmitter, ViewChild
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output,
+  ViewChild
 } from '@angular/core';
-import { FormBuilder, FormGroup, FormGroupDirective, FormControl, AbstractControl, Validators } from '@angular/forms';
 import {
-  GatewayServiceFactory, GatewayService, RunService, OnRun, OnAfterCommit,
-  OnAfterAbort
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  Validators
+} from '@angular/forms';
+import {
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -22,7 +25,7 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class NewWeeklyEventComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() id = ''; // optional
+  @Input() id = ''; // Optional
   @Output() events = new EventEmitter<Event[]>();
 
   // Presentation inputs
@@ -46,11 +49,12 @@ export class NewWeeklyEventComponent implements
       const {hh: endHh, mm: endMm} = this.getHhMm(endTime);
       if (startHh > endHh || (startHh === endHh && startMm >= endMm)) {
         return {
-          'endBeforeStart': {
+          endBeforeStart: {
             startTime: startTime, endTime: endTime
           }
         };
       }
+
       return null;
     }
   ]);
@@ -107,8 +111,9 @@ export class NewWeeklyEventComponent implements
         }
       })
      .toPromise();
-    this.events.emit(_.map(res.data.createWeeklyEvent.events, evt => {
+    this.events.emit(_.map(res.data.createWeeklyEvent.events, (evt) => {
       evt.weeklyEventId = evt.weeklyEvent.id;
+
       return evt;
     }));
   }
@@ -118,8 +123,8 @@ export class NewWeeklyEventComponent implements
     window.setTimeout(() => {
       this.newWeeklyEventSaved = false;
     }, SAVED_MSG_TIMEOUT);
-    // https://github.com/angular/material2/issues/4190
-    // this.newWeeklyEventForm.reset();
+    // Can't do `this.newWeeklyEventForm.reset();`
+    // See https://github.com/angular/material2/issues/4190
     if (this.form) {
       this.form.resetForm();
     }
@@ -132,11 +137,15 @@ export class NewWeeklyEventComponent implements
   // Get the hours and minutes in 24-hour format from a time in 12-hr format
   // (hh:mm AM/PM)
   private getHhMm(hhMmTime: string): {hh: number, mm: number} {
-    const hhMm = hhMmTime.slice(0, -2).split(':');
+    const AM_LENGTH = 2;
+    const PERIOD_HOURS = 12;
+    const hhMm = hhMmTime.slice(0, -AM_LENGTH)
+      .split(':');
     const ret = {hh: Number(hhMm[0]), mm: Number(hhMm[1])};
-    if (hhMmTime.slice(-2) === 'PM') {
-      ret.hh = ret.hh + 12;
+    if (hhMmTime.slice(-AM_LENGTH) === 'PM') {
+      ret.hh = ret.hh + PERIOD_HOURS;
     }
+
     return ret;
   }
 }

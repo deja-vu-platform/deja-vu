@@ -1,12 +1,12 @@
-import { Component, OnInit, ElementRef, Input, Type } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { GatewayServiceFactory, GatewayService, Action } from 'dv-core';
+import { Component, ElementRef, Input, OnInit, Type } from '@angular/core';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
 
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { WeeklyEvent, Event } from '../../../../shared/data';
+import { Event, WeeklyEvent } from '../../../../shared/data';
 
 import { ShowEventComponent } from '../show-event/show-event.component';
 
@@ -54,7 +54,7 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
             `
           }
         })
-        .pipe(map(res => res.data.weeklyEvents))
+        .pipe(map((res) => res.data.weeklyEvents))
         .subscribe((weeklyEvents: WeeklyEvent[]) => {
           this.weeklyEvents = weeklyEvents;
         });
@@ -68,7 +68,7 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
       return;
     }
     this.gs
-      .get<{data: {weeklyEvent: {events: Event[]}}}>('/graphql/', {
+      .get<{data: {weeklyEvent: {events: Event[]}}}>('/graphql', {
         params: {
           query: `
             query {
@@ -86,10 +86,11 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
           `
         }
       })
-      .pipe(map(res => res.data.weeklyEvent.events))
+      .pipe(map((res) => res.data.weeklyEvent.events))
       .subscribe((events: Event[]) => {
-        this.events = _.map(events, evt => {
+        this.events = _.map(events, (evt) => {
           evt.weeklyEventId = evt.weeklyEvent.id;
+
           return evt;
         });
       });

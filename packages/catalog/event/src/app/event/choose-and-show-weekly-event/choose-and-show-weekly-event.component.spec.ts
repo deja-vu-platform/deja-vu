@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChooseAndShowWeeklyEventComponent } from './choose-and-show-weekly-event.component';
+import {
+  ChooseAndShowWeeklyEventComponent
+} from './choose-and-show-weekly-event.component';
 
 describe('ChooseAndShowWeeklyEventComponent', () => {
   let component: ChooseAndShowWeeklyEventComponent;
@@ -20,6 +22,7 @@ describe('ChooseAndShowWeeklyEventComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });

@@ -1,8 +1,8 @@
 import {
-  Component, AfterViewInit, ElementRef, Input, OnInit
+  AfterViewInit, Component, ElementRef, Input, OnInit
 } from '@angular/core';
 import {
-  GatewayServiceFactory, GatewayService, OnRun, RunService, OnAfterCommit
+  GatewayService, GatewayServiceFactory, OnAfterCommit, OnRun, RunService
 } from 'dv-core';
 import * as _ from 'lodash';
 
@@ -14,7 +14,7 @@ import * as _ from 'lodash';
 })
 export class DeleteEventComponent implements OnInit, OnRun, OnAfterCommit {
   @Input() id;
-  // optional list of events to delete itself from after commit
+  // Optional list of events to delete itself from after commit
   @Input() events: Event[];
   gs: GatewayService;
 

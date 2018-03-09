@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 
-import { WeeklyEvent, Event } from '../../../../shared/data';
+import { Event, WeeklyEvent } from '../../../../shared/data';
 
 
 @Component({
@@ -13,6 +13,6 @@ export class CreateEventComponent {
   @Input() weeklyEvent: WeeklyEvent;
 
   run(event: Event, weeklyEvent: WeeklyEvent) {
-    // todo
+    // TODO
   }
 }

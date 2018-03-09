@@ -1,16 +1,24 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatButtonModule, MatDatepickerModule, MatInputModule, MatSelectModule, MatFormFieldModule } from '@angular/material';
+import {
+  MatButtonModule, MatDatepickerModule, MatFormFieldModule, MatInputModule,
+  MatSelectModule
+} from '@angular/material';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { NewWeeklyEventComponent } from './new-weekly-event/new-weekly-event.component';
-import { ChooseAndShowWeeklyEventComponent } from './choose-and-show-weekly-event/choose-and-show-weekly-event.component';
-import { ShowEventComponent } from './show-event/show-event.component';
 import { DvModule } from 'dv-core';
+
+import {
+  ChooseAndShowWeeklyEventComponent
+} from './choose-and-show-weekly-event/choose-and-show-weekly-event.component';
 import { CreateEventComponent } from './create-event/create-event.component';
 import { DeleteEventComponent } from './delete-event/delete-event.component';
+import {
+  NewWeeklyEventComponent
+} from './new-weekly-event/new-weekly-event.component';
+import { ShowEventComponent } from './show-event/show-event.component';
 
 
 const allComponents = [
@@ -25,7 +33,8 @@ const allComponents = [
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatButtonModule, MatDatepickerModule, MatInputModule, MatSelectModule, MatFormFieldModule,
+    MatButtonModule, MatDatepickerModule, MatInputModule, MatSelectModule,
+    MatFormFieldModule,
     MatMomentDateModule
   ],
   declarations: allComponents,

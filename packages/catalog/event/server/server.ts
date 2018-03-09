@@ -1,13 +1,13 @@
-import * as minimist from 'minimist';
-import * as express from 'express';
 import * as bodyParser from 'body-parser';
-import * as mongodb from 'mongodb';
-import { v4 as uuid } from 'uuid';
+import * as express from 'express';
 import { readFileSync } from 'fs';
+import * as minimist from 'minimist';
+import * as mongodb from 'mongodb';
 import * as path from 'path';
+import { v4 as uuid } from 'uuid';
 
-const { graphqlExpress, graphiqlExpress } = require('apollo-server-express');
-const { makeExecutableSchema } = require('graphql-tools');
+import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
+import { makeExecutableSchema } from 'graphql-tools';
 
 
 interface EventDoc {
@@ -101,8 +101,10 @@ const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 const resolvers = {
   Query: {
-    events: () => events.find().toArray(),
-    weeklyEvents: () => weeklyEvents.find().toArray(),
+    events: () => events.find()
+      .toArray(),
+    weeklyEvents: () => weeklyEvents.find()
+      .toArray(),
     event: (root, { id }) => events.findOne({ id: id }),
     weeklyEvent: (root, { id }) => weeklyEvents.findOne({ id: id })
   },
@@ -128,12 +130,14 @@ const resolvers = {
       const eventId = uuid();
       const e = { id: eventId, startDate: startDate, endDate: endDate };
       await events.insertOne(e);
+
       return e;
     },
     updateEvent: async (root, {input}: {input: UpdateEventInput}) => {
       const {startDate, endDate} = getStartAndEndDates(input);
       const updateObj = { $set: { startDate: startDate, endDate: endDate } };
       await events.updateOne({id: input.id}, updateObj);
+
       return true;
     },
     // If a weeklyEventId is given, the event is removed from that weekly event
@@ -145,6 +149,7 @@ const resolvers = {
         await weeklyEvents
           .update({id: deletedEvent.weeklyEventId}, updatedWeeklyEvent);
       }
+
       return true;
     },
     createWeeklyEvent: async (
@@ -158,9 +163,11 @@ const resolvers = {
 
       const startHhMm = getHhMm(input.startTime);
       const endHhMm = getHhMm(input.endTime);
+
+      const DAYS_IN_WEEK = 7;
       for (
         const eventDate = startsOnDate; eventDate <= endsOnDate;
-        eventDate.setDate(eventDate.getDate() + 7)) {
+        eventDate.setDate(eventDate.getDate() + DAYS_IN_WEEK)) {
 
         const startDate = new Date(eventDate.getTime());
         startDate.setHours(startHhMm.hh, startHhMm.mm);
@@ -189,6 +196,7 @@ const resolvers = {
       };
       await Promise.all(inserts);
       await weeklyEvents.insertOne(weeklyEvent);
+
       return weeklyEvent;
     }
   }
@@ -204,17 +212,22 @@ function getStartAndEndDates(input: CreateEventInput | UpdateEventInput)
 
   startsOnDate.setHours(startHhMm.hh, startHhMm.mm);
   endsOnDate.setHours(endHhMm.hh, endHhMm.mm);
+
   return { startDate: startsOnDate.toString(), endDate: endsOnDate.toString() };
 }
 
 // Get the hours and minutes in 24-hour format from a time in 12-hr format
 // (hh:mm AM/PM)
 function getHhMm(hhMmTime: string): {hh: number, mm: number} {
-  const hhMm = hhMmTime.slice(0, -2).split(':');
+  const AM_LENGTH = 2;
+  const PERIOD_HOURS = 12;
+  const hhMm = hhMmTime.slice(0, -AM_LENGTH)
+    .split(':');
   const ret = {hh: Number(hhMm[0]), mm: Number(hhMm[1])};
-  if (hhMmTime.slice(-2) === 'PM') {
-    ret.hh = ret.hh + 12;
+  if (hhMmTime.slice(-AM_LENGTH) === 'PM') {
+    ret.hh = ret.hh + PERIOD_HOURS;
   }
+
   return ret;
 }
 
