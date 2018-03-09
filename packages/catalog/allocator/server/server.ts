@@ -166,27 +166,23 @@ const resolvers = {
 
 namespace Validation {
   export async function resourceExists(resourceId: string) {
-    const resource: ResourceDoc = await resources.findOne({ id: resourceId });
-    if (!resource) {
-      throw new Error(`Resource ${resourceId} not found`);
-    }
-    return resource;
+    return exists(resources, resourceId, 'Resource');
   }
 
   export async function consumerExists(consumerId: string) {
-    const consumer: ConsumerDoc = await consumers.findOne({ id: consumerId });
-    if (!consumer) {
-      throw new Error(`Consumer ${consumerId} not found`);
-    }
-    return consumer;
+    return exists(consumers, consumerId, 'Consumer');
   }
 
   export async function allocationExists(allocationId: string) {
-    const allocation: AllocationDoc = await allocations.findOne({ id: allocationId });
-    if (!allocation) {
-      throw new Error(`Consumer ${allocationId} not found`);
+    return exists(allocations, allocationId, 'Allocation');
+  }
+
+  async function exists(collection, id: string, type: string) {
+    const doc = await collection.findOne({ id: id });
+    if (!doc) {
+      throw new Error(`${type} ${id} not found`);
     }
-    return allocation;
+    return doc;
   }
 }
 

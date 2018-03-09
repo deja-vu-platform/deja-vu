@@ -45,7 +45,6 @@ export class CreateAllocationComponent implements OnInit, OnChanges {
     if (this.resources === undefined) {
       await this.resourcesChange.asObservable().pipe(take(1)).toPromise();
     }
-    debugger;
     console.log(`Create allocation with ${this.id}`);
     const resourceIds = _.map(this.resources, 'id');
     this.allocator

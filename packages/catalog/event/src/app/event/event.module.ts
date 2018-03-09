@@ -29,7 +29,7 @@ const allComponents = [
     MatMomentDateModule
   ],
   declarations: allComponents,
-  entryComponents: [ShowEventComponent],
+  entryComponents: allComponents,
   exports: allComponents
 })
 export class EventModule { }
