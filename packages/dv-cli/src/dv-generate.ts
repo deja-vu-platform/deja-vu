@@ -12,6 +12,9 @@ const SERVER_PATH = path.join(SERVER_SRC_FOLDER, 'server.ts');
 const SERVER_TSCONFIG_PATH = path.join(SERVER_SRC_FOLDER, 'tsconfig.json');
 const SERVER_BLUEPRINT: string = readFileOrFail(
   path.join(__dirname, 'server.blueprint.ts'));
+const SCHEMA_PATH = path.join(SERVER_SRC_FOLDER, 'schema.graphql');
+const SCHEMA_BLUEPRINT: string = readFileOrFail(
+  path.join(__dirname, 'schema.blueprint.graphql'));
 const SERVER_TSCONFIG_BLUEPRINT: string = readFileOrFail(
   path.join(__dirname, 'tsconfig.blueprint.json'));
 
@@ -38,6 +41,7 @@ program
         mkdirSync(SERVER_SRC_FOLDER);
       }
       writeFileOrFail(SERVER_PATH, SERVER_BLUEPRINT);
+      writeFileOrFail(SCHEMA_PATH, SCHEMA_BLUEPRINT);
 
       console.log('Create server tsconfig');
       writeFileOrFail(SERVER_TSCONFIG_PATH, SERVER_TSCONFIG_BLUEPRINT);

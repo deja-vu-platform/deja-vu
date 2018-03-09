@@ -125,19 +125,17 @@ export function buildFeCmd(watch: boolean, projectFolder?: string): string {
   if (watch) {
     return `chokidar src node_modules -c 'ng build'`;
   }
-  return buildCmd(watch, 'ng build', projectFolder);
+  return buildCmd('ng build', projectFolder);
 }
 
 export function buildServerCmd(watch: boolean, projectFolder?: string): string {
-  return buildCmd(watch, 'tsc', projectFolder);
+  const cpSchema = 'cp schema.graphql ../dist/server';
+  const maybeWatch = watch ? '-w' : '';
+  return buildCmd(`tsc ${maybeWatch} && ${cpSchema}`, projectFolder);
 }
 
-function buildCmd(watch: boolean, cmd: string, projectFolder?: string): string {
-  let ret = cmd + (watch ? ' -w' : '');
-  if (projectFolder) {
-    ret = `(cd ${projectFolder}; ${ret})`;
-  }
-  return ret;
+function buildCmd(cmd: string, projectFolder?: string): string {
+  return projectFolder ? `(cd ${projectFolder}; ${cmd})` : cmd;
 }
 
 export function concurrentlyCmd(...cmds: string[]): string {

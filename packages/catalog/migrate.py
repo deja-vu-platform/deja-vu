@@ -20,21 +20,23 @@ def main():
     components_dir = os.path.join(src_dir, "components")
 
     target_module_dir = os.path.join("src", "app", cliche)
-    for _, dirnames, _ in os.walk(components_dir):
-        for dirname in dirnames:
-            component_name = os.path.basename(dirname)
-            print("Migrating component {0}".format(component_name))
-            call_or_fail(["dv", "generate", "action", component_name])
-            replace(components_dir, target_module_dir, component_name, "html")
-            replace(components_dir, target_module_dir, component_name, "css")
-            replace(components_dir, target_module_dir, component_name, "ts")
+    for dirname in os.listdir(components_dir):
+        if dirname == "shared":
+           # todo
+           continue
+        component_name = os.path.basename(dirname)
+        print("Migrating component {0}".format(component_name))
+        call_or_fail(["dv", "generate", "action", component_name])
+        replace(components_dir, target_module_dir, component_name, "html")
+        replace(components_dir, target_module_dir, component_name, "css")
+        replace(components_dir, target_module_dir, component_name, "ts")
 
 
     print("Migrating server")
     call_or_fail(["dv", "generate", "server"])
     os.replace(
         os.path.join(src_dir, "app.ts"),
-        os.path.join("src", "app", "server", "server.ts"))
+        os.path.join("server", "server.ts"))
 
     print("Migrating readme")
     os.replace(
