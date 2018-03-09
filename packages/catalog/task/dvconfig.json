@@ -1,0 +1,9 @@
+{
+  "name": "task",
+  "watch": true,
+  "gatewayPort": 3000,
+  "config": {
+    "wsPort": 3001
+  },
+  "startServer": true
+}
