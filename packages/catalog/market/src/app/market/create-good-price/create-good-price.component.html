@@ -1,11 +1,10 @@
-<fieldset class="form-group">
-  <label class="sr-only" for="price">Price</label>
-  <input
-    class="form-control"
+<div class="form-group">
+  <mat-label>Price</mat-label>
+  <input matInput
     name="price"
     type="number"
     min="0"
     placeholder="Price"
     [(ngModel)]="good.price"
   />
-</fieldset>
+</div>

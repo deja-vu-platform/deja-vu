@@ -1,3 +1,10 @@
-<div *ngFor="let good of unaffordableGoods" class="row">
-  <dv-widget name="ShowGood" [init]="{good: good}"></dv-widget>
+<div class="row">
+  <ul *ngIf="unaffordableGoods && unaffordableGoods.length > 0" class="list-group">
+    <li ngFor="let good of unaffordableGoods" class="list-group-item">
+      <market-show-good [good]="good"></market-show-good>
+    </li>
+  </ul>
+  <div *ngIf="!unaffordableGoods || unaffordableGoods.length == 0">
+    No goods to show
+  </div>
 </div>

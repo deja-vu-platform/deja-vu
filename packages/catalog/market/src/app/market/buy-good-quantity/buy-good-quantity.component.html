@@ -1,7 +1,6 @@
-<fieldset class="form-group">
-  <label class="sr-only" for="quantity">Quantity</label>
-  <input
-    class="form-control"
+<div class="form-group">
+  <mat-label>Quantity</mat-label>
+  <input matInput
     name="quantity"
     type="number"
     min="0"
@@ -10,4 +9,4 @@
     placeholder="Quantity"
     [(ngModel)]="quantity.value"
   />
-</fieldset>
+</div>

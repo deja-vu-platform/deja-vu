@@ -1,11 +1,15 @@
 <form (ngSubmit)="onSubmit()" #addAmountForm="ngForm" class="form-horizontal">
-  <fieldset class="form-group">
-    <label class="sr-only" for="amount">Amount to Add</label>
-    <input required id="amount" class="form-control" name="amount" type="number" min="0"
-      [(ngModel)]="amount.value"/>
-  </fieldset>
   <div class="form-group">
-    <button type="submit" class="btn btn-default btn-sm pull-right"
-     [disabled]="!addAmountForm.valid">Add Amount</button>
+    <mat-form-field>
+      <mat-label>Amount to Add</mat-label>
+      <input matInput required name="amount" type="number" min="0"
+        [(ngModel)]="amount.value"/>
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <button mat-button type="submit"
+       [disabled]="!addAmountForm.valid">Add Amount</button>
+    </mat-form-field>
   </div>
 </form>
