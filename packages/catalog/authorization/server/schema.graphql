@@ -1,35 +1,11 @@
-// Change
-type Source {
+// Controls a user's access to resources.
+
+type Resource {
   id: ID!,
-  ratings: [Rating]
+  owner: Principal!,
+  viewers: [Principal]
 }
 
-type Target {
-  id: ID!,
-  ratings: [Rating]
-}
-
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
-}
-
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
-}
-
-type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
-}
-
-type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
-}
+type Principal {
+  id: ID!
+ }

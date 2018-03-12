@@ -6,12 +6,17 @@ import * as mongodb from 'mongodb';
 import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
-import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
+import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
-// Change
-interface SourceDoc {
+interface PrincipalDoc {
   id: string;
+}
+
+interface ResourceDoc {
+  id: string;
+  ownerId: string;
+  viewerIds: string[];
 }
 
 interface Config {
@@ -24,8 +29,7 @@ interface Config {
 
 const argv = minimist(process.argv);
 
-// Change
-const name = argv.as ? argv.as : 'this-cliche-name';
+const name = argv.as ? argv.as : 'authorization';
 
 const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
@@ -42,11 +46,10 @@ try {
   throw new Error(`Couldn't parse config ${argv.config}`);
 }
 
-const config: Config = {...DEFAULT_CONFIG, ...configArg};
+const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-// Change
-let db, sources, ratings, targets;
+let db, principals, resources;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -57,29 +60,31 @@ mongodb.MongoClient.connect(
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
     }
-    // Change
-    sources = db.collection('sources');
-    sources.createIndex({ id: 1 }, { unique: true, sparse: true });
-    targets = db.collection('targets');
-    targets.createIndex({ id: 1 }, { unique: true, sparse: true });
-    ratings = db.collection('ratings');
-    ratings.createIndex(
-      { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
+    principals = db.collection('sources');
+    resources = db.collection('resources');
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
-
 const resolvers = {
   Query: {
-    source: (root, { id }) => sources.findOne({ id: id }),
-    target: (root, { id }) => targets.findOne({ id: id })
+    principals: () => principals.find()
+      .toArray(),
+    resources: () => resources.find()
+      .toArray(),
+    principal: (root, { id }) => principals.findOne({ id: id }),
+    resource: (root, { id }) => resources.findOne({ id: id })
   },
-  Source: {
-    id: (source: SourceDoc) => source.id,
-    ratings: (source: SourceDoc) => ratings
-      .find({ sourceId: source.id })
+  Principal: {
+    id: (principal: PrincipalDoc) => principal.id
+  },
+  Resource: {
+    id: (resource: ResourceDoc) => resource.id,
+    owner: (resource: ResourceDoc) => principals
+      .findOne({ id: resource.ownerId }),
+    viewers: (resource: ResourceDoc) => principals
+      .find({ id: { $in: resource.viewerIds } })
       .toArray()
   },
   Mutation: {
