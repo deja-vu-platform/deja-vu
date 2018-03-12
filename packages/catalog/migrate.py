@@ -63,7 +63,7 @@ def replace(components_dir, target_module_dir, component_name, ext):
         print("Failed on {0} -> {1}".format(src, target))
 
 def call_or_fail(args):
-    fail = subprocess.call(args, shell=True) # using shell=True can cause injection attacks
+    fail = subprocess.call(args, shell=True)
     if fail:
         sys.exit(1)
 
