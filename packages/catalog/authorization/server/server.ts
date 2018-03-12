@@ -60,7 +60,7 @@ mongodb.MongoClient.connect(
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
     }
-    principals = db.collection('sources');
+    principals = db.collection('principals');
     resources = db.collection('resources');
   });
 
