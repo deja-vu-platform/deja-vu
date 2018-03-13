@@ -9,3 +9,17 @@ type Resource {
 type Principal {
   id: ID!
  }
+
+ type Query {
+  resource(id: ID!): Resource
+  principal(id: ID!): Principal
+  resources: [Resource!]
+  principals: [Principal!]
+  isOwner(principalId: ID!, resourceId: ID!): Boolean
+  isViewer(principalId: ID!, resourceId: ID!): Boolean
+ }
+
+type Mutation {
+  createPrincipal(id:ID!): Principal
+  createResource(id:ID!, ownerId: ID!, viewers: [ID]): Resource
+}
