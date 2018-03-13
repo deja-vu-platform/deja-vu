@@ -3,8 +3,7 @@ import {
   Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
+  OnAfterAbort, OnAfterCommit, OnRun, RunService
 } from 'dv-core';
 import { RatingService, RatingServiceFactory } from '../shared/rating.service';
 
