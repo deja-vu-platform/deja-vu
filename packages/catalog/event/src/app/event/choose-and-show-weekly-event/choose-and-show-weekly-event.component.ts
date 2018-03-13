@@ -23,11 +23,11 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
   selectedWeeklyEvent: WeeklyEvent;
   weeklyEvents: WeeklyEvent[] = [];
   events: Event[] = [];
-  gs: GatewayService;
 
   @Input() showEvent: Action = {type: <Type<Component>> ShowEventComponent};
 
   chooseAndShowWeeklyEvent;
+  private gs: GatewayService;
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {
     this.chooseAndShowWeeklyEvent = this;

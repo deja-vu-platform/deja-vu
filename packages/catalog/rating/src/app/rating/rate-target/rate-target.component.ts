@@ -29,7 +29,7 @@ export class RateTargetComponent implements
 
   prevRatingValue: number;
   ratingValue: number;
-  ratingService: RatingService;
+  private ratingService: RatingService;
 
   constructor(
     private elem: ElementRef,  private rs: RunService,

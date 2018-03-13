@@ -21,8 +21,8 @@ export class ShowRatingsByTargetComponent implements OnInit, OnChanges {
   @Input() noRatingsToShowText = 'No ratings to show';
   ratings: {rating: number, sourceId: string}[] = [];
 
-  ratingService: RatingService;
   showRatingsByTarget;
+  private ratingService: RatingService;
 
   constructor(private elem: ElementRef, private rsf: RatingServiceFactory) {
     this.showRatingsByTarget = this;

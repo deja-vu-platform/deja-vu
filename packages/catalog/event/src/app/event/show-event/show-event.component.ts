@@ -15,7 +15,7 @@ export class ShowEventComponent implements OnChanges, OnInit {
   @Input() event: Event;
   sameDayEvent = false;
 
-  gs: GatewayService;
+  private gs: GatewayService;
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
 

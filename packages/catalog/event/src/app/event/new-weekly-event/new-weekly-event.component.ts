@@ -69,7 +69,7 @@ export class NewWeeklyEventComponent implements
   newWeeklyEventSaved = false;
   newWeeklyEventError: string;
 
-  gs: GatewayService;
+  private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,

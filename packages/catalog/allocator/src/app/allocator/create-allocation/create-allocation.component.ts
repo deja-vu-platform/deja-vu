@@ -22,9 +22,10 @@ export class CreateAllocationComponent implements OnInit, OnChanges {
   @Input() saveResources = false;
 
   @Output() allocation = new EventEmitter();
-  allocator: AllocatorService;
 
   resourcesChange = new EventEmitter();
+
+  private allocator: AllocatorService;
 
   constructor(
     private elem: ElementRef,
