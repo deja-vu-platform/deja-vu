@@ -17,7 +17,7 @@ export function npm(args: string[], cwd?: string): void {
 }
 
 function cmd(cmd: string, args: string[], cwd?: string): void {
-  const c = spawnSync(cmd, args, { stdio: 'inherit', cwd: cwd, shell: true });
+  const c = spawnSync(cmd, args, { stdio: 'inherit', cwd: cwd });
   if (c.error) {
     throw new Error(`Failed to run "${cmd}": ${c.error}`);
   }
@@ -44,7 +44,7 @@ export const ENTRY_FILE_PATH = 'public_api.ts';
 export const NG_PACKAGR = {
   configFilePath: 'ng-package.json',
   configFileContents: {
-    '$schema': './node_modules/ng-packagr/ng-package.schema.json',
+    '$schema': path.join('.', 'node_modules', 'ng-packagr', 'ng-package.schema.json'),
     'lib': {
       'entryFile': ENTRY_FILE_PATH
     },
@@ -77,7 +77,7 @@ export function isCliche(): boolean {
  * @return the path to the module file for the given name
  */
 export function modulePath(name: string): string {
-  return `./src/app/${name}/${name}.module`;
+  return path.join('.', 'src', 'app', `${name}`, `${name}.module`);
 }
 
 export const SERVER_SRC_FOLDER = 'server';
@@ -105,7 +105,7 @@ export function updateJsonFile(
 }
 
 export function startGatewayCmd(configFilePath: string): string {
-  return 'node node_modules/dv-gateway/dist/gateway.js' +
+  return 'node' + path.join('node_modules', 'dv-gateway', 'dist', 'gateway.js') +
     ` --configFilePath ${configFilePath}`;
 }
 
@@ -129,7 +129,7 @@ export function buildFeCmd(watch: boolean, projectFolder?: string): string {
 }
 
 export function buildServerCmd(watch: boolean, projectFolder?: string): string {
-  const cpSchema = 'cp schema.graphql ../dist/server';
+  const cpSchema = 'cp schema.graphql' + path.join('..', 'dist', 'server');
   const maybeWatch = watch ? '-w' : '';
   return buildCmd(`tsc ${maybeWatch} && ${cpSchema}`, projectFolder);
 }
