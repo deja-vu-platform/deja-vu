@@ -1,35 +1,51 @@
-import {GraphQlService} from "gql";
+import {
+  Component, ElementRef, EventEmitter, Input, OnInit
+} from '@angular/core';
 
-import {Widget, Field, Atom, AfterInit, PrimitiveAtom} from "client-bus";
+import {
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
+} from 'dv-core';
 
 
+@Component({
+  selector: 'task-complete-task',
+  templateUrl: './complete-task.component.html',
+  styleUrls: ['./complete-task.component.css']
+})
+export class CompleteTaskComponent implements
+  OnInit, OnRun, OnAfterCommit  {
+  @Input() id;
+  @Input() disabled = false;
 
-@Widget({fqelement: "Task", ng2_providers: [GraphQlService]})
-export class CompleteTaskComponent implements AfterInit {
-  @Field("Task") task: Atom;
-  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
-
-  submitted = false;
+  private gs: GatewayService;
 
   constructor(
-    private _graphQlService: GraphQlService) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {}
 
-  dvAfterInit() {
-    this.submit_ok.on_change(() => {
-      if (this.task.atom_id) this.markCompleted();
-    });
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
   }
 
-  markCompleted() {
-    if (this.submitted) return;
+  onClick() {
+    this.rs.run(this.elem);
+  }
 
-    this._graphQlService
-      .post(`
-        completeTask(task_id: "${this.task.atom_id}")
-      `)
-      .subscribe(res => {
-        this.submitted = true;
-        this.submit_ok.value = !this.submit_ok.value;
-      });
+  async dvOnRun(): Promise<void> {
+    const res = await this.gs
+      .post<{data: any}>('/graphql', {
+        query: `mutation {
+          completeTask(id: "${this.id}") {
+            id
+          }
+        }`
+      })
+      .toPromise();
+  }
+
+  dvOnAfterCommit() {
+    this.disabled = true;
   }
 }

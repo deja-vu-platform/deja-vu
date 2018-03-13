@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, ViewChild
 } from '@angular/core';
 
 import {
@@ -12,37 +12,37 @@ import {
   RunService
 } from 'dv-core';
 
-import { Assignee } from '../shared/task.model';
+import { map } from 'rxjs/operators';
+
+import { Assignee, Task } from '../shared/task.model';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
 
+
 @Component({
-  selector: 'task-create-task',
-  templateUrl: './create-task.component.html',
-  styleUrls: ['./create-task.component.css']
+  selector: 'task-update-task',
+  templateUrl: './update-task.component.html',
+  styleUrls: ['./update-task.component.css']
 })
-export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
+export class UpdateTaskComponent implements OnInit, OnChanges {
   @Input() id;
-  @Input() assignerId;
 
   // Presentation inputs
-  @Input() assigneeSelectPlaceholder = 'Choose Assignee';
-  @Input() buttonLabel = 'Create Task';
-  @Input() newTaskSavedText = 'New task saved';
+  @Input() buttonLabel = 'Update Task';
+  @Input() taskSavedText = 'Task saved';
 
   @ViewChild(FormGroupDirective) form;
 
   assignee = new FormControl('');
   dueDate = new FormControl('');
-  createTaskForm: FormGroup = this.builder.group({
+  updateTaskForm: FormGroup = this.builder.group({
     assignee: this.assignee,
     dueDate: this.dueDate
   });
 
-
-  newTaskSaved = false;
-  newTaskError: string;
+  taskSaved = false;
+  taskError: string;
 
   private gs: GatewayService;
 
@@ -53,7 +53,37 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.loadTask();
   }
+
+  ngOnChanges() {
+    this.loadTask();
+  }
+
+  loadTask() {
+    if (!this.gs || !this.id) {
+      return;
+    }
+    this.gs.get<{data: {task: Task}}>('/graphql', {
+      params: {
+        query: `
+          query {
+            task(id: "${this.id}") {
+              id
+              assignee { id }
+              dueDate
+            }
+          }
+        `
+      }
+    })
+    .pipe(map((res) => res.data.task))
+    .subscribe((task: Task) => {
+      this.assignee.setValue(task.assignee);
+      this.dueDate.setValue(task.dueDate);
+    });
+  }
+
 
   onSubmit() {
     this.rs.run(this.elem);
@@ -61,29 +91,30 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs.post<{data: any}>('/graphql', {
-      query: `mutation CreateTask($input: CreateTaskInput!) {
-        createTask(input: $input) {
+      query: `mutation UpdateTask($input: UpdateTaskInput!) {
+        updateTask(input: $input) {
           id
         }
       }`,
       variables: {
         input: {
           id: this.id,
-          assignerId: this.assignerId,
           assigneeId: this.assignee.value.id,
           dueDate: this.dueDate.value
         }
       }
     })
     .toPromise();
+
+    return res.data.updateTask.id;
   }
 
   dvOnAfterCommit() {
-    this.newTaskSaved = true;
+    this.taskSaved = true;
     window.setTimeout(() => {
-      this.newTaskSaved = false;
+      this.taskSaved = false;
     }, SAVED_MSG_TIMEOUT);
-    // Can't do `this.form.reset();`
+    // Can't do `this.newWeeklyEventForm.reset();`
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
       this.form.resetForm();
@@ -91,6 +122,6 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.newTaskError = reason.message;
+    this.taskError = reason.message;
   }
 }

@@ -1,34 +1,53 @@
-import {GraphQlService} from "gql";
+import {
+  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit
+} from '@angular/core';
 
-import {Widget, Field, Atom, PrimitiveAtom} from "client-bus";
+import {
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
+} from 'dv-core';
+
+import * as _ from 'lodash';
 
 
-@Widget({fqelement: "Task", ng2_providers: [GraphQlService]})
-export class ApproveTaskComponent {
-  @Field("Task") task: Atom;
-  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+@Component({
+  selector: 'task-approve-task',
+  templateUrl: './approve-task.component.html',
+  styleUrls: ['./approve-task.component.css']
+})
+export class ApproveTaskComponent implements
+  OnInit, OnRun, OnAfterCommit  {
+  @Input() id = '';
+  @Input() disabled = false;
 
-  submitted = false;
+  private gs: GatewayService;
 
   constructor(
-    private _graphQlService: GraphQlService) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {}
 
-  dvAfterInit() {
-    this.submit_ok.on_change(() => {
-      if (this.task.atom_id) this.markApproved();
-    });
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
   }
 
-  markApproved() {
-    if (this.submitted) return;
+  onClick() {
+    this.rs.run(this.elem);
+  }
 
-    this._graphQlService
-      .post(`
-        approveTask(task_id: "${this.task.atom_id}")
-      `)
-      .subscribe(res => {
-        this.submitted = true;
-        this.submit_ok.value = !this.submit_ok.value;
-      });
+  async dvOnRun(): Promise<void> {
+    const res = await this.gs
+      .post<{data: any}>('/graphql', {
+        query: `mutation {
+          approveTask(id: "${this.id}") {
+            id
+          }
+        }`
+      })
+      .toPromise();
+  }
+
+  dvOnAfterCommit() {
+    this.disabled = true;
   }
 }

@@ -1,0 +1,14 @@
+<mat-form-field>
+  <mat-label>Due Date</mat-label>
+  <input matInput required [matDatepicker]="dueDatePicker"
+   [formControl]="dueDateControl"
+   name="dueDateControl">
+  <mat-datepicker-toggle matSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+  <mat-datepicker #dueDatePicker></mat-datepicker>
+  <mat-error *ngIf="dueDateControl.hasError('required')">
+    Due Date is <strong>required</strong>
+  </mat-error>
+  <mat-error *ngIf="dueDateControl.hasError('dueBeforeNow')">
+    Due Date should be <strong>in the future</strong>
+  </mat-error>
+</mat-form-field>

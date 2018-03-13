@@ -1,35 +1,63 @@
-// Change
-type Source {
-  id: ID!,
-  ratings: [Rating]
+type Assigner {
+  id: ID!
 }
 
-type Target {
-  id: ID!,
-  ratings: [Rating]
+type Assignee {
+  id: ID!
 }
 
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
+type Task {
+  id: ID!
+  assigner: Assigner
+  assignee: Assignee
+  dueDate: String
+  completed: Boolean
+  approved: Boolean
 }
 
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
+input CreateTaskInput {
+  id: ID
+  assignerId: ID 
+  assigneeId: ID
+  dueDate: String
 }
+
+input CreateTaskForAllAssigneesInput {
+  id: ID
+  assignerId: ID 
+  dueDate: String
+}
+
+input UpdateTaskInput {
+  id: ID!
+  assignerId: ID 
+  assigneeId: ID
+  dueDate: String
+}
+
+input TasksInput {
+  assigneeId: ID
+  assignerId: ID
+  approved: Boolean
+  assigned: Boolean
+  completed: Boolean
+}
+
 
 type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  tasks(input: TasksInput!): [Task]
+  task(id: ID!): Task
+  assignees: [Assignee]
 }
 
 type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  createAssigner(id: ID!): Assigner
+  createAssignee(id: ID!): Assignee
+  createTask(input: CreateTaskInput!): Task
+  createTaskForAllAssignees(
+    input: CreateTaskForAllAssigneesInput!): Task
+  updateTask(input: UpdateTaskInput!): Task
+  claimTask(taskId: ID!, assigneeId: ID!): Task
+  completeTask(id: ID!): Task
+  approveTask(id: ID!): Task
 }
