@@ -22,4 +22,6 @@ type Query {
 type Mutation {
   createPrincipal(id:ID!): Principal
   createResource(id:ID!, ownerId: ID!, viewers: [ID]): Resource
+  addViewerToResource(id: ID!, viewerId: ID!)
+  deleteResource(id: ID!)
 }

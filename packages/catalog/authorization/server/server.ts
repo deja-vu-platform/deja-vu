@@ -170,6 +170,28 @@ const resolvers = {
       await resources.insertOne(newResource);
 
       return newResource;
+    },
+
+    addViewerToResource: async (root, { id, viewerId }) => {
+      await Promise.all([
+        Validation.resourceExists(id),
+        Validation.principalExists(viewerId)
+      ]);
+
+      const resource = resources.findOne({ id: id });
+      const newViewerIds = resource.viewerIds;
+      newViewerIds.push(viewerId);
+
+      const updateOp = {
+        $set: { viewerIds: newViewerIds }
+      };
+      await resources.updateOne({ id: id }, updateOp);
+    },
+
+    deleteResource: async (root, { id }) => {
+      await resources.deleteOne({ id: id });
+
+      return { id: id };
     }
   }
 };
