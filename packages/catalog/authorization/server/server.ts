@@ -67,27 +67,110 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+class Validation {
+  static async principalExists(principalId: string) {
+    return Validation.exists(principals, principalId, 'Principal');
+  }
+
+  static async multiplePrincipalsAllExist(principalIds: string[]) {
+    const docs = await principals.find({ id: { $in: principalIds } });
+
+    return docs.length === principalIds.length;
+  }
+
+  static async resourceExists(resourceId: string) {
+    return Validation.exists(resources, resourceId, 'Resource');
+  }
+
+  private static async exists(collection, id: string, type: string) {
+    const doc = await collection.findOne({ id: id });
+    if (!doc) {
+      throw new Error(`${type} ${id} not found`);
+    }
+
+    return doc;
+  }
+}
+
 const resolvers = {
   Query: {
-    principals: () => principals.find()
-      .toArray(),
+    resource: (root, { id }) => resources.findOne({ id: id }),
+
+    principal: (root, { id }) => principals.findOne({ id: id }),
+
     resources: () => resources.find()
       .toArray(),
-    principal: (root, { id }) => principals.findOne({ id: id }),
-    resource: (root, { id }) => resources.findOne({ id: id })
+
+    principals: () => principals.find()
+      .toArray(),
+
+    isOwner: async (root, { principalId, resourceId }) => {
+      await Promise.all([
+        Validation.principalExists(principalId),
+        Validation.resourceExists(resourceId)
+      ]);
+
+      const resource: ResourceDoc = await resources
+        .findOne({ id: resourceId });
+
+      return resource.ownerId === principalId;
+    },
+
+    isViewer: async (root, { principalId, resourceId }) => {
+      await Promise.all([
+        Validation.principalExists(principalId),
+        Validation.resourceExists(resourceId)
+      ]);
+
+      const resource: ResourceDoc = await resources
+        .findOne({ id: resourceId });
+
+      return resource.viewerIds.indexOf(principalId) > 0;
+    }
   },
+
   Principal: {
     id: (principal: PrincipalDoc) => principal.id
   },
+
   Resource: {
     id: (resource: ResourceDoc) => resource.id,
+
     owner: (resource: ResourceDoc) => principals
       .findOne({ id: resource.ownerId }),
+
     viewers: (resource: ResourceDoc) => principals
       .find({ id: { $in: resource.viewerIds } })
       .toArray()
   },
+
   Mutation: {
+    createPrincipal: async (root, { id }) => {
+      const principalId = id ? id : uuid();
+      const newPrincipal: PrincipalDoc = { id: principalId };
+      await principals.insertOne(newPrincipal);
+
+      return newPrincipal;
+    },
+
+    createResource: async (root, { id, ownerId, viewerIds }) => {
+      const resourceId = id ? id : uuid();
+      const viewers = viewerIds ? viewerIds : [];
+      await Promise.all([
+        Validation.principalExists(ownerId),
+        Validation.multiplePrincipalsAllExist(viewerIds)
+      ]);
+
+      const newResource: ResourceDoc = {
+        id: resourceId,
+        ownerId: ownerId,
+        viewerIds: viewers
+      };
+
+      await resources.insertOne(newResource);
+
+      return newResource;
+    }
   }
 };
 
@@ -95,7 +178,11 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
+  extended: true
+}), graphqlExpress({ schema }));
+
+app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 app.listen(config.wsPort, () => {
   console.log(`Running ${name} with config ${JSON.stringify(config)}`);
