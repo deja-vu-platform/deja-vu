@@ -11,7 +11,7 @@ def main():
         print("I must be run from the packages/catalog folder")
 
     print("Migrating {0}".format(cliche))
-    call_or_fail(["dv", "new", "cliche", cliche, "../.."])
+    call_or_fail(["dv", "new", "cliche", cliche, os.path.join("..", "..")])
 
     os.chdir(cliche)
     cliche_dir = os.path.join(
@@ -63,7 +63,7 @@ def replace(components_dir, target_module_dir, component_name, ext):
         print("Failed on {0} -> {1}".format(src, target))
 
 def call_or_fail(args):
-    fail = subprocess.call(args, shell=True)
+    fail = subprocess.call(args)
     if fail:
         sys.exit(1)
 
