@@ -1,4 +1,4 @@
-// Controls a user's access to resources.
+# Controls a user's access to resources.
 
 type Resource {
   id: ID!,
@@ -8,16 +8,16 @@ type Resource {
 
 type Principal {
   id: ID!
- }
+}
 
- type Query {
+type Query {
   resource(id: ID!): Resource
   principal(id: ID!): Principal
   resources: [Resource!]
   principals: [Principal!]
   isOwner(principalId: ID!, resourceId: ID!): Boolean
   isViewer(principalId: ID!, resourceId: ID!): Boolean
- }
+}
 
 type Mutation {
   createPrincipal(id:ID!): Principal
