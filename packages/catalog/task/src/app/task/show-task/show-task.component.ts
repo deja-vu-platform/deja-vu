@@ -1,10 +1,27 @@
-import {Widget, Field, Atom} from "client-bus";
+import { Component, Input } from '@angular/core';
 
+import { Task } from '../shared/task.model';
 
-@Widget({
-  fqelement: "Task",
-  template: `{{task.name}}`
-  })
+@Component({
+  selector: 'task-show-task',
+  templateUrl: './show-task.component.html'
+})
 export class ShowTaskComponent {
-  @Field("Task") task: Atom;
+  @Input() task: Task;
+
+  @Input() showId = true;
+  @Input() showAssigner = true;
+  @Input() showAssignee = true;
+  @Input() showDueDate = true;
+  @Input() showApproved = true;
+  @Input() showCompleted = true;
+
+  @Input() noAssigneeText = 'No assignee';
+  @Input() noAssignerText = 'No assigner';
+  @Input() noDueDateText = 'No due date';
+
+  @Input() approvedText = 'approved';
+  @Input() notApprovedText = 'not approved';
+  @Input() completedText = 'completed';
+  @Input() incompleteText = 'incomplete';
 }

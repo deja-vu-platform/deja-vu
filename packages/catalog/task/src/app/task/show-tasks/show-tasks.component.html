@@ -1,0 +1,25 @@
+<ul *ngIf="tasks && tasks.length > 0" class="list-group">
+  <li *ngFor="let task of tasks" class="list-group-item">
+    <dv-include [action]="showTask" [inputs]="{
+        task: task, showId: showId, showAssigner: showAssigner,
+        showAssignee: showAssignee,
+        showExpirationDate: showExpirationDate,
+        showApproved: showApproved,
+        showCompleted: showCompleted
+      }"
+      [parent]="showTasks">
+    </dv-include>
+    <div *ngIf="claimAssigneeId">
+      <task-claim-task [id]="task.id" [assigneeId]="claimAssigneeId">
+      </task-claim-task>
+    </div>
+    <div *ngIf="showOptionToComplete">
+      <task-complete-task [id]="task.id" [disabled]="task.completed">
+      </task-complete-task>
+    </div>
+    <div *ngIf="showOptionToApprove">
+      <task-approve-task [id]="task.id" [disabled]="task.approved">
+      </task-approve-task>
+    </div>
+  </li>
+</ul>

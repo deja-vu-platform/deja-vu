@@ -1,0 +1,11 @@
+<mat-form-field>
+  <mat-select [placeholder]="assigneeSelectPlaceholder"
+    (selectionChange)="updateSelected($event.value)" [required]="true" [value]="selectedAssigneeId"
+    class="selectpicker">
+    <mat-option>None</mat-option>
+    <mat-option *ngFor="let assignee of assignees"
+     [value]="assignee.id">
+     {{assignee.id}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
