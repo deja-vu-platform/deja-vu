@@ -1,17 +1,17 @@
 <form (ngSubmit)="onSubmit()" class="form-horizontal">
   <div class="form-group create-principal-form-group">
-    <div *ngIf="newPrincipalSaved" class="create-principal-saved">
+    <div *ngIf="newPrincipalSuccess" class="create-principal-success">
       <i class="material-icons">done</i>
-      {{newPrincipalSavedText}}
+      {{newPrincipalSuccessText}}
     </div>
-    <mat-error *ngIf="newPrincipalError">
+    <mat-error *ngIf="newPrincipalErrorText">
       <i class="material-icons">report_problem</i>
-      {{newPrincipalError}}
+      {{newPrincipalErrorText}}
     </mat-error>
   </div>
   <div class="form-group create-principal-form-group">
     <mat-form-field>
-      <mat-label>{{inputLabel}}</mat-label>
+      <mat-label>{{principalInputLabel}}</mat-label>
       <input matInput [(ngModel)]="id" name="id">
     </mat-form-field>
   </div>

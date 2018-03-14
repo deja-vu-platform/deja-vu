@@ -23,13 +23,13 @@ export class CreatePrincipalComponent implements
   // Presentation Inputs
   @Input() id: string;
   @Input() buttonLabel = 'Create Principal';
-  @Input() inputLabel = 'Id';
-  @Input() newPrincipalSavedText = 'New principal created';
+  @Input() principalInputLabel = 'Id';
+  @Input() newPrincipalSuccessText = 'New principal created';
 
   @Output() principal = new EventEmitter();
 
-  newPrincipalSaved = false;
-  newPrincipalError: string;
+  newPrincipalSuccess = false;
+  newPrincipalErrorText: string;
 
   private gs: GatewayService;
 
@@ -61,13 +61,13 @@ export class CreatePrincipalComponent implements
   }
 
   dvOnAfterCommit() {
-    this.newPrincipalSaved = true;
+    this.newPrincipalSuccess = true;
     window.setTimeout(() => {
-      this.newPrincipalSaved = false;
+      this.newPrincipalSuccess = false;
     }, SAVED_MSG_TIMEOUT);
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.newPrincipalError = reason.message;
-   }
+    this.newPrincipalErrorText = reason.message;
+  }
 }

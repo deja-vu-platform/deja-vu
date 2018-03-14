@@ -1,17 +1,17 @@
 <form (ngSubmit)="onSubmit()" class="form-horizontal">
   <div class="form-group create-resource-form-group">
-    <div *ngIf="newResourceSaved" class="create-resource-saved">
+    <div *ngIf="newResourceSuccess" class="create-resource-success">
       <i class="material-icons">done</i>
-      {{newResourceSavedText}}
+      {{newResourceSuccessText}}
     </div>
-    <mat-error *ngIf="newResourceError">
+    <mat-error *ngIf="newResourceErrorText">
       <i class="material-icons">report_problem</i>
-      {{newResourceError}}
+      {{newResourceErrorText}}
     </mat-error>
   </div>
   <div class="form-group create-resource-form-group">
     <mat-form-field>
-      <mat-label>{{inputLabel}}</mat-label>
+      <mat-label>{{resourceInputLabel}}</mat-label>
       <input matInput [(ngModel)]="id" name="id">
     </mat-form-field>
   </div>

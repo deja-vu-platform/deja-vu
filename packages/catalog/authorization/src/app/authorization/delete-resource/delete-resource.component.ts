@@ -16,9 +16,6 @@ import * as _ from 'lodash';
 export class DeleteResourceComponent implements OnInit, OnRun {
   @Input() id;
 
-  resourceDeleted = false;
-  resourceDeletedError: string;
-
   private gs: GatewayService;
 
   constructor(

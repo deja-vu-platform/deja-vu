@@ -25,15 +25,15 @@ export class CreateResourceComponent implements
   @Input() ownerId: string;
   @Input() viewerIds?: string;
   @Input() buttonLabel = 'Create Resource';
-  @Input() inputLabel = 'Id';
+  @Input() resourceInputLabel = 'Id';
   @Input() ownerInputLabel = 'Owner Id';
   @Input() viewerInputLabel = 'Viewer Id';
-  @Input() newResourceSavedText = 'New resource created';
+  @Input() newResourceSuccessText = 'New resource created';
 
   @Output() resource = new EventEmitter();
 
-  newResourceSaved = false;
-  newResourceError: string;
+  newResourceSuccess = false;
+  newResourceErrorText: string;
 
   private gs: GatewayService;
 
@@ -78,13 +78,13 @@ export class CreateResourceComponent implements
   }
 
   dvOnAfterCommit() {
-    this.newResourceSaved = true;
+    this.newResourceSuccess = true;
     window.setTimeout(() => {
-      this.newResourceSaved = false;
+      this.newResourceSuccess = false;
     }, SAVED_MSG_TIMEOUT);
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.newResourceError = reason.message;
+    this.newResourceErrorText = reason.message;
   }
 }

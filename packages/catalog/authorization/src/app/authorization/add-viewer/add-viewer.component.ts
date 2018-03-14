@@ -23,8 +23,8 @@ export class AddViewerComponent implements
   // Presentation Inputs
   @Input() id: string;
   @Input() viewerId: string;
-  @Input() resourceLabel = 'Resource Id';
-  @Input() viewerLabel = 'Viewer Id';
+  @Input() resourceInputLabel = 'Resource Id';
+  @Input() viewerInputLabel = 'Viewer Id';
   @Input() buttonLabel = 'Add Viewer to Resource';
   @Input() viewerAddedSuccessText = 'Viewer added to resource';
 
