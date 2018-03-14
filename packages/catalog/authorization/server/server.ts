@@ -93,6 +93,21 @@ class Validation {
 }
 
 const resolvers = {
+  Principal: {
+    id: (principal: PrincipalDoc) => principal.id
+  },
+
+  Resource: {
+    id: (resource: ResourceDoc) => resource.id,
+
+    owner: (resource: ResourceDoc) => principals
+      .findOne({ id: resource.ownerId }),
+
+    viewers: (resource: ResourceDoc) => principals
+      .find({ id: { $in: resource.viewerIds } })
+      .toArray()
+  },
+
   Query: {
     resource: (root, { id }) => resources.findOne({ id: id }),
 
@@ -127,21 +142,6 @@ const resolvers = {
 
       return resource.viewerIds.indexOf(principalId) > 0;
     }
-  },
-
-  Principal: {
-    id: (principal: PrincipalDoc) => principal.id
-  },
-
-  Resource: {
-    id: (resource: ResourceDoc) => resource.id,
-
-    owner: (resource: ResourceDoc) => principals
-      .findOne({ id: resource.ownerId }),
-
-    viewers: (resource: ResourceDoc) => principals
-      .find({ id: { $in: resource.viewerIds } })
-      .toArray()
   },
 
   Mutation: {
@@ -186,6 +186,8 @@ const resolvers = {
         $set: { viewerIds: newViewerIds }
       };
       await resources.updateOne({ id: id }, updateOp);
+
+      return true;
     },
 
     deleteResource: async (root, { id }) => {
