@@ -1,21 +1,21 @@
 <form (ngSubmit)="onSubmit()" class="form-horizontal">
-    <div class="form-group create-principal-form-group">
-        <div *ngIf="newPrincipalSaved" class="create-principal-saved">
-            <i class="material-icons">done</i>
-            {{newPrincipalSavedText}}
-        </div>
-        <mat-error *ngIf="newPrincipalError">
-            <i class="material-icons">report_problem</i>
-            {{newPrincipalError}}
-        </mat-error>
+  <div class="form-group create-principal-form-group">
+    <div *ngIf="newPrincipalSaved" class="create-principal-saved">
+      <i class="material-icons">done</i>
+      {{newPrincipalSavedText}}
     </div>
-    <div class="form-group create-principal-form-group">
-        <mat-form-field>
-            <mat-label>{{inputLabel}}</mat-label>
-            <input matInput [(ngModel)]="id" name="id">
-        </mat-form-field>
-    </div>
-    <div class="form-group create-principal-form-group">
-        <button mat-button type="submit">{{buttonLabel}}</button>
-    </div>
+    <mat-error *ngIf="newPrincipalError">
+      <i class="material-icons">report_problem</i>
+      {{newPrincipalError}}
+    </mat-error>
+  </div>
+  <div class="form-group create-principal-form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <input matInput [(ngModel)]="id" name="id">
+    </mat-form-field>
+  </div>
+  <div class="form-group create-principal-form-group">
+    <button mat-button type="submit">{{buttonLabel}}</button>
+  </div>
 </form>

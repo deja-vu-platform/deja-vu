@@ -1,0 +1,33 @@
+<form (ngSubmit)="onSubmit()" class="form-horizontal">
+  <div class="form-group create-resource-form-group">
+    <div *ngIf="newResourceSaved" class="create-resource-saved">
+      <i class="material-icons">done</i>
+      {{newResourceSavedText}}
+    </div>
+    <mat-error *ngIf="newResourceError">
+      <i class="material-icons">report_problem</i>
+      {{newResourceError}}
+    </mat-error>
+  </div>
+  <div class="form-group create-resource-form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <input matInput [(ngModel)]="id" name="id">
+    </mat-form-field>
+  </div>
+  <div class="form-group create-resource-form-group">
+    <mat-form-field>
+      <mat-label>{{ownerInputLabel}}</mat-label>
+      <input matInput [(ngModel)]="ownerId" name="ownerId">
+    </mat-form-field>
+  </div>
+  <div class="form-group create-resource-form-group">
+    <mat-form-field>
+      <mat-label>{{viewerInputLabel}}</mat-label>
+      <input matInput [(ngModel)]="viewerIds" name="viewerIds">
+    </mat-form-field>
+  </div>
+  <div class="form-group create-resource-form-group">
+    <button mat-button type="submit">{{buttonLabel}}</button>
+  </div>
+</form>
