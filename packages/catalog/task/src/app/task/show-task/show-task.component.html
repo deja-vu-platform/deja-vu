@@ -1,3 +1,38 @@
-<p>
-  show-task works!
-</p>
+<div *ngIf="showId">
+  {{task.id}}
+</div>
+
+<div *ngIf="showAssignee && task.assignee">
+  {{task.assignee.id}}
+</div>
+<div *ngIf="showAssignee && !task.assignee">
+  {{noAssigneeText}}
+</div>
+
+<div *ngIf="showAssigner && task.assigner">
+  {{task.assigner.id}}
+</div>
+<div *ngIf="showAssigner && !task.assigner">
+  {{noAssignerText}}
+</div>
+
+<div *ngIf="showDueDate && task.dueDate">
+  {{task.dueDate}}
+</div>
+<div *ngIf="showDueDate && !task.dueDate">
+  {{noDueDateText}}
+</div>
+
+<div *ngIf="showApproved && task.approved">
+  {{approvedText}}
+</div>
+<div *ngIf="showApproved && !task.approved">
+  {{notApprovedText}}
+</div>
+
+<div *ngIf="showCompleted && task.completed">
+  {{completedText}}
+</div>
+<div *ngIf="showCompleted && !task.completed">
+  {{incompleteText}}
+</div>

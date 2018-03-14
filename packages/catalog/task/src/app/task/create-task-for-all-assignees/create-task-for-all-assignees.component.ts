@@ -1,64 +1,93 @@
-import { ElementRef } from "@angular/core";
-import { GraphQlService } from "gql";
-import { Widget, Field } from "client-bus";
-import { NamedAtom } from "../shared/data";
+import {
+  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild
+} from '@angular/core';
 
-@Widget({
-    fqelement: "Task",
-    ng2_providers: [GraphQlService],
-    styles: [``]
+import {
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  Validators
+} from '@angular/forms';
+
+import {
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
+} from 'dv-core';
+
+
+const SAVED_MSG_TIMEOUT = 3000;
+
+/**
+ * Creates one task with the same properties for each assignee
+ */
+@Component({
+  selector: 'task-create-task-for-all-assignees',
+  templateUrl: './create-task-for-all-assignees.component.html',
+  styleUrls: ['./create-task-for-all-assignees.component.css']
 })
-export class CreateTaskForAllAssigneesComponent {
-    @Field("Task") task: NamedAtom;
-    @Field("Assigner") assigner: NamedAtom;
+export class CreateTaskForAllAssigneesComponent
+  implements OnInit, OnRun, OnAfterCommit {
+  @Input() taskId;
+  @Input() assignerId;
 
-    expiration_date: string = "";
+  // Presentation inputs
+  @Input() buttonLabel = 'Create Task';
+  @Input() newTaskSavedText = 'New task saved';
 
-    constructor(
-        private _graphQlService: GraphQlService,
-        private _elementRef: ElementRef) { }
+  @ViewChild(FormGroupDirective) form;
 
-    onSubmit() {
-        let expirationDateText: Element =
-            document.getElementById("expiration-date-text");
-        this.expiration_date = expirationDateText["value"];
+  createTaskForAllAssigneesForm: FormGroup = this.builder.group({});
 
-        this._graphQlService
-            .post(`
-                createTaskForAllAssignees(
-                name: "${this.task.name}",
-                assigner_id: "${this.assigner.atom_id}",
-                expires_on: "${this.expiration_date}") {
-                atom_id
-                }
-            `)
-            .subscribe(res => {
-                expirationDateText["value"] = "";
-                this.expiration_date = "";
-                this.task.name = "";
-            });
+  dueDate: string;
+
+  newTaskSaved = false;
+  newTaskError: string;
+
+  private gs: GatewayService;
+
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService, private builder: FormBuilder) {}
+
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+  }
+
+  onSubmit() {
+    this.rs.run(this.elem);
+  }
+
+  async dvOnRun(): Promise<void> {
+    const res = await this.gs.post<{data: any}>('/graphql', {
+      query: `mutation CreateTaskForAllAssignees($input: CreateTaskInput!) {
+        createTaskForAllAssignees(input: $input) {
+          id
+        }
+      }`,
+      variables: {
+        input: {
+          assignerId: this.assignerId,
+          dueDate: this.dueDate
+        }
+      }
+    })
+    .toPromise();
+
+    return res.data.createTaskForAllAssignees.id;
+  }
+
+  dvOnAfterCommit() {
+    this.newTaskSaved = true;
+    window.setTimeout(() => {
+      this.newTaskSaved = false;
+    }, SAVED_MSG_TIMEOUT);
+    // Can't do `this.newWeeklyEventForm.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
     }
+  }
 
-    ngAfterViewInit() {
-        // Datepicker scripts need to be loaded this way
-        this._loadScript("bootstrap-datepicker/bootstrap-datepicker.min.js");
-        this._loadStyle("bootstrap-datepicker/bootstrap-datepicker3.min.css");
-    }
-
-    _loadScript(src: string) {
-        const s = document.createElement("script");
-        s.type = "text/javascript";
-        s.src = "node_modules/dv-organization-task/lib/components/" +
-            "create-task-for-all-assignees/vendor/" + src;
-        this._elementRef.nativeElement.appendChild(s);
-    }
-
-    _loadStyle(href: string) {
-        const s = document.createElement("link");
-        s.type = "text/css";
-        s.rel = "stylesheet";
-        s.href = "node_modules/dv-organization-task/lib/components/" +
-            "create-task-for-all-assignees/vendor/" + href;
-        this._elementRef.nativeElement.appendChild(s);
-    }
+  dvOnAfterAbort(reason: Error) {
+    this.newTaskError = reason.message;
+  }
 }
