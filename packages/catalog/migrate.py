@@ -63,6 +63,9 @@ def replace(components_dir, target_module_dir, component_name, ext):
         print("Failed on {0} -> {1}".format(src, target))
 
 def call_or_fail(args):
+    if sys.platform == 'win32':
+        args = ["cmd", "/C"] + args
+        
     fail = subprocess.call(args)
     if fail:
         sys.exit(1)
