@@ -1,5 +1,5 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter,
+  Component, ElementRef, EventEmitter,
   Input, OnInit, Output
 } from '@angular/core';
 import {
