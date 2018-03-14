@@ -4,7 +4,7 @@
   "gatewayPort": 3000,
   "config": {
     "wsPort": 3001,
-    "reinitDbOnStartup": false
+    "reinitDbOnStartup": true
   },
   "startServer": true
 }

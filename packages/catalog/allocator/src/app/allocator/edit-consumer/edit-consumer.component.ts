@@ -20,7 +20,7 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
   selectedConsumerId: string;
   currentConsumerId: string;
   consumers = [];
-  allocator: AllocatorService;
+  private allocator: AllocatorService;
 
   constructor(
     private elem: ElementRef, private asf: AllocatorServiceFactory,

@@ -104,7 +104,7 @@ export class AllocatorService {
     return this.gs.post<CreateAllocationRes>(GRAPHQL_ENDPOINT, {
       query: `
         mutation CreateAllocation(
-          $id: ID!, $resourceIds: [ID], $saveResources: Boolean) {
+          $id: ID!, $resourceIds: [ID!], $saveResources: Boolean) {
           createAllocation(
             id: $id, resourceIds: $resourceIds,
             saveResources: $saveResources) {

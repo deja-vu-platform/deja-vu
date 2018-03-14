@@ -22,7 +22,7 @@ export class ShowAverageRatingComponent implements OnInit, OnChanges {
   @Output() ratingCount = new EventEmitter<number>();
   ratingCountValue = 0;
 
-  ratingService: RatingService;
+  private ratingService: RatingService;
 
   constructor(private elem: ElementRef, private rsf: RatingServiceFactory) {}
 

@@ -145,22 +145,19 @@ const resolvers = {
 
       return true;
     },
-    createSource: (root, {sourceId}) => {
-      if (!sourceId) {
-        sourceId = uuid();
-      }
-
-      return sources.insertOne({id: sourceId});
-    },
-    createTarget: (root, {targetId}) => {
-      if (!targetId) {
-        targetId = uuid();
-      }
-
-      return targets.insertOne({id: targetId});
-    }
+    createSource: (root, input) => createEntity(sources, input),
+    createTarget: (root, input) => createEntity(targets, input)
   }
 };
+
+async function createEntity(collection, { id }): Promise<{id: string}> {
+  if (!id) {
+    id = uuid();
+  }
+  const res = await collection.insertOne({id: id});
+
+  return res.ops[0];
+}
 
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
