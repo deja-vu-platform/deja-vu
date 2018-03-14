@@ -15,7 +15,7 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
   @Input() allocationId: string;
   @Output() consumer = new EventEmitter();
   consumerObj = {id: ''};
-  allocator: AllocatorService;
+  private allocator: AllocatorService;
 
   constructor(
     private elem: ElementRef,

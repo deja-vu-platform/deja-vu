@@ -1,6 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import {
+  MatButtonModule, MatFormFieldModule, MatInputModule
+} from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+
+import { CreateSourceComponent } from './create-source/create-source.component';
+import { CreateTargetComponent } from './create-target/create-target.component';
 import {
   RateTargetComponent
 } from './rate-target/rate-target.component';
@@ -21,6 +29,8 @@ import { DvModule } from 'dv-core';
 
 
 const allComponents = [
+  CreateSourceComponent,
+  CreateTargetComponent,
   RateTargetComponent, ShowAverageRatingComponent,
   ShowRatingComponent, ShowRatingsByTargetComponent
 ];
@@ -30,6 +40,9 @@ const allComponents = [
   imports: [
     CommonModule,
     DvModule,
+    FormsModule,
+    BrowserAnimationsModule,
+    MatButtonModule, MatInputModule, MatFormFieldModule,
     StarRatingModule.forRoot()
   ],
   providers: [RatingServiceFactory],

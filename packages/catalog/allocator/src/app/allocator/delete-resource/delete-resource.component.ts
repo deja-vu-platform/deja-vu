@@ -16,9 +16,9 @@ import { OnRun, RunService } from 'dv-core';
 })
 export class DeleteResourceComponent implements OnInit, OnChanges {
   @Input() id: string;
-  allocator: AllocatorService;
-
   idChange = new EventEmitter();
+
+  private allocator: AllocatorService;
 
   constructor(
     private elem: ElementRef,
