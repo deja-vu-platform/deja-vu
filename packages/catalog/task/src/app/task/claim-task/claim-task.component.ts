@@ -15,10 +15,9 @@ import {
 })
 export class ClaimTaskComponent implements
   OnInit, OnRun, OnAfterCommit  {
-  @Input() taskId;
+  @Input() id;
   @Input() assigneeId;
-
-  claimed = false;
+  @Input() disabled = false;
 
   private gs: GatewayService;
 
@@ -40,7 +39,7 @@ export class ClaimTaskComponent implements
       .post<{data: any}>('/graphql', {
         query: `mutation {
           claimTask(
-            taskId: "${this.taskId}",
+            id: "${this.id}",
             assigneeId: "${this.assigneeId}") {
             id
           }
@@ -50,6 +49,6 @@ export class ClaimTaskComponent implements
   }
 
   dvOnAfterCommit() {
-    this.claimed = true;
+    this.disabled = true;
   }
 }

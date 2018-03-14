@@ -57,7 +57,7 @@ type Mutation {
   createTaskForAllAssignees(
     input: CreateTaskForAllAssigneesInput!): Task
   updateTask(input: UpdateTaskInput!): Task
-  claimTask(taskId: ID!, assigneeId: ID!): Task
+  claimTask(id: ID!, assigneeId: ID!): Task
   completeTask(id: ID!): Task
   approveTask(id: ID!): Task
 }

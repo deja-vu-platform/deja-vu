@@ -9,8 +9,8 @@
       }"
       [parent]="showTasks">
     </dv-include>
-    <div *ngIf="showOptionToClaim && assigneeId">
-      <task-claim-task [id]="task.id" [assigneeId]="assigneeId">
+    <div *ngIf="claimAssigneeId">
+      <task-claim-task [id]="task.id" [assigneeId]="claimAssigneeId">
       </task-claim-task>
     </div>
     <div *ngIf="showOptionToComplete">

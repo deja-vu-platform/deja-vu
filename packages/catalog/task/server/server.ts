@@ -250,7 +250,7 @@ const resolvers = {
     },
     claimTask: async (root, { id, assigneeId }) => {
       const res = await tasks
-        .findOneAndUpdate({ id: id }, { $push: { assigneeId: assigneeId}});
+        .findOneAndUpdate({ id: id }, { $set: { assigneeId: assigneeId}});
 
       return res.value;
     },

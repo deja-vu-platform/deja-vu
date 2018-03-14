@@ -89,7 +89,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges {
     this.rs.run(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnRun(): Promise<string> {
     const res = await this.gs.post<{data: any}>('/graphql', {
       query: `mutation UpdateTask($input: UpdateTaskInput!) {
         updateTask(input: $input) {
@@ -114,7 +114,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges {
     window.setTimeout(() => {
       this.taskSaved = false;
     }, SAVED_MSG_TIMEOUT);
-    // Can't do `this.newWeeklyEventForm.reset();`
+    // Can't do `this.updateTaskForm.reset();`
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
       this.form.resetForm();

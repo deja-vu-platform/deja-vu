@@ -35,8 +35,8 @@ export class ShowTasksComponent implements OnInit, OnChanges {
   @Input() showCompleted = true;
 
   // Whether to show the user the option to {claim, complete, approve} a task
-  // Requires assigneeId
-  @Input() showOptionToClaim = false;
+  // If given, it will show the the option to claim
+  @Input() claimAssigneeId: string | undefined;
   @Input() showOptionToComplete = false;
   @Input() showOptionToApprove = false;
 
