@@ -21,6 +21,8 @@ export class CreateAllocationComponent implements OnInit, OnChanges {
   @Input() resources: [{id: string}]; // Required
   @Input() saveResources = false;
 
+  @Input() buttonLabel = 'Create Allocation';
+
   @Output() allocation = new EventEmitter();
 
   resourcesChange = new EventEmitter();
@@ -41,6 +43,10 @@ export class CreateAllocationComponent implements OnInit, OnChanges {
     if (changes.resources || changes.newResources) {
       this.resourcesChange.emit(null);
     }
+  }
+
+  onSubmit() {
+    this.rs.run(this.elem);
   }
 
   async dvOnRun() {

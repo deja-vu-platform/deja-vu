@@ -1,10 +1,16 @@
-<allocator-create-resource></allocator-create-resource>
+<div class="container">
+  <h1>Create Resource</h1>
+  <allocator-create-resource id="r1"></allocator-create-resource>
 
-<allocator-edit-consumer allocationId="a1" resourceId="r1"></allocator-edit-consumer>
+  <h1>Create Allocation</h1>
+  <allocator-create-allocation id="a1" [resources]="[{id: 'r1'}]">
+  </allocator-create-allocation>
 
-Consumer is:
-<allocator-show-consumer allocationId="a1" resourceId="r1">
-</allocator-show-consumer>
+  <h1>Edit Consumer</h1>
+  <allocator-edit-consumer allocationId="a1" resourceId="r1"></allocator-edit-consumer>
 
-<allocator-create-allocation resources="['foo']">
-</allocator-create-allocation>
+  <h1>Show Consumer</h1>
+  Consumer is:
+  <allocator-show-consumer allocationId="a1" resourceId="r1">
+  </allocator-show-consumer>
+</div>

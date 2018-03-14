@@ -26,7 +26,7 @@ type Mutation {
   editConsumerOfResource(
       resourceId: ID!, allocationId: ID!, newConsumerId: ID!): Boolean
   # Creates a new allocation of the given resources and all existing consumers
-  createAllocation(id: ID, resourceIds: [ID], saveResources: Boolean): Allocation
+  createAllocation(id: ID, resourceIds: [ID!], saveResources: Boolean): Allocation
   createResource(id: ID): Resource
   deleteResource(id: ID): Resource
 }
