@@ -109,9 +109,9 @@ const resolvers = {
   },
 
   Query: {
-    resource: (root, { id }) => resources.findOne({ id: id }),
+    resource: (_, { id }) => resources.findOne({ id: id }),
 
-    principal: (root, { id }) => principals.findOne({ id: id }),
+    principal: (_, { id }) => principals.findOne({ id: id }),
 
     resources: () => resources.find()
       .toArray(),
@@ -119,7 +119,7 @@ const resolvers = {
     principals: () => principals.find()
       .toArray(),
 
-    isOwner: async (root, { principalId, resourceId }) => {
+    isOwner: async (_, { principalId, resourceId }) => {
       await Promise.all([
         Validation.principalExists(principalId),
         Validation.resourceExists(resourceId)
@@ -131,7 +131,7 @@ const resolvers = {
       return resource.ownerId === principalId;
     },
 
-    isViewer: async (root, { principalId, resourceId }) => {
+    isViewer: async (_, { principalId, resourceId }) => {
       await Promise.all([
         Validation.principalExists(principalId),
         Validation.resourceExists(resourceId)
@@ -145,7 +145,7 @@ const resolvers = {
   },
 
   Mutation: {
-    createPrincipal: async (root, { id }) => {
+    createPrincipal: async (_, { id }) => {
       const principalId = id ? id : uuid();
       const newPrincipal: PrincipalDoc = { id: principalId };
       await principals.insertOne(newPrincipal);
@@ -153,7 +153,7 @@ const resolvers = {
       return newPrincipal;
     },
 
-    createResource: async (root, { id, ownerId, viewerIds }) => {
+    createResource: async (_, { id, ownerId, viewerIds }) => {
       const resourceId = id ? id : uuid();
       const viewers = viewerIds ? viewerIds : [];
       await Promise.all([
@@ -172,7 +172,7 @@ const resolvers = {
       return newResource;
     },
 
-    addViewerToResource: async (root, { id, viewerId }) => {
+    addViewerToResource: async (_, { id, viewerId }) => {
       await Promise.all([
         Validation.resourceExists(id),
         Validation.principalExists(viewerId)
@@ -190,7 +190,7 @@ const resolvers = {
       return true;
     },
 
-    deleteResource: async (root, { id }) => {
+    deleteResource: async (_, { id }) => {
       await resources.deleteOne({ id: id });
 
       return { id: id };
