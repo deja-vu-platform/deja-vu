@@ -16,7 +16,7 @@ import { PropertyModule } from './property/property.module';
     BrowserModule,
     PropertyModule
   ],
-  providers: [],
+  providers: [{provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

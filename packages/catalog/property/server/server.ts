@@ -9,10 +9,10 @@ import { v4 as uuid } from 'uuid';
 import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
-// Change
-interface SourceDoc {
-  id: string;
-}
+import * as _ from 'lodash';
+
+import * as Ajv from 'ajv';
+
 
 interface Config {
   wsPort: number;
@@ -20,19 +20,20 @@ interface Config {
   dbPort: number;
   dbName: string;
   reinitDbOnStartup: boolean;
+  schema: any;
 }
 
 const argv = minimist(process.argv);
 
-// Change
-const name = argv.as ? argv.as : 'this-cliche-name';
+const name = argv.as ? argv.as : 'property';
 
 const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
   dbPort: 27017,
   wsPort: 3000,
   dbName: `${name}-db`,
-  reinitDbOnStartup: true
+  reinitDbOnStartup: true,
+  schema: {}
 };
 
 let configArg;
@@ -46,7 +47,7 @@ const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 // Change
-let db, sources, ratings, targets;
+let db, objects;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -57,40 +58,102 @@ mongodb.MongoClient.connect(
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
     }
-    // Change
-    sources = db.collection('sources');
-    sources.createIndex({ id: 1 }, { unique: true, sparse: true });
-    targets = db.collection('targets');
-    targets.createIndex({ id: 1 }, { unique: true, sparse: true });
-    ratings = db.collection('ratings');
-    ratings.createIndex(
-      { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
+    objects = db.collection('objects');
+    objects.createIndex({ id: 1 }, { unique: true, sparse: true });
   });
 
+const jsonSchemaTypeToGraphQLType = {
+  integer: 'Int',
+  number: 'Float',
+  string: 'String',
+  boolean: 'Boolean'
+  /* Not supported yet: object, array, null */
+};
+const requiredProperties: Set<string> = new Set(config.schema.required);
+const properties = _
+  .chain(config.schema.properties)
+  .toPairs()
+  .map(([propertyName, schemaPropertyObject]) => {
+    return `${propertyName}: ` +
+      jsonSchemaTypeToGraphQLType[schemaPropertyObject.type] +
+      (requiredProperties.has(propertyName) ? '!' : '');
+  })
+  .value();
 
-const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
+const joinedProperties = properties.join('\n');
+
+const dynamicTypeDefs = [`
+  type Object {
+    id: ID!
+    ${joinedProperties}
+  }
+
+  input CreateObjectInput {
+    id: ID
+    ${joinedProperties}
+  }
+`];
+
+const typeDefs = [
+  readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8'),
+  ...dynamicTypeDefs
+];
 
 
 const resolvers = {
   Query: {
-    source: (root, { id }) => sources.findOne({ id: id }),
-    target: (root, { id }) => targets.findOne({ id: id })
+    property: (root, { name }) => ({
+      name: name,
+      schema: JSON.stringify(config.schema.properties[name]),
+      required: _.includes(config.schema.required, name)
+    }),
+    object: (root, { id }) => objects.findOne({ id: id }),
+    properties: (root) => _
+      .chain(config.schema.properties)
+      .toPairs()
+      .map(([ name, propertyInfo ]) => ({
+        name: name,
+        schema: JSON.stringify(propertyInfo),
+        required: _.includes(config.schema.required, name)
+      }))
+      .value()
   },
-  Source: {
-    id: (source: SourceDoc) => source.id,
-    ratings: (source: SourceDoc) => ratings
-      .find({ sourceId: source.id })
-      .toArray()
+  Property: {
+    name: (root) => root.name,
+    schema: (root) => root.schema,
+    required: (root) => root.required
   },
   Mutation: {
+    createObject: async (root, { input }) => {
+      const newObject = input;
+      newObject.id = input.id ? input.id : uuid();
+      const ajv = new Ajv();
+      const validate = ajv.compile(config.schema);
+      console.log(_.omit(newObject, 'id'));
+      const valid = validate(_.omit(newObject, 'id'));
+      if (!valid) {
+        throw new Error(_.map(validate.errors, (error) => error.message));
+      }
+      await objects.insertOne(newObject);
+
+      return newObject;
+    }
   }
 };
+
+const objectResolvers = {};
+for (const propertyName of _.keys(config.schema.properties)) {
+  objectResolvers[propertyName] = (obj) => obj[propertyName];
+}
+resolvers['Object'] = objectResolvers;
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
 
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+
+app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 app.listen(config.wsPort, () => {
   console.log(`Running ${name} with config ${JSON.stringify(config)}`);

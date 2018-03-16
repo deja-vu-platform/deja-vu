@@ -1,0 +1,7 @@
+<mat-form-field *ngIf="propertyControl">
+  <mat-label>{{name}}</mat-label>
+  <input matInput [formControl]="propertyControl">
+  <mat-error *ngIf="propertyControl.hasError('required')">
+    {{name}} is <strong>required</strong>
+  </mat-error>
+</mat-form-field>
