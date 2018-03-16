@@ -16,7 +16,7 @@ interface PrincipalDoc {
 interface ResourceDoc {
   id: string;
   ownerId: string;
-  viewerIds: string[];
+  viewerIds?: string[];
 }
 
 interface Config {
@@ -93,31 +93,16 @@ class Validation {
 }
 
 const resolvers = {
-  Principal: {
-    id: (principal: PrincipalDoc) => principal.id
-  },
-
-  Resource: {
-    id: (resource: ResourceDoc) => resource.id,
-
-    owner: (resource: ResourceDoc) => principals
-      .findOne({ id: resource.ownerId }),
-
-    viewers: (resource: ResourceDoc) => principals
-      .find({ id: { $in: resource.viewerIds } })
-      .toArray()
-  },
-
   Query: {
-    resource: (_, { id }) => resources.findOne({ id: id }),
-
-    principal: (_, { id }) => principals.findOne({ id: id }),
-
     resources: () => resources.find()
       .toArray(),
 
     principals: () => principals.find()
       .toArray(),
+
+    resource: (_, { id }) => resources.findOne({ id: id }),
+
+    principal: (_, { id }) => principals.findOne({ id: id }),
 
     isOwner: async (_, { principalId, resourceId }) => {
       await Promise.all([
@@ -140,8 +125,22 @@ const resolvers = {
       const resource: ResourceDoc = await resources
         .findOne({ id: resourceId });
 
+      resource.viewerIds = resource.viewerIds ? resource.viewerIds : [];
+
       return resource.viewerIds.indexOf(principalId) > 0;
     }
+  },
+
+  Principal: {
+    id: (principal: PrincipalDoc) => principal.id
+  },
+
+  Resource: {
+    id: (resource: ResourceDoc) => resource.id,
+
+    ownerId: (resource: ResourceDoc) => resource.ownerId,
+
+    viewerIds: (resource: ResourceDoc) => resource.viewerIds
   },
 
   Mutation: {
@@ -158,7 +157,7 @@ const resolvers = {
       const viewers = viewerIds ? viewerIds : [];
       await Promise.all([
         Validation.principalExists(ownerId),
-        Validation.multiplePrincipalsAllExist(viewerIds)
+        Validation.multiplePrincipalsAllExist(viewers)
       ]);
 
       const newResource: ResourceDoc = {

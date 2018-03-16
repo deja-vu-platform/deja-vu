@@ -1,13 +1,11 @@
-# Controls a user's access to resources.
+type Principal {
+  id: ID!
+}
 
 type Resource {
   id: ID!,
-  owner: Principal!,
-  viewers: [Principal]
-}
-
-type Principal {
-  id: ID!
+  ownerId: ID!,
+  viewerIds: [ID!]
 }
 
 type Query {
@@ -21,7 +19,7 @@ type Query {
 
 type Mutation {
   createPrincipal(id:ID!): Principal
-  createResource(id:ID!, ownerId: ID!, viewers: [ID]): Resource
+  createResource(id:ID!, ownerId: ID!, viewerIds: [ID!]): Resource
   addViewerToResource(id: ID!, viewerId: ID!): Boolean
   deleteResource(id: ID!): String
 }
