@@ -41,4 +41,3 @@ export class DeleteResourceComponent implements OnInit, OnRun {
       .toPromise();
   }
 }
-
