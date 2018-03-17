@@ -9,7 +9,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { Resource } from '../../../../shared/data';
+import { Resource } from '../../../../shared/authorization.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
