@@ -4,8 +4,8 @@ type Principal {
 
 type Resource {
   id: ID!,
-  ownerId: ID!,
-  viewerIds: [ID!]
+  owner: Principal!,
+  viewers: [Principal]
 }
 
 type Query {

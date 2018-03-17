@@ -138,9 +138,12 @@ const resolvers = {
   Resource: {
     id: (resource: ResourceDoc) => resource.id,
 
-    ownerId: (resource: ResourceDoc) => resource.ownerId,
+    owner: (resource: ResourceDoc) => principals
+      .findOne({ id: resource.ownerId }),
 
-    viewerIds: (resource: ResourceDoc) => resource.viewerIds
+    viewers: (resource: ResourceDoc) => principals
+      .find({ id: { $in: resource.viewerIds } })
+      .toArray()
   },
 
   Mutation: {

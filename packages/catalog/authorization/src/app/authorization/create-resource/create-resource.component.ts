@@ -65,7 +65,9 @@ export class CreateResourceComponent implements
                 ownerId: "${this.ownerId}",
                 viewerIds: "${this.viewerIds}"
               ) {
-                id, ownerId, viewerIds
+                id,
+                owner{ id },
+                viewers{ id }
               }
             }`
         })
