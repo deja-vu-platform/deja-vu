@@ -73,9 +73,10 @@ class Validation {
   }
 
   static async multiplePrincipalsAllExist(principalIds: string[]) {
-    const docs = await principals.find({ id: { $in: principalIds } });
+    const numExistingPrincipals = await principals
+      .count({ id: { $in: principalIds } });
 
-    return docs.length === principalIds.length;
+    return numExistingPrincipals === principalIds.length;
   }
 
   static async resourceExists(resourceId: string) {
