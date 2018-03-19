@@ -124,6 +124,7 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
     if (!valid) {
       this.schemaErrors = _
         .map(this.schemaValidate.errors, (error) => error.message);
+
       return {
         schema: true
       };
