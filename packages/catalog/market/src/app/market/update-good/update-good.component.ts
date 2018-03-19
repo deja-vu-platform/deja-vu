@@ -1,17 +1,15 @@
-import {GraphQlService} from "gql";
-import {Widget, Field, PrimitiveAtom} from "client-bus";
-import {GoodAtom} from "../../shared/data";
+import { Component, Input } from '@angular/core';
 
+import { Good } from "../shared/market.model";
 
-@Widget({
-  fqelement: "Market",
-  ng2_providers: [GraphQlService],
-  template: ``
+@Component({
+  selector: 'market-update-good',
+  templateUrl: './update-good.component.html',
+  styleUrls: ['./update-good.component.css'],
 })
-export class EditGoodNameComponent {
-  @Field("Good") good: GoodAtom;
-  @Field("string") name: PrimitiveAtom<string>;
-  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+export class UpdateGoodComponent {
+  @Input() good: Good;
+  @Input() name: string;
 
   constructor(private _graphQlService: GraphQlService) {}
 

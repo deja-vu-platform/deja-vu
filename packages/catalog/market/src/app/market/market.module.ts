@@ -23,7 +23,6 @@ import { CreateGoodSupplyComponent } from './create-good-supply/create-good-supp
 import { CreateMarketComponent } from './create-market/create-market.component';
 import { CreatePartyComponent } from './create-party/create-party.component';
 import { EditCompoundTransactionSellerComponent } from './edit-compound-transaction-seller/edit-compound-transaction-seller.component';
-import { EditGoodNameComponent } from './edit-good-name/edit-good-name.component';
 import { CreateGoodSellerComponent } from './create-good-seller/create-good-seller.component';
 import { PayForCompoundTransactionButtonComponent } from './pay-for-compound-transaction-button/pay-for-compound-transaction-button.component';
 import { ShowAffordableGoodsComponent } from './show-affordable-goods/show-affordable-goods.component';
@@ -37,6 +36,7 @@ import { ShowMyPurchasesComponent } from './show-my-purchases/show-my-purchases.
 import { ShowTransactionComponent } from './show-transaction/show-transaction.component';
 import { ShowUnaffordableGoodsComponent } from './show-unaffordable-goods/show-unaffordable-goods.component';
 import { StartCompoundTransactionButtonComponent } from './start-compound-transaction-button/start-compound-transaction-button.component';
+import { UpdateGoodComponent } from './update-good/update-good.component';
 
 const allComponenents = [
   AddAmountComponent, AddTransactionButtonComponent, BuyGoodButtonComponent,
@@ -44,11 +44,12 @@ const allComponenents = [
   CreateCompoundTransactionButtonComponent, CreateBalanceComponent, 
   CreateGoodComponent, CreateGoodNameComponent, CreateGoodPriceComponent,
   CreateGoodSellerComponent, CreateGoodSupplyComponent, CreateMarketComponent,
-  CreatePartyComponent, EditCompoundTransactionSellerComponent, EditGoodNameComponent,
+  CreatePartyComponent, EditCompoundTransactionSellerComponent,
   PayForCompoundTransactionButtonComponent, ShowAffordableGoodsComponent, ShowAllGoodsComponent,
   ShowAllTransactionsComponent, ShowBalanceComponent, ShowCompoundTransactionComponent,
   ShowGoodComponent, ShowMyGoodsForSaleComponent, ShowMyPurchasesComponent,
-  ShowTransactionComponent, ShowUnaffordableGoodsComponent, StartCompoundTransactionButtonComponent
+  ShowTransactionComponent, ShowUnaffordableGoodsComponent, StartCompoundTransactionButtonComponent,
+  UpdateGoodComponent,
 ];
 
 @NgModule({
