@@ -17,6 +17,8 @@ import { map } from 'rxjs/operators';
 
 import { Property } from '../shared/property.model';
 
+import * as _ from 'lodash';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -88,17 +90,22 @@ export class CreateObjectComponent implements OnInit, OnRun, OnAfterCommit {
     for (const property of this.properties) {
       input[property.name] = this[property.name].value;
     }
-    const res = await this.gs.post<{data: any}>('/graphql', {
-      query: `mutation CreateObject($input: CreateObjectInput!) {
-        createObject(input: $input) {
-          id
+    const res = await this.gs
+      .post<{data: any, errors: {message: string}[]}>('/graphql', {
+        query: `mutation CreateObject($input: CreateObjectInput!) {
+          createObject(input: $input) {
+            id
+          }
+        }`,
+        variables: {
+          input: input
         }
-      }`,
-      variables: {
-        input: input
-      }
-    })
-    .toPromise();
+      })
+      .toPromise();
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
   }
 
   dvOnAfterCommit() {

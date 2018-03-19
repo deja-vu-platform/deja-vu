@@ -12,11 +12,13 @@ import {
   GatewayService, GatewayServiceFactory
 } from 'dv-core';
 
-import { Property } from '../shared/property.model';
+import { GraphQlType, Property } from '../shared/property.model';
 
 import { map, startWith } from 'rxjs/operators';
 
 import * as Ajv from 'ajv';
+
+import * as _ from 'lodash';
 
 
 @Component({
@@ -44,6 +46,8 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
   @Output() value = new EventEmitter();
 
   propertyControl: FormControl;
+  schemaErrors: string[];
+  type;
 
   private gs: GatewayService;
   private schemaValidate;
@@ -74,6 +78,7 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
               property(name: "${this.name}") {
                 schema
                 required
+                graphQlType
               }
             }
           `
@@ -82,6 +87,14 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
       .pipe(map((res) => res.data.property))
       .subscribe((property: Property) => {
         this.schemaValidate = this.ajv.compile(JSON.parse(property.schema));
+        if (property.graphQlType === GraphQlType.Int ||
+            property.graphQlType === GraphQlType.Float) {
+          this.type = Number;
+        } else if (property.graphQlType === GraphQlType.String) {
+          this.type = String;
+        } else {
+          this.type = Boolean;
+        }
         const validators = [this.schemaValidator.bind(this)];
         if (property.required) {
           validators.push(Validators.required);
@@ -97,11 +110,19 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
   }
 
   schemaValidator(control: AbstractControl): {[key: string]: any} {
-    if (!this.schemaValidate) {
+    if (!this.schemaValidate || !control.value) {
       return null;
     }
+    const valid = this.schemaValidate(this.type(control.value));
+    if (!valid) {
+      this.schemaErrors = _
+        .map(this.schemaValidate.errors, (error) => error.message);
+      return {
+        schema: true
+      };
+    }
 
-    return this.schemaValidate(control.value);
+    return null;
   }
 
   writeValue(value: any) {

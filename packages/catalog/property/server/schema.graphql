@@ -1,5 +1,6 @@
 type Property {
   name: String
+  graphQlType: String
   # The JSON Schema object for this property only (for partial validation)
   # It can be passed directly to the ajv validate function
   # (after JSON.parse)

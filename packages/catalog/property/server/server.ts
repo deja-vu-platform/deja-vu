@@ -62,7 +62,7 @@ mongodb.MongoClient.connect(
     objects.createIndex({ id: 1 }, { unique: true, sparse: true });
   });
 
-const jsonSchemaTypeToGraphQLType = {
+const jsonSchemaTypeToGraphQlType = {
   integer: 'Int',
   number: 'Float',
   string: 'String',
@@ -75,7 +75,7 @@ const properties = _
   .toPairs()
   .map(([propertyName, schemaPropertyObject]) => {
     return `${propertyName}: ` +
-      jsonSchemaTypeToGraphQLType[schemaPropertyObject.type] +
+      jsonSchemaTypeToGraphQlType[schemaPropertyObject.type] +
       (requiredProperties.has(propertyName) ? '!' : '');
   })
   .value();
@@ -102,11 +102,16 @@ const typeDefs = [
 
 const resolvers = {
   Query: {
-    property: (root, { name }) => ({
-      name: name,
-      schema: JSON.stringify(config.schema.properties[name]),
-      required: _.includes(config.schema.required, name)
-    }),
+    property: (root, { name }) => {
+      const propertyInfo = config.schema.properties[name];
+
+      return {
+        name: name,
+        schema: JSON.stringify(propertyInfo),
+        required: _.includes(config.schema.required, name),
+        graphQlType: jsonSchemaTypeToGraphQlType[propertyInfo.type]
+      };
+    },
     object: (root, { id }) => objects.findOne({ id: id }),
     properties: (root) => _
       .chain(config.schema.properties)
@@ -114,14 +119,16 @@ const resolvers = {
       .map(([ name, propertyInfo ]) => ({
         name: name,
         schema: JSON.stringify(propertyInfo),
-        required: _.includes(config.schema.required, name)
+        required: _.includes(config.schema.required, name),
+        graphQlType: jsonSchemaTypeToGraphQlType[propertyInfo.type]
       }))
       .value()
   },
   Property: {
     name: (root) => root.name,
     schema: (root) => root.schema,
-    required: (root) => root.required
+    required: (root) => root.required,
+    graphQlType: (root) => root.graphQlType
   },
   Mutation: {
     createObject: async (root, { input }) => {
