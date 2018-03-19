@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
-  SimpleChanges, ViewChild
+  Pipe, PipeTransform, SimpleChanges, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, ControlValueAccessor, FormBuilder, FormControl,
@@ -20,6 +20,13 @@ import * as Ajv from 'ajv';
 
 import * as _ from 'lodash';
 
+
+@Pipe({ name: 'camelToTitleCase'})
+export class CamelToTitleCasePipe implements PipeTransform {
+  transform(camelCase: string): string {
+    return _.startCase(_.camelCase(camelCase));
+  }
+}
 
 @Component({
   selector: 'property-create-property',
