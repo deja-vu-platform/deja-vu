@@ -9,7 +9,7 @@
       <li *ngFor="let error of schemaErrors">{{error}}</li>
     </ul>
     <span *ngIf="schemaErrors.length == 1">
-      {{schemaErrors[0]}}
+      {{name | camelToTitleCase}} {{schemaErrors[0]}}
     </span>
   </mat-error>
 </mat-form-field>
