@@ -1,35 +1,87 @@
-// Change
-type Source {
-  id: ID!,
-  ratings: [Rating]
+enum TRANSACTION_STATUS {
+  PAID
+  UNPAID
+  CANCELED
 }
 
-type Target {
-  id: ID!,
-  ratings: [Rating]
+type Market {
+  id: ID!
 }
 
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
+type Party {
+  id: ID!
+  balance: Float
 }
 
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
+type Good {
+  id: ID!
+  name: String
+  price: Float
+  seller: Party
+  supply: Float
+  market: Market
+}
+
+type Transaction {
+  id: ID!
+  good: Good
+  buyer: Party
+  seller: Party
+  price: Float
+  quantity: Float
+  market: Market
+  status: TRANSACTION_STATUS
+}
+
+type CompoundTransaction {
+  id: ID!
+  transactions: [Transaction]
+  totalPrice: Float
+}
+
+type CreateUnpaidTransactionInput {
+  id: String
+  goodId: String
+  buyerId: String
+  quantity: Float
+  price: Float
+}
+
+type CreateAndAddUnpaidTransactionInput {
+  compopundTransactionId: String
+  createTransactionInput: CreateUnpaidTransactionInput
+}
+
+input CreatePartyInput {
+  id: ID
+  balance: Float
+}
+
+input AddAmountInput {
+  partyId: ID
+  amount: Float
 }
 
 type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  party(id: ID!): Party
+  good(id: ID!): Good
+  market(id: ID!): Market
+  transaction(id: ID!): Transaction
+  compoundtransaction(id: ID!): CompoundTransaction
+  affordableGoods(marketId: ID!, buyerId: ID!): [Good]
+  unaffordableGoods(marketId: ID!, buyerId: ID!): [Good]
+  goodsInMarket(marketId: ID!): [Good]
+  goodsFromSeller(marketId: ID!, sellerId: ID!): [Good]
+  marketTransactions(marketId: ID!): [Transaction]
+  buyerTransactions(buyerId: ID!, marketId: ID!): [Transaction]
 }
 
 type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  createMarket(id: ID!): Market
+  createParty(input: CreatePartyInput!): Party
+  addAmount(input: AddAmountInput!): Boolean
+  createGood(id: ID!, name: String, price: Float, sellerId: ID, supply: Float,
+    marketId: ID): Good
+  updateGood(id: ID!, name: String, price: Float, sellerId: ID,supply: Float)
+    : Boolean
 }
