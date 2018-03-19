@@ -1,0 +1,15 @@
+{
+  "name": "potluck",
+  "watch": true,
+  "gatewayPort": 3000,
+  "usedCliches": {
+    "event": {
+      "name": "event",
+      "startServer": true,
+      "watch": true,
+      "config": {
+        "wsPort": 3002
+      }
+    }
+  }
+}
