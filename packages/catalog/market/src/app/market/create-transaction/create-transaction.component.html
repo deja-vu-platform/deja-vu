@@ -1,0 +1,27 @@
+<div class="form-group">
+  <mat-label>Quantity</mat-label>
+  <input matInput
+    name="quantity"
+    type="number"
+    min="0"
+    step="1"
+    pattern="\d+"
+    placeholder="Quantity"
+    [(ngModel)]="quantity"
+  />
+</div>
+
+<div class="form-group">
+  <mat-label>Fraction</mat-label>
+  <input matInput
+    name="fraction"
+    type="number"
+    min="0"
+    placeholder="Fraction"
+    [(ngModel)]="fraction"
+  />
+</div>
+
+<div class="form-group">
+  <button mat-raised-button (click)="buyGood()" [disabled]="!valid()">Buy Good</button>
+</div>
