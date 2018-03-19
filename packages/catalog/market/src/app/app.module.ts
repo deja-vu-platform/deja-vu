@@ -1,8 +1,10 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { GATEWAY_URL } from 'dv-core';
 
 import { AppComponent } from './app.component';
+import { MarketModule } from './market/market.module';
 
 
 @NgModule({
@@ -10,9 +12,10 @@ import { AppComponent } from './app.component';
     AppComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    MarketModule
   ],
-  providers: [],
+  providers: [ {provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'} ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

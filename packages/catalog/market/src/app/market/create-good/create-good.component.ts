@@ -1,86 +1,137 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output, Type } from '@angular/core';
 import {
-  Action, GatewayService, GatewayServiceFactory, OnRun, RunService
+  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild, Output
+} from '@angular/core';
+
+import {
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  Validators
+} from '@angular/forms';
+
+import {
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
 } from 'dv-core';
 
-import { map } from 'rxjs/operators';
+import { Good } from '../shared/market.model';
 
-import { Good, Party, Market } from "../shared/market.model";
 
-import { CreateGoodNameComponent } from '../create-good-name/create-good-name.component';
-import { CreateGoodPriceComponent } from '../create-good-price/create-good-price.component';
-import { CreateGoodSupplyComponent } from '../create-good-supply/create-good-supply.component';
-
+const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
   selector: 'market-create-good',
   templateUrl: './create-good.component.html',
   styleUrls: ['./create-good.component.css'],
 })
-export class CreateGoodComponent implements OnInit, OnRun {
+export class CreateGoodComponent implements
+  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string = ''; // optional
-  @Input() name: string;
-  @Input() price: number;
-  @Input() supply: number;
-  @Input() sellerId: string = ''; // optional, if not yet known
-  @Input() marketId: string;
+  @Input() showSellerId: boolean = true;
+  @Output() good = new EventEmitter();
 
-  @Output() createdId: EventEmitter<string> = new EventEmitter<string>();
+  // required input
+  @Input() set marketId(marketId: string) {
+    this._marketId = marketId;
+    this.createGoodForm.updateValueAndValidity();
+  }
+  private _marketId: string = '';
 
-  @Input() createGoodName: Action = {type: <Type<Component>> CreateGoodNameComponent};
-  @Input() createGoodPrice: Action = {type: <Type<Component>> CreateGoodPriceComponent};
-  @Input() createGoodSupply: Action = {type: <Type<Component>> CreateGoodSupplyComponent};
+  // optional input values to override form input values
+  @Input() set name(name: string) {
+    this.nameControl.setValue(name);
+  }
+  @Input() set price(price: number) {
+    this.priceControl.setValue(price);
+  }
+  @Input() set supply(supply: number) {
+    this.supplyControl.setValue(supply);
+  }
+  @Input() set sellerId(sellerId: string) {
+    this.sellerIdControl.setValue(sellerId);
+  }
 
   // Presentation inputs
-  @Input() buttonLabel: string = 'Create';
+  @Input() buttonLabel = 'Create';
+  @Input() newGoodSavedText = 'New good saved';
 
-  gs: GatewayService;
+  @ViewChild(FormGroupDirective) form;
+
+  nameControl = new FormControl();
+  priceControl = new FormControl();
+  supplyControl = new FormControl();
+  sellerIdControl = new FormControl();
+  createGoodForm: FormGroup = this.builder.group({
+    nameControl: this.nameControl,
+    priceControl: this.priceControl,
+    supplyControl: this.supplyControl,
+    sellerIdControl: this.sellerIdControl
+  }, {
+    validator: (control: AbstractControl): {[key: string]: any} => {
+      if (!this._marketId) {
+        return {required: {marketId: this._marketId}};
+      }
+      return null;
+    }
+  });
+
+
+  newGoodSaved = false;
+  newGoodError: string;
+
+  private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService, private builder: FormBuilder) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-  }
-
-  async dvOnRun() {
-    console.log('creating good...');
-    const res = await this.gs
-      .post<{data: {createGood: Good}}>('/graphql', {
-        query: `mutation {
-          createGood (
-            id: "${this.id}",
-            name: "${this.name}",
-            price: ${this.price},
-            sellerId: "${this.sellerId}",
-            supply: ${this.supply},
-            marketId: "${this.marketId}") { id }
-        }`
-      })
-      .pipe(map((res) => res.data.createGood))
-      .subscribe((good: Good) => {
-        this.createdId.emit(good.id);
-      });
+    if (!this.sellerId) {
+      this.sellerIdControl.clearValidators();
+    }
   }
 
   onSubmit() {
-    if (!this.valid()) {
-      console.log('invalid!');
-      // TODO: show error message
-      return;
-    }
     this.rs.run(this.elem);
   }
 
-  valid() {
-    // sellerId is not required
-    return this.name && CreateGoodComponent.isNumberValid(this.price)
-      && CreateGoodComponent.isNumberValid(this.supply) && this.marketId;
+  async dvOnRun(): Promise<void> {
+    const res = await this.gs.post<{data: {createGood: Good}}>('/graphql', {
+      query: `mutation CreateGood($input: CreateGoodInput!) {
+        createGood (input: $input) {
+          id
+        }
+      }`,
+      variables: {
+        input: {
+          id: this.id,
+          name: this.nameControl.value,
+          price: this.priceControl.value,
+          sellerId: this.sellerIdControl.value,
+          supply: this.supplyControl.value,
+          marketId: this._marketId
+        }
+      }
+    })
+    .toPromise();
+
+    this.good.emit({ id: res.data.createGood.id });
   }
 
-  private static isNumberValid(number: number) {
-    return number || number === 0;
+  dvOnAfterCommit() {
+    this.newGoodSaved = true;
+    this.newGoodError = '';
+    window.setTimeout(() => {
+      this.newGoodSaved = false;
+    }, SAVED_MSG_TIMEOUT);
+    // Can't do `this.form.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
+    }
+  }
+
+  dvOnAfterAbort(reason: Error) {
+    this.newGoodError = reason.message;
   }
 }

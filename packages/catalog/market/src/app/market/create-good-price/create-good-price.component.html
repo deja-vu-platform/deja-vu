@@ -1,10 +1,15 @@
-<div class="form-group">
-  <mat-label>Price</mat-label>
-  <input matInput
-    name="price"
+<mat-form-field>
+  <mat-label>{{inputLabel}}</mat-label>
+  <input matInput required
+    [formControl]="priceControl"
+    name="priceControl"
     type="number"
-    min="0"
-    placeholder="Price"
-    (change)="updatePrice($event)"
-  />
-</div>
+    step="0.01"
+    >
+  <mat-error *ngIf="priceControl.hasError('required')">
+    This field is <strong>required</strong>
+  </mat-error>
+  <mat-error *ngIf="priceControl.hasError('pattern')">
+    This field should be <strong>nonnegative with at most two decimal places</strong>
+  </mat-error>
+</mat-form-field>

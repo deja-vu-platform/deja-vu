@@ -76,6 +76,15 @@ interface AddAmountInput {
   amount: number;
 }
 
+interface CreateGoodInput {
+  id: string;
+  name: string;
+  price: number;
+  supply: number;
+  sellerId: string;
+  marketId: string;
+}
+
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -338,19 +347,19 @@ const resolvers = {
 
       return true;
     },
-    createGood: async (_root, {id, name, price, sellerId, supply, marketId}) => {
+    createGood: async (_root, {input}: {input: CreateGoodInput}) => {
       console.log("create good");
-      // await Validation.marketExists(marketId);
+      await Validation.marketExists(input.marketId);
       const good: GoodDoc = {
-        id: id ? id : uuid(),
-        name,
-        price,
-        supply,
-        marketId
+        id: input.id ? input.id : uuid(),
+        name: input.name,
+        price: input.price,
+        supply: input.supply,
+        marketId: input.marketId
       };
-      if (sellerId) {
-        // await Promise.resolve(Validation.partyExists(sellerId));
-        good.sellerId = sellerId;
+      if (input.sellerId) {
+        await Promise.resolve(Validation.partyExists(input.sellerId));
+        good.sellerId = input.sellerId;
       }
       await goods.insertOne(good);
       console.log(good);

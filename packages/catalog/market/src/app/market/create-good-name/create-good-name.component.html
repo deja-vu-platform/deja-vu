@@ -1,10 +1,11 @@
-<div class="form-group">
-  <mat-label>Name</mat-label>
-  <input matInput
-    name="name"
+<mat-form-field>
+  <mat-label>{{inputLabel}}</mat-label>
+  <input matInput required
+    [formControl]="nameControl"
+    name="nameControl"
     type="text"
-    placeholder="Name"
-    (change)="updateName($event)"
-  />
-</div>
-<!--     [(ngModel)]="good.name" -->
+    >
+  <mat-error *ngIf="nameControl.hasError('required')">
+    This field is <strong>required</strong>
+  </mat-error>
+</mat-form-field>

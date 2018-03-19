@@ -1,3 +1,11 @@
-<p>
-  edit-good-seller works!
-</p>
+<mat-form-field>
+  <mat-label>{{inputLabel}}</mat-label>
+  <input matInput required
+    [formControl]="sellerIdControl"
+    name="sellerIdControl"
+    type="text"
+    >
+  <mat-error *ngIf="sellerIdControl.hasError('required')">
+    This field is <strong>required</strong>
+  </mat-error>
+</mat-form-field>

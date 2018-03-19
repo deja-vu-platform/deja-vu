@@ -62,6 +62,15 @@ input AddAmountInput {
   amount: Float
 }
 
+input CreateGoodInput {
+  id: ID
+  name: String
+  price: Float
+  supply: Float
+  sellerId: String
+  marketId: String
+}
+
 type Query {
   party(id: ID!): Party
   good(id: ID!): Good
@@ -80,8 +89,7 @@ type Mutation {
   createMarket(id: ID!): Market
   createParty(input: CreatePartyInput!): Party
   addAmount(input: AddAmountInput!): Boolean
-  createGood(id: ID!, name: String, price: Float, sellerId: ID, supply: Float,
-    marketId: ID): Good
+  createGood(input: CreateGoodInput!): Good
   updateGood(id: ID!, name: String, price: Float, sellerId: ID,supply: Float)
     : Boolean
 }

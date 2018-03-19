@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { EditGoodSellerComponent } from './edit-good-seller.component';
+import { CreateGoodSellerComponent } from './create-good-seller.component';
 
-describe('EditGoodSellerComponent', () => {
-  let component: EditGoodSellerComponent;
-  let fixture: ComponentFixture<EditGoodSellerComponent>;
+describe('CreateGoodSellerComponent', () => {
+  let component: CreateGoodSellerComponent;
+  let fixture: ComponentFixture<CreateGoodSellerComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditGoodSellerComponent ]
+      declarations: [ CreateGoodSellerComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(EditGoodSellerComponent);
+    fixture = TestBed.createComponent(CreateGoodSellerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

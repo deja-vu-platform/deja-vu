@@ -1,12 +1,15 @@
-<div class="form-group">
-  <mat-label>Supply</mat-label>
-  <input matInput
-    name="supply"
+<mat-form-field>
+  <mat-label>{{inputLabel}}</mat-label>
+  <input matInput required
+    [formControl]="supplyControl"
+    name="supplyControl"
     type="number"
-    min="0"
     step="1"
-    pattern="\d+"
-    placeholder="Supply"
-    (change)="updateSupply($event)"
-  />
-</div>
+    >
+  <mat-error *ngIf="supplyControl.hasError('required')">
+    This field is <strong>required</strong>
+  </mat-error>
+  <mat-error *ngIf="supplyControl.hasError('nonnegative')">
+    This field should be <strong>nonnegative</strong>
+  </mat-error>
+</mat-form-field>
