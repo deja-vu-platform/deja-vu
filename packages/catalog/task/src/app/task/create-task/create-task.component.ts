@@ -1,90 +1,96 @@
-import {ElementRef} from "@angular/core";
+import {
+  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild
+} from '@angular/core';
 
-import {GraphQlService} from "gql";
+import {
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  Validators
+} from '@angular/forms';
 
-import {Widget, Field, Atom, AfterInit} from "client-bus";
+import {
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
+} from 'dv-core';
+
+import { Assignee } from '../shared/task.model';
 
 
-export interface NamedAtom extends Atom { name: string; }
+const SAVED_MSG_TIMEOUT = 3000;
 
-@Widget({
-  fqelement: "Task",
-  ng2_providers: [GraphQlService],
-  styles: [``]
+@Component({
+  selector: 'task-create-task',
+  templateUrl: './create-task.component.html',
+  styleUrls: ['./create-task.component.css']
 })
-export class CreateTaskComponent implements AfterInit {
-  @Field("Task") task: NamedAtom;
-  @Field("Assigner") assigner: NamedAtom;
-  @Field("Assignee") assignee: NamedAtom;
+export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
+  @Input() id;
+  @Input() assignerId;
 
-  expiration_date: string = "";
-  assignee_options = [];
+  // Presentation inputs
+  @Input() assigneeSelectPlaceholder = 'Choose Assignee';
+  @Input() buttonLabel = 'Create Task';
+  @Input() newTaskSavedText = 'New task saved';
+
+  @ViewChild(FormGroupDirective) form;
+
+  assignee = new FormControl('');
+  dueDate = new FormControl('');
+  createTaskForm: FormGroup = this.builder.group({
+    assignee: this.assignee,
+    dueDate: this.dueDate
+  });
+
+
+  newTaskSaved = false;
+  newTaskError: string;
+
+  private gs: GatewayService;
 
   constructor(
-      private _graphQlService: GraphQlService,
-      private _elementRef: ElementRef) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService, private builder: FormBuilder) {}
 
-  dvAfterInit() {
-    this._graphQlService
-      .get(`
-        assignee_all {
-          atom_id,
-          name
-        }
-      `)
-      .subscribe(data => {
-        this.assignee_options = data.assignee_all;
-      });
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
   }
 
   onSubmit() {
-    let expirationDateText: Element =
-      document.getElementById("expiration-date-text");
-    this.expiration_date = expirationDateText["value"];
-    let assigneeText: Element =
-      document.getElementById("task-assignee");
+    this.rs.run(this.elem);
+  }
 
-    this._graphQlService
-      .post(`
-        createTask(
-          name: "${this.task.name}",
-          assigner_id: "${this.assigner.atom_id}",
-          assignee_id: "${this.assignee.atom_id}",
-          expires_on: "${this.expiration_date}") {
-          atom_id
+  async dvOnRun(): Promise<void> {
+    const res = await this.gs.post<{data: any}>('/graphql', {
+      query: `mutation CreateTask($input: CreateTaskInput!) {
+        createTask(input: $input) {
+          id
         }
-      `)
-      .subscribe(res => {
-        expirationDateText["value"] = "";
-        this.expiration_date = "";
-        this.task.name = "";
-        assigneeText["value"] = "";
-        this.assignee.name = "";
-      });
+      }`,
+      variables: {
+        input: {
+          id: this.id,
+          assignerId: this.assignerId,
+          assigneeId: this.assignee.value.id,
+          dueDate: this.dueDate.value
+        }
+      }
+    })
+    .toPromise();
   }
 
-  ngAfterViewInit() {
-    // Datepicker scripts need to be loaded this way
-    this._loadScript("bootstrap-datepicker/bootstrap-datepicker.min.js");
-    this._loadStyle("bootstrap-datepicker/bootstrap-datepicker3.min.css");
+  dvOnAfterCommit() {
+    this.newTaskSaved = true;
+    window.setTimeout(() => {
+      this.newTaskSaved = false;
+    }, SAVED_MSG_TIMEOUT);
+    // Can't do `this.form.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
+    }
   }
 
-  _loadScript(src: string) {
-    const s = document.createElement("script");
-    s.type = "text/javascript";
-    s.src = "node_modules/dv-organization-task/lib/components/" +
-      "create-task/vendor/" + src;
-    this._elementRef.nativeElement.appendChild(s);
+  dvOnAfterAbort(reason: Error) {
+    this.newTaskError = reason.message;
   }
-
-  _loadStyle(href: string) {
-    const s = document.createElement("link");
-    s.type = "text/css";
-    s.rel = "stylesheet";
-    s.href = "node_modules/dv-organization-task/lib/components/" +
-      "create-task/vendor/" + href;
-    this._elementRef.nativeElement.appendChild(s);
-  }
-
-
 }

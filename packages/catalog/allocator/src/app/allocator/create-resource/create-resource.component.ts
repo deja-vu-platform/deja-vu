@@ -17,7 +17,7 @@ export class CreateResourceComponent implements OnInit, OnRun {
   @Input() buttonLabel = 'Create Resource';
   @Input() inputLabel = 'Id';
   @Output() resource = new EventEmitter();
-  allocator: AllocatorService;
+  private allocator: AllocatorService;
 
   constructor(
     private elem: ElementRef,

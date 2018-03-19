@@ -16,7 +16,7 @@ export class DeleteEventComponent implements OnInit, OnRun, OnAfterCommit {
   @Input() id;
   // Optional list of events to delete itself from after commit
   @Input() events: Event[];
-  gs: GatewayService;
+  private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,

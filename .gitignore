@@ -28,6 +28,7 @@ typings
 
 # Users Environment Variables
 .lock-wscript
+.vscode
 
 *.map
 *.baseDir.ts

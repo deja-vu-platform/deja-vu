@@ -36,16 +36,16 @@ input CreateWeeklyEventInput {
   endTime: String!
 }
 
-type Mutation {
-  createEvent(input: CreateEventInput!): Event
-  updateEvent(input: UpdateEventInput!): Boolean
-  deleteEvent(id: ID!): Boolean
-  createWeeklyEvent(input: CreateWeeklyEventInput!): WeeklyEvent
-}
-
 type Query {
   events: [Event!]
   weeklyEvents: [WeeklyEvent!]
   event(id: ID!): Event
   weeklyEvent(id: ID!): WeeklyEvent
+}
+
+type Mutation {
+  createEvent(input: CreateEventInput!): Event
+  updateEvent(input: UpdateEventInput!): Boolean
+  deleteEvent(id: ID!): Boolean
+  createWeeklyEvent(input: CreateWeeklyEventInput!): WeeklyEvent
 }

@@ -1,10 +1,16 @@
-<h2>Rate pizza</h2>
-<rating-rate-target sourceId="ben" targetId="pizza" (rating)="pizzaRating=$event">
-</rating-rate-target>
-Rating for pizza is {{pizzaRating}}
-<h2>Average rating of pizza</h2>
-<rating-show-average-rating targetId="pizza"></rating-show-average-rating>
-<h2>Rating of Pizza by Ben<h2>
-<rating-show-rating sourceId="ben" targetId="pizza"></rating-show-rating>
-<h2>Pizza Rating</h2>
-<rating-show-ratings-by-target targetId="pizza"></rating-show-ratings-by-target>
+<div class="container">
+  <h1>Create Source</h1>
+  <rating-create-source id="ben"></rating-create-source>
+  <h1>Create Target</h1>
+  <rating-create-target id="pizza"></rating-create-target>
+  <h1>Rate pizza</h1>
+  <rating-rate-target sourceId="ben" targetId="pizza" (rating)="pizzaRating=$event">
+  </rating-rate-target>
+  Rating for pizza is {{pizzaRating}}
+  <h1>Average rating of pizza</h1>
+  <rating-show-average-rating targetId="pizza"></rating-show-average-rating>
+  <h1>Rating of Pizza by Ben</h1>
+  <rating-show-rating sourceId="ben" targetId="pizza"></rating-show-rating>
+  <h1>Pizza Rating</h1>
+  <rating-show-ratings-by-target targetId="pizza"></rating-show-ratings-by-target>
+</div>

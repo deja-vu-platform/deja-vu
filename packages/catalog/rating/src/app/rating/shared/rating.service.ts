@@ -70,6 +70,14 @@ export class RatingService {
     return {
       rating: averageRating, count: res.data.averageRatingForTarget.count
     };
+    }
+
+  createSource(id: string): Observable<{id: string}> {
+    return this.post(`createSource(id: "${id}") { id }`);
+  }
+
+  createTarget(id: string): Observable<{id: string}> {
+    return this.post(`createTarget(id: "${id}") { id }`);
   }
 }
 

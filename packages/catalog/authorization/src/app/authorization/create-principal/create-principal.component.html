@@ -1,0 +1,21 @@
+<form (ngSubmit)="onSubmit()" class="form-horizontal">
+  <div class="form-group create-principal-form-group">
+    <div *ngIf="newPrincipalSuccess" class="create-principal-success">
+      <i class="material-icons">done</i>
+      {{newPrincipalSuccessText}}
+    </div>
+    <mat-error *ngIf="newPrincipalErrorText">
+      <i class="material-icons">report_problem</i>
+      {{newPrincipalErrorText}}
+    </mat-error>
+  </div>
+  <div class="form-group create-principal-form-group">
+    <mat-form-field>
+      <mat-label>{{principalInputLabel}}</mat-label>
+      <input matInput [(ngModel)]="id" name="id">
+    </mat-form-field>
+  </div>
+  <div class="form-group create-principal-form-group">
+    <button mat-button type="submit">{{buttonLabel}}</button>
+  </div>
+</form>

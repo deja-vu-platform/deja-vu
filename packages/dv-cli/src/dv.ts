@@ -17,7 +17,7 @@ export function npm(args: string[], cwd?: string): void {
 }
 
 function cmd(cmd: string, args: string[], cwd?: string): void {
-  const c = spawnSync(cmd, args, {stdio: 'inherit', cwd: cwd});
+  const c = spawnSync(cmd, args, { stdio: 'inherit', cwd: cwd });
   if (c.error) {
     throw new Error(`Failed to run "${cmd}": ${c.error}`);
   }
@@ -43,8 +43,8 @@ export const ENTRY_FILE_PATH = 'public_api.ts';
  **/
 export const NG_PACKAGR = {
   configFilePath: 'ng-package.json',
-  configFileContents:  {
-    '$schema': './node_modules/ng-packagr/ng-package.schema.json',
+  configFileContents: {
+    '$schema': path.join('.', 'node_modules', 'ng-packagr', 'ng-package.schema.json'),
     'lib': {
       'entryFile': ENTRY_FILE_PATH
     },
@@ -77,7 +77,7 @@ export function isCliche(): boolean {
  * @return the path to the module file for the given name
  */
 export function modulePath(name: string): string {
-  return `./src/app/${name}/${name}.module`;
+  return path.join('.', 'src', 'app', `${name}`, `${name}.module`);
 }
 
 export const SERVER_SRC_FOLDER = 'server';
@@ -105,20 +105,20 @@ export function updateJsonFile(
 }
 
 export function startGatewayCmd(configFilePath: string): string {
-  return 'node node_modules/dv-gateway/dist/gateway.js' +
+  return 'node' + path.join('node_modules', 'dv-gateway', 'dist', 'gateway.js') +
     ` --configFilePath ${configFilePath}`;
 }
 
 export function startServerCmd(
   watch: boolean, serverDistFolder: string, configKey: string,
   asFlagValue?: string): string {
-  const cmd = watch ? `nodemon -w ${serverDistFolder}`: 'node';
+  const cmd = watch ? `nodemon -w ${serverDistFolder}` : 'node';
   const eoc = watch ? '--' : '';
   const script = path.join(serverDistFolder, 'server.js');
   return `if [ -f ${script} ]; then ${cmd} ${script}` +
     ` ${eoc} --config \"\`dv get ${configKey}\`\"` +
-      (asFlagValue ? `--as ${asFlagValue}` : '') + '; ' +
-      'else echo "No file"; fi;';
+    (asFlagValue ? `--as ${asFlagValue}` : '') + '; ' +
+    'else echo "No file"; fi;';
 }
 
 export function buildFeCmd(watch: boolean, projectFolder?: string): string {
@@ -129,7 +129,7 @@ export function buildFeCmd(watch: boolean, projectFolder?: string): string {
 }
 
 export function buildServerCmd(watch: boolean, projectFolder?: string): string {
-  const cpSchema = 'cp schema.graphql ../dist/server';
+  const cpSchema = 'cp schema.graphql' + path.join('..', 'dist', 'server');
   const maybeWatch = watch ? '-w' : '';
   return buildCmd(`tsc ${maybeWatch} && ${cpSchema}`, projectFolder);
 }
@@ -195,7 +195,7 @@ export interface DvConfig {
   watch?: boolean;
   config?: any;
   gatewayPort?: number;
-  usedCliches?: {[as: string]: DvConfig};
+  usedCliches?: { [as: string]: DvConfig };
 }
 
 program
@@ -217,10 +217,10 @@ program
       const clicheName: string = JSON
         .parse(readFileOrFail(DVCONFIG_FILE_PATH)).name;
       npm(['run', `dv-package-${clicheName}`]);
-      
-      
+
+
       updatePackage(pkg => {
-        pkg.peerDependencies['dv-gateway'] = 'file:' + 
+        pkg.peerDependencies['dv-gateway'] = 'file:' +
           path.join('..', pkg.peerDependencies['dv-gateway'].slice('file:'.length));
         return pkg;
       }, NG_PACKAGR.configFileContents.dest);
@@ -233,7 +233,7 @@ program
 
       const currentProject = _
         .pick(config, ['name', 'startServer', 'watch', 'config']);
-      
+
       const clichesToWatch: string[] = _
         .chain(config.usedCliches)
         .entries()
@@ -269,7 +269,7 @@ program
       };
       const startServerOfCurrentProjectCmd = buildStartServerCmd(
         currentProject.name, currentProject.watch);
-      const startServerCmds =  _
+      const startServerCmds = _
         .chain(config.usedCliches)
         .entries()
         .filter(e => e[1].startServer)
@@ -288,5 +288,5 @@ program
 
       process.exit(0); // commander sucks
     }
-  }) 
+  })
   .parse(process.argv);
