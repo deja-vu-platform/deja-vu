@@ -3,7 +3,8 @@
   <input matInput
     name="name"
     type="text"
-    [(ngModel)]="good.name"
     placeholder="Name"
+    (change)="updateName($event)"
   />
 </div>
+<!--     [(ngModel)]="good.name" -->

@@ -1,11 +1,15 @@
-import {GraphQlService} from "gql";
-import {Widget, Field} from "client-bus";
-import {GoodAtom} from "../../shared/data";
+import { Component, Output, EventEmitter } from '@angular/core';
 
-@Widget({
-  fqelement: "Market",
-  ng2_providers: [GraphQlService]
+
+@Component({
+  selector: 'market-create-good-name',
+  templateUrl: './create-good-name.component.html',
+  styleUrls: ['./create-good-name.component.css'],
 })
 export class CreateGoodNameComponent {
-  @Field("Good") good: GoodAtom;
+  @Output() name: EventEmitter<string> = new EventEmitter<string>();
+
+  updateName(event) {
+      this.name.emit(event.target.value);
+  }
 }

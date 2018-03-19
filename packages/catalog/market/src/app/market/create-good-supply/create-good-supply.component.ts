@@ -1,9 +1,15 @@
-import {Widget, Field} from "client-bus";
-import {GoodAtom} from "../../shared/data";
+import { Component, Output, EventEmitter } from '@angular/core';
 
-@Widget({
-  fqelement: "Market"
+
+@Component({
+  selector: 'market-create-good-supply',
+  templateUrl: './create-good-supply.component.html',
+  styleUrls: ['./create-good-supply.component.css'],
 })
 export class CreateGoodSupplyComponent {
-  @Field("Good") good: GoodAtom;
+  @Output() supply: EventEmitter<number> = new EventEmitter<number>();
+
+  updateSupply(event) {
+      this.supply.emit(event.target.value);
+  }
 }

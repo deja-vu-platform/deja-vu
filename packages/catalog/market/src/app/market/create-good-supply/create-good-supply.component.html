@@ -7,6 +7,6 @@
     step="1"
     pattern="\d+"
     placeholder="Supply"
-    [(ngModel)]="good.supply"
+    (change)="updateSupply($event)"
   />
 </div>

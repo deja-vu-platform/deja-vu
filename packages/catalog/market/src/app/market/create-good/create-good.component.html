@@ -1,0 +1,14 @@
+<form (ngSubmit)="onSubmit()" class="form-horizontal">
+  <dv-include [action]="createGoodName" [parent]="createGood">
+  </dv-include>
+
+  <dv-include [action]="createGoodPrice" [parent]="createGood">
+  </dv-include>
+
+  <dv-include [action]="createGoodSupply" [parent]="createGood">
+  </dv-include>
+
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!valid()">{{buttonLabel}}</button>
+  </div>
+</form>
