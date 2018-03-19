@@ -1,0 +1,24 @@
+<form (ngSubmit)="onSubmit()"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="newMarketSaved">
+      <i class="material-icons">done</i>
+        {{newMarketSavedText}}
+    </div>
+    <mat-error *ngIf="newMarketError">
+      <i class="material-icons">report_problem</i>
+      {{newMarketError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <input matInput [(ngModel)]="id" name="id">
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <button mat-button type="submit">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

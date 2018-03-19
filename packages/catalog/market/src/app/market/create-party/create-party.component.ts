@@ -1,9 +1,10 @@
 import {
-  Component, ElementRef, Input, OnInit, Type, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild, Output
 } from '@angular/core';
 
 import {
-  FormBuilder, FormControl, FormGroup, FormGroupDirective, Validators
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  Validators
 } from '@angular/forms';
 
 import {
@@ -15,28 +16,29 @@ import {
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  selector: 'market-add-amount',
-  templateUrl: './add-amount.component.html',
-  styleUrls: ['./add-amount.component.css']
+  selector: 'market-create-party',
+  templateUrl: './create-party.component.html',
+  styleUrls: ['./create-party.component.css']
 })
-export class AddAmountComponent implements OnInit, OnRun, OnAfterAbort,
-  OnAfterCommit {
-  @Input() partyId: string;
+export class CreatePartyComponent implements
+  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  @Input() id;
+  @Output() createdId: EventEmitter<string> = new EventEmitter<string>();
 
-  // Presentation input
-  @Input() inputLabel: string = 'Amount to Add';
-  @Input() buttonLabel: string = 'Add';
+  // Presentation inputs
+  @Input() buttonLabel = 'Create Party';
+  @Input() newPartySavedText = 'New party saved';
 
   @ViewChild(FormGroupDirective) form;
 
   balance = new FormControl('');
-  addAmountForm: FormGroup = this.builder.group({
+  createPartyForm: FormGroup = this.builder.group({
     balance: this.balance
   });
 
 
-  addAmountSaved = false;
-  addAmountError: string;
+  newPartySaved = false;
+  newPartyError: string;
 
   private gs: GatewayService;
 
@@ -55,24 +57,28 @@ export class AddAmountComponent implements OnInit, OnRun, OnAfterAbort,
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs.post<{data: any}>('/graphql', {
-      query: `mutation AddAmount($input: AddAmountInput!) {
-        addAmount(input: $input)
+      query: `mutation CreateParty($input: CreatePartyInput!) {
+        createParty(input: $input) {
+          id
+        }
       }`,
       variables: {
         input: {
-          partyId: this.partyId,
-          amount: this.balance.value
+          id: this.id,
+          balance: this.balance.value
         }
       }
     })
     .toPromise();
+
+    this.createdId.emit(res.data.createParty.id);
   }
-  
+
   dvOnAfterCommit() {
-    this.addAmountSaved = true;
-    this.addAmountError = '';
+    this.newPartySaved = true;
+    this.newPartyError = '';
     window.setTimeout(() => {
-      this.addAmountSaved = false;
+      this.newPartySaved = false;
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
@@ -81,7 +87,7 @@ export class AddAmountComponent implements OnInit, OnRun, OnAfterAbort,
     }
   }
 
-  dvOnAfterAbort(res: any, reason: Error) {
-    this.addAmountError = reason.message;
+  dvOnAfterAbort(reason: Error) {
+    this.newPartyError = reason.message;
   }
 }

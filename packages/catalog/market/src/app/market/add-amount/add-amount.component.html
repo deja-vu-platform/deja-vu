@@ -1,15 +1,21 @@
-<form (ngSubmit)="onSubmit()" #addAmountForm="ngForm" class="form-horizontal">
+<form (ngSubmit)="onSubmit()" [formGroup]="addAmountForm" class="form-horizontal">
   <div class="form-group">
-    <mat-form-field>
-      <mat-label>Amount to Add</mat-label>
-      <input matInput required name="amount" type="number" min="0"
-        [(ngModel)]="amount.value"/>
-    </mat-form-field>
+    <div *ngIf="addAmountSaved">
+      <i class="material-icons">done</i>
+        {{addAmountSavedText}}
+    </div>
+    <mat-error *ngIf="addAmountError">
+      <i class="material-icons">report_problem</i>
+      {{addAmountError}}
+    </mat-error>
   </div>
   <div class="form-group">
-    <mat-form-field>
-      <button mat-button type="submit"
-       [disabled]="!addAmountForm.valid">Add Amount</button>
-    </mat-form-field>
+    <market-create-balance formControlName="balance"
+      [inputLabel]="inputLabel">
+    </market-create-balance>
+  </div>
+  <div class="form-group">
+    <button mat-button type="submit"
+     [disabled]="!addAmountForm.valid">{{buttonLabel}}</button>
   </div>
 </form>
