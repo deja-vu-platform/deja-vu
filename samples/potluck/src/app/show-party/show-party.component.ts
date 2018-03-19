@@ -1,4 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+
+import { ShowUserComponent } from 'authentication';
+
+import { ShowClaimComponent } from '../show-claim/show-claim.component';
+import { ShowSupplyComponent } from '../show-supply/show-supply.component';
 
 @Component({
   selector: 'potluck-show-party',
@@ -6,10 +11,14 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./show-party.component.css']
 })
 export class ShowPartyComponent implements OnInit {
+  @Input() party: any;
+  @Input() loggedInUserId: string;
+  showGuestUsername = ShowUserComponent;
+  showSupply = ShowSupplyComponent;
+  showClaim = ShowClaimComponent;
 
   constructor() { }
 
   ngOnInit() {
   }
-
 }

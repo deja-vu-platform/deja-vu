@@ -1,17 +1,24 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
+import { RouterModule } from '@angular/router';
+import { DvModule, GATEWAY_URL } from 'dv-core';
 
 import { AppComponent } from './app.component';
 import { LandingComponent } from './landing/landing.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import { ShowPartiesComponent } from './show-parties/show-parties.component';
-import { RequestSupplyComponent } from './request-supply/request-supply.component';
-import { ShowCommitmentComponent } from './show-commitment/show-commitment.component';
 import { ShowPartyComponent } from './show-party/show-party.component';
-import { ShowSuppliesComponent } from './show-supplies/show-supplies.component';
-import { ShowSupplyRequestComponent } from './show-supply-request/show-supply-request.component';
 import { CreatePartyComponent } from './create-party/create-party.component';
+
+import { AuthenticationModule } from 'authentication';
+import { AuthorizationModule } from 'authorization';
+import { MarketModule } from 'market';
+import { EventModule } from 'event';
+import { GroupModule } from 'group';
+import { PropertyModule } from 'property';
+import { ShowSupplyComponent } from './show-supply/show-supply.component';
+import { CreateSupplyComponent } from './create-supply/create-supply.component';
+import { ShowClaimComponent } from './show-claim/show-claim.component';
 
 
 @NgModule({
@@ -20,17 +27,34 @@ import { CreatePartyComponent } from './create-party/create-party.component';
     LandingComponent,
     NavBarComponent,
     ShowPartiesComponent,
-    RequestSupplyComponent,
-    ShowCommitmentComponent,
     ShowPartyComponent,
-    ShowSuppliesComponent,
-    ShowSupplyRequestComponent,
-    CreatePartyComponent
+    CreatePartyComponent,
+    ShowSupplyComponent,
+    CreateSupplyComponent,
+    ShowClaimComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    DvModule,
+    RouterModule.forRoot([
+      {path: 'parties', component: ShowPartiesComponent},
+      {path: 'create-party', component: CreatePartyComponent},
+      {path: '', component: LandingComponent}
+    ]),
+    AuthenticationModule,
+    AuthorizationModule,
+    MarketModule,
+    EventModule,
+    GroupModule,
+    PropertyModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [{
+    provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'
+  }],
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ShowPartyComponent, CreateSupplyComponent, ShowSupplyComponent,
+    ShowClaimComponent
+  ]
 })
 export class AppModule { }

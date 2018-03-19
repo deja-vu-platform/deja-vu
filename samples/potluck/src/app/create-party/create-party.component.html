@@ -1,16 +1,69 @@
-<!-- inputs="user" output="party" -->
+<potluck-nav-bar (loggedInUser)="user=$event"></potluck-nav-bar>
+
 <div class="container" id="homepage-container">
   <div class="col-md-6 col-md-offset-3" id="namebox">
-    <form class="form-horizontal" dvTransaction next="dv:navigate">
-      <!-- all actions inside the element marked with dvTransaction
-           will be executed in a transaction --->
-      <event:new-event [event]="party"></event:new-event>
-      <group:new-group-with-initial-member [group]="party" [member]="user">
-      </group:new-group-with-initial-member>
-      <dv:button>Create Party</dv:button>
+    <form class="form-horizontal">
+      <dv-tx>
+        <dv-id (id)="partyId=$event"></dv-id>
+        <dv-status savedText="Party created"></dv-status>
+
+        <property-create-object
+          dvOf="party"
+          [id]="partyId"
+          [showOptionToSubmit]="false">
+        </property-create-object>
+
+        <event-create-event
+          [id]="partyId"
+          [showOptionToSubmit]="false">
+        </event-create-event>
+
+        <group-create-group
+          [id]="partyId"
+          [showMember]="{type: showGuestUsername}"
+
+          memberAutocompletePlaceholder="Choose Guest"
+          stageMemberButtonLabel="Add to Guest List"
+          [showOptionToAddGroups]="false"
+          [showOptionToSubmit]="false">
+        </group-create-group>
+
+        <market-stage-goods
+          [createGood]="{
+            type: createSupply,
+            outputMap: {good: 'supply'}
+          }"
+          [showGood]="{
+            type: showSupply,
+            inputMap: {good: 'supply'}
+          }"
+
+          stageGoodsButtonLabel="Add Item"
+          supplyLabel="Quantity"
+          [showOptionToInputPrice]="false"
+          [showOptionToInputSeller]="false"
+
+          (stagedGoods)="stagedSupplies=$event">
+        </market-stage-goods>
+
+        <market-create-market
+          [id]="partyId"
+          [goods]="stagedSupplies"
+          [hidden]="true">
+        </market-create-market>
+
+        <property-create-objects
+          dvOf="supply"
+          [objects]="stagedSupplies"
+          [hidden]="true">
+        </property-create-objects>
+          
+
+        <dv-button>Create Party</dv-button>
+      </dv-tx>
     </form>
-    <dv:a [click]="dv:navigate" [clickInputs]="{'to': parties}">
+    <dv-link href="parties" class="btn btn-primary">
       Return to Your Parties
-    </dv:a>
+    </dv-link>
   </div>
 </div>

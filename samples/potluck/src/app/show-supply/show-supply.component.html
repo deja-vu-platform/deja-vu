@@ -1,0 +1,29 @@
+<div *ngIf="id">
+  <market-show-good
+    [id]="id"
+    [showId]="false"
+    [showPrice]="false"
+    [showSeller]="false"
+    [showMarket]="false">
+  </market-show-good>
+  <property-show-object dvOf="supply" [id]="id">
+  </property-show-object>
+</div>
+
+<div *ngIf="supply">
+  <market-show-good
+    [good]="supply"
+    [showId]="false"
+    [showPrice]="false"
+    [showSeller]="false"
+    [showMarket]="false">
+  </market-show-good>
+  <div *ngIf="!useIdForObject">
+    <property-show-object dvOf="supply" [object]="supply">
+    </property-show-object>
+  </div>
+  <div *ngIf="useIdForObject">
+    <property-show-object dvOf="supply" [id]="supply.id">
+    </property-show-object>
+  </div>
+</div>

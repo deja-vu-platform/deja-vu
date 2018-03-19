@@ -1,23 +1,19 @@
-<!-- outputs="user" -->
-<link href="https://fonts.googleapis.com/css?family=Pacifico" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+<authentication-logged-in (user)="user=$event; outputAsLoggedInUser($event)">
+</authentication-logged-in>
 
-<standard-authentication:logged-in (user)="user">
-</standard-authentication:logged-in>
 <nav class="navbar navbar-default navbar-fixed-top">
   <div class="container">
     <div class="navbar-header">
-      <a class="navbar-brand" [routerLink]="['/']">Potluck</a>
+      <dv-link class="navbar-brand" href="/">Potluck</dv-link>
     </div>
-    <ul class="nav navbar-nav navbar-right">
-      <li *ngIf="user.username">
-        <a>
-          {{user.username}}
-        </a>
-      </li>
-      <li *ngIf="user.username">
-        <standard-authentication:sign-out next="landing">
-        </standard-authentication:sign-out>
+    <ul *ngIf="user" class="nav navbar-nav navbar-right">
+      <li>{{user.username}}</li>
+      <li>
+        <dv-tx>
+          <authentication-sign-out>
+          </authentication-sign-out>
+          <dv-link href="/" [hidden]="true"></dv-link>
+        </dv-tx>
       </li>
     </ul>
   </div>

@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowSupplyRequestComponent } from './show-supply-request.component';
+import { ShowSupplyComponent } from './show-supply.component';
 
-describe('ShowSupplyRequestComponent', () => {
-  let component: ShowSupplyRequestComponent;
-  let fixture: ComponentFixture<ShowSupplyRequestComponent>;
+describe('ShowSupplyComponent', () => {
+  let component: ShowSupplyComponent;
+  let fixture: ComponentFixture<ShowSupplyComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShowSupplyRequestComponent ]
+      declarations: [ ShowSupplyComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ShowSupplyRequestComponent);
+    fixture = TestBed.createComponent(ShowSupplyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

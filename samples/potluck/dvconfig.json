@@ -1,14 +1,77 @@
 {
   "name": "potluck",
-  "watch": true,
   "gatewayPort": 3000,
   "usedCliches": {
-    "event": {
-      "name": "event",
-      "startServer": true,
-      "watch": true,
+    "authentication": {
       "config": {
-        "wsPort": 3002
+        "wsPort": 3002,
+        "reinitDbOnStartup": false
+      }
+    },
+    "authorization": {
+      "config": {
+        "wsPort": 3003,
+        "reinitDbOnStartup": false
+      }
+    },
+    "market": {
+      "config": {
+        "wsPort": 3004,
+        "reinitDbOnStartup": false,
+        "enforceBalance": false
+      }
+    },
+    "event": {
+      "config": {
+        "wsPort": 3005,
+        "reinitDbOnStartup": false
+      }
+    },
+    "group": {
+      "config": {
+        "wsPort": 3006,
+        "reinitDbOnStartup": false
+      }
+    },
+    "party": {
+      "config": {
+        "wsPort": 3007,
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Party",
+          "type": "object",
+          "properties": {
+              "title": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+          },
+          "required": ["title"]
+        }
+      }
+    },
+    "supply": {
+      "config": {
+        "wsPort": 3008,
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Good",
+          "type": "object",
+          "properties": {
+              "item": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              }
+          },
+          "required": ["item", "unit"]
+        }
       }
     }
   }

@@ -54,8 +54,14 @@ th {
   margin-bottom: 10px;
 }
 
+.navbar {
+  background-color: #f8f8f8;
+  border-color: #e7e7e7;
+}
+
 .navbar-brand {
   font-family: 'Pacifico', cursive;
+  color: #777;
 }
 
 .view-more-or-less {
