@@ -85,6 +85,14 @@ interface CreateGoodInput {
   marketId: string;
 }
 
+interface UpdateGoodInput {
+  id: string;
+  name: string;
+  price: number;
+  supply: number;
+  sellerId: string;
+}
+
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -365,24 +373,24 @@ const resolvers = {
       console.log(good);
       return good;
     },
-    updateGood: async (_root, {id, name, price, sellerId, supply}) => {
-      await Validation.goodExists(id);
+    updateGood: async (_root, {input}: {input: UpdateGoodInput}) => {
+      await Validation.goodExists(input.id);
       const updatedGood = {};
       if (name) {
         updatedGood[name] = name;
       }
-      if (price || price === 0) {
-        updatedGood[price] = price;
+      if (input.price || input.price === 0) {
+        updatedGood[input.price] = input.price;
       }
-      if (sellerId) {
-        await Promise.resolve(Validation.partyExists(sellerId));
-        updatedGood[sellerId] = sellerId;
+      if (input.sellerId) {
+        await Promise.resolve(Validation.partyExists(input.sellerId));
+        updatedGood[input.sellerId] = input.sellerId;
       }
-      if (supply || supply === 0) {
-        updatedGood[supply] = supply;
+      if (input.supply || input.supply === 0) {
+        updatedGood[input.supply] = input.supply;
       } 
       const updateOp = { $set: updatedGood }
-      await goods.updateOne({ id: id }, updateOp);
+      await goods.updateOne({ id: input.id }, updateOp);
 
       return true;
     },
