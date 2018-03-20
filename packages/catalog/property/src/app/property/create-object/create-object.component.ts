@@ -27,7 +27,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-object.component.html',
   styleUrls: ['./create-object.component.css']
 })
-export class CreateObjectComponent implements OnInit, OnRun, OnAfterCommit {
+export class CreateObjectComponent
+  implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string | undefined;
 
   @Input() buttonLabel = 'Create Object';
