@@ -1,24 +1,19 @@
-import {GraphQlService} from "gql";
-import {Widget, ClientBus, Field} from "client-bus";
-import {
-  MarketAtom,
-  PartyAtom,
-  GoodAtom,
-  TransactionAtom
-} from "../../shared/data";
+// import {Observable} from "rxjs/Observable";
+// import "rxjs/add/observable/from";
+// import "rxjs/add/operator/map";
+// import "rxjs/add/operator/mergeMap";
+import { Component, Input } from '@angular/core';
 
-import {Observable} from "rxjs/Observable";
-import "rxjs/add/observable/from";
-import "rxjs/add/operator/map";
-import "rxjs/add/operator/mergeMap";
+import { Market, Transaction } from "../shared/market.model";
 
-@Widget({
-  fqelement: "Market",
-  ng2_providers: [GraphQlService]
+@Component({
+  selector: 'market-show-transactions',
+  templateUrl: './show-transactions.component.html',
+  styleUrls: ['./show-transactions.component.css'],
 })
-export class ShowAllTransactionsComponent {
-  @Field("Market") market: MarketAtom;
-  allTransactions = [];
+export class ShowTransactionsComponent {
+  @Input() market: Market;
+  allTransactions: Transaction[] = [];
 
   constructor(
     private _graphQlService: GraphQlService,
