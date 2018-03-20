@@ -6,7 +6,7 @@ import {
   ShowTransactionComponent
 } from '../show-transaction/show-transaction.component';
 
-import { CompoundTransaction } from "../shared/market.model";
+import { CompoundTransaction } from '../shared/market.model';
 
 
 @Component({

@@ -12,8 +12,6 @@ import {
 
 import { startWith } from 'rxjs/operators';
 
-import { Good, Party } from "../shared/market.model";
-
 
 @Component({
   selector: 'market-create-good-seller',

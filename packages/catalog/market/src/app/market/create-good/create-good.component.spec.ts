@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateGoodButtonComponent } from './create-good-button.component';
+import { CreateGoodComponent } from './create-good.component';
 
-describe('CreateGoodButtonComponent', () => {
-  let component: CreateGoodButtonComponent;
-  let fixture: ComponentFixture<CreateGoodButtonComponent>;
+describe('CreateGoodComponent', () => {
+  let component: CreateGoodComponent;
+  let fixture: ComponentFixture<CreateGoodComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreateGoodButtonComponent ]
+      declarations: [ CreateGoodComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateGoodButtonComponent);
+    fixture = TestBed.createComponent(CreateGoodComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

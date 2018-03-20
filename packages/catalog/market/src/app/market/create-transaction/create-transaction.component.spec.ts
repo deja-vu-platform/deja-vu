@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BuyGoodButtonComponent } from './buy-good-button.component';
+import { CreateTransactionComponent } from './create-transaction.component';
 
-describe('BuyGoodButtonComponent', () => {
-  let component: BuyGoodButtonComponent;
-  let fixture: ComponentFixture<BuyGoodButtonComponent>;
+describe('CreateTransactionComponent', () => {
+  let component: CreateTransactionComponent;
+  let fixture: ComponentFixture<CreateTransactionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ BuyGoodButtonComponent ]
+      declarations: [ CreateTransactionComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(BuyGoodButtonComponent);
+    fixture = TestBed.createComponent(CreateTransactionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
