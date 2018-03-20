@@ -1,15 +1,16 @@
-import {GraphQlService} from "gql";
-import {Widget, Field, PrimitiveAtom} from "client-bus";
-import {CompoundTransactionAtom} from "../../shared/data";
+import { Component, Input } from '@angular/core';
 
+import {
+  CompoundTransaction//, Good, Party, Market
+} from "../shared/market.model";
 
-@Widget({
-  fqelement: "Market",
-  ng2_providers: [GraphQlService]
+@Component({
+  selector: 'market-pay-compound-transaction',
+  templateUrl: './pay-compound-transaction.component.html',
+  styleUrls: ['./pay-compound-transaction.component.css'],
 })
-export class PayForCompoundTransactionButtonComponent {
-  @Field("CompoundTransaction") compoundTransaction: CompoundTransactionAtom;
-  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+export class PayCompoundTransactionComponent {
+  @Input() compoundTransaction: CompoundTransaction;
 
   paid = false;
 

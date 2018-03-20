@@ -9,8 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from 'dv-core';
 
 import { AddAmountComponent } from './add-amount/add-amount.component';
-import { AddTransactionButtonComponent } from './add-transaction-button/add-transaction-button.component';
-import { CancelCompoundTransactionButtonComponent } from './cancel-compound-transaction-button/cancel-compound-transaction-button.component';
+import { CancelCompoundTransactionComponent } from './cancel-compound-transaction/cancel-compound-transaction.component';
 import { CancelTransactionComponent } from './cancel-transaction/cancel-transaction.component';
 import { CreateBalanceComponent } from './create-balance/create-balance.component';
 import { CreateCompoundTransactionComponent } from './create-compound-transaction/create-compound-transaction.component';
@@ -23,7 +22,7 @@ import { CreatePartyComponent } from './create-party/create-party.component';
 import { CreateTransactionComponent } from './create-transaction/create-transaction.component';
 import { EditCompoundTransactionSellerComponent } from './edit-compound-transaction-seller/edit-compound-transaction-seller.component';
 import { CreateGoodSellerComponent } from './create-good-seller/create-good-seller.component';
-import { PayForCompoundTransactionButtonComponent } from './pay-for-compound-transaction-button/pay-for-compound-transaction-button.component';
+import { PayCompoundTransactionComponent } from './pay-compound-transaction/pay-compound-transaction.component';
 import { PayTransactionComponent } from './pay-transaction/pay-transaction.component';
 import { ShowBalanceComponent } from './show-balance/show-balance.component';
 import { ShowCompoundTransactionComponent } from './show-compound-transaction/show-compound-transaction.component';
@@ -35,17 +34,16 @@ import { StartCompoundTransactionButtonComponent } from './start-compound-transa
 import { UpdateGoodComponent } from './update-good/update-good.component';
 
 const allComponenents = [
-  AddAmountComponent, AddTransactionButtonComponent, 
-  CancelCompoundTransactionButtonComponent, CancelTransactionComponent,
-  CreateCompoundTransactionComponent, CreateBalanceComponent, 
-  CreateGoodComponent, CreateGoodNameComponent, CreateGoodPriceComponent,
-  CreateGoodSellerComponent, CreateGoodSupplyComponent, CreateMarketComponent,
-  CreatePartyComponent, CreateTransactionComponent,
-  EditCompoundTransactionSellerComponent, PayForCompoundTransactionButtonComponent,
-  PayTransactionComponent,
-  ShowBalanceComponent, ShowCompoundTransactionComponent, ShowGoodComponent,
-  ShowGoodsComponent, ShowTransactionComponent, ShowTransactionsComponent,
-  StartCompoundTransactionButtonComponent, UpdateGoodComponent,
+  AddAmountComponent, CancelCompoundTransactionComponent,
+  CancelTransactionComponent, CreateCompoundTransactionComponent,
+  CreateBalanceComponent, CreateGoodComponent, CreateGoodNameComponent,
+  CreateGoodPriceComponent, CreateGoodSellerComponent, CreateGoodSupplyComponent,
+  CreateMarketComponent, CreatePartyComponent, CreateTransactionComponent,
+  EditCompoundTransactionSellerComponent, PayCompoundTransactionComponent,
+  PayTransactionComponent, ShowBalanceComponent, ShowCompoundTransactionComponent,
+  ShowGoodComponent, ShowGoodsComponent, ShowTransactionComponent,
+  ShowTransactionsComponent, StartCompoundTransactionButtonComponent,
+  UpdateGoodComponent,
 ];
 
 @NgModule({
