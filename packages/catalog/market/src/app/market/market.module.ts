@@ -20,7 +20,6 @@ import { CreateGoodSupplyComponent } from './create-good-supply/create-good-supp
 import { CreateMarketComponent } from './create-market/create-market.component';
 import { CreatePartyComponent } from './create-party/create-party.component';
 import { CreateTransactionComponent } from './create-transaction/create-transaction.component';
-import { EditCompoundTransactionSellerComponent } from './edit-compound-transaction-seller/edit-compound-transaction-seller.component';
 import { CreateGoodSellerComponent } from './create-good-seller/create-good-seller.component';
 import { PayCompoundTransactionComponent } from './pay-compound-transaction/pay-compound-transaction.component';
 import { PayTransactionComponent } from './pay-transaction/pay-transaction.component';
@@ -38,10 +37,10 @@ const allComponenents = [
   CreateBalanceComponent, CreateGoodComponent, CreateGoodNameComponent,
   CreateGoodPriceComponent, CreateGoodSellerComponent, CreateGoodSupplyComponent,
   CreateMarketComponent, CreatePartyComponent, CreateTransactionComponent,
-  EditCompoundTransactionSellerComponent, PayCompoundTransactionComponent,
-  PayTransactionComponent, ShowCompoundTransactionComponent, ShowGoodComponent,
-  ShowGoodsComponent, ShowPartyComponent, ShowTransactionComponent,
-  ShowTransactionsComponent, UpdateGoodComponent
+  PayCompoundTransactionComponent, PayTransactionComponent,
+  ShowCompoundTransactionComponent, ShowGoodComponent, ShowGoodsComponent,
+  ShowPartyComponent, ShowTransactionComponent, ShowTransactionsComponent,
+  UpdateGoodComponent
 ];
 
 @NgModule({

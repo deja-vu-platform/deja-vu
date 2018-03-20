@@ -149,7 +149,7 @@ interface Config {
 
 const argv = minimist(process.argv);
 
-const name = argv.as ? argv.as : 'Market';
+const name = argv.as ? argv.as : 'market';
 
 const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
@@ -430,16 +430,21 @@ const resolvers = {
       if (input.price || input.price === 0) {
         updatedGood[input.price] = input.price;
       }
+      if (input.supply || input.supply === 0) {
+        updatedGood[input.supply] = input.supply;
+      }
+
+      const opPromises: Promise<any>[] = [];
       if (input.sellerId) {
         await Promise.resolve(Validation.partyExists(input.sellerId));
         updatedGood[input.sellerId] = input.sellerId;
-        // TODO: also update seller on each TransactionDoc
+        // also update seller on each TransactionDoc
+        opPromises.push(transactions.update({ goodId: input.id },
+          { $set: { sellerId: input.sellerId }}));
       }
-      if (input.supply || input.supply === 0) {
-        updatedGood[input.supply] = input.supply;
-      } 
       const updateOp = { $set: updatedGood }
-      await goods.updateOne({ id: input.id }, updateOp);
+      opPromises.push(goods.updateOne({ id: input.id }, updateOp));
+      await Promise.all(opPromises);
 
       return true;
     },

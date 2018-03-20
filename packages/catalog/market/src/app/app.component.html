@@ -22,16 +22,17 @@
   <market-create-good-supply (supply)="goodSupply = $event"></market-create-good-supply>
   
   <h3>Required Seller</h3>
-  <market-create-good [name]="goodName" [price]="goodPrice" [supply]="goodSupply" [sellerId]="partyId" [marketId]="marketId" (good)="goodId = $event.id"></market-create-good>
+  <market-create-good [name]="goodName" [price]="goodPrice" [supply]="goodSupply" [sellerId]="partyId" [marketId]="marketId" (good)="goodId1 = $event.id"></market-create-good>
 
   <h3>Optional Seller</h3>
-  <market-create-good [name]="goodName" [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [showSellerId]="false"></market-create-good>
+  <market-create-good [name]="goodName" [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [showSellerId]="false" (good)="goodId2 = $event.id"></market-create-good>
 
   <h2>Update Good</h2>
-  <market-update-good [id]="goodId"></market-update-good>
+  <market-update-good [id]="goodId2"></market-update-good>
 
   <h2>Show Good</h2>
-  <market-show-good [good]="{id: goodId}"></market-show-good>
+  <market-show-good [good]="{id: goodId1}"></market-show-good>
+  <market-show-good [good]="{id: goodId2}"></market-show-good>
 
   <h2>My Goods</h2>
   <!-- ben's goods -->
