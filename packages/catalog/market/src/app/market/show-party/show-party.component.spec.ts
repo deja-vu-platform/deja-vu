@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowBalanceComponent } from './show-balance.component';
+import { ShowPartyComponent } from './show-party.component';
 
-describe('ShowBalanceComponent', () => {
-  let component: ShowBalanceComponent;
-  let fixture: ComponentFixture<ShowBalanceComponent>;
+describe('ShowPartyComponent', () => {
+  let component: ShowPartyComponent;
+  let fixture: ComponentFixture<ShowPartyComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShowBalanceComponent ]
+      declarations: [ ShowPartyComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ShowBalanceComponent);
+    fixture = TestBed.createComponent(ShowPartyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
