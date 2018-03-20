@@ -108,8 +108,7 @@ const resolvers = {
       return {
         name: name,
         schema: JSON.stringify(propertyInfo),
-        required: _.includes(config.schema.required, name),
-        graphQlType: jsonSchemaTypeToGraphQlType[propertyInfo.type]
+        required: _.includes(config.schema.required, name)
       };
     },
     object: (root, { id }) => objects.findOne({ id: id }),
@@ -119,16 +118,14 @@ const resolvers = {
       .map(([ name, propertyInfo ]) => ({
         name: name,
         schema: JSON.stringify(propertyInfo),
-        required: _.includes(config.schema.required, name),
-        graphQlType: jsonSchemaTypeToGraphQlType[propertyInfo.type]
+        required: _.includes(config.schema.required, name)
       }))
       .value()
   },
   Property: {
     name: (root) => root.name,
     schema: (root) => root.schema,
-    required: (root) => root.required,
-    graphQlType: (root) => root.graphQlType
+    required: (root) => root.required
   },
   Mutation: {
     createObject: async (root, { input }) => {

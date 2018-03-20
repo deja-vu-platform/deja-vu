@@ -12,7 +12,7 @@ import {
   GatewayService, GatewayServiceFactory
 } from 'dv-core';
 
-import { GraphQlType, Property } from '../shared/property.model';
+import { Property } from '../shared/property.model';
 
 import { map, startWith } from 'rxjs/operators';
 
@@ -85,7 +85,6 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
               property(name: "${this.name}") {
                 schema
                 required
-                graphQlType
               }
             }
           `
@@ -93,11 +92,12 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
       })
       .pipe(map((res) => res.data.property))
       .subscribe((property: Property) => {
-        this.schemaValidate = this.ajv.compile(JSON.parse(property.schema));
-        if (property.graphQlType === GraphQlType.Int ||
-            property.graphQlType === GraphQlType.Float) {
+        const schema = JSON.parse(property.schema);
+        this.schemaValidate = this.ajv.compile(schema);
+        if (schema.type === 'integer' ||
+            schema.type === 'number') {
           this.type = Number;
-        } else if (property.graphQlType === GraphQlType.String) {
+        } else if (schema.type === 'string') {
           this.type = String;
         } else {
           this.type = Boolean;
