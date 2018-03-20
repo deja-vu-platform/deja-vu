@@ -5,7 +5,7 @@ import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
 import { ShowTransactionComponent } from '../show-transaction/show-transaction.component';
 
-import { Transaction, TransactionStatus } from "../shared/market.model";
+import { Transaction, TransactionStatus } from '../shared/market.model';
 
 
 @Component({

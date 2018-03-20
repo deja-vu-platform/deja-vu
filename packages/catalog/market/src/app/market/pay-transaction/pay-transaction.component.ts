@@ -8,16 +8,24 @@ import {
 } from 'dv-core';
 
 
+const SAVED_MSG_TIMEOUT = 3000;
+
 @Component({
   selector: 'market-pay-transaction',
   templateUrl: './pay-transaction.component.html',
   styleUrls: ['./pay-transaction.component.css']
 })
 export class PayTransactionComponent implements
-  OnInit, OnRun, OnAfterCommit  {
+  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id;
 
-  disabled = false;
+  // Presentation inputs
+  @Input() buttonLabel = 'Pay';
+  @Input() paidText = 'Transaction paid!';
+
+
+  paid = false;
+  payErrorText: string;
 
   private gs: GatewayService;
 
@@ -45,6 +53,14 @@ export class PayTransactionComponent implements
   }
 
   dvOnAfterCommit() {
-    this.disabled = true;
+    this.paid = true;
+    this.payErrorText = '';
+    window.setTimeout(() => {
+      this.paid = false;
+    }, SAVED_MSG_TIMEOUT);
+  }
+
+  dvOnAfterAbort(reason: Error) {
+    this.payErrorText = reason.message;
   }
 }

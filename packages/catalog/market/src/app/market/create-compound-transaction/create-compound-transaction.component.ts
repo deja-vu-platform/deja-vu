@@ -1,71 +1,76 @@
-import { Component, Input } from '@angular/core';
+import {
+  Component, ElementRef, EventEmitter, Input, OnInit, Output
+} from '@angular/core';
 
 import {
-  CompoundTransaction//, Good, Party, Market
-} from "../shared/market.model";
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
+} from 'dv-core';
+
+
+const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
   selector: 'market-create-compound-transaction',
   templateUrl: './create-compound-transaction.component.html',
   styleUrls: ['./create-compound-transaction.component.css'],
 })
-export class CreateCompoundTransactionComponent {
-  @Input() compoundTransaction: CompoundTransaction;
+export class CreateCompoundTransactionComponent implements
+  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  @Input() id: string = ''; // optional
+  @Output() compoundTransaction = new EventEmitter();
 
-  error = false;
+  // Presentation inputs
+  @Input() buttonLabel = 'Create';
+  @Input() inputLabel = 'Id';
+  @Input() newCompoundTransactionSavedText = 'New compound transaction saved';
 
-  constructor(private _graphQlService: GraphQlService) {}
+  newCompoundTransactionSaved = false;
+  newCompoundTransactionError: string;
 
-  createCompoundTransaction() {
-    if (! this.isValid()) return;
+  private gs: GatewayService;
 
-    const transactionsToCreate = [];
-    _u.each(this.compoundTransaction.transactions, transaction => {
-      // default value for quantity
-      if (!transaction.quantity) transaction.quantity = 1;
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {}
 
-      transactionsToCreate.push(
-        this._graphQlService
-          .post(`
-            CreateUnpaidTransaction(
-              good_id: "${transaction.good.atom_id}",
-              buyer_id: "${transaction.buyer.atom_id}",
-              quantity: ${transaction.quantity},
-              price: ${transaction.price}
-            ) { atom_id }
-          `)
-          .subscribe(atom_id => {
-            transaction.atom_id = atom_id;
-            transaction.status = "unpaid";
-          })
-      );
-    });
-
-    Promise.all(transactionsToCreate)
-      .then(_ => {
-        this._graphQlService
-          .post(`
-            CreateCompoundTransaction(
-              transactions: ${this.compoundTransaction.transactions},
-            ) { atom_id }
-          `)
-          .subscribe(atom_id => {
-              this.compoundTransaction.atom_id = atom_id;
-              this.submit_ok.value = !this.submit_ok.value;
-          });
-      });
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
   }
 
-  isValid() {
-    // check that each transaction has a good atom id and a buyer atom id
-    // and check same status and same buyer across all transactions
-    if (this.compoundTransaction.transactions.length === 0) return true;
-    // const status = this.compoundTransaction.transactions[0].status;
-    // const buyer = this.compoundTransaction.transactions[0].buyer;
-    return true;
-    // return _u.every(this.compoundTransaction.transactions, transaction => {
-    //   return transaction.good.atom_id && transaction.buyer.atom_id &&
-    //     transaction.status === status && transaction.buyer === buyer;
-    // });
+  onSubmit() {
+    this.rs.run(this.elem);
+  }
+
+  async dvOnRun(): Promise<void> {
+    const res = await this.gs.post<{
+      data: { createCompoundTransaction: { id: string }}
+    }>('/graphql', {
+      query: `mutation {
+        createCompoundTransaction(id: "${this.id}") {
+          id
+        }
+      }`,
+      variables: {
+        input: {
+          id: this.id
+        }
+      }
+    })
+    .toPromise();
+    this.compoundTransaction.emit({ id: res.data.createCompoundTransaction.id });
+  }
+
+  dvOnAfterCommit() {
+    this.newCompoundTransactionSaved = true;
+    this.newCompoundTransactionError = '';
+    window.setTimeout(() => {
+      this.newCompoundTransactionSaved = false;
+    }, SAVED_MSG_TIMEOUT);
+  }
+
+  dvOnAfterAbort(reason: Error) {
+    this.newCompoundTransactionError = reason.message;
   }
 }

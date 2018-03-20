@@ -2,7 +2,7 @@ import { Component, ElementRef, Input } from '@angular/core';
 
 import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
-import { Good } from "../shared/market.model";
+import { Good } from '../shared/market.model';
 
 
 @Component({

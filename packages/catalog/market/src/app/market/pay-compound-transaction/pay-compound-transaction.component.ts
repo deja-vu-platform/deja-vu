@@ -1,42 +1,66 @@
-import { Component, Input } from '@angular/core';
+import {
+  Component, ElementRef, EventEmitter, Input, OnInit
+} from '@angular/core';
 
 import {
-  CompoundTransaction//, Good, Party, Market
-} from "../shared/market.model";
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
+} from 'dv-core';
+
+
+const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
   selector: 'market-pay-compound-transaction',
   templateUrl: './pay-compound-transaction.component.html',
   styleUrls: ['./pay-compound-transaction.component.css'],
 })
-export class PayCompoundTransactionComponent {
-  @Input() compoundTransaction: CompoundTransaction;
+export class PayCompoundTransactionComponent implements
+  OnInit, OnRun, OnAfterCommit, OnAfterAbort  {
+  @Input() id;
+
+  // Presentation inputs
+  @Input() buttonLabel = 'Pay';
+  @Input() paidText = 'Transaction paid!';
+
 
   paid = false;
+  payErrorText: string;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  private gs: GatewayService;
 
-  dvAfterInit() {
-    this.submit_ok.on_change(() => {
-      this.pay();
-    });
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {}
+
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
   }
 
-  pay() {
-    if (!this.compoundTransaction.atom_id || this.paid) return;
+  onClick() {
+    this.rs.run(this.elem);
+  }
 
-    this._graphQlService
-      .post(`
-        PayForCompoundTransaction(
-          compound_transaction_id: "${this.compoundTransaction.atom_id}"
-        )
-      `)
-      .subscribe(_ => {
-        this.compoundTransaction.transactions.forEach(transaction => {
-          transaction.status = "paid";
-        });
-        this.paid = true;
-        this.submit_ok.value = !this.submit_ok.value;
-      });
+  async dvOnRun(): Promise<void> {
+    const res = await this.gs
+      .post<{data: any}>('/graphql', {
+        query: `mutation {
+          payCompoundTransaction(id: "${this.id}")
+        }`
+      })
+      .toPromise();
+  }
+
+  dvOnAfterCommit() {
+    this.paid = true;
+    this.payErrorText = '';
+    window.setTimeout(() => {
+      this.paid = false;
+    }, SAVED_MSG_TIMEOUT);
+  }
+
+  dvOnAfterAbort(reason: Error) {
+    this.payErrorText = reason.message;
   }
 }

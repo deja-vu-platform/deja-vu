@@ -37,6 +37,7 @@ type CompoundTransaction {
   id: ID!
   transactions: [Transaction]
   totalPrice: Float
+  status: TRANSACTION_STATUS
 }
 
 input CreatePartyInput {
@@ -76,6 +77,7 @@ input GoodsInput {
 
 input CreateTransactionInput {
   id: ID
+  compoundTransactionId: ID
   goodId: ID
   buyerId: ID
   quantity: Float
@@ -95,7 +97,7 @@ type Query {
   good(id: ID!): Good
   market(id: ID!): Market
   transaction(id: ID!): Transaction
-  compoundtransaction(id: ID!): CompoundTransaction
+  compoundTransaction(id: ID!): CompoundTransaction
 
   goods(input: GoodsInput!): [Good]
   transactions(input: TransactionsInput!): [Transaction]
@@ -111,4 +113,6 @@ type Mutation {
   payTransaction(id: ID!): Boolean
   cancelTransaction(id: ID!): Boolean
   createCompoundTransaction(id: ID!): CompoundTransaction
+  payCompoundTransaction(id: ID!): Boolean
+  cancelCompoundTransaction(id: ID!): Boolean
 }

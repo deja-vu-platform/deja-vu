@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateCompoundTransactionComponent } from './create-compound-transaction.component';
+import {
+  CreateCompoundTransactionComponent
+} from './create-compound-transaction.component';
 
 describe('CreateCompoundTransactionComponent', () => {
   let component: CreateCompoundTransactionComponent;

@@ -1,81 +1,88 @@
-import {GraphQlService} from "gql";
-import {Widget, ClientBus, Field, AfterInit} from "client-bus";
+import { Component, ElementRef, Input, Type } from '@angular/core';
+
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+
 import {
-  CompoundTransactionAtom,
-  GoodAtom,
-  PartyAtom,
-  TransactionAtom
-} from "../../shared/data";
+  ShowTransactionComponent
+} from '../show-transaction/show-transaction.component';
 
-import "rxjs/add/observable/from";
-import "rxjs/add/operator/map";
+import { CompoundTransaction } from "../shared/market.model";
 
 
-@Widget({
-  fqelement: "Market",
-  ng2_providers: [GraphQlService]
+@Component({
+  selector: 'market-show-compound-transaction',
+  templateUrl: './show-compound-transaction.component.html',
+  styleUrls: ['./show-compound-transaction.component.css'],
 })
-export class ShowCompoundTransactionComponent implements AfterInit {
-  @Field("CompoundTransaction") compoundTransaction: CompoundTransactionAtom;
+export class ShowCompoundTransactionComponent {
+  @Input() compoundTransaction: CompoundTransaction;
+
+  @Input() showId = true;
+  @Input() showTransactions = true;
+  @Input() showTotalPrice = true;
+  @Input() showStatus = true;
+
+  // For showTransaction
+  @Input() showTransactionId = true;
+  @Input() showSummary = true;
+  @Input() showGoodDetails = true;
+  @Input() showTransactionStatus = true;
+  // For showGood in showTransaction if showGoodDetails is true
+  @Input() showGoodId = true;
+  @Input() showName = true;
+  @Input() showPrice = true;
+  @Input() showSupply = true;
+  @Input() showSeller = true;
+  @Input() showMarket = true;
+
+  // Whether to show the user the option to {pay, cancel} a good
+  @Input() showOptionToPay = true;
+  @Input() showOptionToCancel = true;
+
+
+  @Input() showTransaction: Action = {
+    type: <Type<Component>> ShowTransactionComponent
+  };
+
+  showCompoundTransaction;
+  private gs: GatewayService;
 
   constructor(
-    private _graphQlService: GraphQlService,
-    private _clientBus: ClientBus
-  ) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    this.showCompoundTransaction = this;
+  }
 
-  dvAfterInit() {
-    if (!this.compoundTransaction.atom_id) return;
-    this._graphQlService
-      .get(`
-        compoundtransaction_by_id(
-          atom_id: "${this.compoundTransaction.atom_id}") {
-          total_price,
-          transactions {
-            atom_id,
-            good { atom_id, name },
-            buyer { atom_id },
-            price,
-            quantity,
-            status
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.loadCompoundTransaction();
+  }
+
+  ngOnChanges() {
+    this.loadCompoundTransaction();
+  }
+
+  loadCompoundTransaction() {
+    // only load compound transaction when id is given
+    if (!this.gs || !this.compoundTransaction || !this.compoundTransaction.id) {
+      return;
+    }
+    this.gs.get<{data: {compoundTransaction: CompoundTransaction}}>('/graphql', {
+      params: {
+        query: `
+          query {
+            compoundTransaction(id: "${this.compoundTransaction.id}") {
+              ${this.showId ? 'id' : ''}
+              ${this.showTransactions ? 'transactions { id }' : ''}
+              ${this.showTotalPrice ? 'totalPrice' : ''}
+              ${this.showOptionToPay || this.showOptionToCancel 
+                || this.showStatus ? 'status' : ''}
+            }
           }
-        }
-      `)
-      // can't get seller {atom_id} in query above if seller does not exist
-      .map(data => data.compoundtransaction_by_id)
-      .subscribe(compoundTransaction => {
-        this.compoundTransaction.total_price = compoundTransaction.total_price;
-
-        this.compoundTransaction.transactions = [];
-        compoundTransaction.transactions
-          .map((transaction: TransactionAtom) => {
-            const transaction_atom = this.
-              _clientBus.new_atom<TransactionAtom>("Transaction");
-            transaction_atom.atom_id = transaction.atom_id;
-            transaction_atom.price = transaction.price;
-            transaction_atom.quantity = transaction.quantity;
-            transaction_atom.status = transaction.status;
-
-            const good_atom = this._clientBus.new_atom<GoodAtom>("Good");
-            good_atom.atom_id = transaction.good.atom_id;
-            good_atom.name = transaction.good.name;
-            transaction_atom.good = good_atom;
-
-            if (transaction.seller) {
-              const seller_atom = this._clientBus.new_atom<PartyAtom>("Party");
-              seller_atom.atom_id = transaction.seller.atom_id;
-              transaction_atom.seller = seller_atom;
-            }
-            if (transaction.buyer) {
-              const buyer_atom = this._clientBus.new_atom<PartyAtom>("Party");
-              buyer_atom.atom_id = transaction.buyer.atom_id;
-              transaction_atom.buyer = buyer_atom;
-            }
-
-            return transaction_atom;
-          })
-          .forEach(transaction => {
-            this.compoundTransaction.transactions.push(transaction);
-          });
-      });
+        `
+      }
+    })
+    .subscribe((res) => {
+      this.compoundTransaction = res.data.compoundTransaction;
+    });
   }
 }

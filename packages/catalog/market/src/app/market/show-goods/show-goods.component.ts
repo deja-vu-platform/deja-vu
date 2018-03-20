@@ -41,6 +41,7 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   @Input() showOptionToBuy = true;
   // Requires buyerId and compoundTransactionId
   @Input() showOptionToAddToComopundTransaction = true;
+  @Input() compoundTransactionId: string = '';
   // @Input() showOptionToDelete = true; // for next time
 
   @Input() showGood: Action = {

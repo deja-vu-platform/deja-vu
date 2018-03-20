@@ -22,6 +22,8 @@ export class CreateTransactionComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string = ''; // optional
   @Input() paid: boolean = true;
+  // if compoundTransactionId is set, created transaction will be added to it
+  @Input() compoundTransactionId: string = '';
   @Output() transaction = new EventEmitter();
 
   // required input
@@ -48,9 +50,8 @@ export class CreateTransactionComponent implements
 
   // Presentation inputs
   @Input() inputQuantityLabel: string = 'Quantity';
-  @Input() buttonLabel: string = this.paid ? 'Buy' : 'Add';
-  @Input() newTransactionSavedText: string = this.paid ? 'Good purchased'
-    : 'New transaction saved';
+  @Input() buttonLabel: string = 'Buy';
+  @Input() newTransactionSavedText: string = 'New transaction saved';
 
   @ViewChild(FormGroupDirective) form;
 
@@ -117,6 +118,7 @@ export class CreateTransactionComponent implements
       variables: {
         input: {
           id: this.id,
+          compoundTransactionId: this.compoundTransactionId,
           goodId: this._goodId,
           buyerId: this._buyerId,
           quantity: this.quantityControl.value,

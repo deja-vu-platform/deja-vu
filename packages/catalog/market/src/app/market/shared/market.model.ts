@@ -37,4 +37,5 @@ export interface CompoundTransaction {
   id: string;
   transactions: Transaction[];
   totalPrice: number;
+  status: TransactionStatus;
 }

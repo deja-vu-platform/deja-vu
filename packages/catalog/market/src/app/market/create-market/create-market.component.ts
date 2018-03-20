@@ -17,7 +17,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-market.component.html',
   styleUrls: ['./create-market.component.css']
 })
-export class CreateMarketComponent implements OnInit, OnRun, OnAfterCommit {
+export class CreateMarketComponent implements
+  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string = ''; // optional
   @Output() market: EventEmitter<Market> = new EventEmitter<Market>();
 

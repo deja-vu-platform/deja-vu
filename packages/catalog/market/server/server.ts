@@ -49,6 +49,7 @@ interface CompoundTransactionDoc {
   id: string;
   transactions: string[];
   totalPrice: number;
+  status: TransactionStatus;
 }
 
 interface Market { id: string; }
@@ -82,12 +83,8 @@ interface CompoundTransaction {
   id: string;
   transactions: Transaction[];
   totalPrice: number;
+  status: TransactionStatus;
 }
-
-// interface CreateAndAddUnpaidTransactionInput {
-//   compopundTransactionId: string;
-//   createTransactionInput: CreateUnpaidTransactionInput;
-// }
 
 interface CreatePartyInput {
   id: string;
@@ -126,6 +123,7 @@ interface GoodsInput {
 
 interface CreateTransactionInput {
   id: string;
+  compoundTransactionId: string;
   goodId: string;
   buyerId: string;
   quantity: number;
@@ -151,7 +149,6 @@ interface Config {
 
 const argv = minimist(process.argv);
 
-// Change
 const name = argv.as ? argv.as : 'Market';
 
 const DEFAULT_CONFIG: Config = {
@@ -183,12 +180,6 @@ mongodb.MongoClient.connect(
     if (config.reinitDbOnStartup) {
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
-      if (!_.isEmpty(config.initialPartyIds)) {
-        await db.collection('partys')
-          .insertMany(_.map(config.initialPartyIds, (id) => ({id: id})));
-        console.log(
-          `Initialized party set with ${config.initialPartyIds}`);
-      }
     }
     partys = db.collection('partys');
     goods = db.collection('goods');
@@ -218,7 +209,7 @@ class Validation {
   }
 
   static async compoundTransactionExists(id: string): Promise<CompoundTransactionDoc> {
-    return Validation.exists(compoundtransactions, id, 'Compound Transaction');
+    return Validation.exists(compoundtransactions, id, 'Compound transaction');
   }
 
   static async transactionHasStatus(
@@ -234,11 +225,8 @@ class Validation {
     Promise<CompoundTransactionDoc> {
     const compoundTransaction: CompoundTransactionDoc = await 
       Validation.compoundTransactionExists(id);
-    if (!_.isEmpty(compoundTransaction.transactions)) {
-      // other operations guarantee that
-      // all transactions in a compound transaction have the same status
-      await Validation.transactionHasStatus(
-        compoundTransaction.transactions[0], status);
+    if (compoundTransaction.status !== status) {
+      throw new Error(`Compound transaction is ${compoundTransaction.status}`);
     }
     return compoundTransaction;
   }
@@ -246,7 +234,7 @@ class Validation {
   static async goodPurchasable(id: string, quantity: number) {
     const good: GoodDoc = await Validation.goodExists(id);
     if (good.supply < quantity) {
-      throw new Error(`Good ${id} does not enough supply (${good.supply})
+      throw new Error(`Good ${id} does not have enough supply (${good.supply})
         for purchase quantity ${quantity}`);
     }
   }
@@ -296,7 +284,6 @@ function goodDocToGood(goodDoc: GoodDoc): Good {
 
 async function transactionDocToTransaction(transactionDoc: TransactionDoc): Promise<Transaction> {
   const ret = _.omit(transactionDoc, ['goodId', 'buyerId', 'sellerId', 'marketId']);
-  // const good = await goods.findOne({ id: transactionDoc.goodId });
   ret.good = { id: transactionDoc.goodId };
   ret.buyer = { id: transactionDoc.buyerId };
   if (transactionDoc.sellerId) {
@@ -318,24 +305,20 @@ function compoundTransactionDocToCompoundTransaction(
 
 const resolvers = {
   Query: {
-    // partys: () => partys.find().toArray(),
-    // goods: () => goods.find().toArray(),
-    // markets: () => markets.find().toArray(),
-    // transactions: () => transactions.find().toArray(),
-    // compoundtransactions: () => compoundtransactions.find().toArray(),
-
+    market: (_root, { id }) => markets.findOne({ id: id }),
     party: (_root, { id }) => partys.findOne({ id: id }),
     good: async (_root, { id }) => {
       const good = await Validation.goodExists(id);
       return goodDocToGood(good);
     },
-    market: (_root, { id }) => markets.findOne({ id: id }),
     transaction: async (_root, { id }) => {
       const transaction = await Validation.transactionExists(id);
       return transactionDocToTransaction(transaction);
     },
-    compoundtransaction: (id) => compoundTransactionDocToCompoundTransaction(
-      compoundtransactions.findOne({ id: id })),
+    compoundTransaction: async (_root, { id }) => {
+      const compoundTransaction = await Validation.compoundTransactionExists(id);
+      return compoundTransactionDocToCompoundTransaction(compoundTransaction);
+    },
 
     goods: async (_root, { input }: { input: GoodsInput }): Promise<Good[]> => {
       const sellerIdFilterOp = _.omitBy({
@@ -391,11 +374,13 @@ const resolvers = {
     status: (transaction: Transaction) => transaction.status
   },
   CompoundTransaction: {
-    id: (compoundTransaction: CompoundTransactionDoc) => compoundTransaction.id,
-    transactions: (compoundTransaction: CompoundTransactionDoc) =>
+    id: (compoundTransaction: CompoundTransaction) => compoundTransaction.id,
+    transactions: (compoundTransaction: CompoundTransaction) =>
     compoundTransaction.transactions,
-    totalPrice: (compoundTransaction: CompoundTransactionDoc) =>
-      compoundTransaction.totalPrice
+    totalPrice: (compoundTransaction: CompoundTransaction) =>
+      compoundTransaction.totalPrice,
+    status: (compoundTransaction: CompoundTransaction) =>
+      compoundTransaction.status
   },
   Mutation: {
     createMarket: async (_root, {id}: {id: string}) => {
@@ -448,6 +433,7 @@ const resolvers = {
       if (input.sellerId) {
         await Promise.resolve(Validation.partyExists(input.sellerId));
         updatedGood[input.sellerId] = input.sellerId;
+        // TODO: also update seller on each TransactionDoc
       }
       if (input.supply || input.supply === 0) {
         updatedGood[input.supply] = input.supply;
@@ -489,83 +475,72 @@ const resolvers = {
         opPromises.push(
           makePayment(good.sellerId!, input.buyerId, pricePerGood * input.quantity));
       }
+
+      if (input.compoundTransactionId) {
+        const status: TransactionStatus = input.paid ? TransactionStatus.Paid :
+          TransactionStatus.Unpaid;
+        await Validation.compoundTransactionHasStatus(
+          input.compoundTransactionId, status);
+
+        const updateOp = {
+          $push: { transactions: transaction.id },
+          $inc: { totalPrice: transaction.pricePerGood * transaction.quantity }
+        }
+        opPromises.push(compoundtransactions.updateOne({
+          id: input.compoundTransactionId
+        }, updateOp));
+      }
+
       await Promise.all(opPromises);
       return transactionDocToTransaction(transaction);
     },
     cancelTransaction: async (_root, {id}: {id: string}) => {
+      // TODO: what to do about compound transactions associated with this?
       await cancelTransaction(id);
       return true;
     },
     payTransaction: async (_root, {id}: {id: string}) => {
-      const transactionDocs: TransactionDoc[] = await Promise.all([
-        Validation.transactionHasStatus(id, TransactionStatus.Unpaid),
-        Validation.transactionHasSeller(id)
-      ]);
-      const transaction: TransactionDoc = transactionDocs[0];
-      const transactionUpdateOp = { $set: { status: TransactionStatus.Paid }};
-      // good supply was already decremented when transaction was created
-      await Promise.all([
-        transactions.updateOne({ id: id }, transactionUpdateOp),
-        makePayment(transaction.sellerId!, transaction.buyerId,
-          transaction.pricePerGood * transaction.quantity)
-      ]);
+      // TODO: what to do about compound transactions associated with this?
+      await payTransaction(id);
       return true;
     },
     createCompoundTransaction: async (_root, {id}: {id: string}) => {
       const compoundTransaction: CompoundTransactionDoc = {
         id: id ? id : uuid(),
         transactions: [],
-        totalPrice: 0
+        totalPrice: 0,
+        status: TransactionStatus.Unpaid
       };
       await compoundtransactions.insertOne(compoundTransaction);
 
       return compoundTransactionDocToCompoundTransaction(compoundTransaction);
     },
-//     createAndAddUnpaidTransaction: async (_root, {input}: {input: CreateAndAddUnpaidTransactionInput}) => {
-//       const compoundTransaction: CompoundTransactionDoc =
-//         await Validation.compoundTransactionExists(input.compopundTransactionId);
-//       // make sure compoundTransaction is still unpaid
-//       if (!_.isEmpty(compoundTransaction.transactions)) {
-//         const referenceTransaction: TransactionDoc = await transactions
-//           .findOne({ id: compoundTransaction.transactions[0] });
-//         await Validation.transactionStatusMatches(
-//           [referenceTransaction], TransactionStatus.Unpaid);
-//       }
-//       const newTransaction: TransactionDoc = await createUnpaidTransaction(
-//         input.createTransactionInput);
-//       const updateOp = {
-//         $push: { transactions: newTransaction.id },
-//         $inc: { totalPrice: newTransaction.price * newTransaction.quantity }
-//       }
-//       await compoundtransactions.updateOne({
-//         id: input.compopundTransactionId
-//       }, updateOp);
+    cancelCompoundTransaction: async (_root, {id}: {id: string}) => {
+      const compoundTransaction: CompoundTransactionDoc =
+        await Validation.compoundTransactionHasStatus(id, TransactionStatus.Unpaid);
 
-//       return newTransaction;
-//     },
-//     setCompoundTransactionSeller: async (_root, {id, sellerId}) => {
-//       await Promise.all([
-//         Validation.compoundTransactionHasStatus(id, TransactionStatus.Unpaid),
-//         Validation.partyExists(sellerId)
-//       ]);
-//       const updateOp = { $set: { sellerId: sellerId }};
-//       // TODO: should update all transactions + goods seller instead
-//       await compoundtransactions.updateOne({ id: id }, updateOp);
+      const opPromises = _.map(
+        compoundTransaction.transactions, (transactionId: string) => 
+        cancelTransaction(transactionId));
+      opPromises.push(compoundtransactions.updateOne({ id: id },
+        { $set: { status: TransactionStatus.Canceled }}));
+      await Promise.all(opPromises);
 
-//       return true;
-//     },
-//     payForCompoundTransaction: async (_root, {id}) => {
-//       const compoundTransaction: CompoundTransactionDoc =
-//         await Validation.compoundTransactionHasStatus(
-//           id, TransactionStatus.Unpaid);
-//       const transactions: TransactionDoc[] = await Promise.all<TransactionDoc>(
-//         _.map(compoundTransaction.transactions, Validation.transactionHasSeller));
-//       // good supply was already decremented when transaction was created
-//       await Promise.all(_.map(transactions, (transaction: TransactionDoc) => 
-//         makePayment(transaction.sellerId!, transaction.buyerId,
-//           transaction.price * transaction.quantity)));
-//       return true;
-//     }
+      return true;
+    },
+    payCompoundTransaction: async (_root, {id}) => {
+      const compoundTransaction: CompoundTransactionDoc =
+        await Validation.compoundTransactionHasStatus(id, TransactionStatus.Unpaid);
+
+      const opPromises = _.map(
+        compoundTransaction.transactions, (transactionId: string) => 
+        payTransaction(transactionId));
+      opPromises.push(compoundtransactions.updateOne({ id: id },
+        { $set: { status: TransactionStatus.Paid }}));
+      await Promise.all(opPromises);
+
+      return true;
+    }
   }
 };
 
@@ -579,6 +554,22 @@ async function cancelTransaction(id: string) {
     transactions.updateOne({ id: id }, transactionUpdateOp),
     goods.updateOne({ id: transaction.goodId }, goodUpdateOp)
   ]);
+}
+
+async function payTransaction(id: string) {
+  const transactionDocs: TransactionDoc[] = await Promise.all([
+    Validation.transactionHasStatus(id, TransactionStatus.Unpaid),
+    Validation.transactionHasSeller(id)
+  ]);
+  const transaction: TransactionDoc = transactionDocs[0];
+  const transactionUpdateOp = { $set: { status: TransactionStatus.Paid }};
+  // good supply was already decremented when transaction was created
+  await Promise.all([
+    transactions.updateOne({ id: id }, transactionUpdateOp),
+    makePayment(transaction.sellerId!, transaction.buyerId,
+      transaction.pricePerGood * transaction.quantity)
+  ]);
+  return true;
 }
 
 async function makePayment(sellerId: string, buyerId: string, price: number) {

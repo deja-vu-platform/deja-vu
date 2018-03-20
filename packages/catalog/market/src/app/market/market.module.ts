@@ -24,13 +24,12 @@ import { EditCompoundTransactionSellerComponent } from './edit-compound-transact
 import { CreateGoodSellerComponent } from './create-good-seller/create-good-seller.component';
 import { PayCompoundTransactionComponent } from './pay-compound-transaction/pay-compound-transaction.component';
 import { PayTransactionComponent } from './pay-transaction/pay-transaction.component';
-import { ShowBalanceComponent } from './show-balance/show-balance.component';
 import { ShowCompoundTransactionComponent } from './show-compound-transaction/show-compound-transaction.component';
 import { ShowGoodComponent } from './show-good/show-good.component';
 import { ShowGoodsComponent } from './show-goods/show-goods.component';
+import { ShowPartyComponent } from './show-party/show-party.component';
 import { ShowTransactionComponent } from './show-transaction/show-transaction.component';
 import { ShowTransactionsComponent } from './show-transactions/show-transactions.component';
-import { StartCompoundTransactionButtonComponent } from './start-compound-transaction-button/start-compound-transaction-button.component';
 import { UpdateGoodComponent } from './update-good/update-good.component';
 
 const allComponenents = [
@@ -40,10 +39,9 @@ const allComponenents = [
   CreateGoodPriceComponent, CreateGoodSellerComponent, CreateGoodSupplyComponent,
   CreateMarketComponent, CreatePartyComponent, CreateTransactionComponent,
   EditCompoundTransactionSellerComponent, PayCompoundTransactionComponent,
-  PayTransactionComponent, ShowBalanceComponent, ShowCompoundTransactionComponent,
-  ShowGoodComponent, ShowGoodsComponent, ShowTransactionComponent,
-  ShowTransactionsComponent, StartCompoundTransactionButtonComponent,
-  UpdateGoodComponent,
+  PayTransactionComponent, ShowCompoundTransactionComponent, ShowGoodComponent,
+  ShowGoodsComponent, ShowPartyComponent, ShowTransactionComponent,
+  ShowTransactionsComponent, UpdateGoodComponent
 ];
 
 @NgModule({

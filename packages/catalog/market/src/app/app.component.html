@@ -9,6 +9,10 @@
   <market-create-party id="ben" (party)="partyId = $event.id"></market-create-party>
   <market-create-party id="alyssa"></market-create-party>
 
+  <h2>Show Party</h2>
+  <market-show-party [party]="{id: 'ben'}"></market-show-party>
+  <market-show-party [party]="{id: 'alyssa'}"></market-show-party>
+
   <h2>Add Amount to Party</h2>
   <market-add-amount [partyId]="partyId"></market-add-amount>
 
@@ -34,11 +38,14 @@
   <market-show-goods [sellerId]="partyId"></market-show-goods>
 
   <h2>Buy Goods</h2>
-  <market-show-goods [buyerId]="partyId"></market-show-goods>
+  <market-show-goods [buyerId]="partyId" [compoundTransactionId]="'ctid'"></market-show-goods>
 
   <h2>Show Transactions</h2>
   <market-show-transactions [buyerId]="partyId" [marketId]="marketId"></market-show-transactions>
 
   <h2>Compound Transactions</h2>
-  <market-start-compound-transaction-button></market-start-compound-transaction-button>
+  <market-create-compound-transaction id="ctid" (compoundTransaction)="compoundTransactionId = $event.id"></market-create-compound-transaction>
+
+  <market-show-compound-transaction [compoundTransaction]="{id: 'ctid'}">
+  </market-show-compound-transaction>
 </div>

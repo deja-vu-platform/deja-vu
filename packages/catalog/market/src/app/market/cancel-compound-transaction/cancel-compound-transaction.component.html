@@ -1,3 +1,13 @@
-<button mat-button (click)="cancelCompoundTransaction()">
-  Cancel
+<button mat-button (click)="onClick()" [disabled]="canceled">
+  {{buttonLabel}}
 </button>
+<div class="form-group" style="display: inline;">
+  <div *ngIf="canceled">
+    <i class="material-icons">done</i>
+      {{canceledText}}
+  </div>
+  <mat-error *ngIf="cancelErrorText">
+    <i class="material-icons">report_problem</i>
+    {{cancelErrorText}}
+  </mat-error>
+</div>

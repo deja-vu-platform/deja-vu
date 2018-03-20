@@ -5,12 +5,24 @@
       }"
       [parent]="showGoods">
     </dv-include>
-    <div *ngIf="showOptionToBuy && buyerId">
+
+    <div *ngIf="showOptionToBuy">
       <market-create-transaction [goodId]="good.id" [buyerId]="buyerId">
+      </market-create-transaction>
+    </div>
+
+    <div *ngIf="showOptionToAddToComopundTransaction && compoundTransactionId">
+      <market-create-transaction
+        [goodId]="good.id"
+        [buyerId]="buyerId"
+        [compoundTransactionId]="compoundTransactionId"
+        [paid]="false"
+        [buttonLabel]="'Add'">
       </market-create-transaction>
     </div>
   </li>
 </ul>
+
 <div *ngIf="!goods || goods.length === 0">
   <span>No goods to show</span>
 </div>

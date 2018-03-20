@@ -8,16 +8,24 @@ import {
 } from 'dv-core';
 
 
+const SAVED_MSG_TIMEOUT = 3000;
+
 @Component({
   selector: 'market-cancel-transaction',
   templateUrl: './cancel-transaction.component.html',
   styleUrls: ['./cancel-transaction.component.css']
 })
 export class CancelTransactionComponent implements
-  OnInit, OnRun, OnAfterCommit  {
+  OnInit, OnRun, OnAfterCommit, OnAfterAbort  {
   @Input() id;
 
-  disabled = false;
+  // Presentation inputs
+  @Input() buttonLabel = 'Cancel';
+  @Input() canceledText = 'Transaction canceled';
+
+
+  canceled = false;
+  cancelErrorText: string;
 
   private gs: GatewayService;
 
@@ -45,6 +53,14 @@ export class CancelTransactionComponent implements
   }
 
   dvOnAfterCommit() {
-    this.disabled = true;
+    this.canceled = true;
+    this.cancelErrorText = '';
+    window.setTimeout(() => {
+      this.canceled = false;
+    }, SAVED_MSG_TIMEOUT);
+  }
+
+  dvOnAfterAbort(reason: Error) {
+    this.cancelErrorText = reason.message;
   }
 }

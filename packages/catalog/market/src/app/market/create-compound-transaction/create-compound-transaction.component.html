@@ -1,1 +1,24 @@
-<button mat-button (click)="createCompoundTransaction()" disabled]="!isValid()">Create</button>
+<form (ngSubmit)="onSubmit()"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="newCompoundTransactionSaved">
+      <i class="material-icons">done</i>
+        {{newCompoundTransactionSavedText}}
+    </div>
+    <mat-error *ngIf="newCompoundTransactionError">
+      <i class="material-icons">report_problem</i>
+      {{newCompoundTransactionError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <input matInput [(ngModel)]="id" name="id">
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <button mat-button type="submit">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>
