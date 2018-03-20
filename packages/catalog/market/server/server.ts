@@ -13,9 +13,9 @@ import { makeExecutableSchema } from 'graphql-tools';
 
 
 enum TransactionStatus {
-  Paid = 'PAID',
-  Unpaid = 'UNPAID',
-  Canceled = 'CANCELED'
+  Paid = 'Paid',
+  Unpaid = 'Unpaid',
+  Canceled = 'Canceled'
 }
 
 interface MarketDoc { id: string; }
@@ -78,11 +78,11 @@ interface Transaction {
   status: TransactionStatus;
 }
 
-// interface CompoundTransaction {
-//   id: string;
-//   transactions: Transaction[];
-//   totalPrice: number;
-// }
+interface CompoundTransaction {
+  id: string;
+  transactions: Transaction[];
+  totalPrice: number;
+}
 
 // interface CreateAndAddUnpaidTransactionInput {
 //   compopundTransactionId: string;
@@ -131,6 +131,13 @@ interface CreateTransactionInput {
   quantity: number;
   priceFraction: number;
   paid: boolean;
+}
+
+interface TransactionsInput {
+  buyerId?: string;
+  sellerId?: string;
+  marketId?: string;
+  status?: TransactionStatus;
 }
 
 interface Config {
@@ -287,14 +294,23 @@ function goodDocToGood(goodDoc: GoodDoc): Good {
   return ret;
 }
 
-function transactionDocToTransaction(transactionDoc: TransactionDoc): Transaction {
+async function transactionDocToTransaction(transactionDoc: TransactionDoc): Promise<Transaction> {
   const ret = _.omit(transactionDoc, ['goodId', 'buyerId', 'sellerId', 'marketId']);
+  // const good = await goods.findOne({ id: transactionDoc.goodId });
   ret.good = { id: transactionDoc.goodId };
   ret.buyer = { id: transactionDoc.buyerId };
   if (transactionDoc.sellerId) {
     ret.seller = { id: transactionDoc.sellerId };
   }
   ret.market = { id: transactionDoc.marketId };
+  return ret;
+}
+
+function compoundTransactionDocToCompoundTransaction(
+  compoundTransactionDoc: CompoundTransactionDoc): CompoundTransaction {
+  const ret = _.omit(compoundTransactionDoc, ['transactions']);
+  ret.transactions = _.map(compoundTransactionDoc.transactions,
+    (transactionId: string) => { return { id: transactionId }; });
 
   return ret;
 }
@@ -309,13 +325,19 @@ const resolvers = {
     // compoundtransactions: () => compoundtransactions.find().toArray(),
 
     party: (_root, { id }) => partys.findOne({ id: id }),
-    good: (_root, { id }) => goodDocToGood(goods.findOne({ id: id })),
+    good: async (_root, { id }) => {
+      const good = await Validation.goodExists(id);
+      return goodDocToGood(good);
+    },
     market: (_root, { id }) => markets.findOne({ id: id }),
-    transaction: (_root, { id }) =>
-      transactionDocToTransaction(transactions.findOne({ id: id })),
-    compoundtransaction: (id) => compoundtransactions.findOne({ id: id }),
+    transaction: async (_root, { id }) => {
+      const transaction = await Validation.transactionExists(id);
+      return transactionDocToTransaction(transaction);
+    },
+    compoundtransaction: (id) => compoundTransactionDocToCompoundTransaction(
+      compoundtransactions.findOne({ id: id })),
 
-    goods: async (_root, { input }: { input: GoodsInput }): Promise<Good> => {
+    goods: async (_root, { input }: { input: GoodsInput }): Promise<Good[]> => {
       const sellerIdFilterOp = _.omitBy({
         $eq: input.sellerId,
         $ne: input.buyerId
@@ -338,19 +360,17 @@ const resolvers = {
         .toArray();
       return _.map(matchingGoods, goodDocToGood);
     },
-    marketTransactions: (_root, { marketId }) => transactions
-      .find({ marketId: marketId })
-      .toArray(),
-    buyerTransactions: (_root, { buyerId, marketId }) => transactions
-      .find({
-        buyerId: buyerId,
-        marketId: marketId
-      })
-      .toArray()
+    transactions: async (_root, { input }: { input: TransactionsInput })
+      : Promise<Transaction[]> => {
+      const matchingTransactions: TransactionDoc[] = await transactions
+        .find(input)
+        .toArray();
+      return _.map(matchingTransactions, transactionDocToTransaction);
+    }
   },
   Party: {
-    id: (party: PartyDoc) => party.id,
-    balance: (party: PartyDoc) => party.balance
+    id: (party: Party) => party.id,
+    balance: (party: Party) => party.balance
   },
   Good: {
     id: (good: Good) => good.id,
@@ -362,7 +382,7 @@ const resolvers = {
   },
   Transaction: {
     id: (transaction: Transaction) => transaction.id,
-    good: (transaction: Transaction) => transaction.good,
+    good: (transaction: Transaction) => goods.findOne(transaction.good),
     buyer: (transaction: Transaction) => transaction.buyer,
     seller: (transaction: Transaction) => transaction.seller,
     pricePerGood: (transaction: Transaction) => transaction.pricePerGood,
@@ -372,9 +392,8 @@ const resolvers = {
   },
   CompoundTransaction: {
     id: (compoundTransaction: CompoundTransactionDoc) => compoundTransaction.id,
-    transactions: (compoundTransaction: CompoundTransactionDoc) => transactions
-      .find({ id: { $in: compoundTransaction.transactions } })
-      .toArray(),
+    transactions: (compoundTransaction: CompoundTransactionDoc) =>
+    compoundTransaction.transactions,
     totalPrice: (compoundTransaction: CompoundTransactionDoc) =>
       compoundTransaction.totalPrice
   },
@@ -466,32 +485,42 @@ const resolvers = {
         transactions.insertOne(transaction),
         goods.updateOne({ id: input.goodId, }, goodUpdateOp)
       ];
-      if (good.sellerId) {
+      if (good.sellerId && input.paid) {
         opPromises.push(
           makePayment(good.sellerId!, input.buyerId, pricePerGood * input.quantity));
       }
       await Promise.all(opPromises);
       return transactionDocToTransaction(transaction);
     },
-//     createUnpaidCompoundTransaction: async (_root,
-//       {id, transactions}: {id: string, transactions: CreateUnpaidTransactionInput[]}) => {
-//       const transactionDocs: TransactionDoc[] = await Promise.all<TransactionDoc>(
-//         _.map(transactions, createUnpaidTransaction));
-//       const transactionIds = _.map(transactionDocs, 'id');
+    cancelTransaction: async (_root, {id}: {id: string}) => {
+      await cancelTransaction(id);
+      return true;
+    },
+    payTransaction: async (_root, {id}: {id: string}) => {
+      const transactionDocs: TransactionDoc[] = await Promise.all([
+        Validation.transactionHasStatus(id, TransactionStatus.Unpaid),
+        Validation.transactionHasSeller(id)
+      ]);
+      const transaction: TransactionDoc = transactionDocs[0];
+      const transactionUpdateOp = { $set: { status: TransactionStatus.Paid }};
+      // good supply was already decremented when transaction was created
+      await Promise.all([
+        transactions.updateOne({ id: id }, transactionUpdateOp),
+        makePayment(transaction.sellerId!, transaction.buyerId,
+          transaction.pricePerGood * transaction.quantity)
+      ]);
+      return true;
+    },
+    createCompoundTransaction: async (_root, {id}: {id: string}) => {
+      const compoundTransaction: CompoundTransactionDoc = {
+        id: id ? id : uuid(),
+        transactions: [],
+        totalPrice: 0
+      };
+      await compoundtransactions.insertOne(compoundTransaction);
 
-//       const totalPrice: number = _.reduce(transactionDocs,
-//         (sum: number, transaction: TransactionDoc) =>
-//         sum + transaction.price * transaction.quantity, 0);
-
-//       const compoundTransaction: CompoundTransactionDoc = {
-//         id: id ? id : uuid(),
-//         transactions: transactionIds,
-//         totalPrice
-//       };
-//       await compoundtransactions.insertOne(compoundTransaction);
-
-//       return compoundTransaction;
-//     },
+      return compoundTransactionDocToCompoundTransaction(compoundTransaction);
+    },
 //     createAndAddUnpaidTransaction: async (_root, {input}: {input: CreateAndAddUnpaidTransactionInput}) => {
 //       const compoundTransaction: CompoundTransactionDoc =
 //         await Validation.compoundTransactionExists(input.compopundTransactionId);
@@ -536,30 +565,21 @@ const resolvers = {
 //         makePayment(transaction.sellerId!, transaction.buyerId,
 //           transaction.price * transaction.quantity)));
 //       return true;
-//     },
-//     cancelUnpaidTransaction: async (_root, {id}) => {
-//       const compoundTransaction: CompoundTransactionDoc =
-//         await Validation.compoundTransactionHasStatus(
-//           id, TransactionStatus.Unpaid);
-
-//       await Promise.all(_.map(compoundTransaction.transactions,
-//         (transactionId: string) => cancelUnpaidTransaction(transactionId)));
-//       return true;
 //     }
   }
 };
 
-// async function cancelUnpaidTransaction(id: string) {
-//   const transaction: TransactionDoc = await Validation.transactionHasStatus(
-//     id, TransactionStatus.Unpaid);
-//   const transactionUpdateOp = { $set: { status: TransactionStatus.Canceled }};
-//   const goodUpdateOp = { $inc: { supply: transaction.quantity }};
+async function cancelTransaction(id: string) {
+  const transaction: TransactionDoc = await Validation.transactionHasStatus(
+    id, TransactionStatus.Unpaid);
+  const transactionUpdateOp = { $set: { status: TransactionStatus.Canceled }};
+  const goodUpdateOp = { $inc: { supply: transaction.quantity }};
 
-//   await Promise.all([
-//     transactions.updateOne({ id: id }, transactionUpdateOp),
-//     goods.updateOne({ id: transaction.goodId }, goodUpdateOp)
-//   ]);
-// }
+  await Promise.all([
+    transactions.updateOne({ id: id }, transactionUpdateOp),
+    goods.updateOne({ id: transaction.goodId }, goodUpdateOp)
+  ]);
+}
 
 async function makePayment(sellerId: string, buyerId: string, price: number) {
   const buyerUpdateOp = { $inc: { balance: -price } };

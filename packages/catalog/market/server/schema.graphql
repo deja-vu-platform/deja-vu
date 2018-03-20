@@ -1,7 +1,7 @@
 enum TRANSACTION_STATUS {
-  PAID
-  UNPAID
-  CANCELED
+  Paid
+  Unpaid
+  Canceled
 }
 
 type Market {
@@ -83,6 +83,13 @@ input CreateTransactionInput {
   paid: Boolean
 }
 
+input TransactionsInput {
+  buyerId: ID
+  sellerId: ID
+  marketId: ID
+  status: TRANSACTION_STATUS
+}
+
 type Query {
   party(id: ID!): Party
   good(id: ID!): Good
@@ -91,8 +98,7 @@ type Query {
   compoundtransaction(id: ID!): CompoundTransaction
 
   goods(input: GoodsInput!): [Good]
-  marketTransactions(marketId: ID!): [Transaction]
-  buyerTransactions(buyerId: ID!, marketId: ID!): [Transaction]
+  transactions(input: TransactionsInput!): [Transaction]
 }
 
 type Mutation {
@@ -102,4 +108,7 @@ type Mutation {
   createGood(input: CreateGoodInput!): Good
   updateGood(input: UpdateGoodInput!): Boolean
   createTransaction(input: CreateTransactionInput!): Transaction
+  payTransaction(id: ID!): Boolean
+  cancelTransaction(id: ID!): Boolean
+  createCompoundTransaction(id: ID!): CompoundTransaction
 }

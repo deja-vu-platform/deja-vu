@@ -11,6 +11,7 @@ import { DvModule } from 'dv-core';
 import { AddAmountComponent } from './add-amount/add-amount.component';
 import { AddTransactionButtonComponent } from './add-transaction-button/add-transaction-button.component';
 import { CancelCompoundTransactionButtonComponent } from './cancel-compound-transaction-button/cancel-compound-transaction-button.component';
+import { CancelTransactionComponent } from './cancel-transaction/cancel-transaction.component';
 import { CreateBalanceComponent } from './create-balance/create-balance.component';
 import { CreateCompoundTransactionComponent } from './create-compound-transaction/create-compound-transaction.component';
 import { CreateGoodComponent } from './create-good/create-good.component';
@@ -23,6 +24,7 @@ import { CreateTransactionComponent } from './create-transaction/create-transact
 import { EditCompoundTransactionSellerComponent } from './edit-compound-transaction-seller/edit-compound-transaction-seller.component';
 import { CreateGoodSellerComponent } from './create-good-seller/create-good-seller.component';
 import { PayForCompoundTransactionButtonComponent } from './pay-for-compound-transaction-button/pay-for-compound-transaction-button.component';
+import { PayTransactionComponent } from './pay-transaction/pay-transaction.component';
 import { ShowBalanceComponent } from './show-balance/show-balance.component';
 import { ShowCompoundTransactionComponent } from './show-compound-transaction/show-compound-transaction.component';
 import { ShowGoodComponent } from './show-good/show-good.component';
@@ -34,12 +36,13 @@ import { UpdateGoodComponent } from './update-good/update-good.component';
 
 const allComponenents = [
   AddAmountComponent, AddTransactionButtonComponent, 
-  CancelCompoundTransactionButtonComponent,
+  CancelCompoundTransactionButtonComponent, CancelTransactionComponent,
   CreateCompoundTransactionComponent, CreateBalanceComponent, 
   CreateGoodComponent, CreateGoodNameComponent, CreateGoodPriceComponent,
   CreateGoodSellerComponent, CreateGoodSupplyComponent, CreateMarketComponent,
   CreatePartyComponent, CreateTransactionComponent,
   EditCompoundTransactionSellerComponent, PayForCompoundTransactionButtonComponent,
+  PayTransactionComponent,
   ShowBalanceComponent, ShowCompoundTransactionComponent, ShowGoodComponent,
   ShowGoodsComponent, ShowTransactionComponent, ShowTransactionsComponent,
   StartCompoundTransactionButtonComponent, UpdateGoodComponent,

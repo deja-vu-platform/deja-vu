@@ -1,3 +1,9 @@
+export enum TransactionStatus {
+  Paid = 'Paid',
+  Unpaid = 'Unpaid',
+  Canceled = 'Canceled'
+}
+
 export interface Market {
   id: string;
 }
@@ -24,7 +30,7 @@ export interface Transaction {
   pricePerGood: number;
   quantity: number;
   market: Market;
-  status: string;
+  status: TransactionStatus;
 }
 
 export interface CompoundTransaction {

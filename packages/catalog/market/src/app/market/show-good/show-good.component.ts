@@ -2,8 +2,6 @@ import { Component, ElementRef, Input } from '@angular/core';
 
 import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
-import { map } from 'rxjs/operators';
-
 import { Good } from "../shared/market.model";
 
 
@@ -44,8 +42,8 @@ export class ShowGoodComponent {
   }
 
   loadGood() {
-    // only load good when id is given and its fields haven't been loaded
-    if (!this.gs || !this.good || !this.good.id || this.good.name) {
+    // only load good when id is given
+    if (!this.gs || !this.good || !this.good.id) {
       return;
     }
     this.gs.get<{data: {good: Good}}>('/graphql', {
@@ -53,24 +51,19 @@ export class ShowGoodComponent {
         query: `
           query {
             good(id: "${this.good.id}") {
-              id
-              name
-              price
-              supply
-              seller { id }
-              market { id }
+              ${this.showId ? 'id' : ''}
+              ${this.showName ? 'name' : ''}
+              ${this.showPrice ? 'price' : ''}
+              ${this.showSupply ? 'supply' : ''}
+              ${this.showSeller ? 'seller { id }' : ''}
+              ${this.showMarket ? 'market { id }' : ''}
             }
           }
         `
       }
     })
-    .pipe(map((res) => res.data.good))
-    .subscribe((good: Good) => {
-      this.good.name = good.name;
-      this.good.price = good.price;
-      this.good.supply = good.supply;
-      this.good.seller = good.seller;
-      this.good.market = good.market;
+    .subscribe((res) => {
+      this.good = res.data.good;
     })
   }
 }

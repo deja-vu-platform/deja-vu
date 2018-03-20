@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowTransactionsComponent } from './show-transactions.component';
+import { CancelTransactionComponent } from './cancel-transaction.component';
 
-describe('ShowTransactionsComponent', () => {
-  let component: ShowTransactionsComponent;
-  let fixture: ComponentFixture<ShowTransactionsComponent>;
+describe('CancelTransactionComponent', () => {
+  let component: CancelTransactionComponent;
+  let fixture: ComponentFixture<CancelTransactionComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShowTransactionsComponent ]
+      declarations: [ CancelTransactionComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ShowTransactionsComponent);
+    fixture = TestBed.createComponent(CancelTransactionComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

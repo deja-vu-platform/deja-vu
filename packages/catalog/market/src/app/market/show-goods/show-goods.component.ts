@@ -2,7 +2,6 @@ import {
   Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
-import * as _ from 'lodash';
 
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
@@ -16,7 +15,7 @@ import { Good } from '../shared/market.model';
 })
 export class ShowGoodsComponent implements OnInit, OnChanges {
   // Fetch rules
-  // If undefined then the fetched tasks are not filtered by that property
+  // If undefined then the fetched goods are not filtered by that property
   @Input() buyerId: string | undefined;
   @Input() sellerId: string | undefined;
   @Input() marketId: string | undefined;

@@ -1,10 +1,20 @@
-<div class="row">
-  <ul *ngIf="allTransactions && allTransactions.length > 0" class="list-group">
-    <li ngFor="let transaction of allTransactions" class="list-group-item">
-      <market-show-transaction [transaction]="transaction"></market-show-transaction>
-    </li>
-  </ul>
-  <div *ngIf="!allTransactions || allTransactions.length == 0">
-    No transactions to show
-  </div>
+<ul *ngIf="transactions && transactions.length > 0" class="list-group">
+  <li *ngFor="let transaction of transactions" class="list-group-item">
+    <dv-include [action]="showTransaction" [inputs]="{
+        transaction: transaction, showId: showTransactionId, showSummary: showSummary, showGoodDetails: showGoodDetails, showStatus: showStatus, showGoodId: showGoodId, showName: showName, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
+      }"
+      [parent]="showTransactions">
+    </dv-include>
+    <div *ngIf="transaction.status !== 'Paid'">
+      <div *ngIf="showOptionToPay && transaction.seller && transaction.buyer">
+        <market-pay-transaction [id]="transaction.id"></market-pay-transaction>
+      </div>
+      <div *ngIf="showOptionToCancel">
+        <market-cancel-transaction [id]="transaction.id"></market-cancel-transaction>
+      </div>
+    </div>
+  </li>
+</ul>
+<div *ngIf="!transactions || transactions.length === 0">
+  <span>No transactions to show</span>
 </div>
