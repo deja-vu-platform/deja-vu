@@ -107,7 +107,9 @@ export class UpdateGoodComponent implements
       this.nameControl.setValue(good.name);
       this.priceControl.setValue(good.price);
       this.supplyControl.setValue(good.supply);
-      this.sellerIdControl.setValue(good.seller.id);
+      if (good.seller) {
+        this.sellerIdControl.setValue(good.seller.id);
+      }
     })
   }
 
