@@ -12,7 +12,7 @@ import { AddAmountComponent } from './add-amount/add-amount.component';
 import { AddTransactionButtonComponent } from './add-transaction-button/add-transaction-button.component';
 import { CancelCompoundTransactionButtonComponent } from './cancel-compound-transaction-button/cancel-compound-transaction-button.component';
 import { CreateBalanceComponent } from './create-balance/create-balance.component';
-import { CreateCompoundTransactionButtonComponent } from './create-compound-transaction-button/create-compound-transaction-button.component';
+import { CreateCompoundTransactionComponent } from './create-compound-transaction/create-compound-transaction.component';
 import { CreateGoodComponent } from './create-good/create-good.component';
 import { CreateGoodNameComponent } from './create-good-name/create-good-name.component';
 import { CreateGoodPriceComponent } from './create-good-price/create-good-price.component';
@@ -40,7 +40,7 @@ import { UpdateGoodComponent } from './update-good/update-good.component';
 const allComponenents = [
   AddAmountComponent, AddTransactionButtonComponent, 
   CancelCompoundTransactionButtonComponent,
-  CreateCompoundTransactionButtonComponent, CreateBalanceComponent, 
+  CreateCompoundTransactionComponent, CreateBalanceComponent, 
   CreateGoodComponent, CreateGoodNameComponent, CreateGoodPriceComponent,
   CreateGoodSellerComponent, CreateGoodSupplyComponent, CreateMarketComponent,
   CreatePartyComponent, CreateTransactionComponent,

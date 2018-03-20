@@ -1,17 +1,16 @@
-import {GraphQlService} from "gql";
-import {Widget, Field, PrimitiveAtom} from "client-bus";
-import {CompoundTransactionAtom} from "../../shared/data";
+import { Component, Input } from '@angular/core';
 
-import * as _u from "underscore";
+import {
+  CompoundTransaction//, Good, Party, Market
+} from "../shared/market.model";
 
-
-@Widget({
-  fqelement: "Market",
-  ng2_providers: [GraphQlService]
+@Component({
+  selector: 'market-create-compound-transaction',
+  templateUrl: './create-compound-transaction.component.html',
+  styleUrls: ['./create-compound-transaction.component.css'],
 })
-export class CreateCompoundTransactionButtonComponent {
-  @Field("CompoundTransaction") compoundTransaction: CompoundTransactionAtom;
-  @Field("boolean") submit_ok: PrimitiveAtom<boolean>;
+export class CreateCompoundTransactionComponent {
+  @Input() compoundTransaction: CompoundTransaction;
 
   error = false;
 
@@ -61,11 +60,12 @@ export class CreateCompoundTransactionButtonComponent {
     // check that each transaction has a good atom id and a buyer atom id
     // and check same status and same buyer across all transactions
     if (this.compoundTransaction.transactions.length === 0) return true;
-    const status = this.compoundTransaction.transactions[0].status;
-    const buyer = this.compoundTransaction.transactions[0].buyer;
-    return _u.every(this.compoundTransaction.transactions, transaction => {
-      return transaction.good.atom_id && transaction.buyer.atom_id &&
-        transaction.status === status && transaction.buyer === buyer;
-    });
+    // const status = this.compoundTransaction.transactions[0].status;
+    // const buyer = this.compoundTransaction.transactions[0].buyer;
+    return true;
+    // return _u.every(this.compoundTransaction.transactions, transaction => {
+    //   return transaction.good.atom_id && transaction.buyer.atom_id &&
+    //     transaction.status === status && transaction.buyer === buyer;
+    // });
   }
 }
