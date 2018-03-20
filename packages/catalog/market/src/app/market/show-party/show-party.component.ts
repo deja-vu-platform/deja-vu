@@ -1,6 +1,9 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input } from '@angular/core';
 
-import { Party } from "../shared/market.model";
+import { GatewayService, GatewayServiceFactory } from 'dv-core';
+
+import { Party } from '../shared/market.model';
+
 
 @Component({
   selector: 'market-show-party',
@@ -10,20 +13,45 @@ import { Party } from "../shared/market.model";
 export class ShowPartyComponent {
   @Input() party: Party;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  @Input() showId = true;
+  @Input() showBalance = true;
 
-  dvAfterInit() {
-    if (!this.party.atom_id) return;
+  @Input() noBalanceText = 'No balance';
 
-    this._graphQlService
-      .get(`
-        party_by_id(atom_id: "${this.party.atom_id}"){
-          atom_id,
-          balance
-        }
-      `)
-      .subscribe(data => {
-        this.party.balance = data.party_by_id.balance;
-      });
+
+  private gs: GatewayService;
+
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.loadParty();
+  }
+
+  ngOnChanges() {
+    this.loadParty();
+  }
+
+  loadParty() {
+    // only load party when id is given
+    if (!this.gs || !this.party || !this.party.id) {
+      return;
+    }
+    this.gs.get<{data: {party: Party}}>('/graphql', {
+      params: {
+        query: `
+          query {
+            party(id: "${this.party.id}") {
+              ${this.showId ? 'id' : ''}
+              ${this.showBalance ? 'balance' : ''}
+            }
+          }
+        `
+      }
+    })
+    .subscribe((res) => {
+      this.party = res.data.party;
+    })
   }
 }
