@@ -1,0 +1,16 @@
+<ul *ngIf="goods && goods.length > 0" class="list-group">
+  <li *ngFor="let good of goods" class="list-group-item">
+    <dv-include [action]="showGood" [inputs]="{
+        good: good, showId: showId, showName: showName, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
+      }"
+      [parent]="showGoods">
+    </dv-include>
+    <div *ngIf="showOptionToBuy && buyerId">
+      <market-create-transaction [goodId]="good.id" [buyerId]="buyerId">
+      </market-create-transaction>
+    </div>
+  </li>
+</ul>
+<div *ngIf="!goods || goods.length === 0">
+  <span>No goods to show</span>
+</div>

@@ -35,7 +35,7 @@ export class CreateGoodComponent implements
   }
   private _marketId: string = '';
 
-  // optional input values to override form input values
+  // optional input values to override form control values
   @Input() set name(name: string) {
     this.nameControl.setValue(name);
   }

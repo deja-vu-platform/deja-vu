@@ -6,7 +6,8 @@
   <market-create-market (market)="marketId = $event.id"></market-create-market>
 
   <h2>Create Party</h2>
-  <market-create-party id="ben" (createdId)="partyId = $event"></market-create-party>
+  <market-create-party id="ben" (party)="partyId = $event.id"></market-create-party>
+  <market-create-party id="alyssa"></market-create-party>
 
   <h2>Add Amount to Party</h2>
   <market-add-amount [partyId]="partyId"></market-add-amount>
@@ -25,8 +26,15 @@
   <h2>Update Good</h2>
   <market-update-good [id]="goodId"></market-update-good>
 
-  <h2>Goods</h2>
-  <market-show-all-goods></market-show-all-goods>
+  <h2>Show Good</h2>
+  <market-show-good [good]="{id: goodId}"></market-show-good>
+
+  <h2>My Goods</h2>
+  <!-- ben's goods -->
+  <market-show-goods [sellerId]="partyId"></market-show-goods>
+
+  <h2>Buy Goods</h2>
+  <market-show-goods [buyerId]="partyId"></market-show-goods>
 
   <h2>Compound Transactions</h2>
   <market-start-compound-transaction-button></market-start-compound-transaction-button>

@@ -60,7 +60,7 @@ export class CreateMarketComponent implements OnInit, OnRun, OnAfterCommit {
       }
     })
     .toPromise();
-    this.market.emit({id: res.data.createMarket.id});
+    this.market.emit({ id: res.data.createMarket.id });
   }
 
   dvOnAfterCommit() {

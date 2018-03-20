@@ -21,7 +21,7 @@ export interface Transaction {
   good: Good;
   buyer: Party;
   seller: Party;
-  price: number;
+  pricePerGood: number;
   quantity: number;
   market: Market;
   status: string;

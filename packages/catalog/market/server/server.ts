@@ -11,16 +11,14 @@ import * as _ from 'lodash';
 import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
-// Change
+
 enum TransactionStatus {
   Paid = 'PAID',
   Unpaid = 'UNPAID',
   Canceled = 'CANCELED'
 }
 
-interface MarketDoc {
-  id: string;
-}
+interface MarketDoc { id: string; }
 
 interface PartyDoc {
   id: string;
@@ -41,7 +39,7 @@ interface TransactionDoc {
   goodId: string;
   buyerId: string;
   sellerId?: string;
-  price: number;
+  pricePerGood: number;
   quantity: number;
   marketId: string;
   status: TransactionStatus;
@@ -53,12 +51,37 @@ interface CompoundTransactionDoc {
   totalPrice: number;
 }
 
-// interface CreateUnpaidTransactionInput {
+interface Market { id: string; }
+
+interface Party {
+  id: string;
+  balance: number;
+}
+
+interface Good {
+  id: string;
+  name: string;
+  price: number;
+  seller?: Party; // optional when buyer is looking for a seller from whom to buy this
+  supply: number;
+  market: Market;
+}
+
+interface Transaction {
+  id: string;
+  good: Good;
+  buyer: Party;
+  seller?: Party;
+  pricePerGood: number;
+  quantity: number;
+  market: Market;
+  status: TransactionStatus;
+}
+
+// interface CompoundTransaction {
 //   id: string;
-//   goodId: string;
-//   buyerId: string;
-//   quantity: number;
-//   price: number;
+//   transactions: Transaction[];
+//   totalPrice: number;
 // }
 
 // interface CreateAndAddUnpaidTransactionInput {
@@ -87,10 +110,27 @@ interface CreateGoodInput {
 
 interface UpdateGoodInput {
   id: string;
-  name: string;
-  price: number;
-  supply: number;
-  sellerId: string;
+  name: string | undefined;
+  price: number | undefined;
+  supply: number | undefined;
+  sellerId: string | undefined;
+}
+
+interface GoodsInput {
+  buyerId?: string;
+  sellerId?: string;
+  marketId?: string;
+  affordable?: boolean;
+  available?: boolean;
+}
+
+interface CreateTransactionInput {
+  id: string;
+  goodId: string;
+  buyerId: string;
+  quantity: number;
+  priceFraction: number;
+  paid: boolean;
 }
 
 interface Config {
@@ -126,7 +166,6 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-// Change
 let db, partys, goods, markets, transactions, compoundtransactions;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
@@ -144,7 +183,6 @@ mongodb.MongoClient.connect(
           `Initialized party set with ${config.initialPartyIds}`);
       }
     }
-    // Change
     partys = db.collection('partys');
     goods = db.collection('goods');
     markets = db.collection('markets');
@@ -160,7 +198,7 @@ class Validation {
     return Validation.exists(markets, marketId, 'Market');
   }
 
-  static async partyExists(id: string) {
+  static async partyExists(id: string): Promise<PartyDoc> {
     return Validation.exists(partys, id, 'Party');
   }
 
@@ -239,6 +277,28 @@ class Validation {
   }
 }
 
+function goodDocToGood(goodDoc: GoodDoc): Good {
+  const ret = _.omit(goodDoc, ['sellerId', 'marketId']);
+  if (goodDoc.sellerId) {
+    ret.seller = { id: goodDoc.sellerId };
+  }
+  ret.market = { id: goodDoc.marketId };
+
+  return ret;
+}
+
+function transactionDocToTransaction(transactionDoc: TransactionDoc): Transaction {
+  const ret = _.omit(transactionDoc, ['goodId', 'buyerId', 'sellerId', 'marketId']);
+  ret.good = { id: transactionDoc.goodId };
+  ret.buyer = { id: transactionDoc.buyerId };
+  if (transactionDoc.sellerId) {
+    ret.seller = { id: transactionDoc.sellerId };
+  }
+  ret.market = { id: transactionDoc.marketId };
+
+  return ret;
+}
+
 
 const resolvers = {
   Query: {
@@ -248,48 +308,40 @@ const resolvers = {
     // transactions: () => transactions.find().toArray(),
     // compoundtransactions: () => compoundtransactions.find().toArray(),
 
-    party: (_, { id }) => partys.findOne({ id: id }),
-    good: (_, { id }) => goods.findOne({ id: id }),
-    market: (_, { id }) => markets.findOne({ id: id }),
-    transaction: (_, { id }) => transactions.findOne({ id: id }),
+    party: (_root, { id }) => partys.findOne({ id: id }),
+    good: (_root, { id }) => goodDocToGood(goods.findOne({ id: id })),
+    market: (_root, { id }) => markets.findOne({ id: id }),
+    transaction: (_root, { id }) =>
+      transactionDocToTransaction(transactions.findOne({ id: id })),
     compoundtransaction: (id) => compoundtransactions.findOne({ id: id }),
 
-    affordableGoods: async (_, { marketId, buyerId }) => {
-      const buyer: PartyDoc = await partys
-        .findOne({ id: buyerId });
+    goods: async (_root, { input }: { input: GoodsInput }): Promise<Good> => {
+      const sellerIdFilterOp = _.omitBy({
+        $eq: input.sellerId,
+        $ne: input.buyerId
+      }, _.isUndefined);
+      const filterOp = _.omitBy({
+        marketId: input.marketId,
+        sellerId: sellerIdFilterOp
+      }, (val) => _.isUndefined(val) || _.isEmpty(val));
 
-      return goods.find({
-        marketId: marketId,
-        price: { $lte: buyer.balance }
-      })
-      .toArray();
-    },
-    unaffordableGoods: async (_, { marketId, buyerId }) => {
-      const buyer: PartyDoc = await partys
-        .findOne({ id: buyerId });
+      if (input.affordable !== undefined && input.buyerId) {
+        const buyer: PartyDoc = await Validation.partyExists(input.buyerId);
 
-      return goods.find({
-        marketId: marketId,
-        price: { $gt: buyer.balance }
-      })
-      .toArray();
+        filterOp['price'] = { $lte: buyer.balance }; 
+      }
+      if (input.available) {
+        filterOp['supply'] = { $gt: 0 };
+      }
+
+      const matchingGoods: GoodDoc[] = await goods.find(filterOp)
+        .toArray();
+      return _.map(matchingGoods, goodDocToGood);
     },
-    goodsInMarket: (_, { marketId }) => goods
-      .find({
-        marketId: marketId,
-        supply: { $gt: 0 }
-      })
-      .toArray(),
-    goodsFromSeller: (_, { marketId, sellerId }) => goods
-      .find({
-        marketId: marketId,
-        sellerId: sellerId
-      })
-      .toArray(),
-    marketTransactions: (_, { marketId }) => transactions
+    marketTransactions: (_root, { marketId }) => transactions
       .find({ marketId: marketId })
       .toArray(),
-    buyerTransactions: (_, { buyerId, marketId }) => transactions
+    buyerTransactions: (_root, { buyerId, marketId }) => transactions
       .find({
         buyerId: buyerId,
         marketId: marketId
@@ -301,28 +353,22 @@ const resolvers = {
     balance: (party: PartyDoc) => party.balance
   },
   Good: {
-    id: (good: GoodDoc) => good.id,
-    name: (good: GoodDoc) => good.name,
-    price: (good: GoodDoc) => good.price,
-    seller: (good: GoodDoc) => partys
-      .findOne({ id: good.sellerId }),
-    supply: (good: GoodDoc) => good.supply,
-    market: (good: GoodDoc) => markets
-      .findOne({ id: good.marketId })
+    id: (good: Good) => good.id,
+    name: (good: Good) => good.name,
+    price: (good: Good) => good.price,
+    seller: (good: Good) => good.seller,
+    supply: (good: Good) => good.supply,
+    market: (good: Good) => good.market
   },
   Transaction: {
-    id: (transaction: TransactionDoc) => transaction.id,
-    good: (transaction: TransactionDoc) => goods
-      .findOne({ id: transaction.goodId }),
-    buyer: (transaction: TransactionDoc) => partys
-      .findOne({ id: transaction.buyerId }),
-    seller: (transaction: TransactionDoc) => partys
-      .findOne({ id: transaction.sellerId }),
-    price: (transaction: TransactionDoc) => transaction.price,
-    quantity: (transaction: TransactionDoc) => transaction.quantity,
-    market: (transaction: TransactionDoc) => markets
-      .findOne({ id: transaction.marketId }),
-    status: (transaction: TransactionDoc) => transaction.status
+    id: (transaction: Transaction) => transaction.id,
+    good: (transaction: Transaction) => transaction.good,
+    buyer: (transaction: Transaction) => transaction.buyer,
+    seller: (transaction: Transaction) => transaction.seller,
+    pricePerGood: (transaction: Transaction) => transaction.pricePerGood,
+    quantity: (transaction: Transaction) => transaction.quantity,
+    market: (transaction: Transaction) => transaction.market,
+    status: (transaction: Transaction) => transaction.status
   },
   CompoundTransaction: {
     id: (compoundTransaction: CompoundTransactionDoc) => compoundTransaction.id,
@@ -356,7 +402,6 @@ const resolvers = {
       return true;
     },
     createGood: async (_root, {input}: {input: CreateGoodInput}) => {
-      console.log("create good");
       await Validation.marketExists(input.marketId);
       const good: GoodDoc = {
         id: input.id ? input.id : uuid(),
@@ -370,8 +415,7 @@ const resolvers = {
         good.sellerId = input.sellerId;
       }
       await goods.insertOne(good);
-      console.log(good);
-      return good;
+      return goodDocToGood(good);
     },
     updateGood: async (_root, {input}: {input: UpdateGoodInput}) => {
       await Validation.goodExists(input.id);
@@ -394,34 +438,41 @@ const resolvers = {
 
       return true;
     },
-//     buyGood: async (_root, {id, buyerId, quantity, fraction}) => {
-//       await Promise.all([
-//         Validation.partyExists(buyerId),
-//         Validation.goodPurchasable(id, quantity)
-//       ]);
-//       const good: GoodDoc = await Validation.goodHasSeller(id);
-//       const pricePerGood: number = good.price * fraction;
-//       const transaction: TransactionDoc = {
-//         id: uuid(),
-//         goodId: id,
-//         buyerId,
-//         quantity,
-//         price: pricePerGood,
-//         marketId: good.marketId,
-//         status: TransactionStatus.Paid
-//       };
-//       const goodUpdateOp = { $inc: { supply:  -quantity } };
-//       await Promise.all([
-//         transactions.insertOne(transaction),
-//         makePayment(good.sellerId!, buyerId, pricePerGood * quantity),
-//         goods.updateOne({ id: good.id }, goodUpdateOp)
-//       ]);
+    createTransaction: async (_root, {input}: {input: CreateTransactionInput}) => {
+      await Promise.all([
+        Validation.partyExists(input.buyerId),
+        Validation.goodPurchasable(input.goodId, input.quantity)
+      ]);
 
-//       return transaction;
-//     },
-//     createUnpaidTransaction: async (_root, {input}: {input: CreateUnpaidTransactionInput}) => {
-//       return createUnpaidTransaction(input);
-//     },
+      const good: GoodDoc = input.paid ? await Validation.goodHasSeller(input.goodId)
+        : await Validation.goodExists(input.goodId);
+      const pricePerGood = _.isNumber(input.priceFraction) ?
+        good.price * input.priceFraction : good.price;
+
+      const transaction: TransactionDoc = {
+        id: input.id ? input.id : uuid(),
+        goodId: input.goodId,
+        buyerId: input.buyerId,
+        quantity: input.quantity,
+        pricePerGood: pricePerGood,
+        marketId: good.marketId,
+        status: input.paid ? TransactionStatus.Paid : TransactionStatus.Unpaid
+      };
+      if (good.sellerId) {
+        transaction.sellerId = good.sellerId;
+      }
+      const goodUpdateOp = { $inc: { supply: -input.quantity }};
+      const opPromises = [
+        transactions.insertOne(transaction),
+        goods.updateOne({ id: input.goodId, }, goodUpdateOp)
+      ];
+      if (good.sellerId) {
+        opPromises.push(
+          makePayment(good.sellerId!, input.buyerId, pricePerGood * input.quantity));
+      }
+      await Promise.all(opPromises);
+      return transactionDocToTransaction(transaction);
+    },
 //     createUnpaidCompoundTransaction: async (_root,
 //       {id, transactions}: {id: string, transactions: CreateUnpaidTransactionInput[]}) => {
 //       const transactionDocs: TransactionDoc[] = await Promise.all<TransactionDoc>(
@@ -498,34 +549,6 @@ const resolvers = {
   }
 };
 
-// async function createUnpaidTransaction(
-//   input: CreateUnpaidTransactionInput): Promise<TransactionDoc> {
-//   await Promise.all([
-//     Validation.partyExists(input.buyerId),
-//     Validation.goodPurchasable(input.goodId, input.quantity)
-//   ]);
-//   const good: GoodDoc = await goods.findOne({ id: input.goodId });
-//   const transaction: TransactionDoc = {
-//     id: input.id ? input.id : uuid(),
-//     goodId: input.goodId,
-//     buyerId: input.buyerId,
-//     quantity: input.quantity,
-//     price: input.price ? input.price : good.price,
-//     marketId: good.marketId,
-//     status: TransactionStatus.Unpaid
-//   };
-//   if (good.sellerId) {
-//     transaction.sellerId = good.sellerId;
-//   }
-//   const updateOp = { $inc: { supply: -input.quantity }};
-//   await Promise.all([
-//     transactions.insertOne(transaction),
-//     goods.updateOne({ id: input.goodId, }, updateOp)
-//   ]);
-
-//   return transaction;
-// }
-
 // async function cancelUnpaidTransaction(id: string) {
 //   const transaction: TransactionDoc = await Validation.transactionHasStatus(
 //     id, TransactionStatus.Unpaid);
@@ -538,15 +561,15 @@ const resolvers = {
 //   ]);
 // }
 
-// async function makePayment(sellerId: string, buyerId: string, price: number) {
-//   const buyerUpdateOp = { $inc: { balance: -price } };
-//   const sellerUpdateOp = { $inc: { balance: price } };
-//   // NOTE: allows negative balance
-//   await Promise.all([
-//     partys.updateOne({ id: buyerId }, buyerUpdateOp),
-//     partys.updateOne({ id: sellerId }, sellerUpdateOp)
-//   ]);
-// }
+async function makePayment(sellerId: string, buyerId: string, price: number) {
+  const buyerUpdateOp = { $inc: { balance: -price } };
+  const sellerUpdateOp = { $inc: { balance: price } };
+  // NOTE: allows negative balance
+  await Promise.all([
+    partys.updateOne({ id: buyerId }, buyerUpdateOp),
+    partys.updateOne({ id: sellerId }, sellerUpdateOp)
+  ]);
+}
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 

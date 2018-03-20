@@ -10,9 +10,6 @@ import { DvModule } from 'dv-core';
 
 import { AddAmountComponent } from './add-amount/add-amount.component';
 import { AddTransactionButtonComponent } from './add-transaction-button/add-transaction-button.component';
-import { BuyGoodButtonComponent } from './buy-good-button/buy-good-button.component';
-import { BuyGoodFractionComponent } from './buy-good-fraction/buy-good-fraction.component';
-import { BuyGoodQuantityComponent } from './buy-good-quantity/buy-good-quantity.component';
 import { CancelCompoundTransactionButtonComponent } from './cancel-compound-transaction-button/cancel-compound-transaction-button.component';
 import { CreateBalanceComponent } from './create-balance/create-balance.component';
 import { CreateCompoundTransactionButtonComponent } from './create-compound-transaction-button/create-compound-transaction-button.component';
@@ -22,6 +19,7 @@ import { CreateGoodPriceComponent } from './create-good-price/create-good-price.
 import { CreateGoodSupplyComponent } from './create-good-supply/create-good-supply.component';
 import { CreateMarketComponent } from './create-market/create-market.component';
 import { CreatePartyComponent } from './create-party/create-party.component';
+import { CreateTransactionComponent } from './create-transaction/create-transaction.component';
 import { EditCompoundTransactionSellerComponent } from './edit-compound-transaction-seller/edit-compound-transaction-seller.component';
 import { CreateGoodSellerComponent } from './create-good-seller/create-good-seller.component';
 import { PayForCompoundTransactionButtonComponent } from './pay-for-compound-transaction-button/pay-for-compound-transaction-button.component';
@@ -31,6 +29,7 @@ import { ShowAllTransactionsComponent } from './show-all-transactions/show-all-t
 import { ShowBalanceComponent } from './show-balance/show-balance.component';
 import { ShowCompoundTransactionComponent } from './show-compound-transaction/show-compound-transaction.component';
 import { ShowGoodComponent } from './show-good/show-good.component';
+import { ShowGoodsComponent } from './show-goods/show-goods.component';
 import { ShowMyGoodsForSaleComponent } from './show-my-goods-for-sale/show-my-goods-for-sale.component';
 import { ShowMyPurchasesComponent } from './show-my-purchases/show-my-purchases.component';
 import { ShowTransactionComponent } from './show-transaction/show-transaction.component';
@@ -39,15 +38,16 @@ import { StartCompoundTransactionButtonComponent } from './start-compound-transa
 import { UpdateGoodComponent } from './update-good/update-good.component';
 
 const allComponenents = [
-  AddAmountComponent, AddTransactionButtonComponent, BuyGoodButtonComponent,
-  BuyGoodFractionComponent, BuyGoodQuantityComponent, CancelCompoundTransactionButtonComponent,
+  AddAmountComponent, AddTransactionButtonComponent, 
+  CancelCompoundTransactionButtonComponent,
   CreateCompoundTransactionButtonComponent, CreateBalanceComponent, 
   CreateGoodComponent, CreateGoodNameComponent, CreateGoodPriceComponent,
   CreateGoodSellerComponent, CreateGoodSupplyComponent, CreateMarketComponent,
-  CreatePartyComponent, EditCompoundTransactionSellerComponent,
-  PayForCompoundTransactionButtonComponent, ShowAffordableGoodsComponent, ShowAllGoodsComponent,
+  CreatePartyComponent, CreateTransactionComponent,
+  EditCompoundTransactionSellerComponent, PayForCompoundTransactionButtonComponent,
+  ShowAffordableGoodsComponent, ShowAllGoodsComponent,
   ShowAllTransactionsComponent, ShowBalanceComponent, ShowCompoundTransactionComponent,
-  ShowGoodComponent, ShowMyGoodsForSaleComponent, ShowMyPurchasesComponent,
+  ShowGoodComponent, ShowGoodsComponent, ShowMyGoodsForSaleComponent, ShowMyPurchasesComponent,
   ShowTransactionComponent, ShowUnaffordableGoodsComponent, StartCompoundTransactionButtonComponent,
   UpdateGoodComponent,
 ];

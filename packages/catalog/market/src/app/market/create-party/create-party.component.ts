@@ -23,7 +23,7 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class CreatePartyComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id;
-  @Output() createdId: EventEmitter<string> = new EventEmitter<string>();
+  @Output() party = new EventEmitter;
 
   // Presentation inputs
   @Input() buttonLabel = 'Create Party';
@@ -71,7 +71,7 @@ export class CreatePartyComponent implements
     })
     .toPromise();
 
-    this.createdId.emit(res.data.createParty.id);
+    this.party.emit({ id: res.data.createParty.id });
   }
 
   dvOnAfterCommit() {

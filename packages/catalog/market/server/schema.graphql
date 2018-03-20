@@ -27,7 +27,7 @@ type Transaction {
   good: Good
   buyer: Party
   seller: Party
-  price: Float
+  pricePerGood: Float
   quantity: Float
   market: Market
   status: TRANSACTION_STATUS
@@ -37,19 +37,6 @@ type CompoundTransaction {
   id: ID!
   transactions: [Transaction]
   totalPrice: Float
-}
-
-type CreateUnpaidTransactionInput {
-  id: String
-  goodId: String
-  buyerId: String
-  quantity: Float
-  price: Float
-}
-
-type CreateAndAddUnpaidTransactionInput {
-  compopundTransactionId: String
-  createTransactionInput: CreateUnpaidTransactionInput
 }
 
 input CreatePartyInput {
@@ -79,16 +66,31 @@ input UpdateGoodInput {
   sellerId: String
 }
 
+input GoodsInput {
+  buyerId: ID
+  sellerId: ID
+  marketId: ID
+  affordable: Boolean,
+  available: Boolean
+}
+
+input CreateTransactionInput {
+  id: ID
+  goodId: ID
+  buyerId: ID
+  quantity: Float
+  priceFraction: Float
+  paid: Boolean
+}
+
 type Query {
   party(id: ID!): Party
   good(id: ID!): Good
   market(id: ID!): Market
   transaction(id: ID!): Transaction
   compoundtransaction(id: ID!): CompoundTransaction
-  affordableGoods(marketId: ID!, buyerId: ID!): [Good]
-  unaffordableGoods(marketId: ID!, buyerId: ID!): [Good]
-  goodsInMarket(marketId: ID!): [Good]
-  goodsFromSeller(marketId: ID!, sellerId: ID!): [Good]
+
+  goods(input: GoodsInput!): [Good]
   marketTransactions(marketId: ID!): [Transaction]
   buyerTransactions(buyerId: ID!, marketId: ID!): [Transaction]
 }
@@ -99,4 +101,5 @@ type Mutation {
   addAmount(input: AddAmountInput!): Boolean
   createGood(input: CreateGoodInput!): Good
   updateGood(input: UpdateGoodInput!): Boolean
+  createTransaction(input: CreateTransactionInput!): Transaction
 }
