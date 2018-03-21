@@ -1,7 +1,7 @@
 <ul *ngIf="goods && goods.length > 0" class="list-group">
   <li *ngFor="let good of goods" class="list-group-item">
     <dv-include [action]="showGood" [inputs]="{
-        good: good, showId: showId, showName: showName, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
+        good: good, showId: showId, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
       }"
       [parent]="showGoods">
     </dv-include>

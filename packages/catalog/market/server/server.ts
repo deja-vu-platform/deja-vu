@@ -27,7 +27,6 @@ interface PartyDoc {
 
 interface GoodDoc {
   id: string;
-  name: string;
   price: number;
   sellerId?: string; // optional when buyer is looking for a seller from whom to buy this
   supply: number;
@@ -61,7 +60,6 @@ interface Party {
 
 interface Good {
   id: string;
-  name: string;
   price: number;
   seller?: Party; // optional when buyer is looking for a seller from whom to buy this
   supply: number;
@@ -98,7 +96,6 @@ interface AddAmountInput {
 
 interface CreateGoodInput {
   id: string;
-  name: string;
   price: number;
   supply: number;
   sellerId: string;
@@ -107,7 +104,6 @@ interface CreateGoodInput {
 
 interface UpdateGoodInput {
   id: string;
-  name: string | undefined;
   price: number | undefined;
   supply: number | undefined;
   sellerId: string | undefined;
@@ -362,7 +358,6 @@ const resolvers = {
   },
   Good: {
     id: (good: Good) => good.id,
-    name: (good: Good) => good.name,
     price: (good: Good) => good.price,
     seller: (good: Good) => good.seller,
     supply: (good: Good) => good.supply,
@@ -414,7 +409,6 @@ const resolvers = {
       await Validation.marketExists(input.marketId);
       const good: GoodDoc = {
         id: input.id ? input.id : uuid(),
-        name: input.name,
         price: input.price,
         supply: input.supply,
         marketId: input.marketId
@@ -429,9 +423,6 @@ const resolvers = {
     updateGood: async (_root, {input}: {input: UpdateGoodInput}) => {
       await Validation.goodExists(input.id);
       const updatedGood = {};
-      if (name) {
-        updatedGood[name] = name;
-      }
       if (input.price || input.price === 0) {
         updatedGood[input.price] = input.price;
       }

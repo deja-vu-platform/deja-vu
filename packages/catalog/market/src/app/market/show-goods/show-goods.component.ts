@@ -20,7 +20,6 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   @Input() sellerId: string | undefined;
   @Input() marketId: string | undefined;
   // could work in conjunction with a search feature next time:
-  // @Input() name: string | undefined;
   // @Input() lessThanEqPrice: number | undefined;
 
   @Input() affordable: boolean | undefined; // only valid when buyerId is set
@@ -30,7 +29,6 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   /* What fields of the good to show. These are passed as input
     to showGood` */
   @Input() showId = true;
-  @Input() showName = true;
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
@@ -75,7 +73,6 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
               query Goods($input: GoodsInput!) {
                 goods(input: $input) {
                   ${this.showId ? 'id' : ''}
-                  ${this.showName ? 'name' : ''}
                   ${this.showPrice ? 'price' : ''}
                   ${this.showSupply ? 'supply' : ''}
                   ${this.showSeller ? 'seller { id }' : ''}

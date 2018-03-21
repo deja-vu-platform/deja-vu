@@ -30,7 +30,6 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
   @Input() showStatus = true;
   // For showGood in showTransaction
   @Input() showGoodId = true;
-  @Input() showName = true;
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;

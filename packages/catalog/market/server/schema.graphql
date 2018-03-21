@@ -15,7 +15,6 @@ type Party {
 
 type Good {
   id: ID!
-  name: String
   price: Float
   seller: Party
   supply: Float
@@ -52,7 +51,6 @@ input AddAmountInput {
 
 input CreateGoodInput {
   id: ID
-  name: String
   price: Float
   supply: Float
   sellerId: String
@@ -61,7 +59,6 @@ input CreateGoodInput {
 
 input UpdateGoodInput {
   id: ID
-  name: String
   price: Float
   supply: Float
   sellerId: String

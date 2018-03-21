@@ -23,9 +23,6 @@ import {
 } from './create-compound-transaction/create-compound-transaction.component';
 import { CreateGoodComponent } from './create-good/create-good.component';
 import {
-  CreateGoodNameComponent
-} from './create-good-name/create-good-name.component';
-import {
   CreateGoodPriceComponent
 } from './create-good-price/create-good-price.component';
 import {
@@ -62,9 +59,9 @@ import { UpdateGoodComponent } from './update-good/update-good.component';
 const allComponenents = [
   AddAmountComponent, CancelCompoundTransactionComponent,
   CancelTransactionComponent, CreateCompoundTransactionComponent,
-  CreateBalanceComponent, CreateGoodComponent, CreateGoodNameComponent,
-  CreateGoodPriceComponent, CreateGoodSellerComponent, CreateGoodSupplyComponent,
-  CreateMarketComponent, CreatePartyComponent, CreateTransactionComponent,
+  CreateBalanceComponent, CreateGoodComponent, CreateGoodPriceComponent,
+  CreateGoodSellerComponent, CreateGoodSupplyComponent, CreateMarketComponent,
+  CreatePartyComponent, CreateTransactionComponent,
   PayCompoundTransactionComponent, PayTransactionComponent,
   ShowCompoundTransactionComponent, ShowGoodComponent, ShowGoodsComponent,
   ShowPartyComponent, ShowTransactionComponent, ShowTransactionsComponent,

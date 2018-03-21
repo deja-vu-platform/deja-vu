@@ -14,13 +14,11 @@ export class ShowGoodComponent {
   @Input() good: Good;
 
   @Input() showId = true;
-  @Input() showName = true;
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
   @Input() showMarket = true;
 
-  @Input() noNameText = 'No name';
   @Input() noPriceText = 'No price';
   @Input() noSupplyText = 'No supply';
   @Input() noSellerText = 'No seller';
@@ -52,7 +50,6 @@ export class ShowGoodComponent {
           query {
             good(id: "${this.good.id}") {
               ${this.showId ? 'id' : ''}
-              ${this.showName ? 'name' : ''}
               ${this.showPrice ? 'price' : ''}
               ${this.showSupply ? 'supply' : ''}
               ${this.showSeller ? 'seller { id }' : ''}

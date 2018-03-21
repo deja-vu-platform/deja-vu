@@ -1,7 +1,7 @@
 <ul *ngIf="transactions && transactions.length > 0" class="list-group">
   <li *ngFor="let transaction of transactions" class="list-group-item">
     <dv-include [action]="showTransaction" [inputs]="{
-        transaction: transaction, showId: showTransactionId, showSummary: showSummary, showGoodDetails: showGoodDetails, showStatus: showStatus, showGoodId: showGoodId, showName: showName, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
+        transaction: transaction, showId: showTransactionId, showSummary: showSummary, showGoodDetails: showGoodDetails, showStatus: showStatus, showGoodId: showGoodId, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
       }"
       [parent]="showTransactions">
     </dv-include>

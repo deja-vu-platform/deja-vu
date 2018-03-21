@@ -22,7 +22,6 @@ export class ShowTransactionComponent {
 
   // For showGood if showGoodDetails is true
   @Input() showGoodId = true;
-  @Input() showName = true;
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
@@ -68,12 +67,7 @@ export class ShowTransactionComponent {
                 'pricePerGood\n' +
                 'quantity' : ''
               }
-              ${this.showSummary || this.showGoodDetails ?
-                'good {' +
-                  'id\n' +
-                  'name\n' +
-                '}' : ''
-              }
+              ${this.showSummary || this.showGoodDetails ? 'good { id }' : ''}
               ${this.showStatus ? 'status' : ''}
             }
           }

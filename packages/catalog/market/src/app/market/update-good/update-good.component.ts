@@ -30,9 +30,6 @@ export class UpdateGoodComponent implements
   @Input() showSellerId: boolean = true;
 
   // optional input values to override form input values
-  @Input() set name(name: string) {
-    this.nameControl.setValue(name);
-  }
   @Input() set price(price: number) {
     this.priceControl.setValue(price);
   }
@@ -49,12 +46,10 @@ export class UpdateGoodComponent implements
 
   @ViewChild(FormGroupDirective) form;
 
-  nameControl = new FormControl();
   priceControl = new FormControl();
   supplyControl = new FormControl();
   sellerIdControl = new FormControl();
   updateGoodForm: FormGroup = this.builder.group({
-    nameControl: this.nameControl,
     priceControl: this.priceControl,
     supplyControl: this.supplyControl,
     sellerIdControl: this.sellerIdControl
@@ -93,7 +88,6 @@ export class UpdateGoodComponent implements
           query {
             good(id: "${this.id}") {
               id
-              name
               price
               supply
               seller { id }
@@ -104,7 +98,6 @@ export class UpdateGoodComponent implements
     })
     .pipe(map((res) => res.data.good))
     .subscribe((good: Good) => {
-      this.nameControl.setValue(good.name);
       this.priceControl.setValue(good.price);
       this.supplyControl.setValue(good.supply);
       if (good.seller) {
@@ -125,7 +118,6 @@ export class UpdateGoodComponent implements
       variables: {
         input: {
           id: this.id,
-          name: this.nameControl.value,
           price: this.priceControl.value,
           sellerId: this.sellerIdControl.value,
           supply: this.supplyControl.value

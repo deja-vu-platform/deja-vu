@@ -15,7 +15,6 @@ export interface Party {
 
 export interface Good {
   id: string;
-  name: string;
   seller: Party;
   price: number;
   supply: number;

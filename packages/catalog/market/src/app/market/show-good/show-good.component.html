@@ -2,13 +2,6 @@
   {{good.id}}
 </div>
 
-<div *ngIf="showName && good.name">
-  {{good.name}}
-</div>
-<div *ngIf="showName && !good.name">
-  {{noNameText}}
-</div>
-
 <div *ngIf="showPrice && (good.price || good.price === 0)">
   {{good.price}}
 </div>

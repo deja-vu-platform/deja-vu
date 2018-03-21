@@ -36,9 +36,6 @@ export class CreateGoodComponent implements
   private _marketId: string = '';
 
   // optional input values to override form control values
-  @Input() set name(name: string) {
-    this.nameControl.setValue(name);
-  }
   @Input() set price(price: number) {
     this.priceControl.setValue(price);
   }
@@ -55,12 +52,10 @@ export class CreateGoodComponent implements
 
   @ViewChild(FormGroupDirective) form;
 
-  nameControl = new FormControl();
   priceControl = new FormControl();
   supplyControl = new FormControl();
   sellerIdControl = new FormControl();
   createGoodForm: FormGroup = this.builder.group({
-    nameControl: this.nameControl,
     priceControl: this.priceControl,
     supplyControl: this.supplyControl,
     sellerIdControl: this.sellerIdControl
@@ -105,7 +100,6 @@ export class CreateGoodComponent implements
       variables: {
         input: {
           id: this.id,
-          name: this.nameControl.value,
           price: this.priceControl.value,
           sellerId: this.sellerIdControl.value,
           supply: this.supplyControl.value,
