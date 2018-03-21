@@ -15,4 +15,4 @@ import { SignOutWithRedirectComponent } from './sign-out-with-redirect/sign-out-
   ],
   declarations: [ChangePasswordComponent, LoggedInComponent, RegisterComponent, RegisterWithRedirectComponent, SignInComponent, SignInWithRedirectComponent, SignOutComponent, SignOutWithRedirectComponent]
 })
-export class authenticationModule { }
+export class AuthenticationModule { }
