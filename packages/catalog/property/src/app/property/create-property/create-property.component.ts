@@ -73,6 +73,12 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
     }
   }
 
+  /**
+   * Get the JSON Schema object corresponding to the property being created.
+   *
+   * This is used for initializing the property form control with the required
+   * validators.
+   */
   loadSchema() {
     if (!this.gs || !this.name) {
       return;
