@@ -1,0 +1,15 @@
+<mat-form-field *ngIf="propertyControl">
+  <mat-label>{{name | camelToTitleCase}}</mat-label>
+  <input matInput [formControl]="propertyControl">
+  <mat-error *ngIf="propertyControl.hasError('required')">
+    {{name | camelToTitleCase}} is <strong>required</strong>
+  </mat-error>
+  <mat-error *ngIf="propertyControl.hasError('schema')">
+    <ul *ngIf="schemaErrors.length > 1">
+      <li *ngFor="let error of schemaErrors">{{error}}</li>
+    </ul>
+    <span *ngIf="schemaErrors.length == 1">
+      {{name | camelToTitleCase}} {{schemaErrors[0]}}
+    </span>
+  </mat-error>
+</mat-form-field>

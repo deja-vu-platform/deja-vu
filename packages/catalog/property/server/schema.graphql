@@ -1,0 +1,18 @@
+type Property {
+  name: String!
+  # The JSON Schema object for this property only (for partial validation)
+  # It can be passed directly to the ajv validate function
+  # (after JSON.parse)
+  schema: String!
+  required: Boolean!
+}
+
+type Query {
+  property(name: String): Property 
+  object(id: ID!): Object 
+  properties: [Property] 
+}
+
+type Mutation {
+  createObject(input: CreateObjectInput!): Object 
+}
