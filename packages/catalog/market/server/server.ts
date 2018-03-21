@@ -182,10 +182,15 @@ mongodb.MongoClient.connect(
       console.log(`Reinitialized db ${config.dbName}`);
     }
     partys = db.collection('partys');
+    partys.createIndex({ id: 1 }, { unique: true, sparse: true });
     goods = db.collection('goods');
+    goods.createIndex({ id: 1 }, { unique: true, sparse: true });
     markets = db.collection('markets');
+    markets.createIndex({ id: 1 }, { unique: true, sparse: true });
     transactions = db.collection('transactions');
+    transactions.createIndex({ id: 1 }, { unique: true, sparse: true });
     compoundtransactions = db.collection('compoundtransactions');
+    compoundtransactions.createIndex({ id: 1 }, { unique: true, sparse: true });
   });
 
 
