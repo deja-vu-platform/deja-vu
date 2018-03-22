@@ -1,0 +1,32 @@
+type User {
+  id: ID!         # username is ID
+  password: String!
+}
+
+input RegisterUserInput {
+  id: ID!
+  password: String!
+}
+
+input SignInUserInput {
+  id: ID!
+  password: String!
+}
+
+input ChangePasswordInput {
+  id: ID!
+  oldPassword: String!
+  newPassword: String!
+}
+
+type Query {
+  user(id: ID!): User
+  users: [User]!
+}
+
+type Mutation {
+  createUser(id: ID!): User
+  registerUser(input: RegisterUserInput!): User
+  signInUser(input: SignInUserInput!): String          # JSON.stringify
+  changePassword(input: ChangePasswordInput!): Boolean
+}
