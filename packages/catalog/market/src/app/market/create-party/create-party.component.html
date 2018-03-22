@@ -1,0 +1,23 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createPartyForm"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="newPartySaved">
+      <i class="material-icons">done</i>
+        {{newPartySavedText}}
+    </div>
+    <mat-error *ngIf="newPartyError">
+      <i class="material-icons">report_problem</i>
+      {{newPartyError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <market-create-balance formControlName="balance">
+    </market-create-balance>
+  </div>
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!createPartyForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

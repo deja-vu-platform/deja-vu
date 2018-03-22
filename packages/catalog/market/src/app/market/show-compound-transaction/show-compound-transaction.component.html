@@ -1,0 +1,43 @@
+<div class="container">
+  <div *ngIf="showId && compoundTransaction">
+    <span>{{compoundTransaction.id}}</span>
+  </div>
+
+  <div *ngIf="compoundTransaction && compoundTransaction.transactions && compoundTransaction.transactions.length > 0">
+
+    <ul *ngIf="showTransactions" class="list-group">
+      <li *ngFor="let transaction of compoundTransaction.transactions" class="list-group-item">
+        <dv-include [action]="showTransaction" [inputs]="{
+            transaction: transaction, showId: showTransactionId, showSummary: showSummary, showGoodDetails: showGoodDetails, showStatus: showTransactionStatus, showGoodId: showGoodId, showName: showName, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
+          }"
+          [parent]="showCompoundTransaction">
+        </dv-include>
+      </li>
+    </ul>
+
+    <div *ngIf="showTotalPrice && compoundTransaction.totalPrice">
+      <span>Total: {{compoundTransaction.totalPrice}}</span>
+    </div>
+
+    <div *ngIf="showStatus && compoundTransaction.status">
+      <span>Status: {{compoundTransaction.status}}</span>
+    </div>
+
+    <div *ngIf="compoundTransaction.status !== 'Paid'">
+      <div *ngIf="showOptionToPay && compoundTransaction.id">
+        <market-pay-compound-transaction [id]="compoundTransaction.id">
+        </market-pay-compound-transaction>
+      </div>
+
+      <div *ngIf="showOptionToCancel && compoundTransaction.id">
+        <market-cancel-compound-transaction [id]="compoundTransaction.id">
+        </market-cancel-compound-transaction>
+      </div>
+    </div>
+
+  </div>
+
+  <div *ngIf="!compoundTransaction || !compoundTransaction.transactions || compoundTransaction.transactions.length === 0">
+    No transactions to show
+  </div>
+</div>

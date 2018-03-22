@@ -1,0 +1,28 @@
+<div class="container">
+  <div *ngIf="showId">
+    {{transaction.id}}
+  </div>
+
+  <div *ngIf="showSummary && transaction.good && transaction.good.id">
+    <span>
+      x{{transaction.quantity}} {{transaction.good.id}} @{{transaction.pricePerGood}}
+    </span>
+  </div>
+  <div *ngIf="showGoodDetails && transaction.good && transaction.good.id">
+    <dv-include [action]="showGood" [inputs]="{
+        good: transaction.good, showId: showGoodId, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
+      }"
+      [parent]="showTransaction">
+    </dv-include>
+  </div>
+  <div *ngIf="(showSummary || showGoodDetails) && !transaction.good">
+    {{noGoodText}}
+  </div>
+
+  <div *ngIf="showStatus && transaction.status">
+    <span>{{transaction.status}}</span>
+  </div>
+  <div *ngIf="showStatus && !transaction.status">
+    <span>{{noStatusText}}</span>
+  </div>
+</div>

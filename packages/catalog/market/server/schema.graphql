@@ -1,0 +1,115 @@
+enum TRANSACTION_STATUS {
+  Paid
+  Unpaid
+  Canceled
+}
+
+type Market {
+  id: ID!
+}
+
+type Party {
+  id: ID!
+  balance: Float
+}
+
+type Good {
+  id: ID!
+  price: Float
+  seller: Party
+  supply: Float
+  market: Market
+}
+
+type Transaction {
+  id: ID!
+  good: Good
+  buyer: Party
+  seller: Party
+  pricePerGood: Float
+  quantity: Float
+  market: Market
+  status: TRANSACTION_STATUS
+}
+
+type CompoundTransaction {
+  id: ID!
+  transactions: [Transaction]
+  totalPrice: Float
+  status: TRANSACTION_STATUS
+}
+
+input CreatePartyInput {
+  id: ID
+  balance: Float
+}
+
+input AddAmountInput {
+  partyId: ID
+  amount: Float
+}
+
+input CreateGoodInput {
+  id: ID
+  price: Float
+  supply: Float
+  sellerId: String
+  marketId: String
+}
+
+input UpdateGoodInput {
+  id: ID
+  price: Float
+  supply: Float
+  sellerId: String
+}
+
+input GoodsInput {
+  buyerId: ID
+  sellerId: ID
+  marketId: ID
+  affordable: Boolean,
+  available: Boolean
+}
+
+input CreateTransactionInput {
+  id: ID
+  compoundTransactionId: ID
+  goodId: ID
+  buyerId: ID
+  quantity: Float
+  priceFraction: Float
+  paid: Boolean
+}
+
+input TransactionsInput {
+  buyerId: ID
+  sellerId: ID
+  marketId: ID
+  status: TRANSACTION_STATUS
+}
+
+type Query {
+  party(id: ID!): Party
+  good(id: ID!): Good
+  market(id: ID!): Market
+  transaction(id: ID!): Transaction
+  compoundTransaction(id: ID!): CompoundTransaction
+
+  goods(input: GoodsInput!): [Good]
+  transactions(input: TransactionsInput!): [Transaction]
+}
+
+type Mutation {
+  createMarket(id: ID!): Market
+  createParty(input: CreatePartyInput!): Party
+  addAmount(input: AddAmountInput!): Boolean
+  createGood(input: CreateGoodInput!): Good
+  updateGood(input: UpdateGoodInput!): Boolean
+  createTransaction(input: CreateTransactionInput!): Transaction
+  payTransaction(id: ID!): Boolean
+  cancelTransaction(id: ID!): Boolean
+  createCompoundTransaction(id: ID!): CompoundTransaction
+  payCompoundTransaction(id: ID!): Boolean
+  cancelCompoundTransaction(id: ID!): Boolean
+}

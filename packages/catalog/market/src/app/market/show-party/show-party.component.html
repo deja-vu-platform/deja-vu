@@ -1,0 +1,12 @@
+<div *ngIf="party">
+  <div *ngIf="showId">
+    {{party.id}}
+  </div>
+
+  <div *ngIf="showBalance && party.balance">
+    Balance: {{party.balance}}
+  </div>
+  <div *ngIf="showBalance && !party.balance">
+    {{noBalanceText}}
+  </div>
+</div>

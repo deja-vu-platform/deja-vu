@@ -1,0 +1,31 @@
+<div *ngIf="showId">
+  {{good.id}}
+</div>
+
+<div *ngIf="showPrice && (good.price || good.price === 0)">
+  {{good.price}}
+</div>
+<div *ngIf="showPrice && !(good.price || good.price === 0)">
+  {{noPriceText}}
+</div>
+
+<div *ngIf="showSupply && (good.supply || good.supply === 0)">
+  {{good.supply}}
+</div>
+<div *ngIf="showSupply && !(good.supply || good.supply === 0)">
+  {{noSupplyText}}
+</div>
+
+<div *ngIf="showSeller && good.seller">
+  {{good.seller.id}}
+</div>
+<div *ngIf="showSeller && !good.seller">
+  {{noSellerText}}
+</div>
+
+<div *ngIf="showMarket && good.market">
+  {{good.market.id}}
+</div>
+<div *ngIf="showMarket && !good.market">
+  {{noMarketText}}
+</div>
