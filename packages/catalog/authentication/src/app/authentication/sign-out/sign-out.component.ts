@@ -16,7 +16,7 @@ import * as _ from 'lodash';
 export class SignOutComponent implements OnInit, OnRun {
   // TODO: Specify id to logout -> useful for guest functionality
 
-  @Input() href: string;
+  // @Input() href: string;
   @Input() buttonLabel = 'Sign Out';
 
   private gs: GatewayService;

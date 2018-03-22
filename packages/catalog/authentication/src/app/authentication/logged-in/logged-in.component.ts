@@ -8,7 +8,8 @@ import { OnAfterAbort, OnAfterCommit, OnRun, RunService
 import { User } from '../shared/authentication.model';
 
 @Component({
-  selector: 'authentication-logged-in'
+  selector: 'authentication-logged-in',
+  template: ''
 })
 export class LoggedInComponent implements OnInit, AfterViewInit {
   @Output() user = new EventEmitter();

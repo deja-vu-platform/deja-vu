@@ -22,9 +22,10 @@ export class SignInComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string;
   @Input() password: string;
-  @Input() href: string;
+  // @Input() href: string;
   @Input() inputLabel = 'Username';
   @Input() passwordLabel = 'Password';
+  @Input() buttonLabel = 'Sign In';
   @Input() newUserSignedInText = 'User signed in';
 
   @Output() user = new EventEmitter();

@@ -22,9 +22,10 @@ export class RegisterUserComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string;
   @Input() password: string;
-  @Input() href: string; // To log in page
+  // @Input() href: string; // To log in page
   @Input() inputLabel = 'Username';
   @Input() passwordLabel = 'Password';
+  @Input() buttonLabel = 'Register User';
   @Input() newUserRegisteredText = 'New user registered';
 
   @Output() user = new EventEmitter();
