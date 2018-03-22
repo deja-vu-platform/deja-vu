@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter,
-  Input, OnInit
+  Input, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
@@ -15,23 +15,23 @@ const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
   // tslint:disable-next-line:component-selector
-  selector: 'authentication-change-password',
-  templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.css']
+  selector: 'authentication-register-user',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
 })
-export class ChangePasswordComponent implements
+export class RegisterUserComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string;
-  @Input() oldPassword: string;
-  @Input() newPassword: string;
+  @Input() password: string;
+  @Input() href: string; // To log in page
   @Input() inputLabel = 'Username';
-  @Input() oldPasswordLabel = 'Old Password';
-  @Input() newPasswordLabel = 'New Password';
-  @Input() buttonLabel = 'Change Password';
-  @Input() newPasswordSavedText = 'Password changed';
+  @Input() passwordLabel = 'Password';
+  @Input() newUserRegisteredText = 'New user registered';
 
-  newPasswordSaved = false;
-  newPasswordSavedError: string;
+  @Output() user = new EventEmitter();
+
+  newUserRegistered = false;
+  newUserRegisteredError: string;
 
   private gs: GatewayService;
 
@@ -50,28 +50,30 @@ export class ChangePasswordComponent implements
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs.post<{ data: any }>('/graphql', {
-      query: `mutation ChangePassword($input: ChangePasswordInput!) {
-        changePassword(input: $input)
+      query: `mutation RegisterUser($input: RegisterUserInput!) {
+        registerUser(input: $input) {
+          id
+        }
       }`, variables: {
         input: {
           id: this.id,
-          oldPassword: this.oldPassword,
-          newPassword: this.newPassword
+          password: this.password
         }
       }
     })
       .toPromise();
+    this.user.emit({ id: res.data.registerUser.id });
   }
 
   dvOnAfterCommit() {
-    this.newPasswordSaved = true;
+    this.newUserRegistered = true;
     window.setTimeout(() => {
-      this.newPasswordSaved = false;
+      this.newUserRegistered = false;
     }, SAVED_MSG_TIMEOUT);
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.newPasswordSavedError = reason.message;
+    this.newUserRegisteredError = reason.message;
   }
 
 }

@@ -1,31 +1,31 @@
 <form (ngSumbit)="onSubmit()" class="form-horizontal">
 
-  <div class="form-group sign-in-form-group">
-    <div *ngIf="newUserSignedIn" class="sign-in-user-success">
+  <div class="form-group register-form-group">
+    <div *ngIf="newUserRegistered" class="register-user-success">
       <i class="material-icons">done</i>
-      {{newUserSignedInText}}
+      {{newUserRegisteredText}}
     </div>
-    <mat-error *ngIf="newUserSignedInError">
+    <mat-error *ngIf="newUserRegisteredError">
       <i class="material-icons">report_problem</i>
-      {{newUserSignedInError}}
+      {{newUserRegisteredError}}
     </mat-error>
   </div>
 
-  <div class="form-group sign-in-form-group">
+  <div class="form-group register-form-group">
     <mat-form-field>
       <mat-label>{{inputLabel}}</mat-label>
       <input matInput [(ngModel)]="id" name="id">
     </mat-form-field>
   </div>
 
-  <div class="form-group sign-in-form-group">
+  <div class="form-group register-form-group">
     <mat-form-field>
       <mat-label>{{passwordLabel}}</mat-label>
       <input matInput [(ngModel)]="password" name="password" type="password">
     </mat-form-field>
   </div>
 
-  <div class="form-group sign-in-form-group">
+  <div class="form-group register-form-group">
     <button mat-button type="submit">{{buttonLabel}}</button>
   </div>
 

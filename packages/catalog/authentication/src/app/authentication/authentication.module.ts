@@ -1,18 +1,37 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ChangePasswordComponent } from './change-password/change-password.component';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import {
+  MatButtonModule, MatFormFieldModule, MatInputModule,
+  MatSelectModule
+} from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { DvModule } from 'dv-core';
+
+import {
+  ChangePasswordComponent
+} from './change-password/change-password.component';
 import { LoggedInComponent } from './logged-in/logged-in.component';
-import { RegisterComponent } from './register/register.component';
-import { RegisterWithRedirectComponent } from './register-with-redirect/register-with-redirect.component';
+import { RegisterUserComponent } from './register-user/register-user.component';
 import { SignInComponent } from './sign-in/sign-in.component';
-import { SignInWithRedirectComponent } from './sign-in-with-redirect/sign-in-with-redirect.component';
 import { SignOutComponent } from './sign-out/sign-out.component';
-import { SignOutWithRedirectComponent } from './sign-out-with-redirect/sign-out-with-redirect.component';
+
+const allComponents = [
+  ChangePasswordComponent, LoggedInComponent, RegisterUserComponent,
+  SignInComponent, SignOutComponent
+];
 
 @NgModule({
   imports: [
-    CommonModule
+    BrowserAnimationsModule,
+    CommonModule,
+    DvModule,
+    FormsModule,
+    MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
-  declarations: [ChangePasswordComponent, LoggedInComponent, RegisterComponent, RegisterWithRedirectComponent, SignInComponent, SignInWithRedirectComponent, SignOutComponent, SignOutWithRedirectComponent]
+  declarations: allComponents,
+  entryComponents: allComponents,
+  exports: allComponents
 })
 export class AuthenticationModule { }

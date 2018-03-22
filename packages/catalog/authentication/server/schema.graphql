@@ -1,35 +1,26 @@
 type User {
   id: ID!         # username is ID
-  email: String   # email should only be associated with one username
   password: String!
-}
-
-input UserInput {
-  id: ID
-  email: String
 }
 
 input RegisterUserInput {
   id: ID!
-  email: String
   password: String!
 }
 
 input SignInUserInput {
-  id: ID
-  email: String
+  id: ID!
   password: String!
 }
 
 input ChangePasswordInput {
-  id: ID
-  email: String
+  id: ID!
   oldPassword: String!
   newPassword: String!
 }
 
 type Query {
-  user(input: UserInput!): User
+  user(id: ID!): User
   users: [User]!
 }
 
