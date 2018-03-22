@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild, Output
+  ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  SimpleChanges, ViewChild
 } from '@angular/core';
 
 import {
@@ -12,6 +13,10 @@ import {
   RunService
 } from 'dv-core';
 
+import { take } from 'rxjs/operators';
+
+import * as _ from 'lodash';
+
 import { Good } from '../shared/market.model';
 
 
@@ -23,17 +28,14 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-good.component.css'],
 })
 export class CreateGoodComponent implements
-  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string = ''; // optional
   @Input() showSellerId: boolean = true;
   @Output() good = new EventEmitter();
 
   // required input
-  @Input() set marketId(marketId: string) {
-    this._marketId = marketId;
-    this.createGoodForm.updateValueAndValidity();
-  }
-  private _marketId: string = '';
+  @Input() marketId: string;
+  marketIdChange = new EventEmitter<void>();
 
   // optional input values to override form control values
   @Input() set price(price: number) {
@@ -59,13 +61,6 @@ export class CreateGoodComponent implements
     priceControl: this.priceControl,
     supplyControl: this.supplyControl,
     sellerIdControl: this.sellerIdControl
-  }, {
-    validator: (control: AbstractControl): {[key: string]: any} => {
-      if (!this._marketId) {
-        return {required: {marketId: this._marketId}};
-      }
-      return null;
-    }
   });
 
 
@@ -76,7 +71,8 @@ export class CreateGoodComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    private ref: ChangeDetectorRef) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -86,28 +82,48 @@ export class CreateGoodComponent implements
     }
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
+    // The statement below is needed to suppress the error described above.
+    this.ref.detectChanges()
+    if (changes.marketId) {
+      this.marketIdChange.emit();
+    }
+  }
+
   onSubmit() {
     this.rs.run(this.elem);
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{data: {createGood: Good}}>('/graphql', {
-      query: `mutation CreateGood($input: CreateGoodInput!) {
-        createGood (input: $input) {
-          id
+    if (!this.marketId) {
+      await this.marketIdChange.asObservable()
+        .pipe(take(1))
+        .toPromise();
+    }
+    const res = await this.gs
+      .post<{data: {createGood: Good}, errors: {message: string}[]}>('/graphql', {
+        query: `mutation CreateGood($input: CreateGoodInput!) {
+          createGood (input: $input) {
+            id
+          }
+        }`,
+        variables: {
+          input: {
+            id: this.id,
+            price: this.priceControl.value,
+            sellerId: this.sellerIdControl.value,
+            supply: this.supplyControl.value,
+            marketId: this.marketId
+          }
         }
-      }`,
-      variables: {
-        input: {
-          id: this.id,
-          price: this.priceControl.value,
-          sellerId: this.sellerIdControl.value,
-          supply: this.supplyControl.value,
-          marketId: this._marketId
-        }
-      }
-    })
-    .toPromise();
+      })
+      .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
 
     this.good.emit({ id: res.data.createGood.id });
   }

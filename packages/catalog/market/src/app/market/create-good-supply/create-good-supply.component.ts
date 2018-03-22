@@ -63,7 +63,6 @@ export class CreateGoodSupplyComponent
     this.supplyControl.valueChanges.subscribe((newValue: number) => {
       this.supply.emit(newValue);
     });
-    this.supplyControl.valueChanges.pipe(startWith(this.supplyControl.value));
     // set initial value after subscribing to changes so that it will be emitted
     this.supplyControl.setValue(this.initialValue);
   }

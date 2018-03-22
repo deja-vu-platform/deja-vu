@@ -12,6 +12,8 @@ import {
   RunService
 } from 'dv-core';
 
+import * as _ from 'lodash';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -56,20 +58,26 @@ export class CreatePartyComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{data: any}>('/graphql', {
-      query: `mutation CreateParty($input: CreatePartyInput!) {
-        createParty(input: $input) {
-          id
+    const res = await this.gs
+      .post<{data: any, errors: {message: string[]}}>('/graphql', {
+        query: `mutation CreateParty($input: CreatePartyInput!) {
+          createParty(input: $input) {
+            id
+          }
+        }`,
+        variables: {
+          input: {
+            id: this.id,
+            balance: this.balance.value
+          }
         }
-      }`,
-      variables: {
-        input: {
-          id: this.id,
-          balance: this.balance.value
-        }
-      }
-    })
-    .toPromise();
+      })
+      .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
 
     this.party.emit({ id: res.data.createParty.id });
   }

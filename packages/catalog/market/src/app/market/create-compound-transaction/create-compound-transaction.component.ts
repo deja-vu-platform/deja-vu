@@ -7,6 +7,8 @@ import {
   RunService
 } from 'dv-core';
 
+import * as _ from 'lodash';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -44,21 +46,26 @@ export class CreateCompoundTransactionComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{
-      data: { createCompoundTransaction: { id: string }}
-    }>('/graphql', {
-      query: `mutation {
-        createCompoundTransaction(id: "${this.id}") {
-          id
-        }
-      }`,
-      variables: {
-        input: {
-          id: this.id
-        }
-      }
-    })
-    .toPromise();
+    const res = await this.gs
+      .post<{data: {createCompoundTransaction: {id: string}}, errors: {message: string}[]}>(
+        '/graphql', {
+          query: `mutation {
+            createCompoundTransaction(id: "${this.id}") {
+              id
+            }
+          }`,
+          variables: {
+            input: {
+              id: this.id
+            }
+          }
+        })
+        .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
     this.compoundTransaction.emit({ id: res.data.createCompoundTransaction.id });
   }
 

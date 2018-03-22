@@ -9,6 +9,8 @@ import {
 
 import { Market } from '../shared/market.model';
 
+import * as _ from 'lodash';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -46,21 +48,26 @@ export class CreateMarketComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{
-      data: { createMarket: { id: string }}
-    }>('/graphql', {
-      query: `mutation {
-        createMarket(id: "${this.id}") {
-          id
-        }
-      }`,
-      variables: {
-        input: {
-          id: this.id
-        }
-      }
-    })
-    .toPromise();
+    const res = await this.gs
+      .post<{data: {createMarket: {id: string}}, errors: {message: string}[]}>(
+        '/graphql', {
+          query: `mutation {
+            createMarket(id: "${this.id}") {
+              id
+            }
+          }`,
+          variables: {
+            input: {
+              id: this.id
+            }
+          }
+        })
+        .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
     this.market.emit({ id: res.data.createMarket.id });
   }
 

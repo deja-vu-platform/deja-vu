@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  SimpleChanges, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
@@ -10,6 +11,10 @@ import {
   RunService
 } from 'dv-core';
 
+import { take } from 'rxjs/operators';
+
+import * as _ from 'lodash';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -19,7 +24,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-transaction.component.css'],
 })
 export class CreateTransactionComponent implements
-  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string = ''; // optional
   @Input() paid: boolean = true;
   // if compoundTransactionId is set, created transaction will be added to it
@@ -27,21 +32,12 @@ export class CreateTransactionComponent implements
   @Output() transaction = new EventEmitter();
 
   // required input
-  @Input() set goodId(goodId: string) {
-    this._goodId = goodId;
-    this.createTransactionForm.updateValueAndValidity();
-  }
-  @Input() set buyerId(buyerId: string) {
-    this._buyerId = buyerId;
-    this.createTransactionForm.updateValueAndValidity();
-  }
-  @Input() set priceFraction(priceFraction: number) {
-    this._priceFraction = priceFraction;
-    this.createTransactionForm.updateValueAndValidity();
-  }
-  private _goodId: string = '';
-  private _buyerId: string = '';
-  private _priceFraction: number = 1;
+  @Input() goodId: string;
+  goodIdChange = new EventEmitter<void>();
+  @Input() buyerId: string;
+  buyerIdChange = new EventEmitter<void>();
+  // optional, but needs to be a nonnegative number
+  @Input() priceFraction: number = 1;
 
   // optional input value to override form control values
   @Input() set quantity(quantity: string) {
@@ -74,19 +70,6 @@ export class CreateTransactionComponent implements
   ]);
   createTransactionForm: FormGroup = this.builder.group({
     quantityControl: this.quantityControl
-  }, {
-    validator: (control: AbstractControl): {[key: string]: any} => {
-      if (!this._goodId) {
-        return { required: { goodId: this._goodId } };
-      }
-      if (!this._buyerId) {
-        return { required: { buyerId: this._buyerId } };
-      }
-      if (this._priceFraction < 0) {
-        return { nonnegative: { priceFraction: this._priceFraction } };
-      }
-      return null;
-    }
   });
 
 
@@ -104,30 +87,56 @@ export class CreateTransactionComponent implements
     this.rs.register(this.elem, this);
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.goodId) {
+      this.goodIdChange.emit();
+    }
+    if (changes.buyerId) {
+      this.buyerIdChange.emit();
+    }
+  }
+
   onSubmit() {
     this.rs.run(this.elem);
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{data: any}>('/graphql', {
-      query: `mutation CreateTransaction($input: CreateTransactionInput!) {
-        createTransaction(input: $input) {
-          id
+    if (this.goodId === undefined) {
+      await this.goodIdChange.asObservable()
+        .pipe(take(1))
+        .toPromise();
+    }
+    if (this.buyerId === undefined) {
+      await this.buyerIdChange.asObservable()
+        .pipe(take(1))
+        .toPromise();
+    }
+
+    const res = await this.gs
+      .post<{data: any, errors: {message: string}[]}>('/graphql', {
+        query: `mutation CreateTransaction($input: CreateTransactionInput!) {
+          createTransaction(input: $input) {
+            id
+          }
+        }`,
+        variables: {
+          input: {
+            id: this.id,
+            compoundTransactionId: this.compoundTransactionId,
+            goodId: this.goodId,
+            buyerId: this.buyerId,
+            quantity: this.quantityControl.value,
+            priceFraction: _.isNumber(this.priceFraction) ? this.priceFraction : 1,
+            paid: this.paid
+          }
         }
-      }`,
-      variables: {
-        input: {
-          id: this.id,
-          compoundTransactionId: this.compoundTransactionId,
-          goodId: this._goodId,
-          buyerId: this._buyerId,
-          quantity: this.quantityControl.value,
-          priceFraction: this._priceFraction,
-          paid: this.paid
-        }
-      }
-    })
-    .toPromise();
+      })
+      .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
 
     this.transaction.emit({ id: res.data.createTransaction.id });
   }

@@ -49,7 +49,6 @@ export class CreateGoodPriceComponent
     this.priceControl.valueChanges.subscribe((newValue: number) => {
       this.price.emit(newValue);
     });
-    this.priceControl.valueChanges.pipe(startWith(this.priceControl.value));
     // set initial value after subscribing to changes so that it will be emitted
     this.priceControl.setValue(this.initialValue);
   }

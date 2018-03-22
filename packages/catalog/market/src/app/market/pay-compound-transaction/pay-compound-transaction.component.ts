@@ -7,6 +7,8 @@ import {
   RunService
 } from 'dv-core';
 
+import * as _ from 'lodash';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -44,12 +46,17 @@ export class PayCompoundTransactionComponent implements
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs
-      .post<{data: any}>('/graphql', {
+      .post<{data: any, errors: {message: string}[]}>('/graphql', {
         query: `mutation {
           payCompoundTransaction(id: "${this.id}")
         }`
       })
       .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
   }
 
   dvOnAfterCommit() {

@@ -46,7 +46,6 @@ export class CreateGoodSellerComponent
     this.sellerIdControl.valueChanges.subscribe((newValue: string) => {
       this.sellerId.emit(newValue);
     });
-    this.sellerIdControl.valueChanges.pipe(startWith(this.sellerIdControl.value));
     // set initial value after subscribing to changes so that it will be emitted
     this.sellerIdControl.setValue(this.initialValue);
   }

@@ -14,6 +14,8 @@ import {
 
 import { map } from 'rxjs/operators';
 
+import * as _ from 'lodash';
+
 import { Good } from '../shared/market.model';
 
 
@@ -25,7 +27,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./update-good.component.css'],
 })
 export class UpdateGoodComponent implements
-  OnInit, OnRun, OnAfterCommit, OnAfterAbort, OnChanges {
+  OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort, OnChanges {
   @Input() id: string;
   @Input() showSellerId: boolean = true;
 
@@ -111,20 +113,26 @@ export class UpdateGoodComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{data: {updateGood: Good}}>('/graphql', {
-      query: `mutation UpdateGood($input: UpdateGoodInput!) {
-        updateGood (input: $input)
-      }`,
-      variables: {
-        input: {
-          id: this.id,
-          price: this.priceControl.value,
-          sellerId: this.sellerIdControl.value,
-          supply: this.supplyControl.value
+    const res = await this.gs
+      .post<{data: {updateGood: Good}, errors: {message: string}[]}>('/graphql', {
+        query: `mutation UpdateGood($input: UpdateGoodInput!) {
+          updateGood (input: $input)
+        }`,
+        variables: {
+          input: {
+            id: this.id,
+            price: this.priceControl.value,
+            sellerId: this.sellerIdControl.value,
+            supply: this.supplyControl.value
+          }
         }
-      }
-    })
-    .toPromise();
+      })
+      .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
   }
 
   dvOnAfterCommit() {

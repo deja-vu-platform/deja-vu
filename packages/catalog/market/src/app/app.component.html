@@ -17,15 +17,14 @@
   <market-add-amount [partyId]="partyId"></market-add-amount>
 
   <h2>Create Good</h2>
-  <market-create-good-name (name)="goodName = $event"></market-create-good-name>
   <market-create-good-price (price)="goodPrice = $event"></market-create-good-price>
   <market-create-good-supply (supply)="goodSupply = $event"></market-create-good-supply>
   
   <h3>Required Seller</h3>
-  <market-create-good [name]="goodName" [price]="goodPrice" [supply]="goodSupply" [sellerId]="partyId" [marketId]="marketId" (good)="goodId1 = $event.id"></market-create-good>
+  <market-create-good [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [sellerId]="partyId" (good)="goodId1 = $event.id"></market-create-good>
 
   <h3>Optional Seller</h3>
-  <market-create-good [name]="goodName" [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [showSellerId]="false" (good)="goodId2 = $event.id"></market-create-good>
+  <market-create-good [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [showSellerId]="false" (good)="goodId2 = $event.id"></market-create-good>
 
   <h2>Update Good</h2>
   <market-update-good [id]="goodId2"></market-update-good>

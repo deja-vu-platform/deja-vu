@@ -11,6 +11,8 @@ import {
   RunService
 } from 'dv-core';
 
+import * as _ from 'lodash';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -54,18 +56,24 @@ export class AddAmountComponent implements OnInit, OnRun, OnAfterAbort,
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{data: any}>('/graphql', {
-      query: `mutation AddAmount($input: AddAmountInput!) {
-        addAmount(input: $input)
-      }`,
-      variables: {
-        input: {
-          partyId: this.partyId,
-          amount: this.balance.value
+    const res = await this.gs
+      .post<{data: any, errors: {message: string}[]}>('/graphql', {
+        query: `mutation AddAmount($input: AddAmountInput!) {
+          addAmount(input: $input)
+        }`,
+        variables: {
+          input: {
+            partyId: this.partyId,
+            amount: this.balance.value
+          }
         }
-      }
-    })
-    .toPromise();
+      })
+      .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
   }
   
   dvOnAfterCommit() {
