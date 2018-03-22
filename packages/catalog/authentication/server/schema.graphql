@@ -26,7 +26,7 @@ type Query {
 
 type Mutation {
   createUser(id: ID!): User
-  registerUser(input RegisterUserInput!): User
-  signInUser(input SignInUserInput!): String          # JSON.stringify
-  changePassword(input ChangePasswordInput!): Boolean
+  registerUser(input: RegisterUserInput!): User
+  signInUser(input: SignInUserInput!): String          # JSON.stringify
+  changePassword(input: ChangePasswordInput!): Boolean
 }
