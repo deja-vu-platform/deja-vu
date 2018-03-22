@@ -158,7 +158,7 @@
     "component-selector": [
       true,
       "element",
-      "property",
+      "authentication",
       "kebab-case"
     ],
     "no-output-on-prefix": true,
