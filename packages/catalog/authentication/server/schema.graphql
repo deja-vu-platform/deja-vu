@@ -1,35 +1,41 @@
-// Change
-type Source {
-  id: ID!,
-  ratings: [Rating]
+type User {
+  id: ID!         # username is ID
+  email: String   # email should only be associated with one username
+  password: String!
 }
 
-type Target {
-  id: ID!,
-  ratings: [Rating]
+input UserInput {
+  id: ID
+  email: String
 }
 
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
+input RegisterUserInput {
+  id: ID!
+  email: String
+  password: String!
 }
 
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
+input SignInUserInput {
+  id: ID
+  email: String
+  password: String!
+}
+
+input ChangePasswordInput {
+  id: ID
+  email: String
+  oldPassword: String!
+  newPassword: String!
 }
 
 type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  user(input: UserInput!): User
+  users: [User]!
 }
 
 type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  createUser(id: ID!): User
+  registerUser(input RegisterUserInput!): User
+  signInUser(input SignInUserInput!): String          # JSON.stringify
+  changePassword(input ChangePasswordInput!): Boolean
 }
