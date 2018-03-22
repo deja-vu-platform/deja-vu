@@ -14,7 +14,6 @@ import { User } from '../shared/authentication.model';
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  // tslint:disable-next-line:component-selector
   selector: 'authentication-change-password',
   templateUrl: './change-password.component.html',
   styleUrls: ['./change-password.component.css']

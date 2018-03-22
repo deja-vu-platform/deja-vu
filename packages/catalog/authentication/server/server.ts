@@ -114,7 +114,7 @@ const resolvers = {
   Query: {
     users: () => users.find()
       .toArray(),
-    user: async (root, { id }) => users.findOne({ id: id })
+    user: async (_, { id }) => users.findOne({ id: id })
   },
 
   User: {
@@ -123,7 +123,7 @@ const resolvers = {
   },
 
   Mutation: {
-    registerUser: async (root, { input }: { input: RegisterUserInput }) => {
+    registerUser: async (_, { input }: { input: RegisterUserInput }) => {
       await Validation.userIsNew(input.id);
       const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
 
@@ -137,7 +137,7 @@ const resolvers = {
       return newUser;
     },
 
-    signInUser: async (root, { input }: { input: SignInUserInput }) => {
+    signInUser: async (_, { input }: { input: SignInUserInput }) => {
       const user = await Validation.userExists(input.id);
 
       const passwordVerified = await bcrypt.compare(input.password,
@@ -154,7 +154,7 @@ const resolvers = {
       });
     },
 
-    changePassword: async (root, { input }: { input: ChangePasswordInput }) => {
+    changePassword: async (_, { input }: { input: ChangePasswordInput }) => {
       const user = await Validation.userExists(input.id);
 
       const passwordVerified = await bcrypt.compare(input.oldPassword,

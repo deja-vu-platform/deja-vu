@@ -14,10 +14,9 @@ import { User } from '../shared/authentication.model';
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  // tslint:disable-next-line:component-selector
   selector: 'authentication-register-user',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  templateUrl: './register-user.component.html',
+  styleUrls: ['./register-user.component.css']
 })
 export class RegisterUserComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {

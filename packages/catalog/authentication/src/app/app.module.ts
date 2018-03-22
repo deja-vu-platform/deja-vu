@@ -1,11 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
-import { AuthenticationModule } from './authentication/authentication.module';
-
 import { GATEWAY_URL } from 'dv-core';
-
 import { AppComponent } from './app.component';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 
 @NgModule({

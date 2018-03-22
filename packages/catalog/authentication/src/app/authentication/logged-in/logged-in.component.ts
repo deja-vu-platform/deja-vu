@@ -1,23 +1,20 @@
 import {
   AfterViewInit, Component, ElementRef,
-  OnInit, Output
+  EventEmitter, OnInit, Output
 } from '@angular/core';
-import { Router } from '@angular/router';
-import { OnAfterCommit, RunService } from 'dv-core';
-import { EventEmitter } from 'events';
+import { OnAfterAbort, OnAfterCommit, OnRun, RunService
+} from 'dv-core';
 
 import { User } from '../shared/authentication.model';
 
 @Component({
-  // tslint:disable-next-line:component-selector
   selector: 'authentication-logged-in'
 })
 export class LoggedInComponent implements OnInit, AfterViewInit {
   @Output() user = new EventEmitter();
 
   constructor(
-    private elem: ElementRef, private rs: RunService,
-    private router: Router) { }
+    private elem: ElementRef, private rs: RunService) { }
 
   ngOnInit() {
     this.rs.register(this.elem, this);

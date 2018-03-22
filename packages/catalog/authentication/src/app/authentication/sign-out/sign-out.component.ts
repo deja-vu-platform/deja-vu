@@ -9,7 +9,6 @@ import {
 import * as _ from 'lodash';
 
 @Component({
-  // tslint:disable-next-line:component-selector
   selector: 'authentication-sign-out',
   templateUrl: './sign-out.component.html',
   styleUrls: ['./sign-out.component.css']
