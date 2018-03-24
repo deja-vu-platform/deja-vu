@@ -1,35 +1,39 @@
-// Change
-type Source {
-  id: ID!,
-  ratings: [Rating]
+type Group {
+  id: ID!
+  members: [Member]
+  subgroups: [Group]
 }
 
-type Target {
-  id: ID!,
-  ratings: [Rating]
-}
-
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
-}
-
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
+type Member {
+  id: ID!
 }
 
 type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  group(id: ID!): Group
+  member(id: ID!): Member
+  # get all members directly or indirectly in a group
+  allMembers(id: ID!): [Member]
+  # get all subgroups directly or indirectly in a group
+  allSubgroups(id: ID!): [Group]
+  # get all groups directly containing a member
+  groupsByDirectMember(id: ID!): [Group]
+  # get all groups directly containing a subgroup
+  groupsByDirectSubgroup(id: ID!): [Group]
+
+  # get all groups directly or indirectly containing a member
+  groupsByMember(id: ID!): [Group]
+  # get all groups directly or indirectly containing a subgroup 
+  groupsBySubgroup(id: ID!): [Group]
 }
 
 type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  createGroup(
+      id: ID, initialMemberIds: [Member!], initialSubgroupIds: [Group!]): Group 
+  createMember(id: ID): Member 
+
+  addMember(groupId: ID!, memberId: ID!): Group
+  removeMember(groupId: ID!, memberId: ID!): Group
+
+  addSubgroup(groupId: ID!, subgroupId: ID!): Group
+  removeSubgroup(groupId: ID!, subgroupId: ID!): Group
 }
