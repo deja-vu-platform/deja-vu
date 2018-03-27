@@ -21,7 +21,7 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class CreateMarketComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() id: string = ''; // optional
+  @Input() id: string | undefined = '';
   @Output() market: EventEmitter<Market> = new EventEmitter<Market>();
 
   // Presentation inputs

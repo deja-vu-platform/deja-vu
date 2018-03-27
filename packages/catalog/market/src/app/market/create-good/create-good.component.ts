@@ -25,19 +25,18 @@ const SAVED_MSG_TIMEOUT = 3000;
 @Component({
   selector: 'market-create-good',
   templateUrl: './create-good.component.html',
-  styleUrls: ['./create-good.component.css'],
+  styleUrls: ['./create-good.component.css']
 })
 export class CreateGoodComponent implements
   OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() id: string = ''; // optional
-  @Input() showSellerId: boolean = true;
+  @Input() id: string | undefined = '';
+  @Input() showSellerId = true;
   @Output() good = new EventEmitter();
 
-  // required input
   @Input() marketId: string;
   marketIdChange = new EventEmitter<void>();
 
-  // optional input values to override form control values
+  // Optional input values to override form control values
   @Input() set price(price: number) {
     this.priceControl.setValue(price);
   }
