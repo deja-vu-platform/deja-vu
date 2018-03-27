@@ -1,34 +1,69 @@
-import {Widget} from "client-bus";
-import {GraphQlService} from "gql";
+import {
+  Component, ElementRef, Input, OnChanges, OnInit, Type
+} from '@angular/core';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import * as _ from 'lodash';
 
-import Atomize from "../_shared/atomize";
-import {MemberAtom} from "../_shared/data";
-import GroupService from "../_shared/group.service";
+import { ShowMemberComponent } from '../show-member/show-member.component';
+
+import { Member } from '../shared/group.model';
 
 
-@Widget({
-  fqelement: "Group",
-  ng2_providers: [
-    GraphQlService,
-    GroupService,
-    Atomize
-  ]
+@Component({
+  selector: 'group-show-members',
+  templateUrl: './show-members.component.html',
+  styleUrls: ['./show-members.component.css']
 })
-export class ShowMembersComponent {
-  members: MemberAtom[] = [];
+export class ShowMembersComponent implements OnInit, OnChanges {
+  // Fetch rules
+  @Input() inGroupId: string | undefined;
+  @Input() directOnly = true;
+
+  @Input() showMember: Action = {
+    type: <Type<Component>> ShowMemberComponent
+  };
+  members: Member[] = [];
+
+  showMembers;
+  private gs: GatewayService;
 
   constructor(
-    private _groupService: GroupService,
-    private _atomize: Atomize
-  ) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    this.showMembers = this;
+  }
 
-  dvAfterInit() {
-    this.members = [];
-    this._groupService.getMembers()
-      .then(members => {
-        this.members = members.map(member => {
-          return this._atomize.atomizeMember(member);
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.fetchMembers();
+  }
+
+  ngOnChanges() {
+    this.fetchMembers();
+  }
+
+  fetchMembers() {
+    if (this.gs) {
+      this.gs
+        .get<{data: {members: Member[]}}>('/graphql', {
+          params: {
+            query: `
+              query Members($input: MembersInput!) {
+                members(input: $input) {
+                  id
+                }
+              }
+            `,
+            variables: JSON.stringify({
+              input: {
+                inGroupId: this.inGroupId,
+                directOnly: this.directOnly
+              }
+            })
+          }
+        })
+        .subscribe((res) => {
+          this.members = res.data.members;
         });
-      });
+    }
   }
 }

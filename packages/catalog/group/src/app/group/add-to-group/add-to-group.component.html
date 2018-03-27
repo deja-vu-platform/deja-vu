@@ -1,0 +1,27 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="addForm"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="addSaved">
+      <i class="material-icons">done</i>
+        {{addSavedText}}
+    </div>
+    <mat-error *ngIf="addError">
+      <i class="material-icons">report_problem</i>
+      {{addError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <group-autocomplete
+      [autocompletePlaceholder]="autocompletePlaceholder"
+      [type]="type"
+      [disabledIds]="disabledIds"
+      formControlName="autocomplete">
+    </group-autocomplete>
+  </div>
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!addForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

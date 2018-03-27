@@ -1,6 +1,10 @@
-<ul *ngIf="members && members.length > 0" class="list-member member-list">
-  <li *ngFor="let member of members" class="list-member-item member-list-item">
-    <dv-widget name="ShowNameOfMember" [init]="{member: member}"></dv-widget>
+<ul *ngIf="members && members.length > 0" class="list-group">
+  <li *ngFor="let member of members" class="list-group-item">
+    <dv-include [action]="showMember" [inputs]="{
+        member: member
+      }"
+      [parent]="showMembers">
+    </dv-include>
   </li>
 </ul>
 <div *ngIf="!members || members.length === 0">

@@ -1,93 +1,105 @@
-import {Widget, Field, AfterInit} from "client-bus";
-import {GraphQlService} from "gql";
+import {
+  Component, ElementRef, Input, OnChanges, OnInit, Type
+} from '@angular/core';
 
-import Atomize from "../_shared/atomize";
-import {Member, Group, MemberAtom, GroupAtom} from "../_shared/data";
-import GroupService from "../_shared/group.service";
-import {filterInPlace} from "../_shared/utils";
+import {
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
+} from 'dv-core';
+
+import * as _ from 'lodash';
+
+import { ShowGroupComponent } from '../show-group/show-group.component';
+
+import { Group, Member } from '../shared/group.model';
 
 
-@Widget({
-  fqelement: "Group",
-  ng2_providers: [
-    GraphQlService,
-    GroupService,
-    Atomize
-  ]
+@Component({
+  selector: 'group-join-leave',
+  templateUrl: './join-leave.component.html',
+  styleUrls: ['./join-leave.component.css']
 })
-export class JoinLeaveComponent implements AfterInit {
-  @Field("Member") member: MemberAtom;
-  @Field("Group") group: GroupAtom;
+export class JoinLeaveComponent implements OnInit {
+  @Input() member: Member;
+  // One of `group` or `groupId` is required
+  @Input() group: Group;
+  @Input() groupId: string;
+  inGroup = false;
 
-  private fetched: string;
+  private gs: GatewayService;
 
   constructor(
-    private _groupService: GroupService,
-    private _atomize: Atomize
-  ) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) {}
 
-  dvAfterInit() {
-    if (
-      this.group.atom_id &&
-      (!this.group.members || this.group.members.length === 0)
-    ) {
-      this.group.members = [];
-      this.fetch();
-    } else {
-      this.fetched = this.group.atom_id;
-    }
-
-    this.group.on_change(() => this.fetch());
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+    this.load();
   }
 
   joinGroup() {
-    this._groupService.addMemberToGroup(
-      this.group.atom_id,
-      this.member.atom_id
-    )
-      .then(success => {
-        if (success) {
-          this.group.members.push(this.member);
-        }
-      });
+    this.rs.run(this.elem);
   }
 
   leaveGroup() {
-    this._groupService.removeMemberFromGroup(
-      this.group.atom_id,
-      this.member.atom_id
-    )
-      .then(success => {
-        if (success) {
-          filterInPlace(this.group.members, m => {
-            return m.atom_id !== this.member.atom_id;
-          });
+    this.rs.run(this.elem);
+  }
+
+  load() {
+    if (!this.gs || this.group) {
+      this.inGroup = this.groupContains(this.group, this.member);
+
+      return;
+    }
+    this.gs.get<{data: any}>('/graphql', {
+      params: {
+        query: `
+          query {
+            group(id: "${this.groupId}") {
+              id
+              members {
+                id
+              }
+            }
+          }
+        `
+      }
+    })
+    .subscribe((res) => {
+      this.group = res.data.group;
+      this.inGroup = this.groupContains(this.group, this.member);
+    });
+  }
+
+  async dvOnRun(): Promise<void> {
+    if (!this.gs) {
+      return;
+    }
+    const action = this.inGroup ? 'removeMember' : 'addMember';
+    this.gs
+      .post<{data: {groups: Group}}>('/graphql', {
+        query: `
+          mutation {
+            ${action}(
+              groupId: "${this.group.id}", id: "${this.member.id}") {
+              id
+            }
+          }
+        `
+      })
+      .subscribe((res) => {
+        if (this.inGroup) {
+          _.remove(this.group.members, (m) => m.id === this.member.id);
+          this.inGroup = false;
+        } else {
+          this.group.members.push(this.member);
+          this.inGroup = true;
         }
       });
   }
 
-  // called from template to update button text
-  inGroup(member: Member, group: Group): boolean {
-    return group.members.findIndex(m => m.atom_id === member.atom_id) >= 0;
-  }
-
-  private fetch() {
-    if (this.fetched !== this.group.atom_id) {
-      this.fetched = this.group.atom_id;
-      if (this.group.atom_id) {
-        this.getMembers();
-      } else {
-        this.group.members = [];
-      }
-    }
-  }
-
-  private getMembers() {
-    this._groupService.getMembersByGroup(this.group.atom_id)
-      .then(members => {
-        this.group.members = members.map(member => {
-          return this._atomize.atomizeMember(member);
-        });
-      });
+  private groupContains(group: Group, member: Member) {
+    return _.includes(_.map(group.members, 'id'), member.id);
   }
 }

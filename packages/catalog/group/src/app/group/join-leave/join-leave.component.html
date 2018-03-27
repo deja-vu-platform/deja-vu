@@ -1,5 +1,3 @@
-<button *ngIf="!inGroup(member, group)" (click)="joinGroup()"
-  class="btn btn-default btn-sm pull-right">Join Group</button>
+<button mat-button *ngIf="!inGroup" (click)="joinGroup()">Join Group</button>
 
-<button *ngIf="inGroup(member, group)" (click)="leaveGroup()"
-  class="btn btn-default btn-sm pull-right">Leave Group</button>
+<button mat-button *ngIf="inGroup" (click)="leaveGroup()">Leave Group</button>

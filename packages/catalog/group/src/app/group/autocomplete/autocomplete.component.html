@@ -1,0 +1,13 @@
+<mat-form-field>
+  <input type="text" [placeholder]="autocompletePlaceholder" matInput
+  [formControl]="control" [matAutocomplete]="auto" required>
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let id of filteredIds | async" [value]="id" [disabled]="isDisabled(id)">
+      {{ id }}
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error *ngIf="control.hasError('required')" [innerHtml]="requiredErrorMsg">
+  </mat-error>
+  <mat-error *ngIf="control.hasError('notAnOption')" [innerHtml]="notAnOptionErrorMsgFn(control.value)">
+  </mat-error>
+</mat-form-field>

@@ -1,0 +1,35 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createGroupForm"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="newGroupSaved">
+      <i class="material-icons">done</i>
+        {{newGroupSavedText}}
+    </div>
+    <mat-error *ngIf="newGroupError">
+      <i class="material-icons">report_problem</i>
+      {{newGroupError}}
+    </mat-error>
+  </div>
+  <div *ngIf="showOptionToAddMembers" class="form-group">
+    <group-stage
+      type="member"
+      [initialStageIds]="initialMemberIds"
+      [autocompletePlaceholder]="memberAutocompletePlaceholder"
+      formControlName="membersAutocomplete">
+    </group-stage>
+  </div>
+  <div *ngIf="showOptionToAddGroups" class="form-group">
+    <group-stage
+      type="group"
+      [initialStageIds]="initialGroupIds"
+      [autocompletePlaceholder]="groupAutocompletePlaceholder"
+      formControlName="groupAutocomplete">
+    </group-stage>
+  </div>
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!createGroupForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>
