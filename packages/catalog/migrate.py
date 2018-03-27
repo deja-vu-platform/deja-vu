@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+
+# usage ./migrate.py category cliche (e.g., community group)
 import subprocess
 import os
 import sys

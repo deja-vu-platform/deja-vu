@@ -1,0 +1,47 @@
+type Group {
+  id: ID!
+  members: [Member]
+  subgroups: [Group]
+}
+
+type Member {
+  id: ID!
+}
+
+input MembersInput {
+  inGroupId: ID
+  directOnly: Boolean
+}
+
+input GroupsInput {
+  withMemberId: ID
+  withGroupId: ID
+  directOnly: Boolean
+  inGroupId: ID
+}
+
+input CreateGroupInput {
+  id: ID
+  initialMemberIds: [ID!]
+  initialSubgroupIds: [ID!]
+}
+
+type Query {
+  group(id: ID!): Group
+  member(id: ID!): Member
+
+  members(input: MembersInput!): [Member]
+
+  groups(input: GroupsInput!): [Group]
+}
+
+type Mutation {
+  createGroup(input: CreateGroupInput!): Group 
+  createMember(id: ID): Member 
+
+  addMember(groupId: ID!, id: ID!): Group
+  removeMember(groupId: ID!, id: ID!): Group
+
+  addSubgroup(groupId: ID!, id: ID!): Group
+  removeSubgroup(groupId: ID!, id: ID!): Group
+}
