@@ -52,7 +52,6 @@ export class CreateGroupComponent implements OnInit {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    debugger;
     this.membersAutocomplete = new FormControl(this.initialMemberIds);
     this.groupAutocomplete = new FormControl(this.initialGroupIds);
     this.createGroupForm =  this.builder.group({

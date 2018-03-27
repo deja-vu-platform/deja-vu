@@ -93,7 +93,6 @@ implements OnInit, ControlValueAccessor, Validator {
   }
 
   writeValue(value: string[]) {
-    debugger;
     if (value) {
       this.staged = value;
     } else {
