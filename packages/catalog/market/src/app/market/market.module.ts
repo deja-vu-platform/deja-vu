@@ -54,6 +54,7 @@ import {
 import {
   ShowTransactionsComponent
 } from './show-transactions/show-transactions.component';
+import { StageGoodsComponent } from './stage-goods/stage-goods.component';
 import { UpdateGoodComponent } from './update-good/update-good.component';
 
 const allComponenents = [
@@ -65,7 +66,7 @@ const allComponenents = [
   PayCompoundTransactionComponent, PayTransactionComponent,
   ShowCompoundTransactionComponent, ShowGoodComponent, ShowGoodsComponent,
   ShowPartyComponent, ShowTransactionComponent, ShowTransactionsComponent,
-  UpdateGoodComponent
+  StageGoodsComponent, UpdateGoodComponent
 ];
 
 @NgModule({

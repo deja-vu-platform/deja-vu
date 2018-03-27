@@ -2,6 +2,12 @@
   <h1>Market</h1>
   <hr>
 
+  <h1>Stage Goods</h1>
+  <market-stage-goods
+    [showOptionToInputPrice]="false"
+    [showOptionToInputSeller]="false">
+  </market-stage-goods>
+
   <h2>Create Market</h2>
   <market-create-market (market)="marketId = $event.id"></market-create-market>
 
