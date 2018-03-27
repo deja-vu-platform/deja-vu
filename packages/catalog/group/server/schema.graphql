@@ -8,32 +8,40 @@ type Member {
   id: ID!
 }
 
+input MembersInput {
+  inGroupId: ID
+  directOnly: Boolean
+}
+
+input GroupsInput {
+  withMemberId: ID
+  withGroupId: ID
+  directOnly: Boolean
+  inGroupId: ID
+}
+
+input CreateGroupInput {
+  id: ID
+  initialMemberIds: [ID!]
+  initialSubgroupIds: [ID!]
+}
+
 type Query {
   group(id: ID!): Group
   member(id: ID!): Member
-  # get all members directly or indirectly in a group
-  allMembers(id: ID!): [Member]
-  # get all subgroups directly or indirectly in a group
-  allSubgroups(id: ID!): [Group]
-  # get all groups directly containing a member
-  groupsByDirectMember(id: ID!): [Group]
-  # get all groups directly containing a subgroup
-  groupsByDirectSubgroup(id: ID!): [Group]
 
-  # get all groups directly or indirectly containing a member
-  groupsByMember(id: ID!): [Group]
-  # get all groups directly or indirectly containing a subgroup 
-  groupsBySubgroup(id: ID!): [Group]
+  members(input: MembersInput!): [Member]
+
+  groups(input: GroupsInput!): [Group]
 }
 
 type Mutation {
-  createGroup(
-      id: ID, initialMemberIds: [Member!], initialSubgroupIds: [Group!]): Group 
+  createGroup(input: CreateGroupInput!): Group 
   createMember(id: ID): Member 
 
-  addMember(groupId: ID!, memberId: ID!): Group
-  removeMember(groupId: ID!, memberId: ID!): Group
+  addMember(groupId: ID!, id: ID!): Group
+  removeMember(groupId: ID!, id: ID!): Group
 
-  addSubgroup(groupId: ID!, subgroupId: ID!): Group
-  removeSubgroup(groupId: ID!, subgroupId: ID!): Group
+  addSubgroup(groupId: ID!, id: ID!): Group
+  removeSubgroup(groupId: ID!, id: ID!): Group
 }

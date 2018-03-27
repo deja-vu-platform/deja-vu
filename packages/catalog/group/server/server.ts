@@ -20,6 +20,25 @@ interface MemberDoc {
   id: string;
 }
 
+interface GroupsInput {
+  withMemberId: string;
+  withGroupId: string;
+  directOnly: boolean;
+  inGroupId: string;
+}
+
+interface MembersInput {
+  inGroupId: string;
+  directOnly: boolean;
+}
+
+
+interface CreateGroupInput {
+  id: string | undefined;
+  initialMemberIds: string[] | undefined;
+  initialSubgroupIds: string[] | undefined;
+}
+
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -167,13 +186,13 @@ async function addOrRemoveMemberOrSubgroup(
   childId: string,
   groupField: 'memberIds' | 'subgroupIds',
   operation: '$addToSet' | '$pull'
-): Promise<boolean> {
+): Promise<GroupDoc> {
   const queryObj = { id: groupId };
   const updateObj = { [operation]: { [groupField]: childId } };
 
-  const update = await groups.updateOne(queryObj, updateObj);
+  const update = await groups.findOneAndUpdate(queryObj, updateObj);
 
-  return update.modifiedCount > 0;
+  return update.value;
 }
 
 
@@ -182,51 +201,61 @@ const resolvers = {
     group: (root, { id }) => groups.findOne({ id: id }),
     member: (root, { id }) => members.findOne({ id: id }),
     // Get all members directly or indirectly in a group
-    allMembers: async (root, { id }) =>  {
-      const foundMembers: Set<string> = new Set();
-      await forEachGroupInGroup(id, (group: GroupDoc) => {
-        group.memberIds.forEach((memberId: string) => {
-          foundMembers.add(memberId);
+    members: async (root, { input }: { input: MembersInput }) =>  {
+      let filter = {};
+      if (input.inGroupId && !input.directOnly) {
+        const foundMembers: Set<string> = new Set();
+        await forEachGroupInGroup(input.inGroupId, (group: GroupDoc) => {
+          group.memberIds.forEach((memberId: string) => {
+            foundMembers.add(memberId);
+          });
         });
-      });
+        filter = { id: { $in: Array.from(foundMembers) } };
+      } else if (input.inGroupId && input.directOnly) {
+        filter = { id: input.inGroupId };
+      }
 
       return members
-        .find({ id: { $in: Array.from(foundMembers) } })
+        .find(filter)
         .toArray();
     },
-    // Get all subgroups directly or indirectly in a group
-    allSubgroups: async (root, { id }) => {
-      const foundSubgroups: GroupDoc[] = [];
-      await forEachGroupInGroup(id, (group: GroupDoc) => {
-        if (group.id !== id) {
-          foundSubgroups.push(group);
-        }
-      });
+    groups: async (root, { input }: { input: GroupsInput }) => {
+      if (input.withGroupId && input.directOnly) {
+        return getGroupsByDirectSubgroup(input.withGroupId);
+      } else if (input.withGroupId && !input.directOnly) {
+        const foundGroups: GroupDoc[] = [];
+        await forEachGroupContainingGroup(
+          input.withGroupId, (group: GroupDoc) => {
+            foundGroups.push(group);
+          });
 
-      return foundSubgroups;
-    },
-    // Get all groups directly containing a member
-    groupsByDirectMember: (root, { id }) => getGroupsByDirectMember(id),
-    // Get all groups directly containing a subgroup
-    groupsByDirectSubgroup: (root, { id }) => getGroupsByDirectSubgroup(id),
-    // Get all groups directly or indirectly containing a member
-    groupsByMember: async (root, { id }) => {
-      const foundGroups: GroupDoc[] = [];
-      await forEachGroupContainingMember(id, (group: GroupDoc) => {
-        foundGroups.push(group);
-      });
+        return foundGroups;
+      } else if (input.withMemberId && input.directOnly) {
+        return getGroupsByDirectMember(input.withMemberId);
+      } else if (input.withMemberId && !input.directOnly) {
+        const foundGroups: GroupDoc[] = [];
+        await forEachGroupContainingMember(
+          input.withMemberId, (group: GroupDoc) => {
+            foundGroups.push(group);
+          });
 
-      return foundGroups;
-    },
-    // Get all groups directly or indirectly containing a subgroup
-    groupsBySubgroup: async (root, { id }) => {
-      const foundSubgroups: GroupDoc[] = [];
+        return foundGroups;
+      } else if (input.inGroupId && !input.directOnly) {
+        const foundSubgroups: GroupDoc[] = [];
+        await forEachGroupContainingGroup(
+          input.inGroupId, (group: GroupDoc) => {
+            if (group.id !== input.inGroupId) {
+              foundSubgroups.push(group);
+            }
+          });
 
-      await forEachGroupContainingGroup(id, (group: GroupDoc) => {
-        foundSubgroups.push(group);
-      });
+        return foundSubgroups;
+      } else if (input.inGroupId && input.directOnly) {
+        throw new Error('not supported yet');
+      }
 
-      return foundSubgroups;
+      return groups.find()
+        .toArray();
     }
   },
   Group: {
@@ -242,11 +271,11 @@ const resolvers = {
     id: (member: MemberDoc) => member.id
   },
   Mutation: {
-    createGroup: (root, { id, initialMemberIds, initialSubgroupIds }) => {
+    createGroup: (root, { input }: {input: CreateGroupInput}) => {
       const g: GroupDoc = {
-        id: id ? id : uuid(),
-        memberIds: initialMemberIds,
-        subgroupIds: initialSubgroupIds
+        id: input.id ? input.id : uuid(),
+        memberIds: input.initialMemberIds ? input.initialMemberIds : [],
+        subgroupIds: input.initialSubgroupIds ? input.initialSubgroupIds : []
       };
       groups.insertOne(g);
 
@@ -258,21 +287,18 @@ const resolvers = {
 
       return m;
     },
-    addMember: (root, { groupId, memberId }) => {
-      return addOrRemoveMemberOrSubgroup(
-        groupId, memberId, 'memberIds', '$addToSet');
+    addMember: (root, { groupId, id }) => {
+      return addOrRemoveMemberOrSubgroup(groupId, id, 'memberIds', '$addToSet');
     },
-    removeMember: (root, { groupId, memberId }) => {
-      return addOrRemoveMemberOrSubgroup(
-        groupId, memberId, 'memberIds', '$pull');
+    removeMember: (root, { groupId, id }) => {
+      return addOrRemoveMemberOrSubgroup(groupId, id, 'memberIds', '$pull');
     },
-    addSubgroup: (root, { groupId, subgroupId }) => {
+    addSubgroup: (root, { groupId, id }) => {
       return addOrRemoveMemberOrSubgroup(
-        groupId, subgroupId, 'subgroupIds', '$addToSet');
+        groupId, id, 'subgroupIds', '$addToSet');
     },
-    removeSubgroup: (root, { groupId, subgroupId }) => {
-      return addOrRemoveMemberOrSubgroup(
-        groupId, subgroupId, 'subgroupIds', '$pull');
+    removeSubgroup: (root, { groupId, id }) => {
+      return addOrRemoveMemberOrSubgroup(groupId, id, 'subgroupIds', '$pull');
     }
   }
 };
