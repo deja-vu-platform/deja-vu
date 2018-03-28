@@ -18,7 +18,11 @@
     </mat-form-field>
   </div>
   <div *ngIf="showOptionToInputGoods" class="form-group">
-    <market-stage-goods formControlName="goodsControl">
+    <market-stage-goods
+      [sellerId]="sellerId"
+      [showOptionToInputPrice]="showOptionToInputPrice"
+      [showOptionToInputSeller]="showOptionToInputSeller"
+      formControlName="goodsControl">
     </market-stage-goods>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">

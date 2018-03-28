@@ -33,7 +33,7 @@ export class CreatePartyComponent implements
 
   @ViewChild(FormGroupDirective) form;
 
-  balance = new FormControl('');
+  balance = new FormControl();
   createPartyForm: FormGroup = this.builder.group({
     balance: this.balance
   });

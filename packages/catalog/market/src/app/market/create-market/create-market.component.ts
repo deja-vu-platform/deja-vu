@@ -27,10 +27,14 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class CreateMarketComponent
 implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() id: string | undefined = '';
   @Input() showOptionToInputId = true;
   @Input() showOptionToInputGoods = true;
   @Input() showOptionToSubmit = true;
+  // These are only relevant if `showOptionToInputGoods` is true
+  @Input() sellerId: string | undefined;
+  @Input() showOptionToInputPrice = true;
+  @Input() showOptionToInputSeller = true;
+
   @Output() market: EventEmitter<Market> = new EventEmitter<Market>();
 
   // Presentation inputs
@@ -49,6 +53,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   newMarketError: string;
 
   private gs: GatewayService;
+
+  @Input() set id(id: string) {
+    this.idControl.setValue(id);
+  }
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
@@ -74,7 +82,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
           }`,
           variables: {
             input: {
-              id: this.showOptionToInputId ? this.idControl.value : this.id,
+              id: this.idControl.value,
               withNewGoods: this.showOptionToInputGoods ?
                 _.map(this.goodsControl.value, this.goodToCreateGoodInput)
                 : undefined
