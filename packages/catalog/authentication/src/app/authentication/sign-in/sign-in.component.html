@@ -2,8 +2,8 @@
   [formGroup]="signInForm"
   class="form-horizontal">
 
-  <div class="form-group sign-in-form-group">
-    <div *ngIf="newUserSignedIn" class="sign-in-user-success">
+  <div class="form-group">
+    <div *ngIf="newUserSignedIn">
       <i class="material-icons">done</i>
       {{newUserSignedInText}}
     </div>
@@ -13,7 +13,7 @@
     </mat-error>
   </div>
 
-  <div class="form-group sign-in-form-group">
+  <div class="form-group">
     <mat-form-field>
       <mat-label>{{inputLabel}}</mat-label>
       <input matInput
@@ -21,7 +21,7 @@
     </mat-form-field>
   </div>
 
-  <div class="form-group sign-in-form-group">
+  <div class="form-group">
     <mat-form-field>
       <mat-label>{{passwordLabel}}</mat-label>
       <input matInput type="password"
@@ -29,7 +29,7 @@
     </mat-form-field>
   </div>
 
-  <div class="form-group sign-in-form-group">
+  <div class="form-group">
     <button mat-button type="submit" [disabled]="!signInForm.valid">
       {{buttonLabel}}
     </button>
