@@ -27,7 +27,7 @@
       formControlName="groupAutocomplete">
     </group-stage>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToSubmit" class="form-group">
     <button mat-button type="submit" [disabled]="!createGroupForm.valid">
       {{buttonLabel}}
     </button>
