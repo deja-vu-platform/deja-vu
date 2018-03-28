@@ -5,6 +5,7 @@ import { TxComponent } from './tx.component';
 import { IdComponent } from './id.component';
 import { ButtonComponent } from './button.component';
 import { LinkComponent } from './link.component';
+import { StatusComponent } from './status.component';
 import { IncludeComponent, IncludeDirective } from './include.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { RunService } from './run.service';
@@ -12,7 +13,7 @@ import { RunService } from './run.service';
 
 const allComponents = [
   IdComponent, TxComponent, IncludeComponent, IncludeDirective,
-  ButtonComponent, LinkComponent
+  ButtonComponent, LinkComponent, StatusComponent
 ];
 
 @NgModule({
