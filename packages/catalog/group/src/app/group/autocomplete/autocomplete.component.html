@@ -3,7 +3,21 @@
   [formControl]="control" [matAutocomplete]="auto" required>
   <mat-autocomplete #auto="matAutocomplete">
     <mat-option *ngFor="let id of filteredIds | async" [value]="id" [disabled]="isDisabled(id)">
-      {{ id }}
+      <div *ngIf="type === 'member'">
+        <dv-include [action]="showMember" [inputs]="{id: id}"
+          [parent]="autocompleteControl">
+        </dv-include>
+      </div>
+      <div *ngIf="type === 'group'">
+        <dv-include [action]="showGroup"
+          [inputs]="{
+            id: id,
+            showMembers: false,
+            showSubgroups: false
+          }"
+          [parent]="autocompleteControl">
+        </dv-include>
+      </div>
     </mat-option>
   </mat-autocomplete>
   <mat-error *ngIf="control.hasError('required')" [innerHtml]="requiredErrorMsg">

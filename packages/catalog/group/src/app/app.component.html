@@ -11,7 +11,10 @@
       <group-stage type="group"></group-stage>
       
       <h1>Create Group</h1>
-      <group-create-group></group-create-group>
+      <group-create-group
+        [memberAutocompletePlaceholder]="'Choose'"
+        [stageMemberButtonLabel]="'Stage!'">
+       </group-create-group>
       
       <h1>Add Member to Group</h1>
       <group-add-to-group type="member"></group-add-to-group>

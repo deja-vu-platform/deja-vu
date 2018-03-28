@@ -10,6 +10,9 @@
 
   <h2>Create Market</h2>
   <market-create-market
+    [supplyLabel]="'Supply!'"
+    [buttonLabel]="'Create Market!'"
+    [stageGoodsButtonLabel]="'Stage goods!'"
     (market)="marketId = $event.id">
   </market-create-market>
 

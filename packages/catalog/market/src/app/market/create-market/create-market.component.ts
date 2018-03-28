@@ -34,6 +34,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() sellerId: string | undefined;
   @Input() showOptionToInputPrice = true;
   @Input() showOptionToInputSeller = true;
+  @Input() stageGoodsButtonLabel = 'Add Good';
+  @Input() supplyLabel = 'Supply';
 
   @Output() market: EventEmitter<Market> = new EventEmitter<Market>();
 

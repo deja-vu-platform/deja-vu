@@ -7,14 +7,14 @@
           <div class="col-md-10">
             <div *ngIf="type === 'member'">
               <dv-include [action]="showMember" [inputs]="{
-                member: {id: id}
+                id: id
                }"
                [parent]="stageComponent">
               </dv-include>
             </div>
             <div *ngIf="type === 'group'">
               <dv-include [action]="showGroup" [inputs]="{
-                group: {id: id},
+                id: id,
                 showMembers: false,
                 showSubgroups: false
                }"
@@ -42,6 +42,8 @@
         [autocompletePlaceholder]="autocompletePlaceholder"
         [type]="type"
         [disabledIds]="staged"
+        [showMember]="showMember"
+        [showGroup]="showGroup"
         formControlName="autocomplete"
         [required]="true">
       </group-autocomplete>

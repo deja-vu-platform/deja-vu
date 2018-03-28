@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type,
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -8,9 +9,13 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
+  Action, GatewayService, GatewayServiceFactory, OnAfterAbort,
+  OnAfterCommit, OnRun, RunService
 } from 'dv-core';
+
+
+import { ShowGroupComponent } from '../show-group/show-group.component';
+import { ShowMemberComponent } from '../show-member/show-member.component';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -28,10 +33,19 @@ export class CreateGroupComponent implements OnInit {
   @Input() showOptionToAddMembers = true;
   @Input() showOptionToAddGroups = true;
   @Input() showOptionToSubmit = true;
+  @Input() showMember: Action = {
+    type: <Type<Component>> ShowMemberComponent
+  };
+
+  @Input() showGroup: Action = {
+    type: <Type<Component>> ShowGroupComponent
+  };
 
   // Presentation inputs
   @Input() memberAutocompletePlaceholder = 'Choose Member';
+  @Input() stageMemberButtonLabel = 'Add Member';
   @Input() groupAutocompletePlaceholder = 'Choose Group';
+  @Input() stageGroupButtonLabel = 'Add Group';
   @Input() buttonLabel = 'Create Group';
   @Input() newGroupSavedText = 'New Group saved';
 

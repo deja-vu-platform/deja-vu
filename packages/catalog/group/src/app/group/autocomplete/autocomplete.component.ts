@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, ControlValueAccessor, FormBuilder, FormControl,
@@ -13,9 +13,10 @@ import { startWith } from 'rxjs/operators/startWith';
 
 import * as _ from 'lodash';
 
-import {
-  GatewayService, GatewayServiceFactory
-} from 'dv-core';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+
+import { ShowGroupComponent } from '../show-group/show-group.component';
+import { ShowMemberComponent } from '../show-member/show-member.component';
 
 
 @Component({
@@ -42,12 +43,18 @@ implements OnInit, ControlValueAccessor, Validator {
   @Input() type: 'member' | 'group' = 'member';
   @Input() required = true;
   @Input() requiredErrorMsg = `
-    ${_.capitalize(this.type)} is <strong>required</strong>
+    This field is <strong>required</strong>
   `;
   @Input() notAnOptionErrorMsgFn = ((selectedId) => `
     ${selectedId} is not a valid option
   `);
   @Input() disabledIds: string[] = [];
+  @Input() showMember: Action =  {
+    type: <Type<Component>> ShowMemberComponent
+  };
+  @Input() showGroup: Action = {
+    type: <Type<Component>> ShowGroupComponent
+  };
 
   @Output() selectedId = new EventEmitter<string>();
 
