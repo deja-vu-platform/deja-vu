@@ -54,7 +54,7 @@ const allComponents = [
     CommonModule,
     DvModule,
     FormsModule,
-    FormsModule, ReactiveFormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
     MatButtonModule, MatDatepickerModule, MatInputModule, MatSelectModule,
