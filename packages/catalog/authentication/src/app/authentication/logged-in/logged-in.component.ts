@@ -22,7 +22,11 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    const userId = localStorage.getItem('user_id');
-    this.user.emit({ id: userId });
+    setTimeout(() => {
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (user) {
+        this.user.emit(user);
+      }
+    });
   }
 }

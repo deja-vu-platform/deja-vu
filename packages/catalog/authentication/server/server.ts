@@ -6,6 +6,7 @@ import * as jwt from 'jsonwebtoken';
 import * as minimist from 'minimist';
 import * as mongodb from 'mongodb';
 import * as path from 'path';
+import { v4 as uuid } from 'uuid';
 
 import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
@@ -16,21 +17,24 @@ const SALT_ROUNDS = 10;
 
 interface UserDoc {
   id: string;
+  username: string;
   password: string;
 }
 
 interface User {
   id: string;
+  username: string;
   password: string;
 }
 
-interface RegisterUserInput {
-  id: string;
+interface RegisterInput {
+  id: string | undefined;
+  username: string;
   password: string;
 }
 
-interface SignInUserInput {
-  id: string;
+interface SignInInput {
+  username: string;
   password: string;
 }
 
@@ -50,7 +54,7 @@ interface Config {
 
 const argv = minimist(process.argv);
 
-const name = argv.as ? argv.as : 'authentication-name';
+const name = argv.as ? argv.as : 'authentication';
 
 const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
@@ -84,50 +88,30 @@ mongodb.MongoClient.connect(
 
     users = db.collection('users');
     users.createIndex({ id: 1 }, { unique: true, sparse: true });
+    users.createIndex({ username: 1 }, { unique: true, sparse: true });
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
-class Validation {
-  static async userExists(id: string): Promise<UserDoc> {
-    const doc = await users.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`User ${id} not found`);
-    }
-
-    return doc;
-  }
-
-  static async userIsNew(id: string): Promise<Boolean> {
-    const doc = await users.findOne({ id: id }, { _id: 1 });
-    if (doc) {
-      throw new Error(`User already exists`);
-    }
-
-    return true;
-  }
-}
-
 const resolvers = {
   Query: {
     users: () => users.find()
       .toArray(),
-    user: async (_, { id }) => users.findOne({ id: id })
+    user: async (_, { username }) => users.findOne({ username: username})
   },
 
   User: {
     id: (user: User) => user.id,
-    password: (user: User) => user.password
+    username: (user: User) => user.username
   },
 
   Mutation: {
-    registerUser: async (_, { input }: { input: RegisterUserInput }) => {
-      await Validation.userIsNew(input.id);
+    register: async (_, { input }: { input: RegisterInput }) => {
       const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
-
       const newUser: UserDoc = {
-        id: input.id,
+        id: input.id ? input.id : uuid(),
+        username: input.username,
         password: hash
       };
 
@@ -136,13 +120,16 @@ const resolvers = {
       return newUser;
     },
 
-    signInUser: async (_, { input }: { input: SignInUserInput }) => {
-      const user = await Validation.userExists(input.id);
+    signIn: async (_, { input }: { input: SignInInput }) => {
+      const user = await users.findOne({ username: input.username});
+      if (!user) {
+        throw new Error('Wrong username or password');
+      }
 
       const passwordVerified = await bcrypt.compare(input.password,
         user.password);
       if (!passwordVerified) {
-        throw new Error('Incorrect password');
+        throw new Error('Wrong username or password');
       }
 
       const token = jwt.sign(user.id, SECRET_KEY);
@@ -154,7 +141,7 @@ const resolvers = {
     },
 
     changePassword: async (_, { input }: { input: ChangePasswordInput }) => {
-      const user = await Validation.userExists(input.id);
+      const user = await users.findOne({id: input.id});
 
       const passwordVerified = await bcrypt.compare(input.oldPassword,
         user.password);

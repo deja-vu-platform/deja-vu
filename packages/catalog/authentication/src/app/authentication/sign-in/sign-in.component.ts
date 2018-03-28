@@ -1,11 +1,17 @@
 import {
-  Component, ElementRef, EventEmitter,
-  Input, OnInit, Output
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
 } from '@angular/core';
+
+import {
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  Validators
+} from '@angular/forms';
+
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
   OnAfterCommit, OnRun, RunService
 } from 'dv-core';
+
 
 import * as _ from 'lodash';
 
@@ -18,11 +24,10 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './sign-in.component.html',
   styleUrls: ['./sign-in.component.css']
 })
-export class SignInComponent implements
-  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+export class SignInComponent
+implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string;
-  @Input() password: string;
-  // @Input() href: string;
+
   @Input() inputLabel = 'Username';
   @Input() passwordLabel = 'Password';
   @Input() buttonLabel = 'Sign In';
@@ -30,14 +35,31 @@ export class SignInComponent implements
 
   @Output() user = new EventEmitter();
 
+  @ViewChild(FormGroupDirective) form;
+
+  usernameControl = new FormControl('', Validators.required);
+  passwordControl = new FormControl('', Validators.required);
+  signInForm: FormGroup = this.builder.group({
+    usernameControl: this.usernameControl,
+    passwordControl: this.passwordControl
+  });
+
   newUserSignedIn = false;
   newUserSignedInError: string;
 
   private gs: GatewayService;
 
+  @Input() set username(username: string) {
+    this.usernameControl.setValue(username);
+  }
+
+  @Input() set password(password: string) {
+    this.passwordControl.setValue(password);
+  }
+
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, private builder: FormBuilder) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -49,32 +71,35 @@ export class SignInComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{ data: any }>('/graphql', {
-      query: `mutation SignInUser($input: SignInUserInput!) {
-        signInUser(input: $input) {
-          id
-        }
-      }`, variables: {
+    const res = await this.gs.post<{ data: any, errors: any }>('/graphql', {
+      query: `mutation SignIn($input: SignInInput!) {
+        signIn(input: $input)
+      }`,
+      variables: {
         input: {
-          id: this.id,
-          password: this.password
+          username: this.usernameControl.value,
+          password: this.passwordControl.value
         }
       }
     })
-      .toPromise();
+    .toPromise();
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
 
-    const userId = this.setTokens(res.data.signIn);
-    this.user.emit({ id: userId });
+    const user = this.setTokens(res.data.signIn);
+    this.user.emit(user);
   }
 
   setTokens(data) {
     const authToken = JSON.parse(data);
     const token = authToken.token;
-    const userId = authToken.user.id;
+    const user = authToken.user;
     localStorage.setItem('id_token', token);
-    localStorage.setItem('user_id', userId);
+    localStorage.setItem('user', JSON.stringify(user));
 
-    return userId;
+    return user;
   }
 
   dvOnAfterCommit() {
@@ -82,6 +107,11 @@ export class SignInComponent implements
     window.setTimeout(() => {
       this.newUserSignedIn = false;
     }, SAVED_MSG_TIMEOUT);
+    // Can't do `this.form.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
+    }
   }
 
   dvOnAfterAbort(reason: Error) {
