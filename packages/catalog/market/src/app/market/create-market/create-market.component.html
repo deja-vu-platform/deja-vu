@@ -1,4 +1,5 @@
 <form (ngSubmit)="onSubmit()"
+  [formGroup]="createMarketForm"
   class="form-horizontal">
   <div class="form-group">
     <div *ngIf="newMarketSaved">
@@ -10,13 +11,17 @@
       {{newMarketError}}
     </mat-error>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToInputId" class="form-group">
     <mat-form-field>
       <mat-label>{{inputLabel}}</mat-label>
-      <input matInput [(ngModel)]="id" name="id">
+      <input matInput formControlName="idControl">
     </mat-form-field>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToInputGoods" class="form-group">
+    <market-stage-goods formControlName="goodsControl">
+    </market-stage-goods>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
     <button mat-button type="submit">
       {{buttonLabel}}
     </button>

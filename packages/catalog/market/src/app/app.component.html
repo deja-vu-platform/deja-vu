@@ -9,7 +9,9 @@
   </market-stage-goods>
 
   <h2>Create Market</h2>
-  <market-create-market (market)="marketId = $event.id"></market-create-market>
+  <market-create-market
+    (market)="marketId = $event.id">
+  </market-create-market>
 
   <h2>Create Party</h2>
   <market-create-party id="ben" (party)="partyId = $event.id"></market-create-party>

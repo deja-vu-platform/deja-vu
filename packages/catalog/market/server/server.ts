@@ -84,6 +84,11 @@ interface CompoundTransaction {
   status: TransactionStatus;
 }
 
+interface CreateMarketInput {
+  id: string | undefined;
+  withNewGoods: CreateGoodInput[];
+}
+
 interface CreatePartyInput {
   id: string;
   balance: number;
@@ -301,6 +306,23 @@ function compoundTransactionDocToCompoundTransaction(
     (transactionId: string) => { return { id: transactionId }; });
 
   return ret;
+  }
+
+async function createGood(input: CreateGoodInput) {
+  await Validation.marketExists(input.marketId);
+  const good: GoodDoc = {
+    id: input.id ? input.id : uuid(),
+    price: input.price,
+    supply: input.supply,
+    marketId: input.marketId
+  };
+  if (input.sellerId) {
+    await Promise.resolve(Validation.partyExists(input.sellerId));
+    good.sellerId = input.sellerId;
+  }
+  await goods.insertOne(good);
+
+  return goodDocToGood(good);
 }
 
 
@@ -383,9 +405,18 @@ const resolvers = {
       compoundTransaction.status
   },
   Mutation: {
-    createMarket: async (_root, {id}: {id: string}) => {
-      const market: MarketDoc = { id: id ? id : uuid() };
+    createMarket: async (_root, {input}: {input: CreateMarketInput}) => {
+      const marketId = input.id ? input.id : uuid();
+      const market: MarketDoc = { id: marketId };
       await markets.insertOne(market);
+      await Promise.all(_
+        .chain(input.withNewGoods)
+        .map((g: CreateGoodInput) => {
+          g.marketId = marketId;
+
+          return g;
+        })
+        .map(createGood));
 
       return market;
     },
@@ -406,19 +437,7 @@ const resolvers = {
       return true;
     },
     createGood: async (_root, {input}: {input: CreateGoodInput}) => {
-      await Validation.marketExists(input.marketId);
-      const good: GoodDoc = {
-        id: input.id ? input.id : uuid(),
-        price: input.price,
-        supply: input.supply,
-        marketId: input.marketId
-      };
-      if (input.sellerId) {
-        await Promise.resolve(Validation.partyExists(input.sellerId));
-        good.sellerId = input.sellerId;
-      }
-      await goods.insertOne(good);
-      return goodDocToGood(good);
+      return createGood(input);
     },
     updateGood: async (_root, {input}: {input: UpdateGoodInput}) => {
       await Validation.goodExists(input.id);
@@ -434,23 +453,25 @@ const resolvers = {
       if (input.sellerId) {
         await Promise.resolve(Validation.partyExists(input.sellerId));
         updatedGood[input.sellerId] = input.sellerId;
-        // also update seller on each TransactionDoc
+        // Also update seller on each TransactionDoc
         opPromises.push(transactions.update({ goodId: input.id },
           { $set: { sellerId: input.sellerId }}));
       }
-      const updateOp = { $set: updatedGood }
+      const updateOp = { $set: updatedGood };
       opPromises.push(goods.updateOne({ id: input.id }, updateOp));
       await Promise.all(opPromises);
 
       return true;
     },
-    createTransaction: async (_root, {input}: {input: CreateTransactionInput}) => {
+    createTransaction: async (
+      _root, {input}: {input: CreateTransactionInput}) => {
       await Promise.all([
         Validation.partyExists(input.buyerId),
         Validation.goodPurchasable(input.goodId, input.quantity)
       ]);
 
-      const good: GoodDoc = input.paid ? await Validation.goodHasSeller(input.goodId)
+      const good: GoodDoc = input.paid ?
+        await Validation.goodHasSeller(input.goodId)
         : await Validation.goodExists(input.goodId);
       const pricePerGood = _.isNumber(input.priceFraction) ?
         good.price * input.priceFraction : good.price;
@@ -470,7 +491,7 @@ const resolvers = {
       const goodUpdateOp = { $inc: { supply: -input.quantity }};
       const opPromises = [
         transactions.insertOne(transaction),
-        goods.updateOne({ id: input.goodId, }, goodUpdateOp)
+        goods.updateOne({ id: input.goodId }, goodUpdateOp)
       ];
       if (good.sellerId && input.paid) {
         opPromises.push(
@@ -564,12 +585,13 @@ async function payTransaction(id: string) {
   ]);
   const transaction: TransactionDoc = transactionDocs[0];
   const transactionUpdateOp = { $set: { status: TransactionStatus.Paid }};
-  // good supply was already decremented when transaction was created
+  // Good supply was already decremented when transaction was created
   await Promise.all([
     transactions.updateOne({ id: id }, transactionUpdateOp),
     makePayment(transaction.sellerId!, transaction.buyerId,
       transaction.pricePerGood * transaction.quantity)
   ]);
+
   return true;
 }
 
