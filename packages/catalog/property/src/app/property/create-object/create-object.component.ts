@@ -28,7 +28,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-object.component.css']
 })
 export class CreateObjectComponent
-  implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string | undefined;
 
   @Input() buttonLabel = 'Create Object';
@@ -111,10 +111,12 @@ export class CreateObjectComponent
   }
 
   dvOnAfterCommit() {
-    this.newObjectSaved = true;
-    window.setTimeout(() => {
-      this.newObjectSaved = false;
-    }, SAVED_MSG_TIMEOUT);
+    if (this.showOptionToSubmit) {
+      this.newObjectSaved = true;
+      window.setTimeout(() => {
+        this.newObjectSaved = false;
+      }, SAVED_MSG_TIMEOUT);
+    }
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
@@ -123,7 +125,8 @@ export class CreateObjectComponent
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.newObjectError = reason.message;
+    if (this.showOptionToSubmit) {
+      this.newObjectError = reason.message;
+    }
   }
-
 }

@@ -24,8 +24,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-event.component.html',
   styleUrls: ['./create-event.component.css']
 })
-export class CreateEventComponent implements
-  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+export class CreateEventComponent
+implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
 
@@ -90,10 +90,12 @@ export class CreateEventComponent implements
   }
 
   dvOnAfterCommit() {
-    this.createEventSaved = true;
-    window.setTimeout(() => {
-      this.createEventSaved = false;
-    }, SAVED_MSG_TIMEOUT);
+    if (this.showOptionToSubmit) {
+      this.createEventSaved = true;
+      window.setTimeout(() => {
+        this.createEventSaved = false;
+      }, SAVED_MSG_TIMEOUT);
+    }
     // Can't do `this.createEventForm.reset();`
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
@@ -102,6 +104,8 @@ export class CreateEventComponent implements
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.createEventError = reason.message;
+    if (this.showOptionToSubmit) {
+      this.createEventError = reason.message;
+    }
   }
 }

@@ -1,7 +1,7 @@
 <form (ngSubmit)="onSubmit()"
   [formGroup]="createGroupForm"
   class="form-horizontal">
-  <div class="form-group">
+  <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="newGroupSaved">
       <i class="material-icons">done</i>
         {{newGroupSavedText}}

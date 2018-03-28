@@ -25,7 +25,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-group.component.html',
   styleUrls: ['./create-group.component.css']
 })
-export class CreateGroupComponent implements OnInit {
+export class CreateGroupComponent
+implements OnInit, OnAfterCommit, OnAfterAbort {
   @Input() id;
   @Input() assignerId;
   @Input() initialMemberIds: string[] = [];
@@ -98,10 +99,13 @@ export class CreateGroupComponent implements OnInit {
   }
 
   dvOnAfterCommit() {
-    this.newGroupSaved = true;
-    window.setTimeout(() => {
-      this.newGroupSaved = false;
-    }, SAVED_MSG_TIMEOUT);
+    if (this.showOptionToSubmit) {
+      this.newGroupSaved = true;
+      this.newGroupError = '';
+      window.setTimeout(() => {
+        this.newGroupSaved = false;
+      }, SAVED_MSG_TIMEOUT);
+    }
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
@@ -110,6 +114,8 @@ export class CreateGroupComponent implements OnInit {
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.newGroupError = reason.message;
+    if (this.showOptionToSubmit) {
+      this.newGroupError = reason.message;
+    }
   }
 }
