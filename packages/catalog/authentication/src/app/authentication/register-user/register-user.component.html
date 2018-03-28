@@ -1,7 +1,8 @@
-<form (ngSumbit)="onSubmit()" class="form-horizontal">
-
-  <div class="form-group register-form-group">
-    <div *ngIf="newUserRegistered" class="register-user-success">
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="registerForm"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="newUserRegistered">
       <i class="material-icons">done</i>
       {{newUserRegisteredText}}
     </div>
@@ -11,24 +12,32 @@
     </mat-error>
   </div>
 
-  <div class="form-group register-form-group">
+  <div class="form-group">
     <mat-form-field>
       <mat-label>{{inputLabel}}</mat-label>
-      <input matInput [(ngModel)]="id" name="id">
+      <input matInput
+       formControlName="usernameControl">
     </mat-form-field>
   </div>
 
-  <div class="form-group register-form-group">
+  <div class="form-group">
     <mat-form-field>
       <mat-label>{{passwordLabel}}</mat-label>
-      <input matInput [(ngModel)]="password" name="password" type="password">
+      <input matInput type="password"
+       formControlName="passwordControl">
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{retypePasswordLabel}}</mat-label>
+      <input matInput type="password"
+       formControlName="retypePasswordControl">
     </mat-form-field>
   </div>
 
-  <div class="form-group register-form-group">
-    <button mat-button type="submit">{{buttonLabel}}</button>
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!registerForm.valid">
+      {{buttonLabel}}
+    </button>
   </div>
-
-  <!-- <dv-link></dv-link> -->
-
 </form>

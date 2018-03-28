@@ -89,6 +89,11 @@ input TransactionsInput {
   status: TRANSACTION_STATUS
 }
 
+input CreateMarketInput {
+  id: ID
+  withNewGoods: [CreateGoodInput!]
+}
+
 type Query {
   party(id: ID!): Party
   good(id: ID!): Good
@@ -101,7 +106,7 @@ type Query {
 }
 
 type Mutation {
-  createMarket(id: ID!): Market
+  createMarket(input: CreateMarketInput!): Market
   createParty(input: CreatePartyInput!): Party
   addAmount(input: AddAmountInput!): Boolean
   createGood(input: CreateGoodInput!): Good

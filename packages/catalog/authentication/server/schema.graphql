@@ -1,32 +1,32 @@
 type User {
-  id: ID!         # username is ID
+  id: ID!
+  username: String!
+}
+
+input RegisterInput {
+  id: ID
+  username: String!
   password: String!
 }
 
-input RegisterUserInput {
-  id: ID!
-  password: String!
-}
-
-input SignInUserInput {
-  id: ID!
+input SignInInput {
+  username: String!
   password: String!
 }
 
 input ChangePasswordInput {
-  id: ID!
+  id: String!
   oldPassword: String!
   newPassword: String!
 }
 
 type Query {
-  user(id: ID!): User
-  users: [User]!
+  user(username: String!): User
+  users: [User!]
 }
 
 type Mutation {
-  createUser(id: ID!): User
-  registerUser(input: RegisterUserInput!): User
-  signInUser(input: SignInUserInput!): String          # JSON.stringify
+  register(input: RegisterInput!): User
+  signIn(input: SignInInput!): String          # JSON.stringify
   changePassword(input: ChangePasswordInput!): Boolean
 }

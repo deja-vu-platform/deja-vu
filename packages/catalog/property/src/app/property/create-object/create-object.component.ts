@@ -33,6 +33,7 @@ export class CreateObjectComponent
 
   @Input() buttonLabel = 'Create Object';
   @Input() newObjectSavedText = 'New object saved';
+  @Input() showOptionToSubmit = true;
 
   @ViewChild(FormGroupDirective) form;
 

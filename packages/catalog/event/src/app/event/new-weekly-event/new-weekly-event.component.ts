@@ -14,6 +14,7 @@ import {
 import * as _ from 'lodash';
 
 import { Event } from '../../../../shared/data';
+import { endTimeValidator } from '../shared/time.validator';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -25,7 +26,8 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class NewWeeklyEventComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() id = ''; // Optional
+  @Input() id: string | undefined = '';
+  @Input() showOptionToSubmit = true;
   @Output() events = new EventEmitter<Event[]>();
 
   // Presentation inputs
@@ -38,25 +40,7 @@ export class NewWeeklyEventComponent implements
   endsOn = new FormControl('', [Validators.required]);
   startTime = new FormControl('', [Validators.required]);
   endTime = new FormControl('', [
-    Validators.required,
-    (control: AbstractControl): {[key: string]: any} => {
-      const startTime = this.startTime.value;
-      const endTime = control.value;
-      if (!(startTime && endTime)) {
-        return null;
-      }
-      const {hh: startHh, mm: startMm} = this.getHhMm(startTime);
-      const {hh: endHh, mm: endMm} = this.getHhMm(endTime);
-      if (startHh > endHh || (startHh === endHh && startMm >= endMm)) {
-        return {
-          endBeforeStart: {
-            startTime: startTime, endTime: endTime
-          }
-        };
-      }
-
-      return null;
-    }
+    Validators.required, endTimeValidator(() => this.startTime.value)
   ]);
 
   newWeeklyEventForm: FormGroup = this.builder.group({
@@ -132,20 +116,5 @@ export class NewWeeklyEventComponent implements
 
   dvOnAfterAbort(reason: Error) {
     this.newWeeklyEventError = reason.message;
-  }
-
-  // Get the hours and minutes in 24-hour format from a time in 12-hr format
-  // (hh:mm AM/PM)
-  private getHhMm(hhMmTime: string): {hh: number, mm: number} {
-    const AM_LENGTH = 2;
-    const PERIOD_HOURS = 12;
-    const hhMm = hhMmTime.slice(0, -AM_LENGTH)
-      .split(':');
-    const ret = {hh: Number(hhMm[0]), mm: Number(hhMm[1])};
-    if (hhMmTime.slice(-AM_LENGTH) === 'PM') {
-      ret.hh = ret.hh + PERIOD_HOURS;
-    }
-
-    return ret;
   }
 }

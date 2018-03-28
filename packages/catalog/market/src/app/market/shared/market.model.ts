@@ -10,15 +10,15 @@ export interface Market {
 
 export interface Party {
   id: string;
-  balance: number;
+  balance?: number;
 }
 
 export interface Good {
-  id: string;
-  seller: Party;
-  price: number;
-  supply: number;
-  market: Market;
+  id?: string;
+  seller?: Party;
+  price?: number;
+  supply?: number;
+  market?: Market;
 }
 
 export interface Transaction {

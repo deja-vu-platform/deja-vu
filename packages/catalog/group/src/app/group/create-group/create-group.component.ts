@@ -27,6 +27,7 @@ export class CreateGroupComponent implements OnInit {
   @Input() initialGroupIds: string[] = [];
   @Input() showOptionToAddMembers = true;
   @Input() showOptionToAddGroups = true;
+  @Input() showOptionToSubmit = true;
 
   // Presentation inputs
   @Input() memberAutocompletePlaceholder = 'Choose Member';

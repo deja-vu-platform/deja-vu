@@ -3,11 +3,17 @@ import {
 } from '@angular/core';
 
 import {
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  Validators
+} from '@angular/forms';
+
+
+import {
   GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
   RunService
 } from 'dv-core';
 
-import { Market } from '../shared/market.model';
+import { Good, Market } from '../shared/market.model';
 
 import * as _ from 'lodash';
 
@@ -19,9 +25,16 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-market.component.html',
   styleUrls: ['./create-market.component.css']
 })
-export class CreateMarketComponent implements
-  OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() id: string = ''; // optional
+export class CreateMarketComponent
+implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  @Input() showOptionToInputId = true;
+  @Input() showOptionToInputGoods = true;
+  @Input() showOptionToSubmit = true;
+  // These are only relevant if `showOptionToInputGoods` is true
+  @Input() sellerId: string | undefined;
+  @Input() showOptionToInputPrice = true;
+  @Input() showOptionToInputSeller = true;
+
   @Output() market: EventEmitter<Market> = new EventEmitter<Market>();
 
   // Presentation inputs
@@ -29,14 +42,25 @@ export class CreateMarketComponent implements
   @Input() inputLabel = 'Id';
   @Input() newMarketSavedText = 'New market saved';
 
+  idControl = new FormControl('');
+  goodsControl = new FormControl();
+  createMarketForm = this.builder.group({
+    idControl: this.idControl,
+    goodsControl: this.goodsControl
+  });
+
   newMarketSaved = false;
   newMarketError: string;
 
   private gs: GatewayService;
 
+  @Input() set id(id: string) {
+    this.idControl.setValue(id);
+  }
+
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService, private builder: FormBuilder) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -51,14 +75,17 @@ export class CreateMarketComponent implements
     const res = await this.gs
       .post<{data: {createMarket: {id: string}}, errors: {message: string}[]}>(
         '/graphql', {
-          query: `mutation {
-            createMarket(id: "${this.id}") {
+          query: `mutation CreateMarket($input: CreateMarketInput!) {
+            createMarket(input: $input) {
               id
             }
           }`,
           variables: {
             input: {
-              id: this.id
+              id: this.idControl.value,
+              withNewGoods: this.showOptionToInputGoods ?
+                _.map(this.goodsControl.value, this.goodToCreateGoodInput)
+                : undefined
             }
           }
         })
@@ -81,5 +108,12 @@ export class CreateMarketComponent implements
 
   dvOnAfterAbort(reason: Error) {
     this.newMarketError = reason.message;
+  }
+
+  private goodToCreateGoodInput(g: Good) {
+    const goodInput = _.omit(g, 'seller');
+    goodInput.sellerId = g.seller.id;
+
+    return goodInput;
   }
 }
