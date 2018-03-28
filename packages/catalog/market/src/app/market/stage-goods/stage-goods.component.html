@@ -1,28 +1,4 @@
 <div class="row">
-  <div class="col-md-12">
-    <ul *ngIf="staged && staged.length > 0"
-      class="list-group">
-      <li *ngFor="let good of staged; index as i" class="list-group-item">
-        <div class="row">
-          <div class="col-md-10">
-            <dv-include [action]="showGood" [inputs]="{
-              good: good
-             }"
-             [parent]="stageGoodsComponent">
-            </dv-include>
-          </div>
-          <div class="col-md-2">
-            <button mat-button (click)="unstage(i)">
-              <i class="material-icons">eject</i>
-            </button>
-          </div>
-        </div>
-      </li>
-    </ul>
-  </div>
-</div>
-
-<div class="row">
   <form (ngSubmit)="stage()"
     [formGroup]="stageForm"
     class="form-horizontal">
@@ -46,4 +22,28 @@
       </button>
     </div>
   </form>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <ul *ngIf="staged && staged.length > 0"
+      class="list-group">
+      <li *ngFor="let good of staged; index as i" class="list-group-item">
+        <div class="row">
+          <div class="col-md-10">
+            <dv-include [action]="showGood" [inputs]="{
+              good: good
+             }"
+             [parent]="stageGoodsComponent">
+            </dv-include>
+          </div>
+          <div class="col-md-2">
+            <button mat-button (click)="unstage(i)">
+              <i class="material-icons">eject</i>
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
 </div>
