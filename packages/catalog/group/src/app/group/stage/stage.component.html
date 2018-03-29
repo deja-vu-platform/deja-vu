@@ -1,4 +1,27 @@
 <div class="row">
+  <form (ngSubmit)="stage()"
+    [formGroup]="stageForm"
+    class="form-horizontal">
+    <div class="form-group">
+      <group-autocomplete
+        [autocompletePlaceholder]="autocompletePlaceholder"
+        [type]="type"
+        [disabledIds]="staged"
+        [showMember]="showMember"
+        [showGroup]="showGroup"
+        formControlName="autocomplete"
+        [required]="true">
+      </group-autocomplete>
+    </div>
+    <div class="form-group">
+      <button mat-button type="submit" [disabled]="!stageForm.valid">
+        {{buttonLabel}}
+      </button>
+    </div>
+  </form>
+</div>
+
+<div class="row">
   <div class="col-md-12">
     <ul *ngIf="staged && staged.length > 0"
       class="list-group">
@@ -7,14 +30,14 @@
           <div class="col-md-10">
             <div *ngIf="type === 'member'">
               <dv-include [action]="showMember" [inputs]="{
-                member: {id: id}
+                id: id
                }"
                [parent]="stageComponent">
               </dv-include>
             </div>
             <div *ngIf="type === 'group'">
               <dv-include [action]="showGroup" [inputs]="{
-                group: {id: id},
+                id: id,
                 showMembers: false,
                 showSubgroups: false
                }"
@@ -31,25 +54,4 @@
       </li>
     </ul>
   </div>
-</div>
-
-<div class="row">
-  <form (ngSubmit)="stage()"
-    [formGroup]="stageForm"
-    class="form-horizontal">
-    <div class="form-group">
-      <group-autocomplete
-        [autocompletePlaceholder]="autocompletePlaceholder"
-        [type]="type"
-        [disabledIds]="staged"
-        formControlName="autocomplete"
-        [required]="true">
-      </group-autocomplete>
-    </div>
-    <div class="form-group">
-      <button mat-button type="submit" [disabled]="!stageForm.valid">
-        {{buttonLabel}}
-      </button>
-    </div>
-  </form>
 </div>

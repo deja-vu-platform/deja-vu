@@ -347,11 +347,11 @@ const resolvers = {
       const sellerIdFilterOp = _.omitBy({
         $eq: input.sellerId,
         $ne: input.buyerId
-      }, _.isUndefined);
+      }, _.isEmpty);
       const filterOp = _.omitBy({
         marketId: input.marketId,
         sellerId: sellerIdFilterOp
-      }, (val) => _.isUndefined(val) || _.isEmpty(val));
+      }, _.isEmpty);
 
       if (input.affordable !== undefined && input.buyerId) {
         const buyer: PartyDoc = await Validation.partyExists(input.buyerId);
@@ -470,9 +470,7 @@ const resolvers = {
         Validation.goodPurchasable(input.goodId, input.quantity)
       ]);
 
-      const good: GoodDoc = input.paid ?
-        await Validation.goodHasSeller(input.goodId)
-        : await Validation.goodExists(input.goodId);
+      const good: GoodDoc = await Validation.goodExists(input.goodId);
       const pricePerGood = _.isNumber(input.priceFraction) ?
         good.price * input.priceFraction : good.price;
 

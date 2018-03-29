@@ -8,5 +8,7 @@ import { Member } from '../shared/group.model';
   styleUrls: ['./show-member.component.css']
 })
 export class ShowMemberComponent {
-  @Input() member: Member;
+  // One of these is required
+  @Input() member: Member | undefined;
+  @Input() id: string | undefined;
 }

@@ -12,7 +12,9 @@ import { Event, WeeklyEvent } from '../../../../shared/data';
   providers: [ DatePipe ]
 })
 export class ShowEventComponent implements OnChanges, OnInit {
-  @Input() event: Event;
+  // One is required
+  @Input() event: Event | undefined;
+  @Input() id: string | undefined;
   sameDayEvent = false;
 
   private gs: GatewayService;
@@ -21,24 +23,31 @@ export class ShowEventComponent implements OnChanges, OnInit {
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.sameDayEvent = this.isSameDayEvent(this.event);
+    this.load();
   }
 
   ngOnChanges() {
-    if (this.event.startDate && this.event.endDate) {
+    this.load();
+  }
+
+  load() {
+    if (this.event && this.event.startDate && this.event.endDate) {
       this.sameDayEvent = this.isSameDayEvent(this.event);
-    } else if (this.event.id) {
-      this.gs
-        .get<{event: Event}>(`
-          event(id: "${this.event.id}") {
-            startDate,
-            endDate
-          }
-        `)
-        .subscribe((obj) => {
-          this.event = obj.event;
-          this.sameDayEvent = this.isSameDayEvent(obj.event);
-        });
+    } else if (this.gs && this.id) {
+      this.gs.get<{data: {event: Event}}>('/graphql', {
+        params: {
+          query: ` query {
+            event(id: "${this.id}") {
+              startDate,
+              endDate
+            }
+          }`
+        }
+      })
+      .subscribe((obj) => {
+        this.event = obj.data.event;
+        this.sameDayEvent = this.isSameDayEvent(this.event);
+      });
     }
   }
 

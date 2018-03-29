@@ -53,6 +53,7 @@ implements OnInit, ControlValueAccessor, Validator {
 
   // Presentation inputs
   @Input() buttonLabel = 'Add Good';
+  @Input() supplyLabel = 'Supply';
 
   @ViewChild(FormGroupDirective) form;
 

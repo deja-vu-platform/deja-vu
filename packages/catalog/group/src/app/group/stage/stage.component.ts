@@ -52,8 +52,8 @@ implements OnInit, ControlValueAccessor, Validator {
   };
 
   // Presentation inputs
-  @Input() autocompletePlaceholder = '';
-  @Input() buttonLabel = '';
+  @Input() autocompletePlaceholder;
+  @Input() buttonLabel;
 
   @ViewChild(FormGroupDirective) form;
 
@@ -74,8 +74,12 @@ implements OnInit, ControlValueAccessor, Validator {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.autocompletePlaceholder = `Choose ${this.type}`;
-    this.buttonLabel = `Add ${this.type}`;
+    if (!this.autocompletePlaceholder) {
+      this.autocompletePlaceholder = `Choose ${this.type}`;
+    }
+    if (!this.buttonLabel) {
+      this.buttonLabel = `Add ${this.type}`;
+    }
     this.staged = this.initialStageIds;
   }
 

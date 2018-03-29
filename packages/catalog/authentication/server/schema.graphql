@@ -22,6 +22,7 @@ input ChangePasswordInput {
 
 type Query {
   user(username: String!): User
+  userById(id: String!): User
   users: [User!]
 }
 

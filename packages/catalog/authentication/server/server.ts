@@ -98,7 +98,8 @@ const resolvers = {
   Query: {
     users: () => users.find()
       .toArray(),
-    user: async (_, { username }) => users.findOne({ username: username})
+    user: (_, { username }) => users.findOne({ username: username}),
+    userById: (_, { id }) => users.findOne({ id: id})
   },
 
   User: {

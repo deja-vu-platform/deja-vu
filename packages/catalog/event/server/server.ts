@@ -127,7 +127,7 @@ const resolvers = {
   Mutation: {
     createEvent: async (root, {input}: {input: CreateEventInput}) => {
       const {startDate, endDate} = getStartAndEndDates(input);
-      const eventId = uuid();
+      const eventId = input.id ? input.id : uuid();
       const e = { id: eventId, startDate: startDate, endDate: endDate };
       await events.insertOne(e);
 
@@ -203,9 +203,9 @@ const resolvers = {
 };
 
 function getStartAndEndDates(input: CreateEventInput | UpdateEventInput)
-  : {startDate: string, endDate: string} {
-  const startsOnDate = new Date(input.startsOn);
-  const endsOnDate = new Date(input.endsOn);
+  : {startDate: Date, endDate: Date} {
+  const startsOnDate = new Date(Number(input.startsOn));
+  const endsOnDate = new Date(Number(input.endsOn));
 
   const startHhMm = getHhMm(input.startTime);
   const endHhMm = getHhMm(input.endTime);
@@ -213,7 +213,7 @@ function getStartAndEndDates(input: CreateEventInput | UpdateEventInput)
   startsOnDate.setHours(startHhMm.hh, startHhMm.mm);
   endsOnDate.setHours(endHhMm.hh, endHhMm.mm);
 
-  return { startDate: startsOnDate.toString(), endDate: endsOnDate.toString() };
+  return { startDate: startsOnDate, endDate: endsOnDate };
 }
 
 // Get the hours and minutes in 24-hour format from a time in 12-hr format

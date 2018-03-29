@@ -35,11 +35,13 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   @Input() showMarket = true;
 
   // Whether to show the user the option to {buy, ...} a good
-  // Requires buyerId
+  // Requires optionToBuyBuyerId
   @Input() showOptionToBuy = true;
+  @Input() optionToBuyBuyerId: string | undefined;
   // Requires buyerId and compoundTransactionId
-  @Input() showOptionToAddToComopundTransaction = true;
-  @Input() compoundTransactionId: string = '';
+  @Input() showOptionToAddToCompoundTransaction = true;
+  @Input() optionToAddToCompoundTransactionBuyerId: string | undefined;
+  @Input() compoundTransactionId = '';
   // @Input() showOptionToDelete = true; // for next time
 
   @Input() showGood: Action = {

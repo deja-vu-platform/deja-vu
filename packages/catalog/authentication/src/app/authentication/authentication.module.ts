@@ -12,14 +12,21 @@ import { DvModule } from 'dv-core';
 import {
   ChangePasswordComponent
 } from './change-password/change-password.component';
+export { ChangePasswordComponent };
 import { LoggedInComponent } from './logged-in/logged-in.component';
+export { LoggedInComponent };
 import { RegisterUserComponent } from './register-user/register-user.component';
+export { RegisterUserComponent };
+import { ShowUserComponent } from './show-user/show-user.component';
+export { ShowUserComponent };
 import { SignInComponent } from './sign-in/sign-in.component';
+export { SignInComponent };
 import { SignOutComponent } from './sign-out/sign-out.component';
+export { SignOutComponent };
 
 const allComponents = [
   ChangePasswordComponent, LoggedInComponent, RegisterUserComponent,
-  SignInComponent, SignOutComponent
+  ShowUserComponent, SignInComponent, SignOutComponent
 ];
 
 @NgModule({

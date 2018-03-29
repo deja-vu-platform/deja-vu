@@ -10,15 +10,25 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from 'dv-core';
 
 import { AddToGroupComponent } from './add-to-group/add-to-group.component';
+export { AddToGroupComponent };
 import { AutocompleteComponent } from './autocomplete/autocomplete.component';
+export { AutocompleteComponent };
 import { CreateGroupComponent } from './create-group/create-group.component';
+export { CreateGroupComponent };
 import { CreateMemberComponent } from './create-member/create-member.component';
+export { CreateMemberComponent };
 import { JoinLeaveComponent } from './join-leave/join-leave.component';
+export { JoinLeaveComponent };
 import { ShowGroupComponent } from './show-group/show-group.component';
+export { ShowGroupComponent };
 import { ShowGroupsComponent } from './show-groups/show-groups.component';
+export { ShowGroupsComponent };
 import { ShowMemberComponent } from './show-member/show-member.component';
+export { ShowMemberComponent };
 import { ShowMembersComponent } from './show-members/show-members.component';
+export { ShowMembersComponent };
 import { StageComponent } from './stage/stage.component';
+export { StageComponent };
 
 
 const allComponents =  [
@@ -27,6 +37,8 @@ const allComponents =  [
   ShowGroupsComponent, ShowMemberComponent, ShowMembersComponent,
   StageComponent
 ];
+
+
 @NgModule({
   imports: [
     CommonModule,

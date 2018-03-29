@@ -27,10 +27,11 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-good.component.html',
   styleUrls: ['./create-good.component.css']
 })
-export class CreateGoodComponent implements
-  OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
+export class CreateGoodComponent
+implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string | undefined = '';
-  @Input() showSellerId = true;
+  @Input() showOptionToInputSeller = true;
+  @Input() showOptionToInputPrice = true;
   @Output() good = new EventEmitter();
 
   @Input() marketId: string;
@@ -49,6 +50,7 @@ export class CreateGoodComponent implements
 
   // Presentation inputs
   @Input() buttonLabel = 'Create';
+  @Input() supplyLabel = 'Supply';
   @Input() newGoodSavedText = 'New good saved';
 
   @ViewChild(FormGroupDirective) form;

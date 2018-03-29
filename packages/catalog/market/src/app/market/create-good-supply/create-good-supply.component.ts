@@ -32,11 +32,11 @@ import { startWith } from 'rxjs/operators';
 })
 export class CreateGoodSupplyComponent
   implements OnInit, ControlValueAccessor, Validator {
-  @Input() initialValue: number = 0;
+  @Input() initialValue = 0;
   @Output() supply: EventEmitter<number> = new EventEmitter<number>();
 
   // Presentation input
-  @Input() inputLabel: string = 'Supply';
+  @Input() inputLabel = 'Supply';
 
   supplyControl = new FormControl('', [
     Validators.required,

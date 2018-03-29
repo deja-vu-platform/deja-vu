@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output
+  Component, ElementRef, EventEmitter, Input, OnInit, Output,
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -34,6 +35,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() sellerId: string | undefined;
   @Input() showOptionToInputPrice = true;
   @Input() showOptionToInputSeller = true;
+  @Input() stageGoodsButtonLabel = 'Add Good';
+  @Input() supplyLabel = 'Supply';
 
   @Output() market: EventEmitter<Market> = new EventEmitter<Market>();
 
@@ -48,6 +51,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     idControl: this.idControl,
     goodsControl: this.goodsControl
   });
+
+  @ViewChild(FormGroupDirective) form;
 
   newMarketSaved = false;
   newMarketError: string;
@@ -99,15 +104,24 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   dvOnAfterCommit() {
-    this.newMarketSaved = true;
-    this.newMarketError = '';
-    window.setTimeout(() => {
-      this.newMarketSaved = false;
-    }, SAVED_MSG_TIMEOUT);
+    if (this.showOptionToSubmit) {
+      this.newMarketSaved = true;
+      this.newMarketError = '';
+      window.setTimeout(() => {
+        this.newMarketSaved = false;
+      }, SAVED_MSG_TIMEOUT);
+    }
+    // Can't do `this.form.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
+    }
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.newMarketError = reason.message;
+    if (this.showOptionToSubmit) {
+      this.newMarketError = reason.message;
+    }
   }
 
   private goodToCreateGoodInput(g: Good) {
