@@ -27,6 +27,10 @@ export interface Action {
   // A map from the output names the default action is expecting to the ones
   // of `type`
   outputMap?: FieldMap
+  // A map of input names to values. This will be passed to the action when 
+  // invoked. If an input of the same name is given to the action the input
+  // given in `inputs` takes precedence.
+  inputs?: FieldMap
 }
 
 
@@ -51,7 +55,6 @@ export class IncludeComponent implements AfterViewInit {
     private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges) {
-    debugger;
     if (changes.type &&
         changes.type.currentValue !== changes.type.previousValue) {
       this.loadComponent();
@@ -59,7 +62,6 @@ export class IncludeComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    debugger;
     this.isViewInitialized = true;
     this.loadComponent();
   }
@@ -103,6 +105,10 @@ export class IncludeComponent implements AfterViewInit {
         this.action.inputMap[inputKey]] = this.inputs[inputKey];
       shouldCallDetectChanges = true;
     }
+    for (const inputKey of _.keys(this.action.inputs)) {
+      this.componentRef.instance[inputKey] = this.action.inputs[inputKey];
+      shouldCallDetectChanges = true;   
+    }
     for (const outputKey of _.keys(this.outputs)) {
       this.componentRef.instance[this.action.outputMap[outputKey]]
         .subscribe(newVal => {
@@ -115,7 +121,6 @@ export class IncludeComponent implements AfterViewInit {
     // Trigger a new round of change detection since we changed fields of
     // componentRef
     if (shouldCallDetectChanges) {
-      debugger;
       this.changeDetectorRef.detectChanges();
     }
   }
