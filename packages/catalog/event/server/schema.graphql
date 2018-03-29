@@ -13,7 +13,7 @@ type WeeklyEvent {
 }
 
 input CreateEventInput {
-  id: ID!
+  id: ID
   startsOn: String!
   endsOn: String!
   startTime: String!

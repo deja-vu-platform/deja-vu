@@ -1,7 +1,7 @@
 <ul *ngIf="members && members.length > 0" class="list-group">
   <li *ngFor="let member of members" class="list-group-item">
     <dv-include [action]="showMember" [inputs]="{
-        member: member
+        id: member.id
       }"
       [parent]="showMembers">
     </dv-include>

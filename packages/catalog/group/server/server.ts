@@ -6,6 +6,8 @@ import * as mongodb from 'mongodb';
 import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
+import * as _ from 'lodash';
+
 import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
@@ -202,7 +204,7 @@ const resolvers = {
     member: (root, { id }) => members.findOne({ id: id }),
     // Get all members directly or indirectly in a group
     members: async (root, { input }: { input: MembersInput }) =>  {
-      let filter = {};
+      let ret;
       if (input.inGroupId && !input.directOnly) {
         const foundMembers: Set<string> = new Set();
         await forEachGroupInGroup(input.inGroupId, (group: GroupDoc) => {
@@ -210,14 +212,19 @@ const resolvers = {
             foundMembers.add(memberId);
           });
         });
-        filter = { id: { $in: Array.from(foundMembers) } };
+        ret = members
+          .find({ id: { $in: Array.from(foundMembers) } })
+          .toArray();
       } else if (input.inGroupId && input.directOnly) {
-        filter = { id: input.inGroupId };
+        const inGroup: GroupDoc = await groups
+          .findOne({ id: input.inGroupId }, { memberIds: 1 });
+        ret = _.map(inGroup.memberIds, (memberId) => ({ id: memberId }));
+      } else {
+        ret = members.find()
+          .toArray();
       }
 
-      return members
-        .find(filter)
-        .toArray();
+      return ret;
     },
     groups: async (root, { input }: { input: GroupsInput }) => {
       if (input.withGroupId && input.directOnly) {

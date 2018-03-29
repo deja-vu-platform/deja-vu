@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Type, ViewChild
 } from '@angular/core';
 
 import {
@@ -8,12 +8,14 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
+  Action, GatewayService, GatewayServiceFactory, OnAfterAbort,
+  OnAfterCommit, OnRun, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
 
+import { ShowGroupComponent } from '../show-group/show-group.component';
+import { ShowMemberComponent } from '../show-member/show-member.component';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -25,6 +27,14 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class AddToGroupComponent implements OnInit {
   @Input() id: string;
   @Input() type: 'member' | 'subgroup' = 'member';
+
+  @Input() showMember: Action = {
+    type: <Type<Component>> ShowMemberComponent
+  };
+
+  @Input() showGroup: Action = {
+    type: <Type<Component>> ShowGroupComponent
+  };
 
   // Presentation inputs
   @Input() autocompletePlaceholder = `Choose ${this.type}`;

@@ -24,19 +24,37 @@ export class ShowObjectComponent implements OnInit, OnChanges {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory) {}
 
-  async ngOnInit() {
+  ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    await this.fetchProperties();
+    this.load();
+  }
+
+  ngOnChanges() {
+    this.load();
+  }
+
+  async load() {
+    if (!this.gs) {
+      return;
+    }
+
+    const allProperties = await this.fetchProperties();
+    let propertiesToFetch = [];
+    if (this.showOnly) {
+      propertiesToFetch = this.showOnly;
+    } else if (this.showExclude) {
+      propertiesToFetch = _
+        .difference(allProperties, this.showExclude);
+    } else {
+      propertiesToFetch = allProperties;
+    }
+    this.properties = propertiesToFetch;
+
     this.fetchObject();
   }
 
-  async ngOnChanges() {
-    await this.fetchProperties();
-    this.fetchObject();
-  }
-
-  async fetchProperties() {
-    if (this.gs && !this.showOnly && !this.properties) {
+  async fetchProperties(): Promise<string[]> {
+    if (!this.showOnly) {
       const res = await this.gs
         .get<{data: {properties: Property[]}}>('/graphql', {
           params: {
@@ -50,28 +68,20 @@ export class ShowObjectComponent implements OnInit, OnChanges {
           }
         })
         .toPromise();
-      this.properties = _.map(res.data.properties, 'name');
+
+      return _.map(res.data.properties, 'name');
     }
   }
 
   fetchObject() {
-    let propertiesToFetch = [];
-    if (this.showOnly) {
-      propertiesToFetch = this.showOnly;
-    } else if (this.showExclude) {
-      propertiesToFetch = _
-        .difference(this.properties, this.showExclude);
-    } else {
-      propertiesToFetch = this.properties;
-    }
-    if (this.gs && this.id && this.properties) {
+    if (this.id && this.properties) {
       this.gs
         .get<{data: {object: Object}}>('/graphql', {
           params: {
             query: `
               query {
                 object(id: "${this.id}") {
-                  ${propertiesToFetch.join('\n')}
+                  ${this.properties.join('\n')}
                 }
               }
             `
