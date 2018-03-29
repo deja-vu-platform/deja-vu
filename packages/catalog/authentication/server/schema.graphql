@@ -20,6 +20,11 @@ input ChangePasswordInput {
   newPassword: String!
 }
 
+type SignInOutput {
+  token: String!
+  user: User!
+}
+
 type Query {
   user(username: String!): User
   userById(id: String!): User
@@ -28,6 +33,7 @@ type Query {
 
 type Mutation {
   register(input: RegisterInput!): User
-  signIn(input: SignInInput!): String          # JSON.stringify
+  registerAndSignIn(input: RegisterInput!): SignInOutput
+  signIn(input: SignInInput!): SignInOutput
   changePassword(input: ChangePasswordInput!): Boolean
 }

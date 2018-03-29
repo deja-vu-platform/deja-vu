@@ -6,6 +6,9 @@ import { OnRun, RunService } from 'dv-core';
 
 import * as _ from 'lodash';
 
+import { AuthenticationService } from '../shared/authentication.service';
+
+
 @Component({
   selector: 'authentication-sign-out',
   templateUrl: './sign-out.component.html',
@@ -14,7 +17,9 @@ import * as _ from 'lodash';
 export class SignOutComponent implements OnInit, OnRun {
   @Input() buttonLabel = 'Sign Out';
 
-  constructor(private elem: ElementRef, private rs: RunService) {}
+  constructor(
+    private elem: ElementRef, private rs: RunService,
+    private authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     this.rs.register(this.elem, this);
@@ -25,7 +30,6 @@ export class SignOutComponent implements OnInit, OnRun {
   }
 
   dvOnRun() {
-    localStorage.removeItem('id_token');
-    localStorage.removeItem('user');
+    this.authenticationService.signOut();
   }
 }
