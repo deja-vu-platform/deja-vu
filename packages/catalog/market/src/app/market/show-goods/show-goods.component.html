@@ -7,14 +7,16 @@
     </dv-include>
 
     <div *ngIf="showOptionToBuy">
-      <market-create-transaction [goodId]="good.id" [buyerId]="buyerId">
+      <market-create-transaction
+        [goodId]="good.id"
+        [buyerId]="optionToBuyBuyerId">
       </market-create-transaction>
     </div>
 
-    <div *ngIf="showOptionToAddToComopundTransaction && compoundTransactionId">
+    <div *ngIf="showOptionToAddToCompoundTransaction && compoundTransactionId">
       <market-create-transaction
         [goodId]="good.id"
-        [buyerId]="buyerId"
+        [buyerId]="optionToAddToCompoundTransactionBuyerId"
         [compoundTransactionId]="compoundTransactionId"
         [paid]="false"
         [buttonLabel]="'Add'">

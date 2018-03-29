@@ -35,7 +35,7 @@
   <market-create-good [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [sellerId]="partyId" (good)="goodId1 = $event.id"></market-create-good>
 
   <h3>Optional Seller</h3>
-  <market-create-good [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [showSellerId]="false" (good)="goodId2 = $event.id"></market-create-good>
+  <market-create-good [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [showOptionToInputSeller]="false" (good)="goodId2 = $event.id"></market-create-good>
 
   <h2>Update Good</h2>
   <market-update-good [id]="goodId2"></market-update-good>
