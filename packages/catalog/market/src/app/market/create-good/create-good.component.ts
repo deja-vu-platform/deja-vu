@@ -1,6 +1,6 @@
 import {
-  ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
-  SimpleChanges, ViewChild
+  ChangeDetectorRef, Component, ElementRef, EventEmitter, Input,
+  OnChanges, OnInit, Output, SimpleChanges, ViewChild
 } from '@angular/core';
 
 import {
@@ -19,6 +19,10 @@ import * as _ from 'lodash';
 
 import { Good } from '../shared/market.model';
 
+interface CreateGoodResponse {
+  data: {createGood: Good};
+  errors: {message: string}[];
+}
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -32,6 +36,8 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string | undefined = '';
   @Input() showOptionToInputSeller = true;
   @Input() showOptionToInputPrice = true;
+  @Input() showOptionToSubmit = true;
+  @Input() save = true;
   @Output() good = new EventEmitter();
 
   @Input() marketId: string;
@@ -86,7 +92,7 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   ngOnChanges(changes: SimpleChanges) {
     // https://stackoverflow.com/questions/34364880/expression-has-changed-after-it-was-checked
     // The statement below is needed to suppress the error described above.
-    this.ref.detectChanges()
+    this.ref.detectChanges();
     if (changes.marketId) {
       this.marketIdChange.emit();
     }
@@ -97,44 +103,57 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   async dvOnRun(): Promise<void> {
-    if (!this.marketId) {
-      await this.marketIdChange.asObservable()
-        .pipe(take(1))
+    const newGood: Good =  {
+      id: this.id,
+      price: this.priceControl.value,
+      seller: { id: this.sellerIdControl.value },
+      supply: this.supplyControl.value,
+      market: { id: this.marketId }
+    };
+    if (this.save) {
+      if (!this.marketId) {
+        await this.marketIdChange.asObservable()
+          .pipe(take(1))
+          .toPromise();
+      }
+      const res = await this.gs
+        .post<CreateGoodResponse>('/graphql', {
+          query: `mutation CreateGood($input: CreateGoodInput!) {
+            createGood (input: $input) {
+              id
+            }
+          }`,
+          variables: {
+            input: {
+              id: this.id,
+              price: this.priceControl.value,
+              sellerId: this.sellerIdControl.value,
+              supply: this.supplyControl.value,
+              marketId: this.marketId
+            }
+          }
+        })
         .toPromise();
-    }
-    const res = await this.gs
-      .post<{data: {createGood: Good}, errors: {message: string}[]}>('/graphql', {
-        query: `mutation CreateGood($input: CreateGoodInput!) {
-          createGood (input: $input) {
-            id
-          }
-        }`,
-        variables: {
-          input: {
-            id: this.id,
-            price: this.priceControl.value,
-            sellerId: this.sellerIdControl.value,
-            supply: this.supplyControl.value,
-            marketId: this.marketId
-          }
-        }
-      })
-      .toPromise();
 
-    if (res.errors) {
-      throw new Error(_.map(res.errors, 'message')
-        .join());
+      if (res.errors) {
+        throw new Error(_.map(res.errors, 'message')
+          .join());
+      }
+
+      newGood.id = res.data.createGood.id;
     }
 
-    this.good.emit({ id: res.data.createGood.id });
+    this.good.emit(newGood);
   }
 
   dvOnAfterCommit() {
-    this.newGoodSaved = true;
-    this.newGoodError = '';
-    window.setTimeout(() => {
-      this.newGoodSaved = false;
-    }, SAVED_MSG_TIMEOUT);
+    if (this.showOptionToSubmit && this.save) {
+      this.newGoodSaved = true;
+      this.newGoodError = '';
+      window.setTimeout(() => {
+        this.newGoodSaved = false;
+      }, SAVED_MSG_TIMEOUT);
+    }
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
     if (this.form) {
@@ -143,6 +162,8 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   dvOnAfterAbort(reason: Error) {
-    this.newGoodError = reason.message;
+    if (this.showOptionToSubmit && this.save) {
+      this.newGoodError = reason.message;
+    }
   }
 }

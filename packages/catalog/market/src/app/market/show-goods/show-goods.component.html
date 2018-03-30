@@ -9,7 +9,9 @@
     <div *ngIf="showOptionToBuy">
       <market-create-transaction
         [goodId]="good.id"
-        [buyerId]="optionToBuyBuyerId">
+        [buyerId]="optionToBuyBuyerId"
+        [buttonLabel]="optionToBuyButtonLabel"
+        [inputQuantityLabel]="optionToBuyInputQuantityLabel">
       </market-create-transaction>
     </div>
 
@@ -26,5 +28,5 @@
 </ul>
 
 <div *ngIf="!goods || goods.length === 0">
-  <span>No goods to show</span>
+  <span>{{noGoodsToShowText}}</span>
 </div>

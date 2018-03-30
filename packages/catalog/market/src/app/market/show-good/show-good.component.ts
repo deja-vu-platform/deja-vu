@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, OnChanges } from '@angular/core';
 
 import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
@@ -8,9 +8,10 @@ import { Good } from '../shared/market.model';
 @Component({
   selector: 'market-show-good',
   templateUrl: './show-good.component.html',
-  styleUrls: ['./show-good.component.css'],
+  styleUrls: ['./show-good.component.css']
 })
-export class ShowGoodComponent {
+export class ShowGoodComponent implements OnInit, OnChanges {
+  @Input() id: string;
   @Input() good: Good;
 
   @Input() showId = true;
@@ -41,14 +42,14 @@ export class ShowGoodComponent {
 
   loadGood() {
     // only load good when id is given
-    if (!this.gs || !this.good || !this.good.id) {
+    if (!this.gs || this.good || !this.id) {
       return;
     }
     this.gs.get<{data: {good: Good}}>('/graphql', {
       params: {
         query: `
           query {
-            good(id: "${this.good.id}") {
+            good(id: "${this.id}") {
               ${this.showId ? 'id' : ''}
               ${this.showPrice ? 'price' : ''}
               ${this.showSupply ? 'supply' : ''}
@@ -61,6 +62,6 @@ export class ShowGoodComponent {
     })
     .subscribe((res) => {
       this.good = res.data.good;
-    })
+    });
   }
 }
