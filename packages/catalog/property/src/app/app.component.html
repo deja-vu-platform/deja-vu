@@ -2,4 +2,13 @@
   <property-create-object id="ben"></property-create-object>
   <property-show-object id="ben"></property-show-object>
   <property-show-object id="ben" [showOnly]="['lastName']"></property-show-object>
+  <dv-tx>
+    <property-create-objects [hidden]="true" [objects]="[
+      {firstName: 'foo', lastName: 'bar'},
+      {firstName: 'foo1', lastName: 'bar1'},
+      {firstName: 'foo2', lastName: 'bar2'}
+      ]">
+    </property-create-objects>
+    <dv-button>Create Objects</dv-button>
+  </dv-tx>
 </div>

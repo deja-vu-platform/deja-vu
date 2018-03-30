@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -34,6 +34,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() buttonLabel = 'Create Object';
   @Input() newObjectSavedText = 'New object saved';
   @Input() showOptionToSubmit = true;
+  @Input() save = true;
+  @Output() object = new EventEmitter<any>();
 
   @ViewChild(FormGroupDirective) form;
 
@@ -92,26 +94,29 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     for (const property of this.properties) {
       input[property.name] = this[property.name].value;
     }
-    const res = await this.gs
-      .post<{data: any, errors: {message: string}[]}>('/graphql', {
-        query: `mutation CreateObject($input: CreateObjectInput!) {
-          createObject(input: $input) {
-            id
+    if (this.save) {
+      const res = await this.gs
+        .post<{data: any, errors: {message: string}[]}>('/graphql', {
+          query: `mutation CreateObject($input: CreateObjectInput!) {
+            createObject(input: $input) {
+              id
+            }
+          }`,
+          variables: {
+            input: input
           }
-        }`,
-        variables: {
-          input: input
-        }
-      })
-      .toPromise();
-    if (res.errors) {
-      throw new Error(_.map(res.errors, 'message')
-        .join());
+        })
+        .toPromise();
+      if (res.errors) {
+        throw new Error(_.map(res.errors, 'message')
+          .join());
+      }
     }
+    this.object.emit(input);
   }
 
   dvOnAfterCommit() {
-    if (this.showOptionToSubmit) {
+    if (this.showOptionToSubmit && this.save) {
       this.newObjectSaved = true;
       window.setTimeout(() => {
         this.newObjectSaved = false;
@@ -125,7 +130,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   dvOnAfterAbort(reason: Error) {
-    if (this.showOptionToSubmit) {
+    if (this.showOptionToSubmit && this.save) {
       this.newObjectError = reason.message;
     }
   }

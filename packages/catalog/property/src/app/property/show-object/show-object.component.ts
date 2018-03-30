@@ -13,11 +13,11 @@ import { Property } from '../shared/property.model';
 })
 export class ShowObjectComponent implements OnInit, OnChanges {
   @Input() id: string;
+  @Input() object: any;
   @Input() showOnly: string[];
   @Input() showExclude: string[];
 
   properties: string[];
-  object: Object;
 
   private gs: GatewayService;
 
@@ -40,9 +40,9 @@ export class ShowObjectComponent implements OnInit, OnChanges {
 
     const allProperties = await this.fetchProperties();
     let propertiesToFetch = [];
-    if (this.showOnly) {
+    if (!_.isEmpty(this.showOnly)) {
       propertiesToFetch = this.showOnly;
-    } else if (this.showExclude) {
+    } else if (!_.isEmpty(this.showExclude)) {
       propertiesToFetch = _
         .difference(allProperties, this.showExclude);
     } else {

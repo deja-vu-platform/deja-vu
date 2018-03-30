@@ -54,6 +54,7 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
 
   propertyControl: FormControl;
   schemaErrors: string[];
+  required = false;
   type;
 
   private gs: GatewayService;
@@ -110,6 +111,7 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
         }
         const validators = [this.schemaValidator.bind(this)];
         if (property.required) {
+          this.required = true;
           validators.push(Validators.required);
         }
         this.propertyControl = new FormControl('', validators);

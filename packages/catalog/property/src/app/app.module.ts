@@ -7,6 +7,7 @@ import { AppComponent } from './app.component';
 import { GATEWAY_URL } from 'dv-core';
 import { PropertyModule } from './property/property.module';
 
+import { DvModule } from 'dv-core';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { PropertyModule } from './property/property.module';
   ],
   imports: [
     BrowserModule,
+    DvModule,
     PropertyModule
   ],
   providers: [{provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'}],

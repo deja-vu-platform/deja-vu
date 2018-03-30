@@ -1,6 +1,5 @@
 {
   "name": "property",
-  "watch": true,
   "gatewayPort": 3000,
   "config": {
     "wsPort": 3001,
@@ -22,6 +21,5 @@
       },
       "required": ["firstName", "lastName"]
     }
-  },
-  "startServer": true
+  }
 }

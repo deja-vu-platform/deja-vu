@@ -15,4 +15,5 @@ type Query {
 
 type Mutation {
   createObject(input: CreateObjectInput!): Object 
+  createObjects(input: [CreateObjectInput!]!): [Object]
 }
