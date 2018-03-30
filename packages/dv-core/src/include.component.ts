@@ -16,16 +16,37 @@ export class IncludeDirective {
 export type FieldMap = {[field: string]: string};
 export type ValueMap = {[field: string]: any};
 
+/**
+ *  Represents a DV action that can be optionally curried and wrapped with an
+ *  adapter that allows the interface of the action (input/output names) to be
+ *  used as another interface.
+ *
+ *  For example:
+ *  The action given by type=f(fi_1) -> fo_1,
+ *  inputMap={i_1: 'fi_1'}, outputMap={o_1: 'fo_1'},
+ *  inputs={i_2: 'hello'} is conceptually equivalent to:
+ *
+ *  function g(i_1) {
+ *    f_result = f(fi_1=i_1, i_2='hello');
+ *    return {o_1: f_result.fo_1};
+ *  }
+ *
+ *  If no inputMap or outputMap is given then the inputs/outputs are not adapted.
+ *  In the previous example if inputMap is undefined then we have:
+ *
+ *  function g(fi_1) {
+ *    f_result = f(fi_1=fi_1, i_2='hello');
+ *    return {o_1: f_result.fo_1};
+ *  }
+ */
 export interface Action {
-  // The type of the component to include
+  // The type of the action to include
   type: Type<Component>;
-  // Of value
+  // Optional value to specify the cliche the action is from
   of?: string;
-  // A map from the input names the default action is expecting to the ones of
-  // `type`
+  // A map of (adapter input name) -> (action input name)
   inputMap?: FieldMap
-  // A map from the output names the default action is expecting to the ones
-  // of `type`
+  // A map of (adapter output name) -> (action output name)
   outputMap?: FieldMap
   // A map of input names to values. This will be passed to the action when 
   // invoked. If an input of the same name is given to the action the input
@@ -39,10 +60,17 @@ export interface Action {
   template: `<ng-template include-host></ng-template>`
 })
 export class IncludeComponent implements AfterViewInit {
+  // The DV action to include (see interface Action)
   @Input() action: Action;
 
+  // The inputs to `action` (`g`, see above)
+  // Map of the form (adapter input) -> value
   @Input() inputs: ValueMap;
-  @Input() outputs: ValueMap;
+  // A map of the form (adapter output name -> parent field name). When the
+  // action outputs a value (`g`, see above) the field in `parent` of name
+  // `field name` is set to the output value if it's a string. If it's a
+  // function then it's called with the new value
+  @Input() outputs: FieldMap;
   @Input() parent: Component;
 
   @ViewChild(IncludeDirective) host: IncludeDirective;
@@ -113,8 +141,12 @@ export class IncludeComponent implements AfterViewInit {
       this.componentRef.instance[this.action.outputMap[outputKey]]
         .subscribe(newVal => {
           console.log(
-            `Got new value ${newVal}, assigning to ${this.outputs[outputKey]}`);
-          this.parent[this.outputs[outputKey]] = newVal;
+            `Got new value ${newVal}, assigning to/calling ${this.outputs[outputKey]}`);
+          if (_.isFunction(this.parent[this.outputs[outputKey]])) {
+            this.parent[this.outputs[outputKey]](newVal);
+          } else {
+            this.parent[this.outputs[outputKey]] = newVal;
+          }
         });
     }
     // https://github.com/angular/angular/issues/6005
@@ -125,6 +157,9 @@ export class IncludeComponent implements AfterViewInit {
     }
   }
 
+  /**
+   * If `fieldMap` is undefined it returns the identity field map for `valueMap`
+   */
   private initFieldMap(valueMap: ValueMap, fieldMap: FieldMap | undefined)
     : FieldMap {
     if (fieldMap === undefined) {
