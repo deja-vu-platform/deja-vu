@@ -1,3 +1,11 @@
+/* good for black */
+/* @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";*/
+/* @import "~@angular/material/prebuilt-themes/indigo-pink.css";*/
+/* 
+@import "~@angular/material/prebuilt-themes/pink-bluegrey.css";
+*/
+/*@import "~@angular/material/prebuilt-themes/purple-green.css";*/
+
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 
@@ -13,6 +21,7 @@ body {
 }
 
 h1 {
+  font-size: 36px;
   margin-top: 0;
 }
 
@@ -157,6 +166,7 @@ th {
   padding-top: 25px;
   padding-bottom: 25px;
   background-color: #fff;
+  max-height: 150px;
 }
 
 #padding {
@@ -194,6 +204,7 @@ th {
 
 #homepage-container {
   padding-top: 64px;
+  margin-top: 50px;
 }
 
 #party-form {
@@ -285,4 +296,18 @@ caption {
 span.sized, div.inline {
   display: inline-block;
   overflow: hidden;
+}
+
+/* Used in show-parties to style child actions */
+.group-show-groups-group-item {
+  margin-bottom: 10px;
+}
+
+/* Used in show-party to style child actions */
+.event-show-event,
+.event-show-event-same-day-event,
+.event-show-event-diff-day-event,
+.property-show-object,
+.property-show-object-property {
+  display: inline;
 }

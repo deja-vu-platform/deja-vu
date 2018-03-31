@@ -5,7 +5,8 @@
   {{ group.id }}
 </div>
 <ul *ngIf="showMembers && group?.members.length > 0" class="list-group">
-  <li *ngFor="let member of group.members" class="list-group-item">
+  <li *ngFor="let member of group.members"
+    class="list-group-item group-show-group-member-item">
     <dv-include [action]="showMember" [inputs]="{
         member: member
       }"
@@ -15,7 +16,8 @@
 </ul>
 
 <ul *ngIf="showSubgroups && group?.subgroups.length > 0" class="list-group">
-  <li *ngFor="let subgroup of group.subgroups" class="list-group-item">
+  <li *ngFor="let subgroup of group.subgroups"
+    class="list-group-item group-show-group-subgroup-item">
     <group-show-group
       [group]="subgroup"
       [showMembers]="showMembers"

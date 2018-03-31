@@ -51,7 +51,7 @@
                 "type": "string"
               }
           },
-          "required": ["title"]
+          "required": ["title", "location", "description"]
         }
       }
     },
