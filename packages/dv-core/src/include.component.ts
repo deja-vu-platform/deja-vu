@@ -17,9 +17,11 @@ export type FieldMap = {[field: string]: string};
 export type ValueMap = {[field: string]: any};
 
 /**
- *  Represents a DV action that can be optionally curried and wrapped with an
- *  adapter that allows the interface of the action (input/output names) to be
- *  used as another interface.
+ *  Represents a DV action to include with `dv-include`
+ *
+ *  The action given in `type` can be curried and wrapped with an adapter that
+ *  allows the interface of the action (input/output names) to be used as
+ *  another interface.
  *
  *  For example:
  *  The action given by type=f(fi_1) -> fo_1,
@@ -31,8 +33,8 @@ export type ValueMap = {[field: string]: any};
  *    return {o_1: f_result.fo_1};
  *  }
  *
- *  If no inputMap or outputMap is given then the inputs/outputs are not adapted.
- *  In the previous example if inputMap is undefined then we have:
+ *  If no `inputMap` or `outputMap` is given then the inputs/outputs are not
+ *  adapted. In the previous example, if `inputMap` is `undefined` then we have:
  *
  *  function g(fi_1) {
  *    f_result = f(fi_1=fi_1, i_2='hello');
