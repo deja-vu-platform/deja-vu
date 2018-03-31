@@ -6,7 +6,7 @@ import { RunService } from './run.service';
   selector: 'dv-button',
   template: `
     <button mat-button type="button" 
-      [disabled]="!valid" (click)="onClick()">
+      [disabled]="!valid" (click)="onClick()" class="mat-button">
         <ng-content></ng-content>
     </button>
   `

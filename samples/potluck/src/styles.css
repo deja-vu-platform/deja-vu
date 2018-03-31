@@ -297,3 +297,17 @@ span.sized, div.inline {
   display: inline-block;
   overflow: hidden;
 }
+
+/* Used in show-parties to style child actions */
+.group-show-groups-group-item {
+  margin-bottom: 10px;
+}
+
+/* Used in show-party to style child actions */
+.event-show-event,
+.event-show-event-same-day-event,
+.event-show-event-diff-day-event,
+.property-show-object,
+.property-show-object-property {
+  display: inline;
+}

@@ -1,5 +1,6 @@
 <ul *ngIf="groups && groups.length > 0" class="list-group">
-  <li *ngFor="let group of groups" class="list-group-item">
+  <li *ngFor="let group of groups"
+    class="list-group-item group-show-groups-group-item">
     <dv-include [action]="showGroup" [inputs]="{
         group: group, showId: showId, showMembers: showMembers,
         showSubgroups: showSubgroups

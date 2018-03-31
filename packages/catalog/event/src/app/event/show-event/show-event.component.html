@@ -1,9 +1,9 @@
-<div *ngIf="event">
-  <div *ngIf="!sameDayEvent">
+<div *ngIf="event" class="event-show-event">
+  <div *ngIf="!sameDayEvent" class="event-show-event-same-day-event">
     {{event.startDate | date:'EEE MMM d, y h:mm a'}} -
     {{event.endDate | date:'EEE MMM d, y h:mm a'}}
   </div>
-  <div *ngIf="sameDayEvent">
+  <div *ngIf="sameDayEvent" class="event-show-event-diff-day-event">
     {{event.startDate | date:'EEE MMM d, y h:mm a'}} -
     {{event.endDate | date:'h:mm a'}}
   </div>

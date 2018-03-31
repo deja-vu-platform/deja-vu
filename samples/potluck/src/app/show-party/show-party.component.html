@@ -8,10 +8,22 @@
               dvOf="party" [id]="party.id" [showOnly]="['title']">
             </property-show-object>
           </h3>
-          <div style="text-align:center">
-            <event-show-event [id]="party.id">
-            </event-show-event>
-            <div style="height:20px"></div>
+          <div class="party-information">
+            <p>
+              <i class="material-icons">event</i> Date:
+              <event-show-event [id]="party.id"></event-show-event>
+            </p>
+            <p>
+              <i class="material-icons">location_on</i> Location:
+              <property-show-object
+                dvOf="party" [id]="party.id" [showOnly]="['location']">
+              </property-show-object>
+            </p>
+            <p>
+              <property-show-object
+                dvOf="party" [id]="party.id" [showOnly]="['description']">
+              </property-show-object>
+            </p>
           </div>
         </div>
       </div>
