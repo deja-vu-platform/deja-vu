@@ -15,8 +15,11 @@
           </div>
         </div>
       </div>
+      <button mat-button class="btn btn-primary" (click)="viewMore=!viewMore">
+        View {{viewMore ? "Less" : "More"}}
+      </button>
       <hr class="divider">
-      <div class="row">
+      <div class="row" [hidden]="!viewMore">
         <div class="col-md-4">
           <div class="row">
             <div class="col-md-12">

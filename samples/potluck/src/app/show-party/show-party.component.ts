@@ -16,6 +16,7 @@ export class ShowPartyComponent implements OnInit {
   showGuestUsername = ShowUserComponent;
   showSupply = ShowSupplyComponent;
   showClaim = ShowClaimComponent;
+  viewMore: boolean;
 
   constructor() { }
 
