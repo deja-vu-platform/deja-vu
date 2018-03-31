@@ -146,6 +146,8 @@ interface Config {
   dbName: string;
   initialPartyIds: string[];
   reinitDbOnStartup: boolean;
+  // Whether to check and keep track of balances or not. Default is true.
+  enforceBalance: boolean;
 }
 
 const argv = minimist(process.argv);
@@ -158,7 +160,8 @@ const DEFAULT_CONFIG: Config = {
   wsPort: 3000,
   dbName: `${name}-db`,
   initialPartyIds: [],
-  reinitDbOnStartup: true
+  reinitDbOnStartup: true,
+  enforceBalance: true
 };
 
 let configArg;
@@ -594,6 +597,9 @@ async function payTransaction(id: string) {
 }
 
 async function makePayment(sellerId: string, buyerId: string, price: number) {
+  if (!config.enforceBalance) {
+    return;
+  }
   const buyerUpdateOp = { $inc: { balance: -price } };
   const sellerUpdateOp = { $inc: { balance: price } };
   // NOTE: allows negative balance

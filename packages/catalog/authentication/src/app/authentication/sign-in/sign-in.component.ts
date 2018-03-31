@@ -15,6 +15,8 @@ import {
 
 import * as _ from 'lodash';
 
+import { AuthenticationService } from '../shared/authentication.service';
+
 import { User } from '../shared/authentication.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -59,7 +61,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    private authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -73,7 +76,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   async dvOnRun(): Promise<void> {
     const res = await this.gs.post<{ data: any, errors: any }>('/graphql', {
       query: `mutation SignIn($input: SignInInput!) {
-        signIn(input: $input)
+        signIn(input: $input) {
+          token,
+          user { id, username }
+        }
       }`,
       variables: {
         input: {
@@ -88,15 +94,14 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
         .join());
     }
 
-    const user = this.setTokens(res.data.signIn);
+    const token = res.data.signIn.token;
+    const user = res.data.signIn.user;
+    this.authenticationService.setSignedInUser(token, user);
     this.user.emit(user);
   }
 
-  setTokens(data) {
-    const authToken = JSON.parse(data);
-    const token = authToken.token;
-    const user = authToken.user;
-    localStorage.setItem('id_token', token);
+  setTokens(token: string, user: User) {
+    localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
 
     return user;

@@ -1,27 +1,17 @@
 <div class="row">
-  <form (ngSubmit)="stage()"
-    [formGroup]="stageForm"
-    class="form-horizontal">
-    <div *ngIf="showOptionToInputPrice" class="form-group">
-      <market-create-good-price formControlName="priceControl">
-      </market-create-good-price>
-    </div>
-    <div class="form-group">
-      <market-create-good-supply
-        [inputLabel]="supplyLabel"
-        formControlName="supplyControl">
-      </market-create-good-supply>
-    </div>
-    <div *ngIf="showOptionToInputSeller" class="form-group">
-      <market-create-good-seller formControlName="sellerIdControl">
-      </market-create-good-seller>
-    </div>
-    <div class="form-group">
-      <button mat-button type="submit" [disabled]="!stageForm.valid">
-        {{buttonLabel}}
-      </button>
-    </div>
-  </form>
+  <dv-include [action]="createGood"
+    [inputs]="{
+      save: false,
+      showOptionToInputPrice: showOptionToInputPrice,
+      supplyLabel: supplyLabel,
+      showOptionToInputSeller: showOptionToInputSeller,
+      buttonLabel: buttonLabel,
+      sellerId: sellerId,
+      marketId: marketId
+      }"
+    [outputs]="{good: 'stage'}"
+    [parent]="stageGoodsComponent">
+  </dv-include>
 </div>
 
 <div class="row">

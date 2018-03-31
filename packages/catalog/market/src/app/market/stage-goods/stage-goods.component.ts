@@ -15,6 +15,7 @@ import {
   OnAfterCommit, OnRun, RunService
 } from 'dv-core';
 
+import { CreateGoodComponent } from '../create-good/create-good.component';
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
 import { Good } from '../shared/market.model';
@@ -38,14 +39,18 @@ import { Good } from '../shared/market.model';
   ]
 })
 export class StageGoodsComponent
-implements OnInit, ControlValueAccessor, Validator {
+implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   @Input() initialStageGoods: Good[] = [];
   @Output() stagedGoods = new EventEmitter<Good[]>();
 
   @Input() showOptionToInputPrice = true;
   @Input() showOptionToInputSeller = true;
   @Input() sellerId: string | undefined;
+  @Input() marketId: string;
 
+  @Input() createGood: Action = {
+    type: <Type<Component>> CreateGoodComponent
+  };
   @Input() showGood: Action = {
     type: <Type<Component>> ShowGoodComponent
   };
@@ -54,13 +59,6 @@ implements OnInit, ControlValueAccessor, Validator {
   // Presentation inputs
   @Input() buttonLabel = 'Add Good';
   @Input() supplyLabel = 'Supply';
-
-  @ViewChild(FormGroupDirective) form;
-
-  priceControl: FormControl;
-  supplyControl = new FormControl();
-  sellerIdControl: FormControl;
-  stageForm: FormGroup;
 
   staged: Good[] = [];
 
@@ -75,47 +73,20 @@ implements OnInit, ControlValueAccessor, Validator {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.staged = this.initialStageGoods;
-
-    const controls: {
-      priceControl?: FormControl,
-      supplyControl: FormControl,
-      sellerIdControl?: FormControl
-    } = {
-      supplyControl: this.supplyControl
-    };
-    if (this.showOptionToInputPrice) {
-      this.priceControl = new FormControl();
-      controls.priceControl = this.priceControl;
-    }
-    if (this.showOptionToInputSeller) {
-      this.sellerIdControl = new FormControl();
-      controls.sellerIdControl = this.sellerIdControl;
-    }
-    this.stageForm = this.builder.group(controls);
   }
 
-  stage() {
-    let sellerId;
-    if (this.sellerId) {
-      sellerId = this.sellerId;
-    } else if (this.sellerIdControl) {
-      sellerId = this.sellerIdControl.value;
-    }
-    const g: Good = {
-      price: this.priceControl ? this.priceControl.value : undefined,
-      supply: this.supplyControl.value,
-      seller: { id: sellerId }
-    };
-    this.staged.push(g);
+  stage(good: Good) {
+    this.staged.push(good);
     this.stagedGoods.emit(this.staged);
-    if (this.form) {
-      this.form.resetForm();
-    }
   }
 
   unstage(index: string) {
     _.pullAt(this.staged, index);
     this.stagedGoods.emit(this.staged);
+  }
+
+  dvOnAfterCommit() {
+    this.staged = [];
   }
 
   writeValue(value: Good[]) {

@@ -1,0 +1,22 @@
+<potluck-nav-bar (loggedInUser)="user=$event"></potluck-nav-bar>
+
+<div class="container" id="homepage-container">
+  <div class="col-md-3" id="box">
+  <h1>Your Parties</h1>
+  <dv-link href="/create-party" class="btn btn-primary">
+    <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+    Create a New Party
+  </dv-link>
+  </div>
+
+  <div class="col-md-9">
+    <group-show-groups
+      [withMemberId]="user?.id"
+      [showGroup]="{
+        type: showParty,
+        inputMap: {group: 'party'},
+        inputs: {loggedInUserId: user?.id}
+      }">
+    </group-show-groups>
+  </div>
+</div>

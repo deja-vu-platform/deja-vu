@@ -14,11 +14,14 @@ import {
 
 import * as _ from 'lodash';
 
+import { AuthenticationService } from '../shared/authentication.service';
+
 import { User } from '../shared/authentication.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
 
+// Also signs in the user
 @Component({
   selector: 'authentication-register-user',
   templateUrl: './register-user.component.html',
@@ -62,7 +65,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    private authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -76,8 +80,9 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   async dvOnRun(): Promise<void> {
     const res = await this.gs.post<{ data: any }>('/graphql', {
       query: `mutation Register($input: RegisterInput!) {
-        register(input: $input) {
-          id
+        registerAndSignIn(input: $input) {
+          user { id, username }
+          token
         }
       }`,
       variables: {
@@ -89,7 +94,11 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
       }
     })
     .toPromise();
-    this.user.emit({ id: res.data.register.id });
+
+    const token = res.data.registerAndSignIn.token;
+    const user = res.data.registerAndSignIn.user;
+    this.authenticationService.setSignedInUser(token, user);
+    this.user.emit({ id: res.data.registerAndSignIn.id });
   }
 
   dvOnAfterCommit() {

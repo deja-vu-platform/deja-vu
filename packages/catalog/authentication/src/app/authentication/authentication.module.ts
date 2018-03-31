@@ -9,6 +9,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from 'dv-core';
 
+import { AuthenticationService } from './shared/authentication.service';
+
 import {
   ChangePasswordComponent
 } from './change-password/change-password.component';
@@ -38,6 +40,7 @@ const allComponents = [
     ReactiveFormsModule,
     MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
+  providers: [AuthenticationService],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

@@ -1,6 +1,6 @@
 <mat-form-field *ngIf="propertyControl">
   <mat-label>{{name | camelToTitleCase}}</mat-label>
-  <input matInput [formControl]="propertyControl">
+  <input matInput [formControl]="propertyControl" [required]="required">
   <mat-error *ngIf="propertyControl.hasError('required')">
     {{name | camelToTitleCase}} is <strong>required</strong>
   </mat-error>

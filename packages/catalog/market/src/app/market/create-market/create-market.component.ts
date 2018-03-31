@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output,
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type,
   ViewChild
 } from '@angular/core';
 
@@ -10,9 +10,12 @@ import {
 
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
+  Action, GatewayService, GatewayServiceFactory, OnAfterAbort,
+  OnAfterCommit, OnRun, RunService
 } from 'dv-core';
+
+import { CreateGoodComponent } from '../create-good/create-good.component';
+import { ShowGoodComponent } from '../show-good/show-good.component';
 
 import { Good, Market } from '../shared/market.model';
 
@@ -38,6 +41,13 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() stageGoodsButtonLabel = 'Add Good';
   @Input() supplyLabel = 'Supply';
 
+  @Input() createGood: Action = {
+    type: <Type<Component>> CreateGoodComponent
+  };
+  @Input() showGood: Action = {
+    type: <Type<Component>> ShowGoodComponent
+  };
+
   @Output() market: EventEmitter<Market> = new EventEmitter<Market>();
 
   // Presentation inputs
@@ -61,6 +71,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   @Input() set id(id: string) {
     this.idControl.setValue(id);
+  }
+
+  @Input() set goods(goods: Good[]) {
+    this.goodsControl.setValue(goods);
   }
 
   constructor(
@@ -125,7 +139,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   private goodToCreateGoodInput(g: Good) {
-    const goodInput = _.omit(g, 'seller');
+    const goodInput = _.pick(g, ['id', 'price', 'supply']);
     goodInput.sellerId = g.seller.id;
 
     return goodInput;

@@ -28,6 +28,7 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
   @Input() showSummary = true;
   @Input() showGoodDetails = true;
   @Input() showStatus = true;
+  @Input() noTransactionsToShowText = 'No transactions to show';
   // For showGood in showTransaction
   @Input() showGoodId = true;
   @Input() showPrice = true;
@@ -70,7 +71,7 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
             query: `
               query Transactions($input: TransactionsInput!) {
                 transactions(input: $input) {
-                  ${this.showId ? 'id' : ''}
+                  id
                   ${this.showStatus || this.showOptionToCancel ? 'status': ''}
                   ${this.showOptionToPay ?
                     'buyer { id }\n' +

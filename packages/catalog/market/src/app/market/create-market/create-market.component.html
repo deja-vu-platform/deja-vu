@@ -1,7 +1,7 @@
 <form (ngSubmit)="onSubmit()"
   [formGroup]="createMarketForm"
   class="form-horizontal">
-  <div *ngIf="showOptionToSubmit" class="form-group">
+  <div *ngIf="showOptionToSubmit && save" class="form-group">
     <div *ngIf="newMarketSaved">
       <i class="material-icons">done</i>
         {{newMarketSavedText}}
@@ -19,6 +19,7 @@
   </div>
   <div *ngIf="showOptionToInputGoods" class="form-group">
     <market-stage-goods
+      [marketId]="id"
       [sellerId]="sellerId"
       [showOptionToInputPrice]="showOptionToInputPrice"
       [showOptionToInputSeller]="showOptionToInputSeller"

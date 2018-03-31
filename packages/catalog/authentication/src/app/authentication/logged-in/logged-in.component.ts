@@ -5,6 +5,8 @@ import {
 import { OnAfterAbort, OnAfterCommit, OnRun, RunService
 } from 'dv-core';
 
+import { AuthenticationService } from '../shared/authentication.service';
+
 import { User } from '../shared/authentication.model';
 
 @Component({
@@ -15,7 +17,8 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
   @Output() user = new EventEmitter();
 
   constructor(
-    private elem: ElementRef, private rs: RunService) { }
+    private elem: ElementRef, private rs: RunService,
+    private authenticationService: AuthenticationService) {}
 
   ngOnInit() {
     this.rs.register(this.elem, this);
@@ -23,7 +26,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = this.authenticationService.getSignedInUser();
       if (user) {
         this.user.emit(user);
       }

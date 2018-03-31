@@ -1,4 +1,6 @@
-import { Component, ElementRef, Input, Type } from '@angular/core';
+import {
+  Component, ElementRef, EventEmitter, Input, Output, Type
+} from '@angular/core';
 
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
@@ -10,10 +12,11 @@ import { Transaction } from '../shared/market.model';
 @Component({
   selector: 'market-show-transaction',
   templateUrl: './show-transaction.component.html',
-  styleUrls: ['./show-transaction.component.css'],
+  styleUrls: ['./show-transaction.component.css']
 })
 export class ShowTransactionComponent {
   @Input() transaction: Transaction;
+  @Input() id: string;
 
   @Input() showId = true;
   @Input() showSummary = true;
@@ -35,6 +38,8 @@ export class ShowTransactionComponent {
     type: <Type<Component>> ShowGoodComponent
   };
 
+  @Output() loadedTransaction = new EventEmitter<Transaction>();
+
   showTransaction;
   private gs: GatewayService;
 
@@ -54,14 +59,14 @@ export class ShowTransactionComponent {
 
   loadTransaction() {
     // only load transaction when id is given
-    if (!this.gs || !this.transaction || !this.transaction.id) {
+    if (!this.gs || this.transaction || !this.id) {
       return;
     }
     this.gs.get<{data: {transaction: Transaction}}>('/graphql', {
       params: {
         query: `
           query {
-            transaction(id: "${this.transaction.id}") {
+            transaction(id: "${this.id}") {
               id
               ${this.showSummary ?
                 'pricePerGood\n' +
@@ -69,6 +74,9 @@ export class ShowTransactionComponent {
               }
               ${this.showSummary || this.showGoodDetails ? 'good { id }' : ''}
               ${this.showStatus ? 'status' : ''}
+              buyer {
+                id
+              }
             }
           }
         `
@@ -76,6 +84,7 @@ export class ShowTransactionComponent {
     })
     .subscribe((res) => {
       this.transaction = res.data.transaction;
+      this.loadedTransaction.emit(this.transaction);
     });
   }
 }

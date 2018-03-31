@@ -71,6 +71,7 @@ export class RunService {
     while (node && node.getAttribute) { // 'document' doesn't have `getAttribute`
       if (this.isDvTx(node)) {
         targetAction = node;
+        break;
       }
       node = this.renderer.parentNode(node);
     }

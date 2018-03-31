@@ -11,13 +11,16 @@ import { DvModule } from 'dv-core';
 
 import { CreateObjectComponent } from './create-object/create-object.component';
 import {
+  CreateObjectsComponent
+} from './create-objects/create-objects.component';
+import {
    CamelToTitleCasePipe, CreatePropertyComponent
 } from './create-property/create-property.component';
 import { ShowObjectComponent } from './show-object/show-object.component';
 
 
 const allComponents = [
-  CreateObjectComponent,
+  CreateObjectComponent, CreateObjectsComponent,
   ShowObjectComponent, CreatePropertyComponent
 ];
 
@@ -32,7 +35,9 @@ const allComponents = [
     MatButtonModule, MatInputModule,
     MatFormFieldModule
   ],
-  declarations: [...allComponents, CamelToTitleCasePipe],
+  declarations: [
+    ...allComponents, CamelToTitleCasePipe, CreateObjectsComponent
+  ],
   entryComponents: allComponents,
   exports: [...allComponents, CamelToTitleCasePipe]
 })

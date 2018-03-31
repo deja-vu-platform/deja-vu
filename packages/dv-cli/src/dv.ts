@@ -105,7 +105,7 @@ export function updateJsonFile(
 }
 
 export function startGatewayCmd(configFilePath: string): string {
-  return 'node' + path.join('node_modules', 'dv-gateway', 'dist', 'gateway.js') +
+  return 'node ' + path.join('node_modules', 'dv-gateway', 'dist', 'gateway.js') +
     ` --configFilePath ${configFilePath}`;
 }
 

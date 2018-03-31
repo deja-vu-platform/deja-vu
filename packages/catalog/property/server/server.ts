@@ -99,6 +99,19 @@ const typeDefs = [
   ...dynamicTypeDefs
 ];
 
+function createObjectFromInput(input) {
+  const newObject = input;
+  newObject.id = input.id ? input.id : uuid();
+  const ajv = new Ajv();
+  const validate = ajv.compile(config.schema);
+  const valid = validate(_.omit(newObject, 'id'));
+  if (!valid) {
+    throw new Error(_.map(validate.errors, (error) => error.message));
+  }
+
+  return newObject;
+}
+
 
 const resolvers = {
   Query: {
@@ -129,18 +142,17 @@ const resolvers = {
   },
   Mutation: {
     createObject: async (root, { input }) => {
-      const newObject = input;
-      newObject.id = input.id ? input.id : uuid();
-      const ajv = new Ajv();
-      const validate = ajv.compile(config.schema);
-      console.log(_.omit(newObject, 'id'));
-      const valid = validate(_.omit(newObject, 'id'));
-      if (!valid) {
-        throw new Error(_.map(validate.errors, (error) => error.message));
-      }
+      const newObject = createObjectFromInput(input);
       await objects.insertOne(newObject);
 
       return newObject;
+    },
+
+    createObjects: async (root, { input }) => {
+      const objDocs = _.map(input, createObjectFromInput);
+      await objects.insertMany(objDocs);
+
+      return objDocs;
     }
   }
 };

@@ -1,0 +1,20 @@
+<authentication-logged-in (user)="user=$event; outputAsLoggedInUser($event)">
+</authentication-logged-in>
+
+<nav class="navbar navbar-default navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <dv-link class="navbar-brand" href="/">Potluck</dv-link>
+    </div>
+    <ul *ngIf="user" class="nav navbar-nav navbar-right">
+      <li>{{user.username}}</li>
+      <li>
+        <dv-tx>
+          <authentication-sign-out>
+          </authentication-sign-out>
+          <dv-link href="/" [hidden]="true"></dv-link>
+        </dv-tx>
+      </li>
+    </ul>
+  </div>
+</nav>

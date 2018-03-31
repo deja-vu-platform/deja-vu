@@ -25,11 +25,15 @@ console.log(`Using dv config ${JSON.stringify(dvConfig, undefined, 2)}`);
 const app = express();
 
 // Handle API requests
+// projects contains all keys in `usedCliches` plus the name of the current app
 const projects: Set<string> = setOfUsedCliches(dvConfig);
 projects.add(dvConfig.name);
 
-let dstTable = buildDstTable(dvConfig);
-dstTable = _.mapKeys(dstTable, (unusedValue, k) => `${dvConfig.name}-${k}`);
+// dstTable is a table of the form clicheAlias[-clicheAlias]* -> port
+// If cliche A is contained in cliche B the key for B in the dst table is A-B
+const dstTable = _.mapKeys(
+  buildDstTable(dvConfig),
+  (unusedValue, k) => `${dvConfig.name}-${k}`);
 if (dvConfig.config && dvConfig.config.wsPort) {
   dstTable[dvConfig.name] = dvConfig.config.wsPort;
 }

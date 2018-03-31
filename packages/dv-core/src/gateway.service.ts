@@ -14,6 +14,7 @@ export interface RequestOptions {
 }
 export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 
+const OF_ATTR = 'dvOf';
 
 export class GatewayService {
   fromStr: string;
@@ -23,8 +24,12 @@ export class GatewayService {
     private from: ElementRef) {
     let node = from.nativeElement;
     const seenNodes: string[] = [];
-    while (node) {
-      const name = node.nodeName.toLowerCase();
+    while (node && node.getAttribute) {
+      let name = node.nodeName.toLowerCase();
+      const dvOf: string = node.getAttribute(OF_ATTR);
+      if (dvOf) {
+        name = dvOf + name.substring(name.indexOf('-'));
+      }
       seenNodes.push(name);
       node = renderer.parentNode(node);
     }

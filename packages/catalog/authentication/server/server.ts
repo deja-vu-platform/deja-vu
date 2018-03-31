@@ -44,6 +44,11 @@ interface ChangePasswordInput {
   newPassword: string;
 }
 
+interface SignInOutput {
+  token: string;
+  user: User;
+}
+
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -94,6 +99,19 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+async function register(input: RegisterInput): Promise<User> {
+  const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
+  const newUser: UserDoc = {
+    id: input.id ? input.id : uuid(),
+    username: input.username,
+    password: hash
+  };
+
+  await users.insertOne(newUser);
+
+  return newUser;
+}
+
 const resolvers = {
   Query: {
     users: () => users.find()
@@ -107,18 +125,22 @@ const resolvers = {
     username: (user: User) => user.username
   },
 
+  SignInOutput: {
+    token: (signInOutput: SignInOutput) => signInOutput.token,
+    user: (signInOutput: SignInOutput) => signInOutput.user
+  },
+
   Mutation: {
-    register: async (_, { input }: { input: RegisterInput }) => {
-      const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
-      const newUser: UserDoc = {
-        id: input.id ? input.id : uuid(),
-        username: input.username,
-        password: hash
+    register: (_, { input }: { input: RegisterInput }) => register(input),
+
+    registerAndSignIn: async (_, { input }: { input: RegisterInput }) => {
+      const user = await register(input);
+      const token: string = jwt.sign(user.id, SECRET_KEY);
+
+      return {
+        token: token,
+        user: user
       };
-
-      await users.insertOne(newUser);
-
-      return newUser;
     },
 
     signIn: async (_, { input }: { input: SignInInput }) => {
@@ -133,12 +155,12 @@ const resolvers = {
         throw new Error('Wrong username or password');
       }
 
-      const token = jwt.sign(user.id, SECRET_KEY);
+      const token: string = jwt.sign(user.id, SECRET_KEY);
 
-      return JSON.stringify({
+      return {
         token: token,
         user: user
-      });
+      };
     },
 
     changePassword: async (_, { input }: { input: ChangePasswordInput }) => {
