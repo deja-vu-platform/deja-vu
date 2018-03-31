@@ -1,70 +1,93 @@
 <div class="party">
   <div class="panel panel-default">
     <div class="panel-body">
-      <h3 class="party-title">
-        <property-show-object
-          dvOf="party" [id]="party.id" [showOnly]="['title']">
-        </property-show-object>
-      </h3>
-      <div class="col-md-12" style="text-align:center">
-        <event-show-event [id]="party.id">
-        </event-show-event>
-        <div style="height:20px"></div>
+      <div class="row">
+        <div class="col-md-12">
+          <h3 class="party-title">
+            <property-show-object
+              dvOf="party" [id]="party.id" [showOnly]="['title']">
+            </property-show-object>
+          </h3>
+          <div style="text-align:center">
+            <event-show-event [id]="party.id">
+            </event-show-event>
+            <div style="height:20px"></div>
+          </div>
+        </div>
       </div>
-      <div class="col-md-4">
-        <h4>Invited List</h4>
-        <group-show-members
-          [inGroupId]="party.id"
-          [showMember]="{type: showGuestUsername}">
-        </group-show-members>
-        <h4>Invite a User</h4>
-        <group-add-to-group
-          [id]="party.id"
-          type="member"
-          [showMember]="{type: showGuestUsername}"
-          autocompletePlaceholder="Choose Guest"
-          buttonLabel="Add to Guest List"
-          addSavedText="Guest added to list">
-        </group-add-to-group>
-      </div>
-      <div class="col-md-1"></div>
-
-      <div class="col-md-7">
-        <h4>What's Needed</h4>
-          <div class="container-fluid" style="padding:none">
-            <div class="row row-bordered" style="font-weight:bold">
-              <div class="col-xs-4">Item</div>
-              <div class="col-xs-2">Quantity</div>
-              <div class="col-xs-6">Contributor</div>
+      <hr class="divider">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="row">
+            <div class="col-md-12">
+              <h4>Invited List</h4>
+              <group-show-members
+                [inGroupId]="party.id"
+                [showMember]="{type: showGuestUsername}">
+              </group-show-members>
             </div>
-            <market-show-goods
-              [showGood]="{
-                type: showSupply,
-                inputMap: {good: 'supply'},
-                inputs: {useIdForObject: true}
-              }"
-              [marketId]="party.id"
-              [optionToBuyBuyerId]="loggedInUserId"
-              [available]="true"
-              noGoodsToShowText="No supplies needed"
-              optionToBuyButtonLabel="Claim"
-              optionToBuyInputQuantityLabel="Supply">
-            </market-show-goods>
-            <market-show-transactions
-              [marketId]="party.id"
-              noTransactionsToShowText="No claims"
-              [showTransaction]="{
-                type: showClaim,
-                inputMap: {transactionId: 'id'}
-              }">
-            </market-show-transactions>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <h4>Add Guest</h4>
+              <group-add-to-group
+                [id]="party.id"
+                type="member"
+                [showMember]="{type: showGuestUsername}"
+                autocompletePlaceholder="Choose Guest"
+                buttonLabel="Add to Guest List"
+                addSavedText="Guest added to list">
+              </group-add-to-group>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-1"></div>
+
+        <div class="col-md-7">
+          <div class="row">
+            <div class="col-md-12">
+              <h4>Supply List</h4>
+              <div class="container-fluid" style="padding:none">
+                <div class="row row-bordered" style="font-weight:bold">
+                  <div class="col-xs-4">Item</div>
+                  <div class="col-xs-2">Quantity</div>
+                  <div class="col-xs-6">Contributor</div>
+                </div>
+                <market-show-goods
+                  [showGood]="{
+                    type: showSupply,
+                    inputMap: {good: 'supply'},
+                    inputs: {useIdForObject: true}
+                  }"
+                  [marketId]="party.id"
+                  [optionToBuyBuyerId]="loggedInUserId"
+                  [available]="true"
+                  noGoodsToShowText="No supplies needed"
+                  optionToBuyButtonLabel="Claim"
+                  optionToBuyInputQuantityLabel="Supply">
+                </market-show-goods>
+                <market-show-transactions
+                  [marketId]="party.id"
+                  noTransactionsToShowText="No claims"
+                  [showTransaction]="{
+                    type: showClaim,
+                    inputMap: {transactionId: 'id'}
+                  }">
+                </market-show-transactions>
+              </div>
+            </div>
           </div>
 
-        <h4>Request Supplies</h4>
-        <potluck-create-supply
-          [loggedInUserId]="loggedInUserId"
-          [partyId]="party.id">
-        </potluck-create-supply >
+          <div class="row">
+            <div class="col-md-12">
+              <h4>Add Supplies</h4>
+              <potluck-create-supply
+                [loggedInUserId]="loggedInUserId"
+                [partyId]="party.id">
+              </potluck-create-supply>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
