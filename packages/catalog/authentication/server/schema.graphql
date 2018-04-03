@@ -25,10 +25,12 @@ type SignInOutput {
   user: User!
 }
 
+
 type Query {
   user(username: String!): User
   userById(id: String!): User
   users: [User!]
+  verify(id: ID!, token: String!): Boolean
 }
 
 type Mutation {

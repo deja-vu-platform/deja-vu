@@ -11,6 +11,7 @@ import { DvModule } from 'dv-core';
 
 import { AuthenticationService } from './shared/authentication.service';
 
+import { AuthenticateComponent } from './authenticate/authenticate.component';
 import {
   ChangePasswordComponent
 } from './change-password/change-password.component';
@@ -27,7 +28,7 @@ import { SignOutComponent } from './sign-out/sign-out.component';
 export { SignOutComponent };
 
 const allComponents = [
-  ChangePasswordComponent, LoggedInComponent, RegisterUserComponent,
+  AuthenticateComponent, ChangePasswordComponent, LoggedInComponent, RegisterUserComponent,
   ShowUserComponent, SignInComponent, SignOutComponent
 ];
 

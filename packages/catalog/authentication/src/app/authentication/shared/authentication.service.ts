@@ -17,6 +17,10 @@ export class AuthenticationService {
     return JSON.parse(localStorage.getItem(USER_KEY));
   }
 
+  getToken(): string {
+    return localStorage.getItem(TOKEN_KEY);
+  }
+
   signOut() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
