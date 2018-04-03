@@ -4,7 +4,7 @@ import {
 
 import {
   AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  Validators
+  NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, ValidatorFn, Validators
 } from '@angular/forms';
 
 import {
@@ -17,18 +17,34 @@ import * as _ from 'lodash';
 import { AuthenticationService } from '../shared/authentication.service';
 
 import { User } from '../shared/authentication.model';
+import { passwordMatchValidator } from '../shared/password.match.validator';
 
 const SAVED_MSG_TIMEOUT = 3000;
-
+const USERNAME_MIN_LENGTH = 3;
+const USERNAME_MAX_LENGTH = 15;
+const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_MAX_LENGTH = 20;
 
 // Also signs in the user
 @Component({
   selector: 'authentication-register-user',
   templateUrl: './register-user.component.html',
-  styleUrls: ['./register-user.component.css']
+  styleUrls: ['./register-user.component.css'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: RegisterUserComponent,
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: RegisterUserComponent,
+      multi: true
+    }
+  ]
 })
 export class RegisterUserComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -40,9 +56,24 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Output() user = new EventEmitter();
 
   @ViewChild(FormGroupDirective) form;
-  usernameControl = new FormControl('', Validators.required);
-  passwordControl = new FormControl('', Validators.required);
-  retypePasswordControl = new FormControl('', Validators.required);
+  usernameControl = new FormControl('', [
+    Validators.required,
+    Validators.minLength(USERNAME_MIN_LENGTH),
+    Validators.maxLength(USERNAME_MAX_LENGTH),
+    // tslint:disable-next-line:max-line-length
+    Validators.pattern('^(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+$')]
+  );
+  passwordControl = new FormControl('', [
+    Validators.required,
+    Validators.minLength(PASSWORD_MIN_LENGTH),
+    Validators.maxLength(PASSWORD_MAX_LENGTH),
+    // tslint:disable-next-line:max-line-length
+    Validators.pattern('^.*(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?!.*[`~()\-_=+[{\]}\\|;:\'",.<>/? ]).*$')
+  ]);
+  retypePasswordControl = new FormControl('', [
+    Validators.required,
+    passwordMatchValidator(() => this.passwordControl.value)
+  ]);
   registerForm: FormGroup = this.builder.group({
     usernameControl: this.usernameControl,
     passwordControl: this.passwordControl,
@@ -66,7 +97,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private authenticationService: AuthenticationService) {}
+    private authenticationService: AuthenticationService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -93,7 +124,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
         }
       }
     })
-    .toPromise();
+      .toPromise();
 
     const token = res.data.registerAndSignIn.token;
     const user = res.data.registerAndSignIn.user;
