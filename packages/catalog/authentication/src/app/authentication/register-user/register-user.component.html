@@ -1,4 +1,5 @@
-<form (ngSubmit)="onSubmit()" [formGroup]="registerForm" class="form-horizontal">
+<form (ngSubmit)="onSubmit()" [formGroup]="registerForm" 
+  class="form-horizontal">
   <div class="form-group">
     <div *ngIf="newUserRegistered">
       <i class="material-icons">done</i>
@@ -17,17 +18,17 @@
     </mat-form-field>
     <div *ngIf="usernameControl.invalid && usernameControl.touched">
       <mat-error *ngIf="usernameControl.hasError('required')">
-        This field is
-        <strong>required</strong>.
+        This field is <strong>required</strong>.
       </mat-error>
-      <mat-error *ngIf="usernameControl.hasError('minlength') || usernameControl.hasError('maxlength')">
+      <mat-error *ngIf="usernameControl.hasError('minlength') || 
+                        usernameControl.hasError('maxlength')">
         Usernames must be
         <strong>3-15 characters long</strong>.
       </mat-error>
       <mat-error *ngIf="usernameControl.hasError('pattern')">
-        Usernames must contain only
-        <strong>alphanumeric and special characters ._-</strong>. They cannot begin or end with special characters and must not contain
-        consecutive special characters.
+        Usernames must contain only <strong>alphanumeric and special characters 
+        ._-</strong>. They cannot begin or end with special characters and must 
+        not contain consecutive special characters.
       </mat-error>
     </div>
   </div>
@@ -39,16 +40,17 @@
     </mat-form-field>
     <div *ngIf="passwordControl.invalid && passwordControl.touched">
       <mat-error *ngIf="passwordControl.hasError('required')">
-        This field is
-        <strong>required</strong>.
+        This field is <strong>required</strong>.
       </mat-error>
-      <mat-error *ngIf="passwordControl.hasError('minlength') || passwordControl.hasError('maxlength')">
+      <mat-error *ngIf="passwordControl.hasError('minlength') || 
+                        passwordControl.hasError('maxlength')">
         Passwords must be
         <strong>8-20 characters long.</strong>.
       </mat-error>
       <mat-error *ngIf="passwordControl.hasError('pattern')">
-        Passwords must contain
-        <strong>at least 1 lowercase letter, 1 uppercase letter, 1 special character (!@#$%^*&amp;) and 1 number (0-9)</strong>.
+        Passwords must contain <strong>at least 1 lowercase letter, 
+        1 uppercase letter, 1 special character (!@#$%^*&amp;) and 
+        1 number (0-9)</strong>.
       </mat-error>
     </div>
   </div>
