@@ -36,6 +36,7 @@
 
               memberAutocompletePlaceholder="Choose Guest"
               stageMemberButtonLabel="Add to Guest List"
+              (stagedMemberIds)="stagedMemberIds=$event"
               [showOptionToAddGroups]="false"
               [showOptionToSubmit]="false">
             </group-create-group>
@@ -73,6 +74,15 @@
           [objects]="stagedSupplies"
           [hidden]="true">
         </property-create-objects>
+        <authorization-create-resource
+          [id]="partyId"
+          [ownerId]="user?.id"
+          [viewerIds]="stagedMemberIds"
+          [hidden]="true">
+        </authorization-create-resource>
+        <authentication-authenticate
+          [id]="user?.id" [hidden]="true">
+        </authentication-authenticate>
           
         <div class="party-form-footer">
           <dv-button>Create Party</dv-button>

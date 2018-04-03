@@ -50,6 +50,8 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
   @Input() buttonLabel = 'Create Group';
   @Input() newGroupSavedText = 'New Group saved';
 
+  @Output() stagedMemberIds = new EventEmitter<string[]>();
+
   @ViewChild(FormGroupDirective) form;
 
   membersAutocomplete;
@@ -70,6 +72,9 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
     this.rs.register(this.elem, this);
     this.membersAutocomplete = new FormControl(this.initialMemberIds);
     this.groupAutocomplete = new FormControl(this.initialGroupIds);
+    this.membersAutocomplete.valueChanges.subscribe((value) => {
+      this.stagedMemberIds.emit(value);
+    });
     this.createGroupForm =  this.builder.group({
       membersAutocomplete: this.membersAutocomplete,
       groupAutocomplete: this.groupAutocomplete

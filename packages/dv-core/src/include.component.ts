@@ -85,10 +85,8 @@ export class IncludeComponent implements AfterViewInit {
     private changeDetectorRef: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.type &&
-        changes.type.currentValue !== changes.type.previousValue) {
-      this.loadComponent();
-    }
+    // TODO: don't always reload the entire component
+    this.loadComponent();
   }
 
   ngAfterViewInit() {
@@ -114,9 +112,6 @@ export class IncludeComponent implements AfterViewInit {
       console.log('No parent given to include');
       return;
     }
-    this.action.inputMap = this.initFieldMap(this.inputs, this.action.inputMap);
-    this.action.outputMap = this
-      .initFieldMap(this.outputs, this.action.outputMap);
 
     console.log(
       `Loading "${this.action.type}"` +
@@ -130,15 +125,21 @@ export class IncludeComponent implements AfterViewInit {
     this.componentRef = viewContainerRef.createComponent(componentFactory);
 
     let shouldCallDetectChanges = false;
+
+    this.action.inputMap = this.initFieldMap(this.inputs, this.action.inputMap);
     for (const inputKey of _.keys(this.inputs)) {
       this.componentRef.instance[
         this.action.inputMap[inputKey]] = this.inputs[inputKey];
       shouldCallDetectChanges = true;
     }
+
     for (const inputKey of _.keys(this.action.inputs)) {
       this.componentRef.instance[inputKey] = this.action.inputs[inputKey];
       shouldCallDetectChanges = true;   
     }
+
+    this.action.outputMap = this
+      .initFieldMap(this.outputs, this.action.outputMap);
     for (const outputKey of _.keys(this.outputs)) {
       this.componentRef.instance[this.action.outputMap[outputKey]]
         .subscribe(newVal => {

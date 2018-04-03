@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Type, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output,
+  Type, ViewChild
 } from '@angular/core';
 
 import {
@@ -36,6 +37,8 @@ export class AddToGroupComponent implements OnInit {
     type: <Type<Component>> ShowGroupComponent
   };
 
+  @Output() selectedId = new EventEmitter<string>();
+
   // Presentation inputs
   @Input() autocompletePlaceholder = `Choose ${this.type}`;
   @Input() buttonLabel = `Add ${this.type}`;
@@ -63,6 +66,9 @@ export class AddToGroupComponent implements OnInit {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
+    this.autocomplete.valueChanges.subscribe((value) => {
+      this.selectedId.emit(value);
+    });
     this.load();
   }
 
