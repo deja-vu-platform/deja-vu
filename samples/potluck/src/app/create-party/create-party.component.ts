@@ -14,4 +14,6 @@ export class CreatePartyComponent {
   showGuestUsername = ShowUserComponent;
   createSupply = CreateSupplyComponent;
   showSupply = ShowSupplyComponent;
+  stagedMemberIds: any[];
+  user;
 }

@@ -11,14 +11,19 @@
     </div>
 
     <div class="col-md-9">
-      <group-show-groups
-        [withMemberId]="user?.id"
-        [showGroup]="{
-          type: showParty,
-          inputMap: {group: 'party'},
-          inputs: {loggedInUserId: user?.id}
-        }">
-      </group-show-groups>
+      <dv-tx>
+        <authorization-show-resources
+          [viewableBy]="user?.id"
+          [showResource]="{
+            type: showParty,
+            inputMap: {id: 'partyId'},
+            inputs: {loggedInUserId: user?.id}
+          }"
+          noResourcesText="No parties to show">
+        </authorization-show-resources>
+        <authentication-authenticate [id]="user?.id" [hidden]="true">
+        </authentication-authenticate>
+      </dv-tx>
     </div>
   </div>
 </div>
