@@ -11,6 +11,9 @@ import { v4 as uuid } from 'uuid';
 import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
+import * as _ from 'lodash';
+
+
 // TODO: Change before deployment
 const SECRET_KEY = 'ultra-secret-key';
 const SALT_ROUNDS = 10;
@@ -112,12 +115,26 @@ async function register(input: RegisterInput): Promise<User> {
   return newUser;
 }
 
+function sign(userId: string): string {
+  return jwt.sign(userId, SECRET_KEY);
+}
+
+function verify(token: string, userId: string): boolean {
+  if (_.isNil(token)) {
+    return false;
+  }
+  const tokenUserId: string = jwt.verify(token, SECRET_KEY);
+
+  return tokenUserId === userId;
+}
+
 const resolvers = {
   Query: {
     users: () => users.find()
       .toArray(),
-    user: (_, { username }) => users.findOne({ username: username}),
-    userById: (_, { id }) => users.findOne({ id: id})
+    user: (root, { username }) => users.findOne({ username: username}),
+    userById: (root, { id }) => users.findOne({ id: id}),
+    verify: (root, { token, id }) => verify(token, id)
   },
 
   User: {
@@ -131,11 +148,11 @@ const resolvers = {
   },
 
   Mutation: {
-    register: (_, { input }: { input: RegisterInput }) => register(input),
+    register: (root, { input }: { input: RegisterInput }) => register(input),
 
-    registerAndSignIn: async (_, { input }: { input: RegisterInput }) => {
+    registerAndSignIn: async (root, { input }: { input: RegisterInput }) => {
       const user = await register(input);
-      const token: string = jwt.sign(user.id, SECRET_KEY);
+      const token: string = sign(user.id);
 
       return {
         token: token,
@@ -143,7 +160,7 @@ const resolvers = {
       };
     },
 
-    signIn: async (_, { input }: { input: SignInInput }) => {
+    signIn: async (root, { input }: { input: SignInInput }) => {
       const user = await users.findOne({ username: input.username});
       if (!user) {
         throw new Error('Wrong username or password');
@@ -155,7 +172,7 @@ const resolvers = {
         throw new Error('Wrong username or password');
       }
 
-      const token: string = jwt.sign(user.id, SECRET_KEY);
+      const token: string = sign(user.id);
 
       return {
         token: token,
@@ -163,7 +180,7 @@ const resolvers = {
       };
     },
 
-    changePassword: async (_, { input }: { input: ChangePasswordInput }) => {
+    changePassword: async (root, { input }: { input: ChangePasswordInput }) => {
       const user = await users.findOne({id: input.id});
 
       const passwordVerified = await bcrypt.compare(input.oldPassword,
@@ -172,7 +189,8 @@ const resolvers = {
         throw new Error('Incorrect password');
       }
 
-      const newPasswordHash = await bcrypt.hash(input.newPassword, SALT_ROUNDS);
+      const newPasswordHash = await bcrypt
+        .hash(input.newPassword, SALT_ROUNDS);
       const updateOperation = { $set: { password: newPasswordHash } };
 
       await users.updateOne({ id: input.id }, updateOperation);
