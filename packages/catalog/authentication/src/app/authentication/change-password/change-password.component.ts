@@ -22,8 +22,6 @@ import {
 } from '../shared/authentication.validation';
 
 const SAVED_MSG_TIMEOUT = 3000;
-const PASSWORD_MIN_LENGTH = 8;
-const PASSWORD_MAX_LENGTH = 20;
 
 @Component({
   selector: 'authentication-change-password',
