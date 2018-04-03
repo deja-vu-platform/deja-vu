@@ -4,7 +4,7 @@ import {
 
 import {
   AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  Validators
+  NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators
 } from '@angular/forms';
 
 import {
@@ -16,13 +16,28 @@ import {
 import * as _ from 'lodash';
 
 import { User } from '../shared/authentication.model';
+import { passwordMatchValidator } from '../shared/password.match.validator';
 
 const SAVED_MSG_TIMEOUT = 3000;
+const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_MAX_LENGTH = 20;
 
 @Component({
   selector: 'authentication-change-password',
   templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.css']
+  styleUrls: ['./change-password.component.css'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: ChangePasswordComponent,
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: ChangePasswordComponent,
+      multi: true
+    }
+  ]
 })
 export class ChangePasswordComponent
 implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
@@ -37,8 +52,17 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   @ViewChild(FormGroupDirective) form;
   oldPasswordControl = new FormControl('', Validators.required);
-  passwordControl = new FormControl('', Validators.required);
-  retypePasswordControl = new FormControl('', Validators.required);
+  passwordControl = new FormControl('', [
+    Validators.required,
+    Validators.minLength(PASSWORD_MIN_LENGTH),
+    Validators.maxLength(PASSWORD_MAX_LENGTH),
+    // tslint:disable-next-line:max-line-length
+    Validators.pattern('^.*(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?!.*[`~()\-_=+[{\]}\\|;:\'",.<>/? ]).*$')
+  ]);
+  retypePasswordControl = new FormControl('', [
+    Validators.required,
+    passwordMatchValidator(() => this.passwordControl.value)
+  ]);
   changePasswordForm: FormGroup = this.builder.group({
     oldPasswordControl: this.oldPasswordControl,
     passwordControl: this.passwordControl,
