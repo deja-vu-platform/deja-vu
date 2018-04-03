@@ -60,7 +60,6 @@ export class RegisterUserComponent
     Validators.required,
     Validators.minLength(USERNAME_MIN_LENGTH),
     Validators.maxLength(USERNAME_MAX_LENGTH),
-    // tslint:disable-next-line:max-line-length
     Validators.pattern('^(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+$')]
   );
   passwordControl = new FormControl('', [
