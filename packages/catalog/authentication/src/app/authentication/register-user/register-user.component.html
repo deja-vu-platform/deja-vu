@@ -14,7 +14,8 @@
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{inputLabel}}</mat-label>
-      <input matInput required formControlName="usernameControl">
+      <input matInput required
+      formControlName="usernameControl">
     </mat-form-field>
     <div *ngIf="usernameControl.invalid && usernameControl.touched">
       <mat-error *ngIf="usernameControl.hasError('required')">

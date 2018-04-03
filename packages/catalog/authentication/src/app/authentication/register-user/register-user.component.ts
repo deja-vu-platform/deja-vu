@@ -17,13 +17,12 @@ import * as _ from 'lodash';
 import { AuthenticationService } from '../shared/authentication.service';
 
 import { User } from '../shared/authentication.model';
-import { passwordMatchValidator } from '../shared/password.match.validator';
+
+import {
+  PasswordValidator, RetypePasswordValidator, UsernameValidator
+} from '../shared/authentication.validation';
 
 const SAVED_MSG_TIMEOUT = 3000;
-const USERNAME_MIN_LENGTH = 3;
-const USERNAME_MAX_LENGTH = 15;
-const PASSWORD_MIN_LENGTH = 8;
-const PASSWORD_MAX_LENGTH = 20;
 
 // Also signs in the user
 @Component({
@@ -56,23 +55,10 @@ export class RegisterUserComponent
   @Output() user = new EventEmitter();
 
   @ViewChild(FormGroupDirective) form;
-  usernameControl = new FormControl('', [
-    Validators.required,
-    Validators.minLength(USERNAME_MIN_LENGTH),
-    Validators.maxLength(USERNAME_MAX_LENGTH),
-    Validators.pattern('^(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+$')]
-  );
-  passwordControl = new FormControl('', [
-    Validators.required,
-    Validators.minLength(PASSWORD_MIN_LENGTH),
-    Validators.maxLength(PASSWORD_MAX_LENGTH),
-    // tslint:disable-next-line:max-line-length
-    Validators.pattern('^.*(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?!.*[`~()\-_=+[{\]}\\|;:\'",.<>/? ]).*$')
-  ]);
-  retypePasswordControl = new FormControl('', [
-    Validators.required,
-    passwordMatchValidator(() => this.passwordControl.value)
-  ]);
+  usernameControl = new FormControl('', UsernameValidator());
+  passwordControl = new FormControl('', PasswordValidator());
+  retypePasswordControl = new FormControl('',
+    RetypePasswordValidator(this.passwordControl));
   registerForm: FormGroup = this.builder.group({
     usernameControl: this.usernameControl,
     passwordControl: this.passwordControl,

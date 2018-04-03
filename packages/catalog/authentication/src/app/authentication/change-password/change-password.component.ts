@@ -16,7 +16,10 @@ import {
 import * as _ from 'lodash';
 
 import { User } from '../shared/authentication.model';
-import { passwordMatchValidator } from '../shared/password.match.validator';
+
+import {
+  PasswordValidator, RetypePasswordValidator
+} from '../shared/authentication.validation';
 
 const SAVED_MSG_TIMEOUT = 3000;
 const PASSWORD_MIN_LENGTH = 8;
@@ -52,17 +55,9 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   @ViewChild(FormGroupDirective) form;
   oldPasswordControl = new FormControl('', Validators.required);
-  passwordControl = new FormControl('', [
-    Validators.required,
-    Validators.minLength(PASSWORD_MIN_LENGTH),
-    Validators.maxLength(PASSWORD_MAX_LENGTH),
-    // tslint:disable-next-line:max-line-length
-    Validators.pattern('^.*(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?!.*[`~()\-_=+[{\]}\\|;:\'",.<>/? ]).*$')
-  ]);
-  retypePasswordControl = new FormControl('', [
-    Validators.required,
-    passwordMatchValidator(() => this.passwordControl.value)
-  ]);
+  passwordControl = new FormControl('', PasswordValidator());
+  retypePasswordControl = new FormControl('',
+    RetypePasswordValidator(this.passwordControl));
   changePasswordForm: FormGroup = this.builder.group({
     oldPasswordControl: this.oldPasswordControl,
     passwordControl: this.passwordControl,
