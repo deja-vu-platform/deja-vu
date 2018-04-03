@@ -13,6 +13,12 @@ import {
   AddViewerComponent
 } from './add-viewer/add-viewer.component';
 import {
+  CanEditComponent
+} from './can-edit/can-edit.component';
+import {
+  CanViewComponent
+} from './can-view/can-view.component';
+import {
   CreatePrincipalComponent
 } from './create-principal/create-principal.component';
 import {
@@ -21,10 +27,21 @@ import {
 import {
   DeleteResourceComponent
 } from './delete-resource/delete-resource.component';
+import {
+  ShowOwnerComponent
+} from './show-owner/show-owner.component';
+import {
+  ShowResourceComponent
+} from './show-resource/show-resource.component';
+import {
+  ShowResourcesComponent
+} from './show-resources/show-resources.component';
 
 const allComponents = [
-  AddViewerComponent, CreatePrincipalComponent,
-  CreateResourceComponent, DeleteResourceComponent
+  AddViewerComponent, CanEditComponent, CanViewComponent,
+  CreatePrincipalComponent, CreateResourceComponent,
+  DeleteResourceComponent, ShowOwnerComponent,
+  ShowResourceComponent, ShowResourcesComponent
 ];
 
 @NgModule({

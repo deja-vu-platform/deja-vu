@@ -57,19 +57,21 @@ export class CreateResourceComponent implements
           createResource:
           { id: string, ownerId: string, viewerIds: string[] }
         }
-      }>(
-        '/graphql', {
-          query: `mutation {
-              createResource(
-                id: "${this.id}",
-                ownerId: "${this.ownerId}",
-                viewerIds: "${this.viewerIds}"
-              ) {
-                id,
-                owner{ id },
-                viewers{ id }
-              }
-            }`
+      }>('/graphql', {
+          query: `mutation CreateResource($input: CreateResourceInput!){
+            createResource(input: $input) {
+              id,
+              owner { id },
+              viewers { id }
+            }
+          }`,
+          variables: {
+            input: {
+              id: this.id,
+              ownerId: this.ownerId,
+              viewerIds: this.viewerIds
+            }
+          }
         })
       .toPromise();
     this.resource.emit({
