@@ -16,17 +16,27 @@
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{inputLabel}}</mat-label>
-      <input matInput
+      <input matInput required
        formControlName="usernameControl">
     </mat-form-field>
+    <div *ngIf="usernameControl.invalid && usernameControl.touched">
+      <mat-error *ngIf="usernameControl.hasError('required')">
+          This field is <strong>required</strong>.
+      </mat-error>
+    </div>
   </div>
 
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{passwordLabel}}</mat-label>
-      <input matInput type="password"
+      <input matInput required type="password"
        formControlName="passwordControl">
     </mat-form-field>
+    <div *ngIf="passwordControl.invalid && passwordControl.touched">
+      <mat-error *ngIf="passwordControl.hasError('required')">
+          This field is <strong>required</strong>.
+      </mat-error>
+    </div>
   </div>
 
   <div class="form-group">

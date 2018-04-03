@@ -14,7 +14,7 @@
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{inputLabel}}</mat-label>
-      <input matInput formControlName="usernameControl">
+      <input matInput required formControlName="usernameControl">
     </mat-form-field>
     <div *ngIf="usernameControl.invalid && usernameControl.touched">
       <mat-error *ngIf="usernameControl.hasError('required')">
@@ -22,8 +22,7 @@
       </mat-error>
       <mat-error *ngIf="usernameControl.hasError('minlength') || 
                         usernameControl.hasError('maxlength')">
-        Usernames must be
-        <strong>3-15 characters long</strong>.
+        Usernames must be <strong>3-15 characters long</strong>.
       </mat-error>
       <mat-error *ngIf="usernameControl.hasError('pattern')">
         Usernames must contain only <strong>alphanumeric and special characters 
@@ -36,7 +35,8 @@
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{passwordLabel}}</mat-label>
-      <input matInput type="password" formControlName="passwordControl">
+      <input matInput required type="password" 
+      formControlName="passwordControl">
     </mat-form-field>
     <div *ngIf="passwordControl.invalid && passwordControl.touched">
       <mat-error *ngIf="passwordControl.hasError('required')">
@@ -57,7 +57,8 @@
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{retypePasswordLabel}}</mat-label>
-      <input matInput type="password" formControlName="retypePasswordControl">
+      <input matInput required type="password" 
+      formControlName="retypePasswordControl">
     </mat-form-field>
     <div *ngIf="retypePasswordControl.invalid && retypePasswordControl.touched">
       <mat-error *ngIf="retypePasswordControl.hasError('unmatchedPasswords')">
