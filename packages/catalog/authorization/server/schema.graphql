@@ -10,7 +10,7 @@ type Resource {
 }
 
 input ResourcesInput {
-  viewableBy: ID
+  viewableBy: ID!
 }
 
 input CreateResourceInput {
