@@ -8,4 +8,23 @@
   <authorization-add-viewer id="key" viewerId="bob"></authorization-add-viewer>
   <h1>Delete Resource</h1>
   <authorization-delete-resource id="key"></authorization-delete-resource>
+  <h1>Resources</h1>
+  <authorization-show-resources></authorization-show-resources>
+  <h1>Resources viewable by Bob</h1>
+  <authorization-show-resources
+    viewableBy="bob">
+  </authorization-show-resources>
+  <h1>Resources viewable by Alice</h1>
+  <authorization-show-resources
+    viewableBy="alice">
+  </authorization-show-resources>
+  <h1>Can Bob read key?</h1>
+  <authorization-can-view resourceId="key" principalId="bob">
+  </authorization-can-view>
+  <h1>Can Bob edit key?</h1>
+  <authorization-can-edit resourceId="key" principalId="bob">
+  </authorization-can-edit>
+  <h1>Owner of key</h1>
+  <authorization-show-owner resourceId="key">
+  </authorization-show-owner>
 </div>

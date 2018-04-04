@@ -2,30 +2,47 @@
   <div class="panel panel-default">
     <div class="panel-body">
       <div class="row">
-        <div class="col-md-12">
+        <dv-tx name="showPartyInfo" class="col-md-12">
           <h3 class="party-title">
             <property-show-object
-              dvOf="party" [id]="party.id" [showOnly]="['title']">
+              dvOf="party" [id]="partyId" [showOnly]="['title']">
             </property-show-object>
           </h3>
           <div class="party-information">
             <p>
               <i class="material-icons">event</i> Date:
-              <event-show-event [id]="party.id"></event-show-event>
+              <event-show-event [id]="partyId"></event-show-event>
+            </p>
+            <p>
+              <i class="material-icons">person</i> Host:
+              <authorization-show-owner
+                [resourceId]="partyId"
+                (owner)="host=$event"
+                [hidden]="true">
+              </authorization-show-owner>
+              <authentication-show-user [id]="host?.id">
+              </authentication-show-user>
             </p>
             <p>
               <i class="material-icons">location_on</i> Location:
               <property-show-object
-                dvOf="party" [id]="party.id" [showOnly]="['location']">
+                dvOf="party" [id]="partyId" [showOnly]="['location']">
               </property-show-object>
             </p>
             <p>
               <property-show-object
-                dvOf="party" [id]="party.id" [showOnly]="['description']">
+                dvOf="party" [id]="partyId" [showOnly]="['description']">
               </property-show-object>
             </p>
           </div>
-        </div>
+          <authorization-can-view
+            [principalId]="loggedInUserId"
+            [resourceId]="partyId" [hidden]="true">
+          </authorization-can-view>
+          <authentication-authenticate
+            [id]="loggedInUserId" [hidden]="true">
+          </authentication-authenticate>
+        </dv-tx>
       </div>
       <button mat-button class="btn btn-primary" (click)="viewMore=!viewMore">
         View {{viewMore ? "Less" : "More"}}
@@ -34,33 +51,53 @@
       <div class="row" [hidden]="!viewMore">
         <div class="col-md-4">
           <div class="row">
-            <div class="col-md-12">
+            <dv-tx name="invitedList" class="col-md-12">
               <h4>Invited List</h4>
               <group-show-members
-                [inGroupId]="party.id"
+                [inGroupId]="partyId"
                 [showMember]="{type: showGuestUsername}">
               </group-show-members>
-            </div>
+              <authorization-can-view
+                [principalId]="loggedInUserId"
+                [resourceId]="partyId" [hidden]="true">
+              </authorization-can-view>
+              <authentication-authenticate
+                [id]="loggedInUserId" [hidden]="true">
+              </authentication-authenticate>
+            </dv-tx>
           </div>
           <div class="row">
-            <div class="col-md-12">
+            <dv-tx *ngIf="host?.id === loggedInUserId" class="col-md-12">
               <h4>Add Guest</h4>
               <group-add-to-group
-                [id]="party.id"
+                [id]="partyId"
                 type="member"
                 [showMember]="{type: showGuestUsername}"
+                (selectedId)="selectedGuestId=$event"
                 autocompletePlaceholder="Choose Guest"
                 buttonLabel="Add to Guest List"
                 addSavedText="Guest added to list">
               </group-add-to-group>
-            </div>
+              <authorization-can-view
+                [principalId]="loggedInUserId"
+                [resourceId]="partyId" [hidden]="true">
+              </authorization-can-view>
+              <authorization-add-viewer
+                [id]="partyId"
+                [viewerId]="selectedGuestId"
+                [hidden]="true">
+              </authorization-add-viewer>
+              <authentication-authenticate
+                [id]="loggedInUserId" [hidden]="true">
+              </authentication-authenticate>
+            </dv-tx>
           </div>
         </div>
         <div class="col-md-1"></div>
 
         <div class="col-md-7">
           <div class="row">
-            <div class="col-md-12">
+            <dv-tx name="supplyList" class="col-md-12">
               <h4>Supply List</h4>
               <div class="container-fluid" style="padding:none">
                 <div class="row row-bordered" style="font-weight:bold">
@@ -74,7 +111,7 @@
                     inputMap: {good: 'supply'},
                     inputs: {useIdForObject: true}
                   }"
-                  [marketId]="party.id"
+                  [marketId]="partyId"
                   [optionToBuyBuyerId]="loggedInUserId"
                   [available]="true"
                   noGoodsToShowText="No supplies needed"
@@ -82,7 +119,7 @@
                   optionToBuyInputQuantityLabel="Supply">
                 </market-show-goods>
                 <market-show-transactions
-                  [marketId]="party.id"
+                  [marketId]="partyId"
                   noTransactionsToShowText="No claims"
                   [showTransaction]="{
                     type: showClaim,
@@ -90,7 +127,14 @@
                   }">
                 </market-show-transactions>
               </div>
-            </div>
+              <authorization-can-view
+                [principalId]="loggedInUserId"
+                [resourceId]="partyId" [hidden]="true">
+              </authorization-can-view>
+              <authentication-authenticate
+                [id]="loggedInUserId" [hidden]="true">
+              </authentication-authenticate>
+            </dv-tx>
           </div>
 
           <div class="row">
@@ -98,7 +142,7 @@
               <h4>Add Supplies</h4>
               <potluck-create-supply
                 [loggedInUserId]="loggedInUserId"
-                [partyId]="party.id">
+                [partyId]="partyId">
               </potluck-create-supply>
             </div>
           </div>

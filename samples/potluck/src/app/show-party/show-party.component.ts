@@ -11,12 +11,14 @@ import { ShowSupplyComponent } from '../show-supply/show-supply.component';
   styleUrls: ['./show-party.component.css']
 })
 export class ShowPartyComponent implements OnInit {
-  @Input() party: any;
+  @Input() partyId: string;
   @Input() loggedInUserId: string;
   showGuestUsername = ShowUserComponent;
   showSupply = ShowSupplyComponent;
   showClaim = ShowClaimComponent;
   viewMore: boolean;
+  host: {id: string};
+  selectedGuestId: string;
 
   constructor() { }
 

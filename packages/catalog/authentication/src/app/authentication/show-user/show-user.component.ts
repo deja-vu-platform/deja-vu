@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -18,7 +19,7 @@ import {
   templateUrl: './show-user.component.html',
   styleUrls: ['./show-user.component.css']
 })
-export class ShowUserComponent implements OnInit {
+export class ShowUserComponent implements OnInit, OnChanges {
   @Input() id: string;
   username: string;
 
@@ -34,7 +35,14 @@ export class ShowUserComponent implements OnInit {
     this.load();
   }
 
+  ngOnChanges() {
+    this.load();
+  }
+
   load() {
+    if (!this.gs || !this.id) {
+      return;
+    }
     this.gs.get<{ data: any }>('/graphql', {
       params: {
         query: `query {
