@@ -21,7 +21,7 @@ import {
   styleUrls: ['./show-resources.component.css']
 })
 export class ShowResourcesComponent implements OnInit, OnChanges {
-  @Input() viewableBy: string | undefined;
+  @Input() viewableBy: string;
   @Input() showResource: Action = {
     type: <Type<Component>> ShowResourceComponent
   };
@@ -48,7 +48,7 @@ export class ShowResourcesComponent implements OnInit, OnChanges {
   }
 
   load() {
-    if (!this.gs) {
+    if (!this.gs || !this.viewableBy) {
       return;
     }
     this.gs.get<{data: { resources: Resource }}>('/graphql', {
