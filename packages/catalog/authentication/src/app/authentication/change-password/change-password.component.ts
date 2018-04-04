@@ -4,7 +4,7 @@ import {
 
 import {
   AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  Validators
+  NG_VALIDATORS, NG_VALUE_ACCESSOR, Validators
 } from '@angular/forms';
 
 import {
@@ -17,12 +17,28 @@ import * as _ from 'lodash';
 
 import { User } from '../shared/authentication.model';
 
+import {
+  PasswordValidator, RetypePasswordValidator
+} from '../shared/authentication.validation';
+
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
   selector: 'authentication-change-password',
   templateUrl: './change-password.component.html',
-  styleUrls: ['./change-password.component.css']
+  styleUrls: ['./change-password.component.css'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: ChangePasswordComponent,
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: ChangePasswordComponent,
+      multi: true
+    }
+  ]
 })
 export class ChangePasswordComponent
 implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
@@ -37,8 +53,9 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   @ViewChild(FormGroupDirective) form;
   oldPasswordControl = new FormControl('', Validators.required);
-  passwordControl = new FormControl('', Validators.required);
-  retypePasswordControl = new FormControl('', Validators.required);
+  passwordControl = new FormControl('', PasswordValidator());
+  retypePasswordControl = new FormControl('',
+    RetypePasswordValidator(this.passwordControl));
   changePasswordForm: FormGroup = this.builder.group({
     oldPasswordControl: this.oldPasswordControl,
     passwordControl: this.passwordControl,

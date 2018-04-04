@@ -4,7 +4,7 @@ import {
 
 import {
   AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  Validators
+  NG_VALIDATORS, NG_VALUE_ACCESSOR, ValidationErrors, ValidatorFn, Validators
 } from '@angular/forms';
 
 import {
@@ -18,17 +18,32 @@ import { AuthenticationService } from '../shared/authentication.service';
 
 import { User } from '../shared/authentication.model';
 
-const SAVED_MSG_TIMEOUT = 3000;
+import {
+  PasswordValidator, RetypePasswordValidator, UsernameValidator
+} from '../shared/authentication.validation';
 
+const SAVED_MSG_TIMEOUT = 3000;
 
 // Also signs in the user
 @Component({
   selector: 'authentication-register-user',
   templateUrl: './register-user.component.html',
-  styleUrls: ['./register-user.component.css']
+  styleUrls: ['./register-user.component.css'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: RegisterUserComponent,
+      multi: true
+    },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: RegisterUserComponent,
+      multi: true
+    }
+  ]
 })
 export class RegisterUserComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -40,9 +55,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Output() user = new EventEmitter();
 
   @ViewChild(FormGroupDirective) form;
-  usernameControl = new FormControl('', Validators.required);
-  passwordControl = new FormControl('', Validators.required);
-  retypePasswordControl = new FormControl('', Validators.required);
+  usernameControl = new FormControl('', UsernameValidator());
+  passwordControl = new FormControl('', PasswordValidator());
+  retypePasswordControl = new FormControl('',
+    RetypePasswordValidator(this.passwordControl));
   registerForm: FormGroup = this.builder.group({
     usernameControl: this.usernameControl,
     passwordControl: this.passwordControl,
@@ -66,7 +82,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private authenticationService: AuthenticationService) {}
+    private authenticationService: AuthenticationService) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -93,7 +109,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
         }
       }
     })
-    .toPromise();
+      .toPromise();
 
     const token = res.data.registerAndSignIn.token;
     const user = res.data.registerAndSignIn.user;
