@@ -359,7 +359,8 @@ const resolvers = {
       if (input.affordable !== undefined && input.buyerId) {
         const buyer: PartyDoc = await Validation.partyExists(input.buyerId);
 
-        filterOp['price'] = { $lte: buyer.balance }; 
+        const op = input.affordable ? '$lte' : '$gte';
+        filterOp['price'] = { [op]: buyer.balance };
       }
       if (input.available) {
         filterOp['supply'] = { $gt: 0 };
