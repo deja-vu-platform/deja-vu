@@ -34,6 +34,9 @@ import {
   CreateTaskComponent
 } from './create-task/create-task.component';
 import {
+  ShowAssigneeComponent
+} from './show-assignee/show-assignee.component';
+import {
   ShowTaskComponent
 } from './show-task/show-task.component';
 import {
@@ -45,7 +48,8 @@ const allComponents = [
   ApproveTaskComponent, AssigneeSelectComponent, ClaimTaskComponent,
   CompleteTaskComponent, CreateAssigneeComponent, CreateAssignerComponent,
   CreateDueDateComponent, CreateTaskComponent,
-  CreateTaskForAllAssigneesComponent, ShowTaskComponent, ShowTasksComponent,
+  CreateTaskForAllAssigneesComponent, ShowAssigneeComponent,
+  ShowTaskComponent, ShowTasksComponent,
   UpdateTaskComponent
 ];
 

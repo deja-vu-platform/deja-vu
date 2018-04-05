@@ -12,7 +12,8 @@ import {
   RunService
 } from 'dv-core';
 
-import * as moment from 'moment';
+// https://github.com/dherges/ng-packagr/issues/217
+import * as momentImported from 'moment'; const moment = momentImported;
 import { startWith } from 'rxjs/operators';
 
 
