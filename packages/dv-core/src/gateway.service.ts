@@ -14,7 +14,7 @@ export interface RequestOptions {
 }
 export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 
-const OF_ATTR = 'dvOf';
+export const OF_ATTR = 'dvOf';
 
 export class GatewayService {
   fromStr: string;

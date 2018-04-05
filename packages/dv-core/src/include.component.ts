@@ -5,6 +5,8 @@ import {
 
 import * as _ from 'lodash';
 
+import { OF_ATTR } from './gateway.service';
+
 
 @Directive({
   selector: '[include-host]',
@@ -45,7 +47,7 @@ export interface Action {
   // The type of the action to include
   type: Type<Component>;
   // Optional value to specify the cliche the action is from
-  of?: string;
+  dvOf?: string;
   // A map of (adapter input name) -> (action input name)
   inputMap?: FieldMap
   // A map of (adapter output name) -> (action output name)
@@ -115,7 +117,7 @@ export class IncludeComponent implements AfterViewInit {
 
     console.log(
       `Loading "${this.action.type}"` +
-      (this.action.of ? `of "${this.action.of}"`: ''));
+      (this.action.dvOf ? `of "${this.action.dvOf}"`: ''));
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(this.action.type);
 
@@ -123,6 +125,10 @@ export class IncludeComponent implements AfterViewInit {
     viewContainerRef.clear();
 
     this.componentRef = viewContainerRef.createComponent(componentFactory);
+    if (this.action.dvOf) {
+      this.componentRef.location.nativeElement
+        .setAttribute(OF_ATTR, this.action.dvOf);
+    }
 
     let shouldCallDetectChanges = false;
 
