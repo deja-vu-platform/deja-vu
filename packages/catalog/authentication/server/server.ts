@@ -102,10 +102,57 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+class Validation {
+  static async userExistsById(userId: string): Promise<UserDoc> {
+    const userDoc = await users.findOne({ id: userId });
+    if (!userDoc) {
+      throw new Error(`User ${userId} not found.`);
+    }
+
+    return userDoc;
+  }
+
+  static async userExistsByUsername(username: string): Promise<UserDoc> {
+    const userDoc = await users.findOne({ username: username });
+    if (!userDoc) {
+      throw new Error(`User ${username} not found.`);
+    }
+
+    return userDoc;
+  }
+
+  static async userIsNew(id: string, username: string) {
+    const userDocById = await users.findOne({ id: id });
+    const userDocByUsername = await users.findOne({ username: username });
+    if (userDocById) {
+      throw new Error(`User ${id} already exists.`);
+    }
+    if (userDocByUsername) {
+      throw new Error(`User ${username} already exists.`);
+    }
+
+    return userDocById;
+  }
+
+  static async verifyPassword(inputPassword: string, savedPassword: string)
+    : Promise<Boolean> {
+    const passwordVerified = await bcrypt.compare(inputPassword, savedPassword);
+    if (!passwordVerified) {
+      throw new Error('Incorrect password.');
+    }
+
+    return passwordVerified;
+  }
+}
+
 async function register(input: RegisterInput): Promise<User> {
+  const id = input.id ? input.id : uuid();
+
+  await Validation.userIsNew(id, input.username);
+
   const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
   const newUser: UserDoc = {
-    id: input.id ? input.id : uuid(),
+    id: id,
     username: input.username,
     password: hash
   };
@@ -132,8 +179,8 @@ const resolvers = {
   Query: {
     users: () => users.find()
       .toArray(),
-    user: (root, { username }) => users.findOne({ username: username}),
-    userById: (root, { id }) => users.findOne({ id: id}),
+    user: (root, { username }) => users.findOne({ username: username }),
+    userById: (root, { id }) => users.findOne({ id: id }),
     verify: (root, { token, id }) => verify(token, id)
   },
 
@@ -161,16 +208,9 @@ const resolvers = {
     },
 
     signIn: async (root, { input }: { input: SignInInput }) => {
-      const user = await users.findOne({ username: input.username});
-      if (!user) {
-        throw new Error('Wrong username or password');
-      }
-
-      const passwordVerified = await bcrypt.compare(input.password,
+      const user = await Validation.userExistsByUsername(input.username);
+      const verification = await Validation.verifyPassword(input.password,
         user.password);
-      if (!passwordVerified) {
-        throw new Error('Wrong username or password');
-      }
 
       const token: string = sign(user.id);
 
@@ -181,13 +221,9 @@ const resolvers = {
     },
 
     changePassword: async (root, { input }: { input: ChangePasswordInput }) => {
-      const user = await users.findOne({id: input.id});
-
-      const passwordVerified = await bcrypt.compare(input.oldPassword,
+      const user = await Validation.userExistsById(input.id);
+      const verification = await Validation.verifyPassword(input.oldPassword,
         user.password);
-      if (!passwordVerified) {
-        throw new Error('Incorrect password');
-      }
 
       const newPasswordHash = await bcrypt
         .hash(input.newPassword, SALT_ROUNDS);
