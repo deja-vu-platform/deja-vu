@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -11,6 +11,11 @@ import {
   GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
   RunService
 } from 'dv-core';
+
+
+import {
+  ShowAssigneeComponent
+} from '../show-assignee/show-assignee.component';
 
 import { Assignee } from '../shared/task.model';
 
@@ -26,12 +31,18 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
   @Input() id;
   @Input() assignerId;
 
+  @Input() showOptionToSubmit = true;
   // Presentation inputs
   @Input() assigneeSelectPlaceholder = 'Choose Assignee';
   @Input() buttonLabel = 'Create Task';
   @Input() newTaskSavedText = 'New task saved';
+  @Input() showAssignee = {
+    type: ShowAssigneeComponent
+  };
 
   @ViewChild(FormGroupDirective) form;
+
+  @Output() selectedAssignee = new EventEmitter<Assignee>();
 
   assignee = new FormControl('');
   dueDate = new FormControl('');
@@ -57,6 +68,10 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
 
   onSubmit() {
     this.rs.run(this.elem);
+  }
+
+  outputSelectedAssignee(selectedAssignee: Assignee) {
+    this.selectedAssignee.emit(selectedAssignee);
   }
 
   async dvOnRun(): Promise<void> {

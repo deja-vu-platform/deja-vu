@@ -11,6 +11,10 @@ import {
   GatewayService, GatewayServiceFactory
 } from 'dv-core';
 
+import {
+  ShowAssigneeComponent
+} from '../show-assignee/show-assignee.component';
+
 import { Assignee } from '../shared/task.model';
 
 
@@ -35,10 +39,14 @@ export class AssigneeSelectComponent
   implements OnInit, ControlValueAccessor, Validator {
   @Input() initialValue;
   @Input() assigneeSelectPlaceholder = 'Choose Assignee';
+  @Input() showAssignee = {
+    type: ShowAssigneeComponent
+  };
   @Output() selectedAssignee = new EventEmitter<Assignee>();
 
   assignees: Assignee[] = [];
   selectedAssigneeId: string | undefined;
+  assigneeSelect = this;
   private gs: GatewayService;
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}

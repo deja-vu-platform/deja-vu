@@ -43,6 +43,7 @@ export class ShowTasksComponent implements OnInit, OnChanges {
   @Input() showTask: Action = {
     type: <Type<Component>> ShowTaskComponent
   };
+  @Input() noTasksToShowText = 'No tasks to show';
   tasks: Task[] = [];
 
   showTasks;

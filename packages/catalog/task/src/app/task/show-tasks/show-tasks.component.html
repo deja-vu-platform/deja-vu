@@ -23,3 +23,7 @@
     </div>
   </li>
 </ul>
+
+<div *ngIf="!tasks || tasks.length === 0">
+  <span>{{noTasksToShowText}}</span>
+</div>
