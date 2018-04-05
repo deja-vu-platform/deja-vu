@@ -4,7 +4,9 @@ import {
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
-import { take } from 'rxjs/operators';
+import { filter, take } from 'rxjs/operators';
+
+import * as _ from 'lodash';
 
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
@@ -17,19 +19,17 @@ import { Good } from '../shared/market.model';
   styleUrls: ['./show-goods.component.css']
 })
 export class ShowGoodsComponent implements OnInit, OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+
   // Fetch rules
   // If undefined then the fetched goods are not filtered by that property
   @Input() buyerId: string | undefined;
-  @Input() waitOnBuyerId = false;
-  buyerIdChange = new EventEmitter<void>();
-
   @Input() sellerId: string | undefined;
-  @Input() waitOnSellerId = false;
-  sellerIdChange = new EventEmitter<void>();
-
   @Input() marketId: string | undefined;
-  @Input() waitOnMarketId = false;
-  marketIdChange = new EventEmitter<void>();
 
   // could work in conjunction with a search feature next time:
   // @Input() lessThanEqPrice: number | undefined;
@@ -78,35 +78,22 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (this.waitOnBuyerId && changes.buyerId) {
-      this.buyerIdChange.emit();
-    }
-    if (this.waitOnSellerId && changes.sellerId) {
-      this.sellerIdChange.emit();
-    }
-    if (this.waitOnMarketId && changes.marketId) {
-      this.marketIdChange.emit();
+    for (const field of this.waitOn) {
+      if (changes[field]) {
+        this.fieldChange.emit(field);
+      }
     }
     this.fetchGoods();
   }
 
   async fetchGoods() {
     if (this.gs) {
-      if (this.waitOnBuyerId && !this.buyerId) {
-        await this.buyerIdChange.asObservable()
-          .pipe(take(1))
-          .toPromise();
-      }
-      if (this.waitOnSellerId && !this.sellerId) {
-        await this.sellerIdChange.asObservable()
-          .pipe(take(1))
-          .toPromise();
-      }
-      if (this.waitOnMarketId && !this.marketId) {
-        await this.marketIdChange.asObservable()
-          .pipe(take(1))
-          .toPromise();
-      }
+      await Promise.all(_.chain(this.waitOn)
+        .filter((field) => !this[field])
+        .map((fieldToWaitFor) => this.fieldChange
+          .pipe(filter((field) => field === fieldToWaitFor), take(1))
+          .toPromise())
+        .value());
 
       this.gs
         .get<{data: {goods: Good[]}}>('/graphql', {
