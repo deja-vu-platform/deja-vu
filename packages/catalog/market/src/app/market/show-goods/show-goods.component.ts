@@ -1,7 +1,10 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  SimpleChanges, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+
+import { take } from 'rxjs/operators';
 
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
@@ -17,8 +20,17 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined then the fetched goods are not filtered by that property
   @Input() buyerId: string | undefined;
+  @Input() waitOnBuyerId = false;
+  buyerIdChange = new EventEmitter<void>();
+
   @Input() sellerId: string | undefined;
+  @Input() waitOnSellerId = false;
+  sellerIdChange = new EventEmitter<void>();
+
   @Input() marketId: string | undefined;
+  @Input() waitOnMarketId = false;
+  marketIdChange = new EventEmitter<void>();
+
   // could work in conjunction with a search feature next time:
   // @Input() lessThanEqPrice: number | undefined;
 
@@ -65,12 +77,37 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
     this.fetchGoods();
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.waitOnBuyerId && changes.buyerId) {
+      this.buyerIdChange.emit();
+    }
+    if (this.waitOnSellerId && changes.sellerId) {
+      this.sellerIdChange.emit();
+    }
+    if (this.waitOnMarketId && changes.marketId) {
+      this.marketIdChange.emit();
+    }
     this.fetchGoods();
   }
 
-  fetchGoods() {
+  async fetchGoods() {
     if (this.gs) {
+      if (this.waitOnBuyerId && !this.buyerId) {
+        await this.buyerIdChange.asObservable()
+          .pipe(take(1))
+          .toPromise();
+      }
+      if (this.waitOnSellerId && !this.sellerId) {
+        await this.sellerIdChange.asObservable()
+          .pipe(take(1))
+          .toPromise();
+      }
+      if (this.waitOnMarketId && !this.marketId) {
+        await this.marketIdChange.asObservable()
+          .pipe(take(1))
+          .toPromise();
+      }
+
       this.gs
         .get<{data: {goods: Good[]}}>('/graphql', {
           params: {
