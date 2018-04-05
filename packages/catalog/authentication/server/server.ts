@@ -13,6 +13,12 @@ import { makeExecutableSchema } from 'graphql-tools';
 
 import * as _ from 'lodash';
 
+import {
+  PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, PASSWORD_PATTERN_MSG,
+  PASSWORD_REGEX, USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH,
+  USERNAME_PATTERN_MSG, USERNAME_REGEX
+} from '../shared/authentication.config';
+
 
 // TODO: Change before deployment
 const SECRET_KEY = 'ultra-secret-key';
@@ -143,11 +149,52 @@ class Validation {
 
     return passwordVerified;
   }
+
+  static isUsernameValid(username: string): Boolean {
+    return (Validation.isLengthValid(username, USERNAME_MIN_LENGTH,
+      USERNAME_MAX_LENGTH, 'Username') &&
+      Validation.isPatternValid(username, USERNAME_REGEX, 'Username',
+        USERNAME_PATTERN_MSG));
+  }
+
+  static isPasswordValid(password: string): Boolean {
+    return (Validation.isLengthValid(password, PASSWORD_MIN_LENGTH,
+      PASSWORD_MAX_LENGTH, 'Password') &&
+      Validation.isPatternValid(password, PASSWORD_REGEX, 'Password',
+        PASSWORD_PATTERN_MSG));
+  }
+
+  static isLengthValid(value: string, minLength: number, maxLength: number,
+    type: string): Boolean {
+    const length: number = value.length;
+
+    if (length < minLength || length > maxLength) {
+      throw new Error(`${type} must be ${minLength}-${maxLength} characters
+      long.`);
+    }
+
+    return true;
+  }
+
+  static isPatternValid(value: string, regExp: RegExp, type: string,
+    msg: string): Boolean {
+    const valid = regExp.test(value);
+
+    if (!valid) {
+      throw new Error(`${type} must contain ${msg}`);
+    }
+
+    return valid;
+  }
+
+
 }
 
 async function register(input: RegisterInput): Promise<User> {
-  const id = input.id ? input.id : uuid();
+  Validation.isUsernameValid(input.username);
+  Validation.isPasswordValid(input.password);
 
+  const id = input.id ? input.id : uuid();
   await Validation.userIsNew(id, input.username);
 
   const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
@@ -225,6 +272,7 @@ const resolvers = {
       const verification = await Validation.verifyPassword(input.oldPassword,
         user.password);
 
+      Validation.isPasswordValid(input.newPassword);
       const newPasswordHash = await bcrypt
         .hash(input.newPassword, SALT_ROUNDS);
       const updateOperation = { $set: { password: newPasswordHash } };
