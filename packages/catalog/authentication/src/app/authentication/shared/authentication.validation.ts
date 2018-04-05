@@ -2,7 +2,7 @@ import {
   AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators
 } from '@angular/forms';
 
-// TODO: Update authentication.validate.ts if any changes made
+// TODO: Update server.ts if any changes made
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
 const USERNAME_REGEX
