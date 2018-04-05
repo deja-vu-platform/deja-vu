@@ -2,9 +2,11 @@ import {
   AbstractControl, FormControl, ValidationErrors, ValidatorFn, Validators
 } from '@angular/forms';
 
+// TODO: Update server.ts if any changes made
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 15;
-const USERNAME_REGEX = new RegExp('^(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+$');
+const USERNAME_REGEX
+  = new RegExp('^(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+$');
 const USERNAME_PATTERN_MSG = 'alphanumeric and special characters ._-';
 
 const PASSWORD_MIN_LENGTH = 8;
@@ -13,8 +15,8 @@ const PASSWORD_REGEX = new RegExp([
   '^.*(?=.*[a-zA-Z])(?=.*[0-9])',
   '(?=.*[!@#$%^&*])(?!.*[`~()\\-_=+[{\\]}\\\|;:\\\'",.<>/? ]).*$'
 ].join(''));
-const PASSWORD_PATTERN_MSG = 'at least 1 lowercase letter, 1 uppercase letter,'
-  + '1 special character (!@#$%^*&) and 1 number (0-9)';
+const PASSWORD_PATTERN_MSG = 'at least 1 lowercase letter, 1 uppercase '
+  + 'letter, 1 special character (!@#$%^*&) and 1 number (0-9)';
 
 export function UsernameValidator(): ValidatorFn[] {
   return [
@@ -75,9 +77,9 @@ function regexValidatorWithCustomMessage(regExp: RegExp, msg: string)
     }
 
     const value: string = control.value;
-    const invalid = regExp.test(value);
+    const valid = regExp.test(value);
 
-    if (!invalid) {
+    if (!valid) {
       return { incorrectPattern: msg };
     }
 
