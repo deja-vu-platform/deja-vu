@@ -13,6 +13,8 @@ import {
   OnAfterCommit, OnRun, RunService
 } from 'dv-core';
 
+import { User } from '../shared/authentication.model';
+
 
 @Component({
   selector: 'authentication-show-user',
@@ -21,6 +23,7 @@ import {
 })
 export class ShowUserComponent implements OnInit, OnChanges {
   @Input() id: string;
+  @Input() user: User;
   username: string;
 
   private gs: GatewayService;
@@ -40,6 +43,11 @@ export class ShowUserComponent implements OnInit, OnChanges {
   }
 
   load() {
+    if (this.user) {
+      this.username = this.user.username;
+
+      return;
+    }
     if (!this.gs || !this.id) {
       return;
     }
