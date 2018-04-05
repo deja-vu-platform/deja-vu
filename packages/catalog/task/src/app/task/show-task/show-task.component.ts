@@ -1,10 +1,12 @@
+import { DatePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 
 import { Task } from '../shared/task.model';
 
 @Component({
   selector: 'task-show-task',
-  templateUrl: './show-task.component.html'
+  templateUrl: './show-task.component.html',
+  providers: [ DatePipe ]
 })
 export class ShowTaskComponent {
   @Input() task: Task;
