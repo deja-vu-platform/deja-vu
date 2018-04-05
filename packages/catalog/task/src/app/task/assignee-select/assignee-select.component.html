@@ -4,8 +4,12 @@
     class="selectpicker">
     <mat-option>None</mat-option>
     <mat-option *ngFor="let assignee of assignees"
-     [value]="assignee.id">
-     {{assignee.id}}
+      [value]="assignee.id">
+      <dv-include
+        [action]="showAssignee"
+        [inputs]="{id: assignee.id}"
+        [parent]="assigneeSelect">
+      </dv-include>
     </mat-option>
   </mat-select>
 </mat-form-field>

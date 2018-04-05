@@ -1,7 +1,7 @@
 <form (ngSubmit)="onSubmit()"
   [formGroup]="createTaskForm"
   class="form-horizontal">
-  <div class="form-group">
+  <div *ngIf="showOptionToSubmit" class="form-group">
     <div *ngIf="newTaskSaved">
       <i class="material-icons">done</i>
         {{newTaskSavedText}}
@@ -12,14 +12,18 @@
     </mat-error>
   </div>
   <div class="form-group">
-    <task-assignee-select formControlName="assignee">
+    <task-assignee-select
+      [showAssignee]="showAssignee"
+      [assigneeSelectPlaceholder]="assigneeSelectPlaceholder"
+      (selectedAssignee)="outputSelectedAssignee($event)"
+      formControlName="assignee">
     </task-assignee-select>
   </div>
   <div class="form-group">
     <task-create-due-date formControlName="dueDate">
     </task-create-due-date>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToSubmit" class="form-group">
     <button mat-button type="submit" [disabled]="!createTaskForm.valid">
       {{buttonLabel}}
     </button>
