@@ -15,6 +15,7 @@ export class ShowTaskComponent {
   @Input() showAssigner = true;
   @Input() showAssignee = true;
   @Input() showDueDate = true;
+  @Input() showDueDateFormat = 'EEE MMM d, y h:mm a';
   @Input() showApproved = true;
   @Input() showCompleted = true;
 
