@@ -36,6 +36,7 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string | undefined = '';
   @Input() showOptionToInputSeller = true;
   @Input() showOptionToInputPrice = true;
+  @Input() showOptionToInputSupply = true;
   @Input() showOptionToSubmit = true;
   @Input() save = true;
   @Output() good = new EventEmitter();
@@ -57,6 +58,7 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   // Presentation inputs
   @Input() buttonLabel = 'Create';
   @Input() supplyLabel = 'Supply';
+  @Input() priceLabel = 'Price';
   @Input() newGoodSavedText = 'New good saved';
 
   @ViewChild(FormGroupDirective) form;

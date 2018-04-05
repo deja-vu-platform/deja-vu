@@ -12,6 +12,7 @@ import { Party } from '../shared/market.model';
 })
 export class ShowPartyComponent {
   @Input() party: Party;
+  @Input() id: string;
 
   @Input() showId = true;
   @Input() showBalance = true;
@@ -35,14 +36,14 @@ export class ShowPartyComponent {
 
   loadParty() {
     // only load party when id is given
-    if (!this.gs || !this.party || !this.party.id) {
+    if (!this.gs || this.party || !this.id) {
       return;
     }
     this.gs.get<{data: {party: Party}}>('/graphql', {
       params: {
         query: `
           query {
-            party(id: "${this.party.id}") {
+            party(id: "${this.id}") {
               ${this.showId ? 'id' : ''}
               ${this.showBalance ? 'balance' : ''}
             }
