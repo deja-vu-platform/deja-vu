@@ -24,7 +24,7 @@ import {
 
 const SAVED_MSG_TIMEOUT = 3000;
 
-// Also signs in the user
+
 @Component({
   selector: 'authentication-register-user',
   templateUrl: './register-user.component.html',
@@ -51,6 +51,8 @@ export class RegisterUserComponent
   @Input() retypePasswordLabel = 'Retype Password';
   @Input() buttonLabel = 'Register User';
   @Input() newUserRegisteredText = 'New user registered';
+  @Input() showOptionToSubmit = true;
+  @Input() signIn = true;
 
   @Output() user = new EventEmitter();
 
@@ -94,27 +96,43 @@ export class RegisterUserComponent
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{ data: any }>('/graphql', {
-      query: `mutation Register($input: RegisterInput!) {
-        registerAndSignIn(input: $input) {
-          user { id, username }
-          token
-        }
-      }`,
-      variables: {
-        input: {
-          id: this.id,
-          username: this.usernameControl.value,
-          password: this.passwordControl.value
-        }
+    const variables = {
+      input: {
+        id: this.id,
+        username: this.usernameControl.value,
+        password: this.passwordControl.value
       }
-    })
+    };
+    let user;
+    if (this.signIn) {
+      const res = await this.gs.post<{ data: any }>('/graphql', {
+        query: `mutation RegisterAndSignIn($input: RegisterInput!) {
+          registerAndSignIn(input: $input) {
+            user { id, username }
+            token
+          }
+        }`,
+        variables: variables
+      })
       .toPromise();
 
-    const token = res.data.registerAndSignIn.token;
-    const user = res.data.registerAndSignIn.user;
-    this.authenticationService.setSignedInUser(token, user);
-    this.user.emit({ id: res.data.registerAndSignIn.id });
+      const token = res.data.registerAndSignIn.token;
+      user = res.data.registerAndSignIn.user;
+      this.authenticationService.setSignedInUser(token, user);
+    } else {
+      const res = await this.gs.post<{ data: any }>('/graphql', {
+        query: `mutation Register($input: RegisterInput!) {
+          register(input: $input) {
+            id,
+            username
+          }
+        }`,
+        variables: variables
+      })
+      .toPromise();
+      user = res.data.register;
+    }
+    this.user.emit(user);
   }
 
   dvOnAfterCommit() {
