@@ -1,17 +1,19 @@
 <div class="row">
-  <dv-include [action]="createGood"
-    [inputs]="{
-      save: false,
-      showOptionToInputPrice: showOptionToInputPrice,
-      supplyLabel: supplyLabel,
-      showOptionToInputSeller: showOptionToInputSeller,
-      buttonLabel: buttonLabel,
-      sellerId: sellerId,
-      marketId: marketId
-      }"
-    [outputs]="{good: 'stage'}"
-    [parent]="stageGoodsComponent">
-  </dv-include>
+  <div class="col-md-12">
+    <dv-include [action]="createGood"
+      [inputs]="{
+        save: false,
+        showOptionToInputPrice: showOptionToInputPrice,
+        supplyLabel: supplyLabel,
+        showOptionToInputSeller: showOptionToInputSeller,
+        buttonLabel: buttonLabel,
+        sellerId: sellerId,
+        marketId: marketId
+        }"
+      [outputs]="{good: 'stage'}"
+      [parent]="stageGoodsComponent">
+    </dv-include>
+  </div>
 </div>
 
 <div class="row">
