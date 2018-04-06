@@ -1,7 +1,0 @@
-{
-  "name": "grocery-ship",
-  "watch": true,
-  "gatewayPort": 3000,
-  "usedCliches": {
-  }
-}
