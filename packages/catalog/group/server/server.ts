@@ -41,6 +41,11 @@ interface CreateGroupInput {
   initialSubgroupIds: string[] | undefined;
 }
 
+interface CreateMemberInput {
+  id: string | undefined;
+  inGroupId: string | undefined;
+}
+
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -288,9 +293,15 @@ const resolvers = {
 
       return g;
     },
-    createMember: (root, { id }) => {
-      const m = { id : id ? id : uuid() };
-      members.insertOne(m);
+    createMember: async (root, { input }: { input: CreateMemberInput }) => {
+      const memberId = input.id ? input.id : uuid();
+      const m = { id : memberId };
+      await members.insertOne(m);
+
+      if (input.inGroupId) {
+        await addOrRemoveMemberOrSubgroup(
+          input.inGroupId, memberId, 'memberIds', '$addToSet');
+      }
 
       return m;
     },

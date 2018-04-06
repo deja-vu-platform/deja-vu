@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
@@ -31,7 +31,8 @@ export class ShowGroupsComponent implements OnInit, OnChanges {
   @Input() showGroup: Action = {
     type: <Type<Component>> ShowGroupComponent
   };
-  groups: Group[] = [];
+  _groups: Group[] = [];
+  @Output() groups = new EventEmitter<Group[]>();
 
   showGroups;
   private gs: GatewayService;
@@ -74,7 +75,8 @@ export class ShowGroupsComponent implements OnInit, OnChanges {
           }
         })
         .subscribe((res) => {
-          this.groups = res.data.groups;
+          this._groups = res.data.groups;
+          this.groups.emit(this._groups);
         });
     }
   }
