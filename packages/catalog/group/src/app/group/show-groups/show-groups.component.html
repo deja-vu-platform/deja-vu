@@ -1,5 +1,5 @@
-<ul *ngIf="groups && groups.length > 0" class="list-group">
-  <li *ngFor="let group of groups"
+<ul *ngIf="_groups && _groups.length > 0" class="list-group">
+  <li *ngFor="let group of _groups"
     class="list-group-item group-show-groups-group-item">
     <dv-include [action]="showGroup" [inputs]="{
         group: group, showId: showId, showMembers: showMembers,
@@ -9,6 +9,6 @@
     </dv-include>
   </li>
 </ul>
-<div *ngIf="!groups || groups.length === 0">
+<div *ngIf="!_groups || _groups.length === 0">
   No groups
 </div>
