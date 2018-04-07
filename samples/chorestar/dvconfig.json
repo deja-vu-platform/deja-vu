@@ -1,0 +1,96 @@
+{
+  "name": "chorestar",
+  "gatewayPort": 3000,
+  "usedCliches": {
+    "parentauthentication": {
+      "config": {
+        "wsPort": 3002,
+        "reinitDbOnStartup": true
+      }
+    },
+    "parentauthorization": {
+      "config": {
+        "wsPort": 3003,
+        "reinitDbOnStartup": true
+      }
+    },
+    "childauthentication": {
+      "config": {
+        "wsPort": 3004,
+        "reinitDbOnStartup": true
+      }
+    },
+    "childauthorization": {
+      "config": {
+        "wsPort": 3005,
+        "reinitDbOnStartup": true
+      }
+    },
+    "market": {
+      "config": {
+        "wsPort": 3006,
+        "reinitDbOnStartup": true
+      }
+    },
+    "task": {
+      "config": {
+        "wsPort": 3007,
+        "reinitDbOnStartup": true
+      }
+    },
+    "group": {
+      "config": {
+        "wsPort": 3008,
+        "reinitDbOnStartup": true
+      }
+    },
+    "chore": {
+      "config": {
+        "wsPort": 3009,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Chore",
+          "type": "object",
+          "properties": {
+              "name": {
+                "type": "string"
+              }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "child": {
+      "config": {
+        "wsPort": 3010,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Child",
+          "type": "object",
+          "properties": {
+              "name": {
+                "type": "string"
+              }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "reward": {
+      "config": {
+        "wsPort": 3011,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Reward",
+          "type": "object",
+          "properties": {
+              "name": {
+                "type": "string"
+              }
+          },
+          "required": ["name"]
+        }
+      }
+    }
+  }
+}
