@@ -69,12 +69,12 @@ export class IncludeComponent implements AfterViewInit {
 
   // The inputs to `action` (`g`, see above)
   // Map of the form (adapter input) -> value
-  @Input() inputs: ValueMap;
+  @Input() inputs: ValueMap | undefined;
   // A map of the form (adapter output name -> parent field name). When the
   // action outputs a value (`g`, see above) the field in `parent` of name
   // `field name` is set to the output value if it's a string. If it's a
   // function then it's called with the new value
-  @Input() outputs: FieldMap;
+  @Input() outputs: FieldMap | undefined;
   @Input() parent: Component;
 
   @ViewChild(IncludeDirective) host: IncludeDirective;
@@ -135,12 +135,12 @@ export class IncludeComponent implements AfterViewInit {
     this.action.inputMap = this.initFieldMap(this.inputs, this.action.inputMap);
     for (const inputKey of _.keys(this.inputs)) {
       this.componentRef.instance[
-        this.action.inputMap[inputKey]] = this.inputs[inputKey];
+        this.action.inputMap[inputKey]] = this.inputs![inputKey];
       shouldCallDetectChanges = true;
     }
 
     for (const inputKey of _.keys(this.action.inputs)) {
-      this.componentRef.instance[inputKey] = this.action.inputs[inputKey];
+      this.componentRef.instance[inputKey] = this.action.inputs![inputKey];
       shouldCallDetectChanges = true;   
     }
 
@@ -150,11 +150,12 @@ export class IncludeComponent implements AfterViewInit {
       this.componentRef.instance[this.action.outputMap[outputKey]]
         .subscribe(newVal => {
           console.log(
-            `Got new value ${newVal}, assigning to/calling ${this.outputs[outputKey]}`);
-          if (_.isFunction(this.parent[this.outputs[outputKey]])) {
-            this.parent[this.outputs[outputKey]](newVal);
+            `Got new value ${newVal}, assigning to/calling ` +
+            this.outputs![outputKey]);
+          if (_.isFunction(this.parent[this.outputs![outputKey]])) {
+            this.parent[this.outputs![outputKey]](newVal);
           } else {
-            this.parent[this.outputs[outputKey]] = newVal;
+            this.parent[this.outputs![outputKey]] = newVal;
           }
         });
     }
@@ -169,7 +170,8 @@ export class IncludeComponent implements AfterViewInit {
   /**
    * If `fieldMap` is undefined it returns the identity field map for `valueMap`
    */
-  private initFieldMap(valueMap: ValueMap, fieldMap: FieldMap | undefined)
+  private initFieldMap(
+    valueMap: ValueMap | undefined, fieldMap: FieldMap | undefined)
     : FieldMap {
     if (fieldMap === undefined) {
       return _.mapValues(valueMap, ({}, key) => key);
