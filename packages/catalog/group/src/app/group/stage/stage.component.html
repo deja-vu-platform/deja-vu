@@ -23,6 +23,13 @@
   </div>
 </div>
 
+<div *ngIf="stageHeader" class="row">
+  <div class="col-md-12">
+    <dv-include [action]="stageHeader" [parent]="stageComponent">
+    </dv-include>
+  </div>
+</div>
+
 <div class="row">
   <div class="col-md-12">
     <ul *ngIf="staged && staged.length > 0"
@@ -48,8 +55,8 @@
             </div>
           </div>
           <div class="col-md-2">
-            <button mat-button (click)="unstage(id)">
-              <i class="material-icons">eject</i>
+            <button mat-button (click)="unstage(id)" class="eject">
+              <i class="material-icons icon">eject</i>
             </button>
           </div>
         </div>

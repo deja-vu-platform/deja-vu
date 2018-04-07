@@ -51,6 +51,8 @@ implements OnInit, ControlValueAccessor, Validator {
     type: <Type<Component>> ShowGroupComponent
   };
 
+  @Input() stageHeader: Action | undefined;
+
   // Presentation inputs
   @Input() autocompletePlaceholder;
   @Input() buttonLabel;

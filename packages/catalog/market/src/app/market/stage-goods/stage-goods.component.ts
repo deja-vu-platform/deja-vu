@@ -54,11 +54,13 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   @Input() showGood: Action = {
     type: <Type<Component>> ShowGoodComponent
   };
+  @Input() stagedGoodsHeader: Action | undefined;
 
 
   // Presentation inputs
   @Input() buttonLabel = 'Add Good';
   @Input() supplyLabel = 'Supply';
+  @Input() stageGoodsHeader = 'Staged goods';
 
   staged: Good[] = [];
 
