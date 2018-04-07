@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory
+  GatewayService, GatewayServiceFactory, OnAfterCommit, RunService
 } from 'dv-core';
 
 import { Property } from '../shared/property.model';
@@ -46,7 +46,8 @@ export class CamelToTitleCasePipe implements PipeTransform {
   ]
 })
 export class CreatePropertyComponent
-implements OnInit, OnChanges, ControlValueAccessor, Validator {
+implements OnInit, OnChanges, ControlValueAccessor, Validator,
+OnAfterCommit {
   @Input() name: string;
   @Input() initialValue;
 
@@ -61,10 +62,13 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
   private schemaValidate;
   private ajv = new Ajv();
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+  constructor(
+    private elem: ElementRef, private rs: RunService,
+    private gsf: GatewayServiceFactory) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
     this.loadSchema();
   }
 
@@ -164,5 +168,9 @@ implements OnInit, OnChanges, ControlValueAccessor, Validator {
     }
 
     return this.propertyControl.validator(this.propertyControl);
+  }
+
+  dvOnAfterCommit() {
+    this.propertyControl.reset();
   }
 }
