@@ -304,8 +304,20 @@ span.sized, div.inline {
   overflow: hidden;
 }
 
+.stage-header-title {
+  margin-top: 20px;
+}
+
+.stage-header-heading {
+  margin-top: 10px;
+}
+
+.stage-header-hr {
+  margin-top: 0;
+}
+
 /* Used in show-parties to style child actions */
-.group-show-groups-group-item {
+.authorization-show-resources-resource-item {
   margin-bottom: 10px;
 }
 

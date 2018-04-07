@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-8 offset-md-2 list-group-item"
+      <div class="col-md-10 offset-md-1 list-group-item"
         id="party-form-content">
         <div class="row" id="party-form-header">
           <div class="col-md-12">
@@ -46,8 +46,8 @@
                   <div class="col-md-5">
                     <group-create-group
                       [id]="partyId"
-                      [showMember]="{type: showGuestUsername}"
-
+                      [showMember]="{ type: showGuestUsername }"
+                      [stageHeader]="{ type: guestListHeader }"
                       memberAutocompletePlaceholder="Choose Guest"
                       stageMemberButtonLabel="Add to Guest List"
                       (stagedMemberIds)="stagedMemberIds=$event"
@@ -66,7 +66,7 @@
                         type: showSupply,
                         inputMap: {good: 'supply'}
                       }"
-
+                      [stageGoodsHeader]="{ type: supplyListHeader }"
                       stageGoodsButtonLabel="Add Item"
                       supplyLabel="Quantity"
                       [showOptionToInputPrice]="false"

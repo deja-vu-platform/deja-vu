@@ -8,7 +8,7 @@
               dvOf="party" [id]="partyId" [showOnly]="['title']">
             </property-show-object>
           </h3>
-          <div class="party-information">
+          <div class="top-space">
             <p>
               <i class="material-icons icon">event</i> Date:
               <event-show-event [id]="partyId"></event-show-event>
@@ -70,7 +70,7 @@
               </authentication-authenticate>
             </dv-tx>
           </div>
-          <div class="row">
+          <div class="row top-space">
             <dv-tx *ngIf="host?.id === loggedInUserId" class="col-md-12">
               <h4>Add Guest</h4>
               <group-add-to-group
@@ -104,10 +104,10 @@
             <dv-tx name="supplyList" class="col-md-12">
               <h4>Supply List</h4>
               <div class="container-fluid" style="padding: 0">
-                <div class="row row-bordered" style="font-weight:bold">
-                  <div class="col-md-5">Item</div>
-                  <div class="col-md-3">Quantity</div>
-                  <div class="col-md-4">Contributor</div>
+                <div class="row row-bordered supply-list-header">
+                  <div class="col-md-4">Item</div>
+                  <div class="col-md-4">Quantity</div>
+                  <div class="col-md-4">Unit</div>
                 </div>
                 <div class="row">
                   <div class="col-md-12">
@@ -148,7 +148,7 @@
             </dv-tx>
           </div>
 
-          <div class="row">
+          <div class="row top-space">
             <div class="col-md-12">
               <h4>Add Supplies</h4>
               <potluck-create-supply
