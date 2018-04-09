@@ -52,7 +52,7 @@ export interface Action {
   inputMap?: FieldMap
   // A map of (adapter output name) -> (action output name)
   outputMap?: FieldMap
-  // A map of input names to values. This will be passed to the action when 
+  // A map of input names to values. This will be passed to the action when
   // invoked. If an input of the same name is given to the action the input
   // given in `inputs` takes precedence.
   inputs?: FieldMap
@@ -141,7 +141,7 @@ export class IncludeComponent implements AfterViewInit {
 
     for (const inputKey of _.keys(this.action.inputs)) {
       this.componentRef.instance[inputKey] = this.action.inputs[inputKey];
-      shouldCallDetectChanges = true;   
+      shouldCallDetectChanges = true;
     }
 
     this.action.outputMap = this

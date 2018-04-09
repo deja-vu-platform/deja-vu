@@ -67,7 +67,7 @@ export class RunService {
   async run(elem: ElementRef) {
     let node = elem.nativeElement;
     let targetAction = node;
-    
+
     while (node && node.getAttribute) { // 'document' doesn't have `getAttribute`
       if (this.isDvTx(node)) {
         targetAction = node;
@@ -126,7 +126,7 @@ export class RunService {
       }
       if (actionInfo.action.dvOnAfterCommit) {
         actionInfo.action.dvOnAfterCommit(runResultMap[actionId]);
-      }   
+      }
     });
   }
 
@@ -137,7 +137,7 @@ export class RunService {
       }
       if (actionInfo.action.dvOnAfterAbort) {
         actionInfo.action.dvOnAfterAbort(reason);
-      }   
+      }
     });
   }
 
