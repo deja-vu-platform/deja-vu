@@ -16,7 +16,6 @@ import * as _ from 'lodash';
 
 import { Comment } from '../shared/comment.model';
 
-
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
@@ -79,24 +78,24 @@ export class EditCommentComponent implements
       return;
     }
 
-    this.gs.get<{data: { comment: Comment }}>('/graphql', {
+    this.gs.get<{ data: { comment: Comment } }>('/graphql', {
       params: {
         query: `
-          query {
-            comment(id: "${this.id}") {
-              id
-              author { id }
-              target { id }
-              content
-            }
+        query {
+          comment(id: "${this.id}") {
+            id
+            author { id }
+            target { id }
+            content
           }
+        }
         `
       }
     })
-      .pipe(_.map((res) => res.data.comment))
-      .subscribe((comment: Comment) => {
-        this.contentControl.setValue(comment.content);
+      .subscribe((res) => {
+        this.contentControl.setValue(res.data.comment.content);
       });
+
   }
 
   startEditing() {
