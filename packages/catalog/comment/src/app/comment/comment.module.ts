@@ -3,8 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatDatepickerModule, MatFormFieldModule, MatInputModule,
-  MatSelectModule
+  MatButtonModule, MatFormFieldModule, MatInputModule
 } from '@angular/material';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -35,8 +34,8 @@ const allComponents = [
     FormsModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
-    // Material
-    MatButtonModule, MatDatepickerModule, MatInputModule, MatSelectModule,
+    MatButtonModule,
+    MatInputModule,
     MatFormFieldModule,
     MatMomentDateModule
   ],

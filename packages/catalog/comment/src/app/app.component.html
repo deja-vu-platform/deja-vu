@@ -10,10 +10,8 @@
   <h1>Create Comment</h1>
   <comment-create-comment [authorId]="authorId" [targetId]="targetId" (comment)="commentId = $event.id">
   </comment-create-comment>
-  <h1>Show Comment</h1>
-  <comment-show-comment (showId)="commentId"></comment-show-comment>
   <h1>Show All Comments By Author</h1>
-  <comment-show-comments assignerId="alice">
+  <comment-show-comments authorId="alice">
   </comment-show-comments>
   <h1>Show All Comments By Target</h1>
   <comment-show-comments [targetId]="targetId">

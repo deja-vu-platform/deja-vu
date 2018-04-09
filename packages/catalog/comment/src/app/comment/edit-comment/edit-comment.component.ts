@@ -12,11 +12,10 @@ import {
   RunService
 } from 'dv-core';
 
+import * as _ from 'lodash';
+
 import { Comment } from '../shared/comment.model';
 
-import { map } from 'rxjs/operators';
-
-import * as _ from 'lodash';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -41,7 +40,6 @@ export class EditCommentComponent implements
   OnInit, OnRun, OnAfterAbort, OnAfterCommit, OnChanges {
   @Input() id: string;
   @Input() authorId: string;
-  @Input() content: string;
 
   // Presentation text
   @Input() buttonLabel = 'Update Comment';
@@ -81,7 +79,7 @@ export class EditCommentComponent implements
       return;
     }
 
-    this.gs.get<{ data: { comment: Comment } }>('/graphql', {
+    this.gs.get<{data: { comment: Comment }}>('/graphql', {
       params: {
         query: `
           query {
@@ -95,7 +93,7 @@ export class EditCommentComponent implements
         `
       }
     })
-      .pipe(map((res) => res.data.comment))
+      .pipe(_.map((res) => res.data.comment))
       .subscribe((comment: Comment) => {
         this.contentControl.setValue(comment.content);
       });
@@ -124,7 +122,7 @@ export class EditCommentComponent implements
         input: {
           id: this.id,
           authorId: this.authorId,
-          content: this.content
+          content: this.contentControl.value
         }
       }
     })

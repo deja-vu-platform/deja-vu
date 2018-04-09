@@ -1,4 +1,5 @@
-<form (ngSubmit)="onSubmit()" class="form-horizontal">
+<form (ngSubmit)="onSubmit()" [formGroup]="createCommentForm"
+ class="form-horizontal">
   <div class="form-group">
     <div *ngIf="newCommentSaved" class="create-comment-success">
       <i class="material-icons">done</i>
@@ -12,17 +13,17 @@
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{inputLabel}}</mat-label>
-      <textarea matInput required [(ngModel)]="content" name="content" 
-      #content="ngModel"></textarea>
+      <textarea matInput required formControlName="contentControl">
+      </textarea>
     </mat-form-field>
-    <div *ngIf="content.invalid && content.touched">
-      <mat-error *ngIf="content.errors.required">
+    <div *ngIf="contentControl.invalid && contentControl.touched">
+      <mat-error *ngIf="contentControl.hasError('required')">
         This field is <strong>required</strong>.
       </mat-error>
     </div>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit" [disabled]="!content.valid">
+    <button mat-button type="submit" [disabled]="!createCommentForm.valid">
       {{buttonLabel}}
     </button>
   </div>

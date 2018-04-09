@@ -60,8 +60,8 @@ export class ShowCommentsComponent implements OnInit, OnChanges {
               query Comments($input: CommentsInput!) {
                 comments(input: $input) {
                   ${this.showId ? 'id' : ''}
-                  ${this.showAuthor ? 'target { id }' : ''}
-                  ${this.showTarget ? 'author { id }' : ''}
+                  ${this.showAuthor ? 'author { id }' : ''}
+                  ${this.showTarget ? 'target { id }' : ''}
                   ${this.showContent ? 'content' : ''}
                 }
               }

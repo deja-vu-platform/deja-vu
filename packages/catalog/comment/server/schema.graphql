@@ -1,4 +1,4 @@
-// Express an opinion or reaction in writing
+# Express an opinion or reaction in writing
 type Author {
   id: ID!
 }

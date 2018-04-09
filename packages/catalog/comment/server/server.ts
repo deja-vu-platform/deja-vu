@@ -117,7 +117,7 @@ mongodb.MongoClient.connect(
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  // Check to see if author, target and comment already exists
+  // TODO: Check to see if author, target and comment already exists
   static async authorExists(id: string): Promise<AuthorDoc> {
     return Validation.exists(authors, id, 'Author');
   }
@@ -165,7 +165,7 @@ const resolvers = {
 
       return commentDocToComment(comment);
     },
-    commentBySourceTarget: (root, { authorId, targetId }) => {
+    commentByAuthorTarget: (root, { authorId, targetId }) => {
       comments.findOne({ authorId: authorId, targetId: targetId });
     },
     comments: async (root, { input }: { input: CommentsInput }) => {
@@ -189,7 +189,7 @@ const resolvers = {
     id: (comment: Comment) => comment.id,
     author: (comment: Comment) => comment.author,
     target: (comment: Comment) => comment.target,
-    comment: (comment: Comment) => comment.content
+    content: (comment: Comment) => comment.content
   },
   Mutation: {
     createAuthor: async (root, { id }) => {
@@ -223,7 +223,7 @@ const resolvers = {
 
       await comments.insertOne(comment);
 
-      return comment;
+      return commentDocToComment(comment);
     },
 
     editComment: async (root, { input }
