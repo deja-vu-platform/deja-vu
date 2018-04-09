@@ -40,3 +40,19 @@ div.scroll {
 .main {
   padding-top: 100px;
 }
+
+.market-show-good-price,
+.market-show-party-balance,
+.market-show-party-no-balance {
+  display: inline;
+}
+
+.icon {
+  vertical-align: bottom;
+  width: 25px;
+}
+
+h3 .icon {
+  vertical-align: baseline;
+  width: 25px;
+}

@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-3">
+  <div class="col-md-4">
     <property-show-object
       dvOf="chore"
       [id]="chore.id"
@@ -7,7 +7,7 @@
     </property-show-object>
   </div>
 
-  <div class="offset-md-2 col-md-7">
+  <div class="offset-md-1 col-md-7">
     <task-show-task
       [task]="chore"
       [showId]="false"
@@ -20,7 +20,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-md-4">
     <div *ngIf="view === 'parent'">
       <authentication-show-user
         dvOf="childauthentication"
@@ -28,10 +28,8 @@
       </authentication-show-user>
     </div>
   </div>
-</div>
-
-<div class="row">
-  <div class="col-md-12">
+  <div class="offset-md-1 col-md-7">
+    <i class="material-icons icon">star_rate</i>
     <market-show-good
       [id]="chore.id"
       [showId]="false"
@@ -43,7 +41,7 @@
 </div>
 
 <div *ngIf="showOptionToApprove" class="row">
-  <dv-tx class="col-md-12">
+  <dv-tx class="offset-md-4 col-md-4">
     <market-create-transaction
       [goodId]="chore.id"
       [buyerId]="chore.assigner.id"

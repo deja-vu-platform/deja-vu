@@ -13,6 +13,7 @@
                   <h2>Assigned Chores</h2>
                   <task-show-tasks
                     [assignerId]="user?.id"
+                    [completed]="false"
                     [showTask]="{
                       type: showChore,
                       inputMap: { task: 'chore' }
@@ -76,6 +77,7 @@
               <market-show-goods
                 [sellerId]="user?.id"
                 [marketId]="user?.id"
+                [available]="true"
                 [waitOn]="['sellerId', 'marketId']"
                 [showGood]="{
                   type: showReward,

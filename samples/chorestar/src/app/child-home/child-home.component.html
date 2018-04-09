@@ -11,93 +11,110 @@
   <div class="container-fluid main">
     <div id="child-heading" class="col-md-12">
       <div class="row">
-          <div class="col-md-2 offset-md-4"><h4> StarBank Total: </h4></div>
-          <div class="col-md-2">
-            <i class="material-icons">stars</i>
+        <div class="offset-md-4 col-md-4">
+          <h3>
+            StarBank Total:
+            <i class="material-icons icon">star_rate</i>
             <market-show-party
               [id]="user?.id"
-              [showId]="false">
+              [showId]="false"
+              noBalanceText="0">
             </market-show-party>
-          </div>
+          </h3>
+        </div>
       </div>
       <div class="row">
-        <div class="white-box col-md-5">
+        <div class="white-box offset-md-1 col-md-5">
           <h2>Chores</h2>
-          <h4>Uncompleted Chores</h4>
-          <div class="row left-align-row">
-            <task-show-tasks
-              [assigneeId]="user?.id"
-              [completed]="false"
-              [showTask]="{
-                type: showChore,
-                inputMap: { task: 'chore'},
-                inputs: { view: 'child' }
-              }"
-              [showOptionToComplete]="true"
-              noTasksToShowText="No uncompleted chores">
-            </task-show-tasks>
+          <div class="row section">
+            <div class="col-md-12">
+              <h3>Uncompleted Chores</h3>
+              <task-show-tasks
+                [assigneeId]="user?.id"
+                [completed]="false"
+                [showTask]="{
+                  type: showChore,
+                  inputMap: { task: 'chore'},
+                  inputs: { view: 'child' }
+                }"
+                [showOptionToComplete]="true"
+                noTasksToShowText="No uncompleted chores">
+              </task-show-tasks>
+            </div>
           </div>
-          <h4>Chores Pending Approval</h4>
-          <div class="row left-align-row">
-            <task-show-tasks
-              [assigneeId]="user?.id"
-              [completed]="true"
-              [approved]="false"
-              [showTask]="{
-                type: showChore,
-                inputMap: { task: 'chore'},
-                inputs: { view: 'child' }
-              }"
-              noTasksToShowText="No chores pending approval">
-            </task-show-tasks>
+          <div class="row section">
+            <div class="col-md-12">
+              <h3>Chores Pending Approval</h3>
+              <task-show-tasks
+                [assigneeId]="user?.id"
+                [completed]="true"
+                [approved]="false"
+                [showTask]="{
+                  type: showChore,
+                  inputMap: { task: 'chore'},
+                  inputs: { view: 'child' }
+                }"
+                noTasksToShowText="No chores pending approval">
+              </task-show-tasks>
+            </div>
           </div>
-          <h4>Completed and Approved Chores</h4>
-          <div class="row left-align-row">
-            <task-show-tasks
-              [assigneeId]="user?.id"
-              [completed]="true"
-              [approved]="true"
-              [showTask]="{
-                type: showChore,
-                inputMap: { task: 'chore'},
-                inputs: { view: 'child' }
-              }"
-              noTasksToShowText="No approved chores">
-            </task-show-tasks>
+          <div class="row section">
+            <div class="col-md-12">
+              <h3>Completed and Approved Chores</h3>
+              <task-show-tasks
+                [assigneeId]="user?.id"
+                [completed]="true"
+                [approved]="true"
+                [showTask]="{
+                  type: showChore,
+                  inputMap: { task: 'chore'},
+                  inputs: { view: 'child' }
+                }"
+                noTasksToShowText="No approved chores">
+              </task-show-tasks>
+            </div>
           </div>
         </div>
 
-        <div class="white-box offset-md-1 col-md-5">
+        <div class="white-box right-box col-md-5">
           <h2>Rewards</h2>
-          <h3>Rewards You Can Buy</h3>
-          <market-show-goods
-            [affordable]="true"
-            [available]="true"
-            [buyerId]="user?.id"
-            [marketId]="parent?.id"
-            [waitOn]="['buyerId', 'marketId']"
-            [showGood]="{
-              type: showReward,
-              inputMap: { good: 'reward' },
-              inputs: { user: user, showOptionToPurchase: true }
-            }"
-            [showOptionToBuy]="false"
-            noGoodsToShowText="No rewards to show">
-          </market-show-goods>
-          <h3>Rewards You Cannot Buy Yet</h3>
-          <market-show-goods
-            [affordable]="false"
-            [buyerId]="user?.id"
-            [available]="true"
-            [marketId]="parent?.id"
-            [waitOn]="['buyerId', 'marketId']"
-            [showGood]="{
-              type: showReward,
-              inputMap: { good: 'reward' }
-            }"
-            [showOptionToBuy]="false"
-            noGoodsToShowText="No rewards to show">
-          </market-show-goods>
+          <div class="row section">
+            <div class="col-md-12">
+              <h3>Rewards You Can Buy</h3>
+              <market-show-goods
+                [affordable]="true"
+                [available]="true"
+                [buyerId]="user?.id"
+                [marketId]="parent?.id"
+                [waitOn]="['buyerId', 'marketId']"
+                [showGood]="{
+                  type: showReward,
+                  inputMap: { good: 'reward' },
+                  inputs: { user: user, showOptionToPurchase: true }
+                }"
+                [showOptionToBuy]="false"
+                noGoodsToShowText="No rewards to show">
+              </market-show-goods>
+            </div>
+          </div>
+          <div class="row section">
+            <div class="col-md-12">
+              <h3>Rewards You Cannot Buy Yet</h3>
+              <market-show-goods
+                [affordable]="false"
+                [buyerId]="user?.id"
+                [available]="true"
+                [marketId]="parent?.id"
+                [waitOn]="['buyerId', 'marketId']"
+                [showGood]="{
+                  type: showReward,
+                  inputMap: { good: 'reward' }
+                }"
+                [showOptionToBuy]="false"
+                noGoodsToShowText="No rewards to show">
+              </market-show-goods>
+            </div>
+          </div>
         </div>
       </div>
     </div>
