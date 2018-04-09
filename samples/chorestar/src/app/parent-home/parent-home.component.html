@@ -1,35 +1,45 @@
 <div class="body">
-  <authentication-logged-in (user)="user=$event"
-    dvOf="parentauthentication">
-  </authentication-logged-in>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="#">ChoreStar</a>
-      </div>
-      <ul class="navbar-nav">
-        <li>
-          <authentication-show-user [user]="user"
-            dvOf="parentauthentication">
-          </authentication-show-user>
-        </li>
-        <li>
-          <dv-tx>
-            <authentication-sign-out dvOf="parentauthentication">
-            </authentication-sign-out>
-            <dv-link href="/" [hidden]="true"></dv-link>
-          </dv-tx>
-        </li>
-      </ul>
-    </div>
-  </nav>
+  <chorestar-nav-bar for="parent" (loggedInUser)="user=$event">
+  </chorestar-nav-bar>
 
   <div class="container-fluid main">
     <div class="col-md-12">
       <div class="row">
         <div class="col-md-12">
           <div class="row">
-            <dv-tx class="col-md-5 white-box">
+            <div class="offset-md-1 col-md-5">
+              <div class="row">
+                <div class="col-md-12 white-box">
+                  <h2>Assigned Chores</h2>
+                  <task-show-tasks
+                    [assignerId]="user?.id"
+                    [showTask]="{
+                      type: showChore,
+                      inputMap: { task: 'chore' }
+                    }"
+                    noTasksToShowText="No assigned chores">
+                  </task-show-tasks>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-md-12 white-box">
+                  <h2>Chores to Approve</h2>
+                  <task-show-tasks
+                    [approved]="false"
+                    [completed]="true"
+                    [assignerId]="user?.id"
+                    [showTask]="{
+                      type: showChore,
+                      inputMap: {task: 'chore'},
+                      inputs: {showOptionToApprove: true}
+                    }"
+                    [showOptionToApprove]="false"
+                    noTasksToShowText="No chores to approve">
+                  </task-show-tasks>
+                </div>
+              </div>
+            </div>
+            <dv-tx class="white-box right-box col-md-5">
               <h2>Add a New Chore</h2>
               <dv-id (id)="choreId=$event"></dv-id>
               <dv-status savedText="Chore created"></dv-status>
@@ -59,7 +69,23 @@
               </market-create-good>
               <dv-button>Create Chore</dv-button>
             </dv-tx>
-            <dv-tx class="col-md-5 offset-md-1 white-box">
+          </div>
+          <div class="row">
+            <div class="offset-md-1 col-md-5 white-box">
+              <h2>Offered Rewards</h2>
+              <market-show-goods
+                [sellerId]="user?.id"
+                [marketId]="user?.id"
+                [waitOn]="['sellerId', 'marketId']"
+                [showGood]="{
+                  type: showReward,
+                  inputMap: { good: 'reward' }
+                }"
+                [showOptionToBuy]="false"
+                noGoodsToShowText="No offered rewards">
+              </market-show-goods>
+            </div>
+            <dv-tx class="white-box right-box col-md-5">
               <h2>Add a New Reward</h2>
               <dv-id (id)="rewardId=$event"></dv-id>
               <dv-status savedText="Reward created"></dv-status>
@@ -80,53 +106,7 @@
             </dv-tx>
           </div>
           <div class="row">
-            <div class="col-md-5 white-box">
-              <h2>Assigned Chores</h2>
-              <task-show-tasks
-                [assignerId]="user?.id"
-                [showTask]="{
-                  type: showChore,
-                  inputMap: { task: 'chore' }
-                }"
-                noTasksToShowText="No assigned chores">
-              </task-show-tasks>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-5 white-box">
-              <h2>Chores to Approve</h2>
-              <task-show-tasks
-                [approved]="false"
-                [completed]="true"
-                [assignerId]="user?.id"
-                [showTask]="{
-                  type: showChore,
-                  inputMap: {task: 'chore'},
-                  inputs: {showOptionToApprove: true}
-                }"
-                [showOptionToApprove]="false"
-                noTasksToShowText="No chores to approve">
-              </task-show-tasks>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-5 white-box">
-              <h2>Offered Rewards</h2>
-              <market-show-goods
-                [sellerId]="user?.id"
-                [marketId]="user?.id"
-                [waitOn]="['sellerId', 'marketId']"
-                [showGood]="{
-                  type: showReward,
-                  inputMap: { good: 'reward' }
-                }"
-                [showOptionToBuy]="false"
-                noGoodsToShowText="No offered rewards">
-              </market-show-goods>
-            </div>
-          </div>
-          <div class="row">
-            <dv-tx class="col-md-5 white-box">
+            <dv-tx class="white-box offset-md-1 col-md-5">
               <h2>Add a New Child</h2>
               <dv-id (id)="childId=$event"></dv-id>
               <dv-status savedText="Child created"></dv-status>

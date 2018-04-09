@@ -1,28 +1,7 @@
 <div class="body">
-  <authentication-logged-in (user)="user=$event"
-    dvOf="childauthentication">
-  </authentication-logged-in>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-    <div class="container-fluid">
-      <div class="navbar-header">
-        <a class="navbar-brand" href="#">ChoreStar</a>
-      </div>
-      <ul class="navbar-nav">
-        <li>
-          <authentication-show-user [user]="user"
-            dvOf="childauthentication">
-          </authentication-show-user>
-        </li>
-        <li>
-          <dv-tx>
-            <authentication-sign-out dvOf="childauthentication">
-            </authentication-sign-out>
-            <dv-link href="/" [hidden]="true"></dv-link>
-          </dv-tx>
-        </li>
-      </ul>
-    </div>
-  </nav>
+  <chorestar-nav-bar for="child" (loggedInUser)="user=$event">
+  </chorestar-nav-bar>
+
   <group-show-groups
     [withMemberId]="user?.id"
     (groups)="parent=$event[0]"

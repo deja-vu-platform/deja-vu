@@ -22,6 +22,11 @@ body {
   margin-bottom: 10px;
 }
 
+
+.right-box {
+  margin-left: 20px;
+}
+
 .navbar-brand {
   font-size: 20pt;
   font-family: 'Fruktur', sans-serif;
