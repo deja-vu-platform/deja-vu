@@ -19,6 +19,8 @@ import { PropertyModule } from 'property';
 import { ShowSupplyComponent } from './show-supply/show-supply.component';
 import { CreateSupplyComponent } from './create-supply/create-supply.component';
 import { ShowClaimComponent } from './show-claim/show-claim.component';
+import { SupplyListHeaderComponent } from './supply-list-header/supply-list-header.component';
+import { GuestListHeaderComponent } from './guest-list-header/guest-list-header.component';
 
 
 @NgModule({
@@ -31,7 +33,9 @@ import { ShowClaimComponent } from './show-claim/show-claim.component';
     CreatePartyComponent,
     ShowSupplyComponent,
     CreateSupplyComponent,
-    ShowClaimComponent
+    ShowClaimComponent,
+    SupplyListHeaderComponent,
+    GuestListHeaderComponent
   ],
   imports: [
     BrowserModule,
@@ -54,7 +58,8 @@ import { ShowClaimComponent } from './show-claim/show-claim.component';
   bootstrap: [AppComponent],
   entryComponents: [
     ShowPartyComponent, CreateSupplyComponent, ShowSupplyComponent,
-    ShowClaimComponent
+    ShowClaimComponent, SupplyListHeaderComponent,
+    GuestListHeaderComponent
   ]
 })
 export class AppModule { }

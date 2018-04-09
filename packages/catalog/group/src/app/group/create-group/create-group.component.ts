@@ -41,6 +41,7 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
   @Input() showGroup: Action = {
     type: <Type<Component>> ShowGroupComponent
   };
+  @Input() stageHeader: Action | undefined;
 
   // Presentation inputs
   @Input() memberAutocompletePlaceholder = 'Choose Member';

@@ -8,13 +8,13 @@
               dvOf="party" [id]="partyId" [showOnly]="['title']">
             </property-show-object>
           </h3>
-          <div class="party-information">
+          <div class="top-space">
             <p>
-              <i class="material-icons">event</i> Date:
+              <i class="material-icons icon">event</i> Date:
               <event-show-event [id]="partyId"></event-show-event>
             </p>
             <p>
-              <i class="material-icons">person</i> Host:
+              <i class="material-icons icon">person</i> Host:
               <authorization-show-owner
                 [resourceId]="partyId"
                 (owner)="host=$event"
@@ -24,7 +24,7 @@
               </authentication-show-user>
             </p>
             <p>
-              <i class="material-icons">location_on</i> Location:
+              <i class="material-icons icon">location_on</i> Location:
               <property-show-object
                 dvOf="party" [id]="partyId" [showOnly]="['location']">
               </property-show-object>
@@ -44,9 +44,13 @@
           </authentication-authenticate>
         </dv-tx>
       </div>
-      <button mat-button class="btn btn-primary" (click)="viewMore=!viewMore">
-        View {{viewMore ? "Less" : "More"}}
-      </button>
+      <div class="row">
+        <div class="col-md-2 offset-md-5">
+          <button mat-button class="btn btn-primary" (click)="viewMore=!viewMore">
+            View {{viewMore ? "Less" : "More"}}
+          </button>
+        </div>
+      </div>
       <hr class="divider">
       <div class="row" [hidden]="!viewMore">
         <div class="col-md-4">
@@ -66,7 +70,7 @@
               </authentication-authenticate>
             </dv-tx>
           </div>
-          <div class="row">
+          <div class="row top-space">
             <dv-tx *ngIf="host?.id === loggedInUserId" class="col-md-12">
               <h4>Add Guest</h4>
               <group-add-to-group
@@ -99,33 +103,40 @@
           <div class="row">
             <dv-tx name="supplyList" class="col-md-12">
               <h4>Supply List</h4>
-              <div class="container-fluid" style="padding:none">
-                <div class="row row-bordered" style="font-weight:bold">
-                  <div class="col-xs-4">Item</div>
-                  <div class="col-xs-2">Quantity</div>
-                  <div class="col-xs-6">Contributor</div>
+              <div class="container-fluid" style="padding: 0">
+                <div class="row row-bordered supply-list-header">
+                  <div class="col-md-4">Item</div>
+                  <div class="col-md-4">Quantity</div>
+                  <div class="col-md-4">Unit</div>
                 </div>
-                <market-show-goods
-                  [showGood]="{
-                    type: showSupply,
-                    inputMap: {good: 'supply'},
-                    inputs: {useIdForObject: true}
-                  }"
-                  [marketId]="partyId"
-                  [optionToBuyBuyerId]="loggedInUserId"
-                  [available]="true"
-                  noGoodsToShowText="No supplies needed"
-                  optionToBuyButtonLabel="Claim"
-                  optionToBuyInputQuantityLabel="Supply">
-                </market-show-goods>
-                <market-show-transactions
-                  [marketId]="partyId"
-                  noTransactionsToShowText="No claims"
-                  [showTransaction]="{
-                    type: showClaim,
-                    inputMap: {transactionId: 'id'}
-                  }">
-                </market-show-transactions>
+                <div class="row">
+                  <div class="col-md-12">
+                    <market-show-goods
+                      [showGood]="{
+                        type: showSupply,
+                        inputMap: {good: 'supply'},
+                        inputs: {useIdForObject: true}
+                      }"
+                      [marketId]="partyId"
+                      [optionToBuyBuyerId]="loggedInUserId"
+                      [available]="true"
+                      noGoodsToShowText="No supplies needed"
+                      optionToBuyButtonLabel="Claim">
+                    </market-show-goods>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <market-show-transactions
+                      [marketId]="partyId"
+                      noTransactionsToShowText="No claims"
+                      [showTransaction]="{
+                        type: showClaim,
+                        inputMap: {transactionId: 'id'}
+                      }">
+                    </market-show-transactions>
+                  </div>
+                </div>
               </div>
               <authorization-can-view
                 [principalId]="loggedInUserId"
@@ -137,7 +148,7 @@
             </dv-tx>
           </div>
 
-          <div class="row">
+          <div class="row top-space">
             <div class="col-md-12">
               <h4>Add Supplies</h4>
               <potluck-create-supply

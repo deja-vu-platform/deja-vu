@@ -20,6 +20,10 @@ import { Property } from '../shared/property.model';
 import * as _ from 'lodash';
 
 
+export interface ValueMap {
+  [property: string]: any;
+}
+
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
@@ -30,6 +34,19 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class CreateObjectComponent
 implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string | undefined;
+  savedInitialValue: ValueMap;
+  @Input() set initialValue(value: ValueMap) {
+    if (!this.formInitialized) {
+      this.savedInitialValue = value;
+
+      return;
+    }
+    for (const fieldName of _.keys(value)) {
+      if (this[fieldName]) {
+        this[fieldName].setValue(value[fieldName]);
+      }
+    }
+  }
 
   @Input() buttonLabel = 'Create Object';
   @Input() newObjectSavedText = 'New object saved';
@@ -44,6 +61,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   newObjectSaved = false;
   newObjectError: string;
+  formInitialized = false;
 
   private gs: GatewayService;
 
@@ -82,6 +100,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
           formControls[property.name] = this[property.name];
         }
         this.createObjectForm = this.builder.group(formControls);
+        this.formInitialized = true;
+        this.initialValue = this.savedInitialValue;
       });
   }
 
