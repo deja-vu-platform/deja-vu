@@ -13,6 +13,10 @@ md-icon {
   font-family: 'Material Icons' !important;
 }
 
+.icon {
+  vertical-align: text-bottom;
+}
+
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -221,10 +225,12 @@ th {
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
   background-color: #fff;
+  margin-top: 40px;
 }
 
 #party-form-content {
   border-radius: 15px;
+  margin-top: 30px;
 }
 
 #main-info-forms {
@@ -262,7 +268,7 @@ th {
   padding-right: 39px
 }
 
-.create-party-title {
+#create-party-title {
   text-align: center;
 }
 
@@ -298,8 +304,20 @@ span.sized, div.inline {
   overflow: hidden;
 }
 
+.stage-header-title {
+  margin-top: 20px;
+}
+
+.stage-header-heading {
+  margin-top: 10px;
+}
+
+.stage-header-hr {
+  margin-top: 0;
+}
+
 /* Used in show-parties to style child actions */
-.group-show-groups-group-item {
+.authorization-show-resources-resource-item {
   margin-bottom: 10px;
 }
 
@@ -310,4 +328,8 @@ span.sized, div.inline {
 .property-show-object,
 .property-show-object-property {
   display: inline;
+}
+
+.authorization-show-resources-no-resources {
+  text-align: center;
 }

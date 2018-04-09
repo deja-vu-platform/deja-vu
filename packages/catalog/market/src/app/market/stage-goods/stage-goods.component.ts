@@ -54,6 +54,7 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   @Input() showGood: Action = {
     type: <Type<Component>> ShowGoodComponent
   };
+  @Input() stagedGoodsHeader: Action | undefined;
 
 
   // Presentation inputs

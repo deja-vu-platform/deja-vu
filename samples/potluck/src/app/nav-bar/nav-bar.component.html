@@ -5,7 +5,7 @@
   <div class="container">
     <dv-link class="navbar-brand" href="/">Potluck</dv-link>
     <ul *ngIf="user" class="navbar-nav">
-      <li>{{user.username}}</li>
+      <li class="username">{{user.username}}</li>
       <li>
         <dv-tx>
           <authentication-sign-out>

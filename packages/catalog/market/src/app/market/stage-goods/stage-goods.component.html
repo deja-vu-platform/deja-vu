@@ -1,17 +1,26 @@
 <div class="row">
-  <dv-include [action]="createGood"
-    [inputs]="{
-      save: false,
-      showOptionToInputPrice: showOptionToInputPrice,
-      supplyLabel: supplyLabel,
-      showOptionToInputSeller: showOptionToInputSeller,
-      buttonLabel: buttonLabel,
-      sellerId: sellerId,
-      marketId: marketId
-      }"
-    [outputs]="{good: 'stage'}"
-    [parent]="stageGoodsComponent">
-  </dv-include>
+  <div class="col-md-12">
+    <dv-include [action]="createGood"
+      [inputs]="{
+        save: false,
+        showOptionToInputPrice: showOptionToInputPrice,
+        supplyLabel: supplyLabel,
+        showOptionToInputSeller: showOptionToInputSeller,
+        buttonLabel: buttonLabel,
+        sellerId: sellerId,
+        marketId: marketId
+        }"
+      [outputs]="{good: 'stage'}"
+      [parent]="stageGoodsComponent">
+    </dv-include>
+  </div>
+</div>
+
+<div *ngIf="stagedGoodsHeader" class="row">
+  <div class="col-md-12">
+    <dv-include [action]="stagedGoodsHeader" [parent]="stageGoodsComponent">
+    </dv-include>
+  </div>
 </div>
 
 <div class="row">
@@ -28,8 +37,8 @@
             </dv-include>
           </div>
           <div class="col-md-2">
-            <button mat-button (click)="unstage(i)">
-              <i class="material-icons">eject</i>
+            <button mat-button (click)="unstage(i)" class="eject">
+              <i class="material-icons icon">eject</i>
             </button>
           </div>
         </div>

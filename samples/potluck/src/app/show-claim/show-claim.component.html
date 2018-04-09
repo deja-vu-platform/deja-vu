@@ -3,15 +3,28 @@
   [hidden]="true"
   (loadedTransaction)="claim=$event">
 </market-show-transaction>
-
-<div *ngIf="claim">
-  <div>
-    Claimed: {{claim.quantity}}
+<div class="row">
+  <div class="col-md-4">
+    <property-show-object
+      dvOf="supply"
+      [id]="claim?.good.id"
+      [showOnly]="['item']">
+    </property-show-object>
   </div>
-
-  <authentication-show-user
-    [id]="claim.buyer.id">
-  </authentication-show-user>
-  <property-show-object dvOf="supply" [id]="claim.good.id">
-  </property-show-object>
+  <div class="col-md-4">
+    {{claim?.quantity}}
+  </div>
+  <div class="col-md-4">
+    <property-show-object
+      dvOf="supply"
+      [id]="claim?.good.id"
+      [showOnly]="['unit']">
+    </property-show-object>
+  </div>
 </div>
+
+
+Claimed by
+<authentication-show-user
+  [id]="claim?.buyer.id">
+</authentication-show-user>
