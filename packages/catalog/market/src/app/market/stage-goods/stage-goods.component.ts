@@ -60,7 +60,6 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   // Presentation inputs
   @Input() buttonLabel = 'Add Good';
   @Input() supplyLabel = 'Supply';
-  @Input() stageGoodsHeader = 'Staged goods';
 
   staged: Good[] = [];
 
