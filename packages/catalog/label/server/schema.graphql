@@ -1,35 +1,38 @@
-// Change
-type Source {
+// Add labels to items so that they can be found later
+type Item {
   id: ID!,
-  ratings: [Rating]
+  labels: [Label]
 }
 
-type Target {
-  id: ID!,
-  ratings: [Rating]
+type Label {
+  id: ID!
+  item: [Item]
 }
 
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
+// All labels or the labels for a given item
+input LabelsInput {
+  itemId: ID
 }
 
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
+// All items or the items for given labels
+input ItemsInput {
+  labelIds: [ID]
+}
+
+input AddLabelsToItemInput {
+  itemId: ID!
+  labelIds: [ID]
 }
 
 type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  label(id: ID!): Label
+  labels(input: LabelsInput!): [Label]
+  item(id: ID!): Item
+  items(input: ItemsInput!): [Item]
 }
 
 type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  createItem(id: ID!): Item
+  createLabel(id: ID!): Label
+  addLabelsToItem(input: AddLabelToItemInput!): Item
 }

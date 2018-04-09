@@ -9,9 +9,37 @@ import { v4 as uuid } from 'uuid';
 import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
-// Change
-interface SourceDoc {
+interface ItemDoc {
   id: string;
+  labels?: string[];
+}
+
+interface LabelDoc {
+  id: string;
+  items?: string[];
+}
+
+interface Item {
+  id: string;
+  labels?: Label[];
+}
+
+interface Label {
+  id: string;
+  items: Item[];
+}
+
+interface LabelsInput {
+  itemId?: string;
+}
+
+interface ItemsInput {
+  labelIds?: string[];
+}
+
+interface AddLabelsToItemInput {
+  itemId: string;
+  labelIds?: string[];
 }
 
 interface Config {
