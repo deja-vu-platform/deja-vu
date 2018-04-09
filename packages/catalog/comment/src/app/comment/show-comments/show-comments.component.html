@@ -1,6 +1,13 @@
-<ul *ngIf="comments && comments.length > 0" class="row"
- style="list-style-type: none">
-  <li *ngFor="let comment of comments" class="col-md-12">
-    <dv-widget name="ShowComment" [init]="{comment: comment}"></dv-widget>
+<ul *ngIf="comments && comments.length > 0" class="list-group">
+  <li *ngFor="let comment of comments" class="list-group-item">
+    <dv-include [action]="showComment" [inputs]="{
+          comment: comment, showId: showId, showAuthor: showAuthor,
+          showTarget: showTarget, showContent: showContent
+        }" [parent]="showComments">
+    </dv-include>
   </li>
 </ul>
+
+<div *ngIf="!comments || comments.length === 0">
+  <span>{{noCommentsToShowText}}</span>
+</div>

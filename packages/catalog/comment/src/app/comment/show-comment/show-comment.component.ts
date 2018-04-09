@@ -1,11 +1,22 @@
-import {Widget, Field} from "client-bus";
+import { DatePipe } from '@angular/common';
+import { Component, Input } from '@angular/core';
 
-import {CommentAtom} from "../../shared/data";
+import { Comment } from '../shared/comment.model';
 
-
-@Widget({
-  fqelement: "Comment"
+@Component({
+  selector: 'comment-show-comment',
+  templateUrl: './show-comment.component.html',
+  providers: [ DatePipe ]
 })
 export class ShowCommentComponent {
-  @Field("Comment") comment: CommentAtom;
+  @Input() comment: Comment;
+
+  @Input() showId = true;
+  @Input() showAuthor = true;
+  @Input() showTarget = true;
+  @Input() showContent = true;
+
+  @Input() noAuthorText = 'No author';
+  @Input() noTargetText = 'No target';
+  @Input() noContentText = 'No content';
 }

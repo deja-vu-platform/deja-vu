@@ -1,35 +1,48 @@
-// Change
-type Source {
-  id: ID!,
-  ratings: [Rating]
+// Express an opinion or reaction in writing
+type Author {
+  id: ID!
 }
 
 type Target {
-  id: ID!,
-  ratings: [Rating]
+  id: ID!
 }
 
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
+type Comment {
+  id: ID!
+  author: Author
+  target: Target
+  content: String
 }
 
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
+input CreateCommentInput {
+  id: ID
+  authorId: ID
+  targetId: ID
+  content: String
+}
+
+input EditCommentInput {
+  id: ID!
+  authorId: ID
+  content: String
+}
+
+input CommentsInput {
+  authorId: ID
+  targetId: ID
 }
 
 type Query {
-  source(id: ID!): Source
+  author(id: ID!): Author
   target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  comment(id: ID!): Comment
+  commentByAuthorTarget(authorId: ID!, targetId: ID!): Comment
+  comments(input: CommentsInput!): [Comment]
 }
 
 type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  createAuthor(id: ID!): Author
+  createTarget(id: ID!): Target
+  createComment(input: CreateCommentInput!): Comment
+  editComment(input: EditCommentInput!): Comment
 }

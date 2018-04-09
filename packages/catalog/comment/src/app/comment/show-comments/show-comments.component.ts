@@ -1,70 +1,82 @@
-import {GraphQlService} from "gql";
+import {
+  Component, ElementRef, Input, OnChanges, OnInit, Type
+} from '@angular/core';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import * as _ from 'lodash';
 
-import {Observable} from "rxjs/Observable";
-import "rxjs/add/observable/from";
-import "rxjs/add/operator/map";
-import "rxjs/add/operator/mergeMap";
+import { ShowCommentComponent } from '../show-comment/show-comment.component';
 
-import {Widget, ClientBus, Field, AfterInit} from "client-bus";
-
-import {TargetAtom, AuthorAtom, CommentAtom, Comment} from "../../shared/data";
+import { Comment } from '../shared/comment.model';
 
 
-@Widget({fqelement: "Comment", ng2_providers: [GraphQlService]})
-export class ShowCommentsComponent implements AfterInit {
-  @Field("Target") target: TargetAtom;
-  @Field("Author") author: AuthorAtom;
+@Component({
+  selector: 'comment-show-comments',
+  templateUrl: './show-comments.component.html',
+  styleUrls: ['./show-comments.component.css']
+})
+export class ShowCommentsComponent implements OnInit, OnChanges {
+  // Fetch rules
+  // If undefined then the fetched comments are not filtered by that property
+  @Input() authorId: string | undefined;
+  @Input() targetId: string | undefined;
 
-  comments: any[];
-  fetched = false;
+  // Show rules
+  /* What fields of the comment to show. These are passed as input
+     to `showComment` */
+  @Input() showId = true;
+  @Input() showAuthor = true;
+  @Input() showTarget = true;
+  @Input() showContent = true;
+
+  @Input() showComment: Action = {
+    type: <Type<Component>> ShowCommentComponent
+  };
+  @Input() noCommentsToShowText = 'No comments to show';
+  comments: Comment[] = [];
+
+  showComments;
+  private gs: GatewayService;
 
   constructor(
-    private _graphQlService: GraphQlService, private _clientBus: ClientBus) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    this.showComments = this;
+  }
 
-  dvAfterInit() {
-    const update_comments = () => {
-      if (this.fetched) return;
-      this.fetched = true;
-      const author_id = this.author.atom_id ? this.author.atom_id : "";
-      const target_id = this.target.atom_id ? this.target.atom_id : "";
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.fetchComments();
+  }
 
-      this.comments = [];
-      this._graphQlService
-        .get(`
-          getComments(
-            author_id: "${author_id}",
-            target_id: "${target_id}"
-          ) {
-            atom_id,
-            content,
-            author {
-              atom_id,
-              name
-            },
-            target {
-              atom_id
-            }
+  ngOnChanges() {
+    this.fetchComments();
+  }
+
+  fetchComments() {
+    if (this.gs) {
+      this.gs
+        .get<{data: {comments: Comment[]}}>('/graphql', {
+          params: {
+            query: `
+              query Comments($input: CommentsInput!) {
+                comments(input: $input) {
+                  ${this.showId ? 'id' : ''}
+                  ${this.showAuthor ? 'target { id }' : ''}
+                  ${this.showTarget ? 'author { id }' : ''}
+                  ${this.showContent ? 'content' : ''}
+                }
+              }
+            `,
+            variables: JSON.stringify({
+              input: {
+                authorId: this.authorId,
+                targetId: this.targetId
+              }
+            })
           }
-        `)
-        .map(data => data.getComments)
-        .flatMap((comments, unused_ix) => Observable.from(comments))
-        .map((comment: Comment) => {
-          const comment_atom = this._clientBus.new_atom<CommentAtom>("Comment");
-          comment_atom.atom_id = comment.atom_id;
-          comment_atom.content = comment.content;
-          comment_atom.author = this._clientBus.new_atom<AuthorAtom>("Author");
-          comment_atom.author.atom_id = comment.author.atom_id;
-          comment_atom.author.name = comment.author.name;
-          comment_atom.target = this._clientBus.new_atom<TargetAtom>("Target");
-          comment_atom.target.atom_id = comment.target.atom_id;
-          return comment_atom;
         })
-        .subscribe(comment_atom => {
-          this.comments.push(comment_atom);
+        .subscribe((res) => {
+          this.comments = res.data.comments;
         });
-    };
-
-    update_comments();
-    this.target.on_change(update_comments);
+    }
   }
 }

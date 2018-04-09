@@ -1,17 +1,40 @@
-<!-- EditComment(User) -->
 <div class="container">
-  <button (click)="startEditing()" type="submit" class="btn btn-default btn-sm">Edit</button>
-  <form (ngSubmit)="onSubmit()" #postForm="ngForm" class="form-horizontal" [hidden]="!isEditing">
-    <div class="form-group">
-      <label class="sr-only" for="content">Content</label>
-      <textarea required id="content"
-        [(ngModel)]="editedContent" ngControl="content" name="edit"
-        placeholder="The content of this comment"></textarea>
-    </div>
-    <div class="form-group">
-      <button type="submit" class="btn btn-default btn-sm"
-       [disabled]="!postForm.form.valid">Update Comment</button>
-      <button (click)="stopEditing()" type="button" class="btn btn-default btn-sm">Cancel</button>
-    </div>
-  </form>
+    <button mat-button (click)="startEditing()" type="submit">
+      {{startEditButtonLabel}}
+    </button>
+    <form (ngSubmit)="onSubmit()" [formGroup]="editCommentForm"
+    class="form-horizontal" [hidden]="!isEditing">
+      <div class="form-group">
+        <div *ngIf="editCommentSaved" class="edit-comment-success">
+          <i class="material-icons">done</i>
+          {{editCommentSavedText}}
+        </div>
+        <mat-error *ngIf="editCommentError">
+          <i class="material-icons">report_problem</i>
+          {{editCommentError}}
+        </mat-error>
+      </div>
+      <div class="form-group">
+        <mat-form-field>
+          <mat-label>{{inputLabel}}</mat-label>
+          <textarea matInput required formControlName="contentControl">
+          </textarea>
+        </mat-form-field>
+        <div *ngIf="contentControl.invalid && contentControl.touched">
+          <mat-error *ngIf="contentControl.hasError('required')">
+            This field is <strong>required</strong>.
+          </mat-error>
+        </div>
+      </div>
+      <div class="form-group">
+        <button mat-button type="submit" [disabled]="!updateTaskForm.valid">
+          {{buttonLabel}}
+        </button>
+      </div>
+      <div class="form-group">
+        <button mat-button (click)="stopEditing()" type="button">
+          {{stopEditButtonLabel}}
+        </button>
+      </div>
+    </form>
 </div>
