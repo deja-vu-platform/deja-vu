@@ -1,7 +1,12 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  SimpleChanges, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+
+import { filter, take } from 'rxjs/operators';
+
+import * as _ from 'lodash';
 
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
@@ -14,11 +19,18 @@ import { Good } from '../shared/market.model';
   styleUrls: ['./show-goods.component.css']
 })
 export class ShowGoodsComponent implements OnInit, OnChanges {
+  // A list of fields to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
+
   // Fetch rules
   // If undefined then the fetched goods are not filtered by that property
   @Input() buyerId: string | undefined;
   @Input() sellerId: string | undefined;
   @Input() marketId: string | undefined;
+
   // could work in conjunction with a search feature next time:
   // @Input() lessThanEqPrice: number | undefined;
 
@@ -65,12 +77,24 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
     this.fetchGoods();
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field]) {
+        this.fieldChange.emit(field);
+      }
+    }
     this.fetchGoods();
   }
 
-  fetchGoods() {
+  async fetchGoods() {
     if (this.gs) {
+      await Promise.all(_.chain(this.waitOn)
+        .filter((field) => !this[field])
+        .map((fieldToWaitFor) => this.fieldChange
+          .pipe(filter((field) => field === fieldToWaitFor), take(1))
+          .toPromise())
+        .value());
+
       this.gs
         .get<{data: {goods: Good[]}}>('/graphql', {
           params: {

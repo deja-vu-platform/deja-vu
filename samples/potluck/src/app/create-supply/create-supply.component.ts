@@ -13,6 +13,8 @@ export class CreateSupplyComponent  {
   supplyId: string;
   object: any;
   good: any;
+  item: string;
+  unit: string;
 
   outputAsSupply(value) {
     this.supply.emit(value);

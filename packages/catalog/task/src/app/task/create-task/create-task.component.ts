@@ -48,6 +48,7 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
     this.dueDateControl.setValue(dueDate);
   }
 
+  @Input() showOptionToSubmit = true;
   // Presentation inputs
   @Input() assigneeSelectPlaceholder = 'Choose Assignee';
   @Input() buttonLabel = 'Create Task';

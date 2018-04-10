@@ -1,24 +1,33 @@
 <div class="row">
-  <form (ngSubmit)="stage()"
-    [formGroup]="stageForm"
-    class="form-horizontal">
-    <div class="form-group">
-      <group-autocomplete
-        [autocompletePlaceholder]="autocompletePlaceholder"
-        [type]="type"
-        [disabledIds]="staged"
-        [showMember]="showMember"
-        [showGroup]="showGroup"
-        formControlName="autocomplete"
-        [required]="true">
-      </group-autocomplete>
-    </div>
-    <div class="form-group">
-      <button mat-button type="submit" [disabled]="!stageForm.valid">
-        {{buttonLabel}}
-      </button>
-    </div>
-  </form>
+  <div class="col-md-12">
+    <form (ngSubmit)="stage()"
+      [formGroup]="stageForm"
+      class="form-horizontal">
+      <div class="form-group">
+        <group-autocomplete
+          [autocompletePlaceholder]="autocompletePlaceholder"
+          [type]="type"
+          [disabledIds]="staged"
+          [showMember]="showMember"
+          [showGroup]="showGroup"
+          formControlName="autocomplete"
+          [required]="true">
+        </group-autocomplete>
+      </div>
+      <div class="form-group">
+        <button mat-button type="submit" [disabled]="!stageForm.valid">
+          {{buttonLabel}}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="stageHeader" class="row">
+  <div class="col-md-12">
+    <dv-include [action]="stageHeader" [parent]="stageComponent">
+    </dv-include>
+  </div>
 </div>
 
 <div class="row">
@@ -46,8 +55,8 @@
             </div>
           </div>
           <div class="col-md-2">
-            <button mat-button (click)="unstage(id)">
-              <i class="material-icons">eject</i>
+            <button mat-button (click)="unstage(id)" class="eject">
+              <i class="material-icons icon">eject</i>
             </button>
           </div>
         </div>

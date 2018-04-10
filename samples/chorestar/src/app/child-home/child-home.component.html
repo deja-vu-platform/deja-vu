@@ -1,0 +1,126 @@
+<div class="body">
+  <authentication-logged-in (user)="user=$event"
+    dvOf="childauthentication">
+  </authentication-logged-in>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">ChoreStar</a>
+      </div>
+      <ul class="navbar-nav">
+        <li>
+          <authentication-show-user [user]="user"
+            dvOf="childauthentication">
+          </authentication-show-user>
+        </li>
+        <li>
+          <dv-tx>
+            <authentication-sign-out dvOf="childauthentication">
+            </authentication-sign-out>
+            <dv-link href="/" [hidden]="true"></dv-link>
+          </dv-tx>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <group-show-groups
+    [withMemberId]="user?.id"
+    (groups)="parent=$event[0]"
+    [hidden]="true">
+  </group-show-groups>
+
+  <div class="container-fluid main">
+    <div id="child-heading" class="col-md-12">
+      <div class="row">
+          <div class="col-md-2 offset-md-4"><h4> StarBank Total: </h4></div>
+          <div class="col-md-2">
+            <i class="material-icons">stars</i>
+            <market-show-party
+              [id]="user?.id"
+              [showId]="false">
+            </market-show-party>
+          </div>
+      </div>
+      <div class="row">
+        <div class="white-box col-md-5">
+          <h2>Chores</h2>
+          <h4>Uncompleted Chores</h4>
+          <div class="row left-align-row">
+            <task-show-tasks
+              [assigneeId]="user?.id"
+              [completed]="false"
+              [showTask]="{
+                type: showChore,
+                inputMap: { task: 'chore'},
+                inputs: { view: 'child' }
+              }"
+              [showOptionToComplete]="true"
+              noTasksToShowText="No uncompleted chores">
+            </task-show-tasks>
+          </div>
+          <h4>Chores Pending Approval</h4>
+          <div class="row left-align-row">
+            <task-show-tasks
+              [assigneeId]="user?.id"
+              [completed]="true"
+              [approved]="false"
+              [showTask]="{
+                type: showChore,
+                inputMap: { task: 'chore'},
+                inputs: { view: 'child' }
+              }"
+              noTasksToShowText="No chores pending approval">
+            </task-show-tasks>
+          </div>
+          <h4>Completed and Approved Chores</h4>
+          <div class="row left-align-row">
+            <task-show-tasks
+              [assigneeId]="user?.id"
+              [completed]="true"
+              [approved]="true"
+              [showTask]="{
+                type: showChore,
+                inputMap: { task: 'chore'},
+                inputs: { view: 'child' }
+              }"
+              noTasksToShowText="No approved chores">
+            </task-show-tasks>
+          </div>
+        </div>
+
+        <div class="white-box offset-md-1 col-md-5">
+          <h2>Rewards</h2>
+          <h3>Rewards You Can Buy</h3>
+          <market-show-goods
+            [affordable]="true"
+            [available]="true"
+            [buyerId]="user?.id"
+            [marketId]="parent?.id"
+            [waitOn]="['buyerId', 'marketId']"
+            [showGood]="{
+              type: showReward,
+              inputMap: { good: 'reward' },
+              inputs: { user: user, showOptionToPurchase: true }
+            }"
+            [showOptionToBuy]="false"
+            noGoodsToShowText="No rewards to show">
+          </market-show-goods>
+          <h3>Rewards You Cannot Buy Yet</h3>
+          <market-show-goods
+            [affordable]="false"
+            [buyerId]="user?.id"
+            [available]="true"
+            [marketId]="parent?.id"
+            [waitOn]="['buyerId', 'marketId']"
+            [showGood]="{
+              type: showReward,
+              inputMap: { good: 'reward' }
+            }"
+            [showOptionToBuy]="false"
+            noGoodsToShowText="No rewards to show">
+          </market-show-goods>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

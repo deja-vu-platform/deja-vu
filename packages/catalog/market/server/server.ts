@@ -174,7 +174,7 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, partys, goods, markets, transactions, compoundtransactions;
+let db, parties, goods, markets, transactions, compoundtransactions;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -191,8 +191,8 @@ mongodb.MongoClient.connect(
           `Initialized market set with ${config.initialMarketIds}`);
       }
     }
-    partys = db.collection('partys');
-    partys.createIndex({ id: 1 }, { unique: true, sparse: true });
+    parties = db.collection('parties');
+    parties.createIndex({ id: 1 }, { unique: true, sparse: true });
     goods = db.collection('goods');
     goods.createIndex({ id: 1 }, { unique: true, sparse: true });
     markets = db.collection('markets');
@@ -212,7 +212,7 @@ class Validation {
   }
 
   static async partyExists(id: string): Promise<PartyDoc> {
-    return Validation.exists(partys, id, 'Party');
+    return Validation.exists(parties, id, 'Party');
   }
 
   static async goodExists(id: string): Promise<GoodDoc> {
@@ -338,7 +338,7 @@ async function createGood(input: CreateGoodInput) {
 const resolvers = {
   Query: {
     market: (_root, { id }) => markets.findOne({ id: id }),
-    party: (_root, { id }) => partys.findOne({ id: id }),
+    party: (_root, { id }) => parties.findOne({ id: id }),
     good: async (_root, { id }) => {
       const good = await Validation.goodExists(id);
       return goodDocToGood(good);
@@ -435,14 +435,14 @@ const resolvers = {
         id: input.id ? input.id : uuid(),
         balance: input.balance
       };
-      await partys.insertOne(party);
+      await parties.insertOne(party);
 
       return party;
     },
     addAmount: async (_root, {input}: {input: AddAmountInput}) => {
       await Validation.partyExists(input.partyId);
       const updateOp = { $inc: { balance: input.amount } };
-      await partys.updateOne({ id: input.partyId }, updateOp);
+      await parties.updateOne({ id: input.partyId }, updateOp);
 
       return true;
     },
@@ -611,8 +611,8 @@ async function makePayment(sellerId: string, buyerId: string, price: number) {
   const sellerUpdateOp = { $inc: { balance: price } };
   // NOTE: allows negative balance
   await Promise.all([
-    partys.updateOne({ id: buyerId }, buyerUpdateOp),
-    partys.updateOne({ id: sellerId }, sellerUpdateOp)
+    parties.updateOne({ id: buyerId }, buyerUpdateOp),
+    parties.updateOne({ id: sellerId }, sellerUpdateOp)
   ]);
 }
 

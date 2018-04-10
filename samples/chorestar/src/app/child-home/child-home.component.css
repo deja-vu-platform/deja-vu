@@ -1,0 +1,29 @@
+.left-align-row {
+  text-align: left;
+}
+
+#child-chores-table > .row,
+#child-rewards > .row {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.icon-size {
+  font-size: 60px;
+  color: yellow;
+}
+
+.icon-size > span {
+  position: absolute;
+  left: 34px; /** you can make changes here to change position **/
+  top: 18px;
+  font-size: 16pt;
+  z-index: 3;
+  font-family: 'Roboto', sans-serif;
+  color: black;
+}
+
+#child-heading {
+  position: center;
+}
+

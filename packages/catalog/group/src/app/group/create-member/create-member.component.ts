@@ -14,6 +14,7 @@ import {
 })
 export class CreateMemberComponent implements OnInit {
   @Input() id: string | undefined;
+  @Input() inGroupId: string | undefined;
   @Input() buttonLabel = 'Create Member';
   @Input() inputLabel = 'Id';
   @Output() member = new EventEmitter();
@@ -37,11 +38,17 @@ export class CreateMemberComponent implements OnInit {
     const res = await this.gs.post<{
       data: { createMember: { id: string }}
     }>('/graphql', {
-      query: `mutation {
-        createMember(id: "${this.id}") {
+      query: `mutation CreateMember($input: CreateMemberInput!){
+        createMember(input: $input) {
           id
         }
-      }`
+      }`,
+      variables: {
+        input: {
+          id: this.id,
+          inGroupId: this.inGroupId
+        }
+      }
     })
     .toPromise();
     this.member.emit({id: res.data.createMember.id});

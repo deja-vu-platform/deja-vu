@@ -17,7 +17,7 @@
 </div>
 
 <div *ngIf="showDueDate && task.dueDate">
-  {{task.dueDate}}
+  {{task.dueDate | date: showDueDateFormat}}
 </div>
 <div *ngIf="showDueDate && !task.dueDate">
   {{noDueDateText}}

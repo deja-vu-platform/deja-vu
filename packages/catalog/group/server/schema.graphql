@@ -26,6 +26,11 @@ input CreateGroupInput {
   initialSubgroupIds: [ID!]
 }
 
+input CreateMemberInput {
+  id: ID
+  inGroupId: ID
+}
+
 type Query {
   group(id: ID!): Group
   member(id: ID!): Member
@@ -37,7 +42,7 @@ type Query {
 
 type Mutation {
   createGroup(input: CreateGroupInput!): Group 
-  createMember(id: ID): Member 
+  createMember(input: CreateMemberInput!): Member
 
   addMember(groupId: ID!, id: ID!): Group
   removeMember(groupId: ID!, id: ID!): Group

@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild, Output
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -40,9 +40,12 @@ export class CreatePartyComponent implements
 
   balanceControl = new FormControl();
   createPartyForm: FormGroup = this.builder.group({
-    balance: this.balanceControl
+    balanceControl: this.balanceControl
   });
 
+  @Input() set balance(balance: number) {
+    this.balanceControl.setValue(balance);
+  }
 
   newPartySaved = false;
   newPartyError: string;

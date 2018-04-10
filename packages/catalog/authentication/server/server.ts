@@ -13,6 +13,23 @@ import { makeExecutableSchema } from 'graphql-tools';
 
 import * as _ from 'lodash';
 
+// TODO: Update authentication.validate.ts if any changes made
+const USERNAME_MIN_LENGTH = 3;
+const USERNAME_MAX_LENGTH = 15;
+const USERNAME_REGEX
+  = new RegExp('^(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+$');
+const USERNAME_PATTERN_MSG = 'alphanumeric and special characters ._-';
+
+const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_MAX_LENGTH = 20;
+const PASSWORD_REGEX = new RegExp([
+  '^.*(?=.*[a-zA-Z])(?=.*[0-9])',
+  '(?=.*[!@#$%^&*])(?!.*[`~()\\-_=+[{\\]}\\\|;:\\\'",.<>/? ]).*$'
+].join(''));
+const PASSWORD_PATTERN_MSG = 'at least 1 lowercase letter, 1 uppercase '
+  + 'letter, 1 special character (!@#$%^*&) and 1 number (0-9)';
+
+
 
 // TODO: Change before deployment
 const SECRET_KEY = 'ultra-secret-key';
@@ -143,11 +160,60 @@ class Validation {
 
     return passwordVerified;
   }
+<<<<<<< HEAD
 }
 
 async function register(input: RegisterInput): Promise<User> {
   const id = input.id ? input.id : uuid();
 
+=======
+
+  static isUsernameValid(username: string): Boolean {
+    return (Validation.isLengthValid(username, USERNAME_MIN_LENGTH,
+      USERNAME_MAX_LENGTH, 'Username') &&
+      Validation.isPatternValid(username, USERNAME_REGEX, 'Username',
+        USERNAME_PATTERN_MSG));
+  }
+
+  static isPasswordValid(password: string): Boolean {
+    return (Validation.isLengthValid(password, PASSWORD_MIN_LENGTH,
+      PASSWORD_MAX_LENGTH, 'Password') &&
+      Validation.isPatternValid(password, PASSWORD_REGEX, 'Password',
+        PASSWORD_PATTERN_MSG));
+  }
+
+  static isLengthValid(value: string, minLength: number, maxLength: number,
+    type: string): Boolean {
+    const length: number = value.length;
+
+    if (length < minLength || length > maxLength) {
+      throw new Error(`${type} must be ${minLength}-${maxLength} characters
+      long.`);
+    }
+
+    return true;
+  }
+
+  static isPatternValid(value: string, regExp: RegExp, type: string,
+    msg: string): Boolean {
+    const valid = regExp.test(value);
+
+    if (!valid) {
+      throw new Error(`${type} must contain ${msg}`);
+    }
+
+    return valid;
+  }
+
+
+}
+
+async function register(input: RegisterInput): Promise<User> {
+  Validation.isUsernameValid(input.username);
+  Validation.isPasswordValid(input.password);
+
+  const id = input.id ? input.id : uuid();
+>>>>>>> 67d02bcce489657458c54de725f5e361fe5fa8a3
   await Validation.userIsNew(id, input.username);
 
   const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
@@ -225,6 +291,10 @@ const resolvers = {
       const verification = await Validation.verifyPassword(input.oldPassword,
         user.password);
 
+<<<<<<< HEAD
+=======
+      Validation.isPasswordValid(input.newPassword);
+>>>>>>> 67d02bcce489657458c54de725f5e361fe5fa8a3
       const newPasswordHash = await bcrypt
         .hash(input.newPassword, SALT_ROUNDS);
       const updateOperation = { $set: { password: newPasswordHash } };
