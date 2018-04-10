@@ -1,19 +1,25 @@
-<tr>
-    <th>Item Name</th>
-    <td class="item-name">{{task.name}}</td>
-</tr>
+<groceryship-show-request-details
+  [request]="request" [myRequest]="false" [showTransactionSummary]="false">
+</groceryship-show-request-details>
 
 <tr>
-    <th>Deadline</th>
-    <td class="deadline">{{task.expiration_date}}</td>
-</tr>
+  <div *ngIf="request.assignee">
+    <input
+      type="button"
+      class="btn btn-xs btn-primary"
+      (click)="openSetDeliveryTimeDialog()"
+      value="Set Delivery Time">
+  </div>
 
-<tr>
-    <dv-widget name="ShowCompoundTransaction" of="Market" [init]="{compoundTransaction: task}"></dv-widget>
-</tr>
-
-<tr>
-    <th>Requester</th>
-    <td class="requester">{{task.assigner.atom_id}}</td>
-    <dv-widget name="ShowAverageRating"  of="Rating" [init]="{target: task.assigner}"></dv-widget>
+  <div *ngIf="!request.assignee && claimAssigneeId">
+    <dv-tx>
+      <market-update-good
+        [id]="request.id + '-tip'"
+        [sellerId]="claimAssigneeId"
+        [hidden]="true">
+      </market-update-good>
+      <task-claim-task [id]="request.id" [assigneeId]="claimAssigneeId">
+      </task-claim-task>
+    </dv-tx>
+  </div>
 </tr>

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import {
+  ShowDeliverRequestComponent
+} from '../show-deliver-request/show-deliver-request.component';
 
 @Component({
   selector: 'groceryship-deliver',
@@ -6,6 +9,7 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./deliver.component.css']
 })
 export class DeliverComponent implements OnInit {
+  showDeliverRequest = ShowDeliverRequestComponent;
 
   constructor() { }
 

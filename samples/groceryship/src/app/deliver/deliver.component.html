@@ -1,4 +1,4 @@
-<dv-widget name="NavBarLoggedIn"></dv-widget>
+<groceryship-nav-bar (loggedInUser)="user=$event"></groceryship-nav-bar>
 
 <div id="main-content">
   <h1>Claim Requests</h1>
@@ -9,8 +9,15 @@
     Request filters not available (yet)
   </div>
   <div id="request-feed">
-    <table>
-      <dv-widget name="ShowClaimableTasks" of="Task"></dv-widget>
-    </table>
+    <task-show-tasks
+      [assigned]="false"
+      [showTask]="{
+        type: showDeliverRequest,
+        inputMap: {task: 'request'},
+        inputs: {claimAssigneeId: user?.id}
+      }"
+      [claimAssigneeId]="user?.id"
+      noTasksToShowText="No requests to claim yet.">
+    </task-show-tasks>
   </div>
 </div>

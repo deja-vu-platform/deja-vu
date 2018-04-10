@@ -1,0 +1,66 @@
+<h3 class="mat-dialog-title">{{accept ? 'Accept' : 'Reject'}} Delivery</h3>
+
+<mat-dialog-content>
+  <div *ngIf="accept">
+    <p>
+      Below is a summary of the delivery from 
+      <authentication-show-user [id]="request.assignee.id">
+      </authentication-show-user>:
+    </p>
+
+    <market-show-compound-transaction
+      [compoundTransaction]="{ id: request.id }"
+      [showId]="false"
+      [showTransactionId]="false"
+      [showTransactionStatus]="false"
+      [showGoodDetails]="false"
+      [showOptionToPay]="false"
+      [showOptionToCancel]="false">
+    </market-show-compound-transaction>
+  </div>
+
+  <div *ngIf="!accept">
+    <p>Reason for rejection:</p>
+    <!-- TODO: create an update field widget for property then save the selected value -->
+    <select class="form-control">
+      <option>The deliverer did not show up.</option>
+      <option>The delivered item is not what I requested for.</option>
+      <option>The delivered item is not in good condition.</option>
+      <option>The price of the delivered item is incorrect.</option>
+      <option>I don't need the item anymore.</option>
+    </select>
+  </div>
+
+  <hr>
+
+  <p>
+    Rate 
+    <authentication-show-user [id]="request.assignee.id">
+    </authentication-show-user>:
+  </p>
+  <dv-tx>
+    <rating-rate-target
+      [sourceId]="request.assigner.id" [targetId]="request.assigner.id">
+    </rating-rate-target>
+
+    <!-- TODO: find a way to close this dialog if it's successful -->
+    <div *ngIf="accept">
+      <market-pay-compound-transaction
+        [id]="request.id"
+        buttonLabel="Pay & Rate"
+        paidText="Payment successful">
+      </market-pay-compound-transaction>
+      <task-approve-task [id]="request.id" [hidden]="true">
+      </task-approve-task>
+    </div>
+
+    <div *ngIf="!accept">
+      <market-cancel-compound-transaction
+        [id]="request.id"
+        buttonLabel="Reject & Rate">
+      </market-cancel-compound-transaction>
+      <!-- approveTask too? -->
+      <!-- TODO: save rejection reason -->
+    </div>
+  </dv-tx>
+</mat-dialog-content>

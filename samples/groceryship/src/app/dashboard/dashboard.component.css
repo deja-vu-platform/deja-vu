@@ -1,19 +1,7 @@
-.badge {
-  margin-bottom: 23px;
-}
-
 #dashboard-notifications, #dashboard-requests {
   max-height: 400px;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-.title-toggle:hover {
-  color: #1abc9c;
-}
-
-.title-toggle .glyphicon {
-  font-size: 80%;
 }
 
 /* Add request tile styling */

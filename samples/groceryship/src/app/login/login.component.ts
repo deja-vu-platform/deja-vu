@@ -1,15 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material';
+
+import {
+  RegisterDialogComponent
+} from '../register-dialog/register-dialog.component';
+
 
 @Component({
   selector: 'groceryship-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent {
+  userId: string;
 
-  constructor() { }
+  constructor(public dialog: MatDialog) { }
 
-  ngOnInit() {
+  openRegisterDialog() {
+    this.dialog.open(RegisterDialogComponent, {});
   }
-
 }
