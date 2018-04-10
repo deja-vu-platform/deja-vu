@@ -18,6 +18,7 @@ import { ParentHomeComponent } from './parent-home/parent-home.component';
 import { ChildHomeComponent } from './child-home/child-home.component';
 import { ShowChoreComponent } from './show-chore/show-chore.component';
 import { ShowRewardComponent } from './show-reward/show-reward.component';
+import { NavBarComponent } from './nav-bar/nav-bar.component';
 
 
 
@@ -28,7 +29,8 @@ import { ShowRewardComponent } from './show-reward/show-reward.component';
     ParentHomeComponent,
     ChildHomeComponent,
     ShowChoreComponent,
-    ShowRewardComponent
+    ShowRewardComponent,
+    NavBarComponent
   ],
   imports: [
     BrowserModule,

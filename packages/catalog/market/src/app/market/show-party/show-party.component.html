@@ -1,12 +1,14 @@
-<div *ngIf="party">
+<span *ngIf="party">
   <div *ngIf="showId">
     {{party.id}}
   </div>
 
-  <div *ngIf="showBalance && party.balance">
-    Balance: {{party.balance}}
+  <div *ngIf="showBalance && party.balance"
+    class="market-show-party-balance">
+    {{party.balance}}
   </div>
-  <div *ngIf="showBalance && !party.balance">
+  <div *ngIf="showBalance && !party.balance"
+    class="market-show-party-no-balance">
     {{noBalanceText}}
   </div>
-</div>
+</span>
