@@ -1,10 +1,55 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css" integrity="sha384-ObE+ehRshGuMJ3N47RvNz2kEAWkHvWdZvPtU8pn/MoY9AXPhwksQiaVjB17fWwqn" crossorigin="anonymous">
-<link rel="stylesheet" href="./components/nav-bar/nav-bar.css">
+<authentication-logged-in (user)="user=$event; outputAsLoggedInUser($event)">
+</authentication-logged-in>
 
-<div class="navbar navbar-inverse navbar-fixed-top">
-  <div class="container">
-    <div class="navbar-header">
-        <a [routerLink]="['/']" class="navbar-brand"><img class="navbar-logo" src="./components/nav-bar/icon.png"/>GroceryShip</a>
+<mat-toolbar>
+  <dv-link href="/" class="navbar-brand">
+    <img class="navbar-logo" src="/assets/icon.png"/>GroceryShip
+  </dv-link>
+
+  <!-- This fills the remaining space of the current row -->
+  <span class="fill-remaining-space"></span>
+
+  <div *ngIf="user">
+    <div fxLayout="row" fxShow="false" fxShow.gt-xs>
+      <button mat-button routerLink="/dashboard">Dashboard</button>
+      <button mat-button routerLink="/request">Request</button>
+      <button mat-button routerLink="/deliver">Deliver</button>
+      <button mat-button routerLink="/faq">FAQ</button>
+
+      <button mat-button [mat-menu-trigger-for]="profileMenu">
+        <span>{{user.username}}</span><mat-icon>expand_more</mat-icon>
+      </button>
+      <mat-menu #profileMenu="matMenu">
+        <button mat-menu-item routerLink="/profile">Your Profile</button>
+        <mat-divider></mat-divider>
+        <dv-tx>
+          <authentication-sign-out>
+          </authentication-sign-out>
+          <dv-link href="/" [hidden]="true"></dv-link>
+        </dv-tx>
+      </mat-menu>
     </div>
+    <button mat-button [mat-menu-trigger-for]="menu" fxHide="false" fxHide.gt-xs>
+      <mat-icon>menu</mat-icon>
+    </button>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item routerLink="/dashboard">Dashboard</button>
+      <button mat-menu-item routerLink="/request">Request</button>
+      <button mat-menu-item routerLink="/deliver">Deliver</button>
+      <button mat-menu-item routerLink="/faq">FAQ</button>
+
+      <button mat-menu-item [mat-menu-trigger-for]="profileCollapsedMenu">
+        <span>{{user.username}}</span>
+      </button>
+      <mat-menu #profileCollapsedMenu="matMenu">
+        <button mat-menu-item routerLink="/profile">Your Profile</button>
+        <mat-divider></mat-divider>
+        <dv-tx>
+          <authentication-sign-out>
+          </authentication-sign-out>
+          <dv-link href="/" [hidden]="true"></dv-link>
+        </dv-tx>
+      </mat-menu> 
+    </mat-menu>
   </div>
-</div>
+</mat-toolbar>

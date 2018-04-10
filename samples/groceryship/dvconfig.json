@@ -3,5 +3,113 @@
   "watch": true,
   "gatewayPort": 3000,
   "usedCliches": {
+    "authentication": {
+      "config": {
+        "wsPort": 3002,
+        "reinitDbOnStartup": false
+      }
+    },
+    "authorization": {
+      "config": {
+        "wsPort": 3003,
+        "reinitDbOnStartup": false
+      }
+    },
+    "market": {
+      "config": {
+        "wsPort": 3004,
+        "reinitDbOnStartup": false,
+        "initialMarketIds": ["groceryship"],
+        "enforceBalance": true
+      }
+    },
+    "event": {
+      "config": {
+        "wsPort": 3005,
+        "reinitDbOnStartup": false
+      }
+    },
+    "rating": {
+      "config": {
+        "wsPort": 3006,
+        "reinitDbOnStartup": false
+      }
+    },
+    "task": {
+      "config": {
+        "wsPort": 3007,
+        "reinitDbOnStartup": false
+      }
+    },
+    "profile": {
+      "config": {
+        "wsPort": 3008,
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Profile",
+          "type": "object",
+          "properties": {
+            "firstName": {
+              "type": "string"
+            },
+            "lastName": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string"
+            },
+            "phoneNumber": {
+              "type": "string"
+            },
+            "birthday": {
+              "type": "string"
+            },
+            "dorm": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "firstName", "lastName", "email", "phoneNumber", "birthday", "dorm"
+          ]
+        }
+      }
+    },
+    "request": {
+      "config": {
+        "wsPort": 3009,
+        "reinitDbOnStartup": false,
+        "schema": {
+          "title": "Request",
+          "type": "object",
+          "properties": {
+              "itemName": {
+                "type": "string"
+              },
+              "quantity": {
+                "type": "string"
+              },
+              "estimatedPrice": {
+                "type": "number",
+                "minimum": 0
+              },
+              "stores": {
+                "type": "string"
+              },
+              "pickupLocation": {
+                "type": "string"
+              },
+              "moreInfo": {
+                "type": "string"
+              },
+              "rejectionReason": {
+                "type": "string"
+              }
+          },
+          "required": [
+            "itemName", "quantity", "estimatedPrice", "stores", "pickupLocation"
+          ]
+        }
+      }
+    }
   }
 }

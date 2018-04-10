@@ -1,4 +1,4 @@
-<dv-widget name="NavBarLoggedIn"></dv-widget>
+<groceryship-nav-bar (loggedInUser)="user=$event"></groceryship-nav-bar>
 
 <div id="main-content">
   <h1>Make a Request</h1>
@@ -6,72 +6,56 @@
     <p>Fill out the request form to get goods delivered to somewhere nearby! Please be as specific as possible by specifying the unit for quantity (pounds, kg, litre etc.) and providing detailed descriptions, so that the deliverer will not deliver the wrong good.</p>
   </div>
   <div id="request-form">
-    <div id="request-form-container">
-      <table class="table" style="table-layout: fixed">
-          <tr>
-            <th>Item Name</th>
-            <td><dv-widget name="EditTaskName" of="Task"></dv-widget></td>
-          </tr>
-          <tr>
-            <th>Quantity</th>
-            <td><input type="string" name="item-qty" placeholder="6 17oz. cans, 20 gallons, 18 of the largest boxes" class="form-control" required/></td>
-          </tr>
-          <tr>
-            <th>Estimated Price</th>
-            <td>
-              <div class="input-group">
-                <span class="input-group-addon">$</span>
-                <input type="text" name="item-price-estimate" class="price form-control" required>
-              </div>
-            </td>
-          <tr>
-            <th>Stores</th>
-            <td>
-              <select multiple name="item-stores" class="selectpicker" data-none-selected-text="Select store(s)" data-width="100%">
-                <option>Star Market (more locations soon)</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <th>Deadline</th>
-            <td><dv-widget name="EditTaskDeadlineAndAssigner" of="Task"></dv-widget></td>
-          </tr>
-          <tr>
-            <th>Pickup Location</th>
-            <td>
-              <select name="item-pickup" class="form-control selectpicker">
-                <option>Baker (more locations soon)</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <th>Tip</th>
-            <td>
-              <div class="input-group">
-                <span class="input-group-addon">$</span>
-                <dv-widget name="CreateGoodPrice" of="Market"></dv-widget>
-                <dv-widget name="EditGoodName" of="Market" [init]="{good: good, name: {value: 'Tip'}, submit_ok: submit_ok}" style="display: none"></dv-widget>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <th>Minimum Shopper Rating</th>
-            <td>
-              <select name="minimum-shopper-rating" class="form-control selectpicker">
-                <option value="1" selected>None</option>
-                <option value="5">5</option>
-                <option value="4">4</option>
-                <option value="3">3</option>
-                <option value="2">2</option>
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <th>More Info</th>
-            <td><input type="text" name="item-description" class="form-control" placeholder="(optional)" /></td>
-          </tr>
-      </table>
-      <dv-widget name="StartCompoundTransactionButton" of="Market"></dv-widget>
-    </div>
+    <!-- Unsupported: -->
+    <!-- <th>Minimum Shopper Rating</th>
+    <td>
+      <select name="minimum-shopper-rating" class="form-control selectpicker">
+        <option value="1" selected>None</option>
+        <option value="5">5</option>
+        <option value="4">4</option>
+        <option value="3">3</option>
+        <option value="2">2</option>
+      </select>
+    </td> -->
+    <dv-tx>
+      <dv-id (id)="requestId=$event"></dv-id>
+      <property-create-object
+        dvOf="request"
+        [id]="requestId"
+        [showOptionToSubmit]="false">
+      </property-create-object>
+      <market-create-good-price
+        inputLabel="Estimated Price" (price)="tip = $event">
+      </market-create-good-price>
+      <task-create-task
+        [id]="requestId"
+        [assignerId]="user?.id"
+        [showOptionToInputAssignee]="false"
+        buttonLabel="Create Request">
+      </task-create-task>
+
+      <market-create-compound-transaction
+        [id]="requestId"
+        [hidden]="true"
+        (compoundTransaction)="compoundTransactionId=$event?.id">
+      </market-create-compound-transaction>
+      <market-create-good
+        [id]="requestId + '-tip'"
+        [price]="tip"
+        [supply]="1"
+        marketId="groceryship"
+        [hidden]="true"
+        (good)="goodId=$event?.id">
+      </market-create-good>
+      <market-create-transaction
+        [id]="requestId + '-tip'"
+        [paid]="false"
+        [compoundTransactionId]="compoundTransactionId"
+        [goodId]="goodId"
+        [buyerId]="user?.id"
+        [quantity]="1"
+        [hidden]="true">
+      </market-create-transaction>
+    </dv-tx>
   </div>
 </div>
