@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
@@ -16,6 +16,7 @@ export class ShowObjectComponent implements OnInit, OnChanges {
   @Input() object: any;
   @Input() showOnly: string[];
   @Input() showExclude: string[];
+  @Output() loadedObject = new EventEmitter<any>();
 
   properties: string[];
 
@@ -89,6 +90,7 @@ export class ShowObjectComponent implements OnInit, OnChanges {
         })
         .subscribe((res) => {
           this.object = res.data.object;
+          this.loadedObject.emit(this.object);
         });
     }
   }
