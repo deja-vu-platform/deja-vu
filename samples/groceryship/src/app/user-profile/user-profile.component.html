@@ -1,0 +1,13 @@
+<groceryship-nav-bar (loggedInUser)="user=$event"></groceryship-nav-bar>
+
+<div id="main-content">
+  <h1>Your Profile</h1>
+  <div id="profile-content">
+    <groceryship-show-profile [id]="user?.id"></groceryship-show-profile>
+  </div>
+
+  <input type="button" class="btn btn-primary" value="Edit Profile"
+    (click)="openEditProfileDialog(user?.id);">
+  <input type="button" class="btn btn-primary" value="Change Password"
+    (click)="openChangePasswordDialog(user?.id);">
+</div>

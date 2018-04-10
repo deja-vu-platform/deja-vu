@@ -157,7 +157,11 @@ function taskDocToTask(taskDoc: TaskDoc): Task {
 const resolvers = {
   Query: {
     tasks: async (root, { input }: { input: TasksInput }) => {
-      const matchingTasks: TaskDoc[] = await tasks.find(input)
+      const filterOp = _.omit(input, ['assigned']);
+      if (input.assigned === false) {
+        filterOp['assigneeId'] = null;
+      }
+      const matchingTasks: TaskDoc[] = await tasks.find(filterOp)
         .toArray();
 
       return _.map(matchingTasks, taskDocToTask);
@@ -184,11 +188,10 @@ const resolvers = {
   },
   Mutation: {
     createTask: async (root, { input }: {input: CreateTaskInput}) => {
-      await Promise
-        .all([
-          Validation.assignerExists(input.assignerId),
-          Validation.assigneeExists(input.assigneeId)
-        ]);
+      await Validation.assignerExists(input.assignerId);
+      if (input.assigneeId) {
+        await Validation.assigneeExists(input.assigneeId);
+      }
       const newTask: TaskDoc = {
         id: input.id ? input.id : uuid(),
         assignerId: input.assignerId,

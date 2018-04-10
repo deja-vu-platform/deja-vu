@@ -1,0 +1,23 @@
+<groceryship-nav-bar (loggedInUser)="user=$event"></groceryship-nav-bar>
+
+<div id="main-content">
+  <h1>Claim Requests</h1>
+  <div class="instructions">
+    <p>Help others to deliver grocery by claiming their requests! Note that you CANNOT unclaim a request after clicking 'Claim'.</p>
+  </div>
+  <div id="request-filters">
+    Request filters not available (yet)
+  </div>
+  <div id="request-feed">
+    <task-show-tasks
+      [assigned]="false"
+      [showTask]="{
+        type: showDeliverRequest,
+        inputMap: {task: 'request'},
+        inputs: {claimAssigneeId: user?.id}
+      }"
+      [claimAssigneeId]="user?.id"
+      noTasksToShowText="No requests to claim yet.">
+    </task-show-tasks>
+  </div>
+</div>

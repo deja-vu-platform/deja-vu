@@ -1,0 +1,79 @@
+<groceryship-nav-bar (loggedInUser)="user=$event"></groceryship-nav-bar>
+
+<div id="main-content">
+  <mat-expansion-panel [expanded]="true" id="notifications">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <h3>Notifications</h3>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <task-show-tasks
+      [assignerId]="user?.id"
+      [completed]="true"
+      [approved]="false"
+      [showTask]="{
+        type: showAcceptRequestNotification,
+        inputMap: {task: 'request'}
+      }"
+      noTasksToShowText="No requests to accept or reject.">
+    </task-show-tasks>
+    <!-- requests I completed that need approval -->
+    <task-show-tasks
+      [assigneeId]="user?.id"
+      [completed]="true"
+      [approved]="false"
+      [showTask]="{
+        type: showDeliverRequestNotification,
+        inputMap: {task: 'request'}
+      }"
+      noTasksToShowText="No requests to deliver.">
+    </task-show-tasks>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel id="requests">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <h3>Your Requests</h3>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <task-show-tasks
+      [assignerId]="user?.id"
+      [approved]="false"
+      [showTask]="{
+        type: showMyRequest,
+        inputMap: {task: 'request'}
+      }"
+      noTasksToShowText="">
+    </task-show-tasks>
+
+    <div class="tile add-request-tile">
+      <dv-link
+        href="/request"
+        class="glyphicon tile-image"
+        id="add-request-icon">
+        +
+      </dv-link>
+    </div>
+  </mat-expansion-panel>
+
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <h3>To Deliver</h3>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <p>Remember to contact the requester first to set a pickup time!</p>
+    <task-show-tasks
+      [assigneeId]="user?.id"
+      [completed]="false"
+      [approved]="false"
+      [showTask]="{
+        type: showDeliverRequest,
+        inputMap: {task: 'request'}
+      }"
+      noTasksToShowText="No requests claimed yet.">
+    </task-show-tasks>
+  </mat-expansion-panel>
+</div>

@@ -1,0 +1,61 @@
+<groceryship-nav-bar (loggedInUser)="user=$event"></groceryship-nav-bar>
+
+<div id="main-content">
+  <h1>Make a Request</h1>
+  <div class="instructions">
+    <p>Fill out the request form to get goods delivered to somewhere nearby! Please be as specific as possible by specifying the unit for quantity (pounds, kg, litre etc.) and providing detailed descriptions, so that the deliverer will not deliver the wrong good.</p>
+  </div>
+  <div id="request-form">
+    <!-- Unsupported: -->
+    <!-- <th>Minimum Shopper Rating</th>
+    <td>
+      <select name="minimum-shopper-rating" class="form-control selectpicker">
+        <option value="1" selected>None</option>
+        <option value="5">5</option>
+        <option value="4">4</option>
+        <option value="3">3</option>
+        <option value="2">2</option>
+      </select>
+    </td> -->
+    <dv-tx>
+      <dv-id (id)="requestId=$event"></dv-id>
+      <property-create-object
+        dvOf="request"
+        [id]="requestId"
+        [showOptionToSubmit]="false">
+      </property-create-object>
+      <market-create-good-price
+        inputLabel="Estimated Price" (price)="tip = $event">
+      </market-create-good-price>
+      <task-create-task
+        [id]="requestId"
+        [assignerId]="user?.id"
+        [showOptionToInputAssignee]="false"
+        buttonLabel="Create Request">
+      </task-create-task>
+
+      <market-create-compound-transaction
+        [id]="requestId"
+        [hidden]="true"
+        (compoundTransaction)="compoundTransactionId=$event?.id">
+      </market-create-compound-transaction>
+      <market-create-good
+        [id]="requestId + '-tip'"
+        [price]="tip"
+        [supply]="1"
+        marketId="groceryship"
+        [hidden]="true"
+        (good)="goodId=$event?.id">
+      </market-create-good>
+      <market-create-transaction
+        [id]="requestId + '-tip'"
+        [paid]="false"
+        [compoundTransactionId]="compoundTransactionId"
+        [goodId]="goodId"
+        [buyerId]="user?.id"
+        [quantity]="1"
+        [hidden]="true">
+      </market-create-transaction>
+    </dv-tx>
+  </div>
+</div>

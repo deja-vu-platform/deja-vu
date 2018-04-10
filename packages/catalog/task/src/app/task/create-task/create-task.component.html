@@ -11,7 +11,7 @@
       {{newTaskError}}
     </mat-error>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToInputAssignee" class="form-group">
     <task-assignee-select
       [showAssignee]="showAssignee"
       [assigneeSelectPlaceholder]="assigneeSelectPlaceholder"
@@ -19,7 +19,7 @@
       formControlName="assignee">
     </task-assignee-select>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToInputDueDate" class="form-group">
     <task-create-due-date formControlName="dueDate">
     </task-create-due-date>
   </div>

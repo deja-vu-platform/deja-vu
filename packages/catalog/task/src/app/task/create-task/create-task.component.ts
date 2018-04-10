@@ -17,7 +17,14 @@ import {
   ShowAssigneeComponent
 } from '../show-assignee/show-assignee.component';
 
-import { Assignee } from '../shared/task.model';
+import * as _ from 'lodash';
+
+import { Assignee, Task } from '../shared/task.model';
+
+interface CreateTaskResponse {
+  data: {createTask: Task};
+  errors: {message: string}[];
+}
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -30,6 +37,16 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
   @Input() id;
   @Input() assignerId;
+  @Input() showOptionToInputAssignee = true;
+  @Input() showOptionToInputDueDate = true;
+  @Input() showOptionToSubmit = true;
+
+  @Input() set assigneeId(assigneeId: string) {
+    this.assigneeControl.setValue({id: assigneeId});
+  }
+  @Input() set dueDate(dueDate: string) {
+    this.dueDateControl.setValue(dueDate);
+  }
 
   @Input() showOptionToSubmit = true;
   // Presentation inputs
@@ -44,11 +61,11 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
 
   @Output() selectedAssignee = new EventEmitter<Assignee>();
 
-  assignee = new FormControl('');
-  dueDate = new FormControl('');
+  assigneeControl = new FormControl('');
+  dueDateControl = new FormControl('');
   createTaskForm: FormGroup = this.builder.group({
-    assignee: this.assignee,
-    dueDate: this.dueDate
+    assignee: this.assigneeControl,
+    dueDate: this.dueDateControl
   });
 
 
@@ -75,7 +92,7 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{data: any}>('/graphql', {
+    const res = await this.gs.post<CreateTaskResponse>('/graphql', {
       query: `mutation CreateTask($input: CreateTaskInput!) {
         createTask(input: $input) {
           id
@@ -85,12 +102,17 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
         input: {
           id: this.id,
           assignerId: this.assignerId,
-          assigneeId: this.assignee.value.id,
-          dueDate: this.dueDate.value
+          assigneeId: this.assigneeControl.value.id,
+          dueDate: this.dueDateControl.value
         }
       }
     })
     .toPromise();
+
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
+    }
   }
 
   dvOnAfterCommit() {

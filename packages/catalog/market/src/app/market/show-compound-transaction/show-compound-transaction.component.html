@@ -8,7 +8,7 @@
     <ul *ngIf="showTransactions" class="list-group">
       <li *ngFor="let transaction of compoundTransaction.transactions" class="list-group-item">
         <dv-include [action]="showTransaction" [inputs]="{
-            transaction: transaction, showId: showTransactionId, showSummary: showSummary, showGoodDetails: showGoodDetails, showStatus: showTransactionStatus, showGoodId: showGoodId, showName: showName, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
+            id: transaction.id, showId: showTransactionId, showSummary: showSummary, showGoodDetails: showGoodDetails, showStatus: showTransactionStatus, showGoodId: showGoodId, showName: showName, showPrice: showPrice, showSupply: showSupply, showSeller: showSeller, showMarket: showMarket
           }"
           [parent]="showCompoundTransaction">
         </dv-include>

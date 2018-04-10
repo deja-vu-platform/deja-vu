@@ -1,0 +1,16 @@
+a {
+  color: #00B7FF;
+}
+
+.navbar-logo {
+  width: 30px;
+  display: inline !important;
+  margin-top: -5px;
+  margin-right: 5px;
+}
+
+.fill-remaining-space {
+  /*This fills the remaining space, by using flexbox.  
+  Every toolbar row uses a flexbox row layout. */
+  flex: 1 1 auto;
+}
