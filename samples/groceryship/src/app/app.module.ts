@@ -61,6 +61,9 @@ import {
 import {
   ShowRequestDetailsComponent
 } from './show-request-details/show-request-details.component';
+import {
+  ShowRequestTransactionComponent
+} from './show-request-transaction/show-request-transaction.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 
 import { AuthenticationModule } from 'authentication';
@@ -90,7 +93,7 @@ import { TaskModule } from 'task';
     RequestDetailsDialogComponent, SetDeliveryTimeDialogComponent,
     ShowAcceptRequestNotificationComponent, ShowDeliverRequestComponent,
     ShowDeliverRequestNotificationComponent, ShowMyRequestComponent,
-    ShowRequestDetailsComponent
+    ShowRequestDetailsComponent, ShowRequestTransactionComponent
   ],
   imports: [
     BrowserModule,
@@ -125,7 +128,7 @@ import { TaskModule } from 'task';
     RequestDetailsDialogComponent, SetDeliveryTimeDialogComponent,
     ShowAcceptRequestNotificationComponent, ShowDeliverRequestComponent,
     ShowDeliverRequestNotificationComponent, ShowMyRequestComponent,
-    ShowRequestDetailsComponent
+    ShowRequestDetailsComponent, ShowRequestTransactionComponent
   ]
 })
 export class AppModule { }

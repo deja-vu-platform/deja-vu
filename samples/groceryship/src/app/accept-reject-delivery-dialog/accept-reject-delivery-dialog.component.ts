@@ -1,5 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
+import {
+  ShowRequestTransactionComponent
+} from '../show-request-transaction/show-request-transaction.component';
+
 
 @Component({
   selector: 'groceryship-accept-reject-delivery-dialog',
@@ -9,6 +13,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material';
 export class AcceptRejectDeliveryDialogComponent {
   request;
   accept: boolean;
+  showRequestTransaction = ShowRequestTransactionComponent;
 
   constructor(
     public dialogRef: MatDialogRef<AcceptRejectDeliveryDialogComponent>,

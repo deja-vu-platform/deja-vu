@@ -15,7 +15,11 @@
       [showTransactionStatus]="false"
       [showGoodDetails]="false"
       [showOptionToPay]="false"
-      [showOptionToCancel]="false">
+      [showOptionToCancel]="false"
+      [showTransaction]="{
+        type: showRequestTransaction,
+        inputMap: {id: 'id'}
+      }">
     </market-show-compound-transaction>
   </div>
 

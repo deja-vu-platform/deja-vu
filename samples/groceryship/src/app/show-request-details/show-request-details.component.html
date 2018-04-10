@@ -7,6 +7,14 @@
   </td>
 </tr>
 <tr>
+  <th>Quantity</th>
+  <td>
+    <property-show-object
+      dvOf="request" [id]="request.id" [showOnly]="['quantity']">
+    </property-show-object>
+  </td>
+</tr>
+<tr>
   <th>Deadline</th>
   <td>{{request.dueDate}}</td>
 </tr>
@@ -20,6 +28,19 @@
     </property-show-object>
   </td>
 </tr>
+
+<div *ngIf="!request.completed">
+  <tr>
+    <th>Estimated Price</th>
+    <td>
+      <property-show-object
+        dvOf="request"
+        [id]="request.id"
+        [showOnly]="['estimatedPrice']">
+      </property-show-object>
+    </td>
+  </tr>
+</div>
 
 <div *ngIf="request.completed">
   <tr>
@@ -44,7 +65,7 @@
   </tr>
 </div>
 
-<div *ngIf="showTransactionSummary">
+<div *ngIf="showTransactionSummary && !request.assignee">
   <tr>
     <th>Transaction Summary</th>
     <td>
@@ -55,7 +76,11 @@
         [showTransactionStatus]="false"
         [showGoodDetails]="false"
         [showOptionToPay]="false"
-        [showOptionToCancel]="false">
+        [showOptionToCancel]="false"
+        [showTransaction]="{
+          type: showRequestTransaction,
+          inputMap: {id: 'id'}
+        }">
       </market-show-compound-transaction>
     </td>
   </tr>
