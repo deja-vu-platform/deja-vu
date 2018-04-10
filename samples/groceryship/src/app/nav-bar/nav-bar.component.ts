@@ -10,7 +10,6 @@ export class NavBarComponent {
   user: any;
 
   outputAsLoggedInUser(value) {
-    console.log(value);
     this.loggedInUser.emit(value);
   }
 }
