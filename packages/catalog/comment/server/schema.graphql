@@ -1,0 +1,48 @@
+# Express an opinion or reaction in writing
+type Author {
+  id: ID!
+}
+
+type Target {
+  id: ID!
+}
+
+type Comment {
+  id: ID!
+  author: Author
+  target: Target
+  content: String
+}
+
+input CreateCommentInput {
+  id: ID
+  authorId: ID
+  targetId: ID
+  content: String
+}
+
+input EditCommentInput {
+  id: ID!
+  authorId: ID
+  content: String
+}
+
+input CommentsInput {
+  authorId: ID
+  targetId: ID
+}
+
+type Query {
+  author(id: ID!): Author
+  target(id: ID!): Target
+  comment(id: ID!): Comment
+  commentByAuthorTarget(authorId: ID!, targetId: ID!): Comment
+  comments(input: CommentsInput!): [Comment]
+}
+
+type Mutation {
+  createAuthor(id: ID!): Author
+  createTarget(id: ID!): Target
+  createComment(input: CreateCommentInput!): Comment
+  editComment(input: EditCommentInput!): Comment
+}
