@@ -1,4 +1,4 @@
-// Add labels to items so that they can be found later
+# Add labels to items so that they can be found later
 type Item {
   id: ID!,
   labels: [Label]
@@ -6,27 +6,23 @@ type Item {
 
 type Label {
   id: ID!
-  item: [Item]
+  items: [Item]
 }
 
-// All labels or the labels for a given item
-input LabelsInput {
-  itemId: ID
-}
-
-// All items or the items for given labels
+# All items or the items for given labels
 input ItemsInput {
   labelIds: [ID]
 }
 
+# Supports existing and new labels
 input AddLabelsToItemInput {
   itemId: ID!
-  labelIds: [ID]
+  labelIds: [ID!]
 }
 
 type Query {
   label(id: ID!): Label
-  labels(input: LabelsInput!): [Label]
+  labels(): [Label]
   item(id: ID!): Item
   items(input: ItemsInput!): [Item]
 }
@@ -34,5 +30,5 @@ type Query {
 type Mutation {
   createItem(id: ID!): Item
   createLabel(id: ID!): Label
-  addLabelsToItem(input: AddLabelToItemInput!): Item
+  addLabelsToItem(input: AddLabelsToItemInput!): Item
 }
