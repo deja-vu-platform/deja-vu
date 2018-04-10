@@ -144,7 +144,7 @@ interface Config {
   dbHost: string;
   dbPort: number;
   dbName: string;
-  initialPartyIds: string[];
+  initialMarketIds: string[];
   reinitDbOnStartup: boolean;
   // Whether to check and keep track of balances or not. Default is true.
   enforceBalance: boolean;
@@ -159,7 +159,7 @@ const DEFAULT_CONFIG: Config = {
   dbPort: 27017,
   wsPort: 3000,
   dbName: `${name}-db`,
-  initialPartyIds: [],
+  initialMarketIds: [],
   reinitDbOnStartup: true,
   enforceBalance: true
 };
@@ -184,6 +184,12 @@ mongodb.MongoClient.connect(
     if (config.reinitDbOnStartup) {
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
+      if (!_.isEmpty(config.initialMarketIds)) {
+        await db.collection('markets')
+          .insertMany(_.map(config.initialMarketIds, (id) => ({id: id})));
+        console.log(
+          `Initialized market set with ${config.initialMarketIds}`);
+      }
     }
     parties = db.collection('parties');
     parties.createIndex({ id: 1 }, { unique: true, sparse: true });
