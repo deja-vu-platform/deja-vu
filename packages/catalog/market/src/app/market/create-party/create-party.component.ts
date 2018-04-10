@@ -27,15 +27,20 @@ export class CreatePartyComponent implements
   @Input() id;
   @Output() party = new EventEmitter;
 
+  // Optional input value to override form control values
+  @Input() set balance(balance: number) {
+    this.balanceControl.setValue(balance);
+  }
+
   // Presentation inputs
   @Input() buttonLabel = 'Create Party';
   @Input() newPartySavedText = 'New party saved';
 
   @ViewChild(FormGroupDirective) form;
 
-  balance = new FormControl();
+  balanceControl = new FormControl();
   createPartyForm: FormGroup = this.builder.group({
-    balance: this.balance
+    balance: this.balanceControl
   });
 
 
@@ -68,7 +73,7 @@ export class CreatePartyComponent implements
         variables: {
           input: {
             id: this.id,
-            balance: this.balance.value
+            balance: this.balanceControl.value
           }
         }
       })
