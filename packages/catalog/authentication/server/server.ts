@@ -160,13 +160,6 @@ class Validation {
 
     return passwordVerified;
   }
-<<<<<<< HEAD
-}
-
-async function register(input: RegisterInput): Promise<User> {
-  const id = input.id ? input.id : uuid();
-
-=======
 
   static isUsernameValid(username: string): Boolean {
     return (Validation.isLengthValid(username, USERNAME_MIN_LENGTH,
@@ -213,7 +206,6 @@ async function register(input: RegisterInput): Promise<User> {
   Validation.isPasswordValid(input.password);
 
   const id = input.id ? input.id : uuid();
->>>>>>> 67d02bcce489657458c54de725f5e361fe5fa8a3
   await Validation.userIsNew(id, input.username);
 
   const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
@@ -291,10 +283,7 @@ const resolvers = {
       const verification = await Validation.verifyPassword(input.oldPassword,
         user.password);
 
-<<<<<<< HEAD
-=======
       Validation.isPasswordValid(input.newPassword);
->>>>>>> 67d02bcce489657458c54de725f5e361fe5fa8a3
       const newPasswordHash = await bcrypt
         .hash(input.newPassword, SALT_ROUNDS);
       const updateOperation = { $set: { password: newPasswordHash } };

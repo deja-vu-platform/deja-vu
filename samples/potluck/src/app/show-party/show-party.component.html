@@ -43,8 +43,6 @@
             [id]="loggedInUserId" [hidden]="true">
           </authentication-authenticate>
         </dv-tx>
-<<<<<<< HEAD
-=======
       </div>
       <div class="row">
         <div class="col-md-2 offset-md-5">
@@ -52,7 +50,6 @@
             View {{viewMore ? "Less" : "More"}}
           </button>
         </div>
->>>>>>> 67d02bcce489657458c54de725f5e361fe5fa8a3
       </div>
       <hr class="divider">
       <div class="row" [hidden]="!viewMore">
@@ -73,11 +70,7 @@
               </authentication-authenticate>
             </dv-tx>
           </div>
-<<<<<<< HEAD
-          <div class="row">
-=======
           <div class="row top-space">
->>>>>>> 67d02bcce489657458c54de725f5e361fe5fa8a3
             <dv-tx *ngIf="host?.id === loggedInUserId" class="col-md-12">
               <h4>Add Guest</h4>
               <group-add-to-group
@@ -144,30 +137,6 @@
                     </market-show-transactions>
                   </div>
                 </div>
-<<<<<<< HEAD
-                <market-show-goods
-                  [showGood]="{
-                    type: showSupply,
-                    inputMap: {good: 'supply'},
-                    inputs: {useIdForObject: true}
-                  }"
-                  [marketId]="partyId"
-                  [optionToBuyBuyerId]="loggedInUserId"
-                  [available]="true"
-                  noGoodsToShowText="No supplies needed"
-                  optionToBuyButtonLabel="Claim"
-                  optionToBuyInputQuantityLabel="Supply">
-                </market-show-goods>
-                <market-show-transactions
-                  [marketId]="partyId"
-                  noTransactionsToShowText="No claims"
-                  [showTransaction]="{
-                    type: showClaim,
-                    inputMap: {transactionId: 'id'}
-                  }">
-                </market-show-transactions>
-=======
->>>>>>> 67d02bcce489657458c54de725f5e361fe5fa8a3
               </div>
               <authorization-can-view
                 [principalId]="loggedInUserId"
