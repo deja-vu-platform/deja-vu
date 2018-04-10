@@ -24,6 +24,7 @@
       [id]="request.id + '-item'"
       [price]="price"
       [supply]="1"
+      [sellerId]="request.assignee.id"
       marketId="groceryship"
       [hidden]="true"
       (good)="goodId=$event.id">
