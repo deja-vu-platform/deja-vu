@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory
+  GatewayService, GatewayServiceFactory, RunService
 } from 'dv-core';
 
 import {
@@ -40,29 +40,68 @@ import * as _ from 'lodash';
 export class SearchItemsByLabelsComponent
   implements OnInit, ControlValueAccessor, Validator {
   @Input() initialValue;
-  @Input() searchPlaceholder = 'Search for items by selecting labels';
   @Input() showLabel = {
     type: ShowLabelComponent
   };
+
+  // Presentation Inputs
+  @Input() searchPlaceholder = 'Search for items by selecting labels';
+  @Input() buttonLabel = 'Search';
+
   @Output() searchResultItems = new EventEmitter<Item[]>();
+
+  @ViewChild(FormGroupDirective) form;
+  searchFormControl = new FormControl('', Validators.required);
+  searchForm: FormGroup = this.builder.group({
+    searchFormControl: this.searchFormControl
+  });
 
   labels: Label[] = [];
   selectedLabelIds: string[] | undefined;
   searchItemsByLabels = this;
   private gs: GatewayService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) { }
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService, private builder: FormBuilder) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
     this.loadLabels();
     this.selectedLabelIds = this.initialValue;
   }
 
   updateSelected(selectedLabelIds: string[]) {
     this.selectedLabelIds = selectedLabelIds;
-    const ids = _.map(selectedLabelIds, (labelId) => ({ id: labelId }));
-    this.findItems(ids);
+    console.log('HI!', this.selectedLabelIds);
+  }
+
+  onSubmit() {
+    this.rs.run(this.elem);
+  }
+
+  async dvOnRun(): Promise<void> {
+    this.gs.get<{ data: { items: Item[] } }>('/graphql', {
+      params: {
+        query: `
+          query Items($input: ItemsInput!) {
+            items (input: $input) {
+              id
+            }
+          }
+        `,
+        variables: JSON.stringify({
+          input: {
+            labelIds: this.selectedLabelIds
+          }
+        })
+      }
+    })
+      .subscribe((res) => {
+        console.log('HI! results', JSON.stringify(res.data));
+        this.searchResultItems.emit(res.data.items);
+      });
   }
 
   loadLabels() {
@@ -85,31 +124,6 @@ export class SearchItemsByLabelsComponent
     })
       .subscribe((res) => {
         this.labels = res.data.labels;
-      });
-  }
-
-  findItems(labelIds) {
-    if (!this.gs) {
-      return;
-    }
-    this.gs.get<{ data: { items: Item[] } }>('/graphql', {
-      params: {
-        query: `
-          query Items($input: ItemsInput!) {
-            items (input: $input) {
-              id
-            }
-          }
-        `,
-        variables: JSON.stringify({
-          input: {
-            labelIds: labelIds
-          }
-        })
-      }
-    })
-      .subscribe((res) => {
-        this.searchResultItems.emit(res.data.items);
       });
   }
 

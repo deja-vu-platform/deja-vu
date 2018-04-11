@@ -2,7 +2,7 @@
   <div class="form-group">
     <mat-form-field>
       <!-- select multiple from list -->
-      <mat-select placeholder="searchPlaceholder" 
+      <mat-select placeholder={{searchPlaceholder}} 
         [formControl]="searchFormControl" 
         (selectionChange)="updateSelected($event.value)" 
         [required]="true" [value]="selectedLabelIds"
@@ -10,7 +10,7 @@
         <mat-option *ngFor="let label of labels" [value]="label.id">
           <dv-include
             [action]="showLabel"
-            [inputs]="{id: label.id}"
+            [inputs]="{label: label}"
             [parent]="searchItemsByLabels">
           </dv-include>
         </mat-option>
@@ -18,7 +18,9 @@
     </mat-form-field>
   </div>
 
-  <button mat-button type="submit" [disabled]="!searchForm.valid">
-    {{buttonLabel}}
-  </button>
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!searchForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
 </form>

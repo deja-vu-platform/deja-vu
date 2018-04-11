@@ -55,11 +55,15 @@ export class ShowItemsComponent implements OnInit, OnChanges {
             params: {
               query: `
                   query Items($input: ItemsInput!) {
-                    items(input: $input)
+                    items(input: $input) {
+                      id
+                    }
                   }
                 `,
               variables: JSON.stringify({
-                input: { }
+                input: {
+                  labelIds: undefined
+                }
               })
             }
           })

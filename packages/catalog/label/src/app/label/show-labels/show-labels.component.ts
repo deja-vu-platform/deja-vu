@@ -50,7 +50,9 @@ export class ShowLabelsComponent implements OnInit, OnChanges {
           params: {
             query: `
               query Labels($input: LabelsInput!) {
-                labels(input: $input)
+                labels(input: $input) {
+                  id
+                }
               }
             `,
             variables: JSON.stringify({

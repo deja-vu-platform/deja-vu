@@ -1,16 +1,13 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { DatePipe } from '@angular/common';
+import { Component, Input } from '@angular/core';
 import { Item } from '../shared/label.model';
 
 @Component({
   selector: 'label-show-item',
   templateUrl: './show-item.component.html',
-  styleUrls: ['./show-item.component.css']
+  styleUrls: ['./show-item.component.css'],
+  providers: [DatePipe]
 })
-export class ShowItemComponent implements OnInit {
+export class ShowItemComponent {
   @Input() item: Item;
-
-  constructor() { }
-
-  ngOnInit() {
-  }
 }
