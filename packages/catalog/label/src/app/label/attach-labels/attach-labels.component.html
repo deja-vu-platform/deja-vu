@@ -1,6 +1,57 @@
-<fieldset class="form-group">
-  <label class="sr-only" for="labels">Labels</label>
-  <select multiple #select class="form-control" placeholder="Labels"
-    name="labels">
-  </select>
-</fieldset>
+<form (ngSubmit)="onSubmit()" class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="labelsAttached" class="attach-labels-success">
+      <i class="material-icons">done</i>
+      {{labelsAttachedSavedText}}
+    </div>
+    <mat-error *ngIf="labelsAttachedError">
+      <i class="material-icons">report_problem</i>
+      {{labelsAttachedError}}
+    </mat-error>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <!-- select multiple from list -->
+      <mat-select placeholder="labelsSelectPlaceholder" 
+      [formControl]="labelsFormControl" 
+      (selectionChange)="updateSelected($event.value)" 
+      [required]="true" [value]="selectedLabelIds"
+      multiple>
+        <mat-option *ngFor="let label of labels" [value]="label.id">
+          <dv-include
+            [action]="showLabel"
+            [inputs]="{id: label.id}"
+            [parent]="labelsSelected">
+          </dv-include>
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <!-- Selected labels appear here and user can add additional input -->
+      <mat-chip-list>
+        <mat-chip *ngFor="let label of existingLabels" [selectable]="selectable"
+          [removable]="removable" (remove)="remove(label)">
+          <dv-include
+            [action]="showLabel"
+            [inputs]="{id: label.id}"
+            [parent]="labelsExisting">
+          </dv-include>
+          <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+        </mat-chip>
+        <input placeholder="labelsInputPlaceholder"
+          [matChipInputFor]="chipList"
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+          [matChipInputAddOnBlur]="addOnBlur"
+          (matChipInputTokenEnd)="add($event)" />
+      </mat-chip-list>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit">{{buttonLabel}}</button>
+  </div>
+</form>

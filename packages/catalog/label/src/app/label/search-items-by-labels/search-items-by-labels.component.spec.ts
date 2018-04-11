@@ -1,20 +1,22 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowItemComponent } from './show-item.component';
+import {
+  SearchItemsByLabelsComponent
+} from './search-items-by-labels.component';
 
-describe('ShowItemComponent', () => {
-  let component: ShowItemComponent;
-  let fixture: ComponentFixture<ShowItemComponent>;
+describe('SearchItemsByLabelsComponent', () => {
+  let component: SearchItemsByLabelsComponent;
+  let fixture: ComponentFixture<SearchItemsByLabelsComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ShowItemComponent]
+      declarations: [SearchItemsByLabelsComponent]
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ShowItemComponent);
+    fixture = TestBed.createComponent(SearchItemsByLabelsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

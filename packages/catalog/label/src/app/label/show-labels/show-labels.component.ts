@@ -1,40 +1,68 @@
-import "rxjs/add/operator/toPromise";
-import {Widget, Field, AfterInit} from "client-bus";
-import {ItemAtom} from "../_shared/data";
+import {
+  Component, ElementRef, Input, OnChanges, OnInit, Type
+} from '@angular/core';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import * as _ from 'lodash';
 
-import {GraphQlService} from "gql";
+import { ShowLabelComponent } from '../show-label/show-label.component';
+
+import { Label } from '../shared/label.model';
 
 
-@Widget({
-  fqelement: "Label",
-  ng2_providers: [GraphQlService]
+@Component({
+  selector: 'label-show-labels',
+  templateUrl: './show-labels.component.html',
+  styleUrls: ['./show-labels.component.css']
 })
-export class ShowLabelsComponent implements AfterInit {
-  @Field("Item") item: ItemAtom;
-  fetched = false;
+export class ShowLabelsComponent implements OnInit, OnChanges {
+  // Fetch rules
+  // If undefined then the fetched labels are not filtered by that property
+  @Input() itemId: string | undefined;
 
-  constructor(private _graphQlService: GraphQlService) {}
+  @Input() showLabel: Action = {
+    type: <Type<Component>>ShowLabelComponent
+  };
 
-  dvAfterInit() {
-    const update_labels = () => {
-      if (this.item.atom_id === undefined || this.fetched) return;
-      this.fetched = true;
+  @Input() noLabelsToShowText = 'No labels to show';
+  labels: Label[] = [];
 
-      return this._graphQlService
-        .get(`
-          item_by_id(atom_id: "${this.item.atom_id}") {
-            labels {
-              name
-            }
+  showLabels;
+  private gs: GatewayService;
+
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    this.showLabels = this;
+  }
+
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.fetchLabels();
+  }
+
+  ngOnChanges() {
+    this.fetchLabels();
+  }
+
+  fetchLabels() {
+    if (this.gs) {
+      this.gs
+        .get<{ data: { labels: Label[] } }>('/graphql', {
+          params: {
+            query: `
+              query Labels($input: LabelsInput!) {
+                labels(input: $input)
+              }
+            `,
+            variables: JSON.stringify({
+              input: {
+                itemId: this.itemId
+              }
+            })
           }
-        `)
-        .toPromise()
-        .then(data => data.item_by_id)
-        .then(item => {
-          this.item.labels = item.labels;
+        })
+        .subscribe((res) => {
+          this.labels = res.data.labels;
         });
-    };
-    update_labels();
-    this.item.on_change(update_labels);
+    }
   }
 }

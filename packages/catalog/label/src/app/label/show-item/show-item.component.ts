@@ -1,13 +1,16 @@
-import {Widget, Field} from "client-bus";
+import { Component, Input, OnInit } from '@angular/core';
+import { Item } from '../shared/label.model';
 
-import {ItemAtom} from "../_shared/data";
-
-@Widget({
-  fqelement: "Label",
-  template: `{{item.name}}`
+@Component({
+  selector: 'label-show-item',
+  templateUrl: './show-item.component.html',
+  styleUrls: ['./show-item.component.css']
 })
-export class ShowItemComponent {
-  @Field("Item") item : ItemAtom;
+export class ShowItemComponent implements OnInit {
+  @Input() item: Item;
 
-  // TODO: load name from db
+  constructor() { }
+
+  ngOnInit() {
+  }
 }
