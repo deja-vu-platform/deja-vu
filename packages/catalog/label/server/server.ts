@@ -8,8 +8,11 @@ import { v4 as uuid } from 'uuid';
 
 import * as _ from 'lodash';
 
-import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
+// tslint:disable-next-line:no-var-requires
+const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
+
+// TODO: Allow editting labels for an object?
 
 interface ItemDoc {
   id: string;
@@ -19,6 +22,10 @@ interface ItemDoc {
 interface LabelDoc {
   id: string;
   itemIds?: string[];
+}
+
+interface LabelsInput {
+  itemId?: string;
 }
 
 interface ItemsInput {
@@ -152,7 +159,7 @@ const resolvers = {
         const commonItemIds = _.intersection(labelItemsIds);
 
         return items.find({ id: { $in: commonItemIds } })
-          .toArray;
+          .toArray();
       }
 
       // No label filter
@@ -160,7 +167,14 @@ const resolvers = {
         .toArray();
     },
 
-    labels: async (root) => {
+    labels: async (root, { input }: { input: LabelsInput }) => {
+      if (input.itemId) {
+        const item = await Validation.itemExists(input.itemId);
+
+        return labels.find({ id: { $in: item.labelIds } })
+          .toArray();
+      }
+
       return labels.find()
         .toArray();
     }
