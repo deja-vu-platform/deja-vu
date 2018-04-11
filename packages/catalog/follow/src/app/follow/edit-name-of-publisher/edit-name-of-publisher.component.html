@@ -1,0 +1,6 @@
+<fieldset class="form-group">
+  <label class="sr-only" for="name">Name</label>
+  <input required class="form-control" name="name" type="text"
+    placeholder="Name" [(ngModel)]="publisher.name" />
+  <div class="alert alert-danger" *ngIf="failMsg">{{failMsg}}</div>
+</fieldset>

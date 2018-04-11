@@ -1,0 +1,10 @@
+<ul *ngIf="publishers && publishers.length > 0" class="list-member member-list">
+  <li *ngFor="let publisher of publishers"
+    class="list-member-item member-list-item">
+    <dv-widget name="ShowNameOfPublisher" [init]="{publisher: publisher}">
+    </dv-widget>
+  </li>
+</ul>
+<div *ngIf="!publishers || publishers.length === 0">
+  No publishers
+</div>
