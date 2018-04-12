@@ -15,8 +15,6 @@ import { Item } from '../shared/label.model';
   styleUrls: ['./show-items.component.css']
 })
 export class ShowItemsComponent implements OnInit, OnChanges {
-  // Fetch rules
-  // If undefined then the fetched items are not filtered by that property
   @Input() items: Item[] = [];
 
   @Input() showItem: Action = {
@@ -35,14 +33,14 @@ export class ShowItemsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
-    this.fetchItems();
+    this.loadItems();
   }
 
   ngOnChanges() {
-    this.fetchItems();
+    this.loadItems();
   }
 
-  fetchItems() {
+  loadItems() {
     if (_.isEmpty(this.items)) {
       // All items
       if (this.gs) {
@@ -50,15 +48,12 @@ export class ShowItemsComponent implements OnInit, OnChanges {
           .get<{ data: { items: Item[] } }>('/graphql', {
             params: {
               query: `
-                query Items($input: ItemsInput!) {
-                  items(input: $input) {
+                query {
+                  items(input: { }) {
                     id
                   }
                 }
-              `,
-              variables: JSON.stringify({
-                input: { }
-              })
+              `
             }
           })
           .subscribe((res) => {
