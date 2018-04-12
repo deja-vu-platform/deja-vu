@@ -153,9 +153,7 @@ const resolvers = {
           return [];
         }
 
-        const labelItemsIds = inputLabels.map((label) => {
-          return label.itemIds;
-        });
+        const labelItemsIds = _.map(inputLabels, 'itemIds');
         const commonItemIds = _.intersection(labelItemsIds);
 
         return items.find({ id: { $in: commonItemIds } })
@@ -214,15 +212,11 @@ const resolvers = {
       const existingLabels: LabelDoc[] = await labels
         .find({ id: { $in: labelIds } })
         .toArray();
-      const existingLabelIds = _.map(existingLabels, (label) => label.id);
+      const existingLabelIds = _.map(existingLabels, 'id');
 
       // Determine the new labels and add them
       const newLabelIds = _.difference(existingLabelIds, labelIds);
-      const newLabels: LabelDoc[] = _.map(newLabelIds, (id) => {
-        const newLabel: LabelDoc = { id: id };
-
-        return newLabel;
-      });
+      const newLabels: LabelDoc[] = _.map(newLabelIds, (id) => ({ id: id }));
 
       if (!_.isEmpty(newLabels)) {
         await labels.insert(newLabels);
