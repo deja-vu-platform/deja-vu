@@ -9,7 +9,8 @@ type Label {
   items: [Item]
 }
 
-# All items or the items for given labels
+# If no labels are provided, all items will be returned.
+# Otherwise, only items with all specified labels will be returned.
 input ItemsInput {
   labelIds: [ID]
 }
