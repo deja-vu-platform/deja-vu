@@ -34,7 +34,7 @@ export class AttachLabelsComponent implements
   // Presentation inputs
   @Input() inputLabel = 'Add label...';
   @Input() buttonLabel = 'Attach Labels';
-  @Input() labelsAttachedText = 'Labels attached to item';
+  @Input() labelsAttachedSavedText = 'Labels attached to item';
 
   @Output() item: EventEmitter<Item> = new EventEmitter<Item>();
 
@@ -98,7 +98,7 @@ export class AttachLabelsComponent implements
       variables: {
         input: {
           itemId: this.itemId,
-          labelIds: _.map(this.labels, (label) => label.id)
+          labelIds: _.map(this.labels, 'id')
         }
       }
     })

@@ -1,3 +1,8 @@
 .labels-chip-list {
   width: 100%;
 }
+
+.attach-labels-success {
+  color: #5cb85c;
+}
+
