@@ -17,14 +17,13 @@ import { Item } from '../shared/label.model';
 export class ShowItemsComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined then the fetched items are not filtered by that property
-  @Input() searchResults: Item[] | undefined;
+  @Input() items: Item[] = [];
 
   @Input() showItem: Action = {
     type: <Type<Component>>ShowItemComponent
   };
 
   @Input() noItemsToShowText = 'No items to show';
-  items: Item[] = [];
 
   showItems;
   private gs: GatewayService;
@@ -44,26 +43,21 @@ export class ShowItemsComponent implements OnInit, OnChanges {
   }
 
   fetchItems() {
-    if (!_.isEmpty(this.searchResults)) {
-      // Search Results
-      this.items = this.searchResults;
-    } else {
+    if (_.isEmpty(this.items)) {
       // All items
       if (this.gs) {
         this.gs
           .get<{ data: { items: Item[] } }>('/graphql', {
             params: {
               query: `
-                  query Items($input: ItemsInput!) {
-                    items(input: $input) {
-                      id
-                    }
+                query Items($input: ItemsInput!) {
+                  items(input: $input) {
+                    id
                   }
-                `,
-              variables: JSON.stringify({
-                input: {
-                  labelIds: undefined
                 }
+              `,
+              variables: JSON.stringify({
+                input: { }
               })
             }
           })
