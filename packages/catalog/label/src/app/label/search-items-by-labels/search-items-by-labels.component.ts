@@ -74,7 +74,6 @@ export class SearchItemsByLabelsComponent
 
   updateSelected(selectedLabelIds: string[]) {
     this.selectedLabelIds = selectedLabelIds;
-    console.log('HI!', this.selectedLabelIds);
   }
 
   onSubmit() {
@@ -99,7 +98,6 @@ export class SearchItemsByLabelsComponent
       }
     })
       .subscribe((res) => {
-        console.log('HI! results', JSON.stringify(res.data));
         this.searchResultItems.emit(res.data.items);
       });
   }

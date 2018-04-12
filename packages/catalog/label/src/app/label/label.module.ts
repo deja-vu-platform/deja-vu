@@ -4,15 +4,13 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule, MatChipsModule, MatFormFieldModule,
-  MatInputModule, MatSelectModule
+  MatIconModule, MatInputModule, MatSelectModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from 'dv-core';
 
-
-// tslint:disable-next-line:comment-format
-// import {AttachLabelsComponent} from './attach-labels/attach-labels.component'
+import { AttachLabelsComponent } from './attach-labels/attach-labels.component';
 import { CreateItemComponent } from './create-item/create-item.component';
 import { CreateLabelComponent } from './create-label/create-label.component';
 import {
@@ -26,14 +24,14 @@ import { ShowLabelsComponent } from './show-labels/show-labels.component';
 const allComponents = [
   CreateItemComponent, CreateLabelComponent, SearchItemsByLabelsComponent,
   ShowItemComponent, ShowItemsComponent, ShowLabelComponent,
-  ShowLabelsComponent
+  ShowLabelsComponent, AttachLabelsComponent
 ];
 
 @NgModule({
   imports: [
     CommonModule, DvModule, FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule, MatButtonModule, MatChipsModule,
-    MatFormFieldModule, MatInputModule, MatSelectModule
+    MatFormFieldModule, MatInputModule, MatSelectModule, MatIconModule
   ],
   declarations: allComponents,
   exports: allComponents,

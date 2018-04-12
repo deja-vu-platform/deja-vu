@@ -15,7 +15,7 @@ input ItemsInput {
 }
 
 input LabelsInput {
-  itemId: [ID]
+  itemId: ID
 }
 
 # Supports existing and new labels

@@ -134,7 +134,7 @@ function standardizeLabel(id: string): string {
 const resolvers = {
   Query: {
     item: async (root, { id }) => {
-      const item = await Validation.labelExists(id);
+      const item = await Validation.itemExists(id);
 
       return item;
     },
@@ -203,6 +203,42 @@ const resolvers = {
   },
 
   Mutation: {
+    addLabelsToItem: async (root, { input }: { input: AddLabelsToItemInput }) =>
+    // tslint:disable-next-line:one-line
+    {
+      await Validation.itemExists(input.itemId);
+
+      const labelIds = _.map(input.labelIds, standardizeLabel);
+
+      // Find existing labels
+      const existingLabels: LabelDoc[] = await labels
+        .find({ id: { $in: labelIds } })
+        .toArray();
+      const existingLabelIds = _.map(existingLabels, (label) => label.id);
+
+      // Determine the new labels and add them
+      const newLabelIds = _.difference(existingLabelIds, labelIds);
+      const newLabels: LabelDoc[] = _.map(newLabelIds, (id) => {
+        const newLabel: LabelDoc = { id: id };
+
+        return newLabel;
+      });
+
+      if (!_.isEmpty(newLabels)) {
+        await labels.insert(newLabels);
+      }
+
+      // Update the item with all labels it doesn't already have
+      const updateOperation = {
+        $addToSet: { labelIds: { $each: labelIds } }
+      };
+
+      const res = await items
+        .findOneAndUpdate({ id: input.itemId }, updateOperation);
+
+      return res.value;
+    },
+
     createItem: async (root, { id }) => {
       const itemId = id ? id : uuid();
       const newItem: ItemDoc = { id: itemId };
@@ -217,39 +253,6 @@ const resolvers = {
       await labels.insertOne(newLabel);
 
       return newLabel;
-    },
-
-    addLabelsToItem: async (root, { input }
-      : { input: AddLabelsToItemInput }) => {
-
-      await Validation.itemExists(input.itemId);
-
-      const labelIds = _.map(input.labelIds, standardizeLabel);
-
-      // Find existing labels
-      const existingLabelIds: string[] = await labels
-        .find({ id: { $in: labelIds } })
-        .toArray()
-        .map((label) => label.id);
-
-      // Determine the new labels and add them
-      const newLabelIds = _.difference(existingLabelIds, labelIds);
-      const newLabels: LabelDoc[] = _.map(newLabelIds, (id) => {
-        const newLabel: LabelDoc = { id: id };
-
-        return newLabel;
-      });
-      await labels.insert(newLabels);
-
-      // Update the item with all labels it doesn't already have
-      const updateOperation = {
-        $addToSet: { labelIds: { $each: labelIds } }
-      };
-
-      const res = await items
-        .findAndUpdateOne({ id: input.itemId }, updateOperation);
-
-      return res.value;
     }
   }
 };
