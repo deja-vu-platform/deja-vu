@@ -1,0 +1,35 @@
+<form (ngSubmit)="onSubmit()" class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="labelsAttached" class="attach-labels-success">
+      <i class="material-icons">done</i>
+      {{labelsAttachedSavedText}}
+    </div>
+    <mat-error *ngIf="labelsAttachedError">
+      <i class="material-icons">report_problem</i>
+      {{labelsAttachedError}}
+    </mat-error>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field class="labels-chip-list">
+      <mat-chip-list #chipList>
+        <mat-chip *ngFor="let label of labels"
+          [selectable]="selectable" 
+          [removable]="removable" 
+          (remove)="remove(label)">
+            {{label.id}}
+          <i class="material-icons" matChipRemove *ngIf="removable">cancel</i>
+        </mat-chip>
+        <input placeholder={{inputLabel}}
+          [matChipInputFor]="chipList" 
+          [matChipInputSeparatorKeyCodes]="separatorKeysCodes" 
+          [matChipInputAddOnBlur]="addOnBlur"
+          (matChipInputTokenEnd)="add($event)" />
+      </mat-chip-list>
+    </mat-form-field>
+  </div>
+
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit">{{buttonLabel}}</button>
+  </div>
+</form>
