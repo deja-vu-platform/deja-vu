@@ -40,19 +40,17 @@ type TxStatus = (
 type CohortStatus = TxStatus | 'waitingForCompletion';
 
 interface Cohort<Message, Payload> {
-  msg: Message;
-  vote: Vote<Payload> | undefined;
-  status: CohortStatus;
+  id: string;
+  msg?: Message;
+  vote?: Vote<Payload> | undefined;
+  status?: CohortStatus;
 }
 
-type CohortMap<Message, Payload> = {
-  [cohortId: string]: Cohort<Message, Payload> | undefined
-};
 interface TxDoc<Message, Payload> {
   id: string;
   status: TxStatus;
   // Could be undefined if we haven't processed message from the cohort yet
-  cohorts: CohortMap<Message, Payload>;
+  cohorts: Cohort<Message, Payload>[];
   // When the tx was started
   startedOn: Date;
 }
@@ -96,7 +94,9 @@ export class TxCoordinator<Message, Payload, State = any> {
         // has been initialized and if not compute the expected cohorts but we
         // would have to acquire the tx lock to do `find`, get the expected
         // cohorts, and `update` atomically.
-        cohorts: _.zipObject(this.config.getCohorts(cohortId))
+        cohorts: _.map(
+          this.config.getCohorts(cohortId),
+          (cohortId: string) => ({id: cohortId}))
       } },
       { returnOriginal: false, upsert: true }))
       .value!;
@@ -109,7 +109,7 @@ export class TxCoordinator<Message, Payload, State = any> {
 
     // no race condition here because the set of cohorts doesn't change after
     // initialization
-    if (!_.includes(_.keys(tx.cohorts), cohortId)) {
+    if (!_.includes(_.map(tx.cohorts, 'id'), cohortId)) {
       // We received a request from a cohort that is not part of the tx
       throw new Error(`[txId: ${txId}] ${cohortId} is not part of this tx`);
     }
@@ -130,13 +130,13 @@ export class TxCoordinator<Message, Payload, State = any> {
     // Here we are using mongodb to essentially lock on the txId and cohortId
     // to detect duplicate requests and if o/w send the vote (so that we never
     // send a duplicate vote to a cohort)
-    // If `cohorts.${cohortId}` is not undefined then this is a duplicate req
+    // If `cohorts.msg` is defined then this is a duplicate req
     const update = await this.txs.updateOne(
-      { id: txId, [`cohorts.${cohortId}`]: undefined },
+      { id: txId, 'cohorts.id': cohortId, 'cohorts.msg': undefined },
       { $set: {
-        [`cohorts.${cohortId}`]: {
-          msg: msg, vote: undefined, status: 'voting'
-        }
+        'cohorts.$.msg': msg,
+        'cohorts.$.vote': undefined,
+        'cohorts.$.status': 'voting'
       } });
     if (update.matchedCount == 0) { // Duplicate request
       throw new Error(`[txId: ${txId}] Duplicate message from ${cohortId}`);
@@ -226,27 +226,26 @@ export class TxCoordinator<Message, Payload, State = any> {
   }
 
   private allVotedButOne(tx: TxDoc<Message, Payload>): boolean {
-    return !_.includes(tx.cohorts, undefined) &&
-      _.chain(tx.cohorts)
-        .map('status')
-        .filter((s) => s === 'voting')
-        .value()
-        .length === 1;
+    return _.chain(tx.cohorts)
+      .map('status')
+      .filter((s) => s === 'voting')
+      .value()
+      .length === 1;
   }
 
   private saveVote(txId: string, cohortId: string, vote: Vote<Payload>) {
     return this.txs
       .updateOne(
-        { id: txId },
-        { $set: { [`cohorts.${cohortId}.vote`]: vote } });
+        { id: txId, 'cohorts.id': cohortId },
+        { $set: { [`cohorts.$.vote`]: vote } });
   }
 
   private updateCohortStatus(
     txId: string, cohortId: string, newStatus: CohortStatus) {
     return this.txs
       .updateOne(
-        { id: txId},
-        { $set: { [`cohorts.${cohortId}.status`]: newStatus } });
+        { id: txId, 'cohorts.id': cohortId },
+        { $set: { [`cohorts.$.status`]: newStatus } });
   }
 
   private updateTxStatus(id: string, newStatus: CohortStatus) {
@@ -300,15 +299,16 @@ export class TxCoordinator<Message, Payload, State = any> {
 
   private async completeTx(txId: string, success: boolean) {
     const completedStatus = success ? 'committed' : 'aborted';
-    const tx: { cohorts: CohortMap<Message, Payload> }= (await this.txs
-      .findOne({ id: txId }, { projection: { 'cohorts': 1 }}))!;
+    const tx: { cohorts: { id: string, msg?: Message }[] }= (await this.txs
+      .findOne({ id: txId }, {
+        projection: { 'cohorts.msg': 1, 'cohorts.id': 1 }}))!;
     await Promise.all(
       _.map(
-        tx.cohorts, (cohort: Cohort<Message, Payload>, cohortId: string) => {
+        tx.cohorts, (cohort: Cohort<Message, Payload>) => {
         if (cohort.status !== 'waitingForCompletion') {
           return;
         }
-        return this.completeMessage(txId, cohortId, cohort.msg, success);
+        return this.completeMessage(txId, cohort.id, cohort.msg!, success);
       }));
     return this.updateTxStatus(txId, completedStatus);
   }
