@@ -24,6 +24,7 @@ export interface TxConfig<Message, Payload, State = any> {
   sendAbortToClient: (msg: Message, state?: State) => void;
   // payload is what got returned in `sendVoteToCohort`
   sendToClient: (payload: Payload, state?: State) => void;
+  onError: (error: Error, msg: Message, state?: State) => void;
   getCohorts: (cohortId: string) => string[];
 }
 
@@ -73,7 +74,7 @@ export class TxCoordinator<Message, Payload, State = any> {
   private lock = new AsyncLock();
   // Each tx emits a txId-[commit | abort] event
   private completed = new EventEmitter();
-  private txs: Collection<TxDoc<Message, Payload>>;
+  private txs: Collection<TxDoc<Message, Payload>> | undefined;
 
   constructor(private config: TxConfig<Message, Payload, State>) {}
 
@@ -82,37 +83,25 @@ export class TxCoordinator<Message, Payload, State = any> {
     setInterval(this.timeoutAbort.bind(this), TX_TIMEOUT_SECONDS * 1000);
   }
 
-  private async getTx(txId: string, cohortId: string)
-    : Promise<TxDoc<Message, Payload>> {
-    // Look at the tx table and create one if there's no active tx for txId
-    return (await this.txs.findOneAndUpdate(
-      { id: txId },
-      { $setOnInsert: {
-        status: 'voting',
-        $currentDate: { startedOn: true },
-        // We are going to be recomputing the expected cohorts for each tx we
-        // fetch but this lets us do `$setOnInsert`. We could check if the tx
-        // has been initialized and if not compute the expected cohorts but we
-        // would have to acquire the tx lock to do `find`, get the expected
-        // cohorts, and `update` atomically.
-        cohorts: _.map(
-          this.config.getCohorts(cohortId),
-          (cohortId: string) => ({id: cohortId}))
-      } },
-      { returnOriginal: false, upsert: true }))
-      .value!;
-  }
-
   async processMessage(
     txId: string, cohortId: string, msg: Message, state?: State)
     : Promise<void> {
+    if (!this.txs) {
+      this.config.onError(
+        new Error('TxCoordinator hasn\'t been started yet: call start()'),
+        msg, state);
+      return;
+    }
     const tx: TxDoc<Message, Payload> = await this.getTx(txId, cohortId);
 
     // no race condition here because the set of cohorts doesn't change after
     // initialization
     if (!_.includes(_.map(tx.cohorts, 'id'), cohortId)) {
       // We received a request from a cohort that is not part of the tx
-      throw new Error(`[txId: ${txId}] ${cohortId} is not part of this tx`);
+      this.config.onError(
+        new Error(`[txId: ${txId}] ${cohortId} is not part of this tx`),
+        msg, state);
+      return;
     }
 
     // If we got here the tx has been initialized (by this msg or a previous one)
@@ -140,7 +129,9 @@ export class TxCoordinator<Message, Payload, State = any> {
         'cohorts.$.status': 'voting'
       } });
     if (update.matchedCount == 0) { // Duplicate request
-      throw new Error(`[txId: ${txId}] Duplicate message from ${cohortId}`);
+      this.config.onError(
+        new Error(`[txId: ${txId}] Duplicate message from ${cohortId}`),
+        msg, state);
     }
     const vote: Vote<Payload> = await this.config.sendVoteToCohort(msg);
     this.saveVote(txId, cohortId, vote);
@@ -183,11 +174,32 @@ export class TxCoordinator<Message, Payload, State = any> {
     return ret;
   }
 
+  private async getTx(txId: string, cohortId: string)
+    : Promise<TxDoc<Message, Payload>> {
+    // Look at the tx table and create one if there's no active tx for txId
+    return (await this.txs!.findOneAndUpdate(
+      { id: txId },
+      { $setOnInsert: {
+        status: 'voting',
+        currentDate: { startedOn: new Date() },
+        // We are going to be recomputing the expected cohorts for each tx we
+        // fetch but this lets us do `$setOnInsert`. We could check if the tx
+        // has been initialized and if not compute the expected cohorts but we
+        // would have to acquire the tx lock to do `find`, get the expected
+        // cohorts, and `update` atomically.
+        cohorts: _.map(
+          this.config.getCohorts(cohortId),
+          (cohortId: string) => ({id: cohortId}))
+      } },
+      { returnOriginal: false, upsert: true }))
+      .value!;
+  }
+
   private async processVote(
     txId: string, cohortId: string, vote: Vote<Payload>,
     onCommit: () => void, onAbort: () => void): Promise<Transition> {
     // Txs are never removed and if we got here we know there's a tx doc
-    const tx: TxDoc<Message, Payload> = (await this.txs.findOne({ id: txId }))!;
+    const tx: TxDoc<Message, Payload> = (await this.txs!.findOne({ id: txId }))!;
     const ret: Transition = {};
 
     if (this.shouldAbort(tx)) {
@@ -235,7 +247,7 @@ export class TxCoordinator<Message, Payload, State = any> {
   }
 
   private saveVote(txId: string, cohortId: string, vote: Vote<Payload>) {
-    return this.txs
+    return this.txs!
       .updateOne(
         { id: txId, 'cohorts.id': cohortId },
         { $set: { [`cohorts.$.vote`]: vote } });
@@ -243,14 +255,14 @@ export class TxCoordinator<Message, Payload, State = any> {
 
   private updateCohortStatus(
     txId: string, cohortId: string, newStatus: CohortStatus) {
-    return this.txs
+    return this.txs!
       .updateOne(
         { id: txId, 'cohorts.id': cohortId },
         { $set: { [`cohorts.$.status`]: newStatus } });
   }
 
   private updateTxStatus(id: string, newStatus: CohortStatus) {
-    return this.txs.updateOne({ id: id }, { $set: { state: newStatus } });
+    return this.txs!.updateOne({ id: id }, { $set: { state: newStatus } });
   }
 
   /**
@@ -260,7 +272,7 @@ export class TxCoordinator<Message, Payload, State = any> {
   private async timeoutAbort() {
     const threshold = new Date();
     threshold.setSeconds(threshold.getSeconds() - TX_TIMEOUT_SECONDS);
-    const txsToAbort: {id: string}[] = await this.txs.find<{id: string}>({
+    const txsToAbort: {id: string}[] = await this.txs!.find<{id: string}>({
       status: 'voting',
       startedOn: { $gte: threshold }
     }, { projection: { id: 1 } }).toArray();
@@ -268,7 +280,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     await Promise.all(
       _.map(txsToAbort, async (txToAbort: TxDoc<Message, Payload>) => {
         return this.lock.acquire(txToAbort.id, async () => {
-            const tx: TxDoc<Message, Payload> = (await this.txs
+            const tx: TxDoc<Message, Payload> = (await this.txs!
               .findOne({ id: txToAbort.id }, { projection: { status: 1 }}))!;
             if (tx.status !== 'voting') {
               return false;
@@ -300,7 +312,7 @@ export class TxCoordinator<Message, Payload, State = any> {
 
   private async completeTx(txId: string, success: boolean) {
     const completedStatus = success ? 'committed' : 'aborted';
-    const tx: { cohorts: { id: string, msg?: Message }[] }= (await this.txs
+    const tx: { cohorts: { id: string, msg?: Message }[] }= (await this.txs!
       .findOne({ id: txId }, {
         projection: { 'cohorts.msg': 1, 'cohorts.id': 1 }}))!;
     await Promise.all(

@@ -99,6 +99,11 @@ const txConfig: TxConfig<
   getCohorts: (cohortId: string) => {
     // would also need the actionConfig
     return ['foo', 'bar'];
+  },
+  onError: (e: Error, gcr: GatewayToClicheRequest, res?: express.Response) => {
+    console.error(e);
+    res!.status(500);
+    res!.send(e.message);
   }
 };
 
@@ -178,7 +183,7 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
   console.log(
     'Processing request:' + `to: ${to}, port: ${dstTable[to]}, ` +
     `action path: ${actionPath}, runId: ${runId}` +
-    (isDvTx(actionPath) ? `, dvTxId: ${runId}` : 'not part of a tx'));
+    (isDvTx(actionPath) ? `, dvTxId: ${runId}` : ' not part of a tx'));
 
   const gatewayToClicheRequest = {
     ...gatewayRequest,
@@ -188,7 +193,7 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
      body: req.body
     }
   };
-  if (!isDvTx(actionPath)) {
+  if (req.method === 'GET' || !isDvTx(actionPath)) {
     const clicheRes: {status: number, text: string} = await forwardRequest<string>(gatewayToClicheRequest);
     res.status(clicheRes.status);
     res.send(clicheRes.text);
@@ -219,7 +224,7 @@ async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
     }
   }
   clicheReq.send(gatewayRequest.body);
-  const response: request.Response = await clicheReq.end();
+  const response: request.Response = await clicheReq;
   console.log(`Got back ${JSON.stringify(response)}`);
   return {status: response.status, text: JSON.parse(response.text)};
 }
