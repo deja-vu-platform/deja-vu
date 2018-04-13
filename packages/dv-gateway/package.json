@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "package": "npm run build",
+    "start": "node dist/gateway.js --configFilePath dvconfig.json",
     "clean": "rm -rf ./dist"
   },
   "repository": {

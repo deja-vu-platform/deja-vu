@@ -48,6 +48,9 @@ const DEFAULT_CONFIG: Config = {
 function getDvConfig(): DvConfig {
   const argv = minimist(process.argv);
   const configFilePath = argv.configFilePath;
+  if (!argv.configFilePath) {
+    throw new Error('No dvconfig given!');
+  }
   const dvConfig: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
   console.log(`Using dv config ${JSON.stringify(dvConfig, undefined, 2)}`);
   return dvConfig;
@@ -230,13 +233,14 @@ app.get('*', ({}, res) => {
 
 // Listen
 const port = config.wsPort;
-app.listen(port, () => {
-  console.log(`Running gateway on port ${port}`);
-  console.log(`Using config ${JSON.stringify(dvConfig, undefined, 2)}`);
-  console.log(`Serving ${distFolder}`);
-});
-
-
+txCoordinator.start()
+  .then(() => {
+    app.listen(port, async () => {
+      console.log(`Running gateway on port ${port}`);
+      console.log(`Using config ${JSON.stringify(dvConfig, undefined, 2)}`);
+      console.log(`Serving ${distFolder}`);
+    });
+  });
 
 
 /**

@@ -61,7 +61,8 @@ interface Transition {
 }
 
 // The time in seconds after which a transaction stuck in voting should abort
-const TX_TIMEOUT_SECONDS = 3;
+// 10s should be the max https://www.nngroup.com/articles/website-response-times
+const TX_TIMEOUT_SECONDS = 10;
 
 /**
  *  Coordinates between a set of participants on whether to commit or abort
@@ -74,11 +75,11 @@ export class TxCoordinator<Message, Payload, State = any> {
   private completed = new EventEmitter();
   private txs: Collection<TxDoc<Message, Payload>>;
 
-  constructor(private config: TxConfig<Message, Payload, State>) {
-    this.getTxsCollection().then(txs => {
-      this.txs = txs;
-    });
-    setInterval(this.timeoutAbort, TX_TIMEOUT_SECONDS);
+  constructor(private config: TxConfig<Message, Payload, State>) {}
+
+  async start() {
+    this.txs = await this.getTxsCollection();
+    setInterval(this.timeoutAbort.bind(this), TX_TIMEOUT_SECONDS * 1000);
   }
 
   private async getTx(txId: string, cohortId: string)
