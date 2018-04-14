@@ -67,6 +67,13 @@ interface VotePayload {
   text: string;
 }
 
+function newReqWith(prepend: string, gcr: GatewayToClicheRequest)
+  : GatewayToClicheRequest {
+  const ret: GatewayToClicheRequest = _.clone(gcr);
+  ret.path = prepend + ret.path;
+  return ret;
+}
+
 const txConfig: TxConfig<
   GatewayToClicheRequest, VotePayload, express.Response> = {
   dbHost: config.dbHost,
@@ -74,21 +81,22 @@ const txConfig: TxConfig<
   dbName: config.dbName,
   reinitDbOnStartup: config.reinitDbOnStartup,
   sendCommitToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
-    gcr.path = '/commit' + gcr.path;
-    return forwardRequest(gcr).then(unusedResp => undefined);
+    return forwardRequest(newReqWith('/commit', gcr))
+      .then(unusedResp => undefined);
   },
   sendAbortToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
-    gcr.path = '/abort' + gcr.path;
-    return forwardRequest(gcr).then(unusedResp => undefined);
+    return forwardRequest(newReqWith('/abort', gcr))
+      .then(unusedResp => undefined);
   },
   sendVoteToCohort: (gcr: GatewayToClicheRequest): Promise<Vote<VotePayload>> => {
-    gcr.path = '/vote' + gcr.path;
-    return forwardRequest<Vote<string>>(gcr)
+    return forwardRequest<Vote<string>>(newReqWith('/vote', gcr))
       .then((resp: {status: number; text: Vote<string>}): Vote<VotePayload> => {
-        return {
+        const vote = {
           result: resp.text.result,
           payload: { status: resp.status, text: resp.text.payload }
         };
+        console.log('Voted: ' + JSON.stringify(vote))
+        return vote;
       });
   },
   sendAbortToClient: (gcr: GatewayToClicheRequest, res?: express.Response) => {
@@ -252,7 +260,7 @@ async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
   clicheReq.send(gatewayRequest.body);
   const response: request.Response = await clicheReq;
   console.log(`Got back ${JSON.stringify(response)}`);
-  return {status: response.status, text: JSON.parse(response.text)};
+  return { status: response.status, text: JSON.parse(response.text) };
 }
 
 // Serve SPA

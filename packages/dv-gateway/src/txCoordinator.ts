@@ -21,9 +21,11 @@ export interface TxConfig<Message, Payload, State = any> {
   sendCommitToCohort: (msg: Message) => Promise<void>;
   sendAbortToCohort: (msg: Message) => Promise<void>;
   sendVoteToCohort: (msg: Message) => Promise<Vote<Payload>>;
+
   sendAbortToClient: (msg: Message, state?: State) => void;
   // payload is what got returned in `sendVoteToCohort`
   sendToClient: (payload: Payload, state?: State) => void;
+
   onError: (error: Error, msg: Message, state?: State) => void;
   getCohorts: (cohortId: string) => string[];
 }
@@ -137,13 +139,17 @@ export class TxCoordinator<Message, Payload, State = any> {
       this.config.onError(
         new Error(`[txId: ${txId}] Duplicate message from ${cohortId}`),
         msg, state);
+      return;
     }
     let vote: Vote<Payload>;
     try {
       vote = await this.config.sendVoteToCohort(msg);
     } catch (e) {
       console.error(e);
-      throw new Error('Sending vote to cohort failed');
+      this.config.onError(
+        new Error(`[txId: ${txId}] Sending vote to cohort ${cohortId} failed`),
+        msg, state);
+      return;
     }
     this.saveVote(txId, cohortId, vote);
 
@@ -174,7 +180,7 @@ export class TxCoordinator<Message, Payload, State = any> {
                transition.newCohortStatus === 'waitingForCompletion') {
       // nothing to do in this case since we are waiting
     } else if (transition.newTxStatus === 'aborting') {
-      this.config.sendAbortToClient(msg);
+      this.config.sendAbortToClient(msg, state);
       this.completed.emit(txId + '-abort');
       ret = Promise.all([
         this.completeTx(txId, false),
@@ -233,6 +239,11 @@ export class TxCoordinator<Message, Payload, State = any> {
         ret.newCohortStatus = 'waitingForCompletion';
       }
     } else { // the vote was 'no'
+      if (vote.result !== 'no') {
+        console.error(
+          `[txId: ${txId}] Got a vote back that was not 'yes'/'no'. The
+          cliche at ${cohortId} doesn't correcly implement voting`);
+      }
       // We know that all previous votes were 'yes' because if o/w the state
       // would be 'aborting'/'aborted'. Thus, we are in the 'voting' phase and
       // this is the first 'no' vote
@@ -320,7 +331,8 @@ export class TxCoordinator<Message, Payload, State = any> {
       .catch(e => {
         // TODO: handle errors
         console.error(e);
-        throw new Error('Sending commit/abort failed');
+        throw new Error(
+          `[txId: ${txId}] Sending commit/abort to ${cohortId} failed`);
       })
       .then(unused => this.updateCohortStatus(txId, cohortId, completedStatus));
   }
