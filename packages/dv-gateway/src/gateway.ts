@@ -18,12 +18,12 @@ interface Config {
 }
 
 interface ActionInfo {
-  childActions: {[childActionName: string]: ActionInfo};
+  childActions?: {[childActionName: string]: ActionInfo};
 }
 
 interface RootAction {
   rootName: string;
-  childActions: {[childActionName: string]: ActionInfo};
+  childActions?: {[childActionName: string]: ActionInfo};
 }
 
 interface DvConfig {
@@ -33,7 +33,7 @@ interface DvConfig {
   config?: any;
   gateway: { config: Config };
   usedCliches?: {[as: string]: DvConfig};
-  actionTree?: RootAction;
+  actionTree: RootAction;
 }
 
 const DEFAULT_CONFIG: Config = {
@@ -53,6 +53,9 @@ function getDvConfig(): DvConfig {
   }
   const dvConfig: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
   console.log(`Using dv config ${JSON.stringify(dvConfig, undefined, 2)}`);
+  if (!dvConfig.actionTree) {
+    throw new Error('No action tree given');
+  }
   return dvConfig;
 }
 
@@ -75,7 +78,7 @@ const txConfig: TxConfig<
     return forwardRequest(gcr).then(unusedResp => undefined);
   },
   sendAbortToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
-    gcr.path = '/abort' +  gcr.path;
+    gcr.path = '/abort' + gcr.path;
     return forwardRequest(gcr).then(unusedResp => undefined);
   },
   sendVoteToCohort: (gcr: GatewayToClicheRequest): Promise<Vote<VotePayload>> => {
@@ -96,9 +99,21 @@ const txConfig: TxConfig<
     res!.status(payload.status);
     res!.send(payload.text);
   },
-  getCohorts: (cohortId: string) => {
-    // would also need the actionConfig
-    return ['foo', 'bar'];
+  getCohorts: (actionPathId: string) => {
+    const actionPath = idToActionPath(actionPathId);
+    const pathToDvTxNode = _.takeWhile(actionPath, a => (a) !== 'dv-tx');
+    pathToDvTxNode.push('dv-tx');
+
+    // We know that the action path is a valid one because if otherwise the tx
+    // would have never been initiated in the first place
+    const dvTxNode = getActionInfo(pathToDvTxNode, dvConfig.actionTree)!;
+
+    const cohorts = _.map(
+      _.keys(dvTxNode.childActions), (actionName: string) => actionPathToId(
+        [...pathToDvTxNode, actionName]
+      ));
+
+    return cohorts;
   },
   onError: (e: Error, gcr: GatewayToClicheRequest, res?: express.Response) => {
     console.error(e);
@@ -201,10 +216,21 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
     if (!runId) {
       throw new Error('run id undefined');
     }
-    await txCoordinator
-      .processMessage(runId, actionPath.join('-'), gatewayToClicheRequest, res);
+    await txCoordinator.processMessage(
+        runId, actionPathToId(actionPath), gatewayToClicheRequest, res);
   }
 });
+
+
+const ACTION_PATH_SEP = ':';
+
+function actionPathToId(actionPath: string[]): string {
+  return actionPath.join(ACTION_PATH_SEP);
+}
+
+function idToActionPath(id: string): string[] {
+  return id.split(ACTION_PATH_SEP);
+}
 
 /**
  *  Forwards to the cliche the given request.
@@ -253,34 +279,43 @@ txCoordinator.start()
  *  to `actionConfig`.
  */
 function actionPathIsValid(
-  actionPath: string[], actionTree: (RootAction | undefined)): boolean {
-  // For now, if the action tree is undefined we don't do any validation
-  if (!actionTree) {
-    return true;
-  } else if (_.isEmpty(actionPath)) {
-    return false;
-  } else if (actionPath[0] !== actionTree.rootName) {
-    return false;
-  } else if (actionPath.length === 1) {
-    return true;
-  }
-
-  return _actionPathIsValid(actionPath.slice(1), actionTree);
+  actionPath: string[], actionTree: RootAction): boolean {
+  return !!getActionInfo(actionPath, actionTree);
 }
 
-function _actionPathIsValid(actionPath: string[], action: ActionInfo): boolean {
+/**
+ * Returns the ActionInfo corresponding to the last node of the action path or
+ * undefined if none is found
+ **/
+function getActionInfo(
+  actionPath: string[], actionTree: RootAction): ActionInfo | undefined {
+  if (_.isEmpty(actionPath) || actionPath[0] !== actionTree.rootName) {
+    return;
+  } else if (actionPath.length === 1) {
+    return actionTree;
+  }
+
+  return _getActionInfo(actionPath.slice(1), actionTree);
+}
+
+function _getActionInfo(actionPath: string[], action: ActionInfo)
+  : ActionInfo | undefined {
   if (_.isEmpty(action.childActions)) {
-    return false;
+    return;
   }
   const next = actionPath[0];
   if (actionPath.length === 1) {
-    return next in action.childActions;
+    if (_.has(action.childActions, next)) {
+      return action.childActions![next];
+    } else {
+      return;
+    }
   }
 
-  if (!(next in action.childActions)) {
-    return false;
+  if (!_.has(action.childActions, next)) {
+    return;
   }
-  return _actionPathIsValid(actionPath.slice(1), action.childActions[next]);
+  return _getActionInfo(actionPath.slice(1), action.childActions![next]);
 }
 
 // returns an array [action_1, action_2, ..., action_n] representing an action
