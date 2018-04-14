@@ -96,10 +96,15 @@ export class TxCoordinator<Message, Payload, State = any> {
 
     // no race condition here because the set of cohorts doesn't change after
     // initialization
-    if (!_.includes(_.map(tx.cohorts, 'id'), cohortId)) {
+    // While we could deactive this check we still need to know the expected
+    // actions that make up a transaction so that we know when it's done
+    const cohortIds =  _.map(tx.cohorts, 'id');
+    if (!_.includes(cohortIds, cohortId)) {
       // We received a request from a cohort that is not part of the tx
       this.config.onError(
-        new Error(`[txId: ${txId}] ${cohortId} is not part of this tx`),
+        new Error(
+          `[txId: ${txId}] ${cohortId} is not part of this tx. Cohorts are ` +
+          JSON.stringify(cohortIds)),
         msg, state);
       return;
     }
@@ -133,7 +138,13 @@ export class TxCoordinator<Message, Payload, State = any> {
         new Error(`[txId: ${txId}] Duplicate message from ${cohortId}`),
         msg, state);
     }
-    const vote: Vote<Payload> = await this.config.sendVoteToCohort(msg);
+    let vote: Vote<Payload>;
+    try {
+      vote = await this.config.sendVoteToCohort(msg);
+    } catch (e) {
+      console.error(e);
+      throw new Error('Sending vote to cohort failed');
+    }
     this.saveVote(txId, cohortId, vote);
 
     // We need to be sure that we are processing votes one by one because:
@@ -305,8 +316,12 @@ export class TxCoordinator<Message, Payload, State = any> {
     const send = success ? this.config.sendCommitToCohort :
       this.config.sendAbortToCohort;
     return this.updateCohortStatus(txId, cohortId, completingStatus)
-      // TODO: catch errors
       .then(unused => send(msg))
+      .catch(e => {
+        // TODO: handle errors
+        console.error(e);
+        throw new Error('Sending commit/abort failed');
+      })
       .then(unused => this.updateCohortStatus(txId, cohortId, completedStatus));
   }
 
