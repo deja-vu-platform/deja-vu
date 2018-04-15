@@ -198,7 +198,7 @@ export class TxCoordinator<Message, Payload, State = any> {
       { id: txId },
       { $setOnInsert: {
         state: 'voting',
-        currentDate: { startedOn: new Date() },
+        startedOn: new Date(),
         // We are going to be recomputing the expected cohorts for each tx we
         // fetch but this lets us do `$setOnInsert`. We could check if the tx
         // has been initialized and if not compute the expected cohorts but we
@@ -296,7 +296,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     threshold.setSeconds(threshold.getSeconds() - TX_TIMEOUT_SECONDS);
     const txsToAbort: {id: string}[] = await this.txs!.find<{id: string}>({
       state: 'voting',
-      startedOn: { $gte: threshold }
+      startedOn: { $lt: threshold }
     }, { projection: { id: 1 } }).toArray();
 
     console.log(
