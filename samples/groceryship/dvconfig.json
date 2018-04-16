@@ -20,7 +20,7 @@
         "wsPort": 3004,
         "reinitDbOnStartup": false,
         "initialMarketIds": ["groceryship"],
-        "enforceBalance": true
+        "enforceBalance": false
       }
     },
     "event": {
