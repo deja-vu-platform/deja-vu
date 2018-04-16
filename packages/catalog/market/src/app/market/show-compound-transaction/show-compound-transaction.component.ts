@@ -71,7 +71,7 @@ export class ShowCompoundTransactionComponent {
       params: {
         query: `
           query {
-            compoundTransaction(id: "${this.compoundTransaction.id}") {
+            compoundTransaction(id: "${this.id}") {
               ${this.showId ? 'id' : ''}
               ${this.showTransactions ? 'transactions { id }' : ''}
               ${this.showTotalPrice ? 'totalPrice' : ''}
