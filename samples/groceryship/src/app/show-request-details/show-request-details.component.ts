@@ -12,6 +12,6 @@ import {
 export class ShowRequestDetailsComponent {
   @Input() request: any;
   @Input() myRequest: boolean; // whether it was made by the current user
-  @Input() showTransactionSummary: boolean = true;
+  @Input() showTransactionSummary = true;
   showRequestTransaction = ShowRequestTransactionComponent;
 }

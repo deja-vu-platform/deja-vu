@@ -13,6 +13,6 @@ export class ShowRequestTransactionComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.name = this.id.endsWith('tip') ? 'Tip': 'Item(s)';
+    this.name = this.id.endsWith('tip') ? 'Tip' : 'Item(s)';
   }
 }

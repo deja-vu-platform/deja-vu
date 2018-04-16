@@ -24,7 +24,7 @@ export class ShowDeliverRequestNotificationComponent implements OnInit {
     if (this.request) {
       this.dialog.open(RequestDetailsDialogComponent, {
         data: { request: this.request, myRequest: false}
-      })
+      });
     }
   }
 
@@ -34,7 +34,7 @@ export class ShowDeliverRequestNotificationComponent implements OnInit {
       this.dialog.open(CloseDeliveryDialogComponent, {
         // can also specify dialog height and width here
         data: { request: this.request }
-      })
+      });
     }
   }
 }

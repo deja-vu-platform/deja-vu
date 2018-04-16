@@ -22,7 +22,7 @@ export class ShowAcceptRequestNotificationComponent {
     if (this.request) {
       this.dialog.open(RequestDetailsDialogComponent, {
         data: { request: this.request, myRequest: true}
-      })
+      });
     }
   }
 
@@ -32,7 +32,7 @@ export class ShowAcceptRequestNotificationComponent {
       this.dialog.open(AcceptRejectDeliveryDialogComponent, {
         // can also specify dialog height and width here
         data: { request: this.request, accept: accept }
-      })
+      });
     }
   }
 }

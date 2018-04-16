@@ -9,7 +9,7 @@
     </p>
 
     <market-show-compound-transaction
-      [compoundTransaction]="{ id: request.id }"
+      [id]="request.id"
       [showId]="false"
       [showTransactionId]="false"
       [showTransactionStatus]="false"
@@ -25,7 +25,8 @@
 
   <div *ngIf="!accept">
     <p>Reason for rejection:</p>
-    <!-- TODO: create an update field widget for property then save the selected value -->
+    <!-- TODO: create an update field widget for property
+      then save the selected value -->
     <select class="form-control">
       <option>The deliverer did not show up.</option>
       <option>The delivered item is not what I requested for.</option>
