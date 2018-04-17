@@ -13,7 +13,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { Event } from '../../../../shared/data';
+import { Event, toUnixTime } from '../../../../shared/data';
 import { endTimeValidator } from '../shared/time.validator';
 
 
@@ -79,10 +79,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
         variables: {
           input: {
             id: this.id ? this.id : '',
-            startsOn: this.startsOn.value.valueOf(),
-            endsOn: this.endsOn.value.valueOf(),
-            startTime: this.startTime.value,
-            endTime: this.endTime.value
+            startDate: toUnixTime(this.startsOn.value, this.startTime.value),
+            endDate: toUnixTime(this.endsOn.value, this.endTime.value)
           }
         }
       })

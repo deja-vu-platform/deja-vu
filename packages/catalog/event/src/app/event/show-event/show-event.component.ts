@@ -3,7 +3,7 @@ import {
   Component, ElementRef, Input, OnChanges, OnInit
 } from '@angular/core';
 import { GatewayService, GatewayServiceFactory  } from 'dv-core';
-import { Event, WeeklyEvent } from '../../../../shared/data';
+import { Event, fromUnixTime } from '../../../../shared/data';
 
 
 @Component({
@@ -34,7 +34,8 @@ export class ShowEventComponent implements OnChanges, OnInit {
     if (this.event && this.event.startDate && this.event.endDate) {
       this.sameDayEvent = this.isSameDayEvent(this.event);
     } else if (this.gs && this.id) {
-      this.gs.get<{data: {event: Event}}>('/graphql', {
+      this.gs.get<{
+        data: {event: { startDate: number, endDate: number }}}>('/graphql', {
         params: {
           query: ` query {
             event(id: "${this.id}") {
@@ -45,7 +46,10 @@ export class ShowEventComponent implements OnChanges, OnInit {
         }
       })
       .subscribe((obj) => {
-        this.event = obj.data.event;
+        this.event = {
+          startDate: fromUnixTime(obj.data.event.startDate),
+          endDate: fromUnixTime(obj.data.event.endDate)
+        };
         this.sameDayEvent = this.isSameDayEvent(this.event);
       });
     }
@@ -55,11 +59,6 @@ export class ShowEventComponent implements OnChanges, OnInit {
     if (!(event.startDate && event.endDate)) {
       return false;
     }
-    const startDateObj = new Date(event.startDate);
-    const endDateObj = new Date(event.endDate);
-
-    return startDateObj.getFullYear() === endDateObj.getFullYear() &&
-      startDateObj.getMonth() === endDateObj.getMonth() &&
-      startDateObj.getDate() === endDateObj.getDate();
+    return event.startDate.isSame(event.endDate, 'day');
   }
 }

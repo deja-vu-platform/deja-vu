@@ -6,6 +6,8 @@ import * as mongodb from 'mongodb';
 import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
+import * as _ from 'lodash';
+
 import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
@@ -14,41 +16,31 @@ interface EventDoc {
   id: string;
   startDate: Date;
   endDate: Date;
-  weeklyEventId?: string;
+  seriesId?: string;
 }
 
-interface WeeklyEventDoc {
+interface SeriesDoc {
   id: string;
-  startsOn: string;
-  endsOn: string;
-  startTime: string;
-  endTime: string;
+  startsOn: Date;
+  endsOn: Date;
   eventIds: string[];
 }
 
-
 interface CreateEventInput {
   id: string;
-  startsOn: string;
-  endsOn: string;
-  startTime: string;
-  endTime: string;
+  startDate: number;
+  endDate: number;
 }
 
 interface UpdateEventInput {
   id: string;
-  startsOn: string;
-  endsOn: string;
-  startTime: string;
-  endTime: string;
+  startDate: number;
+  endDate: number;
 }
 
-interface CreateWeeklyEventInput {
+interface CreateSeriesInput {
   id?: string;
-  startsOn: string;
-  endsOn: string;
-  startTime: string;
-  endTime: string;
+  events: CreateEventInput[];
 }
 
 interface Config {
@@ -81,7 +73,8 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, events, weeklyEvents;
+let db: mongodb.Db;
+let events: mongodb.Collection<EventDoc>, series: mongodb.Collection<SeriesDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -93,146 +86,115 @@ mongodb.MongoClient.connect(
       console.log(`Reinitialized db ${config.dbName}`);
     }
     events = db.collection('events');
-    weeklyEvents = db.collection('weeklyevents');
+    events.createIndex({ id: 1 }, { unique: true });
+    series = db.collection('series');
+    series.createIndex({ id: 1 }, { unique: true });
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+
 const resolvers = {
   Query: {
     events: () => events.find()
       .toArray(),
-    weeklyEvents: () => weeklyEvents.find()
+    series: () => series.find()
       .toArray(),
     event: (root, { id }) => events.findOne({ id: id }),
-    weeklyEvent: (root, { id }) => weeklyEvents.findOne({ id: id })
+    oneSeries: (root, { id }) => series.findOne({ id: id })
   },
   Event: {
     id: (event: EventDoc) => event.id,
-    startDate: (event: EventDoc) => event.startDate,
-    endDate: (event: EventDoc) => event.endDate,
-    weeklyEvent: (event: EventDoc) => weeklyEvents
-      .findOne({ id: event.weeklyEventId })
+    startDate: (event: EventDoc) => event.startDate.valueOf(),
+    endDate: (event: EventDoc) => event.endDate.valueOf(),
+    series: (event: EventDoc) => series
+      .findOne({ id: event.seriesId })
   },
-  WeeklyEvent: {
-    id: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.id,
-    startsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.startsOn,
-    endsOn: (weeklyEvent: WeeklyEventDoc) => weeklyEvent.endsOn,
-    events: (weeklyEvent: WeeklyEventDoc) => events
-      .find({ id: { $in: weeklyEvent.eventIds } })
-      .sort({startDate: 1})
+  Series: {
+    id: (series: SeriesDoc) => series.id,
+    startsOn: (series: SeriesDoc) => series.startsOn.valueOf(),
+    endsOn: (series: SeriesDoc) => series.endsOn.valueOf(),
+    events: (series: SeriesDoc) => events
+      .find({ id: { $in: series.eventIds } })
+      .sort({ startDate: 1 })
       .toArray()
   },
   Mutation: {
     createEvent: async (root, {input}: {input: CreateEventInput}) => {
-      const {startDate, endDate} = getStartAndEndDates(input);
       const eventId = input.id ? input.id : uuid();
-      const e = { id: eventId, startDate: startDate, endDate: endDate };
+      const e = {
+        id: eventId,
+        startDate: unixTimeToDate(input.startDate),
+        endDate: unixTimeToDate(input.endDate)
+      };
+
       await events.insertOne(e);
 
       return e;
     },
     updateEvent: async (root, {input}: {input: UpdateEventInput}) => {
-      const {startDate, endDate} = getStartAndEndDates(input);
-      const updateObj = { $set: { startDate: startDate, endDate: endDate } };
+      const updateObj = { $set: {
+        startDate: unixTimeToDate(input.startDate),
+        endDate: unixTimeToDate(input.endDate)
+      } };
+
       await events.updateOne({id: input.id}, updateObj);
 
       return true;
     },
-    // If a weeklyEventId is given, the event is removed from that weekly event
-    deleteEvent: async (root, {id}) => {
+    // If a seriesId is given, the event is removed from that weekly event
+    deleteEvent: async (root, { id }) => {
       const res = await events.findOneAndDelete({id: id});
       const deletedEvent = res.value;
-      if (deletedEvent.weeklyEventId) {
-        const updatedWeeklyEvent = { $pull: { events: {id: id} } };
-        await weeklyEvents
-          .update({id: deletedEvent.weeklyEventId}, updatedWeeklyEvent);
+      if (!deletedEvent) {
+        return false;
+      }
+      if (deletedEvent.seriesId) {
+        const seriesUpdate = { $pull: { events: {id: id} } };
+        await series
+          .update({id: deletedEvent.seriesId}, seriesUpdate);
       }
 
       return true;
     },
-    createWeeklyEvent: async (
-      root, {input}: {input: CreateWeeklyEventInput}) => {
-      const startsOnDate = new Date(Number(input.startsOn));
-      const endsOnDate = new Date(Number(input.endsOn));
-
-      const inserts: Promise<any>[] = [];
-      const eventIds: string[] = [];
-      const weeklyEventId = input.id ? input.id : uuid();
-
-      const startHhMm = getHhMm(input.startTime);
-      const endHhMm = getHhMm(input.endTime);
-
-      const DAYS_IN_WEEK = 7;
-      for (
-        const eventDate = startsOnDate; eventDate <= endsOnDate;
-        eventDate.setDate(eventDate.getDate() + DAYS_IN_WEEK)) {
-
-        const startDate = new Date(eventDate.getTime());
-        startDate.setHours(startHhMm.hh, startHhMm.mm);
-
-        const endDate = new Date(eventDate.getTime());
-        endDate.setHours(endHhMm.hh, endHhMm.mm);
-
-        const eventId = uuid();
-        eventIds.push(eventId);
-        const e: EventDoc = {
-          id: eventId,
-          startDate: startDate,
-          endDate: endDate,
-          weeklyEventId: weeklyEventId
-        };
-        inserts.push(events.insertOne(e));
+    createSeries: async (root, {input}: {input: CreateSeriesInput})
+    : Promise<SeriesDoc> => {
+      if (_.isEmpty(input.events)) {
+        throw new Error('Series has no events');
       }
-
-      const weeklyEvent: WeeklyEventDoc = {
-        id: weeklyEventId,
-        eventIds: eventIds,
-        startsOn: input.startsOn,
-        endsOn: input.endsOn,
-        startTime: input.startTime,
-        endTime: input.endTime
+      const inserts: EventDoc[] = [];
+      const seriesId = input.id ? input.id : uuid();
+      for (const createEvent of input.events) {
+        const eventId = createEvent.id ? createEvent.id : uuid();
+        const e = {
+          id: eventId,
+          startDate: unixTimeToDate(createEvent.startDate),
+          endDate: unixTimeToDate(createEvent.endDate),
+          seriesId: seriesId
+        };
+        inserts.push(e);
+      }
+      const newSeries: SeriesDoc = {
+        id: seriesId,
+        startsOn: _.first(inserts).startDate,
+        endsOn: _.last(inserts).startDate,
+        eventIds: _.map(inserts, 'id')
       };
-      await Promise.all(inserts);
-      await weeklyEvents.insertOne(weeklyEvent);
 
-      return weeklyEvent;
+      await Promise
+        .all([ events.insertMany(inserts), series.insertOne(newSeries)]);
+
+      return newSeries;
     }
   }
 };
 
-function getStartAndEndDates(input: CreateEventInput | UpdateEventInput)
-  : {startDate: Date, endDate: Date} {
-  const startsOnDate = new Date(Number(input.startsOn));
-  const endsOnDate = new Date(Number(input.endsOn));
-
-  const startHhMm = getHhMm(input.startTime);
-  const endHhMm = getHhMm(input.endTime);
-
-  startsOnDate.setHours(startHhMm.hh, startHhMm.mm);
-  endsOnDate.setHours(endHhMm.hh, endHhMm.mm);
-
-  return { startDate: startsOnDate, endDate: endsOnDate };
-}
-
-// Get the hours and minutes in 24-hour format from a time in 12-hr format
-// (hh:mm AM/PM)
-function getHhMm(hhMmTime: string): {hh: number, mm: number} {
-  const AM_LENGTH = 2;
-  const PERIOD_HOURS = 12;
-  const hhMm = hhMmTime.slice(0, -AM_LENGTH)
-    .split(':');
-  const ret = {hh: Number(hhMm[0]), mm: Number(hhMm[1])};
-  if (hhMmTime.slice(-AM_LENGTH) === 'PM') {
-    ret.hh = ret.hh + PERIOD_HOURS;
-  }
-
-  return ret;
+function unixTimeToDate(unixTime: string | number): Date {
+  return new Date(Number(unixTime));
 }
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
-
 
 const app = express();
 

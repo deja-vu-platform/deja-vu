@@ -11,19 +11,20 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from 'dv-core';
 
 import {
-  ChooseAndShowWeeklyEventComponent
-} from './choose-and-show-weekly-event/choose-and-show-weekly-event.component';
+  ChooseAndShowSeriesComponent
+} from './choose-and-show-series/choose-and-show-series.component';
 import { CreateEventComponent } from './create-event/create-event.component';
-import { DeleteEventComponent } from './delete-event/delete-event.component';
+import { CreateSeriesComponent } from './create-series/create-series.component';
 import {
-  NewWeeklyEventComponent
-} from './new-weekly-event/new-weekly-event.component';
+  CreateWeeklySeriesComponent
+} from './create-weekly-series/create-weekly-series.component';
+import { DeleteEventComponent } from './delete-event/delete-event.component';
 import { ShowEventComponent } from './show-event/show-event.component';
 
 
 const allComponents = [
-  NewWeeklyEventComponent, ChooseAndShowWeeklyEventComponent,
-  ShowEventComponent, CreateEventComponent, DeleteEventComponent
+  ChooseAndShowSeriesComponent, ShowEventComponent, CreateEventComponent,
+  CreateSeriesComponent, CreateWeeklySeriesComponent, DeleteEventComponent
 ];
 
 @NgModule({

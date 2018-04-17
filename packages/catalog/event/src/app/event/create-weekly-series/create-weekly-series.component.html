@@ -1,17 +1,17 @@
 <form (ngSubmit)="onSubmit()"
-  [formGroup]="newWeeklyEventForm"
+  [formGroup]="createWeeklySeriesForm"
   class="form-horizontal">
-  <div class="form-group nwe-form-group">
-    <div *ngIf="newWeeklyEventSaved" class="nwe-saved">
+  <div class="form-group cws-form-group">
+    <div *ngIf="createWeeklySeriesSaved" class="cws-saved">
       <i class="material-icons">done</i>
-      {{newWeeklyEventSavedText}}
+      {{createWeeklySeriesSavedText}}
     </div>
-    <mat-error *ngIf="newWeeklyEventError">
+    <mat-error *ngIf="createWeeklySeriesError">
       <i class="material-icons">report_problem</i>
-      {{newWeeklyEventError}}
+      {{createWeeklySeriesError}}
     </mat-error>
   </div>
-  <div class="form-group nwe-form-group">
+  <div class="form-group cws-form-group">
     <mat-form-field>
       <mat-label>Starts On</mat-label>
       <input matInput required [matDatepicker]="startsOnPicker"
@@ -24,7 +24,7 @@
       </mat-error>
     </mat-form-field>
   </div>
-  <div class="form-group nwe-form-group">
+  <div class="form-group cws-form-group">
     <mat-form-field>
       <mat-label>Ends On</mat-label>
       <input matInput required [matDatepicker]="endsOnPicker"
@@ -37,7 +37,7 @@
       </mat-error>
     </mat-form-field>
   </div>
-  <div class="form-group nwe-form-group">
+  <div class="form-group cws-form-group">
     <mat-form-field>
       <mat-label>Start Time</mat-label>
       <input matInput required type="time"
@@ -48,7 +48,7 @@
       </mat-error>
     </mat-form-field>
   </div>
-  <div class="form-group nwe-form-group">
+  <div class="form-group cws-form-group">
     <mat-form-field>
       <mat-label>End Time</mat-label>
       <input matInput required type="time"
@@ -63,8 +63,8 @@
     </mat-form-field>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit" 
-      [disabled]="!newWeeklyEventForm.valid">
+    <button mat-button type="submit"
+      [disabled]="!createWeeklySeriesForm.valid">
         {{buttonLabel}}
     </button>
   </div>

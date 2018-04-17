@@ -6,31 +6,31 @@ import * as _ from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { Event, WeeklyEvent } from '../../../../shared/data';
+import { Event, Series, fromUnixTime } from '../../../../shared/data';
 
 import { ShowEventComponent } from '../show-event/show-event.component';
 
 
 @Component({
-  selector: 'event-choose-and-show-weekly-event',
-  templateUrl: './choose-and-show-weekly-event.component.html',
-  styleUrls: ['./choose-and-show-weekly-event.component.css'],
+  selector: 'event-choose-and-show-series',
+  templateUrl: './choose-and-show-series.component.html',
+  styleUrls: ['./choose-and-show-series.component.css'],
   providers: [ DatePipe ]
 })
-export class ChooseAndShowWeeklyEventComponent implements OnInit {
+export class ChooseAndShowSeriesComponent implements OnInit {
   @Input() noEventsToShowText = 'No events to show';
-  @Input() chooseWeeklyEventSelectPlaceholder = 'Choose Weekly Event';
-  selectedWeeklyEvent: WeeklyEvent;
-  weeklyEvents: WeeklyEvent[] = [];
+  @Input() chooseSeriesSelectPlaceholder = 'Choose Weekly Event';
+  selectedSeries: Series;
+  series: Series[] = [];
   events: Event[] = [];
 
-  @Input() showEvent: Action = {type: <Type<Component>> ShowEventComponent};
+  @Input() showEvent: Action = { type: <Type<Component>> ShowEventComponent };
 
-  chooseAndShowWeeklyEvent;
+  chooseAndShowSeries;
   private gs: GatewayService;
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {
-    this.chooseAndShowWeeklyEvent = this;
+    this.chooseAndShowSeries = this;
   }
 
   ngOnInit() {
@@ -41,11 +41,11 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
   maybeFetchEvents(toggle: boolean) {
     if (toggle) {
       this.gs
-        .get<{data: {weeklyEvents: WeeklyEvent[]}}>('/graphql', {
+        .get<{data: {series: Series[]}}>('/graphql', {
           params: {
             query: `
               query {
-                weeklyEvents {
+                series {
                   id,
                   startsOn,
                   endsOn
@@ -54,30 +54,34 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
             `
           }
         })
-        .pipe(map((res) => res.data.weeklyEvents))
-        .subscribe((weeklyEvents: WeeklyEvent[]) => {
-          this.weeklyEvents = weeklyEvents;
+        .pipe(map((res) => res.data.series))
+        .subscribe((series: Series[]) => {
+          this.series = _.map(series, (series) => {
+            series.startsOn = fromUnixTime(series.startsOn);
+            series.endsOn = fromUnixTime(series.endsOn);
+            return series;
+          });
         });
     }
   }
 
-  updateEvents(selectedWeeklyEvent: WeeklyEvent) {
-    this.selectedWeeklyEvent = selectedWeeklyEvent;
+  updateEvents(selectedSeries: Series) {
+    this.selectedSeries = selectedSeries;
     this.events = [];
-    if (!selectedWeeklyEvent) {
+    if (!selectedSeries) {
       return;
     }
     this.gs
-      .get<{data: {weeklyEvent: {events: Event[]}}}>('/graphql', {
+      .get<{data: {oneSeries: {events: Event[]}}}>('/graphql', {
         params: {
           query: `
             query {
-              weeklyEvent(id: "${selectedWeeklyEvent.id}") {
+              oneSeries(id: "${selectedSeries.id}") {
                 events {
                   id,
                   startDate,
                   endDate,
-                  weeklyEvent {
+                  series {
                     id
                   }
                 }
@@ -86,10 +90,12 @@ export class ChooseAndShowWeeklyEventComponent implements OnInit {
           `
         }
       })
-      .pipe(map((res) => res.data.weeklyEvent.events))
+      .pipe(map((res) => res.data.oneSeries.events))
       .subscribe((events: Event[]) => {
         this.events = _.map(events, (evt) => {
-          evt.weeklyEventId = evt.weeklyEvent.id;
+          evt.seriesId = evt.series.id;
+          evt.startDate = fromUnixTime(evt.startDate);
+          evt.endDate = fromUnixTime(evt.endDate);
 
           return evt;
         });
