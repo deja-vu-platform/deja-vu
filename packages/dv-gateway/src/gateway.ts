@@ -99,9 +99,16 @@ const txConfig: TxConfig<
         return vote;
       });
   },
-  sendAbortToClient: (gcr: GatewayToClicheRequest, res?: express.Response) => {
-    res!.status(500);
-    res!.send('the tx this action is part of aborted');
+  sendAbortToClient: (
+    gcr: GatewayToClicheRequest, causedAbort: boolean, payload?: VotePayload,
+    res?: express.Response) => {
+    if (causedAbort) {
+      res!.status(payload!.status);
+      res!.send(payload!.text);
+    } else {
+      res!.status(500);
+      res!.send('the tx this action is part of aborted');
+    }
   },
   sendToClient: (payload: VotePayload, res?: express.Response) =>  {
     res!.status(payload.status);

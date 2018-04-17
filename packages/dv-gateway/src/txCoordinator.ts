@@ -22,7 +22,12 @@ export interface TxConfig<Message, Payload, State = any> {
   sendAbortToCohort: (msg: Message) => Promise<void>;
   sendVoteToCohort: (msg: Message) => Promise<Vote<Payload>>;
 
-  sendAbortToClient: (msg: Message, state?: State) => void;
+  /**
+   * `causedAbort` is `true` if this is the client that caused the abort.
+   * `payload` is `undefined` if the client never got to the point of voting.
+   **/
+  sendAbortToClient: (
+    msg: Message, causedAbort: boolean, payload?: Payload, state?: State) => void;
   // payload is what got returned in `sendVoteToCohort`
   sendToClient: (payload: Payload, state?: State) => void;
 
@@ -118,7 +123,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     // changes to abort right after we do the check but that won't cause any
     // problems. The check here is mostly to save some unnecessary votes.
     if (this.shouldAbort(tx)) {
-      this.config.sendAbortToClient(msg, state);
+      this.config.sendAbortToClient(msg, false, undefined, state);
       return;
     }
 
@@ -160,13 +165,13 @@ export class TxCoordinator<Message, Payload, State = any> {
       return this.processVote(txId, cohortId, vote, () => {
           this.config.sendToClient(vote.payload, state);
       }, () => {
-          this.config.sendAbortToClient(msg, state);
+          this.config.sendAbortToClient(msg, false, vote.payload, state);
       });
     });
 
     let ret;
     if (_.isEmpty(transition)) {  // tx was already aborting
-      this.config.sendAbortToClient(msg, state);
+      this.config.sendAbortToClient(msg, false, vote.payload, state);
       this.completed.emit(txId + '-abort');
       ret = this.completeMessage(txId, cohortId, msg, false);
     } else if (transition.newTxState === 'committing' &&
@@ -180,7 +185,7 @@ export class TxCoordinator<Message, Payload, State = any> {
                transition.newCohortState === 'waitingForCompletion') {
       // nothing to do in this case since we are waiting
     } else if (transition.newTxState === 'aborting') {
-      this.config.sendAbortToClient(msg, state);
+      this.config.sendAbortToClient(msg, true, vote.payload, state);
       this.completed.emit(txId + '-abort');
       ret = Promise.all([
         this.completeTx(txId, false),
