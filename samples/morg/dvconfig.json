@@ -1,20 +1,20 @@
 {
   "name": "morg",
   "watch": true,
-  "gatewayPort": 3000,
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
   "usedCliches": {
     "event": {
       "name": "event",
-      "startServer": true,
-      "watch": true,
       "config": {
         "wsPort": 3002
       }
     },
     "allocator": {
       "name": "allocator",
-      "startServer": true,
-      "watch": true,
       "config": {
         "wsPort": 3003,
         "initialConsumerIds": ["Ben", "Alyssa"]

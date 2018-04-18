@@ -1,6 +1,10 @@
 {
   "name": "chorestar",
-  "gatewayPort": 3000,
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
   "usedCliches": {
     "parentauthentication": {
       "config": {
