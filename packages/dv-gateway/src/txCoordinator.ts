@@ -288,7 +288,7 @@ export class TxCoordinator<Message, Payload, State = any> {
         { $set: { [`cohorts.$.state`]: newState } });
   }
 
-  private updateTxState(id: string, newState: CohortState) {
+  private updateTxState(id: string, newState: TxState) {
     return this.txs!.updateOne({ id: id }, { $set: { state: newState } });
   }
 

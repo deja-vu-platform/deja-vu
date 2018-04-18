@@ -62,9 +62,9 @@ function getDvConfig(): DvConfig {
 const dvConfig: DvConfig = getDvConfig();
 const config: Config = {...DEFAULT_CONFIG, ...dvConfig.gateway.config};
 
-interface VotePayload {
+interface ClicheResponse<T> {
   status: number;
-  text: string;
+  text: T;
 }
 
 function newReqWith(prepend: string, gcr: GatewayToClicheRequest)
@@ -75,7 +75,7 @@ function newReqWith(prepend: string, gcr: GatewayToClicheRequest)
 }
 
 const txConfig: TxConfig<
-  GatewayToClicheRequest, VotePayload, express.Response> = {
+  GatewayToClicheRequest, ClicheResponse<string>, express.Response> = {
   dbHost: config.dbHost,
   dbPort: config.dbPort,
   dbName: config.dbName,
@@ -88,9 +88,11 @@ const txConfig: TxConfig<
     return forwardRequest(newReqWith('/abort', gcr))
       .then(unusedResp => undefined);
   },
-  sendVoteToCohort: (gcr: GatewayToClicheRequest): Promise<Vote<VotePayload>> => {
+  sendVoteToCohort: (gcr: GatewayToClicheRequest)
+    : Promise<Vote<ClicheResponse<string>>> => {
     return forwardRequest<Vote<string>>(newReqWith('/vote', gcr))
-      .then((resp: {status: number; text: Vote<string>}): Vote<VotePayload> => {
+      .then((resp: ClicheResponse<Vote<string>>)
+        : Vote<ClicheResponse<string>> => {
         const vote = {
           result: resp.text.result,
           payload: { status: resp.status, text: resp.text.payload }
@@ -100,8 +102,8 @@ const txConfig: TxConfig<
       });
   },
   sendAbortToClient: (
-    gcr: GatewayToClicheRequest, causedAbort: boolean, payload?: VotePayload,
-    res?: express.Response) => {
+    gcr: GatewayToClicheRequest, causedAbort: boolean,
+    payload?: ClicheResponse<string>, res?: express.Response) => {
     if (causedAbort) {
       res!.status(payload!.status);
       res!.send(payload!.text);
@@ -110,7 +112,7 @@ const txConfig: TxConfig<
       res!.send('the tx this action is part of aborted');
     }
   },
-  sendToClient: (payload: VotePayload, res?: express.Response) =>  {
+  sendToClient: (payload: ClicheResponse<string>, res?: express.Response) =>  {
     res!.status(payload.status);
     res!.send(payload.text);
   },
@@ -139,7 +141,7 @@ const txConfig: TxConfig<
 
 const app = express();
 const txCoordinator = new TxCoordinator<
-  GatewayToClicheRequest, VotePayload, express.Response>(txConfig);
+  GatewayToClicheRequest, ClicheResponse<string>, express.Response>(txConfig);
 
 // Handle API requests
 // projects contains all keys in `usedCliches` plus the name of the current app
@@ -224,7 +226,8 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
     }
   };
   if (req.method === 'GET' || !isDvTx(actionPath)) {
-    const clicheRes: {status: number, text: string} = await forwardRequest<string>(gatewayToClicheRequest);
+    const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
+      gatewayToClicheRequest);
     res.status(clicheRes.status);
     res.send(clicheRes.text);
   } else {
@@ -251,7 +254,7 @@ function idToActionPath(id: string): string[] {
  *  Forwards to the cliche the given request.
  **/
 async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
-  : Promise<{status: number, text: T}> {
+  : Promise<ClicheResponse<T>> {
   if (gatewayRequest.path) {
     gatewayRequest.url += gatewayRequest.path;
   }
