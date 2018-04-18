@@ -53,9 +53,10 @@ function getDvConfig(): DvConfig {
   }
   const dvConfig: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
   console.log(`Using dv config ${JSON.stringify(dvConfig, undefined, 2)}`);
-  if (!dvConfig.actionTree) {
-    throw new Error('No action tree given');
-  }
+  // Temporarily deactivate txs
+  // if (!dvConfig.actionTree) {
+  //   throw new Error('No action tree given');
+  // }
   return dvConfig;
 }
 
@@ -202,20 +203,22 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
       JSON.stringify(dstTable, undefined, 2));
     return;
   }
-  const actionPath = getActionPath(gatewayRequest.from, projects);
-  if (!actionPathIsValid(actionPath, dvConfig.actionTree)) {
-    res.status(500).send(
-      `Invalid action path: ${actionPath}, my actionConfig is ` +
-      JSON.stringify(dvConfig.actionTree, undefined, 2));
-    return;
-  }
+  // Temporarily deactive txs
+  // const actionPath = getActionPath(gatewayRequest.from, projects);
+  // if (!actionPathIsValid(actionPath, dvConfig.actionTree)) {
+  //   res.status(500).send(
+  //     `Invalid action path: ${actionPath}, my actionConfig is ` +
+  //     JSON.stringify(dvConfig.actionTree, undefined, 2));
+  //   return;
+  // }
 
 
   const runId = gatewayRequest.runId;
   console.log(
     'Processing request:' + `to: ${to}, port: ${dstTable[to]}, ` +
-    `action path: ${actionPath}, runId: ${runId}` +
-    (isDvTx(actionPath) ? `, dvTxId: ${runId}` : ' not part of a tx'));
+    // Temporarily deactivate txs
+    /* `action path: ${actionPath}, */ `runId: ${runId}`);
+    // (isDvTx(actionPath) ? `, dvTxId: ${runId}` : ' not part of a tx'));
 
   const gatewayToClicheRequest = {
     ...gatewayRequest,
@@ -225,18 +228,24 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
      body: req.body
     }
   };
-  if (req.method === 'GET' || !isDvTx(actionPath)) {
-    const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
-      gatewayToClicheRequest);
-    res.status(clicheRes.status);
-    res.send(clicheRes.text);
-  } else {
-    if (!runId) {
-      throw new Error('run id undefined');
-    }
-    await txCoordinator.processMessage(
-        runId, actionPathToId(actionPath), gatewayToClicheRequest, res);
-  }
+  const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
+    gatewayToClicheRequest);
+  res.status(clicheRes.status);
+  res.send(clicheRes.text);
+
+  // Temporarily deactive txs
+  // if (req.method === 'GET' || !isDvTx(actionPath)) {
+  //   const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
+  //     gatewayToClicheRequest);
+  //   res.status(clicheRes.status);
+  //   res.send(clicheRes.text);
+  // } else {
+  //   if (!runId) {
+  //     throw new Error('run id undefined');
+  //   }
+  //   await txCoordinator.processMessage(
+  //       runId, actionPathToId(actionPath), gatewayToClicheRequest, res);
+  // }
 });
 
 
