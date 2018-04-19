@@ -117,7 +117,7 @@ const txConfig: TxConfig<
       res!.send(payload!.text);
     } else {
       res!.status(500);
-      res!.send('the tx this action is part of aborted');
+      res!.send('the tx that this action is part of aborted');
     }
   },
   sendToClient: (payload: ClicheResponse<string>, res?: express.Response) =>  {
