@@ -40,18 +40,18 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   @ViewChild(FormGroupDirective) form;
 
-  startsOn = new FormControl('', [Validators.required]);
-  endsOn = new FormControl('', [Validators.required]);
-  startTime = new FormControl('', [Validators.required]);
-  endTime = new FormControl('', [
-    Validators.required, endTimeValidator(() => this.startTime.value)
+  startsOnControl = new FormControl('', [Validators.required]);
+  endsOnControl = new FormControl('', [Validators.required]);
+  startTimeControl = new FormControl('', [Validators.required]);
+  endTimeControl = new FormControl('', [
+    Validators.required, endTimeValidator(() => this.startTimeControl.value)
   ]);
 
   createWeeklySeriesForm: FormGroup = this.builder.group({
-    startsOn: this.startsOn,
-    endsOn: this.endsOn,
-    startTime: this.startTime,
-    endTime: this.endTime
+    startsOn: this.startsOnControl,
+    endsOn: this.endsOnControl,
+    startTime: this.startTimeControl,
+    endTime: this.endTimeControl
   });
 
   createWeeklySeriesSaved = false;
@@ -121,8 +121,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   getSeriesEvents(): Event[] {
-    const startsOnDate: moment.Moment = this.startsOn.value;
-    const endsOnDate: moment.Moment = this.endsOn.value;
+    const startsOnDate: moment.Moment = this.startsOnControl.value;
+    const endsOnDate: moment.Moment = this.endsOnControl.value;
 
     const events = [];
     for (
@@ -130,8 +130,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
       eventDate.add(1, 'w')) {
 
       const e = {
-        startDate: toUnixTime(eventDate, this.startTime.value),
-        endDate: toUnixTime(eventDate, this.endTime.value),
+        startDate: toUnixTime(eventDate, this.startTimeControl.value),
+        endDate: toUnixTime(eventDate, this.endTimeControl.value),
         seriesId: this.id
       };
       events.push(e);
