@@ -48,7 +48,7 @@ export class CreateSeriesComponent implements OnInit {
         }`,
         variables: {
           input: {
-            id: this.id ? this.id : '',
+            id: this.id,
             events: this.seriesEvents
           }
         }
