@@ -168,7 +168,7 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
 
   console.log('Initialize dvconfig file');
   const initialConfig: DvConfig = {
-    name: name, watch: true, gatewayPort: GATEWAY_PORT
+    name: name, gateway: { name: "gateway", config: { wsPort: GATEWAY_PORT } }
   };
   writeFileOrFail(
     path.join(name, DVCONFIG_FILE_PATH),
@@ -194,7 +194,7 @@ export interface DvConfig {
   startServer?: boolean;
   watch?: boolean;
   config?: any;
-  gatewayPort?: number;
+  gateway?: DvConfig;
   usedCliches?: { [as: string]: DvConfig };
 }
 
