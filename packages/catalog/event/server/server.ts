@@ -175,15 +175,16 @@ const resolvers = {
         };
         inserts.push(e);
       }
+      const sortedInserts = _.sortBy(inserts, 'startDate');
       const newSeries: SeriesDoc = {
         id: seriesId,
-        startsOn: _.first(inserts).startDate,
-        endsOn: _.last(inserts).startDate,
-        eventIds: _.map(inserts, 'id')
+        startsOn: _.first(sortedInserts).startDate,
+        endsOn: _.last(sortedInserts).startDate,
+        eventIds: _.map(sortedInserts, 'id')
       };
 
       await Promise
-        .all([ events.insertMany(inserts), series.insertOne(newSeries)]);
+        .all([ events.insertMany(sortedInserts), series.insertOne(newSeries)]);
 
       return newSeries;
     }
