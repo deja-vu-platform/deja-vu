@@ -103,7 +103,7 @@ export class TxCoordinator<Message, Payload, State = any> {
 
     // no race condition here because the set of cohorts doesn't change after
     // initialization
-    // While we could deactive this check we still need to know the expected
+    // While we could deactivate this check we still need to know the expected
     // actions that make up a transaction so that we know when it's done
     const cohortIds =  _.map(tx.cohorts, 'id');
     if (!_.includes(cohortIds, cohortId)) {
