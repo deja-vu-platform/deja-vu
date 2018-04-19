@@ -9,6 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
+    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/*.ts",
     "package": "npm run build",
     "start": "node dist/gateway.js --configFilePath dvconfig.json",
     "clean": "rm -rf ./dist"
@@ -40,6 +41,7 @@
     "@types/minimist": "^1.2.0",
     "@types/mongodb": "^3.0.7",
     "@types/superagent": "^3.5.7",
+    "tslint": "~5.9.1",
     "typescript": "~2.5.3"
   }
 }
