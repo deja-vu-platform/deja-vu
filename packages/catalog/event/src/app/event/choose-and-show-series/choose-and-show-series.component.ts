@@ -6,7 +6,7 @@ import * as _ from 'lodash';
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
-import { Event, Series, fromUnixTime } from '../../../../shared/data';
+import { Event, fromUnixTime, Series } from '../../../../shared/data';
 
 import { ShowEventComponent } from '../show-event/show-event.component';
 
@@ -59,6 +59,7 @@ export class ChooseAndShowSeriesComponent implements OnInit {
           this.series = _.map(series, (series) => {
             series.startsOn = fromUnixTime(series.startsOn);
             series.endsOn = fromUnixTime(series.endsOn);
+
             return series;
           });
         });

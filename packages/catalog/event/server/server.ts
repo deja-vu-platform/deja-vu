@@ -153,7 +153,7 @@ const resolvers = {
       if (deletedEvent.seriesId) {
         const seriesUpdate = { $pull: { events: {id: id} } };
         await series
-          .update({id: deletedEvent.seriesId}, seriesUpdate);
+          .updateMany({id: deletedEvent.seriesId}, seriesUpdate);
       }
 
       return true;

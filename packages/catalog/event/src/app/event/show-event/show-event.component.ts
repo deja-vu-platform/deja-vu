@@ -59,6 +59,7 @@ export class ShowEventComponent implements OnChanges, OnInit {
     if (!(event.startDate && event.endDate)) {
       return false;
     }
+
     return event.startDate.isSame(event.endDate, 'day');
   }
 }

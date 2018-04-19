@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChooseAndShowSeriesComponent } from './choose-and-show-series.component';
+import {
+  ChooseAndShowSeriesComponent
+} from './choose-and-show-series.component';
 
 describe('ChooseAndShowSeriesComponent', () => {
   let component: ChooseAndShowSeriesComponent;
@@ -20,6 +22,7 @@ describe('ChooseAndShowSeriesComponent', () => {
   });
 
   it('should create', () => {
-    expect(component).toBeTruthy();
+    expect(component)
+      .toBeTruthy();
   });
 });
