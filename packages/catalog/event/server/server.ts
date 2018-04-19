@@ -106,15 +106,15 @@ const resolvers = {
   },
   Event: {
     id: (event: EventDoc) => event.id,
-    startDate: (event: EventDoc) => event.startDate.valueOf(),
-    endDate: (event: EventDoc) => event.endDate.valueOf(),
+    startDate: (event: EventDoc) => dateToUnixTime(event.startDate),
+    endDate: (event: EventDoc) => dateToUnixTime(event.endDate),
     series: (event: EventDoc) => series
       .findOne({ id: event.seriesId })
   },
   Series: {
     id: (series: SeriesDoc) => series.id,
-    startsOn: (series: SeriesDoc) => series.startsOn.valueOf(),
-    endsOn: (series: SeriesDoc) => series.endsOn.valueOf(),
+    startsOn: (series: SeriesDoc) => dateToUnixTime(series.startsOn),
+    endsOn: (series: SeriesDoc) => dateToUnixTime(series.endsOn),
     events: (series: SeriesDoc) => events
       .find({ id: { $in: series.eventIds } })
       .sort({ startDate: 1 })
@@ -191,8 +191,16 @@ const resolvers = {
   }
 };
 
+const MS_IN_S = 1000;
+
+// The JS Date object uses milliseconds since the Unix Epoch instead of
+// seconds
 function unixTimeToDate(unixTime: string | number): Date {
-  return new Date(Number(unixTime));
+  return new Date(Number(unixTime) * MS_IN_S);
+}
+
+function dateToUnixTime(date: Date): number {
+  return date.valueOf() / MS_IN_S;
 }
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });

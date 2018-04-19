@@ -17,7 +17,9 @@ export interface Series {
 export function toUnixTime(date: moment.Moment, time: string): number {
   const [hh, mm] = time.split(':');
   const ret = date.clone();
-  ret.add(hh, 'h').add(mm, 'm');
+  ret.add(hh, 'h')
+    .add(mm, 'm');
+
   return ret.unix();
 }
 

@@ -1,3 +1,5 @@
+# All dates are given in unix time (seconds since the Unix Epoch)
+
 type Event {
   id: ID!
   startDate: Int!
@@ -14,14 +16,14 @@ type Series {
 
 input CreateEventInput {
   id: ID
-  startDate: Int!  # unix time
+  startDate: Int!
   endDate: Int!
   seriesId: ID
 }
 
 input UpdateEventInput {
   id: ID!
-  startDate: Int # unix time
+  startDate: Int
   endDate: Int
 }
 
