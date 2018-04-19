@@ -1,12 +1,14 @@
-import * as express from 'express';
 import * as bodyParser from 'body-parser';
+import * as express from 'express';
 import * as minimist from 'minimist';
-import { readFileSync } from 'fs';
-import * as path from 'path';
-import * as _ from 'lodash';
 import * as request from 'superagent';
 
-import { TxCoordinator, TxConfig, Vote } from './txCoordinator';
+import { readFileSync } from 'fs';
+import * as path from 'path';
+
+import * as _ from 'lodash';
+
+import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
 
 interface Config {
@@ -36,6 +38,8 @@ interface DvConfig {
   actionTree: RootAction;
 }
 
+const JSON_INDENTATION = 2;
+
 const DEFAULT_CONFIG: Config = {
   dbHost: 'localhost',
   dbPort: 27017,
@@ -51,13 +55,14 @@ function getDvConfig(): DvConfig {
   if (!argv.configFilePath) {
     throw new Error('No dvconfig given!');
   }
-  const dvConfig: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
-  console.log(`Using dv config ${JSON.stringify(dvConfig, undefined, 2)}`);
+  const ret: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
+  console.log(`Using dv config ${stringify(ret)}`);
   // Temporarily deactivate txs
-  // if (!dvConfig.actionTree) {
+  // if (!ret.actionTree) {
   //   throw new Error('No action tree given');
   // }
-  return dvConfig;
+
+  return ret;
 }
 
 const dvConfig: DvConfig = getDvConfig();
@@ -72,6 +77,7 @@ function newReqWith(prepend: string, gcr: GatewayToClicheRequest)
   : GatewayToClicheRequest {
   const ret: GatewayToClicheRequest = _.clone(gcr);
   ret.path = prepend + ret.path;
+
   return ret;
 }
 
@@ -83,11 +89,11 @@ const txConfig: TxConfig<
   reinitDbOnStartup: config.reinitDbOnStartup,
   sendCommitToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
     return forwardRequest(newReqWith('/commit', gcr))
-      .then(unusedResp => undefined);
+      .then((unusedResp) => undefined);
   },
   sendAbortToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
     return forwardRequest(newReqWith('/abort', gcr))
-      .then(unusedResp => undefined);
+      .then((unusedResp) => undefined);
   },
   sendVoteToCohort: (gcr: GatewayToClicheRequest)
     : Promise<Vote<ClicheResponse<string>>> => {
@@ -98,7 +104,8 @@ const txConfig: TxConfig<
           result: resp.text.result,
           payload: { status: resp.status, text: resp.text.payload }
         };
-        console.log('Voted: ' + JSON.stringify(vote))
+        console.log(`Voted: ${stringify(vote)}`);
+
         return vote;
       });
   },
@@ -119,7 +126,7 @@ const txConfig: TxConfig<
   },
   getCohorts: (actionPathId: string) => {
     const actionPath = idToActionPath(actionPathId);
-    const pathToDvTxNode = _.takeWhile(actionPath, a => (a) !== 'dv-tx');
+    const pathToDvTxNode = _.takeWhile(actionPath, (a) => a !== 'dv-tx');
     pathToDvTxNode.push('dv-tx');
 
     // We know that the action path is a valid one because if otherwise the tx
@@ -145,11 +152,11 @@ const txCoordinator = new TxCoordinator<
   GatewayToClicheRequest, ClicheResponse<string>, express.Response>(txConfig);
 
 // Handle API requests
-// projects contains all keys in `usedCliches` plus the name of the current app
+// `projects` has all keys in `usedCliches` plus the name of the current app
 const projects: Set<string> = setOfUsedCliches(dvConfig);
 projects.add(dvConfig.name);
 
-// dstTable is a table of the form clicheAlias[-clicheAlias]* -> port
+// `dstTable` is a table of the form clicheAlias[-clicheAlias]* -> port
 // If cliche A is contained in cliche B the key for B in the dst table is A-B
 const dstTable = _.mapKeys(
   buildDstTable(dvConfig),
@@ -160,7 +167,9 @@ if (dvConfig.config && dvConfig.config.wsPort) {
 
 console.log(`Using dst table ${JSON.stringify(dstTable)}`);
 
-type Dict = {[key: string]: string};
+interface Dict {
+  [key: string]: string;
+}
 
 interface RequestOptions {
   params?: Dict;
@@ -190,7 +199,9 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
   };
   // Validate request
   if (!req.query.from) {
-    res.status(500).send('No from specified');
+    res.status(500)
+      .send('No from specified');
+
     return;
   }
   console.log(
@@ -198,9 +209,9 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
     JSON.stringify(Array.from(projects.values())));
   const to = getDst(dvConfig.name, gatewayRequest.from, projects);
   if (!(to in dstTable)) {
-    res.status(500).send(
-      `Invalid to: ${to}, my dstTable is ` +
-      JSON.stringify(dstTable, undefined, 2));
+    res.status(500)
+      .send(`Invalid to: ${to}, my dstTable is ${stringify(dstTable)}`);
+
     return;
   }
   // Temporarily deactive txs
@@ -261,7 +272,7 @@ function idToActionPath(id: string): string[] {
 
 /**
  *  Forwards to the cliche the given request.
- **/
+ */
 async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
   : Promise<ClicheResponse<T>> {
   if (gatewayRequest.path) {
@@ -279,6 +290,7 @@ async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
   clicheReq.send(gatewayRequest.body);
   const response: request.Response = await clicheReq;
   console.log(`Got back ${JSON.stringify(response)}`);
+
   return { status: response.status, text: JSON.parse(response.text) };
 }
 
@@ -295,7 +307,7 @@ txCoordinator.start()
   .then(() => {
     app.listen(port, async () => {
       console.log(`Running gateway on port ${port}`);
-      console.log(`Using config ${JSON.stringify(dvConfig, undefined, 2)}`);
+      console.log(`Using config ${stringify(dvConfig)}`);
       console.log(`Serving ${distFolder}`);
     });
   });
@@ -313,7 +325,7 @@ function actionPathIsValid(
 /**
  * Returns the ActionInfo corresponding to the last node of the action path or
  * undefined if none is found
- **/
+ */
 function getActionInfo(
   actionPath: string[], actionTree: RootAction): ActionInfo | undefined {
   if (_.isEmpty(actionPath) || actionPath[0] !== actionTree.rootName) {
@@ -342,19 +354,21 @@ function _getActionInfo(actionPath: string[], action: ActionInfo)
   if (!_.has(action.childActions, next)) {
     return;
   }
+
   return _getActionInfo(actionPath.slice(1), action.childActions![next]);
 }
 
-// returns an array [action_1, action_2, ..., action_n] representing an action
+// Returns an array [action_1, action_2, ..., action_n] representing an action
 // path from action_1 to action_n where action_n is the action that originated
 // the request.
 // Note: dv-* actions are included
 // In other words, it filters non-dv nodes from `from`
-function getActionPath(from: string[], projects: Set<string>): string[]{
+function getActionPath(from: string[], projects: Set<string>): string[] {
   return _.chain(from)
     .map((node) => node.toLowerCase())
     .filter((name) => {
       const project = name.split('-')[0];
+
       return projects.has(project) || project === 'dv';
     })
     .reverse()
@@ -365,13 +379,12 @@ function isDvTx(actionPath: string[]) {
   return _.includes(actionPath, 'dv-tx');
 }
 
-// from: originatingAction-action-....-action
+// `from`: originatingAction-action-....-action
 function getDst(thisProject: string, from: string[], projects: Set<string>)
   : string {
   let lastProjectSeen;
   const seenProjects: string[] = [];
   for (const node of from) {
-    // if you see dv-include break
     const name = node.toLowerCase();
     if (name === 'dv-include') {
       if (lastProjectSeen !== thisProject) {
@@ -385,10 +398,12 @@ function getDst(thisProject: string, from: string[], projects: Set<string>)
       lastProjectSeen = project;
     }
   }
-  return seenProjects.reverse().join('-');
+
+  return seenProjects.reverse()
+    .join('-');
 }
 
-function setOfUsedCliches(dvConfig: DvConfig): Set<string>{
+function setOfUsedCliches(dvConfig: DvConfig): Set<string> {
   const ret = new Set<string>();
   if (!dvConfig.usedCliches) {
     return ret;
@@ -401,6 +416,7 @@ function setOfUsedCliches(dvConfig: DvConfig): Set<string>{
       ret.add(usedUsedClicheKey);
     }
   }
+
   return ret;
 }
 
@@ -413,7 +429,13 @@ function buildDstTable(dvConfig: DvConfig): {[dst: string]: string} {
     const usedCliche = dvConfig.usedCliches[usedClicheKey];
     const usedClichesDstTable = _.mapKeys(
       buildDstTable(usedCliche), (unusedValue, k) => `${usedClicheKey}-${k}`);
-    _.assign(ret, usedClichesDstTable, {[usedClicheKey]: usedCliche.config.wsPort});
+    _.assign(
+      ret, usedClichesDstTable, {[usedClicheKey]: usedCliche.config.wsPort});
   }
+
   return ret;
+}
+
+function stringify(json: any) {
+  return JSON.stringify(json, undefined, JSON_INDENTATION);
 }

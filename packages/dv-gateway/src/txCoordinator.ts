@@ -1,6 +1,6 @@
-import { MongoClient, Collection } from 'mongodb';
 import * as AsyncLock from 'async-lock';
 import * as EventEmitter from 'events';
+import { Collection, MongoClient } from 'mongodb';
 
 import * as _ from 'lodash';
 
@@ -14,7 +14,7 @@ export interface TxConfig<Message, Payload, State = any> {
   dbPort: number;
   dbName: string;
   reinitDbOnStartup: boolean;
-  // msg is the original message processed
+  // `msg` is the original message processed
   // While the return value of these functions is ignored they should only
   // resolve to a value if the cohort responded to the commit/abort (only an
   // ACK is needed)
@@ -25,10 +25,11 @@ export interface TxConfig<Message, Payload, State = any> {
   /**
    * `causedAbort` is `true` if this is the client that caused the abort.
    * `payload` is `undefined` if the client never got to the point of voting.
-   **/
+   */
   sendAbortToClient: (
-    msg: Message, causedAbort: boolean, payload?: Payload, state?: State) => void;
-  // payload is what got returned in `sendVoteToCohort`
+    msg: Message, causedAbort: boolean, payload?: Payload,
+    state?: State) => void;
+  // `payload` is what got returned in `sendVoteToCohort`
   sendToClient: (payload: Payload, state?: State) => void;
 
   onError: (error: Error, msg: Message, state?: State) => void;
@@ -43,7 +44,7 @@ export interface Vote<Payload> {
 type TxState = (
   'voting' | 'committing' | 'committed' | 'aborting' | 'aborted');
 
-// cohorts can be in an additional state in which they voted and are now waiting
+// Cohorts can be in an additional state in which they voted and are now waiting
 // for a resolution
 type CohortState = TxState | 'waitingForCompletion';
 
@@ -71,11 +72,12 @@ interface Transition {
 // The time in seconds after which a transaction stuck in voting should abort
 // 10s should be the max https://www.nngroup.com/articles/website-response-times
 const TX_TIMEOUT_SECONDS = 10;
+const MS_IN_S = 1000;
 
 /**
  *  Coordinates between a set of participants on whether to commit or abort
  *  a transaction.
- **/
+ */
 export class TxCoordinator<Message, Payload, State = any> {
   // The tx id are used as the keys for locking
   private lock = new AsyncLock();
@@ -87,7 +89,7 @@ export class TxCoordinator<Message, Payload, State = any> {
 
   async start() {
     this.txs = await this.getTxsCollection();
-    setInterval(this.timeoutAbort.bind(this), TX_TIMEOUT_SECONDS * 1000);
+    setInterval(this.timeoutAbort.bind(this), TX_TIMEOUT_SECONDS * MS_IN_S);
   }
 
   async processMessage(
@@ -97,11 +99,12 @@ export class TxCoordinator<Message, Payload, State = any> {
       this.config.onError(
         new Error('TxCoordinator hasn\'t been started yet: call start()'),
         msg, state);
+
       return;
     }
     const tx: TxDoc<Message, Payload> = await this.getTx(txId, cohortId);
 
-    // no race condition here because the set of cohorts doesn't change after
+    // No race condition here because the set of cohorts doesn't change after
     // initialization
     // While we could deactivate this check we still need to know the expected
     // actions that make up a transaction so that we know when it's done
@@ -113,6 +116,7 @@ export class TxCoordinator<Message, Payload, State = any> {
           `[txId: ${txId}] ${cohortId} is not part of this tx. Cohorts are ` +
           JSON.stringify(cohortIds)),
         msg, state);
+
       return;
     }
 
@@ -124,12 +128,13 @@ export class TxCoordinator<Message, Payload, State = any> {
     // problems. The check here is mostly to save some unnecessary votes.
     if (this.shouldAbort(tx)) {
       this.config.sendAbortToClient(msg, false, undefined, state);
+
       return;
     }
 
-    // tx is 'voting'
+    // Tx state is 'voting'
 
-    // Here we are using mongodb to essentially lock on the txId and cohortId
+    // Here we are using mongodb to essentially lock on `txId` and `cohortId`
     // to detect duplicate requests and if o/w send the vote (so that we never
     // send a duplicate vote to a cohort)
     // If `cohorts.msg` is defined then this is a duplicate req
@@ -140,10 +145,11 @@ export class TxCoordinator<Message, Payload, State = any> {
         'cohorts.$.vote': undefined,
         'cohorts.$.state': 'voting'
       } });
-    if (update.matchedCount == 0) { // Duplicate request
+    if (update.matchedCount === 0) { // Duplicate request
       this.config.onError(
         new Error(`[txId: ${txId}] Duplicate message from ${cohortId}`),
         msg, state);
+
       return;
     }
     let vote: Vote<Payload>;
@@ -154,6 +160,7 @@ export class TxCoordinator<Message, Payload, State = any> {
       this.config.onError(
         new Error(`[txId: ${txId}] Sending vote to cohort ${cohortId} failed`),
         msg, state);
+
       return;
     }
     this.saveVote(txId, cohortId, vote);
@@ -170,7 +177,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     });
 
     let ret;
-    if (_.isEmpty(transition)) {  // tx was already aborting
+    if (_.isEmpty(transition)) {  // Tx was already aborting
       this.config.sendAbortToClient(msg, false, vote.payload, state);
       this.completed.emit(txId + '-abort');
       ret = this.completeMessage(txId, cohortId, msg, false);
@@ -183,7 +190,7 @@ export class TxCoordinator<Message, Payload, State = any> {
         this.completeMessage(txId, cohortId, msg, true)]);
     } else if (!transition.newTxState &&
                transition.newCohortState === 'waitingForCompletion') {
-      // nothing to do in this case since we are waiting
+      // Nothing to do in this case since we are waiting
     } else if (transition.newTxState === 'aborting') {
       this.config.sendAbortToClient(msg, true, vote.payload, state);
       this.completed.emit(txId + '-abort');
@@ -193,6 +200,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     } else {
       throw new Error('Invalid transition');
     }
+
     return ret;
   }
 
@@ -236,14 +244,14 @@ export class TxCoordinator<Message, Payload, State = any> {
         // state would be 'aborting'/'aborted'
         await this.updateTxState(txId, 'committing');
         ret.newTxState = 'committing';
-      } else { // we are not the last one
-        // wait on complete
+      } else { // We are not the last one
+        // Wait on complete
         this.completed.on(txId + '-commit', onCommit);
         this.completed.on(txId + '-abort', onAbort);
         await this.updateCohortState(txId, cohortId, 'waitingForCompletion');
         ret.newCohortState = 'waitingForCompletion';
       }
-    } else { // the vote was 'no'
+    } else { // The vote was 'no'
       if (vote.result !== 'no') {
         console.error(
           `[txId: ${txId}] Got a vote back that was not 'yes'/'no'. The
@@ -258,6 +266,7 @@ export class TxCoordinator<Message, Payload, State = any> {
       ret.newTxState = 'aborting';
       ret.newCohortState = 'waitingForCompletion';
     }
+
     return ret;
   }
 
@@ -295,14 +304,15 @@ export class TxCoordinator<Message, Payload, State = any> {
   /**
    *  Every time this function runs, it aborts active txs whose
    *  `startedOn + TX_TIMEOUT_SECONDS` time is less than the current time.
-   **/
+   */
   private async timeoutAbort() {
     const threshold = new Date();
     threshold.setSeconds(threshold.getSeconds() - TX_TIMEOUT_SECONDS);
-    const txsToAbort: {id: string}[] = await this.txs!.find<{id: string}>({
-      state: 'voting',
-      startedOn: { $lt: threshold }
-    }, { projection: { id: 1 } }).toArray();
+    const txsToAbort: {id: string}[] = await this.txs!
+      .find<{id: string}>(
+        { state: 'voting', startedOn: { $lt: threshold } },
+        { projection: { id: 1 } })
+      .toArray();
 
     console.log(
       `Found ${txsToAbort.length} transactions to abort due to timeout`);
@@ -316,12 +326,14 @@ export class TxCoordinator<Message, Payload, State = any> {
             }
             console.error(`[txId: ${txToAbort.id}] Aborting due to timeout`);
             await this.updateTxState(txToAbort.id, 'aborting');
+
             return true;
           })
           .then((shouldCompleteTx: boolean): Promise<any> | undefined => {
             if (shouldCompleteTx) {
               return this.completeTx(txToAbort.id, false);
             }
+
             return;
           });
       })
@@ -334,20 +346,21 @@ export class TxCoordinator<Message, Payload, State = any> {
     const completingState = success ? 'committing' : 'aborting';
     const send = success ? this.config.sendCommitToCohort :
       this.config.sendAbortToCohort;
+
     return this.updateCohortState(txId, cohortId, completingState)
-      .then(unused => send(msg))
-      .catch(e => {
+      .then((unused) => send(msg))
+      .catch((e) => {
         // TODO: handle errors
         console.error(e);
         throw new Error(
           `[txId: ${txId}] Sending commit/abort to ${cohortId} failed`);
       })
-      .then(unused => this.updateCohortState(txId, cohortId, completedState));
+      .then((unused) => this.updateCohortState(txId, cohortId, completedState));
   }
 
   private async completeTx(txId: string, success: boolean) {
     const completedState = success ? 'committed' : 'aborted';
-    const tx: { cohorts: { id: string, msg?: Message }[] }= (await this.txs!
+    const tx: { cohorts: { id: string, msg?: Message }[] } = (await this.txs!
       .findOne({ id: txId }, {
         projection: { 'cohorts.msg': 1, 'cohorts.id': 1 }}))!;
     await Promise.all(
@@ -356,8 +369,10 @@ export class TxCoordinator<Message, Payload, State = any> {
         if (cohort.state !== 'waitingForCompletion') {
           return;
         }
+
         return this.completeMessage(txId, cohort.id, cohort.msg!, success);
       }));
+
     return this.updateTxState(txId, completedState);
   }
 
@@ -372,6 +387,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     const txs = db.collection('txs');
     txs.createIndex({ id: 1 }, { unique: true });
     txs.createIndex({ 'cohorts.id': 1 });
+
     return txs;
   }
 }
