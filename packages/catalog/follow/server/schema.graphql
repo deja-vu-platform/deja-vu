@@ -1,35 +1,68 @@
-// Change
-type Source {
+type Follower {
   id: ID!,
-  ratings: [Rating]
+  follows: [Publisher]
 }
 
-type Target {
+type Publisher {
   id: ID!,
-  ratings: [Rating]
+  messages: [Message]
 }
 
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
+type Message {
+  id: ID!,
+  content: String!
 }
 
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
+input CreateMessageInput {
+  id: ID,
+  publisher: Publisher,
+  content: String!
+}
+
+# Show messages by a publisher (publisherId) OR
+# Show messages of publishers followed by a follower (followerId) OR
+# Show all messages
+input MessagesInput {
+  followerId: ID,
+  publisherId: ID
+}
+
+input EditFollowerInput {
+  oldId: ID!,
+  newId: ID!
+}
+
+input EditPublisherInput {
+  oldId: ID!,
+  newId: ID!
+}
+
+input EditMessageInput {
+  id: ID!,
+  content: String!
+}
+
+input FollowUnfollowInput {
+  followerId: ID!,
+  publisherId: ID!
 }
 
 type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  follower(id: ID!): Follower
+  followers(publisherId: ID): [Follower]
+  publisher(id: ID!): Publisher
+  publishers(followerId: ID): [Publisher]
+  message(id: ID!): Message
+  messages(input: MessagesInput!): [Message]
 }
 
 type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  createFollower(id: ID): Follower
+  createPublisher(id: ID): Publisher
+  createMessage(input: CreateMessageInput!): Message
+  editFollower(input: EditFollowerInput!): Boolean
+  editPublisher(input: EditPublisherInput!): Boolean
+  editMessage(input: EditMessageInput!): Boolean
+  follow(input: FollowUnfollowInput!): Boolean
+  unfollow(input: FollowUnfollowInput!): Boolean
 }
