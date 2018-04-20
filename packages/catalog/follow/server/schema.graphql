@@ -10,12 +10,13 @@ type Publisher {
 
 type Message {
   id: ID!,
+  publisher: Publisher!,
   content: String!
 }
 
 input CreateMessageInput {
   id: ID,
-  publisher: Publisher,
+  publisherId: ID!,
   content: String!
 }
 
@@ -39,6 +40,7 @@ input EditPublisherInput {
 
 input EditMessageInput {
   id: ID!,
+  publisher: Publisher!,
   content: String!
 }
 

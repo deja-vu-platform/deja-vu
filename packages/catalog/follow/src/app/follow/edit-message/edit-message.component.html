@@ -1,0 +1,41 @@
+<div class="container">
+  <button mat-button (click)="startEditing()" type="submit" *ngIf="!isEditing">
+    {{startEditButtonLabel}}
+  </button>
+  <form (ngSubmit)="onSubmit()" [formGroup]="editMessageForm" 
+    class="form-horizontal" *ngIf="isEditing">
+    <div class="form-group">
+      <div *ngIf="editMessageSaved" class="edit-message-success">
+        <i class="material-icons">done</i>
+        {{editMessageSavedText}}
+      </div>
+      <mat-error *ngIf="editMessageError">
+        <i class="material-icons">report_problem</i>
+        {{editMessageError}}
+      </mat-error>
+    </div>
+    <div class="form-group">
+      <mat-form-field>
+        <mat-label>{{inputLabel}}</mat-label>
+        <textarea matInput required formControlName="contentControl">
+          </textarea>
+      </mat-form-field>
+      <div *ngIf="contentControl.invalid && contentControl.touched">
+        <mat-error *ngIf="contentControl.hasError('required')">
+          This field is
+          <strong>required</strong>.
+        </mat-error>
+      </div>
+    </div>
+    <div class="form-group">
+      <button mat-button type="submit" [disabled]="!editMessageForm.valid">
+        {{buttonLabel}}
+      </button>
+    </div>
+    <div class="form-group">
+      <button mat-button (click)="stopEditing()" type="button">
+        {{stopEditButtonLabel}}
+      </button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,43 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="editPublisherForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="editPublisherSaved" class="edit-publisher-success">
+      <i class="material-icons">done</i>
+      {{editPublisherSavedText}}
+    </div>
+    <mat-error *ngIf="editPublisherError">
+      <i class="material-icons">report_problem</i>
+      {{editPublisherError}}
+    </mat-error>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{oldPublisherIdLabel}}</mat-label>
+      <input matInput required formControl="oldPublisherIdControl">
+    </mat-form-field>
+    <div *ngIf="oldPublisherIdControl.invalid && oldPublisherIdControl.touched">
+      <mat-error *ngIf="oldPublisherIdControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{newPublisherIdLabel}}</mat-label>
+      <input matInput required formControl="newPublisherIdControl">
+    </mat-form-field>
+    <div *ngIf="newPublisherIdControl.invalid && newPublisherIdControl.touched">
+      <mat-error *ngIf="newPublisherIdControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!editPublisherForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

@@ -25,6 +25,7 @@ interface PublisherDoc {
 
 interface MessageDoc {
   id: string;
+  publisherId: string;
   content: string;
 }
 
@@ -51,6 +52,7 @@ interface EditPublisherInput {
 
 interface EditMessageInput {
   id: string;
+  publisherId: string;
   content: string;
 }
 
@@ -181,23 +183,15 @@ const resolvers = {
         // Get messages by a specific publisher
         const publisher = await Validation.publisherExists(input.publisherId);
 
-        return messages.find({ id: { $in: publisher.messages } })
+        return messages.find({ publisherId: input.publisherId })
           .toArray();
 
       } else if (input.followerId) {
         // Gets messages of all the publishers followed by a follower
         const follower = await Validation.followerExists(input.followerId);
-        const followedPublishers = await publishers
-          .find({ id: { $in: follower.publisherIds } })
-          .toArray();
-
-        const messageIds: string[] = [];
-        for (const publisher of followedPublishers) {
-          messageIds.push.apply(messageIds, publisher.messageIds);
-        }
 
         return messages
-          .find({ id: { $in: messageIds } })
+          .find({ publisherId: { $in: follower.publisherIds } })
           .toArray();
 
       } else {
@@ -221,16 +215,17 @@ const resolvers = {
     Publisher: {
       id: (publisher: PublisherDoc) => publisher.id,
       messages: (publisher: PublisherDoc) => {
-        if (_.isEmpty(publisher.messageIds)) { return []; }
-
         return messages
-          .find({ id: { $in: publisher.messageIds } })
+          .find({ publisherId: publisher.id })
           .toArray();
       }
     },
 
     Message: {
       id: (message: MessageDoc) => message.id,
+      publisher: (message: MessageDoc) => {
+        return publishers.findOne({ id: message.publisherId });
+      },
       content: (message: MessageDoc) => message.content
     }
   },
@@ -253,18 +248,20 @@ const resolvers = {
 
     createMessage: async (root, { input }: { input: CreateMessageInput }) => {
       const messageId = input.id ? input.id : uuid();
-      const newMessage: MessageDoc = { id: messageId, content: input.content };
+      const newMessage: MessageDoc = {
+        id: messageId,
+        publisherId: input.publisherId,
+        content: input.content
+      };
       await messages.insertOne(newMessage);
-
-      const publisher = await Validation.publisherExists(input.publisherId);
-      const updateOperation = { $push: { messageIds: messageId } };
-      await publisher.findOneAndUpdate({ id: input.publisherId },
-        updateOperation);
 
       return newMessage;
     },
 
     editFollower: async (root, { input }: { input: EditFollowerInput }) => {
+      // Alternatively: delete doc and add new one
+      // TODO: throw error if old == new?
+
       await Validation.followerExists(input.oldId);
       const updateOperation = { $set: { id: input.newId } };
       await followers.findOneAndUpdate({ id: input.oldId }, updateOperation);
@@ -275,15 +272,22 @@ const resolvers = {
     editPublisher: async (root, { input }: { input: EditPublisherInput }) => {
       await Validation.publisherExists(input.oldId);
 
+      // TODO: throw error if old == new?
+
       // Update publisherIds of Followers
       const publisherUpdate = {
-        $pull: { follows: { id: input.oldId } },
-        $push: { follows: { id: input.newId } }
+        $pull: { publisherIds: { id: input.oldId } },
+        $push: { publisherIds: { id: input.newId } }
       };
       await followers
         .updateMany({ publisherIds: input.oldId }, publisherUpdate);
 
-      // Update followers db
+      // Update messages db
+      const msgUpdateOperation = { $set: { publisherId: input.newId } };
+      await messages
+        .updateMany({ publisherId: input.oldId }, msgUpdateOperation);
+
+      // Update publishers db
       const updateOperation = { $set: { id: input.newId } };
       await publishers.findOneAndUpdate({ id: input.oldId }, updateOperation);
 
@@ -291,8 +295,15 @@ const resolvers = {
     },
 
     editMessage: async (root, { input }: { input: EditMessageInput }) => {
-      // TODO: Only let publishers edit messages
-      await Validation.messageExists(input.id);
+      const [message, publisher] = await Promise.all([
+        Validation.messageExists(input.id),
+        Validation.publisherExists(input.publisherId)
+      ]);
+
+      if (message.publisherId !== input.publisherId) {
+        throw new Error('Only the publisher of the message can edit it.');
+      }
+
       const updateOperation = { $set: { content: input.content } };
       await messages.findOneAndUpdate({ id: input.id }, updateOperation);
 
@@ -305,8 +316,9 @@ const resolvers = {
         Validation.publisherExists(input.publisherId)
       ]);
 
-      const updateOperation = {$push: {follows: {id: input.publisherId}}};
-      await followers.findOneAndUpdate({id: input.followerId}, updateOperation);
+      const updateOperation = { $push: { follows: { id: input.publisherId } } };
+      await followers
+        .findOneAndUpdate({ id: input.followerId }, updateOperation);
     },
 
     unfollow: async (root, { input }: { input: FollowUnfollowInput }) => {
@@ -315,8 +327,9 @@ const resolvers = {
         Validation.publisherExists(input.publisherId)
       ]);
 
-      const updateOperation = {$pull: {follows: {id: input.publisherId}}};
-      await followers.findOneAndUpdate({id: input.followerId}, updateOperation);
+      const updateOperation = { $pull: { follows: { id: input.publisherId } } };
+      await followers
+        .findOneAndUpdate({ id: input.followerId }, updateOperation);
     }
   }
 };

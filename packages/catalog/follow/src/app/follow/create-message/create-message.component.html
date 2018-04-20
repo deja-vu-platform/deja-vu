@@ -1,0 +1,30 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="createMessageForm"
+ class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newFollowerSaved" class="create-follower-success">
+      <i class="material-icons">done</i>
+      {{newFollowerSavedText}}
+    </div>
+    <mat-error *ngIf="newFollowerError">
+      <i class="material-icons">report_problem</i>
+      {{newFollowerError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <textarea matInput required formControlName="contentControl">
+      </textarea>
+    </mat-form-field>
+    <div *ngIf="contentControl.invalid && contentControl.touched">
+      <mat-error *ngIf="contentControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!createMessageForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>
