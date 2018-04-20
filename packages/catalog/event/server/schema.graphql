@@ -9,8 +9,8 @@ type Event {
 
 type Series {
   id: ID!
-  startsOn: Int
-  endsOn: Int
+  startsOn: Int!
+  endsOn: Int!
   events: [Event!]!
 }
 
