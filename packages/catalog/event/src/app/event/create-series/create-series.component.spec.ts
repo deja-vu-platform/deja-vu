@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NewWeeklyEventComponent } from './new-weekly-event.component';
+import { CreateSeriesComponent } from './create-series.component';
 
-describe('NewWeeklyEventComponent', () => {
-  let component: NewWeeklyEventComponent;
-  let fixture: ComponentFixture<NewWeeklyEventComponent>;
+describe('CreateSeriesComponent', () => {
+  let component: CreateSeriesComponent;
+  let fixture: ComponentFixture<CreateSeriesComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ NewWeeklyEventComponent ]
+      declarations: [ CreateSeriesComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(NewWeeklyEventComponent);
+    fixture = TestBed.createComponent(CreateSeriesComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
