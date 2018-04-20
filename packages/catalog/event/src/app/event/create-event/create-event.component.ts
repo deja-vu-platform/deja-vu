@@ -35,19 +35,19 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   @ViewChild(FormGroupDirective) form;
 
-  startsOn = new FormControl('', [Validators.required]);
-  endsOn = new FormControl('', [Validators.required]);
-  startTime = new FormControl('', [Validators.required]);
-  endTime = new FormControl('', [
+  startsOnControl = new FormControl('', [Validators.required]);
+  endsOnControl = new FormControl('', [Validators.required]);
+  startTimeControl = new FormControl('', [Validators.required]);
+  endTimeControl = new FormControl('', [
     Validators.required,
-    endTimeValidator(() => this.startTime.value)
+    endTimeValidator(() => this.startTimeControl.value)
   ]);
 
   createEventForm: FormGroup = this.builder.group({
-    startsOn: this.startsOn,
-    endsOn: this.endsOn,
-    startTime: this.startTime,
-    endTime: this.endTime
+    startsOn: this.startsOnControl,
+    endsOn: this.endsOnControl,
+    startTime: this.startTimeControl,
+    endTime: this.endTimeControl
   });
 
   createEventSaved = false;
@@ -78,9 +78,11 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
         }`,
         variables: {
           input: {
-            id: this.id ? this.id : '',
-            startDate: toUnixTime(this.startsOn.value, this.startTime.value),
-            endDate: toUnixTime(this.endsOn.value, this.endTime.value)
+            id: this.id,
+            startDate: toUnixTime(
+              this.startsOnControl.value, this.startTimeControl.value),
+            endDate: toUnixTime(
+              this.endsOnControl.value, this.endTimeControl.value)
           }
         }
       })
