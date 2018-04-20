@@ -1,0 +1,43 @@
+<h3 class="mat-dialog-title">Sign Up</h3>
+
+<mat-dialog-content>
+  <dv-tx>
+    <dv-id (id)="userId=$event"></dv-id>
+    <property-create-object
+      dvOf="profile"
+      [id]="userId"
+      [showOptionToSubmit]="false">
+    </property-create-object>
+
+    <authentication-register-user [id]="userId">
+    </authentication-register-user>
+    <authorization-create-principal [id]="userId" [hidden]="true">
+    </authorization-create-principal>
+
+    <market-create-party
+      [id]="userId"
+      [hidden]="true"
+      (party)="partyId=$event.id">
+    </market-create-party>
+
+    <rating-create-source
+      [id]="userId"
+      [hidden]="true">
+    </rating-create-source>
+    <rating-create-target
+      [id]="userId"
+      [hidden]="true">
+    </rating-create-target>
+
+    <task-create-assignee
+      [id]="userId"
+      [hidden]="true">
+    </task-create-assignee>
+    <task-create-assigner
+      [id]="userId"
+      [hidden]="true">
+    </task-create-assigner>
+
+    <dv-link href="/dashboard" [hidden]="true"></dv-link>
+  </dv-tx>
+</mat-dialog-content>

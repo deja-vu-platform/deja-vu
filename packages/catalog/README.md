@@ -99,6 +99,10 @@ createGoodForm: FormGroup = this.builder.group({
 });
 ```
 
+- When using custom form controls as shown above, since we also need an
+  `@Input()` for the same field `foo`, declare the variable for the custom form
+  control as `fooControl = new FormControl()`.
+
 - `create-*` actions should have a `save` option to determine whether the
   entity being created has to be saved in the database or not. This way, with
   `[save]=false` the action can be used to create local objects.
