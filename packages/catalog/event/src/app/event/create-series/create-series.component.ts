@@ -26,6 +26,7 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class CreateSeriesComponent implements OnInit {
   @Input() id: string | undefined = '';
   @Input() seriesEvents: Event[] = [];
+  @Input() seriesEventsIds: string[] = [];
 
   private gs: GatewayService;
 
@@ -49,7 +50,12 @@ export class CreateSeriesComponent implements OnInit {
         variables: {
           input: {
             id: this.id,
-            events: this.seriesEvents
+            events: _.zipWith(
+              this.seriesEvents, this.seriesEventsIds, (evt, id) => {
+              evt.id = id;
+
+              return evt;
+            })
           }
         }
       })
