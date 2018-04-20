@@ -1,12 +1,25 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  ViewChild
 } from '@angular/core';
 import {
-   AllocatorService, AllocatorServiceFactory
-} from '../shared/allocator.service';
+  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
+  Validators
+} from '@angular/forms';
 
-import { OnRun, RunService } from 'dv-core';
+import {
+  GatewayService, GatewayServiceFactory, OnRun, RunService
+} from 'dv-core';
 
+import { Observable } from 'rxjs/Observable';
+import { map, take } from 'rxjs/operators';
+
+interface ConsumerOfResourceRes {
+  data: {consumerOfResource: string};
+}
+
+const GRAPHQL_ENDPOINT = '/graphql';
+const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
   selector: 'allocator-edit-consumer',
@@ -16,18 +29,45 @@ import { OnRun, RunService } from 'dv-core';
 export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
   @Input() resourceId: string;
   @Input() allocationId: string;
-  @Output() currentConsumer = new EventEmitter();
-  selectedConsumerId: string;
-  currentConsumerId: string;
-  consumers = [];
-  private allocator: AllocatorService;
+  @Input() buttonLabel = 'Save';
+  @Input() inputLabel = 'Id';
+
+  @ViewChild(FormGroupDirective) form;
+
+  newConsumerControl = new FormControl('', [
+    Validators.required,
+    (control: AbstractControl): {[key: string]: any} => {
+      if (!this._currentConsumerId ||
+        control.value === this._currentConsumerId) {
+        return { noChange: this._currentConsumerId  };
+      }
+
+      return null;
+    }
+  ]);
+  editConsumerForm: FormGroup = this.builder.group({
+    newConsumerControl: this.newConsumerControl
+  });
+
+  @Input() set newConsumerId(id: string) {
+    this.newConsumerControl.setValue(id);
+  }
+  @Output() currentConsumerId = new EventEmitter();
+  _currentConsumerId: string;
+
+  editConsumerSavedText = 'Saved';
+  editConsumerSaved = false;
+  editConsumerError: string;
+
+  private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private asf: AllocatorServiceFactory,
-    private rs: RunService) {}
+    private elem: ElementRef,
+    private gsf: GatewayServiceFactory,
+    private rs: RunService, private builder: FormBuilder) {}
 
   ngOnInit() {
-    this.allocator = this.asf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.update();
   }
@@ -37,33 +77,64 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
   }
 
   update() {
-    if (this.resourceId && this.allocationId) {
-      this.allocator
-        .consumerOfResource(this.resourceId, this.allocationId)
-        .subscribe((consumer) => {
-          this.currentConsumer.emit(consumer);
-          this.selectedConsumerId = consumer.id;
-          this.currentConsumerId = this.selectedConsumerId;
-        });
-      this.allocator
-        .consumers(this.allocationId)
-        .subscribe((consumers) => {
-          this.consumers = consumers;
+    if (this.gs && this.resourceId && this.allocationId) {
+      this.gs.get<ConsumerOfResourceRes>(GRAPHQL_ENDPOINT, {
+        params: {
+          query: `query {
+            consumerOfResource(
+              resourceId: "${this.resourceId}",
+              allocationId: "${this.allocationId}")
+          }`
+          }
+        })
+        .pipe(map((res) => res.data.consumerOfResource))
+        .subscribe((consumerId) => {
+          this.currentConsumerId.emit(consumerId);
+          this._currentConsumerId = consumerId;
+          this.newConsumerControl.setValue(consumerId);
         });
     }
   }
 
-  updateConsumer() {
+  onSubmit() {
     this.rs.run(this.elem);
   }
 
-  dvOnRun() {
-    if (this.currentConsumerId !== this.selectedConsumerId) {
-      console.log(`Updating consumer to ${this.selectedConsumerId}`);
-      this.allocator
-        .editConsumerOfResource(
-          this.resourceId, this.allocationId, this.selectedConsumerId)
-        .subscribe((unused) => {});
+  async dvOnRun() {
+    if (this.newConsumerControl.value === this._currentConsumerId) {
+      return;
     }
+    const newConsumerId = this.newConsumerControl.value;
+    const res = await this.gs
+      .post<{ data: { editConsumerOfResource: boolean }}>(GRAPHQL_ENDPOINT, {
+        query: `
+          mutation {
+            editConsumerOfResource(
+              resourceId: "${this.resourceId}",
+              allocationId: "${this.allocationId}",
+              newConsumerId: "${newConsumerId}")
+          }
+        `
+      })
+      .toPromise();
+    if (res.data.editConsumerOfResource) {
+      this._currentConsumerId = newConsumerId;
+    }
+  }
+
+  dvOnAfterCommit() {
+    this.editConsumerSaved = true;
+    window.setTimeout(() => {
+      this.editConsumerSaved = false;
+    }, SAVED_MSG_TIMEOUT);
+
+    if (this.form) {
+      this.form.resetForm();
+      this.newConsumerControl.setValue(this._currentConsumerId);
+    }
+  }
+
+  dvOnAfterAbort(reason: Error) {
+    this.editConsumerError = reason.message;
   }
 }

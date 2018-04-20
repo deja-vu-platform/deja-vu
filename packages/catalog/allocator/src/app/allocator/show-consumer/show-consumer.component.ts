@@ -1,28 +1,39 @@
 import {
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
 } from '@angular/core';
-import {
-   AllocatorService, AllocatorServiceFactory
-} from '../shared/allocator.service';
 
+
+import {
+  GatewayService, GatewayServiceFactory, OnRun, RunService
+} from 'dv-core';
+import { Observable } from 'rxjs/Observable';
+import { map, take } from 'rxjs/operators';
+
+interface ConsumerOfResourceRes {
+  data: {consumerOfResource: string};
+}
+
+const GRAPHQL_ENDPOINT = '/graphql';
 
 @Component({
   selector: 'allocator-show-consumer',
-  template: '{{consumerObj.id}}'
+  template: '{{_consumerId}}'
 })
 export class ShowConsumerComponent implements OnChanges, OnInit {
   @Input() resourceId: string;
   @Input() allocationId: string;
-  @Output() consumer = new EventEmitter();
-  consumerObj = {id: ''};
-  private allocator: AllocatorService;
+  @Output() consumerId = new EventEmitter();
+  _consumerId: string;
+  private gs: GatewayService;
 
   constructor(
     private elem: ElementRef,
-    private asf: AllocatorServiceFactory) {}
+    private gsf: GatewayServiceFactory,
+    private rs: RunService) {}
 
   ngOnInit() {
-    this.allocator = this.asf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
     this.update();
   }
 
@@ -31,13 +42,21 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
   }
 
   update() {
-    if (this.allocator && this.resourceId && this.allocationId) {
-      this.allocator
-        .consumerOfResource(this.resourceId, this.allocationId)
-        .subscribe((consumer) => {
-          this.consumer.emit(consumer);
-          this.consumerObj = consumer;
-        });
+    if (this.gs && this.resourceId && this.allocationId) {
+      this.gs.get<ConsumerOfResourceRes>(GRAPHQL_ENDPOINT, {
+        params: {
+          query: ` query {
+             consumerOfResource(
+               resourceId: "${this.resourceId}",
+               allocationId: "${this.allocationId}")
+          }`
+        }
+      })
+      .pipe(map((res) => res.data.consumerOfResource))
+      .subscribe((consumerId) => {
+        this._consumerId = consumerId;
+        this.consumerId.emit(consumerId);
+      });
     }
   }
 }

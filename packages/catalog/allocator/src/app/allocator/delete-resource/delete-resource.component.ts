@@ -2,12 +2,18 @@ import {
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
   SimpleChanges
 } from '@angular/core';
+
 import {
-   AllocatorService, AllocatorServiceFactory
-} from '../shared/allocator.service';
+  GatewayService, GatewayServiceFactory, OnRun, RunService
+} from 'dv-core';
+import { Observable } from 'rxjs/Observable';
+import { map, take } from 'rxjs/operators';
 
-import { OnRun, RunService } from 'dv-core';
+interface DeleteResourceRes {
+  data: {deleteResource: boolean};
+}
 
+const GRAPHQL_ENDPOINT = '/graphql';
 
 @Component({
   selector: 'allocator-delete-resource',
@@ -15,36 +21,54 @@ import { OnRun, RunService } from 'dv-core';
   styleUrls: ['./delete-resource.component.css']
 })
 export class DeleteResourceComponent implements OnInit, OnChanges {
-  @Input() id: string;
-  idChange = new EventEmitter();
+  @Input() resourceId: string;
+  @Input() allocationId: string;
+  resourceIdChange = new EventEmitter();
+  allocationIdChange = new EventEmitter();
 
-  private allocator: AllocatorService;
+  private gs: GatewayService;
 
   constructor(
     private elem: ElementRef,
-    private asf: AllocatorServiceFactory,
+    private gsf: GatewayServiceFactory,
     private rs: RunService) {}
 
   ngOnInit() {
-    this.allocator = this.asf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.id) {
-      this.idChange.emit();
+    if (changes.resourceId) {
+      this.resourceIdChange.emit();
+    }
+    if (changes.allocationId) {
+      this.allocationIdChange.emit();
     }
   }
 
   async dvOnRun(): Promise<any> {
-    if (this.id === undefined) {
-      await this.idChange.asObservable()
+    if (this.resourceId === undefined) {
+      await this.resourceIdChange.asObservable()
         .toPromise();
     }
-    console.log(`Delete resource with ${this.id}`);
+    if (this.allocationId === undefined) {
+      await this.allocationIdChange.asObservable()
+        .toPromise();
+    }
 
-    return this.allocator
-      .deleteResource(this.id)
+    return this.gs
+      .post<DeleteResourceRes>(GRAPHQL_ENDPOINT, {
+        query: `
+          mutation DeleteResource($resourceId: ID!, $allocationId: ID!) {
+            deleteResource(resourceId: $resourceId, allocationId: $allocationId)
+          }
+        `,
+        variables: {
+          resourceId: this.resourceId,
+          allocationId: this.allocationId
+        }
+      })
       .toPromise();
   }
 }

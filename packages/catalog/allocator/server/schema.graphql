@@ -1,32 +1,22 @@
 # When a new allocation is created, resources are distributed among
-# consumers in a round-robin fashion
+# consumers in a round-robin fashion.
 
 type Allocation {
   id: ID!
-  resources: [Resource],
-  consumers: [Consumer]
-}
-
-type Resource {
-  id: ID!
-}
-
-type Consumer {
-  id: ID!
+  resourceIds: [ID!],
+  consumerIds: [ID!]
 }
 
 type Query {
   allocation(id: ID!): Allocation
-  resources: [Resource]
-  consumers: [Consumer]
-  consumerOfResource(resourceId: ID!, allocationId: ID!): Consumer
+  consumerOfResource(resourceId: ID!, allocationId: ID!): ID
 }
 
 type Mutation {
   editConsumerOfResource(
       resourceId: ID!, allocationId: ID!, newConsumerId: ID!): Boolean
   # Creates a new allocation of the given resources and all existing consumers
-  createAllocation(id: ID, resourceIds: [ID!], saveResources: Boolean): Allocation
-  createResource(id: ID): Resource
-  deleteResource(id: ID): Resource
+  createAllocation(id: ID, resourceIds: [ID!], consumerIds: [ID!]): Allocation
+  # Removes the given resource from the allocation
+  deleteResource(resourceId: ID!, allocationId: ID!): Boolean
 }

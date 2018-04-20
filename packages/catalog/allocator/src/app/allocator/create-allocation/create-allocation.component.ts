@@ -2,15 +2,18 @@ import {
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
   SimpleChanges
 } from '@angular/core';
-import {
-  AllocatorService, AllocatorServiceFactory
-} from '../shared/allocator.service';
 
-import { OnRun, RunService } from 'dv-core';
-import { take } from 'rxjs/operators';
+import {
+  GatewayService, GatewayServiceFactory, OnRun, RunService
+} from 'dv-core';
+import { Observable } from 'rxjs/Observable';
+import { map, take } from 'rxjs/operators';
 
 import * as _ from 'lodash';
 
+interface CreateAllocationRes {
+  data: {createAllocation: {id: string}};
+}
 
 @Component({
   selector: 'allocator-create-allocation',
@@ -18,30 +21,34 @@ import * as _ from 'lodash';
 })
 export class CreateAllocationComponent implements OnInit, OnChanges {
   @Input() id: string;
-  @Input() resources: [{id: string}]; // Required
-  @Input() saveResources = false;
+  @Input() resourceIds: string[]; // Required
+  @Input() consumerIds: string[]; // Required
 
   @Input() buttonLabel = 'Create Allocation';
 
   @Output() allocation = new EventEmitter();
 
-  resourcesChange = new EventEmitter();
+  resourceIdsChange = new EventEmitter();
+  consumerIdsChange = new EventEmitter();
 
-  private allocator: AllocatorService;
+  private gs: GatewayService;
 
   constructor(
     private elem: ElementRef,
-    private asf: AllocatorServiceFactory,
+    private gsf: GatewayServiceFactory,
     private rs: RunService) {}
 
   ngOnInit() {
-    this.allocator = this.asf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.resources || changes.newResources) {
-      this.resourcesChange.emit(null);
+    if (changes.resourceIds) {
+      this.resourceIdsChange.emit(null);
+    }
+    if (changes.consumerIds) {
+      this.consumerIdsChange.emit(null);
     }
   }
 
@@ -50,17 +57,37 @@ export class CreateAllocationComponent implements OnInit, OnChanges {
   }
 
   async dvOnRun() {
-    if (this.resources === undefined) {
-      await this.resourcesChange.asObservable()
+    if (this.resourceIds === undefined) {
+      await this.resourceIdsChange.asObservable()
+        .pipe(take(1))
+        .toPromise();
+    }
+    if (this.consumerIds === undefined) {
+      await this.consumerIdsChange.asObservable()
         .pipe(take(1))
         .toPromise();
     }
     console.log(`Create allocation with ${this.id}`);
-    const resourceIds = _.map(this.resources, 'id');
-    this.allocator
-      .createAllocation(this.id, resourceIds, this.saveResources)
-      .subscribe((allocation) => {
-        this.allocation.emit({id: allocation.id});
-      });
+    this.gs.post<CreateAllocationRes>('/graphql', {
+      query: `
+        mutation CreateAllocation(
+          $id: ID!, $resourceIds: [ID!], $consumerIds: [ID!]) {
+          createAllocation(
+            id: $id, resourceIds: $resourceIds,
+            consumerIds: $consumerIds) {
+            id
+          }
+        }
+      `,
+      variables: {
+        id: this.id,
+        resourceIds: this.resourceIds,
+        consumerIds: this.consumerIds
+      }
+    })
+    .pipe(map((res) => res.data.createAllocation))
+    .subscribe((allocation) => {
+      this.allocation.emit({ id: allocation.id });
+    });
   }
 }
