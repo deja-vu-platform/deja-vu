@@ -1,35 +1,162 @@
-import * as express from 'express';
 import * as bodyParser from 'body-parser';
+import * as express from 'express';
 import * as minimist from 'minimist';
-import { readFileSync } from 'fs';
-import * as path from 'path';
-import * as _ from 'lodash';
 import * as request from 'superagent';
 
+import { readFileSync } from 'fs';
+import * as path from 'path';
+
+import * as _ from 'lodash';
+
+import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
+
+
+interface Config {
+  dbHost: string;
+  dbPort: number;
+  wsPort: number;
+  dbName: string;
+  reinitDbOnStartup: boolean;
+}
+
+interface ActionInfo {
+  childActions?: {[childActionName: string]: ActionInfo};
+}
+
+interface RootAction {
+  rootName: string;
+  childActions?: {[childActionName: string]: ActionInfo};
+}
 
 interface DvConfig {
   name: string;
   startServer?: boolean;
   watch?: boolean;
   config?: any;
-  gatewayPort?: number;
+  gateway: { config: Config };
   usedCliches?: {[as: string]: DvConfig};
+  actionTree: RootAction;
 }
 
-// Get DvConfig
-const argv = minimist(process.argv);
-const configFilePath = argv.configFilePath;
-const dvConfig: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
-console.log(`Using dv config ${JSON.stringify(dvConfig, undefined, 2)}`);
+const JSON_INDENTATION = 2;
+
+const DEFAULT_CONFIG: Config = {
+  dbHost: 'localhost',
+  dbPort: 27017,
+  wsPort: 3000,
+  dbName: `gateway-db`,
+  reinitDbOnStartup: true
+};
+
+
+function getDvConfig(): DvConfig {
+  const argv = minimist(process.argv);
+  const configFilePath = argv.configFilePath;
+  if (!argv.configFilePath) {
+    throw new Error('No dvconfig given!');
+  }
+  const ret: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
+  console.log(`Using dv config ${stringify(ret)}`);
+  // Temporarily deactivate txs
+  // if (!ret.actionTree) {
+  //   throw new Error('No action tree given');
+  // }
+
+  return ret;
+}
+
+const dvConfig: DvConfig = getDvConfig();
+const config: Config = {...DEFAULT_CONFIG, ...dvConfig.gateway.config};
+
+interface ClicheResponse<T> {
+  status: number;
+  text: T;
+}
+
+function newReqWith(prepend: string, gcr: GatewayToClicheRequest)
+  : GatewayToClicheRequest {
+  const ret: GatewayToClicheRequest = _.clone(gcr);
+  ret.path = prepend + ret.path;
+
+  return ret;
+}
+
+const txConfig: TxConfig<
+  GatewayToClicheRequest, ClicheResponse<string>, express.Response> = {
+  dbHost: config.dbHost,
+  dbPort: config.dbPort,
+  dbName: config.dbName,
+  reinitDbOnStartup: config.reinitDbOnStartup,
+  sendCommitToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
+    return forwardRequest(newReqWith('/commit', gcr))
+      .then((unusedResp) => undefined);
+  },
+  sendAbortToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
+    return forwardRequest(newReqWith('/abort', gcr))
+      .then((unusedResp) => undefined);
+  },
+  sendVoteToCohort: (gcr: GatewayToClicheRequest)
+    : Promise<Vote<ClicheResponse<string>>> => {
+    return forwardRequest<Vote<string>>(newReqWith('/vote', gcr))
+      .then((resp: ClicheResponse<Vote<string>>)
+        : Vote<ClicheResponse<string>> => {
+        const vote = {
+          result: resp.text.result,
+          payload: { status: resp.status, text: resp.text.payload }
+        };
+        console.log(`Voted: ${stringify(vote)}`);
+
+        return vote;
+      });
+  },
+  sendAbortToClient: (
+    gcr: GatewayToClicheRequest, causedAbort: boolean,
+    payload?: ClicheResponse<string>, res?: express.Response) => {
+    if (causedAbort) {
+      res!.status(payload!.status);
+      res!.send(payload!.text);
+    } else {
+      res!.status(500);
+      res!.send('the tx that this action is part of aborted');
+    }
+  },
+  sendToClient: (payload: ClicheResponse<string>, res?: express.Response) =>  {
+    res!.status(payload.status);
+    res!.send(payload.text);
+  },
+  getCohorts: (actionPathId: string) => {
+    const actionPath = idToActionPath(actionPathId);
+    const pathToDvTxNode = _.takeWhile(actionPath, (a) => a !== 'dv-tx');
+    pathToDvTxNode.push('dv-tx');
+
+    // We know that the action path is a valid one because if otherwise the tx
+    // would have never been initiated in the first place
+    const dvTxNode = getActionInfo(pathToDvTxNode, dvConfig.actionTree)!;
+
+    const cohorts = _.map(
+      _.keys(dvTxNode.childActions), (actionName: string) => actionPathToId(
+        [...pathToDvTxNode, actionName]
+      ));
+
+    return cohorts;
+  },
+  onError: (e: Error, gcr: GatewayToClicheRequest, res?: express.Response) => {
+    console.error(e);
+    res!.status(500);
+    res!.send(e.message);
+  }
+};
 
 const app = express();
+const txCoordinator = new TxCoordinator<
+  GatewayToClicheRequest, ClicheResponse<string>, express.Response>(txConfig);
 
 // Handle API requests
-// projects contains all keys in `usedCliches` plus the name of the current app
+// `projects` has all keys in `usedCliches` plus the name of the current app
 const projects: Set<string> = setOfUsedCliches(dvConfig);
 projects.add(dvConfig.name);
 
-// dstTable is a table of the form clicheAlias[-clicheAlias]* -> port
+// `dstTable` is a table of the form clicheAlias[-clicheAlias]* -> port
 // If cliche A is contained in cliche B the key for B in the dst table is A-B
 const dstTable = _.mapKeys(
   buildDstTable(dvConfig),
@@ -40,7 +167,9 @@ if (dvConfig.config && dvConfig.config.wsPort) {
 
 console.log(`Using dst table ${JSON.stringify(dstTable)}`);
 
-type Dict = {[key: string]: string};
+interface Dict {
+  [key: string]: string;
+}
 
 interface RequestOptions {
   params?: Dict;
@@ -49,18 +178,30 @@ interface RequestOptions {
 
 interface GatewayRequest {
   from: string[];
-  path?: string;
+  runId?: string | undefined;
+  path?: string | undefined;
   options?: RequestOptions;
 }
 
-app.use('/api', bodyParser.json(), (req, res, next) => {
+interface GatewayToClicheRequest extends GatewayRequest {
+  url: string;
+  method: string;
+  body: string;
+}
+
+
+app.use('/api', bodyParser.json(), async (req, res, next) => {
   const gatewayRequest: GatewayRequest = {
     from: JSON.parse(req.query.from),
+    runId: req.query.runId,
     path: req.query.path,
     options: req.query.options ? JSON.parse(req.query.options) : undefined
   };
+  // Validate request
   if (!req.query.from) {
-    res.status(500).send('No from specified');
+    res.status(500)
+      .send('No from specified');
+
     return;
   }
   console.log(
@@ -68,17 +209,76 @@ app.use('/api', bodyParser.json(), (req, res, next) => {
     JSON.stringify(Array.from(projects.values())));
   const to = getDst(dvConfig.name, gatewayRequest.from, projects);
   if (!(to in dstTable)) {
-    res.status(500).send(
-      `Invalid to: ${to}, my dstTable is ` +
-      JSON.stringify(dstTable, undefined, 2));
+    res.status(500)
+      .send(`Invalid to: ${to}, my dstTable is ${stringify(dstTable)}`);
+
     return;
   }
-  console.log(`to:${to}, port: ${dstTable[to]}`);
-  let url = `http://localhost:${dstTable[to]}`;
+  // Temporarily deactive txs
+  // const actionPath = getActionPath(gatewayRequest.from, projects);
+  // if (!actionPathIsValid(actionPath, dvConfig.actionTree)) {
+  //   res.status(500).send(
+  //     `Invalid action path: ${actionPath}, my actionConfig is ` +
+  //     JSON.stringify(dvConfig.actionTree, undefined, 2));
+  //   return;
+  // }
+
+
+  const runId = gatewayRequest.runId;
+  console.log(
+    'Processing request:' + `to: ${to}, port: ${dstTable[to]}, ` +
+    // Temporarily deactivate txs
+    /* `action path: ${actionPath}, */ `runId: ${runId}`);
+    // (isDvTx(actionPath) ? `, dvTxId: ${runId}` : ' not part of a tx'));
+
+  const gatewayToClicheRequest = {
+    ...gatewayRequest,
+    ...{
+     url: `http://localhost:${dstTable[to]}`,
+     method: req.method,
+     body: req.body
+    }
+  };
+  const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
+    gatewayToClicheRequest);
+  res.status(clicheRes.status);
+  res.send(clicheRes.text);
+
+  // Temporarily deactive txs
+  // if (req.method === 'GET' || !isDvTx(actionPath)) {
+  //   const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
+  //     gatewayToClicheRequest);
+  //   res.status(clicheRes.status);
+  //   res.send(clicheRes.text);
+  // } else {
+  //   if (!runId) {
+  //     throw new Error('run id undefined');
+  //   }
+  //   await txCoordinator.processMessage(
+  //       runId, actionPathToId(actionPath), gatewayToClicheRequest, res);
+  // }
+});
+
+
+const ACTION_PATH_SEP = ':';
+
+function actionPathToId(actionPath: string[]): string {
+  return actionPath.join(ACTION_PATH_SEP);
+}
+
+function idToActionPath(id: string): string[] {
+  return id.split(ACTION_PATH_SEP);
+}
+
+/**
+ *  Forwards to the cliche the given request.
+ */
+async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
+  : Promise<ClicheResponse<T>> {
   if (gatewayRequest.path) {
-    url += gatewayRequest.path;
+    gatewayRequest.url += gatewayRequest.path;
   }
-  let clicheReq = request(req.method, url);
+  let clicheReq = request(gatewayRequest.method, gatewayRequest.url);
   if (gatewayRequest.options) {
     if (gatewayRequest.options.params) {
       clicheReq = clicheReq.query(gatewayRequest.options.params);
@@ -87,19 +287,12 @@ app.use('/api', bodyParser.json(), (req, res, next) => {
       clicheReq = clicheReq.set(gatewayRequest.options.headers);
     }
   }
-  clicheReq.send(req.body);
-  clicheReq.end((clicheErr, clicheRes) => {
-    if (clicheErr) {
-      console.log(`Got back ${JSON.stringify(clicheErr)}`);
-      const send = clicheErr.text ? clicheErr.text : clicheErr.response.text;
-      res.status(clicheErr.status).send(send);
-    } else {
-      console.log(`Got back ${JSON.stringify(clicheRes)}`);
-      const send = clicheRes.text ? clicheRes.text : clicheErr.response.text;
-      res.status(clicheRes.status).send(send);
-    }
-  });
-});
+  clicheReq.send(gatewayRequest.body);
+  const response: request.Response = await clicheReq;
+  console.log(`Got back ${JSON.stringify(response)}`);
+
+  return { status: response.status, text: JSON.parse(response.text) };
+}
 
 // Serve SPA
 const distFolder = path.join(process.cwd(), 'dist');
@@ -109,23 +302,89 @@ app.get('*', ({}, res) => {
 });
 
 // Listen
-const port = dvConfig.gatewayPort;
-app.listen(port, () => {
-  console.log(`Running gateway on port ${port}`);
-  console.log(`Using config ${JSON.stringify(dvConfig, undefined, 2)}`);
-  console.log(`Serving ${distFolder}`);
-});
+const port = config.wsPort;
+txCoordinator.start()
+  .then(() => {
+    app.listen(port, async () => {
+      console.log(`Running gateway on port ${port}`);
+      console.log(`Using config ${stringify(dvConfig)}`);
+      console.log(`Serving ${distFolder}`);
+    });
+  });
 
 
-// Utility functions
+/**
+ *  Checks that the given `actionPath` corresponds to a valid path according
+ *  to `actionConfig`.
+ */
+function actionPathIsValid(
+  actionPath: string[], actionTree: RootAction): boolean {
+  return !!getActionInfo(actionPath, actionTree);
+}
 
-// from: originatingAction-action-....-action
+/**
+ * Returns the ActionInfo corresponding to the last node of the action path or
+ * undefined if none is found
+ */
+function getActionInfo(
+  actionPath: string[], actionTree: RootAction): ActionInfo | undefined {
+  if (_.isEmpty(actionPath) || actionPath[0] !== actionTree.rootName) {
+    return;
+  } else if (actionPath.length === 1) {
+    return actionTree;
+  }
+
+  return _getActionInfo(actionPath.slice(1), actionTree);
+}
+
+function _getActionInfo(actionPath: string[], action: ActionInfo)
+  : ActionInfo | undefined {
+  if (_.isEmpty(action.childActions)) {
+    return;
+  }
+  const next = actionPath[0];
+  if (actionPath.length === 1) {
+    if (_.has(action.childActions, next)) {
+      return action.childActions![next];
+    } else {
+      return;
+    }
+  }
+
+  if (!_.has(action.childActions, next)) {
+    return;
+  }
+
+  return _getActionInfo(actionPath.slice(1), action.childActions![next]);
+}
+
+// Returns an array [action_1, action_2, ..., action_n] representing an action
+// path from action_1 to action_n where action_n is the action that originated
+// the request.
+// Note: dv-* actions are included
+// In other words, it filters non-dv nodes from `from`
+function getActionPath(from: string[], projects: Set<string>): string[] {
+  return _.chain(from)
+    .map((node) => node.toLowerCase())
+    .filter((name) => {
+      const project = name.split('-')[0];
+
+      return projects.has(project) || project === 'dv';
+    })
+    .reverse()
+    .value();
+}
+
+function isDvTx(actionPath: string[]) {
+  return _.includes(actionPath, 'dv-tx');
+}
+
+// `from`: originatingAction-action-....-action
 function getDst(thisProject: string, from: string[], projects: Set<string>)
   : string {
   let lastProjectSeen;
   const seenProjects: string[] = [];
   for (const node of from) {
-    // if you see dv-include break
     const name = node.toLowerCase();
     if (name === 'dv-include') {
       if (lastProjectSeen !== thisProject) {
@@ -139,10 +398,12 @@ function getDst(thisProject: string, from: string[], projects: Set<string>)
       lastProjectSeen = project;
     }
   }
-  return seenProjects.reverse().join('-');
+
+  return seenProjects.reverse()
+    .join('-');
 }
 
-function setOfUsedCliches(dvConfig: DvConfig): Set<string>{
+function setOfUsedCliches(dvConfig: DvConfig): Set<string> {
   const ret = new Set<string>();
   if (!dvConfig.usedCliches) {
     return ret;
@@ -155,6 +416,7 @@ function setOfUsedCliches(dvConfig: DvConfig): Set<string>{
       ret.add(usedUsedClicheKey);
     }
   }
+
   return ret;
 }
 
@@ -167,7 +429,13 @@ function buildDstTable(dvConfig: DvConfig): {[dst: string]: string} {
     const usedCliche = dvConfig.usedCliches[usedClicheKey];
     const usedClichesDstTable = _.mapKeys(
       buildDstTable(usedCliche), (unusedValue, k) => `${usedClicheKey}-${k}`);
-    _.assign(ret, usedClichesDstTable, {[usedClicheKey]: usedCliche.config.wsPort});
+    _.assign(
+      ret, usedClichesDstTable, {[usedClicheKey]: usedCliche.config.wsPort});
   }
+
   return ret;
+}
+
+function stringify(json: any) {
+  return JSON.stringify(json, undefined, JSON_INDENTATION);
 }

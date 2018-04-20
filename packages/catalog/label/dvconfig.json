@@ -1,7 +1,10 @@
 {
   "name": "label",
-  "watch": true,
-  "gatewayPort": 3000,
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
   "config": {
     "wsPort": 3001
   },
