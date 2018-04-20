@@ -1,0 +1,46 @@
+<property-show-object
+  dvOf="profile"
+  [id]="id"
+  [hidden]="true"
+  (loadedObject)="profile=$event">
+</property-show-object>
+
+<table class="table">
+  <tbody>
+    <tr>
+      <th>Username</th>
+      <td>
+        <authentication-show-user [id]="id"></authentication-show-user>
+      </td>
+    </tr>
+    <tr>
+      <th>Full Name</th>
+      <td>{{profile?.firstName}} {{profile?.lastName}}</td>
+    </tr>
+    <tr>
+      <th>Email</th>
+      <td>{{profile?.email}}</td>
+    </tr>
+    <tr>
+      <th>Phone Number</th>
+      <td>{{profile?.phoneNumber}}</td>
+    </tr>
+    <tr>
+      <th>Birthday</th>
+      <td>{{profile?.birthday}}</td>
+    </tr>
+    <tr>
+      <th>Dorm</th>
+      <td>{{profile?.dorm}}</td>
+    </tr>
+    <tr>
+      <th>Rating</th>
+      <td>
+        <rating-show-average-rating [targetId]="id">
+        </rating-show-average-rating>
+        <!-- Note that the original GroceryShip differentiates between Requester 
+          and Shopper ratings, but this version does not. -->
+      </td>
+    </tr>
+  </tbody>
+</table>

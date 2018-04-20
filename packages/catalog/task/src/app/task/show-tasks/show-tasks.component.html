@@ -9,7 +9,7 @@
       }"
       [parent]="showTasks">
     </dv-include>
-    <div *ngIf="claimAssigneeId">
+    <div *ngIf="showOptionToClaim && claimAssigneeId">
       <task-claim-task [id]="task.id" [assigneeId]="claimAssigneeId">
       </task-claim-task>
     </div>

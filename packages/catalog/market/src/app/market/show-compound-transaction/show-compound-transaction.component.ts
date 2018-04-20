@@ -15,6 +15,7 @@ import { CompoundTransaction } from '../shared/market.model';
   styleUrls: ['./show-compound-transaction.component.css'],
 })
 export class ShowCompoundTransactionComponent {
+  @Input() id: string;
   @Input() compoundTransaction: CompoundTransaction;
 
   @Input() showId = true;
@@ -63,14 +64,14 @@ export class ShowCompoundTransactionComponent {
 
   loadCompoundTransaction() {
     // only load compound transaction when id is given
-    if (!this.gs || !this.compoundTransaction || !this.compoundTransaction.id) {
+    if (!this.gs || this.compoundTransaction || !this.id) {
       return;
     }
     this.gs.get<{data: {compoundTransaction: CompoundTransaction}}>('/graphql', {
       params: {
         query: `
           query {
-            compoundTransaction(id: "${this.compoundTransaction.id}") {
+            compoundTransaction(id: "${this.id}") {
               ${this.showId ? 'id' : ''}
               ${this.showTransactions ? 'transactions { id }' : ''}
               ${this.showTotalPrice ? 'totalPrice' : ''}

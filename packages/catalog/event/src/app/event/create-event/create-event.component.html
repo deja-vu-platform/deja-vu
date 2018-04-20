@@ -15,11 +15,10 @@
     <mat-form-field>
       <mat-label>Starts On</mat-label>
       <input matInput required [matDatepicker]="startsOnPicker"
-       [formControl]="startsOn"
-       name="startsOn">
+       [formControl]="startsOnControl">
       <mat-datepicker-toggle matSuffix [for]="startsOnPicker"></mat-datepicker-toggle>
       <mat-datepicker #startsOnPicker></mat-datepicker>
-      <mat-error *ngIf="startsOn.hasError('required')">
+      <mat-error *ngIf="startsOnControl.hasError('required')">
         Starts On date is <strong>required</strong>
       </mat-error>
     </mat-form-field>
@@ -28,9 +27,8 @@
     <mat-form-field>
       <mat-label>Start Time</mat-label>
       <input matInput required type="time"
-        [formControl]="startTime"
-        name="startTime">
-      <mat-error *ngIf="startTime.hasError('required')">
+        [formControl]="startTimeControl">
+      <mat-error *ngIf="startTimeControl.hasError('required')">
         Start Time is <strong>required</strong>
       </mat-error>
     </mat-form-field>
@@ -40,11 +38,10 @@
     <mat-form-field>
       <mat-label>Ends On</mat-label>
       <input matInput required [matDatepicker]="endsOnPicker"
-       [formControl]="endsOn"
-       name="endsOn">
+        [formControl]="endsOnControl">
       <mat-datepicker-toggle matSuffix [for]="endsOnPicker"></mat-datepicker-toggle>
       <mat-datepicker #endsOnPicker></mat-datepicker>
-      <mat-error *ngIf="endsOn.hasError('required')">
+      <mat-error *ngIf="endsOnControl.hasError('required')">
         Ends On date is <strong>required</strong>
       </mat-error>
     </mat-form-field>
@@ -53,18 +50,17 @@
     <mat-form-field>
       <mat-label>End Time</mat-label>
       <input matInput required type="time"
-        [formControl]="endTime"
-        name="endTime">
-      <mat-error *ngIf="endTime.hasError('required')">
+        [formControl]="endTimeControl">
+      <mat-error *ngIf="endTimeControl.hasError('required')">
         End Time is <strong>required</strong>
       </mat-error>
-      <mat-error *ngIf="endTime.hasError('endBeforeStart')">
+      <mat-error *ngIf="endTimeControl.hasError('endBeforeStart')">
         End Time should be <strong>after</strong> Start Time
       </mat-error>
     </mat-form-field>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
-    <button mat-button type="submit" 
+    <button mat-button type="submit"
       [disabled]="!createEventForm.valid">
         {{buttonLabel}}
     </button>
