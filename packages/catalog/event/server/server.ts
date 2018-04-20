@@ -34,8 +34,8 @@ interface CreateEventInput {
 
 interface UpdateEventInput {
   id: string;
-  startDate: number;
-  endDate: number;
+  startDate?: number;
+  endDate?: number;
 }
 
 interface CreateSeriesInput {
@@ -134,12 +134,16 @@ const resolvers = {
       return e;
     },
     updateEvent: async (root, {input}: {input: UpdateEventInput}) => {
-      const updateObj = { $set: {
-        startDate: unixTimeToDate(input.startDate),
-        endDate: unixTimeToDate(input.endDate)
-      } };
-
-      await events.updateOne({id: input.id}, updateObj);
+      const setObject: {startDate?: Date, endDate?: Date} = {};
+      if (input.startDate) {
+        setObject.startDate = unixTimeToDate(input.startDate);
+      }
+      if (input.endDate) {
+        setObject.endDate = unixTimeToDate(input.endDate);
+      }
+      if (!_.isEmpty(setObject)) {
+        await events.updateOne({id: input.id}, { $set: setObject });
+      }
 
       return true;
     },
