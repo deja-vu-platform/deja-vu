@@ -16,8 +16,7 @@
     "allocator": {
       "name": "allocator",
       "config": {
-        "wsPort": 3003,
-        "initialConsumerIds": ["Ben", "Alyssa"]
+        "wsPort": 3003
       }
     }
   }

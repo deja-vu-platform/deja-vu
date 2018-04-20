@@ -4,6 +4,7 @@
   </div>
   <div class="col-md-4">
     <allocator-edit-consumer
+      inputLabel="Name"
       [resourceId]="groupMeeting.id"
       [allocationId]="groupMeeting.seriesId">
     </allocator-edit-consumer>
@@ -12,7 +13,8 @@
     <dv-tx>
       <event-delete-event [id]="groupMeeting.id" [events]="groupMeetings">
       </event-delete-event>
-      <allocator-delete-resource [id]="groupMeeting.id" [hidden]="true">
+      <allocator-delete-resource [resourceId]="groupMeeting.id"
+        [allocationId]="groupMeeting.seriesId" [hidden]="true">
       </allocator-delete-resource>
     </dv-tx>
   </div>

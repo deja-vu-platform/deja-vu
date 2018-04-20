@@ -9,22 +9,22 @@
       <div class="row box">
         <div class="col-md-12">
           <dv-tx>
-           <dv-id (id)="groupMeetingId=$event"></dv-id>
-           <dv-status savedText="New group meeting series saved"></dv-status>
-           <dv-id-entities [entities]="events" (entitiesWithId)="meetings=$event">
-           </dv-id-entities>
-           <event-create-weekly-series
-             (seriesEvents)="events=$event"
-             [save]="false"
-             [showOptionToSubmit]="false">
-           </event-create-weekly-series>
+            <dv-id (id)="groupMeetingId=$event"></dv-id>
+            <dv-status savedText="New group meeting series saved"></dv-status>
+            <dv-ids [for]="events" (ids)="meetingIds=$event"></dv-ids>
+            <event-create-weekly-series
+              (seriesEvents)="events=$event"
+              [save]="false"
+              [showOptionToSubmit]="false">
+            </event-create-weekly-series>
             <event-create-series
               [id]="groupMeetingId"
               [hidden]="true"
-              [seriesEvents]="meetings">
+              [seriesEvents]="events" [seriesEventsIds]="meetingIds">
             </event-create-series>
             <allocator-create-allocation [hidden]="true"
-              [id]="groupMeetingId" [resources]="meetings" [saveResources]="true">
+              [id]="groupMeetingId" [resourceIds]="meetingIds"
+              [consumerIds]="['Ben', 'Alyssa']">
             </allocator-create-allocation>
             <dv-button>Create Group Meeting Series</dv-button>
           </dv-tx>
