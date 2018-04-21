@@ -7,6 +7,9 @@
   },
   "config": {
     "wsPort": 3001,
+    "initialObjects": [
+      {"firstName": "Alyssa", "lastName": "Hacker", "age": 20}
+    ],
     "schema": {
       "title": "Person",
       "type": "object",

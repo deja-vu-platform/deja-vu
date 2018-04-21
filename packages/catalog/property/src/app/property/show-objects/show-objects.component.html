@@ -1,0 +1,13 @@
+<ul *ngIf="_objects && _objects.length > 0" class="list-group">
+  <li *ngFor="let object of _objects"
+    class="list-group-item property-show-objects-object-item">
+    <dv-include [action]="showObject" [inputs]="{
+        object: object, showOnly: showOnly, showExclude: showExclude
+      }"
+      [parent]="showObjects">
+    </dv-include>
+  </li>
+</ul>
+<div *ngIf="!_objects || _objects.length === 0">
+  No objects
+</div>

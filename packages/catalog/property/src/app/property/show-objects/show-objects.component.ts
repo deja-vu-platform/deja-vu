@@ -6,24 +6,32 @@ import * as _ from 'lodash';
 
 import { properties, Property } from '../shared/property.model';
 
+import { ShowObjectComponent } from '../show-object/show-object.component';
+
+
 @Component({
-  selector: 'property-show-object',
-  templateUrl: './show-object.component.html',
-  styleUrls: ['./show-object.component.css']
+  selector: 'property-show-objects',
+  templateUrl: './show-objects.component.html',
+  styleUrls: ['./show-objects.component.css']
 })
-export class ShowObjectComponent implements OnInit, OnChanges {
-  @Input() id: string;
-  @Input() object: any;
+export class ShowObjectsComponent implements OnInit, OnChanges {
+  @Input() showObject: Action = {
+    type: <Type<Component>> ShowObjectComponent
+  };
+  _objects: Object[] = [];
   @Input() showOnly: string[];
   @Input() showExclude: string[];
-  @Output() loadedObject = new EventEmitter<any>();
+  @Output() objects = new EventEmitter<Object[]>();
+  @Output() objectIds = new EventEmitter<string[]>();
 
   properties: string[];
-
+  showObjects;
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    this.showObjects = this;
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -40,8 +48,7 @@ export class ShowObjectComponent implements OnInit, OnChanges {
     }
     this.properties = await properties(
       this.showOnly, this.showExclude, this.fetchProperties.bind(this));
-
-    this.fetchObject();
+    this.fetchObjects();
   }
 
   async fetchProperties(): Promise<string[]> {
@@ -62,23 +69,26 @@ export class ShowObjectComponent implements OnInit, OnChanges {
     return _.map(res.data.properties, 'name');
   }
 
-  fetchObject() {
-    if (this.id && this.properties) {
+  fetchObjects() {
+    if (this.gs) {
       this.gs
-        .get<{data: {object: Object}}>('/graphql', {
+        .get<{data: {objects: Object[]}}>('/graphql', {
           params: {
             query: `
               query {
-                object(id: "${this.id}") {
-                  ${this.properties.join('\n')}
+                objects {
+                  id
+                  ${_.map(this.properties)
+                      .join('\n')}
                 }
               }
             `
           }
         })
         .subscribe((res) => {
-          this.object = res.data.object;
-          this.loadedObject.emit(this.object);
+          this._objects = res.data.objects;
+          this.objects.emit(this._objects);
+          this.objectIds.emit(_.map(this._objects, 'id'));
         });
     }
   }
