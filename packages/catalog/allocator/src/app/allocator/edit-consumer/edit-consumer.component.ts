@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
-  ViewChild
+  SimpleChanges, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
@@ -72,8 +72,10 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
     this.update();
   }
 
-  ngOnChanges() {
-    this.update();
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes.resourceId || changes.allocationId) {
+      this.update();
+    }
   }
 
   update() {
