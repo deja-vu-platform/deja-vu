@@ -8,6 +8,9 @@
       </div>
       <div class="row box">
         <div class="col-md-12">
+          <property-show-objects [hidden]="true"
+            (objectIds)="studentIds=$event">
+          </property-show-objects>
           <dv-tx>
             <dv-id (id)="groupMeetingId=$event"></dv-id>
             <dv-status savedText="New group meeting series saved"></dv-status>
@@ -24,7 +27,7 @@
             </event-create-series>
             <allocator-create-allocation [hidden]="true"
               [id]="groupMeetingId" [resourceIds]="meetingIds"
-              [consumerIds]="['Ben', 'Alyssa']">
+              [consumerIds]="studentIds">
             </allocator-create-allocation>
             <dv-button>Create Group Meeting Series</dv-button>
           </dv-tx>

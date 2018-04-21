@@ -3,11 +3,19 @@
     <event-show-event [event]="groupMeeting"></event-show-event>
   </div>
   <div class="col-md-4">
-    <allocator-edit-consumer
-      inputLabel="Name"
-      [resourceId]="groupMeeting.id"
-      [allocationId]="groupMeeting.seriesId">
-    </allocator-edit-consumer>
+    <dv-tx>
+      <property-choose-object
+        chooseObjectSelectPlaceholder="Champion"
+        [initialObjectId]="championId"
+        (selectedObjectId)="studentId=$event">
+      </property-choose-object>
+      <allocator-edit-consumer [hidden]="true"
+        [resourceId]="groupMeeting.id"
+        [allocationId]="groupMeeting.seriesId"
+        [newConsumerId]="studentId"
+        (currentConsumerId)="championId=$event">
+      </allocator-edit-consumer>
+    </dv-tx>
   </div>
   <div class="col-md-2">
     <dv-tx>

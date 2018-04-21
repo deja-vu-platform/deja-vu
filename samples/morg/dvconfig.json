@@ -18,6 +18,23 @@
       "config": {
         "wsPort": 3003
       }
+    },
+    "property": {
+      "name": "property",
+      "config": {
+        "wsPort": 3004,
+        "initialObjects": [{"name": "Ben"}, {"name": "Alyssa"}],
+        "schema": {
+          "title": "Party",
+          "type": "object",
+          "properties": {
+              "name": {
+                "type": "string"
+              }
+          },
+          "required": ["name"]
+        }
+      }
     }
   }
 }

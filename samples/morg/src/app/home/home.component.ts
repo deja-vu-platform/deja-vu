@@ -11,6 +11,7 @@ import {
 })
 export class HomeComponent implements OnInit {
   showGroupMeeting = ShowGroupMeetingComponent;
+  studentIds: string[] = [];
 
   constructor() { }
 

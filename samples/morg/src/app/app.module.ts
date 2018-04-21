@@ -10,6 +10,7 @@ import {
 
 import { AllocatorModule } from 'allocator';
 import { EventModule } from 'event';
+import { PropertyModule } from 'property';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import { EventModule } from 'event';
     BrowserModule,
     DvModule,
     EventModule,
-    AllocatorModule
+    AllocatorModule,
+    PropertyModule
   ],
   entryComponents: [ShowGroupMeetingComponent],
   providers: [{
