@@ -92,7 +92,6 @@ export class EditMessageComponent implements
       .subscribe((res) => {
         this.contentControl.setValue(res.data.message.content);
       });
-
   }
 
   startEditing() {

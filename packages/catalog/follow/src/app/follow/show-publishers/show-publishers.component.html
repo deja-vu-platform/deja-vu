@@ -1,10 +1,20 @@
-<ul *ngIf="publishers && publishers.length > 0" class="list-member member-list">
-  <li *ngFor="let publisher of publishers"
-    class="list-member-item member-list-item">
-    <dv-widget name="ShowNameOfPublisher" [init]="{publisher: publisher}">
-    </dv-widget>
-  </li>
-</ul>
-<div *ngIf="!publishers || publishers.length === 0">
-  No publishers
-</div>
+<ul *ngIf="publishers && publishers.length > 0" class="list-group">
+    <li *ngFor="let publisher of publishers" class="list-group-item">
+      <dv-include 
+        [action]="showPublisher" 
+        [inputs]="{publisher: publisher}" 
+        [parent]="showPublishers">
+      </dv-include>
+      <div *ngIf="showOptionToFollowUnfollow && followerId">
+        <follow-follow-unfollow 
+          [followerId]="followerId"
+          [publisherId]="publisher.id">          
+        </follow-follow-unfollow>
+      </div>
+    </li>
+  </ul>
+  
+  <div *ngIf="!publishers || publishers.length === 0">
+    <span>{{noPublishersToShowText}}</span>
+  </div>
+  

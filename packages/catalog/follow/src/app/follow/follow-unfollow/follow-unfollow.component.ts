@@ -1,92 +1,111 @@
-import {Widget, Field, AfterInit, ClientBus} from "client-bus";
+import {
+  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit
+} from '@angular/core';
 
-import {GraphQlService} from "gql";
-import "rxjs/add/operator/toPromise";
+import {
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  RunService
+} from 'dv-core';
 
-import Atomize from "../_shared/atomize";
-import {FollowerAtom, PublisherAtom} from "../_shared/data";
-import FollowService from "../_shared/follow.service";
-import {doesFollow} from "../_shared/utils";
+import * as _ from 'lodash';
 
+const followQuery = `mutation Follow($input: FollowUnfollowInput!) {
+  follow(input: $input)
+}`;
+const unfollowQuery = `mutation Unfollow($input: FollowUnfollowInput!) {
+  unfollow(input: $input)
+}`;
 
-@Widget({
-  fqelement: "Follow",
-  ng2_providers: [
-    GraphQlService,
-    FollowService,
-    Atomize
-  ]
+@Component({
+  selector: 'follow-follow-unfollow',
+  templateUrl: './follow-unfollow.component.html',
+  styleUrls: ['./follow-unfollow.component.css']
 })
-export class FollowUnfollowComponent implements AfterInit {
-  @Field("Publisher") publisher: PublisherAtom;
-  @Field("Follower") follower: FollowerAtom;
+export class FollowUnfollowComponent implements
+  OnInit, OnChanges, OnRun {
+  @Input() followerId: string;
+  @Input() publisherId: string;
+  @Input() disabled = false;
 
-  _lastID: string = "";
+  // Presentation inputs
+  @Input() followButtonLabel = 'Follow';
+  @Input() unfollowButtonLabel = 'Unfollow';
+
+  followsPublisher: boolean;
+  private queryString: string;
+
+  private gs: GatewayService;
 
   constructor(
-    private _atomize: Atomize,
-    private _clientBus: ClientBus,
-    private _followService: FollowService
-  ) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService) { }
 
-  dvAfterInit() {
-    const getFollows = () => {
-      this._followService.getPublishersByFollower(this.follower.atom_id)
-        .then(publishers => {
-          this.follower.follows = publishers.map(publisher =>
-            this._atomize.atomizePublisher(publisher)
-          );
-        });
-    };
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
+    this.isFollowing();
+  }
 
-    if (!this.follower.follows) {
-      this.follower.follows = [];
+  ngOnChanges() {
+    this.isFollowing();
+  }
+
+  isFollowing() {
+    if (!this.gs || !this.followerId || this.publisherId) {
+      return;
     }
-    if (this.follower.follows.length === 0 && this.follower.atom_id) {
-      getFollows();
-    }
-    if (this.follower.atom_id) {
-      this._lastID = this.follower.atom_id;
-    }
-    this.follower.on_change(() => {
-      if (this._lastID !== this.follower.atom_id) {
-        this._lastID = this.follower.atom_id;
-        return getFollows();
-      }
-    });
+
+    this.gs
+      .get<{ data: any }>('/graphql', {
+        params: {
+          query: `
+              query IsFollowing($input: FollowUnfollowInput!) {
+                isFollowing(input: $input)
+              }
+            `,
+          variables: JSON.stringify({
+            input: {
+              followerId: this.followerId,
+              publisherId: this.publisherId
+            }
+          })
+        }
+      })
+      .subscribe((res) => {
+        this.followsPublisher = res.data.isFollowing;
+      });
   }
 
   follow() {
-    this._followService.addFollow(this.follower.atom_id, this.publisher.atom_id)
-      .then(success => {
-        if (success) this.follower.follows.push(this.publisher);
-      });
+    this.rs.run(this.elem);
+    this.queryString = followQuery;
+    // TODO: update boolean here too?
   }
 
   unfollow() {
-    this._followService
-      .removeFollow(this.follower.atom_id, this.publisher.atom_id)
-      .then(success => {
-        if (success) {
-          filterInPlace(this.follower.follows, (followed) => {
-            return followed.atom_id !== this.publisher.atom_id;
-          });
+    this.rs.run(this.elem);
+    this.queryString = unfollowQuery;
+  }
+
+  async dvOnRun(): Promise<void> {
+    const res = await this.gs.post<{
+      data: any, errors: { message: string }[]
+    }>('/graphql', {
+      query: this.queryString,
+      variables: {
+        input: {
+          followerId: this.followerId,
+          publisherId: this.publisherId
         }
-      });
-  }
+      }
+    })
+      .toPromise();
 
-  doesFollow(follower: FollowerAtom, publisher: PublisherAtom): boolean {
-    return doesFollow(follower, publisher);
-  }
-}
-
-function filterInPlace<T>(arr: T[], f: (elm: T) => boolean): T[] {
-  let out = 0;
-  for (let i = 0; i < arr.length; i++) {
-    if (f(arr[i])) {
-      arr[out++] = arr[i];
+    if (res.errors) {
+      throw new Error(_.map(res.errors, 'message')
+        .join());
     }
+
+    this.queryString = '';
   }
-  arr.length = out;
-  return arr;
 }

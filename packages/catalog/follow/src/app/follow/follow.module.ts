@@ -1,30 +1,63 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {  } from '.base-dir.ts/.base-dir.ts.component';
-import { EditContentOfMessageComponent } from './edit-content-of-message/edit-content-of-message.component';
-import { EditFollowsOfFollowerComponent } from './edit-follows-of-follower/edit-follows-of-follower.component';
-import { EditNameOfFollowerComponent } from './edit-name-of-follower/edit-name-of-follower.component';
-import { EditNameOfPublisherComponent } from './edit-name-of-publisher/edit-name-of-publisher.component';
-import { FollowUnfollowComponent } from './follow-unfollow/follow-unfollow.component';
-import { NewFollowerButtonComponent } from './new-follower-button/new-follower-button.component';
-import { NewMessageButtonComponent } from './new-message-button/new-message-button.component';
-import { NewPublisherButtonComponent } from './new-publisher-button/new-publisher-button.component';
-import { ShowContentOfMessageComponent } from './show-content-of-message/show-content-of-message.component';
-import { ShowFollowersComponent } from './show-followers/show-followers.component';
-import { ShowFollowersByPublisherComponent } from './show-followers-by-publisher/show-followers-by-publisher.component';
-import { ShowMessagesComponent } from './show-messages/show-messages.component';
-import { ShowMessagesByFollowerComponent } from './show-messages-by-follower/show-messages-by-follower.component';
-import { ShowMessagesByPublisherComponent } from './show-messages-by-publisher/show-messages-by-publisher.component';
-import { ShowNameOfFollowerComponent } from './show-name-of-follower/show-name-of-follower.component';
-import { ShowNameOfPublisherComponent } from './show-name-of-publisher/show-name-of-publisher.component';
-import { ShowPublishersComponent } from './show-publishers/show-publishers.component';
-import { ShowPublishersByFollowerComponent } from './show-publishers-by-follower/show-publishers-by-follower.component';
-import { SharedComponent } from './-shared/-shared.component';
+import { NgModule } from '@angular/core';
+
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  MatButtonModule, MatFormFieldModule, MatIconModule, MatInputModule
+} from '@angular/material';
+import { MatMomentDateModule } from '@angular/material-moment-adapter';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { DvModule } from 'dv-core';
+
+import {
+  CreateFollowerComponent
+} from './create-follower/create-follower.component';
+import {
+  CreateMessageComponent
+} from './create-message/create-message.component';
+import {
+  CreatePublisherComponent
+} from './create-publisher/create-publisher.component';
+import { EditFollowerComponent } from './edit-follower/edit-follower.component';
+import { EditMessageComponent } from './edit-message/edit-message.component';
+import {
+  EditPublisherComponent
+} from './edit-publisher/edit-publisher.component';
+import {
+  FollowUnfollowComponent
+} from './follow-unfollow/follow-unfollow.component';
+import { ShowFollowerComponent } from './show-follower/show-follower.component';
+import {
+  ShowFollowersComponent
+} from './show-followers/show-followers.component';
+import { ShowMessageComponent } from './show-message/show-message.component';
+import {
+  ShowMessagesComponent
+} from './show-messages/show-messages.component';
+import {
+  ShowPublisherComponent
+} from './show-publisher/show-publisher.component';
+import {
+  ShowPublishersComponent
+} from './show-publishers/show-publishers.component';
+
+const allComponents = [
+  CreateFollowerComponent, CreateMessageComponent, CreatePublisherComponent,
+  EditFollowerComponent, EditMessageComponent, EditPublisherComponent,
+  FollowUnfollowComponent, ShowFollowerComponent, ShowFollowersComponent,
+  ShowMessageComponent, ShowMessagesComponent, ShowPublisherComponent,
+  ShowPublishersComponent
+];
 
 @NgModule({
   imports: [
-    CommonModule
+    CommonModule, DvModule, FormsModule, ReactiveFormsModule,
+    BrowserAnimationsModule, MatButtonModule, MatFormFieldModule,
+    MatInputModule, MatIconModule
   ],
-  declarations: [.BaseDir.TsComponent, EditContentOfMessageComponent, EditFollowsOfFollowerComponent, EditNameOfFollowerComponent, EditNameOfPublisherComponent, FollowUnfollowComponent, NewFollowerButtonComponent, NewMessageButtonComponent, NewPublisherButtonComponent, ShowContentOfMessageComponent, ShowFollowersComponent, ShowFollowersByPublisherComponent, ShowMessagesComponent, ShowMessagesByFollowerComponent, ShowMessagesByPublisherComponent, ShowNameOfFollowerComponent, ShowNameOfPublisherComponent, ShowPublishersComponent, ShowPublishersByFollowerComponent, SharedComponent]
+  declarations: allComponents,
+  exports: allComponents,
+  entryComponents: allComponents
 })
 export class FollowModule { }

@@ -56,6 +56,7 @@ type Query {
   publishers(followerId: ID): [Publisher]
   message(id: ID!): Message
   messages(input: MessagesInput!): [Message]
+  isFollowing(input: FollowUnfollowInput!): Boolean
 }
 
 type Mutation {

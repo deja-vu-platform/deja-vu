@@ -1,10 +1,13 @@
-<ul *ngIf="followers && followers.length > 0" class="list-member member-list">
-  <li *ngFor="let follower of followers"
-    class="list-member-item member-list-item">
-    <dv-widget name="ShowNameOfFollower" [init]="{follower: follower}">
-    </dv-widget>
+<ul *ngIf="followers && followers.length > 0" class="list-group">
+  <li *ngFor="let follower of followers" class="list-group-item">
+    <dv-include 
+      [action]="showFollower" 
+      [inputs]="{follower: follower}" 
+      [parent]="showFollowers">
+    </dv-include>
   </li>
 </ul>
+
 <div *ngIf="!followers || followers.length === 0">
-  No followers
+  <span>{{noFollowersToShowText}}</span>
 </div>

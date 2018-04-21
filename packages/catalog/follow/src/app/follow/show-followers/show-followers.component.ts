@@ -1,34 +1,69 @@
-import {Widget} from "client-bus";
-import {GraphQlService} from "gql";
+import {
+  Component, ElementRef, Input, OnChanges, OnInit, Type
+} from '@angular/core';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import * as _ from 'lodash';
 
-import Atomize from "../_shared/atomize";
-import {FollowerAtom} from "../_shared/data";
-import FollowService from "../_shared/follow.service";
+import {
+  ShowFollowerComponent
+} from '../show-follower/show-follower.component';
+
+import { Follower } from '../shared/follow.model';
 
 
-@Widget({
-  fqelement: "Follow",
-  ng2_providers: [
-    GraphQlService,
-    FollowService,
-    Atomize
-  ]
+@Component({
+  selector: 'follow-show-followers',
+  templateUrl: './show-followers.component.html',
+  styleUrls: ['./show-followers.component.css']
 })
-export class ShowFollowersComponent {
-  followers: FollowerAtom[] = [];
+export class ShowFollowersComponent implements OnInit, OnChanges {
+  // Fetch rules
+  // If undefined, fetch all followers.
+  // Else, fetch the followers of the given publisher.
+  @Input() publisherId: string | undefined;
+
+  @Input() showFollower: Action = {
+    type: <Type<Component>>ShowFollowerComponent
+  };
+
+  // Presentation text
+  @Input() noFollowersToShowText = 'No followers to show';
+
+  followers: Follower[] = [];
+
+  showFollowers;
+  private gs: GatewayService;
 
   constructor(
-    private _followService: FollowService,
-    private _atomize: Atomize
-  ) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    this.showFollowers = this;
+  }
 
-  dvAfterInit() {
-    this.followers = [];
-    this._followService.getFollowers()
-      .then(followers => {
-        this.followers = followers.map(follower => {
-          return this._atomize.atomizeFollower(follower);
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.fetchFollowers();
+  }
+
+  ngOnChanges() {
+    this.fetchFollowers();
+  }
+
+  fetchFollowers() {
+    if (this.gs) {
+      this.gs
+        .get<{ data: { followers: Follower[] } }>('/graphql', {
+          params: {
+            query: `
+                followers(publisherId: "${this.publisherId}") {
+                  id
+                }
+              }
+            `
+          }
+        })
+        .subscribe((res) => {
+          this.followers = res.data.followers;
         });
-      });
+    }
   }
 }

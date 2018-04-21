@@ -166,11 +166,11 @@ const resolvers = {
         const follower = await Validation.followerExists(followerId);
         const publisherIds = follower.publisherIds;
 
-        if (!_.isEmpty(publisherIds)) {
-          return publishers
-            .find({ id: { $in: publisherIds } })
-            .toArray();
-        }
+        if (_.isEmpty(publisherIds)) { return []; }
+
+        return publishers
+          .find({ id: { $in: publisherIds } })
+          .toArray();
       }
 
       // No publisher filter
@@ -199,6 +199,22 @@ const resolvers = {
         return messages.find()
           .toArray();
       }
+    },
+
+    isFollowing: async (root, { input }: { input: FollowUnfollowInput }) => {
+      const [follower, publisher] = await Promise.all([
+        Validation.followerExists(input.followerId),
+        Validation.publisherExists(input.publisherId)
+      ]);
+
+      if (!_.isEmpty(follower.publisherIds)) {
+        const publisherIndex = _
+          .indexOf(follower.publisherIds, input.publisherId);
+
+        return (publisherIndex > -1);
+      }
+
+      return false;
     }
 
   },
