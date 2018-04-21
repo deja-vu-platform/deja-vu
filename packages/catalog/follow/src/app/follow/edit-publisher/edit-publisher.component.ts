@@ -37,13 +37,6 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class EditPublisherComponent implements
   OnInit, OnRun, OnAfterAbort, OnAfterCommit {
-  @ViewChild(FormGroupDirective) form;
-  oldPublisherIdControl = new FormControl('', Validators.required);
-  newPublisherIdControl = new FormControl('', Validators.required);
-  editPublisherForm: FormGroup = this.builder.group({
-    oldPublisherIdControl: this.oldPublisherIdControl,
-    newPublisherIdControl: this.newPublisherIdControl
-  });
 
   @Input() set oldId(id: string) {
     this.oldPublisherIdControl.setValue(id);
@@ -58,6 +51,16 @@ export class EditPublisherComponent implements
   @Input() oldPublisherIdLabel = 'Enter your current publisher id';
   @Input() newPublisherIdLabel = 'Enter your new publisher id';
   @Input() editPublisherSavedText = 'Publisher updated';
+
+  @Input() showOptionToSubmit = true;
+
+  @ViewChild(FormGroupDirective) form;
+  oldPublisherIdControl = new FormControl('', Validators.required);
+  newPublisherIdControl = new FormControl('', Validators.required);
+  editPublisherForm: FormGroup = this.builder.group({
+    oldPublisherIdControl: this.oldPublisherIdControl,
+    newPublisherIdControl: this.newPublisherIdControl
+  });
 
   editPublisherSaved = false;
   editPublisherError: string;

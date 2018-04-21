@@ -147,6 +147,14 @@ class Validation {
   }
 }
 
+function isDifferent(before: string, after: string, type: string): Boolean {
+  if (before === after) {
+    throw new Error(`The current and new ${type}s must be different`);
+  }
+
+  return true;
+}
+
 const resolvers = {
   Query: {
     follower: (root, { id }) => followers.findOne({ id: id }),
@@ -285,8 +293,7 @@ const resolvers = {
     },
 
     editFollower: async (root, { input }: { input: EditFollowerInput }) => {
-      // Alternatively: delete doc and add new one
-      // TODO: throw error if old == new?
+      isDifferent(input.oldId, input.newId, 'Follower');
 
       await Validation.followerExists(input.oldId);
       const updateOperation = { $set: { id: input.newId } };
@@ -296,17 +303,16 @@ const resolvers = {
     },
 
     editPublisher: async (root, { input }: { input: EditPublisherInput }) => {
+      isDifferent(input.oldId, input.newId, 'Publisher');
+
       await Validation.publisherExists(input.oldId);
-
-      // TODO: throw error if old == new?
-
       // Update publisherIds of Followers
-      const publisherUpdate = {
-        $pull: { publisherIds: input.oldId },
-        $push: { publisherIds: input.newId }
-      };
+      const addPublisherUpdate = { $push: { publisherIds: input.newId } };
+      const removePublisherUpdate = { $pull: { publisherIds: input.oldId } };
       await followers
-        .updateMany({ publisherIds: input.oldId }, publisherUpdate);
+        .updateMany({ publisherIds: input.oldId }, addPublisherUpdate);
+      await followers
+        .updateMany({ publisherIds: input.oldId }, removePublisherUpdate);
 
       // Update messages db
       const msgUpdateOperation = { $set: { publisherId: input.newId } };

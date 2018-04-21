@@ -12,32 +12,36 @@
   <follow-show-publisher [publisher]="alicePublisher">
   </follow-show-publisher> -->
   <h1>Create Message</h1>
-  <follow-create-message publisherId="alice" 
+  <follow-create-message id="herMessage" publisherId="alice" 
     (message)="aliceMessage=$event">
   </follow-create-message>
-  <!-- <h1>Show Message</h1>
-  <follow-show-message [message]="aliceMessage"></follow-show-message> -->
-  <!-- <h1>Show All Followers</h1> 
-  <follow-show-followers></follow-show-followers> -->
-  <!-- <h1>Show All Publishers w/out Follow/ Unfollow</h1>
-  <follow-show-publishers></follow-show-publishers> -->
-  <!-- <h1>Show All Messages</h1>
-  <follow-show-messages></follow-show-messages> -->
-  <!-- <h1>Follow/ Unfollow</h1>
+  <h1>Show Message</h1>
+  <follow-show-message [message]="aliceMessage"></follow-show-message>
+  <h1>Show All Followers</h1> 
+  <follow-show-followers></follow-show-followers>
+  <h1>Show All Publishers w/out Follow/ Unfollow</h1>
+  <follow-show-publishers></follow-show-publishers>
+  <h1>Show All Messages</h1>
+  <follow-show-messages></follow-show-messages>
+  <h1>Follow/ Unfollow</h1>
   <follow-follow-unfollow followerId="ben" publisherId="alice">
-  </follow-follow-unfollow> -->
-  <!-- <h1>Show All Followers of a Publisher</h1>
-  <follow-show-followers publisherId="alice"></follow-show-followers> -->
-  <!-- <h1>Show All Publishers followed by a Follower</h1>
-  <follow-show-publishers followerId="ben"></follow-show-publishers> -->
-  <!-- <h1>Show All Publishers followed by a Follower w/ Follow/ Unfollow</h1>
+  </follow-follow-unfollow>
+  <h1>Show All Followers of a Publisher</h1>
+  <follow-show-followers publisherId="alice"></follow-show-followers>
+  <h1>Show All Publishers followed by a Follower</h1>
+  <follow-show-publishers followerId="ben"></follow-show-publishers>
+  <h1>Show All Publishers followed by a Follower w/ Follow/ Unfollow</h1>
   <follow-show-publishers followerId="ben" showOptionToFollowUnfollow="true">
-  </follow-show-publishers> -->
-  <!-- <h1>Show All Messages by a Publisher</h1>
-  <follow-show-messages publisherId="alice"></follow-show-messages> -->
-  <!-- <h1>Show All Messages written by Publishers followed by a Follower</h1>
-  <follow-show-messages followerId="ben"></follow-show-messages> -->
-  <!-- <h1>Edit Follower</h1> -->
+  </follow-show-publishers>
+  <h1>Show All Messages by a Publisher</h1>
+  <follow-show-messages publisherId="alice"></follow-show-messages>
+  <h1>Show All Messages written by Publishers followed by a Follower</h1>
+  <follow-show-messages followerId="ben"></follow-show-messages>
+  <h1>Edit Follower</h1>
+  <follow-edit-follower oldId="ben" newId="benny"></follow-edit-follower>
   <h1>Edit Message</h1>
-  <!-- <h1>Edit Publisher</h1> -->
+  <follow-edit-message id="herMessage" publisherId="alice">
+  </follow-edit-message>
+  <h1>Edit Publisher</h1>
+  <follow-edit-publisher oldId="alice" newId="alyssa"></follow-edit-publisher>
 </div>

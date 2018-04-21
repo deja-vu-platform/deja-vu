@@ -37,13 +37,6 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class EditFollowerComponent implements
   OnInit, OnRun, OnAfterAbort, OnAfterCommit {
-  @ViewChild(FormGroupDirective) form;
-  oldFollowerIdControl = new FormControl('', Validators.required);
-  newFollowerIdControl = new FormControl('', Validators.required);
-  editFollowerForm: FormGroup = this.builder.group({
-    oldFollowerIdControl: this.oldFollowerIdControl,
-    newFollowerIdControl: this.newFollowerIdControl
-  });
 
   @Input() set oldId(id: string) {
     this.oldFollowerIdControl.setValue(id);
@@ -58,6 +51,16 @@ export class EditFollowerComponent implements
   @Input() oldFollowerIdLabel = 'Enter your current follower id';
   @Input() newFollowerIdLabel = 'Enter your new follower id';
   @Input() editFollowerSavedText = 'Follower updated';
+
+  @Input() showOptionToSubmit = true;
+
+  @ViewChild(FormGroupDirective) form;
+  oldFollowerIdControl = new FormControl('', Validators.required);
+  newFollowerIdControl = new FormControl('', Validators.required);
+  editFollowerForm: FormGroup = this.builder.group({
+    oldFollowerIdControl: this.oldFollowerIdControl,
+    newFollowerIdControl: this.newFollowerIdControl
+  });
 
   editFollowerSaved = false;
   editFollowerError: string;

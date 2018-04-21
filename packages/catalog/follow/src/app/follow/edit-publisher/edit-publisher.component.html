@@ -14,7 +14,7 @@
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{oldPublisherIdLabel}}</mat-label>
-      <input matInput required formControl="oldPublisherIdControl">
+      <input matInput required formControlName="oldPublisherIdControl">
     </mat-form-field>
     <div *ngIf="oldPublisherIdControl.invalid && oldPublisherIdControl.touched">
       <mat-error *ngIf="oldPublisherIdControl.hasError('required')">
@@ -26,7 +26,7 @@
   <div class="form-group">
     <mat-form-field>
       <mat-label>{{newPublisherIdLabel}}</mat-label>
-      <input matInput required formControl="newPublisherIdControl">
+      <input matInput required formControlName="newPublisherIdControl">
     </mat-form-field>
     <div *ngIf="newPublisherIdControl.invalid && newPublisherIdControl.touched">
       <mat-error *ngIf="newPublisherIdControl.hasError('required')">

@@ -78,7 +78,6 @@ export class FollowUnfollowComponent implements
   follow() {
     this.queryString = followQuery;
     this.rs.run(this.elem);
-    // TODO: update boolean here too?
   }
 
   unfollow() {
