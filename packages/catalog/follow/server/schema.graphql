@@ -20,12 +20,24 @@ input CreateMessageInput {
   content: String!
 }
 
+# Show a publisher's followers OR
+# Show all folllowers
+input FollowersInput {
+  publisherId: ID
+}
+
 # Show messages by a publisher (publisherId) OR
 # Show messages of publishers followed by a follower (followerId) OR
 # Show all messages
 input MessagesInput {
   followerId: ID,
   publisherId: ID
+}
+
+# Show a follower's publishers OR
+# Show all publishers
+input PublishersInput {
+  followerId: ID
 }
 
 input EditFollowerInput {
@@ -40,7 +52,7 @@ input EditPublisherInput {
 
 input EditMessageInput {
   id: ID!,
-  publisher: Publisher!,
+  publisherId: ID!,
   content: String!
 }
 
@@ -51,9 +63,9 @@ input FollowUnfollowInput {
 
 type Query {
   follower(id: ID!): Follower
-  followers(publisherId: ID): [Follower]
+  followers(input: FollowersInput!): [Follower]
   publisher(id: ID!): Publisher
-  publishers(followerId: ID): [Publisher]
+  publishers(input: PublishersInput): [Publisher]
   message(id: ID!): Message
   messages(input: MessagesInput!): [Message]
   isFollowing(input: FollowUnfollowInput!): Boolean

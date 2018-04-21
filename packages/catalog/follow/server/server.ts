@@ -35,9 +35,17 @@ interface CreateMessageInput {
   content: string;
 }
 
+interface FollowersInput {
+  publisherId?: string;
+}
+
 interface MessagesInput {
   followerId?: string;
   publisherId?: string;
+}
+
+interface PublishersInput {
+  followerId?: string;
 }
 
 interface EditFollowerInput {
@@ -147,12 +155,12 @@ const resolvers = {
 
     message: (root, { id }) => messages.findOne({ id: id }),
 
-    followers: async (root, { publisherId }) => {
-      if (publisherId) {
-        await Validation.publisherExists(publisherId);
+    followers: async (root, { input }: {input: FollowersInput}) => {
+      if (input.publisherId) {
+        await Validation.publisherExists(input.publisherId);
 
         return followers
-          .find({ publisherIds: publisherId })
+          .find({ publisherIds: input.publisherId })
           .toArray();
       }
 
@@ -161,9 +169,9 @@ const resolvers = {
         .toArray();
     },
 
-    publishers: async (root, { followerId }) => {
-      if (followerId) {
-        const follower = await Validation.followerExists(followerId);
+    publishers: async (root, { input }: {input: PublishersInput}) => {
+      if (input.followerId) {
+        const follower = await Validation.followerExists(input.followerId);
         const publisherIds = follower.publisherIds;
 
         if (_.isEmpty(publisherIds)) { return []; }
@@ -218,6 +226,7 @@ const resolvers = {
     }
 
   },
+
   Follower: {
     id: (follower: FollowerDoc) => follower.id,
     follows: (follower: FollowerDoc) => {
@@ -226,25 +235,26 @@ const resolvers = {
       return publishers
         .find({ id: { $in: follower.publisherIds } })
         .toArray();
-    },
-
-    Publisher: {
-      id: (publisher: PublisherDoc) => publisher.id,
-      messages: (publisher: PublisherDoc) => {
-        return messages
-          .find({ publisherId: publisher.id })
-          .toArray();
-      }
-    },
-
-    Message: {
-      id: (message: MessageDoc) => message.id,
-      publisher: (message: MessageDoc) => {
-        return publishers.findOne({ id: message.publisherId });
-      },
-      content: (message: MessageDoc) => message.content
     }
   },
+
+  Publisher: {
+    id: (publisher: PublisherDoc) => publisher.id,
+    messages: (publisher: PublisherDoc) => {
+      return messages
+        .find({ publisherId: publisher.id })
+        .toArray();
+    }
+  },
+
+  Message: {
+    id: (message: MessageDoc) => message.id,
+    publisher: (message: MessageDoc) => {
+      return publishers.findOne({ id: message.publisherId });
+    },
+    content: (message: MessageDoc) => message.content
+  },
+
   Mutation: {
     createFollower: async (root, { id }) => {
       const followerId = id ? id : uuid();

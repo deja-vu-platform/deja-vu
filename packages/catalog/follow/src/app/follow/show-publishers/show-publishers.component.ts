@@ -58,11 +58,17 @@ export class ShowPublishersComponent implements OnInit, OnChanges {
         .get<{ data: { publishers: Publisher[] } }>('/graphql', {
           params: {
             query: `
-                publishers(followerId: "${this.followerId}") {
+              query Publishers($input: PublishersInput!) {
+                publishers(input: $input) {
                   id
                 }
               }
-            `
+            `,
+            variables: JSON.stringify({
+              input: {
+                followerId: this.followerId
+              }
+            })
           }
         })
         .subscribe((res) => {
