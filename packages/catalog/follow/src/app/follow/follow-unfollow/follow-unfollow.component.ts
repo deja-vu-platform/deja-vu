@@ -25,7 +25,6 @@ export class FollowUnfollowComponent implements
   OnInit, OnChanges, OnRun {
   @Input() followerId: string;
   @Input() publisherId: string;
-  @Input() disabled = false;
 
   // Presentation inputs
   @Input() followButtonLabel = 'Follow';
@@ -51,7 +50,7 @@ export class FollowUnfollowComponent implements
   }
 
   isFollowing() {
-    if (!this.gs || !this.followerId || this.publisherId) {
+    if (!this.gs || !this.followerId || !this.publisherId) {
       return;
     }
 
@@ -77,14 +76,14 @@ export class FollowUnfollowComponent implements
   }
 
   follow() {
-    this.rs.run(this.elem);
     this.queryString = followQuery;
+    this.rs.run(this.elem);
     // TODO: update boolean here too?
   }
 
   unfollow() {
-    this.rs.run(this.elem);
     this.queryString = unfollowQuery;
+    this.rs.run(this.elem);
   }
 
   async dvOnRun(): Promise<void> {

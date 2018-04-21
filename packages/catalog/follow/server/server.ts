@@ -155,7 +155,7 @@ const resolvers = {
 
     message: (root, { id }) => messages.findOne({ id: id }),
 
-    followers: async (root, { input }: {input: FollowersInput}) => {
+    followers: async (root, { input }: { input: FollowersInput }) => {
       if (input.publisherId) {
         await Validation.publisherExists(input.publisherId);
 
@@ -169,7 +169,7 @@ const resolvers = {
         .toArray();
     },
 
-    publishers: async (root, { input }: {input: PublishersInput}) => {
+    publishers: async (root, { input }: { input: PublishersInput }) => {
       if (input.followerId) {
         const follower = await Validation.followerExists(input.followerId);
         const publisherIds = follower.publisherIds;
@@ -302,8 +302,8 @@ const resolvers = {
 
       // Update publisherIds of Followers
       const publisherUpdate = {
-        $pull: { publisherIds: { id: input.oldId } },
-        $push: { publisherIds: { id: input.newId } }
+        $pull: { publisherIds: input.oldId },
+        $push: { publisherIds: input.newId }
       };
       await followers
         .updateMany({ publisherIds: input.oldId }, publisherUpdate);
@@ -342,9 +342,11 @@ const resolvers = {
         Validation.publisherExists(input.publisherId)
       ]);
 
-      const updateOperation = { $push: { follows: { id: input.publisherId } } };
+      const updateOperation = { $push: { publisherIds: input.publisherId } };
       await followers
         .findOneAndUpdate({ id: input.followerId }, updateOperation);
+
+      return true;
     },
 
     unfollow: async (root, { input }: { input: FollowUnfollowInput }) => {
@@ -353,9 +355,11 @@ const resolvers = {
         Validation.publisherExists(input.publisherId)
       ]);
 
-      const updateOperation = { $pull: { follows: { id: input.publisherId } } };
+      const updateOperation = { $pull: { publisherIds: input.publisherId } };
       await followers
         .findOneAndUpdate({ id: input.followerId }, updateOperation);
+
+      return true;
     }
   }
 };
