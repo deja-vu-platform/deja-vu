@@ -1,0 +1,46 @@
+// Keep track of scores
+cliche Scoring {
+  data Target {
+    name: text,
+    scores: [Score]
+  }
+
+  data Score {
+    name: text,
+    score: number
+  }
+
+  widget ShowScore {
+    score: Score
+  }
+
+  // Show all the scores of [target]
+  widget ShowTargetScores uses ShowScore {
+    target: Target
+  }
+
+  // Show the total score (based on some specified aggregate function) of [target]
+  widget ShowTotal {
+    target: Target
+  }
+
+  // Show the total scores of all targets in decreasing order
+  widget ShowFullRankings {}
+
+  widget ShowTopNRankings {
+    n: number
+  }
+
+  // Show rankings of the Targets by Score with name [name]
+  widget ShowRankingsByScoreName {
+    name: text
+  }
+
+  // Create and add [score] to the array of [target]'s scores field
+  // when submit_ok changes
+  widget UpdateScore {
+    target: Target,
+    score: Score,
+    submit_ok: boolean
+  }
+}

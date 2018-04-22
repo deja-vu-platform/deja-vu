@@ -1,5 +1,5 @@
 const graphql = require("graphql");
-const bcrypt = require("bcryptjs");
+const shajs = require("sha.js");
 const jwt = require("jsonwebtoken");
 
 import { Mean } from "mean-loader";
@@ -11,8 +11,6 @@ import { WORDS } from "./words";
 
 const mean = new Mean();
 
-const SALT_WORK_FACTOR = 10;
-
 // IMPORTANT: Change before deploying
 const SECRET_KEY = "ultra-secret-key";
 
@@ -21,16 +19,17 @@ const WORDS_SIZE = WORDS.length;
 const handlers = {
     passkey: {
         create: Helpers.resolve_create(mean.db, "passkey", "passkeys", passkey => {
-            passkey["code"] = bcrypt.hashSync(passkey.code, SALT_WORK_FACTOR);
+            passkey["code"] = shajs('sha256').update(passkey.code).digest('hex');
             return passkey;
         }),
         update: Helpers.resolve_update(mean.db, "passkey")
     }
-}
+};
 
-const bus = new ServerBus(mean.fqelement, mean.ws, handlers, mean.comp, mean.locs);
+const bus = new ServerBus(mean.fqelement, mean.ws, handlers,
+                          mean.comp, mean.locs);
 
-////////////////////////////////////////////////////
+//////////////////////////////////////////////////
 
 const grafo = new Grafo(mean.db);
 
@@ -47,54 +46,58 @@ const schema = grafo
         args: {
             code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
-        resolve: (root, { code }) => {
-            return mean.db.collection("passkeys").findOne({ atom_id: code });
+        resolve: (_, { code }) => {
+            const hashedCode = shajs('sha256').update(code).digest('hex');
+            return mean.db.collection("passkeys").findOne({ code: hashedCode });
         }
     })
     .add_mutation({
         name: "createCustomPasskey",
-        "type": graphql.GraphQLBoolean,
+        "type": graphql.GraphQLString,
         args: {
             code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
         resolve: (_, { code }) => {
-            return Validation.passkeyIsNew(code).then(_ => {
-                const passkey = {
-                    code: bcrypt.hashSync(code, SALT_WORK_FACTOR),
-                    atom_id: code
-                };
-                return mean.db.collection("passkeys")
-                    .insertOne(passkey)
-                    .then(write_res => {
-                        if (write_res.insertedCount !== 1) {
-                            throw new Error("Couldn't save new passkey");
-                        }
-                        bus.create_atom("Passkey", passkey.atom_id, passkey);
-                        return true;
-                    });
-            });
+            const hashedCode = shajs('sha256').update(code).digest('hex');
+            return mean.db.collection("passkeys")
+                .findOne({ code: hashedCode })
+                .then(passkey => {
+                    if (passkey) { throw new Error(`Passkey with code ${code} already exists`) }
+
+                    const newPasskey = { code: hashedCode, atom_id: hashedCode };
+
+                    return mean.db.collection("passkeys")
+                        .insertOne(newPasskey)
+                        .then(write_res => {
+                            if (write_res.insertedCount !== 1) {
+                                throw new Error("Could not save new passkey");
+                            }
+                            // report
+                            return bus.create_atom("Passkey", newPasskey.atom_id, newPasskey);
+                        })
+                        .then(_ => { newPasskey.atom_id });
+                })
         }
     })
     .add_mutation({
         name: "createRandomPasskey",
-        "type": graphql.GraphQLBoolean,
+        "type": graphql.GraphQLString,
         args: {},
         resolve: (_, { }) => {
             return getRandomPasscode().then(code => {
-                console.log("here is the code: " + code);
-                const passkey = {
-                    code: bcrypt.hashSync(code, SALT_WORK_FACTOR),
-                    atom_id: code
-                };
+                const hashedCode = shajs('sha256').update(code).digest('hex');
+                const passkey = { code: hashedCode, atom_id: hashedCode };
+
                 return mean.db.collection("passkeys")
                     .insertOne(passkey)
                     .then(write_res => {
                         if (write_res.insertedCount !== 1) {
-                            throw new Error("Couldn't save new passkey");
+                            throw new Error("Could not save new passkey");
                         }
-                        bus.create_atom("Passkey", passkey.atom_id, passkey);
-                        return true;
-                    });
+                        // report
+                        return bus.create_atom("Passkey", passkey.atom_id, passkey);
+                    })
+                    .then(_ => { passkey.atom_id });
             });
         }
     })
@@ -105,39 +108,18 @@ const schema = grafo
             code: { "type": new graphql.GraphQLNonNull(graphql.GraphQLString) }
         },
         resolve: (_, { code }) => {
-            return Validation.passkeyExists(code).then(passkey => {
-                if (!bcrypt.compareSync(code, passkey.code)) {
-                    throw new Error("Incorrect code");
-                }
-                const token = jwt.sign(code, SECRET_KEY);
-                return JSON.stringify({
-                    token: token,
-                    passkey: passkey
+            const hashedCode = shajs('sha256').update(code).digest('hex');
+            return mean.db.collection("passkeys")
+                .findOne({ code: hashedCode })
+                .then(passkey => {
+                    if (!passkey) { throw new Error(`Passkey with code ${code} does not exist.`) };
+
+                    const token = jwt.sign(hashedCode, SECRET_KEY);
+                    return JSON.stringify({ token: token, passkey: passkey });
                 });
-            });
         }
     })
     .schema();
-
-namespace Validation {
-    export function passkeyExists(code) {
-        return mean.db.collection("passkeys")
-            .findOne({ atom_id: code })
-            .then(passkey => {
-                if (!passkey) throw new Error(`passkey with code ${passkey.atom_id} doesn't exist`);
-                return passkey;
-            });
-    }
-
-    export function passkeyIsNew(code) {
-        return mean.db.collection("passkeys")
-            .findOne({ atom_id: code }, { _id: 1 })
-            .then(passkey => {
-                if (passkey) throw new Error(`passkey with code ${passkey.atom_id} already exists`);
-                return passkey;
-            });
-    }
-}
 
 /**
  * Generates a random code. 

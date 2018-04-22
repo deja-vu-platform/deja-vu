@@ -1,3 +1,4 @@
+<dv-widget name="PasskeyLoggedIn" of="ClimberAuthentication"></dv-widget>
 <nav class="navbar navbar-inverse navbar-fixed-top bug-fix" role="navigation">
     <div class="container">
         <div class="navbar-header">
@@ -12,11 +13,6 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <!-- Is it possible to toggle visibility? -->
-                <li class="popup">
-                    <a class="mycode">My Code</a>
-                    <span class="popuptext" id="my-popup">{{climber.code}}</span>
-                </li>
                 <li>
                     <a routerLink="/buddy-login">Buddy Log</a>
                 </li>
@@ -25,14 +21,14 @@
                 </li>
                 <li>
                     <!-- TODO: Implement leaderboard -->
-                    <a>Rules</a>
+                    <a>Leaderboard</a>
                 </li>
                 <li>
                     <!-- TODO: Implement rules -->
                     <a>Rules</a>
                 </li>
                 <li>
-                    <dv-widget name="PasskeySignOutWithRedirect" of="ClimberAuthentication"></dv-widget>
+                    <dv-widget name="ClimberLogOut"></dv-widget>
                 </li>
             </ul>
         </div>

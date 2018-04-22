@@ -23,25 +23,23 @@ Team Reach
 - Group
 
 ## Missing Features
-- It's not pretty yet
-- Leaderboard
+### Host 
+- Register with profile information -> `Profile` cliche
+- Display host profile info -> `Profile` cliche
+- Edit competition info -> `Event`, `Group` cliches
+- Edit climber info ->  `Group` cliche
+- List number of climbers -> Needs new widget in the `Group` cliche
+- List number of climbs -> Needs new widget in the `Task` cliche
+- Leaderboard -> `Scoring` cliche
+- Add sex, category info for a climber -> Persisted fields OR create new widgets in the `Profile` cliche
+- Add point, category info for a climb -> Persisted fields
+- Sort climbers in alphabetical order -> Needs a `Sort` or `Filter` cliche
 
-**Host**
-- Edit competitions
-- Define the sex and category of a climber when creating one (persistent fields)
-- Reveal code when looking at the climbers
-- Edit climbers
-- Sort climbers in alphabetical order
-- Define points and category to a climb (persistent fields)
-- Edit a climb
-- Show the number of climbs and climbers
+### Climber 
+- Record number of falls per climb -> `Scoring` cliche
+- Leaderboard -> `Scoring` cliche
+- Sort climbs by name/ points -> Needs a `Sort` or `Filter` cliche
+- Give approval by entering credentials -> Needs new widget in the `Task` cliche
 
-**Climber**
-- Record number of falls per climb
-- Sort climbs by name/ points
-- Leaderboard
-- BuddyLog
-- Complete climb with approval from witness
-
-**Spectator**
-- Leaderboard
+### Spectator 
+- Leaderboard -> `Scoring` cliche
