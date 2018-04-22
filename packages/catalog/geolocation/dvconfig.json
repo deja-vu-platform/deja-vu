@@ -1,7 +1,6 @@
 {
   "name": "geolocation",
   "gateway": {
-    "name": "gateway",
     "config": {
       "wsPort": 3000
     }
