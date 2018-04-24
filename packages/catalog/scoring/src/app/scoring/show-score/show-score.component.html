@@ -1,0 +1,10 @@
+<span *ngIf="score">
+  <div *ngIf="showId">{{score.id}}</div>
+
+  <div *ngIf="showValue && (score.value || score.value === 0)">
+    {{score.value}}
+  </div>
+  <div *ngIf="showValue && !(score.value || good.value === 0)">
+    {{noValueText}}
+  </div>
+</span>

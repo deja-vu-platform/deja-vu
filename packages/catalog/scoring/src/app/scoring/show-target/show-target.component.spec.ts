@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ShowTotalComponent } from './show-total.component';
+import { ShowTargetComponent } from './show-target.component';
 
-describe('ShowTotalComponent', () => {
-  let component: ShowTotalComponent;
-  let fixture: ComponentFixture<ShowTotalComponent>;
+describe('ShowTargetComponent', () => {
+  let component: ShowTargetComponent;
+  let fixture: ComponentFixture<ShowTargetComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ShowTotalComponent ]
+      declarations: [ ShowTargetComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ShowTotalComponent);
+    fixture = TestBed.createComponent(ShowTargetComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

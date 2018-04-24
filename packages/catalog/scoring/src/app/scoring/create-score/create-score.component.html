@@ -1,0 +1,25 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createScoreForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit && save" class="form-group">
+    <div *ngIf="newScoreSaved">
+      <i class="material-icons">done</i>
+        {{newScoreSavedText}}
+    </div>
+    <mat-error *ngIf="newScoreError">
+      <i class="material-icons">report_problem</i>
+      {{newScoreError}}
+    </mat-error>
+  </div>
+  <div *ngIf="showOptionToInputValue" class="form-group">
+    <scoring-create-score-value
+      [inputLabel]="valueLabel"
+      formControlName="valueControl">
+    </scoring-create-score-value>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!createScoreForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

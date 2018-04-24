@@ -1,20 +1,30 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
-</div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://github.com/angular/angular-cli/wiki">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
+<div class="container">
+  <h1>Scoring</h1>
 
+  <h2>Create Score</h2>
+  <scoring-create-score id="win" (score)="scoreId = $event.id">
+  </scoring-create-score>
+
+  <h2>Show Score</h2>
+  <scoring-show-score [id]="scoreId"></scoring-show-score>
+
+  <h2>Create Target</h2>
+  <h3>Initial Score</h3>
+  <scoring-create-target id="ben" [initialScore]="5"
+    (target)="targetId1 = $event.id">
+  </scoring-create-target>
+
+  <h3>No Initial Score</h3>
+  <scoring-create-target id="alyssa"
+    [showOptionToInputInitialScore]="false"
+    [useInitialScore]="false"
+    (target)="targetId2 = $event.id">
+  </scoring-create-target>
+
+  <h2>Show Target</h2>
+  <scoring-show-target [id]="targetId1"></scoring-show-target>
+  <scoring-show-target [id]="targetId2"></scoring-show-target>
+
+  <h2>Update Target</h2>
+  <scoring-update-target [id]="targetId1"></scoring-update-target>
+</div>

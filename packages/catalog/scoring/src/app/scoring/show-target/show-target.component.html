@@ -1,0 +1,25 @@
+<div *ngIf="target" class="container">
+  <div *ngIf="showId">
+    <span>{{target.id}}</span>
+  </div>
+
+  <div *ngIf="target.scores && target.scores.length > 0">
+
+    <ul *ngIf="showScores" class="list-group">
+      <li *ngFor="let score of target.scores" class="list-group-item">
+        <dv-include [action]="showScore" [inputs]="{
+            id: score.id, showId: showScoreId, showValue: showScoreValue}"
+          [parent]="showTarget">
+        </dv-include>
+      </li>
+    </ul>
+  </div>
+
+  <div *ngIf="!target || !target.scores || target.scores.length === 0">
+    {{noScoresText}}
+  </div>
+
+  <div *ngIf="showTotal && (target.total || target.total === 0)">
+    <span>{{totalLabel}}{{target.total}}</span>
+  </div>
+</div>
