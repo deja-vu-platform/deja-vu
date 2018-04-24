@@ -1,21 +1,39 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CreateMarkerButtonComponent } from './create-marker-button/create-marker-button.component';
-import { CreateMarkerPositionComponent } from './create-marker-position/create-marker-position.component';
-import { CreateMarkerTitleComponent } from './create-marker-title/create-marker-title.component';
-import { DeleteMarkerComponent } from './delete-marker/delete-marker.component';
+import { ApplicationRef, NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import {
+  MatButtonModule, MatFormFieldModule, MatInputModule
+} from '@angular/material';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+import { DvModule } from 'dv-core';
+
 import { DisplayMapComponent } from './display-map/display-map.component';
-import { MarkerInfoWindowComponent } from './marker-info-window/marker-info-window.component';
-import { OverlayMarkerComponent } from './overlay-marker/overlay-marker.component';
-import { OverlayMarkersComponent } from './overlay-markers/overlay-markers.component';
-import { SearchForPlaceComponent } from './search-for-place/search-for-place.component';
-import { ShowMarkerLocationComponent } from './show-marker-location/show-marker-location.component';
-import { SharedComponent } from './-shared/-shared.component';
+
+import { AgmCoreModule } from '@agm/core';
+
+const allComponents = [
+  DisplayMapComponent
+];
 
 @NgModule({
   imports: [
-    CommonModule
+    BrowserModule,
+    CommonModule,
+    DvModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    FormsModule,
+    AgmCoreModule.forRoot({
+      apiKey: 'AIzaSyBbPL7hviCiMdW7ZkIuq119PuidXV0epwY'
+    })
   ],
-  declarations: [CreateMarkerButtonComponent, CreateMarkerPositionComponent, CreateMarkerTitleComponent, DeleteMarkerComponent, DisplayMapComponent, MarkerInfoWindowComponent, OverlayMarkerComponent, OverlayMarkersComponent, SearchForPlaceComponent, ShowMarkerLocationComponent, SharedComponent]
+  declarations: allComponents,
+  exports: allComponents,
+  entryComponents: allComponents
 })
 export class GeolocationModule { }

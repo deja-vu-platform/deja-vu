@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeleteMarkerComponent } from './delete-marker.component';
+import { ShowMarkerComponent } from './show-marker.component';
 
-describe('DeleteMarkerComponent', () => {
-  let component: DeleteMarkerComponent;
-  let fixture: ComponentFixture<DeleteMarkerComponent>;
+describe('ShowMarkerComponent', () => {
+  let component: ShowMarkerComponent;
+  let fixture: ComponentFixture<ShowMarkerComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [DeleteMarkerComponent]
+      declarations: [ShowMarkerComponent]
     })
       .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DeleteMarkerComponent);
+    fixture = TestBed.createComponent(ShowMarkerComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
