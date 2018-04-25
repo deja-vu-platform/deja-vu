@@ -9,12 +9,22 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from 'dv-core';
 
+import { CreateMarkerComponent } from './create-marker/create-marker.component';
+import { DeleteMarkerComponent } from './delete-marker/delete-marker.component';
 import { DisplayMapComponent } from './display-map/display-map.component';
+import { ShowMarkerComponent } from './show-marker/show-marker.component';
+import { ShowMarkersComponent } from './show-markers/show-markers.component';
 
 import { AgmCoreModule } from '@agm/core';
 
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBbPL7hviCiMdW7ZkIuq119PuidXV0epwY';
+
 const allComponents = [
-  DisplayMapComponent
+  CreateMarkerComponent,
+  DeleteMarkerComponent,
+  DisplayMapComponent,
+  ShowMarkerComponent,
+  ShowMarkersComponent
 ];
 
 @NgModule({
@@ -29,7 +39,7 @@ const allComponents = [
     MatFormFieldModule,
     FormsModule,
     AgmCoreModule.forRoot({
-      apiKey: 'AIzaSyBbPL7hviCiMdW7ZkIuq119PuidXV0epwY'
+      apiKey: GOOGLE_MAPS_API_KEY
     })
   ],
   declarations: allComponents,

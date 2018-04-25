@@ -1,3 +1,15 @@
-<p>
-  show-marker-location works!
-</p>
+<div *ngIf="marker">
+  <div *ngIf="showId">
+    {{marker.id}}
+  </div>
+  <div *ngIf="showTitle">
+    {{marker.title}}
+  </div>
+  <div *ngIf="showLatLong">
+    Latitude: <span>{{marker.latitude}}</span>
+    Longitude: <span>{{marker.longitude}}</span>
+  </div>
+  <div *ngIf="showMapId">
+    {{marker.mapId}}
+  </div>
+</div>

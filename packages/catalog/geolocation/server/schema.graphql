@@ -1,35 +1,33 @@
-// Change
-type Source {
+type Marker {
   id: ID!,
-  ratings: [Rating]
+  title: String,
+  latitude: Float!,
+  longitude: Float!,
+  mapId: ID!
 }
 
-type Target {
-  id: ID!,
-  ratings: [Rating]
+input CreateMarkerInput {
+  id: ID,
+  title: String,
+  latitude: Float!,
+  longitude: Float!,
+  mapId: ID!
 }
 
-type Rating {
-  sourceId: ID!
-  targetId: ID!
-  rating: Float
-}
-
-type AverageRatingForTargetOutput {
-  rating: Float
-  count: Float
+input MarkersInput {
+  mapId: ID,
+  minLat: Float,
+  maxLat: Float,
+  minLong: Float,
+  maxLong: Float
 }
 
 type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  marker(id: ID!): Marker
+  markers(input: MarkersInput): [Marker]
 }
 
 type Mutation {
-  createSource(sourceId: ID!): Source
-  createTarget(targetId: ID!): Target 
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  createMarker(input: CreateMarkerInput!): Marker
+  deleteMarker(id: ID!): Boolean
 }
