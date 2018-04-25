@@ -10,11 +10,10 @@
   (mapClick)="mapClicked($event)">
 
   <agm-marker 
-    *ngFor="let m of markers; let i = index"
+    *ngFor="let m of markers"
     (markerClick)="clickedMarker(m.title)"
     [latitude]="m.latitude"
     [longitude]="m.longitude"
-    [label]="i"
     [markerDraggable]="draggableMarker"
     (dragEnd)="markerDragEnd(m, $event)">
     

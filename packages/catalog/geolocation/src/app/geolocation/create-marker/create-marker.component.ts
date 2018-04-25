@@ -47,10 +47,10 @@ export class CreateMarkerComponent implements
     const markerTitle = label ? label : '';
     this.titleControl.setValue(markerTitle);
   }
-  @Input() set latitude(pos: string) {
+  @Input() set latitude(pos: number) {
     this.latitudeControl.setValue(pos);
   }
-  @Input() set longitude(pos: string) {
+  @Input() set longitude(pos: number) {
     this.longitudeControl.setValue(pos);
   }
 

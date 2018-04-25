@@ -25,7 +25,7 @@ export class DisplayMapComponent implements OnInit, OnChanges {
   @Input() maxZoom = 20;
   @Input() minZoom = 3;
   @Input() streetViewControl = false;
-  @Input() draggableMarker = true;
+  @Input() draggableMarker = false;
 
   @Output() newPosition: EventEmitter<Marker> = new EventEmitter<Marker>();
 
@@ -76,7 +76,7 @@ export class DisplayMapComponent implements OnInit, OnChanges {
     console.log(`Marker location: ${$event.coords.lat}, ${$event.coords.lng}`);
     const m: Marker = {
       latitude: $event.coords.lat,
-      longitude: $event.coords.lat,
+      longitude: $event.coords.lng,
       mapId: this.mapId
     };
     this.newPosition.emit(m);
