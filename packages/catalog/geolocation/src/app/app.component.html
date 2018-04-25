@@ -1,9 +1,10 @@
-<!-- <geolocation-display-map></geolocation-display-map> -->
-
 <div class="container">
+  <geolocation-display-map mapId="markerMapId"></geolocation-display-map>
   <h1>Create Marker</h1>
-  <geolocation-create-marker id="markerId" mapId="markerMapId" 
+  <geolocation-create-marker mapId="markerMapId" 
     latitude="42.3592" longitude="-71.09315" (marker)="m=$event">
+  <!-- <geolocation-create-marker id="markerId" mapId="markerMapId" 
+  latitude="42.3592" longitude="-71.09315" (marker)="m=$event"> -->
   </geolocation-create-marker>
   <h1>Show Marker</h1>
   <geolocation-show-marker [marker]="m"></geolocation-show-marker>
@@ -12,5 +13,5 @@
   <h1>Show Markers for a given Map</h1>
   <geolocation-show-markers mapId="markerMapId"></geolocation-show-markers>
   <h1>Delete Marker</h1>
-  <geolocation-delete-marker id="markerId"></geolocation-delete-marker>
+  <!-- <geolocation-delete-marker id="markerId"></geolocation-delete-marker> -->
 </div>

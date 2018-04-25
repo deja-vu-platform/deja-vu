@@ -13,8 +13,8 @@ import * as _ from 'lodash';
   templateUrl: './display-map.component.html',
   styleUrls: ['./display-map.component.css']
 })
-export class DisplayMapComponent {
-  @Input() mapId: string; // TODO
+export class DisplayMapComponent implements OnInit, OnChanges {
+  @Input() mapId: string;
 
 
   // Default configurations for the Google Maps Display
@@ -29,7 +29,48 @@ export class DisplayMapComponent {
 
   @Output() newPosition: EventEmitter<Marker> = new EventEmitter<Marker>();
 
-  markers: Marker[];
+  markers: Marker[] = [];
+
+  private gs: GatewayService;
+
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory) { }
+
+  ngOnInit() {
+    this.gs = this.gsf.for(this.elem);
+    this.fetchMarkers();
+  }
+
+  ngOnChanges() {
+    this.fetchMarkers();
+  }
+
+  fetchMarkers() {
+    if (this.gs) {
+      this.gs
+        .get<{ data: { markers: Marker[] } }>('/graphql', {
+          params: {
+            query: `
+              query Markers($input: MarkersInput!) {
+                markers(input: $input) {
+                  title
+                  latitude
+                  longitude
+                }
+              }
+            `,
+            variables: JSON.stringify({
+              input: {
+                mapId: this.mapId
+              }
+            })
+          }
+        })
+        .subscribe((res) => {
+          this.markers = res.data.markers;
+        });
+    }
+  }
 
   mapClicked($event: MouseEvent) {
     console.log(`Marker location: ${$event.coords.lat}, ${$event.coords.lng}`);
@@ -41,8 +82,8 @@ export class DisplayMapComponent {
     this.newPosition.emit(m);
   }
 
-  clickedMarker(label: string, index: number) {
-    console.log(`clicked the marker: ${label || index}`);
+  clickedMarker(title: string) {
+    console.log(`clicked the marker: ${title}`);
   }
 
   markerDragEnd(m: Marker, $event: MouseEvent) {
