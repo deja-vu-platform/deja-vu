@@ -3,9 +3,9 @@
     [(value)]="_selectedObjectId"
     (selectionChange)="updateSelected($event.value)">
     <mat-option>None</mat-option>
-    <mat-option *ngFor="let o of _objects" [value]="o.id">
+    <mat-option *ngFor="let object of _objects" [value]="object.id">
       <dv-include [action]="showObject" [inputs]="{
-          object: o, showOnly: showOnly, showExclude: showExclude
+          object: object, showOnly: showOnly, showExclude: showExclude
         }"
         [parent]="chooseObject">
       </dv-include>
