@@ -21,6 +21,7 @@ import {
 import { ShowObjectComponent } from './show-object/show-object.component';
 import { ShowObjectsComponent } from './show-objects/show-objects.component';
 
+import { API_PATH } from './property.config';
 
 const allComponents = [
   ChooseObjectComponent, CreateObjectComponent, CreateObjectsComponent,
@@ -38,6 +39,7 @@ const allComponents = [
     MatButtonModule, MatInputModule, MatFormFieldModule,
     MatSelectModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: [...allComponents, CamelToTitleCasePipe],
   entryComponents: allComponents,
   exports: [...allComponents, CamelToTitleCasePipe]

@@ -1,10 +1,14 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, Type
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
+  Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
 
 import { properties, Property } from '../shared/property.model';
+
+import { API_PATH } from '../property.config';
+
 
 @Component({
   selector: 'property-show-object',
@@ -23,7 +27,8 @@ export class ShowObjectComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -46,7 +51,7 @@ export class ShowObjectComponent implements OnInit, OnChanges {
 
   async fetchProperties(): Promise<string[]> {
     const res = await this.gs
-      .get<{data: {properties: Property[]}}>('/graphql', {
+      .get<{data: {properties: Property[]}}>(this.apiPath, {
         params: {
           query: `
             query {
@@ -65,7 +70,7 @@ export class ShowObjectComponent implements OnInit, OnChanges {
   fetchObject() {
     if (this.id && this.properties) {
       this.gs
-        .get<{data: {object: Object}}>('/graphql', {
+        .get<{data: {object: Object}}>(this.apiPath, {
           params: {
             query: `
               query {
