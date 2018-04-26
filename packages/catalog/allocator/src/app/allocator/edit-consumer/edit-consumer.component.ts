@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
   SimpleChanges, ViewChild
 } from '@angular/core';
 import {
@@ -14,11 +14,13 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
+import { API_PATH } from '../allocator.config';
+
+
 interface ConsumerOfResourceRes {
   data: {consumerOfResource: string};
 }
 
-const GRAPHQL_ENDPOINT = '/graphql';
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
@@ -64,7 +66,8 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
   constructor(
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -80,7 +83,7 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
 
   update() {
     if (this.gs && this.resourceId && this.allocationId) {
-      this.gs.get<ConsumerOfResourceRes>(GRAPHQL_ENDPOINT, {
+      this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
           query: `query {
             consumerOfResource(
@@ -108,7 +111,7 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
     }
     const newConsumerId = this.newConsumerControl.value;
     const res = await this.gs
-      .post<{ data: { editConsumerOfResource: boolean }}>(GRAPHQL_ENDPOINT, {
+      .post<{ data: { editConsumerOfResource: boolean }}>(this.apiPath, {
         query: `
           mutation {
             editConsumerOfResource(

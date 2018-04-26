@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
   SimpleChanges
 } from '@angular/core';
 
@@ -8,6 +8,8 @@ import {
 } from 'dv-core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
+
+import { API_PATH } from '../allocator.config';
 
 import * as _ from 'lodash';
 
@@ -36,7 +38,8 @@ export class CreateAllocationComponent implements OnInit, OnChanges {
   constructor(
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -68,7 +71,7 @@ export class CreateAllocationComponent implements OnInit, OnChanges {
         .toPromise();
     }
     console.log(`Create allocation with ${this.id}`);
-    this.gs.post<CreateAllocationRes>('/graphql', {
+    this.gs.post<CreateAllocationRes>(this.apiPath, {
       query: `
         mutation CreateAllocation(
           $id: ID!, $resourceIds: [ID!], $consumerIds: [ID!]) {

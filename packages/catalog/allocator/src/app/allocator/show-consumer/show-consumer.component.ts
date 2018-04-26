@@ -1,7 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
-
 
 import {
   GatewayService, GatewayServiceFactory, OnRun, RunService
@@ -9,11 +8,12 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
+import { API_PATH } from '../allocator.config';
+
 interface ConsumerOfResourceRes {
   data: {consumerOfResource: string};
 }
 
-const GRAPHQL_ENDPOINT = '/graphql';
 
 @Component({
   selector: 'allocator-show-consumer',
@@ -29,7 +29,8 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
   constructor(
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -43,9 +44,9 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
 
   update() {
     if (this.gs && this.resourceId && this.allocationId) {
-      this.gs.get<ConsumerOfResourceRes>(GRAPHQL_ENDPOINT, {
+      this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
-          query: ` query {
+          query: `query {
              consumerOfResource(
                resourceId: "${this.resourceId}",
                allocationId: "${this.allocationId}")

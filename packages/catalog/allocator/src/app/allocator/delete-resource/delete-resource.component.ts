@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
   SimpleChanges
 } from '@angular/core';
 
@@ -9,11 +9,12 @@ import {
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
 
+import { API_PATH } from '../allocator.config';
+
 interface DeleteResourceRes {
   data: {deleteResource: boolean};
 }
 
-const GRAPHQL_ENDPOINT = '/graphql';
 
 @Component({
   selector: 'allocator-delete-resource',
@@ -31,7 +32,8 @@ export class DeleteResourceComponent implements OnInit, OnChanges {
   constructor(
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -58,7 +60,7 @@ export class DeleteResourceComponent implements OnInit, OnChanges {
     }
 
     return this.gs
-      .post<DeleteResourceRes>(GRAPHQL_ENDPOINT, {
+      .post<DeleteResourceRes>(this.apiPath, {
         query: `
           mutation DeleteResource($resourceId: ID!, $allocationId: ID!) {
             deleteResource(resourceId: $resourceId, allocationId: $allocationId)

@@ -18,6 +18,9 @@ import {
 import { EditConsumerComponent } from './edit-consumer/edit-consumer.component';
 import { ShowConsumerComponent } from './show-consumer/show-consumer.component';
 
+import { API_PATH } from './allocator.config';
+
+
 const allComponents = [
   CreateAllocationComponent, ShowConsumerComponent, EditConsumerComponent,
   DeleteResourceComponent
@@ -32,6 +35,7 @@ const allComponents = [
     MatButtonModule, MatInputModule, MatFormFieldModule,
     MatSelectModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents
