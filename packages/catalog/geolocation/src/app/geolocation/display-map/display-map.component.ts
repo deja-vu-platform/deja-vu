@@ -14,13 +14,13 @@ import * as _ from 'lodash';
   styleUrls: ['./display-map.component.css']
 })
 export class DisplayMapComponent implements OnInit, OnChanges {
-  @Input() mapId: string;
+  @Input() id: string;
 
 
   // Default configurations for the Google Maps Display
-  // Default center: MIT Lobby 7
-  @Input() lat = 42.3592;
-  @Input() lng = -71.09315;
+  // Default center: MIT Stata Center
+  @Input() lat = 42.3616423;
+  @Input() lng = -71.0928587;
   @Input() zoom = 16;
   @Input() maxZoom = 20;
   @Input() minZoom = 3;
@@ -61,7 +61,7 @@ export class DisplayMapComponent implements OnInit, OnChanges {
             `,
             variables: JSON.stringify({
               input: {
-                mapId: this.mapId
+                mapId: this.id
               }
             })
           }
@@ -77,7 +77,7 @@ export class DisplayMapComponent implements OnInit, OnChanges {
     const m: Marker = {
       latitude: $event.coords.lat,
       longitude: $event.coords.lng,
-      mapId: this.mapId
+      mapId: this.id
     };
     this.newPosition.emit(m);
   }
