@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
   SimpleChanges
 } from '@angular/core';
 
@@ -11,17 +11,17 @@ import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../allocator.config';
 
+
 interface DeleteResourceRes {
   data: {deleteResource: boolean};
 }
-
 
 @Component({
   selector: 'allocator-delete-resource',
   templateUrl: './delete-resource.component.html',
   styleUrls: ['./delete-resource.component.css']
 })
-export class DeleteResourceComponent implements OnInit, OnChanges {
+export class DeleteResourceComponent implements OnInit, OnChanges, OnRun {
   @Input() resourceId: string;
   @Input() allocationId: string;
   resourceIdChange = new EventEmitter();

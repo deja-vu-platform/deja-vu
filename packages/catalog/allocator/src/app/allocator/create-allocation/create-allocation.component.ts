@@ -11,7 +11,6 @@ import { map, take } from 'rxjs/operators';
 
 import { API_PATH } from '../allocator.config';
 
-import * as _ from 'lodash';
 
 interface CreateAllocationRes {
   data: {createAllocation: {id: string}};
@@ -21,7 +20,7 @@ interface CreateAllocationRes {
   selector: 'allocator-create-allocation',
   templateUrl: './create-allocation.component.html'
 })
-export class CreateAllocationComponent implements OnInit, OnChanges {
+export class CreateAllocationComponent implements OnInit, OnChanges, OnRun {
   @Input() id: string;
   @Input() resourceIds: string[]; // Required
   @Input() consumerIds: string[]; // Required

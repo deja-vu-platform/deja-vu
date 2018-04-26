@@ -1,10 +1,9 @@
 import {
-  Component, ElementRef, EventEmitter, Inject, Input, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
+  GatewayService, GatewayServiceFactory, OnRun, RunService
 } from 'dv-core';
 
 import { Observable } from 'rxjs/Observable';
