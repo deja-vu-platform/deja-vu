@@ -85,19 +85,25 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
     if (this.gs && this.resourceId && this.allocationId) {
       this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
-          query: `query {
-            consumerOfResource(
-              resourceId: "${this.resourceId}",
-              allocationId: "${this.allocationId}")
-          }`
-          }
-        })
-        .pipe(map((res) => res.data.consumerOfResource))
-        .subscribe((consumerId) => {
-          this.currentConsumerId.emit(consumerId);
-          this._currentConsumerId = consumerId;
-          this.newConsumerControl.setValue(consumerId);
-        });
+          query: `
+            query ConsumerOfResource($input: ConsumerOfResourceInput!) {
+              consumerOfResource(input: $input)
+            }
+          `,
+          variables: JSON.stringify({
+            input: {
+              resourceId: this.resourceId,
+              allocationId: this.allocationId
+            }
+          })
+        }
+      })
+      .pipe(map((res) => res.data.consumerOfResource))
+      .subscribe((consumerId) => {
+        this.currentConsumerId.emit(consumerId);
+        this._currentConsumerId = consumerId;
+        this.newConsumerControl.setValue(consumerId);
+      });
     }
   }
 
@@ -113,13 +119,18 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
     const res = await this.gs
       .post<{ data: { editConsumerOfResource: boolean }}>(this.apiPath, {
         query: `
-          mutation {
-            editConsumerOfResource(
-              resourceId: "${this.resourceId}",
-              allocationId: "${this.allocationId}",
-              newConsumerId: "${newConsumerId}")
+          mutation EditConsumerOfResource(
+            $input: EditConsumerOfResourceInput!) {
+            editConsumerOfResource(input: $input)
           }
-        `
+        `,
+        variables: {
+          input: {
+            resourceId: this.resourceId,
+            allocationId: this.allocationId,
+            newConsumerId: newConsumerId
+          }
+        }
       })
       .toPromise();
     if (res.data.editConsumerOfResource) {

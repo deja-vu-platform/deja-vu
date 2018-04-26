@@ -46,11 +46,17 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
     if (this.gs && this.resourceId && this.allocationId) {
       this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
         params: {
-          query: `query {
-             consumerOfResource(
-               resourceId: "${this.resourceId}",
-               allocationId: "${this.allocationId}")
-          }`
+          query: `
+            query ConsumerOfResource($input: ConsumerOfResourceInput!) {
+              consumerOfResource(input: $input)
+            }
+          `,
+          variables: JSON.stringify({
+            input: {
+              resourceId: this.resourceId,
+              allocationId: this.allocationId
+            }
+          })
         }
       })
       .pipe(map((res) => res.data.consumerOfResource))

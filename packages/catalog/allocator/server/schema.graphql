@@ -3,20 +3,41 @@
 
 type Allocation {
   id: ID!
-  resourceIds: [ID!],
+  resourceIds: [ID!]
   consumerIds: [ID!]
+}
+
+input ConsumerOfResourceInput {
+  resourceId: ID!
+  allocationId: ID!
+}
+
+input EditConsumerOfResourceInput {
+  resourceId: ID!
+  allocationId: ID!
+  newConsumerId: ID!
+}
+
+input CreateAllocationInput {
+  id: ID
+  resourceIds: [ID!]
+  consumerIds: [ID!]
+}
+
+input DeleteResourceInput {
+  resourceId: ID!
+  allocationId: ID!
 }
 
 type Query {
   allocation(id: ID!): Allocation
-  consumerOfResource(resourceId: ID!, allocationId: ID!): ID
+  consumerOfResource(input: ConsumerOfResourceInput!): ID
 }
 
 type Mutation {
-  editConsumerOfResource(
-      resourceId: ID!, allocationId: ID!, newConsumerId: ID!): Boolean
+  editConsumerOfResource(input: EditConsumerOfResourceInput!): Boolean
   # Creates a new allocation of the given resources and all existing consumers
-  createAllocation(id: ID, resourceIds: [ID!], consumerIds: [ID!]): Allocation
+  createAllocation(input: CreateAllocationInput!): Allocation
   # Removes the given resource from the allocation
-  deleteResource(resourceId: ID!, allocationId: ID!): Boolean
+  deleteResource(input: DeleteResourceInput!): Boolean
 }

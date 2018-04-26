@@ -24,6 +24,28 @@ interface Assignment {
   consumerId: string;
 }
 
+interface EditConsumerOfResourceInput {
+  resourceId: string;
+  allocationId: string;
+  newConsumerId: string;
+}
+
+interface ConsumerOfResourceInput {
+  resourceId: string;
+  allocationId: string;
+}
+
+interface CreateAllocationInput {
+  id: string;
+  resourceIds: string[];
+  consumerIds: string[];
+}
+
+interface DeleteResourceInput {
+  resourceId: string;
+  allocationId: string;
+}
+
 
 interface Config {
   wsPort: number;
@@ -78,7 +100,9 @@ const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 const resolvers = {
   Query: {
     allocation: (root, { id }) => allocations.findOne({ id: id }),
-    consumerOfResource: async (root, { resourceId, allocationId }) => {
+    consumerOfResource: async (
+      root, { input: { resourceId, allocationId } }
+      : { input: ConsumerOfResourceInput }) => {
       const allocation: AllocationDoc = await allocations
         .findOne(
           { id: allocationId, 'assignments.resourceId': resourceId },
@@ -94,7 +118,8 @@ const resolvers = {
   },
   Mutation: {
     editConsumerOfResource: async (
-      root, { resourceId, allocationId, newConsumerId }) => {
+      root, { input: { resourceId, allocationId, newConsumerId } }
+      : { input: EditConsumerOfResourceInput }) => {
         const updateOp = {
           $set: { 'assignments.$.consumerId': newConsumerId }
         };
@@ -109,7 +134,9 @@ const resolvers = {
 
         return true;
     },
-    createAllocation: async (root, { id, resourceIds, consumerIds }) => {
+    createAllocation: async (
+      root, { input: { id, resourceIds, consumerIds } }
+      : { input: CreateAllocationInput }) => {
       const assignments: Assignment[] = [];
       if (!_.isEmpty(consumerIds)) {
         let currentConsumerIndex = 0;
@@ -131,7 +158,9 @@ const resolvers = {
 
       return newAllocation;
     },
-    deleteResource: async (root, { resourceId, allocationId }) => {
+    deleteResource: async (
+      root, { input: { resourceId, allocationId } }
+      : { input: DeleteResourceInput }) => {
       const updateObj = await allocations
         .updateOne({ id: allocationId },
           { $pull: {

@@ -21,9 +21,9 @@ interface CreateAllocationRes {
   templateUrl: './create-allocation.component.html'
 })
 export class CreateAllocationComponent implements OnInit, OnChanges, OnRun {
-  @Input() id: string;
-  @Input() resourceIds: string[]; // Required
-  @Input() consumerIds: string[]; // Required
+  @Input() id: string | undefined;
+  @Input() resourceIds: string[];
+  @Input() consumerIds: string[];
 
   @Input() buttonLabel = 'Create Allocation';
 
@@ -72,19 +72,18 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnRun {
     console.log(`Create allocation with ${this.id}`);
     this.gs.post<CreateAllocationRes>(this.apiPath, {
       query: `
-        mutation CreateAllocation(
-          $id: ID!, $resourceIds: [ID!], $consumerIds: [ID!]) {
-          createAllocation(
-            id: $id, resourceIds: $resourceIds,
-            consumerIds: $consumerIds) {
+        mutation CreateAllocation($input: CreateAllocationInput!) {
+          createAllocation(input: $input) {
             id
           }
         }
       `,
       variables: {
-        id: this.id,
-        resourceIds: this.resourceIds,
-        consumerIds: this.consumerIds
+        input: {
+          id: this.id,
+          resourceIds: this.resourceIds,
+          consumerIds: this.consumerIds
+        }
       }
     })
     .pipe(map((res) => res.data.createAllocation))
