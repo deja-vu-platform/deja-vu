@@ -147,6 +147,7 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
       this.editConsumerSaved = false;
     }, SAVED_MSG_TIMEOUT);
 
+    // https://github.com/angular/material2/issues/4190
     if (this.form) {
       this.form.resetForm();
       this.newConsumerControl.setValue(this._currentConsumerId);
