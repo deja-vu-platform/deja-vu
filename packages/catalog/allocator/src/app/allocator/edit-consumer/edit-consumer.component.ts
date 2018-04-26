@@ -18,7 +18,11 @@ import { API_PATH } from '../allocator.config';
 
 
 interface ConsumerOfResourceRes {
-  data: {consumerOfResource: string};
+  data: { consumerOfResource: string };
+}
+
+interface EditConsumerOfResourceRes {
+  data: { editConsumerOfResource: boolean };
 }
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -116,23 +120,22 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
       return;
     }
     const newConsumerId = this.newConsumerControl.value;
-    const res = await this.gs
-      .post<{ data: { editConsumerOfResource: boolean }}>(this.apiPath, {
-        query: `
-          mutation EditConsumerOfResource(
-            $input: EditConsumerOfResourceInput!) {
-            editConsumerOfResource(input: $input)
-          }
-        `,
-        variables: {
-          input: {
-            resourceId: this.resourceId,
-            allocationId: this.allocationId,
-            newConsumerId: newConsumerId
-          }
+    const res = await this.gs.post<EditConsumerOfResourceRes>(this.apiPath, {
+      query: `
+        mutation EditConsumerOfResource(
+          $input: EditConsumerOfResourceInput!) {
+          editConsumerOfResource(input: $input)
         }
-      })
-      .toPromise();
+      `,
+      variables: {
+        input: {
+          resourceId: this.resourceId,
+          allocationId: this.allocationId,
+          newConsumerId: newConsumerId
+        }
+      }
+    })
+    .toPromise();
     if (res.data.editConsumerOfResource) {
       this._currentConsumerId = newConsumerId;
     }
