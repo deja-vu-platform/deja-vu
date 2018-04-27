@@ -269,7 +269,7 @@ const resolvers = {
       isDifferent(input.oldId, input.newId, 'Publisher');
 
       const updateOperation = { $set: { id: input.newId } };
-      await publishers.findOneAndUpdate({ id: input.oldId }, updateOperation);
+      await publishers.updateOne({ id: input.oldId }, updateOperation);
 
       return true;
     },
@@ -288,7 +288,7 @@ const resolvers = {
         { id: input.publisherId, 'messages.id': input.id },
         updateOperation);
 
-      return updatedObj.matchedCount !== 0;
+      return updatedObj.modifiedCount !== 0;
     },
 
     follow: async (root, { input }: { input: FollowUnfollowInput }) => {
@@ -298,10 +298,10 @@ const resolvers = {
       }
 
       const updateOperation = { $push: { followerIds: input.followerId } };
-      await publishers
-        .findOneAndUpdate({ id: input.publisherId }, updateOperation);
+      const updatedObj = await publishers
+        .updateOne({ id: input.publisherId }, updateOperation);
 
-      return true;
+      return updatedObj.modifiedCount !== 0;
     },
 
     unfollow: async (root, { input }: { input: FollowUnfollowInput }) => {
@@ -311,10 +311,10 @@ const resolvers = {
       }
 
       const updateOperation = { $pull: { followerIds: input.followerId } };
-      await publishers
-        .findOneAndUpdate({ id: input.publisherId }, updateOperation);
+      const updatedObj = await publishers
+        .updateOne({ id: input.publisherId }, updateOperation);
 
-      return true;
+      return updatedObj.modifiedCount !== 0;
     }
   }
 };
