@@ -275,46 +275,41 @@ const resolvers = {
     },
 
     editMessage: async (root, { input }: { input: EditMessageInput }) => {
-      const publisher = await publishers
-        .findOne({ id: input.publisherId, 'messages.id': input.id });
-
-      if (!publisher) {
-        throw new Error(`Message/ Publisher does not exist
-      AND you must be the publisher to edit the message`);
-      }
-
       const updateOperation = { $set: { 'messages.$.content': input.content } };
       const updatedObj = await publishers.updateOne(
         { id: input.publisherId, 'messages.id': input.id },
         updateOperation);
 
-      return updatedObj.modifiedCount !== 0;
+      if (updatedObj.modifiedCount === 0 || updatedObj.matchedCount === 0) {
+        throw new Error(`Message/ Publisher does not exist
+        AND you must be the publisher to edit the message`);
+      }
+
+      return true;
     },
 
     follow: async (root, { input }: { input: FollowUnfollowInput }) => {
-      const publisher = await publishers.findOne({ id: input.publisherId });
-      if (_.isEmpty(publisher)) {
-        throw new Error(`Publisher ${input.publisherId} does not exist`);
-      }
-
       const updateOperation = { $push: { followerIds: input.followerId } };
       const updatedObj = await publishers
         .updateOne({ id: input.publisherId }, updateOperation);
 
-      return updatedObj.modifiedCount !== 0;
-    },
-
-    unfollow: async (root, { input }: { input: FollowUnfollowInput }) => {
-      const publisher = await publishers.findOne({ id: input.publisherId });
-      if (_.isEmpty(publisher)) {
+      if (updatedObj.matchedCount === 0) {
         throw new Error(`Publisher ${input.publisherId} does not exist`);
       }
 
+      return true;
+    },
+
+    unfollow: async (root, { input }: { input: FollowUnfollowInput }) => {
       const updateOperation = { $pull: { followerIds: input.followerId } };
       const updatedObj = await publishers
         .updateOne({ id: input.publisherId }, updateOperation);
 
-      return updatedObj.modifiedCount !== 0;
+      if (updatedObj.matchedCount === 0) {
+        throw new Error(`Publisher ${input.publisherId} does not exist`);
+      }
+
+      return true;
     }
   }
 };
