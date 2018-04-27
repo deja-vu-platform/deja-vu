@@ -1,22 +1,22 @@
 type Publisher {
-  id: ID!,
+  id: ID!
   messages: [Message]
   followerIds: [String]
 }
 
 type Message {
-  id: ID!,
+  id: ID!
   content: String!
 }
 
 input CreateMessageInput {
-  id: ID,
-  publisherId: ID!,
+  id: ID
+  publisherId: ID!
   content: String!
 }
 
 # Show a publisher's followers OR
-# Show all folllowers
+# Show all followers
 input FollowersInput {
   publisherId: ID
 }
@@ -31,37 +31,35 @@ input PublishersInput {
 # Show messages of publishers followed by a follower (followerId) OR
 # Show all messages
 input MessagesInput {
-  followerId: ID,
+  followerId: ID
   publisherId: ID
 }
 
 input EditFollowerInput {
-  oldId: ID!,
+  oldId: ID!
   newId: ID!
 }
 
 input EditPublisherInput {
-  oldId: ID!,
+  oldId: ID!
   newId: ID!
 }
 
 input EditMessageInput {
-  id: ID!,
-  publisherId: ID!,
+  id: ID!
+  publisherId: ID!
   content: String!
 }
 
 input FollowUnfollowInput {
-  followerId: ID!,
+  followerId: ID!
   publisherId: ID!
 }
 
 type Query {
-  followers(input: FollowersInput!): [String]
-
+  followers(input: FollowersInput!): [ID]
   publisher(id: ID!): Publisher
   publishers(input: PublishersInput!): [Publisher]
-
   message(id: ID!): Message
   messages(input: MessagesInput!): [Message]
   isFollowing(input: FollowUnfollowInput!): Boolean
