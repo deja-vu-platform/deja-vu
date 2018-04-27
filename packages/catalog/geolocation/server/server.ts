@@ -77,9 +77,8 @@ mongodb.MongoClient.connect(
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
     }
-    // Change
     markers = db.collection('markers');
-    markers.createIndex({ id: 1 }, { unique: true, sparse: true });
+    markers.createIndex({ id: 1, mapId: 1 }, { unique: true, sparse: true });
   });
 
 
