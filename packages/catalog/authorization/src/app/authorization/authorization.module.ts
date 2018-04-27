@@ -19,9 +19,6 @@ import {
   CanViewComponent
 } from './can-view/can-view.component';
 import {
-  CreatePrincipalComponent
-} from './create-principal/create-principal.component';
-import {
   CreateResourceComponent
 } from './create-resource/create-resource.component';
 import {
@@ -39,8 +36,7 @@ import {
 
 const allComponents = [
   AddViewerComponent, CanEditComponent, CanViewComponent,
-  CreatePrincipalComponent, CreateResourceComponent,
-  DeleteResourceComponent, ShowOwnerComponent,
+  CreateResourceComponent, DeleteResourceComponent, ShowOwnerComponent,
   ShowResourceComponent, ShowResourcesComponent
 ];
 

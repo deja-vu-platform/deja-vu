@@ -11,9 +11,6 @@ import * as _ from 'lodash';
 import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
-interface PrincipalDoc {
-  id: string;
-}
 
 interface ResourceDoc {
   id: string;
@@ -61,7 +58,7 @@ try {
 const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, principals, resources;
+let db: mongodb.Db, resources: mongodb.Collection<ResourceDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -72,25 +69,17 @@ mongodb.MongoClient.connect(
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
     }
-    principals = db.collection('principals');
     resources = db.collection('resources');
+    resources.createIndex({ id: 1 }, { unique: true });
+    resources.createIndex({ id: 1, viewerIds: 1 }, { unique: true });
+    resources.createIndex({ viewerId: 1 });
+    resources.createIndex({ ownerId: 1 });
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  static async principalExists(principalId: string): Promise<PrincipalDoc> {
-    return Validation.exists(principals, principalId, 'Principal');
-  }
-
-  static async multiplePrincipalsAllExist(principalIds: string[]) {
-    const numExistingPrincipals = await principals
-      .count({ id: { $in: principalIds } });
-
-    return numExistingPrincipals === principalIds.length;
-  }
-
   static async resourceExists(resourceId: string): Promise<ResourceDoc> {
     return Validation.exists(resources, resourceId, 'Resource');
   }
@@ -103,6 +92,14 @@ class Validation {
 
     return doc;
   }
+}
+
+async function isOwner(principalId: string, resourceId: string) {
+  const res = await resources
+    .findOne({ id: resourceId, ownerId: principalId },
+      { projection: { _id: 1 } });
+
+  return !_.isNil(res);
 }
 
 const resolvers = {
@@ -119,96 +116,63 @@ const resolvers = {
         .toArray();
     },
 
-    principals: () => principals.find()
-      .toArray(),
-
     resource: (root, { id }) => resources.findOne({ id: id }),
-
-    principal: (root, { id }) => principals.findOne({ id: id }),
 
     owner: async (root, { resourceId }) => {
       const resource = await resources
-        .findOne({ id: resourceId }, { ownerId: 1 });
+        .findOne({ id: resourceId }, { projection: { ownerId: 1 } });
 
-      return principals.findOne({ id: resource.ownerId });
+      if (!resource) {
+        throw new Error(`Resource ${resourceId} not found`);
+      }
+
+      return resource.ownerId;
     },
 
-    isOwner: async (root, { principalId, resourceId }) => {
-      const [unusedPrincipal, resource] = await Promise.all([
-        Validation.principalExists(principalId),
-        Validation.resourceExists(resourceId)
-      ]);
-
-      return resource.ownerId === principalId;
+    isOwner: (root, { principalId, resourceId }) => {
+      return isOwner(principalId, resourceId);
     },
 
     isViewer: async (root, { principalId, resourceId }) => {
-      const [unusedPrincipal, resource] = await Promise.all([
-        Validation.principalExists(principalId),
-        Validation.resourceExists(resourceId)
-      ]);
+      const res = await resources
+        .findOne({ id: resourceId, viewerId: principalId },
+          { projection: { _id: 1 } });
 
-      return _.include(resource.viewerIds, principalId);
+      return !_.isNil(res);
     },
 
     canView: async (root, { principalId, resourceId }) => {
-      const [unusedPrincipal, resource] = await Promise.all([
-        Validation.principalExists(principalId),
-        Validation.resourceExists(resourceId)
-      ]);
+      const res = await resources
+        .findOne(
+          { id: resourceId, $or: [
+            { viewerIds: principalId },
+            { ownerId: principalId }
+          ] },
+          { projection: { _id: 1 } });
 
-      return resource.ownerId === principalId ||
-        _.includes(resource.viewerIds, principalId);
+      return !_.isNil(res);
     },
 
-    canEdit: async (root, { principalId, resourceId }) => {
-      const [unusedPrincipal, resource] = await Promise.all([
-        Validation.principalExists(principalId),
-        Validation.resourceExists(resourceId)
-      ]);
-
-      return resource.ownerId === principalId;
+    canEdit: (root, { principalId, resourceId }) => {
+      return isOwner(principalId, resourceId);
     }
-
-  },
-
-  Principal: {
-    id: (principal: PrincipalDoc) => principal.id
   },
 
   Resource: {
     id: (resource: ResourceDoc) => resource.id,
 
-    owner: (resource: ResourceDoc) => principals
-      .findOne({ id: resource.ownerId }),
+    ownerId: (resource: ResourceDoc) => resource.ownerId,
 
-    viewers: (resource: ResourceDoc) => principals
-      .find({ id: { $in: resource.viewerIds } })
-      .toArray()
+    viewerIds: (resource: ResourceDoc) => resource.viewerIds
   },
 
   Mutation: {
-    createPrincipal: async (root, { id }) => {
-      const principalId = id ? id : uuid();
-      const newPrincipal: PrincipalDoc = { id: principalId };
-      await principals.insertOne(newPrincipal);
-
-      return newPrincipal;
-    },
-
     createResource: async (
       root, { input }: { input: CreateResourceInput }) => {
-      const resourceId = input.id ? input.id : uuid();
-      const viewers = !_.isEmpty(input.viewerIds) ? input.viewerIds! : [];
-      await Promise.all([
-        Validation.principalExists(input.ownerId),
-        Validation.multiplePrincipalsAllExist(viewers)
-      ]);
-
       const newResource: ResourceDoc = {
-        id: resourceId,
+        id: input.id ? input.id : uuid(),
         ownerId: input.ownerId,
-        viewerIds: viewers
+        viewerIds: _.get(input, 'viewerIds', [])
       };
 
       await resources.insertOne(newResource);
@@ -217,26 +181,16 @@ const resolvers = {
     },
 
     addViewerToResource: async (root, { id, viewerId }) => {
-      const [unusedPrincipal, resource] = await Promise.all([
-        Validation.principalExists(viewerId),
-        Validation.resourceExists(id)
-      ]);
+      const updateOp = { $push: { viewerIds: viewerId } };
+      const update = await resources.updateOne({ id: id }, updateOp);
 
-      const newViewerIds = resource.viewerIds;
-      newViewerIds.push(viewerId);
-
-      const updateOp = {
-        $set: { viewerIds: newViewerIds }
-      };
-      await resources.updateOne({ id: id }, updateOp);
-
-      return true;
+      return update.modifiedCount === 1;
     },
 
     deleteResource: async (root, { id }) => {
-      await resources.deleteOne({ id: id });
+      const del = await resources.deleteOne({ id: id });
 
-      return { id: id };
+      return del.deletedCount === 1;
     }
   }
 };

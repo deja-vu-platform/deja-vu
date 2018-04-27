@@ -1,12 +1,7 @@
-type Principal {
-  id: ID!
-}
-
 type Resource {
   id: ID!,
-  # only owners can edit a resource
-  owner: Principal!,
-  viewers: [Principal]
+  ownerId: ID!,
+  viewerIds: [ID!]
 }
 
 input ResourcesInput {
@@ -21,10 +16,8 @@ input CreateResourceInput {
 
 type Query {
   resource(id: ID!): Resource
-  principal(id: ID!): Principal
-  owner(resourceId: ID!): Principal
+  owner(resourceId: ID!): ID
   resources(input: ResourcesInput!): [Resource!]
-  principals: [Principal!]
   isOwner(principalId: ID!, resourceId: ID!): Boolean
   isViewer(principalId: ID!, resourceId: ID!): Boolean
   canView(principalId: ID!, resourceId: ID!): Boolean
@@ -32,8 +25,7 @@ type Query {
 }
 
 type Mutation {
-  createPrincipal(id: ID!): Principal
   createResource(input: CreateResourceInput!): Resource
   addViewerToResource(id: ID!, viewerId: ID!): Boolean
-  deleteResource(id: ID!): String
+  deleteResource(id: ID!): Boolean
 }

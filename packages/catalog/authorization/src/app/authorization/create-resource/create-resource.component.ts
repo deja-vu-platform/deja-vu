@@ -61,8 +61,8 @@ export class CreateResourceComponent implements
           query: `mutation CreateResource($input: CreateResourceInput!){
             createResource(input: $input) {
               id,
-              owner { id },
-              viewers { id }
+              ownerId,
+              viewerIds
             }
           }`,
           variables: {
