@@ -16,14 +16,17 @@ interface EventDoc {
   id: string;
   startDate: Date;
   endDate: Date;
-  seriesId?: string;
 }
 
 interface SeriesDoc {
   id: string;
   startsOn: Date;
   endsOn: Date;
-  eventIds: string[];
+  events: EventDoc[];
+}
+
+interface GraphQlEvent extends EventDoc {
+  series?: SeriesDoc;
 }
 
 interface CreateEventInput {
@@ -74,7 +77,10 @@ const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 let db: mongodb.Db;
-let events: mongodb.Collection<EventDoc>, series: mongodb.Collection<SeriesDoc>;
+// Stores individual events that are not part of any series
+let events: mongodb.Collection<EventDoc>,
+// Stores event series. Its constituent events are embedded in `SeriesDoc`
+    series: mongodb.Collection<SeriesDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -89,6 +95,8 @@ mongodb.MongoClient.connect(
     events.createIndex({ id: 1 }, { unique: true });
     series = db.collection('series');
     series.createIndex({ id: 1 }, { unique: true });
+    // The same event can't be part of more than one series
+    series.createIndex({ 'events.id': 1 }, { unique: true });
   });
 
 
@@ -105,23 +113,24 @@ const resolvers = {
     oneSeries: (root, { id }) => series.findOne({ id: id })
   },
   Event: {
-    id: (event: EventDoc) => event.id,
-    startDate: (event: EventDoc) => dateToUnixTime(event.startDate),
-    endDate: (event: EventDoc) => dateToUnixTime(event.endDate),
-    series: (event: EventDoc) => series
-      .findOne({ id: event.seriesId })
+    id: (evt: EventDoc) => evt.id,
+    startDate: (evt: EventDoc) => dateToUnixTime(evt.startDate),
+    endDate: (evt: EventDoc) => dateToUnixTime(evt.endDate),
+    series: (evt: EventDoc | GraphQlEvent ) => ('series' in evt) ?
+      (evt as GraphQlEvent).series : undefined
   },
   Series: {
-    id: (series: SeriesDoc) => series.id,
-    startsOn: (series: SeriesDoc) => dateToUnixTime(series.startsOn),
-    endsOn: (series: SeriesDoc) => dateToUnixTime(series.endsOn),
-    events: (series: SeriesDoc) => events
-      .find({ id: { $in: series.eventIds } })
-      .sort({ startDate: 1 })
-      .toArray()
+    id: (oneSeries: SeriesDoc) => oneSeries.id,
+    startsOn: (oneSeries: SeriesDoc) => dateToUnixTime(oneSeries.startsOn),
+    endsOn: (oneSeries: SeriesDoc) => dateToUnixTime(oneSeries.endsOn),
+    events: (oneSeries: SeriesDoc) => _.map(oneSeries.events, (e) => {
+      e.series = oneSeries;
+
+      return e;
+    })
   },
   Mutation: {
-    createEvent: async (root, {input}: {input: CreateEventInput}) => {
+    createEvent: async (root, { input }: { input: CreateEventInput }) => {
       const eventId = input.id ? input.id : uuid();
       const e = {
         id: eventId,
@@ -133,8 +142,8 @@ const resolvers = {
 
       return e;
     },
-    updateEvent: async (root, {input}: {input: UpdateEventInput}) => {
-      const setObject: {startDate?: Date, endDate?: Date} = {};
+    updateEvent: async (root, { input }: { input: UpdateEventInput }) => {
+      const setObject: { startDate?: Date, endDate?: Date } = {};
       if (input.startDate) {
         setObject.startDate = unixTimeToDate(input.startDate);
       }
@@ -142,53 +151,48 @@ const resolvers = {
         setObject.endDate = unixTimeToDate(input.endDate);
       }
       if (!_.isEmpty(setObject)) {
-        await events.updateOne({id: input.id}, { $set: setObject });
+        await events.updateOne({ id: input.id }, { $set: setObject });
       }
 
       return true;
     },
-    // If a seriesId is given, the event is removed from that weekly event
     deleteEvent: async (root, { id }) => {
-      const res = await events.findOneAndDelete({id: id});
-      const deletedEvent = res.value;
-      if (!deletedEvent) {
-        return false;
-      }
-      if (deletedEvent.seriesId) {
-        const seriesUpdate = { $pull: { events: {id: id} } };
-        await series
-          .updateMany({id: deletedEvent.seriesId}, seriesUpdate);
+      const res = await events.deleteOne({ id: id });
+      if (res.deletedCount === 0) { // Might be an event that's part of a series
+        const seriesUpdate = { $pull: { events: { id: id } } };
+        const update = await series
+          .updateOne({ 'events.id': id }, seriesUpdate);
+
+        return update.result.nModified === 1;
       }
 
       return true;
     },
-    createSeries: async (root, {input}: {input: CreateSeriesInput})
+    createSeries: async (root, { input }: { input: CreateSeriesInput })
     : Promise<SeriesDoc> => {
       if (_.isEmpty(input.events)) {
         throw new Error('Series has no events');
       }
-      const inserts: EventDoc[] = [];
+      const evts: EventDoc[] = [];
       const seriesId = input.id ? input.id : uuid();
       for (const createEvent of input.events) {
         const eventId = createEvent.id ? createEvent.id : uuid();
         const e = {
           id: eventId,
           startDate: unixTimeToDate(createEvent.startDate),
-          endDate: unixTimeToDate(createEvent.endDate),
-          seriesId: seriesId
+          endDate: unixTimeToDate(createEvent.endDate)
         };
-        inserts.push(e);
+        evts.push(e);
       }
-      const sortedInserts = _.sortBy(inserts, 'startDate');
+      const sortedInserts = _.sortBy(evts, 'startDate');
       const newSeries: SeriesDoc = {
         id: seriesId,
         startsOn: _.first(sortedInserts).startDate,
         endsOn: _.last(sortedInserts).startDate,
-        eventIds: _.map(sortedInserts, 'id')
+        events: evts
       };
 
-      await Promise
-        .all([ events.insertMany(sortedInserts), series.insertOne(newSeries)]);
+      await series.insertOne(newSeries);
 
       return newSeries;
     }
