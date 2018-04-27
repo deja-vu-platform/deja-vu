@@ -1,17 +1,17 @@
 <div class="container">
-  <h1>Register User</h1>
+  <h1>Register user of id ben</h1>
   <authentication-register-user id="ben"></authentication-register-user>
-  <h1>Sign In</h1>
+  <h1>Sign in</h1>
   <authentication-sign-in></authentication-sign-in>
-  <h1>Show User</h1>
+  <h1>Show user of id ben</h1>
   <authentication-show-user id="ben"></authentication-show-user>
-  <h1>Change Password</h1>
+  <h1>Change password of the logged in user</h1>
   <authentication-logged-in (user)="user=$event">
   </authentication-logged-in>
   <authentication-change-password [id]="user?.id">
   </authentication-change-password>
-  <h1>Sign Out</h1>
+  <h1>Sign out</h1>
   <authentication-sign-out></authentication-sign-out>
-  <h1>Is Ben Authenticated</h1>
+  <h1>Is the user of id ben authenticated?</h1>
   <authentication-authenticate id="ben"></authentication-authenticate>
 </div>
