@@ -65,6 +65,7 @@ mongodb.MongoClient.connect(
     if (!_.isEmpty(config.initialObjects)) {
       objects.insertMany(_.map(config.initialObjects, (obj) => {
         obj.id = obj.id ? obj.id : uuid();
+
         return obj;
       }));
     }
@@ -132,7 +133,8 @@ const resolvers = {
         required: _.includes(config.schema.required, name)
       };
     },
-    object: (root, { id }) => objects.findOne({ id: id }),
+    object: (root, { id }) => objects
+      .findOne({ id: id }),
     objects: (root) => objects.find().toArray(),
     properties: (root) => _
       .chain(config.schema.properties)

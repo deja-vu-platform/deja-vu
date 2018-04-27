@@ -36,7 +36,7 @@ interface ConsumerOfResourceInput {
 }
 
 interface CreateAllocationInput {
-  id: string;
+  id?: string;
   resourceIds: string[];
   consumerIds: string[];
 }
@@ -77,7 +77,7 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db: mongodb.Db, allocations: mongodb.Collection;
+let db: mongodb.Db, allocations: mongodb.Collection<AllocationDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -103,12 +103,17 @@ const resolvers = {
     consumerOfResource: async (
       root, { input: { resourceId, allocationId } }
       : { input: ConsumerOfResourceInput }) => {
-      const allocation: AllocationDoc = await allocations
+      const allocation: AllocationDoc | null = await allocations
         .findOne(
           { id: allocationId, 'assignments.resourceId': resourceId },
           { projection: { 'assignments.$.consumerId': 1 } });
 
-      return allocation.assignments[0].consumerId;
+      if (_.isNil(allocation)) {
+        throw new Error(
+          `Allocation ${allocationId} or resource ${resourceId} not found`);
+      }
+
+      return allocation!.assignments[0].consumerId;
     }
   },
   Allocation: {
