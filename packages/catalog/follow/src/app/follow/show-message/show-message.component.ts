@@ -12,6 +12,5 @@ export class ShowMessageComponent {
   @Input() message: Message;
 
   @Input() showId = true;
-  @Input() showPublisher = true;
   @Input() showContent = true;
 }

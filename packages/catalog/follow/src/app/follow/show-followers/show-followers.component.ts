@@ -8,9 +8,6 @@ import {
   ShowFollowerComponent
 } from '../show-follower/show-follower.component';
 
-import { Follower } from '../shared/follow.model';
-
-
 @Component({
   selector: 'follow-show-followers',
   templateUrl: './show-followers.component.html',
@@ -29,7 +26,7 @@ export class ShowFollowersComponent implements OnInit, OnChanges {
   // Presentation text
   @Input() noFollowersToShowText = 'No followers to show';
 
-  followers: Follower[] = [];
+  followers: string[] = [];
 
   showFollowers;
   private gs: GatewayService;
@@ -51,13 +48,11 @@ export class ShowFollowersComponent implements OnInit, OnChanges {
   fetchFollowers() {
     if (this.gs) {
       this.gs
-        .get<{ data: { followers: Follower[] } }>('/graphql', {
+        .get<{ data: { followers: string[] } }>('/graphql', {
           params: {
             query: `
               query Followers($input: FollowersInput!) {
-                followers(input: $input) {
-                  id
-                }
+                followers(input: $input)
               }
             `,
             variables: JSON.stringify({

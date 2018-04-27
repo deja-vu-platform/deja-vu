@@ -1,16 +1,10 @@
 <div class="container">
-  <h1>Create Follower</h1>
-  <follow-create-follower id="ben" (follower)="benFollower=$event">
-  </follow-create-follower>
-  <!-- <h1>Show Follower</h1>
-  <follow-show-follower [follower]="benFollower">
-  </follow-show-follower> -->
   <h1>Create Publisher</h1>
   <follow-create-publisher id="alice" (publisher)="alicePublisher=$event">
   </follow-create-publisher>
-  <!-- <h1>Show Publisher</h1>
+  <h1>Show Publisher</h1>
   <follow-show-publisher [publisher]="alicePublisher">
-  </follow-show-publisher> -->
+  </follow-show-publisher>
   <h1>Create Message</h1>
   <follow-create-message id="herMessage" publisherId="alice" 
     (message)="aliceMessage=$event">

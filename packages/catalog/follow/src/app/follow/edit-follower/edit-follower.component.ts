@@ -14,8 +14,6 @@ import {
 
 import * as _ from 'lodash';
 
-import { Follower } from '../shared/follow.model';
-
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({

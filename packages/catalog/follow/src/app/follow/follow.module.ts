@@ -11,9 +11,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from 'dv-core';
 
 import {
-  CreateFollowerComponent
-} from './create-follower/create-follower.component';
-import {
   CreateMessageComponent
 } from './create-message/create-message.component';
 import {
@@ -43,7 +40,7 @@ import {
 } from './show-publishers/show-publishers.component';
 
 const allComponents = [
-  CreateFollowerComponent, CreateMessageComponent, CreatePublisherComponent,
+  CreateMessageComponent, CreatePublisherComponent,
   EditFollowerComponent, EditMessageComponent, EditPublisherComponent,
   FollowUnfollowComponent, ShowFollowerComponent, ShowFollowersComponent,
   ShowMessageComponent, ShowMessagesComponent, ShowPublisherComponent,

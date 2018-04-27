@@ -24,7 +24,6 @@ export class ShowMessagesComponent implements OnInit, OnChanges {
   /* What fields of the message to show. These are passed as input
      to `showMessage` */
   @Input() showId = true;
-  @Input() showPublisher = true;
   @Input() showContent = true;
 
   @Input() showMessage: Action = {
@@ -59,7 +58,6 @@ export class ShowMessagesComponent implements OnInit, OnChanges {
               query Messages($input: MessagesInput!) {
                 messages(input: $input) {
                   ${this.showId ? 'id' : ''}
-                  ${this.showPublisher ? 'publisher{ id }' : ''}
                   ${this.showContent ? 'content' : ''}
                 }
               }

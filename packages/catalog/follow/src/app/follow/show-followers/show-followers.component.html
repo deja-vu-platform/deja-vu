@@ -1,8 +1,8 @@
 <ul *ngIf="followers && followers.length > 0" class="list-group">
-  <li *ngFor="let follower of followers" class="list-group-item">
+  <li *ngFor="let followerId of followers" class="list-group-item">
     <dv-include 
       [action]="showFollower" 
-      [inputs]="{follower: follower}" 
+      [inputs]="{id: followerId}" 
       [parent]="showFollowers">
     </dv-include>
   </li>

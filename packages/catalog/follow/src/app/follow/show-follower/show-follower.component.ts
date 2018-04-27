@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Follower } from '../shared/follow.model';
 
 @Component({
   selector: 'follow-show-follower',
@@ -7,7 +6,7 @@ import { Follower } from '../shared/follow.model';
   styleUrls: ['./show-follower.component.css']
 })
 export class ShowFollowerComponent implements OnInit {
-  @Input() follower: Follower;
+  @Input() id: string;
 
   constructor() { }
 

@@ -13,19 +13,14 @@ import * as _ from 'lodash';
 const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
 
-interface FollowerDoc {
-  id: string;
-  publisherIds?: string[];
-}
-
 interface PublisherDoc {
   id: string;
-  messageIds?: string[];
+  messages?: Message[];
+  followerIds?: string[];
 }
 
-interface MessageDoc {
+interface Message {
   id: string;
-  publisherId: string;
   content: string;
 }
 
@@ -39,13 +34,13 @@ interface FollowersInput {
   publisherId?: string;
 }
 
+interface PublishersInput {
+  followerId?: string;
+}
+
 interface MessagesInput {
   followerId?: string;
   publisherId?: string;
-}
-
-interface PublishersInput {
-  followerId?: string;
 }
 
 interface EditFollowerInput {
@@ -100,9 +95,7 @@ const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 let db: mongodb.Db;
-let followers: mongodb.Collection<FollowerDoc>;
 let publishers: mongodb.Collection<PublisherDoc>;
-let messages: mongodb.Collection<MessageDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -113,39 +106,11 @@ mongodb.MongoClient.connect(
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
     }
-    followers = db.collection('followers');
-    followers.createIndex({ id: 1 }, { unique: true, sparse: true });
     publishers = db.collection('publishers');
     publishers.createIndex({ id: 1 }, { unique: true, sparse: true });
-    messages = db.collection('messages');
-    messages.createIndex({ id: 1 }, { unique: true, sparse: true });
   });
 
-
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
-
-class Validation {
-  static async followerExists(id: string) {
-    return Validation.exists(followers, id, 'Follower');
-  }
-
-  static async publisherExists(id: string) {
-    return Validation.exists(publishers, id, 'Publisher');
-  }
-
-  static async messageExists(id: string) {
-    return Validation.exists(messages, id, 'Message');
-  }
-
-  private static async exists(collection, id: string, type: string) {
-    const doc = await collection.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`${type} ${id} not found`);
-    }
-
-    return doc;
-  }
-}
 
 function isDifferent(before: string, after: string, type: string): Boolean {
   if (before === after) {
@@ -157,35 +122,44 @@ function isDifferent(before: string, after: string, type: string): Boolean {
 
 const resolvers = {
   Query: {
-    follower: (root, { id }) => followers.findOne({ id: id }),
-
     publisher: (root, { id }) => publishers.findOne({ id: id }),
 
-    message: (root, { id }) => messages.findOne({ id: id }),
+    message: async (root, { id }) => {
+      const publisher =
+        await publishers.findOne({ 'messages.id': id });
+
+      if (!publisher) { throw new Error(`Message ${id} does not exist`); }
+
+      return _.find(publisher.messages, { id: id });
+    },
 
     followers: async (root, { input }: { input: FollowersInput }) => {
       if (input.publisherId) {
-        await Validation.publisherExists(input.publisherId);
+        // A publisher's followers
+        const publisher = await publishers.findOne({ id: input.publisherId });
 
-        return followers
-          .find({ publisherIds: input.publisherId })
-          .toArray();
+        if (!publisher) { return []; }
+
+        return !_.isEmpty(publisher.followerIds) ? publisher.followerIds : [];
       }
 
       // No follower filter
-      return followers.find()
+      let followers: string[] = [];
+      const pubs = await publishers.find()
         .toArray();
+      for (const p of pubs) {
+        const ids = !_.isEmpty(p.followerIds) ? p.followerIds : [];
+        followers = _.union(followers, ids);
+      }
+
+      return followers;
     },
 
     publishers: async (root, { input }: { input: PublishersInput }) => {
       if (input.followerId) {
-        const follower = await Validation.followerExists(input.followerId);
-        const publisherIds = follower.publisherIds;
-
-        if (_.isEmpty(publisherIds)) { return []; }
-
+        // Get all publishers of a follower
         return publishers
-          .find({ id: { $in: publisherIds } })
+          .find({ followerIds: input.followerId })
           .toArray();
       }
 
@@ -197,81 +171,60 @@ const resolvers = {
     messages: async (root, { input }: { input: MessagesInput }) => {
       if (input.publisherId) {
         // Get messages by a specific publisher
-        const publisher = await Validation.publisherExists(input.publisherId);
+        const publisher = await publishers.findOne({ id: input.publisherId });
+        if (!publisher) { return []; }
 
-        return messages.find({ publisherId: input.publisherId })
-          .toArray();
+        return !_.isEmpty(publisher.messages) ? publisher.messages : [];
 
       } else if (input.followerId) {
         // Gets messages of all the publishers followed by a follower
-        const follower = await Validation.followerExists(input.followerId);
-
-        return messages
-          .find({ publisherId: { $in: follower.publisherIds } })
+        const pubs = await publishers.find({ followerIds: input.followerId })
           .toArray();
+
+        let messages: Message[] = [];
+        for (const p of pubs) {
+          const msgs = !_.isEmpty(p.messages) ? p.messages : [];
+          messages = _.union(messages, msgs);
+        }
+
+        return messages;
 
       } else {
         // No message filter
-        return messages.find()
+        const pubs = await publishers.find()
           .toArray();
+
+        let messages: Message[] = [];
+        for (const p of pubs) {
+          const msgs = !_.isEmpty(p.messages) ? p.messages : [];
+          messages = _.union(messages, msgs);
+        }
+
+        return messages;
       }
     },
 
     isFollowing: async (root, { input }: { input: FollowUnfollowInput }) => {
-      const [follower, publisher] = await Promise.all([
-        Validation.followerExists(input.followerId),
-        Validation.publisherExists(input.publisherId)
-      ]);
+      const publisher = await publishers
+        .findOne({ id: input.publisherId, followerIds: input.followerId });
 
-      if (!_.isEmpty(follower.publisherIds)) {
-        const publisherIndex = _
-          .indexOf(follower.publisherIds, input.publisherId);
-
-        return (publisherIndex > -1);
-      }
-
-      return false;
+      return !_.isEmpty(publisher);
     }
 
-  },
-
-  Follower: {
-    id: (follower: FollowerDoc) => follower.id,
-    follows: (follower: FollowerDoc) => {
-      if (_.isEmpty(follower.publisherIds)) { return []; }
-
-      return publishers
-        .find({ id: { $in: follower.publisherIds } })
-        .toArray();
-    }
   },
 
   Publisher: {
     id: (publisher: PublisherDoc) => publisher.id,
-    messages: (publisher: PublisherDoc) => {
-      return messages
-        .find({ publisherId: publisher.id })
-        .toArray();
-    }
+    messages: (publisher: PublisherDoc) => publisher.messages,
+    followerIds: (publisher: PublisherDoc) => publisher.followerIds
   },
 
   Message: {
-    id: (message: MessageDoc) => message.id,
-    publisher: (message: MessageDoc) => {
-      return publishers.findOne({ id: message.publisherId });
-    },
-    content: (message: MessageDoc) => message.content
+    id: (message: Message) => message.id,
+    content: (message: Message) => message.content
   },
 
   Mutation: {
-    createFollower: async (root, { id }) => {
-      const followerId = id ? id : uuid();
-      const newFollower: FollowerDoc = { id: followerId };
-      await followers.insertOne(newFollower);
-
-      return newFollower;
-    },
-
     createPublisher: async (root, { id }) => {
       const publisherId = id ? id : uuid();
       const newPublisher: PublisherDoc = { id: publisherId };
@@ -282,12 +235,12 @@ const resolvers = {
 
     createMessage: async (root, { input }: { input: CreateMessageInput }) => {
       const messageId = input.id ? input.id : uuid();
-      const newMessage: MessageDoc = {
+      const newMessage: Message = {
         id: messageId,
-        publisherId: input.publisherId,
         content: input.content
       };
-      await messages.insertOne(newMessage);
+      const updateOperation = { $push: { messages: newMessage } };
+      await publishers.updateOne({ id: input.publisherId }, updateOperation);
 
       return newMessage;
     },
@@ -295,9 +248,19 @@ const resolvers = {
     editFollower: async (root, { input }: { input: EditFollowerInput }) => {
       isDifferent(input.oldId, input.newId, 'Follower');
 
-      await Validation.followerExists(input.oldId);
-      const updateOperation = { $set: { id: input.newId } };
-      await followers.findOneAndUpdate({ id: input.oldId }, updateOperation);
+      const pubs = await publishers.find({ followerIds: input.oldId })
+        .toArray();
+
+      if (_.isEmpty(pubs)) {
+        throw new Error(`Follower ${input.oldId} does not exist`);
+      }
+
+      const addFollowerUpdate = { $push: { followerIds: input.newId } };
+      const removeFollowerUpdate = { $pull: { followerIds: input.oldId } };
+      await publishers
+        .updateMany({ followerIds: input.oldId }, addFollowerUpdate);
+      await publishers
+        .updateMany({ followerIds: input.newId }, removeFollowerUpdate);
 
       return true;
     },
@@ -305,21 +268,6 @@ const resolvers = {
     editPublisher: async (root, { input }: { input: EditPublisherInput }) => {
       isDifferent(input.oldId, input.newId, 'Publisher');
 
-      await Validation.publisherExists(input.oldId);
-      // Update publisherIds of Followers
-      const addPublisherUpdate = { $push: { publisherIds: input.newId } };
-      const removePublisherUpdate = { $pull: { publisherIds: input.oldId } };
-      await followers
-        .updateMany({ publisherIds: input.oldId }, addPublisherUpdate);
-      await followers
-        .updateMany({ publisherIds: input.oldId }, removePublisherUpdate);
-
-      // Update messages db
-      const msgUpdateOperation = { $set: { publisherId: input.newId } };
-      await messages
-        .updateMany({ publisherId: input.oldId }, msgUpdateOperation);
-
-      // Update publishers db
       const updateOperation = { $set: { id: input.newId } };
       await publishers.findOneAndUpdate({ id: input.oldId }, updateOperation);
 
@@ -327,43 +275,47 @@ const resolvers = {
     },
 
     editMessage: async (root, { input }: { input: EditMessageInput }) => {
-      const [message, publisher] = await Promise.all([
-        Validation.messageExists(input.id),
-        Validation.publisherExists(input.publisherId)
-      ]);
+      const publisher = await publishers
+        .findOne({ id: input.publisherId, 'messages.id': input.id });
 
-      if (message.publisherId !== input.publisherId) {
-        throw new Error('Only the publisher of the message can edit it.');
+      if (!publisher) {
+        throw new Error(`Message/ Publisher does not exist
+      AND you must be the publisher to edit the message`);
       }
+      const updatedMessage: Message = { id: input.id, content: input.content };
+      const removeMessageUpdate = { $pull: { messages: {id: input.id} } };
+      const addMessageUpdate = { $push: { messages: updatedMessage } };
 
-      const updateOperation = { $set: { content: input.content } };
-      await messages.findOneAndUpdate({ id: input.id }, updateOperation);
+      await publishers
+        .findOneAndUpdate({ id: input.publisherId }, removeMessageUpdate);
+      await publishers
+        .findOneAndUpdate({ id: input.publisherId }, addMessageUpdate);
 
       return true;
     },
 
     follow: async (root, { input }: { input: FollowUnfollowInput }) => {
-      await Promise.all([
-        Validation.followerExists(input.followerId),
-        Validation.publisherExists(input.publisherId)
-      ]);
+      const publisher = await publishers.findOne({ id: input.publisherId });
+      if (_.isEmpty(publisher)) {
+        throw new Error(`Publisher ${input.publisherId} does not exist`);
+      }
 
-      const updateOperation = { $push: { publisherIds: input.publisherId } };
-      await followers
-        .findOneAndUpdate({ id: input.followerId }, updateOperation);
+      const updateOperation = { $push: { followerIds: input.followerId } };
+      await publishers
+        .findOneAndUpdate({ id: input.publisherId }, updateOperation);
 
       return true;
     },
 
     unfollow: async (root, { input }: { input: FollowUnfollowInput }) => {
-      await Promise.all([
-        Validation.followerExists(input.followerId),
-        Validation.publisherExists(input.publisherId)
-      ]);
+      const publisher = await publishers.findOne({ id: input.publisherId });
+      if (_.isEmpty(publisher)) {
+        throw new Error(`Publisher ${input.publisherId} does not exist`);
+      }
 
-      const updateOperation = { $pull: { publisherIds: input.publisherId } };
-      await followers
-        .findOneAndUpdate({ id: input.followerId }, updateOperation);
+      const updateOperation = { $pull: { followerIds: input.followerId } };
+      await publishers
+        .findOneAndUpdate({ id: input.publisherId }, updateOperation);
 
       return true;
     }

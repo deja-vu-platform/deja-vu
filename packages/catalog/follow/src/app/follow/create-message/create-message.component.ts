@@ -81,7 +81,6 @@ export class CreateMessageComponent implements
       query: `mutation CreateMessage($input: CreateMessageInput!) {
             createMessage(input: $input) {
               id,
-              publisher { id },
               content
             }
           }`,
@@ -102,7 +101,6 @@ export class CreateMessageComponent implements
 
     this.message.emit({
       id: res.data.createMessage.id,
-      publisher: res.data.createMessage.publisher,
       content: res.data.createMessage.content
     });
   }

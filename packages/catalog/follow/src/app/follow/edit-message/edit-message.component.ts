@@ -90,7 +90,10 @@ export class EditMessageComponent implements
       }
     })
       .subscribe((res) => {
-        this.contentControl.setValue(res.data.message.content);
+        const msg = res.data.message;
+        if (msg) {
+          this.contentControl.setValue(msg.content);
+        }
       });
   }
 
