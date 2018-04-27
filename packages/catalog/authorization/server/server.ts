@@ -15,6 +15,7 @@ import { makeExecutableSchema } from 'graphql-tools';
 interface ResourceDoc {
   id: string;
   ownerId: string;
+  // Includes the owner id because the owner is also a viewer
   viewerIds: string[];
 }
 
@@ -107,9 +108,7 @@ const resolvers = {
     resources: (root, { input }: { input: ResourcesInput }) => {
       let filter = {};
       if (!_.isEmpty(input.viewableBy)) {
-        filter = {
-          $or: [{viewerIds: input.viewableBy}, {ownerId: input.viewableBy}]
-        };
+        filter = { viewerIds: input.viewableBy };
       }
 
       return resources.find(filter)
@@ -144,10 +143,7 @@ const resolvers = {
     canView: async (root, { principalId, resourceId }) => {
       const res = await resources
         .findOne(
-          { id: resourceId, $or: [
-            { viewerIds: principalId },
-            { ownerId: principalId }
-          ] },
+          { id: resourceId, viewerIds: principalId },
           { projection: { _id: 1 } });
 
       return !_.isNil(res);
@@ -172,7 +168,7 @@ const resolvers = {
       const newResource: ResourceDoc = {
         id: input.id ? input.id : uuid(),
         ownerId: input.ownerId,
-        viewerIds: _.get(input, 'viewerIds', [])
+        viewerIds: _.union(_.get(input, 'viewerIds', []), input.ownerId)
       };
 
       await resources.insertOne(newResource);

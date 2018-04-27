@@ -1,6 +1,7 @@
 type Resource {
   id: ID!,
   ownerId: ID!,
+  # includes the owner id because the owner is also a viewer
   viewerIds: [ID!]
 }
 
