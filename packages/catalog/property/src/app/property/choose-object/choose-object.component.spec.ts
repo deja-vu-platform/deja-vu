@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateResourceComponent } from './create-resource.component';
+import { ChooseObjectComponent } from './choose-object.component';
 
-describe('CreateResourceComponent', () => {
-  let component: CreateResourceComponent;
-  let fixture: ComponentFixture<CreateResourceComponent>;
+describe('ChooseObjectComponent', () => {
+  let component: ChooseObjectComponent;
+  let fixture: ComponentFixture<ChooseObjectComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreateResourceComponent ]
+      declarations: [ ChooseObjectComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateResourceComponent);
+    fixture = TestBed.createComponent(ChooseObjectComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -1,11 +1,11 @@
-import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
 import { GATEWAY_URL } from 'dv-core';
 
 import { AppComponent } from './app.component';
-import { AllocatorModule } from './allocator/allocator.module';
 
+import { AllocatorModule } from './allocator/allocator.module';
 
 @NgModule({
   declarations: [

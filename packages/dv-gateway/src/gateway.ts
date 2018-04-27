@@ -288,9 +288,13 @@ async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
     }
   }
   clicheReq.send(gatewayRequest.body);
-  const response: request.Response = await clicheReq;
-  console.log(`Got back ${JSON.stringify(response)}`);
-
+  let response: request.Response;
+  try {
+    response = await clicheReq;
+  } catch (err) {
+    response = err.response;
+  }
+  console.log(`Got back ${JSON.stringify(response, undefined, 2)}`);
   return { status: response.status, text: JSON.parse(response.text) };
 }
 

@@ -107,12 +107,10 @@ export class IncludeComponent implements AfterViewInit {
       return;
     }
     if (this.action === undefined || this.action.type === undefined) {
-      console.log('No type given to include');
-      return;
+      throw new Error('No type given to include');
     }
     if (this.parent === undefined) {
-      console.log('No parent given to include');
-      return;
+      throw new Error('No parent given to include');
     }
 
     console.log(

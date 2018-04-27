@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { TxComponent } from './tx.component';
 import { IdComponent } from './id.component';
-import { IdEntitiesComponent } from './id-entities.component';
+import { IdsComponent } from './ids.component';
 import { ButtonComponent } from './button.component';
 import { LinkComponent } from './link.component';
 import { StatusComponent } from './status.component';
@@ -16,7 +16,7 @@ import { OfDirective } from './of.directive';
 
 
 const allComponents = [
-  IdComponent, IdEntitiesComponent, TxComponent, IncludeComponent,
+  IdComponent, IdsComponent, TxComponent, IncludeComponent,
   IncludeDirective, ButtonComponent, LinkComponent, StatusComponent,
   MergeComponent
 ];

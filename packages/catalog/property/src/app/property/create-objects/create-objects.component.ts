@@ -1,10 +1,9 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
+  GatewayService, GatewayServiceFactory, OnRun, RunService
 } from 'dv-core';
 
 import { Observable } from 'rxjs/Observable';
@@ -13,6 +12,8 @@ import { map } from 'rxjs/operators';
 import { Property } from '../shared/property.model';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../property.config';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -30,7 +31,8 @@ export class CreateObjectsComponent implements OnInit, OnRun {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -43,7 +45,7 @@ export class CreateObjectsComponent implements OnInit, OnRun {
       return;
     }
     this.gs
-      .get<{data: {properties: Property[]}}>('/graphql', {
+      .get<{data: {properties: Property[]}}>(this.apiPath, {
         params: {
           query: `
             query {
@@ -65,7 +67,7 @@ export class CreateObjectsComponent implements OnInit, OnRun {
       return;
     }
     const res = await this.gs
-      .post<{data: any, errors: {message: string}[]}>('/graphql', {
+      .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
         query: `mutation CreateObjects($input: [CreateObjectInput!]!) {
           createObjects(input: $input) {
             id

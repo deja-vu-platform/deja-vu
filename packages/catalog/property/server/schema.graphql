@@ -8,12 +8,13 @@ type Property {
 }
 
 type Query {
-  property(name: String): Property 
-  object(id: ID!): Object 
-  properties: [Property] 
+  property(name: String): Property
+  object(id: ID!): Object
+  properties: [Property]
+  objects: [Object]
 }
 
 type Mutation {
-  createObject(input: CreateObjectInput!): Object 
+  createObject(input: CreateObjectInput!): Object
   createObjects(input: [CreateObjectInput!]!): [Object]
 }

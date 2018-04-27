@@ -1,25 +1,28 @@
-import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatInputModule, MatFormFieldModule,
+  MatButtonModule, MatFormFieldModule, MatInputModule,
   MatSelectModule
 } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from 'dv-core';
 
-import { AllocatorServiceFactory } from './shared/allocator.service';
-
-import { CreateResourceComponent } from './create-resource/create-resource.component';
-import { CreateAllocationComponent } from './create-allocation/create-allocation.component';
-import { ShowConsumerComponent } from './show-consumer/show-consumer.component';
+import {
+  CreateAllocationComponent
+} from './create-allocation/create-allocation.component';
+import {
+  DeleteResourceComponent
+} from './delete-resource/delete-resource.component';
 import { EditConsumerComponent } from './edit-consumer/edit-consumer.component';
-import { DeleteResourceComponent } from './delete-resource/delete-resource.component';
+import { ShowConsumerComponent } from './show-consumer/show-consumer.component';
+
+import { API_PATH } from './allocator.config';
+
 
 const allComponents = [
-  CreateResourceComponent, CreateAllocationComponent,
-  ShowConsumerComponent, EditConsumerComponent,
+  CreateAllocationComponent, ShowConsumerComponent, EditConsumerComponent,
   DeleteResourceComponent
 ];
 
@@ -27,13 +30,14 @@ const allComponents = [
   imports: [
     DvModule,
     CommonModule,
-    FormsModule,
+    FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     MatButtonModule, MatInputModule, MatFormFieldModule,
     MatSelectModule
   ],
-  providers: [AllocatorServiceFactory],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponents,
-  exports: allComponents,
+  entryComponents: allComponents,
+  exports: allComponents
 })
 export class AllocatorModule { }
