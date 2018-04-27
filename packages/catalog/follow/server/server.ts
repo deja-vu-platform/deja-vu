@@ -282,16 +282,13 @@ const resolvers = {
         throw new Error(`Message/ Publisher does not exist
       AND you must be the publisher to edit the message`);
       }
-      const updatedMessage: Message = { id: input.id, content: input.content };
-      const removeMessageUpdate = { $pull: { messages: {id: input.id} } };
-      const addMessageUpdate = { $push: { messages: updatedMessage } };
 
-      await publishers
-        .findOneAndUpdate({ id: input.publisherId }, removeMessageUpdate);
-      await publishers
-        .findOneAndUpdate({ id: input.publisherId }, addMessageUpdate);
+      const updateOperation = { $set: { 'messages.$.content': input.content } };
+      const updatedObj = await publishers.updateOne(
+        { id: input.publisherId, 'messages.id': input.id },
+        updateOperation);
 
-      return true;
+      return updatedObj.matchedCount !== 0;
     },
 
     follow: async (root, { input }: { input: FollowUnfollowInput }) => {
