@@ -6,6 +6,7 @@ type Resource {
 }
 
 input ResourcesInput {
+  # viewableBy is required, you can't see the entire list of resources
   viewableBy: ID!
 }
 

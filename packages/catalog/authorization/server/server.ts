@@ -106,12 +106,7 @@ async function isOwner(principalId: string, resourceId: string) {
 const resolvers = {
   Query: {
     resources: (root, { input }: { input: ResourcesInput }) => {
-      let filter = {};
-      if (!_.isEmpty(input.viewableBy)) {
-        filter = { viewerIds: input.viewableBy };
-      }
-
-      return resources.find(filter)
+      return resources.find({ viewerIds: input.viewableBy })
         .toArray();
     },
 
@@ -168,7 +163,7 @@ const resolvers = {
       const newResource: ResourceDoc = {
         id: input.id ? input.id : uuid(),
         ownerId: input.ownerId,
-        viewerIds: _.union(_.get(input, 'viewerIds', []), input.ownerId)
+        viewerIds: _.union(_.get(input, 'viewerIds', []), [input.ownerId])
       };
 
       await resources.insertOne(newResource);

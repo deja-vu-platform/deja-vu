@@ -20,10 +20,11 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class CreateResourceComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  // Presentation Inputs
   @Input() id: string;
   @Input() ownerId: string;
-  @Input() viewerIds?: string;
+  @Input() viewerIds?: string[];
+  @Input() save = true;
+  // Presentation Inputs
   @Input() buttonLabel = 'Create Resource';
   @Input() resourceInputLabel = 'Id';
   @Input() ownerInputLabel = 'Owner Id';
@@ -51,34 +52,28 @@ export class CreateResourceComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs
-      .post<{
-        data: {
-          createResource:
-          { id: string, ownerId: string, viewerIds: string[] }
-        }
-      }>('/graphql', {
-          query: `mutation CreateResource($input: CreateResourceInput!){
-            createResource(input: $input) {
-              id,
-              ownerId,
-              viewerIds
+    const resource: Resource = {
+      id: this.id,
+      ownerId: this.ownerId,
+      viewerIds: this.viewerIds
+    };
+    if (this.save) {
+      const res = await this.gs
+        .post<{ data: { createResource: Resource } }>('/graphql', {
+          query: `
+            mutation CreateResource($input: CreateResourceInput!){
+              createResource(input: $input) {
+                id
+              }
             }
-          }`,
+          `,
           variables: {
-            input: {
-              id: this.id,
-              ownerId: this.ownerId,
-              viewerIds: this.viewerIds
-            }
+            input: resource
           }
         })
-      .toPromise();
-    this.resource.emit({
-      id: res.data.createResource.id,
-      ownerId: res.data.createResource.ownerId,
-      viewerIds: res.data.createResource.viewerIds
-    });
+        .toPromise();
+    }
+    this.resource.emit(resource);
   }
 
   dvOnAfterCommit() {
