@@ -138,7 +138,9 @@ const resolvers = {
         // A publisher's followers
         const publisher = await publishers.findOne({ id: input.publisherId });
 
-        if (!publisher) { return []; }
+        if (!publisher) {
+          throw new Error(`Publisher ${input.publisherId} does not exist`);
+        }
 
         return !_.isEmpty(publisher.followerIds) ? publisher.followerIds : [];
       }
@@ -172,7 +174,9 @@ const resolvers = {
       if (input.publisherId) {
         // Get messages by a specific publisher
         const publisher = await publishers.findOne({ id: input.publisherId });
-        if (!publisher) { return []; }
+        if (!publisher) {
+          throw new Error(`Publisher ${input.publisherId} does not exist`);
+        }
 
         return !_.isEmpty(publisher.messages) ? publisher.messages : [];
 
