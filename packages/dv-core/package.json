@@ -9,8 +9,7 @@
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19",
     "@angular/platform-browser": "^5.2.0",
-    "@angular/compiler": "^5.2.0",
-    "uuid": "^3.2.1"
+    "@angular/compiler": "^5.2.0"
   },
   "devDependencies": {
     "@angular/common": "^5.2.0",
@@ -40,5 +39,8 @@
   "bugs": {
     "url": "https://github.com/spderosso/dejavu/issues"
   },
-  "homepage": "https://github.com/spderosso/dejavu#readme"
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "dependencies": {
+    "uuid": "^3.2.1"
+  }
 }
