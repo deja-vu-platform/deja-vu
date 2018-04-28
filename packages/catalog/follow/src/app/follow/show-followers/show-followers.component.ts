@@ -17,7 +17,7 @@ export class ShowFollowersComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined, fetch all followers.
   // Else, fetch the followers of the given publisher.
-  @Input() publisherId: string | undefined;
+  @Input() ofPublisherId: string | undefined;
 
   @Input() showFollower: Action = {
     type: <Type<Component>>ShowFollowerComponent
@@ -57,7 +57,7 @@ export class ShowFollowersComponent implements OnInit, OnChanges {
             `,
             variables: JSON.stringify({
               input: {
-                publisherId: this.publisherId
+                ofPublisherId: this.ofPublisherId
               }
             })
           }

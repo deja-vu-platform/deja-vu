@@ -35,12 +35,12 @@ interface FollowersInput {
 }
 
 interface PublishersInput {
-  followerId?: string;
+  followedById?: string;
 }
 
 interface MessagesInput {
-  followerId?: string;
-  publisherId?: string;
+  ofPublishersFollowedById?: string;
+  byPublisherId?: string;
 }
 
 interface EditMessageInput {
@@ -102,14 +102,6 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
-function isDifferent(before: string, after: string, type: string): Boolean {
-  if (before === after) {
-    throw new Error(`The current and new ${type}s must be different`);
-  }
-
-  return true;
-}
-
 async function getAggregatedMessages(matchQuery: any): Promise<PublisherDoc[]> {
   const results = await publishers.aggregate([
     { $match: matchQuery },
@@ -163,7 +155,7 @@ const resolvers = {
 
       // No follower filter
       const results = await publishers.aggregate([
-        { $match: { } },
+        { $match: {} },
         {
           $group: {
             _id: 0,
@@ -188,10 +180,10 @@ const resolvers = {
     },
 
     publishers: async (root, { input }: { input: PublishersInput }) => {
-      if (input.followerId) {
+      if (input.followedById) {
         // Get all publishers of a follower
         return publishers
-          .find({ followerIds: input.followerId })
+          .find({ followerIds: input.followedById })
           .toArray();
       }
 
@@ -201,19 +193,20 @@ const resolvers = {
     },
 
     messages: async (root, { input }: { input: MessagesInput }) => {
-      if (input.publisherId) {
+      if (input.byPublisherId) {
         // Get messages by a specific publisher
-        const publisher = await publishers.findOne({ id: input.publisherId });
+        const publisher = await publishers.findOne({ id: input.byPublisherId });
         if (!publisher) {
-          throw new Error(`Publisher ${input.publisherId} does not exist`);
+          throw new Error(`Publisher ${input.byPublisherId} does not exist`);
         }
 
         return !_.isEmpty(publisher.messages) ? publisher.messages : [];
 
-      } else if (input.followerId) {
+      } else if (input.ofPublishersFollowedById) {
 
-        const results =
-          await getAggregatedMessages({ followerIds: input.followerId });
+        const results = await getAggregatedMessages(
+          { followerIds: input.ofPublishersFollowedById }
+        );
 
         return results[0].messages;
 

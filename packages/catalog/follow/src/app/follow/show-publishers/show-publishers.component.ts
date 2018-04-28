@@ -20,7 +20,7 @@ export class ShowPublishersComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined, fetch all publishers.
   // Else, fetch the publishers of the given follower.
-  @Input() followerId: string | undefined;
+  @Input() followedById: string | undefined;
 
   @Input() showPublisher: Action = {
     type: <Type<Component>>ShowPublisherComponent
@@ -30,7 +30,7 @@ export class ShowPublishersComponent implements OnInit, OnChanges {
   @Input() noPublishersToShowText = 'No publishers to show';
 
   // Whether to show the follower the option to follow/ unfollow a publisher.
-  // If followerId given, it will show the the option to follow/ unfollow.
+  // If followedById given, it will show the the option to follow/ unfollow.
   @Input() showOptionToFollowUnfollow = false;
 
   publishers: Publisher[] = [];
@@ -66,7 +66,7 @@ export class ShowPublishersComponent implements OnInit, OnChanges {
             `,
             variables: JSON.stringify({
               input: {
-                followerId: this.followerId
+                followedById: this.followedById
               }
             })
           }

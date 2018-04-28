@@ -17,8 +17,8 @@ import { Message } from '../shared/follow.model';
 export class ShowMessagesComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined then the fetched messages are not filtered by that property
-  @Input() followerId: string | undefined;
-  @Input() publisherId: string | undefined;
+  @Input() ofPublishersFollowedById: string | undefined;
+  @Input() byPublisherId: string | undefined;
 
   // Show rules
   /* What fields of the message to show. These are passed as input
@@ -64,8 +64,8 @@ export class ShowMessagesComponent implements OnInit, OnChanges {
             `,
             variables: JSON.stringify({
               input: {
-                followerId: this.followerId,
-                publisherId: this.publisherId
+                ofPublishersFollowedById: this.ofPublishersFollowedById,
+                byPublisherId: this.byPublisherId
               }
             })
           }

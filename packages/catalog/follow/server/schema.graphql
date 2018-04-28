@@ -24,15 +24,15 @@ input FollowersInput {
 # Show a follower's publishers OR
 # Show all publishers
 input PublishersInput {
-  followerId: ID
+  followedById: ID
 }
 
 # Show messages by a publisher (publisherId) OR
 # Show messages of publishers followed by a follower (followerId) OR
 # Show all messages
 input MessagesInput {
-  followerId: ID
-  publisherId: ID
+  ofPublishersFollowedById: ID
+  byPublisherId: ID
 }
 
 input EditMessageInput {
