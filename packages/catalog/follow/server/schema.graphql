@@ -15,21 +15,14 @@ input CreateMessageInput {
   content: String!
 }
 
-# Show a publisher's followers OR
-# Show all followers
 input FollowersInput {
   ofPublisherId: ID
 }
 
-# Show a follower's publishers OR
-# Show all publishers
 input PublishersInput {
   followedById: ID
 }
 
-# Show messages by a publisher (publisherId) OR
-# Show messages of publishers followed by a follower (followerId) OR
-# Show all messages
 input MessagesInput {
   ofPublishersFollowedById: ID
   byPublisherId: ID
