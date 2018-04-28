@@ -31,7 +31,7 @@ interface CreateMessageInput {
 }
 
 interface FollowersInput {
-  publisherId?: string;
+  ofPublisherId?: string;
 }
 
 interface PublishersInput {
@@ -41,16 +41,6 @@ interface PublishersInput {
 interface MessagesInput {
   followerId?: string;
   publisherId?: string;
-}
-
-interface EditFollowerInput {
-  oldId: string;
-  newId: string;
-}
-
-interface EditPublisherInput {
-  oldId: string;
-  newId: string;
 }
 
 interface EditMessageInput {
@@ -160,12 +150,12 @@ const resolvers = {
     },
 
     followers: async (root, { input }: { input: FollowersInput }) => {
-      if (input.publisherId) {
+      if (input.ofPublisherId) {
         // A publisher's followers
-        const publisher = await publishers.findOne({ id: input.publisherId });
+        const publisher = await publishers.findOne({ id: input.ofPublisherId });
 
         if (!publisher) {
-          throw new Error(`Publisher ${input.publisherId} does not exist`);
+          throw new Error(`Publisher ${input.ofPublisherId} does not exist`);
         }
 
         return !_.isEmpty(publisher.followerIds) ? publisher.followerIds : [];
@@ -275,35 +265,6 @@ const resolvers = {
       await publishers.updateOne({ id: input.publisherId }, updateOperation);
 
       return newMessage;
-    },
-
-    editFollower: async (root, { input }: { input: EditFollowerInput }) => {
-      isDifferent(input.oldId, input.newId, 'Follower');
-
-      const pubs = await publishers.find({ followerIds: input.oldId })
-        .toArray();
-
-      if (_.isEmpty(pubs)) {
-        throw new Error(`Follower ${input.oldId} does not exist`);
-      }
-
-      const addFollowerUpdate = { $push: { followerIds: input.newId } };
-      const removeFollowerUpdate = { $pull: { followerIds: input.oldId } };
-      await publishers
-        .updateMany({ followerIds: input.oldId }, addFollowerUpdate);
-      await publishers
-        .updateMany({ followerIds: input.newId }, removeFollowerUpdate);
-
-      return true;
-    },
-
-    editPublisher: async (root, { input }: { input: EditPublisherInput }) => {
-      isDifferent(input.oldId, input.newId, 'Publisher');
-
-      const updateOperation = { $set: { id: input.newId } };
-      await publishers.updateOne({ id: input.oldId }, updateOperation);
-
-      return true;
     },
 
     editMessage: async (root, { input }: { input: EditMessageInput }) => {

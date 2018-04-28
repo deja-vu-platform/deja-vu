@@ -18,7 +18,7 @@ input CreateMessageInput {
 # Show a publisher's followers OR
 # Show all followers
 input FollowersInput {
-  publisherId: ID
+  ofPublisherId: ID
 }
 
 # Show a follower's publishers OR
@@ -33,16 +33,6 @@ input PublishersInput {
 input MessagesInput {
   followerId: ID
   publisherId: ID
-}
-
-input EditFollowerInput {
-  oldId: ID!
-  newId: ID!
-}
-
-input EditPublisherInput {
-  oldId: ID!
-  newId: ID!
 }
 
 input EditMessageInput {
@@ -68,8 +58,6 @@ type Query {
 type Mutation {
   createPublisher(id: ID): Publisher
   createMessage(input: CreateMessageInput!): Message
-  editFollower(input: EditFollowerInput!): Boolean
-  editPublisher(input: EditPublisherInput!): Boolean
   editMessage(input: EditMessageInput!): Boolean
   follow(input: FollowUnfollowInput!): Boolean
   unfollow(input: FollowUnfollowInput!): Boolean

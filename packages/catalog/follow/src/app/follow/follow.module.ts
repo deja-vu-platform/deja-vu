@@ -16,11 +16,7 @@ import {
 import {
   CreatePublisherComponent
 } from './create-publisher/create-publisher.component';
-import { EditFollowerComponent } from './edit-follower/edit-follower.component';
 import { EditMessageComponent } from './edit-message/edit-message.component';
-import {
-  EditPublisherComponent
-} from './edit-publisher/edit-publisher.component';
 import {
   FollowUnfollowComponent
 } from './follow-unfollow/follow-unfollow.component';
@@ -40,8 +36,7 @@ import {
 } from './show-publishers/show-publishers.component';
 
 const allComponents = [
-  CreateMessageComponent, CreatePublisherComponent,
-  EditFollowerComponent, EditMessageComponent, EditPublisherComponent,
+  CreateMessageComponent, CreatePublisherComponent, EditMessageComponent,
   FollowUnfollowComponent, ShowFollowerComponent, ShowFollowersComponent,
   ShowMessageComponent, ShowMessagesComponent, ShowPublisherComponent,
   ShowPublishersComponent
