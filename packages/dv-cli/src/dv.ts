@@ -17,6 +17,7 @@ export function npm(args: string[], cwd?: string): void {
 }
 
 function cmd(cmd: string, args: string[], cwd?: string): void {
+  // TODO: Remove shell: true in the future
   const c = spawnSync(cmd, args, { stdio: 'inherit', cwd: cwd, shell: true });
   if (c.error) {
     throw new Error(`Failed to run "${cmd}": ${c.error}`);
