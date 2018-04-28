@@ -15,11 +15,7 @@ input CreateMarkerInput {
 }
 
 input MarkersInput {
-  mapId: ID,
-  minLat: Float,
-  maxLat: Float,
-  minLong: Float,
-  maxLong: Float
+  mapId: ID
 }
 
 type Query {

@@ -6,12 +6,24 @@ import * as mongodb from 'mongodb';
 import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
+import * as _ from 'lodash';
+
 // GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
 // tslint:disable-next-line:no-var-requires
 const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
 
 interface MarkerDoc {
+  id: string;
+  title?: string;
+  location: {
+    type: string,                   // 'Point'
+    coordinates: [number, number]   // [longitude, latitude]
+  };
+  mapId: string;
+}
+
+interface Marker {
   id: string;
   title?: string;
   latitude: number;
@@ -29,10 +41,6 @@ interface CreateMarkerInput {
 
 interface MarkersInput {
   mapId?: string;
-  minLat?: number;
-  maxLat?: number;
-  minLong?: number;
-  maxLong?: number;
 }
 
 interface Config {
@@ -78,31 +86,37 @@ mongodb.MongoClient.connect(
       console.log(`Reinitialized db ${config.dbName}`);
     }
     markers = db.collection('markers');
-    markers.createIndex({ id: 1, mapId: 1 }, { unique: true, sparse: true });
+    markers.createIndex({ id: 1 }, { unique: true, sparse: true });
+    markers.createIndex({ id: 1, mapId: 1, location: '2dsphere' },
+      { unique: true, sparse: true });
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+function markerDocToMarker(markerDoc: MarkerDoc): Marker {
+  const ret = _.omit(markerDoc, ['location']);
+  ret.longitude = markerDoc.location.coordinates[0];
+  ret.latitude = markerDoc.location.coordinates[1];
+
+  return ret;
+}
 
 const resolvers = {
   Query: {
-    marker: (root, { id }) => markers.findOne({ id: id }),
+    marker: async (root, { id }) => {
+      const marker = await markers.findOne({ id: id });
+      if (!marker) {
+        throw new Error(`Marker ${id} does not exist`);
+      }
+
+      return markerDocToMarker(marker);
+    },
 
     markers: (root, { input }: { input: MarkersInput }) => {
       if (input.mapId) {
         // Get markers by map
         return markers.find({ mapId: input.mapId })
-          .toArray();
-      } else if (input.maxLat && input.maxLong
-        && input.minLat && input.minLong) {
-        // Get markers for a defined area
-        return markers.find({
-          $and: [
-            { latitude: { $gt: input.minLat, $lt: input.maxLat } },
-            { longitude: { $gt: input.minLong, $lt: input.maxLong } }
-          ]
-        })
           .toArray();
       } else {
         // Get all markers
@@ -115,8 +129,8 @@ const resolvers = {
   Marker: {
     id: (marker: MarkerDoc) => marker.id,
     title: (marker: MarkerDoc) => marker.title,
-    latitude: (marker: MarkerDoc) => marker.latitude,
-    longitude: (marker: MarkerDoc) => marker.longitude,
+    latitude: (marker: MarkerDoc) => marker.location.coordinates[1],
+    longitude: (marker: MarkerDoc) => marker.location.coordinates[0],
     mapId: (marker: MarkerDoc) => marker.mapId
   },
 
@@ -125,8 +139,10 @@ const resolvers = {
       const marker: MarkerDoc = {
         id: input.id ? input.id : uuid(),
         title: input.title ? input.title : '',
-        latitude: input.latitude,
-        longitude: input.longitude,
+        location: {
+          type: 'Point',
+          coordinates: [input.longitude, input.latitude]
+        },
         mapId: input.mapId
       };
 
