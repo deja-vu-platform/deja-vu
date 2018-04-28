@@ -1,21 +1,21 @@
 type Marker {
-  id: ID!,
-  title: String,
-  latitude: Float!,
-  longitude: Float!,
+  id: ID!
+  title: String
+  latitude: Float!
+  longitude: Float!
   mapId: ID!
 }
 
 input CreateMarkerInput {
-  id: ID,
-  title: String,
-  latitude: Float!,
-  longitude: Float!,
+  id: ID
+  title: String
+  latitude: Float!
+  longitude: Float!
   mapId: ID!
 }
 
 input MarkersInput {
-  mapId: ID
+  ofMapId: ID
 }
 
 type Query {

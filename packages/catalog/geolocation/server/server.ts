@@ -40,7 +40,7 @@ interface CreateMarkerInput {
 }
 
 interface MarkersInput {
-  mapId?: string;
+  ofMapId?: string;
 }
 
 interface Config {
@@ -114,9 +114,9 @@ const resolvers = {
     },
 
     markers: (root, { input }: { input: MarkersInput }) => {
-      if (input.mapId) {
+      if (input.ofMapId) {
         // Get markers by map
-        return markers.find({ mapId: input.mapId })
+        return markers.find({ mapId: input.ofMapId })
           .toArray();
       } else {
         // Get all markers

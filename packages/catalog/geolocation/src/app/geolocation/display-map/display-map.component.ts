@@ -19,8 +19,8 @@ export class DisplayMapComponent implements OnInit, OnChanges {
 
   // Default configurations for the Google Maps Display
   // Default center: MIT Stata Center
-  @Input() lat = 42.3616423;
-  @Input() lng = -71.0928587;
+  @Input() lat = 42.361635760915846;
+  @Input() lng = -71.0906195640564;
   @Input() zoom = 16;
   @Input() maxZoom = 20;
   @Input() minZoom = 3;
@@ -61,7 +61,7 @@ export class DisplayMapComponent implements OnInit, OnChanges {
             `,
             variables: JSON.stringify({
               input: {
-                mapId: this.id
+                ofMapId: this.id
               }
             })
           }

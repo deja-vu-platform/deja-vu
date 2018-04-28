@@ -17,7 +17,7 @@ import { Marker } from '../shared/geolocation.model';
 export class ShowMarkersComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined then the fetched markers are not filtered by that property
-  @Input() mapId: string | undefined;
+  @Input() ofMapId: string | undefined;
 
   // Show rules
   /* What fields of the marker to show. These are passed as input
@@ -68,7 +68,7 @@ export class ShowMarkersComponent implements OnInit, OnChanges {
             `,
             variables: JSON.stringify({
               input: {
-                mapId: this.mapId
+                ofMapId: this.ofMapId
               }
             })
           }
