@@ -120,3 +120,6 @@ createGoodForm: FormGroup = this.builder.group({
 - actions that load some entity from the backend (usually `show-*`) should
   produce the object as output. For example, when `show-foo` probably loads a
   `Foo` if an `id` is given it should output the object `loadedFoo`.
+
+- If there's only one id input for a widget, only use `id`. Otherwise, use named ids, e.g. `fooId` and `barId`. An exception to this rule involves `Show*` 
+actions. Even if there is only one possible id input, the id must be named, e.g. `ShowFoo` must have `fooId` not just `id`.

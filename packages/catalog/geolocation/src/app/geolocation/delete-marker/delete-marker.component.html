@@ -1,0 +1,15 @@
+<div *ngIf="showNotifications" class="form-group">
+  <div *ngIf="markerDeleted" class="delete-marker-success">
+    <i class="material-icons">done</i>
+    {{markerDeletedText}}
+  </div>
+  <mat-error *ngIf="markerDeletedError">
+    <i class="material-icons">report_problem</i>
+    {{markerDeletedError}}
+  </mat-error>
+</div>
+<div class="form-group">
+  <button mat-raised-button color="warn" (click)="deleteMarker()">
+    {{buttonLabel}}
+  </button>
+</div>
