@@ -120,6 +120,32 @@ function isDifferent(before: string, after: string, type: string): Boolean {
   return true;
 }
 
+async function getAggregatedMessages(matchQuery: any): Promise<PublisherDoc[]> {
+  const results = await publishers.aggregate([
+    { $match: matchQuery },
+    {
+      $group: {
+        _id: 0,
+        messages: { $push: '$messages' }
+      }
+    },
+    {
+      $project: {
+        messages: {
+          $reduce: {
+            input: '$messages',
+            initialValue: [],
+            in: { $setUnion: ['$$value', '$$this'] }
+          }
+        }
+      }
+    }
+  ])
+    .toArray();
+
+  return results;
+}
+
 const resolvers = {
   Query: {
     publisher: (root, { id }) => publishers.findOne({ id: id }),
@@ -146,15 +172,29 @@ const resolvers = {
       }
 
       // No follower filter
-      let followers: string[] = [];
-      const pubs = await publishers.find()
+      const results = await publishers.aggregate([
+        { $match: { } },
+        {
+          $group: {
+            _id: 0,
+            followerIds: { $push: '$followerIds' }
+          }
+        },
+        {
+          $project: {
+            followerIds: {
+              $reduce: {
+                input: '$followerIds',
+                initialValue: [],
+                in: { $setUnion: ['$$value', '$$this'] }
+              }
+            }
+          }
+        }
+      ])
         .toArray();
-      for (const p of pubs) {
-        const ids = !_.isEmpty(p.followerIds) ? p.followerIds : [];
-        followers = _.union(followers, ids);
-      }
 
-      return followers;
+      return results[0].followerIds;
     },
 
     publishers: async (root, { input }: { input: PublishersInput }) => {
@@ -181,30 +221,18 @@ const resolvers = {
         return !_.isEmpty(publisher.messages) ? publisher.messages : [];
 
       } else if (input.followerId) {
-        // Gets messages of all the publishers followed by a follower
-        const pubs = await publishers.find({ followerIds: input.followerId })
-          .toArray();
 
-        let messages: Message[] = [];
-        for (const p of pubs) {
-          const msgs = !_.isEmpty(p.messages) ? p.messages : [];
-          messages = _.union(messages, msgs);
-        }
+        const results =
+          await getAggregatedMessages({ followerIds: input.followerId });
 
-        return messages;
+        return results[0].messages;
 
       } else {
         // No message filter
-        const pubs = await publishers.find()
-          .toArray();
+        const results =
+          await getAggregatedMessages({});
 
-        let messages: Message[] = [];
-        for (const p of pubs) {
-          const msgs = !_.isEmpty(p.messages) ? p.messages : [];
-          messages = _.union(messages, msgs);
-        }
-
-        return messages;
+        return results[0].messages;
       }
     },
 
