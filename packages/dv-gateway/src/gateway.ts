@@ -8,6 +8,9 @@ import * as path from 'path';
 
 import * as _ from 'lodash';
 
+import {
+  ActionAst, ActionHelper, ActionTable, ActionTag
+} from './actionHelper';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
 
@@ -19,15 +22,6 @@ interface Config {
   reinitDbOnStartup: boolean;
 }
 
-interface ActionInfo {
-  childActions?: {[childActionName: string]: ActionInfo};
-}
-
-interface RootAction {
-  rootName: string;
-  childActions?: {[childActionName: string]: ActionInfo};
-}
-
 interface DvConfig {
   name: string;
   startServer?: boolean;
@@ -35,8 +29,8 @@ interface DvConfig {
   config?: any;
   gateway: { config: Config };
   usedCliches?: {[as: string]: DvConfig};
-  actionTree: RootAction;
 }
+
 
 const JSON_INDENTATION = 2;
 
@@ -48,25 +42,31 @@ const DEFAULT_CONFIG: Config = {
   reinitDbOnStartup: true
 };
 
+const CONFIG_FLAG = 'configFilePath';
+const ACTION_TABLE_FP = 'actionTable.json';
+const distFolder = path.join(process.cwd(), 'dist');
 
-function getDvConfig(): DvConfig {
-  const argv = minimist(process.argv);
-  const configFilePath = argv.configFilePath;
-  if (!argv.configFilePath) {
-    throw new Error('No dvconfig given!');
+function getFromArgs<T>(argv, flag: string): T {
+  const filePath = argv[flag];
+  if (!filePath) {
+    throw new Error(`No ${flag} given!`);
   }
-  const ret: DvConfig = JSON.parse(readFileSync(configFilePath, 'utf8'));
-  console.log(`Using dv config ${stringify(ret)}`);
-  // Temporarily deactivate txs
-  // if (!ret.actionTree) {
-  //   throw new Error('No action tree given');
-  // }
+  const ret: T = JSON.parse(readFileSync(filePath, 'utf8'));
+  console.log(`Using ${flag} ${stringify(ret)}`);
 
   return ret;
 }
 
-const dvConfig: DvConfig = getDvConfig();
+const argv = minimist(process.argv);
+const dvConfig: DvConfig = getFromArgs<DvConfig>(argv, CONFIG_FLAG);
 const config: Config = {...DEFAULT_CONFIG, ...dvConfig.gateway.config};
+
+const actionHelper = new ActionHelper(
+  dvConfig.name,
+  JSON.parse(readFileSync(path.join(distFolder, ACTION_TABLE_FP), 'utf8')),
+  _.zipObject(
+    _.keys(dvConfig.usedCliches),
+    _.map(dvConfig.usedCliches, 'name')));
 
 interface ClicheResponse<T> {
   status: number;
@@ -131,11 +131,11 @@ const txConfig: TxConfig<
 
     // We know that the action path is a valid one because if otherwise the tx
     // would have never been initiated in the first place
-    const dvTxNode = getActionInfo(pathToDvTxNode, dvConfig.actionTree)!;
+    const dvTxNode = actionHelper.getActionOrFail(pathToDvTxNode);
 
     const cohorts = _.map(
-      _.keys(dvTxNode.childActions), (actionName: string) => actionPathToId(
-        [...pathToDvTxNode, actionName]
+      dvTxNode.content, (action: ActionTag) => actionPathToId(
+        [...pathToDvTxNode, action.fqtag]
       ));
 
     return cohorts;
@@ -214,22 +214,25 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
 
     return;
   }
-  // Temporarily deactive txs
-  // const actionPath = getActionPath(gatewayRequest.from, projects);
-  // if (!actionPathIsValid(actionPath, dvConfig.actionTree)) {
-  //   res.status(500).send(
-  //     `Invalid action path: ${actionPath}, my actionConfig is ` +
-  //     JSON.stringify(dvConfig.actionTree, undefined, 2));
-  //   return;
-  // }
+
+  const actionPath = actionHelper.getActionPath(
+    gatewayRequest.from, projects);
+  if (!actionHelper.actionPathIsValid(actionPath)) {
+    res.status(500)
+      .send(
+        `Invalid action path: ${actionPath}, my actionConfig is ` +
+        actionHelper.toString());
+
+    return;
+  }
 
 
   const runId = gatewayRequest.runId;
   console.log(
     'Processing request:' + `to: ${to}, port: ${dstTable[to]}, ` +
-    // Temporarily deactivate txs
-    /* `action path: ${actionPath}, */ `runId: ${runId}`);
-    // (isDvTx(actionPath) ? `, dvTxId: ${runId}` : ' not part of a tx'));
+    `action path: ${actionPath}, runId: ${runId}` +
+    (actionHelper.isDvTx(actionPath) ?
+      `, dvTxId: ${runId}` : ' not part of a tx'));
 
   const gatewayToClicheRequest = {
     ...gatewayRequest,
@@ -239,24 +242,19 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
      body: req.body
     }
   };
-  const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
-    gatewayToClicheRequest);
-  res.status(clicheRes.status);
-  res.send(clicheRes.text);
 
-  // Temporarily deactive txs
-  // if (req.method === 'GET' || !isDvTx(actionPath)) {
-  //   const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
-  //     gatewayToClicheRequest);
-  //   res.status(clicheRes.status);
-  //   res.send(clicheRes.text);
-  // } else {
-  //   if (!runId) {
-  //     throw new Error('run id undefined');
-  //   }
-  //   await txCoordinator.processMessage(
-  //       runId, actionPathToId(actionPath), gatewayToClicheRequest, res);
-  // }
+  if (req.method === 'GET' || !actionHelper.isDvTx(actionPath)) {
+    const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
+      gatewayToClicheRequest);
+    res.status(clicheRes.status);
+    res.send(clicheRes.text);
+  } else {
+    if (!runId) {
+      throw new Error('run id undefined');
+    }
+    await txCoordinator.processMessage(
+        runId, actionPathToId(actionPath), gatewayToClicheRequest, res);
+  }
 });
 
 
@@ -294,12 +292,12 @@ async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
   } catch (err) {
     response = err.response;
   }
-  console.log(`Got back ${JSON.stringify(response, undefined, 2)}`);
+  console.log(`Got back ${stringify(response)}`);
+
   return { status: response.status, text: JSON.parse(response.text) };
 }
 
 // Serve SPA
-const distFolder = path.join(process.cwd(), 'dist');
 app.use(express.static(distFolder));
 app.get('*', ({}, res) => {
   res.sendFile(path.join(distFolder, 'index.html'));
@@ -312,76 +310,11 @@ txCoordinator.start()
     app.listen(port, async () => {
       console.log(`Running gateway on port ${port}`);
       console.log(`Using config ${stringify(dvConfig)}`);
+      console.log(`Using action table ${actionHelper}`);
       console.log(`Serving ${distFolder}`);
     });
   });
 
-
-/**
- *  Checks that the given `actionPath` corresponds to a valid path according
- *  to `actionConfig`.
- */
-function actionPathIsValid(
-  actionPath: string[], actionTree: RootAction): boolean {
-  return !!getActionInfo(actionPath, actionTree);
-}
-
-/**
- * Returns the ActionInfo corresponding to the last node of the action path or
- * undefined if none is found
- */
-function getActionInfo(
-  actionPath: string[], actionTree: RootAction): ActionInfo | undefined {
-  if (_.isEmpty(actionPath) || actionPath[0] !== actionTree.rootName) {
-    return;
-  } else if (actionPath.length === 1) {
-    return actionTree;
-  }
-
-  return _getActionInfo(actionPath.slice(1), actionTree);
-}
-
-function _getActionInfo(actionPath: string[], action: ActionInfo)
-  : ActionInfo | undefined {
-  if (_.isEmpty(action.childActions)) {
-    return;
-  }
-  const next = actionPath[0];
-  if (actionPath.length === 1) {
-    if (_.has(action.childActions, next)) {
-      return action.childActions![next];
-    } else {
-      return;
-    }
-  }
-
-  if (!_.has(action.childActions, next)) {
-    return;
-  }
-
-  return _getActionInfo(actionPath.slice(1), action.childActions![next]);
-}
-
-// Returns an array [action_1, action_2, ..., action_n] representing an action
-// path from action_1 to action_n where action_n is the action that originated
-// the request.
-// Note: dv-* actions are included
-// In other words, it filters non-dv nodes from `from`
-function getActionPath(from: string[], projects: Set<string>): string[] {
-  return _.chain(from)
-    .map((node) => node.toLowerCase())
-    .filter((name) => {
-      const project = name.split('-')[0];
-
-      return projects.has(project) || project === 'dv';
-    })
-    .reverse()
-    .value();
-}
-
-function isDvTx(actionPath: string[]) {
-  return _.includes(actionPath, 'dv-tx');
-}
 
 // `from`: originatingAction-action-....-action
 function getDst(thisProject: string, from: string[], projects: Set<string>)
