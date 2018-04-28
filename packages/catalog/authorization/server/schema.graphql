@@ -21,7 +21,6 @@ type Query {
   owner(resourceId: ID!): ID
   resources(input: ResourcesInput!): [Resource!]
   isOwner(principalId: ID!, resourceId: ID!): Boolean
-  isViewer(principalId: ID!, resourceId: ID!): Boolean
   canView(principalId: ID!, resourceId: ID!): Boolean
   canEdit(principalId: ID!, resourceId: ID!): Boolean
 }

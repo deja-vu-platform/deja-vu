@@ -73,8 +73,7 @@ mongodb.MongoClient.connect(
     resources = db.collection('resources');
     resources.createIndex({ id: 1 }, { unique: true });
     resources.createIndex({ id: 1, viewerIds: 1 }, { unique: true });
-    resources.createIndex({ viewerId: 1 });
-    resources.createIndex({ ownerId: 1 });
+    resources.createIndex({ id: 1, ownerId: 1 }, { unique: true });
   });
 
 
@@ -103,6 +102,7 @@ async function isOwner(principalId: string, resourceId: string) {
   return !_.isNil(res);
 }
 
+
 const resolvers = {
   Query: {
     resources: (root, { input }: { input: ResourcesInput }) => {
@@ -127,18 +127,9 @@ const resolvers = {
       return isOwner(principalId, resourceId);
     },
 
-    isViewer: async (root, { principalId, resourceId }) => {
-      const res = await resources
-        .findOne({ id: resourceId, viewerId: principalId },
-          { projection: { _id: 1 } });
-
-      return !_.isNil(res);
-    },
-
     canView: async (root, { principalId, resourceId }) => {
       const res = await resources
-        .findOne(
-          { id: resourceId, viewerIds: principalId },
+        .findOne({ id: resourceId, viewerIds: principalId },
           { projection: { _id: 1 } });
 
       return !_.isNil(res);
