@@ -98,6 +98,7 @@ mongodb.MongoClient.connect(
     }
     publishers = db.collection('publishers');
     publishers.createIndex({ id: 1 }, { unique: true, sparse: true });
+    publishers.createIndex({ 'messages.id': 1 }, { unique: true });
   });
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
@@ -144,7 +145,8 @@ const resolvers = {
     followers: async (root, { input }: { input: FollowersInput }) => {
       if (input.ofPublisherId) {
         // A publisher's followers
-        const publisher = await publishers.findOne({ id: input.ofPublisherId });
+        const publisher = await publishers.findOne({ id: input.ofPublisherId },
+          { projection: { followerIds: 1 } });
 
         if (!publisher) {
           throw new Error(`Publisher ${input.ofPublisherId} does not exist`);
@@ -195,7 +197,8 @@ const resolvers = {
     messages: async (root, { input }: { input: MessagesInput }) => {
       if (input.byPublisherId) {
         // Get messages by a specific publisher
-        const publisher = await publishers.findOne({ id: input.byPublisherId });
+        const publisher = await publishers.findOne({ id: input.byPublisherId },
+          { projection: { messages: 1 } });
         if (!publisher) {
           throw new Error(`Publisher ${input.byPublisherId} does not exist`);
         }
@@ -221,7 +224,8 @@ const resolvers = {
 
     isFollowing: async (root, { input }: { input: FollowUnfollowInput }) => {
       const publisher = await publishers
-        .findOne({ id: input.publisherId, followerIds: input.followerId });
+        .findOne({ id: input.publisherId, followerIds: input.followerId },
+          { projection: { _id: 1 } });
 
       return !_.isEmpty(publisher);
     }
