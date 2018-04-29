@@ -12,37 +12,25 @@ import { makeExecutableSchema } from 'graphql-tools';
 interface ScoreDoc {
   id: string;
   value: number;
-}
-
-interface TargetDoc {
-  id: string;
-  scores: string[];
-}
-
-interface Score {
-  id: string;
-  value: number;
+  targetId: string;
 }
 
 interface Target {
   id: string;
-  scores: Score[];
+  scores: ScoreDoc[];
   total: number;
 }
 
 interface CreateScoreInput {
   id: string;
   value: number;
+  targetId: string;
 }
 
-interface CreateTargetInput {
+interface ScoresByTargetIdInput {
   id: string;
-  initialScore: CreateScoreInput;
-}
-
-interface UpdateTargetInput {
-  id: string;
-  addScore: CreateScoreInput;
+  showScores: boolean;
+  showTotal: boolean;
 }
 
 interface Config {
@@ -79,7 +67,7 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, scores, targets, aggregateFn;
+let db, scores, aggregateFn;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -92,93 +80,43 @@ mongodb.MongoClient.connect(
     }
     scores = db.collection('scores');
     scores.createIndex({ id: 1 }, { unique: true, sparse: true });
-    targets = db.collection('targets');
-    targets.createIndex({ id: 1 }, { unique: true, sparse: true });
+    scores.createIndex({ targetId: 1});
     aggregateFn = new Function('scores', config.aggregateFn);
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
-class Validation {
-  static async scoreExists(id: string): Promise<ScoreDoc> {
-    return Validation.exists(scores, id, 'Score');
-  }
-
-  static async targetExists(id: string): Promise<TargetDoc> {
-    return Validation.exists(targets, id, 'Target');
-  }
-
-  private static async exists(collection, id: string, type: string) {
-    const doc = await collection.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`${type} ${id} not found`);
-    }
-    return doc;
-  }
-}
-
-async function targetDocToTarget(targetDoc: TargetDoc): Promise<Target> {
-  const targetScores: Score[] = await Promise.all(targetDoc.scores.map(
-    (scoreId: string) => scores.findOne({ id: scoreId })));
-  const total: number = aggregateFn(targetScores);
-  return {
-    id: targetDoc.id,
-    scores: targetScores,
-    total: total
-  };
-}
-
-async function createScore(input: CreateScoreInput): Promise<ScoreDoc> {
-  const score: ScoreDoc = {
-    id: input.id ? input.id : uuid(),
-    value: input.value
-  };
-  await scores.insertOne(score);
-
-  return score;
-}
-
 
 const resolvers = {
   Query: {
     score: (_root, { id }) => scores.findOne({ id: id }),
-    target: async (_root, { id }) => {
-      const targetDoc = await Validation.targetExists(id);
-      return targetDocToTarget(targetDoc);
+    scoresByTargetId: (_root, {input}:
+      {input: ScoresByTargetIdInput}): Target => {
+      const targetScores: ScoreDoc[] = scores.find({ targetId: input.id })
+        .toArray();
+      const total: number = aggregateFn(targetScores);
+      return {
+        id: input.id,
+        scores: targetScores,
+        total: total
+      };
     }
   },
   Score: {
     id: (score: ScoreDoc) => score.id,
-    value: (score: ScoreDoc) => score.value
-  },
-  Target: {
-    id: (target: TargetDoc) => target.id,
-    scores: async (target: TargetDoc) => target.scores
+    value: (score: ScoreDoc) => score.value,
+    targetId: (score: ScoreDoc) => score.targetId
   },
   Mutation: {
     createScore: async (_root, {input}: {input: CreateScoreInput}) => {
-      return createScore(input);
-    },
-    createTarget: async (_root, {input}: {input: CreateTargetInput}) => {
-      const targetId = input.id ? input.id : uuid();
-      const target: TargetDoc = { id: targetId, scores: []};
-      if (input.initialScore) {
-        const initialScore: ScoreDoc = await createScore(input.initialScore);
-        target.scores = [initialScore.id];
-      }
-      await targets.insertOne(target);
-
-      return targetDocToTarget(target);
-    },
-    updateTarget: async (_root, {input}: {input: UpdateTargetInput}) => {
-      await Validation.targetExists(input.id);
-      const newScore: ScoreDoc = await createScore(input.addScore);
-
-      const updateOp = { $push: { scores: newScore.id } };
-      await targets.updateOne({ id: input.id }, updateOp);
-
-      return true;
+      const score: ScoreDoc = {
+        id: input.id ? input.id : uuid(),
+        value: input.value,
+        targetId: input.targetId
+      };
+      await scores.insertOne(score);
+      return score;
     }
   }
 };

@@ -7,4 +7,11 @@
   <div *ngIf="showValue && !(score.value || good.value === 0)">
     {{noValueText}}
   </div>
+
+  <div *ngIf="showTargetId && score.targetId">
+    {{score.targetId}}
+  </div>
+  <div *ngIf="showTargetId && !score.targetId">
+    {{noTargetIdText}}
+  </div>
 </span>

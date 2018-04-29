@@ -9,16 +9,11 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from 'dv-core';
 
 import { CreateScoreComponent } from './create-score/create-score.component';
-import { CreateScoreValueComponent } from './create-score-value/create-score-value.component';
-import { CreateTargetComponent } from './create-target/create-target.component';
 import { ShowScoreComponent } from './show-score/show-score.component';
 import { ShowTargetComponent } from './show-target/show-target.component';
-// import { ShowTotalComponent } from './show-total/show-total.component';
-import { UpdateTargetComponent } from './update-target/update-target.component';
 
 const allComponents = [
-  CreateScoreComponent, CreateScoreValueComponent, CreateTargetComponent,
-  ShowScoreComponent, ShowTargetComponent, UpdateTargetComponent];
+  CreateScoreComponent, ShowScoreComponent, ShowTargetComponent ];
 
 @NgModule({
   imports: [

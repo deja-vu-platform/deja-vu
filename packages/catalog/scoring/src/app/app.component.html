@@ -1,30 +1,10 @@
 <div class="container">
   <h1>Scoring</h1>
 
-  <h2>Create Score</h2>
-  <scoring-create-score id="win" (score)="scoreId = $event.id">
+  <h2>Create Score (id win, targetId ben)</h2>
+  <scoring-create-score id="win" targetId="ben" (score)="scoreId = $event.id">
   </scoring-create-score>
 
-  <h2>Show Score</h2>
-  <scoring-show-score [id]="scoreId"></scoring-show-score>
-
-  <h2>Create Target</h2>
-  <h3>Initial Score</h3>
-  <scoring-create-target id="ben" [initialScore]="5"
-    (target)="targetId1 = $event.id">
-  </scoring-create-target>
-
-  <h3>No Initial Score</h3>
-  <scoring-create-target id="alyssa"
-    [showOptionToInputInitialScore]="false"
-    [useInitialScore]="false"
-    (target)="targetId2 = $event.id">
-  </scoring-create-target>
-
-  <h2>Show Target</h2>
-  <scoring-show-target [id]="targetId1"></scoring-show-target>
-  <scoring-show-target [id]="targetId2"></scoring-show-target>
-
-  <h2>Update Target</h2>
-  <scoring-update-target [id]="targetId1"></scoring-update-target>
+  <h2>Show Target (id ben)</h2>
+  <scoring-show-target id="ben"></scoring-show-target>
 </div>

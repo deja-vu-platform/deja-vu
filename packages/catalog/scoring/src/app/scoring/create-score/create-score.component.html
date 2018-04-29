@@ -12,10 +12,17 @@
     </mat-error>
   </div>
   <div *ngIf="showOptionToInputValue" class="form-group">
-    <scoring-create-score-value
-      [inputLabel]="valueLabel"
-      formControlName="valueControl">
-    </scoring-create-score-value>
+    <mat-form-field>
+      <mat-label>{{valueInputLabel}}</mat-label>
+      <input matInput required
+        [formControl]="valueControl"
+        name="valueControl"
+        type="number"
+        >
+      <mat-error *ngIf="valueControl.hasError('required')">
+        This field is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
     <button mat-button type="submit" [disabled]="!createScoreForm.valid">

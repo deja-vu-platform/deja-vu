@@ -23,6 +23,7 @@ export class ShowTargetComponent implements OnInit, OnChanges {
   @Input() showTotal = true;
   @Input() showScoreId = true;
   @Input() showScoreValue = true;
+  @Input() showScoreTargetId = true;
 
   @Input() totalLabel = 'Total: ';
   @Input() noScoresText = 'No scores to show';
@@ -56,14 +57,24 @@ export class ShowTargetComponent implements OnInit, OnChanges {
     this.gs.get<{data: {target: Target}}>('/graphql', {
       params: {
         query: `
-          query {
-            target(id: "${this.id}") {
-              ${this.showId ? 'id' : ''}
-              ${this.showScores ? 'scores { id }' : ''}
+          query ScoresByTargetId($input: ScoreByTargetIdInput!) {
+            scoresByTargetId(input: $input) {
+              ${this.showScores ? 'scores {' +
+                'id \n' +
+                `${this.showScoreValue ? 'value' : ''} \n` +
+                `${this.showScoreTargetId ? 'targetId' : ''}` : ''
+              }
               ${this.showTotal ? 'total': ''}
             }
           }
-        `
+        `,
+        variables: JSON.stringify({
+          input: {
+            id: this.id,
+            showScores: this.showScores,
+            showTotal: this.showTotal
+          }
+        })
       }
     })
     .subscribe((res) => {

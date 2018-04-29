@@ -1,6 +1,7 @@
 export interface Score {
   id: string;
   value: number;
+  targetId: string;
 }
 
 export interface Target {

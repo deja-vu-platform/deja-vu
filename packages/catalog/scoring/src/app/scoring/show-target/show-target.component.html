@@ -8,7 +8,8 @@
     <ul *ngIf="showScores" class="list-group">
       <li *ngFor="let score of target.scores" class="list-group-item">
         <dv-include [action]="showScore" [inputs]="{
-            id: score.id, showId: showScoreId, showValue: showScoreValue}"
+            score: score, showId: showScoreId, showValue: showScoreValue,
+            showTargetId: showScoreTargetId }"
           [parent]="showTarget">
         </dv-include>
       </li>

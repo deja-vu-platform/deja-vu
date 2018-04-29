@@ -16,8 +16,10 @@ export class ShowScoreComponent implements OnInit, OnChanges {
 
   @Input() showId = true;
   @Input() showValue = true;
+  @Input() showTargetId = true;
 
   @Input() noValueText = 'No value';
+  @Input() noTargetIdText = 'No target id';
 
   private gs: GatewayService;
 
@@ -45,6 +47,7 @@ export class ShowScoreComponent implements OnInit, OnChanges {
             score(id: "${this.id}") {
               ${this.showId ? 'id' : ''}
               ${this.showValue ? 'value' : ''}
+              ${this.showTargetId ? 'targetId' : ''}
             }
           }
         `

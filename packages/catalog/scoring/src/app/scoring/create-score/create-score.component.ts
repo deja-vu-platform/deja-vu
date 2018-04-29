@@ -29,7 +29,8 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class CreateScoreComponent
     implements OnInit, OnRun, OnAfterCommit, OnAfterAbort  {
-  @Input() id: string | undefined = '';
+  @Input() id: string | undefined;
+  @Input() targetId: string;
   @Input() showOptionToInputValue = true;
   @Input() showOptionToSubmit = true;
   @Input() save = true;
@@ -42,7 +43,7 @@ export class CreateScoreComponent
 
   // Presentation inputs
   @Input() buttonLabel = 'Create';
-  @Input() valueLabel = 'Score';
+  @Input() valueInputLabel = 'Score';
   @Input() newScoreSavedText = 'New Score saved';
 
   @ViewChild(FormGroupDirective) form;
@@ -74,7 +75,8 @@ export class CreateScoreComponent
   async dvOnRun(): Promise<void> {
     const newScore: Score = {
       id: this.id,
-      value: this.valueControl.value
+      value: this.valueControl.value,
+      targetId: this.targetId
     };
     if (this.save) {
       const res = await this.gs
@@ -87,7 +89,8 @@ export class CreateScoreComponent
           variables: {
             input: {
               id: this.id,
-              value: this.valueControl.value
+              value: this.valueControl.value,
+              targetId: this.targetId
             }
           }
         })
