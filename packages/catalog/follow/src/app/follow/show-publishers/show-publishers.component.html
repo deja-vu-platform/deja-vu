@@ -5,9 +5,9 @@
         [inputs]="{publisher: publisher}" 
         [parent]="showPublishers">
       </dv-include>
-      <div *ngIf="showOptionToFollowUnfollow && followerId">
+      <div *ngIf="showOptionToFollowUnfollow && followedById">
         <follow-follow-unfollow 
-          [followerId]="followerId"
+          [followerId]="followedById"
           [publisherId]="publisher.id">          
         </follow-follow-unfollow>
       </div>
