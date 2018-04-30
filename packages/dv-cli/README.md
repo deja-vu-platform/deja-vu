@@ -70,3 +70,30 @@ and reinstall it globally with:
 npm run clean && npm run build && npm uninstall -g && npm install -g
 ```
 
+Dv Config
+---------
+
+The presence of a dvconfig.json file in a directory indicates that the directory
+is the root of a Deja Vu project.
+
+The "actions" property specifies the location of the actions. The property can
+be ommitted, in which case it defaults to including all `.html` files. The list
+of actions to include can be customized with properties "include" and
+"exclude".
+
+The "include" and "exclude" properties take a list of
+(glob-like file patterns)[https://www.npmjs.com/package/glob#glob-primer] or
+objects with properties "name" and "file".
+
+If "include" is left unspecified, the cli defaults to
+including all `.html` files in the containing directory and subdirectories
+except those excluded using the "exclude" property.
+
+The `node_modules`, `dist` and `pkg` directories are always excluded. So is
+`index.html` and all files ending in something else other than `.html`.
+The name of the action is given by the value of `name` in the dvconfig.json and
+from the name of the html file up to the first `.` (e.g., for a file named
+`show-groups.component.html` or `show-groups.html` and `name: 'group'` the
+action name is `group-show-groups`).
+
+Any action referenced in another `.html` file must be included.
