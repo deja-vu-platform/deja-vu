@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter,
-  Input, OnChanges, OnInit, Output
+  Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
@@ -8,6 +8,10 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
+
+import { Resource } from '../shared/authorization.model';
+
+import { API_PATH } from '../authorization.config';
 
 
 @Component({
@@ -25,7 +29,7 @@ export class ShowOwnerComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -41,7 +45,7 @@ export class ShowOwnerComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-    this.gs.get<{data: { owner: string }}>('/graphql', {
+    this.gs.get<{data: { owner: string }}>(this.apiPath, {
       params: {
         query: `query {
           owner(resourceId: "${this.resourceId}")

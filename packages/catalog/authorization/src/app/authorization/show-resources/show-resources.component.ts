@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter,
-  Input, OnChanges, OnInit, Output, Type
+  Inject, Input, OnChanges, OnInit, Output, Type
 } from '@angular/core';
 import {
   Action, GatewayService, GatewayServiceFactory, OnAfterAbort,
@@ -11,9 +11,12 @@ import * as _ from 'lodash';
 
 import { Resource } from '../shared/authorization.model';
 
+import { API_PATH } from '../authorization.config';
+
 import {
   ShowResourceComponent
 } from '../show-resource/show-resource.component';
+
 
 @Component({
   selector: 'authorization-show-resources',
@@ -35,7 +38,7 @@ export class ShowResourcesComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -51,7 +54,7 @@ export class ShowResourcesComponent implements OnInit, OnChanges {
     if (!this.gs || !this.viewableBy) {
       return;
     }
-    this.gs.get<{data: { resources: Resource }}>('/graphql', {
+    this.gs.get<{data: { resources: Resource }}>(this.apiPath, {
       params: {
         query: `
           query Resources($input: ResourcesInput!) {

@@ -34,6 +34,9 @@ import {
   ShowResourcesComponent
 } from './show-resources/show-resources.component';
 
+import { API_PATH } from './authorization.config';
+
+
 const allComponents = [
   AddViewerComponent, CanEditComponent, CanViewComponent,
   CreateResourceComponent, DeleteResourceComponent, ShowOwnerComponent,
@@ -48,6 +51,7 @@ const allComponents = [
     FormsModule,
     MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

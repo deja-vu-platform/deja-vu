@@ -1,11 +1,13 @@
 import {
-  Component, ElementRef, Input, OnInit
+  Component, ElementRef, Inject, Input, OnInit
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnRun, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../authorization.config';
 
 
 @Component({
@@ -20,7 +22,7 @@ export class DeleteResourceComponent implements OnInit, OnRun {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -33,7 +35,7 @@ export class DeleteResourceComponent implements OnInit, OnRun {
 
   dvOnRun() {
     this.gs
-      .post('/graphql', {
+      .post(this.apiPath, {
         query: `mutation {
           deleteResource (id: "${this.id}")
         }`

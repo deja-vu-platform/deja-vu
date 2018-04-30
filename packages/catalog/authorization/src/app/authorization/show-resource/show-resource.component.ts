@@ -1,9 +1,11 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
 import { GatewayService, GatewayServiceFactory  } from 'dv-core';
 import { Resource } from '../shared/authorization.model';
+
+import { API_PATH } from '../authorization.config';
 
 @Component({
   selector: 'authorization-show-resource',
@@ -17,7 +19,9 @@ export class ShowResourceComponent implements OnInit, OnChanges {
 
   private gs: GatewayService;
 
-  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+  constructor(
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -30,7 +34,7 @@ export class ShowResourceComponent implements OnInit, OnChanges {
 
   load() {
     if (this.gs && !this.resource && this.id) {
-      this.gs.get<{data: { resource: Resource } }>('/graphql', {
+      this.gs.get<{data: { resource: Resource } }>(this.apiPath, {
         params: {
           query: `
             query {

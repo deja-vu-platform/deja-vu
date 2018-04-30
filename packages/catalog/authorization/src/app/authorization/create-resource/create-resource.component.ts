@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter,
-  Input, OnInit, Output
+  Inject, Input, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
@@ -10,6 +10,9 @@ import {
 import * as _ from 'lodash';
 
 import { Resource } from '../shared/authorization.model';
+
+import { API_PATH } from '../authorization.config';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -40,7 +43,7 @@ export class CreateResourceComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -59,7 +62,7 @@ export class CreateResourceComponent implements
     };
     if (this.save) {
       const res = await this.gs
-        .post<{ data: { createResource: Resource } }>('/graphql', {
+        .post<{ data: { createResource: Resource } }>(this.apiPath, {
           query: `
             mutation CreateResource($input: CreateResourceInput!) {
               createResource(input: $input) {
