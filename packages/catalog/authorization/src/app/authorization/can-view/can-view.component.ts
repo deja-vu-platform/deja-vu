@@ -43,11 +43,17 @@ export class CanViewComponent implements OnInit, OnChanges {
     }
     this.gs.get<{data: { canView: boolean }}>('/graphql', {
       params: {
-        query: `query {
-          canView(
-            principalId: "${this.principalId}",
-            resourceId: "${this.resourceId}")
-        }`
+        query: `
+          query CanView($input: PrincipalResourceInput!) {
+            canView(input: $input)
+          }
+        `,
+        variables: JSON.stringify({
+          input: {
+            principalId: this.principalId,
+            resourceId: this.resourceId
+          }
+        })
       }
     })
     .subscribe((res) => {

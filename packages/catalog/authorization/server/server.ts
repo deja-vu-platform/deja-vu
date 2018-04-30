@@ -29,6 +29,16 @@ interface CreateResourceInput {
   viewerIds?: string[];
 }
 
+interface PrincipalResourceInput {
+  principalId: string;
+  resourceId: string;
+}
+
+interface AddViewerToResourceInput {
+  id: string;
+  viewerId: string;
+}
+
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -105,10 +115,9 @@ async function isOwner(principalId: string, resourceId: string) {
 
 const resolvers = {
   Query: {
-    resources: (root, { input }: { input: ResourcesInput }) => {
-      return resources.find({ viewerIds: input.viewableBy })
-        .toArray();
-    },
+    resources: (root, { input }: { input: ResourcesInput }) => resources
+        .find({ viewerIds: input.viewableBy })
+        .toArray(),
 
     resource: (root, { id }) => resources.findOne({ id: id }),
 
@@ -123,11 +132,11 @@ const resolvers = {
       return resource.ownerId;
     },
 
-    isOwner: (root, { principalId, resourceId }) => {
-      return isOwner(principalId, resourceId);
-    },
+    isOwner: (root, { input: { principalId, resourceId } }
+      : { input: PrincipalResourceInput }) => isOwner(principalId, resourceId),
 
-    canView: async (root, { principalId, resourceId }) => {
+    canView: async (root, { input: { principalId, resourceId } }
+      : { input: PrincipalResourceInput }) => {
       const res = await resources
         .findOne({ id: resourceId, viewerIds: principalId },
           { projection: { _id: 1 } });
@@ -135,9 +144,8 @@ const resolvers = {
       return !_.isNil(res);
     },
 
-    canEdit: (root, { principalId, resourceId }) => {
-      return isOwner(principalId, resourceId);
-    }
+    canEdit: (root, { input: { principalId, resourceId } }
+      : { input: PrincipalResourceInput }) => isOwner(principalId, resourceId)
   },
 
   Resource: {
@@ -162,7 +170,8 @@ const resolvers = {
       return newResource;
     },
 
-    addViewerToResource: async (root, { id, viewerId }) => {
+    addViewerToResource: async (root, { input: { id, viewerId } }
+      : { input: AddViewerToResourceInput }) => {
       const updateOp = { $push: { viewerIds: viewerId } };
       const update = await resources.updateOne({ id: id }, updateOp);
 

@@ -53,11 +53,13 @@ export class ShowResourcesComponent implements OnInit, OnChanges {
     }
     this.gs.get<{data: { resources: Resource }}>('/graphql', {
       params: {
-        query: `query Resources($input: ResourcesInput!){
-          resources(input: $input) {
-            id
+        query: `
+          query Resources($input: ResourcesInput!) {
+            resources(input: $input) {
+              id
+            }
           }
-        }`,
+        `,
         variables: JSON.stringify({
           input: {
             viewableBy: this.viewableBy

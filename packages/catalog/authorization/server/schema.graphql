@@ -16,17 +16,27 @@ input CreateResourceInput {
   viewerIds: [ID!]
 }
 
+input PrincipalResourceInput {
+  principalId: ID!,
+  resourceId: ID!
+}
+
+input AddViewerToResourceInput {
+  id: ID!,
+  viewerId: ID!
+}
+
 type Query {
   resource(id: ID!): Resource
   owner(resourceId: ID!): ID
   resources(input: ResourcesInput!): [Resource!]
-  isOwner(principalId: ID!, resourceId: ID!): Boolean
-  canView(principalId: ID!, resourceId: ID!): Boolean
-  canEdit(principalId: ID!, resourceId: ID!): Boolean
+  isOwner(input: PrincipalResourceInput!): Boolean
+  canView(input: PrincipalResourceInput!): Boolean
+  canEdit(input: PrincipalResourceInput!): Boolean
 }
 
 type Mutation {
   createResource(input: CreateResourceInput!): Resource
-  addViewerToResource(id: ID!, viewerId: ID!): Boolean
+  addViewerToResource(input: AddViewerToResourceInput!): Boolean
   deleteResource(id: ID!): Boolean
 }

@@ -43,11 +43,17 @@ export class CanEditComponent implements OnInit, OnChanges {
     }
     this.gs.get<{data: { canEdit: boolean }}>('/graphql', {
       params: {
-        query: `query {
-          canEdit(
-            principalId: "${this.principalId}",
-            resourceId: "${this.resourceId}")
-        }`
+        query: `
+          query CanEdit($input: PrincipalResourceInput!) {
+            canEdit(input: $input)
+          }
+        `,
+        variables: JSON.stringify({
+          input: {
+            principalId: this.principalId,
+            resourceId: this.resourceId
+          }
+        })
       }
     })
     .subscribe((res) => {

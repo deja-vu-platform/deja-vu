@@ -49,12 +49,17 @@ export class AddViewerComponent implements
   dvOnRun() {
     this.gs
       .post('/graphql', {
-        query: `mutation {
-          addViewerToResource (
-            id: "${this.id}",
-            viewerId: "${this.viewerId}"
-          )
-        }`
+        query: `
+          mutation AddViewerToResource($input: AddViewerToResourceInput!) {
+            addViewerToResource (input: $input)
+          }
+        `,
+        variables: {
+          input: {
+            id: this.id,
+            viewerId: this.viewerId
+          }
+        }
       })
       .toPromise();
   }

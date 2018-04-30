@@ -61,7 +61,7 @@ export class CreateResourceComponent implements
       const res = await this.gs
         .post<{ data: { createResource: Resource } }>('/graphql', {
           query: `
-            mutation CreateResource($input: CreateResourceInput!){
+            mutation CreateResource($input: CreateResourceInput!) {
               createResource(input: $input) {
                 id
               }
