@@ -9,7 +9,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { Resource } from '../../../../shared/authorization.model';
+import { Resource } from '../shared/authorization.model';
 
 import {
   ShowResourceComponent
