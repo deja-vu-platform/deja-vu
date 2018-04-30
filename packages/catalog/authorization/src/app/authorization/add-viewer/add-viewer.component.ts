@@ -20,9 +20,9 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class AddViewerComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  // Presentation Inputs
   @Input() id: string;
   @Input() viewerId: string;
+  // Presentation Inputs
   @Input() resourceInputLabel = 'Resource Id';
   @Input() viewerInputLabel = 'Viewer Id';
   @Input() buttonLabel = 'Add Viewer to Resource';
