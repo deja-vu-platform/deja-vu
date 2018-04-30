@@ -12,6 +12,10 @@ import * as _ from 'lodash';
 import { API_PATH } from '../authorization.config';
 
 
+interface CanViewRes {
+  data: { canView: boolean; };
+}
+
 @Component({
   selector: 'authorization-can-view',
   templateUrl: './can-view.component.html',
@@ -43,7 +47,7 @@ export class CanViewComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-    this.gs.get<{data: { canView: boolean }}>(this.apiPath, {
+    this.gs.get<CanViewRes>(this.apiPath, {
       params: {
         query: `
           query CanView($input: PrincipalResourceInput!) {

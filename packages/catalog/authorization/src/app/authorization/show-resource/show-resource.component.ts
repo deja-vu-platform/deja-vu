@@ -7,6 +7,11 @@ import { Resource } from '../shared/authorization.model';
 
 import { API_PATH } from '../authorization.config';
 
+
+interface ResourceRes {
+  data: { resource: Resource; };
+}
+
 @Component({
   selector: 'authorization-show-resource',
   templateUrl: './show-resource.component.html',
@@ -34,7 +39,7 @@ export class ShowResourceComponent implements OnInit, OnChanges {
 
   load() {
     if (this.gs && !this.resource && this.id) {
-      this.gs.get<{data: { resource: Resource } }>(this.apiPath, {
+      this.gs.get<ResourceRes>(this.apiPath, {
         params: {
           query: `
             query {

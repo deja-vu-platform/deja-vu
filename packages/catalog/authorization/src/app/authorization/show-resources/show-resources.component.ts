@@ -17,6 +17,10 @@ import {
   ShowResourceComponent
 } from '../show-resource/show-resource.component';
 
+interface ResourcesRes {
+  data: { resources: Resource; };
+}
+
 
 @Component({
   selector: 'authorization-show-resources',
@@ -54,7 +58,7 @@ export class ShowResourcesComponent implements OnInit, OnChanges {
     if (!this.gs || !this.viewableBy) {
       return;
     }
-    this.gs.get<{data: { resources: Resource }}>(this.apiPath, {
+    this.gs.get<ResourcesRes>(this.apiPath, {
       params: {
         query: `
           query Resources($input: ResourcesInput!) {

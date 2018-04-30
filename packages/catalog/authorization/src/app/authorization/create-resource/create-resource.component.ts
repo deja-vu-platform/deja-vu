@@ -14,6 +14,10 @@ import { Resource } from '../shared/authorization.model';
 import { API_PATH } from '../authorization.config';
 
 
+interface CreateResourceRes {
+ data: { createResource: Resource; };
+}
+
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
@@ -61,20 +65,19 @@ export class CreateResourceComponent implements
       viewerIds: this.viewerIds
     };
     if (this.save) {
-      const res = await this.gs
-        .post<{ data: { createResource: Resource } }>(this.apiPath, {
-          query: `
-            mutation CreateResource($input: CreateResourceInput!) {
-              createResource(input: $input) {
-                id
-              }
+      const res = await this.gs.post<CreateResourceRes>(this.apiPath, {
+        query: `
+          mutation CreateResource($input: CreateResourceInput!) {
+            createResource(input: $input) {
+              id
             }
-          `,
-          variables: {
-            input: resource
           }
-        })
-        .toPromise();
+        `,
+        variables: {
+          input: resource
+        }
+      })
+      .toPromise();
     }
     this.resource.emit(resource);
   }
