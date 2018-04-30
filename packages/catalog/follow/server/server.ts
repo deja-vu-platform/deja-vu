@@ -135,11 +135,14 @@ const resolvers = {
 
     message: async (root, { id }) => {
       const publisher =
-        await publishers.findOne({ 'messages.id': id });
+        await publishers.findOne({ 'messages.id': id },
+          { projection: { 'messages.$': 1 } });
 
-      if (!publisher) { throw new Error(`Message ${id} does not exist`); }
+      if (!publisher || !publisher.messages) {
+        throw new Error(`Message ${id} does not exist`);
+      }
 
-      return _.find(publisher.messages, { id: id });
+      return publisher.messages[0];
     },
 
     followers: async (root, { input }: { input: FollowersInput }) => {
