@@ -1,12 +1,12 @@
 type Resource {
   id: ID!,
   ownerId: ID!,
-  # includes the owner id because the owner is also a viewer
+  # Includes the owner id because the owner is also a viewer
   viewerIds: [ID!]
 }
 
 input ResourcesInput {
-  # viewableBy is required, you can't see the entire list of resources
+  # Only resources viewable by the specified user will be shown
   viewableBy: ID!
 }
 
