@@ -1,13 +1,18 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
 
 import { ShowMessageComponent } from '../show-message/show-message.component';
 
+import { API_PATH } from '../follow.config';
 import { Message } from '../shared/follow.model';
 
+interface MessagesRes {
+  data: { messages: Message[] };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'follow-show-messages',
@@ -27,7 +32,7 @@ export class ShowMessagesComponent implements OnInit, OnChanges {
   @Input() showContent = true;
 
   @Input() showMessage: Action = {
-    type: <Type<Component>> ShowMessageComponent
+    type: <Type<Component>>ShowMessageComponent
   };
   @Input() noMessagesToShowText = 'No messages to show';
   messages: Message[] = [];
@@ -36,7 +41,8 @@ export class ShowMessagesComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showMessages = this;
   }
 
@@ -52,7 +58,7 @@ export class ShowMessagesComponent implements OnInit, OnChanges {
   fetchMessages() {
     if (this.gs) {
       this.gs
-        .get<{data: {messages: Message[]}}>('/graphql', {
+        .get<MessagesRes>(this.apiPath, {
           params: {
             query: `
               query Messages($input: MessagesInput!) {

@@ -1,12 +1,19 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
 
+import { API_PATH } from '../follow.config';
+
 import {
   ShowFollowerComponent
 } from '../show-follower/show-follower.component';
+
+interface FollowersRes {
+  data: { followers: string[] };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'follow-show-followers',
@@ -32,7 +39,8 @@ export class ShowFollowersComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showFollowers = this;
   }
 
@@ -48,7 +56,7 @@ export class ShowFollowersComponent implements OnInit, OnChanges {
   fetchFollowers() {
     if (this.gs) {
       this.gs
-        .get<{ data: { followers: string[] } }>('/graphql', {
+        .get<FollowersRes>(this.apiPath, {
           params: {
             query: `
               query Followers($input: FollowersInput!) {

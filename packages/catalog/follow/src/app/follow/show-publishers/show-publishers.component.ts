@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
@@ -8,8 +8,13 @@ import {
   ShowPublisherComponent
 } from '../show-publisher/show-publisher.component';
 
+import { API_PATH } from '../follow.config';
 import { Publisher } from '../shared/follow.model';
 
+interface PublishersRes {
+  data: { publishers: Publisher[] };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'follow-show-publishers',
@@ -39,7 +44,8 @@ export class ShowPublishersComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showPublishers = this;
   }
 
@@ -55,7 +61,7 @@ export class ShowPublishersComponent implements OnInit, OnChanges {
   fetchPublishers() {
     if (this.gs) {
       this.gs
-        .get<{ data: { publishers: Publisher[] } }>('/graphql', {
+        .get<PublishersRes>(this.apiPath, {
           params: {
             query: `
               query Publishers($input: PublishersInput!) {

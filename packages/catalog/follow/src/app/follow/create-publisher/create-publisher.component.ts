@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output
 } from '@angular/core';
 
 import {
@@ -8,10 +8,15 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
+import { API_PATH } from '../follow.config';
 import { Publisher } from '../shared/follow.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
+interface CreatePublisherRes {
+  data: { createPublisher: Publisher };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'follow-create-publisher',
@@ -38,7 +43,7 @@ export class CreatePublisherComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -50,9 +55,7 @@ export class CreatePublisherComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{
-      data: { createPublisher: { id: string } }, errors: { message: string }[]
-    }>('/graphql', {
+    const res = await this.gs.post<CreatePublisherRes>(this.apiPath, {
       query: `mutation {
           createPublisher(id: "${this.id}") {
             id

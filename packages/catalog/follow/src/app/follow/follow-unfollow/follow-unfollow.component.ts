@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
 
 import {
@@ -9,12 +9,24 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../follow.config';
+
 const followQuery = `mutation Follow($input: FollowUnfollowInput!) {
   follow(input: $input)
 }`;
 const unfollowQuery = `mutation Unfollow($input: FollowUnfollowInput!) {
   unfollow(input: $input)
 }`;
+
+interface IsFollowingRes {
+  data: { isFollowing: boolean };
+  errors: { message: string }[];
+}
+
+interface FollowUnfollowRes {
+  data: any;
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'follow-follow-unfollow',
@@ -37,7 +49,7 @@ export class FollowUnfollowComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -55,7 +67,7 @@ export class FollowUnfollowComponent implements
     }
 
     this.gs
-      .get<{ data: any }>('/graphql', {
+      .get<{ data: any }>(this.apiPath, {
         params: {
           query: `
               query IsFollowing($input: FollowUnfollowInput!) {
@@ -86,9 +98,7 @@ export class FollowUnfollowComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{
-      data: any, errors: { message: string }[]
-    }>('/graphql', {
+    const res = await this.gs.post<FollowUnfollowRes>(this.apiPath, {
       query: this.queryString,
       variables: {
         input: {

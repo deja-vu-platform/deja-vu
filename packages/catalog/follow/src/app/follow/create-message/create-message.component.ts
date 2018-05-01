@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
   ViewChild
 } from '@angular/core';
 
@@ -15,9 +15,15 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../follow.config';
 import { Message } from '../shared/follow.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
+
+interface CreateMessageRes {
+  data: { createMessage: Message };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'follow-create-message',
@@ -63,7 +69,8 @@ export class CreateMessageComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -75,9 +82,7 @@ export class CreateMessageComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{
-      data: any, errors: { message: string }[]
-    }>('/graphql', {
+    const res = await this.gs.post<CreateMessageRes>(this.apiPath, {
       query: `mutation CreateMessage($input: CreateMessageInput!) {
             createMessage(input: $input) {
               id,

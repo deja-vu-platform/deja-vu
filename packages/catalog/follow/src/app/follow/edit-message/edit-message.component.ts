@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, 
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -14,9 +15,20 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../follow.config';
 import { Message } from '../shared/follow.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
+
+interface EditMessageRes {
+  data: { editMessage: boolean };
+  errors: { message: string }[];
+}
+
+interface LoadMessageRes {
+  data: { message: Message };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'follow-edit-message',
@@ -61,7 +73,8 @@ export class EditMessageComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -78,7 +91,7 @@ export class EditMessageComponent implements
       return;
     }
 
-    this.gs.get<{ data: { message: Message } }>('/graphql', {
+    this.gs.get<LoadMessageRes>(this.apiPath, {
       params: {
         query: `
         query {
@@ -110,9 +123,7 @@ export class EditMessageComponent implements
   }
 
   async dvOnRun(): Promise<Boolean> {
-    const res = await this.gs.post<{
-      data: any, errors: { message: string }[]
-    }>('/graphql', {
+    const res = await this.gs.post<EditMessageRes>(this.apiPath, {
       query: `mutation EditMessage($input: EditMessageInput!) {
             editMessage(input: $input)
           }`,
@@ -131,7 +142,7 @@ export class EditMessageComponent implements
         .join());
     }
 
-    return true;
+    return res.data.editMessage;
   }
 
   dvOnAfterCommit() {

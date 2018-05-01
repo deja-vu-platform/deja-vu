@@ -35,6 +35,8 @@ import {
   ShowPublishersComponent
 } from './show-publishers/show-publishers.component';
 
+import {API_PATH} from './follow.config';
+
 const allComponents = [
   CreateMessageComponent, CreatePublisherComponent, EditMessageComponent,
   FollowUnfollowComponent, ShowFollowerComponent, ShowFollowersComponent,
@@ -48,6 +50,7 @@ const allComponents = [
     BrowserAnimationsModule, MatButtonModule, MatFormFieldModule,
     MatInputModule, MatIconModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponents,
   exports: allComponents,
   entryComponents: allComponents
