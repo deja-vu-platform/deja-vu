@@ -19,7 +19,10 @@ export class CreateCustomPasskeyComponent {
                 )
             `)
             .subscribe(
-                _ => { this.create_passkey_ok.value = true; },
+                _ => {
+                    this.passkey.code = "";
+                    this.create_passkey_ok.value = true;
+                },
                 err => {
                     this.error = true;
                 }

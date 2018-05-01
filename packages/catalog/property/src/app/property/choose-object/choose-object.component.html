@@ -1,0 +1,14 @@
+<mat-form-field>
+  <mat-select [placeholder]="chooseObjectSelectPlaceholder"
+    [(value)]="_selectedObjectId"
+    (selectionChange)="updateSelected($event.value)">
+    <mat-option>None</mat-option>
+    <mat-option *ngFor="let object of _objects" [value]="object.id">
+      <dv-include [action]="showObject" [inputs]="{
+          object: object, showOnly: showOnly, showExclude: showExclude
+        }"
+        [parent]="chooseObject">
+      </dv-include>
+    </mat-option>
+  </mat-select>
+</mat-form-field>

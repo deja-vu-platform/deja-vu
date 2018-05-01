@@ -1,0 +1,49 @@
+<dv-widget-options 
+    [widget]="widget" 
+    (applyChanges)="applyChanges($event)">
+  <div items>
+    <button mat-menu-item [matMenuTriggerFor]="styleStyle">Style</button>
+    <button mat-menu-item [matMenuTriggerFor]="styleSize">Size</button>    
+  </div>
+  <div menus>
+    <mat-menu #styleStyle="matMenu">
+      <button mat-menu-item class="btn-style-link">Link</button>
+      <!-- TODO divider -->
+      <button mat-menu-item [matMenuTriggerFor]="styleStyleButton">Button</button>
+    </mat-menu>
+    
+    <mat-menu #styleStyleButton="matMenu">
+      <button mat-menu-item 
+                *ngFor="let style of bootstrapStyles"
+                (click)="setStyle(style.class)">
+              {{style.name}}
+            </button>
+    </mat-menu>
+    
+    <mat-menu #styleSize="matMenu">
+      <button mat-menu-item class="btn-size-xs">Small</button>
+      <button mat-menu-item class="btn-size-df">Default</button>
+      <button mat-menu-item class="btn-size-lg">Large</button>
+    </mat-menu>
+  </div>  
+
+  <div tooltip>
+    <!-- TODO make this better -->
+    <div class="row">
+      <div class="col-sm-2 form-lbl">Text: </div>
+      <div class="col-sm-7">
+        <input type="text" class="form-control" required autofocus 
+                [(ngModel)]="value.text"/>
+      </div>
+      <div class="col-sm-4"></div>
+    </div>
+    <br/>
+    <div class="row">
+      <div class="col-sm-2 form-lbl">Target: </div>
+      <div class="col-sm-7">
+        <input type="text" class="form-control" required 
+        [(ngModel)]="value.target"/>
+      </div>
+    </div>
+  </div>
+</dv-widget-options>

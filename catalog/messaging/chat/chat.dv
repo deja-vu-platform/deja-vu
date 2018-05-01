@@ -1,0 +1,65 @@
+// Have conversations among groups of users
+cliche Chat {
+  data Chat {
+    users: [User],
+    messages: [Message]
+  }
+
+  data User {
+    username: text
+  }
+
+  data Message {
+    author: User,
+    content: text,
+    timestamp: string
+  }
+
+  // Shows the commad-separated list of usernames in [chat]
+  widget ShowChatUsers {
+    chat: Chat
+  }
+
+  // Shows a preview of [chat]
+  // including the list of users and a preview of the latest message
+  widget ShowChatPreview uses ShowChatUsers {
+    chat: Chat
+  }
+
+  // Shows previews of all the chats [user] has
+  // Shows a full view of a selected chat
+  widget ShowChats uses ShowChatPreview, ShowChatUsers, ShowMessage {
+    user: User
+  }
+
+  // TODO refactor ShowChats
+  // widget ShowChat {
+  //  chat: Chat
+  // }
+
+  // Starts a chat between [user1] and [user2]
+  // [submit_ok] changes when a new chat is started
+  // redirects to [on_chat_ok] (if present) when the button is clicked
+  widget StartChatButtonWithRedirect {
+    user1: User,
+    user2: User,
+    on_chat_ok: Widget,
+    submit_ok: boolean
+  }
+
+  widget ShowMessage {
+    message: Message
+  }
+
+  widget ShowUser {
+    user: User
+  }
+
+  // Shows the list of users other than [user]
+  // that [user] can chat with
+  widget ShowUsers uses ShowUser, StartChatButtonWithRedirect {
+    user: User,
+    on_chat_ok: Widget,
+    submit_ok: boolean
+  }
+}

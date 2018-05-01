@@ -1,6 +1,25 @@
 <dv-widget name="HostNavBar"></dv-widget>
 
 <div class="container below-navbar">
+    <div class="row">
+        <div class="col-lg-10">
+            <div class="col-xs-3 white">name</div>
+            <div class="col-xs-2 white">date</div>
+            <div class="col-xs-2 white">code</div>
+            <div class="col-xs-1"></div>
+            <div class="col-xs-1"></div>
+            <div class="col-xs-1"></div>
+            <div class="col-xs-2"></div>
+        </div>
+        <div class="col-lg-2 col-xs-12 center"></div>
+    </div>
+    
     <dv-widget name="AddCompetitionForm"></dv-widget>
-    <dv-widget name="ShowEvents" of="Event"></dv-widget>
+
+    <div class="row">
+        <div class="col-lg-10">
+            <dv-widget name="ShowEvents" of="Event"></dv-widget>
+        </div>
+        <div class="col-lg-2 col-xs-12 center"></div>
+    </div>
 </div>

@@ -20,6 +20,7 @@ interface Config {
   dbPort: number;
   dbName: string;
   reinitDbOnStartup: boolean;
+  initialObjects: Object[];
   schema: any;
 }
 
@@ -33,6 +34,7 @@ const DEFAULT_CONFIG: Config = {
   wsPort: 3000,
   dbName: `${name}-db`,
   reinitDbOnStartup: true,
+  initialObjects: [],
   schema: {}
 };
 
@@ -60,6 +62,13 @@ mongodb.MongoClient.connect(
     }
     objects = db.collection('objects');
     objects.createIndex({ id: 1 }, { unique: true, sparse: true });
+    if (!_.isEmpty(config.initialObjects)) {
+      objects.insertMany(_.map(config.initialObjects, (obj) => {
+        obj.id = obj.id ? obj.id : uuid();
+
+        return obj;
+      }));
+    }
   });
 
 const jsonSchemaTypeToGraphQlType = {
@@ -124,7 +133,9 @@ const resolvers = {
         required: _.includes(config.schema.required, name)
       };
     },
-    object: (root, { id }) => objects.findOne({ id: id }),
+    object: (root, { id }) => objects
+      .findOne({ id: id }),
+    objects: (root) => objects.find().toArray(),
     properties: (root) => _
       .chain(config.schema.properties)
       .toPairs()
@@ -157,7 +168,9 @@ const resolvers = {
   }
 };
 
-const objectResolvers = {};
+const objectResolvers = {
+  id: (obj) => obj.id
+};
 for (const propertyName of _.keys(config.schema.properties)) {
   objectResolvers[propertyName] = (obj) => obj[propertyName];
 }

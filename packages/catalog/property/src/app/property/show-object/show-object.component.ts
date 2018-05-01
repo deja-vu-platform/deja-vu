@@ -1,10 +1,14 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, Type
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
+  Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
 
-import { Property } from '../shared/property.model';
+import { properties, Property } from '../shared/property.model';
+
+import { API_PATH } from '../property.config';
+
 
 @Component({
   selector: 'property-show-object',
@@ -23,7 +27,8 @@ export class ShowObjectComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -38,46 +43,34 @@ export class ShowObjectComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-
-    const allProperties = await this.fetchProperties();
-    let propertiesToFetch = [];
-    if (!_.isEmpty(this.showOnly)) {
-      propertiesToFetch = this.showOnly;
-    } else if (!_.isEmpty(this.showExclude)) {
-      propertiesToFetch = _
-        .difference(allProperties, this.showExclude);
-    } else {
-      propertiesToFetch = allProperties;
-    }
-    this.properties = propertiesToFetch;
+    this.properties = await properties(
+      this.showOnly, this.showExclude, this.fetchProperties.bind(this));
 
     this.fetchObject();
   }
 
   async fetchProperties(): Promise<string[]> {
-    if (!this.showOnly) {
-      const res = await this.gs
-        .get<{data: {properties: Property[]}}>('/graphql', {
-          params: {
-            query: `
-              query {
-                properties {
-                  name
-                }
+    const res = await this.gs
+      .get<{data: {properties: Property[]}}>(this.apiPath, {
+        params: {
+          query: `
+            query {
+              properties {
+                name
               }
-            `
-          }
-        })
-        .toPromise();
+            }
+          `
+        }
+      })
+      .toPromise();
 
-      return _.map(res.data.properties, 'name');
-    }
+    return _.map(res.data.properties, 'name');
   }
 
   fetchObject() {
     if (this.id && this.properties) {
       this.gs
-        .get<{data: {object: Object}}>('/graphql', {
+        .get<{data: {object: Object}}>(this.apiPath, {
           params: {
             query: `
               query {

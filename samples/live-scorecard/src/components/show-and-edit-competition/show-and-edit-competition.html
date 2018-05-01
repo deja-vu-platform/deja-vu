@@ -4,41 +4,34 @@
     }
 </style>
 
-<div class="row show-and-edit-competition">
-    <div class="col-lg-10 col-lg-offset-2">
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div class="col-xs-3">
-                    <dv-widget name="ShowNameOfGroup" of="CompetitionHosts"></dv-widget>
-                </div>
-                <div class="col-xs-2">{{competition.end_date}}</div>
-                <!-- TODO: Show code -->
-                <div class="col-xs-1">
-                    <!-- TODO: Should only show when edit clicked -->
-                    <dv-widget name="LinkToHosts"></dv-widget>
-                </div>
-                <div class="col-xs-1">
-                    <!-- TODO: Should only show when edit clicked -->
-                    <a routerLink="/rules">Rules</a>
-                </div>
-                <div class="col-xs-1">
-                    <dv-widget name="LinkToClimbers"></dv-widget>
-                </div>
-                <div class="col-xs-1">
-                    <dv-widget name="LinkToClimbs"></dv-widget>
-                </div>
-                <div class="col-xs-1">
-                    <!-- TODO: Add leaderboard functionality -->
-                    <img src="./components/show-and-edit-competition/leaderboardgray.png" class="trophy">
-                </div>
-                <div class="col-xs-1">
-                    <!-- TODO: Allow editing of competitions -->
-                    <img src="./components/show-and-edit-competition/edit.png" class="edit">
-                </div>
-                <div class="col-xs-1">
-                    <!-- TODO: Should only show when edit clicked -->
-                    <dv-widget name="DeleteEvent" of="Event"></dv-widget>
-                </div>
+<div class="row">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="col-xs-3">
+                <dv-widget name="ShowNameOfGroup" of="CompetitionHosts"></dv-widget>
+            </div>
+            <div class="col-xs-2">{{competition.start_date}}</div>
+            <!-- TODO: Show code -->
+            <div class="col-xs-1">
+                <!-- TODO: Should only show when edit clicked -->
+                <dv-widget name="LinkToHosts"></dv-widget>
+            </div>
+            <div class="col-xs-1">
+                <!-- TODO: Should only show when edit clicked -->
+                <a routerLink="/rules">Rules</a>
+            </div>
+            <div class="col-xs-1">
+                <dv-widget name="LinkToClimbers"></dv-widget>
+            </div>
+            <div class="col-xs-1">
+                <dv-widget name="LinkToClimbs"></dv-widget>
+            </div>
+            <div class="col-xs-1">
+                <!-- TODO: Add leaderboard functionality -->
+                <img src="./components/show-and-edit-competition/leaderboardgray.png" class="trophy">
+            </div>
+            <div class="col-xs-2">
+                <dv-widget name="DeleteEvent" of="Event"></dv-widget>
             </div>
         </div>
     </div>

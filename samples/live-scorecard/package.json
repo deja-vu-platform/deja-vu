@@ -12,7 +12,6 @@
       "dv-access-standardauthentication": "file:../../catalog/access/standardAuthentication",
       "dv-organization-event":"file:../../catalog/organization/event",
       "dv-organization-group":"file:../../catalog/organization/group",
-      "dv-organization-label": "file:../../catalog/organization/label",
       "dv-organization-task":"file:../../catalog/organization/task"
     },
     "devDependencies": {

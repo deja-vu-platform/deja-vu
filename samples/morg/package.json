@@ -26,7 +26,13 @@
     "dv-start-watch-allocator": "if [ -f node_modules/allocator/server/server.js ]; then nodemon -w node_modules/allocator/server node_modules/allocator/server/server.js -- --config \"`dv get usedCliches.allocator.config`\"; else echo \"No file\"; fi;",
     "dv-reinstall-watch-allocator": "chokidar ../../packages/catalog/allocator/pkg -c \"npm run dv-reinstall-allocator\"",
     "dv-reinstall-allocator": "rm -rf node_modules/allocator && npm i",
-    "dv-start-all": "concurrently \"npm run dv-start-event\" \"npm run dv-start-allocator\" \"npm run dv-start-gateway\""
+    "dv-package-property": "(cd ../../packages/catalog/property/; npm run dv-package-property)",
+    "dv-package-watch-property": "(cd ../../packages/catalog/property/; npm run dv-package-watch-property)",
+    "dv-start-property": "if [ -f node_modules/property/server/server.js ]; then node node_modules/property/server/server.js --config \"`dv get usedCliches.property.config`\"; else echo \"No file\"; fi;",
+    "dv-start-watch-property": "if [ -f node_modules/property/server/server.js ]; then nodemon -w node_modules/property/server node_modules/property/server/server.js -- --config \"`dv get usedCliches.property.config`\"; else echo \"No file\"; fi;",
+    "dv-reinstall-watch-property": "chokidar ../../packages/catalog/property/pkg -c \"npm run dv-reinstall-property\"",
+    "dv-reinstall-property": "rm -rf node_modules/property && npm i",
+    "dv-start-all": "concurrently \"npm run dv-start-event\" \"npm run dv-start-allocator\" \"npm run dv-start-gateway\" \"npm run dv-start-property\""
   },
   "private": true,
   "dependencies": {
@@ -48,6 +54,7 @@
     "dv-core": "file:../../packages/dv-core/pkg",
     "dv-gateway": "file:../../packages/dv-gateway",
     "event": "file:../../packages/catalog/event/pkg",
+    "property": "file:../../packages/catalog/property/pkg",
     "moment": "^2.20.1",
     "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"

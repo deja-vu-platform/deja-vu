@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -18,6 +18,8 @@ import { map } from 'rxjs/operators';
 import { Property } from '../shared/property.model';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../property.config';
 
 
 export interface ValueMap {
@@ -67,7 +69,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -80,7 +83,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
       return;
     }
     this.gs
-      .get<{data: {properties: Property[]}}>('/graphql', {
+      .get<{data: {properties: Property[]}}>(this.apiPath, {
         params: {
           query: `
             query {
@@ -116,7 +119,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     }
     if (this.save) {
       const res = await this.gs
-        .post<{data: any, errors: {message: string}[]}>('/graphql', {
+        .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
           query: `mutation CreateObject($input: CreateObjectInput!) {
             createObject(input: $input) {
               id

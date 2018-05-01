@@ -7,6 +7,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class ShowGroupMeetingComponent implements OnInit {
   @Input() groupMeeting;
+  championId: string;
 
   constructor() { }
 

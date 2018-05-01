@@ -8,6 +8,10 @@ body {
 	background-color: #4FB5C3;
 }
 
+.white {
+	color: white;
+}
+
 .white-back {
 	background-color: white;
 	color: black;
@@ -90,7 +94,7 @@ body {
 	text-align: right;
 }
 
-a{
+a {
     cursor: pointer;
     text-decoration: none;
 }
@@ -99,6 +103,128 @@ a:hover {
 	text-decoration: none;
 }
 
-.inv-border{
+.inv-border {
 	border: 1px;
+}
+
+.left-space {
+	margin-left: 1em;
+}
+
+.labels {
+	opacity: .9;
+	color: black;
+}
+
+.red {
+	color: #871515;
+}
+
+.edit-status {
+	display: inline;
+}
+
+.others {
+	height: 1.3em;
+	margin-right: .2em;
+	display: inline-block;
+}
+
+.others:hover{
+	opacity:.5;
+	cursor:pointer;
+}
+
+.round-checkbox {
+	cursor: pointer;
+	width: 1.5em;
+	height: 1.5em;
+	top: 0;
+	border: 1px solid #bdc3c7;
+	border-radius: 50%;
+	background-color: white;
+}
+
+.check {
+	height: 2em;
+	margin-top: -1em;
+	margin-left: .2em;
+}
+
+.round-checkbox:hover {
+	background-color: #ecf0f1;
+}
+
+.buddy {
+	background-color: #F1C40F;
+}
+
+.tall {
+	height: 100%;
+	flex: 1;
+}
+
+.center{
+	text-align: center;
+}
+
+.teal {
+	color:#4FB5C3;
+}
+
+input[disabled] {
+	background-color: #bdc3c7;
+}
+
+input {
+	color: black;
+}
+
+input[type=text] {
+	width: 100%;
+	padding: .2em;
+	border-color: #F5F5F5;
+}
+
+input[type=radio]:after {
+	cursor: pointer;
+	width: 1em;
+	height: 1em;
+	top: 0;
+	border: 1px solid white;
+	border-radius: 50%;
+	background-color: white;
+}
+
+input[type=radio]checked:after {
+	width: .5em;
+	height: .5em;
+	border: 1px solid white;
+	border-radius: 50%;
+	background-color: #218290;
+}
+
+input[type=text].authentication:not(.passkey-create){
+	width: 80%;
+	height: 3em;
+	text-align:center;
+	border: 1px solid #bdc3c7;
+	margin: 0em auto;
+}
+
+input[type=password].authentication {
+	width: 80%;
+	margin: 0em auto;
+	height: 3em;
+	text-align:center;
+	border: 1px solid #bdc3c7;
+}
+
+.user-form {
+	margin: 30px 0px;
+}
+
+.event-item, .task-item {
+	background-color: transparent;
+	border: none;
 }

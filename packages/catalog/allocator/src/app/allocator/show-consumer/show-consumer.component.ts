@@ -1,28 +1,40 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
+
 import {
-   AllocatorService, AllocatorServiceFactory
-} from '../shared/allocator.service';
+  GatewayService, GatewayServiceFactory, OnRun, RunService
+} from 'dv-core';
+import { Observable } from 'rxjs/Observable';
+import { map, take } from 'rxjs/operators';
+
+import { API_PATH } from '../allocator.config';
+
+interface ConsumerOfResourceRes {
+  data: {consumerOfResource: string};
+}
 
 
 @Component({
   selector: 'allocator-show-consumer',
-  template: '{{consumerObj.id}}'
+  template: '{{_consumerId}}'
 })
 export class ShowConsumerComponent implements OnChanges, OnInit {
   @Input() resourceId: string;
   @Input() allocationId: string;
-  @Output() consumer = new EventEmitter();
-  consumerObj = {id: ''};
-  private allocator: AllocatorService;
+  @Output() consumerId = new EventEmitter();
+  _consumerId: string;
+  private gs: GatewayService;
 
   constructor(
     private elem: ElementRef,
-    private asf: AllocatorServiceFactory) {}
+    private gsf: GatewayServiceFactory,
+    private rs: RunService,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
-    this.allocator = this.asf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
+    this.rs.register(this.elem, this);
     this.update();
   }
 
@@ -31,13 +43,27 @@ export class ShowConsumerComponent implements OnChanges, OnInit {
   }
 
   update() {
-    if (this.allocator && this.resourceId && this.allocationId) {
-      this.allocator
-        .consumerOfResource(this.resourceId, this.allocationId)
-        .subscribe((consumer) => {
-          this.consumer.emit(consumer);
-          this.consumerObj = consumer;
-        });
+    if (this.gs && this.resourceId && this.allocationId) {
+      this.gs.get<ConsumerOfResourceRes>(this.apiPath, {
+        params: {
+          query: `
+            query ConsumerOfResource($input: ConsumerOfResourceInput!) {
+              consumerOfResource(input: $input)
+            }
+          `,
+          variables: JSON.stringify({
+            input: {
+              resourceId: this.resourceId,
+              allocationId: this.allocationId
+            }
+          })
+        }
+      })
+      .pipe(map((res) => res.data.consumerOfResource))
+      .subscribe((consumerId) => {
+        this._consumerId = consumerId;
+        this.consumerId.emit(consumerId);
+      });
     }
   }
 }

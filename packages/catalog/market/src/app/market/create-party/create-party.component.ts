@@ -43,10 +43,6 @@ export class CreatePartyComponent implements
     balanceControl: this.balanceControl
   });
 
-  @Input() set balance(balance: number) {
-    this.balanceControl.setValue(balance);
-  }
-
   newPartySaved = false;
   newPartyError: string;
 
