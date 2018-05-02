@@ -91,9 +91,9 @@ const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 const resolvers = {
   Query: {
     score: (_root, { id }) => scores.findOne({ id: id }),
-    scoresByTargetId: (_root, {input}:
-      {input: ScoresByTargetIdInput}): Target => {
-      const targetScores: ScoreDoc[] = scores.find({ targetId: input.id })
+    scoresByTargetId: async (_root, {input}:
+      {input: ScoresByTargetIdInput}): Promise<Target> => {
+      const targetScores: ScoreDoc[] = await scores.find({ targetId: input.id })
         .toArray();
       const total: number = aggregateFn(targetScores);
       return {
