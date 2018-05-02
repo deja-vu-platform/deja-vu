@@ -6,7 +6,6 @@
 /tmp
 /out-tsc
 /pkg
-/pkg.tgz
 
 # dependencies
 /node_modules
@@ -33,6 +32,7 @@
 /coverage
 /libpeerconnection.log
 npm-debug.log
+yarn-error.log
 testem.log
 /typings
 

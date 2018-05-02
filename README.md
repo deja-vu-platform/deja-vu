@@ -4,8 +4,8 @@ Déjà Vu
 Building and running for development
 ------------------------------------
 
-You need to be running npm v5 and node v9 and the directory containing `mongod`
-has to be in your path.
+You need to be running npm v5, node v9 and at least MongoDB 3.4. The directory 
+containing `mongod` has to be in your path.
 
 Each cliché and sample is its own node project. Like any other node project, you
 need to run `npm install` to install dependencies. To build a library, cliché
