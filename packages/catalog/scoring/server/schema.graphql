@@ -16,15 +16,9 @@ input CreateScoreInput {
   targetId: ID
 }
 
-input ScoresByTargetIdInput {
-  id: ID
-  showScores: Boolean
-  showTotal: Boolean
-}
-
 type Query {
   score(id: ID!): Score
-  scoresByTargetId(input: ScoresByTargetIdInput!): Target
+  target(id: ID!): Target
 }
 
 type Mutation {

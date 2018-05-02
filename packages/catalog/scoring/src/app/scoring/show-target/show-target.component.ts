@@ -54,11 +54,11 @@ export class ShowTargetComponent implements OnInit, OnChanges {
     if (!this.gs || this.target || !this.id) {
       return;
     }
-    this.gs.get<{data: {scoresByTargetId: Target}}>('/graphql', {
+    this.gs.get<{data: {target: Target}}>('/graphql', {
       params: {
         query: `
-          query ScoresByTargetId($input: ScoresByTargetIdInput!) {
-            scoresByTargetId(input: $input) {
+          query {
+            target(id: "${this.id}") {
               id
               ${this.showScores ? 'scores ' +
                 '{' +
@@ -70,18 +70,11 @@ export class ShowTargetComponent implements OnInit, OnChanges {
               ${this.showTotal ? 'total': ''}
             }
           }
-        `,
-        variables: JSON.stringify({
-          input: {
-            id: this.id,
-            showScores: this.showScores,
-            showTotal: this.showTotal
-          }
-        })
+        `
       }
     })
     .subscribe((res) => {
-      this.target = res.data.scoresByTargetId;
+      this.target = res.data.target;
     });
   }
 }

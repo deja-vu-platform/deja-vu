@@ -6,6 +6,8 @@ import * as mongodb from 'mongodb';
 import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
+import * as _ from 'lodash';
+
 import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
 import { makeExecutableSchema } from 'graphql-tools';
 
@@ -27,12 +29,6 @@ interface CreateScoreInput {
   targetId: string;
 }
 
-interface ScoresByTargetIdInput {
-  id: string;
-  showScores: boolean;
-  showTotal: boolean;
-}
-
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -40,8 +36,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
   // Function body that calculates the total score
-  // based on the parameter scores which is an array of Score objects
-  aggregateFn: string;
+  // based on the parameter scores which is an array of scores with type number
+  totalScoreFn: string;
 }
 
 const argv = minimist(process.argv);
@@ -54,7 +50,7 @@ const DEFAULT_CONFIG: Config = {
   wsPort: 3000,
   dbName: `${name}-db`,
   reinitDbOnStartup: true,
-  aggregateFn: `return scores.reduce((total, score) => total + score.value, 0);`
+  totalScoreFn: `return scores.reduce((total, score) => total + score, 0);`
 };
 
 let configArg;
@@ -67,7 +63,7 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, scores, aggregateFn;
+let db: mongodb.Db, scores: mongodb.Collection<ScoreDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -81,23 +77,21 @@ mongodb.MongoClient.connect(
     scores = db.collection('scores');
     scores.createIndex({ id: 1 }, { unique: true, sparse: true });
     scores.createIndex({ targetId: 1});
-    aggregateFn = new Function('scores', config.aggregateFn);
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
-
+const totalScoreFn = new Function('scores', config.totalScoreFn);
 
 const resolvers = {
   Query: {
     score: (_root, { id }) => scores.findOne({ id: id }),
-    scoresByTargetId: async (_root, {input}:
-      {input: ScoresByTargetIdInput}): Promise<Target> => {
-      const targetScores: ScoreDoc[] = await scores.find({ targetId: input.id })
+    target: async (_root, { id }): Promise<Target> => {
+      const targetScores: ScoreDoc[] = await scores.find({ targetId: id })
         .toArray();
-      const total: number = aggregateFn(targetScores);
+      const total: number = totalScoreFn(_.map(targetScores, 'value'));
       return {
-        id: input.id,
+        id: id,
         scores: targetScores,
         total: total
       };
@@ -107,6 +101,11 @@ const resolvers = {
     id: (score: ScoreDoc) => score.id,
     value: (score: ScoreDoc) => score.value,
     targetId: (score: ScoreDoc) => score.targetId
+  },
+  Target: {
+    id: (target: Target) => target.id,
+    scores: (target: Target) => target.scores,
+    total: (target: Target) => target.total
   },
   Mutation: {
     createScore: async (_root, {input}: {input: CreateScoreInput}) => {
