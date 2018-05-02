@@ -1,22 +1,16 @@
 <div class="container">
-  <h1>Create Author</h1>
-  <comment-create-author id="ben" (author)="authorId = $event.id">
-  </comment-create-author>
-  <comment-create-author id="alice">
-  </comment-create-author>
-  <h1>Create Target</h1>
-  <comment-create-target id="pizza" (target)="targetId = $event.id">
-  </comment-create-target>
-  <h1>Create Comment</h1>
-  <comment-create-comment [authorId]="authorId" [targetId]="targetId" (comment)="commentId = $event.id">
-  </comment-create-comment>
-  <h1>Show All Comments By Author</h1>
-  <comment-show-comments authorId="alice">
-  </comment-show-comments>
-  <h1>Show All Comments By Target</h1>
-  <comment-show-comments [targetId]="targetId">
-  </comment-show-comments>
-  <h1>Edit Comment</h1>
-  <comment-edit-comment [id]="commentId" [authorId]="authorId">
+  <h1>Create comment by author <i>alice</i> for target <i>pizza</i></h1>
+  <comment-create-comment id="commentId" authorId="alice" targetId="pizza" 
+  (comment)="pizzaComment = $event"></comment-create-comment>
+  <h1>Show comment</h1>
+  <comment-show-comment [comment]="pizzaComment"></comment-show-comment>
+  <h1>Show all comments</h1>
+  <comment-show-comments></comment-show-comments>
+  <h1>Show all comments by author <i>alice</i></h1>
+  <comment-show-comments authorId="alice"></comment-show-comments>
+  <h1>Show all comments of target <i>pizza</i></h1>
+  <comment-show-comments targetId="pizza"></comment-show-comments>
+  <h1>Edit Comment written by <i>alice</i> about target <i>pizza</i></h1>
+  <comment-edit-comment id="commentId" authorId="alice">
   </comment-edit-comment>
 </div>

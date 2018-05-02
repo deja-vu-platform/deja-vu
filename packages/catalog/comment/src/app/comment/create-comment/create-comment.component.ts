@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
   ViewChild
 } from '@angular/core';
 
@@ -15,9 +15,15 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../comment.config';
 import { Comment } from '../shared/comment.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
+
+interface CreateCommentRes {
+  data: { createComment: Comment };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'comment-create-comment',
@@ -64,7 +70,8 @@ export class CreateCommentComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -76,14 +83,12 @@ export class CreateCommentComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{
-      data: any, errors: { message: string }[]
-    }>('/graphql', {
+    const res = await this.gs.post<CreateCommentRes>(this.apiPath, {
       query: `mutation CreateComment($input: CreateCommentInput!) {
             createComment(input: $input) {
-              id,
-              author { id },
-              target { id },
+              id
+              authorId
+              targetId
               content
             }
           }`,
@@ -103,12 +108,7 @@ export class CreateCommentComponent implements
         .join());
     }
 
-    this.comment.emit({
-      id: res.data.createComment.id,
-      author: res.data.createComment.author,
-      target: res.data.createComment.target,
-      content: res.data.createComment.content
-    });
+    this.comment.emit(res.data.createComment);
   }
 
   dvOnAfterCommit() {

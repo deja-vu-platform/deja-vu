@@ -1,27 +1,17 @@
-<div *ngIf="showId">
-  {{comment.id}}
-</div>
+<div *ngIf="comment">
+  <div *ngIf="showId">
+    {{comment.id}}
+  </div>
 
-<div *ngIf="showAuthor && comment.author">
-  {{comment.author.id}}
-</div>
+  <div *ngIf="showAuthorId">
+    {{comment.authorId}}
+  </div>
 
-<div *ngIf="showAuthor && !comment.author">
-  {{noAuthorText}}
-</div>
+  <div *ngIf="showTargetId">
+    {{comment.targetId}}
+  </div>
 
-<div *ngIf="showTarget && comment.target">
-  {{comment.target.id}}
-</div>
-
-<div *ngIf="showTarget && !comment.target">
-  {{noTargetText}}
-</div>
-
-<div *ngIf="showContent && comment.content">
-  {{comment.content}}
-</div>
-
-<div *ngIf="showContent && !comment.content">
-  {{noContentText}}
+  <div *ngIf="showContent">
+    {{comment.content}}
+  </div>
 </div>

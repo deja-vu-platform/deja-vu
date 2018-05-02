@@ -6,17 +6,13 @@ import { Comment } from '../shared/comment.model';
 @Component({
   selector: 'comment-show-comment',
   templateUrl: './show-comment.component.html',
-  providers: [ DatePipe ]
+  providers: [DatePipe]
 })
 export class ShowCommentComponent {
   @Input() comment: Comment;
 
   @Input() showId = true;
-  @Input() showAuthor = true;
-  @Input() showTarget = true;
+  @Input() showAuthorId = true;
+  @Input() showTargetId = true;
   @Input() showContent = true;
-
-  @Input() noAuthorText = 'No author';
-  @Input() noTargetText = 'No target';
-  @Input() noContentText = 'No content';
 }

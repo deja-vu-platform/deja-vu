@@ -10,21 +10,18 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from 'dv-core';
 
-import { CreateAuthorComponent } from './create-author/create-author.component';
 import {
   CreateCommentComponent
 } from './create-comment/create-comment.component';
-import { CreateTargetComponent } from './create-target/create-target.component';
 import { EditCommentComponent } from './edit-comment/edit-comment.component';
-import { ShowAuthorComponent } from './show-author/show-author.component';
 import { ShowCommentComponent } from './show-comment/show-comment.component';
 import { ShowCommentsComponent } from './show-comments/show-comments.component';
-import { ShowTargetComponent } from './show-target/show-target.component';
+
+import { API_PATH } from './comment.config';
 
 const allComponents = [
-  CreateAuthorComponent, CreateCommentComponent, CreateTargetComponent,
-  EditCommentComponent, ShowAuthorComponent, ShowCommentComponent,
-  ShowCommentsComponent, ShowTargetComponent
+  CreateCommentComponent, EditCommentComponent, ShowCommentComponent,
+  ShowCommentsComponent
 ];
 
 @NgModule({
@@ -39,6 +36,7 @@ const allComponents = [
     MatFormFieldModule,
     MatMomentDateModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponents,
   exports: allComponents,
   entryComponents: allComponents
