@@ -12,6 +12,10 @@ import * as _ from 'lodash';
 import { API_PATH } from '../authorization.config';
 
 
+interface CanEditRes {
+  data: { canEdit: boolean };
+}
+
 @Component({
   selector: 'authorization-can-edit',
   templateUrl: './can-edit.component.html',
@@ -43,7 +47,7 @@ export class CanEditComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-    this.gs.get<{data: { canEdit: boolean }}>(this.apiPath, {
+    this.gs.get<CanEditRes>(this.apiPath, {
       params: {
         query: `
           query CanEdit($input: PrincipalResourceInput!) {
