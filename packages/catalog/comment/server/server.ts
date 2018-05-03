@@ -34,9 +34,8 @@ interface EditCommentInput {
 }
 
 interface CommentInput {
-  id?: string;
-  byAuthorId?: string;
-  ofTargetId?: string;
+  byAuthorId: string;
+  ofTargetId: string;
 }
 
 interface CommentsInput {
@@ -113,18 +112,20 @@ class Validation {
 
 const resolvers = {
   Query: {
-    comment: async (root, { input }: { input: CommentInput }) => {
-      let comment;
-      if (!_.isEmpty(input.id)) {
-        // Comment by id
-        comment = await comments.findOne({ id: input.id });
-      } else if (!_.isEmpty(input.byAuthorId) && !_.isEmpty(input.ofTargetId)) {
-        // Comments by an author AND of a target
-        comment = await comments.findOne({
-          authorId: input.byAuthorId,
-          targetId: input.ofTargetId
-        });
+    comment: async (root, { id }) => {
+      const comment = await comments.findOne({ id: id });
+
+      if (_.isEmpty(comment)) {
+        throw new Error(`Comment ${id} not found`);
       }
+
+      return comment;
+    },
+
+    commentByAuthorTarget: async (root, { input }: { input: CommentInput }) => {
+      const comment = await comments.findOne({
+        authorId: input.byAuthorId, targetId: input.ofTargetId
+      });
 
       if (_.isEmpty(comment)) {
         throw new Error(`Comment not found`);
@@ -134,19 +135,19 @@ const resolvers = {
     },
 
     comments: async (root, { input }: { input: CommentsInput }) => {
+      const filter = {};
       if (!_.isEmpty(input.byAuthorId)) {
         // Comments by an author
-        return comments.find({ authorId: input.byAuthorId })
-          .toArray();
-      } else if (!_.isEmpty(input.ofTargetId)) {
-        // Comments of a target
-        return comments.find({ targetId: input.ofTargetId })
-          .toArray();
-      } else {
-        // All comments
-        return comments.find()
-          .toArray();
+        _.set(filter, 'authorId', input.byAuthorId);
       }
+      if (!_.isEmpty(input.ofTargetId)) {
+        // Comments of a target
+        _.set(filter, 'targetId', input.ofTargetId);
+      }
+
+      return comments.find(filter)
+        .toArray();
+
     }
   },
 

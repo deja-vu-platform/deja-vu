@@ -19,11 +19,9 @@ input EditCommentInput {
   content: String!
 }
 
-# Comment by id OR Comment by authorId and targetId
 input CommentInput {
-  id: ID
-  byAuthorId: ID
-  ofTargetId: ID
+  byAuthorId: ID!
+  ofTargetId: ID!
 }
 
 input CommentsInput {
@@ -32,7 +30,8 @@ input CommentsInput {
 }
 
 type Query {
-  comment(input: CommentInput!): Comment
+  comment(id: ID): Comment
+  commentByAuthorTarget(input: CommentInput!): Comment
   comments(input: CommentsInput!): [Comment]
 }
 

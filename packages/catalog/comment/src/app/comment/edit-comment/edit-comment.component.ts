@@ -94,17 +94,12 @@ export class EditCommentComponent implements
     this.gs.get<CommentRes>(this.apiPath, {
       params: {
         query: `
-        query Comment($input: CommentInput!) {
-          comment(input: $input) {
+        query {
+          comment(id: "${this.id}") {
             content
           }
         }
-        `,
-        variables: JSON.stringify({
-          input: {
-            id: this.id
-          }
-        })
+        `
       }
     })
       .subscribe((res) => {
