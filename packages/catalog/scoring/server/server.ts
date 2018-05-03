@@ -20,7 +20,7 @@ interface ScoreDoc {
 interface Target {
   id: string;
   scores: ScoreDoc[];
-  total: number;
+  total?: number; // optional to allow lazy computation
 }
 
 interface CreateScoreInput {
@@ -89,11 +89,9 @@ const resolvers = {
     target: async (_root, { id }): Promise<Target> => {
       const targetScores: ScoreDoc[] = await scores.find({ targetId: id })
         .toArray();
-      const total: number = totalScoreFn(_.map(targetScores, 'value'));
       return {
         id: id,
-        scores: targetScores,
-        total: total
+        scores: targetScores
       };
     }
   },
@@ -105,7 +103,7 @@ const resolvers = {
   Target: {
     id: (target: Target) => target.id,
     scores: (target: Target) => target.scores,
-    total: (target: Target) => target.total
+    total: (target: Target) => totalScoreFn(_.map(target.scores, 'value'))
   },
   Mutation: {
     createScore: async (_root, {input}: {input: CreateScoreInput}) => {
