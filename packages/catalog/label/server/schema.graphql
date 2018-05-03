@@ -1,12 +1,7 @@
 # Add labels to items so that they can be found later
-type Item {
-  id: ID!,
-  labels: [Label]
-}
-
 type Label {
   id: ID!
-  items: [Item]
+  itemIds: [ID]
 }
 
 # If no labels are provided, all items will be returned.
@@ -15,6 +10,8 @@ input ItemsInput {
   labelIds: [ID]
 }
 
+# If no itemId provided, all labels will be returned.
+# Otherwise, only labels of the given item will be returned.
 input LabelsInput {
   itemId: ID
 }
@@ -28,12 +25,10 @@ input AddLabelsToItemInput {
 type Query {
   label(id: ID!): Label
   labels(input: LabelsInput!): [Label]
-  item(id: ID!): Item
   items(input: ItemsInput!): [Item]
 }
 
 type Mutation {
-  createItem(id: ID!): Item
   createLabel(id: ID!): Label
-  addLabelsToItem(input: AddLabelsToItemInput!): Item
+  addLabelsToItem(input: AddLabelsToItemInput!): Boolean
 }

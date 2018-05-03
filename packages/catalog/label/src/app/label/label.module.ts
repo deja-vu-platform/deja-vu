@@ -21,6 +21,8 @@ import { ShowItemsComponent } from './show-items/show-items.component';
 import { ShowLabelComponent } from './show-label/show-label.component';
 import { ShowLabelsComponent } from './show-labels/show-labels.component';
 
+import { API_PATH } from './label.config';
+
 const allComponents = [
   CreateItemComponent, CreateLabelComponent, SearchItemsByLabelsComponent,
   ShowItemComponent, ShowItemsComponent, ShowLabelComponent,
@@ -33,6 +35,7 @@ const allComponents = [
     BrowserAnimationsModule, MatButtonModule, MatChipsModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatIconModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponents,
   exports: allComponents,
   entryComponents: allComponents

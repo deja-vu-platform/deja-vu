@@ -1,13 +1,17 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
 
+import { API_PATH } from '../label.config';
+
 import { ShowItemComponent } from '../show-item/show-item.component';
 
-import { Item } from '../shared/label.model';
-
+interface ItemsRes {
+  data: { itemIds: string[] };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'label-show-items',
@@ -15,7 +19,7 @@ import { Item } from '../shared/label.model';
   styleUrls: ['./show-items.component.css']
 })
 export class ShowItemsComponent implements OnInit, OnChanges {
-  @Input() items: Item[] = [];
+  @Input() itemIds: string[] = [];
 
   @Input() showItem: Action = {
     type: <Type<Component>>ShowItemComponent
@@ -27,7 +31,8 @@ export class ShowItemsComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showItems = this;
   }
 
@@ -41,11 +46,11 @@ export class ShowItemsComponent implements OnInit, OnChanges {
   }
 
   loadItems() {
-    if (_.isEmpty(this.items)) {
+    if (_.isEmpty(this.itemIds)) {
       // All items
       if (this.gs) {
         this.gs
-          .get<{ data: { items: Item[] } }>('/graphql', {
+          .get<ItemsRes>(this.apiPath, {
             params: {
               query: `
                 query {
@@ -57,7 +62,7 @@ export class ShowItemsComponent implements OnInit, OnChanges {
             }
           })
           .subscribe((res) => {
-            this.items = res.data.items;
+            this.itemIds = res.data.itemIds;
           });
       }
     }

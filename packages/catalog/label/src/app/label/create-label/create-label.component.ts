@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output
 } from '@angular/core';
 
 import {
@@ -8,10 +8,16 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../label.config';
 import { Label } from '../shared/label.model';
 
-const SAVED_MSG_TIMEOUT = 3000;
+interface CreateLabelRes {
+  data: { createLabel: Label };
+  errors: { message: string }[];
+}
 
+const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
   selector: 'label-create-label',
@@ -38,7 +44,7 @@ export class CreateLabelComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -50,9 +56,7 @@ export class CreateLabelComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{
-      data: { createLabel: { id: string } }, errors: { message: string }[]
-    }>('/graphql', {
+    const res = await this.gs.post<CreateLabelRes>(this.apiPath, {
       query: `mutation {
           createLabel(id: "${this.id}") {
             id
@@ -66,7 +70,7 @@ export class CreateLabelComponent implements
         .join());
     }
 
-    this.label.emit({ id: res.data.createLabel.id });
+    this.label.emit(res.data.createLabel);
   }
 
   dvOnAfterCommit() {

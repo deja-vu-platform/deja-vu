@@ -1,13 +1,13 @@
-<ul *ngIf="items && items.length > 0" class="list-group">
-  <li *ngFor="let item of items" class="list-group-item">
+<ul *ngIf="itemIds && itemIds.length > 0" class="list-group">
+  <li *ngFor="let itemId of itemIds" class="list-group-item">
     <dv-include 
       [action]="showItem" 
-      [inputs]="{item: item}" 
+      [inputs]="{id: itemId}" 
       [parent]="showItems">
     </dv-include>
   </li>
 </ul>
 
-<div *ngIf="!items || items.length === 0">
+<div *ngIf="!itemIds || itemIds.length === 0">
   <span>{{noItemsToShowText}}</span>
 </div>

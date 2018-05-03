@@ -1,18 +1,14 @@
 <div class="container">
-  <h1>Create Item</h1>
-  <label-create-item id="pizza" (item)="pizzaItem = $event"></label-create-item>
-  <h1>Create Label</h1>
+  <h1>Create label <i>food</i></h1>
   <label-create-label id="food" (label)="pizzaLabel = $event">
   </label-create-label>
-  <h1>Show Item</h1>
-  <label-show-item [item]="pizzaItem"></label-show-item>
-  <h1>Show Label</h1>
+  <h1>Show label <i>food</i></h1>
   <label-show-label [label]="pizzaLabel"></label-show-label>
-  <h1>Attach Label</h1>
+  <h1>Attach label <i>food</i> to item <i>pizza</i></h1>
   <label-attach-labels itemId="pizza"></label-attach-labels>
-  <h1>Show Labels by Item</h1>
+  <h1>Show labels of item <i>pizza</i></h1>
   <label-show-labels itemId="pizza"></label-show-labels>
-  <h1>Show All Items</h1>
+  <h1>Show all items</h1>
   <label-show-items></label-show-items>
   <h1>Search</h1>
   <label-search-items-by-labels (searchResultItems)="results = $event">

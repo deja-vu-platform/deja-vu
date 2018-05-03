@@ -1,13 +1,18 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 import * as _ from 'lodash';
 
 import { ShowLabelComponent } from '../show-label/show-label.component';
 
+import { API_PATH } from '../label.config';
 import { Label } from '../shared/label.model';
 
+interface LabelsRes {
+  data: { labels: Label[] };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'label-show-labels',
@@ -30,7 +35,8 @@ export class ShowLabelsComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showLabels = this;
   }
 
@@ -46,7 +52,7 @@ export class ShowLabelsComponent implements OnInit, OnChanges {
   fetchLabels() {
     if (this.gs) {
       this.gs
-        .get<{ data: { labels: Label[] } }>('/graphql', {
+        .get<LabelsRes>(this.apiPath, {
           params: {
             query: `
               query Labels($input: LabelsInput!) {
