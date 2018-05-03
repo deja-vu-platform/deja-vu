@@ -138,11 +138,11 @@ const resolvers = {
       const filter = {};
       if (!_.isEmpty(input.byAuthorId)) {
         // Comments by an author
-        _.set(filter, 'authorId', input.byAuthorId);
+        filter['authorId'] = input.byAuthorId;
       }
       if (!_.isEmpty(input.ofTargetId)) {
         // Comments of a target
-        _.set(filter, 'targetId', input.ofTargetId);
+        filter['targetId'] = input.ofTargetId;
       }
 
       return comments.find(filter)
