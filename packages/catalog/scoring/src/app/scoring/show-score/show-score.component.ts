@@ -1,7 +1,10 @@
-import { Component, ElementRef, Input, OnInit, OnChanges } from '@angular/core';
+import {
+  Component, ElementRef, Inject, Input, OnInit, OnChanges
+} from '@angular/core';
 
 import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
+import { API_PATH } from '../scoring.config';
 import { Score } from '../shared/scoring.model';
 
 
@@ -24,7 +27,8 @@ export class ShowScoreComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -40,7 +44,7 @@ export class ShowScoreComponent implements OnInit, OnChanges {
     if (!this.gs || this.score || !this.id) {
       return;
     }
-    this.gs.get<{data: {score: Score}}>('/graphql', {
+    this.gs.get<{data: {score: Score}}>(this.apiPath, {
       params: {
         query: `
           query {

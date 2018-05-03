@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -13,6 +13,7 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../scoring.config';
 import { Score } from '../shared/scoring.model';
 
 interface CreateScoreResponse {
@@ -61,7 +62,8 @@ export class CreateScoreComponent
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -80,7 +82,7 @@ export class CreateScoreComponent
     };
     if (this.save) {
       const res = await this.gs
-        .post<CreateScoreResponse>('/graphql', {
+        .post<CreateScoreResponse>(this.apiPath, {
           query: `mutation CreateScore($input: CreateScoreInput!) {
             createScore (input: $input) {
               id

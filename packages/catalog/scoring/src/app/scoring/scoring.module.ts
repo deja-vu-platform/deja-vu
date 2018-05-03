@@ -12,6 +12,8 @@ import { CreateScoreComponent } from './create-score/create-score.component';
 import { ShowScoreComponent } from './show-score/show-score.component';
 import { ShowTargetComponent } from './show-target/show-target.component';
 
+import { API_PATH } from './scoring.config';
+
 const allComponents = [
   CreateScoreComponent, ShowScoreComponent, ShowTargetComponent ];
 
@@ -24,6 +26,7 @@ const allComponents = [
     // Material
     MatButtonModule, MatFormFieldModule, MatInputModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

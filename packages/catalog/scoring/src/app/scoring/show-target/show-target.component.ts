@@ -1,11 +1,12 @@
 import {
-  Component, ElementRef, Input, OnInit, OnChanges, Type
+  Component, ElementRef, Inject, Input, OnInit, OnChanges, Type
 } from '@angular/core';
 
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
 import { ShowScoreComponent } from '../show-score/show-score.component';
 
+import { API_PATH } from '../scoring.config';
 import { Target } from '../shared/scoring.model';
 
 
@@ -36,7 +37,8 @@ export class ShowTargetComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showTarget = this;
   }
 
@@ -54,7 +56,7 @@ export class ShowTargetComponent implements OnInit, OnChanges {
     if (!this.gs || this.target || !this.id) {
       return;
     }
-    this.gs.get<{data: {target: Target}}>('/graphql', {
+    this.gs.get<{data: {target: Target}}>(this.apiPath, {
       params: {
         query: `
           query {
