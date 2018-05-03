@@ -13,38 +13,15 @@ import * as _ from 'lodash';
 const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
 
-interface AuthorDoc {
-  id: string;
-}
-
-interface TargetDoc {
-  id: string;
-}
-
 interface CommentDoc {
   id: string;
-  authorId?: string;
-  targetId?: string;
-  content?: string;
-}
-
-interface Author {
-  id: string;
-}
-
-interface Target {
-  id: string;
-}
-
-interface Comment {
-  id: string;
-  author: Author;
-  target: Target;
+  authorId: string;
+  targetId: string;
   content: string;
 }
 
 interface CreateCommentInput {
-  id: string;
+  id?: string;
   authorId: string;
   targetId: string;
   content: string;
@@ -56,9 +33,14 @@ interface EditCommentInput {
   content: string;
 }
 
+interface CommentInput {
+  byAuthorId: string;
+  ofTargetId: string;
+}
+
 interface CommentsInput {
-  authorId?: string;
-  targetId?: string;
+  byAuthorId?: string;
+  ofTargetId?: string;
 }
 
 interface Config {
@@ -92,7 +74,8 @@ const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 
-let db, authors, targets, comments;
+let db: mongodb.Db;
+let comments: mongodb.Collection<CommentDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -104,27 +87,14 @@ mongodb.MongoClient.connect(
       console.log(`Reinitialized db ${config.dbName}`);
     }
 
-    authors = db.collection('authors');
-    authors.createIndex({ id: 1 }, { unique: true, sparse: true });
-    targets = db.collection('targets');
-    targets.createIndex({ id: 1 }, { unique: true, sparse: true });
     comments = db.collection('comments');
-    comments.createIndex(
-      { id: 1 }, { unique: true, sparse: true });
+    comments.createIndex({ id: 1 }, { unique: true, sparse: true });
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  // TODO: Check to see if author, target and comment already exists
-  static async authorExists(id: string): Promise<AuthorDoc> {
-    return Validation.exists(authors, id, 'Author');
-  }
-
-  static async targetExists(id: string): Promise<TargetDoc> {
-    return Validation.exists(targets, id, 'Target');
-  }
 
   static async commentExists(id: string): Promise<CommentDoc> {
     return Validation.exists(comments, id, 'Comment');
@@ -140,98 +110,69 @@ class Validation {
   }
 }
 
-function commentDocToComment(commentDoc: CommentDoc): Comment {
-  const ret = _.omit(commentDoc, ['authorId', 'targetId']);
-  ret.author = { id: commentDoc.authorId };
-  ret.target = { id: commentDoc.targetId };
-
-  return ret;
-}
-
 const resolvers = {
   Query: {
-    author: async (root, { id }) => {
-      const author = await Validation.authorExists(id);
-
-      return author;
-    },
-    target: async (root, { id }) => {
-      const target = await Validation.targetExists(id);
-
-      return target;
-    },
     comment: async (root, { id }) => {
-      const comment = await Validation.commentExists(id);
+      const comment = await comments.findOne({ id: id });
 
-      return commentDocToComment(comment);
+      if (_.isEmpty(comment)) {
+        throw new Error(`Comment ${id} not found`);
+      }
+
+      return comment;
     },
-    commentByAuthorTarget: (root, { authorId, targetId }) => {
-      comments.findOne({ authorId: authorId, targetId: targetId });
+
+    commentByAuthorTarget: async (root, { input }: { input: CommentInput }) => {
+      const comment = await comments.findOne({
+        authorId: input.byAuthorId, targetId: input.ofTargetId
+      });
+
+      if (_.isEmpty(comment)) {
+        throw new Error(`Comment not found`);
+      }
+
+      return comment;
     },
+
     comments: async (root, { input }: { input: CommentsInput }) => {
-      const matchingComments: CommentDoc[] = await comments
-        .find(input)
+      const filter = {};
+      if (!_.isEmpty(input.byAuthorId)) {
+        // Comments by an author
+        filter['authorId'] = input.byAuthorId;
+      }
+      if (!_.isEmpty(input.ofTargetId)) {
+        // Comments of a target
+        filter['targetId'] = input.ofTargetId;
+      }
+
+      return comments.find(filter)
         .toArray();
 
-      return _.map(matchingComments, commentDocToComment);
     }
   },
 
-  Author: {
-    id: (author: Author) => author.id
-  },
-
-  Target: {
-    id: (target: Target) => target.id
-  },
-
   Comment: {
-    id: (comment: Comment) => comment.id,
-    author: (comment: Comment) => comment.author,
-    target: (comment: Comment) => comment.target,
-    content: (comment: Comment) => comment.content
+    id: (comment: CommentDoc) => comment.id,
+    authorId: (comment: CommentDoc) => comment.authorId,
+    targetId: (comment: CommentDoc) => comment.targetId,
+    content: (comment: CommentDoc) => comment.content
   },
+
   Mutation: {
-    createAuthor: async (root, { id }) => {
-      const authorId = id ? id : uuid();
-      const author: AuthorDoc = { id: authorId };
-      await authors.insertOne(author);
-
-      return author;
-    },
-
-    createTarget: async (root, { id }) => {
-      const targetId = id ? id : uuid();
-      const target: TargetDoc = { id: targetId };
-      await targets.insertOne(target);
-
-      return target;
-    },
-
     createComment: async (root, { input }: { input: CreateCommentInput }) => {
-      await Promise.all([
-        Validation.authorExists(input.authorId),
-        Validation.targetExists(input.targetId)
-      ]);
-
       const comment: CommentDoc = {
         id: input.id ? input.id : uuid(),
         authorId: input.authorId,
         targetId: input.targetId,
         content: input.content
       };
-
       await comments.insertOne(comment);
 
-      return commentDocToComment(comment);
+      return comment;
     },
 
-    editComment: async (root, { input }
-      : { input: EditCommentInput }) => {
-      const [comment, author] = await Promise.all([
-        Validation.commentExists(input.id),
-        Validation.authorExists(input.authorId)
-      ]);
+    editComment: async (root, { input }: { input: EditCommentInput }) => {
+      const comment = await Validation.commentExists(input.id);
 
       if (comment.authorId !== input.authorId) {
         throw new Error('Only the author of the comment can edit it.');
@@ -239,10 +180,9 @@ const resolvers = {
 
       const updateOperation = { $set: { content: input.content } };
 
-      const res = await comments
-        .findAndUpdateOne({ id: input.id }, updateOperation);
+      const res = await comments.updateOne({ id: input.id }, updateOperation);
 
-      return res.value;
+      return res.modifiedCount === 1;
     }
   }
 };

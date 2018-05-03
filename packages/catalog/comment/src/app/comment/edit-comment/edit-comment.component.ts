@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
+  ViewChild
 } from '@angular/core';
 
 import {
@@ -14,9 +15,20 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../comment.config';
 import { Comment } from '../shared/comment.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
+
+interface CommentRes {
+  data: { comment: Comment };
+  errors: { message: string }[];
+}
+
+interface EditCommentRes {
+  data: { editComment: boolean };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'comment-edit-comment',
@@ -61,7 +73,8 @@ export class EditCommentComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -78,14 +91,11 @@ export class EditCommentComponent implements
       return;
     }
 
-    this.gs.get<{ data: { comment: Comment } }>('/graphql', {
+    this.gs.get<CommentRes>(this.apiPath, {
       params: {
         query: `
         query {
           comment(id: "${this.id}") {
-            id
-            author { id }
-            target { id }
             content
           }
         }
@@ -93,7 +103,10 @@ export class EditCommentComponent implements
       }
     })
       .subscribe((res) => {
-        this.contentControl.setValue(res.data.comment.content);
+        const comment = res.data.comment;
+        if (comment) {
+          this.contentControl.setValue(comment.content);
+        }
       });
 
   }
@@ -110,10 +123,8 @@ export class EditCommentComponent implements
     this.rs.run(this.elem);
   }
 
-  async dvOnRun(): Promise<string> {
-    const res = await this.gs.post<{
-      data: any, errors: { message: string }[]
-    }>('/graphql', {
+  async dvOnRun(): Promise<boolean> {
+    const res = await this.gs.post<EditCommentRes>(this.apiPath, {
       query: `mutation EditComment($input: EditCommentInput!) {
             editComment(input: $input)
           }`,
@@ -132,7 +143,7 @@ export class EditCommentComponent implements
         .join());
     }
 
-    return res.data.editComment.id;
+    return res.data.editComment;
   }
 
   dvOnAfterCommit() {
