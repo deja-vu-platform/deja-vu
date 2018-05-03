@@ -1,0 +1,26 @@
+type Score {
+  id: ID!
+  value: Float
+  targetId: ID
+}
+
+type Target {
+  id: ID!
+  scores: [Score!]
+  total: Float
+}
+
+input CreateScoreInput {
+  id: ID
+  value: Float
+  targetId: ID
+}
+
+type Query {
+  score(id: ID!): Score
+  target(id: ID!): Target
+}
+
+type Mutation {
+  createScore(input: CreateScoreInput!): Score
+}
