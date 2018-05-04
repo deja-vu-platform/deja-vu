@@ -1,12 +1,14 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
-  Output, SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject,
+  Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit,
+  OnRun, RunService
 } from 'dv-core';
-import { RatingService, RatingServiceFactory } from '../shared/rating.service';
 
+import { API_PATH } from '../rating.config';
+import { Rating } from '../shared/rating.model';
 
 @Component({
   selector: 'rating-show-average-rating',

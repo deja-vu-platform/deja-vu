@@ -4,26 +4,30 @@ import { readFileSync } from 'fs';
 import * as minimist from 'minimist';
 import * as mongodb from 'mongodb';
 import * as path from 'path';
-import { v4 as uuid } from 'uuid';
 
-import { graphiqlExpress, graphqlExpress  } from 'apollo-server-express';
+import * as _ from 'lodash';
+
+// GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
+// tslint:disable-next-line:no-var-requires
+const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
-
-
-interface SourceDoc {
-  id: string;
-}
-
-interface TargetDoc {
-  id: string;
-}
 
 interface RatingDoc {
   sourceId: string;
   targetId: string;
-  rating: number;
+  rating?: number;
 }
 
+interface RatingInput {
+  bySourceId: string;
+  ofTargetId: string;
+}
+
+interface UpdateRatingInput {
+  sourceId: string;
+  targetId: string;
+  newRating?: number;
+}
 
 interface Config {
   wsPort: number;
@@ -52,10 +56,11 @@ try {
   throw new Error(`Couldn't parse config ${argv.config}`);
 }
 
-const config: Config = {...DEFAULT_CONFIG, ...configArg};
+const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, sources, ratings, targets;
+let db: mongodb.Db;
+let ratings: mongodb.Collection<RatingDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -66,10 +71,6 @@ mongodb.MongoClient.connect(
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
     }
-    sources = db.collection('sources');
-    sources.createIndex({ id: 1 }, { unique: true, sparse: true });
-    targets = db.collection('targets');
-    targets.createIndex({ id: 1 }, { unique: true, sparse: true });
     ratings = db.collection('ratings');
     ratings.createIndex(
       { sourceId: 1, targetId: 1 }, { unique: true, sparse: true });
@@ -78,87 +79,49 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
-class Validation {
-  static async sourceExists(sourceId: string) {
-    return Validation.exists(sources, sourceId, 'Source');
-  }
-
-  static async targetExists(targetId: string) {
-    return Validation.exists(targets, targetId, 'Target');
-  }
-
-  private static async exists(collection, id: string, type: string) {
-    const doc = await collection.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`${type} ${id} not found`);
-    }
-
-    return doc;
-  }
-}
-
 const resolvers = {
   Query: {
-    source: (root, { id }) => sources.findOne({ id: id }),
-    target: (root, { id }) => targets.findOne({ id: id }),
-    ratingBySourceTarget: (root, {sourceId, targetId}) => ratings
-      .findOne({ sourceId: sourceId, targetId: targetId }),
-    averageRatingForTarget: async (root, {targetId}) => {
-      const ratingsForTarget = await ratings
-        .find({ targetId: targetId })
-        .toArray();
-      const count = ratingsForTarget.length;
-      const average = ratingsForTarget.reduce(
-        // Sum over all the values, adjusting each for the number of results
-        (prev, current) => prev + (current.rating / count), 0);
+    rating: (root, { input }: { input: RatingInput }) => ratings
+      .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
 
-      return { rating: average, count: count };
+    averageRatingForTarget: async (root, { targetId }) => {
+      const results = await ratings.aggregate([
+        { $match: { targetId: targetId } },
+        { $count: 'count' },
+        {
+          $group:
+            {
+              _id: 0,
+              average: { $avg: '$rating' }
+            }
+        }
+      ]);
+
+      if (_.isEmpty(results)) { throw new Error(`Target does not exist`); }
+
+      console.log('HEY', results);
+
+      return { rating: results[0].average, count: results[0].count };
     }
   },
-  Source: {
-    id: (source: SourceDoc) => source.id,
-    ratings: (source: SourceDoc) => ratings
-      .find({ sourceId: source.id })
-      .toArray()
-  },
-  Target: {
-    id: (target: TargetDoc) => target.id,
-    ratings: (target: TargetDoc) => ratings
-      .find({ targetId: target.id })
-      .toArray()
-  },
+
   Rating: {
     sourceId: (rating: RatingDoc) => rating.sourceId,
     targetId: (rating: RatingDoc) => rating.targetId,
     rating: (rating: RatingDoc) => rating.rating
   },
-  Mutation: {
-    updateRating: async (root, {sourceId, targetId, newRating}) => {
-      await Promise.all([
-        Validation.sourceExists(sourceId), Validation.targetExists(targetId)
-      ]);
-      await ratings
-        .update(
-          { sourceId: sourceId, targetId: targetId },
-          { $set: { rating: newRating } },
-          { upsert: true });
 
-      return true;
-    },
-    createSource: (root, input) => createEntity(sources, input),
-    createTarget: (root, input) => createEntity(targets, input)
+  Mutation: {
+    updateRating: async (root, { input }: { input: UpdateRatingInput }) => {
+      const res = await ratings.updateMany(
+        { sourceId: input.sourceId, targetId: input.targetId },
+        { $set: { rating: input.newRating } },
+        { upsert: true });
+
+      return res.matchedCount === res.modifiedCount + res.upsertedCount;
+    }
   }
 };
-
-async function createEntity(collection, { id }): Promise<{id: string}> {
-  if (!id) {
-    id = uuid();
-  }
-  const res = await collection.insertOne({id: id});
-
-  return res.ops[0];
-}
-
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 

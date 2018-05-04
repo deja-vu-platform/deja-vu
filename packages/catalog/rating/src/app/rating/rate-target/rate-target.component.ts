@@ -1,15 +1,25 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
-  Output, SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject,
+  Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  OnAfterAbort, OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit,
+  OnRun, RunService
 } from 'dv-core';
-import { RatingService, RatingServiceFactory } from '../shared/rating.service';
-
 import { take } from 'rxjs/operators';
 
-import * as _ from 'lodash';
+import { API_PATH } from '../rating.config';
+import { Rating } from '../shared/rating.model';
+
+interface UpdateRatingRes {
+  data: { updateRating: boolean };
+  errors: { message: string }[];
+}
+
+interface RatingRes {
+  data: { rating: Rating };
+  errors: { message: string }[];
+}
 
 
 @Component({
@@ -28,14 +38,15 @@ export class RateTargetComponent implements
 
   prevRatingValue: number;
   ratingValue: number;
-  private ratingService: RatingService;
+
+  private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef,  private rs: RunService,
-    private rsf: RatingServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.ratingService = this.rsf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.loadRating();
   }
@@ -70,14 +81,24 @@ export class RateTargetComponent implements
         .pipe(take(1))
         .toPromise();
     }
-    const res = await this.ratingService.post<{data: any}>(`
-        updateRating(
-          sourceId: "${this.sourceId}",
-          targetId: "${this.targetId}",
-          newRating: ${this.ratingValue})
-      `)
-      .toPromise();
-    this.rating.emit(this.ratingValue);
+
+    this.gs.get<UpdateRatingRes>(this.apiPath, {
+      params: {
+        query: `
+          query UpdateRating($input: UpdateRatingInput!) {
+            updateRating(input: $input)
+          }
+        `,
+        variables: JSON.stringify({
+          sourceId: this.sourceId,
+          targetId: this.targetId,
+          newRating: this.ratingValue
+        })
+      }
+    })
+      .subscribe((res) => {
+        this.rating.emit(this.ratingValue);
+      });
   }
 
   dvOnAfterAbort() {
@@ -89,11 +110,27 @@ export class RateTargetComponent implements
    * Load a rating from the server (if any), and set the value of the widget.
    */
   async loadRating() {
-    if (!this.sourceId || !this.targetId || !this.ratingService) {
+    if (!this.sourceId || !this.targetId || !this.gs) {
       return;
     }
-    this.ratingValue = await this.ratingService
-      .ratingBySourceTarget(this.sourceId, this.targetId);
-    this.rating.emit(this.ratingValue);
+    this.gs.get<RatingRes>(this.apiPath, {
+      params: {
+        query: `
+        query Rating($input: RatingInput) {
+          rating(input: $input) {
+            rating
+          }
+        }
+        `,
+        variables: JSON.stringify({
+          bySourceId: this.sourceId,
+          ofTargetId: this.targetId
+        })
+      }
+    })
+    .subscribe((res) => {
+      this.ratingValue = res.data.rating.rating;
+      this.rating.emit(this.ratingValue);
+    });
   }
 }

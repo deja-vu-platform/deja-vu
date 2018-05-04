@@ -1,13 +1,3 @@
-type Source {
-  id: ID!,
-  ratings: [Rating]
-}
-
-type Target {
-  id: ID!,
-  ratings: [Rating]
-}
-
 type Rating {
   sourceId: ID!
   targetId: ID!
@@ -19,16 +9,23 @@ type AverageRatingForTargetOutput {
   count: Float
 }
 
+input RatingInput {
+  bySourceId: ID!
+  ofTargetId: ID!
+}
+
+input UpdateRatingInput {
+  sourceId: ID!
+  targetId: ID!
+  newRating: Float
+}
+
 type Query {
-  source(id: ID!): Source
-  target(id: ID!): Target
-  ratingBySourceTarget(sourceId: ID!, targetId: ID!): Rating
+  rating(input: RatingInput!): Rating
   averageRatingForTarget(targetId: ID!)
     : AverageRatingForTargetOutput
 }
 
 type Mutation {
-  createSource(id: ID!): Source
-  createTarget(id: ID!): Target
-  updateRating(sourceId: ID!, targetId: ID!, newRating: Float): Boolean
+  updateRating(input: UpdateRatingInput!): Boolean
 }
