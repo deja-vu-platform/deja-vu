@@ -94,9 +94,7 @@ export class AttachLabelsComponent implements
   async dvOnRun(): Promise<void> {
     const res = await this.gs.post<AddLabelsToItemRes>(this.apiPath, {
       query: `mutation AttachLabelsToItem($input: AddLabelsToItemInput!) {
-            addLabelsToItem(input: $input) {
-              id
-            }
+            addLabelsToItem(input: $input)
           }`,
       variables: {
         input: {

@@ -88,28 +88,35 @@ function standardizeLabel(id: string): string {
 }
 
 const resolvers = {
-  label: async (root, { id }) => {
-    const label = await labels.findOne({ id: standardizeLabel(id) });
-    if (_.isEmpty(label)) { throw new Error(`Label ${id} not found`); }
+  Query: {
+    label: async (root, { id }) => {
+      const label = await labels.findOne({ id: standardizeLabel(id) });
+      if (_.isEmpty(label)) { throw new Error(`Label ${id} not found`); }
 
-    return label;
-  },
+      return label;
+    },
 
-  items: async (root, { input }: { input: ItemsInput }) => {
-    if (input.labelIds) {
-      // Items matching all labelIds
-      const standarardizedLabelIds = _.map(input.labelIds, standardizeLabel);
-      const inputLabels =
-        await labels.find({ id: { $in: standarardizedLabelIds } },
-          { projection: { _id: 1 } })
-          .toArray();
+    items: async (root, { input }: { input: ItemsInput }) => {
+      if (input.labelIds) {
+        // Items matching all labelIds
+        const standarardizedLabelIds = _.map(input.labelIds, standardizeLabel);
+        const inputLabels =
+          await labels.find({ id: { $in: standarardizedLabelIds } },
+            { projection: { itemIds: 1 } })
+            .toArray();
 
-      if (inputLabels.length !== input.labelIds.length) {
-        throw new Error(`One of the labels does not exist.`);
+        if (inputLabels.length !== input.labelIds.length) {
+          return [];
+        }
+
+        const labelItemsIds = _.map(inputLabels, 'itemIds');
+
+        return _.intersection(labelItemsIds);
       }
 
-      const res = await labels.aggregate([
-        { $match: { id: { $in: standarardizedLabelIds } } },
+      // No label filter
+      const results = await labels.aggregate([
+        { $match: {} },
         {
           $group: {
             _id: 0,
@@ -122,7 +129,7 @@ const resolvers = {
               $reduce: {
                 input: '$itemIds',
                 initialValue: [],
-                in: { $setIntersection: ['$$value', '$$this'] }
+                in: { $setUnion: ['$$value', '$$this'] }
               }
             }
           }
@@ -130,50 +137,25 @@ const resolvers = {
       ])
         .toArray();
 
-      return res[0].itemIds;
-    }
+      return !_.isEmpty(results) ? results[0].itemIds : [];
+    },
 
-    // No item filter
-    const results = await labels.aggregate([
-      { $match: {} },
-      {
-        $group: {
-          _id: 0,
-          itemIds: { $push: '$itemIds' }
-        }
-      },
-      {
-        $project: {
-          itemIds: {
-            $reduce: {
-              input: '$itemIds',
-              initialValue: [],
-              in: { $setUnion: ['$$value', '$$this'] }
-            }
-          }
-        }
+    labels: async (root, { input }: { input: LabelsInput }) => {
+      if (input.itemId) {
+        // Labels of an item
+        return labels.find({ itemIds: input.itemId })
+          .toArray();
       }
-    ])
-      .toArray();
 
-    return results[0].itemIds;
-  },
-
-  labels: async (root, { input }: { input: LabelsInput }) => {
-    if (input.itemId) {
-      // Labels of an item
-      return labels.find({ itemIds: input.itemId })
+      // No labels filter
+      return labels.find()
         .toArray();
     }
-
-    // No labels filter
-    return labels.find()
-      .toArray();
   },
 
   Label: {
     id: (label: LabelDoc) => label.id,
-    items: (label: LabelDoc) => label.itemIds
+    itemIds: (label: LabelDoc) => label.itemIds
   },
 
   Mutation: {
@@ -200,9 +182,7 @@ const resolvers = {
       }
 
       // Update other labels with the itemId
-      const updateOperation = {
-        $addToSet: { itemIds: input.itemId }
-      };
+      const updateOperation = { $push: { itemIds: input.itemId } };
 
       const res = await labels
         .update({ id: { $in: existingLabelIds } }, updateOperation);

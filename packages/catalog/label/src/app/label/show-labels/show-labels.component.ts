@@ -51,23 +51,22 @@ export class ShowLabelsComponent implements OnInit, OnChanges {
 
   fetchLabels() {
     if (this.gs) {
-      this.gs
-        .get<LabelsRes>(this.apiPath, {
-          params: {
-            query: `
+      this.gs.get<LabelsRes>(this.apiPath, {
+        params: {
+          query: `
               query Labels($input: LabelsInput!) {
                 labels(input: $input) {
                   id
                 }
               }
             `,
-            variables: JSON.stringify({
-              input: {
-                itemId: this.itemId
-              }
-            })
-          }
-        })
+          variables: JSON.stringify({
+            input: {
+              itemId: this.itemId
+            }
+          })
+        }
+      })
         .subscribe((res) => {
           this.labels = res.data.labels;
         });

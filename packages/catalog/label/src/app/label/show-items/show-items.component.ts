@@ -9,7 +9,7 @@ import { API_PATH } from '../label.config';
 import { ShowItemComponent } from '../show-item/show-item.component';
 
 interface ItemsRes {
-  data: { itemIds: string[] };
+  data: { items: string[] };
   errors: { message: string }[];
 }
 
@@ -46,7 +46,7 @@ export class ShowItemsComponent implements OnInit, OnChanges {
   }
 
   loadItems() {
-    if (_.isEmpty(this.itemIds)) {
+    if (_.isEmpty(this.itemIds) && !_.isNil(this.itemIds)) {
       // All items
       if (this.gs) {
         this.gs
@@ -54,15 +54,13 @@ export class ShowItemsComponent implements OnInit, OnChanges {
             params: {
               query: `
                 query {
-                  items(input: { }) {
-                    id
-                  }
+                  items(input: { })
                 }
               `
             }
           })
           .subscribe((res) => {
-            this.itemIds = res.data.itemIds;
+            this.itemIds = res.data.items;
           });
       }
     }

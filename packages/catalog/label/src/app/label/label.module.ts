@@ -11,7 +11,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { DvModule } from 'dv-core';
 
 import { AttachLabelsComponent } from './attach-labels/attach-labels.component';
-import { CreateItemComponent } from './create-item/create-item.component';
 import { CreateLabelComponent } from './create-label/create-label.component';
 import {
   SearchItemsByLabelsComponent
@@ -24,7 +23,7 @@ import { ShowLabelsComponent } from './show-labels/show-labels.component';
 import { API_PATH } from './label.config';
 
 const allComponents = [
-  CreateItemComponent, CreateLabelComponent, SearchItemsByLabelsComponent,
+   CreateLabelComponent, SearchItemsByLabelsComponent,
   ShowItemComponent, ShowItemsComponent, ShowLabelComponent,
   ShowLabelsComponent, AttachLabelsComponent
 ];

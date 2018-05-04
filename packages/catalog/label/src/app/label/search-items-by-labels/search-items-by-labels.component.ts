@@ -96,9 +96,7 @@ export class SearchItemsByLabelsComponent
       params: {
         query: `
           query Items($input: ItemsInput!) {
-            items (input: $input) {
-              id
-            }
+            items (input: $input)
           }
         `,
         variables: JSON.stringify({
@@ -120,7 +118,7 @@ export class SearchItemsByLabelsComponent
     this.gs.get<LabelsRes>(this.apiPath, {
       params: {
         query: `
-          query Labels($input: LabelsInput!) {
+          query {
             labels (input: { }) {
               id
             }

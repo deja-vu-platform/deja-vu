@@ -5,14 +5,16 @@
   <h1>Show label <i>food</i></h1>
   <label-show-label [label]="pizzaLabel"></label-show-label>
   <h1>Attach label <i>food</i> to item <i>pizza</i></h1>
-  <label-attach-labels itemId="pizza"></label-attach-labels>
+  <label-attach-labels [labels]="[{id: 'food'}]" itemId="pizza"></label-attach-labels>
   <h1>Show labels of item <i>pizza</i></h1>
   <label-show-labels itemId="pizza"></label-show-labels>
   <h1>Show all items</h1>
   <label-show-items></label-show-items>
+  <h1>Show all labels</h1>
+  <label-show-labels></label-show-labels>
   <h1>Search</h1>
   <label-search-items-by-labels (searchResultItems)="results = $event">
   </label-search-items-by-labels>
   <h1>Search Results</h1>
-  <label-show-items [items]="results"></label-show-items>
+  <label-show-items [itemIds]="results"></label-show-items>
 </div>
