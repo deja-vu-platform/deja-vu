@@ -36,5 +36,12 @@
         }
       }
     }
+  },
+  "actions": {
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "morg-root"}
+      ]
+    }
   }
 }
