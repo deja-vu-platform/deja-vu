@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && copyfiles -f src/*.blueprint.* dist",
     "package": "npm run build",
+    "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/**/*.ts",
     "clean": "rm -rf ./dist",
     "reinstall-globally": "npm run clean && npm run build && npm uninstall -g && npm install -g"
   },
@@ -35,6 +36,7 @@
     "@types/lodash": "^4.14.96",
     "@types/node": "^9.3.0",
     "copyfiles": "^1.2.0",
+    "tslint": "~5.9.1",
     "typescript": "~2.5.3"
   }
 }
