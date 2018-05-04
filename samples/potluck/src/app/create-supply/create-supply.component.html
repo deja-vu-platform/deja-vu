@@ -46,7 +46,9 @@
     (object)="object=$event">
   </property-create-object>
 
-  <dv-merge [sources]="[object, good]" (object)="outputAsSupply($event)">
+  <dv-merge
+    [sources]="[object, good]"
+    (object)="outputAsSupply($event)">
   </dv-merge>
 
   <div class="row">

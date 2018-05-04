@@ -17,10 +17,10 @@
               <i class="material-icons icon">person</i> Host:
               <authorization-show-owner
                 [resourceId]="partyId"
-                (owner)="host=$event"
+                (ownerId)="hostId=$event"
                 [hidden]="true">
               </authorization-show-owner>
-              <authentication-show-user [id]="host?.id">
+              <authentication-show-user [id]="hostId">
               </authentication-show-user>
             </p>
             <p>
@@ -71,7 +71,7 @@
             </dv-tx>
           </div>
           <div class="row top-space">
-            <dv-tx *ngIf="host?.id === loggedInUserId" class="col-md-12">
+            <dv-tx *ngIf="hostId === loggedInUserId" class="col-md-12">
               <h4>Add Guest</h4>
               <group-add-to-group
                 [id]="partyId"
@@ -132,7 +132,7 @@
                       noTransactionsToShowText="No claims"
                       [showTransaction]="{
                         type: showClaim,
-                        inputMap: {transactionId: 'id'}
+                        inputMap: {id: 'id'}
                       }">
                     </market-show-transactions>
                   </div>

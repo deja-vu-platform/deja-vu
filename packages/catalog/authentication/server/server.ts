@@ -279,11 +279,11 @@ const resolvers = {
     },
 
     changePassword: async (root, { input }: { input: ChangePasswordInput }) => {
+      Validation.isPasswordValid(input.newPassword);
       const user = await Validation.userExistsById(input.id);
       const verification = await Validation.verifyPassword(input.oldPassword,
         user.password);
 
-      Validation.isPasswordValid(input.newPassword);
       const newPasswordHash = await bcrypt
         .hash(input.newPassword, SALT_ROUNDS);
       const updateOperation = { $set: { password: newPasswordHash } };

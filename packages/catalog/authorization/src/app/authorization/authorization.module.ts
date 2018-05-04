@@ -19,9 +19,6 @@ import {
   CanViewComponent
 } from './can-view/can-view.component';
 import {
-  CreatePrincipalComponent
-} from './create-principal/create-principal.component';
-import {
   CreateResourceComponent
 } from './create-resource/create-resource.component';
 import {
@@ -37,10 +34,12 @@ import {
   ShowResourcesComponent
 } from './show-resources/show-resources.component';
 
+import { API_PATH } from './authorization.config';
+
+
 const allComponents = [
   AddViewerComponent, CanEditComponent, CanViewComponent,
-  CreatePrincipalComponent, CreateResourceComponent,
-  DeleteResourceComponent, ShowOwnerComponent,
+  CreateResourceComponent, DeleteResourceComponent, ShowOwnerComponent,
   ShowResourceComponent, ShowResourcesComponent
 ];
 
@@ -52,6 +51,7 @@ const allComponents = [
     FormsModule,
     MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter,
-  Input, OnChanges, OnInit, Output
+  Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
@@ -9,6 +9,12 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../authorization.config';
+
+
+interface CanEditRes {
+  data: { canEdit: boolean };
+}
 
 @Component({
   selector: 'authorization-can-edit',
@@ -25,7 +31,7 @@ export class CanEditComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -41,13 +47,19 @@ export class CanEditComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-    this.gs.get<{data: { canEdit: boolean }}>('/graphql', {
+    this.gs.get<CanEditRes>(this.apiPath, {
       params: {
-        query: `query {
-          canEdit(
-            principalId: "${this.principalId}",
-            resourceId: "${this.resourceId}")
-        }`
+        query: `
+          query CanEdit($input: PrincipalResourceInput!) {
+            canEdit(input: $input)
+          }
+        `,
+        variables: JSON.stringify({
+          input: {
+            principalId: this.principalId,
+            resourceId: this.resourceId
+          }
+        })
       }
     })
     .subscribe((res) => {

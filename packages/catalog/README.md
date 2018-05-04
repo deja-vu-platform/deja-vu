@@ -42,6 +42,9 @@ Yes:
 }
  ```
 
+- use an `input` object type in the schema if there's more than one parameter
+  for the query/mutation method and for possible `null` one parameter methods.
+
 - When creating a custom `FormControl`, include an initial value as an `@Input`
   field and an event emitter for its value as an `@Output` field. The latter is
   so that its value can be linked as an input to components with `dvOnRun`.

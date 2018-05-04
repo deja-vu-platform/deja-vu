@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter,
-  Input, OnChanges, OnInit, Output
+  Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
@@ -9,7 +9,9 @@ import {
 
 import * as _ from 'lodash';
 
-import { Principal } from '../../../../shared/authorization.model';
+import { Resource } from '../shared/authorization.model';
+
+import { API_PATH } from '../authorization.config';
 
 
 @Component({
@@ -19,15 +21,15 @@ import { Principal } from '../../../../shared/authorization.model';
 })
 export class ShowOwnerComponent implements OnInit, OnChanges {
   @Input() resourceId: string;
-  @Output() owner = new EventEmitter<Principal>();
+  @Output() ownerId = new EventEmitter<string>();
 
-  ownerId: string | undefined;
+  _ownerId: string | undefined;
 
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -43,19 +45,17 @@ export class ShowOwnerComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-    this.gs.get<{data: { owner: Principal }}>('/graphql', {
+    this.gs.get<{data: { owner: string }}>(this.apiPath, {
       params: {
         query: `query {
-          owner(resourceId: "${this.resourceId}") {
-            id
-          }
+          owner(resourceId: "${this.resourceId}")
         }`
       }
     })
     .subscribe((res) => {
-      const owner = res.data.owner;
-      this.ownerId = owner.id;
-      this.owner.emit(owner);
+      const ownerId = res.data.owner;
+      this._ownerId = ownerId;
+      this.ownerId.emit(ownerId);
     });
   }
 

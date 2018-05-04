@@ -16,8 +16,6 @@
           <dv-id (id)="userId=$event"></dv-id>
           <authentication-register-user [id]="userId">
           </authentication-register-user>
-          <authorization-create-principal [id]="userId" [hidden]="true">
-          </authorization-create-principal>
           <group-create-member [id]="userId" [hidden]="true">
           </group-create-member>
           <market-create-party [id]="userId" [hidden]="true">

@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter,
-  Input, OnChanges, OnInit, Output
+  Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
@@ -9,6 +9,12 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../authorization.config';
+
+
+interface CanViewRes {
+  data: { canView: boolean; };
+}
 
 @Component({
   selector: 'authorization-can-view',
@@ -25,7 +31,7 @@ export class CanViewComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -41,13 +47,19 @@ export class CanViewComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-    this.gs.get<{data: { canView: boolean }}>('/graphql', {
+    this.gs.get<CanViewRes>(this.apiPath, {
       params: {
-        query: `query {
-          canView(
-            principalId: "${this.principalId}",
-            resourceId: "${this.resourceId}")
-        }`
+        query: `
+          query CanView($input: PrincipalResourceInput!) {
+            canView(input: $input)
+          }
+        `,
+        variables: JSON.stringify({
+          input: {
+            principalId: this.principalId,
+            resourceId: this.resourceId
+          }
+        })
       }
     })
     .subscribe((res) => {

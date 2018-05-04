@@ -122,5 +122,4 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   dvOnAfterAbort(reason: Error) {
     this.newUserSignedInError = reason.message;
   }
-
 }

@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter,
-  Input, OnInit, Output
+  Inject, Input, OnInit, Output
 } from '@angular/core';
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
@@ -9,7 +9,9 @@ import {
 
 import * as _ from 'lodash';
 
-import { Principal, Resource } from '../../../../shared/authorization.model';
+import { Resource } from '../shared/authorization.model';
+
+import { API_PATH } from '../authorization.config';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -20,9 +22,9 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class AddViewerComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  // Presentation Inputs
   @Input() id: string;
   @Input() viewerId: string;
+  // Presentation Inputs
   @Input() resourceInputLabel = 'Resource Id';
   @Input() viewerInputLabel = 'Viewer Id';
   @Input() buttonLabel = 'Add Viewer to Resource';
@@ -35,7 +37,7 @@ export class AddViewerComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -48,13 +50,18 @@ export class AddViewerComponent implements
 
   dvOnRun() {
     this.gs
-      .post('/graphql', {
-        query: `mutation {
-          addViewerToResource (
-            id: "${this.id}",
-            viewerId: "${this.viewerId}"
-          )
-        }`
+      .post(this.apiPath, {
+        query: `
+          mutation AddViewerToResource($input: AddViewerToResourceInput!) {
+            addViewerToResource (input: $input)
+          }
+        `,
+        variables: {
+          input: {
+            id: this.id,
+            viewerId: this.viewerId
+          }
+        }
       })
       .toPromise();
   }
