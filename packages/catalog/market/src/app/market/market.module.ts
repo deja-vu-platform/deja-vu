@@ -28,7 +28,6 @@ import {
 import {
   CreateGoodSupplyComponent
 } from './create-good-supply/create-good-supply.component';
-import { CreateMarketComponent } from './create-market/create-market.component';
 import { CreatePartyComponent } from './create-party/create-party.component';
 import {
   CreateTransactionComponent
@@ -61,7 +60,7 @@ const allComponenents = [
   AddAmountComponent, CancelCompoundTransactionComponent,
   CancelTransactionComponent, CreateCompoundTransactionComponent,
   CreateBalanceComponent, CreateGoodComponent, CreateGoodPriceComponent,
-  CreateGoodSellerComponent, CreateGoodSupplyComponent, CreateMarketComponent,
+  CreateGoodSellerComponent, CreateGoodSupplyComponent,
   CreatePartyComponent, CreateTransactionComponent,
   PayCompoundTransactionComponent, PayTransactionComponent,
   ShowCompoundTransactionComponent, ShowGoodComponent, ShowGoodsComponent,

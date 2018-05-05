@@ -4,10 +4,6 @@ enum TRANSACTION_STATUS {
   Canceled
 }
 
-type Market {
-  id: ID!
-}
-
 type Party {
   id: ID!
   balance: Float
@@ -18,7 +14,7 @@ type Good {
   price: Float
   seller: Party
   supply: Float
-  market: Market
+  marketId: ID!
 }
 
 type Transaction {
@@ -28,7 +24,7 @@ type Transaction {
   seller: Party
   pricePerGood: Float
   quantity: Float
-  market: Market
+  marketId: ID!
   status: TRANSACTION_STATUS
 }
 
@@ -89,15 +85,9 @@ input TransactionsInput {
   status: TRANSACTION_STATUS
 }
 
-input CreateMarketInput {
-  id: ID
-  withNewGoods: [CreateGoodInput!]
-}
-
 type Query {
   party(id: ID!): Party
   good(id: ID!): Good
-  market(id: ID!): Market
   transaction(id: ID!): Transaction
   compoundTransaction(id: ID!): CompoundTransaction
 
@@ -106,7 +96,6 @@ type Query {
 }
 
 type Mutation {
-  createMarket(input: CreateMarketInput!): Market
   createParty(input: CreatePartyInput!): Party
   addAmount(input: AddAmountInput!): Boolean
   createGood(input: CreateGoodInput!): Good

@@ -44,7 +44,7 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
   @Input() noGoodsToShowText = 'No goods to show';
 
   // Whether to show the user the option to {buy, ...} a good
@@ -105,7 +105,7 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
                   ${this.showPrice ? 'price' : ''}
                   ${this.showSupply ? 'supply' : ''}
                   ${this.showSeller ? 'seller { id }' : ''}
-                  ${this.showMarket ? 'market { id }' : ''}
+                  ${this.showMarketId ? 'marketId' : ''}
                 }
               }
             `,

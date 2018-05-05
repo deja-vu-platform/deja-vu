@@ -4,10 +4,6 @@ export enum TransactionStatus {
   Canceled = 'Canceled'
 }
 
-export interface Market {
-  id: string;
-}
-
 export interface Party {
   id: string;
   balance?: number;
@@ -18,7 +14,7 @@ export interface Good {
   seller?: Party;
   price?: number;
   supply?: number;
-  market?: Market;
+  marketId?: string;
 }
 
 export interface Transaction {
@@ -28,7 +24,7 @@ export interface Transaction {
   seller: Party;
   pricePerGood: number;
   quantity: number;
-  market: Market;
+  marketId: string;
   status: TransactionStatus;
 }
 

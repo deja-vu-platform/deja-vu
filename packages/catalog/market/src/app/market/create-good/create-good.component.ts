@@ -110,7 +110,7 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
       price: this.priceControl.value,
       seller: { id: this.sellerIdControl.value },
       supply: this.supplyControl.value,
-      market: { id: this.marketId }
+      marketId: this.marketId
     };
     if (this.save) {
       if (!this.marketId) {

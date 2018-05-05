@@ -34,7 +34,7 @@ export class ShowCompoundTransactionComponent {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
 
   // Whether to show the user the option to {pay, cancel} a good
   @Input() showOptionToPay = true;

@@ -18,7 +18,7 @@ export class ShowGoodComponent implements OnInit, OnChanges {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
 
   @Input() noPriceText = 'No price';
   @Input() noSupplyText = 'No supply';
@@ -54,7 +54,7 @@ export class ShowGoodComponent implements OnInit, OnChanges {
               ${this.showPrice ? 'price' : ''}
               ${this.showSupply ? 'supply' : ''}
               ${this.showSeller ? 'seller { id }' : ''}
-              ${this.showMarket ? 'market { id }' : ''}
+              ${this.showMarketId ? 'marketId' : ''}
             }
           }
         `

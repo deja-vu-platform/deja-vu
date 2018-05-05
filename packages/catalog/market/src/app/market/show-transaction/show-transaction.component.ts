@@ -28,7 +28,7 @@ export class ShowTransactionComponent {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
 
   // Presentation inputs
   @Input() noGoodText = 'No good';
