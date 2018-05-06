@@ -1,48 +1,58 @@
-<div class="row">
-  <div class="col-md-12">
-    <dv-include [action]="createGood"
-      [inputs]="{
-        save: false,
-        showOptionToInputPrice: showOptionToInputPrice,
-        supplyLabel: supplyLabel,
-        showOptionToInputSeller: showOptionToInputSeller,
-        buttonLabel: buttonLabel,
-        sellerId: sellerId,
-        marketId: marketId
-        }"
-      [outputs]="{good: 'stage'}"
-      [parent]="stageGoodsComponent">
-    </dv-include>
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createGoodsForm"
+  class="form-horizontal">
+  <div class="row">
+    <div class="col-md-12">
+      <dv-include [action]="createGood"
+        [inputs]="{
+          save: false,
+          showOptionToInputPrice: showOptionToInputPrice,
+          supplyLabel: supplyLabel,
+          showOptionToInputSeller: showOptionToInputSeller,
+          buttonLabel: stageGoodButtonLabel,
+          sellerId: sellerId,
+          marketId: marketId
+          }"
+        [outputs]="{good: 'stage'}"
+        [parent]="stageGoodsComponent">
+      </dv-include>
+    </div>
   </div>
-</div>
 
-<div *ngIf="stagedGoodsHeader" class="row">
-  <div class="col-md-12">
-    <dv-include [action]="stagedGoodsHeader" [parent]="stageGoodsComponent">
-    </dv-include>
+  <div *ngIf="stagedGoodsHeader" class="row">
+    <div class="col-md-12">
+      <dv-include [action]="stagedGoodsHeader" [parent]="stageGoodsComponent">
+      </dv-include>
+    </div>
   </div>
-</div>
 
-<div class="row">
-  <div class="col-md-12">
-    <ul *ngIf="staged && staged.length > 0"
-      class="list-group">
-      <li *ngFor="let good of staged; index as i" class="list-group-item">
-        <div class="row">
-          <div class="col-md-10">
-            <dv-include [action]="showGood" [inputs]="{
-              good: good
-             }"
-             [parent]="stageGoodsComponent">
-            </dv-include>
+  <div class="row">
+    <div class="col-md-12">
+      <ul *ngIf="staged && staged.length > 0"
+        class="list-group">
+        <li *ngFor="let good of staged; index as i" class="list-group-item">
+          <div class="row">
+            <div class="col-md-10">
+              <dv-include [action]="showGood" [inputs]="{
+                good: good
+               }"
+               [parent]="stageGoodsComponent">
+              </dv-include>
+            </div>
+            <div class="col-md-2">
+              <button mat-button (click)="unstage(i)" class="eject">
+                <i class="material-icons icon">eject</i>
+              </button>
+            </div>
           </div>
-          <div class="col-md-2">
-            <button mat-button (click)="unstage(i)" class="eject">
-              <i class="material-icons icon">eject</i>
-            </button>
-          </div>
-        </div>
-      </li>
-    </ul>
+        </li>
+      </ul>
+    </div>
   </div>
-</div>
+
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!createGoodsForm.valid">
+      {{createGoodsButtonLabel}}
+    </button>
+  </div>
+</form>

@@ -14,7 +14,7 @@ type Good {
   price: Float
   seller: Party
   supply: Float
-  marketId: ID!
+  marketId: ID
 }
 
 type Transaction {
@@ -24,7 +24,7 @@ type Transaction {
   seller: Party
   pricePerGood: Float
   quantity: Float
-  marketId: ID!
+  marketId: ID
   status: TRANSACTION_STATUS
 }
 
@@ -99,6 +99,7 @@ type Mutation {
   createParty(input: CreatePartyInput!): Party
   addAmount(input: AddAmountInput!): Boolean
   createGood(input: CreateGoodInput!): Good
+  createGoods(input: [CreateGoodInput!]): [Good]
   updateGood(input: UpdateGoodInput!): Boolean
   createTransaction(input: CreateTransactionInput!): Transaction
   payTransaction(id: ID!): Boolean

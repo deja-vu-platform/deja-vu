@@ -20,26 +20,21 @@ import { ShowGoodComponent } from '../show-good/show-good.component';
 
 import { Good } from '../shared/market.model';
 
+interface CreateGoodsResponse {
+  data: {createGoods: Good[]};
+  errors: {message: string}[];
+}
+
+const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
-  selector: 'market-stage-goods',
-  templateUrl: './stage-goods.component.html',
-  styleUrls: ['./stage-goods.component.css'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: StageGoodsComponent,
-      multi: true
-    },
-    {
-      provide: NG_VALIDATORS,
-      useExisting: StageGoodsComponent,
-      multi: true
-    }
-  ]
+  selector: 'market-create-goods',
+  templateUrl: './create-goods.component.html',
+  styleUrls: ['./create-goods.component.css']
 })
-export class StageGoodsComponent
+export class CreateGoodsComponent
 implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
+  // for staging
   @Input() initialStageGoods: Good[] = [];
   @Output() stagedGoods = new EventEmitter<Good[]>();
 
@@ -47,6 +42,11 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   @Input() showOptionToInputSeller = true;
   @Input() sellerId: string | undefined;
   @Input() marketId: string;
+
+  // for creating
+  @Input() showOptionToSubmit = true;
+  @Input() save = true;
+  @Output() createdGoods = new EventEmitter<Good[]>();
 
   @Input() createGood: Action = {
     type: <Type<Component>> CreateGoodComponent
@@ -58,10 +58,17 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
 
 
   // Presentation inputs
-  @Input() buttonLabel = 'Add Good';
+  @Input() stageGoodButtonLabel = 'Add Good';
   @Input() supplyLabel = 'Supply';
+  @Input() createGoodsButtonLabel = 'Create';
 
   staged: Good[] = [];
+  @ViewChild(FormGroupDirective) form;
+
+  createGoodsForm: FormGroup = this.builder.group({});
+
+  newGoodsSaved = false;
+  newGoodsError: string;
 
   private gs: GatewayService;
   stageGoodsComponent = this;
@@ -86,10 +93,6 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
     this.stagedGoods.emit(this.staged);
   }
 
-  dvOnAfterCommit() {
-    this.staged = [];
-  }
-
   writeValue(value: Good[]) {
     if (value) {
       this.staged = value;
@@ -107,5 +110,58 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
 
   validate(c: FormControl): ValidationErrors {
     return null;
+  }
+
+  onSubmit() {
+    this.rs.run(this.elem);
+  }
+
+  async dvOnRun(): Promise<void> {
+    const newGoods = this.staged.slice()
+    if (this.save && newGoods.length > 0) {
+      const res = await this.gs
+        .post<any>('/graphql', {
+          query: `mutation CreateGoods($input: [CreateGoodInput!]!) {
+            createGoods (input: $input) {
+              id
+            }
+          }`,
+          variables: {
+            input: _.map(newGoods, this.goodToCreateGoodInput)
+          }
+        })
+        .toPromise();
+
+      if (res.errors) {
+        throw new Error(_.map(res.errors, 'message')
+          .join());
+      }
+
+      this.createdGoods.emit(_.merge(newGoods, res.data.createGoods));
+    }
+  }
+
+  dvOnAfterCommit() {
+    this.staged = [];
+    if (this.showOptionToSubmit && this.save) {
+      this.newGoodsSaved = true;
+      this.newGoodsError = '';
+      window.setTimeout(() => {
+        this.newGoodsSaved = false;
+      }, SAVED_MSG_TIMEOUT);
+    }
+  }
+
+  dvOnAfterAbort(reason: Error) {
+    if (this.showOptionToSubmit && this.save) {
+      this.newGoodsError = reason.message;
+    }
+  }
+
+  private goodToCreateGoodInput(g: Good) {
+    const goodInput = _.pick(g, ['id', 'price', 'supply']);
+    goodInput.sellerId = g.seller.id;
+
+    return goodInput;
   }
 }

@@ -408,6 +408,9 @@ const resolvers = {
     createGood: async (_root, {input}: {input: CreateGoodInput}) => {
       return createGood(input);
     },
+    createGoods: async (_root, {input}: {input: CreateGoodInput[]}) => {
+      return _.map(input, (createGoodInput) => createGood(createGoodInput));
+    },
     updateGood: async (_root, {input}: {input: UpdateGoodInput}) => {
       await Validation.goodExists(input.id);
       const updatedGood = {};
