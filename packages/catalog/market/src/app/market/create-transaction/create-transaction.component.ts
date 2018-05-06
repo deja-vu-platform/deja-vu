@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
   SimpleChanges, ViewChild
 } from '@angular/core';
 import {
@@ -14,6 +14,8 @@ import {
 import { take } from 'rxjs/operators';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../market.config';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -80,7 +82,8 @@ export class CreateTransactionComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -113,7 +116,7 @@ export class CreateTransactionComponent implements
     }
 
     const res = await this.gs
-      .post<{data: any, errors: {message: string}[]}>('/graphql', {
+      .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
         query: `mutation CreateTransaction($input: CreateTransactionInput!) {
           createTransaction(input: $input) {
             id

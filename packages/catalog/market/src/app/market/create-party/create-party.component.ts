@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -13,6 +13,8 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../market.config';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -50,7 +52,8 @@ export class CreatePartyComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -63,7 +66,7 @@ export class CreatePartyComponent implements
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs
-      .post<{data: any, errors: {message: string[]}}>('/graphql', {
+      .post<{data: any, errors: {message: string[]}}>(this.apiPath, {
         query: `mutation CreateParty($input: CreatePartyInput!) {
           createParty(input: $input) {
             id

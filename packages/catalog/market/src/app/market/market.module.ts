@@ -56,6 +56,8 @@ import {
 } from './show-transactions/show-transactions.component';
 import { UpdateGoodComponent } from './update-good/update-good.component';
 
+import { API_PATH } from './market.config';
+
 const allComponenents = [
   AddAmountComponent, CancelCompoundTransactionComponent,
   CancelTransactionComponent, CreateCompoundTransactionComponent,
@@ -77,6 +79,7 @@ const allComponenents = [
     // Material
     MatButtonModule, MatFormFieldModule, MatInputModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponenents,
   entryComponents: allComponenents,
   exports: allComponenents

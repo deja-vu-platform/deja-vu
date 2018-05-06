@@ -1,10 +1,11 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
 import { ShowTransactionComponent } from '../show-transaction/show-transaction.component';
 
+import { API_PATH } from '../market.config';
 import { Transaction, TransactionStatus } from '../shared/market.model';
 
 
@@ -50,7 +51,8 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showTransactions = this;
   }
 
@@ -66,7 +68,7 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
   fetchTransactions() {
     if (this.gs) {
       this.gs
-        .get<{data: {transactions: Transaction[]}}>('/graphql', {
+        .get<{data: {transactions: Transaction[]}}>(this.apiPath, {
           params: {
             query: `
               query Transactions($input: TransactionsInput!) {

@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
   SimpleChanges, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
@@ -10,6 +10,7 @@ import * as _ from 'lodash';
 
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
 
@@ -68,7 +69,8 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showGoods = this;
   }
 
@@ -96,7 +98,7 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
         .value());
 
       this.gs
-        .get<{data: {goods: Good[]}}>('/graphql', {
+        .get<{data: {goods: Good[]}}>(this.apiPath, {
           params: {
             query: `
               query Goods($input: GoodsInput!) {

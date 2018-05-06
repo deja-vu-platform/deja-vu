@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit
 } from '@angular/core';
 
 import {
@@ -8,6 +8,8 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../market.config';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -33,7 +35,7 @@ export class CancelCompoundTransactionComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -46,7 +48,7 @@ export class CancelCompoundTransactionComponent implements
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs
-      .post<{data: any, errors: {message: string}[]}>('/graphql', {
+      .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
         query: `mutation {
           cancelCompoundTransaction(id: "${this.id}")
         }`

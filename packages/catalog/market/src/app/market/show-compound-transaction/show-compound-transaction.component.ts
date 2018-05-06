@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, Type } from '@angular/core';
+import { Component, ElementRef, Inject, Input, Type } from '@angular/core';
 
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
@@ -6,6 +6,7 @@ import {
   ShowTransactionComponent
 } from '../show-transaction/show-transaction.component';
 
+import { API_PATH } from '../market.config';
 import { CompoundTransaction } from '../shared/market.model';
 
 
@@ -49,7 +50,8 @@ export class ShowCompoundTransactionComponent {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showCompoundTransaction = this;
   }
 
@@ -67,7 +69,7 @@ export class ShowCompoundTransactionComponent {
     if (!this.gs || this.compoundTransaction || !this.id) {
       return;
     }
-    this.gs.get<{data: {compoundTransaction: CompoundTransaction}}>('/graphql', {
+    this.gs.get<{data: {compoundTransaction: CompoundTransaction}}>(this.apiPath, {
       params: {
         query: `
           query {

@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Input, OnInit, Type, ViewChild
+  Component, ElementRef, Inject, Input, OnInit, Type, ViewChild
 } from '@angular/core';
 
 import {
@@ -12,6 +12,8 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../market.config';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -44,7 +46,8 @@ export class AddAmountComponent implements OnInit, OnRun, OnAfterAbort,
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -57,7 +60,7 @@ export class AddAmountComponent implements OnInit, OnRun, OnAfterAbort,
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs
-      .post<{data: any, errors: {message: string}[]}>('/graphql', {
+      .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
         query: `mutation AddAmount($input: AddAmountInput!) {
           addAmount(input: $input)
         }`,

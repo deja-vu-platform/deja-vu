@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, ViewChild, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
+  ViewChild, Output
 } from '@angular/core';
 
 import {
@@ -16,6 +17,7 @@ import { map } from 'rxjs/operators';
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
 
@@ -65,7 +67,8 @@ export class UpdateGoodComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -84,7 +87,7 @@ export class UpdateGoodComponent implements
     if (!this.gs || !this.id) {
       return;
     }
-    this.gs.get<{data: {good: Good}}>('/graphql', {
+    this.gs.get<{data: {good: Good}}>(this.apiPath, {
       params: {
         query: `
           query {

@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, Type,
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, Type,
   ViewChild
 } from '@angular/core';
 import {
@@ -18,6 +18,7 @@ import {
 import { CreateGoodComponent } from '../create-good/create-good.component';
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
 interface CreateGoodsResponse {
@@ -75,7 +76,8 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -120,7 +122,7 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
     const newGoods = this.staged.slice()
     if (this.save && newGoods.length > 0) {
       const res = await this.gs
-        .post<any>('/graphql', {
+        .post<any>(this.apiPath, {
           query: `mutation CreateGoods($input: [CreateGoodInput!]!) {
             createGoods (input: $input) {
               id

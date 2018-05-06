@@ -1,5 +1,5 @@
 import {
-  ChangeDetectorRef, Component, ElementRef, EventEmitter, Input,
+  ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, Input,
   OnChanges, OnInit, Output, SimpleChanges, ViewChild
 } from '@angular/core';
 
@@ -17,6 +17,7 @@ import { take } from 'rxjs/operators';
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
 interface CreateGoodResponse {
@@ -81,7 +82,7 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private ref: ChangeDetectorRef) {}
+    private ref: ChangeDetectorRef, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -119,7 +120,7 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
           .toPromise();
       }
       const res = await this.gs
-        .post<CreateGoodResponse>('/graphql', {
+        .post<CreateGoodResponse>(this.apiPath, {
           query: `mutation CreateGood($input: CreateGoodInput!) {
             createGood (input: $input) {
               id

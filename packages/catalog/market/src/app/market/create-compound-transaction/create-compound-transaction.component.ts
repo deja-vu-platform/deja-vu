@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output
 } from '@angular/core';
 
 import {
@@ -8,6 +8,8 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../market.config';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -34,7 +36,7 @@ export class CreateCompoundTransactionComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -48,7 +50,7 @@ export class CreateCompoundTransactionComponent implements
   async dvOnRun(): Promise<void> {
     const res = await this.gs
       .post<{data: {createCompoundTransaction: {id: string}}, errors: {message: string}[]}>(
-        '/graphql', {
+        this.apiPath, {
           query: `mutation {
             createCompoundTransaction(id: "${this.id}") {
               id

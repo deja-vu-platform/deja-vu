@@ -1,7 +1,10 @@
-import { Component, ElementRef, Input, OnInit, OnChanges } from '@angular/core';
+import {
+  Component, ElementRef, Inject, Input, OnInit, OnChanges
+} from '@angular/core';
 
 import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
 
@@ -29,7 +32,8 @@ export class ShowGoodComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -45,7 +49,7 @@ export class ShowGoodComponent implements OnInit, OnChanges {
     if (!this.gs || this.good || !this.id) {
       return;
     }
-    this.gs.get<{data: {good: Good}}>('/graphql', {
+    this.gs.get<{data: {good: Good}}>(this.apiPath, {
       params: {
         query: `
           query {
