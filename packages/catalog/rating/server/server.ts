@@ -23,6 +23,16 @@ interface RatingInput {
   ofTargetId: string;
 }
 
+interface RatingsInput {
+  bySourceId?: string;
+  ofTargetId?: string;
+}
+
+interface AverageRatingForTargetOutput {
+  rating: number;
+  count: number;
+}
+
 interface UpdateRatingInput {
   sourceId: string;
   targetId: string;
@@ -81,10 +91,37 @@ const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 const resolvers = {
   Query: {
-    rating: (root, { input }: { input: RatingInput }) => ratings
-      .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId }),
+    rating: async (root, { input }: { input: RatingInput }) => {
+      const rating = await ratings
+        .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId });
 
-    averageRatingForTarget: async (root, { targetId }) => {
+      if (_.isEmpty(rating)) {
+        throw new Error(`Rating by ${input.bySourceId} for target
+         ${input.ofTargetId} does not exist`);
+      }
+
+      return rating;
+    },
+
+    ratings: (root, { input }: { input: RatingsInput }) => {
+      if (input.bySourceId) {
+        // All ratings by a source
+        return ratings.find({ sourceId: input.bySourceId })
+          .toArray();
+      } else if (input.ofTargetId) {
+        // All ratings of a target
+        return ratings.find({ targetId: input.ofTargetId })
+          .toArray();
+      } else {
+        // All ratings
+        return ratings.find()
+          .toArray();
+      }
+    },
+
+    // tslint:disable-next-line:max-line-length
+    averageRatingForTarget: async (root, { targetId }): Promise<AverageRatingForTargetOutput> => {
+      console.log('HAVE WE MADE IT');
       const results = await ratings.aggregate([
         { $match: { targetId: targetId } },
         { $count: 'count' },
@@ -95,13 +132,17 @@ const resolvers = {
               average: { $avg: '$rating' }
             }
         }
-      ]);
+      ])
+        .toArray();
 
       if (_.isEmpty(results)) { throw new Error(`Target does not exist`); }
 
       console.log('HEY', results);
 
-      return { rating: results[0].average, count: results[0].count };
+      return {
+        rating: results[0]['average'],
+        count: results[0]['count']
+      };
     }
   },
 

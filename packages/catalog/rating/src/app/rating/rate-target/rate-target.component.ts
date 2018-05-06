@@ -82,18 +82,17 @@ export class RateTargetComponent implements
         .toPromise();
     }
 
-    this.gs.get<UpdateRatingRes>(this.apiPath, {
-      params: {
-        query: `
-          query UpdateRating($input: UpdateRatingInput!) {
+    this.gs.post<UpdateRatingRes>(this.apiPath, {
+      query: `mutation UpdateRating($input: UpdateRatingInput!) {
             updateRating(input: $input)
           }
         `,
-        variables: JSON.stringify({
+      variables: {
+        input: {
           sourceId: this.sourceId,
           targetId: this.targetId,
           newRating: this.ratingValue
-        })
+        }
       }
     })
       .subscribe((res) => {
@@ -116,21 +115,25 @@ export class RateTargetComponent implements
     this.gs.get<RatingRes>(this.apiPath, {
       params: {
         query: `
-        query Rating($input: RatingInput) {
-          rating(input: $input) {
-            rating
+          query Rating($input: RatingInput!) {
+            rating(input: $input) {
+              rating
+            }
           }
-        }
         `,
         variables: JSON.stringify({
-          bySourceId: this.sourceId,
-          ofTargetId: this.targetId
+          input: {
+            bySourceId: this.sourceId,
+            ofTargetId: this.targetId
+          }
         })
       }
     })
-    .subscribe((res) => {
-      this.ratingValue = res.data.rating.rating;
-      this.rating.emit(this.ratingValue);
-    });
+      .subscribe((res) => {
+        if (res.data.rating) {
+          this.ratingValue = res.data.rating.rating;
+          this.rating.emit(this.ratingValue);
+        }
+      });
   }
 }

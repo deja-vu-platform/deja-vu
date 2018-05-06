@@ -20,11 +20,10 @@ import {
 } from './show-ratings-by-target/show-ratings-by-target.component';
 
 import { StarRatingModule } from 'angular-star-rating';
-import { RatingServiceFactory } from './shared/rating.service';
 
 import { DvModule } from 'dv-core';
 
-import {API_PATH} from './rating.config';
+import { API_PATH } from './rating.config';
 
 const allComponents = [
   RateTargetComponent, ShowAverageRatingComponent,
@@ -41,7 +40,7 @@ const allComponents = [
     MatButtonModule, MatInputModule, MatFormFieldModule,
     StarRatingModule.forRoot()
   ],
-  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
+  providers: [{ provide: API_PATH, useValue: '/graphql' }],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

@@ -14,6 +14,11 @@ input RatingInput {
   ofTargetId: ID!
 }
 
+input RatingsInput {
+  bySourceId: ID
+  ofTargetId: ID
+}
+
 input UpdateRatingInput {
   sourceId: ID!
   targetId: ID!
@@ -22,8 +27,8 @@ input UpdateRatingInput {
 
 type Query {
   rating(input: RatingInput!): Rating
-  averageRatingForTarget(targetId: ID!)
-    : AverageRatingForTargetOutput
+  ratings(input: RatingsInput!): [Rating]
+  averageRatingForTarget(targetId: ID!): AverageRatingForTargetOutput
 }
 
 type Mutation {
