@@ -57,7 +57,8 @@
                   </div>
                   <div class="col-md-2"></div>
                   <div class="col-md-5">
-                    <market-stage-goods
+                    <market-create-goods
+                      [marketId]="partyId"
                       [createGood]="{
                         type: createSupply,
                         outputMap: {good: 'supply'}
@@ -71,17 +72,12 @@
                       supplyLabel="Quantity"
                       [showOptionToInputPrice]="false"
                       [showOptionToInputSeller]="false"
+                      [showOptionToSubmit]="false"
 
                       (stagedGoods)="stagedSupplies=$event">
-                    </market-stage-goods>
+                    </market-create-goods>
                   </div>
                 </div>
-
-                <market-create-market
-                  [id]="partyId"
-                  [goods]="stagedSupplies"
-                  [hidden]="true">
-                </market-create-market>
 
                 <property-create-objects
                   dvOf="supply"
