@@ -21,9 +21,9 @@ import { ShowGoodComponent } from '../show-good/show-good.component';
 import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
-interface CreateGoodsResponse {
-  data: {createGoods: Good[]};
-  errors: {message: string}[];
+interface CreateGoodsRes {
+  data: { createGoods: Good[] };
+  errors: { message: string }[];
 }
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -121,18 +121,17 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   async dvOnRun(): Promise<void> {
     const newGoods = this.staged.slice()
     if (this.save && newGoods.length > 0) {
-      const res = await this.gs
-        .post<any>(this.apiPath, {
-          query: `mutation CreateGoods($input: [CreateGoodInput!]!) {
-            createGoods (input: $input) {
-              id
-            }
-          }`,
-          variables: {
-            input: _.map(newGoods, this.goodToCreateGoodInput)
+      const res = await this.gs.post<CreateGoodsRes>(this.apiPath, {
+        query: `mutation CreateGoods($input: [CreateGoodInput!]!) {
+          createGoods (input: $input) {
+            id
           }
-        })
-        .toPromise();
+        }`,
+        variables: {
+          input: _.map(newGoods, this.goodToCreateGoodInput)
+        }
+      })
+      .toPromise();
 
       if (res.errors) {
         throw new Error(_.map(res.errors, 'message')

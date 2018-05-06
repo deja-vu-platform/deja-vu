@@ -7,6 +7,10 @@ import { GatewayService, GatewayServiceFactory } from 'dv-core';
 import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
+interface GoodRes {
+  data: { good: Good },
+  errors: {message: string}[]
+}
 
 @Component({
   selector: 'market-show-good',
@@ -49,7 +53,7 @@ export class ShowGoodComponent implements OnInit, OnChanges {
     if (!this.gs || this.good || !this.id) {
       return;
     }
-    this.gs.get<{data: {good: Good}}>(this.apiPath, {
+    this.gs.get<GoodRes>(this.apiPath, {
       params: {
         query: `
           query {

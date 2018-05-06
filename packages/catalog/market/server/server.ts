@@ -163,7 +163,11 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, parties, goods, transactions, compoundtransactions;
+let db: mongodb.Db,
+  parties: mongodb.Collection<PartyDoc>,
+  goods: mongodb.Collection<GoodDoc>,
+  transactions: mongodb.Collection<TransactionDoc>,
+  compoundtransactions: mongodb.Collection<CompoundTransactionDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -353,7 +357,7 @@ const resolvers = {
     transactions: async (_root, { input }: { input: TransactionsInput })
       : Promise<Transaction[]> => {
       const matchingTransactions: TransactionDoc[] = await transactions
-        .find(input)
+        .find<TransactionDoc>(input)
         .toArray();
       return _.map(matchingTransactions, transactionDocToTransaction);
     }
@@ -459,15 +463,8 @@ const resolvers = {
         transaction.sellerId = good.sellerId;
       }
       const goodUpdateOp = { $inc: { supply: -input.quantity }};
-      const opPromises = [
-        transactions.insertOne(transaction),
-        goods.updateOne({ id: input.goodId }, goodUpdateOp)
-      ];
-      if (good.sellerId && input.paid) {
-        opPromises.push(
-          makePayment(good.sellerId!, input.buyerId, pricePerGood * input.quantity));
-      }
 
+      const opPromises: Promise<any>[] = [];
       if (input.compoundTransactionId) {
         const status: TransactionStatus = input.paid ? TransactionStatus.Paid :
           TransactionStatus.Unpaid;
@@ -481,6 +478,14 @@ const resolvers = {
         opPromises.push(compoundtransactions.updateOne({
           id: input.compoundTransactionId
         }, updateOp));
+      }
+      
+      opPromises.push(...[ transactions.insertOne(transaction),
+        goods.updateOne({ id: input.goodId }, goodUpdateOp) ]);
+
+      if (good.sellerId && input.paid) {
+        opPromises.push(
+          makePayment(good.sellerId!, input.buyerId, pricePerGood * input.quantity));
       }
 
       await Promise.all(opPromises);

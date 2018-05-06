@@ -5,6 +5,10 @@ import { GatewayService, GatewayServiceFactory } from 'dv-core';
 import { API_PATH } from '../market.config';
 import { Party } from '../shared/market.model';
 
+interface PartyRes {
+  data: { party: Party },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-party',
@@ -41,7 +45,7 @@ export class ShowPartyComponent {
     if (!this.gs || this.party || !this.id) {
       return;
     }
-    this.gs.get<{data: {party: Party}}>(this.apiPath, {
+    this.gs.get<PartyRes>(this.apiPath, {
       params: {
         query: `
           query {

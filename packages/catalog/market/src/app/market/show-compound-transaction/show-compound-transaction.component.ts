@@ -9,6 +9,10 @@ import {
 import { API_PATH } from '../market.config';
 import { CompoundTransaction } from '../shared/market.model';
 
+interface CompoundTransactionRes {
+  data: { compoundTransaction: CompoundTransaction },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-compound-transaction',
@@ -69,7 +73,7 @@ export class ShowCompoundTransactionComponent {
     if (!this.gs || this.compoundTransaction || !this.id) {
       return;
     }
-    this.gs.get<{data: {compoundTransaction: CompoundTransaction}}>(this.apiPath, {
+    this.gs.get<CompoundTransactionRes>(this.apiPath, {
       params: {
         query: `
           query {

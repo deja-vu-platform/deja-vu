@@ -11,6 +11,10 @@ import * as _ from 'lodash';
 
 import { API_PATH } from '../market.config';
 
+interface CancelCompoundTransactionRes {
+  data: { cancelCompoundTransaction: boolean },
+  errors: { message: string }[]
+}
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -47,13 +51,12 @@ export class CancelCompoundTransactionComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs
-      .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
-        query: `mutation {
-          cancelCompoundTransaction(id: "${this.id}")
-        }`
-      })
-      .toPromise();
+    const res = await this.gs.post<CancelCompoundTransactionRes>(this.apiPath, {
+      query: `mutation {
+        cancelCompoundTransaction(id: "${this.id}")
+      }`
+    })
+    .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

@@ -8,6 +8,10 @@ import { ShowTransactionComponent } from '../show-transaction/show-transaction.c
 import { API_PATH } from '../market.config';
 import { Transaction, TransactionStatus } from '../shared/market.model';
 
+interface TransactionsRes {
+  data: { transactions: Transaction[] },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-transactions',
@@ -67,34 +71,33 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
 
   fetchTransactions() {
     if (this.gs) {
-      this.gs
-        .get<{data: {transactions: Transaction[]}}>(this.apiPath, {
-          params: {
-            query: `
-              query Transactions($input: TransactionsInput!) {
-                transactions(input: $input) {
-                  id
-                  ${this.showStatus || this.showOptionToCancel ? 'status': ''}
-                  ${this.showOptionToPay ?
-                    'buyer { id }\n' +
-                    'seller { id }\n' : ''
-                  }
+      this.gs.get<TransactionsRes>(this.apiPath, {
+        params: {
+          query: `
+            query Transactions($input: TransactionsInput!) {
+              transactions(input: $input) {
+                id
+                ${this.showStatus || this.showOptionToCancel ? 'status': ''}
+                ${this.showOptionToPay ?
+                  'buyer { id }\n' +
+                  'seller { id }\n' : ''
                 }
               }
-            `,
-            variables: JSON.stringify({
-              input: {
-                buyerId: this.buyerId,
-                sellerId: this.sellerId,
-                marketId: this.marketId,
-                status: this.status
-              }
-            })
-          }
-        })
-        .subscribe((res) => {
-          this.transactions = res.data.transactions;
-        });
+            }
+          `,
+          variables: JSON.stringify({
+            input: {
+              buyerId: this.buyerId,
+              sellerId: this.sellerId,
+              marketId: this.marketId,
+              status: this.status
+            }
+          })
+        }
+      })
+      .subscribe((res) => {
+        this.transactions = res.data.transactions;
+      });
     }
   }
 }

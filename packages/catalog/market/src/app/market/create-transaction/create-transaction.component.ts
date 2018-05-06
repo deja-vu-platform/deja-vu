@@ -16,7 +16,12 @@ import { take } from 'rxjs/operators';
 import * as _ from 'lodash';
 
 import { API_PATH } from '../market.config';
+import { Transaction } from '../shared/market.model';
 
+interface CreateTransactionRes {
+  data: { createTransaction: Transaction },
+  errors: { message: string }[]
+}
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -115,26 +120,25 @@ export class CreateTransactionComponent implements
         .toPromise();
     }
 
-    const res = await this.gs
-      .post<{data: any, errors: {message: string}[]}>(this.apiPath, {
-        query: `mutation CreateTransaction($input: CreateTransactionInput!) {
-          createTransaction(input: $input) {
-            id
-          }
-        }`,
-        variables: {
-          input: {
-            id: this.id,
-            compoundTransactionId: this.compoundTransactionId,
-            goodId: this.goodId,
-            buyerId: this.buyerId,
-            quantity: this.quantityControl.value,
-            priceFraction: _.isNumber(this.priceFraction) ? this.priceFraction : 1,
-            paid: this.paid
-          }
+    const res = await this.gs.post<CreateTransactionRes>(this.apiPath, {
+      query: `mutation CreateTransaction($input: CreateTransactionInput!) {
+        createTransaction(input: $input) {
+          id
         }
-      })
-      .toPromise();
+      }`,
+      variables: {
+        input: {
+          id: this.id,
+          compoundTransactionId: this.compoundTransactionId,
+          goodId: this.goodId,
+          buyerId: this.buyerId,
+          quantity: this.quantityControl.value,
+          priceFraction: _.isNumber(this.priceFraction) ? this.priceFraction : 1,
+          paid: this.paid
+        }
+      }
+    })
+    .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

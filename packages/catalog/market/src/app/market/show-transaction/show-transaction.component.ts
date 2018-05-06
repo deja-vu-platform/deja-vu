@@ -9,6 +9,10 @@ import { ShowGoodComponent } from '../show-good/show-good.component';
 import { API_PATH } from '../market.config';
 import { Transaction } from '../shared/market.model';
 
+interface TransactionRes {
+  data: { transaction: Transaction },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-transaction',
@@ -64,7 +68,7 @@ export class ShowTransactionComponent {
     if (!this.gs || this.transaction || !this.id) {
       return;
     }
-    this.gs.get<{data: {transaction: Transaction}}>(this.apiPath, {
+    this.gs.get<TransactionRes>(this.apiPath, {
       params: {
         query: `
           query {

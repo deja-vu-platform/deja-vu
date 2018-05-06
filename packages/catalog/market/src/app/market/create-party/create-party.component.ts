@@ -15,7 +15,12 @@ import {
 import * as _ from 'lodash';
 
 import { API_PATH } from '../market.config';
+import { Party } from '../shared/market.model';
 
+interface CreatePartyRes {
+  data: { createParty: Party },
+  errors: { message: string[] }
+}
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -66,7 +71,7 @@ export class CreatePartyComponent implements
 
   async dvOnRun(): Promise<void> {
     const res = await this.gs
-      .post<{data: any, errors: {message: string[]}}>(this.apiPath, {
+      .post<CreatePartyRes>(this.apiPath, {
         query: `mutation CreateParty($input: CreatePartyInput!) {
           createParty(input: $input) {
             id
