@@ -46,6 +46,8 @@ export type ValueMap = {[field: string]: any};
 export interface Action {
   // The type of the action to include
   type: Type<Component>;
+  tag?: string;
+  dvAlias?: string;
   // Optional value to specify the cliche the action is from
   dvOf?: string;
   // A map of (adapter input name) -> (action input name)
