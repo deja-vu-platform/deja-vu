@@ -31,7 +31,8 @@ interface TagOnly extends TagInfo {
 
 
 export function getActionAst(
-  projectName: string, usedCliches: ReadonlyArray<string>, html: string)
+  projectName: string, actionName: string, usedCliches: ReadonlyArray<string>,
+  html: string)
   : ActionAst {
   const tagsToKeep = new Set([ projectName, ...usedCliches, 'dv' ]);
 
@@ -39,6 +40,7 @@ export function getActionAst(
       filterActionTags(tagsToKeep),
       flatten(tagsToKeep),
       buildActionAst(),
+      checkForErrors(actionName)
     ])
     .process(html, { sync: true })
     .tree;
@@ -117,6 +119,55 @@ function buildActionAst() {
   };
 
   return _buildActionAst;
+}
+
+
+/**
+ * Check for errors in the tree. The following are considered errors:
+ *   - having the same action as a child more than once
+ *   - having sibling dv-tx nodes with the same child action
+ *
+ * These are errors because at runtime we can't tell apart the requests from
+ * these actions with the same path and we need to be able to tell them apart
+ * because they are part of a tx.
+ */
+function checkForErrors(actionName: string) {
+  const getRepeatedFqTags = (actionAst: ActionAst) => _.pickBy(
+    _.groupBy(actionAst, 'fqtag'),
+    (actions: ActionTag[]) => actions.length > 1);
+  const _checkForErrors = (path: string, fqtag: string) =>
+    (tree: ActionAst): ActionAst => {
+      const currPath = path + ' -> ' + fqtag;
+      const repeatedFqTags = getRepeatedFqTags(tree);
+      if (!_.isEmpty(repeatedFqTags) && fqtag === 'dv-tx') {
+        throw new Error(`
+          More than one element with the same fqtag inside a dv-tx
+          solution: use aliasing
+          path: ${currPath}
+          repeated fqtag: ${_.keys(repeatedFqTags)}
+        `);
+      }
+      const repeatedDvTxTags = repeatedFqTags['dv-tx'];
+      if (!_.isEmpty(repeatedDvTxTags)) {
+        const repeatedDvTxChildren = getRepeatedFqTags(
+          _.flatMap(repeatedDvTxTags, 'content'));
+        if (!_.isEmpty(repeatedDvTxChildren)) {
+          throw new Error(`
+            More than one element with the same fqtag inside sibling dv-tx nodes
+            solution: use aliasing
+            path: ${currPath}
+            repeated fqtags: ${_.keys(repeatedDvTxChildren)}
+          `);
+        }
+      }
+      _.each(tree, (actionTag: ActionTag): void => {
+        _checkForErrors(currPath, actionTag.fqtag)(actionTag.content);
+      });
+
+      return tree;
+    };
+
+  return _checkForErrors('', actionName);
 }
 
 /**
