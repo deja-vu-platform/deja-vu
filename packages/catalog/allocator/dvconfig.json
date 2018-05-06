@@ -13,6 +13,11 @@
   "actions": {
     "package": {
       "include": [ "src/app/allocator/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "allocator-root" }
+      ]
     }
   }
 }
