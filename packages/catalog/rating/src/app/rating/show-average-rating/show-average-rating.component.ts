@@ -54,7 +54,10 @@ export class ShowAverageRatingComponent implements OnInit, OnChanges {
       params: {
         query: `
           query {
-            averageRatingForTarget(targetId: "${this.targetId}")
+            averageRatingForTarget(targetId: "${this.targetId}") {
+              rating,
+              count
+            }
           }
         `
       }

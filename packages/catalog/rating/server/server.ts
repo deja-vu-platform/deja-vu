@@ -28,11 +28,6 @@ interface RatingsInput {
   ofTargetId?: string;
 }
 
-interface AverageRatingForTargetOutput {
-  rating: number;
-  count: number;
-}
-
 interface UpdateRatingInput {
   sourceId: string;
   targetId: string;
@@ -119,25 +114,21 @@ const resolvers = {
       }
     },
 
-    // tslint:disable-next-line:max-line-length
-    averageRatingForTarget: async (root, { targetId }): Promise<AverageRatingForTargetOutput> => {
-      console.log('HAVE WE MADE IT');
+    averageRatingForTarget: async (root, { targetId }) => {
       const results = await ratings.aggregate([
         { $match: { targetId: targetId } },
-        { $count: 'count' },
         {
           $group:
             {
               _id: 0,
-              average: { $avg: '$rating' }
+              average: { $avg: '$rating' },
+              count: { $sum: 1 }
             }
         }
       ])
         .toArray();
 
       if (_.isEmpty(results)) { throw new Error(`Target does not exist`); }
-
-      console.log('HEY', results);
 
       return {
         rating: results[0]['average'],
