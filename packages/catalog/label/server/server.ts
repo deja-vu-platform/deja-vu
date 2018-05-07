@@ -99,19 +99,33 @@ const resolvers = {
     items: async (root, { input }: { input: ItemsInput }) => {
       if (input.labelIds) {
         // Items matching all labelIds
-        const standarardizedLabelIds = _.map(input.labelIds, standardizeLabel);
-        const inputLabels =
-          await labels.find({ id: { $in: standarardizedLabelIds } },
-            { projection: { itemIds: 1 } })
-            .toArray();
+        const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
+        const res = await labels.aggregate([
+          { $match: { id: { $in: standardizedLabelIds } } },
+          {
+            $group: {
+              _id: 0,
+              itemIds: { $push: '$itemIds' },
+              initialSet: { $first: '$itemIds' }
+            }
+          },
+          {
+            $project: {
+              itemIds: {
+                $reduce: {
+                  input: '$itemIds',
+                  initialValue: '$initialSet',
+                  in: { $setIntersection: ['$$value', '$$this'] }
+                }
+              }
+            }
+          }
+        ])
+          .toArray();
 
-        if (inputLabels.length !== input.labelIds.length) {
-          return [];
-        }
+        console.log('HEY ITEMS', res);
 
-        const labelItemsIds = _.map(inputLabels, 'itemIds');
-
-        return _.intersection(labelItemsIds);
+        return !_.isEmpty(res) ? res[0].itemIds : [];
       }
 
       // No label filter
@@ -162,32 +176,30 @@ const resolvers = {
     addLabelsToItem: async (root, { input }: { input: AddLabelsToItemInput }) =>
     // tslint:disable-next-line:one-line
     {
-      let status;
-
       const labelIds = _.map(input.labelIds, standardizeLabel);
 
-      // Find existing labels
-      const existingLabels: LabelDoc[] = await labels
-        .find({ id: { $in: labelIds } }, { projection: { id: 1 } })
-        .toArray();
-      const existingLabelIds = _.map(existingLabels, 'id');
+      const bulkUpdateOps = _.map(labelIds, (labelId) => {
+        return {
+          updateOne: {
+            filter: { id: labelId },
+            update: {
+              $push: { itemIds: input.itemId }
+            },
+            upsert: true
+          }
+        };
+      });
 
-      // Determine the new labels and add them
-      const newLabelIds = _.difference(existingLabelIds, labelIds);
-      if (!_.isEmpty(newLabelIds)) {
-        const newLabels: LabelDoc[] =
-          _.map(newLabelIds, (id) => ({ id: id, itemIds: [input.itemId] }));
-        const insertRes = await labels.insert(newLabels);
-        status = insertRes.insertedCount !== newLabelIds.length;
-      }
+      const result = await labels.bulkWrite(bulkUpdateOps, (err, res) => {
 
-      // Update other labels with the itemId
-      const updateOperation = { $push: { itemIds: input.itemId } };
+        if (err) { throw new Error(err.message); }
 
-      const res = await labels
-        .update({ id: { $in: existingLabelIds } }, updateOperation);
+        const modified = res.modifiedCount ? res.modifiedCount : 0;
+        const upserted = res.upsertedCount ? res.upsertedCount : 0;
 
-      return status && (res.result.nModified === existingLabelIds.length);
+        return (modified + upserted === labelIds.length);
+      });
+
     },
 
     createLabel: async (root, { id }) => {

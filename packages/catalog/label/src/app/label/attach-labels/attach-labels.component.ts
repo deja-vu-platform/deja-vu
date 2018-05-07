@@ -114,6 +114,7 @@ export class AttachLabelsComponent implements
   dvOnAfterCommit() {
     this.labelsAttached = true;
     this.labelsAttachedError = '';
+    this.labels = [];
     window.setTimeout(() => {
       this.labelsAttached = false;
     }, SAVED_MSG_TIMEOUT);
