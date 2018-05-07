@@ -2,15 +2,20 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import * as _ from 'lodash';
+import * as RJSON from 'relaxed-json';
 
 export type ActionAst = ReadonlyArray<ActionTag>;
+export interface InputMap {
+  [name: string]: string; /* expr */
+}
 
 export interface ActionTag {
   readonly fqtag: string;
   readonly dvOf?: string;
   readonly dvAlias?: string;
   readonly tag: string;
-  readonly inputs?: {[name: string]: string} /* expr */;
+  readonly inputs?: InputMap;
+  readonly context?: InputMap;
   readonly content?: ActionAst;
 }
 
@@ -18,57 +23,46 @@ export interface ActionTable {
   readonly [tag: string]: ActionAst;
 }
 
+// From dv-core
+export interface FieldMap {
+  [field: string]: string;
+}
+export interface ActionInput {
+  tag: string;
+  // Optional value to specify the cliche the action is from
+  dvOf?: string;
+  dvAlias?: string;
+  // A map of (adapter input name) -> (action input name)
+  inputMap?: FieldMap;
+  // A map of input names to exprs
+  inputs?: FieldMap;
+}
+
 const ACTION_TABLE_FILE_NAME = 'actionTable.json';
 
-// Having the same action as a child more than once is a problem for
-// dv-tx nodes because we can't tell apart the requests. It is also
-// a problem if we have sibling dv-tx nodes with the same child action for the
-// same reason. When we encounter an ambigous path we throw an error. The
-// solution is for the user to alias the dv-tx or the duplicated action.
+
 export class ActionHelper {
   private readonly actionTable: ActionTable;
-  constructor(
-    appName: string, appActionTable: ActionTable,
-    usedCliches: {[alias: string]: string}) {
-    // The table should only contain actions that are reachable from the app
-    const usedClicheActions = new Set<string>();
-    const getUsedClicheActions = (actionAst: ActionAst | undefined): void => {
+  constructor(appActionTable: ActionTable, usedCliches: string[]) {
+    const clicheActionTables: ActionTable[] = _.map(
+        _.uniq(usedCliches), this.getActionTableOfCliche.bind(this));
+    const allActionsTable = _.assign({}, appActionTable, ...clicheActionTables);
+
+    // Prune the action table to have only used actions
+    // TODO: instead of adding all app actions, use the route information
+    const usedActions = new Set<string>(_.keys(appActionTable));
+    const getUsedActions = (actionAst: ActionAst | undefined): void => {
       _.each(actionAst, (action: ActionTag) => {
-        const cliche = this.clicheOfTag(action.tag);
-        switch (cliche) {
-          case appName:
-            return;
-          case 'dv':
-            getUsedClicheActions(action.content);
-            break;
-          default:
-            usedClicheActions.add(action.tag);
-            getUsedClicheActions(action.content);
-            break;
+        if (action.tag === 'dv-include' ||
+            this.clicheOfTag(action.tag) !== 'dv') {
+          usedActions.add(action.tag);
         }
+        getUsedActions(this.getActionContent(action, allActionsTable).content);
       });
     };
-    _.each(_.values(appActionTable), getUsedClicheActions);
+    _.each(_.values(appActionTable), getUsedActions);
 
-    const usedClicheNames = new Set<string>(_.values(usedCliches));
-    this.actionTable = {
-      ...appActionTable,
-      // Add the used cliche actions to the table
-      ..._.fromPairs(_.map(
-        Array.from(usedClicheActions),
-        (tag: string): [string, ActionAst] => {
-          const cliche = this.clicheOfTag(tag);
-          if (!usedClicheNames.has(cliche)) {
-            throw new Error(`No cliche ${cliche} in use`);
-          }
-          const clicheActionTable = this.getActionTableOfCliche(cliche);
-          if (!(tag in clicheActionTable)) {
-            throw new Error(`Cliche ${cliche} has no action ${tag}`);
-          }
-
-          return [ tag, clicheActionTable[tag] ];
-        }))
-    };
+    this.actionTable = _.pick(allActionsTable, Array.from(usedActions));
   }
 
   private getActionTableOfCliche(cliche: string): ActionTable {
@@ -97,8 +91,7 @@ export class ActionHelper {
   }
 
   /**
-   * Returns the `ActionTag` objects corresponding to the last node of the
-   * action path
+   * @returns the `ActionTag`s corresponding to the last node of the action path
    */
   getMatchingActions(actionPath: string[]): ActionTag[] {
     if (_.isEmpty(actionPath) || !(actionPath[0] in this.actionTable)) {
@@ -130,11 +123,114 @@ export class ActionHelper {
     }
 
     return _.flatMap(matchingNodes, (matchingNode: ActionTag) => {
-      const actionAst = this.clicheOfTag(matchingNode.tag) === 'dv' ?
-        matchingNode.content : this.actionTable[actionPath[0]];
+      const action = this.getActionContent(matchingNode, this.actionTable);
 
-      return this._getMatchingActions(actionPath.slice(1), actionAst);
+      return this._getMatchingActions(actionPath.slice(1), action.content);
     });
+  }
+
+  /**
+   *  @param actionTag - the action tag to get the content form
+   *  @param actionTable - the action table to use to retrieve the content
+   *  @returns an `ActionTag` representing the given action tag but with its
+   *    content populated
+   */
+  private getActionContent(actionTag: ActionTag, actionTable: ActionTable)
+    : ActionTag {
+    if (actionTag.tag === 'dv-include') {
+      return {
+        fqtag: actionTag.fqtag,
+        tag: actionTag.tag,
+        content: _.map(
+          [this.getIncludedActionTag(actionTag)], (at: ActionTag) => {
+          return {...at, context: {}};
+        }),
+        context: actionTag.context
+      };
+    } else if (this.clicheOfTag(actionTag.tag) === 'dv') {
+      return actionTag;
+    } else {
+      return {
+        fqtag: actionTag.fqtag,
+        tag: actionTag.tag,
+        content: _.map(actionTable[actionTag.tag], (at: ActionTag) => {
+          return {...at, context: actionTag.inputs};
+        }),
+        context: actionTag.context
+      };
+    }
+  }
+
+  /**
+   *  Get the fully qualified tag for the given tag.
+   */
+  private getFqTag(
+    tag: string, dvOf: string | undefined,
+    dvAlias: string | undefined): string {
+    if (dvAlias) {
+      return dvAlias;
+    }
+    let [clicheName, ...actionTagName] = tag.split('-');
+    if (dvOf) { clicheName = dvOf; }
+
+    return clicheName + '-' + actionTagName.join('-');
+  }
+
+  /**
+   *  Determine the included action tag from a `dv-include` action tag
+   *
+   *  @param includeActionTag - the action tag to get the included action from
+   *  @returns the included action tag
+   */
+  private getIncludedActionTag(includeActionTag: ActionTag): ActionTag {
+    const noActionErrorMsg = (cause: string) => `
+      Couldn't find the included action in ${JSON.stringify(includeActionTag)}:
+      ${cause} \n Context is ${JSON.stringify(includeActionTag.context)}
+    `;
+    const actionExpr: string = _.get(includeActionTag.inputs, '[action]');
+    if (_.isEmpty(actionExpr)) {
+      throw new Error(noActionErrorMsg('no action input'));
+    }
+    let ret: ActionTag;
+    if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
+      // action is not the default one
+      let inputObj: ActionInput, tag: string;
+      try {
+        inputObj = RJSON.parse(
+          _.get(includeActionTag.context, `[${actionExpr}]`)) as ActionInput;
+        tag = _.kebabCase(inputObj.tag);
+      } catch (e) {
+        throw new Error(noActionErrorMsg('Expected object with tag field'));
+      }
+      ret = {
+        fqtag: this.getFqTag(tag, inputObj.dvOf, inputObj.dvAlias),
+        tag: tag,
+        dvOf: inputObj.dvOf,
+        dvAlias: inputObj.dvAlias,
+        inputs: _.assign({},
+          _.mapValues(_.invert(inputObj.inputMap), (value) => {
+            return _.get(includeActionTag.context, value);
+          }),
+          ..._.get(inputObj, 'inputs', [])),
+        context: {}
+      };
+
+    } else {  // action is the default one
+      const tag = _.get(includeActionTag, 'inputs.tag');
+      const dvOf = _.get(includeActionTag, 'inputs.dvOf');
+      const dvAlias = _.get(includeActionTag, 'inputs.dvAlias');
+      const inputs = _.get(includeActionTag, 'inputs.inputs');
+      ret = {
+        fqtag: this.getFqTag(tag, dvOf, dvAlias),
+        tag: tag,
+        dvOf: dvOf,
+        dvAlias: dvAlias,
+        inputs: inputs ? RJSON.parse(inputs) : undefined,
+        context: {}
+      };
+    }
+
+    return ret;
   }
 
   // Returns an array [action_1, action_2, ..., action_n] representing an action
