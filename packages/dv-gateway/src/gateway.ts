@@ -2,6 +2,7 @@ import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as minimist from 'minimist';
 import * as request from 'superagent';
+import { v4 as uuid } from 'uuid';
 
 import { readFileSync } from 'fs';
 import * as path from 'path';
@@ -175,6 +176,7 @@ interface RequestOptions {
 
 interface GatewayRequest {
   from: string[];
+  reqId: string;
   runId?: string | undefined;
   path?: string | undefined;
   options?: RequestOptions;
@@ -190,6 +192,7 @@ interface GatewayToClicheRequest extends GatewayRequest {
 app.use('/api', bodyParser.json(), async (req, res, next) => {
   const gatewayRequest: GatewayRequest = {
     from: JSON.parse(req.query.from),
+    reqId: uuid(),
     runId: req.query.runId,
     path: req.query.path,
     options: req.query.options ? JSON.parse(req.query.options) : undefined
@@ -234,9 +237,9 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
   const gatewayToClicheRequest = {
     ...gatewayRequest,
     ...{
-     url: `http://localhost:${dstTable[to]}`,
-     method: req.method,
-     body: req.body
+      url: `http://localhost:${dstTable[to]}`,
+      method: req.method,
+      body: req.body
     }
   };
 
