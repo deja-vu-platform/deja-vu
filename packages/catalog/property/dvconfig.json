@@ -28,5 +28,15 @@
       },
       "required": ["firstName", "lastName"]
     }
+  },
+  "actions": {
+    "package": {
+      "include": [ "src/app/property/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "property-root" }
+      ]
+    }
   }
 }

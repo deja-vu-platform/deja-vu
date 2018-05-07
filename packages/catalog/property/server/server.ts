@@ -24,6 +24,18 @@ interface Config {
   schema: any;
 }
 
+interface ObjectDoc extends Pending {
+  [field: string]: any;
+}
+
+interface Pending {
+  _pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+}
+
 const argv = minimist(process.argv);
 
 const name = argv.as ? argv.as : 'property';
@@ -49,7 +61,7 @@ const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 
-let db, objects;
+let db: mongodb.Db, objects: mongodb.Collection<ObjectDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -121,6 +133,11 @@ function createObjectFromInput(input) {
   return newObject;
 }
 
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
 
 const resolvers = {
   Query: {
@@ -133,9 +150,13 @@ const resolvers = {
         required: _.includes(config.schema.required, name)
       };
     },
-    object: (root, { id }) => objects
-      .findOne({ id: id }),
-    objects: (root) => objects.find().toArray(),
+    object: async (root, { id }) => {
+      const obj: ObjectDoc | null = await objects.findOne({ id: id });
+
+      return _.get(obj, '_pending') ? null : obj;
+    },
+    objects: (root) => objects.find({ _pending: { $exists: false } })
+      .toArray(),
     properties: (root) => _
       .chain(config.schema.properties)
       .toPairs()
@@ -152,18 +173,52 @@ const resolvers = {
     required: (root) => root.required
   },
   Mutation: {
-    createObject: async (root, { input }) => {
-      const newObject = createObjectFromInput(input);
-      await objects.insertOne(newObject);
+    createObject: async (root, { input }, context: Context) => {
+      const newObject: ObjectDoc = createObjectFromInput(input);
+      switch (context.reqType) {
+        case 'vote':
+          newObject._pending = { reqId: context.reqId };
+          /* falls through */
+        case undefined:
+          await objects.insertOne(newObject);
 
-      return newObject;
+          return newObject;
+        case 'commit':
+          await objects.updateOne(
+            { '_pending.reqId': context.reqId },
+            { $unset: { _pending: '' } });
+
+          return;
+        case 'abort':
+          await objects.deleteOne({ '_pending.reqId': context.reqId });
+
+          return;
+      }
     },
 
-    createObjects: async (root, { input }) => {
-      const objDocs = _.map(input, createObjectFromInput);
-      await objects.insertMany(objDocs);
+    createObjects: async (root, { input }, context: Context) => {
+      const objDocs: ObjectDoc[] = _.map(input, createObjectFromInput);
+      switch (context.reqType) {
+        case 'vote':
+          _.each(objDocs, (objDoc: ObjectDoc) => {
+            objDoc._pending = { reqId: context.reqId };
+          });
+          /* falls through */
+        case undefined:
+          await objects.insertMany(objDocs);
 
-      return objDocs;
+          return objDocs;
+        case 'commit':
+          await objects.updateMany(
+            { '_pending.reqId': context.reqId },
+            { $unset: { _pending: '' } });
+
+          return;
+        case 'abort':
+          await objects.deleteMany({ '_pending.reqId': context.reqId });
+
+          return;
+      }
     }
   }
 };
@@ -179,6 +234,39 @@ resolvers['Object'] = objectResolvers;
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
 
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 
