@@ -1,9 +1,16 @@
-import { Component, ElementRef, Input, OnInit, OnChanges } from '@angular/core';
+import {
+  Component, ElementRef, Inject, Input, OnInit, OnChanges
+} from '@angular/core';
 
 import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
+interface GoodRes {
+  data: { good: Good },
+  errors: {message: string}[]
+}
 
 @Component({
   selector: 'market-show-good',
@@ -18,7 +25,7 @@ export class ShowGoodComponent implements OnInit, OnChanges {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
 
   @Input() noPriceText = 'No price';
   @Input() noSupplyText = 'No supply';
@@ -29,7 +36,8 @@ export class ShowGoodComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -45,7 +53,7 @@ export class ShowGoodComponent implements OnInit, OnChanges {
     if (!this.gs || this.good || !this.id) {
       return;
     }
-    this.gs.get<{data: {good: Good}}>('/graphql', {
+    this.gs.get<GoodRes>(this.apiPath, {
       params: {
         query: `
           query {
@@ -54,7 +62,7 @@ export class ShowGoodComponent implements OnInit, OnChanges {
               ${this.showPrice ? 'price' : ''}
               ${this.showSupply ? 'supply' : ''}
               ${this.showSeller ? 'seller { id }' : ''}
-              ${this.showMarket ? 'market { id }' : ''}
+              ${this.showMarketId ? 'marketId' : ''}
             }
           }
         `

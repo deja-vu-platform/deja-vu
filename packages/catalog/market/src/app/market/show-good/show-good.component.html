@@ -26,11 +26,11 @@
     {{noSellerText}}
   </div>
 
-  <div *ngIf="showMarket && good.market"
+  <div *ngIf="showMarketId && good.marketId"
     class="market-show-good-market">
-    {{good.market.id}}
+    {{good.marketId}}
   </div>
-  <div *ngIf="showMarket && !good.market">
-    {{noMarketText}}
+  <div *ngIf="showMarketId && !good.marketId">
+    {{noMarketIdText}}
   </div>
 </span>

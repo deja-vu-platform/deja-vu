@@ -18,8 +18,6 @@ enum TransactionStatus {
   Canceled = 'Canceled'
 }
 
-interface MarketDoc { id: string; }
-
 interface PartyDoc {
   id: string;
   balance: number;
@@ -51,8 +49,6 @@ interface CompoundTransactionDoc {
   status: TransactionStatus;
 }
 
-interface Market { id: string; }
-
 interface Party {
   id: string;
   balance: number;
@@ -63,7 +59,7 @@ interface Good {
   price: number;
   seller?: Party; // optional when buyer is looking for a seller from whom to buy this
   supply: number;
-  market: Market;
+  marketId: string;
 }
 
 interface Transaction {
@@ -73,7 +69,7 @@ interface Transaction {
   seller?: Party;
   pricePerGood: number;
   quantity: number;
-  market: Market;
+  marketId: string;
   status: TransactionStatus;
 }
 
@@ -82,11 +78,6 @@ interface CompoundTransaction {
   transactions: Transaction[];
   totalPrice: number;
   status: TransactionStatus;
-}
-
-interface CreateMarketInput {
-  id: string | undefined;
-  withNewGoods: CreateGoodInput[];
 }
 
 interface CreatePartyInput {
@@ -144,7 +135,6 @@ interface Config {
   dbHost: string;
   dbPort: number;
   dbName: string;
-  initialMarketIds: string[];
   reinitDbOnStartup: boolean;
   // Whether to check and keep track of balances or not. Default is true.
   enforceBalance: boolean;
@@ -159,7 +149,6 @@ const DEFAULT_CONFIG: Config = {
   dbPort: 27017,
   wsPort: 3000,
   dbName: `${name}-db`,
-  initialMarketIds: [],
   reinitDbOnStartup: true,
   enforceBalance: true
 };
@@ -174,7 +163,11 @@ try {
 const config: Config = {...DEFAULT_CONFIG, ...configArg};
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, parties, goods, markets, transactions, compoundtransactions;
+let db: mongodb.Db,
+  parties: mongodb.Collection<PartyDoc>,
+  goods: mongodb.Collection<GoodDoc>,
+  transactions: mongodb.Collection<TransactionDoc>,
+  compoundtransactions: mongodb.Collection<CompoundTransactionDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -184,19 +177,12 @@ mongodb.MongoClient.connect(
     if (config.reinitDbOnStartup) {
       await db.dropDatabase();
       console.log(`Reinitialized db ${config.dbName}`);
-      if (!_.isEmpty(config.initialMarketIds)) {
-        await db.collection('markets')
-          .insertMany(_.map(config.initialMarketIds, (id) => ({id: id})));
-        console.log(
-          `Initialized market set with ${config.initialMarketIds}`);
-      }
     }
     parties = db.collection('parties');
     parties.createIndex({ id: 1 }, { unique: true, sparse: true });
     goods = db.collection('goods');
     goods.createIndex({ id: 1 }, { unique: true, sparse: true });
-    markets = db.collection('markets');
-    markets.createIndex({ id: 1 }, { unique: true, sparse: true });
+    goods.createIndex({ marketId: 1});
     transactions = db.collection('transactions');
     transactions.createIndex({ id: 1 }, { unique: true, sparse: true });
     compoundtransactions = db.collection('compoundtransactions');
@@ -207,10 +193,6 @@ mongodb.MongoClient.connect(
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  static async marketExists(marketId: string) {
-    return Validation.exists(markets, marketId, 'Market');
-  }
-
   static async partyExists(id: string): Promise<PartyDoc> {
     return Validation.exists(parties, id, 'Party');
   }
@@ -288,23 +270,21 @@ class Validation {
 }
 
 function goodDocToGood(goodDoc: GoodDoc): Good {
-  const ret = _.omit(goodDoc, ['sellerId', 'marketId']);
+  const ret = _.omit(goodDoc, ['sellerId']);
   if (goodDoc.sellerId) {
     ret.seller = { id: goodDoc.sellerId };
   }
-  ret.market = { id: goodDoc.marketId };
 
   return ret;
 }
 
 async function transactionDocToTransaction(transactionDoc: TransactionDoc): Promise<Transaction> {
-  const ret = _.omit(transactionDoc, ['goodId', 'buyerId', 'sellerId', 'marketId']);
+  const ret = _.omit(transactionDoc, ['goodId', 'buyerId', 'sellerId']);
   ret.good = { id: transactionDoc.goodId };
   ret.buyer = { id: transactionDoc.buyerId };
   if (transactionDoc.sellerId) {
     ret.seller = { id: transactionDoc.sellerId };
   }
-  ret.market = { id: transactionDoc.marketId };
   return ret;
 }
 
@@ -318,7 +298,6 @@ function compoundTransactionDocToCompoundTransaction(
   }
 
 async function createGood(input: CreateGoodInput) {
-  await Validation.marketExists(input.marketId);
   const good: GoodDoc = {
     id: input.id ? input.id : uuid(),
     price: input.price,
@@ -337,7 +316,6 @@ async function createGood(input: CreateGoodInput) {
 
 const resolvers = {
   Query: {
-    market: (_root, { id }) => markets.findOne({ id: id }),
     party: (_root, { id }) => parties.findOne({ id: id }),
     good: async (_root, { id }) => {
       const good = await Validation.goodExists(id);
@@ -379,7 +357,7 @@ const resolvers = {
     transactions: async (_root, { input }: { input: TransactionsInput })
       : Promise<Transaction[]> => {
       const matchingTransactions: TransactionDoc[] = await transactions
-        .find(input)
+        .find<TransactionDoc>(input)
         .toArray();
       return _.map(matchingTransactions, transactionDocToTransaction);
     }
@@ -393,7 +371,7 @@ const resolvers = {
     price: (good: Good) => good.price,
     seller: (good: Good) => good.seller,
     supply: (good: Good) => good.supply,
-    market: (good: Good) => good.market
+    marketId: (good: Good) => good.marketId
   },
   Transaction: {
     id: (transaction: Transaction) => transaction.id,
@@ -402,7 +380,7 @@ const resolvers = {
     seller: (transaction: Transaction) => transaction.seller,
     pricePerGood: (transaction: Transaction) => transaction.pricePerGood,
     quantity: (transaction: Transaction) => transaction.quantity,
-    market: (transaction: Transaction) => transaction.market,
+    marketId: (transaction: Transaction) => transaction.marketId,
     status: (transaction: Transaction) => transaction.status
   },
   CompoundTransaction: {
@@ -415,21 +393,6 @@ const resolvers = {
       compoundTransaction.status
   },
   Mutation: {
-    createMarket: async (_root, {input}: {input: CreateMarketInput}) => {
-      const marketId = input.id ? input.id : uuid();
-      const market: MarketDoc = { id: marketId };
-      await markets.insertOne(market);
-      await Promise.all(_
-        .chain(input.withNewGoods)
-        .map((g: CreateGoodInput) => {
-          g.marketId = marketId;
-
-          return g;
-        })
-        .map(createGood));
-
-      return market;
-    },
     createParty: async (_root, {input}: {input: CreatePartyInput}) => {
       const party: PartyDoc = {
         id: input.id ? input.id : uuid(),
@@ -448,6 +411,9 @@ const resolvers = {
     },
     createGood: async (_root, {input}: {input: CreateGoodInput}) => {
       return createGood(input);
+    },
+    createGoods: async (_root, {input}: {input: CreateGoodInput[]}) => {
+      return _.map(input, (createGoodInput) => createGood(createGoodInput));
     },
     updateGood: async (_root, {input}: {input: UpdateGoodInput}) => {
       await Validation.goodExists(input.id);
@@ -497,15 +463,8 @@ const resolvers = {
         transaction.sellerId = good.sellerId;
       }
       const goodUpdateOp = { $inc: { supply: -input.quantity }};
-      const opPromises = [
-        transactions.insertOne(transaction),
-        goods.updateOne({ id: input.goodId }, goodUpdateOp)
-      ];
-      if (good.sellerId && input.paid) {
-        opPromises.push(
-          makePayment(good.sellerId!, input.buyerId, pricePerGood * input.quantity));
-      }
 
+      const opPromises: Promise<any>[] = [];
       if (input.compoundTransactionId) {
         const status: TransactionStatus = input.paid ? TransactionStatus.Paid :
           TransactionStatus.Unpaid;
@@ -519,6 +478,14 @@ const resolvers = {
         opPromises.push(compoundtransactions.updateOne({
           id: input.compoundTransactionId
         }, updateOp));
+      }
+      
+      opPromises.push(transactions.insertOne(transaction),
+        goods.updateOne({ id: input.goodId }, goodUpdateOp));
+
+      if (good.sellerId && input.paid) {
+        opPromises.push(
+          makePayment(good.sellerId!, input.buyerId, pricePerGood * input.quantity));
       }
 
       await Promise.all(opPromises);

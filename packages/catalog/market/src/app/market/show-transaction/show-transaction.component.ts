@@ -1,13 +1,18 @@
 import {
-  Component, ElementRef, EventEmitter, Input, Output, Type
+  Component, ElementRef, EventEmitter, Inject, Input, Output, Type
 } from '@angular/core';
 
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
+import { API_PATH } from '../market.config';
 import { Transaction } from '../shared/market.model';
 
+interface TransactionRes {
+  data: { transaction: Transaction },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-transaction',
@@ -28,7 +33,7 @@ export class ShowTransactionComponent {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
 
   // Presentation inputs
   @Input() noGoodText = 'No good';
@@ -44,7 +49,8 @@ export class ShowTransactionComponent {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showTransaction = this;
   }
 
@@ -62,7 +68,7 @@ export class ShowTransactionComponent {
     if (!this.gs || this.transaction || !this.id) {
       return;
     }
-    this.gs.get<{data: {transaction: Transaction}}>('/graphql', {
+    this.gs.get<TransactionRes>(this.apiPath, {
       params: {
         query: `
           query {

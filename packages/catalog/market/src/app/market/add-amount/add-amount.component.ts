@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Input, OnInit, Type, ViewChild
+  Component, ElementRef, Inject, Input, OnInit, Type, ViewChild
 } from '@angular/core';
 
 import {
@@ -13,6 +13,12 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../market.config';
+
+interface AddAmountRes {
+  data: { addAmount: boolean },
+  errors: { message: string }[]
+}
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -44,7 +50,8 @@ export class AddAmountComponent implements OnInit, OnRun, OnAfterAbort,
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -56,19 +63,18 @@ export class AddAmountComponent implements OnInit, OnRun, OnAfterAbort,
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs
-      .post<{data: any, errors: {message: string}[]}>('/graphql', {
-        query: `mutation AddAmount($input: AddAmountInput!) {
-          addAmount(input: $input)
-        }`,
-        variables: {
-          input: {
-            partyId: this.partyId,
-            amount: this.balance.value
-          }
+    const res = await this.gs.post<AddAmountRes>(this.apiPath, {
+      query: `mutation AddAmount($input: AddAmountInput!) {
+        addAmount(input: $input)
+      }`,
+      variables: {
+        input: {
+          partyId: this.partyId,
+          amount: this.balance.value
         }
-      })
-      .toPromise();
+      }
+    })
+    .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

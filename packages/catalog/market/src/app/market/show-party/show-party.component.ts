@@ -1,9 +1,14 @@
-import { Component, ElementRef, Input } from '@angular/core';
+import { Component, ElementRef, Inject, Input } from '@angular/core';
 
 import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
+import { API_PATH } from '../market.config';
 import { Party } from '../shared/market.model';
 
+interface PartyRes {
+  data: { party: Party },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-party',
@@ -23,7 +28,8 @@ export class ShowPartyComponent {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {}
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -39,7 +45,7 @@ export class ShowPartyComponent {
     if (!this.gs || this.party || !this.id) {
       return;
     }
-    this.gs.get<{data: {party: Party}}>('/graphql', {
+    this.gs.get<PartyRes>(this.apiPath, {
       params: {
         query: `
           query {

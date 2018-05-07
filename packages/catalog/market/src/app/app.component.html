@@ -2,19 +2,11 @@
   <h1>Market</h1>
   <hr>
 
-  <h1>Stage Goods</h1>
-  <market-stage-goods
+  <h2>Create Goods</h2>
+  <market-create-goods
     [showOptionToInputPrice]="false"
     [showOptionToInputSeller]="false">
-  </market-stage-goods>
-
-  <h2>Create Market</h2>
-  <market-create-market
-    [supplyLabel]="'Supply!'"
-    [buttonLabel]="'Create Market!'"
-    [stageGoodsButtonLabel]="'Stage goods!'"
-    (market)="marketId = $event.id">
-  </market-create-market>
+  </market-create-goods>
 
   <h2>Create Party</h2>
   <market-create-party id="ben" (party)="partyId = $event.id"></market-create-party>
@@ -32,10 +24,10 @@
   <market-create-good-supply (supply)="goodSupply = $event"></market-create-good-supply>
   
   <h3>Required Seller</h3>
-  <market-create-good [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [sellerId]="partyId" (good)="goodId1 = $event.id"></market-create-good>
+  <market-create-good [price]="goodPrice" [supply]="goodSupply" marketId="dvmarket" [sellerId]="partyId" (good)="goodId1 = $event.id"></market-create-good>
 
   <h3>Optional Seller</h3>
-  <market-create-good [price]="goodPrice" [supply]="goodSupply" [marketId]="marketId" [showOptionToInputSeller]="false" (good)="goodId2 = $event.id"></market-create-good>
+  <market-create-good [price]="goodPrice" [supply]="goodSupply" marketId="dvmarket" [showOptionToInputSeller]="false" (good)="goodId2 = $event.id"></market-create-good>
 
   <h2>Update Good</h2>
   <market-update-good [id]="goodId2"></market-update-good>
@@ -52,7 +44,7 @@
   <market-show-goods [buyerId]="partyId" [compoundTransactionId]="'ctid'"></market-show-goods>
 
   <h2>Show Transactions</h2>
-  <market-show-transactions [buyerId]="partyId" [marketId]="marketId"></market-show-transactions>
+  <market-show-transactions [buyerId]="partyId" marketId="dvmarket"></market-show-transactions>
 
   <h2>Compound Transactions</h2>
   <market-create-compound-transaction id="ctid" (compoundTransaction)="compoundTransactionId = $event.id"></market-create-compound-transaction>

@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output
 } from '@angular/core';
 
 import {
@@ -9,6 +9,13 @@ import {
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../market.config';
+import { CompoundTransaction } from '../shared/market.model';
+
+interface CreateCompoundTransactionRes {
+  data: { createCompoundTransaction: CompoundTransaction },
+  errors: { message: string }[]
+}
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -34,7 +41,7 @@ export class CreateCompoundTransactionComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -46,21 +53,19 @@ export class CreateCompoundTransactionComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs
-      .post<{data: {createCompoundTransaction: {id: string}}, errors: {message: string}[]}>(
-        '/graphql', {
-          query: `mutation {
-            createCompoundTransaction(id: "${this.id}") {
-              id
-            }
-          }`,
-          variables: {
-            input: {
-              id: this.id
-            }
-          }
-        })
-        .toPromise();
+    const res = await this.gs.post<CreateCompoundTransactionRes>(this.apiPath, {
+      query: `mutation {
+        createCompoundTransaction(id: "${this.id}") {
+          id
+        }
+      }`,
+      variables: {
+        input: {
+          id: this.id
+        }
+      }
+    })
+    .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

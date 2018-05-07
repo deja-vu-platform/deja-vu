@@ -25,10 +25,10 @@ import { CreateGoodComponent } from './create-good/create-good.component';
 import {
   CreateGoodPriceComponent
 } from './create-good-price/create-good-price.component';
+import { CreateGoodsComponent } from './create-goods/create-goods.component';
 import {
   CreateGoodSupplyComponent
 } from './create-good-supply/create-good-supply.component';
-import { CreateMarketComponent } from './create-market/create-market.component';
 import { CreatePartyComponent } from './create-party/create-party.component';
 import {
   CreateTransactionComponent
@@ -54,19 +54,20 @@ import {
 import {
   ShowTransactionsComponent
 } from './show-transactions/show-transactions.component';
-import { StageGoodsComponent } from './stage-goods/stage-goods.component';
 import { UpdateGoodComponent } from './update-good/update-good.component';
+
+import { API_PATH } from './market.config';
 
 const allComponenents = [
   AddAmountComponent, CancelCompoundTransactionComponent,
   CancelTransactionComponent, CreateCompoundTransactionComponent,
   CreateBalanceComponent, CreateGoodComponent, CreateGoodPriceComponent,
-  CreateGoodSellerComponent, CreateGoodSupplyComponent, CreateMarketComponent,
+  CreateGoodsComponent, CreateGoodSellerComponent, CreateGoodSupplyComponent,
   CreatePartyComponent, CreateTransactionComponent,
   PayCompoundTransactionComponent, PayTransactionComponent,
   ShowCompoundTransactionComponent, ShowGoodComponent, ShowGoodsComponent,
   ShowPartyComponent, ShowTransactionComponent, ShowTransactionsComponent,
-  StageGoodsComponent, UpdateGoodComponent
+  UpdateGoodComponent
 ];
 
 @NgModule({
@@ -78,6 +79,7 @@ const allComponenents = [
     // Material
     MatButtonModule, MatFormFieldModule, MatInputModule
   ],
+  providers: [ { provide: API_PATH, useValue: '/graphql' } ],
   declarations: allComponenents,
   entryComponents: allComponenents,
   exports: allComponenents

@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
   SimpleChanges, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
@@ -10,8 +10,13 @@ import * as _ from 'lodash';
 
 import { ShowGoodComponent } from '../show-good/show-good.component';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
+interface GoodsRes {
+  data: { goods: Good[] },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-goods',
@@ -44,7 +49,7 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
   @Input() noGoodsToShowText = 'No goods to show';
 
   // Whether to show the user the option to {buy, ...} a good
@@ -68,7 +73,8 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showGoods = this;
   }
 
@@ -95,34 +101,33 @@ export class ShowGoodsComponent implements OnInit, OnChanges {
           .toPromise())
         .value());
 
-      this.gs
-        .get<{data: {goods: Good[]}}>('/graphql', {
-          params: {
-            query: `
-              query Goods($input: GoodsInput!) {
-                goods(input: $input) {
-                  ${this.showId ? 'id' : ''}
-                  ${this.showPrice ? 'price' : ''}
-                  ${this.showSupply ? 'supply' : ''}
-                  ${this.showSeller ? 'seller { id }' : ''}
-                  ${this.showMarket ? 'market { id }' : ''}
-                }
+      this.gs.get<GoodsRes>(this.apiPath, {
+        params: {
+          query: `
+            query Goods($input: GoodsInput!) {
+              goods(input: $input) {
+                ${this.showId ? 'id' : ''}
+                ${this.showPrice ? 'price' : ''}
+                ${this.showSupply ? 'supply' : ''}
+                ${this.showSeller ? 'seller { id }' : ''}
+                ${this.showMarketId ? 'marketId' : ''}
               }
-            `,
-            variables: JSON.stringify({
-              input: {
-                buyerId: this.buyerId,
-                sellerId: this.sellerId,
-                marketId: this.marketId,
-                affordable: this.affordable,
-                available: this.available
-              }
-            })
-          }
-        })
-        .subscribe((res) => {
-          this.goods = res.data.goods;
-        });
+            }
+          `,
+          variables: JSON.stringify({
+            input: {
+              buyerId: this.buyerId,
+              sellerId: this.sellerId,
+              marketId: this.marketId,
+              affordable: this.affordable,
+              available: this.available
+            }
+          })
+        }
+      })
+      .subscribe((res) => {
+        this.goods = res.data.goods;
+      });
     }
   }
 }

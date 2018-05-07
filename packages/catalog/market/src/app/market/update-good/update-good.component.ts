@@ -1,5 +1,6 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, ViewChild, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
+  ViewChild, Output
 } from '@angular/core';
 
 import {
@@ -16,8 +17,13 @@ import { map } from 'rxjs/operators';
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
+interface UpdateGoodRes {
+  data: { updateGood: boolean },
+  errors: { message: string }[]
+}
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -65,7 +71,8 @@ export class UpdateGoodComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -84,7 +91,7 @@ export class UpdateGoodComponent implements
     if (!this.gs || !this.id) {
       return;
     }
-    this.gs.get<{data: {good: Good}}>('/graphql', {
+    this.gs.get<{data: {good: Good}}>(this.apiPath, {
       params: {
         query: `
           query {
@@ -113,21 +120,20 @@ export class UpdateGoodComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs
-      .post<{data: {updateGood: Good}, errors: {message: string}[]}>('/graphql', {
-        query: `mutation UpdateGood($input: UpdateGoodInput!) {
-          updateGood (input: $input)
-        }`,
-        variables: {
-          input: {
-            id: this.id,
-            price: this.priceControl.value,
-            sellerId: this.sellerIdControl.value,
-            supply: this.supplyControl.value
-          }
+    const res = await this.gs.post<UpdateGoodRes>('/graphql', {
+      query: `mutation UpdateGood($input: UpdateGoodInput!) {
+        updateGood (input: $input)
+      }`,
+      variables: {
+        input: {
+          id: this.id,
+          price: this.priceControl.value,
+          sellerId: this.sellerIdControl.value,
+          supply: this.supplyControl.value
         }
-      })
-      .toPromise();
+      }
+    })
+    .toPromise();
 
     if (res.errors) {
       throw new Error(_.map(res.errors, 'message')

@@ -1,5 +1,5 @@
 import {
-  ChangeDetectorRef, Component, ElementRef, EventEmitter, Input,
+  ChangeDetectorRef, Component, ElementRef, EventEmitter, Inject, Input,
   OnChanges, OnInit, Output, SimpleChanges, ViewChild
 } from '@angular/core';
 
@@ -17,11 +17,12 @@ import { take } from 'rxjs/operators';
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../market.config';
 import { Good } from '../shared/market.model';
 
-interface CreateGoodResponse {
-  data: {createGood: Good};
-  errors: {message: string}[];
+interface CreateGoodRes {
+  data: { createGood: Good };
+  errors: { message: string }[];
 }
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -81,7 +82,7 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private ref: ChangeDetectorRef) {}
+    private ref: ChangeDetectorRef, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -110,7 +111,7 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
       price: this.priceControl.value,
       seller: { id: this.sellerIdControl.value },
       supply: this.supplyControl.value,
-      market: { id: this.marketId }
+      marketId: this.marketId
     };
     if (this.save) {
       if (!this.marketId) {
@@ -118,24 +119,23 @@ implements OnInit, OnChanges, OnRun, OnAfterCommit, OnAfterAbort {
           .pipe(take(1))
           .toPromise();
       }
-      const res = await this.gs
-        .post<CreateGoodResponse>('/graphql', {
-          query: `mutation CreateGood($input: CreateGoodInput!) {
-            createGood (input: $input) {
-              id
-            }
-          }`,
-          variables: {
-            input: {
-              id: this.id,
-              price: this.priceControl.value,
-              sellerId: this.sellerIdControl.value,
-              supply: this.supplyControl.value,
-              marketId: this.marketId
-            }
+      const res = await this.gs.post<CreateGoodRes>(this.apiPath, {
+        query: `mutation CreateGood($input: CreateGoodInput!) {
+          createGood (input: $input) {
+            id
           }
-        })
-        .toPromise();
+        }`,
+        variables: {
+          input: {
+            id: this.id,
+            price: this.priceControl.value,
+            sellerId: this.sellerIdControl.value,
+            supply: this.supplyControl.value,
+            marketId: this.marketId
+          }
+        }
+      })
+      .toPromise();
 
       if (res.errors) {
         throw new Error(_.map(res.errors, 'message')

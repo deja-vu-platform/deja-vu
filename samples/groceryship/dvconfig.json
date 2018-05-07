@@ -23,7 +23,6 @@
       "config": {
         "wsPort": 3004,
         "reinitDbOnStartup": false,
-        "initialMarketIds": ["groceryship"],
         "enforceBalance": false
       }
     },

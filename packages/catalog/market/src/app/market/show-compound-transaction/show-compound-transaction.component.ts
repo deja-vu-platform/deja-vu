@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, Type } from '@angular/core';
+import { Component, ElementRef, Inject, Input, Type } from '@angular/core';
 
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
@@ -6,8 +6,13 @@ import {
   ShowTransactionComponent
 } from '../show-transaction/show-transaction.component';
 
+import { API_PATH } from '../market.config';
 import { CompoundTransaction } from '../shared/market.model';
 
+interface CompoundTransactionRes {
+  data: { compoundTransaction: CompoundTransaction },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-compound-transaction',
@@ -34,7 +39,7 @@ export class ShowCompoundTransactionComponent {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
 
   // Whether to show the user the option to {pay, cancel} a good
   @Input() showOptionToPay = true;
@@ -49,7 +54,8 @@ export class ShowCompoundTransactionComponent {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showCompoundTransaction = this;
   }
 
@@ -67,7 +73,7 @@ export class ShowCompoundTransactionComponent {
     if (!this.gs || this.compoundTransaction || !this.id) {
       return;
     }
-    this.gs.get<{data: {compoundTransaction: CompoundTransaction}}>('/graphql', {
+    this.gs.get<CompoundTransactionRes>(this.apiPath, {
       params: {
         query: `
           query {

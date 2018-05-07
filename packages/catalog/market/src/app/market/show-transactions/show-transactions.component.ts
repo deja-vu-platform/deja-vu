@@ -1,12 +1,17 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
 import { ShowTransactionComponent } from '../show-transaction/show-transaction.component';
 
+import { API_PATH } from '../market.config';
 import { Transaction, TransactionStatus } from '../shared/market.model';
 
+interface TransactionsRes {
+  data: { transactions: Transaction[] },
+  errors: { message: string }[]
+}
 
 @Component({
   selector: 'market-show-transactions',
@@ -34,7 +39,7 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
   @Input() showPrice = true;
   @Input() showSupply = true;
   @Input() showSeller = true;
-  @Input() showMarket = true;
+  @Input() showMarketId = true;
 
   // Whether to show the user the option to {pay, cancel} a good
   // Requires buyer and seller
@@ -50,7 +55,8 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showTransactions = this;
   }
 
@@ -65,34 +71,33 @@ export class ShowTransactionsComponent implements OnInit, OnChanges {
 
   fetchTransactions() {
     if (this.gs) {
-      this.gs
-        .get<{data: {transactions: Transaction[]}}>('/graphql', {
-          params: {
-            query: `
-              query Transactions($input: TransactionsInput!) {
-                transactions(input: $input) {
-                  id
-                  ${this.showStatus || this.showOptionToCancel ? 'status': ''}
-                  ${this.showOptionToPay ?
-                    'buyer { id }\n' +
-                    'seller { id }\n' : ''
-                  }
+      this.gs.get<TransactionsRes>(this.apiPath, {
+        params: {
+          query: `
+            query Transactions($input: TransactionsInput!) {
+              transactions(input: $input) {
+                id
+                ${this.showStatus || this.showOptionToCancel ? 'status': ''}
+                ${this.showOptionToPay ?
+                  'buyer { id }\n' +
+                  'seller { id }\n' : ''
                 }
               }
-            `,
-            variables: JSON.stringify({
-              input: {
-                buyerId: this.buyerId,
-                sellerId: this.sellerId,
-                marketId: this.marketId,
-                status: this.status
-              }
-            })
-          }
-        })
-        .subscribe((res) => {
-          this.transactions = res.data.transactions;
-        });
+            }
+          `,
+          variables: JSON.stringify({
+            input: {
+              buyerId: this.buyerId,
+              sellerId: this.sellerId,
+              marketId: this.marketId,
+              status: this.status
+            }
+          })
+        }
+      })
+      .subscribe((res) => {
+        this.transactions = res.data.transactions;
+      });
     }
   }
 }
