@@ -14,14 +14,14 @@
           marketId: marketId
           }"
         [outputs]="{good: 'stage'}"
-        [parent]="stageGoodsComponent">
+        [parent]="createGoodsComponent">
       </dv-include>
     </div>
   </div>
 
   <div *ngIf="stagedGoodsHeader" class="row">
     <div class="col-md-12">
-      <dv-include [action]="stagedGoodsHeader" [parent]="stageGoodsComponent">
+      <dv-include [action]="stagedGoodsHeader" [parent]="createGoodsComponent">
       </dv-include>
     </div>
   </div>
@@ -36,7 +36,7 @@
               <dv-include [action]="showGood" [inputs]="{
                 good: good
                }"
-               [parent]="stageGoodsComponent">
+               [parent]="createGoodsComponent">
               </dv-include>
             </div>
             <div class="col-md-2">

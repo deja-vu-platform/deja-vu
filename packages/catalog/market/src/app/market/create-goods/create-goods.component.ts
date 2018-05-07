@@ -72,7 +72,7 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   newGoodsError: string;
 
   private gs: GatewayService;
-  stageGoodsComponent = this;
+  createGoodsComponent = this;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,

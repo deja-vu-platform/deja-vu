@@ -480,8 +480,8 @@ const resolvers = {
         }, updateOp));
       }
       
-      opPromises.push(...[ transactions.insertOne(transaction),
-        goods.updateOne({ id: input.goodId }, goodUpdateOp) ]);
+      opPromises.push(transactions.insertOne(transaction),
+        goods.updateOne({ id: input.goodId }, goodUpdateOp));
 
       if (good.sellerId && input.paid) {
         opPromises.push(
