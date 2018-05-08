@@ -220,23 +220,32 @@ export class TxCoordinator<Message, Payload, State = any> {
 
   private async getTx(txId: string, cohortId: string)
     : Promise<TxDoc<Message, Payload>> {
-    // Look at the tx table and create one if there's no active tx for txId
-    return (await this.txs!.findOneAndUpdate(
-      { id: txId },
-      { $setOnInsert: {
-        state: 'voting',
-        startedOn: new Date(),
-        // We are going to be recomputing the expected cohorts for each tx we
-        // fetch but this lets us do `$setOnInsert`. We could check if the tx
-        // has been initialized and if not compute the expected cohorts but we
-        // would have to acquire the tx lock to do `find`, get the expected
-        // cohorts, and `update` atomically.
-        cohorts: _.map(
-          this.config.getCohorts(cohortId),
-          (cohortId: string) => ({id: cohortId}))
-      } },
-      { returnOriginal: false, upsert: true }))
-      .value!;
+    // We are going to be recomputing the expected cohorts for each tx we fetch
+    // but this lets us do `$setOnInsert`. We could check if the tx has been
+    // initialized and if not compute the expected cohorts but we would have to
+    // acquire the tx lock to do `find`, get the expected cohorts, and `update`
+    // atomically.
+    const cohorts = _.map(
+      this.config.getCohorts(cohortId), (cohortId: string) => ({id: cohortId}));
+    try { // https://jira.mongodb.org/browse/SERVER-14322
+      // Look at the tx table and create one if there's no active tx for txId
+      return (await this.txs!.findOneAndUpdate(
+        { id: txId },
+        { $setOnInsert: {
+          state: 'voting',
+          startedOn: new Date(),
+          cohorts: cohorts
+        } },
+        { returnOriginal: false, upsert: true }))
+        .value!;
+    } catch (e) {
+      log(txMsg(e, txId));
+
+      // Definitely not null because the catch should only happen if we have two
+      // concurrent threads trying to do the upsert at the same time. In that
+      // case one succeeds but the other fails with a unique exception.
+      return (await this.txs!.findOne({ id: txId }))!;
+    }
   }
 
   private async processVote(
