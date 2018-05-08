@@ -4,13 +4,14 @@ import * as minimist from 'minimist';
 import * as request from 'superagent';
 import { v4 as uuid } from 'uuid';
 
+import * as assert from 'assert';
 import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import * as _ from 'lodash';
 
 import {
-  ActionAst, ActionHelper, ActionTable, ActionTag
+  ActionAst, ActionHelper, ActionTable, ActionTag, ActionTagPath
 } from './actionHelper';
 import { TxConfig, TxCoordinator, Vote } from './txCoordinator';
 
@@ -71,10 +72,10 @@ interface ClicheResponse<T> {
   text: T;
 }
 
-function newReqWith(prepend: string, gcr: GatewayToClicheRequest)
+function newReqFor(msg: string, gcr: GatewayToClicheRequest)
   : GatewayToClicheRequest {
   const ret: GatewayToClicheRequest = _.clone(gcr);
-  ret.path = prepend + ret.path;
+  ret.path = `/dv/${gcr.reqId}/${msg}` + ret.path;
 
   return ret;
 }
@@ -86,16 +87,16 @@ const txConfig: TxConfig<
   dbName: config.dbName,
   reinitDbOnStartup: config.reinitDbOnStartup,
   sendCommitToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
-    return forwardRequest(newReqWith('/commit', gcr))
+    return forwardRequest(newReqFor('commit', gcr))
       .then((unusedResp) => undefined);
   },
   sendAbortToCohort: (gcr: GatewayToClicheRequest): Promise<void> => {
-    return forwardRequest(newReqWith('/abort', gcr))
+    return forwardRequest(newReqFor('abort', gcr))
       .then((unusedResp) => undefined);
   },
   sendVoteToCohort: (gcr: GatewayToClicheRequest)
     : Promise<Vote<ClicheResponse<string>>> => {
-    return forwardRequest<Vote<string>>(newReqWith('/vote', gcr))
+    return forwardRequest<Vote<string>>(newReqFor('vote', gcr))
       .then((resp: ClicheResponse<Vote<string>>)
         : Vote<ClicheResponse<string>> => {
         const vote = {
@@ -123,13 +124,16 @@ const txConfig: TxConfig<
     res!.send(payload.text);
   },
   getCohorts: (actionPathId: string) => {
-    const actionPath = idToActionPath(actionPathId);
-    const pathToDvTxNode = _.takeWhile(actionPath, (a) => a !== 'dv-tx');
-    pathToDvTxNode.push('dv-tx');
+    const actionPath: string[] = idToActionPath(actionPathId);
+    const dvTxNodeIndex = _.indexOf(actionPath, 'dv-tx');
 
+    const paths: ActionTagPath[] = actionHelper.getMatchingPaths(actionPath);
     // We know that the action path is a valid one because if otherwise the tx
     // would have never been initiated in the first place
-    const dvTxNode = actionHelper.getActionOrFail(pathToDvTxNode);
+    assert.ok(paths.length === 1,
+      `Expected 1 path but got ${JSON.stringify(paths, null, 2)}`);
+    const actionTagPath: ActionTagPath = paths[0];
+    const dvTxNode = actionTagPath[dvTxNodeIndex];
 
     const cohortActions = _.reject(dvTxNode.content, (action: ActionTag) => {
       return action.tag.split('-')[0] === 'dv' ||
@@ -138,7 +142,7 @@ const txConfig: TxConfig<
 
     const cohorts = _.map(
       cohortActions, (action: ActionTag) => actionPathToId(
-        [...pathToDvTxNode, action.fqtag]
+        [..._.take(actionPath, dvTxNodeIndex + 1), action.fqtag]
       ));
 
     return cohorts;

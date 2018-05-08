@@ -30,6 +30,7 @@
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
     "lodash": "^4.17.5",
+    "lodash.product": "^18.1.16",
     "minimist": "^1.2.0",
     "mongodb": "^3.0.4",
     "relaxed-json": "^1.0.1",

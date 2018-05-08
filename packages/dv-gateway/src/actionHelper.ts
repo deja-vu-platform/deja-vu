@@ -2,6 +2,8 @@ import { readFileSync } from 'fs';
 import * as path from 'path';
 
 import * as _ from 'lodash';
+import 'lodash.product';
+
 import * as RJSON from 'relaxed-json';
 
 export type ActionAst = ReadonlyArray<ActionTag>;
@@ -18,6 +20,8 @@ export interface ActionTag {
   readonly context?: InputMap;
   readonly content?: ActionAst;
 }
+
+export type ActionTagPath = ActionTag[];
 
 export interface ActionTable {
   readonly [tag: string]: ActionAst;
@@ -94,22 +98,33 @@ export class ActionHelper {
    * @returns the `ActionTag`s corresponding to the last node of the action path
    */
   getMatchingActions(actionPath: string[]): ActionTag[] {
-    if (_.isEmpty(actionPath) || !(actionPath[0] in this.actionTable)) {
-      return [];
-    } else if (actionPath.length === 1 && actionPath[0] in this.actionTable) {
-      return [{
-        fqtag: actionPath[0],
-        tag: actionPath[0],
-        content: this.actionTable[actionPath[0]]
-      }];
-    }
-
-    return this._getMatchingActions(
-      actionPath.slice(1), this.actionTable[actionPath[0]]);
+    return _.map(this.getMatchingPaths(actionPath.slice(1)), _.last);
   }
 
-  private _getMatchingActions(
-    actionPath: string[], actionAst: ActionAst | undefined): ActionTag[] {
+  /**
+   * @returns an list of matching paths
+   */
+  getMatchingPaths(actionPath: string[]): ActionTagPath[] {
+    if (_.isEmpty(actionPath) || !(actionPath[0] in this.actionTable)) {
+      return [];
+    }
+    const matchingPaths = [[{
+      fqtag: actionPath[0],
+      tag: actionPath[0],
+      content: this.actionTable[actionPath[0]]
+    }]];
+    if (actionPath.length === 1 && actionPath[0] in this.actionTable) {
+      return matchingPaths;
+    }
+
+    return this._getMatchingPaths(
+      actionPath.slice(1), this.actionTable[actionPath[0]], matchingPaths);
+  }
+
+  private _getMatchingPaths(
+    actionPath: string[], actionAst: ActionAst | undefined,
+    pathsMatchingSoFar: ActionTagPath[])
+    : ActionTagPath[] {
     // actionPath.length is always >= 1
 
     if (_.isEmpty(actionAst)) {
@@ -119,13 +134,23 @@ export class ActionHelper {
       actionAst, (at: ActionTag) => at.fqtag === actionPath[0]);
 
     if (actionPath.length === 1) {
-      return matchingNodes;
+      _.each(_.product(pathsMatchingSoFar, matchingNodes),
+        (matchingPath: ActionTagPath, matchingNode: ActionTag): void => {
+          matchingPath.push(matchingNode);
+        });
+
+      return pathsMatchingSoFar;
     }
 
     return _.flatMap(matchingNodes, (matchingNode: ActionTag) => {
       const action = this.getActionContent(matchingNode, this.actionTable);
 
-      return this._getMatchingActions(actionPath.slice(1), action.content);
+      _.each(pathsMatchingSoFar, (matchingPath: ActionTagPath): void => {
+        matchingPath.push(action);
+      });
+
+      return this._getMatchingPaths(
+        actionPath.slice(1), action.content, pathsMatchingSoFar);
     });
   }
 
