@@ -61,11 +61,11 @@ export class ShowRatingComponent implements
       this.gs.get<RatingRes>(this.apiPath, {
         params: {
           query: `
-          query Rating($input: RatingInput) {
-            rating(input: $input) {
-              rating
+            query Rating($input: RatingInput!) {
+              rating(input: $input) {
+                rating
+              }
             }
-          }
           `,
           variables: JSON.stringify({
             input: {

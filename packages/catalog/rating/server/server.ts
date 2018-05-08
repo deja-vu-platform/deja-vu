@@ -99,19 +99,19 @@ const resolvers = {
     },
 
     ratings: (root, { input }: { input: RatingsInput }) => {
+      const filter = {};
       if (input.bySourceId) {
         // All ratings by a source
-        return ratings.find({ sourceId: input.bySourceId })
-          .toArray();
-      } else if (input.ofTargetId) {
-        // All ratings of a target
-        return ratings.find({ targetId: input.ofTargetId })
-          .toArray();
-      } else {
-        // All ratings
-        return ratings.find()
-          .toArray();
+        filter['sourceId'] = input.bySourceId;
       }
+
+      if (input.ofTargetId) {
+        // All ratings of a target
+        filter['targetId'] = input.ofTargetId;
+      }
+
+      return ratings.find(filter)
+        .toArray();
     },
 
     averageRatingForTarget: async (root, { targetId }) => {
