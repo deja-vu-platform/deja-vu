@@ -171,15 +171,11 @@ const resolvers = {
         };
       });
 
-      const result = labels.bulkWrite(bulkUpdateOps, (err, res) => {
+      const result = await labels.bulkWrite(bulkUpdateOps);
+      const modified = result.modifiedCount ? result.modifiedCount : 0;
+      const upserted = result.upsertedCount ? result.upsertedCount : 0;
 
-        if (err) { throw new Error(err.message); }
-
-        const modified = res.modifiedCount ? res.modifiedCount : 0;
-        const upserted = res.upsertedCount ? res.upsertedCount : 0;
-
-        return (modified + upserted === labelIds.length);
-      });
+      return (modified + upserted === labelIds.length);
     },
 
     createLabel: async (root, { id }) => {
