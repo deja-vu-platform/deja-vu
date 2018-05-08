@@ -74,6 +74,14 @@ interface Transition {
 const TX_TIMEOUT_SECONDS = 10;
 const MS_IN_S = 1000;
 
+function txMsg(msg: string, txId: string): string {
+  return `[txId: ${txId}] ${msg}`;
+}
+
+function log(msg: string, txId?: string): void {
+  console.log(txId ? txMsg(msg, txId) : msg);
+}
+
 /**
  *  Coordinates between a set of participants on whether to commit or abort
  *  a transaction.
@@ -95,12 +103,17 @@ export class TxCoordinator<Message, Payload, State = any> {
   async processMessage(
     txId: string, cohortId: string, msg: Message, state?: State)
     : Promise<void> {
-    if (!this.txs) {
-      this.config.onError(
-        new Error('TxCoordinator hasn\'t been started yet: call start()'),
-        msg, state);
+    return this.doProcessMessage(txId, cohortId, msg, state)
+      .catch((e) => {
+        this.config.onError(e, msg, state);
+      });
+  }
 
-      return;
+  private async doProcessMessage(
+    txId: string, cohortId: string, msg: Message, state?: State)
+    : Promise<void> {
+    if (!this.txs) {
+      throw new Error('TxCoordinator hasn\'t been started yet: call start()');
     }
     const tx: TxDoc<Message, Payload> = await this.getTx(txId, cohortId);
 
@@ -111,13 +124,10 @@ export class TxCoordinator<Message, Payload, State = any> {
     const cohortIds =  _.map(tx.cohorts, 'id');
     if (!_.includes(cohortIds, cohortId)) {
       // We received a request from a cohort that is not part of the tx
-      this.config.onError(
-        new Error(
-          `[txId: ${txId}] ${cohortId} is not part of this tx. Cohorts are ` +
-          JSON.stringify(cohortIds)),
-        msg, state);
-
-      return;
+      throw new Error(txMsg(
+        `${cohortId} is not part of this tx. Cohorts are ` +
+        JSON.stringify(cohortIds),
+        txId));
     }
 
     // If we got here the tx has been initialized (by this msg or a previous one)
@@ -146,22 +156,15 @@ export class TxCoordinator<Message, Payload, State = any> {
         'cohorts.$.state': 'voting'
       } });
     if (update.matchedCount === 0) { // Duplicate request
-      this.config.onError(
-        new Error(`[txId: ${txId}] Duplicate message from ${cohortId}`),
-        msg, state);
-
-      return;
+      throw new Error(txMsg(`Duplicate message from ${cohortId}`, txId));
     }
     let vote: Vote<Payload>;
     try {
       vote = await this.config.sendVoteToCohort(msg);
     } catch (e) {
-      console.error(e);
-      this.config.onError(
-        new Error(`[txId: ${txId}] Sending vote to cohort ${cohortId} failed`),
-        msg, state);
-
-      return;
+      // The cohort didn't vote yes/no but crashed or returned a wrong response
+      throw new Error(txMsg(
+        `Sending vote to cohort ${cohortId} failed: ${e}`, txId));
     }
     this.saveVote(txId, cohortId, vote);
 
@@ -170,19 +173,28 @@ export class TxCoordinator<Message, Payload, State = any> {
     // (ii) when we receive the last 'yes' we are going to commit.
     const transition: Transition = await this.lock.acquire(txId, () => {
       return this.processVote(txId, cohortId, vote, () => {
-          this.config.sendToClient(vote.payload, state);
+        log(
+          'Not waiting anymore (tx committed). ' +
+          `Send payload to client of cohort ${cohortId}`, txId);
+        this.config.sendToClient(vote.payload, state);
       }, () => {
-          this.config.sendAbortToClient(msg, false, vote.payload, state);
+        log(
+          'Not waiting anymore (tx aborted). ' +
+          `Send payload to client of cohort ${cohortId}`, txId);
+        this.config.sendAbortToClient(msg, false, vote.payload, state);
       });
     });
 
+    log(`Processing tx transition caused by cohort ${cohortId}`, txId);
     let ret;
     if (_.isEmpty(transition)) {  // Tx was already aborting
+      log(`Tx aborted. Send abort to client of cohort ${cohortId}`, txId);
       this.config.sendAbortToClient(msg, false, vote.payload, state);
       this.completed.emit(txId + '-abort');
       ret = this.completeMessage(txId, cohortId, msg, false);
     } else if (transition.newTxState === 'committing' &&
                !transition.newCohortState) {
+      log(`Tx committed. Send payload to client of cohort ${cohortId}`, txId);
       this.config.sendToClient(vote.payload, state);
       this.completed.emit(txId + '-commit');
       ret = Promise.all([
@@ -190,8 +202,10 @@ export class TxCoordinator<Message, Payload, State = any> {
         this.completeMessage(txId, cohortId, msg, true)]);
     } else if (!transition.newTxState &&
                transition.newCohortState === 'waitingForCompletion') {
+      log(`Tx pending. Cohort ${cohortId} is waiting for completion`, txId);
       // Nothing to do in this case since we are waiting
     } else if (transition.newTxState === 'aborting') {
+      log(`Tx aborted. Send abort to client of cohort ${cohortId}`, txId);
       this.config.sendAbortToClient(msg, true, vote.payload, state);
       this.completed.emit(txId + '-abort');
       ret = Promise.all([
@@ -253,9 +267,9 @@ export class TxCoordinator<Message, Payload, State = any> {
       }
     } else { // The vote was 'no'
       if (vote.result !== 'no') {
-        console.error(
-          `[txId: ${txId}] Got a vote back that was not 'yes'/'no'. The
-          cliche at ${cohortId} doesn't correcly implement voting`);
+        log(
+          `Got a vote back that was not 'yes'/'no'. The cliche at ${cohortId}` +
+          'doesn\'t correcly implement voting', txId);
       }
       // We know that all previous votes were 'yes' because if o/w the state
       // would be 'aborting'/'aborted'. Thus, we are in the 'voting' phase and
@@ -289,12 +303,16 @@ export class TxCoordinator<Message, Payload, State = any> {
         { $set: { [`cohorts.$.vote`]: vote } });
   }
 
-  private updateCohortState(
-    txId: string, cohortId: string, newState: CohortState) {
-    return this.txs!
+  private async updateCohortState(
+    txId: string, cohortId: string, newState: CohortState): Promise<void> {
+    const update = await this.txs!
       .updateOne(
         { id: txId, 'cohorts.id': cohortId },
         { $set: { [`cohorts.$.state`]: newState } });
+    if (update.modifiedCount === 0) {
+      throw new Error(
+        txMsg(`Couldn't set cohort ${cohortId} state to ${newState}`, txId));
+    }
   }
 
   private updateTxState(id: string, newState: TxState) {
@@ -314,8 +332,7 @@ export class TxCoordinator<Message, Payload, State = any> {
         { projection: { id: 1 } })
       .toArray();
 
-    console.log(
-      `Found ${txsToAbort.length} transactions to abort due to timeout`);
+    log(`Found ${txsToAbort.length} transactions to abort due to timeout`);
     await Promise.all(
       _.map(txsToAbort, async (txToAbort: TxDoc<Message, Payload>) => {
         return this.lock.acquire(txToAbort.id, async () => {
@@ -324,7 +341,7 @@ export class TxCoordinator<Message, Payload, State = any> {
             if (tx.state !== 'voting') {
               return false;
             }
-            console.error(`[txId: ${txToAbort.id}] Aborting due to timeout`);
+            log('Aborting due to timeout', txToAbort.id);
             await this.updateTxState(txToAbort.id, 'aborting');
 
             return true;
@@ -340,33 +357,47 @@ export class TxCoordinator<Message, Payload, State = any> {
     );
   }
 
-  private completeMessage(
-    txId: string, cohortId: string, msg: Message, success: boolean) {
+  /**
+   * Send a complete ('commit' or 'abort') message to a cohort server.
+   *
+   * After an ACK is received, the cohort state is updated.
+   */
+  private async completeMessage(
+    txId: string, cohortId: string, msg: Message, success: boolean)
+    : Promise<void> {
     const completedState = success ? 'committed' : 'aborted';
     const completingState = success ? 'committing' : 'aborting';
     const send = success ? this.config.sendCommitToCohort :
       this.config.sendAbortToCohort;
 
-    return this.updateCohortState(txId, cohortId, completingState)
-      .then((unused) => send(msg))
-      .catch((e) => {
-        // TODO: handle errors
-        console.error(e);
-        throw new Error(
-          `[txId: ${txId}] Sending commit/abort to ${cohortId} failed`);
-      })
-      .then((unused) => this.updateCohortState(txId, cohortId, completedState));
+    await this.updateCohortState(txId, cohortId, completingState);
+    try {
+      await send(msg);
+    } catch (e) {
+      // TODO: handle errors
+      log(e, txId);
+      throw new Error(txMsg(
+        `Sending commit/abort to ${cohortId} failed`, txId));
+    }
+    await this.updateCohortState(txId, cohortId, completedState);
   }
 
   private async completeTx(txId: string, success: boolean) {
     const completedState = success ? 'committed' : 'aborted';
+    log(`Completing tx (status: ${completedState})`, txId);
     const tx: { cohorts: { id: string, msg?: Message }[] } = (await this.txs!
       .findOne({ id: txId }, {
-        projection: { 'cohorts.msg': 1, 'cohorts.id': 1 }}))!;
+        projection: {
+          'cohorts.msg': 1, 'cohorts.id': 1, 'cohorts.state': 1
+        }}))!;
     await Promise.all(
       _.map(
         tx.cohorts, (cohort: Cohort<Message, Payload>) => {
         if (cohort.state !== 'waitingForCompletion') {
+          log(
+            `cohort ${cohort.id} is not waiting for completion ` +
+            `(${cohort.state}), not sending complete message`, txId);
+
           return;
         }
 
@@ -382,7 +413,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     const db = client.db(this.config.dbName);
     if (this.config.reinitDbOnStartup) {
       await db.dropDatabase();
-      console.log(`Reinitialized db ${this.config.dbName}`);
+      log(`Reinitialized db ${this.config.dbName}`);
     }
     const txs = db.collection('txs');
     txs.createIndex({ id: 1 }, { unique: true });
