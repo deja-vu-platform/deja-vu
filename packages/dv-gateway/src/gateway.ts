@@ -131,8 +131,13 @@ const txConfig: TxConfig<
     // would have never been initiated in the first place
     const dvTxNode = actionHelper.getActionOrFail(pathToDvTxNode);
 
+    const cohortActions = _.reject(dvTxNode.content, (action: ActionTag) => {
+      return action.tag.split('-')[0] === 'dv' ||
+        _.get(action.inputs, '[save]') === 'false';
+    });
+
     const cohorts = _.map(
-      dvTxNode.content, (action: ActionTag) => actionPathToId(
+      cohortActions, (action: ActionTag) => actionPathToId(
         [...pathToDvTxNode, action.fqtag]
       ));
 
