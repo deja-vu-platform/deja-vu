@@ -97,53 +97,35 @@ const resolvers = {
     },
 
     items: async (root, { input }: { input: ItemsInput }) => {
+      const matchQuery = {};
+      const groupQuery = { _id: 0, itemIds: { $push: '$itemIds' } };
+      const reduceOperator = {};
+      let initialValue;
+
       if (input.labelIds) {
         // Items matching all labelIds
         const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
-        const res = await labels.aggregate([
-          { $match: { id: { $in: standardizedLabelIds } } },
-          {
-            $group: {
-              _id: 0,
-              itemIds: { $push: '$itemIds' },
-              initialSet: { $first: '$itemIds' }
-            }
-          },
-          {
-            $project: {
-              itemIds: {
-                $reduce: {
-                  input: '$itemIds',
-                  initialValue: '$initialSet',
-                  in: { $setIntersection: ['$$value', '$$this'] }
-                }
-              }
-            }
-          }
-        ])
-          .toArray();
-
-        console.log('HEY ITEMS', res);
-
-        return !_.isEmpty(res) ? res[0].itemIds : [];
+        matchQuery['id'] = { $in: standardizedLabelIds };
+        groupQuery['initialSet'] = { $first: '$itemIds' };
+        initialValue = '$initialSet';
+        reduceOperator['$setIntersection'] = ['$$value', '$$this'];
+      } else {
+        // No label filter
+        initialValue = [];
+        reduceOperator['$setUnion'] = ['$$value', '$$this'];
       }
-
-      // No label filter
       const results = await labels.aggregate([
-        { $match: {} },
+        { $match: matchQuery },
         {
-          $group: {
-            _id: 0,
-            itemIds: { $push: '$itemIds' }
-          }
+          $group: groupQuery
         },
         {
           $project: {
             itemIds: {
               $reduce: {
                 input: '$itemIds',
-                initialValue: [],
-                in: { $setUnion: ['$$value', '$$this'] }
+                initialValue: initialValue,
+                in: reduceOperator
               }
             }
           }
@@ -155,14 +137,13 @@ const resolvers = {
     },
 
     labels: async (root, { input }: { input: LabelsInput }) => {
+      const query = {}; // No labels filter
       if (input.itemId) {
         // Labels of an item
-        return labels.find({ itemIds: input.itemId })
-          .toArray();
+        query['itemIds'] = input.itemId;
       }
 
-      // No labels filter
-      return labels.find()
+      return labels.find(query)
         .toArray();
     }
   },
@@ -190,7 +171,7 @@ const resolvers = {
         };
       });
 
-      const result = await labels.bulkWrite(bulkUpdateOps, (err, res) => {
+      const result = labels.bulkWrite(bulkUpdateOps, (err, res) => {
 
         if (err) { throw new Error(err.message); }
 
@@ -199,7 +180,6 @@ const resolvers = {
 
         return (modified + upserted === labelIds.length);
       });
-
     },
 
     createLabel: async (root, { id }) => {
