@@ -15,7 +15,7 @@ import { makeExecutableSchema } from 'graphql-tools';
 interface RatingDoc {
   sourceId: string;
   targetId: string;
-  rating?: number;
+  rating: number;
 }
 
 interface RatingInput {

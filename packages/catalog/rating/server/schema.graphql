@@ -1,7 +1,7 @@
 type Rating {
   sourceId: ID!
   targetId: ID!
-  rating: Float
+  rating: Float!
 }
 
 type AverageRatingForTargetOutput {
