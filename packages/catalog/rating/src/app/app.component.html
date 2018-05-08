@@ -1,12 +1,14 @@
 <div class="container">
-  <h1>Rate pizza</h1>
-  <rating-rate-target sourceId="ben" targetId="pizza" (rating)="pizzaRating=$event">
+  <h1>Rate target <i>pizza</i> by source <i>ben</i></h1>
+  <rating-rate-target sourceId="ben" targetId="pizza" 
+  (rating)="pizzaRating=$event">
   </rating-rate-target>
   Rating for pizza is {{pizzaRating}}
-  <h1>Average rating of pizza</h1>
+  <h1>Average rating of target <i>pizza</i></h1>
   <rating-show-average-rating targetId="pizza"></rating-show-average-rating>
-  <h1>Rating of Pizza by Ben</h1>
+  <h1>Rating of target <i>pizza</i> by source <i>ben</i></h1>
   <rating-show-rating sourceId="ben" targetId="pizza"></rating-show-rating>
-  <!-- <h1>Pizza Rating</h1>
-  <rating-show-ratings-by-target targetId="pizza"></rating-show-ratings-by-target> -->
+  <h1>Show all ratings of target <i>pizza</i></h1>
+  <rating-show-ratings-by-target targetId="pizza">
+  </rating-show-ratings-by-target>
 </div>

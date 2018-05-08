@@ -50,11 +50,11 @@ export class ShowRatingsByTargetComponent implements OnInit, OnChanges {
     this.gs.get<RatingsRes>(this.apiPath, {
       params: {
         query: `
-        query Ratings($input: RatingsInput) {
-          ratings(input: $input) {
-            rating
+          query Ratings($input: RatingsInput!) {
+            ratings(input: $input) {
+              rating
+            }
           }
-        }
         `,
         variables: JSON.stringify({
           input: {
