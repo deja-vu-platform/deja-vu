@@ -126,3 +126,33 @@ createGoodForm: FormGroup = this.builder.group({
 
 - If there's only one id input for a widget, only use `id`. Otherwise, use named ids, e.g. `fooId` and `barId`. An exception to this rule involves `Show*` 
 actions. Even if there is only one possible id input, the id must be named, e.g. `ShowFoo` must have `fooId` not just `id`.
+
+- If you want to give the user of an action a way to ask to wait for an input value create a `waitOn: string[]` input that takes a list of input fields to wait on when run. In your Component class you have:
+
+```typescript
+// A list of fields to wait for
+@Input() waitOn: string[] = [];
+// Watcher of changes to fields specified in `waitOn`
+// Emits the field name that changes
+fieldChange = new EventEmitter<string>();
+  
+...
+ngOnChanges(changes: SimpleChanges) {
+  for (const field of this.waitOn) {
+    if (changes[field]) {
+      this.fieldChange.emit(field);
+    }
+  }
+  ...
+}
+```
+
+And in your run method, to wait on changes to the specified inputs, do:
+```typescript
+await Promise.all(_.chain(this.waitOn)
+  .filter((field) => !this[field])
+  .map((fieldToWaitFor) => this.fieldChange
+    .pipe(filter((field) => field === fieldToWaitFor), take(1))
+    .toPromise())
+  .value());
+```
