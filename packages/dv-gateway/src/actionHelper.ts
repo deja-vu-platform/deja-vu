@@ -105,53 +105,48 @@ export class ActionHelper {
    * @returns an list of matching paths
    */
   getMatchingPaths(actionPath: string[]): ActionTagPath[] {
-    if (_.isEmpty(actionPath) || !(actionPath[0] in this.actionTable)) {
+    const firstTag = actionPath[0];
+    if (_.isEmpty(actionPath) || !(firstTag in this.actionTable)) {
       return [];
     }
-    const matchingPaths = [[{
-      fqtag: actionPath[0],
-      tag: actionPath[0],
-      content: this.actionTable[actionPath[0]]
-    }]];
-    if (actionPath.length === 1 && actionPath[0] in this.actionTable) {
-      return matchingPaths;
+    const matchingNode: ActionTag = {
+      fqtag: firstTag, tag: firstTag,
+      content: this.actionTable[firstTag]
+    };
+    if (actionPath.length === 1 && firstTag in this.actionTable) {
+      return [[ matchingNode ]] ;
     }
 
-    return this._getMatchingPaths(
-      actionPath.slice(1), this.actionTable[actionPath[0]], matchingPaths);
+    return _.map(
+      this._getMatchingPaths(
+        actionPath.slice(1), this.actionTable[actionPath[0]]),
+      (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]);
   }
 
   private _getMatchingPaths(
-    actionPath: string[], actionAst: ActionAst | undefined,
-    pathsMatchingSoFar: ActionTagPath[])
+    actionPath: string[], actionAst: ActionAst | undefined)
     : ActionTagPath[] {
     // actionPath.length is always >= 1
 
     if (_.isEmpty(actionAst)) {
       return [];
     }
-    const matchingNodes = _.filter(
-      actionAst, (at: ActionTag) => at.fqtag === actionPath[0]);
+    const matchingNodes: ActionTag[] = _.map(
+      _.filter(actionAst, (at: ActionTag) => at.fqtag === actionPath[0]),
+      (matchingNode: ActionTag) => this.getActionContent(
+        matchingNode, this.actionTable));
 
     if (actionPath.length === 1) {
-      _.each(_.product(pathsMatchingSoFar, matchingNodes),
-        (matchingPath: ActionTagPath, matchingNode: ActionTag): void => {
-          matchingPath.push(matchingNode);
-        });
-
-      return pathsMatchingSoFar;
+      return _.map(
+        matchingNodes,
+        (matchingNode: ActionTag): ActionTagPath => [ matchingNode ]);
     }
 
-    return _.flatMap(matchingNodes, (matchingNode: ActionTag) => {
-      const action = this.getActionContent(matchingNode, this.actionTable);
-
-      _.each(pathsMatchingSoFar, (matchingPath: ActionTagPath): void => {
-        matchingPath.push(action);
-      });
-
-      return this._getMatchingPaths(
-        actionPath.slice(1), action.content, pathsMatchingSoFar);
-    });
+    return _.flatMap(
+      matchingNodes,
+      (matchingNode: ActionTag): ActionTagPath[] =>  _.map(
+        this._getMatchingPaths(actionPath.slice(1), matchingNode.content),
+        (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]));
   }
 
   /**
