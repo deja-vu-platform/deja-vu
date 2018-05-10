@@ -2,6 +2,7 @@ import * as AsyncLock from 'async-lock';
 import * as EventEmitter from 'events';
 import { Collection, MongoClient } from 'mongodb';
 
+import * as assert from 'assert';
 import * as _ from 'lodash';
 
 
@@ -149,7 +150,12 @@ export class TxCoordinator<Message, Payload, State = any> {
     // send a duplicate vote to a cohort)
     // If `cohorts.msg` is defined then this is a duplicate req
     const update = await this.txs.updateOne(
-      { id: txId, 'cohorts.id': cohortId, 'cohorts.msg': undefined },
+      {
+        id: txId,
+        cohorts: {
+          $elemMatch: { id: cohortId, msg: { $exists: false } }
+        }
+      },
       { $set: {
         'cohorts.$.msg': msg,
         'cohorts.$.vote': undefined,
@@ -190,7 +196,6 @@ export class TxCoordinator<Message, Payload, State = any> {
     if (_.isEmpty(transition)) {  // Tx was already aborting
       log(`Tx aborted. Send abort to client of cohort ${cohortId}`, txId);
       this.config.sendAbortToClient(msg, false, vote.payload, state);
-      this.completed.emit(txId + '-abort');
       ret = this.completeMessage(txId, cohortId, msg, false);
     } else if (transition.newTxState === 'committing' &&
                !transition.newCohortState) {
@@ -205,7 +210,7 @@ export class TxCoordinator<Message, Payload, State = any> {
       log(`Tx pending. Cohort ${cohortId} is waiting for completion`, txId);
       // Nothing to do in this case since we are waiting
     } else if (transition.newTxState === 'aborting') {
-      log(`Tx aborted. Send abort to client of cohort ${cohortId}`, txId);
+      log(`Tx is aborting. Send abort to client of cohort ${cohortId}`, txId);
       this.config.sendAbortToClient(msg, true, vote.payload, state);
       this.completed.emit(txId + '-abort');
       ret = Promise.all([
@@ -248,6 +253,8 @@ export class TxCoordinator<Message, Payload, State = any> {
     }
   }
 
+  // Updates the cohort and tx state and registers a complete listener according
+  // to the vote result
   private async processVote(
     txId: string, cohortId: string, vote: Vote<Payload>,
     onCommit: () => void, onAbort: () => void): Promise<Transition> {
@@ -283,11 +290,8 @@ export class TxCoordinator<Message, Payload, State = any> {
       // We know that all previous votes were 'yes' because if o/w the state
       // would be 'aborting'/'aborted'. Thus, we are in the 'voting' phase and
       // this is the first 'no' vote
-      await Promise.all([
-        this.updateCohortState(txId, cohortId, 'waitingForCompletion'),
-        this.updateTxState(txId, 'aborting')]);
+      await this.updateTxState(txId, 'aborting');
       ret.newTxState = 'aborting';
-      ret.newCohortState = 'waitingForCompletion';
     }
 
     return ret;
@@ -300,9 +304,9 @@ export class TxCoordinator<Message, Payload, State = any> {
   private allVotedButOne(tx: TxDoc<Message, Payload>): boolean {
     return _.chain(tx.cohorts)
       .map('state')
-      .filter((s) => s === 'voting')
+      .filter((s) => s === 'waitingForCompletion')
       .value()
-      .length === 1;
+      .length === tx.cohorts.length - 1;
   }
 
   private saveVote(txId: string, cohortId: string, vote: Vote<Payload>) {
@@ -320,7 +324,9 @@ export class TxCoordinator<Message, Payload, State = any> {
         { $set: { [`cohorts.$.state`]: newState } });
     if (update.modifiedCount === 0) {
       throw new Error(
-        txMsg(`Couldn't set cohort ${cohortId} state to ${newState}`, txId));
+        txMsg(
+          `Couldn't set cohort ${cohortId} state to ${newState} ` +
+          `(matched: ${update.matchedCount})`, txId));
     }
   }
 
@@ -371,6 +377,7 @@ export class TxCoordinator<Message, Payload, State = any> {
    *
    * After an ACK is received, the cohort state is updated.
    */
+  // Mutates the cohort state
   private async completeMessage(
     txId: string, cohortId: string, msg: Message, success: boolean)
     : Promise<void> {
@@ -379,6 +386,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     const send = success ? this.config.sendCommitToCohort :
       this.config.sendAbortToCohort;
 
+    log(`Send complete message to ${cohortId}, success: ${success}`, txId);
     await this.updateCohortState(txId, cohortId, completingState);
     try {
       await send(msg);
@@ -391,6 +399,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     await this.updateCohortState(txId, cohortId, completedState);
   }
 
+  // Mutates the tx state and the cohort state if it's not waitingForCompletion
   private async completeTx(txId: string, success: boolean) {
     const completedState = success ? 'committed' : 'aborted';
     log(`Completing tx (status: ${completedState})`, txId);
@@ -405,10 +414,17 @@ export class TxCoordinator<Message, Payload, State = any> {
         if (cohort.state !== 'waitingForCompletion') {
           log(
             `cohort ${cohort.id} is not waiting for completion ` +
-            `(${cohort.state}), not sending complete message`, txId);
+            `(it's ${cohort.state}), not sending complete message`, txId);
 
           return;
         }
+
+        log(`On complete tx, sending complete message to ${cohort.id} ` +
+          `(state is: ${cohort.state})`, txId);
+
+        assert.ok(
+          !_.isNil(cohort.msg),
+          txMsg(`Expected msg for ${cohort.id} but got undefined`, txId));
 
         return this.completeMessage(txId, cohort.id, cohort.msg!, success);
       }));
