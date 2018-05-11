@@ -1,7 +1,11 @@
 import {
-  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
+  SimpleChanges, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+
+import { filter, take } from 'rxjs/operators';
+
 import * as _ from 'lodash';
 
 import { API_PATH } from '../label.config';
@@ -19,13 +23,19 @@ interface ItemsRes {
   styleUrls: ['./show-items.component.css']
 })
 export class ShowItemsComponent implements OnInit, OnChanges {
-  @Input() itemIds: string[] = [];
+  // A list of itemIds to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
 
   @Input() showItem: Action = {
     type: <Type<Component>>ShowItemComponent
   };
 
   @Input() noItemsToShowText = 'No items to show';
+
+  itemIds: string[] = [];
 
   showItems;
   private gs: GatewayService;
@@ -41,28 +51,37 @@ export class ShowItemsComponent implements OnInit, OnChanges {
     this.loadItems();
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field]) {
+        this.fieldChange.emit(field);
+      }
+    }
     this.loadItems();
   }
 
-  loadItems() {
-    if (_.isEmpty(this.itemIds) && !_.isNil(this.itemIds)) {
-      // All items
-      if (this.gs) {
-        this.gs
-          .get<ItemsRes>(this.apiPath, {
-            params: {
-              query: `
+  async loadItems() {
+    if (this.gs) {
+      await Promise.all(_.chain(this.waitOn)
+        .filter((field) => !this[field])
+        .map((fieldToWaitFor) => this.fieldChange
+          .pipe(filter((field) => field === fieldToWaitFor), take(1))
+          .toPromise())
+        .value());
+
+      this.gs
+        .get<ItemsRes>(this.apiPath, {
+          params: {
+            query: `
                 query {
                   items(input: { })
                 }
               `
-            }
-          })
-          .subscribe((res) => {
-            this.itemIds = res.data.items;
-          });
-      }
+          }
+        })
+        .subscribe((res) => {
+          this.itemIds = res.data.items;
+        });
     }
   }
 }
