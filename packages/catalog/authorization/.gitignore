@@ -6,6 +6,7 @@
 /dist-server
 /tmp
 /out-tsc
+pkg.tgz
 
 # dependencies
 /node_modules

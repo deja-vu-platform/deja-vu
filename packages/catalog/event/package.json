@@ -93,7 +93,7 @@
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
     "moment": "^2.22.1",
-    "ng-packagr": "2.2.0",
+    "ng-packagr": "^2.2.0",
     "nodemon": "^1.14.12",
     "protractor": "~5.1.2",
     "rxjs": "^5.5.6",
