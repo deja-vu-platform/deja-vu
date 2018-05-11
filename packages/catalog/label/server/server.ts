@@ -12,13 +12,6 @@ import * as _ from 'lodash';
 const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
 
-// TODO: Allow editting labels for an object?
-
-interface ItemDoc {
-  id: string;
-  labelIds?: string[];
-}
-
 interface LabelDoc {
   id: string;
   itemIds?: string[];
@@ -68,7 +61,8 @@ const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 
-let db, items, labels;
+let db: mongodb.Db;
+let labels: mongodb.Collection<LabelDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -80,51 +74,13 @@ mongodb.MongoClient.connect(
       console.log(`Reinitialized db ${config.dbName}`);
     }
 
-    items = db.collection('items');
-    items.createIndex({ id: 1 }, { unique: true, sparse: true });
     labels = db.collection('labels');
     labels.createIndex({ id: 1 }, { unique: true, sparse: true });
+    labels.createIndex({ id: 1, itemIds: 1 }, { unique: true });
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
-
-class Validation {
-  static async itemExists(id: string): Promise<ItemDoc> {
-    return Validation.exists(items, id, 'Item');
-  }
-
-  static async labelExists(id: string): Promise<LabelDoc> {
-    return Validation.exists(labels, standardizeLabel(id), 'Label');
-  }
-
-  static labelsExist(ids: string[]): Promise<LabelDoc[]> {
-    const standarardizedLabelIds = _.map(ids, standardizeLabel);
-
-    return Validation.multipleExist(labels, standarardizedLabelIds);
-  }
-
-  private static async exists(collection, id: string, type: string) {
-    const doc = await collection.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`${type} ${id} not found`);
-    }
-
-    return doc;
-  }
-
-  static async multipleExist(collection, ids: string[]) {
-    const documents = await collection
-      .find({ id: { $in: ids } })
-      .toArray();
-
-    if (documents.length !== ids.length) {
-      return [];
-    }
-
-    return documents;
-  }
-}
 
 function standardizeLabel(id: string): string {
   return id.trim()
@@ -133,112 +89,93 @@ function standardizeLabel(id: string): string {
 
 const resolvers = {
   Query: {
-    item: async (root, { id }) => {
-      const item = await Validation.itemExists(id);
-
-      return item;
-    },
-
     label: async (root, { id }) => {
-      const label = await Validation.labelExists(id);
+      const label = await labels.findOne({ id: standardizeLabel(id) });
+      if (_.isNil(label)) { throw new Error(`Label ${id} not found`); }
 
       return label;
     },
 
     items: async (root, { input }: { input: ItemsInput }) => {
+      const matchQuery = {};
+      const groupQuery = { _id: 0, itemIds: { $push: '$itemIds' } };
+      const reduceOperator = {};
+      let initialValue;
+
       if (input.labelIds) {
-        const inputLabels = await Validation.labelsExist(input.labelIds);
-
-        if (inputLabels.length !== input.labelIds.length) {
-          return [];
-        }
-
-        const labelItemsIds = _.map(inputLabels, 'itemIds');
-        const commonItemIds = _.intersection(labelItemsIds);
-
-        return items.find({ id: { $in: commonItemIds } })
-          .toArray();
+        // Items matching all labelIds
+        const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
+        matchQuery['id'] = { $in: standardizedLabelIds };
+        groupQuery['initialSet'] = { $first: '$itemIds' };
+        initialValue = '$initialSet';
+        reduceOperator['$setIntersection'] = ['$$value', '$$this'];
+      } else {
+        // No label filter
+        initialValue = [];
+        reduceOperator['$setUnion'] = ['$$value', '$$this'];
       }
-
-      // No label filter
-      return items.find()
+      const results = await labels.aggregate([
+        { $match: matchQuery },
+        {
+          $group: groupQuery
+        },
+        {
+          $project: {
+            itemIds: {
+              $reduce: {
+                input: '$itemIds',
+                initialValue: initialValue,
+                in: reduceOperator
+              }
+            }
+          }
+        }
+      ])
         .toArray();
+
+      return !_.isEmpty(results) ? results[0].itemIds : [];
     },
 
     labels: async (root, { input }: { input: LabelsInput }) => {
+      const query = {}; // No labels filter
       if (input.itemId) {
-        const item = await Validation.itemExists(input.itemId);
-
-        return labels.find({ id: { $in: item.labelIds } })
-          .toArray();
+        // Labels of an item
+        query['itemIds'] = input.itemId;
       }
 
-      return labels.find()
-        .toArray();
-    }
-  },
-
-  Item: {
-    id: (item: ItemDoc) => item.id,
-    labels: (item: ItemDoc) => {
-      if (_.isEmpty(item.labelIds)) { return []; }
-
-      return labels
-        .find({ id: { $in: item.labelIds } })
+      return labels.find(query)
         .toArray();
     }
   },
 
   Label: {
     id: (label: LabelDoc) => label.id,
-    items: (label: LabelDoc) => {
-      if (_.isEmpty(label.itemIds)) { return []; }
-
-      return items
-        .find({ id: { $in: label.itemIds } })
-        .toArray();
-    }
+    itemIds: (label: LabelDoc) => label.itemIds
   },
 
   Mutation: {
     addLabelsToItem: async (root, { input }: { input: AddLabelsToItemInput }) =>
     // tslint:disable-next-line:one-line
     {
-      await Validation.itemExists(input.itemId);
-
       const labelIds = _.map(input.labelIds, standardizeLabel);
 
-      // Find existing labels
-      const existingLabels: LabelDoc[] = await labels
-        .find({ id: { $in: labelIds } })
-        .toArray();
-      const existingLabelIds = _.map(existingLabels, 'id');
+      const bulkUpdateOps = _.map(labelIds, (labelId) => {
+        return {
+          updateOne: {
+            filter: { id: labelId },
+            update: {
+              $push: { itemIds: input.itemId }
+            },
+            upsert: true
+          }
+        };
+      });
 
-      // Determine the new labels and add them
-      const newLabelIds = _.difference(existingLabelIds, labelIds);
-      const newLabels: LabelDoc[] = _.map(newLabelIds, (id) => ({ id: id }));
+      const result = await labels.bulkWrite(bulkUpdateOps);
+      const modified = result.modifiedCount ? result.modifiedCount : 0;
+      const upserted = result.upsertedCount ? result.upsertedCount : 0;
 
-      if (!_.isEmpty(newLabels)) {
-        await labels.insert(newLabels);
-      }
-
-      // Update the item with all labels it doesn't already have
-      const updateOperation = {
-        $addToSet: { labelIds: { $each: labelIds } }
-      };
-
-      const res = await items
-        .findOneAndUpdate({ id: input.itemId }, updateOperation);
-
-      return res.value;
-    },
-
-    createItem: async (root, { id }) => {
-      const itemId = id ? id : uuid();
-      const newItem: ItemDoc = { id: itemId };
-      await items.insertOne(newItem);
-
-      return newItem;
+      return (modified + upserted === labelIds.length);
     },
 
     createLabel: async (root, { id }) => {

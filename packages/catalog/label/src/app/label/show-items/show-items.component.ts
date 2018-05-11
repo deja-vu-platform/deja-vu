@@ -1,13 +1,21 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit,
+  SimpleChanges, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+
+import { filter, take } from 'rxjs/operators';
+
 import * as _ from 'lodash';
+
+import { API_PATH } from '../label.config';
 
 import { ShowItemComponent } from '../show-item/show-item.component';
 
-import { Item } from '../shared/label.model';
-
+interface ItemsRes {
+  data: { items: string[] };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'label-show-items',
@@ -15,7 +23,11 @@ import { Item } from '../shared/label.model';
   styleUrls: ['./show-items.component.css']
 })
 export class ShowItemsComponent implements OnInit, OnChanges {
-  @Input() items: Item[] = [];
+  // A list of itemIds to wait for
+  @Input() waitOn: string[] = [];
+  // Watcher of changes to fields specified in `waitOn`
+  // Emits the field name that changes
+  fieldChange = new EventEmitter<string>();
 
   @Input() showItem: Action = {
     type: <Type<Component>>ShowItemComponent
@@ -23,11 +35,14 @@ export class ShowItemsComponent implements OnInit, OnChanges {
 
   @Input() noItemsToShowText = 'No items to show';
 
+  itemIds: string[] = [];
+
   showItems;
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showItems = this;
   }
 
@@ -36,30 +51,37 @@ export class ShowItemsComponent implements OnInit, OnChanges {
     this.loadItems();
   }
 
-  ngOnChanges() {
+  ngOnChanges(changes: SimpleChanges) {
+    for (const field of this.waitOn) {
+      if (changes[field]) {
+        this.fieldChange.emit(field);
+      }
+    }
     this.loadItems();
   }
 
-  loadItems() {
-    if (_.isEmpty(this.items)) {
-      // All items
-      if (this.gs) {
-        this.gs
-          .get<{ data: { items: Item[] } }>('/graphql', {
-            params: {
-              query: `
+  async loadItems() {
+    if (this.gs) {
+      await Promise.all(_.chain(this.waitOn)
+        .filter((field) => !this[field])
+        .map((fieldToWaitFor) => this.fieldChange
+          .pipe(filter((field) => field === fieldToWaitFor), take(1))
+          .toPromise())
+        .value());
+
+      this.gs
+        .get<ItemsRes>(this.apiPath, {
+          params: {
+            query: `
                 query {
-                  items(input: { }) {
-                    id
-                  }
+                  items(input: { })
                 }
               `
-            }
-          })
-          .subscribe((res) => {
-            this.items = res.data.items;
-          });
-      }
+          }
+        })
+        .subscribe((res) => {
+          this.itemIds = res.data.items;
+        });
     }
   }
 }

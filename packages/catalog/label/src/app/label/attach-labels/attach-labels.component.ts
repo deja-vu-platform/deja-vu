@@ -1,6 +1,6 @@
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit
 } from '@angular/core';
 import { MatChipInputEvent } from '@angular/material';
 
@@ -10,9 +10,16 @@ import {
 } from 'dv-core';
 
 import * as _ from 'lodash';
-import { Item, Label } from '../shared/label.model';
+
+import { API_PATH } from '../label.config';
+import { Label } from '../shared/label.model';
 
 const SAVED_MSG_TIMEOUT = 3000;
+
+interface AddLabelsToItemRes {
+  data: { addLabelsToItem: boolean };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'label-attach-labels',
@@ -36,8 +43,6 @@ export class AttachLabelsComponent implements
   @Input() buttonLabel = 'Attach Labels';
   @Input() labelsAttachedSavedText = 'Labels attached to item';
 
-  @Output() item: EventEmitter<Item> = new EventEmitter<Item>();
-
   labelsAttached = false;
   labelsAttachedError: string;
 
@@ -48,7 +53,7 @@ export class AttachLabelsComponent implements
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) { }
+    private rs: RunService, @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -87,13 +92,9 @@ export class AttachLabelsComponent implements
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{
-      data: {item: Item}, errors: { message: string }[]
-    }>('/graphql', {
+    const res = await this.gs.post<AddLabelsToItemRes>(this.apiPath, {
       query: `mutation AttachLabelsToItem($input: AddLabelsToItemInput!) {
-            addLabelsToItem(input: $input) {
-              id
-            }
+            addLabelsToItem(input: $input)
           }`,
       variables: {
         input: {
@@ -108,13 +109,12 @@ export class AttachLabelsComponent implements
       throw new Error(_.map(res.errors, 'message')
         .join());
     }
-
-    this.item.emit(res.data.item);
   }
 
   dvOnAfterCommit() {
     this.labelsAttached = true;
     this.labelsAttachedError = '';
+    this.labels = [];
     window.setTimeout(() => {
       this.labelsAttached = false;
     }, SAVED_MSG_TIMEOUT);

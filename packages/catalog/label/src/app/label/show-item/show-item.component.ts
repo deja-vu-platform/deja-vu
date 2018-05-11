@@ -1,6 +1,5 @@
 import { DatePipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { Item } from '../shared/label.model';
 
 @Component({
   selector: 'label-show-item',
@@ -9,5 +8,5 @@ import { Item } from '../shared/label.model';
   providers: [DatePipe]
 })
 export class ShowItemComponent {
-  @Input() item: Item;
+  @Input() id: string;
 }

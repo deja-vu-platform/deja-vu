@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 import {
   AbstractControl, ControlValueAccessor, FormBuilder, FormControl,
@@ -15,10 +15,20 @@ import {
   ShowLabelComponent
 } from '../show-label/show-label.component';
 
-import { Item, Label } from '../shared/label.model';
+import { API_PATH } from '../label.config';
+import { Label } from '../shared/label.model';
 
 import * as _ from 'lodash';
 
+interface ItemsRes {
+  data: { items: string[] };
+  errors: { message: string }[];
+}
+
+interface LabelsRes {
+  data: { labels: Label[] };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'label-search-items-by-labels',
@@ -48,7 +58,7 @@ export class SearchItemsByLabelsComponent
   @Input() searchPlaceholder = 'Search for items by selecting labels';
   @Input() buttonLabel = 'Search';
 
-  @Output() searchResultItems = new EventEmitter<Item[]>();
+  @Output() searchResultItems = new EventEmitter<string[]>();
 
   @ViewChild(FormGroupDirective) form;
   searchFormControl = new FormControl('', Validators.required);
@@ -63,7 +73,8 @@ export class SearchItemsByLabelsComponent
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) { }
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -81,13 +92,11 @@ export class SearchItemsByLabelsComponent
   }
 
   async dvOnRun(): Promise<void> {
-    this.gs.get<{ data: { items: Item[] } }>('/graphql', {
+    this.gs.get<ItemsRes>(this.apiPath, {
       params: {
         query: `
           query Items($input: ItemsInput!) {
-            items (input: $input) {
-              id
-            }
+            items (input: $input)
           }
         `,
         variables: JSON.stringify({
@@ -106,18 +115,15 @@ export class SearchItemsByLabelsComponent
     if (!this.gs) {
       return;
     }
-    this.gs.get<{ data: { labels: Label[] } }>('/graphql', {
+    this.gs.get<LabelsRes>(this.apiPath, {
       params: {
         query: `
-          query Labels($input: LabelsInput!) {
-            labels (input: $input) {
+          query {
+            labels (input: { }) {
               id
             }
           }
-        `,
-        variables: JSON.stringify({
-          input: {}
-        })
+        `
       }
     })
       .subscribe((res) => {
