@@ -31,6 +31,7 @@ interface DvConfig {
   config?: any;
   gateway: { config: Config };
   usedCliches?: {[as: string]: DvConfig};
+  actionsNoRequest?: { exec: string[] };
 }
 
 
@@ -133,11 +134,15 @@ const txConfig: TxConfig<
     assert.ok(paths.length === 1,
       `Expected 1 path but got ${JSON.stringify(paths, null, 2)}`);
     const actionTagPath: ActionTagPath = paths[0];
+    assert.ok(actionTagPath.length === actionPath.length,
+      'Expected the length of the path to match the action path length but ' +
+      ` got ${JSON.stringify(actionTagPath, null, 2)}`);
     const dvTxNode = actionTagPath[dvTxNodeIndex];
 
     const cohortActions = _.reject(dvTxNode.content, (action: ActionTag) => {
       return action.tag.split('-')[0] === 'dv' ||
-        _.get(action.inputs, '[save]') === 'false';
+        _.get(action.inputs, '[save]') === 'false' ||
+        !actionHelper.shouldHaveExecRequest(action.tag);
     });
 
     const cohorts = _.map(

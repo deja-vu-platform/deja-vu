@@ -43,10 +43,13 @@ export interface ActionInput {
 }
 
 const ACTION_TABLE_FILE_NAME = 'actionTable.json';
+const CONFIG_FILE_NAME = 'dvconfig.json';
 
 
 export class ActionHelper {
   private readonly actionTable: ActionTable;
+  private readonly actionsNoExecRequest: Set<string>;
+
   constructor(appActionTable: ActionTable, usedCliches: string[]) {
     const clicheActionTables: ActionTable[] = _.map(
         _.uniq(usedCliches), this.getActionTableOfCliche.bind(this));
@@ -67,15 +70,30 @@ export class ActionHelper {
     _.each(_.values(appActionTable), getUsedActions);
 
     this.actionTable = _.pick(allActionsTable, Array.from(usedActions));
+
+    this.actionsNoExecRequest = new Set<string>(
+      _.flatMap(usedCliches, (cliche: string) => _.get(
+      this.getActionsNoRequest(cliche), 'exec', [])));
   }
 
   private getActionTableOfCliche(cliche: string): ActionTable {
-    return JSON.parse(readFileSync(
-      path.join('node_modules', cliche, ACTION_TABLE_FILE_NAME), 'utf8'));
+    const fp = path.join('node_modules', cliche, ACTION_TABLE_FILE_NAME);
+
+    return JSON.parse(readFileSync(fp, 'utf8'));
+  }
+
+  private getActionsNoRequest(cliche: string): { exec: string[] } | undefined {
+    const fp = path.join('node_modules', cliche, CONFIG_FILE_NAME);
+
+    return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
   }
 
   private clicheOfTag(tag: string) {
     return tag.split('-')[0];
+  }
+
+  shouldHaveExecRequest(tag: string): boolean {
+    return !this.actionsNoExecRequest.has(tag);
   }
 
   getActionOrFail(actionPath: string[]): ActionTag {

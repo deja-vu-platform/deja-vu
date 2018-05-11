@@ -2,6 +2,7 @@
 import * as program from 'commander';
 import { spawnSync } from 'child_process';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { copySync } from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 
@@ -226,7 +227,7 @@ program
     // There seems to be something wrong with commander because if we do
     // `package` with a subcommand it doesn't work unless the user provides args
     const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
-    if (subcmd == 'package') {
+    if (subcmd === 'package') {
       console.log('Packaging cliche');
       npm(['run', `dv-package-${config.name}`]);
 
@@ -239,9 +240,10 @@ program
       writeFileOrFail(
         path.join('pkg', ACTION_TABLE_FILE_NAME),
         actionTable(config, _.get(config.actions, 'package')));
+      copySync(DVCONFIG_FILE_PATH, path.join('pkg', DVCONFIG_FILE_PATH));
       console.log('Done');
       process.exit(0); // commander sucks
-    } else if (subcmd == 'serve') {
+    } else if (subcmd === 'serve') {
       console.log('Serving app');
       // Serve everything (including all dep cliches)
 
