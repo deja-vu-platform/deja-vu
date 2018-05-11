@@ -90,7 +90,7 @@ const resolvers = {
       const rating = await ratings
         .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId });
 
-      if (_.isEmpty(rating)) {
+      if (_.isNil(rating)) {
         throw new Error(`Rating by ${input.bySourceId} for target
          ${input.ofTargetId} does not exist`);
       }
