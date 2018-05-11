@@ -266,8 +266,14 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
     if (!runId) {
       throw new Error('run id undefined');
     }
+    /* Temporarily deactivate txs
     await txCoordinator.processMessage(
         runId, actionPathToId(actionPath), gatewayToClicheRequest, res);
+    */
+    const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
+      gatewayToClicheRequest);
+    res.status(clicheRes.status);
+    res.send(clicheRes.text);
   }
 });
 
