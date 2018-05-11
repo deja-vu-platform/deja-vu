@@ -91,7 +91,7 @@ const resolvers = {
   Query: {
     label: async (root, { id }) => {
       const label = await labels.findOne({ id: standardizeLabel(id) });
-      if (_.isEmpty(label)) { throw new Error(`Label ${id} not found`); }
+      if (_.isNil(label)) { throw new Error(`Label ${id} not found`); }
 
       return label;
     },
