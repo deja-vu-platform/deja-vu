@@ -35,6 +35,9 @@ import { FaqComponent } from './faq/faq.component';
 import { LoginComponent } from './login/login.component';
 import { NavBarComponent } from './nav-bar/nav-bar.component';
 import {
+  RegisterDialogComponent
+} from './register-dialog/register-dialog.component';
+import {
   RequestDetailsDialogComponent
 } from './request-details-dialog/request-details-dialog.component';
 import {
@@ -87,6 +90,7 @@ import { TaskModule } from 'task';
     FaqComponent,
     ShowProfileComponent,
     ShowPartySummaryComponent,
+    RegisterDialogComponent,
 
     AcceptRejectDeliveryDialogComponent, ChangePasswordDialogComponent,
     CloseDeliveryDialogComponent, EditProfileDialogComponent,
@@ -103,12 +107,12 @@ import { TaskModule } from 'task';
     MatIconModule, MatToolbarModule,
     MatExpansionModule,
     RouterModule.forRoot([
-      {path: '', component: LoginComponent},
-      {path: 'dashboard', component: DashboardComponent},
-      {path: 'request', component: CreateRequestComponent},
-      {path: 'deliver', component: DeliverComponent},
-      {path: 'faq', component: FaqComponent},
-      {path: 'profile', component: UserProfileComponent}
+      { path: '', component: LoginComponent },
+      { path: 'dashboard', component: DashboardComponent },
+      { path: 'request', component: CreateRequestComponent },
+      { path: 'deliver', component: DeliverComponent },
+      { path: 'faq', component: FaqComponent },
+      { path: 'profile', component: UserProfileComponent }
     ]),
     AuthenticationModule,
     AuthorizationModule,
@@ -128,7 +132,8 @@ import { TaskModule } from 'task';
     RequestDetailsDialogComponent, SetDeliveryTimeDialogComponent,
     ShowAcceptRequestNotificationComponent, ShowDeliverRequestComponent,
     ShowDeliverRequestNotificationComponent, ShowMyRequestComponent,
-    ShowRequestDetailsComponent, ShowRequestTransactionComponent
+    ShowRequestDetailsComponent, ShowRequestTransactionComponent,
+    RegisterDialogComponent
   ]
 })
 export class AppModule { }
