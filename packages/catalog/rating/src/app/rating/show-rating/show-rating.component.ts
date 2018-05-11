@@ -1,16 +1,20 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
-  Output, SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject,
+  Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory
-} from 'dv-core';
-import { RatingService, RatingServiceFactory } from '../shared/rating.service';
+import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
 import { take } from 'rxjs/operators';
 
 import * as _ from 'lodash';
 
+import { API_PATH } from '../rating.config';
+import { Rating } from '../shared/rating.model';
+
+interface RatingRes {
+  data: { rating: Rating };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'rating-show-rating',
@@ -19,8 +23,8 @@ import * as _ from 'lodash';
 })
 export class ShowRatingComponent implements
   OnInit, OnChanges {
-    // Either (`sourceId`, `targetId`) or `ratingIn` must be given. If
-    // `ratingIn` is given this rating is displayed
+  // Either (`sourceId`, `targetId`) or `ratingIn` must be given. If
+  // `ratingIn` is given this rating is displayed
   @Input() sourceId: string;
   @Input() targetId: string;
 
@@ -29,12 +33,13 @@ export class ShowRatingComponent implements
   @Output() rating = new EventEmitter<number>();
 
   ratingValue: number;
-  private ratingService: RatingService;
+  private gs: GatewayService;
 
-  constructor(private elem: ElementRef, private rsf: RatingServiceFactory) {}
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.ratingService = this.rsf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
     this.loadRating();
   }
 
@@ -46,16 +51,36 @@ export class ShowRatingComponent implements
    * Load a rating from the server (if any), and set the value of the widget.
    */
   async loadRating() {
-    if (!this.ratingService) {
+    if (!this.gs) {
       return;
     }
     if (this.ratingIn) {
       this.ratingValue = this.ratingIn;
       this.rating.emit(this.ratingValue);
     } else if (this.sourceId && this.targetId) {
-      this.ratingValue = await this.ratingService
-        .ratingBySourceTarget(this.sourceId, this.targetId);
-      this.rating.emit(this.ratingValue);
+      this.gs.get<RatingRes>(this.apiPath, {
+        params: {
+          query: `
+            query Rating($input: RatingInput!) {
+              rating(input: $input) {
+                rating
+              }
+            }
+          `,
+          variables: JSON.stringify({
+            input: {
+              bySourceId: this.sourceId,
+              ofTargetId: this.targetId
+            }
+          })
+        }
+      })
+        .subscribe((res) => {
+          if (res.data.rating) {
+            this.ratingValue = res.data.rating.rating;
+            this.rating.emit(this.ratingValue);
+          }
+        });
     }
   }
 }

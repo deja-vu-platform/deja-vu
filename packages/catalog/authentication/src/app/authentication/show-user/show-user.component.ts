@@ -61,7 +61,10 @@ export class ShowUserComponent implements OnInit, OnChanges {
       }
     })
     .subscribe((res) => {
-      this.username = res.data.userById.username;
+      const userById = res.data.userById;
+      if (userById) {
+        this.username = res.data.userById.username;
+      }
     });
   }
 }

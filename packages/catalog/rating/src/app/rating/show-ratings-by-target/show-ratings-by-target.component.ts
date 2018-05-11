@@ -1,13 +1,18 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
-  Output, SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject,
+  Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
-import {
-  Action, GatewayService, GatewayServiceFactory
-} from 'dv-core';
-import { RatingService, RatingServiceFactory } from '../shared/rating.service';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+
+import { API_PATH } from '../rating.config';
+import { Rating } from '../shared/rating.model';
+
 import { ShowRatingComponent } from '../show-rating/show-rating.component';
 
+interface RatingsRes {
+  data: { ratings: Rating[] };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'rating-show-ratings-by-target',
@@ -16,20 +21,21 @@ import { ShowRatingComponent } from '../show-rating/show-rating.component';
 })
 export class ShowRatingsByTargetComponent implements OnInit, OnChanges {
   @Input() targetId: string;
-  @Input() showRating: Action = {type: <Type<Component>> ShowRatingComponent};
+  @Input() showRating: Action = { type: <Type<Component>>ShowRatingComponent };
 
   @Input() noRatingsToShowText = 'No ratings to show';
-  ratings: {rating: number, sourceId: string}[] = [];
+  ratings: Rating[] = [];
 
   showRatingsByTarget;
-  private ratingService: RatingService;
+  private gs: GatewayService;
 
-  constructor(private elem: ElementRef, private rsf: RatingServiceFactory) {
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showRatingsByTarget = this;
   }
 
   ngOnInit() {
-    this.ratingService = this.rsf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
     this.loadRatings();
   }
 
@@ -38,21 +44,27 @@ export class ShowRatingsByTargetComponent implements OnInit, OnChanges {
   }
 
   async loadRatings() {
-    if (!this.targetId || !this.ratingService) {
+    if (!this.targetId || !this.gs) {
       return;
     }
-    const res = await this.ratingService
-      .get<{
-        data: {target: {ratings: {rating: number, sourceId: string}[]}}
-        }>(`
-        target(id: "${this.targetId}") {
-          ratings {
-            rating
-            sourceId
+    this.gs.get<RatingsRes>(this.apiPath, {
+      params: {
+        query: `
+          query Ratings($input: RatingsInput!) {
+            ratings(input: $input) {
+              rating
+            }
           }
-        }
-      `)
-      .toPromise();
-    this.ratings = res.data.target.ratings;
+        `,
+        variables: JSON.stringify({
+          input: {
+            ofTargetId: this.targetId
+          }
+        })
+      }
+    })
+      .subscribe((res) => {
+        this.ratings = res.data.ratings;
+      });
   }
 }

@@ -8,7 +8,9 @@ import * as mongodb from 'mongodb';
 import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
-import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
+// GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
+// tslint:disable-next-line:no-var-requires
+const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
 
 import * as _ from 'lodash';

@@ -1,12 +1,16 @@
 import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit,
-  Output, SimpleChanges, Type
+  AfterViewInit, Component, ElementRef, EventEmitter, Inject,
+  Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
-import {
-  GatewayService, GatewayServiceFactory
-} from 'dv-core';
-import { RatingService, RatingServiceFactory } from '../shared/rating.service';
+import { GatewayService, GatewayServiceFactory } from 'dv-core';
 
+import { API_PATH } from '../rating.config';
+import { Rating } from '../shared/rating.model';
+
+interface AverageRatingForInputRes {
+  data: { averageRatingForTarget: { rating: number; count: number } };
+  errors: { message: string }[];
+}
 
 @Component({
   selector: 'rating-show-average-rating',
@@ -22,12 +26,13 @@ export class ShowAverageRatingComponent implements OnInit, OnChanges {
   @Output() ratingCount = new EventEmitter<number>();
   ratingCountValue = 0;
 
-  private ratingService: RatingService;
+  private gs: GatewayService;
 
-  constructor(private elem: ElementRef, private rsf: RatingServiceFactory) {}
+  constructor(private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
-    this.ratingService = this.rsf.for(this.elem);
+    this.gs = this.gsf.for(this.elem);
     this.loadRatingAverage();
   }
 
@@ -40,16 +45,30 @@ export class ShowAverageRatingComponent implements OnInit, OnChanges {
   /**
    * Download ratings for the target from the server.
    */
-  async loadRatingAverage() {
-    if (!this.targetId || !this.ratingService) {
+  loadRatingAverage() {
+    if (!this.targetId || !this.gs) {
       return;
     }
-    const { rating, count } = await this.ratingService
-      .averageRatingForTarget(this.targetId);
-    this.averageRatingValue = rating;
-    this.averageRating.emit(this.averageRatingValue);
 
-    this.ratingCountValue = count;
-    this.ratingCount.emit(this.ratingCountValue);
+    this.gs.get<AverageRatingForInputRes>(this.apiPath, {
+      params: {
+        query: `
+          query {
+            averageRatingForTarget(targetId: "${this.targetId}") {
+              rating,
+              count
+            }
+          }
+        `
+      }
+    })
+      .subscribe((res) => {
+        if (res.data.averageRatingForTarget) {
+          this.averageRatingValue = res.data.averageRatingForTarget.rating;
+          this.averageRating.emit(this.averageRatingValue);
+          this.ratingCountValue = res.data.averageRatingForTarget.count;
+          this.ratingCount.emit(this.ratingCountValue);
+        }
+      });
   }
 }
