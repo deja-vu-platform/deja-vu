@@ -173,7 +173,7 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
 
   console.log('Initialize dvconfig file');
   const initialConfig: DvConfig = {
-    name: name, gateway: { name: 'gateway', config: { wsPort: GATEWAY_PORT } }
+    name: name, gateway: { config: { wsPort: GATEWAY_PORT } }
   };
   writeFileOrFail(
     path.join(name, DVCONFIG_FILE_PATH),
@@ -195,7 +195,7 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
 }
 
 export interface DvConfig {
-  name: string;
+  name?: string;
   startServer?: boolean;
   watch?: boolean;
   config?: any;
@@ -206,7 +206,10 @@ export interface DvConfig {
 
 function actionTable(
   config: DvConfig, actionsConfig: ActionsConfig | undefined): string {
-  const usedClicheNames = new Set(_.map(config.usedCliches, 'name'));
+  const usedClicheNames = new Set(
+    _.map(_.toPairs(config.usedCliches),
+      ([alias, usedClicheConfig]: [string, DvConfig]): string => _.get(
+        usedClicheConfig, 'name', alias)));
   const actionTable = getActionTable(
     config.name, process.cwd(), actionsConfig, Array.from(usedClicheNames));
   return JSON.stringify(actionTable, null, 2);
