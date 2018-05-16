@@ -17,7 +17,7 @@ interface ConsumerOfResourceRes {
 
 @Component({
   selector: 'allocator-show-consumer',
-  template: '{{_consumerId}}'
+  templateUrl: './show-consumer.component.html'
 })
 export class ShowConsumerComponent implements OnChanges, OnInit {
   @Input() resourceId: string;
