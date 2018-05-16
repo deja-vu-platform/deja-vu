@@ -2,9 +2,11 @@
 import * as program from 'commander';
 import { spawnSync } from 'child_process';
 import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { copySync } from 'fs-extra';
 import * as path from 'path';
 import * as _ from 'lodash';
 
+import { ActionsConfig, getActionTable } from './actionProcessor/actionTable';
 
 /** Executes `ng` synchronously **/
 export function ng(args: string[], cwd?: string): void {
@@ -58,6 +60,7 @@ export const NG_PACKAGR = {
 
 
 const NG_CLI_CONFIG_FILE = '.angular-cli.json';
+const ACTION_TABLE_FILE_NAME = 'actionTable.json';
 export const DVCONFIG_FILE_PATH = 'dvconfig.json';
 
 /**
@@ -192,12 +195,24 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
 }
 
 export interface DvConfig {
-  name: string;
+  name?: string;
   startServer?: boolean;
   watch?: boolean;
   config?: any;
   gateway?: DvConfig;
   usedCliches?: { [as: string]: DvConfig };
+  actions?: { package?: ActionsConfig, app?: ActionsConfig };
+}
+
+function actionTable(
+  config: DvConfig, actionsConfig: ActionsConfig | undefined): string {
+  const usedClicheNames = new Set(
+    _.map(_.toPairs(config.usedCliches),
+      ([alias, usedClicheConfig]: [string, DvConfig]): string => _.get(
+        usedClicheConfig, 'name', alias)));
+  const actionTable = getActionTable(
+    config.name, process.cwd(), actionsConfig, Array.from(usedClicheNames));
+  return JSON.stringify(actionTable, null, 2);
 }
 
 program
@@ -214,79 +229,46 @@ program
   .action(subcmd => {
     // There seems to be something wrong with commander because if we do
     // `package` with a subcommand it doesn't work unless the user provides args
-    if (subcmd == 'package') {
+    const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
+    if (subcmd === 'package') {
       console.log('Packaging cliche');
-      const clicheName: string = JSON
-        .parse(readFileOrFail(DVCONFIG_FILE_PATH)).name;
-      npm(['run', `dv-package-${clicheName}`]);
-
+      npm(['run', `dv-package-${config.name}`]);
 
       updatePackage(pkg => {
         pkg.peerDependencies['dv-gateway'] = 'file:' +
           path.join('..', pkg.peerDependencies['dv-gateway'].slice('file:'.length));
         return pkg;
       }, NG_PACKAGR.configFileContents.dest);
+
+      writeFileOrFail(
+        path.join('pkg', ACTION_TABLE_FILE_NAME),
+        actionTable(config, _.get(config.actions, 'package')));
+      copySync(DVCONFIG_FILE_PATH, path.join('pkg', DVCONFIG_FILE_PATH));
       console.log('Done');
       process.exit(0); // commander sucks
-    } else if (subcmd == 'serve') {
-      const config: DvConfig = JSON.parse(readFileOrFail(DVCONFIG_FILE_PATH));
+    } else if (subcmd === 'serve') {
       console.log('Serving app');
-      // for now, serve everything (including all dep cliches)
+      // Serve everything (including all dep cliches)
 
-      const currentProject = _
-        .pick(config, ['name', 'startServer', 'watch', 'config']);
-
-      const clichesToWatch: string[] = _
-        .chain(config.usedCliches)
-        .entries()
-        .filter(e => e[1].watch)
-        .map(e => e[0])
-        .value();
-
-      console.log('Build everything');
-      const pkgScripts: string[] = _.map(
-        clichesToWatch, clicheName => `dv-package-${clicheName}`);
-      if (pkgScripts.length > 1) {
-        cmd('npm', [
-          'run', 'concurrently', '--',
-          ..._.map(pkgScripts, pkgScript => `"npm run ${pkgScript}"`)]);
-      } else if (pkgScripts.length == 1) {
-        cmd('npm', ['run', pkgScripts[0]]);
-      }
       cmd('npm', ['run', `dv-build-${config.name}`]);
-
-      console.log('Start build and serve watchers');
-      const buildWatchCmds = _
-        .chain(clichesToWatch)
-        .map(clicheName => `npm run dv-package-watch-${clicheName}`)
-        .concat(`npm run dv-build-watch-${config.name}`)
-        .value();
-      const reinstallWatchCmds = _
-        .chain(clichesToWatch)
-        .map(clicheName => `npm run dv-reinstall-watch-${clicheName}`)
-        .value();
-
-      const buildStartServerCmd = (name: string, watch?: boolean) => {
-        return 'npm run dv-start' + (watch ? '-watch' : '') + `-${name}`;
-      };
-      const startServerOfCurrentProjectCmd = buildStartServerCmd(
-        currentProject.name, currentProject.watch);
+      writeFileOrFail(
+        path.join('dist', ACTION_TABLE_FILE_NAME),
+        actionTable(config, _.get(config.actions, 'app')));
+      const buildStartServerCmd = (name: string) => `npm run dv-start-${name}`;
+      const startServerOfCurrentProjectCmd = buildStartServerCmd(config.name);
       const startServerCmds = _
         .chain(config.usedCliches)
         .entries()
-        .filter(e => e[1].startServer)
-        .map(e => buildStartServerCmd(e[0], e[1].watch))
+        .map(e => buildStartServerCmd(e[0]))
         .concat(startServerOfCurrentProjectCmd)
         .value();
 
-      const allBuildAndWatchCmds: string[] = _
-        .chain(buildWatchCmds)
-        .concat(reinstallWatchCmds)
-        .concat(startServerCmds)
+      const allStartCmds: string[] = _
+        .chain(startServerCmds)
         .concat('npm run dv-start-gateway')
         .map(cmd => `"${cmd}"`)
         .value();
-      cmd('npm', ['run', 'concurrently', '--', ...allBuildAndWatchCmds]);
+      cmd('npm', ['run', 'concurrently', '--', ...allStartCmds]);
 
       process.exit(0); // commander sucks
     }
