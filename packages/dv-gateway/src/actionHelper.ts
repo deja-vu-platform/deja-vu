@@ -255,6 +255,10 @@ export class ActionHelper {
 
     } else {  // action is the default one
       const tag = _.get(includeActionTag, 'inputs.tag');
+      if (_.isEmpty(tag)) {
+        throw new Error(noActionErrorMsg(
+          'Expected default action to have tag attribute'));
+      }
       const dvOf = _.get(includeActionTag, 'inputs.dvOf');
       const dvAlias = _.get(includeActionTag, 'inputs.dvAlias');
       const inputs = _.get(includeActionTag, 'inputs.inputs');
