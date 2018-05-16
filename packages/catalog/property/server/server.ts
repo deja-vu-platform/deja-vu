@@ -175,6 +175,7 @@ const resolvers = {
   Mutation: {
     createObject: async (root, { input }, context: Context) => {
       const newObject: ObjectDoc = createObjectFromInput(input);
+      const reqIdPendingFilter = { '_pending.reqId': context.reqId };
       switch (context.reqType) {
         case 'vote':
           newObject._pending = { reqId: context.reqId };
@@ -185,12 +186,11 @@ const resolvers = {
           return newObject;
         case 'commit':
           await objects.updateOne(
-            { '_pending.reqId': context.reqId },
-            { $unset: { _pending: '' } });
+            reqIdPendingFilter, { $unset: { _pending: '' } });
 
           return;
         case 'abort':
-          await objects.deleteOne({ '_pending.reqId': context.reqId });
+          await objects.deleteOne(reqIdPendingFilter);
 
           return;
       }
@@ -198,6 +198,7 @@ const resolvers = {
 
     createObjects: async (root, { input }, context: Context) => {
       const objDocs: ObjectDoc[] = _.map(input, createObjectFromInput);
+      const reqIdPendingFilter = { '_pending.reqId': context.reqId };
       switch (context.reqType) {
         case 'vote':
           _.each(objDocs, (objDoc: ObjectDoc) => {
@@ -210,12 +211,11 @@ const resolvers = {
           return objDocs;
         case 'commit':
           await objects.updateMany(
-            { '_pending.reqId': context.reqId },
-            { $unset: { _pending: '' } });
+            reqIdPendingFilter, { $unset: { _pending: '' } });
 
           return;
         case 'abort':
-          await objects.deleteMany({ '_pending.reqId': context.reqId });
+          await objects.deleteMany(reqIdPendingFilter);
 
           return;
       }

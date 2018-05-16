@@ -183,17 +183,18 @@ const resolvers = {
         const updateOp = {
           $set: { 'assignments.$.consumerId': newConsumerId }
         };
+        const notPendingAllocFilter = {
+          id: allocationId,
+          'assignments.resourceId': resourceId,
+          pending: { $exists: false }
+        };
         switch (context.reqType) {
           case 'vote':
             await Validation.resourceIsPartOfAllocationOrFail(
               allocationId, resourceId);
             const pendingUpdateObj = await allocations
               .updateOne(
-                {
-                  id: allocationId,
-                  'assignments.resourceId': resourceId,
-                  pending: { $exists: false }
-                },
+                notPendingAllocFilter,
                 {
                   $set: {
                     pending: {
@@ -211,13 +212,7 @@ const resolvers = {
             await Validation.resourceIsPartOfAllocationOrFail(
               allocationId, resourceId);
             const updateObj = await allocations
-              .updateOne(
-                {
-                  id: allocationId,
-                  'assignments.resourceId': resourceId,
-                  pending: { $exists: false }
-                },
-                updateOp);
+              .updateOne(notPendingAllocFilter, updateOp);
             if (updateObj.matchedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);
             }
@@ -244,6 +239,7 @@ const resolvers = {
     createAllocation: async (
       root, { input: { id, resourceIds, consumerIds } }
       : { input: CreateAllocationInput }, context: Context) => {
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
         let pending: PendingDoc | undefined;
         switch (context.reqType) {
           case 'vote':
@@ -277,12 +273,11 @@ const resolvers = {
             return newAllocation;
           case 'commit':
             await allocations.updateOne(
-              { 'pending.reqId': context.reqId },
-              { $unset: { pending: '' } });
+              reqIdPendingFilter, { $unset: { pending: '' } });
 
             return;
           case 'abort':
-            await allocations.deleteOne({ 'pending.reqId': context.reqId });
+            await allocations.deleteOne(reqIdPendingFilter);
 
             return;
         }
@@ -296,6 +291,7 @@ const resolvers = {
           assignments: { resourceId: resourceId }
         }
       };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
       switch (context.reqType) {
         case 'vote':
           await Validation.allocationExistsOrFail(allocationId);
@@ -327,13 +323,12 @@ const resolvers = {
           return true;
         case 'commit':
           await allocations.updateOne(
-            { 'pending.reqId': context.reqId },
-            { ...updateOp, $unset: { pending: '' } });
+            reqIdPendingFilter, { ...updateOp, $unset: { pending: '' } });
 
           return;
         case 'abort':
           await allocations.updateOne(
-            { 'pending.reqId': context.reqId }, { $unset: { pending: '' } });
+            reqIdPendingFilter, { $unset: { pending: '' } });
 
           return;
       }

@@ -193,6 +193,7 @@ const resolvers = {
         endDate: unixTimeToDate(input.endDate)
       };
 
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
       switch (context.reqType) {
         case 'vote':
           e.pending = { reqId: context.reqId, type: 'create-event' };
@@ -203,12 +204,12 @@ const resolvers = {
           return e;
         case 'commit':
           await events.updateOne(
-            { 'pending.reqId': context.reqId },
-            { $unset: { _pending: '' } });
+            reqIdPendingFilter,
+            { $unset: { pending: '' } });
 
           return;
         case 'abort':
-          await events.deleteOne({ 'pending.reqId': context.reqId });
+          await events.deleteOne(reqIdPendingFilter);
 
           return;
       }
@@ -228,15 +229,17 @@ const resolvers = {
         return false;
       }
       const updateOp = { $set: setObject };
+      const notPendingEventFilter = {
+        id: input.id,
+        pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
       switch (context.reqType) {
         case 'vote':
           await Validation.eventExistsOrFail(input.id);
           const pendingUpdateObj = await events
             .updateOne(
-              {
-                id: input.id,
-                pending: { $exists: false }
-              },
+              notPendingEventFilter,
               {
                 $set: {
                   pending: {
@@ -253,12 +256,7 @@ const resolvers = {
         case undefined:
           await Validation.eventExistsOrFail(input.id);
           const updateObj = await events
-            .updateOne(
-              {
-                id: input.id,
-                pending: { $exists: false }
-              },
-              updateOp);
+            .updateOne(notPendingEventFilter, updateOp);
           if (updateObj.matchedCount === 0) {
             throw new Error(CONCURRENT_UPDATE_ERROR);
           }
@@ -266,13 +264,13 @@ const resolvers = {
           return true;
         case 'commit':
           await events.updateOne(
-            { 'pending.reqId': context.reqId },
+            reqIdPendingFilter,
             { ...updateOp, $unset: { pending: '' } });
 
           return;
         case 'abort':
           await events.updateOne(
-            { 'pending.reqId': context.reqId }, { $unset: { pending: '' } });
+            reqIdPendingFilter, { $unset: { pending: '' } });
 
           return;
       }
@@ -280,13 +278,18 @@ const resolvers = {
     deleteEvent: async (root, { id }, context: Context) => {
       const isPartOfSeries: boolean = await events
         .findOne({ id: id }, { projection: { _id: 1 }}) === null;
+      const notPendingEventsFilter = {
+        'events.id': id, pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
       if (isPartOfSeries) {
         const updateOp = { $pull: { events: { id: id } } };
+
         switch (context.reqType) {
           case 'vote':
             await Validation.eventExistsInSeriesOrFail(id);
             const pendingUpdateObj = await series.updateOne(
-              { 'events.id': id, pending: { $exists: false } },
+              notPendingEventsFilter,
               {
                 $set: {
                   pending: {
@@ -304,7 +307,7 @@ const resolvers = {
           case undefined:
             await Validation.eventExistsInSeriesOrFail(id);
             const updateObj = await series.updateOne(
-              { 'events.id': id, pending: { $exists: false} }, updateOp);
+              notPendingEventsFilter, updateOp);
 
             if (updateObj.matchedCount === 0) {
               throw new Error(CONCURRENT_UPDATE_ERROR);
@@ -313,13 +316,13 @@ const resolvers = {
             return true;
           case 'commit':
             await series.updateOne(
-              { 'pending.reqId': context.reqId },
+              reqIdPendingFilter,
               { ...updateOp, $unset: { pending: '' } });
 
             return;
           case 'abort':
             await series.updateOne(
-              { 'pending.reqId': context.reqId }, { $unset: { pending: '' } });
+              reqIdPendingFilter, { $unset: { pending: '' } });
 
             return;
         }
@@ -331,7 +334,7 @@ const resolvers = {
           case 'vote':
             await Validation.eventExistsOrFail(id);
             const pendingUpdateObj = await series.updateOne(
-              { 'events.id': id, pending: { $exists: false } },
+              notPendingEventsFilter,
               {
                 $set: {
                   pending: {
@@ -357,12 +360,12 @@ const resolvers = {
 
             return true;
           case 'commit':
-            await events.deleteOne({ 'pending.reqId': context.reqId });
+            await events.deleteOne(reqIdPendingFilter);
 
             return;
           case 'abort':
             await events.updateOne(
-              { 'pending.reqId': context.reqId }, { $unset: { pending: '' } });
+              reqIdPendingFilter, { $unset: { pending: '' } });
 
             return;
         }
@@ -377,6 +380,7 @@ const resolvers = {
       if (_.isEmpty(input.events)) {
         throw new Error('Series has no events');
       }
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
       let pending: PendingDoc | undefined;
       switch (context.reqType) {
         case 'vote':
@@ -410,12 +414,11 @@ const resolvers = {
           return newSeries;
         case 'commit':
           await series.updateOne(
-            { 'pending.reqId': context.reqId },
-            { $unset: { pending: '' } });
+            reqIdPendingFilter, { $unset: { pending: '' } });
 
           return;
         case 'abort':
-          await series.deleteOne({ 'pending.reqId': context.reqId });
+          await series.deleteOne(reqIdPendingFilter);
 
           return;
       }
