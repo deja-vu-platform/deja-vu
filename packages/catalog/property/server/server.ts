@@ -24,12 +24,12 @@ interface Config {
   schema: any;
 }
 
-interface ObjectDoc extends Pending {
-  [field: string]: any;
-}
-
 interface Pending {
   _pending?: PendingDoc;
+}
+
+interface ObjectDoc extends Pending {
+  [field: string]: any;
 }
 
 interface PendingDoc {
