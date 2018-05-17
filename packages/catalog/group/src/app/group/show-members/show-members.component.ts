@@ -6,8 +6,6 @@ import * as _ from 'lodash';
 
 import { ShowMemberComponent } from '../show-member/show-member.component';
 
-import { Member } from '../shared/group.model';
-
 
 @Component({
   selector: 'group-show-members',
@@ -22,7 +20,7 @@ export class ShowMembersComponent implements OnInit, OnChanges {
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent
   };
-  members: Member[] = [];
+  memberIds: string[] = [];
 
   showMembers;
   private gs: GatewayService;
@@ -44,13 +42,11 @@ export class ShowMembersComponent implements OnInit, OnChanges {
   fetchMembers() {
     if (this.gs) {
       this.gs
-        .get<{data: {members: Member[]}}>('/graphql', {
+        .get<{data: {members: string[]}}>('/graphql', {
           params: {
             query: `
               query Members($input: MembersInput!) {
-                members(input: $input) {
-                  id
-                }
+                members(input: $input)
               }
             `,
             variables: JSON.stringify({
@@ -62,7 +58,7 @@ export class ShowMembersComponent implements OnInit, OnChanges {
           }
         })
         .subscribe((res) => {
-          this.members = res.data.members;
+          this.memberIds = res.data.members;
         });
     }
   }

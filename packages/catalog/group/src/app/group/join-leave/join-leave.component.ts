@@ -11,7 +11,7 @@ import * as _ from 'lodash';
 
 import { ShowGroupComponent } from '../show-group/show-group.component';
 
-import { Group, Member } from '../shared/group.model';
+import { Group } from '../shared/group.model';
 
 
 @Component({
@@ -20,7 +20,7 @@ import { Group, Member } from '../shared/group.model';
   styleUrls: ['./join-leave.component.css']
 })
 export class JoinLeaveComponent implements OnInit {
-  @Input() member: Member;
+  @Input() memberId: string;
   // One of `group` or `groupId` is required
   @Input() group: Group;
   @Input() groupId: string;
@@ -48,7 +48,7 @@ export class JoinLeaveComponent implements OnInit {
 
   load() {
     if (!this.gs || this.group) {
-      this.inGroup = this.groupContains(this.group, this.member);
+      this.inGroup = this.groupContains(this.group, this.memberId);
 
       return;
     }
@@ -58,9 +58,7 @@ export class JoinLeaveComponent implements OnInit {
           query {
             group(id: "${this.groupId}") {
               id
-              members {
-                id
-              }
+              memberIds
             }
           }
         `
@@ -68,7 +66,7 @@ export class JoinLeaveComponent implements OnInit {
     })
     .subscribe((res) => {
       this.group = res.data.group;
-      this.inGroup = this.groupContains(this.group, this.member);
+      this.inGroup = this.groupContains(this.group, this.memberId);
     });
   }
 
@@ -82,7 +80,7 @@ export class JoinLeaveComponent implements OnInit {
         query: `
           mutation {
             ${action}(
-              groupId: "${this.group.id}", id: "${this.member.id}") {
+              groupId: "${this.group.id}", id: "${this.memberId}") {
               id
             }
           }
@@ -90,16 +88,16 @@ export class JoinLeaveComponent implements OnInit {
       })
       .subscribe((res) => {
         if (this.inGroup) {
-          _.remove(this.group.members, (m) => m.id === this.member.id);
+          _.remove(this.group.memberIds, this.memberId);
           this.inGroup = false;
         } else {
-          this.group.members.push(this.member);
+          this.group.memberIds.push(this.memberId);
           this.inGroup = true;
         }
       });
   }
 
-  private groupContains(group: Group, member: Member) {
-    return _.includes(_.map(group.members, 'id'), member.id);
+  private groupContains(group: Group, memberId: string) {
+    return _.includes(group.memberIds, memberId);
   }
 }

@@ -60,7 +60,7 @@ export class ShowGroupsComponent implements OnInit, OnChanges {
               query Groups($input: GroupsInput!) {
                 groups(input: $input) {
                   ${this.showId ? 'id' : ''}
-                  ${this.showMembers ? 'members { id }' : ''}
+                  ${this.showMembers ? 'memberIds' : ''}
                   ${this.showSubgroups ? 'subgroups { id }' : ''}
                 }
               }

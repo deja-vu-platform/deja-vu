@@ -15,8 +15,6 @@ import { AutocompleteComponent } from './autocomplete/autocomplete.component';
 export { AutocompleteComponent };
 import { CreateGroupComponent } from './create-group/create-group.component';
 export { CreateGroupComponent };
-import { CreateMemberComponent } from './create-member/create-member.component';
-export { CreateMemberComponent };
 import { JoinLeaveComponent } from './join-leave/join-leave.component';
 export { JoinLeaveComponent };
 import { ShowGroupComponent } from './show-group/show-group.component';
@@ -33,7 +31,7 @@ export { StageComponent };
 
 const allComponents =  [
   AddToGroupComponent, AutocompleteComponent, CreateGroupComponent,
-  CreateMemberComponent, JoinLeaveComponent, ShowGroupComponent,
+  JoinLeaveComponent, ShowGroupComponent,
   ShowGroupsComponent, ShowMemberComponent, ShowMembersComponent,
   StageComponent
 ];

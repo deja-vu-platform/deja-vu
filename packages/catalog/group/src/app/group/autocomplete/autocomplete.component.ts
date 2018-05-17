@@ -93,20 +93,20 @@ implements OnInit, ControlValueAccessor, Validator {
     if (!this.gs) {
       return;
     }
-    const query = this.type === 'member' ? 'members' : 'groups';
+    const query = this.type === 'member' ? 'members(input: {})' :
+      'groups(input: {}) { id }';
     this.gs.get<{data: any}>('/graphql', {
       params: {
         query: `
           query {
-            ${query}(input: {}) {
-              id
-            }
+            ${query}
           }
         `
       }
     })
     .subscribe((res) => {
-      this.ids = _.map(res.data[query], 'id');
+      this.ids = this.type === 'member' ? res.data.members :
+        _.map(res.data.groups, 'id');
       this.filteredIds = this.control
         .valueChanges
         .pipe(startWith(''), map(this.filter.bind(this)));

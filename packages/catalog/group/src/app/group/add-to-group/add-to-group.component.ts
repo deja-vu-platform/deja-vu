@@ -80,14 +80,12 @@ export class AddToGroupComponent implements OnInit {
     if (!this.gs) {
       return;
     }
-    const field = this.type === 'member' ? 'members' : 'subgroups';
+    const field = this.type === 'member' ? 'memberIds' : 'subgroups { id }';
     this.gs.get<{data: {group: any}}>('/graphql', {
       params: {
         query: `query {
           group(id: "${this.id}") {
-            ${field} \{
-              id
-            }
+            ${field}
           }
         }`
       }
@@ -96,7 +94,8 @@ export class AddToGroupComponent implements OnInit {
       if (!res.data.group) {
         throw new Error(`Group ${this.id} doesn't exist`);
       }
-      this.disabledIds = _.map(res.data.group[field], 'id');
+      this.disabledIds = this.type === 'member' ?
+        res.data.group.memberIds : _.map(res.data.group.subgroups, 'id');
     });
   }
 
