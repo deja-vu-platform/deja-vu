@@ -58,8 +58,13 @@ export class ActionHelper {
     // Prune the action table to have only used actions
     // TODO: instead of adding all app actions, use the route information
     const usedActions = new Set<string>(_.keys(appActionTable));
+    const seenActions = new Set<string>();
     const getUsedActions = (actionAst: ActionAst | undefined): void => {
       _.each(actionAst, (action: ActionTag) => {
+        if (seenActions.has(action.tag)) {
+          return;
+        }
+        seenActions.add(action.tag);
         if (action.tag === 'dv-include' ||
             this.clicheOfTag(action.tag) !== 'dv') {
           usedActions.add(action.tag);
@@ -116,7 +121,7 @@ export class ActionHelper {
    * @returns the `ActionTag`s corresponding to the last node of the action path
    */
   getMatchingActions(actionPath: string[]): ActionTag[] {
-    return _.map(this.getMatchingPaths(actionPath.slice(1)), _.last);
+    return _.map(this.getMatchingPaths(actionPath), _.last);
   }
 
   /**
@@ -182,7 +187,7 @@ export class ActionHelper {
       return {
         fqtag: actionTag.fqtag,
         tag: actionTag.tag,
-        content: includedActionTag ? [] : _.map(
+        content: (includedActionTag === null) ? [] : _.map(
           [includedActionTag], (at: ActionTag) => ({...at, context: {}})),
         context: actionTag.context
       };
