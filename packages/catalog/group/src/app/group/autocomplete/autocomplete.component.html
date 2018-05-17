@@ -2,14 +2,16 @@
   <input type="text" [placeholder]="autocompletePlaceholder" matInput
   [formControl]="control" [matAutocomplete]="auto" required>
   <mat-autocomplete #auto="matAutocomplete">
-    <mat-option *ngFor="let id of filteredIds | async" [value]="id" [disabled]="isDisabled(id)">
+    <mat-option *ngFor="let id of filteredIds | async" [value]="id"
+      [disabled]="isDisabled(id)">
       <div *ngIf="type === 'member'">
-        <dv-include [action]="showMember" [inputs]="{id: id}"
+        <dv-include [action]="showMember" tag="group-show-member"
+          [inputs]="{id: id}"
           [parent]="autocompleteControl">
         </dv-include>
       </div>
       <div *ngIf="type === 'group'">
-        <dv-include [action]="showGroup"
+        <dv-include [action]="showGroup" tag="group-show-group"
           [inputs]="{
             id: id,
             showMembers: false,
@@ -20,8 +22,10 @@
       </div>
     </mat-option>
   </mat-autocomplete>
-  <mat-error *ngIf="control.hasError('required')" [innerHtml]="requiredErrorMsg">
+  <mat-error *ngIf="control.hasError('required')"
+    [innerHtml]="requiredErrorMsg">
   </mat-error>
-  <mat-error *ngIf="control.hasError('notAnOption')" [innerHtml]="notAnOptionErrorMsgFn(control.value)">
+  <mat-error *ngIf="control.hasError('notAnOption')"
+    [innerHtml]="notAnOptionErrorMsgFn(control.value)">
   </mat-error>
 </mat-form-field>

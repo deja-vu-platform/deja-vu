@@ -38,18 +38,18 @@
         <div class="row">
           <div class="col-md-10">
             <div *ngIf="type === 'member'">
-              <dv-include [action]="showMember" [inputs]="{
-                id: id
-               }"
-               [parent]="stageComponent">
+              <dv-include [action]="showMember" tag="group-show-member"
+                [inputs]="{ id: id }"
+                [parent]="stageComponent">
               </dv-include>
             </div>
             <div *ngIf="type === 'group'">
-              <dv-include [action]="showGroup" [inputs]="{
-                id: id,
-                showMembers: false,
-                showSubgroups: false
-               }"
+              <dv-include [action]="showGroup" tag="group-show-group"
+                [inputs]="{
+                  id: id,
+                  showMembers: false,
+                  showSubgroups: false
+                 }"
                 [parent]="stageComponent">
               </dv-include>
             </div>

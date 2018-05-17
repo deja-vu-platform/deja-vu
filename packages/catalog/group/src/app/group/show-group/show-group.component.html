@@ -7,7 +7,7 @@
 <ul *ngIf="showMembers && group?.members.length > 0" class="list-group">
   <li *ngFor="let member of group.members"
     class="list-group-item group-show-group-member-item">
-    <dv-include [action]="showMember" [inputs]="{
+    <dv-include [action]="showMember" tag="group-show-member" [inputs]="{
         member: member
       }"
       [parent]="showGroup">
