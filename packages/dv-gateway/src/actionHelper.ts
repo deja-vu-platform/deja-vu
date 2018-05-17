@@ -176,13 +176,14 @@ export class ActionHelper {
   private getActionContent(actionTag: ActionTag, actionTable: ActionTable)
     : ActionTag {
     if (actionTag.tag === 'dv-include') {
+      const includedActionTag: ActionTag | null = this
+        .getIncludedActionTag(actionTag);
+
       return {
         fqtag: actionTag.fqtag,
         tag: actionTag.tag,
-        content: _.map(
-          [this.getIncludedActionTag(actionTag)], (at: ActionTag) => {
-          return {...at, context: {}};
-        }),
+        content: includedActionTag ? [] : _.map(
+          [includedActionTag], (at: ActionTag) => ({...at, context: {}})),
         context: actionTag.context
       };
     } else if (this.clicheOfTag(actionTag.tag) === 'dv') {
@@ -220,7 +221,7 @@ export class ActionHelper {
    *  @param includeActionTag - the action tag to get the included action from
    *  @returns the included action tag
    */
-  private getIncludedActionTag(includeActionTag: ActionTag): ActionTag {
+  private getIncludedActionTag(includeActionTag: ActionTag): ActionTag | null {
     const noActionErrorMsg = (cause: string) => `
       Couldn't find the included action in ${JSON.stringify(includeActionTag)}:
       ${cause} \n Context is ${JSON.stringify(includeActionTag.context)}
@@ -229,7 +230,7 @@ export class ActionHelper {
     if (_.isEmpty(actionExpr)) {
       throw new Error(noActionErrorMsg('no action input'));
     }
-    let ret: ActionTag;
+    let ret: ActionTag | null = null;
     if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
       // action is not the default one
       let inputObj: ActionInput, tag: string;
@@ -253,7 +254,8 @@ export class ActionHelper {
         context: {}
       };
 
-    } else {  // action is the default one
+    // action has a default
+    } else if (!_.has(includeActionTag, 'inputs.no-default')) {
       const tag = _.get(includeActionTag, 'inputs.tag');
       if (_.isEmpty(tag)) {
         throw new Error(noActionErrorMsg(
