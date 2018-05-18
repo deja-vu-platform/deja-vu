@@ -16,6 +16,7 @@ interface EventDoc {
   id: string;
   startDate: Date;
   endDate: Date;
+  pending?: PendingDoc;
 }
 
 interface SeriesDoc {
@@ -23,6 +24,13 @@ interface SeriesDoc {
   startsOn: Date;
   endsOn: Date;
   events: EventDoc[];
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'create-event' | 'update-event' | 'delete-event' |
+    'delete-series-event' | 'create-series';
 }
 
 interface GraphQlEvent extends EventDoc {
@@ -53,6 +61,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -102,15 +112,59 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+class Validation {
+  static async eventExistsOrFail(id: string): Promise<void> {
+    const evt: EventDoc | null = await events
+      .findOne({ id: id }, { projection: { _id: 1 } });
+    if (evt === null) {
+      throw new Error(`Event ${id} doesn't exist `);
+    }
+  }
+
+  static async eventExistsInSeriesOrFail(id: string): Promise<void> {
+    const s: SeriesDoc | null = await series
+      .findOne({ 'events.id': id }, { projection: { _id: 1 } });
+    if (s === null) {
+      throw new Error(`Event ${id} doesn't exist `);
+    }
+  }
+}
+
+
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingCreate(doc: EventDoc | SeriesDoc | null) {
+  const docPending = _.get(doc, 'pending.type');
+
+  return docPending === 'create-event' || docPending === 'create-series';
+}
 
 const resolvers = {
   Query: {
-    events: () => events.find()
+    events: () => events.find({ pending: { $exists: false } })
       .toArray(),
-    series: () => series.find()
+    series: () => series.find({ pending: { $exists: false } })
       .toArray(),
-    event: (root, { id }) => events.findOne({ id: id }),
-    oneSeries: (root, { id }) => series.findOne({ id: id })
+    event: async (root, { id }) => {
+      const evt: EventDoc | null = await events.findOne({ id: id });
+      if (isPendingCreate(evt)) {
+        return null;
+      }
+
+      return evt;
+    },
+    oneSeries: async (root, { id }) => {
+      const s: SeriesDoc | null = await series.findOne({ id: id });
+      if (isPendingCreate(s)) {
+        return null;
+      }
+
+      return s;
+    }
   },
   Event: {
     id: (evt: EventDoc) => evt.id,
@@ -130,19 +184,40 @@ const resolvers = {
     })
   },
   Mutation: {
-    createEvent: async (root, { input }: { input: CreateEventInput }) => {
+    createEvent: async (
+      root, { input }: { input: CreateEventInput }, context: Context) => {
       const eventId = input.id ? input.id : uuid();
-      const e = {
+      const e: EventDoc = {
         id: eventId,
         startDate: unixTimeToDate(input.startDate),
         endDate: unixTimeToDate(input.endDate)
       };
 
-      await events.insertOne(e);
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+      switch (context.reqType) {
+        case 'vote':
+          e.pending = { reqId: context.reqId, type: 'create-event' };
+          /* falls through */
+        case undefined:
+          await events.insertOne(e);
+
+          return e;
+        case 'commit':
+          await events.updateOne(
+            reqIdPendingFilter,
+            { $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await events.deleteOne(reqIdPendingFilter);
+
+          return;
+      }
 
       return e;
     },
-    updateEvent: async (root, { input }: { input: UpdateEventInput }) => {
+    updateEvent: async (
+      root, { input }: { input: UpdateEventInput }, context: Context) => {
       const setObject: { startDate?: Date, endDate?: Date } = {};
       if (input.startDate) {
         setObject.startDate = unixTimeToDate(input.startDate);
@@ -150,51 +225,203 @@ const resolvers = {
       if (input.endDate) {
         setObject.endDate = unixTimeToDate(input.endDate);
       }
-      if (!_.isEmpty(setObject)) {
-        await events.updateOne({ id: input.id }, { $set: setObject });
+      if (_.isEmpty(setObject)) {
+        return false;
       }
+      const updateOp = { $set: setObject };
+      const notPendingEventFilter = {
+        id: input.id,
+        pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+      switch (context.reqType) {
+        case 'vote':
+          await Validation.eventExistsOrFail(input.id);
+          const pendingUpdateObj = await events
+            .updateOne(
+              notPendingEventFilter,
+              {
+                $set: {
+                  pending: {
+                    reqId: context.reqId,
+                    type: 'update-event'
+                  }
+                }
+              });
+          if (pendingUpdateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
 
-      return true;
-    },
-    deleteEvent: async (root, { id }) => {
-      const res = await events.deleteOne({ id: id });
-      if (res.deletedCount === 0) { // Might be an event that's part of a series
-        const seriesUpdate = { $pull: { events: { id: id } } };
-        const update = await series
-          .updateOne({ 'events.id': id }, seriesUpdate);
+          return true;
+        case undefined:
+          await Validation.eventExistsOrFail(input.id);
+          const updateObj = await events
+            .updateOne(notPendingEventFilter, updateOp);
+          if (updateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
 
-        return update.result.nModified === 1;
+          return true;
+        case 'commit':
+          await events.updateOne(
+            reqIdPendingFilter,
+            { ...updateOp, $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await events.updateOne(
+            reqIdPendingFilter, { $unset: { pending: '' } });
+
+          return;
       }
-
-      return true;
     },
-    createSeries: async (root, { input }: { input: CreateSeriesInput })
-    : Promise<SeriesDoc> => {
+    deleteEvent: async (root, { id }, context: Context) => {
+      const isPartOfSeries: boolean = await events
+        .findOne({ id: id }, { projection: { _id: 1 }}) === null;
+      const notPendingEventsFilter = {
+        'events.id': id, pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+      if (isPartOfSeries) {
+        const updateOp = { $pull: { events: { id: id } } };
+
+        switch (context.reqType) {
+          case 'vote':
+            await Validation.eventExistsInSeriesOrFail(id);
+            const pendingUpdateObj = await series.updateOne(
+              notPendingEventsFilter,
+              {
+                $set: {
+                  pending: {
+                    reqId: context.reqId,
+                    type: 'delete-series-event'
+                  }
+                }
+              });
+
+            if (pendingUpdateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case undefined:
+            await Validation.eventExistsInSeriesOrFail(id);
+            const updateObj = await series.updateOne(
+              notPendingEventsFilter, updateOp);
+
+            if (updateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case 'commit':
+            await series.updateOne(
+              reqIdPendingFilter,
+              { ...updateOp, $unset: { pending: '' } });
+
+            return;
+          case 'abort':
+            await series.updateOne(
+              reqIdPendingFilter, { $unset: { pending: '' } });
+
+            return;
+        }
+
+        // https://github.com/Microsoft/TypeScript/issues/19423
+        return;
+      } else {
+        switch (context.reqType) {
+          case 'vote':
+            await Validation.eventExistsOrFail(id);
+            const pendingUpdateObj = await series.updateOne(
+              notPendingEventsFilter,
+              {
+                $set: {
+                  pending: {
+                    reqId: context.reqId,
+                    type: 'delete-event'
+                  }
+                }
+              });
+
+            if (pendingUpdateObj.matchedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case undefined:
+            await Validation.eventExistsOrFail(id);
+            const res = await events
+              .deleteOne({ id: id, pending: { $exists: false } });
+
+            if (res.deletedCount === 0) {
+              throw new Error(CONCURRENT_UPDATE_ERROR);
+            }
+
+            return true;
+          case 'commit':
+            await events.deleteOne(reqIdPendingFilter);
+
+            return;
+          case 'abort':
+            await events.updateOne(
+              reqIdPendingFilter, { $unset: { pending: '' } });
+
+            return;
+        }
+
+        // https://github.com/Microsoft/TypeScript/issues/19423
+        return;
+      }
+    },
+    createSeries: async (
+      root, { input }: { input: CreateSeriesInput }, context: Context)
+      : Promise<SeriesDoc | undefined> => {
       if (_.isEmpty(input.events)) {
         throw new Error('Series has no events');
       }
-      const evts: EventDoc[] = [];
-      const seriesId = input.id ? input.id : uuid();
-      for (const createEvent of input.events) {
-        const eventId = createEvent.id ? createEvent.id : uuid();
-        const e = {
-          id: eventId,
-          startDate: unixTimeToDate(createEvent.startDate),
-          endDate: unixTimeToDate(createEvent.endDate)
-        };
-        evts.push(e);
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+      let pending: PendingDoc | undefined;
+      switch (context.reqType) {
+        case 'vote':
+          pending = { reqId: context.reqId, type: 'create-series' };
+          /* falls through */
+        case undefined:
+          const evts: EventDoc[] = [];
+          const seriesId = input.id ? input.id : uuid();
+          for (const createEvent of input.events) {
+            const eventId = createEvent.id ? createEvent.id : uuid();
+            const e = {
+              id: eventId,
+              startDate: unixTimeToDate(createEvent.startDate),
+              endDate: unixTimeToDate(createEvent.endDate)
+            };
+            evts.push(e);
+          }
+          const sortedInserts = _.sortBy(evts, 'startDate');
+          const newSeries: SeriesDoc = {
+            id: seriesId,
+            startsOn: _.first(sortedInserts).startDate,
+            endsOn: _.last(sortedInserts).startDate,
+            events: evts
+          };
+          if (pending) {
+            newSeries.pending = pending;
+          }
+
+          await series.insertOne(newSeries);
+
+          return newSeries;
+        case 'commit':
+          await series.updateOne(
+            reqIdPendingFilter, { $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await series.deleteOne(reqIdPendingFilter);
+
+          return;
       }
-      const sortedInserts = _.sortBy(evts, 'startDate');
-      const newSeries: SeriesDoc = {
-        id: seriesId,
-        startsOn: _.first(sortedInserts).startDate,
-        endsOn: _.last(sortedInserts).startDate,
-        events: evts
-      };
-
-      await series.insertOne(newSeries);
-
-      return newSeries;
     }
   }
 };
@@ -214,6 +441,39 @@ function dateToUnixTime(date: Date): number {
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
 
 app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
   extended: true

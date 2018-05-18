@@ -22,7 +22,8 @@ export class ShowObjectComponent implements OnInit, OnChanges {
   @Input() showExclude: string[];
   @Output() loadedObject = new EventEmitter<any>();
 
-  properties: string[];
+  // Internal input
+  @Input() properties: string[];
 
   private gs: GatewayService;
 
@@ -43,10 +44,14 @@ export class ShowObjectComponent implements OnInit, OnChanges {
     if (!this.gs) {
       return;
     }
-    this.properties = await properties(
-      this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+    if (!this.properties) {
+      this.properties = await properties(
+        this.showOnly, this.showExclude, this.fetchProperties.bind(this));
+    }
 
-    this.fetchObject();
+    if (!this.object && this.id && this.properties) {
+      this.fetchObject();
+    }
   }
 
   async fetchProperties(): Promise<string[]> {
@@ -68,23 +73,21 @@ export class ShowObjectComponent implements OnInit, OnChanges {
   }
 
   fetchObject() {
-    if (this.id && this.properties) {
-      this.gs
-        .get<{data: {object: Object}}>(this.apiPath, {
-          params: {
-            query: `
-              query {
-                object(id: "${this.id}") {
-                  ${this.properties.join('\n')}
-                }
+    this.gs
+      .get<{data: {object: Object}}>(this.apiPath, {
+        params: {
+          query: `
+            query {
+              object(id: "${this.id}") {
+                ${this.properties.join('\n')}
               }
-            `
-          }
-        })
-        .subscribe((res) => {
-          this.object = res.data.object;
-          this.loadedObject.emit(this.object);
-        });
-    }
+            }
+          `
+        }
+      })
+      .subscribe((res) => {
+        this.object = res.data.object;
+        this.loadedObject.emit(this.object);
+      });
   }
 }

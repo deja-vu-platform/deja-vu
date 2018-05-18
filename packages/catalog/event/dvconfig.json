@@ -7,5 +7,15 @@
     "config": {
       "wsPort": 3000
     }
+  },
+  "actions": {
+    "package": {
+      "include": [ "src/app/event/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "event-root" }
+      ]
+    }
   }
 }

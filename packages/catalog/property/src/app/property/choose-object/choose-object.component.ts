@@ -20,7 +20,7 @@ import { API_PATH } from '../property.config';
   templateUrl: './choose-object.component.html',
   styleUrls: ['./choose-object.component.css']
 })
-export class ChooseObjectComponent implements OnInit, OnChanges {
+export class ChooseObjectComponent implements OnInit {
   @Input() chooseObjectSelectPlaceholder = 'Choose Object';
   @Input() showObject: Action = {
     type: <Type<Component>> ShowObjectComponent
@@ -51,10 +51,6 @@ export class ChooseObjectComponent implements OnInit, OnChanges {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.load();
-  }
-
-  ngOnChanges() {
     this.load();
   }
 
