@@ -1,0 +1,9 @@
+<mat-form-field>
+  <mat-label>member</mat-label>
+  <input matInput required
+    [formControl]="memberIdControl"
+    name="memberIdControl">
+  <mat-error *ngIf="memberIdControl.hasError('required')">
+    Member is <strong>required</strong>
+  </mat-error>
+</mat-form-field>

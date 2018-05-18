@@ -15,7 +15,6 @@ import { ShowMemberComponent } from '../show-member/show-member.component';
 export class ShowMembersComponent implements OnInit, OnChanges {
   // Fetch rules
   @Input() inGroupId: string | undefined;
-  @Input() directOnly = true;
 
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent
@@ -51,8 +50,7 @@ export class ShowMembersComponent implements OnInit, OnChanges {
             `,
             variables: JSON.stringify({
               input: {
-                inGroupId: this.inGroupId,
-                directOnly: this.directOnly
+                inGroupId: this.inGroupId
               }
             })
           }

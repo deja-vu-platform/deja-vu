@@ -9,15 +9,9 @@
       {{addError}}
     </mat-error>
   </div>
-  <div class="form-group">
-    <group-autocomplete
-      [autocompletePlaceholder]="autocompletePlaceholder"
-      [type]="type"
-      [showMember]="showMember"
-      [showGroup]="showGroup"
-      [disabledIds]="disabledIds"
-      formControlName="autocomplete">
-    </group-autocomplete>
+  <div *ngIf="memberIdControl" class="form-group">
+    <group-input-member formControlName="memberId">
+    </group-input-member>
   </div>
   <div class="form-group">
     <button mat-button type="submit" [disabled]="!addForm.valid">

@@ -2,8 +2,7 @@
   <li *ngFor="let group of _groups"
     class="list-group-item group-show-groups-group-item">
     <dv-include [action]="showGroup" tag="group-show-group" [inputs]="{
-        group: group, showId: showId, showMembers: showMembers,
-        showSubgroups: showSubgroups
+        group: group, showId: showId, showMembers: showMembers
       }"
       [parent]="showGroups">
     </dv-include>

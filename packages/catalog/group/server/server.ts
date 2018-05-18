@@ -99,7 +99,7 @@ const resolvers = {
     members: async (root, { input }: { input: MembersInput }) =>  {
       const filter = input.inGroupId ? { id: input.inGroupId } : {};
 
-      return groups.aggregate([
+      const pipelineResults = await groups.aggregate([
         { $match: filter },
         {
           $group: {
@@ -120,6 +120,10 @@ const resolvers = {
         }
       ])
       .toArray();
+
+      const matchingMembers = _.get(pipelineResults[0], 'memberIds', []);
+
+      return matchingMembers;
     },
     groups: async (root, { input }: { input: GroupsInput }) => {
       const filter = input.withMemberId ?

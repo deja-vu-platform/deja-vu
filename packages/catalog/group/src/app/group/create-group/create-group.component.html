@@ -13,24 +13,11 @@
   </div>
   <div *ngIf="showOptionToAddMembers" class="form-group">
     <group-stage
-      type="member"
       [initialStageIds]="initialMemberIds"
-      [autocompletePlaceholder]="memberAutocompletePlaceholder"
       [buttonLabel]="stageMemberButtonLabel"
       [showMember]="showMember"
       [stageHeader]="stageHeader"
       formControlName="membersAutocomplete">
-    </group-stage>
-  </div>
-  <div *ngIf="showOptionToAddGroups" class="form-group">
-    <group-stage
-      type="group"
-      [initialStageIds]="initialGroupIds"
-      [autocompletePlaceholder]="groupAutocompletePlaceholder"
-      [buttonLabel]="stageGroupButtonLabel"
-      [showGroup]="showGroup"
-      [stageHeader]="stageHeader"
-      formControlName="groupAutocomplete">
     </group-stage>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
