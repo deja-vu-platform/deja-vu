@@ -1,0 +1,21 @@
+<mat-form-field>
+  <input type="text" [placeholder]="objectAutocompletePlaceholder" matInput
+  [formControl]="control" [matAutocomplete]="auto" required>
+  <mat-autocomplete #auto="matAutocomplete"
+    (optionSelected)="objectSelected($event)">
+    <mat-option *ngFor="let object of _objects" [value]="object.id"
+      [disabled]="isDisabled(object.id)">
+      <dv-include [action]="showObject" tag="property-show-object" [inputs]="{
+          object: object, showOnly: showOnly, showExclude: showExclude
+        }"
+        [parent]="objectAutocomplete">
+      </dv-include>
+    </mat-option>
+  </mat-autocomplete>
+  <mat-error *ngIf="control.hasError('required')"
+    [innerHtml]="requiredErrorMsg">
+  </mat-error>
+  <mat-error *ngIf="control.hasError('notAnOption')"
+    [innerHtml]="notAnOptionErrorMsgFn(control.value)">
+  </mat-error>
+</mat-form-field>

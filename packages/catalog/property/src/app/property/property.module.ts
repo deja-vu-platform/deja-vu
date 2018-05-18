@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule,
+  MatAutocompleteModule, MatButtonModule, MatFormFieldModule, MatInputModule,
   MatSelectModule
 } from '@angular/material';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
@@ -18,6 +18,9 @@ import {
 import {
    CamelToTitleCasePipe, CreatePropertyComponent
 } from './create-property/create-property.component';
+import {
+  ObjectAutocompleteComponent
+} from './object-autocomplete/object-autocomplete.component';
 import { ShowObjectComponent } from './show-object/show-object.component';
 import { ShowObjectsComponent } from './show-objects/show-objects.component';
 
@@ -25,7 +28,8 @@ import { API_PATH } from './property.config';
 
 const allComponents = [
   ChooseObjectComponent, CreateObjectComponent, CreateObjectsComponent,
-  CreatePropertyComponent, ShowObjectComponent, ShowObjectsComponent
+  CreatePropertyComponent, ObjectAutocompleteComponent,
+  ShowObjectComponent, ShowObjectsComponent
 ];
 
 
@@ -36,7 +40,7 @@ const allComponents = [
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatButtonModule, MatInputModule, MatFormFieldModule,
+    MatAutocompleteModule, MatButtonModule, MatInputModule, MatFormFieldModule,
     MatSelectModule
   ],
   providers: [ { provide: API_PATH, useValue: '/graphql' } ],
