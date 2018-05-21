@@ -124,8 +124,8 @@ function buildActionAst() {
 
 /**
  * Check for errors in the tree. The following are considered errors:
- *   - having the same action as a child more than once
- *   - having sibling dv-tx nodes with the same child action
+ *   - having the same (request-sending) action as a child more than once
+ *   - having sibling dv-tx nodes with the same child (request-sending) action
  *
  * These are errors because at runtime we can't tell apart the requests from
  * these actions with the same path and we need to be able to tell them apart
@@ -134,7 +134,13 @@ function buildActionAst() {
 function checkForErrors(actionName: string) {
   const getRepeatedFqTags = (actionAst: ActionAst) => _.pickBy(
     _.groupBy(actionAst, 'fqtag'),
-    (actions: ActionTag[]) => actions.length > 1);
+    (actions: ActionTag[], fqtag: string) => {
+      // TODO: filter non-request sending cliche actions
+      if (fqtag !== 'dv-tx' && fqtag.startsWith('dv')) {
+        return false;
+      }
+      return actions.length > 1;
+    });
   const _checkForErrors = (path: string, fqtag: string) =>
     (tree: ActionAst): ActionAst => {
       const currPath = path + ' -> ' + fqtag;
