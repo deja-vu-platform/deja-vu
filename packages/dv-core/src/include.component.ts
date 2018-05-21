@@ -147,6 +147,10 @@ export class IncludeComponent implements AfterViewInit {
     this.action.outputMap = this
       .initFieldMap(this.outputs, this.action.outputMap);
     for (const outputKey of _.keys(this.outputs)) {
+      // The call to `subscribe` is mutating the state of the component
+      // ref so we need to call detect changes to avoid getting the expression
+      // changed after it has been checked error
+      shouldCallDetectChanges = true;
       this.componentRef.instance[this.action.outputMap[outputKey]]
         .subscribe(newVal => {
           console.log(
