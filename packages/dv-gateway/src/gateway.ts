@@ -66,7 +66,9 @@ const config: Config = {...DEFAULT_CONFIG, ...dvConfig.gateway.config};
 
 const actionHelper = new ActionHelper(
   JSON.parse(readFileSync(path.join(distFolder, ACTION_TABLE_FP), 'utf8')),
-  _.map(dvConfig.usedCliches, 'name'));
+  _.map(_.toPairs(dvConfig.usedCliches),
+    ([alias, usedClicheConfig]: [string, DvConfig]): string => _.get(
+      usedClicheConfig, 'name', alias)));
 
 interface ClicheResponse<T> {
   status: number;
