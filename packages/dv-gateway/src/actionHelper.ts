@@ -63,10 +63,12 @@ export class ActionHelper {
     const seenActions = new Set<string>();
     const getUsedActions = (actionAst: ActionAst | undefined): void => {
       _.each(actionAst, (action: ActionTag) => {
-        if (seenActions.has(action.tag)) {
-          return;
+        if (this.clicheOfTag(action.tag) !== 'dv') {
+          if (seenActions.has(action.tag)) {
+            return;
+          }
+          seenActions.add(action.tag);
         }
-        seenActions.add(action.tag);
         if (action.tag === 'dv-include' ||
             this.clicheOfTag(action.tag) !== 'dv') {
           usedActions.add(action.tag);
