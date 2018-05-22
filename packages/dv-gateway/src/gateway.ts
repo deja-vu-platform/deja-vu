@@ -32,6 +32,7 @@ interface DvConfig {
   gateway: { config: Config };
   usedCliches?: {[as: string]: DvConfig};
   actionsNoRequest?: { exec: string[] };
+  routes?: { path: string, action: string }[];
 }
 
 
@@ -68,7 +69,8 @@ const actionHelper = new ActionHelper(
   JSON.parse(readFileSync(path.join(distFolder, ACTION_TABLE_FP), 'utf8')),
   _.map(_.toPairs(dvConfig.usedCliches),
     ([alias, usedClicheConfig]: [string, DvConfig]): string => _.get(
-      usedClicheConfig, 'name', alias)));
+      usedClicheConfig, 'name', alias)),
+  dvConfig.routes);
 
 interface ClicheResponse<T> {
   status: number;

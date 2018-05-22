@@ -50,7 +50,9 @@ export class ActionHelper {
   private readonly actionTable: ActionTable;
   private readonly actionsNoExecRequest: Set<string>;
 
-  constructor(appActionTable: ActionTable, usedCliches: string[]) {
+  constructor(
+    appActionTable: ActionTable, usedCliches: string[],
+    private readonly routes: { path: string, action: string }[] | undefined) {
     const clicheActionTables: ActionTable[] = _.map(
         _.uniq(usedCliches), this.getActionTableOfCliche.bind(this));
     const allActionsTable = _.assign({}, appActionTable, ...clicheActionTables);
@@ -72,7 +74,12 @@ export class ActionHelper {
         getUsedActions(this.getActionContent(action, allActionsTable).content);
       });
     };
-    _.each(_.values(appActionTable), getUsedActions);
+    const rootActions = _.map(
+      _.keys(appActionTable),
+      (tag) => {
+        return this.getActionContent({ fqtag: tag, tag: tag }, allActionsTable);
+      });
+    _.each(_.map(rootActions, 'content'), getUsedActions);
 
     this.actionTable = _.pick(allActionsTable, Array.from(usedActions));
 
@@ -132,17 +139,14 @@ export class ActionHelper {
     if (_.isEmpty(actionPath) || !(firstTag in this.actionTable)) {
       return [];
     }
-    const matchingNode: ActionTag = {
-      fqtag: firstTag, tag: firstTag,
-      content: this.actionTable[firstTag]
-    };
+    const matchingNode: ActionTag = this.getActionContent(
+      { fqtag: firstTag, tag: firstTag }, this.actionTable);
     if (actionPath.length === 1 && firstTag in this.actionTable) {
       return [[ matchingNode ]] ;
     }
 
     return _.map(
-      this._getMatchingPaths(
-        actionPath.slice(1), this.actionTable[actionPath[0]]),
+      this._getMatchingPaths(actionPath.slice(1), matchingNode.content),
       (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]);
   }
 
@@ -180,11 +184,12 @@ export class ActionHelper {
    */
   private getActionContent(actionTag: ActionTag, actionTable: ActionTable)
     : ActionTag {
+    let ret;
     if (actionTag.tag === 'dv-include') {
       const includedActionTag: ActionTag | null = this
         .getIncludedActionTag(actionTag);
 
-      return {
+      ret = {
         fqtag: actionTag.fqtag,
         tag: actionTag.tag,
         content: (includedActionTag === null) ? [] : _.map(
@@ -192,9 +197,9 @@ export class ActionHelper {
         context: actionTag.context
       };
     } else if (this.clicheOfTag(actionTag.tag) === 'dv') {
-      return actionTag;
+      ret = actionTag;
     } else {
-      return {
+      ret = {
         fqtag: actionTag.fqtag,
         tag: actionTag.tag,
         content: _.map(actionTable[actionTag.tag], (at: ActionTag) => {
@@ -203,6 +208,15 @@ export class ActionHelper {
         context: actionTag.context
       };
     }
+    // https://angular.io/guide/router
+    // The router adds the <router-outlet> element to the DOM and subsequently
+    // inserts the navigated view element immediately after the <router-outlet>.
+    if (_.includes(_.map(ret.content, 'tag'), 'router-outlet')) {
+      const routeActions: ActionTag[] = this.getRouteActions(actionTable);
+      ret.content = _.concat(ret.content, routeActions);
+    }
+
+    return ret;
   }
 
   /**
@@ -297,6 +311,21 @@ export class ActionHelper {
       })
       .reverse()
       .value();
+  }
+
+  getRouteActions(actionTable: ActionTable): ActionTag[] {
+    return _.map(this.routes, (route) => {
+      if (!_.has(actionTable, route.action)) {
+        throw new Error(`Route action ${route.action} doesn't exist`);
+      }
+
+      return {
+        fqtag: route.action,
+        tag: route.action,
+        content: actionTable[route.action],
+        context: {}
+      };
+    });
   }
 
   isDvTx(actionPath: string[]) {

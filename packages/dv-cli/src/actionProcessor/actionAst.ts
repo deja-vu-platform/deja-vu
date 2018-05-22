@@ -32,13 +32,14 @@ interface TagOnly extends TagInfo {
 
 export function getActionAst(
   projectName: string, actionName: string, usedCliches: ReadonlyArray<string>,
-  html: string)
-  : ActionAst {
+  html: string): ActionAst {
   const tagsToKeep = new Set([ projectName, ...usedCliches, 'dv' ]);
-
+  const shouldKeep = (tag: Tag): boolean =>  {
+    return tagsToKeep.has(tag.tag.split('-')[0]) || tag.tag === 'router-outlet';
+  };
   return posthtml([
-      filterActionTags(tagsToKeep),
-      flatten(tagsToKeep),
+      filterActionTags(shouldKeep),
+      flatten(shouldKeep),
       buildActionAst(),
       checkForErrors(actionName)
     ])
@@ -47,19 +48,19 @@ export function getActionAst(
 }
 
 /**
- *  Retain only elements whose tag is in `tagsToKeep` and its parents.
+ *  Retain only elements s.t `shouldKeep(tag)` is true and its parents.
  *
  *  The goal of this pass is to prune the AST, cutting the branches that
  *  include no actions.
  */
-function filterActionTags(tagsToKeep: Set<string>) {
+function filterActionTags(shouldKeep: (tag: Tag) => boolean) {
   const _filterActionTags = (tree: PostHtmlAst): TagOnlyAst => {
     const ret: TagOnlyAst = _.chain<PostHtmlAst>(tree)
       .map((tag: string | Tag): TagOnly | null => {
         if (_.isString(tag)) {
           return null;
         }
-        if (tagsToKeep.has(tag.tag.split('-')[0])) {
+        if (shouldKeep(tag)) {
           tag.content = _filterActionTags(tag.content);
           // We can't filter attrs to only include those that are not html
           // global attributes because the action could use what would be valid
@@ -85,10 +86,10 @@ function filterActionTags(tagsToKeep: Set<string>) {
 /**
  *  Replace non-action elements with its children
  */
-function flatten(tagsToKeep: Set<string>) {
+function flatten(shouldKeep: (tag: Tag) => boolean) {
   const _flatten = (tree: TagOnlyAst): PostHtmlAst => {
     return _.flatten(_.map(tree, (tag: TagOnly) => {
-      if (!tagsToKeep.has(tag.tag.split('-')[0])) {
+      if (!shouldKeep(tag)) {
         return _flatten(tag.content);
       }
       return tag;

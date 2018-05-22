@@ -202,6 +202,7 @@ export interface DvConfig {
   gateway?: DvConfig;
   usedCliches?: { [as: string]: DvConfig };
   actions?: { package?: ActionsConfig, app?: ActionsConfig };
+  routes?: { path: string, action: string }[];
 }
 
 function actionTable(
