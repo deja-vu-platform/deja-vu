@@ -254,14 +254,21 @@ export class ActionHelper {
     let ret: ActionTag | null = null;
     if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
       // action is not the default one
-      let inputObj: ActionInput, tag: string;
+      let inputObj: ActionInput;
+      const actionObj = _.get(includeActionTag.context, `[${actionExpr}]`);
       try {
-        inputObj = RJSON.parse(
-          _.get(includeActionTag.context, `[${actionExpr}]`)) as ActionInput;
-        tag = _.kebabCase(inputObj.tag);
+        inputObj = RJSON.parse(actionObj) as ActionInput;
       } catch (e) {
-        throw new Error(noActionErrorMsg('Expected object with tag field'));
+        throw new Error(noActionErrorMsg(
+          `Action is not the default one
+           Expected action object but found ${actionObj}`));
       }
+      if (_.isEmpty(inputObj.tag)) {
+        throw new Error(noActionErrorMsg(
+          `Action is not the default one
+           Missing 'tag' in ${actionObj}`));
+      }
+      const tag: string = _.kebabCase(inputObj.tag);
       ret = {
         fqtag: this.getFqTag(tag, inputObj.dvOf, inputObj.dvAlias),
         tag: tag,
@@ -275,8 +282,8 @@ export class ActionHelper {
         context: {}
       };
 
-    // action has a default
     } else if (!_.has(includeActionTag, 'inputs.no-default')) {
+      // action has a default
       const tag = _.get(includeActionTag, 'inputs.tag');
       if (_.isEmpty(tag)) {
         throw new Error(noActionErrorMsg(
