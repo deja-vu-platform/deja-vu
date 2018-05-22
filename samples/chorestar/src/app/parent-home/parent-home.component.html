@@ -16,6 +16,7 @@
                     [completed]="false"
                     [showTask]="{
                       type: showChore,
+                      tag: 'chorestar-show-chore',
                       inputMap: { task: 'chore' }
                     }"
                     noTasksToShowText="No assigned chores">
@@ -31,6 +32,7 @@
                     [assignerId]="user?.id"
                     [showTask]="{
                       type: showChore,
+                      tag: 'chorestar-show-chore',
                       inputMap: {task: 'chore'},
                       inputs: {showOptionToApprove: true}
                     }"
@@ -54,7 +56,9 @@
                 assigneeSelectPlaceholder="For Child"
                 (selectedAssignee)="choreAssignee=$event"
                 [showAssignee]="{
-                  type: showUser, dvOf: 'childauthentication'
+                  type: showUser,
+                  tag: 'authentication-show-user',
+                  dvOf: 'childauthentication'
                 }"
                 [showOptionToSubmit]="false">
               </task-create-task>
@@ -81,6 +85,7 @@
                 [waitOn]="['sellerId', 'marketId']"
                 [showGood]="{
                   type: showReward,
+                  tag: 'chorestar-show-reward',
                   inputMap: { good: 'reward' }
                 }"
                 [showOptionToBuy]="false"

@@ -34,6 +34,7 @@
                 [completed]="false"
                 [showTask]="{
                   type: showChore,
+                  tag: 'chorestar-show-chore',
                   inputMap: { task: 'chore'},
                   inputs: { view: 'child' }
                 }"
@@ -51,6 +52,7 @@
                 [approved]="false"
                 [showTask]="{
                   type: showChore,
+                  tag: 'chorestar-show-chore',
                   inputMap: { task: 'chore'},
                   inputs: { view: 'child' }
                 }"
@@ -67,6 +69,7 @@
                 [approved]="true"
                 [showTask]="{
                   type: showChore,
+                  tag: 'chorestar-show-chore',
                   inputMap: { task: 'chore'},
                   inputs: { view: 'child' }
                 }"
@@ -89,6 +92,7 @@
                 [waitOn]="['buyerId', 'marketId']"
                 [showGood]="{
                   type: showReward,
+                  tag: 'chorestar-show-reward',
                   inputMap: { good: 'reward' },
                   inputs: { user: user, showOptionToPurchase: true }
                 }"
@@ -108,6 +112,7 @@
                 [waitOn]="['buyerId', 'marketId']"
                 [showGood]="{
                   type: showReward,
+                  tag: 'chorestar-show-reward',
                   inputMap: { good: 'reward' }
                 }"
                 [showOptionToBuy]="false"
