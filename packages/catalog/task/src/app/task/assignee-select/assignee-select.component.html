@@ -1,12 +1,14 @@
 <mat-form-field>
   <mat-select [placeholder]="assigneeSelectPlaceholder"
-    (selectionChange)="updateSelected($event.value)" [required]="true" [value]="selectedAssigneeId"
-    class="selectpicker">
+    (selectionChange)="updateSelected($event.value)" [required]="true"
+    [value]="selectedAssigneeId"
+    class="selectpicker" [ngClass]="'dv-' + selectId">
     <mat-option>None</mat-option>
     <mat-option *ngFor="let assignee of assignees"
-      [value]="assignee.id">
+      [value]="assignee.id" [ngClass]="'dv-parent-is-' + selectId">
       <dv-include
         [action]="showAssignee"
+        tag="task-show-assignee"
         [inputs]="{id: assignee.id}"
         [parent]="assigneeSelect">
       </dv-include>

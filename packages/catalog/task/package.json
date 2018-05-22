@@ -31,7 +31,8 @@
     "graphql-tools": "^2.21.0",
     "minimist": "^1.2.0",
     "moment": "^2.22.0",
-    "mongodb": "^3.0.4"
+    "mongodb": "^3.0.4",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@angular/animations": "^5.2.0",
@@ -56,6 +57,7 @@
     "@types/minimist": "^1.2.0",
     "@types/mongodb": "^3.0.7",
     "@types/node": "~6.0.60",
+    "@types/uuid": "^3.4.3",
     "bootstrap": "^4.0.0",
     "chokidar-cli": "^1.2.0",
     "codelyzer": "^4.0.1",
