@@ -110,5 +110,10 @@
         {"for": "src/app/app.component.html", "use": "chorestar-root"}
       ]
     }
-  }
+  },
+  "routes": [
+    {"path": "parent", "action": "chorestar-parent-home"},
+    {"path": "child", "action": "chorestar-child-home"},
+    {"path": "", "action": "chorestar-landing"}
+  ]
 }
