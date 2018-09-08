@@ -255,7 +255,10 @@ program
         path.join('dist', ACTION_TABLE_FILE_NAME),
         actionTable(config, _.get(config.actions, 'app')));
       const buildStartServerCmd = (name: string) => `npm run dv-start-${name}`;
-      const startServerOfCurrentProjectCmd = buildStartServerCmd(config.name);
+      const pkgJson = JSON.parse(readFileOrFail('package.json'));
+      const startServerOfCurrentProjectCmd = _
+        .has(pkgJson, `dv-start-${config.name}`) ?
+        buildStartServerCmd(config.name) : [];
       const startServerCmds = _
         .chain(config.usedCliches)
         .entries()
@@ -266,7 +269,7 @@ program
       const allStartCmds: string[] = _
         .chain(startServerCmds)
         .concat('npm run dv-start-gateway')
-        .map(cmd => `"${cmd}"`)
+        .map(startCmd => `"${startCmd}"`)
         .value();
       cmd('npm', ['run', 'concurrently', '--', ...allStartCmds]);
 
