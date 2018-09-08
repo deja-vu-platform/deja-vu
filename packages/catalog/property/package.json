@@ -3,10 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "ng": "ng",
-    "start": "npm run dv-start-all",
+    "start": "dv serve",
     "build": "npm run dv-build-property",
-    "package": "npm run dv-package-property",
+    "package": "dv package",
     "test": "ng test",
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/app/**/**/*.ts server/*.ts",
     "e2e": "ng e2e",
