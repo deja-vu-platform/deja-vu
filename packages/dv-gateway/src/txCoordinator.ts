@@ -244,7 +244,9 @@ export class TxCoordinator<Message, Payload, State = any> {
         { returnOriginal: false, upsert: true }))
         .value!;
     } catch (e) {
-      log(txMsg(e, txId));
+      log(txMsg(
+        `We got ${e}, this is not an error (it is expected to ` +
+        'happen in some cases)', txId));
 
       // Definitely not null because the catch should only happen if we have two
       // concurrent threads trying to do the upsert at the same time. In that

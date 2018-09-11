@@ -50,181 +50,10 @@ export class ActionHelper {
   private readonly actionTable: ActionTable;
   private readonly actionsNoExecRequest: Set<string>;
 
-  constructor(
-    appActionTable: ActionTable, usedCliches: string[],
-    private readonly routes: { path: string, action: string }[] | undefined) {
-    const clicheActionTables: ActionTable[] = _.map(
-        _.uniq(usedCliches), this.getActionTableOfCliche.bind(this));
-    const allActionsTable = _.assign({}, appActionTable, ...clicheActionTables);
-
-    // Prune the action table to have only used actions
-    // TODO: instead of adding all app actions, use the route information
-    const usedActions = new Set<string>(_.keys(appActionTable));
-    const seenActions = new Set<string>();
-    const getUsedActions = (actionAst: ActionAst | undefined): void => {
-      _.each(actionAst, (action: ActionTag) => {
-        if (this.clicheOfTag(action.tag) !== 'dv') {
-          if (seenActions.has(action.tag)) {
-            return;
-          }
-          seenActions.add(action.tag);
-        }
-        if (action.tag === 'dv-include' ||
-            this.clicheOfTag(action.tag) !== 'dv') {
-          usedActions.add(action.tag);
-        }
-        getUsedActions(this.getActionContent(action, allActionsTable).content);
-      });
-    };
-    const rootActions = _.map(
-      _.keys(appActionTable),
-      (tag) => {
-        return this.getActionContent({ fqtag: tag, tag: tag }, allActionsTable);
-      });
-    _.each(_.map(rootActions, 'content'), getUsedActions);
-
-    this.actionTable = _.pick(allActionsTable, Array.from(usedActions));
-
-    this.actionsNoExecRequest = new Set<string>(
-      _.flatMap(usedCliches, (cliche: string) => _.get(
-      this.getActionsNoRequest(cliche), 'exec', [])));
-  }
-
-  private getActionTableOfCliche(cliche: string): ActionTable {
-    const fp = path.join('node_modules', cliche, ACTION_TABLE_FILE_NAME);
-
-    return JSON.parse(readFileSync(fp, 'utf8'));
-  }
-
-  private getActionsNoRequest(cliche: string): { exec: string[] } | undefined {
-    const fp = path.join('node_modules', cliche, CONFIG_FILE_NAME);
-
-    return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
-  }
-
-  private clicheOfTag(tag: string) {
-    return tag.split('-')[0];
-  }
-
-  shouldHaveExecRequest(tag: string): boolean {
-    return !this.actionsNoExecRequest.has(tag);
-  }
-
-  getActionOrFail(actionPath: string[]): ActionTag {
-    const ret = this.getMatchingActions(actionPath);
-    if (_.isEmpty(ret)) {
-      throw new Error(`No action ${actionPath} found`);
-    }
-    if (ret.length > 1) {
-      throw new Error(`Found more than one matching action for ${actionPath}`);
-    }
-
-    return ret[0];
-  }
-
-  actionPathIsValid(actionPath: string[]): boolean {
-    return !_.isEmpty(this.getMatchingActions(actionPath));
-  }
-
   /**
-   * @returns the `ActionTag`s corresponding to the last node of the action path
+   *  @returns get the fully qualified tag for the given tag.
    */
-  getMatchingActions(actionPath: string[]): ActionTag[] {
-    return _.map(this.getMatchingPaths(actionPath), _.last);
-  }
-
-  /**
-   * @returns an list of matching paths
-   */
-  getMatchingPaths(actionPath: string[]): ActionTagPath[] {
-    const firstTag = actionPath[0];
-    if (_.isEmpty(actionPath) || !(firstTag in this.actionTable)) {
-      return [];
-    }
-    const matchingNode: ActionTag = this.getActionContent(
-      { fqtag: firstTag, tag: firstTag }, this.actionTable);
-    if (actionPath.length === 1 && firstTag in this.actionTable) {
-      return [[ matchingNode ]] ;
-    }
-
-    return _.map(
-      this._getMatchingPaths(actionPath.slice(1), matchingNode.content),
-      (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]);
-  }
-
-  private _getMatchingPaths(
-    actionPath: string[], actionAst: ActionAst | undefined)
-    : ActionTagPath[] {
-    // actionPath.length is always >= 1
-
-    if (_.isEmpty(actionAst)) {
-      return [];
-    }
-    const matchingNodes: ActionTag[] = _.map(
-      _.filter(actionAst, (at: ActionTag) => at.fqtag === actionPath[0]),
-      (matchingNode: ActionTag) => this.getActionContent(
-        matchingNode, this.actionTable));
-
-    if (actionPath.length === 1) {
-      return _.map(
-        matchingNodes,
-        (matchingNode: ActionTag): ActionTagPath => [ matchingNode ]);
-    }
-
-    return _.flatMap(
-      matchingNodes,
-      (matchingNode: ActionTag): ActionTagPath[] =>  _.map(
-        this._getMatchingPaths(actionPath.slice(1), matchingNode.content),
-        (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]));
-  }
-
-  /**
-   *  @param actionTag - the action tag to get the content form
-   *  @param actionTable - the action table to use to retrieve the content
-   *  @returns an `ActionTag` representing the given action tag but with its
-   *    content populated
-   */
-  private getActionContent(actionTag: ActionTag, actionTable: ActionTable)
-    : ActionTag {
-    let ret;
-    if (actionTag.tag === 'dv-include') {
-      const includedActionTag: ActionTag | null = this
-        .getIncludedActionTag(actionTag);
-
-      ret = {
-        fqtag: actionTag.fqtag,
-        tag: actionTag.tag,
-        content: (includedActionTag === null) ? [] : _.map(
-          [includedActionTag], (at: ActionTag) => ({...at, context: {}})),
-        context: actionTag.context
-      };
-    } else if (this.clicheOfTag(actionTag.tag) === 'dv') {
-      ret = actionTag;
-    } else {
-      ret = {
-        fqtag: actionTag.fqtag,
-        tag: actionTag.tag,
-        content: _.map(actionTable[actionTag.tag], (at: ActionTag) => {
-          return {...at, context: actionTag.inputs};
-        }),
-        context: actionTag.context
-      };
-    }
-    // https://angular.io/guide/router
-    // The router adds the <router-outlet> element to the DOM and subsequently
-    // inserts the navigated view element immediately after the <router-outlet>.
-    if (_.includes(_.map(ret.content, 'tag'), 'router-outlet')) {
-      const routeActions: ActionTag[] = this.getRouteActions(actionTable);
-      ret.content = _.concat(ret.content, routeActions);
-    }
-
-    return ret;
-  }
-
-  /**
-   *  Get the fully qualified tag for the given tag.
-   */
-  private getFqTag(
+  private static GetFqTag(
     tag: string, dvOf: string | undefined,
     dvAlias: string | undefined): string {
     if (dvAlias) {
@@ -242,7 +71,7 @@ export class ActionHelper {
    *  @param includeActionTag - the action tag to get the included action from
    *  @returns the included action tag
    */
-  private getIncludedActionTag(includeActionTag: ActionTag): ActionTag | null {
+  private static GetIncludedActionTag(includeActionTag: ActionTag): ActionTag {
     const noActionErrorMsg = (cause: string) => `
       Couldn't find the included action in ${JSON.stringify(includeActionTag)}:
       ${cause} \n Context is ${JSON.stringify(includeActionTag.context)}
@@ -251,7 +80,7 @@ export class ActionHelper {
     if (_.isEmpty(actionExpr)) {
       throw new Error(noActionErrorMsg('no action input'));
     }
-    let ret: ActionTag | null = null;
+    let ret: ActionTag;
     if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
       // action is not the default one
       let inputObj: ActionInput;
@@ -270,7 +99,7 @@ export class ActionHelper {
       }
       const tag: string = _.kebabCase(inputObj.tag);
       ret = {
-        fqtag: this.getFqTag(tag, inputObj.dvOf, inputObj.dvAlias),
+        fqtag: ActionHelper.GetFqTag(tag, inputObj.dvOf, inputObj.dvAlias),
         tag: tag,
         dvOf: inputObj.dvOf,
         dvAlias: inputObj.dvAlias,
@@ -293,23 +122,251 @@ export class ActionHelper {
       const dvAlias = _.get(includeActionTag, 'inputs.dvAlias');
       const inputs = _.get(includeActionTag, 'inputs.inputs');
       ret = {
-        fqtag: this.getFqTag(tag, dvOf, dvAlias),
+        fqtag: ActionHelper.GetFqTag(tag, dvOf, dvAlias),
         tag: tag,
         dvOf: dvOf,
         dvAlias: dvAlias,
         inputs: inputs ? RJSON.parse(inputs) : undefined,
         context: {}
       };
+    } else {
+      throw new Error(noActionErrorMsg('No hint provided'));
     }
 
     return ret;
   }
 
-  // Returns an array [action_1, action_2, ..., action_n] representing an action
-  // path from action_1 to action_n where action_n is the action that originated
-  // the request.
-  // Note: dv-* actions are included
-  // In other words, it filters non-dv nodes from `from`
+  /**
+   * @return the action table of the given cliche
+   */
+  private static GetActionTableOfCliche(cliche: string): ActionTable {
+    const fp = path.join('node_modules', cliche, ACTION_TABLE_FILE_NAME);
+
+    return JSON.parse(readFileSync(fp, 'utf8'));
+  }
+
+  /**
+   * @return the set of actions from the given cliche that are not expected to
+   * issue a request
+   */
+  private static GetActionsNoRequest(cliche: string)
+    : { exec: string[] } | undefined {
+    const fp = path.join('node_modules', cliche, CONFIG_FILE_NAME);
+
+    return JSON.parse(readFileSync(fp, 'utf8')).actionsNoRequest;
+  }
+
+  /**
+   * @returns the cliche of the action represented by the given tag
+   */
+  private static ClicheOfTag(tag: string) {
+    return tag.split('-')[0];
+  }
+
+  /**
+   * @returns true if the given action is the built-in include action
+   */
+  private static IsDvIncludeAction(action: ActionTag) {
+    return action.tag === 'dv-include';
+  }
+
+  /**
+   * @returns true if the given action is a built-in action
+   */
+  private static IsDvAction(action: ActionTag) {
+    return ActionHelper.ClicheOfTag(action.tag) === 'dv';
+  }
+
+
+  constructor(
+    appActionTable: ActionTable, usedCliches: string[],
+    private readonly routes: { path: string, action: string }[] | undefined) {
+    const clicheActionTables: ActionTable[] = _.map(
+        _.uniq(usedCliches), ActionHelper.GetActionTableOfCliche);
+    const allActionsTable = _.assign({}, appActionTable, ...clicheActionTables);
+    console.log(
+      `Unpruned action table ${JSON.stringify(allActionsTable, null, 2)}`);
+
+    // Prune the action table to have only used actions
+    // TODO: instead of adding all app actions, use the route information
+    const usedActions = new Set<string>(_.keys(appActionTable));
+    const seenActions = new Set<string>();
+    const getUsedActions = (
+      actionAst: ActionAst | undefined, debugPath: string[] = []): void => {
+      _.each(actionAst, (action: ActionTag) => {
+        console.log(debugPath);
+        console.log(debugPath.push);
+        debugPath.push(action.fqtag);
+        if (!ActionHelper.IsDvAction(action)) {
+          if (seenActions.has(action.tag)) {
+            return;
+          }
+          seenActions.add(action.tag);
+        }
+        if (ActionHelper.IsDvIncludeAction(action) ||
+            !ActionHelper.IsDvAction(action)) {
+          usedActions.add(action.tag);
+        }
+
+        try {
+          const actionWithContent = this
+            .populateActionContent(action, allActionsTable);
+
+          getUsedActions(actionWithContent.content, debugPath);
+        } catch (e) {
+          throw new Error(`Path: ${debugPath}\n${e.message}`);
+        }
+      });
+    };
+    const rootActions = _.map(
+      _.keys(appActionTable),
+      (tag) => {
+        return this
+          .populateActionContent({ fqtag: tag, tag: tag }, allActionsTable);
+      });
+    _.each(rootActions, (rootAction) => getUsedActions(rootAction.content));
+
+    this.actionTable = _.pick(allActionsTable, Array.from(usedActions));
+    console.log(
+      `Using action table ${JSON.stringify(this.actionTable, null, 2)}`);
+
+    this.actionsNoExecRequest = new Set<string>(
+      _.flatMap(usedCliches, (cliche: string) => _.get(
+      ActionHelper.GetActionsNoRequest(cliche), 'exec', [])));
+  }
+
+  /**
+   * @returns true if the action given by `tag` is expected to do an exe
+   * request
+   */
+  shouldHaveExecRequest(tag: string): boolean {
+    return !this.actionsNoExecRequest.has(tag);
+  }
+
+  /**
+   * @returns the `ActionTag` corresponding to the given action path
+   */
+  getActionOrFail(actionPath: string[]): ActionTag {
+    const ret = this.getMatchingActions(actionPath);
+    if (_.isEmpty(ret)) {
+      throw new Error(`No action ${actionPath} found`);
+    }
+    if (ret.length > 1) {
+      throw new Error(`Found more than one matching action for ${actionPath}`);
+    }
+
+    return ret[0];
+  }
+
+  /**
+   * @returns true if the given action path is expected
+   */
+  actionPathIsValid(actionPath: string[]): boolean {
+    return !_.isEmpty(this.getMatchingActions(actionPath));
+  }
+
+  /**
+   * @returns the `ActionTag`s corresponding to the last node of the action path
+   */
+  getMatchingActions(actionPath: string[]): ActionTag[] {
+    return _.map(this.getMatchingPaths(actionPath), _.last);
+  }
+
+  /**
+   * @returns the `ActionTag`s corresponding to the given action path
+   */
+  getMatchingPaths(actionPath: string[]): ActionTagPath[] {
+    const firstTag = actionPath[0];
+    if (_.isEmpty(actionPath) || !(firstTag in this.actionTable)) {
+      return [];
+    }
+    const matchingNode: ActionTag = this.populateActionContent(
+      { fqtag: firstTag, tag: firstTag }, this.actionTable);
+    if (actionPath.length === 1 && firstTag in this.actionTable) {
+      return [[ matchingNode ]] ;
+    }
+
+    return _.map(
+      this._getMatchingPaths(actionPath.slice(1), matchingNode.content),
+      (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]);
+  }
+
+  private _getMatchingPaths(
+    actionPath: string[], actionAst: ActionAst | undefined)
+    : ActionTagPath[] {
+    // actionPath.length is always >= 1
+
+    if (_.isEmpty(actionAst)) {
+      return [];
+    }
+    const matchingNodes: ActionTag[] = _.map(
+      _.filter(actionAst, (at: ActionTag) => at.fqtag === actionPath[0]),
+      (matchingNode: ActionTag) => this.populateActionContent(
+        matchingNode, this.actionTable));
+
+    if (actionPath.length === 1) {
+      return _.map(
+        matchingNodes,
+        (matchingNode: ActionTag): ActionTagPath => [ matchingNode ]);
+    }
+
+    return _.flatMap(
+      matchingNodes,
+      (matchingNode: ActionTag): ActionTagPath[] =>  _.map(
+        this._getMatchingPaths(actionPath.slice(1), matchingNode.content),
+        (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]));
+  }
+
+  /**
+   *  @param actionTag - the action tag to get the content from
+   *  @param actionTable - the action table to use to retrieve the content
+   *  @returns an `ActionTag` representing the given action tag but with its
+   *    content populated
+   */
+  private populateActionContent(actionTag: ActionTag, actionTable: ActionTable)
+    : ActionTag {
+    let ret;
+    if (ActionHelper.IsDvIncludeAction(actionTag)) {
+      const includedActionTag: ActionTag = ActionHelper
+        .GetIncludedActionTag(actionTag);
+
+      ret = {
+        fqtag: actionTag.fqtag,
+        tag: actionTag.tag,
+        content: _
+          .map([includedActionTag], (at: ActionTag) => ({...at, context: {}})),
+        context: actionTag.context
+      };
+    } else if (ActionHelper.IsDvAction(actionTag)) {
+      ret = actionTag;
+    } else {
+      ret = {
+        fqtag: actionTag.fqtag,
+        tag: actionTag.tag,
+        content: _.map(actionTable[actionTag.tag], (at: ActionTag) => {
+          return {...at, context: actionTag.inputs};
+        }),
+        context: actionTag.context
+      };
+    }
+    // https://angular.io/guide/router
+    // The router adds the <router-outlet> element to the DOM and subsequently
+    // inserts the navigated view element immediately after the <router-outlet>.
+    const contentTags: string[] = _.map(ret.content, 'tag');
+    if (_.includes(contentTags, 'router-outlet')) {
+      const routeActions: ActionTag[] = this.getRouteActions(actionTable);
+      ret.content = _.concat(ret.content, routeActions);
+    }
+
+    return ret;
+  }
+
+  /**
+   * @returns an array [action_1, action_2, ..., action_n] representing an
+   * action path from action_1 to action_n where action_n is the action that
+   * originated the request. An action path is a DOM path that includes only
+   * actions (it filters HTML elements like div)
+   */
   getActionPath(from: string[], projects: Set<string>): string[] {
     return _.chain(from)
       .map((node) => node.toLowerCase())
@@ -322,7 +379,21 @@ export class ActionHelper {
       .value();
   }
 
-  getRouteActions(actionTable: ActionTable): ActionTag[] {
+  /**
+   * @returns true if the given action path is inside a dv transaction
+   */
+  isDvTx(actionPath: string[]) {
+    return _.includes(actionPath, 'dv-tx');
+  }
+
+  toString() {
+    return JSON.stringify(this.actionTable, null, 2);
+  }
+
+  /**
+   * @return a list of `ActionTag`s, one for each route
+   */
+  private getRouteActions(actionTable: ActionTable): ActionTag[] {
     return _.map(this.routes, (route) => {
       if (!_.has(actionTable, route.action)) {
         throw new Error(`Route action ${route.action} doesn't exist`);
@@ -335,13 +406,5 @@ export class ActionHelper {
         context: {}
       };
     });
-  }
-
-  isDvTx(actionPath: string[]) {
-    return _.includes(actionPath, 'dv-tx');
-  }
-
-  toString() {
-    return JSON.stringify(this.actionTable, null, 2);
   }
 }
