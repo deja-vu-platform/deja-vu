@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "ng": "ng",
-    "start": "npm run dv-start-all",
+    "start": "dv serve",
     "build": "npm run dv-build-potluck",
     "test": "ng test",
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/app/**/*.ts",
