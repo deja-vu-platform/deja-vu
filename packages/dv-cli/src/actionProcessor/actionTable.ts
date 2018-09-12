@@ -32,19 +32,19 @@ export function getActionTable(
   actionsConfig: ActionsConfig | undefined,
   // the name of the used cliches (not the aliases)
   usedCliches: ReadonlyArray<string>): ActionTable {
-  const fpToNameTable = _.reduce(
+  const fpToNameMap = _.reduce(
     _.get(actionsConfig, 'names'),
-    (fpToNameTable, value: ActionNameForFilePath) => {
-      fpToNameTable[value.for] = value.use;
+    (fpToNameMapAccumulator, value: ActionNameForFilePath) => {
+      fpToNameMapAccumulator[value.for] = value.use;
 
-      return fpToNameTable;
+      return fpToNameMapAccumulator;
     }, {});
 
   return _.reduce(
     filesToParse(rootDirectory, actionsConfig),
     (actionTable: ActionTable, fp: string): ActionTable => {
       const actionName = _.get(
-        fpToNameTable, fp, getActionName(fp, projectName));
+        fpToNameMap, fp, getActionNameFromFilePath(fp, projectName));
       actionTable[actionName] = getActionAst(
         projectName, actionName, usedCliches,
         fs.readFileSync(fp, { encoding: 'utf8' }));
@@ -53,7 +53,11 @@ export function getActionTable(
     }, {});
 }
 
-function getActionName(fp: string, projectName: string) {
+/**
+ *  @returns the action name corresponding to the given file path. It assumes
+ *  that the path follows the convention `action-name.something-else.html`
+ **/
+function getActionNameFromFilePath(fp: string, projectName: string) {
   return projectName + '-' + path.basename(fp).split('.')[0];
 }
 

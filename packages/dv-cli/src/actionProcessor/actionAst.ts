@@ -19,6 +19,7 @@ interface TagInfo {
 }
 
 // https://github.com/posthtml/posthtml-parser
+// strings represent plain text content to be written to the output
 type PostHtmlAst = (string | Tag)[];
 interface Tag extends TagInfo {
   content: PostHtmlAst;
@@ -38,8 +39,8 @@ export function getActionAst(
     return tagsToKeep.has(tag.tag.split('-')[0]) || tag.tag === 'router-outlet';
   };
   return posthtml([
-      filterActionTags(shouldKeep),
-      flatten(shouldKeep),
+      pruneSubtreesWithNoActions(shouldKeep),
+      removeNonActions(shouldKeep),
       buildActionAst(),
       checkForErrors(actionName)
     ])
@@ -48,26 +49,26 @@ export function getActionAst(
 }
 
 /**
- *  Retain only elements s.t `shouldKeep(tag)` is true and its parents.
+ *  Retain only elements s.t `shouldKeep(tag)` is true and its ancestors.
  *
  *  The goal of this pass is to prune the AST, cutting the branches that
  *  include no actions.
  */
-function filterActionTags(shouldKeep: (tag: Tag) => boolean) {
-  const _filterActionTags = (tree: PostHtmlAst): TagOnlyAst => {
+function pruneSubtreesWithNoActions(shouldKeep: (tag: Tag) => boolean) {
+  const _pruneSubtreesWithNoActions = (tree: PostHtmlAst): TagOnlyAst => {
     const ret: TagOnlyAst = _.chain<PostHtmlAst>(tree)
       .map((tag: string | Tag): TagOnly | null => {
         if (_.isString(tag)) {
           return null;
         }
         if (shouldKeep(tag)) {
-          tag.content = _filterActionTags(tag.content);
+          tag.content = _pruneSubtreesWithNoActions(tag.content);
           // We can't filter attrs to only include those that are not html
           // global attributes because the action could use what would be valid
           // html global attributes as inputs (e.g., `<foo [id]="bar"></foo>`)
         } else {
           tag.attrs = {};
-          tag.content = _filterActionTags(tag.content);
+          tag.content = _pruneSubtreesWithNoActions(tag.content);
           if (_.isEmpty(tag.content)) {
             return null;
           }
@@ -80,22 +81,31 @@ function filterActionTags(shouldKeep: (tag: Tag) => boolean) {
 
     return ret;
   };
-  return _filterActionTags;
+  return _pruneSubtreesWithNoActions;
 }
 
 /**
  *  Replace non-action elements with its children
  */
-function flatten(shouldKeep: (tag: Tag) => boolean) {
-  const _flatten = (tree: TagOnlyAst): PostHtmlAst => {
-    return _.flatten(_.map(tree, (tag: TagOnly) => {
-      if (!shouldKeep(tag)) {
-        return _flatten(tag.content);
-      }
-      return tag;
-    }));
+function removeNonActions(shouldKeep: (tag: Tag) => boolean) {
+  // The given AST will have actions and its ancestors (which could be actions
+  // or not). In this phase, we remove the non actions. Note that the leafs
+  // of the tree are always actions.
+  const _removeNonActions = (tree: TagOnlyAst): TagOnlyAst => {
+    return _
+      .chain(tree)
+      .map((tag: TagOnly) => {
+        if (shouldKeep(tag)) {
+          tag.content = _removeNonActions(tag.content);
+          return [tag];
+        } else {
+          return _removeNonActions(tag.content);
+        }
+      })
+      .flatten()
+      .value();
   };
-  return _flatten;
+  return _removeNonActions;
 }
 
 /**
