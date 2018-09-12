@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateMemberComponent } from './create-member.component';
+import { ObjectAutocompleteComponent } from './object-autocomplete.component';
 
-describe('CreateMemberComponent', () => {
-  let component: CreateMemberComponent;
-  let fixture: ComponentFixture<CreateMemberComponent>;
+describe('ObjectAutocompleteComponent', () => {
+  let component: ObjectAutocompleteComponent;
+  let fixture: ComponentFixture<ObjectAutocompleteComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreateMemberComponent ]
+      declarations: [ ObjectAutocompleteComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateMemberComponent);
+    fixture = TestBed.createComponent(ObjectAutocompleteComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

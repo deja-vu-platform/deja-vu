@@ -31,7 +31,9 @@ interface DvConfig {
   config?: any;
   gateway: { config: Config };
   usedCliches?: {[as: string]: DvConfig};
+  // Actions that have no expected request
   actionsNoRequest?: { exec: string[] };
+  routes?: { path: string, action: string }[];
 }
 
 
@@ -66,7 +68,10 @@ const config: Config = {...DEFAULT_CONFIG, ...dvConfig.gateway.config};
 
 const actionHelper = new ActionHelper(
   JSON.parse(readFileSync(path.join(distFolder, ACTION_TABLE_FP), 'utf8')),
-  _.map(dvConfig.usedCliches, 'name'));
+  _.map(_.toPairs(dvConfig.usedCliches),
+    ([alias, usedClicheConfig]: [string, DvConfig]): string => _.get(
+      usedClicheConfig, 'name', alias)),
+  dvConfig.routes);
 
 interface ClicheResponse<T> {
   status: number;
@@ -116,7 +121,7 @@ const txConfig: TxConfig<
       res!.status(payload!.status);
       res!.send(payload!.text);
     } else {
-      res!.status(500);
+      res!.status(INTERNAL_SERVER_ERROR);
       res!.send('the tx that this action is part of aborted');
     }
   },
@@ -154,7 +159,7 @@ const txConfig: TxConfig<
   },
   onError: (e: Error, gcr: GatewayToClicheRequest, res?: express.Response) => {
     console.error(e);
-    res!.status(500);
+    res!.status(INTERNAL_SERVER_ERROR);
     res!.send(e.message);
   }
 };
@@ -202,8 +207,22 @@ interface GatewayToClicheRequest extends GatewayRequest {
   body: string;
 }
 
+const INTERNAL_SERVER_ERROR = 500;
+
 
 app.use('/api', bodyParser.json(), async (req, res, next) => {
+  try {
+    await processRequest(req, res, next);
+  } catch (e) {
+    console.error(
+      `Something bad happened when processing req` +
+      ` ${JSON.stringify(req.query)}: ${e.stack}`);
+    res.status(INTERNAL_SERVER_ERROR)
+      .send();
+  }
+});
+
+async function processRequest(req, res, next): Promise<void> {
   const gatewayRequest: GatewayRequest = {
     from: JSON.parse(req.query.from),
     reqId: uuid(),
@@ -213,7 +232,7 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
   };
   // Validate request
   if (!req.query.from) {
-    res.status(500)
+    res.status(INTERNAL_SERVER_ERROR)
       .send('No from specified');
 
     return;
@@ -223,7 +242,7 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
     JSON.stringify(Array.from(projects.values())));
   const to = getDst(dvConfig.name, gatewayRequest.from, projects);
   if (!(to in dstTable)) {
-    res.status(500)
+    res.status(INTERNAL_SERVER_ERROR)
       .send(`Invalid to: ${to}, my dstTable is ${stringify(dstTable)}`);
 
     return;
@@ -232,7 +251,7 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
   const actionPath = actionHelper.getActionPath(
     gatewayRequest.from, projects);
   if (!actionHelper.actionPathIsValid(actionPath)) {
-    res.status(500)
+    res.status(INTERNAL_SERVER_ERROR)
       .send(
         `Invalid action path: ${actionPath}, my actionConfig is ` +
         actionHelper.toString());
@@ -266,16 +285,11 @@ app.use('/api', bodyParser.json(), async (req, res, next) => {
     if (!runId) {
       throw new Error('run id undefined');
     }
-    /* Temporarily deactivate txs
+
     await txCoordinator.processMessage(
         runId, actionPathToId(actionPath), gatewayToClicheRequest, res);
-    */
-    const clicheRes: ClicheResponse<string> = await forwardRequest<string>(
-      gatewayToClicheRequest);
-    res.status(clicheRes.status);
-    res.send(clicheRes.text);
   }
-});
+}
 
 
 const ACTION_PATH_SEP = ':';
@@ -312,7 +326,11 @@ async function forwardRequest<T>(gatewayRequest: GatewayToClicheRequest)
   } catch (err) {
     response = err.response;
   }
-  console.log(`Got back ${stringify(response)}`);
+  if (!response) {
+    console.error(
+      `Got an undefined response for cliche request
+      ${JSON.stringify(clicheReq)}`);
+  }
 
   return { status: response.status, text: JSON.parse(response.text) };
 }

@@ -1,9 +1,5 @@
 export interface Group {
   id: string;
-  members: Member[];
+  memberIds: string[];
   subgroups: Group[];
-}
-
-export interface Member {
-  id: string;
 }

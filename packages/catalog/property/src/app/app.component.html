@@ -17,10 +17,16 @@
   </dv-tx>
   <h1>Show Objects</h1>
   <property-show-objects></property-show-objects>
-  <h1>Choose Objects</h1>
+  <h1>Choose Object</h1>
   <property-choose-object
-    (selectedObjectId)="selectedObjectId=$event"
+    (selectedObjectId)="chooseObjectId=$event"
     [showOnly]="['lastName']">
   </property-choose-object>
-  Select id is: {{selectedObjectId}}
+  Select id is: {{chooseObjectId}}
+  <h1>Choose Object from autocomplete</h1>
+  <property-object-autocomplete
+    (selectedObjectId)="autocompleteObjectId=$event"
+    [showOnly]="['lastName']">
+  </property-object-autocomplete>
+  Select id is: {{autocompleteObjectId}}
 </div>

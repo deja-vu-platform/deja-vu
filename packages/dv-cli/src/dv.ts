@@ -202,6 +202,7 @@ export interface DvConfig {
   gateway?: DvConfig;
   usedCliches?: { [as: string]: DvConfig };
   actions?: { package?: ActionsConfig, app?: ActionsConfig };
+  routes?: { path: string, action: string }[];
 }
 
 function actionTable(
@@ -257,8 +258,8 @@ program
       const buildStartServerCmd = (name: string) => `npm run dv-start-${name}`;
       const pkgJson = JSON.parse(readFileOrFail('package.json'));
       const startServerOfCurrentProjectCmd = _
-        .has(pkgJson, `dv-start-${config.name}`) ?
-        buildStartServerCmd(config.name) : [];
+        .has(pkgJson, `scripts.dv-start-${config.name}`) ?
+        [buildStartServerCmd(config.name)] : [];
       const startServerCmds = _
         .chain(config.usedCliches)
         .entries()

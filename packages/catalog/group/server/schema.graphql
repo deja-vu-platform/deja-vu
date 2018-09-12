@@ -1,29 +1,19 @@
 type Group {
   id: ID!
-  members: [Member]
-  subgroups: [Group]
-}
-
-type Member {
-  id: ID!
+  memberIds: [ID!]
 }
 
 input MembersInput {
   inGroupId: ID
-  directOnly: Boolean
 }
 
 input GroupsInput {
   withMemberId: ID
-  withGroupId: ID
-  directOnly: Boolean
-  inGroupId: ID
 }
 
 input CreateGroupInput {
   id: ID
   initialMemberIds: [ID!]
-  initialSubgroupIds: [ID!]
 }
 
 input CreateMemberInput {
@@ -33,20 +23,13 @@ input CreateMemberInput {
 
 type Query {
   group(id: ID!): Group
-  member(id: ID!): Member
-
-  members(input: MembersInput!): [Member]
-
-  groups(input: GroupsInput!): [Group]
+  members(input: MembersInput!): [ID!]
+  groups(input: GroupsInput!): [Group!]
 }
 
 type Mutation {
-  createGroup(input: CreateGroupInput!): Group 
-  createMember(input: CreateMemberInput!): Member
+  createGroup(input: CreateGroupInput!): Group
 
   addMember(groupId: ID!, id: ID!): Group
   removeMember(groupId: ID!, id: ID!): Group
-
-  addSubgroup(groupId: ID!, id: ID!): Group
-  removeSubgroup(groupId: ID!, id: ID!): Group
 }

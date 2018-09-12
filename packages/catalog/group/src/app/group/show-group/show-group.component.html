@@ -4,24 +4,13 @@
 <div *ngIf="group">
   {{ group.id }}
 </div>
-<ul *ngIf="showMembers && group?.members.length > 0" class="list-group">
-  <li *ngFor="let member of group.members"
+<ul *ngIf="showMembers && group?.memberIds.length > 0" class="list-group">
+  <li *ngFor="let memberId of group.memberIds"
     class="list-group-item group-show-group-member-item">
-    <dv-include [action]="showMember" [inputs]="{
-        member: member
+    <dv-include [action]="showMember" tag="group-show-member" [inputs]="{
+        id: memberId
       }"
       [parent]="showGroup">
     </dv-include>
-  </li>
-</ul>
-
-<ul *ngIf="showSubgroups && group?.subgroups.length > 0" class="list-group">
-  <li *ngFor="let subgroup of group.subgroups"
-    class="list-group-item group-show-group-subgroup-item">
-    <group-show-group
-      [group]="subgroup"
-      [showMembers]="showMembers"
-      [showSubgroups]="showSubgroups">
-    </group-show-group>
   </li>
 </ul>

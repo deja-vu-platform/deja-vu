@@ -1,31 +1,27 @@
 <div class="row">
   <div class="col-md-12">
-    <form (ngSubmit)="stage()"
-      [formGroup]="stageForm"
-      class="form-horizontal">
-      <div class="form-group">
-        <group-autocomplete
-          [autocompletePlaceholder]="autocompletePlaceholder"
-          [type]="type"
-          [disabledIds]="staged"
-          [showMember]="showMember"
-          [showGroup]="showGroup"
-          formControlName="autocomplete"
-          [required]="true">
-        </group-autocomplete>
-      </div>
-      <div class="form-group">
-        <button mat-button type="submit" [disabled]="!stageForm.valid">
-          {{buttonLabel}}
-        </button>
-      </div>
-    </form>
+    <dv-tx>
+      <form class="form-horizontal">
+        <div class="form-group">
+          <dv-include [action]="inputMember" tag="group-input-member"
+            [outputs]="{ memberId: 'memberId' }"
+            [parent]="stageComponent">
+          </dv-include>
+        </div>
+        <div class="form-group">
+          <dv-button-last [of]="memberId"
+            [disabled]="!memberId" (last)="stage($event)">
+            {{buttonLabel}}
+          </dv-button-last>
+        </div>
+      </form>
+    </dv-tx>
   </div>
 </div>
 
 <div *ngIf="stageHeader" class="row">
   <div class="col-md-12">
-    <dv-include [action]="stageHeader" [parent]="stageComponent">
+    <dv-include [action]="stageHeader" no-default [parent]="stageComponent">
     </dv-include>
   </div>
 </div>
@@ -37,22 +33,10 @@
       <li *ngFor="let id of staged" class="list-group-item">
         <div class="row">
           <div class="col-md-10">
-            <div *ngIf="type === 'member'">
-              <dv-include [action]="showMember" [inputs]="{
-                id: id
-               }"
-               [parent]="stageComponent">
-              </dv-include>
-            </div>
-            <div *ngIf="type === 'group'">
-              <dv-include [action]="showGroup" [inputs]="{
-                id: id,
-                showMembers: false,
-                showSubgroups: false
-               }"
-                [parent]="stageComponent">
-              </dv-include>
-            </div>
+            <dv-include [action]="showMember" tag="group-show-member"
+              [inputs]="{ id: id }"
+              [parent]="stageComponent">
+            </dv-include>
           </div>
           <div class="col-md-2">
             <button mat-button (click)="unstage(id)" class="eject">

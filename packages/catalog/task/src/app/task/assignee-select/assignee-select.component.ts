@@ -7,9 +7,9 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import {
-  GatewayService, GatewayServiceFactory
-} from 'dv-core';
+import { GatewayService, GatewayServiceFactory } from 'dv-core';
+
+import { v4 as uuid } from 'uuid';
 
 import {
   ShowAssigneeComponent
@@ -48,6 +48,8 @@ export class AssigneeSelectComponent
   selectedAssigneeId: string | undefined;
   assigneeSelect = this;
   private gs: GatewayService;
+
+  selectId = uuid();
 
   constructor(private elem: ElementRef, private gsf: GatewayServiceFactory) {}
 

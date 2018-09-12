@@ -18,7 +18,6 @@ export class ShowGroupComponent  {
   @Input() id: string | undefined;
 
   @Input() showMembers = true;
-  @Input() showSubgroups = true;
 
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent

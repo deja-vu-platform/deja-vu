@@ -5,6 +5,7 @@ import { TxComponent } from './tx.component';
 import { IdComponent } from './id.component';
 import { IdsComponent } from './ids.component';
 import { ButtonComponent } from './button.component';
+import { ButtonLastComponent } from './button-last.component';
 import { LinkComponent } from './link.component';
 import { StatusComponent } from './status.component';
 import { MergeComponent } from './merge.component';
@@ -17,8 +18,8 @@ import { OfDirective } from './of.directive';
 
 const allComponents = [
   IdComponent, IdsComponent, TxComponent, IncludeComponent,
-  IncludeDirective, ButtonComponent, LinkComponent, StatusComponent,
-  MergeComponent
+  IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
+  StatusComponent, MergeComponent
 ];
 
 @NgModule({

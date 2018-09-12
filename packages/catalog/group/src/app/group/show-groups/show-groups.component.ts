@@ -18,15 +18,10 @@ export class ShowGroupsComponent implements OnInit, OnChanges {
   // Fetch rules
   // If undefined then the fetched groups are not filtered by that property
   @Input() withMemberId: string | undefined;
-  @Input() withGroupId: string | undefined;
-  @Input() inGroupId: string | undefined;
-
-  @Input() directOnly = true;
 
   // Show rules
   @Input() showId = true;
   @Input() showMembers = true;
-  @Input() showSubgroups = true;
 
   @Input() showGroup: Action = {
     type: <Type<Component>> ShowGroupComponent
@@ -60,16 +55,13 @@ export class ShowGroupsComponent implements OnInit, OnChanges {
               query Groups($input: GroupsInput!) {
                 groups(input: $input) {
                   ${this.showId ? 'id' : ''}
-                  ${this.showMembers ? 'members { id }' : ''}
-                  ${this.showSubgroups ? 'subgroups { id }' : ''}
+                  ${this.showMembers ? 'memberIds' : ''}
                 }
               }
             `,
             variables: JSON.stringify({
               input: {
-                withMemberId: this.withMemberId,
-                withGroupId: this.withGroupId,
-                inGroupId: this.inGroupId
+                withMemberId: this.withMemberId
               }
             })
           }

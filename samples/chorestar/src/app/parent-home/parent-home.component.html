@@ -16,6 +16,7 @@
                     [completed]="false"
                     [showTask]="{
                       type: showChore,
+                      tag: 'chorestar-show-chore',
                       inputMap: { task: 'chore' }
                     }"
                     noTasksToShowText="No assigned chores">
@@ -31,6 +32,7 @@
                     [assignerId]="user?.id"
                     [showTask]="{
                       type: showChore,
+                      tag: 'chorestar-show-chore',
                       inputMap: {task: 'chore'},
                       inputs: {showOptionToApprove: true}
                     }"
@@ -54,11 +56,13 @@
                 assigneeSelectPlaceholder="For Child"
                 (selectedAssignee)="choreAssignee=$event"
                 [showAssignee]="{
-                  type: showUser, dvOf: 'childauthentication'
+                  type: showUser,
+                  tag: 'authentication-show-user',
+                  dvOf: 'childauthentication'
                 }"
                 [showOptionToSubmit]="false">
               </task-create-task>
-              <market-create-good
+              <market-create-good dvAlias="chore-create-good"
                 [id]="choreId"
                 priceLabel="Star Value"
                 [sellerId]="choreAssignee?.id"
@@ -81,6 +85,7 @@
                 [waitOn]="['sellerId', 'marketId']"
                 [showGood]="{
                   type: showReward,
+                  tag: 'chorestar-show-reward',
                   inputMap: { good: 'reward' }
                 }"
                 [showOptionToBuy]="false"
@@ -94,7 +99,7 @@
               <property-create-object dvOf="reward"
                 [id]="rewardId" [showOptionToSubmit]="false">
               </property-create-object>
-              <market-create-good
+              <market-create-good dvAlias="reward-create-good"
                 [id]="rewardId"
                 [sellerId]="user?.id"
                 [marketId]="user?.id"
@@ -127,11 +132,11 @@
                 balance=0
                 [hidden]="true">
               </market-create-party>
-              <group-create-member
-                [id]="childId"
-                [inGroupId]="user?.id"
+              <group-add-to-group
+                [id]="user?.id"
+                [initialMemberId]="childId"
                 [hidden]="true">
-              </group-create-member>
+              </group-add-to-group>
               <dv-button>Create Child</dv-button>
             </dv-tx>
           </div>

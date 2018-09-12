@@ -1,12 +1,12 @@
-<ul *ngIf="members && members.length > 0" class="list-group">
-  <li *ngFor="let member of members" class="list-group-item">
+<ul *ngIf="memberIds && memberIds.length > 0" class="list-group">
+  <li *ngFor="let memberId of memberIds" class="list-group-item">
     <dv-include [action]="showMember" [inputs]="{
-        id: member.id
+        id: memberId
       }"
       [parent]="showMembers">
     </dv-include>
   </li>
 </ul>
-<div *ngIf="!members || members.length === 0">
+<div *ngIf="!memberIds || memberIds.length === 0">
   No members
 </div>

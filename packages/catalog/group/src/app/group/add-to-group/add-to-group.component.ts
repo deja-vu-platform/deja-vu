@@ -27,28 +27,21 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class AddToGroupComponent implements OnInit {
   @Input() id: string;
-  @Input() type: 'member' | 'subgroup' = 'member';
 
-  @Input() showMember: Action = {
-    type: <Type<Component>> ShowMemberComponent
-  };
-
-  @Input() showGroup: Action = {
-    type: <Type<Component>> ShowGroupComponent
-  };
-
+  @Input() set initialMemberId(id: string) {
+    this.memberIdControl.setValue(id);
+  }
   @Output() selectedId = new EventEmitter<string>();
 
   // Presentation inputs
-  @Input() autocompletePlaceholder = `Choose ${this.type}`;
-  @Input() buttonLabel = `Add ${this.type}`;
-  @Input() addSavedText = `${this.type} added to group`;
+  @Input() buttonLabel = `Add member`;
+  @Input() addSavedText = `Member added to group`;
 
   @ViewChild(FormGroupDirective) form;
 
-  autocomplete = new FormControl('');
+  memberIdControl = new FormControl('');
   addForm: FormGroup = this.builder.group({
-    autocomplete: this.autocomplete
+    memberId: this.memberIdControl
   });
 
 
@@ -57,8 +50,6 @@ export class AddToGroupComponent implements OnInit {
 
   private gs: GatewayService;
 
-  disabledIds: string[] = [];
-
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder) {}
@@ -66,47 +57,18 @@ export class AddToGroupComponent implements OnInit {
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    this.autocomplete.valueChanges.subscribe((value) => {
-      this.selectedId.emit(value);
-    });
-    this.load();
   }
 
   onSubmit() {
     this.rs.run(this.elem);
   }
 
-  load() {
-    if (!this.gs) {
-      return;
-    }
-    const field = this.type === 'member' ? 'members' : 'subgroups';
-    this.gs.get<{data: {group: any}}>('/graphql', {
-      params: {
-        query: `query {
-          group(id: "${this.id}") {
-            ${field} \{
-              id
-            }
-          }
-        }`
-      }
-    })
-    .subscribe((res) => {
-      if (!res.data.group) {
-        throw new Error(`Group ${this.id} doesn't exist`);
-      }
-      this.disabledIds = _.map(res.data.group[field], 'id');
-    });
-  }
-
   async dvOnRun(): Promise<void> {
-    const mutation = this.type === 'member' ? 'addMember' : 'addSubgroup';
     const res = await this.gs.post<{data: any}>('/graphql', {
       query: `mutation {
-        ${mutation}(
+        addMember(
           groupId: "${this.id}",
-          id: "${this.autocomplete.value}") {
+          id: "${this.memberIdControl.value}") {
           id
         }
       }`

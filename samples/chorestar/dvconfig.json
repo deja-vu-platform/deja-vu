@@ -7,24 +7,28 @@
   },
   "usedCliches": {
     "parentauthentication": {
+      "name": "authentication",
       "config": {
         "wsPort": 3002,
         "reinitDbOnStartup": true
       }
     },
     "parentauthorization": {
+      "name": "authorization",
       "config": {
         "wsPort": 3003,
         "reinitDbOnStartup": true
       }
     },
     "childauthentication": {
+      "name": "authentication",
       "config": {
         "wsPort": 3004,
         "reinitDbOnStartup": true
       }
     },
     "childauthorization": {
+      "name": "authorization",
       "config": {
         "wsPort": 3005,
         "reinitDbOnStartup": true
@@ -49,6 +53,7 @@
       }
     },
     "chore": {
+      "name": "property",
       "config": {
         "wsPort": 3009,
         "reinitDbOnStartup": true,
@@ -65,6 +70,7 @@
       }
     },
     "child": {
+      "name": "property",
       "config": {
         "wsPort": 3010,
         "reinitDbOnStartup": true,
@@ -81,6 +87,7 @@
       }
     },
     "reward": {
+      "name": "property",
       "config": {
         "wsPort": 3011,
         "reinitDbOnStartup": true,
@@ -96,5 +103,17 @@
         }
       }
     }
-  }
+  },
+  "actions": {
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "chorestar-root"}
+      ]
+    }
+  },
+  "routes": [
+    {"path": "parent", "action": "chorestar-parent-home"},
+    {"path": "child", "action": "chorestar-child-home"},
+    {"path": "", "action": "chorestar-landing"}
+  ]
 }

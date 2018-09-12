@@ -6,6 +6,8 @@ import { Observable } from 'rxjs/Observable';
 
 import { RUN_ID_ATTR } from './run.service';
 
+import * as _ from 'lodash';
+
 
 export type Dict = {[field: string]: string};
 export interface RequestOptions {
@@ -31,7 +33,20 @@ export class GatewayService {
         name = dvOf + name.substring(name.indexOf('-'));
       }
       seenNodes.push(name);
-      node = renderer.parentNode(node);
+
+      const classAttr = node.getAttribute('class');
+      let dvClass: string | null = null;
+      if (!_.isEmpty(classAttr)) {
+        for (const cssClass of classAttr.split()) {
+          const match = /dv-parent-is-(.*)/i.exec(cssClass);
+          dvClass = match ? match[1] : null;
+        }
+      }
+      if (dvClass !== null) {
+        node = renderer.selectRootElement('.dv-' + dvClass);
+      } else {
+        node = renderer.parentNode(node);
+      }
     }
     this.fromStr = JSON.stringify(seenNodes);
   }

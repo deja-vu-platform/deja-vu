@@ -28,26 +28,18 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class CreateGroupComponent
 implements OnInit, OnAfterCommit, OnAfterAbort {
   @Input() id;
-  @Input() assignerId;
   @Input() initialMemberIds: string[] = [];
-  @Input() initialGroupIds: string[] = [];
   @Input() showOptionToAddMembers = true;
-  @Input() showOptionToAddGroups = true;
   @Input() showOptionToSubmit = true;
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent
   };
 
-  @Input() showGroup: Action = {
-    type: <Type<Component>> ShowGroupComponent
-  };
   @Input() stageHeader: Action | undefined;
 
   // Presentation inputs
   @Input() memberAutocompletePlaceholder = 'Choose Member';
   @Input() stageMemberButtonLabel = 'Add Member';
-  @Input() groupAutocompletePlaceholder = 'Choose Group';
-  @Input() stageGroupButtonLabel = 'Add Group';
   @Input() buttonLabel = 'Create Group';
   @Input() newGroupSavedText = 'New Group saved';
 
@@ -56,7 +48,6 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
   @ViewChild(FormGroupDirective) form;
 
   membersAutocomplete;
-  groupAutocomplete;
   createGroupForm: FormGroup;
 
   newGroupSaved = false;
@@ -72,13 +63,11 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
     this.membersAutocomplete = new FormControl(this.initialMemberIds);
-    this.groupAutocomplete = new FormControl(this.initialGroupIds);
     this.membersAutocomplete.valueChanges.subscribe((value) => {
       this.stagedMemberIds.emit(value);
     });
     this.createGroupForm =  this.builder.group({
-      membersAutocomplete: this.membersAutocomplete,
-      groupAutocomplete: this.groupAutocomplete
+      membersAutocomplete: this.membersAutocomplete
     });
   }
 
@@ -96,8 +85,7 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
       variables: {
         input: {
           id: this.id,
-          initialMemberIds: this.membersAutocomplete.value,
-          initialSubgroupIds: this.groupAutocomplete.value
+          initialMemberIds: this.membersAutocomplete.value
         }
       }
     })

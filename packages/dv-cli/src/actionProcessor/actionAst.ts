@@ -19,6 +19,7 @@ interface TagInfo {
 }
 
 // https://github.com/posthtml/posthtml-parser
+// strings represent plain text content to be written to the output
 type PostHtmlAst = (string | Tag)[];
 interface Tag extends TagInfo {
   content: PostHtmlAst;
@@ -32,13 +33,14 @@ interface TagOnly extends TagInfo {
 
 export function getActionAst(
   projectName: string, actionName: string, usedCliches: ReadonlyArray<string>,
-  html: string)
-  : ActionAst {
+  html: string): ActionAst {
   const tagsToKeep = new Set([ projectName, ...usedCliches, 'dv' ]);
-
+  const shouldKeep = (tag: Tag): boolean =>  {
+    return tagsToKeep.has(tag.tag.split('-')[0]) || tag.tag === 'router-outlet';
+  };
   return posthtml([
-      filterActionTags(tagsToKeep),
-      flatten(tagsToKeep),
+      pruneSubtreesWithNoActions(shouldKeep),
+      removeNonActions(shouldKeep),
       buildActionAst(),
       checkForErrors(actionName)
     ])
@@ -47,26 +49,26 @@ export function getActionAst(
 }
 
 /**
- *  Retain only elements whose tag is in `tagsToKeep` and its parents.
+ *  Retain only elements s.t `shouldKeep(tag)` is true and its ancestors.
  *
  *  The goal of this pass is to prune the AST, cutting the branches that
  *  include no actions.
  */
-function filterActionTags(tagsToKeep: Set<string>) {
-  const _filterActionTags = (tree: PostHtmlAst): TagOnlyAst => {
+function pruneSubtreesWithNoActions(shouldKeep: (tag: Tag) => boolean) {
+  const _pruneSubtreesWithNoActions = (tree: PostHtmlAst): TagOnlyAst => {
     const ret: TagOnlyAst = _.chain<PostHtmlAst>(tree)
       .map((tag: string | Tag): TagOnly | null => {
         if (_.isString(tag)) {
           return null;
         }
-        if (tagsToKeep.has(tag.tag.split('-')[0])) {
-          tag.content = _filterActionTags(tag.content);
+        if (shouldKeep(tag)) {
+          tag.content = _pruneSubtreesWithNoActions(tag.content);
           // We can't filter attrs to only include those that are not html
           // global attributes because the action could use what would be valid
           // html global attributes as inputs (e.g., `<foo [id]="bar"></foo>`)
         } else {
           tag.attrs = {};
-          tag.content = _filterActionTags(tag.content);
+          tag.content = _pruneSubtreesWithNoActions(tag.content);
           if (_.isEmpty(tag.content)) {
             return null;
           }
@@ -79,22 +81,31 @@ function filterActionTags(tagsToKeep: Set<string>) {
 
     return ret;
   };
-  return _filterActionTags;
+  return _pruneSubtreesWithNoActions;
 }
 
 /**
  *  Replace non-action elements with its children
  */
-function flatten(tagsToKeep: Set<string>) {
-  const _flatten = (tree: TagOnlyAst): PostHtmlAst => {
-    return _.flatten(_.map(tree, (tag: TagOnly) => {
-      if (!tagsToKeep.has(tag.tag.split('-')[0])) {
-        return _flatten(tag.content);
-      }
-      return tag;
-    }));
+function removeNonActions(shouldKeep: (tag: Tag) => boolean) {
+  // The given AST will have actions and its ancestors (which could be actions
+  // or not). In this phase, we remove the non actions. Note that the leafs
+  // of the tree are always actions.
+  const _removeNonActions = (tree: TagOnlyAst): TagOnlyAst => {
+    return _
+      .chain(tree)
+      .map((tag: TagOnly) => {
+        if (shouldKeep(tag)) {
+          tag.content = _removeNonActions(tag.content);
+          return [tag];
+        } else {
+          return _removeNonActions(tag.content);
+        }
+      })
+      .flatten()
+      .value();
   };
-  return _flatten;
+  return _removeNonActions;
 }
 
 /**
@@ -124,8 +135,8 @@ function buildActionAst() {
 
 /**
  * Check for errors in the tree. The following are considered errors:
- *   - having the same action as a child more than once
- *   - having sibling dv-tx nodes with the same child action
+ *   - having the same (request-sending) action as a child more than once
+ *   - having sibling dv-tx nodes with the same child (request-sending) action
  *
  * These are errors because at runtime we can't tell apart the requests from
  * these actions with the same path and we need to be able to tell them apart
@@ -134,7 +145,13 @@ function buildActionAst() {
 function checkForErrors(actionName: string) {
   const getRepeatedFqTags = (actionAst: ActionAst) => _.pickBy(
     _.groupBy(actionAst, 'fqtag'),
-    (actions: ActionTag[]) => actions.length > 1);
+    (actions: ActionTag[], fqtag: string) => {
+      // TODO: filter non-request sending cliche actions
+      if (fqtag !== 'dv-tx' && fqtag.startsWith('dv')) {
+        return false;
+      }
+      return actions.length > 1;
+    });
   const _checkForErrors = (path: string, fqtag: string) =>
     (tree: ActionAst): ActionAst => {
       const currPath = path + ' -> ' + fqtag;

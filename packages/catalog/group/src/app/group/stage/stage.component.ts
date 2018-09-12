@@ -16,7 +16,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { ShowGroupComponent } from '../show-group/show-group.component';
+import { InputMemberComponent } from '../input-member/input-member.component';
 import { ShowMemberComponent } from '../show-member/show-member.component';
 
 
@@ -39,30 +39,22 @@ import { ShowMemberComponent } from '../show-member/show-member.component';
 })
 export class StageComponent
 implements OnInit, ControlValueAccessor, Validator {
-  @Input() type: 'member' | 'group' = 'member';
   @Input() initialStageIds: string[] = [];
   @Output() stagedIds = new EventEmitter<string[]>();
 
+  @Input() inputMember: Action = {
+    type: <Type<Component>> InputMemberComponent
+  };
   @Input() showMember: Action = {
     type: <Type<Component>> ShowMemberComponent
   };
 
-  @Input() showGroup: Action = {
-    type: <Type<Component>> ShowGroupComponent
-  };
-
   @Input() stageHeader: Action | undefined;
 
+  memberId: string;
+
   // Presentation inputs
-  @Input() autocompletePlaceholder;
-  @Input() buttonLabel;
-
-  @ViewChild(FormGroupDirective) form;
-
-  autocomplete = new FormControl('');
-  stageForm: FormGroup = this.builder.group({
-    autocomplete: this.autocomplete
-  });
+  @Input() buttonLabel = 'Add member';
 
   private gs: GatewayService;
   staged: string[] = [];
@@ -71,26 +63,17 @@ implements OnInit, ControlValueAccessor, Validator {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
     this.rs.register(this.elem, this);
-    if (!this.autocompletePlaceholder) {
-      this.autocompletePlaceholder = `Choose ${this.type}`;
-    }
-    if (!this.buttonLabel) {
-      this.buttonLabel = `Add ${this.type}`;
-    }
     this.staged = this.initialStageIds;
   }
 
-  stage() {
-    this.staged.push(this.autocomplete.value);
+  stage(id: string) {
+    this.staged.push(id);
     this.stagedIds.emit(this.staged);
-    if (this.form) {
-      this.form.resetForm();
-    }
   }
 
   unstage(id: string) {

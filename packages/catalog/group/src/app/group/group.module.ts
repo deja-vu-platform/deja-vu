@@ -2,8 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatAutocompleteModule, MatButtonModule, MatFormFieldModule,
-  MatInputModule
+  MatButtonModule, MatFormFieldModule, MatInputModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -11,12 +10,10 @@ import { DvModule } from 'dv-core';
 
 import { AddToGroupComponent } from './add-to-group/add-to-group.component';
 export { AddToGroupComponent };
-import { AutocompleteComponent } from './autocomplete/autocomplete.component';
-export { AutocompleteComponent };
 import { CreateGroupComponent } from './create-group/create-group.component';
 export { CreateGroupComponent };
-import { CreateMemberComponent } from './create-member/create-member.component';
-export { CreateMemberComponent };
+import { InputMemberComponent } from './input-member/input-member.component';
+export { InputMemberComponent };
 import { JoinLeaveComponent } from './join-leave/join-leave.component';
 export { JoinLeaveComponent };
 import { ShowGroupComponent } from './show-group/show-group.component';
@@ -32,8 +29,8 @@ export { StageComponent };
 
 
 const allComponents =  [
-  AddToGroupComponent, AutocompleteComponent, CreateGroupComponent,
-  CreateMemberComponent, JoinLeaveComponent, ShowGroupComponent,
+  AddToGroupComponent, CreateGroupComponent,
+  InputMemberComponent, JoinLeaveComponent, ShowGroupComponent,
   ShowGroupsComponent, ShowMemberComponent, ShowMembersComponent,
   StageComponent
 ];
@@ -47,8 +44,7 @@ const allComponents =  [
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatAutocompleteModule, MatButtonModule, MatInputModule,
-    MatFormFieldModule
+    MatButtonModule, MatInputModule, MatFormFieldModule
   ],
   declarations: allComponents,
   exports: allComponents,
