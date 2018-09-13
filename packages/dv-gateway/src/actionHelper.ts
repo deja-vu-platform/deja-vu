@@ -69,9 +69,12 @@ export class ActionHelper {
    *  Determine the included action tag from a `dv-include` action tag
    *
    *  @param includeActionTag - the action tag to get the included action from
-   *  @returns the included action tag
+   *  @returns the included action tag or `null` if there's no included tag.
+   *    It is `null` if there is no default action and the user hasn't
+   *    provided one as input
    */
-  private static GetIncludedActionTag(includeActionTag: ActionTag): ActionTag {
+  private static GetIncludedActionTag(includeActionTag: ActionTag)
+    : ActionTag | null {
     const noActionErrorMsg = (cause: string) => `
       Couldn't find the included action in ${JSON.stringify(includeActionTag)}:
       ${cause} \n Context is ${JSON.stringify(includeActionTag.context)}
@@ -80,7 +83,7 @@ export class ActionHelper {
     if (_.isEmpty(actionExpr)) {
       throw new Error(noActionErrorMsg('no action input'));
     }
-    let ret: ActionTag;
+    let ret: ActionTag | null = null;
     if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
       // action is not the default one
       let inputObj: ActionInput;
@@ -129,8 +132,6 @@ export class ActionHelper {
         inputs: inputs ? RJSON.parse(inputs) : undefined,
         context: {}
       };
-    } else {
-      throw new Error(noActionErrorMsg('No hint provided'));
     }
 
     return ret;
@@ -325,14 +326,14 @@ export class ActionHelper {
     : ActionTag {
     let ret;
     if (ActionHelper.IsDvIncludeAction(actionTag)) {
-      const includedActionTag: ActionTag = ActionHelper
+      const includedActionTag: ActionTag | null = ActionHelper
         .GetIncludedActionTag(actionTag);
 
       ret = {
         fqtag: actionTag.fqtag,
         tag: actionTag.tag,
-        content: _
-          .map([includedActionTag], (at: ActionTag) => ({...at, context: {}})),
+        content: (includedActionTag === null) ? [] :
+          [{...includedActionTag, context: {}}],
         context: actionTag.context
       };
     } else if (ActionHelper.IsDvAction(actionTag)) {
