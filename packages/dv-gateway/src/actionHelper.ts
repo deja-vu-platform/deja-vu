@@ -194,8 +194,6 @@ export class ActionHelper {
     const getUsedActions = (
       actionAst: ActionAst | undefined, debugPath: string[] = []): void => {
       _.each(actionAst, (action: ActionTag) => {
-        console.log(debugPath);
-        console.log(debugPath.push);
         debugPath.push(action.fqtag);
         if (!ActionHelper.IsDvAction(action)) {
           if (seenActions.has(action.tag)) {
