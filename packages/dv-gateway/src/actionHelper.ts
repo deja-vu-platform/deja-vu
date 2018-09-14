@@ -193,9 +193,10 @@ export class ActionHelper {
     const usedActions = new Set<string>(_.keys(appActionTable));
     const seenActions = new Set<string>();
     const getUsedActions = (
-      actionAst: ActionAst | undefined, debugPath: string[] = []): void => {
+      actionAst: ActionAst | undefined, debugPath: string[]): void => {
       _.each(actionAst, (action: ActionTag) => {
-        debugPath.push(action.fqtag);
+        const thisDebugPath = debugPath.slice();
+        thisDebugPath.push(action.fqtag);
         if (!ActionHelper.IsDvAction(action)) {
           if (seenActions.has(action.tag)) {
             return;
@@ -207,14 +208,15 @@ export class ActionHelper {
           usedActions.add(action.tag);
         }
 
+        let actionWithContent: ActionTag;
         try {
-          const actionWithContent = this
+          actionWithContent = this
             .populateActionContent(action, allActionsTable);
-
-          getUsedActions(actionWithContent.content, debugPath);
         } catch (e) {
-          throw new Error(`Path: ${debugPath}\n${e.message}`);
+          throw new Error(`Path: ${thisDebugPath}\n${e.message}`);
         }
+
+        getUsedActions(actionWithContent.content, thisDebugPath);
       });
     };
     const rootActions = _.map(
@@ -223,7 +225,8 @@ export class ActionHelper {
         return this
           .populateActionContent({ fqtag: tag, tag: tag }, allActionsTable);
       });
-    _.each(rootActions, (rootAction) => getUsedActions(rootAction.content));
+    _.each(rootActions,
+      (rootAction) => getUsedActions(rootAction.content, [rootAction.fqtag]));
 
     this.actionTable = _.pick(allActionsTable, Array.from(usedActions));
     console.log(
