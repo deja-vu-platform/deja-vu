@@ -12,12 +12,11 @@
     </mat-error>
   </div>
   <div *ngIf="showOptionToInputAssignee" class="form-group">
-    <task-assignee-select
-      [showAssignee]="showAssignee"
-      [assigneeSelectPlaceholder]="assigneeSelectPlaceholder"
-      (selectedAssignee)="outputSelectedAssignee($event)"
+    <dv-input-id
+      [entityName]="assigneeInputPlaceholder"
+      (id)="outputSelectedAssignee($event)"
       formControlName="assignee">
-    </task-assignee-select>
+    </dv-input-id>
   </div>
   <div *ngIf="showOptionToInputDueDate" class="form-group">
     <task-create-due-date formControlName="dueDate">

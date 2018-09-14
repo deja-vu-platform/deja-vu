@@ -73,8 +73,8 @@ export class ShowTasksComponent implements OnInit, OnChanges {
               query Tasks($input: TasksInput!) {
                 tasks(input: $input) {
                   ${this.showId ? 'id' : ''}
-                  ${this.showAssigner ? 'assigner { id }' : ''}
-                  ${this.showAssignee ? 'assignee { id }' : ''}
+                  ${this.showAssigner ? 'assignerId' : ''}
+                  ${this.showAssignee ? 'assigneeId' : ''}
                   ${this.showDueDate ? 'dueDate' : ''}
                   ${this.showApproved ? 'approved' : ''}
                   ${this.showCompleted ? 'completed' : ''}

@@ -13,13 +13,10 @@ import {
 } from 'dv-core';
 
 
-import {
-  ShowAssigneeComponent
-} from '../show-assignee/show-assignee.component';
 
 import * as _ from 'lodash';
 
-import { Assignee, Task } from '../shared/task.model';
+import { Task } from '../shared/task.model';
 
 interface CreateTaskResponse {
   data: {createTask: Task};
@@ -42,23 +39,20 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
   @Input() showOptionToSubmit = true;
 
   @Input() set assigneeId(assigneeId: string) {
-    this.assigneeControl.setValue({id: assigneeId});
+    this.assigneeControl.setValue(assigneeId);
   }
   @Input() set dueDate(dueDate: string) {
     this.dueDateControl.setValue(dueDate);
   }
 
   // Presentation inputs
-  @Input() assigneeSelectPlaceholder = 'Choose Assignee';
+  @Input() assigneeInputPlaceholder = 'Assignee';
   @Input() buttonLabel = 'Create Task';
   @Input() newTaskSavedText = 'New task saved';
-  @Input() showAssignee = {
-    type: ShowAssigneeComponent
-  };
 
   @ViewChild(FormGroupDirective) form;
 
-  @Output() selectedAssignee = new EventEmitter<Assignee>();
+  @Output() selectedAssignee = new EventEmitter<string>();
 
   assigneeControl = new FormControl('');
   dueDateControl = new FormControl('');
@@ -86,7 +80,7 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
     this.rs.run(this.elem);
   }
 
-  outputSelectedAssignee(selectedAssignee: Assignee) {
+  outputSelectedAssignee(selectedAssignee: string) {
     this.selectedAssignee.emit(selectedAssignee);
   }
 
@@ -101,7 +95,7 @@ export class CreateTaskComponent implements OnInit, OnRun, OnAfterCommit {
         input: {
           id: this.id,
           assignerId: this.assignerId,
-          assigneeId: this.assigneeControl.value.id,
+          assigneeId: this.assigneeControl.value,
           dueDate: this.dueDateControl.value
         }
       }
