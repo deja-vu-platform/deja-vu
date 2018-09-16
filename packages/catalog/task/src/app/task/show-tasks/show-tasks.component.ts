@@ -2,7 +2,6 @@ import {
   Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
-import * as _ from 'lodash';
 
 import { ShowTaskComponent } from '../show-task/show-task.component';
 

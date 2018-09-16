@@ -3,15 +3,13 @@ import {
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  Validators
+  FormBuilder, FormControl, FormGroup, FormGroupDirective
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnAfterCommit, OnRun,
   RunService
 } from 'dv-core';
-
 
 
 import * as _ from 'lodash';

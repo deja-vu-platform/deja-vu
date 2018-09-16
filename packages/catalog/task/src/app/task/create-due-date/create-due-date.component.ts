@@ -1,16 +1,11 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, EventEmitter, Input, OnInit, Output
 } from '@angular/core';
 import {
-  AbstractControl, ControlValueAccessor, FormBuilder, FormControl,
-  FormGroup, FormGroupDirective, NG_VALIDATORS, NG_VALUE_ACCESSOR,
+  AbstractControl, ControlValueAccessor, FormControl,
+  NG_VALIDATORS, NG_VALUE_ACCESSOR,
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
-
-import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
-} from 'dv-core';
 
 // https://github.com/dherges/ng-packagr/issues/217
 import * as momentImported from 'moment'; const moment = momentImported;
@@ -58,8 +53,6 @@ export class CreateDueDateComponent
       return null;
     }
   ]);
-
-  constructor(private elem: ElementRef, private rs: RunService) {}
 
   ngOnInit() {
     this.dueDateControl.setValue(this.initialValue);

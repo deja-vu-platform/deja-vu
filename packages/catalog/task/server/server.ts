@@ -6,12 +6,12 @@ import * as mongodb from 'mongodb';
 import * as path from 'path';
 import { v4 as uuid } from 'uuid';
 
+import { makeExecutableSchema } from 'graphql-tools';
 import * as _ from 'lodash';
 
 // GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
 // tslint:disable-next-line:no-var-requires
 const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
-import { makeExecutableSchema } from 'graphql-tools';
 
 
 interface TaskDoc {
@@ -117,18 +117,13 @@ const resolvers = {
       if (input.assigned === false) {
         filterOp['assigneeId'] = null;
       }
-      const matchingTasks: TaskDoc[] = await tasks.find(filterOp)
-        .toArray();
 
-      return matchingTasks;
+      return await tasks.find(filterOp)
+        .toArray();
     },
     task: async (root, { id }) => {
-      const task = await Validation.taskExists(id);
-
-      return task;
-    }/*,
-    assignees: (root) => assignees.find()
-      .toArray()*/
+      return await Validation.taskExists(id);
+    }
   },
   Task: {
     id: (task: TaskDoc) => task.id,
