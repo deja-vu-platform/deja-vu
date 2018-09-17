@@ -1,0 +1,38 @@
+type Account {
+  id: ID!
+  balance: #Balance
+  transfers: [Transfer]
+}
+
+type Transfer {
+  fromId: ID!
+  toId: ID!
+  amount: #Balance!
+}
+
+input CreateTransferInput {
+  id: ID
+  fromId: ID!
+  toId: ID!
+  amount: #Balance!
+}
+
+input AddToBalanceInput {
+  accountId: ID!
+  amount: #Balance!
+}
+
+input CreateAccountInput {
+  id: ID
+  balance: #Balance!
+}
+
+type Query {
+  account(id: ID!): Account
+}
+
+type Mutation {
+  createAccount(input: CreateAccountInput!): Account
+  createTransfer(input: CreateTransferInput!): Transfer
+  addToBalance(input: AddToBalanceInput!): Account
+}
