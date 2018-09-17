@@ -9,7 +9,6 @@
   "config": {
     "wsPort": 3001
   },
-  "startServer": true,
   "actions": {
     "package": {
       "include": [

@@ -2,7 +2,6 @@ import {
   Component, ElementRef, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
-import * as _ from 'lodash';
 
 import { ShowTaskComponent } from '../show-task/show-task.component';
 
@@ -73,8 +72,8 @@ export class ShowTasksComponent implements OnInit, OnChanges {
               query Tasks($input: TasksInput!) {
                 tasks(input: $input) {
                   ${this.showId ? 'id' : ''}
-                  ${this.showAssigner ? 'assigner { id }' : ''}
-                  ${this.showAssignee ? 'assignee { id }' : ''}
+                  ${this.showAssigner ? 'assignerId' : ''}
+                  ${this.showAssignee ? 'assigneeId' : ''}
                   ${this.showDueDate ? 'dueDate' : ''}
                   ${this.showApproved ? 'approved' : ''}
                   ${this.showCompleted ? 'completed' : ''}

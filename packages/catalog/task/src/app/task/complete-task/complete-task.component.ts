@@ -1,9 +1,9 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit
+  Component, ElementRef, Input, OnInit
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnAfterCommit, OnRun,
   RunService
 } from 'dv-core';
 
@@ -33,8 +33,8 @@ export class CompleteTaskComponent implements
     this.rs.run(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
-    const res = await this.gs
+  dvOnRun(): Promise<{data: any}> {
+    return this.gs
       .post<{data: any}>('/graphql', {
         query: `mutation {
           completeTask(id: "${this.id}") {

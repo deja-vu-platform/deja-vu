@@ -12,5 +12,4 @@ export class ShowAssigneeComponent implements OnInit {
 
   ngOnInit() {
   }
-
 }

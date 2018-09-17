@@ -1,20 +1,18 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, ViewChild
+  Component, ElementRef, Input, OnChanges, OnInit, ViewChild
 } from '@angular/core';
 
 import {
-  AbstractControl, FormBuilder, FormControl, FormGroup, FormGroupDirective,
-  Validators
+  FormBuilder, FormControl, FormGroup, FormGroupDirective
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
+  GatewayService, GatewayServiceFactory, RunService
 } from 'dv-core';
 
 import { map } from 'rxjs/operators';
 
-import { Assignee, Task } from '../shared/task.model';
+import { Task } from '../shared/task.model';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
@@ -70,7 +68,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges {
           query {
             task(id: "${this.id}") {
               id
-              assignee { id }
+              assigneeId
               dueDate
             }
           }
@@ -79,7 +77,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges {
     })
     .pipe(map((res) => res.data.task))
     .subscribe((task: Task) => {
-      this.assignee.setValue(task.assignee);
+      this.assignee.setValue(task.assigneeId);
       this.dueDate.setValue(task.dueDate);
     });
   }
@@ -99,7 +97,7 @@ export class UpdateTaskComponent implements OnInit, OnChanges {
       variables: {
         input: {
           id: this.id,
-          assigneeId: this.assignee.value.id,
+          assigneeId: this.assignee.value,
           dueDate: this.dueDate.value
         }
       }

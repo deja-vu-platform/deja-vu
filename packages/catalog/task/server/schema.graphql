@@ -1,15 +1,7 @@
-type Assigner {
-  id: ID!
-}
-
-type Assignee {
-  id: ID!
-}
-
 type Task {
   id: ID!
-  assigner: Assigner
-  assignee: Assignee
+  assignerId: ID
+  assigneeId: ID
   dueDate: String
   completed: Boolean
   approved: Boolean
@@ -17,20 +9,14 @@ type Task {
 
 input CreateTaskInput {
   id: ID
-  assignerId: ID 
+  assignerId: ID
   assigneeId: ID
-  dueDate: String
-}
-
-input CreateTaskForAllAssigneesInput {
-  id: ID
-  assignerId: ID 
   dueDate: String
 }
 
 input UpdateTaskInput {
   id: ID!
-  assignerId: ID 
+  assignerId: ID
   assigneeId: ID
   dueDate: String
 }
@@ -47,15 +33,10 @@ input TasksInput {
 type Query {
   tasks(input: TasksInput!): [Task]
   task(id: ID!): Task
-  assignees: [Assignee]
 }
 
 type Mutation {
-  createAssigner(id: ID!): Assigner
-  createAssignee(id: ID!): Assignee
   createTask(input: CreateTaskInput!): Task
-  createTaskForAllAssignees(
-    input: CreateTaskForAllAssigneesInput!): Task
   updateTask(input: UpdateTaskInput!): Task
   claimTask(id: ID!, assigneeId: ID!): Task
   completeTask(id: ID!): Task

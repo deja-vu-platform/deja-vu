@@ -1,13 +1,9 @@
-import {
-  AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit
-} from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnAfterCommit, OnRun,
   RunService
 } from 'dv-core';
-
-import * as _ from 'lodash';
 
 
 @Component({
@@ -35,8 +31,8 @@ export class ApproveTaskComponent implements
     this.rs.run(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
-    const res = await this.gs
+  dvOnRun(): Promise<{data: any}> {
+    return this.gs
       .post<{data: any}>('/graphql', {
         query: `mutation {
           approveTask(id: "${this.id}") {

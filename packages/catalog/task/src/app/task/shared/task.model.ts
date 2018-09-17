@@ -1,15 +1,7 @@
-export interface Assigner {
-  id: string;
-}
-
-export interface Assignee {
-  id: string;
-}
-
 export interface Task {
   id: string;
-  assigner: Assigner;
-  assignee: Assignee;
+  assignerId: string;
+  assigneeId: string;
   dueDate: string; // Datetime;
   approved: boolean;
   completed: boolean;

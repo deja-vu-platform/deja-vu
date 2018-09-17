@@ -2,17 +2,17 @@
   {{task.id}}
 </div>
 
-<div *ngIf="showAssignee && task.assignee">
-  {{task.assignee.id}}
+<div *ngIf="showAssignee && task.assigneeId">
+  {{task.assigneeId}}
 </div>
-<div *ngIf="showAssignee && !task.assignee">
+<div *ngIf="showAssignee && !task.assigneeId">
   {{noAssigneeText}}
 </div>
 
-<div *ngIf="showAssigner && task.assigner">
-  {{task.assigner.id}}
+<div *ngIf="showAssigner && task.assignerId">
+  {{task.assignerId}}
 </div>
-<div *ngIf="showAssigner && !task.assigner">
+<div *ngIf="showAssigner && !task.assignerId">
   {{noAssignerText}}
 </div>
 
