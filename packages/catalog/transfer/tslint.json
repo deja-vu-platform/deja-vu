@@ -85,7 +85,7 @@
     "no-magic-numbers": true,
     "no-misused-new": true,
     "no-namespace": true,
-    "no-non-null-assertion": true,
+    "no-non-null-assertion": false,
     "no-reference": true,
     "no-shadowed-variable": true,
     "no-string-literal": false,
