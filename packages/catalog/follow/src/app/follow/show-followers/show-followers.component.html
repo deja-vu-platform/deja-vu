@@ -1,0 +1,13 @@
+<ul *ngIf="followers && followers.length > 0" class="list-group">
+  <li *ngFor="let followerId of followers" class="list-group-item">
+    <dv-include 
+      [action]="showFollower" 
+      [inputs]="{id: followerId}" 
+      [parent]="showFollowers">
+    </dv-include>
+  </li>
+</ul>
+
+<div *ngIf="!followers || followers.length === 0">
+  <span>{{noFollowersToShowText}}</span>
+</div>

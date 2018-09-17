@@ -1,0 +1,65 @@
+<div *ngIf="id" class="row">
+  <div class="col-md-4">
+    <property-show-object
+      dvOf="supply"
+      [id]="id"
+      [showOnly]="['item']">
+    </property-show-object>
+  </div>
+  <div class="col-md-4">
+    <market-show-good
+      [id]="id"
+      [showId]="false"
+      [showPrice]="false"
+      [showSeller]="false"
+      [showMarketId]="false">
+    </market-show-good>
+  </div>
+  <div class="col-md-4">
+    <property-show-object
+      dvOf="supply"
+      [id]="id"
+      [showOnly]="['item']">
+    </property-show-object>
+  </div>
+</div>
+  
+<div *ngIf="supply" class="row">
+  <div class="col-md-4">
+    <div *ngIf="!useIdForObject">
+      <property-show-object
+        dvOf="supply" [object]="supply"
+        [showOnly]="['item']">
+      </property-show-object>
+    </div>
+    <div *ngIf="useIdForObject">
+      <property-show-object
+        dvOf="supply" [id]="supply.id"
+        [showOnly]="['item']">
+      </property-show-object>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <market-show-good
+      [good]="supply"
+      [showId]="false"
+      [showPrice]="false"
+      [showSeller]="false"
+      [showMarketId]="false">
+    </market-show-good>
+  </div>
+  <div class="col-md-4">
+    <div *ngIf="!useIdForObject">
+      <property-show-object
+        dvOf="supply" [object]="supply"
+        [showOnly]="['unit']">
+      </property-show-object>
+    </div>
+    <div *ngIf="useIdForObject">
+      <property-show-object
+        dvOf="supply" [id]="supply.id"
+        [showOnly]="['unit']">
+      </property-show-object>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,11 @@
+{
+  "name": "authorization",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "config": {
+    "wsPort": 3001
+  }
+}

@@ -1,0 +1,24 @@
+<ul *ngIf="transactions && transactions.length > 0" class="list-group">
+  <li *ngFor="let transaction of transactions" class="list-group-item">
+    <dv-include [action]="showTransaction" [inputs]="{
+        id: transaction.id, showId: showTransactionId,
+        showSummary: showSummary, showGoodDetails: showGoodDetails,
+        showStatus: showStatus, showGoodId: showGoodId, showPrice: showPrice,
+        showSupply: showSupply, showSeller: showSeller, showMarketId: showMarketId
+      }"
+      [parent]="showTransactions">
+    </dv-include>
+    <div *ngIf="transaction.status !== 'Paid'">
+      <div *ngIf="showOptionToPay && transaction.seller && transaction.buyer">
+        <market-pay-transaction [id]="transaction.id"></market-pay-transaction>
+      </div>
+      <div *ngIf="showOptionToCancel">
+        <market-cancel-transaction [id]="transaction.id">
+        </market-cancel-transaction>
+      </div>
+    </div>
+  </li>
+</ul>
+<div *ngIf="!transactions || transactions.length === 0">
+  <span>{{noTransactionsToShowText}}</span>
+</div>

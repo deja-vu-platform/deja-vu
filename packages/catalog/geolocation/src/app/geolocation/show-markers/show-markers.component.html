@@ -1,0 +1,13 @@
+<ul *ngIf="markers && markers.length > 0" class="list-group">
+  <li *ngFor="let marker of markers" class="list-group-item">
+    <dv-include [action]="showMarker" [inputs]="{
+      marker: marker, showId: showId, showTitle: showTitle,
+      showLatLong: showLatLong, showMapId: showMapId
+      }" [parent]="showMarkers">
+    </dv-include>
+  </li>
+</ul>
+
+<div *ngIf="!markers || markers.length === 0">
+  <span>{{noMarkersToShowText}}</span>
+</div>

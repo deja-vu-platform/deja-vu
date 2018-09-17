@@ -1,0 +1,27 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="updateTaskForm"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="taskSaved">
+      <i class="material-icons">done</i>
+        {{taskSavedText}}
+    </div>
+    <mat-error *ngIf="taskError">
+      <i class="material-icons">report_problem</i>
+      {{taskError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <dv-input-id entityName="Assignee" formControlName="assignee">
+    </dv-input-id>
+  </div>
+  <div class="form-group">
+    <task-create-due-date formControlName="dueDate">
+    </task-create-due-date>
+  </div>
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!updateTaskForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

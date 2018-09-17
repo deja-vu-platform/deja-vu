@@ -1,0 +1,24 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createObjectForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newObjectSaved">
+      <i class="material-icons">done</i>
+      {{newObjectSavedText}}
+    </div>
+    <mat-error *ngIf="newObjectError">
+      <i class="material-icons">report_problem</i>
+      {{newObjectError}}
+    </mat-error>
+  </div>
+  <div class="form-group" *ngFor="let property of properties">
+    <property-create-property [name]="property.name" [formControlName]="property.name">
+    </property-create-property>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" 
+      [disabled]="!createObjectForm.valid">
+        {{buttonLabel}}
+    </button>
+  </div>
+</form>

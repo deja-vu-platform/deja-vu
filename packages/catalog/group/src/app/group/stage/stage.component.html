@@ -1,0 +1,50 @@
+<div class="row">
+  <div class="col-md-12">
+    <dv-tx>
+      <form class="form-horizontal">
+        <div class="form-group">
+          <dv-include [action]="inputMember" tag="group-input-member"
+            [outputs]="{ memberId: 'memberId' }"
+            [parent]="stageComponent">
+          </dv-include>
+        </div>
+        <div class="form-group">
+          <dv-button-last [of]="memberId"
+            [disabled]="!memberId" (last)="stage($event)">
+            {{buttonLabel}}
+          </dv-button-last>
+        </div>
+      </form>
+    </dv-tx>
+  </div>
+</div>
+
+<div *ngIf="stageHeader" class="row">
+  <div class="col-md-12">
+    <dv-include [action]="stageHeader" no-default [parent]="stageComponent">
+    </dv-include>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <ul *ngIf="staged && staged.length > 0"
+      class="list-group">
+      <li *ngFor="let id of staged" class="list-group-item">
+        <div class="row">
+          <div class="col-md-10">
+            <dv-include [action]="showMember" tag="group-show-member"
+              [inputs]="{ id: id }"
+              [parent]="stageComponent">
+            </dv-include>
+          </div>
+          <div class="col-md-2">
+            <button mat-button (click)="unstage(id)" class="eject">
+              <i class="material-icons icon">eject</i>
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

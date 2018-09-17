@@ -29,6 +29,7 @@ typings
 
 # Users Environment Variables
 .lock-wscript
+.vscode
 
 *.map
 *.baseDir.ts
@@ -37,3 +38,4 @@ dist
 lib
 tscommand-*.txt
 dv-dev
+pkg

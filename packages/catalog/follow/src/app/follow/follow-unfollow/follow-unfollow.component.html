@@ -1,0 +1,7 @@
+<button mat-button *ngIf="!followsPublisher" (click)="follow()">
+  {{followButtonLabel}}
+</button>
+
+<button mat-button *ngIf="followsPublisher" (click)="unfollow()">
+  {{unfollowButtonLabel}}
+</button>

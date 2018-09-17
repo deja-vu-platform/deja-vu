@@ -1,0 +1,25 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="editConsumerForm"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="editConsumerSaved" class="nwe-saved">
+      <i class="material-icons">done</i>
+      {{editConsumerSavedText}}
+    </div>
+    <mat-error *ngIf="editConsumerError">
+      <i class="material-icons">report_problem</i>
+      {{editConsumerError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <input matInput [formControl]="newConsumerControl">
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <button mat-button [disabled]="!editConsumerForm.valid" type="submit">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

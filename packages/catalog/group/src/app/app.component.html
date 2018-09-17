@@ -1,0 +1,36 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Member Stage</h1>
+      <group-stage (stagedIds)="stagedIds=$event"></group-stage>
+      Staged Ids: {{stagedIds}}
+
+      <h1>Create Group of id <em>bens</em></h1>
+      <group-create-group id="bens"
+        [memberAutocompletePlaceholder]="'Choose'"
+        [stageMemberButtonLabel]="'Stage!'">
+       </group-create-group>
+
+      <h1>Add Member to <em>bens</em></h1>
+      <group-add-to-group id="bens"></group-add-to-group>
+
+      <h1>Show Groups</h1>
+      <group-show-groups></group-show-groups>
+
+      <h1>Show Members</h1>
+      <group-show-members></group-show-members>
+
+      <h1>Show Members in <em>bens</em></h1>
+      <group-show-members inGroupId="bens"></group-show-members>
+
+      <h1>Create group <em>bobs</em> with initial member <em>bob</em></h1>
+      <group-create-group id="bobs" [initialMemberIds]="['bob']">
+      </group-create-group>
+      <h1><em>ben</em> join/leave <em>bens</em></h1>
+      <group-join-leave
+        groupId="bens"
+        memberId="ben">
+      </group-join-leave>
+    </div>
+  </div>
+</div>

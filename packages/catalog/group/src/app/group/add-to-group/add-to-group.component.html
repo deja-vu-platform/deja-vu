@@ -1,0 +1,21 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="addForm" class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="addSaved">
+      <i class="material-icons">done</i>
+        {{addSavedText}}
+    </div>
+    <mat-error *ngIf="addError">
+      <i class="material-icons">report_problem</i>
+      {{addError}}
+    </mat-error>
+  </div>
+  <div *ngIf="memberIdControl" class="form-group">
+    <group-input-member formControlName="memberId">
+    </group-input-member>
+  </div>
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!addForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

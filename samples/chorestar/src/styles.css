@@ -1,0 +1,58 @@
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import "~bootstrap/dist/css/bootstrap.min.css";
+
+md-icon {
+  font-family: 'Material Icons' !important;
+}
+
+h1, h2, h4 {
+  text-align: center;
+}
+
+body {
+  background: #b7d1e5;
+  font-family: 'Roboto', sans-serif;
+  padding-top: 50px;
+}
+
+.white-box {
+  background-color: white;
+  padding: 10px;
+  border-radius: 25px;
+  margin-bottom: 10px;
+}
+
+
+.right-box {
+  margin-left: 20px;
+}
+
+.navbar-brand {
+  font-size: 20pt;
+  font-family: 'Fruktur', sans-serif;
+}
+
+div.scroll {
+  height: 200px;
+  overflow: scroll;
+}
+
+.main {
+  padding-top: 100px;
+}
+
+.market-show-good-price,
+.market-show-party-balance,
+.market-show-party-no-balance {
+  display: inline;
+}
+
+.icon {
+  vertical-align: bottom;
+  width: 25px;
+}
+
+h3 .icon {
+  vertical-align: baseline;
+  width: 25px;
+}

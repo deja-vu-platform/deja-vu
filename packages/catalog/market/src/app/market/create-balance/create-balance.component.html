@@ -1,0 +1,15 @@
+<mat-form-field>
+  <mat-label>{{inputLabel}}</mat-label>
+  <input matInput required
+    [formControl]="balanceControl"
+    name="balanceControl"
+    type="number"
+    step="0.01"
+    >
+  <mat-error *ngIf="balanceControl.hasError('required')">
+    This field is <strong>required</strong>
+  </mat-error>
+  <mat-error *ngIf="balanceControl.hasError('pattern')">
+    This field should be <strong>nonnegative with at most two decimal places</strong>
+  </mat-error>
+</mat-form-field>

@@ -1,8 +1,9 @@
+<!-- inputs="band" -->
 <div>
-  <dv-widget name="ShowNameOfGroup" of="Group"></dv-widget>
-  <a [dvLink]="on_redirect" class="btn btn-default">View Group</a>
+  <group:show-name-of-group [group]="band">
+  </group:show-name-of-group>
+  <dv:a [click]="show-band" [clickInputs]="{'band': band}"
+    class="btn btn-default">
+    View Band
+  </dv:a>
 </div>
-
-<!-- HACK: remove once fields with default values are always included -->
-<dv-widget name="SignInWithRedirect" of="StandardAuthentication" style="display:none">
-</dv-widget>

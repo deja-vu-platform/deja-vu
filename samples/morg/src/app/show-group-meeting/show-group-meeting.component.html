@@ -1,0 +1,29 @@
+<div class="row">
+  <div class="col-md-6">
+    <event-show-event [event]="groupMeeting"></event-show-event>
+  </div>
+  <div class="col-md-4">
+    <dv-tx>
+      <property-choose-object
+        chooseObjectSelectPlaceholder="Champion"
+        [initialObjectId]="championId"
+        (selectedObjectId)="studentId=$event">
+      </property-choose-object>
+      <allocator-edit-consumer [hidden]="true"
+        [resourceId]="groupMeeting.id"
+        [allocationId]="groupMeeting.seriesId"
+        [newConsumerId]="studentId"
+        (currentConsumerId)="championId=$event">
+      </allocator-edit-consumer>
+    </dv-tx>
+  </div>
+  <div class="col-md-2">
+    <dv-tx>
+      <event-delete-event [id]="groupMeeting.id" [events]="groupMeetings">
+      </event-delete-event>
+      <allocator-delete-resource [resourceId]="groupMeeting.id"
+        [allocationId]="groupMeeting.seriesId" [hidden]="true">
+      </allocator-delete-resource>
+    </dv-tx>
+  </div>
+</div>

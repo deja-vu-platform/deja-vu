@@ -1,0 +1,44 @@
+type Task {
+  id: ID!
+  assignerId: ID
+  assigneeId: ID
+  dueDate: String
+  completed: Boolean
+  approved: Boolean
+}
+
+input CreateTaskInput {
+  id: ID
+  assignerId: ID
+  assigneeId: ID
+  dueDate: String
+}
+
+input UpdateTaskInput {
+  id: ID!
+  assignerId: ID
+  assigneeId: ID
+  dueDate: String
+}
+
+input TasksInput {
+  assigneeId: ID
+  assignerId: ID
+  approved: Boolean
+  assigned: Boolean
+  completed: Boolean
+}
+
+
+type Query {
+  tasks(input: TasksInput!): [Task]
+  task(id: ID!): Task
+}
+
+type Mutation {
+  createTask(input: CreateTaskInput!): Task
+  updateTask(input: UpdateTaskInput!): Task
+  claimTask(id: ID!, assigneeId: ID!): Task
+  completeTask(id: ID!): Task
+  approveTask(id: ID!): Task
+}

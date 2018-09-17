@@ -1,6 +1,8 @@
+<!-- fields="user" -->
 <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
 
-<dv-widget name="LoggedIn" of="StandardAuthentication"></dv-widget>
+<standard-authentication:logged-in (user)="user">
+</standard-authentication:logged-in>
 <nav class="navbar navbar-default navbar-fixed-top" id="main-navbar">
   <div class="container">
     <!-- Brand and toggle get grouped for better mobile display -->
@@ -31,7 +33,10 @@
             {{user.username}}
           </a>
         </li>
-        <li *ngIf="user.username"><dv-widget name="SignOutWithRedirect" of="StandardAuthentication"></dv-widget></li>
+        <li *ngIf="user.username">
+          <standard-authentication:sign-out next="landing">
+          </standard-authentication:sign-out>
+        </li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

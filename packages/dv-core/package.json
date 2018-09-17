@@ -1,0 +1,50 @@
+{
+  "name": "dv-core",
+  "version": "0.0.1",
+  "description": "Core libraries of Déjà Vu",
+  "main": "index.js",
+  "peerDependencies": {
+    "@angular/core": "^5.2.4",
+    "@angular/forms": "^5.2.0",
+    "@angular/common": "^5.2.0",
+    "rxjs": "^5.5.6",
+    "zone.js": "^0.8.19",
+    "@angular/material": "^5.2.1",
+    "@angular/platform-browser": "^5.2.0",
+    "@angular/compiler": "^5.2.0"
+  },
+  "devDependencies": {
+    "@angular/common": "^5.2.0",
+    "@angular/compiler": "^5.2.0",
+    "@angular/compiler-cli": "^5.2.0",
+    "@angular/core": "^5.2.4",
+    "@angular/forms": "^5.2.0",
+    "@angular/material": "^5.2.1",
+    "@angular/platform-browser": "^5.2.0",
+    "@angular/router": "^5.2.9",
+    "@types/uuid": "^3.4.3",
+    "ng-packagr": "^2.0.0",
+    "rxjs": "^5.5.6",
+    "typescript": "~2.5.3",
+    "zone.js": "^0.8.19"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc",
+    "package": "ng-packagr -p ng-package.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spderosso/dejavu.git"
+  },
+  "author": "Santiago De Rosso",
+  "license": "MIT",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/spderosso/dejavu/issues"
+  },
+  "homepage": "https://github.com/spderosso/dejavu#readme",
+  "dependencies": {
+    "uuid": "^3.2.1"
+  }
+}

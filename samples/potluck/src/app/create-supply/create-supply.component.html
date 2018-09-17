@@ -1,0 +1,59 @@
+<dv-tx>
+  <dv-id (id)="supplyId=$event"></dv-id>
+
+  <div class="row">
+    <div class="col-md-12">
+      <property-create-property
+        dvOf="supply"
+        name="item"
+        (value)="item=$event">
+      </property-create-property>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <market-create-good
+        [id]="supplyId"
+        [marketId]="partyId"
+        [sellerId]="loggedInUserId"
+        [showOptionToInputPrice]="false"
+        [showOptionToInputSeller]="false"
+        [showOptionToSubmit]="false"
+        supplyLabel="Quantity"
+        [save]="save"
+        (good)="good=$event">
+      </market-create-good>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <property-create-property
+        dvOf="supply"
+        name="unit"
+        (value)="unit=$event">
+      </property-create-property>
+    </div>
+  </div>
+
+  <property-create-object
+    dvOf="supply"
+    [id]="supplyId"
+    [initialValue]="{ item: item, unit: unit }"
+    [hidden]="true"
+    [save]="save"
+    (object)="object=$event">
+  </property-create-object>
+
+  <dv-merge
+    [sources]="[object, good]"
+    (object)="outputAsSupply($event)">
+  </dv-merge>
+
+  <div class="row">
+    <div class="col-md-12">
+      <dv-button>Add Supply</dv-button>
+    </div>
+  </div>
+</dv-tx>

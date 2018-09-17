@@ -1,0 +1,24 @@
+{
+  "name": "group",
+  "watch": true,
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "config": {
+    "wsPort": 3001
+  },
+  "actions": {
+    "package": {
+      "include": [
+        "src/app/group/**"
+      ]
+    },
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "group-root"}
+      ]
+    }
+  }
+}

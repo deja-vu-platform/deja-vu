@@ -1,0 +1,14 @@
+<ul *ngIf="_resourceIds && _resourceIds.length > 0" class="list-group">
+  <li *ngFor="let resourceId of _resourceIds"
+    class="list-group-item authorization-show-resources-resource-item">
+    <dv-include [action]="showResource" [inputs]="{
+        id: resourceId
+      }"
+      [parent]="showResources">
+    </dv-include>
+  </li>
+</ul>
+<div *ngIf="!_resourceIds || _resourceIds.length === 0"
+  class="authorization-show-resources-no-resources">
+  {{noResourcesText}}
+</div>

@@ -1,0 +1,69 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createWeeklySeriesForm"
+  class="form-horizontal">
+  <div class="form-group cws-form-group">
+    <div *ngIf="createWeeklySeriesSaved" class="cws-saved">
+      <i class="material-icons">done</i>
+      {{createWeeklySeriesSavedText}}
+    </div>
+    <mat-error *ngIf="createWeeklySeriesError">
+      <i class="material-icons">report_problem</i>
+      {{createWeeklySeriesError}}
+    </mat-error>
+  </div>
+  <div class="form-group cws-form-group">
+    <mat-form-field>
+      <mat-label>Starts On</mat-label>
+      <input matInput required [matDatepicker]="startsOnPicker"
+        [formControl]="startsOnControl">
+      <mat-datepicker-toggle matSuffix [for]="startsOnPicker">
+      </mat-datepicker-toggle>
+      <mat-datepicker #startsOnPicker></mat-datepicker>
+      <mat-error *ngIf="startsOnControl.hasError('required')">
+        Starts On date is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-group cws-form-group">
+    <mat-form-field>
+      <mat-label>Ends On</mat-label>
+      <input matInput required [matDatepicker]="endsOnPicker"
+        [formControl]="endsOnControl">
+      <mat-datepicker-toggle matSuffix [for]="endsOnPicker">
+      </mat-datepicker-toggle>
+      <mat-datepicker #endsOnPicker></mat-datepicker>
+      <mat-error *ngIf="endsOnControl.hasError('required')">
+        Ends On date is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-group cws-form-group">
+    <mat-form-field>
+      <mat-label>Start Time</mat-label>
+      <input matInput required type="time"
+        [formControl]="startTimeControl">
+      <mat-error *ngIf="startTimeControl.hasError('required')">
+        Start Time is <strong>required</strong>
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div class="form-group cws-form-group">
+    <mat-form-field>
+      <mat-label>End Time</mat-label>
+      <input matInput required type="time"
+        [formControl]="endTimeControl">
+      <mat-error *ngIf="endTimeControl.hasError('required')">
+        End Time is <strong>required</strong>
+      </mat-error>
+      <mat-error *ngIf="endTimeControl.hasError('endBeforeStart')">
+        End Time should be <strong>after</strong> Start Time
+      </mat-error>
+    </mat-form-field>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit"
+      [disabled]="!createWeeklySeriesForm.valid">
+        {{buttonLabel}}
+    </button>
+  </div>
+</form>

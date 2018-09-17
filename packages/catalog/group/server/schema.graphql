@@ -1,0 +1,35 @@
+type Group {
+  id: ID!
+  memberIds: [ID!]
+}
+
+input MembersInput {
+  inGroupId: ID
+}
+
+input GroupsInput {
+  withMemberId: ID
+}
+
+input CreateGroupInput {
+  id: ID
+  initialMemberIds: [ID!]
+}
+
+input CreateMemberInput {
+  id: ID
+  inGroupId: ID
+}
+
+type Query {
+  group(id: ID!): Group
+  members(input: MembersInput!): [ID!]
+  groups(input: GroupsInput!): [Group!]
+}
+
+type Mutation {
+  createGroup(input: CreateGroupInput!): Group
+
+  addMember(groupId: ID!, id: ID!): Group
+  removeMember(groupId: ID!, id: ID!): Group
+}

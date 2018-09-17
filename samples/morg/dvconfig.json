@@ -1,0 +1,47 @@
+{
+  "name": "morg",
+  "watch": true,
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {
+    "event": {
+      "name": "event",
+      "config": {
+        "wsPort": 3002
+      }
+    },
+    "allocator": {
+      "name": "allocator",
+      "config": {
+        "wsPort": 3003
+      }
+    },
+    "property": {
+      "name": "property",
+      "config": {
+        "wsPort": 3004,
+        "initialObjects": [{"name": "Ben"}, {"name": "Alyssa"}],
+        "schema": {
+          "title": "Party",
+          "type": "object",
+          "properties": {
+              "name": {
+                "type": "string"
+              }
+          },
+          "required": ["name"]
+        }
+      }
+    }
+  },
+  "actions": {
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "morg-root"}
+      ]
+    }
+  }
+}

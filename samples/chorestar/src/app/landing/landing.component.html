@@ -1,0 +1,45 @@
+<div class="body">
+  <h1 id="welcome">Welcome to <span class="logo">ChoreStar</span></h1>
+  <div class="container-fluid">
+    <div class="col-md-12">
+      <div class="row">
+        <div class="white-box offset-md-1 col-md-5">
+          <dv-tx>
+            <h2>Parent Login</h2>
+            <authentication-sign-in dvOf="parentauthentication">
+            </authentication-sign-in>
+            <dv-link href="/parent" [hidden]="true"></dv-link>
+          </dv-tx>
+        </div>
+        <div class="white-box right-box col-md-5">
+          <dv-tx>
+            <h2>Child Login</h2>
+            <authentication-sign-in dvOf="childauthentication">
+            </authentication-sign-in>
+            <dv-link href="/child" [hidden]="true"></dv-link>
+          </dv-tx>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="white-box offset-md-1 col-md-5">
+          <dv-tx>
+            <h2>Parent Registration</h2>
+            <dv-id (id)="parentId=$event"></dv-id>
+            <authentication-register-user
+              [id]="parentId" dvOf="parentauthentication">
+            </authentication-register-user>
+            <task-create-assigner [id]="parentId" [hidden]="true">
+            </task-create-assigner>
+            <market-create-party
+              [id]="parentId" balance=0 [hidden]="true">
+            </market-create-party>
+            <group-create-group [id]="parentId" [hidden]="true">
+            </group-create-group>
+            <dv-link href="/parent" [hidden]="true"></dv-link>
+          </dv-tx>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

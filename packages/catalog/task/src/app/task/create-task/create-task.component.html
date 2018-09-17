@@ -1,0 +1,30 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createTaskForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newTaskSaved">
+      <i class="material-icons">done</i>
+        {{newTaskSavedText}}
+    </div>
+    <mat-error *ngIf="newTaskError">
+      <i class="material-icons">report_problem</i>
+      {{newTaskError}}
+    </mat-error>
+  </div>
+  <div *ngIf="showOptionToInputAssignee" class="form-group">
+    <dv-input-id
+      [entityName]="assigneeInputPlaceholder"
+      (id)="outputSelectedAssignee($event)"
+      formControlName="assignee">
+    </dv-input-id>
+  </div>
+  <div *ngIf="showOptionToInputDueDate" class="form-group">
+    <task-create-due-date formControlName="dueDate">
+    </task-create-due-date>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!createTaskForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

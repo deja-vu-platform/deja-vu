@@ -1,0 +1,5 @@
+<div *ngIf="object" class="property-show-object">
+  <div *ngFor="let prop of properties" class="property-show-object-property">
+    {{object[prop]}}
+  </div>
+</div>

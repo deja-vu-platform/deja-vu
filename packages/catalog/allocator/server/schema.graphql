@@ -1,0 +1,43 @@
+# When a new allocation is created, resources are distributed among
+# consumers in a round-robin fashion.
+
+type Allocation {
+  id: ID!
+  resourceIds: [ID!]
+  consumerIds: [ID!]
+}
+
+input ConsumerOfResourceInput {
+  resourceId: ID!
+  allocationId: ID!
+}
+
+input EditConsumerOfResourceInput {
+  resourceId: ID!
+  allocationId: ID!
+  newConsumerId: ID!
+}
+
+input CreateAllocationInput {
+  id: ID
+  resourceIds: [ID!]
+  consumerIds: [ID!]
+}
+
+input DeleteResourceInput {
+  resourceId: ID!
+  allocationId: ID!
+}
+
+type Query {
+  allocation(id: ID!): Allocation
+  consumerOfResource(input: ConsumerOfResourceInput!): ID
+}
+
+type Mutation {
+  editConsumerOfResource(input: EditConsumerOfResourceInput!): Boolean
+  # Creates a new allocation of the given resources and all existing consumers
+  createAllocation(input: CreateAllocationInput!): Allocation
+  # Removes the given resource from the allocation
+  deleteResource(input: DeleteResourceInput!): Boolean
+}

@@ -1,0 +1,36 @@
+type Rating {
+  sourceId: ID!
+  targetId: ID!
+  rating: Float!
+}
+
+type AverageRatingForTargetOutput {
+  rating: Float
+  count: Float
+}
+
+input RatingInput {
+  bySourceId: ID!
+  ofTargetId: ID!
+}
+
+input RatingsInput {
+  bySourceId: ID
+  ofTargetId: ID
+}
+
+input UpdateRatingInput {
+  sourceId: ID!
+  targetId: ID!
+  newRating: Float
+}
+
+type Query {
+  rating(input: RatingInput!): Rating
+  ratings(input: RatingsInput!): [Rating]
+  averageRatingForTarget(targetId: ID!): AverageRatingForTargetOutput
+}
+
+type Mutation {
+  updateRating(input: UpdateRatingInput!): Boolean
+}

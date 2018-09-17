@@ -1,0 +1,30 @@
+<market-show-transaction
+  [id]="id"
+  [hidden]="true"
+  (loadedTransaction)="claim=$event">
+</market-show-transaction>
+<div class="row">
+  <div class="col-md-4">
+    <property-show-object
+      dvOf="supply"
+      [id]="claim?.good.id"
+      [showOnly]="['item']">
+    </property-show-object>
+  </div>
+  <div class="col-md-4">
+    {{claim?.quantity}}
+  </div>
+  <div class="col-md-4">
+    <property-show-object
+      dvOf="supply"
+      [id]="claim?.good.id"
+      [showOnly]="['unit']">
+    </property-show-object>
+  </div>
+</div>
+
+
+Claimed by
+<authentication-show-user
+  [id]="claim?.buyer.id">
+</authentication-show-user>

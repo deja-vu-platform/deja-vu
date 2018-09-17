@@ -1,0 +1,27 @@
+<form (ngSubmit)="onSubmit()" class="form-horizontal">
+  <div class="form-group add-viewer-form-group">
+    <div *ngIf="viewerAddedSuccess" class="add-viewer-success">
+      <i class="material-icons">done</i>
+      {{viewerAddedSuccessText}}
+    </div>
+    <mat-error *ngIf="viewerAddedErrorText">
+      <i class="material-icons">report_problem</i>
+      {{viewerAddedErrorText}}
+    </mat-error>
+  </div>
+  <div class="form-group add-viewer-form-group">
+    <mat-form-field>
+      <mat-label>{{resourceInputLabel}}</mat-label>
+      <input matInput [(ngModel)]="id" name="id">
+    </mat-form-field>
+  </div>
+  <div class="form-group add-viewer-form-group">
+    <mat-form-field>
+      <mat-label>{{viewerInputLabel}}</mat-label>
+      <input matInput [(ngModel)]="viewerId" name="viewerId">
+    </mat-form-field>
+  </div>
+  <div class="form-group add-viewer-form-group">
+    <button mat-button type="submit">{{buttonLabel}}</button>
+  </div>
+</form>

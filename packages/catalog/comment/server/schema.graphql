@@ -1,0 +1,41 @@
+# Express an opinion or reaction in writing
+type Comment {
+  id: ID!
+  authorId: ID!
+  targetId: ID!
+  content: String!
+}
+
+input CreateCommentInput {
+  id: ID
+  authorId: ID!
+  targetId: ID!
+  content: String!
+}
+
+input EditCommentInput {
+  id: ID!
+  authorId: ID!
+  content: String!
+}
+
+input CommentInput {
+  byAuthorId: ID!
+  ofTargetId: ID!
+}
+
+input CommentsInput {
+  byAuthorId: ID
+  ofTargetId: ID
+}
+
+type Query {
+  comment(id: ID): Comment
+  commentByAuthorTarget(input: CommentInput!): Comment
+  comments(input: CommentsInput!): [Comment]
+}
+
+type Mutation {
+  createComment(input: CreateCommentInput!): Comment
+  editComment(input: EditCommentInput!): Boolean
+}

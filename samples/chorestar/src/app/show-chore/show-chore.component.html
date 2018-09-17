@@ -1,0 +1,54 @@
+<div class="row">
+  <div class="col-md-4">
+    <property-show-object
+      dvOf="chore"
+      [id]="chore.id"
+      [showOnly]="['name']">
+    </property-show-object>
+  </div>
+
+  <div class="offset-md-1 col-md-7">
+    <task-show-task
+      [task]="chore"
+      [showId]="false"
+      [showAssigner]="false"
+      [showAssignee]="false"
+      [showCompleted]="false"
+      [showApproved]="false">
+    </task-show-task>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4">
+    <div *ngIf="view === 'parent'">
+      <authentication-show-user
+        dvOf="childauthentication"
+        [id]="chore.assignee.id">
+      </authentication-show-user>
+    </div>
+  </div>
+  <div class="offset-md-1 col-md-7">
+    <i class="material-icons icon">star_rate</i>
+    <market-show-good
+      [id]="chore.id"
+      [showId]="false"
+      [showSupply]="false"
+      [showSeller]="false"
+      [showMarketId]="false">
+    </market-show-good>
+  </div>
+</div>
+
+<div *ngIf="showOptionToApprove" class="row">
+  <dv-tx class="offset-md-4 col-md-4">
+    <market-create-transaction
+      [goodId]="chore.id"
+      [buyerId]="chore.assigner.id"
+      quantity="1" [hidden]="true">
+    </market-create-transaction>
+    <task-approve-task [id]="chore.id" [hidden]="true">
+    </task-approve-task>
+    <dv-button>Approve</dv-button>
+  </dv-tx>
+</div>

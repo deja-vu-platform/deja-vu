@@ -1,0 +1,35 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createGoodForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newGoodSaved">
+      <i class="material-icons">done</i>
+        {{newGoodSavedText}}
+    </div>
+    <mat-error *ngIf="newGoodError">
+      <i class="material-icons">report_problem</i>
+      {{newGoodError}}
+    </mat-error>
+  </div>
+  <div *ngIf="showOptionToInputPrice" class="form-group">
+    <market-create-good-price
+      [inputLabel]="priceLabel"
+      formControlName="priceControl">
+    </market-create-good-price>
+  </div>
+  <div *ngIf="showOptionToInputSupply" class="form-group">
+    <market-create-good-supply
+      [inputLabel]="supplyLabel"
+      formControlName="supplyControl">
+    </market-create-good-supply>
+  </div>
+  <div *ngIf="showOptionToInputSeller" class="form-group">
+    <market-create-good-seller formControlName="sellerIdControl">
+    </market-create-good-seller>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!createGoodForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

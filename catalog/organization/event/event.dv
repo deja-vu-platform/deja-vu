@@ -69,10 +69,4 @@ cliche Event {
   widget DeleteEvent {
     event: Event
   }
-
-  // Edits the date and time of [event] when [submit_ok] is changed
-  widget EditEventTime {
-    event: Event,
-    submit_ok: boolean
-  }
 }

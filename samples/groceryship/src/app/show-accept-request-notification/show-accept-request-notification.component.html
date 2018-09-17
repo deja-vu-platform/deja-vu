@@ -1,0 +1,36 @@
+<!-- A Request made by the current user. 
+  The user is waiting to accept/reject the delivery from the shopper/fulfiller 
+  of the request. The user pays for the request and rates the shopper here. -->
+<div class="row">
+  <!-- request items with a shopper and pickup time -->
+  <div class="col-xs-12 col-ms-6 col-sm-4 col-md-4 col-lg-3">
+    <div class="tile notification-tile" (click)="openRequestDetailsDialog();">
+      <div class="tile-icon" style="float: left">
+        <img src="/assets/clipboard.png">
+      </div>
+
+      <h4 class="tile-title">{{request.name}}</h4>
+      <p class="tile-subtitle">
+        Shopper: 
+        <authentication-show-user [id]="request.assignee.id">
+        </authentication-show-user>
+      </p>
+      <p class="tile-content">Arrival:
+        <event-show-event [id]="request.id"></event-show-event>
+      </p>
+
+      <div class="accept-reject-container">
+        <button
+          class="accept-notification-items btn btn-primary btn-xs"
+          (click)="openAcceptRejectDeliveryDialog($event, true);">
+          Accept
+        </button>
+        <button
+          class="reject-notification-items btn btn-danger btn-xs"
+          (click)="openAcceptRejectDeliveryDialog($event, false);">
+          Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

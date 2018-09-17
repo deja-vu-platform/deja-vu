@@ -1,0 +1,29 @@
+<div class="container">
+  <h1>Create resource with id key, owner alice</h1>
+  <authorization-create-resource id="key" ownerId="alice">
+  </authorization-create-resource>
+  <h1>Add bob as viewer of resource key</h1>
+  <authorization-add-viewer id="key" viewerId="bob"></authorization-add-viewer>
+  <h1>Delete resource key</h1>
+  <authorization-delete-resource id="key"></authorization-delete-resource>
+  <h1>Resources viewable by bob</h1>
+  <authorization-show-resources
+    viewableBy="bob">
+  </authorization-show-resources>
+  <h1>Resources viewable by alice</h1>
+  <authorization-show-resources
+    viewableBy="alice">
+  </authorization-show-resources>
+  <h1>Show resource key</h1>
+  <authorization-show-resource id="key">
+  </authorization-show-resource>
+  <h1>Can Bob read key?</h1>
+  <authorization-can-view resourceId="key" principalId="bob">
+  </authorization-can-view>
+  <h1>Can Bob edit key?</h1>
+  <authorization-can-edit resourceId="key" principalId="bob">
+  </authorization-can-edit>
+  <h1>Owner of key</h1>
+  <authorization-show-owner resourceId="key">
+  </authorization-show-owner>
+</div>

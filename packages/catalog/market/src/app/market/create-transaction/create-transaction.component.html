@@ -1,0 +1,31 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="createTransactionForm"
+  class="form-horizontal">
+  <div class="form-group">
+    <div *ngIf="newTransactionSaved">
+      <i class="material-icons">done</i>
+        {{newTransactionSavedText}}
+    </div>
+    <mat-error *ngIf="newTransactionError">
+      <i class="material-icons">report_problem</i>
+      {{newTransactionError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputQuantityLabel}}</mat-label>
+      <input matInput required
+        [formControl]="quantityControl"
+        name="quantityControl"
+        type="number"
+        min="0"
+        step="1"
+      >
+    </mat-form-field>
+  </div>
+  <div class="form-group">
+    <button mat-raised-button type="submit" [disabled]="!createTransactionForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

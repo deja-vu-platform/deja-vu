@@ -1,0 +1,47 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="signInForm"
+  class="form-horizontal">
+
+  <div class="form-group">
+    <div *ngIf="newUserSignedIn">
+      <i class="material-icons">done</i>
+      {{newUserSignedInText}}
+    </div>
+    <mat-error *ngIf="newUserSignedInError">
+      <i class="material-icons">report_problem</i>
+      {{newUserSignedInError}}
+    </mat-error>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <input matInput required
+       formControlName="usernameControl">
+    </mat-form-field>
+    <div *ngIf="usernameControl.invalid && usernameControl.touched">
+      <mat-error *ngIf="usernameControl.hasError('required')">
+          This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{passwordLabel}}</mat-label>
+      <input matInput required type="password"
+       formControlName="passwordControl">
+    </mat-form-field>
+    <div *ngIf="passwordControl.invalid && passwordControl.touched">
+      <mat-error *ngIf="passwordControl.hasError('required')">
+          This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!signInForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

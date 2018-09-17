@@ -1,0 +1,29 @@
+type Marker {
+  id: ID!
+  title: String
+  latitude: Float!
+  longitude: Float!
+  mapId: ID!
+}
+
+input CreateMarkerInput {
+  id: ID
+  title: String
+  latitude: Float!
+  longitude: Float!
+  mapId: ID!
+}
+
+input MarkersInput {
+  ofMapId: ID
+}
+
+type Query {
+  marker(id: ID!): Marker
+  markers(input: MarkersInput): [Marker]
+}
+
+type Mutation {
+  createMarker(input: CreateMarkerInput!): Marker
+  deleteMarker(id: ID!): Boolean
+}

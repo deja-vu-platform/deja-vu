@@ -1,0 +1,32 @@
+<div class="container">
+  <h1>Create Object with id Ben</h1>
+  <property-create-object id="ben"></property-create-object>
+  <h1>Show Object with id Ben</h1>
+  <property-show-object id="ben"></property-show-object>
+  <property-show-object id="ben" [showOnly]="['lastName']">
+  </property-show-object>
+  <h1>Create Objects</h1>
+  <dv-tx>
+    <property-create-objects [hidden]="true" [objects]="[
+      {firstName: 'foo', lastName: 'bar'},
+      {firstName: 'foo1', lastName: 'bar1'},
+      {firstName: 'foo2', lastName: 'bar2'}
+    ]">
+    </property-create-objects>
+    <dv-button>Create Objects</dv-button>
+  </dv-tx>
+  <h1>Show Objects</h1>
+  <property-show-objects></property-show-objects>
+  <h1>Choose Object</h1>
+  <property-choose-object
+    (selectedObjectId)="chooseObjectId=$event"
+    [showOnly]="['lastName']">
+  </property-choose-object>
+  Select id is: {{chooseObjectId}}
+  <h1>Choose Object from autocomplete</h1>
+  <property-object-autocomplete
+    (selectedObjectId)="autocompleteObjectId=$event"
+    [showOnly]="['lastName']">
+  </property-object-autocomplete>
+  Select id is: {{autocompleteObjectId}}
+</div>

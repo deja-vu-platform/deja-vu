@@ -1,28 +1,33 @@
+<!-- inputs="band" -->
 <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-<dv-widget name="NavBar"></dv-widget>
+<nav-bar></nav-bar>
 <div class="container page-content">
   <div class="row">
     <div class="col-md-3">
       <h2>
-        <dv-widget name="ShowNameOfGroup" of="Group"></dv-widget>
+        <group:show-name-of-group [group]="band"></group:show-name-of-group>
       </h2>
 
-      <a [dvLink]="on_redirect" class="btn btn-default">Create Setlist</a>
+      <dv:a [click]="create-setlist" [clickInputs]="{'band': band}"
+        class="btn btn-default">
+        Create Setlist
+      </dv:a>
 
       <p>Setlists:</p>
-      <dv-widget name="ShowChecklist" of="SetlistList"></dv-widget>
+      <checklist:show-checklist of="SetlistList"
+        [showItem]="link-to-setlist"
+        [showItemInputs]="{'setlist': !item}">
+      </checklist:show-checklist>
     </div>
     <div class="col-md-9">
       <h1>
-        <dv-widget name="ShowNameOfGroup" of="Group"></dv-widget>
+        <group:show-name-of-group [group]="band">
+        </group:show-name-of-group>
       </h1>
 
       <h2>Members</h2>
-      <dv-widget name="ShowMembersOfGroup" of="Group"></dv-widget>
+      <group:show-members-of-group [group]="band">
+      </group:show-members-of-group>
     </div>
   </div>
 </div>
-
-<!-- HACK: remove once fields with default values are always included -->
-<dv-widget name="SignInWithRedirect" of="StandardAuthentication" style="display:none">
-</dv-widget>

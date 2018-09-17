@@ -1,0 +1,25 @@
+<groceryship-show-request-details
+  [request]="request" [myRequest]="false" [showTransactionSummary]="false">
+</groceryship-show-request-details>
+
+<tr>
+  <div *ngIf="request.assignee">
+    <input
+      type="button"
+      class="btn btn-xs btn-primary"
+      (click)="openSetDeliveryTimeDialog()"
+      value="Set Delivery Time">
+  </div>
+
+  <div *ngIf="!request.assignee && claimAssigneeId">
+    <dv-tx>
+      <market-update-good
+        [id]="request.id + '-tip'"
+        [sellerId]="claimAssigneeId"
+        [hidden]="true">
+      </market-update-good>
+      <task-claim-task [id]="request.id" [assigneeId]="claimAssigneeId">
+      </task-claim-task>
+    </dv-tx>
+  </div>
+</tr>

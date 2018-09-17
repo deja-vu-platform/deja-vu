@@ -1,0 +1,47 @@
+# All dates are given in unix time (seconds since the Unix Epoch)
+
+type Event {
+  id: ID!
+  startDate: Int!
+  endDate: Int!
+  series: Series
+}
+
+type Series {
+  id: ID!
+  startsOn: Int!
+  endsOn: Int!
+  events: [Event!]!
+}
+
+input CreateEventInput {
+  id: ID
+  startDate: Int!
+  endDate: Int!
+  seriesId: ID
+}
+
+input UpdateEventInput {
+  id: ID!
+  startDate: Int
+  endDate: Int
+}
+
+input CreateSeriesInput {
+  id: ID
+  events: [CreateEventInput!]!
+}
+
+type Query {
+  events: [Event!]
+  series: [Series!]
+  event(id: ID!): Event
+  oneSeries(id: ID!): Series
+}
+
+type Mutation {
+  createEvent(input: CreateEventInput!): Event
+  updateEvent(input: UpdateEventInput!): Boolean
+  deleteEvent(id: ID!): Boolean
+  createSeries(input: CreateSeriesInput!): Series
+}

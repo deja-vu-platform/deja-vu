@@ -1,0 +1,82 @@
+{
+  "name": "potluck",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {
+    "authentication": {
+      "config": {
+        "wsPort": 3002,
+        "reinitDbOnStartup": true
+      }
+    },
+    "authorization": {
+      "config": {
+        "wsPort": 3003,
+        "reinitDbOnStartup": true
+      }
+    },
+    "market": {
+      "config": {
+        "wsPort": 3004,
+        "reinitDbOnStartup": true,
+        "enforceBalance": false
+      }
+    },
+    "event": {
+      "config": {
+        "wsPort": 3005,
+        "reinitDbOnStartup": true
+      }
+    },
+    "group": {
+      "config": {
+        "wsPort": 3006,
+        "reinitDbOnStartup": true
+      }
+    },
+    "party": {
+      "config": {
+        "wsPort": 3007,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Party",
+          "type": "object",
+          "properties": {
+              "title": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+          },
+          "required": ["title", "location", "description"]
+        }
+      }
+    },
+    "supply": {
+      "config": {
+        "wsPort": 3008,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Good",
+          "type": "object",
+          "properties": {
+              "item": {
+                "type": "string"
+              },
+              "unit": {
+                "type": "string"
+              }
+          },
+          "required": ["item", "unit"]
+        }
+      }
+    }
+  }
+}

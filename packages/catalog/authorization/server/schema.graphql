@@ -1,0 +1,42 @@
+type Resource {
+  id: ID!,
+  ownerId: ID!,
+  # Includes the owner id because the owner is also a viewer
+  viewerIds: [ID!]
+}
+
+input ResourcesInput {
+  # Only resources viewable by the specified principal will be shown
+  viewableBy: ID!
+}
+
+input CreateResourceInput {
+  id: ID,
+  ownerId: ID!,
+  viewerIds: [ID!]
+}
+
+input PrincipalResourceInput {
+  principalId: ID!,
+  resourceId: ID!
+}
+
+input AddViewerToResourceInput {
+  id: ID!,
+  viewerId: ID!
+}
+
+type Query {
+  resource(id: ID!): Resource
+  owner(resourceId: ID!): ID
+  resources(input: ResourcesInput!): [Resource!]
+  isOwner(input: PrincipalResourceInput!): Boolean
+  canView(input: PrincipalResourceInput!): Boolean
+  canEdit(input: PrincipalResourceInput!): Boolean
+}
+
+type Mutation {
+  createResource(input: CreateResourceInput!): Resource
+  addViewerToResource(input: AddViewerToResourceInput!): Boolean
+  deleteResource(id: ID!): Boolean
+}

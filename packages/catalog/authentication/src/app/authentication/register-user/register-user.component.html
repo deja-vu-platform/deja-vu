@@ -1,0 +1,84 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="registerForm" 
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newUserRegistered">
+      <i class="material-icons">done</i>
+      {{newUserRegisteredText}}
+    </div>
+    <mat-error *ngIf="newUserRegisteredError">
+      <i class="material-icons">report_problem</i>
+      {{newUserRegisteredError}}
+    </mat-error>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <input matInput required
+      formControlName="usernameControl">
+    </mat-form-field>
+    <div *ngIf="usernameControl.invalid && usernameControl.touched">
+      <mat-error *ngIf="usernameControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+      <mat-error *ngIf="usernameControl.hasError('incorrectLength')">
+        Usernames must be 
+        <strong>{{usernameControl.errors.incorrectLength.minlength}}-
+          {{usernameControl.errors.incorrectLength.maxlength}} characters long
+        </strong>.
+      </mat-error>
+      <mat-error *ngIf="usernameControl.hasError('incorrectPattern')">
+        Usernames must contain only 
+        <strong>
+            {{usernameControl.errors.incorrectPattern}}
+        </strong>.
+      </mat-error>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{passwordLabel}}</mat-label>
+      <input matInput required type="password" 
+      formControlName="passwordControl">
+    </mat-form-field>
+    <div *ngIf="passwordControl.invalid && passwordControl.touched">
+      <mat-error *ngIf="passwordControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+      <mat-error *ngIf="passwordControl.hasError('incorrectLength')">
+        Passwords must be
+        <strong>{{passwordControl.errors.incorrectLength.minlength}}-
+        {{passwordControl.errors.incorrectLength.maxlength}} characters long
+        </strong>.
+      </mat-error>
+      <mat-error *ngIf="passwordControl.hasError('incorrectPattern')">
+        Passwords must contain 
+        <strong>
+          {{passwordControl.errors.incorrectPattern}}
+        </strong>.
+      </mat-error>
+    </div>
+  </div>
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{retypePasswordLabel}}</mat-label>
+      <input matInput required type="password" 
+      formControlName="retypePasswordControl">
+    </mat-form-field>
+    <div *ngIf="retypePasswordControl.invalid && retypePasswordControl.touched">
+        <mat-error *ngIf="retypePasswordControl.hasError('required')">
+          This field is <strong>required</strong>.
+        </mat-error>
+      <mat-error *ngIf="retypePasswordControl.hasError('unmatchedPasswords')">
+        Passwords do not match.
+      </mat-error>
+    </div>
+  </div>
+
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!registerForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

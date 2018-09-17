@@ -1,7 +1,0 @@
-<form (ngSubmit)="onSubmit()" #searchForm="ngForm">
-  <label class="sr-only" for="search">Search</label>
-  <select required multiple #select class="form-control" placeholder="Search"
-    name="search" style="min-width:125px;">
-  </select>
-  <button type="submit" [disabled]="!searchForm.form.valid">Search</button>
-</form>

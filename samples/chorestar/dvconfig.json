@@ -1,0 +1,119 @@
+{
+  "name": "chorestar",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "usedCliches": {
+    "parentauthentication": {
+      "name": "authentication",
+      "config": {
+        "wsPort": 3002,
+        "reinitDbOnStartup": true
+      }
+    },
+    "parentauthorization": {
+      "name": "authorization",
+      "config": {
+        "wsPort": 3003,
+        "reinitDbOnStartup": true
+      }
+    },
+    "childauthentication": {
+      "name": "authentication",
+      "config": {
+        "wsPort": 3004,
+        "reinitDbOnStartup": true
+      }
+    },
+    "childauthorization": {
+      "name": "authorization",
+      "config": {
+        "wsPort": 3005,
+        "reinitDbOnStartup": true
+      }
+    },
+    "market": {
+      "config": {
+        "wsPort": 3006,
+        "reinitDbOnStartup": true
+      }
+    },
+    "task": {
+      "config": {
+        "wsPort": 3007,
+        "reinitDbOnStartup": true
+      }
+    },
+    "group": {
+      "config": {
+        "wsPort": 3008,
+        "reinitDbOnStartup": true
+      }
+    },
+    "chore": {
+      "name": "property",
+      "config": {
+        "wsPort": 3009,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Chore",
+          "type": "object",
+          "properties": {
+              "name": {
+                "type": "string"
+              }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "child": {
+      "name": "property",
+      "config": {
+        "wsPort": 3010,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Child",
+          "type": "object",
+          "properties": {
+              "name": {
+                "type": "string"
+              }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    "reward": {
+      "name": "property",
+      "config": {
+        "wsPort": 3011,
+        "reinitDbOnStartup": true,
+        "schema": {
+          "title": "Reward",
+          "type": "object",
+          "properties": {
+              "name": {
+                "type": "string"
+              }
+          },
+          "required": ["name"]
+        }
+      }
+    }
+  },
+  "actions": {
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "chorestar-root"}
+      ]
+    }
+  },
+  "routes": [
+    {"path": "parent", "action": "chorestar-parent-home"},
+    {"path": "child", "action": "chorestar-child-home"},
+    {"path": "", "action": "chorestar-landing"}
+  ]
+}

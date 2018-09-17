@@ -1,0 +1,14 @@
+.new-party-form {
+  padding: 20px;
+}
+
+.create-party-title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.party-form-footer {
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
+  /* background-color: #fff; */
+}

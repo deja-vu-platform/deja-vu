@@ -1,8 +1,7 @@
+<!-- inputs="setlist" -->
 <div>
-  <dv-widget name="ShowItem" of="SetlistList"></dv-widget>
-  <a [dvLink]="on_redirect" class="btn btn-default">View Setlist</a>
+  <checklist:show-item of="SetlistList" [item]="setlist">
+  </checklist:show-item>
+  <dv:a [click]="show-setlist" [clickInputs]="{'setlist': setlist}"
+    class="btn btn-default">View Setlist</dv:a>
 </div>
-
-<!-- HACK: remove once fields with default values are always included -->
-<dv-widget name="SignInWithRedirect" of="StandardAuthentication" style="display:none">
-</dv-widget>

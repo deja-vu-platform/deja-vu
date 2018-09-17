@@ -1,0 +1,34 @@
+# Add labels to items so that they can be found later
+type Label {
+  id: ID!
+  itemIds: [ID]
+}
+
+# If no labels are provided, all items will be returned.
+# Otherwise, only items with all specified labels will be returned.
+input ItemsInput {
+  labelIds: [ID]
+}
+
+# If no itemId provided, all labels will be returned.
+# Otherwise, only labels of the given item will be returned.
+input LabelsInput {
+  itemId: ID
+}
+
+# Supports existing and new labels
+input AddLabelsToItemInput {
+  itemId: ID!
+  labelIds: [ID!]
+}
+
+type Query {
+  label(id: ID!): Label
+  labels(input: LabelsInput!): [Label]
+  items(input: ItemsInput!): [ID]
+}
+
+type Mutation {
+  createLabel(id: ID!): Label
+  addLabelsToItem(input: AddLabelsToItemInput!): Boolean
+}
