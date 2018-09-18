@@ -109,7 +109,7 @@ function isPendingCreate(group: GroupDoc | null) {
 }
 
 async function addOrRemoveMember(groupId: string, memberId: string,
-  updateType: 'add-member' | 'remove-member', context:Context): Promise<Boolean> {
+  updateType: 'add-member' | 'remove-member', context: Context): Promise<Boolean> {
   const operation = updateType === 'add-member' ? '$addToSet' : '$pull';
   const updateOp = { [operation]: { memberIds: memberId } };
 
