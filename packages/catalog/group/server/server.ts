@@ -15,6 +15,12 @@ import { makeExecutableSchema } from 'graphql-tools';
 interface GroupDoc {
   id: string;
   memberIds: string[];
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'create-group' | 'add-member' | 'remove-member';
 }
 
 interface GroupsInput {
@@ -38,6 +44,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -79,25 +87,83 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
-
-async function addOrRemoveMember(
-  groupId: string, memberId: string, operation: '$addToSet' | '$pull')
-  : Promise<GroupDoc> {
-  const updateObj = { [operation]: { memberIds: memberId } };
-  const update = await groups.findOneAndUpdate({ id: groupId }, updateObj);
-  if (_.isNil(update.value)) {
-    throw new Error(`Group ${groupId} not found`);
+class Validation {
+  static async groupExistsOrFail(id: string): Promise<void> {
+    const group: GroupDoc | null = await groups.findOne(
+      { id: id }, { projection: { _id: 1 } });
+    if (group === null) {
+      throw new Error(`Group ${id} doesn't exist`);
+    }
   }
+}
 
-  return update.value!;
+
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingCreate(group: GroupDoc | null) {
+  return _.get(group, 'pending.type') === 'create-group';
+}
+
+async function addOrRemoveMember(groupId: string, memberId: string,
+  updateType: 'add-member' | 'remove-member', context: Context): Promise<Boolean> {
+  const operation = updateType === 'add-member' ? '$addToSet' : '$pull';
+  const updateOp = { [operation]: { memberIds: memberId } };
+
+  const notPendingGroupFilter = {
+    id: groupId,
+    pending: { $exists: false },
+  };
+  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+  switch (context.reqType) {
+    case 'vote':
+      await Validation.groupExistsOrFail(groupId);
+      const pendingUpdateObj = await groups.updateOne(
+        notPendingGroupFilter,
+        {
+          $set: {
+            pending: {
+              reqId: context.reqId,
+              type: updateType,
+            },
+          },
+        });
+      if (pendingUpdateObj.matchedCount === 0) {
+        throw new Error(CONCURRENT_UPDATE_ERROR);
+      }
+      return true;
+    case undefined:
+      await Validation.groupExistsOrFail(groupId);
+      const updateObj = await groups.updateOne(notPendingGroupFilter, updateOp);
+      if (updateObj.matchedCount === 0) {
+        throw new Error(CONCURRENT_UPDATE_ERROR);
+      }
+      return true;
+    case 'commit':
+      await groups.updateOne(
+        reqIdPendingFilter,
+        { ...updateOp, $unset: { pending: '' } });
+      return false;
+    case 'abort':
+      await groups.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+      return false;
+  }
+  return false;
 }
 
 
 const resolvers = {
   Query: {
-    group: (root, { id }) => groups.findOne({ id: id }),
+    group: async (root, { id }) => {
+      const group: GroupDoc | null = await groups.findOne({ id: id });
+      return isPendingCreate(group) ? null : group;
+    },
     members: async (root, { input }: { input: MembersInput }) =>  {
       const filter = input.inGroupId ? { id: input.inGroupId } : {};
+      filter['pending'] = { type: { $ne: 'create-group' } };
 
       const pipelineResults = await groups.aggregate([
         { $match: filter },
@@ -128,6 +194,7 @@ const resolvers = {
     groups: async (root, { input }: { input: GroupsInput }) => {
       const filter = input.withMemberId ?
         { memberIds: input.withMemberId } : {};
+      filter['pending'] = { type: { $ne: 'create-group' } };
 
       return groups.find(filter)
         .toArray();
@@ -138,25 +205,74 @@ const resolvers = {
     memberIds: (group: GroupDoc) => group.memberIds
   },
   Mutation: {
-    createGroup: (root, { input }: {input: CreateGroupInput}) => {
+    createGroup: async (
+      root, { input }: {input: CreateGroupInput}, context: Context) => {
       const g: GroupDoc = {
         id: input.id ? input.id : uuid(),
         memberIds: input.initialMemberIds ? input.initialMemberIds : []
       };
-      groups.insertOne(g);
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+      switch (context.reqType) {
+        case 'vote':
+          g.pending = { reqId: context.reqId, type: 'create-group' };
+        case undefined:
+          await groups.insertOne(g);
+          return g;
+        case 'commit':
+          await groups.updateOne(
+            reqIdPendingFilter,
+            { $unset: { pending: '' } });
+          return;
+        case 'abort':
+          await groups.deleteOne(reqIdPendingFilter);
+          return;
+      }
 
       return g;
     },
-    addMember: (root, { groupId, id }) => addOrRemoveMember(
-      groupId, id, '$addToSet'),
-    removeMember: (root, { groupId, id }) => addOrRemoveMember(
-      groupId, id, '$pull')
+    addMember: (root, { groupId, id }, context: Context) => addOrRemoveMember(
+      groupId, id, 'add-member', context),
+    removeMember: (root, { groupId, id }, context: Context) => addOrRemoveMember(
+      groupId, id, 'remove-member', context)
   }
 };
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
 
 app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
 
