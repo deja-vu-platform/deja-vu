@@ -1,0 +1,15 @@
+<div *ngIf="showId">
+  {{transfer.id}}
+</div>
+
+<div *ngIf="showFromId && transfer.fromId">
+  {{transfer.fromId}}
+</div>
+
+<div *ngIf="showToId && transfer.toId">
+  {{transfer.toId}}
+</div>
+
+<div *ngIf="showAmount && transfer.amount">
+  {{transfer.amount}}
+</div>

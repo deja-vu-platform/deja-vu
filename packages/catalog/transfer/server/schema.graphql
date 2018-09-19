@@ -1,11 +1,6 @@
-type Account {
-  id: ID!
-  balance: #Balance
-  transfers: [Transfer]
-}
-
 type Transfer {
-  fromId: ID!
+  id: ID!
+  fromId: ID
   toId: ID!
   amount: #Balance!
 }
@@ -22,17 +17,17 @@ input AddToBalanceInput {
   amount: #Balance!
 }
 
-input CreateAccountInput {
-  id: ID
-  balance: #Balance!
+input TransfersInput {
+  fromId: ID
+  toId: ID
 }
 
 type Query {
-  account(id: ID!): Account
+  transfers(input: TransfersInput): [Transfer]
+  balance(accountId: ID!): #Balance
 }
 
 type Mutation {
-  createAccount(input: CreateAccountInput!): Account
   createTransfer(input: CreateTransferInput!): Transfer
-  addToBalance(input: AddToBalanceInput!): Account
+  addToBalance(input: AddToBalanceInput!): Transfer
 }

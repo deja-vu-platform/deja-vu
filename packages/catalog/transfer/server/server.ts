@@ -11,20 +11,38 @@ import * as _ from 'lodash';
 import {graphiqlExpress, graphqlExpress} from 'apollo-server-express';
 import {makeExecutableSchema} from 'graphql-tools';
 
+import * as assert from 'assert';
+
 
 interface ItemCount {
   itemId: string;
   count: number;
 }
 
+interface PendingTransfer<Balance> {
+  updateId: string;
+  transfer: TransferDoc<Balance>;
+}
+
 interface AccountDoc<Balance> {
   id: string;
   balance: Balance;
-  transfers: TransferDoc<Balance>[];
+  /*
+   * This field exists if the account itself is pending
+   * This could be because it's the first time we are seeing a transfer from/to
+   * this account. If the transfer ends up being aborted, then we'll delete
+   * the account.
+   */
   pending?: string;
-  pendingTransfer?: {
-    updateId: string; transfer: TransferDoc<Balance>
-  };
+  // This field exists if the account has a pending transfer
+  pendingTransfer?: PendingTransfer<Balance>;
+}
+
+interface AccountPendingDoc<Balance> {
+  id: string;
+  balance: Balance;
+  pending: string;
+  pendingTransfer: PendingTransfer<Balance>;
 }
 
 interface TransferDoc<Balance> {
@@ -34,9 +52,9 @@ interface TransferDoc<Balance> {
   amount: Balance;
 }
 
-interface CreateAccountInput<Balance> {
-  id: string;
-  balance: Balance;
+interface AddToBalanceInput<Balance> {
+  accountId: string;
+  amount: Balance;
 }
 
 interface CreateTransferInput<Balance> {
@@ -46,16 +64,15 @@ interface CreateTransferInput<Balance> {
   amount: Balance;
 }
 
-interface AddToBalanceInput<Balance> {
-  accountId: string;
-  amount: Balance;
+interface TransfersInput {
+  fromId?: string;
+  toId?: string;
 }
 
 
 interface Context {
   reqType: 'vote' | 'commit' | 'abort' | undefined;
-  runId: string;
-  reqId: string;
+  reqId: string | undefined;
 }
 
 
@@ -88,13 +105,16 @@ try {
   throw new Error(`Couldn't parse config ${argv.config}`);
 }
 
-const config: Config = {...DEFAULT_CONFIG, ...configArg};
+const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 let db: mongodb.Db;
-let accounts;
-let moneyAccounts: mongodb.Collection<AccountDoc<number>>;
-let itemAccounts: mongodb.Collection<AccountDoc<ItemCount>>;
+/**
+ * `transfers` is the main collection, the only reason why we have an `accounts`
+ * collection is to keep track of the balance (to avoid having to compute it
+ * every time) and to be able to lock accounts when processing transfers.
+ */
+let accounts: mongodb.Collection, transfers: mongodb.Collection;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -108,8 +128,10 @@ mongodb.MongoClient.connect(
     accounts = db.collection('accounts');
     accounts.createIndex({ id: 1 }, { unique: true, sparse: true });
 
-    moneyAccounts = accounts;
-    itemAccounts = accounts;
+    transfers = db.collection('transfers');
+    transfers.createIndex({ id: 1 }, { unique: true, sparse: true });
+    transfers.createIndex({ fromId: 1 }, { sparse: true });
+    transfers.createIndex({ toId: 1 }, { sparse: true });
   });
 
 
@@ -117,65 +139,69 @@ type AccountHasFundsFn<Balance> = (
   accountBalance: Balance, transferAmount: Balance) => boolean;
 type NewBalanceFn<Balance> = (
   accountBalance: Balance, transferAmount: Balance) => Balance;
-type CommitUpdateFn<Balance> = (
-  transferAmount: Balance, updateId: string) => Promise<void>;
 type NegateBalanceFn<Balance> = (balance: Balance) => Balance;
+type ZeroBalanceFn<Balance> = () => Balance;
 
 function getResolvers<Balance>(
   accountHasFundsFn: AccountHasFundsFn<Balance>,
   newBalanceFn: NewBalanceFn<Balance>,
-  commitUpdateFn: CommitUpdateFn<Balance>,
-  negateBalanceFn: NegateBalanceFn<Balance>) {
+  negateBalanceFn: NegateBalanceFn<Balance>,
+  zeroBalanceFn: ZeroBalanceFn<Balance>) {
   return {
     Query: {
-      account: (_root, { id }) => accounts.findOne({ id: id })
-    },
-    Account: {
-      id: (account) => account.id,
-      balance: (account) => account.balance,
-      transfers: (account) => account.transfers
+      balance: async (_root, { accountId }) => {
+        const account: AccountDoc<Balance> | null = await accounts
+          .findOne({ id: accountId });
+
+        return account === null ? 0 : account.balance;
+      },
+      transfers: async (_root, { input }: { input: TransfersInput }) => {
+        return transfers.find({ ...input, pending: { $exists: false } })
+          .toArray();
+      }
     },
     Mutation: {
-      createAccount: async (
-        _root, {input}: { input: CreateAccountInput<Balance> },
-        context: Context) => {
-
-        const doc: AccountDoc<Balance> = {
-          id: input.id ? input.id : uuid(),
-          balance: input.balance,
-          transfers: []
+      addToBalance: async (
+        _root, {input}: { input: AddToBalanceInput<Balance> },
+        context: Context): Promise<TransferDoc<Balance>> => {
+        const transfer: TransferDoc<Balance> = {
+          id: uuid(),
+          toId: input.accountId,
+          amount: input.amount
         };
-        const reqIdPendingFilter = { pending: context.reqId };
-        switch (context.reqType) {
-          case 'vote':
-            doc.pending = context.reqId;
-            /* falls through */
-          case undefined:
-            await accounts.insertOne(input);
+        const updateId = _.get(context, 'reqId', uuid());
 
-            return doc;
-          case 'commit':
-            await accounts.updateOne(
-              reqIdPendingFilter,
-              { $unset: { pending: '' } });
-
-            return;
-          case 'abort':
-            await accounts.deleteOne(reqIdPendingFilter);
-
-            return;
+        await transfers.insertOne({...transfer, pending: updateId });
+        try {
+          await addToBalance<Balance>(
+            input.accountId, input.amount, transfer,
+            updateId, context.reqType,
+            accountHasFundsFn, newBalanceFn, zeroBalanceFn);
+        } catch (e) {
+          console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
+          await abortAccountUpdate(updateId);
+          await transfers.deleteOne({ pending: updateId });
+          throw e;
         }
+
+        await transfers
+          .updateOne({ pending: updateId }, { $unset: { pending: '' }});
+
+        return transfer;
       },
       createTransfer: async (
         _root, {input}: { input: CreateTransferInput<Balance> },
-        context: Context) => {
-        const updateId = context.reqId;
-        const transfer = {
+        context: Context): Promise<TransferDoc<Balance>> => {
+        const updateId = _.get(context, 'reqId', uuid());
+        const transfer: TransferDoc<Balance> = {
           id: input.id ? input.id : uuid(),
           fromId: input.fromId,
           toId: input.toId,
           amount: input.amount
         };
+        transfer.fromId = input.fromId;
+
+        await transfers.insertOne({...transfer, pending: updateId });
         try {
           /*
            * It is important that we apply the update to the source account
@@ -185,80 +211,127 @@ function getResolvers<Balance>(
           await addToBalance<Balance>(
             input.fromId, negateBalanceFn(input.amount), transfer,
             updateId, context.reqType,
-            accountHasFundsFn, newBalanceFn, commitUpdateFn);
-
-          /*
-           * No need to do the updates in a tx. Even if the server fails before
-           * doing the second update, there will be a record on the pending
-           * transfer in the other account
-           */
-          await addToBalance<Balance>(
-            input.toId, input.amount, transfer, updateId, context.reqType,
-            accountHasFundsFn, newBalanceFn, commitUpdateFn);
+            accountHasFundsFn, newBalanceFn, zeroBalanceFn);
         } catch (e) {
-          await abortUpdate(updateId);
-        }
+          console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
+          await abortAccountUpdate(updateId);
+          await transfers.deleteOne({ pending: updateId });
+          throw e;
+       }
 
-        return transfer;
-      },
-      addToBalance: async (
-        _root, {input}: { input: AddToBalanceInput<Balance> },
-        context: Context) => {
-        return await addToBalance<Balance>(
-          input.accountId, input.amount,
-          { id: uuid(), toId: input.accountId, amount: input.amount },
-          context.reqId, context.reqType,
-          accountHasFundsFn, newBalanceFn, commitUpdateFn);
+       /*
+        * At this point we know that the transfer is going to work, because
+        * we are adding a positive number to `toId`. There's no need to do
+        * the updates in a tx because even if the server fails with an
+        * internal error before doing the second update, there will be a
+        * record of the pending transfer that can be used to reconcile the
+        * data
+        */
+       await addToBalance<Balance>(
+         input.toId, input.amount, transfer, updateId, context.reqType,
+         accountHasFundsFn, newBalanceFn, zeroBalanceFn);
+
+       await transfers
+         .updateOne({ pending: updateId }, { $unset: { pending: '' }});
+
+
+       return transfer;
       }
     }
   };
 }
 
-async function voteUpdate<Balance>(
+async function voteAccountUpdate<Balance>(
   accountId: string, amount: Balance, transfer: TransferDoc<Balance>,
   updateId: string,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
-  newBalanceFn: NewBalanceFn<Balance>)
-  : Promise<AccountDoc<Balance> | undefined> {
+  zeroBalanceFn: ZeroBalanceFn<Balance>)
+  : Promise<AccountPendingDoc<Balance>> {
   // Error messages
-  const noAccountMsg = (accountIdWithError) =>
-    `Account ${accountIdWithError} doesn't exist`;
   const noFundsMsg = (accountIdWithError) =>
     `Account ${accountIdWithError} has insufficient funds`;
   const pendingTransferMsg = (accountIdWithError) =>
     `Account ${accountIdWithError} has a pending transfer, try again later`;
 
-  const accountFilter = { id: accountId, pending: { $exists: false } };
-  const pendingTransfer = {
-    reqId: updateId,
+  const pendingTransfer: PendingTransfer<Balance> = {
+    updateId: updateId,
     transfer: transfer
   };
-  const voteUpdateOp = { $set: { pending: pendingTransfer } };
-  const voteAccount = (await accounts
-    .findOneAndUpdate(accountFilter, voteUpdateOp))
-    .value;
-  if (voteAccount === undefined) {
-    // Do another find so that we return a more specific error
-    const accountExists = (await accounts
-      .findOne({ id: accountId }, { _id: 1 })) === undefined;
-    const errorMsg = accountExists ?
-      noAccountMsg(accountId) : pendingTransferMsg(accountId);
-    throw new Error(errorMsg);
+  let voteAccount: AccountPendingDoc<Balance>;
+
+  const accountExists = (await accounts
+    .findOne({ id: accountId }, { projection: { _id: 1 } })) !== null;
+  if (accountExists) {
+    const accountFilter = {
+      id: accountId, pendingTransfer: { $exists: false }
+    };
+    const voteUpdateOp = { $set: { pendingTransfer: pendingTransfer } };
+    voteAccount = (await accounts
+      .findOneAndUpdate(accountFilter, voteUpdateOp, { returnOriginal: false }))
+      .value;
+    if (voteAccount === undefined) {
+      throw new Error(pendingTransferMsg(accountId));
+    }
+  } else {
+    const newAccount: AccountPendingDoc<Balance> = {
+      id: accountId,
+      balance: zeroBalanceFn(),
+      pending: updateId,
+      pendingTransfer: pendingTransfer
+    };
+    console.log(`insert new account ${accountId} with balance ${zeroBalanceFn()}`);
+    await accounts.insertOne(newAccount);
+    voteAccount = newAccount;
   }
+
+  console.log(`${voteAccount.balance}, ${amount} ${accountHasFundsFn(voteAccount.balance, amount)}`);
   // Throw an error if the balance in acct would be negative after updating
   if (!accountHasFundsFn(voteAccount.balance, amount)) {
-    await abortUpdate(updateId);
+    console.log('account doesn t have funds');
+    await abortAccountUpdate(updateId);
+    console.log('throwin error');
     throw new Error(noFundsMsg(accountId));
   }
-  voteAccount.balance = newBalanceFn(voteAccount.balance, amount);
+  console.log('acount has funds');
 
   return voteAccount;
 }
 
-async function abortUpdate(updateId: string) {
-  const reqIdPendingFilter = { 'pending.updateId': updateId };
+async function commitAccountUpdate<Balance>(
+  account: AccountPendingDoc<Balance>, newBalance: Balance) {
+  const reqIdPendingFilter = {
+    'pendingTransfer.updateId': account.pendingTransfer.updateId
+  };
+  const commitUpdateOp = {
+    $set: { balance: newBalance },
+    $unset: { pendingTransfer: '', pending: '' }
+  };
+  const res = await accounts
+    .updateOne(reqIdPendingFilter, commitUpdateOp);
+  assert.ok(
+    res.matchedCount === 1,
+    `Expected matchedCount of update to be 1, ` +
+    `but got ${res.matchedCount}`);
+  assert.ok(
+    res.modifiedCount === 1,
+    `Expected modifiedCount of update to be 1, ` +
+    `but got ${res.modifiedCount}`);
+
+  return;
+}
+
+async function abortAccountUpdate(updateId: string) {
+  const reqIdPendingFilter = { 'pendingTransfer.updateId': updateId };
   await accounts
-    .updateMany(reqIdPendingFilter, { $unset: { pending: '' } });
+    .updateMany(reqIdPendingFilter, { $unset: { pendingTransfer: '' } });
+
+  // Also delete any new accounts that were created
+  const res = await accounts
+    .deleteMany({ pending: updateId });
+  assert.ok(
+    res.result.n === undefined || res.result.n <= 2,
+    `Expected the number of deleted accounts to be less than 2, ` +
+    `but got ${res.result.n}`);
 
   return;
 }
@@ -276,7 +349,7 @@ async function abortUpdate(updateId: string) {
  * @param action the action to perform
  * @param accountHasFundsFn fn that returns true if the account has funds
  * @param newBalanceFn fn to compute the new account balance
- * @param commitUpdateFn fn to commit update
+ * @param zeroBalanceFn fn to retrieve the initial balance of a new account
  * @throws error if the account doesn't exists, has insufficient funds, or has
  *         a pending update
  */
@@ -285,12 +358,21 @@ async function addToBalance<Balance>(
   updateId: string, action: 'vote' | 'commit' | 'abort' | undefined,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
   newBalanceFn: NewBalanceFn<Balance>,
-  commitUpdateFn: CommitUpdateFn<Balance>)
+  zeroBalanceFn: ZeroBalanceFn<Balance>)
   : Promise<AccountDoc<Balance> | undefined> {
+  if (_.isEmpty(accountId)) {
+    throw new Error(`Invalid account id ${accountId}`);
+  }
+  if (_.isEmpty(updateId)) {
+    throw new Error(`Invalid update id ${updateId}`);
+  }
+
+  console.log(`to ${accountId} ${amount}`);
   switch (action) {
     case 'vote':
-      return await voteUpdate<Balance>(
-        accountId, amount, transfer, updateId, accountHasFundsFn, newBalanceFn);
+      return await voteAccountUpdate<Balance>(
+        accountId, amount, transfer, updateId,
+        accountHasFundsFn, zeroBalanceFn);
     case undefined:
       /*
        * We can't apply the update directly because we need to check that the
@@ -299,23 +381,36 @@ async function addToBalance<Balance>(
        * If we do vote + commit then we ensure that the balance won't change in
        * the middle (because voting on an update puts a "lock" on that account)
        */
-      let account: AccountDoc<Balance> | undefined;
       try {
-        account = await voteUpdate<Balance>(
-          accountId, amount, transfer, updateId,
-          accountHasFundsFn, newBalanceFn);
-      } catch (e) {
-        await abortUpdate(updateId);
-      }
-      await commitUpdateFn(amount, updateId);
+        const account: AccountPendingDoc<Balance> = await
+          voteAccountUpdate<Balance>(
+            accountId, amount, transfer, updateId,
+            accountHasFundsFn, zeroBalanceFn);
+        const newBalance = newBalanceFn(account.balance, amount);
+        await commitAccountUpdate<Balance>(account, newBalance);
 
-      return account;
+        return account;
+      } catch (e) {
+        console.error(
+          `Balance update ${updateId} aborted, error: ${e.message}`);
+        await abortAccountUpdate(updateId);
+        throw e;
+      }
     case 'commit':
-      await commitUpdateFn(amount, updateId);
+      const reqIdPendingFilter = { 'pendingTransfer.updateId': updateId };
+      const commitAccount: AccountPendingDoc<Balance> | null = await accounts
+        .findOne(reqIdPendingFilter);
+      if (commitAccount === null) {
+        console.error(`Couldn't find account for update id ${updateId}`);
+        throw new Error('An internal error has occurred');
+      }
+
+      const newCommitBalance = newBalanceFn(commitAccount.balance, amount);
+      await commitAccountUpdate<Balance>(commitAccount, newCommitBalance);
 
       return;
     case 'abort':
-      await abortUpdate(updateId);
+      await abortAccountUpdate(updateId);
 
       return;
   }
@@ -326,9 +421,11 @@ if (config.balance === 'money') {
 
   const schemaPath = path.join(__dirname, 'schema.graphql');
   typeDefinitions = [
-    readFileSync(schemaPath, 'utf8')
-      .replace('#Balance', 'Float')
+    _.replace(
+      readFileSync(schemaPath, 'utf8'),
+      /#Balance/g, 'Float')
   ];
+  console.log(typeDefinitions);
 
   const newBalanceFn: NewBalanceFn<number> =
     (accountBalance: number, transferAmount: number) => (
@@ -336,36 +433,28 @@ if (config.balance === 'money') {
     );
   const accountHasFundsFn: AccountHasFundsFn<number> =
     (accountBalance: number, transferAmount: number) => (
-      newBalanceFn(accountBalance, transferAmount) > 0
+      newBalanceFn(accountBalance, transferAmount) >= 0
     );
-  const commitUpdateFn: CommitUpdateFn<number> =
-    async (transferAmount: number, updateId: string) => {
-      const reqIdPendingFilter = { 'pending.updateId': updateId };
-      const commitUpdateOp = {
-        $inc: { balance: transferAmount }, $unset: { pending: '' }
-      };
-      await accounts
-        .updateOne(reqIdPendingFilter, commitUpdateOp);
-
-      return;
-    };
   const negateBalanceFn: NegateBalanceFn<number> =
     (balance: number) => -balance;
+  const zeroBalanceFn: ZeroBalanceFn<number> = () => 0;
 
   resolvers = getResolvers<number>(
-    accountHasFundsFn, newBalanceFn, commitUpdateFn, negateBalanceFn);
+    accountHasFundsFn, newBalanceFn, negateBalanceFn,
+    zeroBalanceFn);
 
 } else {
   const schemaPath = path.join(__dirname, 'schema.graphql');
   typeDefinitions = [
-    readFileSync(schemaPath, 'utf8')
-      .concat(`
-        type ItemCount {
-          itemId: ID!
-          count: Number
-        }
-      `)
-      .replace('#Balance', '[ItemCount]')
+    _.replace(
+      readFileSync(schemaPath, 'utf8')
+        .concat(`
+          type ItemCount {
+            itemId: ID!
+            count: Number
+          }
+        `),
+      /#Balance/g, '[ItemCount]')
   ];
 
   const newBalanceFn: NewBalanceFn<ItemCount[]> =
@@ -403,28 +492,17 @@ if (config.balance === 'money') {
 
       return true;
     };
-  const commitUpdateFn: CommitUpdateFn<ItemCount[]> =
-    async (transferAmount: ItemCount[], updateId: string) => {
-      const reqIdPendingFilter = { 'pending.updateId': updateId };
-      const account = await accounts.findOne(reqIdPendingFilter);
-      const newBalance = newBalanceFn(account.balance, transferAmount);
-      const commitUpdateOp = {
-        $set: { balance: newBalance }, $unset: { pending: '' }
-      };
-      await accounts
-        .updateOne(reqIdPendingFilter, commitUpdateOp);
-
-      return;
-    };
   const negateBalanceFn: NegateBalanceFn<ItemCount[]> =
     (balance: ItemCount[]) => {
       return _.map(balance, (itemCount: ItemCount) => {
         return { itemId: itemCount.itemId, count: -itemCount.count };
       });
     };
+  const zeroBalanceFn: ZeroBalanceFn<ItemCount[]> = () => [];
 
   resolvers = getResolvers<ItemCount[]>(
-    accountHasFundsFn, newBalanceFn, commitUpdateFn, negateBalanceFn);
+    accountHasFundsFn, newBalanceFn,
+    negateBalanceFn, zeroBalanceFn);
 }
 
 const schema = makeExecutableSchema({ typeDefs: typeDefinitions, resolvers });
