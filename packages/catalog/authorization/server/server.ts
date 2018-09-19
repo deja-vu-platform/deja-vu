@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
 
 import * as _ from 'lodash';
 
-import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
+const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
 
 
@@ -17,6 +17,12 @@ interface ResourceDoc {
   ownerId: string;
   // Includes the owner id because the owner is also a viewer
   viewerIds: string[];
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'create-resource' | 'add-viewer-to-resource' | 'delete-resource';
 }
 
 interface ResourcesInput {
@@ -46,6 +52,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -90,17 +98,15 @@ mongodb.MongoClient.connect(
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  static async resourceExists(resourceId: string): Promise<ResourceDoc> {
-    return Validation.exists(resources, resourceId, 'Resource');
-  }
-
-  private static async exists(collection, id: string, type: string) {
-    const doc = await collection.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`${type} ${id} not found`);
+  static async resourceExistsOrFail(resourceId: string):
+    Promise<ResourceDoc | null> {
+    const resource: ResourceDoc | null = await resources
+      .findOne({ id: resourceId });
+    if (!resource) {
+      throw new Error(`Resource ${resourceId} not found`);
     }
 
-    return doc;
+    return resource;
   }
 }
 
@@ -112,40 +118,70 @@ async function isOwner(principalId: string, resourceId: string) {
   return !_.isNil(res);
 }
 
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingCreate(doc: ResourceDoc | null) {
+  return _.get(doc, 'pending.type') === 'create-resource';
+}
 
 const resolvers = {
   Query: {
     resources: (root, { input }: { input: ResourcesInput }) => resources
-        .find({ viewerIds: input.viewableBy })
-        .toArray(),
+      .find({ viewerIds: input.viewableBy, pending: { $exists: false } })
+      .toArray(),
 
-    resource: (root, { id }) => resources.findOne({ id: id }),
+    resource: async (root, { id }) => {
+      const resource: ResourceDoc | null = await Validation
+        .resourceExistsOrFail(id);
+      if (isPendingCreate(resource)) {
+        return null;
+      }
+
+      return resource;
+    },
 
     owner: async (root, { resourceId }) => {
       const resource = await resources
         .findOne({ id: resourceId }, { projection: { ownerId: 1 } });
 
-      if (!resource) {
+      if (isPendingCreate(resource)) {
+        return null;
+      }
+
+      if (_.isNil(resource)) {
         throw new Error(`Resource ${resourceId} not found`);
       }
 
-      return resource.ownerId;
+      return resource!.ownerId;
     },
 
-    isOwner: (root, { input: { principalId, resourceId } }
-      : { input: PrincipalResourceInput }) => isOwner(principalId, resourceId),
-
-    canView: async (root, { input: { principalId, resourceId } }
-      : { input: PrincipalResourceInput }) => {
-      const res = await resources
-        .findOne({ id: resourceId, viewerIds: principalId },
+    canView: async (root, { input }: { input: PrincipalResourceInput }) => {
+      const resource = await resources
+        .findOne({ id: input.resourceId, viewerIds: input.principalId },
           { projection: { _id: 1 } });
 
-      return !_.isNil(res);
+      if (isPendingCreate(resource)) {
+        return null;
+      }
+
+      return !_.isNil(resource);
     },
 
-    canEdit: (root, { input: { principalId, resourceId } }
-      : { input: PrincipalResourceInput }) => isOwner(principalId, resourceId)
+    canEdit: async (root, { input }: { input: PrincipalResourceInput }) => {
+      const resource = await resources
+        .findOne({ id: input.resourceId, ownerId: input.principalId },
+          { projection: { _id: 1 } });
+
+      if (isPendingCreate(resource)) {
+        return null;
+      }
+
+      return !_.isNil(resource);
+    }
   },
 
   Resource: {
@@ -158,30 +194,140 @@ const resolvers = {
 
   Mutation: {
     createResource: async (
-      root, { input }: { input: CreateResourceInput }) => {
+      root, { input }: { input: CreateResourceInput }, context: Context) => {
       const newResource: ResourceDoc = {
         id: input.id ? input.id : uuid(),
         ownerId: input.ownerId,
         viewerIds: _.union(_.get(input, 'viewerIds', []), [input.ownerId])
       };
 
-      await resources.insertOne(newResource);
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+      switch (context.reqType) {
+        case 'vote':
+          newResource.pending = {
+            reqId: context.reqId,
+            type: 'create-resource'
+          };
+        /* falls through */
+        case undefined:
+          await resources.insertOne(newResource);
+
+          return newResource;
+        case 'commit':
+          await resources.updateOne(
+            reqIdPendingFilter,
+            { $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await resources.deleteOne(reqIdPendingFilter);
+
+          return;
+      }
 
       return newResource;
     },
 
-    addViewerToResource: async (root, { input: { id, viewerId } }
-      : { input: AddViewerToResourceInput }) => {
-      const updateOp = { $push: { viewerIds: viewerId } };
-      const update = await resources.updateOne({ id: id }, updateOp);
+    addViewerToResource: async (
+      root,
+      { input }: { input: AddViewerToResourceInput }, context: Context) => {
+      const updateOp = { $push: { viewerIds: input.viewerId } };
+      const notPendingResourceFilter = {
+        id: input.id,
+        pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-      return update.modifiedCount === 1;
+      switch (context.reqType) {
+        case 'vote':
+          await Validation.resourceExistsOrFail(input.id);
+          const pendingUpdateObj = await resources
+            .updateOne(
+              notPendingResourceFilter,
+              {
+                $set: {
+                  pending: {
+                    reqId: context.reqId,
+                    type: 'add-viewer-to-resource'
+                  }
+                }
+              });
+          if (pendingUpdateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+        case undefined:
+          await Validation.resourceExistsOrFail(input.id);
+          const updateObj = await resources
+            .updateOne(notPendingResourceFilter, updateOp);
+          if (updateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+        case 'commit':
+          await resources.updateOne(
+            reqIdPendingFilter,
+            { ...updateOp, $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await resources.updateOne(
+            reqIdPendingFilter, { $unset: { pending: '' } });
+
+          return;
+      }
     },
 
-    deleteResource: async (root, { id }) => {
-      const del = await resources.deleteOne({ id: id });
+    deleteResource: async (root, { id }, context: Context) => {
+      const notPendingResourceFilter = {
+        id: id,
+        pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-      return del.deletedCount === 1;
+      switch (context.reqType) {
+        case 'vote':
+          await Validation.resourceExistsOrFail(id);
+          const pendingUpdateObj = await resources.updateOne(
+            notPendingResourceFilter,
+            {
+              $set: {
+                pending: {
+                  reqId: context.reqId,
+                  type: 'delete-resource'
+                }
+              }
+            });
+
+          if (pendingUpdateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+        case undefined:
+          await Validation.resourceExistsOrFail(id);
+          const res = await resources
+            .deleteOne({ id: id, pending: { $exists: false } });
+
+          if (res.deletedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+        case 'commit':
+          await resources.deleteOne(reqIdPendingFilter);
+
+          return;
+        case 'abort':
+          await resources.updateOne(
+            reqIdPendingFilter, { $unset: { pending: '' } });
+
+          return;
+      }
+
+      return;
     }
   }
 };
@@ -189,6 +335,39 @@ const resolvers = {
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
 
 app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
   extended: true

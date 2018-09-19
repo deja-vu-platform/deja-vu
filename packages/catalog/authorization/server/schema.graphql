@@ -30,7 +30,6 @@ type Query {
   resource(id: ID!): Resource
   owner(resourceId: ID!): ID
   resources(input: ResourcesInput!): [Resource!]
-  isOwner(input: PrincipalResourceInput!): Boolean
   canView(input: PrincipalResourceInput!): Boolean
   canEdit(input: PrincipalResourceInput!): Boolean
 }
