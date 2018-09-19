@@ -32,7 +32,6 @@ const PASSWORD_PATTERN_MSG = 'at least 1 lowercase letter, 1 uppercase '
   + 'letter, 1 special character (!@#$%^*&) and 1 number (0-9)';
 
 
-
 // TODO: Change before deployment
 const SECRET_KEY = 'ultra-secret-key';
 const SALT_ROUNDS = 10;
@@ -41,6 +40,12 @@ interface UserDoc {
   id: string;
   username: string;
   password: string;
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'register' | 'change-password';
 }
 
 interface User {
@@ -78,6 +83,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -199,15 +206,25 @@ class Validation {
 
     return valid;
   }
-
-
 }
 
-async function register(input: RegisterInput): Promise<User> {
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingRegister(user: UserDoc | null) {
+  return _.get(user, 'pending.type') === 'register';
+}
+
+async function register(input: RegisterInput, context: Context) {
+
   Validation.isUsernameValid(input.username);
   Validation.isPasswordValid(input.password);
 
   const id = input.id ? input.id : uuid();
+
   await Validation.userIsNew(id, input.username);
 
   const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
@@ -217,7 +234,20 @@ async function register(input: RegisterInput): Promise<User> {
     password: hash
   };
 
-  await users.insertOne(newUser);
+  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+  switch (context.reqType) {
+    case 'vote':
+      newUser.pending = { reqId: context.reqId, type: 'register' };
+    case undefined:
+      await users.insertOne(newUser);
+      return newUser;
+    case 'commit':
+      await users.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+      return;
+    case 'abort':
+      await users.deleteOne(reqIdPendingFilter);
+      return;
+  }
 
   return newUser;
 }
@@ -237,10 +267,26 @@ function verify(token: string, userId: string): boolean {
 
 const resolvers = {
   Query: {
-    users: () => users.find()
-      .toArray(),
-    user: (root, { username }) => users.findOne({ username: username }),
-    userById: (root, { id }) => users.findOne({ id: id }),
+    users: () => {
+      const filter = {
+        pending: {
+          type: { $ne: 'register' }
+        }
+      };
+
+      return users.find(filter)
+        .toArray();
+    },
+    user: async (root, { username }) => {
+      const user: UserDoc | null = await users.findOne({ username: username });
+
+      return isPendingRegister(user) ? null : user;
+    },
+    userById: async (root, { id }) => {
+      const user: UserDoc | null = await users.findOne({ id: id });
+
+      return isPendingRegister(user) ? null : user;
+    },
     verify: (root, { token, id }) => verify(token, id)
   },
 
@@ -255,16 +301,24 @@ const resolvers = {
   },
 
   Mutation: {
-    register: (root, { input }: { input: RegisterInput }) => register(input),
+    register: (root, { input }: { input: RegisterInput }, context: Context) => {
+      return register(input, context);
+    },
 
-    registerAndSignIn: async (root, { input }: { input: RegisterInput }) => {
-      const user = await register(input);
-      const token: string = sign(user.id);
+    registerAndSignIn: async (
+      root, { input }: { input: RegisterInput }, context: Context) => {
+      const user = await register(input, context);
 
-      return {
-        token: token,
-        user: user
-      };
+      if (!_.isNil(user)) {
+        const token: string = sign(user!.id);
+
+        return {
+          token: token,
+          user: user
+        };
+      }
+
+      return;
     },
 
     signIn: async (root, { input }: { input: SignInInput }) => {
@@ -280,19 +334,59 @@ const resolvers = {
       };
     },
 
-    changePassword: async (root, { input }: { input: ChangePasswordInput }) => {
+    changePassword: async (
+      root, { input }: { input: ChangePasswordInput }, context: Context) => {
       Validation.isPasswordValid(input.newPassword);
       const user = await Validation.userExistsById(input.id);
-      const verification = await Validation.verifyPassword(input.oldPassword,
-        user.password);
-
+      const verification =
+        await Validation.verifyPassword(input.oldPassword, user.password);
       const newPasswordHash = await bcrypt
         .hash(input.newPassword, SALT_ROUNDS);
-      const updateOperation = { $set: { password: newPasswordHash } };
 
-      await users.updateOne({ id: input.id }, updateOperation);
+      const updateOp = { $set: { password: newPasswordHash } };
 
-      return true;
+      const notPendingUserFilter = {
+        id: input.id,
+        pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
+      switch (context.reqType) {
+        case 'vote':
+          const pendingUpdateObj = await users.updateOne(
+            notPendingUserFilter,
+            {
+              $set: {
+                pending: {
+                  reqId: context.reqId,
+                  type: 'change-password'
+                }
+              }
+            });
+          if (pendingUpdateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+          return true;
+
+        case undefined:
+          const updateObj = await users
+            .updateOne(notPendingUserFilter, updateOp);
+          if (updateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+          return true;
+
+        case 'commit':
+          await users.updateOne(
+            reqIdPendingFilter,
+            { ...updateOp, $unset: { pending: '' } });
+          return false;
+        case 'abort':
+          await users
+            .updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+          return false;
+      }
+      return false;
     }
   }
 };
@@ -300,6 +394,39 @@ const resolvers = {
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
 
 app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
   extended: true
