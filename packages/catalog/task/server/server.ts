@@ -21,6 +21,13 @@ interface TaskDoc {
   dueDate: string;
   completed: boolean;
   approved: boolean;
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'create-task' | 'update-task' | 'claim-task' | 'complete-task' |
+    'approve-task';
 }
 
 interface TasksInput {
@@ -53,6 +60,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -95,20 +104,74 @@ mongodb.MongoClient.connect(
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  static async taskExists(id: string): Promise<TaskDoc> {
+  static async taskExistsOrFail(id: string): Promise<void> {
     return Validation.exists(tasks, id, 'Task');
   }
 
-  private static async exists(collection, id: string, type: string) {
+  private static async existsOrFail(
+    collection, id: string, type: string): Promise<void> {
     const doc = await collection.findOne({ id: id });
     if (!doc) {
       throw new Error(`${type} ${id} not found`);
     }
-
-    return doc;
   }
 }
 
+
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingCreate(task: TaskDoc | null) {
+  return _.get(task, 'pending.type') === 'create-task';
+}
+
+async function updateTask(id: string, updateOp: object,
+  updateType: 'update-task' | 'claim-task' | 'complete-task' | 'approve-task',
+  context: Context): Promise<Boolean> {
+
+  const notPendingTaskFilter = {
+    id,
+    pending: { $exists: false },
+  };
+  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+  switch (context.reqType) {
+    case 'vote':
+      await Validation.taskExistsOrFail(id);
+      const pendingUpdateObj = await tasks.updateOne(
+        notPendingTaskFilter,
+        {
+          $set: {
+            pending: {
+              reqId: context.reqId,
+              type: updateType,
+            },
+          },
+        });
+      if (pendingUpdateObj.matchedCount === 0) {
+        throw new Error(CONCURRENT_UPDATE_ERROR);
+      }
+      return true;
+    case undefined:
+      await Validation.taskExistsOrFail(id);
+      const updateObj = await tasks.updateOne(notPendingTaskFilter);
+      if (updateObj.matchedCount === 0) {
+        throw new Error(CONCURRENT_UPDATE_ERROR);
+      }
+      return true;
+    case 'commit':
+      await tasks.updateOne(
+        reqIdPendingFilter,
+        { ...updateOp, $unset: { pending: '' } });
+      return false;
+    case 'abort':
+      await tasks.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+      return false;
+  }
+  return false;
+}
 
 const resolvers = {
   Query: {
@@ -117,12 +180,14 @@ const resolvers = {
       if (input.assigned === false) {
         filterOp['assigneeId'] = null;
       }
+      filterOp['pending'] = { type: { $ne: 'create-task' } };
 
       return await tasks.find(filterOp)
         .toArray();
     },
     task: async (root, { id }) => {
-      return await Validation.taskExists(id);
+      const task: TaskDoc | null = await tasks.findOne({ id: id });
+      return isPendingCreate(task) ? null : task;
     }
   },
   Task: {
@@ -132,7 +197,8 @@ const resolvers = {
     dueDate: (task: TaskDoc) => task.dueDate
   },
   Mutation: {
-    createTask: async (root, { input }: {input: CreateTaskInput}) => {
+    createTask: async (
+      root, { input }: {input: CreateTaskInput}, context: Context) => {
       const newTask: TaskDoc = {
         id: input.id ? input.id : uuid(),
         assignerId: input.assignerId,
@@ -141,33 +207,39 @@ const resolvers = {
         completed: false,
         approved: false
       };
-      await tasks.insertOne(newTask);
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+      switch (context.reqType) {
+        case 'vote':
+          newTask.pending = { reqId: context.reqId, type: 'create-task' };
+        case undefined:
+          await tasks.insertOne(newTask);
+          return newTask;
+        case 'commit':
+          await tasks.updateOne(
+            reqIdPendingFilter,
+            { $unset: { pending: '' } });
+          return;
+        case 'abort':
+          await tasks.deleteOne(reqIdPendingFilter);
+          return;
+      }
 
       return newTask;
     },
-    updateTask: async (root, { input }: {input: UpdateTaskInput}) => {
-      const updateObj = { $set: input };
-      const res = await tasks.findOneAndUpdate({ id: input.id }, updateObj);
-
-      return res.value;
+    updateTask: async (root, { input }: {input: UpdateTaskInput}, context:Context) => {
+      return updateTask(id, { $set: input }, 'update-task', context);
     },
-    claimTask: async (root, { id, assigneeId }) => {
-      const res = await tasks
-        .findOneAndUpdate({ id: id }, { $set: { assigneeId: assigneeId}});
-
-      return res.value;
+    claimTask: async (root, { id, assigneeId }, context: Context) => {
+      return updateTask(
+        id, { $set: { assigneeId: assigneeId } }, 'claim-task', context);
     },
-    approveTask: async (root, { id }) => {
-      const res = await tasks
-        .findOneAndUpdate({ id: id }, { $set: { approved: true }});
-
-      return res.value;
+    approveTask: async (root, { id }, context: Context) => {
+      return updateTask(
+        id, { $set: { approved: true } }, 'approve-task', context);
     },
-    completeTask: async (root, { id }) => {
-      const res = await tasks
-        .findOneAndUpdate({ id: id }, { $set: { completed: true }});
-
-      return res.value;
+    completeTask: async (root, { id }, context: Context) => {
+      return updateTask(
+        id, { $set: { completed: true } }, 'complete-task', context);
     }
   }
 };
@@ -176,6 +248,39 @@ const resolvers = {
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
 
 app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
   extended: true
