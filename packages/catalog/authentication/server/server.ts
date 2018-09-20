@@ -108,7 +108,8 @@ try {
 const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db, users;
+let db: mongodb.Db;
+let users: mongodb.Collection<UserDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -130,34 +131,35 @@ const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
   static async userExistsById(userId: string): Promise<UserDoc> {
-    const userDoc = await users.findOne({ id: userId });
-    if (!userDoc) {
+    const user: UserDoc | null = await users.findOne({ id: userId });
+    if (!user) {
       throw new Error(`User ${userId} not found.`);
     }
 
-    return userDoc;
+    return user;
   }
 
   static async userExistsByUsername(username: string): Promise<UserDoc> {
-    const userDoc = await users.findOne({ username: username });
-    if (!userDoc) {
+    const user: UserDoc | null = await users.findOne({ username: username });
+    if (!user) {
       throw new Error(`User ${username} not found.`);
     }
 
-    return userDoc;
+    return user;
   }
 
   static async userIsNew(id: string, username: string) {
-    const userDocById = await users.findOne({ id: id });
-    const userDocByUsername = await users.findOne({ username: username });
-    if (userDocById) {
+    const userById: UserDoc | null = await users.findOne({ id: id });
+    const userByUsername: UserDoc | null = await users
+      .findOne({ username: username });
+    if (userById) {
       throw new Error(`User ${id} already exists.`);
     }
-    if (userDocByUsername) {
+    if (userByUsername) {
       throw new Error(`User ${username} already exists.`);
     }
 
-    return userDocById;
+    return userById;
   }
 
   static async verifyPassword(inputPassword: string, savedPassword: string)
@@ -240,12 +242,15 @@ async function register(input: RegisterInput, context: Context) {
       newUser.pending = { reqId: context.reqId, type: 'register' };
     case undefined:
       await users.insertOne(newUser);
+
       return newUser;
     case 'commit':
       await users.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+
       return;
     case 'abort':
       await users.deleteOne(reqIdPendingFilter);
+
       return;
   }
 
@@ -267,16 +272,8 @@ function verify(token: string, userId: string): boolean {
 
 const resolvers = {
   Query: {
-    users: () => {
-      const filter = {
-        pending: {
-          type: { $ne: 'register' }
-        }
-      };
-
-      return users.find(filter)
-        .toArray();
-    },
+    users: () => users.find({ pending: { $exists: false } })
+      .toArray(),
     user: async (root, { username }) => {
       const user: UserDoc | null = await users.findOne({ username: username });
 
@@ -366,26 +363,33 @@ const resolvers = {
           if (pendingUpdateObj.matchedCount === 0) {
             throw new Error(CONCURRENT_UPDATE_ERROR);
           }
+
           return true;
 
         case undefined:
+          await Validation.userExistsById(input.id);
           const updateObj = await users
             .updateOne(notPendingUserFilter, updateOp);
           if (updateObj.matchedCount === 0) {
             throw new Error(CONCURRENT_UPDATE_ERROR);
           }
+
           return true;
 
         case 'commit':
           await users.updateOne(
             reqIdPendingFilter,
             { ...updateOp, $unset: { pending: '' } });
+
           return false;
+
         case 'abort':
           await users
             .updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+
           return false;
       }
+
       return false;
     }
   }
