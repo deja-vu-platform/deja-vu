@@ -149,17 +149,17 @@ class Validation {
   }
 
   static async userIsNew(id: string, username: string) {
-    const userById: UserDoc | null = await users.findOne({ id: id });
-    const userByUsername: UserDoc | null = await users
-      .findOne({ username: username });
-    if (userById) {
-      throw new Error(`User ${id} already exists.`);
-    }
-    if (userByUsername) {
-      throw new Error(`User ${username} already exists.`);
+    const user: UserDoc | null = await users
+      .findOne({
+        $or: [
+          { id: id }, { username: username }
+        ]
+      });
+    if (user) {
+      throw new Error(`User already exists.`);
     }
 
-    return userById;
+    return user;
   }
 
   static async verifyPassword(inputPassword: string, savedPassword: string)
@@ -282,7 +282,11 @@ const resolvers = {
     userById: async (root, { id }) => {
       const user: UserDoc | null = await users.findOne({ id: id });
 
-      return isPendingRegister(user) ? null : user;
+      if (_.isNil(user) || isPendingRegister(user)) {
+        throw new Error(`User ${id} not found`);
+      }
+
+      return user;
     },
     verify: (root, { token, id }) => verify(token, id)
   },
