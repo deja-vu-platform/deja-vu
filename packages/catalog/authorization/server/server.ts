@@ -137,8 +137,8 @@ const resolvers = {
     resource: async (root, { id }) => {
       const resource: ResourceDoc | null = await Validation
         .resourceExistsOrFail(id);
-      if (isPendingCreate(resource)) {
-        return null;
+      if (_.isNil(resource) || isPendingCreate(resource)) {
+        throw new Error(`Resource ${id} not found`);
       }
 
       return resource;
@@ -148,11 +148,7 @@ const resolvers = {
       const resource = await resources
         .findOne({ id: resourceId }, { projection: { ownerId: 1 } });
 
-      if (isPendingCreate(resource)) {
-        return null;
-      }
-
-      if (_.isNil(resource)) {
+      if (_.isNil(resource) || isPendingCreate(resource)) {
         throw new Error(`Resource ${resourceId} not found`);
       }
 
