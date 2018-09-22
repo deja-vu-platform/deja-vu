@@ -28,9 +28,9 @@ interface AccountDoc<Balance> {
   id: string;
   balance: Balance;
   /*
-   * This field exists if the account itself is pending
+   * This field exists if the account itself is pending.
    * This could be because it's the first time we are seeing a transfer from/to
-   * this account. If the transfer ends up being aborted, then we'll delete
+   * this account. If the transfer ends up being aborted, we'll delete
    * the account.
    */
   pending?: string;
