@@ -28,7 +28,7 @@ export type ValueMap = {[field: string]: any};
  *  For example:
  *  The action given by type=f(fi_1) -> fo_1,
  *  inputMap={i_1: 'fi_1'}, outputMap={o_1: 'fo_1'},
- *  inputs={i_2: 'hello'} is conceptually equivalent to:
+ *  inputs={i_2: 'hello'} is equivalent to:
  *
  *  function g(i_1) {
  *    f_result = f(fi_1=i_1, i_2='hello');
@@ -51,13 +51,13 @@ export interface Action {
   // Optional value to specify the cliche the action is from
   dvOf?: string;
   // A map of (adapter input name) -> (action input name)
-  inputMap?: FieldMap
+  inputMap?: FieldMap;
   // A map of (adapter output name) -> (action output name)
-  outputMap?: FieldMap
+  outputMap?: FieldMap;
   // A map of input names to values. This will be passed to the action when
   // invoked. If an input of the same name is given to the action the input
   // given in `inputs` takes precedence.
-  inputs?: FieldMap
+  inputs?: FieldMap;
 }
 
 
@@ -81,8 +81,20 @@ export class IncludeComponent implements AfterViewInit {
 
   @ViewChild(IncludeDirective) host: IncludeDirective;
 
-  private isViewInitialized: boolean = false;
+  private isViewInitialized = false;
   private componentRef: ComponentRef<Component>;
+
+  /**
+   * If `fieldMap` is undefined it returns the identity field map for `valueMap`
+   */
+  private static initFieldMap(
+    valueMap: ValueMap | undefined, fieldMap: FieldMap | undefined)
+    : FieldMap {
+    if (fieldMap === undefined) {
+      return _.mapValues(valueMap, ({}, key) => key);
+    }
+    return fieldMap;
+  }
 
   constructor(
     private componentFactoryResolver: ComponentFactoryResolver,
@@ -115,9 +127,10 @@ export class IncludeComponent implements AfterViewInit {
       throw new Error('No parent given to include');
     }
 
-    console.log(
-      `Loading "${this.action.type}"` +
-      (this.action.dvOf ? `of "${this.action.dvOf}"`: ''));
+    const actionName: string =
+      (this.action.dvOf ? `${this.action.dvOf}.` : '') +
+      this.action.type.name;
+    console.log(`Loading "${actionName}"`);
     const componentFactory = this.componentFactoryResolver
       .resolveComponentFactory(this.action.type);
 
@@ -132,7 +145,8 @@ export class IncludeComponent implements AfterViewInit {
 
     let shouldCallDetectChanges = false;
 
-    this.action.inputMap = this.initFieldMap(this.inputs, this.action.inputMap);
+    this.action.inputMap = IncludeComponent.initFieldMap(
+      this.inputs, this.action.inputMap);
     for (const inputKey of _.keys(this.inputs)) {
       this.componentRef.instance[
         this.action.inputMap[inputKey]] = this.inputs![inputKey];
@@ -144,17 +158,29 @@ export class IncludeComponent implements AfterViewInit {
       shouldCallDetectChanges = true;
     }
 
-    this.action.outputMap = this
-      .initFieldMap(this.outputs, this.action.outputMap);
+    this.action.outputMap = IncludeComponent.initFieldMap(
+      this.outputs, this.action.outputMap);
     for (const outputKey of _.keys(this.outputs)) {
       // The call to `subscribe` is mutating the state of the component
       // ref so we need to call detect changes to avoid getting the expression
       // changed after it has been checked error
       shouldCallDetectChanges = true;
-      this.componentRef.instance[this.action.outputMap[outputKey]]
+      const componentField: string = this.action.outputMap[outputKey];
+      if (componentField === undefined) {
+       console.warn(
+         `Output field ${outputKey} of included action ` +
+         `${actionName} is ignored`);
+       continue;
+      }
+      if (!_.has(this.componentRef.instance, componentField)) {
+        throw new Error(
+          `Included action ${actionName} has no field ${componentField}, ` +
+          `output map ${JSON.stringify(this.action.outputMap)} is wrong`);
+      }
+      this.componentRef.instance[componentField]
         .subscribe(newVal => {
           console.log(
-            `Got new value ${newVal}, assigning to/calling ` +
+            `Got new value ${JSON.stringify(newVal)}, assigning to/calling ` +
             this.outputs![outputKey]);
           if (_.isFunction(this.parent[this.outputs![outputKey]])) {
             this.parent[this.outputs![outputKey]](newVal);
@@ -171,15 +197,4 @@ export class IncludeComponent implements AfterViewInit {
     }
   }
 
-  /**
-   * If `fieldMap` is undefined it returns the identity field map for `valueMap`
-   */
-  private initFieldMap(
-    valueMap: ValueMap | undefined, fieldMap: FieldMap | undefined)
-    : FieldMap {
-    if (fieldMap === undefined) {
-      return _.mapValues(valueMap, ({}, key) => key);
-    }
-    return fieldMap;
-  }
 }
