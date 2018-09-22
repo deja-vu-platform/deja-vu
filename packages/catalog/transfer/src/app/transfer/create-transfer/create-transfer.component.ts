@@ -33,7 +33,7 @@ export class CreateTransferComponent
 implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
-  @Input() showOptionToInputBalance = true;
+  @Input() showOptionToInputAmount = true;
 
   @Input() save = true;
 

@@ -1,15 +1,15 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
-import {readFileSync} from 'fs';
+import { readFileSync } from 'fs';
 import * as minimist from 'minimist';
 import * as mongodb from 'mongodb';
 import * as path from 'path';
-import {v4 as uuid} from 'uuid';
+import { v4 as uuid } from 'uuid';
 
 import * as _ from 'lodash';
 
-import {graphiqlExpress, graphqlExpress} from 'apollo-server-express';
-import {makeExecutableSchema} from 'graphql-tools';
+import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
+import { makeExecutableSchema } from 'graphql-tools';
 
 import * as assert from 'assert';
 
@@ -82,7 +82,7 @@ interface Config {
   dbPort: number;
   dbName: string;
   reinitDbOnStartup: boolean;
-  balance: 'money' | 'items';
+  balanceType: 'money' | 'items';
 }
 
 const argv = minimist(process.argv);
@@ -95,7 +95,7 @@ const DEFAULT_CONFIG: Config = {
   wsPort: 3000,
   dbName: `${name}-db`,
   reinitDbOnStartup: true,
-  balance: 'money'
+  balanceType: 'money'
 };
 
 let configArg;
@@ -141,19 +141,21 @@ type NewBalanceFn<Balance> = (
   accountBalance: Balance, transferAmount: Balance) => Balance;
 type NegateBalanceFn<Balance> = (balance: Balance) => Balance;
 type ZeroBalanceFn<Balance> = () => Balance;
+type IsZeroBalanceFn<Balance> = (balance: Balance) => boolean;
 
 function getResolvers<Balance>(
   accountHasFundsFn: AccountHasFundsFn<Balance>,
   newBalanceFn: NewBalanceFn<Balance>,
   negateBalanceFn: NegateBalanceFn<Balance>,
-  zeroBalanceFn: ZeroBalanceFn<Balance>) {
+  zeroBalanceFn: ZeroBalanceFn<Balance>,
+  isZeroBalanceFn: IsZeroBalanceFn<Balance>) {
   return {
     Query: {
       balance: async (_root, { accountId }) => {
         const account: AccountDoc<Balance> | null = await accounts
           .findOne({ id: accountId });
 
-        return account === null ? 0 : account.balance;
+        return account === null ? zeroBalanceFn() : account.balance;
       },
       transfers: async (_root, { input }: { input: TransfersInput }) => {
         return transfers.find({ ...input, pending: { $exists: false } })
@@ -176,7 +178,7 @@ function getResolvers<Balance>(
           await addToBalance<Balance>(
             input.accountId, input.amount, transfer,
             updateId, context.reqType,
-            accountHasFundsFn, newBalanceFn, zeroBalanceFn);
+            accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
         } catch (e) {
           console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
           await abortAccountUpdate(updateId);
@@ -211,7 +213,7 @@ function getResolvers<Balance>(
           await addToBalance<Balance>(
             input.fromId, negateBalanceFn(input.amount), transfer,
             updateId, context.reqType,
-            accountHasFundsFn, newBalanceFn, zeroBalanceFn);
+            accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
         } catch (e) {
           console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
           await abortAccountUpdate(updateId);
@@ -229,7 +231,7 @@ function getResolvers<Balance>(
         */
        await addToBalance<Balance>(
          input.toId, input.amount, transfer, updateId, context.reqType,
-         accountHasFundsFn, newBalanceFn, zeroBalanceFn);
+         accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
 
        await transfers
          .updateOne({ pending: updateId }, { $unset: { pending: '' }});
@@ -279,43 +281,50 @@ async function voteAccountUpdate<Balance>(
       pending: updateId,
       pendingTransfer: pendingTransfer
     };
-    console.log(`insert new account ${accountId} with balance ${zeroBalanceFn()}`);
     await accounts.insertOne(newAccount);
     voteAccount = newAccount;
   }
 
-  console.log(`${voteAccount.balance}, ${amount} ${accountHasFundsFn(voteAccount.balance, amount)}`);
   // Throw an error if the balance in acct would be negative after updating
   if (!accountHasFundsFn(voteAccount.balance, amount)) {
-    console.log('account doesn t have funds');
     await abortAccountUpdate(updateId);
-    console.log('throwin error');
     throw new Error(noFundsMsg(accountId));
   }
-  console.log('acount has funds');
 
   return voteAccount;
 }
 
 async function commitAccountUpdate<Balance>(
-  account: AccountPendingDoc<Balance>, newBalance: Balance) {
+  account: AccountPendingDoc<Balance>, newBalance: Balance,
+  isZeroBalanceFn: IsZeroBalanceFn<Balance>) {
   const reqIdPendingFilter = {
     'pendingTransfer.updateId': account.pendingTransfer.updateId
   };
-  const commitUpdateOp = {
-    $set: { balance: newBalance },
-    $unset: { pendingTransfer: '', pending: '' }
-  };
-  const res = await accounts
-    .updateOne(reqIdPendingFilter, commitUpdateOp);
-  assert.ok(
-    res.matchedCount === 1,
-    `Expected matchedCount of update to be 1, ` +
-    `but got ${res.matchedCount}`);
-  assert.ok(
-    res.modifiedCount === 1,
-    `Expected modifiedCount of update to be 1, ` +
-    `but got ${res.modifiedCount}`);
+  console.log(
+    `New balance for account ${account.id} is ${JSON.stringify(newBalance)}`);
+  if (isZeroBalanceFn(newBalance)) {
+    console.log(`Balance is 0, deleting ${account.id}`);
+    const res = await accounts.deleteOne(reqIdPendingFilter);
+    assert.ok(
+      res.deletedCount === 1,
+      `Expected deletedCount of update to be 1, ` +
+      `but got ${res.deletedCount}`);
+  } else {
+    const commitUpdateOp = {
+      $set: { balance: newBalance },
+      $unset: { pendingTransfer: '', pending: '' }
+    };
+    const res = await accounts
+      .updateOne(reqIdPendingFilter, commitUpdateOp);
+    assert.ok(
+      res.matchedCount === 1,
+      `Expected matchedCount of update to be 1, ` +
+      `but got ${res.matchedCount}`);
+    assert.ok(
+      res.modifiedCount === 1,
+      `Expected modifiedCount of update to be 1, ` +
+      `but got ${res.modifiedCount}`);
+  }
 
   return;
 }
@@ -338,18 +347,19 @@ async function abortAccountUpdate(updateId: string) {
 
 /**
  * Adds `amount` to the balance of account `accountId` and adds `transfer`
- * to its transfer log if the account has sufficient funds (amount could be
+ * to the transfer log if the account has sufficient funds (amount could be
  * negative)
  *
  * @param accountId the id of the account that will receive `amount`
- * @param amount the amount to add to the account. Use a negative number to
- *               subtract money from the account.
+ * @param amount the balance to add to the account. Use a negative number to
+ *               subtract from the account.
  * @param transfer the transfer object to add to the log
  * @param updateId the id of the update
  * @param action the action to perform
  * @param accountHasFundsFn fn that returns true if the account has funds
  * @param newBalanceFn fn to compute the new account balance
  * @param zeroBalanceFn fn to retrieve the initial balance of a new account
+ * @param isZeroBalanceFn fn to check if a given balance is 0
  * @throws error if the account doesn't exists, has insufficient funds, or has
  *         a pending update
  */
@@ -358,7 +368,8 @@ async function addToBalance<Balance>(
   updateId: string, action: 'vote' | 'commit' | 'abort' | undefined,
   accountHasFundsFn: AccountHasFundsFn<Balance>,
   newBalanceFn: NewBalanceFn<Balance>,
-  zeroBalanceFn: ZeroBalanceFn<Balance>)
+  zeroBalanceFn: ZeroBalanceFn<Balance>,
+  isZeroBalanceFn: IsZeroBalanceFn<Balance>)
   : Promise<AccountDoc<Balance> | undefined> {
   if (_.isEmpty(accountId)) {
     throw new Error(`Invalid account id ${accountId}`);
@@ -367,7 +378,7 @@ async function addToBalance<Balance>(
     throw new Error(`Invalid update id ${updateId}`);
   }
 
-  console.log(`to ${accountId} ${amount}`);
+  console.log(`Adding ${JSON.stringify(amount)} to ${accountId}`);
   switch (action) {
     case 'vote':
       return await voteAccountUpdate<Balance>(
@@ -387,7 +398,8 @@ async function addToBalance<Balance>(
             accountId, amount, transfer, updateId,
             accountHasFundsFn, zeroBalanceFn);
         const newBalance = newBalanceFn(account.balance, amount);
-        await commitAccountUpdate<Balance>(account, newBalance);
+        await commitAccountUpdate<Balance>(
+          account, newBalance, isZeroBalanceFn);
 
         return account;
       } catch (e) {
@@ -406,7 +418,8 @@ async function addToBalance<Balance>(
       }
 
       const newCommitBalance = newBalanceFn(commitAccount.balance, amount);
-      await commitAccountUpdate<Balance>(commitAccount, newCommitBalance);
+      await commitAccountUpdate<Balance>(
+        commitAccount, newCommitBalance, isZeroBalanceFn);
 
       return;
     case 'abort':
@@ -417,15 +430,16 @@ async function addToBalance<Balance>(
 }
 
 let typeDefinitions, resolvers;
-if (config.balance === 'money') {
+if (config.balanceType === 'money') {
 
   const schemaPath = path.join(__dirname, 'schema.graphql');
   typeDefinitions = [
     _.replace(
-      readFileSync(schemaPath, 'utf8'),
+      _.replace(
+        readFileSync(schemaPath, 'utf8'),
+        /#BalanceInput/g, 'Float'),
       /#Balance/g, 'Float')
   ];
-  console.log(typeDefinitions);
 
   const newBalanceFn: NewBalanceFn<number> =
     (accountBalance: number, transferAmount: number) => (
@@ -438,22 +452,31 @@ if (config.balance === 'money') {
   const negateBalanceFn: NegateBalanceFn<number> =
     (balance: number) => -balance;
   const zeroBalanceFn: ZeroBalanceFn<number> = () => 0;
+  const isZeroBalanceFn: IsZeroBalanceFn<number> =
+    (balance: number) => balance === 0;
 
   resolvers = getResolvers<number>(
     accountHasFundsFn, newBalanceFn, negateBalanceFn,
-    zeroBalanceFn);
+    zeroBalanceFn, isZeroBalanceFn);
 
 } else {
   const schemaPath = path.join(__dirname, 'schema.graphql');
   typeDefinitions = [
     _.replace(
-      readFileSync(schemaPath, 'utf8')
-        .concat(`
-          type ItemCount {
-            itemId: ID!
-            count: Number
-          }
-        `),
+      _.replace(
+        readFileSync(schemaPath, 'utf8')
+          .concat(`
+            input ItemCountInput {
+              itemId: ID!
+              count: Int
+            }
+
+            type ItemCount {
+              itemId: ID!
+              count: Int
+            }
+          `),
+        /#BalanceInput/g, '[ItemCountInput]'),
       /#Balance/g, '[ItemCount]')
   ];
 
@@ -470,9 +493,9 @@ if (config.balance === 'money') {
         const prevItemCount = _.get(accountBalanceMap, itemCount.itemId, 0);
         const newCount = prevItemCount + itemCount.count;
         if (newCount === 0) {
-          delete accountBalanceMap[itemCount.count];
+          delete accountBalanceMap[itemCount.itemId];
         } else {
-          accountBalanceMap[itemCount.itemId] = prevItemCount + itemCount.count;
+          accountBalanceMap[itemCount.itemId] = newCount;
         }
       });
 
@@ -499,10 +522,19 @@ if (config.balance === 'money') {
       });
     };
   const zeroBalanceFn: ZeroBalanceFn<ItemCount[]> = () => [];
+  const isZeroBalanceFn: IsZeroBalanceFn<ItemCount[]> =
+    (balance: ItemCount[]) => _.isEmpty(balance);
 
   resolvers = getResolvers<ItemCount[]>(
     accountHasFundsFn, newBalanceFn,
-    negateBalanceFn, zeroBalanceFn);
+    negateBalanceFn, zeroBalanceFn, isZeroBalanceFn);
+
+  _.merge(resolvers, {
+    ItemCount: {
+      itemId: (itemCount: ItemCount) => itemCount.itemId,
+      count: (itemCount: ItemCount) => itemCount.count
+    }
+  });
 }
 
 const schema = makeExecutableSchema({ typeDefs: typeDefinitions, resolvers });

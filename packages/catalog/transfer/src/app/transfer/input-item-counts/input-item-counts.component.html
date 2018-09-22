@@ -1,0 +1,10 @@
+<dv-stage [formControl]="itemsControl"
+  [stageEntity]="{
+    type: createItemCount,
+    outputMap: { stage: 'itemCount' }
+  }"
+  [showEntity]="{
+    type: showItemCount,
+    inputMap: { entity: 'itemCount' }
+  }">
+</dv-stage>

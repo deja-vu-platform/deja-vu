@@ -11,5 +11,6 @@
 </div>
 
 <div *ngIf="showAmount && transfer.amount">
-  {{transfer.amount}}
+  <transfer-show-amount [amount]="transfer.amount">
+  </transfer-show-amount>
 </div>

@@ -18,8 +18,8 @@
     </dv-input-id>
   </div>
   <div *ngIf="showOptionToInputBalance" class="form-group">
-    <transfer-input-money formControlName="amountControl">
-    </transfer-input-money>
+    <transfer-input-amount formControlName="amountControl">
+    </transfer-input-amount>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
     <button mat-button type="submit" [disabled]="!addToBalanceForm.valid">

@@ -1,0 +1,6 @@
+<div *ngIf="balanceType === 'money'">
+  {{amount}}
+</div>
+<div *ngIf="balanceType === 'items'">
+  <transfer-show-items [itemCounts]="amount"></transfer-show-items>
+</div>

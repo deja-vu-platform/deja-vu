@@ -9,12 +9,12 @@ input CreateTransferInput {
   id: ID
   fromId: ID!
   toId: ID!
-  amount: #Balance!
+  amount: #BalanceInput!
 }
 
 input AddToBalanceInput {
   accountId: ID!
-  amount: #Balance!
+  amount: #BalanceInput!
 }
 
 input TransfersInput {

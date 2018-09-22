@@ -7,7 +7,7 @@ import {
   OnInit
 } from '@angular/core';
 import {GatewayService, GatewayServiceFactory} from 'dv-core';
-import {API_PATH} from '../transfer.config';
+import { API_PATH, CONFIG } from '../transfer.config';
 
 
 interface BalanceRes {
@@ -24,11 +24,15 @@ export class ShowBalanceComponent implements OnInit, OnChanges {
   @Input() accountId: string;
   @Input() balance: any;
 
+  balanceType: 'money' | 'items';
+
   private gs: GatewayService;
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(API_PATH) private apiPath) {}
+    @Inject(API_PATH) private apiPath, @Inject(CONFIG) config) {
+    this.balanceType = config.balanceType;
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -43,11 +47,12 @@ export class ShowBalanceComponent implements OnInit, OnChanges {
     if (!this.gs || this.balance || !this.accountId) {
       return;
     }
+    const selection = this.balanceType === 'money' ? '' : ' { itemId, count }';
     this.gs.get<BalanceRes>(this.apiPath, {
       params: {
         query: `
           query {
-           balance(accountId: "${this.accountId}")
+           balance(accountId: "${this.accountId}") ${selection}
           }
         `
       }

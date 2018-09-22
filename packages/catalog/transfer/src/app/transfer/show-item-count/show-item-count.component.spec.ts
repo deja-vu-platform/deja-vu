@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreateTransferComponent } from './create-transfer.component';
+import { ShowItemCountComponent } from './show-item-count.component';
 
-describe('CreateTransferComponent', () => {
-  let component: CreateTransferComponent;
-  let fixture: ComponentFixture<CreateTransferComponent>;
+describe('ShowItemCountComponent', () => {
+  let component: ShowItemCountComponent;
+  let fixture: ComponentFixture<ShowItemCountComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CreateTransferComponent ]
+      declarations: [ ShowItemCountComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CreateTransferComponent);
+    fixture = TestBed.createComponent(ShowItemCountComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

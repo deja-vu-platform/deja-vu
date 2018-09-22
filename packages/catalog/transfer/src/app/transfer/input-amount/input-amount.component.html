@@ -1,0 +1,9 @@
+<div *ngIf="balanceType === 'money'">
+  <transfer-input-money [formControl]="amountControl"
+  [moneyInputPlaceholder]="inputPlaceholder">
+  </transfer-input-money>
+</div>
+<div *ngIf="balanceType === 'items'">
+  <transfer-input-item-counts [formControl]="amountControl">
+  </transfer-input-item-counts>
+</div>

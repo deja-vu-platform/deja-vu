@@ -1,0 +1,20 @@
+<form (ngSubmit)="onSubmit()"
+      [formGroup]="createItemCountForm"
+      class="form-horizontal">
+  <dv-input-id [formControl]="itemIdControl">
+  </dv-input-id>
+  <mat-form-field>
+    <mat-label>{{inputCountPlaceholder}}</mat-label>
+    <input matInput required type="number"
+           [formControl]="countControl"
+           name="moneyControl">
+    <mat-error *ngIf="countControl.hasError('required')">
+      {{inputCountPlaceholder}} is <strong>required</strong>
+    </mat-error>
+  </mat-form-field>
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!createItemCountForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

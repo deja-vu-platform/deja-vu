@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, Input, OnChanges, OnInit, Type
+  Component, ElementRef, Inject, Input, OnChanges, OnInit, Type
 } from '@angular/core';
 import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
 
@@ -7,6 +7,7 @@ import { Transfer } from '../shared/transfer.model';
 import {
   ShowTransferComponent
 } from '../show-transfer/show-transfer.component';
+import { CONFIG } from '../transfer.config';
 
 
 @Component({
@@ -35,12 +36,16 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
   @Input() noTransfersToShowText = 'No transfers to show';
   transfers: Transfer[] = [];
 
+  balanceType: 'money' | 'items';
+
   showTransfers;
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(CONFIG) config) {
     this.showTransfers = this;
+    this.balanceType = config.balanceType;
   }
 
   ngOnInit() {
@@ -54,6 +59,8 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
 
   fetchTransfers() {
     if (this.gs) {
+      const selection = this.balanceType === 'money' ?
+        '' : ' { itemId, count }';
       this.gs
         .get<{data: {transfers: Transfer[]}}>('/graphql', {
           params: {
@@ -63,7 +70,7 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
                   ${this.showId ? 'id' : ''}
                   ${this.showFromId ? 'fromId' : ''}
                   ${this.showToId ? 'toId' : ''}
-                  ${this.showAmount ? 'amount' : ''}
+                  ${this.showAmount ? `amount ${selection}` : ''}
                 }
               }
             `,

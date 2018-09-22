@@ -6,7 +6,8 @@
     }
   },
   "config": {
-    "wsPort": 3001
+    "wsPort": 3001,
+    "balanceType": "items"
   },
   "actions": {
     "package": {

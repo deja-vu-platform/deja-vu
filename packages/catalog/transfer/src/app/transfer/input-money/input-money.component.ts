@@ -10,6 +10,9 @@ import { OnAfterCommit, RunService } from 'dv-core';
 
 import { startWith } from 'rxjs/operators';
 
+import * as _ from 'lodash';
+
+
 @Component({
   selector: 'transfer-input-money',
   templateUrl: './input-money.component.html',
@@ -33,7 +36,9 @@ export class InputMoneyComponent
   @Output() money = new EventEmitter<number>();
 
   // Presentation inputs
-  @Input() moneyInputPlaceholder = 'Amount';
+  @Input() moneyInputPlaceholder;
+  moneyInputLabel = _.isEmpty(this.moneyInputPlaceholder) ?
+    'Amount' : this.moneyInputPlaceholder;
 
   constructor(private elem: ElementRef, private rs: RunService) {}
 
