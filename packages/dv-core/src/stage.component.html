@@ -1,0 +1,54 @@
+<div *ngIf="stageEntity">
+  <dv-include [action]="stageEntity"
+              [outputs]="{ stage: 'stage' }"
+              [parent]="stageComponent">
+  </dv-include>
+</div>
+<div *ngIf="!stageEntity" class="row">
+  <div class="col-md-12">
+    <form (ngSubmit)="onSubmit()"
+          [formGroup]="stageForm"
+          class="form-horizontal">
+
+      <div *ngIf="!stageEntity">
+        <dv-input-id formControlName="entityControl"></dv-input-id>
+      </div>
+      <button mat-button type="submit" [disabled]="!stageForm.valid">
+        {{stageButtonLabel}}
+      </button>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="stageHeader" class="row">
+  <div class="col-md-12">
+    <dv-include [action]="stageHeader" [parent]="stageComponent">
+    </dv-include>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <ul *ngIf="staged && staged.length > 0" class="list-group">
+      <li *ngFor="let entity of staged; index as i" class="list-group-item">
+        <div class="row">
+          <div class="col-md-10">
+            <div *ngIf="showEntity">
+              <dv-include [action]="showEntity" [inputs]="{ entity: entity }"
+                          [parent]="stageComponent">
+              </dv-include>
+            </div>
+            <div *ngIf="!showEntity">
+              {{entity}}
+            </div>
+          </div>
+          <div class="col-md-2">
+            <button mat-button (click)="unstage(i)" class="eject">
+                <i class="material-icons icon">eject</i>
+            </button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+</div>

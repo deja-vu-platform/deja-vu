@@ -11,6 +11,7 @@ import { TxComponent } from './tx.component';
 import { IdComponent } from './id.component';
 import { IdsComponent } from './ids.component';
 import { InputIdComponent } from './input-id.component';
+import { StageComponent } from './stage.component';
 import { ButtonComponent } from './button.component';
 import { ButtonLastComponent } from './button-last.component';
 import { LinkComponent } from './link.component';
@@ -27,14 +28,13 @@ const allComponents = [
   IdComponent, IdsComponent, TxComponent, IncludeComponent,
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
   StatusComponent, MergeComponent,
-  InputIdComponent
+  InputIdComponent, StageComponent
 ];
 
 @NgModule({
   imports: [
     CommonModule,
     HttpClientModule,
-    FormsModule,
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
