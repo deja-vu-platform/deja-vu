@@ -68,14 +68,9 @@ implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
 
   registerOnTouched() {}
 
-  validate(c: FormControl): ValidationErrors {
-    if (this.idControl.pristine) {
-      return null;
-    }
-
+  validate(_c: FormControl): ValidationErrors | null {
     return this.idControl.errors;
   }
-
 
   dvOnAfterCommit() {
     this.reset();

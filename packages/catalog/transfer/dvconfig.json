@@ -1,0 +1,24 @@
+{
+  "name": "transfer",
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "config": {
+    "wsPort": 3001,
+    "balanceType": "items"
+  },
+  "actions": {
+    "package": {
+      "include": [
+        "src/app/transfer/**"
+      ]
+    },
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "transfer-root"}
+      ]
+    }
+  }
+}

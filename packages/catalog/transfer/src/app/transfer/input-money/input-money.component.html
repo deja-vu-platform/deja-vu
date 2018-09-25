@@ -1,0 +1,9 @@
+<mat-form-field>
+  <mat-label>{{moneyInputLabel}}</mat-label>
+  <input matInput required
+    [formControl]="moneyControl"
+    name="moneyControl">
+  <mat-error *ngIf="moneyControl.hasError('required')">
+    {{moneyInputLabel}} is <strong>required</strong>
+  </mat-error>
+</mat-form-field>

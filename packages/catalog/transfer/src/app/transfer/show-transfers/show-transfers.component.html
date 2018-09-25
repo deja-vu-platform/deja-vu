@@ -1,0 +1,13 @@
+<ul *ngIf="transfers && transfers.length > 0" class="list-group">
+  <li *ngFor="let transfer of transfers" class="list-group-item">
+    <dv-include [action]="showTransfer" tag="transfer-show-transfer" [inputs]="{
+        transfer: transfer
+      }"
+      [parent]="showTransfers">
+    </dv-include>
+  </li>
+</ul>
+
+<div *ngIf="!transfers || transfers.length === 0">
+  <span>{{noTransfersToShowText}}</span>
+</div>

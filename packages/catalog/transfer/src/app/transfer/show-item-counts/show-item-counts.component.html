@@ -1,0 +1,23 @@
+<ul *ngIf="itemCounts && itemCounts.length > 0" class="list-group">
+  <li *ngFor="let itemCount of itemCounts" class="list-group-item">
+    <dv-include [action]="showItemCount" tag="transfer-show-item"
+                [inputs]="{ itemCount: itemCount }"
+                [parent]="showItemCounts">
+    </dv-include>
+
+    <!---
+    <div *ngIf="showOptionToBuy">
+      <transfer-create-transfer
+        [itemId]="item.id"
+        [toId]="optionToBuyToId"
+        [buttonLabel]="optionToBuyButtonLabel"
+        [inputQuantityLabel]="optionToBuyInputQuantityLabel">
+      </market-create-transfer>
+    </div>
+    -->
+  </li>
+</ul>
+
+<div *ngIf="!itemCounts || itemCounts.length === 0">
+  <span>{{noItemsToShowText}}</span>
+</div>

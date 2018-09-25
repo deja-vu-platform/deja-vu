@@ -1,0 +1,29 @@
+<form (ngSubmit)="onSubmit()"
+  [formGroup]="addToBalanceForm"
+  class="form-horizontal">
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <div *ngIf="newTransferSaved">
+      <i class="material-icons">done</i>
+      {{newTransferSavedText}}
+    </div>
+    <mat-error *ngIf="newTransferError">
+      <i class="material-icons">report_problem</i>
+      {{newTransferError}}
+    </mat-error>
+  </div>
+  <div class="form-group">
+    <dv-input-id
+      [entityName]="accountIdInputPlaceholder"
+      formControlName="accountIdControl">
+    </dv-input-id>
+  </div>
+  <div *ngIf="showOptionToInputBalance" class="form-group">
+    <transfer-input-amount formControlName="amountControl">
+    </transfer-input-amount>
+  </div>
+  <div *ngIf="showOptionToSubmit" class="form-group">
+    <button mat-button type="submit" [disabled]="!addToBalanceForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>

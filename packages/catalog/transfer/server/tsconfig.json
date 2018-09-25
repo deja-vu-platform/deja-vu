@@ -5,8 +5,7 @@
     "module": "commonjs",               /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
     "declaration": true,                /* Generates corresponding '.d.ts' file. */
     "sourceMap": true,                  /* Generates corresponding '.map' file. */
-    "outDir": "./dist",                 /* Redirect output structure to the directory. */
-    "rootDir": "./src",
+    "outDir": "../dist/server",         /* Redirect output structure to the directory. */
 
     /* Strict Type-Checking Options */
     "strict": true,                     /* Enable all strict type-checking options. */
@@ -19,7 +18,6 @@
     "noUnusedLocals": true,             /* Report errors on unused locals. */
     "noUnusedParameters": true,         /* Report errors on unused parameters. */
     "noImplicitReturns": true,          /* Report error when not all code paths in function return a value. */
-    "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 
     /* Module Resolution Options */
     "moduleResolution": "node",         /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */
@@ -29,6 +27,10 @@
     "emitDecoratorMetadata": true,      /* Enables experimental support for emitting type metadata for decorators. */
     "typeRoots": [
       "node_modules/@types"
+    ],
+    "lib": [
+      "es2017",
+      "esnext.asynciterable"
     ]
   }
 }
