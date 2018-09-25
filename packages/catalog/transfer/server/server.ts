@@ -351,14 +351,15 @@ async function abortAccountUpdate(updateId: string) {
  * negative)
  *
  * @param accountId the id of the account that will receive `amount`
- * @param amount the balance to add to the account. Use a negative number to
+ * @param amount the balance to add to the account. Use a negative balance to
  *               subtract from the account.
  * @param transfer the transfer object to add to the log
  * @param updateId the id of the update
  * @param action the action to perform
  * @param accountHasFundsFn fn that returns true if the account has funds
  * @param newBalanceFn fn to compute the new account balance
- * @param zeroBalanceFn fn to retrieve the initial balance of a new account
+ * @param zeroBalanceFn fn to retrieve the 0 balance. This will be used as
+ *                      the initial balance of a new account
  * @param isZeroBalanceFn fn to check if a given balance is 0
  * @throws error if the account doesn't exists, has insufficient funds, or has
  *         a pending update
