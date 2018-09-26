@@ -212,7 +212,7 @@ const resolvers = {
       root, { input }: { input: EditCommentInput }, context: Context) => {
       const comment = await Validation.commentExistsOrFails(input.id);
 
-      if (comment!.authorId !== input.authorId) {
+      if (comment.authorId !== input.authorId) {
         throw new Error('Only the author of the comment can edit it.');
       }
 
