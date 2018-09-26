@@ -103,14 +103,14 @@ mongodb.MongoClient.connect(
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  static async commentExistsOrFails(id: string): Promise<CommentDoc | null> {
+  static async commentExistsOrFails(id: string): Promise<CommentDoc> {
     const comment: CommentDoc | null = await comments
       .findOne({ id: id });
     if (_.isNil(comment)) {
       throw new Error(`Comment ${id} not found`);
     }
 
-    return comment;
+    return comment!;
   }
 }
 
