@@ -18,6 +18,12 @@ interface CommentDoc {
   authorId: string;
   targetId: string;
   content: string;
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'create-comment' | 'edit-comment';
 }
 
 interface CreateCommentInput {
@@ -50,6 +56,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -95,27 +103,33 @@ mongodb.MongoClient.connect(
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-
-  static async commentExists(id: string): Promise<CommentDoc> {
-    return Validation.exists(comments, id, 'Comment');
-  }
-
-  private static async exists(collection, id: string, type: string) {
-    const doc = await collection.findOne({ id: id });
-    if (!doc) {
-      throw new Error(`${type} ${id} not found`);
+  static async commentExistsOrFails(id: string): Promise<CommentDoc | null> {
+    const comment: CommentDoc | null = await comments
+      .findOne({ id: id });
+    if (_.isNil(comment)) {
+      throw new Error(`Comment ${id} not found`);
     }
 
-    return doc;
+    return comment;
   }
+}
+
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingCreate(doc: CommentDoc | null) {
+  return _.get(doc, 'pending.type') === 'create-comment';
 }
 
 const resolvers = {
   Query: {
     comment: async (root, { id }) => {
-      const comment = await comments.findOne({ id: id });
+      const comment = await Validation.commentExistsOrFails(id);
 
-      if (_.isEmpty(comment)) {
+      if (_.isNil(comment) || isPendingCreate(comment)) {
         throw new Error(`Comment ${id} not found`);
       }
 
@@ -127,7 +141,7 @@ const resolvers = {
         authorId: input.byAuthorId, targetId: input.ofTargetId
       });
 
-      if (_.isEmpty(comment)) {
+      if (_.isNil(comment) || isPendingCreate(comment)) {
         throw new Error(`Comment not found`);
       }
 
@@ -135,7 +149,7 @@ const resolvers = {
     },
 
     comments: async (root, { input }: { input: CommentsInput }) => {
-      const filter = {};
+      const filter = { pending: { $exists: false } };
       if (!_.isEmpty(input.byAuthorId)) {
         // Comments by an author
         filter['authorId'] = input.byAuthorId;
@@ -147,7 +161,6 @@ const resolvers = {
 
       return comments.find(filter)
         .toArray();
-
     }
   },
 
@@ -159,30 +172,97 @@ const resolvers = {
   },
 
   Mutation: {
-    createComment: async (root, { input }: { input: CreateCommentInput }) => {
-      const comment: CommentDoc = {
+    createComment: async (
+      root, { input }: { input: CreateCommentInput }, context: Context) => {
+      const newComment: CommentDoc = {
         id: input.id ? input.id : uuid(),
         authorId: input.authorId,
         targetId: input.targetId,
         content: input.content
       };
-      await comments.insertOne(comment);
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-      return comment;
+      switch (context.reqType) {
+        case 'vote':
+          newComment.pending = {
+            reqId: context.reqId,
+            type: 'create-comment'
+          };
+        /* falls through */
+        case undefined:
+          await comments.insertOne(newComment);
+
+          return newComment;
+        case 'commit':
+          await comments.updateOne(
+            reqIdPendingFilter,
+            { $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await comments.deleteOne(reqIdPendingFilter);
+
+          return;
+      }
+
+      return newComment;
     },
 
-    editComment: async (root, { input }: { input: EditCommentInput }) => {
-      const comment = await Validation.commentExists(input.id);
+    editComment: async (
+      root, { input }: { input: EditCommentInput }, context: Context) => {
+      const comment = await Validation.commentExistsOrFails(input.id);
 
-      if (comment.authorId !== input.authorId) {
+      if (comment!.authorId !== input.authorId) {
         throw new Error('Only the author of the comment can edit it.');
       }
 
-      const updateOperation = { $set: { content: input.content } };
+      const updateOp = { $set: { content: input.content } };
+      const notPendingResourceFilter = {
+        id: input.id,
+        pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-      const res = await comments.updateOne({ id: input.id }, updateOperation);
+      switch (context.reqType) {
+        case 'vote':
+          await Validation.commentExistsOrFails(input.id);
+          const pendingUpdateObj = await comments
+            .updateOne(
+              notPendingResourceFilter,
+              {
+                $set: {
+                  pending: {
+                    reqId: context.reqId,
+                    type: 'edit-comment'
+                  }
+                }
+              });
+          if (pendingUpdateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
 
-      return res.modifiedCount === 1;
+          return true;
+        case undefined:
+          await Validation.commentExistsOrFails(input.id);
+          const updateObj = await comments
+            .updateOne(notPendingResourceFilter, updateOp);
+          if (updateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return updateObj.modifiedCount === 1;
+        case 'commit':
+          await comments.updateOne(
+            reqIdPendingFilter,
+            { ...updateOp, $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await comments.updateOne(
+            reqIdPendingFilter, { $unset: { pending: '' } });
+
+          return;
+      }
     }
   }
 };
@@ -190,6 +270,39 @@ const resolvers = {
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
 
 app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
   extended: true

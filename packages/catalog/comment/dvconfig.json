@@ -7,5 +7,15 @@
   },
   "config": {
     "wsPort": 3001
+  },
+  "actions": {
+    "package": {
+      "include": [ "src/app/comment/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "comment-root" }
+      ]
+    }
   }
 }
