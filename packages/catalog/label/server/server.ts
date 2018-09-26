@@ -204,49 +204,20 @@ const resolvers = {
         };
       });
 
-      const bulkUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
-        const newOp = JSON.parse(JSON.stringify(op));
-        newOp['updateOne']['update']['$push'] = { itemIds: input.itemId };
-
-        return newOp;
-      });
-
-      const bulkPendingUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
-        const newOp = JSON.parse(JSON.stringify(op));
-        newOp['updateOne']['update']['$set'] = {
-          pending: {
-            reqId: context.reqId,
-            type: 'add-labels-to-item'
-          }
-        };
-
-        return newOp;
-      });
-
-      const bulkCommitUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
-        const newOp = JSON.parse(JSON.stringify(op));
-        newOp['updateOne']['filter'] = reqIdPendingFilter;
-        newOp['updateOne']['update']['$unset'] = { pending: '' };
-
-        return newOp;
-      });
-
-      const bulkAbortUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
-        const newOp = JSON.parse(JSON.stringify(op));
-        newOp['updateOne']['filter'] = reqIdPendingFilter;
-        newOp['updateOne']['update'] = { pending: '' };
-
-        return newOp;
-      });
-
-      console.log(JSON.stringify(bulkUpdateBaseOps),
-        JSON.stringify(bulkUpdateOps),
-        JSON.stringify(bulkPendingUpdateOps),
-        JSON.stringify(bulkCommitUpdateOps),
-        JSON.stringify(bulkAbortUpdateOps));
-
       switch (context.reqType) {
         case 'vote':
+          const bulkPendingUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
+            const newOp = _.cloneDeep(op);
+            _.set(newOp, 'updateOne.update.$set', {
+              pending: {
+                reqId: context.reqId,
+                type: 'add-labels-to-item'
+              }
+            });
+
+            return newOp;
+          });
+
           const pendingResult = await labels.bulkWrite(bulkPendingUpdateOps);
           const pendingModified =
             pendingResult.modifiedCount ? pendingResult.modifiedCount : 0;
@@ -260,6 +231,13 @@ const resolvers = {
           return true;
 
         case undefined:
+          const bulkUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
+            const newOp = _.cloneDeep(op);
+            _.set(newOp, 'updateOne.update.$push', { itemIds: input.itemId });
+
+            return newOp;
+          });
+
           const result = await labels.bulkWrite(bulkUpdateOps);
           const modified = result.modifiedCount ? result.modifiedCount : 0;
           const upserted = result.upsertedCount ? result.upsertedCount : 0;
@@ -271,11 +249,27 @@ const resolvers = {
           return true;
 
         case 'commit':
+          const bulkCommitUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
+            const newOp = _.cloneDeep(op);
+            _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
+            _.set(newOp, 'updateOne.update.$unset', { pending: '' });
+
+            return newOp;
+          });
+
           await labels.bulkWrite(bulkCommitUpdateOps);
 
           return;
 
         case 'abort':
+          const bulkAbortUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
+            const newOp = _.cloneDeep(op);
+            _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
+            _.set(newOp, 'updateOne.update', { pending: '' });
+
+            return newOp;
+          });
+
           await labels.bulkWrite(bulkAbortUpdateOps);
 
           return;
