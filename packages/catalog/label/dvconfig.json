@@ -1,5 +1,6 @@
 {
   "name": "label",
+  "watch": true,
   "gateway": {
     "config": {
       "wsPort": 3000
@@ -8,5 +9,15 @@
   "config": {
     "wsPort": 3001
   },
-  "startServer": true
+  "startServer": true,
+  "actions": {
+    "package": {
+      "include": [ "src/app/label/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "label-root" }
+      ]
+    }
+  }
 }

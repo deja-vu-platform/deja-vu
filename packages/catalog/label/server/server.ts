@@ -15,6 +15,12 @@ import { makeExecutableSchema } from 'graphql-tools';
 interface LabelDoc {
   id: string;
   itemIds?: string[];
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'create-label' | 'add-labels-to-item';
 }
 
 interface LabelsInput {
@@ -37,6 +43,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -87,11 +95,34 @@ function standardizeLabel(id: string): string {
     .toLowerCase();
 }
 
+class Validation {
+  static async labelExistsOrFail(labelId: string): Promise<LabelDoc> {
+    const label: LabelDoc | null = await labels.findOne({ id: labelId });
+    if (_.isNil(label)) {
+      throw new Error(`Label ${labelId} not found`);
+    }
+
+    return label!;
+  }
+}
+
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingCreate(doc: LabelDoc | null) {
+  return _.get(doc, 'pending.type') === 'create-label';
+}
+
 const resolvers = {
   Query: {
     label: async (root, { id }) => {
-      const label = await labels.findOne({ id: standardizeLabel(id) });
-      if (_.isNil(label)) { throw new Error(`Label ${id} not found`); }
+      const label = await Validation.labelExistsOrFail(standardizeLabel(id));
+      if (_.isNil(label) || isPendingCreate(label)) {
+        throw new Error(`Label ${id} not found`);
+      }
 
       return label;
     },
@@ -105,7 +136,10 @@ const resolvers = {
       if (input.labelIds) {
         // Items matching all labelIds
         const standardizedLabelIds = _.map(input.labelIds, standardizeLabel);
-        matchQuery['id'] = { $in: standardizedLabelIds };
+        matchQuery['id'] = {
+          $in: standardizedLabelIds,
+          pending: { $exists: false }
+        };
         groupQuery['initialSet'] = { $first: '$itemIds' };
         initialValue = '$initialSet';
         reduceOperator['$setIntersection'] = ['$$value', '$$this'];
@@ -137,7 +171,7 @@ const resolvers = {
     },
 
     labels: async (root, { input }: { input: LabelsInput }) => {
-      const query = {}; // No labels filter
+      const query = { pending: { $exists: false } };
       if (input.itemId) {
         // Labels of an item
         query['itemIds'] = input.itemId;
@@ -154,34 +188,120 @@ const resolvers = {
   },
 
   Mutation: {
-    addLabelsToItem: async (root, { input }: { input: AddLabelsToItemInput }) =>
-    // tslint:disable-next-line:one-line
-    {
+    addLabelsToItem: async (
+      root, { input }: { input: AddLabelsToItemInput }, context: Context) => {
       const labelIds = _.map(input.labelIds, standardizeLabel);
 
-      const bulkUpdateOps = _.map(labelIds, (labelId) => {
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+
+      const bulkUpdateBaseOps = _.map(labelIds, (labelId) => {
         return {
           updateOne: {
-            filter: { id: labelId },
-            update: {
-              $push: { itemIds: input.itemId }
-            },
-            upsert: true
-          }
+            filter: { id: labelId, pending: { $exists: false } }
+          },
+          upsert: true
         };
       });
 
-      const result = await labels.bulkWrite(bulkUpdateOps);
-      const modified = result.modifiedCount ? result.modifiedCount : 0;
-      const upserted = result.upsertedCount ? result.upsertedCount : 0;
+      switch (context.reqType) {
+        case 'vote':
+          const bulkPendingUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
+            const newOp = _.cloneDeep(op);
+            _.set(newOp, 'updateOne.update.$set', {
+              pending: {
+                reqId: context.reqId,
+                type: 'add-labels-to-item'
+              }
+            });
 
-      return (modified + upserted === labelIds.length);
+            return newOp;
+          });
+
+          const pendingResult = await labels.bulkWrite(bulkPendingUpdateOps);
+          const pendingModified =
+            pendingResult.modifiedCount ? pendingResult.modifiedCount : 0;
+          const pendingUpserted =
+            pendingResult.upsertedCount ? pendingResult.upsertedCount : 0;
+
+          if (pendingModified + pendingUpserted !== labelIds.length) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+
+        case undefined:
+          const bulkUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
+            const newOp = _.cloneDeep(op);
+            _.set(newOp, 'updateOne.update.$push', { itemIds: input.itemId });
+
+            return newOp;
+          });
+
+          const result = await labels.bulkWrite(bulkUpdateOps);
+          const modified = result.modifiedCount ? result.modifiedCount : 0;
+          const upserted = result.upsertedCount ? result.upsertedCount : 0;
+
+          if (modified + upserted !== labelIds.length) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+
+        case 'commit':
+          const bulkCommitUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
+            const newOp = _.cloneDeep(op);
+            _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
+            _.set(newOp, 'updateOne.update.$unset', { pending: '' });
+
+            return newOp;
+          });
+
+          await labels.bulkWrite(bulkCommitUpdateOps);
+
+          return;
+
+        case 'abort':
+          const bulkAbortUpdateOps = _.map(bulkUpdateBaseOps, (op) => {
+            const newOp = _.cloneDeep(op);
+            _.set(newOp, 'updateOne.filter', reqIdPendingFilter);
+            _.set(newOp, 'updateOne.update', { pending: '' });
+
+            return newOp;
+          });
+
+          await labels.bulkWrite(bulkAbortUpdateOps);
+
+          return;
+      }
     },
 
-    createLabel: async (root, { id }) => {
+    createLabel: async (root, { id }, context: Context) => {
       const labelId = id ? standardizeLabel(id) : uuid();
       const newLabel: LabelDoc = { id: labelId };
-      await labels.insertOne(newLabel);
+
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+      switch (context.reqType) {
+        case 'vote':
+          newLabel.pending = {
+            reqId: context.reqId,
+            type: 'create-label'
+          };
+        /* falls through */
+        case undefined:
+          await labels.insertOne(newLabel);
+
+          return newLabel;
+        case 'commit':
+          await labels.updateOne(
+            reqIdPendingFilter,
+            { $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await labels.deleteOne(reqIdPendingFilter);
+
+          return;
+      }
 
       return newLabel;
     }
@@ -192,7 +312,44 @@ const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
+
+app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
+  extended: true
+}), graphqlExpress({ schema }));
+
+app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
 
 app.listen(config.wsPort, () => {
   console.log(`Running ${name} with config ${JSON.stringify(config)}`);
