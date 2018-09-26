@@ -1,9 +1,13 @@
 <ul *ngIf="comments && comments.length > 0" class="list-group">
   <li *ngFor="let comment of comments" class="list-group-item">
-    <dv-include [action]="showComment" [inputs]="{
+    <dv-include 
+      [action]="showComment" 
+      [inputs]="{
           comment: comment, showId: showId, showAuthor: showAuthor,
           showTarget: showTarget, showContent: showContent
-        }" [parent]="showComments">
+        }" 
+      [parent]="showComments"
+      tag="comment-show-comment">
     </dv-include>
   </li>
 </ul>
