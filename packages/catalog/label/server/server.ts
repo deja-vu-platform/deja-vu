@@ -96,13 +96,13 @@ function standardizeLabel(id: string): string {
 }
 
 class Validation {
-  static async labelExistsOrFail(labelId: string): Promise<LabelDoc | null> {
+  static async labelExistsOrFail(labelId: string): Promise<LabelDoc> {
     const label: LabelDoc | null = await labels.findOne({ id: labelId });
     if (_.isNil(label)) {
       throw new Error(`Label ${labelId} not found`);
     }
 
-    return label;
+    return label!;
   }
 }
 
@@ -197,8 +197,7 @@ const resolvers = {
       const bulkUpdateBaseOps = _.map(labelIds, (labelId) => {
         return {
           updateOne: {
-            filter: { id: labelId, pending: { $exists: false } },
-            update: {}
+            filter: { id: labelId, pending: { $exists: false } }
           },
           upsert: true
         };
