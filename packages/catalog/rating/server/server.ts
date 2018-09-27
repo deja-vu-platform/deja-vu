@@ -16,6 +16,12 @@ interface RatingDoc {
   sourceId: string;
   targetId: string;
   rating: number;
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'update-rating';
 }
 
 interface RatingInput {
@@ -41,6 +47,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -84,13 +92,23 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingUpdate(doc: RatingDoc | null) {
+  return _.get(doc, 'pending.type') === 'update-rating';
+}
+
 const resolvers = {
   Query: {
     rating: async (root, { input }: { input: RatingInput }) => {
       const rating = await ratings
         .findOne({ sourceId: input.bySourceId, targetId: input.ofTargetId });
 
-      if (_.isNil(rating)) {
+      if (_.isNil(rating) || isPendingUpdate(rating)) {
         throw new Error(`Rating by ${input.bySourceId} for target
          ${input.ofTargetId} does not exist`);
       }
@@ -99,7 +117,7 @@ const resolvers = {
     },
 
     ratings: (root, { input }: { input: RatingsInput }) => {
-      const filter = {};
+      const filter = { pending: { $exists: false } };
       if (input.bySourceId) {
         // All ratings by a source
         filter['sourceId'] = input.bySourceId;
@@ -116,14 +134,14 @@ const resolvers = {
 
     averageRatingForTarget: async (root, { targetId }) => {
       const results = await ratings.aggregate([
-        { $match: { targetId: targetId } },
+        { $match: { targetId: targetId, pending: { $exists: false } } },
         {
           $group:
-            {
-              _id: 0,
-              average: { $avg: '$rating' },
-              count: { $sum: 1 }
-            }
+          {
+            _id: 0,
+            average: { $avg: '$rating' },
+            count: { $sum: 1 }
+          }
         }
       ])
         .toArray();
@@ -144,13 +162,67 @@ const resolvers = {
   },
 
   Mutation: {
-    updateRating: async (root, { input }: { input: UpdateRatingInput }) => {
-      const res = await ratings.updateMany(
-        { sourceId: input.sourceId, targetId: input.targetId },
-        { $set: { rating: input.newRating } },
-        { upsert: true });
+    updateRating: async (
+      root, { input }: { input: UpdateRatingInput }, context: Context) => {
+      const notPendingRatingFilter = {
+        sourceId: input.sourceId,
+        targetId: input.targetId,
+        pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-      return res.matchedCount === res.modifiedCount + res.upsertedCount;
+      switch (context.reqType) {
+        case 'vote':
+          const pendingUpdateObj = await ratings.updateMany(
+            notPendingRatingFilter,
+            {
+              $set: {
+                pending: {
+                  reqId: context.reqId,
+                  type: 'change-password'
+                }
+              }
+            });
+          if (pendingUpdateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+
+        case undefined:
+          const updateObj = await ratings.updateMany(
+            notPendingRatingFilter,
+            { $set: { rating: input.newRating } },
+            { upsert: true });
+          if (updateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+
+        case 'commit':
+          await ratings.updateMany(
+            reqIdPendingFilter,
+            {
+              $set: { rating: input.newRating },
+              $unset: { pending: '' }
+            },
+            { upsert: true }
+          );
+
+          return false;
+
+        case 'abort':
+          await ratings.updateMany(
+            reqIdPendingFilter,
+            { $unset: { pending: '' } },
+            { upsert: true }
+          );
+
+          return false;
+      }
+
+      return false;
     }
   }
 };
@@ -158,6 +230,39 @@ const resolvers = {
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    req['reqType'] = req.params[1];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: req!['reqType'],
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        const reqType = req!['reqType'];
+        switch (reqType) {
+          case 'vote':
+            return {
+              result: (gqlResp.errors) ? 'no' : 'yes',
+              payload: gqlResp
+            };
+          case 'abort':
+          case 'commit':
+            return 'ACK';
+          case undefined:
+            return gqlResp;
+        }
+      }
+    };
+  })
+);
 
 app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
   extended: true

@@ -6,7 +6,16 @@
     }
   },
   "config": {
-    "wsPort": 3001,
-    "reinitDbOnStartup": true
+    "wsPort": 3001
+  },
+  "actions": {
+    "package": {
+      "include": [ "src/app/rating/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "rating-root" }
+      ]
+    }
   }
 }
