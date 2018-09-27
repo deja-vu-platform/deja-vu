@@ -11,8 +11,8 @@ import { take } from 'rxjs/operators';
 import { API_PATH } from '../rating.config';
 import { Rating } from '../shared/rating.model';
 
-interface UpdateRatingRes {
-  data: { updateRating: boolean };
+interface SetRatingRes {
+  data: { setRating: boolean };
   errors: { message: string }[];
 }
 
@@ -61,7 +61,7 @@ export class RateTargetComponent implements
     this.loadRating();
   }
 
-  updateRating($event) {
+  setRating($event) {
     this.prevRatingValue = this.ratingValue;
     this.ratingValue = $event.rating;
     this.rs.run(this.elem);
@@ -82,9 +82,9 @@ export class RateTargetComponent implements
         .toPromise();
     }
 
-    this.gs.post<UpdateRatingRes>(this.apiPath, {
-      query: `mutation UpdateRating($input: UpdateRatingInput!) {
-            updateRating(input: $input)
+    this.gs.post<SetRatingRes>(this.apiPath, {
+      query: `mutation SetRating($input: SetRatingInput!) {
+            setRating(input: $input)
           }
         `,
       variables: {

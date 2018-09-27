@@ -34,7 +34,7 @@ interface RatingsInput {
   ofTargetId?: string;
 }
 
-interface UpdateRatingInput {
+interface SetRatingInput {
   sourceId: string;
   targetId: string;
   newRating?: number;
@@ -163,8 +163,8 @@ const resolvers = {
   },
 
   Mutation: {
-    updateRating: async (
-      root, { input }: { input: UpdateRatingInput }, context: Context) => {
+    setRating: async (
+      root, { input }: { input: SetRatingInput }, context: Context) => {
       const notPendingRatingFilter = {
         sourceId: input.sourceId,
         targetId: input.targetId,

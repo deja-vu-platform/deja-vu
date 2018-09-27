@@ -98,8 +98,7 @@ mongodb.MongoClient.connect(
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  static async resourceExistsOrFail(resourceId: string):
-    Promise<ResourceDoc | null> {
+  static async resourceExistsOrFail(resourceId: string): Promise<ResourceDoc> {
     const resource: ResourceDoc | null = await resources
       .findOne({ id: resourceId });
     if (!resource) {
