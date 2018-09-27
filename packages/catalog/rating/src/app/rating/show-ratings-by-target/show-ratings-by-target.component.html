@@ -1,9 +1,12 @@
 <ul *ngIf="ratings && ratings.length > 0" class="list-group">
   <li *ngFor="let rating of ratings" class="list-group-item">
-    <dv-include [action]="showRating" [inputs]="{
-      'ratingIn': rating.rating
-      }"
-      [parent]="showRatingsByTarget">
+    <dv-include 
+      [action]="showRating" 
+      [inputs]="{
+        'ratingIn': rating.rating
+        }"
+      [parent]="showRatingsByTarget"
+      tag="rating-show-rating">
     </dv-include>
   </li>
 </ul>
