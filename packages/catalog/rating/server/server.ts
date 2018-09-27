@@ -28,7 +28,7 @@ interface RatingsInput {
   ofTargetId?: string;
 }
 
-interface UpdateRatingInput {
+interface SetRatingInput {
   sourceId: string;
   targetId: string;
   newRating?: number;
@@ -144,7 +144,7 @@ const resolvers = {
   },
 
   Mutation: {
-    updateRating: async (root, { input }: { input: UpdateRatingInput }) => {
+    setRating: async (root, { input }: { input: SetRatingInput }) => {
       const res = await ratings.updateMany(
         { sourceId: input.sourceId, targetId: input.targetId },
         { $set: { rating: input.newRating } },
