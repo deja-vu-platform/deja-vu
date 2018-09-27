@@ -21,7 +21,7 @@ interface RatingDoc {
 
 interface PendingDoc {
   reqId: string;
-  type: 'update-rating';
+  type: 'set-rating';
 }
 
 interface RatingInput {
@@ -180,7 +180,7 @@ const resolvers = {
               $set: {
                 pending: {
                   reqId: context.reqId,
-                  type: 'change-password'
+                  type: 'set-rating'
                 }
               }
             },
