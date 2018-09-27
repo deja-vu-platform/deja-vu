@@ -134,6 +134,7 @@ const resolvers = {
 
     averageRatingForTarget: async (root, { targetId }) => {
       const results = await ratings.aggregate([
+        // Ignore ratings that are currently being updated
         { $match: { targetId: targetId, pending: { $exists: false } } },
         {
           $group:
@@ -182,7 +183,10 @@ const resolvers = {
                   type: 'change-password'
                 }
               }
-            });
+            },
+            { upsert: true }
+          );
+
           if (pendingUpdateObj.matchedCount === 0) {
             throw new Error(CONCURRENT_UPDATE_ERROR);
           }
