@@ -11,7 +11,7 @@ import { User } from '../shared/authentication.model';
 
 @Component({
   selector: 'authentication-logged-in',
-  template: ''
+  templateUrl: './logged-in.component.html',
 })
 export class LoggedInComponent implements OnInit, AfterViewInit {
   @Output() user = new EventEmitter();
