@@ -3,7 +3,10 @@
     <div class="col-md-12">
       <h1>Member Stage</h1>
       <group-stage (stagedIds)="stagedIds=$event"></group-stage>
-      Staged Ids: {{stagedIds}}
+      Staged Ids:
+      <ul>
+        <li *ngFor="let stagedId of stagedIds">{{stagedId}}</li>
+      </ul>
 
       <h1>Create Group of id <em>bens</em></h1>
       <group-create-group id="bens"
