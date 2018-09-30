@@ -23,6 +23,7 @@ input TransfersInput {
 }
 
 type Query {
+  transfer(id: ID!): Transfer
   transfers(input: TransfersInput): [Transfer]
   balance(accountId: ID!): #Balance
 }

@@ -160,6 +160,9 @@ function getResolvers<Balance>(
       transfers: async (_root, { input }: { input: TransfersInput }) => {
         return transfers.find({ ...input, pending: { $exists: false } })
           .toArray();
+      },
+      transfer: async (_root, { id }) => {
+        return transfers.findOne({ id: id });
       }
     },
     Mutation: {
