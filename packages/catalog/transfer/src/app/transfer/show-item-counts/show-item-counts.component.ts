@@ -8,7 +8,7 @@ import {
 import { ItemCount } from '../transfer.config';
 
 @Component({
-  selector: 'transfer-show-items',
+  selector: 'transfer-show-item-counts',
   templateUrl: './show-item-counts.component.html',
   styleUrls: ['./show-item-counts.component.css']
 })

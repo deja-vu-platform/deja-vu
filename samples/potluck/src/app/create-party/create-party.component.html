@@ -48,16 +48,16 @@
                     <group-create-group
                       [id]="partyId"
                       [showMember]="{ type: showGuestUsername }"
-                      [stageHeader]="{ type: guestListHeader }"
+                      [stageHeader]="{ type: guestListHeader, tag: 'potluck-guest-list-header' }"
                       memberAutocompletePlaceholder="Choose Guest"
                       stageMemberButtonLabel="Add to Guest List"
                       (stagedMemberIds)="stagedMemberIds=$event"
-                      [showOptionToAddGroups]="false"
                       [showOptionToSubmit]="false">
                     </group-create-group>
                   </div>
                   <div class="col-md-2"></div>
                   <div class="col-md-5">
+                    <!--
                     <market-create-goods
                       [marketId]="partyId"
                       [createGood]="{
@@ -75,6 +75,7 @@
 
                       (stagedGoods)="stagedSupplies=$event">
                     </market-create-goods>
+                    -->
                   </div>
                 </div>
 

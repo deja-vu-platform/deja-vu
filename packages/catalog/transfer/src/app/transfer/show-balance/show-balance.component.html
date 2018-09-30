@@ -1,1 +1,6 @@
-<transfer-show-amount [amount]="balance"></transfer-show-amount>
+<!-- <transfer-show-amount [amount]="balance"></transfer-show-amount> -->
+<dv-include [action]="showAmount"
+            default-showAmount="{ tag: transfer-show-amount }"
+            [inputs]="{ amount: balance }"
+            [parent]="showBalance">
+</dv-include>

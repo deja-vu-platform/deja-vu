@@ -7,10 +7,9 @@
 <ul *ngIf="showMembers && group?.memberIds.length > 0" class="list-group">
   <li *ngFor="let memberId of group.memberIds"
     class="list-group-item group-show-group-member-item">
-    <dv-include [action]="showMember" tag="group-show-member" [inputs]="{
-        id: memberId
-      }"
-      [parent]="showGroup">
+    <dv-include [action]="showMember" default-showMember="{ tag: group-show-member }"
+                [inputs]="{ id: memberId }"
+                [parent]="showGroup">
     </dv-include>
   </li>
 </ul>

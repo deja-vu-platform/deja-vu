@@ -3,7 +3,7 @@
 
   <div class="row">
     <div class="col-md-12">
-      <property-create-property
+      <property-create-property dvAlias="supply-item"
         dvOf="supply"
         name="item"
         (value)="item=$event">
@@ -13,6 +13,11 @@
 
   <div class="row">
     <div class="col-md-12">
+      <transfer-create-item-count
+        [id]="supplyId"
+        (itemCount)="good=$event">
+      </transfer-create-item-count>
+      <!--
       <market-create-good
         [id]="supplyId"
         [marketId]="partyId"
@@ -24,12 +29,13 @@
         [save]="save"
         (good)="good=$event">
       </market-create-good>
+      -->
     </div>
   </div>
 
   <div class="row">
     <div class="col-md-12">
-      <property-create-property
+      <property-create-property dvAlias="supply-unit"
         dvOf="supply"
         name="unit"
         (value)="unit=$event">

@@ -15,7 +15,7 @@
         <authorization-show-resources
           [viewableBy]="user?.id"
           [showResource]="{
-            type: showParty,
+            type: showParty, tag: 'potluck-show-party',
             inputMap: { id: 'partyId' },
             inputs: { loggedInUserId: user?.id }
           }"

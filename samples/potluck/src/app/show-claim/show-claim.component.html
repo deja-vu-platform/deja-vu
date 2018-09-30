@@ -1,8 +1,15 @@
+<!--
 <market-show-transaction
   [id]="id"
   [hidden]="true"
   (loadedTransaction)="claim=$event">
 </market-show-transaction>
+-->
+<transfer-show-transfer
+  [id]="id"
+  [hidden]="true"
+  (loadedTransfer)="claim=$event">
+</transfer-show-transfer>
 <div class="row">
   <div class="col-md-4">
     <property-show-object

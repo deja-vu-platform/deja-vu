@@ -159,7 +159,7 @@ function checkForErrors(actionName: string) {
       if (!_.isEmpty(repeatedFqTags) && fqtag === 'dv-tx') {
         throw new Error(`
           More than one element with the same fqtag inside a dv-tx
-          solution: use aliasing
+          solution: use aliasing (the dvAlias attribute)
           path: ${currPath}
           repeated fqtag: ${_.keys(repeatedFqTags)}
         `);
@@ -171,7 +171,7 @@ function checkForErrors(actionName: string) {
         if (!_.isEmpty(repeatedDvTxChildren)) {
           throw new Error(`
             More than one element with the same fqtag inside sibling dv-tx nodes
-            solution: use aliasing
+            solution: use aliasing (the dvAlias attribute)
             path: ${currPath}
             repeated fqtags: ${_.keys(repeatedDvTxChildren)}
           `);
@@ -188,7 +188,9 @@ function checkForErrors(actionName: string) {
 }
 
 /**
- *  @returns the fully qualified tag for the given tag
+ *  @returns the fully-qualified tag for the given tag. The fully-qualified tag
+ *           of an action is its `dvAlias` if one is given, `dvOf-actionName`
+ *           if a `dvOf` is given or `tag` if otherwise
  */
 function getFqTag(
   tag: string, dvOf: string | undefined, dvAlias: string | undefined): string {

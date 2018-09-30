@@ -18,11 +18,11 @@
         "reinitDbOnStartup": true
       }
     },
-    "market": {
+    "transfer": {
       "config": {
         "wsPort": 3004,
         "reinitDbOnStartup": true,
-        "enforceBalance": false
+        "balance": "items"
       }
     },
     "event": {
@@ -38,6 +38,7 @@
       }
     },
     "party": {
+      "name": "property",
       "config": {
         "wsPort": 3007,
         "reinitDbOnStartup": true,
@@ -60,6 +61,7 @@
       }
     },
     "supply": {
+      "name": "property",
       "config": {
         "wsPort": 3008,
         "reinitDbOnStartup": true,
@@ -78,5 +80,17 @@
         }
       }
     }
-  }
+  },
+  "actions": {
+    "app": {
+      "names": [
+        {"for": "src/app/app.component.html", "use": "potluck-root"}
+      ]
+    }
+  },
+  "routes": [
+    { "path": "parties", "action": "potluck-show-parties" },
+    { "path": "create-party", "action": "potluck-create-party" },
+    { "path": "", "action": "potluck-landing" }
+  ]
 }

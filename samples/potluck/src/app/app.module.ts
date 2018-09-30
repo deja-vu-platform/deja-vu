@@ -12,7 +12,7 @@ import { CreatePartyComponent } from './create-party/create-party.component';
 
 import { AuthenticationModule } from 'authentication';
 import { AuthorizationModule } from 'authorization';
-import { MarketModule } from 'market';
+import { TransferModule } from 'transfer';
 import { EventModule } from 'event';
 import { GroupModule } from 'group';
 import { PropertyModule } from 'property';
@@ -47,7 +47,7 @@ import { GuestListHeaderComponent } from './guest-list-header/guest-list-header.
     ]),
     AuthenticationModule,
     AuthorizationModule,
-    MarketModule,
+    TransferModule,
     EventModule,
     GroupModule,
     PropertyModule

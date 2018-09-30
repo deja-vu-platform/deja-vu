@@ -1,6 +1,6 @@
 <ul *ngIf="transfers && transfers.length > 0" class="list-group">
   <li *ngFor="let transfer of transfers" class="list-group-item">
-    <dv-include [action]="showTransfer" tag="transfer-show-transfer" [inputs]="{
+    <dv-include [action]="showTransfer" default-showTransfer="{tag: transfer-show-transfer}" [inputs]="{
         transfer: transfer
       }"
       [parent]="showTransfers">

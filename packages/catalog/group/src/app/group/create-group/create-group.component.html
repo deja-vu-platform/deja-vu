@@ -15,8 +15,8 @@
     <group-stage
       [initialStageIds]="initialMemberIds"
       [buttonLabel]="stageMemberButtonLabel"
-      [showMember]="showMember"
-      [stageHeader]="stageHeader"
+      [showMember]="showMember" default-showMember="{tag: group-show-member }"
+      [stageHeader]="stageHeader" no-default-stageHeader
       formControlName="membersAutocomplete">
     </group-stage>
   </div>

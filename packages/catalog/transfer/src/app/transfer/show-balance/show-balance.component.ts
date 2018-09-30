@@ -4,9 +4,10 @@ import {
   Inject,
   Input,
   OnChanges,
-  OnInit
+  OnInit, Type
 } from '@angular/core';
-import {GatewayService, GatewayServiceFactory} from 'dv-core';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import { ShowAmountComponent } from '../show-amount/show-amount.component';
 import { API_PATH, CONFIG } from '../transfer.config';
 
 
@@ -23,6 +24,11 @@ interface BalanceRes {
 export class ShowBalanceComponent implements OnInit, OnChanges {
   @Input() accountId: string;
   @Input() balance: any;
+
+  @Input() showAmount: Action = {
+    type: <Type<Component>> ShowAmountComponent
+  };
+  showBalance = this;
 
   balanceType: 'money' | 'items';
 

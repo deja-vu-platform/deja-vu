@@ -2,9 +2,11 @@
   <div class="panel panel-default">
     <div class="panel-body">
       <div class="row">
-        <dv-tx name="showPartyInfo" class="col-md-12">
+        <!-- need to respect dvAlias in the cli -->
+        <!-- <dv-tx dvAlias="showPartyInfo" class="col-md-12"> -->
+        <dv-tx class="col-md-12">
           <h3 class="party-title">
-            <property-show-object
+            <property-show-object dvAlias="show-party-title"
               dvOf="party" [id]="partyId" [showOnly]="['title']">
             </property-show-object>
           </h3>
@@ -25,21 +27,21 @@
             </p>
             <p>
               <i class="material-icons icon">location_on</i> Location:
-              <property-show-object
+              <property-show-object dvAlias="show-party-location"
                 dvOf="party" [id]="partyId" [showOnly]="['location']">
               </property-show-object>
             </p>
             <p>
-              <property-show-object
+              <property-show-object dvAlias="show-party-description"
                 dvOf="party" [id]="partyId" [showOnly]="['description']">
               </property-show-object>
             </p>
           </div>
-          <authorization-can-view
+          <authorization-can-view dvAlias="can-view-show-party-info"
             [principalId]="loggedInUserId"
             [resourceId]="partyId" [hidden]="true">
           </authorization-can-view>
-          <authentication-authenticate
+          <authentication-authenticate dvAlias="authenticate-show-party-info"
             [id]="loggedInUserId" [hidden]="true">
           </authentication-authenticate>
         </dv-tx>
@@ -55,17 +57,18 @@
       <div class="row" [hidden]="!viewMore">
         <div class="col-md-4">
           <div class="row">
-            <dv-tx name="invitedList" class="col-md-12">
+            <dv-tx class="col-md-12">
+            <!-- <dv-tx dvAlias="invitedList" class="col-md-12"> -->
               <h4>Invited List</h4>
               <group-show-members
                 [inGroupId]="partyId"
-                [showMember]="{type: showGuestUsername}">
+                [showMember]="{ type: showGuestUsername, tag: 'authentication-show-user' }">
               </group-show-members>
-              <authorization-can-view
+              <authorization-can-view dvAlias="can-view-invited-list"
                 [principalId]="loggedInUserId"
                 [resourceId]="partyId" [hidden]="true">
               </authorization-can-view>
-              <authentication-authenticate
+              <authentication-authenticate dvAlias="authenticate-invited-list"
                 [id]="loggedInUserId" [hidden]="true">
               </authentication-authenticate>
             </dv-tx>
@@ -76,7 +79,6 @@
               <group-add-to-group
                 [id]="partyId"
                 type="member"
-                [showMember]="{type: showGuestUsername}"
                 (selectedId)="selectedGuestId=$event"
                 autocompletePlaceholder="Choose Guest"
                 buttonLabel="Add to Guest List"
@@ -101,7 +103,8 @@
 
         <div class="col-md-7">
           <div class="row">
-            <dv-tx name="supplyList" class="col-md-12">
+            <!-- <dv-tx dvAlias="supplyList" class="col-md-12"> -->
+            <dv-tx class="col-md-12">
               <h4>Supply List</h4>
               <div class="container-fluid" style="padding: 0">
                 <div class="row row-bordered supply-list-header">
@@ -111,11 +114,16 @@
                 </div>
                 <div class="row">
                   <div class="col-md-12">
+                    <transfer-show-balance
+                      [showAmount]="{ type: showSupply, tag: 'potluck-show-supply' }"
+                      [accountId]="partyId">
+                    </transfer-show-balance>
+                    <!--
                     <market-show-goods
                       [showGood]="{
                         type: showSupply,
-                        inputMap: {good: 'supply'},
-                        inputs: {useIdForObject: true}
+                        inputMap: { good: 'supply' },
+                        inputs: { useIdForObject: true }
                       }"
                       [marketId]="partyId"
                       [optionToBuyBuyerId]="loggedInUserId"
@@ -123,10 +131,18 @@
                       noGoodsToShowText="No supplies needed"
                       optionToBuyButtonLabel="Claim">
                     </market-show-goods>
+                    -->
                   </div>
                 </div>
                 <div class="row">
                   <div class="col-md-12">
+                    <transfer-show-transfers
+                      [fromId]="partyId"
+                      noTransfersToShowText="No claims"
+                      [showTransfer]="{ type: showClaim, tag: 'potluck-show-claim', inputMap: { id: 'id'} }"
+                    >
+                    </transfer-show-transfers>
+                    <!--
                     <market-show-transactions
                       [marketId]="partyId"
                       noTransactionsToShowText="No claims"
@@ -135,14 +151,15 @@
                         inputMap: {id: 'id'}
                       }">
                     </market-show-transactions>
+                    -->
                   </div>
                 </div>
               </div>
-              <authorization-can-view
+              <authorization-can-view dvAlias="can-view-supply-list"
                 [principalId]="loggedInUserId"
                 [resourceId]="partyId" [hidden]="true">
               </authorization-can-view>
-              <authentication-authenticate
+              <authentication-authenticate dvAlias="authenticate-supply-list"
                 [id]="loggedInUserId" [hidden]="true">
               </authentication-authenticate>
             </dv-tx>

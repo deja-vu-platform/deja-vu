@@ -28,6 +28,8 @@ export class GatewayService {
     const seenNodes: string[] = [];
     while (node && node.getAttribute) {
       let name = node.nodeName.toLowerCase();
+      // We need to check dvAlias here, too?
+      // the fqtag is used in the action tree, but it's not sent here
       const dvOf: string = node.getAttribute(OF_ATTR);
       if (dvOf) {
         name = dvOf + name.substring(name.indexOf('-'));
