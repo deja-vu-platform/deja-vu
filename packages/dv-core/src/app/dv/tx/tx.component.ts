@@ -3,6 +3,6 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'dv-tx',
-  template: '<ng-content></ng-content>'
+  templateUrl: './tx.component.html'
 })
 export class TxComponent { }

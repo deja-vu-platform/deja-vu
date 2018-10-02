@@ -8,7 +8,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { Action } from './include.component';
+import { Action } from '../include/include.component';
 
 
 @Component({

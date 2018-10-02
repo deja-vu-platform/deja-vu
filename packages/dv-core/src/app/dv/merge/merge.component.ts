@@ -3,7 +3,7 @@ import {
   Input, EventEmitter, SimpleChanges
 } from '@angular/core';
 
-import { RunService, OnRun, OnAfterCommit } from './run.service';
+import { RunService, OnRun, OnAfterCommit } from '../run.service';
 
 import { take, filter } from 'rxjs/operators';
 
@@ -12,7 +12,7 @@ import * as _ from 'lodash';
 
 @Component({
   selector: 'dv-merge',
-  template: ``
+  templateUrl: './merge.component.html'
 })
 export class MergeComponent
 implements OnInit, OnChanges, OnRun, OnAfterCommit {

@@ -7,17 +7,17 @@ import {
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { HttpClientModule } from '@angular/common/http';
-import { TxComponent } from './tx.component';
-import { IdComponent } from './id.component';
-import { IdsComponent } from './ids.component';
-import { InputIdComponent } from './input-id.component';
-import { StageComponent } from './stage.component';
-import { ButtonComponent } from './button.component';
-import { ButtonLastComponent } from './button-last.component';
-import { LinkComponent } from './link.component';
-import { StatusComponent } from './status.component';
-import { MergeComponent } from './merge.component';
-import { IncludeComponent, IncludeDirective } from './include.component';
+import { TxComponent } from './tx/tx.component';
+import { IdComponent } from './id/id.component';
+import { IdsComponent } from './ids/ids.component';
+import { InputIdComponent } from './input-id/input-id.component';
+import { StageComponent } from './stage/stage.component';
+import { ButtonComponent } from './button/button.component';
+import { ButtonLastComponent } from './button-last/button-last.component';
+import { LinkComponent } from './link/link.component';
+import { StatusComponent } from './status/status.component';
+import { MergeComponent } from './merge/merge.component';
+import { IncludeComponent, IncludeDirective } from './include/include.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { RunService } from './run.service';
 

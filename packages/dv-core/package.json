@@ -32,7 +32,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "package": "ng-packagr -p ng-package.json",
+    "package": "dv package",
+    "dv-package-dv": "ng-packagr -p ng-package.json",
     "lint": "./node_modules/.bin/tslint -p . -c tslint.json src/*.ts"
   },
   "repository": {

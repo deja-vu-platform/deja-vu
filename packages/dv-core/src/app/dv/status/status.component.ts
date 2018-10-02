@@ -1,22 +1,13 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
-import { RunService, OnAfterCommit, OnAfterAbort } from './run.service';
+import { RunService, OnAfterCommit, OnAfterAbort } from '../run.service';
 
 
 const SAVED_MSG_TIMEOUT = 3000;
 
 @Component({
   selector: 'dv-status',
-  template: `
-    <div *ngIf="saved">
-      <i class="material-icons">done</i>
-        {{savedText}}
-    </div>
-    <div *ngIf="error">
-      <i class="material-icons">report_problem</i>
-      {{error}}
-    </div>
-  `
+  templateUrl: './status.component.html'
 })
 export class StatusComponent
 implements OnInit, OnAfterCommit, OnAfterAbort {

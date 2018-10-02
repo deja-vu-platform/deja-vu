@@ -3,12 +3,12 @@ import {
 } from '@angular/core';
 import { v4 as uuid } from 'uuid';
 
-import { RunService, OnAfterCommit } from './run.service';
+import { RunService, OnAfterCommit } from '../run.service';
 
 
 @Component({
   selector: 'dv-id',
-  template: ``
+  templateUrl: './id.component.html'
 })
 export class IdComponent implements OnInit, OnAfterCommit {
   @Output() id = new EventEmitter<string>();

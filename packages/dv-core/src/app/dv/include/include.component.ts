@@ -5,7 +5,7 @@ import {
 
 import * as _ from 'lodash';
 
-import { OF_ATTR } from './gateway.service';
+import { OF_ATTR } from '../gateway.service';
 
 
 @Directive({
@@ -63,7 +63,7 @@ export interface Action {
 
 @Component({
   selector: 'dv-include',
-  template: `<ng-template include-host></ng-template>`
+  templateUrl: './include.component.html'
 })
 export class IncludeComponent implements AfterViewInit {
   // The DV action to include (see interface Action)
