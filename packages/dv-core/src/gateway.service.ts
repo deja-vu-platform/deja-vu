@@ -17,6 +17,7 @@ export interface RequestOptions {
 export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 
 export const OF_ATTR = 'dvOf';
+export const ALIAS_ATTR = 'dvAlias';
 
 export class GatewayService {
   fromStr: string;
@@ -28,10 +29,12 @@ export class GatewayService {
     const seenNodes: string[] = [];
     while (node && node.getAttribute) {
       let name = node.nodeName.toLowerCase();
-      // We need to check dvAlias here, too?
       // the fqtag is used in the action tree, but it's not sent here
-      const dvOf: string = node.getAttribute(OF_ATTR);
-      if (dvOf) {
+      // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute
+      if (node.hasAttribute(ALIAS_ATTR)) {
+        name = node.getAttribute(ALIAS_ATTR);
+      } else if (node.hasAttribute(OF_ATTR)) {
+        const dvOf: string = node.getAttribute(OF_ATTR);
         name = dvOf + name.substring(name.indexOf('-'));
       }
       seenNodes.push(name);
