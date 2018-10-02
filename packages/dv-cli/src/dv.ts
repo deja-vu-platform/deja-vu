@@ -257,8 +257,11 @@ program
       npm(['run', `dv-package-${config.name}`]);
 
       updatePackage(pkg => {
-        pkg.peerDependencies['dv-gateway'] = 'file:' +
-          path.join('..', pkg.peerDependencies['dv-gateway'].slice('file:'.length));
+        if (_.has(pkg, 'peerDependencies.dv-gateway')) {
+          const newGatewayPath = path.join(
+            '..', pkg['peerDependencies']['dv-gateway'].slice('file:'.length));
+          pkg['peerDependencies']['dv-gateway'] = `file:${newGatewayPath}`;
+        }
         return pkg;
       }, NG_PACKAGR.configFileContents.dest);
 
