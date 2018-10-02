@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { NgModule, InjectionToken } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
   MatButtonModule, MatFormFieldModule, MatInputModule
@@ -35,7 +35,7 @@ import {
 
 import { DvModule } from 'dv-core';
 
-import { API_PATH } from './transfer.config';
+import { API_PATH, CONFIG, TransferConfig } from './transfer.config';
 
 const allComponents = [
   CreateTransferComponent, InputMoneyComponent, AddToBalanceComponent,
@@ -59,3 +59,5 @@ const allComponents = [
   exports: allComponents
 })
 export class TransferModule { }
+
+export const TRANSFER_CONFIG: InjectionToken<TransferConfig> = CONFIG;
