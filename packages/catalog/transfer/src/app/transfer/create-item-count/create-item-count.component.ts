@@ -25,6 +25,13 @@ export class CreateItemCountComponent
   // Presentation inputs
   @Input() inputCountPlaceholder = 'Count';
   @Input() buttonLabel = 'Add';
+  @Input() showOptionToInputItemId = true;
+  @Input() showOptionToCreate = true;
+
+  @Input()
+  set itemId(value: string) {
+    this.itemIdControl.setValue(value);
+  }
 
   @ViewChild(FormGroupDirective) form;
   createItemCountForm = this.builder.group({
@@ -52,9 +59,9 @@ export class CreateItemCountComponent
 
   dvOnAfterCommit() {
     // Can't do `this.form.reset();`
-     // See https://github.com/angular/material2/issues/4190
-     if (this.form) {
-       this.form.resetForm();
-     }
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
+    }
   }
 }

@@ -1,8 +1,10 @@
 <form (ngSubmit)="onSubmit()"
       [formGroup]="createItemCountForm"
       class="form-horizontal">
-  <dv-input-id [formControl]="itemIdControl">
-  </dv-input-id>
+  <div *ngIf="showOptionToInputItemId">
+    <dv-input-id [formControl]="itemIdControl">
+    </dv-input-id>
+  </div>
   <mat-form-field>
     <mat-label>{{inputCountPlaceholder}}</mat-label>
     <input matInput required type="number"
@@ -12,7 +14,7 @@
       {{inputCountPlaceholder}} is <strong>required</strong>
     </mat-error>
   </mat-form-field>
-  <div class="form-group">
+  <div *ngIf="showOptionToCreate" class="form-group">
     <button mat-button type="submit" [disabled]="!createItemCountForm.valid">
       {{buttonLabel}}
     </button>
