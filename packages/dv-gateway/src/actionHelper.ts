@@ -25,7 +25,13 @@ export interface ActionTag {
 
 export type ActionTagPath = ActionTag[];
 
+/**
+ * The action table is indexed by tag. If in the content of two actions we have
+ * an action of the same tag (but different `of`, or different `alias`) there
+ * would still be only one entry for that action in the table.
+ */
 export interface ActionTable {
+  // note: this is the real action tag, not the fqtag
   readonly [tag: string]: ActionAst;
 }
 
@@ -384,6 +390,9 @@ export class ActionHelper {
    * @returns the `ActionTag`s corresponding to the given action path
    */
   getMatchingPaths(actionPath: string[]): ActionTagPath[] {
+    // We assume here that the first tag in the action path is a simple tag
+    // so that fqtag = tag (i.e., the root action is not aliased and it is not
+    // from some cliche for which there's more than one instance of in the app)
     const firstTag = actionPath[0];
     if (_.isEmpty(actionPath) || !(firstTag in this.actionTable)) {
       return [];
