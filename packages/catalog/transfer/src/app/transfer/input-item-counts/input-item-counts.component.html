@@ -1,10 +1,12 @@
 <dv-stage [formControl]="itemsControl"
   [stageEntity]="{
     type: createItemCount,
+    tag: 'transfer-create-item-count',
     outputMap: { stage: 'itemCount' }
   }"
   [showEntity]="{
     type: showItemCount,
+    tag: 'transfer-show-item-count',
     inputMap: { entity: 'itemCount' }
   }">
 </dv-stage>

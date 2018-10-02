@@ -31,7 +31,6 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class AddToBalanceComponent
 implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputBalance = true;
 
@@ -42,6 +41,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   // Optional input values to override form control values
   @Input() set accountId(accountId: string) {
     this.accountIdControl.setValue(accountId);
+  }
+
+  @Input() set amount(amount: any) {
+    this.amountControl.setValue(amount);
   }
 
   // Presentation inputs
