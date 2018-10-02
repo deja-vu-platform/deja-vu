@@ -96,17 +96,38 @@ export function updateDvConfig(
   updateJsonFile(DVCONFIG_FILE_PATH, updateFn);
 }
 
-export function updatePackage(
-  updateFn: (pkg: any) => any, dir?: string): void {
-  const pkgPath: string = dir ? path.join(dir, 'package.json') : 'package.json';
-  updateJsonFile(pkgPath, updateFn);
+export interface PackageJson {
+  peerDependencies?: object;
+  dependencies?: object;
+  devDependencies?: object;
+  scripts?: object;
 }
 
-export function updateJsonFile(
-  path: string, updateFn: (curr: any) => any): void {
-  const obj = JSON.parse(readFileOrFail(path));
+/**
+ * Update the package.json file
+ *
+ * @param updateFn the function to use to apply the update
+ * @param dir where to look for a package.json file (defaults to the current
+ *            working directory)
+ */
+export function updatePackage(
+  updateFn: (pkg: PackageJson) => PackageJson, dir?: string): void {
+  const pkgPath: string = dir ? path.join(dir, 'package.json') : 'package.json';
+  updateJsonFile<PackageJson>(pkgPath, updateFn);
+}
+
+/**
+ * Update a generic JSON file
+ *
+ * @param pathOfJsonFile the path to the JSON file to update
+ * @param updateFn the function to use to apply the update
+ */
+export function updateJsonFile<T>(
+  pathOfJsonFile: string, updateFn: (curr: T) => T): void {
+  const obj = JSON.parse(readFileOrFail(pathOfJsonFile));
   const newObj = updateFn(obj);
-  writeFileOrFail(path, JSON.stringify(newObj, undefined, JSON_SPACE));
+  writeFileOrFail(
+    pathOfJsonFile, JSON.stringify(newObj, undefined, JSON_SPACE));
 }
 
 export function startGatewayCmd(configFilePath: string): string {
@@ -181,14 +202,14 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
   );
 
   console.log('Add npm script to serve');
-  updateJsonFile(path.join(name, 'package.json'), pkg => {
+  updatePackage(pkg => {
     pkg.scripts[`dv-start-gateway`] = START_THIS_GATEWAY_CMD;
     pkg.scripts[`dv-build-${name}`] = buildFeCmd(false);
     pkg.scripts[`dv-build-watch-${name}`] = buildFeCmd(true);
     pkg.scripts['concurrently'] = 'concurrently';
     pkg.scripts['tsc'] = 'tsc';
     return pkg;
-  });
+  }, name);
 
   // https://github.com/dherges/ng-packagr/issues/335
   ng(['set', 'defaults.build.preserveSymlinks', 'true'], name);

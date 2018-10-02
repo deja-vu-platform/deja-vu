@@ -69,5 +69,5 @@ program
         return pkg;
       });
     }
-  }) 
+  })
   .parse(process.argv);
