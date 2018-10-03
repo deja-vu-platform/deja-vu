@@ -25,11 +25,15 @@ type SignInOutput {
   user: User!
 }
 
+input UsersInput {
+  # nothing for now
+  _: Boolean
+}
 
 type Query {
   user(username: String!): User
   userById(id: String!): User
-  users: [User!]
+  users(input: UsersInput!): [User!]
   verify(id: ID!, token: String!): Boolean
 }
 

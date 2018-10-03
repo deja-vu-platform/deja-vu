@@ -1,0 +1,14 @@
+<ul *ngIf="users && users.length > 0" class="list-group">
+  <li *ngFor="let user of users" class="list-group-item">
+    <dv-include [action]="showUser" default-showUser="{ tag: authentication-show-user }"
+                [inputs]="{
+                  user: user, showId: showId, showUsername: showUsername
+                }"
+                [parent]="showUsers">
+    </dv-include>
+  </li>
+</ul>
+
+<div *ngIf="!users || users.length === 0">
+  <span>{{noUsersToShowText}}</span>
+</div>
