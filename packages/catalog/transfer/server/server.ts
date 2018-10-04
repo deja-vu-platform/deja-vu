@@ -8,7 +8,9 @@ import { v4 as uuid } from 'uuid';
 
 import * as _ from 'lodash';
 
-import { graphiqlExpress, graphqlExpress } from 'apollo-server-express';
+// GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
+// tslint:disable-next-line:no-var-requires
+const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
 import { makeExecutableSchema } from 'graphql-tools';
 
 import * as assert from 'assert';
