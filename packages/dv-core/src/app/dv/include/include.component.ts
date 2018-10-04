@@ -100,7 +100,7 @@ export class IncludeComponent implements AfterViewInit {
     private componentFactoryResolver: ComponentFactoryResolver,
     private changeDetectorRef: ChangeDetectorRef) { }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(_changes: SimpleChanges) {
     // TODO: don't always reload the entire component
     this.loadComponent();
   }

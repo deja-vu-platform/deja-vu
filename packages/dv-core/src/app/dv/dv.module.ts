@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {
-  MatButtonModule, MatFormFieldModule, MatInputModule
+  MatButtonModule, MatFormFieldModule, MatInputModule, MatSelectModule
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
@@ -17,6 +17,7 @@ import { ButtonLastComponent } from './button-last/button-last.component';
 import { LinkComponent } from './link/link.component';
 import { StatusComponent } from './status/status.component';
 import { MergeComponent } from './merge/merge.component';
+import { ChooseComponent } from './choose/choose.component';
 import { IncludeComponent, IncludeDirective } from './include/include.component';
 import { GatewayServiceFactory } from './gateway.service';
 import { RunService } from './run.service';
@@ -28,7 +29,7 @@ const allComponents = [
   IdComponent, IdsComponent, TxComponent, IncludeComponent,
   IncludeDirective, ButtonLastComponent, ButtonComponent, LinkComponent,
   StatusComponent, MergeComponent,
-  InputIdComponent, StageComponent
+  InputIdComponent, StageComponent, ChooseComponent
 ];
 
 @NgModule({
@@ -38,7 +39,7 @@ const allComponents = [
     FormsModule, ReactiveFormsModule,
     BrowserAnimationsModule,
     // Material
-    MatButtonModule, MatInputModule, MatFormFieldModule
+    MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
   declarations: [...allComponents, OfDirective],
   providers: [ GatewayServiceFactory, RunService ],
