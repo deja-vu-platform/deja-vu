@@ -12,7 +12,7 @@ import { CreatePartyComponent } from './create-party/create-party.component';
 
 import { AuthenticationModule } from 'authentication';
 import { AuthorizationModule } from 'authorization';
-import { TransferModule } from 'transfer';
+import { TransferModule, TRANSFER_CONFIG } from 'transfer';
 import { EventModule } from 'event';
 import { GroupModule } from 'group';
 import { PropertyModule } from 'property';
@@ -52,9 +52,10 @@ import { GuestListHeaderComponent } from './guest-list-header/guest-list-header.
     GroupModule,
     PropertyModule
   ],
-  providers: [{
-    provide: GATEWAY_URL, useValue: 'http://localhost:3000/api'
-  }],
+  providers: [
+    { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' },
+    { provide: TRANSFER_CONFIG, useValue: { balanceType: 'items' } }
+  ],
   bootstrap: [AppComponent],
   entryComponents: [
     ShowPartyComponent, CreateSupplyComponent, ShowSupplyComponent,

@@ -47,11 +47,8 @@
     </div>
   </div>
   <div class="col-md-4">
-    <transfer-show-transfer
-      [transfer]="supply"
-      [showId]="false"
-      [showToId]="false">
-    </transfer-show-transfer>
+    <transfer-show-item-count [itemCount]="supply" [showItemId]="false">
+    </transfer-show-item-count>
     <!--
     <market-show-good
       [good]="supply"

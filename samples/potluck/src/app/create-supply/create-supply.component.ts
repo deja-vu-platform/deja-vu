@@ -12,7 +12,7 @@ export class CreateSupplyComponent  {
   @Output() supply = new EventEmitter();
   supplyId: string;
   object: any;
-  good: any;
+  itemCount: any;
   item: string;
   unit: string;
 
