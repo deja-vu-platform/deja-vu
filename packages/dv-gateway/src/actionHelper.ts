@@ -52,6 +52,7 @@ export interface ActionInput {
 
 const ACTION_TABLE_FILE_NAME = 'actionTable.json';
 const CONFIG_FILE_NAME = 'dvconfig.json';
+const DV_CORE_CLICHE = 'dv-core';
 
 
 export class ActionHelper {
@@ -259,6 +260,13 @@ export class ActionHelper {
   }
 
   /**
+   * @returns true if the given action is a tx action
+   */
+  private static IsDvTxAction(action: ActionTag) {
+    return action.tag === 'dv-tx';
+  }
+
+  /**
    * @returns true if the given action is a built-in action
    */
   private static IsDvAction(action: ActionTag) {
@@ -293,7 +301,10 @@ export class ActionHelper {
     private readonly routes: { path: string, action: string }[] | undefined) {
     const clicheActionTables: ActionTable[] = _.map(
         _.uniq(usedCliches), ActionHelper.GetActionTableOfCliche);
-    const allActionsTable = _.assign({}, appActionTable, ...clicheActionTables);
+    const dvCoreActionTable = ActionHelper.GetActionTableOfCliche(
+      DV_CORE_CLICHE);
+    const allActionsTable = _.assign(
+      {}, appActionTable, ...clicheActionTables, dvCoreActionTable);
     console.log(
       `Unpruned action table ${JSON.stringify(allActionsTable, null, 2)}`);
     console.log('Done printing');
@@ -309,6 +320,8 @@ export class ActionHelper {
         console.log(`Looking at action ${JSON.stringify(action)}`);
         const thisDebugPath = debugPath.slice();
         thisDebugPath.push(action.fqtag);
+        usedActions.add(action.tag);
+        /*
         if (!ActionHelper.IsDvAction(action)) {
           if (seenActions.has(action.tag)) {
             return;
@@ -318,7 +331,7 @@ export class ActionHelper {
         if (ActionHelper.IsDvIncludeAction(action) ||
             !ActionHelper.IsDvAction(action)) {
           usedActions.add(action.tag);
-        }
+        }*/
 
         try {
           const actionContent = this.getContent(action, allActionsTable);
@@ -415,6 +428,7 @@ export class ActionHelper {
     actionPath: string[], actionAst: ActionAst | undefined)
     : ActionTagPath[] {
     // actionPath.length is always >= 1
+    console.log(`Looking at action path ${actionPath}`);
 
     if (_.isEmpty(actionAst)) {
       return [];
@@ -456,9 +470,11 @@ export class ActionHelper {
       } else {
         // TODO: what will happen if we don't have this check?
         ActionHelper.ActionExistsOrFail(includedActionTag, actionTable);
-        ret = [ { ...includedActionTag, context: {} } ];
+        ret = [{...includedActionTag, context: {}}];
       }
-    } else if (ActionHelper.IsDvAction(actionTag)) {
+    } else if (ActionHelper.IsDvTxAction(actionTag)) {
+      console.log(`Getting content for a dv-tx, returning ${actionTag.content}`);
+    // } else if (ActionHelper.IsDvAction(actionTag)) {
       ret = actionTag.content;
     } else {
       /**
