@@ -9,7 +9,7 @@ import {
 } from 'dv-core';
 
 import { User } from '../shared/authentication.model';
-import {ShowUserComponent} from '../show-user/show-user.component';
+import { ShowUserComponent } from '../show-user/show-user.component';
 
 
 @Component({

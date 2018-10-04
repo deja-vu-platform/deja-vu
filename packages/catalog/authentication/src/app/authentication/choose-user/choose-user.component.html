@@ -1,0 +1,5 @@
+<authentication-show-users (fetchedUsers)="users=$event" [hidden]="true">
+</authentication-show-users>
+<dv-choose [showEntity]="showUser" default-showUser="{ tag: 'authentication-show-user' }"
+           [entities]="users">
+</dv-choose>

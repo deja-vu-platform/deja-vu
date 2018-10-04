@@ -26,12 +26,15 @@ import { SignInComponent } from './sign-in/sign-in.component';
 export { SignInComponent };
 import { SignOutComponent } from './sign-out/sign-out.component';
 export { SignOutComponent };
+import { ChooseUserComponent } from './choose-user/choose-user.component';
+export { ChooseUserComponent };
 import { ShowUsersComponent } from './show-users/show-users.component';
+export { ShowUsersComponent };
 
 const allComponents = [
   AuthenticateComponent, ChangePasswordComponent, LoggedInComponent,
   RegisterUserComponent, ShowUserComponent, SignInComponent, SignOutComponent,
-  ShowUsersComponent
+  ShowUsersComponent, ChooseUserComponent
 ];
 
 @NgModule({
