@@ -21,6 +21,12 @@ interface MarkerDoc {
     coordinates: [number, number]   // [longitude, latitude]
   };
   mapId: string;
+  pending?: PendingDoc;
+}
+
+interface PendingDoc {
+  reqId: string;
+  type: 'create-marker' | 'delete-marker';
 }
 
 interface Marker {
@@ -50,6 +56,8 @@ interface Config {
   dbName: string;
   reinitDbOnStartup: boolean;
 }
+
+const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -94,6 +102,18 @@ mongodb.MongoClient.connect(
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
+class Validation {
+  static async markerExistsOrFail(id: string): Promise<MarkerDoc> {
+    const marker: MarkerDoc | null = await markers
+      .findOne({ id: id });
+    if (!marker) {
+      throw new Error(`Marker ${id} doesn't exist `);
+    }
+
+    return marker;
+  }
+}
+
 function markerDocToMarker(markerDoc: MarkerDoc): Marker {
   const ret = _.omit(markerDoc, ['location']);
   ret.longitude = markerDoc.location.coordinates[0];
@@ -102,11 +122,22 @@ function markerDocToMarker(markerDoc: MarkerDoc): Marker {
   return ret;
 }
 
+
+interface Context {
+  reqType: 'vote' | 'commit' | 'abort' | undefined;
+  runId: string;
+  reqId: string;
+}
+
+function isPendingCreate(doc: MarkerDoc | null) {
+  return _.get(doc, 'pending.type') === 'create-marker';
+}
+
 const resolvers = {
   Query: {
     marker: async (root, { id }) => {
-      const marker = await markers.findOne({ id: id });
-      if (!marker) {
+      const marker = await Validation.markerExistsOrFail(id);
+      if (_.isNil(marker) || isPendingCreate(marker)) {
         throw new Error(`Marker ${id} does not exist`);
       }
 
@@ -114,13 +145,16 @@ const resolvers = {
     },
 
     markers: (root, { input }: { input: MarkersInput }) => {
+      const filter = { pending: { $exists: false } };
       if (input.ofMapId) {
         // Get markers by map
-        return markers.find({ mapId: input.ofMapId })
+        filter['mapId'] = input.ofMapId;
+
+        return markers.find(filter)
           .toArray();
       } else {
         // Get all markers
-        return markers.find()
+        return markers.find(filter)
           .toArray();
       }
     }
@@ -135,8 +169,9 @@ const resolvers = {
   },
 
   Mutation: {
-    createMarker: async (root, { input }: { input: CreateMarkerInput }) => {
-      const marker: MarkerDoc = {
+    createMarker: async (
+      root, { input }: { input: CreateMarkerInput }, context: Context) => {
+      const newMarker: MarkerDoc = {
         id: input.id ? input.id : uuid(),
         title: input.title ? input.title : '',
         location: {
@@ -146,15 +181,83 @@ const resolvers = {
         mapId: input.mapId
       };
 
-      await markers.insertOne(marker);
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-      return marker;
+      switch (context.reqType) {
+        case 'vote':
+          newMarker.pending = {
+            reqId: context.reqId,
+            type: 'create-marker'
+          };
+        /* falls through */
+        case undefined:
+          await markers.insertOne(newMarker);
+
+          return newMarker;
+        case 'commit':
+          await markers.updateOne(
+            reqIdPendingFilter,
+            { $unset: { pending: '' } });
+
+          return;
+        case 'abort':
+          await markers.deleteOne(reqIdPendingFilter);
+
+          return;
+      }
+
+      return newMarker;
     },
 
-    deleteMarker: async (root, { id }) => {
-      const res = await markers.deleteOne({ id: id });
+    deleteMarker: async (root, { id }, context: Context) => {
+      const notPendingResourceFilter = {
+        id: id,
+        pending: { $exists: false }
+      };
+      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
 
-      return res.deletedCount === 1;
+      switch (context.reqType) {
+        case 'vote':
+          await Validation.markerExistsOrFail(id);
+          const pendingUpdateObj = await markers.updateOne(
+            notPendingResourceFilter,
+            {
+              $set: {
+                pending: {
+                  reqId: context.reqId,
+                  type: 'delete-marker'
+                }
+              }
+            });
+
+          if (pendingUpdateObj.matchedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+        case undefined:
+          await Validation.markerExistsOrFail(id);
+          const res = await markers
+            .deleteOne({ id: id, pending: { $exists: false } });
+
+          if (res.deletedCount === 0) {
+            throw new Error(CONCURRENT_UPDATE_ERROR);
+          }
+
+          return true;
+        case 'commit':
+          await markers.deleteOne(reqIdPendingFilter);
+
+          return;
+        case 'abort':
+          await markers.updateOne(
+            reqIdPendingFilter, { $unset: { pending: '' } });
+
+          return;
+      }
+
+      return;
+
     }
   }
 };
