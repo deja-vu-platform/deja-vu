@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { ItemCount } from '../transfer.config';
+import { ItemCount } from '../shared/transfer.model';
 
 @Component({
   selector: 'transfer-show-item-count',

@@ -4,3 +4,8 @@ export interface Transfer {
   toId: string;
   amount: any;
 }
+
+export interface ItemCount {
+  itemId: string;
+  count: number;
+}

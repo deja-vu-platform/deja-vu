@@ -7,7 +7,7 @@ import {
 
 import { OnAfterCommit, OnRun, RunService } from 'dv-core';
 
-import { ItemCount } from '../transfer.config';
+import { ItemCount } from '../shared/transfer.model';
 
 
 @Component({

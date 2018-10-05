@@ -186,13 +186,9 @@ function getResolvers<Balance>(
             accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
         } catch (e) {
           console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
-          await abortAccountUpdate(updateId);
-          await transfers.deleteOne({ pending: updateId });
+          await abortUpdate(updateId);
           throw e;
         }
-
-        await transfers
-          .updateOne({ pending: updateId }, { $unset: { pending: '' }});
 
         return transfer;
       },
@@ -221,8 +217,7 @@ function getResolvers<Balance>(
             accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
         } catch (e) {
           console.error(`Transfer ${transfer.id} aborted, error: ${e.message}`);
-          await abortAccountUpdate(updateId);
-          await transfers.deleteOne({ pending: updateId });
+          await abortUpdate(updateId);
           throw e;
        }
 
@@ -237,10 +232,6 @@ function getResolvers<Balance>(
        await addToBalance<Balance>(
          input.toId, input.amount, transfer, updateId, context.reqType,
          accountHasFundsFn, newBalanceFn, zeroBalanceFn, isZeroBalanceFn);
-
-       await transfers
-         .updateOne({ pending: updateId }, { $unset: { pending: '' }});
-
 
        return transfer;
       }
@@ -334,6 +325,13 @@ async function commitAccountUpdate<Balance>(
   return;
 }
 
+async function abortUpdate(updateId: string): Promise<void> {
+  await Promise
+    .all([abortAccountUpdate(updateId), abortTransferUpdate(updateId)]);
+
+  return;
+}
+
 async function abortAccountUpdate(updateId: string) {
   const reqIdPendingFilter = { 'pendingTransfer.updateId': updateId };
   await accounts
@@ -347,7 +345,11 @@ async function abortAccountUpdate(updateId: string) {
     `Expected the number of deleted accounts to be less than 2, ` +
     `but got ${res.result.n}`);
 
-  return;
+  return res;
+}
+
+function abortTransferUpdate(updateId: string) {
+  return transfers.deleteMany({ pending: updateId });
 }
 
 /**
@@ -411,7 +413,7 @@ async function addToBalance<Balance>(
       } catch (e) {
         console.error(
           `Balance update ${updateId} aborted, error: ${e.message}`);
-        await abortAccountUpdate(updateId);
+        await abortUpdate(updateId);
         throw e;
       }
     case 'commit':
@@ -429,7 +431,7 @@ async function addToBalance<Balance>(
 
       return;
     case 'abort':
-      await abortAccountUpdate(updateId);
+      await abortUpdate(updateId);
 
       return;
   }

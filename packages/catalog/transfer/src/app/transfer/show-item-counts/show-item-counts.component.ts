@@ -5,7 +5,8 @@ import {
   ShowItemCountComponent
 } from '../show-item-count/show-item-count.component';
 
-import { ItemCount } from '../transfer.config';
+import { ItemCount } from '../shared/transfer.model';
+
 
 @Component({
   selector: 'transfer-show-item-counts',
