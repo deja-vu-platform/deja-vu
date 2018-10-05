@@ -115,9 +115,11 @@ const txConfig: TxConfig<
       });
   },
   sendAbortToClient: (
-    gcr: GatewayToClicheRequest, causedAbort: boolean,
+    causedAbort: boolean, gcr?: GatewayToClicheRequest,
     payload?: ClicheResponse<string>, res?: express.Response) => {
+    assert.ok(res !== undefined);
     if (causedAbort) {
+      assert.ok(payload !== undefined);
       res!.status(payload!.status);
       res!.send(payload!.text);
     } else {
