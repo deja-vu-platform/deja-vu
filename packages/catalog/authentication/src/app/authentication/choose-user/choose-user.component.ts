@@ -16,9 +16,11 @@ export class ChooseUserComponent {
   users: User[];
   @Input() showUser: Action = {
     type: <Type<Component>> ShowUserComponent,
-    inputMap: { entity: 'user' },
-    outputMap: { selectedEntity: 'outputSelectedUser' }
+    inputMap: { entity: 'user' }
   };
+
+  @Input() chooseSelectPlaceholder = 'Choose User';
+  @Input() addButtonLabel = 'Add User';
 
   @Output() selectedUser = new EventEmitter<User>();
 

@@ -1,5 +1,7 @@
 <authentication-show-users (fetchedUsers)="users=$event" [hidden]="true">
 </authentication-show-users>
 <dv-choose [showEntity]="showUser" default-showUser="{ tag: 'authentication-show-user' }"
-           [entities]="users">
+           [entities]="users" [chooseSelectPlaceholder]="chooseSelectPlaceholder"
+           [addButtonLabel]="addButtonLabel"
+           (selectedEntity)="outputSelectedUser($event)">
 </dv-choose>
