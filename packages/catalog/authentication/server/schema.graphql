@@ -30,11 +30,16 @@ input UsersInput {
   _: Boolean
 }
 
+input VerifyInput {
+  id: ID!
+  token: String!
+}
+
 type Query {
   user(username: String!): User
   userById(id: String!): User
   users(input: UsersInput!): [User!]
-  verify(id: ID!, token: String!): Boolean
+  verify(input: VerifyInput!): Boolean
 }
 
 type Mutation {
@@ -42,4 +47,5 @@ type Mutation {
   registerAndSignIn(input: RegisterInput!): SignInOutput
   signIn(input: SignInInput!): SignInOutput
   changePassword(input: ChangePasswordInput!): Boolean
+  verify(input: VerifyInput!): Boolean
 }

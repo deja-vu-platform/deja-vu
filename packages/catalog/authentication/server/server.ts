@@ -76,6 +76,11 @@ interface SignInOutput {
   user: User;
 }
 
+interface VerifyInput {
+  id: string;
+  token: string;
+}
+
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -294,7 +299,9 @@ const resolvers = {
 
       return user;
     },
-    verify: (root, { token, id }) => verify(token, id)
+
+    verify: (root, { input }: { input: VerifyInput }) => verify(
+      input.token, input.id)
   },
 
   User: {
@@ -401,6 +408,14 @@ const resolvers = {
       }
 
       return false;
+    },
+
+    verify: (root, { input }: { input: VerifyInput }, context: Context) => {
+      if (context.reqType === undefined || context.reqType === 'vote') {
+        return verify(input.token, input.id);
+      }
+
+      return;
     }
   }
 };

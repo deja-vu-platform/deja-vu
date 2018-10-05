@@ -2,12 +2,11 @@ import {
   Component, ElementRef, EventEmitter,
   Input, OnChanges, OnInit, Output
 } from '@angular/core';
+
 import {
   GatewayService, GatewayServiceFactory, OnAfterAbort,
   OnAfterCommit, OnRun, RunService
 } from 'dv-core';
-
-import * as _ from 'lodash';
 
 import { AuthenticationService } from '../shared/authentication.service';
 
@@ -39,15 +38,21 @@ export class AuthenticateComponent implements OnInit, OnChanges {
   }
 
   load() {
-    if (!this.gs) {
+    if (!this.gs || this.id === undefined) {
       return;
     }
     const token = this.authenticationService.getToken();
-    this.gs.get<{data: { verify: boolean }}>('/graphql', {
+    this.gs.get<{ data: { verify: boolean } }>('/graphql', {
       params: {
-        query: `query {
-          verify(id: "${this.id}", token: "${token}")
-        }`
+        query: `query Verify($input: VerifyInput!){
+          verify(input: $input)
+        }`,
+        variables: JSON.stringify({
+          input: {
+            id: this.id,
+            token: token
+          }
+        })
       }
     })
     .subscribe((res) => {
@@ -56,6 +61,20 @@ export class AuthenticateComponent implements OnInit, OnChanges {
   }
 
   dvOnRun() {
-    this.load();
+    const token = this.authenticationService.getToken();
+    this.gs.post<{ data: { verify: boolean } }>('/graphql', {
+      query: `mutation Verify($input: VerifyInput!) {
+        verify(input: $input)
+      }`,
+      variables: {
+        input: {
+          id: this.id,
+          token: token
+        }
+      }
+    })
+    .subscribe((res) => {
+      this.isAuthenticated = res.data.verify;
+    });
   }
 }
