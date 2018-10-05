@@ -1,5 +1,5 @@
 import {
-  Component, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 import {
   ControlValueAccessor, FormBuilder, FormControl, FormGroupDirective,
@@ -9,6 +9,7 @@ import {
 import * as _ from 'lodash';
 
 import { Action } from '../include/include.component';
+import { RunService } from '../run.service';
 
 
 @Component({
@@ -49,9 +50,12 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
     entityControl: this.entityControl
   });
 
-  constructor(private builder: FormBuilder) {}
+  constructor(
+    private builder: FormBuilder, private elem: ElementRef,
+    private rs: RunService) {}
 
   ngOnInit() {
+    this.rs.register(this.elem, this);
     this.staged = this.initialStagedEntities;
   }
 
@@ -66,8 +70,10 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
   }
 
   stage(value: any) {
-    this.staged.push(value);
-    this.stagedEntities.emit(this.staged);
+    if (value !== undefined && value !== null) {
+      this.staged.push(value);
+      this.stagedEntities.emit(this.staged);
+    }
   }
 
   unstage(index: string) {

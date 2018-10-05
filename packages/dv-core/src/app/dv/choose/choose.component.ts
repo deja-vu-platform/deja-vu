@@ -1,7 +1,10 @@
-import { Component, EventEmitter, Input, Output, Type } from '@angular/core';
+import {
+  Component, ElementRef, EventEmitter, Input, Output, Type
+} from '@angular/core';
 
 import { Action } from '../include/include.component';
 import { ShowEntityComponent } from '../show-entity/show-entity.component';
+import { RunService } from '../run.service';
 
 
 @Component({
@@ -23,8 +26,12 @@ export class ChooseComponent {
 
   choose;
 
-  constructor() {
+  constructor(private elem: ElementRef, private rs: RunService) {
     this.choose = this;
+  }
+
+  ngOnInit() {
+    this.rs.register(this.elem, this);
   }
 
   add() {
