@@ -18,12 +18,6 @@ export class ChooseComponent {
 
   @Input() entities: any[] = [];
   entityIndex: number | undefined;
-  // _selectedEntity: any | undefined;
-
-  // @Input() set initialEntity(entity: any) {
-  //   this._selectedEntity = entity;
-  //   this.selectedEntity.emit(entity);
-  // }
 
   @Output() selectedEntity = new EventEmitter<any>();
 
