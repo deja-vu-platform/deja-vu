@@ -47,12 +47,14 @@
                     <dv-stage
                       [stageEntity]="{
                         type: chooseUser, tag: 'authentication-choose-user',
-                        outputMap: { selectedUser: 'stage' }
+                        inputs: { chooseSelectPlaceholder: 'Choose Guest', addButtonLabel: 'Add to Guest List' },
+                        outputMap: { stage: 'selectedUser' }
                       }"
-                      [showEntity]="{ type: showGuestUsername, tag: 'authentication-show-user' }"
+                      [showEntity]="{
+                        type: showGuestUsername, tag: 'authentication-show-user', inputMap: { entity: 'user' }
+                      }"
                       [stageHeader]="{ type: guestListHeader, tag: 'potluck-guest-list-header' }"
                       (stagedEntities)="stagedMemberIds=$event">
-
                     </dv-stage>
                     <!-- for the members dropdown we'll need to retrieve users or provide some kind of autocomplete -->
                     <!--
@@ -78,7 +80,8 @@
                       [showEntity]="{
                         type: showSupply, tag: 'potluck-show-supply', inputMap: { entity: 'supply' }
                       }"
-                      [stageHeader]="{ type: supplyListHeader, tag: 'potluck-supply-list-header' }">
+                      [stageHeader]="{ type: supplyListHeader, tag: 'potluck-supply-list-header' }"
+                      (stagedEntities)="stagedSupplies=$event">
                     </dv-stage>
                     <!--
                     <market-create-goods

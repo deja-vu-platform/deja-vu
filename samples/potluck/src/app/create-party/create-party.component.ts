@@ -25,5 +25,7 @@ export class CreatePartyComponent {
   supplyListHeader = SupplyListHeaderComponent;
   chooseUser = ChooseUserComponent;
   stagedMemberIds: any[];
+  stagedSupplies: any[];
+  partyId: string;
   user;
 }

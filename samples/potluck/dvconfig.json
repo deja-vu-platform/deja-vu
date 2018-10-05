@@ -22,7 +22,7 @@
       "config": {
         "wsPort": 3004,
         "reinitDbOnStartup": true,
-        "balance": "items"
+        "balanceType": "items"
       }
     },
     "event": {
