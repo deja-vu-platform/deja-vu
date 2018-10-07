@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
+import { EventModule } from 'event';
 
 import { AppComponent } from './app.component';
 import { MainViewComponent } from './main-view/main-view.component';
@@ -13,10 +14,11 @@ import { TopBarComponent } from './top-bar/top-bar.component';
     AppComponent,
     MainViewComponent,
     SideMenuComponent,
-    TopBarComponent
+    TopBarComponent,
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    EventModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
