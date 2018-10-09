@@ -7,13 +7,15 @@ import { GATEWAY_URL, DvModule } from 'dv-core';
 
 import { MatModule } from './mat/mat.module';
 
+import { WidgetDirective } from './widget.directive';
+
 import { AppComponent } from './app.component';
 import { MainViewComponent } from './main-view/main-view.component';
 import { SideMenuComponent } from './side-menu/side-menu.component';
 import { TopBarComponent } from './top-bar/top-bar.component';
 import { ClicheListComponent } from './cliche-list/cliche-list.component';
 import { WidgetListComponent } from './widget-list/widget-list.component';
-
+import { PageComponent } from './page/page.component';
 
 @NgModule({
   declarations: [
@@ -23,6 +25,8 @@ import { WidgetListComponent } from './widget-list/widget-list.component';
     TopBarComponent,
     ClicheListComponent,
     WidgetListComponent,
+    PageComponent,
+    WidgetDirective,
   ],
   imports: [
     BrowserModule,
