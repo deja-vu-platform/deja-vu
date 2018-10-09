@@ -16,6 +16,7 @@ import { TopBarComponent } from './top-bar/top-bar.component';
 import { ClicheListComponent } from './cliche-list/cliche-list.component';
 import { WidgetListComponent } from './widget-list/widget-list.component';
 import { PageComponent } from './page/page.component';
+import { WidgetComponent } from './widget/widget.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { PageComponent } from './page/page.component';
     WidgetListComponent,
     PageComponent,
     WidgetDirective,
+    WidgetComponent,
   ],
   imports: [
     BrowserModule,
