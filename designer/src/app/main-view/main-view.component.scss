@@ -1,6 +1,14 @@
 #main-view {
-  background: lightyellow;
-  padding: 8px;
   width: 100%;
   height: 100%;
+  background: darkgray;
+  padding: 16px;
+  overflow-y: auto; /* enable component scrolling */
+}
+
+#page {
+  width: 100%;
+  height: 150%;
+  background: white; /* TODO: configurable */
+  padding: 8px;
 }
