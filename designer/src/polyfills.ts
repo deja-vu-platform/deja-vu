@@ -18,6 +18,9 @@
  * BROWSER POLYFILLS
  */
 
+// This is a temporary workaround for #849, while upstream dragula still relies on global.
+(window as any).global = window;
+
 /** IE9, IE10 and IE11 requires all of the following polyfills. **/
 // import 'core-js/es6/symbol';
 // import 'core-js/es6/object';

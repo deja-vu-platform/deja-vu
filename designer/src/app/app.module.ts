@@ -2,6 +2,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { DragulaModule } from 'ng2-dragula';
+
 import { EventModule } from 'event';
 import { GATEWAY_URL, DvModule } from 'dv-core';
 
@@ -34,6 +36,7 @@ import { WidgetComponent } from './widget/widget.component';
     BrowserModule,
     BrowserAnimationsModule,
     MatModule,
+    DragulaModule.forRoot(),
     DvModule,
     EventModule,
   ],
