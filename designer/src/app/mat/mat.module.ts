@@ -5,12 +5,12 @@ import { MatListModule, MatToolbarModule } from '@angular/material';
 @NgModule({
   imports: [
     CommonModule,
-    MatListModule
+    MatListModule,
   ],
   exports: [
     MatListModule,
-    MatToolbarModule
+    MatToolbarModule,
   ],
-  declarations: []
+  declarations: [],
 })
 export class MatModule { }

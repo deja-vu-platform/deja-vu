@@ -4,7 +4,7 @@ import { ɵe as CreateWeeklySeriesComponent } from 'event'; // TODO: proper impo
 @Component({
   selector: 'app-page',
   templateUrl: './page.component.html',
-  styleUrls: ['./page.component.scss']
+  styleUrls: ['./page.component.scss'],
 })
 export class PageComponent {
   widgets = [CreateWeeklySeriesComponent];
