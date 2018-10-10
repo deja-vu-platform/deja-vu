@@ -8,4 +8,8 @@ import { Row } from '../datatypes';
 })
 export class RowComponent {
   @Input() row: (Row & { index: number });
+
+  get widgets() {
+    return this.row.widgets.map((component, i) => ({ component, i }));
+  }
 }
