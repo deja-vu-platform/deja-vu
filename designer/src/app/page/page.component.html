@@ -1,5 +1,3 @@
   <div id="page" class="fullsize">
-    <div *ngFor="let row of composedWidget.rows">
-      <app-row [row]="row"></app-row>
-    </div>
+    <app-row *ngFor="let row of composedWidget.rows" [row]="row"></app-row>
   </div>

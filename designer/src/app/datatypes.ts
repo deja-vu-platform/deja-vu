@@ -6,6 +6,7 @@ export interface ComposedWidget {
 
 export interface Row {
   widgets: Widget[];
+  index: number;
 }
 
 export type Widget = BaseWidget | ComposedWidget;
