@@ -1,15 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-cliche-list',
   templateUrl: './cliche-list.component.html',
   styleUrls: ['./cliche-list.component.scss'],
 })
-export class ClicheListComponent implements OnInit {
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
-}
+export class ClicheListComponent { }

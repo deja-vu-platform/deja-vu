@@ -19,6 +19,7 @@ import { ClicheListComponent } from './cliche-list/cliche-list.component';
 import { WidgetListComponent } from './widget-list/widget-list.component';
 import { PageComponent } from './page/page.component';
 import { WidgetComponent } from './widget/widget.component';
+import { RowComponent } from './row/row.component';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { WidgetComponent } from './widget/widget.component';
     PageComponent,
     WidgetDirective,
     WidgetComponent,
+    RowComponent,
   ],
   imports: [
     BrowserModule,
