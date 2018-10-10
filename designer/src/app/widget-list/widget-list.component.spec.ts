@@ -8,7 +8,7 @@ describe('WidgetListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WidgetListComponent ]
+      declarations: [WidgetListComponent],
     })
     .compileComponents();
   }));

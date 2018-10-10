@@ -38,8 +38,8 @@ import { WidgetComponent } from './widget/widget.component';
     EventModule,
   ],
   providers: [
-    { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' }
+    { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }
