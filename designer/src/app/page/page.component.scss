@@ -3,4 +3,21 @@
   height: 150%;
   background: white; /* TODO: configurable */
   padding: 8px;
+  display: flex;
+  flex-direction: column;
+}
+
+app-row {
+  border-width: 1px 0;
+  border-style: solid;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+app-row:first-child {
+  border-top: none;
+}
+
+app-row:last-child {
+  flex: 1;
+  border-bottom: none;
 }
