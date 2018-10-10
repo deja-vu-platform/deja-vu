@@ -15,7 +15,7 @@ export class AppComponent {
   composedWidgets: ComposedWidget[] = [
     {
       rows: [
-        { widgets: [CreateWeeklySeriesComponent] },
+        { widgets: [CreateWeeklySeriesComponent], index: 0 },
       ],
     },
   ];
@@ -26,8 +26,10 @@ export class AppComponent {
       copy: (el, source) => source.classList.contains('widget-list'),
       accepts: (el, target) => target.classList.contains('page-row'),
     });
-    // dragulaService.drop('widget').subscribe(({ target }) => {
-    //   target.
-    // });
+    dragulaService.drop('widget').subscribe(({ target }) => {
+      const composedWidget = this.composedWidgets[0]; // TODO: active composed widget
+      const { index } = target['dataset'];
+      composedWidget.rows[parseInt(index, 10)].widgets.push(CreateWeeklySeriesComponent); // TODO: dragged component
+    });
   }
 }

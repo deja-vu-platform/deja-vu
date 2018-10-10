@@ -12,3 +12,9 @@ body {
   height: 100vh;
   margin: 0;
 }
+
+/* Apparently we can't easlily make dragula not clone or drag.
+Hacky solution: hide the clone a la The Prestige. */
+.page-row > .mat-list-item {
+  display: none;
+}
