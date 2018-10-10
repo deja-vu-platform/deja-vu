@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { DragulaService } from 'ng2-dragula';
 
-import { ɵe as CreateWeeklySeriesComponent } from 'event'; // TODO: proper import
+import * as EventComponents from 'event'; // TODO: proper import
 
 import { ComposedWidget } from './datatypes';
 
@@ -15,7 +15,8 @@ export class AppComponent {
   composedWidgets: ComposedWidget[] = [
     {
       rows: [
-        { widgets: [CreateWeeklySeriesComponent], index: 0 },
+        { widgets: [], index: 0 },
+        { widgets: [], index: 1 },
       ],
     },
   ];
@@ -28,8 +29,14 @@ export class AppComponent {
     });
     dragulaService.drop('widget').subscribe(({ target }) => {
       const composedWidget = this.composedWidgets[0]; // TODO: active composed widget
-      const { index } = target['dataset'];
-      composedWidget.rows[parseInt(index, 10)].widgets.push(CreateWeeklySeriesComponent); // TODO: dragged component
+      const index = parseInt(target['dataset'].index, 10);
+      const component = EventComponents.ɵe;
+      composedWidget.rows[index].widgets.push(component); // TODO: dragged component
+      const lastRowIndex = composedWidget.rows.length - 1;
+      if (index === lastRowIndex) {
+        composedWidget.rows.push({ widgets: [], index: lastRowIndex + 1 });
+      }
     });
+    console.log(Object.keys(EventComponents));
   }
 }
