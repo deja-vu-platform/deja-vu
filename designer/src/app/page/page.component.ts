@@ -8,4 +8,9 @@ import { ComposedWidget } from '../datatypes';
 })
 export class PageComponent {
   @Input() composedWidget: ComposedWidget;
+
+  get rows() {
+    return this.composedWidget.rows
+      .map((row, index) => Object.assign({ index }, row));
+  }
 }

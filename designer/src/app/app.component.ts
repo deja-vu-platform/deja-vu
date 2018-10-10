@@ -15,8 +15,8 @@ export class AppComponent {
   composedWidgets: ComposedWidget[] = [
     {
       rows: [
-        { widgets: [], index: 0 },
-        { widgets: [], index: 1 },
+        { widgets: [] },
+        { widgets: [] },
       ],
     },
   ];
@@ -32,11 +32,9 @@ export class AppComponent {
       const index = parseInt(target['dataset'].index, 10);
       const component = EventComponents.ɵe;
       composedWidget.rows[index].widgets.push(component); // TODO: dragged component
-      const lastRowIndex = composedWidget.rows.length - 1;
-      if (index === lastRowIndex) {
-        composedWidget.rows.push({ widgets: [], index: lastRowIndex + 1 });
+      if (index === composedWidget.rows.length - 1) {
+        composedWidget.rows.push({ widgets: [] });
       }
     });
-    console.log(Object.keys(EventComponents));
   }
 }
