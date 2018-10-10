@@ -1,18 +1,11 @@
-import { Component, OnInit } from '@angular/core';
-
-import { ɵe as CreateWeeklySeriesComponent } from 'event'; // TODO: proper import
+import { Component, Input } from '@angular/core';
+import { ComposedWidget } from '../datatypes';
 
 @Component({
   selector: 'app-page',
   templateUrl: './page.component.html',
   styleUrls: ['./page.component.scss'],
 })
-export class PageComponent implements OnInit {
-  widgets = [CreateWeeklySeriesComponent];
-
-  constructor() { }
-
-  ngOnInit() {
-  }
-
+export class PageComponent {
+  @Input() composedWidget: ComposedWidget;
 }

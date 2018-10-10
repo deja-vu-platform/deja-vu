@@ -1,5 +1,5 @@
-  <div id="page" class="fullsize" dragula="widget">
-    <div *ngFor="let widget of widgets" class="widget">
-      <app-widget [widget]="widget"></app-widget>
+  <div id="page" class="fullsize">
+    <div *ngFor="let row of composedWidget.rows">
+      <app-row [row]="row"></app-row>
     </div>
   </div>
