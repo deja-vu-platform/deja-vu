@@ -18,31 +18,62 @@ export const GATEWAY_URL = new InjectionToken<string>('gateway.url');
 
 export const OF_ATTR = 'dvOf';
 export const ALIAS_ATTR = 'dvAlias';
+const CLASS_ATTR = 'class';
+
 
 export class GatewayService {
   fromStr: string;
+
+  private static GetAttribute(node, attribute: string): string | undefined {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute
+    if (node.hasAttribute(attribute)) {
+      return node.getAttribute(attribute);
+    }
+
+    return undefined;
+  }
+
+  private static GetTag(node): string {
+   return node.nodeName.toLowerCase();
+  }
+
+  private static IsAction(node): boolean {
+    // No HTML tag has a hyphen
+    return _.includes(GatewayService.GetTag(node), '-');
+  }
+
+  private static GetFqTag(tag, dvAlias, dvOf): string {
+    if (!_.isEmpty(dvAlias)) {
+      return dvAlias;
+    } else if (!_.isEmpty(dvOf)) {
+      return dvOf + tag.substring(tag.indexOf('-'));
+    } else {
+      return tag;
+    }
+  }
+
+  private static GetFqTagFromNode(node): string {
+    const tag = GatewayService.GetTag(node);
+    const dvAlias = GatewayService.GetAttribute(node, ALIAS_ATTR);
+    const dvOf = GatewayService.GetAttribute(node, OF_ATTR);
+
+    return GatewayService.GetFqTag(tag, dvAlias, dvOf);
+  }
 
   constructor(
     private gatewayUrl: string, private http: HttpClient, renderer: Renderer2,
     private from: ElementRef) {
     let node = from.nativeElement;
-    const seenNodes: string[] = [];
+    const seenActionNodes: string[] = [];
     while (node && node.getAttribute) {
-      let name = node.nodeName.toLowerCase();
-      // the fqtag is used in the action tree, but it's not sent here
-      // https://developer.mozilla.org/en-US/docs/Web/API/Element/getAttribute
-      if (node.hasAttribute(ALIAS_ATTR)) {
-        name = node.getAttribute(ALIAS_ATTR);
-      } else if (node.hasAttribute(OF_ATTR)) {
-        const dvOf: string = node.getAttribute(OF_ATTR);
-        name = dvOf + name.substring(name.indexOf('-'));
+      if (GatewayService.IsAction(node)) {
+       seenActionNodes.push(GatewayService.GetFqTagFromNode(node));
       }
-      seenNodes.push(name);
 
-      const classAttr = node.getAttribute('class');
+      const classAttr = GatewayService.GetAttribute(node, CLASS_ATTR);
       let dvClass: string | null = null;
       if (!_.isEmpty(classAttr)) {
-        for (const cssClass of classAttr.split()) {
+        for (const cssClass of classAttr!.split(' ')) {
           const match = /dv-parent-is-(.*)/i.exec(cssClass);
           dvClass = match ? match[1] : null;
         }
@@ -53,7 +84,7 @@ export class GatewayService {
         node = renderer.parentNode(node);
       }
     }
-    this.fromStr = JSON.stringify(seenNodes);
+    this.fromStr = JSON.stringify(_.reverse(seenActionNodes));
   }
 
   get<T>(path?: string, options?: RequestOptions): Observable<T> {

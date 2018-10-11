@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 import 'lodash.product';
 
 import * as RJSON from 'relaxed-json';
+import { ActionPath } from './actionPath';
 
 export type ActionAst = ReadonlyArray<ActionTag>;
 export interface InputMap {
@@ -266,13 +267,6 @@ export class ActionHelper {
     return action.tag === 'dv-tx';
   }
 
-  /**
-   * @returns true if the given action is a built-in action
-   */
-  private static IsDvAction(action: ActionTag) {
-    return ActionHelper.ClicheOfTag(action.tag) === 'dv';
-  }
-
   private static ActionExistsOrFail(
     action: ActionTag, actionTable: ActionTable) {
     if (action.tag === 'router-outlet') {
@@ -373,6 +367,7 @@ export class ActionHelper {
   /**
    * @returns the `ActionTag` corresponding to the given action path
    */
+  /*
   getActionOrFail(actionPath: string[]): ActionTag {
     const ret = this.getMatchingActions(actionPath);
     if (_.isEmpty(ret)) {
@@ -383,31 +378,31 @@ export class ActionHelper {
     }
 
     return ret[0];
-  }
+  }*/
 
   /**
    * @returns true if the given action path is expected
    */
-  actionPathIsValid(actionPath: string[]): boolean {
+  actionPathIsValid(actionPath: ActionPath): boolean {
     return !_.isEmpty(this.getMatchingActions(actionPath));
   }
 
   /**
    * @returns the `ActionTag`s corresponding to the last node of the action path
    */
-  getMatchingActions(actionPath: string[]): ActionTag[] {
+  getMatchingActions(actionPath: ActionPath): ActionTag[] {
     return _.map(this.getMatchingPaths(actionPath), _.last);
   }
 
   /**
    * @returns the `ActionTag`s corresponding to the given action path
    */
-  getMatchingPaths(actionPath: string[]): ActionTagPath[] {
+  getMatchingPaths(actionPath: ActionPath): ActionTagPath[] {
     // We assume here that the first tag in the action path is a simple tag
     // so that fqtag = tag (i.e., the root action is not aliased and it is not
     // from some cliche for which there's more than one instance of in the app)
-    const firstTag = actionPath[0];
-    if (_.isEmpty(actionPath) || !(firstTag in this.actionTable)) {
+    const firstTag = actionPath.first();
+    if (!(firstTag in this.actionTable)) {
       return [];
     }
     const matchingNode: ActionTag = {
@@ -415,17 +410,17 @@ export class ActionHelper {
       content: this.getContent(
         { fqtag: firstTag, tag: firstTag }, this.actionTable)
     };
-    if (actionPath.length === 1 && firstTag in this.actionTable) {
+    if (actionPath.length() === 1 && firstTag in this.actionTable) {
       return [[ matchingNode ]] ;
     }
 
     return _.map(
-      this._getMatchingPaths(actionPath.slice(1), matchingNode.content),
+      this._getMatchingPaths(actionPath.tail(), matchingNode.content),
       (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]);
   }
 
   private _getMatchingPaths(
-    actionPath: string[], actionAst: ActionAst | undefined)
+    actionPath: ActionPath, actionAst: ActionAst | undefined)
     : ActionTagPath[] {
     // actionPath.length is always >= 1
     console.log(`Looking at action path ${actionPath}`);
@@ -434,13 +429,13 @@ export class ActionHelper {
       return [];
     }
     const matchingNodes: ActionTag[] = _.map(
-      _.filter(actionAst, (at: ActionTag) => at.fqtag === actionPath[0]),
+      _.filter(actionAst, (at) => at.fqtag === actionPath.first()),
       (matchingNode: ActionTag) => _
         .assign(matchingNode, {
           content: this.getContent(matchingNode, this.actionTable)
         }));
 
-    if (actionPath.length === 1) {
+    if (actionPath.length() === 1) {
       return _.map(
         matchingNodes,
         (matchingNode: ActionTag): ActionTagPath => [ matchingNode ]);
@@ -449,7 +444,7 @@ export class ActionHelper {
     return _.flatMap(
       matchingNodes,
       (matchingNode: ActionTag): ActionTagPath[] =>  _.map(
-        this._getMatchingPaths(actionPath.slice(1), matchingNode.content),
+        this._getMatchingPaths(actionPath.tail(), matchingNode.content),
         (matchingPath: ActionTagPath) => [ matchingNode, ...matchingPath ]));
   }
 
@@ -535,31 +530,6 @@ export class ActionHelper {
     console.log(`Returning content ${JSON.stringify(ret)} for ${JSON.stringify(actionTag)}`);
 
     return ret;
-  }
-
-  /**
-   * @returns an array [action_1, action_2, ..., action_n] representing an
-   * action path from action_1 to action_n where action_n is the action that
-   * originated the request. An action path is a DOM path that includes only
-   * actions (it filters HTML elements like div)
-   */
-  getActionPath(from: string[], projects: Set<string>): string[] {
-    return _.chain(from)
-      .map((node) => node.toLowerCase())
-      .filter((name) => {
-        const project = name.split('-')[0];
-
-        return projects.has(project) || project === 'dv';
-      })
-      .reverse()
-      .value();
-  }
-
-  /**
-   * @returns true if the given action path is inside a dv transaction
-   */
-  isDvTx(actionPath: string[]) {
-    return _.includes(actionPath, 'dv-tx');
   }
 
   toString() {
