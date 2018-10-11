@@ -10,6 +10,8 @@ import {
 
 import { AuthenticationService } from '../shared/authentication.service';
 
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'authentication-authenticate',
@@ -38,7 +40,7 @@ export class AuthenticateComponent implements OnInit, OnChanges {
   }
 
   load() {
-    if (!this.gs || this.id === undefined) {
+    if (!this.gs || _.isEmpty(this.id)) {
       return;
     }
     const token = this.authenticationService.getToken();
