@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { filter } from 'rxjs/operators';
 import { DragulaService } from 'ng2-dragula';
 
 import * as EventComponents from 'event'; // TODO: proper import
@@ -29,7 +30,9 @@ export class AppComponent {
       accepts: (el, target) => target.classList.contains('page-row'),
     });
     dragulaService.drop('widget')
+      .pipe(filter(({ el, target }) => !!el && !!target))
       .subscribe(({ el, source, target }) => {
+        console.log(el, source, target);
         const composedWidget = this.composedWidgets[0]; // TODO: active composed widget
         const component = EventComponents.ɵe; // TODO: dragged component
         // add widget to row
@@ -45,7 +48,7 @@ export class AppComponent {
         filterInPlace(composedWidget.rows, r => r.widgets.length > 0);
         // always end in empty row
         composedWidget.rows.push({ widgets: [] });
-        console.log(composedWidget.rows);
+        console.log('foo');
       });
   }
 }
