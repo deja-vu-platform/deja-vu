@@ -253,6 +253,18 @@ export class ActionHelper {
     return tag.split('-')[0];
   }
 
+  private static GetDvOfForChild(
+    actionTag: ActionTag, childActionTag: ActionTag): string | undefined {
+    if (
+      !_.isEmpty(actionTag.dvOf) && _.isEmpty(childActionTag.dvOf) &&
+      ActionHelper.ClicheOfTag(actionTag.tag) ===
+      ActionHelper.ClicheOfTag(childActionTag.tag)) {
+      return actionTag.dvOf;
+    }
+
+    return childActionTag.dvOf;
+  }
+
   /**
    * @returns true if the given action is the built-in include action
    */
@@ -465,7 +477,15 @@ export class ActionHelper {
       } else {
         // TODO: what will happen if we don't have this check?
         ActionHelper.ActionExistsOrFail(includedActionTag, actionTable);
-        ret = [{...includedActionTag, context: {}}];
+        const childDvOf = ActionHelper
+          .GetDvOfForChild(actionTag, includedActionTag);
+
+        const childActionTag = {
+          ...includedActionTag,
+          context: {},
+          ...{ dvOf: childDvOf }
+        };
+        ret = [ childActionTag ];
       }
     } else if (ActionHelper.IsDvTxAction(actionTag)) {
       console.log(`Getting content for a dv-tx, returning ${actionTag.content}`);
@@ -509,7 +529,11 @@ export class ActionHelper {
       });
       ActionHelper.ActionExistsOrFail(actionTag, actionTable);
       ret = _.map(actionTable[actionTag.tag], (at: ActionTag) => {
-        return { ...at, context: childContext };
+        const childActionTag = { ...at, context: childContext };
+        childActionTag.dvOf = ActionHelper.GetDvOfForChild(
+          actionTag, childActionTag);
+
+        return childActionTag;
       });
     }
     // https://angular.io/guide/router

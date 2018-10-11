@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 const DV_TX_TAG = 'dv-tx';
 
 /**
- * A path of actions. The first node is the root.
+ * A path of actions (represented by their fqtags). The first node is the root.
  *
  * An action path is a DOM path that includes only actions (it filters HTML
  * elements like `div`)
