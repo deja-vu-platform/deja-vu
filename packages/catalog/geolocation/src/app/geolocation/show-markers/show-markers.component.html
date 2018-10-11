@@ -1,9 +1,13 @@
 <ul *ngIf="markers && markers.length > 0" class="list-group">
   <li *ngFor="let marker of markers" class="list-group-item">
-    <dv-include [action]="showMarker" [inputs]="{
+    <dv-include 
+      [action]="showMarker" 
+      [inputs]="{
       marker: marker, showId: showId, showTitle: showTitle,
       showLatLong: showLatLong, showMapId: showMapId
-      }" [parent]="showMarkers">
+      }" 
+      [parent]="showMarkers"
+      tag="geolocation-show-marker">
     </dv-include>
   </li>
 </ul>
