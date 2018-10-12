@@ -1,0 +1,21 @@
+{
+  "name": "passkey",
+  "config": {
+    "wsPort": 3001
+  },
+  "gateway": {
+    "config": {
+      "wsPort": 3000
+    }
+  },
+  "actions": {
+    "package": {
+      "include": [ "src/app/passkey/**" ]
+    },
+    "app": {
+      "names": [
+        { "for": "src/app/app.component.html", "use": "passkey-root" }
+      ]
+    }
+  }
+}
