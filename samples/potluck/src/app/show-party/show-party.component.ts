@@ -19,6 +19,7 @@ export class ShowPartyComponent implements OnInit {
   viewMore: boolean;
   host: {id: string};
   selectedGuestId: string;
+  balance;
 
   constructor() { }
 

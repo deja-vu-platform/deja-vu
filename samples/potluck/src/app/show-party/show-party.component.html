@@ -115,9 +115,14 @@
                 <div class="row">
                   <div class="col-md-12">
                     <transfer-show-balance
-                      [showAmount]="{ type: showSupply, tag: 'potluck-show-supply' }"
-                      [accountId]="partyId">
+                      [hidden]="true"
+                      [accountId]="partyId"
+                      (fetchedBalance)="balance=$event">
                     </transfer-show-balance>
+                    <transfer-show-item-counts
+                      [itemCounts]="balance"
+                      [showItemCount]="{ type: showSupply, tag: 'potluck-show-supply', inputMap: { itemCount: 'supply' } }">
+                    </transfer-show-item-counts>
                     <!--
                     <market-show-goods
                       [showGood]="{
