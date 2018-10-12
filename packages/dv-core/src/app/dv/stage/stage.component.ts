@@ -9,7 +9,7 @@ import {
 import * as _ from 'lodash';
 
 import { Action } from '../include/include.component';
-import { RunService } from '../run.service';
+import {OnAfterCommit, RunService} from '../run.service';
 
 
 @Component({
@@ -28,7 +28,8 @@ import { RunService } from '../run.service';
     }
   ]
 })
-export class StageComponent implements OnInit, ControlValueAccessor, Validator {
+export class StageComponent
+  implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   // for staging
   @Input() initialStagedEntities: any[] = [];
   @Output() stagedEntities = new EventEmitter<any[]>();
@@ -72,13 +73,13 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
   stage(value: any) {
     if (value !== undefined && value !== null) {
       this.staged.push(value);
-      this.stagedEntities.emit(this.staged);
+      this.stagedEntities.emit(_.cloneDeep(this.staged));
     }
   }
 
   unstage(index: string) {
     _.pullAt(this.staged, index);
-    this.stagedEntities.emit(this.staged);
+    this.stagedEntities.emit(_.cloneDeep(this.staged));
   }
 
   writeValue(value: any[]) {
@@ -87,7 +88,7 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
     } else {
       this.staged = [];
     }
-    this.stagedEntities.emit(this.staged);
+    this.stagedEntities.emit(_.cloneDeep(this.staged));
   }
 
   registerOnChange(fn: (value: string) => void) {
@@ -98,5 +99,18 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
 
   validate(_c: FormControl): ValidationErrors {
     return {};
+  }
+
+  dvOnAfterCommit() {
+    this.reset();
+  }
+
+  reset() {
+    this.staged = [];
+    // Can't do `this.form.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
+    }
   }
 }
