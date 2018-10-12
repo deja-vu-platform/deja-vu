@@ -11,6 +11,8 @@ import { OnAfterCommit, RunService } from 'dv-core';
 import { startWith } from 'rxjs/operators';
 import { CONFIG } from '../transfer.config';
 
+import { Amount } from '../shared/transfer.model';
+
 @Component({
   selector: 'transfer-input-amount',
   templateUrl: './input-amount.component.html',
@@ -31,7 +33,7 @@ import { CONFIG } from '../transfer.config';
 export class InputAmountComponent
   implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   amountControl = new FormControl(0, [Validators.required]);
-  @Output() amount = new EventEmitter<any>();
+  @Output() amount = new EventEmitter<Amount>();
 
   balanceType: 'money' | 'items';
 
@@ -45,14 +47,14 @@ export class InputAmountComponent
 
   ngOnInit() {
     this.rs.register(this.elem, this);
-    this.amountControl.valueChanges.subscribe((value: number) => {
+    this.amountControl.valueChanges.subscribe((value: Amount) => {
       this.amount.emit(value);
     });
     this.amountControl.valueChanges.pipe(startWith(
       this.amountControl.value));
   }
 
-  writeValue(value: number) {
+  writeValue(value: Amount) {
     if (value === null) {
       this.reset();
     } else {
@@ -60,7 +62,7 @@ export class InputAmountComponent
     }
   }
 
-  registerOnChange(fn: (value: number) => void) {
+  registerOnChange(fn: (value: Amount) => void) {
     this.amount.subscribe(fn);
   }
 

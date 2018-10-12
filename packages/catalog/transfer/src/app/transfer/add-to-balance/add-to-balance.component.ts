@@ -15,7 +15,7 @@ import {
 import * as _ from 'lodash';
 import { API_PATH } from '../transfer.config';
 
-import { Transfer } from '../shared/transfer.model';
+import { Amount, Transfer } from '../shared/transfer.model';
 
 interface CreateTransferRes {
   data: { addToBalance: Transfer };
@@ -43,7 +43,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     this.accountIdControl.setValue(accountId);
   }
 
-  @Input() set amount(amount: any) {
+  @Input() set amount(amount: Amount) {
     this.amountControl.setValue(amount);
   }
 
