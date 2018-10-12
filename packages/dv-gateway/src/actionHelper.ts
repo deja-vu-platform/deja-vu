@@ -182,18 +182,23 @@ export class ActionHelper {
       } else {
         // need to figure out if we have one from the context
         if (_.has(includeActionTag.context, `[${actionExpr}]`)) {
-          console.log(`INCLUDE: We HAVE one from the context for ${JSON.stringify(includeActionTag)}`);
+          console.log(
+              `include: We have one from the context for ` +
+              JSON.stringify(includeActionTag));
           const unparsedParentActionExpr = _
             .get(includeActionTag.context, `[${actionExpr}]`);
           const parentActionExpr = this.ParseActionExpr(
             unparsedParentActionExpr);
-          console.log(`Using parent Expr ${unparsedParentActionExpr}`);
-          console.log(`And context ${JSON.stringify(includeActionTag.context)}`);
+          console.log(
+              `Using parent Expr ${unparsedParentActionExpr} ` +
+              `and context ${JSON.stringify(includeActionTag.context)}`);
           actionInput = this.GetActionInput(
             parentActionExpr, includeActionTag.context);
           console.log(`Got back ${JSON.stringify(actionInput)}`);
         } else {
-          console.log(`INCLUDE: We don't have one from the context for ${JSON.stringify(includeActionTag)}`);
+          console.log(
+              `include: We don't have one from the context for ` +
+              JSON.stringify(includeActionTag));
           actionInput = this.GetActionInput(
             actionExpr, _.get(includeActionTag, 'inputs'));
         }
@@ -312,8 +317,8 @@ export class ActionHelper {
     const allActionsTable = _.assign(
       {}, appActionTable, ...clicheActionTables, dvCoreActionTable);
     console.log(
-      `Unpruned action table ${JSON.stringify(allActionsTable, null, 2)}`);
-    console.log('Done printing');
+      `Unpruned action table ` +
+      JSON.stringify(allActionsTable, null, 2));
 
     // Prune the action table to have only used actions
     // TODO: instead of adding all app actions, use the route information
@@ -488,8 +493,8 @@ export class ActionHelper {
         ret = [ childActionTag ];
       }
     } else if (ActionHelper.IsDvTxAction(actionTag)) {
-      console.log(`Getting content for a dv-tx, returning ${actionTag.content}`);
-    // } else if (ActionHelper.IsDvAction(actionTag)) {
+      console.log(
+          `Getting content for a dv-tx, returning ${actionTag.content}`);
       ret = actionTag.content;
     } else {
       /**
@@ -500,9 +505,12 @@ export class ActionHelper {
        */
       const childContext: InputMap | undefined = actionTag.inputs;
       if (_.isEmpty(actionTag.inputs))  {
-        console.log(`inputs of ${JSON.stringify(actionTag)} is empty so nothing to override` );
+        console.log(
+            `inputs of ${JSON.stringify(actionTag)} is empty so nothing to ` +
+            `override`);
       } else {
-        console.log(`will try with ${JSON.stringify(actionTag)}` );
+        console.log(
+            `will try with ${JSON.stringify(actionTag)}` );
       }
       _.each(actionTag.inputs, (inputValue: string, inputName: string) => {
         /**
@@ -517,7 +525,7 @@ export class ActionHelper {
             childContext![inputName] = JSON.stringify(
               ActionHelper.GetActionInput(actionExpr, actionTag.context));
             console.log(
-              `OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOVERWROTE ${inputName} with ${childContext![inputName]}`);
+              `Overwrote ${inputName} with ${childContext![inputName]}`);
           } catch (e) {
             console.log('got an error so no action');
             // Do nothing. If the attempt to parse and obtain an action input
@@ -551,7 +559,9 @@ export class ActionHelper {
       console.log(`Added ${routeActions} `);
     }
 
-    console.log(`Returning content ${JSON.stringify(ret)} for ${JSON.stringify(actionTag)}`);
+    console.log(
+        `Returning content ${JSON.stringify(ret)} for ` +
+        JSON.stringify(actionTag));
 
     return ret;
   }
