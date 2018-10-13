@@ -69,11 +69,11 @@ async function updateTask(tasks, id: string, updateOp: object,
 }
 
 const taskCliche: ClicheServer = new ClicheServerBuilder('task')
-  .initDb((db: mongodb.Db, config: Config) => {
+  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
     const tasks: mongodb.Collection<TaskDoc> = db.collection('tasks');
     return tasks.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .resolvers((db: mongodb.Db, config: Config) => {
+  .resolvers((db: mongodb.Db, config: Config): object => {
     const tasks: mongodb.Collection<TaskDoc> = db.collection('tasks');
     return {
       Query: {
