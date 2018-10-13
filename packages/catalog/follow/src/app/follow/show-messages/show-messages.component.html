@@ -1,8 +1,14 @@
 <ul *ngIf="messages && messages.length > 0" class="list-group">
   <li *ngFor="let message of messages" class="list-group-item">
-    <dv-include [action]="showMessage" [inputs]="{
-          message: message, showId: showId, showContent: showContent}" 
-          [parent]="showMessages">
+    <dv-include 
+      [action]="showMessage" 
+      [inputs]="{
+          message: message, 
+          showId: showId, 
+          showContent: showContent
+      }" 
+      [parent]="showMessages"
+      tag="follow-show-message">
     </dv-include>
   </li>
 </ul>
