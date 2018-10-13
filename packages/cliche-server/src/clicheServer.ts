@@ -19,7 +19,7 @@ export const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again l
 /**
  * The type of the function to be called after connecting to the db.
  */
-export type InitDbCallbackFn = ((db: mongodb.Db, config: Config) => void)
+export type InitDbCallbackFn = ((db: mongodb.Db, config: Config) => Promise<any>)
   | undefined;
 
 /**
@@ -28,7 +28,6 @@ export type InitDbCallbackFn = ((db: mongodb.Db, config: Config) => void)
  */
 export type InitResolversFn = ((db: mongodb.Db, config: Config) => object)
   | undefined;
-
 
 export interface Context {
   reqType: 'vote' | 'commit' | 'abort' | undefined;
@@ -125,11 +124,14 @@ export class ClicheServer {
           console.log(`Reinitialized db ${this._config.dbName}`);
         }
         if (this._initDbCallback) {
-          this._initDbCallback(this._db, this._config);
+          await this._initDbCallback(this._db, this._config);
+          if (!this._db)
+            throw new Error('Db was not initialized');
 
+          // TODO: support for initResolvers that don't require a db,
+          // e.g. for email cliche
           if (this._initResolvers) {
-            this._resolvers = this._initResolvers(
-              this._db as mongodb.Db, this._config);
+            this._resolvers = this._initResolvers(this._db, this._config);
             const typeDefs = [readFileSync(this._schemaPath, 'utf8')];
             const schema = makeExecutableSchema(
               { typeDefs, resolvers: this._resolvers });

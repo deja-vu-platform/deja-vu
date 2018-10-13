@@ -14,7 +14,7 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
 class TaskValidation {
-  static async taskExistsOrFail(tasks, id: string): Promise<void> {
+  static async taskExistsOrFail(tasks, id: string): Promise<any> {
     return Validation.existsOrFail(tasks, id, 'Task');
   }
 }
@@ -71,7 +71,7 @@ async function updateTask(tasks, id: string, updateOp: object,
 const taskCliche: ClicheServer = new ClicheServerBuilder('task')
   .initDb((db: mongodb.Db, config: Config) => {
     const tasks: mongodb.Collection<TaskDoc> = db.collection('tasks');
-    tasks.createIndex({ id: 1 }, { unique: true, sparse: true });
+    return tasks.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
   .resolvers((db: mongodb.Db, config: Config) => {
     const tasks: mongodb.Collection<TaskDoc> = db.collection('tasks');
