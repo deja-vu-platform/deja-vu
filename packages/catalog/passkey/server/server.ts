@@ -1,4 +1,3 @@
-import * as bcrypt from 'bcryptjs';
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import { readFileSync } from 'fs';
@@ -6,7 +5,8 @@ import * as jwt from 'jsonwebtoken';
 import * as minimist from 'minimist';
 import * as mongodb from 'mongodb';
 import * as path from 'path';
-import { v4 as uuid } from 'uuid';
+import * as shajs from 'sha.js';
+import { WORDS } from './words';
 
 // GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
 // tslint:disable-next-line:no-var-requires
@@ -16,64 +16,27 @@ import { makeExecutableSchema } from 'graphql-tools';
 import * as _ from 'lodash';
 
 // TODO: Update passkey.validate.ts if any changes made
-const USERNAME_MIN_LENGTH = 3;
-const USERNAME_MAX_LENGTH = 15;
-const USERNAME_REGEX
-  = new RegExp('^(?![_.-])(?!.*[_.-]{2})[a-zA-Z0-9._-]+$');
-const USERNAME_PATTERN_MSG = 'alphanumeric and special characters ._-';
+const PASSKEY_MIN_LENGTH = 3;
+const PASSKEY_MAX_LENGTH = 15;
 
-const PASSWORD_MIN_LENGTH = 8;
-const PASSWORD_MAX_LENGTH = 20;
-const PASSWORD_REGEX = new RegExp([
-  '^.*(?=.*[a-zA-Z])(?=.*[0-9])',
-  '(?=.*[!@#$%^&*])(?!.*[`~()\\-_=+[{\\]}\\\|;:\\\'",.<>/? ]).*$'
-].join(''));
-const PASSWORD_PATTERN_MSG = 'at least 1 lowercase letter, 1 uppercase '
-  + 'letter, 1 special character (!@#$%^*&) and 1 number (0-9)';
-
+const WORDS_SIZE = WORDS.length;
 
 // TODO: Change before deployment
 const SECRET_KEY = 'ultra-secret-key';
-const SALT_ROUNDS = 10;
 
-interface UserDoc {
-  id: string;
-  username: string;
-  password: string;
+interface PasskeyDoc {
+  code: string;
   pending?: PendingDoc;
 }
 
 interface PendingDoc {
   reqId: string;
-  type: 'register' | 'change-password';
-}
-
-interface User {
-  id: string;
-  username: string;
-  password: string;
-}
-
-interface RegisterInput {
-  id: string | undefined;
-  username: string;
-  password: string;
-}
-
-interface SignInInput {
-  username: string;
-  password: string;
-}
-
-interface ChangePasswordInput {
-  id: string;
-  oldPassword: string;
-  newPassword: string;
+  type: 'create-passkey' | 'sign-in';
 }
 
 interface SignInOutput {
   token: string;
-  user: User;
+  passkey: PasskeyDoc;
 }
 
 interface Config {
@@ -109,7 +72,7 @@ const config: Config = { ...DEFAULT_CONFIG, ...configArg };
 
 console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
 let db: mongodb.Db;
-let users: mongodb.Collection<UserDoc>;
+let passkeys: mongodb.Collection<PasskeyDoc>;
 mongodb.MongoClient.connect(
   `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
     if (err) {
@@ -121,92 +84,33 @@ mongodb.MongoClient.connect(
       console.log(`Reinitialized db ${config.dbName}`);
     }
 
-    users = db.collection('users');
-    users.createIndex({ id: 1 }, { unique: true, sparse: true });
-    users.createIndex({ username: 1 }, { unique: true, sparse: true });
+    passkeys = db.collection('passkeys');
+    passkeys.createIndex({ code: 1 }, { unique: true, sparse: true });
   });
 
 
 const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
 
 class Validation {
-  static async userExistsById(userId: string): Promise<UserDoc> {
-    const user: UserDoc | null = await users.findOne({ id: userId });
-    if (!user) {
-      throw new Error(`User ${userId} not found.`);
+
+  static async passkeyExistsOrFail(code: string): Promise<PasskeyDoc> {
+    const hashedCode = getHashedCode(code);
+    const passkey: PasskeyDoc | null = await passkeys
+      .findOne({ code: hashedCode });
+    if (!passkey) {
+      throw new Error(`Passkey ${code} not found.`);
     }
 
-    return user;
+    return passkey;
   }
 
-  static async userExistsByUsername(username: string): Promise<UserDoc> {
-    const user: UserDoc | null = await users.findOne({ username: username });
-    if (!user) {
-      throw new Error(`User ${username} not found.`);
-    }
-
-    return user;
-  }
-
-  static async userIsNew(id: string, username: string) {
-    const user: UserDoc | null = await users
-      .findOne({
-        $or: [
-          { id: id }, { username: username }
-        ]
-      });
-    if (user) {
-      throw new Error(`User already exists.`);
-    }
-
-    return user;
-  }
-
-  static async verifyPassword(inputPassword: string, savedPassword: string)
-    : Promise<Boolean> {
-    const passwordVerified = await bcrypt.compare(inputPassword, savedPassword);
-    if (!passwordVerified) {
-      throw new Error('Incorrect password.');
-    }
-
-    return passwordVerified;
-  }
-
-  static isUsernameValid(username: string): Boolean {
-    return (Validation.isLengthValid(username, USERNAME_MIN_LENGTH,
-      USERNAME_MAX_LENGTH, 'Username') &&
-      Validation.isPatternValid(username, USERNAME_REGEX, 'Username',
-        USERNAME_PATTERN_MSG));
-  }
-
-  static isPasswordValid(password: string): Boolean {
-    return (Validation.isLengthValid(password, PASSWORD_MIN_LENGTH,
-      PASSWORD_MAX_LENGTH, 'Password') &&
-      Validation.isPatternValid(password, PASSWORD_REGEX, 'Password',
-        PASSWORD_PATTERN_MSG));
-  }
-
-  static isLengthValid(value: string, minLength: number, maxLength: number,
-    type: string): Boolean {
+  static isPasskeyValid(value: string): void {
     const length: number = value.length;
 
-    if (length < minLength || length > maxLength) {
-      throw new Error(`${type} must be ${minLength}-${maxLength} characters
-      long.`);
+    if (length < PASSKEY_MIN_LENGTH || length > PASSKEY_MAX_LENGTH) {
+      throw new Error(`Passkey code must be
+      ${PASSKEY_MIN_LENGTH}-${PASSKEY_MAX_LENGTH} characters long.`);
     }
-
-    return true;
-  }
-
-  static isPatternValid(value: string, regExp: RegExp, type: string,
-    msg: string): Boolean {
-    const valid = regExp.test(value);
-
-    if (!valid) {
-      throw new Error(`${type} must contain ${msg}`);
-    }
-
-    return valid;
   }
 }
 
@@ -216,185 +120,134 @@ interface Context {
   reqId: string;
 }
 
-function isPendingRegister(user: UserDoc | null) {
-  return _.get(user, 'pending.type') === 'register';
+function isPendingCreate(passkey: PasskeyDoc | null) {
+  return _.get(passkey, 'pending.type') === 'create-passkey';
 }
 
-async function register(input: RegisterInput, context: Context) {
-
-  Validation.isUsernameValid(input.username);
-  Validation.isPasswordValid(input.password);
-
-  const id = input.id ? input.id : uuid();
-
-  await Validation.userIsNew(id, input.username);
-
-  const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
-  const newUser: UserDoc = {
-    id: id,
-    username: input.username,
-    password: hash
-  };
-
-  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-  switch (context.reqType) {
-    case 'vote':
-      newUser.pending = { reqId: context.reqId, type: 'register' };
-    case undefined:
-      await users.insertOne(newUser);
-
-      return newUser;
-    case 'commit':
-      await users.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
-
-      return;
-    case 'abort':
-      await users.deleteOne(reqIdPendingFilter);
-
-      return;
-  }
-
-  return newUser;
+function getHashedCode(code: string): string {
+  return shajs('sha256')
+    .update(code)
+    .digest('hex');
 }
 
-function sign(userId: string): string {
-  return jwt.sign(userId, SECRET_KEY);
+function sign(code: string): string {
+  return jwt.sign(code, SECRET_KEY);
 }
 
-function verify(token: string, userId: string): boolean {
+function verify(token: string, code: string): boolean {
   if (_.isNil(token)) {
     return false;
   }
   const tokenUserId: string = jwt.verify(token, SECRET_KEY);
 
-  return tokenUserId === userId;
+  return tokenUserId === code;
+}
+
+/**
+ * Generates a random code.
+ * @returns{string} A unique 5-7 letter english word not found in the database.
+ */
+function getRandomPasscode() {
+  const randomIndex = Math.floor(Math.random() * WORDS_SIZE);
+  const code = WORDS[randomIndex];
+
+  return passkeys
+    .findOne({ code: getHashedCode(code) })
+    .then((passkey) => {
+      if (!passkey) { return code; }
+
+      return getRandomPasscode();
+    });
+}
+
+async function createPasskey(code: string, context: Context) {
+  if (_.isEmpty(code)) {
+    // Generate random code
+    code = await getRandomPasscode();
+  } else {
+    const passkey = await passkeys.findOne({ code: getHashedCode(code) });
+    if (passkey) {
+      throw new Error(`Passkey ${code} already exists`);
+    }
+
+    Validation.isPasskeyValid(code);
+  }
+
+  const newPasskey: PasskeyDoc = { code: getHashedCode(code) };
+  const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+  switch (context.reqType) {
+    case 'vote':
+      newPasskey.pending = { reqId: context.reqId, type: 'create-passkey' };
+    case undefined:
+      await passkeys.insertOne(newPasskey);
+
+      return newPasskey;
+    case 'commit':
+      await passkeys.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+
+      return;
+    case 'abort':
+      await passkeys.deleteOne(reqIdPendingFilter);
+
+      return;
+  }
+
+  return newPasskey;
+
 }
 
 const resolvers = {
   Query: {
-    users: () => users.find({ pending: { $exists: false } })
+    passkeys: () => passkeys.find({ pending: { $exists: false } })
       .toArray(),
-    user: async (root, { username }) => {
-      const user: UserDoc | null = await users.findOne({ username: username });
 
-      return isPendingRegister(user) ? null : user;
+    passkey: async (root, { code }) => {
+      const passkey: PasskeyDoc = await Validation.passkeyExistsOrFail(code);
+
+      return isPendingCreate(passkey) ? null : passkey;
     },
-    userById: async (root, { id }) => {
-      const user: UserDoc | null = await users.findOne({ id: id });
 
-      if (_.isNil(user) || isPendingRegister(user)) {
-        throw new Error(`User ${id} not found`);
-      }
-
-      return user;
-    },
     verify: (root, { token, id }) => verify(token, id)
   },
 
-  User: {
-    id: (user: User) => user.id,
-    username: (user: User) => user.username
+  Passkey: {
+    code: (passkey: PasskeyDoc) => passkey.code
   },
 
   SignInOutput: {
     token: (signInOutput: SignInOutput) => signInOutput.token,
-    user: (signInOutput: SignInOutput) => signInOutput.user
+    passkey: (signInOutput: SignInOutput) => signInOutput.passkey
   },
 
   Mutation: {
-    register: (root, { input }: { input: RegisterInput }, context: Context) => {
-      return register(input, context);
+    createPasskey: async (root, { code }, context: Context) => {
+      return createPasskey(code, context);
     },
 
-    registerAndSignIn: async (
-      root, { input }: { input: RegisterInput }, context: Context) => {
-      const user = await register(input, context);
+    createAndValidatePasskey: async (root, { code }, context: Context) => {
+      const passkey = await createPasskey(code, context);
 
-      if (!_.isNil(user)) {
-        const token: string = sign(user!.id);
+      if (!_.isNil(passkey)) {
+        const token: string = sign(passkey!.code);
 
         return {
           token: token,
-          user: user
+          passkey: passkey
         };
       }
 
       return;
     },
 
-    signIn: async (root, { input }: { input: SignInInput }) => {
-      const user = await Validation.userExistsByUsername(input.username);
-      const verification = await Validation.verifyPassword(input.password,
-        user.password);
+    validatePasskey: async (root, { code }) => {
+      const passkey = await Validation.passkeyExistsOrFail(code);
 
-      const token: string = sign(user.id);
+      const token: string = sign(code);
 
       return {
         token: token,
-        user: user
+        passkey: passkey
       };
-    },
-
-    changePassword: async (
-      root, { input }: { input: ChangePasswordInput }, context: Context) => {
-      Validation.isPasswordValid(input.newPassword);
-      const user = await Validation.userExistsById(input.id);
-      const verification =
-        await Validation.verifyPassword(input.oldPassword, user.password);
-      const newPasswordHash = await bcrypt
-        .hash(input.newPassword, SALT_ROUNDS);
-
-      const updateOp = { $set: { password: newPasswordHash } };
-
-      const notPendingUserFilter = {
-        id: input.id,
-        pending: { $exists: false }
-      };
-      const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-
-      switch (context.reqType) {
-        case 'vote':
-          const pendingUpdateObj = await users.updateOne(
-            notPendingUserFilter,
-            {
-              $set: {
-                pending: {
-                  reqId: context.reqId,
-                  type: 'change-password'
-                }
-              }
-            });
-          if (pendingUpdateObj.matchedCount === 0) {
-            throw new Error(CONCURRENT_UPDATE_ERROR);
-          }
-
-          return true;
-
-        case undefined:
-          await Validation.userExistsById(input.id);
-          const updateObj = await users
-            .updateOne(notPendingUserFilter, updateOp);
-          if (updateObj.matchedCount === 0) {
-            throw new Error(CONCURRENT_UPDATE_ERROR);
-          }
-
-          return true;
-
-        case 'commit':
-          await users.updateOne(
-            reqIdPendingFilter,
-            { ...updateOp, $unset: { pending: '' } });
-
-          return false;
-
-        case 'abort':
-          await users
-            .updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
-
-          return false;
-      }
-
-      return false;
     }
   }
 };

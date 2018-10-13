@@ -8,8 +8,16 @@ import {
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DvModule } from 'dv-core';
+import { PasskeyService } from './shared/passkey.service';
+
+import { API_PATH } from './passkey.config';
+
+import {
+  CreatePasskeyComponent
+} from './create-passkey/create-passkey.component';
 
 const allComponents = [
+  CreatePasskeyComponent
 ];
 
 @NgModule({
@@ -19,9 +27,12 @@ const allComponents = [
     DvModule,
     FormsModule,
     ReactiveFormsModule,
-    MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule
   ],
-  providers: [],
+  providers: [PasskeyService, { provide: API_PATH, useValue: '/graphql' }],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

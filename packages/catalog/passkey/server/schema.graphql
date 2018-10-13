@@ -1,41 +1,20 @@
-type User {
-  id: ID!
-  username: String!
-}
-
-input RegisterInput {
-  id: ID
-  username: String!
-  password: String!
-}
-
-input SignInInput {
-  username: String!
-  password: String!
-}
-
-input ChangePasswordInput {
-  id: String!
-  oldPassword: String!
-  newPassword: String!
+type Passkey {
+  code: String!
 }
 
 type SignInOutput {
   token: String!
-  user: User!
+  passkey: Passkey!
 }
 
-
 type Query {
-  user(username: String!): User
-  userById(id: String!): User
-  users: [User!]
-  verify(id: ID!, token: String!): Boolean
+  passkey(code: String!): Passkey
+  passkeys: [Passkey]
+  verify(code: String!, token: String!): Boolean
 }
 
 type Mutation {
-  register(input: RegisterInput!): User
-  registerAndSignIn(input: RegisterInput!): SignInOutput
-  signIn(input: SignInInput!): SignInOutput
-  changePassword(input: ChangePasswordInput!): Boolean
+  createPasskey(code: String): Passkey
+  createAndValidatePasskey(code: String!): SignInOutput
+  validatePasskey(code: String!): SignInOutput
 }
