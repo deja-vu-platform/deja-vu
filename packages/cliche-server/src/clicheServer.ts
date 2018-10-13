@@ -1,7 +1,6 @@
 import * as bodyParser from 'body-parser';
 import * as express from 'express';
 import * as mongodb from 'mongodb';
-import * as path from 'path';
 import { readFileSync } from 'fs';
 import { makeExecutableSchema } from 'graphql-tools';
 
@@ -43,18 +42,18 @@ export interface Context {
  */
 export class ClicheServer {
   private readonly _name: string;
-  private readonly _schema: string;
+  private readonly _schemaPath: string;
   private readonly _config: Config;
   private _db: mongodb.Db | undefined;
   private _resolvers: object | undefined;
   private readonly _initDbCallback: InitDbCallbackFn;
   private readonly _initResolvers: InitResolversFn;
 
-  constructor(name: string, config: Config, schema: string,
+  constructor(name: string, config: Config, schemaPath: string,
     initDbCallback: InitDbCallbackFn, initResolvers: InitResolversFn) {
     this._name = name;
     this._config = config;
-    this._schema = schema;
+    this._schemaPath = schemaPath;
     this._initDbCallback = initDbCallback;
     this._initResolvers = initResolvers;
   }
@@ -131,8 +130,7 @@ export class ClicheServer {
           if (this._initResolvers) {
             this._resolvers = this._initResolvers(
               this._db as mongodb.Db, this._config);
-            const typeDefs = [readFileSync(
-              path.join(process.cwd(), 'dist', 'server', this._schema), 'utf8')];
+            const typeDefs = [readFileSync(this._schemaPath, 'utf8')];
             const schema = makeExecutableSchema(
               { typeDefs, resolvers: this._resolvers });
 

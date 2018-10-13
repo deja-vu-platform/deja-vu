@@ -1,5 +1,6 @@
 import * as minimist from 'minimist';
 import * as mongodb from 'mongodb';
+import * as path from 'path';
 
 import {
   ClicheServer,
@@ -14,7 +15,8 @@ import { Config, getConfig } from './config';
  */
 export class ClicheServerBuilder {
   private readonly _name: string;
-  private _schema: string = 'schema.graphql';
+  private _schemaPath: string = path.join(
+    process.cwd(), 'dist', 'server', 'schema.graphql');
   private _config: Config;
   private _initDbCallback: InitDbCallbackFn;
   private _initResolvers: InitResolversFn;
@@ -64,13 +66,12 @@ export class ClicheServerBuilder {
   }
 
   /**
-   * Set the filename that contains the schema for the cliche.
-   * The file must be in the same directory. (?)
-   * @param  schema the filename of the schema
-   * @return        this builder
+   * Set the filepath that contains the schema for the cliche.
+   * @param  schemaPath the filepath of the schema
+   * @return            this builder
    */
-  schema(schema: string): ClicheServerBuilder {
-    this._schema = schema;
+  schemaPath(schemaPath: string): ClicheServerBuilder {
+    this._schemaPath = schemaPath;
     return this;
   }
 
@@ -79,7 +80,7 @@ export class ClicheServerBuilder {
    * @return the resulting cliche server
    */
   build(): ClicheServer {
-    return new ClicheServer(this._name, this._config, this._schema,
+    return new ClicheServer(this._name, this._config, this._schemaPath,
       this._initDbCallback, this._initResolvers);
   }
 } 
