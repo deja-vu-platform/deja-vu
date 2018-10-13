@@ -29,8 +29,7 @@
     "express": "^4.16.2",
     "graphql": "^0.13.0",
     "graphql-tools": "^2.21.0",
-    "minimist": "^1.2.0",
-    "mongodb": "^3.0.4"
+    "minimist": "^1.2.0"
   },
   "devDependencies": {
     "@angular/compiler": "^5.2.0",
@@ -42,7 +41,10 @@
     "@types/mongodb": "^3.0.7",
     "rxjs": "^5.5.12",
     "tslint": "~5.9.1",
-    "typescript": "^2.5.3",
+    "typescript": ">=2.4.2 <2.7",
     "zone.js": "^0.8.26"
+  },
+  "peerDependencies": {
+    "mongodb": "^3.0.4"
   }
 }
