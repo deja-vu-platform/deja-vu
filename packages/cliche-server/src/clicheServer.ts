@@ -19,15 +19,13 @@ export const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again l
 /**
  * The type of the function to be called after connecting to the db.
  */
-export type InitDbCallbackFn = ((db: mongodb.Db, config: Config) => Promise<any>)
-  | undefined;
+export type InitDbCallbackFn = ((db: mongodb.Db, config: Config) => Promise<any>);
 
 /**
  * The type of the function to be called to generate the resolvers.
  * @return the resolvers object
  */
-export type InitResolversFn = ((db: mongodb.Db, config: Config) => object)
-  | undefined;
+export type InitResolversFn = ((db: mongodb.Db, config: Config) => object);
 
 export interface Context {
   reqType: 'vote' | 'commit' | 'abort' | undefined;
@@ -45,11 +43,11 @@ export class ClicheServer {
   private readonly _config: Config;
   private _db: mongodb.Db | undefined;
   private _resolvers: object | undefined;
-  private readonly _initDbCallback: InitDbCallbackFn;
-  private readonly _initResolvers: InitResolversFn;
+  private readonly _initDbCallback: InitDbCallbackFn | undefined;
+  private readonly _initResolvers: InitResolversFn | undefined;
 
   constructor(name: string, config: Config, schemaPath: string,
-    initDbCallback: InitDbCallbackFn, initResolvers: InitResolversFn) {
+    initDbCallback?: InitDbCallbackFn, initResolvers?: InitResolversFn) {
     this._name = name;
     this._config = config;
     this._schemaPath = schemaPath;
@@ -109,37 +107,33 @@ export class ClicheServer {
   /**
    * Start this cliche server.
    */
-  start() {
+  async start(): Promise<void> {
+    // TODO: make connecting to mongo optional since there will be cliches that
+    // don't require a db, e.g. email cliche
     const mongoServer: string = `${this._config.dbHost}:${this._config.dbPort}`;
     console.log(`Connecting to mongo server ${mongoServer}`);
-    mongodb.MongoClient.connect(
-      `mongodb://${mongoServer}`, async (err, client) => {
-        if (err) {
-          throw err;
-        }
+    const client: mongodb.MongoClient = await mongodb.MongoClient.connect(
+      `mongodb://${mongoServer}`);
 
-        this._db = client.db(this._config.dbName);
-        if (this._config.reinitDbOnStartup) {
-          await this._db.dropDatabase();
-          console.log(`Reinitialized db ${this._config.dbName}`);
-        }
-        if (this._initDbCallback) {
-          await this._initDbCallback(this._db, this._config);
-          if (!this._db)
-            throw new Error('Db was not initialized');
+    this._db = client.db(this._config.dbName);
+    if (!this._db)
+      throw new Error('Db was not initialized');
 
-          // TODO: support for initResolvers that don't require a db,
-          // e.g. for email cliche
-          if (this._initResolvers) {
-            this._resolvers = this._initResolvers(this._db, this._config);
-            const typeDefs = [readFileSync(this._schemaPath, 'utf8')];
-            const schema = makeExecutableSchema(
-              { typeDefs, resolvers: this._resolvers });
+    if (this._config.reinitDbOnStartup) {
+      await this._db.dropDatabase();
+      console.log(`Reinitialized db ${this._config.dbName}`);
+    }
+    if (this._initDbCallback) {
+      await this._initDbCallback(this._db, this._config);
+    }
+    // TODO: support for initResolvers that don't require a db
+    if (this._initResolvers) {
+      this._resolvers = this._initResolvers(this._db, this._config);
+      const typeDefs = [readFileSync(this._schemaPath, 'utf8')];
+      const schema = makeExecutableSchema(
+        { typeDefs, resolvers: this._resolvers });
 
-            this.startApp(schema);
-          }
-        }
-      }
-    );
+      this.startApp(schema);
+    }
   }
 } 

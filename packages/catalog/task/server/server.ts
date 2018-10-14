@@ -14,7 +14,8 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
 class TaskValidation {
-  static async taskExistsOrFail(tasks, id: string): Promise<any> {
+  static async taskExistsOrFail(
+    tasks: mongodb.Collection<TaskDoc>, id: string): Promise<TaskDoc> {
     return Validation.existsOrFail(tasks, id, 'Task');
   }
 }

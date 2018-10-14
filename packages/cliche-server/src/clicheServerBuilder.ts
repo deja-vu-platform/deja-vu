@@ -18,13 +18,13 @@ export class ClicheServerBuilder {
   private _schemaPath: string = path.join(
     process.cwd(), 'dist', 'server', 'schema.graphql');
   private _config: Config;
-  private _initDbCallback: InitDbCallbackFn;
-  private _initResolvers: InitResolversFn;
+  private _initDbCallback?: InitDbCallbackFn;
+  private _initResolvers?: InitResolversFn;
 
   /**
    * Start building a ClicheServerBuilder,
-   * which starts out with the default config and the ones specified
-   * in the command-line arguments.
+   * which starts out with the default schema path, and
+   * the default config and the ones specified in the command-line arguments.
    * @param defaultName the cliche name to use if it is not specified
    *                    in the command-line arguments
    */
@@ -35,7 +35,9 @@ export class ClicheServerBuilder {
   }
 
   /**
-   * Update the existing config with the given one
+   * Update the existing (default) config with the given one.
+   * Any fields present in the previous config, but not in the new one
+   * will be retained.
    * @param  config the config to use for updating
    * @return        this builder
    */
@@ -67,6 +69,7 @@ export class ClicheServerBuilder {
 
   /**
    * Set the filepath that contains the schema for the cliche.
+   * If not set before, overrides the default filepath.
    * @param  schemaPath the filepath of the schema
    * @return            this builder
    */
