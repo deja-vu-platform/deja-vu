@@ -5,7 +5,6 @@ import { DragulaService } from 'ng2-dragula';
 import * as EventCliche from 'event'; // TODO: proper import
 
 import { ComposedWidget, Cliche, ClicheComponents } from './datatypes';
-import { filterInPlace } from '../utils';
 
 const importedCliches = {
   Event: EventCliche,
@@ -30,10 +29,10 @@ export class AppComponent {
     {
       rows: [
         { widgets: [] },
-        { widgets: [] },
       ],
     },
   ];
+  composedWidget = this.composedWidgets[0]; // TODO: dynamic
 
   cliches: Cliche[] = [];
   clicheMap: { [clicheName: string]: Cliche } = {}; // redundant, for performance & clarity
@@ -58,25 +57,40 @@ export class AppComponent {
       copy: (el, source) => source.classList.contains('widget-list'),
       accepts: (el, target) => target.classList.contains('page-row'),
     });
-    dragulaService.drop('widget')
-      .pipe(filter(({ el, target }) => !!el && !!target))
-      .subscribe(({ el, source, target }) => {
-        const composedWidget = this.composedWidgets[0]; // TODO: active composed widget
+
+    const dropStream = dragulaService.drop('widget')
+      .pipe(filter(({ el, source, target }) => !!el && !!source && !!target));
+
+    dropStream.pipe(filter(({ source }) => source.classList.contains('widget-list')))
+      .subscribe(({ el, target }) => {
         const { cliche: clicheName, component: componentName } = el['dataset'];
         const component = this.clicheMap[clicheName].components[componentName];
-        // add widget to row
-        const targetRowIndex = parseInt(target['dataset'].index, 10);
-        composedWidget.rows[targetRowIndex].widgets.push(component);
-        // remove widget from old location if dragged from row
-        if (source.classList.contains('page-row')) {
-          const sourceRowIndex = parseInt(source['dataset'].index, 10);
-          const widgetIndex = parseInt(el['dataset'].index, 10);
-          composedWidget.rows[sourceRowIndex].widgets.splice(widgetIndex, 1);
-        }
-        // remove empty rows
-        filterInPlace(composedWidget.rows, r => r.widgets.length > 0);
-        // always end in empty row
-        composedWidget.rows.push({ widgets: [] });
+        this.addWidget(target, component);
       });
+
+    dropStream.pipe(filter(({ source }) => source.classList.contains('page-row')))
+      .subscribe(({ el, source, target }) => {
+        const component = this.removeWidget(el, source);
+        this.addWidget(target, component);
+      });
+  }
+
+  addWidget(targetRowElement, componentToAdd) {
+    const targetRowIndex = parseInt(targetRowElement['dataset'].index, 10);
+    this.composedWidget.rows[targetRowIndex].widgets.push(componentToAdd);
+    // always end in empty row
+    if (targetRowIndex === this.composedWidget.rows.length - 1) {
+      this.composedWidget.rows.push({ widgets: [] });
+    }
+  }
+
+  removeWidget(widgetElement, rowElement) {
+    const sourceRowIndex = parseInt(rowElement['dataset'].index, 10);
+    const widgetIndex = parseInt(widgetElement['dataset'].index, 10);
+    const [component] = this.composedWidget.rows[sourceRowIndex].widgets.splice(widgetIndex, 1);
+    if (this.composedWidget.rows[sourceRowIndex].widgets.length === 0) {
+      this.composedWidget.rows.splice(sourceRowIndex, 1);
+    }
+    return component;
   }
 }
