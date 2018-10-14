@@ -4,13 +4,19 @@ import { DragulaService } from 'ng2-dragula';
 
 import * as EventCliche from 'event'; // TODO: proper import
 
-import { ComposedWidget, Cliche } from './datatypes';
+import { ComposedWidget, Cliche, ClicheComponents } from './datatypes';
 import { filterInPlace } from '../utils';
 
-function getComponents(cliche: Cliche): Cliche {
-  return Object.values(cliche)
+const importedCliches = {
+  Event: EventCliche,
+};
+
+function restoreComponentNames(importedComponents) {
+  const namedComponents: ClicheComponents = {};
+  Object.values(importedComponents)
     .filter(f => f['name'].endsWith('Component'))
-    .reduce((o: Cliche, c) => { o[c['name'].slice(0, -9)] = c; return o; }, {});
+    .forEach(c => namedComponents[c['name'].slice(0, -9)] = c);
+  return namedComponents;
 }
 
 @Component({
@@ -29,12 +35,25 @@ export class AppComponent {
     },
   ];
 
-  cliches: { [clicheName: string]: Cliche } = {};
+  cliches: Cliche[] = [];
+  clicheMap: { [clicheName: string]: Cliche } = {}; // redundant, for performance & clarity
 
   // dragula needs to be configured at the top-level
   constructor(private dragulaService: DragulaService) {
-    this.cliches.event = getComponents(<Cliche>EventCliche);
+    this.loadCliches();
+    this.configureDragula(dragulaService);
+  }
 
+  loadCliches() {
+    Object.entries(importedCliches).forEach(([name, clicheModule]) => {
+      const components = restoreComponentNames(clicheModule);
+      const cliche = { name, components };
+      this.cliches.push(cliche);
+      this.clicheMap[name] = cliche;
+    });
+  }
+
+  configureDragula(dragulaService: DragulaService) {
     dragulaService.createGroup('widget', {
       copy: (el, source) => source.classList.contains('widget-list'),
       accepts: (el, target) => target.classList.contains('page-row'),
@@ -43,7 +62,8 @@ export class AppComponent {
       .pipe(filter(({ el, target }) => !!el && !!target))
       .subscribe(({ el, source, target }) => {
         const composedWidget = this.composedWidgets[0]; // TODO: active composed widget
-        const component = this.cliches.event.CreateWeeklySeries; // TODO: dragged component
+        const { cliche: clicheName, component: componentName } = el['dataset'];
+        const component = this.clicheMap[clicheName].components[componentName];
         // add widget to row
         const targetRowIndex = parseInt(target['dataset'].index, 10);
         composedWidget.rows[targetRowIndex].widgets.push(component);
