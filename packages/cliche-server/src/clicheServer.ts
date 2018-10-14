@@ -116,8 +116,6 @@ export class ClicheServer {
       `mongodb://${mongoServer}`);
 
     this._db = client.db(this._config.dbName);
-    if (!this._db)
-      throw new Error('Db was not initialized');
 
     if (this._config.reinitDbOnStartup) {
       await this._db.dropDatabase();
