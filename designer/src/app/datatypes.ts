@@ -13,5 +13,10 @@ export interface Row {
 export type Widget = BaseWidget | ComposedWidget;
 
 export interface Cliche {
+  name: string;
+  components: ClicheComponents;
+}
+
+export interface ClicheComponents {
   [componentName: string]: Component;
 }

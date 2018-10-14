@@ -1,4 +1,9 @@
 <mat-list class='widget-list' dragula="widget">
-  <mat-list-item>Create Weekly Series</mat-list-item>
-  <mat-list-item>Show Weekly Series</mat-list-item>
+  <mat-list-item
+    *ngFor="let componentName of componentNames"
+    [attr.data-cliche]="cliche.name"
+    [attr.data-component]="componentName"
+  >
+    {{componentName}}
+  </mat-list-item>
 </mat-list>
