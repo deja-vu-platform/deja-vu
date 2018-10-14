@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { filter } from 'rxjs/operators';
+import { filter, tap } from 'rxjs/operators';
 import { DragulaService } from 'ng2-dragula';
 
 import * as EventCliche from 'event'; // TODO: proper import
@@ -59,18 +59,17 @@ export class AppComponent {
     });
 
     const dropStream = dragulaService.drop('widget')
-      .pipe(filter(({ el, source, target }) => !!el && !!source && !!target));
-
-    dropStream.pipe(filter(({ source }) => source.classList.contains('widget-list')))
-      .subscribe(({ el, target }) => {
-        const { cliche: clicheName, component: componentName } = el['dataset'];
-        const component = this.clicheMap[clicheName].components[componentName];
-        this.addWidget(target, component);
-      });
-
-    dropStream.pipe(filter(({ source }) => source.classList.contains('page-row')))
+      .pipe(filter(({ el, source, target }) => !!el && !!source && !!target))
       .subscribe(({ el, source, target }) => {
-        const component = this.removeWidget(el, source);
+        let component;
+        if (source.classList.contains('widget-list')) {
+          const { cliche: clicheName, component: componentName } = el['dataset'];
+          component = this.clicheMap[clicheName].components[componentName];
+        } else if (source.classList.contains('page-row')) {
+          component = this.removeWidget(el, source);
+        } else {
+          return;
+        }
         this.addWidget(target, component);
       });
   }
