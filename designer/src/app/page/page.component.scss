@@ -20,4 +20,6 @@ app-row:first-child {
 app-row:last-child {
   flex: 1;
   border-bottom: none;
+  display: flex;
+  flex: 1;
 }
