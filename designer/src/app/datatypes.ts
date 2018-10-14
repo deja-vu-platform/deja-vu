@@ -1,3 +1,5 @@
+import { Component } from '@angular/core';
+
 export type BaseWidget = any; // TODO
 
 export interface ComposedWidget {
@@ -9,3 +11,7 @@ export interface Row {
 }
 
 export type Widget = BaseWidget | ComposedWidget;
+
+export interface Cliche {
+  [componentName: string]: Component;
+}
