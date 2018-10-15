@@ -141,10 +141,9 @@ export function startServerCmd(
   const cmd = watch ? `nodemon -w ${serverDistFolder}` : 'node';
   const eoc = watch ? '--' : '';
   const script = path.join(serverDistFolder, 'server.js');
-  return `if [ -f ${script} ]; then ${cmd} ${script}` +
-    ` ${eoc} --config \"\`dv get ${configKey}\`\"` +
-    (asFlagValue ? `--as ${asFlagValue}` : '') + '; ' +
-    'else echo "No file"; fi;';
+
+  return `${cmd} ${script} ${eoc} --config '\`dv get ${configKey}\`'` +
+    (asFlagValue ? ` --as ${asFlagValue}` : '');
 }
 
 export function buildFeCmd(watch: boolean, projectFolder?: string): string {
@@ -162,6 +161,21 @@ export function buildServerCmd(watch: boolean, projectFolder?: string): string {
 
 function buildCmd(cmd: string, projectFolder?: string): string {
   return projectFolder ? `(cd ${projectFolder}; ${cmd})` : cmd;
+}
+
+function startServerCmdOfCliche() {
+  return startServerCmd(false, path.join('dist', 'server'), 'config');
+}
+
+function startServerCmdOfUsedCliche(cliche: string | undefined, alias: string)
+  : string {
+  const clicheFolder = (cliche === undefined) ? alias : cliche;
+  const serverDistFolder = path
+    .join('node_modules', clicheFolder, 'server');
+  const configKey = `usedCliches.${alias}.config`;
+  const asFlagValue = (alias !== cliche) ? alias : undefined;
+
+  return startServerCmd(false, serverDistFolder, configKey, asFlagValue);
 }
 
 export function concurrentlyCmd(...cmds: string[]): string {
@@ -279,21 +293,19 @@ program
       writeFileOrFail(
         path.join('dist', ACTION_TABLE_FILE_NAME),
         actionTable(config, _.get(config.actions, 'app')));
-      const buildStartServerCmd = (name: string) => `npm run dv-start-${name}`;
-      const pkgJson = JSON.parse(readFileOrFail('package.json'));
-      const startServerOfCurrentProjectCmd = _
-        .has(pkgJson, `scripts.dv-start-${config.name}`) ?
-        [buildStartServerCmd(config.name)] : [];
+      const startServerOfCurrentProjectCmd =
+        (existsSync(path.join('dist', 'server'))) ?
+        [ startServerCmdOfCliche() ] : [];
       const startServerCmds = _
         .chain(config.usedCliches)
         .entries()
-        .map(e => buildStartServerCmd(e[0]))
+        .map(e => startServerCmdOfUsedCliche(e[1].name, e[0]))
         .concat(startServerOfCurrentProjectCmd)
         .value();
 
       const allStartCmds: string[] = _
         .chain(startServerCmds)
-        .concat('npm run dv-start-gateway')
+        .concat(startGatewayCmd('dvconfig.json'))
         .map(startCmd => `"${startCmd}"`)
         .value();
       cmd('npm', ['run', 'concurrently', '--', ...allStartCmds]);
