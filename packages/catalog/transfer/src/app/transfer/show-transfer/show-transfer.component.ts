@@ -11,6 +11,8 @@ import { GatewayService, GatewayServiceFactory } from 'dv-core';
 import { Transfer } from '../shared/transfer.model';
 import { API_PATH, CONFIG } from '../transfer.config';
 
+import * as _ from 'lodash';
+
 
 interface TransferRes {
   data: { transfer: Transfer };
@@ -73,6 +75,10 @@ export class ShowTransferComponent implements OnInit, OnChanges {
       }
     })
       .subscribe((res) => {
+        if (res.errors) {
+          throw new Error(_.map(res.errors, 'message')
+            .join());
+        }
         this.transfer = res.data.transfer;
         this.loadedTransfer.emit(this.transfer);
       });
