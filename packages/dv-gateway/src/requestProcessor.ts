@@ -127,10 +127,13 @@ export class RequestProcessor {
     this.actionHelper = new ActionHelper(
       appActionTable, usedCliches, dvConfig.routes);
 
-    this.dstTable = _
+    const usedClicheServers = _
       .mapValues(
         dvConfig.usedCliches,
         (clicheConfig: DvConfig) => clicheConfig.config.wsPort);
+    const thisServer = (dvConfig.config !== undefined) ?
+      { [dvConfig.name]: dvConfig.config.wsPort } : {};
+    this.dstTable = _.assign({}, usedClicheServers, thisServer);
     console.log(`Using dst table ${JSON.stringify(this.dstTable)}`);
 
     const txConfig = this.getTxConfig(config, this.actionHelper);
@@ -161,7 +164,7 @@ export class RequestProcessor {
     const actionPath = gatewayRequest.from;
     const matchingActions = this.actionHelper.getMatchingActions(actionPath);
     const to = RequestProcessor.ClicheOf(matchingActions[0]);
-    const toPort = _.get(this.dstTable, to);
+    const toPort: port | undefined = _.get(this.dstTable, to);
 
     console.log(`Req from ${stringify(gatewayRequest)}`);
     if (!this.validateRequest(actionPath, matchingActions, to, toPort, res)) {
