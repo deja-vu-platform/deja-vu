@@ -31,7 +31,12 @@ interface PasskeyDoc {
 
 interface PendingDoc {
   reqId: string;
-  type: 'create-passkey' | 'sign-in';
+  type: 'create-passkey';
+}
+
+interface VerifyInput {
+  code: string;
+  token: string;
 }
 
 interface SignInOutput {
@@ -178,6 +183,7 @@ async function createPasskey(code: string, context: Context) {
   switch (context.reqType) {
     case 'vote':
       newPasskey.pending = { reqId: context.reqId, type: 'create-passkey' };
+    // tslint:disable-next-line:no-switch-case-fall-through
     case undefined:
       await passkeys.insertOne(newPasskey);
 
@@ -207,7 +213,8 @@ const resolvers = {
       return isPendingCreate(passkey) ? null : passkey;
     },
 
-    verify: (root, { token, id }) => verify(token, id)
+    verify: (root, { input }: { input: VerifyInput }) =>
+      verify(input.token, input.code)
   },
 
   Passkey: {
@@ -221,7 +228,9 @@ const resolvers = {
 
   Mutation: {
     createPasskey: async (root, { code }, context: Context) => {
-      return createPasskey(code, context);
+      const passkey = await createPasskey(code, context);
+
+      return passkey;
     },
 
     createAndValidatePasskey: async (root, { code }, context: Context) => {

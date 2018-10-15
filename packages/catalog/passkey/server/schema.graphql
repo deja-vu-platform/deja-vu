@@ -7,10 +7,15 @@ type SignInOutput {
   passkey: Passkey!
 }
 
+input VerifyInput {
+  code: String!
+  token: String!
+}
+
 type Query {
   passkey(code: String!): Passkey
   passkeys: [Passkey]
-  verify(code: String!, token: String!): Boolean
+  verify(input: VerifyInput!): Boolean
 }
 
 type Mutation {

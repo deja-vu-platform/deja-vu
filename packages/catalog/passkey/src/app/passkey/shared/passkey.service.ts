@@ -4,28 +4,28 @@ import { Passkey } from './passkey.model';
 
 
 const TOKEN_KEY = 'token';
-const USER_KEY = 'user';
-const GUEST_USER_KEY = 'guest';
+const PASSKEY_KEY = 'passkey';
+const GUEST_PASSKEY_KEY = 'guest';
 const GUEST_TOKEN_KEY = 'guest-token';
 
 @Injectable()
 export class PasskeyService {
-  setSignedInUser(token: string, passkey: Passkey) {
+  setSignedInPasskey(token: string, passkey: Passkey) {
     localStorage.setItem(TOKEN_KEY, token);
-    localStorage.setItem(USER_KEY, JSON.stringify(passkey));
+    localStorage.setItem(PASSKEY_KEY, JSON.stringify(passkey));
   }
 
   setSignedInGuest(token: string, passkey: Passkey) {
     localStorage.setItem(GUEST_TOKEN_KEY, token);
-    localStorage.setItem(GUEST_USER_KEY, JSON.stringify(passkey));
+    localStorage.setItem(GUEST_PASSKEY_KEY, JSON.stringify(passkey));
   }
 
-  getSignedInUser(): Passkey {
-    return JSON.parse(localStorage.getItem(USER_KEY));
+  getSignedInPasskey(): Passkey {
+    return JSON.parse(localStorage.getItem(PASSKEY_KEY));
   }
 
   getSignedInGuest(): Passkey {
-    return JSON.parse(localStorage.getItem(GUEST_USER_KEY));
+    return JSON.parse(localStorage.getItem(GUEST_PASSKEY_KEY));
   }
 
   getToken(): string {
@@ -38,11 +38,11 @@ export class PasskeyService {
 
   signOut() {
     localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(PASSKEY_KEY);
   }
 
   guestSignOut() {
     localStorage.removeItem(GUEST_TOKEN_KEY);
-    localStorage.removeItem(GUEST_USER_KEY);
+    localStorage.removeItem(GUEST_PASSKEY_KEY);
   }
 }

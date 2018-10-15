@@ -21,8 +21,13 @@ import { PasskeyValidator } from '../shared/passkey.validation';
 
 const SAVED_MSG_TIMEOUT = 3000;
 
-interface CreatePasskeyRes {
+interface CreateAndValidatePasskeyRes {
   data: { createAndValidatePasskey: SignInOutput };
+  errors: { message: string }[];
+}
+
+interface CreatePasskeyRes {
+  data: { createPasskey: Passkey };
   errors: { message: string }[];
 }
 
@@ -45,6 +50,7 @@ interface CreatePasskeyRes {
 })
 export class CreatePasskeyComponent
   implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+
   // Presentation options
   @Input() randomPassword = false;
   @Input() signIn = true;
@@ -63,6 +69,10 @@ export class CreatePasskeyComponent
   createPasskeyForm: FormGroup = this.builder.group({
     passkeyControl: this.passkeyControl
   });
+
+  @Input() set code(code: string) {
+    if (code) { this.passkeyControl.setValue(code); }
+  }
 
   newPasskeyCreated = false;
   newPasskeyError: string;
@@ -87,29 +97,31 @@ export class CreatePasskeyComponent
   async dvOnRun(): Promise<void> {
     let passkey;
     if (this.signIn) {
-      const res = await this.gs.post<CreatePasskeyRes>(this.apiPath, {
-        query: `mutation {
+      const res = await this.gs
+        .post<CreateAndValidatePasskeyRes>(this.apiPath, {
+          query: `mutation {
           createAndValidatePasskey(code: "${this.passkeyControl.value}") {
             passkey { code }
             token
           }
         }`
-      })
+        })
         .toPromise();
 
       if (res.errors) {
         throw new Error(_.map(res.errors, 'message')
           .join());
       }
-      
+
       const token = res.data.createAndValidatePasskey.token;
       passkey = res.data.createAndValidatePasskey.passkey;
-      this.passkeyService.setSignedInUser(token, passkey);
+      this.passkeyService.setSignedInPasskey(token, passkey);
+
     } else {
       const res = await this.gs.post<CreatePasskeyRes>(this.apiPath, {
         query: `mutation {
-          validatePasskey(code: "${this.passkeyControl.value}") {
-            passkey { code }
+          createPasskey(code: "${this.passkeyControl.value}") {
+            code
           }
         }`
       })
@@ -120,7 +132,7 @@ export class CreatePasskeyComponent
           .join());
       }
 
-      passkey = res.data.createAndValidatePasskey.passkey;
+      passkey = res.data.createPasskey;
     }
     this.passkey.emit(passkey);
   }
@@ -129,6 +141,7 @@ export class CreatePasskeyComponent
     this.newPasskeyCreated = true;
     window.setTimeout(() => {
       this.newPasskeyCreated = false;
+      this.newPasskeyError = '';
     }, SAVED_MSG_TIMEOUT);
     // Can't do `this.form.reset();`
     // See https://github.com/angular/material2/issues/4190
