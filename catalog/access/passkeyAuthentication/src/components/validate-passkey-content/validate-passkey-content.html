@@ -1,9 +1,0 @@
-<!-- ValidatePasskeyContent -->
-<fieldset class="form-group">
-    <label class="sr-only" for="code">Passkey</label>
-    <input type="text" required class="form-control authentication" name="code" [(ngModel)]="passkey.code" ngControl="code" placeholder="Passkey Code"
-    />
-    <div id="validate-status" class="alert alert-danger" [hidden]="!error">
-        Incorrect passkey code. Try again.
-    </div>
-</fieldset>
