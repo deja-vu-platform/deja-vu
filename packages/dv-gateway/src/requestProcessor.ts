@@ -52,6 +52,10 @@ interface ClicheResponse<T> {
 
 type port = string;
 
+// https://stackoverflow.com/questions/985431
+const MAX_BROWSER_CONNECTIONS = 6;
+
+
 export class RequestProcessor {
   private readonly txCoordinator: TxCoordinator<
     GatewayToClicheRequest, ClicheResponse<string>, express.Response>;
@@ -253,7 +257,6 @@ export class RequestProcessor {
               result: resp.text.result,
               payload: { status: resp.status, text: resp.text.payload }
             };
-            console.log(`Voted: ${stringify(vote)}`);
 
             return vote;
           });
@@ -312,6 +315,13 @@ export class RequestProcessor {
             return new ActionPath(nodes)
               .serialize();
           });
+
+        if (cohorts.length > MAX_BROWSER_CONNECTIONS) {
+          throw new Error(
+            `The max number of cohorts per tx is ` +
+            `${MAX_BROWSER_CONNECTIONS}. This limit will be removed in the ` +
+            `future.`);
+        }
 
         return cohorts;
       },
