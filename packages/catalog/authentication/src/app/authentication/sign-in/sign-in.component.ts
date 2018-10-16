@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -19,7 +19,11 @@ import { AuthenticationService } from '../shared/authentication.service';
 
 import { User } from '../shared/authentication.model';
 
+import { API_PATH } from '../authentication.config';
+
+
 const SAVED_MSG_TIMEOUT = 3000;
+
 
 @Component({
   selector: 'authentication-sign-in',
@@ -62,7 +66,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private authenticationService: AuthenticationService) {}
+    private authenticationService: AuthenticationService,
+    @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -74,7 +79,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{ data: any, errors: any }>('/graphql', {
+    const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
       query: `mutation SignIn($input: SignInInput!) {
         signIn(input: $input) {
           token,

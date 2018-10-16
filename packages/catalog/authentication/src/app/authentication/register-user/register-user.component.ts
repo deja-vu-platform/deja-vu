@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -12,7 +12,6 @@ import {
   OnAfterCommit, OnRun, RunService
 } from 'dv-core';
 
-import * as _ from 'lodash';
 
 import { AuthenticationService } from '../shared/authentication.service';
 
@@ -21,6 +20,9 @@ import { User } from '../shared/authentication.model';
 import {
   PasswordValidator, RetypePasswordValidator, UsernameValidator
 } from '../shared/authentication.validation';
+
+import { API_PATH } from '../authentication.config';
+
 
 const SAVED_MSG_TIMEOUT = 3000;
 
@@ -84,7 +86,8 @@ export class RegisterUserComponent
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
-    private authenticationService: AuthenticationService) { }
+    private authenticationService: AuthenticationService,
+    @Inject(API_PATH) private apiPath) { }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -105,7 +108,7 @@ export class RegisterUserComponent
     };
     let user;
     if (this.signIn) {
-      const res = await this.gs.post<{ data: any }>('/graphql', {
+      const res = await this.gs.post<{ data: any }>(this.apiPath, {
         query: `mutation RegisterAndSignIn($input: RegisterInput!) {
           registerAndSignIn(input: $input) {
             user { id, username }
@@ -120,7 +123,7 @@ export class RegisterUserComponent
       user = res.data.registerAndSignIn.user;
       this.authenticationService.setSignedInUser(token, user);
     } else {
-      const res = await this.gs.post<{ data: any }>('/graphql', {
+      const res = await this.gs.post<{ data: any }>(this.apiPath, {
         query: `mutation Register($input: RegisterInput!) {
           register(input: $input) {
             id,

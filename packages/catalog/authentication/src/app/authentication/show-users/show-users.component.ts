@@ -1,5 +1,13 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, Type,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Inject,
+  Input,
+  OnChanges,
+  OnInit,
+  Output,
+  Type,
   ViewChild
 } from '@angular/core';
 
@@ -10,6 +18,8 @@ import {
 
 import { User } from '../shared/authentication.model';
 import { ShowUserComponent } from '../show-user/show-user.component';
+
+import { API_PATH } from '../authentication.config';
 
 
 @Component({
@@ -33,7 +43,8 @@ export class ShowUsersComponent implements OnInit, OnChanges {
   private gs: GatewayService;
 
   constructor(
-    private elem: ElementRef, private gsf: GatewayServiceFactory) {
+    private elem: ElementRef, private gsf: GatewayServiceFactory,
+    @Inject(API_PATH) private apiPath) {
     this.showUsers = this;
   }
 
@@ -49,7 +60,7 @@ export class ShowUsersComponent implements OnInit, OnChanges {
   fetchUsers() {
     if (this.gs) {
       this.gs
-        .get<{ data: { users: User[] } }>('/graphql', {
+        .get<{ data: { users: User[] } }>(this.apiPath, {
           params: {
             query: `
               query Users($input: UsersInput!) {

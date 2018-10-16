@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Inject, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 
 import {
@@ -21,7 +21,11 @@ import {
   PasswordValidator, RetypePasswordValidator
 } from '../shared/authentication.validation';
 
+import { API_PATH } from '../authentication.config';
+
+
 const SAVED_MSG_TIMEOUT = 3000;
+
 
 @Component({
   selector: 'authentication-change-password',
@@ -72,7 +76,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder,
+    @Inject(API_PATH) private apiPath) {}
 
   newPasswordSaved = false;
   newPasswordSavedError: string;
@@ -89,7 +94,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   async dvOnRun(): Promise<void> {
-    const res = await this.gs.post<{ data: any, errors: any }>('/graphql', {
+    const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
         query: `mutation ChangePassword($input: ChangePasswordInput!) {
           changePassword(input: $input)
         }`,

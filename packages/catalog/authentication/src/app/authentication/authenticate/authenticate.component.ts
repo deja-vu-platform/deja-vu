@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter,
+  Component, ElementRef, EventEmitter, Inject,
   Input, OnChanges, OnInit, Output
 } from '@angular/core';
 
@@ -11,6 +11,8 @@ import {
 import { AuthenticationService } from '../shared/authentication.service';
 
 import * as _ from 'lodash';
+
+import { API_PATH } from '../authentication.config';
 
 
 @Component({
@@ -26,7 +28,7 @@ export class AuthenticateComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService,
+    private rs: RunService, @Inject(API_PATH) private apiPath,
     private authenticationService: AuthenticationService) { }
 
   ngOnInit() {
@@ -44,7 +46,7 @@ export class AuthenticateComponent implements OnInit, OnChanges {
       return;
     }
     const token = this.authenticationService.getToken();
-    this.gs.get<{ data: { verify: boolean } }>('/graphql', {
+    this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {
       params: {
         query: `query Verify($input: VerifyInput!){
           verify(input: $input)
@@ -64,7 +66,7 @@ export class AuthenticateComponent implements OnInit, OnChanges {
 
   dvOnRun() {
     const token = this.authenticationService.getToken();
-    this.gs.post<{ data: { verify: boolean } }>('/graphql', {
+    this.gs.post<{ data: { verify: boolean } }>(this.apiPath, {
       query: `mutation Verify($input: VerifyInput!) {
         verify(input: $input)
       }`,

@@ -31,6 +31,8 @@ export { ChooseUserComponent };
 import { ShowUsersComponent } from './show-users/show-users.component';
 export { ShowUsersComponent };
 
+import { API_PATH } from './authentication.config';
+
 const allComponents = [
   AuthenticateComponent, ChangePasswordComponent, LoggedInComponent,
   RegisterUserComponent, ShowUserComponent, SignInComponent, SignOutComponent,
@@ -46,7 +48,10 @@ const allComponents = [
     ReactiveFormsModule,
     MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
-  providers: [AuthenticationService],
+  providers: [
+    AuthenticationService,
+    { provide: API_PATH, useValue: '/graphql' }
+  ],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

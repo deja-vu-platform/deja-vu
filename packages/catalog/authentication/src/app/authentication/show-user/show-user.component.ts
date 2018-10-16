@@ -1,5 +1,5 @@
 import {
-  Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output,
+  Component, ElementRef, EventEmitter, Inject, Input, OnChanges, OnInit, Output,
   ViewChild
 } from '@angular/core';
 
@@ -14,6 +14,8 @@ import {
 } from 'dv-core';
 
 import { User } from '../shared/authentication.model';
+
+import { API_PATH } from '../authentication.config';
 
 
 @Component({
@@ -30,7 +32,7 @@ export class ShowUserComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    private rs: RunService) {}
+    private rs: RunService, @Inject(API_PATH) private apiPath) {}
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -51,7 +53,7 @@ export class ShowUserComponent implements OnInit, OnChanges {
     if (!this.gs || !this.id) {
       return;
     }
-    this.gs.get<{ data: any }>('/graphql', {
+    this.gs.get<{ data: any }>(this.apiPath, {
       params: {
         query: `query {
           userById(id: "${this.id}") {
