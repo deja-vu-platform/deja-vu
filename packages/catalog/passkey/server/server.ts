@@ -109,7 +109,7 @@ class Validation {
     return passkey;
   }
 
-  static isPasskeyValid(value: string): void {
+  static passkeyIsValidOrFail(value: string): void {
     const length: number = value.length;
 
     if (length < PASSKEY_MIN_LENGTH || length > PASSKEY_MAX_LENGTH) {
@@ -152,11 +152,11 @@ function verify(token: string, code: string): boolean {
  * Generates a random code.
  * @returns{string} A unique 5-7 letter english word not found in the database.
  */
-function getRandomPasscode() {
+async function getRandomPasscode() {
   const randomIndex = Math.floor(Math.random() * WORDS_SIZE);
   const code = WORDS[randomIndex];
 
-  return passkeys
+  return await passkeys
     .findOne({ code: getHashedCode(code) })
     .then((passkey) => {
       if (!passkey) { return code; }
@@ -175,7 +175,7 @@ async function createPasskey(code: string, context: Context) {
       throw new Error(`Passkey ${code} already exists`);
     }
 
-    Validation.isPasskeyValid(code);
+    Validation.passkeyIsValidOrFail(code);
   }
 
   const newPasskey: PasskeyDoc = { code: getHashedCode(code) };
