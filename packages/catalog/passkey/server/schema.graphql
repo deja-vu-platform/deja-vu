@@ -1,0 +1,25 @@
+type Passkey {
+  code: String!
+}
+
+type SignInOutput {
+  token: String!
+  passkey: Passkey!
+}
+
+input VerifyInput {
+  code: String!
+  token: String!
+}
+
+type Query {
+  passkey(code: String!): Passkey
+  passkeys: [Passkey]
+  verify(input: VerifyInput!): Boolean
+}
+
+type Mutation {
+  createPasskey(code: String): Passkey
+  createAndValidatePasskey(code: String!): SignInOutput
+  validatePasskey(code: String!): SignInOutput
+}

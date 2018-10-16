@@ -1,0 +1,32 @@
+<form (ngSubmit)="onSubmit()" [formGroup]="validatePasskeyForm" 
+  class="form-horizontal">
+
+  <div class="form-group">
+    <div *ngIf="passkeyValidated">
+      <i class="material-icons">done</i>
+      {{passkeyValidatedText}}
+    </div>
+    <mat-error *ngIf="passkeyValidatedError">
+      <i class="material-icons">report_problem</i>
+      {{passkeyValidatedError}}
+    </mat-error>
+  </div>
+
+  <div class="form-group">
+    <mat-form-field>
+      <mat-label>{{inputLabel}}</mat-label>
+      <input matInput required formControlName="passkeyControl">
+    </mat-form-field>
+    <div *ngIf="passkeyControl.invalid && passkeyControl.touched">
+      <mat-error *ngIf="passkeyControl.hasError('required')">
+        This field is <strong>required</strong>.
+      </mat-error>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <button mat-button type="submit" [disabled]="!validatePasskeyForm.valid">
+      {{buttonLabel}}
+    </button>
+  </div>
+</form>
