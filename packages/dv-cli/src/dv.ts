@@ -96,17 +96,38 @@ export function updateDvConfig(
   updateJsonFile(DVCONFIG_FILE_PATH, updateFn);
 }
 
-export function updatePackage(
-  updateFn: (pkg: any) => any, dir?: string): void {
-  const pkgPath: string = dir ? path.join(dir, 'package.json') : 'package.json';
-  updateJsonFile(pkgPath, updateFn);
+export interface PackageJson {
+  peerDependencies?: object;
+  dependencies?: object;
+  devDependencies?: object;
+  scripts?: object;
 }
 
-export function updateJsonFile(
-  path: string, updateFn: (curr: any) => any): void {
-  const obj = JSON.parse(readFileOrFail(path));
+/**
+ * Update the package.json file
+ *
+ * @param updateFn the function to use to apply the update
+ * @param dir where to look for a package.json file (defaults to the current
+ *            working directory)
+ */
+export function updatePackage(
+  updateFn: (pkg: PackageJson) => PackageJson, dir?: string): void {
+  const pkgPath: string = dir ? path.join(dir, 'package.json') : 'package.json';
+  updateJsonFile<PackageJson>(pkgPath, updateFn);
+}
+
+/**
+ * Update a generic JSON file
+ *
+ * @param pathOfJsonFile the path to the JSON file to update
+ * @param updateFn the function to use to apply the update
+ */
+export function updateJsonFile<T>(
+  pathOfJsonFile: string, updateFn: (curr: T) => T): void {
+  const obj = JSON.parse(readFileOrFail(pathOfJsonFile));
   const newObj = updateFn(obj);
-  writeFileOrFail(path, JSON.stringify(newObj, undefined, JSON_SPACE));
+  writeFileOrFail(
+    pathOfJsonFile, JSON.stringify(newObj, undefined, JSON_SPACE));
 }
 
 export function startGatewayCmd(configFilePath: string): string {
@@ -120,10 +141,9 @@ export function startServerCmd(
   const cmd = watch ? `nodemon -w ${serverDistFolder}` : 'node';
   const eoc = watch ? '--' : '';
   const script = path.join(serverDistFolder, 'server.js');
-  return `if [ -f ${script} ]; then ${cmd} ${script}` +
-    ` ${eoc} --config \"\`dv get ${configKey}\`\"` +
-    (asFlagValue ? `--as ${asFlagValue}` : '') + '; ' +
-    'else echo "No file"; fi;';
+
+  return `${cmd} ${script} ${eoc} --config '\`dv get ${configKey}\`'` +
+    (asFlagValue ? ` --as ${asFlagValue}` : '');
 }
 
 export function buildFeCmd(watch: boolean, projectFolder?: string): string {
@@ -141,6 +161,21 @@ export function buildServerCmd(watch: boolean, projectFolder?: string): string {
 
 function buildCmd(cmd: string, projectFolder?: string): string {
   return projectFolder ? `(cd ${projectFolder}; ${cmd})` : cmd;
+}
+
+function startServerCmdOfCliche() {
+  return startServerCmd(false, path.join('dist', 'server'), 'config');
+}
+
+function startServerCmdOfUsedCliche(cliche: string | undefined, alias: string)
+  : string {
+  const clicheFolder = (cliche === undefined) ? alias : cliche;
+  const serverDistFolder = path
+    .join('node_modules', clicheFolder, 'server');
+  const configKey = `usedCliches.${alias}.config`;
+  const asFlagValue = (alias !== cliche) ? alias : undefined;
+
+  return startServerCmd(false, serverDistFolder, configKey, asFlagValue);
 }
 
 export function concurrentlyCmd(...cmds: string[]): string {
@@ -181,14 +216,14 @@ export function installAndConfigureGateway(name: string, pathToDv: string) {
   );
 
   console.log('Add npm script to serve');
-  updateJsonFile(path.join(name, 'package.json'), pkg => {
+  updatePackage(pkg => {
     pkg.scripts[`dv-start-gateway`] = START_THIS_GATEWAY_CMD;
     pkg.scripts[`dv-build-${name}`] = buildFeCmd(false);
     pkg.scripts[`dv-build-watch-${name}`] = buildFeCmd(true);
     pkg.scripts['concurrently'] = 'concurrently';
     pkg.scripts['tsc'] = 'tsc';
     return pkg;
-  });
+  }, name);
 
   // https://github.com/dherges/ng-packagr/issues/335
   ng(['set', 'defaults.build.preserveSymlinks', 'true'], name);
@@ -236,8 +271,11 @@ program
       npm(['run', `dv-package-${config.name}`]);
 
       updatePackage(pkg => {
-        pkg.peerDependencies['dv-gateway'] = 'file:' +
-          path.join('..', pkg.peerDependencies['dv-gateway'].slice('file:'.length));
+        if (_.has(pkg, 'peerDependencies.dv-gateway')) {
+          const newGatewayPath = path.join(
+            '..', pkg['peerDependencies']['dv-gateway'].slice('file:'.length));
+          pkg['peerDependencies']['dv-gateway'] = `file:${newGatewayPath}`;
+        }
         return pkg;
       }, NG_PACKAGR.configFileContents.dest);
 
@@ -255,21 +293,19 @@ program
       writeFileOrFail(
         path.join('dist', ACTION_TABLE_FILE_NAME),
         actionTable(config, _.get(config.actions, 'app')));
-      const buildStartServerCmd = (name: string) => `npm run dv-start-${name}`;
-      const pkgJson = JSON.parse(readFileOrFail('package.json'));
-      const startServerOfCurrentProjectCmd = _
-        .has(pkgJson, `scripts.dv-start-${config.name}`) ?
-        [buildStartServerCmd(config.name)] : [];
+      const startServerOfCurrentProjectCmd =
+        (existsSync(path.join('dist', 'server'))) ?
+        [ startServerCmdOfCliche() ] : [];
       const startServerCmds = _
         .chain(config.usedCliches)
         .entries()
-        .map(e => buildStartServerCmd(e[0]))
+        .map(e => startServerCmdOfUsedCliche(e[1].name, e[0]))
         .concat(startServerOfCurrentProjectCmd)
         .value();
 
       const allStartCmds: string[] = _
         .chain(startServerCmds)
-        .concat('npm run dv-start-gateway')
+        .concat(startGatewayCmd('dvconfig.json'))
         .map(startCmd => `"${startCmd}"`)
         .value();
       cmd('npm', ['run', 'concurrently', '--', ...allStartCmds]);

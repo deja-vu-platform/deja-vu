@@ -1,15 +1,10 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
-import { RunService } from './run.service';
+import { RunService } from '../run.service';
 
 
 @Component({
   selector: 'dv-button',
-  template: `
-    <button mat-button type="button"
-      [disabled]="!valid" (click)="onClick()" class="mat-button">
-        <ng-content></ng-content>
-    </button>
-  `
+  templateUrl: './button.component.html'
 })
 export class ButtonComponent implements OnInit {
   @Input() valid = true;

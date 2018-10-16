@@ -28,7 +28,7 @@ export interface TxConfig<Message, Payload, State = any> {
    * `payload` is `undefined` if the client never got to the point of voting.
    */
   sendAbortToClient: (
-    msg: Message, causedAbort: boolean, payload?: Payload,
+    causedAbort: boolean, msg?: Message, payload?: Payload,
     state?: State) => void;
   // `payload` is what got returned in `sendVoteToCohort`
   sendToClient: (payload: Payload, state?: State) => void;
@@ -131,14 +131,14 @@ export class TxCoordinator<Message, Payload, State = any> {
         txId));
     }
 
-    // If we got here the tx has been initialized (by this msg or a previous one)
-    // The tx state could be 'voting', 'aborting' or 'aborted'
+    // If we got here the tx has been initialized (by this msg or a previous
+    // one). The tx state could be 'voting', 'aborting' or 'aborted'
 
     // We might still end up sending an unnecessary vote message if the tx
     // changes to abort right after we do the check but that won't cause any
     // problems. The check here is mostly to save some unnecessary votes.
     if (this.shouldAbort(tx)) {
-      this.config.sendAbortToClient(msg, false, undefined, state);
+      this.config.sendAbortToClient(false, msg, undefined, state);
 
       return;
     }
@@ -187,7 +187,7 @@ export class TxCoordinator<Message, Payload, State = any> {
         log(
           'Not waiting anymore (tx aborted). ' +
           `Send payload to client of cohort ${cohortId}`, txId);
-        this.config.sendAbortToClient(msg, false, vote.payload, state);
+        this.config.sendAbortToClient(false, msg, vote.payload, state);
       });
     });
 
@@ -195,7 +195,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     let ret;
     if (_.isEmpty(transition)) {  // Tx was already aborting
       log(`Tx aborted. Send abort to client of cohort ${cohortId}`, txId);
-      this.config.sendAbortToClient(msg, false, vote.payload, state);
+      this.config.sendAbortToClient(false, msg, vote.payload, state);
       ret = this.completeMessage(txId, cohortId, msg, false);
     } else if (transition.newTxState === 'committing' &&
                !transition.newCohortState) {
@@ -211,7 +211,7 @@ export class TxCoordinator<Message, Payload, State = any> {
       // Nothing to do in this case since we are waiting
     } else if (transition.newTxState === 'aborting') {
       log(`Tx is aborting. Send abort to client of cohort ${cohortId}`, txId);
-      this.config.sendAbortToClient(msg, true, vote.payload, state);
+      this.config.sendAbortToClient(true, msg, vote.payload, state);
       this.completed.emit(txId + '-abort');
       ret = Promise.all([
         this.completeTx(txId, false),
@@ -261,7 +261,8 @@ export class TxCoordinator<Message, Payload, State = any> {
     txId: string, cohortId: string, vote: Vote<Payload>,
     onCommit: () => void, onAbort: () => void): Promise<Transition> {
     // Txs are never removed and if we got here we know there's a tx doc
-    const tx: TxDoc<Message, Payload> = (await this.txs!.findOne({ id: txId }))!;
+    const tx: TxDoc<Message, Payload> = (await this.txs!
+      .findOne({ id: txId }))!;
     const ret: Transition = {};
 
     if (this.shouldAbort(tx)) {
@@ -352,7 +353,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     log(`Found ${txsToAbort.length} transactions to abort due to timeout`);
     await Promise.all(
       _.map(txsToAbort, async (txToAbort: TxDoc<Message, Payload>) => {
-        return this.lock.acquire(txToAbort.id, async () => {
+        return this.lock.acquire(txToAbort.id, async (): Promise<boolean> => {
             const tx: TxDoc<Message, Payload> = (await this.txs!
               .findOne({ id: txToAbort.id }, { projection: { state: 1 }}))!;
             if (tx.state !== 'voting') {
@@ -365,6 +366,9 @@ export class TxCoordinator<Message, Payload, State = any> {
           })
           .then((shouldCompleteTx: boolean): Promise<any> | undefined => {
             if (shouldCompleteTx) {
+              log('Emitting abort event', txToAbort.id);
+              this.completed.emit(txToAbort.id + '-abort');
+
               return this.completeTx(txToAbort.id, false);
             }
 

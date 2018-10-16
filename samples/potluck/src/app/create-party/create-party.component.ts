@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { ShowUserComponent } from 'authentication';
+import { ChooseUserComponent, ShowUserComponent } from 'authentication';
 
 import { CreateSupplyComponent } from '../create-supply/create-supply.component';
 import { ShowSupplyComponent } from '../show-supply/show-supply.component';
@@ -9,8 +9,7 @@ import {
   GuestListHeaderComponent
 } from '../guest-list-header/guest-list-header.component';
 
-import { SupplyListHeaderComponent
-} from '../supply-list-header/supply-list-header.component';
+import { SupplyListHeaderComponent } from '../supply-list-header/supply-list-header.component';
 
 
 @Component({
@@ -24,6 +23,9 @@ export class CreatePartyComponent {
   showSupply = ShowSupplyComponent;
   guestListHeader = GuestListHeaderComponent;
   supplyListHeader = SupplyListHeaderComponent;
+  chooseUser = ChooseUserComponent;
   stagedMemberIds: any[];
+  stagedSupplies: any[];
+  partyId: string;
   user;
 }

@@ -1,5 +1,5 @@
 import {
-  Component, EventEmitter, Input, OnInit, Output, ViewChild
+  Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild
 } from '@angular/core';
 import {
   ControlValueAccessor, FormBuilder, FormControl, FormGroupDirective,
@@ -8,7 +8,8 @@ import {
 
 import * as _ from 'lodash';
 
-import { Action } from './include.component';
+import { Action } from '../include/include.component';
+import {OnAfterCommit, RunService} from '../run.service';
 
 
 @Component({
@@ -27,7 +28,8 @@ import { Action } from './include.component';
     }
   ]
 })
-export class StageComponent implements OnInit, ControlValueAccessor, Validator {
+export class StageComponent
+  implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   // for staging
   @Input() initialStagedEntities: any[] = [];
   @Output() stagedEntities = new EventEmitter<any[]>();
@@ -49,9 +51,12 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
     entityControl: this.entityControl
   });
 
-  constructor(private builder: FormBuilder) {}
+  constructor(
+    private builder: FormBuilder, private elem: ElementRef,
+    private rs: RunService) {}
 
   ngOnInit() {
+    this.rs.register(this.elem, this);
     this.staged = this.initialStagedEntities;
   }
 
@@ -66,13 +71,15 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
   }
 
   stage(value: any) {
-    this.staged.push(value);
-    this.stagedEntities.emit(this.staged);
+    if (value !== undefined && value !== null) {
+      this.staged.push(value);
+      this.stagedEntities.emit(_.cloneDeep(this.staged));
+    }
   }
 
   unstage(index: string) {
     _.pullAt(this.staged, index);
-    this.stagedEntities.emit(this.staged);
+    this.stagedEntities.emit(_.cloneDeep(this.staged));
   }
 
   writeValue(value: any[]) {
@@ -81,7 +88,7 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
     } else {
       this.staged = [];
     }
-    this.stagedEntities.emit(this.staged);
+    this.stagedEntities.emit(_.cloneDeep(this.staged));
   }
 
   registerOnChange(fn: (value: string) => void) {
@@ -92,5 +99,18 @@ export class StageComponent implements OnInit, ControlValueAccessor, Validator {
 
   validate(_c: FormControl): ValidationErrors {
     return {};
+  }
+
+  dvOnAfterCommit() {
+    this.reset();
+  }
+
+  reset() {
+    this.staged = [];
+    // Can't do `this.form.reset();`
+    // See https://github.com/angular/material2/issues/4190
+    if (this.form) {
+      this.form.resetForm();
+    }
   }
 }

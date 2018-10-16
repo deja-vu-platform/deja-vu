@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  FormBuilder, FormControl, FormGroupDirective
+  FormBuilder, FormControl, FormGroup, FormGroupDirective
 } from '@angular/forms';
 
 import {

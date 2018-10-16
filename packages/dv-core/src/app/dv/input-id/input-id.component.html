@@ -1,0 +1,9 @@
+<mat-form-field>
+  <mat-label>{{entityName}}</mat-label>
+  <input matInput required
+         [formControl]="idControl"
+         name="idControl">
+  <mat-error *ngIf="idControl.hasError('required')">
+    {{entityName}} is <strong>required</strong>
+  </mat-error>
+</mat-form-field>

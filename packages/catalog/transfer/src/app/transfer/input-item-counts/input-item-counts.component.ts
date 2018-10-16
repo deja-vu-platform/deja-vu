@@ -16,6 +16,10 @@ import {
   ShowItemCountComponent
 } from '../show-item-count/show-item-count.component';
 
+import { ItemCount } from '../shared/transfer.model';
+
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'transfer-input-item-counts',
@@ -37,7 +41,7 @@ import {
 export class InputItemCountsComponent
   implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
   itemsControl = new FormControl(0, [Validators.required]);
-  @Output() itemCounts = new EventEmitter<any>();
+  @Output() itemCounts = new EventEmitter<ItemCount[]>();
 
   // Presentation inputs
   @Input() itemPlaceholder = 'item';
@@ -51,22 +55,23 @@ export class InputItemCountsComponent
 
   ngOnInit() {
     this.rs.register(this.elem, this);
-    this.itemsControl.valueChanges.subscribe((value: number) => {
+    this.itemsControl.valueChanges.subscribe((value: ItemCount[]) => {
       this.itemCounts.emit(value);
     });
     this.itemsControl.valueChanges.pipe(startWith(
       this.itemsControl.value));
   }
 
-  writeValue(value: number) {
+  writeValue(value: ItemCount[]) {
     if (value === null) {
       this.reset();
     } else {
-      this.itemsControl.setValue(value);
+      this.itemsControl.setValue(
+        _.map(value, (itemCount) => _.pick(itemCount, ['itemId', 'count'])));
     }
   }
 
-  registerOnChange(fn: (value: number) => void) {
+  registerOnChange(fn: (value: ItemCount[]) => void) {
     this.itemCounts.subscribe(fn);
   }
 

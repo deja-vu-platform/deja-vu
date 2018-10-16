@@ -26,10 +26,17 @@ import { SignInComponent } from './sign-in/sign-in.component';
 export { SignInComponent };
 import { SignOutComponent } from './sign-out/sign-out.component';
 export { SignOutComponent };
+import { ChooseUserComponent } from './choose-user/choose-user.component';
+export { ChooseUserComponent };
+import { ShowUsersComponent } from './show-users/show-users.component';
+export { ShowUsersComponent };
+
+import { API_PATH } from './authentication.config';
 
 const allComponents = [
-  AuthenticateComponent, ChangePasswordComponent, LoggedInComponent, RegisterUserComponent,
-  ShowUserComponent, SignInComponent, SignOutComponent
+  AuthenticateComponent, ChangePasswordComponent, LoggedInComponent,
+  RegisterUserComponent, ShowUserComponent, SignInComponent, SignOutComponent,
+  ShowUsersComponent, ChooseUserComponent
 ];
 
 @NgModule({
@@ -41,7 +48,10 @@ const allComponents = [
     ReactiveFormsModule,
     MatButtonModule, MatInputModule, MatFormFieldModule, MatSelectModule
   ],
-  providers: [AuthenticationService],
+  providers: [
+    AuthenticationService,
+    { provide: API_PATH, useValue: '/graphql' }
+  ],
   declarations: allComponents,
   entryComponents: allComponents,
   exports: allComponents

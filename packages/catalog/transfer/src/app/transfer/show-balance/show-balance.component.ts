@@ -1,13 +1,16 @@
 import {
   Component,
-  ElementRef,
+  ElementRef, EventEmitter,
   Inject,
   Input,
   OnChanges,
-  OnInit
+  OnInit, Output, Type
 } from '@angular/core';
-import {GatewayService, GatewayServiceFactory} from 'dv-core';
+import { Action, GatewayService, GatewayServiceFactory } from 'dv-core';
+import { ShowAmountComponent } from '../show-amount/show-amount.component';
 import { API_PATH, CONFIG } from '../transfer.config';
+
+import { Amount } from '../shared/transfer.model';
 
 
 interface BalanceRes {
@@ -22,7 +25,15 @@ interface BalanceRes {
 })
 export class ShowBalanceComponent implements OnInit, OnChanges {
   @Input() accountId: string;
-  @Input() balance: any;
+  @Input() balance: Amount;
+
+  @Input() showAmount: Action = {
+    type: <Type<Component>> ShowAmountComponent
+  };
+
+  @Output() fetchedBalance = new EventEmitter<Amount>();
+
+  showBalance = this;
 
   balanceType: 'money' | 'items';
 
@@ -59,6 +70,7 @@ export class ShowBalanceComponent implements OnInit, OnChanges {
     })
     .subscribe((res) => {
       this.balance = res.data.balance;
+      this.fetchedBalance.emit(this.balance);
     });
   }
 }

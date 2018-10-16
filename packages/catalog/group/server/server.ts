@@ -47,7 +47,7 @@ interface Config {
   reinitDbOnStartup: boolean;
 }
 
-const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
+const CONCURRENT_UPDATE_ERROR = 'An error has occurred. Please try again later';
 
 const argv = minimist(process.argv);
 
@@ -111,13 +111,14 @@ function isPendingCreate(group: GroupDoc | null) {
 }
 
 async function addOrRemoveMember(groupId: string, memberId: string,
-  updateType: 'add-member' | 'remove-member', context: Context): Promise<Boolean> {
+  updateType: 'add-member' | 'remove-member', context: Context)
+  : Promise<Boolean> {
   const operation = updateType === 'add-member' ? '$addToSet' : '$pull';
   const updateOp = { [operation]: { memberIds: memberId } };
 
   const notPendingGroupFilter = {
     id: groupId,
-    pending: { $exists: false },
+    pending: { $exists: false }
   };
   const reqIdPendingFilter = { 'pending.reqId': context.reqId };
   switch (context.reqType) {
@@ -129,13 +130,14 @@ async function addOrRemoveMember(groupId: string, memberId: string,
           $set: {
             pending: {
               reqId: context.reqId,
-              type: updateType,
-            },
-          },
+              type: updateType
+            }
+          }
         });
       if (pendingUpdateObj.matchedCount === 0) {
         throw new Error(CONCURRENT_UPDATE_ERROR);
       }
+
       return true;
     case undefined:
       await Validation.groupExistsOrFail(groupId);
@@ -143,16 +145,20 @@ async function addOrRemoveMember(groupId: string, memberId: string,
       if (updateObj.matchedCount === 0) {
         throw new Error(CONCURRENT_UPDATE_ERROR);
       }
+
       return true;
     case 'commit':
       await groups.updateOne(
         reqIdPendingFilter,
         { ...updateOp, $unset: { pending: '' } });
+
       return false;
     case 'abort':
       await groups.updateOne(reqIdPendingFilter, { $unset: { pending: '' } });
+
       return false;
   }
+
   return false;
 }
 
@@ -161,11 +167,19 @@ const resolvers = {
   Query: {
     group: async (root, { id }) => {
       const group: GroupDoc | null = await groups.findOne({ id: id });
+
       return isPendingCreate(group) ? null : group;
     },
     members: async (root, { input }: { input: MembersInput }) =>  {
-      const filter = input.inGroupId ? { id: input.inGroupId } : {};
-      filter['pending'] = { type: { $ne: 'create-group' } };
+      const noCreateGroupPending =  {
+        $or: [
+          { pending: { $exists: false } },
+          { pending: { type: { $ne: 'create-group' } } }
+        ]
+      };
+      const filter = input.inGroupId ?
+        { $and: [ { id: input.inGroupId }, noCreateGroupPending ] } :
+        noCreateGroupPending;
 
       const pipelineResults = await groups.aggregate([
         { $match: filter },

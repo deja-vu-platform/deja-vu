@@ -22,7 +22,8 @@
 
 <div *ngIf="stageHeader" class="row">
   <div class="col-md-12">
-    <dv-include [action]="stageHeader" [parent]="stageComponent">
+    <dv-include [action]="stageHeader" no-default-stageHeader
+                [parent]="stageComponent">
     </dv-include>
   </div>
 </div>

@@ -8,7 +8,7 @@ import * as _ from 'lodash';
 
 @Component({
   selector: 'dv-ids',
-  template: ``
+  templateUrl: './ids.component.html'
 })
 export class IdsComponent implements OnChanges {
   @Input() for: any[] = [];
@@ -16,7 +16,7 @@ export class IdsComponent implements OnChanges {
 
   ngOnChanges() {
     if (!_.isEmpty(this.for)) {
-      this.ids.emit(_.map(this.for, (unused) => uuid()));
+      this.ids.emit(_.map(this.for, (_unused) => uuid()));
     }
   }
 }

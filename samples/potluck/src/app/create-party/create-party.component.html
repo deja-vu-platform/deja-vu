@@ -44,19 +44,46 @@
                 <hr class="divider">
                 <div class="row">
                   <div class="col-md-5">
+                    <dv-stage
+                      [stageEntity]="{
+                        type: chooseUser, tag: 'authentication-choose-user',
+                        inputs: { chooseSelectPlaceholder: 'Choose Guest', addButtonLabel: 'Add to Guest List' },
+                        outputMap: { stage: 'selectedUser' }
+                      }"
+                      [showEntity]="{
+                        type: showGuestUsername, tag: 'authentication-show-user', inputMap: { entity: 'user' }
+                      }"
+                      [stageHeader]="{ type: guestListHeader, tag: 'potluck-guest-list-header' }"
+                      (stagedEntities)="stagedMemberIds=$event">
+                    </dv-stage>
+                    <!-- for the members dropdown we'll need to retrieve users or provide some kind of autocomplete -->
+                    <!--
                     <group-create-group
                       [id]="partyId"
                       [showMember]="{ type: showGuestUsername }"
-                      [stageHeader]="{ type: guestListHeader }"
+                      [stageHeader]="{ type: guestListHeader, tag: 'potluck-guest-list-header' }"
                       memberAutocompletePlaceholder="Choose Guest"
                       stageMemberButtonLabel="Add to Guest List"
                       (stagedMemberIds)="stagedMemberIds=$event"
-                      [showOptionToAddGroups]="false"
                       [showOptionToSubmit]="false">
                     </group-create-group>
+                    -->
                   </div>
                   <div class="col-md-2"></div>
                   <div class="col-md-5">
+                    <!-- stage-objects -->
+                    <dv-stage
+                      [stageEntity]="{
+                        type: createSupply, tag: 'potluck-create-supply', outputMap: { stage: 'supply' },
+                        inputs: { save: false }
+                      }"
+                      [showEntity]="{
+                        type: showSupply, tag: 'potluck-show-supply', inputMap: { entity: 'supply' }
+                      }"
+                      [stageHeader]="{ type: supplyListHeader, tag: 'potluck-supply-list-header' }"
+                      (stagedEntities)="stagedSupplies=$event">
+                    </dv-stage>
+                    <!--
                     <market-create-goods
                       [marketId]="partyId"
                       [createGood]="{
@@ -74,6 +101,7 @@
 
                       (stagedGoods)="stagedSupplies=$event">
                     </market-create-goods>
+                    -->
                   </div>
                 </div>
 
@@ -82,6 +110,11 @@
                   [objects]="stagedSupplies"
                   [hidden]="true">
                 </property-create-objects>
+                <transfer-add-to-balance
+                  [accountId]="partyId"
+                  [amount]="stagedSupplies"
+                  [hidden]="true">
+                </transfer-add-to-balance>
                 <authorization-create-resource
                   [id]="partyId"
                   [ownerId]="user?.id"

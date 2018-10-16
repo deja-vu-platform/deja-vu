@@ -1,15 +1,11 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { OnAfterCommit, RunService } from './run.service';
+import { OnAfterCommit, RunService } from '../run.service';
 
 
 @Component({
   selector: 'dv-link',
-  template: `
-    <a (click)="onClick()">
-      <ng-content></ng-content>
-    </a>
-  `
+  templateUrl: './link.component.html'
 })
 export class LinkComponent implements OnInit, OnAfterCommit {
   @Input() href: string;

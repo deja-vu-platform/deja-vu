@@ -6,24 +6,14 @@ import {
   ValidationErrors, Validator, Validators
 } from '@angular/forms';
 
-import { RunService, OnAfterCommit } from './run.service';
+import { RunService, OnAfterCommit } from '../run.service';
 
 
 import { startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'dv-input-id',
-  template: `
-    <mat-form-field>
-      <mat-label>{{entityName}}</mat-label>
-      <input matInput required
-        [formControl]="idControl"
-        name="idControl">
-      <mat-error *ngIf="idControl.hasError('required')">
-        {{entityName}} is <strong>required</strong>
-      </mat-error>
-    </mat-form-field>
-  `,
+  templateUrl: './input-id.component.html',
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,

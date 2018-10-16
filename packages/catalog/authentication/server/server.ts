@@ -76,6 +76,11 @@ interface SignInOutput {
   user: User;
 }
 
+interface VerifyInput {
+  id: string;
+  token: string;
+}
+
 interface Config {
   wsPort: number;
   dbHost: string;
@@ -220,8 +225,7 @@ function isPendingRegister(user: UserDoc | null) {
   return _.get(user, 'pending.type') === 'register';
 }
 
-async function register(input: RegisterInput, context: Context) {
-
+async function newUserDocOrFail(input: RegisterInput): Promise<UserDoc> {
   Validation.isUsernameValid(input.username);
   Validation.isPasswordValid(input.password);
 
@@ -230,17 +234,26 @@ async function register(input: RegisterInput, context: Context) {
   await Validation.userIsNew(id, input.username);
 
   const hash = await bcrypt.hash(input.password, SALT_ROUNDS);
-  const newUser: UserDoc = {
+
+  return {
     id: id,
     username: input.username,
     password: hash
   };
+}
 
+async function register(input: RegisterInput, context: Context) {
   const reqIdPendingFilter = { 'pending.reqId': context.reqId };
   switch (context.reqType) {
     case 'vote':
-      newUser.pending = { reqId: context.reqId, type: 'register' };
+      const newUserVote: UserDoc = await newUserDocOrFail(input);
+      newUserVote.pending = { reqId: context.reqId, type: 'register' };
+
+      await users.insertOne(newUserVote);
+
+      return newUserVote;
     case undefined:
+      const newUser: UserDoc = await newUserDocOrFail(input);
       await users.insertOne(newUser);
 
       return newUser;
@@ -253,8 +266,6 @@ async function register(input: RegisterInput, context: Context) {
 
       return;
   }
-
-  return newUser;
 }
 
 function sign(userId: string): string {
@@ -288,7 +299,9 @@ const resolvers = {
 
       return user;
     },
-    verify: (root, { token, id }) => verify(token, id)
+
+    verify: (root, { input }: { input: VerifyInput }) => verify(
+      input.token, input.id)
   },
 
   User: {
@@ -395,6 +408,14 @@ const resolvers = {
       }
 
       return false;
+    },
+
+    verify: (root, { input }: { input: VerifyInput }, context: Context) => {
+      if (context.reqType === undefined || context.reqType === 'vote') {
+        return verify(input.token, input.id);
+      }
+
+      return;
     }
   }
 };

@@ -5,9 +5,7 @@ import { GATEWAY_URL } from 'dv-core';
 
 import { AppComponent } from './app.component';
 
-import { TransferModule } from './transfer/transfer.module';
-
-import { CONFIG } from './transfer/transfer.config';
+import { TRANSFER_CONFIG, TransferModule } from './transfer/transfer.module';
 
 @NgModule({
   declarations: [
@@ -19,7 +17,7 @@ import { CONFIG } from './transfer/transfer.config';
   ],
   providers: [
     { provide: GATEWAY_URL, useValue: 'http://localhost:3000/api' },
-    { provide: CONFIG, useValue: { balanceType: 'items' } }
+    { provide: TRANSFER_CONFIG, useValue: { balanceType: 'items' } }
   ],
   bootstrap: [AppComponent]
 })

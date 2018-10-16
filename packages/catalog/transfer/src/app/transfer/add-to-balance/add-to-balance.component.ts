@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  FormBuilder, FormControl, FormGroupDirective
+  FormBuilder, FormControl, FormGroup, FormGroupDirective
 } from '@angular/forms';
 
 import {
@@ -15,7 +15,7 @@ import {
 import * as _ from 'lodash';
 import { API_PATH } from '../transfer.config';
 
-import { Transfer } from '../shared/transfer.model';
+import { Amount, Transfer } from '../shared/transfer.model';
 
 interface CreateTransferRes {
   data: { addToBalance: Transfer };
@@ -31,7 +31,6 @@ const SAVED_MSG_TIMEOUT = 3000;
 })
 export class AddToBalanceComponent
 implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputBalance = true;
 
@@ -42,6 +41,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   // Optional input values to override form control values
   @Input() set accountId(accountId: string) {
     this.accountIdControl.setValue(accountId);
+  }
+
+  @Input() set amount(amount: Amount) {
+    this.amountControl.setValue(amount);
   }
 
   // Presentation inputs

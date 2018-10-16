@@ -1,2 +1,6 @@
-{{itemCount?.itemId}}
-{{itemCount?.count}}
+<div *ngIf="showItemId">
+  {{itemCount?.itemId}}
+</div>
+<div *ngIf="showCount">
+  {{itemCount?.count}}
+</div>
