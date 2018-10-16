@@ -14,7 +14,6 @@ import { PasskeyService } from '../shared/passkey.service';
   styleUrls: ['./sign-out.component.css']
 })
 export class SignOutComponent implements OnInit, OnRun {
-  @Input() guestSignOut = false;
   @Input() buttonLabel = 'Sign Out';
 
   constructor(
@@ -30,10 +29,6 @@ export class SignOutComponent implements OnInit, OnRun {
   }
 
   dvOnRun() {
-    if (this.guestSignOut) {
-      this.passkeyService.guestSignOut();
-    } else {
-      this.passkeyService.signOut();
-    }
+    this.passkeyService.signOut();
   }
 }

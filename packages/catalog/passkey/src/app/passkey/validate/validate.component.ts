@@ -19,8 +19,6 @@ interface VerifyRes {
   styleUrls: ['./validate.component.css']
 })
 export class ValidateComponent implements OnInit, OnChanges {
-  @Input() guestValidate = false;
-
   isValidated = false;
 
   private gs: GatewayService;
@@ -45,14 +43,8 @@ export class ValidateComponent implements OnInit, OnChanges {
       return;
     }
 
-    let token, code;
-    if (this.guestValidate) {
-      code = this.passkeyService.getSignedInGuest();
-      token = this.passkeyService.getGuestToken();
-    } else {
-      code = this.passkeyService.getSignedInPasskey();
-      token = this.passkeyService.getToken();
-    }
+    const code = this.passkeyService.getSignedInPasskey();
+    const token = this.passkeyService.getToken();
 
     if (!code || !token) {
       return;

@@ -32,8 +32,6 @@ interface ValidatePasskeyRes {
 })
 export class SignInComponent
   implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
-  @Input() guestSignIn = false;
-
   // Presentation inputs
   @Input() inputLabel = 'Passkey Code';
   @Input() buttonLabel = 'Validate';
@@ -90,11 +88,7 @@ export class SignInComponent
 
     const token = res.data.validatePasskey.token;
     const passkey = res.data.validatePasskey.passkey;
-    if (this.guestSignIn) {
-      this.passkeyService.setSignedInGuest(token, passkey);
-    } else {
-      this.passkeyService.setSignedInPasskey(token, passkey);
-    }
+    this.passkeyService.setSignedInPasskey(token, passkey);
     this.passkey.emit(passkey);
   }
 

@@ -12,7 +12,6 @@ import { PasskeyService } from '../shared/passkey.service';
   template: ''
 })
 export class LoggedInComponent implements OnInit, AfterViewInit {
-  @Input() guestLoggedIn = false;
   @Output() passkey = new EventEmitter();
 
   constructor(
@@ -25,12 +24,7 @@ export class LoggedInComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     setTimeout(() => {
-      let passkey;
-      if (this.guestLoggedIn) {
-        passkey = this.passkeyService.getSignedInGuest();
-      } else {
-        passkey = this.passkeyService.getSignedInPasskey();
-      }
+        const passkey = this.passkeyService.getSignedInPasskey();
 
       if (passkey) {
         this.passkey.emit(passkey);
