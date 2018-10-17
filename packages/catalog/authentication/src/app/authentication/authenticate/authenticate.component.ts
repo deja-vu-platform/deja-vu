@@ -42,38 +42,28 @@ export class AuthenticateComponent implements OnInit, OnChanges {
   }
 
   load() {
+    this.doRequest();
+  }
+
+  dvOnRun() {
+    this.doRequest();
+  }
+
+  doRequest() {
     if (!this.gs || _.isEmpty(this.id)) {
       return;
     }
     const token = this.authenticationService.getToken();
     this.gs.get<{ data: { verify: boolean } }>(this.apiPath, {
       params: {
-        query: `query Verify($input: VerifyInput!){
+        query: `query Verify($input: VerifyInput!) {
           verify(input: $input)
         }`,
-        variables: JSON.stringify({
+        variables: {
           input: {
             id: this.id,
             token: token
           }
-        })
-      }
-    })
-    .subscribe((res) => {
-      this.isAuthenticated = res.data.verify;
-    });
-  }
-
-  dvOnRun() {
-    const token = this.authenticationService.getToken();
-    this.gs.post<{ data: { verify: boolean } }>(this.apiPath, {
-      query: `mutation Verify($input: VerifyInput!) {
-        verify(input: $input)
-      }`,
-      variables: {
-        input: {
-          id: this.id,
-          token: token
         }
       }
     })

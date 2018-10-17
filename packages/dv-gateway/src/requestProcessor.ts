@@ -101,7 +101,10 @@ export class RequestProcessor {
       ${JSON.stringify(clicheReq)}`);
     }
 
-    return { status: response.status, text: JSON.parse(response.text) };
+    return {
+      status: response.status,
+      text: RequestProcessor.JsonParse(response.text)
+    };
   }
 
   private static NewReqFor(msg: string, gcr: GatewayToClicheRequest)
@@ -116,8 +119,17 @@ export class RequestProcessor {
       reqId: uuid(),
       runId: req.query.runId,
       path: req.query.path,
-      options: req.query.options ? JSON.parse(req.query.options) : undefined
+      options: req.query.options ?
+        RequestProcessor.JsonParse(req.query.options) : undefined
     };
+  }
+
+  private static JsonParse(value: string): any {
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      throw new Error(`Couldn't parse JSON ${value}. Reason: ${e}`);
+    }
   }
 
   constructor(
@@ -189,18 +201,14 @@ export class RequestProcessor {
       }
     };
 
-    if (req.method === 'GET' || !actionPath.isDvTx()) {
+    if (_.isEmpty(runId) || runId === 'null' || runId === 'undefined') {
       const clicheRes: ClicheResponse<string> = await RequestProcessor
         .ForwardRequest<string>(gatewayToClicheRequest);
       res.status(clicheRes.status);
       res.send(clicheRes.text);
     } else {
-      if (!runId) {
-        throw new Error('run id undefined');
-      }
-
       await this.txCoordinator.processMessage(
-        runId, actionPath.serialize(), gatewayToClicheRequest, res);
+        runId!, actionPath.serialize(), gatewayToClicheRequest, res);
     }
   }
 
