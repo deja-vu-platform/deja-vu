@@ -9,7 +9,10 @@ import { RUN_ID_ATTR } from './run.service';
 import * as _ from 'lodash';
 
 
-export type Dict = {[field: string]: string};
+export interface Dict {
+  [field: string]: any;
+}
+
 export interface RequestOptions {
   params?: Dict;
   headers?: Dict;
@@ -131,7 +134,7 @@ export class GatewayService {
 
 @Injectable()
 export class GatewayServiceFactory {
-  private renderer: Renderer2;
+  private readonly renderer: Renderer2;
   constructor(
     @Inject(GATEWAY_URL) private gatewayUrl: string, private http: HttpClient,
     rendererFactory: RendererFactory2) {
