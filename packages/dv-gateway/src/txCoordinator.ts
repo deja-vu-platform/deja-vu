@@ -79,8 +79,17 @@ function txMsg(msg: string, txId: string): string {
   return `[txId: ${txId}] ${msg}`;
 }
 
-function log(msg: string, txId?: string): void {
-  console.log(txId ? txMsg(msg, txId) : msg);
+function cohortMsg(msg: string, cohortId: string): string {
+  return `(cohortId: ${cohortId}) ${msg}`;
+}
+
+function txCohortMsg(msg: string, txId: string, cohortId: string): string {
+ return txMsg(cohortMsg(msg, cohortId), txId);
+}
+
+function log(msg: string, txId: string, cohortId?: string): void {
+  const msgWithCohort = cohortId === undefined ? msg : cohortMsg(msg, cohortId);
+  console.log(txMsg(msgWithCohort, txId));
 }
 
 /**
@@ -116,6 +125,7 @@ export class TxCoordinator<Message, Payload, State = any> {
     if (!this.txs) {
       throw new Error('TxCoordinator hasn\'t been started yet: call start()');
     }
+    log(`Processing msg ${JSON.stringify(msg)}`, txId, cohortId);
     const tx: TxDoc<Message, Payload> = await this.getTx(txId, cohortId);
 
     // No race condition here because the set of cohorts doesn't change after
@@ -166,12 +176,16 @@ export class TxCoordinator<Message, Payload, State = any> {
     }
     let vote: Vote<Payload>;
     try {
+      log(`Sending vote to cohort`, txId, cohortId);
       vote = await this.config.sendVoteToCohort(msg);
     } catch (e) {
       // The cohort didn't vote yes/no but crashed or returned a wrong response
-      throw new Error(txMsg(
-        `Sending vote to cohort ${cohortId} failed: ${e}`, txId));
+      throw new Error(txCohortMsg(
+        `Sending vote to cohort failed: ${e}`, txId, cohortId));
     }
+    log(`Received vote ${JSON.stringify(vote)}`, txId, cohortId);
+    // We don't need to await this method because we don't care when the vote
+    // gets saved---it is only saved for logging purposes.
     this.saveVote(txId, cohortId, vote);
 
     // We need to be sure that we are processing votes one by one because:
@@ -244,9 +258,8 @@ export class TxCoordinator<Message, Payload, State = any> {
         { returnOriginal: false, upsert: true }))
         .value!;
     } catch (e) {
-      log(txMsg(
-        `We got ${e}, this is not an error (it is expected to ` +
-        'happen in some cases)', txId));
+      log(`We got ${e}, this is not an error (it is expected to ` +
+        'happen in some cases)', txId);
 
       // Definitely not null because the catch should only happen if we have two
       // concurrent threads trying to do the upsert at the same time. In that
@@ -287,8 +300,8 @@ export class TxCoordinator<Message, Payload, State = any> {
     } else { // The vote was 'no'
       if (vote.result !== 'no') {
         log(
-          `Got a vote back that was not 'yes'/'no'. The cliche at ${cohortId}` +
-          'doesn\'t correcly implement voting', txId);
+          `Got a vote back that was not 'yes'/'no'. The cliche ` +
+          'doesn\'t correctly implement voting', txId, cohortId);
       }
       // We know that all previous votes were 'yes' because if o/w the state
       // would be 'aborting'/'aborted'. Thus, we are in the 'voting' phase and
@@ -327,9 +340,9 @@ export class TxCoordinator<Message, Payload, State = any> {
         { $set: { [`cohorts.$.state`]: newState } });
     if (update.modifiedCount === 0) {
       throw new Error(
-        txMsg(
-          `Couldn't set cohort ${cohortId} state to ${newState} ` +
-          `(matched: ${update.matchedCount})`, txId));
+        txCohortMsg(
+          `Couldn't set state to ${newState} ` +
+          `(matched: ${update.matchedCount})`, txId, cohortId));
     }
   }
 
@@ -350,7 +363,8 @@ export class TxCoordinator<Message, Payload, State = any> {
         { projection: { id: 1 } })
       .toArray();
 
-    log(`Found ${txsToAbort.length} transactions to abort due to timeout`);
+    console.log(
+      `Found ${txsToAbort.length} transactions to abort due to timeout`);
     await Promise.all(
       _.map(txsToAbort, async (txToAbort: TxDoc<Message, Payload>) => {
         return this.lock.acquire(txToAbort.id, async (): Promise<boolean> => {
@@ -392,15 +406,17 @@ export class TxCoordinator<Message, Payload, State = any> {
     const send = success ? this.config.sendCommitToCohort :
       this.config.sendAbortToCohort;
 
-    log(`Send complete message to ${cohortId}, success: ${success}`, txId);
+    log(
+      `Sending complete message to cohort, success: ${success}`,
+      txId, cohortId);
     await this.updateCohortState(txId, cohortId, completingState);
     try {
       await send(msg);
     } catch (e) {
       // TODO: handle errors
       log(e, txId);
-      throw new Error(txMsg(
-        `Sending commit/abort to ${cohortId} failed`, txId));
+      throw new Error(txCohortMsg(
+        `Sending commit/abort failed`, txId, cohortId));
     }
     await this.updateCohortState(txId, cohortId, completedState);
   }
@@ -444,11 +460,13 @@ export class TxCoordinator<Message, Payload, State = any> {
     const db = client.db(this.config.dbName);
     if (this.config.reinitDbOnStartup) {
       await db.dropDatabase();
-      log(`Reinitialized db ${this.config.dbName}`);
+      console.log(`Reinitialized db ${this.config.dbName}`);
     }
     const txs = db.collection('txs');
-    txs.createIndex({ id: 1 }, { unique: true });
-    txs.createIndex({ 'cohorts.id': 1 });
+    await Promise.all([
+      txs.createIndex({ id: 1 }, { unique: true }),
+      txs.createIndex({ 'cohorts.id': 1 })
+    ]);
 
     return txs;
   }
