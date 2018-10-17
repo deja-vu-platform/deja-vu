@@ -1,18 +1,22 @@
-import * as mongodb from 'mongodb';
-import { TaskDoc, TasksInput, CreateTaskInput, UpdateTaskInput } from './schema';
 import {
   ClicheServer,
   ClicheServerBuilder,
+  CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
   InitResolversFn,
-  Validation,
-  CONCURRENT_UPDATE_ERROR
+  Validation
 } from 'cliche-server';
-
+import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
+import {
+  CreateTaskInput,
+  TaskDoc,
+  TasksInput,
+  UpdateTaskInput
+} from './schema';
 import { v4 as uuid } from 'uuid';
 
-import * as _ from 'lodash';
 
 class TaskValidation {
   static async taskExistsOrFail(
