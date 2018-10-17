@@ -46,7 +46,7 @@ export class ActionPath {
     return new ActionPath(_.tail(this.path));
   }
 
-  indexOfTxNode(): number | null {
+  indexOfClosestTxNode(): number | null {
     return this.indexOf(DV_TX_TAG);
   }
 
@@ -54,7 +54,7 @@ export class ActionPath {
    * @returns true if this action path is inside a dv transaction
    */
   isDvTx(): boolean {
-    return this.indexOfTxNode() !== null;
+    return this.indexOfClosestTxNode() !== null;
   }
 
   /**
@@ -70,7 +70,7 @@ export class ActionPath {
   }
 
   private indexOf(tag: string): number | null {
-    const indexOfTag = _.indexOf(this.path, tag);
+    const indexOfTag = _.lastIndexOf(this.path, tag);
 
     return indexOfTag === -1 ? null : indexOfTag;
   }

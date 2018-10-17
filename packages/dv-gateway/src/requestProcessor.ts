@@ -285,7 +285,7 @@ export class RequestProcessor {
       getCohorts: (actionPathId: string): string[] => {
         const actionPath: ActionPath = ActionPath.fromString(actionPathId);
         assert.ok(actionPath.isDvTx());
-        const dvTxNodeIndex: number = actionPath.indexOfTxNode()!;
+        const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
 
         const paths: ActionTagPath[] = actionHelper
           .getMatchingPaths(actionPath);
