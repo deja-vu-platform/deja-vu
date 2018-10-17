@@ -80,9 +80,7 @@ export class JoinLeaveComponent implements OnInit {
         query: `
           mutation {
             ${action}(
-              groupId: "${this.group.id}", id: "${this.memberId}") {
-              id
-            }
+              groupId: "${this.group.id}", id: "${this.memberId}")
           }
         `
       })

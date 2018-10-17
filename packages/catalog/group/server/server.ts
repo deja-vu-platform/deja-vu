@@ -246,8 +246,10 @@ const resolvers = {
 
       return g;
     },
+
     addMember: (root, { groupId, id }, context: Context) => addOrRemoveMember(
       groupId, id, 'add-member', context),
+
     removeMember: (root, { groupId, id }, context: Context) => addOrRemoveMember(
       groupId, id, 'remove-member', context)
   }
