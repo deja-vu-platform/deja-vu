@@ -29,7 +29,8 @@ function isPendingCreate(task: TaskDoc | null) {
   return _.get(task, 'pending.type') === 'create-task';
 }
 
-async function updateTask(tasks, id: string, updateOp: object,
+async function updateTask(
+  tasks: mongodb.Collection<TaskDoc>, id: string, updateOp: object,
   updateType: 'update-task' | 'claim-task' | 'complete-task' | 'approve-task',
   context: Context): Promise<Boolean> {
 
