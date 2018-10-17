@@ -17,5 +17,10 @@
         { "for": "src/app/app.component.html", "use": "authentication-root" }
       ]
     }
+  },
+  "actionsNoRequest": {
+    "exec": [
+      "authentication-choose-user"
+    ]
   }
 }
