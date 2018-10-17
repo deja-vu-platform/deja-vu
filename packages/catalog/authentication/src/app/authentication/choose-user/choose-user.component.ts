@@ -19,6 +19,7 @@ export class ChooseUserComponent {
     inputMap: { entity: 'user' }
   };
 
+  @Input() showChooseButton = true;
   @Input() chooseSelectPlaceholder = 'Choose User';
   @Input() addButtonLabel = 'Add User';
 
