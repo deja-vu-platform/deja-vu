@@ -18,6 +18,7 @@ export class ChooseComponent {
   };
 
   @Input() addButtonLabel = 'Add';
+  @Input() showChooseButton = true;
 
   @Input() entities: any[] = [];
   entityIndex: number | undefined;
@@ -32,6 +33,12 @@ export class ChooseComponent {
 
   ngOnInit() {
     this.rs.register(this.elem, this);
+  }
+
+  entitySelected() {
+    if (!this.showChooseButton) {
+      this.selectedEntity.emit(this.entities[this.entityIndex!]);
+    }
   }
 
   add() {
