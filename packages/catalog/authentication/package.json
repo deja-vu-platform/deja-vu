@@ -25,7 +25,8 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cliche-server": "file:../../cliche-server",
-    "jsonwebtoken": "^8.2.0"
+    "jsonwebtoken": "^8.2.0",
+    "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@angular/animations": "^5.2.0",
@@ -46,7 +47,7 @@
     "@types/jasmine": "~2.8.3",
     "@types/jasminewd2": "~2.0.2",
     "@types/mongodb": "^3.0.5",
-    "@types/node": "~6.0.60",
+    "@types/uuid": "^3.4.3",
     "bootstrap": "^4.0.0",
     "chokidar-cli": "^1.2.0",
     "codelyzer": "^4.0.1",
