@@ -47,7 +47,4 @@ type Mutation {
   registerAndSignIn(input: RegisterInput!): SignInOutput
   signIn(input: SignInInput!): SignInOutput
   changePassword(input: ChangePasswordInput!): Boolean
-  # This is the same as the `verify` query. We might be able to remove this one
-  # in the future after we have read txs working
-  verify(input: VerifyInput!): Boolean
 }

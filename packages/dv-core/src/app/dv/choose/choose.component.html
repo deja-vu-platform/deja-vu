@@ -1,6 +1,6 @@
 <mat-form-field>
   <mat-select [placeholder]="chooseSelectPlaceholder"
-              [(value)]="entityIndex">
+              [(value)]="entityIndex" (selectionChange)="entitySelected()">
     <mat-option>None</mat-option>
     <mat-option *ngFor="let entity of entities; index as i" [value]="i">
       <dv-include [action]="showEntity" default-showEntity="{ tag: dv-show-entity }"
@@ -12,6 +12,8 @@
     </mat-option>
   </mat-select>
 </mat-form-field>
-<button mat-button (click)="add()" [disabled]="entityIndex === undefined">
-  {{addButtonLabel}}
-</button>
+<div *ngIf="showChooseButton">
+  <button mat-button (click)="add()" [disabled]="entityIndex === undefined">
+    {{addButtonLabel}}
+  </button>
+</div>

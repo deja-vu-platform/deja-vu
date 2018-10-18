@@ -21,7 +21,7 @@ interface CanViewRes {
   templateUrl: './can-view.component.html',
   styleUrls: ['./can-view.component.css']
 })
-export class CanViewComponent implements OnInit, OnChanges {
+export class CanViewComponent implements OnInit, OnChanges, OnRun {
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canView = new EventEmitter<boolean>();
@@ -44,6 +44,14 @@ export class CanViewComponent implements OnInit, OnChanges {
   }
 
   load() {
+    this.doRequest();
+  }
+
+  dvOnRun() {
+    this.doRequest();
+  }
+
+  doRequest() {
     if (!this.gs) {
       return;
     }
@@ -54,12 +62,12 @@ export class CanViewComponent implements OnInit, OnChanges {
             canView(input: $input)
           }
         `,
-        variables: JSON.stringify({
+        variables: {
           input: {
             principalId: this.principalId,
             resourceId: this.resourceId
           }
-        })
+        }
       }
     })
     .subscribe((res) => {

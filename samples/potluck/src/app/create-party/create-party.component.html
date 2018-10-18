@@ -54,7 +54,7 @@
                         type: showGuestUsername, tag: 'authentication-show-user', inputMap: { entity: 'user' }
                       }"
                       [stageHeader]="{ type: guestListHeader, tag: 'potluck-guest-list-header' }"
-                      (stagedEntities)="stagedMemberIds=$event">
+                      (stagedEntities)="stagedMembers=$event">
                     </dv-stage>
                     <!-- for the members dropdown we'll need to retrieve users or provide some kind of autocomplete -->
                     <!--
@@ -115,15 +115,22 @@
                   [amount]="stagedSupplies"
                   [hidden]="true">
                 </transfer-add-to-balance>
+                <group-create-group
+                  [id]="partyId"
+                  [members]="stagedMembers"
+                  [hidden]="true">
+                </group-create-group>
                 <authorization-create-resource
                   [id]="partyId"
                   [ownerId]="user?.id"
-                  [viewerIds]="stagedMemberIds"
+                  [viewers]="stagedMembers"
                   [hidden]="true">
                 </authorization-create-resource>
+                <!-- comment out for now, until the max cohorts limit is removed
                 <authentication-authenticate
                   [id]="user?.id" [hidden]="true">
                 </authentication-authenticate>
+                -->
 
                 <div class="row" id="party-form-footer">
                   <div class="offset-md-4 col-md-3">

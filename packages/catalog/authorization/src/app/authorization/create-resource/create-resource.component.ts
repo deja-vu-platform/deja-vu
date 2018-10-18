@@ -30,6 +30,12 @@ export class CreateResourceComponent implements
   @Input() id: string;
   @Input() ownerId: string;
   @Input() viewerIds?: string[];
+
+  @Input()
+  set viewers(value: { id: string }[]) {
+    this.viewerIds = _.map(value, 'id');
+  }
+
   @Input() save = true;
   // Presentation Inputs
   @Input() buttonLabel = 'Create Resource';
