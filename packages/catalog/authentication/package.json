@@ -24,7 +24,6 @@
   "private": true,
   "dependencies": {
     "bcryptjs": "^2.4.3",
-    "cliche-server": "file:../../cliche-server",
     "jsonwebtoken": "^8.2.0",
     "uuid": "^3.2.1"
   },
@@ -50,6 +49,7 @@
     "@types/uuid": "^3.4.3",
     "bootstrap": "^4.0.0",
     "chokidar-cli": "^1.2.0",
+    "cliche-server": "file:../../cliche-server",
     "codelyzer": "^4.0.1",
     "concurrently": "^3.5.1",
     "core-js": "^2.4.1",
@@ -89,6 +89,7 @@
     "@angular/platform-browser-dynamic": "^5.2.0",
     "@angular/router": "^5.2.0",
     "bootstrap": "^4.0.0",
+    "cliche-server": "file:../../cliche-server",
     "core-js": "^2.4.1",
     "dv-core": "file:../../dv-core/pkg",
     "dv-gateway": "file:../../dv-gateway",
