@@ -3,5 +3,6 @@
 <dv-choose [showEntity]="showUser" default-showUser="{ tag: 'authentication-show-user' }"
            [entities]="users" [chooseSelectPlaceholder]="chooseSelectPlaceholder"
            [addButtonLabel]="addButtonLabel"
+           [showChooseButton]="showChooseButton"
            (selectedEntity)="outputSelectedUser($event)">
 </dv-choose>

@@ -2,8 +2,6 @@
   <div class="panel panel-default">
     <div class="panel-body">
       <div class="row">
-        <!-- need to respect dvAlias in the cli -->
-        <!-- <dv-tx dvAlias="showPartyInfo" class="col-md-12"> -->
         <dv-tx class="col-md-12">
           <h3 class="party-title">
             <property-show-object dvAlias="show-party-title"
@@ -58,7 +56,6 @@
         <div class="col-md-4">
           <div class="row">
             <dv-tx class="col-md-12">
-            <!-- <dv-tx dvAlias="invitedList" class="col-md-12"> -->
               <h4>Invited List</h4>
               <group-show-members
                 [inGroupId]="partyId"
@@ -76,6 +73,19 @@
           <div class="row top-space">
             <dv-tx *ngIf="hostId === loggedInUserId" class="col-md-12">
               <h4>Add Guest</h4>
+              <dv-status savedText="Guest added to list"></dv-status>
+              <authentication-choose-user
+                [showChooseButton]="false"
+                (selectedUser)="newGuest=$event"
+                chooseSelectPlaceholder="Choose Guest"
+                addButtonLabel="Add to Guest List">
+              </authentication-choose-user>
+              <group-add-to-group
+                [id]="partyId"
+                [member]="newGuest"
+                [hidden]="true">
+              </group-add-to-group>
+              <!--
               <group-add-to-group
                 [id]="partyId"
                 type="member"
@@ -84,18 +94,20 @@
                 buttonLabel="Add to Guest List"
                 addSavedText="Guest added to list">
               </group-add-to-group>
+              -->
               <authorization-can-view
                 [principalId]="loggedInUserId"
                 [resourceId]="partyId" [hidden]="true">
               </authorization-can-view>
               <authorization-add-viewer
                 [id]="partyId"
-                [viewerId]="selectedGuestId"
+                [viewer]="newGuest"
                 [hidden]="true">
               </authorization-add-viewer>
               <authentication-authenticate
                 [id]="loggedInUserId" [hidden]="true">
               </authentication-authenticate>
+              <dv-button>Add to Guest List</dv-button>
             </dv-tx>
           </div>
         </div>
@@ -103,7 +115,6 @@
 
         <div class="col-md-7">
           <div class="row">
-            <!-- <dv-tx dvAlias="supplyList" class="col-md-12"> -->
             <dv-tx class="col-md-12">
               <h4>Supply List</h4>
               <div class="container-fluid" style="padding: 0">

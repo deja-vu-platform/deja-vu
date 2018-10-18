@@ -24,6 +24,11 @@ export class AddViewerComponent implements
   OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() id: string;
   @Input() viewerId: string;
+  @Input()
+  set viewer(value: { id: string }) {
+    this.viewerId = _.get(value, 'id');
+  }
+
   // Presentation Inputs
   @Input() resourceInputLabel = 'Resource Id';
   @Input() viewerInputLabel = 'Viewer Id';

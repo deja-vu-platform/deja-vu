@@ -18,8 +18,8 @@ export class ShowPartyComponent implements OnInit {
   showClaim = ShowClaimComponent;
   viewMore: boolean;
   host: {id: string};
-  selectedGuestId: string;
   balance;
+  newGuest: { id: string };
 
   constructor() { }
 

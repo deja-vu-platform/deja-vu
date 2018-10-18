@@ -28,9 +28,18 @@ const SAVED_MSG_TIMEOUT = 3000;
 export class AddToGroupComponent implements OnInit {
   @Input() id: string;
 
-  @Input() set initialMemberId(id: string) {
-    this.memberIdControl.setValue(id);
+  @Input() set memberId(value: string | undefined) {
+    if (value !== undefined) {
+      this.memberIdControl.setValue(value);
+    }
   }
+
+  @Input() set member(value: { id: string } | undefined) {
+    if (value !== undefined) {
+      this.memberIdControl.setValue(value.id);
+    }
+  }
+
   @Output() selectedId = new EventEmitter<string>();
 
   // Presentation inputs
@@ -68,9 +77,7 @@ export class AddToGroupComponent implements OnInit {
       query: `mutation {
         addMember(
           groupId: "${this.id}",
-          id: "${this.memberIdControl.value}") {
-          id
-        }
+          id: "${this.memberIdControl.value}")
       }`
     })
     .toPromise();

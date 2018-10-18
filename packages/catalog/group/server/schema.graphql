@@ -29,7 +29,6 @@ type Query {
 
 type Mutation {
   createGroup(input: CreateGroupInput!): Group
-
-  addMember(groupId: ID!, id: ID!): Group
-  removeMember(groupId: ID!, id: ID!): Group
+  addMember(groupId: ID!, id: ID!): Boolean
+  removeMember(groupId: ID!, id: ID!): Boolean
 }

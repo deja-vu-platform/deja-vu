@@ -408,14 +408,6 @@ const resolvers = {
       }
 
       return false;
-    },
-
-    verify: (root, { input }: { input: VerifyInput }, context: Context) => {
-      if (context.reqType === undefined || context.reqType === 'vote') {
-        return verify(input.token, input.id);
-      }
-
-      return;
     }
   }
 };
@@ -423,6 +415,29 @@ const resolvers = {
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const app = express();
+
+app.get(/^\/dv\/(.*)\/vote\/.*/,
+  (req, res, next) => {
+    req['reqId'] = req.params[0];
+    next();
+  },
+  bodyParser.json(),
+  graphqlExpress((req) => {
+    return {
+      schema: schema,
+      context: {
+        reqType: 'vote',
+        reqId: req!['reqId']
+      },
+      formatResponse: (gqlResp) => {
+        return {
+          result: (gqlResp.errors) ? 'no' : 'yes',
+          payload: gqlResp
+        };
+      }
+    };
+  })
+);
 
 app.post(/^\/dv\/(.*)\/(vote|commit|abort)\/.*/,
   (req, res, next) => {
