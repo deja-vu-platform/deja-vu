@@ -35,7 +35,8 @@ function resolvers(db: mongodb.Db, config: Config): object {
   return {
     Query: {
       comment: async (root, { id }) => {
-        const comment = await Validation.commentExistsOrFails(id);
+        const comment = await CommentValidation.commentExistsOrFails(
+          comments, id);
 
         if (_.isNil(comment) || isPendingCreate(comment)) {
           throw new Error(`Comment ${id} not found`);
@@ -118,7 +119,8 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
       editComment: async (
         root, { input }: { input: EditCommentInput }, context: Context) => {
-        const comment = await Validation.commentExistsOrFails(input.id);
+        const comment = await CommentValidation.commentExistsOrFails(
+          comments, input.id);
 
         if (comment.authorId !== input.authorId) {
           throw new Error('Only the author of the comment can edit it.');
@@ -133,7 +135,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
         switch (context.reqType) {
           case 'vote':
-            await Validation.commentExistsOrFails(input.id);
+            await CommentValidation.commentExistsOrFails(comments, input.id);
             const pendingUpdateObj = await comments
               .updateOne(
                 notPendingResourceFilter,
@@ -151,7 +153,7 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
             return true;
           case undefined:
-            await Validation.commentExistsOrFails(input.id);
+            await CommentValidation.commentExistsOrFails(comments, input.id);
             const updateObj = await comments
               .updateOne(notPendingResourceFilter, updateOp);
             if (updateObj.matchedCount === 0) {

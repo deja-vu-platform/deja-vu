@@ -49,8 +49,8 @@ function resolvers(db: mongodb.Db, config: Config): object {
         .toArray(),
 
       resource: async (root, { id }) => {
-        const resource: ResourceDoc | null = await Validation
-          .resourceExistsOrFail(id);
+        const resource: ResourceDoc | null = await ResourceValidation
+          .resourceExistsOrFail(resources, id);
         if (_.isNil(resource) || isPendingCreate(resource)) {
           throw new Error(`Resource ${id} not found`);
         }

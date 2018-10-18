@@ -84,16 +84,16 @@ class UserValidation {
   }
 
   static isUsernameValid(username: string): Boolean {
-    return (Validation.isLengthValid(username, USERNAME_MIN_LENGTH,
+    return (UserValidation.isLengthValid(username, USERNAME_MIN_LENGTH,
       USERNAME_MAX_LENGTH, 'Username') &&
-      Validation.isPatternValid(username, USERNAME_REGEX, 'Username',
+      UserValidation.isPatternValid(username, USERNAME_REGEX, 'Username',
         USERNAME_PATTERN_MSG));
   }
 
   static isPasswordValid(password: string): Boolean {
-    return (Validation.isLengthValid(password, PASSWORD_MIN_LENGTH,
+    return (UserValidation.isLengthValid(password, PASSWORD_MIN_LENGTH,
       PASSWORD_MAX_LENGTH, 'Password') &&
-      Validation.isPatternValid(password, PASSWORD_REGEX, 'Password',
+      UserValidation.isPatternValid(password, PASSWORD_REGEX, 'Password',
         PASSWORD_PATTERN_MSG));
   }
 
