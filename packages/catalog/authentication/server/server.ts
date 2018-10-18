@@ -5,7 +5,6 @@ import {
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
-  InitResolversFn,
   Validation
 } from 'cliche-server';
 import * as jwt from 'jsonwebtoken';
@@ -186,7 +185,7 @@ function verify(token: string, userId: string): boolean {
   return tokenUserId === userId;
 }
 
-const resolvers: InitResolversFn = (db: mongodb.Db, config: Config): object => {
+function resolvers(db: mongodb.Db, config: Config): object {
   const users: mongodb.Collection<UserDoc> = db.collection('users');
   return {
     Query: {

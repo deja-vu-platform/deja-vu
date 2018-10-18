@@ -4,7 +4,6 @@ import {
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
-  InitResolversFn,
   Validation
 } from 'cliche-server';
 import * as _ from 'lodash';
@@ -75,7 +74,7 @@ async function updateTask(
   return false;
 }
 
-const resolvers: InitResolversFn = (db: mongodb.Db, config: Config): object => {
+function resolvers(db: mongodb.Db, config: Config): object {
   const tasks: mongodb.Collection<TaskDoc> = db.collection('tasks');
   return {
     Query: {

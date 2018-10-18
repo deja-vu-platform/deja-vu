@@ -4,7 +4,6 @@ import {
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
-  InitResolversFn,
   Validation
 } from 'cliche-server';
 import * as _ from 'lodash';
@@ -55,7 +54,7 @@ function isPendingCreate(doc: EventDoc | SeriesDoc | null) {
   return docPending === 'create-event' || docPending === 'create-series';
 }
 
-const resolvers: InitResolversFn = (db: mongodb.Db, config: Config): object => {
+function resolvers(db: mongodb.Db, config: Config): object {
   const events: mongodb.Collection<EventDoc> = db.collection('events');
   const series: mongodb.Collection<SeriesDoc> = db.collection('series');
   return {

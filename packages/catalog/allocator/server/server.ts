@@ -4,7 +4,6 @@ import {
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
-  InitResolversFn,
   Validation
 } from 'cliche-server';
 import * as _ from 'lodash';
@@ -47,7 +46,7 @@ function isPendingCreate(alloc: AllocationDoc | null) {
   return _.get(alloc, 'pending.type') === 'create-allocation';
 }
 
-const resolvers: InitResolversFn = (db: mongodb.Db, config: Config): object => {
+function resolvers(db: mongodb.Db, config: Config): object {
   const allocations: mongodb.Collection<AllocationDoc> =
     db.collection('allocations');
   return {

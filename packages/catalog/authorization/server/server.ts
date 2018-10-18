@@ -4,7 +4,6 @@ import {
   CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
-  InitResolversFn,
   Validation
 } from 'cliche-server';
 import * as _ from 'lodash';
@@ -41,7 +40,7 @@ function isPendingCreate(doc: ResourceDoc | null) {
   return _.get(doc, 'pending.type') === 'create-resource';
 }
 
-const resolvers: InitResolversFn = (db: mongodb.Db, config: Config): object => {
+function resolvers(db: mongodb.Db, config: Config): object {
   const resources: mongodb.Collection<ResourceDoc> = db.collection('resources');
   return {
     Query: {
