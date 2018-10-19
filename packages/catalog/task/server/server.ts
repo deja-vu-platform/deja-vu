@@ -1,17 +1,21 @@
-import * as mongodb from 'mongodb';
-import { TaskDoc, TasksInput, CreateTaskInput, UpdateTaskInput } from './schema';
 import {
   ClicheServer,
   ClicheServerBuilder,
+  CONCURRENT_UPDATE_ERROR,
   Config,
   Context,
-  Validation,
-  CONCURRENT_UPDATE_ERROR
+  Validation
 } from 'cliche-server';
-
+import * as _ from 'lodash';
+import * as mongodb from 'mongodb';
+import {
+  CreateTaskInput,
+  TaskDoc,
+  TasksInput,
+  UpdateTaskInput
+} from './schema';
 import { v4 as uuid } from 'uuid';
 
-import * as _ from 'lodash';
 
 class TaskValidation {
   static async taskExistsOrFail(
@@ -24,7 +28,8 @@ function isPendingCreate(task: TaskDoc | null) {
   return _.get(task, 'pending.type') === 'create-task';
 }
 
-async function updateTask(tasks, id: string, updateOp: object,
+async function updateTask(
+  tasks: mongodb.Collection<TaskDoc>, id: string, updateOp: object,
   updateType: 'update-task' | 'claim-task' | 'complete-task' | 'approve-task',
   context: Context): Promise<Boolean> {
 
@@ -69,84 +74,86 @@ async function updateTask(tasks, id: string, updateOp: object,
   return false;
 }
 
+function resolvers(db: mongodb.Db, config: Config): object {
+  const tasks: mongodb.Collection<TaskDoc> = db.collection('tasks');
+  return {
+    Query: {
+      tasks: async (root, { input }: { input: TasksInput }) => {
+        const filterOp = _.omit(input, ['assigned']);
+        if (input.assigned === false) {
+          filterOp['assigneeId'] = null;
+        }
+        filterOp['pending'] = { type: { $ne: 'create-task' } };
+
+        return await tasks.find(filterOp)
+          .toArray();
+      },
+      task: async (root, { id }) => {
+        const task: TaskDoc | null = await tasks.findOne({ id: id });
+        return isPendingCreate(task) ? null : task;
+      }
+    },
+    Task: {
+      id: (task: TaskDoc) => task.id,
+      assignerId: (task: TaskDoc) => task.assignerId,
+      assigneeId: (task: TaskDoc) => task.assigneeId,
+      dueDate: (task: TaskDoc) => task.dueDate
+    },
+    Mutation: {
+      createTask: async (
+        root, { input }: {input: CreateTaskInput}, context: Context) => {
+        const newTask: TaskDoc = {
+          id: input.id ? input.id : uuid(),
+          assignerId: input.assignerId,
+          assigneeId: input.assigneeId,
+          dueDate: input.dueDate,
+          completed: false,
+          approved: false
+        };
+        const reqIdPendingFilter = { 'pending.reqId': context.reqId };
+        switch (context.reqType) {
+          case 'vote':
+            newTask.pending = { reqId: context.reqId, type: 'create-task' };
+          case undefined:
+            await tasks.insertOne(newTask);
+            return newTask;
+          case 'commit':
+            await tasks.updateOne(
+              reqIdPendingFilter,
+              { $unset: { pending: '' } });
+            return;
+          case 'abort':
+            await tasks.deleteOne(reqIdPendingFilter);
+            return;
+        }
+
+        return newTask;
+      },
+      updateTask: async (root, { input }: {input: UpdateTaskInput}, context:Context) => {
+        return updateTask(tasks, input.id, { $set: input }, 'update-task', context);
+      },
+      claimTask: async (root, { id, assigneeId }, context: Context) => {
+        return updateTask(tasks,
+          id, { $set: { assigneeId: assigneeId } }, 'claim-task', context);
+      },
+      approveTask: async (root, { id }, context: Context) => {
+        return updateTask(tasks,
+          id, { $set: { approved: true } }, 'approve-task', context);
+      },
+      completeTask: async (root, { id }, context: Context) => {
+        return updateTask(tasks,
+          id, { $set: { completed: true } }, 'complete-task', context);
+      }
+    }
+  };
+};
+
 const taskCliche: ClicheServer = new ClicheServerBuilder('task')
   .initDb((db: mongodb.Db, config: Config): Promise<any> => {
     const tasks: mongodb.Collection<TaskDoc> = db.collection('tasks');
     return tasks.createIndex({ id: 1 }, { unique: true, sparse: true });
   })
-  .resolvers((db: mongodb.Db, config: Config): object => {
-    const tasks: mongodb.Collection<TaskDoc> = db.collection('tasks');
-    return {
-      Query: {
-        tasks: async (root, { input }: { input: TasksInput }) => {
-          const filterOp = _.omit(input, ['assigned']);
-          if (input.assigned === false) {
-            filterOp['assigneeId'] = null;
-          }
-          filterOp['pending'] = { type: { $ne: 'create-task' } };
-
-          return await tasks.find(filterOp)
-            .toArray();
-        },
-        task: async (root, { id }) => {
-          const task: TaskDoc | null = await tasks.findOne({ id: id });
-          return isPendingCreate(task) ? null : task;
-        }
-      },
-      Task: {
-        id: (task: TaskDoc) => task.id,
-        assignerId: (task: TaskDoc) => task.assignerId,
-        assigneeId: (task: TaskDoc) => task.assigneeId,
-        dueDate: (task: TaskDoc) => task.dueDate
-      },
-      Mutation: {
-        createTask: async (
-          root, { input }: {input: CreateTaskInput}, context: Context) => {
-          const newTask: TaskDoc = {
-            id: input.id ? input.id : uuid(),
-            assignerId: input.assignerId,
-            assigneeId: input.assigneeId,
-            dueDate: input.dueDate,
-            completed: false,
-            approved: false
-          };
-          const reqIdPendingFilter = { 'pending.reqId': context.reqId };
-          switch (context.reqType) {
-            case 'vote':
-              newTask.pending = { reqId: context.reqId, type: 'create-task' };
-            case undefined:
-              await tasks.insertOne(newTask);
-              return newTask;
-            case 'commit':
-              await tasks.updateOne(
-                reqIdPendingFilter,
-                { $unset: { pending: '' } });
-              return;
-            case 'abort':
-              await tasks.deleteOne(reqIdPendingFilter);
-              return;
-          }
-
-          return newTask;
-        },
-        updateTask: async (root, { input }: {input: UpdateTaskInput}, context:Context) => {
-          return updateTask(tasks, input.id, { $set: input }, 'update-task', context);
-        },
-        claimTask: async (root, { id, assigneeId }, context: Context) => {
-          return updateTask(tasks,
-            id, { $set: { assigneeId: assigneeId } }, 'claim-task', context);
-        },
-        approveTask: async (root, { id }, context: Context) => {
-          return updateTask(tasks,
-            id, { $set: { approved: true } }, 'approve-task', context);
-        },
-        completeTask: async (root, { id }, context: Context) => {
-          return updateTask(tasks,
-            id, { $set: { completed: true } }, 'complete-task', context);
-        }
-      }
-    };
-  })
+  .resolvers(resolvers)
   .build();
 
 taskCliche.start();

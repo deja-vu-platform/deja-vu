@@ -39,6 +39,7 @@
     "@types/express": "^4.11.0",
     "@types/minimist": "^1.2.0",
     "@types/mongodb": "^3.0.7",
+    "mongodb": "^3.0.4",
     "rxjs": "^5.5.12",
     "tslint": "~5.9.1",
     "typescript": ">=2.4.2 <2.7",

@@ -83,8 +83,9 @@ export class ClicheServer {
               case 'abort':
               case 'commit':
                 return 'ACK';
-              case undefined:
-                return gqlResp;
+              default:
+                throw new Error(`Unexpected request type ${reqType} for
+                   ${this._name} cliche server`);
             }
           }
         };
