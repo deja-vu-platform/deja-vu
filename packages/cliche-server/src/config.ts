@@ -4,6 +4,7 @@ export interface Config {
   dbPort: number;
   dbName: string;
   reinitDbOnStartup: boolean;
+  [extraProperties: string]: any;
 }
 
 /**

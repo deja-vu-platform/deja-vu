@@ -45,14 +45,17 @@ export class ClicheServer {
   private _resolvers: object | undefined;
   private readonly _initDbCallback: InitDbCallbackFn | undefined;
   private readonly _initResolvers: InitResolversFn | undefined;
+  private readonly _dynamicTypeDefs: string[];
 
   constructor(name: string, config: Config, schemaPath: string,
-    initDbCallback?: InitDbCallbackFn, initResolvers?: InitResolversFn) {
+    initDbCallback?: InitDbCallbackFn, initResolvers?: InitResolversFn,
+    dynamicTypeDefs: string[] = []) {
     this._name = name;
     this._config = config;
     this._schemaPath = schemaPath;
     this._initDbCallback = initDbCallback;
     this._initResolvers = initResolvers;
+    this._dynamicTypeDefs = dynamicTypeDefs;
   }
 
   private startApp(schema) {
@@ -128,7 +131,8 @@ export class ClicheServer {
     // TODO: support for initResolvers that don't require a db
     if (this._initResolvers) {
       this._resolvers = this._initResolvers(this._db, this._config);
-      const typeDefs = [readFileSync(this._schemaPath, 'utf8')];
+      const typeDefs = [
+        readFileSync(this._schemaPath, 'utf8'), ...this._dynamicTypeDefs];
       const schema = makeExecutableSchema(
         { typeDefs, resolvers: this._resolvers });
 
