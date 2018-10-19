@@ -39,6 +39,10 @@ export class RunService {
   private renderer: Renderer2;
   private actionTable: {[id: string]: ActionInfo} = {};
 
+  private static IsDvTx(node) {
+    return node.nodeName.toLowerCase() === 'dv-tx';
+  }
+
   constructor(
     rendererFactory: RendererFactory2) {
     // https://github.com/angular/angular/issues/17824
@@ -69,7 +73,7 @@ export class RunService {
     let targetAction = node;
 
     while (node && node.getAttribute) { // 'document' doesn't have `getAttribute`
-      if (this.isDvTx(node)) {
+      if (RunService.IsDvTx(node)) {
         targetAction = node;
         break;
       }
@@ -141,7 +145,4 @@ export class RunService {
     });
   }
 
-  private isDvTx(node) {
-    return node.nodeName.toLowerCase() === 'dv-tx';
-  }
 }
