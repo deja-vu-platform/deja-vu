@@ -3,17 +3,20 @@ import { filter, tap } from 'rxjs/operators';
 import { DragulaService } from 'ng2-dragula';
 
 import * as EventCliche from 'event'; // TODO: proper import
+import * as AllocatorCliche from 'allocator'; // TODO: proper import
 
 import { ComposedWidget, Cliche, ClicheComponents } from './datatypes';
+import { isString } from '../utils';
 
 const importedCliches = {
   Event: EventCliche,
+  Allocator: AllocatorCliche,
 };
 
 function restoreComponentNames(importedComponents) {
   const namedComponents: ClicheComponents = {};
   Object.values(importedComponents)
-    .filter(f => f['name'].endsWith('Component'))
+    .filter(f => isString(f['name']) && f['name'].endsWith('Component'))
     .forEach(c => namedComponents[c['name'].slice(0, -9)] = c);
   return namedComponents;
 }
