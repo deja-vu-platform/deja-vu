@@ -60,7 +60,7 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
   fetchTransfers() {
     if (this.gs) {
       const selection = this.balanceType === 'money' ?
-        '' : ' { itemId, count }';
+        '' : ' { id, count }';
       this.gs
         .get<{data: {transfers: Transfer[]}}>('/graphql', {
           params: {

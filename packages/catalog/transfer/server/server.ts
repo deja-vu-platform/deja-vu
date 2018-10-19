@@ -17,7 +17,7 @@ import * as assert from 'assert';
 
 
 interface ItemCount {
-  itemId: string;
+  id: string;
   count: number;
 }
 
@@ -475,12 +475,12 @@ if (config.balanceType === 'money') {
         readFileSync(schemaPath, 'utf8')
           .concat(`
             input ItemCountInput {
-              itemId: ID!
+              id: ID!
               count: Int
             }
 
             type ItemCount {
-              itemId: ID!
+              id: ID!
               count: Int
             }
           `),
@@ -492,24 +492,24 @@ if (config.balanceType === 'money') {
     (accountBalance: ItemCount[], transferAmount: ItemCount[]) => {
       const accountBalanceMap = _
         .reduce(accountBalance, (acc, itemCount: ItemCount) => {
-          acc[itemCount.itemId] = itemCount.count;
+          acc[itemCount.id] = itemCount.count;
 
           return acc;
         }, {});
 
       _.each(transferAmount, (itemCount: ItemCount) => {
-        const prevItemCount = _.get(accountBalanceMap, itemCount.itemId, 0);
+        const prevItemCount = _.get(accountBalanceMap, itemCount.id, 0);
         const newCount = prevItemCount + itemCount.count;
         if (newCount === 0) {
-          delete accountBalanceMap[itemCount.itemId];
+          delete accountBalanceMap[itemCount.id];
         } else {
-          accountBalanceMap[itemCount.itemId] = newCount;
+          accountBalanceMap[itemCount.id] = newCount;
         }
       });
 
       return _
         .map(accountBalanceMap, (value: number, key: string): ItemCount => {
-          return { itemId: key, count: value };
+          return { id: key, count: value };
         });
     };
   const accountHasFundsFn: AccountHasFundsFn<ItemCount[]> =
@@ -526,7 +526,7 @@ if (config.balanceType === 'money') {
   const negateBalanceFn: NegateBalanceFn<ItemCount[]> =
     (balance: ItemCount[]) => {
       return _.map(balance, (itemCount: ItemCount) => {
-        return { itemId: itemCount.itemId, count: -itemCount.count };
+        return { id: itemCount.id, count: -itemCount.count };
       });
     };
   const zeroBalanceFn: ZeroBalanceFn<ItemCount[]> = () => [];
@@ -539,7 +539,7 @@ if (config.balanceType === 'money') {
 
   _.merge(resolvers, {
     ItemCount: {
-      itemId: (itemCount: ItemCount) => itemCount.itemId,
+      id: (itemCount: ItemCount) => itemCount.id,
       count: (itemCount: ItemCount) => itemCount.count
     }
   });

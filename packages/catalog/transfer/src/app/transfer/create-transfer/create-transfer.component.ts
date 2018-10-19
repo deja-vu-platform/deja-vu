@@ -17,7 +17,7 @@ import * as _ from 'lodash';
 import { API_PATH } from '../transfer.config';
 
 import { InputAmountComponent } from '../input-amount/input-amount.component';
-import { Transfer } from '../shared/transfer.model';
+import { Amount, Transfer } from '../shared/transfer.model';
 
 interface CreateTransferRes {
   data: { createTransfer: Transfer };
@@ -53,6 +53,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     this.toIdControl.setValue(toId);
   }
 
+  @Input() amount: Amount;
+
   // Presentation inputs
   @Input() fromIdInputPlaceholder = 'From Account';
   @Input() toIdInputPlaceholder = 'To Account';
@@ -63,13 +65,11 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
 
   fromIdControl = new FormControl();
   toIdControl = new FormControl();
-  amountControl = new FormControl();
 
   @ViewChild(FormGroupDirective) form;
   createTransferForm = this.builder.group({
     fromIdControl: this.fromIdControl,
-    toIdControl: this.toIdControl,
-    amountControl: this.amountControl
+    toIdControl: this.toIdControl
   });
 
   newTransferSaved = false;
@@ -83,10 +83,6 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
     @Inject(API_PATH) private apiPath) {}
-
-  setAmount(amount) {
-    this.amountControl.setValue(amount);
-  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);
@@ -111,7 +107,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
           id: this.id,
           fromId: this.fromIdControl.value,
           toId: this.toIdControl.value,
-          amount: this.amountControl.value
+          amount: this.amount
         }
       }
     })

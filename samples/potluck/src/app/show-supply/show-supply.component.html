@@ -25,14 +25,12 @@
 <div *ngIf="supply" class="row">
   <div class="col-md-4">
     <div *ngIf="!useIdForObject">
-      useIdForObject is false
       <property-show-object
         dvOf="supply" [object]="supply"
         [showOnly]="['item']">
       </property-show-object>
     </div>
     <div *ngIf="useIdForObject">
-      Using supply id {{supply.id}}
       <property-show-object
         dvOf="supply" [id]="supply.id"
         [showOnly]="['item']">

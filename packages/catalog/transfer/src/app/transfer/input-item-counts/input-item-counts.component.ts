@@ -67,7 +67,7 @@ export class InputItemCountsComponent
       this.reset();
     } else {
       this.itemsControl.setValue(
-        _.map(value, (itemCount) => _.pick(itemCount, ['itemId', 'count'])));
+        _.map(value, (itemCount) => _.pick(itemCount, ['id', 'count'])));
     }
   }
 

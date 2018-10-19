@@ -9,6 +9,8 @@ import { OnAfterCommit, OnRun, RunService } from 'dv-core';
 
 import { ItemCount } from '../shared/transfer.model';
 
+import * as _ from 'lodash';
+
 
 @Component({
   selector: 'transfer-create-item-count',
@@ -17,7 +19,7 @@ import { ItemCount } from '../shared/transfer.model';
 })
 export class CreateItemCountComponent
   implements OnInit, OnRun, OnAfterCommit {
-  itemIdControl = new FormControl(undefined, [Validators.required]);
+  idControl = new FormControl(undefined, [Validators.required]);
   countControl = new FormControl(undefined, [Validators.required]);
 
   @Output() itemCount = new EventEmitter<ItemCount>();
@@ -32,13 +34,13 @@ export class CreateItemCountComponent
   @Input() showOptionToCreate = true;
 
   @Input()
-  set itemId(value: string) {
-    this.itemIdControl.setValue(value);
+  set id(value: string) {
+    this.idControl.setValue(value);
   }
 
   @ViewChild(FormGroupDirective) form;
   createItemCountForm = this.builder.group({
-    itemIdControl: this.itemIdControl,
+    idControl: this.idControl,
     countControl: this.countControl
   });
 
@@ -47,18 +49,18 @@ export class CreateItemCountComponent
   constructor(
     private elem: ElementRef,
     private rs: RunService, private builder: FormBuilder) {
-    this.itemIdControl.valueChanges.subscribe((value: string) => {
+    this.idControl.valueChanges.subscribe((value: string) => {
       if (this.thisItemCount === undefined) {
-        this.thisItemCount = { itemId: undefined, count: undefined };
+        this.thisItemCount = { id: undefined, count: undefined };
       }
-      this.thisItemCount.itemId = value;
+      this.thisItemCount.id = value;
       if (!this.emitOnRunOnly) {
         this.emit();
       }
     });
     this.countControl.valueChanges.subscribe((value: number) => {
       if (this.thisItemCount === undefined) {
-        this.thisItemCount = { itemId: undefined, count: undefined };
+        this.thisItemCount = { id: undefined, count: undefined };
       }
       this.thisItemCount.count = value;
       if (!this.emitOnRunOnly) {
@@ -76,8 +78,9 @@ export class CreateItemCountComponent
   }
 
   emit() {
-    this.itemCount.emit(this.thisItemCount);
-    this.itemCountAsAmount.emit([ this.thisItemCount ]);
+    const itemCountToEmit = _.cloneDeep(this.thisItemCount);
+    this.itemCount.emit(itemCountToEmit);
+    this.itemCountAsAmount.emit([ itemCountToEmit ]);
   }
 
   dvOnRun() {

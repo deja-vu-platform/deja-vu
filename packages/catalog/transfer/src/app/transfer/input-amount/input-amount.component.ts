@@ -13,6 +13,9 @@ import { CONFIG } from '../transfer.config';
 
 import { Amount } from '../shared/transfer.model';
 
+import * as _ from 'lodash';
+
+
 @Component({
   selector: 'transfer-input-amount',
   templateUrl: './input-amount.component.html',
@@ -48,7 +51,7 @@ export class InputAmountComponent
   ngOnInit() {
     this.rs.register(this.elem, this);
     this.amountControl.valueChanges.subscribe((value: Amount) => {
-      this.amount.emit(value);
+      this.amount.emit(_.cloneDeep(value));
     });
     this.amountControl.valueChanges.pipe(startWith(
       this.amountControl.value));
