@@ -84,7 +84,7 @@ export class RunService {
     try {
       runResultMap = await this.callDvOnRun(targetAction, runId);
     } catch (error) {
-      console.log(`Got error on run ${runId}: ${error}`);
+      console.error(`Got error on run ${runId}: ${error}`);
       this.callDvOnAfterAbort(targetAction, error);
     }
     if (runResultMap) { // no error
