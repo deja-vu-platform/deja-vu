@@ -1,25 +1,9 @@
 import { Component } from '@angular/core';
-import { filter, tap } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 import { DragulaService } from 'ng2-dragula';
 
-import * as EventCliche from 'event'; // TODO: proper import
-import * as AllocatorCliche from 'allocator'; // TODO: proper import
-
-import { ComposedWidget, Cliche, ClicheComponents } from './datatypes';
-import { isString } from '../utils';
-
-const importedCliches = {
-  Event: EventCliche,
-  Allocator: AllocatorCliche,
-};
-
-function restoreComponentNames(importedComponents) {
-  const namedComponents: ClicheComponents = {};
-  Object.values(importedComponents)
-    .filter(f => isString(f['name']) && f['name'].endsWith('Component'))
-    .forEach(c => namedComponents[c['name'].slice(0, -9)] = c);
-  return namedComponents;
-}
+import { ComposedWidget } from './datatypes';
+import { cliches } from './cliche/cliche.module';
 
 @Component({
   selector: 'app-root',
@@ -35,24 +19,16 @@ export class AppComponent {
       ],
     },
   ];
-  composedWidget = this.composedWidgets[0]; // TODO: dynamic
 
-  cliches: Cliche[] = [];
-  clicheMap: { [clicheName: string]: Cliche } = {}; // redundant, for performance & clarity
+  composedWidget = this.composedWidgets[0]; // TODO: dynamic
 
   // dragula needs to be configured at the top-level
   constructor(private dragulaService: DragulaService) {
-    this.loadCliches();
     this.configureDragula(dragulaService);
   }
 
-  loadCliches() {
-    Object.entries(importedCliches).forEach(([name, clicheModule]) => {
-      const components = restoreComponentNames(clicheModule);
-      const cliche = { name, components };
-      this.cliches.push(cliche);
-      this.clicheMap[name] = cliche;
-    });
+  get clicheList() {
+    return Object.values(cliches);
   }
 
   configureDragula(dragulaService: DragulaService) {
@@ -61,13 +37,13 @@ export class AppComponent {
       accepts: (el, target) => target.classList.contains('page-row'),
     });
 
-    const dropStream = dragulaService.drop('widget')
+    dragulaService.drop('widget')
       .pipe(filter(({ el, source, target }) => !!el && !!source && !!target))
       .subscribe(({ el, source, target }) => {
         let component;
         if (source.classList.contains('widget-list')) {
           const { cliche: clicheName, component: componentName } = el['dataset'];
-          component = this.clicheMap[clicheName].components[componentName];
+          component = cliches[clicheName].components[componentName];
         } else if (source.classList.contains('page-row')) {
           component = this.removeWidget(el, source);
         } else {
