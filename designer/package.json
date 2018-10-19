@@ -30,6 +30,7 @@
     "dv-core": "file:../packages/dv-core/pkg",
     "dv-gateway": "file:../packages/dv-gateway",
     "event": "file:../packages/catalog/event/pkg",
+    "allocator": "file:../packages/catalog/allocator/pkg",
     "jquery": "^1.9.1",
     "lodash": "^4.17.11",
     "moment": "^2.22.2",

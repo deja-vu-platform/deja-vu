@@ -9,3 +9,7 @@ export function filterInPlace<T>(arr: T[], f: (e: T, i: number) => boolean) {
   arr.length = out;
   return arr;
 }
+
+export function isString(variable) {
+  return (typeof variable === 'string' || variable instanceof String);
+}
