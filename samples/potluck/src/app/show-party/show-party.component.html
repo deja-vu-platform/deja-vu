@@ -2,7 +2,7 @@
   <div class="panel panel-default">
     <div class="panel-body">
       <div class="row">
-        <dv-tx class="col-md-12">
+        <div class="col-md-12">
           <h3 class="party-title">
             <property-show-object dvAlias="show-party-title"
               dvOf="party" [id]="partyId" [showOnly]="['title']">
@@ -42,7 +42,7 @@
           <authentication-authenticate dvAlias="authenticate-show-party-info"
             [id]="loggedInUserId" [hidden]="true">
           </authentication-authenticate>
-        </dv-tx>
+        </div>
       </div>
       <div class="row">
         <div class="col-md-2 offset-md-5">
@@ -55,7 +55,7 @@
       <div class="row" [hidden]="!viewMore">
         <div class="col-md-4">
           <div class="row">
-            <dv-tx class="col-md-12">
+            <div class="col-md-12">
               <h4>Invited List</h4>
               <group-show-members
                 [inGroupId]="partyId"
@@ -68,7 +68,7 @@
               <authentication-authenticate dvAlias="authenticate-invited-list"
                 [id]="loggedInUserId" [hidden]="true">
               </authentication-authenticate>
-            </dv-tx>
+            </div>
           </div>
           <div class="row top-space">
             <dv-tx *ngIf="hostId === loggedInUserId" class="col-md-12">
@@ -123,7 +123,7 @@
                     <transfer-show-item-counts
                       [itemCounts]="balance"
                       [showItemCount]="{
-                        type: claimSupply, tag: 'potluck-show-supply', inputMap: { itemCount: 'supply' },
+                        type: claimSupply, tag: 'potluck-claim-supply', inputMap: { itemCount: 'supply' },
                         inputs: { loggedInUserId: loggedInUserId, partyId: partyId }
                       }">
                     </transfer-show-item-counts>
@@ -148,8 +148,7 @@
                     <transfer-show-transfers
                       [fromId]="partyId"
                       noTransfersToShowText="No claims"
-                      [showTransfer]="{ type: showClaim, tag: 'potluck-show-claim', inputMap: { id: 'id'} }"
-                    >
+                      [showTransfer]="{ type: showClaim, tag: 'potluck-show-claim', inputMap: { id: 'id'} }">
                     </transfer-show-transfers>
                     <!--
                     <market-show-transactions
