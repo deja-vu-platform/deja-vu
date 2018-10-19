@@ -7,7 +7,7 @@ import { Transfer } from '../shared/transfer.model';
 import {
   ShowTransferComponent
 } from '../show-transfer/show-transfer.component';
-import { CONFIG } from '../transfer.config';
+import { API_PATH, CONFIG } from '../transfer.config';
 
 
 @Component({
@@ -43,7 +43,7 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
 
   constructor(
     private elem: ElementRef, private gsf: GatewayServiceFactory,
-    @Inject(CONFIG) config) {
+    @Inject(CONFIG) config, @Inject(API_PATH) private apiPath) {
     this.showTransfers = this;
     this.balanceType = config.balanceType;
   }
@@ -62,7 +62,7 @@ export class ShowTransfersComponent implements OnInit, OnChanges {
       const selection = this.balanceType === 'money' ?
         '' : ' { id, count }';
       this.gs
-        .get<{data: {transfers: Transfer[]}}>('/graphql', {
+        .get<{data: {transfers: Transfer[]}}>(this.apiPath, {
           params: {
             query: `
               query Transfers($input: TransfersInput!) {
