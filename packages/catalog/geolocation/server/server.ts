@@ -1,116 +1,27 @@
-import * as bodyParser from 'body-parser';
-import * as express from 'express';
-import { readFileSync } from 'fs';
-import * as minimist from 'minimist';
+import {
+  ClicheServer,
+  ClicheServerBuilder,
+  CONCURRENT_UPDATE_ERROR,
+  Config,
+  Context,
+  Validation
+} from 'cliche-server';
+import * as _ from 'lodash';
 import * as mongodb from 'mongodb';
-import * as path from 'path';
+import {
+  CreateMarkerInput,
+  Marker,
+  MarkerDoc,
+  MarkersInput,
+  PendingDoc
+} from './schema';
 import { v4 as uuid } from 'uuid';
 
-import * as _ from 'lodash';
 
-// GitHub Issue: https://github.com/apollographql/apollo-server/issues/927
-// tslint:disable-next-line:no-var-requires
-const { graphiqlExpress, graphqlExpress } = require('apollo-server-express');
-import { makeExecutableSchema } from 'graphql-tools';
-
-interface MarkerDoc {
-  id: string;
-  title?: string;
-  location: {
-    type: string,                   // 'Point'
-    coordinates: [number, number]   // [longitude, latitude]
-  };
-  mapId: string;
-  pending?: PendingDoc;
-}
-
-interface PendingDoc {
-  reqId: string;
-  type: 'create-marker' | 'delete-marker';
-}
-
-interface Marker {
-  id: string;
-  title?: string;
-  latitude: number;
-  longitude: number;
-  mapId: string;
-}
-
-interface CreateMarkerInput {
-  id?: string;
-  title?: string;
-  latitude: number;
-  longitude: number;
-  mapId: string;
-}
-
-interface MarkersInput {
-  ofMapId?: string;
-}
-
-interface Config {
-  wsPort: number;
-  dbHost: string;
-  dbPort: number;
-  dbName: string;
-  reinitDbOnStartup: boolean;
-}
-
-const CONCURRENT_UPDATE_ERROR = 'An error has occured. Please try again later';
-
-const argv = minimist(process.argv);
-
-const name = argv.as ? argv.as : 'geolocation';
-
-const DEFAULT_CONFIG: Config = {
-  dbHost: 'localhost',
-  dbPort: 27017,
-  wsPort: 3000,
-  dbName: `${name}-db`,
-  reinitDbOnStartup: true
-};
-
-let configArg;
-try {
-  configArg = JSON.parse(argv.config);
-} catch (e) {
-  throw new Error(`Couldn't parse config ${argv.config}`);
-}
-
-const config: Config = { ...DEFAULT_CONFIG, ...configArg };
-
-console.log(`Connecting to mongo server ${config.dbHost}:${config.dbPort}`);
-let db: mongodb.Db;
-let markers: mongodb.Collection<MarkerDoc>;
-mongodb.MongoClient.connect(
-  `mongodb://${config.dbHost}:${config.dbPort}`, async (err, client) => {
-    if (err) {
-      throw err;
-    }
-    db = client.db(config.dbName);
-    if (config.reinitDbOnStartup) {
-      await db.dropDatabase();
-      console.log(`Reinitialized db ${config.dbName}`);
-    }
-    markers = db.collection('markers');
-    markers.createIndex({ id: 1 }, { unique: true, sparse: true });
-    markers.createIndex({ id: 1, mapId: 1, location: '2dsphere' },
-      { unique: true, sparse: true });
-  });
-
-
-const typeDefs = [readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')];
-
-class Validation {
-  static async markerExistsOrFail(id: string): Promise<MarkerDoc> {
-    const marker: MarkerDoc | null = await markers
-      .findOne({ id: id });
-    if (!marker) {
-      throw new Error(`Marker ${id} doesn't exist `);
-    }
-
-    return marker;
+class MarkerValidation {
+  static async markerExistsOrFail(
+    markers: mongodb.Collection<MarkerDoc>, id: string): Promise<MarkerDoc> {
+    return Validation.existsOrFail(markers, id, 'Marker');
   }
 }
 
@@ -122,21 +33,16 @@ function markerDocToMarker(markerDoc: MarkerDoc): Marker {
   return ret;
 }
 
-
-interface Context {
-  reqType: 'vote' | 'commit' | 'abort' | undefined;
-  runId: string;
-  reqId: string;
-}
-
 function isPendingCreate(doc: MarkerDoc | null) {
   return _.get(doc, 'pending.type') === 'create-marker';
 }
 
-const resolvers = {
+function resolvers(db: mongodb.Db, config: Config): object {
+  const markers: mongodb.Collection<MarkerDoc> = db.collection('markers');
+  return {
   Query: {
     marker: async (root, { id }) => {
-      const marker = await Validation.markerExistsOrFail(id);
+      const marker = await MarkerValidation.markerExistsOrFail(markers, id);
       if (_.isNil(marker) || isPendingCreate(marker)) {
         throw new Error(`Marker ${id} does not exist`);
       }
@@ -218,7 +124,7 @@ const resolvers = {
 
       switch (context.reqType) {
         case 'vote':
-          await Validation.markerExistsOrFail(id);
+          await MarkerValidation.markerExistsOrFail(markers, id);
           const pendingUpdateObj = await markers.updateOne(
             notPendingResourceFilter,
             {
@@ -236,7 +142,7 @@ const resolvers = {
 
           return true;
         case undefined:
-          await Validation.markerExistsOrFail(id);
+          await MarkerValidation.markerExistsOrFail(markers, id);
           const res = await markers
             .deleteOne({ id: id, pending: { $exists: false } });
 
@@ -257,21 +163,20 @@ const resolvers = {
       }
 
       return;
-
     }
   }
 };
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+const geolocationCliche: ClicheServer = new ClicheServerBuilder('geolocation')
+  .initDb((db: mongodb.Db, config: Config): Promise<any> => {
+    const markers: mongodb.Collection<MarkerDoc> = db.collection('markers');
+    return Promise.all([
+      markers.createIndex({ id: 1 }, { unique: true, sparse: true }),
+      markers.createIndex({ id: 1, mapId: 1, location: '2dsphere' },
+        { unique: true, sparse: true })
+    ]);
+  })
+  .resolvers(resolvers)
+  .build();
 
-const app = express();
-
-app.use('/graphql', bodyParser.json(), bodyParser.urlencoded({
-  extended: true
-}), graphqlExpress({ schema }));
-
-app.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
-
-app.listen(config.wsPort, () => {
-  console.log(`Running ${name} with config ${JSON.stringify(config)}`);
-});
+geolocationCliche.start();

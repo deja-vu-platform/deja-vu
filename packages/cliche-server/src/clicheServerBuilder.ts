@@ -11,6 +11,12 @@ import { Config, getConfig } from './config';
 
 
 /**
+ * The type of the function to be called to get the dynamic type definitions
+ * for the schema from the config
+ */
+export type GetDynamicTypeDefsFn = (config: Config) => string[];
+
+/**
  * A builder for {@link ClicheServer}
  */
 export class ClicheServerBuilder {
@@ -20,6 +26,7 @@ export class ClicheServerBuilder {
   private _config: Config;
   private _initDbCallback?: InitDbCallbackFn;
   private _initResolvers?: InitResolversFn;
+  private _getDynamicTypeDefsFn: GetDynamicTypeDefsFn = (_) => [];
 
   /**
    * Start building a ClicheServerBuilder,
@@ -79,11 +86,26 @@ export class ClicheServerBuilder {
   }
 
   /**
+   * Set the function that will return the list of
+   * dynamic type definitions for the schema from the config.
+   * If not set before, overrides the default function
+   * which provides no dynamic type definitions.
+   * @param  getDynamicTypeDefsFn the function to get the dynamic type defs
+   * @return                      this builder
+   */
+  dynamicTypeDefs(
+    getDynamicTypeDefsFn: GetDynamicTypeDefsFn): ClicheServerBuilder {
+    this._getDynamicTypeDefsFn = getDynamicTypeDefsFn;
+    return this;
+  }
+
+  /**
    * Create a ClicheServer out of this builder
    * @return the resulting cliche server
    */
   build(): ClicheServer {
     return new ClicheServer(this._name, this._config, this._schemaPath,
-      this._initDbCallback, this._initResolvers);
+      this._initDbCallback, this._initResolvers,
+      this._getDynamicTypeDefsFn(this._config));
   }
-} 
+}
