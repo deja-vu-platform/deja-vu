@@ -3,7 +3,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { ShowUserComponent } from 'authentication';
 
 import { ShowClaimComponent } from '../show-claim/show-claim.component';
-import { ShowSupplyComponent } from '../show-supply/show-supply.component';
+import { ClaimSupplyComponent } from '../claim-supply/claim-supply.component';
 
 @Component({
   selector: 'potluck-show-party',
@@ -14,7 +14,7 @@ export class ShowPartyComponent implements OnInit {
   @Input() partyId: string;
   @Input() loggedInUserId: string;
   showGuestUsername = ShowUserComponent;
-  showSupply = ShowSupplyComponent;
+  claimSupply = ClaimSupplyComponent;
   showClaim = ShowClaimComponent;
   viewMore: boolean;
   host: {id: string};

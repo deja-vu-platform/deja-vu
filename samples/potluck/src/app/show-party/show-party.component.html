@@ -85,16 +85,6 @@
                 [member]="newGuest"
                 [hidden]="true">
               </group-add-to-group>
-              <!--
-              <group-add-to-group
-                [id]="partyId"
-                type="member"
-                (selectedId)="selectedGuestId=$event"
-                autocompletePlaceholder="Choose Guest"
-                buttonLabel="Add to Guest List"
-                addSavedText="Guest added to list">
-              </group-add-to-group>
-              -->
               <authorization-can-view
                 [principalId]="loggedInUserId"
                 [resourceId]="partyId" [hidden]="true">
@@ -115,7 +105,7 @@
 
         <div class="col-md-7">
           <div class="row">
-            <dv-tx class="col-md-12">
+            <div class="col-md-12">
               <h4>Supply List</h4>
               <div class="container-fluid" style="padding: 0">
                 <div class="row row-bordered supply-list-header">
@@ -132,7 +122,10 @@
                     </transfer-show-balance>
                     <transfer-show-item-counts
                       [itemCounts]="balance"
-                      [showItemCount]="{ type: showSupply, tag: 'potluck-show-supply', inputMap: { itemCount: 'supply' } }">
+                      [showItemCount]="{
+                        type: claimSupply, tag: 'potluck-show-supply', inputMap: { itemCount: 'supply' },
+                        inputs: { loggedInUserId: loggedInUserId, partyId: partyId }
+                      }">
                     </transfer-show-item-counts>
                     <!--
                     <market-show-goods
@@ -178,7 +171,7 @@
               <authentication-authenticate dvAlias="authenticate-supply-list"
                 [id]="loggedInUserId" [hidden]="true">
               </authentication-authenticate>
-            </dv-tx>
+            </div>
           </div>
 
           <div class="row top-space">

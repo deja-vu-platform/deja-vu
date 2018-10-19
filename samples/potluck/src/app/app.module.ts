@@ -17,6 +17,7 @@ import { EventModule } from 'event';
 import { GroupModule } from 'group';
 import { PropertyModule } from 'property';
 import { ShowSupplyComponent } from './show-supply/show-supply.component';
+import { ClaimSupplyComponent } from './claim-supply/claim-supply.component';
 import { CreateSupplyComponent } from './create-supply/create-supply.component';
 import { ShowClaimComponent } from './show-claim/show-claim.component';
 import { SupplyListHeaderComponent } from './supply-list-header/supply-list-header.component';
@@ -33,6 +34,7 @@ import { GuestListHeaderComponent } from './guest-list-header/guest-list-header.
     CreatePartyComponent,
     ShowSupplyComponent,
     CreateSupplyComponent,
+    ClaimSupplyComponent,
     ShowClaimComponent,
     SupplyListHeaderComponent,
     GuestListHeaderComponent
@@ -60,7 +62,7 @@ import { GuestListHeaderComponent } from './guest-list-header/guest-list-header.
   entryComponents: [
     ShowPartyComponent, CreateSupplyComponent, ShowSupplyComponent,
     ShowClaimComponent, SupplyListHeaderComponent,
-    GuestListHeaderComponent
+    GuestListHeaderComponent, ClaimSupplyComponent
   ]
 })
 export class AppModule { }
