@@ -4,11 +4,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DragulaModule } from 'ng2-dragula';
 
-import { EventModule } from 'event';
-import { AllocatorModule } from 'allocator';
 import { GATEWAY_URL, DvModule } from 'dv-core';
 
 import { MatModule } from './mat/mat.module';
+import { ClicheModule } from './cliche/cliche.module';
 
 import { WidgetDirective } from './widget.directive';
 
@@ -41,8 +40,7 @@ import { RowComponent } from './row/row.component';
     MatModule,
     DragulaModule.forRoot(),
     DvModule,
-    EventModule,
-    AllocatorModule,
+    ClicheModule,
   ],
   providers: [
     { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' },
