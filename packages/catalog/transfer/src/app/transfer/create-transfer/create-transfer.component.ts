@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter, Inject, Input,
-  OnInit, Output, ViewChild
+  OnInit, Output, Type, ViewChild
 } from '@angular/core';
 
 import {
@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
+  Action,
   GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
   RunService
 } from 'dv-core';
@@ -15,6 +16,7 @@ import {
 import * as _ from 'lodash';
 import { API_PATH } from '../transfer.config';
 
+import { InputAmountComponent } from '../input-amount/input-amount.component';
 import { Transfer } from '../shared/transfer.model';
 
 interface CreateTransferRes {
@@ -36,6 +38,9 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() showOptionToInputAmount = true;
 
   @Input() save = true;
+  @Input() inputAmount: Action = {
+    type: <Type<Component>> InputAmountComponent
+  };
 
   @Output() transfer = new EventEmitter<Transfer>();
 
@@ -53,6 +58,8 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() toIdInputPlaceholder = 'To Account';
   @Input() buttonLabel = 'Create Transfer';
   @Input() newTransferSavedText = 'New transfer saved';
+  @Input() showOptionToInputFromId = true;
+  @Input() showOptionToInputToId = true;
 
   fromIdControl = new FormControl();
   toIdControl = new FormControl();
@@ -69,11 +76,17 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   newTransferError: string;
   private gs: GatewayService;
 
+  createTransfer = this;
+
   constructor(
     private elem: ElementRef,
     private gsf: GatewayServiceFactory,
     private rs: RunService, private builder: FormBuilder,
     @Inject(API_PATH) private apiPath) {}
+
+  setAmount(amount) {
+    this.amountControl.setValue(amount);
+  }
 
   ngOnInit() {
     this.gs = this.gsf.for(this.elem);

@@ -21,6 +21,9 @@ export class CreateItemCountComponent
   countControl = new FormControl(undefined, [Validators.required]);
 
   @Output() itemCount = new EventEmitter<ItemCount>();
+  @Output() itemCountAsAmount = new EventEmitter<ItemCount[]>();
+
+  @Input() emitOnRunOnly = true;
 
   // Presentation inputs
   @Input() inputCountPlaceholder = 'Count';
@@ -39,9 +42,30 @@ export class CreateItemCountComponent
     countControl: this.countControl
   });
 
+  thisItemCount: ItemCount | undefined;
+
   constructor(
     private elem: ElementRef,
-    private rs: RunService, private builder: FormBuilder) {}
+    private rs: RunService, private builder: FormBuilder) {
+    this.itemIdControl.valueChanges.subscribe((value: string) => {
+      if (this.thisItemCount === undefined) {
+        this.thisItemCount = { itemId: undefined, count: undefined };
+      }
+      this.thisItemCount.itemId = value;
+      if (!this.emitOnRunOnly) {
+        this.emit();
+      }
+    });
+    this.countControl.valueChanges.subscribe((value: number) => {
+      if (this.thisItemCount === undefined) {
+        this.thisItemCount = { itemId: undefined, count: undefined };
+      }
+      this.thisItemCount.count = value;
+      if (!this.emitOnRunOnly) {
+        this.emit();
+      }
+    });
+  }
 
   ngOnInit() {
     this.rs.register(this.elem, this);
@@ -51,10 +75,13 @@ export class CreateItemCountComponent
     this.rs.run(this.elem);
   }
 
+  emit() {
+    this.itemCount.emit(this.thisItemCount);
+    this.itemCountAsAmount.emit([ this.thisItemCount ]);
+  }
+
   dvOnRun() {
-    this.itemCount.emit({
-      itemId: this.itemIdControl.value, count: this.countControl.value
-    });
+    this.emit();
   }
 
   dvOnAfterCommit() {
