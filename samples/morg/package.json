@@ -29,13 +29,15 @@
     "@angular/router": "^5.2.0",
     "allocator": "file:../../packages/catalog/allocator/pkg",
     "bootstrap": "^4.0.0",
+    "cliche-server": "file:../../packages/cliche-server",
     "core-js": "^2.4.1",
     "dv-core": "file:../../packages/dv-core/pkg",
     "dv-gateway": "file:../../packages/dv-gateway",
     "event": "file:../../packages/catalog/event/pkg",
-    "property": "file:../../packages/catalog/property/pkg",
     "moment": "^2.20.1",
-    "rxjs": "^5.5.6",
+    "property": "file:../../packages/catalog/property/pkg",
+    "rxjs": "^6.3.3",
+    "rxjs-compat": "^6.3.3",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {

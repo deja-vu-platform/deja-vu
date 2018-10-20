@@ -1,4 +1,4 @@
-interface Pending {
+export interface Pending {
   _pending?: PendingDoc;
 }
 
