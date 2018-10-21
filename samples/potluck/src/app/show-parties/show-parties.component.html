@@ -11,7 +11,7 @@
     </div>
 
     <div class="col-md-9">
-      <dv-tx>
+      <div>
         <authorization-show-resources
           [viewableBy]="user?.id"
           [showResource]="{
@@ -23,7 +23,7 @@
         </authorization-show-resources>
         <authentication-authenticate [id]="user?.id" [hidden]="true">
         </authentication-authenticate>
-      </dv-tx>
+      </div>
     </div>
   </div>
 </div>

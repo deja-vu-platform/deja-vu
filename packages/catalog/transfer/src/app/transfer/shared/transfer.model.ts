@@ -6,7 +6,7 @@ export interface Transfer {
 }
 
 export interface ItemCount {
-  itemId: string;
+  id: string;
   count: number;
 }
 

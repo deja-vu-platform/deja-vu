@@ -12,13 +12,12 @@ export interface OnRun {
 
 export interface OnAfterCommit {
   // res is the value the promise returned in `dvOnRun` resolved to
-  dvOnAfterCommit: (res?: any) => void
+  dvOnAfterCommit: (res?: any) => void;
 }
 
 export interface OnAfterAbort {
-  // res is the value the promise returned in `dvOnRun` resolved to
   // reason is the error that caused the abort
-  dvOnAfterAbort: (res: any, reason: Error) => void
+  dvOnAfterAbort: (reason: Error) => void;
 }
 
 interface ActionInfo {
@@ -27,7 +26,7 @@ interface ActionInfo {
 }
 
 interface RunResultMap {
-  [actionId: string]: any
+  [actionId: string]: any;
 }
 
 const ACTION_ID_ATTR = '_dvActionId';
@@ -38,6 +37,10 @@ export const RUN_ID_ATTR = '_dvRunId';
 export class RunService {
   private renderer: Renderer2;
   private actionTable: {[id: string]: ActionInfo} = {};
+
+  private static IsDvTx(node) {
+    return node.nodeName.toLowerCase() === 'dv-tx';
+  }
 
   constructor(
     rendererFactory: RendererFactory2) {
@@ -69,7 +72,7 @@ export class RunService {
     let targetAction = node;
 
     while (node && node.getAttribute) { // 'document' doesn't have `getAttribute`
-      if (this.isDvTx(node)) {
+      if (RunService.IsDvTx(node)) {
         targetAction = node;
         break;
       }
@@ -80,7 +83,7 @@ export class RunService {
     try {
       runResultMap = await this.callDvOnRun(targetAction, runId);
     } catch (error) {
-      console.log(`Got error on run ${runId}: ${error}`);
+      console.error(`Got error on run ${runId}: ${error.message}`);
       this.callDvOnAfterAbort(targetAction, error);
     }
     if (runResultMap) { // no error
@@ -131,7 +134,7 @@ export class RunService {
   }
 
   private callDvOnAfterAbort(node, reason): void {
-    this.walkActions(node, actionInfo => {
+    this.walkActions(node, (actionInfo) => {
       if (actionInfo.action.dvOnRun) {
         actionInfo.node.removeAttribute(RUN_ID_ATTR);
       }
@@ -141,7 +144,4 @@ export class RunService {
     });
   }
 
-  private isDvTx(node) {
-    return node.nodeName.toLowerCase() === 'dv-tx';
-  }
 }

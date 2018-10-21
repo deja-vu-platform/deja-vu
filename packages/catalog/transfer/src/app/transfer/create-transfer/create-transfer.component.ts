@@ -1,6 +1,6 @@
 import {
   Component, ElementRef, EventEmitter, Inject, Input,
-  OnInit, Output, ViewChild
+  OnInit, Output, Type, ViewChild
 } from '@angular/core';
 
 import {
@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
+  Action,
   GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
   RunService
 } from 'dv-core';
@@ -15,7 +16,8 @@ import {
 import * as _ from 'lodash';
 import { API_PATH } from '../transfer.config';
 
-import { Transfer } from '../shared/transfer.model';
+import { InputAmountComponent } from '../input-amount/input-amount.component';
+import { Amount, Transfer } from '../shared/transfer.model';
 
 interface CreateTransferRes {
   data: { createTransfer: Transfer };
@@ -36,6 +38,9 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   @Input() showOptionToInputAmount = true;
 
   @Input() save = true;
+  @Input() inputAmount: Action = {
+    type: <Type<Component>> InputAmountComponent
+  };
 
   @Output() transfer = new EventEmitter<Transfer>();
 
@@ -48,26 +53,30 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     this.toIdControl.setValue(toId);
   }
 
+  @Input() amount: Amount;
+
   // Presentation inputs
   @Input() fromIdInputPlaceholder = 'From Account';
   @Input() toIdInputPlaceholder = 'To Account';
   @Input() buttonLabel = 'Create Transfer';
   @Input() newTransferSavedText = 'New transfer saved';
+  @Input() showOptionToInputFromId = true;
+  @Input() showOptionToInputToId = true;
 
   fromIdControl = new FormControl();
   toIdControl = new FormControl();
-  amountControl = new FormControl();
 
   @ViewChild(FormGroupDirective) form;
   createTransferForm = this.builder.group({
     fromIdControl: this.fromIdControl,
-    toIdControl: this.toIdControl,
-    amountControl: this.amountControl
+    toIdControl: this.toIdControl
   });
 
   newTransferSaved = false;
   newTransferError: string;
   private gs: GatewayService;
+
+  createTransfer = this;
 
   constructor(
     private elem: ElementRef,
@@ -98,7 +107,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
           id: this.id,
           fromId: this.fromIdControl.value,
           toId: this.toIdControl.value,
-          amount: this.amountControl.value
+          amount: this.amount
         }
       }
     })

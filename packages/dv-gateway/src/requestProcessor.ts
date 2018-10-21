@@ -132,6 +132,12 @@ export class RequestProcessor {
     }
   }
 
+  private static HasRunId(gatewayRequest: GatewayRequest) {
+    const runId = gatewayRequest.runId;
+
+    return !(_.isEmpty(runId) || runId === 'null' || runId === 'undefined');
+  }
+
   constructor(
     dvConfig: DvConfig, config: GatewayConfig, appActionTable: ActionTable) {
     const usedCliches = _
@@ -200,15 +206,21 @@ export class RequestProcessor {
         body: req.body
       }
     };
-
-    if (_.isEmpty(runId) || runId === 'null' || runId === 'undefined') {
+    /*
+     * For a request to be part of a exec tx, two things must happen:
+     *  - it must have a `runId` (all actions that get executed get a run id,
+     *    independently of whether they are part of a tx or not)
+     *  - the action path must be a dv-tx path (if it isn't, then it is a
+     *    request that was caused by an exec but it is not part of a dv-tx)
+     */
+    if (RequestProcessor.HasRunId(gatewayRequest) && actionPath.isDvTx()) {
+      await this.txCoordinator.processMessage(
+        runId!, actionPath.serialize(), gatewayToClicheRequest, res);
+    } else {
       const clicheRes: ClicheResponse<string> = await RequestProcessor
         .ForwardRequest<string>(gatewayToClicheRequest);
       res.status(clicheRes.status);
       res.send(clicheRes.text);
-    } else {
-      await this.txCoordinator.processMessage(
-        runId!, actionPath.serialize(), gatewayToClicheRequest, res);
     }
   }
 
@@ -292,7 +304,10 @@ export class RequestProcessor {
 
       getCohorts: (actionPathId: string): string[] => {
         const actionPath: ActionPath = ActionPath.fromString(actionPathId);
-        assert.ok(actionPath.isDvTx());
+        assert.ok(
+          actionPath.isDvTx(),
+          `Getting cohorts of an action path that is not part of a ` +
+          `dv-tx: ${actionPath}`);
         const dvTxNodeIndex: number = actionPath.indexOfClosestTxNode()!;
 
         const paths: ActionTagPath[] = actionHelper

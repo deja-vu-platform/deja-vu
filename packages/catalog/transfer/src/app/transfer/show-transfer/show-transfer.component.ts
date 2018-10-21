@@ -59,7 +59,7 @@ export class ShowTransferComponent implements OnInit, OnChanges {
       return;
     }
     const selection = this.balanceType === 'money' ?
-      '' : ' { itemId, count }';
+      '' : ' { id, count }';
     this.gs.get<TransferRes>(this.apiPath, {
       params: {
         query: `

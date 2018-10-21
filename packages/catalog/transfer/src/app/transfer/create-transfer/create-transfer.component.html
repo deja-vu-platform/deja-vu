@@ -11,21 +11,24 @@
       {{newTransferError}}
     </mat-error>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToInputFromId" class="form-group">
     <dv-input-id
       [entityName]="fromIdInputPlaceholder"
       formControlName="fromIdControl">
     </dv-input-id>
   </div>
-  <div class="form-group">
+  <div *ngIf="showOptionToInputToId" class="form-group">
     <dv-input-id
       [entityName]="toIdInputPlaceholder"
       formControlName="toIdControl">
     </dv-input-id>
   </div>
   <div *ngIf="showOptionToInputAmount" class="form-group">
-   <transfer-input-amount formControlName="amountControl">
-   </transfer-input-amount>
+    <dv-include
+      [action]="inputAmount" default-inputAmount="{ tag: 'transfer-input-amount' }"
+      [outputs]="{ amount: 'amount' }"
+      [parent]="createTransfer">
+    </dv-include>
   </div>
   <div *ngIf="showOptionToSubmit" class="form-group">
     <button mat-button type="submit" [disabled]="!createTransferForm.valid">

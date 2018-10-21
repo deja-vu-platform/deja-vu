@@ -2,14 +2,14 @@
       [formGroup]="createItemCountForm"
       class="form-horizontal">
   <div *ngIf="showOptionToInputItemId">
-    <dv-input-id [formControl]="itemIdControl">
+    <dv-input-id [formControl]="idControl">
     </dv-input-id>
   </div>
   <mat-form-field>
     <mat-label>{{inputCountPlaceholder}}</mat-label>
     <input matInput required type="number"
            [formControl]="countControl"
-           name="moneyControl">
+           name="countControl">
     <mat-error *ngIf="countControl.hasError('required')">
       {{inputCountPlaceholder}} is <strong>required</strong>
     </mat-error>

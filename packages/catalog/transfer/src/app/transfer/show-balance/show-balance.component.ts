@@ -58,7 +58,7 @@ export class ShowBalanceComponent implements OnInit, OnChanges {
     if (!this.gs || this.balance || !this.accountId) {
       return;
     }
-    const selection = this.balanceType === 'money' ? '' : ' { itemId, count }';
+    const selection = this.balanceType === 'money' ? '' : ' { id, count }';
     this.gs.get<BalanceRes>(this.apiPath, {
       params: {
         query: `

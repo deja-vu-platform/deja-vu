@@ -15,8 +15,13 @@ export class IncludeDirective {
   constructor(public viewContainerRef: ViewContainerRef) { }
 }
 
-export type FieldMap = {[field: string]: string};
-export type ValueMap = {[field: string]: any};
+export interface FieldMap {
+  [field: string]: string;
+}
+
+export interface ValueMap {
+  [field: string]: any;
+}
 
 /**
  *  Represents a DV action to include with `dv-include`
@@ -179,13 +184,19 @@ export class IncludeComponent implements AfterViewInit {
       }
       this.componentRef.instance[componentField]
         .subscribe(newVal => {
+          const propertyName: string = this.outputs![outputKey];
+          if (!_.isString(propertyName)) {
+            throw new Error(
+              `Outputs should be a map of string -> string, found ` +
+              `${typeof propertyName} for ${outputKey}`);
+          }
           console.log(
             `Got new value ${JSON.stringify(newVal)}, assigning to/calling ` +
-            this.outputs![outputKey]);
-          if (_.isFunction(this.parent[this.outputs![outputKey]])) {
-            this.parent[this.outputs![outputKey]](newVal);
+            propertyName);
+          if (_.isFunction(this.parent[propertyName])) {
+            this.parent[propertyName](newVal);
           } else {
-            this.parent[this.outputs![outputKey]] = newVal;
+            this.parent[propertyName] = newVal;
           }
         });
     }
