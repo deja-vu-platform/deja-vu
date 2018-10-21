@@ -36,8 +36,7 @@
     "event": "file:../../packages/catalog/event/pkg",
     "moment": "^2.20.1",
     "property": "file:../../packages/catalog/property/pkg",
-    "rxjs": "^6.3.3",
-    "rxjs-compat": "^6.3.3",
+    "rxjs": "^5.5.6",
     "zone.js": "^0.8.19"
   },
   "devDependencies": {
