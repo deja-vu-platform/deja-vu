@@ -1,6 +1,8 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import "~bootstrap/dist/css/bootstrap.min.css";
 @import "./dragula.scss";
+@import "~quill/dist/quill.bubble.css";
+@import "~quill/dist/quill.snow.css";
 
 * {
   box-sizing: border-box;
@@ -17,4 +19,9 @@ body {
 Hacky solution: hide the clone a la The Prestige. */
 .page-row > .mat-list-item {
   display: none;
+}
+
+/* Ensure text boxes do not get squished */
+.ql-container {
+  min-width: 300px;
 }

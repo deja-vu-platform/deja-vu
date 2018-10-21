@@ -1,3 +1,7 @@
   <div id="page">
-    <app-row *ngFor="let row of rows" [row]="row"></app-row>
+    <app-row
+      *ngFor="let row of composedWidget.rows; let i = index"
+      [row]="row"
+      [idx]="i"
+    ></app-row>
   </div>

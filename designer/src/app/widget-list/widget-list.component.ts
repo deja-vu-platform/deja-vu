@@ -9,7 +9,7 @@ import { Cliche } from '../datatypes';
 export class WidgetListComponent {
   @Input() cliche: Cliche = { name: '', components: {} };
 
-  get componentNames() {
+  get widgetNames() {
     return Object.keys(this.cliche.components);
   }
 }

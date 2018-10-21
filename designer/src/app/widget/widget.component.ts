@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, ViewChild, ComponentFactoryResolver } from '@angular/core';
 import { WidgetDirective } from '../widget.directive';
+import { TextComponent } from '../text/text.component';
 
 @Component({
   selector: 'app-widget',
@@ -17,7 +18,8 @@ export class WidgetComponent implements OnInit {
   }
 
   loadWidget() {
-    const componentFactory = this.componentFactoryResolver.resolveComponentFactory(this.widget);
+    const componentFactory = this.componentFactoryResolver
+      .resolveComponentFactory(this.widget.component);
     const viewContainerRef = this.widgetHost.viewContainerRef;
     viewContainerRef.clear();
     viewContainerRef.createComponent(componentFactory);

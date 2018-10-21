@@ -7,9 +7,6 @@ import { Row } from '../datatypes';
   styleUrls: ['./row.component.scss'],
 })
 export class RowComponent {
-  @Input() row: (Row & { index: number });
-
-  get widgets() {
-    return this.row.widgets.map((component, i) => ({ component, i }));
-  }
+  @Input() row: Row;
+  @Input() idx: number;
 }

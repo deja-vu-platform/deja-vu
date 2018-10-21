@@ -1,9 +1,9 @@
 <mat-list class='widget-list' dragula="widget">
   <mat-list-item
-    *ngFor="let componentName of componentNames"
+    *ngFor="let widgetName of widgetNames"
     [attr.data-cliche]="cliche.name"
-    [attr.data-component]="componentName"
+    [attr.data-widget]="widgetName"
   >
-    {{componentName}}
+    {{widgetName}}
   </mat-list-item>
 </mat-list>

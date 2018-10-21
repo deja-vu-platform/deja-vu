@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-export type BaseWidget = any; // TODO
+// TODO: nested composed widgets
 
 export interface ComposedWidget {
   rows: Row[];
@@ -10,7 +10,11 @@ export interface Row {
   widgets: Widget[];
 }
 
-export type Widget = BaseWidget | ComposedWidget;
+export interface Widget {
+  clicheName: string;
+  widgetName: string;
+  component: Component;
+}
 
 export interface Cliche {
   name: string;

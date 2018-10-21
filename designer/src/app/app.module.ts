@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { DragulaModule } from 'ng2-dragula';
+import { QuillModule } from 'ngx-quill';
 
 import { GATEWAY_URL, DvModule } from 'dv-core';
 
@@ -20,6 +21,7 @@ import { WidgetListComponent } from './widget-list/widget-list.component';
 import { PageComponent } from './page/page.component';
 import { WidgetComponent } from './widget/widget.component';
 import { RowComponent } from './row/row.component';
+import { TextComponent } from './text/text.component';
 
 @NgModule({
   declarations: [
@@ -33,12 +35,14 @@ import { RowComponent } from './row/row.component';
     WidgetDirective,
     WidgetComponent,
     RowComponent,
+    TextComponent,
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     MatModule,
     DragulaModule.forRoot(),
+    QuillModule,
     DvModule,
     ClicheModule,
   ],
@@ -46,5 +50,6 @@ import { RowComponent } from './row/row.component';
     { provide: GATEWAY_URL, useValue: 'http://localhost:8080/api' },
   ],
   bootstrap: [AppComponent],
+  entryComponents: [TextComponent],
 })
 export class AppModule { }
