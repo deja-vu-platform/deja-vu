@@ -2,8 +2,17 @@ import { Component } from '@angular/core';
 import { filter } from 'rxjs/operators';
 import { DragulaService } from 'ng2-dragula';
 
-import { ComposedWidget } from './datatypes';
+import { ComposedWidget, Widget } from './datatypes';
 import { cliches } from './cliche/cliche.module';
+
+// alphebetize cliches, putting Déjà Vu on top
+const clicheList = Object.values(cliches)
+  .sort(({ name: nameA }, { name: nameB }) => {
+    if (nameA === nameB) { return 0; }
+    if (nameA === 'Déjà Vu') { return -1; }
+    if (nameB === 'Déjà Vu') { return 1; }
+    return (nameA < nameB) ? -1 : 1;
+  });
 
 @Component({
   selector: 'app-root',
@@ -22,13 +31,13 @@ export class AppComponent {
 
   composedWidget = this.composedWidgets[0]; // TODO: dynamic
 
-  // dragula needs to be configured at the top-level
+  // dragula needs to be configured at the top level
   constructor(private dragulaService: DragulaService) {
     this.configureDragula(dragulaService);
   }
 
   get clicheList() {
-    return Object.values(cliches);
+    return clicheList;
   }
 
   configureDragula(dragulaService: DragulaService) {
@@ -40,35 +49,39 @@ export class AppComponent {
     dragulaService.drop('widget')
       .pipe(filter(({ el, source, target }) => !!el && !!source && !!target))
       .subscribe(({ el, source, target }) => {
-        let component;
+        let targetRowIndex = parseInt(target['dataset'].index, 10);
         if (source.classList.contains('widget-list')) {
-          const { cliche: clicheName, component: componentName } = el['dataset'];
-          component = cliches[clicheName].components[componentName];
+          const { cliche: clicheName, widget: widgetName } = el['dataset'];
+          this.addWidget(targetRowIndex, clicheName, widgetName);
         } else if (source.classList.contains('page-row')) {
-          component = this.removeWidget(el, source);
-        } else {
-          return;
+          const sourceRowIndex = parseInt(source['dataset'].index, 10);
+          const widgetIndex = parseInt(el['dataset'].index, 10);
+          const { widget, emptiedRow } = this.removeWidget(sourceRowIndex, widgetIndex);
+          el.parentNode.removeChild(el); // delete old copy that Dragula leaves
+          if (emptiedRow && sourceRowIndex < targetRowIndex) {
+            targetRowIndex -= 1;
+          }
+          this.addWidget(targetRowIndex, widget.clicheName, widget.widgetName);
         }
-        this.addWidget(target, component);
       });
   }
 
-  addWidget(targetRowElement, componentToAdd) {
-    const targetRowIndex = parseInt(targetRowElement['dataset'].index, 10);
-    this.composedWidget.rows[targetRowIndex].widgets.push(componentToAdd);
+  addWidget(rowIndex: number, clicheName: string, widgetName: string) {
+    const component = cliches[clicheName].components[widgetName];
+    this.composedWidget.rows[rowIndex].widgets.push({ clicheName, widgetName, component });
     // always end in empty row
-    if (targetRowIndex === this.composedWidget.rows.length - 1) {
+    if (rowIndex === this.composedWidget.rows.length - 1) {
       this.composedWidget.rows.push({ widgets: [] });
     }
   }
 
-  removeWidget(widgetElement, rowElement) {
-    const sourceRowIndex = parseInt(rowElement['dataset'].index, 10);
-    const widgetIndex = parseInt(widgetElement['dataset'].index, 10);
-    const [component] = this.composedWidget.rows[sourceRowIndex].widgets.splice(widgetIndex, 1);
-    if (this.composedWidget.rows[sourceRowIndex].widgets.length === 0) {
-      this.composedWidget.rows.splice(sourceRowIndex, 1);
+  removeWidget(rowIndex: number, widgetIndex: number) {
+    const [widget] = this.composedWidget.rows[rowIndex].widgets.splice(widgetIndex, 1);
+    let emptiedRow = false;
+    if (this.composedWidget.rows[rowIndex].widgets.length === 0) {
+      this.composedWidget.rows.splice(rowIndex, 1);
+      emptiedRow = true;
     }
-    return component;
+    return { widget, emptiedRow };
   }
 }

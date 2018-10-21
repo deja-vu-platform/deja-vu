@@ -1,5 +1,9 @@
-<div class="page-row" dragula="widget" [attr.data-index]="row.index">
-  <div *ngFor="let widget of widgets" class="widget" [attr.data-index]="widget.index">
-    <app-widget [widget]="widget.component"></app-widget>
+<div class="page-row" dragula="widget" [attr.data-index]="idx">
+  <div
+    *ngFor="let widget of row.widgets; let i = index"
+    class="widget"
+    [attr.data-index]="i"
+  >
+    <app-widget [widget]="widget"></app-widget>
   </div>
 </div>
