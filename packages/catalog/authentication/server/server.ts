@@ -314,14 +314,6 @@ function resolvers(db: mongodb.Db, config: Config): object {
         }
 
         return false;
-      },
-
-      verify: (root, { input }: { input: VerifyInput }, context: Context) => {
-        if (context.reqType === undefined || context.reqType === 'vote') {
-          return verify(input.token, input.id);
-        }
-
-        return;
       }
     }
   };
