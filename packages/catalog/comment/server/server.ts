@@ -173,6 +173,8 @@ function resolvers(db: mongodb.Db, config: Config): object {
 
             return;
         }
+
+        return;
       }
     }
   };

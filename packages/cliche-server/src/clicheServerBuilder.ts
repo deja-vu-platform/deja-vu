@@ -1,3 +1,4 @@
+import * as callsite from 'callsite';
 import * as minimist from 'minimist';
 import * as mongodb from 'mongodb';
 import * as path from 'path';
@@ -22,7 +23,7 @@ export type GetDynamicTypeDefsFn = (config: Config) => string[];
 export class ClicheServerBuilder {
   private readonly _name: string;
   private _schemaPath: string = path.join(
-    process.cwd(), 'dist', 'server', 'schema.graphql');
+    path.dirname(callsite()[1].getFileName()), 'schema.graphql');
   private _config: Config;
   private _initDbCallback?: InitDbCallbackFn;
   private _initResolvers?: InitResolversFn;
