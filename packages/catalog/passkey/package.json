@@ -23,6 +23,7 @@
   },
   "private": true,
   "dependencies": {
+    "jsonwebtoken": "^8.2.0",
     "sha.js": "^2.4.11"
   },
   "devDependencies": {
@@ -43,7 +44,7 @@
     "@angular/router": "^5.2.0",
     "@types/jasmine": "~2.8.3",
     "@types/jasminewd2": "~2.0.2",
-    "@types/mongodb": "^3.0.5",
+    "@types/mongodb": "~3.0.7",
     "bootstrap": "^4.0.0",
     "chokidar-cli": "^1.2.0",
     "cliche-server": "file:../../cliche-server",
@@ -66,7 +67,7 @@
     "nodemon": "^1.14.12",
     "popper.js": "^1.14.1",
     "protractor": "~5.1.2",
-    "rxjs": "^5.5.6",
+    "rxjs": "5.5.6",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3",
@@ -93,7 +94,7 @@
     "graphql": "^0.13.2",
     "jquery": "^3.3.1",
     "popper.js": "^1.14.1",
-    "rxjs": "^5.5.6",
+    "rxjs": "5.5.6",
     "zone.js": "^0.8.19"
   }
 }
