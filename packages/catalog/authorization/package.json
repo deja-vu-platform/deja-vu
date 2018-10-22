@@ -42,7 +42,7 @@
     "dv-core": "file:../../dv-core/pkg",
     "dv-gateway": "file:../../dv-gateway",
     "mongodb": "^3.0.4",
-    "rxjs": "^5.5.6",
+    "rxjs": "5.5.6",
     "zone.js": "^0.8.19"
   },
   "dependencies": {
@@ -88,7 +88,7 @@
     "ng-packagr": "^2.0.0",
     "nodemon": "^1.14.12",
     "protractor": "~5.1.2",
-    "rxjs": "^5.5.6",
+    "rxjs": "5.5.6",
     "ts-node": "~4.1.0",
     "tslint": "~5.9.1",
     "typescript": "~2.5.3",
