@@ -8,5 +8,4 @@ import { Row } from '../datatypes';
 })
 export class RowComponent {
   @Input() row: Row;
-  @Input() idx: number;
 }

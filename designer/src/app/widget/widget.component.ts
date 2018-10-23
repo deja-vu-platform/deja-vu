@@ -1,6 +1,6 @@
-import { Component, OnInit, Input, ViewChild, ComponentFactoryResolver } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ComponentFactoryResolver, Type } from '@angular/core';
 import { WidgetDirective } from '../widget.directive';
-import { TextComponent } from '../text/text.component';
+import { BaseWidget } from '../datatypes';
 
 @Component({
   selector: 'app-widget',
@@ -8,7 +8,7 @@ import { TextComponent } from '../text/text.component';
   styleUrls: ['./widget.component.scss'],
 })
 export class WidgetComponent implements OnInit {
-  @Input() widget;
+  @Input() widget: BaseWidget;
   @ViewChild(WidgetDirective) widgetHost: WidgetDirective;
 
   constructor(private componentFactoryResolver: ComponentFactoryResolver) { }
@@ -19,9 +19,10 @@ export class WidgetComponent implements OnInit {
 
   loadWidget() {
     const componentFactory = this.componentFactoryResolver
-      .resolveComponentFactory(this.widget.component);
+      .resolveComponentFactory(<Type<{}>>this.widget.component);
     const viewContainerRef = this.widgetHost.viewContainerRef;
     viewContainerRef.clear();
-    viewContainerRef.createComponent(componentFactory);
+    const componentRef = viewContainerRef.createComponent(componentFactory);
+    componentRef.instance['widget'] = this.widget;
   }
 }
