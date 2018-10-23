@@ -18,8 +18,8 @@ Some projects depend on others so you need to build the dependencies first.
 If you follow these steps in order then everything should work:
   1. `npm i`, `npm run package` and `npm i -g` in `packages/dv-cli` to install
       the cli globally
-  2. `npm i` and `npm run package` in `packages/dv-core` and
-      `packages/dv-gateway`
+  2. `npm i` and `npm run package` in `packages/dv-core`,
+      `packages/dv-gateway`, and `packages/cliche-server`
   3. `npm i` and `npm run package` in each cliché under `catalog` (e.g.,
      `npm i` and `npm run package` in `catalog/event`)
   4. `npm i` in each sample under `samples` (e.g., `npm i` in `samples/morg`)
