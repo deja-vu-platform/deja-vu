@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
 
 import { DragulaModule } from 'ng2-dragula';
 import { QuillModule } from 'ngx-quill';
@@ -40,6 +41,7 @@ import { TextComponent } from './text/text.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    FormsModule,
     MatModule,
     DragulaModule.forRoot(),
     QuillModule,

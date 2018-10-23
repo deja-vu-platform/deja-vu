@@ -1,1 +1,5 @@
-<quill-editor theme='bubble'></quill-editor>
+<quill-editor
+  theme="bubble"
+  [ngModel]="widget.content"
+  (onContentChanged)="onContentChanged($event)"
+></quill-editor>
