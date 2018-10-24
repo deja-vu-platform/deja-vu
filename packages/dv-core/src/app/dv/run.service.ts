@@ -5,19 +5,19 @@ import { v4 as uuid } from 'uuid';
 import * as _ from 'lodash';
 
 
-export interface OnRun {
-  // To abort the run return a rejected promise
-  dvOnRun: () => Promise<any> | any;
+export interface OnExec {
+  // To abort the exec return a rejected promise
+  dvOnExec: () => Promise<any> | any;
 }
 
-export interface OnAfterCommit {
-  // res is the value the promise returned in `dvOnRun` resolved to
-  dvOnAfterCommit: (res?: any) => void;
+export interface OnAfterExecCommit {
+  // res is the value the promise returned in `dvOnExec` resolved to
+  dvOnAfterExecCommit: (res?: any) => void;
 }
 
-export interface OnAfterAbort {
+export interface OnAfterExecAbort {
   // reason is the error that caused the abort
-  dvOnAfterAbort: (reason: Error) => void;
+  dvOnAfterExecAbort: (reason: Error) => void;
 }
 
 interface ActionInfo {
@@ -25,12 +25,12 @@ interface ActionInfo {
   node: any;
 }
 
-interface RunResultMap {
+interface ExecResultMap {
   [actionId: string]: any;
 }
 
 const ACTION_ID_ATTR = '_dvActionId';
-export const RUN_ID_ATTR = '_dvRunId';
+export const EXEC_ID_ATTR = '_dvExecId';
 
 
 @Injectable()
@@ -55,7 +55,7 @@ export class RunService {
 
   /**
    * Register a new action. Should be called on init. Only actions that can be
-   * run are required to be registered.
+   * Exec are required to be registered.
    **/
   register(elem: ElementRef, action: any) {
     const actionId = uuid();
@@ -65,9 +65,9 @@ export class RunService {
   }
 
   /**
-   * Cause the action given by `elem` to run.
+   * Cause the action given by `elem` to execute.
    **/
-  async run(elem: ElementRef) {
+  async exec(elem: ElementRef) {
     let node = elem.nativeElement;
     let targetAction = node;
 
@@ -78,16 +78,16 @@ export class RunService {
       }
       node = this.renderer.parentNode(node);
     }
-    const runId = uuid();
-    let runResultMap: RunResultMap | undefined;
+    const execId = uuid();
+    let execResultMap: ExecResultMap | undefined;
     try {
-      runResultMap = await this.callDvOnRun(targetAction, runId);
+      execResultMap = await this.callDvOnExec(targetAction, execId);
     } catch (error) {
-      console.error(`Got error on run ${runId}: ${error.message}`);
-      this.callDvOnAfterAbort(targetAction, error);
+      console.error(`Got error on exec ${execId}: ${error.message}`);
+      this.callDvOnAfterExecAbort(targetAction, error);
     }
-    if (runResultMap) { // no error
-      this.callDvOnAfterCommit(targetAction, runResultMap);
+    if (execResultMap) { // no error
+      this.callDvOnAfterExecCommit(targetAction, execResultMap);
     }
   }
 
@@ -107,39 +107,39 @@ export class RunService {
     onAction(target, actionId);
   }
 
-  private async callDvOnRun(node, id: string): Promise<RunResultMap> {
-    const runs: Promise<RunResultMap>[] = [];
+  private async callDvOnExec(node, id: string): Promise<ExecResultMap> {
+    const execs: Promise<ExecResultMap>[] = [];
     this.walkActions(node, (actionInfo, actionId) => {
-      if (actionInfo.action.dvOnRun) {
-        actionInfo.node.setAttribute(RUN_ID_ATTR, id);
-        runs.push(
+      if (actionInfo.action.dvOnExec) {
+        actionInfo.node.setAttribute(EXEC_ID_ATTR, id);
+        execs.push(
           Promise
-            .resolve(actionInfo.action.dvOnRun())
+            .resolve(actionInfo.action.dvOnExec())
             .then(result => ({[actionId]: result})));
       }
     });
-    const resultMaps: RunResultMap[] = await Promise.all(runs);
+    const resultMaps: ExecResultMap[] = await Promise.all(execs);
     return _.assign({}, ...resultMaps);
   }
 
-  private callDvOnAfterCommit(node, runResultMap: RunResultMap): void {
+  private callDvOnAfterExecCommit(node, execResultMap: ExecResultMap): void {
     this.walkActions(node, (actionInfo, actionId) => {
-      if (actionInfo.action.dvOnRun) {
-        actionInfo.node.removeAttribute(RUN_ID_ATTR);
+      if (actionInfo.action.dvOnExec) {
+        actionInfo.node.removeAttribute(EXEC_ID_ATTR);
       }
-      if (actionInfo.action.dvOnAfterCommit) {
-        actionInfo.action.dvOnAfterCommit(runResultMap[actionId]);
+      if (actionInfo.action.dvOnAfterExecCommit) {
+        actionInfo.action.dvOnAfterExecCommit(execResultMap[actionId]);
       }
     });
   }
 
-  private callDvOnAfterAbort(node, reason): void {
+  private callDvOnAfterExecAbort(node, reason): void {
     this.walkActions(node, (actionInfo) => {
-      if (actionInfo.action.dvOnRun) {
-        actionInfo.node.removeAttribute(RUN_ID_ATTR);
+      if (actionInfo.action.dvOnExec) {
+        actionInfo.node.removeAttribute(EXEC_ID_ATTR);
       }
-      if (actionInfo.action.dvOnAfterAbort) {
-        actionInfo.action.dvOnAfterAbort(reason);
+      if (actionInfo.action.dvOnAfterExecAbort) {
+        actionInfo.action.dvOnAfterExecAbort(reason);
       }
     });
   }

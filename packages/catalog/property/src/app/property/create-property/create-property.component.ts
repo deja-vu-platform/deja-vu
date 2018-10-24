@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterCommit, RunService
+  GatewayService, GatewayServiceFactory, OnAfterExecCommit, RunService
 } from 'dv-core';
 
 import { Property } from '../shared/property.model';
@@ -47,7 +47,7 @@ export class CamelToTitleCasePipe implements PipeTransform {
 })
 export class CreatePropertyComponent
 implements OnInit, OnChanges, ControlValueAccessor, Validator,
-OnAfterCommit {
+OnAfterExecCommit {
   @Input() name: string;
   @Input() initialValue;
 
@@ -170,7 +170,7 @@ OnAfterCommit {
     return this.propertyControl.validator(this.propertyControl);
   }
 
-  dvOnAfterCommit() {
+  dvOnAfterExecCommit() {
     this.propertyControl.reset();
   }
 }

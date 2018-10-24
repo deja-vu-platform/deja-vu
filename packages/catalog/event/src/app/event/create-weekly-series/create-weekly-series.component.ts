@@ -7,7 +7,11 @@ import {
   Validators
 } from '@angular/forms';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService,
+  GatewayServiceFactory,
+  OnAfterExecAbort,
+  OnAfterExecCommit,
+  OnExec,
   RunService
 } from 'dv-core';
 
@@ -27,7 +31,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-weekly-series.component.css']
 })
 export class CreateWeeklySeriesComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnExec, OnAfterExecCommit, OnAfterExecAbort {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
   @Input() save = true;
@@ -77,10 +81,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  dvOnRun(): Promise<any> {
+  dvOnExec(): Promise<any> {
     if (this.save) {
       return this.gs
         .post<{data: any}>('/graphql', {
@@ -100,7 +104,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     }
   }
 
-  dvOnAfterCommit() {
+  dvOnAfterExecCommit() {
     if (this.save) {
       this.createWeeklySeriesSaved = true;
       window.setTimeout(() => {
@@ -114,7 +118,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnAfterExecAbort(reason: Error) {
     if (this.save) {
       this.createWeeklySeriesError = reason.message;
     }

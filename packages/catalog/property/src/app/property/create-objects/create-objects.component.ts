@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 
 import { Observable } from 'rxjs/Observable';
@@ -23,7 +23,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './create-objects.component.html',
   styleUrls: ['./create-objects.component.css']
 })
-export class CreateObjectsComponent implements OnInit, OnRun {
+export class CreateObjectsComponent implements OnInit, OnExec {
   @Input() objects: any[];
 
   private gs: GatewayService;
@@ -62,7 +62,7 @@ export class CreateObjectsComponent implements OnInit, OnRun {
       });
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     if (_.isEmpty(this.objects)) {
       return;
     }

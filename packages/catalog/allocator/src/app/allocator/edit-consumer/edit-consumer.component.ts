@@ -8,7 +8,12 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnRun, RunService
+  GatewayService,
+  GatewayServiceFactory,
+  OnAfterExecAbort,
+  OnAfterExecCommit,
+  OnExec,
+  RunService
 } from 'dv-core';
 
 import { Observable } from 'rxjs/Observable';
@@ -32,7 +37,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './edit-consumer.component.html',
   styleUrls: ['./edit-consumer.component.css']
 })
-export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
+export class EditConsumerComponent implements OnAfterExecAbort,
+  OnAfterExecCommit, OnChanges, OnInit, OnExec {
   @Input() resourceId: string;
   @Input() allocationId: string;
   @Input() buttonLabel = 'Save';
@@ -112,10 +118,10 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun() {
+  async dvOnExec() {
     if (this.newConsumerControl.value === this._currentConsumerId) {
       return;
     }
@@ -141,7 +147,7 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
     }
   }
 
-  dvOnAfterCommit() {
+  dvOnAfterExecCommit() {
     this.editConsumerSaved = true;
     window.setTimeout(() => {
       this.editConsumerSaved = false;
@@ -154,7 +160,7 @@ export class EditConsumerComponent implements OnChanges, OnInit, OnRun {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnAfterExecAbort(reason: Error) {
     this.editConsumerError = reason.message;
   }
 }

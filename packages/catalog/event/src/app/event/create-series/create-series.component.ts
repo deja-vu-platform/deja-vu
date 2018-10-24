@@ -7,7 +7,7 @@ import {
   Validators
 } from '@angular/forms';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExec,
   RunService
 } from 'dv-core';
 
@@ -39,7 +39,7 @@ export class CreateSeriesComponent implements OnInit {
     this.rs.register(this.elem, this);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs
       .post<{data: any}>('/graphql', {
         query: `mutation CreateSeries($input: CreateSeriesInput!) {

@@ -16,6 +16,6 @@ export class ButtonComponent implements OnInit {
   }
 
   onClick() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 }

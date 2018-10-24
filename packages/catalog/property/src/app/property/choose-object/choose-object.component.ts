@@ -107,6 +107,6 @@ export class ChooseObjectComponent implements OnInit {
   updateSelected(id: string) {
     this._selectedObjectId = id;
     this.selectedObjectId.emit(id);
-    setTimeout(() => this.rs.run(this.elem));
+    setTimeout(() => this.rs.exec(this.elem));
   }
 }

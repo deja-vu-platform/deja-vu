@@ -9,7 +9,7 @@ import {
 import * as _ from 'lodash';
 
 import { Action } from '../include/include.component';
-import {OnAfterCommit, RunService} from '../run.service';
+import {OnAfterExecCommit, RunService} from '../run.service';
 
 
 @Component({
@@ -29,7 +29,7 @@ import {OnAfterCommit, RunService} from '../run.service';
   ]
 })
 export class StageComponent
-  implements OnInit, ControlValueAccessor, Validator, OnAfterCommit {
+  implements OnInit, ControlValueAccessor, Validator, OnAfterExecCommit {
   // for staging
   @Input() initialStagedEntities: any[] = [];
   @Output() stagedEntities = new EventEmitter<any[]>();
@@ -101,7 +101,7 @@ export class StageComponent
     return {};
   }
 
-  dvOnAfterCommit() {
+  dvOnAfterExecCommit() {
     this.reset();
   }
 

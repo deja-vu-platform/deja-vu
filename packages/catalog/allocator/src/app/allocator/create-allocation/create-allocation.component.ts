@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
@@ -20,7 +20,7 @@ interface CreateAllocationRes {
   selector: 'allocator-create-allocation',
   templateUrl: './create-allocation.component.html'
 })
-export class CreateAllocationComponent implements OnInit, OnChanges, OnRun {
+export class CreateAllocationComponent implements OnInit, OnChanges, OnExec {
   @Input() id: string | undefined;
   @Input() resourceIds: string[];
   @Input() consumerIds: string[];
@@ -55,10 +55,10 @@ export class CreateAllocationComponent implements OnInit, OnChanges, OnRun {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun() {
+  async dvOnExec() {
     if (this.resourceIds === undefined) {
       await this.resourceIdsChange.asObservable()
         .pipe(take(1))

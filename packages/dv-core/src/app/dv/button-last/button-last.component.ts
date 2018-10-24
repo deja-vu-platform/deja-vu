@@ -1,14 +1,14 @@
 import {
   Component, ElementRef, EventEmitter, Input, OnInit, Output
 } from '@angular/core';
-import { RunService, OnRun } from '../run.service';
+import { RunService, OnExec } from '../run.service';
 
 
 @Component({
   selector: 'dv-button-last',
   templateUrl: './button-last.component.html'
 })
-export class ButtonLastComponent implements OnInit, OnRun {
+export class ButtonLastComponent implements OnInit, OnExec {
   @Input() disabled = false;
   @Input() of: any;
   @Output() last = new EventEmitter<any>();
@@ -20,10 +20,10 @@ export class ButtonLastComponent implements OnInit, OnRun {
   }
 
   onClick() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  dvOnRun() {
+  dvOnExec() {
     this.last.emit(this.of);
   }
 }
