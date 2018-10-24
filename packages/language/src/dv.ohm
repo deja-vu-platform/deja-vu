@@ -1,0 +1,39 @@
+Action {
+  Element = HtmlElement
+
+  HtmlElement = NormalElement | VoidElement
+
+  // Normal Element
+  NormalElement = StartTag Content EndTag
+  StartTag = "<" ElementName HtmlAttribute* ">"
+  EndTag = "</" ElementName ">"
+
+  // Void Element
+  VoidElement = "<" name HtmlAttribute* "/>"
+
+  HtmlAttribute = AttributeName "=" "\"" AttributeValue "\""
+
+  Content = (Text | HtmlElement)*
+  Text = (~"<" ~">" any)+
+  ElementName = name
+  AttributeName = name
+  AttributeValue = (~"\"" any)*
+  name = letter alnum*
+
+  comment = multiLineComment
+  eol = "\r"?"\n"
+  multiLineComment = "<!--" (~"-->" any)* "-->"
+
+  // from the es5 grammar example
+  space := whitespace | lineTerminator | comment
+  whitespace = "\t"
+             | "\x0B"    -- verticalTab
+             | "\x0C"    -- formFeed
+             | " "
+             | "\u00A0"  -- noBreakSpace
+             | "\uFEFF"  -- byteOrderMark
+             | unicodeSpaceSeparator
+  unicodeSpaceSeparator = "\u2000".."\u200B" | "\u3000"
+
+  lineTerminator = "\n" | "\r" | "\u2028" | "\u2029"
+}
