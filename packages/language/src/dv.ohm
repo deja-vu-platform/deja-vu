@@ -1,30 +1,64 @@
 Action {
-  Element = HtmlElement
-
-  HtmlElement = NormalElement | VoidElement
+  Element
+    = NormalElement -- normal
+    | VoidElement -- void
 
   // Normal Element
   NormalElement = StartTag Content EndTag
-  StartTag = "<" ElementName HtmlAttribute* ">"
+  StartTag = "<" ElementName Attribute* ">"
   EndTag = "</" ElementName ">"
 
   // Void Element
-  VoidElement = "<" name HtmlAttribute* "/>"
+  VoidElement = "<" ElementName Attribute* "/>"
 
-  HtmlAttribute = AttributeName "=" "\"" AttributeValue "\""
+  Attribute = AttributeName "=" AttributeValue
 
-  Content = (Text | HtmlElement)*
+  Content = (Text | Element)*
   Text = (~"<" ~">" any)+
-  ElementName = name
-  AttributeName = name
-  AttributeValue = (~"\"" any)*
-  name = letter alnum*
+  ElementName = ActionNameMaybeAlias | name
+  AttributeName = output | name
+  AttributeValue = Expr
+  ActionNameMaybeAlias = actionName ("as" name)?
+  actionName = name "." name
 
   comment = multiLineComment
   eol = "\r"?"\n"
   multiLineComment = "<!--" (~"-->" any)* "-->"
 
-  // from the es5 grammar example
+  // Exprs
+  Expr
+    = UnExpr -- un
+    | BinExpr -- bin
+    | Literal -- literal
+    | name -- symbol
+    | input -- input
+    | Element -- element
+
+  BinExpr
+    = Expr "+" Expr -- plus
+    | Expr "-" Expr -- minus
+    | Expr "and" Expr -- and
+    | Expr "or" Expr -- or
+    | Expr "." Expr -- dot
+
+  UnExpr
+    = "not" Expr -- not
+
+  Literal
+    = number -- number
+    | "\"" (~"\"" any)* "\"" -- text
+    | "true" -- true
+    | "false" -- false
+    | "{" ListOf<PropAssignment, ","> "}" -- obj
+    | "[" ListOf<Expr, ","> "]" -- array
+
+  PropAssignment = name ":" Expr
+
+  number = "-"? digit+
+  name = letter (alnum | "-")*
+  input = "$" name
+  output = name "$"
+
   space := whitespace | lineTerminator | comment
   whitespace = "\t"
              | "\x0B"    -- verticalTab

@@ -12,15 +12,15 @@ export class ActionCompiler {
   private readonly grammar;
   private readonly semantics;
 
-  private static GetSymbolsFromActionOperation(symbolTable: SymbolTable) {
+  private static GetSymbolsOperation(symbolTable: SymbolTable) {
     return {
-
+      Element: (element) => { return; }
     };
   }
 
   private static ToNgTemplateOperation(symbolTable: SymbolTable) {
     return {
-
+      Element: (element) => { return; }
     };
   }
 
@@ -33,9 +33,9 @@ export class ActionCompiler {
   compile(actionContents: string, symbolTable: SymbolTable) {
     this.semantics
       .addOperation(
-        'GetSymbols', ActionCompiler.GetSymbolsFromActionOperation(symbolTable))
+        'getSymbols', ActionCompiler.GetSymbolsOperation(symbolTable))
       .addOperation(
-        'ToNgTemplate', ActionCompiler.ToNgTemplateOperation(symbolTable));
+        'toNgTemplate', ActionCompiler.ToNgTemplateOperation(symbolTable));
 
     const matchResult = this.grammar.match(actionContents);
     if (matchResult.failed()) {
@@ -43,9 +43,9 @@ export class ActionCompiler {
     }
     const s = this.semantics(matchResult);
     console.log(JSON.stringify(symbolTable));
-    s.GetSymbols();
+    s.getSymbols();
     console.log(JSON.stringify(symbolTable));
-    s.ToNgTemplate();
+    s.toNgTemplate();
   }
 }
 
