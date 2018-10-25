@@ -9,7 +9,7 @@ import {
 import * as _ from 'lodash';
 
 import { Action } from '../include/include.component';
-import {OnExecCommit, RunService} from '../run.service';
+import { OnExecCommit, RunService } from '../run.service';
 
 
 @Component({
