@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -12,7 +12,7 @@ import {
   styleUrls: ['./claim-task.component.css']
 })
 export class ClaimTaskComponent implements
-  OnInit, OnRun, OnAfterCommit  {
+  OnInit, OnExec, OnExecCommit  {
   @Input() id;
   @Input() assigneeId;
   @Input() disabled = false;
@@ -29,10 +29,10 @@ export class ClaimTaskComponent implements
   }
 
   onClick() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  dvOnRun(): Promise<{data: any}> {
+  dvOnExec(): Promise<{data: any}> {
     return this.gs
       .post<{data: any}>('/graphql', {
         query: `mutation {
@@ -46,7 +46,7 @@ export class ClaimTaskComponent implements
       .toPromise();
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.disabled = true;
   }
 }

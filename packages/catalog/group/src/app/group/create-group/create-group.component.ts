@@ -9,8 +9,8 @@ import {
 } from '@angular/forms';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  Action, GatewayService, GatewayServiceFactory, OnExecAbort,
+  OnExecCommit, OnExec, RunService
 } from 'dv-core';
 
 import { ShowMemberComponent } from '../show-member/show-member.component';
@@ -26,7 +26,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-group.component.css']
 })
 export class CreateGroupComponent
-implements OnInit, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnExecCommit, OnExecAbort {
   @Input() id;
 
   @Input()
@@ -85,10 +85,10 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{data: any}>('/graphql', {
       query: `mutation CreateGroup($input: CreateGroupInput!) {
         createGroup(input: $input) {
@@ -105,7 +105,7 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
     .toPromise();
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     if (this.showOptionToSubmit) {
       this.newGroupSaved = true;
       this.newGroupError = '';
@@ -120,7 +120,7 @@ implements OnInit, OnAfterCommit, OnAfterAbort {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     if (this.showOptionToSubmit) {
       this.newGroupError = reason.message;
     }

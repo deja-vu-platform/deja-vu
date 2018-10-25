@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort,
+  OnExecCommit, OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -49,7 +49,7 @@ interface CreatePasskeyRes {
   ]
 })
 export class CreatePasskeyComponent
-  implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  implements OnInit, OnExec, OnExecCommit, OnExecAbort {
 
   // Presentation options
   @Input() randomPassword = false;
@@ -91,10 +91,10 @@ export class CreatePasskeyComponent
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     let passkey;
     if (this.signIn) {
       const res = await this.gs
@@ -137,7 +137,7 @@ export class CreatePasskeyComponent
     this.passkey.emit(passkey);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newPasskeyCreated = true;
     window.setTimeout(() => {
       this.newPasskeyCreated = false;
@@ -150,7 +150,7 @@ export class CreatePasskeyComponent
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newPasskeyError = reason.message;
   }
 }

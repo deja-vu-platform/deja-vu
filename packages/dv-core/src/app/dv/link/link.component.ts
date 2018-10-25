@@ -1,13 +1,13 @@
 import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { OnAfterCommit, RunService } from '../run.service';
+import { OnExecCommit, RunService } from '../run.service';
 
 
 @Component({
   selector: 'dv-link',
   templateUrl: './link.component.html'
 })
-export class LinkComponent implements OnInit, OnAfterCommit {
+export class LinkComponent implements OnInit, OnExecCommit {
   @Input() href: string;
 
   constructor(
@@ -19,10 +19,10 @@ export class LinkComponent implements OnInit, OnAfterCommit {
   }
 
   onClick() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.router.navigate([this.href]);
   }
 }

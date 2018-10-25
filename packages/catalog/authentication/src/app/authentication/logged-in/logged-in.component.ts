@@ -2,8 +2,7 @@ import {
   AfterViewInit, Component, ElementRef,
   EventEmitter, OnInit, Output
 } from '@angular/core';
-import { OnAfterAbort, OnAfterCommit, OnRun, RunService
-} from 'dv-core';
+import { RunService } from 'dv-core';
 
 import { AuthenticationService } from '../shared/authentication.service';
 

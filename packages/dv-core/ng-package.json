@@ -3,6 +3,6 @@
   "lib": {
     "entryFile": "public_api.ts"
   },
- "whitelistedNonPeerDependencies": ["uuid"],
+  "whitelistedNonPeerDependencies": ["uuid"],
   "dest": "pkg"
 }

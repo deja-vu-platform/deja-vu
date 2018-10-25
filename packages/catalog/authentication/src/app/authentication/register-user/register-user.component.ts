@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort,
+  OnExecCommit, OnExec, RunService
 } from 'dv-core';
 
 
@@ -45,7 +45,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   ]
 })
 export class RegisterUserComponent
-  implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+  implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -95,10 +95,10 @@ export class RegisterUserComponent
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const variables = {
       input: {
         id: this.id,
@@ -138,7 +138,7 @@ export class RegisterUserComponent
     this.user.emit(user);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newUserRegistered = true;
     window.setTimeout(() => {
       this.newUserRegistered = false;
@@ -150,7 +150,7 @@ export class RegisterUserComponent
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newUserRegisteredError = reason.message;
   }
 }

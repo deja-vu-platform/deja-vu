@@ -1,7 +1,9 @@
 import {
   Component, ElementRef, Inject, Input, OnChanges, OnInit
 } from '@angular/core';
-import { GatewayService, GatewayServiceFactory, RunService } from 'dv-core';
+import {
+  GatewayService, GatewayServiceFactory, OnExec, RunService
+} from 'dv-core';
 
 import * as _ from 'lodash';
 
@@ -18,7 +20,7 @@ interface VerifyRes {
   templateUrl: './validate.component.html',
   styleUrls: ['./validate.component.css']
 })
-export class ValidateComponent implements OnInit, OnChanges {
+export class ValidateComponent implements OnExec, OnInit, OnChanges {
   isValidated = false;
 
   private gs: GatewayService;
@@ -69,7 +71,7 @@ export class ValidateComponent implements OnInit, OnChanges {
       });
   }
 
-  dvOnRun() {
+  dvOnExec() {
     this.load();
   }
 }

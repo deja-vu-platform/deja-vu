@@ -9,8 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, RunService
 } from 'dv-core';
 
 import { User } from '../shared/authentication.model';

@@ -10,8 +10,7 @@ import {
 
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  Action, GatewayService, GatewayServiceFactory, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';

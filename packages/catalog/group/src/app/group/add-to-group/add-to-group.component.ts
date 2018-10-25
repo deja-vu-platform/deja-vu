@@ -9,8 +9,8 @@ import {
 } from '@angular/forms';
 
 import {
-  Action, GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  Action, GatewayService, GatewayServiceFactory, OnExecAbort,
+  OnExecCommit, OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -25,7 +25,8 @@ const SAVED_MSG_TIMEOUT = 3000;
   templateUrl: './add-to-group.component.html',
   styleUrls: ['./add-to-group.component.css']
 })
-export class AddToGroupComponent implements OnInit {
+export class AddToGroupComponent implements OnExec, OnExecAbort, OnExecCommit,
+  OnInit {
   @Input() id: string;
 
   @Input() set memberId(value: string | undefined) {
@@ -69,10 +70,10 @@ export class AddToGroupComponent implements OnInit {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{data: any}>('/graphql', {
       query: `mutation {
         addMember(
@@ -83,7 +84,7 @@ export class AddToGroupComponent implements OnInit {
     .toPromise();
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.addSaved = true;
     window.setTimeout(() => {
       this.addSaved = false;
@@ -95,7 +96,7 @@ export class AddToGroupComponent implements OnInit {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.addError = reason.message;
   }
 }

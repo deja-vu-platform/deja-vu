@@ -3,8 +3,8 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit,
-  OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit,
+  OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -25,7 +25,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-label.component.css']
 })
 export class CreateLabelComponent implements
-  OnInit, OnRun, OnAfterAbort, OnAfterCommit {
+  OnInit, OnExec, OnExecAbort, OnExecCommit {
   @Input() id: string | undefined;
   @Input() buttonLabel = 'Create Label';
 
@@ -52,10 +52,10 @@ export class CreateLabelComponent implements
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreateLabelRes>(this.apiPath, {
       query: `mutation {
           createLabel(id: "${this.id}") {
@@ -73,7 +73,7 @@ export class CreateLabelComponent implements
     this.label.emit(res.data.createLabel);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newLabelSaved = true;
     this.newLabelError = '';
     window.setTimeout(() => {
@@ -82,7 +82,7 @@ export class CreateLabelComponent implements
     this.id = '';
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newLabelError = reason.message;
   }
 }

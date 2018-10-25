@@ -3,8 +3,7 @@ import {
   Inject, Input, OnChanges, OnInit, Output
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -21,7 +20,7 @@ interface CanViewRes {
   templateUrl: './can-view.component.html',
   styleUrls: ['./can-view.component.css']
 })
-export class CanViewComponent implements OnInit, OnChanges, OnRun {
+export class CanViewComponent implements OnInit, OnChanges, OnExec {
   @Input() resourceId: string;
   @Input() principalId: string;
   @Output() canView = new EventEmitter<boolean>();
@@ -47,7 +46,7 @@ export class CanViewComponent implements OnInit, OnChanges, OnRun {
     this.doRequest();
   }
 
-  dvOnRun() {
+  dvOnExec() {
     this.doRequest();
   }
 

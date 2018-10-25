@@ -8,8 +8,8 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort,
+  OnExecCommit, OnExec, RunService
 } from 'dv-core';
 
 
@@ -31,7 +31,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./sign-in.component.css']
 })
 export class SignInComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string;
 
   @Input() inputLabel = 'Username';
@@ -75,10 +75,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<{ data: any, errors: any }>(this.apiPath, {
       query: `mutation SignIn($input: SignInInput!) {
         signIn(input: $input) {
@@ -112,7 +112,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     return user;
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newUserSignedIn = true;
     window.setTimeout(() => {
       this.newUserSignedIn = false;
@@ -124,7 +124,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newUserSignedInError = reason.message;
   }
 }

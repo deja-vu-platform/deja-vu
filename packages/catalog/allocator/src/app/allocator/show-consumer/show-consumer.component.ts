@@ -3,7 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnRun, RunService
+  GatewayService, GatewayServiceFactory, RunService
 } from 'dv-core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';

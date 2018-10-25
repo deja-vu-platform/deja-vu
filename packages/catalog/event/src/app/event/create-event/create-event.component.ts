@@ -7,7 +7,7 @@ import {
   Validators
 } from '@angular/forms';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -25,7 +25,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-event.component.css']
 })
 export class CreateEventComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
 
@@ -65,10 +65,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs
       .post<{data: any}>('/graphql', {
         query: `mutation CreateEvent($input: CreateEventInput!) {
@@ -89,7 +89,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
      .toPromise();
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     if (this.showOptionToSubmit) {
       this.createEventSaved = true;
       window.setTimeout(() => {
@@ -103,7 +103,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     if (this.showOptionToSubmit) {
       this.createEventError = reason.message;
     }

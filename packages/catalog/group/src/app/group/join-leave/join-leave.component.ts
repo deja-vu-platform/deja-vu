@@ -3,8 +3,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
-  RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -19,7 +18,7 @@ import { Group } from '../shared/group.model';
   templateUrl: './join-leave.component.html',
   styleUrls: ['./join-leave.component.css']
 })
-export class JoinLeaveComponent implements OnInit {
+export class JoinLeaveComponent implements OnExec, OnInit {
   @Input() memberId: string;
   // One of `group` or `groupId` is required
   @Input() group: Group;
@@ -39,11 +38,11 @@ export class JoinLeaveComponent implements OnInit {
   }
 
   joinGroup() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
   leaveGroup() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
   load() {
@@ -70,7 +69,7 @@ export class JoinLeaveComponent implements OnInit {
     });
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     if (!this.gs) {
       return;
     }

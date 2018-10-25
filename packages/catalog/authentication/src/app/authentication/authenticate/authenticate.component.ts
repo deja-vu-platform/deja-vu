@@ -4,8 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort,
-  OnAfterCommit, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 
 import { AuthenticationService } from '../shared/authentication.service';
@@ -20,7 +19,7 @@ import { API_PATH } from '../authentication.config';
   templateUrl: './authenticate.component.html',
   styleUrls: ['./authenticate.component.css']
 })
-export class AuthenticateComponent implements OnInit, OnChanges {
+export class AuthenticateComponent implements OnExec, OnInit, OnChanges {
   @Input() id: string;
   isAuthenticated = false;
 
@@ -45,7 +44,7 @@ export class AuthenticateComponent implements OnInit, OnChanges {
     this.doRequest();
   }
 
-  dvOnRun() {
+  dvOnExec() {
     this.doRequest();
   }
 

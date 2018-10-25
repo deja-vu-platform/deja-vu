@@ -3,8 +3,7 @@ import {
   Input, OnChanges, OnInit, Output, SimpleChanges, Type
 } from '@angular/core';
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit,
-  OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExec, RunService
 } from 'dv-core';
 import { take } from 'rxjs/operators';
 
@@ -28,7 +27,7 @@ interface RatingRes {
   styleUrls: ['./rate-target.component.css']
 })
 export class RateTargetComponent implements
-  OnInit, OnChanges, OnRun, OnAfterAbort {
+  OnInit, OnChanges, OnExec, OnExecAbort {
   @Input() sourceId: string;
   sourceIdChange = new EventEmitter<void>();
   @Input() targetId: string;
@@ -64,13 +63,13 @@ export class RateTargetComponent implements
   setRating($event) {
     this.prevRatingValue = this.ratingValue;
     this.ratingValue = $event.rating;
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
   /**
    * Sync the rating on the server with the rating on the client.
    */
-  async dvOnRun() {
+  async dvOnExec() {
     if (this.sourceId === undefined) {
       await this.sourceIdChange.asObservable()
         .pipe(take(1))
@@ -100,7 +99,7 @@ export class RateTargetComponent implements
       });
   }
 
-  dvOnAfterAbort() {
+  dvOnExecAbort() {
     this.ratingValue = this.prevRatingValue;
     this.rating.emit(this.ratingValue);
   }

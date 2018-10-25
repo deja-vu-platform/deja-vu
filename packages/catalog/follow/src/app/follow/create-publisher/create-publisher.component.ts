@@ -3,8 +3,8 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit,
-  OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit,
+  OnExec, RunService
 } from 'dv-core';
 
 import * as _ from 'lodash';
@@ -24,7 +24,7 @@ interface CreatePublisherRes {
   styleUrls: ['./create-publisher.component.css']
 })
 export class CreatePublisherComponent implements
-  OnInit, OnRun, OnAfterAbort, OnAfterCommit {
+  OnInit, OnExec, OnExecAbort, OnExecCommit {
   @Input() id: string | undefined;
   @Input() buttonLabel = 'Create Publisher';
 
@@ -51,10 +51,10 @@ export class CreatePublisherComponent implements
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreatePublisherRes>(this.apiPath, {
       query: `mutation {
           createPublisher(id: "${this.id}") {
@@ -72,7 +72,7 @@ export class CreatePublisherComponent implements
     this.publisher.emit({ id: res.data.createPublisher.id });
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newPublisherSaved = true;
     this.newPublisherError = '';
     window.setTimeout(() => {
@@ -81,7 +81,7 @@ export class CreatePublisherComponent implements
     this.id = '';
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newPublisherError = reason.message;
   }
 }

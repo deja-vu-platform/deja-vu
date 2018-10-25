@@ -9,7 +9,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -43,7 +43,7 @@ interface CreateMessageRes {
   ]
 })
 export class CreateMessageComponent implements
-  OnInit, OnRun, OnAfterAbort, OnAfterCommit {
+  OnInit, OnExec, OnExecAbort, OnExecCommit {
   @Input() id: string | undefined;
   @Input() publisherId: string;
 
@@ -78,10 +78,10 @@ export class CreateMessageComponent implements
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const res = await this.gs.post<CreateMessageRes>(this.apiPath, {
       query: `mutation CreateMessage($input: CreateMessageInput!) {
             createMessage(input: $input) {
@@ -110,7 +110,7 @@ export class CreateMessageComponent implements
     });
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     this.newMessageSaved = true;
     this.newMessageError = '';
     window.setTimeout(() => {
@@ -123,7 +123,7 @@ export class CreateMessageComponent implements
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     this.newMessageError = reason.message;
   }
 }

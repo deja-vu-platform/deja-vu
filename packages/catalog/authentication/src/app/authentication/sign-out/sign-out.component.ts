@@ -2,7 +2,7 @@ import {
   Component, ElementRef, EventEmitter,
   Input, OnInit
 } from '@angular/core';
-import { OnRun, RunService } from 'dv-core';
+import { OnExec, RunService } from 'dv-core';
 
 import * as _ from 'lodash';
 
@@ -14,7 +14,7 @@ import { AuthenticationService } from '../shared/authentication.service';
   templateUrl: './sign-out.component.html',
   styleUrls: ['./sign-out.component.css']
 })
-export class SignOutComponent implements OnInit, OnRun {
+export class SignOutComponent implements OnInit, OnExec {
   @Input() buttonLabel = 'Sign Out';
 
   constructor(
@@ -26,10 +26,10 @@ export class SignOutComponent implements OnInit, OnRun {
   }
 
   signOut() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  dvOnRun() {
+  dvOnExec() {
     this.authenticationService.signOut();
   }
 }

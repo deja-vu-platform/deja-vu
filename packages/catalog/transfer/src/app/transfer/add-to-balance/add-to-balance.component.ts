@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -30,7 +30,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./add-to-balance.component.css']
 })
 export class AddToBalanceComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputBalance = true;
 
@@ -77,10 +77,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun() {
+  async dvOnExec() {
     const res = await this.gs.post<CreateTransferRes>(this.apiPath, {
       query: `
         mutation AddToBalance($input: AddToBalanceInput!) {
@@ -105,7 +105,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
    this.transfer.emit(res.data.addToBalance);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     if (this.showOptionToSubmit && this.save) {
       this.newTransferSaved = true;
       this.newTransferError = '';
@@ -120,7 +120,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
      }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     if (this.showOptionToSubmit && this.save) {
       this.newTransferError = reason.message;
     }

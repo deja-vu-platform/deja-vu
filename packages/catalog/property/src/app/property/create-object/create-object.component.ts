@@ -8,7 +8,11 @@ import {
 } from '@angular/forms';
 
 import {
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService,
+  GatewayServiceFactory,
+  OnExecAbort,
+  OnExecCommit,
+  OnExec,
   RunService
 } from 'dv-core';
 
@@ -34,7 +38,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-object.component.css']
 })
 export class CreateObjectComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string | undefined;
   savedInitialValue: ValueMap;
   @Input() set initialValue(value: ValueMap) {
@@ -109,10 +113,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun(): Promise<void> {
+  async dvOnExec(): Promise<void> {
     const input = { id: this.id };
     for (const property of this.properties) {
       input[property.name] = this[property.name].value;
@@ -138,7 +142,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     this.object.emit(input);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     if (this.showOptionToSubmit && this.save) {
       this.newObjectSaved = true;
       window.setTimeout(() => {
@@ -152,7 +156,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
     }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     if (this.showOptionToSubmit && this.save) {
       this.newObjectError = reason.message;
     }

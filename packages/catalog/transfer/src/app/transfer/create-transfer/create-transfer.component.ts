@@ -9,7 +9,7 @@ import {
 
 import {
   Action,
-  GatewayService, GatewayServiceFactory, OnAfterAbort, OnAfterCommit, OnRun,
+  GatewayService, GatewayServiceFactory, OnExecAbort, OnExecCommit, OnExec,
   RunService
 } from 'dv-core';
 
@@ -32,7 +32,7 @@ const SAVED_MSG_TIMEOUT = 3000;
   styleUrls: ['./create-transfer.component.css']
 })
 export class CreateTransferComponent
-implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
+implements OnInit, OnExec, OnExecCommit, OnExecAbort {
   @Input() id: string | undefined = '';
   @Input() showOptionToSubmit = true;
   @Input() showOptionToInputAmount = true;
@@ -90,10 +90,10 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
   }
 
   onSubmit() {
-    this.rs.run(this.elem);
+    this.rs.exec(this.elem);
   }
 
-  async dvOnRun() {
+  async dvOnExec() {
     const res = await this.gs.post<CreateTransferRes>(this.apiPath, {
       query: `
         mutation CreateTransfer($input: CreateTransferInput!) {
@@ -120,7 +120,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
    this.transfer.emit(res.data.createTransfer);
   }
 
-  dvOnAfterCommit() {
+  dvOnExecCommit() {
     if (this.showOptionToSubmit && this.save) {
       this.newTransferSaved = true;
       this.newTransferError = '';
@@ -135,7 +135,7 @@ implements OnInit, OnRun, OnAfterCommit, OnAfterAbort {
      }
   }
 
-  dvOnAfterAbort(reason: Error) {
+  dvOnExecAbort(reason: Error) {
     if (this.showOptionToSubmit && this.save) {
       this.newTransferError = reason.message;
     }

@@ -4,7 +4,7 @@ import {
 } from '@angular/core';
 
 import {
-  GatewayService, GatewayServiceFactory, OnRun, RunService
+  GatewayService, GatewayServiceFactory, OnExec, RunService
 } from 'dv-core';
 import { Observable } from 'rxjs/Observable';
 import { map, take } from 'rxjs/operators';
@@ -21,7 +21,7 @@ interface DeleteResourceRes {
   templateUrl: './delete-resource.component.html',
   styleUrls: ['./delete-resource.component.css']
 })
-export class DeleteResourceComponent implements OnInit, OnChanges, OnRun {
+export class DeleteResourceComponent implements OnInit, OnChanges, OnExec {
   @Input() resourceId: string;
   @Input() allocationId: string;
   resourceIdChange = new EventEmitter();
@@ -49,7 +49,7 @@ export class DeleteResourceComponent implements OnInit, OnChanges, OnRun {
     }
   }
 
-  async dvOnRun(): Promise<any> {
+  async dvOnExec(): Promise<any> {
     if (this.resourceId === undefined) {
       await this.resourceIdChange.asObservable()
         .toPromise();
