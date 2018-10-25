@@ -23,7 +23,6 @@
   },
   "private": true,
   "dependencies": {
-    "dv-core": "file:../../dv-core/pkg",
     "jsonwebtoken": "^8.2.0",
     "sha.js": "^2.4.11"
   },
@@ -52,6 +51,7 @@
     "codelyzer": "^4.0.1",
     "concurrently": "^3.5.1",
     "core-js": "^2.4.1",
+    "dv-core": "file:../../dv-core/pkg",
     "dv-gateway": "file:../../dv-gateway",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.1",
